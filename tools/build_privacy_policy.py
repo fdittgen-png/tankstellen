@@ -31,7 +31,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 OUT_ROOT = REPO_ROOT / "docs" / "privacy-policy"
-LAST_UPDATED_ISO = "2026-05-09"
+LAST_UPDATED_ISO = "2026-08-15"
 
 # Locale → relative URL path used in the language switcher.
 LOCALE_URLS = {
@@ -74,7 +74,7 @@ TRANSLATIONS = {
         "page_title": "Sparkilo — Privacy Policy",
         "h1": "Privacy Policy",
         "meta_app": "Sparkilo (de.tankstellen.tankstellen on iOS, de.tankstellen.fuelprices on Android)",
-        "meta_last_updated": "Last updated: 9 May 2026",
+        "meta_last_updated": "Last updated: 15 August 2026",
         "h2_overview": "1. Overview",
         "p_overview": (
             "Sparkilo (formerly known as Fuel Prices Europe & More) is a free, open-source fuel and "
@@ -83,12 +83,14 @@ TRANSLATIONS = {
             "advertising identifiers."
         ),
         "h2_collected": "2. Data we use",
-        "h3_location": "2.1 Approximate location",
+        "h3_location": "2.1 Location",
         "p_location": (
-            "When you grant location permission, the app reads your approximate position to find nearby "
-            "fuel and charging stations. Coordinates are sent to third-party price APIs (see Section 4) "
-            "as part of the search query. Your location is <strong>not stored on any server we operate</strong> "
-            "and is never used for tracking or profiling."
+            "When you grant location permission, the app reads your position to find nearby fuel and "
+            "charging stations; those search coordinates are sent to third-party price APIs (see Section "
+            "4) as part of the search query and are not stored on any server we operate. If you use trip "
+            "recording, the app additionally records your <strong>precise GPS route</strong>; recorded "
+            "trips are stored on your device and, only if you enable TankSync, synced to your TankSync "
+            "backend. Recorded trips are never shared with third parties."
         ),
         "h3_apikey": "2.2 API keys you provide",
         "p_apikey": (
@@ -103,10 +105,15 @@ TRANSLATIONS = {
         ),
         "h3_sync": "2.4 TankSync (optional cloud sync)",
         "p_sync_intro": "If you opt in to TankSync, an anonymous account is created via Supabase. The data synced is:",
-        "li_sync_id": "Anonymous user identifier (a UUID — no email or name)",
+        "li_sync_id": (
+            "User identifier — anonymous UUID by default; you can optionally link an e-mail address to "
+            "your TankSync account for cross-device sync"
+        ),
         "li_sync_fav": "Favorite station IDs",
         "li_sync_alerts": "Price alert configurations",
         "li_sync_reports": "Community price reports (station ID, fuel type, price, timestamp)",
+        "li_sync_trips": "Recorded trips (GPS route, distances, consumption statistics)",
+        "li_sync_fillups": "Fill-ups (cost, litres, odometer) and vehicle profiles",
         "p_sync_outro": (
             "TankSync is optional and disabled by default. You can view, export and delete all "
             "server-side data from the Data Transparency screen inside the app."
@@ -118,7 +125,10 @@ TRANSLATIONS = {
             "included. Diagnostic reporting is off by default."
         ),
         "h2_not_collected": "3. Data we do NOT collect",
-        "li_nc_email": "Name, email address or phone number",
+        "li_nc_email": (
+            "Name or phone number (an e-mail address is only stored if you explicitly link one to your "
+            "optional TankSync account)"
+        ),
         "li_nc_payment": "Financial or payment information",
         "li_nc_health": "Health or fitness data",
         "li_nc_contacts": "Contacts, messages or call logs",
@@ -154,17 +164,36 @@ TRANSLATIONS = {
         "li_r_export": "<strong>Export</strong> — export your TankSync data as JSON from the Data Transparency screen.",
         "li_r_delete": "<strong>Delete</strong> — delete all local data via Settings → Delete all data; delete all server data via TankSync → Data Transparency → Delete everything.",
         "li_r_withdraw": "<strong>Withdraw consent</strong> — revoke location permission in your device settings, or disable TankSync / diagnostics, at any time.",
-        "h2_children": "7. Children's privacy",
+        "h2_deletion": "7. Deleting your account and data",
+        "p_deletion_intro": (
+            "You can delete everything yourself, directly in the app — no support request needed:"
+        ),
+        "li_del_local": (
+            "<strong>Local data:</strong> Settings → Delete all data removes all profiles, favorites, "
+            "API keys, cached prices, recorded trips and settings from your device."
+        ),
+        "li_del_account": (
+            "<strong>TankSync account and server data:</strong> TankSync → Data Transparency → Delete "
+            "account first wipes every row you own (favorites, alerts, price reports, vehicles, "
+            "fill-ups, trips, ratings) and then deletes the account identity itself, including any "
+            "linked e-mail address. This cannot be undone."
+        ),
+        "p_deletion_fallback": (
+            "If you can no longer access the app, you can request deletion by contacting the developer "
+            "(Section 10); please write from the e-mail address linked to your account so we can "
+            "verify ownership."
+        ),
+        "h2_children": "8. Children's privacy",
         "p_children": (
             "The app is not directed at children under 13. We do not knowingly collect personal "
             "information from children."
         ),
-        "h2_changes": "8. Changes to this policy",
+        "h2_changes": "9. Changes to this policy",
         "p_changes": (
             "We may update this policy from time to time. Changes will be published at this URL with "
             "an updated date. Continued use of the app constitutes acceptance of the updated policy."
         ),
-        "h2_contact": "9. Contact",
+        "h2_contact": "10. Contact",
         "contact_dev_label": "Developer",
         "contact_email_label": "Email",
         "contact_source_label": "Source code",
@@ -176,7 +205,7 @@ TRANSLATIONS = {
         "page_title": "Sparkilo — Datenschutzerklärung",
         "h1": "Datenschutzerklärung",
         "meta_app": "Sparkilo (de.tankstellen.tankstellen unter iOS, de.tankstellen.fuelprices unter Android)",
-        "meta_last_updated": "Stand: 9. Mai 2026",
+        "meta_last_updated": "Stand: 15. August 2026",
         "h2_overview": "1. Überblick",
         "p_overview": (
             "Sparkilo (vormals Fuel Prices Europe & More) ist eine kostenlose, quelloffene App zum "
@@ -185,13 +214,15 @@ TRANSLATIONS = {
             "kein Tracking und keine Werbe-IDs."
         ),
         "h2_collected": "2. Verwendete Daten",
-        "h3_location": "2.1 Ungefährer Standort",
+        "h3_location": "2.1 Standort",
         "p_location": (
-            "Wenn Sie den Standortzugriff erlauben, liest die App Ihre ungefähre Position aus, um "
-            "nahegelegene Tankstellen und Ladesäulen zu finden. Die Koordinaten werden als Teil der "
-            "Suchanfrage an Drittanbieter-APIs gesendet (siehe Abschnitt 4). Ihr Standort wird "
-            "<strong>auf keinem von uns betriebenen Server gespeichert</strong> und niemals zum "
-            "Tracking oder Profiling verwendet."
+            "Wenn Sie den Standortzugriff erlauben, liest die App Ihre Position aus, um nahegelegene "
+            "Tankstellen und Ladesäulen zu finden; diese Suchkoordinaten werden als Teil der "
+            "Suchanfrage an Drittanbieter-APIs gesendet (siehe Abschnitt 4) und nicht auf einem von uns "
+            "betriebenen Server gespeichert. Wenn Sie die Fahrtenaufzeichnung nutzen, zeichnet die App "
+            "zusätzlich Ihre <strong>präzise GPS-Route</strong> auf; aufgezeichnete Fahrten werden auf "
+            "Ihrem Gerät gespeichert und, nur wenn Sie TankSync aktivieren, mit Ihrem TankSync-Backend "
+            "synchronisiert. Aufgezeichnete Fahrten werden niemals an Dritte weitergegeben."
         ),
         "h3_apikey": "2.2 Eigene API-Schlüssel",
         "p_apikey": (
@@ -207,10 +238,15 @@ TRANSLATIONS = {
         ),
         "h3_sync": "2.4 TankSync (optionale Cloud-Synchronisation)",
         "p_sync_intro": "Wenn Sie TankSync aktivieren, wird über Supabase ein anonymes Konto angelegt. Synchronisiert werden:",
-        "li_sync_id": "Anonyme Benutzer-ID (UUID — keine E-Mail-Adresse, kein Name)",
+        "li_sync_id": (
+            "Benutzerkennung — standardmäßig anonyme UUID; Sie können optional eine E-Mail-Adresse mit "
+            "Ihrem TankSync-Konto verknüpfen, um geräteübergreifend zu synchronisieren"
+        ),
         "li_sync_fav": "Favoriten-Stationen-IDs",
         "li_sync_alerts": "Konfigurationen für Preisalarme",
         "li_sync_reports": "Community-Preismeldungen (Stations-ID, Kraftstoffart, Preis, Zeitstempel)",
+        "li_sync_trips": "Aufgezeichnete Fahrten (GPS-Route, Distanzen, Verbrauchsstatistiken)",
+        "li_sync_fillups": "Tankvorgänge (Kosten, Liter, Kilometerstand) und Fahrzeugprofile",
         "p_sync_outro": (
             "TankSync ist optional und standardmäßig deaktiviert. Sie können sämtliche serverseitigen "
             "Daten im Bildschirm „Datentransparenz“ in der App einsehen, exportieren und löschen."
@@ -223,7 +259,10 @@ TRANSLATIONS = {
             "standardmäßig deaktiviert."
         ),
         "h2_not_collected": "3. Daten, die wir NICHT erheben",
-        "li_nc_email": "Name, E-Mail-Adresse oder Telefonnummer",
+        "li_nc_email": (
+            "Name oder Telefonnummer (eine E-Mail-Adresse wird nur gespeichert, wenn Sie sie "
+            "ausdrücklich mit Ihrem optionalen TankSync-Konto verknüpfen)"
+        ),
         "li_nc_payment": "Finanz- oder Zahlungsdaten",
         "li_nc_health": "Gesundheits- oder Fitnessdaten",
         "li_nc_contacts": "Kontakte, Nachrichten oder Anrufprotokolle",
@@ -259,18 +298,39 @@ TRANSLATIONS = {
         "li_r_export": "<strong>Export</strong> — Sie können Ihre TankSync-Daten im Bildschirm „Datentransparenz“ als JSON exportieren.",
         "li_r_delete": "<strong>Löschung</strong> — alle lokalen Daten über Einstellungen → Alle Daten löschen; alle Serverdaten über TankSync → Datentransparenz → Alles löschen.",
         "li_r_withdraw": "<strong>Widerruf</strong> — Sie können den Standortzugriff in den Geräteeinstellungen jederzeit widerrufen oder TankSync / Diagnose jederzeit deaktivieren.",
-        "h2_children": "7. Datenschutz für Kinder",
+        "h2_deletion": "7. Löschen Ihres Kontos und Ihrer Daten",
+        "p_deletion_intro": (
+            "Sie können alles selbst löschen, direkt in der App — ohne Support-Anfrage:"
+        ),
+        "li_del_local": (
+            "<strong>Lokale Daten:</strong> Einstellungen → Alle Daten löschen entfernt alle Profile, "
+            "Favoriten, API-Schlüssel, zwischengespeicherten Preise, aufgezeichneten Fahrten und "
+            "Einstellungen von Ihrem Gerät."
+        ),
+        "li_del_account": (
+            "<strong>TankSync-Konto und Serverdaten:</strong> TankSync → Datentransparenz → Konto "
+            "löschen entfernt zunächst jeden Datensatz, der Ihnen gehört (Favoriten, Preisalarme, "
+            "Preismeldungen, Fahrzeuge, Tankvorgänge, Fahrten, Bewertungen), und löscht anschließend "
+            "die Kontoidentität selbst, einschließlich einer verknüpften E-Mail-Adresse. Dies kann "
+            "nicht rückgängig gemacht werden."
+        ),
+        "p_deletion_fallback": (
+            "Wenn Sie keinen Zugriff mehr auf die App haben, können Sie die Löschung beantragen, indem "
+            "Sie den Entwickler kontaktieren (Abschnitt 10); schreiben Sie bitte von der mit Ihrem "
+            "Konto verknüpften E-Mail-Adresse, damit wir die Inhaberschaft überprüfen können."
+        ),
+        "h2_children": "8. Datenschutz für Kinder",
         "p_children": (
             "Die App richtet sich nicht an Kinder unter 13 Jahren. Wir erheben wissentlich keine "
             "personenbezogenen Daten von Kindern."
         ),
-        "h2_changes": "8. Änderungen dieser Erklärung",
+        "h2_changes": "9. Änderungen dieser Erklärung",
         "p_changes": (
             "Wir können diese Datenschutzerklärung von Zeit zu Zeit aktualisieren. Änderungen werden "
             "unter dieser URL mit aktualisiertem Datum veröffentlicht. Die fortgesetzte Nutzung der "
             "App gilt als Zustimmung zur aktualisierten Fassung."
         ),
-        "h2_contact": "9. Kontakt",
+        "h2_contact": "10. Kontakt",
         "contact_dev_label": "Entwickler",
         "contact_email_label": "E-Mail",
         "contact_source_label": "Quellcode",
@@ -282,7 +342,7 @@ TRANSLATIONS = {
         "page_title": "Sparkilo — Politique de confidentialité",
         "h1": "Politique de confidentialité",
         "meta_app": "Sparkilo (de.tankstellen.tankstellen sous iOS, de.tankstellen.fuelprices sous Android)",
-        "meta_last_updated": "Dernière mise à jour : 9 mai 2026",
+        "meta_last_updated": "Dernière mise à jour : 15 août 2026",
         "h2_overview": "1. Aperçu",
         "p_overview": (
             "Sparkilo (anciennement Fuel Prices Europe & More) est une application open-source et "
@@ -291,13 +351,16 @@ TRANSLATIONS = {
             "Pas de publicité, pas de pixels de suivi, pas d'identifiants publicitaires."
         ),
         "h2_collected": "2. Données utilisées",
-        "h3_location": "2.1 Position approximative",
+        "h3_location": "2.1 Position",
         "p_location": (
-            "Lorsque vous accordez l'autorisation de localisation, l'app lit votre position "
-            "approximative pour trouver les stations à proximité. Les coordonnées sont envoyées aux "
-            "API tierces (voir section 4) dans le cadre de la requête. Votre position "
-            "<strong>n'est stockée sur aucun serveur que nous exploitons</strong> et n'est jamais "
-            "utilisée à des fins de suivi ou de profilage."
+            "Lorsque vous accordez l'autorisation de localisation, l'app lit votre position pour "
+            "trouver les stations et les bornes de recharge à proximité ; ces coordonnées de recherche "
+            "sont envoyées aux API tierces (voir section 4) dans le cadre de la requête et ne sont "
+            "stockées sur aucun serveur que nous exploitons. Si vous utilisez l'enregistrement de "
+            "trajets, l'app enregistre en outre votre <strong>itinéraire GPS précis</strong> ; les "
+            "trajets enregistrés sont stockés sur votre appareil et, uniquement si vous activez "
+            "TankSync, synchronisés avec votre backend TankSync. Les trajets enregistrés ne sont "
+            "jamais partagés avec des tiers."
         ),
         "h3_apikey": "2.2 Clés d'API que vous fournissez",
         "p_apikey": (
@@ -312,10 +375,15 @@ TRANSLATIONS = {
         ),
         "h3_sync": "2.4 TankSync (synchronisation cloud optionnelle)",
         "p_sync_intro": "Si vous activez TankSync, un compte anonyme est créé via Supabase. Les données synchronisées sont :",
-        "li_sync_id": "Identifiant utilisateur anonyme (UUID — sans e-mail ni nom)",
+        "li_sync_id": (
+            "Identifiant utilisateur — UUID anonyme par défaut ; vous pouvez éventuellement associer "
+            "une adresse e-mail à votre compte TankSync pour la synchronisation multi-appareils"
+        ),
         "li_sync_fav": "Identifiants des stations favorites",
         "li_sync_alerts": "Configurations d'alertes de prix",
         "li_sync_reports": "Signalements communautaires de prix (ID de station, type de carburant, prix, horodatage)",
+        "li_sync_trips": "Trajets enregistrés (itinéraire GPS, distances, statistiques de consommation)",
+        "li_sync_fillups": "Pleins (coût, litres, kilométrage) et profils de véhicule",
         "p_sync_outro": (
             "TankSync est optionnel et désactivé par défaut. Vous pouvez consulter, exporter et "
             "supprimer toutes les données côté serveur depuis l'écran « Transparence des données » "
@@ -328,7 +396,10 @@ TRANSLATIONS = {
             "position ou contenu n'est transmis. Les diagnostics sont désactivés par défaut."
         ),
         "h2_not_collected": "3. Données NON collectées",
-        "li_nc_email": "Nom, adresse e-mail ou numéro de téléphone",
+        "li_nc_email": (
+            "Nom ou numéro de téléphone (une adresse e-mail n'est stockée que si vous l'associez "
+            "explicitement à votre compte TankSync facultatif)"
+        ),
         "li_nc_payment": "Informations financières ou de paiement",
         "li_nc_health": "Données de santé ou de fitness",
         "li_nc_contacts": "Contacts, messages ou journaux d'appels",
@@ -364,18 +435,40 @@ TRANSLATIONS = {
         "li_r_export": "<strong>Export</strong> — exporter vos données TankSync au format JSON depuis l'écran Transparence des données.",
         "li_r_delete": "<strong>Suppression</strong> — supprimer toutes les données locales via Réglages → Tout supprimer ; supprimer toutes les données serveur via TankSync → Transparence des données → Tout supprimer.",
         "li_r_withdraw": "<strong>Retrait du consentement</strong> — révoquer l'autorisation de localisation dans les réglages système ou désactiver TankSync / les diagnostics à tout moment.",
-        "h2_children": "7. Confidentialité des enfants",
+        "h2_deletion": "7. Suppression de votre compte et de vos données",
+        "p_deletion_intro": (
+            "Vous pouvez tout supprimer vous-même, directement dans l'app — aucune demande "
+            "d'assistance nécessaire :"
+        ),
+        "li_del_local": (
+            "<strong>Données locales :</strong> Réglages → Tout supprimer retire tous les profils, "
+            "favoris, clés d'API, prix mis en cache, trajets enregistrés et paramètres de votre "
+            "appareil."
+        ),
+        "li_del_account": (
+            "<strong>Compte TankSync et données serveur :</strong> TankSync → Transparence des "
+            "données → Supprimer le compte efface d'abord chaque enregistrement vous appartenant "
+            "(favoris, alertes, signalements de prix, véhicules, pleins, trajets, évaluations), puis "
+            "supprime l'identité du compte elle-même, y compris toute adresse e-mail associée. Cette "
+            "action est irréversible."
+        ),
+        "p_deletion_fallback": (
+            "Si vous ne pouvez plus accéder à l'app, vous pouvez demander la suppression en "
+            "contactant le développeur (section 10) ; merci d'écrire depuis l'adresse e-mail associée "
+            "à votre compte afin que nous puissions vérifier que vous en êtes bien le titulaire."
+        ),
+        "h2_children": "8. Confidentialité des enfants",
         "p_children": (
             "L'application ne s'adresse pas aux enfants de moins de 13 ans. Nous ne collectons "
             "pas sciemment d'informations personnelles auprès d'enfants."
         ),
-        "h2_changes": "8. Modifications de cette politique",
+        "h2_changes": "9. Modifications de cette politique",
         "p_changes": (
             "Cette politique peut être mise à jour de temps à autre. Les modifications seront "
             "publiées à cette URL avec une date mise à jour. L'utilisation continue de l'application "
             "vaut acceptation de la version mise à jour."
         ),
-        "h2_contact": "9. Contact",
+        "h2_contact": "10. Contact",
         "contact_dev_label": "Développeur",
         "contact_email_label": "E-mail",
         "contact_source_label": "Code source",
@@ -387,7 +480,7 @@ TRANSLATIONS = {
         "page_title": "Sparkilo — Política de privacidad",
         "h1": "Política de privacidad",
         "meta_app": "Sparkilo (de.tankstellen.tankstellen en iOS, de.tankstellen.fuelprices en Android)",
-        "meta_last_updated": "Última actualización: 9 de mayo de 2026",
+        "meta_last_updated": "Última actualización: 15 de agosto de 2026",
         "h2_overview": "1. Resumen",
         "p_overview": (
             "Sparkilo (antes Fuel Prices Europe & More) es una aplicación gratuita y de código "
@@ -396,13 +489,15 @@ TRANSLATIONS = {
             "Sin anuncios, sin píxeles de seguimiento, sin identificadores publicitarios."
         ),
         "h2_collected": "2. Datos que utilizamos",
-        "h3_location": "2.1 Ubicación aproximada",
+        "h3_location": "2.1 Ubicación",
         "p_location": (
-            "Cuando concede el permiso de ubicación, la app lee su posición aproximada para "
-            "encontrar gasolineras y puntos de recarga cercanos. Las coordenadas se envían a "
-            "APIs de terceros (ver sección 4) como parte de la consulta. Su ubicación "
-            "<strong>no se almacena en ningún servidor que operemos</strong> y nunca se utiliza "
-            "para seguimiento o perfilado."
+            "Cuando concede el permiso de ubicación, la app lee su posición para encontrar "
+            "gasolineras y puntos de recarga cercanos; esas coordenadas de búsqueda se envían a APIs "
+            "de terceros (ver sección 4) como parte de la consulta y no se almacenan en ningún "
+            "servidor que operemos. Si utiliza el registro de rutas, la app también registra su "
+            "<strong>ruta GPS precisa</strong>; las rutas registradas se almacenan en su dispositivo "
+            "y, solo si activa TankSync, se sincronizan con su backend de TankSync. Las rutas "
+            "registradas nunca se comparten con terceros."
         ),
         "h3_apikey": "2.2 Claves de API que usted proporciona",
         "p_apikey": (
@@ -417,10 +512,16 @@ TRANSLATIONS = {
         ),
         "h3_sync": "2.4 TankSync (sincronización en la nube opcional)",
         "p_sync_intro": "Si activa TankSync, se crea una cuenta anónima en Supabase. Los datos sincronizados son:",
-        "li_sync_id": "Identificador anónimo de usuario (UUID — sin correo ni nombre)",
+        "li_sync_id": (
+            "Identificador de usuario — UUID anónimo de forma predeterminada; opcionalmente puede "
+            "vincular una dirección de correo electrónico a su cuenta de TankSync para la "
+            "sincronización entre dispositivos"
+        ),
         "li_sync_fav": "IDs de gasolineras favoritas",
         "li_sync_alerts": "Configuraciones de alertas de precio",
         "li_sync_reports": "Reportes comunitarios de precios (ID de gasolinera, tipo de combustible, precio, marca temporal)",
+        "li_sync_trips": "Rutas registradas (ruta GPS, distancias, estadísticas de consumo)",
+        "li_sync_fillups": "Repostajes (coste, litros, kilometraje) y perfiles de vehículo",
         "p_sync_outro": (
             "TankSync es opcional y está desactivado por defecto. Puede ver, exportar y eliminar "
             "todos los datos del servidor desde la pantalla « Transparencia de datos » dentro de la app."
@@ -432,7 +533,10 @@ TRANSLATIONS = {
             "contenido. Los diagnósticos están desactivados por defecto."
         ),
         "h2_not_collected": "3. Datos que NO recogemos",
-        "li_nc_email": "Nombre, dirección de correo o número de teléfono",
+        "li_nc_email": (
+            "Nombre o número de teléfono (una dirección de correo electrónico solo se almacena si la "
+            "vincula explícitamente a su cuenta TankSync opcional)"
+        ),
         "li_nc_payment": "Información financiera o de pago",
         "li_nc_health": "Datos de salud o fitness",
         "li_nc_contacts": "Contactos, mensajes o registros de llamadas",
@@ -468,18 +572,40 @@ TRANSLATIONS = {
         "li_r_export": "<strong>Exportación</strong> — exportar sus datos de TankSync como JSON desde la pantalla Transparencia de datos.",
         "li_r_delete": "<strong>Supresión</strong> — eliminar todos los datos locales mediante Ajustes → Eliminar todos los datos; eliminar todos los datos del servidor mediante TankSync → Transparencia de datos → Eliminar todo.",
         "li_r_withdraw": "<strong>Retirar el consentimiento</strong> — revocar el permiso de ubicación en los ajustes del sistema o desactivar TankSync / los diagnósticos en cualquier momento.",
-        "h2_children": "7. Privacidad de los menores",
+        "h2_deletion": "7. Eliminación de su cuenta y sus datos",
+        "p_deletion_intro": (
+            "Puede eliminar todo usted mismo, directamente en la app — sin necesidad de contactar "
+            "con soporte:"
+        ),
+        "li_del_local": (
+            "<strong>Datos locales:</strong> Ajustes → Eliminar todos los datos elimina todos los "
+            "perfiles, favoritos, claves de API, precios en caché, rutas registradas y ajustes de su "
+            "dispositivo."
+        ),
+        "li_del_account": (
+            "<strong>Cuenta TankSync y datos del servidor:</strong> TankSync → Transparencia de "
+            "datos → Eliminar cuenta primero borra cada registro de su propiedad (favoritos, alertas, "
+            "reportes de precios, vehículos, repostajes, rutas, valoraciones) y después elimina la "
+            "identidad de la cuenta en sí, incluida cualquier dirección de correo electrónico "
+            "vinculada. Esta acción no se puede deshacer."
+        ),
+        "p_deletion_fallback": (
+            "Si ya no puede acceder a la app, puede solicitar la eliminación contactando con el "
+            "desarrollador (sección 10); escriba desde la dirección de correo electrónico vinculada a "
+            "su cuenta para que podamos verificar la titularidad."
+        ),
+        "h2_children": "8. Privacidad de los menores",
         "p_children": (
             "La aplicación no está dirigida a menores de 13 años. No recopilamos a sabiendas "
             "información personal de menores."
         ),
-        "h2_changes": "8. Cambios en esta política",
+        "h2_changes": "9. Cambios en esta política",
         "p_changes": (
             "Podemos actualizar esta política de vez en cuando. Los cambios se publicarán en esta "
             "URL con una fecha actualizada. El uso continuado de la aplicación constituye aceptación "
             "de la política actualizada."
         ),
-        "h2_contact": "9. Contacto",
+        "h2_contact": "10. Contacto",
         "contact_dev_label": "Desarrollador",
         "contact_email_label": "Correo",
         "contact_source_label": "Código fuente",
@@ -491,7 +617,7 @@ TRANSLATIONS = {
         "page_title": "Sparkilo — Informativa sulla privacy",
         "h1": "Informativa sulla privacy",
         "meta_app": "Sparkilo (de.tankstellen.tankstellen su iOS, de.tankstellen.fuelprices su Android)",
-        "meta_last_updated": "Ultimo aggiornamento: 9 maggio 2026",
+        "meta_last_updated": "Ultimo aggiornamento: 15 agosto 2026",
         "h2_overview": "1. Panoramica",
         "p_overview": (
             "Sparkilo (precedentemente Fuel Prices Europe & More) è un'app gratuita e open source "
@@ -500,13 +626,16 @@ TRANSLATIONS = {
             "Niente pubblicità, niente pixel di tracciamento, niente identificatori pubblicitari."
         ),
         "h2_collected": "2. Dati utilizzati",
-        "h3_location": "2.1 Posizione approssimativa",
+        "h3_location": "2.1 Posizione",
         "p_location": (
-            "Quando concedi l'autorizzazione alla posizione, l'app legge la tua posizione "
-            "approssimativa per trovare distributori e punti di ricarica nelle vicinanze. Le "
-            "coordinate vengono inviate ad API di terze parti (vedi sezione 4) come parte della "
-            "ricerca. La tua posizione <strong>non viene memorizzata su alcun server da noi gestito</strong> "
-            "e non viene mai usata per tracciamento o profilazione."
+            "Quando concedi l'autorizzazione alla posizione, l'app legge la tua posizione per trovare "
+            "distributori e punti di ricarica nelle vicinanze; queste coordinate di ricerca vengono "
+            "inviate ad API di terze parti (vedi sezione 4) come parte della ricerca e non vengono "
+            "memorizzate su alcun server da noi gestito. Se utilizzi la registrazione dei percorsi, "
+            "l'app registra inoltre il tuo <strong>percorso GPS preciso</strong>; i percorsi "
+            "registrati vengono memorizzati sul tuo dispositivo e, solo se attivi TankSync, "
+            "sincronizzati con il tuo backend TankSync. I percorsi registrati non vengono mai "
+            "condivisi con terze parti."
         ),
         "h3_apikey": "2.2 Chiavi API che fornisci tu",
         "p_apikey": (
@@ -521,10 +650,16 @@ TRANSLATIONS = {
         ),
         "h3_sync": "2.4 TankSync (sincronizzazione cloud opzionale)",
         "p_sync_intro": "Se attivi TankSync, viene creato un account anonimo tramite Supabase. I dati sincronizzati sono:",
-        "li_sync_id": "Identificatore utente anonimo (UUID — nessuna email, nessun nome)",
+        "li_sync_id": (
+            "Identificatore utente — UUID anonimo per impostazione predefinita; puoi facoltativamente "
+            "collegare un indirizzo email al tuo account TankSync per la sincronizzazione "
+            "multi-dispositivo"
+        ),
         "li_sync_fav": "ID dei distributori preferiti",
         "li_sync_alerts": "Configurazioni degli avvisi di prezzo",
         "li_sync_reports": "Segnalazioni di prezzo dalla community (ID distributore, tipo carburante, prezzo, timestamp)",
+        "li_sync_trips": "Percorsi registrati (percorso GPS, distanze, statistiche di consumo)",
+        "li_sync_fillups": "Rifornimenti (costo, litri, chilometraggio) e profili veicolo",
         "p_sync_outro": (
             "TankSync è opzionale e disattivato per impostazione predefinita. Puoi visualizzare, "
             "esportare ed eliminare tutti i dati lato server dalla schermata « Trasparenza dei dati » "
@@ -537,7 +672,10 @@ TRANSLATIONS = {
             "o contenuto. La diagnostica è disattivata per impostazione predefinita."
         ),
         "h2_not_collected": "3. Dati che NON raccogliamo",
-        "li_nc_email": "Nome, indirizzo email o numero di telefono",
+        "li_nc_email": (
+            "Nome o numero di telefono (un indirizzo email viene memorizzato solo se lo colleghi "
+            "esplicitamente al tuo account TankSync facoltativo)"
+        ),
         "li_nc_payment": "Informazioni finanziarie o di pagamento",
         "li_nc_health": "Dati di salute o fitness",
         "li_nc_contacts": "Contatti, messaggi o registri delle chiamate",
@@ -573,18 +711,40 @@ TRANSLATIONS = {
         "li_r_export": "<strong>Esportazione</strong> — esportare i tuoi dati TankSync in JSON dalla schermata Trasparenza dei dati.",
         "li_r_delete": "<strong>Cancellazione</strong> — eliminare tutti i dati locali tramite Impostazioni → Elimina tutti i dati; eliminare tutti i dati del server tramite TankSync → Trasparenza dei dati → Elimina tutto.",
         "li_r_withdraw": "<strong>Revocare il consenso</strong> — revocare l'autorizzazione alla posizione nelle impostazioni del dispositivo o disattivare TankSync / la diagnostica in qualsiasi momento.",
-        "h2_children": "7. Privacy dei minori",
+        "h2_deletion": "7. Eliminazione dell'account e dei dati",
+        "p_deletion_intro": (
+            "Puoi eliminare tutto autonomamente, direttamente nell'app — senza bisogno di "
+            "contattare l'assistenza:"
+        ),
+        "li_del_local": (
+            "<strong>Dati locali:</strong> Impostazioni → Elimina tutti i dati rimuove tutti i "
+            "profili, i preferiti, le chiavi API, i prezzi memorizzati nella cache, i percorsi "
+            "registrati e le impostazioni dal tuo dispositivo."
+        ),
+        "li_del_account": (
+            "<strong>Account TankSync e dati sul server:</strong> TankSync → Trasparenza dei dati → "
+            "Elimina account cancella prima ogni riga di tua proprietà (preferiti, avvisi, "
+            "segnalazioni di prezzo, veicoli, rifornimenti, percorsi, valutazioni) e poi elimina "
+            "l'identità dell'account stessa, compreso qualsiasi indirizzo email collegato. Questa "
+            "azione non può essere annullata."
+        ),
+        "p_deletion_fallback": (
+            "Se non riesci più ad accedere all'app, puoi richiedere la cancellazione contattando lo "
+            "sviluppatore (sezione 10); scrivi dall'indirizzo email collegato al tuo account in modo "
+            "da poterne verificare la proprietà."
+        ),
+        "h2_children": "8. Privacy dei minori",
         "p_children": (
             "L'app non è destinata a bambini sotto i 13 anni. Non raccogliamo consapevolmente "
             "informazioni personali dai minori."
         ),
-        "h2_changes": "8. Modifiche a questa informativa",
+        "h2_changes": "9. Modifiche a questa informativa",
         "p_changes": (
             "Potremmo aggiornare periodicamente questa informativa. Le modifiche saranno pubblicate "
             "a questo URL con una data aggiornata. L'uso continuato dell'app costituisce accettazione "
             "della versione aggiornata."
         ),
-        "h2_contact": "9. Contatti",
+        "h2_contact": "10. Contatti",
         "contact_dev_label": "Sviluppatore",
         "contact_email_label": "Email",
         "contact_source_label": "Codice sorgente",
@@ -596,7 +756,7 @@ TRANSLATIONS = {
         "page_title": "Sparkilo — Privacybeleid",
         "h1": "Privacybeleid",
         "meta_app": "Sparkilo (de.tankstellen.tankstellen op iOS, de.tankstellen.fuelprices op Android)",
-        "meta_last_updated": "Laatst bijgewerkt: 9 mei 2026",
+        "meta_last_updated": "Laatst bijgewerkt: 15 augustus 2026",
         "h2_overview": "1. Overzicht",
         "p_overview": (
             "Sparkilo (voorheen Fuel Prices Europe & More) is een gratis open-source app om "
@@ -605,13 +765,15 @@ TRANSLATIONS = {
             "geen tracking pixels, geen advertentie-ID's."
         ),
         "h2_collected": "2. Welke gegevens we gebruiken",
-        "h3_location": "2.1 Bij benadering locatie",
+        "h3_location": "2.1 Locatie",
         "p_location": (
-            "Wanneer u de locatietoestemming verleent, leest de app uw geschatte positie om "
-            "tankstations en laadpunten in de buurt te vinden. De coördinaten worden naar "
-            "API's van derden gestuurd (zie sectie 4) als onderdeel van de zoekopdracht. Uw "
-            "locatie <strong>wordt niet opgeslagen op een server die wij beheren</strong> en wordt "
-            "nooit gebruikt voor tracking of profilering."
+            "Wanneer u de locatietoestemming verleent, leest de app uw positie om tankstations en "
+            "laadpunten in de buurt te vinden; deze zoekcoördinaten worden als onderdeel van de "
+            "zoekopdracht naar API's van derden gestuurd (zie sectie 4) en niet opgeslagen op een "
+            "server die wij beheren. Als u ritregistratie gebruikt, registreert de app bovendien uw "
+            "<strong>nauwkeurige gps-route</strong>; geregistreerde ritten worden op uw toestel "
+            "opgeslagen en, alleen als u TankSync inschakelt, gesynchroniseerd met uw "
+            "TankSync-backend. Geregistreerde ritten worden nooit gedeeld met derden."
         ),
         "h3_apikey": "2.2 API-sleutels die u zelf opgeeft",
         "p_apikey": (
@@ -626,10 +788,15 @@ TRANSLATIONS = {
         ),
         "h3_sync": "2.4 TankSync (optionele cloud-sync)",
         "p_sync_intro": "Als u TankSync inschakelt, wordt een anoniem account aangemaakt via Supabase. Gesynchroniseerde gegevens:",
-        "li_sync_id": "Anonieme gebruikers-ID (UUID — geen e-mail, geen naam)",
+        "li_sync_id": (
+            "Gebruikers-ID — standaard een anonieme UUID; u kunt optioneel een e-mailadres koppelen "
+            "aan uw TankSync-account voor synchronisatie tussen apparaten"
+        ),
         "li_sync_fav": "ID's van favoriete tankstations",
         "li_sync_alerts": "Configuraties van prijswaarschuwingen",
         "li_sync_reports": "Community-prijsmeldingen (station-ID, brandstofsoort, prijs, tijdstempel)",
+        "li_sync_trips": "Geregistreerde ritten (gps-route, afstanden, verbruiksstatistieken)",
+        "li_sync_fillups": "Tankbeurten (kosten, liters, kilometerstand) en voertuigprofielen",
         "p_sync_outro": (
             "TankSync is optioneel en standaard uitgeschakeld. U kunt alle servergegevens bekijken, "
             "exporteren en verwijderen via het scherm « Datatransparantie » in de app."
@@ -641,7 +808,10 @@ TRANSLATIONS = {
             "locatie of inhoud meegestuurd. Diagnose staat standaard uit."
         ),
         "h2_not_collected": "3. Gegevens die we NIET verzamelen",
-        "li_nc_email": "Naam, e-mailadres of telefoonnummer",
+        "li_nc_email": (
+            "Naam of telefoonnummer (een e-mailadres wordt alleen opgeslagen als u dit expliciet "
+            "koppelt aan uw optionele TankSync-account)"
+        ),
         "li_nc_payment": "Financiële of betalingsgegevens",
         "li_nc_health": "Gezondheids- of fitnessgegevens",
         "li_nc_contacts": "Contacten, berichten of belregistraties",
@@ -677,18 +847,40 @@ TRANSLATIONS = {
         "li_r_export": "<strong>Export</strong> — uw TankSync-gegevens als JSON te exporteren via het scherm Datatransparantie.",
         "li_r_delete": "<strong>Verwijdering</strong> — alle lokale gegevens te verwijderen via Instellingen → Alle gegevens verwijderen; alle servergegevens via TankSync → Datatransparantie → Alles verwijderen.",
         "li_r_withdraw": "<strong>Toestemming intrekken</strong> — locatietoestemming intrekken in de toestelinstellingen of TankSync / diagnose op elk moment uitschakelen.",
-        "h2_children": "7. Privacy van kinderen",
+        "h2_deletion": "7. Uw account en gegevens verwijderen",
+        "p_deletion_intro": (
+            "U kunt alles zelf verwijderen, rechtstreeks in de app — geen ondersteuningsverzoek "
+            "nodig:"
+        ),
+        "li_del_local": (
+            "<strong>Lokale gegevens:</strong> Instellingen → Alle gegevens verwijderen verwijdert "
+            "alle profielen, favorieten, API-sleutels, gecachte prijzen, geregistreerde ritten en "
+            "instellingen van uw toestel."
+        ),
+        "li_del_account": (
+            "<strong>TankSync-account en servergegevens:</strong> TankSync → Datatransparantie → "
+            "Account verwijderen wist eerst elke rij die u bezit (favorieten, waarschuwingen, "
+            "prijsmeldingen, voertuigen, tankbeurten, ritten, beoordelingen) en verwijdert vervolgens "
+            "de accountidentiteit zelf, inclusief een eventueel gekoppeld e-mailadres. Dit kan niet "
+            "ongedaan worden gemaakt."
+        ),
+        "p_deletion_fallback": (
+            "Als u geen toegang meer heeft tot de app, kunt u verwijdering aanvragen door contact op "
+            "te nemen met de ontwikkelaar (sectie 10); schrijf vanaf het e-mailadres dat aan uw "
+            "account is gekoppeld, zodat we het eigendom kunnen verifiëren."
+        ),
+        "h2_children": "8. Privacy van kinderen",
         "p_children": (
             "De app is niet gericht op kinderen jonger dan 13. We verzamelen niet bewust "
             "persoonlijke gegevens van kinderen."
         ),
-        "h2_changes": "8. Wijzigingen in dit beleid",
+        "h2_changes": "9. Wijzigingen in dit beleid",
         "p_changes": (
             "We kunnen dit beleid van tijd tot tijd aanpassen. Wijzigingen worden op deze URL "
             "gepubliceerd met een bijgewerkte datum. Voortgezet gebruik van de app betekent "
             "aanvaarding van het bijgewerkte beleid."
         ),
-        "h2_contact": "9. Contact",
+        "h2_contact": "10. Contact",
         "contact_dev_label": "Ontwikkelaar",
         "contact_email_label": "E-mail",
         "contact_source_label": "Broncode",
@@ -700,7 +892,7 @@ TRANSLATIONS = {
         "page_title": "Sparkilo — Política de privacidade",
         "h1": "Política de privacidade",
         "meta_app": "Sparkilo (de.tankstellen.tankstellen no iOS, de.tankstellen.fuelprices no Android)",
-        "meta_last_updated": "Última atualização: 9 de maio de 2026",
+        "meta_last_updated": "Última atualização: 15 de agosto de 2026",
         "h2_overview": "1. Visão geral",
         "p_overview": (
             "O Sparkilo (anteriormente Fuel Prices Europe & More) é uma aplicação gratuita e de "
@@ -710,13 +902,15 @@ TRANSLATIONS = {
             "publicitários."
         ),
         "h2_collected": "2. Dados que utilizamos",
-        "h3_location": "2.1 Localização aproximada",
+        "h3_location": "2.1 Localização",
         "p_location": (
-            "Quando concede a permissão de localização, a app lê a sua posição aproximada para "
-            "encontrar postos e pontos de carregamento próximos. As coordenadas são enviadas a "
-            "APIs de terceiros (ver secção 4) como parte da consulta. A sua localização "
-            "<strong>não é armazenada em nenhum servidor que operamos</strong> e nunca é usada "
-            "para rastreamento ou perfis."
+            "Quando concede a permissão de localização, a app lê a sua posição para encontrar "
+            "postos e pontos de carregamento próximos; essas coordenadas de pesquisa são enviadas a "
+            "APIs de terceiros (ver secção 4) como parte da consulta e não são armazenadas em "
+            "nenhum servidor que operamos. Se usar o registo de viagens, a app regista "
+            "adicionalmente o seu <strong>percurso GPS preciso</strong>; as viagens registadas são "
+            "guardadas no seu dispositivo e, apenas se ativar o TankSync, sincronizadas com o seu "
+            "backend TankSync. As viagens registadas nunca são partilhadas com terceiros."
         ),
         "h3_apikey": "2.2 Chaves de API que você fornece",
         "p_apikey": (
@@ -732,10 +926,16 @@ TRANSLATIONS = {
         ),
         "h3_sync": "2.4 TankSync (sincronização na nuvem opcional)",
         "p_sync_intro": "Se ativar o TankSync, é criada uma conta anónima através do Supabase. Os dados sincronizados são:",
-        "li_sync_id": "Identificador anónimo de utilizador (UUID — sem email nem nome)",
+        "li_sync_id": (
+            "Identificador de utilizador — UUID anónimo por predefinição; pode opcionalmente "
+            "associar um endereço de email à sua conta TankSync para sincronização entre "
+            "dispositivos"
+        ),
         "li_sync_fav": "IDs dos postos favoritos",
         "li_sync_alerts": "Configurações de alertas de preço",
         "li_sync_reports": "Relatos comunitários de preço (ID do posto, tipo de combustível, preço, carimbo de tempo)",
+        "li_sync_trips": "Viagens registadas (percurso GPS, distâncias, estatísticas de consumo)",
+        "li_sync_fillups": "Abastecimentos (custo, litros, quilometragem) e perfis de veículo",
         "p_sync_outro": (
             "O TankSync é opcional e desativado por predefinição. Pode ver, exportar e eliminar "
             "todos os dados do servidor a partir do ecrã « Transparência de dados » dentro da app."
@@ -747,7 +947,10 @@ TRANSLATIONS = {
             "localização nem conteúdo. Os diagnósticos estão desativados por predefinição."
         ),
         "h2_not_collected": "3. Dados que NÃO recolhemos",
-        "li_nc_email": "Nome, endereço de email ou número de telefone",
+        "li_nc_email": (
+            "Nome ou número de telefone (um endereço de email só é guardado se o associar "
+            "explicitamente à sua conta TankSync opcional)"
+        ),
         "li_nc_payment": "Informações financeiras ou de pagamento",
         "li_nc_health": "Dados de saúde ou de fitness",
         "li_nc_contacts": "Contactos, mensagens ou registos de chamadas",
@@ -783,18 +986,40 @@ TRANSLATIONS = {
         "li_r_export": "<strong>Exportação</strong> — exportar os seus dados TankSync em JSON a partir do ecrã Transparência de dados.",
         "li_r_delete": "<strong>Eliminação</strong> — eliminar todos os dados locais via Definições → Eliminar todos os dados; eliminar todos os dados de servidor via TankSync → Transparência de dados → Eliminar tudo.",
         "li_r_withdraw": "<strong>Retirar consentimento</strong> — revogar a permissão de localização nas definições do dispositivo, ou desativar o TankSync / diagnósticos a qualquer momento.",
-        "h2_children": "7. Privacidade de crianças",
+        "h2_deletion": "7. Eliminar a sua conta e os seus dados",
+        "p_deletion_intro": (
+            "Pode eliminar tudo você mesmo, diretamente na app — sem necessidade de contactar o "
+            "suporte:"
+        ),
+        "li_del_local": (
+            "<strong>Dados locais:</strong> Definições → Eliminar todos os dados remove todos os "
+            "perfis, favoritos, chaves de API, preços em cache, viagens registadas e definições do "
+            "seu dispositivo."
+        ),
+        "li_del_account": (
+            "<strong>Conta TankSync e dados do servidor:</strong> TankSync → Transparência de "
+            "dados → Eliminar conta apaga primeiro todos os registos que lhe pertencem (favoritos, "
+            "alertas, relatos de preços, veículos, abastecimentos, viagens, avaliações) e depois "
+            "elimina a própria identidade da conta, incluindo qualquer endereço de email associado. "
+            "Esta ação não pode ser desfeita."
+        ),
+        "p_deletion_fallback": (
+            "Se já não conseguir aceder à app, pode solicitar a eliminação contactando o "
+            "programador (secção 10); escreva a partir do endereço de email associado à sua conta "
+            "para que possamos verificar a titularidade."
+        ),
+        "h2_children": "8. Privacidade de crianças",
         "p_children": (
             "A app não é dirigida a crianças com menos de 13 anos. Não recolhemos conscientemente "
             "informação pessoal de crianças."
         ),
-        "h2_changes": "8. Alterações a esta política",
+        "h2_changes": "9. Alterações a esta política",
         "p_changes": (
             "Podemos atualizar esta política periodicamente. As alterações serão publicadas neste "
             "URL com uma data atualizada. A continuação do uso da app constitui aceitação da "
             "política atualizada."
         ),
-        "h2_contact": "9. Contacto",
+        "h2_contact": "10. Contacto",
         "contact_dev_label": "Programador",
         "contact_email_label": "Email",
         "contact_source_label": "Código-fonte",
@@ -806,7 +1031,7 @@ TRANSLATIONS = {
         "page_title": "Sparkilo — Integritetspolicy",
         "h1": "Integritetspolicy",
         "meta_app": "Sparkilo (de.tankstellen.tankstellen på iOS, de.tankstellen.fuelprices på Android)",
-        "meta_last_updated": "Senast uppdaterad: 9 maj 2026",
+        "meta_last_updated": "Senast uppdaterad: 15 augusti 2026",
         "h2_overview": "1. Översikt",
         "p_overview": (
             "Sparkilo (tidigare Fuel Prices Europe & More) är en gratis öppen källkods-app för "
@@ -815,13 +1040,15 @@ TRANSLATIONS = {
             "spårningspixlar, inga annons-ID:n."
         ),
         "h2_collected": "2. Data vi använder",
-        "h3_location": "2.1 Ungefärlig plats",
+        "h3_location": "2.1 Plats",
         "p_location": (
-            "När du beviljar platsbehörighet läser appen din ungefärliga position för att hitta "
-            "drivmedels- och laddstationer i närheten. Koordinaterna skickas till tredje parts "
-            "API:er (se avsnitt 4) som en del av sökningen. Din position "
-            "<strong>lagras inte på någon server vi driver</strong> och används aldrig för "
-            "spårning eller profilering."
+            "När du beviljar platsbehörighet läser appen din position för att hitta drivmedels- och "
+            "laddstationer i närheten; dessa sökkoordinater skickas till tredje parts API:er (se "
+            "avsnitt 4) som en del av sökningen och lagras inte på någon server vi driver. Om du "
+            "använder färdregistrering registrerar appen dessutom din <strong>exakta "
+            "GPS-rutt</strong>; registrerade färder lagras på din enhet och, endast om du aktiverar "
+            "TankSync, synkroniseras till ditt TankSync-backend. Registrerade färder delas aldrig "
+            "med tredje part."
         ),
         "h3_apikey": "2.2 API-nycklar du anger själv",
         "p_apikey": (
@@ -836,10 +1063,15 @@ TRANSLATIONS = {
         ),
         "h3_sync": "2.4 TankSync (valfri molnsynkronisering)",
         "p_sync_intro": "Om du aktiverar TankSync skapas ett anonymt konto via Supabase. Synkroniserade data:",
-        "li_sync_id": "Anonym användar-ID (UUID — ingen e-post eller namn)",
+        "li_sync_id": (
+            "Användaridentifierare — anonymt UUID som standard; du kan valfritt länka en "
+            "e-postadress till ditt TankSync-konto för synkronisering mellan enheter"
+        ),
         "li_sync_fav": "ID:n för favoritstationer",
         "li_sync_alerts": "Konfigurationer för prislarm",
         "li_sync_reports": "Communityrapporter om priser (stations-ID, drivmedelstyp, pris, tidsstämpel)",
+        "li_sync_trips": "Registrerade färder (GPS-rutt, avstånd, förbrukningsstatistik)",
+        "li_sync_fillups": "Tankningar (kostnad, liter, mätarställning) och fordonsprofiler",
         "p_sync_outro": (
             "TankSync är valfritt och inaktiverat som standard. Du kan visa, exportera och radera "
             "all serverdata från skärmen « Datatransparens » i appen."
@@ -851,7 +1083,10 @@ TRANSLATIONS = {
             "ingår. Diagnos är avstängd som standard."
         ),
         "h2_not_collected": "3. Data vi INTE samlar in",
-        "li_nc_email": "Namn, e-postadress eller telefonnummer",
+        "li_nc_email": (
+            "Namn eller telefonnummer (en e-postadress lagras endast om du uttryckligen länkar en "
+            "till ditt valfria TankSync-konto)"
+        ),
         "li_nc_payment": "Finansiell information eller betalningsuppgifter",
         "li_nc_health": "Hälso- eller träningsdata",
         "li_nc_contacts": "Kontakter, meddelanden eller samtalsloggar",
@@ -887,18 +1122,38 @@ TRANSLATIONS = {
         "li_r_export": "<strong>Exportera</strong> — exportera dina TankSync-data som JSON från skärmen Datatransparens.",
         "li_r_delete": "<strong>Radera</strong> — radera all lokal data via Inställningar → Radera all data; radera all serverdata via TankSync → Datatransparens → Radera allt.",
         "li_r_withdraw": "<strong>Återkalla samtycke</strong> — återkalla platsbehörigheten i enhetens inställningar, eller stänga av TankSync / diagnos när som helst.",
-        "h2_children": "7. Barns integritet",
+        "h2_deletion": "7. Radera ditt konto och dina data",
+        "p_deletion_intro": (
+            "Du kan radera allt själv, direkt i appen — ingen supportförfrågan behövs:"
+        ),
+        "li_del_local": (
+            "<strong>Lokal data:</strong> Inställningar → Radera all data tar bort alla profiler, "
+            "favoriter, API-nycklar, cachade priser, registrerade färder och inställningar från din "
+            "enhet."
+        ),
+        "li_del_account": (
+            "<strong>TankSync-konto och serverdata:</strong> TankSync → Datatransparens → Radera "
+            "konto raderar först varje post du äger (favoriter, larm, prisrapporter, fordon, "
+            "tankningar, färder, betyg) och tar sedan bort själva kontoidentiteten, inklusive en "
+            "eventuellt länkad e-postadress. Detta kan inte ångras."
+        ),
+        "p_deletion_fallback": (
+            "Om du inte längre har åtkomst till appen kan du begära radering genom att kontakta "
+            "utvecklaren (avsnitt 10); skriv från den e-postadress som är länkad till ditt konto så "
+            "att vi kan verifiera ägarskapet."
+        ),
+        "h2_children": "8. Barns integritet",
         "p_children": (
             "Appen riktar sig inte till barn under 13 år. Vi samlar inte medvetet in personlig "
             "information från barn."
         ),
-        "h2_changes": "8. Ändringar i denna policy",
+        "h2_changes": "9. Ändringar i denna policy",
         "p_changes": (
             "Vi kan uppdatera denna policy från tid till annan. Ändringar publiceras på denna "
             "URL med ett uppdaterat datum. Fortsatt användning av appen utgör godkännande av "
             "den uppdaterade policyn."
         ),
-        "h2_contact": "9. Kontakt",
+        "h2_contact": "10. Kontakt",
         "contact_dev_label": "Utvecklare",
         "contact_email_label": "E-post",
         "contact_source_label": "Källkod",
@@ -910,7 +1165,7 @@ TRANSLATIONS = {
         "page_title": "Sparkilo — Tietosuojakäytäntö",
         "h1": "Tietosuojakäytäntö",
         "meta_app": "Sparkilo (de.tankstellen.tankstellen iOS:llä, de.tankstellen.fuelprices Androidilla)",
-        "meta_last_updated": "Viimeksi päivitetty: 9. toukokuuta 2026",
+        "meta_last_updated": "Viimeksi päivitetty: 15. elokuuta 2026",
         "h2_overview": "1. Yleiskatsaus",
         "p_overview": (
             "Sparkilo (aiemmin Fuel Prices Europe & More) on ilmainen avoimen lähdekoodin "
@@ -919,13 +1174,15 @@ TRANSLATIONS = {
             "Ei mainoksia, ei seurantapikseleitä, ei mainostunnisteita."
         ),
         "h2_collected": "2. Käyttämämme tiedot",
-        "h3_location": "2.1 Likimääräinen sijainti",
+        "h3_location": "2.1 Sijainti",
         "p_location": (
-            "Kun annat sijaintiluvan, sovellus lukee likimääräisen sijaintisi löytääkseen "
-            "lähimmät polttoaine- ja latausasemat. Koordinaatit lähetetään kolmansien osapuolien "
-            "rajapintoihin (ks. luku 4) hakuna. Sijaintiasi <strong>ei tallenneta millekään "
-            "ylläpitämällemme palvelimelle</strong>, eikä sitä koskaan käytetä seurantaan tai "
-            "profilointiin."
+            "Kun annat sijaintiluvan, sovellus lukee sijaintisi löytääkseen lähimmät polttoaine- ja "
+            "latausasemat; nämä hakukoordinaatit lähetetään kolmansien osapuolien rajapintoihin (ks. "
+            "luku 4) osana hakua eikä niitä tallenneta millekään ylläpitämällemme palvelimelle. Jos "
+            "käytät matkan tallennusta, sovellus tallentaa lisäksi <strong>tarkan "
+            "GPS-reittisi</strong>; tallennetut matkat säilytetään laitteellasi ja, vain jos otat "
+            "TankSyncin käyttöön, synkronoidaan TankSync-taustajärjestelmääsi. Tallennettuja matkoja "
+            "ei koskaan jaeta kolmansille osapuolille."
         ),
         "h3_apikey": "2.2 Itse antamasi API-avaimet",
         "p_apikey": (
@@ -940,10 +1197,15 @@ TRANSLATIONS = {
         ),
         "h3_sync": "2.4 TankSync (valinnainen pilvisynkronointi)",
         "p_sync_intro": "Jos otat TankSyncin käyttöön, Supabaseen luodaan anonyymi tili. Synkronoitavat tiedot:",
-        "li_sync_id": "Anonyymi käyttäjätunnus (UUID — ei sähköpostia, ei nimeä)",
+        "li_sync_id": (
+            "Käyttäjätunnus — oletuksena anonyymi UUID; voit halutessasi liittää sähköpostiosoitteen "
+            "TankSync-tiliisi laitteiden välistä synkronointia varten"
+        ),
         "li_sync_fav": "Suosikkiasemien tunnukset",
         "li_sync_alerts": "Hintahälytysten asetukset",
         "li_sync_reports": "Yhteisön hintailmoitukset (aseman tunnus, polttoainetyyppi, hinta, aikaleima)",
+        "li_sync_trips": "Tallennetut matkat (GPS-reitti, matkat, kulutustilastot)",
+        "li_sync_fillups": "Tankkaukset (hinta, litrat, mittarilukema) ja ajoneuvoprofiilit",
         "p_sync_outro": (
             "TankSync on valinnainen ja oletuksena pois käytöstä. Voit tarkastella, viedä ja "
             "poistaa kaikki palvelinpuolen tiedot sovelluksen « Tietojen läpinäkyvyys » -näytöltä."
@@ -955,7 +1217,10 @@ TRANSLATIONS = {
             "sisältöä ei sisällytetä. Diagnostiikka on oletuksena pois käytöstä."
         ),
         "h2_not_collected": "3. Tiedot, joita EMME kerää",
-        "li_nc_email": "Nimi, sähköpostiosoite tai puhelinnumero",
+        "li_nc_email": (
+            "Nimi tai puhelinnumero (sähköpostiosoite tallennetaan vain, jos liität sen "
+            "nimenomaisesti valinnaiseen TankSync-tiliisi)"
+        ),
         "li_nc_payment": "Talous- tai maksutiedot",
         "li_nc_health": "Terveys- tai kuntotiedot",
         "li_nc_contacts": "Yhteystiedot, viestit tai puhelulokit",
@@ -991,18 +1256,38 @@ TRANSLATIONS = {
         "li_r_export": "<strong>Viedä</strong> — TankSync-tietosi JSON-muodossa Tietojen läpinäkyvyys -näytöltä.",
         "li_r_delete": "<strong>Poistaa</strong> — kaikki paikalliset tiedot kohdasta Asetukset → Poista kaikki tiedot; kaikki palvelintiedot kohdasta TankSync → Tietojen läpinäkyvyys → Poista kaikki.",
         "li_r_withdraw": "<strong>Peruuttaa suostumuksesi</strong> — peruuta sijaintilupa laitteen asetuksista tai poista TankSync / diagnostiikka käytöstä milloin tahansa.",
-        "h2_children": "7. Lasten yksityisyys",
+        "h2_deletion": "7. Tilisi ja tietojesi poistaminen",
+        "p_deletion_intro": (
+            "Voit poistaa kaiken itse, suoraan sovelluksessa — ilman tukipyyntöä:"
+        ),
+        "li_del_local": (
+            "<strong>Paikalliset tiedot:</strong> Asetukset → Poista kaikki tiedot poistaa kaikki "
+            "profiilit, suosikit, API-avaimet, välimuistiin tallennetut hinnat, tallennetut matkat "
+            "ja asetukset laitteeltasi."
+        ),
+        "li_del_account": (
+            "<strong>TankSync-tili ja palvelintiedot:</strong> TankSync → Tietojen läpinäkyvyys → "
+            "Poista tili tyhjentää ensin jokaisen omistamasi rivin (suosikit, hälytykset, "
+            "hintailmoitukset, ajoneuvot, tankkaukset, matkat, arvostelut) ja poistaa sitten itse "
+            "tilin identiteetin, mukaan lukien mahdollisesti liitetyn sähköpostiosoitteen. Tätä ei "
+            "voi peruuttaa."
+        ),
+        "p_deletion_fallback": (
+            "Jos et enää pääse sovellukseen, voit pyytää poistoa ottamalla yhteyttä kehittäjään "
+            "(luku 10); kirjoita tilisi sähköpostiosoitteesta, jotta voimme vahvistaa omistajuuden."
+        ),
+        "h2_children": "8. Lasten yksityisyys",
         "p_children": (
             "Sovellusta ei ole suunnattu alle 13-vuotiaille lapsille. Emme tietoisesti kerää "
             "henkilötietoja lapsilta."
         ),
-        "h2_changes": "8. Muutokset tähän käytäntöön",
+        "h2_changes": "9. Muutokset tähän käytäntöön",
         "p_changes": (
             "Voimme päivittää tätä käytäntöä ajoittain. Muutokset julkaistaan tässä osoitteessa "
             "päivitetyllä päivämäärällä. Sovelluksen käytön jatkaminen tarkoittaa päivitetyn "
             "käytännön hyväksymistä."
         ),
-        "h2_contact": "9. Yhteystiedot",
+        "h2_contact": "10. Yhteystiedot",
         "contact_dev_label": "Kehittäjä",
         "contact_email_label": "Sähköposti",
         "contact_source_label": "Lähdekoodi",
@@ -1014,7 +1299,7 @@ TRANSLATIONS = {
         "page_title": "Sparkilo — Privatlivspolitik",
         "h1": "Privatlivspolitik",
         "meta_app": "Sparkilo (de.tankstellen.tankstellen på iOS, de.tankstellen.fuelprices på Android)",
-        "meta_last_updated": "Senest opdateret: 9. maj 2026",
+        "meta_last_updated": "Senest opdateret: 15. august 2026",
         "h2_overview": "1. Oversigt",
         "p_overview": (
             "Sparkilo (tidligere Fuel Prices Europe & More) er en gratis open source-app til "
@@ -1023,13 +1308,15 @@ TRANSLATIONS = {
             "sporings­pixels, ingen reklame-id'er."
         ),
         "h2_collected": "2. Data vi bruger",
-        "h3_location": "2.1 Omtrentlig placering",
+        "h3_location": "2.1 Placering",
         "p_location": (
-            "Når du giver placerings­tilladelse, læser appen din omtrentlige position for at "
-            "finde brændstof- og ladestationer i nærheden. Koordinaterne sendes til "
-            "tredjeparts-API'er (se afsnit 4) som en del af forespørgslen. Din placering "
-            "<strong>opbevares ikke på nogen server, vi driver</strong>, og bruges aldrig til "
-            "sporing eller profilering."
+            "Når du giver placeringstilladelse, læser appen din position for at finde brændstof- og "
+            "ladestationer i nærheden; disse søgekoordinater sendes til tredjeparts-API'er (se "
+            "afsnit 4) som en del af forespørgslen og gemmes ikke på nogen server, vi driver. Hvis "
+            "du bruger turregistrering, registrerer appen desuden din <strong>præcise "
+            "GPS-rute</strong>; registrerede ture gemmes på din enhed og, kun hvis du aktiverer "
+            "TankSync, synkroniseres til dit TankSync-backend. Registrerede ture deles aldrig med "
+            "tredjeparter."
         ),
         "h3_apikey": "2.2 API-nøgler du selv angiver",
         "p_apikey": (
@@ -1044,10 +1331,15 @@ TRANSLATIONS = {
         ),
         "h3_sync": "2.4 TankSync (valgfri cloud-synk)",
         "p_sync_intro": "Hvis du aktiverer TankSync, oprettes en anonym konto via Supabase. Synkroniserede data:",
-        "li_sync_id": "Anonymt bruger-id (UUID — ingen e-mail, intet navn)",
+        "li_sync_id": (
+            "Brugeridentifikator — som standard et anonymt UUID; du kan valgfrit knytte en "
+            "e-mailadresse til din TankSync-konto for synkronisering på tværs af enheder"
+        ),
         "li_sync_fav": "Id'er for favorit­stationer",
         "li_sync_alerts": "Konfiguration af prisalarmer",
         "li_sync_reports": "Community-prisrapporter (stations-id, brændstoftype, pris, tidsstempel)",
+        "li_sync_trips": "Registrerede ture (GPS-rute, afstande, forbrugsstatistik)",
+        "li_sync_fillups": "Optankninger (pris, liter, kilometertæller) og køretøjsprofiler",
         "p_sync_outro": (
             "TankSync er valgfri og som standard slået fra. Du kan se, eksportere og slette alle "
             "data på serveren fra skærmen « Datatransparens » i appen."
@@ -1059,7 +1351,10 @@ TRANSLATIONS = {
             "indgår. Diagnose er som standard slået fra."
         ),
         "h2_not_collected": "3. Data vi IKKE indsamler",
-        "li_nc_email": "Navn, e-mailadresse eller telefonnummer",
+        "li_nc_email": (
+            "Navn eller telefonnummer (en e-mailadresse gemmes kun, hvis du udtrykkeligt knytter "
+            "den til din valgfrie TankSync-konto)"
+        ),
         "li_nc_payment": "Finansielle eller betalings­oplysninger",
         "li_nc_health": "Sundheds- eller fitnessdata",
         "li_nc_contacts": "Kontakter, beskeder eller opkalds­logger",
@@ -1095,18 +1390,39 @@ TRANSLATIONS = {
         "li_r_export": "<strong>Eksportere</strong> — eksportere dine TankSync-data som JSON fra skærmen Datatransparens.",
         "li_r_delete": "<strong>Slette</strong> — slette alle lokale data via Indstillinger → Slet alle data; slette alle server­data via TankSync → Datatransparens → Slet alt.",
         "li_r_withdraw": "<strong>Trække samtykke tilbage</strong> — tilbagekalde placerings­tilladelsen i enhedens indstillinger eller slå TankSync / diagnose fra når som helst.",
-        "h2_children": "7. Børns privatliv",
+        "h2_deletion": "7. Sletning af din konto og dine data",
+        "p_deletion_intro": (
+            "Du kan slette alt selv, direkte i appen — ingen supportanmodning nødvendig:"
+        ),
+        "li_del_local": (
+            "<strong>Lokale data:</strong> Indstillinger → Slet alle data fjerner alle profiler, "
+            "favoritter, API-nøgler, cachede priser, registrerede ture og indstillinger fra din "
+            "enhed."
+        ),
+        "li_del_account": (
+            "<strong>TankSync-konto og serverdata:</strong> TankSync → Datatransparens → Slet konto "
+            "sletter først hver eneste post, du ejer (favoritter, alarmer, prisrapporter, "
+            "køretøjer, optankninger, ture, bedømmelser), og sletter derefter selve "
+            "kontoidentiteten, inklusive en eventuel tilknyttet e-mailadresse. Dette kan ikke "
+            "fortrydes."
+        ),
+        "p_deletion_fallback": (
+            "Hvis du ikke længere har adgang til appen, kan du anmode om sletning ved at kontakte "
+            "udvikleren (afsnit 10); skriv venligst fra den e-mailadresse, der er knyttet til din "
+            "konto, så vi kan verificere ejerskabet."
+        ),
+        "h2_children": "8. Børns privatliv",
         "p_children": (
             "Appen er ikke rettet mod børn under 13 år. Vi indsamler ikke bevidst personlige "
             "oplysninger fra børn."
         ),
-        "h2_changes": "8. Ændringer i denne politik",
+        "h2_changes": "9. Ændringer i denne politik",
         "p_changes": (
             "Vi kan opdatere denne politik fra tid til anden. Ændringer offentliggøres på denne "
             "URL med en opdateret dato. Fortsat brug af appen udgør accept af den opdaterede "
             "politik."
         ),
-        "h2_contact": "9. Kontakt",
+        "h2_contact": "10. Kontakt",
         "contact_dev_label": "Udvikler",
         "contact_email_label": "E-mail",
         "contact_source_label": "Kildekode",
@@ -1118,7 +1434,7 @@ TRANSLATIONS = {
         "page_title": "Sparkilo — Polityka prywatności",
         "h1": "Polityka prywatności",
         "meta_app": "Sparkilo (de.tankstellen.tankstellen w iOS, de.tankstellen.fuelprices w Androidzie)",
-        "meta_last_updated": "Ostatnia aktualizacja: 9 maja 2026",
+        "meta_last_updated": "Ostatnia aktualizacja: 15 sierpnia 2026",
         "h2_overview": "1. Omówienie",
         "p_overview": (
             "Sparkilo (wcześniej Fuel Prices Europe & More) to bezpłatna aplikacja open source "
@@ -1127,13 +1443,16 @@ TRANSLATIONS = {
             "bez pikseli śledzących, bez identyfikatorów reklamowych."
         ),
         "h2_collected": "2. Wykorzystywane dane",
-        "h3_location": "2.1 Przybliżona lokalizacja",
+        "h3_location": "2.1 Lokalizacja",
         "p_location": (
-            "Po przyznaniu uprawnienia do lokalizacji aplikacja odczytuje Twoją przybliżoną "
-            "pozycję, by znaleźć pobliskie stacje paliw i punkty ładowania. Współrzędne są "
-            "wysyłane do interfejsów API stron trzecich (zob. sekcja 4) jako część zapytania. "
-            "Twoja lokalizacja <strong>nie jest przechowywana na żadnym z naszych serwerów</strong> "
-            "i nigdy nie służy do śledzenia ani profilowania."
+            "Po przyznaniu uprawnienia do lokalizacji aplikacja odczytuje Twoją pozycję, by znaleźć "
+            "pobliskie stacje paliw i punkty ładowania; te współrzędne wyszukiwania są wysyłane do "
+            "interfejsów API stron trzecich (zob. sekcja 4) jako część zapytania i nie są "
+            "przechowywane na żadnym z naszych serwerów. Jeśli korzystasz z rejestrowania tras, "
+            "aplikacja dodatkowo rejestruje Twoją <strong>precyzyjną trasę GPS</strong>; "
+            "zarejestrowane trasy są przechowywane na Twoim urządzeniu i tylko wtedy, gdy włączysz "
+            "TankSync, synchronizowane z Twoim zapleczem TankSync. Zarejestrowane trasy nigdy nie są "
+            "udostępniane osobom trzecim."
         ),
         "h3_apikey": "2.2 Klucze API podawane przez Ciebie",
         "p_apikey": (
@@ -1148,10 +1467,15 @@ TRANSLATIONS = {
         ),
         "h3_sync": "2.4 TankSync (opcjonalna synchronizacja w chmurze)",
         "p_sync_intro": "Po włączeniu TankSync tworzone jest anonimowe konto w Supabase. Synchronizowane są:",
-        "li_sync_id": "Anonimowy identyfikator użytkownika (UUID — bez e-maila, bez imienia)",
+        "li_sync_id": (
+            "Identyfikator użytkownika — domyślnie anonimowy UUID; opcjonalnie możesz powiązać "
+            "adres e-mail ze swoim kontem TankSync w celu synchronizacji między urządzeniami"
+        ),
         "li_sync_fav": "Identyfikatory ulubionych stacji",
         "li_sync_alerts": "Konfiguracje alertów cenowych",
         "li_sync_reports": "Społecznościowe zgłoszenia cen (ID stacji, rodzaj paliwa, cena, znacznik czasu)",
+        "li_sync_trips": "Zarejestrowane trasy (trasa GPS, dystanse, statystyki zużycia)",
+        "li_sync_fillups": "Tankowania (koszt, litry, przebieg) i profile pojazdów",
         "p_sync_outro": (
             "TankSync jest opcjonalny i domyślnie wyłączony. Możesz przeglądać, eksportować i "
             "usuwać wszystkie dane po stronie serwera z ekranu « Przejrzystość danych » w aplikacji."
@@ -1163,7 +1487,10 @@ TRANSLATIONS = {
             "ani treści. Diagnostyka jest domyślnie wyłączona."
         ),
         "h2_not_collected": "3. Dane, których NIE zbieramy",
-        "li_nc_email": "Imię i nazwisko, adres e-mail lub numer telefonu",
+        "li_nc_email": (
+            "Imię i nazwisko lub numer telefonu (adres e-mail jest zapisywany tylko wtedy, gdy "
+            "wyraźnie powiążesz go ze swoim opcjonalnym kontem TankSync)"
+        ),
         "li_nc_payment": "Dane finansowe lub płatnicze",
         "li_nc_health": "Dane zdrowotne lub fitness",
         "li_nc_contacts": "Kontakty, wiadomości lub rejestry połączeń",
@@ -1199,18 +1526,39 @@ TRANSLATIONS = {
         "li_r_export": "<strong>Eksportu</strong> — eksportu danych TankSync w formacie JSON z ekranu Przejrzystość danych.",
         "li_r_delete": "<strong>Usunięcia</strong> — usunięcia wszystkich danych lokalnych przez Ustawienia → Usuń wszystkie dane; usunięcia wszystkich danych po stronie serwera przez TankSync → Przejrzystość danych → Usuń wszystko.",
         "li_r_withdraw": "<strong>Wycofania zgody</strong> — odebranie uprawnienia do lokalizacji w ustawieniach urządzenia lub wyłączenie TankSync / diagnostyki w dowolnej chwili.",
-        "h2_children": "7. Prywatność dzieci",
+        "h2_deletion": "7. Usuwanie konta i danych",
+        "p_deletion_intro": (
+            "Możesz usunąć wszystko samodzielnie, bezpośrednio w aplikacji — bez konieczności "
+            "kontaktu z pomocą techniczną:"
+        ),
+        "li_del_local": (
+            "<strong>Dane lokalne:</strong> Ustawienia → Usuń wszystkie dane usuwa z Twojego "
+            "urządzenia wszystkie profile, ulubione, klucze API, buforowane ceny, zarejestrowane "
+            "trasy i ustawienia."
+        ),
+        "li_del_account": (
+            "<strong>Konto TankSync i dane na serwerze:</strong> TankSync → Przejrzystość danych → "
+            "Usuń konto najpierw usuwa każdy należący do Ciebie rekord (ulubione, alerty, "
+            "zgłoszenia cen, pojazdy, tankowania, trasy, oceny), a następnie usuwa samą tożsamość "
+            "konta, w tym powiązany adres e-mail. Tej czynności nie można cofnąć."
+        ),
+        "p_deletion_fallback": (
+            "Jeśli nie masz już dostępu do aplikacji, możesz poprosić o usunięcie danych, "
+            "kontaktując się z deweloperem (sekcja 10); napisz z adresu e-mail powiązanego z Twoim "
+            "kontem, abyśmy mogli zweryfikować własność."
+        ),
+        "h2_children": "8. Prywatność dzieci",
         "p_children": (
             "Aplikacja nie jest skierowana do dzieci poniżej 13 roku życia. Świadomie nie "
             "zbieramy danych osobowych od dzieci."
         ),
-        "h2_changes": "8. Zmiany w niniejszej polityce",
+        "h2_changes": "9. Zmiany w niniejszej polityce",
         "p_changes": (
             "Co pewien czas możemy aktualizować tę politykę. Zmiany będą publikowane pod tym "
             "adresem URL z aktualną datą. Dalsze korzystanie z aplikacji oznacza akceptację "
             "zaktualizowanej polityki."
         ),
-        "h2_contact": "9. Kontakt",
+        "h2_contact": "10. Kontakt",
         "contact_dev_label": "Programista",
         "contact_email_label": "E-mail",
         "contact_source_label": "Kod źródłowy",
@@ -1222,7 +1570,7 @@ TRANSLATIONS = {
         "page_title": "Sparkilo — Pravilnik o zasebnosti",
         "h1": "Pravilnik o zasebnosti",
         "meta_app": "Sparkilo (de.tankstellen.tankstellen v iOS-u, de.tankstellen.fuelprices v Androidu)",
-        "meta_last_updated": "Zadnja posodobitev: 9. maj 2026",
+        "meta_last_updated": "Zadnja posodobitev: 15. avgust 2026",
         "h2_overview": "1. Pregled",
         "p_overview": (
             "Sparkilo (prej Fuel Prices Europe & More) je brezplačna odprtokodna aplikacija za "
@@ -1231,13 +1579,15 @@ TRANSLATIONS = {
             "sledilnih pikslov, brez oglaševalskih ID-jev."
         ),
         "h2_collected": "2. Podatki, ki jih uporabljamo",
-        "h3_location": "2.1 Približna lokacija",
+        "h3_location": "2.1 Lokacija",
         "p_location": (
-            "Ko dovolite dostop do lokacije, aplikacija prebere vaš približni položaj, da poišče "
-            "bližnje črpalke in polnilne postaje. Koordinate se kot del poizvedbe pošljejo "
-            "API-jem tretjih oseb (glejte razdelek 4). Vaša lokacija "
-            "<strong>se ne shrani na noben naš strežnik</strong> in se nikoli ne uporablja za "
-            "sledenje ali profiliranje."
+            "Ko dovolite dostop do lokacije, aplikacija prebere vaš položaj, da poišče bližnje "
+            "črpalke in polnilne postaje; te koordinate iskanja se kot del poizvedbe pošljejo "
+            "API-jem tretjih oseb (glejte razdelek 4) in se ne shranjujejo na noben naš strežnik. "
+            "Če uporabljate beleženje poti, aplikacija dodatno zabeleži vašo <strong>natančno "
+            "GPS-pot</strong>; zabeležene poti se shranjujejo na vaši napravi in, samo če omogočite "
+            "TankSync, sinhronizirajo z vašim zaledjem TankSync. Zabeležene poti se nikoli ne delijo "
+            "s tretjimi osebami."
         ),
         "h3_apikey": "2.2 API ključi, ki jih posredujete sami",
         "p_apikey": (
@@ -1252,10 +1602,15 @@ TRANSLATIONS = {
         ),
         "h3_sync": "2.4 TankSync (neobvezna sinhronizacija v oblaku)",
         "p_sync_intro": "Če omogočite TankSync, se prek storitve Supabase ustvari anonimni račun. Sinhronizirani podatki:",
-        "li_sync_id": "Anonimni ID uporabnika (UUID — brez e-pošte ali imena)",
+        "li_sync_id": (
+            "Identifikator uporabnika — privzeto anonimen UUID; po želji lahko z računom TankSync "
+            "povežete e-poštni naslov za sinhronizacijo med napravami"
+        ),
         "li_sync_fav": "ID-ji priljubljenih črpalk",
         "li_sync_alerts": "Nastavitve cenovnih opozoril",
         "li_sync_reports": "Skupnostni podatki o cenah (ID črpalke, vrsta goriva, cena, časovni žig)",
+        "li_sync_trips": "Zabeležene poti (GPS-pot, razdalje, statistika porabe)",
+        "li_sync_fillups": "Točenja goriva (strošek, litri, števec kilometrov) in profili vozil",
         "p_sync_outro": (
             "TankSync je neobvezen in privzeto izklopljen. Vse podatke na strežniku si lahko "
             "ogledate, izvozite in izbrišete iz zaslona « Preglednost podatkov » znotraj aplikacije."
@@ -1267,7 +1622,10 @@ TRANSLATIONS = {
             "vsebine. Diagnostika je privzeto izklopljena."
         ),
         "h2_not_collected": "3. Podatki, ki jih NE zbiramo",
-        "li_nc_email": "Ime, e-poštni naslov ali telefonsko številko",
+        "li_nc_email": (
+            "Ime ali telefonsko številko (e-poštni naslov se shrani samo, če ga izrecno povežete s "
+            "svojim neobveznim računom TankSync)"
+        ),
         "li_nc_payment": "Finančne ali plačilne podatke",
         "li_nc_health": "Zdravstvene ali fitnes podatke",
         "li_nc_contacts": "Stike, sporočila ali dnevnike klicev",
@@ -1303,18 +1661,39 @@ TRANSLATIONS = {
         "li_r_export": "<strong>Izvoza</strong> — podatke TankSync lahko izvozite v JSON s zaslona Preglednost podatkov.",
         "li_r_delete": "<strong>Izbrisa</strong> — vse lokalne podatke izbrišete prek Nastavitve → Izbriši vse podatke; vse strežniške podatke prek TankSync → Preglednost podatkov → Izbriši vse.",
         "li_r_withdraw": "<strong>Preklica privolitve</strong> — preklicati dovoljenje za lokacijo v sistemskih nastavitvah ali kadar koli onemogočiti TankSync / diagnostiko.",
-        "h2_children": "7. Zasebnost otrok",
+        "h2_deletion": "7. Brisanje računa in podatkov",
+        "p_deletion_intro": (
+            "Vse lahko izbrišete sami, neposredno v aplikaciji — brez potrebe po stiku s podporo:"
+        ),
+        "li_del_local": (
+            "<strong>Lokalni podatki:</strong> Nastavitve → Izbriši vse podatke odstrani vse "
+            "profile, priljubljene, API ključe, predpomnjene cene, zabeležene poti in nastavitve z "
+            "vaše naprave."
+        ),
+        "li_del_account": (
+            "<strong>Račun TankSync in podatki na strežniku:</strong> TankSync → Preglednost "
+            "podatkov → Izbriši račun najprej izbriše vsak zapis, ki je vaš (priljubljene, "
+            "opozorila, poročila o cenah, vozila, točenja goriva, poti, ocene), nato pa izbriše "
+            "samo identiteto računa, vključno z morebitnim povezanim e-poštnim naslovom. Tega "
+            "dejanja ni mogoče razveljaviti."
+        ),
+        "p_deletion_fallback": (
+            "Če do aplikacije ne morete več dostopati, lahko zahtevate izbris tako, da se obrnete "
+            "na razvijalca (razdelek 10); prosimo, pišite z e-poštnega naslova, povezanega z vašim "
+            "računom, da bomo lahko preverili lastništvo."
+        ),
+        "h2_children": "8. Zasebnost otrok",
         "p_children": (
             "Aplikacija ni namenjena otrokom, mlajšim od 13 let. Zavestno ne zbiramo osebnih "
             "podatkov otrok."
         ),
-        "h2_changes": "8. Spremembe tega pravilnika",
+        "h2_changes": "9. Spremembe tega pravilnika",
         "p_changes": (
             "Pravilnik lahko občasno posodobimo. Spremembe bomo objavili na tem URL-ju z "
             "ažurnim datumom. Z nadaljnjo uporabo aplikacije se strinjate s posodobljenim "
             "pravilnikom."
         ),
-        "h2_contact": "9. Kontakt",
+        "h2_contact": "10. Kontakt",
         "contact_dev_label": "Razvijalec",
         "contact_email_label": "E-pošta",
         "contact_source_label": "Izvorna koda",
@@ -1326,7 +1705,7 @@ TRANSLATIONS = {
         "page_title": "Sparkilo — 개인정보 처리방침",
         "h1": "개인정보 처리방침",
         "meta_app": "Sparkilo (iOS의 de.tankstellen.tankstellen, Android의 de.tankstellen.fuelprices)",
-        "meta_last_updated": "최종 업데이트: 2026년 5월 9일",
+        "meta_last_updated": "최종 업데이트: 2026년 8월 15일",
         "h2_overview": "1. 개요",
         "p_overview": (
             "Sparkilo(이전 명칭: Fuel Prices Europe & More)는 무료 오픈소스 연료 및 전기차 충전 가격 비교 앱입니다. "
@@ -1334,12 +1713,13 @@ TRANSLATIONS = {
             "광고 식별자도 사용하지 않습니다."
         ),
         "h2_collected": "2. 사용하는 데이터",
-        "h3_location": "2.1 대략적인 위치",
+        "h3_location": "2.1 위치",
         "p_location": (
-            "위치 권한을 허용하면 앱은 근처 주유소와 충전소를 찾기 위해 대략적인 위치를 읽습니다. "
-            "좌표는 검색의 일부로 제3자 API(섹션 4 참조)에 전송됩니다. 위치 정보는 "
-            "<strong>당사가 운영하는 어떤 서버에도 저장되지 않으며</strong> 추적이나 프로파일링에 "
-            "사용되지 않습니다."
+            "위치 권한을 허용하면 앱은 근처 주유소와 충전소를 찾기 위해 위치를 읽으며, 이 검색 좌표는 "
+            "검색 쿼리의 일부로 제3자 가격 API(섹션 4 참조)에 전송되고 당사가 운영하는 서버에는 "
+            "저장되지 않습니다. 주행 기록 기능을 사용하는 경우 앱은 추가로 <strong>정밀 GPS "
+            "경로</strong>를 기록하며, 기록된 주행은 기기에 저장되고 TankSync를 활성화한 경우에만 "
+            "TankSync 백엔드에 동기화됩니다. 기록된 주행은 제3자와 절대 공유되지 않습니다."
         ),
         "h3_apikey": "2.2 사용자가 제공하는 API 키",
         "p_apikey": (
@@ -1354,10 +1734,15 @@ TRANSLATIONS = {
         ),
         "h3_sync": "2.4 TankSync(선택적 클라우드 동기화)",
         "p_sync_intro": "TankSync를 활성화하면 Supabase를 통해 익명 계정이 생성됩니다. 동기화되는 데이터:",
-        "li_sync_id": "익명 사용자 ID(UUID — 이메일 또는 이름 없음)",
+        "li_sync_id": (
+            "사용자 식별자 — 기본값은 익명 UUID이며, 기기 간 동기화를 위해 선택적으로 TankSync 계정에 "
+            "이메일 주소를 연결할 수 있습니다"
+        ),
         "li_sync_fav": "즐겨찾는 주유소 ID",
         "li_sync_alerts": "가격 알림 구성",
         "li_sync_reports": "커뮤니티 가격 보고(주유소 ID, 연료 종류, 가격, 타임스탬프)",
+        "li_sync_trips": "기록된 주행(GPS 경로, 거리, 연비 통계)",
+        "li_sync_fillups": "주유 기록(비용, 리터, 주행거리계) 및 차량 프로필",
         "p_sync_outro": (
             "TankSync는 선택사항이며 기본적으로 비활성화되어 있습니다. 앱 내 « 데이터 투명성 » 화면에서 "
             "모든 서버 측 데이터를 확인, 내보내기 및 삭제할 수 있습니다."
@@ -1368,7 +1753,10 @@ TRANSLATIONS = {
             "개인 식별 정보, 위치 또는 콘텐츠는 포함되지 않습니다. 진단 보고는 기본적으로 꺼져 있습니다."
         ),
         "h2_not_collected": "3. 수집하지 않는 데이터",
-        "li_nc_email": "이름, 이메일 주소 또는 전화번호",
+        "li_nc_email": (
+            "이름 또는 전화번호(이메일 주소는 선택적인 TankSync 계정에 명시적으로 연결한 경우에만 "
+            "저장됩니다)"
+        ),
         "li_nc_payment": "금융 또는 결제 정보",
         "li_nc_health": "건강 또는 피트니스 데이터",
         "li_nc_contacts": "연락처, 메시지 또는 통화 기록",
@@ -1404,17 +1792,33 @@ TRANSLATIONS = {
         "li_r_export": "<strong>내보내기</strong> — 데이터 투명성 화면에서 TankSync 데이터를 JSON으로 내보낼 수 있습니다.",
         "li_r_delete": "<strong>삭제</strong> — 설정 → 모든 데이터 삭제로 모든 로컬 데이터를 삭제하고, TankSync → 데이터 투명성 → 모두 삭제로 모든 서버 데이터를 삭제할 수 있습니다.",
         "li_r_withdraw": "<strong>동의 철회</strong> — 기기 설정에서 위치 권한을 취소하거나 언제든 TankSync / 진단을 비활성화할 수 있습니다.",
-        "h2_children": "7. 아동 개인정보",
+        "h2_deletion": "7. 계정 및 데이터 삭제",
+        "p_deletion_intro": "고객 지원에 문의할 필요 없이 앱에서 직접 모든 것을 삭제할 수 있습니다:",
+        "li_del_local": (
+            "<strong>로컬 데이터:</strong> 설정 → 모든 데이터 삭제를 실행하면 기기에서 모든 프로필, "
+            "즐겨찾기, API 키, 캐시된 가격, 기록된 주행 및 설정이 제거됩니다."
+        ),
+        "li_del_account": (
+            "<strong>TankSync 계정 및 서버 데이터:</strong> TankSync → 데이터 투명성 → 계정 삭제를 "
+            "실행하면 먼저 사용자가 소유한 모든 행(즐겨찾기, 알림, 가격 보고, 차량, 주유 기록, 주행, "
+            "평가)이 삭제된 후 연결된 이메일 주소를 포함한 계정 자체의 신원이 삭제됩니다. 이 작업은 "
+            "되돌릴 수 없습니다."
+        ),
+        "p_deletion_fallback": (
+            "더 이상 앱에 접근할 수 없는 경우 개발자에게 문의하여(섹션 10) 삭제를 요청할 수 "
+            "있습니다. 소유권을 확인할 수 있도록 계정에 연결된 이메일 주소로 문의해 주세요."
+        ),
+        "h2_children": "8. 아동 개인정보",
         "p_children": (
             "이 앱은 13세 미만 아동을 대상으로 하지 않습니다. 당사는 아동으로부터 개인정보를 "
             "고의로 수집하지 않습니다."
         ),
-        "h2_changes": "8. 정책 변경",
+        "h2_changes": "9. 정책 변경",
         "p_changes": (
             "당사는 이 정책을 수시로 업데이트할 수 있습니다. 변경사항은 업데이트된 날짜와 함께 "
             "이 URL에 게시됩니다. 앱을 계속 사용하는 것은 업데이트된 정책에 대한 동의로 간주됩니다."
         ),
-        "h2_contact": "9. 연락처",
+        "h2_contact": "10. 연락처",
         "contact_dev_label": "개발자",
         "contact_email_label": "이메일",
         "contact_source_label": "소스 코드",
@@ -1466,6 +1870,8 @@ def render(lang: str) -> str:
           <li>{t['li_sync_fav']}</li>
           <li>{t['li_sync_alerts']}</li>
           <li>{t['li_sync_reports']}</li>
+          <li>{t['li_sync_trips']}</li>
+          <li>{t['li_sync_fillups']}</li>
         </ul>
         <p>{t['p_sync_outro']}</p>
 
@@ -1517,6 +1923,14 @@ def render(lang: str) -> str:
           <li>{t['li_r_delete']}</li>
           <li>{t['li_r_withdraw']}</li>
         </ul>
+
+        <h2>{t['h2_deletion']}</h2>
+        <p>{t['p_deletion_intro']}</p>
+        <ul>
+          <li>{t['li_del_local']}</li>
+          <li>{t['li_del_account']}</li>
+        </ul>
+        <p>{t['p_deletion_fallback']}</p>
 
         <h2>{t['h2_children']}</h2>
         <p>{t['p_children']}</p>

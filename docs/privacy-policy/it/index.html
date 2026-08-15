@@ -1,8 +1,3 @@
-<!--
-  Copyright (c) 2026 Florian DITTGEN
-  SPDX-License-Identifier: MIT
--->
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -14,7 +9,7 @@
 <body>
 
 <h1>Informativa sulla privacy</h1>
-<p class="meta">Sparkilo (de.tankstellen.tankstellen su iOS, de.tankstellen.fuelprices su Android) &mdash; Ultimo aggiornamento: 9 maggio 2026</p>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen su iOS, de.tankstellen.fuelprices su Android) &mdash; Ultimo aggiornamento: 15 agosto 2026</p>
 <p class="langs">Lingue disponibili: <a href="../">English</a> <a href="../de/">Deutsch</a> <a href="../fr/">Français</a> <a href="../es/">Español</a> <a href="../it/">Italiano</a> <a href="../nl/">Nederlands</a> <a href="../pt/">Português</a> <a href="../sv/">Svenska</a> <a href="../fi/">Suomi</a> <a href="../da/">Dansk</a> <a href="../pl/">Polski</a> <a href="../sl/">Slovenščina</a> <a href="../ko/">한국어</a></p>
 
 <h2>1. Panoramica</h2>
@@ -22,8 +17,8 @@
 
 <h2>2. Dati utilizzati</h2>
 
-<h3>2.1 Posizione approssimativa</h3>
-<p>Quando concedi l'autorizzazione alla posizione, l'app legge la tua posizione approssimativa per trovare distributori e punti di ricarica nelle vicinanze. Le coordinate vengono inviate ad API di terze parti (vedi sezione 4) come parte della ricerca. La tua posizione <strong>non viene memorizzata su alcun server da noi gestito</strong> e non viene mai usata per tracciamento o profilazione.</p>
+<h3>2.1 Posizione</h3>
+<p>Quando concedi l'autorizzazione alla posizione, l'app legge la tua posizione per trovare distributori e punti di ricarica nelle vicinanze; queste coordinate di ricerca vengono inviate ad API di terze parti (vedi sezione 4) come parte della ricerca e non vengono memorizzate su alcun server da noi gestito. Se utilizzi la registrazione dei percorsi, l'app registra inoltre il tuo <strong>percorso GPS preciso</strong>; i percorsi registrati vengono memorizzati sul tuo dispositivo e, solo se attivi TankSync, sincronizzati con il tuo backend TankSync. I percorsi registrati non vengono mai condivisi con terze parti.</p>
 
 <h3>2.2 Chiavi API che fornisci tu</h3>
 <p>Se fornisci una tua chiave API (es. Tankerkönig), viene memorizzata localmente in uno storage cifrato (Android Keystore / iOS Keychain). La chiave viene inviata solo al fornitore di API corrispondente, mai a noi o a terzi.</p>
@@ -34,10 +29,12 @@
 <h3>2.4 TankSync (sincronizzazione cloud opzionale)</h3>
 <p>Se attivi TankSync, viene creato un account anonimo tramite Supabase. I dati sincronizzati sono:</p>
 <ul>
-  <li>Identificatore utente anonimo (UUID — nessuna email, nessun nome)</li>
+  <li>Identificatore utente — UUID anonimo per impostazione predefinita; puoi facoltativamente collegare un indirizzo email al tuo account TankSync per la sincronizzazione multi-dispositivo</li>
   <li>ID dei distributori preferiti</li>
   <li>Configurazioni degli avvisi di prezzo</li>
   <li>Segnalazioni di prezzo dalla community (ID distributore, tipo carburante, prezzo, timestamp)</li>
+  <li>Percorsi registrati (percorso GPS, distanze, statistiche di consumo)</li>
+  <li>Rifornimenti (costo, litri, chilometraggio) e profili veicolo</li>
 </ul>
 <p>TankSync è opzionale e disattivato per impostazione predefinita. Puoi visualizzare, esportare ed eliminare tutti i dati lato server dalla schermata « Trasparenza dei dati » all'interno dell'app.</p>
 
@@ -46,7 +43,7 @@
 
 <h2>3. Dati che NON raccogliamo</h2>
 <ul>
-  <li>Nome, indirizzo email o numero di telefono</li>
+  <li>Nome o numero di telefono (un indirizzo email viene memorizzato solo se lo colleghi esplicitamente al tuo account TankSync facoltativo)</li>
   <li>Informazioni finanziarie o di pagamento</li>
   <li>Dati di salute o fitness</li>
   <li>Contatti, messaggi o registri delle chiamate</li>
@@ -90,13 +87,21 @@
   <li><strong>Revocare il consenso</strong> — revocare l'autorizzazione alla posizione nelle impostazioni del dispositivo o disattivare TankSync / la diagnostica in qualsiasi momento.</li>
 </ul>
 
-<h2>7. Privacy dei minori</h2>
+<h2>7. Eliminazione dell'account e dei dati</h2>
+<p>Puoi eliminare tutto autonomamente, direttamente nell'app — senza bisogno di contattare l'assistenza:</p>
+<ul>
+  <li><strong>Dati locali:</strong> Impostazioni → Elimina tutti i dati rimuove tutti i profili, i preferiti, le chiavi API, i prezzi memorizzati nella cache, i percorsi registrati e le impostazioni dal tuo dispositivo.</li>
+  <li><strong>Account TankSync e dati sul server:</strong> TankSync → Trasparenza dei dati → Elimina account cancella prima ogni riga di tua proprietà (preferiti, avvisi, segnalazioni di prezzo, veicoli, rifornimenti, percorsi, valutazioni) e poi elimina l'identità dell'account stessa, compreso qualsiasi indirizzo email collegato. Questa azione non può essere annullata.</li>
+</ul>
+<p>Se non riesci più ad accedere all'app, puoi richiedere la cancellazione contattando lo sviluppatore (sezione 10); scrivi dall'indirizzo email collegato al tuo account in modo da poterne verificare la proprietà.</p>
+
+<h2>8. Privacy dei minori</h2>
 <p>L'app non è destinata a bambini sotto i 13 anni. Non raccogliamo consapevolmente informazioni personali dai minori.</p>
 
-<h2>8. Modifiche a questa informativa</h2>
+<h2>9. Modifiche a questa informativa</h2>
 <p>Potremmo aggiornare periodicamente questa informativa. Le modifiche saranno pubblicate a questo URL con una data aggiornata. L'uso continuato dell'app costituisce accettazione della versione aggiornata.</p>
 
-<h2>9. Contatti</h2>
+<h2>10. Contatti</h2>
 <div class="contact">
   <p><strong>Sviluppatore:</strong> Florian DITTGEN</p>
   <p><strong>Email:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>

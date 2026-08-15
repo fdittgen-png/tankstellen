@@ -186,4 +186,20 @@ END;
 REVOKE ALL ON FUNCTION public.claim_trip_share(TEXT) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.claim_trip_share(TEXT) TO authenticated;
 REVOKE EXECUTE ON FUNCTION public.claim_trip_share(TEXT) FROM anon;
+
+-- ── Account deletion RPC (#3712, schema v6) ─────────────────────────
+-- Play's account-deletion requirement: "Delete account" must remove the
+-- auth identity itself, not only the data rows. Pinned to auth.uid() so
+-- a caller can only ever delete THEMSELVES; a null uid deletes nothing.
+CREATE OR REPLACE FUNCTION public.delete_user()
+RETURNS VOID
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public, auth
+AS \$\$
+  DELETE FROM auth.users WHERE id = auth.uid();
+\$\$;
+REVOKE ALL ON FUNCTION public.delete_user() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.delete_user() TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.delete_user() FROM anon;
 ''';

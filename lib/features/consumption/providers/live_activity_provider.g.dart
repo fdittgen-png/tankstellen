@@ -65,7 +65,7 @@ final class LiveActivityControllerProvider
 }
 
 String _$liveActivityControllerHash() =>
-    r'3f8ade6e06fb4c261ca2a54dfb26df691c207f14';
+    r'abfe5dafb5dbcd098f401fc797cac10cfff083ab';
 
 /// The single app-wide [LiveActivityCoordinator] — keepAlive so its
 /// throttle state (last-sent content / timestamps) survives across

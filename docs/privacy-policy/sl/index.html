@@ -1,8 +1,3 @@
-<!--
-  Copyright (c) 2026 Florian DITTGEN
-  SPDX-License-Identifier: MIT
--->
-
 <!DOCTYPE html>
 <html lang="sl">
 <head>
@@ -14,7 +9,7 @@
 <body>
 
 <h1>Pravilnik o zasebnosti</h1>
-<p class="meta">Sparkilo (de.tankstellen.tankstellen v iOS-u, de.tankstellen.fuelprices v Androidu) &mdash; Zadnja posodobitev: 9. maj 2026</p>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen v iOS-u, de.tankstellen.fuelprices v Androidu) &mdash; Zadnja posodobitev: 15. avgust 2026</p>
 <p class="langs">Razpoložljivi jeziki: <a href="../">English</a> <a href="../de/">Deutsch</a> <a href="../fr/">Français</a> <a href="../es/">Español</a> <a href="../it/">Italiano</a> <a href="../nl/">Nederlands</a> <a href="../pt/">Português</a> <a href="../sv/">Svenska</a> <a href="../fi/">Suomi</a> <a href="../da/">Dansk</a> <a href="../pl/">Polski</a> <a href="../sl/">Slovenščina</a> <a href="../ko/">한국어</a></p>
 
 <h2>1. Pregled</h2>
@@ -22,8 +17,8 @@
 
 <h2>2. Podatki, ki jih uporabljamo</h2>
 
-<h3>2.1 Približna lokacija</h3>
-<p>Ko dovolite dostop do lokacije, aplikacija prebere vaš približni položaj, da poišče bližnje črpalke in polnilne postaje. Koordinate se kot del poizvedbe pošljejo API-jem tretjih oseb (glejte razdelek 4). Vaša lokacija <strong>se ne shrani na noben naš strežnik</strong> in se nikoli ne uporablja za sledenje ali profiliranje.</p>
+<h3>2.1 Lokacija</h3>
+<p>Ko dovolite dostop do lokacije, aplikacija prebere vaš položaj, da poišče bližnje črpalke in polnilne postaje; te koordinate iskanja se kot del poizvedbe pošljejo API-jem tretjih oseb (glejte razdelek 4) in se ne shranjujejo na noben naš strežnik. Če uporabljate beleženje poti, aplikacija dodatno zabeleži vašo <strong>natančno GPS-pot</strong>; zabeležene poti se shranjujejo na vaši napravi in, samo če omogočite TankSync, sinhronizirajo z vašim zaledjem TankSync. Zabeležene poti se nikoli ne delijo s tretjimi osebami.</p>
 
 <h3>2.2 API ključi, ki jih posredujete sami</h3>
 <p>Če posredujete svoj API ključ (npr. Tankerkönig), je shranjen lokalno v šifriranem shranjevalniku (Android Keystore / iOS Keychain). Ključ se pošlje samo ustreznemu ponudniku API-ja, nikoli nam ali tretjim osebam.</p>
@@ -34,10 +29,12 @@
 <h3>2.4 TankSync (neobvezna sinhronizacija v oblaku)</h3>
 <p>Če omogočite TankSync, se prek storitve Supabase ustvari anonimni račun. Sinhronizirani podatki:</p>
 <ul>
-  <li>Anonimni ID uporabnika (UUID — brez e-pošte ali imena)</li>
+  <li>Identifikator uporabnika — privzeto anonimen UUID; po želji lahko z računom TankSync povežete e-poštni naslov za sinhronizacijo med napravami</li>
   <li>ID-ji priljubljenih črpalk</li>
   <li>Nastavitve cenovnih opozoril</li>
   <li>Skupnostni podatki o cenah (ID črpalke, vrsta goriva, cena, časovni žig)</li>
+  <li>Zabeležene poti (GPS-pot, razdalje, statistika porabe)</li>
+  <li>Točenja goriva (strošek, litri, števec kilometrov) in profili vozil</li>
 </ul>
 <p>TankSync je neobvezen in privzeto izklopljen. Vse podatke na strežniku si lahko ogledate, izvozite in izbrišete iz zaslona « Preglednost podatkov » znotraj aplikacije.</p>
 
@@ -46,7 +43,7 @@
 
 <h2>3. Podatki, ki jih NE zbiramo</h2>
 <ul>
-  <li>Ime, e-poštni naslov ali telefonsko številko</li>
+  <li>Ime ali telefonsko številko (e-poštni naslov se shrani samo, če ga izrecno povežete s svojim neobveznim računom TankSync)</li>
   <li>Finančne ali plačilne podatke</li>
   <li>Zdravstvene ali fitnes podatke</li>
   <li>Stike, sporočila ali dnevnike klicev</li>
@@ -90,13 +87,21 @@
   <li><strong>Preklica privolitve</strong> — preklicati dovoljenje za lokacijo v sistemskih nastavitvah ali kadar koli onemogočiti TankSync / diagnostiko.</li>
 </ul>
 
-<h2>7. Zasebnost otrok</h2>
+<h2>7. Brisanje računa in podatkov</h2>
+<p>Vse lahko izbrišete sami, neposredno v aplikaciji — brez potrebe po stiku s podporo:</p>
+<ul>
+  <li><strong>Lokalni podatki:</strong> Nastavitve → Izbriši vse podatke odstrani vse profile, priljubljene, API ključe, predpomnjene cene, zabeležene poti in nastavitve z vaše naprave.</li>
+  <li><strong>Račun TankSync in podatki na strežniku:</strong> TankSync → Preglednost podatkov → Izbriši račun najprej izbriše vsak zapis, ki je vaš (priljubljene, opozorila, poročila o cenah, vozila, točenja goriva, poti, ocene), nato pa izbriše samo identiteto računa, vključno z morebitnim povezanim e-poštnim naslovom. Tega dejanja ni mogoče razveljaviti.</li>
+</ul>
+<p>Če do aplikacije ne morete več dostopati, lahko zahtevate izbris tako, da se obrnete na razvijalca (razdelek 10); prosimo, pišite z e-poštnega naslova, povezanega z vašim računom, da bomo lahko preverili lastništvo.</p>
+
+<h2>8. Zasebnost otrok</h2>
 <p>Aplikacija ni namenjena otrokom, mlajšim od 13 let. Zavestno ne zbiramo osebnih podatkov otrok.</p>
 
-<h2>8. Spremembe tega pravilnika</h2>
+<h2>9. Spremembe tega pravilnika</h2>
 <p>Pravilnik lahko občasno posodobimo. Spremembe bomo objavili na tem URL-ju z ažurnim datumom. Z nadaljnjo uporabo aplikacije se strinjate s posodobljenim pravilnikom.</p>
 
-<h2>9. Kontakt</h2>
+<h2>10. Kontakt</h2>
 <div class="contact">
   <p><strong>Razvijalec:</strong> Florian DITTGEN</p>
   <p><strong>E-pošta:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
