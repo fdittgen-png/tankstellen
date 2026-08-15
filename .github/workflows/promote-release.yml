@@ -1,0 +1,85 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
+name: Promote Release
+
+# #3713 — one-click track promotion at ALWAYS 100%. The Console's promote
+# flow pre-fills the staged-rollout percentage from the last staged
+# release (a production release silently shipped at 5% that way); this
+# workflow replaces it: the newest completed release of the source track
+# is assigned to the target track with status 'completed' via the API —
+# no percentage field exists anywhere in this path. Country availability
+# is untouched (it lives on the app's track config, not the release).
+#
+# Managed publishing stays in charge: after Google's review the change
+# waits in the publishing overview for the final publish click.
+
+on:
+  workflow_dispatch:
+    inputs:
+      from_track:
+        description: 'Source track (newest completed release is promoted)'
+        required: true
+        type: choice
+        options: [internal, alpha, beta]
+        default: beta
+      to_track:
+        description: 'Target track'
+        required: true
+        type: choice
+        options: [alpha, beta, production]
+        default: production
+      dry_run:
+        description: 'Resolve and print the promotion without committing'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: promote-release
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Install Python deps
+        run: pip install --quiet google-api-python-client google-auth google-auth-httplib2
+
+      - name: Decode service-account key
+        env:
+          SA_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [ -z "$SA_JSON" ]; then
+            echo "::error::PLAY_STORE_SERVICE_ACCOUNT_JSON secret is not set." >&2
+            exit 1
+          fi
+          echo "$SA_JSON" > "$RUNNER_TEMP/play-key.json"
+          echo "PLAY_KEY_PATH=$RUNNER_TEMP/play-key.json" >> "$GITHUB_ENV"
+
+      - name: Promote at 100%
+        run: |
+          python tools/promote_release.py \
+            --from-track "${{ github.event.inputs.from_track }}" \
+            --to-track "${{ github.event.inputs.to_track }}" \
+            --key "$PLAY_KEY_PATH" \
+            ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
+
+      - name: Clean up service-account key
+        if: always()
+        run: rm -f "$PLAY_KEY_PATH"
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Promote Release" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **${{ github.event.inputs.from_track }} → ${{ github.event.inputs.to_track }}** at 100% (status: completed)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Dry run: ${{ github.event.inputs.dry_run }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Managed publishing: check the publishing overview after review for the final publish click." >> "$GITHUB_STEP_SUMMARY"
