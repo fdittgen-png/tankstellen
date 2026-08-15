@@ -477,10 +477,32 @@ class AutoTripCoordinator {
     final sup = linkSupervisor;
     Obd2Service? service;
     try {
-      service = sup == null
-          ? await opener(config.mac)
-          : sup.service ?? // #3642 — automated: respect the stand-down hold
-              await sup.connectWith(() => opener(config.mac), automated: true);
+      if (sup == null) {
+        service = await opener(config.mac);
+      } else {
+        // #3725 — a `ready` supervisor can hold a corpse: a dongle
+        // unplugged between trips dies silently (classic RFCOMM death is
+        // only visible on I/O, and nothing polls an idle link), so no
+        // drop event ever moved the state off `ready`. Reusing that
+        // service strands auto-record in an error→retry loop for the
+        // whole trip (field log 2026-08-15: 25 min of sessionOpenFailed
+        // at 60 s cadence after an adapter swap). Validate before reuse;
+        // on a corpse, report the drop so the supervisor recycles
+        // (research rule 8: full close + fresh socket) and dial through
+        // its single-flight machinery.
+        var held = sup.service;
+        if (held != null && !held.isConnected) {
+          AutoRecordTraceLog.add(
+            AutoRecordEventKind.sessionOpenFailed,
+            mac: config.mac,
+            detail: 'supervisor service stale (transport dead) — recycling',
+          );
+          sup.notifyDrop('staleServiceOnReuse');
+          held = null;
+        }
+        service = held ?? // #3642 — automated: respect the stand-down hold
+            await sup.connectWith(() => opener(config.mac), automated: true);
+      }
     } catch (e, st) {
       service = null;
       AutoRecordTraceLog.add(
@@ -522,6 +544,9 @@ class AutoTripCoordinator {
       return;
     }
 
+    // Non-null alias — flow promotion doesn't reach the stream-handler
+    // closures below.
+    final Obd2Service live = service;
     _session = service;
     // #2282 concern 4 — only the 1 Hz auto-record movement stream is
     // live at this point (the recorder hasn't taken over yet), so drop
@@ -543,6 +568,7 @@ class AutoTripCoordinator {
           mac: config.mac,
           detail: 'speed stream error — treating as link drop: $e',
         );
+        _reportSupervisorCorpse(live);
         unawaited(_onDisconnected());
       },
       onDone: () {
@@ -551,9 +577,25 @@ class AutoTripCoordinator {
           mac: config.mac,
           detail: 'speed stream closed — treating as link drop',
         );
+        _reportSupervisorCorpse(live);
         unawaited(_onDisconnected());
       },
     );
+  }
+
+  /// #3725 — when the service that died under the speed watch is the
+  /// supervisor's own held link AND its transport is genuinely dead,
+  /// tell the supervisor. Without this the supervisor stays `ready`
+  /// holding the corpse (a silent transport death produces no drop
+  /// event) and serves the exact same dead service to every subsequent
+  /// arm attempt. Session-level errors on a live transport are left
+  /// alone — the supervisor's link is still healthy for other owners.
+  void _reportSupervisorCorpse(Obd2Service service) {
+    final sup = linkSupervisor;
+    if (sup == null) return;
+    if (!identical(sup.service, service)) return;
+    if (service.isConnected) return;
+    sup.notifyDrop('coordinatorSpeedWatch: transport dead');
   }
 
   /// Best-effort balanced-priority downgrade (#2282 concern 4). The
