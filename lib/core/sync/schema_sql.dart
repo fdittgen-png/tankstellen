@@ -30,7 +30,10 @@ import 'schema_sql_policies.dart';
 /// v5 (#3452): `favorites.kind` (fuel | ev — EV favorites join the sync)
 /// + `favorites.data` (JSONB station payload, so a favorite pulled on a
 /// second device renders name/coords immediately).
-const int kSupabaseSchemaVersion = 5;
+/// v6 (#3712): `delete_user()` RPC — Play's account-deletion requirement
+/// expects "Delete account" to remove the auth identity itself, not only
+/// the data rows.
+const int kSupabaseSchemaVersion = 6;
 
 /// The metadata table that records the applied schema version. Readable by
 /// anyone (it carries no user data — only the schema version the verifier

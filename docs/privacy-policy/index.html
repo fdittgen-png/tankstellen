@@ -1,8 +1,3 @@
-<!--
-  Copyright (c) 2026 Florian DITTGEN
-  SPDX-License-Identifier: MIT
--->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,7 +9,7 @@
 <body>
 
 <h1>Privacy Policy</h1>
-<p class="meta">Sparkilo (de.tankstellen.tankstellen on iOS, de.tankstellen.fuelprices on Android) &mdash; Last updated: 9 May 2026</p>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen on iOS, de.tankstellen.fuelprices on Android) &mdash; Last updated: 15 August 2026</p>
 <p class="langs">Available languages: <a href="../">English</a> <a href="../de/">Deutsch</a> <a href="../fr/">Français</a> <a href="../es/">Español</a> <a href="../it/">Italiano</a> <a href="../nl/">Nederlands</a> <a href="../pt/">Português</a> <a href="../sv/">Svenska</a> <a href="../fi/">Suomi</a> <a href="../da/">Dansk</a> <a href="../pl/">Polski</a> <a href="../sl/">Slovenščina</a> <a href="../ko/">한국어</a></p>
 
 <h2>1. Overview</h2>
@@ -22,8 +17,8 @@
 
 <h2>2. Data we use</h2>
 
-<h3>2.1 Approximate location</h3>
-<p>When you grant location permission, the app reads your approximate position to find nearby fuel and charging stations. Coordinates are sent to third-party price APIs (see Section 4) as part of the search query. Your location is <strong>not stored on any server we operate</strong> and is never used for tracking or profiling.</p>
+<h3>2.1 Location</h3>
+<p>When you grant location permission, the app reads your position to find nearby fuel and charging stations; those search coordinates are sent to third-party price APIs (see Section 4) as part of the search query and are not stored on any server we operate. If you use trip recording, the app additionally records your <strong>precise GPS route</strong>; recorded trips are stored on your device and, only if you enable TankSync, synced to your TankSync backend. Recorded trips are never shared with third parties.</p>
 
 <h3>2.2 API keys you provide</h3>
 <p>If you provide your own API key (e.g. for Tankerkönig), it is stored locally in encrypted secure storage (Android Keystore / iOS Keychain). The key is sent only to the corresponding API provider and never to us or any other party.</p>
@@ -34,10 +29,12 @@
 <h3>2.4 TankSync (optional cloud sync)</h3>
 <p>If you opt in to TankSync, an anonymous account is created via Supabase. The data synced is:</p>
 <ul>
-  <li>Anonymous user identifier (a UUID — no email or name)</li>
+  <li>User identifier — anonymous UUID by default; you can optionally link an e-mail address to your TankSync account for cross-device sync</li>
   <li>Favorite station IDs</li>
   <li>Price alert configurations</li>
   <li>Community price reports (station ID, fuel type, price, timestamp)</li>
+  <li>Recorded trips (GPS route, distances, consumption statistics)</li>
+  <li>Fill-ups (cost, litres, odometer) and vehicle profiles</li>
 </ul>
 <p>TankSync is optional and disabled by default. You can view, export and delete all server-side data from the Data Transparency screen inside the app.</p>
 
@@ -46,7 +43,7 @@
 
 <h2>3. Data we do NOT collect</h2>
 <ul>
-  <li>Name, email address or phone number</li>
+  <li>Name or phone number (an e-mail address is only stored if you explicitly link one to your optional TankSync account)</li>
   <li>Financial or payment information</li>
   <li>Health or fitness data</li>
   <li>Contacts, messages or call logs</li>
@@ -90,25 +87,26 @@
   <li><strong>Withdraw consent</strong> — revoke location permission in your device settings, or disable TankSync / diagnostics, at any time.</li>
 </ul>
 
-<h2>7. Children's privacy</h2>
+<h2>7. Deleting your account and data</h2>
+<p>You can delete everything yourself, directly in the app — no support request needed:</p>
+<ul>
+  <li><strong>Local data:</strong> Settings → Delete all data removes all profiles, favorites, API keys, cached prices, recorded trips and settings from your device.</li>
+  <li><strong>TankSync account and server data:</strong> TankSync → Data Transparency → Delete account first wipes every row you own (favorites, alerts, price reports, vehicles, fill-ups, trips, ratings) and then deletes the account identity itself, including any linked e-mail address. This cannot be undone.</li>
+</ul>
+<p>If you can no longer access the app, you can request deletion by contacting the developer (Section 10); please write from the e-mail address linked to your account so we can verify ownership.</p>
+
+<h2>8. Children's privacy</h2>
 <p>The app is not directed at children under 13. We do not knowingly collect personal information from children.</p>
 
-<h2>8. Changes to this policy</h2>
+<h2>9. Changes to this policy</h2>
 <p>We may update this policy from time to time. Changes will be published at this URL with an updated date. Continued use of the app constitutes acceptance of the updated policy.</p>
 
-<h2>9. Contact</h2>
+<h2>10. Contact</h2>
 <div class="contact">
   <p><strong>Developer:</strong> Florian DITTGEN</p>
   <p><strong>Email:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
   <p><strong>Source code:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
 </div>
-
-<h2>Install via F-Droid</h2>
-<p>A fully libre, GMS-free build is published from this site as a self-hosted F-Droid repository. It contains no Google Mobile Services (OpenStreetMap maps, Android <code>LocationManager</code> positioning; on-device receipt/pump OCR is omitted because it depends on Google ML Kit).</p>
-<p>Add this repository in your F-Droid client (Settings → Repositories → Add):</p>
-<!-- The maintainer fills <REPO_FINGERPRINT> with the SHA-256 fingerprint
-     printed by `fdroid init` / `fdroid update`. -->
-<p><code>https://fdittgen-png.github.io/tankstellen/fdroid?fingerprint=&lt;REPO_FINGERPRINT&gt;</code></p>
 
 </body>
 </html>

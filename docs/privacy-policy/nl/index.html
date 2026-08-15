@@ -1,8 +1,3 @@
-<!--
-  Copyright (c) 2026 Florian DITTGEN
-  SPDX-License-Identifier: MIT
--->
-
 <!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -14,7 +9,7 @@
 <body>
 
 <h1>Privacybeleid</h1>
-<p class="meta">Sparkilo (de.tankstellen.tankstellen op iOS, de.tankstellen.fuelprices op Android) &mdash; Laatst bijgewerkt: 9 mei 2026</p>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen op iOS, de.tankstellen.fuelprices op Android) &mdash; Laatst bijgewerkt: 15 augustus 2026</p>
 <p class="langs">Beschikbare talen: <a href="../">English</a> <a href="../de/">Deutsch</a> <a href="../fr/">Français</a> <a href="../es/">Español</a> <a href="../it/">Italiano</a> <a href="../nl/">Nederlands</a> <a href="../pt/">Português</a> <a href="../sv/">Svenska</a> <a href="../fi/">Suomi</a> <a href="../da/">Dansk</a> <a href="../pl/">Polski</a> <a href="../sl/">Slovenščina</a> <a href="../ko/">한국어</a></p>
 
 <h2>1. Overzicht</h2>
@@ -22,8 +17,8 @@
 
 <h2>2. Welke gegevens we gebruiken</h2>
 
-<h3>2.1 Bij benadering locatie</h3>
-<p>Wanneer u de locatietoestemming verleent, leest de app uw geschatte positie om tankstations en laadpunten in de buurt te vinden. De coördinaten worden naar API's van derden gestuurd (zie sectie 4) als onderdeel van de zoekopdracht. Uw locatie <strong>wordt niet opgeslagen op een server die wij beheren</strong> en wordt nooit gebruikt voor tracking of profilering.</p>
+<h3>2.1 Locatie</h3>
+<p>Wanneer u de locatietoestemming verleent, leest de app uw positie om tankstations en laadpunten in de buurt te vinden; deze zoekcoördinaten worden als onderdeel van de zoekopdracht naar API's van derden gestuurd (zie sectie 4) en niet opgeslagen op een server die wij beheren. Als u ritregistratie gebruikt, registreert de app bovendien uw <strong>nauwkeurige gps-route</strong>; geregistreerde ritten worden op uw toestel opgeslagen en, alleen als u TankSync inschakelt, gesynchroniseerd met uw TankSync-backend. Geregistreerde ritten worden nooit gedeeld met derden.</p>
 
 <h3>2.2 API-sleutels die u zelf opgeeft</h3>
 <p>Als u een eigen API-sleutel opgeeft (bijv. Tankerkönig), wordt deze lokaal opgeslagen in versleutelde opslag (Android Keystore / iOS Keychain). De sleutel wordt alleen naar de bijbehorende API-aanbieder verzonden, nooit naar ons of derden.</p>
@@ -34,10 +29,12 @@
 <h3>2.4 TankSync (optionele cloud-sync)</h3>
 <p>Als u TankSync inschakelt, wordt een anoniem account aangemaakt via Supabase. Gesynchroniseerde gegevens:</p>
 <ul>
-  <li>Anonieme gebruikers-ID (UUID — geen e-mail, geen naam)</li>
+  <li>Gebruikers-ID — standaard een anonieme UUID; u kunt optioneel een e-mailadres koppelen aan uw TankSync-account voor synchronisatie tussen apparaten</li>
   <li>ID's van favoriete tankstations</li>
   <li>Configuraties van prijswaarschuwingen</li>
   <li>Community-prijsmeldingen (station-ID, brandstofsoort, prijs, tijdstempel)</li>
+  <li>Geregistreerde ritten (gps-route, afstanden, verbruiksstatistieken)</li>
+  <li>Tankbeurten (kosten, liters, kilometerstand) en voertuigprofielen</li>
 </ul>
 <p>TankSync is optioneel en standaard uitgeschakeld. U kunt alle servergegevens bekijken, exporteren en verwijderen via het scherm « Datatransparantie » in de app.</p>
 
@@ -46,7 +43,7 @@
 
 <h2>3. Gegevens die we NIET verzamelen</h2>
 <ul>
-  <li>Naam, e-mailadres of telefoonnummer</li>
+  <li>Naam of telefoonnummer (een e-mailadres wordt alleen opgeslagen als u dit expliciet koppelt aan uw optionele TankSync-account)</li>
   <li>Financiële of betalingsgegevens</li>
   <li>Gezondheids- of fitnessgegevens</li>
   <li>Contacten, berichten of belregistraties</li>
@@ -90,13 +87,21 @@
   <li><strong>Toestemming intrekken</strong> — locatietoestemming intrekken in de toestelinstellingen of TankSync / diagnose op elk moment uitschakelen.</li>
 </ul>
 
-<h2>7. Privacy van kinderen</h2>
+<h2>7. Uw account en gegevens verwijderen</h2>
+<p>U kunt alles zelf verwijderen, rechtstreeks in de app — geen ondersteuningsverzoek nodig:</p>
+<ul>
+  <li><strong>Lokale gegevens:</strong> Instellingen → Alle gegevens verwijderen verwijdert alle profielen, favorieten, API-sleutels, gecachte prijzen, geregistreerde ritten en instellingen van uw toestel.</li>
+  <li><strong>TankSync-account en servergegevens:</strong> TankSync → Datatransparantie → Account verwijderen wist eerst elke rij die u bezit (favorieten, waarschuwingen, prijsmeldingen, voertuigen, tankbeurten, ritten, beoordelingen) en verwijdert vervolgens de accountidentiteit zelf, inclusief een eventueel gekoppeld e-mailadres. Dit kan niet ongedaan worden gemaakt.</li>
+</ul>
+<p>Als u geen toegang meer heeft tot de app, kunt u verwijdering aanvragen door contact op te nemen met de ontwikkelaar (sectie 10); schrijf vanaf het e-mailadres dat aan uw account is gekoppeld, zodat we het eigendom kunnen verifiëren.</p>
+
+<h2>8. Privacy van kinderen</h2>
 <p>De app is niet gericht op kinderen jonger dan 13. We verzamelen niet bewust persoonlijke gegevens van kinderen.</p>
 
-<h2>8. Wijzigingen in dit beleid</h2>
+<h2>9. Wijzigingen in dit beleid</h2>
 <p>We kunnen dit beleid van tijd tot tijd aanpassen. Wijzigingen worden op deze URL gepubliceerd met een bijgewerkte datum. Voortgezet gebruik van de app betekent aanvaarding van het bijgewerkte beleid.</p>
 
-<h2>9. Contact</h2>
+<h2>10. Contact</h2>
 <div class="contact">
   <p><strong>Ontwikkelaar:</strong> Florian DITTGEN</p>
   <p><strong>E-mail:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>

@@ -1,8 +1,3 @@
-<!--
-  Copyright (c) 2026 Florian DITTGEN
-  SPDX-License-Identifier: MIT
--->
-
 <!DOCTYPE html>
 <html lang="da">
 <head>
@@ -14,7 +9,7 @@
 <body>
 
 <h1>Privatlivspolitik</h1>
-<p class="meta">Sparkilo (de.tankstellen.tankstellen på iOS, de.tankstellen.fuelprices på Android) &mdash; Senest opdateret: 9. maj 2026</p>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen på iOS, de.tankstellen.fuelprices på Android) &mdash; Senest opdateret: 15. august 2026</p>
 <p class="langs">Tilgængelige sprog: <a href="../">English</a> <a href="../de/">Deutsch</a> <a href="../fr/">Français</a> <a href="../es/">Español</a> <a href="../it/">Italiano</a> <a href="../nl/">Nederlands</a> <a href="../pt/">Português</a> <a href="../sv/">Svenska</a> <a href="../fi/">Suomi</a> <a href="../da/">Dansk</a> <a href="../pl/">Polski</a> <a href="../sl/">Slovenščina</a> <a href="../ko/">한국어</a></p>
 
 <h2>1. Oversigt</h2>
@@ -22,8 +17,8 @@
 
 <h2>2. Data vi bruger</h2>
 
-<h3>2.1 Omtrentlig placering</h3>
-<p>Når du giver placerings­tilladelse, læser appen din omtrentlige position for at finde brændstof- og ladestationer i nærheden. Koordinaterne sendes til tredjeparts-API'er (se afsnit 4) som en del af forespørgslen. Din placering <strong>opbevares ikke på nogen server, vi driver</strong>, og bruges aldrig til sporing eller profilering.</p>
+<h3>2.1 Placering</h3>
+<p>Når du giver placeringstilladelse, læser appen din position for at finde brændstof- og ladestationer i nærheden; disse søgekoordinater sendes til tredjeparts-API'er (se afsnit 4) som en del af forespørgslen og gemmes ikke på nogen server, vi driver. Hvis du bruger turregistrering, registrerer appen desuden din <strong>præcise GPS-rute</strong>; registrerede ture gemmes på din enhed og, kun hvis du aktiverer TankSync, synkroniseres til dit TankSync-backend. Registrerede ture deles aldrig med tredjeparter.</p>
 
 <h3>2.2 API-nøgler du selv angiver</h3>
 <p>Hvis du angiver din egen API-nøgle (fx Tankerkönig), gemmes den lokalt i krypteret lager (Android Keystore / iOS Keychain). Nøglen sendes kun til den tilsvarende API-udbyder, aldrig til os eller tredjeparter.</p>
@@ -34,10 +29,12 @@
 <h3>2.4 TankSync (valgfri cloud-synk)</h3>
 <p>Hvis du aktiverer TankSync, oprettes en anonym konto via Supabase. Synkroniserede data:</p>
 <ul>
-  <li>Anonymt bruger-id (UUID — ingen e-mail, intet navn)</li>
+  <li>Brugeridentifikator — som standard et anonymt UUID; du kan valgfrit knytte en e-mailadresse til din TankSync-konto for synkronisering på tværs af enheder</li>
   <li>Id'er for favorit­stationer</li>
   <li>Konfiguration af prisalarmer</li>
   <li>Community-prisrapporter (stations-id, brændstoftype, pris, tidsstempel)</li>
+  <li>Registrerede ture (GPS-rute, afstande, forbrugsstatistik)</li>
+  <li>Optankninger (pris, liter, kilometertæller) og køretøjsprofiler</li>
 </ul>
 <p>TankSync er valgfri og som standard slået fra. Du kan se, eksportere og slette alle data på serveren fra skærmen « Datatransparens » i appen.</p>
 
@@ -46,7 +43,7 @@
 
 <h2>3. Data vi IKKE indsamler</h2>
 <ul>
-  <li>Navn, e-mailadresse eller telefonnummer</li>
+  <li>Navn eller telefonnummer (en e-mailadresse gemmes kun, hvis du udtrykkeligt knytter den til din valgfrie TankSync-konto)</li>
   <li>Finansielle eller betalings­oplysninger</li>
   <li>Sundheds- eller fitnessdata</li>
   <li>Kontakter, beskeder eller opkalds­logger</li>
@@ -90,13 +87,21 @@
   <li><strong>Trække samtykke tilbage</strong> — tilbagekalde placerings­tilladelsen i enhedens indstillinger eller slå TankSync / diagnose fra når som helst.</li>
 </ul>
 
-<h2>7. Børns privatliv</h2>
+<h2>7. Sletning af din konto og dine data</h2>
+<p>Du kan slette alt selv, direkte i appen — ingen supportanmodning nødvendig:</p>
+<ul>
+  <li><strong>Lokale data:</strong> Indstillinger → Slet alle data fjerner alle profiler, favoritter, API-nøgler, cachede priser, registrerede ture og indstillinger fra din enhed.</li>
+  <li><strong>TankSync-konto og serverdata:</strong> TankSync → Datatransparens → Slet konto sletter først hver eneste post, du ejer (favoritter, alarmer, prisrapporter, køretøjer, optankninger, ture, bedømmelser), og sletter derefter selve kontoidentiteten, inklusive en eventuel tilknyttet e-mailadresse. Dette kan ikke fortrydes.</li>
+</ul>
+<p>Hvis du ikke længere har adgang til appen, kan du anmode om sletning ved at kontakte udvikleren (afsnit 10); skriv venligst fra den e-mailadresse, der er knyttet til din konto, så vi kan verificere ejerskabet.</p>
+
+<h2>8. Børns privatliv</h2>
 <p>Appen er ikke rettet mod børn under 13 år. Vi indsamler ikke bevidst personlige oplysninger fra børn.</p>
 
-<h2>8. Ændringer i denne politik</h2>
+<h2>9. Ændringer i denne politik</h2>
 <p>Vi kan opdatere denne politik fra tid til anden. Ændringer offentliggøres på denne URL med en opdateret dato. Fortsat brug af appen udgør accept af den opdaterede politik.</p>
 
-<h2>9. Kontakt</h2>
+<h2>10. Kontakt</h2>
 <div class="contact">
   <p><strong>Udvikler:</strong> Florian DITTGEN</p>
   <p><strong>E-mail:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>

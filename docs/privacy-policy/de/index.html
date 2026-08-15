@@ -1,8 +1,3 @@
-<!--
-  Copyright (c) 2026 Florian DITTGEN
-  SPDX-License-Identifier: MIT
--->
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -14,7 +9,7 @@
 <body>
 
 <h1>Datenschutzerklärung</h1>
-<p class="meta">Sparkilo (de.tankstellen.tankstellen unter iOS, de.tankstellen.fuelprices unter Android) &mdash; Stand: 9. Mai 2026</p>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen unter iOS, de.tankstellen.fuelprices unter Android) &mdash; Stand: 15. August 2026</p>
 <p class="langs">Verfügbare Sprachen: <a href="../">English</a> <a href="../de/">Deutsch</a> <a href="../fr/">Français</a> <a href="../es/">Español</a> <a href="../it/">Italiano</a> <a href="../nl/">Nederlands</a> <a href="../pt/">Português</a> <a href="../sv/">Svenska</a> <a href="../fi/">Suomi</a> <a href="../da/">Dansk</a> <a href="../pl/">Polski</a> <a href="../sl/">Slovenščina</a> <a href="../ko/">한국어</a></p>
 
 <h2>1. Überblick</h2>
@@ -22,8 +17,8 @@
 
 <h2>2. Verwendete Daten</h2>
 
-<h3>2.1 Ungefährer Standort</h3>
-<p>Wenn Sie den Standortzugriff erlauben, liest die App Ihre ungefähre Position aus, um nahegelegene Tankstellen und Ladesäulen zu finden. Die Koordinaten werden als Teil der Suchanfrage an Drittanbieter-APIs gesendet (siehe Abschnitt 4). Ihr Standort wird <strong>auf keinem von uns betriebenen Server gespeichert</strong> und niemals zum Tracking oder Profiling verwendet.</p>
+<h3>2.1 Standort</h3>
+<p>Wenn Sie den Standortzugriff erlauben, liest die App Ihre Position aus, um nahegelegene Tankstellen und Ladesäulen zu finden; diese Suchkoordinaten werden als Teil der Suchanfrage an Drittanbieter-APIs gesendet (siehe Abschnitt 4) und nicht auf einem von uns betriebenen Server gespeichert. Wenn Sie die Fahrtenaufzeichnung nutzen, zeichnet die App zusätzlich Ihre <strong>präzise GPS-Route</strong> auf; aufgezeichnete Fahrten werden auf Ihrem Gerät gespeichert und, nur wenn Sie TankSync aktivieren, mit Ihrem TankSync-Backend synchronisiert. Aufgezeichnete Fahrten werden niemals an Dritte weitergegeben.</p>
 
 <h3>2.2 Eigene API-Schlüssel</h3>
 <p>Wenn Sie einen eigenen API-Schlüssel hinterlegen (z. B. für Tankerkönig), wird er lokal in einem verschlüsselten Speicher (Android Keystore / iOS Keychain) gehalten. Der Schlüssel wird ausschließlich an den jeweiligen API-Anbieter gesendet, niemals an uns oder Dritte.</p>
@@ -34,10 +29,12 @@
 <h3>2.4 TankSync (optionale Cloud-Synchronisation)</h3>
 <p>Wenn Sie TankSync aktivieren, wird über Supabase ein anonymes Konto angelegt. Synchronisiert werden:</p>
 <ul>
-  <li>Anonyme Benutzer-ID (UUID — keine E-Mail-Adresse, kein Name)</li>
+  <li>Benutzerkennung — standardmäßig anonyme UUID; Sie können optional eine E-Mail-Adresse mit Ihrem TankSync-Konto verknüpfen, um geräteübergreifend zu synchronisieren</li>
   <li>Favoriten-Stationen-IDs</li>
   <li>Konfigurationen für Preisalarme</li>
   <li>Community-Preismeldungen (Stations-ID, Kraftstoffart, Preis, Zeitstempel)</li>
+  <li>Aufgezeichnete Fahrten (GPS-Route, Distanzen, Verbrauchsstatistiken)</li>
+  <li>Tankvorgänge (Kosten, Liter, Kilometerstand) und Fahrzeugprofile</li>
 </ul>
 <p>TankSync ist optional und standardmäßig deaktiviert. Sie können sämtliche serverseitigen Daten im Bildschirm „Datentransparenz“ in der App einsehen, exportieren und löschen.</p>
 
@@ -46,7 +43,7 @@
 
 <h2>3. Daten, die wir NICHT erheben</h2>
 <ul>
-  <li>Name, E-Mail-Adresse oder Telefonnummer</li>
+  <li>Name oder Telefonnummer (eine E-Mail-Adresse wird nur gespeichert, wenn Sie sie ausdrücklich mit Ihrem optionalen TankSync-Konto verknüpfen)</li>
   <li>Finanz- oder Zahlungsdaten</li>
   <li>Gesundheits- oder Fitnessdaten</li>
   <li>Kontakte, Nachrichten oder Anrufprotokolle</li>
@@ -90,13 +87,21 @@
   <li><strong>Widerruf</strong> — Sie können den Standortzugriff in den Geräteeinstellungen jederzeit widerrufen oder TankSync / Diagnose jederzeit deaktivieren.</li>
 </ul>
 
-<h2>7. Datenschutz für Kinder</h2>
+<h2>7. Löschen Ihres Kontos und Ihrer Daten</h2>
+<p>Sie können alles selbst löschen, direkt in der App — ohne Support-Anfrage:</p>
+<ul>
+  <li><strong>Lokale Daten:</strong> Einstellungen → Alle Daten löschen entfernt alle Profile, Favoriten, API-Schlüssel, zwischengespeicherten Preise, aufgezeichneten Fahrten und Einstellungen von Ihrem Gerät.</li>
+  <li><strong>TankSync-Konto und Serverdaten:</strong> TankSync → Datentransparenz → Konto löschen entfernt zunächst jeden Datensatz, der Ihnen gehört (Favoriten, Preisalarme, Preismeldungen, Fahrzeuge, Tankvorgänge, Fahrten, Bewertungen), und löscht anschließend die Kontoidentität selbst, einschließlich einer verknüpften E-Mail-Adresse. Dies kann nicht rückgängig gemacht werden.</li>
+</ul>
+<p>Wenn Sie keinen Zugriff mehr auf die App haben, können Sie die Löschung beantragen, indem Sie den Entwickler kontaktieren (Abschnitt 10); schreiben Sie bitte von der mit Ihrem Konto verknüpften E-Mail-Adresse, damit wir die Inhaberschaft überprüfen können.</p>
+
+<h2>8. Datenschutz für Kinder</h2>
 <p>Die App richtet sich nicht an Kinder unter 13 Jahren. Wir erheben wissentlich keine personenbezogenen Daten von Kindern.</p>
 
-<h2>8. Änderungen dieser Erklärung</h2>
+<h2>9. Änderungen dieser Erklärung</h2>
 <p>Wir können diese Datenschutzerklärung von Zeit zu Zeit aktualisieren. Änderungen werden unter dieser URL mit aktualisiertem Datum veröffentlicht. Die fortgesetzte Nutzung der App gilt als Zustimmung zur aktualisierten Fassung.</p>
 
-<h2>9. Kontakt</h2>
+<h2>10. Kontakt</h2>
 <div class="contact">
   <p><strong>Entwickler:</strong> Florian DITTGEN</p>
   <p><strong>E-Mail:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>

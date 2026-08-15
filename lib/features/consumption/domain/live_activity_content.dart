@@ -70,6 +70,13 @@ class LiveActivityContent {
   /// would break the documented lock-step.
   final String recordingLabel;
 
+  /// #3724 — localized labels for the Android tile's action buttons
+  /// (Pause / Resume / Stop). Same channel-map exclusion rule as
+  /// [recordingLabel].
+  final String pauseActionLabel;
+  final String resumeActionLabel;
+  final String stopActionLabel;
+
   const LiveActivityContent({
     required this.mode,
     required this.paused,
@@ -80,6 +87,9 @@ class LiveActivityContent {
     required this.distanceText,
     required this.pausedLabel,
     required this.recordingLabel,
+    required this.pauseActionLabel,
+    required this.resumeActionLabel,
+    required this.stopActionLabel,
     this.stationName,
     this.priceText,
     this.fuelLabel,
@@ -119,6 +129,9 @@ class LiveActivityContent {
       other.distanceText == distanceText &&
       other.pausedLabel == pausedLabel &&
       other.recordingLabel == recordingLabel &&
+      other.pauseActionLabel == pauseActionLabel &&
+      other.resumeActionLabel == resumeActionLabel &&
+      other.stopActionLabel == stopActionLabel &&
       other.stationName == stationName &&
       other.priceText == priceText &&
       other.fuelLabel == fuelLabel &&
@@ -136,6 +149,9 @@ class LiveActivityContent {
     distanceText,
     pausedLabel,
     recordingLabel,
+    pauseActionLabel,
+    resumeActionLabel,
+    stopActionLabel,
     stationName,
     priceText,
     fuelLabel,
@@ -178,6 +194,10 @@ LiveActivityContent? buildLiveActivityContent({
       1000;
   final pausedLabel = l.tripBannerPaused;
   final recordingLabel = l.tripBannerRecording; // #3722 — Android tile title
+  // #3724 — Android tile action labels (existing keys, zero new strings).
+  final pauseActionLabel = l.tripPause;
+  final resumeActionLabel = l.tripResume;
+  final stopActionLabel = l.tripStop;
   final distance = live?.distanceKmSoFar;
   final distanceText = (distance != null && distance >= 0.1)
       ? '${distance.toStringAsFixed(1)} km'
@@ -227,6 +247,9 @@ LiveActivityContent? buildLiveActivityContent({
       distanceText: distanceText,
       pausedLabel: pausedLabel,
       recordingLabel: recordingLabel,
+      pauseActionLabel: pauseActionLabel,
+      resumeActionLabel: resumeActionLabel,
+      stopActionLabel: stopActionLabel,
       stationName: station.name.isNotEmpty ? station.name : station.brand,
       priceText: price != null ? PriceFormatter.formatPrice(price) : '--',
       fuelLabel: fuel.displayName,
@@ -264,5 +287,8 @@ LiveActivityContent? buildLiveActivityContent({
     distanceText: distanceText,
     pausedLabel: pausedLabel,
     recordingLabel: recordingLabel,
+    pauseActionLabel: pauseActionLabel,
+    resumeActionLabel: resumeActionLabel,
+    stopActionLabel: stopActionLabel,
   );
 }

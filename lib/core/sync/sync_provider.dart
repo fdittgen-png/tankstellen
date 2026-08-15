@@ -257,6 +257,18 @@ class SyncState extends _$SyncState {
   Future<void> deleteAccount() async {
     try {
       await UserDataSync.deleteAll();
+      // #3712 — Play's account-deletion requirement: the auth identity
+      // (e-mail) must go too, not just the data rows. The delete_user()
+      // RPC (schema v6) deletes the caller's own auth.users record.
+      // Best-effort in its own guard: a self-host schema older than v6
+      // lacks the RPC, and the wipe + sign-out must still complete —
+      // the verifier's version check flags the outdated schema.
+      try {
+        await TankSyncClient.client?.rpc<void>('delete_user');
+      } catch (e, st) {
+        unawaited(errorLogger.log(ErrorLayer.sync, e, st,
+            context: const {'where': 'delete_user RPC failed (schema < v6?)'}));
+      }
       await TankSyncClient.signOut();
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'Delete account failed'}));

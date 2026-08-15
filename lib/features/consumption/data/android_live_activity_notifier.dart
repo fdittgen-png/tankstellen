@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -17,6 +19,13 @@ import '../domain/live_activity_content.dart';
 /// trick the Swift widget uses. Distance / consumption refresh rides the
 /// [LiveActivityCoordinator]'s existing update cadence with
 /// `onlyAlertOnce`, so updates are silent in-place redraws.
+///
+/// #3724 — swipe-resistance: Android 14+ lets users dismiss even
+/// `ongoing: true` notifications (only a foreground-service notification
+/// is truly fixed, and the FGS is gated behind the #3436 Play
+/// declaration). While a trip is active the notifier therefore
+/// self-reposts on a [heartbeat] cadence, so a swipe resurrects the
+/// tile within seconds; [end] kills the heartbeat with the tile.
 ///
 /// Same never-throw contract as [LiveActivityController]: any platform
 /// failure degrades to "no tile", never to a crashed recorder.
@@ -44,6 +53,23 @@ class AndroidLiveActivityNotifier {
 
   bool _channelCreated = false;
 
+  /// #3724 — swipe-resurrect cadence. Short enough that a dismissed
+  /// tile reappears promptly, long enough to be battery-irrelevant.
+  static const Duration heartbeat = Duration(seconds: 20);
+
+  Timer? _heartbeat;
+  LiveActivityContent? _lastContent;
+
+  /// Notification action ids, routed back through the tap dispatcher as
+  /// `trip_action:<id>` payloads — ONE listener maps them onto the same
+  /// TripRecordingController methods the in-app buttons call.
+  static const String actionPause = 'trip_pause';
+  static const String actionResume = 'trip_resume';
+  static const String actionStop = 'trip_stop';
+
+  /// Payload prefix for action round-trips via NotificationTapDispatcher.
+  static const String actionPayloadPrefix = 'trip_action:';
+
   Future<void> _ensureChannel() async {
     if (_channelCreated) return;
     final android = _plugin.resolvePlatformSpecificImplementation<
@@ -65,6 +91,12 @@ class AndroidLiveActivityNotifier {
   /// false when the platform refused — the coordinator then stays quiet
   /// for this trip, mirroring the iOS contract.
   Future<bool> show(LiveActivityContent content) async {
+    _lastContent = content;
+    _armHeartbeat();
+    return _post(content);
+  }
+
+  Future<bool> _post(LiveActivityContent content) async {
     try {
       await _ensureChannel();
       final render = buildAndroidLiveActivityRender(content);
@@ -89,6 +121,20 @@ class AndroidLiveActivityNotifier {
             showWhen: true,
             when: content.startedAtEpochMs,
             usesChronometer: render.chronometerTicking,
+            // #3724 — the full body survives in the expanded card; the
+            // collapsed two-line clamp is an OS constant.
+            styleInformation: BigTextStyleInformation(render.body),
+            actions: [
+              for (final a in render.actions)
+                AndroidNotificationAction(
+                  a.id,
+                  a.label,
+                  // Bring the app forward: the recorder lives in the
+                  // main isolate, and the in-app banner gives instant
+                  // visual feedback for the tapped control.
+                  showsUserInterface: true,
+                ),
+            ],
           ),
         ),
       );
@@ -101,9 +147,30 @@ class AndroidLiveActivityNotifier {
     }
   }
 
+  void _armHeartbeat() {
+    _heartbeat ??= Timer.periodic(heartbeat, (_) {
+      final content = _lastContent;
+      if (content == null) return;
+      // Re-post unconditionally: a swiped-away tile comes back, an
+      // intact one redraws in place (onlyAlertOnce keeps it silent).
+      unawaited(_post(content));
+    });
+  }
+
+  /// #3724 — cancel only the heartbeat (no platform call): the
+  /// provider-dispose path, where the plugin may already be unusable.
+  void disposeHeartbeat() {
+    _heartbeat?.cancel();
+    _heartbeat = null;
+    _lastContent = null;
+  }
+
   /// Remove the tile (trip stopped, or a stale tile from a dead
-  /// process on next launch).
+  /// process on next launch) and stop the swipe-resurrect heartbeat.
   Future<void> end() async {
+    _heartbeat?.cancel();
+    _heartbeat = null;
+    _lastContent = null;
     try {
       await _plugin.cancel(id: notificationId);
     } catch (e, st) {
@@ -120,6 +187,7 @@ class AndroidLiveActivityRender {
     required this.title,
     required this.body,
     required this.chronometerTicking,
+    required this.actions,
   });
 
   final String title;
@@ -128,6 +196,18 @@ class AndroidLiveActivityRender {
   /// Paused trips freeze the elapsed readout (the `when` timestamp still
   /// anchors "started at HH:MM" via `showWhen`).
   final bool chronometerTicking;
+
+  /// #3724 — Pause/Resume (contextual) + Stop, mirroring the in-app
+  /// recording controls.
+  final List<AndroidLiveActivityAction> actions;
+}
+
+/// One tile action button — id + localized label.
+@immutable
+class AndroidLiveActivityAction {
+  const AndroidLiveActivityAction({required this.id, required this.label});
+  final String id;
+  final String label;
 }
 
 /// Render precedence mirrors the PiP tile / Live Activity exactly:
@@ -150,5 +230,21 @@ AndroidLiveActivityRender buildAndroidLiveActivityRender(
     title: title,
     body: parts.join(' · '),
     chronometerTicking: !c.paused,
+    // #3724 — mirror the in-app controls: pause XOR resume, always stop.
+    actions: [
+      c.paused
+          ? AndroidLiveActivityAction(
+              id: AndroidLiveActivityNotifier.actionResume,
+              label: c.resumeActionLabel,
+            )
+          : AndroidLiveActivityAction(
+              id: AndroidLiveActivityNotifier.actionPause,
+              label: c.pauseActionLabel,
+            ),
+      AndroidLiveActivityAction(
+        id: AndroidLiveActivityNotifier.actionStop,
+        label: c.stopActionLabel,
+      ),
+    ],
   );
 }

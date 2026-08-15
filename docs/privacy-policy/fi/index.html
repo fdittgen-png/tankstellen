@@ -1,8 +1,3 @@
-<!--
-  Copyright (c) 2026 Florian DITTGEN
-  SPDX-License-Identifier: MIT
--->
-
 <!DOCTYPE html>
 <html lang="fi">
 <head>
@@ -14,7 +9,7 @@
 <body>
 
 <h1>Tietosuojakäytäntö</h1>
-<p class="meta">Sparkilo (de.tankstellen.tankstellen iOS:llä, de.tankstellen.fuelprices Androidilla) &mdash; Viimeksi päivitetty: 9. toukokuuta 2026</p>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen iOS:llä, de.tankstellen.fuelprices Androidilla) &mdash; Viimeksi päivitetty: 15. elokuuta 2026</p>
 <p class="langs">Saatavilla olevat kielet: <a href="../">English</a> <a href="../de/">Deutsch</a> <a href="../fr/">Français</a> <a href="../es/">Español</a> <a href="../it/">Italiano</a> <a href="../nl/">Nederlands</a> <a href="../pt/">Português</a> <a href="../sv/">Svenska</a> <a href="../fi/">Suomi</a> <a href="../da/">Dansk</a> <a href="../pl/">Polski</a> <a href="../sl/">Slovenščina</a> <a href="../ko/">한국어</a></p>
 
 <h2>1. Yleiskatsaus</h2>
@@ -22,8 +17,8 @@
 
 <h2>2. Käyttämämme tiedot</h2>
 
-<h3>2.1 Likimääräinen sijainti</h3>
-<p>Kun annat sijaintiluvan, sovellus lukee likimääräisen sijaintisi löytääkseen lähimmät polttoaine- ja latausasemat. Koordinaatit lähetetään kolmansien osapuolien rajapintoihin (ks. luku 4) hakuna. Sijaintiasi <strong>ei tallenneta millekään ylläpitämällemme palvelimelle</strong>, eikä sitä koskaan käytetä seurantaan tai profilointiin.</p>
+<h3>2.1 Sijainti</h3>
+<p>Kun annat sijaintiluvan, sovellus lukee sijaintisi löytääkseen lähimmät polttoaine- ja latausasemat; nämä hakukoordinaatit lähetetään kolmansien osapuolien rajapintoihin (ks. luku 4) osana hakua eikä niitä tallenneta millekään ylläpitämällemme palvelimelle. Jos käytät matkan tallennusta, sovellus tallentaa lisäksi <strong>tarkan GPS-reittisi</strong>; tallennetut matkat säilytetään laitteellasi ja, vain jos otat TankSyncin käyttöön, synkronoidaan TankSync-taustajärjestelmääsi. Tallennettuja matkoja ei koskaan jaeta kolmansille osapuolille.</p>
 
 <h3>2.2 Itse antamasi API-avaimet</h3>
 <p>Jos annat oman API-avaimesi (esim. Tankerkönig), se tallennetaan paikallisesti salattuun säilöön (Android Keystore / iOS Keychain). Avain lähetetään vain vastaavalle API-tarjoajalle, ei meille eikä kolmansille osapuolille.</p>
@@ -34,10 +29,12 @@
 <h3>2.4 TankSync (valinnainen pilvisynkronointi)</h3>
 <p>Jos otat TankSyncin käyttöön, Supabaseen luodaan anonyymi tili. Synkronoitavat tiedot:</p>
 <ul>
-  <li>Anonyymi käyttäjätunnus (UUID — ei sähköpostia, ei nimeä)</li>
+  <li>Käyttäjätunnus — oletuksena anonyymi UUID; voit halutessasi liittää sähköpostiosoitteen TankSync-tiliisi laitteiden välistä synkronointia varten</li>
   <li>Suosikkiasemien tunnukset</li>
   <li>Hintahälytysten asetukset</li>
   <li>Yhteisön hintailmoitukset (aseman tunnus, polttoainetyyppi, hinta, aikaleima)</li>
+  <li>Tallennetut matkat (GPS-reitti, matkat, kulutustilastot)</li>
+  <li>Tankkaukset (hinta, litrat, mittarilukema) ja ajoneuvoprofiilit</li>
 </ul>
 <p>TankSync on valinnainen ja oletuksena pois käytöstä. Voit tarkastella, viedä ja poistaa kaikki palvelinpuolen tiedot sovelluksen « Tietojen läpinäkyvyys » -näytöltä.</p>
 
@@ -46,7 +43,7 @@
 
 <h2>3. Tiedot, joita EMME kerää</h2>
 <ul>
-  <li>Nimi, sähköpostiosoite tai puhelinnumero</li>
+  <li>Nimi tai puhelinnumero (sähköpostiosoite tallennetaan vain, jos liität sen nimenomaisesti valinnaiseen TankSync-tiliisi)</li>
   <li>Talous- tai maksutiedot</li>
   <li>Terveys- tai kuntotiedot</li>
   <li>Yhteystiedot, viestit tai puhelulokit</li>
@@ -90,13 +87,21 @@
   <li><strong>Peruuttaa suostumuksesi</strong> — peruuta sijaintilupa laitteen asetuksista tai poista TankSync / diagnostiikka käytöstä milloin tahansa.</li>
 </ul>
 
-<h2>7. Lasten yksityisyys</h2>
+<h2>7. Tilisi ja tietojesi poistaminen</h2>
+<p>Voit poistaa kaiken itse, suoraan sovelluksessa — ilman tukipyyntöä:</p>
+<ul>
+  <li><strong>Paikalliset tiedot:</strong> Asetukset → Poista kaikki tiedot poistaa kaikki profiilit, suosikit, API-avaimet, välimuistiin tallennetut hinnat, tallennetut matkat ja asetukset laitteeltasi.</li>
+  <li><strong>TankSync-tili ja palvelintiedot:</strong> TankSync → Tietojen läpinäkyvyys → Poista tili tyhjentää ensin jokaisen omistamasi rivin (suosikit, hälytykset, hintailmoitukset, ajoneuvot, tankkaukset, matkat, arvostelut) ja poistaa sitten itse tilin identiteetin, mukaan lukien mahdollisesti liitetyn sähköpostiosoitteen. Tätä ei voi peruuttaa.</li>
+</ul>
+<p>Jos et enää pääse sovellukseen, voit pyytää poistoa ottamalla yhteyttä kehittäjään (luku 10); kirjoita tilisi sähköpostiosoitteesta, jotta voimme vahvistaa omistajuuden.</p>
+
+<h2>8. Lasten yksityisyys</h2>
 <p>Sovellusta ei ole suunnattu alle 13-vuotiaille lapsille. Emme tietoisesti kerää henkilötietoja lapsilta.</p>
 
-<h2>8. Muutokset tähän käytäntöön</h2>
+<h2>9. Muutokset tähän käytäntöön</h2>
 <p>Voimme päivittää tätä käytäntöä ajoittain. Muutokset julkaistaan tässä osoitteessa päivitetyllä päivämäärällä. Sovelluksen käytön jatkaminen tarkoittaa päivitetyn käytännön hyväksymistä.</p>
 
-<h2>9. Yhteystiedot</h2>
+<h2>10. Yhteystiedot</h2>
 <div class="contact">
   <p><strong>Kehittäjä:</strong> Florian DITTGEN</p>
   <p><strong>Sähköposti:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>

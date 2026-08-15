@@ -122,6 +122,22 @@ void main() {
       expect(sql, contains("'schema_version', '$kSupabaseSchemaVersion'"));
     });
 
+    test('#3712 (v6) — the delete_user account-deletion RPC ships in the '
+        'wizard SQL, self-scoped and never callable anonymously', () {
+      // Even a fully-provisioned older schema must receive the RPC — it
+      // lives in the unconditional rpcSql tail, not a table block.
+      final sql = SchemaVerifier.getMigrationSql(
+          {for (final t in SchemaVerifier.allTables) t: true});
+      expect(sql, contains('CREATE OR REPLACE FUNCTION public.delete_user()'));
+      expect(sql, contains('DELETE FROM auth.users WHERE id = auth.uid()'),
+          reason: 'the RPC must be pinned to the CALLER — any broader '
+              'predicate would let one user delete another');
+      expect(sql,
+          contains('REVOKE EXECUTE ON FUNCTION public.delete_user() FROM anon'));
+      expect(sql,
+          contains('GRANT EXECUTE ON FUNCTION public.delete_user() TO authenticated'));
+    });
+
     test('#3452 — the v5 favorites columns reach an EXISTING favorites '
         'table (idempotent ALTER upgrade path)', () {
       // A self-hoster whose `favorites` table pre-exists gets NO CREATE

@@ -80,5 +80,22 @@ void main() {
     test('mentions HTTPS encryption', () {
       expect(html, contains('HTTPS'));
     });
+
+    test('#3712 — contains the account/data-deletion section Play\'s '
+        'deletion URL points at', () {
+      expect(html, contains('Deleting your account and data'));
+      expect(html, contains('Delete account'),
+          reason: 'the in-app deletion path must be named');
+      expect(html, contains('including any linked e-mail address'),
+          reason: 'the page must state the auth identity is deleted too, '
+              'matching the delete_user RPC behavior (schema v6)');
+    });
+
+    test('#3712 — no longer claims e-mail is never collected (TankSync '
+        'accounts can link one)', () {
+      expect(html, isNot(contains('Name, email address or phone number')),
+          reason: 'the pre-2026-08 "we never collect email" bullet '
+              'contradicts the corrected Play data-safety declaration');
+    });
   });
 }
