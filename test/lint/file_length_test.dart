@@ -383,10 +383,15 @@ void main() {
     // dead-link self-heal (speed-stream error/done handlers, the
     // foreground-arm liveness check, and the dead-husk hand-off guard)
     // that un-strands auto-record after a foreground link death.
+    // #3725 — re-grandfathered 803 → 845: the stale-supervisor-service
+    // guards (validate-before-reuse in the open path + the
+    // _reportSupervisorCorpse speed-watch hook) that stop a whole trip
+    // from looping on a dead adapter link. Third bump — decomposition
+    // tracked by #3727.
     'lib/features/obd2/data/auto_trip_coordinator.dart': (
-      lines: 803,
-      bumps: 2,
-      decompositionIssue: null,
+      lines: 845,
+      bumps: 3,
+      decompositionIssue: 3727,
     ),
     // #3279 — elm327_parsers.dart decomposed below the cap (419 → 345): the
     // final slice moved the shared decode plumbing — `cleanResponse`
