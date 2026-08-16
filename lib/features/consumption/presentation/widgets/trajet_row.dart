@@ -25,6 +25,11 @@ class TrajetRow extends StatelessWidget {
   /// — every owned trip renders exactly as before.
   final bool shared;
 
+  /// Long-press action (#3726) — the "Shared with me" section wires
+  /// the report/block moderation sheet here. Null (no-op) for owned
+  /// trips, which need no moderation affordance.
+  final VoidCallback? onLongPress;
+
   const TrajetRow({
     super.key,
     required this.entry,
@@ -33,6 +38,7 @@ class TrajetRow extends StatelessWidget {
     required this.theme,
     required this.onTap,
     this.shared = false,
+    this.onLongPress,
   });
 
   @override
@@ -78,6 +84,7 @@ class TrajetRow extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
+        onLongPress: onLongPress,
         child: Container(
           decoration: BoxDecoration(
             border: Border(left: BorderSide(color: stripeColor, width: 4)),

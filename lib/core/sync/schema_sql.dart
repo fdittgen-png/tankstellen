@@ -33,7 +33,11 @@ import 'schema_sql_policies.dart';
 /// v6 (#3712): `delete_user()` RPC — Play's account-deletion requirement
 /// expects "Delete account" to remove the auth identity itself, not only
 /// the data rows.
-const int kSupabaseSchemaVersion = 6;
+/// v7 (#3726): `content_reports` table — Play's UGC policy requires an
+/// in-app REPORT mechanism before UGC can be declared in the IARC rating;
+/// each report row names the reporter and the reported content
+/// (`target_kind` / `target_id`) for the self-host operator to review.
+const int kSupabaseSchemaVersion = 7;
 
 /// The metadata table that records the applied schema version. Readable by
 /// anyone (it carries no user data — only the schema version the verifier
@@ -255,6 +259,21 @@ CREATE INDEX IF NOT EXISTS trip_shares_recipient_idx
   ON public.trip_shares(shared_with_id);
 CREATE INDEX IF NOT EXISTS trip_shares_trip_recipient_idx
   ON public.trip_shares(trip_id, shared_with_id);
+''',
+  // #3726 (v7) — in-app "Report content" rows for community UGC (Play
+  // UGC-policy prerequisite). The reporter files a row naming the content
+  // (`target_kind`/`target_id`); the operator reviews out-of-band.
+  'content_reports': '''
+CREATE TABLE IF NOT EXISTS public.content_reports (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  reporter_user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  target_kind TEXT NOT NULL,
+  target_id TEXT NOT NULL,
+  reason TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS content_reports_reporter_idx
+  ON public.content_reports(reporter_user_id);
 ''',
   // #3078 — deletion tombstones. One row per deleted record so a delete on
   // one device doesn't resurrect from another's still-local copy through the

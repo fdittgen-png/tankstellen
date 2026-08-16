@@ -5,6 +5,8 @@ import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/sync/trip_shares_sync.dart';
+import 'package:tankstellen/features/consumption/data/trip_history_entry.dart';
+import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import '../../helpers/silence_error_logger.dart';
 
 /// #2240 — coverage of [TripSharesSync] (cross-account trip sharing).
@@ -68,7 +70,9 @@ void main() {
     test('fetchSharedWithMe returns empty when not signed in', () async {
       // Mirrors RLS contract #1/#2: with no session there's no
       // auth.uid(), so the recipient policy matches nothing.
-      expect(await TripSharesSync.fetchSharedWithMe(), isEmpty);
+      final fetch = await TripSharesSync.fetchSharedWithMe();
+      expect(fetch.entries, isEmpty);
+      expect(fetch.ownerByTripId, isEmpty);
     });
 
     test('revoke is a no-op when not signed in', () async {
@@ -164,6 +168,65 @@ void main() {
       final a = TripSharesSync.generateShareToken(random: Random(42));
       final b = TripSharesSync.generateShareToken(random: Random(42));
       expect(a, b);
+    });
+  });
+
+  group('TripSharesSync.ownersByTripId (#3726)', () {
+    test('maps trip_id → owner_id, dropping malformed rows', () {
+      final map = TripSharesSync.ownersByTripId([
+        {'trip_id': 't1', 'owner_id': 'alice'},
+        {'trip_id': 't2', 'owner_id': 'bob'},
+        {'trip_id': 't3'}, // no owner → dropped
+        {'owner_id': 'carol'}, // no trip id → dropped
+      ]);
+      expect(map, {'t1': 'alice', 't2': 'bob'});
+    });
+  });
+
+  group('SharedTripsFetch.withoutModerated (#3726)', () {
+    TripHistoryEntry entry(String id) => TripHistoryEntry(
+          id: id,
+          vehicleId: null,
+          summary: TripSummary(
+            startedAt: DateTime(2026, 5, 10, 10),
+            endedAt: DateTime(2026, 5, 10, 10, 30),
+            distanceKm: 12.5,
+            maxRpm: 3000,
+            highRpmSeconds: 5,
+            idleSeconds: 30,
+            harshBrakes: 0,
+            harshAccelerations: 0,
+          ),
+        );
+
+    final fetch = SharedTripsFetch(
+      entries: [entry('t1'), entry('t2'), entry('t3')],
+      ownerByTripId: const {'t1': 'alice', 't2': 'bob', 't3': 'alice'},
+    );
+
+    test('no moderation → identical result (fast path)', () {
+      final out = fetch.withoutModerated(
+          blockedAuthors: const {}, hiddenTargetIds: const {});
+      expect(out.entries, hasLength(3));
+    });
+
+    test('a blocked author disappears from EVERY entry they shared', () {
+      final out = fetch.withoutModerated(
+          blockedAuthors: const {'alice'}, hiddenTargetIds: const {});
+      expect(out.entries.map((e) => e.id), ['t2'],
+          reason: 'both of alice\'s trips (t1, t3) must vanish');
+    });
+
+    test('a reported target id is hidden regardless of author', () {
+      final out = fetch.withoutModerated(
+          blockedAuthors: const {}, hiddenTargetIds: const {'t2'});
+      expect(out.entries.map((e) => e.id), ['t1', 't3']);
+    });
+
+    test('block + report compose', () {
+      final out = fetch.withoutModerated(
+          blockedAuthors: const {'bob'}, hiddenTargetIds: const {'t1'});
+      expect(out.entries.map((e) => e.id), ['t3']);
     });
   });
 }

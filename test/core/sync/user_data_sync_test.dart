@@ -58,14 +58,23 @@ void main() {
       );
     });
 
-    test('price_reports keys on reporter_id, every other table on user_id',
-        () {
-      expect(UserDataSync.deletableTables['price_reports'], 'reporter_id');
+    test('price_reports keys on reporter_id, content_reports on '
+        'reporter_user_id, every other table on user_id', () {
+      // The two reporter-authored tables carry the user id under a
+      // reporter column; everything else is plain user_id ownership.
+      const reporterKeyed = {
+        'price_reports': 'reporter_id',
+        'content_reports': 'reporter_user_id', // #3726
+      };
       for (final entry in UserDataSync.deletableTables.entries) {
-        if (entry.key == 'price_reports') continue;
-        expect(entry.value, 'user_id',
-            reason: '${entry.key} should be keyed on user_id');
+        expect(entry.value, reporterKeyed[entry.key] ?? 'user_id',
+            reason: '${entry.key} is keyed on the wrong column');
       }
+    });
+
+    test('#3726 — content_reports (UGC report rows) are wiped on account '
+        'deletion', () {
+      expect(UserDataSync.deletableTables.keys, contains('content_reports'));
     });
 
     test(

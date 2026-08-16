@@ -4367,6 +4367,44 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get contentModerationReportAction => 'Report content';
+
+  @override
+  String get contentModerationBlockAction => 'Block author';
+
+  @override
+  String get contentModerationReportDialogTitle => 'Report this content?';
+
+  @override
+  String get contentModerationReportDialogBody =>
+      'A report is sent to your TankSync server for review, and this content is hidden on your device.';
+
+  @override
+  String get contentModerationReportConfirmButton => 'Report';
+
+  @override
+  String get contentModerationBlockDialogTitle => 'Block this author?';
+
+  @override
+  String get contentModerationBlockDialogBody =>
+      'Everything this account shares with you will be hidden on this device.';
+
+  @override
+  String get contentModerationBlockConfirmButton => 'Block';
+
+  @override
+  String get contentModerationReportedSnack =>
+      'Report submitted — content hidden.';
+
+  @override
+  String get contentModerationReportFailedSnack =>
+      'Couldn\'t submit the report. Try again.';
+
+  @override
+  String get contentModerationBlockedSnack =>
+      'Author blocked — their shared content is hidden.';
+
+  @override
   String get fillUpCorrectionLabel => 'Auto-correction — tap to edit';
 
   @override
@@ -12829,6 +12867,46 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String statCorrectionLiters(String liters) {
     return '⟦Çóřřéçŧîóñš: +$liters Ł ·····⟧';
   }
+
+  @override
+  String get contentModerationReportAction => '⟦Řéƥóřŧ çóñŧéñŧ ······⟧';
+
+  @override
+  String get contentModerationBlockAction => '⟦Ɓłóçķ áúŧĥóř ·····⟧';
+
+  @override
+  String get contentModerationReportDialogTitle =>
+      '⟦Řéƥóřŧ ŧĥîš çóñŧéñŧ? ········⟧';
+
+  @override
+  String get contentModerationReportDialogBody =>
+      '⟦Á řéƥóřŧ îš šéñŧ ŧó ýóúř ŦáñķŠýñç šéřṽéř ƒóř řéṽîéŵ, áñđ ŧĥîš çóñŧéñŧ îš ĥîđđéñ óñ ýóúř đéṽîçé. ··································⟧';
+
+  @override
+  String get contentModerationReportConfirmButton => '⟦Řéƥóřŧ ···⟧';
+
+  @override
+  String get contentModerationBlockDialogTitle =>
+      '⟦Ɓłóçķ ŧĥîš áúŧĥóř? ·······⟧';
+
+  @override
+  String get contentModerationBlockDialogBody =>
+      '⟦Éṽéřýŧĥîñǧ ŧĥîš áççóúñŧ šĥářéš ŵîŧĥ ýóú ŵîłł ƀé ĥîđđéñ óñ ŧĥîš đéṽîçé. ··························⟧';
+
+  @override
+  String get contentModerationBlockConfirmButton => '⟦Ɓłóçķ ··⟧';
+
+  @override
+  String get contentModerationReportedSnack =>
+      '⟦Řéƥóřŧ šúƀɱîŧŧéđ — çóñŧéñŧ ĥîđđéñ. ·············⟧';
+
+  @override
+  String get contentModerationReportFailedSnack =>
+      '⟦Çóúłđñ\'ŧ šúƀɱîŧ ŧĥé řéƥóřŧ. Ŧřý áǧáîñ. ··············⟧';
+
+  @override
+  String get contentModerationBlockedSnack =>
+      '⟦Áúŧĥóř ƀłóçķéđ — ŧĥéîř šĥářéđ çóñŧéñŧ îš ĥîđđéñ. ··················⟧';
 
   @override
   String get fillUpCorrectionLabel =>

@@ -30,6 +30,7 @@ void main() {
         'trip_summaries',
         'trip_details',
         'trip_shares',
+        'content_reports',
       ]));
     });
 
@@ -136,6 +137,40 @@ void main() {
           contains('REVOKE EXECUTE ON FUNCTION public.delete_user() FROM anon'));
       expect(sql,
           contains('GRANT EXECUTE ON FUNCTION public.delete_user() TO authenticated'));
+    });
+
+    test('#3726 (v7) — the content_reports UGC-report table ships in the '
+        'wizard SQL with reporter-scoped RLS', () {
+      final sql = SchemaVerifier.getMigrationSql(const {});
+      expect(
+          sql, contains('CREATE TABLE IF NOT EXISTS public.content_reports'));
+      expect(sql, contains('reporter_user_id UUID NOT NULL'));
+      expect(sql, contains('target_kind TEXT NOT NULL'));
+      expect(sql, contains('target_id TEXT NOT NULL'));
+      expect(
+          sql,
+          contains('ALTER TABLE public.content_reports '
+              'ENABLE ROW LEVEL SECURITY'));
+      // A user may only file reports naming THEMSELVES, and only ever
+      // read / delete their own — never another user's reports.
+      expect(
+          sql,
+          contains('CREATE POLICY content_reports_insert_own '
+              'ON public.content_reports\n'
+              '  FOR INSERT WITH CHECK (reporter_user_id = auth.uid())'));
+      expect(
+          sql,
+          contains('CREATE POLICY content_reports_select_own '
+              'ON public.content_reports\n'
+              '  FOR SELECT USING (reporter_user_id = auth.uid())'));
+      expect(
+          sql,
+          contains('CREATE POLICY content_reports_delete_own '
+              'ON public.content_reports\n'
+              '  FOR DELETE USING (reporter_user_id = auth.uid())'));
+      // v7 is what the wizard records — an un-upgraded self-host is
+      // flagged as outdated, not silently broken.
+      expect(kSupabaseSchemaVersion, greaterThanOrEqualTo(7));
     });
 
     test('#3452 — the v5 favorites columns reach an EXISTING favorites '

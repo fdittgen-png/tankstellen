@@ -1,0 +1,13 @@
+{
+  "contentModerationReportAction": "Inhalt melden",
+  "contentModerationBlockAction": "Autor blockieren",
+  "contentModerationReportDialogTitle": "Diesen Inhalt melden?",
+  "contentModerationReportDialogBody": "Eine Meldung wird zur Prüfung an deinen TankSync-Server gesendet und dieser Inhalt wird auf deinem Gerät ausgeblendet.",
+  "contentModerationReportConfirmButton": "Melden",
+  "contentModerationBlockDialogTitle": "Diesen Autor blockieren?",
+  "contentModerationBlockDialogBody": "Alles, was dieses Konto mit dir teilt, wird auf diesem Gerät ausgeblendet.",
+  "contentModerationBlockConfirmButton": "Blockieren",
+  "contentModerationReportedSnack": "Meldung gesendet — Inhalt ausgeblendet.",
+  "contentModerationReportFailedSnack": "Meldung konnte nicht gesendet werden. Versuche es erneut.",
+  "contentModerationBlockedSnack": "Autor blockiert — geteilte Inhalte sind ausgeblendet."
+}
