@@ -10,6 +10,44 @@ import '../../features/consumption/data/trip_history_repository.dart';
 import '../../core/logging/error_logger.dart';
 import 'supabase_client.dart';
 
+/// The "shared with me" fetch result (#3726): the decoded read-only
+/// trip entries plus the trip-id → owner-id map, so the UI can attribute
+/// each shared trip to the account that shared it ("Block author").
+@immutable
+class SharedTripsFetch {
+  /// The decoded shared-trip summaries, read-only for the recipient.
+  final List<TripHistoryEntry> entries;
+
+  /// `trip_summaries.id` → `trip_shares.owner_id` for every grant row.
+  final Map<String, String> ownerByTripId;
+
+  const SharedTripsFetch({
+    required this.entries,
+    required this.ownerByTripId,
+  });
+
+  static const empty = SharedTripsFetch(entries: [], ownerByTripId: {});
+
+  /// Pure moderation filter (#3726): drops every entry whose author is
+  /// in [blockedAuthors] and every entry the viewer reported
+  /// ([hiddenTargetIds]). Takes primitive sets so callers on any
+  /// feature can filter without importing another feature's types.
+  SharedTripsFetch withoutModerated({
+    required Set<String> blockedAuthors,
+    required Set<String> hiddenTargetIds,
+  }) {
+    if (blockedAuthors.isEmpty && hiddenTargetIds.isEmpty) return this;
+    return SharedTripsFetch(
+      entries: entries
+          .where((e) =>
+              !hiddenTargetIds.contains(e.id) &&
+              !blockedAuthors.contains(ownerByTripId[e.id]))
+          .toList(growable: false),
+      ownerByTripId: ownerByTripId,
+    );
+  }
+}
+
 /// One cross-account share grant — either a row I created (listing who
 /// I've shared a trip with) or a row pointing at me (a trip shared
 /// WITH me). Mirrors the `public.trip_shares` columns from the
@@ -239,23 +277,21 @@ class TripSharesSync {
   /// the matching `trip_summaries` rows — readable thanks to the
   /// additive `trip_summaries_shared_read` policy. Returns the decoded
   /// summary entries (samples empty — the heavy blob arrives on demand
-  /// from `trip_details`, also recipient-readable). Empty when
-  /// unauthenticated or on failure.
-  static Future<List<TripHistoryEntry>> fetchSharedWithMe() async {
+  /// from `trip_details`, also recipient-readable) PLUS the
+  /// trip-id → owner-id map (#3726 — "Block author" needs to know who
+  /// shared each trip). Empty when unauthenticated or on failure.
+  static Future<SharedTripsFetch> fetchSharedWithMe() async {
     final client = TankSyncClient.client;
     final userId = client?.auth.currentUser?.id;
-    if (client == null || userId == null) return const [];
+    if (client == null || userId == null) return SharedTripsFetch.empty;
     try {
       final shareRows = await client
           .from('trip_shares')
-          .select('trip_id')
+          .select('trip_id, owner_id')
           .eq('shared_with_id', userId);
-      final tripIds = <String>{};
-      for (final r in shareRows) {
-        final id = r['trip_id'];
-        if (id is String) tripIds.add(id);
-      }
-      if (tripIds.isEmpty) return const [];
+      final ownerByTripId = ownersByTripId(
+          List<Map<String, dynamic>>.from(shareRows));
+      if (ownerByTripId.isEmpty) return SharedTripsFetch.empty;
 
       // The additive `trip_summaries_shared_read` RLS policy is what
       // makes these rows visible despite their `user_id` being the
@@ -263,13 +299,29 @@ class TripSharesSync {
       final summaryRows = await client
           .from('trip_summaries')
           .select('id, data')
-          .inFilter('id', tripIds.toList());
-      return parseSharedSummaries(summaryRows);
+          .inFilter('id', ownerByTripId.keys.toList());
+      return SharedTripsFetch(
+        entries: parseSharedSummaries(summaryRows),
+        ownerByTripId: ownerByTripId,
+      );
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.sync, e, st,
           context: const {'where': 'TripSharesSync.fetchSharedWithMe FAILED'}));
-      return const [];
+      return SharedTripsFetch.empty;
     }
+  }
+
+  /// Pure decode of `trip_shares` grant rows into a
+  /// `trip_id → owner_id` map, dropping malformed rows (#3726).
+  @visibleForTesting
+  static Map<String, String> ownersByTripId(List<Map<String, dynamic>> rows) {
+    final out = <String, String>{};
+    for (final r in rows) {
+      final tripId = r['trip_id'];
+      final ownerId = r['owner_id'];
+      if (tripId is String && ownerId is String) out[tripId] = ownerId;
+    }
+    return out;
   }
 
   // ── Pure, testable seams ──────────────────────────────────────────

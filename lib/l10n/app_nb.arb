@@ -5738,5 +5738,60 @@
   "@trajetDetailChartTiming": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "contentModerationReportAction": "Report content",
+  "@contentModerationReportAction": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "contentModerationBlockAction": "Block author",
+  "@contentModerationBlockAction": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "contentModerationReportDialogTitle": "Report this content?",
+  "@contentModerationReportDialogTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "contentModerationReportDialogBody": "A report is sent to your TankSync server for review, and this content is hidden on your device.",
+  "@contentModerationReportDialogBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "contentModerationReportConfirmButton": "Report",
+  "@contentModerationReportConfirmButton": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "contentModerationBlockDialogTitle": "Block this author?",
+  "@contentModerationBlockDialogTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "contentModerationBlockDialogBody": "Everything this account shares with you will be hidden on this device.",
+  "@contentModerationBlockDialogBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "contentModerationBlockConfirmButton": "Block",
+  "@contentModerationBlockConfirmButton": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "contentModerationReportedSnack": "Report submitted — content hidden.",
+  "@contentModerationReportedSnack": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "contentModerationReportFailedSnack": "Couldn't submit the report. Try again.",
+  "@contentModerationReportFailedSnack": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "contentModerationBlockedSnack": "Author blocked — their shared content is hidden.",
+  "@contentModerationBlockedSnack": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

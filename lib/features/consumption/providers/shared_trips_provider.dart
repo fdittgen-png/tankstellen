@@ -3,9 +3,9 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/moderation/content_moderation_providers.dart';
 import '../../../core/sync/trip_shares_sync.dart';
 import '../../../core/sync/trip_shares_sync_enabled_provider.dart';
-import '../data/trip_history_repository.dart';
 
 part 'shared_trips_provider.g.dart';
 
@@ -20,13 +20,19 @@ part 'shared_trips_provider.g.dart';
 /// local copy the recipient can't account for.
 ///
 /// Gated on [tripSharesSyncEnabled]: an anonymous / consent-off session
-/// returns an empty list without a wire call, so the "Shared with me"
+/// returns an empty result without a wire call, so the "Shared with me"
 /// section stays hidden exactly when sharing itself is unavailable.
+///
+/// #3726 — the raw fetch also carries the trip → author map; UI
+/// consumers watch [visibleSharedTrips] instead, which applies the
+/// report/block moderation filter.
 @riverpod
 class SharedTrips extends _$SharedTrips {
   @override
-  Future<List<TripHistoryEntry>> build() async {
-    if (!ref.watch(tripSharesSyncEnabledProvider)) return const [];
+  Future<SharedTripsFetch> build() async {
+    if (!ref.watch(tripSharesSyncEnabledProvider)) {
+      return SharedTripsFetch.empty;
+    }
     return TripSharesSync.fetchSharedWithMe();
   }
 
@@ -36,9 +42,23 @@ class SharedTrips extends _$SharedTrips {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       if (!ref.read(tripSharesSyncEnabledProvider)) {
-        return const <TripHistoryEntry>[];
+        return SharedTripsFetch.empty;
       }
       return TripSharesSync.fetchSharedWithMe();
     });
   }
+}
+
+/// The shared-with-me trips AFTER moderation (#3726): entries whose
+/// author the viewer blocked, or which the viewer reported, are
+/// filtered out. Every render surface (Trajets section, trip-detail
+/// fallback) watches THIS, never the raw [sharedTripsProvider], so
+/// blocked/reported content disappears everywhere at once.
+@riverpod
+SharedTripsFetch visibleSharedTrips(Ref ref) {
+  final fetch = ref.watch(sharedTripsProvider).value ?? SharedTripsFetch.empty;
+  return fetch.withoutModerated(
+    blockedAuthors: ref.watch(blockedContentAuthorsProvider),
+    hiddenTargetIds: ref.watch(reportedContentTargetsProvider),
+  );
 }

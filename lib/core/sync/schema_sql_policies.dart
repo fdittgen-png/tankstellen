@@ -28,6 +28,7 @@ ALTER TABLE public.obd2_baselines ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.trip_summaries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.trip_details ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.trip_shares ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.content_reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.deletions ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS users_own ON public.users;
@@ -135,6 +136,20 @@ CREATE POLICY trip_details_shared_read ON public.trip_details
         AND s.shared_with_id = auth.uid()
     )
   );
+
+-- Content reports (#3726, v7): a user may only file reports naming
+-- THEMSELVES as reporter, and only ever sees / deletes their own (the
+-- delete path serves the GDPR wipe). Moderation review happens with the
+-- service role / SQL editor, never through the client.
+DROP POLICY IF EXISTS content_reports_insert_own ON public.content_reports;
+CREATE POLICY content_reports_insert_own ON public.content_reports
+  FOR INSERT WITH CHECK (reporter_user_id = auth.uid());
+DROP POLICY IF EXISTS content_reports_select_own ON public.content_reports;
+CREATE POLICY content_reports_select_own ON public.content_reports
+  FOR SELECT USING (reporter_user_id = auth.uid());
+DROP POLICY IF EXISTS content_reports_delete_own ON public.content_reports;
+CREATE POLICY content_reports_delete_own ON public.content_reports
+  FOR DELETE USING (reporter_user_id = auth.uid());
 
 -- Deletion tombstones (#3078): a user only ever sees / writes their own.
 DROP POLICY IF EXISTS deletions_own ON public.deletions;

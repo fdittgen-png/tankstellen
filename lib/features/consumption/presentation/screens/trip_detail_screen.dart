@@ -128,7 +128,9 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     // history; fall back to the live "shared with me" list so tapping a
     // shared row opens a read-only detail. `isShared` gates the owner-
     // only actions (cross-account share / delete) off for these.
-    final sharedTrips = ref.watch(sharedTripsProvider).value ?? const [];
+    // #3726 — the MODERATED list: a reported / blocked-author trip has
+    // no detail screen either.
+    final sharedTrips = ref.watch(visibleSharedTripsProvider).entries;
     final isShared = ownedEntry == null;
     final entry =
         ownedEntry ??

@@ -61,6 +61,11 @@ class UserDataSync {
           .eq('user_id', userId);
       final tripDetails =
           await client.from('trip_details').select().eq('user_id', userId);
+      // #3726 — reports the user filed against community content.
+      final contentReports = await client
+          .from('content_reports')
+          .select()
+          .eq('reporter_user_id', userId);
 
       debugPrint('UserDataSync.fetchAll: favorites=${favorites.length}, '
           'alerts=${alerts.length}, trips=${tripSummaries.length}');
@@ -73,6 +78,7 @@ class UserDataSync {
         'itineraries': itineraries,
         'trip_summaries': tripSummaries,
         'trip_details': tripDetails,
+        'content_reports': contentReports,
       };
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'UserDataSync.fetchAll FAILED'}));
@@ -97,6 +103,7 @@ class UserDataSync {
     'alerts': 'user_id',
     'push_tokens': 'user_id',
     'price_reports': 'reporter_id',
+    'content_reports': 'reporter_user_id', // #3726 — UGC report rows
     'vehicles': 'user_id',
     'fill_ups': 'user_id',
     'itineraries': 'user_id',

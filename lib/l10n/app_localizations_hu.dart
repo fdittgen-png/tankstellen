@@ -4417,6 +4417,44 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get contentModerationReportAction => 'Report content';
+
+  @override
+  String get contentModerationBlockAction => 'Block author';
+
+  @override
+  String get contentModerationReportDialogTitle => 'Report this content?';
+
+  @override
+  String get contentModerationReportDialogBody =>
+      'A report is sent to your TankSync server for review, and this content is hidden on your device.';
+
+  @override
+  String get contentModerationReportConfirmButton => 'Report';
+
+  @override
+  String get contentModerationBlockDialogTitle => 'Block this author?';
+
+  @override
+  String get contentModerationBlockDialogBody =>
+      'Everything this account shares with you will be hidden on this device.';
+
+  @override
+  String get contentModerationBlockConfirmButton => 'Block';
+
+  @override
+  String get contentModerationReportedSnack =>
+      'Report submitted — content hidden.';
+
+  @override
+  String get contentModerationReportFailedSnack =>
+      'Couldn\'t submit the report. Try again.';
+
+  @override
+  String get contentModerationBlockedSnack =>
+      'Author blocked — their shared content is hidden.';
+
+  @override
   String get fillUpCorrectionLabel =>
       'Automatikus korrekció — szerkesztéshez érintsen';
 

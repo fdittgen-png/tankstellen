@@ -325,6 +325,10 @@ dependencies {
     // androidx artifact (GMS-free), so the fdroid flavor is unaffected — the
     // car components are only registered in the play source-set manifest.
     implementation("androidx.car.app:app:1.7.0")
+    // #3729 — MediaSessionCompat + NotificationCompat.MediaStyle for the
+    // lock-screen media pill while a trip records. Plain androidx artifact
+    // (GMS-free), so the fdroid flavor is unaffected.
+    implementation("androidx.media:media:1.7.0")
     // #2412 / #2413 — BootReceiver + the widget-refresh trigger enqueue a
     // WorkManager one-off directly (androidx.work.*). The workmanager plugin
     // pulls work-runtime in as `implementation`, which Gradle does not expose

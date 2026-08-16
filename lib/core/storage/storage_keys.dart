@@ -175,4 +175,17 @@ class StorageKeys {
   /// one-accessor rule).
   static const String obd2FuelLevelSnapshotPrefix =
       'obd2_fuel_level_snapshot_';
+
+  /// #3726 — device-local block list for community-content authors
+  /// (Play UGC policy). Stores the TankSync user ids whose shared
+  /// content ("Shared with me" trips, and any future community surface)
+  /// is filtered out of display on this device. Local-only, never
+  /// synced — blocking is a viewer preference, not shared state.
+  static const String blockedContentAuthorIds = 'blocked_content_author_ids';
+
+  /// #3726 — device-local ids of community-content items the user
+  /// REPORTED (`content_reports.target_id`). A reported item is hidden
+  /// locally right away, and stays hidden across restarts, without
+  /// waiting for any server-side moderation outcome.
+  static const String reportedContentTargetIds = 'reported_content_target_ids';
 }

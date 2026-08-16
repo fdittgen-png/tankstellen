@@ -4416,6 +4416,44 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get contentModerationReportAction => 'Inhalt melden';
+
+  @override
+  String get contentModerationBlockAction => 'Autor blockieren';
+
+  @override
+  String get contentModerationReportDialogTitle => 'Diesen Inhalt melden?';
+
+  @override
+  String get contentModerationReportDialogBody =>
+      'Eine Meldung wird zur Prüfung an deinen TankSync-Server gesendet und dieser Inhalt wird auf deinem Gerät ausgeblendet.';
+
+  @override
+  String get contentModerationReportConfirmButton => 'Melden';
+
+  @override
+  String get contentModerationBlockDialogTitle => 'Diesen Autor blockieren?';
+
+  @override
+  String get contentModerationBlockDialogBody =>
+      'Alles, was dieses Konto mit dir teilt, wird auf diesem Gerät ausgeblendet.';
+
+  @override
+  String get contentModerationBlockConfirmButton => 'Blockieren';
+
+  @override
+  String get contentModerationReportedSnack =>
+      'Meldung gesendet — Inhalt ausgeblendet.';
+
+  @override
+  String get contentModerationReportFailedSnack =>
+      'Meldung konnte nicht gesendet werden. Versuche es erneut.';
+
+  @override
+  String get contentModerationBlockedSnack =>
+      'Autor blockiert — geteilte Inhalte sind ausgeblendet.';
+
+  @override
   String get fillUpCorrectionLabel => 'Auto-Korrektur — zum Bearbeiten tippen';
 
   @override
