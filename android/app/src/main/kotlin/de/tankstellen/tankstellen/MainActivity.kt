@@ -83,6 +83,11 @@ class MainActivity : FlutterActivity() {
         // app-private save target was invisible.
         PublicFileExporterChannel.registerWith(flutterEngine, applicationContext)
 
+        // Lock-screen media tile for trip recording (#3729). Android side
+        // of the shared `tankstellen/live_activity` channel — same
+        // registerWith pattern as the bridges above.
+        TripMediaTileChannel.registerWith(flutterEngine, applicationContext)
+
         // GMS-free inbound share-intent receiver (#2735). Same app-internal
         // channel pattern as the bridges above — replaces the third-party
         // share_handler plugin so the F-Droid build pulls no extra share

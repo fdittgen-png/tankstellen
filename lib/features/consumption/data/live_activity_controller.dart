@@ -4,6 +4,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import '../../../core/notifications/notification_tap_dispatcher.dart';
 import '../domain/live_activity_content.dart';
 import 'android_live_activity_notifier.dart';
 
@@ -44,6 +45,35 @@ class LiveActivityController {
 
   final MethodChannel _channel;
 
+  bool _actionHandlerArmed = false;
+
+  /// #3729 — the Android native side calls back with `tripAction`
+  /// (media-pill Play/Pause/Stop). Feed it through the SAME
+  /// NotificationTapDispatcher round-trip the notification-action tile
+  /// uses, so one Dart listener serves both tile flavors. Registered
+  /// lazily on the first show — a controller constructed in a plain
+  /// unit test (no binding) must not touch the binary messenger.
+  void _armActionHandler() {
+    if (_actionHandlerArmed) return;
+    try {
+      _channel.setMethodCallHandler((call) async {
+        if (call.method == 'tripAction') {
+          final id = call.arguments;
+          if (id is String && id.isNotEmpty) {
+            NotificationTapDispatcher.instance.dispatch(
+                '${AndroidLiveActivityNotifier.actionPayloadPrefix}$id');
+          }
+        }
+        return null;
+      });
+      _actionHandlerArmed = true;
+    } catch (e, st) {
+      // No binding (plain unit test) — the media path is unreachable
+      // there anyway; the fallback notifier carries the actions.
+      debugPrint('LiveActivityController: action handler not armed: $e\n$st');
+    }
+  }
+
   /// #3722 — non-null on Android (wired by the provider); null keeps the
   /// platform an inert no-op (tests, desktop).
   final AndroidLiveActivityNotifier? _android;
@@ -64,7 +94,7 @@ class LiveActivityController {
   /// disabled Live Activities, or ActivityKit rejected the request) —
   /// callers treat false as "stay quiet for this trip".
   Future<bool> startActivity(LiveActivityContent content) async {
-    if (_isAndroid) return _android!.show(content);
+    if (_isAndroid) return _androidShow(content);
     if (!_isIos) return false;
     try {
       return await _channel.invokeMethod<bool>(
@@ -84,7 +114,7 @@ class LiveActivityController {
   /// the next update or the trip end will reconcile.
   Future<void> updateActivity(LiveActivityContent content) async {
     if (_isAndroid) {
-      await _android!.show(content); // in-place restyle (onlyAlertOnce)
+      await _androidShow(content); // in-place restyle
       return;
     }
     if (!_isIos) return;
@@ -110,6 +140,16 @@ class LiveActivityController {
 
   Future<void> endActivity() async {
     if (_isAndroid) {
+      // #3729 — tear down BOTH surfaces: the media pill (native channel)
+      // and any fallback notification a channel failure left behind.
+      // Double-cancel is free; a stranded tile after stop is not.
+      try {
+        await _channel.invokeMethod<void>('end');
+      } catch (e, st) {
+        // Best-effort (platform error / no handler / no binding) — the
+        // fallback end below still runs.
+        debugPrint('LiveActivityController: media tile end failed: $e\n$st');
+      }
       await _android!.end();
       return;
     }
@@ -121,5 +161,34 @@ class LiveActivityController {
     } on MissingPluginException {
       // No native handler — nothing to end.
     }
+  }
+
+  /// #3729 — Android media-pill path with graceful degradation: the
+  /// native MediaSession tile is the primary surface (lock-screen media
+  /// pill + shade media carousel); if the channel is unavailable or
+  /// errors, fall back to the #3722/#3724 ongoing notification so the
+  /// recording NEVER loses its tile entirely.
+  Future<bool> _androidShow(LiveActivityContent content) async {
+    _armActionHandler();
+    final render = buildAndroidLiveActivityRender(content);
+    try {
+      final ok = await _channel.invokeMethod<bool>('start', <String, Object?>{
+            'title': render.title,
+            'body': render.body,
+            'paused': content.paused,
+            'startedAtEpochMs': content.startedAtEpochMs,
+            'pauseLabel': content.pauseActionLabel,
+            'resumeLabel': content.resumeActionLabel,
+            'stopLabel': content.stopActionLabel,
+          }) ??
+          false;
+      if (ok) return true;
+    } catch (e, st) {
+      // PlatformException, MissingPluginException, or the no-binding
+      // assertion in plain unit tests — every failure degrades to the
+      // notification fallback below (documented never-throw contract).
+      debugPrint('LiveActivityController: media tile show failed: $e\n$st');
+    }
+    return _android!.show(content);
   }
 }

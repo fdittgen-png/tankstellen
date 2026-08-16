@@ -241,6 +241,12 @@
             </intent-filter>
         </receiver>
 
+        <!-- #3729 — pre-Android-13 notification-action relay for the trip
+             media tile. In-process only; never exported. -->
+        <receiver
+            android:name=".TripMediaActionReceiver"
+            android:exported="false" />
+
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
