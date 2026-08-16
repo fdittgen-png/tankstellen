@@ -7,78 +7,18 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/logging/error_logger.dart';
 import 'auto_record_trace_log.dart';
+import 'auto_trip_contracts.dart';
+import 'auto_trip_disconnect_debouncer.dart';
+import 'auto_trip_session_opener.dart';
 import 'background_adapter_listener.dart';
 import 'obd2_link_supervisor.dart';
-import 'obd2_read_telemetry.dart';
 import 'obd2_service.dart';
 import 'obd2_speed_stream.dart';
 
-/// Immutable snapshot of the auto-record fields off [VehicleProfile]
-/// (#1004 phase 1) the coordinator needs to make decisions.
-///
-/// Modelled as a value object instead of holding the whole profile
-/// because the coordinator doesn't care about brand, fuel type, or
-/// odometer — only the MAC to filter on, the speed threshold to count
-/// against, and the disconnect debounce window. Detaching from the
-/// profile also makes this safe to copy into a future
-/// background-isolate hand-off without dragging Hive types.
-@immutable
-class AutoRecordConfig {
-  /// MAC address of the paired ELM327 adapter, sourced from
-  /// `VehicleProfile.obd2AdapterMac`. The coordinator drops every
-  /// event whose MAC does not equal this string — the multi-vehicle
-  /// case (a household with two paired cars) only treats the active
-  /// profile's adapter as live.
-  final String mac;
-
-  /// Speed (km/h) above which a sustained run kicks `startTrip()`.
-  /// Sourced from `VehicleProfile.movementStartThresholdKmh`. Default
-  /// in the profile is 5 km/h — low enough to catch pulling out of a
-  /// parking spot, high enough to filter the brief speed spikes BLE
-  /// adapters sometimes report on first connect.
-  final double movementStartThresholdKmh;
-
-  /// Debounce window before a disconnect triggers `stopAndSave`.
-  /// Sourced from `VehicleProfile.disconnectSaveDelaySec`. Default in
-  /// the profile is 60 s — long enough to absorb a tunnel or a
-  /// parking-garage lift, short enough that the user sees a saved
-  /// trip when they walk into the kitchen.
-  final Duration disconnectSaveDelay;
-
-  const AutoRecordConfig({
-    required this.mac,
-    required this.movementStartThresholdKmh,
-    required this.disconnectSaveDelay,
-  });
-}
-
-/// Callback that opens an [Obd2Service] for the configured MAC on
-/// `AdapterConnected`. Returns null when the service can't be opened
-/// (adapter already taken, scan timed out, init failed) so the
-/// coordinator can stay idle until the next event without throwing.
-///
-/// Production wiring resolves to `Obd2ConnectionService.connectByMac`;
-/// tests inject a fake that returns a stub service whose
-/// `readSpeedKmh()` is wired to a queue.
-typedef Obd2SessionOpener = Future<Obd2Service?> Function(String mac);
-
-/// Opener used by the foreground-active arming fallback (#2282
-/// concern 1). Distinct from [Obd2SessionOpener] only by intent:
-/// production wires this to `Obd2ConnectionService.connectByMacDirect`
-/// (a no-scan `BluetoothDevice.fromId` connect with `autoConnect`),
-/// which wakes ELM327 clones that stop advertising in standby — exactly
-/// the case the disabled foreground service can no longer cover while
-/// the app is in front. Same null-on-failure contract as the scan
-/// opener.
-typedef Obd2ForegroundSessionOpener = Future<Obd2Service?> Function(String mac);
-
-/// Factory that wraps an open [Obd2Service] in a polled km/h stream.
-/// Test seam — production code uses [Obd2SpeedStream.new]; tests pass
-/// a shorter `pollPeriod` so the timer fires inside `pumpEventQueue`.
-typedef Obd2SpeedStreamFactory = Obd2SpeedStream Function(
-  Obd2Service service, {
-  String? mac,
-});
+// #3727 — `AutoRecordConfig` and the opener/factory typedefs moved to
+// `auto_trip_contracts.dart`; re-exported here so existing call sites
+// keep compiling unchanged.
+export 'auto_trip_contracts.dart';
 
 /// Coordinates the hands-free auto-record state machine: BLE connect
 /// → OBD2 session opens → speed PID polled → start trip on
@@ -124,6 +64,14 @@ typedef Obd2SpeedStreamFactory = Obd2SpeedStream Function(
 /// it as a thin orchestrator means the manual flow (the user
 /// explicitly tapping "Start trip") stays the simple, well-tested
 /// code path; the auto path is purely additive.
+///
+/// ## Decomposition (#3727)
+///
+/// The session-open/watch/hand-off tail lives in
+/// [AutoTripSessionOpener] (which owns the held session + speed
+/// subscription); the disconnect-debounce/save tail lives in
+/// [AutoTripDisconnectDebouncer] (which owns the timer). This class
+/// keeps the state machine flags and the adapter-event plumbing.
 class AutoTripCoordinator {
   /// Source of BLE connect / disconnect transitions. In production a
   /// native-bridge implementation; in tests the
@@ -198,17 +146,35 @@ class AutoTripCoordinator {
   final DateTime Function() _now;
 
   StreamSubscription<BackgroundAdapterEvent>? _adapterSub;
-  StreamSubscription<double>? _speedSub;
-  Timer? _disconnectTimer;
   int _consecutiveSupraThreshold = 0;
   bool _started = false;
   bool _tripActive = false;
 
-  /// Open OBD2 session held between `AdapterConnected` and either
-  /// threshold-cross (handed to the recorder) or disconnect (closed
-  /// here). Null when the coordinator is idle, when no opener was
-  /// injected, or after a successful hand-off.
-  Obd2Service? _session;
+  /// Session-open/watch tail (#3727) — owns the held OBD2 session and
+  /// the 1 Hz speed subscription between `AdapterConnected` and either
+  /// threshold-cross (handed to the recorder) or disconnect.
+  late final AutoTripSessionOpener _watch = AutoTripSessionOpener(
+    mac: config.mac,
+    linkSupervisor: linkSupervisor,
+    speedStreamFactory: speedStreamFactory,
+    startTrip: startTrip,
+    onSpeedSample: _onSpeedSample,
+    onLinkDrop: _onDisconnected,
+    shouldAbandonOpen: () => !_started || _tripActive,
+    clearTripActive: () => _tripActive = false,
+  );
+
+  /// Disconnect-debounce/save tail (#3727) — owns the disconnect-save
+  /// timer and the automatic stop-and-save invocation.
+  late final AutoTripDisconnectDebouncer _debouncer =
+      AutoTripDisconnectDebouncer(
+    mac: config.mac,
+    disconnectSaveDelay: config.disconnectSaveDelay,
+    stopAndSaveAutomatic: stopAndSaveAutomatic,
+    now: _now,
+    isTripActive: () => _tripActive,
+    clearTripActive: () => _tripActive = false,
+  );
 
   AutoTripCoordinator({
     required this.listener,
@@ -237,13 +203,13 @@ class AutoTripCoordinator {
   /// tests that want to assert "reconnect cancelled the timer" without
   /// reaching into private state.
   @visibleForTesting
-  bool get hasPendingDisconnectTimer => _disconnectTimer?.isActive ?? false;
+  bool get hasPendingDisconnectTimer => _debouncer.isPending;
 
   /// Whether the coordinator currently holds an open OBD2 session.
   /// Test seam — flips to `false` after threshold-cross hand-off and
   /// after disconnect-without-trip teardown.
   @visibleForTesting
-  bool get hasOpenSession => _session != null;
+  bool get hasOpenSession => _watch.hasOpenSession;
 
   /// Begin watching for BLE transitions. Idempotent — calling `start`
   /// while already started is a no-op (does not double-subscribe to
@@ -306,16 +272,14 @@ class AutoTripCoordinator {
       mac: config.mac,
     );
     _started = false;
-    _disconnectTimer?.cancel();
-    _disconnectTimer = null;
+    _debouncer.cancel();
     _consecutiveSupraThreshold = 0;
     await _adapterSub?.cancel();
     _adapterSub = null;
-    await _speedSub?.cancel();
-    _speedSub = null;
-    // Idempotent — when `_session` is already null (e.g. handed off
-    // to the recorder, or never opened) this is a no-op.
-    await _closeSessionIfHeld();
+    await _watch.stopWatching();
+    // Idempotent — when the held session is already null (e.g. handed
+    // off to the recorder, or never opened) this is a no-op.
+    await _watch.closeSessionIfHeld();
     try {
       await listener.stop();
     } catch (e, st) {
@@ -381,29 +345,21 @@ class AutoTripCoordinator {
     // Reconnect within the disconnect-save window: cancel the timer
     // and let the existing trip continue. We still re-open the OBD2
     // session because the previous one died with the disconnect.
-    if (_disconnectTimer?.isActive ?? false) {
-      _disconnectTimer!.cancel();
-      _disconnectTimer = null;
-      AutoRecordTraceLog.add(
-        AutoRecordEventKind.disconnectTimerCancelled,
-        mac: config.mac,
-      );
-    }
+    _debouncer.cancelIfPending();
     _consecutiveSupraThreshold = 0;
-    await _speedSub?.cancel();
-    _speedSub = null;
+    await _watch.stopWatching();
     // Close any orphan session from a prior connect cycle defensively
-    // — under normal flow `_session` is null here because the
+    // — under normal flow the held session is null here because the
     // disconnect path either handed it off (trip active) or closed
     // it (no trip). Double-close is cheap on a disconnected service.
-    await _closeSessionIfHeld();
+    await _watch.closeSessionIfHeld();
 
     // If a trip is already active (hand-off happened on a previous
     // connect), the recorder owns the session and we don't need to
     // open a new one — speed sampling is the recorder's job now.
     if (_tripActive) return;
 
-    await _openSessionAndWatch(sessionOpener);
+    await _watch.openAndWatch(sessionOpener);
   }
 
   /// Foreground-active arming fallback (#2282 concern 1).
@@ -429,7 +385,7 @@ class AutoTripCoordinator {
     // happened while foregrounded, so no platform event and possibly a
     // stream that neither errored nor closed), tear it down now so this
     // resume re-arms instead of skipping forever.
-    final held = _session;
+    final held = _watch.session;
     if (!_tripActive && held != null && !held.isConnected) {
       AutoRecordTraceLog.add(
         AutoRecordEventKind.foregroundArmAttempt,
@@ -439,12 +395,12 @@ class AutoTripCoordinator {
       await _onDisconnected();
     }
     // Already watching (session held) or recording — nothing to arm.
-    if (_tripActive || _session != null || _speedSub != null) {
+    if (_tripActive || _watch.hasOpenSession || _watch.isWatching) {
       AutoRecordTraceLog.add(
         AutoRecordEventKind.foregroundArmSkipped,
         mac: config.mac,
-        detail: 'tripActive=$_tripActive sessionHeld=${_session != null} '
-            'watching=${_speedSub != null}',
+        detail: 'tripActive=$_tripActive sessionHeld=${_watch.hasOpenSession} '
+            'watching=${_watch.isWatching}',
       );
       return;
     }
@@ -454,205 +410,27 @@ class AutoTripCoordinator {
     );
     // Prefer the direct opener; fall back to the scan opener so a caller
     // that only wired one still arms.
-    await _openSessionAndWatch(foregroundSessionOpener ?? sessionOpener);
-  }
-
-  /// Shared "open an OBD2 session, then watch its 1 Hz speed stream"
-  /// tail used by both the background `AdapterConnected` path and the
-  /// foreground-active arm. [opener] selects the connect strategy
-  /// (scan-based vs direct). No-ops when no opener was wired (legacy /
-  /// event-only tests).
-  Future<void> _openSessionAndWatch(Obd2SessionOpener? opener) async {
-    if (opener == null) {
-      // Test / legacy mode: no opener was wired. The coordinator's
-      // pre-2b-3 contract was "speed comes from a stream injected at
-      // construction time"; that field is gone, so without an opener
-      // we simply have no speed source. Stay idle.
-      return;
-    }
-    // #3527 — no lease, no arbitration: reuse the supervisor's live
-    // service when one exists (a manual recording in flight shares the
-    // one link — never a second RFCOMM session against a live trip),
-    // else dial through the supervisor's single-flight machinery.
-    final sup = linkSupervisor;
-    Obd2Service? service;
-    try {
-      if (sup == null) {
-        service = await opener(config.mac);
-      } else {
-        // #3725 — a `ready` supervisor can hold a corpse: a dongle
-        // unplugged between trips dies silently (classic RFCOMM death is
-        // only visible on I/O, and nothing polls an idle link), so no
-        // drop event ever moved the state off `ready`. Reusing that
-        // service strands auto-record in an error→retry loop for the
-        // whole trip (field log 2026-08-15: 25 min of sessionOpenFailed
-        // at 60 s cadence after an adapter swap). Validate before reuse;
-        // on a corpse, report the drop so the supervisor recycles
-        // (research rule 8: full close + fresh socket) and dial through
-        // its single-flight machinery.
-        var held = sup.service;
-        if (held != null && !held.isConnected) {
-          AutoRecordTraceLog.add(
-            AutoRecordEventKind.sessionOpenFailed,
-            mac: config.mac,
-            detail: 'supervisor service stale (transport dead) — recycling',
-          );
-          sup.notifyDrop('staleServiceOnReuse');
-          held = null;
-        }
-        service = held ?? // #3642 — automated: respect the stand-down hold
-            await sup.connectWith(() => opener(config.mac), automated: true);
-      }
-    } catch (e, st) {
-      service = null;
-      AutoRecordTraceLog.add(
-        AutoRecordEventKind.sessionOpenFailed,
-        mac: config.mac,
-        detail: 'exception=$e',
-      );
-      // #2933 (error-log #25) — probing a PARKED car here, an EXPECTED
-      // "engine off / adapter asleep" condition spooled 42/44 of that log as a
-      // repeated Obd2AdapterUnresponsive ERROR. Route through the shared #2892
-      // de-noiser so the expected family records a breadcrumb (sessionOpenFailed
-      // above already captures it) while a GENUINE fault still ERROR-logs.
-      recordObd2ConnectTransient(e, st,
-          where: 'AutoTripCoordinator.openSession mac=${config.mac}',
-          layer: ErrorLayer.background);
-    }
-    if (service == null) {
-      AutoRecordTraceLog.add(
-        AutoRecordEventKind.sessionOpenFailed,
-        mac: config.mac,
-        detail: 'opener returned null',
-      );
-      return;
-    }
-
-    // The connect cycle could have been cancelled between awaiting the
-    // opener and now (stop() was called, a disconnect already fired and
-    // queued ahead of us, or a trip went live mid-open). Don't wire a
-    // dangling subscription — but never close a supervisor-owned link
-    // (#3527): the supervisor keeps it healthy for whoever needs it next.
-    if (!_started || _tripActive || _session != null) {
-      if (!identical(linkSupervisor?.service, service)) {
-        try {
-          await service.disconnect();
-        } catch (e, st) {
-          unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'AutoTripCoordinator: drop-orphan disconnect failed'}));
-        }
-      }
-      return;
-    }
-
-    // Non-null alias — flow promotion doesn't reach the stream-handler
-    // closures below.
-    final Obd2Service live = service;
-    _session = service;
-    // #2282 concern 4 — only the 1 Hz auto-record movement stream is
-    // live at this point (the recorder hasn't taken over yet), so drop
-    // the BLE link to balanced connection priority. The recorder bumps
-    // it back to high on threshold-cross when it owns the session.
-    unawaited(_tuneLinkForBackground(service));
-    final speedStream = speedStreamFactory(service, mac: config.mac);
-    // #3569 — a foreground link death produces NO AdapterDisconnected
-    // platform event (the FGS is gated off), so the speed stream's own
-    // error/done is the only drop signal the coordinator gets. Without
-    // these handlers the dead `_session`/`_speedSub` stranded
-    // `armForegroundActive` behind its skip-guard for the rest of the
-    // day (field log 2026-07-13: zero dials from 10:32 to 21:32).
-    _speedSub = speedStream.stream.listen(
-      _onSpeedSample,
-      onError: (Object e, StackTrace st) {
-        AutoRecordTraceLog.add(
-          AutoRecordEventKind.sessionOpenFailed,
-          mac: config.mac,
-          detail: 'speed stream error — treating as link drop: $e',
-        );
-        _reportSupervisorCorpse(live);
-        unawaited(_onDisconnected());
-      },
-      onDone: () {
-        AutoRecordTraceLog.add(
-          AutoRecordEventKind.sessionOpenFailed,
-          mac: config.mac,
-          detail: 'speed stream closed — treating as link drop',
-        );
-        _reportSupervisorCorpse(live);
-        unawaited(_onDisconnected());
-      },
-    );
-  }
-
-  /// #3725 — when the service that died under the speed watch is the
-  /// supervisor's own held link AND its transport is genuinely dead,
-  /// tell the supervisor. Without this the supervisor stays `ready`
-  /// holding the corpse (a silent transport death produces no drop
-  /// event) and serves the exact same dead service to every subsequent
-  /// arm attempt. Session-level errors on a live transport are left
-  /// alone — the supervisor's link is still healthy for other owners.
-  void _reportSupervisorCorpse(Obd2Service service) {
-    final sup = linkSupervisor;
-    if (sup == null) return;
-    if (!identical(sup.service, service)) return;
-    if (service.isConnected) return;
-    sup.notifyDrop('coordinatorSpeedWatch: transport dead');
-  }
-
-  /// Best-effort balanced-priority downgrade (#2282 concern 4). The
-  /// service no-ops for non-BLE transports / fakes and swallows platform
-  /// rejections internally, so this never throws into the connect path.
-  Future<void> _tuneLinkForBackground(Obd2Service service) async {
-    try {
-      await service.tuneLinkForBackground();
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.background, e, st, context: const {
-        'where': 'AutoTripCoordinator: tuneLinkForBackground failed',
-      }));
-    }
-  }
-
-  /// Best-effort high-priority restore on threshold-cross hand-off
-  /// (#2282 concern 4). Same swallow-and-log contract as
-  /// [_tuneLinkForBackground].
-  Future<void> _tuneLinkForRecording(Obd2Service service) async {
-    try {
-      await service.tuneLinkForRecording();
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.background, e, st, context: const {
-        'where': 'AutoTripCoordinator: tuneLinkForRecording failed',
-      }));
-    }
+    await _watch.openAndWatch(foregroundSessionOpener ?? sessionOpener);
   }
 
   Future<void> _onDisconnected() async {
     // Stop counting movement samples — the OBD2 session is gone, no
     // more speed will arrive until the adapter reappears.
     _consecutiveSupraThreshold = 0;
-    await _speedSub?.cancel();
-    _speedSub = null;
+    await _watch.stopWatching();
     // Close any orphan session if no trip is active. When a trip IS
     // active the recorder owns the session, so we leave its
     // pause-on-drop logic to handle teardown.
     if (!_tripActive) {
-      await _closeSessionIfHeld();
+      await _watch.closeSessionIfHeld();
     } else {
       // A trip is active: ownership has already moved to the recorder
-      // on the threshold-cross hand-off, so `_session` should already
-      // be null here. Defensive null-out covers the edge case where a
-      // test bypasses the hand-off.
-      _session = null;
+      // on the threshold-cross hand-off, so the held session should
+      // already be null here. Defensive null-out covers the edge case
+      // where a test bypasses the hand-off.
+      _watch.takeSession();
     }
-    // Arm the debounce. A reconnect within `disconnectSaveDelay`
-    // cancels it and the trip carries on; otherwise the timer fires
-    // and we save.
-    _disconnectTimer?.cancel();
-    _disconnectTimer = Timer(config.disconnectSaveDelay, _onSaveTimerFired);
-    AutoRecordTraceLog.add(
-      AutoRecordEventKind.disconnectTimerStarted,
-      mac: config.mac,
-      detail: 'delaySec=${config.disconnectSaveDelay.inSeconds} '
-          'delayMs=${config.disconnectSaveDelay.inMilliseconds}',
-    );
+    _debouncer.arm();
   }
 
   void _onSpeedSample(double kmh) {
@@ -686,163 +464,7 @@ class AutoTripCoordinator {
       // movement, the provider knows what to do". Errors are logged
       // through `errorLogger` rather than re-thrown into the speed
       // stream, where they'd kill the subscription.
-      unawaited(_invokeStartTrip(kmh));
+      unawaited(_watch.handOffAndStartTrip(kmh));
     }
   }
-
-  void _onSaveTimerFired() {
-    final firedAt = _now();
-    _disconnectTimer = null;
-    AutoRecordTraceLog.add(
-      AutoRecordEventKind.disconnectTimerFired,
-      mac: config.mac,
-      detail: 'tripActive=$_tripActive',
-    );
-    if (!_tripActive) {
-      // Edge case: connect, no movement detected, disconnect, timer
-      // fires. Nothing to save. Stay idle and let the next connect
-      // start the cycle over.
-      return;
-    }
-    _tripActive = false;
-    unawaited(_invokeStopAndSave(firedAt));
-  }
-
-  Future<void> _invokeStartTrip(double observedSpeedKmh) async {
-    final session = _session;
-    if (session == null) {
-      // Should not happen — `_onSpeedSample` only fires when the
-      // speed stream is wired, and the speed stream only exists when
-      // a session was opened. Trace it so a regression here is
-      // visible rather than silent.
-      AutoRecordTraceLog.add(
-        AutoRecordEventKind.tripStartFailed,
-        mac: config.mac,
-        detail: 'no session held at threshold-cross',
-      );
-      _tripActive = false;
-      return;
-    }
-    if (!session.isConnected) {
-      // #3569 — never hand a dead husk to the recorder: a link that died
-      // between the last speed sample and the threshold-cross would start
-      // a trip whose every PID command times out. Tear down instead; the
-      // disconnect debounce + the self-healing foreground arm take over.
-      AutoRecordTraceLog.add(
-        AutoRecordEventKind.tripStartFailed,
-        mac: config.mac,
-        detail: 'session dead at threshold-cross — torn down, not handed off',
-      );
-      _tripActive = false;
-      await _onDisconnected();
-      return;
-    }
-    // Stop the coordinator's speed polling immediately — the recorder
-    // is about to take ownership and will run its own per-PID
-    // sampling. Holding the polling timer alongside would
-    // double-issue PID 0x0D commands on the same transport.
-    await _speedSub?.cancel();
-    _speedSub = null;
-    // #2282 concern 4 — the movement watch is over and the recorder is
-    // about to drive the full-rate PID poll, so restore the high-
-    // throughput BLE link we downgraded to balanced while only the 1 Hz
-    // stream was live. Best-effort; the recorder gets a high-priority
-    // link for the trip either way (a fresh connect already tunes high).
-    await _tuneLinkForRecording(session);
-    // Transfer ownership: null out the local pointer so neither
-    // `stop()` nor `_onDisconnected()` will try to close a session
-    // the recorder is using. #3420 — release the auto-record lease at the
-    // same moment: the recorder's `start()` acquires its own RECORDING
-    // lease, so the hand-off is a clean ownership transfer, not a preempt.
-    _session = null;
-    AutoRecordTraceLog.add(
-      AutoRecordEventKind.sessionHandedOff,
-      mac: config.mac,
-      detail: 'observedSpeedKmh=${observedSpeedKmh.toStringAsFixed(1)}',
-    );
-    try {
-      final Object? outcome = await startTrip(session);
-      // The coordinator is decoupled from `StartTripOutcome` (it lives
-      // in the providers layer). We classify outcomes by their string
-      // form: enum `toString()` is `EnumName.value`, so the trailing
-      // segment after the dot is the value name. `null` is the test
-      // stub's signal for "no outcome to report" and is treated as
-      // success — production wiring always returns a typed outcome.
-      final String? outcomeName = outcome?.toString().split('.').last;
-      if (outcome == null || outcomeName == 'started') {
-        AutoRecordTraceLog.add(
-          AutoRecordEventKind.tripStarted,
-          mac: config.mac,
-          detail: 'observedSpeedKmh=${observedSpeedKmh.toStringAsFixed(1)}',
-        );
-      } else {
-        AutoRecordTraceLog.add(
-          AutoRecordEventKind.tripStartFailed,
-          mac: config.mac,
-          detail: 'outcome=$outcomeName',
-        );
-      }
-    } catch (e, st) {
-      AutoRecordTraceLog.add(
-        AutoRecordEventKind.tripStartFailed,
-        mac: config.mac,
-        detail: 'exception=$e',
-      );
-      await errorLogger.log(
-        ErrorLayer.background,
-        e,
-        st,
-        context: <String, Object?>{
-          'phase': 'AutoTripCoordinator.startTrip',
-          'mac': config.mac,
-          'observedSpeedKmh': observedSpeedKmh,
-        },
-      );
-    }
-  }
-
-  Future<void> _invokeStopAndSave(DateTime firedAt) async {
-    try {
-      await stopAndSaveAutomatic();
-      AutoRecordTraceLog.add(
-        AutoRecordEventKind.tripSavedAuto,
-        mac: config.mac,
-        detail: 'firedAt=${firedAt.toIso8601String()}',
-      );
-    } catch (e, st) {
-      AutoRecordTraceLog.add(
-        AutoRecordEventKind.tripSaveFailed,
-        mac: config.mac,
-        detail: 'exception=$e',
-      );
-      await errorLogger.log(
-        ErrorLayer.background,
-        e,
-        st,
-        context: <String, Object?>{
-          'phase': 'AutoTripCoordinator.stopAndSaveAutomatic',
-          'mac': config.mac,
-          'firedAt': firedAt.toIso8601String(),
-        },
-      );
-    }
-  }
-
-  /// Close [_session] if held, swallowing transport errors. Idempotent
-  /// — `_session` is nulled out either way so a follow-up call is a
-  /// no-op. #3527 — a session that IS the supervisor's live link is NOT
-  /// closed here: the supervisor owns link health end-to-end, and a
-  /// deliberate close would leave it believing a dead socket is ready.
-  Future<void> _closeSessionIfHeld() async {
-    final held = _session;
-    if (held == null) return;
-    _session = null;
-    if (identical(linkSupervisor?.service, held)) return;
-    try {
-      await held.disconnect();
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'AutoTripCoordinator: session close failed'}));
-    }
-  }
-
 }

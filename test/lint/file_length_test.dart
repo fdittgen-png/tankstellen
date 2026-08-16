@@ -388,8 +388,21 @@ void main() {
     // _reportSupervisorCorpse speed-watch hook) that stop a whole trip
     // from looping on a dead adapter link. Third bump — decomposition
     // tracked by #3727.
+    // #3727 — decomposed 845 → 470 (shrink ratchet): `AutoRecordConfig` +
+    // the opener/factory typedefs moved to `auto_trip_contracts.dart`
+    // (re-exported); the session-open/watch/hand-off tail (dial +
+    // stale-service guards + link tuning + speed-stream drop handlers +
+    // threshold-cross hand-off + supervisor-aware close) moved to
+    // `auto_trip_session_opener.dart`, which now owns the held session and
+    // speed subscription; the disconnect-debounce/save tail (timer + fired
+    // handler + stopAndSaveAutomatic bridge) moved to
+    // `auto_trip_disconnect_debouncer.dart`, which owns the timer. What
+    // remains is the state machine (started/trip-active/sample counting),
+    // the adapter-event plumbing, and the public constructor seam with its
+    // API doc comments — no further honest seam without mangling state
+    // ownership, so the file stays grandfathered at the shrunken count.
     'lib/features/obd2/data/auto_trip_coordinator.dart': (
-      lines: 845,
+      lines: 470,
       bumps: 3,
       decompositionIssue: 3727,
     ),

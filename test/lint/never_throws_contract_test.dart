@@ -52,7 +52,10 @@ void main() {
     'lib/core/services/radar/corridor_location_cache.dart',
     'lib/core/sync/trip_shares_sync.dart',
     'lib/features/obd2/data/adapter_capability.dart',
-    'lib/features/obd2/data/auto_trip_coordinator.dart',
+    // #3727 — auto_trip_coordinator.dart entry removed (shrink): its only
+    // never-throws boundary (the link-tuning swallow contract) moved into
+    // auto_trip_session_opener.dart, which ships WITH its fault-injection
+    // test (auto_trip_session_opener_test.dart) — no grandfathering needed.
     'lib/features/obd2/data/broken_map_detector.dart',
     'lib/features/obd2/data/obd2_cache_openers.dart',
     'lib/features/obd2/data/obd2_service.dart',
