@@ -41,10 +41,20 @@ updates:
       # — same cluster.
       - dependency-name: "json_serializable"
       - dependency-name: "json_annotation"
-      # Dependabot pulled the 3.2.6-dev.1 prerelease into PR #3563; stable
-      # releases only.
+      # Dependabot pulled the 3.2.6-dev.1 prerelease into PR #3563 and the
+      # 4.0.0-dev.3 MAJOR prerelease into PR #3733; stable releases only,
+      # and the freezed-4 major stays out until an intentional migration.
       - dependency-name: "freezed"
-        versions: [">=3.2.6-dev <3.2.6"]
+        versions: [">=3.2.6-dev <3.2.6", ">=4.0.0-0"]
+      # build_runner >=2.16 forces the newer build/analyzer graph the held
+      # riverpod/analyzer cluster forbids (red on PR #3733) — same lockstep.
+      - dependency-name: "build_runner"
+        versions: [">=2.16.0"]
+      # permission_handler 13.x ships an Android build.gradle.kts that fails
+      # script compilation under our Gradle/AGP (needs the deferred AGP 9
+      # upgrade, see #3736) — closed PR #3734. Re-bump with the AGP upgrade.
+      - dependency-name: "permission_handler"
+        update-types: ["version-update:semver-major"]
       # Vendored as a stripped fork under third_party/ via
       # dependency_overrides (#3172) — the hosted constraint is inert, and
       # bumping it just makes pubspec.yaml lie about the shipped version.
