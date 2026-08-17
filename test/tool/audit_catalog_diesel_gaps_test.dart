@@ -5,6 +5,8 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../tool/audit_catalog_diesel_gaps.dart' as audit;
+
 /// Smoke test for `tool/audit_catalog_diesel_gaps.dart` (#1396).
 ///
 /// The audit script is a developer tool, not part of the runtime
@@ -15,7 +17,14 @@ import 'package:flutter_test/flutter_test.dart';
 ///      `assets/reference_vehicles/vehicles.json`,
 ///   3. The output looks like the markdown table the maintainer is
 ///      meant to paste into a PR comment (header + at least one
-///      "covered" row, since this PR ships several).
+///      "covered" row).
+///
+/// #3752 — the audit runs IN-PROCESS via [audit.runAudit] instead of
+/// spawning `dart run`: the subprocess raced the concurrently-running
+/// `flutter test` over `.dart_tool` (the Dart build-hooks resolver
+/// died with "File not formatted as yaml"), turning the master
+/// full-suite CI shard deterministically red while standalone runs
+/// stayed green.
 ///
 /// We don't assert on the *contents* of the missing-diesels list —
 /// the curated table inside the script will drift over time and
@@ -27,26 +36,15 @@ void main() {
     expect(File('tool/audit_catalog_diesel_gaps.dart').existsSync(), isTrue);
   });
 
-  test('audit_catalog_diesel_gaps.dart runs and emits the markdown header',
-      () async {
-    final result = await Process.run(
-      'dart',
-      <String>['run', 'tool/audit_catalog_diesel_gaps.dart'],
-      runInShell: true,
-    );
-    expect(
-      result.exitCode,
-      0,
-      reason:
-          'Audit script exited non-zero. stderr:\n${result.stderr}\n'
-          'stdout:\n${result.stdout}',
-    );
-    final stdout = result.stdout.toString();
-    expect(stdout, contains('# Catalog diesel-gap audit (#1396)'));
-    expect(stdout, contains('## Already covered'));
-    // The Dacia Duster diesel sibling lands with this PR — assert it
+  test('audit runs in-process and emits the markdown header', () {
+    final report = audit.runAudit();
+    expect(report, isNotNull,
+        reason: 'vehicles.json must exist when running from the repo root');
+    expect(report, contains('# Catalog diesel-gap audit (#1396)'));
+    expect(report, contains('## Already covered'));
+    // The Dacia Duster diesel sibling ships in the catalog — assert it
     // is in the "Already covered" section so the script's join logic
     // is verified end-to-end against the catalog asset.
-    expect(stdout, contains('Dacia | Duster'));
+    expect(report, contains('Dacia | Duster'));
   });
 }
