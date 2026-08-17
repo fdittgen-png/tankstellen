@@ -51,7 +51,7 @@ dependencies:
 
   # UI
   flex_color_scheme: ^8.1.0
-  intl: ^0.20.2
+  intl: ^0.20.3
   qr_flutter: ^4.1.0
   mobile_scanner: ^7.4.0
   # FOSS QR/barcode scanner (FFI to libzxing) — the GMS-free replacement for
