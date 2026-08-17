@@ -44,7 +44,7 @@ class _Reviewer implements ReviewPrompter {
   Future<bool> isAvailable() async {
     isAvailableCalls++;
     final err = throwError;
-    if (err != null) throw err;
+    if (err != null) throw err; // ignore: only_throw_errors
     return available;
   }
 
@@ -52,7 +52,7 @@ class _Reviewer implements ReviewPrompter {
   Future<void> requestReview() async {
     requestReviewCalls++;
     final err = throwError;
-    if (err != null) throw err;
+    if (err != null) throw err; // ignore: only_throw_errors
   }
 }
 

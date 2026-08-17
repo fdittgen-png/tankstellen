@@ -759,11 +759,14 @@ class FillUpList extends _$FillUpList {
       // driving patterns).
       final tripHistory = ref.read(tripHistoryRepositoryProvider);
       if (tripHistory == null) return;
-      final allTrips = tripHistory.loadAll();
-      final inWindow = allTrips
-          .where((t) => fillUp.linkedTripIds.contains(t.id))
-          .where((t) => t.summary.kind != TripKind.gpsPlusObd2)
-          .toList();
+      // #3741 — `loadById` per linked trip; never full-decode history.
+      final inWindow = <TripHistoryEntry>[];
+      for (final id in fillUp.linkedTripIds) {
+        final t = tripHistory.loadById(id);
+        if (t != null && t.summary.kind != TripKind.gpsPlusObd2) {
+          inWindow.add(t);
+        }
+      }
       if (inWindow.isEmpty) return;
 
       final trajetFeatures = <GpsDrivingFeatures>[];

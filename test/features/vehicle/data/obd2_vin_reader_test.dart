@@ -280,6 +280,6 @@ class _ThrowingTransport implements Obd2Transport {
 
   @override
   Future<String> sendCommand(String command) async {
-    throw _err;
+    throw _err; // ignore: only_throw_errors
   }
 }

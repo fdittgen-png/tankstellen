@@ -157,8 +157,14 @@ void main() {
     'lib/app/app_initializer.dart': (
       // #3610 — the eviction sweep's yield now lands in the health
       // counters (cache.evicted, +5). Decomposition tracked by #3139.
-      lines: 700,
-      bumps: 16,
+      // #3738 — re-grandfathered 700 → 716: `createContainer()`, the ONE
+      // production container factory that installs the #3134
+      // profile-language bridge overrides (previously dead code — run()
+      // built a bare ProviderContainer). Composition-root glue by
+      // definition; the composition-root regression test asserts against
+      // this exact factory, so it cannot move out of the shell.
+      lines: 716,
+      bumps: 17,
       decompositionIssue: 3139,
     ),
     // #3078 — grandfathered at 414 (was 400, right at the cap on master). The
@@ -699,22 +705,19 @@ void main() {
       bumps: 3,
       decompositionIssue: 3141,
     ),
-    'lib/features/route_search/providers/route_search_provider.dart': (
-      // #3610 — kDebugMode gates around the per-search debugPrints
-      // (+6 over the cap). Decomposition candidate: the strategy-run
-      // orchestration helpers.
-      lines: 406,
-      bumps: 1,
-      decompositionIssue: 3141,
-    ),
+    // route_search_provider.dart graduated in #3742 (the deprecated
+    // countryCode plumbing was removed, dropping it below the 400 cap).
     'lib/features/obd2/data/trip_recording_controller.dart': (
       // #3625 — post-reconnect grace: replaceService opens an 8 s window
       // during which transport errors / null parses feed the #3575
       // protocol recovery instead of the drop verdict (+27).
       // #3692 — stamp IAT + timing advance, MAP always-on (+10).
+      // #3741 — the two O(1) buffer reads (`latestSample`,
+      // `maxCapturedRpm`) delegating to TripSampleBuffer, so the WAL
+      // flush and glide-coach stop copying the whole buffer (+7).
       // Decomposition tracked by #3140.
-      lines: 1868,
-      bumps: 22,
+      lines: 1875,
+      bumps: 23,
       decompositionIssue: 3140,
     ),
     // #2798 — grandfathered at 408 (8 over): the pump path now retries OCR

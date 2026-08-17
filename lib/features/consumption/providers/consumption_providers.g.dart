@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// ignore_for_file: deprecated_member_use_from_same_package
+
 part of 'consumption_providers.dart';
 
 // **************************************************************************
@@ -467,7 +469,7 @@ final class FillUpListProvider
   }
 }
 
-String _$fillUpListHash() => r'9bb819ddf2750a1d20fb08ab49a8f6e905978067';
+String _$fillUpListHash() => r'd6434bb1948b5981249985f9f336e923f376c1a6';
 
 /// Mutable list of all fill-ups, newest first.
 

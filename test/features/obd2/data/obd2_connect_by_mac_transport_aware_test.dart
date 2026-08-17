@@ -369,7 +369,7 @@ class _ScriptedChannel implements ElmByteChannel {
   @override
   Future<void> open() async {
     final err = openError;
-    if (err != null) throw err;
+    if (err != null) throw err; // ignore: only_throw_errors
     _open = true;
   }
 

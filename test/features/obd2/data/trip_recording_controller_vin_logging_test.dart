@@ -53,7 +53,7 @@ class _VinThrowingTransport extends FakeObd2Transport {
   @override
   Future<String> sendCommand(String command) async {
     if (command.trim() == Elm327Protocol.vinCommand.trim()) {
-      throw _onVin();
+      throw _onVin(); // ignore: only_throw_errors
     }
     return super.sendCommand(command);
   }

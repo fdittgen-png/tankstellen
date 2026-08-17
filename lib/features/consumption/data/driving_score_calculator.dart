@@ -82,9 +82,6 @@ const double kHighRpmThreshold = 3000;
 /// throttle".
 const double kFullThrottlePercent = 90.0;
 
-/// RPM ceiling used by the lugging heuristic (one gear too low).
-const double kLuggingRpmCeiling = 2200;
-
 /// Speed (km/h) at/above which a sample is in the high-speed band.
 const double kHighSpeedThresholdKmh = 110.0;
 

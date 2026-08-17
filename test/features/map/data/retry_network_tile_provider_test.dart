@@ -525,9 +525,9 @@ class _FakeClient extends http.BaseClient {
       }
       final item = scheduled[idx];
       if (item is http.StreamedResponse) return item;
-      throw item;
+      throw item; // ignore: only_throw_errors
     }
-    if (idx < errors.length) throw errors[idx];
+    if (idx < errors.length) throw errors[idx]; // ignore: only_throw_errors
     if (idx < responses.length) return responses[idx];
     throw StateError('FakeClient exhausted after $idx calls');
   }

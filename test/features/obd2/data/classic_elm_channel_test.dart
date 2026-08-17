@@ -54,7 +54,7 @@ class _FakeObd2ClassicMethodChannel extends Obd2ClassicMethodChannel {
   Future<void> write(List<int> bytes) async {
     writeCalls.add(List<int>.from(bytes));
     if (writeError != null) {
-      throw writeError!;
+      throw writeError!; // ignore: only_throw_errors
     }
   }
 
@@ -66,7 +66,7 @@ class _FakeObd2ClassicMethodChannel extends Obd2ClassicMethodChannel {
   Future<void> disconnect() async {
     disconnectCallCount++;
     if (disconnectError != null) {
-      throw disconnectError!;
+      throw disconnectError!; // ignore: only_throw_errors
     }
   }
 

@@ -6,7 +6,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/error/exceptions.dart';
 import '../../../core/services/service_result.dart';
-import '../../../core/country/country_provider.dart';
 import '../../ev/data/services/ev_price_enricher.dart';
 import '../../ev/data/services/fr_irve_price_service.dart';
 import '../../../core/domain/ev/charging_station.dart';
@@ -49,12 +48,13 @@ class EVSearchState extends _$EVSearchState {
         throw const NoEvApiKeyException();
       }
 
-      final country = ref.read(activeCountryProvider);
+      // #697/#3742 — `countryCode` is no longer passed: OCM's
+      // countrycode filter dropped legitimate results in border regions
+      // and the service stopped sending it to the API anyway.
       final result = await service.searchStations(
         lat: lat,
         lng: lng,
         radiusKm: radiusKm,
-        countryCode: country.code,
       );
 
       // Layer onto the OCM result any country-authoritative price/access

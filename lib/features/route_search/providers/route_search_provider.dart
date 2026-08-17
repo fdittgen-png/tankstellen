@@ -10,7 +10,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/country/country_bounding_box.dart';
-import '../../../core/country/country_provider.dart';
 import '../../../core/utils/geo_utils.dart';
 import '../../../core/utils/station_extensions.dart';
 import '../../profile/data/models/user_profile.dart';
@@ -289,27 +288,19 @@ class RouteSearchState extends _$RouteSearchState {
       throw const ApiException(message: 'OpenChargeMap API key required');
     }
 
-    final fallbackCountry = ref.read(activeCountryProvider).code;
     final seen = <String>{};
     final results = <SearchResultItem>[];
 
     for (final point in route.samplePoints) {
       try {
-        // #2595 — detect the per-point country OFFLINE via the bbox
-        // registry (no network geocode that could blackhole and fall
-        // back to the active country). Outside every box (e.g. mid-sea)
-        // falls back to the active country.
-        final countryCode = countryCodeFromLatLng(
-              point.latitude,
-              point.longitude,
-            ) ??
-            fallbackCountry;
-
+        // #697/#3742 — `countryCode` is no longer passed: OCM's
+        // countrycode filter dropped legitimate results in border
+        // regions and the service stopped sending it to the API; the
+        // lat/lng + distance constraint is the geographic filter.
         final result = await service.searchStations(
           lat: point.latitude,
           lng: point.longitude,
           radiusKm: radiusKm,
-          countryCode: countryCode,
           maxResults: 20,
         );
         for (final station in result.data) {

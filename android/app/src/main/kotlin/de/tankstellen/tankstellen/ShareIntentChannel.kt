@@ -11,6 +11,9 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
 import java.io.File
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import java.util.Locale
 
 /**
@@ -162,6 +165,15 @@ object ShareIntentChannel {
      */
     private fun decodeUri(uri: Uri, intentType: String?): Map<String, Any?>? {
         val context = cachedContext ?: return null
+        // #3740 — accept only content:// URIs. A file:// (or any other
+        // scheme) in EXTRA_STREAM lets a malicious sharer point the copy at
+        // app-private files (path traversal into our own sandbox) instead of
+        // a ContentProvider stream it actually owns. Modern senders must use
+        // FileProvider content URIs anyway (StrictMode enforces since N).
+        if (uri.scheme != "content") {
+            Log.w(TAG, "rejected non-content share URI scheme: ${uri.scheme}")
+            return null
+        }
         val resolver = context.contentResolver
         val mime = resolver.getType(uri) ?: intentType ?: ""
         val kind = when {
@@ -171,10 +183,16 @@ object ShareIntentChannel {
             else -> "file"
         }
 
-        // For a text/* stream, read the body directly rather than caching a file.
+        // For a text/* stream, read the body directly rather than caching a
+        // file. Bounded (#3740): an unbounded readBytes() let a hostile
+        // sharer OOM the process with a giant stream.
         if (kind == "text") {
             val text = try {
-                resolver.openInputStream(uri)?.use { it.readBytes().toString(Charsets.UTF_8) }
+                resolver.openInputStream(uri)?.use { input ->
+                    val out = java.io.ByteArrayOutputStream()
+                    copyBounded(input, out)
+                    out.toByteArray().toString(Charsets.UTF_8)
+                }
             } catch (e: Exception) {
                 Log.w(TAG, "text stream read failed", e)
                 null
@@ -194,12 +212,39 @@ object ShareIntentChannel {
         )
         return try {
             resolver.openInputStream(uri)?.use { input ->
-                cacheFile.outputStream().use { output -> input.copyTo(output) }
+                cacheFile.outputStream().use { output -> copyBounded(input, output) }
             } ?: return null
             mapOf("kind" to kind, "path" to cacheFile.absolutePath)
         } catch (e: Exception) {
             Log.w(TAG, "stream copy failed for $uri", e)
+            // Best-effort cleanup of a partial over-cap/failed copy.
+            cacheFile.delete()
             null
+        }
+    }
+
+    /** Copy cap (#3740): a receipt photo/PDF is well under this; anything
+     *  bigger is a resource-exhaustion attempt, not a receipt. */
+    private const val MAX_SHARE_BYTES = 8L * 1024 * 1024
+
+    /**
+     * Streams [input] into [output], counting bytes as they flow; aborts
+     * with an [IOException] the moment the running total exceeds
+     * [MAX_SHARE_BYTES] (#3740). Counting the stream — instead of trusting
+     * a provider-reported size — means a lying ContentProvider cannot
+     * bypass the cap.
+     */
+    private fun copyBounded(input: InputStream, output: OutputStream) {
+        val buf = ByteArray(64 * 1024)
+        var total = 0L
+        while (true) {
+            val n = input.read(buf)
+            if (n < 0) return
+            total += n
+            if (total > MAX_SHARE_BYTES) {
+                throw IOException("shared stream exceeds $MAX_SHARE_BYTES bytes — aborting copy")
+            }
+            output.write(buf, 0, n)
         }
     }
 

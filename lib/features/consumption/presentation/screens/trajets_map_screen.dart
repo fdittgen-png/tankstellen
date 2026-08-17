@@ -49,9 +49,11 @@ class TrajetsMapScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
-    final allTrips = ref.watch(tripHistoryListProvider);
+    // #3741 — the history list is summaries-only; this screen renders
+    // the GPS polylines, so it full-decodes exactly the selected trips
+    // via the per-id family (null → the id vanished; skip it).
     final selected = <TripHistoryEntry>[
-      for (final id in tripIds) ...allTrips.where((t) => t.id == id),
+      for (final id in tripIds) ?ref.watch(tripHistoryDetailProvider(id)),
     ];
 
     final tracks = <_TripTrack>[];

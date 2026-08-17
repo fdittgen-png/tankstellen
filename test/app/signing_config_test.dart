@@ -152,9 +152,19 @@ void main() {
         expect(ciSource, contains('secrets.ANDROID_KEYSTORE_BASE64'));
         expect(ciSource, contains('secrets.ANDROID_KEYSTORE_PASSWORD'));
         expect(ciSource, contains('secrets.ANDROID_KEY_ALIAS'));
-        // The three env vars gradle reads, written to GITHUB_ENV.
+        // #3740 — the PASSWORD is deliberately NOT written to GITHUB_ENV
+        // anymore (every later step incl. third-party actions could read
+        // it there); it reaches gradle only via the consuming build
+        // step's own `env:` block. Path + alias stay in GITHUB_ENV.
         expect(ciSource, contains('ANDROID_KEYSTORE_PATH='));
-        expect(ciSource, contains('ANDROID_KEYSTORE_PASSWORD='));
+        expect(ciSource, isNot(contains('ANDROID_KEYSTORE_PASSWORD=')),
+            reason: 'the keystore password must never be exported to '
+                'GITHUB_ENV (#3740) — scope it to the build step env');
+        expect(
+            ciSource,
+            contains('ANDROID_KEYSTORE_PASSWORD: '
+                r'${{ secrets.ANDROID_KEYSTORE_PASSWORD }}'),
+            reason: 'the build step consumes the secret via its own env');
         expect(ciSource, contains('ANDROID_KEY_ALIAS='));
       },
     );

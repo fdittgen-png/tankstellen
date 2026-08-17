@@ -32,7 +32,7 @@ class _ScriptedDialer {
     final outcome = _script.length > 1 ? _script.removeAt(0) : _script.first;
     if (outcome is Obd2Service) return outcome;
     if (outcome == null) return null;
-    throw outcome;
+    throw outcome; // ignore: only_throw_errors
   }
 }
 

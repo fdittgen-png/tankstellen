@@ -50,7 +50,7 @@ class _FakeClassicPlugin extends Obd2ClassicMethodChannel {
     required String uuid,
     int? budgetMs, // #3421
   }) async {
-    if (connectThrows != null) throw connectThrows!;
+    if (connectThrows != null) throw connectThrows!; // ignore: only_throw_errors
     return (
       ok: connectResult,
       strategy: connectResult ? 'secure' : 'exhausted',
@@ -67,7 +67,7 @@ class _FakeClassicPlugin extends Obd2ClassicMethodChannel {
   @override
   Future<void> disconnect() async {
     disconnectCalls++;
-    if (disconnectError != null) throw disconnectError!;
+    if (disconnectError != null) throw disconnectError!; // ignore: only_throw_errors
   }
 
   final StreamController<List<int>> incomingController =

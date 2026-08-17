@@ -28,7 +28,7 @@ class _StubRepo implements TrafficSignalRepository {
     required double east,
   }) async {
     final err = errorToThrow;
-    if (err != null) throw err;
+    if (err != null) throw err; // ignore: only_throw_errors
     return response;
   }
 

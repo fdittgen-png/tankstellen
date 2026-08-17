@@ -50,7 +50,7 @@ class _GatedService implements StationService {
     final g = gate;
     if (g != null) await g.future;
     final f = failure;
-    if (f != null) throw f;
+    if (f != null) throw f; // ignore: only_throw_errors
     return ServiceResult(
       data: stations,
       source: ServiceSource.tankerkoenigApi,

@@ -553,7 +553,7 @@ class _ScriptedChannel implements ElmByteChannel {
     openAttempts++;
     if (_openFailuresRemaining > 0) {
       _openFailuresRemaining--;
-      throw _openFailure;
+      throw _openFailure; // ignore: only_throw_errors
     }
     _open = true;
   }
@@ -584,7 +584,7 @@ class _ScriptedChannel implements ElmByteChannel {
       // #2453 — the underlying BLE/GATT write rejected. The transport must
       // surface this to the caller AND clear `_pending` so the next command
       // isn't poisoned.
-      throw throwFor;
+      throw throwFor; // ignore: only_throw_errors
     }
     final chunks = _chunksByCommand[command];
     if (chunks == null) {

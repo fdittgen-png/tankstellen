@@ -1,11 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../../../core/logging/error_logger.dart';
 import '../../../../core/utils/geo_utils.dart' as geo;
 import '../../data/traffic_signal_repository.dart';
 import '../entities/traffic_signal.dart';
@@ -94,9 +96,10 @@ class ImminentSignalDetector {
   /// awaited; the caller is responsible for throttling invocations
   /// (e.g. once per N seconds of GPS samples).
   ///
-  /// Repository errors are swallowed (and `debugPrint`-ed) so a brief
-  /// network blip does not throw inside a GPS callback. Under-trigger
-  /// is the safe default for a distraction-warning feature.
+  /// Repository errors are swallowed (logged via [errorLogger] and
+  /// `debugPrint`) so a brief network blip does not throw inside a GPS
+  /// callback. Under-trigger is the safe default for a
+  /// distraction-warning feature.
   Future<TrafficSignal?> nextSignalAhead(GpsReading reading) async {
     final user = LatLng(reading.latitude, reading.longitude);
     final bbox = searchBoundingBox(user, _horizonMeters);
@@ -114,6 +117,11 @@ class ImminentSignalDetector {
         'ImminentSignalDetector: repo lookup failed, '
         'returning null: $e\n$st',
       );
+      // Release-visible trace (#3742) — debugPrint alone is invisible in
+      // release builds, hiding a persistently failing signal lookup.
+      unawaited(errorLogger.log(ErrorLayer.services, e, st, context: const {
+        'where': 'ImminentSignalDetector: repo lookup failed, returning null',
+      }));
       return null;
     }
 

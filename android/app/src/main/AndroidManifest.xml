@@ -128,10 +128,18 @@
          active); it does not enable any new data collection. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
+    <!-- #3740 — backup hygiene: Google Auto-Backup + device-to-device
+         migration must never ship the Supabase auth session
+         (FlutterSharedPreferences.xml holds legacy plaintext sessions +
+         other app prefs), the widget prefs, or the crash journal
+         off-device. dataExtractionRules covers Android 12+ (cloud-backup
+         AND device-transfer); fullBackupContent covers Android ≤ 11. -->
     <application
         android:label="Sparkilo"
         android:name=".TankstellenApplication"
         android:icon="@mipmap/ic_launcher"
+        android:fullBackupContent="@xml/backup_rules"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:networkSecurityConfig="@xml/network_security_config">
         <activity
             android:name=".MainActivity"
@@ -237,7 +245,10 @@
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <!-- #3740 — QUICKBOOT_POWERON dropped: it is NOT a protected
+                     broadcast, so any app could spoof it into this exported
+                     receiver. HTC/legacy quickboot devices still get
+                     BOOT_COMPLETED. -->
             </intent-filter>
         </receiver>
 

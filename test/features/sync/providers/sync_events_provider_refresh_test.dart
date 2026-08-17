@@ -161,12 +161,18 @@ Map<String, dynamic> _itineraryMap(String id) => {
     };
 
 /// In-memory [TripHistoryRepository] exposing just what
-/// [TripHistoryList] touches ([loadAll]); everything else fails loudly.
+/// [TripHistoryList] touches ([loadSummaries] since #3741 — the list
+/// provider no longer materialises full sample arrays); everything else
+/// fails loudly.
 class _FakeTripHistoryRepository implements TripHistoryRepository {
   final List<TripHistoryEntry> entries = [];
 
   @override
   List<TripHistoryEntry> loadAll({bool dedupe = true}) => List.of(entries);
+
+  @override
+  List<TripHistoryEntry> loadSummaries({bool dedupe = true}) =>
+      List.of(entries);
 
   @override
   dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError(

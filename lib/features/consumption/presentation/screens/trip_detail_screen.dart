@@ -122,8 +122,11 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final trips = ref.watch(tripHistoryListProvider);
-    final ownedEntry = trips.where((t) => t.id == widget.tripId).firstOrNull;
+    // #3741 — the history list is summaries-only now; the detail screen
+    // is the sample consumer, so it full-decodes exactly ONE trip via
+    // the per-id family (which watches the list, keeping every
+    // save/delete/verdict refresh reactive).
+    final ownedEntry = ref.watch(tripHistoryDetailProvider(widget.tripId));
     // #2240 — a trip shared WITH the user isn't in their local Hive
     // history; fall back to the live "shared with me" list so tapping a
     // shared row opens a read-only detail. `isShared` gates the owner-
@@ -346,10 +349,9 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     // BEFORE the pop (SnackBarHelper contract) because this screen's
     // context dies with it.
     final notifier = ref.read(tripHistoryListProvider.notifier);
-    final deleted = ref
-        .read(tripHistoryListProvider)
-        .where((t) => t.id == widget.tripId)
-        .firstOrNull;
+    // #3741 — capture the FULL entry (summaries-only list would restore
+    // a sample-less trip on Undo, silently losing the charts/track).
+    final deleted = ref.read(tripHistoryDetailProvider(widget.tripId));
     final messenger = ScaffoldMessenger.maybeOf(context);
     final undoLabel = l.undo;
     final message = l.trajetDeletedUndoSnackbar;

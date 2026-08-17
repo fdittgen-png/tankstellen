@@ -119,6 +119,90 @@ void main() {
       );
     });
 
+    group('formula-injection defusal (#3740, OWASP CSV injection)', () {
+      test("prefixes ' on a cell starting with =", () {
+        expect(
+          encodeCsv(const [
+            ['=SUM(A1:A3)', 'safe'],
+          ]),
+          "'=SUM(A1:A3),safe\r\n",
+        );
+      });
+
+      test("prefixes ' on a cell starting with +", () {
+        expect(
+          encodeCsv(const [
+            ['+49 Tank & Rast'],
+          ]),
+          "'+49 Tank & Rast\r\n",
+        );
+      });
+
+      test("prefixes ' on a cell starting with -", () {
+        expect(
+          encodeCsv(const [
+            ['-2+3+cmd|"/C calc"!A0'],
+          ]),
+          '"\'-2+3+cmd|""/C calc""!A0"\r\n',
+        );
+      });
+
+      test("prefixes ' on a cell starting with @", () {
+        expect(
+          encodeCsv(const [
+            ['@SUM(1+9)'],
+          ]),
+          "'@SUM(1+9)\r\n",
+        );
+      });
+
+      test("prefixes ' on a cell starting with a tab", () {
+        expect(
+          encodeCsv(const [
+            ['\t=1+1'],
+          ]),
+          "'\t=1+1\r\n",
+        );
+      });
+
+      test("prefixes ' on a cell starting with a CR and still quotes it", () {
+        expect(
+          encodeCsv(const [
+            ['\r=1+1'],
+          ]),
+          '"\'\r=1+1"\r\n',
+        );
+      });
+
+      test('formula-shaped station name with a comma is defused AND quoted',
+          () {
+        expect(
+          encodeCsv(const [
+            ['=HYPERLINK("http://evil", "Aral Nord")'],
+          ]),
+          '"\'=HYPERLINK(""http://evil"", ""Aral Nord"")"\r\n',
+        );
+      });
+
+      test('negative numbers are NOT defused (they cannot be formulas)', () {
+        expect(
+          encodeCsv(const [
+            [-3.7038, -12, 'lat'],
+          ]),
+          '-3.7038,-12,lat\r\n',
+        );
+      });
+
+      test('a formula trigger mid-cell is left alone', () {
+        expect(
+          encodeCsv(const [
+            ['Aral =Nord', 'a+b'],
+          ]),
+          'Aral =Nord,a+b\r\n',
+        );
+      });
+    });
+
     test('handles ragged rows (different column counts per row)', () {
       expect(
         encodeCsv(const [

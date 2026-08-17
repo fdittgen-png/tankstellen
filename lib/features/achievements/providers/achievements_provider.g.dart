@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// ignore_for_file: deprecated_member_use_from_same_package
+
 part of 'achievements_provider.dart';
 
 // **************************************************************************
@@ -173,7 +175,7 @@ final class AchievementsProvider
   }
 }
 
-String _$achievementsHash() => r'9b7655096f50c916ce14e224d5faf89277810abc';
+String _$achievementsHash() => r'7bc75ae0b27d370cb86b17ec9491a5fa8049d435';
 
 /// Earned badges, newest-first. Watches the trip-history and
 /// fill-up providers so that adding a trip or fill-up naturally

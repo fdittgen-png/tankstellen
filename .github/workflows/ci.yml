@@ -724,8 +724,10 @@ jobs:
             exit 1
           fi
           echo "ANDROID_KEYSTORE_PATH=$KEYSTORE_PATH" >> "$GITHUB_ENV"
-          echo "ANDROID_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
           echo "ANDROID_KEY_ALIAS=$ANDROID_KEY_ALIAS" >> "$GITHUB_ENV"
+          # #3740 — the keystore PASSWORD is deliberately NOT exported to
+          # GITHUB_ENV: that exposes it to every subsequent step (and any
+          # compromised action). It is scoped to the build steps' env: blocks.
       # #1813 — PR validation builds a single unsigned debug APK: it
       # compiles + links all Dart and Kotlin (catching the breakage a
       # PR can realistically introduce) without paying for R8-minified
@@ -751,9 +753,15 @@ jobs:
           echo "versionCode: $BN"
       - name: Build APK (release, split per ABI)
         if: github.event_name != 'pull_request'
+        env:
+          # #3740 — keystore password scoped to the signing build steps only.
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: flutter build apk --release --split-per-abi --flavor play --build-number=${{ steps.bn.outputs.build_number }}
       - name: Build App Bundle (release)
         if: github.event_name != 'pull_request'
+        env:
+          # #3740 — keystore password scoped to the signing build steps only.
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: flutter build appbundle --release --flavor play --build-number=${{ steps.bn.outputs.build_number }}
       # #3661 — size visible on every build; fails on an implausibly
       # small artifact (llmwiki page 25).

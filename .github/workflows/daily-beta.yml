@@ -119,8 +119,10 @@ jobs:
           KEYSTORE_PATH="$RUNNER_TEMP/upload-keystore.jks"
           echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_PATH"
           echo "ANDROID_KEYSTORE_PATH=$KEYSTORE_PATH" >> "$GITHUB_ENV"
-          echo "ANDROID_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
           echo "ANDROID_KEY_ALIAS=$ANDROID_KEY_ALIAS" >> "$GITHUB_ENV"
+          # #3740 — the keystore PASSWORD is deliberately NOT exported to
+          # GITHUB_ENV: that exposes it to every subsequent step (and any
+          # compromised action). It is scoped to the build step's env: block.
 
       # #3543 — cache + retry-pre-install the NDK the AGP would otherwise
       # download on demand (flaked 4× on 2026-07-09; see ci.yml for the
@@ -163,6 +165,9 @@ jobs:
         # run (mints the #3436 declaration-surfacing bundle) without
         # flipping the global variable, which would 403 the next scheduled
         # upload.
+        env:
+          # #3740 — keystore password scoped to the only step that needs it.
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: flutter build appbundle --release --flavor play --build-number=${{ steps.bn.outputs.build_number }} ${{ (vars.FGS_FORM_APPROVED == 'true' || inputs.fgs_bundle == true) && '--dart-define=FGS_FORM_APPROVED=true' || '' }}
 
       # #3661 — size visible on every build; fails on an implausibly

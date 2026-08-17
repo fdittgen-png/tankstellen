@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/widgets/responsive_layout.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/achievement.dart';
 import '../../providers/achievements_provider.dart';
@@ -26,7 +27,7 @@ class BadgeShelf extends ConsumerWidget {
     // to 48×48 icon-only with the label moving to the tooltip so the
     // shelf doesn't eat ~120 dp of left-panel real-estate in a wide
     // layout.
-    final compact = MediaQuery.of(context).size.width >= 600;
+    final compact = isWideScreen(context);
     final shelfHeight = compact ? 48.0 : 88.0;
     final cardMargin = compact
         ? const EdgeInsets.symmetric(horizontal: 12, vertical: 4)

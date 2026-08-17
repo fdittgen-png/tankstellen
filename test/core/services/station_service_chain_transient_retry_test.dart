@@ -39,7 +39,7 @@ class _ScriptedService implements StationService {
     final i = callCount++;
     final step = i < script.length ? script[i] : null;
     if (step != null) {
-      throw step;
+      throw step; // ignore: only_throw_errors
     }
     return ServiceResult(
       data: stations,
