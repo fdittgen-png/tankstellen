@@ -49,9 +49,15 @@ class RoadGradeCalculator {
     this.windowMeters = 150.0,
     this.smoothingFactor = 0.2,
     this.minSamplesInWindow = 5,
-  })  : assert(windowMeters > 0),
-        assert(smoothingFactor > 0 && smoothingFactor <= 1),
-        assert(minSamplesInWindow >= 2);
+  })  : assert(windowMeters > 0, 'windowMeters must be positive'),
+        assert(
+          smoothingFactor > 0 && smoothingFactor <= 1,
+          'smoothingFactor must be in (0, 1]',
+        ),
+        assert(
+          minSamplesInWindow >= 2,
+          'a grade needs at least 2 samples in the window',
+        );
 
   /// Distance (metres) the grade is measured over. Longer = less
   /// noise-sensitive but slower to react to a real slope change.

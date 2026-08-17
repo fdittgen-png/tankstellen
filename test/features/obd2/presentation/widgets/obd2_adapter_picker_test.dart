@@ -673,7 +673,7 @@ class _RecordingFakeConnection extends Obd2ConnectionService {
     String? adapterName,
   }) async {
     connectByMacCalls.add(mac);
-    if (connectByMacError != null) throw connectByMacError!;
+    if (connectByMacError != null) throw connectByMacError!; // ignore: only_throw_errors
     return connectByMacResult;
   }
 

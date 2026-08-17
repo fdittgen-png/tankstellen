@@ -705,14 +705,8 @@ void main() {
       bumps: 3,
       decompositionIssue: 3141,
     ),
-    'lib/features/route_search/providers/route_search_provider.dart': (
-      // #3610 — kDebugMode gates around the per-search debugPrints
-      // (+6 over the cap). Decomposition candidate: the strategy-run
-      // orchestration helpers.
-      lines: 406,
-      bumps: 1,
-      decompositionIssue: 3141,
-    ),
+    // route_search_provider.dart graduated in #3742 (the deprecated
+    // countryCode plumbing was removed, dropping it below the 400 cap).
     'lib/features/obd2/data/trip_recording_controller.dart': (
       // #3625 — post-reconnect grace: replaceService opens an 8 s window
       // during which transport errors / null parses feed the #3575

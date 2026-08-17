@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// ignore_for_file: deprecated_member_use_from_same_package
+
 part of 'isolate_error_spool_entry.dart';
 
 // **************************************************************************

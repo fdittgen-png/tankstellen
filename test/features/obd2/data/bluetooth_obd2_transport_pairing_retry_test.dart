@@ -32,7 +32,7 @@ class _FakeChannel implements ElmByteChannel {
   @override
   Future<void> open() async {
     openAttempts++;
-    throw fault;
+    throw fault; // ignore: only_throw_errors
   }
 
   @override

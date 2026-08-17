@@ -426,7 +426,7 @@ class _FakeStationService implements StationService {
   Future<ServiceResult<StationDetail>> getStationDetail(
       String stationId) async {
     onGetStationDetail?.call();
-    if (apiError != null) throw apiError!;
+    if (apiError != null) throw apiError!; // ignore: only_throw_errors
     if (apiResult != null) return apiResult!;
     throw StateError('no api fixture for $stationId');
   }

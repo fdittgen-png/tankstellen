@@ -33,7 +33,7 @@ class _FakeOsmClient implements OsmTrafficSignalClient {
   }) async {
     callCount++;
     final err = errorToThrow;
-    if (err != null) throw err;
+    if (err != null) throw err; // ignore: only_throw_errors
     return responder();
   }
 }

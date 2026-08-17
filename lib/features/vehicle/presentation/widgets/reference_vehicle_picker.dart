@@ -125,7 +125,7 @@ class _ReferenceVehiclePickerState
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final catalogAsync = ref.watch(referenceVehicleCatalogProvider);
-    final maxHeight = MediaQuery.of(context).size.height * 0.85;
+    final maxHeight = MediaQuery.sizeOf(context).height * 0.85;
     final searching = _query.isNotEmpty;
 
     return SafeArea(

@@ -36,7 +36,7 @@ class _FakeSyncState extends SyncState {
 
   @override
   Future<void> connectCommunity() async {
-    throw _throwOnConnect;
+    throw _throwOnConnect; // ignore: only_throw_errors
   }
 }
 

@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// ignore_for_file: deprecated_member_use_from_same_package
+
 part of 'route_search_provider.dart';
 
 // **************************************************************************
@@ -59,7 +61,7 @@ final class RouteSearchStateProvider
   }
 }
 
-String _$routeSearchStateHash() => r'965d1ec4b7e594c0a9d6957476beace911ccd702';
+String _$routeSearchStateHash() => r'73648837299371ed15e113d9ec2168525258d4d9';
 
 /// Orchestrates "cheapest stations along my route" feature.
 ///

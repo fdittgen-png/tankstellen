@@ -117,9 +117,9 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
   }
 
   Widget _buildBody(BuildContext context, AppLocalizations l10n) {
-    final media = MediaQuery.of(context);
-    final isLandscape = media.orientation == Orientation.landscape;
-    final isWide = media.size.width >= 600;
+    final isLandscape =
+        MediaQuery.orientationOf(context) == Orientation.landscape;
+    final isWide = isWideScreen(context);
     if (isLandscape || isWide) {
       // #2530 — the side-by-side panes go through the shared
       // ResponsiveMasterDetail scaffold so the foldable-hinge + 1:1/2:3

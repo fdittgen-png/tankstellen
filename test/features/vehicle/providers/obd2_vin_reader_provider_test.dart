@@ -271,7 +271,7 @@ class _FakeObd2ConnectionService extends Obd2ConnectionService {
     connectByMacCalls++;
     lastConnectByMacArg = mac;
     final err = throwOnConnect;
-    if (err != null) throw err;
+    if (err != null) throw err; // ignore: only_throw_errors
     return connectByMacResult;
   }
 }

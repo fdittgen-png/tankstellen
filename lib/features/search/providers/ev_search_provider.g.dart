@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// ignore_for_file: deprecated_member_use_from_same_package
+
 part of 'ev_search_provider.dart';
 
 // **************************************************************************
@@ -121,7 +123,7 @@ final class EVSearchStateProvider
   }
 }
 
-String _$eVSearchStateHash() => r'cf50b050b303acd2ba9709c6a384721f6818b583';
+String _$eVSearchStateHash() => r'60721240a9b2ef153fb6cca6ece739b86c9a613c';
 
 /// Manages EV charging station search, parallel to [SearchState] for fuel.
 ///

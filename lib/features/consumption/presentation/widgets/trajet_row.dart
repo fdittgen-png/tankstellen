@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/widgets/responsive_layout.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../data/trip_history_repository.dart';
@@ -62,7 +63,7 @@ class TrajetRow extends StatelessWidget {
     // per-row vertical margin from 3 → 1 dp and the inner padding
     // from (12, 8) → (10, 4) so a 600+ dp viewport shows ~50 % more
     // trajets without scrolling.
-    final compact = MediaQuery.of(context).size.width >= 600;
+    final compact = isWideScreen(context);
     final cardMargin = compact
         ? const EdgeInsets.symmetric(horizontal: 8, vertical: 1)
         : const EdgeInsets.symmetric(horizontal: 12, vertical: 3);

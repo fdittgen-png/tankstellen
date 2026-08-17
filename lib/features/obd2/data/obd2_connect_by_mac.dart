@@ -112,7 +112,7 @@ Future<Obd2Service?> _connectByMacDirect(
       debugPrint('_connectByMacDirect: recoverable direct-connect failure, '
           'falling back to scan: $e\n$st');
       return true;
-    }());
+    }(), 'debug-only breadcrumb — the closure always returns true');
     // #3244 — close-by-identity: tear down THIS attempt's channel only. The
     // no-arg teardown closed whatever `_lastDirectChannel` pointed at, which
     // a rival admitted meanwhile may have re-assigned to ITS live channel.
@@ -221,7 +221,7 @@ Future<Obd2Service?> _connectByMacClassicDirect(
     assert(() {
       debugPrint('_connectByMacClassicDirect: recoverable failure: $e\n$st');
       return true;
-    }());
+    }(), 'debug-only breadcrumb — the closure always returns true');
     // #3244 — close-by-identity (see _connectByMacDirect's catch).
     await _teardownDirectChannel(svc, channel);
     return null;

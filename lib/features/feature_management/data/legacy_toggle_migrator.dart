@@ -69,7 +69,7 @@ const String showConsumptionTabMigratedKey = 'showConsumptionTabMigrated';
 /// One-shot migrator that promotes legacy scattered toggles into the
 /// central [FeatureFlagsRepository] (#1373 phase 3a).
 ///
-/// Reads the legacy [StorageKeys.hapticEcoCoachEnabled] value from the
+/// Reads the legacy `StorageKeys.hapticEcoCoachEnabled` value from the
 /// passed-in `settings` box. If it was `true` AND the migration has
 /// not yet run, force-enables [Feature.obd2TripRecording] (the
 /// manifest-declared prerequisite of [Feature.hapticEcoCoach]) and
@@ -151,7 +151,7 @@ Future<void> migrateLegacyToggles({
 /// One-shot migrator for UserProfile-backed legacy toggles (#1373
 /// phase 3b).
 ///
-/// Reads the legacy [UserProfile.gamificationEnabled] value from the
+/// Reads the legacy `UserProfile.gamificationEnabled` value from the
 /// passed-in [activeProfile]. The migrator is a no-op when [activeProfile]
 /// is null — the next launch will retry; idempotency is preserved by
 /// NOT writing the migrated-key flag in that case.
@@ -481,7 +481,7 @@ Future<void> _migrateAutoRecord({
   }
 }
 
-/// Phase-3c migration for the legacy [UserProfile.showFuel] bool
+/// Phase-3c migration for the legacy `UserProfile.showFuel` bool
 /// (#1373 phase 3c).
 ///
 /// Mirrors [_migrateGamification]: the manifest defaults
@@ -539,7 +539,7 @@ Future<void> _migrateShowFuel({
   }
 }
 
-/// Phase-3c migration for the legacy [UserProfile.showElectric] bool
+/// Phase-3c migration for the legacy `UserProfile.showElectric` bool
 /// (#1373 phase 3c). Mirrors [_migrateShowFuel] verbatim — same
 /// default-true semantics, no manifest prerequisites.
 Future<void> _migrateShowElectric({
@@ -582,7 +582,7 @@ Future<void> _migrateShowElectric({
   }
 }
 
-/// Phase-3c migration for the legacy [UserProfile.showConsumptionTab]
+/// Phase-3c migration for the legacy `UserProfile.showConsumptionTab`
 /// bool (#1373 phase 3c).
 ///
 /// Distinct from [_migrateShowFuel] / [_migrateShowElectric] because

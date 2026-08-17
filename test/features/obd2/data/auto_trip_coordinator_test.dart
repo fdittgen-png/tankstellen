@@ -84,7 +84,7 @@ class _SessionOpenerHarness {
       openedFor.add(mac);
       if (queue.isEmpty) return null;
       final next = queue.removeFirst();
-      if (next is _OpenerError) throw next.cause;
+      if (next is _OpenerError) throw next.cause; // ignore: only_throw_errors
       return next as Obd2Service?;
     };
   }

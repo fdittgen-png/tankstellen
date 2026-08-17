@@ -33,7 +33,7 @@ class _NotifyChannel extends FlutterBluePlusElmChannel {
     final d = delay;
     if (d != null) await Future<void>.delayed(d);
     final f = fault;
-    if (f != null) throw f;
+    if (f != null) throw f; // ignore: only_throw_errors
   }
 }
 

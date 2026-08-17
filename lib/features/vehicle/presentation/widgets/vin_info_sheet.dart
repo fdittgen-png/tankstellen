@@ -32,7 +32,7 @@ class VinInfoSheet extends StatelessWidget {
     final theme = Theme.of(context);
     // Cap the sheet height so the long body scrolls instead of
     // spilling past the top of the screen on compact phones.
-    final maxHeight = MediaQuery.of(context).size.height * 0.85;
+    final maxHeight = MediaQuery.sizeOf(context).height * 0.85;
 
     return SafeArea(
       top: false,

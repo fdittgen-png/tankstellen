@@ -33,7 +33,7 @@ class _StubRepo implements TrafficSignalRepository {
     callCount++;
     lastBbox = (south: south, west: west, north: north, east: east);
     final err = errorToThrow;
-    if (err != null) throw err;
+    if (err != null) throw err; // ignore: only_throw_errors
     return response;
   }
 

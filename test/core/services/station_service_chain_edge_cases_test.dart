@@ -33,7 +33,7 @@ class _FakeStationService implements StationService {
   }) async {
     searchCallCount++;
     if (delay > Duration.zero) await Future<void>.delayed(delay);
-    if (errorToThrow != null) throw errorToThrow!;
+    if (errorToThrow != null) throw errorToThrow!; // ignore: only_throw_errors
     return ServiceResult(
       data: stationsToReturn,
       source: ServiceSource.tankerkoenigApi,
@@ -43,7 +43,7 @@ class _FakeStationService implements StationService {
 
   @override
   Future<ServiceResult<StationDetail>> getStationDetail(String id) async {
-    if (errorToThrow != null) throw errorToThrow!;
+    if (errorToThrow != null) throw errorToThrow!; // ignore: only_throw_errors
     throw const ApiException(message: 'Not implemented');
   }
 
@@ -51,7 +51,7 @@ class _FakeStationService implements StationService {
   Future<ServiceResult<Map<String, StationPrices>>> getPrices(
     List<String> ids,
   ) async {
-    if (errorToThrow != null) throw errorToThrow!;
+    if (errorToThrow != null) throw errorToThrow!; // ignore: only_throw_errors
     return ServiceResult(
       data: const {},
       source: ServiceSource.tankerkoenigApi,

@@ -428,7 +428,7 @@ class AppInitializer {
     assert(() {
       CountryServiceRegistry.assertAllCountriesRegistered();
       return true;
-    }());
+    }(), 'every configured country must have a registered service');
 
     // Safety net: guarantee a default profile always exists (#555).
     // The onboarding wizard calls ensureDefaultProfile() at completion,

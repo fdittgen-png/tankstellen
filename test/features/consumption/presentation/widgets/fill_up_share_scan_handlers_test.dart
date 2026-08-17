@@ -60,7 +60,7 @@ class _FakeRecognizer extends TextRecognizer {
 
   @override
   Future<RecognizedText> processImage(InputImage inputImage) async {
-    if (errorToThrow != null) throw errorToThrow!;
+    if (errorToThrow != null) throw errorToThrow!; // ignore: only_throw_errors
     return RecognizedText(text: textToReturn, blocks: const []);
   }
 

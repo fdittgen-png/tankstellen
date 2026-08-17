@@ -14,7 +14,7 @@ enum ScreenSize { compact, medium, expanded }
 
 /// Returns the [ScreenSize] category based on the screen width.
 ScreenSize screenSizeOf(BuildContext context) {
-  final width = MediaQuery.of(context).size.width;
+  final width = MediaQuery.sizeOf(context).width;
   return screenSizeFromWidth(width);
 }
 
@@ -32,7 +32,7 @@ ScreenSize screenSizeFromWidth(double width) {
 ///
 /// Maintained for backward compatibility — prefer [screenSizeOf] for new code.
 bool isWideScreen(BuildContext context) =>
-    MediaQuery.of(context).size.width >= 600;
+    MediaQuery.sizeOf(context).width >= 600;
 
 /// Detects whether the device has a display hinge (foldable device).
 ///

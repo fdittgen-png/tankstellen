@@ -32,6 +32,9 @@ void main() {
         lat: 40.4168,
         lng: -3.7038,
         radiusKm: 10,
+        // This test exercises the deprecated parameter's contract (#697:
+        // accepted but never sent to the API), so using it is the point.
+        // ignore: deprecated_member_use_from_same_package
         countryCode: 'ES',
       );
 

@@ -51,7 +51,7 @@ class _InjectingChannel extends FlutterBluePlusElmChannel {
   @override
   Future<void> writeRaw(BluetoothCharacteristic char, List<int> bytes) async {
     writeRawCalls++;
-    throw fault;
+    throw fault; // ignore: only_throw_errors
   }
 }
 

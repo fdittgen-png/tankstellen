@@ -165,7 +165,7 @@ class _CapturingChannel implements ElmByteChannel {
   @override
   Future<void> open() async {
     firstConnectAtOpen ??= Obd2PairingMode.isFirstConnect(deviceId);
-    throw error;
+    throw error; // ignore: only_throw_errors
   }
 
   @override

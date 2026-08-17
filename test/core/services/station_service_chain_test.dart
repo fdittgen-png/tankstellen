@@ -19,7 +19,7 @@ class _FakeStationService implements StationService {
 
   @override
   Future<ServiceResult<List<Station>>> searchStations(SearchParams params, {CancelToken? cancelToken}) async {
-    if (errorToThrow != null) throw errorToThrow!;
+    if (errorToThrow != null) throw errorToThrow!; // ignore: only_throw_errors
     return ServiceResult(
       data: stationsToReturn ?? [],
       source: ServiceSource.tankerkoenigApi,
