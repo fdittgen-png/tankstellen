@@ -173,6 +173,59 @@ void main() {
       expect(kSupabaseSchemaVersion, greaterThanOrEqualTo(7));
     });
 
+    test('#3747 (v8) — the owner-protection block ships in the wizard SQL '
+        'with search_path pinned on its SECURITY DEFINER functions', () {
+      // Even a fully-provisioned older schema must receive the block —
+      // it is emitted unconditionally, like the RLS/RPC tails.
+      final sql = SchemaVerifier.getMigrationSql(
+          {for (final t in SchemaVerifier.allTables) t: true});
+      expect(sql,
+          contains('CREATE TABLE IF NOT EXISTS public.database_owner'));
+      expect(sql,
+          contains('ALTER TABLE public.database_owner ENABLE ROW LEVEL SECURITY'));
+      // The three functions, each with a pinned search_path — an
+      // unpinned SECURITY DEFINER function is the schema-shadowing
+      // privilege-escalation vector #3747 closes.
+      expect(
+          sql,
+          contains('CREATE OR REPLACE FUNCTION public.is_database_owner()\n'
+              'RETURNS BOOLEAN\n'
+              'LANGUAGE sql\n'
+              'SECURITY DEFINER\n'
+              'STABLE\n'
+              'SET search_path = public'));
+      expect(
+          sql,
+          contains('CREATE OR REPLACE FUNCTION public.auto_register_owner()\n'
+              'RETURNS TRIGGER\n'
+              'LANGUAGE plpgsql\n'
+              'SECURITY DEFINER\n'
+              'SET search_path = public'));
+      expect(
+          sql,
+          contains('CREATE OR REPLACE FUNCTION public.limit_bulk_delete()\n'
+              'RETURNS TRIGGER\n'
+              'LANGUAGE plpgsql\n'
+              'SET search_path = public'));
+      // First-signin owner bootstrap + the delete restrictions.
+      expect(sql, contains('CREATE TRIGGER trg_auto_register_owner'));
+      expect(sql, contains('CREATE POLICY users_delete_owner_only'));
+      expect(sql, contains('CREATE POLICY snapshots_delete'));
+      expect(sql, contains('CREATE POLICY reports_delete'));
+      expect(sql, contains('CREATE TRIGGER trg_limit_delete_reports'));
+      // The legacy broad users policy must be dropped AFTER rlsSql
+      // creates it — the split policies are the final state.
+      expect(
+          sql.lastIndexOf('DROP POLICY IF EXISTS users_own ON public.users'),
+          greaterThan(sql.indexOf(
+              'CREATE POLICY users_own ON public.users FOR ALL')),
+          reason: 'ownerProtectionSql must run after rlsSql so the '
+              'users_own FOR ALL policy does not survive');
+      // v8 is what the wizard records — an un-upgraded self-host is
+      // flagged as outdated, not silently broken.
+      expect(kSupabaseSchemaVersion, greaterThanOrEqualTo(8));
+    });
+
     test('#3452 — the v5 favorites columns reach an EXISTING favorites '
         'table (idempotent ALTER upgrade path)', () {
       // A self-hoster whose `favorites` table pre-exists gets NO CREATE

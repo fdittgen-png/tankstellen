@@ -17,6 +17,7 @@
 /// safely after a schema bump.
 library;
 
+import 'schema_sql_owner.dart';
 import 'schema_sql_policies.dart';
 
 /// Bumped whenever the wizard SQL below changes in a way an existing
@@ -37,7 +38,12 @@ import 'schema_sql_policies.dart';
 /// in-app REPORT mechanism before UGC can be declared in the IARC rating;
 /// each report row names the reporter and the reported content
 /// (`target_kind` / `target_id`) for the self-host operator to review.
-const int kSupabaseSchemaVersion = 7;
+/// v8 (#3747): the owner-protection block (`database_owner` +
+/// first-signin bootstrap + delete restrictions, with `search_path`
+/// pinned on its SECURITY DEFINER functions) ships in the wizard SQL
+/// for the first time, so self-hosts get the same posture as the
+/// maintainer's project.
+const int kSupabaseSchemaVersion = 8;
 
 /// The metadata table that records the applied schema version. Readable by
 /// anyone (it carries no user data — only the schema version the verifier
@@ -335,6 +341,10 @@ String buildMigrationSql(Map<String, bool> schema) {
   buffer
     ..writeln(upgradeSql)
     ..writeln(rlsSql)
+    // v8 (#3747) — after rlsSql: the block replaces rlsSql's legacy
+    // `users_own FOR ALL` policy with the owner-aware split, so it must
+    // run last to be the final state.
+    ..writeln(ownerProtectionSql)
     ..writeln(rpcSql)
     ..writeln(_metaSql);
 
