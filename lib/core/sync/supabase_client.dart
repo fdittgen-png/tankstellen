@@ -6,12 +6,40 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/logging/error_logger.dart';
+import 'secure_session_storage.dart';
 
 /// Thin wrapper around the Supabase Flutter SDK.
 ///
 /// Provides initialisation, anonymous auth, and a singleton accessor.
 class TankSyncClient {
   static bool _initialized = false;
+
+  /// Hosts that may be reached over plain http — local dev / Android
+  /// emulator loopback only (#3740). Everything else must be https so the
+  /// self-host URL can never ship the session tokens in cleartext.
+  static const devHttpHosts = {'localhost', '127.0.0.1', '10.0.2.2'};
+
+  /// Validates a sanitized Supabase URL and returns the parsed [Uri].
+  ///
+  /// Throws [ArgumentError] when the URL is malformed, or (#3740) when it
+  /// is not https — a cleartext self-host URL would ship the auth session
+  /// (incl. the refresh token) unencrypted on every sync. Plain http is
+  /// tolerated only for the [devHttpHosts] local-dev loopback hosts.
+  @visibleForTesting
+  static Uri validateUrl(String cleanUrl) {
+    final uri = Uri.tryParse(cleanUrl);
+    if (uri == null ||
+        !uri.hasScheme ||
+        (!uri.host.contains('.') && !devHttpHosts.contains(uri.host))) {
+      throw ArgumentError('Invalid Supabase URL: $cleanUrl');
+    }
+    if (uri.scheme != 'https' && !devHttpHosts.contains(uri.host)) {
+      throw ArgumentError(
+        'Supabase URL must use https:// (got ${uri.scheme}://): $cleanUrl',
+      );
+    }
+    return uri;
+  }
 
   /// Max retry attempts for the public.users upsert after auth signup/signin.
   static const maxUpsertRetries = 3;
@@ -29,11 +57,8 @@ class TankSyncClient {
     final cleanUrl = url.replaceAll(RegExp(r'\s+'), '').replaceAll(RegExp(r'/+$'), '');
     final cleanKey = anonKey.replaceAll(RegExp(r'\s+'), '');
 
-    // Validate URL format
-    final uri = Uri.tryParse(cleanUrl);
-    if (uri == null || !uri.hasScheme || !uri.host.contains('.')) {
-      throw ArgumentError('Invalid Supabase URL: $cleanUrl');
-    }
+    // Validate URL format + https enforcement (#3740).
+    final uri = validateUrl(cleanUrl);
 
     if (_initialized) {
       // Already initialized — check if URL changed
@@ -42,7 +67,20 @@ class TankSyncClient {
       // (the existing client is still valid).
       return;
     }
-    await Supabase.initialize(url: cleanUrl, publishableKey: cleanKey);
+    // #3740 — keep the persisted session (incl. the refresh token) in the
+    // platform keychain/keystore instead of the SDK's default plaintext
+    // SharedPreferences slot. The key mirrors the SDK default
+    // (`sb-<host-first-label>-auth-token`) so SecureSessionLocalStorage
+    // can find — and wipe — a legacy plaintext session on first run.
+    await Supabase.initialize(
+      url: cleanUrl,
+      publishableKey: cleanKey,
+      authOptions: FlutterAuthClientOptions(
+        localStorage: SecureSessionLocalStorage(
+          persistSessionKey: 'sb-${uri.host.split('.').first}-auth-token',
+        ),
+      ),
+    );
     _initialized = true;
   }
 

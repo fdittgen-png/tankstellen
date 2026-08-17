@@ -83,6 +83,53 @@ void main() {
     });
   });
 
+  group('TankSyncClient.validateUrl https enforcement (#3740)', () {
+    test('rejects a plain-http self-host URL', () {
+      expect(
+        () => TankSyncClient.validateUrl('http://supabase.example.com'),
+        throwsArgumentError,
+      );
+    });
+
+    test('rejects http even with a port and path', () {
+      expect(
+        () => TankSyncClient.validateUrl('http://sync.example.org:8000'),
+        throwsArgumentError,
+      );
+    });
+
+    test('rejects a non-http(s) scheme', () {
+      expect(
+        () => TankSyncClient.validateUrl('ftp://supabase.example.com'),
+        throwsArgumentError,
+      );
+    });
+
+    test('accepts an https self-host URL', () {
+      final uri = TankSyncClient.validateUrl('https://supabase.example.com');
+      expect(uri.scheme, 'https');
+      expect(uri.host, 'supabase.example.com');
+    });
+
+    test('allows http for the local-dev loopback hosts only', () {
+      for (final host in TankSyncClient.devHttpHosts) {
+        final uri = TankSyncClient.validateUrl('http://$host:54321');
+        expect(uri.host, host);
+      }
+    });
+
+    test('still rejects malformed URLs', () {
+      expect(
+        () => TankSyncClient.validateUrl('not a url'),
+        throwsArgumentError,
+      );
+      expect(
+        () => TankSyncClient.validateUrl('https://nodots'),
+        throwsArgumentError,
+      );
+    });
+  });
+
   group('TankSyncClient upsert retry constants', () {
     test('maxUpsertRetries is at least 2', () {
       expect(TankSyncClient.maxUpsertRetries, greaterThanOrEqualTo(2));

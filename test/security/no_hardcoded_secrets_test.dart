@@ -171,7 +171,7 @@ void main() {
       }
     });
 
-    test('network_security_config restricts cleartext to Argentina only', () {
+    test('network_security_config permits NO cleartext domains (#3740)', () {
       final configFile = File(
         'android/app/src/main/res/xml/network_security_config.xml',
       );
@@ -183,14 +183,16 @@ void main() {
       // Base config must deny cleartext
       expect(content, contains('cleartextTrafficPermitted="false"'));
 
-      // Only datos.energia.gob.ar should have cleartext permitted
+      // #3740 — the last cleartext exemption (datos.energia.gob.ar, whose
+      // server has been https since #728) was removed; no domain may be
+      // granted cleartext again.
       final cleartextDomains = RegExp(
         r'<domain-config\s+cleartextTrafficPermitted="true">'
         r'[\s\S]*?<domain[^>]*>([^<]+)</domain>',
       ).allMatches(content).map((m) => m.group(1)).toList();
 
-      expect(cleartextDomains, hasLength(1));
-      expect(cleartextDomains.first, 'datos.energia.gob.ar');
+      expect(cleartextDomains, isEmpty,
+          reason: 'no domain may be exempted from the https-only base config');
     });
 
     test('CarAppService does not use ALLOW_ALL_HOSTS_VALIDATOR in release', () {

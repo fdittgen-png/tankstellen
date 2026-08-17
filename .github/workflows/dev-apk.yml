@@ -74,9 +74,11 @@ jobs:
           echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_PATH"
           {
             echo "ANDROID_KEYSTORE_PATH=$KEYSTORE_PATH"
-            echo "ANDROID_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD"
             echo "ANDROID_KEY_ALIAS=$ANDROID_KEY_ALIAS"
           } >> "$GITHUB_ENV"
+          # #3740 — the keystore PASSWORD is deliberately NOT exported to
+          # GITHUB_ENV: that exposes it to every subsequent step (and any
+          # compromised action). It is scoped to the build step's env: block.
 
       - name: Flutter pub get
         run: flutter pub get
@@ -90,6 +92,9 @@ jobs:
         # ship the GPS foreground service (#3173): this is the build used to
         # validate background recording on-device before the Play declaration
         # (#3436) clears.
+        env:
+          # #3740 — keystore password scoped to the only step that needs it.
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
           flutter build apk --release --flavor play \
             --target-platform android-arm64 \

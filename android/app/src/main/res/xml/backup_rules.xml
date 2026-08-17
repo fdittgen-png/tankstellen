@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+
+  #3740 — legacy Auto-Backup rules (Android 11 and below; Android 12+
+  reads data_extraction_rules.xml instead). Everything is backed up
+  EXCEPT:
+   * FlutterSharedPreferences.xml — held the plaintext Supabase auth
+     session (refresh token!) before the SecureSessionLocalStorage
+     migration, and still holds misc app prefs; must never leave the
+     device via backup.
+   * HomeWidgetPreferences.xml — home-widget render state, device-local.
+   * files/crash_journal/ — CrashForensics' crash journal, device-local
+     diagnostics.
+-->
+<full-backup-content>
+    <exclude domain="sharedpref" path="FlutterSharedPreferences.xml"/>
+    <exclude domain="sharedpref" path="HomeWidgetPreferences.xml"/>
+    <exclude domain="file" path="crash_journal/"/>
+</full-backup-content>
