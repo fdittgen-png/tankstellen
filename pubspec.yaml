@@ -117,7 +117,7 @@ dependencies:
   # separately as part of #1542; do NOT bump it as routine drift.
   flutter_blue_plus: ^1.35.5
   async: ^2.11.0
-  permission_handler: ^12.0.3
+  permission_handler: ^13.0.1
   flutter_secure_storage: ^10.3.1
   package_info_plus: ^10.2.1
   sentry_flutter: ^9.26.0
