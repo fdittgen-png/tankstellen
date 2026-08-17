@@ -84,13 +84,30 @@ const List<(String make, String model, String engineCode)> _popularEuDiesels = [
 ];
 
 void main(List<String> args) {
-  final file = File(_catalogPath);
-  if (!file.existsSync()) {
+  final report = runAudit();
+  if (report == null) {
     stderr.writeln('audit_catalog_diesel_gaps: $_catalogPath not found.');
     stderr.writeln('Run from the project root.');
     exitCode = 1;
     return;
   }
+  stdout.write(report);
+}
+
+/// Builds the full markdown audit report, or null when the catalog
+/// asset is missing (caller decides how to surface that).
+///
+/// #3752 — extracted from `main` so the smoke test can run the audit
+/// IN-PROCESS: the previous `Process.run('dart', ['run', ...])` spawn
+/// raced the concurrently-running `flutter test` over `.dart_tool`
+/// (the Dart build-hooks resolver died with "File not formatted as
+/// yaml"), turning the master full-suite shard deterministically red.
+String? runAudit() {
+  final file = File(_catalogPath);
+  if (!file.existsSync()) {
+    return null;
+  }
+  final out = StringBuffer();
 
   final entries = (json.decode(file.readAsStringSync()) as List)
       .cast<Map<String, dynamic>>();
@@ -124,57 +141,58 @@ void main(List<String> args) {
     }
   }
 
-  stdout.writeln('# Catalog diesel-gap audit (#1396)');
-  stdout.writeln('');
-  stdout.writeln(
+  out.writeln('# Catalog diesel-gap audit (#1396)');
+  out.writeln('');
+  out.writeln(
       'Catalog has ${entries.length} entries, audited against '
       '${_popularEuDiesels.length} popular EU diesel powertrains.');
-  stdout.writeln('');
+  out.writeln('');
 
-  stdout.writeln('## Missing diesel siblings (${missing.length})');
-  stdout.writeln('');
+  out.writeln('## Missing diesel siblings (${missing.length})');
+  out.writeln('');
   if (missing.isEmpty) {
-    stdout.writeln('_None — every popular diesel has a catalog row._');
+    out.writeln('_None — every popular diesel has a catalog row._');
   } else {
-    stdout.writeln('| Make | Model | Engine code |');
-    stdout.writeln('|------|-------|-------------|');
+    out.writeln('| Make | Model | Engine code |');
+    out.writeln('|------|-------|-------------|');
     for (final row in missing) {
-      stdout.writeln('| ${row.make} | ${row.model} | ${row.engineCode} |');
+      out.writeln('| ${row.make} | ${row.model} | ${row.engineCode} |');
     }
   }
-  stdout.writeln('');
+  out.writeln('');
 
-  stdout.writeln('## Already covered (${ok.length})');
-  stdout.writeln('');
+  out.writeln('## Already covered (${ok.length})');
+  out.writeln('');
   if (ok.isEmpty) {
-    stdout.writeln('_None covered yet._');
+    out.writeln('_None covered yet._');
   } else {
-    stdout.writeln('| Make | Model | Engine code |');
-    stdout.writeln('|------|-------|-------------|');
+    out.writeln('| Make | Model | Engine code |');
+    out.writeln('|------|-------|-------------|');
     for (final row in ok) {
-      stdout.writeln('| ${row.make} | ${row.model} | ${row.engineCode} |');
+      out.writeln('| ${row.make} | ${row.model} | ${row.engineCode} |');
     }
   }
-  stdout.writeln('');
+  out.writeln('');
 
-  stdout.writeln(
+  out.writeln(
       '## Not in catalog at all (${notInCatalog.length})');
-  stdout.writeln('');
-  stdout.writeln(
+  out.writeln('');
+  out.writeln(
       'These models are listed in the popular-diesels table but the '
       'catalog has no row for them in any fuel type. Adding them is '
       'out of scope for #1396 — log a follow-up issue if the user '
       'base trends towards one of these brands.');
-  stdout.writeln('');
+  out.writeln('');
   if (notInCatalog.isEmpty) {
-    stdout.writeln('_None._');
+    out.writeln('_None._');
   } else {
-    stdout.writeln('| Make | Model | Engine code |');
-    stdout.writeln('|------|-------|-------------|');
+    out.writeln('| Make | Model | Engine code |');
+    out.writeln('|------|-------|-------------|');
     for (final row in notInCatalog) {
-      stdout.writeln('| ${row.make} | ${row.model} | ${row.engineCode} |');
+      out.writeln('| ${row.make} | ${row.model} | ${row.engineCode} |');
     }
   }
+  return out.toString();
 }
 
 class _AuditRow {
