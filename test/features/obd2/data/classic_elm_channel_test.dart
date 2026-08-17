@@ -269,6 +269,33 @@ void main() {
     });
 
     test(
+        '#3731 — a socket DONE edge surfaces on channel.incoming as a '
+        'disconnect error, so the transport above learns the link is dead',
+        () async {
+      // Field logs 2026-08-16/17: the classic-socket-done drop reached the
+      // supervisor (drop signal) but NEVER the transport — its pending
+      // command waited out the full read timeout and isConnected kept
+      // lying true, leaving a zombie 1 Hz poller on the corpse.
+      final channel = ClassicElmChannel(address: 'AA:BB', plugin: fake);
+      await channel.open();
+
+      final errors = <Object>[];
+      final sub = channel.incoming.listen((_) {}, onError: errors.add);
+
+      await fake.incomingController.close(); // the reader completes: done
+      await Future<void>.delayed(Duration.zero);
+
+      expect(channel.isOpen, isFalse);
+      expect(errors, hasLength(1));
+      expect(errors.single, isA<Obd2DisconnectedException>(),
+          reason: 'the transport-visible edge must be the recoverable '
+              'disconnect type the drop detector already routes');
+
+      await sub.cancel();
+      await channel.close();
+    });
+
+    test(
         '#2295 — forwards plugin.incoming errors onto channel.incoming so the '
         'transport fails the pending command immediately, and stays functional',
         () async {
