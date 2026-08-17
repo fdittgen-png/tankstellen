@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -44,6 +45,7 @@ import '../features/price_history/data/repositories/price_history_repository.dar
 import '../features/profile/data/repositories/profile_repository.dart';
 import '../features/widget/data/home_widget_service.dart';
 import '../features/widget/providers/pending_widget_uri_provider.dart';
+import 'profile_language_binding.dart';
 import 'startup/launch_sync_phase.dart';
 import 'startup/provider_warmup_phase.dart';
 import 'startup/telemetry_replay_phase.dart';
@@ -144,7 +146,7 @@ class AppInitializer {
     await _initServicesInParallel();
     StartupTimer.instance.mark('services_init');
 
-    final container = ProviderContainer();
+    final container = createContainer();
 
     final storage = HiveStorage();
 
@@ -336,6 +338,20 @@ class AppInitializer {
 
     _launch(container, appBuilder);
   }
+
+  /// Builds the app's ONE root [ProviderContainer] — the production
+  /// composition root (#3738). Every cross-boundary container override
+  /// belongs here: `run()` used to build a bare `ProviderContainer()`,
+  /// which left the #3134 profile-language bridge overrides uninstalled
+  /// (dead code) while override-installing unit tests stayed green.
+  /// [overrides] lets the composition-root test append fakes after the
+  /// real seams; production callers pass none.
+  static ProviderContainer createContainer({
+    List<Override> overrides = const [],
+  }) =>
+      ProviderContainer(
+        overrides: [...profileLanguageOverrides(), ...overrides],
+      );
 
   /// Resolves the active Sentry DSN at startup. The user-stored
   /// `sentry_dsn` setting (entered manually via Settings > Diagnostics)

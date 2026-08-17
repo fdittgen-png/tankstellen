@@ -157,8 +157,14 @@ void main() {
     'lib/app/app_initializer.dart': (
       // #3610 — the eviction sweep's yield now lands in the health
       // counters (cache.evicted, +5). Decomposition tracked by #3139.
-      lines: 700,
-      bumps: 16,
+      // #3738 — re-grandfathered 700 → 716: `createContainer()`, the ONE
+      // production container factory that installs the #3134
+      // profile-language bridge overrides (previously dead code — run()
+      // built a bare ProviderContainer). Composition-root glue by
+      // definition; the composition-root regression test asserts against
+      // this exact factory, so it cannot move out of the shell.
+      lines: 716,
+      bumps: 17,
       decompositionIssue: 3139,
     ),
     // #3078 — grandfathered at 414 (was 400, right at the cap on master). The
