@@ -481,6 +481,30 @@ class _FakeTripHistory implements TripHistoryRepository {
     return sorted;
   }
 
+  // #3741 — the updater filters on the summary-only decode, then
+  // full-decodes per id. Mirror the production contract: summaries
+  // carry no samples but keep the stored sampleCount.
+  @override
+  List<TripHistoryEntry> loadSummaries({bool dedupe = true}) => [
+        for (final e in loadAll(dedupe: dedupe))
+          TripHistoryEntry(
+            id: e.id,
+            vehicleId: e.vehicleId,
+            summary: e.summary,
+            automatic: e.automatic,
+            sampleCount: e.samples.length,
+            verdict: e.verdict,
+          ),
+      ];
+
+  @override
+  TripHistoryEntry? loadById(String id) {
+    for (final e in entries) {
+      if (e.id == id) return e;
+    }
+    return null;
+  }
+
   @override
   Future<void> save(TripHistoryEntry entry) async {
     entries.add(entry);

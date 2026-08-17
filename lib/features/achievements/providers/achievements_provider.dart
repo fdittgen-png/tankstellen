@@ -61,14 +61,25 @@ class Achievements extends _$Achievements {
     final scores = <String, int>{};
     final coldStarts = <String, double>{};
     final stdDevs = <String, double>{};
+    // #3741 — the trip list is summaries-only now (`t.samples` is always
+    // empty there); the sample-based metrics full-decode each stored
+    // trip individually via `loadById`, skipping sample-less trips
+    // (legacy / ghost entries) without paying any decode at all.
+    final tripRepo = ref.watch(tripHistoryRepositoryProvider);
     for (final t in trips) {
       scores[t.id] = TripMetrics.drivingScore(t.summary);
       // Sample-based metrics only land for trips persisted with
-      // their tick buffer (#1040+). Legacy trips with empty
-      // [TripHistoryEntry.samples] yield 0 / +inf which the engine
-      // treats as "skip this trip for the rule".
-      coldStarts[t.id] = TripMetrics.coldStartExcessLiters(t.samples);
-      stdDevs[t.id] = TripMetrics.speedStdDev(t.samples);
+      // their tick buffer (#1040+). Legacy trips with no stored
+      // samples yield 0 / +inf which the engine treats as "skip this
+      // trip for the rule". Widget-test overrides of the list provider
+      // carry inline samples and no open box — honour those directly.
+      final samples = t.samples.isNotEmpty
+          ? t.samples
+          : (t.sampleCount == 0
+              ? t.samples
+              : tripRepo?.loadById(t.id)?.samples ?? t.samples);
+      coldStarts[t.id] = TripMetrics.coldStartExcessLiters(samples);
+      stdDevs[t.id] = TripMetrics.speedStdDev(samples);
     }
     final earnedIds = engine.evaluate(
       trips: trips,

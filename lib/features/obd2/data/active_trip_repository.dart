@@ -13,6 +13,7 @@ import 'package:hive/hive.dart';
 // `show` keeps this file's dependency surface explicit.
 import '../../consumption/api.dart'
     show
+        kTripSaveComputeSampleThreshold,
         sampleFromJson,
         sampleToJson,
         tripSummaryFromJson,
@@ -201,9 +202,24 @@ class ActiveTripRepository {
 
   /// Persist [snapshot]. Overwrites any previous payload — the
   /// active-trip box only ever holds one entry.
+  ///
+  /// #3741 — mirrors [TripHistoryRepository.save]'s #3613 pattern: the
+  /// WAL flush runs every ~5 s DURING the drive, on the isolate
+  /// rendering the 4 Hz gauges, and `jsonEncode` over the whole growing
+  /// sample list is O(n) per flush. Above
+  /// [kTripSaveComputeSampleThreshold] samples the encode hops to a
+  /// background isolate via `compute()` (`toJson()` runs synchronously
+  /// first, so the map crossing the isolate boundary is plain JSON-safe
+  /// data and the live buffer view can't mutate mid-encode); smaller
+  /// payloads stay inline because the ~10 ms isolate hand-off dominates.
   Future<void> saveSnapshot(ActiveTripSnapshot snapshot) async {
     try {
-      await _box.put(_singletonKey, jsonEncode(snapshot.toJson()));
+      final json = snapshot.toJson();
+      final encoded =
+          snapshot.samples.length > kTripSaveComputeSampleThreshold
+              ? await compute(jsonEncode, json)
+              : jsonEncode(json);
+      await _box.put(_singletonKey, encoded);
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'ActiveTripRepository.saveSnapshot'}));
     }

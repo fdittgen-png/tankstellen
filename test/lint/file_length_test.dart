@@ -718,9 +718,12 @@ void main() {
       // during which transport errors / null parses feed the #3575
       // protocol recovery instead of the drop verdict (+27).
       // #3692 — stamp IAT + timing advance, MAP always-on (+10).
+      // #3741 — the two O(1) buffer reads (`latestSample`,
+      // `maxCapturedRpm`) delegating to TripSampleBuffer, so the WAL
+      // flush and glide-coach stop copying the whole buffer (+7).
       // Decomposition tracked by #3140.
-      lines: 1868,
-      bumps: 22,
+      lines: 1875,
+      bumps: 23,
       decompositionIssue: 3140,
     ),
     // #2798 — grandfathered at 408 (8 over): the pump path now retries OCR
