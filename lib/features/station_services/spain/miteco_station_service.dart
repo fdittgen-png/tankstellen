@@ -20,6 +20,7 @@ import '../../../core/domain/opening_hours.dart';
 import '../opening_hours/open_state_from_hours.dart';
 import 'spain_opening_hours_adapter.dart';
 import 'spain_provinces.dart';
+import '../../../core/services/country_service_dependencies.dart';
 
 /// Spanish fuel prices from Geoportal Gasolineras (MITECO).
 /// Free, no API key, no registration.
@@ -369,3 +370,9 @@ class MitecoStationService
     return emptyPricesResult(ServiceSource.mitecoApi);
   }
 }
+
+/// Builds the ES raw [StationService] — the `CountryServiceEntry.buildService`
+/// factory (#3746). Takes [CountryServiceDependencies], never a Riverpod `Ref`,
+/// so the identical wiring runs in the background isolate (#2861).
+StationService buildEsStationService(CountryServiceDependencies deps) =>
+    MitecoStationService(cache: deps.cache);

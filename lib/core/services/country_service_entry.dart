@@ -3,8 +3,10 @@
 
 import '../country/country_bounding_box.dart';
 import '../domain/fuel_type.dart';
+import 'country_service_dependencies.dart';
 import 'fuel_service_policy.dart';
 import 'service_result.dart';
+import 'station_service.dart';
 
 /// A single entry in the country service registry — the **single source of
 /// truth** for everything we need to know about a supported country at the
@@ -16,21 +18,25 @@ import 'service_result.dart';
 /// (#516), the ordered list of [availableFuelTypes] the upstream API
 /// publishes, the API-key requirement, and the data-source [policy].
 ///
-/// Adding a 12th country now requires:
+/// Adding a new country now requires:
 ///
 /// 1. A new file under
 ///    `lib/features/station_services/<country>/<country>_station_service.dart`
+///    including its top-level `build<Cc>StationService(deps)` factory
 /// 2. One [ServiceSource] enum value in `service_result.dart` (mechanical;
 ///    enums naturally cluster on append)
 /// 3. One new entry appended to `kCountryServiceEntries`
-///    (`country_service_data.dart`)
+///    (`country_service_data.dart`) referencing that factory via
+///    [buildService]
 ///
-/// The raw `StationService` is no longer a per-entry factory field: the
-/// per-country construction lives in the single, Riverpod-free
-/// `buildRawCountryService` (`country_raw_service_builder.dart`) so the
-/// foreground (`CountryServiceRegistry.buildService`) and the WorkManager /
-/// BGAppRefresh background isolate (`CountryServiceRegistry.buildBackgroundService`)
-/// share one construction path. Both dispatch on [countryCode].
+/// #3746 — the raw `StationService` construction is a per-entry
+/// [buildService] factory field again, but a **Riverpod-free** one: it
+/// takes [CountryServiceDependencies] (never a `Ref`), so the foreground
+/// (`CountryServiceRegistry.buildService`) and the WorkManager /
+/// BGAppRefresh background isolate
+/// (`CountryServiceRegistry.buildBackgroundService`) share the identical
+/// wiring through `buildRawCountryService`, which just dispatches to the
+/// entry's factory.
 ///
 /// The country's `CountryConfig` (display name, flag, postal-code shape,
 /// currency formatting, etc.) is intentionally kept separate in
@@ -79,12 +85,25 @@ class CountryServiceEntry {
   /// TTL cache; the rate limiter reads [FuelServicePolicy.minInterval].
   final FuelServicePolicy policy;
 
+  /// Builds this country's **raw** (un-chained) `StationService` from
+  /// explicitly resolved [CountryServiceDependencies] (#3746).
+  ///
+  /// LOAD-BEARING: the factory must never take a Riverpod `Ref` — the
+  /// WorkManager / BGAppRefresh background isolate has no provider scope,
+  /// and fg/bg parity depends on both paths running this exact function
+  /// (#2861). Factories live feature-side, next to the service they
+  /// construct (e.g. `buildDeStationService` in
+  /// `germany/tankerkoenig_station_service.dart`), so core's only
+  /// per-country knowledge is this data row.
+  final StationService Function(CountryServiceDependencies deps) buildService;
+
   const CountryServiceEntry({
     required this.countryCode,
     required this.errorSource,
     required this.boundingBox,
     required this.availableFuelTypes,
     required this.policy,
+    required this.buildService,
     this.requiresApiKey = false,
   });
 }

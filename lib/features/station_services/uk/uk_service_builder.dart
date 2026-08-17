@@ -9,6 +9,7 @@ import 'uk_fuel_finder_auth.dart';
 import 'uk_fuel_finder_feed.dart';
 import 'uk_station_service.dart';
 import 'uk_statutory_fallback_station_service.dart';
+import '../../../core/services/country_service_dependencies.dart';
 
 /// Builds the GB raw [StationService] (#3190) — the single seam
 /// `buildRawCountryService` calls, so the feature owns its own composition
@@ -46,3 +47,12 @@ StationService buildGbStationService({
       ? UkCmaBulkStationService(cache: cache)
       : UkStationService();
 }
+
+/// The `CountryServiceEntry.buildService` factory for GB (#3746) —
+/// resolves GB's own per-country key slot and delegates to
+/// [buildGbStationService].
+StationService buildGbStationServiceFromDeps(CountryServiceDependencies deps) =>
+    buildGbStationService(
+      apiKey: deps.storage.getApiKey('gb'),
+      cache: deps.cache,
+    );

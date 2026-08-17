@@ -14,6 +14,7 @@ import '../../../core/services/station_service.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/domain/opening_hours.dart';
 import 'austria_opening_hours_adapter.dart';
+import '../../../core/services/country_service_dependencies.dart';
 
 /// Austrian fuel prices from E-Control Spritpreisrechner.
 /// Free, no API key, no registration.
@@ -230,3 +231,9 @@ class EControlStationService with StationServiceHelpers implements StationServic
     return emptyPricesResult(ServiceSource.eControlApi);
   }
 }
+
+/// Builds the AT raw [StationService] — the `CountryServiceEntry.buildService`
+/// factory (#3746). Takes [CountryServiceDependencies], never a Riverpod `Ref`,
+/// so the identical wiring runs in the background isolate (#2861).
+StationService buildAtStationService(CountryServiceDependencies deps) =>
+    EControlStationService();

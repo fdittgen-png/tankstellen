@@ -11,6 +11,7 @@ import 'country_config.dart';
 
 const kGermany = CountryConfig(
   code: 'DE',
+  stationIdPrefixes: ['de-'],
   name: 'Deutschland',
   flag: '\u{1F1E9}\u{1F1EA}',
   locale: 'de_DE',
@@ -28,6 +29,7 @@ const kGermany = CountryConfig(
 
 const kFrance = CountryConfig(
   code: 'FR',
+  stationIdPrefixes: ['fr-'],
   name: 'France',
   flag: '\u{1F1EB}\u{1F1F7}',
   locale: 'fr_FR',
@@ -53,6 +55,7 @@ const kFrance = CountryConfig(
 
 const kAustria = CountryConfig(
   code: 'AT',
+  stationIdPrefixes: ['at-'],
   name: 'Österreich',
   flag: '\u{1F1E6}\u{1F1F9}',
   locale: 'de_AT',
@@ -77,6 +80,7 @@ const kAustria = CountryConfig(
 
 const kSpain = CountryConfig(
   code: 'ES',
+  stationIdPrefixes: ['es-'],
   name: 'España',
   flag: '\u{1F1EA}\u{1F1F8}',
   locale: 'es_ES',
@@ -102,6 +106,7 @@ const kSpain = CountryConfig(
 
 const kItaly = CountryConfig(
   code: 'IT',
+  stationIdPrefixes: ['it-'],
   name: 'Italia',
   flag: '\u{1F1EE}\u{1F1F9}',
   locale: 'it_IT',
@@ -125,6 +130,7 @@ const kItaly = CountryConfig(
 
 const kDenmark = CountryConfig(
   code: 'DK',
+  stationIdPrefixes: ['ok-', 'shell-'],
   name: 'Danmark',
   flag: '\u{1F1E9}\u{1F1F0}',
   currency: 'DKK',
@@ -155,6 +161,7 @@ const kDenmark = CountryConfig(
 
 const kArgentina = CountryConfig(
   code: 'AR',
+  stationIdPrefixes: ['ar-'],
   name: 'Argentina',
   flag: '\u{1F1E6}\u{1F1F7}',
   currency: 'ARS',
@@ -187,3 +194,11 @@ const kArgentina = CountryConfig(
   // litre; the per-fuel override keeps every other fuel on \$/L.
   pricePerUnitSuffixByFuel: {FuelType.cng: '\$/m³'},
 );
+
+/// #3746 — the pre-v4.1.0 rows in display order. `Countries.all` is defined
+/// as the concatenation `[...kCoreCountries, ...kExtendedCountries]`, so a
+/// new row added to a data file is automatically part of [Countries.all] —
+/// no third hand-maintained list to forget.
+const List<CountryConfig> kCoreCountries = [
+  kGermany, kFrance, kAustria, kSpain, kItaly, kDenmark, kArgentina,
+];

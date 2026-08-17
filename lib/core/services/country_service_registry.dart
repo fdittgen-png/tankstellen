@@ -47,10 +47,10 @@ class CountryServiceRegistry {
   /// All registered country service entries.
   ///
   /// Aliases the [kCountryServiceEntries] data list (#3232) so existing
-  /// `CountryServiceRegistry.entries` call sites are unchanged. The list is
-  /// ordered for the bounding-box lookup algorithm (see [entryByLatLng] /
-  /// [entriesByLatLng]) — tighter boxes first so they aren't shadowed by larger
-  /// neighbours; see the ordering note on [kCountryServiceEntries].
+  /// `CountryServiceRegistry.entries` call sites are unchanged. #3746 —
+  /// [entryByLatLng] picks the smallest-area containing box, so declaration
+  /// order no longer decides single-country attribution; [entriesByLatLng]
+  /// still yields in declared order.
   static const List<CountryServiceEntry> entries = kCountryServiceEntries;
 
   /// Lookup map built once from [entries] for O(1) access by code.
@@ -81,31 +81,42 @@ class CountryServiceRegistry {
       _byCode[countryCode]?.availableFuelTypes ?? kDefaultFuelTypes;
 
   /// Returns the entry whose bounding box contains the given point, or
-  /// null when no box matches. Walks [entries] in declared order — the
-  /// list is intentionally ordered so tighter boxes are tested before
-  /// the larger boxes that incidentally overlap them.
+  /// null when no box matches.
   ///
-  /// First-match: used for single-country attribution (#516) where one
-  /// answer is wanted. For corridor detection — where a point inside a
-  /// larger box that SHADOWS a smaller declared-later box must still
-  /// surface the shadowed country — use [entriesByLatLng] (#2621).
+  /// #3746 — of all containing boxes, the **smallest-area** one wins
+  /// (ties keep declared order). Continental boxes overlap generously;
+  /// the tighter box is the better single-country guess — e.g. Cologne
+  /// (50.9, 7.0) sits inside both the DE box and FR's larger box, and the
+  /// old first-match walk attributed it to FR purely because FR was
+  /// declared earlier. Declaration order no longer matters here.
+  ///
+  /// Single-answer attribution only (#516). For corridor detection —
+  /// where EVERY containing country must surface, not just the best
+  /// guess — use [entriesByLatLng] (#2621).
   static CountryServiceEntry? entryByLatLng(double lat, double lng) {
+    CountryServiceEntry? best;
+    var bestArea = double.infinity;
     for (final entry in entriesByLatLng(lat, lng)) {
-      return entry;
+      final area = entry.boundingBox.areaDegrees;
+      if (area < bestArea) {
+        best = entry;
+        bestArea = area;
+      }
     }
-    return null;
+    return best;
   }
 
   /// Every entry whose bounding box contains the given point, in declared
   /// order — NOT just the first match (#2621).
   ///
   /// Continental bounding boxes overlap: FR's box (lat 41.0–51.5,
-  /// lng −5.5–10.0) geographically contains all of Catalonia, yet ES is
-  /// declared later, so [entryByLatLng] resolves every Catalonian point to
-  /// FR and never reaches ES. A Pézenas→Barcelona corridor then queried
-  /// only FR and returned zero Spanish stations. Corridor detection unions
-  /// these so the shadowed country (ES) is never dropped — over-collecting
-  /// is safe because the route detour filter drops off-corridor stations.
+  /// lng −5.5–10.0) geographically contains all of Catalonia, and it is
+  /// smaller than ES's generous box, so the single-answer [entryByLatLng]
+  /// resolves every Catalonian point to FR and never reaches ES. A
+  /// Pézenas→Barcelona corridor then queried only FR and returned zero
+  /// Spanish stations. Corridor detection unions these so the shadowed
+  /// country (ES) is never dropped — over-collecting is safe because the
+  /// route detour filter drops off-corridor stations.
   static Iterable<CountryServiceEntry> entriesByLatLng(
       double lat, double lng) sync* {
     for (final entry in entries) {
@@ -235,6 +246,22 @@ class CountryServiceRegistry {
       debugPrint(
         'CountryServiceRegistry: entries without CountryConfig: '
         '${extra.join(', ')}',
+      );
+    }
+
+    // #3746 — the station-id prefix map is derived from
+    // [CountryConfig.stationIdPrefixes]; a config without prefixes would
+    // silently break origin-country resolution for that country's ids.
+    final noPrefixes = Countries.all
+        .where((c) => c.stationIdPrefixes.isEmpty)
+        .map((c) => c.code)
+        .toList();
+    if (noPrefixes.isNotEmpty) {
+      throw StateError(
+        'CountryServiceRegistry: countries without stationIdPrefixes: '
+        '${noPrefixes.join(', ')}. '
+        'Every CountryConfig must declare the station-id prefixes its '
+        'service emits (e.g. de-, or ok-/shell- for DK).',
       );
     }
   }

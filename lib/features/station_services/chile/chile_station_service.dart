@@ -16,6 +16,8 @@ import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import 'chile_response_parser.dart' as parser;
 import '../../../core/logging/error_logger.dart';
+import '../../../core/services/country_service_dependencies.dart';
+import '../../../core/services/impl/demo_station_service.dart';
 
 /// Chile fuel prices from the **CNE Bencina en Línea** developer API
 /// (#596).
@@ -221,4 +223,15 @@ class ChileStationService
   ) async {
     return emptyPricesResult(ServiceSource.chileApi);
   }
+}
+
+/// Builds the CL raw [StationService] — the `CountryServiceEntry.buildService`
+/// factory (#3746). Gates on the CL per-country key slot: no CNE key
+/// configured means [DemoStationService].
+StationService buildClStationService(CountryServiceDependencies deps) {
+  final apiKey = deps.storage.getApiKey('cl');
+  if (apiKey == null || apiKey.isEmpty) {
+    return DemoStationService(countryCode: 'CL');
+  }
+  return ChileStationService(apiKey: apiKey);
 }

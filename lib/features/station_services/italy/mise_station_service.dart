@@ -14,6 +14,7 @@ import '../../../core/services/persistent_dataset.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/services/utils/csv_parser.dart';
+import '../../../core/services/country_service_dependencies.dart';
 
 /// Italian fuel prices from MIMIT (ex-MISE) open data CSV files.
 /// Free, no API key, no registration. Updated daily at 08:00.
@@ -313,3 +314,9 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
     return emptyPricesResult(ServiceSource.miseApi);
   }
 }
+
+/// Builds the IT raw [StationService] — the `CountryServiceEntry.buildService`
+/// factory (#3746). Takes [CountryServiceDependencies], never a Riverpod `Ref`,
+/// so the identical wiring runs in the background isolate (#2861).
+StationService buildItStationService(CountryServiceDependencies deps) =>
+    MiseStationService(cache: deps.cache);

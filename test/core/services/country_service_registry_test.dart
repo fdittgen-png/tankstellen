@@ -243,11 +243,48 @@ void main() {
 
     group('assertAllCountriesRegistered', () {
       test('does not throw when all countries are registered', () {
-        // This should not throw since we keep them in sync
+        // This should not throw since we keep them in sync — including the
+        // #3746 stationIdPrefixes completeness check.
         expect(
           () => CountryServiceRegistry.assertAllCountriesRegistered(),
           returnsNormally,
         );
+      });
+    });
+
+    // #3746 — the station-id prefix map is derived from each config row's
+    // stationIdPrefixes instead of a second hand-maintained map.
+    group('stationIdPrefixes (#3746)', () {
+      test('every registered country declares at least one prefix', () {
+        for (final country in Countries.all) {
+          expect(country.stationIdPrefixes, isNotEmpty,
+              reason: '${country.code} must declare its station-id '
+                  'prefix(es) on its CountryConfig row');
+        }
+      });
+
+      test('every declared prefix resolves back to its own country', () {
+        for (final country in Countries.all) {
+          for (final prefix in country.stationIdPrefixes) {
+            expect(
+              Countries.countryCodeForStationId('${prefix}12345'),
+              country.code,
+              reason: 'prefix $prefix must resolve to ${country.code}',
+            );
+          }
+        }
+      });
+
+      test('DK contributes both retailer-specific prefixes (ok-, shell-)',
+          () {
+        expect(Countries.countryCodeForStationId('ok-1'), 'DK');
+        expect(Countries.countryCodeForStationId('shell-1'), 'DK');
+        expect(Countries.byCode('DK')!.stationIdPrefixes,
+            equals(['ok-', 'shell-']));
+      });
+
+      test('GB keeps its historical uk- prefix', () {
+        expect(Countries.countryCodeForStationId('uk-1'), 'GB');
       });
     });
 
@@ -373,10 +410,50 @@ void main() {
       });
 
       test('entryByLatLng resolves a Lisbon point to PT (not ES)', () {
-        // Tight-box ordering invariant: PT must be tested before ES.
+        // PT's tight box sits inside ES's generous box; the smallest-area
+        // rule (#3746) must pick PT.
         final entry = CountryServiceRegistry.entryByLatLng(38.72, -9.14);
         expect(entry, isNotNull);
         expect(entry!.countryCode, equals('PT'));
+      });
+
+      // #3746 — smallest-area rule: of all containing boxes the tightest
+      // one wins, regardless of declaration order. Genoa sits inside BOTH
+      // the FR box (lat 41.0–51.5, lng −5.5–10.0) and the IT box (lat
+      // 35.0–47.5, lng 6.0–19.0); IT's box is the smaller one, but FR is
+      // declared first — the old first-match walk attributed Genoa to FR.
+      test('entryByLatLng resolves Genoa to IT even though the containing '
+          'FR box is declared first (smallest-area rule, #3746)', () {
+        const genoaLat = 44.41;
+        const genoaLng = 8.93;
+        // Sanity: the point is genuinely inside both declared boxes.
+        expect(
+            CountryServiceRegistry.boundingBoxFor('FR')!
+                .contains(genoaLat, genoaLng),
+            isTrue,
+            reason: 'FR box must geographically contain Genoa');
+        expect(
+            CountryServiceRegistry.boundingBoxFor('IT')!
+                .contains(genoaLat, genoaLng),
+            isTrue,
+            reason: 'IT box must contain Genoa');
+
+        final entry = CountryServiceRegistry.entryByLatLng(genoaLat, genoaLng);
+        expect(entry!.countryCode, equals('IT'));
+      });
+
+      test('entryByLatLng resolves Cologne to DE even though the containing '
+          'FR box is declared first (smallest-area rule, #3746)', () {
+        const cologneLat = 50.94;
+        const cologneLng = 6.96;
+        expect(
+            CountryServiceRegistry.boundingBoxFor('FR')!
+                .contains(cologneLat, cologneLng),
+            isTrue,
+            reason: 'FR box must geographically contain Cologne');
+        final entry =
+            CountryServiceRegistry.entryByLatLng(cologneLat, cologneLng);
+        expect(entry!.countryCode, equals('DE'));
       });
 
       test('entryByLatLng returns null for the Atlantic', () {

@@ -16,6 +16,7 @@ import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import 'greece_prefectures.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/services/country_service_dependencies.dart';
 
 /// Greece fuel prices — Paratiritirio Timon (Fuel Price Observatory) via the
 /// community [fuelpricesgr](https://github.com/mavroprovato/fuelpricesgr)
@@ -389,3 +390,9 @@ class GreeceStationService
     return emptyPricesResult(ServiceSource.greeceApi);
   }
 }
+
+/// Builds the GR raw [StationService] — the `CountryServiceEntry.buildService`
+/// factory (#3746). Takes [CountryServiceDependencies], never a Riverpod `Ref`,
+/// so the identical wiring runs in the background isolate (#2861).
+StationService buildGrStationService(CountryServiceDependencies deps) =>
+    GreeceStationService();

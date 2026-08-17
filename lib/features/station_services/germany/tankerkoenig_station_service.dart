@@ -12,6 +12,8 @@ import '../../../core/services/station_service.dart';
 import '../../../core/domain/opening_hours.dart';
 import 'germany_opening_hours_adapter.dart';
 import 'tankerkoenig_batch_price_fetcher.dart';
+import '../../../core/services/country_service_dependencies.dart';
+import '../../../core/services/impl/demo_station_service.dart';
 
 // Key für den Zugriff auf die freie Tankerkönig-Spritpreis-API
 // Für eigenen Key bitte hier https://onboarding.tankerkoenig.de
@@ -230,4 +232,26 @@ class TankerkoenigStationService with StationServiceHelpers implements StationSe
       );
     }
   }
+}
+
+/// Builds the DE raw [StationService] — the `CountryServiceEntry.buildService`
+/// factory (#3746). Takes [CountryServiceDependencies], never a Riverpod
+/// `Ref`, so the identical wiring runs in the background isolate (#2861).
+///
+/// Gates on the DE per-country key slot (#425 / #3746): without a
+/// configured Tankerkönig key — or without the caller-supplied
+/// Tankerkönig Dio — Germany falls back to [DemoStationService] so a
+/// keyless user still sees realistic demo data.
+StationService buildDeStationService(CountryServiceDependencies deps) {
+  if (!deps.storage.hasApiKey('de')) {
+    return DemoStationService(countryCode: 'DE');
+  }
+  final dio = deps.tankerkoenigDio;
+  if (dio == null) {
+    // Defensive: a DE caller must supply the Tankerkönig Dio. Without it
+    // we cannot talk to the API, so fall back to demo rather than throw
+    // inside an OS-spawned isolate.
+    return DemoStationService(countryCode: 'DE');
+  }
+  return TankerkoenigStationService(dio);
 }

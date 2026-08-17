@@ -401,6 +401,10 @@ const _featurePairBaseline = <String, int>{
 // OSM brand enricher's import is core→core now (the search feature
 // re-exports the registry to keep its public surface stable). The
 // survivor is country_provider → search_provider.
+// #3746 — station_services 18→17: the raw builder's switch is gone; each
+// CountryServiceEntry carries a feature-side buildService factory and
+// country_service_data.dart imports ONE file per country (FR's two
+// service imports collapsed into france_service_builder.dart).
 const _coreImportBaseline = <String, int>{
   'alerts': 3,
   'consumption': 6,
@@ -409,7 +413,7 @@ const _coreImportBaseline = <String, int>{
   'map': 1,
   'profile': 4,
   'search': 1,
-  'station_services': 18,
+  'station_services': 17,
 };
 
 /// Post-#3133 measurement (2026-06-11): `lib/features/` files importing

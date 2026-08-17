@@ -34,6 +34,13 @@ class CountryBoundingBox {
     return lat >= minLat && lat <= maxLat && lng >= minLng && lng <= maxLng;
   }
 
+  /// Box area in squared degrees (#3746) — the tie-breaker
+  /// [CountryServiceRegistry.entryByLatLng] uses to prefer the tightest
+  /// containing box over larger overlapping neighbours. Plain degree
+  /// arithmetic is fine here: it is only ever compared against other
+  /// boxes at similar latitudes, never used as a real surface area.
+  double get areaDegrees => (maxLat - minLat) * (maxLng - minLng);
+
   @override
   String toString() =>
       'CountryBoundingBox(lat: $minLat..$maxLat, lng: $minLng..$maxLng)';
@@ -61,9 +68,8 @@ Map<String, CountryBoundingBox> get countryBoundingBoxes => {
 /// identifier (FR Prix-Carburants, DE Tankerkoenig, AT E-Control,
 /// ES MITECO, IT MISE all fall into this case).
 ///
-/// Lookup-order matters: [CountryServiceRegistry.entries] is intentionally
-/// ordered so tighter / island / coastal boxes come first, before the
-/// larger boxes that incidentally overlap them. See the doc on
-/// [CountryServiceRegistry.entries] for the full rationale.
+/// #3746 — when several boxes contain the point, the smallest-area box
+/// wins (see [CountryServiceRegistry.entryByLatLng]); declaration order
+/// no longer matters for this single-answer lookup.
 String? countryCodeFromLatLng(double lat, double lng) =>
     CountryServiceRegistry.entryByLatLng(lat, lng)?.countryCode;
