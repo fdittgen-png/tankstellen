@@ -169,7 +169,7 @@ void main() {
     });
 
     test('accessToken degrades to null instead of throwing', () async {
-      expect(() async => await storage.accessToken(), returnsNormally);
+      expect(() => storage.accessToken(), returnsNormally);
       expect(await storage.accessToken(), isNull);
     });
 
