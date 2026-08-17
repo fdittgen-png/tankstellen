@@ -195,9 +195,28 @@ class BluetoothObd2Transport
     }
     _subscription = _channel.incoming.listen(
       _onBytes,
+      // #3731 — a dead byte channel is a dead transport. Both edges MUST
+      // flip `_connected`, because every liveness guard in the stack keys
+      // off [isConnected]: the #3569 speed-stream staleness watchdog, the
+      // #3725 supervisor-reuse validation and corpse reporter, and the
+      // session-opener's dead-husk hand-off check. Before this, only a
+      // deliberate [disconnect] cleared the flag — after a socket-level
+      // death the transport lied `true` forever, so a zombie 1 Hz poller
+      // kept timing out on the corpse while every freshly reconnected
+      // session was discarded as "already held", sat idle, and got killed
+      // by the adapter's idle timeout (field logs 2026-08-16/17: flap ×3
+      // → #3603 stand-down → whole trips with zero OBD2 data).
       onError: (Object e, StackTrace st) {
         debugPrint('BluetoothObd2Transport: channel error: $e');
+        _connected = false;
         _failPending(e);
+      },
+      onDone: () {
+        debugPrint('BluetoothObd2Transport: channel closed (done edge)');
+        _connected = false;
+        _failPending(const Obd2DisconnectedException(
+          'BluetoothObd2Transport: byte channel closed',
+        ));
       },
     );
     // #2233 — the transport NO LONGER runs the ELM327 init handshake.

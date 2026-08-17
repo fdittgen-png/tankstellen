@@ -692,8 +692,11 @@ void main() {
       // Decomposition candidate: the #3014 GATT-133 recovery block.
       // #3639 — completer.future.ignore() + rationale comment closing the
       // no-listener window that leaked an unhandled 'Transport closed' (+6).
-      lines: 414,
-      bumps: 2,
+      // #3731 — the channel-death edges (onError + new onDone) now flip
+      // `_connected` and fail the pending command; the rationale comment
+      // documents why every liveness guard depends on this flag (+16).
+      lines: 430,
+      bumps: 3,
       decompositionIssue: 3141,
     ),
     'lib/features/route_search/providers/route_search_provider.dart': (

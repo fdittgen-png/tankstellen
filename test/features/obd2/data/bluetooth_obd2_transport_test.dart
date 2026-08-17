@@ -409,6 +409,83 @@ void main() {
       expect(channel.isOpen, isFalse);
     });
   });
+
+  group('#3731 — transport liveness truth on channel death', () {
+    // Field logs 2026-08-16/17: after a classic-socket death the transport
+    // kept isConnected=true forever (only deliberate disconnect() cleared
+    // it), so the #3569 speed-stream watchdog, the #3725 supervisor-reuse
+    // guards and the dead-husk hand-off check were ALL blind — a zombie
+    // 1 Hz poller timed out on the corpse while fresh reconnected sessions
+    // were discarded, idled, and got killed by the adapter's idle timeout
+    // (flap ×3 → #3603 stand-down → whole trips with zero OBD2 data).
+
+    Future<BluetoothObd2Transport> connected(_ScriptedChannel channel) async {
+      final transport = BluetoothObd2Transport(channel);
+      await transport.connect();
+      expect(transport.isConnected, isTrue);
+      return transport;
+    }
+
+    test('channel DONE edge flips isConnected to false', () async {
+      final channel = _ScriptedChannel();
+      final transport = await connected(channel);
+
+      await channel.injectDone();
+      await pumpEventQueue();
+
+      expect(transport.isConnected, isFalse,
+          reason: 'a closed byte channel is a dead transport — every '
+              'liveness guard in the stack keys off this flag');
+    });
+
+    test('channel ERROR edge flips isConnected to false', () async {
+      final channel = _ScriptedChannel();
+      final transport = await connected(channel);
+
+      channel.injectError(const Obd2DisconnectedException('socket died'));
+      await pumpEventQueue();
+
+      expect(transport.isConnected, isFalse);
+    });
+
+    test('an in-flight command fails fast on the done edge instead of '
+        'waiting out the read timeout', () async {
+      final channel = _ScriptedChannel();
+      // Write succeeds but the adapter never replies — the command sits
+      // awaiting bytes when the socket dies.
+      channel.scriptChunkedResponse('010D\r', const []);
+      final transport = await connected(channel);
+
+      final pending = transport.sendCommand('010D\r');
+      final result = expectLater(
+          pending, throwsA(isA<Obd2DisconnectedException>()));
+      await channel.injectDone();
+      await result;
+      expect(transport.isConnected, isFalse);
+    });
+
+    test('sendCommand after the death edge throws the not-connected '
+        'StateError (no writes to a corpse)', () async {
+      final channel = _ScriptedChannel();
+      final transport = await connected(channel);
+      await channel.injectDone();
+      await pumpEventQueue();
+
+      expect(() => transport.sendCommand('010D\r'),
+          throwsA(isA<StateError>()));
+    });
+
+    test('a deliberate disconnect() after the death edge stays clean '
+        '(idempotent, no throw)', () async {
+      final channel = _ScriptedChannel();
+      final transport = await connected(channel);
+      await channel.injectDone();
+      await pumpEventQueue();
+
+      await transport.disconnect();
+      expect(transport.isConnected, isFalse);
+    });
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -463,6 +540,10 @@ class _ScriptedChannel implements ElmByteChannel {
   void injectError(Object error) {
     _controller.addError(error);
   }
+
+  /// #3731 — simulate the byte stream CLOSING (the classic-socket-done
+  /// edge: the reader completes instead of erroring).
+  Future<void> injectDone() => _controller.close();
 
   List<String> get writesAsStrings =>
       _writes.map((w) => String.fromCharCodes(w)).toList();

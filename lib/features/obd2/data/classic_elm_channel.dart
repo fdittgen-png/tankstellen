@@ -13,11 +13,14 @@ import 'obd2_platform_budgets.dart';
 import '../../../../core/utils/event_channel_cancel.dart';
 import 'obd2_comm_diagnostics.dart';
 import 'obd2_link_drop_signal.dart';
+import 'classic_link_drop_signature.dart';
 import 'obd2_connect_trace.dart';
 import 'obd2_connect_trace_log.dart';
 import 'obd2_connection_errors.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
+
+export 'classic_link_drop_signature.dart' show isBenignClassicLinkDrop;
 
 /// Standard Bluetooth Serial Port Profile UUID (#761). Every
 /// Classic-SPP ELM327 adapter (vLinker FS, OBDLink LX, generic
@@ -281,6 +284,15 @@ class ClassicElmChannel implements ElmByteChannel {
         // #3019 — a clean socket `done` is also a drop (some stacks close the
         // reader instead of erroring it). Same proactive signal.
         _signalDrop(reason: 'classic-socket-done'); // #3346
+        // #3731 — surface the death on the byte stream too (#2295-style):
+        // the drop signal above only reaches the RECONNECT machinery; this
+        // edge is what flips the TRANSPORT's isConnected, else a zombie
+        // poller keeps timing out on the corpse.
+        if (!_incoming.isClosed) {
+          _incoming.addError(const Obd2DisconnectedException(
+            'ClassicElmChannel: socket closed (read done)',
+          ));
+        }
       },
     );
     _open = true;
@@ -378,21 +390,3 @@ class ClassicElmChannel implements ElmByteChannel {
   }
 }
 
-/// #3379 — whether [e] is the EXPECTED Classic-SPP link-drop signature, as
-/// opposed to an unexpected fault worth an ERROR trace.
-///
-/// An RFCOMM reader stream surfaces a closed link as `bt socket closed,
-/// read return: -1` (or `… not connected`) on every normal session end —
-/// engine off, drive away, navigate off the trip screen, adapter unplugged.
-/// That drop is already handled (the channel `_signalDrop`s it to the
-/// reconnect controller), so it is breadcrumbed rather than ERROR-logged;
-/// only a NON-matching socket error keeps the full error trace.
-///
-/// Pure + case-insensitive substring match — the message text is the only
-/// stable signal the platform layer carries across OEM BT stacks.
-bool isBenignClassicLinkDrop(Object e) {
-  final m = e.toString().toLowerCase();
-  return m.contains('socket closed') ||
-      m.contains('read ret') || // "read ret: -1" and "read return: -1"
-      m.contains('not connected');
-}
