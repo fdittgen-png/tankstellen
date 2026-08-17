@@ -10,28 +10,28 @@ part of 'app_state_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Whether the Tankerkoenig API key is configured.
+/// Whether the Tankerkoenig (DE) API key is configured.
 ///
-/// Since #521 this is always true — the app ships a community
-/// default. Use [hasCustomApiKey] to tell whether the user set their
-/// own key.
+/// #3746 — API keys are per-country now; this app-level provider keeps
+/// its historical meaning (the DE Tankerkönig key that gates setup /
+/// demo mode) by reading the 'de' slot explicitly.
 
 @ProviderFor(hasApiKey)
 final hasApiKeyProvider = HasApiKeyProvider._();
 
-/// Whether the Tankerkoenig API key is configured.
+/// Whether the Tankerkoenig (DE) API key is configured.
 ///
-/// Since #521 this is always true — the app ships a community
-/// default. Use [hasCustomApiKey] to tell whether the user set their
-/// own key.
+/// #3746 — API keys are per-country now; this app-level provider keeps
+/// its historical meaning (the DE Tankerkönig key that gates setup /
+/// demo mode) by reading the 'de' slot explicitly.
 
 final class HasApiKeyProvider extends $FunctionalProvider<bool, bool, bool>
     with $Provider<bool> {
-  /// Whether the Tankerkoenig API key is configured.
+  /// Whether the Tankerkoenig (DE) API key is configured.
   ///
-  /// Since #521 this is always true — the app ships a community
-  /// default. Use [hasCustomApiKey] to tell whether the user set their
-  /// own key.
+  /// #3746 — API keys are per-country now; this app-level provider keeps
+  /// its historical meaning (the DE Tankerkönig key that gates setup /
+  /// demo mode) by reading the 'de' slot explicitly.
   HasApiKeyProvider._()
     : super(
         from: null,
@@ -65,7 +65,7 @@ final class HasApiKeyProvider extends $FunctionalProvider<bool, bool, bool>
   }
 }
 
-String _$hasApiKeyHash() => r'9927ae0b513afe69898707f03a015b769948e062';
+String _$hasApiKeyHash() => r'53fab8dc64c7307ace922e4d6e33e5b6a668a379';
 
 /// Whether the user has set their **own** Tankerkoenig key, distinct
 /// from the community default bundled in the app (#521).
@@ -114,7 +114,7 @@ final class HasCustomApiKeyProvider
   }
 }
 
-String _$hasCustomApiKeyHash() => r'c1825c86532b5661179d05a09d9a079cc6d6abc0';
+String _$hasCustomApiKeyHash() => r'5508011b0f42596dd0b335306f1b45851fce8914';
 
 /// Whether a custom EV API key is configured.
 
@@ -251,7 +251,7 @@ final class IsDemoModeProvider extends $FunctionalProvider<bool, bool, bool>
   }
 }
 
-String _$isDemoModeHash() => r'36e1fc7f0ba8650fba7bfb3eab5cb284ab5a90f7';
+String _$isDemoModeHash() => r'951153908f7b04b2262cf54193b5123ddd510dd1';
 
 /// Whether location consent has been given.
 
@@ -732,4 +732,4 @@ final class StorageStatsProvider
   }
 }
 
-String _$storageStatsHash() => r'0bd96d7fdac0c73e4cb62e88007daea25f2c0c94';
+String _$storageStatsHash() => r'2d452fed9014e4011428af10cb6a83ea1f353851';

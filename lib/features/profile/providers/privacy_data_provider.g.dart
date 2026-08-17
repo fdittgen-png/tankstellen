@@ -60,7 +60,7 @@ final class PrivacyDataProvider
   }
 }
 
-String _$privacyDataHash() => r'c004c1b4d435170de05f841b7fa0b8a90ff4db2d';
+String _$privacyDataHash() => r'54b71f30e1717427b5675c69f671f7cd6e717f77';
 
 /// Exports all user data as a JSON string for GDPR data portability.
 ///
