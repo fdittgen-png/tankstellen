@@ -4,10 +4,12 @@
 import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tankstellen/core/sync/trip_shares_sync.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_entry.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import '../../helpers/silence_error_logger.dart';
+import 'fake_trip_share_transport.dart';
 
 /// #2240 — coverage of [TripSharesSync] (cross-account trip sharing).
 ///
@@ -77,6 +79,86 @@ void main() {
 
     test('revoke is a no-op when not signed in', () async {
       await TripSharesSync.revoke('share-1');
+    });
+  });
+
+  group('TripSharesSync.shareWithEmail — v8 RPC + pre-v8 fallback (#3747)',
+      () {
+    test('calls share_trip_with_email and maps true → shared (no UUID '
+        'ever reaches the client)', () async {
+      final wire = FakeTripShareTransport(
+          rpcResults: {'share_trip_with_email': true});
+      final result = await TripSharesSync.shareWithEmail(
+          'trip-1', 'a@example.com',
+          transport: wire);
+      expect(result, TripShareResult.shared);
+      expect(wire.rpcCalls.single.fn, 'share_trip_with_email');
+      expect(wire.rpcCalls.single.params,
+          {'p_trip_id': 'trip-1', 'p_email': 'a@example.com'});
+      expect(wire.upsertCalls, isEmpty,
+          reason: 'the insert happens server-side on the v8 path');
+    });
+
+    test('maps false → recipientNotFound (the ONE surviving oracle bit)',
+        () async {
+      final wire = FakeTripShareTransport(
+          rpcResults: {'share_trip_with_email': false});
+      expect(
+          await TripSharesSync.shareWithEmail('trip-1', 'x@y.z',
+              transport: wire),
+          TripShareResult.recipientNotFound);
+    });
+
+    test('missing function (PGRST202 — older self-host schema) falls '
+        'back to the legacy resolve+insert path', () async {
+      final wire = FakeTripShareTransport(
+        rpcErrors: {
+          'share_trip_with_email': const PostgrestException(
+              message: 'Could not find the function', code: 'PGRST202'),
+        },
+        rpcResults: {'resolve_share_recipient': 'recipient-9'},
+      );
+      final result = await TripSharesSync.shareWithEmail(
+          'trip-1', 'a@example.com',
+          transport: wire);
+      expect(result, TripShareResult.shared);
+      expect(wire.rpcCalls.map((c) => c.fn),
+          ['share_trip_with_email', 'resolve_share_recipient']);
+      final upsert = wire.upsertCalls.single;
+      expect(upsert.row['owner_id'], wire.userId,
+          reason: 'legacy path mirrors the RLS WITH CHECK — the grant is '
+              'always owned by the caller');
+      expect(upsert.row['shared_with_id'], 'recipient-9');
+      expect(upsert.onConflict, 'trip_id,owner_id,shared_with_id');
+    });
+
+    test('any OTHER PostgrestException (e.g. 42501 permission denied) '
+        'fails soft WITHOUT falling back — never thrown', () async {
+      final wire = FakeTripShareTransport(rpcErrors: {
+        'share_trip_with_email': const PostgrestException(
+            message: 'permission denied', code: '42501'),
+      });
+      await expectLater(
+          TripSharesSync.shareWithEmail('trip-1', 'x@y.z', transport: wire),
+          completes);
+      expect(
+          await TripSharesSync.shareWithEmail('trip-1', 'x@y.z',
+              transport: wire),
+          TripShareResult.failed);
+      expect(wire.rpcCalls.every((c) => c.fn == 'share_trip_with_email'),
+          isTrue,
+          reason: 'the legacy oracle must never be probed on a real error');
+      expect(wire.upsertCalls, isEmpty);
+    });
+
+    test('a generic wire failure maps to failed — never thrown', () async {
+      final wire = FakeTripShareTransport(rpcErrors: {
+        'share_trip_with_email': Exception('socket closed'),
+      });
+      expect(
+          await TripSharesSync.shareWithEmail('trip-1', 'x@y.z',
+              transport: wire),
+          TripShareResult.failed);
     });
   });
 

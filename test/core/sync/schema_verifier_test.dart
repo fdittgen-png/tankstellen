@@ -226,6 +226,46 @@ void main() {
       expect(kSupabaseSchemaVersion, greaterThanOrEqualTo(8));
     });
 
+    test('#3747 (v8) — share_trip_with_email replaces the '
+        'resolve_share_recipient email→UUID oracle in the wizard SQL', () {
+      final sql = SchemaVerifier.getMigrationSql(
+          {for (final t in SchemaVerifier.allTables) t: true});
+      // The new RPC: SECURITY DEFINER, search_path pinned, boolean-only
+      // return (the recipient UUID never crosses the wire).
+      expect(
+          sql,
+          contains('CREATE OR REPLACE FUNCTION public.share_trip_with_email'
+              '(p_trip_id TEXT, p_email TEXT)\n'
+              'RETURNS BOOLEAN\n'
+              'LANGUAGE plpgsql\n'
+              'SECURITY DEFINER\n'
+              'SET search_path = public, auth'));
+      expect(
+          sql,
+          contains('GRANT EXECUTE ON FUNCTION '
+              'public.share_trip_with_email(TEXT, TEXT) TO authenticated'));
+      expect(
+          sql,
+          contains('REVOKE EXECUTE ON FUNCTION '
+              'public.share_trip_with_email(TEXT, TEXT) FROM anon'));
+      // Ownership mirrors the old client insert path: forced to the
+      // caller, same conflict target as the client upsert used.
+      expect(sql, contains("VALUES (p_trip_id, auth.uid(), recipient, 'read')"));
+      expect(sql,
+          contains('ON CONFLICT (trip_id, owner_id, shared_with_id)'));
+      // The legacy oracle stays defined (idempotent re-runs) but
+      // authenticated clients lost EXECUTE on it.
+      expect(
+          sql,
+          contains('REVOKE EXECUTE ON FUNCTION '
+              'public.resolve_share_recipient(TEXT) FROM authenticated'));
+      expect(
+          sql,
+          isNot(contains('GRANT EXECUTE ON FUNCTION '
+              'public.resolve_share_recipient(TEXT) TO authenticated')));
+      expect(kSupabaseSchemaVersion, greaterThanOrEqualTo(8));
+    });
+
     test('#3452 — the v5 favorites columns reach an EXISTING favorites '
         'table (idempotent ALTER upgrade path)', () {
       // A self-hoster whose `favorites` table pre-exists gets NO CREATE

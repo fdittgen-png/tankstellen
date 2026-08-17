@@ -42,7 +42,10 @@ import 'schema_sql_policies.dart';
 /// first-signin bootstrap + delete restrictions, with `search_path`
 /// pinned on its SECURITY DEFINER functions) ships in the wizard SQL
 /// for the first time, so self-hosts get the same posture as the
-/// maintainer's project.
+/// maintainer's project. Also v8 (#3747): `share_trip_with_email()`
+/// replaces the `resolve_share_recipient` email→UUID oracle — the
+/// resolve+insert moves server-side, only success/failure crosses the
+/// wire, and authenticated clients lose EXECUTE on the old resolver.
 const int kSupabaseSchemaVersion = 8;
 
 /// The metadata table that records the applied schema version. Readable by

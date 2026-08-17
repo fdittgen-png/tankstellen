@@ -50,7 +50,9 @@ void main() {
   // write a fault-path test in the matching `<stem>_test.dart`.
   const grandfathered = <String>{
     'lib/core/services/radar/corridor_location_cache.dart',
-    'lib/core/sync/trip_shares_sync.dart',
+    // #3747 — trip_shares_sync.dart entry removed (shrink): its test now
+    // injects wire faults through the FakeTripShareTransport and asserts
+    // shareWithEmail completes with a soft TripShareResult.failed.
     'lib/features/obd2/data/adapter_capability.dart',
     // #3727 — auto_trip_coordinator.dart entry removed (shrink): its only
     // never-throws boundary (the link-tuning swallow contract) moved into

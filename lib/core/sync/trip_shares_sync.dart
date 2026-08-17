@@ -9,6 +9,9 @@ import 'package:flutter/foundation.dart';
 import '../../features/consumption/data/trip_history_repository.dart';
 import '../../core/logging/error_logger.dart';
 import 'supabase_client.dart';
+import 'trip_share_transport.dart';
+
+export 'trip_share_transport.dart' show TripShareResult, TripShareTransport;
 
 /// The "shared with me" fetch result (#3726): the decoded read-only
 /// trip entries plus the trip-id → owner-id map, so the UI can attribute
@@ -100,22 +103,6 @@ class TripShare {
   }
 }
 
-/// Outcome of a [TripSharesSync.shareWithEmail] call so the UI can show
-/// a precise message instead of a generic failure.
-enum TripShareResult {
-  /// The share row was created (recipient resolved + grant inserted).
-  shared,
-
-  /// No TankSync account matched the recipient email.
-  recipientNotFound,
-
-  /// The caller isn't signed into a TankSync account.
-  notAuthenticated,
-
-  /// The wire call threw — surfaced as a soft failure.
-  failed,
-}
-
 /// Cross-account trip sharing wire helper (#2240).
 ///
 /// Sibling to [TripsSync]. Where `TripsSync` moves a user's OWN trips
@@ -135,43 +122,44 @@ class TripSharesSync {
 
   /// Share [tripId] with the account that owns [recipientEmail].
   ///
-  /// Resolves the email → user id through the `resolve_share_recipient`
-  /// SECURITY DEFINER RPC (clients can't read `auth.users` directly),
-  /// then inserts a `read`-permission grant. Returns a [TripShareResult] so
-  /// the sheet can distinguish "no such account" from a wire failure.
+  /// #3747 — calls the `share_trip_with_email` SECURITY DEFINER RPC,
+  /// which resolves the email AND inserts the grant server-side so the
+  /// recipient's raw UUID never crosses the wire (the old
+  /// `resolve_share_recipient` was an email→UUID oracle; v8 revokes its
+  /// EXECUTE from authenticated). On an OLDER self-host schema (< v8,
+  /// function missing) it falls back to the legacy resolve+insert path
+  /// — the schema-version checker separately flags that schema as
+  /// outdated. Returns a [TripShareResult] so the sheet can distinguish
+  /// "no such account" from a wire failure.
   static Future<TripShareResult> shareWithEmail(
     String tripId,
-    String recipientEmail,
-  ) async {
-    final client = TankSyncClient.client;
-    final userId = client?.auth.currentUser?.id;
-    if (client == null || userId == null) {
+    String recipientEmail, {
+    TripShareTransport? transport,
+  }) async {
+    final wire = transport ?? SupabaseTripShareTransport.currentOrNull();
+    if (wire == null) {
       debugPrint('TripSharesSync.shareWithEmail: not authenticated');
       return TripShareResult.notAuthenticated;
     }
     try {
-      final resolved = await client.rpc<dynamic>(
-        'resolve_share_recipient',
-        params: {'recipient_email': recipientEmail},
-      );
-      if (resolved is! String || resolved.isEmpty) {
-        return TripShareResult.recipientNotFound;
+      final ok = await wire.rpc('share_trip_with_email', {
+        'p_trip_id': tripId,
+        'p_email': recipientEmail,
+      });
+      if (ok == true) {
+        debugPrint('TripSharesSync.shareWithEmail: shared $tripId');
+        return TripShareResult.shared;
       }
-      await client.from('trip_shares').upsert(
-        {
-          'trip_id': tripId,
-          'owner_id': userId,
-          'shared_with_id': resolved,
-          'permission': 'read',
-        },
-        onConflict: 'trip_id,owner_id,shared_with_id',
-      );
-      debugPrint('TripSharesSync.shareWithEmail: shared $tripId');
-      return TripShareResult.shared;
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-          context: {'where': 'TripSharesSync.shareWithEmail FAILED for $tripId'}));
+      if (ok == false) return TripShareResult.recipientNotFound;
       return TripShareResult.failed;
+    } catch (e, st) {
+      if (!isMissingFunctionError(e)) {
+        unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: {
+          'where': 'TripSharesSync.shareWithEmail FAILED for $tripId'
+        }));
+        return TripShareResult.failed;
+      }
+      return legacyShareWithEmail(wire, tripId, recipientEmail);
     }
   }
 
