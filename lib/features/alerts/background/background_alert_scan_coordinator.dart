@@ -198,7 +198,9 @@ class BackgroundAlertScanCoordinator {
   Future<({int stationsScanned, int alertsFired})> _runScanBody(
       HiveStorage storage) async {
     await HiveStorage.loadApiKey();
-    final apiKey = storage.getApiKey();
+    // #3746 — the threaded key only builds the DE Tankerkönig Dio; every
+    // other country's polled strategy reads its own slot via `storage`.
+    final apiKey = storage.getApiKey('de');
 
     // #2306 — load the localized notification templates the main isolate
     // stashed at reconcile() time. If absent (e.g. a task that outran the
@@ -351,7 +353,7 @@ class BackgroundAlertScanCoordinator {
     BackgroundPriceSource? source,
   }) async {
     try {
-      final apiKey = storage.getApiKey();
+      final apiKey = storage.getApiKey('de'); // #3746 — DE Dio key only.
       final activeCountry =
           storage.getSetting('active_country_code') as String? ?? 'DE';
       final priceSource = source ??

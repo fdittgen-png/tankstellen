@@ -7,6 +7,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'hive_boxes.dart';
 import 'hive_cipher_loader.dart';
 import 'hive_isolate_ownership.dart';
+import 'impl/hive_directory_resolver.dart';
 
 /// Background-isolate box lifecycle, split out of [HiveBoxes] (#3689).
 ///
@@ -32,7 +33,10 @@ class HiveIsolateBoxes {
 
   /// Initialize Hive in a background isolate with proper encryption.
   static Future<void> initInIsolate() async {
-    await Hive.initFlutter();
+    // #3747 — must resolve the SAME base dir as HiveBoxes.init (on iOS:
+    // Application Support), or a background isolate would open a
+    // parallel empty box set in Documents.
+    await HiveDirectoryResolver.initHive();
     final cipher = await HiveCipherLoader.loadGuarded();
     Future<Box<T>> open<T>(String name, {HiveAesCipher? boxCipher}) =>
         Hive.openBox<T>(name,

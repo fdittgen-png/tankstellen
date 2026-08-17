@@ -54,7 +54,7 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     final test = standardTestOverrides();
-    when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+    when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
     await pumpApp(
       tester,

@@ -66,25 +66,35 @@ abstract class SettingsStorage {
 }
 
 /// API key secure storage.
+///
+/// #3746 — keys are **per country**: the one legacy slot was shared by the
+/// DE (Tankerkönig), KR (OPINET), CL and GB (Fuel Finder OAuth) services,
+/// so configuring one clobbered the others and the wrong key got sent.
+/// Every accessor now takes the ISO 3166-1 alpha-2 [countryCode] (case
+/// insensitive) and the value is stored under `api_key_<lowercase-cc>`.
 abstract class ApiKeyStorage {
-  /// Returns the user's personal Tankerkönig API key from secure storage,
-  /// or `null` when no key has been configured. The app ships with NO
-  /// bundled key (#713) — the Tankerkönig terms of service forbid
-  /// publishing any key, including demo keys, on public repositories.
-  /// Users register their free personal key at
+  /// Returns the user's personal API key for [countryCode] from secure
+  /// storage, or `null` when no key has been configured for that country.
+  /// The app ships with NO bundled key (#713) — e.g. the Tankerkönig
+  /// terms of service forbid publishing any key, including demo keys, on
+  /// public repositories. Users register their free personal DE key at
   /// https://creativecommons.tankerkoenig.de.
-  String? getApiKey();
-  Future<void> setApiKey(String key);
-  Future<void> deleteApiKey();
+  String? getApiKey(String countryCode);
+  Future<void> setApiKey(String countryCode, String key);
+  Future<void> deleteApiKey(String countryCode);
 
-  /// Whether the user has configured a personal Tankerkönig key.
-  /// When false, Germany search falls back to [DemoStationService].
-  bool hasApiKey();
+  /// Deletes every configured per-country key (and the pre-#3746 legacy
+  /// slot) — the privacy "delete all data" wipe path.
+  Future<void> deleteAllApiKeys();
+
+  /// Whether the user has configured a personal key for [countryCode].
+  /// When false, that country's search falls back to [DemoStationService].
+  bool hasApiKey(String countryCode);
 
   /// Alias of [hasApiKey] kept for backwards compatibility with older
   /// callers. Since there is no longer a bundled default key, any
   /// configured key IS the user's custom key.
-  bool hasCustomApiKey();
+  bool hasCustomApiKey(String countryCode);
 
   String? getEvApiKey();
   bool hasEvApiKey();

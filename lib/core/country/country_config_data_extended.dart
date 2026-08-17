@@ -11,6 +11,7 @@ import 'country_config.dart';
 
 const kPortugal = CountryConfig(
   code: 'PT',
+  stationIdPrefixes: ['pt-'],
   name: 'Portugal',
   flag: '\u{1F1F5}\u{1F1F9}',
   locale: 'pt_PT',
@@ -33,6 +34,7 @@ const kPortugal = CountryConfig(
 
 const kUnitedKingdom = CountryConfig(
   code: 'GB',
+  stationIdPrefixes: ['uk-'],
   name: 'United Kingdom',
   flag: '\u{1F1EC}\u{1F1E7}',
   currency: 'GBP',
@@ -65,6 +67,7 @@ const kUnitedKingdom = CountryConfig(
 
 const kAustralia = CountryConfig(
   code: 'AU',
+  stationIdPrefixes: ['au-'],
   name: 'Australia',
   flag: '\u{1F1E6}\u{1F1FA}',
   currency: 'AUD',
@@ -100,6 +103,7 @@ const kAustralia = CountryConfig(
 
 const kSlovenia = CountryConfig(
   code: 'SI',
+  stationIdPrefixes: ['si-'],
   name: 'Slovenija',
   flag: '\u{1F1F8}\u{1F1EE}',
   locale: 'sl_SI',
@@ -127,6 +131,7 @@ const kSlovenia = CountryConfig(
 
 const kMexico = CountryConfig(
   code: 'MX',
+  stationIdPrefixes: ['mx-'],
   name: 'México',
   flag: '\u{1F1F2}\u{1F1FD}',
   currency: 'MXN',
@@ -158,6 +163,7 @@ const kMexico = CountryConfig(
 /// `LuxembourgStationService` for the uniform-price model.
 const kLuxembourg = CountryConfig(
   code: 'LU',
+  stationIdPrefixes: ['lu-'],
   name: 'Luxembourg',
   flag: '\u{1F1F1}\u{1F1FA}',
   locale: 'fr_LU',
@@ -185,6 +191,7 @@ const kLuxembourg = CountryConfig(
 /// FuelType enum for it). Prices are in KRW per litre (integer).
 const kSouthKorea = CountryConfig(
   code: 'KR',
+  stationIdPrefixes: ['kr-'],
   name: '대한민국',
   flag: '\u{1F1F0}\u{1F1F7}',
   currency: 'KRW',
@@ -219,6 +226,7 @@ const kSouthKorea = CountryConfig(
 /// we add a FuelType enum for it. Prices are in CLP per litre.
 const kChile = CountryConfig(
   code: 'CL',
+  stationIdPrefixes: ['cl-'],
   name: 'Chile',
   flag: '\u{1F1E8}\u{1F1F1}',
   currency: 'CLP',
@@ -260,6 +268,7 @@ const kChile = CountryConfig(
 /// published but dropped — not a motoring fuel.
 const kGreece = CountryConfig(
   code: 'GR',
+  stationIdPrefixes: ['gr-'],
   name: 'Ελλάδα',
   flag: '\u{1F1EC}\u{1F1F7}',
   locale: 'el_GR',
@@ -294,6 +303,7 @@ const kGreece = CountryConfig(
 /// (→ diesel), premium 22 (→ diesel premium), GPL 31 (→ lpg).
 const kRomania = CountryConfig(
   code: 'RO',
+  stationIdPrefixes: ['ro-'],
   name: 'România',
   flag: '\u{1F1F7}\u{1F1F4}',
   currency: 'RON',
@@ -328,3 +338,10 @@ const kRomania = CountryConfig(
   // hidden until the maintainer field-verifies, then flip to true.
   verified: false,
 );
+
+/// #3746 — the v4.1.0+ rows in display order; see [kCoreCountries] for how
+/// `Countries.all` is assembled from the two data files.
+const List<CountryConfig> kExtendedCountries = [
+  kPortugal, kUnitedKingdom, kAustralia, kMexico, kLuxembourg, kSlovenia,
+  kSouthKorea, kChile, kGreece, kRomania,
+];

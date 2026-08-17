@@ -33,8 +33,8 @@ void main() {
 
     setUp(() {
       mockStorage = MockHiveStorage();
-      when(() => mockStorage.hasApiKey()).thenReturn(false);
-      when(() => mockStorage.getApiKey()).thenReturn(null);
+      when(() => mockStorage.hasApiKey(any())).thenReturn(false);
+      when(() => mockStorage.getApiKey(any())).thenReturn(null);
       when(() => mockStorage.getActiveProfileId()).thenReturn(null);
       when(() => mockStorage.getAllProfiles()).thenReturn([]);
       when(() => mockStorage.getRatings()).thenReturn({});

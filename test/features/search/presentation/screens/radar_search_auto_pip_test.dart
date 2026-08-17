@@ -74,7 +74,7 @@ void main() {
     final radar = _ToggleRadar();
 
     final test = standardTestOverrides();
-    when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+    when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
     when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
     when(() => test.mockStorage.getRatings()).thenReturn(const <String, int>{});
 

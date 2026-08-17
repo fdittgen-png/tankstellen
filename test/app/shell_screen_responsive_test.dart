@@ -89,7 +89,7 @@ void main() {
 
     setUp(() {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.isSetupComplete).thenReturn(true);
       when(() => test.mockStorage.getActiveProfileId()).thenReturn(null);
       when(() => test.mockStorage.getAllProfiles()).thenReturn([]);

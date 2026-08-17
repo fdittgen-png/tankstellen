@@ -61,7 +61,7 @@ void main() {
       };
 
       final test = standardTestOverrides(favoriteIds: [testStation.id]);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       final result = ServiceResult(
         data: const [testStation],

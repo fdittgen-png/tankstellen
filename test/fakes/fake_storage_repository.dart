@@ -48,15 +48,21 @@ class FakeStorageRepository implements StorageRepository {
   // ApiKeyStorage
   // ---------------------------------------------------------------------------
   @override
-  String? getApiKey() => inner.getApiKey();
+  String? getApiKey(String countryCode) => inner.getApiKey(countryCode);
   @override
-  Future<void> setApiKey(String key) => inner.setApiKey(key);
+  Future<void> setApiKey(String countryCode, String key) =>
+      inner.setApiKey(countryCode, key);
   @override
-  Future<void> deleteApiKey() => inner.deleteApiKey();
+  Future<void> deleteApiKey(String countryCode) =>
+      inner.deleteApiKey(countryCode);
+
   @override
-  bool hasApiKey() => inner.hasApiKey();
+  Future<void> deleteAllApiKeys() => inner.deleteAllApiKeys();
   @override
-  bool hasCustomApiKey() => inner.hasCustomApiKey();
+  bool hasApiKey(String countryCode) => inner.hasApiKey(countryCode);
+  @override
+  bool hasCustomApiKey(String countryCode) =>
+      inner.hasCustomApiKey(countryCode);
   @override
   String? getEvApiKey() => inner.getEvApiKey();
   @override

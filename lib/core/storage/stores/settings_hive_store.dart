@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -21,8 +22,14 @@ class SettingsHiveStore implements SettingsStorage, ApiKeyStorage {
   // API Key — stored in platform secure enclave, NOT in plain Hive.
   static const _secureStorage = FlutterSecureStorage();
 
-  // In-memory cache to avoid async reads on every API call.
-  static String? _apiKeyCache;
+  // #3746 — per-country in-memory cache (synchronous reads on the search
+  // hot path), keyed by lowercase ISO country code. Backed by one secure-
+  // storage entry per country under `api_key_<lowercase-cc>`.
+  static final Map<String, String> _apiKeyCache = {};
+
+  // The pre-#3746 single 'api_key' slot, cached at load time so the lazy
+  // DE migration in [getApiKey] stays synchronous.
+  static String? _legacyApiKeyCache;
 
   // Key für den Zugriff auf die freie Tankerkönig-Spritpreis-API
   // Für eigenen Key bitte hier https://onboarding.tankerkoenig.de
@@ -33,41 +40,87 @@ class SettingsHiveStore implements SettingsStorage, ApiKeyStorage {
   // The app therefore ships with NO bundled key: the user must register
   // at creativecommons.tankerkoenig.de and paste their personal key into
   // Settings → API keys. Until then, Germany falls back to
-  // [DemoStationService] (see `country_service_registry._createTankerkoenig`).
+  // [DemoStationService] (see `buildRawCountryService`).
 
-  /// Load API key from secure storage into memory. Call once at startup.
+  /// The secure-storage entry name for [countryCode]'s API key.
+  static String _slotFor(String countryCode) =>
+      '${StorageKeys.apiKey}_${countryCode.toLowerCase()}';
+
+  /// Load all per-country API keys from secure storage into memory. Call
+  /// once at startup. Also caches the pre-#3746 legacy single slot so the
+  /// one-time DE migration in [getApiKey] can run synchronously.
   static Future<void> loadApiKey() async {
-    _apiKeyCache = await _secureStorage.read(key: StorageKeys.apiKey);
+    final all = await _secureStorage.readAll();
+    const prefix = '${StorageKeys.apiKey}_';
+    _apiKeyCache.clear();
+    for (final entry in all.entries) {
+      if (!entry.key.startsWith(prefix)) continue;
+      final value = entry.value;
+      if (value.isEmpty) continue;
+      _apiKeyCache[entry.key.substring(prefix.length)] = value;
+    }
+    _legacyApiKeyCache = all[StorageKeys.apiKey];
     await loadEvApiKey();
     await loadSupabaseAnonKey();
   }
 
   @override
-  String? getApiKey() {
-    final custom = _apiKeyCache;
-    return (custom != null && custom.isNotEmpty) ? custom : null;
+  String? getApiKey(String countryCode) {
+    final cc = countryCode.toLowerCase();
+    var key = _apiKeyCache[cc];
+    if (key == null && cc == 'de') {
+      // #3746 one-time lazy migration: the pre-#3746 single 'api_key' slot
+      // was documented (and validated) as the Tankerkönig key, so its value
+      // becomes the DE slot on first read after the upgrade. The legacy
+      // slot itself is deliberately LEFT IN PLACE for one release so a
+      // downgrade to a pre-#3746 build still finds its key; remove it (and
+      // this branch) in the release after #3746 ships.
+      final legacy = _legacyApiKeyCache;
+      if (legacy != null && legacy.isNotEmpty) {
+        _apiKeyCache[cc] = legacy;
+        key = legacy;
+        unawaited(_secureStorage.write(key: _slotFor('de'), value: legacy));
+      }
+    }
+    return (key != null && key.isNotEmpty) ? key : null;
   }
 
   @override
-  Future<void> setApiKey(String key) async {
-    await _secureStorage.write(key: StorageKeys.apiKey, value: key);
-    _apiKeyCache = key;
+  Future<void> setApiKey(String countryCode, String key) async {
+    final cc = countryCode.toLowerCase();
+    await _secureStorage.write(key: _slotFor(cc), value: key);
+    _apiKeyCache[cc] = key;
   }
 
   @override
-  Future<void> deleteApiKey() async {
+  Future<void> deleteApiKey(String countryCode) async {
+    final cc = countryCode.toLowerCase();
+    await _secureStorage.delete(key: _slotFor(cc));
+    _apiKeyCache.remove(cc);
+    if (cc == 'de') {
+      // Deleting the DE key must also clear the legacy slot — otherwise
+      // the lazy migration above would resurrect the just-deleted key on
+      // the next read.
+      await _secureStorage.delete(key: StorageKeys.apiKey);
+      _legacyApiKeyCache = null;
+    }
+  }
+
+  @override
+  Future<void> deleteAllApiKeys() async {
+    for (final cc in _apiKeyCache.keys.toList()) {
+      await _secureStorage.delete(key: _slotFor(cc));
+    }
+    _apiKeyCache.clear();
     await _secureStorage.delete(key: StorageKeys.apiKey);
-    _apiKeyCache = null;
+    _legacyApiKeyCache = null;
   }
 
   @override
-  bool hasApiKey() {
-    final key = _apiKeyCache;
-    return key != null && key.isNotEmpty;
-  }
+  bool hasApiKey(String countryCode) => getApiKey(countryCode) != null;
 
   @override
-  bool hasCustomApiKey() => hasApiKey();
+  bool hasCustomApiKey(String countryCode) => hasApiKey(countryCode);
 
   // EV Charging API key (OpenChargeMap)
   static String? _evApiKeyCache;

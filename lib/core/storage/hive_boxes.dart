@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'hive_cipher_loader.dart';
+import 'impl/hive_directory_resolver.dart';
 import 'hive_isolate_boxes.dart';
 import 'hive_isolate_ownership.dart';
 import 'hive_legacy_migration.dart';
@@ -188,7 +189,10 @@ class HiveBoxes {
   /// which the app-initializer kicks after the first frame. Every box
   /// `init()` opens is still open before it returns.
   static Future<void> init() async {
-    await Hive.initFlutter();
+    // #3747 — on iOS the base dir is Application Support (out of the
+    // UIFileSharingEnabled Documents surface), with a one-time move of
+    // the legacy box files; elsewhere identical to Hive.initFlutter().
+    await HiveDirectoryResolver.initHive();
     final cipher = await HiveCipherLoader.loadGuarded();
 
     // Phase 1 — migrate any pre-encryption plaintext boxes. The probes

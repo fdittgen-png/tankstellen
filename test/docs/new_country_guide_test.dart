@@ -142,6 +142,12 @@ void main() {
             File('lib/core/services/country_raw_service_builder.dart');
         final builderContent =
             builderFile.existsSync() ? builderFile.readAsStringSync() : '';
+        // #3746 — the per-country wiring is a buildService factory on each
+        // CountryServiceEntry; the data rows import one feature file per
+        // country, so a service wired there counts too.
+        final dataFile = File('lib/core/services/country_service_data.dart');
+        final dataContent =
+            dataFile.existsSync() ? dataFile.readAsStringSync() : '';
         // #3190 — countries whose composition moved feature-side behind a
         // builder (the #3132 boundary pattern: the core raw builder imports
         // ONE feature builder instead of N service files). A service imported
@@ -170,11 +176,13 @@ void main() {
             serviceProviders.contains(fileName) ||
                 registryContent.contains(fileName) ||
                 builderContent.contains(fileName) ||
+                dataContent.contains(fileName) ||
                 featureBuilderContent.contains(fileName),
             isTrue,
             reason:
                 'service_providers.dart, country_service_registry.dart, '
-                'country_raw_service_builder.dart, or a feature-side '
+                'country_raw_service_builder.dart, country_service_data.dart '
+                '(#3746 buildService rows), or a feature-side '
                 '*_service_builder.dart must import $fileName',
           );
         }

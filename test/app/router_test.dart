@@ -97,13 +97,13 @@ void main() {
 
     setUp(() {
       mockStorage = MockHiveStorage();
-      when(() => mockStorage.hasApiKey()).thenReturn(false);
+      when(() => mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => mockStorage.getActiveProfileId()).thenReturn(null);
       when(() => mockStorage.getAllProfiles()).thenReturn([]);
       when(() => mockStorage.getFavoriteIds()).thenReturn([]);
 
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.isSetupComplete).thenReturn(true);
       when(() => test.mockStorage.getActiveProfileId()).thenReturn(null);
       when(() => test.mockStorage.getAllProfiles()).thenReturn([]);
@@ -129,7 +129,7 @@ void main() {
     testWidgets('redirects to /setup when setup not complete', (tester) async {
       // Create a separate storage mock where setup is NOT complete
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.isSetupComplete).thenReturn(false);
       when(() => test.mockStorage.getActiveProfileId()).thenReturn(null);
       when(() => test.mockStorage.getAllProfiles()).thenReturn([]);

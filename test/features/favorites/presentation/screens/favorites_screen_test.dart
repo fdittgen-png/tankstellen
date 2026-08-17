@@ -34,7 +34,7 @@ void main() {
   group('FavoritesScreen', () {
     testWidgets('renders Scaffold', (tester) async {
       final test = standardTestOverrides(favoriteIds: []);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       stubAlerts(test.mockStorage);
 
       await pumpApp(
@@ -48,7 +48,7 @@ void main() {
 
     testWidgets('renders app bar with Favorites title', (tester) async {
       final test = standardTestOverrides(favoriteIds: []);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       stubAlerts(test.mockStorage);
 
@@ -64,7 +64,7 @@ void main() {
 
     testWidgets('shows empty state message when no favorites', (tester) async {
       final test = standardTestOverrides(favoriteIds: []);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       stubAlerts(test.mockStorage);
 
@@ -85,7 +85,7 @@ void main() {
 
     testWidgets('shows hint text in empty state', (tester) async {
       final test = standardTestOverrides(favoriteIds: []);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       stubAlerts(test.mockStorage);
 
@@ -105,7 +105,7 @@ void main() {
         'shows tabs for Favorites and Price Alerts (portrait phone)',
         (tester) async {
       final test = standardTestOverrides(favoriteIds: []);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       stubAlerts(test.mockStorage);
 
@@ -129,7 +129,7 @@ void main() {
         '#2155 landscape phone renders FavoritesTab + AlertsTab '
         'side-by-side (no TabSwitcher)', (tester) async {
       final test = standardTestOverrides(favoriteIds: []);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       stubAlerts(test.mockStorage);
 
@@ -154,7 +154,7 @@ void main() {
         '#2155 wide portrait (tablet) also gets the side-by-side layout',
         (tester) async {
       final test = standardTestOverrides(favoriteIds: []);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       stubAlerts(test.mockStorage);
 
@@ -175,7 +175,7 @@ void main() {
         '#2530 expanded width picks up the shared 2:3 master/detail ratio',
         (tester) async {
       final test = standardTestOverrides(favoriteIds: []);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       stubAlerts(test.mockStorage);
 
@@ -202,7 +202,7 @@ void main() {
         (tester) async {
       final test = standardTestOverrides(
           favoriteIds: [testStation.id]);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       stubAlerts(test.mockStorage);
 

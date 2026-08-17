@@ -118,7 +118,7 @@ void main() {
     testWidgets('TextField is wrapped in a 40px SizedBox for compactness',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -146,7 +146,7 @@ void main() {
     testWidgets('TextField uses isDense and compact contentPadding',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -168,7 +168,7 @@ void main() {
         (tester) async {
       var gpsCalls = 0;
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -195,7 +195,7 @@ void main() {
       var zip = 0;
       var city = 0;
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -221,7 +221,7 @@ void main() {
     testWidgets('TextField is not wrapped in nested Semantics(textField: true)',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -250,7 +250,7 @@ void main() {
         (tester) async {
       final handle = tester.ensureSemantics();
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -280,7 +280,7 @@ void main() {
     testWidgets('GPS button has tooltip for screen readers', (tester) async {
       final handle = tester.ensureSemantics();
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,

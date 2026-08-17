@@ -82,7 +82,8 @@ Map<String, CountrySource> buildCorridorServiceMap(
   RouteInfo route,
   Map<String, FuelType> profileFuels,
 ) {
-  final hasKey = ref.read(storageRepositoryProvider).hasApiKey();
+  // #3746 — keys are per-country; each keyed country is gated on ITS slot.
+  final keyStore = ref.read(storageRepositoryProvider);
   // #2741 — the maintainer's profile rule: query a country only when the user
   // has a profile for it. Genuine geographic entry alone is not enough.
   final profileCountries =
@@ -105,7 +106,9 @@ Map<String, CountrySource> buildCorridorServiceMap(
   for (final code in codes) {
     final entry = CountryServiceRegistry.entryFor(code);
     if (entry == null) continue; // unregistered → no real data source.
-    if (entry.requiresApiKey && !hasKey) continue; // demo guard (#2595).
+    if (entry.requiresApiKey && !keyStore.hasApiKey(code)) {
+      continue; // demo guard (#2595).
+    }
     map[code] = (
       service: stationServiceForCountry(ref, code),
       fuel: profileFuels[code] ?? FuelType.e10,

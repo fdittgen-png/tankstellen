@@ -27,8 +27,8 @@ void main() {
       // #521 — hasApiKey is true when the bundled community default is
       // present (the fake's default); the custom-key flag is what the
       // UI actually branches on now.
-      expect(fake.hasApiKey(), isTrue);
-      expect(fake.hasCustomApiKey(), isFalse);
+      expect(fake.hasApiKey('de'), isTrue);
+      expect(fake.hasCustomApiKey('de'), isFalse);
       expect(fake.isSetupComplete, isFalse);
       expect(fake.alertCount, 0);
       expect(fake.favoriteCount, 0);

@@ -124,22 +124,22 @@ void main() {
         () async {
       final fake = FakeHiveStorage();
       // Bundled default: hasApiKey true even with no custom key.
-      expect(fake.getApiKey(), isNull);
-      expect(fake.hasApiKey(), isTrue);
-      expect(fake.hasCustomApiKey(), isFalse);
+      expect(fake.getApiKey('de'), isNull);
+      expect(fake.hasApiKey('de'), isTrue);
+      expect(fake.hasCustomApiKey('de'), isFalse);
 
       // Without bundled default: must have a real key to be true.
       fake.hasBundledDefaultKey = false;
-      expect(fake.hasApiKey(), isFalse);
+      expect(fake.hasApiKey('de'), isFalse);
 
-      await fake.setApiKey('user-key');
-      expect(fake.getApiKey(), 'user-key');
-      expect(fake.hasApiKey(), isTrue);
-      expect(fake.hasCustomApiKey(), isTrue);
+      await fake.setApiKey('de', 'user-key');
+      expect(fake.getApiKey('de'), 'user-key');
+      expect(fake.hasApiKey('de'), isTrue);
+      expect(fake.hasCustomApiKey('de'), isTrue);
 
-      await fake.deleteApiKey();
-      expect(fake.getApiKey(), isNull);
-      expect(fake.hasApiKey(), isFalse);
+      await fake.deleteApiKey('de');
+      expect(fake.getApiKey('de'), isNull);
+      expect(fake.hasApiKey('de'), isFalse);
     });
 
     test('ev api key + supabase anon key round-trip', () async {

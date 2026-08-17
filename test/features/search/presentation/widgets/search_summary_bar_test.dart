@@ -30,7 +30,7 @@ void main() {
     testWidgets('renders fuel type and radius badge (#2131 — inline button removed)',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -48,7 +48,7 @@ void main() {
 
     testWidgets('tapping the bar opens SearchCriteriaScreen', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -77,7 +77,7 @@ void main() {
     testWidgets('nearby mode keeps the radius badge (default mode)',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -96,7 +96,7 @@ void main() {
     testWidgets('route mode + loading shows searching chip, no radius',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -126,7 +126,7 @@ void main() {
     testWidgets('route mode + partial result shows searching chip',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -159,7 +159,7 @@ void main() {
     testWidgets('route mode + complete result shows route-segment summary',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -189,7 +189,7 @@ void main() {
     testWidgets('radar active replaces the radius chip with the radar badge',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -209,7 +209,7 @@ void main() {
     testWidgets('radar inactive keeps the radius chip (badge absent)',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,

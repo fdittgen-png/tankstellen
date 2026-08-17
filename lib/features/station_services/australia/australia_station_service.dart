@@ -9,6 +9,7 @@ import '../../../core/error/exceptions.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
+import '../../../core/services/country_service_dependencies.dart';
 
 /// NSW FuelCheck — Australian fuel price service.
 ///
@@ -70,3 +71,9 @@ class AustraliaStationService
     );
   }
 }
+
+/// Builds the AU raw [StationService] — the `CountryServiceEntry.buildService`
+/// factory (#3746). Takes [CountryServiceDependencies], never a Riverpod `Ref`,
+/// so the identical wiring runs in the background isolate (#2861).
+StationService buildAuStationService(CountryServiceDependencies deps) =>
+    const AustraliaStationService();

@@ -290,7 +290,7 @@ Future<void> _bootReady(String languageCode, {required bool german}) async {
     // DE (Tankerkönig) requires an API key; without one the search header
     // renders the demo-mode banner instead of the country attribution. The
     // station service is faked, so the key's value is never sent anywhere.
-    await storage.setApiKey('appstore-screenshot-placeholder');
+    await storage.setApiKey('de', 'appstore-screenshot-placeholder');
   }
 }
 

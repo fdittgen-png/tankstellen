@@ -105,34 +105,94 @@ void main() {
     test('isSetupComplete reflects only the explicit setup-skip flag', () async {
       // No bundled Tankerkönig key (#713) — wizard completion must depend
       // on the explicit flag, not on key availability.
-      expect(store.hasApiKey(), isFalse);
+      expect(store.hasApiKey('de'), isFalse);
       expect(store.isSetupComplete, isFalse);
     });
   });
 
-  group('Tankerkoenig API key', () {
+  group('Per-country API keys (#3746)', () {
     test('without a custom key, getApiKey returns null (#713 — Tankerkönig '
         'TOS forbid bundling any key, including demo keys, in public source)',
         () async {
       await SettingsHiveStore.loadApiKey();
-      expect(store.getApiKey(), isNull);
-      expect(store.hasApiKey(), isFalse);
-      expect(store.hasCustomApiKey(), isFalse);
+      expect(store.getApiKey('de'), isNull);
+      expect(store.hasApiKey('de'), isFalse);
+      expect(store.hasCustomApiKey('de'), isFalse);
     });
 
     test('setApiKey persists the user key and flips hasApiKey', () async {
-      await store.setApiKey('custom-key-123');
-      expect(store.getApiKey(), 'custom-key-123');
-      expect(store.hasApiKey(), isTrue);
-      expect(store.hasCustomApiKey(), isTrue);
+      await store.setApiKey('de', 'custom-key-123');
+      expect(store.getApiKey('de'), 'custom-key-123');
+      expect(store.hasApiKey('de'), isTrue);
+      expect(store.hasCustomApiKey('de'), isTrue);
+    });
+
+    test('country slots are independent — setting DE leaves KR/CL/GB empty',
+        () async {
+      await SettingsHiveStore.loadApiKey();
+      await store.setApiKey('de', 'tankerkoenig-key');
+      expect(store.getApiKey('kr'), isNull);
+      expect(store.getApiKey('cl'), isNull);
+      expect(store.getApiKey('gb'), isNull);
+
+      await store.setApiKey('kr', 'opinet-key');
+      expect(store.getApiKey('de'), 'tankerkoenig-key');
+      expect(store.getApiKey('kr'), 'opinet-key');
+    });
+
+    test('country codes are case-insensitive and stored lowercase', () async {
+      await store.setApiKey('DE', 'upper-set');
+      expect(store.getApiKey('de'), 'upper-set');
+      expect(store.getApiKey('De'), 'upper-set');
+      await store.deleteApiKey('dE');
+      expect(store.getApiKey('DE'), isNull);
     });
 
     test('deleteApiKey clears the user key and returns to null', () async {
-      await store.setApiKey('custom-key-123');
-      await store.deleteApiKey();
-      expect(store.getApiKey(), isNull);
-      expect(store.hasApiKey(), isFalse);
-      expect(store.hasCustomApiKey(), isFalse);
+      await store.setApiKey('de', 'custom-key-123');
+      await store.deleteApiKey('de');
+      expect(store.getApiKey('de'), isNull);
+      expect(store.hasApiKey('de'), isFalse);
+      expect(store.hasCustomApiKey('de'), isFalse);
+    });
+
+    test('deleteAllApiKeys wipes every country slot', () async {
+      await store.setApiKey('de', 'k1');
+      await store.setApiKey('kr', 'k2');
+      await store.deleteAllApiKeys();
+      expect(store.getApiKey('de'), isNull);
+      expect(store.getApiKey('kr'), isNull);
+    });
+
+    test('legacy single-slot key migrates to the DE slot on first read '
+        'and the legacy slot survives one release', () async {
+      // Simulate a pre-#3746 install: only the bare 'api_key' entry exists.
+      _mockSecureStorage(initial: {'api_key': 'legacy-tankerkoenig'});
+      await SettingsHiveStore.loadApiKey();
+
+      // First DE read migrates lazily.
+      expect(store.getApiKey('de'), 'legacy-tankerkoenig');
+      expect(store.hasApiKey('de'), isTrue);
+      // Other countries never inherit the legacy slot.
+      expect(store.getApiKey('kr'), isNull);
+      expect(store.getApiKey('gb'), isNull);
+
+      // A reload now finds the migrated per-country slot.
+      await SettingsHiveStore.loadApiKey();
+      expect(store.getApiKey('de'), 'legacy-tankerkoenig');
+    });
+
+    test('deleting the DE key also clears the legacy slot so the migration '
+        'cannot resurrect it', () async {
+      _mockSecureStorage(initial: {'api_key': 'legacy-tankerkoenig'});
+      await SettingsHiveStore.loadApiKey();
+      expect(store.getApiKey('de'), 'legacy-tankerkoenig');
+
+      await store.deleteApiKey('de');
+      expect(store.getApiKey('de'), isNull);
+
+      await SettingsHiveStore.loadApiKey();
+      expect(store.getApiKey('de'), isNull);
     });
   });
 

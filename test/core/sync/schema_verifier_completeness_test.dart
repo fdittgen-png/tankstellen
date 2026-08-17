@@ -105,6 +105,22 @@ void main() {
       expect(sql, contains('FUNCTION public.claim_trip_share'));
     });
 
+    test('wizard SQL creates the server-only tables too (#3747 widened: '
+        'not just the .from()-probed ones)', () {
+      // `serverOnlyTables` are read by SQL functions/triggers, never
+      // `.from()`d, so the verifier does not probe them — but the wizard
+      // must still create them or the owner bootstrap / schema-version
+      // probe break on a self-host. `tanksync_meta` ships via _metaSql;
+      // `database_owner` via ownerProtectionSql (v8).
+      final sql = SchemaVerifier.getMigrationSql(const {});
+      for (final table in serverOnlyTables) {
+        expect(sql, contains('CREATE TABLE IF NOT EXISTS public.$table'),
+            reason: 'wizard SQL is missing server-only table "$table"');
+        expect(sql, contains('ALTER TABLE public.$table ENABLE ROW LEVEL SECURITY'),
+            reason: 'wizard SQL does not enable RLS on "$table"');
+      }
+    });
+
     test('schema_sql.tableSql is itself complete + idempotent', () {
       // tableSql is the source of truth getMigrationSql iterates.
       for (final table in syncedTables) {

@@ -26,7 +26,7 @@ void main() {
 
     test('propagates hiveStorageProvider override', () async {
       final fake = FakeHiveStorage();
-      await fake.setApiKey('user-key');
+      await fake.setApiKey('de', 'user-key');
       await fake.setFavoriteIds(['s1', 's2']);
 
       final container = ProviderContainer(overrides: [
@@ -35,7 +35,7 @@ void main() {
       addTearDown(container.dispose);
 
       final repo = container.read(storageRepositoryProvider);
-      expect(repo.hasApiKey(), isTrue);
+      expect(repo.hasApiKey('de'), isTrue);
       expect(repo.getFavoriteIds(), ['s1', 's2']);
     });
 
@@ -72,7 +72,7 @@ void main() {
       fake.inner.hasBundledDefaultKey = false;
       final storage = container.read(apiKeyStorageProvider);
       expect(storage, isA<ApiKeyStorage>());
-      expect(storage.hasApiKey(), isFalse);
+      expect(storage.hasApiKey('de'), isFalse);
     });
 
     test('settingsStorageProvider returns SettingsStorage', () {

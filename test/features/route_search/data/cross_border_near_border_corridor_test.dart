@@ -58,7 +58,7 @@ import 'package:tankstellen/features/station_services/spain/miteco_station_servi
 /// FR + ES are keyless, so `hasApiKey()` does not gate them.
 class _NoKeyStorage implements StorageRepository {
   @override
-  bool hasApiKey() => false;
+  bool hasApiKey(String countryCode) => false;
 
   @override
   dynamic noSuchMethod(Invocation invocation) =>

@@ -4,6 +4,10 @@
 class StorageKeys {
   StorageKeys._();
 
+  /// #3746 — LEGACY single-slot name. Per-country keys live under
+  /// `api_key_<lowercase-cc>` now (see `SettingsHiveStore`); this bare slot
+  /// only survives as the one-time DE (Tankerkönig) migration source and as
+  /// the prefix of the per-country slots.
   static const String apiKey = 'api_key';
   static const String activeProfileId = 'active_profile_id';
   static const String favoriteStationIds = 'favorite_station_ids';

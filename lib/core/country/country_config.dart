@@ -67,6 +67,16 @@ class CountryConfig {
   /// unproven. Flip to `true` once the endpoint is confirmed.
   final bool verified;
 
+  /// Station-id prefixes this country's service emits (#753 / #3746) —
+  /// e.g. `['de-']`, or `['ok-', 'shell-']` for Denmark's two
+  /// retailer-specific feeds. `Countries.countryCodeForStationId` derives
+  /// its prefix→country map from these, so a new country declares its
+  /// prefix on its own config row instead of editing a separate map.
+  /// Must be non-empty for every registered country —
+  /// `CountryServiceRegistry.assertAllCountriesRegistered` fails on an
+  /// empty list at startup in debug.
+  final List<String> stationIdPrefixes;
+
   const CountryConfig({
     required this.code,
     required this.name,
@@ -95,6 +105,7 @@ class CountryConfig {
     this.pricePerUnitSuffix = '€/L',
     this.pricePerUnitSuffixByFuel = const {},
     this.verified = true,
+    this.stationIdPrefixes = const [],
   });
 
   /// The price-per-unit suffix for [fuelType]: the per-fuel override when
@@ -143,11 +154,12 @@ class Countries {
   /// registered country — station-id prefix → country, the
   /// registry-completeness assertion, geocoding scope. User-facing
   /// country pickers must iterate [verified] instead.
-  static const all = [
-    germany, france, austria, spain, italy, denmark, argentina,
-    portugal, unitedKingdom, australia, mexico, luxembourg, slovenia,
-    southKorea, chile, greece, romania,
-  ];
+  ///
+  /// #3746 — defined as the concatenation of the two per-data-file lists
+  /// ([kCoreCountries] + [kExtendedCountries]) instead of a third
+  /// hand-maintained list, so appending a config row to a data file is
+  /// enough to register it here.
+  static const all = [...kCoreCountries, ...kExtendedCountries];
 
   /// Countries safe to surface in the user-facing country pickers
   /// (#1828) — [all] minus any whose station service still targets an
@@ -191,44 +203,15 @@ class Countries {
   /// [StationService], even when the user has switched the active
   /// profile to a different country.
   ///
-  /// Known prefixes:
-  /// - \`de-\` → DE (Germany Tankerkönig, #753)
-  /// - \`fr-\` → FR (France Prix-Carburants, #753)
-  /// - \`at-\` → AT (Austria E-Control, #753)
-  /// - \`es-\` → ES (Spain MITECO Geoportal, #753)
-  /// - \`it-\` → IT (Italy MIMIT/MISE, #753)
-  /// - \`pt-\` → PT (Portugal DGEG, #503)
-  /// - \`uk-\` → GB (UK CMA Fuel Finder, #499)
-  /// - \`au-\` → AU (Australia FuelCheck)
-  /// - \`mx-\` → MX (Mexico CRE)
-  /// - \`ar-\` → AR (Argentina)
-  /// - \`ok-\` / \`shell-\` → DK (Denmark — two retailer-specific feeds)
-  /// - \`lu-\` → LU (Luxembourg regulated prices, #574)
-  /// - \`si-\` → SI (Slovenia goriva.si, #575)
-  /// - \`kr-\` → KR (South Korea OPINET / KNOC, #597)
-  /// - \`cl-\` → CL (Chile CNE Bencina en Línea, #596)
-  /// - \`gr-\` → GR (Greece Paratiritirio Timon, #576)
-  /// - \`ro-\` → RO (Romania Monitorul Prețurilor, #577)
-  /// - \`demo-\` → null (demo service, no real country)
-  static const Map<String, String> _stationIdPrefixToCountry = {
-    'de-': 'DE',
-    'fr-': 'FR',
-    'at-': 'AT',
-    'es-': 'ES',
-    'it-': 'IT',
-    'pt-': 'PT',
-    'uk-': 'GB',
-    'au-': 'AU',
-    'mx-': 'MX',
-    'ar-': 'AR',
-    'ok-': 'DK',
-    'shell-': 'DK',
-    'lu-': 'LU',
-    'si-': 'SI',
-    'kr-': 'KR',
-    'cl-': 'CL',
-    'gr-': 'GR',
-    'ro-': 'RO',
+  /// #3746 — derived once from each config row's
+  /// [CountryConfig.stationIdPrefixes] instead of being a second
+  /// hand-maintained map (DK contributes two retailer-specific prefixes,
+  /// `ok-` / `shell-`; `demo-` maps to no real country and is
+  /// intentionally absent). `assertAllCountriesRegistered` fails at
+  /// startup on any config without prefixes.
+  static final Map<String, String> _stationIdPrefixToCountry = {
+    for (final c in all)
+      for (final prefix in c.stationIdPrefixes) prefix: c.code,
   };
 
   /// Returns the ISO country code inferred from a station id's prefix,

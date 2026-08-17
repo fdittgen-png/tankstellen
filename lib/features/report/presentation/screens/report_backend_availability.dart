@@ -43,7 +43,7 @@ class ReportBackendAvailability {
 
   static ReportBackendAvailability watch(WidgetRef ref) {
     final country = ref.watch(activeCountryProvider);
-    final apiKey = ref.watch(apiKeyStorageProvider).getApiKey();
+    final apiKey = ref.watch(apiKeyStorageProvider).getApiKey('de');
     final syncConfig = ref.watch(syncStateProvider);
     final canSubmitTankerkoenig =
         country.code == 'DE' && apiKey != null && apiKey.isNotEmpty;

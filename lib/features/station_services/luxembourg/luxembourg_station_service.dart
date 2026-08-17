@@ -17,6 +17,7 @@ import '../../../core/services/station_service.dart';
 import 'lustat_parser.dart' as lustat;
 import 'lustat_parser.dart' show LustatObservation;
 import '../../../core/logging/error_logger.dart';
+import '../../../core/services/country_service_dependencies.dart';
 
 /// Luxembourg fuel prices — government-regulated, uniform nationally.
 ///
@@ -329,3 +330,9 @@ class _LuxembourgCity {
     required this.lng,
   });
 }
+
+/// Builds the LU raw [StationService] — the `CountryServiceEntry.buildService`
+/// factory (#3746). Takes [CountryServiceDependencies], never a Riverpod `Ref`,
+/// so the identical wiring runs in the background isolate (#2861).
+StationService buildLuStationService(CountryServiceDependencies deps) =>
+    LuxembourgStationService();

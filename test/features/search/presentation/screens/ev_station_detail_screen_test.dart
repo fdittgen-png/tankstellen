@@ -104,7 +104,7 @@ void main() {
 
     setUp(() {
       mockStorage = MockHiveStorage();
-      when(() => mockStorage.hasApiKey()).thenReturn(false);
+      when(() => mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => mockStorage.getFavoriteIds()).thenReturn([]);
       when(() => mockStorage.getRatings()).thenReturn({});
       when(() => mockStorage.getRating(any())).thenReturn(null);
@@ -183,7 +183,7 @@ void main() {
 
     setUp(() {
       mockStorage = MockHiveStorage();
-      when(() => mockStorage.hasApiKey()).thenReturn(false);
+      when(() => mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => mockStorage.getFavoriteIds()).thenReturn([]);
       when(() => mockStorage.getRatings()).thenReturn({});
       when(() => mockStorage.getRating(any())).thenReturn(null);
@@ -255,7 +255,7 @@ void main() {
 
     setUp(() {
       mockStorage = MockHiveStorage();
-      when(() => mockStorage.hasApiKey()).thenReturn(false);
+      when(() => mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => mockStorage.getFavoriteIds()).thenReturn([]);
       when(() => mockStorage.getRatings()).thenReturn({});
       when(() => mockStorage.getRating(any())).thenReturn(null);

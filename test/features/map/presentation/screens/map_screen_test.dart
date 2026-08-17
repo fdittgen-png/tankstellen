@@ -34,7 +34,7 @@ void main() {
       'visibility',
       (tester) async {
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
         await pumpApp(
           tester,
@@ -52,7 +52,7 @@ void main() {
       'TileLayer must never capture the IndexedStack zero-sized viewport',
       (tester) async {
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
         // Default branch is 0 (Search) — Carte sits offstage in the shell
         // IndexedStack, mounted with degenerate constraints.
@@ -79,7 +79,7 @@ void main() {
       'builds the FlutterMap subtree once Carte becomes the visible branch',
       (tester) async {
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
         await pumpApp(
           tester,
@@ -105,7 +105,7 @@ void main() {
       'exposes the refresh-prices action in the app bar',
       (tester) async {
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
         await pumpApp(
           tester,
@@ -121,7 +121,7 @@ void main() {
       'exposes the share action in the app bar (#1959)',
       (tester) async {
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
         await pumpApp(
           tester,
@@ -137,7 +137,7 @@ void main() {
       'a long-gap app resume while Carte is visible does not throw',
       (tester) async {
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
         await pumpApp(
           tester,
