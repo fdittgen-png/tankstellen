@@ -19,7 +19,7 @@ void main() {
         'shows empty state CTA when no radius alerts are configured',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getAlerts()).thenReturn([]);
 
       await pumpApp(
@@ -40,7 +40,7 @@ void main() {
     testWidgets('tapping empty-state CTA opens the create sheet',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getAlerts()).thenReturn([]);
 
       await pumpApp(

@@ -349,7 +349,7 @@ void main() {
     group('SearchScreen RTL', () {
       List<Object> overrides() {
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
         return [
           ...test.overrides,
           activeLanguageProvider
@@ -386,7 +386,7 @@ void main() {
     group('FavoritesScreen RTL', () {
       List<Object> overrides() {
         final test = standardTestOverrides(favoriteIds: []);
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
         // #2155 — the wide-layout path mounts AlertsTab immediately, so
         // stub the otherwise-unmocked getAlerts() call to avoid the
         // AsyncValue.error blowing the test.

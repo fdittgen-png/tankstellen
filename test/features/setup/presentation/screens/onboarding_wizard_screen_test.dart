@@ -58,7 +58,7 @@ void main() {
       ];
       when(() => std.mockStorage.isSetupComplete).thenReturn(false);
       when(() => std.mockStorage.isSetupSkipped).thenReturn(false);
-      when(() => std.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => std.mockStorage.hasApiKey(any())).thenReturn(false);
     });
 
     Future<void> pumpWizard(WidgetTester tester) async {
@@ -210,7 +210,7 @@ void main() {
       final std = standardTestOverrides(country: Countries.france);
       when(() => std.mockStorage.isSetupComplete).thenReturn(false);
       when(() => std.mockStorage.isSetupSkipped).thenReturn(false);
-      when(() => std.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => std.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await tester.pumpWidget(
         ProviderScope(
@@ -349,7 +349,7 @@ void main() {
       final std = standardTestOverrides();
       when(() => std.mockStorage.isSetupComplete).thenReturn(false);
       when(() => std.mockStorage.isSetupSkipped).thenReturn(false);
-      when(() => std.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => std.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await tester.pumpWidget(
         ProviderScope(

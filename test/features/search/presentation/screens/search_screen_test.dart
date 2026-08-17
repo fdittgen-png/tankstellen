@@ -41,7 +41,7 @@ void main() {
   group('SearchScreen (results-first layout)', () {
     testWidgets('renders Scaffold', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -57,7 +57,7 @@ void main() {
 
     testWidgets('renders the SearchSummaryBar at the top', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -75,7 +75,7 @@ void main() {
         (tester) async {
       // In the new results-first layout, these live on the criteria screen.
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -92,7 +92,7 @@ void main() {
 
     testWidgets('renders UserPositionBar', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -109,7 +109,7 @@ void main() {
     testWidgets('shows empty state message when no search performed',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -129,7 +129,7 @@ void main() {
     testWidgets('rebuild does not re-trigger auto-search side effects',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -150,7 +150,7 @@ void main() {
 
     testWidgets('AppBar exposes a Refresh action (#1313)', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -175,7 +175,7 @@ void main() {
         'changing the selected fuel re-triggers the search exactly once (#2401)',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       final spy = _SpySearchState();
 
       await pumpApp(
@@ -224,7 +224,7 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -261,7 +261,7 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -281,7 +281,7 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,

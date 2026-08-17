@@ -70,7 +70,7 @@ class ReportSubmitHandler {
       }
 
       final apiKeys = ref.read(apiKeyStorageProvider);
-      final apiKey = apiKeys.getApiKey();
+      final apiKey = apiKeys.getApiKey('de');
       final price = selectedType.needsPrice
           ? double.tryParse(priceController.text.replaceAll(',', '.'))
           : null;

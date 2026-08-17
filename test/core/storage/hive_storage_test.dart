@@ -629,19 +629,19 @@ void main() {
     test(
         '#713: getApiKey returns null when no user key is set — the app '
         'ships with no bundled Tankerkönig key (TOS compliance)', () {
-      final key = storage.getApiKey();
+      final key = storage.getApiKey('de');
       expect(key, isNull,
           reason: 'Tankerkönig TOS forbid publishing any API key, '
               'including demo keys, in public source repositories.');
     });
 
     test('#713: hasApiKey is false until the user configures one', () {
-      expect(storage.hasApiKey(), isFalse);
+      expect(storage.hasApiKey('de'), isFalse);
     });
 
     test('#713: hasCustomApiKey mirrors hasApiKey — any configured key is '
         "the user's", () {
-      expect(storage.hasCustomApiKey(), isFalse);
+      expect(storage.hasCustomApiKey('de'), isFalse);
     });
 
     test('hasEvApiKey returns true (default key always available)', () {

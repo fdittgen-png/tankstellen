@@ -24,12 +24,12 @@ import 'package:tankstellen/core/domain/fuel_type.dart';
 /// doesn't gate them.
 class _NoKeyStorage implements StorageRepository {
   @override
-  bool hasApiKey() => false;
+  bool hasApiKey(String countryCode) => false;
 
   // #3190 — the GB registry case now reads the packed Fuel Finder
   // credentials from the same slot; keyless here = legacy GB behaviour.
   @override
-  String? getApiKey() => null;
+  String? getApiKey(String countryCode) => null;
 
   @override
   dynamic noSuchMethod(Invocation invocation) =>

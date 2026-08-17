@@ -104,7 +104,7 @@ void main() {
     group('SearchScreen', () {
       List<Object> overrides() {
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
         return [
           ...test.overrides,
           activeLanguageProvider.overrideWith(
@@ -148,7 +148,7 @@ void main() {
     group('FavoritesScreen', () {
       List<Object> overrides() {
         final test = standardTestOverrides(favoriteIds: []);
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
         return [
           ...test.overrides,
           favoriteStationsProvider
@@ -181,7 +181,7 @@ void main() {
     group('ProfileScreen', () {
       List<Object> overrides() {
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
         when(() => test.mockStorage.getActiveProfileId()).thenReturn(null);
         when(() => test.mockStorage.getAllProfiles()).thenReturn([]);
         return test.overrides;
@@ -212,7 +212,7 @@ void main() {
     group('SetupScreen', () {
       List<Object> overrides() {
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
         return [
           ...test.overrides,
           activeLanguageProvider.overrideWith(
@@ -260,7 +260,7 @@ void main() {
     group('SyncSetupScreen', () {
       List<Object> overrides() {
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
         return test.overrides;
       }
 
@@ -289,7 +289,7 @@ void main() {
     group('CalculatorScreen', () {
       List<Object> overrides() {
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
         return test.overrides;
       }
 
@@ -318,7 +318,7 @@ void main() {
     group('ConsumptionScreen', () {
       List<Object> overrides() {
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
         return [
           ...test.overrides,
           fillUpListProvider.overrideWith(() => _FixedFillUpList(const [])),
@@ -350,8 +350,8 @@ void main() {
     group('PrivacyDashboardScreen', () {
       List<Object> overrides() {
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-        when(() => test.mockStorage.hasCustomApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+        when(() => test.mockStorage.hasCustomApiKey(any())).thenReturn(false);
         when(() => test.mockStorage.hasEvApiKey()).thenReturn(false);
         when(() => test.mockStorage.hasCustomEvApiKey()).thenReturn(false);
         when(() => test.mockStorage.favoriteCount).thenReturn(0);

@@ -89,7 +89,7 @@ void main() {
 
     test('Germany branch falls back to DemoStationService when no API key',
         () {
-      expect(builderSource, contains('hasApiKey()'));
+      expect(builderSource, contains("hasApiKey('de')"));
       expect(builderSource, contains("DemoStationService(countryCode: 'DE')"));
     });
 

@@ -61,7 +61,7 @@ void main() {
       'shows demo banner when country requires API key and no key configured',
       (tester) async {
         final storage = mockHiveStorageOverride();
-        when(() => storage.mock.hasApiKey()).thenReturn(false);
+        when(() => storage.mock.hasApiKey(any())).thenReturn(false);
 
         await pumpApp(
           tester,
@@ -143,7 +143,7 @@ void main() {
       'shows nothing when country requires API key and key is configured',
       (tester) async {
         final storage = mockHiveStorageOverride();
-        when(() => storage.mock.hasApiKey()).thenReturn(true);
+        when(() => storage.mock.hasApiKey(any())).thenReturn(true);
 
         await pumpApp(
           tester,
@@ -164,7 +164,7 @@ void main() {
       'shows Setup button in demo banner',
       (tester) async {
         final storage = mockHiveStorageOverride();
-        when(() => storage.mock.hasApiKey()).thenReturn(false);
+        when(() => storage.mock.hasApiKey(any())).thenReturn(false);
 
         await pumpApp(
           tester,
@@ -184,7 +184,7 @@ void main() {
       'demo banner copy is jargon-free — no "API key" wording (#1696)',
       (tester) async {
         final storage = mockHiveStorageOverride();
-        when(() => storage.mock.hasApiKey()).thenReturn(false);
+        when(() => storage.mock.hasApiKey(any())).thenReturn(false);
 
         await pumpApp(
           tester,

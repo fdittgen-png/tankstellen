@@ -23,7 +23,7 @@ void main() {
       tester,
     ) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -48,7 +48,7 @@ void main() {
       // offer FRANCE's evaluable fuels (E85 / GPLc included), not the German
       // e5/e10/diesel trio that the old `Countries.germany` default forced.
       final test = standardTestOverrides(country: Countries.france);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -74,7 +74,7 @@ void main() {
       tester,
     ) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -100,7 +100,7 @@ void main() {
       tester,
     ) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       final fake = _CapturingRadiusAlerts();
 
@@ -162,7 +162,7 @@ void main() {
       tester,
     ) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       final fake = _CapturingRadiusAlerts();
 
@@ -187,7 +187,7 @@ void main() {
       'Pick-on-map returns a LatLng and enables Save (#578 phase 3)',
       (tester) async {
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
         final fake = _CapturingRadiusAlerts();
 
@@ -267,7 +267,7 @@ void main() {
       tester,
     ) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       final fake = _CapturingRadiusAlerts();
 
@@ -304,7 +304,7 @@ void main() {
     testWidgets('frequency dropdown writes selected value into the saved alert '
         '(#1012 phase 1)', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       final fake = _CapturingRadiusAlerts();
 
@@ -361,7 +361,7 @@ void main() {
     testWidgets('frequency dropdown defaults to once-a-day when left untouched '
         '(#1012 phase 1)', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       final fake = _CapturingRadiusAlerts();
 
@@ -400,7 +400,7 @@ void main() {
       tester,
     ) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       final fake = _CapturingRadiusAlerts();
 

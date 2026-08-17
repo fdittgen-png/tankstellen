@@ -7,15 +7,15 @@ import '../storage/storage_providers.dart';
 
 part 'app_state_provider.g.dart';
 
-/// Whether the Tankerkoenig API key is configured.
+/// Whether the Tankerkoenig (DE) API key is configured.
 ///
-/// Since #521 this is always true — the app ships a community
-/// default. Use [hasCustomApiKey] to tell whether the user set their
-/// own key.
+/// #3746 — API keys are per-country now; this app-level provider keeps
+/// its historical meaning (the DE Tankerkönig key that gates setup /
+/// demo mode) by reading the 'de' slot explicitly.
 @riverpod
 bool hasApiKey(Ref ref) {
   final storage = ref.watch(storageRepositoryProvider);
-  return storage.hasApiKey();
+  return storage.hasApiKey('de');
 }
 
 /// Whether the user has set their **own** Tankerkoenig key, distinct
@@ -23,7 +23,7 @@ bool hasApiKey(Ref ref) {
 @riverpod
 bool hasCustomApiKey(Ref ref) {
   final storage = ref.watch(storageRepositoryProvider);
-  return storage.hasCustomApiKey();
+  return storage.hasCustomApiKey('de');
 }
 
 /// Whether a custom EV API key is configured.
@@ -44,7 +44,7 @@ bool isSetupComplete(Ref ref) {
 @riverpod
 bool isDemoMode(Ref ref) {
   final storage = ref.watch(storageRepositoryProvider);
-  return storage.isSetupSkipped && !storage.hasApiKey();
+  return storage.isSetupSkipped && !storage.hasApiKey('de');
 }
 
 /// Whether location consent has been given.
@@ -223,7 +223,7 @@ StorageStats storageStats(Ref ref) {
     priceHistoryCount: storage.priceHistoryEntryCount,
     profileCount: storage.profileCount,
     hasGpsPosition: storage.getSetting('user_position_lat') != null,
-    hasApiKey: storage.hasApiKey(),
+    hasApiKey: storage.hasApiKey('de'),
     hasCustomEvKey: storage.hasCustomEvApiKey(),
   );
 }

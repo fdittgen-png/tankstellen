@@ -22,7 +22,7 @@ void main() {
       final storage = mockHiveStorageOverride();
       when(() => storage.mock.getActiveProfileId()).thenReturn(null);
       when(() => storage.mock.getSetting(any())).thenReturn(null);
-      when(() => storage.mock.hasApiKey()).thenReturn(false);
+      when(() => storage.mock.hasApiKey(any())).thenReturn(false);
       when(() => storage.mock.hasCustomEvApiKey()).thenReturn(false);
 
       await pumpApp(
@@ -42,7 +42,7 @@ void main() {
       final storage = mockHiveStorageOverride();
       when(() => storage.mock.getActiveProfileId()).thenReturn(null);
       when(() => storage.mock.getSetting(any())).thenReturn(null);
-      when(() => storage.mock.hasApiKey()).thenReturn(true);
+      when(() => storage.mock.hasApiKey(any())).thenReturn(true);
       when(() => storage.mock.hasCustomEvApiKey()).thenReturn(false);
 
       await pumpApp(
@@ -61,7 +61,7 @@ void main() {
       final storage = mockHiveStorageOverride();
       when(() => storage.mock.getActiveProfileId()).thenReturn(null);
       when(() => storage.mock.getSetting(any())).thenReturn(null);
-      when(() => storage.mock.hasApiKey()).thenReturn(false);
+      when(() => storage.mock.hasApiKey(any())).thenReturn(false);
       when(() => storage.mock.hasCustomEvApiKey()).thenReturn(false);
 
       await pumpApp(
@@ -82,7 +82,7 @@ void main() {
       final storage = mockHiveStorageOverride();
       when(() => storage.mock.getActiveProfileId()).thenReturn(null);
       when(() => storage.mock.getSetting(any())).thenReturn(null);
-      when(() => storage.mock.hasApiKey()).thenReturn(true);
+      when(() => storage.mock.hasApiKey(any())).thenReturn(true);
       when(() => storage.mock.hasCustomEvApiKey()).thenReturn(false);
 
       await pumpApp(
@@ -102,7 +102,7 @@ void main() {
       final storage = mockHiveStorageOverride();
       when(() => storage.mock.getActiveProfileId()).thenReturn(null);
       when(() => storage.mock.getSetting(any())).thenReturn(null);
-      when(() => storage.mock.hasApiKey()).thenReturn(true);
+      when(() => storage.mock.hasApiKey(any())).thenReturn(true);
       when(() => storage.mock.hasCustomEvApiKey()).thenReturn(true);
 
       await pumpApp(
@@ -122,7 +122,7 @@ void main() {
       final storage = mockHiveStorageOverride();
       when(() => storage.mock.getActiveProfileId()).thenReturn(null);
       when(() => storage.mock.getSetting(any())).thenReturn(null);
-      when(() => storage.mock.hasApiKey()).thenReturn(false);
+      when(() => storage.mock.hasApiKey(any())).thenReturn(false);
       when(() => storage.mock.hasCustomEvApiKey()).thenReturn(false);
 
       await pumpApp(
@@ -143,7 +143,7 @@ void main() {
       final storage = mockHiveStorageOverride();
       when(() => storage.mock.getActiveProfileId()).thenReturn(null);
       when(() => storage.mock.getSetting(any())).thenReturn(null);
-      when(() => storage.mock.hasApiKey()).thenReturn(false);
+      when(() => storage.mock.hasApiKey(any())).thenReturn(false);
       when(() => storage.mock.hasCustomEvApiKey()).thenReturn(false);
 
       await pumpApp(
@@ -164,7 +164,7 @@ void main() {
       final storage = mockHiveStorageOverride();
       when(() => storage.mock.getActiveProfileId()).thenReturn(null);
       when(() => storage.mock.getSetting(any())).thenReturn(null);
-      when(() => storage.mock.hasApiKey()).thenReturn(true);
+      when(() => storage.mock.hasApiKey(any())).thenReturn(true);
       when(() => storage.mock.hasCustomEvApiKey()).thenReturn(false);
 
       await pumpApp(
@@ -187,7 +187,7 @@ void main() {
       final storage = mockHiveStorageOverride();
       when(() => storage.mock.getActiveProfileId()).thenReturn(null);
       when(() => storage.mock.getSetting(any())).thenReturn(null);
-      when(() => storage.mock.hasApiKey()).thenReturn(false);
+      when(() => storage.mock.hasApiKey(any())).thenReturn(false);
       when(() => storage.mock.hasCustomEvApiKey()).thenReturn(false);
 
       await pumpApp(
@@ -209,7 +209,7 @@ void main() {
       final storage = mockHiveStorageOverride();
       when(() => storage.mock.getActiveProfileId()).thenReturn(null);
       when(() => storage.mock.getSetting(any())).thenReturn(null);
-      when(() => storage.mock.hasApiKey()).thenReturn(false);
+      when(() => storage.mock.hasApiKey(any())).thenReturn(false);
       when(() => storage.mock.hasCustomEvApiKey()).thenReturn(false);
 
       await pumpApp(

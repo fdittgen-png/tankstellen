@@ -106,9 +106,9 @@ void main() {
       when(() => mockStorage.getItineraries()).thenReturn([
         {'id': 'r1'},
       ]);
-      when(() => mockStorage.hasApiKey()).thenReturn(true);
-      when(() => mockStorage.hasCustomApiKey()).thenReturn(true);
-      when(() => mockStorage.getApiKey()).thenReturn('key');
+      when(() => mockStorage.hasApiKey(any())).thenReturn(true);
+      when(() => mockStorage.hasCustomApiKey(any())).thenReturn(true);
+      when(() => mockStorage.getApiKey(any())).thenReturn('key');
       when(() => mockStorage.hasEvApiKey()).thenReturn(false);
       when(() => mockStorage.hasCustomEvApiKey()).thenReturn(false);
       when(() => mockStorage.storageStats).thenReturn((

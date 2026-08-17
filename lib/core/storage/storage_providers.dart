@@ -81,7 +81,9 @@ class StorageManagement {
 
   Future<void> clearCache() => _storage.clearCache();
   Future<void> clearPriceHistory() => _storage.clearPriceHistory();
-  Future<void> deleteApiKey() => _storage.deleteApiKey();
+  /// #3746 — the storage-settings / privacy wipe deletes EVERY per-country
+  /// key (plus the legacy slot), not just one country's.
+  Future<void> deleteApiKey() => _storage.deleteAllApiKeys();
 
   Future<void> savePriceRecords(String stationId, List<Map<String, dynamic>> records) =>
       _storage.savePriceRecords(stationId, records);

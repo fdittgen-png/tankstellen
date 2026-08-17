@@ -64,7 +64,7 @@ PrivacyDataSnapshot privacyData(Ref ref) {
     profileCount: storage.profileCount,
     cacheEntryCount: storage.cacheEntryCount,
     itineraryCount: storage.getItineraries().length,
-    hasApiKey: storage.hasApiKey(),
+    hasApiKey: storage.hasApiKey('de'),
     hasEvApiKey: storage.hasEvApiKey(),
     syncEnabled: syncConfig.enabled,
     syncMode: syncConfig.enabled ? syncConfig.modeName : null,

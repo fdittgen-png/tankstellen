@@ -27,7 +27,7 @@ class ConfigVerificationWidget extends ConsumerWidget {
     // #521 — hasApiKey is always true now (community default always
     // available). We render one of two states based on hasCustomApiKey
     // instead: user-configured key vs shipped default.
-    final hasCustomApiKey = apiKeys.hasCustomApiKey();
+    final hasCustomApiKey = apiKeys.hasCustomApiKey('de');
     final isEmail = syncConfig.hasEmail;
 
     return Card(

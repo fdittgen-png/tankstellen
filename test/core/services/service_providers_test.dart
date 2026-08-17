@@ -60,7 +60,7 @@ void main() {
 
     test('returns StationServiceChain when DE and API key present',
         () async {
-      await fakeStorage.setApiKey('test-key');
+      await fakeStorage.setApiKey('de', 'test-key');
 
       final container = createContainer(country: Countries.germany);
       final service = container.read(stationServiceProvider);

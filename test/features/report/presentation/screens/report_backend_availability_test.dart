@@ -192,8 +192,8 @@ void main() {
     testWidgets('DE + Tankerkoenig key set → canSubmitTankerkoenig = true',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(true);
-      when(() => test.mockStorage.getApiKey())
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(true);
+      when(() => test.mockStorage.getApiKey(any()))
           .thenReturn('11111111-2222-3333-4444-555555555555');
 
       final ref = await _pumpAndCaptureRef(tester, overrides: test.overrides);
@@ -211,8 +211,8 @@ void main() {
     testWidgets('DE + no Tankerkoenig key → canSubmitTankerkoenig = false',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-      when(() => test.mockStorage.getApiKey()).thenReturn(null);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+      when(() => test.mockStorage.getApiKey(any())).thenReturn(null);
 
       final ref = await _pumpAndCaptureRef(tester, overrides: test.overrides);
       final a = ReportBackendAvailability.watch(ref);
@@ -233,8 +233,8 @@ void main() {
       // The factory specifically guards on `apiKey.isNotEmpty`; an empty
       // string must be treated the same as null.
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(true);
-      when(() => test.mockStorage.getApiKey()).thenReturn('');
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(true);
+      when(() => test.mockStorage.getApiKey(any())).thenReturn('');
 
       final ref = await _pumpAndCaptureRef(tester, overrides: test.overrides);
       final a = ReportBackendAvailability.watch(ref);
@@ -249,8 +249,8 @@ void main() {
         (tester) async {
       final test = standardTestOverrides(country: Countries.france);
       // Even if a key is present, FR is not the Tankerkoenig country.
-      when(() => test.mockStorage.hasApiKey()).thenReturn(true);
-      when(() => test.mockStorage.getApiKey())
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(true);
+      when(() => test.mockStorage.getApiKey(any()))
           .thenReturn('11111111-2222-3333-4444-555555555555');
 
       final ref = await _pumpAndCaptureRef(tester, overrides: test.overrides);
@@ -274,8 +274,8 @@ void main() {
         'DE — visibleTypes mirrors ReportType.visibleForCountry("DE")',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-      when(() => test.mockStorage.getApiKey()).thenReturn(null);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+      when(() => test.mockStorage.getApiKey(any())).thenReturn(null);
 
       final ref = await _pumpAndCaptureRef(tester, overrides: test.overrides);
       final a = ReportBackendAvailability.watch(ref);
@@ -290,8 +290,8 @@ void main() {
         'GB — visibleTypes mirrors ReportType.visibleForCountry("GB")',
         (tester) async {
       final test = standardTestOverrides(country: Countries.unitedKingdom);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-      when(() => test.mockStorage.getApiKey()).thenReturn(null);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+      when(() => test.mockStorage.getApiKey(any())).thenReturn(null);
 
       final ref = await _pumpAndCaptureRef(tester, overrides: test.overrides);
       final a = ReportBackendAvailability.watch(ref);

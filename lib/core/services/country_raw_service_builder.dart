@@ -84,7 +84,7 @@ StationService buildRawCountryService(
 ) {
   switch (countryCode) {
     case 'DE':
-      if (!deps.storage.hasApiKey()) {
+      if (!deps.storage.hasApiKey('de')) {
         return DemoStationService(countryCode: 'DE');
       }
       final dio = deps.tankerkoenigDio;
@@ -119,13 +119,13 @@ StationService buildRawCountryService(
     case 'GB':
       // #3190 — statutory Fuel Finder API as PRIMARY once OAuth2 credentials
       // are configured (Settings → API key, packed "client_id:client_secret"
-      // — the same single per-country key slot DE/KR/CL read), legacy
+      // — GB's own per-country key slot since #3746), legacy
       // retailer fan-out demoted to the in-service fallback; keyless
       // installs keep the legacy / #2277 flag-gated behaviour unchanged.
       // Composition lives feature-side in buildGbStationService (#3132
       // boundary ratchet: one core→feature import instead of five).
       return buildGbStationService(
-        apiKey: deps.storage.getApiKey(),
+        apiKey: deps.storage.getApiKey('gb'),
         cache: deps.cache,
       );
     case 'AU':
@@ -137,13 +137,13 @@ StationService buildRawCountryService(
     case 'SI':
       return SloveniaStationService();
     case 'KR':
-      final apiKey = deps.storage.getApiKey();
+      final apiKey = deps.storage.getApiKey('kr');
       if (apiKey == null || apiKey.isEmpty) {
         return DemoStationService(countryCode: 'KR');
       }
       return SouthKoreaStationService(apiKey: apiKey);
     case 'CL':
-      final apiKey = deps.storage.getApiKey();
+      final apiKey = deps.storage.getApiKey('cl');
       if (apiKey == null || apiKey.isEmpty) {
         return DemoStationService(countryCode: 'CL');
       }

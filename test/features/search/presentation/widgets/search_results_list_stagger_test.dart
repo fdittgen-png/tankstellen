@@ -56,8 +56,8 @@ void main() {
   group('SearchResultsList stagger (#595)', () {
     testWidgets('each card is wrapped in a StaggeredFadeIn', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-      when(() => test.mockStorage.getApiKey()).thenReturn(null);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+      when(() => test.mockStorage.getApiKey(any())).thenReturn(null);
       when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
       when(() => test.mockStorage.getRatings()).thenReturn(<String, int>{});
 
@@ -103,8 +103,8 @@ void main() {
     testWidgets('no bottom data-source attribution footer in the list',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-      when(() => test.mockStorage.getApiKey()).thenReturn(null);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+      when(() => test.mockStorage.getApiKey(any())).thenReturn(null);
       when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
       when(() => test.mockStorage.getRatings()).thenReturn(<String, int>{});
 

@@ -50,7 +50,8 @@ class FakeHiveStorage implements HiveStorage {
   bool _isSetupComplete = false;
   bool _isSetupSkipped = false;
 
-  String? _apiKey;
+  // #3746 — per-country API keys, keyed by lowercase country code.
+  final Map<String, String> _apiKeys = <String, String>{};
   String? _evApiKey;
   String? _supabaseAnonKey;
 
@@ -99,23 +100,30 @@ class FakeHiveStorage implements HiveStorage {
   // ---------------------------------------------------------------------------
 
   @override
-  String? getApiKey() => _apiKey;
+  String? getApiKey(String countryCode) => _apiKeys[countryCode.toLowerCase()];
 
   @override
-  Future<void> setApiKey(String key) async {
-    _apiKey = key;
+  Future<void> setApiKey(String countryCode, String key) async {
+    _apiKeys[countryCode.toLowerCase()] = key;
   }
 
   @override
-  Future<void> deleteApiKey() async {
-    _apiKey = null;
+  Future<void> deleteApiKey(String countryCode) async {
+    _apiKeys.remove(countryCode.toLowerCase());
   }
 
   @override
-  bool hasApiKey() => _apiKey != null || hasBundledDefaultKey;
+  Future<void> deleteAllApiKeys() async {
+    _apiKeys.clear();
+  }
 
   @override
-  bool hasCustomApiKey() => _apiKey != null;
+  bool hasApiKey(String countryCode) =>
+      _apiKeys.containsKey(countryCode.toLowerCase()) || hasBundledDefaultKey;
+
+  @override
+  bool hasCustomApiKey(String countryCode) =>
+      _apiKeys.containsKey(countryCode.toLowerCase());
 
   @override
   String? getEvApiKey() => _evApiKey;

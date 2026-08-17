@@ -26,7 +26,7 @@ void main() {
 
   group('hasApiKeyProvider', () {
     test('returns true when API key exists', () async {
-      await fakeStorage.setApiKey('user-key');
+      await fakeStorage.setApiKey('de', 'user-key');
       final c = createContainer();
       expect(c.read(hasApiKeyProvider), isTrue);
     });
@@ -46,7 +46,7 @@ void main() {
 
     test('returns false when API key exists', () async {
       await fakeStorage.skipSetup();
-      await fakeStorage.setApiKey('user-key');
+      await fakeStorage.setApiKey('de', 'user-key');
       final c = createContainer();
       expect(c.read(isDemoModeProvider), isFalse);
     });
@@ -73,7 +73,7 @@ void main() {
         {'a': 5},
       ]);
       await fakeStorage.saveProfile('p1', {});
-      await fakeStorage.setApiKey('user-key');
+      await fakeStorage.setApiKey('de', 'user-key');
       await fakeStorage.putSetting('user_position_lat', 48.0);
 
       final c = createContainer();

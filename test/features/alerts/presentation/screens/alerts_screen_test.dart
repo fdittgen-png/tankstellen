@@ -21,7 +21,7 @@ void main() {
   group('AlertsScreen', () {
     testWidgets('renders Scaffold with app bar', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getAlerts()).thenReturn([]);
 
       await pumpApp(
@@ -39,7 +39,7 @@ void main() {
 
     testWidgets('shows empty state when no alerts exist', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getAlerts()).thenReturn([]);
 
       await pumpApp(
@@ -60,7 +60,7 @@ void main() {
 
     testWidgets('shows alert list when alerts exist', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getAlerts()).thenReturn([]);
 
       final alert = PriceAlert(
@@ -92,7 +92,7 @@ void main() {
     testWidgets('renders ServiceChainErrorWidget when provider throws',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getAlerts()).thenReturn([]);
 
       await pumpApp(
@@ -119,7 +119,7 @@ void main() {
         'renders ServiceChainErrorWidget on arbitrary alert load exception',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getAlerts()).thenReturn([]);
 
       await pumpApp(
@@ -159,7 +159,7 @@ void main() {
     testWidgets('tapping the Station "+" opens the station picker, not a '
         'snackbar', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getAlerts()).thenReturn([]);
       when(() => test.mockStorage.getFavoriteIds()).thenReturn(['fav-1']);
       when(() => test.mockStorage.getFavoriteStationData('fav-1'))
@@ -190,7 +190,7 @@ void main() {
 
     testWidgets('selecting a station opens CreateAlertDialog', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getAlerts()).thenReturn([]);
       when(() => test.mockStorage.getFavoriteIds()).thenReturn(['fav-1']);
       when(() => test.mockStorage.getFavoriteStationData('fav-1'))
@@ -216,7 +216,7 @@ void main() {
     testWidgets('with no favorites the picker offers a Search fallback, not a '
         'dead-end', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getAlerts()).thenReturn([]);
       when(() => test.mockStorage.getFavoriteIds()).thenReturn(<String>[]);
 
@@ -245,7 +245,7 @@ void main() {
     testWidgets('loading shows the shared skeleton, not a bare spinner',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getAlerts()).thenReturn([]);
 
       await pumpApp(
@@ -266,7 +266,7 @@ void main() {
 
     testWidgets('the alerts list is pull-to-refreshable', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getAlerts()).thenReturn([]);
 
       await pumpApp(

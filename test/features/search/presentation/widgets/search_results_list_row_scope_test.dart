@@ -44,8 +44,8 @@ const _stationB = Station(
 
 Future<void> _pumpList(WidgetTester tester) async {
   final test = standardTestOverrides();
-  when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-  when(() => test.mockStorage.getApiKey()).thenReturn(null);
+  when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+  when(() => test.mockStorage.getApiKey(any())).thenReturn(null);
   when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
   when(() => test.mockStorage.getRatings()).thenReturn(<String, int>{});
 

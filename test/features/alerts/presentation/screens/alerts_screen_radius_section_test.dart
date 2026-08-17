@@ -20,7 +20,7 @@ void main() {
     testWidgets('renders section header with count and add button',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getAlerts()).thenReturn([]);
 
       final fake = _FakeRadiusAlerts([
@@ -47,7 +47,7 @@ void main() {
     testWidgets('toggle switch calls RadiusAlerts.toggle(id)',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getAlerts()).thenReturn([]);
 
       final fake = _FakeRadiusAlerts([
@@ -77,7 +77,7 @@ void main() {
     testWidgets('swipe-dismiss calls RadiusAlerts.remove(id)',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getAlerts()).thenReturn([]);
 
       final fake = _FakeRadiusAlerts([
@@ -109,7 +109,7 @@ void main() {
     testWidgets('swipe-dismiss shows a past-tense undo snackbar (not the '
         'interrogative confirm)', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getAlerts()).thenReturn([]);
 
       final fake = _FakeRadiusAlerts([
@@ -140,7 +140,7 @@ void main() {
     testWidgets('tapping Undo re-inserts the deleted alert via add()',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getAlerts()).thenReturn([]);
 
       final fake = _FakeRadiusAlerts([

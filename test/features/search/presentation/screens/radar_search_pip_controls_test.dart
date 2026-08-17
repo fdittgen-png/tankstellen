@@ -82,7 +82,7 @@ void main() {
     addTearDown(pip.dispose);
 
     final test = standardTestOverrides();
-    when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+    when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
     when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
     when(() => test.mockStorage.getRatings()).thenReturn(const <String, int>{});
 
@@ -132,7 +132,7 @@ void main() {
         .setMockMethodCallHandler(SystemChannels.platform, null));
 
     final test = standardTestOverrides();
-    when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+    when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
     when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
     when(() => test.mockStorage.getRatings()).thenReturn(const <String, int>{});
 
@@ -167,7 +167,7 @@ void main() {
     debugDefaultTargetPlatformOverride = TargetPlatform.android;
 
     final test = standardTestOverrides();
-    when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+    when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
     await pumpApp(
       tester,

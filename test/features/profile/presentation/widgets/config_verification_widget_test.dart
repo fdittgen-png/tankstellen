@@ -68,7 +68,7 @@ List<Object> _buildOverrides({
   // PLUS the actual key — `hasApiKey` here controls only the custom-key flag.
   final fake = FakeStorageRepository();
   if (hasApiKey) {
-    unawaited(fake.setApiKey('custom-key'));
+    unawaited(fake.setApiKey('de', 'custom-key'));
   }
   // The widget reads the bundled-default fingerprint when no custom key is
   // configured; mirror the legacy mock value so any UI that surfaces the

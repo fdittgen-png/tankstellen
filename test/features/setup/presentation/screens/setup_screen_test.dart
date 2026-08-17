@@ -23,7 +23,7 @@ void main() {
   group('SetupScreen', () {
     List<Object> setupOverrides() {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       return [
         ...test.overrides,
         activeLanguageProvider

@@ -97,8 +97,8 @@ void main() {
       tester,
     ) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-      when(() => test.mockStorage.getApiKey()).thenReturn(null);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+      when(() => test.mockStorage.getApiKey(any())).thenReturn(null);
 
       final priceCtrl = TextEditingController();
       final textCtrl = TextEditingController();
@@ -132,8 +132,8 @@ void main() {
       tester,
     ) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-      when(() => test.mockStorage.getApiKey()).thenReturn(null);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+      when(() => test.mockStorage.getApiKey(any())).thenReturn(null);
 
       final priceCtrl = TextEditingController(); // empty!
       final textCtrl = TextEditingController();
@@ -167,8 +167,8 @@ void main() {
     testWidgets('needsText + empty/whitespace text → shows enter-correction',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-      when(() => test.mockStorage.getApiKey()).thenReturn(null);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+      when(() => test.mockStorage.getApiKey(any())).thenReturn(null);
 
       final priceCtrl = TextEditingController();
       final textCtrl = TextEditingController(text: '   '); // whitespace only
@@ -212,8 +212,8 @@ void main() {
         );
 
         final test = standardTestOverrides(country: Countries.france);
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-        when(() => test.mockStorage.getApiKey()).thenReturn(null);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+        when(() => test.mockStorage.getApiKey(any())).thenReturn(null);
 
         final priceCtrl = TextEditingController();
         final textCtrl = TextEditingController(
@@ -278,8 +278,8 @@ void main() {
         // DE + a Tankerkoenig key — the routesToGitHub short-circuit
         // must still fire BEFORE either backend is consulted.
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(true);
-        when(() => test.mockStorage.getApiKey())
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(true);
+        when(() => test.mockStorage.getApiKey(any()))
             .thenReturn('11111111-2222-3333-4444-555555555555');
 
         final priceCtrl = TextEditingController();
@@ -323,8 +323,8 @@ void main() {
         );
 
         final test = standardTestOverrides(country: Countries.france);
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-        when(() => test.mockStorage.getApiKey()).thenReturn(null);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+        when(() => test.mockStorage.getApiKey(any())).thenReturn(null);
 
         final priceCtrl = TextEditingController();
         final textCtrl = TextEditingController(text: 'Some other address');
@@ -382,8 +382,8 @@ void main() {
         // the routesToGitHub check (false for wrongE5), and lands on
         // the no-backend banner branch.
         final test = standardTestOverrides(country: Countries.france);
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-        when(() => test.mockStorage.getApiKey()).thenReturn(null);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+        when(() => test.mockStorage.getApiKey(any())).thenReturn(null);
 
         final priceCtrl = TextEditingController(text: '1.459');
         final textCtrl = TextEditingController();
