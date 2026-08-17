@@ -27,6 +27,13 @@ export 'data/ocr/pump_ocr_config.dart';
 export 'data/pip_controller.dart';
 export 'data/receipt_scan_service.dart';
 export 'data/trip_history_repository.dart';
+// #3739 — the ONE canonical TripSummary/TripSample codec. The obd2
+// feature's WAL (active) + paused trip repositories delegate to these
+// functions through this barrel (the boundary test's sanctioned seam)
+// instead of maintaining the drifted private copies that were silently
+// dropping 13-16 summary keys on crash/pause rehydrate.
+export 'data/trip_sample_codec.dart';
+export 'data/trip_summary_codec.dart';
 export 'domain/direct_fuel_rate_detector.dart';
 export 'domain/driving_coaching.dart';
 export 'domain/entities/fill_up.dart';

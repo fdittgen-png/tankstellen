@@ -38,7 +38,7 @@ void main() {
     testWidgets('renders the shimmer pane while AsyncLoading (#3615)',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       // Bypass pumpAndSettle — the spinner animates forever.
       await tester.pumpWidget(
@@ -74,7 +74,7 @@ void main() {
     testWidgets('renders "Map unavailable" text when AsyncError',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -96,7 +96,7 @@ void main() {
         'renders EmptyState with the map icon and "search to see stations" '
         'title when the result list is empty', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -126,7 +126,7 @@ void main() {
     testWidgets('mounts StationMapLayers when the result has fuel stations',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -148,7 +148,7 @@ void main() {
     testWidgets('forwards searchRadiusKm from searchRadiusProvider to '
         'StationMapLayers', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -170,7 +170,7 @@ void main() {
     testWidgets('forwards selectedFuel from selectedFuelTypeProvider to '
         'StationMapLayers', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -194,7 +194,7 @@ void main() {
         'list (FuelStationResult.station, not the SearchResultItem itself)',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,

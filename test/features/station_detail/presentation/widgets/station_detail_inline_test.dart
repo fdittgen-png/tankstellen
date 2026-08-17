@@ -1,6 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+// The mocktail Mock* storage doubles are deprecated as a steering hint
+// (prefer the stateful fakes) but remain sanctioned for widget tests that
+// stub reads exclusively -- see test/helpers/mock_providers.dart (#3742).
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';

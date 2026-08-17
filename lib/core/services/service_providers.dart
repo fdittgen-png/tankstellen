@@ -140,7 +140,7 @@ class _ApiKeyInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     final storage = _ref.read(storageRepositoryProvider);
-    final apiKey = storage.getApiKey();
+    final apiKey = storage.getApiKey('de');
     if (apiKey != null && apiKey.isNotEmpty) {
       options.queryParameters['apikey'] = apiKey;
     }

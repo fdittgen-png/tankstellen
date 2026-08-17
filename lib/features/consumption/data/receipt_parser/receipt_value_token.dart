@@ -50,9 +50,6 @@ class ReceiptCurrencyRange {
 const double kReceiptVolumeMin = 0.5;
 const double kReceiptVolumeMax = 200.0;
 
-bool receiptVolumeInRange(double v) =>
-    v >= kReceiptVolumeMin && v <= kReceiptVolumeMax;
-
 /// The EUR default — used when neither a locale profile nor a printed
 /// symbol identifies the currency (historical behaviour).
 const ReceiptCurrencyRange kEuroRange = ReceiptCurrencyRange(

@@ -1,6 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+// The mocktail Mock* storage doubles are deprecated as a steering hint
+// (prefer the stateful fakes) but remain sanctioned for widget tests that
+// stub reads exclusively -- see test/helpers/mock_providers.dart (#3742).
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/country/country_config.dart';
@@ -31,7 +36,6 @@ import '../mocks/mocks.dart';
   'does not track state changes; see test/fakes/fake_storage_repository.dart.',
 )
 ({Object override, MockStorageRepository mock}) mockStorageRepositoryOverride() {
-  // ignore: deprecated_member_use_from_same_package
   final mock = MockStorageRepository();
   // Default stubs to avoid null returns from Mock
   when(() => mock.getFavoriteIds()).thenReturn([]);
@@ -54,7 +58,6 @@ import '../mocks/mocks.dart';
   'test/fakes/fake_hive_storage.dart.',
 )
 ({Object override, MockHiveStorage mock}) mockHiveStorageOverride() {
-  // ignore: deprecated_member_use_from_same_package
   final mock = MockHiveStorage();
   return (
     override: hiveStorageProvider.overrideWithValue(mock),

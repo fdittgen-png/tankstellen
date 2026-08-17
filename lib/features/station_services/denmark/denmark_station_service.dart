@@ -14,6 +14,7 @@ import '../../../core/services/persistent_dataset.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/services/country_service_dependencies.dart';
 
 /// Danish fuel prices aggregated from 3 free public APIs:
 /// - OK (ok.dk) — ~350 stations
@@ -345,3 +346,9 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
     return emptyPricesResult(ServiceSource.denmarkApi);
   }
 }
+
+/// Builds the DK raw [StationService] — the `CountryServiceEntry.buildService`
+/// factory (#3746). Takes [CountryServiceDependencies], never a Riverpod `Ref`,
+/// so the identical wiring runs in the background isolate (#2861).
+StationService buildDkStationService(CountryServiceDependencies deps) =>
+    DenmarkStationService(cache: deps.cache);

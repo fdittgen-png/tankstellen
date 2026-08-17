@@ -86,7 +86,7 @@ void main() {
       // key. The fix made the getter depend solely on the setupSkipped
       // flag. The test proves the new contract: the API key situation
       // is irrelevant to setup completion.
-      expect(storage.hasApiKey(), isFalse);
+      expect(storage.hasApiKey('de'), isFalse);
       expect(storage.isSetupComplete, isFalse);
     });
   });

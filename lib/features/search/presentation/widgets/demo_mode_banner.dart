@@ -43,7 +43,7 @@ class DemoModeBanner extends ConsumerWidget {
       return _MultiSourceHeader(countryCodes: corridorCountryCodes);
     }
 
-    if (country.requiresApiKey && !storage.hasApiKey()) {
+    if (country.requiresApiKey && !storage.hasApiKey(country.code)) {
       // #1696 — jargon-free copy: the banner names neither "API key"
       // nor any technical term; the user just learns prices are sample
       // data and that Settings is where live prices are turned on.

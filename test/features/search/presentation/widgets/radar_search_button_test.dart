@@ -108,7 +108,7 @@ void main() {
         'renders as a FloatingActionButton.extended (the "Start recording" '
         'pill style), idle label, with a leading radar icon', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -127,7 +127,7 @@ void main() {
         'radar stations as fuel cards — searchStateProvider untouched',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
       when(() => test.mockStorage.getRatings())
           .thenReturn(const <String, int>{});
@@ -174,7 +174,7 @@ void main() {
         'while a run is initialising the pill shows a spinner + "Searching…" '
         'so the user sees the radar is working (#3290)', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       // `settle: false` — the spinner animates forever, so pumpAndSettle would
       // hang; a single frame is enough to assert the first paint.
@@ -213,7 +213,7 @@ void main() {
         'when the radar is active the pill flips to a stop treatment that '
         'dismisses it', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -249,7 +249,7 @@ void main() {
   testWidgets('the old header radar IconButton is gone from SearchResultsList',
       (tester) async {
     final test = standardTestOverrides();
-    when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+    when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
     when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
     when(() => test.mockStorage.getRatings()).thenReturn(const <String, int>{});
 
@@ -271,7 +271,7 @@ void main() {
   testWidgets('an active radar state renders its stations via the same list',
       (tester) async {
     final test = standardTestOverrides();
-    when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+    when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
     when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
     when(() => test.mockStorage.getRatings()).thenReturn(const <String, int>{});
 

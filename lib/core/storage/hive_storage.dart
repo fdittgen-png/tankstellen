@@ -88,15 +88,20 @@ class HiveStorage implements StorageRepository {
   // ApiKeyStorage
   // ---------------------------------------------------------------------------
   @override
-  String? getApiKey() => _settings.getApiKey();
+  String? getApiKey(String countryCode) => _settings.getApiKey(countryCode);
   @override
-  Future<void> setApiKey(String key) => _settings.setApiKey(key);
+  Future<void> setApiKey(String countryCode, String key) =>
+      _settings.setApiKey(countryCode, key);
   @override
-  Future<void> deleteApiKey() => _settings.deleteApiKey();
+  Future<void> deleteApiKey(String countryCode) =>
+      _settings.deleteApiKey(countryCode);
   @override
-  bool hasApiKey() => _settings.hasApiKey();
+  Future<void> deleteAllApiKeys() => _settings.deleteAllApiKeys();
   @override
-  bool hasCustomApiKey() => _settings.hasCustomApiKey();
+  bool hasApiKey(String countryCode) => _settings.hasApiKey(countryCode);
+  @override
+  bool hasCustomApiKey(String countryCode) =>
+      _settings.hasCustomApiKey(countryCode);
   @override
   String? getEvApiKey() => _settings.getEvApiKey();
   @override

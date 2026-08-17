@@ -91,20 +91,6 @@ enum SpeedBand {
   motorwayFast,
 }
 
-/// Lower edge (inclusive) of each speed band, in km/h. The
-/// declaration order matches [SpeedBand]; `idleJam` starts at 0 by
-/// convention and the next band's lower edge is the previous band's
-/// exclusive upper edge.
-const Map<SpeedBand, double> _speedBandLowerKmh = <SpeedBand, double>{
-  SpeedBand.idleJam: 0.0,
-  SpeedBand.urban: 10.0,
-  SpeedBand.suburban: 50.0,
-  SpeedBand.rural: 80.0,
-  SpeedBand.motorwaySlow: 100.0,
-  SpeedBand.motorway: 115.0,
-  SpeedBand.motorwayFast: 130.0,
-};
-
 /// One band's aggregate stats. Value type — the widget reads these
 /// fields directly.
 class SpeedConsumptionBin {
@@ -249,8 +235,3 @@ SpeedConsumptionBin _buildBin({
     avgLPer100Km: avg,
   );
 }
-
-/// Lower edge (inclusive) of [band], in km/h. Exposed for the widget's
-/// label-formatting helpers — keeps the band-edge constants in one
-/// place even if the UI changes how they're rendered.
-double speedBandLowerKmh(SpeedBand band) => _speedBandLowerKmh[band]!;

@@ -1,6 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+// The mocktail Mock* storage doubles are deprecated as a steering hint
+// (prefer the stateful fakes) but remain sanctioned for widget tests that
+// stub reads exclusively -- see test/helpers/mock_providers.dart (#3742).
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -160,7 +165,7 @@ void main() {
     testWidgets('renders the inner StationCard for the supplied station',
         (tester) async {
       final test = standardTestOverrides(favoriteIds: [_station.id]);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -182,7 +187,7 @@ void main() {
         '(swipe-left) labels + icons during the corresponding drag',
         (tester) async {
       final test = standardTestOverrides(favoriteIds: [_station.id]);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -249,7 +254,7 @@ void main() {
       UrlLauncherPlatform.instance = fake;
 
       final test = standardTestOverrides(favoriteIds: [_station.id]);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -286,7 +291,7 @@ void main() {
         '"removed from favorites" snackbar', (tester) async {
       final favorites = _RecordingFavorites([_station.id]);
       final test = _overridesWithRecordingFavorites(favorites);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.isFavorite(any())).thenReturn(true);
 
       await pumpApp(
@@ -319,7 +324,7 @@ void main() {
         'station data so the row can be restored verbatim', (tester) async {
       final favorites = _RecordingFavorites([_station.id]);
       final test = _overridesWithRecordingFavorites(favorites);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.isFavorite(any())).thenReturn(true);
 
       await pumpApp(
@@ -350,7 +355,7 @@ void main() {
         'tapping the inner StationCard pushes /station/<id> via GoRouter',
         (tester) async {
       final test = standardTestOverrides(favoriteIds: [_station.id]);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       String? landedOn;
       final router = GoRouter(
@@ -402,7 +407,7 @@ void main() {
         'favorites.remove(id)', (tester) async {
       final favorites = _RecordingFavorites([_station.id]);
       final test = _overridesWithRecordingFavorites(favorites);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.isFavorite(any())).thenReturn(true);
 
       await pumpApp(
@@ -431,7 +436,7 @@ void main() {
         'StationCard.profileFuelType so the profile fuel highlight matches',
         (tester) async {
       final test = standardTestOverrides(favoriteIds: [_station.id]);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       const profile = UserProfile(
         id: 'p1',

@@ -752,7 +752,7 @@ class _FakeConnection extends Obd2ConnectionService {
     String? adapterName,
   }) async {
     connectByMacCalls++;
-    if (connectByMacError != null) throw connectByMacError!;
+    if (connectByMacError != null) throw connectByMacError!; // ignore: only_throw_errors
     final s = connectByMacResult;
     if (s == null) return null;
     // The populator expects a connected service so it can issue PID

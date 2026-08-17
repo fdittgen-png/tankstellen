@@ -159,7 +159,7 @@ class ShellBottomBar extends ConsumerWidget {
     // gets <50 dp and starts truncating. Hide on inactive only — the
     // active tab keeps its label so the user always sees what's
     // selected.
-    final width = MediaQuery.of(context).size.width;
+    final width = MediaQuery.sizeOf(context).width;
     final showLabel = !isLandscape && (selected || width >= 360);
 
     final inkWell = InkWell(

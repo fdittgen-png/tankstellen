@@ -1257,6 +1257,6 @@ class _ThrowingTransport implements Obd2Transport {
     final canned = initResponses[key];
     if (canned != null) return canned;
     if (!_postConnect) return 'NO DATA>';
-    throw error;
+    throw error; // ignore: only_throw_errors
   }
 }

@@ -374,11 +374,18 @@ class TripRecordingController {
   /// extracted into a focused collaborator (#1679).
   final TripSampleBuffer _sampleBuffer = TripSampleBuffer();
 
-  /// Read-only snapshot of the captured sample buffer (#1040). The
+  /// Read-only view of the captured sample buffer (#1040, #3741 —
+  /// zero-copy: a cached unmodifiable VIEW, not a per-access copy). The
   /// list is unmodifiable so callers can't accidentally mutate the
   /// controller's state — the provider clones it into the persisted
   /// [TripHistoryEntry] at stop time.
   List<TripSample> get capturedSamples => _sampleBuffer.capturedSamples;
+
+  /// O(1) newest captured sample (#3741) — glide-coach per-fix read.
+  TripSample? get latestSample => _sampleBuffer.latestSample;
+
+  /// O(1) running max captured RPM (#3741) — WAL flush summary stamp.
+  double get maxCapturedRpm => _sampleBuffer.maxCapturedRpm;
 
   /// Read-only snapshot of the GPS cadence diagnostics buffer
   /// (#1458 phase 2). The list is unmodifiable so callers can't

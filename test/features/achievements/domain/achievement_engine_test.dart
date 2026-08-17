@@ -155,7 +155,7 @@ void main() {
       final base = DateTime(2026, 4, 1);
       final trips = [
         // Days 0, 1, 2 — then skip day 3 — days 4..8 (5 more)
-        for (var i in [0, 1, 2, 4, 5, 6, 7, 8])
+        for (final i in [0, 1, 2, 4, 5, 6, 7, 8])
           _trip(km: 15, startedAt: base.add(Duration(days: i))),
       ];
       final earned = engine.evaluate(trips: trips, fillUps: const []);

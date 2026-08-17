@@ -140,9 +140,11 @@ jobs:
           echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_PATH"
           {
             echo "ANDROID_KEYSTORE_PATH=$KEYSTORE_PATH"
-            echo "ANDROID_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD"
             echo "ANDROID_KEY_ALIAS=$ANDROID_KEY_ALIAS"
           } >> "$GITHUB_ENV"
+          # #3740 — the keystore PASSWORD is deliberately NOT exported to
+          # GITHUB_ENV: that exposes it to every subsequent step (and any
+          # compromised action). It is scoped to the build step's env: block.
 
       # #3543 — cache + retry-pre-install the NDK the AGP would otherwise
       # download on demand (flaked 4× on 2026-07-09; see ci.yml for the
@@ -178,6 +180,9 @@ jobs:
         # needed to de-obfuscate later crash reports (uploaded below).
         # #3434 — FGS define gated on the FGS_FORM_APPROVED repo variable;
         # see daily-beta.yml for the full rationale.
+        env:
+          # #3740 — keystore password scoped to the only step that needs it.
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
           flutter build appbundle --release --flavor play \
             --build-number=${{ needs.pre-check.outputs.build_number }} \

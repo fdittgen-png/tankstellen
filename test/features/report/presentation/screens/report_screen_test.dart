@@ -21,8 +21,8 @@ void main() {
       tester,
     ) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-      when(() => test.mockStorage.getApiKey()).thenReturn(null);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+      when(() => test.mockStorage.getApiKey(any())).thenReturn(null);
 
       await pumpApp(
         tester,
@@ -40,8 +40,8 @@ void main() {
 
     testWidgets('renders all report type radio options', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-      when(() => test.mockStorage.getApiKey()).thenReturn(null);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+      when(() => test.mockStorage.getApiKey(any())).thenReturn(null);
 
       await pumpApp(
         tester,
@@ -83,8 +83,8 @@ void main() {
       tester,
     ) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-      when(() => test.mockStorage.getApiKey()).thenReturn(null);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+      when(() => test.mockStorage.getApiKey(any())).thenReturn(null);
 
       await pumpApp(
         tester,
@@ -110,8 +110,8 @@ void main() {
         'banner shown; price/status radios disabled but name/address '
         '(GitHub-routed, #508) stay enabled', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-      when(() => test.mockStorage.getApiKey()).thenReturn(null);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+      when(() => test.mockStorage.getApiKey(any())).thenReturn(null);
 
       await pumpApp(
         tester,
@@ -194,8 +194,8 @@ void main() {
       'visible, both enabled (#508)',
       (tester) async {
         final test = standardTestOverrides(country: Countries.france);
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-        when(() => test.mockStorage.getApiKey()).thenReturn(null);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+        when(() => test.mockStorage.getApiKey(any())).thenReturn(null);
 
         await pumpApp(
           tester,
@@ -239,8 +239,8 @@ void main() {
       tester,
     ) async {
       final test = standardTestOverrides(country: Countries.france);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-      when(() => test.mockStorage.getApiKey()).thenReturn(null);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+      when(() => test.mockStorage.getApiKey(any())).thenReturn(null);
 
       await pumpApp(
         tester,
@@ -275,9 +275,9 @@ void main() {
       'DE WITH Tankerkoenig API key → banner hidden, radios enabled',
       (tester) async {
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(true);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(true);
         when(
-          () => test.mockStorage.getApiKey(),
+          () => test.mockStorage.getApiKey(any()),
         ).thenReturn('11111111-2222-3333-4444-555555555555');
 
         await pumpApp(
@@ -328,9 +328,9 @@ void main() {
       tester,
     ) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(true);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(true);
       when(
-        () => test.mockStorage.getApiKey(),
+        () => test.mockStorage.getApiKey(any()),
       ).thenReturn('11111111-2222-3333-4444-555555555555');
 
       await pumpApp(
@@ -357,9 +357,9 @@ void main() {
       tester,
     ) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(true);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(true);
       when(
-        () => test.mockStorage.getApiKey(),
+        () => test.mockStorage.getApiKey(any()),
       ).thenReturn('11111111-2222-3333-4444-555555555555');
 
       await pumpApp(
@@ -383,9 +383,9 @@ void main() {
       'selecting wrongE85 shows the price field (extended fuel type)',
       (tester) async {
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(true);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(true);
         when(
-          () => test.mockStorage.getApiKey(),
+          () => test.mockStorage.getApiKey(any()),
         ).thenReturn('11111111-2222-3333-4444-555555555555');
 
         await pumpApp(
@@ -411,9 +411,9 @@ void main() {
       tester,
     ) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(true);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(true);
       when(
-        () => test.mockStorage.getApiKey(),
+        () => test.mockStorage.getApiKey(any()),
       ).thenReturn('11111111-2222-3333-4444-555555555555');
 
       await pumpApp(
@@ -456,9 +456,9 @@ void main() {
   group('ReportScreen country-gated visibility (#508)', () {
     testWidgets('DE — all 10 report types are rendered', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(true);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(true);
       when(
-        () => test.mockStorage.getApiKey(),
+        () => test.mockStorage.getApiKey(any()),
       ).thenReturn('11111111-2222-3333-4444-555555555555');
 
       await pumpApp(
@@ -486,8 +486,8 @@ void main() {
       tester,
     ) async {
       final test = standardTestOverrides(country: Countries.france);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-      when(() => test.mockStorage.getApiKey()).thenReturn(null);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+      when(() => test.mockStorage.getApiKey(any())).thenReturn(null);
 
       await pumpApp(
         tester,
@@ -539,8 +539,8 @@ void main() {
         final reporter = ErrorReporter(launcher: (uri) async => true);
 
         final test = standardTestOverrides(country: Countries.france);
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-        when(() => test.mockStorage.getApiKey()).thenReturn(null);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+        when(() => test.mockStorage.getApiKey(any())).thenReturn(null);
 
         // A wrapped reporter that records the payload on reportError and
         // then delegates (with consent skipped) to the real one.
@@ -584,9 +584,9 @@ void main() {
         final recording = _RecordingReporter((p) => captured = p);
 
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(true);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(true);
         when(
-          () => test.mockStorage.getApiKey(),
+          () => test.mockStorage.getApiKey(any()),
         ).thenReturn('11111111-2222-3333-4444-555555555555');
 
         await pumpApp(

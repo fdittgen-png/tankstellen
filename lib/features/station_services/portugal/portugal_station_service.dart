@@ -22,6 +22,7 @@ import '../opening_hours/open_state_from_hours.dart';
 import 'portugal_detail_parser.dart';
 import 'portugal_merged_row.dart';
 import 'portugal_opening_hours_adapter.dart';
+import '../../../core/services/country_service_dependencies.dart';
 
 /// DGEG (Direção-Geral de Energia e Geologia) Portuguese fuel price service.
 ///
@@ -372,3 +373,9 @@ class PortugalStationService
     return emptyPricesResult(ServiceSource.portugalApi);
   }
 }
+
+/// Builds the PT raw [StationService] — the `CountryServiceEntry.buildService`
+/// factory (#3746). Takes [CountryServiceDependencies], never a Riverpod `Ref`,
+/// so the identical wiring runs in the background isolate (#2861).
+StationService buildPtStationService(CountryServiceDependencies deps) =>
+    PortugalStationService();

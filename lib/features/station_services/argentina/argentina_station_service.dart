@@ -20,6 +20,7 @@ import '../../../core/services/persistent_dataset.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/services/utils/csv_parser.dart';
+import '../../../core/services/country_service_dependencies.dart';
 
 /// Argentine fuel prices from Secretaría de Energía open data.
 /// Free, no API key. CSV with station-level prices + coordinates.
@@ -340,3 +341,9 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
     return emptyPricesResult(ServiceSource.argentinaApi);
   }
 }
+
+/// Builds the AR raw [StationService] — the `CountryServiceEntry.buildService`
+/// factory (#3746). Takes [CountryServiceDependencies], never a Riverpod `Ref`,
+/// so the identical wiring runs in the background isolate (#2861).
+StationService buildArStationService(CountryServiceDependencies deps) =>
+    ArgentinaStationService(cache: deps.cache);

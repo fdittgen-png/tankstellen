@@ -218,8 +218,10 @@ class CarDataService {
       await HiveStorage.initInIsolate();
       await HiveStorage.loadApiKey();
       final storage = HiveStorage();
+      // #3746 — the threaded key only builds the DE Tankerkönig Dio;
+      // every other country's strategy reads its own slot via `storage`.
       return await _resolveJson(storage, snapshotKey,
-              apiKey: storage.getApiKey(), liveFix: liveFix)
+              apiKey: storage.getApiKey('de'), liveFix: liveFix)
           .timeout(_fetchTimeout, onTimeout: () => kNoGpsMarker);
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {

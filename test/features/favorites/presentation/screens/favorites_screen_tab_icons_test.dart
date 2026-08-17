@@ -27,7 +27,7 @@ void main() {
       'tab carries Icons.notifications_outlined',
       (tester) async {
         final test = standardTestOverrides(favoriteIds: const []);
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
         await pumpApp(
           tester,

@@ -256,7 +256,7 @@ class _FakeStorage extends Fake implements StorageRepository {
   @override
   dynamic getSetting(String key) => settings[key];
   @override
-  String? getApiKey() => apiKey;
+  String? getApiKey(String countryCode) => apiKey;
   @override
   String? getEvApiKey() => evApiKey;
 }

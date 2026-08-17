@@ -70,7 +70,7 @@ void main() {
   group('buildRawCountryService — single construction path', () {
     test('DE with a key → Tankerkönig; without bundled key → Demo', () async {
       final withKey = FakeStorageRepository();
-      await withKey.setApiKey('key123');
+      await withKey.setApiKey('de', 'key123');
       expect(
         buildRawCountryService('DE', deps(storage: withKey, dio: Dio())),
         isA<TankerkoenigStationService>(),
@@ -86,7 +86,7 @@ void main() {
 
     test('DE with a key but no Dio → Demo (cannot reach the API)', () async {
       final withKey = FakeStorageRepository();
-      await withKey.setApiKey('key123');
+      await withKey.setApiKey('de', 'key123');
       expect(
         buildRawCountryService('DE', deps(storage: withKey)),
         isA<DemoStationService>(),
@@ -112,11 +112,11 @@ void main() {
 
     test('KR with a key → OPINET; without a key → Demo', () async {
       final withKey = FakeStorageRepository();
-      await withKey.setApiKey('opinet');
+      await withKey.setApiKey('kr', 'opinet');
       expect(buildRawCountryService('KR', deps(storage: withKey)),
           isA<SouthKoreaStationService>());
 
-      // KR/CL gate on getApiKey() (not hasApiKey), so a null key → Demo
+      // KR/CL gate on getApiKey('kr'/'cl') (not hasApiKey), so a null key → Demo
       // regardless of the bundled-default flag.
       expect(buildRawCountryService('KR', deps()), isA<DemoStationService>());
     });

@@ -1,6 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+// The mocktail Mock* storage doubles are deprecated as a steering hint
+// (prefer the stateful fakes) but remain sanctioned for widget tests that
+// stub reads exclusively -- see test/helpers/mock_providers.dart (#3742).
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -28,7 +33,7 @@ void main() {
       when(() => mockStorage.profileCount).thenReturn(2);
       when(() => mockStorage.cacheEntryCount).thenReturn(10);
       when(() => mockStorage.getItineraries()).thenReturn([]);
-      when(() => mockStorage.hasApiKey()).thenReturn(true);
+      when(() => mockStorage.hasApiKey(any())).thenReturn(true);
       when(() => mockStorage.hasEvApiKey()).thenReturn(false);
       when(() => mockStorage.storageStats).thenReturn((
         settings: 1024,
@@ -95,7 +100,7 @@ void main() {
       when(() => mockStorage.profileCount).thenReturn(0);
       when(() => mockStorage.cacheEntryCount).thenReturn(0);
       when(() => mockStorage.getItineraries()).thenReturn([]);
-      when(() => mockStorage.hasApiKey()).thenReturn(false);
+      when(() => mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => mockStorage.hasEvApiKey()).thenReturn(false);
       when(() => mockStorage.storageStats).thenReturn((
         settings: 0,
@@ -160,7 +165,7 @@ void main() {
       when(() => mockStorage.profileCount).thenReturn(1);
       when(() => mockStorage.cacheEntryCount).thenReturn(0);
       when(() => mockStorage.alertCount).thenReturn(1);
-      when(() => mockStorage.hasApiKey()).thenReturn(false);
+      when(() => mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => mockStorage.hasEvApiKey()).thenReturn(false);
 
       final container = ProviderContainer(overrides: [

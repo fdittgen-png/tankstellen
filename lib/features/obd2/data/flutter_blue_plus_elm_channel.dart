@@ -371,7 +371,7 @@ class FlutterBluePlusElmChannel with Obd2ChannelAbandonLatch
         debugPrint('FlutterBluePlusElmChannel: pre-connect dead-GATT teardown '
             'failed (proceeding): $e');
         return true;
-      }());
+      }(), 'debug-only breadcrumb — the closure always returns true');
     }
     // #3014 — SCAN-BEFORE-CONNECT (the single highest-leverage SmartOBD fix).
     // Run a brief TARGETED scan for this MAC FIRST so Android holds a fresh
@@ -429,7 +429,7 @@ class FlutterBluePlusElmChannel with Obd2ChannelAbandonLatch
         debugPrint('FlutterBluePlusElmChannel: scan-seed failed '
             '(proceeding to connect): $e');
         return true;
-      }());
+      }(), 'debug-only breadcrumb — the closure always returns true');
     }
     _debugScanSeedRan = true;
     _debugScanSeedSawMac = sawMac;
@@ -739,7 +739,7 @@ class FlutterBluePlusElmChannel with Obd2ChannelAbandonLatch
         debugPrint('FlutterBluePlusElmChannel: clearGattCache best-effort '
             'failed (proceeding with retry): $e');
         return true;
-      }());
+      }(), 'debug-only breadcrumb — the closure always returns true');
     }
   }
 
@@ -782,8 +782,7 @@ class FlutterBluePlusElmChannel with Obd2ChannelAbandonLatch
         );
       }
       // A genuine non-disconnect BLE error still surfaces unchanged.
-      // ignore: use_rethrow_when_possible
-      throw e;
+      rethrow;
     }
   }
 

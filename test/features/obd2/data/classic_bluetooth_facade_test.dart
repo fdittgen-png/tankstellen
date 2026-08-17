@@ -43,5 +43,5 @@ class _ThrowingPlugin extends Obd2ClassicMethodChannel {
   final Object error;
 
   @override
-  Future<List<ClassicBondedDevice>> bondedDevices() async => throw error;
+  Future<List<ClassicBondedDevice>> bondedDevices() async => throw error; // ignore: only_throw_errors
 }

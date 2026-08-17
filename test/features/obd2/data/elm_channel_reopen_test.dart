@@ -58,7 +58,7 @@ class _ReopenFakePlugin extends Obd2ClassicMethodChannel {
   Future<void> write(List<int> bytes) async {
     writes.add(List<int>.from(bytes));
     final e = writeError;
-    if (e != null) throw e;
+    if (e != null) throw e; // ignore: only_throw_errors
   }
 
   @override

@@ -36,7 +36,7 @@ void main() {
     testWidgets('renders empty state when no favorites of any kind',
         (tester) async {
       final test = standardTestOverrides(favoriteIds: []);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -53,7 +53,7 @@ void main() {
         'but EV favorites exist', (tester) async {
       // Pass EV ID in favoriteIds so the unified provider sees it.
       final test = standardTestOverrides(favoriteIds: ['ev-1']);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -74,7 +74,7 @@ void main() {
         'renders fuel + EV favorites in one interleaved list — no section '
         'headers (#1787)', (tester) async {
       final test = standardTestOverrides(favoriteIds: [testStation.id]);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
       when(() => test.mockStorage.getRatings())
           .thenReturn(const <String, int>{});
@@ -101,7 +101,7 @@ void main() {
     testWidgets('renders error UI with retry button when stream errors',
         (tester) async {
       final test = standardTestOverrides(favoriteIds: ['stub-id']);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,

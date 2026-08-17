@@ -24,6 +24,10 @@ void main() {
   // #3232 — the registry's entry rows moved into country_service_data.dart;
   // the entry-existence assertions read it directly now.
   late String dataSource;
+  // #3746 — the per-country construction moved out of the builder's switch
+  // into feature-side CountryServiceEntry.buildService factories; the DE
+  // gate assertions read the germany factory's source now.
+  late String germanySource;
 
   setUpAll(() {
     providersSource =
@@ -36,6 +40,9 @@ void main() {
             .readAsStringSync();
     dataSource =
         File('lib/core/services/country_service_data.dart').readAsStringSync();
+    germanySource = File(
+            'lib/features/station_services/germany/tankerkoenig_station_service.dart')
+        .readAsStringSync();
   });
 
   group('service_providers.dart no longer special-cases any country', () {
@@ -74,32 +81,42 @@ void main() {
     });
   });
 
-  group('the registry / raw builder own the Germany factory', () {
-    test('the Germany branch is no longer an UnsupportedError stub', () {
+  group('the registry / per-entry factory own the Germany wiring', () {
+    test('the Germany factory is no longer an UnsupportedError stub', () {
       // The stub used to throw UnsupportedError because the registry had no
       // way to wire the API-key check. After #425 it returns Demo or the
-      // real Tankerkoenig service depending on the storage state. (#2861 —
-      // this wiring now lives in country_raw_service_builder.dart.)
+      // real Tankerkoenig service depending on the storage state. (#2861
+      // moved it into country_raw_service_builder.dart; #3746 into the
+      // feature-side buildDeStationService factory.)
       expect(
-        builderSource,
+        germanySource,
         isNot(contains('UnsupportedError')),
-        reason: 'the DE branch should be implemented, not a stub',
+        reason: 'the DE factory should be implemented, not a stub',
       );
     });
 
-    test('Germany branch falls back to DemoStationService when no API key',
-        () {
-      expect(builderSource, contains('hasApiKey()'));
-      expect(builderSource, contains("DemoStationService(countryCode: 'DE')"));
+    test('the raw builder has no per-country switch left (#3746)', () {
+      // Open/closed: registering a country is one CountryServiceEntry data
+      // row; the builder just dispatches to entry.buildService.
+      expect(builderSource, isNot(contains('switch (')),
+          reason: 'buildRawCountryService must dispatch via '
+              'CountryServiceEntry.buildService, not a switch');
+      expect(builderSource, contains('entry.buildService(deps)'));
     });
 
-    test('Germany branch builds the real Tankerkönig service with the Dio',
+    test('Germany factory falls back to DemoStationService when no API key',
+        () {
+      expect(germanySource, contains("hasApiKey('de')"));
+      expect(germanySource, contains("DemoStationService(countryCode: 'DE')"));
+    });
+
+    test('Germany factory builds the real Tankerkönig service with the Dio',
         () {
       // #2861 — the foreground reads tankerkoenigDioProvider in the registry
-      // and threads it through to the Riverpod-free builder, which constructs
+      // and threads it through to the Riverpod-free factory, which constructs
       // the real service.
       expect(registrySource, contains('tankerkoenigDioProvider'));
-      expect(builderSource, contains('TankerkoenigStationService(dio)'));
+      expect(germanySource, contains('TankerkoenigStationService(dio)'));
     });
 
     test('every supported country still has a registry entry', () {

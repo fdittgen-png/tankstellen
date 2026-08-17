@@ -86,9 +86,14 @@ class VehicleAggregateUpdater {
     final profile = _vehicleRepo.getById(vehicleId);
     if (profile == null) return;
 
-    final allTrips = tripRepo.loadAll();
-    final trips =
-        allTrips.where((t) => t.vehicleId == vehicleId).toList(growable: false);
+    // #3741 — filter on the cheap summary-only decode, then full-decode
+    // (samples materialised) ONLY this vehicle's trips. `loadAll()` used
+    // to decode every stored trip's 1 Hz sample array just to throw the
+    // other vehicles' away.
+    final trips = <TripHistoryEntry>[
+      for (final s in tripRepo.loadSummaries())
+        if (s.vehicleId == vehicleId) ?tripRepo.loadById(s.id),
+    ];
 
     if (trips.length < kMinTripsForAggregates) {
       // Below threshold — null everything so the UI hides the section.

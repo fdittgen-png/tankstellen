@@ -10,6 +10,7 @@ import '../../../core/services/dio_factory.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
+import '../../../core/services/country_service_dependencies.dart';
 
 /// Slovenia fuel prices from the community `goriva.si` API (#575).
 ///
@@ -282,3 +283,9 @@ class SloveniaStationService with StationServiceHelpers implements StationServic
     return emptyPricesResult(ServiceSource.sloveniaApi);
   }
 }
+
+/// Builds the SI raw [StationService] — the `CountryServiceEntry.buildService`
+/// factory (#3746). Takes [CountryServiceDependencies], never a Riverpod `Ref`,
+/// so the identical wiring runs in the background isolate (#2861).
+StationService buildSiStationService(CountryServiceDependencies deps) =>
+    SloveniaStationService();

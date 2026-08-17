@@ -43,7 +43,7 @@ void main() {
       'renders form: LocationInput, FuelTypeSelector, slider, button',
       (tester) async {
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
         await pumpApp(
           tester,
@@ -85,7 +85,7 @@ void main() {
       tester,
     ) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -110,7 +110,7 @@ void main() {
 
     testWidgets('open-only toggle updates provider', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       late ProviderContainer container;
       await tester.pumpWidget(
@@ -149,7 +149,7 @@ void main() {
 
     testWidgets('equipment chips toggle on/off', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       late ProviderContainer container;
       await tester.pumpWidget(
@@ -202,7 +202,7 @@ void main() {
       tester,
     ) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       // #1792 — open-only, amenities and brands have no UserProfile
       // field; they persist device-locally via putSetting.
       when(
@@ -257,7 +257,7 @@ void main() {
       '#2592 — save-as-defaults persists route params in route mode',
       (tester) async {
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
         when(
           () => test.mockStorage.putSetting(any(), any<dynamic>()),
         ).thenAnswer((_) async {});
@@ -295,7 +295,7 @@ void main() {
 
     testWidgets('has a close (X) button that pops the route', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -332,7 +332,7 @@ void main() {
       tester,
     ) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       late ProviderContainer container;
       await tester.pumpWidget(
@@ -370,7 +370,7 @@ void main() {
 
     testWidgets('radius slider updates value', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -390,7 +390,7 @@ void main() {
       testWidgets('FR locale shows the localised location placeholder '
           '(not "Location search field")', (tester) async {
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
         await pumpApp(
           tester,
@@ -415,7 +415,7 @@ void main() {
       testWidgets('FR locale renders the HelpBanner with the translated '
           '"Compris" dismiss button', (tester) async {
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
         // Ensure the banner is shown (not previously dismissed).
         when(() => test.mockStorage.getSetting(any())).thenReturn(null);
 
@@ -443,7 +443,7 @@ void main() {
         addTearDown(() => tester.binding.setSurfaceSize(null));
 
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
         await pumpApp(
           tester,

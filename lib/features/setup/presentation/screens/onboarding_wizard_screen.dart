@@ -190,7 +190,9 @@ class _OnboardingWizardScreenState
         }
         return false;
       }
-      await apiKeys.setApiKey(apiKey);
+      // #3746 — the wizard validates against Tankerkönig, so the key it
+      // stores is the DE slot.
+      await apiKeys.setApiKey('de', apiKey);
       return true;
     } finally {
       if (mounted) ctrl.setLoading(false);

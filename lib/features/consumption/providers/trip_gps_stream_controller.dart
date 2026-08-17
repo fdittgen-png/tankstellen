@@ -216,11 +216,10 @@ class TripGpsStreamController {
       // (typically also ~1 Hz). Cars without PID 0x11 carry
       // `throttlePercent == null` on every sample; the evaluator's
       // rule 2 short-circuits that to `hold` so this getter returning
-      // null is fine.
-      final samples = ctl.capturedSamples;
-      final throttle = samples.isEmpty
-          ? null
-          : samples.last.throttlePercent;
+      // null is fine. #3741 — O(1) `latestSample` read: this fires once
+      // per GPS fix and used to materialise a full buffer copy for one
+      // `.last` access.
+      final throttle = ctl.latestSample?.throttlePercent;
       final reading = (
         latitude: pos.latitude,
         longitude: pos.longitude,

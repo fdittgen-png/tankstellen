@@ -8,28 +8,6 @@ import 'package:flutter/foundation.dart';
 import '../telemetry/collectors/breadcrumb_collector.dart';
 import 'error_logger.dart';
 
-/// Severity levels of the [AppLog] facade (#3144).
-enum LogLevel {
-  /// Developer chatter: visible on the debug console only, fully
-  /// invisible in release builds (no logcat / os_log emission).
-  debug,
-
-  /// User-flow milestones ("sync ready", "migrated N profiles"): debug
-  /// console + a [BreadcrumbCollector] breadcrumb, so the last
-  /// [BreadcrumbCollector.maxBreadcrumbs] of them ride along inside
-  /// every persisted error trace — release-visible without consuming a
-  /// slot in the bounded trace ring.
-  info,
-
-  /// Unexpected-but-survivable conditions: full [errorLogger] pipeline
-  /// (persisted trace, export, opt-in Sentry) tagged `level: warn` so
-  /// triage can separate warnings from hard errors.
-  warn,
-
-  /// Hard failures: delegates to [errorLogger] unchanged.
-  error,
-}
-
 /// Leveled logging facade over the existing `errorLogger` / `debugPrint`
 /// split (#3144).
 ///
@@ -37,8 +15,8 @@ enum LogLevel {
 /// (release-invisible — `_bootstrap()` no-ops it in release builds, and
 /// even when emitted it never reaches the trace export) or a full
 /// `errorLogger.log(...)` ERROR trace (which consumes one of the 50
-/// ring slots). The four levels above fill the gap; see [LogLevel] for
-/// the routing of each.
+/// ring slots). The four level methods ([debug], [info], [warn],
+/// [error]) fill the gap; each documents its own routing.
 ///
 /// ## Contract
 /// Every method never throws — logging must never derail the caller.

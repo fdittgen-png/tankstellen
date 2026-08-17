@@ -25,7 +25,7 @@ class _FakeStreamSubscription<T> implements StreamSubscription<T> {
   Future<void> cancel() async {
     cancelCallCount++;
     if (cancelError != null) {
-      throw cancelError!;
+      throw cancelError!; // ignore: only_throw_errors
     }
   }
 

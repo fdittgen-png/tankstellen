@@ -28,7 +28,7 @@ class _ScriptedService implements StationService {
   }) async {
     final i = callCount++;
     final step = i < script.length ? script[i] : null;
-    if (step != null) throw step;
+    if (step != null) throw step; // ignore: only_throw_errors
     return ServiceResult(
       data: stations,
       source: ServiceSource.tankerkoenigApi,

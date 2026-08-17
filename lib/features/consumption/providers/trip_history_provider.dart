@@ -13,7 +13,7 @@ import '../domain/trip_verdict.dart';
 import '../domain/gps_driving_features.dart';
 import 'verdict_calibration_provider.dart';
 import '../../../core/logging/error_logger.dart';
-import 'package:collection/collection.dart';
+import 'package:collection/collection.dart' show IterableExtension;
 
 part 'trip_history_provider.g.dart';
 
@@ -33,6 +33,15 @@ TripHistoryRepository? tripHistoryRepository(Ref ref) {
 /// List of finalised trips, newest-first. Empty when the box is
 /// closed or carries no entries. Refreshed by callers after they
 /// save a new trip via [TripHistoryListNotifier.refresh].
+///
+/// #3741 — SUMMARIES-ONLY: entries come from
+/// [TripHistoryRepository.loadSummaries], so the heavy per-tick
+/// payloads are never materialised on the UI isolate (the flagship
+/// list decoded every trip's full 1 Hz sample array on first watch and
+/// after every save/delete/verdict/sync — the consumption-tab jank).
+/// `entry.samples` is always empty here and `entry.sampleCount` carries
+/// the stored count; consumers that render or recompute samples fetch
+/// the single trips they need through [tripHistoryDetailProvider].
 @Riverpod(keepAlive: true)
 class TripHistoryList extends _$TripHistoryList {
   @override
@@ -53,7 +62,7 @@ class TripHistoryList extends _$TripHistoryList {
     });
     ref.onDispose(sub.cancel);
     if (repo == null) return const [];
-    return repo.loadAll();
+    return repo.loadSummaries();
   }
 
   /// Re-read the Hive box. Called by [TripRecording.stop] after a
@@ -62,7 +71,7 @@ class TripHistoryList extends _$TripHistoryList {
   void refresh() {
     final repo = ref.read(tripHistoryRepositoryProvider);
     if (repo == null) return;
-    state = repo.loadAll();
+    state = repo.loadSummaries();
   }
 
   /// #3501 — persist the driver's post-trip verdict and refresh so the
@@ -71,12 +80,14 @@ class TripHistoryList extends _$TripHistoryList {
     final repo = ref.read(tripHistoryRepositoryProvider);
     if (repo == null) return;
     await repo.saveVerdict(id, verdict);
-    state = repo.loadAll();
+    state = repo.loadSummaries();
     // #3503 — feed the calibration store: join the label with the trip's
     // energy KPIs and re-derive the personal bands. Best-effort — the
     // store swallows its own failures, and a missing entry just skips.
+    // #3741 — the state list is summaries-only now (no samples); the
+    // KPI join needs the per-tick data, so full-decode THIS trip only.
     try {
-      final entry = state.where((e) => e.id == id).firstOrNull;
+      final entry = repo.loadById(id);
       final features =
           entry == null ? null : GpsDrivingFeatures.from(entry.samples);
       await ref
@@ -97,7 +108,7 @@ class TripHistoryList extends _$TripHistoryList {
     final repo = ref.read(tripHistoryRepositoryProvider);
     if (repo == null) return;
     await repo.delete(id);
-    state = repo.loadAll();
+    state = repo.loadSummaries();
   }
 
   /// Persist [entry] (insert or update) and refresh the list. Used by
@@ -108,6 +119,29 @@ class TripHistoryList extends _$TripHistoryList {
     final repo = ref.read(tripHistoryRepositoryProvider);
     if (repo == null) return;
     await repo.save(entry);
-    state = repo.loadAll();
+    state = repo.loadSummaries();
   }
+}
+
+/// Full decode of ONE persisted trip — samples materialised (#3741).
+///
+/// [tripHistoryListProvider] is summaries-only; consumers that render or
+/// recompute per-tick samples (the trip-detail charts, the trajets map
+/// polylines, the speed-consumption histogram, the achievements sample
+/// metrics) fetch exactly the trips they need through this family
+/// instead of paying a full-history decode.
+///
+/// Watching the list makes every save/delete/verdict/sync refresh
+/// re-read the row (the notifier pushes a new list instance on each).
+/// Falls back to the list's own entry when the repository is
+/// unavailable (closed box in widget tests, where the list provider is
+/// overridden with fully-populated fixtures) or when the row vanished
+/// between refreshes.
+@riverpod
+TripHistoryEntry? tripHistoryDetail(Ref ref, String id) {
+  final listed =
+      ref.watch(tripHistoryListProvider).where((t) => t.id == id).firstOrNull;
+  final repo = ref.watch(tripHistoryRepositoryProvider);
+  if (repo == null) return listed;
+  return repo.loadById(id) ?? listed;
 }

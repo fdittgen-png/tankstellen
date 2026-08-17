@@ -238,7 +238,7 @@ class _Facade implements BluetoothFacade {
       yield b;
     }
     final err = scanError;
-    if (err != null) throw err;
+    if (err != null) throw err; // ignore: only_throw_errors
   }
 
   @override
@@ -320,7 +320,7 @@ class _ThrowingChannel implements ElmByteChannel {
   @override
   Stream<List<int>> get incoming => _ctrl.stream;
   @override
-  Future<void> open() async => throw error;
+  Future<void> open() async => throw error; // ignore: only_throw_errors
   @override
   Future<void> write(List<int> bytes) async {}
   @override

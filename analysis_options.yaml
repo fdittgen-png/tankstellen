@@ -132,9 +132,13 @@ linter:
     - avoid_type_to_string
     - cancel_subscriptions
     - close_sinks
+    # #3742 — in-repo use of our own @Deprecated API hides migration debt.
+    - deprecated_member_use_from_same_package
     - discarded_futures
     - no_adjacent_strings_in_list
     - no_logic_in_create_state
+    # #3742 — thrown non-Error/Exception values defeat typed catch sites.
+    - only_throw_errors
     - prefer_void_to_null
     - test_types_in_equals
     - throw_in_finally
@@ -146,9 +150,15 @@ linter:
     # Style / maintainability.
     - avoid_print
     - avoid_unnecessary_containers
+    # #3742 — a bare assert reports only "assert failed"; name the invariant.
+    - prefer_asserts_with_message
+    # #3742 — completes prefer_final_locals for for-in loop variables.
+    - prefer_final_in_for_each
     - prefer_final_locals
     - prefer_single_quotes
     - sized_box_for_whitespace
     - sort_child_properties_last
     - unawaited_futures
+    # #3742 — `return await` outside try/catch is a pointless extra hop.
+    - unnecessary_await_in_return
     - use_key_in_widget_constructors

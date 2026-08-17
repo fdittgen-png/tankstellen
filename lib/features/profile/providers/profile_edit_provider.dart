@@ -16,7 +16,7 @@ part 'profile_edit_provider.g.dart';
 /// longer round-trip through this state: they read+write the central
 /// feature-flag shim providers directly so a flip in the edit sheet is
 /// immediately visible to consumers (search results, map markers).
-/// The legacy [UserProfile.showFuel] / `showElectric` fields are
+/// The legacy `UserProfile.showFuel` / `showElectric` fields are
 /// preserved for the one-shot migration read but are no longer
 /// authoritative.
 class ProfileEditState {

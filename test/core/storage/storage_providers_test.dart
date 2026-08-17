@@ -137,7 +137,7 @@ void main() {
       await fakeStorage.savePriceRecords('s', [
         {'p': 1.5},
       ]);
-      await fakeStorage.setApiKey('user-key');
+      await fakeStorage.setApiKey('de', 'user-key');
 
       final mgmt = make().read(storageManagementProvider);
       await mgmt.clearCache();
@@ -146,7 +146,7 @@ void main() {
 
       expect(fakeStorage.cacheEntryCount, 0);
       expect(fakeStorage.priceHistoryEntryCount, 0);
-      expect(fakeStorage.getApiKey(), isNull);
+      expect(fakeStorage.getApiKey('de'), isNull);
     });
 
     test('savePriceRecords delegates with the same args', () async {

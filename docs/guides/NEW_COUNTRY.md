@@ -132,22 +132,37 @@ enum ServiceSource {
 
 ### 3. Append the CountryServiceEntry
 
-**File:** `lib/core/services/country_service_registry.dart`
+**File:** `lib/core/services/country_service_data.dart` (rows read by
+`lib/core/services/country_service_registry.dart`)
 
 This is the single registry edit that wires everything together — bounding
-box, fuel types, error source, API-key requirement, and the service factory
-all live on the entry. The registry uses `StationServiceChain` automatically
-to wrap the raw service.
+box, fuel types, error source, API-key requirement, and the `buildService`
+factory all live on the entry (#3746). The registry uses
+`StationServiceChain` automatically to wrap the raw service.
+
+First add the factory next to your service — it takes the Riverpod-free
+`CountryServiceDependencies` (NEVER a `Ref`), so the identical wiring runs
+in the background isolate (#2861):
 
 ```dart
-import 'impl/example_station_service.dart';
+// ... at the bottom of example_station_service.dart ...
+StationService buildXxStationService(CountryServiceDependencies deps) =>
+    ExampleStationService();
+```
 
-// ... in the entries list ...
+Then append the data row:
+
+```dart
+import '../../features/station_services/example/example_station_service.dart';
+
+// ... in the kCountryServiceEntries list ...
 CountryServiceEntry(
   countryCode: 'XX',
+  buildService: buildXxStationService,
   errorSource: ServiceSource.exampleApi,
-  // Generous 1-2 degree margin around the country's actual bounds. See
-  // ordering note on entries — tighter / island / coastal boxes go first.
+  // Generous 1-2 degree margin around the country's actual bounds. When
+  // boxes overlap, single-country attribution picks the smallest-area
+  // containing box (#3746), so declaration order no longer matters there.
   boundingBox: CountryBoundingBox(
     minLat: 40.0, maxLat: 50.0, minLng: -5.0, maxLng: 10.0,
   ),
@@ -157,16 +172,13 @@ CountryServiceEntry(
     FuelType.e5, FuelType.diesel, FuelType.electric, FuelType.all,
   ],
   requiresApiKey: false,
-  createService: _createExample,
 ),
-
-// ... at the bottom of the file, alongside the other factories ...
-StationService _createExample(Ref ref) => ExampleStationService();
 ```
 
 If the API requires a user-supplied key, mirror the Tankerkönig pattern
-(`_createTankerkoenig` in the registry): fall back to `DemoStationService`
-when no key is configured.
+(`buildDeStationService` in `tankerkoenig_station_service.dart`): read
+`deps.storage.getApiKey('<cc>')` (per-country slots, #3746) and fall back
+to `DemoStationService` when no key is configured.
 
 ### 4. Append the CountryConfig
 
@@ -193,14 +205,16 @@ static const example = CountryConfig(
   fuelTypes: ['Petrol 95', 'Diesel'],
   examplePostalCode: '10000',
   exampleCity: 'Capital City',
+  // The station-id prefix(es) your service emits — the prefix→country
+  // map is derived from these rows (#3746).
+  stationIdPrefixes: ['xx-'],
 );
-
-// Append to Countries.all:
-static const all = [
-  // ... existing entries ...
-  example,
-];
 ```
+
+Append the new config const to the exported list at the bottom of the
+data file (`kExtendedCountries` in `country_config_data_extended.dart`) —
+`Countries.all` is defined as `[...kCoreCountries, ...kExtendedCountries]`
+(#3746), so there is no separate list to edit.
 
 The startup assertion `CountryServiceRegistry.assertAllCountriesRegistered()`
 verifies `Countries.all` and the registry stay in sync — drift fails fast

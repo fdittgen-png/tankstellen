@@ -15,7 +15,7 @@ void main() {
   group('ItinerariesScreen', () {
     testWidgets('renders Scaffold with app bar', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getItineraries()).thenReturn([]);
 
       await pumpApp(
@@ -33,7 +33,7 @@ void main() {
 
     testWidgets('shows empty state when no saved routes', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getItineraries()).thenReturn([]);
 
       await pumpApp(
@@ -51,7 +51,7 @@ void main() {
 
     testWidgets('shows route list when itineraries exist', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getItineraries()).thenReturn([]);
 
       final itinerary = SavedItinerary(

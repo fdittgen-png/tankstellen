@@ -105,7 +105,9 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
         }
         return;
       }
-      await apiKeys.setApiKey(apiKey);
+      // #3746 — the setup flow validates against Tankerkönig, so the key
+      // it stores is the DE slot.
+      await apiKeys.setApiKey('de', apiKey);
       await _finishSetup();
     } finally {
       if (mounted) setState(() => _isLoading = false);

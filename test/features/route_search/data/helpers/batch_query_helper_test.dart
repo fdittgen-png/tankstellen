@@ -401,7 +401,7 @@ void main() {
                 required FuelType fuelType,
               }) async {
                 callElapsedMs.add((async.elapsed - start).inMilliseconds);
-                if (call++ == 0) throw failOnFirst;
+                if (call++ == 0) throw failOnFirst; // ignore: only_throw_errors
                 return const <SearchResultItem>[];
               },
             )

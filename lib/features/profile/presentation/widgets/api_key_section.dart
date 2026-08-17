@@ -35,11 +35,14 @@ class ApiKeySection extends ConsumerWidget {
               theme: theme,
               icon: Icons.local_gas_station,
               title: l.fuelPricesTankerkoenig,
-              subtitle: storage.hasApiKey()
+              // #3746 — per-country key slots: this row reads/writes the
+              // ACTIVE country's slot (its registration link is already
+              // country-specific above).
+              subtitle: storage.hasApiKey(country.code)
                   ? (l.configured)
                   : (l.notConfigured),
-              isConfigured: storage.hasApiKey(),
-              onEdit: () => _editApiKey(context, ref, storage),
+              isConfigured: storage.hasApiKey(country.code),
+              onEdit: () => _editApiKey(context, ref, storage, country.code),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(56, 0, 16, 4),
@@ -163,8 +166,10 @@ class ApiKeySection extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     ApiKeyStorage storage,
+    String countryCode,
   ) async {
-    final controller = TextEditingController(text: storage.getApiKey() ?? '');
+    final controller =
+        TextEditingController(text: storage.getApiKey(countryCode) ?? '');
 
     final result = await showDialog<String>(
       context: context,
@@ -191,7 +196,7 @@ class ApiKeySection extends ConsumerWidget {
     );
 
     if (result != null && result.isNotEmpty) {
-      await storage.setApiKey(result);
+      await storage.setApiKey(countryCode, result);
       // Force rebuild to show updated status. #3159 — mounted guard: the
       // dialog + storage awaits mean the section can be gone here, and
       // invalidating a dead WidgetRef throws a StateError under Riverpod 3.

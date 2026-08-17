@@ -17,6 +17,8 @@ import '../../../core/services/station_service.dart';
 import 'katec_converter.dart';
 import 'south_korea_response_parser.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/services/country_service_dependencies.dart';
+import '../../../core/services/impl/demo_station_service.dart';
 
 /// South Korea fuel prices from the **OPINET** (Korea National Oil
 /// Corporation, KNOC) developer API (#597).
@@ -265,4 +267,15 @@ class SouthKoreaStationService
   ) async {
     return emptyPricesResult(ServiceSource.openinetApi);
   }
+}
+
+/// Builds the KR raw [StationService] — the `CountryServiceEntry.buildService`
+/// factory (#3746). Gates on the KR per-country key slot: no OPINET key
+/// configured means [DemoStationService].
+StationService buildKrStationService(CountryServiceDependencies deps) {
+  final apiKey = deps.storage.getApiKey('kr');
+  if (apiKey == null || apiKey.isEmpty) {
+    return DemoStationService(countryCode: 'KR');
+  }
+  return SouthKoreaStationService(apiKey: apiKey);
 }

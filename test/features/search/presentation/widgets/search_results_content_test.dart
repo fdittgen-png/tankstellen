@@ -26,7 +26,7 @@ void main() {
     testWidgets('shows shimmer while the search state is loading',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       // Bypass pumpApp here — the shimmer animation never settles.
       await tester.pumpWidget(
@@ -55,7 +55,7 @@ void main() {
         'renders the redundant "Stations les plus proches" CTA card',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
@@ -81,7 +81,7 @@ void main() {
     testWidgets('shows the SearchResultsList when stations are loaded',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
       when(() => test.mockStorage.getRatings())
           .thenReturn(const <String, int>{});
@@ -104,7 +104,7 @@ void main() {
         '#3058 — an empty radar result shows a clear empty-state (not a blank '
         'SearchResultsList) so the user knows the scan finished', (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,

@@ -8,6 +8,16 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
+// #3739 — the canonical codec functions come through the consumption
+// feature's public api.dart barrel (the feature-boundary contract);
+// `show` keeps this file's dependency surface explicit.
+import '../../consumption/api.dart'
+    show
+        kTripSaveComputeSampleThreshold,
+        sampleFromJson,
+        sampleToJson,
+        tripSummaryFromJson,
+        tripSummaryToJson;
 import '../../consumption/domain/trip_recorder.dart';
 import 'paused_trip_repository.dart';
 import '../../../core/logging/error_logger.dart';
@@ -123,9 +133,9 @@ class ActiveTripSnapshot {
         if (vin != null) 'vin': vin,
         if (automatic) 'automatic': true,
         'phase': phase,
-        'summary': _summaryToJson(summary),
+        'summary': tripSummaryToJson(summary),
         'samples':
-            samples.map(_sampleToJson).toList(growable: false),
+            samples.map(sampleToJson).toList(growable: false),
         if (odometerStartKm != null) 'odometerStartKm': odometerStartKm,
         if (odometerLatestKm != null) 'odometerLatestKm': odometerLatestKm,
         'startedAt': startedAt.toIso8601String(),
@@ -139,12 +149,12 @@ class ActiveTripSnapshot {
         vin: json['vin'] as String?,
         automatic: (json['automatic'] as bool?) ?? false,
         phase: (json['phase'] as String?) ?? 'recording',
-        summary: _summaryFromJson(
+        summary: tripSummaryFromJson(
           (json['summary'] as Map).cast<String, dynamic>(),
         ),
         samples: (json['samples'] as List?)
                 ?.map((e) =>
-                    _sampleFromJson((e as Map).cast<String, dynamic>()))
+                    sampleFromJson((e as Map).cast<String, dynamic>()))
                 .toList(growable: false) ??
             const [],
         odometerStartKm: (json['odometerStartKm'] as num?)?.toDouble(),
@@ -155,92 +165,15 @@ class ActiveTripSnapshot {
 }
 
 // ---------------------------------------------------------------------------
-// Compact-key JSON helpers — kept private to this file so the schema
-// stays grep-able alongside the snapshot it serialises. The shape is
-// intentionally aligned with `trip_history_repository.dart` so a
-// recovered trip's samples deserialise identically when the user
-// completes the trip.
+// #3739 — the former private compact-key JSON helpers lived here and had
+// silently drifted from the canonical codec: 13 summary keys (eAvg, eFuel,
+// ergs, he, ier, ierd, iha, ihb, ima, kind, sc, veUsed, virt) and every
+// post-#3251 sample key were missing, so a trip recovered from a crash
+// snapshot lost its IMU counters, estimated-consumption figures and kind.
+// The snapshot now delegates to `trip_summary_codec.dart` /
+// `trip_sample_codec.dart` (via the consumption api.dart barrel) — ONE
+// codec for the history, WAL and paused paths.
 // ---------------------------------------------------------------------------
-
-Map<String, dynamic> _summaryToJson(TripSummary s) => {
-      'distanceKm': s.distanceKm,
-      'maxRpm': s.maxRpm,
-      'highRpmSeconds': s.highRpmSeconds,
-      'idleSeconds': s.idleSeconds,
-      'harshBrakes': s.harshBrakes,
-      'harshAccelerations': s.harshAccelerations,
-      if (s.avgLPer100Km != null) 'avgLPer100Km': s.avgLPer100Km,
-      if (s.fuelLitersConsumed != null)
-        'fuelLitersConsumed': s.fuelLitersConsumed,
-      if (s.startedAt != null) 'startedAt': s.startedAt!.toIso8601String(),
-      if (s.endedAt != null) 'endedAt': s.endedAt!.toIso8601String(),
-      'distanceSource': s.distanceSource,
-      'cs': s.coldStartSurcharge,
-      if (s.secondsBelowOptimalGear != null)
-        'sblog': s.secondsBelowOptimalGear,
-    };
-
-TripSummary _summaryFromJson(Map<String, dynamic> j) => TripSummary(
-      distanceKm: (j['distanceKm'] as num).toDouble(),
-      maxRpm: (j['maxRpm'] as num).toDouble(),
-      highRpmSeconds: (j['highRpmSeconds'] as num).toDouble(),
-      idleSeconds: (j['idleSeconds'] as num).toDouble(),
-      harshBrakes: (j['harshBrakes'] as num).toInt(),
-      harshAccelerations: (j['harshAccelerations'] as num).toInt(),
-      avgLPer100Km: (j['avgLPer100Km'] as num?)?.toDouble(),
-      fuelLitersConsumed: (j['fuelLitersConsumed'] as num?)?.toDouble(),
-      startedAt: j['startedAt'] == null
-          ? null
-          : DateTime.parse(j['startedAt'] as String),
-      endedAt: j['endedAt'] == null
-          ? null
-          : DateTime.parse(j['endedAt'] as String),
-      distanceSource: (j['distanceSource'] as String?) ?? 'virtual',
-      coldStartSurcharge: (j['cs'] as bool?) ?? false,
-      secondsBelowOptimalGear: (j['sblog'] as num?)?.toDouble(),
-    );
-
-Map<String, dynamic> _sampleToJson(TripSample s) => {
-      't': s.timestamp.millisecondsSinceEpoch,
-      's': s.speedKmh,
-      if (s.rpm != null) 'r': s.rpm, // #2692 C4-G — omit on GPS-only.
-      if (s.fuelRateLPerHour != null) 'f': s.fuelRateLPerHour,
-      if (s.throttlePercent != null) 'th': s.throttlePercent,
-      if (s.engineLoadPercent != null) 'el': s.engineLoadPercent,
-      if (s.coolantTempC != null) 'ct': s.coolantTempC,
-      // #1374 phase 1: GPS fix mirror keys. Aligned with
-      // `trip_history_repository.dart` so a recovered active trip's
-      // samples deserialise identically when the user finishes it.
-      if (s.latitude != null) 'la': s.latitude,
-      if (s.longitude != null) 'lo': s.longitude,
-      if (s.altitudeM != null) 'al': s.altitudeM,
-      // #3251 — GPS accuracy + bearing were dropped on the WAL codec, so a
-      // recovered GPS trip lost its jitter-gating + map-arrow data. Same keys
-      // as trip_sample_codec.dart so a recovered trip round-trips identically.
-      if (s.hAccuracyM != null) 'ha': s.hAccuracyM,
-      if (s.bearingDeg != null) 'be': s.bearingDeg,
-    };
-
-TripSample _sampleFromJson(Map<String, dynamic> j) => TripSample(
-      timestamp: DateTime.fromMillisecondsSinceEpoch(
-        (j['t'] as num).toInt(),
-      ),
-      speedKmh: (j['s'] as num).toDouble(),
-      rpm: (j['r'] as num?)?.toDouble(), // #2692 C4-G — missing 'r' → null.
-      fuelRateLPerHour: (j['f'] as num?)?.toDouble(),
-      throttlePercent: (j['th'] as num?)?.toDouble(),
-      engineLoadPercent: (j['el'] as num?)?.toDouble(),
-      coolantTempC: (j['ct'] as num?)?.toDouble(),
-      // #1374 phase 1: legacy active-trip snapshots written before
-      // this PR carry no GPS keys → null on both fields.
-      latitude: (j['la'] as num?)?.toDouble(),
-      longitude: (j['lo'] as num?)?.toDouble(),
-      // #1935 child A — GPS altitude mirror key.
-      altitudeM: (j['al'] as num?)?.toDouble(),
-      // #3251 — GPS accuracy + bearing (legacy snapshots have neither → null).
-      hAccuracyM: (j['ha'] as num?)?.toDouble(),
-      bearingDeg: (j['be'] as num?)?.toDouble(),
-    );
 
 /// Hive-backed singleton store for the live, in-progress trip
 /// snapshot (#1303).
@@ -269,9 +202,24 @@ class ActiveTripRepository {
 
   /// Persist [snapshot]. Overwrites any previous payload — the
   /// active-trip box only ever holds one entry.
+  ///
+  /// #3741 — mirrors [TripHistoryRepository.save]'s #3613 pattern: the
+  /// WAL flush runs every ~5 s DURING the drive, on the isolate
+  /// rendering the 4 Hz gauges, and `jsonEncode` over the whole growing
+  /// sample list is O(n) per flush. Above
+  /// [kTripSaveComputeSampleThreshold] samples the encode hops to a
+  /// background isolate via `compute()` (`toJson()` runs synchronously
+  /// first, so the map crossing the isolate boundary is plain JSON-safe
+  /// data and the live buffer view can't mutate mid-encode); smaller
+  /// payloads stay inline because the ~10 ms isolate hand-off dominates.
   Future<void> saveSnapshot(ActiveTripSnapshot snapshot) async {
     try {
-      await _box.put(_singletonKey, jsonEncode(snapshot.toJson()));
+      final json = snapshot.toJson();
+      final encoded =
+          snapshot.samples.length > kTripSaveComputeSampleThreshold
+              ? await compute(jsonEncode, json)
+              : jsonEncode(json);
+      await _box.put(_singletonKey, encoded);
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'ActiveTripRepository.saveSnapshot'}));
     }

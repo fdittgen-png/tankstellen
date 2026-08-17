@@ -129,7 +129,7 @@ void main() {
     void wireUpdateWidgetThrow(Object toThrow) {
       messenger.setMockMethodCallHandler(channel, (call) async {
         if (call.method == 'getInstalledWidgets') return <dynamic>[];
-        if (call.method == 'updateWidget') throw toThrow;
+        if (call.method == 'updateWidget') throw toThrow; // ignore: only_throw_errors
         return true;
       });
     }

@@ -582,7 +582,7 @@ class _FakeReporter extends GithubIssueReporter {
   }) async {
     callCount++;
     onKindCaptured?.call(kind);
-    return await onCall();
+    return onCall();
   }
 }
 

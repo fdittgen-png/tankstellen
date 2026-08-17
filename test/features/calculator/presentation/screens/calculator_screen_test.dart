@@ -22,7 +22,7 @@ Future<ProviderContainer> _pumpCalculator(
   double? initialPrice,
 }) async {
   final test = standardTestOverrides();
-  when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+  when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
   final container = ProviderContainer(
     overrides: [

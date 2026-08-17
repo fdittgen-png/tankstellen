@@ -1117,7 +1117,7 @@ class _ThrowingConnectBest extends Obd2ConnectionService {
 
   @override
   Future<Obd2Service> connect(ResolvedObd2Candidate candidate) async {
-    throw directError;
+    throw directError; // ignore: only_throw_errors
   }
 }
 
@@ -1234,7 +1234,7 @@ class _FakeFacade implements BluetoothFacade {
     }
     final err = error;
     if (err != null) {
-      throw err;
+      throw err; // ignore: only_throw_errors
     }
   }
 
@@ -1324,7 +1324,7 @@ class _FakeChannel implements ElmByteChannel {
   Future<void> open() async {
     openCalls++;
     final err = openError;
-    if (err != null) throw err;
+    if (err != null) throw err; // ignore: only_throw_errors
     _open = true;
   }
 

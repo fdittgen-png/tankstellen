@@ -38,7 +38,7 @@ void main() {
           if (latency > Duration.zero) {
             await Future<void>.delayed(latency);
           }
-          if (throwing != null) throw throwing;
+          if (throwing != null) throw throwing; // ignore: only_throw_errors
           onDone?.call();
           return pulled;
         },

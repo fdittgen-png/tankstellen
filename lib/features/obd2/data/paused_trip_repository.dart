@@ -8,6 +8,10 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
+// #3739 — the canonical codec functions come through the consumption
+// feature's public api.dart barrel (the feature-boundary contract).
+import '../../consumption/api.dart'
+    show tripSummaryFromJson, tripSummaryToJson;
 import '../../consumption/domain/trip_recorder.dart';
 import '../../../core/logging/error_logger.dart';
 
@@ -68,7 +72,7 @@ class PausedTripEntry {
         'id': id,
         if (vehicleId != null) 'vehicleId': vehicleId,
         if (vin != null) 'vin': vin,
-        'summary': _summaryToJson(summary),
+        'summary': tripSummaryToJson(summary),
         if (odometerStartKm != null) 'odometerStartKm': odometerStartKm,
         if (odometerLatestKm != null) 'odometerLatestKm': odometerLatestKm,
         'pausedAt': pausedAt.toIso8601String(),
@@ -80,7 +84,7 @@ class PausedTripEntry {
         id: json['id'] as String,
         vehicleId: json['vehicleId'] as String?,
         vin: json['vin'] as String?,
-        summary: _summaryFromJson(
+        summary: tripSummaryFromJson(
           (json['summary'] as Map).cast<String, dynamic>(),
         ),
         odometerStartKm: (json['odometerStartKm'] as num?)?.toDouble(),
@@ -90,36 +94,13 @@ class PausedTripEntry {
       );
 }
 
-Map<String, dynamic> _summaryToJson(TripSummary s) => {
-      'distanceKm': s.distanceKm,
-      'maxRpm': s.maxRpm,
-      'highRpmSeconds': s.highRpmSeconds,
-      'idleSeconds': s.idleSeconds,
-      'harshBrakes': s.harshBrakes,
-      'harshAccelerations': s.harshAccelerations,
-      if (s.avgLPer100Km != null) 'avgLPer100Km': s.avgLPer100Km,
-      if (s.fuelLitersConsumed != null)
-        'fuelLitersConsumed': s.fuelLitersConsumed,
-      if (s.startedAt != null) 'startedAt': s.startedAt!.toIso8601String(),
-      if (s.endedAt != null) 'endedAt': s.endedAt!.toIso8601String(),
-    };
-
-TripSummary _summaryFromJson(Map<String, dynamic> j) => TripSummary(
-      distanceKm: (j['distanceKm'] as num).toDouble(),
-      maxRpm: (j['maxRpm'] as num).toDouble(),
-      highRpmSeconds: (j['highRpmSeconds'] as num).toDouble(),
-      idleSeconds: (j['idleSeconds'] as num).toDouble(),
-      harshBrakes: (j['harshBrakes'] as num).toInt(),
-      harshAccelerations: (j['harshAccelerations'] as num).toInt(),
-      avgLPer100Km: (j['avgLPer100Km'] as num?)?.toDouble(),
-      fuelLitersConsumed: (j['fuelLitersConsumed'] as num?)?.toDouble(),
-      startedAt: j['startedAt'] == null
-          ? null
-          : DateTime.parse(j['startedAt'] as String),
-      endedAt: j['endedAt'] == null
-          ? null
-          : DateTime.parse(j['endedAt'] as String),
-    );
+// #3739 — the former private summary codec lived here and was the most
+// drifted of the three: 16 canonical keys missing, including
+// `distanceSource` (so every paused→finalised trip fell back to the
+// suspicious `'virtual'` default flagged in earlier field sessions) and
+// `kind`, `cs`, `sblog` plus all the #3576/#2760/#3589 fields. The entry
+// now delegates to the canonical `trip_summary_codec.dart` (via the
+// consumption api.dart barrel) — ONE codec for history, WAL and paused.
 
 /// Hive-backed store for paused OBD2 trips (#797 phase 1).
 ///

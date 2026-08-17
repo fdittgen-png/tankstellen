@@ -63,7 +63,7 @@ List<Object> _readyAppOverrides({
   required LandingScreen landing,
 }) {
   final test = standardTestOverrides();
-  when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+  when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
   when(() => test.mockStorage.isSetupComplete).thenReturn(true);
   when(() => test.mockStorage.getSetting(StorageKeys.gdprConsentGiven))
       .thenReturn(true);

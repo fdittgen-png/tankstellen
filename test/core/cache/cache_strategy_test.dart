@@ -87,7 +87,7 @@ class _FakeStationService implements StationService {
     CancelToken? cancelToken,
   }) async {
     callCount++;
-    if (errorToThrow != null) throw errorToThrow!;
+    if (errorToThrow != null) throw errorToThrow!; // ignore: only_throw_errors
     return ServiceResult(
       data: stationsToReturn,
       source: ServiceSource.tankerkoenigApi,
@@ -98,7 +98,7 @@ class _FakeStationService implements StationService {
   @override
   Future<ServiceResult<StationDetail>> getStationDetail(String id) async {
     callCount++;
-    if (errorToThrow != null) throw errorToThrow!;
+    if (errorToThrow != null) throw errorToThrow!; // ignore: only_throw_errors
     throw const ApiException(message: 'Not implemented');
   }
 
@@ -107,7 +107,7 @@ class _FakeStationService implements StationService {
     List<String> ids,
   ) async {
     callCount++;
-    if (errorToThrow != null) throw errorToThrow!;
+    if (errorToThrow != null) throw errorToThrow!; // ignore: only_throw_errors
     return ServiceResult(
       data: const {},
       source: ServiceSource.tankerkoenigApi,

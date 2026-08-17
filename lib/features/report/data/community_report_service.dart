@@ -57,13 +57,20 @@ class CommunityReportService {
   }
 
   /// Get recent community reports for a station (last 2 hours).
+  ///
+  /// #3747 — selects explicit columns WITHOUT `reporter_id`: the
+  /// community read surface has no use for another user's stable
+  /// account UUID, so the app stops requesting it (the RLS-level
+  /// exposure is documented in migration
+  /// `20260818000002_share_trip_with_email.sql`).
   static Future<List<Map<String, dynamic>>> getReports({
     required String stationId,
     required SupabaseClient client,
   }) async {
     final response = await client
         .from(SyncFields.reportsTable)
-        .select()
+        .select('id, station_id, country_code, fuel_type, reported_price, '
+            'correction_text, is_validated, reported_at')
         .eq(SyncFields.stationId, stationId)
         .gte(SyncFields.reportedAt,
             DateTime.now().subtract(const Duration(hours: 2)).toIso8601String())

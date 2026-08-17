@@ -1,6 +1,23 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import '../../features/station_services/argentina/argentina_station_service.dart';
+import '../../features/station_services/australia/australia_station_service.dart';
+import '../../features/station_services/austria/econtrol_station_service.dart';
+import '../../features/station_services/chile/chile_station_service.dart';
+import '../../features/station_services/denmark/denmark_station_service.dart';
+import '../../features/station_services/france/france_service_builder.dart';
+import '../../features/station_services/germany/tankerkoenig_station_service.dart';
+import '../../features/station_services/greece/greece_station_service.dart';
+import '../../features/station_services/italy/mise_station_service.dart';
+import '../../features/station_services/luxembourg/luxembourg_station_service.dart';
+import '../../features/station_services/mexico/mexico_service_builder.dart';
+import '../../features/station_services/portugal/portugal_station_service.dart';
+import '../../features/station_services/romania/romania_station_service.dart';
+import '../../features/station_services/slovenia/slovenia_station_service.dart';
+import '../../features/station_services/south_korea/south_korea_station_service.dart';
+import '../../features/station_services/spain/miteco_station_service.dart';
+import '../../features/station_services/uk/uk_service_builder.dart';
 import '../country/country_bounding_box.dart';
 import '../domain/fuel_type.dart';
 import 'country_service_entry.dart';
@@ -52,6 +69,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
   // ── Tight-box / island first (avoid shadowing) ─────────────────────
   CountryServiceEntry(
     countryCode: 'PT',
+    buildService: buildPtStationService,
     errorSource: ServiceSource.portugalApi,
     boundingBox: CountryBoundingBox(
       minLat: 32.0, maxLat: 42.5, minLng: -32.0, maxLng: -6.0,
@@ -64,6 +82,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
   ),
   CountryServiceEntry(
     countryCode: 'GB',
+    buildService: buildGbStationServiceFromDeps,
     errorSource: ServiceSource.ukApi,
     boundingBox: CountryBoundingBox(
       minLat: 49.5, maxLat: 61.0, minLng: -9.0, maxLng: 2.0,
@@ -80,6 +99,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
   ),
   CountryServiceEntry(
     countryCode: 'DK',
+    buildService: buildDkStationService,
     errorSource: ServiceSource.denmarkApi,
     boundingBox: CountryBoundingBox(
       minLat: 54.0, maxLat: 58.0, minLng: 7.5, maxLng: 15.5,
@@ -95,6 +115,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
   ),
   CountryServiceEntry(
     countryCode: 'LU',
+    buildService: buildLuStationService,
     errorSource: ServiceSource.luxembourgApi,
     // Tight box — LU is ~82 km north-south, ~57 km east-west; modest
     // margin so BE/FR/DE neighbours don't bleed into LU matches.
@@ -111,6 +132,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
   ),
   CountryServiceEntry(
     countryCode: 'SI',
+    buildService: buildSiStationService,
     errorSource: ServiceSource.sloveniaApi,
     // Tight box — Slovenia surrounded by IT / AT / HR; over-generous
     // margin would shadow them. See #575.
@@ -131,6 +153,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
   // ── Continental EU (test order matters for shadow neighbours) ─────
   CountryServiceEntry(
     countryCode: 'AT',
+    buildService: buildAtStationService,
     errorSource: ServiceSource.eControlApi,
     boundingBox: CountryBoundingBox(
       minLat: 46.0, maxLat: 49.5, minLng: 9.0, maxLng: 17.5,
@@ -144,6 +167,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
   ),
   CountryServiceEntry(
     countryCode: 'FR',
+    buildService: buildFrStationService,
     errorSource: ServiceSource.prixCarburantsApi,
     // France (mainland), excludes overseas territories.
     boundingBox: CountryBoundingBox(
@@ -159,6 +183,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
   ),
   CountryServiceEntry(
     countryCode: 'IT',
+    buildService: buildItStationService,
     errorSource: ServiceSource.miseApi,
     boundingBox: CountryBoundingBox(
       minLat: 35.0, maxLat: 47.5, minLng: 6.0, maxLng: 19.0,
@@ -172,6 +197,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
   ),
   CountryServiceEntry(
     countryCode: 'ES',
+    buildService: buildEsStationService,
     errorSource: ServiceSource.mitecoApi,
     // Spain (mainland + Balearic + Canary).
     boundingBox: CountryBoundingBox(
@@ -187,6 +213,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
   ),
   CountryServiceEntry(
     countryCode: 'DE',
+    buildService: buildDeStationService,
     errorSource: ServiceSource.tankerkoenigApi,
     requiresApiKey: true,
     boundingBox: CountryBoundingBox(
@@ -199,6 +226,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
   // ── Non-EU countries (no overlap concerns) ─────────────────────────
   CountryServiceEntry(
     countryCode: 'MX',
+    buildService: buildMxStationService,
     errorSource: ServiceSource.mexicoApi,
     boundingBox: CountryBoundingBox(
       minLat: 14.0, maxLat: 33.0, minLng: -119.0, maxLng: -86.0,
@@ -217,6 +245,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
   // longitude range along the cordillera (#596).
   CountryServiceEntry(
     countryCode: 'CL',
+    buildService: buildClStationService,
     errorSource: ServiceSource.chileApi,
     requiresApiKey: true,
     boundingBox: CountryBoundingBox(
@@ -231,6 +260,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
   ),
   CountryServiceEntry(
     countryCode: 'AR',
+    buildService: buildArStationService,
     errorSource: ServiceSource.argentinaApi,
     boundingBox: CountryBoundingBox(
       minLat: -56.0, maxLat: -21.0, minLng: -74.0, maxLng: -53.0,
@@ -247,6 +277,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
   ),
   CountryServiceEntry(
     countryCode: 'AU',
+    buildService: buildAuStationService,
     errorSource: ServiceSource.australiaApi,
     boundingBox: CountryBoundingBox(
       minLat: -44.0, maxLat: -9.5, minLng: 112.5, maxLng: 154.0,
@@ -265,6 +296,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
   ),
   CountryServiceEntry(
     countryCode: 'KR',
+    buildService: buildKrStationService,
     errorSource: ServiceSource.openinetApi,
     requiresApiKey: true,
     // South Korea mainland + Jeju. No overlap with any other
@@ -281,6 +313,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
   ),
   CountryServiceEntry(
     countryCode: 'GR',
+    buildService: buildGrStationService,
     errorSource: ServiceSource.greeceApi,
     // Eastern edge deliberately pulled in from the geographic limit
     // (~29.6) so Istanbul (41.01, 28.98) is NOT falsely attributed
@@ -297,6 +330,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
   ),
   CountryServiceEntry(
     countryCode: 'RO',
+    buildService: buildRoStationService,
     errorSource: ServiceSource.romaniaApi,
     // No neighbour conflicts — HU, BG, UA, RS, MD are not in the
     // registry. See #577.

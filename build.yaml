@@ -11,3 +11,11 @@ targets:
           # any other Map-consumer) sees raw Connector/etc. objects in generated
           # toJson output and silently drops them on encrypted boxes (#690).
           explicit_to_json: true
+      source_gen:combining_builder:
+        options:
+          # #3742 — generated part files legitimately serialize fields the
+          # hand-written model deprecates (e.g. UserProfile's #1373 legacy
+          # toggles kept for the one-shot migration read); the lint is for
+          # hand-written call sites, not codegen output.
+          ignore_for_file:
+            - deprecated_member_use_from_same_package

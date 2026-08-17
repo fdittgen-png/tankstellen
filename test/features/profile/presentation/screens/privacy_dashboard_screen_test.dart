@@ -1,6 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+// The mocktail Mock* storage doubles are deprecated as a steering hint
+// (prefer the stateful fakes) but remain sanctioned for widget tests that
+// stub reads exclusively -- see test/helpers/mock_providers.dart (#3742).
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -101,9 +106,9 @@ void main() {
       when(() => mockStorage.getItineraries()).thenReturn([
         {'id': 'r1'},
       ]);
-      when(() => mockStorage.hasApiKey()).thenReturn(true);
-      when(() => mockStorage.hasCustomApiKey()).thenReturn(true);
-      when(() => mockStorage.getApiKey()).thenReturn('key');
+      when(() => mockStorage.hasApiKey(any())).thenReturn(true);
+      when(() => mockStorage.hasCustomApiKey(any())).thenReturn(true);
+      when(() => mockStorage.getApiKey(any())).thenReturn('key');
       when(() => mockStorage.hasEvApiKey()).thenReturn(false);
       when(() => mockStorage.hasCustomEvApiKey()).thenReturn(false);
       when(() => mockStorage.storageStats).thenReturn((

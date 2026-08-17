@@ -92,7 +92,7 @@ class _BrandedStationService implements StationService {
 /// value doesn't gate them; it only matters for the DE/CL/KR demo guard.
 class _NoKeyStorage implements StorageRepository {
   @override
-  bool hasApiKey() => false;
+  bool hasApiKey(String countryCode) => false;
 
   @override
   dynamic noSuchMethod(Invocation invocation) =>

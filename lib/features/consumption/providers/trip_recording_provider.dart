@@ -656,10 +656,13 @@ class TripRecording extends _$TripRecording {
     final base = _activeSnapshot;
     if (base == null) return null;
     final phaseStr = _phaseStringFor(ctl);
+    // #3741 — read the captured buffer ONCE per flush (was twice: here
+    // and inside _summaryFromCtl, each a full O(n) copy pre-#3741).
+    final samples = ctl.capturedSamples;
     return base.copyWith(
       phase: phaseStr,
-      summary: _summaryFromCtl(ctl),
-      samples: ctl.capturedSamples,
+      summary: _summaryFromCtl(ctl, samples),
+      samples: samples,
       odometerStartKm: ctl.odometerStartKm,
       odometerLatestKm: ctl.odometerLatestKm,
       lastFlushedAt: DateTime.now(),
@@ -692,18 +695,15 @@ class TripRecording extends _$TripRecording {
   /// Pull the recorder's running summary; lets the snapshot carry
   /// the latest distance / fuel / harsh counts without forcing the
   /// controller to expose more debug surface than [capturedSamples].
-  TripSummary _summaryFromCtl(TripRecordingController ctl) {
-    // capturedSamples is a List<TripSample>; the controller exposes
-    // the running summary indirectly via stop()/buildSummary, but
-    // there's no public mid-trip accessor. Rather than reach into
-    // the controller's recorder we recompute distance + max RPM
-    // from the captured buffer — it's already the post-debounce
-    // 1 Hz feed and is plenty for the staleness / preview rendering
-    // that recovery does. A perfect mid-trip summary (idle/harsh
-    // counters) would require the controller to expose its own
-    // recorder snapshot; we leave that for a future iteration if
-    // recovery acquires a richer preview.
-    final samples = ctl.capturedSamples;
+  /// [samples] is the buffer view the caller read for this flush (#3741).
+  TripSummary _summaryFromCtl(
+      TripRecordingController ctl, List<TripSample> samples) {
+    // The controller has no public mid-trip summary accessor; rather
+    // than reach into its recorder we use the captured buffer — the
+    // post-debounce 1 Hz feed, plenty for the staleness / preview
+    // rendering recovery does. A perfect mid-trip summary (idle/harsh
+    // counters) would need the controller to expose its own recorder
+    // snapshot; deferred until recovery acquires a richer preview.
     if (samples.isEmpty) {
       return const TripSummary(
         distanceKm: 0,
@@ -714,10 +714,9 @@ class TripRecording extends _$TripRecording {
         harshAccelerations: 0,
       );
     }
-    var maxRpm = 0.0;
-    for (final s in samples) {
-      if ((s.rpm ?? 0) > maxRpm) maxRpm = s.rpm ?? 0; // #2692 C4-G null→0
-    }
+    // #3741 — incremental running max; the old whole-buffer loop was
+    // O(n) per 5 s flush (O(n²) over a drive) on the gauge isolate.
+    final maxRpm = ctl.maxCapturedRpm;
     // #3251 — use the controller's OWN gap-capped distance + provenance, not a
     // re-integration of the raw buffer. Re-integrating bridged dropout gaps and
     // fabricated ~10 km across a 20-min hole (the #1927 bug on the recovery

@@ -1,6 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+// The mocktail Mock* storage doubles are deprecated as a steering hint
+// (prefer the stateful fakes) but remain sanctioned for widget tests that
+// stub reads exclusively -- see test/helpers/mock_providers.dart (#3742).
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -35,8 +40,8 @@ void main() {
 
     List<Object> buildOverrides(AppThemeChoice themeMode) {
       mockStorage = MockHiveStorage();
-      when(() => mockStorage.hasApiKey()).thenReturn(false);
-      when(() => mockStorage.getApiKey()).thenReturn(null);
+      when(() => mockStorage.hasApiKey(any())).thenReturn(false);
+      when(() => mockStorage.getApiKey(any())).thenReturn(null);
       when(() => mockStorage.getActiveProfileId()).thenReturn(null);
       when(() => mockStorage.getAllProfiles()).thenReturn([]);
       when(() => mockStorage.getRatings()).thenReturn({});

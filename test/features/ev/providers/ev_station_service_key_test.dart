@@ -59,17 +59,20 @@ class _FakeApiKeyStorage implements ApiKeyStorage {
   Future<void> setEvApiKey(String key) async {}
 
   @override
-  String? getApiKey() => null;
+  String? getApiKey(String countryCode) => null;
   @override
-  bool hasApiKey() => false;
+  bool hasApiKey(String countryCode) => false;
   @override
-  bool hasCustomApiKey() => false;
+  bool hasCustomApiKey(String countryCode) => false;
   @override
   bool hasCustomEvApiKey() => false;
   @override
-  Future<void> setApiKey(String key) async {}
+  Future<void> setApiKey(String countryCode, String key) async {}
   @override
-  Future<void> deleteApiKey() async {}
+  Future<void> deleteApiKey(String countryCode) async {}
+
+  @override
+  Future<void> deleteAllApiKeys() async {}
   @override
   String? getSupabaseAnonKey() => null;
   @override
