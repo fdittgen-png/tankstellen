@@ -55,6 +55,11 @@ updates:
       # upgrade, see #3736) — closed PR #3734. Re-bump with the AGP upgrade.
       - dependency-name: "permission_handler"
         update-types: ["version-update:semver-major"]
+      # intl is pinned EXACTLY by the Flutter SDK (flutter_localizations
+      # pins 0.20.2 on Flutter 3.41.9) — any bump is unsolvable until the
+      # SDK moves (red on PR #3744, same class as the meta pin).
+      - dependency-name: "intl"
+
       # Vendored as a stripped fork under third_party/ via
       # dependency_overrides (#3172) — the hosted constraint is inert, and
       # bumping it just makes pubspec.yaml lie about the shipped version.
