@@ -54,6 +54,10 @@ export 'data/paused_trip_repository.dart';
 export 'domain/trip_distance_source.dart';
 export 'domain/trip_live_reading.dart';
 export 'data/session/trip_recording_controller.dart';
+// #3743 — the TripRecordingController inversion seam (epic item 2): a NEW
+// cross-feature contract (consumption implements the obd2-owned overlay
+// interface), the same sanctioned-growth shape as the #3437 CDM seam.
+export 'data/session/trip_recording_sink.dart';
 export 'domain/services/obd2_analytics_signals.dart';
 export 'presentation/obd2_connection_reset_action.dart';
 export 'presentation/obd2_connect_telemetry.dart';

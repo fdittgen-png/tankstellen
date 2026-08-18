@@ -332,7 +332,12 @@ const _featurePairBaseline = <String, int>{
   'map -> profile': 1,
   'map -> route_search': 6,
   'map -> search': 10,
-  'obd2 -> consumption': 42,
+  // #3743 — the TripRecordingController inversion (epic item 2): the
+  // controller's coaching-hint import moved to the core domain kernel and
+  // the GPS-estimate folder now sits behind the obd2-owned
+  // TripGpsEstimateOverlay seam (consumption implements it via the
+  // barrel). 42 → 40.
+  'obd2 -> consumption': 40,
   'obd2 -> driving': 1,
   'obd2 -> feature_management': 4,
   'obd2 -> vehicle': 10,

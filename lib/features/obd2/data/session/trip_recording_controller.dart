@@ -8,10 +8,9 @@ import 'package:flutter/foundation.dart';
 import '../../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../../../core/telemetry/collectors/breadcrumb_collector.dart';
-import '../../../consumption/domain/driving_coaching.dart' show DrivingCoachingHint;
+import '../../../../core/domain/driving_coaching_hint.dart';
 import '../../../consumption/domain/entities/gps_sample_diagnostic.dart';
 import '../../../consumption/domain/services/gear_inference.dart';
-import '../../../consumption/domain/services/gps_live_estimate_folder.dart';
 import '../../../consumption/domain/services/trip_consumption_reliability.dart';
 import '../../../consumption/domain/trip_recorder.dart';
 import '../../../consumption/data/trip_history_repository.dart';
@@ -22,6 +21,7 @@ import 'dropped_session_manager.dart';
 import '../../domain/gps_only_sample_builder.dart';
 import '../../domain/instant_consumption_ema.dart';
 import 'live_sample_snapshot.dart';
+import 'trip_recording_sink.dart';
 import '../obd2_breadcrumb_collector.dart';
 import '../../domain/obd2_connection_errors.dart';
 import '../../domain/obd2_trip_start_budgets.dart';
@@ -351,7 +351,9 @@ class TripRecordingController {
   /// `Obd2RecordingPipeline` so the OBD2 live path mirrors the GPS-only
   /// pipeline through ONE implementation (the anti-divergence seam). Null
   /// in harnesses that don't wire it → the live estimate fields stay null.
-  final GpsLiveEstimateFolder? _gpsEstimateFolder;
+  /// #3743 — typed as the obd2-owned [TripGpsEstimateOverlay] seam;
+  /// consumption's `GpsLiveEstimateFolder` is the one implementation.
+  final TripGpsEstimateOverlay? _gpsEstimateFolder;
 
   /// #2506 — latest GPS ground-speed (km/h) latched via [updateGpsFix];
   /// the live speed-read-out fallback when the OBD2 speed PID (0x0D) is
@@ -450,7 +452,7 @@ class TripRecordingController {
       VoidCallback onReconnect,
     )? reconnectScannerFactory,
     Obd2BreadcrumbRecorder? breadcrumbCollector,
-    GpsLiveEstimateFolder? gpsEstimateFolder,
+    TripGpsEstimateOverlay? gpsEstimateFolder,
     void Function(HarshEvent event)? onHarshEvent,
   })  : _service = service,
         _diagnosticCapture = diagnosticCapture,
@@ -1539,7 +1541,7 @@ class TripRecordingController {
     // the GPS-physics estimate + coaching into the live reading so the
     // recording screen mirrors the proven post-trip
     // `Obd2GpsEstimateFallback` instead of dashing the whole drive. The
-    // shared [GpsLiveEstimateFolder] is the same implementation the
+    // shared [TripGpsEstimateOverlay] folder is the same implementation the
     // GPS-only pipeline uses, so the two paths can't diverge. The fold is
     // driven by the EFFECTIVE speed (GPS latch when OBD2 0x0D is absent),
     // so the physics still runs on a car that exposes neither a fuel PID
