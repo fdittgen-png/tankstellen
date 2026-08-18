@@ -4,7 +4,7 @@
 import '../../../../core/domain/gps_calibration_matrix.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../../obd2/api.dart';
-import '../driving_coaching.dart'
+import '../../../driving_score/api.dart'
     show DrivingCoachingHint, gpsCoachingHint, recentSamplesWithin;
 import '../road_grade_calculator.dart';
 import '../trip_recorder.dart' show TripSample;

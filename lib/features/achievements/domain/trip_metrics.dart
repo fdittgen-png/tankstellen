@@ -4,7 +4,7 @@
 import 'dart:math' as math;
 
 import '../../../core/utils/num_extensions.dart';
-import '../../consumption/data/driving_score_calculator.dart';
+import '../../driving_score/api.dart';
 import '../../consumption/data/trip_history_repository.dart';
 import '../../consumption/domain/trip_recorder.dart';
 

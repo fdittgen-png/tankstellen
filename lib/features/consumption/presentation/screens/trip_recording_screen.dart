@@ -32,7 +32,7 @@ import '../../providers/recording_profile_provider.dart';
 import '../../providers/trip_recording_provider.dart';
 import '../../providers/wakelock_facade.dart';
 import '../widgets/broken_map_widgets.dart';
-import '../widgets/eco_nudge_listener.dart';
+import '../../../driving_score/api.dart';
 import '../widgets/minimal_drive_summary.dart';
 import '../widgets/recording_app_bar_actions.dart';
 import '../widgets/trip_avg_consumption_card.dart';

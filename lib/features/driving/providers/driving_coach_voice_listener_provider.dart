@@ -13,7 +13,7 @@ import '../../../core/logging/error_logger.dart';
 import '../../../core/services/voice_announcement_providers.dart';
 import '../../../core/services/voice_announcement_service.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../consumption/domain/driving_coaching.dart'
+import '../../driving_score/api.dart'
     show DrivingCoachingHint, coachingHint;
 import '../../consumption/domain/harsh_event.dart'
     show HarshEvent, HarshEventType;

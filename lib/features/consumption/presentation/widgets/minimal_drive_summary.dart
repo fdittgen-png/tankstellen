@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../domain/driving_coaching.dart';
+import '../../../driving_score/api.dart';
 import '../../providers/trip_recording_provider.dart';
 import 'broken_map_widgets.dart';
 

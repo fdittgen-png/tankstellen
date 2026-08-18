@@ -7,10 +7,9 @@ import '../../../../core/utils/time_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/cold_start_baselines.dart';
-import '../../domain/driving_coaching.dart';
+import '../../../driving_score/api.dart';
 import '../../domain/situation_classifier.dart';
 import '../../providers/trip_recording_provider.dart';
-import 'coaching_chip.dart';
 import 'trip_recording_banner_palette.dart';
 
 /// Localized label for a [DrivingSituation], shared by the banner's

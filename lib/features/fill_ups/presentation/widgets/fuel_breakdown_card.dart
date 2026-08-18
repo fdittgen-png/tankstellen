@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../consumption/data/lessons/lesson_format.dart';
+import '../../../driving_score/api.dart';
 import '../../../consumption/domain/fuel_event_attribution.dart';
 
 /// "Where your fuel went" breakdown card on the Trip detail screen

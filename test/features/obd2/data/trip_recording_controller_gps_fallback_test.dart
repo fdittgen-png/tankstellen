@@ -6,7 +6,7 @@ import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 import 'package:tankstellen/features/obd2/domain/pid_scheduler.dart';
 import 'package:tankstellen/features/obd2/data/session/trip_recording_controller.dart';
-import 'package:tankstellen/features/consumption/domain/driving_coaching.dart';
+import 'package:tankstellen/features/driving_score/domain/driving_coaching.dart';
 import 'package:tankstellen/features/consumption/domain/services/gps_fuel_estimator.dart';
 import 'package:tankstellen/features/consumption/domain/services/gps_live_estimate_folder.dart';
 

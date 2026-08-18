@@ -8,7 +8,7 @@ import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../obd2/api.dart';
 import 'broken_map_widgets.dart';
-import 'eco_nudge_listener.dart';
+import '../../../driving_score/api.dart';
 import 'minimal_drive_summary.dart';
 import 'trip_avg_consumption_card.dart';
 import 'trip_radar_card.dart';

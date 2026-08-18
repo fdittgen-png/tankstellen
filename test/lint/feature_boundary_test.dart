@@ -283,7 +283,7 @@ void main() {
 /// `obd2/api.dart` barrel (exempt). Same graph, new attribution — the
 /// `obd2 -> *` entries are the decomposition's measured starting point.
 const _featurePairBaseline = <String, int>{
-  'achievements -> consumption': 5,
+  'achievements -> consumption': 4,
   'achievements -> price_history': 2,
   'alerts -> map': 1,
   'approach -> consumption': 2,
@@ -301,7 +301,7 @@ const _featurePairBaseline = <String, int>{
   'consumption -> ev': 8,
   // #3743 (epic item 1, receipts_ocr extraction) — the share-receipt
   // handler moved out and now imports the feature_management barrel: 21→19.
-  'consumption -> feature_management': 15,
+  'consumption -> feature_management': 13,
   'consumption -> glide_coach': 4,
   'consumption -> map': 2,
   'consumption -> profile': 7,
@@ -309,12 +309,18 @@ const _featurePairBaseline = <String, int>{
   'consumption -> sync': 1,
   'consumption -> vehicle': 23,
   'driving -> approach': 1,
-  'driving -> consumption': 5,
+  'driving -> consumption': 4,
   'driving -> feature_management': 6,
   'driving -> glide_coach': 2,
   'driving -> map': 3,
   'driving -> profile': 5,
   'driving -> search': 1,
+  // #3743 (epic item 1, driving_score extraction, step 3/5) — the 35
+  // edges are former INTRA-consumption imports of the trip stack
+  // (trip_recorder/summary, accel gate, engine power factor, trip-detail
+  // charts) — #3137-precedent decomposition edges that collapse onto the
+  // trips barrel in step 5. All inbound edges are barrel-routed.
+  'driving_score -> consumption': 35,
   'ev -> search': 1,
   'ev -> vehicle': 1,
   'favorites -> alerts': 1,
@@ -333,7 +339,7 @@ const _featurePairBaseline = <String, int>{
   // consumption<->carbon cycles broke (17 -> 15).
   'fill_ups -> achievements': 1,
   'fill_ups -> carbon': 2,
-  'fill_ups -> consumption': 36,
+  'fill_ups -> consumption': 35,
   'fill_ups -> ev': 4,
   'fill_ups -> profile': 3,
   'fill_ups -> vehicle': 13,

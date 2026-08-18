@@ -4,9 +4,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/domain/driving_score.dart';
+import 'package:tankstellen/features/driving_score/domain/driving_score.dart';
 import 'package:tankstellen/features/consumption/domain/trip_summary.dart';
-import 'package:tankstellen/features/consumption/presentation/widgets/driving_analysis_trace_card.dart';
+import 'package:tankstellen/features/driving_score/presentation/widgets/driving_analysis_trace_card.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';

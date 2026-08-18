@@ -9,7 +9,7 @@ import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/osm_attribution.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../map/data/sparkilo_tile_layer.dart';
-import '../../data/driving_insights_hard_accel_indices.dart';
+import '../../../driving_score/api.dart';
 import 'trip_detail_charts.dart';
 import 'trip_path_geometry.dart';
 

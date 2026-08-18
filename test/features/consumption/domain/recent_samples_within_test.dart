@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/domain/driving_coaching.dart';
+import 'package:tankstellen/features/driving_score/domain/driving_coaching.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 
 TripSample _sampleAt(DateTime t) =>

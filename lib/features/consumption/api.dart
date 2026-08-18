@@ -19,7 +19,6 @@ export 'data/baseline_sync.dart';
 // lib/core/sync; exported so cross-feature consumers (device linking,
 // data transparency) keep going through the barrel.
 export 'data/trips_sync.dart';
-export 'data/driving_score_calculator.dart';
 // #3743 — the #3137 source-compat re-export of ../obd2/api.dart is gone:
 // consumers of the OBD2 stack import features/obd2/api.dart directly.
 export 'data/pip_controller.dart';
@@ -32,7 +31,6 @@ export 'data/trip_history_repository.dart';
 export 'data/trip_sample_codec.dart';
 export 'data/trip_summary_codec.dart';
 export 'domain/direct_fuel_rate_detector.dart';
-export 'domain/driving_coaching.dart';
 export 'domain/harsh_event.dart';
 export 'domain/services/speed_consumption_histogram.dart';
 export 'domain/services/trip_length_aggregator.dart';

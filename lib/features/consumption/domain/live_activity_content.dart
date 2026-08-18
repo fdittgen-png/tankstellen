@@ -11,7 +11,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../core/domain/fuel_type.dart';
 import '../../../core/domain/station.dart';
 import '../providers/trip_recording_provider.dart';
-import 'driving_coaching.dart';
+import '../../driving_score/api.dart';
 
 /// Which layout the iOS Live Activity leads with (#3170) — mirrors the
 /// Android PiP tile's two faces (`TripRecordingPipView`): the default

@@ -7,7 +7,7 @@ import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/core/services/voice_announcement_providers.dart';
 import 'package:tankstellen/core/services/voice_announcement_service.dart';
 import 'package:tankstellen/features/obd2/domain/trip_live_reading.dart';
-import 'package:tankstellen/features/consumption/domain/driving_coaching.dart'
+import 'package:tankstellen/features/driving_score/domain/driving_coaching.dart'
     show DrivingCoachingHint;
 import 'package:tankstellen/features/consumption/domain/harsh_event.dart';
 import 'package:tankstellen/features/consumption/domain/situation_classifier.dart';

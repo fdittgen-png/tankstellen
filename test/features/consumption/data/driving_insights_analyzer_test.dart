@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/data/driving_insights_analyzer.dart';
-import 'package:tankstellen/features/consumption/data/driving_insights_hard_accel_indices.dart';
-import 'package:tankstellen/features/consumption/domain/driving_insight.dart';
+import 'package:tankstellen/features/driving_score/data/driving_insights_analyzer.dart';
+import 'package:tankstellen/features/driving_score/data/driving_insights_hard_accel_indices.dart';
+import 'package:tankstellen/features/driving_score/domain/driving_insight.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_detail_charts.dart';
 

@@ -5,9 +5,8 @@ import 'package:xml/xml.dart';
 
 import '../../../../core/utils/time_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../domain/lessons/driving_lesson.dart';
+import '../../../driving_score/api.dart';
 import '../../domain/trip_recorder.dart';
-import '../lessons/driving_lesson_registry.dart';
 import '../trip_history_repository.dart';
 
 /// Namespace URI for the tankstellen GPX extensions (#2251). Carrying

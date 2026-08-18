@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/data/driving_score_calculator.dart';
+import 'package:tankstellen/features/driving_score/data/driving_score_calculator.dart';
 import 'package:tankstellen/features/obd2/domain/trip_distance_source.dart';
-import 'package:tankstellen/features/consumption/domain/driving_score.dart';
+import 'package:tankstellen/features/driving_score/domain/driving_score.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 
 /// Pure-logic tests for the driving-score composite calculator

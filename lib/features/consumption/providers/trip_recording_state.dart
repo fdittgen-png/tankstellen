@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../obd2/api.dart';
 import '../domain/cold_start_baselines.dart';
-import '../domain/driving_coaching.dart' show DrivingCoachingHint;
+import '../../driving_score/api.dart' show DrivingCoachingHint;
 import '../domain/entities/trip_save_stage.dart';
 import '../domain/entities/trip_start_stage.dart';
 import '../domain/situation_classifier.dart';

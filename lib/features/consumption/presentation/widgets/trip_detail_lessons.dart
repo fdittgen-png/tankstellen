@@ -4,12 +4,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../data/lessons/driving_lesson_registry.dart';
+import '../../../driving_score/api.dart';
 import '../../data/trip_history_entry.dart';
-import '../../domain/driving_insight.dart';
-import '../../domain/driving_score.dart';
-import '../../domain/lessons/driving_lesson.dart';
-import '../../domain/lessons/driving_lesson_rule.dart';
 import '../../domain/trip_sample.dart';
 import '../../../fill_ups/api.dart';
 
