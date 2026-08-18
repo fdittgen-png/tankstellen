@@ -217,15 +217,14 @@ class SouthKoreaStationService
 
       return wrapStations(filtered, ServiceSource.openinetApi);
     } on DioException catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'KR search failed'}));
-      final status = e.response?.statusCode;
-      if (status == 401 || status == 403) {
-        throw ApiException(
-          message: 'OPINET rejected API key (HTTP $status)',
-          statusCode: status,
-        );
-      }
-      throwApiException(e, defaultMessage: 'Network error (OPINET)', stackTrace: st);
+      throwApiException(
+        e,
+        defaultMessage: 'Network error (OPINET)',
+        stackTrace: st,
+        logWhere: 'KR search failed',
+        authRejectedMessage: (status) =>
+            'OPINET rejected API key (HTTP $status)',
+      );
     }
   }
 

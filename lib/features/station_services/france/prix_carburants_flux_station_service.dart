@@ -68,23 +68,16 @@ class PrixCarburantsFluxStationService
               responseType: ResponseType.bytes,
             ),
         _zipUrl = zipUrl ?? defaultZipUrl,
+        // The shared `{'stations': [...]}` envelope + per-item codec —
+        // see [stationListDataset] (deduped from the DK/MX/FR copies).
         _persistent = cache == null
             ? null
-            : PersistentDataset<List<Station>>(
+            : stationListDataset<Station>(
                 cache: cache,
                 countryCode: 'FR',
-                datasetName: 'stations',
                 source: ServiceSource.prixCarburantsApi,
-                serialize: (stations) =>
-                    {'stations': stations.map((s) => s.toJson()).toList()},
-                deserialize: (json) {
-                  final list = json['stations'] as List<dynamic>?;
-                  if (list == null) return null;
-                  return list
-                      .map((j) =>
-                          Station.fromJson(Map<String, dynamic>.from(j as Map)))
-                      .toList();
-                },
+                itemToJson: (s) => s.toJson(),
+                itemFromJson: Station.fromJson,
               );
 
   /// Soft/hard dataset TTLs mirror the FR bulk [FuelServicePolicy] in the

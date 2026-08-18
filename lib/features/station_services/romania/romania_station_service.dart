@@ -199,13 +199,15 @@ class RomaniaStationService
         fetchedAt: DateTime.now(),
       );
     } on DioException catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st,
-          context: const {'where': 'RO Monitorul fetch failed'}));
-      final status = e.response?.statusCode;
-      throw ApiException(
-        message: 'Monitorul Prețurilor unreachable (${e.type.name})'
-            '${status != null ? ' [HTTP $status]' : ''}',
-        statusCode: status,
+      throwApiException(
+        e,
+        stackTrace: st,
+        logWhere: 'RO Monitorul fetch failed',
+        customMessage: (e) {
+          final status = e.response?.statusCode;
+          return 'Monitorul Prețurilor unreachable (${e.type.name})'
+              '${status != null ? ' [HTTP $status]' : ''}';
+        },
       );
     } on ApiException {
       rethrow;

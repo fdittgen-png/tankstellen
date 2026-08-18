@@ -67,9 +67,11 @@ class MexicoStationService
               receiveTimeout: const Duration(seconds: 45),
             ),
         _baseUrl = baseUrl,
+        // The shared `{'stations': [...]}` envelope + per-item codec —
+        // see [stationListDataset] (deduped from the DK/MX/FR copies).
         _persistent = cache == null
             ? null
-            : PersistentDataset<List<_CreStation>>(
+            : stationListDataset<_CreStation>(
                 cache: cache,
                 countryCode: 'MX',
                 // #2704 — bumped from 'stations' to 'stations.v2' so warm
@@ -78,16 +80,8 @@ class MexicoStationService
                 // of waiting out the 24-hour hard TTL.
                 datasetName: 'stations.v2',
                 source: ServiceSource.mexicoApi,
-                serialize: (stations) =>
-                    {'stations': stations.map((s) => s.toJson()).toList()},
-                deserialize: (json) {
-                  final list = json['stations'] as List<dynamic>?;
-                  if (list == null) return null;
-                  return list
-                      .map((j) => _CreStation.fromJson(
-                          Map<String, dynamic>.from(j as Map)))
-                      .toList();
-                },
+                itemToJson: (s) => s.toJson(),
+                itemFromJson: _CreStation.fromJson,
               );
 
   static const Duration _cacheTtl = Duration(hours: 4);

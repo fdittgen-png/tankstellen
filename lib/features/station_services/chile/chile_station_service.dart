@@ -15,7 +15,6 @@ import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import 'chile_response_parser.dart' as parser;
-import '../../../core/logging/error_logger.dart';
 import '../../../core/services/country_service_dependencies.dart';
 import '../../../core/services/impl/demo_station_service.dart';
 
@@ -174,15 +173,13 @@ class ChileStationService
 
       return wrapStations(filtered, ServiceSource.chileApi);
     } on DioException catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'CL search failed'}));
-      final status = e.response?.statusCode;
-      if (status == 401 || status == 403) {
-        throw ApiException(
-          message: 'CNE rejected API key (HTTP $status)',
-          statusCode: status,
-        );
-      }
-      throwApiException(e, defaultMessage: 'Network error (CNE)', stackTrace: st);
+      throwApiException(
+        e,
+        defaultMessage: 'Network error (CNE)',
+        stackTrace: st,
+        logWhere: 'CL search failed',
+        authRejectedMessage: (status) => 'CNE rejected API key (HTTP $status)',
+      );
     }
   }
 

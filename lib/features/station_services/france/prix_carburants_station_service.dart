@@ -16,7 +16,6 @@ import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/services/brand_enrich_budget.dart';
 import 'prix_carburants_queries.dart';
-import '../../../core/logging/error_logger.dart';
 
 /// Real French fuel price data from Prix-Carburants (gouv.fr).
 /// Free, no API key, no registration. Updated every 10 minutes.
@@ -309,8 +308,7 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
         );
       }
     } on DioException catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st,
-          context: const {'where': 'Prix-Carburants batch prices fetch failed'}));
+      logDioFailure(e, st, 'Prix-Carburants batch prices fetch failed');
     }
     return ServiceResult(
       data: prices,

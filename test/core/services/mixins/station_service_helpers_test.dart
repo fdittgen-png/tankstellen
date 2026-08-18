@@ -71,6 +71,71 @@ void main() {
             .having((e) => e.statusCode, 'statusCode', isNull)),
       );
     });
+
+    DioException authError(int status) => DioException(
+          requestOptions: RequestOptions(path: '/auth'),
+          type: DioExceptionType.badResponse,
+          response: Response(
+            requestOptions: RequestOptions(path: '/auth'),
+            statusCode: status,
+          ),
+        );
+
+    test('authRejectedMessage wins on 401/403 with the provider message', () {
+      for (final status in [401, 403]) {
+        expect(
+          () => helper.throwApiException(
+            authError(status),
+            authRejectedMessage: (s) => 'CNE rejected API key (HTTP $s)',
+          ),
+          throwsA(isA<ApiException>()
+              .having((e) => e.message, 'message',
+                  'CNE rejected API key (HTTP $status)')
+              .having((e) => e.statusCode, 'statusCode', status)),
+        );
+      }
+    });
+
+    test('authRejectedMessage is ignored for non-auth statuses — falls '
+        'through to the generic classification', () {
+      expect(
+        () => helper.throwApiException(
+          authError(500),
+          defaultMessage: 'Network error (CNE)',
+          authRejectedMessage: (s) => 'CNE rejected API key (HTTP $s)',
+        ),
+        throwsA(isA<ApiException>()
+            .having((e) => e.message, 'message', contains('Network error'))
+            .having((e) => e.statusCode, 'statusCode', 500)),
+      );
+    });
+
+    test('customMessage overrides the whole message shape (RO/GR variants)',
+        () {
+      expect(
+        () => helper.throwApiException(
+          authError(503),
+          customMessage: (e) => 'Monitorul unreachable (${e.type.name})',
+        ),
+        throwsA(isA<ApiException>()
+            .having((e) => e.message, 'message',
+                'Monitorul unreachable (badResponse)')
+            .having((e) => e.statusCode, 'statusCode', 503)),
+      );
+    });
+
+    test('authRejectedMessage takes precedence over customMessage on 401',
+        () {
+      expect(
+        () => helper.throwApiException(
+          authError(401),
+          authRejectedMessage: (s) => 'rejected (HTTP $s)',
+          customMessage: (e) => 'unreachable',
+        ),
+        throwsA(isA<ApiException>()
+            .having((e) => e.message, 'message', 'rejected (HTTP 401)')),
+      );
+    });
   });
 
   group('sortStations', () {
