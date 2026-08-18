@@ -24,7 +24,7 @@ import '../../domain/trip_recorder.dart';
 import 'driving_analysis_trace_card.dart';
 import 'driving_insights_card.dart';
 import 'driving_score_card.dart';
-import 'fuel_breakdown_card.dart';
+import '../../../fill_ups/api.dart';
 import 'gps_diagnostics_card.dart';
 import 'gps_efficiency_kpi_card.dart';
 import 'gps_road_usage_card.dart';

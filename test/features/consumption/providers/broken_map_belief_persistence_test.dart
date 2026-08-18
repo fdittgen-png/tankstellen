@@ -13,9 +13,9 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/features/obd2/domain/broken_map_belief.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
-import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
+import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
-import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
+import 'package:tankstellen/features/fill_ups/providers/consumption_providers.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import '../../../helpers/silence_error_logger.dart';
 

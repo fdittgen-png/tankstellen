@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/data/session/trip_recording_controller.dart';
 import 'package:tankstellen/features/obd2/providers/current_obd2_fuel_level_provider.dart';
-import 'package:tankstellen/features/consumption/providers/psa_fuel_level_provider.dart';
+import 'package:tankstellen/features/fill_ups/providers/psa_fuel_level_provider.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';

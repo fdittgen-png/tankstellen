@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/cold_start_baselines.dart';
 import 'package:tankstellen/features/consumption/domain/situation_classifier.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
-import 'package:tankstellen/features/consumption/presentation/screens/add_fill_up_screen.dart';
+import 'package:tankstellen/features/fill_ups/presentation/screens/add_fill_up_screen.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/trip_recording_screen.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 import 'package:tankstellen/features/consumption/providers/wakelock_facade.dart';

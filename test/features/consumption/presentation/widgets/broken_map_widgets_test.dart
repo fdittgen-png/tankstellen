@@ -8,7 +8,7 @@ import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/features/obd2/domain/broken_map_belief.dart';
 import 'package:tankstellen/features/obd2/data/obd_adapter_blocklist.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/broken_map_widgets.dart';
-import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
+import 'package:tankstellen/features/fill_ups/providers/consumption_providers.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 

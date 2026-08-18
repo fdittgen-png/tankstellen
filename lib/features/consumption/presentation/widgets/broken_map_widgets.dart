@@ -9,7 +9,7 @@ import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../../obd2/api.dart';
-import '../../providers/consumption_providers.dart';
+import '../../../fill_ups/api.dart';
 import '../../../../core/utils/unit_formatter.dart';
 
 /// Confidence band thresholds shared by every broken-MAP UI surface

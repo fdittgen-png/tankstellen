@@ -8,8 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/navigation/app_routes.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
-import 'package:tankstellen/features/consumption/presentation/screens/'
-    'pick_station_for_fill_up_screen.dart';
+import 'package:tankstellen/features/fill_ups/presentation/screens/pick_station_for_fill_up_screen.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Station picker that owns the station-first fill-up flow (#715).

@@ -4,7 +4,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../domain/services/trip_fuel_cost_estimator.dart';
-import 'consumption_providers.dart';
+import '../../fill_ups/api.dart';
 import 'trip_history_provider.dart';
 
 part 'trip_fuel_cost_provider.g.dart';

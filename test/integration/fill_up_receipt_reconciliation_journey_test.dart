@@ -8,10 +8,10 @@ import 'package:hive/hive.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/features/receipts_ocr/data/receipt_parser.dart';
-import 'package:tankstellen/features/consumption/data/repositories/fill_up_repository.dart';
+import 'package:tankstellen/features/fill_ups/data/repositories/fill_up_repository.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
-import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
-import 'package:tankstellen/features/consumption/domain/services/reconciler.dart';
+import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
+import 'package:tankstellen/features/fill_ups/domain/services/reconciler.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 

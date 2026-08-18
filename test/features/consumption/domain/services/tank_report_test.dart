@@ -7,8 +7,8 @@
 // and the pump calibration only trusts well-covered windows.
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
-import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
-import 'package:tankstellen/features/consumption/domain/services/tank_report.dart';
+import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
+import 'package:tankstellen/features/fill_ups/domain/services/tank_report.dart';
 import 'package:tankstellen/features/consumption/domain/trip_summary.dart';
 
 void main() {

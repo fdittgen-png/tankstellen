@@ -4,8 +4,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
-import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
-import 'package:tankstellen/features/consumption/domain/services/fill_up_trip_linker.dart';
+import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
+import 'package:tankstellen/features/fill_ups/domain/services/fill_up_trip_linker.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 
 /// #3138 — pins the plein-to-plein window semantics (#1361 / #888) now that the

@@ -63,7 +63,7 @@ void main() {
     'lib/features/obd2/data/session/obd2_service.dart',
     'lib/features/receipts_ocr/data/ocr/ocr_image_preprocessor.dart',
     'lib/features/receipts_ocr/data/ocr/seven_segment_recognizer.dart',
-    'lib/features/consumption/providers/consumption_providers.dart',
+    'lib/features/fill_ups/providers/consumption_providers.dart',
     'lib/features/vehicle/data/obd2_vin_reader.dart',
     'lib/features/vehicle/data/vin_adapter_pair_auto_populator.dart',
     // #3234 — the never-throws adapter-persist / auto-population boundaries

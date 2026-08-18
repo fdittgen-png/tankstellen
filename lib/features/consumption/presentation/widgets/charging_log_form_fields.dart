@@ -9,9 +9,7 @@ import '../../../../core/domain/vehicle_profile.dart';
 import '../../domain/charging_log_readout.dart';
 import '../../domain/charging_log_validators.dart';
 import 'charging_log_derived_readout_panel.dart';
-import 'fill_up_date_row.dart';
-import 'fill_up_numeric_field.dart';
-import 'fill_up_vehicle_dropdown.dart';
+import '../../../fill_ups/api.dart';
 
 /// All the input rows on the Add-Charging-Log form, composed in the
 /// canonical order: date, vehicle, kWh, cost (+derived readout),

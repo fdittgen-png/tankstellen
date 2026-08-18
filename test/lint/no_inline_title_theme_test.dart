@@ -72,7 +72,7 @@ void main() {
         'lib/features/consumption/presentation/screens/add_charging_log_screen.dart',
         'lib/features/consumption/presentation/screens/trip_detail_screen.dart',
         'lib/features/consumption/presentation/screens/trip_recording_screen.dart',
-        'lib/features/consumption/presentation/screens/add_fill_up_screen.dart',
+        'lib/features/fill_ups/presentation/screens/add_fill_up_screen.dart',
         'lib/features/search/presentation/screens/ev_station_detail_screen.dart',
         'lib/features/station_detail/presentation/screens/station_detail_screen.dart',
       };

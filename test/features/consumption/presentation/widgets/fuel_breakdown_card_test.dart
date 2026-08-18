@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/fuel_event_attribution.dart';
-import 'package:tankstellen/features/consumption/presentation/widgets/fuel_breakdown_card.dart';
+import 'package:tankstellen/features/fill_ups/presentation/widgets/fuel_breakdown_card.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// #3432 (epic #3416) — the "where your fuel went" card renders one row

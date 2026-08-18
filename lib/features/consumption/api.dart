@@ -18,7 +18,6 @@ export 'data/baseline_sync.dart';
 // #3743 (epic item 5) — the per-entity sync configs moved home from
 // lib/core/sync; exported so cross-feature consumers (device linking,
 // data transparency) keep going through the barrel.
-export 'data/fill_ups_sync.dart';
 export 'data/trips_sync.dart';
 export 'data/driving_score_calculator.dart';
 // #3743 — the #3137 source-compat re-export of ../obd2/api.dart is gone:
@@ -34,16 +33,12 @@ export 'data/trip_sample_codec.dart';
 export 'data/trip_summary_codec.dart';
 export 'domain/direct_fuel_rate_detector.dart';
 export 'domain/driving_coaching.dart';
-export 'domain/entities/fill_up.dart';
 export 'domain/harsh_event.dart';
 export 'domain/services/speed_consumption_histogram.dart';
 export 'domain/services/trip_length_aggregator.dart';
 export 'domain/trip_recorder.dart';
 export 'presentation/screens/add_charging_log_screen.dart';
-export 'presentation/screens/add_fill_up_screen.dart';
 export 'presentation/screens/consumption_screen.dart';
-export 'presentation/screens/consumption_statistics_screen.dart';
-export 'presentation/screens/pick_station_for_fill_up_screen.dart';
 export 'presentation/screens/trip_detail_screen.dart';
 export 'presentation/screens/trip_recording_screen.dart';
 export 'presentation/widgets/broken_map_widgets.dart';
@@ -52,7 +47,6 @@ export 'presentation/widgets/trip_recording_banner.dart';
 export 'presentation/widgets/vehicle_adapter_section.dart';
 export 'presentation/widgets/vehicle_baseline_section.dart';
 export 'providers/auto_record_orchestrator.dart';
-export 'providers/consumption_providers.dart';
 export 'providers/pip_mode_provider.dart';
 export 'providers/trip_history_provider.dart';
 export 'providers/trip_recording_provider.dart';

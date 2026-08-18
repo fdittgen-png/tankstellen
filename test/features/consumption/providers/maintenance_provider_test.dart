@@ -7,11 +7,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
-import 'package:tankstellen/features/consumption/data/maintenance_snooze_repository.dart';
+import 'package:tankstellen/features/fill_ups/data/maintenance_snooze_repository.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
-import 'package:tankstellen/features/consumption/domain/entities/maintenance_suggestion.dart';
+import 'package:tankstellen/features/fill_ups/domain/entities/maintenance_suggestion.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
-import 'package:tankstellen/features/consumption/providers/maintenance_provider.dart';
+import 'package:tankstellen/features/fill_ups/providers/maintenance_provider.dart';
 import 'package:tankstellen/features/consumption/providers/trip_history_provider.dart';
 
 /// Provider-layer coverage for the predictive-maintenance pipeline

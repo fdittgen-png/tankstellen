@@ -4,13 +4,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/widgets/page_scaffold.dart';
-import 'package:tankstellen/features/consumption/domain/entities/consumption_stats.dart';
-import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
+import 'package:tankstellen/features/fill_ups/domain/entities/consumption_stats.dart';
+import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
-import 'package:tankstellen/features/consumption/presentation/widgets/fuel_tab.dart';
+import 'package:tankstellen/features/fill_ups/presentation/widgets/fuel_tab.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trajets_tab.dart';
-import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
+import 'package:tankstellen/features/fill_ups/providers/consumption_providers.dart';
 import 'package:tankstellen/features/consumption/providers/trip_history_provider.dart';
 import 'package:tankstellen/features/profile/providers/gamification_enabled_provider.dart';
 import 'package:tankstellen/features/achievements/domain/achievement.dart';

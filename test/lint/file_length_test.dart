@@ -785,7 +785,7 @@ void main() {
     // migration (the UnitFormatter import + the previousOdoKm null
     // branch wrapping formatDecimal so the odometer warning renders
     // the active locale's decimal convention).
-    'lib/features/consumption/presentation/screens/add_fill_up_screen.dart': (
+    'lib/features/fill_ups/presentation/screens/add_fill_up_screen.dart': (
       lines: 651,
       bumps: 9,
       decompositionIssue: 3138,
@@ -933,7 +933,7 @@ void main() {
     // `_relinkOpenWindow` moved into the pure, unit-tested FillUpTripLinker
     // (domain/services/fill_up_trip_linker.dart). First #3138 slice; the
     // trips/fillups feature split is the remaining work.
-    'lib/features/consumption/providers/consumption_providers.dart': (
+    'lib/features/fill_ups/providers/consumption_providers.dart': (
       lines: 938,
       bumps: 5,
       decompositionIssue: 3138,

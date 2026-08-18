@@ -1,0 +1,138 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../l10n/app_localizations.dart';
+import '../../../feature_management/api.dart';
+
+/// Two side-by-side import buttons restored on the Add-Fill-up form
+/// (#951). The previous single "Import from…" chip + bottom-sheet was
+/// rolled back because the OBD-II tile inside the sheet returned null
+/// for the odometer on the user's real hardware (Peugeot 107 + generic
+/// ELM327 BLE). Until odometer reading via PID 0xA6 is proven reliable
+/// across the supported adapter registry, the OBD-II import path is
+/// hidden from the fill-up screen — see `docs/guides/obd2-adapters.md`.
+///
+/// The full OBD-II trajet flow remains available from the Consumption
+/// screen (#888); only this fill-up entry-point is reduced.
+///
+/// Pulled out of `add_fill_up_screen.dart` (#563 extraction) so the
+/// screen file drops well below 300 LOC.
+///
+/// As of #2110 the two buttons are independently gated by
+/// `Feature.addFillUpOcrReceipt` (default-on — works reliably) and
+/// `Feature.addFillUpOcrPump` (default-off — recognizer immature).
+/// When both flags are off the widget collapses to `SizedBox.shrink()`.
+///
+/// #2687 — a third, full-width "Paste text" affordance sits below the
+/// scan row when [onPasteReceipt] is provided. It opens the on-device
+/// e-receipt TEXT parser (no camera, no cloud) so a digital fuel receipt
+/// the user copied — an e-mail body, an SMS confirmation, or a PDF's
+/// selectable text — can pre-fill the form. It rides the same
+/// `addFillUpOcrReceipt` gate as the camera receipt button (both are the
+/// "import a receipt" capability; one reads a photo, one reads text).
+class FillUpImportButtonsPair extends ConsumerWidget {
+  final bool scanningReceipt;
+  final bool scanningPump;
+  final VoidCallback onScanReceipt;
+  final VoidCallback onScanPumpDisplay;
+
+  /// #2687 — opens the paste-receipt-text dialog. When null (e.g. a host
+  /// that hasn't wired the manual path) the paste affordance is omitted.
+  final VoidCallback? onPasteReceipt;
+
+  const FillUpImportButtonsPair({
+    super.key,
+    required this.scanningReceipt,
+    required this.scanningPump,
+    required this.onScanReceipt,
+    required this.onScanPumpDisplay,
+    this.onPasteReceipt,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final enabled = ref.watch(enabledFeaturesProvider);
+    final receiptOn = enabled.contains(Feature.addFillUpOcrReceipt);
+    final pumpOn = enabled.contains(Feature.addFillUpOcrPump);
+
+    // #2110 — neither button enabled → render nothing. The form
+    // continues without the import row.
+    if (!receiptOn && !pumpOn) return const SizedBox.shrink();
+
+    final receiptBtn = receiptOn
+        ? Expanded(
+            child: OutlinedButton.icon(
+              key: const Key('import_receipt_button'),
+              onPressed: scanningReceipt ? null : onScanReceipt,
+              icon: scanningReceipt
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.document_scanner_outlined),
+              label: Text(
+                l.fillUpImportReceiptLabel,
+                maxLines: 2,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.visible,
+              ),
+            ),
+          )
+        : null;
+    final pumpBtn = pumpOn
+        ? Expanded(
+            child: OutlinedButton.icon(
+              key: const Key('import_pump_button'),
+              onPressed: scanningPump ? null : onScanPumpDisplay,
+              icon: scanningPump
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.local_gas_station_outlined),
+              label: Text(
+                l.fillUpImportPumpLabel,
+                maxLines: 2,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.visible,
+              ),
+            ),
+          )
+        : null;
+
+    // #2687 — the camera-free "Paste text" affordance rides the receipt
+    // gate. Full-width below the scan row so three controls never crowd a
+    // single Row on narrow phones.
+    final pasteBtn = (receiptOn && onPasteReceipt != null)
+        ? TextButton.icon(
+            key: const Key('import_paste_receipt_button'),
+            onPressed: onPasteReceipt,
+            icon: const Icon(Icons.content_paste_outlined, size: 18),
+            label: Text(l.fillUpImportPasteLabel),
+          )
+        : null;
+
+    final scanRow = Row(
+      children: [
+        ?receiptBtn,
+        if (receiptBtn != null && pumpBtn != null) const SizedBox(width: 8),
+        ?pumpBtn,
+      ],
+    );
+
+    if (pasteBtn == null) return scanRow;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        scanRow,
+        Align(alignment: AlignmentDirectional.centerStart, child: pasteBtn),
+      ],
+    );
+  }
+}

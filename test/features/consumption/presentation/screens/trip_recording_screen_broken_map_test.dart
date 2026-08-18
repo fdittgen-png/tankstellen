@@ -11,7 +11,7 @@ import 'package:tankstellen/features/consumption/domain/situation_classifier.dar
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/trip_recording_screen.dart';
 import 'package:tankstellen/features/consumption/providers/broken_map_warned_vehicles_provider.dart';
-import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
+import 'package:tankstellen/features/fill_ups/providers/consumption_providers.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 import 'package:tankstellen/features/consumption/providers/wakelock_facade.dart';
 import 'package:tankstellen/features/driving/haptic_eco_coach.dart';

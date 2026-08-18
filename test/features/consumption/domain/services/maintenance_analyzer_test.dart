@@ -3,8 +3,8 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
-import 'package:tankstellen/features/consumption/domain/entities/maintenance_suggestion.dart';
-import 'package:tankstellen/features/consumption/domain/services/maintenance_analyzer.dart';
+import 'package:tankstellen/features/fill_ups/domain/entities/maintenance_suggestion.dart';
+import 'package:tankstellen/features/fill_ups/domain/services/maintenance_analyzer.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 
 /// Pure-logic coverage for `analyzeMaintenance` (#1124, expanded under

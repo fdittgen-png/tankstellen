@@ -3,14 +3,14 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/sync/deletions_sync.dart';
-import 'package:tankstellen/features/consumption/data/fill_ups_sync.dart';
+import 'package:tankstellen/features/fill_ups/data/fill_ups_sync.dart';
 import 'package:tankstellen/core/sync/pending_deletions_journal.dart';
 import 'package:tankstellen/core/sync/schema_sql.dart';
 import 'package:tankstellen/core/sync/schema_verifier.dart';
 import 'package:tankstellen/core/sync/sync_device_identity.dart';
 import 'package:tankstellen/core/sync/sync_transport.dart';
 import 'package:tankstellen/core/sync/vehicles_sync.dart';
-import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
+import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 

@@ -23,7 +23,7 @@ import '../../../obd2/api.dart';
 import '../../domain/driving_coaching.dart';
 import '../../domain/situation_classifier.dart';
 import '../../providers/live_activity_provider.dart';
-import '../../providers/obd2_fuel_level_tracker.dart';
+import '../../../fill_ups/api.dart';
 import '../../providers/pip_mode_provider.dart';
 import '../../providers/trip_recording_provider.dart';
 import 'gps_degraded_banner.dart';

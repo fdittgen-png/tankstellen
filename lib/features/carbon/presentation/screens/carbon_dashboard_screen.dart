@@ -12,7 +12,7 @@ import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../consumption/providers/consumption_providers.dart';
+import '../../../fill_ups/api.dart';
 import '../../domain/monthly_summary.dart';
 import '../widgets/charts_tab.dart';
 import '../../../../core/error/guarded.dart';

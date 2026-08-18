@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../entities/fill_up.dart';
+import '../../../fill_ups/api.dart';
 import '../../data/trip_history_repository.dart';
 
 /// Estimates the monetary cost of the fuel consumed on a trip (#1209).

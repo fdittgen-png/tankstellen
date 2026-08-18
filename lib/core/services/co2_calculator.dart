@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../features/consumption/domain/entities/fill_up.dart';
+import '../../features/fill_ups/domain/entities/fill_up.dart';
 import '../domain/fuel_type.dart';
 
 /// Pure utility for estimating CO2 emissions from fuel consumption.

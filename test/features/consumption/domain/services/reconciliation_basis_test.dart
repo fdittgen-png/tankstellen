@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
-import 'package:tankstellen/features/consumption/domain/services/reconciliation_basis.dart';
+import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
+import 'package:tankstellen/features/fill_ups/domain/services/reconciliation_basis.dart';
 import 'package:tankstellen/features/consumption/domain/trip_summary.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 

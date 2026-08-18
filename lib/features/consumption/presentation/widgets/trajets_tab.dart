@@ -11,13 +11,10 @@ import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/trip_history_repository.dart';
-import '../../domain/services/monthly_insights_aggregator.dart';
+import '../../../fill_ups/api.dart';
 import '../../providers/trip_history_provider.dart';
-import 'maintenance_suggestion_card.dart';
-import 'monthly_insights_card.dart';
 import 'edit_virtual_trajet_sheet.dart';
 import 'shared_trips_section.dart';
-import 'tank_report_card.dart';
 import 'trajet_row.dart';
 
 /// Trajets tab body on the Consumption screen (#889).

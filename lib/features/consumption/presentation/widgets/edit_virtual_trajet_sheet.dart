@@ -11,9 +11,8 @@ import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/trip_history_repository.dart';
-import '../../domain/add_fill_up_validators.dart';
+import '../../../fill_ups/api.dart';
 import '../../providers/trip_history_provider.dart';
-import 'fill_up_numeric_field.dart';
 
 /// Modal bottom sheet for editing a synthetic reconciliation trajet
 /// (#2444). Opens when the user taps a virtual trip row in the Trajets

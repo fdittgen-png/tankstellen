@@ -5,7 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/utils/price_utils.dart';
 import '../../../core/utils/station_extensions.dart';
-import '../../consumption/providers/consumption_providers.dart';
+import '../../fill_ups/api.dart';
 import '../../consumption/providers/trip_history_provider.dart';
 import '../../profile/providers/effective_fuel_type_provider.dart';
 import '../../../core/domain/station.dart';

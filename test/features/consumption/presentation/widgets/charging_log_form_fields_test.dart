@@ -6,8 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/charging_log_readout.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/charging_log_derived_readout_panel.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/charging_log_form_fields.dart';
-import 'package:tankstellen/features/consumption/presentation/widgets/fill_up_date_row.dart';
-import 'package:tankstellen/features/consumption/presentation/widgets/fill_up_vehicle_dropdown.dart';
+import 'package:tankstellen/features/fill_ups/presentation/widgets/fill_up_date_row.dart';
+import 'package:tankstellen/features/fill_ups/presentation/widgets/fill_up_vehicle_dropdown.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 

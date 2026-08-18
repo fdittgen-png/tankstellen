@@ -5,7 +5,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../consumption/providers/consumption_providers.dart';
+import '../../../fill_ups/api.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/vehicle_profile.dart';

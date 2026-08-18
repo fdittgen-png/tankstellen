@@ -19,7 +19,7 @@ import '../../core/sync/trips_sync_enabled_provider.dart';
 import '../../core/utils/event_loop_yield.dart';
 import '../../features/alerts/providers/alert_provider.dart';
 import '../../features/consumption/data/trip_history_repository.dart';
-import '../../features/consumption/providers/consumption_providers.dart';
+import '../../features/fill_ups/api.dart';
 import '../../features/itinerary/providers/itinerary_provider.dart';
 import '../../features/sync/providers/baseline_sync_enabled_provider.dart';
 import '../../features/vehicle/providers/vehicle_providers.dart';

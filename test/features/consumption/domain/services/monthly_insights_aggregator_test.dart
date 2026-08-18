@@ -3,7 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
-import 'package:tankstellen/features/consumption/domain/services/monthly_insights_aggregator.dart';
+import 'package:tankstellen/features/fill_ups/domain/services/monthly_insights_aggregator.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 
 /// Pure-logic coverage for `aggregateMonthlyInsights` (#1041 phase 4).

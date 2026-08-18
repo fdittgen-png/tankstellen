@@ -11,7 +11,7 @@ import '../../domain/driving_score.dart';
 import '../../domain/lessons/driving_lesson.dart';
 import '../../domain/lessons/driving_lesson_rule.dart';
 import '../../domain/trip_sample.dart';
-import '../../providers/tank_mix_provider.dart';
+import '../../../fill_ups/api.dart';
 
 /// Post-trip lesson resolution for the trip-detail body (#2251), split
 /// out of `trip_detail_body.dart` for the file-length norm.
