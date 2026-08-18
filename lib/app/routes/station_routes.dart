@@ -9,12 +9,14 @@ import '../../core/navigation/app_routes.dart';
 import '../../core/storage/storage_providers.dart';
 import '../../features/ev/data/repositories/ev_station_repository.dart';
 import '../../features/ev/providers/ev_providers.dart';
+import '../../features/feature_management/domain/feature.dart';
 import '../../features/price_history/presentation/screens/price_history_screen.dart';
 import '../../features/report/presentation/screens/report_screen.dart';
 import '../../features/search/presentation/screens/ev_station_detail_screen.dart';
 import '../../features/station_detail/presentation/screens/station_detail_screen.dart';
 import '../station_id_validator.dart';
 import 'detail_transition_page.dart';
+import 'feature_gated_screen.dart';
 import 'invalid_id_screen.dart';
 
 /// Detail-level routes anchored on a single station id: fuel and EV
@@ -30,7 +32,13 @@ List<RouteBase> stationRoutes(Ref ref) => [
           if (!isValidStationId(id)) {
             return invalidIdScreen(context, state.matchedLocation);
           }
-          return PriceHistoryScreen(stationId: id!);
+          // Feature.priceHistory finally gates its surface (2026-08-17
+          // review, dead-code finding 6). Default-on.
+          return FeatureGatedScreen(
+            feature: Feature.priceHistory,
+            fallbackPath: RoutePaths.search,
+            child: PriceHistoryScreen(stationId: id!),
+          );
         },
       ),
       GoRoute(
@@ -49,11 +57,17 @@ List<RouteBase> stationRoutes(Ref ref) => [
       GoRoute(
         path: RoutePaths.evStation,
         // #3615 — same detail transition as the fuel screen.
+        // Feature.evCharging finally gates the EV surfaces (2026-08-17
+        // review, dead-code finding 6). Default-on.
         pageBuilder: (context, state) {
           final station = state.extra as ChargingStation;
           return detailTransitionPage(
             key: state.pageKey,
-            child: EVStationDetailScreen(station: station),
+            child: FeatureGatedScreen(
+              feature: Feature.evCharging,
+              fallbackPath: RoutePaths.search,
+              child: EVStationDetailScreen(station: station),
+            ),
           );
         },
       ),
@@ -77,7 +91,13 @@ List<RouteBase> stationRoutes(Ref ref) => [
           if (station == null) {
             return invalidIdScreen(context, state.matchedLocation);
           }
-          return EVStationDetailScreen(station: station);
+          // Feature.evCharging gate — same guard as the extra-payload
+          // EV route above, covering the widget/URL deep-link path.
+          return FeatureGatedScreen(
+            feature: Feature.evCharging,
+            fallbackPath: RoutePaths.search,
+            child: EVStationDetailScreen(station: station),
+          );
         },
       ),
       GoRoute(

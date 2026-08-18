@@ -12,6 +12,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
+import 'package:tankstellen/features/feature_management/domain/feature.dart';
+import 'package:tankstellen/features/feature_management/domain/feature_manifest.dart';
 import 'package:tankstellen/features/search/presentation/widgets/fuel_type_selector.dart';
 
 import '../../../../helpers/mock_providers.dart';
@@ -187,5 +190,44 @@ void main() {
         findsOneWidget,
       );
     });
+
+    testWidgets(
+        'dead-code finding 6 — hides the Electric chip (and All, since '
+        'fuel-only) when Feature.evCharging is disabled', (tester) async {
+      final storage = mockHiveStorageOverride();
+      when(() => storage.mock.getActiveProfileId()).thenReturn(null);
+      when(() => storage.mock.getSetting(any())).thenReturn(null);
+
+      await pumpApp(
+        tester,
+        const FuelTypeSelector(),
+        overrides: [
+          storage.override,
+          activeCountryOverride(Countries.germany),
+          selectedFuelTypeOverride(FuelType.e5),
+          featureFlagsProvider.overrideWith(
+            () => _FlagsWithout({Feature.evCharging}),
+          ),
+        ],
+      );
+
+      // Same shape as showElectric=false: no EV chip, no 'All'.
+      expect(find.text('Electric ⚡'), findsNothing);
+      expect(find.text('All'), findsNothing);
+      expect(find.text('Super E5'), findsOneWidget);
+      expect(find.text('Diesel'), findsOneWidget);
+    });
   });
+}
+
+/// A [FeatureFlags] notifier whose enabled set is the manifest default
+/// minus [_disabled] — the same test double the #1638 gate tests use.
+class _FlagsWithout extends FeatureFlags {
+  _FlagsWithout(this._disabled);
+
+  final Set<Feature> _disabled;
+
+  @override
+  Set<Feature> build() =>
+      FeatureManifest.defaultManifest.defaultEnabledSet().difference(_disabled);
 }

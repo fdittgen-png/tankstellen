@@ -54,11 +54,16 @@ class StationDetailAppBarActions extends ConsumerWidget {
         // #3337 — directions moved out of this icon cluster to a prominent
         // labelled FAB ([StationDirectionsFab]); users couldn't find the
         // small icon here.
-        IconButton(
-          icon: const Icon(Icons.notifications_outlined),
-          onPressed: () => _showCreateAlertDialog(context, ref),
-          tooltip: l10n.createAlert,
-        ),
+        // Feature.priceAlerts finally gates its entry point (2026-08-17
+        // review, dead-code finding 6) — same central-gate pattern as
+        // the #1638 actions below. Default-on.
+        if (enabledFeatures.contains(Feature.priceAlerts))
+          IconButton(
+            key: const Key('create_price_alert'),
+            icon: const Icon(Icons.notifications_outlined),
+            onPressed: () => _showCreateAlertDialog(context, ref),
+            tooltip: l10n.createAlert,
+          ),
         // #1638 — the scan-payment-QR action is gated on the central
         // Feature enum so it can be toggled per profile.
         if (enabledFeatures.contains(Feature.paymentQrScan))
