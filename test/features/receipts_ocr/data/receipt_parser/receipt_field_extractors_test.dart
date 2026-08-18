@@ -1,0 +1,905 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/receipts_ocr/data/ocr/pump_ocr_config.dart';
+import 'package:tankstellen/features/receipts_ocr/data/receipt_parser/receipt_field_extractors.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+
+/// Per-country [OcrLocaleProfile]s for the currency-aware extraction
+/// tests (#2273). Mirror the bands shipped in `assets/ocr_config`.
+const _gb = OcrLocaleProfile(
+  country: 'GB',
+  currency: 'GBP',
+  decimalSeparator: '.',
+  priceMin: 0.8,
+  priceMax: 3.0,
+  volumeMax: 200,
+  totalMax: 500,
+);
+const _dk = OcrLocaleProfile(
+  country: 'DK',
+  currency: 'DKK',
+  decimalSeparator: ',',
+  priceMin: 5,
+  priceMax: 40,
+  volumeMax: 200,
+  totalMax: 2000,
+);
+const _us = OcrLocaleProfile(
+  country: 'US',
+  currency: 'USD',
+  decimalSeparator: '.',
+  priceMin: 0.5,
+  priceMax: 4.0,
+  volumeMax: 200,
+  totalMax: 500,
+);
+
+void main() {
+  group('extractFuelType', () {
+    test('E85 via "E85" word boundary', () {
+      expect(extractFuelType('42,35 X E85\nTOTAL 35,00 EUR'), FuelType.e85);
+    });
+
+    test('E85 via "SP95-E85" compound', () {
+      expect(extractFuelType('Produit: SP95-E85'), FuelType.e85);
+    });
+
+    test('E85 via "bioéthanol" French label', () {
+      expect(extractFuelType('Bioéthanol 35,00 L'), FuelType.e85);
+    });
+
+    test('E85 via "bio ethanol" (no accent, space)', () {
+      expect(extractFuelType('BIO ETHANOL 35,00'), FuelType.e85);
+    });
+
+    test('E10 compound — SP95E10 without separator', () {
+      // TotalEnergies emits SP95E10 with no separator.
+      expect(
+        extractFuelType('5,00 x SP95E10\nTOTAL 9,95 EUR'),
+        FuelType.e10,
+      );
+    });
+
+    test('E10 compound — SP95-E10 with hyphen', () {
+      expect(extractFuelType('Produit: SP95-E10'), FuelType.e10);
+    });
+
+    test('E10 compound — SP95 E10 with space', () {
+      expect(extractFuelType('Produit: SP95 E10'), FuelType.e10);
+    });
+
+    test('E10 standalone — "E10" word boundary', () {
+      expect(extractFuelType('Volume 42,35 L\nE10\nTOT 58,42'), FuelType.e10);
+    });
+
+    test('E10 — "Super E10" German-style label', () {
+      expect(extractFuelType('Super E10\n42,35 L'), FuelType.e10);
+    });
+
+    test('E10 beats E5 when both named (cross-reference table)', () {
+      // Receipts that print a cross-reference table listing both codes
+      // must still classify as E10 — the priority cascade puts E10
+      // above E5.
+      const text = 'Codes produits:\n- SP95 (E5)\n- SP95-E10\n'
+          'Pompe: SP95-E10\nVolume 42,35 L';
+      expect(extractFuelType(text), FuelType.e10);
+    });
+
+    test('E5 — SP95E5 compound', () {
+      expect(
+        extractFuelType('5,00 x SP95E5\nTOTAL 9,95 EUR'),
+        FuelType.e5,
+      );
+    });
+
+    test('E5 — "E5" word boundary', () {
+      expect(extractFuelType('Volume 42,35 L\nE5\nTOT 58,42'), FuelType.e5);
+    });
+
+    test('E5 — SP95 alone (no E10 suffix)', () {
+      // `sp95(?!\s*-?\s*e\s*10)` — SP95 without E10 suffix means E5.
+      expect(extractFuelType('Pompe: SP95\n42,35 L'), FuelType.e5);
+    });
+
+    test('E5 — "Super E5"', () {
+      expect(extractFuelType('Super E5\n42,35 L'), FuelType.e5);
+    });
+
+    test('E98 via "SP98"', () {
+      expect(extractFuelType('SP98\n42,35 L'), FuelType.e98);
+    });
+
+    test('E98 via "E98" word boundary', () {
+      expect(extractFuelType('Volume 42,35 L\nE98\nTOT 58,42'), FuelType.e98);
+    });
+
+    test('E98 via "Super 98"', () {
+      expect(extractFuelType('SUPER 98\n42,35 L'), FuelType.e98);
+    });
+
+    test('dieselPremium — "diesel premium"', () {
+      expect(
+        extractFuelType('DIESEL PREMIUM\n42,35 L'),
+        FuelType.dieselPremium,
+      );
+    });
+
+    test('dieselPremium — "gazole premium" French', () {
+      expect(
+        extractFuelType('Gazole Premium\n42,35 L'),
+        FuelType.dieselPremium,
+      );
+    });
+
+    test('dieselPremium beats plain diesel on compound labels', () {
+      // "Premium Diesel" on Shell V-Power Diesel receipts.
+      expect(
+        extractFuelType('PREMIUM DIESEL 42,35 L'),
+        FuelType.dieselPremium,
+      );
+    });
+
+    test('diesel — plain "diesel" label', () {
+      expect(extractFuelType('DIESEL\n42,35 L'), FuelType.diesel);
+    });
+
+    test('diesel — French "Gazole"', () {
+      expect(extractFuelType('GAZOLE\n42,35 L'), FuelType.diesel);
+    });
+
+    test('diesel — "B7" biodiesel code', () {
+      expect(extractFuelType('B7\n42,35 L'), FuelType.diesel);
+    });
+
+    test('LPG via "GPL" French', () {
+      expect(extractFuelType('GPL\n35,00 L\nTOT 25,00'), FuelType.lpg);
+    });
+
+    test('LPG via "LPG" English', () {
+      expect(extractFuelType('LPG\n35,00 L'), FuelType.lpg);
+    });
+
+    test('CNG via "GNV" French', () {
+      expect(extractFuelType('GNV\n12,50 kg'), FuelType.cng);
+    });
+
+    test('CNG via "CNG" English', () {
+      expect(extractFuelType('CNG\n12,50 kg'), FuelType.cng);
+    });
+
+    test('returns null for text with no fuel code', () {
+      expect(extractFuelType('Thank you for shopping\nGoodbye'), isNull);
+    });
+
+    test('returns null for empty string', () {
+      expect(extractFuelType(''), isNull);
+    });
+
+    test('case-insensitive matching', () {
+      expect(extractFuelType('gazole 42,35 l'), FuelType.diesel);
+      expect(extractFuelType('GAZOLE 42,35 L'), FuelType.diesel);
+    });
+  });
+
+  group('extractLiters', () {
+    test('decimal-dot format "42.35 L"', () {
+      expect(extractLiters('Volume 42.35 L'), closeTo(42.35, 0.001));
+    });
+
+    test('decimal-comma format "42,35 l"', () {
+      expect(extractLiters('Volume 42,35 l'), closeTo(42.35, 0.001));
+    });
+
+    test('no space "5.24L"', () {
+      expect(extractLiters('5.24L'), closeTo(5.24, 0.001));
+    });
+
+    test('suffix "litres" (French)', () {
+      expect(extractLiters('42,35 litres'), closeTo(42.35, 0.001));
+    });
+
+    test('suffix "litre" (singular French)', () {
+      expect(extractLiters('1,00 litre'), closeTo(1.00, 0.001));
+    });
+
+    test('U+2113 script ℓ symbol', () {
+      // French thermal printers emit ℓ verbatim — Latin [lL] misses it.
+      expect(extractLiters('5,24 ℓ'), closeTo(5.24, 0.001));
+    });
+
+    test('label "VOLUME : 42.35"', () {
+      expect(extractLiters('VOLUME : 42.35'), closeTo(42.35, 0.001));
+    });
+
+    test('label "Volume: 42,35"', () {
+      expect(extractLiters('Volume: 42,35'), closeTo(42.35, 0.001));
+    });
+
+    test('label "Quantité = 5.27"', () {
+      expect(extractLiters('Quantité = 5.27'), closeTo(5.27, 0.001));
+    });
+
+    test('French line item "5,00 x SP95E5"', () {
+      expect(extractLiters('5,00 x SP95E5'), closeTo(5.00, 0.001));
+    });
+
+    test('French line item "42,50 X GAZOLE" (uppercase X)', () {
+      expect(extractLiters('42,50 X GAZOLE'), closeTo(42.50, 0.001));
+    });
+
+    test('French line item "10,00 × SP98" (Unicode multiplication sign)', () {
+      expect(extractLiters('10,00 × SP98'), closeTo(10.00, 0.001));
+    });
+
+    test('French line item "10,00 x gpl"', () {
+      expect(extractLiters('10,00 x gpl'), closeTo(10.00, 0.001));
+    });
+
+    test('filters out "TVA 20.00 %" (no L/volume anchor)', () {
+      // "20.00" from "TVA 20.00 %" has no litre unit or volume label
+      // and no `x FUELCODE` — must not match.
+      expect(extractLiters('TVA 20.00 %'), isNull);
+    });
+
+    test('filters pathological values outside 0.1–300 L range', () {
+      // "0.05 L" below 0.1 threshold.
+      expect(extractLiters('volume 0.05 L'), isNull);
+    });
+
+    test('multi-line realistic Super U fragment', () {
+      const text = 'SUPER U VERDUN\n'
+          'Volume    5.24 L\n'
+          'PU        1.999 €/L\n'
+          'TOT TTC € 10.47';
+      expect(extractLiters(text), closeTo(5.24, 0.001));
+    });
+
+    test('returns null when no volume anywhere', () {
+      expect(extractLiters('THANK YOU\nGOODBYE'), isNull);
+    });
+
+    test('returns null for empty string', () {
+      expect(extractLiters(''), isNull);
+    });
+  });
+
+  group('extractLiters — French POS unit-char OCR variants (#1308)', () {
+    // The italic lowercase `l` (litre) glyph after the volume number on
+    // French thermal-print receipts is so faintly printed that ML Kit
+    // OCR transcribes it as `?`, `|`, `i`, `t`, `j`, `P`, or `1`.
+    // Reported across Super U Pomerols + enilive Pezenas; the regex
+    // broadening lives in the GENERIC extractor so every brand benefits.
+
+    test('"5.24 ?" parses as 5.24 (Super U glyph)', () {
+      expect(extractLiters('5.24 ?'), closeTo(5.24, 0.001));
+    });
+
+    test('"5.24 |" parses as 5.24 (pipe-as-l misread)', () {
+      expect(extractLiters('5.24 |'), closeTo(5.24, 0.001));
+    });
+
+    test('"5.24 i" parses as 5.24 (dot-i misread)', () {
+      expect(extractLiters('5.24 i'), closeTo(5.24, 0.001));
+    });
+
+    test('"5.24 t" parses as 5.24 (narrow-glyph t misread)', () {
+      expect(extractLiters('5.24 t'), closeTo(5.24, 0.001));
+    });
+
+    test('"5.24 j" parses as 5.24', () {
+      expect(extractLiters('5.24 j'), closeTo(5.24, 0.001));
+    });
+
+    test('"5.24 P" parses as 5.24 (poor scan)', () {
+      expect(extractLiters('5.24 P'), closeTo(5.24, 0.001));
+    });
+
+    test('"8.93 ?" parses as 8.93 (enilive Pezenas case)', () {
+      expect(extractLiters('8.93 ?'), closeTo(8.93, 0.001));
+    });
+
+    test('"5.24 1" parses as 5.24 (digit-1 misread, with whitespace)', () {
+      // Whitespace before the `1` is the disambiguator: with a space
+      // the `1` is the unit char. Without space (`5.241`) the negative
+      // lookahead `(?!\d)` after the decimals prevents the partial
+      // capture, so `5.241` does NOT yield 5.24 — see boundary test.
+      expect(extractLiters('5.24 1'), closeTo(5.24, 0.001));
+    });
+
+    test('"5.241" does NOT match (no whitespace boundary)', () {
+      // Without whitespace between the decimals and the trailing digit,
+      // the lookahead pins the decimals to the full `5.241` token —
+      // which then has no `[?|itjP1]` unit char after it. No match.
+      // (No other regex picks this up because there's no `volume` /
+      // `quantité` label and no `x FUELCODE` line item either.)
+      expect(extractLiters('5.241'), isNull);
+    });
+
+    test('OCR-eaten char inside larger receipt text parses correctly', () {
+      // Whole-text match, not just the line.
+      const text = 'QUITTANCE COPIE\n* Pompe 3 SP95-E10\n'
+          'Volume                                 5.24 ?\n'
+          'Prix                                 € 1.999/?\n'
+          'TOT TTC                              € 10.47\n';
+      expect(extractLiters(text), closeTo(5.24, 0.001));
+    });
+
+    test('does not match when the unit char would form a longer word', () {
+      // "5,24 thanks" — `t` is in the OCR-eaten class, but it's
+      // followed by `h`, a word char, so the negative lookahead
+      // `(?![A-Za-z0-9])` rejects the partial match.
+      expect(extractLiters('5,24 thanks for your business'), isNull);
+    });
+  });
+
+  group('extractLiters — false-positive guards (#1308)', () {
+    test('"TVA 20.00 %" does NOT match (no OCR-eaten unit char)', () {
+      // The new pattern requires a `[?|itjP1]` after the number, and
+      // `%` is not in the class. Range guard would also reject 20.00.
+      expect(extractLiters('TVA 20.00 %'), isNull);
+    });
+
+    test('"2026-04-29" does NOT match (year fragment, no decimal point)', () {
+      // The `[.,]` separator in the captured group needs a literal
+      // `.` or `,`; the date hyphens defeat this.
+      expect(extractLiters('2026-04-29'), isNull);
+    });
+
+    test('"12.99 €" does NOT match (price, not volume)', () {
+      // The new pattern requires a `[?|itjP1]` unit char, not `€`.
+      expect(extractLiters('12.99 €'), isNull);
+    });
+
+    test('"€ 1.999/?" does NOT match as volume (slash blocks unit char)', () {
+      // The `?` after `1.999` is on the price-per-liter denominator,
+      // not the volume. The `/` between `1.999` and `?` is not
+      // whitespace, so `\s*[?|itjP1]` cannot bridge them.
+      expect(extractLiters('€ 1.999/?'), isNull);
+    });
+  });
+
+  group('extractTotalCost', () {
+    test('labelled "TOTAL 58.42"', () {
+      expect(extractTotalCost('TOTAL 58.42'), closeTo(58.42, 0.001));
+    });
+
+    test('labelled "MONTANT 58,42 EUR"', () {
+      expect(
+        extractTotalCost('MONTANT 58,42 EUR'),
+        closeTo(58.42, 0.001),
+      );
+    });
+
+    test('labelled "TOT TTC 10.47"', () {
+      expect(extractTotalCost('TOT TTC 10.47'), closeTo(10.47, 0.001));
+    });
+
+    test('labelled "MONTANT REEL : 10.69"', () {
+      expect(
+        extractTotalCost('MONTANT REEL : 10.69'),
+        closeTo(10.69, 0.001),
+      );
+    });
+
+    test('labelled "MONTANT RÉEL = 10.69" (accented)', () {
+      expect(
+        extractTotalCost('MONTANT RÉEL = 10.69'),
+        closeTo(10.69, 0.001),
+      );
+    });
+
+    test('labelled "Gesamt: 58,42" (German)', () {
+      expect(
+        extractTotalCost('Gesamt: 58,42'),
+        closeTo(58.42, 0.001),
+      );
+    });
+
+    test('labelled "Betrag 58,42"', () {
+      expect(
+        extractTotalCost('Betrag 58,42'),
+        closeTo(58.42, 0.001),
+      );
+    });
+
+    test('labelled "Summe 58,42"', () {
+      expect(
+        extractTotalCost('Summe 58,42'),
+        closeTo(58.42, 0.001),
+      );
+    });
+
+    test('fallback — "€ 58.42" without label picks the amount', () {
+      expect(extractTotalCost('€ 58.42'), closeTo(58.42, 0.001));
+    });
+
+    test('fallback — picks largest amount, ignores /L prices', () {
+      // "€ 1.999/L" is unit price (has /L suffix → skipped), "€ 10.47"
+      // should win.
+      const text = '€ 1.999/L\n€ 10.47';
+      expect(extractTotalCost(text), closeTo(10.47, 0.001));
+    });
+
+    test(
+      'fallback — skips 3-decimal amounts <5 € (fuel price, not total)',
+      () {
+        // `1,990 €` is 3-decimal → treated as unit price, skipped.
+        // `9,95 €` is 2-decimal → accepted as total.
+        const text = '1,990 €\n9,95 €';
+        expect(extractTotalCost(text), closeTo(9.95, 0.001));
+      },
+    );
+
+    test('fallback — filters values under 1 € and over 10000 €', () {
+      // 0.50 € and 20000 € would never be valid totals — skipped.
+      expect(extractTotalCost('€ 0.50'), isNull);
+      expect(extractTotalCost('€ 20000.00'), isNull);
+    });
+
+    test('prefers labelled over fallback', () {
+      // Both a labelled TOTAL and a bare €-amount in text. Labelled wins.
+      const text = '€ 999.99\nTOTAL 10.47';
+      expect(extractTotalCost(text), closeTo(10.47, 0.001));
+    });
+
+    test('realistic Super U receipt', () {
+      const text = 'SUPER U VERDUN\n'
+          'Volume    5.24 L\n'
+          'PU        1.999 €/L\n'
+          'TOT TTC € 10.47';
+      expect(extractTotalCost(text), closeTo(10.47, 0.001));
+    });
+
+    test('returns null for empty string', () {
+      expect(extractTotalCost(''), isNull);
+    });
+
+    test('returns null when no price anywhere', () {
+      expect(extractTotalCost('THANK YOU'), isNull);
+    });
+  });
+
+  group('extractPricePerLiter', () {
+    test('"1.899 €/L" dot decimal', () {
+      expect(
+        extractPricePerLiter('1.899 €/L'),
+        closeTo(1.899, 0.001),
+      );
+    });
+
+    test('"1,899 EUR/L" comma decimal', () {
+      expect(
+        extractPricePerLiter('1,899 EUR/L'),
+        closeTo(1.899, 0.001),
+      );
+    });
+
+    test('"€ 1.999/L" currency-first', () {
+      expect(
+        extractPricePerLiter('€ 1.999/L'),
+        closeTo(1.999, 0.001),
+      );
+    });
+
+    test('"EUR 1,999/L" currency-first comma', () {
+      expect(
+        extractPricePerLiter('EUR 1,999/L'),
+        closeTo(1.999, 0.001),
+      );
+    });
+
+    test('"1.999 €/ℓ" U+2113 script symbol', () {
+      expect(
+        extractPricePerLiter('1.999 €/ℓ'),
+        closeTo(1.999, 0.001),
+      );
+    });
+
+    test('label "PU: 1,899"', () {
+      expect(
+        extractPricePerLiter('PU: 1,899'),
+        closeTo(1.899, 0.001),
+      );
+    });
+
+    test('label "PRIX/L 1.899"', () {
+      expect(
+        extractPricePerLiter('PRIX/L 1.899'),
+        closeTo(1.899, 0.001),
+      );
+    });
+
+    test('label "Prix unit. = 2,028 EUR"', () {
+      expect(
+        extractPricePerLiter('Prix unit. = 2,028 EUR'),
+        closeTo(2.028, 0.001),
+      );
+    });
+
+    test('label "Prix unit 2,028"', () {
+      expect(
+        extractPricePerLiter('Prix unit 2,028'),
+        closeTo(2.028, 0.001),
+      );
+    });
+
+    test('label "Literpreis: 1.799" German', () {
+      expect(
+        extractPricePerLiter('Literpreis: 1.799'),
+        closeTo(1.799, 0.001),
+      );
+    });
+
+    test('label "Preis je Liter 1,799" German', () {
+      expect(
+        extractPricePerLiter('Preis je Liter 1,799'),
+        closeTo(1.799, 0.001),
+      );
+    });
+
+    test('label "Preis/L 1,799" German', () {
+      expect(
+        extractPricePerLiter('Preis/L 1,799'),
+        closeTo(1.799, 0.001),
+      );
+    });
+
+    test('bare 3-decimal euro fallback "1,990 €" (#801)', () {
+      // TotalEnergies / independent French receipts: unit price printed
+      // as bare `1,990 €` below the QTY x FUELCODE line.
+      expect(
+        extractPricePerLiter('1,990 €'),
+        closeTo(1.990, 0.001),
+      );
+    });
+
+    test('bare 3-decimal dot fallback "1.990 EUR"', () {
+      expect(
+        extractPricePerLiter('1.990 EUR'),
+        closeTo(1.990, 0.001),
+      );
+    });
+
+    test('fallback rejects 3-decimal amount outside 0.5–3.0 €/L range', () {
+      // 4,500 € is outside plausible fuel-price range.
+      expect(extractPricePerLiter('4,500 €'), isNull);
+    });
+
+    test('fallback does not grab 3-decimal amount followed by /L', () {
+      // When followed by /L the *labelled* pattern already handled it.
+      // The bare-fuel-price fallback must not double-match.
+      final result = extractPricePerLiter('1,990 €/L');
+      expect(result, closeTo(1.990, 0.001));
+    });
+
+    test('realistic Super U receipt', () {
+      const text = 'SUPER U VERDUN\n'
+          'Volume    5.24 L\n'
+          'PU        1.999 €/L\n'
+          'TOT TTC € 10.47';
+      expect(extractPricePerLiter(text), closeTo(1.999, 0.001));
+    });
+
+    test('returns null when no price per litre', () {
+      expect(extractPricePerLiter('THANK YOU'), isNull);
+    });
+
+    test('returns null for empty string', () {
+      expect(extractPricePerLiter(''), isNull);
+    });
+  });
+
+  // -------------------------------------------------------------------
+  // #2273 — config-driven, multi-currency extraction. The threaded
+  // OcrLocaleProfile selects the currency symbols + subunit convention.
+  // EUR (no profile) keeps working; GBP/£/p, kr, $ now read correctly,
+  // and minor-unit (pence/cents) per-litre folds back to the major unit.
+  // -------------------------------------------------------------------
+  group('extractTotalCost — multi-currency (#2273)', () {
+    test('GBP "£ 58.42" total', () {
+      expect(extractTotalCost('£ 58.42', profile: _gb), closeTo(58.42, 0.001));
+    });
+
+    test('GBP "TOTAL £45.10", suffix "45.10 GBP" both read', () {
+      expect(
+          extractTotalCost('TOTAL £45.10', profile: _gb), closeTo(45.10, 0.001));
+      expect(
+          extractTotalCost('45.10 GBP', profile: _gb), closeTo(45.10, 0.001));
+    });
+
+    test('GBP fallback skips the pence-per-litre unit price', () {
+      // A UK receipt: "142.9 p/L" unit price + "£72.43" total. The total
+      // must win; the per-litre figure (different unit) is not a total.
+      const text = 'UNLEADED 142.9p/L\nTOTAL £72.43';
+      expect(extractTotalCost(text, profile: _gb), closeTo(72.43, 0.001));
+    });
+
+    test('GBP fallback treats a bare 3-decimal £ amount as the unit price',
+        () {
+      // "1.429 £" (3-decimal, within the GBP price band) is the £/L unit
+      // price, not the total → skipped; "20.00 £" is the total.
+      const text = '1.429 £\n20.00 £';
+      expect(extractTotalCost(text, profile: _gb), closeTo(20.00, 0.001));
+    });
+
+    test('DKK "kr" total "TOTAL 612,50 kr"', () {
+      expect(
+          extractTotalCost('TOTAL 612,50 kr', profile: _dk), closeTo(612.5, 0.1));
+    });
+
+    test('DKK suffix "DKK 612,50"', () {
+      expect(
+          extractTotalCost('612,50 DKK', profile: _dk), closeTo(612.5, 0.1));
+    });
+
+    test('USD "\$ 58.42" total', () {
+      expect(extractTotalCost(r'$ 58.42', profile: _us), closeTo(58.42, 0.001));
+    });
+
+    test('EUR default still works when no profile is threaded', () {
+      expect(extractTotalCost('TOTAL 58.42'), closeTo(58.42, 0.001));
+      expect(extractTotalCost('€ 10.47'), closeTo(10.47, 0.001));
+    });
+
+    test('GBP profile does not accidentally read a € amount', () {
+      // With a GBP profile the € symbol is not a recognised currency, so
+      // the bare fallback must not pick "€ 99.99" as a £ total.
+      expect(extractTotalCost('€ 99.99', profile: _gb), isNull);
+    });
+  });
+
+  group('extractPricePerLiter — multi-currency (#2273)', () {
+    test('GBP pence-per-litre "142.9p/L" → £1.429/L', () {
+      expect(
+        extractPricePerLiter('142.9p/L', profile: _gb),
+        closeTo(1.429, 0.0005),
+      );
+    });
+
+    test('GBP pence-per-litre with spaces "142,9 p / L"', () {
+      expect(
+        extractPricePerLiter('142,9 p / L', profile: _gb),
+        closeTo(1.429, 0.0005),
+      );
+    });
+
+    test('GBP major-unit "£1.429/L"', () {
+      expect(
+        extractPricePerLiter('£1.429/L', profile: _gb),
+        closeTo(1.429, 0.0005),
+      );
+    });
+
+    test('GBP "Unit price £1.429" English label', () {
+      expect(
+        extractPricePerLiter('Unit price £1.429', profile: _gb),
+        closeTo(1.429, 0.0005),
+      );
+    });
+
+    test('GBP pence price out of band is rejected', () {
+      // 50p/L → £0.50/L, below the GBP priceMin 0.8 → null.
+      expect(extractPricePerLiter('50.0p/L', profile: _gb), isNull);
+    });
+
+    test('DKK kroner-per-litre "13,49 kr/L"', () {
+      expect(
+        extractPricePerLiter('13,49 kr/L', profile: _dk),
+        closeTo(13.49, 0.005),
+      );
+    });
+
+    test('DKK bare 3-decimal in band "13,490 kr"', () {
+      expect(
+        extractPricePerLiter('13,490 kr', profile: _dk),
+        closeTo(13.49, 0.005),
+      );
+    });
+
+    test('USD cents-per-litre "139.9c/L" → \$1.399/L', () {
+      expect(
+        extractPricePerLiter('139.9c/L', profile: _us),
+        closeTo(1.399, 0.0005),
+      );
+    });
+
+    test('USD major-unit "\$1.399/L"', () {
+      expect(
+        extractPricePerLiter(r'$1.399/L', profile: _us),
+        closeTo(1.399, 0.0005),
+      );
+    });
+
+    test('EUR default still works when no profile is threaded', () {
+      expect(extractPricePerLiter('1.899 €/L'), closeTo(1.899, 0.001));
+      expect(extractPricePerLiter('1,990 €'), closeTo(1.990, 0.001));
+    });
+
+    test('end-to-end €/L-equivalent: 142.9 p/L equals 1.429 £/L', () {
+      // The pence read and the equivalent major-unit read must agree.
+      final pence = extractPricePerLiter('142.9p/L', profile: _gb);
+      final pounds = extractPricePerLiter('£1.429/L', profile: _gb);
+      expect(pence, isNotNull);
+      expect(pounds, isNotNull);
+      expect(pence, closeTo(pounds!, 0.0005));
+    });
+  });
+
+  group('extractDate', () {
+    test('DD/MM/YYYY slash format', () {
+      expect(extractDate('Date: 19/04/2026'), DateTime(2026, 4, 19));
+    });
+
+    test('DD.MM.YYYY dot format (German)', () {
+      expect(extractDate('19.04.2026'), DateTime(2026, 4, 19));
+    });
+
+    test('DD-MM-YYYY dash format', () {
+      expect(extractDate('19-04-2026'), DateTime(2026, 4, 19));
+    });
+
+    test('DD/MM/YY 2-digit year assumes 20xx', () {
+      // Carrefour receipts use 2-digit year.
+      expect(extractDate('19/04/26'), DateTime(2026, 4, 19));
+    });
+
+    test('DD.MM.YY 2-digit year dot format', () {
+      expect(extractDate('19.04.26'), DateTime(2026, 4, 19));
+    });
+
+    test('prefers 4-digit year match over 2-digit on same line', () {
+      // When both appear, the 4-digit regex runs first.
+      expect(
+        extractDate('Due: 19/04/26\nIssued: 20/04/2026'),
+        DateTime(2026, 4, 20),
+      );
+    });
+
+    test('skips phone-number-like DD.MM.YY fragments with day > 31', () {
+      // Phone numbers can read as dates: "67.77.29.10" — 67 is invalid
+      // month, 77 is invalid day, so calendar sanity check must reject.
+      expect(extractDate('Tel: 04.67.77.29.10'), isNull);
+    });
+
+    test('continues past invalid day/month until valid date found', () {
+      // "04.67.77.29" fails (67 > 12 as month, 77 > 31 as day). But
+      // there's also an embedded valid DD.MM.YY "19.04.26".
+      expect(
+        extractDate('Tel: 04.67.77.29.10\nDate 19.04.26'),
+        DateTime(2026, 4, 19),
+      );
+    });
+
+    test('returns null for empty string', () {
+      expect(extractDate(''), isNull);
+    });
+
+    test('returns null when no date anywhere', () {
+      expect(extractDate('THANK YOU'), isNull);
+    });
+
+    test('realistic Carrefour receipt fragment', () {
+      const text = 'CARREFOUR MARKET\n'
+          'Caisse 03  19/04/26 14:35\n'
+          'Volume 5.24 L\n'
+          'TOTAL 10.47';
+      expect(extractDate(text), DateTime(2026, 4, 19));
+    });
+  });
+
+  group('buildDate', () {
+    test('valid date returns DateTime', () {
+      expect(buildDate('19', '04', '2026'), DateTime(2026, 4, 19));
+    });
+
+    test('invalid month (13) returns null', () {
+      expect(buildDate('19', '13', '2026'), isNull);
+    });
+
+    test('invalid month (0) returns null', () {
+      expect(buildDate('19', '0', '2026'), isNull);
+    });
+
+    test('invalid day (32) returns null', () {
+      expect(buildDate('32', '04', '2026'), isNull);
+    });
+
+    test('invalid day (0) returns null', () {
+      expect(buildDate('0', '04', '2026'), isNull);
+    });
+
+    test('non-numeric input is caught and returns null', () {
+      // FormatException from int.parse must be caught → null.
+      expect(buildDate('XX', '04', '2026'), isNull);
+    });
+
+    test('leap day 29/02 in leap year — DateTime normalizes', () {
+      expect(buildDate('29', '02', '2024'), DateTime(2024, 2, 29));
+    });
+  });
+
+  group('matchFirst', () {
+    test('returns first successful captured group', () {
+      final patterns = [
+        RegExp(r'never-matches-(\d+)'),
+        RegExp(r'second-(\d+\.\d+)'),
+        RegExp(r'third-(\d+)'),
+      ];
+      expect(matchFirst('second-42.50 third-99', patterns), 42.50);
+    });
+
+    test('returns null when no pattern matches', () {
+      final patterns = [RegExp(r'nope-(\d+)')];
+      expect(matchFirst('nothing here', patterns), isNull);
+    });
+
+    test('returns null for empty pattern list', () {
+      expect(matchFirst('anything', const []), isNull);
+    });
+
+    test('handles comma-decimal via parseDecimal', () {
+      final patterns = [RegExp(r'val=(\d+,\d+)')];
+      expect(matchFirst('val=3,14', patterns), closeTo(3.14, 0.0001));
+    });
+  });
+
+  group('parseDecimal', () {
+    test('dot-decimal "42.35"', () {
+      expect(parseDecimal('42.35'), closeTo(42.35, 0.0001));
+    });
+
+    test('comma-decimal "42,35"', () {
+      expect(parseDecimal('42,35'), closeTo(42.35, 0.0001));
+    });
+
+    test('integer string "42"', () {
+      expect(parseDecimal('42'), 42.0);
+    });
+
+    test('returns null for non-numeric input', () {
+      expect(parseDecimal('abc'), isNull);
+    });
+
+    test('returns null for empty string', () {
+      expect(parseDecimal(''), isNull);
+    });
+
+    test('handles negative numbers', () {
+      expect(parseDecimal('-1,5'), closeTo(-1.5, 0.0001));
+    });
+  });
+
+  group('decimalDigitCount', () {
+    test('returns 0 for integer string', () {
+      expect(decimalDigitCount('42'), 0);
+    });
+
+    test('returns 2 for "58.42"', () {
+      expect(decimalDigitCount('58.42'), 2);
+    });
+
+    test('returns 3 for "1.999"', () {
+      expect(decimalDigitCount('1.999'), 3);
+    });
+
+    test('returns 3 for "1,990" (comma separator)', () {
+      expect(decimalDigitCount('1,990'), 3);
+    });
+
+    test('returns 2 for comma-separated "9,95"', () {
+      expect(decimalDigitCount('9,95'), 2);
+    });
+
+    test('returns 0 for empty string', () {
+      expect(decimalDigitCount(''), 0);
+    });
+
+    test('uses LAST separator when both "." and "," are present', () {
+      // European thousand-separator format "1.234,56" — the last
+      // separator is the decimal point.
+      expect(decimalDigitCount('1.234,56'), 2);
+    });
+  });
+}

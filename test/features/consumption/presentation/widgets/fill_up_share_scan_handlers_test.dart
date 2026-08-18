@@ -7,12 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:tankstellen/features/consumption/data/receipt_parser.dart';
-import 'package:tankstellen/features/consumption/data/receipt_scan_service.dart';
-import 'package:tankstellen/features/consumption/presentation/widgets/'
-    'fill_up_scan_handlers.dart';
-import 'package:tankstellen/features/consumption/presentation/widgets/'
-    'fill_up_share_scan_handlers.dart';
+import 'package:tankstellen/features/receipts_ocr/data/receipt_parser.dart';
+import 'package:tankstellen/features/receipts_ocr/data/receipt_scan_service.dart';
+import 'package:tankstellen/features/consumption/presentation/widgets/fill_up_scan_handlers.dart';
+import 'package:tankstellen/features/consumption/presentation/widgets/fill_up_share_scan_handlers.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 import '../../../../helpers/silence_error_logger.dart';
@@ -128,7 +126,7 @@ ReceiptScanService _realParserService({
 
 /// Reads a shipped receipt OCR fixture's raw text.
 String _fixture(String name) => File(
-  'test/features/consumption/data/receipt_parser/fixtures/$name',
+  'test/features/receipts_ocr/data/receipt_parser/fixtures/$name',
 ).readAsStringSync();
 
 /// Writes a throwaway capture file (minimal JPEG bytes) and returns its

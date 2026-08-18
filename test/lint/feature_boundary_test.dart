@@ -301,7 +301,9 @@ const _featurePairBaseline = <String, int>{
   'consumption -> carbon': 2,
   'consumption -> driving': 5,
   'consumption -> ev': 12,
-  'consumption -> feature_management': 21,
+  // #3743 (epic item 1, receipts_ocr extraction) — the share-receipt
+  // handler moved out and now imports the feature_management barrel: 21→19.
+  'consumption -> feature_management': 19,
   'consumption -> glide_coach': 4,
   'consumption -> map': 2,
   'consumption -> profile': 10,
@@ -345,7 +347,10 @@ const _featurePairBaseline = <String, int>{
   'profile -> alerts': 2,
   'profile -> approach': 1,
   'profile -> consent': 1,
-  'profile -> consumption': 10,
+  // #3743 (epic item 1) — 'profile -> consumption' hit ZERO: all 10 edges
+  // were the developer-tools pump-OCR tester reaching into the OCR stack,
+  // which now lives in features/receipts_ocr behind its api.dart barrel.
+  // This also breaks the profile <-> consumption cycle (18 → 17).
   'profile -> driving': 1,
   'profile -> feature_management': 52,
   'profile -> search': 2,
@@ -439,8 +444,12 @@ const _coreImportBaseline = <String, int>{
 // handler, the trip-recording banner and the home-widget click listener
 // all run above/without the router's InheritedGoRouter, #1987), which
 // needs a core-owned router seam to break.
+// #3743 (epic item 1) — the share-receipt handler (one of consumption's
+// two router.dart importers) moved to features/receipts_ocr: same edge,
+// new attribution (consumption 2 → 1, receipts_ocr 0 → 1; total flat).
 const _shellImportBaseline = <String, int>{
-  'consumption': 2,
+  'consumption': 1,
+  'receipts_ocr': 1,
   'widget': 1,
 };
 
@@ -449,4 +458,7 @@ const _shellImportBaseline = <String, int>{
 /// DECREASES.
 // #3743 (epic item 5) — 19 → 18: 'sync -> consumption' hit zero (entity
 // sync configs moved home + barrel routing), breaking consumption <-> sync.
-const _cycleBaseline = 18;
+// #3743 (epic item 1) — 18 → 17: 'profile -> consumption' hit zero (the
+// pump-OCR tester's targets moved to receipts_ocr, imported via barrel),
+// breaking profile <-> consumption.
+const _cycleBaseline = 17;

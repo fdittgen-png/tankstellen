@@ -3,8 +3,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/providers/'
-    'pending_shared_receipt_provider.dart';
+import 'package:tankstellen/features/receipts_ocr/providers/pending_shared_receipt_provider.dart';
 
 /// #2735 — cover the one-shot stash contract for the inbound-share
 /// receipt path the router redirect + AddFillUpScreen both read. Mirrors

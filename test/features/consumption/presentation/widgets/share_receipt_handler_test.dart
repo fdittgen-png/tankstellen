@@ -8,18 +8,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tankstellen/app/router.dart';
-import 'package:tankstellen/features/consumption/data/ocr/'
-    'receipt_pdf_rasterizer.dart';
-import 'package:tankstellen/features/consumption/data/share/'
-    'shared_receipt_intent.dart';
-import 'package:tankstellen/features/consumption/presentation/widgets/'
-    'share_receipt_handler.dart';
-import 'package:tankstellen/features/consumption/providers/'
-    'pending_shared_receipt_provider.dart';
-import 'package:tankstellen/features/consumption/providers/'
-    'pending_shared_receipt_text_provider.dart';
-import 'package:tankstellen/features/feature_management/application/'
-    'feature_flags_provider.dart';
+import 'package:tankstellen/features/receipts_ocr/data/ocr/receipt_pdf_rasterizer.dart';
+import 'package:tankstellen/features/receipts_ocr/data/share/shared_receipt_intent.dart';
+import 'package:tankstellen/features/receipts_ocr/presentation/widgets/share_receipt_handler.dart';
+import 'package:tankstellen/features/receipts_ocr/providers/pending_shared_receipt_provider.dart';
+import 'package:tankstellen/features/receipts_ocr/providers/pending_shared_receipt_text_provider.dart';
+import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import '../../../../helpers/silence_error_logger.dart';
@@ -75,7 +69,7 @@ class _FakeRasterizer extends ReceiptPdfRasterizer {
 }
 
 String _fixture(String name) => File(
-      'test/features/consumption/data/ereceipt/fixtures/$name',
+      'test/features/receipts_ocr/data/ereceipt/fixtures/$name',
     ).readAsStringSync();
 
 void main() {

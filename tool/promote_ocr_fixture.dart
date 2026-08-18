@@ -24,7 +24,7 @@
 // The package is expected to live under `test/fixtures/pump_displays/`
 // (or a sibling receipt dir), next to its `<slug>.jpg` source image. The
 // generated test is written to
-// `test/features/consumption/data/ocr/fixtures/<slug>_fixture_test.dart`.
+// `test/features/receipts_ocr/data/ocr/fixtures/<slug>_fixture_test.dart`.
 //
 // Idempotent: re-running on the same package overwrites the generated
 // test byte-for-byte (so it can be regenerated and the diff committed if
@@ -37,7 +37,7 @@ import 'dart:io';
 
 /// Directory the generated fixture tests land in (relative to repo root).
 const String _generatedTestDir =
-    'test/features/consumption/data/ocr/fixtures';
+    'test/features/receipts_ocr/data/ocr/fixtures';
 
 Future<void> main(List<String> args) async {
   if (args.length != 1) {
@@ -287,11 +287,11 @@ String _renderTest({
   b.writeln("import 'dart:io';");
   b.writeln();
   b.writeln("import 'package:flutter_test/flutter_test.dart';");
-  b.writeln("import 'package:tankstellen/features/consumption/data/ocr/"
+  b.writeln("import 'package:tankstellen/features/receipts_ocr/data/ocr/"
       "label_anchored_extractor.dart';");
-  b.writeln("import 'package:tankstellen/features/consumption/data/ocr/"
+  b.writeln("import 'package:tankstellen/features/receipts_ocr/data/ocr/"
       "pump_ocr_config.dart';");
-  b.writeln("import 'package:tankstellen/features/consumption/data/ocr/"
+  b.writeln("import 'package:tankstellen/features/receipts_ocr/data/ocr/"
       "recognized_text_block.dart';");
   b.writeln();
   b.writeln('void main() {');

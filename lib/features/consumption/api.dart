@@ -23,13 +23,7 @@ export 'data/trips_sync.dart';
 export 'data/driving_score_calculator.dart';
 // #3743 — the #3137 source-compat re-export of ../obd2/api.dart is gone:
 // consumers of the OBD2 stack import features/obd2/api.dart directly.
-export 'data/ocr/ocr_geometry.dart';
-export 'data/ocr/ocr_trace_package.dart';
-export 'data/ocr/ocr_trace_recorder.dart';
-export 'data/ocr/ocr_trace_serializer.dart';
-export 'data/ocr/pump_ocr_config.dart';
 export 'data/pip_controller.dart';
-export 'data/receipt_scan_service.dart';
 export 'data/trip_history_repository.dart';
 // #3739 — the ONE canonical TripSummary/TripSample codec. The obd2
 // feature's WAL (active) + paused trip repositories delegate to these
@@ -50,20 +44,15 @@ export 'presentation/screens/add_fill_up_screen.dart';
 export 'presentation/screens/consumption_screen.dart';
 export 'presentation/screens/consumption_statistics_screen.dart';
 export 'presentation/screens/pick_station_for_fill_up_screen.dart';
-export 'presentation/screens/pump_display_camera_screen.dart';
 export 'presentation/screens/trip_detail_screen.dart';
 export 'presentation/screens/trip_recording_screen.dart';
 export 'presentation/widgets/broken_map_widgets.dart';
-export 'presentation/widgets/ocr_block_overlay_painter.dart';
-export 'presentation/widgets/ocr_trace_steps_panel.dart';
 export 'presentation/widgets/proximity_fill_bar.dart';
-export 'presentation/widgets/share_receipt_listener.dart';
 export 'presentation/widgets/trip_recording_banner.dart';
 export 'presentation/widgets/vehicle_adapter_section.dart';
 export 'presentation/widgets/vehicle_baseline_section.dart';
 export 'providers/auto_record_orchestrator.dart';
 export 'providers/consumption_providers.dart';
-export 'providers/pending_shared_receipt_provider.dart';
 export 'providers/pip_mode_provider.dart';
 export 'providers/trip_history_provider.dart';
 export 'providers/trip_recording_provider.dart';

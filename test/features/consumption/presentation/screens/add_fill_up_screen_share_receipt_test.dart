@@ -9,13 +9,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:tankstellen/features/consumption/data/ereceipt/ereceipt_text_parser.dart';
-import 'package:tankstellen/features/consumption/data/receipt_parser.dart';
-import 'package:tankstellen/features/consumption/data/receipt_scan_service.dart';
+import 'package:tankstellen/features/receipts_ocr/data/ereceipt/ereceipt_text_parser.dart';
+import 'package:tankstellen/features/receipts_ocr/data/receipt_parser.dart';
+import 'package:tankstellen/features/receipts_ocr/data/receipt_scan_service.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/add_fill_up_screen.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/fill_up_numeric_field.dart';
-import 'package:tankstellen/features/consumption/providers/pending_shared_receipt_provider.dart';
-import 'package:tankstellen/features/consumption/providers/pending_shared_receipt_text_provider.dart';
+import 'package:tankstellen/features/receipts_ocr/providers/pending_shared_receipt_provider.dart';
+import 'package:tankstellen/features/receipts_ocr/providers/pending_shared_receipt_text_provider.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
@@ -70,7 +70,7 @@ class _FixtureRecognizer extends TextRecognizer {
 }
 
 String _fixture(String name) => File(
-      'test/features/consumption/data/receipt_parser/fixtures/$name',
+      'test/features/receipts_ocr/data/receipt_parser/fixtures/$name',
     ).readAsStringSync();
 
 /// Writes a throwaway capture file (minimal JPEG bytes); the recognizer
@@ -174,7 +174,7 @@ void main() {
     // stash with the REAL EReceiptTextParser's output for a German e-receipt
     // fixture so this drives the actual parse→apply path end to end.
     final parsed = const EReceiptTextParser().parse(
-      File('test/features/consumption/data/ereceipt/fixtures/'
+      File('test/features/receipts_ocr/data/ereceipt/fixtures/'
               'aral_koeln_2026-05-28.txt')
           .readAsStringSync(),
       countryCode: 'DE',

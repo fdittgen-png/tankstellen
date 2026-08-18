@@ -12,8 +12,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../../../core/logging/error_logger.dart';
 import '../../../../../core/sharing/public_file_exporter.dart';
-import '../../../../consumption/data/ocr/ocr_trace_package.dart';
-import '../../../../consumption/data/ocr/ocr_trace_serializer.dart';
+import '../../../../receipts_ocr/api.dart';
 import '../../../../../core/sharing/share_seam.dart';
 
 /// Test-only override for the OCR-package share-sheet handoff (#2518)

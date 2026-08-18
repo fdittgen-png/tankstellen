@@ -3,8 +3,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/data/ereceipt/ereceipt_text_parser.dart';
-import 'package:tankstellen/features/consumption/data/receipt_parser/receipt_parse_result.dart';
+import 'package:tankstellen/features/receipts_ocr/data/ereceipt/ereceipt_text_parser.dart';
+import 'package:tankstellen/features/receipts_ocr/data/receipt_parser/receipt_parse_result.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/fill_up_paste_receipt_handler.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/fill_up_scan_handlers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';

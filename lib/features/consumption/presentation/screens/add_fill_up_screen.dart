@@ -18,8 +18,7 @@ import '../../../profile/providers/profile_provider.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
-import '../../data/ocr/pump_ocr_config.dart';
-import '../../data/receipt_scan_service.dart';
+import '../../../receipts_ocr/api.dart';
 import '../../domain/add_fill_up_fuel_resolver.dart';
 import '../../domain/add_fill_up_validators.dart';
 import '../../domain/add_fill_up_warnings.dart';
@@ -37,7 +36,6 @@ import '../widgets/fill_up_scan_handlers.dart';
 import '../widgets/fill_up_share_scan_handlers.dart';
 import '../widgets/fill_up_variance_prompt.dart';
 import '../widgets/fill_up_warning_dialog.dart';
-import 'pump_display_camera_screen.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/utils/unit_formatter.dart';
 

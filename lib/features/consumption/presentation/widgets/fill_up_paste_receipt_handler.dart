@@ -8,8 +8,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/error/guarded.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../data/ereceipt/ereceipt_text_parser.dart';
-import '../../data/receipt_scan_service.dart';
+import '../../../receipts_ocr/api.dart';
 import 'fill_up_scan_handlers.dart';
 import 'fill_up_share_scan_handlers.dart';
 

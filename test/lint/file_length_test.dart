@@ -730,7 +730,7 @@ void main() {
     // recovers nothing (the binarization erased faint 7-seg value digits). The
     // retry + its parseFor helper + the threaded `binarize` flag push this just
     // past 400; further compression would hurt readability of a real fix.
-    'lib/features/consumption/data/receipt_scan_service.dart': (
+    'lib/features/receipts_ocr/data/receipt_scan_service.dart': (
       lines: 408,
       bumps: 0,
       decompositionIssue: null,

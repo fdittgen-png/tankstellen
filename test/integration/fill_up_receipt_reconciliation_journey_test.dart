@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
-import 'package:tankstellen/features/consumption/data/receipt_parser.dart';
+import 'package:tankstellen/features/receipts_ocr/data/receipt_parser.dart';
 import 'package:tankstellen/features/consumption/data/repositories/fill_up_repository.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';

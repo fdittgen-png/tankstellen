@@ -11,12 +11,8 @@ import '../../../../core/error/guarded.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/fuel_type.dart';
-import '../../data/pump_scan_disposition.dart';
-import '../../data/receipt_scan_service.dart';
-import '../screens/pump_display_camera_screen.dart';
-import 'bad_scan_report_sheet.dart';
+import '../../../receipts_ocr/api.dart';
 import 'fill_up_share_scan_handlers.dart';
-import 'pump_scan_failure_sheet.dart';
 
 /// Pure UI-side scan flows extracted from `add_fill_up_screen.dart`
 /// (#563 extraction). Each entry-point takes a [BuildContext] plus

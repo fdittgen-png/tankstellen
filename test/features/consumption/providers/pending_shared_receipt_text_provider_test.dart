@@ -3,9 +3,8 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/data/receipt_parser.dart';
-import 'package:tankstellen/features/consumption/providers/'
-    'pending_shared_receipt_text_provider.dart';
+import 'package:tankstellen/features/receipts_ocr/data/receipt_parser.dart';
+import 'package:tankstellen/features/receipts_ocr/providers/pending_shared_receipt_text_provider.dart';
 
 /// #2838 — the one-shot stash for a parsed e-receipt TEXT result the share
 /// handler writes and the AddFillUpScreen reads. Mirrors the path-stash

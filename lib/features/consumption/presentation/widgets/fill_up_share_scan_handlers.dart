@@ -9,10 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/error/guarded.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../data/receipt_parser.dart';
-import '../../data/receipt_scan_service.dart';
-import '../../providers/pending_shared_receipt_provider.dart';
-import '../../providers/pending_shared_receipt_text_provider.dart';
+import '../../../receipts_ocr/api.dart';
 import 'fill_up_scan_handlers.dart';
 
 /// Shared receipt-prefill body + the path-fed share-scan sibling
