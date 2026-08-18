@@ -5,157 +5,28 @@
 /// `schema_sql.dart` (which holds the CREATE TABLE blocks) to keep each file
 /// reviewable under the line cap. Both are always (idempotently) re-asserted
 /// by the wizard so re-running the setup SQL repairs drifted policies.
+///
+/// The per-table policy blocks live on each table's [SyncedTableSpec]
+/// (`schema_table_specs*.dart`) since the extensibility-finding-8 refactor;
+/// [rlsSql] here is ASSEMBLED from them, byte-identical to the previous
+/// monolithic literal (pinned by
+/// `test/core/sync/schema_sql_golden_test.dart`).
 library;
 
+import 'schema_table_specs.dart';
+
 /// Row-level security: enables RLS + own-row / shared-read policies on every
-/// table. Idempotent via DROP POLICY IF EXISTS so the wizard can re-assert
-/// policies even when the tables already exist.
-const String rlsSql = '''
--- ── Row Level Security ──────────────────────────────────────────────
-ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.favorites ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.alerts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.price_snapshots ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.sync_settings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.vehicles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.fill_ups ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.itineraries ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.ignored_stations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.station_ratings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.price_reports ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.push_tokens ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.obd2_baselines ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.trip_summaries ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.trip_details ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.trip_shares ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.content_reports ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.deletions ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS users_own ON public.users;
-CREATE POLICY users_own ON public.users FOR ALL USING (id = auth.uid());
-
-DROP POLICY IF EXISTS favorites_own ON public.favorites;
-CREATE POLICY favorites_own ON public.favorites
-  FOR ALL USING (user_id = auth.uid());
-
-DROP POLICY IF EXISTS alerts_own ON public.alerts;
-CREATE POLICY alerts_own ON public.alerts
-  FOR ALL USING (user_id = auth.uid());
-
--- Price snapshots: readable by all; only service_role writes.
-DROP POLICY IF EXISTS snapshots_read ON public.price_snapshots;
-CREATE POLICY snapshots_read ON public.price_snapshots
-  FOR SELECT USING (true);
-
-DROP POLICY IF EXISTS sync_own ON public.sync_settings;
-CREATE POLICY sync_own ON public.sync_settings
-  FOR ALL USING (user_id = auth.uid());
-
-DROP POLICY IF EXISTS vehicles_own ON public.vehicles;
-CREATE POLICY vehicles_own ON public.vehicles
-  FOR ALL USING (user_id = auth.uid());
-
-DROP POLICY IF EXISTS fill_ups_own ON public.fill_ups;
-CREATE POLICY fill_ups_own ON public.fill_ups
-  FOR ALL USING (user_id = auth.uid());
-
-DROP POLICY IF EXISTS itineraries_own ON public.itineraries;
-CREATE POLICY itineraries_own ON public.itineraries
-  FOR ALL USING (user_id = auth.uid());
-
-DROP POLICY IF EXISTS ignored_own ON public.ignored_stations;
-CREATE POLICY ignored_own ON public.ignored_stations
-  FOR ALL USING (user_id = auth.uid());
-
-DROP POLICY IF EXISTS ratings_own ON public.station_ratings;
-CREATE POLICY ratings_own ON public.station_ratings
-  FOR ALL USING (user_id = auth.uid());
-DROP POLICY IF EXISTS ratings_shared_read ON public.station_ratings;
-CREATE POLICY ratings_shared_read ON public.station_ratings
-  FOR SELECT USING (is_shared = true OR user_id = auth.uid());
-
--- Price reports: anyone reads, reporter inserts their own.
-DROP POLICY IF EXISTS reports_read ON public.price_reports;
-CREATE POLICY reports_read ON public.price_reports
-  FOR SELECT USING (true);
-DROP POLICY IF EXISTS reports_insert ON public.price_reports;
-CREATE POLICY reports_insert ON public.price_reports
-  FOR INSERT WITH CHECK (reporter_id = auth.uid());
-
-DROP POLICY IF EXISTS push_own ON public.push_tokens;
-CREATE POLICY push_own ON public.push_tokens
-  FOR ALL USING (user_id = auth.uid());
-
-DROP POLICY IF EXISTS obd2_baselines_own ON public.obd2_baselines;
-CREATE POLICY obd2_baselines_own ON public.obd2_baselines
-  FOR ALL USING (user_id = auth.uid());
-
-DROP POLICY IF EXISTS trip_summaries_own ON public.trip_summaries;
-CREATE POLICY trip_summaries_own ON public.trip_summaries
-  FOR ALL USING (user_id = auth.uid());
-
-DROP POLICY IF EXISTS trip_details_own ON public.trip_details;
-CREATE POLICY trip_details_own ON public.trip_details
-  FOR ALL USING (user_id = auth.uid());
-
--- Trip shares: owner has full CRUD over rows they created; the recipient
--- may only READ a grant pointing at them.
-DROP POLICY IF EXISTS trip_shares_owner_select ON public.trip_shares;
-CREATE POLICY trip_shares_owner_select ON public.trip_shares
-  FOR SELECT USING (owner_id = auth.uid());
-DROP POLICY IF EXISTS trip_shares_owner_insert ON public.trip_shares;
-CREATE POLICY trip_shares_owner_insert ON public.trip_shares
-  FOR INSERT WITH CHECK (owner_id = auth.uid());
-DROP POLICY IF EXISTS trip_shares_owner_update ON public.trip_shares;
-CREATE POLICY trip_shares_owner_update ON public.trip_shares
-  FOR UPDATE USING (owner_id = auth.uid())
-  WITH CHECK (owner_id = auth.uid());
-DROP POLICY IF EXISTS trip_shares_owner_delete ON public.trip_shares;
-CREATE POLICY trip_shares_owner_delete ON public.trip_shares
-  FOR DELETE USING (owner_id = auth.uid());
-DROP POLICY IF EXISTS trip_shares_recipient_select ON public.trip_shares;
-CREATE POLICY trip_shares_recipient_select ON public.trip_shares
-  FOR SELECT USING (shared_with_id = auth.uid());
-
--- Additive read access so a recipient can read a shared trip (never write).
-DROP POLICY IF EXISTS trip_summaries_shared_read ON public.trip_summaries;
-CREATE POLICY trip_summaries_shared_read ON public.trip_summaries
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM public.trip_shares s
-      WHERE s.trip_id = trip_summaries.id
-        AND s.shared_with_id = auth.uid()
-    )
-  );
-DROP POLICY IF EXISTS trip_details_shared_read ON public.trip_details;
-CREATE POLICY trip_details_shared_read ON public.trip_details
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM public.trip_shares s
-      WHERE s.trip_id = trip_details.id
-        AND s.shared_with_id = auth.uid()
-    )
-  );
-
--- Content reports (#3726, v7): a user may only file reports naming
--- THEMSELVES as reporter, and only ever sees / deletes their own (the
--- delete path serves the GDPR wipe). Moderation review happens with the
--- service role / SQL editor, never through the client.
-DROP POLICY IF EXISTS content_reports_insert_own ON public.content_reports;
-CREATE POLICY content_reports_insert_own ON public.content_reports
-  FOR INSERT WITH CHECK (reporter_user_id = auth.uid());
-DROP POLICY IF EXISTS content_reports_select_own ON public.content_reports;
-CREATE POLICY content_reports_select_own ON public.content_reports
-  FOR SELECT USING (reporter_user_id = auth.uid());
-DROP POLICY IF EXISTS content_reports_delete_own ON public.content_reports;
-CREATE POLICY content_reports_delete_own ON public.content_reports
-  FOR DELETE USING (reporter_user_id = auth.uid());
-
--- Deletion tombstones (#3078): a user only ever sees / writes their own.
-DROP POLICY IF EXISTS deletions_own ON public.deletions;
-CREATE POLICY deletions_own ON public.deletions
-  FOR ALL USING (user_id = auth.uid());
-''';
+/// table, assembled from [syncedTableSpecs] in list order (enable-RLS lines
+/// first, then each table's policy block separated by one blank line).
+/// Idempotent via DROP POLICY IF EXISTS so the wizard can re-assert policies
+/// even when the tables already exist.
+final String rlsSql = [
+  '-- \u2500\u2500 Row Level Security \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500',
+  for (final spec in syncedTableSpecs)
+    'ALTER TABLE public.${spec.name} ENABLE ROW LEVEL SECURITY;',
+  '',
+  '${syncedTableSpecs.map((spec) => spec.rlsPolicySql).join('\n\n')}\n',
+].join('\n');
 
 /// SECURITY DEFINER RPCs the trip-sharing sync code calls
 /// (`resolve_share_recipient`, `claim_trip_share`). Without these the

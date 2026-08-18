@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'schema_sql.dart';
+import 'schema_table_specs.dart';
 import 'supabase_client.dart';
 import '../../core/logging/error_logger.dart';
 
@@ -23,33 +24,22 @@ class SchemaVerifier {
 
   /// Core tables TankSync needs before sync can function at all. A missing
   /// one means the wizard SQL has not been run — the verifier flags it.
-  static const requiredTables = [
-    'users',
-    'favorites',
-    'alerts',
-    'price_snapshots',
-    'sync_settings',
-    'vehicles',
-    'fill_ups',
-  ];
+  /// Derived from [syncedTableSpecs] (the single per-table registry), so a
+  /// new spec is probed automatically.
+  static List<String> get requiredTables => [
+        for (final spec in syncedTableSpecs)
+          if (spec.isRequired) spec.name,
+      ];
 
   /// Tables the sync code writes for opt-in features (history, ratings,
   /// trips, sharing, push). Their absence degrades a feature rather than
   /// breaking core sync, but the wizard SQL still creates every one so a
-  /// self-hoster ends up with a complete schema.
-  static const optionalTables = [
-    'itineraries',
-    'ignored_stations',
-    'station_ratings',
-    'price_reports',
-    'push_tokens',
-    'obd2_baselines',
-    'trip_summaries',
-    'trip_details',
-    'trip_shares',
-    'content_reports',
-    'deletions',
-  ];
+  /// self-hoster ends up with a complete schema. Derived from
+  /// [syncedTableSpecs].
+  static List<String> get optionalTables => [
+        for (final spec in syncedTableSpecs)
+          if (!spec.isRequired) spec.name,
+      ];
 
   /// Every table the wizard SQL creates / the verifier probes.
   static List<String> get allTables => [...requiredTables, ...optionalTables];
