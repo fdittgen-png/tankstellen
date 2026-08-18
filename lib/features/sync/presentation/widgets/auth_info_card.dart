@@ -3,9 +3,11 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/widgets/info_card.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Informational card explaining the benefits of creating an account.
+/// Thin binding over the shared [InfoCard] skeleton.
 ///
 /// Displayed below the sign-in/sign-up form for unauthenticated users.
 class AuthInfoCard extends StatelessWidget {
@@ -23,29 +25,12 @@ class AuthInfoCard extends StatelessWidget {
       l.authInfoBenefit4,
     ];
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.info_outline, size: 18),
-                const SizedBox(width: 8),
-                Text(l.authInfoTitle, style: theme.textTheme.titleSmall),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              bullets.join('\n'),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-      ),
+    return InfoCard(
+      icon: Icons.info_outline,
+      iconSize: 18,
+      title: l.authInfoTitle,
+      titleStyle: theme.textTheme.titleSmall,
+      body: bullets.join('\n'),
     );
   }
 }

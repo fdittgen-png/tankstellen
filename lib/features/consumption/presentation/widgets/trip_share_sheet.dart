@@ -6,21 +6,16 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../core/sharing/share_seam.dart';
 import '../../data/trip_shares_sync.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/error/guarded.dart';
 
-/// Hook for handing a freshly-minted share link to the OS share sheet
-/// (#2240). Production uses `SharePlus.instance.share`; widget tests
-/// substitute a fake via [debugTripShareLinkSinkOverride] to assert the
-/// outgoing link text without launching the OS share sheet. Mirrors the
-/// seam in `obd2_breadcrumb_overlay.dart`.
-typedef TripShareLinkSink = Future<void> Function(ShareParams params);
-
-/// Test-only override for the link share sink.
+/// Test-only override for handing a freshly-minted share link to the
+/// OS share sheet (#2240) — the shared [ShareSink] seam.
 @visibleForTesting
-TripShareLinkSink? debugTripShareLinkSinkOverride;
+ShareSink? debugTripShareLinkSinkOverride;
 
 /// Test-only override for the wire layer used by the share sheet, so a
 /// widget test can drive the create / list / revoke flows without a

@@ -5,13 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/widgets/info_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/link_device_provider.dart';
 
 /// Card with the code input field and the "Import data" button on the
 /// Link Device screen. Watches `linkDeviceControllerProvider` for the
 /// linking state (idle / linking / result message) and forwards the
-/// submit action through the controller.
+/// submit action through the controller. The card chrome + header/body
+/// treatment live in the shared [InfoCard] skeleton.
 ///
 /// The [codeController] is owned by the parent screen state because
 /// `TextEditingController` lifecycle should match a `StatefulWidget`.
@@ -30,92 +32,73 @@ class LinkDeviceImportCard extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final uiState = ref.watch(linkDeviceControllerProvider);
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    return InfoCard(
+      icon: Icons.link,
+      title: l10n.linkDeviceImportSectionTitle,
+      titleStyle: theme.textTheme.titleMedium?.copyWith(
+        fontWeight: FontWeight.bold,
+      ),
+      body: l10n.linkDeviceImportDescription,
+      children: [
+        const SizedBox(height: 12),
+        // ListenableBuilder so the submit button enables/disables based
+        // on the local TextEditingController without rebuilding the
+        // whole screen on every keystroke.
+        ListenableBuilder(
+          listenable: codeController,
+          builder: (context, _) {
+            final hasText = codeController.text.isNotEmpty;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.link, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  l10n.linkDeviceImportSectionTitle,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
+                TextField(
+                  controller: codeController,
+                  decoration: InputDecoration(
+                    labelText: l10n.linkDeviceCodeFieldLabel,
+                    hintText: l10n.linkDeviceCodeFieldHint,
+                    prefixIcon: const Icon(Icons.key, size: 18),
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              l10n.linkDeviceImportDescription,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 12),
-            // ListenableBuilder so the submit button enables/disables based
-            // on the local TextEditingController without rebuilding the
-            // whole screen on every keystroke.
-            ListenableBuilder(
-              listenable: codeController,
-              builder: (context, _) {
-                final hasText = codeController.text.isNotEmpty;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TextField(
-                      controller: codeController,
-                      decoration: InputDecoration(
-                        labelText: l10n.linkDeviceCodeFieldLabel,
-                        hintText: l10n.linkDeviceCodeFieldHint,
-                        prefixIcon: const Icon(Icons.key, size: 18),
-                        isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    FilledButton.icon(
-                      onPressed: (hasText && !uiState.isLinking)
-                          ? () => ref
-                                .read(linkDeviceControllerProvider.notifier)
-                                .linkDevice(codeController.text)
-                          : null,
-                      icon: uiState.isLinking
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Icon(Icons.sync),
-                      label: Text(l10n.linkDeviceImportButton),
-                    ),
-                  ],
-                );
-              },
-            ),
-            if (uiState.result != null) ...[
-              const SizedBox(height: 12),
-              Text(
-                uiState.result!,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: uiState.isError
-                      ? DarkModeColors.error(context)
-                      : DarkModeColors.success(context),
+                const SizedBox(height: 12),
+                FilledButton.icon(
+                  onPressed: (hasText && !uiState.isLinking)
+                      ? () => ref
+                            .read(linkDeviceControllerProvider.notifier)
+                            .linkDevice(codeController.text)
+                      : null,
+                  icon: uiState.isLinking
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Icon(Icons.sync),
+                  label: Text(l10n.linkDeviceImportButton),
                 ),
-              ),
-            ],
-          ],
+              ],
+            );
+          },
         ),
-      ),
+        if (uiState.result != null) ...[
+          const SizedBox(height: 12),
+          Text(
+            uiState.result!,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: uiState.isError
+                  ? DarkModeColors.error(context)
+                  : DarkModeColors.success(context),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

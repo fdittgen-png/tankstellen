@@ -10,33 +10,22 @@ import 'package:flutter/widgets.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-/// Hook for the share-sheet handoff (#1189, generalised in #1344).
-///
-/// Production calls [SharePlus.instance.share] directly; tests substitute
-/// a fake via [debugShareSinkOverride] so widget tests can assert on the
-/// outgoing [ShareParams] without launching the OS share sheet.
-typedef WidgetShareSink = Future<void> Function(ShareParams params);
+import 'share_seam.dart';
 
-/// Test-only override for the share sink used by [shareWidgetAsImage].
-///
-/// Set inside a widget test (and remember to clear it in `addTearDown`)
-/// so the renderer routes [SharePlus.instance.share] through a fake.
+/// Test-only override for the share sink used by [shareWidgetAsImage]
+/// (#1189, generalised in #1344). Production calls
+/// [SharePlus.instance.share] directly; set a fake inside a widget test
+/// (and remember to clear it in `addTearDown`) to assert on the outgoing
+/// [ShareParams] without launching the OS share sheet.
 @visibleForTesting
-WidgetShareSink? debugShareSinkOverride;
-
-/// Hook for the temporary-directory lookup used by [shareWidgetAsImage].
-///
-/// Production calls [getTemporaryDirectory] from `path_provider`; tests
-/// substitute a fake via [debugTemporaryDirectoryOverride] so the
-/// generated PNG is written into the test sandbox instead of the real
-/// platform temp folder.
-typedef WidgetShareTempDirectoryProvider = Future<Directory> Function();
+ShareSink? debugShareSinkOverride;
 
 /// Test-only override for the temp-directory lookup used by
-/// [shareWidgetAsImage]. Returns a [Directory] the renderer is allowed to
-/// write into.
+/// [shareWidgetAsImage]. Production calls [getTemporaryDirectory] from
+/// `path_provider`; tests substitute a sandbox [Directory] so the
+/// generated PNG never lands in the real platform temp folder.
 @visibleForTesting
-WidgetShareTempDirectoryProvider? debugTemporaryDirectoryOverride;
+ShareTempDirectoryProvider? debugTemporaryDirectoryOverride;
 
 /// Renders the widget identified by [boundaryKey] to a PNG and hands it
 /// to the OS share sheet via `share_plus` (#1189, generalised in #1344).

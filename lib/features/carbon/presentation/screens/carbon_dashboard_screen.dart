@@ -16,17 +16,12 @@ import '../../../consumption/providers/consumption_providers.dart';
 import '../../domain/monthly_summary.dart';
 import '../widgets/charts_tab.dart';
 import '../../../../core/error/guarded.dart';
+import '../../../../core/sharing/share_seam.dart';
 
-/// Hook for the share-sheet handoff used by [CarbonDashboardScreen]
-/// (#2005). Production sends [ShareParams] straight to
-/// `SharePlus.instance.share`; widget tests substitute a fake via
-/// [debugCarbonShareSinkOverride] to assert the outgoing payload
-/// without launching the real OS share sheet.
-typedef CarbonShareSink = Future<void> Function(ShareParams params);
-
-/// See [CarbonShareSink].
+/// Test-only override for the share-sheet handoff used by
+/// [CarbonDashboardScreen] (#2005) — the shared [ShareSink] seam.
 @visibleForTesting
-CarbonShareSink? debugCarbonShareSinkOverride;
+ShareSink? debugCarbonShareSinkOverride;
 
 Future<void> _defaultCarbonShareSink(ShareParams params) =>
     SharePlus.instance.share(params);

@@ -5,19 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/navigation/app_routes.dart';
-import '../../../../core/theme/dark_mode_colors.dart';
-import '../../../../core/utils/navigation_utils.dart';
-import '../../../../core/widgets/snackbar_helper.dart';
-import '../../../../core/widgets/confirm_delete_dialog.dart';
-import '../../../../l10n/app_localizations.dart';
+import '../../../../core/widgets/favorite_dismissible.dart';
 import '../../../../core/domain/ev/charging_station.dart';
 import '../../providers/ev_favorites_provider.dart';
 import 'ev_favorite_card.dart';
 
-/// Wraps an [EvFavoriteCard] in the same swipe-to-act gesture the
-/// fuel-station favorites use (mirrors `FavoriteStationDismissible`,
-/// #1958): swipe right launches navigation, swipe left removes the
-/// favorite — from `evFavoritesProvider` — with an undo snackbar.
+/// Wraps an [EvFavoriteCard] in the shared [FavoriteDismissible] swipe
+/// gesture (mirrors `FavoriteStationDismissible`, #1958): swipe right
+/// launches navigation, swipe left removes the favorite — from
+/// `evFavoritesProvider` — with an undo snackbar. The swipe chrome +
+/// #3159 capture-before-await handling live in core.
 ///
 /// Before this, EV-charger favorites were rendered as a bare card and
 /// could not be swiped at all, unlike fuel-station favorites.
@@ -28,84 +25,20 @@ class EvFavoriteDismissible extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final label = station.name;
 
-    return Dismissible(
-      key: ValueKey('ev-fav-${station.id}'),
-      confirmDismiss: (direction) async {
-        // #3159 — capture before any await: the dismissed row's element
-        // unmounts once the swipe completes, so the snackbar's onUndo (and
-        // any post-await ref use) would throw a StateError on the dead
-        // WidgetRef. evFavoritesProvider is keepAlive, so the captured
-        // notifier stays valid for the undo.
-        final favorites = ref.read(evFavoritesProvider.notifier);
-        if (direction == DismissDirection.startToEnd) {
-          await NavigationUtils.openInMaps(
-            station.latitude,
-            station.longitude,
-            label: label,
-          );
-          return false;
-        }
-        // #3682 — the app-wide delete confirmation before the removal.
-        if (!await confirmDestructiveAction(context)) return false;
-        if (!context.mounted) return false;
-        await favorites.remove(station.id);
-        if (!context.mounted) return true;
-        final l10nSnack = AppLocalizations.of(context);
-        SnackBarHelper.showWithUndo(
-          context,
-          l10nSnack.removedFromFavoritesName(label),
-          undoLabel: l10nSnack.undo,
-          onUndo: () => favorites.add(station.id, stationData: station),
-        );
-        return true;
-      },
-      background: Semantics(
-        label: l10n.semanticsNavigateTo(label),
-        child: Container(
-          alignment: Alignment.centerLeft,
-          padding: const EdgeInsets.only(left: 24),
-          color: Theme.of(context).colorScheme.primary,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.navigation, color: Colors.white, size: 20),
-              const SizedBox(width: 8),
-              Text(
-                l10n.navigate,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      secondaryBackground: Semantics(
-        label: l10n.semanticsRemoveFromFavorites(label),
-        child: Container(
-          alignment: Alignment.centerRight,
-          padding: const EdgeInsets.only(right: 24),
-          color: DarkModeColors.error(context),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                l10n.remove,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(width: 8),
-              const Icon(Icons.delete, color: Colors.white, size: 20),
-            ],
-          ),
-        ),
-      ),
+    return FavoriteDismissible<EvFavorites>(
+      dismissKey: 'ev-fav-${station.id}',
+      label: label,
+      latitude: station.latitude,
+      longitude: station.longitude,
+      // #3159 — captured synchronously before any await in the swipe
+      // callback; evFavoritesProvider is keepAlive, so the captured
+      // notifier stays valid for the undo.
+      captureHandle: () => ref.read(evFavoritesProvider.notifier),
+      removeFavorite: (favorites) => favorites.remove(station.id),
+      undoRemove: (favorites) =>
+          favorites.add(station.id, stationData: station),
       child: EvFavoriteCard(
         key: ValueKey(station.id),
         station: station,

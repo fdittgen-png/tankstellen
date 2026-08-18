@@ -20,24 +20,17 @@ import '../../trip_history_repository.dart';
 import 'backup_xml_writer.dart';
 import 'backup_zipper.dart';
 import '../../../../../core/logging/error_logger.dart';
+import '../../../../../core/sharing/share_seam.dart';
 
-/// Hook for the share-sheet handoff (#1317). Production uses
-/// `SharePlus.instance.share`; tests substitute a fake via
-/// [debugBackupShareSinkOverride] to assert the outgoing [ShareParams]
-/// without launching the OS share sheet.
-typedef BackupShareSink = Future<void> Function(ShareParams params);
-
-/// Test-only override for the share sink used by [FullBackupExporter].
+/// Test-only override for the share-sheet handoff (#1317) — the shared
+/// [ShareSink] seam used by [FullBackupExporter].
 @visibleForTesting
-BackupShareSink? debugBackupShareSinkOverride;
+ShareSink? debugBackupShareSinkOverride;
 
-/// Hook for the temporary-directory lookup used by [FullBackupExporter].
-typedef BackupTempDirectoryProvider = Future<Directory> Function();
-
-/// Test-only override for the temp-directory lookup. Returns a
-/// [Directory] the exporter is allowed to write into.
+/// Test-only override for the temp-directory lookup used by
+/// [FullBackupExporter] — the shared [ShareTempDirectoryProvider] seam.
 @visibleForTesting
-BackupTempDirectoryProvider? debugBackupTempDirectoryOverride;
+ShareTempDirectoryProvider? debugBackupTempDirectoryOverride;
 
 /// Test-only override for the wall-clock used to stamp the backup
 /// filename and the `<ExportedAt>` element.

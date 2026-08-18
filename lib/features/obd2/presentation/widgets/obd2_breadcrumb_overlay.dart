@@ -21,19 +21,14 @@ import '../../providers/obd2_breadcrumb_provider.dart';
 import '../../../consumption/presentation/widgets/broken_map_widgets.dart';
 import 'obd2_breadcrumb_row.dart';
 import '../../../../core/error/guarded.dart';
+import '../../../../core/sharing/share_seam.dart';
 
-/// Hook for the share-sheet handoff of the OBD2 diagnostic log
-/// (#1920). Production uses `SharePlus.instance.share`; tests
-/// substitute a fake via [debugObd2DiagnosticShareSinkOverride] to
-/// assert the outgoing report text without launching the OS share
-/// sheet. Mirrors the seam pattern in `full_backup_exporter.dart`.
-typedef Obd2DiagnosticShareSink = Future<void> Function(ShareParams params);
-
-/// Test-only override for the share sink used by the OBD2 diagnostic
-/// share button. When set, the button hands the formatted report to
-/// this sink instead of the real `share_plus` plugin.
+/// Test-only override for the share-sheet handoff of the OBD2
+/// diagnostic log (#1920) — the shared [ShareSink] seam. When set, the
+/// share button hands the formatted report to this sink instead of the
+/// real `share_plus` plugin.
 @visibleForTesting
-Obd2DiagnosticShareSink? debugObd2DiagnosticShareSinkOverride;
+ShareSink? debugObd2DiagnosticShareSinkOverride;
 
 /// In-app overlay that renders the most recent fuel-rate breadcrumbs
 /// captured by [Obd2BreadcrumbsNotifier] (#1395). Sibling to the map

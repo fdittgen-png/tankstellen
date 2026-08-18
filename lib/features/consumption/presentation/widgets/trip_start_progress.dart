@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/widgets/staged_progress_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/trip_start_stage.dart';
 
@@ -13,11 +14,11 @@ import '../../domain/entities/trip_start_stage.dart';
 export '../../domain/entities/trip_start_stage.dart' show TripStartStage;
 
 /// Inline progress card shown on the Trips tab in place of the
-/// "Start recording" button while the trip-start flow runs. Combines
-/// a slowly-rotating Bluetooth/route icon (the "entertainment"
-/// affordance) with a [LinearProgressIndicator] and a stage-driven
-/// status label so the user can see the app is doing something.
-class TripStartProgress extends StatefulWidget {
+/// "Start recording" button while the trip-start flow runs. The
+/// animated chrome (rotating/pulsing icon + indeterminate bar) lives
+/// in the shared [StagedProgressCard]; this file only maps
+/// [TripStartStage] onto its icon + label.
+class TripStartProgress extends StatelessWidget {
   final TripStartStage stage;
 
   /// #3335 — when non-null, a "Cancel" affordance is shown so the user can
@@ -26,28 +27,6 @@ class TripStartProgress extends StatefulWidget {
   final VoidCallback? onCancel;
 
   const TripStartProgress({super.key, required this.stage, this.onCancel});
-
-  @override
-  State<TripStartProgress> createState() => _TripStartProgressState();
-}
-
-class _TripStartProgressState extends State<TripStartProgress>
-    with TickerProviderStateMixin {
-  late final AnimationController _spin = AnimationController(
-    vsync: this,
-    duration: const Duration(seconds: 2),
-  )..repeat();
-  late final AnimationController _pulse = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 900),
-  )..repeat(reverse: true);
-
-  @override
-  void dispose() {
-    _spin.dispose();
-    _pulse.dispose();
-    super.dispose();
-  }
 
   IconData _iconFor(TripStartStage stage) {
     switch (stage) {
@@ -74,76 +53,13 @@ class _TripStartProgressState extends State<TripStartProgress>
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    return Card(
-      key: const Key('trip_start_progress_card'),
-      margin: EdgeInsets.zero,
-      color: theme.colorScheme.primaryContainer,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                ScaleTransition(
-                  scale: Tween<double>(begin: 0.85, end: 1.1).animate(
-                    CurvedAnimation(parent: _pulse, curve: Curves.easeInOut),
-                  ),
-                  child: RotationTransition(
-                    turns: _spin,
-                    child: Icon(
-                      _iconFor(widget.stage),
-                      size: 28,
-                      color: theme.colorScheme.onPrimaryContainer,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 220),
-                    child: Text(
-                      _labelFor(l, widget.stage),
-                      key: ValueKey(widget.stage),
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: theme.colorScheme.onPrimaryContainer,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                minHeight: 6,
-                backgroundColor: theme.colorScheme.onPrimaryContainer
-                    .withValues(alpha: 0.15),
-                color: theme.colorScheme.onPrimaryContainer,
-              ),
-            ),
-            // #3335 — escape hatch for a stuck / slow init. Interrupts the
-            // connect and returns to idle so the user can retry.
-            if (widget.onCancel != null) ...[
-              const SizedBox(height: 4),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  key: const Key('trip_start_progress_cancel'),
-                  onPressed: widget.onCancel,
-                  style: TextButton.styleFrom(
-                    foregroundColor: theme.colorScheme.onPrimaryContainer,
-                  ),
-                  child: Text(l.cancel),
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
+    return StagedProgressCard(
+      cardKey: const Key('trip_start_progress_card'),
+      icon: _iconFor(stage),
+      label: _labelFor(l, stage),
+      stageKey: stage,
+      onCancel: onCancel,
+      cancelKey: const Key('trip_start_progress_cancel'),
     );
   }
 }
