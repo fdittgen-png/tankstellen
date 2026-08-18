@@ -3,7 +3,7 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../ev/domain/entities/charging_log.dart';
+import '../../ev/api.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import 'charging_logs_provider.dart';
 

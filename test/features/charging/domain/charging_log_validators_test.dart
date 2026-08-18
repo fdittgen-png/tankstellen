@@ -4,7 +4,7 @@
 import 'dart:ui' show Locale;
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/domain/charging_log_validators.dart';
+import 'package:tankstellen/features/charging/domain/charging_log_validators.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Unit tests for the pure validators / parsers extracted from

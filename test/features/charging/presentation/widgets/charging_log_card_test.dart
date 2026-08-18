@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/utils/price_formatter.dart';
-import 'package:tankstellen/features/consumption/presentation/widgets/charging_log_card.dart';
+import 'package:tankstellen/features/charging/presentation/widgets/charging_log_card.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_log.dart';
 
 import '../../../../helpers/pump_app.dart';

@@ -35,7 +35,6 @@ export 'domain/harsh_event.dart';
 export 'domain/services/speed_consumption_histogram.dart';
 export 'domain/services/trip_length_aggregator.dart';
 export 'domain/trip_recorder.dart';
-export 'presentation/screens/add_charging_log_screen.dart';
 export 'presentation/screens/consumption_screen.dart';
 export 'presentation/screens/trip_detail_screen.dart';
 export 'presentation/screens/trip_recording_screen.dart';

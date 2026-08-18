@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
-import 'package:tankstellen/features/consumption/presentation/widgets/charging_efficiency_chart.dart';
+import 'package:tankstellen/features/charging/presentation/widgets/charging_efficiency_chart.dart';
 
 import '../../../../helpers/pump_app.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';

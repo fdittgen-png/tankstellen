@@ -4,8 +4,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/widgets/page_scaffold.dart';
-import 'package:tankstellen/features/consumption/presentation/screens/add_charging_log_screen.dart';
-import 'package:tankstellen/features/consumption/providers/charging_logs_provider.dart';
+import 'package:tankstellen/features/charging/presentation/screens/add_charging_log_screen.dart';
+import 'package:tankstellen/features/charging/providers/charging_logs_provider.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_log.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';

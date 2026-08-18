@@ -3,8 +3,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/presentation/widgets/charging_cost_trend_chart.dart';
-import 'package:tankstellen/features/consumption/presentation/widgets/charging_efficiency_chart.dart';
+import 'package:tankstellen/features/charging/presentation/widgets/charging_cost_trend_chart.dart';
+import 'package:tankstellen/features/charging/presentation/widgets/charging_efficiency_chart.dart';
 
 import '../../../../helpers/pump_app.dart';
 

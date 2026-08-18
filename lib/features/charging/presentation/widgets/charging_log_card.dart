@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../ev/domain/entities/charging_log.dart';
+import '../../../ev/api.dart';
 import '../../../../core/utils/unit_formatter.dart';
 
 /// Compact list-tile card for a single [ChargingLog] row on the

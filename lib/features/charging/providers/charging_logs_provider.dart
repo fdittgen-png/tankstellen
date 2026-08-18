@@ -5,7 +5,7 @@ import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../ev/domain/entities/charging_log.dart';
+import '../../ev/api.dart';
 import '../data/charging_log_store.dart';
 import '../../../core/logging/error_logger.dart';
 

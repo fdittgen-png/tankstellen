@@ -294,11 +294,15 @@ const _featurePairBaseline = <String, int>{
   'calculator -> search': 3,
   'calculator -> vehicle': 1,
   'car -> widget': 1,
+  // #3743 (epic item 1, charging extraction, step 4/5) — re-attributed
+  // from 'consumption -> vehicle' (23 -> 21). The 8 'consumption -> ev'
+  // edges hit ZERO: the moved charging surfaces now import the ev
+  // barrel for ChargingLog + the cost calculator.
+  'charging -> vehicle': 2,
   'carbon -> consumption': 6,
   'carbon -> vehicle': 1,
   'consumption -> approach': 8,
   'consumption -> driving': 5,
-  'consumption -> ev': 8,
   // #3743 (epic item 1, receipts_ocr extraction) — the share-receipt
   // handler moved out and now imports the feature_management barrel: 21→19.
   'consumption -> feature_management': 13,
@@ -307,7 +311,7 @@ const _featurePairBaseline = <String, int>{
   'consumption -> profile': 7,
   'consumption -> search': 2,
   'consumption -> sync': 1,
-  'consumption -> vehicle': 23,
+  'consumption -> vehicle': 21,
   'driving -> approach': 1,
   'driving -> consumption': 4,
   'driving -> feature_management': 6,
@@ -339,7 +343,7 @@ const _featurePairBaseline = <String, int>{
   // consumption<->carbon cycles broke (17 -> 15).
   'fill_ups -> achievements': 1,
   'fill_ups -> carbon': 2,
-  'fill_ups -> consumption': 35,
+  'fill_ups -> consumption': 34,
   'fill_ups -> ev': 4,
   'fill_ups -> profile': 3,
   'fill_ups -> vehicle': 13,
@@ -378,7 +382,7 @@ const _featurePairBaseline = <String, int>{
   'route_search -> profile': 11,
   'route_search -> search': 1,
   'search -> approach': 1,
-  'search -> consumption': 5,
+  'search -> consumption': 4,
   'search -> ev': 4,
   'search -> favorites': 4,
   'search -> feature_management': 8,

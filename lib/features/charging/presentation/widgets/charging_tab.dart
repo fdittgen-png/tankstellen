@@ -9,7 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/widgets/swipe_to_delete.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../ev/domain/entities/charging_log.dart';
+import '../../../ev/api.dart';
 import '../../providers/charging_charts_provider.dart';
 import '../../providers/charging_logs_provider.dart';
 import 'charging_cost_trend_chart.dart';

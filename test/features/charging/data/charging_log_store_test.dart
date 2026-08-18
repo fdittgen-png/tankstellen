@@ -6,7 +6,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
-import 'package:tankstellen/features/consumption/data/charging_log_store.dart';
+import 'package:tankstellen/features/charging/data/charging_log_store.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_log.dart';
 
 void main() {

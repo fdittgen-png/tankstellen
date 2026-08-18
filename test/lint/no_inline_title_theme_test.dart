@@ -69,7 +69,7 @@ void main() {
       const allowlist = <String>{
         'lib/features/alerts/presentation/screens/alerts_screen.dart',
         'lib/features/price_history/presentation/screens/price_history_screen.dart',
-        'lib/features/consumption/presentation/screens/add_charging_log_screen.dart',
+        'lib/features/charging/presentation/screens/add_charging_log_screen.dart',
         'lib/features/consumption/presentation/screens/trip_detail_screen.dart',
         'lib/features/consumption/presentation/screens/trip_recording_screen.dart',
         'lib/features/fill_ups/presentation/screens/add_fill_up_screen.dart',

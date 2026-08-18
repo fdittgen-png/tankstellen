@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/providers/charging_charts_provider.dart';
+import 'package:tankstellen/features/charging/providers/charging_charts_provider.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_log.dart';
 
 /// #582 phase 3 — unit tests for the derived monthly-cost and

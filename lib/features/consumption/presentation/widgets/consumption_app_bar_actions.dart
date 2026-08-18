@@ -15,7 +15,7 @@ import '../../../feature_management/application/feature_flags_provider.dart';
 import '../../../feature_management/domain/feature.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../../fill_ups/api.dart';
-import '../../providers/charging_logs_provider.dart';
+import '../../../charging/api.dart';
 import '../../providers/trip_history_provider.dart';
 import '../screens/consumption_screen.dart';
 import '../screens/trajets_map_screen.dart';

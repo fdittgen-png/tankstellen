@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/consumption_screen.dart';
-import 'package:tankstellen/features/consumption/providers/charging_logs_provider.dart';
+import 'package:tankstellen/features/charging/providers/charging_logs_provider.dart';
 import 'package:tankstellen/features/fill_ups/providers/consumption_providers.dart';
 import 'package:tankstellen/features/consumption/providers/trip_history_provider.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_log.dart';

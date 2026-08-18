@@ -17,7 +17,7 @@ import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/exporters/backup/backup_xml_reader.dart';
 import '../../data/exporters/backup/backup_zip_reader.dart';
 import '../../data/exporters/backup/full_backup_importer.dart';
-import '../../../consumption/providers/charging_logs_provider.dart';
+import '../../../charging/api.dart';
 import '../../providers/consumption_providers.dart';
 import '../../../consumption/providers/trip_history_provider.dart';
 

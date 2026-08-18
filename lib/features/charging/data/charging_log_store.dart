@@ -9,7 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../../core/storage/hive_boxes.dart';
-import '../../ev/domain/entities/charging_log.dart';
+import '../../ev/api.dart';
 import '../../../core/logging/error_logger.dart';
 
 /// Hive-backed CRUD store for [ChargingLog] records (#582 phase 1).

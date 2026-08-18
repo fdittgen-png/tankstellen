@@ -1,8 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../ev/domain/charging_cost_calculator.dart';
-import '../../ev/domain/entities/charging_log.dart';
+import '../../ev/api.dart';
 
 /// Shape of the EUR/100 km + kWh/100 km readout shown beneath the
 /// cost field on the Add-Charging-Log form. Pulled out of

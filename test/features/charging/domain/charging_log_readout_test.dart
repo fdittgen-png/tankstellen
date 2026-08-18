@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/domain/charging_log_readout.dart';
+import 'package:tankstellen/features/charging/domain/charging_log_readout.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_log.dart';
 
 /// Unit tests for [computeChargingLogReadout] — the pure derivation
