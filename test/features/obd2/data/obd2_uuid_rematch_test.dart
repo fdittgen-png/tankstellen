@@ -5,15 +5,15 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
-import 'package:tankstellen/features/obd2/data/adapter_registry.dart';
-import 'package:tankstellen/features/obd2/data/bluetooth_facade.dart';
-import 'package:tankstellen/features/obd2/data/elm_byte_channel.dart';
-import 'package:tankstellen/features/obd2/data/obd2_adapter_identity.dart';
+import 'package:tankstellen/features/obd2/data/protocol/adapter_registry.dart';
+import 'package:tankstellen/features/obd2/data/transport/bluetooth_facade.dart';
+import 'package:tankstellen/features/obd2/data/transport/elm_byte_channel.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_adapter_identity.dart';
 import 'package:tankstellen/features/obd2/data/obd2_known_adapters_store.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connect_trace.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connect_trace_log.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connection_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_permissions.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_connection_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_permissions.dart';
 
 import '../../../helpers/silence_error_logger.dart';
 

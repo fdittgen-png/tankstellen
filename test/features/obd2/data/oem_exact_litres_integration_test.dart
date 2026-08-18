@@ -3,10 +3,10 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/adapter_capability.dart';
-import 'package:tankstellen/features/obd2/data/oem_pid_registry.dart';
-import 'package:tankstellen/features/obd2/data/oem_pid_table.dart';
-import 'package:tankstellen/features/obd2/data/trip_recording_controller.dart';
+import 'package:tankstellen/features/obd2/data/protocol/adapter_capability.dart';
+import 'package:tankstellen/features/obd2/data/protocol/oem_pid_registry.dart';
+import 'package:tankstellen/features/obd2/data/protocol/oem_pid_table.dart';
+import 'package:tankstellen/features/obd2/data/session/trip_recording_controller.dart';
 import 'package:tankstellen/features/obd2/providers/current_obd2_fuel_level_provider.dart';
 import 'package:tankstellen/features/consumption/providers/trip_oem_fuel_level_controller.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';

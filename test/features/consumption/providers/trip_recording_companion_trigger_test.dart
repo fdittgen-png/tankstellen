@@ -7,10 +7,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
-import 'package:tankstellen/features/obd2/data/companion_auto_record_coordinator.dart';
-import 'package:tankstellen/features/obd2/data/companion_device_association.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/session/companion_auto_record_coordinator.dart';
+import 'package:tankstellen/features/obd2/data/transport/companion_device_association.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../helpers/silence_error_logger.dart';

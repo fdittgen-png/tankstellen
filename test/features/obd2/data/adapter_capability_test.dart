@@ -4,7 +4,7 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/adapter_capability.dart';
+import 'package:tankstellen/features/obd2/data/protocol/adapter_capability.dart';
 
 void main() {
   group('detectCapabilityFromFirmwareString (#1401 phase 1)', () {

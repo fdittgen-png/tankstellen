@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'obd2_connect_trace_log.dart';
-import 'obd2_response_class.dart';
+import 'protocol/obd2_response_class.dart';
 import 'obd2_session_completeness.dart';
 import 'obd2_session_diagnostic.dart';
 

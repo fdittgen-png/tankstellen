@@ -6,8 +6,8 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/logging/error_logger.dart';
-import '../../data/obd2_link_supervisor.dart';
-import '../../data/obd2_service.dart';
+import '../../data/session/obd2_link_supervisor.dart';
+import '../../data/session/obd2_service.dart';
 import '../../providers/obd2_reconnect_provider.dart';
 
 /// #3527 — the adapter picker's supervised one-shot dial.

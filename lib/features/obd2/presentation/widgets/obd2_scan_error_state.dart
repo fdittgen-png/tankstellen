@@ -9,7 +9,7 @@ import 'package:permission_handler/permission_handler.dart';
 import '../../../../core/error/guarded.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../data/obd2_connection_errors.dart';
+import '../../domain/obd2_connection_errors.dart';
 import '../obd2_connection_error_l10n.dart';
 
 /// Error state for the OBD2 adapter picker: a scan or connect attempt

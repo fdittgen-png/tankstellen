@@ -5,9 +5,9 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:tankstellen/features/obd2/data/elm327_protocol.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/protocol/elm327_protocol.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 import 'package:tankstellen/features/obd2/data/supported_pids_cache.dart';
 
 // Shared AT-init boilerplate for the FakeObd2Transport — mirrors

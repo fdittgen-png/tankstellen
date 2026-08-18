@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/fuel_rate_estimator.dart';
+import 'package:tankstellen/features/obd2/domain/fuel_rate_estimator.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 
 /// Guardrails for the pure-math fuel-rate estimator extracted out of

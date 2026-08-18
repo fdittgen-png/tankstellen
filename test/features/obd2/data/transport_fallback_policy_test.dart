@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/adapter_registry.dart';
-import 'package:tankstellen/features/obd2/data/transport_fallback_policy.dart';
+import 'package:tankstellen/features/obd2/data/protocol/adapter_registry.dart';
+import 'package:tankstellen/features/obd2/data/transport/transport_fallback_policy.dart';
 
 /// Pure decision for the Classic↔BLE transport fallback (#2908).
 void main() {

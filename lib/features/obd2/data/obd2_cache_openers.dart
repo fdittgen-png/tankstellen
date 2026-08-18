@@ -3,11 +3,11 @@
 
 import 'package:hive/hive.dart';
 
-import 'adapter_registry.dart';
-import 'bluetooth_obd2_transport.dart';
-import 'elm_byte_channel.dart';
+import 'protocol/adapter_registry.dart';
+import 'transport/bluetooth_obd2_transport.dart';
+import 'transport/elm_byte_channel.dart';
 import 'negotiated_protocol_cache.dart';
-import 'obd2_service.dart';
+import 'session/obd2_service.dart';
 import 'supported_pids_cache.dart';
 import '../../../core/storage/hive_boxes.dart';
 

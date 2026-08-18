@@ -9,7 +9,7 @@ import '../../core/logging/app_log.dart';
 import '../../core/logging/error_logger.dart';
 import '../../core/storage/hive_boxes.dart';
 import '../../core/storage/hive_storage.dart';
-import '../../features/obd2/data/ios_state_restoration_provider.dart';
+import '../../features/obd2/data/transport/ios_state_restoration_provider.dart';
 import '../../features/consumption/providers/auto_record_orchestrator.dart';
 import '../../features/obd2/providers/obd2_comm_diagnostics_gate_provider.dart';
 import '../../features/obd2/providers/obd2_debug_logging_provider.dart';

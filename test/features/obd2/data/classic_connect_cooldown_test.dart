@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/classic_connect_cooldown.dart';
+import 'package:tankstellen/features/obd2/data/transport/classic_connect_cooldown.dart';
 
 /// #3421 — post-close cooldown unit tests. The clock and the wait are
 /// injected (mirroring the Obd2ScanGovernor seams), so nothing here sleeps

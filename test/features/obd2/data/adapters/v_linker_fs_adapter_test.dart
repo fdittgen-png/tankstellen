@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/adapters/v_linker_fs_adapter.dart';
-import 'package:tankstellen/features/obd2/data/elm327_commands.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/protocol/adapters/v_linker_fs_adapter.dart';
+import 'package:tankstellen/features/obd2/data/protocol/elm327_commands.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 
 /// Same Stopwatch-based recording transport pattern Phase 1's
 /// regression test uses (`elm327_adapter_test.dart`). Records every

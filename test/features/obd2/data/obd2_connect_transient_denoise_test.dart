@@ -8,7 +8,7 @@ import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/telemetry/collectors/breadcrumb_collector.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connection_errors.dart';
+import 'package:tankstellen/features/obd2/domain/obd2_connection_errors.dart';
 import 'package:tankstellen/features/obd2/data/obd2_read_telemetry.dart';
 
 /// #2892 part C — the connect-log flood de-noiser. Error-log #22 spooled an

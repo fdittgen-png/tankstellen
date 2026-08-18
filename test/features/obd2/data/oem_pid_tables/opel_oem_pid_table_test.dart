@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/adapter_capability.dart';
-import 'package:tankstellen/features/obd2/data/oem_pid_registry.dart';
-import 'package:tankstellen/features/obd2/data/oem_pid_table.dart';
-import 'package:tankstellen/features/obd2/data/oem_pid_tables/opel_oem_pid_table.dart';
+import 'package:tankstellen/features/obd2/data/protocol/adapter_capability.dart';
+import 'package:tankstellen/features/obd2/data/protocol/oem_pid_registry.dart';
+import 'package:tankstellen/features/obd2/data/protocol/oem_pid_table.dart';
+import 'package:tankstellen/features/obd2/data/protocol/oem_pid_tables/opel_oem_pid_table.dart';
 
 /// Tests for the Opel `W0L` OEM fuel-level table (#1617).
 

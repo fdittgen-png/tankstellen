@@ -10,7 +10,7 @@ import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/features/obd2/data/supported_pids_cache.dart';
-import 'package:tankstellen/features/obd2/data/supported_pids_resolver.dart';
+import 'package:tankstellen/features/obd2/data/session/supported_pids_resolver.dart';
 
 /// #2424 (follow-up to #2379) — [SupportedPidsResolver] is best-effort:
 /// every catch site (prime, VIN-for-cache-key read, supported-PID scan)

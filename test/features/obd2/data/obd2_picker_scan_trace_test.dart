@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/adapter_registry.dart';
-import 'package:tankstellen/features/obd2/data/bluetooth_facade.dart';
-import 'package:tankstellen/features/obd2/data/elm_byte_channel.dart';
+import 'package:tankstellen/features/obd2/data/protocol/adapter_registry.dart';
+import 'package:tankstellen/features/obd2/data/transport/bluetooth_facade.dart';
+import 'package:tankstellen/features/obd2/data/transport/elm_byte_channel.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connect_trace.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connect_trace_log.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connection_errors.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connection_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_permissions.dart';
+import 'package:tankstellen/features/obd2/domain/obd2_connection_errors.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_connection_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_permissions.dart';
 
 /// #3184(e)/(f) — the SCAN itself is now traced:
 ///

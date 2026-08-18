@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/elm_byte_channel.dart';
+import 'package:tankstellen/features/obd2/data/transport/elm_byte_channel.dart';
 import 'package:tankstellen/features/obd2/data/obd2_comm_diagnostics.dart';
 
 /// Encode an ASCII reply to the raw byte chunk an ELM327 channel would

@@ -229,7 +229,7 @@ void main() {
     // 5 bumps — decomposition forced (#3141), tracked by the OPEN #3140
     // (OBD2 god-class decomposition, successor to the closed #2190 the
     // comments above reference).
-    'lib/features/obd2/data/adapter_registry.dart': (
+    'lib/features/obd2/data/protocol/adapter_registry.dart': (
       lines: 697,
       bumps: 5,
       decompositionIssue: 3140,
@@ -314,7 +314,7 @@ void main() {
     // consolidation removed two inline forks from this library's part file).
     // 12 bumps — decomposition forced (#3141), tracked by the OPEN #3140
     // (successor to the closed #2187/#2188 the comments above reference).
-    'lib/features/obd2/data/obd2_connection_service.dart': (
+    'lib/features/obd2/data/session/obd2_connection_service.dart': (
       lines: 939,
       bumps: 12,
       decompositionIssue: 3140,
@@ -372,7 +372,7 @@ void main() {
     // that never got a GATT link — from ONE field export.
     // 6 bumps — decomposition forced (#3141), tracked by the OPEN #3140
     // (successor to the closed #2190 the comments above reference).
-    'lib/features/obd2/data/flutter_blue_plus_elm_channel.dart': (
+    'lib/features/obd2/data/transport/flutter_blue_plus_elm_channel.dart': (
       lines: 866,
       bumps: 6,
       decompositionIssue: 3140,
@@ -407,7 +407,7 @@ void main() {
     // the adapter-event plumbing, and the public constructor seam with its
     // API doc comments — no further honest seam without mangling state
     // ownership, so the file stays grandfathered at the shrunken count.
-    'lib/features/obd2/data/auto_trip_coordinator.dart': (
+    'lib/features/obd2/data/session/auto_trip_coordinator.dart': (
       lines: 470,
       bumps: 3,
       decompositionIssue: 3727,
@@ -463,7 +463,7 @@ void main() {
     // subscribes through isPidKnownSupported — comment + call reshape.)
     // (+15, #3692: timing-advance PID subscription + the two persisted-
     // signal getters — the turbo record.)
-    'lib/features/obd2/data/live_sample_snapshot.dart': (
+    'lib/features/obd2/data/session/live_sample_snapshot.dart': (
       lines: 846,
       bumps: 7,
       decompositionIssue: 3140,
@@ -554,7 +554,7 @@ void main() {
     // #3575 — re-grandfathered 1317 → 1357: recoverVehicleProtocol(),
     // the in-session ATSP0 + 0100 + ATDPN recovery for the
     // UNABLE-TO-CONNECT livelock (2026-07-13 field trip).
-    'lib/features/obd2/data/obd2_service.dart': (
+    'lib/features/obd2/data/session/obd2_service.dart': (
       lines: 1357,
       bumps: 14,
       decompositionIssue: 3540,
@@ -692,7 +692,7 @@ void main() {
     // #3575/#3576 — re-grandfathered 1728 → 1780: the no-protocol
     // episode handler (pause → recoverVehicleProtocol → resume, throttled)
     // + stop-time stamping of the live GPS-physics estimate figures.
-    'lib/features/obd2/data/bluetooth_obd2_transport.dart': (
+    'lib/features/obd2/data/transport/bluetooth_obd2_transport.dart': (
       // #3610 — the two best-effort teardown catches now count a
       // bt.teardown_fail health counter + breadcrumb (+8 over the cap).
       // Decomposition candidate: the #3014 GATT-133 recovery block.
@@ -707,7 +707,7 @@ void main() {
     ),
     // route_search_provider.dart graduated in #3742 (the deprecated
     // countryCode plumbing was removed, dropping it below the 400 cap).
-    'lib/features/obd2/data/trip_recording_controller.dart': (
+    'lib/features/obd2/data/session/trip_recording_controller.dart': (
       // #3625 — post-reconnect grace: replaceService opens an 8 s window
       // during which transport errors / null parses feed the #3575
       // protocol recovery instead of the drop verdict (+27).

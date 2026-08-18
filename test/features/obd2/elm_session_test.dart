@@ -10,9 +10,9 @@ import 'dart:async';
 
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/elm327_commands.dart';
-import 'package:tankstellen/features/obd2/data/elm_session.dart';
-import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/protocol/elm327_commands.dart';
+import 'package:tankstellen/features/obd2/data/protocol/elm_session.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 
 /// Scripted transport: maps command → reply like [FakeObd2Transport] but
 /// can also throw [TimeoutException] on selected commands and records

@@ -3,7 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/obd2_link_supervisor.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_link_supervisor.dart';
 import 'package:tankstellen/features/obd2/presentation/widgets/obd2_status_dot.dart';
 import 'package:tankstellen/features/obd2/providers/obd2_connection_state_provider.dart';
 import 'package:tankstellen/features/obd2/providers/obd2_reconnect_provider.dart';

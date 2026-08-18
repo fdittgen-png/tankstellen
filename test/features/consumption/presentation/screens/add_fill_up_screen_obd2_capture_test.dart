@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:tankstellen/features/obd2/data/trip_recording_controller.dart';
+import 'package:tankstellen/features/obd2/data/session/trip_recording_controller.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/add_fill_up_screen.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/fill_up_numeric_field.dart';

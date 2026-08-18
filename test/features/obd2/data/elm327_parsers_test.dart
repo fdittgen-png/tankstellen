@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/elm327_mode22_parsers.dart';
-import 'package:tankstellen/features/obd2/data/elm327_parsers.dart';
+import 'package:tankstellen/features/obd2/data/protocol/elm327_mode22_parsers.dart';
+import 'package:tankstellen/features/obd2/data/protocol/elm327_parsers.dart';
 
 /// Pure-logic coverage for [Elm327Parsers] — every public static parser
 /// for Mode 01, Mode 09 (VIN) and Mode 22 manufacturer odometers. Refs

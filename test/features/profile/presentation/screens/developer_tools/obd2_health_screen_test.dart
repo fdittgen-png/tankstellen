@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/sharing/public_file_exporter.dart';
 import 'package:tankstellen/features/obd2/data/obd2_comm_diagnostics.dart';
-import 'package:tankstellen/features/obd2/data/obd2_response_class.dart';
+import 'package:tankstellen/features/obd2/data/protocol/obd2_response_class.dart';
 import 'package:tankstellen/features/obd2/presentation/widgets/obd2_diagnostics_card.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';

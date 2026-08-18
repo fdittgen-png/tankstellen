@@ -10,12 +10,12 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tankstellen/features/obd2/data/obd2_link_drop_signal.dart';
-import 'package:tankstellen/features/obd2/data/obd2_link_supervisor.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_link_drop_signal.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_link_supervisor.dart';
 import 'package:tankstellen/features/obd2/providers/obd2_reconnect_provider.dart';
 import 'package:tankstellen/features/obd2/data/last_good_adapter_store.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connection_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_connection_service.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import '../../../helpers/silence_error_logger.dart';

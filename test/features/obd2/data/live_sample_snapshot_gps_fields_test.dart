@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/live_sample_snapshot.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/session/live_sample_snapshot.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 
 /// #2648 — `LiveSampleSnapshot.updateGpsFix` now latches GPS horizontal
 /// accuracy + bearing alongside lat/lon/altitude, so the OBD2 emit path

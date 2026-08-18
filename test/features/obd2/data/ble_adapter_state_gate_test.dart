@@ -5,7 +5,7 @@ import 'dart:async';
 
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/ble_adapter_state_gate.dart';
+import 'package:tankstellen/features/obd2/data/transport/ble_adapter_state_gate.dart';
 
 /// #3182 — the bounded poweredOn gate run before every BLE scan / connect
 /// dispatch. FBP's darwin side creates the CBCentralManager lazily and

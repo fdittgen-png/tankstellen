@@ -4,7 +4,7 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/can_frame_decoders/psa_fuel_level_can_decoder.dart';
+import 'package:tankstellen/features/obd2/data/protocol/can_frame_decoders/psa_fuel_level_can_decoder.dart';
 
 void main() {
   group('decodeFuelLevelLitres — pure parser (#1401 phase 5)', () {

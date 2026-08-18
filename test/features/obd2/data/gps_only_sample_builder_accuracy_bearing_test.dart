@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/degraded_gps_emitter.dart';
-import 'package:tankstellen/features/obd2/data/gps_only_sample_builder.dart';
-import 'package:tankstellen/features/obd2/data/trip_sample_buffer.dart';
+import 'package:tankstellen/features/obd2/domain/degraded_gps_emitter.dart';
+import 'package:tankstellen/features/obd2/domain/gps_only_sample_builder.dart';
+import 'package:tankstellen/features/obd2/domain/trip_sample_buffer.dart';
 import 'package:tankstellen/features/consumption/data/trip_sample_codec.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 

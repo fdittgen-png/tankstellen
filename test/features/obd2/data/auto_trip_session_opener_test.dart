@@ -7,10 +7,10 @@ import 'package:tankstellen/core/telemetry/collectors/breadcrumb_collector.dart'
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/features/obd2/data/auto_record_trace_log.dart';
-import 'package:tankstellen/features/obd2/data/auto_trip_session_opener.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_speed_stream.dart';
-import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/session/auto_trip_session_opener.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_speed_stream.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 
 /// Seam-level fault-injection tests for [AutoTripSessionOpener] (#3727 —
 /// extracted from `AutoTripCoordinator`). The coordinator's own

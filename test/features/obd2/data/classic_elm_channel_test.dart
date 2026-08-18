@@ -6,11 +6,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/classic_connect_cooldown.dart';
-import 'package:tankstellen/features/obd2/data/classic_elm_channel.dart';
-import 'package:tankstellen/features/obd2/data/classic_method_channel.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connection_errors.dart';
-import 'package:tankstellen/features/obd2/data/obd2_link_drop_signal.dart';
+import 'package:tankstellen/features/obd2/data/transport/classic_connect_cooldown.dart';
+import 'package:tankstellen/features/obd2/data/transport/classic_elm_channel.dart';
+import 'package:tankstellen/features/obd2/data/transport/classic_method_channel.dart';
+import 'package:tankstellen/features/obd2/domain/obd2_connection_errors.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_link_drop_signal.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// Captured call to [_FakeObd2ClassicMethodChannel.connect].

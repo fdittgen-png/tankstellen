@@ -5,7 +5,7 @@ import 'dart:async';
 
 import '../../../core/logging/error_logger.dart';
 import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
-import '../data/obd2_connection_errors.dart';
+import '../domain/obd2_connection_errors.dart';
 
 // #2763 — `recordObd2ReadFailure` / `isExpectedObd2ReadTransient` live in the
 // data layer (so `obd2_service` can use them without a presentation→data

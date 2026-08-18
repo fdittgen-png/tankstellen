@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/virtual_odometer.dart';
+import 'package:tankstellen/features/obd2/domain/virtual_odometer.dart';
 
 // Shared epoch for the virtual-odometer tests. Top-level so the
 // linter doesn't flag it as a const-declarable local.

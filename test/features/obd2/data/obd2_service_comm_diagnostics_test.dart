@@ -3,8 +3,8 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/data/obd2_comm_diagnostics.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 
 // Mirrors the shared AT-init boilerplate the other Obd2Service tests use.
 const _initResponses = {

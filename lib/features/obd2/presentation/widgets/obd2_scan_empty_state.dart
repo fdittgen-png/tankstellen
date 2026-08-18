@@ -11,7 +11,7 @@ import 'package:permission_handler/permission_handler.dart';
 import '../../../../core/error/guarded.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../data/obd2_scan_readiness.dart';
+import '../../data/transport/obd2_scan_readiness.dart';
 
 /// Diagnostic empty state for the OBD2 adapter picker: a scan finished
 /// and found nothing, so tell the user *why* and what to do next.

@@ -8,7 +8,7 @@ import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/telemetry/collectors/breadcrumb_collector.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connection_errors.dart';
+import 'package:tankstellen/features/obd2/domain/obd2_connection_errors.dart';
 import 'package:tankstellen/features/obd2/presentation/obd2_connect_telemetry.dart';
 
 /// #2745 — error-log #14 trace #5: `recordObd2ConnectFailure` is the shared

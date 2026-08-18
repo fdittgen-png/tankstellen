@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/background_adapter_listener.dart';
-import 'package:tankstellen/features/obd2/data/fake_background_adapter_listener.dart';
+import 'package:tankstellen/features/obd2/data/transport/background_adapter_listener.dart';
+import 'package:tankstellen/features/obd2/data/transport/fake_background_adapter_listener.dart';
 
 void main() {
   group('UnimplementedBackgroundAdapterListener (#1004 phase 2a)', () {

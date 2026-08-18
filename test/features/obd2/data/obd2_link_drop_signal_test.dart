@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/obd2_link_drop_signal.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_link_drop_signal.dart';
 
 void main() {
   group('Obd2LinkDropSignal (#3019 / Epic #3013 phase 3)', () {

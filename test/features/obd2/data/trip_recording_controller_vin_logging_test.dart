@@ -7,10 +7,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
-import 'package:tankstellen/features/obd2/data/elm327_protocol.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
-import 'package:tankstellen/features/obd2/data/trip_recording_controller.dart';
+import 'package:tankstellen/features/obd2/data/protocol/elm327_protocol.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/session/trip_recording_controller.dart';
 
 /// #2428 (follow-up to #2379/#2424) — [TripRecordingController]'s one-shot
 /// VIN (0902) read at [TripRecordingController.start] is a best-effort

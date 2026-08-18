@@ -9,13 +9,13 @@ import 'package:tankstellen/core/telemetry/collectors/breadcrumb_collector.dart'
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/features/obd2/data/auto_record_trace_log.dart';
-import 'package:tankstellen/features/obd2/data/auto_trip_coordinator.dart';
-import 'package:tankstellen/features/obd2/data/elm327_protocol.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connection_errors.dart';
-import 'package:tankstellen/features/obd2/data/fake_background_adapter_listener.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_speed_stream.dart';
-import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/session/auto_trip_coordinator.dart';
+import 'package:tankstellen/features/obd2/data/protocol/elm327_protocol.dart';
+import 'package:tankstellen/features/obd2/domain/obd2_connection_errors.dart';
+import 'package:tankstellen/features/obd2/data/transport/fake_background_adapter_listener.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_speed_stream.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 
 /// Coordinator state-machine tests for #1004 phase 2b-3. Drives the
 /// coordinator with synthetic adapter events, an injected fake OBD2

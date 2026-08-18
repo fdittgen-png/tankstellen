@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/elm327_precision_pids.dart';
+import 'package:tankstellen/features/obd2/data/protocol/elm327_precision_pids.dart';
 
 /// Epic #3416 — parsers for the consumption-precision PID families, driven
 /// with real ELM327 frame bytes (same `41 <pid> …>` wire format the

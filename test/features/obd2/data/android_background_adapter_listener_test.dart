@@ -3,8 +3,8 @@
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/android_background_adapter_listener.dart';
-import 'package:tankstellen/features/obd2/data/background_adapter_listener.dart';
+import 'package:tankstellen/features/obd2/data/transport/android_background_adapter_listener.dart';
+import 'package:tankstellen/features/obd2/data/transport/background_adapter_listener.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

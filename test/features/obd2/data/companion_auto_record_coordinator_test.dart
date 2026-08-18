@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/companion_auto_record_coordinator.dart';
-import 'package:tankstellen/features/obd2/data/companion_device_association.dart';
+import 'package:tankstellen/features/obd2/data/session/companion_auto_record_coordinator.dart';
+import 'package:tankstellen/features/obd2/data/transport/companion_device_association.dart';
 
 /// #3320 — the FGS-gated, one-time Companion-Device-Manager association
 /// decision for hands-free auto-record.

@@ -17,8 +17,8 @@ import 'package:tankstellen/features/consumption/data/trip_history_repository.da
 import 'package:tankstellen/features/consumption/domain/entities/recording_lifecycle_mark.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../helpers/empty_imu_source.dart';

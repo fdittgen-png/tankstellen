@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/fuel_rate_estimator.dart' show kPetrolAfr, kPetrolDensityGPerL, kDieselAfr, kDieselDensityGPerL;
+import 'package:tankstellen/features/obd2/domain/fuel_rate_estimator.dart' show kPetrolAfr, kPetrolDensityGPerL, kDieselAfr, kDieselDensityGPerL;
 import 'package:tankstellen/features/obd2/domain/services/obd2_analytics_signals.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 

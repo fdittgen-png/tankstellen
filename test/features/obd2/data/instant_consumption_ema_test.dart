@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/instant_consumption_ema.dart';
+import 'package:tankstellen/features/obd2/domain/instant_consumption_ema.dart';
 
 /// #3431 (epic #3416) — EMA step response + idle guard for the true
 /// instantaneous consumption signal.

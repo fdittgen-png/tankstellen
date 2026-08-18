@@ -4,7 +4,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../data/adapter_capability.dart';
+import '../data/protocol/adapter_capability.dart';
 
 part 'obd2_connection_state_provider.g.dart';
 

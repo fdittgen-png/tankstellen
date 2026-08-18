@@ -6,8 +6,8 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/bluetooth_obd2_transport.dart';
-import 'package:tankstellen/features/obd2/data/elm_byte_channel.dart';
+import 'package:tankstellen/features/obd2/data/transport/bluetooth_obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/transport/elm_byte_channel.dart';
 
 /// #3014 (Epic #3013, Phase 2) — GATT-133 recovery in the channel-open retry.
 ///

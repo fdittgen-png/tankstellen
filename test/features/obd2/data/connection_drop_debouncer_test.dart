@@ -3,10 +3,10 @@
 
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/bluetooth_obd2_transport.dart';
-import 'package:tankstellen/features/obd2/data/connection_drop_debouncer.dart';
-import 'package:tankstellen/features/obd2/data/elm_byte_channel.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connection_errors.dart';
+import 'package:tankstellen/features/obd2/data/transport/bluetooth_obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/transport/connection_drop_debouncer.dart';
+import 'package:tankstellen/features/obd2/data/transport/elm_byte_channel.dart';
+import 'package:tankstellen/features/obd2/domain/obd2_connection_errors.dart';
 
 import 'dart:async';
 

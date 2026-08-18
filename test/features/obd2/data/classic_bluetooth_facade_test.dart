@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/classic_bluetooth_facade.dart';
-import 'package:tankstellen/features/obd2/data/classic_method_channel.dart';
+import 'package:tankstellen/features/obd2/data/transport/classic_bluetooth_facade.dart';
+import 'package:tankstellen/features/obd2/data/transport/classic_method_channel.dart';
 
 import '../../../helpers/silence_error_logger.dart';
 

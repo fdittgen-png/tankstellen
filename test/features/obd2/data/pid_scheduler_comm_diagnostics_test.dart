@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/data/obd2_comm_diagnostics.dart';
 import 'package:tankstellen/features/obd2/data/obd2_session_diagnostic.dart';
-import 'package:tankstellen/features/obd2/data/pid_scheduler.dart';
+import 'package:tankstellen/features/obd2/domain/pid_scheduler.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// A transport that returns a canned reply per command, or NO DATA /

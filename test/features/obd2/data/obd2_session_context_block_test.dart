@@ -5,7 +5,7 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/data/obd2_comm_diagnostics.dart' show Obd2CommDiagnostics, redactObd2Mac;
-import 'package:tankstellen/features/obd2/data/obd2_response_class.dart';
+import 'package:tankstellen/features/obd2/data/protocol/obd2_response_class.dart';
 import 'package:tankstellen/features/obd2/data/obd2_session_context_block.dart';
 
 /// Coverage for the #2472 error-log enrichment — the compact obd2Session

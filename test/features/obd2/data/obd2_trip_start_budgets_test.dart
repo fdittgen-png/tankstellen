@@ -4,7 +4,7 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/obd2_trip_start_budgets.dart';
+import 'package:tankstellen/features/obd2/domain/obd2_trip_start_budgets.dart';
 
 /// #3382 — [boundedStartRead] is the primitive that keeps a slow/silent
 /// adapter from hanging the trajet trip-start: the best-effort odometer / VIN

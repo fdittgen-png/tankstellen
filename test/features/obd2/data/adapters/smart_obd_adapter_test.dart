@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/adapter_capability.dart';
-import 'package:tankstellen/features/obd2/data/adapters/smart_obd_adapter.dart';
-import 'package:tankstellen/features/obd2/data/elm327_commands.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/protocol/adapter_capability.dart';
+import 'package:tankstellen/features/obd2/data/protocol/adapters/smart_obd_adapter.dart';
+import 'package:tankstellen/features/obd2/data/protocol/elm327_commands.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 
 class _RecordingObd2Transport implements Obd2Transport {
   final Map<String, String> _responses;

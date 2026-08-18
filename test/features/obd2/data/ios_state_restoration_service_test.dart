@@ -5,8 +5,8 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/ios_restoration_event.dart';
-import 'package:tankstellen/features/obd2/data/ios_state_restoration_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/ios_restoration_event.dart';
+import 'package:tankstellen/features/obd2/data/transport/ios_state_restoration_service.dart';
 
 import '../../../helpers/silence_error_logger.dart';
 

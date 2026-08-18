@@ -4,11 +4,11 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/classic_connect_cooldown.dart';
-import 'package:tankstellen/features/obd2/data/classic_elm_channel.dart';
-import 'package:tankstellen/features/obd2/data/classic_method_channel.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connection_errors.dart';
-import 'package:tankstellen/features/obd2/data/obd2_platform_budgets.dart';
+import 'package:tankstellen/features/obd2/data/transport/classic_connect_cooldown.dart';
+import 'package:tankstellen/features/obd2/data/transport/classic_elm_channel.dart';
+import 'package:tankstellen/features/obd2/data/transport/classic_method_channel.dart';
+import 'package:tankstellen/features/obd2/domain/obd2_connection_errors.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_platform_budgets.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// Fake [Obd2ClassicMethodChannel] that records the budgetMs the channel

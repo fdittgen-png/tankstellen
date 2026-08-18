@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../data/trip_recording_controller.dart';
+import '../data/session/trip_recording_controller.dart';
 import '../../consumption/providers/trip_recording_phase.dart';
 
 /// Maps the [TripRecordingController]'s lifecycle enum onto the

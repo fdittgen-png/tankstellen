@@ -6,8 +6,8 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connect_trace.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connect_trace_log.dart';
-import 'package:tankstellen/features/obd2/data/supported_pids_probe.dart';
-import 'package:tankstellen/features/obd2/data/supported_pids_resolver.dart';
+import 'package:tankstellen/features/obd2/data/protocol/supported_pids_probe.dart';
+import 'package:tankstellen/features/obd2/data/session/supported_pids_resolver.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// #3035/#3037 — the CORE OBD2 bug: the adapter connects (AT handshake OK) but

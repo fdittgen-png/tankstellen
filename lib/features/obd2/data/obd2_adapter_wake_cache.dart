@@ -5,8 +5,8 @@ import 'dart:async';
 
 import '../../../core/data/storage_repository.dart';
 import '../../../core/logging/error_logger.dart';
-import 'elm327_adapter.dart';
-import 'obd2_service.dart';
+import 'protocol/elm327_adapter.dart';
+import 'session/obd2_service.dart';
 
 /// Per-MAC observed-outcome wake cache (#2268 concern 3).
 ///

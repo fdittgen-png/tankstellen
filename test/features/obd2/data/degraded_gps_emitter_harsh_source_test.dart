@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/degraded_gps_emitter.dart';
-import 'package:tankstellen/features/obd2/data/trip_live_reading.dart';
-import 'package:tankstellen/features/obd2/data/trip_sample_buffer.dart';
+import 'package:tankstellen/features/obd2/domain/degraded_gps_emitter.dart';
+import 'package:tankstellen/features/obd2/domain/trip_live_reading.dart';
+import 'package:tankstellen/features/obd2/domain/trip_sample_buffer.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 
 /// #3029 — the `degradedGpsOnly` emit tick (OBD2 dropped mid-trip, GPS

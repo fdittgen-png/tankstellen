@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/supported_pids_resolver.dart';
+import 'package:tankstellen/features/obd2/data/session/supported_pids_resolver.dart';
 
 /// #2457 → #3532 — the live subscription set is the OPTIMISTIC UNION:
 /// the full target table is subscribed regardless of the discovered

@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/broken_map_belief.dart';
-import 'package:tankstellen/features/obd2/data/broken_map_detector.dart';
+import 'package:tankstellen/features/obd2/domain/broken_map_belief.dart';
+import 'package:tankstellen/features/obd2/domain/broken_map_detector.dart';
 
 /// Helper: pumped / consumed = ratio = reconciledLPer100km /
 /// estimatedLPer100km. Build a `(reconciled, estimated)` pair from a
