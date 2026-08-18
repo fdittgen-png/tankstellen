@@ -45,22 +45,7 @@ class AppLocalizationsEt extends AppLocalizations {
   String get searchNearby => 'Lähedalolevad tankla';
 
   @override
-  String get searchButton => 'Otsi';
-
-  @override
-  String get fabOpenCriteria => 'Ava otsing';
-
-  @override
-  String get fabOpenResults => 'Ava tulemused';
-
-  @override
   String get fabRunSearch => 'Käivita otsing';
-
-  @override
-  String get fabRefineCriteria => 'Täpsusta otsingut';
-
-  @override
-  String get routeSearchPartialBanner => 'Otsitakse rohkem jaamu…';
 
   @override
   String get routeSearchingChip => 'Marsruudi otsimine…';
@@ -74,15 +59,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get searchCriteriaTitle => 'Otsinguparameetrid';
 
   @override
-  String get searchCriteriaOpen => 'Otsi';
-
-  @override
   String searchCriteriaRadiusBadge(String km) {
     return '$km km raadiuses';
   }
-
-  @override
-  String get searchCriteriaTapToSearch => 'Puuduta otsimise alustamiseks';
 
   @override
   String get noResults => 'Tanklasid ei leitud.';
@@ -124,10 +103,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get apiKeySetup => 'API võti';
-
-  @override
-  String get apiKeyDescription =>
-      'Registreeruge üks kord tasuta API võtme saamiseks.';
 
   @override
   String get apiKeyLabel => 'API võti';
@@ -233,19 +208,10 @@ class AppLocalizationsEt extends AppLocalizations {
   String get country => 'Riik';
 
   @override
-  String get demoMode => 'Demorežiim — näidisandmed.';
-
-  @override
-  String get setupLiveData => 'Seadista reaalajas andmed';
-
-  @override
   String get freeNoKey => 'Tasuta — võtit pole vaja';
 
   @override
   String get apiKeyRequired => 'API võti nõutud';
-
-  @override
-  String get skipWithoutKey => 'Jätka ilma võtmeta';
 
   @override
   String get dataTransparency => 'Andmete läbipaistvus';
@@ -257,68 +223,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get clearCache => 'Tühjenda vahemälu';
 
   @override
-  String get clearAllData => 'Kustuta kõik andmed';
-
-  @override
-  String get errorLog => 'Vigade logi';
-
-  @override
   String stationsFound(int count) {
     return 'Leiti $count tanklat';
   }
-
-  @override
-  String get whatIsShared => 'Mida jagatakse — ja kellega?';
-
-  @override
-  String get gpsCoordinates => 'GPS koordinaadid';
-
-  @override
-  String get gpsReason =>
-      'Saadetakse iga otsinguga lähedalolevate jaamade leidmiseks.';
-
-  @override
-  String get postalCodeData => 'Postiindeks';
-
-  @override
-  String get postalReason =>
-      'Teisendatakse koordinaatideks geokodeerimise teenuse kaudu.';
-
-  @override
-  String get mapViewport => 'Kaardi vaade';
-
-  @override
-  String get mapReason =>
-      'Kaardi paanid laaditakse serverist. Isikuandmeid ei edastata.';
-
-  @override
-  String get apiKeyData => 'API võti';
-
-  @override
-  String get apiKeyReason =>
-      'Teie isiklik võti saadetakse iga API päringuga. See on seotud teie e-postiga.';
-
-  @override
-  String get notShared => 'EI jagata:';
-
-  @override
-  String get searchHistory => 'Otsinguajalugu';
-
-  @override
-  String get favoritesData => 'Lemmikud';
-
-  @override
-  String get profileNames => 'Profiilide nimed';
-
-  @override
-  String get homeZipData => 'Kodu postiindeks';
-
-  @override
-  String get usageData => 'Kasutusandmed';
-
-  @override
-  String get privacyBanner =>
-      'Sellel rakendusel pole serverit. Kõik andmed jäävad teie seadmesse. Pole analüütikat, jälgimist ega reklaame.';
 
   @override
   String get storageUsage => 'Salvestusruumi kasutus selles seadmes';
@@ -403,24 +310,11 @@ class AppLocalizationsEt extends AppLocalizations {
   String get cacheEmpty => 'Vahemälu on tühi';
 
   @override
-  String get noStorage => 'Salvestusruum pole kasutuses';
-
-  @override
   String get apiKeyNote =>
       'Tasuta registreerumine. Andmed riiklike hinnaläbipaistvuse asutuste käest.';
 
   @override
   String get apiKeyFormatError => 'Vigane vorming — oodatav UUID (8-4-4-4-12)';
-
-  @override
-  String get supportProject => 'Toetage seda projekti';
-
-  @override
-  String get supportDescription =>
-      'See rakendus on tasuta, avatud lähtekoodiga ja reklaamivaba. Kui leiate selle kasulikuks, kaaluge arendaja toetamist.';
-
-  @override
-  String get reportBug => 'Teata veast / Soovita funktsiooni';
 
   @override
   String get reportThisIssue => 'Teata probleemist';
@@ -464,9 +358,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get configApiKeyConfigured => 'Seadistatud';
-
-  @override
-  String get configApiKeyNotSet => 'Määramata (demorežiim)';
 
   @override
   String get configApiKeyCommunity => 'Vaikimisi (ühenduse võti)';
@@ -586,15 +477,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get expensive => 'kallis';
 
   @override
-  String stationsOnMap(int count) {
-    return '$count tanklat';
-  }
-
-  @override
-  String get loadingFavorites =>
-      'Lemmikute laadimine...\nOtsige kõigepealt tanklasid andmete salvestamiseks.';
-
-  @override
   String get reportPrice => 'Teata hinnast';
 
   @override
@@ -620,10 +502,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get positionUnknown => 'Asukoht teadmata';
-
-  @override
-  String get routeModeBannerLabel =>
-      'Marsruudi režiim — vahemaad on piki koridori';
 
   @override
   String get distancesFromCenter => 'Kaugused otsingu keskpunktist';
@@ -754,12 +632,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get wrongStatusClosed => 'Näidatud suletuna, kuid avatud';
 
   @override
-  String get searchAlongRouteLabel => 'Marsruudi ääres';
-
-  @override
-  String get searchEvStations => 'Otsi laadimisjaamu';
-
-  @override
   String get allStations => 'Kõik jaamad';
 
   @override
@@ -882,11 +754,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get stop => 'Peatus';
 
   @override
-  String stopN(int n) {
-    return 'Peatus $n';
-  }
-
-  @override
   String get addStop => 'Lisa peatus';
 
   @override
@@ -925,16 +792,10 @@ class AppLocalizationsEt extends AppLocalizations {
       'Valikuline: asendage sisseehitatud rakenduse võti enda omaga';
 
   @override
-  String get requiredForEvSearch => 'Vajalik EV laadimisjaamade otsinguks';
-
-  @override
   String get edit => 'Muuda';
 
   @override
   String get fuelPricesApiKey => 'Kütusehindade API võti';
-
-  @override
-  String get tankerkoenigApiKey => 'Tankerkoenig API võti';
 
   @override
   String get evChargingApiKey => 'EV laadimise API võti';
@@ -1008,12 +869,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get distanceKm => 'Kaugus (km)';
 
   @override
-  String get consumptionL100km => 'Tarbimine (L/100km)';
-
-  @override
-  String get fuelPriceEurL => 'Kütuse hind (EUR/L)';
-
-  @override
   String get tripCost => 'Reisikulu';
 
   @override
@@ -1021,10 +876,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get totalCost => 'Kogukulu';
-
-  @override
-  String get enterCalcValues =>
-      'Sisestage kaugus, tarbimine ja hind reisikulu arvutamiseks';
 
   @override
   String calculatorDistanceLabel(String unit) {
@@ -1094,10 +945,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get citySearchCache => 'Linna otsing';
 
   @override
-  String get dataDeletionNotAvailableCommunity =>
-      'Andmete kustutamine ei ole kogukonna režiimis saadaval. Esmalt katkestage ühendus või kasutage privaatset andmebaasi.';
-
-  @override
   String priceHistoryStationsTracked(int count) {
     return '$count jälitatud tanklat';
   }
@@ -1121,19 +968,7 @@ class AppLocalizationsEt extends AppLocalizations {
   String get noPriceHistory => 'Hinnaajalugu puudub';
 
   @override
-  String get noHourlyData => 'Tunniandmed puuduvad';
-
-  @override
   String get noStatistics => 'Statistika pole saadaval';
-
-  @override
-  String get statMin => 'Min';
-
-  @override
-  String get statMax => 'Max';
-
-  @override
-  String get statAvg => 'Kesk';
 
   @override
   String get showAllFuelTypes => 'Näita kõiki kütuseliike';
@@ -1142,34 +977,10 @@ class AppLocalizationsEt extends AppLocalizations {
   String get connected => 'Ühendatud';
 
   @override
-  String get notConnected => 'Ühendamata';
-
-  @override
-  String get connectTankSync => 'Ühenda TankSync';
-
-  @override
   String get disconnectTankSync => 'Katkesta TankSync';
 
   @override
   String get viewMyData => 'Vaata minu andmeid';
-
-  @override
-  String get optionalCloudSync =>
-      'Valikuline pilvsünkroniseerimine hoiatuste, lemmikute ja tõuketeadete jaoks';
-
-  @override
-  String get tapToUpdateGps => 'Puudutage GPS asukoha uuendamiseks';
-
-  @override
-  String get gpsAutoUpdateHint =>
-      'GPS asukoht hangitakse automaatselt otsimisel. Saate seda ka käsitsi siin uuendada.';
-
-  @override
-  String get clearGpsConfirm =>
-      'Kustutada salvestatud GPS asukoht? Saate seda igal ajal uuendada.';
-
-  @override
-  String get pageNotFound => 'Lehte ei leitud';
 
   @override
   String get deleteAllServerData => 'Kustuta kõik serveriandmed';
@@ -1200,9 +1011,6 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get forgetAllSyncedTripsSuccess =>
       'Kõik sünkroonitud reisid eemaldati serverist';
-
-  @override
-  String get disconnectConfirm => 'Katkestada TankSync?';
 
   @override
   String get disconnect => 'Katkesta';
@@ -1260,9 +1068,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get signIn => 'Logi sisse';
-
-  @override
-  String get upgradeToEmail => 'Loo e-postiga konto';
 
   @override
   String get savedRoutes => 'Salvestatud marsruudid';
@@ -1365,27 +1170,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get onboardingFinish => 'Alusta';
 
   @override
-  String crossBorderNearby(String country) {
-    return '$country on lähedal';
-  }
-
-  @override
-  String crossBorderDistance(int km) {
-    return '~$km km piirini';
-  }
-
-  @override
-  String crossBorderAvgPrice(String price, int count) {
-    return 'Keskmine siin: $price EUR ($count jaama)';
-  }
-
-  @override
-  String get allPricesView => 'Kõik hinnad';
-
-  @override
-  String get compactView => 'Kompaktne';
-
-  @override
   String get switchToAllPricesView => 'Lülitu kõigi hindade vaatesse';
 
   @override
@@ -1472,18 +1256,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String failedToSwitch(String error) {
     return 'Lülitumine ebaõnnestus: $error';
   }
-
-  @override
-  String get topicUrlCopied => 'Teema URL kopeeritud';
-
-  @override
-  String get testNotificationSent => 'Testteatise saatmine õnnestus!';
-
-  @override
-  String get testNotificationFailed => 'Testteatise saatmine ebaõnnestus';
-
-  @override
-  String get pushUpdateFailed => 'Tõuketeate seade uuendamine ebaõnnestus';
 
   @override
   String get connectedAsGuest => 'Ühendatud külalisena';
@@ -1689,11 +1461,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get privacyDeleteButton => 'Kustuta kõik andmed';
 
   @override
-  String privacyCopyErrorLog(int count) {
-    return 'Kopeeri tõrkepäevik lõikelauale ($count)';
-  }
-
-  @override
   String privacySaveErrorLog(int count) {
     return 'Salvesta tõrkelogi ($count)';
   }
@@ -1818,21 +1585,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get voiceAnnouncementsEnabled => 'Luba häälteated';
 
   @override
-  String voiceAnnouncementThreshold(String price) {
-    return 'Ainult alla $price';
-  }
-
-  @override
-  String voiceAnnouncementCheapFuel(
-    String station,
-    String distance,
-    String fuelType,
-    String price,
-  ) {
-    return '$station, $distance kilomeetrit ees, $fuelType $price';
-  }
-
-  @override
   String get voiceAnnouncementProximityRadius => 'Teate raadius';
 
   @override
@@ -1840,22 +1592,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get voiceAnnouncementPriceLimit => 'Maximum price';
-
-  @override
-  String get nearestStations => 'Lahimad jaamad';
-
-  @override
-  String get nearestStationsHint =>
-      'Leidke lahimad jaamad oma praeguse asukoha jargi';
-
-  @override
-  String get consumptionLogTitle => 'Kütusekulu';
-
-  @override
-  String get consumptionLogMenuTitle => 'Kulupäevik';
-
-  @override
-  String get consumptionLogMenuSubtitle => 'Jälgi tankimisi ja arvuta L/100km';
 
   @override
   String get consumptionStatsTitle => 'Kulu statistika';
@@ -1970,9 +1706,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get fillUpVehicleLabel => 'Sõiduk';
 
   @override
-  String get fillUpVehicleNone => 'Sõiduk puudub';
-
-  @override
   String get fillUpVehicleRequired => 'Sõiduk on kohustuslik';
 
   @override
@@ -1991,9 +1724,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get pickStationSkip => 'Jäta vahele — lisa ilma jaamata';
-
-  @override
-  String get scanPump => 'Skaneeri pump';
 
   @override
   String get scanPayment => 'Skaneeri makse QR';
@@ -2064,17 +1794,7 @@ class AppLocalizationsEt extends AppLocalizations {
   String get torchOff => 'Lülita välk välja';
 
   @override
-  String get obdNoAdapter => 'OBD2 adapterit ei leitud';
-
-  @override
-  String get obdOdometerUnavailable => 'Läbisõidumõõdikut ei saanud lugeda';
-
-  @override
   String get obdPermissionDenied => 'Anna Bluetooth\'i luba süsteemiseadetes';
-
-  @override
-  String get obdAdapterUnresponsive =>
-      'Adapter ei vastanud — lülita süütevool sisse ja proovi uuesti';
 
   @override
   String get obdPickerTitle => 'Vali OBD2 adapter';
@@ -2084,18 +1804,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get obdPickerConnecting => 'Ühendan…';
-
-  @override
-  String get themeSettingTitle => 'Teema';
-
-  @override
-  String get themeModeLight => 'Hele';
-
-  @override
-  String get themeModeDark => 'Tume';
-
-  @override
-  String get themeModeSystem => 'Järgi süsteemi';
 
   @override
   String get tripRecordingTitle => 'Reisi salvestamine';
@@ -2241,24 +1949,11 @@ class AppLocalizationsEt extends AppLocalizations {
   String get obd2StatusConnected => 'OBD2 adapter: ühendatud';
 
   @override
-  String get obd2StatusAttempting => 'OBD2 adapter: ühendub';
-
-  @override
-  String get obd2StatusUnreachable => 'OBD2 adapter: kättesaamatu';
-
-  @override
   String get obd2StatusPermissionDenied =>
       'OBD2 adapter: Bluetooth\'i luba vajalik';
 
   @override
   String get obd2StatusConnectedBody => 'Valmis reisi salvestama.';
-
-  @override
-  String get obd2StatusAttemptingBody => 'Ühendan taustal…';
-
-  @override
-  String get obd2StatusUnreachableBody =>
-      'Adapter on levialast väljas või kasutusel teises rakenduses.';
 
   @override
   String get obd2StatusPermissionDeniedBody =>
@@ -2275,10 +1970,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get tripHistoryEmptyTitle => 'Reise pole veel';
-
-  @override
-  String get tripHistoryEmptySubtitle =>
-      'Ühenda OBD2 adapter ja salvesta reis, et hakata sõitmisajalugu koostama.';
 
   @override
   String get tripHistoryUnknownDate => 'Teadmata kuupäev';
@@ -2317,13 +2008,7 @@ class AppLocalizationsEt extends AppLocalizations {
   String get situationFuelCut => 'Kütuse katkestus — libisemine';
 
   @override
-  String get tripSaveAsFillUp => 'Salvesta tankimisena';
-
-  @override
   String get tripSaveRecording => 'Salvesta reis';
-
-  @override
-  String get tripDiscard => 'Hülga';
 
   @override
   String get tripSummaryAutoSaved => 'Trip saved automatically';
@@ -2335,15 +2020,7 @@ class AppLocalizationsEt extends AppLocalizations {
   String get tripSummaryDelete => 'Delete this trip';
 
   @override
-  String obdOdometerRead(int km) {
-    return 'Läbisõidumõõdik loetud: $km km';
-  }
-
-  @override
   String get vehicleFuelNotSet => 'Määramata';
-
-  @override
-  String get wizardVehicleTapToEdit => 'Puuduta muutmiseks';
 
   @override
   String get wizardVehicleDefaultBadge => 'Vaikimisi';
@@ -2379,10 +2056,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get wizardProfileCustomName => 'Kohandatud';
-
-  @override
-  String get wizardProfileCustomDescription =>
-      'Sinu enda funktsioonide kombinatsioon. Kohanda iga lülitit allpool.';
 
   @override
   String get useModeSectionHint =>
@@ -2512,15 +2185,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get evMinPower => 'Min võimsus';
 
   @override
-  String get evMaxPower => 'Maks võimsus';
-
-  @override
-  String get evOperator => 'Operaator';
-
-  @override
-  String get evLastUpdate => 'Viimane uuendus';
-
-  @override
   String get evStatusAvailable => 'Saadaval';
 
   @override
@@ -2542,9 +2206,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get criteriaSavedToProfile => 'Salvestatud vaikimisi sätetena';
 
   @override
-  String get profileNotFound => 'Aktiivset profiili pole';
-
-  @override
   String get updatingFavorites => 'Uuendan sinu lemmikuid...';
 
   @override
@@ -2552,9 +2213,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get noDataAvailable => 'Andmed puuduvad';
-
-  @override
-  String get configAndPrivacy => 'Seaded ja privaatsus';
 
   @override
   String get searchToSeeMap => 'Otsi jaamade kuvamiseks kaardil';
@@ -2847,15 +2505,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get scanReceipt => 'Skaneeri kviitung';
 
   @override
-  String get obdConnect => 'OBD-II';
-
-  @override
-  String get stationTypeFuel => 'Kütus';
-
-  @override
-  String get stationTypeEv => 'EV';
-
-  @override
   String get brandFilterHighway => 'Kiirtee';
 
   @override
@@ -2922,10 +2571,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get alertsLoadErrorTitle => 'Teatiste laadimine ebaõnnestus';
-
-  @override
-  String get alertsBackgroundCheckErrorTitle =>
-      'Teatiste taustakonkroll ebaõnnestus';
 
   @override
   String get detailsLabel => 'Üksikasjad';
@@ -3284,12 +2929,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get swipeHide => 'Peida';
 
   @override
-  String get evChargingSection => 'EV laadimine';
-
-  @override
-  String get fuelStationsSection => 'Kütusejaamad';
-
-  @override
   String get yourRating => 'Sinu hinnang';
 
   @override
@@ -3304,26 +2943,6 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get aboutSupportDescription =>
       'See rakendus on tasuta, avatud lähtekoodiga ja reklaamivaba. Kui leiad selle kasulikuks, kaalu arendaja toetamist.';
-
-  @override
-  String get luxembourgRegulatedPricesNotice =>
-      'Luksemburgi kütushinnad on riiklikult reguleeritud ja ühtlased kogu riigis.';
-
-  @override
-  String get luxembourgFuelUnleaded95 => 'Pliivabal 95';
-
-  @override
-  String get luxembourgFuelUnleaded98 => 'Pliivabal 98';
-
-  @override
-  String get luxembourgFuelDiesel => 'Diisel';
-
-  @override
-  String get luxembourgFuelLpg => 'LPG';
-
-  @override
-  String get luxembourgPricesUnavailable =>
-      'Luksemburgi reguleeritud hinnad pole saadaval.';
 
   @override
   String get reportIssueTitle => 'Teata probleemist';
@@ -3413,20 +3032,6 @@ class AppLocalizationsEt extends AppLocalizations {
   }
 
   @override
-  String get southKoreaApiKeyRequired =>
-      'Registreeru OPINETis tasuta API-võtme saamiseks';
-
-  @override
-  String get southKoreaApiProvider => 'OPINET (KNOC)';
-
-  @override
-  String get chileApiKeyRequired =>
-      'Registreeru CNEs tasuta API-võtme saamiseks';
-
-  @override
-  String get chileApiProvider => 'CNE Bencina en Linea';
-
-  @override
   String get vinConfirmTitle => 'Kas see on sinu auto?';
 
   @override
@@ -3509,9 +3114,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get alertsRadiusFuelType => 'Kütuse liik';
 
   @override
-  String get alertsRadiusThreshold => 'Künnis (€/L)';
-
-  @override
   String get alertsRadiusKm => 'Raadius (km)';
 
   @override
@@ -3527,9 +3129,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get alertsRadiusCancel => 'Tühista';
 
   @override
-  String get alertsRadiusDeleteConfirm => 'Kustutada raadiusteatis?';
-
-  @override
   String radiusAlertDeleted(String name) {
     return 'Raadiusalert \"$name\" kustutatud';
   }
@@ -3541,16 +3140,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get obd2PairChipTooltip => 'Ühenda OBD2 adapter';
-
-  @override
-  String velocityAlertTitle(String fuelLabel) {
-    return '$fuelLabel langes lähedalasuvates jaamades';
-  }
-
-  @override
-  String velocityAlertBody(int stationCount, int maxDropCents) {
-    return '$stationCount jaamas langes kuni $maxDropCents¢ viimase tunni jooksul';
-  }
 
   @override
   String get fillUpSavedSnackbar => 'Tankimine salvestatud';
@@ -3780,16 +3369,6 @@ class AppLocalizationsEt extends AppLocalizations {
       'Lisage lemmikjaam, et lähenemise ülekatet testida';
 
   @override
-  String approachStationDistance(String meters) {
-    return '$meters m kaugusel';
-  }
-
-  @override
-  String fuelStationRadarDistanceKm(String km) {
-    return '$km km kaugusel';
-  }
-
-  @override
   String fuelStationRadarProximity(int percent) {
     return 'Lähedus $percent%';
   }
@@ -3882,13 +3461,6 @@ class AppLocalizationsEt extends AppLocalizations {
       'Salvestuse viivitus pärast katkestust (sekundid)';
 
   @override
-  String get autoRecordPairedAdapterLabel => 'Ühendatud adapter';
-
-  @override
-  String get autoRecordPairedAdapterNone =>
-      'Adapterit pole ühendatud. Ühenda esmalt OBD2 seadistuse kaudu.';
-
-  @override
   String get autoRecordBackgroundLocationLabel => 'Taustakoht lubatud';
 
   @override
@@ -3914,14 +3486,8 @@ class AppLocalizationsEt extends AppLocalizations {
       'Taustaasukoha taotlemine ebaõnnestus';
 
   @override
-  String get autoRecordBadgeClearTooltip => 'Tühjenda loendur';
-
-  @override
   String get autoRecordPairAdapterLinkText =>
       'Ühenda adapter allolevas jaotises automaatsalvestamise lubamiseks';
-
-  @override
-  String get exportBackupTooltip => 'Ekspordi varukoopia';
 
   @override
   String get exportBackupReady => 'Varukoopia valmis — vali sihtkoht';
@@ -3939,9 +3505,6 @@ class AppLocalizationsEt extends AppLocalizations {
   }
 
   @override
-  String get restoreBackupTooltip => 'Taasta varukoopia';
-
-  @override
   String get restoreBackupDialogTitle => 'Taasta varukoopia';
 
   @override
@@ -3953,11 +3516,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get restoreBackupReplaceAction => 'Asenda kõik';
-
-  @override
-  String restoreBackupSuccess(int count) {
-    return 'Varukoopia taastatud — $count kirjet imporditud';
-  }
 
   @override
   String get restoreBackupEmpty =>
@@ -3995,9 +3553,6 @@ class AppLocalizationsEt extends AppLocalizations {
   }
 
   @override
-  String get brokenMapChipVerifying => 'MAP-sensor kontrollib…';
-
-  @override
   String get brokenMapChipDisclaimer => 'MAP-näidud kahtlased';
 
   @override
@@ -4007,21 +3562,6 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get brokenMapBannerHardDisable =>
       'MAP-sensor ebausaldusväärsetu. Kuvab tankimise keskmised reaalajas kütusemäära asemel.';
-
-  @override
-  String brokenMapOverlayVerified(String confidence) {
-    return 'MAP-sensor: kontrollitud ($confidence)';
-  }
-
-  @override
-  String brokenMapOverlayUnverified(String confidence) {
-    return 'MAP-sensor: kontrollimine ($confidence)';
-  }
-
-  @override
-  String brokenMapOverlaySuspicious(String confidence) {
-    return 'MAP-sensor: kahtlane ($confidence)';
-  }
 
   @override
   String brokenMapOverlayPosterior(String posterior, String margin) {
@@ -4241,9 +3781,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get chargingChartsEmpty => 'Andmeid pole veel piisavalt';
 
   @override
-  String get chargingChartsMonthAxis => 'Kuu';
-
-  @override
   String get confirmDeleteTitle => 'Delete?';
 
   @override
@@ -4438,20 +3975,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get fillUpCorrectionStation => 'Jaama nimi (vabatahtlik)';
-
-  @override
-  String get greeceApiProvider => 'Paratiritirio Timon (Kreeka)';
-
-  @override
-  String get greeceCommunityApiNotice =>
-      'Põhineb kogukonna hallatava fuelpricesgr API-l';
-
-  @override
-  String get romaniaApiProvider => 'Monitorul Prețurilor (Rumeenia)';
-
-  @override
-  String get romaniaScrapingNotice =>
-      'Põhineb monitorulpreturilor.info andmetel (Konkurentsiamet + ANPC)';
 
   @override
   String crossBorderCheaper(String country, String km, String price) {
@@ -4959,18 +4482,6 @@ class AppLocalizationsEt extends AppLocalizations {
       'High revs at cruise — shifting up earlier saves fuel';
 
   @override
-  String get ecoRouteOption => 'Öko';
-
-  @override
-  String ecoRouteSavings(String liters) {
-    return '≈ $liters L säästetud';
-  }
-
-  @override
-  String get ecoRouteHint =>
-      'Targem sõit — eelistab ühtlast kiirteed sika-saka otseteedele.';
-
-  @override
   String get obd2CoverageNoneNote =>
       'No engine data arrived from the OBD2 adapter on this trip — fuel figures are GPS-based estimates.';
 
@@ -5043,13 +4554,6 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get featureDescription_baselineSync =>
       'Sünkrooni sõitmise baasjoon TankSync kaudu.';
-
-  @override
-  String get featureLabel_unifiedSearchResults => 'Ühendatud otsingutulemused';
-
-  @override
-  String get featureDescription_unifiedSearchResults =>
-      'Üks tulemuste loend, mis ühendab kütuse ja EV jaamad.';
 
   @override
   String get featureLabel_priceAlerts => 'Hinnateatised';
@@ -5147,12 +4651,6 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get featureBlockedEnable_autoRecord =>
       'Luba esmalt OBD2 reisi salvestamine';
-
-  @override
-  String get featureBlockedEnable_showFuel => 'Eeltingimused pole täidetud';
-
-  @override
-  String get featureBlockedEnable_showElectric => 'Eeltingimused pole täidetud';
 
   @override
   String get featureBlockedEnable_showConsumptionTab =>
@@ -5502,10 +5000,6 @@ class AppLocalizationsEt extends AppLocalizations {
   }
 
   @override
-  String get scanPumpUnreadable =>
-      'Pumba kuvarit ei saa lugeda — proovi uuesti';
-
-  @override
   String get scanPumpSuccess => 'Pumba kuvar skaneeritud — kontrolli väärtusi.';
 
   @override
@@ -5520,9 +5014,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String scanPumpFailed(String error) {
     return 'Pumba skaneerimineen ebaõnnestus: $error';
   }
-
-  @override
-  String get badScanReportTitle => 'Teata skaneerimisveast';
 
   @override
   String get badScanReportTitleReceipt => 'Teata skaneerimisveast — kviitung';
@@ -5550,9 +5041,6 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get badScanReportHint =>
       'Jagame kviitungifoto ja mõlemad väärtuste komplektid, et järgmine versioon õpiks selle paigutust.';
-
-  @override
-  String get badScanReportShareAction => 'Jaga raportit + fotot';
 
   @override
   String get badScanReportFieldBrandLayout => 'Brändi paigutus';
@@ -5590,9 +5078,6 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get badScanReportFallbackToShare =>
       'Saatmine ebaõnnestus — käsitsi jagamine';
-
-  @override
-  String get pumpCameraHint => 'Joonda tankla ekraani kolm numbrit raami sisse';
 
   @override
   String get pumpCameraCapture => 'Pildista';
@@ -5657,36 +5142,13 @@ class AppLocalizationsEt extends AppLocalizations {
   String get fillUpSectionWhereSubtitle => 'Jaam, läbisõidumõõdik, märkmed';
 
   @override
-  String get fillUpImportFromLabel => 'Impordi…';
-
-  @override
-  String get fillUpImportSheetTitle => 'Impordi tankimise andmed';
-
-  @override
   String get fillUpImportReceiptLabel => 'Kviitung';
-
-  @override
-  String get fillUpImportReceiptDescription =>
-      'Skaneeri paberist kviitung kaameraga';
 
   @override
   String get fillUpImportPumpLabel => 'Pumba kuvar';
 
   @override
-  String get fillUpImportPumpDescription => 'Loe Betrag / Preis pumba LCD-lt';
-
-  @override
-  String get fillUpImportObdLabel => 'OBD-II adapter';
-
-  @override
-  String get fillUpImportObdDescription =>
-      'Loe läbisõidumõõdik OBD-II pordilt Bluetooth\'i kaudu';
-
-  @override
   String get fillUpPricePerLiterLabel => 'Hind liitri kohta';
-
-  @override
-  String get vehicleHeaderPlateLabel => 'Registreerimisnumber';
 
   @override
   String get vehicleHeaderUntitled => 'Uus sõiduk';
@@ -5748,17 +5210,6 @@ class AppLocalizationsEt extends AppLocalizations {
       locale: localeName,
       other: '$count fills',
       one: '1 fill',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String fuelEfficiencyMixedFootnote(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count mixed tanks counted toward their main fuel',
-      one: '1 mixed tank counted toward its main fuel',
     );
     return '$_temp0';
   }
@@ -6012,9 +5463,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get gpsRoadUseSource => 'From your GPS track';
 
   @override
-  String get hapticEcoCoachSectionTitle => 'Sõitmine';
-
-  @override
   String get hapticEcoCoachSettingTitle => 'Reaalajas ökonõustamine';
 
   @override
@@ -6248,15 +5696,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get calculatorPriceHint => 'nt 1,899';
-
-  @override
-  String get routeStrategyLabel => 'Strateegia:';
-
-  @override
-  String get routeStrategyUniform => 'Ühtlane';
-
-  @override
-  String get routeStrategyBalanced => 'Tasakaalustatud';
 
   @override
   String get glideCoachBetaTitle =>
@@ -6667,9 +6106,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get obd2DiagnosticsInitCold => 'külm';
 
   @override
-  String get obd2HealthCopyInitTranscript => 'Kopeeri ainult init-protokoll';
-
-  @override
   String get obd2DiagnosticsEmpty =>
       'Ühtegi OBD2 seanssi pole veel salvestatud — ühendage adapter ja salvestage sõit arendajarežiimis.';
 
@@ -6688,12 +6124,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get obd2HealthHistorySection => 'Hiljutised seansid';
-
-  @override
-  String get obd2HealthCopyJson => 'Kopeeri JSON-ina';
-
-  @override
-  String get obd2HealthCopied => 'OBD2 diagnostika kopeeritud lõikelauale.';
 
   @override
   String get obd2HealthDownloadJson => 'Download as JSON';
@@ -6944,9 +6374,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get ocrTesterRunning => 'OCR töötab…';
 
   @override
-  String get ocrTesterNoResult => 'OCR ei andnud loetavat tulemust.';
-
-  @override
   String get ocrTesterOverlaySection => 'Ploki ülekat';
 
   @override
@@ -7057,10 +6484,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get onboardingObd2ReadingVin => 'Loen VIN-koodi…';
-
-  @override
-  String get onboardingObd2VinReadFailed =>
-      'VIN-koodi ei saanud lugeda — sisesta käsitsi';
 
   @override
   String get onboardingObd2ConnectFailed =>
@@ -7260,16 +6683,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get radiusAlertCenterFromMap => 'Kaardi asukoht';
 
   @override
-  String radiusAlertNotificationTitle(String fuelLabel, String label) {
-    return '$fuelLabel lähedal $label';
-  }
-
-  @override
-  String radiusAlertNotificationBody(String price, String threshold) {
-    return 'Jaam on $price € (eesmärk: $threshold €)';
-  }
-
-  @override
   String get reconcileWorkflowTitle => 'Kütuse täsmeldamine';
 
   @override
@@ -7362,16 +6775,10 @@ class AppLocalizationsEt extends AppLocalizations {
       'Lahenda lahendamata kütuse ja sõidu lünk';
 
   @override
-  String get refuelUnitPerLiter => '/L';
-
-  @override
   String get refuelUnitPerKwh => '/kWh';
 
   @override
   String get refuelUnitPerSession => '/sessioon';
-
-  @override
-  String get shareReceiptImporting => 'Jagatud kviitungi importimine…';
 
   @override
   String get shareReceiptUnsupportedFormat =>
@@ -7538,15 +6945,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String tankLevelLastFillUpFormat(String date, String count) {
     return 'Viimane tankimine: $date · $count reis(i) sellest saadik';
   }
-
-  @override
-  String get tankLevelMethodObd2 => 'OBD2 mõõdetud';
-
-  @override
-  String get tankLevelMethodDistanceFallback => 'vahemaapõhine hinnang';
-
-  @override
-  String get tankLevelMethodMixed => 'segamõõtmine';
 
   @override
   String get tankLevelEmptyNoFillUp => 'Lisa tankimine paagi taseme nägemiseks';
@@ -7845,9 +7243,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get trajetDetailChartAltitudeRelative => 'Altitude (m, from start)';
 
   @override
-  String get trajetDetailChartAltitude => 'Kõrgus (m)';
-
-  @override
   String get trajetDetailChartLambda => 'Käskluslik λ';
 
   @override
@@ -7904,9 +7299,6 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get trajetDetailDeleteConfirmBody =>
       'See reis eemaldatakse jäädavalt sinu ajaloost.';
-
-  @override
-  String get trajetDetailDeleteConfirmCancel => 'Tühista';
 
   @override
   String get trajetDetailDeleteConfirmConfirm => 'Kustuta';
@@ -7973,9 +7365,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get tripPathCardSubtitle => 'GPS-salvestatud marsruut';
 
   @override
-  String get tripPathLegendTitle => 'Tarbimine';
-
-  @override
   String get tripPathLegendEfficient => 'Efektiivne (< 6 L/100km)';
 
   @override
@@ -8007,9 +7396,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get fuelStationRadarResultBadge => 'Tankla radari tulemus';
-
-  @override
-  String get radarAcquiringLocation => 'Finding your location…';
 
   @override
   String get radarUpdatingLocation => 'Updating your location…';
@@ -8044,10 +7430,6 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get tripRecordingResumeHintMessage =>
       'Salvestamine jätkub taustal. Puuduta punast ribareklaam ekraani ülaosas, et naasta.';
-
-  @override
-  String get tripBannerOpenFromConsumptionTab =>
-      'Ava aktiivne reis Kulu kaardilt';
 
   @override
   String get tripRecordingUnpinnedWarning =>
@@ -8165,18 +7547,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get trajetDeletedUndoSnackbar => 'Recording deleted';
-
-  @override
-  String get unifiedFilterFuel => 'Kütus';
-
-  @override
-  String get unifiedFilterEv => 'EV';
-
-  @override
-  String get unifiedFilterBoth => 'Mõlemad';
-
-  @override
-  String get unifiedNoResultsForFilter => 'Selle filtri jaoks pole tulemusi';
 
   @override
   String get searchFailedSnackbar => 'Otsing ebaõnnestus — palun proovi uuesti';
@@ -8348,9 +7718,6 @@ class AppLocalizationsEt extends AppLocalizations {
       'Kui ühendate adapteri, loetakse sinu sõiduki VIN lokaalselt auto tuvastamiseks. Selle lubamine saadab 17-kohalise VIN-i NHTSA tasuta vPIC teenusesse täiendavate andmete (mudel, mootori töömaht, kütuse liik) otsimiseks. VIN on ainus saadetav andmestik — muud teave ei lahku sinu seadmest.';
 
   @override
-  String get vehicleDetectedFromVinBadge => '(tuvastatud)';
-
-  @override
   String vehicleDetectedFromVinSnackbar(String summary) {
     return 'Tuvastatud VIN-koodist: $summary. Rakenda?';
   }
@@ -8421,7 +7788,4 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get widgetVariantPredictive => 'Ennustav: parim tankimisaeg';
-
-  @override
-  String get widgetPredictiveNowPrefix => 'praegu';
 }

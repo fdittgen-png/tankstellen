@@ -289,10 +289,6 @@
   "@obd2DiagnosticsInitCold": {
     "description": "Word for a cold (full-handshake) adapter start in the init-transcript header on the OBD2 diagnostics card (#2511)."
   },
-  "obd2HealthCopyInitTranscript": "Copy init transcript only",
-  "@obd2HealthCopyInitTranscript": {
-    "description": "Label for the action on the dev-tools OBD2 communication-health screen (#2511) that copies only the dongle-init handshake (adapter identity + init transcript + supported PIDs) to the clipboard as JSON, without the full per-PID/session payload."
-  },
   "obd2DiagnosticsEmpty": "No OBD2 session recorded yet — connect an adapter and record a trip with Developer mode on.",
   "@obd2DiagnosticsEmpty": {
     "description": "Empty-state line on the OBD2 diagnostics card / screen (#2470/#2471) shown when Developer mode is off or no diagnostics session has been captured yet."
@@ -316,14 +312,6 @@
   "obd2HealthHistorySection": "Recent sessions",
   "@obd2HealthHistorySection": {
     "description": "Section header above the capped ring of finished OBD2 session diagnostics on the OBD2 communication-health screen (#2471)."
-  },
-  "obd2HealthCopyJson": "Copy as JSON",
-  "@obd2HealthCopyJson": {
-    "description": "Label for the action that copies the OBD2 session diagnostics (per-PID table + counters) to the clipboard as JSON, on the OBD2 communication-health screen (#2471)."
-  },
-  "obd2HealthCopied": "OBD2 diagnostics copied to clipboard.",
-  "@obd2HealthCopied": {
-    "description": "Confirmation snackbar after the OBD2 communication-health screen copies the session diagnostics JSON to the clipboard (#2471)."
   },
   "obd2HealthDownloadJson": "Download as JSON",
   "@obd2HealthDownloadJson": {

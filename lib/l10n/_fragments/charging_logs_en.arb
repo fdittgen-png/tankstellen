@@ -76,9 +76,5 @@
   "chargingChartsEmpty": "Not enough data yet",
   "@chargingChartsEmpty": {
     "description": "Empty-state caption shown inside the charging charts when no data is available for the last 6 months (#582 phase 3)."
-  },
-  "chargingChartsMonthAxis": "Month",
-  "@chargingChartsMonthAxis": {
-    "description": "Axis label for the X axis (month) on the charging charts (#582 phase 3)."
   }
 }

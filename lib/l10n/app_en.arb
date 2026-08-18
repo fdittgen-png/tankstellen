@@ -12,12 +12,7 @@
   "fuelType": "Fuel type",
   "searchRadius": "Radius",
   "searchNearby": "Nearby stations",
-  "searchButton": "Search",
-  "fabOpenCriteria": "Open search",
-  "fabOpenResults": "Open results",
   "fabRunSearch": "Run search",
-  "fabRefineCriteria": "Refine search",
-  "routeSearchPartialBanner": "Searching for more stations…",
   "routeSearchingChip": "Searching the route…",
   "routeSegmentSummaryBadge": "Every {km} km",
   "@routeSegmentSummaryBadge": {
@@ -28,7 +23,6 @@
     }
   },
   "searchCriteriaTitle": "Search criteria",
-  "searchCriteriaOpen": "Search",
   "searchCriteriaRadiusBadge": "Within {km} km",
   "@searchCriteriaRadiusBadge": {
     "placeholders": {
@@ -37,7 +31,6 @@
       }
     }
   },
-  "searchCriteriaTapToSearch": "Tap to start searching",
   "noResults": "No stations found.",
   "startSearch": "Search to find fuel stations.",
   "open": "Open",
@@ -58,7 +51,6 @@
   "navigate": "Navigate",
   "retry": "Try again",
   "apiKeySetup": "API key setup",
-  "apiKeyDescription": "Register once for a free API key.",
   "apiKeyLabel": "API Key",
   "register": "Registration",
   "continueButton": "Continue",
@@ -100,16 +92,11 @@
   "noFavoritesHint": "Tap the star on a station to save it as a favorite.",
   "language": "Language",
   "country": "Country",
-  "demoMode": "Demo mode — sample data shown.",
-  "setupLiveData": "Set up for live data",
   "freeNoKey": "Free — no key needed",
   "apiKeyRequired": "API key required",
-  "skipWithoutKey": "Continue without key",
   "dataTransparency": "Data transparency",
   "storageAndCache": "Storage & cache",
   "clearCache": "Clear cache",
-  "clearAllData": "Delete all data",
-  "errorLog": "Error log",
   "stationsFound": "{count} stations found",
   "@stationsFound": {
     "placeholders": {
@@ -118,22 +105,6 @@
       }
     }
   },
-  "whatIsShared": "What is shared — and with whom?",
-  "gpsCoordinates": "GPS coordinates",
-  "gpsReason": "Sent with every location search to find nearby stations.",
-  "postalCodeData": "Postal code",
-  "postalReason": "Converted to coordinates via geocoding service.",
-  "mapViewport": "Map viewport",
-  "mapReason": "Map tiles are loaded from the tile server. No personal data is transmitted.",
-  "apiKeyData": "API Key",
-  "apiKeyReason": "Your personal key is sent with every API request. It is linked to your email.",
-  "notShared": "NOT shared:",
-  "searchHistory": "Search history",
-  "favoritesData": "Favorites",
-  "profileNames": "Profile names",
-  "homeZipData": "Home ZIP",
-  "usageData": "Usage data",
-  "privacyBanner": "This app has no server. All data stays on your device. No analytics, no tracking, no ads.",
   "storageUsage": "Storage usage on this device",
   "settingsLabel": "Settings",
   "profilesStored": "profiles stored",
@@ -173,12 +144,8 @@
   "deleteAllButton": "Delete all",
   "entries": "entries",
   "cacheEmpty": "Cache is empty",
-  "noStorage": "No storage used",
   "apiKeyNote": "Free registration. Data from government price transparency agencies.",
   "apiKeyFormatError": "Invalid format — expected UUID (8-4-4-4-12)",
-  "supportProject": "Support this project",
-  "supportDescription": "This app is free, open source, and has no ads. If you find it useful, consider supporting the developer.",
-  "reportBug": "Report a bug / Suggest a feature",
   "reportThisIssue": "Report this issue",
   "reportAlreadySent": "You already reported this issue.",
   "reportConsentTitle": "Report to GitHub?",
@@ -193,7 +160,6 @@
   "configApiKeysSection": "API keys",
   "configTankerkoenigKey": "Tankerkoenig API key",
   "configApiKeyConfigured": "Configured",
-  "configApiKeyNotSet": "Not set (demo mode)",
   "configApiKeyCommunity": "Default (community key)",
   "searchLocationPlaceholder": "Address, postal code or city",
   "configEvKey": "EV charging API key",
@@ -242,15 +208,6 @@
   "sortPriceDistance": "Price/km",
   "cheap": "cheap",
   "expensive": "expensive",
-  "stationsOnMap": "{count} stations",
-  "@stationsOnMap": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "loadingFavorites": "Loading favorites...\nSearch for stations first to save data.",
   "reportPrice": "Report price",
   "whatsWrong": "What's wrong?",
   "correctPrice": "Correct price (e.g. 1.459)",
@@ -260,7 +217,6 @@
   "cacheCleared": "Cache cleared.",
   "yourPosition": "Your position",
   "positionUnknown": "Position unknown",
-  "routeModeBannerLabel": "Route mode — distances are along the corridor",
   "distancesFromCenter": "Distances from search center",
   "autoUpdatePosition": "Auto-update position",
   "autoUpdateDescription": "Refresh GPS position before each search",
@@ -363,8 +319,6 @@
   "wrongDieselPrice": "Wrong Diesel price",
   "wrongStatusOpen": "Shown as open, but closed",
   "wrongStatusClosed": "Shown as closed, but open",
-  "searchAlongRouteLabel": "Along route",
-  "searchEvStations": "Search to find EV charging stations",
   "allStations": "All stations",
   "bestStops": "Best stops",
   "openInMaps": "Open in Maps",
@@ -431,14 +385,6 @@
   "cityOrAddress": "City or address",
   "useGps": "Use GPS",
   "stop": "Stop",
-  "stopN": "Stop {n}",
-  "@stopN": {
-    "placeholders": {
-      "n": {
-        "type": "int"
-      }
-    }
-  },
   "addStop": "Add stop",
   "searchAlongRoute": "Search along route",
   "cheapest": "Cheapest",
@@ -464,10 +410,8 @@
   "customKey": "Custom key",
   "appDefaultKey": "App default key",
   "optionalOverrideKey": "Optional: override the built-in app key with your own",
-  "requiredForEvSearch": "Required for EV charging station search",
   "edit": "Edit",
   "fuelPricesApiKey": "Fuel prices API Key",
-  "tankerkoenigApiKey": "Tankerkoenig API Key",
   "evChargingApiKey": "EV Charging API Key",
   "openChargeMapApiKey": "OpenChargeMap API Key",
   "routePlanningSection": "Route planning",
@@ -509,12 +453,9 @@
   "noStationsAlongThisRoute": "No stations found along this route.",
   "fuelCostCalculator": "Fuel Cost Calculator",
   "distanceKm": "Distance (km)",
-  "consumptionL100km": "Consumption (L/100km)",
-  "fuelPriceEurL": "Fuel price (EUR/L)",
   "tripCost": "Trip Cost",
   "fuelNeeded": "Fuel needed",
   "totalCost": "Total cost",
-  "enterCalcValues": "Enter distance, consumption, and price to calculate trip cost",
   "calculatorDistanceLabel": "Distance ({unit})",
   "@calculatorDistanceLabel": {
     "placeholders": {
@@ -556,7 +497,6 @@
   "ratingsLabel": "Ratings",
   "favoritesDataCache": "Favorites data",
   "citySearchCache": "City search",
-  "dataDeletionNotAvailableCommunity": "Data deletion is not available in community mode. Disconnect first, or use a private database.",
   "priceHistoryStationsTracked": "{count} stations tracked",
   "@priceHistoryStationsTracked": {
     "placeholders": {
@@ -590,22 +530,11 @@
     }
   },
   "noPriceHistory": "No price history yet",
-  "noHourlyData": "No hourly data",
   "noStatistics": "No statistics available",
-  "statMin": "Min",
-  "statMax": "Max",
-  "statAvg": "Avg",
   "showAllFuelTypes": "Show all fuel types",
   "connected": "Connected",
-  "notConnected": "Not connected",
-  "connectTankSync": "Connect TankSync",
   "disconnectTankSync": "Disconnect TankSync",
   "viewMyData": "View my data",
-  "optionalCloudSync": "Optional cloud sync for alerts, favorites, and push notifications",
-  "tapToUpdateGps": "Tap to update GPS position",
-  "gpsAutoUpdateHint": "GPS position is acquired automatically when you search. You can also update it manually here.",
-  "clearGpsConfirm": "Clear the stored GPS position? You can update it again at any time.",
-  "pageNotFound": "Page not found",
   "deleteAllServerData": "Delete all server data",
   "deleteServerDataConfirm": "Delete all server data?",
   "deleteEverything": "Delete everything",
@@ -615,7 +544,6 @@
   "forgetAllSyncedTripsConfirmBody": "Every trip summary and detail blob will be removed from the server. Your local trip history on this device won't be affected.\n\nThis action cannot be undone.",
   "forgetAllSyncedTripsConfirmAction": "Forget all",
   "forgetAllSyncedTripsSuccess": "All synced trips removed from server",
-  "disconnectConfirm": "Disconnect TankSync?",
   "disconnect": "Disconnect",
   "myServerData": "My server data",
   "anonymousUuid": "Anonymous UUID",
@@ -635,7 +563,6 @@
   "continueAsGuest": "Continue as guest",
   "createAccount": "Create account",
   "signIn": "Sign in",
-  "upgradeToEmail": "Create email account",
   "savedRoutes": "Saved Routes",
   "noSavedRoutes": "No saved routes",
   "noSavedRoutesHint": "Search along a route and save it for quick access later.",
@@ -680,35 +607,6 @@
   "onboardingNext": "Next",
   "onboardingSkip": "Skip",
   "onboardingFinish": "Get started",
-  "crossBorderNearby": "{country} is nearby",
-  "@crossBorderNearby": {
-    "placeholders": {
-      "country": {
-        "type": "String"
-      }
-    }
-  },
-  "crossBorderDistance": "~{km} km to border",
-  "@crossBorderDistance": {
-    "placeholders": {
-      "km": {
-        "type": "int"
-      }
-    }
-  },
-  "crossBorderAvgPrice": "Avg here: {price} EUR ({count} stations)",
-  "@crossBorderAvgPrice": {
-    "placeholders": {
-      "price": {
-        "type": "String"
-      },
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "allPricesView": "All prices",
-  "compactView": "Compact",
   "switchToAllPricesView": "Switch to all-prices view",
   "switchToCompactView": "Switch to compact view",
   "unavailable": "N/A",
@@ -742,10 +640,6 @@
       }
     }
   },
-  "topicUrlCopied": "Topic URL copied",
-  "testNotificationSent": "Test notification sent!",
-  "testNotificationFailed": "Failed to send test notification",
-  "pushUpdateFailed": "Failed to update push notification setting",
   "connectedAsGuest": "Connected as guest",
   "accountCreated": "Account created!",
   "signedIn": "Signed in!",
@@ -860,15 +754,6 @@
     "description": "Snackbar confirming an export was written to the device's public Downloads folder (#2014). Replaces the earlier savedToFile string, which leaked a filesystem path that is meaningless to users (and on Android Q+ becomes a content:// URI)."
   },
   "privacyDeleteButton": "Delete all data",
-  "privacyCopyErrorLog": "Copy error log to clipboard ({count})",
-  "@privacyCopyErrorLog": {
-    "description": "Button that copies recorded error traces to the clipboard. count = number of traces buffered.",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "privacySaveErrorLog": "Save error log ({count})",
   "@privacySaveErrorLog": {
     "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder (and shares / copies as a secondary path). Supersedes privacyCopyErrorLog (#2145). count = number of traces buffered.",
@@ -954,42 +839,12 @@
   "voiceAnnouncementsTitle": "Voice Announcements",
   "voiceAnnouncementsDescription": "Announce nearby cheap stations while driving",
   "voiceAnnouncementsEnabled": "Enable voice announcements",
-  "voiceAnnouncementThreshold": "Only below {price}",
-  "@voiceAnnouncementThreshold": {
-    "placeholders": {
-      "price": {
-        "type": "String"
-      }
-    }
-  },
-  "voiceAnnouncementCheapFuel": "{station}, {distance} kilometers ahead, {fuelType} {price}",
-  "@voiceAnnouncementCheapFuel": {
-    "placeholders": {
-      "station": {
-        "type": "String"
-      },
-      "distance": {
-        "type": "String"
-      },
-      "fuelType": {
-        "type": "String"
-      },
-      "price": {
-        "type": "String"
-      }
-    }
-  },
   "voiceAnnouncementProximityRadius": "Announcement radius",
   "voiceAnnouncementCooldown": "Repeat interval",
   "voiceAnnouncementPriceLimit": "Maximum price",
   "@voiceAnnouncementPriceLimit": {
     "description": "Title of the voice-announcement price-threshold slider in driving settings: only stations priced at or below this per-litre figure are announced."
   },
-  "nearestStations": "Nearest stations",
-  "nearestStationsHint": "Find the closest stations using your current location",
-  "consumptionLogTitle": "Fuel consumption",
-  "consumptionLogMenuTitle": "Consumption log",
-  "consumptionLogMenuSubtitle": "Track fill-ups and calculate L/100km",
   "consumptionStatsTitle": "Consumption stats",
   "addFillUp": "Add fill-up",
   "noFillUpsTitle": "No fill-ups yet",
@@ -1030,14 +885,12 @@
   },
   "vehiclesWizardSkipHint": "Skip to finish setup — you can add vehicles anytime from Settings.",
   "fillUpVehicleLabel": "Vehicle",
-  "fillUpVehicleNone": "No vehicle",
   "fillUpVehicleRequired": "Vehicle is required",
   "reportScanError": "Report scan error",
   "pickStationTitle": "Pick a station",
   "pickStationHelper": "Start the fill-up from a known station so prices, brand and fuel type fill themselves in.",
   "pickStationEmpty": "No favorite stations yet — add some from Search or Favorites, or skip and fill in manually.",
   "pickStationSkip": "Skip — add without a station",
-  "scanPump": "Scan pump",
   "scanPayment": "Scan payment QR",
   "qrPaymentBeneficiary": "Beneficiary",
   "qrPaymentAmount": "Amount",
@@ -1059,17 +912,10 @@
   "qrScannerRetry": "Try again",
   "torchOn": "Turn flash on",
   "torchOff": "Turn flash off",
-  "obdNoAdapter": "No OBD2 adapter in range",
-  "obdOdometerUnavailable": "Could not read odometer",
   "obdPermissionDenied": "Grant Bluetooth permission in system settings",
-  "obdAdapterUnresponsive": "Adapter didn't answer — turn the ignition on and retry",
   "obdPickerTitle": "Pick an OBD2 adapter",
   "obdPickerScanning": "Scanning for adapters…",
   "obdPickerConnecting": "Connecting…",
-  "themeSettingTitle": "Theme",
-  "themeModeLight": "Light",
-  "themeModeDark": "Dark",
-  "themeModeSystem": "Follow system",
   "tripRecordingTitle": "Recording trip",
   "tripSummaryTitle": "Trip summary",
   "tripMetricDistance": "Distance",
@@ -1129,18 +975,13 @@
   "syncBaselinesToggleTitle": "Share learned vehicle profiles",
   "syncBaselinesToggleSubtitle": "Upload per-vehicle consumption baselines so a second device can reuse them.",
   "obd2StatusConnected": "OBD2 adapter: connected",
-  "obd2StatusAttempting": "OBD2 adapter: connecting",
-  "obd2StatusUnreachable": "OBD2 adapter: unreachable",
   "obd2StatusPermissionDenied": "OBD2 adapter: Bluetooth permission needed",
   "obd2StatusConnectedBody": "Ready to record a trip.",
-  "obd2StatusAttemptingBody": "Connecting in the background…",
-  "obd2StatusUnreachableBody": "Adapter out of range or already in use by another app.",
   "obd2StatusPermissionDeniedBody": "Grant Bluetooth permission in system settings to reconnect automatically.",
   "obd2StatusNoAdapter": "No adapter paired",
   "obd2StatusForget": "Forget adapter",
   "tripHistoryTitle": "Trip history",
   "tripHistoryEmptyTitle": "No trips yet",
-  "tripHistoryEmptySubtitle": "Connect an OBD2 adapter and record a trip to start building your driving history.",
   "tripHistoryUnknownDate": "Unknown date",
   "situationIdle": "Idle",
   "situationStopAndGo": "Stop & go",
@@ -1153,28 +994,14 @@
   "situationPartialDecel": "Coasting",
   "situationHardAccel": "Hard accel",
   "situationFuelCut": "Fuel cut — coast",
-  "tripSaveAsFillUp": "Save as fill-up",
-  "@tripSaveAsFillUp": {
-    "description": "DEPRECATED (#1185): replaced by tripSaveRecording. Retained for parity with non-EN locales until the orphan-key sweep lands."
-  },
   "tripSaveRecording": "Save trip",
   "@tripSaveRecording": {
     "description": "Trip-summary CTA: persists a TripHistoryEntry only — no fill-up created. (#1185)"
   },
-  "tripDiscard": "Discard",
   "tripSummaryAutoSaved": "Trip saved automatically",
   "tripSummaryDone": "Done",
   "tripSummaryDelete": "Delete this trip",
-  "obdOdometerRead": "Odometer read: {km} km",
-  "@obdOdometerRead": {
-    "placeholders": {
-      "km": {
-        "type": "int"
-      }
-    }
-  },
   "vehicleFuelNotSet": "Not set",
-  "wizardVehicleTapToEdit": "Tap to edit",
   "wizardVehicleDefaultBadge": "Default",
   "wizardProfileChoiceHint": "Choose how you want to use the app. You can change this later in Settings.",
   "wizardProfileChoiceFooter": "You can change your choice any time from Settings → Use mode.",
@@ -1185,7 +1012,6 @@
   "wizardProfileFullName": "Full",
   "wizardProfileFullDescription": "Everything in Medium, plus automatic OBD2 trip recording, driving scores, and loyalty cards.",
   "wizardProfileCustomName": "Custom",
-  "wizardProfileCustomDescription": "Your own combination of features. Tweak each toggle below.",
   "useModeSectionHint": "Right-size the app to how you actually use it. Picking a preset enables the matching set of features.",
   "useModeCustomSettingsDescription": "Your feature mix doesn't match any preset. Pick one above to overwrite, or keep customising individual features in the section below.",
   "useModeSwitchedSnack": "Use mode set to {profile}.",
@@ -1246,9 +1072,6 @@
   "evShowOnMap": "Show EV stations",
   "evAvailableOnly": "Available only",
   "evMinPower": "Min power",
-  "evMaxPower": "Max power",
-  "evOperator": "Operator",
-  "evLastUpdate": "Last update",
   "evStatusAvailable": "Available",
   "evStatusOccupied": "Occupied",
   "evStatusOutOfOrder": "Out of order",
@@ -1256,11 +1079,9 @@
   "openOnlyFilter": "Open only",
   "saveAsDefaults": "Save as my defaults",
   "criteriaSavedToProfile": "Saved as defaults",
-  "profileNotFound": "No active profile",
   "updatingFavorites": "Updating your favorites...",
   "fetchingLatestPrices": "Fetching the latest prices",
   "noDataAvailable": "No data",
-  "configAndPrivacy": "Configuration & Privacy",
   "searchToSeeMap": "Search to see stations on the map",
   "evPowerAny": "Any",
   "evPowerKw": "{kw} kW+",
@@ -1440,9 +1261,6 @@
   "iosAutoRecordOnboardingBullet3Title": "When iOS asks for \"Always\" location, please say yes.",
   "iosAutoRecordOnboardingBullet3Body": "The fallback that records your trip when the OBD2 adapter is slow needs background location. We never share it.",
   "scanReceipt": "Scan receipt",
-  "obdConnect": "OBD-II",
-  "stationTypeFuel": "Fuel",
-  "stationTypeEv": "EV",
   "brandFilterHighway": "Highway",
   "ratingModeLocal": "Local",
   "ratingModePrivate": "Private",
@@ -1479,7 +1297,6 @@
   "errorHintRouting": "Route calculation failed. Check your internet connection and try again.",
   "errorHintFallback": "Try again or search by postal code / city name.",
   "alertsLoadErrorTitle": "Couldn't load your alerts",
-  "alertsBackgroundCheckErrorTitle": "Alert background check failed",
   "detailsLabel": "Details",
   "remove": "Remove",
   "showKey": "Show key",
@@ -1606,19 +1423,11 @@
   "linkDeviceHowItWorksBody": "1. On Device A: copy the device code above\n2. On Device B: paste it in the \"Device code\" field\n3. Tap \"Import data\" to merge favorites, alerts, vehicles, and consumption logs\n4. Both devices will have all combined data\n\nEach device keeps its own anonymous identity and its own profile (preferred fuel, default vehicle, landing screen). Data is merged, not moved.",
   "vehicleSetActive": "Set active",
   "swipeHide": "Hide",
-  "evChargingSection": "EV Charging",
-  "fuelStationsSection": "Fuel Stations",
   "yourRating": "Your rating",
   "noStorageUsed": "No storage used",
   "aboutReportBug": "Report a bug / Suggest a feature",
   "aboutSupportProject": "Support this project",
   "aboutSupportDescription": "This app is free, open source, and has no ads. If you find it useful, consider supporting the developer.",
-  "luxembourgRegulatedPricesNotice": "Luxembourg fuel prices are government-regulated and uniform nationwide.",
-  "luxembourgFuelUnleaded95": "Unleaded 95",
-  "luxembourgFuelUnleaded98": "Unleaded 98",
-  "luxembourgFuelDiesel": "Diesel",
-  "luxembourgFuelLpg": "LPG",
-  "luxembourgPricesUnavailable": "Luxembourg regulated prices are unavailable.",
   "reportIssueTitle": "Report a problem",
   "enterCorrection": "Please enter the correction",
   "reportNoBackendAvailable": "The report could not be sent: no reporting service is configured for this country. Enable TankSync in Settings to send community reports.",
@@ -1666,10 +1475,6 @@
       }
     }
   },
-  "southKoreaApiKeyRequired": "Register at OPINET to get a free API key",
-  "southKoreaApiProvider": "OPINET (KNOC)",
-  "chileApiKeyRequired": "Register at CNE to get a free API key",
-  "chileApiProvider": "CNE Bencina en Linea",
   "vinConfirmTitle": "Is this your car?",
   "vinConfirmBody": "{year} {make} {model} — {displacement}L, {cylinders}-cyl, {fuel}",
   "@vinConfirmBody": {
@@ -1781,10 +1586,6 @@
   "@alertsRadiusFuelType": {
     "description": "Fuel-type picker label in the radius-alert create sheet (#578)."
   },
-  "alertsRadiusThreshold": "Threshold (€/L)",
-  "@alertsRadiusThreshold": {
-    "description": "Price-threshold field label in the radius-alert create sheet (#578)."
-  },
   "alertsRadiusKm": "Radius (km)",
   "@alertsRadiusKm": {
     "description": "Radius slider label in the radius-alert create sheet (#578)."
@@ -1804,10 +1605,6 @@
   "alertsRadiusCancel": "Cancel",
   "@alertsRadiusCancel": {
     "description": "Cancel button label in the radius-alert create sheet (#578)."
-  },
-  "alertsRadiusDeleteConfirm": "Delete radius alert?",
-  "@alertsRadiusDeleteConfirm": {
-    "description": "Snackbar/confirm text shown when a radius alert is dismissed for deletion (#578)."
   },
   "radiusAlertDeleted": "Radius alert \"{name}\" deleted",
   "@radiusAlertDeleted": {
@@ -1831,30 +1628,6 @@
   "obd2PairChipTooltip": "Pair an OBD2 adapter",
   "@obd2PairChipTooltip": {
     "description": "Tooltip on the title-bar OBD2 chip when no adapter is paired yet — tapping opens the adapter picker so pairing has a discoverable entry point (#1695)."
-  },
-  "velocityAlertTitle": "{fuelLabel} dropped at nearby stations",
-  "@velocityAlertTitle": {
-    "description": "Title of the price-drop velocity notification (#579). Fired when multiple nearby stations drop within the lookback window.",
-    "placeholders": {
-      "fuelLabel": {
-        "type": "String",
-        "example": "E10"
-      }
-    }
-  },
-  "velocityAlertBody": "{stationCount} stations dropped by up to {maxDropCents}¢ in the last hour",
-  "@velocityAlertBody": {
-    "description": "Body of the price-drop velocity notification (#579). Lists the number of affected stations and the largest observed drop in cents.",
-    "placeholders": {
-      "stationCount": {
-        "type": "int",
-        "example": "3"
-      },
-      "maxDropCents": {
-        "type": "int",
-        "example": "5"
-      }
-    }
   },
   "fillUpSavedSnackbar": "Fill-up saved",
   "@fillUpSavedSnackbar": {
@@ -2177,26 +1950,6 @@
   "@approachTestUnavailable": {
     "description": "Caption shown when the test button is disabled because no favorite station is available as a target (#2163)."
   },
-  "approachStationDistance": "{meters} m away",
-  "@approachStationDistance": {
-    "description": "PiP overlay caption (#2084) showing how far the driver is from the in-radius target station, in metres.",
-    "placeholders": {
-      "meters": {
-        "type": "String",
-        "example": "350"
-      }
-    }
-  },
-  "fuelStationRadarDistanceKm": "{km} km away",
-  "@fuelStationRadarDistanceKm": {
-    "description": "Fuel Station Radar caption (#2661) showing how far the driver is from the radar station while still approaching, in kilometres.",
-    "placeholders": {
-      "km": {
-        "type": "String",
-        "example": "2.4"
-      }
-    }
-  },
   "fuelStationRadarProximity": "Proximity {percent}%",
   "@fuelStationRadarProximity": {
     "description": "Accessibility label for the battery-style proximity fill bar (#2661): how close the driver is to the radar station, as a percentage (100% at the station, 0% at the radar radius edge).",
@@ -2308,14 +2061,6 @@
   "@autoRecordSaveDelayLabel": {
     "description": "Label for the slider that controls how long after a Bluetooth disconnect the auto-record path waits before saving the trip."
   },
-  "autoRecordPairedAdapterLabel": "Paired adapter",
-  "@autoRecordPairedAdapterLabel": {
-    "description": "Label for the read-only field showing the MAC address of the OBD2 adapter paired to this vehicle."
-  },
-  "autoRecordPairedAdapterNone": "No adapter paired. Pair one via the OBD2 onboarding first.",
-  "@autoRecordPairedAdapterNone": {
-    "description": "Empty-state text shown when no OBD2 adapter has been paired to this vehicle yet."
-  },
   "autoRecordBackgroundLocationLabel": "Background location allowed",
   "@autoRecordBackgroundLocationLabel": {
     "description": "Label for the read-only field showing whether the user has granted always-on location permission for auto-record."
@@ -2344,17 +2089,9 @@
   "@autoRecordBackgroundLocationRequestFailedSnackbar": {
     "description": "Snackbar shown when the permission request itself threw an exception. Replaces the previous silent debugPrint catch (#1302)."
   },
-  "autoRecordBadgeClearTooltip": "Clear counter",
-  "@autoRecordBadgeClearTooltip": {
-    "description": "Tooltip on the AppBar action that resets the auto-record unseen-trip badge to zero."
-  },
   "autoRecordPairAdapterLinkText": "Pair an adapter in the section below to enable auto-recording",
   "@autoRecordPairAdapterLinkText": {
     "description": "Passive informational link rendered on the auto-record card when no adapter is paired (#1400). Replaces the duplicate orange-tinted 'Pair an adapter' CTA that lived in the auto-record card before #1400; tapping the link scrolls to the canonical 'OBD2 adapter' card below and pulses its border."
-  },
-  "exportBackupTooltip": "Export backup",
-  "@exportBackupTooltip": {
-    "description": "AppBar IconButton tooltip on the consumption screen for the full XML-in-ZIP backup export (#1317)."
   },
   "exportBackupReady": "Backup ready — pick a destination",
   "@exportBackupReady": {
@@ -2377,10 +2114,6 @@
       }
     }
   },
-  "restoreBackupTooltip": "Restore backup",
-  "@restoreBackupTooltip": {
-    "description": "AppBar IconButton tooltip on the consumption screen for the full-backup RESTORE flow (#2571)."
-  },
   "restoreBackupDialogTitle": "Restore backup",
   "@restoreBackupDialogTitle": {
     "description": "Title of the merge-vs-replace confirmation dialog shown after a backup .zip is picked (#2571)."
@@ -2396,15 +2129,6 @@
   "restoreBackupReplaceAction": "Replace all",
   "@restoreBackupReplaceAction": {
     "description": "Destructive action button in the restore dialog: wipe all current data then restore only the backup (#2571)."
-  },
-  "restoreBackupSuccess": "Backup restored — {count} records imported",
-  "@restoreBackupSuccess": {
-    "description": "Success SnackBar after a restore completes with at least one record (#2571).",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
   },
   "restoreBackupEmpty": "Backup restored — it contained no records",
   "@restoreBackupEmpty": {
@@ -2458,10 +2182,6 @@
       }
     }
   },
-  "brokenMapChipVerifying": "MAP sensor verifying…",
-  "@brokenMapChipVerifying": {
-    "description": "Diagnostic-overlay chip shown while the broken-MAP belief is in the 0.4–0.7 confidence band — the app is still gathering observations and not yet ready to warn the user (#1423 phase 5)."
-  },
   "brokenMapChipDisclaimer": "MAP readings suspicious",
   "@brokenMapChipDisclaimer": {
     "description": "Small chip displayed alongside the live fuel-rate metric while the broken-MAP belief sits in the 0.7–0.9 confidence band — the rate continues to be shown but the user is told it may be unreliable (#1423 phase 5)."
@@ -2473,36 +2193,6 @@
   "brokenMapBannerHardDisable": "MAP sensor unreliable. Showing fill-up averages instead of live fuel rate.",
   "@brokenMapBannerHardDisable": {
     "description": "Persistent MaterialBanner shown at the top of the trip-recording screen when the broken-MAP belief is at or above 0.9 — the live fuel-rate display is hard-disabled and the app falls back to per-fill L/100km from receipts (#1423 phase 5)."
-  },
-  "brokenMapOverlayVerified": "MAP sensor: verified ({confidence})",
-  "@brokenMapOverlayVerified": {
-    "description": "Diagnostic-overlay row shown in the OBD2 breadcrumb panel when the broken-MAP belief sits below 0.4 — the sensor has been observed and looks healthy (#1423 phase 5).",
-    "placeholders": {
-      "confidence": {
-        "type": "String",
-        "example": "0.05"
-      }
-    }
-  },
-  "brokenMapOverlayUnverified": "MAP sensor: verifying ({confidence})",
-  "@brokenMapOverlayUnverified": {
-    "description": "Diagnostic-overlay row shown in the OBD2 breadcrumb panel when the broken-MAP belief sits in 0.4–0.7 — the app is still building confidence (#1423 phase 5).",
-    "placeholders": {
-      "confidence": {
-        "type": "String",
-        "example": "0.43"
-      }
-    }
-  },
-  "brokenMapOverlaySuspicious": "MAP sensor: suspicious ({confidence})",
-  "@brokenMapOverlaySuspicious": {
-    "description": "Diagnostic-overlay row shown in the OBD2 breadcrumb panel when the broken-MAP belief sits at or above 0.7 — strong evidence the MAP sensor is broken (#1423 phase 5).",
-    "placeholders": {
-      "confidence": {
-        "type": "String",
-        "example": "0.92"
-      }
-    }
   },
   "brokenMapOverlayPosterior": "MAP sensor: {posterior}% ± {margin}%",
   "@brokenMapOverlayPosterior": {
@@ -2855,10 +2545,6 @@
   "@chargingChartsEmpty": {
     "description": "Empty-state caption shown inside the charging charts when no data is available for the last 6 months (#582 phase 3)."
   },
-  "chargingChartsMonthAxis": "Month",
-  "@chargingChartsMonthAxis": {
-    "description": "Axis label for the X axis (month) on the charging charts (#582 phase 3)."
-  },
   "confirmDeleteTitle": "Delete?",
   "@confirmDeleteTitle": {
     "description": "Title of the shared destructive-action confirmation dialog (#3682) shown before EVERY delete in the app."
@@ -3073,10 +2759,6 @@
   "@fillUpCorrectionStation": {
     "description": "Label for the optional station-name field on the correction fill-up edit sheet (#1361). Synthetic entries have no station by default."
   },
-  "greeceApiProvider": "Paratiritirio Timon (Greece)",
-  "greeceCommunityApiNotice": "Powered by the community-maintained fuelpricesgr API",
-  "romaniaApiProvider": "Monitorul Prețurilor (Romania)",
-  "romaniaScrapingNotice": "Powered by monitorulpreturilor.info (Competition Council + ANPC)",
   "crossBorderCheaper": "{country} stations {km} km away — €{price}/L cheaper",
   "@crossBorderCheaper": {
     "description": "Banner shown when stations across the border are cheaper than local prices.",
@@ -3816,23 +3498,6 @@
   "@ecoNudgeHighRpm": {
     "description": "Live in-trip nudge SnackBar (#3432) after sustained high-RPM steady-speed cruising. Rate-limited to at most one nudge per minute, three per trip."
   },
-  "ecoRouteOption": "Eco",
-  "@ecoRouteOption": {
-    "description": "Label for the eco-routing strategy chip on the route search controls (#1123). Picks routes that minimise fuel rather than time."
-  },
-  "ecoRouteSavings": "≈ {liters} L saved",
-  "@ecoRouteSavings": {
-    "description": "Predicted savings preview shown when the eco-routing strategy is active on the route search controls (#1123). {liters} is the estimated litres saved compared to the fastest route, formatted with one decimal.",
-    "placeholders": {
-      "liters": {
-        "type": "String"
-      }
-    }
-  },
-  "ecoRouteHint": "Smarter drive — favours steady highway over zigzag shortcuts.",
-  "@ecoRouteHint": {
-    "description": "Helper caption shown beneath the eco-routing chip explaining why the user might pick it (#1123). Keep concise; the leitmotiv 'Smarter pump. Smarter drive.' should remain recognisable."
-  },
   "obd2CoverageNoneNote": "No engine data arrived from the OBD2 adapter on this trip — fuel figures are GPS-based estimates.",
   "@obd2CoverageNoneNote": {
     "description": "Trip-detail note (#3499, epic #3498) shown on a gpsPlusObd2 trip whose samples carried ZERO engine PIDs: the adapter session never delivered engine data (drop at start, silent ECU, no supported PIDs), so the fuel chart/figures silently fell back to the GPS-physics estimate. This makes that fallback honest instead of unexplained."
@@ -3927,14 +3592,6 @@
   "featureDescription_baselineSync": "Sync driving baselines via TankSync.",
   "@featureDescription_baselineSync": {
     "description": "One-line description for the baseline sync feature."
-  },
-  "featureLabel_unifiedSearchResults": "Unified search results",
-  "@featureLabel_unifiedSearchResults": {
-    "description": "Display name for the unified fuel + EV search results feature in the Feature management list."
-  },
-  "featureDescription_unifiedSearchResults": "Single result list combining fuel and EV stations.",
-  "@featureDescription_unifiedSearchResults": {
-    "description": "One-line description for the unified search results feature."
   },
   "featureLabel_priceAlerts": "Price alerts",
   "@featureLabel_priceAlerts": {
@@ -4043,14 +3700,6 @@
   "featureBlockedEnable_autoRecord": "Enable OBD2 trip recording first",
   "@featureBlockedEnable_autoRecord": {
     "description": "Tooltip shown on the disabled master auto-record toggle when its prerequisite (OBD2 trip recording) is off."
-  },
-  "featureBlockedEnable_showFuel": "Prerequisites not met",
-  "@featureBlockedEnable_showFuel": {
-    "description": "Tooltip shown on the disabled show-fuel-stations toggle. The feature has no prerequisites today so this string is a defensive fallback for the dependency-graph helpers."
-  },
-  "featureBlockedEnable_showElectric": "Prerequisites not met",
-  "@featureBlockedEnable_showElectric": {
-    "description": "Tooltip shown on the disabled show-EV-charging-stations toggle. The feature has no prerequisites today so this string is a defensive fallback for the dependency-graph helpers."
   },
   "featureBlockedEnable_showConsumptionTab": "Enable OBD2 trip recording first",
   "@featureBlockedEnable_showConsumptionTab": {
@@ -4501,10 +4150,6 @@
       }
     }
   },
-  "scanPumpUnreadable": "Pump display not readable — try again",
-  "@scanPumpUnreadable": {
-    "description": "Snackbar shown on the Add-Fill-Up screen when the pump-display scan returns no usable fields (#751)."
-  },
   "scanPumpSuccess": "Pump display scanned — verify the values.",
   "@scanPumpSuccess": {
     "description": "Snackbar shown after a successful pump-display scan (#751)."
@@ -4525,10 +4170,6 @@
         "type": "String"
       }
     }
-  },
-  "badScanReportTitle": "Report a scan error",
-  "@badScanReportTitle": {
-    "description": "Title of the bottom sheet that reports an incorrect receipt scan (#751)."
   },
   "badScanReportTitleReceipt": "Report a scan error — Receipt",
   "@badScanReportTitleReceipt": {
@@ -4562,10 +4203,6 @@
   "@badScanReportHint": {
     "description": "Subtitle under the bad-scan-report sheet title (#751)."
   },
-  "badScanReportShareAction": "Share report + photo",
-  "@badScanReportShareAction": {
-    "description": "Button on the bad-scan-report sheet that triggers the system share intent (#751)."
-  },
   "badScanReportFieldBrandLayout": "Brand layout",
   "badScanReportFieldTotal": "Total",
   "badScanReportFieldPricePerLiter": "Price/L",
@@ -4586,10 +4223,6 @@
   "badScanReportFallbackToShare": "Submission failed — manual share",
   "@badScanReportFallbackToShare": {
     "description": "Snackbar shown when the GitHub submission fails and we fall back to the system share sheet (#952 phase 2)."
-  },
-  "pumpCameraHint": "Line up the three pump-display numbers inside the frame",
-  "@pumpCameraHint": {
-    "description": "Hint shown over the in-app camera reticle for the pump-display capture (#1868)."
   },
   "pumpCameraCapture": "Capture",
   "@pumpCameraCapture": {
@@ -4675,45 +4308,17 @@
   "@fillUpSectionWhereSubtitle": {
     "description": "Sub-title for the 'Where you were' card (#751 phase 2)."
   },
-  "fillUpImportFromLabel": "Import from…",
-  "@fillUpImportFromLabel": {
-    "description": "Chip label that opens the import bottom sheet with receipt / pump / OBD-II options (#751 phase 2)."
-  },
-  "fillUpImportSheetTitle": "Import fill-up data",
-  "@fillUpImportSheetTitle": {
-    "description": "Bottom-sheet title for the import-from chooser (#751 phase 2)."
-  },
   "fillUpImportReceiptLabel": "Receipt",
   "@fillUpImportReceiptLabel": {
     "description": "Import option: OCR-scan a paper receipt (#751 phase 2)."
-  },
-  "fillUpImportReceiptDescription": "Scan a paper receipt with the camera",
-  "@fillUpImportReceiptDescription": {
-    "description": "Subtitle for the receipt-scan import option (#751 phase 2)."
   },
   "fillUpImportPumpLabel": "Pump display",
   "@fillUpImportPumpLabel": {
     "description": "Import option: OCR-scan the fuel-pump LCD (#751 phase 2)."
   },
-  "fillUpImportPumpDescription": "Read Betrag / Preis from the pump LCD",
-  "@fillUpImportPumpDescription": {
-    "description": "Subtitle for the pump-display import option (#751 phase 2)."
-  },
-  "fillUpImportObdLabel": "OBD-II adapter",
-  "@fillUpImportObdLabel": {
-    "description": "Import option: pull the odometer reading via OBD-II Bluetooth (#751 phase 2)."
-  },
-  "fillUpImportObdDescription": "Read odometer from the OBD-II port over Bluetooth",
-  "@fillUpImportObdDescription": {
-    "description": "Subtitle for the OBD-II import option (#751 phase 2)."
-  },
   "fillUpPricePerLiterLabel": "Price per liter",
   "@fillUpPricePerLiterLabel": {
     "description": "Read-only derived value shown below the cost field when liters + cost are both entered (#751 phase 2)."
-  },
-  "vehicleHeaderPlateLabel": "Plate",
-  "@vehicleHeaderPlateLabel": {
-    "description": "Tiny chip label shown next to the big vehicle title on the edit screen header (#751 phase 2)."
   },
   "vehicleHeaderUntitled": "New vehicle",
   "@vehicleHeaderUntitled": {
@@ -4802,16 +4407,6 @@
       "count": {
         "type": "int",
         "example": "3"
-      }
-    }
-  },
-  "fuelEfficiencyMixedFootnote": "{count, plural, =1{1 mixed tank counted toward its main fuel} other{{count} mixed tanks counted toward their main fuel}}",
-  "@fuelEfficiencyMixedFootnote": {
-    "description": "Transparency footnote on the per-fuel efficiency card, disclosing how many tanks contained more than one fuel and were each attributed whole to their dominant fuel (#2887, ADR 0014).",
-    "placeholders": {
-      "count": {
-        "type": "int",
-        "example": "1"
       }
     }
   },
@@ -5149,10 +4744,6 @@
   "@gpsRoadUseSource": {
     "description": "Footnote on the road-use panel (#2796) clarifying the shares come from the GPS speed/position track (no OBD2 dongle needed)."
   },
-  "hapticEcoCoachSectionTitle": "Driving",
-  "@hapticEcoCoachSectionTitle": {
-    "description": "Section header on the Settings screen grouping wheel-lens (driving-behaviour) settings (#1122)."
-  },
   "hapticEcoCoachSettingTitle": "Real-time eco coaching",
   "@hapticEcoCoachSettingTitle": {
     "description": "Title of the haptic-eco-coach toggle on the Settings screen (#1122)."
@@ -5387,9 +4978,6 @@
   "calculatorDistanceHint": "e.g. 150",
   "calculatorConsumptionHint": "e.g. 7.0",
   "calculatorPriceHint": "e.g. 1.899",
-  "routeStrategyLabel": "Strategy:",
-  "routeStrategyUniform": "Uniform",
-  "routeStrategyBalanced": "Balanced",
   "glideCoachBetaTitle": "Glide-coach beta (experimental)",
   "glideCoachBetaSubtitle": "Subtle haptic when slowing down ahead of a red light. Off by default — distraction risk.",
   "consentSyncTripsTitle": "Sync trip recordings",
@@ -5962,10 +5550,6 @@
   "@obd2DiagnosticsInitCold": {
     "description": "Word for a cold (full-handshake) adapter start in the init-transcript header on the OBD2 diagnostics card (#2511)."
   },
-  "obd2HealthCopyInitTranscript": "Copy init transcript only",
-  "@obd2HealthCopyInitTranscript": {
-    "description": "Label for the action on the dev-tools OBD2 communication-health screen (#2511) that copies only the dongle-init handshake (adapter identity + init transcript + supported PIDs) to the clipboard as JSON, without the full per-PID/session payload."
-  },
   "obd2DiagnosticsEmpty": "No OBD2 session recorded yet — connect an adapter and record a trip with Developer mode on.",
   "@obd2DiagnosticsEmpty": {
     "description": "Empty-state line on the OBD2 diagnostics card / screen (#2470/#2471) shown when Developer mode is off or no diagnostics session has been captured yet."
@@ -5989,14 +5573,6 @@
   "obd2HealthHistorySection": "Recent sessions",
   "@obd2HealthHistorySection": {
     "description": "Section header above the capped ring of finished OBD2 session diagnostics on the OBD2 communication-health screen (#2471)."
-  },
-  "obd2HealthCopyJson": "Copy as JSON",
-  "@obd2HealthCopyJson": {
-    "description": "Label for the action that copies the OBD2 session diagnostics (per-PID table + counters) to the clipboard as JSON, on the OBD2 communication-health screen (#2471)."
-  },
-  "obd2HealthCopied": "OBD2 diagnostics copied to clipboard.",
-  "@obd2HealthCopied": {
-    "description": "Confirmation snackbar after the OBD2 communication-health screen copies the session diagnostics JSON to the clipboard (#2471)."
   },
   "obd2HealthDownloadJson": "Download as JSON",
   "@obd2HealthDownloadJson": {
@@ -6323,10 +5899,6 @@
   "@ocrTesterRunning": {
     "description": "Progress label shown while the OCR pipeline runs on the selected image in the tester (#2518)."
   },
-  "ocrTesterNoResult": "OCR produced no readable result.",
-  "@ocrTesterNoResult": {
-    "description": "Shown on the OCR tester when the pipeline returned no result (e.g. the user cancelled the camera or OCR read nothing) (#2518)."
-  },
   "ocrTesterOverlaySection": "Block overlay",
   "@ocrTesterOverlaySection": {
     "description": "Section header above the ML Kit block overlay (the image with classified boxes) on the OCR tester (#2518)."
@@ -6470,10 +6042,6 @@
   "onboardingObd2ReadingVin": "Reading VIN…",
   "@onboardingObd2ReadingVin": {
     "description": "Spinner label shown while the app reads the VIN from the connected OBD2 adapter (#816)."
-  },
-  "onboardingObd2VinReadFailed": "Couldn't read VIN — enter manually",
-  "@onboardingObd2VinReadFailed": {
-    "description": "Banner shown on the next manual vehicle step when the OBD2 adapter connected but the VIN could not be read (#816)."
   },
   "onboardingObd2ConnectFailed": "Couldn't connect to the adapter. You can retry or skip.",
   "onboardingPickUseMode": "Pick a use mode to continue.",
@@ -6741,34 +6309,6 @@
   "@radiusAlertCenterFromMap": {
     "description": "Label shown in the create sheet after a location has been picked on the map, distinguishing it from a GPS or postal-code center (#578 phase 3)."
   },
-  "radiusAlertNotificationTitle": "{fuelLabel} near {label}",
-  "@radiusAlertNotificationTitle": {
-    "description": "Background notification title when a station in the radius drops to the alert threshold (#578 phase 3).",
-    "placeholders": {
-      "fuelLabel": {
-        "type": "String",
-        "example": "DIESEL"
-      },
-      "label": {
-        "type": "String",
-        "example": "Home"
-      }
-    }
-  },
-  "radiusAlertNotificationBody": "A station is at {price} € (target: {threshold} €)",
-  "@radiusAlertNotificationBody": {
-    "description": "Background notification body with the observed price and the user's threshold (#578 phase 3).",
-    "placeholders": {
-      "price": {
-        "type": "String",
-        "example": "1.559"
-      },
-      "threshold": {
-        "type": "String",
-        "example": "1.600"
-      }
-    }
-  },
   "reconcileWorkflowTitle": "Reconcile your fuel",
   "@reconcileWorkflowTitle": {
     "description": "Title of the guided reconciliation workflow dialog raised after a full-tank fill-up when recorded trips don't account for all the pumped fuel (#2442)."
@@ -6886,10 +6426,6 @@
   "@reconcileResolveGapSemanticLabel": {
     "description": "Accessibility label for the tappable 'Resolve gap' banner on the consumption stats card (#2445)."
   },
-  "refuelUnitPerLiter": "/L",
-  "@refuelUnitPerLiter": {
-    "description": "Trailing unit suffix on a fuel-pump price in the unified RefuelOptionCard (#1116 phase 3b). Renders below the numeric price (e.g. \"1,799\" + \"/L\" → \"1,799 /L\")."
-  },
   "refuelUnitPerKwh": "/kWh",
   "@refuelUnitPerKwh": {
     "description": "Trailing unit suffix on an EV charging price in the unified RefuelOptionCard (#1116 phase 3b)."
@@ -6897,10 +6433,6 @@
   "refuelUnitPerSession": "/session",
   "@refuelUnitPerSession": {
     "description": "Trailing unit suffix when an EV network bills a flat per-session price instead of per-kWh in the unified RefuelOptionCard (#1116 phase 3b)."
-  },
-  "shareReceiptImporting": "Importing shared receipt…",
-  "@shareReceiptImporting": {
-    "description": "Shown briefly while an inbound shared receipt image is being OCR'd on the Add fill-up screen (#2735)."
   },
   "shareReceiptUnsupportedFormat": "That file type can't be imported yet — share a photo of the receipt instead.",
   "@shareReceiptUnsupportedFormat": {
@@ -7124,18 +6656,6 @@
         "type": "String"
       }
     }
-  },
-  "tankLevelMethodObd2": "OBD2 measured",
-  "@tankLevelMethodObd2": {
-    "description": "Method label appended to the tank-level caption when every trip since the last fill-up carried a measured OBD2 fuel-rate value (#1195)."
-  },
-  "tankLevelMethodDistanceFallback": "distance-based estimate",
-  "@tankLevelMethodDistanceFallback": {
-    "description": "Method label appended to the tank-level caption when no OBD2 fuel measurement was available and consumption was estimated from distance × avg L/100 km (#1195)."
-  },
-  "tankLevelMethodMixed": "mixed measurement",
-  "@tankLevelMethodMixed": {
-    "description": "Method label appended to the tank-level caption when some trips used OBD2 and some used the distance-based fallback (#1195)."
   },
   "tankLevelEmptyNoFillUp": "Log a fill-up to see your tank level",
   "@tankLevelEmptyNoFillUp": {
@@ -7561,10 +7081,6 @@
   "@trajetDetailChartAltitudeRelative": {
     "description": "Trip-detail chart section title (#3502): the altitude profile is plotted RELATIVE to the trip start, because raw GPS altitude is the WGS84 ellipsoid height on Android (no geoid correction) and routinely reads below sea level near a coast. 'from start' tells the user the 0 line is where they departed."
   },
-  "trajetDetailChartAltitude": "Altitude (m)",
-  "@trajetDetailChartAltitude": {
-    "description": "Section title above the GPS-altitude-over-time chart on the Trip detail screen (#2461). Hidden when no sample carries an altitude value (GPS path off / no fix)."
-  },
   "trajetDetailChartLambda": "Commanded λ",
   "@trajetDetailChartLambda": {
     "description": "Section title above the commanded-lambda-over-time chart on the Trip detail screen (#2461). Lambda is the commanded equivalence ratio (PID 0x44); values below 1 mean an enriched mixture. The Greek letter lambda is a universal automotive symbol — kept untranslated. Hidden when no sample carries a lambda value."
@@ -7641,10 +7157,6 @@
   "trajetDetailDeleteConfirmBody": "This trip will be permanently removed from your history.",
   "@trajetDetailDeleteConfirmBody": {
     "description": "Body of the confirmation dialog before deleting a trip on the Trip detail screen (#890)."
-  },
-  "trajetDetailDeleteConfirmCancel": "Cancel",
-  "@trajetDetailDeleteConfirmCancel": {
-    "description": "Cancel button label on the delete-trip confirmation dialog (#890)."
   },
   "trajetDetailDeleteConfirmConfirm": "Delete",
   "@trajetDetailDeleteConfirmConfirm": {
@@ -7723,10 +7235,6 @@
   "@tripPathCardSubtitle": {
     "description": "Sub-line beneath the trip-path card title clarifying that the polyline comes from the GPS samples captured during the trip."
   },
-  "tripPathLegendTitle": "Consumption",
-  "@tripPathLegendTitle": {
-    "description": "Header label above the trip-path heatmap legend (#1374 phase 3) — names the metric the colour coding represents."
-  },
   "tripPathLegendEfficient": "Efficient (< 6 L/100km)",
   "@tripPathLegendEfficient": {
     "description": "Legend entry for the green heatmap bucket on the trip-path card (#1374 phase 3): segments where computed L/100 km is below 6."
@@ -7771,10 +7279,6 @@
   "@fuelStationRadarResultBadge": {
     "description": "Label of the grey summary-bar chip shown above the results list while the on-search Fuel Station Radar owns the results, replacing the radius chip to signal the list is a radar scan rather than a regular search (#2676)."
   },
-  "radarAcquiringLocation": "Finding your location…",
-  "@radarAcquiringLocation": {
-    "description": "Status shown while the on-search Fuel Station Radar acquires the first GPS fix and has no last-known position to scan around yet (#3267)."
-  },
   "radarUpdatingLocation": "Updating your location…",
   "@radarUpdatingLocation": {
     "description": "Status banner shown above the on-search Fuel Station Radar results while a fresh GPS fix is still resolving — the list is painted from the last-known position and refreshes once the live fix lands (#3267)."
@@ -7814,10 +7318,6 @@
   "tripRecordingResumeHintMessage": "Recording continues in the background. Tap the red banner at the top of any screen to return.",
   "@tripRecordingResumeHintMessage": {
     "description": "One-time tooltip shown the first time the user backs out of the recording screen while a trip is still recording (#1273). Tells them they can tap the persistent banner to return. Persisted dismissal — never fires twice."
-  },
-  "tripBannerOpenFromConsumptionTab": "Open the active trip from the Conso tab",
-  "@tripBannerOpenFromConsumptionTab": {
-    "description": "Snackbar shown when the user taps the trip-recording banner on a screen whose context is above the GoRouter ancestor (#1322). Falls back from a navigation push to a hint pointing the user at the consumption tab."
   },
   "tripRecordingUnpinnedWarning": "Pin the screen to keep GPS active during the trip — Android may throttle GPS during sleep.",
   "@tripRecordingUnpinnedWarning": {
@@ -7962,22 +7462,6 @@
   "trajetDeletedUndoSnackbar": "Recording deleted",
   "@trajetDeletedUndoSnackbar": {
     "description": "Undo snackbar shown after a trip recording is deleted (trip detail screen or the virtual-trajet sheet, #3664). The trailing Undo action restores it within the 10 s window."
-  },
-  "unifiedFilterFuel": "Fuel",
-  "@unifiedFilterFuel": {
-    "description": "Filter chip label that narrows the unified search list to fuel pumps only (#1116 phase 3c)."
-  },
-  "unifiedFilterEv": "EV",
-  "@unifiedFilterEv": {
-    "description": "Filter chip label that narrows the unified search list to EV chargers only (#1116 phase 3c)."
-  },
-  "unifiedFilterBoth": "Both",
-  "@unifiedFilterBoth": {
-    "description": "Filter chip label that shows fuel pumps and EV chargers together in the unified search list (default selection, #1116 phase 3c)."
-  },
-  "unifiedNoResultsForFilter": "No results match this filter",
-  "@unifiedNoResultsForFilter": {
-    "description": "Empty-state placeholder shown in the unified search list when the active filter (Fuel / EV / Both) leaves zero options (#1116 phase 3c)."
   },
   "searchFailedSnackbar": "Search failed — please try again",
   "@searchFailedSnackbar": {
@@ -8180,10 +7664,6 @@
   "@gdprVinOnlineDecodeDescription": {
     "description": "GDPR consent toggle — full description used on the first-launch consent screen (#1399). Mentions exactly what is sent (the VIN) and what is NOT sent (anything else) so the user can give informed consent."
   },
-  "vehicleDetectedFromVinBadge": "(detected)",
-  "@vehicleDetectedFromVinBadge": {
-    "description": "Short badge shown next to a vehicle profile field (make, model, year, etc.) whose value matches the VIN-decoded value, to signal the field was auto-populated rather than typed by the user (#1399)."
-  },
   "vehicleDetectedFromVinSnackbar": "Detected from VIN: {summary}. Apply?",
   "@vehicleDetectedFromVinSnackbar": {
     "description": "Snackbar shown when the VIN-decoded values differ from values the user has already entered, offering to apply the detected values without silently overwriting (#1399).",
@@ -8287,9 +7767,5 @@
   "widgetVariantPredictive": "Predictive: best time to fill",
   "@widgetVariantPredictive": {
     "description": "Label for the predictive home-widget content variant — adds a best-time-to-fill nudge under each row (#1121)."
-  },
-  "widgetPredictiveNowPrefix": "now",
-  "@widgetPredictiveNowPrefix": {
-    "description": "One-word prefix shown before the current price on the predictive widget line, e.g. 'now €1.84/L' (#1121)."
   }
 }

@@ -12,11 +12,8 @@
   "fuelType": "Καύσιμο",
   "searchRadius": "Ακτίνα",
   "searchNearby": "Κοντινά βενζινάδικα",
-  "searchButton": "Αναζήτηση",
   "searchCriteriaTitle": "Κριτήρια αναζήτησης",
-  "searchCriteriaOpen": "Αναζήτηση",
   "searchCriteriaRadiusBadge": "Εντός {km} km",
-  "searchCriteriaTapToSearch": "Πατήστε για αναζήτηση",
   "noResults": "Δεν βρέθηκαν βενζινάδικα.",
   "startSearch": "Αναζητήστε για να βρείτε βενζινάδικα.",
   "open": "Ανοιχτό",
@@ -30,7 +27,6 @@
   "navigate": "Πλοήγηση",
   "retry": "Δοκιμάστε ξανά",
   "apiKeySetup": "Κλειδί API",
-  "apiKeyDescription": "Εγγραφείτε μία φορά για δωρεάν κλειδί API.",
   "apiKeyLabel": "Κλειδί API",
   "register": "Εγγραφή",
   "continueButton": "Συνέχεια",
@@ -64,33 +60,12 @@
   "noFavoritesHint": "Πατήστε το αστέρι σε ένα βενζινάδικο για να το αποθηκεύσετε στα αγαπημένα.",
   "language": "Γλώσσα",
   "country": "Χώρα",
-  "demoMode": "Λειτουργία επίδειξης — δείγματα δεδομένων.",
-  "setupLiveData": "Ρύθμιση για ζωντανά δεδομένα",
   "freeNoKey": "Δωρεάν — δεν χρειάζεται κλειδί",
   "apiKeyRequired": "Απαιτείται κλειδί API",
-  "skipWithoutKey": "Συνέχεια χωρίς κλειδί",
   "dataTransparency": "Διαφάνεια δεδομένων",
   "storageAndCache": "Αποθήκευση και προσωρινή μνήμη",
   "clearCache": "Εκκαθάριση προσωρινής μνήμης",
-  "clearAllData": "Διαγραφή όλων των δεδομένων",
-  "errorLog": "Αρχείο σφαλμάτων",
   "stationsFound": "Βρέθηκαν {count} βενζινάδικα",
-  "whatIsShared": "Τι κοινοποιείται — και σε ποιον;",
-  "gpsCoordinates": "Συντεταγμένες GPS",
-  "gpsReason": "Αποστέλλονται με κάθε αναζήτηση για εύρεση κοντινών σταθμών.",
-  "postalCodeData": "Ταχυδρομικός κώδικας",
-  "postalReason": "Μετατρέπεται σε συντεταγμένες μέσω υπηρεσίας γεωκωδικοποίησης.",
-  "mapViewport": "Προβολή χάρτη",
-  "mapReason": "Τα πλακίδια χάρτη φορτώνονται από τον διακομιστή. Δεν μεταδίδονται προσωπικά δεδομένα.",
-  "apiKeyData": "Κλειδί API",
-  "apiKeyReason": "Το προσωπικό σας κλειδί αποστέλλεται με κάθε αίτημα API. Συνδέεται με το e-mail σας.",
-  "notShared": "ΔΕΝ κοινοποιείται:",
-  "searchHistory": "Ιστορικό αναζήτησης",
-  "favoritesData": "Αγαπημένα",
-  "profileNames": "Ονόματα προφίλ",
-  "homeZipData": "Τ.Κ. κατοικίας",
-  "usageData": "Δεδομένα χρήσης",
-  "privacyBanner": "Αυτή η εφαρμογή δεν έχει διακομιστή. Όλα τα δεδομένα παραμένουν στη συσκευή σας. Χωρίς αναλύσεις, παρακολούθηση ή διαφημίσεις.",
   "storageUsage": "Χρήση αποθηκευτικού χώρου σε αυτή τη συσκευή",
   "settingsLabel": "Ρυθμίσεις",
   "profilesStored": "αποθηκευμένα προφίλ",
@@ -116,12 +91,8 @@
   "deleteAllButton": "Διαγραφή όλων",
   "entries": "εγγραφές",
   "cacheEmpty": "Η προσωρινή μνήμη είναι κενή",
-  "noStorage": "Χωρίς χρησιμοποιούμενο χώρο",
   "apiKeyNote": "Δωρεάν εγγραφή. Δεδομένα από κρατικούς φορείς διαφάνειας τιμών.",
   "apiKeyFormatError": "Μη έγκυρη μορφή — αναμενόμενο UUID (8-4-4-4-12)",
-  "supportProject": "Υποστηρίξτε αυτό το έργο",
-  "supportDescription": "Αυτή η εφαρμογή είναι δωρεάν, ανοιχτού κώδικα και χωρίς διαφημίσεις. Αν τη βρίσκετε χρήσιμη, σκεφτείτε να υποστηρίξετε τον προγραμματιστή.",
-  "reportBug": "Αναφορά σφάλματος / Πρόταση λειτουργίας",
   "reportThisIssue": "Αναφορά προβλήματος",
   "reportAlreadySent": "Έχετε ήδη αναφέρει αυτό το πρόβλημα.",
   "reportConsentTitle": "Αναφορά στο GitHub;",
@@ -136,7 +107,6 @@
   "configApiKeysSection": "Κλειδιά API",
   "configTankerkoenigKey": "Κλειδί API Tankerkoenig",
   "configApiKeyConfigured": "Ρυθμισμένο",
-  "configApiKeyNotSet": "Μη ορισμένο (λειτουργία επίδειξης)",
   "configApiKeyCommunity": "Προεπιλογή (κοινοτικό κλειδί)",
   "searchLocationPlaceholder": "Διεύθυνση, ταχυδρομικός κώδικας ή πόλη",
   "configEvKey": "Κλειδί API φόρτισης EV",
@@ -174,8 +144,6 @@
   "sortPriceDistance": "Τιμή/km",
   "cheap": "φθηνό",
   "expensive": "ακριβό",
-  "stationsOnMap": "{count} σταθμοί",
-  "loadingFavorites": "Φόρτωση αγαπημένων...\nΑναζητήστε πρώτα σταθμούς για αποθήκευση δεδομένων.",
   "reportPrice": "Αναφορά τιμής",
   "whatsWrong": "Τι δεν πάει καλά;",
   "correctPrice": "Σωστή τιμή (π.χ. 1,459)",
@@ -185,7 +153,6 @@
   "cacheCleared": "Η προσωρινή μνήμη εκκαθαρίστηκε.",
   "yourPosition": "Η θέση σας",
   "positionUnknown": "Θέση άγνωστη",
-  "routeModeBannerLabel": "Λειτουργία διαδρομής — οι αποστάσεις είναι κατά μήκος του διαδρόμου",
   "distancesFromCenter": "Αποστάσεις από το κέντρο αναζήτησης",
   "autoUpdatePosition": "Αυτόματη ενημέρωση θέσης",
   "autoUpdateDescription": "Ενημέρωση θέσης GPS πριν από κάθε αναζήτηση",
@@ -220,8 +187,6 @@
   "wrongDieselPrice": "Λανθασμένη τιμή Diesel",
   "wrongStatusOpen": "Εμφανίζεται ανοιχτό, αλλά είναι κλειστό",
   "wrongStatusClosed": "Εμφανίζεται κλειστό, αλλά είναι ανοιχτό",
-  "searchAlongRouteLabel": "Κατά μήκος της διαδρομής",
-  "searchEvStations": "Αναζήτηση σταθμών φόρτισης",
   "allStations": "Όλοι οι σταθμοί",
   "bestStops": "Καλύτερες στάσεις",
   "openInMaps": "Άνοιγμα στους Χάρτες",
@@ -253,7 +218,6 @@
   "cityOrAddress": "Πόλη ή διεύθυνση",
   "useGps": "Χρήση GPS",
   "stop": "Στάση",
-  "stopN": "Στάση {n}",
   "addStop": "Προσθήκη στάσης",
   "searchAlongRoute": "Αναζήτηση κατά μήκος διαδρομής",
   "cheapest": "Φθηνότερο",
@@ -265,10 +229,8 @@
   "customKey": "Προσαρμοσμένο κλειδί",
   "appDefaultKey": "Προεπιλεγμένο κλειδί εφαρμογής",
   "optionalOverrideKey": "Προαιρετικό: αντικατάσταση του ενσωματωμένου κλειδιού με το δικό σας",
-  "requiredForEvSearch": "Απαιτείται για αναζήτηση σταθμών φόρτισης EV",
   "edit": "Επεξεργασία",
   "fuelPricesApiKey": "Κλειδί API τιμών καυσίμων",
-  "tankerkoenigApiKey": "Κλειδί API Tankerkoenig",
   "evChargingApiKey": "Κλειδί API φόρτισης EV",
   "openChargeMapApiKey": "Κλειδί API OpenChargeMap",
   "routePlanningSection": "Σχεδιασμός διαδρομής",
@@ -303,18 +265,14 @@
   "noStationsAlongThisRoute": "Δεν βρέθηκαν σταθμοί κατά μήκος αυτής της διαδρομής.",
   "fuelCostCalculator": "Υπολογιστής κόστους καυσίμου",
   "distanceKm": "Απόσταση (χλμ)",
-  "consumptionL100km": "Κατανάλωση (L/100χλμ)",
-  "fuelPriceEurL": "Τιμή καυσίμου (EUR/L)",
   "tripCost": "Κόστος ταξιδιού",
   "fuelNeeded": "Απαιτούμενο καύσιμο",
   "totalCost": "Συνολικό κόστος",
-  "enterCalcValues": "Εισάγετε απόσταση, κατανάλωση και τιμή για υπολογισμό κόστους ταξιδιού",
   "priceHistory": "Ιστορικό τιμών",
   "ignoredStationsLabel": "Παραβλέφθηκαν",
   "ratingsLabel": "Βαθμολογίες",
   "favoritesDataCache": "Δεδομένα αγαπημένων",
   "citySearchCache": "Αναζήτηση πόλης",
-  "dataDeletionNotAvailableCommunity": "Η διαγραφή δεδομένων δεν είναι διαθέσιμη στη λειτουργία Κοινότητας. Αποσυνδεθείτε πρώτα ή χρησιμοποιήστε μια ιδιωτική βάση δεδομένων.",
   "priceHistoryStationsTracked": "{count} σταθμοί που παρακολουθούνται",
   "@priceHistoryStationsTracked": {
     "placeholders": {
@@ -348,22 +306,11 @@
     }
   },
   "noPriceHistory": "Δεν υπάρχει ακόμη ιστορικό τιμών",
-  "noHourlyData": "Χωρίς ωριαία δεδομένα",
   "noStatistics": "Δεν υπάρχουν διαθέσιμα στατιστικά",
-  "statMin": "Ελάχ",
-  "statMax": "Μέγ",
-  "statAvg": "Μέσ",
   "showAllFuelTypes": "Εμφάνιση όλων των τύπων καυσίμου",
   "connected": "Συνδεδεμένο",
-  "notConnected": "Μη συνδεδεμένο",
-  "connectTankSync": "Σύνδεση TankSync",
   "disconnectTankSync": "Αποσύνδεση TankSync",
   "viewMyData": "Προβολή δεδομένων μου",
-  "optionalCloudSync": "Προαιρετικός συγχρονισμός cloud για ειδοποιήσεις, αγαπημένα και push ειδοποιήσεις",
-  "tapToUpdateGps": "Πατήστε για ενημέρωση θέσης GPS",
-  "gpsAutoUpdateHint": "Η θέση GPS αποκτάται αυτόματα κατά την αναζήτηση. Μπορείτε επίσης να την ενημερώσετε χειροκίνητα εδώ.",
-  "clearGpsConfirm": "Διαγραφή αποθηκευμένης θέσης GPS; Μπορείτε να την ενημερώσετε ξανά ανά πάσα στιγμή.",
-  "pageNotFound": "Η σελίδα δεν βρέθηκε",
   "deleteAllServerData": "Διαγραφή όλων των δεδομένων διακομιστή",
   "deleteServerDataConfirm": "Διαγραφή όλων των δεδομένων διακομιστή;",
   "deleteEverything": "Διαγραφή όλων",
@@ -373,7 +320,6 @@
   "forgetAllSyncedTripsConfirmBody": "Κάθε σύνοψη διαδρομής και αναλυτικά δεδομένα θα αφαιρεθούν από τον διακομιστή. Το τοπικό ιστορικό διαδρομών σε αυτή τη συσκευή δεν θα επηρεαστεί.\n\nΑυτή η ενέργεια δεν μπορεί να αναιρεθεί.",
   "forgetAllSyncedTripsConfirmAction": "Διαγραφή όλων",
   "forgetAllSyncedTripsSuccess": "Όλες οι συγχρονισμένες διαδρομές αφαιρέθηκαν από τον διακομιστή",
-  "disconnectConfirm": "Αποσύνδεση TankSync;",
   "disconnect": "Αποσύνδεση",
   "myServerData": "Τα δεδομένα μου στον διακομιστή",
   "anonymousUuid": "Ανώνυμο UUID",
@@ -393,7 +339,6 @@
   "continueAsGuest": "Συνέχεια ως επισκέπτης",
   "createAccount": "Δημιουργία λογαριασμού",
   "signIn": "Σύνδεση",
-  "upgradeToEmail": "Δημιουργία λογαριασμού email",
   "savedRoutes": "Αποθηκευμένες διαδρομές",
   "noSavedRoutes": "Δεν υπάρχουν αποθηκευμένες διαδρομές",
   "noSavedRoutesHint": "Αναζητήστε κατά μήκος μιας διαδρομής και αποθηκεύστε την για γρήγορη πρόσβαση αργότερα.",
@@ -424,11 +369,6 @@
   "onboardingNext": "Επόμενο",
   "onboardingSkip": "Παράλειψη",
   "onboardingFinish": "Ξεκινήστε",
-  "crossBorderNearby": "Η {country} είναι κοντά",
-  "crossBorderDistance": "~{km} km στα σύνορα",
-  "crossBorderAvgPrice": "Μέση τιμή εδώ: {price} EUR ({count} σταθμοί)",
-  "allPricesView": "Όλες οι τιμές",
-  "compactView": "Συμπαγής",
   "switchToAllPricesView": "Εναλλαγή στην προβολή όλων των τιμών",
   "switchToCompactView": "Εναλλαγή στη συμπαγή προβολή",
   "unavailable": "Μ/Δ",
@@ -453,10 +393,6 @@
   "accountDeleted": "Ο λογαριασμός διαγράφηκε. Τα τοπικά δεδομένα διατηρήθηκαν.",
   "switchedToAnonymous": "Μετάβαση σε ανώνυμη σύνδεση",
   "failedToSwitch": "Αποτυχία εναλλαγής: {error}",
-  "topicUrlCopied": "URL θέματος αντιγράφηκε",
-  "testNotificationSent": "Δοκιμαστική ειδοποίηση στάλθηκε!",
-  "testNotificationFailed": "Αποτυχία αποστολής δοκιμαστικής ειδοποίησης",
-  "pushUpdateFailed": "Αποτυχία ενημέρωσης ρύθμισης push ειδοποιήσεων",
   "connectedAsGuest": "Συνδεδεμένος ως επισκέπτης",
   "accountCreated": "Ο λογαριασμός δημιουργήθηκε!",
   "signedIn": "Συνδεθήκατε!",
@@ -518,7 +454,6 @@
   "privacyClearErrorLog": "Εκκαθάριση αρχείου σφαλμάτων",
   "privacyErrorLogCleared": "Το αρχείο σφαλμάτων εκκαθαρίστηκε",
   "privacyDeleteButton": "Διαγραφή όλων των δεδομένων",
-  "privacyCopyErrorLog": "Αντιγραφή αρχείου καταγραφής σφαλμάτων στο πρόχειρο ({count})",
   "privacyDeleteTitle": "Διαγραφή όλων των δεδομένων;",
   "privacyDeleteBody": "Αυτό θα διαγράψει μόνιμα:\n\n- Όλα τα αγαπημένα και τα δεδομένα σταθμών\n- Όλα τα προφίλ αναζήτησης\n- Όλες τις ειδοποιήσεις τιμών\n- Όλο το ιστορικό τιμών\n- Όλα τα δεδομένα προσωρινής μνήμης\n- Το κλειδί API σας\n- Όλες τις ρυθμίσεις εφαρμογής\n\nΗ εφαρμογή θα επαναφερθεί στην αρχική της κατάσταση. Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.",
   "privacyDeleteConfirm": "Διαγραφή όλων",
@@ -553,15 +488,8 @@
   "voiceAnnouncementsTitle": "Φωνητικές ανακοινώσεις",
   "voiceAnnouncementsDescription": "Ανακοίνωση κοντινών φθηνών σταθμών κατά την οδήγηση",
   "voiceAnnouncementsEnabled": "Ενεργοποίηση φωνητικών ανακοινώσεων",
-  "voiceAnnouncementThreshold": "Μόνο κάτω από {price}",
-  "voiceAnnouncementCheapFuel": "{station}, {distance} χιλιόμετρα μπροστά, {fuelType} {price}",
   "voiceAnnouncementProximityRadius": "Ακτίνα ανακοίνωσης",
   "voiceAnnouncementCooldown": "Διάστημα επανάληψης",
-  "nearestStations": "Kontinoteroi stathmoi",
-  "nearestStationsHint": "Vreite tous kontinoterous stathmous me tin trexousa topothesia sas",
-  "consumptionLogTitle": "Κατανάλωση καυσίμου",
-  "consumptionLogMenuTitle": "Αρχείο κατανάλωσης",
-  "consumptionLogMenuSubtitle": "Παρακολούθηση ανεφοδιασμών και υπολογισμός L/100km",
   "consumptionStatsTitle": "Στατιστικά κατανάλωσης",
   "addFillUp": "Προσθήκη ανεφοδιασμού",
   "noFillUpsTitle": "Δεν υπάρχουν ανεφοδιασμοί",
@@ -595,14 +523,12 @@
   "vehiclesWizardYoursList": "Έχετε {count, plural, =1{1 όχημα} other{{count} οχήματα}}:",
   "vehiclesWizardSkipHint": "Παράλειψη για ολοκλήρωση ρύθμισης — μπορείτε να προσθέσετε οχήματα ανά πάσα στιγμή από τις Ρυθμίσεις.",
   "fillUpVehicleLabel": "Όχημα",
-  "fillUpVehicleNone": "Χωρίς όχημα",
   "fillUpVehicleRequired": "Το όχημα είναι υποχρεωτικό",
   "reportScanError": "Αναφορά σφάλματος σάρωσης",
   "pickStationTitle": "Επιλογή σταθμού",
   "pickStationHelper": "Ξεκινήστε τον ανεφοδιασμό από γνωστό σταθμό για αυτόματη συμπλήρωση τιμών, μάρκας και τύπου καυσίμου.",
   "pickStationEmpty": "Δεν υπάρχουν αγαπημένοι σταθμοί ακόμα — προσθέστε μερικούς από Αναζήτηση ή Αγαπημένα, ή παραλείψτε και συμπληρώστε χειροκίνητα.",
   "pickStationSkip": "Παράλειψη — προσθήκη χωρίς σταθμό",
-  "scanPump": "Σάρωση αντλίας",
   "scanPayment": "Σάρωση QR πληρωμής",
   "qrPaymentBeneficiary": "Δικαιούχος",
   "qrPaymentAmount": "Ποσό",
@@ -624,17 +550,10 @@
   "qrScannerRetry": "Δοκιμάστε ξανά",
   "torchOn": "Ενεργοποίηση φλας",
   "torchOff": "Απενεργοποίηση φλας",
-  "obdNoAdapter": "Δεν βρέθηκε προσαρμογέας OBD2 σε εμβέλεια",
-  "obdOdometerUnavailable": "Αδύνατη ανάγνωση χιλιομετρητή",
   "obdPermissionDenied": "Εκχωρήστε άδεια Bluetooth στις ρυθμίσεις συστήματος",
-  "obdAdapterUnresponsive": "Ο προσαρμογέας δεν ανταποκρίθηκε — ανάψτε τη μίζα και δοκιμάστε ξανά",
   "obdPickerTitle": "Επιλογή προσαρμογέα OBD2",
   "obdPickerScanning": "Σάρωση για προσαρμογείς…",
   "obdPickerConnecting": "Σύνδεση…",
-  "themeSettingTitle": "Θέμα",
-  "themeModeLight": "Φωτεινό",
-  "themeModeDark": "Σκοτεινό",
-  "themeModeSystem": "Ακολουθεί σύστημα",
   "tripRecordingTitle": "Καταγραφή διαδρομής",
   "tripSummaryTitle": "Σύνοψη διαδρομής",
   "tripMetricDistance": "Απόσταση",
@@ -676,18 +595,13 @@
   "syncBaselinesToggleTitle": "Κοινοποίηση εκμαθημένων προφίλ οχημάτων",
   "syncBaselinesToggleSubtitle": "Μεταφόρτωση βάσεων κατανάλωσης ανά όχημα ώστε μια δεύτερη συσκευή να μπορεί να τις χρησιμοποιήσει.",
   "obd2StatusConnected": "Προσαρμογέας OBD2: συνδεδεμένος",
-  "obd2StatusAttempting": "Προσαρμογέας OBD2: σύνδεση",
-  "obd2StatusUnreachable": "Προσαρμογέας OBD2: μη προσβάσιμος",
   "obd2StatusPermissionDenied": "Προσαρμογέας OBD2: απαιτείται άδεια Bluetooth",
   "obd2StatusConnectedBody": "Έτοιμος για καταγραφή ταξιδιού.",
-  "obd2StatusAttemptingBody": "Σύνδεση στο παρασκήνιο…",
-  "obd2StatusUnreachableBody": "Ο προσαρμογέας είναι εκτός εμβέλειας ή χρησιμοποιείται ήδη από άλλη εφαρμογή.",
   "obd2StatusPermissionDeniedBody": "Εκχωρήστε άδεια Bluetooth στις ρυθμίσεις συστήματος για αυτόματη επανασύνδεση.",
   "obd2StatusNoAdapter": "Δεν έχει συζευχθεί προσαρμογέας",
   "obd2StatusForget": "Αποζεύξη προσαρμογέα",
   "tripHistoryTitle": "Ιστορικό ταξιδιών",
   "tripHistoryEmptyTitle": "Δεν υπάρχουν ταξίδια ακόμα",
-  "tripHistoryEmptySubtitle": "Συνδέστε έναν προσαρμογέα OBD2 και καταγράψτε ένα ταξίδι για να ξεκινήσετε την ιστορία οδήγησής σας.",
   "tripHistoryUnknownDate": "Άγνωστη ημερομηνία",
   "situationIdle": "Ρελαντί",
   "situationStopAndGo": "Σταμάτημα & εκκίνηση",
@@ -697,12 +611,8 @@
   "situationClimbing": "Ανηφόρα / φορτωμένο",
   "situationHardAccel": "Δυνατή επιτάχυνση",
   "situationFuelCut": "Διακοπή καυσίμου — αδράνεια",
-  "tripSaveAsFillUp": "Αποθήκευση ως ανεφοδιασμός",
   "tripSaveRecording": "Αποθήκευση ταξιδιού",
-  "tripDiscard": "Απόρριψη",
-  "obdOdometerRead": "Ανάγνωση χιλιομετρητή: {km} km",
   "vehicleFuelNotSet": "Μη ορισμένο",
-  "wizardVehicleTapToEdit": "Πατήστε για επεξεργασία",
   "wizardVehicleDefaultBadge": "Προεπιλογή",
   "wizardProfileChoiceHint": "Επιλέξτε πώς θέλετε να χρησιμοποιήσετε την εφαρμογή. Μπορείτε να το αλλάξετε αργότερα στις Ρυθμίσεις.",
   "wizardProfileChoiceFooter": "Μπορείτε να αλλάξετε την επιλογή σας ανά πάσα στιγμή από Ρυθμίσεις → Λειτουργία χρήσης.",
@@ -713,7 +623,6 @@
   "wizardProfileFullName": "Πλήρες",
   "wizardProfileFullDescription": "Όλα του Μεσαίου, συν αυτόματη καταγραφή ταξιδιών OBD2, βαθμολογίες οδήγησης και κάρτες πιστότητας.",
   "wizardProfileCustomName": "Προσαρμοσμένο",
-  "wizardProfileCustomDescription": "Ο δικός σας συνδυασμός λειτουργιών. Προσαρμόστε κάθε διακόπτη παρακάτω.",
   "useModeSectionHint": "Προσαρμόστε την εφαρμογή στον τρόπο που τη χρησιμοποιείτε. Η επιλογή προεπιλογής ενεργοποιεί το αντίστοιχο σύνολο λειτουργιών.",
   "useModeCustomSettingsDescription": "Ο συνδυασμός λειτουργιών σας δεν αντιστοιχεί σε καμία προεπιλογή. Επιλέξτε μία παραπάνω για αντικατάσταση ή συνεχίστε την προσαρμογή.",
   "useModeSwitchedSnack": "Λειτουργία χρήσης ορίστηκε σε {profile}.",
@@ -751,20 +660,15 @@
   "evShowOnMap": "Εμφάνιση σταθμών EV",
   "evAvailableOnly": "Μόνο διαθέσιμοι",
   "evMinPower": "Ελάχιστη ισχύς",
-  "evMaxPower": "Μέγιστη ισχύς",
-  "evOperator": "Πάροχος",
-  "evLastUpdate": "Τελευταία ενημέρωση",
   "evStatusAvailable": "Διαθέσιμος",
   "evStatusOccupied": "Κατειλημμένος",
   "evStatusOutOfOrder": "Εκτός λειτουργίας",
   "openOnlyFilter": "Μόνο ανοιχτοί",
   "saveAsDefaults": "Αποθήκευση ως προεπιλογές μου",
   "criteriaSavedToProfile": "Αποθηκεύτηκε ως προεπιλογές",
-  "profileNotFound": "Δεν υπάρχει ενεργό προφίλ",
   "updatingFavorites": "Ενημέρωση αγαπημένων...",
   "fetchingLatestPrices": "Λήψη τελευταίων τιμών",
   "noDataAvailable": "Δεν υπάρχουν δεδομένα",
-  "configAndPrivacy": "Ρυθμίσεις & Απόρρητο",
   "searchToSeeMap": "Αναζητήστε για να δείτε σταθμούς στον χάρτη",
   "evPowerAny": "Οποιαδήποτε",
   "evPowerKw": "{kw} kW+",
@@ -819,9 +723,6 @@
   "iosAutoRecordOnboardingBullet3Title": "Όταν το iOS ζητά τοποθεσία \"Πάντα\", παρακαλώ πείτε ναι.",
   "iosAutoRecordOnboardingBullet3Body": "Η εφεδρεία που καταγράφει το ταξίδι σας όταν ο προσαρμογέας OBD2 είναι αργός χρειάζεται τοποθεσία παρασκηνίου. Δεν τη μοιραζόμαστε ποτέ.",
   "scanReceipt": "Σάρωση απόδειξης",
-  "obdConnect": "OBD-II",
-  "stationTypeFuel": "Καύσιμο",
-  "stationTypeEv": "EV",
   "brandFilterHighway": "Αυτοκινητόδρομος",
   "ratingModeLocal": "Τοπικό",
   "ratingModePrivate": "Ιδιωτικό",
@@ -841,7 +742,6 @@
   "errorHintRouting": "Αποτυχία υπολογισμού διαδρομής. Ελέγξτε τη σύνδεση στο διαδίκτυο και δοκιμάστε ξανά.",
   "errorHintFallback": "Δοκιμάστε ξανά ή αναζητήστε με ταχυδρομικό κώδικα / όνομα πόλης.",
   "alertsLoadErrorTitle": "Αδύνατη φόρτωση ειδοποιήσεων",
-  "alertsBackgroundCheckErrorTitle": "Αποτυχία ελέγχου ειδοποίησης παρασκηνίου",
   "detailsLabel": "Λεπτομέρειες",
   "remove": "Αφαίρεση",
   "showKey": "Εμφάνιση κλειδιού",
@@ -950,19 +850,11 @@
   "linkDeviceHowItWorksBody": "1. Στη Συσκευή Α: αντιγράψτε τον κωδικό συσκευής παραπάνω\n2. Στη Συσκευή Β: επικολλήστε τον στο πεδίο \"Κωδικός συσκευής\"\n3. Πατήστε \"Εισαγωγή δεδομένων\" για συγχώνευση αγαπημένων, ειδοποιήσεων, οχημάτων και αρχείων κατανάλωσης\n4. Και οι δύο συσκευές θα έχουν όλα τα συνδυασμένα δεδομένα\n\nΚάθε συσκευή διατηρεί τη δική της ανώνυμη ταυτότητα και το δικό της προφίλ (προτιμώμενο καύσιμο, προεπιλεγμένο όχημα, αρχική οθόνη). Τα δεδομένα συγχωνεύονται, δεν μεταφέρονται.",
   "vehicleSetActive": "Ορισμός ως ενεργό",
   "swipeHide": "Απόκρυψη",
-  "evChargingSection": "Φόρτιση EV",
-  "fuelStationsSection": "Πρατήρια καυσίμων",
   "yourRating": "Η αξιολόγησή σας",
   "noStorageUsed": "Δεν χρησιμοποιείται αποθηκευτικός χώρος",
   "aboutReportBug": "Αναφορά σφάλματος / Πρόταση λειτουργίας",
   "aboutSupportProject": "Υποστήριξη αυτού του έργου",
   "aboutSupportDescription": "Αυτή η εφαρμογή είναι δωρεάν, ανοιχτού κώδικα και χωρίς διαφημίσεις. Αν τη βρίσκετε χρήσιμη, σκεφτείτε να υποστηρίξετε τον προγραμματιστή.",
-  "luxembourgRegulatedPricesNotice": "Οι τιμές καυσίμων στο Λουξεμβούργο είναι κυβερνητικά ρυθμιζόμενες και ομοιόμορφες σε όλη τη χώρα.",
-  "luxembourgFuelUnleaded95": "Αμόλυβδη 95",
-  "luxembourgFuelUnleaded98": "Αμόλυβδη 98",
-  "luxembourgFuelDiesel": "Πετρέλαιο",
-  "luxembourgFuelLpg": "LPG",
-  "luxembourgPricesUnavailable": "Οι ρυθμιζόμενες τιμές Λουξεμβούργου δεν είναι διαθέσιμες.",
   "reportIssueTitle": "Αναφορά προβλήματος",
   "enterCorrection": "Παρακαλώ εισάγετε τη διόρθωση",
   "reportNoBackendAvailable": "Η αναφορά δεν μπόρεσε να σταλεί: δεν έχει ρυθμιστεί υπηρεσία αναφοράς για αυτή τη χώρα. Ενεργοποιήστε το TankSync στις Ρυθμίσεις για αποστολή αναφορών κοινότητας.",
@@ -989,10 +881,6 @@
   "serviceReminderMarkDone": "Επισήμανση ως ολοκληρωμένο",
   "serviceReminderDueTitle": "Σέρβις σε αναμονή",
   "serviceReminderDueBody": "Το {label} είναι σε αναμονή — {kmOver} km μετά το διάστημα.",
-  "southKoreaApiKeyRequired": "Εγγραφείτε στο OPINET για δωρεάν κλειδί API",
-  "southKoreaApiProvider": "OPINET (KNOC)",
-  "chileApiKeyRequired": "Εγγραφείτε στο CNE για δωρεάν κλειδί API",
-  "chileApiProvider": "CNE Bencina en Linea",
   "vinConfirmTitle": "Είναι αυτό το αυτοκίνητό σας;",
   "vinConfirmBody": "{year} {make} {model} — {displacement}L, {cylinders} κύλινδροι, {fuel}",
   "vinPartialInfoNote": "Μερικές πληροφορίες (εκτός σύνδεσης). Μπορείτε να επεξεργαστείτε παρακάτω.",
@@ -1011,17 +899,13 @@
   "alertsRadiusCreateTitle": "Δημιουργία ειδοποίησης ακτίνας",
   "alertsRadiusLabelHint": "Ετικέτα (π.χ. Diesel σπίτι)",
   "alertsRadiusFuelType": "Τύπος καυσίμου",
-  "alertsRadiusThreshold": "Κατώφλι (€/L)",
   "alertsRadiusKm": "Ακτίνα (km)",
   "alertsRadiusCenterGps": "Χρήση τοποθεσίας μου",
   "alertsRadiusCenterPostalCode": "Ταχυδρομικός κώδικας",
   "alertsRadiusSave": "Αποθήκευση",
   "alertsRadiusCancel": "Ακύρωση",
-  "alertsRadiusDeleteConfirm": "Διαγραφή ειδοποίησης ακτίνας;",
   "obd2ConnectedTooltip": "OBD2 συνδεδεμένο: {adapterName}",
   "obd2PairChipTooltip": "Σύζευξη προσαρμογέα OBD2",
-  "velocityAlertTitle": "Η τιμή {fuelLabel} έπεσε σε κοντινούς σταθμούς",
-  "velocityAlertBody": "{stationCount} σταθμοί μείωσαν κατά έως {maxDropCents}¢ την τελευταία ώρα",
   "fillUpSavedSnackbar": "Ο ανεφοδιασμός αποθηκεύτηκε",
   "radiusAlertsEntryTitle": "Ειδοποιήσεις ακτίνας & στατιστικά",
   "radiusAlertsEntrySubtitle": "Ειδοποίηση όταν πέφτουν οι τιμές κοντά σας",
@@ -1060,8 +944,6 @@
   "autoRecordStatusPairAdapterCta": "Σύζευξη προσαρμογέα",
   "autoRecordSpeedThresholdLabel": "Ταχύτητα εκκίνησης (km/h)",
   "autoRecordSaveDelayLabel": "Καθυστέρηση αποθήκευσης μετά την αποσύνδεση (δευτερόλεπτα)",
-  "autoRecordPairedAdapterLabel": "Συζευγμένος προσαρμογέας",
-  "autoRecordPairedAdapterNone": "Δεν έχει συζευχθεί προσαρμογέας. Συζεύξτε έναν πρώτα μέσω του OBD2 onboarding.",
   "autoRecordBackgroundLocationLabel": "Τοποθεσία παρασκηνίου επιτρέπεται",
   "autoRecordBackgroundLocationRequest": "Αίτηση άδειας",
   "autoRecordBackgroundLocationRationaleTitle": "Γιατί \"Πάντα να επιτρέπεται\";",
@@ -1069,18 +951,12 @@
   "autoRecordBackgroundLocationOpenSettings": "Άνοιγμα ρυθμίσεων",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Απαιτείται άδεια τοποθεσίας",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Αδύνατη αίτηση τοποθεσίας παρασκηνίου",
-  "autoRecordBadgeClearTooltip": "Εκκαθάριση μετρητή",
   "autoRecordPairAdapterLinkText": "Συζεύξτε έναν προσαρμογέα στην παρακάτω ενότητα για ενεργοποίηση αυτόματης καταγραφής",
-  "exportBackupTooltip": "Εξαγωγή αντιγράφου ασφαλείας",
   "exportBackupReady": "Αντίγραφο ασφαλείας έτοιμο — επιλέξτε προορισμό",
   "exportBackupFailed": "Αποτυχία εξαγωγής αντιγράφου — παρακαλώ δοκιμάστε ξανά",
-  "brokenMapChipVerifying": "Επαλήθευση αισθητήρα MAP…",
   "brokenMapChipDisclaimer": "Ύποπτες ενδείξεις MAP",
   "brokenMapSnackbarUnreliable": "Ο αισθητήρας MAP διαβάζει εσφαλμένα — οι ενδείξεις καυσίμου μπορεί να είναι 50–80% χαμηλότερες. Δοκιμάστε διαφορετικό προσαρμογέα.",
   "brokenMapBannerHardDisable": "Αναξιόπιστος αισθητήρας MAP. Εμφάνιση μέσων ανεφοδιασμού αντί για ζωντανή ροή καυσίμου.",
-  "brokenMapOverlayVerified": "Αισθητήρας MAP: επαληθευμένος ({confidence})",
-  "brokenMapOverlayUnverified": "Αισθητήρας MAP: επαλήθευση ({confidence})",
-  "brokenMapOverlaySuspicious": "Αισθητήρας MAP: ύποπτος ({confidence})",
   "brokenMapOverlayPosterior": "Αισθητήρας MAP: {posterior}% ± {margin}%",
   "brokenMapOverlayPosteriorVerified": "Αισθητήρας MAP: {posterior}% ± {margin}% (επαληθευμένος)",
   "brokenMapDiagnosticsCardTitle": "Διαγνωστικά αισθητήρα MAP",
@@ -1142,7 +1018,6 @@
   "chargingCostTrendTitle": "Τάση κόστους φόρτισης",
   "chargingEfficiencyTitle": "Απόδοση (kWh/100 km)",
   "chargingChartsEmpty": "Δεν υπάρχουν αρκετά δεδομένα ακόμα",
-  "chargingChartsMonthAxis": "Μήνας",
   "consoFeatureGroupTitle": "Κατανάλωση",
   "consoFeatureGroupDescription": "Παρακολουθήστε την κατανάλωση — χειροκίνητοι ανεφοδιασμοί ή αυτόματη καταγραφή ταξιδιών OBD2.",
   "consoModeOff": "Ανενεργό",
@@ -1158,10 +1033,6 @@
   "fillUpCorrectionEditExplainer": "Αυτή η εγγραφή δημιουργήθηκε αυτόματα για κάλυψη της διαφοράς μεταξύ καταγεγραμμένων ταξιδιών και αντλημένου καυσίμου. Προσαρμόστε τις τιμές αν γνωρίζετε τα ακριβή στοιχεία.",
   "fillUpCorrectionDelete": "Διαγραφή διόρθωσης",
   "fillUpCorrectionStation": "Όνομα σταθμού (προαιρετικό)",
-  "greeceApiProvider": "Παρατηρητήριο Τιμών (Ελλάδα)",
-  "greeceCommunityApiNotice": "Τροφοδοτείται από το API fuelpricesgr που συντηρεί η κοινότητα",
-  "romaniaApiProvider": "Monitorul Prețurilor (Ρουμανία)",
-  "romaniaScrapingNotice": "Τροφοδοτείται από το monitorulpreturilor.info (Συμβούλιο Ανταγωνισμού + ANPC)",
   "crossBorderCheaper": "Σταθμοί {country} {km} km μακριά — {price}€/L φθηνότεροι",
   "crossBorderTapToSwitch": "Πατήστε για εναλλαγή χώρας",
   "crossBorderDismissTooltip": "Απόρριψη",
@@ -1186,9 +1057,6 @@
   "drivingScorePenaltyHardBrake": "Δυνατό φρενάρισμα",
   "drivingScorePenaltyHighRpm": "Υψηλές στροφές",
   "drivingScorePenaltyFullThrottle": "Πλήρες γκάζι",
-  "ecoRouteOption": "Οικονομικό",
-  "ecoRouteSavings": "≈ {liters} L εξοικονόμηση",
-  "ecoRouteHint": "Πιο έξυπνη οδήγηση — προτιμά σταθερό αυτοκινητόδρομο αντί για λαβυρινθώδεις συντομεύσεις.",
   "favoritesShareAction": "Κοινοποίηση",
   "favoritesShareSubject": "Sparkilo — αγαπημένα στις {date}",
   "favoritesShareError": "Αδύνατη δημιουργία εικόνας κοινοποίησης",
@@ -1206,8 +1074,6 @@
   "featureDescription_consumptionAnalytics": "Καρτέλα ανάλυσης ανεφοδιασμών και ταξιδιών.",
   "featureLabel_baselineSync": "Συγχρονισμός βάσης",
   "featureDescription_baselineSync": "Συγχρονισμός βάσεων οδήγησης μέσω TankSync.",
-  "featureLabel_unifiedSearchResults": "Ενοποιημένα αποτελέσματα αναζήτησης",
-  "featureDescription_unifiedSearchResults": "Ενιαία λίστα αποτελεσμάτων που συνδυάζει σταθμούς καυσίμων και EV.",
   "featureLabel_priceAlerts": "Ειδοποιήσεις τιμών",
   "featureDescription_priceAlerts": "Ειδοποιήσεις πτώσης τιμής βάσει κατωφλίου.",
   "featureLabel_priceHistory": "Ιστορικό τιμών",
@@ -1235,8 +1101,6 @@
   "featureBlockedEnable_glideCoach": "Ενεργοποιήστε πρώτα την καταγραφή ταξιδιών OBD2",
   "featureBlockedEnable_gpsTripPath": "Ενεργοποιήστε πρώτα την καταγραφή ταξιδιών OBD2",
   "featureBlockedEnable_autoRecord": "Ενεργοποιήστε πρώτα την καταγραφή ταξιδιών OBD2",
-  "featureBlockedEnable_showFuel": "Δεν πληρούνται οι προαπαιτούμενες",
-  "featureBlockedEnable_showElectric": "Δεν πληρούνται οι προαπαιτούμενες",
   "featureBlockedEnable_showConsumptionTab": "Ενεργοποιήστε πρώτα την καταγραφή ταξιδιών OBD2",
   "featureLabel_tflitePricePrediction": "Πρόβλεψη τιμής TFLite",
   "featureDescription_tflitePricePrediction": "Μοντέλο πρόβλεψης τιμών στη συσκευή — η εκτέλεση γίνεται τοπικά· χαρακτηριστικά και προβλέψεις δεν φεύγουν ποτέ από τη συσκευή.",
@@ -1281,15 +1145,12 @@
   "scanReceiptNoData": "Δεν βρέθηκαν δεδομένα απόδειξης — δοκιμάστε ξανά",
   "scanReceiptSuccess": "Η απόδειξη σαρώθηκε — επαληθεύστε τις τιμές. Πατήστε «Αναφορά σφάλματος σάρωσης» παρακάτω αν κάτι είναι λάθος.",
   "scanReceiptFailed": "Αποτυχία σάρωσης: {error}",
-  "scanPumpUnreadable": "Η οθόνη αντλίας δεν είναι αναγνώσιμη — δοκιμάστε ξανά",
-  "pumpCameraHint": "Ευθυγραμμίστε τους τρεις αριθμούς της οθόνης της αντλίας μέσα στο πλαίσιο",
   "pumpCameraCapture": "Λήψη",
   "pumpCameraPermissionDenied": "Απαιτείται πρόσβαση στην κάμερα για τη σάρωση της οθόνης της αντλίας. Ενεργοποιήστε την στις ρυθμίσεις της συσκευής.",
   "pumpCameraError": "Η κάμερα δεν μπόρεσε να ξεκινήσει. Δοκιμάστε ξανά ή εισαγάγετε τις τιμές χειροκίνητα.",
   "scanPumpSuccess": "Η οθόνη αντλίας σαρώθηκε — επαληθεύστε τις τιμές.",
   "scanPumpGlare": "Πάρα πολλή αντανάκλαση στην οθόνη — δοκιμάστε ξανά υπό μικρή γωνία ώστε οι αριθμοί να μην ξεθωριάζουν.",
   "scanPumpFailed": "Αποτυχία σάρωσης αντλίας: {error}",
-  "badScanReportTitle": "Αναφορά σφάλματος σάρωσης",
   "badScanReportTitleReceipt": "Αναφορά σφάλματος σάρωσης — Απόδειξη",
   "badScanReportTitlePumpDisplay": "Αναφορά σφάλματος σάρωσης — Οθόνη αντλίας",
   "pumpScanFailureTitle": "Μη αναγνώσιμη οθόνη",
@@ -1298,7 +1159,6 @@
   "pumpScanFailureReport": "Αναφορά",
   "pumpScanFailureRemove": "Αφαίρεση φωτογραφίας",
   "badScanReportHint": "Θα μοιραστούμε τη φωτογραφία απόδειξης και και τα δύο σύνολα τιμών ώστε η επόμενη έκδοση να μάθει αυτή τη διάταξη.",
-  "badScanReportShareAction": "Κοινοποίηση αναφοράς + φωτογραφίας",
   "badScanReportFieldBrandLayout": "Διάταξη μάρκας",
   "badScanReportFieldTotal": "Σύνολο",
   "badScanReportFieldPricePerLiter": "Τιμή/L",
@@ -1315,16 +1175,9 @@
   "fillUpSectionWhatSubtitle": "Καύσιμο, ποσότητα, τιμή",
   "fillUpSectionWhereTitle": "Πού βρισκόσαστε",
   "fillUpSectionWhereSubtitle": "Σταθμός, χιλιόμετρα, σημειώσεις",
-  "fillUpImportFromLabel": "Εισαγωγή από…",
-  "fillUpImportSheetTitle": "Εισαγωγή δεδομένων ανεφοδιασμού",
   "fillUpImportReceiptLabel": "Απόδειξη",
-  "fillUpImportReceiptDescription": "Σάρωση χάρτινης απόδειξης με κάμερα",
   "fillUpImportPumpLabel": "Οθόνη αντλίας",
-  "fillUpImportPumpDescription": "Ανάγνωση Betrag / Preis από την οθόνη LCD αντλίας",
-  "fillUpImportObdLabel": "Προσαρμογέας OBD-II",
-  "fillUpImportObdDescription": "Ανάγνωση χιλιομετρητή από τη θύρα OBD-II μέσω Bluetooth",
   "fillUpPricePerLiterLabel": "Τιμή ανά λίτρο",
-  "vehicleHeaderPlateLabel": "Πινακίδα",
   "vehicleHeaderUntitled": "Νέο όχημα",
   "vehicleSectionIdentityTitle": "Ταυτότητα",
   "vehicleSectionIdentitySubtitle": "Όνομα & VIN",
@@ -1340,7 +1193,6 @@
   "gpsDiagnosticsHeader": "{count} δείγματα · {span} · {gaps, plural, =0{χωρίς κενά} =1{1 κενό} other{{gaps} κενά}}",
   "gpsDiagnosticsCadence": "Διάμεσο διάστημα: {ms} ms",
   "gpsDiagnosticsExplain": "Καταγράφηκε κατά τη διάρκεια εγγραφής για επαλήθευση ρυθμού GPS κατά την αδρανοποίηση τηλεφώνου.",
-  "hapticEcoCoachSectionTitle": "Οδήγηση",
   "hapticEcoCoachSettingTitle": "Eco coaching σε πραγματικό χρόνο",
   "hapticEcoCoachSettingSubtitle": "Ήπια απτική + συμβουλή οθόνης όταν πατάτε γκάζι στη ζώνη κρουαζιέρας",
   "hapticEcoCoachSnackBarMessage": "Ελαφρύτερο γκάζι — η αδράνεια εξοικονομεί περισσότερα",
@@ -1370,9 +1222,6 @@
   "calculatorDistanceHint": "π.χ. 150",
   "calculatorConsumptionHint": "π.χ. 7.0",
   "calculatorPriceHint": "π.χ. 1.899",
-  "routeStrategyLabel": "Στρατηγική:",
-  "routeStrategyUniform": "Ομοιόμορφη",
-  "routeStrategyBalanced": "Ισορροπημένη",
   "glideCoachBetaTitle": "Οδηγός glide beta (πειραματικό)",
   "glideCoachBetaSubtitle": "Ήπια απτική κατά την επιβράδυνση μπροστά σε κόκκινο φανάρι. Ανενεργό εξ ορισμού — κίνδυνος απόσπασης προσοχής.",
   "consentSyncTripsTitle": "Συγχρονισμός καταγεγραμμένων ταξιδιών",
@@ -1428,7 +1277,6 @@
   "onboardingObd2ConnectButton": "Σύνδεση προσαρμογέα",
   "onboardingObd2SkipButton": "Ίσως αργότερα",
   "onboardingObd2ReadingVin": "Ανάγνωση VIN…",
-  "onboardingObd2VinReadFailed": "Αδύνατη ανάγνωση VIN — εισάγετε χειροκίνητα",
   "onboardingObd2ConnectFailed": "Αδύνατη σύνδεση με τον προσαρμογέα. Μπορείτε να δοκιμάσετε ξανά ή να παραλείψετε.",
   "onboardingPickUseMode": "Επιλέξτε λειτουργία χρήσης για συνέχεια.",
   "alertsRadiusFrequencyLabel": "Συχνότητα ελέγχου",
@@ -1442,9 +1290,6 @@
   "radiusAlertMapPickerCancel": "Ακύρωση",
   "radiusAlertMapPickerHint": "Σύρετε τον χάρτη για τοποθέτηση κέντρου ειδοποίησης",
   "radiusAlertCenterFromMap": "Τοποθεσία χάρτη",
-  "radiusAlertNotificationTitle": "{fuelLabel} κοντά στο {label}",
-  "radiusAlertNotificationBody": "Ένας σταθμός έχει {price} € (στόχος: {threshold} €)",
-  "refuelUnitPerLiter": "/L",
   "refuelUnitPerKwh": "/kWh",
   "refuelUnitPerSession": "/συνεδρία",
   "speedConsumptionCardTitle": "Κατανάλωση ανά ταχύτητα",
@@ -1463,9 +1308,6 @@
   "tankLevelLitersFormat": "{litres} L",
   "tankLevelRangeFormat": "≈ {kilometres} km αυτονομία",
   "tankLevelLastFillUpFormat": "Τελευταίος ανεφοδιασμός: {date} · {count} ταξίδι(α) από τότε",
-  "tankLevelMethodObd2": "Μέτρηση OBD2",
-  "tankLevelMethodDistanceFallback": "εκτίμηση βάσει απόστασης",
-  "tankLevelMethodMixed": "μεικτή μέτρηση",
   "tankLevelEmptyNoFillUp": "Καταγράψτε ανεφοδιασμό για εμφάνιση στάθμης ντεπόζιτου",
   "tankLevelDetailSheetTitle": "Ταξίδια από τον τελευταίο ανεφοδιασμό",
   "addFillUpIsFullTankLabel": "Πλήρες ντεπόζιτο",
@@ -1536,7 +1378,6 @@
   "trajetDetailDeleteAction": "Διαγραφή",
   "trajetDetailDeleteConfirmTitle": "Διαγραφή αυτού του ταξιδιού;",
   "trajetDetailDeleteConfirmBody": "Αυτό το ταξίδι θα αφαιρεθεί μόνιμα από το ιστορικό σας.",
-  "trajetDetailDeleteConfirmCancel": "Ακύρωση",
   "trajetDetailDeleteConfirmConfirm": "Διαγραφή",
   "tripRecordingObd2NotResponding": "Ο προσαρμογέας OBD2 είναι συνδεδεμένος αλλά δεν επιστρέφει δεδομένα. Δοκιμάστε διαφορετικό προσαρμογέα ή ελέγξτε το πρωτόκολλο διαγνωστικού του οχήματος.",
   "trajetsViewAllOnMap": "Όλα στον χάρτη",
@@ -1552,7 +1393,6 @@
   "tripLengthBucketTripCount": "{count, plural, =0{κανένα ταξίδι} one{1 ταξίδι} other{{count} ταξίδια}}",
   "tripPathCardTitle": "Διαδρομή ταξιδιού",
   "tripPathCardSubtitle": "Διαδρομή καταγεγραμμένη με GPS",
-  "tripPathLegendTitle": "Κατανάλωση",
   "tripPathLegendEfficient": "Αποδοτική (< 6 L/100km)",
   "tripPathLegendBorderline": "Οριακή (6–10 L/100km)",
   "tripPathLegendWasteful": "Σπάταλη (≥ 10 L/100km)",
@@ -1563,13 +1403,8 @@
   "tripRecordingPinHelpTitle": "Σχετικά με την καρφίτσωση",
   "tripRecordingPinHelpBody": "Η καρφίτσωση κρατά την οθόνη αναμμένη και αποκρύπτει τις γραμμές συστήματος ώστε η φόρμα να παραμένει αναγνώσιμη σε βάση ταμπλό. Πατήστε ξανά για απελευθέρωση. Απελευθερώνεται αυτόματα όταν σταματά το ταξίδι.",
   "tripRecordingResumeHintMessage": "Η καταγραφή συνεχίζεται στο παρασκήνιο. Πατήστε το κόκκινο banner στην κορυφή οποιασδήποτε οθόνης για επιστροφή.",
-  "tripBannerOpenFromConsumptionTab": "Ανοίξτε το ενεργό ταξίδι από την καρτέλα Κατανάλωση",
   "tripRecordingUnpinnedWarning": "Καρφιτσώστε την οθόνη για να διατηρείτε το GPS ενεργό κατά τη διάρκεια του ταξιδιού — Το Android μπορεί να περιορίσει το GPS κατά την αδρανοποίηση.",
   "tripRecordingMinimiseTooltip": "Σμίκρυνση σε πλωτό πλακίδιο",
-  "unifiedFilterFuel": "Καύσιμο",
-  "unifiedFilterEv": "EV",
-  "unifiedFilterBoth": "Και τα δύο",
-  "unifiedNoResultsForFilter": "Δεν υπάρχουν αποτελέσματα για αυτό το φίλτρο",
   "searchFailedSnackbar": "Αποτυχία αναζήτησης — παρακαλώ δοκιμάστε ξανά",
   "vinLabel": "VIN (προαιρετικό)",
   "vinDecodeTooltip": "Αποκωδικοποίηση VIN",
@@ -1601,7 +1436,6 @@
   "gdprVinOnlineDecodeTitle": "Αποκωδικοποίηση VIN online",
   "gdprVinOnlineDecodeShort": "Αποκωδικοποίηση VIN μέσω της δωρεάν δημόσιας υπηρεσίας NHTSA",
   "gdprVinOnlineDecodeDescription": "Όταν συζεύγνυτε έναν προσαρμογέα, το VIN του οχήματός σας διαβάζεται τοπικά για αναγνώριση του αυτοκινήτου. Ενεργοποιώντας αυτό αποστέλλεται το 17-χαρακτηρο VIN στη δωρεάν υπηρεσία vPIC της NHTSA για αναζήτηση πρόσθετων στοιχείων (μοντέλο, κυβισμός, τύπος καυσίμου). Το VIN είναι τα μόνα δεδομένα που αποστέλλονται — καμία άλλη πληροφορία δεν φεύγει από τη συσκευή σας.",
-  "vehicleDetectedFromVinBadge": "(ανιχνεύτηκε)",
   "vehicleDetectedFromVinSnackbar": "Ανιχνεύτηκε από VIN: {summary}. Εφαρμογή;",
   "vehicleDetectedFromVinApply": "Εφαρμογή",
   "widgetHelpSectionTitle": "Widget αρχικής οθόνης",
@@ -1620,7 +1454,6 @@
   "widgetColorSchemeOrange": "Πορτοκαλί",
   "widgetVariantDefault": "Μόνο τρέχουσα τιμή",
   "widgetVariantPredictive": "Προβλεπτικό: καλύτερη στιγμή για ανεφοδιασμό",
-  "widgetPredictiveNowPrefix": "τώρα",
   "@distance": {
     "placeholders": {
       "distance": {
@@ -1645,13 +1478,6 @@
   "@hours": {
     "placeholders": {
       "n": {
-        "type": "int"
-      }
-    }
-  },
-  "@stationsOnMap": {
-    "placeholders": {
-      "count": {
         "type": "int"
       }
     }
@@ -1700,13 +1526,6 @@
   "@evConnectors": {
     "placeholders": {
       "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@stopN": {
-    "placeholders": {
-      "n": {
         "type": "int"
       }
     }
@@ -1850,25 +1669,11 @@
       }
     }
   },
-  "approachStationDistance": "{meters} m μακριά",
-  "@approachStationDistance": {
-    "description": "PiP overlay caption (#2084) showing how far the driver is from the in-radius target station, in metres.",
-    "placeholders": {
-      "meters": {
-        "type": "String",
-        "example": "350"
-      }
-    }
-  },
   "tripRecordingPipElapsedCaption": "παρήλθε",
   "@tripRecordingPipElapsedCaption": {
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
-  "fabOpenCriteria": "Άνοιγμα αναζήτησης",
-  "fabOpenResults": "Άνοιγμα αποτελεσμάτων",
   "fabRunSearch": "Εκτέλεση αναζήτησης",
-  "fabRefineCriteria": "Βελτίωση αναζήτησης",
-  "routeSearchPartialBanner": "Αναζήτηση για περισσότερους σταθμούς…",
   "privacySaveErrorLog": "Αποθήκευση αρχείου σφαλμάτων ({count})",
   "@privacySaveErrorLog": {
     "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
@@ -2418,10 +2223,6 @@
   "@trajetDetailChartCoolant": {
     "description": "MT — needs native review"
   },
-  "trajetDetailChartAltitude": "Υψόμετρο (m)",
-  "@trajetDetailChartAltitude": {
-    "description": "MT — needs native review"
-  },
   "trajetDetailChartLambda": "Εντεταλμένο λ",
   "@trajetDetailChartLambda": {
     "description": "MT — needs native review"
@@ -2654,14 +2455,6 @@
   "@obd2HealthHistorySection": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyJson": "Αντιγραφή ως JSON",
-  "@obd2HealthCopyJson": {
-    "description": "MT — needs native review"
-  },
-  "obd2HealthCopied": "Τα διαγνωστικά OBD2 αντιγράφηκαν στο πρόχειρο.",
-  "@obd2HealthCopied": {
-    "description": "MT — needs native review"
-  },
   "evStatusPartial": "Μερικώς διαθέσιμο",
   "@evStatusPartial": {
     "description": "MT — needs native review"
@@ -2767,10 +2560,6 @@
   },
   "ocrTesterRunning": "Εκτέλεση OCR…",
   "@ocrTesterRunning": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterNoResult": "Το OCR δεν παρήγαγε αναγνώσιμο αποτέλεσμα.",
-  "@ocrTesterNoResult": {
     "description": "MT — needs native review"
   },
   "ocrTesterOverlaySection": "Επικάλυψη μπλοκ",
@@ -2937,10 +2726,6 @@
   "@obd2DiagnosticsInitCold": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyInitTranscript": "Αντιγραφή μόνο αντιγραφής αρχικοποίησης",
-  "@obd2HealthCopyInitTranscript": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterSaveFixture": "Αποθήκευση ως fixture",
   "@ocrTesterSaveFixture": {
     "description": "MT — needs native review"
@@ -3092,10 +2877,6 @@
   "@obd2GpsDegradedBannerTitle": {
     "description": "MT — needs native review"
   },
-  "restoreBackupTooltip": "Επαναφορά αντιγράφου ασφαλείας",
-  "@restoreBackupTooltip": {
-    "description": "MT — needs native review"
-  },
   "restoreBackupDialogTitle": "Επαναφορά αντιγράφου ασφαλείας",
   "@restoreBackupDialogTitle": {
     "description": "MT — needs native review"
@@ -3111,15 +2892,6 @@
   "restoreBackupReplaceAction": "Αντικατάσταση όλων",
   "@restoreBackupReplaceAction": {
     "description": "MT — needs native review"
-  },
-  "restoreBackupSuccess": "Αντίγραφο ασφαλείας επαναφέρθηκε — εισήχθησαν {count} εγγραφές",
-  "@restoreBackupSuccess": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
   },
   "restoreBackupEmpty": "Αντίγραφο ασφαλείας επαναφέρθηκε — δεν περιείχε εγγραφές",
   "@restoreBackupEmpty": {
@@ -3391,16 +3163,6 @@
   "voiceCoachingSettingSubtitle": "Ακούστε φωνητικές συμβουλές κατά την οδήγηση — δυνατή επιτάχυνση, απότομο φρενάρισμα και υποδείξεις σχέσεων",
   "@voiceCoachingSettingSubtitle": {
     "description": "MT — needs native review"
-  },
-  "fuelStationRadarDistanceKm": "{km} km μακριά",
-  "@fuelStationRadarDistanceKm": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "km": {
-        "type": "String",
-        "example": "2.4"
-      }
-    }
   },
   "fuelStationRadarProximity": "Εγγύτητα {percent}%",
   "@fuelStationRadarProximity": {
@@ -3733,10 +3495,6 @@
   },
   "consumptionStatsChartConsumption": "L/100km ανά μήνα",
   "@consumptionStatsChartConsumption": {
-    "description": "MT — needs native review"
-  },
-  "shareReceiptImporting": "Εισαγωγή κοινόχρηστης απόδειξης…",
-  "@shareReceiptImporting": {
     "description": "MT — needs native review"
   },
   "shareReceiptUnsupportedFormat": "Αυτός ο τύπος αρχείου δεν μπορεί να εισαχθεί ακόμη — κοινοποιήστε μια φωτογραφία της απόδειξης.",
@@ -4228,17 +3986,6 @@
       "count": {
         "type": "int",
         "example": "3"
-      }
-    }
-  },
-  "fuelEfficiencyMixedFootnote": "{count, plural, =1{1 mixed tank counted toward its main fuel} other{{count} mixed tanks counted toward their main fuel}}",
-  "@fuelEfficiencyMixedFootnote": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int",
-        "example": "1"
       }
     }
   },
@@ -4752,11 +4499,6 @@
         "example": "Oil change"
       }
     }
-  },
-  "radarAcquiringLocation": "Finding your location…",
-  "@radarAcquiringLocation": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
   },
   "radarUpdatingLocation": "Updating your location…",
   "@radarUpdatingLocation": {

@@ -149,10 +149,6 @@
   "@trajetDetailChartAltitudeRelative": {
     "description": "Trip-detail chart section title (#3502): the altitude profile is plotted RELATIVE to the trip start, because raw GPS altitude is the WGS84 ellipsoid height on Android (no geoid correction) and routinely reads below sea level near a coast. 'from start' tells the user the 0 line is where they departed."
   },
-  "trajetDetailChartAltitude": "Altitude (m)",
-  "@trajetDetailChartAltitude": {
-    "description": "Section title above the GPS-altitude-over-time chart on the Trip detail screen (#2461). Hidden when no sample carries an altitude value (GPS path off / no fix)."
-  },
   "trajetDetailChartLambda": "Commanded λ",
   "@trajetDetailChartLambda": {
     "description": "Section title above the commanded-lambda-over-time chart on the Trip detail screen (#2461). Lambda is the commanded equivalence ratio (PID 0x44); values below 1 mean an enriched mixture. The Greek letter lambda is a universal automotive symbol — kept untranslated. Hidden when no sample carries a lambda value."
@@ -229,10 +225,6 @@
   "trajetDetailDeleteConfirmBody": "This trip will be permanently removed from your history.",
   "@trajetDetailDeleteConfirmBody": {
     "description": "Body of the confirmation dialog before deleting a trip on the Trip detail screen (#890)."
-  },
-  "trajetDetailDeleteConfirmCancel": "Cancel",
-  "@trajetDetailDeleteConfirmCancel": {
-    "description": "Cancel button label on the delete-trip confirmation dialog (#890)."
   },
   "trajetDetailDeleteConfirmConfirm": "Delete",
   "@trajetDetailDeleteConfirmConfirm": {

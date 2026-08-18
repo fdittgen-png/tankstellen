@@ -12,11 +12,8 @@
   "fuelType": "Brandstof",
   "searchRadius": "Straal",
   "searchNearby": "Tankstations in de buurt",
-  "searchButton": "Zoeken",
   "searchCriteriaTitle": "Zoekcriteria",
-  "searchCriteriaOpen": "Zoeken",
   "searchCriteriaRadiusBadge": "Binnen {km} km",
-  "searchCriteriaTapToSearch": "Tik om te zoeken",
   "noResults": "Geen tankstations gevonden.",
   "startSearch": "Zoek om tankstations te vinden.",
   "open": "Open",
@@ -30,7 +27,6 @@
   "navigate": "Navigeren",
   "retry": "Opnieuw proberen",
   "apiKeySetup": "API-sleutel",
-  "apiKeyDescription": "Registreer eenmalig voor een gratis API-sleutel.",
   "apiKeyLabel": "API-sleutel",
   "register": "Registratie",
   "continueButton": "Doorgaan",
@@ -64,33 +60,12 @@
   "noFavoritesHint": "Tik op de ster bij een tankstation om het als favoriet op te slaan.",
   "language": "Taal",
   "country": "Land",
-  "demoMode": "Demomodus — voorbeeldgegevens.",
-  "setupLiveData": "Instellen voor live gegevens",
   "freeNoKey": "Gratis — geen sleutel nodig",
   "apiKeyRequired": "API-sleutel vereist",
-  "skipWithoutKey": "Doorgaan zonder sleutel",
   "dataTransparency": "Gegevenstransparantie",
   "storageAndCache": "Opslag en cache",
   "clearCache": "Cache wissen",
-  "clearAllData": "Alle gegevens verwijderen",
-  "errorLog": "Foutenlogboek",
   "stationsFound": "{count} tankstations gevonden",
-  "whatIsShared": "Wat wordt gedeeld — en met wie?",
-  "gpsCoordinates": "GPS-coördinaten",
-  "gpsReason": "Worden bij elke zoekopdracht verstuurd om nabijgelegen stations te vinden.",
-  "postalCodeData": "Postcode",
-  "postalReason": "Wordt omgezet in coördinaten via de geocoderingsservice.",
-  "mapViewport": "Kaartweergave",
-  "mapReason": "Kaarttegels worden geladen vanaf de server. Er worden geen persoonlijke gegevens verzonden.",
-  "apiKeyData": "API-sleutel",
-  "apiKeyReason": "Uw persoonlijke sleutel wordt bij elke API-aanvraag meegezonden. Deze is gekoppeld aan uw e-mail.",
-  "notShared": "Wordt NIET gedeeld:",
-  "searchHistory": "Zoekgeschiedenis",
-  "favoritesData": "Favorieten",
-  "profileNames": "Profielnamen",
-  "homeZipData": "Postcode thuis",
-  "usageData": "Gebruiksgegevens",
-  "privacyBanner": "Deze app heeft geen server. Alle gegevens blijven op uw apparaat. Geen analyse, geen tracking, geen advertenties.",
   "storageUsage": "Opslaggebruik op dit apparaat",
   "settingsLabel": "Instellingen",
   "profilesStored": "profielen opgeslagen",
@@ -116,12 +91,8 @@
   "deleteAllButton": "Alles verwijderen",
   "entries": "items",
   "cacheEmpty": "De cache is leeg",
-  "noStorage": "Geen opslag gebruikt",
   "apiKeyNote": "Gratis registratie. Gegevens van overheidsinstanties voor prijstransparantie.",
   "apiKeyFormatError": "Ongeldig formaat — UUID verwacht (8-4-4-4-12)",
-  "supportProject": "Steun dit project",
-  "supportDescription": "Deze app is gratis, open source en zonder advertenties. Als u het nuttig vindt, overweeg de ontwikkelaar te steunen.",
-  "reportBug": "Bug melden / Functie voorstellen",
   "reportThisIssue": "Probleem melden",
   "reportAlreadySent": "Je hebt dit probleem al gemeld.",
   "reportConsentTitle": "Melden via GitHub?",
@@ -136,7 +107,6 @@
   "configApiKeysSection": "API-sleutels",
   "configTankerkoenigKey": "Tankerkoenig API-sleutel",
   "configApiKeyConfigured": "Geconfigureerd",
-  "configApiKeyNotSet": "Niet ingesteld (demomodus)",
   "configApiKeyCommunity": "Standaard (communitysleutel)",
   "searchLocationPlaceholder": "Adres, postcode of stad",
   "configEvKey": "EV-laad API-sleutel",
@@ -174,8 +144,6 @@
   "sortPriceDistance": "Prijs/km",
   "cheap": "goedkoop",
   "expensive": "duur",
-  "stationsOnMap": "{count} stations",
-  "loadingFavorites": "Favorieten laden...\nZoek eerst naar stations om gegevens op te slaan.",
   "reportPrice": "Prijs melden",
   "whatsWrong": "Wat klopt er niet?",
   "correctPrice": "Correcte prijs (bijv. 1,459)",
@@ -185,7 +153,6 @@
   "cacheCleared": "Cache gewist.",
   "yourPosition": "Uw positie",
   "positionUnknown": "Positie onbekend",
-  "routeModeBannerLabel": "Routemodus — afstanden zijn langs het traject",
   "distancesFromCenter": "Afstanden vanaf zoekcentrum",
   "autoUpdatePosition": "Positie automatisch bijwerken",
   "autoUpdateDescription": "GPS-positie bijwerken voor elke zoekopdracht",
@@ -220,8 +187,6 @@
   "wrongDieselPrice": "Verkeerde Diesel prijs",
   "wrongStatusOpen": "Getoond als open, maar gesloten",
   "wrongStatusClosed": "Getoond als gesloten, maar open",
-  "searchAlongRouteLabel": "Langs de route",
-  "searchEvStations": "Zoek laadstations",
   "allStations": "Alle stations",
   "bestStops": "Beste stops",
   "openInMaps": "Openen in Kaarten",
@@ -253,7 +218,6 @@
   "cityOrAddress": "Stad of adres",
   "useGps": "GPS gebruiken",
   "stop": "Stop",
-  "stopN": "Stop {n}",
   "addStop": "Stop toevoegen",
   "searchAlongRoute": "Zoek langs de route",
   "cheapest": "Goedkoopste",
@@ -265,10 +229,8 @@
   "customKey": "Eigen sleutel",
   "appDefaultKey": "Standaard app-sleutel",
   "optionalOverrideKey": "Optioneel: de ingebouwde app-sleutel vervangen door uw eigen",
-  "requiredForEvSearch": "Vereist voor het zoeken naar EV-laadstations",
   "edit": "Bewerken",
   "fuelPricesApiKey": "Brandstofprijzen API-sleutel",
-  "tankerkoenigApiKey": "Tankerkoenig API-sleutel",
   "evChargingApiKey": "EV-laden API-sleutel",
   "openChargeMapApiKey": "OpenChargeMap API-sleutel",
   "routePlanningSection": "Routeplanning",
@@ -303,18 +265,14 @@
   "noStationsAlongThisRoute": "Geen stations gevonden langs deze route.",
   "fuelCostCalculator": "Brandstofkostencalculator",
   "distanceKm": "Afstand (km)",
-  "consumptionL100km": "Verbruik (L/100km)",
-  "fuelPriceEurL": "Brandstofprijs (EUR/L)",
   "tripCost": "Ritkosten",
   "fuelNeeded": "Benodigde brandstof",
   "totalCost": "Totale kosten",
-  "enterCalcValues": "Voer afstand, verbruik en prijs in om de ritkosten te berekenen",
   "priceHistory": "Prijsgeschiedenis",
   "ignoredStationsLabel": "Genegeerd",
   "ratingsLabel": "Beoordelingen",
   "favoritesDataCache": "Favorietengegevens",
   "citySearchCache": "Plaatszoeken",
-  "dataDeletionNotAvailableCommunity": "Gegevens verwijderen is niet beschikbaar in de Community-modus. Verbreek eerst de verbinding of gebruik een privédatabase.",
   "priceHistoryStationsTracked": "{count} gevolgde stations",
   "@priceHistoryStationsTracked": {
     "placeholders": {
@@ -348,22 +306,11 @@
     }
   },
   "noPriceHistory": "Nog geen prijsgeschiedenis",
-  "noHourlyData": "Geen uurgegevens",
   "noStatistics": "Geen statistieken beschikbaar",
-  "statMin": "Min",
-  "statMax": "Max",
-  "statAvg": "Gem",
   "showAllFuelTypes": "Alle brandstofsoorten tonen",
   "connected": "Verbonden",
-  "notConnected": "Niet verbonden",
-  "connectTankSync": "TankSync verbinden",
   "disconnectTankSync": "TankSync loskoppelen",
   "viewMyData": "Mijn gegevens bekijken",
-  "optionalCloudSync": "Optionele cloudsynchronisatie voor waarschuwingen, favorieten en pushmeldingen",
-  "tapToUpdateGps": "Tik om GPS-positie bij te werken",
-  "gpsAutoUpdateHint": "De GPS-positie wordt automatisch verkregen bij het zoeken. U kunt deze hier ook handmatig bijwerken.",
-  "clearGpsConfirm": "Opgeslagen GPS-positie wissen? U kunt deze op elk moment opnieuw bijwerken.",
-  "pageNotFound": "Pagina niet gevonden",
   "deleteAllServerData": "Alle servergegevens verwijderen",
   "deleteServerDataConfirm": "Alle servergegevens verwijderen?",
   "deleteEverything": "Alles verwijderen",
@@ -373,7 +320,6 @@
   "forgetAllSyncedTripsConfirmBody": "Alle ritoverzichten en detailgegevens worden van de server verwijderd. Je lokale ritgeschiedenis op dit apparaat wordt niet beïnvloed.\n\nDeze actie kan niet ongedaan worden gemaakt.",
   "forgetAllSyncedTripsConfirmAction": "Alles verwijderen",
   "forgetAllSyncedTripsSuccess": "Alle gesynchroniseerde ritten van server verwijderd",
-  "disconnectConfirm": "TankSync loskoppelen?",
   "disconnect": "Loskoppelen",
   "myServerData": "Mijn servergegevens",
   "anonymousUuid": "Anonieme UUID",
@@ -393,7 +339,6 @@
   "continueAsGuest": "Doorgaan als gast",
   "createAccount": "Account aanmaken",
   "signIn": "Aanmelden",
-  "upgradeToEmail": "E-mailaccount aanmaken",
   "savedRoutes": "Opgeslagen routes",
   "noSavedRoutes": "Geen opgeslagen routes",
   "noSavedRoutesHint": "Zoek langs een route en sla hem op voor snelle toegang later.",
@@ -424,11 +369,6 @@
   "onboardingNext": "Volgende",
   "onboardingSkip": "Overslaan",
   "onboardingFinish": "Aan de slag",
-  "crossBorderNearby": "{country} is dichtbij",
-  "crossBorderDistance": "~{km} km tot grens",
-  "crossBorderAvgPrice": "Gemiddeld hier: {price} EUR ({count} stations)",
-  "allPricesView": "Alle prijzen",
-  "compactView": "Compact",
   "switchToAllPricesView": "Overschakelen naar alle-prijzenweergave",
   "switchToCompactView": "Overschakelen naar compacte weergave",
   "unavailable": "N.v.t.",
@@ -453,10 +393,6 @@
   "accountDeleted": "Account verwijderd. Lokale gegevens bewaard.",
   "switchedToAnonymous": "Overgeschakeld naar anonieme sessie",
   "failedToSwitch": "Overschakelen mislukt: {error}",
-  "topicUrlCopied": "Onderwerp-URL gekopieerd",
-  "testNotificationSent": "Testmelding verzonden!",
-  "testNotificationFailed": "Testmelding versturen mislukt",
-  "pushUpdateFailed": "Instelling voor pushmeldingen bijwerken mislukt",
   "connectedAsGuest": "Verbonden als gast",
   "accountCreated": "Account aangemaakt!",
   "signedIn": "Aangemeld!",
@@ -518,7 +454,6 @@
   "privacyClearErrorLog": "Foutenlogboek wissen",
   "privacyErrorLogCleared": "Foutenlogboek gewist",
   "privacyDeleteButton": "Alle gegevens verwijderen",
-  "privacyCopyErrorLog": "Foutlogboek kopiëren naar klembord ({count})",
   "privacyDeleteTitle": "Alle gegevens verwijderen?",
   "privacyDeleteBody": "Dit verwijdert permanent:\n\n- Alle favorieten en stationgegevens\n- Alle zoekprofielen\n- Alle prijsmeldingen\n- Alle prijsgeschiedenis\n- Alle gecachede gegevens\n- Je API-sleutel\n- Alle app-instellingen\n\nDe app wordt teruggezet naar de beginstatus. Deze actie kan niet ongedaan worden gemaakt.",
   "privacyDeleteConfirm": "Alles verwijderen",
@@ -553,15 +488,8 @@
   "voiceAnnouncementsTitle": "Gesproken aankondigingen",
   "voiceAnnouncementsDescription": "Goedkope stations in de buurt aankondigen tijdens het rijden",
   "voiceAnnouncementsEnabled": "Gesproken aankondigingen inschakelen",
-  "voiceAnnouncementThreshold": "Alleen onder {price}",
-  "voiceAnnouncementCheapFuel": "{station}, {distance} kilometer verderop, {fuelType} {price}",
   "voiceAnnouncementProximityRadius": "Aankondigingsstraal",
   "voiceAnnouncementCooldown": "Herhalingsinterval",
-  "nearestStations": "Dichtstbijzijnde stations",
-  "nearestStationsHint": "Vind de dichtstbijzijnde stations met uw huidige locatie",
-  "consumptionLogTitle": "Brandstofverbruik",
-  "consumptionLogMenuTitle": "Verbruikslogboek",
-  "consumptionLogMenuSubtitle": "Tankbeurten bijhouden en L/100km berekenen",
   "consumptionStatsTitle": "Verbruiksstatistieken",
   "addFillUp": "Tankbeurt toevoegen",
   "noFillUpsTitle": "Nog geen tankbeurten",
@@ -595,14 +523,12 @@
   "vehiclesWizardYoursList": "Je hebt {count, plural, =1{1 voertuig} other{{count} voertuigen}}:",
   "vehiclesWizardSkipHint": "Overslaan om de setup te voltooien — je kunt voertuigen altijd toevoegen via Instellingen.",
   "fillUpVehicleLabel": "Voertuig",
-  "fillUpVehicleNone": "Geen voertuig",
   "fillUpVehicleRequired": "Voertuig is verplicht",
   "reportScanError": "Scanfout melden",
   "pickStationTitle": "Kies een station",
   "pickStationHelper": "Start de tankbeurt vanuit een bekend station zodat prijzen, merk en brandstoftype automatisch worden ingevuld.",
   "pickStationEmpty": "Nog geen favoriete stations — voeg ze toe via Zoeken of Favorieten, of sla dit over en vul handmatig in.",
   "pickStationSkip": "Overslaan — toevoegen zonder station",
-  "scanPump": "Pomp scannen",
   "scanPayment": "Betaal-QR scannen",
   "qrPaymentBeneficiary": "Begunstigde",
   "qrPaymentAmount": "Bedrag",
@@ -624,17 +550,10 @@
   "qrScannerRetry": "Opnieuw proberen",
   "torchOn": "Flits inschakelen",
   "torchOff": "Flits uitschakelen",
-  "obdNoAdapter": "Geen OBD2-adapter bereikbaar",
-  "obdOdometerUnavailable": "Kilometerstand niet uitlesbaar",
   "obdPermissionDenied": "Geef Bluetooth-toestemming in systeeminstellingen",
-  "obdAdapterUnresponsive": "Adapter reageert niet — zet het contact aan en probeer opnieuw",
   "obdPickerTitle": "Kies een OBD2-adapter",
   "obdPickerScanning": "Zoeken naar adapters…",
   "obdPickerConnecting": "Verbinden…",
-  "themeSettingTitle": "Thema",
-  "themeModeLight": "Licht",
-  "themeModeDark": "Donker",
-  "themeModeSystem": "Systeem volgen",
   "tripRecordingTitle": "Rit opnemen",
   "tripSummaryTitle": "Ritoverzicht",
   "tripMetricDistance": "Afstand",
@@ -676,18 +595,13 @@
   "syncBaselinesToggleTitle": "Geleerde voertuigprofielen delen",
   "syncBaselinesToggleSubtitle": "Upload verbruiksbaselines per voertuig zodat een tweede apparaat ze kan hergebruiken.",
   "obd2StatusConnected": "OBD2-adapter: verbonden",
-  "obd2StatusAttempting": "OBD2-adapter: verbinden",
-  "obd2StatusUnreachable": "OBD2-adapter: niet bereikbaar",
   "obd2StatusPermissionDenied": "OBD2-adapter: Bluetooth-toestemming vereist",
   "obd2StatusConnectedBody": "Klaar om een rit op te nemen.",
-  "obd2StatusAttemptingBody": "Verbinden op de achtergrond…",
-  "obd2StatusUnreachableBody": "Adapter buiten bereik of al in gebruik door een andere app.",
   "obd2StatusPermissionDeniedBody": "Geef Bluetooth-toestemming in systeeminstellingen om automatisch opnieuw te verbinden.",
   "obd2StatusNoAdapter": "Geen adapter gekoppeld",
   "obd2StatusForget": "Adapter vergeten",
   "tripHistoryTitle": "Ritgeschiedenis",
   "tripHistoryEmptyTitle": "Nog geen ritten",
-  "tripHistoryEmptySubtitle": "Verbind een OBD2-adapter en neem een rit op om je rijgeschiedenis op te bouwen.",
   "tripHistoryUnknownDate": "Datum onbekend",
   "situationIdle": "Stationair",
   "situationStopAndGo": "Stop & go",
@@ -697,12 +611,8 @@
   "situationClimbing": "Klimmen / zwaar beladen",
   "situationHardAccel": "Hard optrekken",
   "situationFuelCut": "Brandstofonderbreking — uitrollen",
-  "tripSaveAsFillUp": "Opslaan als tankbeurt",
   "tripSaveRecording": "Rit opslaan",
-  "tripDiscard": "Verwerpen",
-  "obdOdometerRead": "Kilometerstand gelezen: {km} km",
   "vehicleFuelNotSet": "Niet ingesteld",
-  "wizardVehicleTapToEdit": "Tik om te bewerken",
   "wizardVehicleDefaultBadge": "Standaard",
   "wizardProfileChoiceHint": "Kies hoe je de app wilt gebruiken. Je kunt dit later aanpassen in Instellingen.",
   "wizardProfileChoiceFooter": "Je kunt je keuze altijd wijzigen via Instellingen → Gebruiksmodus.",
@@ -713,7 +623,6 @@
   "wizardProfileFullName": "Volledig",
   "wizardProfileFullDescription": "Alles uit Gemiddeld, plus automatische OBD2-ritopname, rijscores en loyaliteitskaarten.",
   "wizardProfileCustomName": "Aangepast",
-  "wizardProfileCustomDescription": "Jouw eigen combinatie van functies. Pas elke schakelaar hieronder aan.",
   "useModeSectionHint": "Pas de app aan je gebruik aan. Door een preset te kiezen, worden de bijbehorende functies ingeschakeld.",
   "useModeCustomSettingsDescription": "Je functiemix komt niet overeen met een preset. Kies er een hierboven om te overschrijven, of blijf individuele functies hieronder aanpassen.",
   "useModeSwitchedSnack": "Gebruiksmodus ingesteld op {profile}.",
@@ -751,20 +660,15 @@
   "evShowOnMap": "EV-stations tonen",
   "evAvailableOnly": "Alleen beschikbaar",
   "evMinPower": "Min. vermogen",
-  "evMaxPower": "Max. vermogen",
-  "evOperator": "Exploitant",
-  "evLastUpdate": "Laatste update",
   "evStatusAvailable": "Beschikbaar",
   "evStatusOccupied": "Bezet",
   "evStatusOutOfOrder": "Buiten gebruik",
   "openOnlyFilter": "Alleen geopend",
   "saveAsDefaults": "Opslaan als standaard",
   "criteriaSavedToProfile": "Opgeslagen als standaard",
-  "profileNotFound": "Geen actief profiel",
   "updatingFavorites": "Favorieten bijwerken...",
   "fetchingLatestPrices": "Actuele prijzen ophalen",
   "noDataAvailable": "Geen gegevens",
-  "configAndPrivacy": "Configuratie & Privacy",
   "searchToSeeMap": "Zoek om stations op de kaart te zien",
   "evPowerAny": "Willekeurig",
   "evPowerKw": "{kw} kW+",
@@ -819,9 +723,6 @@
   "iosAutoRecordOnboardingBullet3Title": "Als iOS vraagt om \"Altijd\" locatie, zeg dan ja.",
   "iosAutoRecordOnboardingBullet3Body": "De reservemethode die je rit opneemt als de OBD2-adapter traag is, heeft achtergrondlocatie nodig. We delen het nooit.",
   "scanReceipt": "Bon scannen",
-  "obdConnect": "OBD-II",
-  "stationTypeFuel": "Brandstof",
-  "stationTypeEv": "EV",
   "brandFilterHighway": "Snelweg",
   "ratingModeLocal": "Lokaal",
   "ratingModePrivate": "Privé",
@@ -841,7 +742,6 @@
   "errorHintRouting": "Routeberekening mislukt. Controleer je internetverbinding en probeer opnieuw.",
   "errorHintFallback": "Probeer opnieuw of zoek op postcode / plaatsnaam.",
   "alertsLoadErrorTitle": "Meldingen konden niet worden geladen",
-  "alertsBackgroundCheckErrorTitle": "Achtergrondcontrole meldingen mislukt",
   "detailsLabel": "Details",
   "remove": "Verwijderen",
   "showKey": "Sleutel tonen",
@@ -950,19 +850,11 @@
   "linkDeviceHowItWorksBody": "1. Op apparaat A: kopieer de apparaatcode hierboven\n2. Op apparaat B: plak hem in het veld \"Apparaatcode\"\n3. Tik op \"Gegevens importeren\" om favorieten, meldingen, voertuigen en verbruikslogboeken samen te voegen\n4. Beide apparaten hebben alle gecombineerde gegevens\n\nElk apparaat behoudt zijn eigen anonieme identiteit en profiel (voorkeursbrandstof, standaardvoertuig, startscherm). Gegevens worden samengevoegd, niet verplaatst.",
   "vehicleSetActive": "Instellen als actief",
   "swipeHide": "Verbergen",
-  "evChargingSection": "EV-laden",
-  "fuelStationsSection": "Tankstations",
   "yourRating": "Jouw beoordeling",
   "noStorageUsed": "Geen opslag in gebruik",
   "aboutReportBug": "Bug melden / Functie voorstellen",
   "aboutSupportProject": "Project ondersteunen",
   "aboutSupportDescription": "Deze app is gratis, open source en heeft geen advertenties. Als je hem nuttig vindt, overweeg dan de ontwikkelaar te ondersteunen.",
-  "luxembourgRegulatedPricesNotice": "Luxemburgse brandstofprijzen zijn door de overheid gereguleerd en overal in het land gelijk.",
-  "luxembourgFuelUnleaded95": "Loodvrij 95",
-  "luxembourgFuelUnleaded98": "Loodvrij 98",
-  "luxembourgFuelDiesel": "Diesel",
-  "luxembourgFuelLpg": "LPG",
-  "luxembourgPricesUnavailable": "Luxemburgse gereguleerde prijzen zijn niet beschikbaar.",
   "reportIssueTitle": "Probleem melden",
   "enterCorrection": "Voer de correctie in",
   "reportNoBackendAvailable": "Het rapport kon niet worden verzonden: er is geen rapportageservice geconfigureerd voor dit land. Schakel TankSync in via Instellingen om communityrapports te versturen.",
@@ -989,10 +881,6 @@
   "serviceReminderMarkDone": "Als gedaan markeren",
   "serviceReminderDueTitle": "Onderhoud verschuldigd",
   "serviceReminderDueBody": "{label} is verschuldigd — {kmOver} km over het interval.",
-  "southKoreaApiKeyRequired": "Registreer bij OPINET voor een gratis API-sleutel",
-  "southKoreaApiProvider": "OPINET (KNOC)",
-  "chileApiKeyRequired": "Registreer bij CNE voor een gratis API-sleutel",
-  "chileApiProvider": "CNE Bencina en Linea",
   "vinConfirmTitle": "Is dit jouw auto?",
   "vinConfirmBody": "{year} {make} {model} — {displacement}L, {cylinders}-cil., {fuel}",
   "vinPartialInfoNote": "Gedeeltelijke info (offline). Je kunt dit hieronder bewerken.",
@@ -1011,17 +899,13 @@
   "alertsRadiusCreateTitle": "Straalwaarschuwing aanmaken",
   "alertsRadiusLabelHint": "Label (bijv. Thuis diesel)",
   "alertsRadiusFuelType": "Brandstoftype",
-  "alertsRadiusThreshold": "Drempelwaarde (€/L)",
   "alertsRadiusKm": "Straal (km)",
   "alertsRadiusCenterGps": "Mijn locatie gebruiken",
   "alertsRadiusCenterPostalCode": "Postcode",
   "alertsRadiusSave": "Opslaan",
   "alertsRadiusCancel": "Annuleren",
-  "alertsRadiusDeleteConfirm": "Straalwaarschuwing verwijderen?",
   "obd2ConnectedTooltip": "OBD2 verbonden: {adapterName}",
   "obd2PairChipTooltip": "Een OBD2-adapter koppelen",
-  "velocityAlertTitle": "{fuelLabel} gedaald bij nabijgelegen stations",
-  "velocityAlertBody": "{stationCount} stations daalden tot {maxDropCents}¢ in het afgelopen uur",
   "fillUpSavedSnackbar": "Tankbeurt opgeslagen",
   "radiusAlertsEntryTitle": "Straalwaarschuwingen & statistieken",
   "radiusAlertsEntrySubtitle": "Ontvang een melding als prijzen in de buurt dalen",
@@ -1060,8 +944,6 @@
   "autoRecordStatusPairAdapterCta": "Een adapter koppelen",
   "autoRecordSpeedThresholdLabel": "Startsnelheid (km/h)",
   "autoRecordSaveDelayLabel": "Opslagvertraging na verbreken (seconden)",
-  "autoRecordPairedAdapterLabel": "Gekoppelde adapter",
-  "autoRecordPairedAdapterNone": "Geen adapter gekoppeld. Koppel er eerst een via de OBD2-inrichting.",
   "autoRecordBackgroundLocationLabel": "Achtergrondlocatie toegestaan",
   "autoRecordBackgroundLocationRequest": "Toestemming aanvragen",
   "autoRecordBackgroundLocationRationaleTitle": "Waarom \"Altijd toestaan\"?",
@@ -1069,18 +951,12 @@
   "autoRecordBackgroundLocationOpenSettings": "Instellingen openen",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Locatietoestemming vereist",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Achtergrondlocatie kon niet worden aangevraagd",
-  "autoRecordBadgeClearTooltip": "Teller wissen",
   "autoRecordPairAdapterLinkText": "Koppel een adapter in de onderstaande sectie om automatisch opnemen in te schakelen",
-  "exportBackupTooltip": "Back-up exporteren",
   "exportBackupReady": "Back-up klaar — kies een bestemming",
   "exportBackupFailed": "Back-up exporteren mislukt — probeer het opnieuw",
-  "brokenMapChipVerifying": "MAP-sensor wordt geverifieerd…",
   "brokenMapChipDisclaimer": "MAP-meetwaarden verdacht",
   "brokenMapSnackbarUnreliable": "MAP-sensor leest onjuist — brandstofmetingen kunnen 50–80% te laag zijn. Probeer een andere adapter.",
   "brokenMapBannerHardDisable": "MAP-sensor onbetrouwbaar. Tankbeurtgemiddelden worden getoond in plaats van live brandstofverbruik.",
-  "brokenMapOverlayVerified": "MAP-sensor: geverifieerd ({confidence})",
-  "brokenMapOverlayUnverified": "MAP-sensor: verificatie bezig ({confidence})",
-  "brokenMapOverlaySuspicious": "MAP-sensor: verdacht ({confidence})",
   "brokenMapOverlayPosterior": "MAP-sensor: {posterior}% ± {margin}%",
   "brokenMapOverlayPosteriorVerified": "MAP-sensor: {posterior}% ± {margin}% (geverifieerd)",
   "brokenMapDiagnosticsCardTitle": "MAP-sensor diagnostiek",
@@ -1142,7 +1018,6 @@
   "chargingCostTrendTitle": "Trend laadkosten",
   "chargingEfficiencyTitle": "Efficiëntie (kWh/100 km)",
   "chargingChartsEmpty": "Nog niet genoeg gegevens",
-  "chargingChartsMonthAxis": "Maand",
   "consoFeatureGroupTitle": "Verbruik",
   "consoFeatureGroupDescription": "Bijhouden van je verbruik — handmatige tankbeurten of automatische OBD2-ritopname.",
   "consoModeOff": "Uit",
@@ -1158,10 +1033,6 @@
   "fillUpCorrectionEditExplainer": "Deze invoer werd automatisch aangemaakt om het verschil tussen geregistreerde ritten en getankte brandstof te overbruggen. Pas de waarden aan als je de werkelijke cijfers kent.",
   "fillUpCorrectionDelete": "Correctie verwijderen",
   "fillUpCorrectionStation": "Stationsnaam (optioneel)",
-  "greeceApiProvider": "Paratiritirio Timon (Griekenland)",
-  "greeceCommunityApiNotice": "Mogelijk gemaakt door de door de community onderhouden fuelpricesgr API",
-  "romaniaApiProvider": "Monitorul Prețurilor (Roemenië)",
-  "romaniaScrapingNotice": "Mogelijk gemaakt door monitorulpreturilor.info (Mededingingsraad + ANPC)",
   "crossBorderCheaper": "{country}-stations {km} km verderop — €{price}/L goedkoper",
   "crossBorderTapToSwitch": "Tik om van land te wisselen",
   "crossBorderDismissTooltip": "Sluiten",
@@ -1186,9 +1057,6 @@
   "drivingScorePenaltyHardBrake": "Hard remmen",
   "drivingScorePenaltyHighRpm": "Hoog toerental",
   "drivingScorePenaltyFullThrottle": "Vol gas",
-  "ecoRouteOption": "Eco",
-  "ecoRouteSavings": "≈ {liters} L bespaard",
-  "ecoRouteHint": "Slimmere rit — geeft voorkeur aan rustige snelweg boven zigzag-snelkoppelingen.",
   "favoritesShareAction": "Delen",
   "favoritesShareSubject": "Sparkilo — favorieten op {date}",
   "favoritesShareError": "Deelafbeelding kon niet worden gegenereerd",
@@ -1206,8 +1074,6 @@
   "featureDescription_consumptionAnalytics": "Tabblad voor tankbeurt- en ritanalyse.",
   "featureLabel_baselineSync": "Baselinesynchro nisatie",
   "featureDescription_baselineSync": "Rijbaselines synchroniseren via TankSync.",
-  "featureLabel_unifiedSearchResults": "Gecombineerde zoekresultaten",
-  "featureDescription_unifiedSearchResults": "Enkele resultatenlijst met brandstof- en EV-stations gecombineerd.",
   "featureLabel_priceAlerts": "Prijsmeldingen",
   "featureDescription_priceAlerts": "Meldingen bij prijsdaling op basis van drempelwaarde.",
   "featureLabel_priceHistory": "Prijsgeschiedenis",
@@ -1235,8 +1101,6 @@
   "featureBlockedEnable_glideCoach": "Schakel eerst OBD2-ritopname in",
   "featureBlockedEnable_gpsTripPath": "Schakel eerst OBD2-ritopname in",
   "featureBlockedEnable_autoRecord": "Schakel eerst OBD2-ritopname in",
-  "featureBlockedEnable_showFuel": "Vereisten niet voldaan",
-  "featureBlockedEnable_showElectric": "Vereisten niet voldaan",
   "featureBlockedEnable_showConsumptionTab": "Schakel eerst OBD2-ritopname in",
   "featureLabel_tflitePricePrediction": "TFLite-prijsvoorspelling",
   "featureDescription_tflitePricePrediction": "Prijsvoorspellingsmodel op het apparaat — inferentie draait lokaal; kenmerken en voorspellingen verlaten het apparaat nooit.",
@@ -1281,15 +1145,12 @@
   "scanReceiptNoData": "Geen bongegevens gevonden — probeer opnieuw",
   "scanReceiptSuccess": "Bon gescand — verifieer de waarden. Tik hieronder op \"Scanfout melden\" als er iets niet klopt.",
   "scanReceiptFailed": "Scan mislukt: {error}",
-  "scanPumpUnreadable": "Pompdisplay niet leesbaar — probeer opnieuw",
-  "pumpCameraHint": "Lijn de drie cijfers van het pompdisplay uit binnen het kader",
   "pumpCameraCapture": "Vastleggen",
   "pumpCameraPermissionDenied": "Cameratoegang is nodig om het pompdisplay te scannen. Schakel het in bij de apparaatinstellingen.",
   "pumpCameraError": "De camera kon niet starten. Probeer opnieuw of voer de waarden handmatig in.",
   "scanPumpSuccess": "Pompdisplay gescand — verifieer de waarden.",
   "scanPumpGlare": "Te veel weerschijn op het display — probeer het opnieuw onder een lichte hoek zodat de cijfers niet overstraald zijn.",
   "scanPumpFailed": "Pompscan mislukt: {error}",
-  "badScanReportTitle": "Scanfout melden",
   "badScanReportTitleReceipt": "Scanfout melden — Bon",
   "badScanReportTitlePumpDisplay": "Scanfout melden — Pompdisplay",
   "pumpScanFailureTitle": "Display niet leesbaar",
@@ -1298,7 +1159,6 @@
   "pumpScanFailureReport": "Melden",
   "pumpScanFailureRemove": "Foto verwijderen",
   "badScanReportHint": "We delen de bonfoto en beide sets waarden zodat de volgende versie deze indeling kan leren.",
-  "badScanReportShareAction": "Rapport + foto delen",
   "badScanReportFieldBrandLayout": "Merkindeling",
   "badScanReportFieldTotal": "Totaal",
   "badScanReportFieldPricePerLiter": "Prijs/L",
@@ -1315,16 +1175,9 @@
   "fillUpSectionWhatSubtitle": "Brandstof, hoeveelheid, prijs",
   "fillUpSectionWhereTitle": "Waar je was",
   "fillUpSectionWhereSubtitle": "Station, kilometerstand, notities",
-  "fillUpImportFromLabel": "Importeren uit…",
-  "fillUpImportSheetTitle": "Tankbeurtgegevens importeren",
   "fillUpImportReceiptLabel": "Bon",
-  "fillUpImportReceiptDescription": "Scan een papieren bon met de camera",
   "fillUpImportPumpLabel": "Pompdisplay",
-  "fillUpImportPumpDescription": "Bedrag/Prijs aflezen van het pomp-LCD",
-  "fillUpImportObdLabel": "OBD-II adapter",
-  "fillUpImportObdDescription": "Kilometerstand uitlezen via de OBD-II poort over Bluetooth",
   "fillUpPricePerLiterLabel": "Prijs per liter",
-  "vehicleHeaderPlateLabel": "Kenteken",
   "vehicleHeaderUntitled": "Nieuw voertuig",
   "vehicleSectionIdentityTitle": "Identiteit",
   "vehicleSectionIdentitySubtitle": "Naam & VIN",
@@ -1340,7 +1193,6 @@
   "gpsDiagnosticsHeader": "{count} steekproeven · {span} · {gaps, plural, =0{geen hiaten} =1{1 hiaat} other{{gaps} hiaten}}",
   "gpsDiagnosticsCadence": "Mediaan interval: {ms} ms",
   "gpsDiagnosticsExplain": "Vastgelegd tijdens opname om GPS-cadans te verifiëren tijdens telefoonscherm-uit.",
-  "hapticEcoCoachSectionTitle": "Rijden",
   "hapticEcoCoachSettingTitle": "Realtime eco-coaching",
   "hapticEcoCoachSettingSubtitle": "Zachte trilling + tip op het scherm als je vol gas geeft tijdens het cruisen",
   "hapticEcoCoachSnackBarMessage": "Rustig aan het gas — uitrollen bespaart meer",
@@ -1370,9 +1222,6 @@
   "calculatorDistanceHint": "bijv. 150",
   "calculatorConsumptionHint": "bijv. 7.0",
   "calculatorPriceHint": "bijv. 1.899",
-  "routeStrategyLabel": "Strategie:",
-  "routeStrategyUniform": "Uniform",
-  "routeStrategyBalanced": "Gebalanceerd",
   "glideCoachBetaTitle": "Glide-coach bèta (experimenteel)",
   "glideCoachBetaSubtitle": "Subtiele trilling bij het afremmen voor een rood licht. Standaard uit — afleiding risico.",
   "consentSyncTripsTitle": "Ritopnames synchroniseren",
@@ -1428,7 +1277,6 @@
   "onboardingObd2ConnectButton": "Adapter verbinden",
   "onboardingObd2SkipButton": "Misschien later",
   "onboardingObd2ReadingVin": "VIN uitlezen…",
-  "onboardingObd2VinReadFailed": "VIN kon niet worden uitgelezen — voer handmatig in",
   "onboardingObd2ConnectFailed": "Verbinding met adapter mislukt. Je kunt opnieuw proberen of overslaan.",
   "onboardingPickUseMode": "Kies een gebruiksmodus om door te gaan.",
   "alertsRadiusFrequencyLabel": "Controlefrequentie",
@@ -1442,9 +1290,6 @@
   "radiusAlertMapPickerCancel": "Annuleren",
   "radiusAlertMapPickerHint": "Sleep de kaart om het centrum van de melding te positioneren",
   "radiusAlertCenterFromMap": "Kaartlocatie",
-  "radiusAlertNotificationTitle": "{fuelLabel} bij {label}",
-  "radiusAlertNotificationBody": "Een station heeft {price} € (doel: {threshold} €)",
-  "refuelUnitPerLiter": "/L",
   "refuelUnitPerKwh": "/kWh",
   "refuelUnitPerSession": "/sessie",
   "speedConsumptionCardTitle": "Verbruik per snelheid",
@@ -1463,9 +1308,6 @@
   "tankLevelLitersFormat": "{litres} L",
   "tankLevelRangeFormat": "≈ {kilometres} km bereik",
   "tankLevelLastFillUpFormat": "Laatste tankbeurt: {date} · {count} rit(ten) daarna",
-  "tankLevelMethodObd2": "OBD2-meting",
-  "tankLevelMethodDistanceFallback": "afstandsgebaseerde schatting",
-  "tankLevelMethodMixed": "gemengde meting",
   "tankLevelEmptyNoFillUp": "Registreer een tankbeurt om je tankinhoud te zien",
   "tankLevelDetailSheetTitle": "Ritten na laatste tankbeurt",
   "addFillUpIsFullTankLabel": "Volle tank",
@@ -1536,7 +1378,6 @@
   "trajetDetailDeleteAction": "Verwijderen",
   "trajetDetailDeleteConfirmTitle": "Deze rit verwijderen?",
   "trajetDetailDeleteConfirmBody": "Deze rit wordt permanent verwijderd uit je geschiedenis.",
-  "trajetDetailDeleteConfirmCancel": "Annuleren",
   "trajetDetailDeleteConfirmConfirm": "Verwijderen",
   "tripRecordingObd2NotResponding": "OBD2-adapter verbonden maar geeft geen gegevens terug. Probeer een andere adapter of controleer het diagnostische protocol van het voertuig.",
   "trajetsViewAllOnMap": "Alles op kaart tonen",
@@ -1552,7 +1393,6 @@
   "tripLengthBucketTripCount": "{count, plural, =0{geen ritten} one{1 rit} other{{count} ritten}}",
   "tripPathCardTitle": "Ritpad",
   "tripPathCardSubtitle": "GPS-opgenomen route",
-  "tripPathLegendTitle": "Verbruik",
   "tripPathLegendEfficient": "Efficiënt (< 6 L/100km)",
   "tripPathLegendBorderline": "Grenswaarde (6–10 L/100km)",
   "tripPathLegendWasteful": "Verspillend (≥ 10 L/100km)",
@@ -1563,13 +1403,8 @@
   "tripRecordingPinHelpTitle": "Over vastzetten",
   "tripRecordingPinHelpBody": "Vastzetten houdt het scherm aan en verbergt de systeembalk zodat het formulier leesbaar blijft op een dashboardhouder. Tik opnieuw om te ontgrendelen. Wordt automatisch vrijgegeven als de rit stopt.",
   "tripRecordingResumeHintMessage": "Opname gaat door op de achtergrond. Tik op de rode balk boven aan elk scherm om terug te keren.",
-  "tripBannerOpenFromConsumptionTab": "Open de actieve rit via het tabblad Verbruik",
   "tripRecordingUnpinnedWarning": "Zet het scherm vast om GPS actief te houden tijdens de rit — Android kan GPS beperken tijdens slaapstand.",
   "tripRecordingMinimiseTooltip": "Minimaliseren tot een zwevende tegel",
-  "unifiedFilterFuel": "Brandstof",
-  "unifiedFilterEv": "EV",
-  "unifiedFilterBoth": "Beide",
-  "unifiedNoResultsForFilter": "Geen resultaten voor dit filter",
   "searchFailedSnackbar": "Zoeken mislukt — probeer het opnieuw",
   "vinLabel": "VIN (optioneel)",
   "vinDecodeTooltip": "VIN decoderen",
@@ -1601,7 +1436,6 @@
   "gdprVinOnlineDecodeTitle": "VIN online decoderen",
   "gdprVinOnlineDecodeShort": "VIN decoderen via de gratis openbare dienst van NHTSA",
   "gdprVinOnlineDecodeDescription": "Als je een adapter koppelt, wordt het VIN van je voertuig lokaal uitgelezen om de auto te identificeren. Als je dit inschakelt, wordt het 17-tekens VIN naar de gratis vPIC-dienst van NHTSA gestuurd om extra details op te zoeken (model, motorinhoud, brandstoftype). Het VIN is de enige verzonden data — geen andere informatie verlaat je apparaat.",
-  "vehicleDetectedFromVinBadge": "(gedetecteerd)",
   "vehicleDetectedFromVinSnackbar": "Gedetecteerd via VIN: {summary}. Toepassen?",
   "vehicleDetectedFromVinApply": "Toepassen",
   "widgetHelpSectionTitle": "Widget voor startscherm",
@@ -1620,7 +1454,6 @@
   "widgetColorSchemeOrange": "Oranje",
   "widgetVariantDefault": "Alleen huidige prijs",
   "widgetVariantPredictive": "Voorspellend: beste tijd om te tanken",
-  "widgetPredictiveNowPrefix": "nu",
   "@distance": {
     "placeholders": {
       "distance": {
@@ -1629,13 +1462,6 @@
     }
   },
   "@stationsFound": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@stationsOnMap": {
     "placeholders": {
       "count": {
         "type": "int"
@@ -1700,13 +1526,6 @@
   "@evConnectors": {
     "placeholders": {
       "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@stopN": {
-    "placeholders": {
-      "n": {
         "type": "int"
       }
     }
@@ -1850,25 +1669,11 @@
       }
     }
   },
-  "approachStationDistance": "{meters} m verderop",
-  "@approachStationDistance": {
-    "description": "PiP overlay caption (#2084) showing how far the driver is from the in-radius target station, in metres.",
-    "placeholders": {
-      "meters": {
-        "type": "String",
-        "example": "350"
-      }
-    }
-  },
   "tripRecordingPipElapsedCaption": "verstreken",
   "@tripRecordingPipElapsedCaption": {
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
-  "fabOpenCriteria": "Zoeken openen",
-  "fabOpenResults": "Resultaten openen",
   "fabRunSearch": "Zoekopdracht uitvoeren",
-  "fabRefineCriteria": "Zoekopdracht verfijnen",
-  "routeSearchPartialBanner": "Zoekt naar meer stations…",
   "privacySaveErrorLog": "Foutenlogboek opslaan ({count})",
   "@privacySaveErrorLog": {
     "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
@@ -2418,10 +2223,6 @@
   "@trajetDetailChartCoolant": {
     "description": "MT — needs native review"
   },
-  "trajetDetailChartAltitude": "Hoogte (m)",
-  "@trajetDetailChartAltitude": {
-    "description": "MT — needs native review"
-  },
   "trajetDetailChartLambda": "Ingestelde λ",
   "@trajetDetailChartLambda": {
     "description": "MT — needs native review"
@@ -2654,14 +2455,6 @@
   "@obd2HealthHistorySection": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyJson": "Kopiëren als JSON",
-  "@obd2HealthCopyJson": {
-    "description": "MT — needs native review"
-  },
-  "obd2HealthCopied": "OBD2-diagnose gekopieerd naar klembord.",
-  "@obd2HealthCopied": {
-    "description": "MT — needs native review"
-  },
   "evStatusPartial": "Gedeeltelijk beschikbaar",
   "@evStatusPartial": {
     "description": "MT — needs native review"
@@ -2767,10 +2560,6 @@
   },
   "ocrTesterRunning": "OCR uitvoeren…",
   "@ocrTesterRunning": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterNoResult": "OCR heeft geen leesbaar resultaat opgeleverd.",
-  "@ocrTesterNoResult": {
     "description": "MT — needs native review"
   },
   "ocrTesterOverlaySection": "Blokoverlay",
@@ -2937,10 +2726,6 @@
   "@obd2DiagnosticsInitCold": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyInitTranscript": "Alleen init-transcript kopiëren",
-  "@obd2HealthCopyInitTranscript": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterSaveFixture": "Opslaan als fixture",
   "@ocrTesterSaveFixture": {
     "description": "MT — needs native review"
@@ -3092,10 +2877,6 @@
   "@obd2GpsDegradedBannerTitle": {
     "description": "MT — needs native review"
   },
-  "restoreBackupTooltip": "Back-up terugzetten",
-  "@restoreBackupTooltip": {
-    "description": "MT — needs native review"
-  },
   "restoreBackupDialogTitle": "Back-up terugzetten",
   "@restoreBackupDialogTitle": {
     "description": "MT — needs native review"
@@ -3111,15 +2892,6 @@
   "restoreBackupReplaceAction": "Alles vervangen",
   "@restoreBackupReplaceAction": {
     "description": "MT — needs native review"
-  },
-  "restoreBackupSuccess": "Back-up teruggezet — {count} records geïmporteerd",
-  "@restoreBackupSuccess": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
   },
   "restoreBackupEmpty": "Back-up teruggezet — deze bevatte geen records",
   "@restoreBackupEmpty": {
@@ -3391,16 +3163,6 @@
   "voiceCoachingSettingSubtitle": "Hoor gesproken tips terwijl je rijdt — hard optrekken, hard remmen en schakelhints",
   "@voiceCoachingSettingSubtitle": {
     "description": "MT — needs native review"
-  },
-  "fuelStationRadarDistanceKm": "{km} km verderop",
-  "@fuelStationRadarDistanceKm": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "km": {
-        "type": "String",
-        "example": "2.4"
-      }
-    }
   },
   "fuelStationRadarProximity": "Nabijheid {percent}%",
   "@fuelStationRadarProximity": {
@@ -3733,10 +3495,6 @@
   },
   "consumptionStatsChartConsumption": "L/100km per maand",
   "@consumptionStatsChartConsumption": {
-    "description": "MT — needs native review"
-  },
-  "shareReceiptImporting": "Gedeelde bon importeren…",
-  "@shareReceiptImporting": {
     "description": "MT — needs native review"
   },
   "shareReceiptUnsupportedFormat": "Dit bestandstype kan nog niet worden geïmporteerd — deel in plaats daarvan een foto van de bon.",
@@ -4228,17 +3986,6 @@
       "count": {
         "type": "int",
         "example": "3"
-      }
-    }
-  },
-  "fuelEfficiencyMixedFootnote": "{count, plural, =1{1 mixed tank counted toward its main fuel} other{{count} mixed tanks counted toward their main fuel}}",
-  "@fuelEfficiencyMixedFootnote": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int",
-        "example": "1"
       }
     }
   },
@@ -4752,11 +4499,6 @@
         "example": "Oil change"
       }
     }
-  },
-  "radarAcquiringLocation": "Finding your location…",
-  "@radarAcquiringLocation": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
   },
   "radarUpdatingLocation": "Updating your location…",
   "@radarUpdatingLocation": {

@@ -12,11 +12,8 @@
   "fuelType": "Combustible",
   "searchRadius": "Radio",
   "searchNearby": "Gasolineras cercanas",
-  "searchButton": "Buscar",
   "searchCriteriaTitle": "Criterios de búsqueda",
-  "searchCriteriaOpen": "Buscar",
   "searchCriteriaRadiusBadge": "En un radio de {km} km",
-  "searchCriteriaTapToSearch": "Toca para empezar a buscar",
   "noResults": "No se encontraron gasolineras.",
   "startSearch": "Busca para encontrar gasolineras.",
   "open": "Abierto",
@@ -30,7 +27,6 @@
   "navigate": "Navegar",
   "retry": "Reintentar",
   "apiKeySetup": "Clave API",
-  "apiKeyDescription": "Regístrate una vez para obtener una clave API gratuita.",
   "apiKeyLabel": "Clave API",
   "register": "Registro",
   "continueButton": "Continuar",
@@ -64,33 +60,12 @@
   "noFavoritesHint": "Toca la estrella de una gasolinera para guardarla como favorita.",
   "language": "Idioma",
   "country": "País",
-  "demoMode": "Modo demo — datos de ejemplo.",
-  "setupLiveData": "Configurar datos en vivo",
   "freeNoKey": "Gratis — sin clave necesaria",
   "apiKeyRequired": "Clave API necesaria",
-  "skipWithoutKey": "Continuar sin clave",
   "dataTransparency": "Transparencia de datos",
   "storageAndCache": "Almacenamiento y caché",
   "clearCache": "Limpiar caché",
-  "clearAllData": "Eliminar todos los datos",
-  "errorLog": "Registro de errores",
   "stationsFound": "{count} gasolineras encontradas",
-  "whatIsShared": "¿Qué se comparte — y con quién?",
-  "gpsCoordinates": "Coordenadas GPS",
-  "gpsReason": "Se envían en cada búsqueda para encontrar las estaciones cercanas.",
-  "postalCodeData": "Código postal",
-  "postalReason": "Se convierte en coordenadas mediante el servicio de geocodificación.",
-  "mapViewport": "Vista del mapa",
-  "mapReason": "Los mosaicos del mapa se cargan desde el servidor. No se transmiten datos personales.",
-  "apiKeyData": "Clave API",
-  "apiKeyReason": "Su clave personal se envía con cada solicitud API. Está vinculada a su correo electrónico.",
-  "notShared": "NO se comparte:",
-  "searchHistory": "Historial de búsqueda",
-  "favoritesData": "Favoritos",
-  "profileNames": "Nombres de perfil",
-  "homeZipData": "Código postal de casa",
-  "usageData": "Datos de uso",
-  "privacyBanner": "Esta app no tiene servidor. Todos los datos permanecen en su dispositivo. Sin análisis, sin seguimiento, sin publicidad.",
   "storageUsage": "Uso de almacenamiento en este dispositivo",
   "settingsLabel": "Ajustes",
   "profilesStored": "perfiles guardados",
@@ -116,12 +91,8 @@
   "deleteAllButton": "Eliminar todo",
   "entries": "entradas",
   "cacheEmpty": "La caché está vacía",
-  "noStorage": "Sin almacenamiento utilizado",
   "apiKeyNote": "Registro gratuito. Datos de las agencias gubernamentales de transparencia de precios.",
   "apiKeyFormatError": "Formato inválido — se espera UUID (8-4-4-4-12)",
-  "supportProject": "Apoyar este proyecto",
-  "supportDescription": "Esta app es gratuita, de código abierto y sin publicidad. Si le resulta útil, considere apoyar al desarrollador.",
-  "reportBug": "Reportar error / Sugerir función",
   "reportThisIssue": "Informar de este problema",
   "reportAlreadySent": "Ya has informado de este problema.",
   "reportConsentTitle": "¿Informar a GitHub?",
@@ -136,7 +107,6 @@
   "configApiKeysSection": "Claves de API",
   "configTankerkoenigKey": "Clave de API de Tankerkoenig",
   "configApiKeyConfigured": "Configurada",
-  "configApiKeyNotSet": "Sin configurar (modo demo)",
   "configApiKeyCommunity": "Predeterminada (clave de la comunidad)",
   "searchLocationPlaceholder": "Dirección, código postal o ciudad",
   "configEvKey": "Clave de API de carga de VE",
@@ -174,8 +144,6 @@
   "sortPriceDistance": "Precio/km",
   "cheap": "barato",
   "expensive": "caro",
-  "stationsOnMap": "{count} estaciones",
-  "loadingFavorites": "Cargando favoritos...\nBusque estaciones primero para guardar datos.",
   "reportPrice": "Reportar precio",
   "whatsWrong": "¿Qué está mal?",
   "correctPrice": "Precio correcto (ej. 1,459)",
@@ -185,7 +153,6 @@
   "cacheCleared": "Caché vaciado.",
   "yourPosition": "Su posición",
   "positionUnknown": "Posición desconocida",
-  "routeModeBannerLabel": "Modo ruta — las distancias son a lo largo del corredor",
   "distancesFromCenter": "Distancias desde el centro de búsqueda",
   "autoUpdatePosition": "Actualizar posición automáticamente",
   "autoUpdateDescription": "Actualizar GPS antes de cada búsqueda",
@@ -220,8 +187,6 @@
   "wrongDieselPrice": "Precio Diésel incorrecto",
   "wrongStatusOpen": "Aparece abierto, pero cerrado",
   "wrongStatusClosed": "Aparece cerrado, pero abierto",
-  "searchAlongRouteLabel": "A lo largo de la ruta",
-  "searchEvStations": "Buscar estaciones de carga",
   "allStations": "Todas las estaciones",
   "bestStops": "Mejores paradas",
   "openInMaps": "Abrir en Mapas",
@@ -253,7 +218,6 @@
   "cityOrAddress": "Ciudad o dirección",
   "useGps": "Usar GPS",
   "stop": "Parada",
-  "stopN": "Parada {n}",
   "addStop": "Añadir parada",
   "searchAlongRoute": "Buscar a lo largo de la ruta",
   "cheapest": "Más barata",
@@ -265,10 +229,8 @@
   "customKey": "Clave personalizada",
   "appDefaultKey": "Clave predeterminada de la app",
   "optionalOverrideKey": "Opcional: reemplazar la clave integrada con la suya",
-  "requiredForEvSearch": "Requerido para buscar estaciones de carga EV",
   "edit": "Editar",
   "fuelPricesApiKey": "Clave API precios de combustible",
-  "tankerkoenigApiKey": "Clave API Tankerkoenig",
   "evChargingApiKey": "Clave API carga EV",
   "openChargeMapApiKey": "Clave API OpenChargeMap",
   "routePlanningSection": "Planificación de ruta",
@@ -303,18 +265,14 @@
   "noStationsAlongThisRoute": "No se encontraron estaciones a lo largo de esta ruta.",
   "fuelCostCalculator": "Calculadora de coste de combustible",
   "distanceKm": "Distancia (km)",
-  "consumptionL100km": "Consumo (L/100km)",
-  "fuelPriceEurL": "Precio combustible (EUR/L)",
   "tripCost": "Coste del viaje",
   "fuelNeeded": "Combustible necesario",
   "totalCost": "Coste total",
-  "enterCalcValues": "Introduzca distancia, consumo y precio para calcular el coste del viaje",
   "priceHistory": "Historial de precios",
   "ignoredStationsLabel": "Ignoradas",
   "ratingsLabel": "Valoraciones",
   "favoritesDataCache": "Datos de favoritos",
   "citySearchCache": "Búsqueda de ciudad",
-  "dataDeletionNotAvailableCommunity": "La eliminación de datos no está disponible en el modo Comunidad. Desconéctese primero o utilice una base de datos privada.",
   "priceHistoryStationsTracked": "{count} estaciones seguidas",
   "@priceHistoryStationsTracked": {
     "placeholders": {
@@ -348,22 +306,11 @@
     }
   },
   "noPriceHistory": "Aún no hay historial de precios",
-  "noHourlyData": "Sin datos por hora",
   "noStatistics": "No hay estadísticas disponibles",
-  "statMin": "Mín",
-  "statMax": "Máx",
-  "statAvg": "Prom",
   "showAllFuelTypes": "Mostrar todos los tipos de combustible",
   "connected": "Conectado",
-  "notConnected": "No conectado",
-  "connectTankSync": "Conectar TankSync",
   "disconnectTankSync": "Desconectar TankSync",
   "viewMyData": "Ver mis datos",
-  "optionalCloudSync": "Sincronización en la nube opcional para alertas, favoritos y notificaciones push",
-  "tapToUpdateGps": "Toque para actualizar la posición GPS",
-  "gpsAutoUpdateHint": "La posición GPS se adquiere automáticamente al buscar. También puede actualizarla manualmente aquí.",
-  "clearGpsConfirm": "¿Borrar la posición GPS almacenada? Puede actualizarla en cualquier momento.",
-  "pageNotFound": "Página no encontrada",
   "deleteAllServerData": "Eliminar todos los datos del servidor",
   "deleteServerDataConfirm": "¿Eliminar todos los datos del servidor?",
   "deleteEverything": "Eliminar todo",
@@ -373,7 +320,6 @@
   "forgetAllSyncedTripsConfirmBody": "Se eliminarán del servidor todos los resúmenes y detalles de viajes. Tu historial local de viajes en este dispositivo no se verá afectado.\n\nEsta acción no se puede deshacer.",
   "forgetAllSyncedTripsConfirmAction": "Olvidar todos",
   "forgetAllSyncedTripsSuccess": "Todos los viajes sincronizados se han eliminado del servidor",
-  "disconnectConfirm": "¿Desconectar TankSync?",
   "disconnect": "Desconectar",
   "myServerData": "Mis datos del servidor",
   "anonymousUuid": "UUID anónimo",
@@ -393,7 +339,6 @@
   "continueAsGuest": "Continuar como invitado",
   "createAccount": "Crear cuenta",
   "signIn": "Iniciar sesión",
-  "upgradeToEmail": "Crear cuenta de correo",
   "savedRoutes": "Rutas guardadas",
   "noSavedRoutes": "Sin rutas guardadas",
   "noSavedRoutesHint": "Busca a lo largo de una ruta y guárdala para acceso rápido.",
@@ -424,11 +369,6 @@
   "onboardingNext": "Siguiente",
   "onboardingSkip": "Omitir",
   "onboardingFinish": "Empezar",
-  "crossBorderNearby": "{country} está cerca",
-  "crossBorderDistance": "~{km} km hasta la frontera",
-  "crossBorderAvgPrice": "Media aquí: {price} EUR ({count} estaciones)",
-  "allPricesView": "Todos los precios",
-  "compactView": "Compacta",
   "switchToAllPricesView": "Cambiar a la vista de todos los precios",
   "switchToCompactView": "Cambiar a la vista compacta",
   "unavailable": "N/D",
@@ -453,10 +393,6 @@
   "accountDeleted": "Cuenta eliminada. Datos locales conservados.",
   "switchedToAnonymous": "Se ha cambiado a una sesión anónima",
   "failedToSwitch": "Error al cambiar: {error}",
-  "topicUrlCopied": "URL del tema copiada",
-  "testNotificationSent": "¡Notificación de prueba enviada!",
-  "testNotificationFailed": "Error al enviar la notificación de prueba",
-  "pushUpdateFailed": "Error al actualizar el ajuste de notificaciones push",
   "connectedAsGuest": "Conectado como invitado",
   "accountCreated": "¡Cuenta creada!",
   "signedIn": "¡Sesión iniciada!",
@@ -518,7 +454,6 @@
   "privacyClearErrorLog": "Borrar registro de errores",
   "privacyErrorLogCleared": "Registro de errores borrado",
   "privacyDeleteButton": "Eliminar todos los datos",
-  "privacyCopyErrorLog": "Copiar registro de errores al portapapeles ({count})",
   "privacyDeleteTitle": "¿Eliminar todos los datos?",
   "privacyDeleteBody": "Esto eliminará de forma permanente:\n\n- Todos los favoritos y datos de estaciones\n- Todos los perfiles de búsqueda\n- Todas las alertas de precios\n- Todo el historial de precios\n- Todos los datos en caché\n- Tu clave de API\n- Todos los ajustes de la app\n\nLa app se restablecerá a su estado inicial. Esta acción no se puede deshacer.",
   "privacyDeleteConfirm": "Eliminar todo",
@@ -553,15 +488,8 @@
   "voiceAnnouncementsTitle": "Anuncios por voz",
   "voiceAnnouncementsDescription": "Anuncia estaciones baratas cercanas mientras conduces",
   "voiceAnnouncementsEnabled": "Activar anuncios por voz",
-  "voiceAnnouncementThreshold": "Solo por debajo de {price}",
-  "voiceAnnouncementCheapFuel": "{station}, a {distance} kilómetros, {fuelType} {price}",
   "voiceAnnouncementProximityRadius": "Radio de anuncio",
   "voiceAnnouncementCooldown": "Intervalo de repetición",
-  "nearestStations": "Estaciones cercanas",
-  "nearestStationsHint": "Encontrar las estaciones mas cercanas con su ubicacion actual",
-  "consumptionLogTitle": "Consumo de combustible",
-  "consumptionLogMenuTitle": "Registro de consumo",
-  "consumptionLogMenuSubtitle": "Registra los repostajes y calcula L/100 km",
   "consumptionStatsTitle": "Estadísticas de consumo",
   "addFillUp": "Añadir repostaje",
   "noFillUpsTitle": "Aún no hay repostajes",
@@ -595,14 +523,12 @@
   "vehiclesWizardYoursList": "{count, plural, =1{Tienes 1 vehículo} other{Tienes {count} vehículos}}:",
   "vehiclesWizardSkipHint": "Omite este paso para finalizar la configuración: puedes añadir vehículos en cualquier momento desde Ajustes.",
   "fillUpVehicleLabel": "Vehículo",
-  "fillUpVehicleNone": "Sin vehículo",
   "fillUpVehicleRequired": "El vehículo es obligatorio",
   "reportScanError": "Informar de error de escaneo",
   "pickStationTitle": "Elige una estación",
   "pickStationHelper": "Empieza el repostaje desde una estación conocida para que los precios, la marca y el tipo de combustible se rellenen solos.",
   "pickStationEmpty": "Aún no tienes estaciones favoritas: añade algunas desde Buscar o Favoritos, u omite este paso y rellénalo manualmente.",
   "pickStationSkip": "Omitir: añadir sin estación",
-  "scanPump": "Escanear surtidor",
   "scanPayment": "Escanear QR de pago",
   "qrPaymentBeneficiary": "Beneficiario",
   "qrPaymentAmount": "Importe",
@@ -624,17 +550,10 @@
   "qrScannerRetry": "Reintentar",
   "torchOn": "Encender el flash",
   "torchOff": "Apagar el flash",
-  "obdNoAdapter": "No hay ningún adaptador OBD2 al alcance",
-  "obdOdometerUnavailable": "No se pudo leer el cuentakilómetros",
   "obdPermissionDenied": "Concede el permiso de Bluetooth en los ajustes del sistema",
-  "obdAdapterUnresponsive": "El adaptador no respondió: enciende el contacto y reinténtalo",
   "obdPickerTitle": "Elige un adaptador OBD2",
   "obdPickerScanning": "Buscando adaptadores…",
   "obdPickerConnecting": "Conectando…",
-  "themeSettingTitle": "Tema",
-  "themeModeLight": "Claro",
-  "themeModeDark": "Oscuro",
-  "themeModeSystem": "Según el sistema",
   "tripRecordingTitle": "Grabando viaje",
   "tripSummaryTitle": "Resumen del viaje",
   "tripMetricDistance": "Distancia",
@@ -676,18 +595,13 @@
   "syncBaselinesToggleTitle": "Compartir perfiles de vehículo aprendidos",
   "syncBaselinesToggleSubtitle": "Sube las referencias de consumo por vehículo para que un segundo dispositivo pueda reutilizarlas.",
   "obd2StatusConnected": "Adaptador OBD2: conectado",
-  "obd2StatusAttempting": "Adaptador OBD2: conectando",
-  "obd2StatusUnreachable": "Adaptador OBD2: no accesible",
   "obd2StatusPermissionDenied": "Adaptador OBD2: se necesita el permiso de Bluetooth",
   "obd2StatusConnectedBody": "Listo para grabar un viaje.",
-  "obd2StatusAttemptingBody": "Conectando en segundo plano…",
-  "obd2StatusUnreachableBody": "El adaptador está fuera de alcance o ya lo está usando otra app.",
   "obd2StatusPermissionDeniedBody": "Concede el permiso de Bluetooth en los ajustes del sistema para reconectar automáticamente.",
   "obd2StatusNoAdapter": "No hay ningún adaptador emparejado",
   "obd2StatusForget": "Olvidar adaptador",
   "tripHistoryTitle": "Historial de viajes",
   "tripHistoryEmptyTitle": "Aún no hay viajes",
-  "tripHistoryEmptySubtitle": "Conecta un adaptador OBD2 y graba un viaje para empezar a crear tu historial de conducción.",
   "tripHistoryUnknownDate": "Fecha desconocida",
   "situationIdle": "Ralentí",
   "situationStopAndGo": "Parada y arranque",
@@ -697,12 +611,8 @@
   "situationClimbing": "Subiendo / con carga",
   "situationHardAccel": "Aceleración fuerte",
   "situationFuelCut": "Corte de combustible: deceleración",
-  "tripSaveAsFillUp": "Guardar como repostaje",
   "tripSaveRecording": "Guardar viaje",
-  "tripDiscard": "Descartar",
-  "obdOdometerRead": "Lectura del cuentakilómetros: {km} km",
   "vehicleFuelNotSet": "Sin definir",
-  "wizardVehicleTapToEdit": "Toca para editar",
   "wizardVehicleDefaultBadge": "Predeterminado",
   "wizardProfileChoiceHint": "Elige cómo quieres usar la app. Puedes cambiarlo más tarde en Ajustes.",
   "wizardProfileChoiceFooter": "Puedes cambiar tu elección en cualquier momento desde Ajustes → Modo de uso.",
@@ -713,7 +623,6 @@
   "wizardProfileFullName": "Completo",
   "wizardProfileFullDescription": "Todo lo del modo Intermedio, además de la grabación automática de viajes por OBD2, las puntuaciones de conducción y las tarjetas de fidelización.",
   "wizardProfileCustomName": "Personalizado",
-  "wizardProfileCustomDescription": "Tu propia combinación de funciones. Ajusta cada interruptor abajo.",
   "useModeSectionHint": "Adapta la app a cómo la usas realmente. Al elegir un preajuste se activa el conjunto de funciones correspondiente.",
   "useModeCustomSettingsDescription": "Tu combinación de funciones no coincide con ningún preajuste. Elige uno arriba para sobrescribirla o sigue personalizando funciones individuales en la sección de abajo.",
   "useModeSwitchedSnack": "Modo de uso definido como {profile}.",
@@ -751,20 +660,15 @@
   "evShowOnMap": "Mostrar estaciones de VE",
   "evAvailableOnly": "Solo disponibles",
   "evMinPower": "Potencia mín.",
-  "evMaxPower": "Potencia máx.",
-  "evOperator": "Operador",
-  "evLastUpdate": "Última actualización",
   "evStatusAvailable": "Disponible",
   "evStatusOccupied": "Ocupado",
   "evStatusOutOfOrder": "Fuera de servicio",
   "openOnlyFilter": "Solo abiertas",
   "saveAsDefaults": "Guardar como mis valores predeterminados",
   "criteriaSavedToProfile": "Guardado como valores predeterminados",
-  "profileNotFound": "No hay ningún perfil activo",
   "updatingFavorites": "Actualizando tus favoritos...",
   "fetchingLatestPrices": "Obteniendo los últimos precios",
   "noDataAvailable": "Sin datos",
-  "configAndPrivacy": "Configuración y privacidad",
   "searchToSeeMap": "Busca para ver estaciones en el mapa",
   "evPowerAny": "Cualquiera",
   "evPowerKw": "{kw} kW+",
@@ -819,9 +723,6 @@
   "iosAutoRecordOnboardingBullet3Title": "Cuando iOS te pida la ubicación «Siempre», acéptala.",
   "iosAutoRecordOnboardingBullet3Body": "El sistema de respaldo que graba tu viaje cuando el adaptador OBD2 va lento necesita la ubicación en segundo plano. Nunca la compartimos.",
   "scanReceipt": "Escanear recibo",
-  "obdConnect": "OBD-II",
-  "stationTypeFuel": "Combustible",
-  "stationTypeEv": "VE",
   "brandFilterHighway": "Autopista",
   "ratingModeLocal": "Local",
   "ratingModePrivate": "Privado",
@@ -841,7 +742,6 @@
   "errorHintRouting": "Error al calcular la ruta. Comprueba tu conexión a internet e inténtalo de nuevo.",
   "errorHintFallback": "Inténtalo de nuevo o busca por código postal o nombre de ciudad.",
   "alertsLoadErrorTitle": "No se pudieron cargar tus alertas",
-  "alertsBackgroundCheckErrorTitle": "Error en la comprobación de alertas en segundo plano",
   "detailsLabel": "Detalles",
   "remove": "Eliminar",
   "showKey": "Mostrar clave",
@@ -950,19 +850,11 @@
   "linkDeviceHowItWorksBody": "1. En el dispositivo A: copia el código del dispositivo de arriba\n2. En el dispositivo B: pégalo en el campo «Código del dispositivo»\n3. Toca «Importar datos» para combinar favoritos, alertas, vehículos y registros de consumo\n4. Ambos dispositivos tendrán todos los datos combinados\n\nCada dispositivo conserva su propia identidad anónima y su propio perfil (combustible preferido, vehículo predeterminado, pantalla de inicio). Los datos se combinan, no se transfieren.",
   "vehicleSetActive": "Marcar como activo",
   "swipeHide": "Ocultar",
-  "evChargingSection": "Carga de VE",
-  "fuelStationsSection": "Estaciones de servicio",
   "yourRating": "Tu valoración",
   "noStorageUsed": "No se usa almacenamiento",
   "aboutReportBug": "Informar de un error / Sugerir una función",
   "aboutSupportProject": "Apoya este proyecto",
   "aboutSupportDescription": "Esta app es gratuita, de código abierto y sin anuncios. Si te resulta útil, considera apoyar al desarrollador.",
-  "luxembourgRegulatedPricesNotice": "Los precios del combustible en Luxemburgo están regulados por el gobierno y son uniformes en todo el país.",
-  "luxembourgFuelUnleaded95": "Sin plomo 95",
-  "luxembourgFuelUnleaded98": "Sin plomo 98",
-  "luxembourgFuelDiesel": "Diésel",
-  "luxembourgFuelLpg": "GLP",
-  "luxembourgPricesUnavailable": "Los precios regulados de Luxemburgo no están disponibles.",
   "reportIssueTitle": "Informar de un problema",
   "enterCorrection": "Introduce la corrección",
   "reportNoBackendAvailable": "No se pudo enviar el informe: no hay ningún servicio de informes configurado para este país. Activa TankSync en Ajustes para enviar informes de la comunidad.",
@@ -989,10 +881,6 @@
   "serviceReminderMarkDone": "Marcar como hecho",
   "serviceReminderDueTitle": "Mantenimiento pendiente",
   "serviceReminderDueBody": "{label} toca hacerlo: {kmOver} km por encima del intervalo.",
-  "southKoreaApiKeyRequired": "Regístrate en OPINET para obtener una clave de API gratuita",
-  "southKoreaApiProvider": "OPINET (KNOC)",
-  "chileApiKeyRequired": "Regístrate en CNE para obtener una clave de API gratuita",
-  "chileApiProvider": "CNE Bencina en Línea",
   "vinConfirmTitle": "¿Es este tu coche?",
   "vinConfirmBody": "{make} {model} {year} — {displacement} L, {cylinders} cil., {fuel}",
   "vinPartialInfoNote": "Información parcial (sin conexión). Puedes editarla abajo.",
@@ -1011,17 +899,13 @@
   "alertsRadiusCreateTitle": "Crear alerta por radio",
   "alertsRadiusLabelHint": "Etiqueta (p. ej. Diésel casa)",
   "alertsRadiusFuelType": "Tipo de combustible",
-  "alertsRadiusThreshold": "Umbral (€/L)",
   "alertsRadiusKm": "Radio (km)",
   "alertsRadiusCenterGps": "Usar mi ubicación",
   "alertsRadiusCenterPostalCode": "Código postal",
   "alertsRadiusSave": "Guardar",
   "alertsRadiusCancel": "Cancelar",
-  "alertsRadiusDeleteConfirm": "¿Eliminar la alerta por radio?",
   "obd2ConnectedTooltip": "OBD2 conectado: {adapterName}",
   "obd2PairChipTooltip": "Emparejar un adaptador OBD2",
-  "velocityAlertTitle": "{fuelLabel} ha bajado en estaciones cercanas",
-  "velocityAlertBody": "{stationCount} estaciones han bajado hasta {maxDropCents} ¢ en la última hora",
   "fillUpSavedSnackbar": "Repostaje guardado",
   "radiusAlertsEntryTitle": "Alertas por radio y estadísticas",
   "radiusAlertsEntrySubtitle": "Recibe un aviso cuando los precios bajen cerca de ti",
@@ -1060,8 +944,6 @@
   "autoRecordStatusPairAdapterCta": "Emparejar un adaptador",
   "autoRecordSpeedThresholdLabel": "Velocidad de inicio (km/h)",
   "autoRecordSaveDelayLabel": "Retardo de guardado tras la desconexión (segundos)",
-  "autoRecordPairedAdapterLabel": "Adaptador emparejado",
-  "autoRecordPairedAdapterNone": "No hay ningún adaptador emparejado. Empareja uno primero mediante la configuración inicial de OBD2.",
   "autoRecordBackgroundLocationLabel": "Ubicación en segundo plano permitida",
   "autoRecordBackgroundLocationRequest": "Solicitar permiso",
   "autoRecordBackgroundLocationRationaleTitle": "¿Por qué «Permitir todo el tiempo»?",
@@ -1069,18 +951,12 @@
   "autoRecordBackgroundLocationOpenSettings": "Abrir ajustes",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Se requiere el permiso de ubicación",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "No se pudo solicitar la ubicación en segundo plano",
-  "autoRecordBadgeClearTooltip": "Borrar contador",
   "autoRecordPairAdapterLinkText": "Empareja un adaptador en la sección de abajo para activar la grabación automática",
-  "exportBackupTooltip": "Exportar copia de seguridad",
   "exportBackupReady": "Copia de seguridad lista: elige un destino",
   "exportBackupFailed": "Error al exportar la copia de seguridad: inténtalo de nuevo",
-  "brokenMapChipVerifying": "Verificando sensor MAP…",
   "brokenMapChipDisclaimer": "Lecturas del MAP sospechosas",
   "brokenMapSnackbarUnreliable": "El sensor MAP da lecturas incorrectas: las lecturas de combustible pueden ser entre un 50 y un 80 % demasiado bajas. Prueba con otro adaptador.",
   "brokenMapBannerHardDisable": "Sensor MAP poco fiable. Se muestran las medias de repostaje en lugar del caudal de combustible en directo.",
-  "brokenMapOverlayVerified": "Sensor MAP: verificado ({confidence})",
-  "brokenMapOverlayUnverified": "Sensor MAP: verificando ({confidence})",
-  "brokenMapOverlaySuspicious": "Sensor MAP: sospechoso ({confidence})",
   "brokenMapOverlayPosterior": "Sensor MAP: {posterior} % ± {margin} %",
   "brokenMapOverlayPosteriorVerified": "Sensor MAP: {posterior} % ± {margin} % (verificado)",
   "brokenMapDiagnosticsCardTitle": "Diagnóstico del sensor MAP",
@@ -1142,7 +1018,6 @@
   "chargingCostTrendTitle": "Tendencia del coste de carga",
   "chargingEfficiencyTitle": "Eficiencia (kWh/100 km)",
   "chargingChartsEmpty": "Aún no hay datos suficientes",
-  "chargingChartsMonthAxis": "Mes",
   "consoFeatureGroupTitle": "Consumo",
   "consoFeatureGroupDescription": "Controla tu consumo: repostajes manuales o grabación automática de viajes por OBD2.",
   "consoModeOff": "Desactivado",
@@ -1158,10 +1033,6 @@
   "fillUpCorrectionEditExplainer": "Esta entrada se generó automáticamente para cerrar la diferencia entre los viajes registrados y el combustible repostado. Ajusta los valores si conoces las cifras reales.",
   "fillUpCorrectionDelete": "Eliminar corrección",
   "fillUpCorrectionStation": "Nombre de la estación (opcional)",
-  "greeceApiProvider": "Paratiritirio Timon (Grecia)",
-  "greeceCommunityApiNotice": "Con la tecnología de la API fuelpricesgr mantenida por la comunidad",
-  "romaniaApiProvider": "Monitorul Prețurilor (Rumanía)",
-  "romaniaScrapingNotice": "Con la tecnología de monitorulpreturilor.info (Consejo de Competencia + ANPC)",
   "crossBorderCheaper": "Estaciones de {country} a {km} km: {price} €/L más baratas",
   "crossBorderTapToSwitch": "Toca para cambiar de país",
   "crossBorderDismissTooltip": "Descartar",
@@ -1186,9 +1057,6 @@
   "drivingScorePenaltyHardBrake": "Frenadas bruscas",
   "drivingScorePenaltyHighRpm": "RPM altas",
   "drivingScorePenaltyFullThrottle": "Acelerador a fondo",
-  "ecoRouteOption": "Eco",
-  "ecoRouteSavings": "≈ {liters} L ahorrados",
-  "ecoRouteHint": "Conducción más inteligente: prioriza la autopista estable frente a los atajos en zigzag.",
   "favoritesShareAction": "Compartir",
   "favoritesShareSubject": "Sparkilo: favoritos del {date}",
   "favoritesShareError": "No se pudo generar la imagen para compartir",
@@ -1206,8 +1074,6 @@
   "featureDescription_consumptionAnalytics": "Pestaña de análisis de repostajes y viajes.",
   "featureLabel_baselineSync": "Sincronización de referencias",
   "featureDescription_baselineSync": "Sincroniza las referencias de conducción mediante TankSync.",
-  "featureLabel_unifiedSearchResults": "Resultados de búsqueda unificados",
-  "featureDescription_unifiedSearchResults": "Una sola lista de resultados que combina estaciones de combustible y de VE.",
   "featureLabel_priceAlerts": "Alertas de precios",
   "featureDescription_priceAlerts": "Notificaciones de bajada de precio basadas en umbrales.",
   "featureLabel_priceHistory": "Historial de precios",
@@ -1235,8 +1101,6 @@
   "featureBlockedEnable_glideCoach": "Activa primero la grabación de viajes por OBD2",
   "featureBlockedEnable_gpsTripPath": "Activa primero la grabación de viajes por OBD2",
   "featureBlockedEnable_autoRecord": "Activa primero la grabación de viajes por OBD2",
-  "featureBlockedEnable_showFuel": "No se cumplen los requisitos previos",
-  "featureBlockedEnable_showElectric": "No se cumplen los requisitos previos",
   "featureBlockedEnable_showConsumptionTab": "Activa primero la grabación de viajes por OBD2",
   "featureLabel_tflitePricePrediction": "Predicción de precios con TFLite",
   "featureDescription_tflitePricePrediction": "Modelo de previsión de precios en el dispositivo: la inferencia se ejecuta localmente; las características y predicciones nunca salen del dispositivo.",
@@ -1281,15 +1145,12 @@
   "scanReceiptNoData": "No se encontraron datos del recibo: inténtalo de nuevo",
   "scanReceiptSuccess": "Recibo escaneado: verifica los valores. Toca «Informar de error de escaneo» abajo si algo no cuadra.",
   "scanReceiptFailed": "Error de escaneo: {error}",
-  "scanPumpUnreadable": "No se puede leer la pantalla del surtidor: inténtalo de nuevo",
-  "pumpCameraHint": "Alinea los tres números del surtidor dentro del marco",
   "pumpCameraCapture": "Capturar",
   "pumpCameraPermissionDenied": "Se necesita acceso a la cámara para escanear el surtidor. Actívalo en los ajustes del dispositivo.",
   "pumpCameraError": "La cámara no pudo iniciarse. Inténtalo de nuevo o introduce los valores a mano.",
   "scanPumpSuccess": "Pantalla del surtidor escaneada: verifica los valores.",
   "scanPumpGlare": "Demasiado reflejo en la pantalla — inténtalo de nuevo desde un ángulo ligeramente distinto para que los números no se vean lavados.",
   "scanPumpFailed": "Error al escanear el surtidor: {error}",
-  "badScanReportTitle": "Informar de un error de escaneo",
   "badScanReportTitleReceipt": "Informar de un error de escaneo: recibo",
   "badScanReportTitlePumpDisplay": "Informar de un error de escaneo: pantalla del surtidor",
   "pumpScanFailureTitle": "Pantalla ilegible",
@@ -1298,7 +1159,6 @@
   "pumpScanFailureReport": "Informar",
   "pumpScanFailureRemove": "Quitar foto",
   "badScanReportHint": "Compartiremos la foto del recibo y ambos conjuntos de valores para que la próxima versión pueda aprender este formato.",
-  "badScanReportShareAction": "Compartir informe + foto",
   "badScanReportFieldBrandLayout": "Diseño de la marca",
   "badScanReportFieldTotal": "Total",
   "badScanReportFieldPricePerLiter": "Precio/L",
@@ -1315,16 +1175,9 @@
   "fillUpSectionWhatSubtitle": "Combustible, cantidad, precio",
   "fillUpSectionWhereTitle": "Dónde estabas",
   "fillUpSectionWhereSubtitle": "Estación, cuentakilómetros, notas",
-  "fillUpImportFromLabel": "Importar desde…",
-  "fillUpImportSheetTitle": "Importar datos de repostaje",
   "fillUpImportReceiptLabel": "Recibo",
-  "fillUpImportReceiptDescription": "Escanea un recibo de papel con la cámara",
   "fillUpImportPumpLabel": "Pantalla del surtidor",
-  "fillUpImportPumpDescription": "Lee el importe y el precio de la pantalla LCD del surtidor",
-  "fillUpImportObdLabel": "Adaptador OBD-II",
-  "fillUpImportObdDescription": "Lee el cuentakilómetros del puerto OBD-II por Bluetooth",
   "fillUpPricePerLiterLabel": "Precio por litro",
-  "vehicleHeaderPlateLabel": "Matrícula",
   "vehicleHeaderUntitled": "Vehículo nuevo",
   "vehicleSectionIdentityTitle": "Identidad",
   "vehicleSectionIdentitySubtitle": "Nombre y VIN",
@@ -1340,7 +1193,6 @@
   "gpsDiagnosticsHeader": "{count} muestras · {span} · {gaps, plural, =0{sin huecos} =1{1 hueco} other{{gaps} huecos}}",
   "gpsDiagnosticsCadence": "Intervalo mediano: {ms} ms",
   "gpsDiagnosticsExplain": "Capturado durante la grabación para verificar la cadencia del GPS con el teléfono en reposo.",
-  "hapticEcoCoachSectionTitle": "Conducción",
   "hapticEcoCoachSettingTitle": "Eco-coaching en tiempo real",
   "hapticEcoCoachSettingSubtitle": "Vibración háptica suave y consejo en pantalla cuando pisas a fondo durante la conducción de crucero",
   "hapticEcoCoachSnackBarMessage": "Suave con el acelerador: dejarse llevar ahorra más",
@@ -1370,9 +1222,6 @@
   "calculatorDistanceHint": "p. ej. 150",
   "calculatorConsumptionHint": "p. ej. 7,0",
   "calculatorPriceHint": "p. ej. 1,899",
-  "routeStrategyLabel": "Estrategia:",
-  "routeStrategyUniform": "Uniforme",
-  "routeStrategyBalanced": "Equilibrada",
   "glideCoachBetaTitle": "Glide-coach beta (experimental)",
   "glideCoachBetaSubtitle": "Vibración háptica sutil al frenar antes de un semáforo en rojo. Desactivado por defecto: riesgo de distracción.",
   "consentSyncTripsTitle": "Sincronizar grabaciones de viajes",
@@ -1428,7 +1277,6 @@
   "onboardingObd2ConnectButton": "Conectar adaptador",
   "onboardingObd2SkipButton": "Quizás más tarde",
   "onboardingObd2ReadingVin": "Leyendo el VIN…",
-  "onboardingObd2VinReadFailed": "No se pudo leer el VIN: introdúcelo manualmente",
   "onboardingObd2ConnectFailed": "No se pudo conectar con el adaptador. Puedes reintentarlo u omitir este paso.",
   "onboardingPickUseMode": "Elige un modo de uso para continuar.",
   "alertsRadiusFrequencyLabel": "Frecuencia de comprobación",
@@ -1442,9 +1290,6 @@
   "radiusAlertMapPickerCancel": "Cancelar",
   "radiusAlertMapPickerHint": "Arrastra el mapa para situar el centro de la alerta",
   "radiusAlertCenterFromMap": "Ubicación del mapa",
-  "radiusAlertNotificationTitle": "{fuelLabel} cerca de {label}",
-  "radiusAlertNotificationBody": "Hay una estación a {price} € (objetivo: {threshold} €)",
-  "refuelUnitPerLiter": "/L",
   "refuelUnitPerKwh": "/kWh",
   "refuelUnitPerSession": "/sesión",
   "speedConsumptionCardTitle": "Consumo por velocidad",
@@ -1463,9 +1308,6 @@
   "tankLevelLitersFormat": "{litres} L",
   "tankLevelRangeFormat": "≈ {kilometres} km de autonomía",
   "tankLevelLastFillUpFormat": "Último repostaje: {date} · {count} viaje(s) desde entonces",
-  "tankLevelMethodObd2": "medido por OBD2",
-  "tankLevelMethodDistanceFallback": "estimación basada en la distancia",
-  "tankLevelMethodMixed": "medición mixta",
   "tankLevelEmptyNoFillUp": "Registra un repostaje para ver el nivel de tu depósito",
   "tankLevelDetailSheetTitle": "Viajes desde el último repostaje",
   "addFillUpIsFullTankLabel": "Depósito lleno",
@@ -1536,7 +1378,6 @@
   "trajetDetailDeleteAction": "Eliminar",
   "trajetDetailDeleteConfirmTitle": "¿Eliminar este viaje?",
   "trajetDetailDeleteConfirmBody": "Este viaje se eliminará de forma permanente de tu historial.",
-  "trajetDetailDeleteConfirmCancel": "Cancelar",
   "trajetDetailDeleteConfirmConfirm": "Eliminar",
   "tripRecordingObd2NotResponding": "El adaptador OBD2 está conectado pero no devuelve datos. Prueba con otro adaptador o comprueba el protocolo de diagnóstico del vehículo.",
   "trajetsViewAllOnMap": "Ver todos en el mapa",
@@ -1552,7 +1393,6 @@
   "tripLengthBucketTripCount": "{count, plural, =0{sin viajes} one{1 viaje} other{{count} viajes}}",
   "tripPathCardTitle": "Ruta del viaje",
   "tripPathCardSubtitle": "Ruta registrada por GPS",
-  "tripPathLegendTitle": "Consumo",
   "tripPathLegendEfficient": "Eficiente (< 6 L/100 km)",
   "tripPathLegendBorderline": "Justo (6-10 L/100 km)",
   "tripPathLegendWasteful": "Derrochador (≥ 10 L/100 km)",
@@ -1563,13 +1403,8 @@
   "tripRecordingPinHelpTitle": "Acerca de fijar",
   "tripRecordingPinHelpBody": "Fijar mantiene la pantalla encendida y oculta las barras del sistema para que el formulario siga siendo legible en un soporte de salpicadero. Toca de nuevo para soltarlo. Se suelta automáticamente cuando el viaje se detiene.",
   "tripRecordingResumeHintMessage": "La grabación continúa en segundo plano. Toca el banner rojo de la parte superior de cualquier pantalla para volver.",
-  "tripBannerOpenFromConsumptionTab": "Abre el viaje activo desde la pestaña Consumo",
   "tripRecordingUnpinnedWarning": "Fija la pantalla para mantener el GPS activo durante el viaje: Android puede limitar el GPS durante el reposo.",
   "tripRecordingMinimiseTooltip": "Minimizar a un mosaico flotante",
-  "unifiedFilterFuel": "Combustible",
-  "unifiedFilterEv": "VE",
-  "unifiedFilterBoth": "Ambos",
-  "unifiedNoResultsForFilter": "Ningún resultado coincide con este filtro",
   "searchFailedSnackbar": "Error en la búsqueda: inténtalo de nuevo",
   "vinLabel": "VIN (opcional)",
   "vinDecodeTooltip": "Decodificar VIN",
@@ -1601,7 +1436,6 @@
   "gdprVinOnlineDecodeTitle": "Decodificación de VIN en línea",
   "gdprVinOnlineDecodeShort": "Decodifica el VIN mediante el servicio público gratuito de la NHTSA",
   "gdprVinOnlineDecodeDescription": "Cuando emparejas un adaptador, el VIN de tu vehículo se lee localmente para identificar el coche. Al activar esta opción se envía el VIN de 17 caracteres al servicio gratuito vPIC de la NHTSA para buscar detalles adicionales (modelo, cilindrada del motor, tipo de combustible). El VIN es el único dato que se envía: ninguna otra información sale de tu dispositivo.",
-  "vehicleDetectedFromVinBadge": "(detectado)",
   "vehicleDetectedFromVinSnackbar": "Detectado a partir del VIN: {summary}. ¿Aplicar?",
   "vehicleDetectedFromVinApply": "Aplicar",
   "widgetHelpSectionTitle": "Widget de pantalla de inicio",
@@ -1620,7 +1454,6 @@
   "widgetColorSchemeOrange": "Naranja",
   "widgetVariantDefault": "Solo el precio actual",
   "widgetVariantPredictive": "Predictivo: mejor momento para repostar",
-  "widgetPredictiveNowPrefix": "ahora",
   "@distance": {
     "placeholders": {
       "distance": {
@@ -1629,13 +1462,6 @@
     }
   },
   "@stationsFound": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@stationsOnMap": {
     "placeholders": {
       "count": {
         "type": "int"
@@ -1700,13 +1526,6 @@
   "@evConnectors": {
     "placeholders": {
       "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@stopN": {
-    "placeholders": {
-      "n": {
         "type": "int"
       }
     }
@@ -1850,25 +1669,11 @@
       }
     }
   },
-  "approachStationDistance": "a {meters} m",
-  "@approachStationDistance": {
-    "description": "PiP overlay caption (#2084) showing how far the driver is from the in-radius target station, in metres.",
-    "placeholders": {
-      "meters": {
-        "type": "String",
-        "example": "350"
-      }
-    }
-  },
   "tripRecordingPipElapsedCaption": "transcurrido",
   "@tripRecordingPipElapsedCaption": {
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
-  "fabOpenCriteria": "Abrir búsqueda",
-  "fabOpenResults": "Abrir resultados",
   "fabRunSearch": "Ejecutar búsqueda",
-  "fabRefineCriteria": "Refinar búsqueda",
-  "routeSearchPartialBanner": "Buscando más estaciones…",
   "privacySaveErrorLog": "Guardar registro de errores ({count})",
   "@privacySaveErrorLog": {
     "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
@@ -2418,10 +2223,6 @@
   "@trajetDetailChartCoolant": {
     "description": "MT — needs native review"
   },
-  "trajetDetailChartAltitude": "Altitud (m)",
-  "@trajetDetailChartAltitude": {
-    "description": "MT — needs native review"
-  },
   "trajetDetailChartLambda": "λ demandada",
   "@trajetDetailChartLambda": {
     "description": "MT — needs native review"
@@ -2654,14 +2455,6 @@
   "@obd2HealthHistorySection": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyJson": "Copiar como JSON",
-  "@obd2HealthCopyJson": {
-    "description": "MT — needs native review"
-  },
-  "obd2HealthCopied": "Diagnósticos OBD2 copiados al portapapeles.",
-  "@obd2HealthCopied": {
-    "description": "MT — needs native review"
-  },
   "evStatusPartial": "Disponibilidad parcial",
   "@evStatusPartial": {
     "description": "MT — needs native review"
@@ -2767,10 +2560,6 @@
   },
   "ocrTesterRunning": "Ejecutando OCR…",
   "@ocrTesterRunning": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterNoResult": "OCR no produjo ningún resultado legible.",
-  "@ocrTesterNoResult": {
     "description": "MT — needs native review"
   },
   "ocrTesterOverlaySection": "Superposición de bloques",
@@ -2937,10 +2726,6 @@
   "@obd2DiagnosticsInitCold": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyInitTranscript": "Copiar solo la transcripción de inicio",
-  "@obd2HealthCopyInitTranscript": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterSaveFixture": "Guardar como fixture",
   "@ocrTesterSaveFixture": {
     "description": "MT — needs native review"
@@ -3092,10 +2877,6 @@
   "@obd2GpsDegradedBannerTitle": {
     "description": "MT — needs native review"
   },
-  "restoreBackupTooltip": "Restaurar copia de seguridad",
-  "@restoreBackupTooltip": {
-    "description": "MT — needs native review"
-  },
   "restoreBackupDialogTitle": "Restaurar copia de seguridad",
   "@restoreBackupDialogTitle": {
     "description": "MT — needs native review"
@@ -3111,15 +2892,6 @@
   "restoreBackupReplaceAction": "Reemplazar todo",
   "@restoreBackupReplaceAction": {
     "description": "MT — needs native review"
-  },
-  "restoreBackupSuccess": "Copia de seguridad restaurada — {count} registros importados",
-  "@restoreBackupSuccess": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
   },
   "restoreBackupEmpty": "Copia de seguridad restaurada — no contenía ningún registro",
   "@restoreBackupEmpty": {
@@ -3391,16 +3163,6 @@
   "voiceCoachingSettingSubtitle": "Recibe consejos en voz alta mientras conduces — aceleración brusca, frenada fuerte y sugerencias de cambio de marcha",
   "@voiceCoachingSettingSubtitle": {
     "description": "MT — needs native review"
-  },
-  "fuelStationRadarDistanceKm": "{km} km",
-  "@fuelStationRadarDistanceKm": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "km": {
-        "type": "String",
-        "example": "2.4"
-      }
-    }
   },
   "fuelStationRadarProximity": "Proximidad {percent}%",
   "@fuelStationRadarProximity": {
@@ -3733,10 +3495,6 @@
   },
   "consumptionStatsChartConsumption": "L/100km por mes",
   "@consumptionStatsChartConsumption": {
-    "description": "MT — needs native review"
-  },
-  "shareReceiptImporting": "Importando ticket compartido…",
-  "@shareReceiptImporting": {
     "description": "MT — needs native review"
   },
   "shareReceiptUnsupportedFormat": "Este tipo de archivo no puede importarse todavía — comparte una foto del ticket.",
@@ -4228,17 +3986,6 @@
       "count": {
         "type": "int",
         "example": "3"
-      }
-    }
-  },
-  "fuelEfficiencyMixedFootnote": "{count, plural, =1{1 mixed tank counted toward its main fuel} other{{count} mixed tanks counted toward their main fuel}}",
-  "@fuelEfficiencyMixedFootnote": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int",
-        "example": "1"
       }
     }
   },
@@ -4752,11 +4499,6 @@
         "example": "Oil change"
       }
     }
-  },
-  "radarAcquiringLocation": "Finding your location…",
-  "@radarAcquiringLocation": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
   },
   "radarUpdatingLocation": "Updating your location…",
   "@radarUpdatingLocation": {

@@ -12,11 +12,8 @@
   "fuelType": "Palivo",
   "searchRadius": "Okruh",
   "searchNearby": "Čerpacie stanice v okolí",
-  "searchButton": "Hľadať",
   "searchCriteriaTitle": "Kritériá vyhľadávania",
-  "searchCriteriaOpen": "Vyhľadať",
   "searchCriteriaRadiusBadge": "V okruhu {km} km",
-  "searchCriteriaTapToSearch": "Klepnutím spustíte vyhľadávanie",
   "noResults": "Nenašli sa žiadne čerpacie stanice.",
   "startSearch": "Vyhľadajte čerpacie stanice.",
   "open": "Otvorené",
@@ -30,7 +27,6 @@
   "navigate": "Navigovať",
   "retry": "Skúsiť znova",
   "apiKeySetup": "Kľúč API",
-  "apiKeyDescription": "Zaregistrujte sa raz pre bezplatný kľúč API.",
   "apiKeyLabel": "Kľúč API",
   "register": "Registrácia",
   "continueButton": "Pokračovať",
@@ -64,33 +60,12 @@
   "noFavoritesHint": "Ťuknite na hviezdičku pri stanici, aby ste ju uložili do obľúbených.",
   "language": "Jazyk",
   "country": "Krajina",
-  "demoMode": "Demo režim — ukážkové dáta.",
-  "setupLiveData": "Nastaviť živé dáta",
   "freeNoKey": "Zadarmo — kľúč nie je potrebný",
   "apiKeyRequired": "Vyžaduje sa kľúč API",
-  "skipWithoutKey": "Pokračovať bez kľúča",
   "dataTransparency": "Transparentnosť údajov",
   "storageAndCache": "Úložisko a vyrovnávacia pamäť",
   "clearCache": "Vymazať vyrovnávaciu pamäť",
-  "clearAllData": "Vymazať všetky údaje",
-  "errorLog": "Protokol chýb",
   "stationsFound": "Nájdených {count} staníc",
-  "whatIsShared": "Čo sa zdieľa — a s kým?",
-  "gpsCoordinates": "Súradnice GPS",
-  "gpsReason": "Odosielané s každým vyhľadávaním na nájdenie blízkych staníc.",
-  "postalCodeData": "PSČ",
-  "postalReason": "Prevedené na súradnice prostredníctvom geokódovacej služby.",
-  "mapViewport": "Výrez mapy",
-  "mapReason": "Mapové dlaždice sa načítavajú zo servera. Žiadne osobné údaje sa neprenášajú.",
-  "apiKeyData": "Kľúč API",
-  "apiKeyReason": "Váš osobný kľúč sa odosiela s každou API požiadavkou. Je prepojený s vaším e-mailom.",
-  "notShared": "NEZDIEĽA sa:",
-  "searchHistory": "História vyhľadávania",
-  "favoritesData": "Obľúbené",
-  "profileNames": "Názvy profilov",
-  "homeZipData": "Domáce PSČ",
-  "usageData": "Údaje o používaní",
-  "privacyBanner": "Táto aplikácia nemá server. Všetky údaje zostávajú na vašom zariadení. Žiadna analytika, sledovanie ani reklamy.",
   "storageUsage": "Využitie úložiska na tomto zariadení",
   "settingsLabel": "Nastavenia",
   "profilesStored": "uložených profilov",
@@ -116,12 +91,8 @@
   "deleteAllButton": "Vymazať všetko",
   "entries": "záznamov",
   "cacheEmpty": "Vyrovnávacia pamäť je prázdna",
-  "noStorage": "Žiadne využité úložisko",
   "apiKeyNote": "Bezplatná registrácia. Údaje od vládnych agentúr pre cenovú transparentnosť.",
   "apiKeyFormatError": "Neplatný formát — očakávané UUID (8-4-4-4-12)",
-  "supportProject": "Podporte tento projekt",
-  "supportDescription": "Táto aplikácia je bezplatná, s otvoreným zdrojovým kódom a bez reklám. Ak ju považujete za užitočnú, zvážte podporu vývojára.",
-  "reportBug": "Nahlásiť chybu / Navrhnúť funkciu",
   "reportThisIssue": "Nahlásiť tento problém",
   "reportAlreadySent": "Tento problém ste už nahlásili.",
   "reportConsentTitle": "Nahlásiť na GitHub?",
@@ -136,7 +107,6 @@
   "configApiKeysSection": "Kľúče API",
   "configTankerkoenigKey": "Kľúč API Tankerkoenig",
   "configApiKeyConfigured": "Nakonfigurovaný",
-  "configApiKeyNotSet": "Nenastavený (demo režim)",
   "configApiKeyCommunity": "Predvolený (komunitný kľúč)",
   "searchLocationPlaceholder": "Adresa, PSČ alebo mesto",
   "configEvKey": "Kľúč API pre nabíjanie EV",
@@ -174,8 +144,6 @@
   "sortPriceDistance": "Cena/km",
   "cheap": "lacné",
   "expensive": "drahé",
-  "stationsOnMap": "{count} staníc",
-  "loadingFavorites": "Načítavanie obľúbených...\nNajprv vyhľadajte stanice na uloženie údajov.",
   "reportPrice": "Nahlásiť cenu",
   "whatsWrong": "Čo nie je v poriadku?",
   "correctPrice": "Správna cena (napr. 1,459)",
@@ -185,7 +153,6 @@
   "cacheCleared": "Vyrovnávacia pamäť vymazaná.",
   "yourPosition": "Vaša poloha",
   "positionUnknown": "Poloha neznáma",
-  "routeModeBannerLabel": "Režim trasy — vzdialenosti pozdĺž koridoru",
   "distancesFromCenter": "Vzdialenosti od centra hľadania",
   "autoUpdatePosition": "Automaticky aktualizovať polohu",
   "autoUpdateDescription": "Aktualizovať polohu GPS pred každým hľadaním",
@@ -220,8 +187,6 @@
   "wrongDieselPrice": "Nesprávna cena nafty",
   "wrongStatusOpen": "Zobrazené ako otvorené, ale zatvorené",
   "wrongStatusClosed": "Zobrazené ako zatvorené, ale otvorené",
-  "searchAlongRouteLabel": "Pozdĺž trasy",
-  "searchEvStations": "Hľadať nabíjacie stanice",
   "allStations": "Všetky stanice",
   "bestStops": "Najlepšie zastávky",
   "openInMaps": "Otvoriť v Mapách",
@@ -253,7 +218,6 @@
   "cityOrAddress": "Mesto alebo adresa",
   "useGps": "Použiť GPS",
   "stop": "Zastávka",
-  "stopN": "Zastávka {n}",
   "addStop": "Pridať zastávku",
   "searchAlongRoute": "Hľadať pozdĺž trasy",
   "cheapest": "Najlacnejšia",
@@ -265,10 +229,8 @@
   "customKey": "Vlastný kľúč",
   "appDefaultKey": "Predvolený kľúč aplikácie",
   "optionalOverrideKey": "Voliteľné: nahradiť vstavaný kľúč aplikácie vlastným",
-  "requiredForEvSearch": "Vyžadované pre vyhľadávanie nabíjacích staníc EV",
   "edit": "Upraviť",
   "fuelPricesApiKey": "Kľúč API cien palív",
-  "tankerkoenigApiKey": "Kľúč API Tankerkoenig",
   "evChargingApiKey": "Kľúč API nabíjania EV",
   "openChargeMapApiKey": "Kľúč API OpenChargeMap",
   "routePlanningSection": "Plánovanie trasy",
@@ -303,18 +265,14 @@
   "noStationsAlongThisRoute": "Pozdĺž tejto trasy neboli nájdené žiadne stanice.",
   "fuelCostCalculator": "Kalkulačka nákladov na palivo",
   "distanceKm": "Vzdialenosť (km)",
-  "consumptionL100km": "Spotreba (L/100km)",
-  "fuelPriceEurL": "Cena paliva (EUR/L)",
   "tripCost": "Náklady na cestu",
   "fuelNeeded": "Potrebné palivo",
   "totalCost": "Celkové náklady",
-  "enterCalcValues": "Zadajte vzdialenosť, spotrebu a cenu pre výpočet nákladov na cestu",
   "priceHistory": "História cien",
   "ignoredStationsLabel": "Ignorované",
   "ratingsLabel": "Hodnotenia",
   "favoritesDataCache": "Dáta obľúbených",
   "citySearchCache": "Vyhľadávanie mesta",
-  "dataDeletionNotAvailableCommunity": "Mazanie údajov nie je v komunitnom režime k dispozícii. Najprv sa odpojte alebo použite súkromnú databázu.",
   "priceHistoryStationsTracked": "{count} sledovaných staníc",
   "@priceHistoryStationsTracked": {
     "placeholders": {
@@ -348,22 +306,11 @@
     }
   },
   "noPriceHistory": "Zatiaľ žiadna história cien",
-  "noHourlyData": "Žiadne hodinové údaje",
   "noStatistics": "Žiadne štatistiky k dispozícii",
-  "statMin": "Min",
-  "statMax": "Max",
-  "statAvg": "Priem",
   "showAllFuelTypes": "Zobraziť všetky typy palív",
   "connected": "Pripojené",
-  "notConnected": "Nepripojené",
-  "connectTankSync": "Pripojiť TankSync",
   "disconnectTankSync": "Odpojiť TankSync",
   "viewMyData": "Zobraziť moje údaje",
-  "optionalCloudSync": "Voliteľná cloudová synchronizácia pre upozornenia, obľúbené a push notifikácie",
-  "tapToUpdateGps": "Ťuknite pre aktualizáciu polohy GPS",
-  "gpsAutoUpdateHint": "Poloha GPS sa získava automaticky pri hľadaní. Môžete ju tiež aktualizovať manuálne tu.",
-  "clearGpsConfirm": "Vymazať uloženú polohu GPS? Môžete ju kedykoľvek znova aktualizovať.",
-  "pageNotFound": "Stránka nenájdená",
   "deleteAllServerData": "Vymazať všetky údaje servera",
   "deleteServerDataConfirm": "Vymazať všetky údaje servera?",
   "deleteEverything": "Vymazať všetko",
@@ -373,7 +320,6 @@
   "forgetAllSyncedTripsConfirmBody": "Všetky súhrny jázd a detailné záznamy budú odstránené zo servera. Vaša lokálna história jázd na tomto zariadení nebude ovplyvnená.\n\nTúto akciu nie je možné vrátiť späť.",
   "forgetAllSyncedTripsConfirmAction": "Odstrániť všetko",
   "forgetAllSyncedTripsSuccess": "Všetky synchronizované jazdy boli odstránené zo servera",
-  "disconnectConfirm": "Odpojiť TankSync?",
   "disconnect": "Odpojiť",
   "myServerData": "Moje údaje na serveri",
   "anonymousUuid": "Anonymné UUID",
@@ -393,7 +339,6 @@
   "continueAsGuest": "Pokračovať ako hosť",
   "createAccount": "Vytvoriť účet",
   "signIn": "Prihlásiť sa",
-  "upgradeToEmail": "Vytvoriť e-mailový účet",
   "savedRoutes": "Uložené trasy",
   "noSavedRoutes": "Žiadne uložené trasy",
   "noSavedRoutesHint": "Vyhľadajte pozdĺž trasy a uložte ju pre rýchly prístup neskôr.",
@@ -424,11 +369,6 @@
   "onboardingNext": "Ďalej",
   "onboardingSkip": "Preskočiť",
   "onboardingFinish": "Začať",
-  "crossBorderNearby": "{country} je v blízkosti",
-  "crossBorderDistance": "~{km} km k hranici",
-  "crossBorderAvgPrice": "Priem. tu: {price} EUR ({count} staníc)",
-  "allPricesView": "Všetky ceny",
-  "compactView": "Kompaktné",
   "switchToAllPricesView": "Prepnúť na zobrazenie všetkých cien",
   "switchToCompactView": "Prepnúť na kompaktné zobrazenie",
   "unavailable": "N/A",
@@ -453,10 +393,6 @@
   "accountDeleted": "Účet bol odstránený. Lokálne údaje sú zachované.",
   "switchedToAnonymous": "Prepnuté na anonymnú reláciu",
   "failedToSwitch": "Prepnutie zlyhalo: {error}",
-  "topicUrlCopied": "URL témy skopírovaná",
-  "testNotificationSent": "Testové upozornenie odoslané!",
-  "testNotificationFailed": "Odoslanie testového upozornenia zlyhalo",
-  "pushUpdateFailed": "Aktualizácia nastavenia push upozornení zlyhala",
   "connectedAsGuest": "Pripojený ako hosť",
   "accountCreated": "Účet vytvorený!",
   "signedIn": "Prihlásený!",
@@ -518,7 +454,6 @@
   "privacyClearErrorLog": "Vymazať protokol chýb",
   "privacyErrorLogCleared": "Protokol chýb vymazaný",
   "privacyDeleteButton": "Odstrániť všetky údaje",
-  "privacyCopyErrorLog": "Kopírovať chybový log do schránky ({count})",
   "privacyDeleteTitle": "Odstrániť všetky údaje?",
   "privacyDeleteBody": "Toto natrvalo odstráni:\n\n- Všetky obľúbené a údaje o staniciach\n- Všetky vyhľadávacie profily\n- Všetky cenové upozornenia\n- Celú históriu cien\n- Všetky uložené dáta v cache\n- Váš kľúč API\n- Všetky nastavenia aplikácie\n\nAplikácia sa resetuje do počiatočného stavu. Túto akciu nie je možné vrátiť späť.",
   "privacyDeleteConfirm": "Odstrániť všetko",
@@ -553,15 +488,8 @@
   "voiceAnnouncementsTitle": "Hlasové oznámenia",
   "voiceAnnouncementsDescription": "Oznamovať blízke lacné stanice počas jazdy",
   "voiceAnnouncementsEnabled": "Zapnúť hlasové oznámenia",
-  "voiceAnnouncementThreshold": "Iba pod {price}",
-  "voiceAnnouncementCheapFuel": "{station}, {distance} kilometrov pred vami, {fuelType} {price}",
   "voiceAnnouncementProximityRadius": "Polomer oznámenia",
   "voiceAnnouncementCooldown": "Interval opakovania",
-  "nearestStations": "Najblizsie stanice",
-  "nearestStationsHint": "Najdite najblizsie stanice podla vasej aktualnej polohy",
-  "consumptionLogTitle": "Spotreba paliva",
-  "consumptionLogMenuTitle": "Záznam spotreby",
-  "consumptionLogMenuSubtitle": "Sledujte tankovania a vypočítajte L/100km",
   "consumptionStatsTitle": "Štatistiky spotreby",
   "addFillUp": "Pridať tankovanie",
   "noFillUpsTitle": "Zatiaľ žiadne tankovania",
@@ -595,14 +523,12 @@
   "vehiclesWizardYoursList": "Máte {count, plural, =1{1 vozidlo} other{{count} vozidiel}}:",
   "vehiclesWizardSkipHint": "Preskočiť nastavenie — vozidlá môžete pridať kedykoľvek z Nastavení.",
   "fillUpVehicleLabel": "Vozidlo",
-  "fillUpVehicleNone": "Žiadne vozidlo",
   "fillUpVehicleRequired": "Vozidlo je povinné",
   "reportScanError": "Nahlásiť chybu skenovania",
   "pickStationTitle": "Vybrať stanicu",
   "pickStationHelper": "Začnite tankovanie zo známej stanice, aby sa ceny, značka a typ paliva vyplnili automaticky.",
   "pickStationEmpty": "Zatiaľ žiadne obľúbené stanice — pridajte ich z Vyhľadávania alebo Obľúbených, alebo preskočte a vyplňte ručne.",
   "pickStationSkip": "Preskočiť — pridať bez stanice",
-  "scanPump": "Skenovať pumpu",
   "scanPayment": "Skenovať platobný QR",
   "qrPaymentBeneficiary": "Príjemca",
   "qrPaymentAmount": "Suma",
@@ -624,17 +550,10 @@
   "qrScannerRetry": "Skúsiť znova",
   "torchOn": "Zapnúť blesk",
   "torchOff": "Vypnúť blesk",
-  "obdNoAdapter": "Žiadny OBD2 adaptér v dosahu",
-  "obdOdometerUnavailable": "Tachometer sa nepodarilo prečítať",
   "obdPermissionDenied": "Udeľte oprávnenie Bluetooth v systémových nastaveniach",
-  "obdAdapterUnresponsive": "Adaptér neodpovedal — zapnite zapaľovanie a skúste znova",
   "obdPickerTitle": "Vybrať OBD2 adaptér",
   "obdPickerScanning": "Vyhľadávanie adaptérov…",
   "obdPickerConnecting": "Pripájanie…",
-  "themeSettingTitle": "Téma",
-  "themeModeLight": "Svetlá",
-  "themeModeDark": "Tmavá",
-  "themeModeSystem": "Podľa systému",
   "tripRecordingTitle": "Záznam jazdy",
   "tripSummaryTitle": "Súhrn jazdy",
   "tripMetricDistance": "Vzdialenosť",
@@ -676,18 +595,13 @@
   "syncBaselinesToggleTitle": "Zdieľať naučené profily vozidiel",
   "syncBaselinesToggleSubtitle": "Nahrávať základné hodnoty spotreby pre každé vozidlo, aby ich mohlo použiť druhé zariadenie.",
   "obd2StatusConnected": "OBD2 adaptér: pripojený",
-  "obd2StatusAttempting": "OBD2 adaptér: pripájanie",
-  "obd2StatusUnreachable": "OBD2 adaptér: nedostupný",
   "obd2StatusPermissionDenied": "OBD2 adaptér: potrebné oprávnenie Bluetooth",
   "obd2StatusConnectedBody": "Pripravený na záznam jazdy.",
-  "obd2StatusAttemptingBody": "Pripájanie na pozadí…",
-  "obd2StatusUnreachableBody": "Adaptér je mimo dosahu alebo ho používa iná aplikácia.",
   "obd2StatusPermissionDeniedBody": "Udeľte oprávnenie Bluetooth v systémových nastaveniach pre automatické opätovné pripojenie.",
   "obd2StatusNoAdapter": "Žiadny adaptér nie je spárovaný",
   "obd2StatusForget": "Zabudnúť adaptér",
   "tripHistoryTitle": "História jázd",
   "tripHistoryEmptyTitle": "Zatiaľ žiadne jazdy",
-  "tripHistoryEmptySubtitle": "Pripojte OBD2 adaptér a zaznamenajte jazdu pre začatie vašej histórie jázd.",
   "tripHistoryUnknownDate": "Neznámy dátum",
   "situationIdle": "Voľnobeh",
   "situationStopAndGo": "Stop & go",
@@ -697,12 +611,8 @@
   "situationClimbing": "Stúpanie / zaťaženie",
   "situationHardAccel": "Prudké zrýchlenie",
   "situationFuelCut": "Odpojenie paliva — voľný beh",
-  "tripSaveAsFillUp": "Uložiť ako tankovanie",
   "tripSaveRecording": "Uložiť jazdu",
-  "tripDiscard": "Zahodiť",
-  "obdOdometerRead": "Tachometer prečítaný: {km} km",
   "vehicleFuelNotSet": "Nenastavené",
-  "wizardVehicleTapToEdit": "Klepnutím upraviť",
   "wizardVehicleDefaultBadge": "Predvolené",
   "wizardProfileChoiceHint": "Vyberte, ako chcete používať aplikáciu. Toto môžete neskôr zmeniť v Nastaveniach.",
   "wizardProfileChoiceFooter": "Svoju voľbu môžete kedykoľvek zmeniť v Nastaveniach → Režim používania.",
@@ -713,7 +623,6 @@
   "wizardProfileFullName": "Plný",
   "wizardProfileFullDescription": "Všetko v Strednom, plus automatický záznam jázd OBD2, jazdné skóre a vernostné karty.",
   "wizardProfileCustomName": "Vlastný",
-  "wizardProfileCustomDescription": "Vaša vlastná kombinácia funkcií. Upravte každý prepínač nižšie.",
   "useModeSectionHint": "Prispôsobte aplikáciu vášmu skutočnému využitiu. Výber predvoľby aktivuje zodpovedajúcu sadu funkcií.",
   "useModeCustomSettingsDescription": "Vaša kombinácia funkcií nezodpovedá žiadnej predvoľbe. Vyberte predvoľbu pre prepísanie alebo pokračujte v úprave jednotlivých funkcií nižšie.",
   "useModeSwitchedSnack": "Režim používania nastavený na {profile}.",
@@ -751,20 +660,15 @@
   "evShowOnMap": "Zobraziť EV stanice",
   "evAvailableOnly": "Iba dostupné",
   "evMinPower": "Min. výkon",
-  "evMaxPower": "Max. výkon",
-  "evOperator": "Prevádzkovateľ",
-  "evLastUpdate": "Posledná aktualizácia",
   "evStatusAvailable": "Dostupná",
   "evStatusOccupied": "Obsadená",
   "evStatusOutOfOrder": "Mimo prevádzky",
   "openOnlyFilter": "Iba otvorené",
   "saveAsDefaults": "Uložiť ako predvolené",
   "criteriaSavedToProfile": "Uložené ako predvolené",
-  "profileNotFound": "Žiadny aktívny profil",
   "updatingFavorites": "Aktualizujú sa obľúbené...",
   "fetchingLatestPrices": "Načítavajú sa najnovšie ceny",
   "noDataAvailable": "Žiadne údaje",
-  "configAndPrivacy": "Konfigurácia a súkromie",
   "searchToSeeMap": "Vyhľadajte pre zobrazenie staníc na mape",
   "evPowerAny": "Akýkoľvek",
   "evPowerKw": "{kw} kW+",
@@ -819,9 +723,6 @@
   "iosAutoRecordOnboardingBullet3Title": "Keď iOS žiada o polohu \"Vždy\", prosím povedzte áno.",
   "iosAutoRecordOnboardingBullet3Body": "Záložná funkcia, ktorá zaznamenáva jazdu pri pomalom OBD2 adaptéri, potrebuje polohu na pozadí. Nikdy ju nezdieľame.",
   "scanReceipt": "Skenovať doklad",
-  "obdConnect": "OBD-II",
-  "stationTypeFuel": "Palivo",
-  "stationTypeEv": "EV",
   "brandFilterHighway": "Diaľnica",
   "ratingModeLocal": "Lokálne",
   "ratingModePrivate": "Súkromné",
@@ -841,7 +742,6 @@
   "errorHintRouting": "Výpočet trasy zlyhal. Skontrolujte internetové pripojenie a skúste znova.",
   "errorHintFallback": "Skúste znova alebo vyhľadajte podľa PSČ / názvu mesta.",
   "alertsLoadErrorTitle": "Upozornenia sa nepodarilo načítať",
-  "alertsBackgroundCheckErrorTitle": "Kontrola upozornení na pozadí zlyhala",
   "detailsLabel": "Podrobnosti",
   "remove": "Odstrániť",
   "showKey": "Zobraziť kľúč",
@@ -950,19 +850,11 @@
   "linkDeviceHowItWorksBody": "1. Na zariadení A: skopírujte kód zariadenia uvedený vyššie\n2. Na zariadení B: vložte ho do poľa \"Kód zariadenia\"\n3. Klepnite na \"Importovať dáta\" pre zlúčenie obľúbených, upozornení, vozidiel a záznamov spotreby\n4. Obe zariadenia budú mať všetky kombinované dáta\n\nKaždé zariadenie si uchováva vlastnú anonymnú identitu a vlastný profil (preferované palivo, predvolené vozidlo, úvodná obrazovka). Dáta sa zlúčia, nie presunú.",
   "vehicleSetActive": "Nastaviť ako aktívne",
   "swipeHide": "Skryť",
-  "evChargingSection": "Nabíjanie EV",
-  "fuelStationsSection": "Čerpacie stanice",
   "yourRating": "Vaše hodnotenie",
   "noStorageUsed": "Žiadne využité úložisko",
   "aboutReportBug": "Nahlásiť chybu / Navrhnúť funkciu",
   "aboutSupportProject": "Podporiť tento projekt",
   "aboutSupportDescription": "Táto aplikácia je bezplatná, open source a bez reklám. Ak vám je užitočná, zvážte podporu vývojára.",
-  "luxembourgRegulatedPricesNotice": "Ceny palív v Luxemburgu sú regulované vládou a jednotné po celej krajine.",
-  "luxembourgFuelUnleaded95": "Natural 95",
-  "luxembourgFuelUnleaded98": "Natural 98",
-  "luxembourgFuelDiesel": "Nafta",
-  "luxembourgFuelLpg": "LPG",
-  "luxembourgPricesUnavailable": "Regulované ceny palív v Luxemburgu nie sú dostupné.",
   "reportIssueTitle": "Nahlásiť problém",
   "enterCorrection": "Prosím zadajte opravu",
   "reportNoBackendAvailable": "Správu sa nepodarilo odoslať: pre túto krajinu nie je nakonfigurovaná žiadna služba hlásení. Zapnite TankSync v Nastaveniach pre odosielanie komunitných hlásení.",
@@ -989,10 +881,6 @@
   "serviceReminderMarkDone": "Označiť ako hotové",
   "serviceReminderDueTitle": "Servis splatný",
   "serviceReminderDueBody": "{label} je splatný — {kmOver} km po intervale.",
-  "southKoreaApiKeyRequired": "Zaregistrujte sa na OPINET pre získanie bezplatného kľúča API",
-  "southKoreaApiProvider": "OPINET (KNOC)",
-  "chileApiKeyRequired": "Zaregistrujte sa na CNE pre získanie bezplatného kľúča API",
-  "chileApiProvider": "CNE Bencina en Linea",
   "vinConfirmTitle": "Je to vaše auto?",
   "vinConfirmBody": "{year} {make} {model} — {displacement}L, {cylinders}-valec, {fuel}",
   "vinPartialInfoNote": "Čiastočné informácie (offline). Môžete upraviť nižšie.",
@@ -1011,17 +899,13 @@
   "alertsRadiusCreateTitle": "Vytvoriť upozornenie v okruhu",
   "alertsRadiusLabelHint": "Označenie (napr. Domov nafta)",
   "alertsRadiusFuelType": "Typ paliva",
-  "alertsRadiusThreshold": "Prahová hodnota (€/L)",
   "alertsRadiusKm": "Polomer (km)",
   "alertsRadiusCenterGps": "Použiť moju polohu",
   "alertsRadiusCenterPostalCode": "PSČ",
   "alertsRadiusSave": "Uložiť",
   "alertsRadiusCancel": "Zrušiť",
-  "alertsRadiusDeleteConfirm": "Odstrániť upozornenie v okruhu?",
   "obd2ConnectedTooltip": "OBD2 pripojený: {adapterName}",
   "obd2PairChipTooltip": "Spárovať OBD2 adaptér",
-  "velocityAlertTitle": "{fuelLabel} klesol na blízkych staniciach",
-  "velocityAlertBody": "{stationCount} staníc kleslo až o {maxDropCents}¢ za poslednú hodinu",
   "fillUpSavedSnackbar": "Tankovanie uložené",
   "radiusAlertsEntryTitle": "Upozornenia v okruhu a štatistiky",
   "radiusAlertsEntrySubtitle": "Dostávajte upozornenia, keď ceny klesnú vo vašej blízkosti",
@@ -1060,8 +944,6 @@
   "autoRecordStatusPairAdapterCta": "Spárovať adaptér",
   "autoRecordSpeedThresholdLabel": "Rýchlosť spustenia (km/h)",
   "autoRecordSaveDelayLabel": "Oneskorenie uloženia po odpojení (sekundy)",
-  "autoRecordPairedAdapterLabel": "Spárovaný adaptér",
-  "autoRecordPairedAdapterNone": "Žiadny adaptér nie je spárovaný. Najprv spárujte cez úvodné nastavenie OBD2.",
   "autoRecordBackgroundLocationLabel": "Poloha na pozadí povolená",
   "autoRecordBackgroundLocationRequest": "Požiadať o oprávnenie",
   "autoRecordBackgroundLocationRationaleTitle": "Prečo \"Vždy povoliť\"?",
@@ -1069,18 +951,12 @@
   "autoRecordBackgroundLocationOpenSettings": "Otvoriť nastavenia",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Vyžaduje sa oprávnenie polohy",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Nepodarilo sa požiadať o polohu na pozadí",
-  "autoRecordBadgeClearTooltip": "Vymazať počítadlo",
   "autoRecordPairAdapterLinkText": "Spárujte adaptér v sekcii nižšie pre zapnutie automatického záznamu",
-  "exportBackupTooltip": "Exportovať zálohu",
   "exportBackupReady": "Záloha pripravená — vyberte cieľ",
   "exportBackupFailed": "Export zálohy zlyhal — skúste to znova",
-  "brokenMapChipVerifying": "Overovanie MAP senzora…",
   "brokenMapChipDisclaimer": "Hodnoty MAP senzora sú podozrivé",
   "brokenMapSnackbarUnreliable": "MAP senzor číta nesprávne — hodnoty paliva môžu byť o 50–80 % nízke. Skúste iný adaptér.",
   "brokenMapBannerHardDisable": "MAP senzor nespoľahlivý. Zobrazujú sa priemerné hodnoty tankovania namiesto živého prietoku paliva.",
-  "brokenMapOverlayVerified": "MAP senzor: overený ({confidence})",
-  "brokenMapOverlayUnverified": "MAP senzor: overuje sa ({confidence})",
-  "brokenMapOverlaySuspicious": "MAP senzor: podozrivý ({confidence})",
   "brokenMapOverlayPosterior": "MAP senzor: {posterior}% ± {margin}%",
   "brokenMapOverlayPosteriorVerified": "MAP senzor: {posterior}% ± {margin}% (overený)",
   "brokenMapDiagnosticsCardTitle": "Diagnostika MAP senzora",
@@ -1142,7 +1018,6 @@
   "chargingCostTrendTitle": "Trend nákladov na nabíjanie",
   "chargingEfficiencyTitle": "Účinnosť (kWh/100 km)",
   "chargingChartsEmpty": "Zatiaľ nedostatok dát",
-  "chargingChartsMonthAxis": "Mesiac",
   "consoFeatureGroupTitle": "Spotreba",
   "consoFeatureGroupDescription": "Sledujte svoju spotrebu — ručné tankovania alebo automatický záznam jázd OBD2.",
   "consoModeOff": "Vypnuté",
@@ -1158,10 +1033,6 @@
   "fillUpCorrectionEditExplainer": "Tento záznam bol automaticky vygenerovaný na uzatvorenie medzery medzi zaznamananými jazdami a natankovaným palivom. Upravte hodnoty, ak poznáte skutočné čísla.",
   "fillUpCorrectionDelete": "Odstrániť korekciu",
   "fillUpCorrectionStation": "Názov stanice (voliteľné)",
-  "greeceApiProvider": "Paratiritirio Timon (Grécko)",
-  "greeceCommunityApiNotice": "Poháňané komunitne udržiavaným API fuelpricesgr",
-  "romaniaApiProvider": "Monitorul Prețurilor (Rumunsko)",
-  "romaniaScrapingNotice": "Poháňané monitorulpreturilor.info (Rada pre hospodársku súťaž + ANPC)",
   "crossBorderCheaper": "Stanice v {country} vzdialené {km} km — €{price}/L lacnejšie",
   "crossBorderTapToSwitch": "Klepnutím prepnúť krajinu",
   "crossBorderDismissTooltip": "Zatvoriť",
@@ -1186,9 +1057,6 @@
   "drivingScorePenaltyHardBrake": "Prudké brzdenie",
   "drivingScorePenaltyHighRpm": "Vysoké RPM",
   "drivingScorePenaltyFullThrottle": "Plný plyn",
-  "ecoRouteOption": "Eko",
-  "ecoRouteSavings": "≈ {liters} L ušetrených",
-  "ecoRouteHint": "Inteligentnejšia jazda — uprednostňuje plynulú diaľnicu pred kľukatými skratkami.",
   "favoritesShareAction": "Zdieľať",
   "favoritesShareSubject": "Sparkilo — obľúbené dňa {date}",
   "favoritesShareError": "Nepodarilo sa vygenerovať obrázok pre zdieľanie",
@@ -1206,8 +1074,6 @@
   "featureDescription_consumptionAnalytics": "Karta analýzy tankovaní a jázd.",
   "featureLabel_baselineSync": "Synchronizácia základní",
   "featureDescription_baselineSync": "Synchronizovať jazdné základne cez TankSync.",
-  "featureLabel_unifiedSearchResults": "Zlúčené výsledky vyhľadávania",
-  "featureDescription_unifiedSearchResults": "Jeden zoznam výsledkov kombinujúci palivové a EV stanice.",
   "featureLabel_priceAlerts": "Cenové upozornenia",
   "featureDescription_priceAlerts": "Upozornenia na pokles cien na základe prahovej hodnoty.",
   "featureLabel_priceHistory": "História cien",
@@ -1235,8 +1101,6 @@
   "featureBlockedEnable_glideCoach": "Najprv zapnite záznam jázd OBD2",
   "featureBlockedEnable_gpsTripPath": "Najprv zapnite záznam jázd OBD2",
   "featureBlockedEnable_autoRecord": "Najprv zapnite záznam jázd OBD2",
-  "featureBlockedEnable_showFuel": "Predpoklady nie sú splnené",
-  "featureBlockedEnable_showElectric": "Predpoklady nie sú splnené",
   "featureBlockedEnable_showConsumptionTab": "Najprv zapnite záznam jázd OBD2",
   "featureLabel_tflitePricePrediction": "TFLite predikcia cien",
   "featureDescription_tflitePricePrediction": "Model predpovede cien na zariadení — inference beží lokálne; funkcie a predpovede nikdy neopustia zariadenie.",
@@ -1281,15 +1145,12 @@
   "scanReceiptNoData": "Nenašli sa žiadne údaje z dokladu — skúste znova",
   "scanReceiptSuccess": "Doklad naskenovaný — overte hodnoty. Klepnite na \"Nahlásiť chybu skenovania\" nižšie, ak je niečo nesprávne.",
   "scanReceiptFailed": "Skenovanie zlyhalo: {error}",
-  "scanPumpUnreadable": "Displej pumpy nie je čitateľný — skúste znova",
-  "pumpCameraHint": "Zarovnajte tri čísla z displeja stojana do rámčeka",
   "pumpCameraCapture": "Odfotiť",
   "pumpCameraPermissionDenied": "Na naskenovanie displeja stojana je potrebný prístup ku kamere. Povoľte ho v nastaveniach zariadenia.",
   "pumpCameraError": "Kameru sa nepodarilo spustiť. Skúste to znova alebo zadajte hodnoty ručne.",
   "scanPumpSuccess": "Displej pumpy naskenovaný — overte hodnoty.",
   "scanPumpGlare": "Príliš veľa odleskov na displeji — skús to znova z mierneho uhla, aby čísla neboli prežiarené.",
   "scanPumpFailed": "Skenovanie pumpy zlyhalo: {error}",
-  "badScanReportTitle": "Nahlásiť chybu skenovania",
   "badScanReportTitleReceipt": "Nahlásiť chybu skenovania — Doklad",
   "badScanReportTitlePumpDisplay": "Nahlásiť chybu skenovania — Displej pumpy",
   "pumpScanFailureTitle": "Displej nečitateľný",
@@ -1298,7 +1159,6 @@
   "pumpScanFailureReport": "Nahlásiť",
   "pumpScanFailureRemove": "Odstrániť fotografiu",
   "badScanReportHint": "Zdieľame fotografiu dokladu a obe sady hodnôt, aby sa nasledujúca verzia mohla naučiť toto rozloženie.",
-  "badScanReportShareAction": "Zdieľať hlásenie + fotografiu",
   "badScanReportFieldBrandLayout": "Rozloženie značky",
   "badScanReportFieldTotal": "Celkom",
   "badScanReportFieldPricePerLiter": "Cena/L",
@@ -1315,16 +1175,9 @@
   "fillUpSectionWhatSubtitle": "Palivo, množstvo, cena",
   "fillUpSectionWhereTitle": "Kde ste boli",
   "fillUpSectionWhereSubtitle": "Stanica, tachometer, poznámky",
-  "fillUpImportFromLabel": "Importovať z…",
-  "fillUpImportSheetTitle": "Importovať údaje o tankovaní",
   "fillUpImportReceiptLabel": "Doklad",
-  "fillUpImportReceiptDescription": "Naskenovať papierový doklad kamerou",
   "fillUpImportPumpLabel": "Displej pumpy",
-  "fillUpImportPumpDescription": "Prečítať Betrag / Preis z LCD pumpy",
-  "fillUpImportObdLabel": "OBD-II adaptér",
-  "fillUpImportObdDescription": "Prečítať tachometer z OBD-II portu cez Bluetooth",
   "fillUpPricePerLiterLabel": "Cena za liter",
-  "vehicleHeaderPlateLabel": "ŠPZ",
   "vehicleHeaderUntitled": "Nové vozidlo",
   "vehicleSectionIdentityTitle": "Identita",
   "vehicleSectionIdentitySubtitle": "Názov a VIN",
@@ -1340,7 +1193,6 @@
   "gpsDiagnosticsHeader": "{count} vzoriek · {span} · {gaps, plural, =0{žiadne medzery} =1{1 medzera} other{{gaps} medzier}}",
   "gpsDiagnosticsCadence": "Medián intervalu: {ms} ms",
   "gpsDiagnosticsExplain": "Zachytené počas záznamu pre overenie kadencie GPS počas spánku telefónu.",
-  "hapticEcoCoachSectionTitle": "Jazda",
   "hapticEcoCoachSettingTitle": "Eko koučing v reálnom čase",
   "hapticEcoCoachSettingSubtitle": "Jemná haptika + tip na obrazovke, keď šliahnete plyn pri jazde na stálo",
   "hapticEcoCoachSnackBarMessage": "Šetrite plynom — voľný beh šetrí viac",
@@ -1370,9 +1222,6 @@
   "calculatorDistanceHint": "napr. 150",
   "calculatorConsumptionHint": "napr. 7,0",
   "calculatorPriceHint": "napr. 1,899",
-  "routeStrategyLabel": "Stratégia:",
-  "routeStrategyUniform": "Rovnomerná",
-  "routeStrategyBalanced": "Vyvážená",
   "glideCoachBetaTitle": "Beta koučingu plachtenia (experimentálne)",
   "glideCoachBetaSubtitle": "Jemná haptika pri spomaľovaní pred červenou. Vypnuté štandardne — riziko rozptyľovania.",
   "consentSyncTripsTitle": "Synchronizovať záznamy jázd",
@@ -1428,7 +1277,6 @@
   "onboardingObd2ConnectButton": "Pripojiť adaptér",
   "onboardingObd2SkipButton": "Možno neskôr",
   "onboardingObd2ReadingVin": "Čítanie VIN…",
-  "onboardingObd2VinReadFailed": "Nepodarilo sa prečítať VIN — zadajte ručne",
   "onboardingObd2ConnectFailed": "Nepodarilo sa pripojiť k adaptéru. Môžete skúsiť znova alebo preskočiť.",
   "onboardingPickUseMode": "Pre pokračovanie vyberte režim používania.",
   "alertsRadiusFrequencyLabel": "Frekvencia kontrol",
@@ -1442,9 +1290,6 @@
   "radiusAlertMapPickerCancel": "Zrušiť",
   "radiusAlertMapPickerHint": "Potiahnite mapu pre nastavenie stredu upozornenia",
   "radiusAlertCenterFromMap": "Poloha na mape",
-  "radiusAlertNotificationTitle": "{fuelLabel} pri {label}",
-  "radiusAlertNotificationBody": "Stanica má cenu {price} € (cieľ: {threshold} €)",
-  "refuelUnitPerLiter": "/L",
   "refuelUnitPerKwh": "/kWh",
   "refuelUnitPerSession": "/relácia",
   "speedConsumptionCardTitle": "Spotreba podľa rýchlosti",
@@ -1463,9 +1308,6 @@
   "tankLevelLitersFormat": "{litres} L",
   "tankLevelRangeFormat": "≈ {kilometres} km dojazdu",
   "tankLevelLastFillUpFormat": "Posledné tankovanie: {date} · {count} jazda(y) odvtedy",
-  "tankLevelMethodObd2": "Merané OBD2",
-  "tankLevelMethodDistanceFallback": "odhad na základe vzdialenosti",
-  "tankLevelMethodMixed": "zmiešané meranie",
   "tankLevelEmptyNoFillUp": "Zaznamenajte tankovanie pre zobrazenie hladiny nádrže",
   "tankLevelDetailSheetTitle": "Jazdy od posledného tankovania",
   "addFillUpIsFullTankLabel": "Plná nádrž",
@@ -1536,7 +1378,6 @@
   "trajetDetailDeleteAction": "Odstrániť",
   "trajetDetailDeleteConfirmTitle": "Odstrániť túto jazdu?",
   "trajetDetailDeleteConfirmBody": "Táto jazda bude natrvalo odstránená z vašej histórie.",
-  "trajetDetailDeleteConfirmCancel": "Zrušiť",
   "trajetDetailDeleteConfirmConfirm": "Odstrániť",
   "tripRecordingObd2NotResponding": "OBD2 adaptér je pripojený, ale nevracia dáta. Skúste iný adaptér alebo skontrolujte diagnostický protokol vozidla.",
   "trajetsViewAllOnMap": "Zobraziť všetko na mape",
@@ -1552,7 +1393,6 @@
   "tripLengthBucketTripCount": "{count, plural, =0{žiadne jazdy} one{1 jazda} other{{count} jázd}}",
   "tripPathCardTitle": "Trasa jazdy",
   "tripPathCardSubtitle": "GPS zaznamenaná trasa",
-  "tripPathLegendTitle": "Spotreba",
   "tripPathLegendEfficient": "Efektívna (< 6 L/100km)",
   "tripPathLegendBorderline": "Hraničná (6–10 L/100km)",
   "tripPathLegendWasteful": "Plytvaná (≥ 10 L/100km)",
@@ -1563,13 +1403,8 @@
   "tripRecordingPinHelpTitle": "O pripnutí",
   "tripRecordingPinHelpBody": "Pripnutie udržuje obrazovku zapnutú a skrýva systémové lišty, aby formulár zostal čitateľný pri montáži na palubnej doske. Klepnutím znova uvoľnite. Automaticky sa uvoľní po zastavení jazdy.",
   "tripRecordingResumeHintMessage": "Záznam pokračuje na pozadí. Klepnite na červený banner v hornej časti ľubovoľnej obrazovky pre návrat.",
-  "tripBannerOpenFromConsumptionTab": "Otvoriť aktívnu jazdu z karty Spotreba",
   "tripRecordingUnpinnedWarning": "Pripnite obrazovku pre udržanie GPS aktívneho počas jazdy — Android môže obmedziť GPS počas spánku.",
   "tripRecordingMinimiseTooltip": "Minimalizovať do plávajúcej dlaždice",
-  "unifiedFilterFuel": "Palivo",
-  "unifiedFilterEv": "EV",
-  "unifiedFilterBoth": "Oboje",
-  "unifiedNoResultsForFilter": "Žiadne výsledky pre tento filter",
   "searchFailedSnackbar": "Vyhľadávanie zlyhalo — skúste to znova",
   "vinLabel": "VIN (voliteľné)",
   "vinDecodeTooltip": "Dekódovať VIN",
@@ -1601,7 +1436,6 @@
   "gdprVinOnlineDecodeTitle": "Online dekódovanie VIN",
   "gdprVinOnlineDecodeShort": "Dekódovať VIN cez bezplatnú verejnú službu NHTSA",
   "gdprVinOnlineDecodeDescription": "Keď spárujete adaptér, VIN vášho vozidla sa prečíta lokálne pre identifikáciu auta. Povolením tohto sa 17-znakový VIN odošle do bezplatnej služby NHTSA vPIC pre vyhľadanie ďalších detailov (model, zdvihový objem, typ paliva). VIN je jediný odoslaný údaj — žiadne iné informácie neopustia vaše zariadenie.",
-  "vehicleDetectedFromVinBadge": "(zistené)",
   "vehicleDetectedFromVinSnackbar": "Zistené z VIN: {summary}. Použiť?",
   "vehicleDetectedFromVinApply": "Použiť",
   "widgetHelpSectionTitle": "Widget na domovskej obrazovke",
@@ -1620,7 +1454,6 @@
   "widgetColorSchemeOrange": "Oranžová",
   "widgetVariantDefault": "Iba aktuálna cena",
   "widgetVariantPredictive": "Prediktívny: najlepší čas na tankovanie",
-  "widgetPredictiveNowPrefix": "teraz",
   "@distance": {
     "placeholders": {
       "distance": {
@@ -1645,13 +1478,6 @@
   "@hours": {
     "placeholders": {
       "n": {
-        "type": "int"
-      }
-    }
-  },
-  "@stationsOnMap": {
-    "placeholders": {
-      "count": {
         "type": "int"
       }
     }
@@ -1700,13 +1526,6 @@
   "@evConnectors": {
     "placeholders": {
       "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@stopN": {
-    "placeholders": {
-      "n": {
         "type": "int"
       }
     }
@@ -1850,25 +1669,11 @@
       }
     }
   },
-  "approachStationDistance": "{meters} m ďaleko",
-  "@approachStationDistance": {
-    "description": "PiP overlay caption (#2084) showing how far the driver is from the in-radius target station, in metres.",
-    "placeholders": {
-      "meters": {
-        "type": "String",
-        "example": "350"
-      }
-    }
-  },
   "tripRecordingPipElapsedCaption": "uplynulo",
   "@tripRecordingPipElapsedCaption": {
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
-  "fabOpenCriteria": "Otvoriť vyhľadávanie",
-  "fabOpenResults": "Otvoriť výsledky",
   "fabRunSearch": "Spustiť vyhľadávanie",
-  "fabRefineCriteria": "Spresniť vyhľadávanie",
-  "routeSearchPartialBanner": "Hľadajú sa ďalšie stanice…",
   "privacySaveErrorLog": "Uložiť záznam chýb ({count})",
   "@privacySaveErrorLog": {
     "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
@@ -2418,10 +2223,6 @@
   "@trajetDetailChartCoolant": {
     "description": "MT — needs native review"
   },
-  "trajetDetailChartAltitude": "Nadmorská výška (m)",
-  "@trajetDetailChartAltitude": {
-    "description": "MT — needs native review"
-  },
   "trajetDetailChartLambda": "Commanded λ",
   "@trajetDetailChartLambda": {
     "description": "MT — needs native review"
@@ -2654,14 +2455,6 @@
   "@obd2HealthHistorySection": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyJson": "Kopírovať ako JSON",
-  "@obd2HealthCopyJson": {
-    "description": "MT — needs native review"
-  },
-  "obd2HealthCopied": "Diagnostika OBD2 skopírovaná do schránky.",
-  "@obd2HealthCopied": {
-    "description": "MT — needs native review"
-  },
   "evStatusPartial": "Čiastočne dostupné",
   "@evStatusPartial": {
     "description": "MT — needs native review"
@@ -2767,10 +2560,6 @@
   },
   "ocrTesterRunning": "Spúšťam OCR…",
   "@ocrTesterRunning": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterNoResult": "OCR neprodukoval čitateľný výsledok.",
-  "@ocrTesterNoResult": {
     "description": "MT — needs native review"
   },
   "ocrTesterOverlaySection": "Prekrytie blokov",
@@ -2937,10 +2726,6 @@
   "@obd2DiagnosticsInitCold": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyInitTranscript": "Kopírovať iba záznam inicializácie",
-  "@obd2HealthCopyInitTranscript": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterSaveFixture": "Uložiť ako fixture",
   "@ocrTesterSaveFixture": {
     "description": "MT — needs native review"
@@ -3092,10 +2877,6 @@
   "@obd2GpsDegradedBannerTitle": {
     "description": "MT — needs native review"
   },
-  "restoreBackupTooltip": "Obnoviť zálohu",
-  "@restoreBackupTooltip": {
-    "description": "MT — needs native review"
-  },
   "restoreBackupDialogTitle": "Obnoviť zálohu",
   "@restoreBackupDialogTitle": {
     "description": "MT — needs native review"
@@ -3111,15 +2892,6 @@
   "restoreBackupReplaceAction": "Nahradiť všetko",
   "@restoreBackupReplaceAction": {
     "description": "MT — needs native review"
-  },
-  "restoreBackupSuccess": "Záloha obnovená — importovaných {count} záznamov",
-  "@restoreBackupSuccess": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
   },
   "restoreBackupEmpty": "Záloha obnovená — neobsahovala žiadne záznamy",
   "@restoreBackupEmpty": {
@@ -3391,16 +3163,6 @@
   "voiceCoachingSettingSubtitle": "Počúvajte hlasové tipy počas jazdy — prudké zrýchlenie, prudké brzdenie a rady o radení",
   "@voiceCoachingSettingSubtitle": {
     "description": "MT — needs native review"
-  },
-  "fuelStationRadarDistanceKm": "{km} km ďalej",
-  "@fuelStationRadarDistanceKm": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "km": {
-        "type": "String",
-        "example": "2.4"
-      }
-    }
   },
   "fuelStationRadarProximity": "Blízkosť {percent}%",
   "@fuelStationRadarProximity": {
@@ -3733,10 +3495,6 @@
   },
   "consumptionStatsChartConsumption": "L/100km za mesiac",
   "@consumptionStatsChartConsumption": {
-    "description": "MT — needs native review"
-  },
-  "shareReceiptImporting": "Importujem zdieľaný paragon…",
-  "@shareReceiptImporting": {
     "description": "MT — needs native review"
   },
   "shareReceiptUnsupportedFormat": "Tento typ súboru zatiaľ nie je možné importovať — namiesto toho zdieľajte fotografiu paragónu.",
@@ -4228,17 +3986,6 @@
       "count": {
         "type": "int",
         "example": "3"
-      }
-    }
-  },
-  "fuelEfficiencyMixedFootnote": "{count, plural, =1{1 mixed tank counted toward its main fuel} other{{count} mixed tanks counted toward their main fuel}}",
-  "@fuelEfficiencyMixedFootnote": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int",
-        "example": "1"
       }
     }
   },
@@ -4752,11 +4499,6 @@
         "example": "Oil change"
       }
     }
-  },
-  "radarAcquiringLocation": "Finding your location…",
-  "@radarAcquiringLocation": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
   },
   "radarUpdatingLocation": "Updating your location…",
   "@radarUpdatingLocation": {

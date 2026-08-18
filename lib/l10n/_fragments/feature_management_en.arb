@@ -55,14 +55,6 @@
   "@featureDescription_baselineSync": {
     "description": "One-line description for the baseline sync feature."
   },
-  "featureLabel_unifiedSearchResults": "Unified search results",
-  "@featureLabel_unifiedSearchResults": {
-    "description": "Display name for the unified fuel + EV search results feature in the Feature management list."
-  },
-  "featureDescription_unifiedSearchResults": "Single result list combining fuel and EV stations.",
-  "@featureDescription_unifiedSearchResults": {
-    "description": "One-line description for the unified search results feature."
-  },
   "featureLabel_priceAlerts": "Price alerts",
   "@featureLabel_priceAlerts": {
     "description": "Display name for the price alerts feature in the Feature management list."
@@ -170,14 +162,6 @@
   "featureBlockedEnable_autoRecord": "Enable OBD2 trip recording first",
   "@featureBlockedEnable_autoRecord": {
     "description": "Tooltip shown on the disabled master auto-record toggle when its prerequisite (OBD2 trip recording) is off."
-  },
-  "featureBlockedEnable_showFuel": "Prerequisites not met",
-  "@featureBlockedEnable_showFuel": {
-    "description": "Tooltip shown on the disabled show-fuel-stations toggle. The feature has no prerequisites today so this string is a defensive fallback for the dependency-graph helpers."
-  },
-  "featureBlockedEnable_showElectric": "Prerequisites not met",
-  "@featureBlockedEnable_showElectric": {
-    "description": "Tooltip shown on the disabled show-EV-charging-stations toggle. The feature has no prerequisites today so this string is a defensive fallback for the dependency-graph helpers."
   },
   "featureBlockedEnable_showConsumptionTab": "Enable OBD2 trip recording first",
   "@featureBlockedEnable_showConsumptionTab": {

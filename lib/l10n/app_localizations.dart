@@ -213,41 +213,11 @@ abstract class AppLocalizations {
   /// **'Nearby stations'**
   String get searchNearby;
 
-  /// No description provided for @searchButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Search'**
-  String get searchButton;
-
-  /// No description provided for @fabOpenCriteria.
-  ///
-  /// In en, this message translates to:
-  /// **'Open search'**
-  String get fabOpenCriteria;
-
-  /// No description provided for @fabOpenResults.
-  ///
-  /// In en, this message translates to:
-  /// **'Open results'**
-  String get fabOpenResults;
-
   /// No description provided for @fabRunSearch.
   ///
   /// In en, this message translates to:
   /// **'Run search'**
   String get fabRunSearch;
-
-  /// No description provided for @fabRefineCriteria.
-  ///
-  /// In en, this message translates to:
-  /// **'Refine search'**
-  String get fabRefineCriteria;
-
-  /// No description provided for @routeSearchPartialBanner.
-  ///
-  /// In en, this message translates to:
-  /// **'Searching for more stations…'**
-  String get routeSearchPartialBanner;
 
   /// No description provided for @routeSearchingChip.
   ///
@@ -267,23 +237,11 @@ abstract class AppLocalizations {
   /// **'Search criteria'**
   String get searchCriteriaTitle;
 
-  /// No description provided for @searchCriteriaOpen.
-  ///
-  /// In en, this message translates to:
-  /// **'Search'**
-  String get searchCriteriaOpen;
-
   /// No description provided for @searchCriteriaRadiusBadge.
   ///
   /// In en, this message translates to:
   /// **'Within {km} km'**
   String searchCriteriaRadiusBadge(String km);
-
-  /// No description provided for @searchCriteriaTapToSearch.
-  ///
-  /// In en, this message translates to:
-  /// **'Tap to start searching'**
-  String get searchCriteriaTapToSearch;
 
   /// No description provided for @noResults.
   ///
@@ -362,12 +320,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'API key setup'**
   String get apiKeySetup;
-
-  /// No description provided for @apiKeyDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Register once for a free API key.'**
-  String get apiKeyDescription;
 
   /// No description provided for @apiKeyLabel.
   ///
@@ -567,18 +519,6 @@ abstract class AppLocalizations {
   /// **'Country'**
   String get country;
 
-  /// No description provided for @demoMode.
-  ///
-  /// In en, this message translates to:
-  /// **'Demo mode — sample data shown.'**
-  String get demoMode;
-
-  /// No description provided for @setupLiveData.
-  ///
-  /// In en, this message translates to:
-  /// **'Set up for live data'**
-  String get setupLiveData;
-
   /// No description provided for @freeNoKey.
   ///
   /// In en, this message translates to:
@@ -590,12 +530,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'API key required'**
   String get apiKeyRequired;
-
-  /// No description provided for @skipWithoutKey.
-  ///
-  /// In en, this message translates to:
-  /// **'Continue without key'**
-  String get skipWithoutKey;
 
   /// No description provided for @dataTransparency.
   ///
@@ -615,119 +549,11 @@ abstract class AppLocalizations {
   /// **'Clear cache'**
   String get clearCache;
 
-  /// No description provided for @clearAllData.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete all data'**
-  String get clearAllData;
-
-  /// No description provided for @errorLog.
-  ///
-  /// In en, this message translates to:
-  /// **'Error log'**
-  String get errorLog;
-
   /// No description provided for @stationsFound.
   ///
   /// In en, this message translates to:
   /// **'{count} stations found'**
   String stationsFound(int count);
-
-  /// No description provided for @whatIsShared.
-  ///
-  /// In en, this message translates to:
-  /// **'What is shared — and with whom?'**
-  String get whatIsShared;
-
-  /// No description provided for @gpsCoordinates.
-  ///
-  /// In en, this message translates to:
-  /// **'GPS coordinates'**
-  String get gpsCoordinates;
-
-  /// No description provided for @gpsReason.
-  ///
-  /// In en, this message translates to:
-  /// **'Sent with every location search to find nearby stations.'**
-  String get gpsReason;
-
-  /// No description provided for @postalCodeData.
-  ///
-  /// In en, this message translates to:
-  /// **'Postal code'**
-  String get postalCodeData;
-
-  /// No description provided for @postalReason.
-  ///
-  /// In en, this message translates to:
-  /// **'Converted to coordinates via geocoding service.'**
-  String get postalReason;
-
-  /// No description provided for @mapViewport.
-  ///
-  /// In en, this message translates to:
-  /// **'Map viewport'**
-  String get mapViewport;
-
-  /// No description provided for @mapReason.
-  ///
-  /// In en, this message translates to:
-  /// **'Map tiles are loaded from the tile server. No personal data is transmitted.'**
-  String get mapReason;
-
-  /// No description provided for @apiKeyData.
-  ///
-  /// In en, this message translates to:
-  /// **'API Key'**
-  String get apiKeyData;
-
-  /// No description provided for @apiKeyReason.
-  ///
-  /// In en, this message translates to:
-  /// **'Your personal key is sent with every API request. It is linked to your email.'**
-  String get apiKeyReason;
-
-  /// No description provided for @notShared.
-  ///
-  /// In en, this message translates to:
-  /// **'NOT shared:'**
-  String get notShared;
-
-  /// No description provided for @searchHistory.
-  ///
-  /// In en, this message translates to:
-  /// **'Search history'**
-  String get searchHistory;
-
-  /// No description provided for @favoritesData.
-  ///
-  /// In en, this message translates to:
-  /// **'Favorites'**
-  String get favoritesData;
-
-  /// No description provided for @profileNames.
-  ///
-  /// In en, this message translates to:
-  /// **'Profile names'**
-  String get profileNames;
-
-  /// No description provided for @homeZipData.
-  ///
-  /// In en, this message translates to:
-  /// **'Home ZIP'**
-  String get homeZipData;
-
-  /// No description provided for @usageData.
-  ///
-  /// In en, this message translates to:
-  /// **'Usage data'**
-  String get usageData;
-
-  /// No description provided for @privacyBanner.
-  ///
-  /// In en, this message translates to:
-  /// **'This app has no server. All data stays on your device. No analytics, no tracking, no ads.'**
-  String get privacyBanner;
 
   /// No description provided for @storageUsage.
   ///
@@ -879,12 +705,6 @@ abstract class AppLocalizations {
   /// **'Cache is empty'**
   String get cacheEmpty;
 
-  /// No description provided for @noStorage.
-  ///
-  /// In en, this message translates to:
-  /// **'No storage used'**
-  String get noStorage;
-
   /// No description provided for @apiKeyNote.
   ///
   /// In en, this message translates to:
@@ -896,24 +716,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invalid format — expected UUID (8-4-4-4-12)'**
   String get apiKeyFormatError;
-
-  /// No description provided for @supportProject.
-  ///
-  /// In en, this message translates to:
-  /// **'Support this project'**
-  String get supportProject;
-
-  /// No description provided for @supportDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'This app is free, open source, and has no ads. If you find it useful, consider supporting the developer.'**
-  String get supportDescription;
-
-  /// No description provided for @reportBug.
-  ///
-  /// In en, this message translates to:
-  /// **'Report a bug / Suggest a feature'**
-  String get reportBug;
 
   /// No description provided for @reportThisIssue.
   ///
@@ -998,12 +800,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Configured'**
   String get configApiKeyConfigured;
-
-  /// No description provided for @configApiKeyNotSet.
-  ///
-  /// In en, this message translates to:
-  /// **'Not set (demo mode)'**
-  String get configApiKeyNotSet;
 
   /// No description provided for @configApiKeyCommunity.
   ///
@@ -1227,18 +1023,6 @@ abstract class AppLocalizations {
   /// **'expensive'**
   String get expensive;
 
-  /// No description provided for @stationsOnMap.
-  ///
-  /// In en, this message translates to:
-  /// **'{count} stations'**
-  String stationsOnMap(int count);
-
-  /// No description provided for @loadingFavorites.
-  ///
-  /// In en, this message translates to:
-  /// **'Loading favorites...\nSearch for stations first to save data.'**
-  String get loadingFavorites;
-
   /// No description provided for @reportPrice.
   ///
   /// In en, this message translates to:
@@ -1292,12 +1076,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Position unknown'**
   String get positionUnknown;
-
-  /// No description provided for @routeModeBannerLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Route mode — distances are along the corridor'**
-  String get routeModeBannerLabel;
 
   /// No description provided for @distancesFromCenter.
   ///
@@ -1520,18 +1298,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Shown as closed, but open'**
   String get wrongStatusClosed;
-
-  /// No description provided for @searchAlongRouteLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Along route'**
-  String get searchAlongRouteLabel;
-
-  /// No description provided for @searchEvStations.
-  ///
-  /// In en, this message translates to:
-  /// **'Search to find EV charging stations'**
-  String get searchEvStations;
 
   /// No description provided for @allStations.
   ///
@@ -1761,12 +1527,6 @@ abstract class AppLocalizations {
   /// **'Stop'**
   String get stop;
 
-  /// No description provided for @stopN.
-  ///
-  /// In en, this message translates to:
-  /// **'Stop {n}'**
-  String stopN(int n);
-
   /// No description provided for @addStop.
   ///
   /// In en, this message translates to:
@@ -1833,12 +1593,6 @@ abstract class AppLocalizations {
   /// **'Optional: override the built-in app key with your own'**
   String get optionalOverrideKey;
 
-  /// No description provided for @requiredForEvSearch.
-  ///
-  /// In en, this message translates to:
-  /// **'Required for EV charging station search'**
-  String get requiredForEvSearch;
-
   /// No description provided for @edit.
   ///
   /// In en, this message translates to:
@@ -1850,12 +1604,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Fuel prices API Key'**
   String get fuelPricesApiKey;
-
-  /// No description provided for @tankerkoenigApiKey.
-  ///
-  /// In en, this message translates to:
-  /// **'Tankerkoenig API Key'**
-  String get tankerkoenigApiKey;
 
   /// No description provided for @evChargingApiKey.
   ///
@@ -1977,18 +1725,6 @@ abstract class AppLocalizations {
   /// **'Distance (km)'**
   String get distanceKm;
 
-  /// No description provided for @consumptionL100km.
-  ///
-  /// In en, this message translates to:
-  /// **'Consumption (L/100km)'**
-  String get consumptionL100km;
-
-  /// No description provided for @fuelPriceEurL.
-  ///
-  /// In en, this message translates to:
-  /// **'Fuel price (EUR/L)'**
-  String get fuelPriceEurL;
-
   /// No description provided for @tripCost.
   ///
   /// In en, this message translates to:
@@ -2006,12 +1742,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Total cost'**
   String get totalCost;
-
-  /// No description provided for @enterCalcValues.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter distance, consumption, and price to calculate trip cost'**
-  String get enterCalcValues;
 
   /// No description provided for @calculatorDistanceLabel.
   ///
@@ -2133,12 +1863,6 @@ abstract class AppLocalizations {
   /// **'City search'**
   String get citySearchCache;
 
-  /// No description provided for @dataDeletionNotAvailableCommunity.
-  ///
-  /// In en, this message translates to:
-  /// **'Data deletion is not available in community mode. Disconnect first, or use a private database.'**
-  String get dataDeletionNotAvailableCommunity;
-
   /// No description provided for @priceHistoryStationsTracked.
   ///
   /// In en, this message translates to:
@@ -2169,35 +1893,11 @@ abstract class AppLocalizations {
   /// **'No price history yet'**
   String get noPriceHistory;
 
-  /// No description provided for @noHourlyData.
-  ///
-  /// In en, this message translates to:
-  /// **'No hourly data'**
-  String get noHourlyData;
-
   /// No description provided for @noStatistics.
   ///
   /// In en, this message translates to:
   /// **'No statistics available'**
   String get noStatistics;
-
-  /// No description provided for @statMin.
-  ///
-  /// In en, this message translates to:
-  /// **'Min'**
-  String get statMin;
-
-  /// No description provided for @statMax.
-  ///
-  /// In en, this message translates to:
-  /// **'Max'**
-  String get statMax;
-
-  /// No description provided for @statAvg.
-  ///
-  /// In en, this message translates to:
-  /// **'Avg'**
-  String get statAvg;
 
   /// No description provided for @showAllFuelTypes.
   ///
@@ -2211,18 +1911,6 @@ abstract class AppLocalizations {
   /// **'Connected'**
   String get connected;
 
-  /// No description provided for @notConnected.
-  ///
-  /// In en, this message translates to:
-  /// **'Not connected'**
-  String get notConnected;
-
-  /// No description provided for @connectTankSync.
-  ///
-  /// In en, this message translates to:
-  /// **'Connect TankSync'**
-  String get connectTankSync;
-
   /// No description provided for @disconnectTankSync.
   ///
   /// In en, this message translates to:
@@ -2234,36 +1922,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View my data'**
   String get viewMyData;
-
-  /// No description provided for @optionalCloudSync.
-  ///
-  /// In en, this message translates to:
-  /// **'Optional cloud sync for alerts, favorites, and push notifications'**
-  String get optionalCloudSync;
-
-  /// No description provided for @tapToUpdateGps.
-  ///
-  /// In en, this message translates to:
-  /// **'Tap to update GPS position'**
-  String get tapToUpdateGps;
-
-  /// No description provided for @gpsAutoUpdateHint.
-  ///
-  /// In en, this message translates to:
-  /// **'GPS position is acquired automatically when you search. You can also update it manually here.'**
-  String get gpsAutoUpdateHint;
-
-  /// No description provided for @clearGpsConfirm.
-  ///
-  /// In en, this message translates to:
-  /// **'Clear the stored GPS position? You can update it again at any time.'**
-  String get clearGpsConfirm;
-
-  /// No description provided for @pageNotFound.
-  ///
-  /// In en, this message translates to:
-  /// **'Page not found'**
-  String get pageNotFound;
 
   /// No description provided for @deleteAllServerData.
   ///
@@ -2318,12 +1976,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All synced trips removed from server'**
   String get forgetAllSyncedTripsSuccess;
-
-  /// No description provided for @disconnectConfirm.
-  ///
-  /// In en, this message translates to:
-  /// **'Disconnect TankSync?'**
-  String get disconnectConfirm;
 
   /// No description provided for @disconnect.
   ///
@@ -2438,12 +2090,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign in'**
   String get signIn;
-
-  /// No description provided for @upgradeToEmail.
-  ///
-  /// In en, this message translates to:
-  /// **'Create email account'**
-  String get upgradeToEmail;
 
   /// No description provided for @savedRoutes.
   ///
@@ -2625,36 +2271,6 @@ abstract class AppLocalizations {
   /// **'Get started'**
   String get onboardingFinish;
 
-  /// No description provided for @crossBorderNearby.
-  ///
-  /// In en, this message translates to:
-  /// **'{country} is nearby'**
-  String crossBorderNearby(String country);
-
-  /// No description provided for @crossBorderDistance.
-  ///
-  /// In en, this message translates to:
-  /// **'~{km} km to border'**
-  String crossBorderDistance(int km);
-
-  /// No description provided for @crossBorderAvgPrice.
-  ///
-  /// In en, this message translates to:
-  /// **'Avg here: {price} EUR ({count} stations)'**
-  String crossBorderAvgPrice(String price, int count);
-
-  /// No description provided for @allPricesView.
-  ///
-  /// In en, this message translates to:
-  /// **'All prices'**
-  String get allPricesView;
-
-  /// No description provided for @compactView.
-  ///
-  /// In en, this message translates to:
-  /// **'Compact'**
-  String get compactView;
-
   /// No description provided for @switchToAllPricesView.
   ///
   /// In en, this message translates to:
@@ -2810,30 +2426,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to switch: {error}'**
   String failedToSwitch(String error);
-
-  /// No description provided for @topicUrlCopied.
-  ///
-  /// In en, this message translates to:
-  /// **'Topic URL copied'**
-  String get topicUrlCopied;
-
-  /// No description provided for @testNotificationSent.
-  ///
-  /// In en, this message translates to:
-  /// **'Test notification sent!'**
-  String get testNotificationSent;
-
-  /// No description provided for @testNotificationFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to send test notification'**
-  String get testNotificationFailed;
-
-  /// No description provided for @pushUpdateFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to update push notification setting'**
-  String get pushUpdateFailed;
 
   /// No description provided for @connectedAsGuest.
   ///
@@ -3189,12 +2781,6 @@ abstract class AppLocalizations {
   /// **'Delete all data'**
   String get privacyDeleteButton;
 
-  /// Button that copies recorded error traces to the clipboard. count = number of traces buffered.
-  ///
-  /// In en, this message translates to:
-  /// **'Copy error log to clipboard ({count})'**
-  String privacyCopyErrorLog(int count);
-
   /// Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder (and shares / copies as a secondary path). Supersedes privacyCopyErrorLog (#2145). count = number of traces buffered.
   ///
   /// In en, this message translates to:
@@ -3417,23 +3003,6 @@ abstract class AppLocalizations {
   /// **'Enable voice announcements'**
   String get voiceAnnouncementsEnabled;
 
-  /// No description provided for @voiceAnnouncementThreshold.
-  ///
-  /// In en, this message translates to:
-  /// **'Only below {price}'**
-  String voiceAnnouncementThreshold(String price);
-
-  /// No description provided for @voiceAnnouncementCheapFuel.
-  ///
-  /// In en, this message translates to:
-  /// **'{station}, {distance} kilometers ahead, {fuelType} {price}'**
-  String voiceAnnouncementCheapFuel(
-    String station,
-    String distance,
-    String fuelType,
-    String price,
-  );
-
   /// No description provided for @voiceAnnouncementProximityRadius.
   ///
   /// In en, this message translates to:
@@ -3451,36 +3020,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Maximum price'**
   String get voiceAnnouncementPriceLimit;
-
-  /// No description provided for @nearestStations.
-  ///
-  /// In en, this message translates to:
-  /// **'Nearest stations'**
-  String get nearestStations;
-
-  /// No description provided for @nearestStationsHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Find the closest stations using your current location'**
-  String get nearestStationsHint;
-
-  /// No description provided for @consumptionLogTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Fuel consumption'**
-  String get consumptionLogTitle;
-
-  /// No description provided for @consumptionLogMenuTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Consumption log'**
-  String get consumptionLogMenuTitle;
-
-  /// No description provided for @consumptionLogMenuSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Track fill-ups and calculate L/100km'**
-  String get consumptionLogMenuSubtitle;
 
   /// No description provided for @consumptionStatsTitle.
   ///
@@ -3680,12 +3219,6 @@ abstract class AppLocalizations {
   /// **'Vehicle'**
   String get fillUpVehicleLabel;
 
-  /// No description provided for @fillUpVehicleNone.
-  ///
-  /// In en, this message translates to:
-  /// **'No vehicle'**
-  String get fillUpVehicleNone;
-
   /// No description provided for @fillUpVehicleRequired.
   ///
   /// In en, this message translates to:
@@ -3721,12 +3254,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Skip — add without a station'**
   String get pickStationSkip;
-
-  /// No description provided for @scanPump.
-  ///
-  /// In en, this message translates to:
-  /// **'Scan pump'**
-  String get scanPump;
 
   /// No description provided for @scanPayment.
   ///
@@ -3854,29 +3381,11 @@ abstract class AppLocalizations {
   /// **'Turn flash off'**
   String get torchOff;
 
-  /// No description provided for @obdNoAdapter.
-  ///
-  /// In en, this message translates to:
-  /// **'No OBD2 adapter in range'**
-  String get obdNoAdapter;
-
-  /// No description provided for @obdOdometerUnavailable.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not read odometer'**
-  String get obdOdometerUnavailable;
-
   /// No description provided for @obdPermissionDenied.
   ///
   /// In en, this message translates to:
   /// **'Grant Bluetooth permission in system settings'**
   String get obdPermissionDenied;
-
-  /// No description provided for @obdAdapterUnresponsive.
-  ///
-  /// In en, this message translates to:
-  /// **'Adapter didn\'t answer — turn the ignition on and retry'**
-  String get obdAdapterUnresponsive;
 
   /// No description provided for @obdPickerTitle.
   ///
@@ -3895,30 +3404,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Connecting…'**
   String get obdPickerConnecting;
-
-  /// No description provided for @themeSettingTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Theme'**
-  String get themeSettingTitle;
-
-  /// No description provided for @themeModeLight.
-  ///
-  /// In en, this message translates to:
-  /// **'Light'**
-  String get themeModeLight;
-
-  /// No description provided for @themeModeDark.
-  ///
-  /// In en, this message translates to:
-  /// **'Dark'**
-  String get themeModeDark;
-
-  /// No description provided for @themeModeSystem.
-  ///
-  /// In en, this message translates to:
-  /// **'Follow system'**
-  String get themeModeSystem;
 
   /// No description provided for @tripRecordingTitle.
   ///
@@ -4184,18 +3669,6 @@ abstract class AppLocalizations {
   /// **'OBD2 adapter: connected'**
   String get obd2StatusConnected;
 
-  /// No description provided for @obd2StatusAttempting.
-  ///
-  /// In en, this message translates to:
-  /// **'OBD2 adapter: connecting'**
-  String get obd2StatusAttempting;
-
-  /// No description provided for @obd2StatusUnreachable.
-  ///
-  /// In en, this message translates to:
-  /// **'OBD2 adapter: unreachable'**
-  String get obd2StatusUnreachable;
-
   /// No description provided for @obd2StatusPermissionDenied.
   ///
   /// In en, this message translates to:
@@ -4207,18 +3680,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Ready to record a trip.'**
   String get obd2StatusConnectedBody;
-
-  /// No description provided for @obd2StatusAttemptingBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Connecting in the background…'**
-  String get obd2StatusAttemptingBody;
-
-  /// No description provided for @obd2StatusUnreachableBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Adapter out of range or already in use by another app.'**
-  String get obd2StatusUnreachableBody;
 
   /// No description provided for @obd2StatusPermissionDeniedBody.
   ///
@@ -4249,12 +3710,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No trips yet'**
   String get tripHistoryEmptyTitle;
-
-  /// No description provided for @tripHistoryEmptySubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Connect an OBD2 adapter and record a trip to start building your driving history.'**
-  String get tripHistoryEmptySubtitle;
 
   /// No description provided for @tripHistoryUnknownDate.
   ///
@@ -4328,23 +3783,11 @@ abstract class AppLocalizations {
   /// **'Fuel cut — coast'**
   String get situationFuelCut;
 
-  /// DEPRECATED (#1185): replaced by tripSaveRecording. Retained for parity with non-EN locales until the orphan-key sweep lands.
-  ///
-  /// In en, this message translates to:
-  /// **'Save as fill-up'**
-  String get tripSaveAsFillUp;
-
   /// Trip-summary CTA: persists a TripHistoryEntry only — no fill-up created. (#1185)
   ///
   /// In en, this message translates to:
   /// **'Save trip'**
   String get tripSaveRecording;
-
-  /// No description provided for @tripDiscard.
-  ///
-  /// In en, this message translates to:
-  /// **'Discard'**
-  String get tripDiscard;
 
   /// No description provided for @tripSummaryAutoSaved.
   ///
@@ -4364,23 +3807,11 @@ abstract class AppLocalizations {
   /// **'Delete this trip'**
   String get tripSummaryDelete;
 
-  /// No description provided for @obdOdometerRead.
-  ///
-  /// In en, this message translates to:
-  /// **'Odometer read: {km} km'**
-  String obdOdometerRead(int km);
-
   /// No description provided for @vehicleFuelNotSet.
   ///
   /// In en, this message translates to:
   /// **'Not set'**
   String get vehicleFuelNotSet;
-
-  /// No description provided for @wizardVehicleTapToEdit.
-  ///
-  /// In en, this message translates to:
-  /// **'Tap to edit'**
-  String get wizardVehicleTapToEdit;
 
   /// No description provided for @wizardVehicleDefaultBadge.
   ///
@@ -4441,12 +3872,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Custom'**
   String get wizardProfileCustomName;
-
-  /// No description provided for @wizardProfileCustomDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Your own combination of features. Tweak each toggle below.'**
-  String get wizardProfileCustomDescription;
 
   /// No description provided for @useModeSectionHint.
   ///
@@ -4682,24 +4107,6 @@ abstract class AppLocalizations {
   /// **'Min power'**
   String get evMinPower;
 
-  /// No description provided for @evMaxPower.
-  ///
-  /// In en, this message translates to:
-  /// **'Max power'**
-  String get evMaxPower;
-
-  /// No description provided for @evOperator.
-  ///
-  /// In en, this message translates to:
-  /// **'Operator'**
-  String get evOperator;
-
-  /// No description provided for @evLastUpdate.
-  ///
-  /// In en, this message translates to:
-  /// **'Last update'**
-  String get evLastUpdate;
-
   /// No description provided for @evStatusAvailable.
   ///
   /// In en, this message translates to:
@@ -4742,12 +4149,6 @@ abstract class AppLocalizations {
   /// **'Saved as defaults'**
   String get criteriaSavedToProfile;
 
-  /// No description provided for @profileNotFound.
-  ///
-  /// In en, this message translates to:
-  /// **'No active profile'**
-  String get profileNotFound;
-
   /// No description provided for @updatingFavorites.
   ///
   /// In en, this message translates to:
@@ -4765,12 +4166,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No data'**
   String get noDataAvailable;
-
-  /// No description provided for @configAndPrivacy.
-  ///
-  /// In en, this message translates to:
-  /// **'Configuration & Privacy'**
-  String get configAndPrivacy;
 
   /// No description provided for @searchToSeeMap.
   ///
@@ -5262,24 +4657,6 @@ abstract class AppLocalizations {
   /// **'Scan receipt'**
   String get scanReceipt;
 
-  /// No description provided for @obdConnect.
-  ///
-  /// In en, this message translates to:
-  /// **'OBD-II'**
-  String get obdConnect;
-
-  /// No description provided for @stationTypeFuel.
-  ///
-  /// In en, this message translates to:
-  /// **'Fuel'**
-  String get stationTypeFuel;
-
-  /// No description provided for @stationTypeEv.
-  ///
-  /// In en, this message translates to:
-  /// **'EV'**
-  String get stationTypeEv;
-
   /// No description provided for @brandFilterHighway.
   ///
   /// In en, this message translates to:
@@ -5393,12 +4770,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Couldn\'t load your alerts'**
   String get alertsLoadErrorTitle;
-
-  /// No description provided for @alertsBackgroundCheckErrorTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Alert background check failed'**
-  String get alertsBackgroundCheckErrorTitle;
 
   /// No description provided for @detailsLabel.
   ///
@@ -6054,18 +5425,6 @@ abstract class AppLocalizations {
   /// **'Hide'**
   String get swipeHide;
 
-  /// No description provided for @evChargingSection.
-  ///
-  /// In en, this message translates to:
-  /// **'EV Charging'**
-  String get evChargingSection;
-
-  /// No description provided for @fuelStationsSection.
-  ///
-  /// In en, this message translates to:
-  /// **'Fuel Stations'**
-  String get fuelStationsSection;
-
   /// No description provided for @yourRating.
   ///
   /// In en, this message translates to:
@@ -6095,42 +5454,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This app is free, open source, and has no ads. If you find it useful, consider supporting the developer.'**
   String get aboutSupportDescription;
-
-  /// No description provided for @luxembourgRegulatedPricesNotice.
-  ///
-  /// In en, this message translates to:
-  /// **'Luxembourg fuel prices are government-regulated and uniform nationwide.'**
-  String get luxembourgRegulatedPricesNotice;
-
-  /// No description provided for @luxembourgFuelUnleaded95.
-  ///
-  /// In en, this message translates to:
-  /// **'Unleaded 95'**
-  String get luxembourgFuelUnleaded95;
-
-  /// No description provided for @luxembourgFuelUnleaded98.
-  ///
-  /// In en, this message translates to:
-  /// **'Unleaded 98'**
-  String get luxembourgFuelUnleaded98;
-
-  /// No description provided for @luxembourgFuelDiesel.
-  ///
-  /// In en, this message translates to:
-  /// **'Diesel'**
-  String get luxembourgFuelDiesel;
-
-  /// No description provided for @luxembourgFuelLpg.
-  ///
-  /// In en, this message translates to:
-  /// **'LPG'**
-  String get luxembourgFuelLpg;
-
-  /// No description provided for @luxembourgPricesUnavailable.
-  ///
-  /// In en, this message translates to:
-  /// **'Luxembourg regulated prices are unavailable.'**
-  String get luxembourgPricesUnavailable;
 
   /// No description provided for @reportIssueTitle.
   ///
@@ -6294,30 +5617,6 @@ abstract class AppLocalizations {
   /// **'{label} is due now.'**
   String serviceReminderDueNowBody(String label);
 
-  /// No description provided for @southKoreaApiKeyRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Register at OPINET to get a free API key'**
-  String get southKoreaApiKeyRequired;
-
-  /// No description provided for @southKoreaApiProvider.
-  ///
-  /// In en, this message translates to:
-  /// **'OPINET (KNOC)'**
-  String get southKoreaApiProvider;
-
-  /// No description provided for @chileApiKeyRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Register at CNE to get a free API key'**
-  String get chileApiKeyRequired;
-
-  /// No description provided for @chileApiProvider.
-  ///
-  /// In en, this message translates to:
-  /// **'CNE Bencina en Linea'**
-  String get chileApiProvider;
-
   /// No description provided for @vinConfirmTitle.
   ///
   /// In en, this message translates to:
@@ -6457,12 +5756,6 @@ abstract class AppLocalizations {
   /// **'Fuel type'**
   String get alertsRadiusFuelType;
 
-  /// Price-threshold field label in the radius-alert create sheet (#578).
-  ///
-  /// In en, this message translates to:
-  /// **'Threshold (€/L)'**
-  String get alertsRadiusThreshold;
-
   /// Radius slider label in the radius-alert create sheet (#578).
   ///
   /// In en, this message translates to:
@@ -6493,12 +5786,6 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get alertsRadiusCancel;
 
-  /// Snackbar/confirm text shown when a radius alert is dismissed for deletion (#578).
-  ///
-  /// In en, this message translates to:
-  /// **'Delete radius alert?'**
-  String get alertsRadiusDeleteConfirm;
-
   /// Past-tense snackbar shown after a radius alert is deleted, paired with an Undo action that re-inserts it (#2494).
   ///
   /// In en, this message translates to:
@@ -6516,18 +5803,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pair an OBD2 adapter'**
   String get obd2PairChipTooltip;
-
-  /// Title of the price-drop velocity notification (#579). Fired when multiple nearby stations drop within the lookback window.
-  ///
-  /// In en, this message translates to:
-  /// **'{fuelLabel} dropped at nearby stations'**
-  String velocityAlertTitle(String fuelLabel);
-
-  /// Body of the price-drop velocity notification (#579). Lists the number of affected stations and the largest observed drop in cents.
-  ///
-  /// In en, this message translates to:
-  /// **'{stationCount} stations dropped by up to {maxDropCents}¢ in the last hour'**
-  String velocityAlertBody(int stationCount, int maxDropCents);
 
   /// Success snackbar confirming a fill-up was saved, shown after the Add fill-up screen pops back to the consumption list (#1692).
   ///
@@ -6886,18 +6161,6 @@ abstract class AppLocalizations {
   /// **'Add a favorite station to test the Fuel Station Radar'**
   String get approachTestUnavailable;
 
-  /// PiP overlay caption (#2084) showing how far the driver is from the in-radius target station, in metres.
-  ///
-  /// In en, this message translates to:
-  /// **'{meters} m away'**
-  String approachStationDistance(String meters);
-
-  /// Fuel Station Radar caption (#2661) showing how far the driver is from the radar station while still approaching, in kilometres.
-  ///
-  /// In en, this message translates to:
-  /// **'{km} km away'**
-  String fuelStationRadarDistanceKm(String km);
-
   /// Accessibility label for the battery-style proximity fill bar (#2661): how close the driver is to the radar station, as a percentage (100% at the station, 0% at the radar radius edge).
   ///
   /// In en, this message translates to:
@@ -7048,18 +6311,6 @@ abstract class AppLocalizations {
   /// **'Save delay after disconnect (seconds)'**
   String get autoRecordSaveDelayLabel;
 
-  /// Label for the read-only field showing the MAC address of the OBD2 adapter paired to this vehicle.
-  ///
-  /// In en, this message translates to:
-  /// **'Paired adapter'**
-  String get autoRecordPairedAdapterLabel;
-
-  /// Empty-state text shown when no OBD2 adapter has been paired to this vehicle yet.
-  ///
-  /// In en, this message translates to:
-  /// **'No adapter paired. Pair one via the OBD2 onboarding first.'**
-  String get autoRecordPairedAdapterNone;
-
   /// Label for the read-only field showing whether the user has granted always-on location permission for auto-record.
   ///
   /// In en, this message translates to:
@@ -7102,23 +6353,11 @@ abstract class AppLocalizations {
   /// **'Could not request background location'**
   String get autoRecordBackgroundLocationRequestFailedSnackbar;
 
-  /// Tooltip on the AppBar action that resets the auto-record unseen-trip badge to zero.
-  ///
-  /// In en, this message translates to:
-  /// **'Clear counter'**
-  String get autoRecordBadgeClearTooltip;
-
   /// Passive informational link rendered on the auto-record card when no adapter is paired (#1400). Replaces the duplicate orange-tinted 'Pair an adapter' CTA that lived in the auto-record card before #1400; tapping the link scrolls to the canonical 'OBD2 adapter' card below and pulses its border.
   ///
   /// In en, this message translates to:
   /// **'Pair an adapter in the section below to enable auto-recording'**
   String get autoRecordPairAdapterLinkText;
-
-  /// AppBar IconButton tooltip on the consumption screen for the full XML-in-ZIP backup export (#1317).
-  ///
-  /// In en, this message translates to:
-  /// **'Export backup'**
-  String get exportBackupTooltip;
 
   /// SnackBar shown after a successful backup export when the share sheet is about to appear (#1317).
   ///
@@ -7144,12 +6383,6 @@ abstract class AppLocalizations {
   /// **'Saved to Downloads as {fileName}'**
   String exportBackupSavedAs(String fileName);
 
-  /// AppBar IconButton tooltip on the consumption screen for the full-backup RESTORE flow (#2571).
-  ///
-  /// In en, this message translates to:
-  /// **'Restore backup'**
-  String get restoreBackupTooltip;
-
   /// Title of the merge-vs-replace confirmation dialog shown after a backup .zip is picked (#2571).
   ///
   /// In en, this message translates to:
@@ -7173,12 +6406,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Replace all'**
   String get restoreBackupReplaceAction;
-
-  /// Success SnackBar after a restore completes with at least one record (#2571).
-  ///
-  /// In en, this message translates to:
-  /// **'Backup restored — {count} records imported'**
-  String restoreBackupSuccess(int count);
 
   /// Success SnackBar when the restored backup parsed correctly but held zero records (#2571).
   ///
@@ -7226,12 +6453,6 @@ abstract class AppLocalizations {
     int chargingLogs,
   );
 
-  /// Diagnostic-overlay chip shown while the broken-MAP belief is in the 0.4–0.7 confidence band — the app is still gathering observations and not yet ready to warn the user (#1423 phase 5).
-  ///
-  /// In en, this message translates to:
-  /// **'MAP sensor verifying…'**
-  String get brokenMapChipVerifying;
-
   /// Small chip displayed alongside the live fuel-rate metric while the broken-MAP belief sits in the 0.7–0.9 confidence band — the rate continues to be shown but the user is told it may be unreliable (#1423 phase 5).
   ///
   /// In en, this message translates to:
@@ -7249,24 +6470,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'MAP sensor unreliable. Showing fill-up averages instead of live fuel rate.'**
   String get brokenMapBannerHardDisable;
-
-  /// Diagnostic-overlay row shown in the OBD2 breadcrumb panel when the broken-MAP belief sits below 0.4 — the sensor has been observed and looks healthy (#1423 phase 5).
-  ///
-  /// In en, this message translates to:
-  /// **'MAP sensor: verified ({confidence})'**
-  String brokenMapOverlayVerified(String confidence);
-
-  /// Diagnostic-overlay row shown in the OBD2 breadcrumb panel when the broken-MAP belief sits in 0.4–0.7 — the app is still building confidence (#1423 phase 5).
-  ///
-  /// In en, this message translates to:
-  /// **'MAP sensor: verifying ({confidence})'**
-  String brokenMapOverlayUnverified(String confidence);
-
-  /// Diagnostic-overlay row shown in the OBD2 breadcrumb panel when the broken-MAP belief sits at or above 0.7 — strong evidence the MAP sensor is broken (#1423 phase 5).
-  ///
-  /// In en, this message translates to:
-  /// **'MAP sensor: suspicious ({confidence})'**
-  String brokenMapOverlaySuspicious(String confidence);
 
   /// Diagnostic-overlay row showing the Bayesian posterior point estimate and the half-width of the 95% credible interval for the broken-MAP belief (#1424 deliverable G).
   ///
@@ -7628,12 +6831,6 @@ abstract class AppLocalizations {
   /// **'Not enough data yet'**
   String get chargingChartsEmpty;
 
-  /// Axis label for the X axis (month) on the charging charts (#582 phase 3).
-  ///
-  /// In en, this message translates to:
-  /// **'Month'**
-  String get chargingChartsMonthAxis;
-
   /// Title of the shared destructive-action confirmation dialog (#3682) shown before EVERY delete in the app.
   ///
   /// In en, this message translates to:
@@ -7963,30 +7160,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Station name (optional)'**
   String get fillUpCorrectionStation;
-
-  /// No description provided for @greeceApiProvider.
-  ///
-  /// In en, this message translates to:
-  /// **'Paratiritirio Timon (Greece)'**
-  String get greeceApiProvider;
-
-  /// No description provided for @greeceCommunityApiNotice.
-  ///
-  /// In en, this message translates to:
-  /// **'Powered by the community-maintained fuelpricesgr API'**
-  String get greeceCommunityApiNotice;
-
-  /// No description provided for @romaniaApiProvider.
-  ///
-  /// In en, this message translates to:
-  /// **'Monitorul Prețurilor (Romania)'**
-  String get romaniaApiProvider;
-
-  /// No description provided for @romaniaScrapingNotice.
-  ///
-  /// In en, this message translates to:
-  /// **'Powered by monitorulpreturilor.info (Competition Council + ANPC)'**
-  String get romaniaScrapingNotice;
 
   /// Banner shown when stations across the border are cheaper than local prices.
   ///
@@ -8796,24 +7969,6 @@ abstract class AppLocalizations {
   /// **'High revs at cruise — shifting up earlier saves fuel'**
   String get ecoNudgeHighRpm;
 
-  /// Label for the eco-routing strategy chip on the route search controls (#1123). Picks routes that minimise fuel rather than time.
-  ///
-  /// In en, this message translates to:
-  /// **'Eco'**
-  String get ecoRouteOption;
-
-  /// Predicted savings preview shown when the eco-routing strategy is active on the route search controls (#1123). {liters} is the estimated litres saved compared to the fastest route, formatted with one decimal.
-  ///
-  /// In en, this message translates to:
-  /// **'≈ {liters} L saved'**
-  String ecoRouteSavings(String liters);
-
-  /// Helper caption shown beneath the eco-routing chip explaining why the user might pick it (#1123). Keep concise; the leitmotiv 'Smarter pump. Smarter drive.' should remain recognisable.
-  ///
-  /// In en, this message translates to:
-  /// **'Smarter drive — favours steady highway over zigzag shortcuts.'**
-  String get ecoRouteHint;
-
   /// Trip-detail note (#3499, epic #3498) shown on a gpsPlusObd2 trip whose samples carried ZERO engine PIDs: the adapter session never delivered engine data (drop at start, silent ECU, no supported PIDs), so the fuel chart/figures silently fell back to the GPS-physics estimate. This makes that fallback honest instead of unexplained.
   ///
   /// In en, this message translates to:
@@ -8933,18 +8088,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sync driving baselines via TankSync.'**
   String get featureDescription_baselineSync;
-
-  /// Display name for the unified fuel + EV search results feature in the Feature management list.
-  ///
-  /// In en, this message translates to:
-  /// **'Unified search results'**
-  String get featureLabel_unifiedSearchResults;
-
-  /// One-line description for the unified search results feature.
-  ///
-  /// In en, this message translates to:
-  /// **'Single result list combining fuel and EV stations.'**
-  String get featureDescription_unifiedSearchResults;
 
   /// Display name for the price alerts feature in the Feature management list.
   ///
@@ -9107,18 +8250,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enable OBD2 trip recording first'**
   String get featureBlockedEnable_autoRecord;
-
-  /// Tooltip shown on the disabled show-fuel-stations toggle. The feature has no prerequisites today so this string is a defensive fallback for the dependency-graph helpers.
-  ///
-  /// In en, this message translates to:
-  /// **'Prerequisites not met'**
-  String get featureBlockedEnable_showFuel;
-
-  /// Tooltip shown on the disabled show-EV-charging-stations toggle. The feature has no prerequisites today so this string is a defensive fallback for the dependency-graph helpers.
-  ///
-  /// In en, this message translates to:
-  /// **'Prerequisites not met'**
-  String get featureBlockedEnable_showElectric;
 
   /// Tooltip shown on the disabled consumption-tab toggle when its prerequisite (OBD2 trip recording) is off.
   ///
@@ -9690,12 +8821,6 @@ abstract class AppLocalizations {
   /// **'Scan failed: {error}'**
   String scanReceiptFailed(String error);
 
-  /// Snackbar shown on the Add-Fill-Up screen when the pump-display scan returns no usable fields (#751).
-  ///
-  /// In en, this message translates to:
-  /// **'Pump display not readable — try again'**
-  String get scanPumpUnreadable;
-
   /// Snackbar shown after a successful pump-display scan (#751).
   ///
   /// In en, this message translates to:
@@ -9719,12 +8844,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pump scan failed: {error}'**
   String scanPumpFailed(String error);
-
-  /// Title of the bottom sheet that reports an incorrect receipt scan (#751).
-  ///
-  /// In en, this message translates to:
-  /// **'Report a scan error'**
-  String get badScanReportTitle;
 
   /// Receipt-specific title for the bad-scan report sheet (#953). Used when ScanKind == receipt.
   ///
@@ -9773,12 +8892,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We\'ll share the receipt photo and both sets of values so the next build can learn this layout.'**
   String get badScanReportHint;
-
-  /// Button on the bad-scan-report sheet that triggers the system share intent (#751).
-  ///
-  /// In en, this message translates to:
-  /// **'Share report + photo'**
-  String get badScanReportShareAction;
 
   /// No description provided for @badScanReportFieldBrandLayout.
   ///
@@ -9851,12 +8964,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Submission failed — manual share'**
   String get badScanReportFallbackToShare;
-
-  /// Hint shown over the in-app camera reticle for the pump-display capture (#1868).
-  ///
-  /// In en, this message translates to:
-  /// **'Line up the three pump-display numbers inside the frame'**
-  String get pumpCameraHint;
 
   /// Label of the shutter button on the pump-display camera screen (#1868).
   ///
@@ -9960,29 +9067,11 @@ abstract class AppLocalizations {
   /// **'Station, odometer, notes'**
   String get fillUpSectionWhereSubtitle;
 
-  /// Chip label that opens the import bottom sheet with receipt / pump / OBD-II options (#751 phase 2).
-  ///
-  /// In en, this message translates to:
-  /// **'Import from…'**
-  String get fillUpImportFromLabel;
-
-  /// Bottom-sheet title for the import-from chooser (#751 phase 2).
-  ///
-  /// In en, this message translates to:
-  /// **'Import fill-up data'**
-  String get fillUpImportSheetTitle;
-
   /// Import option: OCR-scan a paper receipt (#751 phase 2).
   ///
   /// In en, this message translates to:
   /// **'Receipt'**
   String get fillUpImportReceiptLabel;
-
-  /// Subtitle for the receipt-scan import option (#751 phase 2).
-  ///
-  /// In en, this message translates to:
-  /// **'Scan a paper receipt with the camera'**
-  String get fillUpImportReceiptDescription;
 
   /// Import option: OCR-scan the fuel-pump LCD (#751 phase 2).
   ///
@@ -9990,35 +9079,11 @@ abstract class AppLocalizations {
   /// **'Pump display'**
   String get fillUpImportPumpLabel;
 
-  /// Subtitle for the pump-display import option (#751 phase 2).
-  ///
-  /// In en, this message translates to:
-  /// **'Read Betrag / Preis from the pump LCD'**
-  String get fillUpImportPumpDescription;
-
-  /// Import option: pull the odometer reading via OBD-II Bluetooth (#751 phase 2).
-  ///
-  /// In en, this message translates to:
-  /// **'OBD-II adapter'**
-  String get fillUpImportObdLabel;
-
-  /// Subtitle for the OBD-II import option (#751 phase 2).
-  ///
-  /// In en, this message translates to:
-  /// **'Read odometer from the OBD-II port over Bluetooth'**
-  String get fillUpImportObdDescription;
-
   /// Read-only derived value shown below the cost field when liters + cost are both entered (#751 phase 2).
   ///
   /// In en, this message translates to:
   /// **'Price per liter'**
   String get fillUpPricePerLiterLabel;
-
-  /// Tiny chip label shown next to the big vehicle title on the edit screen header (#751 phase 2).
-  ///
-  /// In en, this message translates to:
-  /// **'Plate'**
-  String get vehicleHeaderPlateLabel;
 
   /// Placeholder shown in the vehicle header when no name has been typed yet (#751 phase 2).
   ///
@@ -10121,12 +9186,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 fill} other{{count} fills}}'**
   String fuelEfficiencyFillCount(int count);
-
-  /// Transparency footnote on the per-fuel efficiency card, disclosing how many tanks contained more than one fuel and were each attributed whole to their dominant fuel (#2887, ADR 0014).
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 mixed tank counted toward its main fuel} other{{count} mixed tanks counted toward their main fuel}}'**
-  String fuelEfficiencyMixedFootnote(int count);
 
   /// Footnote shown on the per-fuel efficiency card when no winner can be crowned yet because at least one composition bucket has fewer than two closed plein-to-plein intervals (#2887, ADR 0015 verdict gate).
   ///
@@ -10542,12 +9601,6 @@ abstract class AppLocalizations {
   /// **'From your GPS track'**
   String get gpsRoadUseSource;
 
-  /// Section header on the Settings screen grouping wheel-lens (driving-behaviour) settings (#1122).
-  ///
-  /// In en, this message translates to:
-  /// **'Driving'**
-  String get hapticEcoCoachSectionTitle;
-
   /// Title of the haptic-eco-coach toggle on the Settings screen (#1122).
   ///
   /// In en, this message translates to:
@@ -10858,24 +9911,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'e.g. 1.899'**
   String get calculatorPriceHint;
-
-  /// No description provided for @routeStrategyLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Strategy:'**
-  String get routeStrategyLabel;
-
-  /// No description provided for @routeStrategyUniform.
-  ///
-  /// In en, this message translates to:
-  /// **'Uniform'**
-  String get routeStrategyUniform;
-
-  /// No description provided for @routeStrategyBalanced.
-  ///
-  /// In en, this message translates to:
-  /// **'Balanced'**
-  String get routeStrategyBalanced;
 
   /// No description provided for @glideCoachBetaTitle.
   ///
@@ -11512,12 +10547,6 @@ abstract class AppLocalizations {
   /// **'cold'**
   String get obd2DiagnosticsInitCold;
 
-  /// Label for the action on the dev-tools OBD2 communication-health screen (#2511) that copies only the dongle-init handshake (adapter identity + init transcript + supported PIDs) to the clipboard as JSON, without the full per-PID/session payload.
-  ///
-  /// In en, this message translates to:
-  /// **'Copy init transcript only'**
-  String get obd2HealthCopyInitTranscript;
-
   /// Empty-state line on the OBD2 diagnostics card / screen (#2470/#2471) shown when Developer mode is off or no diagnostics session has been captured yet.
   ///
   /// In en, this message translates to:
@@ -11553,18 +10582,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Recent sessions'**
   String get obd2HealthHistorySection;
-
-  /// Label for the action that copies the OBD2 session diagnostics (per-PID table + counters) to the clipboard as JSON, on the OBD2 communication-health screen (#2471).
-  ///
-  /// In en, this message translates to:
-  /// **'Copy as JSON'**
-  String get obd2HealthCopyJson;
-
-  /// Confirmation snackbar after the OBD2 communication-health screen copies the session diagnostics JSON to the clipboard (#2471).
-  ///
-  /// In en, this message translates to:
-  /// **'OBD2 diagnostics copied to clipboard.'**
-  String get obd2HealthCopied;
 
   /// Label for the action that saves the OBD2 session diagnostics (per-PID table + counters) as a JSON file to the device's Downloads folder, on the OBD2 communication-health screen (#2938).
   ///
@@ -12016,12 +11033,6 @@ abstract class AppLocalizations {
   /// **'Running OCR…'**
   String get ocrTesterRunning;
 
-  /// Shown on the OCR tester when the pipeline returned no result (e.g. the user cancelled the camera or OCR read nothing) (#2518).
-  ///
-  /// In en, this message translates to:
-  /// **'OCR produced no readable result.'**
-  String get ocrTesterNoResult;
-
   /// Section header above the ML Kit block overlay (the image with classified boxes) on the OCR tester (#2518).
   ///
   /// In en, this message translates to:
@@ -12237,12 +11248,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reading VIN…'**
   String get onboardingObd2ReadingVin;
-
-  /// Banner shown on the next manual vehicle step when the OBD2 adapter connected but the VIN could not be read (#816).
-  ///
-  /// In en, this message translates to:
-  /// **'Couldn\'t read VIN — enter manually'**
-  String get onboardingObd2VinReadFailed;
 
   /// No description provided for @onboardingObd2ConnectFailed.
   ///
@@ -12592,18 +11597,6 @@ abstract class AppLocalizations {
   /// **'Map location'**
   String get radiusAlertCenterFromMap;
 
-  /// Background notification title when a station in the radius drops to the alert threshold (#578 phase 3).
-  ///
-  /// In en, this message translates to:
-  /// **'{fuelLabel} near {label}'**
-  String radiusAlertNotificationTitle(String fuelLabel, String label);
-
-  /// Background notification body with the observed price and the user's threshold (#578 phase 3).
-  ///
-  /// In en, this message translates to:
-  /// **'A station is at {price} € (target: {threshold} €)'**
-  String radiusAlertNotificationBody(String price, String threshold);
-
   /// Title of the guided reconciliation workflow dialog raised after a full-tank fill-up when recorded trips don't account for all the pumped fuel (#2442).
   ///
   /// In en, this message translates to:
@@ -12752,12 +11745,6 @@ abstract class AppLocalizations {
   /// **'Resolve unresolved fuel and trip gap'**
   String get reconcileResolveGapSemanticLabel;
 
-  /// Trailing unit suffix on a fuel-pump price in the unified RefuelOptionCard (#1116 phase 3b). Renders below the numeric price (e.g. "1,799" + "/L" → "1,799 /L").
-  ///
-  /// In en, this message translates to:
-  /// **'/L'**
-  String get refuelUnitPerLiter;
-
   /// Trailing unit suffix on an EV charging price in the unified RefuelOptionCard (#1116 phase 3b).
   ///
   /// In en, this message translates to:
@@ -12769,12 +11756,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'/session'**
   String get refuelUnitPerSession;
-
-  /// Shown briefly while an inbound shared receipt image is being OCR'd on the Add fill-up screen (#2735).
-  ///
-  /// In en, this message translates to:
-  /// **'Importing shared receipt…'**
-  String get shareReceiptImporting;
 
   /// Snackbar shown when the user shares an unsupported file (e.g. a PDF) into the app. Image receipts work today; PDF rasterisation arrives in #2737 (#2735).
   ///
@@ -13057,24 +12038,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last fill-up: {date} · {count} trip(s) since'**
   String tankLevelLastFillUpFormat(String date, String count);
-
-  /// Method label appended to the tank-level caption when every trip since the last fill-up carried a measured OBD2 fuel-rate value (#1195).
-  ///
-  /// In en, this message translates to:
-  /// **'OBD2 measured'**
-  String get tankLevelMethodObd2;
-
-  /// Method label appended to the tank-level caption when no OBD2 fuel measurement was available and consumption was estimated from distance × avg L/100 km (#1195).
-  ///
-  /// In en, this message translates to:
-  /// **'distance-based estimate'**
-  String get tankLevelMethodDistanceFallback;
-
-  /// Method label appended to the tank-level caption when some trips used OBD2 and some used the distance-based fallback (#1195).
-  ///
-  /// In en, this message translates to:
-  /// **'mixed measurement'**
-  String get tankLevelMethodMixed;
 
   /// Empty-state message inside the tank-level card when the active vehicle has no fill-ups logged yet (#1195).
   ///
@@ -13574,12 +12537,6 @@ abstract class AppLocalizations {
   /// **'Altitude (m, from start)'**
   String get trajetDetailChartAltitudeRelative;
 
-  /// Section title above the GPS-altitude-over-time chart on the Trip detail screen (#2461). Hidden when no sample carries an altitude value (GPS path off / no fix).
-  ///
-  /// In en, this message translates to:
-  /// **'Altitude (m)'**
-  String get trajetDetailChartAltitude;
-
   /// Section title above the commanded-lambda-over-time chart on the Trip detail screen (#2461). Lambda is the commanded equivalence ratio (PID 0x44); values below 1 mean an enriched mixture. The Greek letter lambda is a universal automotive symbol — kept untranslated. Hidden when no sample carries a lambda value.
   ///
   /// In en, this message translates to:
@@ -13687,12 +12644,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This trip will be permanently removed from your history.'**
   String get trajetDetailDeleteConfirmBody;
-
-  /// Cancel button label on the delete-trip confirmation dialog (#890).
-  ///
-  /// In en, this message translates to:
-  /// **'Cancel'**
-  String get trajetDetailDeleteConfirmCancel;
 
   /// Confirm button label on the delete-trip confirmation dialog (#890).
   ///
@@ -13802,12 +12753,6 @@ abstract class AppLocalizations {
   /// **'GPS-recorded route'**
   String get tripPathCardSubtitle;
 
-  /// Header label above the trip-path heatmap legend (#1374 phase 3) — names the metric the colour coding represents.
-  ///
-  /// In en, this message translates to:
-  /// **'Consumption'**
-  String get tripPathLegendTitle;
-
   /// Legend entry for the green heatmap bucket on the trip-path card (#1374 phase 3): segments where computed L/100 km is below 6.
   ///
   /// In en, this message translates to:
@@ -13874,12 +12819,6 @@ abstract class AppLocalizations {
   /// **'Fuel Station Radar result'**
   String get fuelStationRadarResultBadge;
 
-  /// Status shown while the on-search Fuel Station Radar acquires the first GPS fix and has no last-known position to scan around yet (#3267).
-  ///
-  /// In en, this message translates to:
-  /// **'Finding your location…'**
-  String get radarAcquiringLocation;
-
   /// Status banner shown above the on-search Fuel Station Radar results while a fresh GPS fix is still resolving — the list is painted from the last-known position and refreshes once the live fix lands (#3267).
   ///
   /// In en, this message translates to:
@@ -13939,12 +12878,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Recording continues in the background. Tap the red banner at the top of any screen to return.'**
   String get tripRecordingResumeHintMessage;
-
-  /// Snackbar shown when the user taps the trip-recording banner on a screen whose context is above the GoRouter ancestor (#1322). Falls back from a navigation push to a hint pointing the user at the consumption tab.
-  ///
-  /// In en, this message translates to:
-  /// **'Open the active trip from the Conso tab'**
-  String get tripBannerOpenFromConsumptionTab;
 
   /// One-shot SnackBar shown the moment the user lands on the trip-recording screen with the pin toggle OFF (#1458 phase 2). Warns that without pinning, Android may suspend or throttle GPS while the screen sleeps and the captured path will show gaps.
   ///
@@ -14161,30 +13094,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Recording deleted'**
   String get trajetDeletedUndoSnackbar;
-
-  /// Filter chip label that narrows the unified search list to fuel pumps only (#1116 phase 3c).
-  ///
-  /// In en, this message translates to:
-  /// **'Fuel'**
-  String get unifiedFilterFuel;
-
-  /// Filter chip label that narrows the unified search list to EV chargers only (#1116 phase 3c).
-  ///
-  /// In en, this message translates to:
-  /// **'EV'**
-  String get unifiedFilterEv;
-
-  /// Filter chip label that shows fuel pumps and EV chargers together in the unified search list (default selection, #1116 phase 3c).
-  ///
-  /// In en, this message translates to:
-  /// **'Both'**
-  String get unifiedFilterBoth;
-
-  /// Empty-state placeholder shown in the unified search list when the active filter (Fuel / EV / Both) leaves zero options (#1116 phase 3c).
-  ///
-  /// In en, this message translates to:
-  /// **'No results match this filter'**
-  String get unifiedNoResultsForFilter;
 
   /// Error snackbar shown when a search request fails. Replaces a raw exception toString() that previously leaked stack-like text to the user (#1692).
   ///
@@ -14462,12 +13371,6 @@ abstract class AppLocalizations {
   /// **'When you pair an adapter, your vehicle\'s VIN is read locally to identify the car. Enabling this sends the 17-char VIN to NHTSA\'s free vPIC service to look up additional details (model, engine displacement, fuel type). The VIN is the only data sent — no other information leaves your device.'**
   String get gdprVinOnlineDecodeDescription;
 
-  /// Short badge shown next to a vehicle profile field (make, model, year, etc.) whose value matches the VIN-decoded value, to signal the field was auto-populated rather than typed by the user (#1399).
-  ///
-  /// In en, this message translates to:
-  /// **'(detected)'**
-  String get vehicleDetectedFromVinBadge;
-
   /// Snackbar shown when the VIN-decoded values differ from values the user has already entered, offering to apply the detected values without silently overwriting (#1399).
   ///
   /// In en, this message translates to:
@@ -14587,12 +13490,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Predictive: best time to fill'**
   String get widgetVariantPredictive;
-
-  /// One-word prefix shown before the current price on the predictive widget line, e.g. 'now €1.84/L' (#1121).
-  ///
-  /// In en, this message translates to:
-  /// **'now'**
-  String get widgetPredictiveNowPrefix;
 }
 
 class _AppLocalizationsDelegate

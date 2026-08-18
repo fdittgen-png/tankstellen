@@ -49,13 +49,6 @@
       "count": { "type": "int", "example": "3" }
     }
   },
-  "fuelEfficiencyMixedFootnote": "{count, plural, =1{1 mixed tank counted toward its main fuel} other{{count} mixed tanks counted toward their main fuel}}",
-  "@fuelEfficiencyMixedFootnote": {
-    "description": "Transparency footnote on the per-fuel efficiency card, disclosing how many tanks contained more than one fuel and were each attributed whole to their dominant fuel (#2887, ADR 0014).",
-    "placeholders": {
-      "count": { "type": "int", "example": "1" }
-    }
-  },
   "fuelEfficiencyInsufficientData": "Log at least two full tanks per composition to crown the cheapest.",
   "@fuelEfficiencyInsufficientData": {
     "description": "Footnote shown on the per-fuel efficiency card when no winner can be crowned yet because at least one composition bucket has fewer than two closed plein-to-plein intervals (#2887, ADR 0015 verdict gate)."

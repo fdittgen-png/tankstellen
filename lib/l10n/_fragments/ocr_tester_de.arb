@@ -11,7 +11,6 @@
   "ocrTesterCountryNone": "Standard (kein Profil)",
   "ocrTesterNoImage": "Bild auswählen oder aufnehmen, dann „Ausführen“.",
   "ocrTesterRunning": "OCR läuft…",
-  "ocrTesterNoResult": "OCR lieferte kein lesbares Ergebnis.",
   "ocrTesterOverlaySection": "Block-Overlay",
   "ocrTesterStepsSection": "Pipeline-Schritte",
   "ocrTesterLegendLabel": "Bezeichnung",

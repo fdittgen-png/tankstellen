@@ -47,10 +47,6 @@
   "@ocrTesterRunning": {
     "description": "Progress label shown while the OCR pipeline runs on the selected image in the tester (#2518)."
   },
-  "ocrTesterNoResult": "OCR produced no readable result.",
-  "@ocrTesterNoResult": {
-    "description": "Shown on the OCR tester when the pipeline returned no result (e.g. the user cancelled the camera or OCR read nothing) (#2518)."
-  },
   "ocrTesterOverlaySection": "Block overlay",
   "@ocrTesterOverlaySection": {
     "description": "Section header above the ML Kit block overlay (the image with classified boxes) on the OCR tester (#2518)."

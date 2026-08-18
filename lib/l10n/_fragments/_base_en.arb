@@ -12,12 +12,7 @@
   "fuelType": "Fuel type",
   "searchRadius": "Radius",
   "searchNearby": "Nearby stations",
-  "searchButton": "Search",
-  "fabOpenCriteria": "Open search",
-  "fabOpenResults": "Open results",
   "fabRunSearch": "Run search",
-  "fabRefineCriteria": "Refine search",
-  "routeSearchPartialBanner": "Searching for more stations…",
   "routeSearchingChip": "Searching the route…",
   "routeSegmentSummaryBadge": "Every {km} km",
   "@routeSegmentSummaryBadge": {
@@ -28,7 +23,6 @@
     }
   },
   "searchCriteriaTitle": "Search criteria",
-  "searchCriteriaOpen": "Search",
   "searchCriteriaRadiusBadge": "Within {km} km",
   "@searchCriteriaRadiusBadge": {
     "placeholders": {
@@ -37,7 +31,6 @@
       }
     }
   },
-  "searchCriteriaTapToSearch": "Tap to start searching",
   "noResults": "No stations found.",
   "startSearch": "Search to find fuel stations.",
   "open": "Open",
@@ -58,7 +51,6 @@
   "navigate": "Navigate",
   "retry": "Try again",
   "apiKeySetup": "API key setup",
-  "apiKeyDescription": "Register once for a free API key.",
   "apiKeyLabel": "API Key",
   "register": "Registration",
   "continueButton": "Continue",
@@ -100,16 +92,11 @@
   "noFavoritesHint": "Tap the star on a station to save it as a favorite.",
   "language": "Language",
   "country": "Country",
-  "demoMode": "Demo mode — sample data shown.",
-  "setupLiveData": "Set up for live data",
   "freeNoKey": "Free — no key needed",
   "apiKeyRequired": "API key required",
-  "skipWithoutKey": "Continue without key",
   "dataTransparency": "Data transparency",
   "storageAndCache": "Storage & cache",
   "clearCache": "Clear cache",
-  "clearAllData": "Delete all data",
-  "errorLog": "Error log",
   "stationsFound": "{count} stations found",
   "@stationsFound": {
     "placeholders": {
@@ -118,22 +105,6 @@
       }
     }
   },
-  "whatIsShared": "What is shared — and with whom?",
-  "gpsCoordinates": "GPS coordinates",
-  "gpsReason": "Sent with every location search to find nearby stations.",
-  "postalCodeData": "Postal code",
-  "postalReason": "Converted to coordinates via geocoding service.",
-  "mapViewport": "Map viewport",
-  "mapReason": "Map tiles are loaded from the tile server. No personal data is transmitted.",
-  "apiKeyData": "API Key",
-  "apiKeyReason": "Your personal key is sent with every API request. It is linked to your email.",
-  "notShared": "NOT shared:",
-  "searchHistory": "Search history",
-  "favoritesData": "Favorites",
-  "profileNames": "Profile names",
-  "homeZipData": "Home ZIP",
-  "usageData": "Usage data",
-  "privacyBanner": "This app has no server. All data stays on your device. No analytics, no tracking, no ads.",
   "storageUsage": "Storage usage on this device",
   "settingsLabel": "Settings",
   "profilesStored": "profiles stored",
@@ -173,12 +144,8 @@
   "deleteAllButton": "Delete all",
   "entries": "entries",
   "cacheEmpty": "Cache is empty",
-  "noStorage": "No storage used",
   "apiKeyNote": "Free registration. Data from government price transparency agencies.",
   "apiKeyFormatError": "Invalid format — expected UUID (8-4-4-4-12)",
-  "supportProject": "Support this project",
-  "supportDescription": "This app is free, open source, and has no ads. If you find it useful, consider supporting the developer.",
-  "reportBug": "Report a bug / Suggest a feature",
   "reportThisIssue": "Report this issue",
   "reportAlreadySent": "You already reported this issue.",
   "reportConsentTitle": "Report to GitHub?",
@@ -193,7 +160,6 @@
   "configApiKeysSection": "API keys",
   "configTankerkoenigKey": "Tankerkoenig API key",
   "configApiKeyConfigured": "Configured",
-  "configApiKeyNotSet": "Not set (demo mode)",
   "configApiKeyCommunity": "Default (community key)",
   "searchLocationPlaceholder": "Address, postal code or city",
   "configEvKey": "EV charging API key",
@@ -242,15 +208,6 @@
   "sortPriceDistance": "Price/km",
   "cheap": "cheap",
   "expensive": "expensive",
-  "stationsOnMap": "{count} stations",
-  "@stationsOnMap": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "loadingFavorites": "Loading favorites...\nSearch for stations first to save data.",
   "reportPrice": "Report price",
   "whatsWrong": "What's wrong?",
   "correctPrice": "Correct price (e.g. 1.459)",
@@ -260,7 +217,6 @@
   "cacheCleared": "Cache cleared.",
   "yourPosition": "Your position",
   "positionUnknown": "Position unknown",
-  "routeModeBannerLabel": "Route mode — distances are along the corridor",
   "distancesFromCenter": "Distances from search center",
   "autoUpdatePosition": "Auto-update position",
   "autoUpdateDescription": "Refresh GPS position before each search",
@@ -363,8 +319,6 @@
   "wrongDieselPrice": "Wrong Diesel price",
   "wrongStatusOpen": "Shown as open, but closed",
   "wrongStatusClosed": "Shown as closed, but open",
-  "searchAlongRouteLabel": "Along route",
-  "searchEvStations": "Search to find EV charging stations",
   "allStations": "All stations",
   "bestStops": "Best stops",
   "openInMaps": "Open in Maps",
@@ -431,14 +385,6 @@
   "cityOrAddress": "City or address",
   "useGps": "Use GPS",
   "stop": "Stop",
-  "stopN": "Stop {n}",
-  "@stopN": {
-    "placeholders": {
-      "n": {
-        "type": "int"
-      }
-    }
-  },
   "addStop": "Add stop",
   "searchAlongRoute": "Search along route",
   "cheapest": "Cheapest",
@@ -464,10 +410,8 @@
   "customKey": "Custom key",
   "appDefaultKey": "App default key",
   "optionalOverrideKey": "Optional: override the built-in app key with your own",
-  "requiredForEvSearch": "Required for EV charging station search",
   "edit": "Edit",
   "fuelPricesApiKey": "Fuel prices API Key",
-  "tankerkoenigApiKey": "Tankerkoenig API Key",
   "evChargingApiKey": "EV Charging API Key",
   "openChargeMapApiKey": "OpenChargeMap API Key",
   "routePlanningSection": "Route planning",
@@ -509,12 +453,9 @@
   "noStationsAlongThisRoute": "No stations found along this route.",
   "fuelCostCalculator": "Fuel Cost Calculator",
   "distanceKm": "Distance (km)",
-  "consumptionL100km": "Consumption (L/100km)",
-  "fuelPriceEurL": "Fuel price (EUR/L)",
   "tripCost": "Trip Cost",
   "fuelNeeded": "Fuel needed",
   "totalCost": "Total cost",
-  "enterCalcValues": "Enter distance, consumption, and price to calculate trip cost",
   "calculatorDistanceLabel": "Distance ({unit})",
   "@calculatorDistanceLabel": {
     "placeholders": {
@@ -556,7 +497,6 @@
   "ratingsLabel": "Ratings",
   "favoritesDataCache": "Favorites data",
   "citySearchCache": "City search",
-  "dataDeletionNotAvailableCommunity": "Data deletion is not available in community mode. Disconnect first, or use a private database.",
   "priceHistoryStationsTracked": "{count} stations tracked",
   "@priceHistoryStationsTracked": {
     "placeholders": {
@@ -590,22 +530,11 @@
     }
   },
   "noPriceHistory": "No price history yet",
-  "noHourlyData": "No hourly data",
   "noStatistics": "No statistics available",
-  "statMin": "Min",
-  "statMax": "Max",
-  "statAvg": "Avg",
   "showAllFuelTypes": "Show all fuel types",
   "connected": "Connected",
-  "notConnected": "Not connected",
-  "connectTankSync": "Connect TankSync",
   "disconnectTankSync": "Disconnect TankSync",
   "viewMyData": "View my data",
-  "optionalCloudSync": "Optional cloud sync for alerts, favorites, and push notifications",
-  "tapToUpdateGps": "Tap to update GPS position",
-  "gpsAutoUpdateHint": "GPS position is acquired automatically when you search. You can also update it manually here.",
-  "clearGpsConfirm": "Clear the stored GPS position? You can update it again at any time.",
-  "pageNotFound": "Page not found",
   "deleteAllServerData": "Delete all server data",
   "deleteServerDataConfirm": "Delete all server data?",
   "deleteEverything": "Delete everything",
@@ -615,7 +544,6 @@
   "forgetAllSyncedTripsConfirmBody": "Every trip summary and detail blob will be removed from the server. Your local trip history on this device won't be affected.\n\nThis action cannot be undone.",
   "forgetAllSyncedTripsConfirmAction": "Forget all",
   "forgetAllSyncedTripsSuccess": "All synced trips removed from server",
-  "disconnectConfirm": "Disconnect TankSync?",
   "disconnect": "Disconnect",
   "myServerData": "My server data",
   "anonymousUuid": "Anonymous UUID",
@@ -635,7 +563,6 @@
   "continueAsGuest": "Continue as guest",
   "createAccount": "Create account",
   "signIn": "Sign in",
-  "upgradeToEmail": "Create email account",
   "savedRoutes": "Saved Routes",
   "noSavedRoutes": "No saved routes",
   "noSavedRoutesHint": "Search along a route and save it for quick access later.",
@@ -680,35 +607,6 @@
   "onboardingNext": "Next",
   "onboardingSkip": "Skip",
   "onboardingFinish": "Get started",
-  "crossBorderNearby": "{country} is nearby",
-  "@crossBorderNearby": {
-    "placeholders": {
-      "country": {
-        "type": "String"
-      }
-    }
-  },
-  "crossBorderDistance": "~{km} km to border",
-  "@crossBorderDistance": {
-    "placeholders": {
-      "km": {
-        "type": "int"
-      }
-    }
-  },
-  "crossBorderAvgPrice": "Avg here: {price} EUR ({count} stations)",
-  "@crossBorderAvgPrice": {
-    "placeholders": {
-      "price": {
-        "type": "String"
-      },
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "allPricesView": "All prices",
-  "compactView": "Compact",
   "switchToAllPricesView": "Switch to all-prices view",
   "switchToCompactView": "Switch to compact view",
   "unavailable": "N/A",
@@ -742,10 +640,6 @@
       }
     }
   },
-  "topicUrlCopied": "Topic URL copied",
-  "testNotificationSent": "Test notification sent!",
-  "testNotificationFailed": "Failed to send test notification",
-  "pushUpdateFailed": "Failed to update push notification setting",
   "connectedAsGuest": "Connected as guest",
   "accountCreated": "Account created!",
   "signedIn": "Signed in!",
@@ -860,15 +754,6 @@
     "description": "Snackbar confirming an export was written to the device's public Downloads folder (#2014). Replaces the earlier savedToFile string, which leaked a filesystem path that is meaningless to users (and on Android Q+ becomes a content:// URI)."
   },
   "privacyDeleteButton": "Delete all data",
-  "privacyCopyErrorLog": "Copy error log to clipboard ({count})",
-  "@privacyCopyErrorLog": {
-    "description": "Button that copies recorded error traces to the clipboard. count = number of traces buffered.",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "privacySaveErrorLog": "Save error log ({count})",
   "@privacySaveErrorLog": {
     "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder (and shares / copies as a secondary path). Supersedes privacyCopyErrorLog (#2145). count = number of traces buffered.",
@@ -954,42 +839,12 @@
   "voiceAnnouncementsTitle": "Voice Announcements",
   "voiceAnnouncementsDescription": "Announce nearby cheap stations while driving",
   "voiceAnnouncementsEnabled": "Enable voice announcements",
-  "voiceAnnouncementThreshold": "Only below {price}",
-  "@voiceAnnouncementThreshold": {
-    "placeholders": {
-      "price": {
-        "type": "String"
-      }
-    }
-  },
-  "voiceAnnouncementCheapFuel": "{station}, {distance} kilometers ahead, {fuelType} {price}",
-  "@voiceAnnouncementCheapFuel": {
-    "placeholders": {
-      "station": {
-        "type": "String"
-      },
-      "distance": {
-        "type": "String"
-      },
-      "fuelType": {
-        "type": "String"
-      },
-      "price": {
-        "type": "String"
-      }
-    }
-  },
   "voiceAnnouncementProximityRadius": "Announcement radius",
   "voiceAnnouncementCooldown": "Repeat interval",
   "voiceAnnouncementPriceLimit": "Maximum price",
   "@voiceAnnouncementPriceLimit": {
     "description": "Title of the voice-announcement price-threshold slider in driving settings: only stations priced at or below this per-litre figure are announced."
   },
-  "nearestStations": "Nearest stations",
-  "nearestStationsHint": "Find the closest stations using your current location",
-  "consumptionLogTitle": "Fuel consumption",
-  "consumptionLogMenuTitle": "Consumption log",
-  "consumptionLogMenuSubtitle": "Track fill-ups and calculate L/100km",
   "consumptionStatsTitle": "Consumption stats",
   "addFillUp": "Add fill-up",
   "noFillUpsTitle": "No fill-ups yet",
@@ -1030,14 +885,12 @@
   },
   "vehiclesWizardSkipHint": "Skip to finish setup — you can add vehicles anytime from Settings.",
   "fillUpVehicleLabel": "Vehicle",
-  "fillUpVehicleNone": "No vehicle",
   "fillUpVehicleRequired": "Vehicle is required",
   "reportScanError": "Report scan error",
   "pickStationTitle": "Pick a station",
   "pickStationHelper": "Start the fill-up from a known station so prices, brand and fuel type fill themselves in.",
   "pickStationEmpty": "No favorite stations yet — add some from Search or Favorites, or skip and fill in manually.",
   "pickStationSkip": "Skip — add without a station",
-  "scanPump": "Scan pump",
   "scanPayment": "Scan payment QR",
   "qrPaymentBeneficiary": "Beneficiary",
   "qrPaymentAmount": "Amount",
@@ -1059,17 +912,10 @@
   "qrScannerRetry": "Try again",
   "torchOn": "Turn flash on",
   "torchOff": "Turn flash off",
-  "obdNoAdapter": "No OBD2 adapter in range",
-  "obdOdometerUnavailable": "Could not read odometer",
   "obdPermissionDenied": "Grant Bluetooth permission in system settings",
-  "obdAdapterUnresponsive": "Adapter didn't answer — turn the ignition on and retry",
   "obdPickerTitle": "Pick an OBD2 adapter",
   "obdPickerScanning": "Scanning for adapters…",
   "obdPickerConnecting": "Connecting…",
-  "themeSettingTitle": "Theme",
-  "themeModeLight": "Light",
-  "themeModeDark": "Dark",
-  "themeModeSystem": "Follow system",
   "tripRecordingTitle": "Recording trip",
   "tripSummaryTitle": "Trip summary",
   "tripMetricDistance": "Distance",
@@ -1129,18 +975,13 @@
   "syncBaselinesToggleTitle": "Share learned vehicle profiles",
   "syncBaselinesToggleSubtitle": "Upload per-vehicle consumption baselines so a second device can reuse them.",
   "obd2StatusConnected": "OBD2 adapter: connected",
-  "obd2StatusAttempting": "OBD2 adapter: connecting",
-  "obd2StatusUnreachable": "OBD2 adapter: unreachable",
   "obd2StatusPermissionDenied": "OBD2 adapter: Bluetooth permission needed",
   "obd2StatusConnectedBody": "Ready to record a trip.",
-  "obd2StatusAttemptingBody": "Connecting in the background…",
-  "obd2StatusUnreachableBody": "Adapter out of range or already in use by another app.",
   "obd2StatusPermissionDeniedBody": "Grant Bluetooth permission in system settings to reconnect automatically.",
   "obd2StatusNoAdapter": "No adapter paired",
   "obd2StatusForget": "Forget adapter",
   "tripHistoryTitle": "Trip history",
   "tripHistoryEmptyTitle": "No trips yet",
-  "tripHistoryEmptySubtitle": "Connect an OBD2 adapter and record a trip to start building your driving history.",
   "tripHistoryUnknownDate": "Unknown date",
   "situationIdle": "Idle",
   "situationStopAndGo": "Stop & go",
@@ -1153,28 +994,14 @@
   "situationPartialDecel": "Coasting",
   "situationHardAccel": "Hard accel",
   "situationFuelCut": "Fuel cut — coast",
-  "tripSaveAsFillUp": "Save as fill-up",
-  "@tripSaveAsFillUp": {
-    "description": "DEPRECATED (#1185): replaced by tripSaveRecording. Retained for parity with non-EN locales until the orphan-key sweep lands."
-  },
   "tripSaveRecording": "Save trip",
   "@tripSaveRecording": {
     "description": "Trip-summary CTA: persists a TripHistoryEntry only — no fill-up created. (#1185)"
   },
-  "tripDiscard": "Discard",
   "tripSummaryAutoSaved": "Trip saved automatically",
   "tripSummaryDone": "Done",
   "tripSummaryDelete": "Delete this trip",
-  "obdOdometerRead": "Odometer read: {km} km",
-  "@obdOdometerRead": {
-    "placeholders": {
-      "km": {
-        "type": "int"
-      }
-    }
-  },
   "vehicleFuelNotSet": "Not set",
-  "wizardVehicleTapToEdit": "Tap to edit",
   "wizardVehicleDefaultBadge": "Default",
   "wizardProfileChoiceHint": "Choose how you want to use the app. You can change this later in Settings.",
   "wizardProfileChoiceFooter": "You can change your choice any time from Settings → Use mode.",
@@ -1185,7 +1012,6 @@
   "wizardProfileFullName": "Full",
   "wizardProfileFullDescription": "Everything in Medium, plus automatic OBD2 trip recording, driving scores, and loyalty cards.",
   "wizardProfileCustomName": "Custom",
-  "wizardProfileCustomDescription": "Your own combination of features. Tweak each toggle below.",
   "useModeSectionHint": "Right-size the app to how you actually use it. Picking a preset enables the matching set of features.",
   "useModeCustomSettingsDescription": "Your feature mix doesn't match any preset. Pick one above to overwrite, or keep customising individual features in the section below.",
   "useModeSwitchedSnack": "Use mode set to {profile}.",
@@ -1246,9 +1072,6 @@
   "evShowOnMap": "Show EV stations",
   "evAvailableOnly": "Available only",
   "evMinPower": "Min power",
-  "evMaxPower": "Max power",
-  "evOperator": "Operator",
-  "evLastUpdate": "Last update",
   "evStatusAvailable": "Available",
   "evStatusOccupied": "Occupied",
   "evStatusOutOfOrder": "Out of order",
@@ -1256,11 +1079,9 @@
   "openOnlyFilter": "Open only",
   "saveAsDefaults": "Save as my defaults",
   "criteriaSavedToProfile": "Saved as defaults",
-  "profileNotFound": "No active profile",
   "updatingFavorites": "Updating your favorites...",
   "fetchingLatestPrices": "Fetching the latest prices",
   "noDataAvailable": "No data",
-  "configAndPrivacy": "Configuration & Privacy",
   "searchToSeeMap": "Search to see stations on the map",
   "evPowerAny": "Any",
   "evPowerKw": "{kw} kW+",
@@ -1440,9 +1261,6 @@
   "iosAutoRecordOnboardingBullet3Title": "When iOS asks for \"Always\" location, please say yes.",
   "iosAutoRecordOnboardingBullet3Body": "The fallback that records your trip when the OBD2 adapter is slow needs background location. We never share it.",
   "scanReceipt": "Scan receipt",
-  "obdConnect": "OBD-II",
-  "stationTypeFuel": "Fuel",
-  "stationTypeEv": "EV",
   "brandFilterHighway": "Highway",
   "ratingModeLocal": "Local",
   "ratingModePrivate": "Private",
@@ -1479,7 +1297,6 @@
   "errorHintRouting": "Route calculation failed. Check your internet connection and try again.",
   "errorHintFallback": "Try again or search by postal code / city name.",
   "alertsLoadErrorTitle": "Couldn't load your alerts",
-  "alertsBackgroundCheckErrorTitle": "Alert background check failed",
   "detailsLabel": "Details",
   "remove": "Remove",
   "showKey": "Show key",
@@ -1606,19 +1423,11 @@
   "linkDeviceHowItWorksBody": "1. On Device A: copy the device code above\n2. On Device B: paste it in the \"Device code\" field\n3. Tap \"Import data\" to merge favorites, alerts, vehicles, and consumption logs\n4. Both devices will have all combined data\n\nEach device keeps its own anonymous identity and its own profile (preferred fuel, default vehicle, landing screen). Data is merged, not moved.",
   "vehicleSetActive": "Set active",
   "swipeHide": "Hide",
-  "evChargingSection": "EV Charging",
-  "fuelStationsSection": "Fuel Stations",
   "yourRating": "Your rating",
   "noStorageUsed": "No storage used",
   "aboutReportBug": "Report a bug / Suggest a feature",
   "aboutSupportProject": "Support this project",
   "aboutSupportDescription": "This app is free, open source, and has no ads. If you find it useful, consider supporting the developer.",
-  "luxembourgRegulatedPricesNotice": "Luxembourg fuel prices are government-regulated and uniform nationwide.",
-  "luxembourgFuelUnleaded95": "Unleaded 95",
-  "luxembourgFuelUnleaded98": "Unleaded 98",
-  "luxembourgFuelDiesel": "Diesel",
-  "luxembourgFuelLpg": "LPG",
-  "luxembourgPricesUnavailable": "Luxembourg regulated prices are unavailable.",
   "reportIssueTitle": "Report a problem",
   "enterCorrection": "Please enter the correction",
   "reportNoBackendAvailable": "The report could not be sent: no reporting service is configured for this country. Enable TankSync in Settings to send community reports.",
@@ -1666,10 +1475,6 @@
       }
     }
   },
-  "southKoreaApiKeyRequired": "Register at OPINET to get a free API key",
-  "southKoreaApiProvider": "OPINET (KNOC)",
-  "chileApiKeyRequired": "Register at CNE to get a free API key",
-  "chileApiProvider": "CNE Bencina en Linea",
   "vinConfirmTitle": "Is this your car?",
   "vinConfirmBody": "{year} {make} {model} — {displacement}L, {cylinders}-cyl, {fuel}",
   "@vinConfirmBody": {
@@ -1781,10 +1586,6 @@
   "@alertsRadiusFuelType": {
     "description": "Fuel-type picker label in the radius-alert create sheet (#578)."
   },
-  "alertsRadiusThreshold": "Threshold (€/L)",
-  "@alertsRadiusThreshold": {
-    "description": "Price-threshold field label in the radius-alert create sheet (#578)."
-  },
   "alertsRadiusKm": "Radius (km)",
   "@alertsRadiusKm": {
     "description": "Radius slider label in the radius-alert create sheet (#578)."
@@ -1804,10 +1605,6 @@
   "alertsRadiusCancel": "Cancel",
   "@alertsRadiusCancel": {
     "description": "Cancel button label in the radius-alert create sheet (#578)."
-  },
-  "alertsRadiusDeleteConfirm": "Delete radius alert?",
-  "@alertsRadiusDeleteConfirm": {
-    "description": "Snackbar/confirm text shown when a radius alert is dismissed for deletion (#578)."
   },
   "radiusAlertDeleted": "Radius alert \"{name}\" deleted",
   "@radiusAlertDeleted": {
@@ -1831,30 +1628,6 @@
   "obd2PairChipTooltip": "Pair an OBD2 adapter",
   "@obd2PairChipTooltip": {
     "description": "Tooltip on the title-bar OBD2 chip when no adapter is paired yet — tapping opens the adapter picker so pairing has a discoverable entry point (#1695)."
-  },
-  "velocityAlertTitle": "{fuelLabel} dropped at nearby stations",
-  "@velocityAlertTitle": {
-    "description": "Title of the price-drop velocity notification (#579). Fired when multiple nearby stations drop within the lookback window.",
-    "placeholders": {
-      "fuelLabel": {
-        "type": "String",
-        "example": "E10"
-      }
-    }
-  },
-  "velocityAlertBody": "{stationCount} stations dropped by up to {maxDropCents}¢ in the last hour",
-  "@velocityAlertBody": {
-    "description": "Body of the price-drop velocity notification (#579). Lists the number of affected stations and the largest observed drop in cents.",
-    "placeholders": {
-      "stationCount": {
-        "type": "int",
-        "example": "3"
-      },
-      "maxDropCents": {
-        "type": "int",
-        "example": "5"
-      }
-    }
   },
   "fillUpSavedSnackbar": "Fill-up saved",
   "@fillUpSavedSnackbar": {

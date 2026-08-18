@@ -1,4 +1,0 @@
-{
-  "radiusAlertNotificationTitle": "{fuelLabel} in der Nähe von {label}",
-  "radiusAlertNotificationBody": "Eine Tankstelle bietet {price} € (Grenze: {threshold} €)"
-}

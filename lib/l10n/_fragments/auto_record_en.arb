@@ -31,14 +31,6 @@
   "@autoRecordSaveDelayLabel": {
     "description": "Label for the slider that controls how long after a Bluetooth disconnect the auto-record path waits before saving the trip."
   },
-  "autoRecordPairedAdapterLabel": "Paired adapter",
-  "@autoRecordPairedAdapterLabel": {
-    "description": "Label for the read-only field showing the MAC address of the OBD2 adapter paired to this vehicle."
-  },
-  "autoRecordPairedAdapterNone": "No adapter paired. Pair one via the OBD2 onboarding first.",
-  "@autoRecordPairedAdapterNone": {
-    "description": "Empty-state text shown when no OBD2 adapter has been paired to this vehicle yet."
-  },
   "autoRecordBackgroundLocationLabel": "Background location allowed",
   "@autoRecordBackgroundLocationLabel": {
     "description": "Label for the read-only field showing whether the user has granted always-on location permission for auto-record."
@@ -66,9 +58,5 @@
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Could not request background location",
   "@autoRecordBackgroundLocationRequestFailedSnackbar": {
     "description": "Snackbar shown when the permission request itself threw an exception. Replaces the previous silent debugPrint catch (#1302)."
-  },
-  "autoRecordBadgeClearTooltip": "Clear counter",
-  "@autoRecordBadgeClearTooltip": {
-    "description": "Tooltip on the AppBar action that resets the auto-record unseen-trip badge to zero."
   }
 }

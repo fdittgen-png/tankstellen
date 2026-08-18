@@ -12,12 +12,7 @@
   "fuelType": "Kraftstoff",
   "searchRadius": "Umkreis",
   "searchNearby": "Tankstellen in der Nähe",
-  "searchButton": "Suchen",
-  "fabOpenCriteria": "Suche öffnen",
-  "fabOpenResults": "Ergebnisse anzeigen",
   "fabRunSearch": "Suche starten",
-  "fabRefineCriteria": "Suche verfeinern",
-  "routeSearchPartialBanner": "Weitere Tankstellen werden gesucht…",
   "routeSearchingChip": "Route wird gesucht…",
   "routeSegmentSummaryBadge": "Alle {km} km",
   "@routeSegmentSummaryBadge": {
@@ -28,7 +23,6 @@
     }
   },
   "searchCriteriaTitle": "Suchkriterien",
-  "searchCriteriaOpen": "Suchen",
   "searchCriteriaRadiusBadge": "Im Umkreis von {km} km",
   "@searchCriteriaRadiusBadge": {
     "placeholders": {
@@ -37,7 +31,6 @@
       }
     }
   },
-  "searchCriteriaTapToSearch": "Tippen, um die Suche zu starten",
   "noResults": "Keine Tankstellen gefunden.",
   "startSearch": "Suche starten, um Tankstellen zu finden.",
   "open": "Geöffnet",
@@ -58,7 +51,6 @@
   "navigate": "Navigation starten",
   "retry": "Erneut versuchen",
   "apiKeySetup": "API-Schlüssel einrichten",
-  "apiKeyDescription": "Registrieren Sie sich einmalig für einen kostenlosen API-Schlüssel.",
   "apiKeyLabel": "API-Schlüssel",
   "register": "Registrierung",
   "continueButton": "Weiter",
@@ -92,16 +84,11 @@
   "noFavoritesHint": "Tippen Sie auf den Stern bei einer Tankstelle, um sie als Favorit zu speichern.",
   "language": "Sprache",
   "country": "Land",
-  "demoMode": "Demo-Modus — Beispieldaten werden angezeigt.",
-  "setupLiveData": "Für Live-Daten einrichten",
   "freeNoKey": "Kostenlos — kein Schlüssel nötig",
   "apiKeyRequired": "API-Schlüssel erforderlich",
-  "skipWithoutKey": "Ohne Schlüssel fortfahren",
   "dataTransparency": "Datentransparenz",
   "storageAndCache": "Speicher & Cache",
   "clearCache": "Cache leeren",
-  "clearAllData": "Alle Daten löschen",
-  "errorLog": "Fehlerprotokoll",
   "stationsFound": "{count} Tankstellen gefunden",
   "@stationsFound": {
     "placeholders": {
@@ -110,22 +97,6 @@
       }
     }
   },
-  "whatIsShared": "Was wird geteilt — und mit wem?",
-  "gpsCoordinates": "GPS-Koordinaten",
-  "gpsReason": "Wird bei jeder Standort-Suche gesendet, um Tankstellen in der Nähe zu finden.",
-  "postalCodeData": "Postleitzahl",
-  "postalReason": "Wird bei PLZ-Suche in Koordinaten umgewandelt.",
-  "mapViewport": "Kartenausschnitt",
-  "mapReason": "Beim Öffnen der Karte werden Kartenkacheln geladen. Keine persönlichen Daten werden übertragen.",
-  "apiKeyData": "API-Schlüssel",
-  "apiKeyReason": "Ihr persönlicher Schlüssel wird bei jeder API-Anfrage mitgesendet.",
-  "notShared": "Wird NICHT geteilt:",
-  "searchHistory": "Suchverlauf",
-  "favoritesData": "Favoritenanlage",
-  "profileNames": "Profilnamen",
-  "homeZipData": "Heim-PLZ",
-  "usageData": "App-Nutzungsdaten",
-  "privacyBanner": "Diese App hat keinen eigenen Server. Alle Daten bleiben auf Ihrem Gerät. Keine Analyse, kein Tracking, keine Werbung.",
   "storageUsage": "Speichernutzung auf diesem Gerät",
   "settingsLabel": "Einstellungen",
   "profilesStored": "Profile gespeichert",
@@ -165,12 +136,8 @@
   "deleteAllButton": "Alles löschen",
   "entries": "Einträge",
   "cacheEmpty": "Cache ist leer",
-  "noStorage": "Kein Speicher belegt",
   "apiKeyNote": "Kostenlose Registrierung. Daten von den Markttransparenzstellen.",
   "apiKeyFormatError": "Ungültiges Format — UUID erwartet (8-4-4-4-12)",
-  "supportProject": "Dieses Projekt unterstützen",
-  "supportDescription": "Diese App ist kostenlos, Open Source und ohne Werbung. Wenn Sie sie nützlich finden, unterstützen Sie den Entwickler.",
-  "reportBug": "Fehler melden / Funktion vorschlagen",
   "reportThisIssue": "Dieses Problem melden",
   "reportAlreadySent": "Du hast dieses Problem bereits gemeldet.",
   "reportConsentTitle": "Auf GitHub melden?",
@@ -185,7 +152,6 @@
   "configApiKeysSection": "API-Schlüssel",
   "configTankerkoenigKey": "Tankerkönig API-Schlüssel",
   "configApiKeyConfigured": "Konfiguriert",
-  "configApiKeyNotSet": "Nicht gesetzt (Demo-Modus)",
   "configApiKeyCommunity": "Standard-Community-Schlüssel",
   "searchLocationPlaceholder": "Adresse, Postleitzahl oder Stadt",
   "configEvKey": "Ladesäulen API-Schlüssel",
@@ -223,15 +189,6 @@
   "sortPriceDistance": "Preis/km",
   "cheap": "günstig",
   "expensive": "teuer",
-  "stationsOnMap": "{count} Tankstellen",
-  "@stationsOnMap": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "loadingFavorites": "Favoriten werden geladen...\nSuchen Sie zuerst Tankstellen, um Daten zu speichern.",
   "reportPrice": "Preis melden",
   "whatsWrong": "Was stimmt nicht?",
   "correctPrice": "Korrekter Preis (z.B. 1,459)",
@@ -241,7 +198,6 @@
   "cacheCleared": "Cache wurde geleert.",
   "yourPosition": "Ihre Position",
   "positionUnknown": "Position unbekannt",
-  "routeModeBannerLabel": "Routenmodus — Entfernungen entlang des Korridors",
   "distancesFromCenter": "Entfernungen vom Suchzentrum",
   "autoUpdatePosition": "Position automatisch aktualisieren",
   "autoUpdateDescription": "GPS-Position vor jeder Suche aktualisieren",
@@ -344,8 +300,6 @@
   "wrongDieselPrice": "Falscher Diesel Preis",
   "wrongStatusOpen": "Als geöffnet angezeigt, aber geschlossen",
   "wrongStatusClosed": "Als geschlossen angezeigt, aber geöffnet",
-  "searchAlongRouteLabel": "Entlang der Route",
-  "searchEvStations": "Ladestationen suchen",
   "allStations": "Alle Stationen",
   "bestStops": "Beste Stopps",
   "openInMaps": "In Karten öffnen",
@@ -391,14 +345,6 @@
   "cityOrAddress": "Stadt oder Adresse",
   "useGps": "GPS verwenden",
   "stop": "Stopp",
-  "stopN": "Stopp {n}",
-  "@stopN": {
-    "placeholders": {
-      "n": {
-        "type": "int"
-      }
-    }
-  },
   "addStop": "Stopp hinzufügen",
   "searchAlongRoute": "Entlang der Route suchen",
   "cheapest": "Günstigste",
@@ -424,10 +370,8 @@
   "customKey": "Eigener Schlüssel",
   "appDefaultKey": "Standard-App-Schlüssel",
   "optionalOverrideKey": "Optional: den integrierten App-Schlüssel mit Ihrem eigenen überschreiben",
-  "requiredForEvSearch": "Erforderlich für die Suche nach E-Ladestationen",
   "edit": "Bearbeiten",
   "fuelPricesApiKey": "Kraftstoffpreise API-Schlüssel",
-  "tankerkoenigApiKey": "Tankerkoenig API-Schlüssel",
   "evChargingApiKey": "E-Laden API-Schlüssel",
   "openChargeMapApiKey": "OpenChargeMap API-Schlüssel",
   "routePlanningSection": "Routenplanung",
@@ -469,12 +413,9 @@
   "noStationsAlongThisRoute": "Keine Stationen entlang dieser Route gefunden.",
   "fuelCostCalculator": "Kraftstoffkostenrechner",
   "distanceKm": "Entfernung (km)",
-  "consumptionL100km": "Verbrauch (L/100km)",
-  "fuelPriceEurL": "Kraftstoffpreis (EUR/L)",
   "tripCost": "Fahrtkosten",
   "fuelNeeded": "Benötigter Kraftstoff",
   "totalCost": "Gesamtkosten",
-  "enterCalcValues": "Geben Sie Entfernung, Verbrauch und Preis ein, um die Fahrtkosten zu berechnen",
   "calculatorDistanceLabel": "Entfernung ({unit})",
   "@calculatorDistanceLabel": {
     "placeholders": {
@@ -516,7 +457,6 @@
   "ratingsLabel": "Bewertungen",
   "favoritesDataCache": "Favoritendaten",
   "citySearchCache": "Stadtsuche",
-  "dataDeletionNotAvailableCommunity": "Datenlöschung ist im Community-Modus nicht verfügbar. Trennen Sie zuerst die Verbindung oder verwenden Sie eine private Datenbank.",
   "priceHistoryStationsTracked": "{count} Tankstellen verfolgt",
   "@priceHistoryStationsTracked": {
     "placeholders": {
@@ -550,22 +490,11 @@
     }
   },
   "noPriceHistory": "Noch kein Preisverlauf",
-  "noHourlyData": "Keine Stundendaten",
   "noStatistics": "Keine Statistiken verfügbar",
-  "statMin": "Min",
-  "statMax": "Max",
-  "statAvg": "Mittel",
   "showAllFuelTypes": "Alle Kraftstoffarten anzeigen",
   "connected": "Verbunden",
-  "notConnected": "Nicht verbunden",
-  "connectTankSync": "TankSync verbinden",
   "disconnectTankSync": "TankSync trennen",
   "viewMyData": "Meine Daten anzeigen",
-  "optionalCloudSync": "Optionale Cloud-Synchronisierung für Alarme, Favoriten und Push-Benachrichtigungen",
-  "tapToUpdateGps": "Tippen, um GPS-Position zu aktualisieren",
-  "gpsAutoUpdateHint": "Die GPS-Position wird automatisch bei der Suche ermittelt. Sie können sie auch hier manuell aktualisieren.",
-  "clearGpsConfirm": "Gespeicherte GPS-Position löschen? Sie können sie jederzeit erneut aktualisieren.",
-  "pageNotFound": "Seite nicht gefunden",
   "deleteAllServerData": "Alle Serverdaten löschen",
   "deleteServerDataConfirm": "Alle Serverdaten löschen?",
   "deleteEverything": "Alles löschen",
@@ -575,7 +504,6 @@
   "forgetAllSyncedTripsConfirmBody": "Alle Fahrtzusammenfassungen und Detail-Blobs werden vom Server entfernt. Deine lokale Fahrtenhistorie auf diesem Gerät bleibt unverändert.\n\nDiese Aktion kann nicht rückgängig gemacht werden.",
   "forgetAllSyncedTripsConfirmAction": "Alle vergessen",
   "forgetAllSyncedTripsSuccess": "Alle synchronisierten Fahrten vom Server entfernt",
-  "disconnectConfirm": "TankSync trennen?",
   "disconnect": "Trennen",
   "myServerData": "Meine Serverdaten",
   "anonymousUuid": "Anonyme UUID",
@@ -595,7 +523,6 @@
   "continueAsGuest": "Als Gast fortfahren",
   "createAccount": "Konto erstellen",
   "signIn": "Anmelden",
-  "upgradeToEmail": "E-Mail-Konto erstellen",
   "savedRoutes": "Gespeicherte Routen",
   "noSavedRoutes": "Keine gespeicherten Routen",
   "noSavedRoutesHint": "Suche entlang einer Route und speichere sie fuer schnellen Zugriff.",
@@ -640,35 +567,6 @@
   "onboardingNext": "Weiter",
   "onboardingSkip": "Überspringen",
   "onboardingFinish": "Los geht's",
-  "crossBorderNearby": "{country} ist in der Nähe",
-  "@crossBorderNearby": {
-    "placeholders": {
-      "country": {
-        "type": "String"
-      }
-    }
-  },
-  "crossBorderDistance": "~{km} km bis zur Grenze",
-  "@crossBorderDistance": {
-    "placeholders": {
-      "km": {
-        "type": "int"
-      }
-    }
-  },
-  "crossBorderAvgPrice": "Ø hier: {price} EUR ({count} Tankstellen)",
-  "@crossBorderAvgPrice": {
-    "placeholders": {
-      "price": {
-        "type": "String"
-      },
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "allPricesView": "Alle Preise",
-  "compactView": "Kompakt",
   "switchToAllPricesView": "Zur Alle-Preise-Ansicht wechseln",
   "switchToCompactView": "Zur Kompaktansicht wechseln",
   "unavailable": "k.A.",
@@ -702,10 +600,6 @@
       }
     }
   },
-  "topicUrlCopied": "Themen-URL kopiert",
-  "testNotificationSent": "Testbenachrichtigung gesendet!",
-  "testNotificationFailed": "Testbenachrichtigung konnte nicht gesendet werden",
-  "pushUpdateFailed": "Push-Benachrichtigungseinstellung konnte nicht aktualisiert werden",
   "connectedAsGuest": "Als Gast verbunden",
   "accountCreated": "Konto erstellt!",
   "signedIn": "Angemeldet!",
@@ -817,15 +711,6 @@
   "privacyExportCsvSuccess": "CSV-Daten in die Zwischenablage exportiert",
   "savedToDownloadsFolder": "Im Downloads-Ordner gespeichert",
   "privacyDeleteButton": "Alle Daten löschen",
-  "privacyCopyErrorLog": "Fehlerprotokoll in Zwischenablage kopieren ({count})",
-  "@privacyCopyErrorLog": {
-    "description": "Button that copies recorded error traces to the clipboard. count = number of traces buffered.",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "privacySaveErrorLog": "Fehlerprotokoll speichern ({count})",
   "@privacySaveErrorLog": {
     "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
@@ -871,39 +756,9 @@
   "voiceAnnouncementsTitle": "Sprachansagen",
   "voiceAnnouncementsDescription": "Günstige Tankstellen beim Fahren ansagen",
   "voiceAnnouncementsEnabled": "Sprachansagen aktivieren",
-  "voiceAnnouncementThreshold": "Nur unter {price}",
-  "@voiceAnnouncementThreshold": {
-    "placeholders": {
-      "price": {
-        "type": "String"
-      }
-    }
-  },
-  "voiceAnnouncementCheapFuel": "{station}, {distance} Kilometer voraus, {fuelType} {price}",
-  "@voiceAnnouncementCheapFuel": {
-    "placeholders": {
-      "station": {
-        "type": "String"
-      },
-      "distance": {
-        "type": "String"
-      },
-      "fuelType": {
-        "type": "String"
-      },
-      "price": {
-        "type": "String"
-      }
-    }
-  },
   "voiceAnnouncementProximityRadius": "Ansage-Radius",
   "voiceAnnouncementCooldown": "Wiederholungsintervall",
   "voiceAnnouncementPriceLimit": "Höchstpreis",
-  "nearestStations": "Nächste Tankstellen",
-  "nearestStationsHint": "Die nächstgelegenen Tankstellen über Ihren Standort finden",
-  "consumptionLogTitle": "Verbrauch",
-  "consumptionLogMenuTitle": "Verbrauchs-Log",
-  "consumptionLogMenuSubtitle": "Tankvorgänge erfassen und L/100km berechnen",
   "consumptionStatsTitle": "Verbrauchsstatistik",
   "addFillUp": "Tankvorgang hinzufügen",
   "noFillUpsTitle": "Noch keine Tankvorgänge",
@@ -944,14 +799,12 @@
   },
   "vehiclesWizardSkipHint": "Überspringen, um die Einrichtung abzuschließen — Sie können Fahrzeuge jederzeit in den Einstellungen hinzufügen.",
   "fillUpVehicleLabel": "Fahrzeug",
-  "fillUpVehicleNone": "Kein Fahrzeug",
   "fillUpVehicleRequired": "Fahrzeug erforderlich",
   "reportScanError": "Scan-Fehler melden",
   "pickStationTitle": "Tankstelle wählen",
   "pickStationHelper": "Tankvorgang von einer bekannten Tankstelle starten — Preise, Marke und Kraftstoff werden automatisch übernommen.",
   "pickStationEmpty": "Noch keine Favoriten — fügen Sie welche aus Suche oder Favoriten hinzu, oder überspringen Sie diesen Schritt.",
   "pickStationSkip": "Überspringen — ohne Tankstelle eintragen",
-  "scanPump": "Zapfsäule scannen",
   "scanPayment": "Zahlungs-QR scannen",
   "qrPaymentBeneficiary": "Empfänger",
   "qrPaymentAmount": "Betrag",
@@ -973,17 +826,10 @@
   "qrScannerRetry": "Erneut versuchen",
   "torchOn": "Blitz einschalten",
   "torchOff": "Blitz ausschalten",
-  "obdNoAdapter": "Kein OBD2-Adapter in Reichweite",
-  "obdOdometerUnavailable": "Kilometerstand konnte nicht gelesen werden",
   "obdPermissionDenied": "Bluetooth-Berechtigung in den Einstellungen erteilen",
-  "obdAdapterUnresponsive": "Keine Antwort — Zündung einschalten und neu versuchen",
   "obdPickerTitle": "OBD2-Adapter wählen",
   "obdPickerScanning": "Suche nach Adaptern…",
   "obdPickerConnecting": "Verbinden…",
-  "themeSettingTitle": "Design",
-  "themeModeLight": "Hell",
-  "themeModeDark": "Dunkel",
-  "themeModeSystem": "Systemeinstellung",
   "tripRecordingTitle": "Fahrt wird aufgezeichnet",
   "tripSummaryTitle": "Fahrtzusammenfassung",
   "tripMetricDistance": "Strecke",
@@ -1028,18 +874,13 @@
   "syncBaselinesToggleTitle": "Gelernte Fahrzeugprofile teilen",
   "syncBaselinesToggleSubtitle": "Pro-Fahrzeug-Verbrauchsbaselines hochladen, damit ein zweites Gerät sie wiederverwenden kann.",
   "obd2StatusConnected": "OBD2-Adapter: verbunden",
-  "obd2StatusAttempting": "OBD2-Adapter: verbindet",
-  "obd2StatusUnreachable": "OBD2-Adapter: nicht erreichbar",
   "obd2StatusPermissionDenied": "OBD2-Adapter: Bluetooth-Berechtigung erforderlich",
   "obd2StatusConnectedBody": "Bereit für eine Fahrtaufzeichnung.",
-  "obd2StatusAttemptingBody": "Verbindung wird im Hintergrund aufgebaut…",
-  "obd2StatusUnreachableBody": "Adapter ausser Reichweite oder wird von einer anderen App verwendet.",
   "obd2StatusPermissionDeniedBody": "Bluetooth-Berechtigung in den Systemeinstellungen erteilen, um automatisch neu zu verbinden.",
   "obd2StatusNoAdapter": "Kein Adapter gekoppelt",
   "obd2StatusForget": "Adapter vergessen",
   "tripHistoryTitle": "Fahrtenverlauf",
   "tripHistoryEmptyTitle": "Noch keine Fahrten",
-  "tripHistoryEmptySubtitle": "OBD2-Adapter anschließen und eine Fahrt aufzeichnen, um deinen Fahrtenverlauf aufzubauen.",
   "tripHistoryUnknownDate": "Unbekanntes Datum",
   "situationIdle": "Leerlauf",
   "situationStopAndGo": "Stop & go",
@@ -1052,22 +893,11 @@
   "situationPartialDecel": "Ausrollen",
   "situationHardAccel": "Harte Beschl.",
   "situationFuelCut": "Schubabschaltung",
-  "tripSaveAsFillUp": "Als Tankfüllung speichern",
   "tripSaveRecording": "Fahrt speichern",
-  "tripDiscard": "Verwerfen",
   "tripSummaryAutoSaved": "Fahrt automatisch gespeichert",
   "tripSummaryDone": "Fertig",
   "tripSummaryDelete": "Diese Fahrt löschen",
-  "obdOdometerRead": "Kilometerstand gelesen: {km} km",
-  "@obdOdometerRead": {
-    "placeholders": {
-      "km": {
-        "type": "int"
-      }
-    }
-  },
   "vehicleFuelNotSet": "Nicht gesetzt",
-  "wizardVehicleTapToEdit": "Zum Bearbeiten tippen",
   "wizardVehicleDefaultBadge": "Standard",
   "wizardProfileChoiceHint": "Wähle, wie du die App nutzen möchtest. Du kannst dies später in den Einstellungen ändern.",
   "wizardProfileChoiceFooter": "Du kannst deine Auswahl jederzeit unter Einstellungen → Nutzungsmodus ändern.",
@@ -1078,7 +908,6 @@
   "wizardProfileFullName": "Voll",
   "wizardProfileFullDescription": "Alles aus Mittel, plus automatische OBD2-Fahrtaufzeichnung, Fahrwertung und Treuekarten.",
   "wizardProfileCustomName": "Individuell",
-  "wizardProfileCustomDescription": "Deine eigene Kombination an Funktionen. Passe jeden Schalter unten an.",
   "useModeSectionHint": "Passe die App an deine tatsächliche Nutzung an. Eine Voreinstellung aktiviert das passende Funktionsbündel.",
   "useModeCustomSettingsDescription": "Deine Funktionsauswahl passt zu keiner Voreinstellung. Wähle oben eine aus, um sie zu überschreiben, oder passe einzelne Funktionen unten weiter an.",
   "useModeSwitchedSnack": "Nutzungsmodus auf {profile} gesetzt.",
@@ -1132,9 +961,6 @@
   "evShowOnMap": "Ladestationen anzeigen",
   "evAvailableOnly": "Nur verfügbare",
   "evMinPower": "Min. Leistung",
-  "evMaxPower": "Max. Leistung",
-  "evOperator": "Betreiber",
-  "evLastUpdate": "Letzte Aktualisierung",
   "evStatusAvailable": "Verfügbar",
   "evStatusOccupied": "Belegt",
   "evStatusOutOfOrder": "Außer Betrieb",
@@ -1142,11 +968,9 @@
   "openOnlyFilter": "Nur geöffnete",
   "saveAsDefaults": "Als Standard speichern",
   "criteriaSavedToProfile": "Als Standard gespeichert",
-  "profileNotFound": "Kein aktives Profil",
   "updatingFavorites": "Favoriten werden aktualisiert…",
   "fetchingLatestPrices": "Neueste Preise werden geladen",
   "noDataAvailable": "Keine Daten",
-  "configAndPrivacy": "Konfiguration & Datenschutz",
   "searchToSeeMap": "Suchen Sie, um Tankstellen auf der Karte zu sehen",
   "evPowerAny": "Alle",
   "evPowerKw": "{kw} kW+",
@@ -1265,9 +1089,6 @@
   "iosAutoRecordOnboardingBullet3Title": "Wenn iOS nach „Immer“-Standort fragt, bitte zustimmen.",
   "iosAutoRecordOnboardingBullet3Body": "Die Fallback-Aufzeichnung greift, wenn der OBD2-Adapter zu langsam reagiert — sie braucht Hintergrund-Standort. Wir teilen ihn niemals.",
   "scanReceipt": "Beleg scannen",
-  "obdConnect": "OBD-II",
-  "stationTypeFuel": "Kraftstoff",
-  "stationTypeEv": "Elektro",
   "brandFilterHighway": "Autobahn",
   "ratingModeLocal": "Lokal",
   "ratingModePrivate": "Privat",
@@ -1294,7 +1115,6 @@
   "errorHintRouting": "Routenberechnung fehlgeschlagen. Prüfen Sie Ihre Internetverbindung.",
   "errorHintFallback": "Versuchen Sie es erneut oder suchen Sie nach Postleitzahl / Stadt.",
   "alertsLoadErrorTitle": "Alarme konnten nicht geladen werden",
-  "alertsBackgroundCheckErrorTitle": "Hintergrundprüfung der Alarme fehlgeschlagen",
   "detailsLabel": "Details",
   "remove": "Entfernen",
   "showKey": "Schlüssel anzeigen",
@@ -1414,19 +1234,11 @@
   "linkDeviceHowItWorksBody": "1. Auf Gerät A: Gerätecode oben kopieren\n2. Auf Gerät B: in das Feld \"Gerätecode\" einfügen\n3. \"Daten importieren\" tippen, um Favoriten, Alarme, Fahrzeuge und Tankprotokoll zusammenzuführen\n4. Beide Geräte haben dann alle kombinierten Daten\n\nJedes Gerät behält seine eigene anonyme Identität und sein eigenes Profil (bevorzugter Kraftstoff, Standardfahrzeug, Startbildschirm). Daten werden zusammengeführt, nicht verschoben.",
   "vehicleSetActive": "Aktivieren",
   "swipeHide": "Ausblenden",
-  "evChargingSection": "Elektro-Laden",
-  "fuelStationsSection": "Tankstellen",
   "yourRating": "Ihre Bewertung",
   "noStorageUsed": "Kein Speicher verwendet",
   "aboutReportBug": "Fehler melden / Funktion vorschlagen",
   "aboutSupportProject": "Dieses Projekt unterstützen",
   "aboutSupportDescription": "Diese App ist kostenlos, Open Source und werbefrei. Wenn sie Ihnen gefällt, unterstützen Sie bitte den Entwickler.",
-  "luxembourgRegulatedPricesNotice": "Die Kraftstoffpreise in Luxemburg sind staatlich reguliert und landesweit einheitlich.",
-  "luxembourgFuelUnleaded95": "Super bleifrei 95",
-  "luxembourgFuelUnleaded98": "Super bleifrei 98",
-  "luxembourgFuelDiesel": "Diesel",
-  "luxembourgFuelLpg": "Autogas",
-  "luxembourgPricesUnavailable": "Luxemburgs regulierte Preise sind nicht verfügbar.",
   "reportIssueTitle": "Problem melden",
   "enterCorrection": "Bitte Korrektur eingeben",
   "reportNoBackendAvailable": "Die Meldung konnte nicht gesendet werden: Für dieses Land ist kein Meldedienst konfiguriert. Aktivieren Sie TankSync in den Einstellungen, um Community-Meldungen zu senden.",
@@ -1454,10 +1266,6 @@
   "serviceReminderDueTitle": "Wartung fällig",
   "serviceReminderDueBody": "{label} ist fällig — {kmOver} km über dem Intervall.",
   "serviceReminderDueNowBody": "{label} ist jetzt fällig.",
-  "southKoreaApiKeyRequired": "Registrieren Sie sich bei OPINET, um einen kostenlosen API-Schlüssel zu erhalten",
-  "southKoreaApiProvider": "OPINET (KNOC)",
-  "chileApiKeyRequired": "Registrieren Sie sich bei CNE, um einen kostenlosen API-Schlüssel zu erhalten",
-  "chileApiProvider": "CNE Bencina en Linea",
   "vinConfirmTitle": "Ist das Ihr Auto?",
   "vinConfirmBody": "{year} {make} {model} — {displacement}L, {cylinders}-Zyl., {fuel}",
   "vinPartialInfoNote": "Teilinfo (offline). Sie können die Felder unten bearbeiten.",
@@ -1480,18 +1288,14 @@
   "alertsRadiusCreateTitle": "Umkreis-Alarm anlegen",
   "alertsRadiusLabelHint": "Bezeichnung (z. B. Zuhause Diesel)",
   "alertsRadiusFuelType": "Kraftstoffart",
-  "alertsRadiusThreshold": "Schwelle (€/L)",
   "alertsRadiusKm": "Radius (km)",
   "alertsRadiusCenterGps": "Meinen Standort verwenden",
   "alertsRadiusCenterPostalCode": "Postleitzahl",
   "alertsRadiusSave": "Speichern",
   "alertsRadiusCancel": "Abbrechen",
-  "alertsRadiusDeleteConfirm": "Umkreis-Alarm löschen?",
   "radiusAlertDeleted": "Umkreis-Alarm \"{name}\" gelöscht",
   "obd2ConnectedTooltip": "OBD2 verbunden: {adapterName}",
   "obd2PairChipTooltip": "OBD2-Adapter koppeln",
-  "velocityAlertTitle": "{fuelLabel} an Tankstellen in der Nähe gefallen",
-  "velocityAlertBody": "{stationCount} Tankstellen um bis zu {maxDropCents}¢ in der letzten Stunde gefallen",
   "fillUpSavedSnackbar": "Tankvorgang gespeichert",
   "radiusAlertsEntryTitle": "Umkreis-Alarme & Statistik",
   "radiusAlertsEntrySubtitle": "Werde benachrichtigt, wenn die Preise in deiner Nähe fallen",

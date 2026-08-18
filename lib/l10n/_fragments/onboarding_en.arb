@@ -19,10 +19,6 @@
   "@onboardingObd2ReadingVin": {
     "description": "Spinner label shown while the app reads the VIN from the connected OBD2 adapter (#816)."
   },
-  "onboardingObd2VinReadFailed": "Couldn't read VIN — enter manually",
-  "@onboardingObd2VinReadFailed": {
-    "description": "Banner shown on the next manual vehicle step when the OBD2 adapter connected but the VIN could not be read (#816)."
-  },
   "onboardingObd2ConnectFailed": "Couldn't connect to the adapter. You can retry or skip.",
   "onboardingPickUseMode": "Pick a use mode to continue.",
   "@onboardingPickUseMode": {

@@ -12,11 +12,8 @@
   "fuelType": "Gorivo",
   "searchRadius": "Radijus",
   "searchNearby": "Benzinske postaje u blizini",
-  "searchButton": "Pretraži",
   "searchCriteriaTitle": "Kriteriji pretraživanja",
-  "searchCriteriaOpen": "Pretraži",
   "searchCriteriaRadiusBadge": "U polumjeru {km} km",
-  "searchCriteriaTapToSearch": "Dodirnite za početak pretraživanja",
   "noResults": "Benzinske postaje nisu pronađene.",
   "startSearch": "Pretražite za pronalaženje benzinskih postaja.",
   "open": "Otvoreno",
@@ -30,7 +27,6 @@
   "navigate": "Navigiraj",
   "retry": "Pokušaj ponovo",
   "apiKeySetup": "API ključ",
-  "apiKeyDescription": "Registrirajte se jednom za besplatni API ključ.",
   "apiKeyLabel": "API ključ",
   "register": "Registracija",
   "continueButton": "Nastavi",
@@ -64,33 +60,12 @@
   "noFavoritesHint": "Dodirnite zvjezdicu na postaji da je spremite kao favorita.",
   "language": "Jezik",
   "country": "Država",
-  "demoMode": "Demo način — prikazani primjeri podataka.",
-  "setupLiveData": "Postavke za stvarne podatke",
   "freeNoKey": "Besplatno — ključ nije potreban",
   "apiKeyRequired": "Potreban API ključ",
-  "skipWithoutKey": "Nastavi bez ključa",
   "dataTransparency": "Transparentnost podataka",
   "storageAndCache": "Pohrana i predmemorija",
   "clearCache": "Očisti predmemoriju",
-  "clearAllData": "Obriši sve podatke",
-  "errorLog": "Dnevnik grešaka",
   "stationsFound": "Pronađeno {count} postaja",
-  "whatIsShared": "Što se dijeli — i s kim?",
-  "gpsCoordinates": "GPS koordinate",
-  "gpsReason": "Šalju se sa svakom pretragom za pronalaženje obližnjih postaja.",
-  "postalCodeData": "Poštanski broj",
-  "postalReason": "Pretvara se u koordinate putem geokodiranja.",
-  "mapViewport": "Prikaz karte",
-  "mapReason": "Pločice karte učitavaju se s poslužitelja. Osobni podaci se ne prenose.",
-  "apiKeyData": "API ključ",
-  "apiKeyReason": "Vaš osobni ključ šalje se sa svakim API zahtjevom. Povezan je s vašom e-poštom.",
-  "notShared": "NE dijeli se:",
-  "searchHistory": "Povijest pretraživanja",
-  "favoritesData": "Favoriti",
-  "profileNames": "Nazivi profila",
-  "homeZipData": "Kućni poštanski broj",
-  "usageData": "Podaci o korištenju",
-  "privacyBanner": "Ova aplikacija nema poslužitelj. Svi podaci ostaju na vašem uređaju. Bez analitike, praćenja ili reklama.",
   "storageUsage": "Korištenje pohrane na ovom uređaju",
   "settingsLabel": "Postavke",
   "profilesStored": "spremljenih profila",
@@ -116,12 +91,8 @@
   "deleteAllButton": "Obriši sve",
   "entries": "unosa",
   "cacheEmpty": "Predmemorija je prazna",
-  "noStorage": "Nema korištene pohrane",
   "apiKeyNote": "Besplatna registracija. Podaci od vladinih agencija za transparentnost cijena.",
   "apiKeyFormatError": "Nevažeći format — očekivan UUID (8-4-4-4-12)",
-  "supportProject": "Podržite ovaj projekt",
-  "supportDescription": "Ova aplikacija je besplatna, otvorenog koda i bez reklama. Ako je smatrate korisnom, razmislite o podršci razvojnom programeru.",
-  "reportBug": "Prijavi grešku / Predloži značajku",
   "reportThisIssue": "Prijavi ovaj problem",
   "reportAlreadySent": "Već ste prijavili ovaj problem.",
   "reportConsentTitle": "Prijaviti na GitHub?",
@@ -136,7 +107,6 @@
   "configApiKeysSection": "API ključevi",
   "configTankerkoenigKey": "Tankerkoenig API ključ",
   "configApiKeyConfigured": "Konfigurirano",
-  "configApiKeyNotSet": "Nije postavljeno (demo način)",
   "configApiKeyCommunity": "Zadano (zajednički ključ)",
   "searchLocationPlaceholder": "Adresa, poštanski broj ili grad",
   "configEvKey": "EV punionice API ključ",
@@ -174,8 +144,6 @@
   "sortPriceDistance": "Cijena/km",
   "cheap": "jeftino",
   "expensive": "skupo",
-  "stationsOnMap": "{count} postaja",
-  "loadingFavorites": "Učitavanje favorita...\nNajprije pretražite postaje za spremanje podataka.",
   "reportPrice": "Prijavi cijenu",
   "whatsWrong": "Što nije u redu?",
   "correctPrice": "Ispravna cijena (npr. 1,459)",
@@ -185,7 +153,6 @@
   "cacheCleared": "Predmemorija očišćena.",
   "yourPosition": "Vaša pozicija",
   "positionUnknown": "Pozicija nepoznata",
-  "routeModeBannerLabel": "Način rute — udaljenosti su uz koridor",
   "distancesFromCenter": "Udaljenosti od centra pretrage",
   "autoUpdatePosition": "Automatsko ažuriranje pozicije",
   "autoUpdateDescription": "Ažuriraj GPS poziciju prije svake pretrage",
@@ -220,8 +187,6 @@
   "wrongDieselPrice": "Pogrešna cijena dizela",
   "wrongStatusOpen": "Prikazano kao otvoreno, ali zatvoreno",
   "wrongStatusClosed": "Prikazano kao zatvoreno, ali otvoreno",
-  "searchAlongRouteLabel": "Duž rute",
-  "searchEvStations": "Pretraži stanice za punjenje",
   "allStations": "Sve postaje",
   "bestStops": "Najbolja zaustavljanja",
   "openInMaps": "Otvori u Kartama",
@@ -253,7 +218,6 @@
   "cityOrAddress": "Grad ili adresa",
   "useGps": "Koristi GPS",
   "stop": "Zaustavljanje",
-  "stopN": "Zaustavljanje {n}",
   "addStop": "Dodaj zaustavljanje",
   "searchAlongRoute": "Pretraži duž rute",
   "cheapest": "Najjeftinija",
@@ -265,10 +229,8 @@
   "customKey": "Prilagođeni ključ",
   "appDefaultKey": "Zadani ključ aplikacije",
   "optionalOverrideKey": "Neobavezno: zamijenite ugrađeni ključ svojim vlastitim",
-  "requiredForEvSearch": "Potrebno za pretraživanje EV stanica za punjenje",
   "edit": "Uredi",
   "fuelPricesApiKey": "API ključ cijena goriva",
-  "tankerkoenigApiKey": "API ključ Tankerkoenig",
   "evChargingApiKey": "API ključ EV punjenja",
   "openChargeMapApiKey": "API ključ OpenChargeMap",
   "routePlanningSection": "Planiranje rute",
@@ -303,18 +265,14 @@
   "noStationsAlongThisRoute": "Nisu pronađene postaje duž ove rute.",
   "fuelCostCalculator": "Kalkulator troškova goriva",
   "distanceKm": "Udaljenost (km)",
-  "consumptionL100km": "Potrošnja (L/100km)",
-  "fuelPriceEurL": "Cijena goriva (EUR/L)",
   "tripCost": "Trošak putovanja",
   "fuelNeeded": "Potrebno gorivo",
   "totalCost": "Ukupni trošak",
-  "enterCalcValues": "Unesite udaljenost, potrošnju i cijenu za izračun troška putovanja",
   "priceHistory": "Povijest cijena",
   "ignoredStationsLabel": "Ignorirano",
   "ratingsLabel": "Ocjene",
   "favoritesDataCache": "Podaci favorita",
   "citySearchCache": "Pretraga gradova",
-  "dataDeletionNotAvailableCommunity": "Brisanje podataka nije dostupno u načinu Zajednica. Najprije se odjavite ili upotrijebite privatnu bazu podataka.",
   "priceHistoryStationsTracked": "{count} praćenih stanica",
   "@priceHistoryStationsTracked": {
     "placeholders": {
@@ -348,22 +306,11 @@
     }
   },
   "noPriceHistory": "Još nema povijesti cijena",
-  "noHourlyData": "Nema satnih podataka",
   "noStatistics": "Nema dostupnih statistika",
-  "statMin": "Min",
-  "statMax": "Maks",
-  "statAvg": "Pros",
   "showAllFuelTypes": "Prikaži sve vrste goriva",
   "connected": "Spojeno",
-  "notConnected": "Nije spojeno",
-  "connectTankSync": "Spoji TankSync",
   "disconnectTankSync": "Odspoji TankSync",
   "viewMyData": "Pogledaj moje podatke",
-  "optionalCloudSync": "Neobavezna sinkronizacija u oblaku za obavijesti, favorite i push obavijesti",
-  "tapToUpdateGps": "Dodirnite za ažuriranje GPS pozicije",
-  "gpsAutoUpdateHint": "GPS pozicija se automatski dobiva pri pretrazi. Možete je ažurirati i ručno ovdje.",
-  "clearGpsConfirm": "Obrisati spremljenu GPS poziciju? Možete je ažurirati ponovno u bilo kojem trenutku.",
-  "pageNotFound": "Stranica nije pronađena",
   "deleteAllServerData": "Obriši sve podatke s poslužitelja",
   "deleteServerDataConfirm": "Obrisati sve podatke s poslužitelja?",
   "deleteEverything": "Obriši sve",
@@ -373,7 +320,6 @@
   "forgetAllSyncedTripsConfirmBody": "Svaki sažetak vožnje i detalji bit će uklonjeni s poslužitelja. Lokalna povijest vožnji na ovom uređaju neće biti zahvaćena.\n\nOva se radnja ne može poništiti.",
   "forgetAllSyncedTripsConfirmAction": "Zaboravi sve",
   "forgetAllSyncedTripsSuccess": "Sve sinkronizirane vožnje uklonjene s poslužitelja",
-  "disconnectConfirm": "Odspojiti TankSync?",
   "disconnect": "Odspoji",
   "myServerData": "Moji podaci na poslužitelju",
   "anonymousUuid": "Anonimni UUID",
@@ -393,7 +339,6 @@
   "continueAsGuest": "Nastavi kao gost",
   "createAccount": "Stvori račun",
   "signIn": "Prijava",
-  "upgradeToEmail": "Stvori e-mail račun",
   "savedRoutes": "Spremljene rute",
   "noSavedRoutes": "Nema spremljenih ruta",
   "noSavedRoutesHint": "Pretražite duž rute i spremite je za brzi pristup kasnije.",
@@ -424,11 +369,6 @@
   "onboardingNext": "Dalje",
   "onboardingSkip": "Preskoči",
   "onboardingFinish": "Počni",
-  "crossBorderNearby": "{country} je u blizini",
-  "crossBorderDistance": "~{km} km do granice",
-  "crossBorderAvgPrice": "Prosj. ovdje: {price} EUR ({count} postaja)",
-  "allPricesView": "Sve cijene",
-  "compactView": "Kompaktno",
   "switchToAllPricesView": "Prebaci na prikaz svih cijena",
   "switchToCompactView": "Prebaci na kompaktni prikaz",
   "unavailable": "N/D",
@@ -453,10 +393,6 @@
   "accountDeleted": "Račun obrisan. Lokalni podaci sačuvani.",
   "switchedToAnonymous": "Prebačeno na anonimnu sesiju",
   "failedToSwitch": "Prebacivanje nije uspjelo: {error}",
-  "topicUrlCopied": "URL teme kopiran",
-  "testNotificationSent": "Testna obavijest poslana!",
-  "testNotificationFailed": "Slanje testne obavijesti nije uspjelo",
-  "pushUpdateFailed": "Ažuriranje postavki push obavijesti nije uspjelo",
   "connectedAsGuest": "Spojeni kao gost",
   "accountCreated": "Račun stvoren!",
   "signedIn": "Prijavljeni!",
@@ -518,7 +454,6 @@
   "privacyClearErrorLog": "Očisti zapisnik pogrešaka",
   "privacyErrorLogCleared": "Zapisnik pogrešaka očišćen",
   "privacyDeleteButton": "Obriši sve podatke",
-  "privacyCopyErrorLog": "Kopiraj dnevnik grešaka u međuspremnik ({count})",
   "privacyDeleteTitle": "Obrisati sve podatke?",
   "privacyDeleteBody": "Ovo će trajno obrisati:\n\n- Sve favorite i podatke o postajama\n- Sve profile pretraživanja\n- Sva upozorenja o cijenama\n- Cjelokupnu povijest cijena\n- Sve predmemorirane podatke\n- Vaš API ključ\n- Sve postavke aplikacije\n\nAplikacija će se resetirati na početno stanje. Ova se radnja ne može poništiti.",
   "privacyDeleteConfirm": "Obriši sve",
@@ -553,15 +488,8 @@
   "voiceAnnouncementsTitle": "Glasovne najave",
   "voiceAnnouncementsDescription": "Najava obližnjih jeftinih postaja za vrijeme vožnje",
   "voiceAnnouncementsEnabled": "Omogući glasovne najave",
-  "voiceAnnouncementThreshold": "Samo ispod {price}",
-  "voiceAnnouncementCheapFuel": "{station}, {distance} kilometara ispred, {fuelType} {price}",
   "voiceAnnouncementProximityRadius": "Polumjer najava",
   "voiceAnnouncementCooldown": "Interval ponavljanja",
-  "nearestStations": "Najblize postaje",
-  "nearestStationsHint": "Pronadite najblize postaje pomocu vase trenutne lokacije",
-  "consumptionLogTitle": "Potrošnja goriva",
-  "consumptionLogMenuTitle": "Evidencija potrošnje",
-  "consumptionLogMenuSubtitle": "Pratite punjenja i izračunajte L/100km",
   "consumptionStatsTitle": "Statistika potrošnje",
   "addFillUp": "Dodaj punjenje",
   "noFillUpsTitle": "Još nema punjenja",
@@ -595,14 +523,12 @@
   "vehiclesWizardYoursList": "Imate {count, plural, =1{1 vozilo} other{{count} vozila}}:",
   "vehiclesWizardSkipHint": "Preskoči za završetak postavljanja — vozila možete dodati u bilo kojem trenutku iz Postavki.",
   "fillUpVehicleLabel": "Vozilo",
-  "fillUpVehicleNone": "Bez vozila",
   "fillUpVehicleRequired": "Vozilo je obavezno",
   "reportScanError": "Prijavi grešku skeniranja",
   "pickStationTitle": "Odaberite postaju",
   "pickStationHelper": "Pokrenite punjenje s poznate postaje kako bi se automatski popunili cijena, brand i vrsta goriva.",
   "pickStationEmpty": "Još nema omiljenih postaja — dodajte ih iz Pretraživanja ili Favorita, ili preskočite i ispunite ručno.",
   "pickStationSkip": "Preskoči — dodaj bez postaje",
-  "scanPump": "Skeniraj pumpu",
   "scanPayment": "Skeniraj QR za plaćanje",
   "qrPaymentBeneficiary": "Primatelj",
   "qrPaymentAmount": "Iznos",
@@ -624,17 +550,10 @@
   "qrScannerRetry": "Pokušaj ponovo",
   "torchOn": "Uključi bljeskalicu",
   "torchOff": "Isključi bljeskalicu",
-  "obdNoAdapter": "Nema OBD2 adaptera u dosegu",
-  "obdOdometerUnavailable": "Nije moguće očitati kilometar-sat",
   "obdPermissionDenied": "Odobrite Bluetooth dozvolu u sistemskim postavkama",
-  "obdAdapterUnresponsive": "Adapter ne odgovara — uključite paljenje i pokušajte ponovo",
   "obdPickerTitle": "Odaberite OBD2 adapter",
   "obdPickerScanning": "Traženje adaptera…",
   "obdPickerConnecting": "Spajanje…",
-  "themeSettingTitle": "Tema",
-  "themeModeLight": "Svijetla",
-  "themeModeDark": "Tamna",
-  "themeModeSystem": "Prati sustav",
   "tripRecordingTitle": "Snimanje vožnje",
   "tripSummaryTitle": "Sažetak vožnje",
   "tripMetricDistance": "Udaljenost",
@@ -676,18 +595,13 @@
   "syncBaselinesToggleTitle": "Dijeli naučene profile vozila",
   "syncBaselinesToggleSubtitle": "Učitajte osnove potrošnje po vozilu kako bi ih drugi uređaj mogao koristiti.",
   "obd2StatusConnected": "OBD2 adapter: spojen",
-  "obd2StatusAttempting": "OBD2 adapter: spajanje",
-  "obd2StatusUnreachable": "OBD2 adapter: nedostupan",
   "obd2StatusPermissionDenied": "OBD2 adapter: potrebna Bluetooth dozvola",
   "obd2StatusConnectedBody": "Spreman za snimanje vožnje.",
-  "obd2StatusAttemptingBody": "Spajanje u pozadini…",
-  "obd2StatusUnreachableBody": "Adapter izvan dosega ili ga već koristi druga aplikacija.",
   "obd2StatusPermissionDeniedBody": "Odobrite Bluetooth dozvolu u sistemskim postavkama za automatsko ponovno spajanje.",
   "obd2StatusNoAdapter": "Nema uparenog adaptera",
   "obd2StatusForget": "Zaboravi adapter",
   "tripHistoryTitle": "Povijest vožnji",
   "tripHistoryEmptyTitle": "Još nema vožnji",
-  "tripHistoryEmptySubtitle": "Spojite OBD2 adapter i snimite vožnju za početak izgradnje vaše povijesti vožnji.",
   "tripHistoryUnknownDate": "Nepoznat datum",
   "situationIdle": "Mirovanje",
   "situationStopAndGo": "Zaustavljanje i kretanje",
@@ -697,12 +611,8 @@
   "situationClimbing": "Uspinjanje / opterećenje",
   "situationHardAccel": "Naglo ubrzanje",
   "situationFuelCut": "Isključenje goriva — klizanje",
-  "tripSaveAsFillUp": "Spremi kao punjenje",
   "tripSaveRecording": "Spremi vožnju",
-  "tripDiscard": "Odbaci",
-  "obdOdometerRead": "Kilometar-sat pročitan: {km} km",
   "vehicleFuelNotSet": "Nije postavljeno",
-  "wizardVehicleTapToEdit": "Dodirnite za uređivanje",
   "wizardVehicleDefaultBadge": "Zadano",
   "wizardProfileChoiceHint": "Odaberite kako želite koristiti aplikaciju. To možete promijeniti kasnije u Postavkama.",
   "wizardProfileChoiceFooter": "Svoju izbor možete promijeniti u bilo kojem trenutku iz Postavki → Način korištenja.",
@@ -713,7 +623,6 @@
   "wizardProfileFullName": "Potpuno",
   "wizardProfileFullDescription": "Sve iz Srednjeg, plus automatsko OBD2 snimanje vožnji, ocjene vožnje i kartice lojalnosti.",
   "wizardProfileCustomName": "Prilagođeno",
-  "wizardProfileCustomDescription": "Vlastita kombinacija značajki. Podesite svaki prekidač ispod.",
   "useModeSectionHint": "Prilagodite aplikaciju načinu na koji je stvarno koristite. Odabirom unaprijed postavljenog profila omogućuju se odgovarajuće značajke.",
   "useModeCustomSettingsDescription": "Vaša kombinacija značajki ne odgovara nijednom unaprijed postavljenom profilu. Odaberite jedan gore za prepisivanje ili nastavite prilagođavati pojedinačne značajke u odjeljku ispod.",
   "useModeSwitchedSnack": "Način korištenja postavljen na {profile}.",
@@ -751,20 +660,15 @@
   "evShowOnMap": "Prikaži EV postaje",
   "evAvailableOnly": "Samo dostupne",
   "evMinPower": "Min snaga",
-  "evMaxPower": "Maks snaga",
-  "evOperator": "Operater",
-  "evLastUpdate": "Posljednje ažuriranje",
   "evStatusAvailable": "Dostupno",
   "evStatusOccupied": "Zauzeto",
   "evStatusOutOfOrder": "Izvan pogona",
   "openOnlyFilter": "Samo otvorene",
   "saveAsDefaults": "Spremi kao moje zadane",
   "criteriaSavedToProfile": "Spremljeno kao zadano",
-  "profileNotFound": "Nema aktivnog profila",
   "updatingFavorites": "Ažuriranje favorita...",
   "fetchingLatestPrices": "Dohvaćanje najnovijih cijena",
   "noDataAvailable": "Nema podataka",
-  "configAndPrivacy": "Konfiguracija i privatnost",
   "searchToSeeMap": "Pretražite da vidite postaje na karti",
   "evPowerAny": "Bilo koja",
   "evPowerKw": "{kw} kW+",
@@ -819,9 +723,6 @@
   "iosAutoRecordOnboardingBullet3Title": "Kada iOS zatraži lokaciju \"Uvijek\", molimo recite da.",
   "iosAutoRecordOnboardingBullet3Body": "Sigurnosna kopija koja snima vožnju kada je OBD2 adapter spor treba lokaciju u pozadini. Nikada je ne dijelimo.",
   "scanReceipt": "Skeniraj račun",
-  "obdConnect": "OBD-II",
-  "stationTypeFuel": "Gorivo",
-  "stationTypeEv": "EV",
   "brandFilterHighway": "Autocesta",
   "ratingModeLocal": "Lokalno",
   "ratingModePrivate": "Privatno",
@@ -841,7 +742,6 @@
   "errorHintRouting": "Izračun rute nije uspio. Provjerite internetsku vezu i pokušajte ponovo.",
   "errorHintFallback": "Pokušajte ponovo ili pretražite prema poštanskom broju / nazivu grada.",
   "alertsLoadErrorTitle": "Nije moguće učitati upozorenja",
-  "alertsBackgroundCheckErrorTitle": "Provjera upozorenja u pozadini nije uspjela",
   "detailsLabel": "Pojedinosti",
   "remove": "Ukloni",
   "showKey": "Prikaži ključ",
@@ -950,19 +850,11 @@
   "linkDeviceHowItWorksBody": "1. Na uređaju A: kopirajte kôd uređaja gore\n2. Na uređaju B: zalijepite ga u polje \"Kôd uređaja\"\n3. Dodirnite \"Uvezi podatke\" za spajanje favorita, upozorenja, vozila i evidencije potrošnje\n4. Oba uređaja imat će sve kombinirane podatke\n\nSvaki uređaj zadržava vlastiti anonimni identitet i vlastiti profil (željeno gorivo, zadano vozilo, početni zaslon). Podaci se spajaju, ne premještaju.",
   "vehicleSetActive": "Postavi kao aktivno",
   "swipeHide": "Sakrij",
-  "evChargingSection": "EV punjenje",
-  "fuelStationsSection": "Benzinske postaje",
   "yourRating": "Vaša ocjena",
   "noStorageUsed": "Nema iskorištenog prostora",
   "aboutReportBug": "Prijavi grešku / Predloži značajku",
   "aboutSupportProject": "Podrži ovaj projekt",
   "aboutSupportDescription": "Ova aplikacija je besplatna, open source i bez oglasa. Ako vam je korisna, razmislite o podršci razvojnom programeru.",
-  "luxembourgRegulatedPricesNotice": "Cijene goriva u Luksemburgu regulira vlada i jedinstvene su diljem cijele zemlje.",
-  "luxembourgFuelUnleaded95": "Bezolovni 95",
-  "luxembourgFuelUnleaded98": "Bezolovni 98",
-  "luxembourgFuelDiesel": "Diesel",
-  "luxembourgFuelLpg": "LPG",
-  "luxembourgPricesUnavailable": "Luksemburške regulirane cijene nisu dostupne.",
   "reportIssueTitle": "Prijavi problem",
   "enterCorrection": "Molimo unesite ispravak",
   "reportNoBackendAvailable": "Izvješće nije moglo biti poslano: nije konfigurirana usluga za prijavu za ovu zemlju. Omogućite TankSync u Postavkama za slanje izvješća zajednice.",
@@ -989,10 +881,6 @@
   "serviceReminderMarkDone": "Označi kao obavljeno",
   "serviceReminderDueTitle": "Servis dospijeva",
   "serviceReminderDueBody": "{label} dospijeva — {kmOver} km prošlo od intervala.",
-  "southKoreaApiKeyRequired": "Registrirajte se na OPINET za besplatni API ključ",
-  "southKoreaApiProvider": "OPINET (KNOC)",
-  "chileApiKeyRequired": "Registrirajte se na CNE za besplatni API ključ",
-  "chileApiProvider": "CNE Bencina en Linea",
   "vinConfirmTitle": "Je li ovo vaše vozilo?",
   "vinConfirmBody": "{year} {make} {model} — {displacement}L, {cylinders}-cilindarski, {fuel}",
   "vinPartialInfoNote": "Djelomične informacije (izvan mreže). Možete urediti ispod.",
@@ -1011,17 +899,13 @@
   "alertsRadiusCreateTitle": "Stvori upozorenje polumjera",
   "alertsRadiusLabelHint": "Oznaka (npr. Kućni diesel)",
   "alertsRadiusFuelType": "Vrsta goriva",
-  "alertsRadiusThreshold": "Prag (€/L)",
   "alertsRadiusKm": "Polumjer (km)",
   "alertsRadiusCenterGps": "Koristi moju lokaciju",
   "alertsRadiusCenterPostalCode": "Poštanski broj",
   "alertsRadiusSave": "Spremi",
   "alertsRadiusCancel": "Odustani",
-  "alertsRadiusDeleteConfirm": "Obrisati upozorenje polumjera?",
   "obd2ConnectedTooltip": "OBD2 spojen: {adapterName}",
   "obd2PairChipTooltip": "Upari OBD2 adapter",
-  "velocityAlertTitle": "{fuelLabel} pao na obližnjim postajama",
-  "velocityAlertBody": "{stationCount} postaja palo za do {maxDropCents}¢ u posljednjem satu",
   "fillUpSavedSnackbar": "Punjenje spremljeno",
   "radiusAlertsEntryTitle": "Upozorenja polumjera i statistika",
   "radiusAlertsEntrySubtitle": "Primajte obavijest kada cijene padnu u vašoj blizini",
@@ -1060,8 +944,6 @@
   "autoRecordStatusPairAdapterCta": "Upari adapter",
   "autoRecordSpeedThresholdLabel": "Brzina pokretanja (km/h)",
   "autoRecordSaveDelayLabel": "Kašnjenje pohrane nakon odspajanja (sekunde)",
-  "autoRecordPairedAdapterLabel": "Upareni adapter",
-  "autoRecordPairedAdapterNone": "Nema uparenog adaptera. Uparite ga prvo putem OBD2 uvodnika.",
   "autoRecordBackgroundLocationLabel": "Lokacija u pozadini dopuštena",
   "autoRecordBackgroundLocationRequest": "Zatraži dozvolu",
   "autoRecordBackgroundLocationRationaleTitle": "Zašto \"Uvijek dopusti\"?",
@@ -1069,18 +951,12 @@
   "autoRecordBackgroundLocationOpenSettings": "Otvori postavke",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Potrebna je dozvola za lokaciju",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Nije moguće zatražiti lokaciju u pozadini",
-  "autoRecordBadgeClearTooltip": "Očisti brojač",
   "autoRecordPairAdapterLinkText": "Uparite adapter u odjeljku ispod za omogućavanje automatskog snimanja",
-  "exportBackupTooltip": "Izvezi sigurnosnu kopiju",
   "exportBackupReady": "Sigurnosna kopija spremna — odaberite odredište",
   "exportBackupFailed": "Izvoz sigurnosne kopije nije uspio — pokušajte ponovo",
-  "brokenMapChipVerifying": "MAP senzor se verificira…",
   "brokenMapChipDisclaimer": "MAP očitanja su sumnjiva",
   "brokenMapSnackbarUnreliable": "MAP senzor čita netočno — očitanja goriva mogu biti 50–80% preniska. Pokušajte s drugim adapterom.",
   "brokenMapBannerHardDisable": "MAP senzor nije pouzdan. Prikazujem prosjeke punjenja umjesto stvarne potrošnje.",
-  "brokenMapOverlayVerified": "MAP senzor: verificiran ({confidence})",
-  "brokenMapOverlayUnverified": "MAP senzor: verificira se ({confidence})",
-  "brokenMapOverlaySuspicious": "MAP senzor: sumnjiv ({confidence})",
   "brokenMapOverlayPosterior": "MAP senzor: {posterior}% ± {margin}%",
   "brokenMapOverlayPosteriorVerified": "MAP senzor: {posterior}% ± {margin}% (verificiran)",
   "brokenMapDiagnosticsCardTitle": "Dijagnostika MAP senzora",
@@ -1142,7 +1018,6 @@
   "chargingCostTrendTitle": "Trend troška punjenja",
   "chargingEfficiencyTitle": "Učinkovitost (kWh/100 km)",
   "chargingChartsEmpty": "Još nema dovoljno podataka",
-  "chargingChartsMonthAxis": "Mjesec",
   "consoFeatureGroupTitle": "Conso",
   "consoFeatureGroupDescription": "Pratite potrošnju — ručna punjenja ili automatsko OBD2 snimanje vožnji.",
   "consoModeOff": "Isključeno",
@@ -1158,10 +1033,6 @@
   "fillUpCorrectionEditExplainer": "Ovaj unos je automatski generiran za zatvaranje razlike između snimljenih vožnji i natočenog goriva. Prilagodite vrijednosti ako znate stvarne podatke.",
   "fillUpCorrectionDelete": "Obriši ispravak",
   "fillUpCorrectionStation": "Naziv postaje (neobavezno)",
-  "greeceApiProvider": "Paratiritirio Timon (Greece)",
-  "greeceCommunityApiNotice": "Pokreće ga API fuelpricesgr koji održava zajednica",
-  "romaniaApiProvider": "Monitorul Prețurilor (Romania)",
-  "romaniaScrapingNotice": "Pokreće monitorulpreturilor.info (Vijeće za tržišno natjecanje + ANPC)",
   "crossBorderCheaper": "Postaje u {country} {km} km dalje — €{price}/L jeftinije",
   "crossBorderTapToSwitch": "Dodirnite za promjenu države",
   "crossBorderDismissTooltip": "Odbaci",
@@ -1186,9 +1057,6 @@
   "drivingScorePenaltyHardBrake": "Nagla kočenja",
   "drivingScorePenaltyHighRpm": "Visoki RPM",
   "drivingScorePenaltyFullThrottle": "Puni gas",
-  "ecoRouteOption": "Eko",
-  "ecoRouteSavings": "≈ {liters} L uštede",
-  "ecoRouteHint": "Pametnije upravljanje — prednost autocesti pred zaobilaznim rutama.",
   "favoritesShareAction": "Dijeli",
   "favoritesShareSubject": "Sparkilo — favoriti na {date}",
   "favoritesShareError": "Nije moguće generirati sliku za dijeljenje",
@@ -1206,8 +1074,6 @@
   "featureDescription_consumptionAnalytics": "Kartica za analizu punjenja i vožnji.",
   "featureLabel_baselineSync": "Sinkronizacija osnove",
   "featureDescription_baselineSync": "Sinkronizacija osnova vožnje putem TankSync.",
-  "featureLabel_unifiedSearchResults": "Objedinjeni rezultati pretraživanja",
-  "featureDescription_unifiedSearchResults": "Jedinstvena lista rezultata koja kombinira benzinske i EV postaje.",
   "featureLabel_priceAlerts": "Upozorenja o cijenama",
   "featureDescription_priceAlerts": "Obavijesti o padu cijene na temelju praga.",
   "featureLabel_priceHistory": "Povijest cijena",
@@ -1235,8 +1101,6 @@
   "featureBlockedEnable_glideCoach": "Prvo omogući OBD2 snimanje vožnji",
   "featureBlockedEnable_gpsTripPath": "Prvo omogući OBD2 snimanje vožnji",
   "featureBlockedEnable_autoRecord": "Prvo omogući OBD2 snimanje vožnji",
-  "featureBlockedEnable_showFuel": "Preduvjeti nisu ispunjeni",
-  "featureBlockedEnable_showElectric": "Preduvjeti nisu ispunjeni",
   "featureBlockedEnable_showConsumptionTab": "Prvo omogući OBD2 snimanje vožnji",
   "featureLabel_tflitePricePrediction": "TFLite predviđanje cijena",
   "featureDescription_tflitePricePrediction": "Model predviđanja cijena na uređaju — zaključivanje se odvija lokalno; značajke i predviđanja nikad ne napuštaju uređaj.",
@@ -1281,15 +1145,12 @@
   "scanReceiptNoData": "Nisu pronađeni podaci s računa — pokušajte ponovo",
   "scanReceiptSuccess": "Račun skeniran — provjerite vrijednosti. Dodirnite \"Prijavi grešku skeniranja\" ispod ako nešto nije ispravno.",
   "scanReceiptFailed": "Skeniranje nije uspjelo: {error}",
-  "scanPumpUnreadable": "Zaslon pumpe nije čitljiv — pokušajte ponovo",
-  "pumpCameraHint": "Poravnajte tri broja sa zaslona crpke unutar okvira",
   "pumpCameraCapture": "Snimi",
   "pumpCameraPermissionDenied": "Pristup kameri potreban je za skeniranje zaslona crpke. Omogućite ga u postavkama uređaja.",
   "pumpCameraError": "Kamera se nije mogla pokrenuti. Pokušajte ponovno ili unesite vrijednosti ručno.",
   "scanPumpSuccess": "Zaslon pumpe skeniran — provjerite vrijednosti.",
   "scanPumpGlare": "Previše odsjaja na zaslonu — pokušajte ponovno pod blagim kutom kako brojevi ne bi bili izblijedjeli.",
   "scanPumpFailed": "Skeniranje pumpe nije uspjelo: {error}",
-  "badScanReportTitle": "Prijavi grešku skeniranja",
   "badScanReportTitleReceipt": "Prijavi grešku skeniranja — Račun",
   "badScanReportTitlePumpDisplay": "Prijavi grešku skeniranja — Zaslon pumpe",
   "pumpScanFailureTitle": "Zaslon nije čitljiv",
@@ -1298,7 +1159,6 @@
   "pumpScanFailureReport": "Prijavi",
   "pumpScanFailureRemove": "Ukloni fotografiju",
   "badScanReportHint": "Dijelit ćemo fotografiju računa i oba skupa vrijednosti kako bi sljedeće verzije mogle naučiti ovaj raspored.",
-  "badScanReportShareAction": "Dijeli izvješće + fotografiju",
   "badScanReportFieldBrandLayout": "Raspored brenda",
   "badScanReportFieldTotal": "Ukupno",
   "badScanReportFieldPricePerLiter": "Cijena/L",
@@ -1315,16 +1175,9 @@
   "fillUpSectionWhatSubtitle": "Gorivo, količina, cijena",
   "fillUpSectionWhereTitle": "Gdje ste bili",
   "fillUpSectionWhereSubtitle": "Postaja, kilometar-sat, napomene",
-  "fillUpImportFromLabel": "Uvezi iz…",
-  "fillUpImportSheetTitle": "Uvezi podatke o punjenju",
   "fillUpImportReceiptLabel": "Račun",
-  "fillUpImportReceiptDescription": "Skenirajte papirnati račun kamerom",
   "fillUpImportPumpLabel": "Zaslon pumpe",
-  "fillUpImportPumpDescription": "Čitanje Betrag / Preis s LCD zaslona pumpe",
-  "fillUpImportObdLabel": "OBD-II adapter",
-  "fillUpImportObdDescription": "Čitanje kilometar-sata s OBD-II priključka putem Bluetootha",
   "fillUpPricePerLiterLabel": "Cijena po litri",
-  "vehicleHeaderPlateLabel": "Registracija",
   "vehicleHeaderUntitled": "Novo vozilo",
   "vehicleSectionIdentityTitle": "Identitet",
   "vehicleSectionIdentitySubtitle": "Naziv i VIN",
@@ -1340,7 +1193,6 @@
   "gpsDiagnosticsHeader": "{count} uzoraka · {span} · {gaps, plural, =0{bez prekida} =1{1 prekid} other{{gaps} prekida}}",
   "gpsDiagnosticsCadence": "Srednji interval: {ms} ms",
   "gpsDiagnosticsExplain": "Snimljeno za vrijeme snimanja za provjeru GPS kadence tijekom spavanja telefona.",
-  "hapticEcoCoachSectionTitle": "Vožnja",
   "hapticEcoCoachSettingTitle": "Eko treneriranje u stvarnom vremenu",
   "hapticEcoCoachSettingSubtitle": "Nježna haptika + savjet na ekranu kada snažno ubrzate za vrijeme krstarenja",
   "hapticEcoCoachSnackBarMessage": "Polako s gasom — klizanje više štedi",
@@ -1370,9 +1222,6 @@
   "calculatorDistanceHint": "npr. 150",
   "calculatorConsumptionHint": "npr. 7.0",
   "calculatorPriceHint": "npr. 1.899",
-  "routeStrategyLabel": "Strategija:",
-  "routeStrategyUniform": "Jednoličan",
-  "routeStrategyBalanced": "Uravnotežen",
   "glideCoachBetaTitle": "Glide-coach beta (eksperimentalno)",
   "glideCoachBetaSubtitle": "Suptilna haptika pri usporavanju pred crvenim svjetlom. Zadano isključeno — rizik od odvraćanja pažnje.",
   "consentSyncTripsTitle": "Sinkroniziraj snimanja vožnji",
@@ -1428,7 +1277,6 @@
   "onboardingObd2ConnectButton": "Spoji adapter",
   "onboardingObd2SkipButton": "Možda kasnije",
   "onboardingObd2ReadingVin": "Čitanje VIN-a…",
-  "onboardingObd2VinReadFailed": "Nije moguće pročitati VIN — unesite ručno",
   "onboardingObd2ConnectFailed": "Nije moguće spojiti se na adapter. Možete ponoviti pokušaj ili preskočiti.",
   "onboardingPickUseMode": "Odaberite način korištenja za nastavak.",
   "alertsRadiusFrequencyLabel": "Učestalost provjere",
@@ -1442,9 +1290,6 @@
   "radiusAlertMapPickerCancel": "Odustani",
   "radiusAlertMapPickerHint": "Povucite kartu za pozicioniranje centra upozorenja",
   "radiusAlertCenterFromMap": "Lokacija na karti",
-  "radiusAlertNotificationTitle": "{fuelLabel} kod {label}",
-  "radiusAlertNotificationBody": "Postaja je na {price} € (cilj: {threshold} €)",
-  "refuelUnitPerLiter": "/L",
   "refuelUnitPerKwh": "/kWh",
   "refuelUnitPerSession": "/sesija",
   "speedConsumptionCardTitle": "Potrošnja prema brzini",
@@ -1463,9 +1308,6 @@
   "tankLevelLitersFormat": "{litres} L",
   "tankLevelRangeFormat": "≈ {kilometres} km dosega",
   "tankLevelLastFillUpFormat": "Zadnje punjenje: {date} · {count} vožnja(i) od tada",
-  "tankLevelMethodObd2": "OBD2 izmjereno",
-  "tankLevelMethodDistanceFallback": "procjena na temelju udaljenosti",
-  "tankLevelMethodMixed": "mješovita mjerenja",
   "tankLevelEmptyNoFillUp": "Unesite punjenje za prikaz razine goriva",
   "tankLevelDetailSheetTitle": "Vožnje od zadnjeg punjenja",
   "addFillUpIsFullTankLabel": "Puni spremnik",
@@ -1536,7 +1378,6 @@
   "trajetDetailDeleteAction": "Obriši",
   "trajetDetailDeleteConfirmTitle": "Obrisati ovu vožnju?",
   "trajetDetailDeleteConfirmBody": "Ova vožnja bit će trajno uklonjena iz vaše povijesti.",
-  "trajetDetailDeleteConfirmCancel": "Odustani",
   "trajetDetailDeleteConfirmConfirm": "Obriši",
   "tripRecordingObd2NotResponding": "OBD2 adapter spojen, ali ne vraća podatke. Pokušajte s drugim adapterom ili provjerite dijagnostički protokol vozila.",
   "trajetsViewAllOnMap": "Prikaži sve na karti",
@@ -1552,7 +1393,6 @@
   "tripLengthBucketTripCount": "{count, plural, =0{nema vožnji} one{1 vožnja} other{{count} vožnji}}",
   "tripPathCardTitle": "Put vožnje",
   "tripPathCardSubtitle": "GPS-snimljena ruta",
-  "tripPathLegendTitle": "Potrošnja",
   "tripPathLegendEfficient": "Učinkovito (< 6 L/100km)",
   "tripPathLegendBorderline": "Na granici (6–10 L/100km)",
   "tripPathLegendWasteful": "Rastrošno (≥ 10 L/100km)",
@@ -1563,13 +1403,8 @@
   "tripRecordingPinHelpTitle": "O prikačivanju",
   "tripRecordingPinHelpBody": "Prikačivanje drži ekran uključenim i sakriva sistemske trake kako bi obrazac ostao čitljiv na nosaču. Dodirnite ponovo za otpuštanje. Automatski se otpušta kada vožnja završi.",
   "tripRecordingResumeHintMessage": "Snimanje se nastavlja u pozadini. Dodirnite crveni natpis na vrhu bilo kojeg zaslona za povratak.",
-  "tripBannerOpenFromConsumptionTab": "Otvori aktivnu vožnju iz kartice Conso",
   "tripRecordingUnpinnedWarning": "Prikačite ekran za održavanje GPS-a aktivnim za vrijeme vožnje — Android može ograničiti GPS za vrijeme spavanja.",
   "tripRecordingMinimiseTooltip": "Smanji u plutajuću pločicu",
-  "unifiedFilterFuel": "Gorivo",
-  "unifiedFilterEv": "EV",
-  "unifiedFilterBoth": "Oboje",
-  "unifiedNoResultsForFilter": "Nema rezultata koji odgovaraju ovom filteru",
   "searchFailedSnackbar": "Pretraživanje nije uspjelo — molimo pokušajte ponovo",
   "vinLabel": "VIN (neobavezno)",
   "vinDecodeTooltip": "Dekodiraj VIN",
@@ -1601,7 +1436,6 @@
   "gdprVinOnlineDecodeTitle": "VIN online dekodiranje",
   "gdprVinOnlineDecodeShort": "Dekodiraj VIN putem besplatne javne usluge NHTSA",
   "gdprVinOnlineDecodeDescription": "Kada uparite adapter, VIN vašeg vozila čita se lokalno za identifikaciju automobila. Omogućavanjem ovoga šalje se 17-znakovni VIN usluzi NHTSA vPIC za pretraživanje dodatnih detalja (model, radni obujam, vrsta goriva). VIN je jedini podatak koji se šalje — nikakvi drugi podaci ne napuštaju vaš uređaj.",
-  "vehicleDetectedFromVinBadge": "(otkriveno)",
   "vehicleDetectedFromVinSnackbar": "Otkriveno iz VIN-a: {summary}. Primijeniti?",
   "vehicleDetectedFromVinApply": "Primijeni",
   "widgetHelpSectionTitle": "Widget na početnom zaslonu",
@@ -1620,7 +1454,6 @@
   "widgetColorSchemeOrange": "Narančasta",
   "widgetVariantDefault": "Samo trenutna cijena",
   "widgetVariantPredictive": "Prediktivno: najbolje vrijeme za punjenje",
-  "widgetPredictiveNowPrefix": "sada",
   "@distance": {
     "placeholders": {
       "distance": {
@@ -1645,13 +1478,6 @@
   "@hours": {
     "placeholders": {
       "n": {
-        "type": "int"
-      }
-    }
-  },
-  "@stationsOnMap": {
-    "placeholders": {
-      "count": {
         "type": "int"
       }
     }
@@ -1700,13 +1526,6 @@
   "@evConnectors": {
     "placeholders": {
       "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@stopN": {
-    "placeholders": {
-      "n": {
         "type": "int"
       }
     }
@@ -1850,25 +1669,11 @@
       }
     }
   },
-  "approachStationDistance": "{meters} m udaljeno",
-  "@approachStationDistance": {
-    "description": "PiP overlay caption (#2084) showing how far the driver is from the in-radius target station, in metres.",
-    "placeholders": {
-      "meters": {
-        "type": "String",
-        "example": "350"
-      }
-    }
-  },
   "tripRecordingPipElapsedCaption": "proteklo",
   "@tripRecordingPipElapsedCaption": {
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
-  "fabOpenCriteria": "Otvori pretraživanje",
-  "fabOpenResults": "Otvori rezultate",
   "fabRunSearch": "Pokreni pretraživanje",
-  "fabRefineCriteria": "Pročisti pretraživanje",
-  "routeSearchPartialBanner": "Pretražuju se dodatne stanice…",
   "privacySaveErrorLog": "Spremi zapisnik pogrešaka ({count})",
   "@privacySaveErrorLog": {
     "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
@@ -2418,10 +2223,6 @@
   "@trajetDetailChartCoolant": {
     "description": "MT — needs native review"
   },
-  "trajetDetailChartAltitude": "Nadmorska visina (m)",
-  "@trajetDetailChartAltitude": {
-    "description": "MT — needs native review"
-  },
   "trajetDetailChartLambda": "Komandirana λ",
   "@trajetDetailChartLambda": {
     "description": "MT — needs native review"
@@ -2654,14 +2455,6 @@
   "@obd2HealthHistorySection": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyJson": "Kopiraj kao JSON",
-  "@obd2HealthCopyJson": {
-    "description": "MT — needs native review"
-  },
-  "obd2HealthCopied": "OBD2 dijagnostika kopirana u međuspremnik.",
-  "@obd2HealthCopied": {
-    "description": "MT — needs native review"
-  },
   "evStatusPartial": "Djelomično dostupno",
   "@evStatusPartial": {
     "description": "MT — needs native review"
@@ -2767,10 +2560,6 @@
   },
   "ocrTesterRunning": "Pokretanje OCR-a…",
   "@ocrTesterRunning": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterNoResult": "OCR nije dao čitljiv rezultat.",
-  "@ocrTesterNoResult": {
     "description": "MT — needs native review"
   },
   "ocrTesterOverlaySection": "Prekrivač blokova",
@@ -2937,10 +2726,6 @@
   "@obd2DiagnosticsInitCold": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyInitTranscript": "Kopiraj samo transkript inicijalizacije",
-  "@obd2HealthCopyInitTranscript": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterSaveFixture": "Spremi kao fixture",
   "@ocrTesterSaveFixture": {
     "description": "MT — needs native review"
@@ -3092,10 +2877,6 @@
   "@obd2GpsDegradedBannerTitle": {
     "description": "MT — needs native review"
   },
-  "restoreBackupTooltip": "Obnovi sigurnosnu kopiju",
-  "@restoreBackupTooltip": {
-    "description": "MT — needs native review"
-  },
   "restoreBackupDialogTitle": "Obnovi sigurnosnu kopiju",
   "@restoreBackupDialogTitle": {
     "description": "MT — needs native review"
@@ -3111,15 +2892,6 @@
   "restoreBackupReplaceAction": "Zamijeni sve",
   "@restoreBackupReplaceAction": {
     "description": "MT — needs native review"
-  },
-  "restoreBackupSuccess": "Sigurnosna kopija obnovljena — uvezeno {count} zapisa",
-  "@restoreBackupSuccess": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
   },
   "restoreBackupEmpty": "Sigurnosna kopija obnovljena — nije sadržavala zapise",
   "@restoreBackupEmpty": {
@@ -3391,16 +3163,6 @@
   "voiceCoachingSettingSubtitle": "Slušajte glasovne savjete za vrijeme vožnje — jako ubrzavanje, naglo kočenje i savjeti za mijenjanje brzina",
   "@voiceCoachingSettingSubtitle": {
     "description": "MT — needs native review"
-  },
-  "fuelStationRadarDistanceKm": "{km} km daleko",
-  "@fuelStationRadarDistanceKm": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "km": {
-        "type": "String",
-        "example": "2.4"
-      }
-    }
   },
   "fuelStationRadarProximity": "Blizina {percent}%",
   "@fuelStationRadarProximity": {
@@ -3733,10 +3495,6 @@
   },
   "consumptionStatsChartConsumption": "L/100km po mjesecu",
   "@consumptionStatsChartConsumption": {
-    "description": "MT — needs native review"
-  },
-  "shareReceiptImporting": "Uvoz dijeljenol računa…",
-  "@shareReceiptImporting": {
     "description": "MT — needs native review"
   },
   "shareReceiptUnsupportedFormat": "Ovaj format datoteke još se ne može uvesti — umjesto toga podijelite fotografiju računa.",
@@ -4228,17 +3986,6 @@
       "count": {
         "type": "int",
         "example": "3"
-      }
-    }
-  },
-  "fuelEfficiencyMixedFootnote": "{count, plural, =1{1 mixed tank counted toward its main fuel} other{{count} mixed tanks counted toward their main fuel}}",
-  "@fuelEfficiencyMixedFootnote": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int",
-        "example": "1"
       }
     }
   },
@@ -4752,11 +4499,6 @@
         "example": "Oil change"
       }
     }
-  },
-  "radarAcquiringLocation": "Finding your location…",
-  "@radarAcquiringLocation": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
   },
   "radarUpdatingLocation": "Updating your location…",
   "@radarUpdatingLocation": {
