@@ -5,7 +5,7 @@ import 'dart:async';
 
 import '../../../core/logging/error_logger.dart';
 import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
-import 'obd2_connection_errors.dart';
+import '../domain/obd2_connection_errors.dart';
 
 /// #2763 — true when [error] is an EXPECTED transient on a best-effort OBD2
 /// read (VIN / one-shot PID), the documented #2428/#2379 flaky-comms contract:

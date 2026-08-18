@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/reconnect_rssi_gate.dart';
+import 'package:tankstellen/features/obd2/domain/reconnect_rssi_gate.dart';
 
 /// Unit tests for the pure relative-RSSI / two-consecutive-batch gate
 /// that the in-trip reconnect scan fallback uses (#2245). NOT an

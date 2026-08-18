@@ -8,14 +8,16 @@ import 'package:flutter/material.dart';
 // the dart:ui/material one (with `.ltr`).
 import 'package:intl/intl.dart' hide TextDirection;
 
+import '../../../../core/widgets/charts/monthly_bar_chart_base.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Monthly-total charging-cost bar chart (#582 phase 3).
 ///
-/// Mirrors [MonthlyBarChart] from the carbon feature: one bar per
-/// month, short month label below, max-value reference line up top.
-/// Uses [CustomPaint] rather than pulling in a chart library so we
-/// stay consistent with `price_chart.dart` / `monthly_bar_chart.dart`.
+/// The paint routine lives in the shared [MonthlyBarChartPainter] base
+/// (the same base the carbon dashboard uses): one bar per month, short
+/// month label below, max-value reference line up top. No chart
+/// library — stays consistent with `price_chart.dart` /
+/// `monthly_bar_chart.dart`.
 ///
 /// Empty-state: when every month is 0, renders a centred
 /// "Not enough data yet" caption so the section still feels
@@ -76,113 +78,21 @@ class ChargingCostTrendChart extends StatelessWidget {
   }
 }
 
-class _CostTrendPainter extends CustomPainter {
-  final List<MapEntry<DateTime, double>> entries;
-  final Color color;
-  final Color labelColor;
-
-  /// Locale-aware short-month formatter for the X-axis labels (#2971).
-  final DateFormat monthFormat;
-
+/// Charging-facing shim over the shared [MonthlyBarChartPainter]: maps
+/// the month→EUR entries onto the base's primitives. Kept as its own
+/// type (name matched by widget tests).
+class _CostTrendPainter extends MonthlyBarChartPainter {
   _CostTrendPainter({
-    required this.entries,
-    required this.color,
-    required this.labelColor,
-    required this.monthFormat,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (entries.isEmpty) return;
-
-    const leftInset = 8.0;
-    const rightInset = 8.0;
-    const topInset = 18.0;
-    const bottomInset = 22.0;
-
-    final chartWidth = size.width - leftInset - rightInset;
-    final chartHeight = size.height - topInset - bottomInset;
-
-    final values = entries.map((e) => e.value).toList(growable: false);
-    final maxValue = values.reduce(math.max);
-    final effectiveMax = maxValue > 0 ? maxValue : 1.0;
-
-    final barCount = entries.length;
-    final slot = chartWidth / barCount;
-    final barWidth = math.max(4.0, slot * 0.55);
-
-    final barPaint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-
-    // Max reference line
-    final refPaint = Paint()
-      ..color = color.withAlpha(50)
-      ..strokeWidth = 1;
-    canvas.drawLine(
-      const Offset(leftInset, topInset),
-      Offset(size.width - rightInset, topInset),
-      refPaint,
-    );
-
-    // Max label top-right
-    _drawText(
-      canvas,
-      '€${maxValue.toStringAsFixed(0)}',
-      Offset(size.width - rightInset, 2),
-      anchorRight: true,
-      color: labelColor.withAlpha(160),
-      fontSize: 10,
-    );
-
-    for (int i = 0; i < barCount; i++) {
-      final v = values[i];
-      final barHeight = (v / effectiveMax) * chartHeight;
-      final cx = leftInset + slot * i + slot / 2;
-      final left = cx - barWidth / 2;
-      final top = topInset + chartHeight - barHeight;
-      final rect = RRect.fromRectAndCorners(
-        Rect.fromLTWH(left, top, barWidth, barHeight),
-        topLeft: const Radius.circular(3),
-        topRight: const Radius.circular(3),
-      );
-      canvas.drawRRect(rect, barPaint);
-      _drawText(
-        canvas,
-        monthFormat.format(entries[i].key),
-        Offset(cx, topInset + chartHeight + 4),
-        anchorCenter: true,
-        color: labelColor.withAlpha(160),
-        fontSize: 10,
-      );
-    }
-  }
-
-  void _drawText(
-    Canvas canvas,
-    String text,
-    Offset offset, {
-    bool anchorRight = false,
-    bool anchorCenter = false,
-    required Color color,
-    double fontSize = 10,
-  }) {
-    final tp = TextPainter(
-      text: TextSpan(
-        text: text,
-        style: TextStyle(color: color, fontSize: fontSize),
-      ),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    var dx = offset.dx;
-    if (anchorRight) dx -= tp.width;
-    if (anchorCenter) dx -= tp.width / 2;
-    tp.paint(canvas, Offset(dx, offset.dy));
-  }
-
-  @override
-  bool shouldRepaint(_CostTrendPainter oldDelegate) =>
-      oldDelegate.entries != entries ||
-      oldDelegate.color != color ||
-      oldDelegate.monthFormat.locale != monthFormat.locale;
+    required List<MapEntry<DateTime, double>> entries,
+    required super.color,
+    required super.labelColor,
+    required super.monthFormat,
+  }) : super(
+          values: entries.map((e) => e.value).toList(growable: false),
+          months: entries.map((e) => e.key).toList(growable: false),
+          maxLabel:
+              '€${entries.map((e) => e.value).reduce(math.max).toStringAsFixed(0)}',
+          barWidthFactor: 0.55,
+          bottomInset: 22,
+        );
 }

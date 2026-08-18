@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
-import 'package:tankstellen/features/obd2/data/pid_scheduler.dart';
+import 'package:tankstellen/features/obd2/domain/pid_scheduler.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// Captures every `errorLogger.log` call routed through the foreground

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/vehicle_profile.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Compact summary card for one [VehicleProfile].
 ///
@@ -43,10 +44,14 @@ class VehicleCard extends StatelessWidget {
     final parts = <String>[];
     if (vehicle.isEv) {
       if (vehicle.batteryKwh != null) {
-        parts.add('${vehicle.batteryKwh!.toStringAsFixed(0)} kWh');
+        parts.add(
+          '${UnitFormatter.formatDecimal(vehicle.batteryKwh!, fractionDigits: 0)} kWh',
+        );
       }
       if (vehicle.maxChargingKw != null) {
-        parts.add('${vehicle.maxChargingKw!.toStringAsFixed(0)} kW');
+        parts.add(
+          '${UnitFormatter.formatDecimal(vehicle.maxChargingKw!, fractionDigits: 0)} kW',
+        );
       }
       if (vehicle.supportedConnectors.isNotEmpty) {
         parts.add(vehicle.supportedConnectors.map((c) => c.label).join(', '));
@@ -54,7 +59,9 @@ class VehicleCard extends StatelessWidget {
     }
     if (vehicle.isCombustion) {
       if (vehicle.tankCapacityL != null) {
-        parts.add('${vehicle.tankCapacityL!.toStringAsFixed(0)} L');
+        parts.add(
+          '${UnitFormatter.formatDecimal(vehicle.tankCapacityL!, fractionDigits: 0)} L',
+        );
       }
       if (vehicle.preferredFuelType != null) {
         parts.add(vehicle.preferredFuelType!);

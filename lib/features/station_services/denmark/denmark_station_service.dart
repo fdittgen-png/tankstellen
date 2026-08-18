@@ -42,23 +42,16 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
               connectTimeout: const Duration(seconds: 15),
               receiveTimeout: const Duration(seconds: 15),
             ),
+        // The shared `{'stations': [...]}` envelope + per-item codec —
+        // see [stationListDataset] (deduped from the DK/MX/FR copies).
         _persistent = cache == null
             ? null
-            : PersistentDataset<List<Station>>(
+            : stationListDataset<Station>(
                 cache: cache,
                 countryCode: 'DK',
-                datasetName: 'stations',
                 source: ServiceSource.denmarkApi,
-                serialize: (stations) =>
-                    {'stations': stations.map((s) => s.toJson()).toList()},
-                deserialize: (json) {
-                  final list = json['stations'] as List<dynamic>?;
-                  if (list == null) return null;
-                  return list
-                      .map((j) =>
-                          Station.fromJson(Map<String, dynamic>.from(j as Map)))
-                      .toList();
-                },
+                itemToJson: (s) => s.toJson(),
+                itemFromJson: Station.fromJson,
               );
 
   // #2264 — soft/hard dataset TTLs mirror the DK FuelServicePolicy in the
@@ -239,7 +232,7 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
         );
       }).whereType<Station>().toList();
     } on DioException catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'DK OK fetch failed'}));
+      logDioFailure(e, st, 'DK OK fetch failed');
       // #2249 — rethrow so the completeness gate sees a *failed* source (vs a
       // genuinely empty feed). [_fetchSource] catches it and downgrades the
       // dataset to a short TTL; the legacy in-memory path is unaffected.
@@ -309,7 +302,7 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
         );
       }).whereType<Station>().toList();
     } on DioException catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'DK Shell fetch failed'}));
+      logDioFailure(e, st, 'DK Shell fetch failed');
       // #2249 — rethrow so the completeness gate downgrades to a short TTL.
       rethrow;
     }

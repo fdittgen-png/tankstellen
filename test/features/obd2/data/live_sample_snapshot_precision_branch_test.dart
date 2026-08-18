@@ -3,12 +3,12 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
-import 'package:tankstellen/features/obd2/data/fuel_mixture_model.dart';
-import 'package:tankstellen/features/obd2/data/live_sample_snapshot.dart';
+import 'package:tankstellen/features/obd2/domain/fuel_mixture_model.dart';
+import 'package:tankstellen/features/obd2/data/session/live_sample_snapshot.dart';
 import 'package:tankstellen/features/obd2/data/obd2_breadcrumb_collector.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
-import 'package:tankstellen/features/obd2/data/pid_scheduler.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/domain/pid_scheduler.dart';
 
 /// Epic #3416 — the LIVE derivation path ([deriveFuelRateLPerHour]) with
 /// the precision branches: 0x9D/0xA2 on top (#3428), 0x66-over-0x10 MAF,

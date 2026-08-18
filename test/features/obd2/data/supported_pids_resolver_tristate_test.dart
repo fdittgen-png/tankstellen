@@ -4,7 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/data/obd2_comm_diagnostics.dart';
 import 'package:tankstellen/features/obd2/data/obd2_session_diagnostic.dart';
-import 'package:tankstellen/features/obd2/data/supported_pids_resolver.dart';
+import 'package:tankstellen/features/obd2/data/session/supported_pids_resolver.dart';
 
 /// #2469 — discovered-supported tri-state: supported / unsupported /
 /// unknown, sourced from the resolver's discovered set, teed FREE into the

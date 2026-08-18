@@ -4,10 +4,10 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connect_classifier.dart';
+import 'package:tankstellen/features/obd2/domain/obd2_connect_classifier.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connect_trace.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connect_trace_log.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connection_errors.dart';
+import 'package:tankstellen/features/obd2/domain/obd2_connection_errors.dart';
 
 void main() {
   setUp(Obd2ConnectTraceLog.clear);

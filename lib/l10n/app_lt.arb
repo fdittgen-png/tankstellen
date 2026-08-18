@@ -12,11 +12,8 @@
   "fuelType": "Degalai",
   "searchRadius": "Spindulys",
   "searchNearby": "Degalinės netoliese",
-  "searchButton": "Ieškoti",
   "searchCriteriaTitle": "Paieškos kriterijai",
-  "searchCriteriaOpen": "Ieškoti",
   "searchCriteriaRadiusBadge": "{km} km spinduliu",
-  "searchCriteriaTapToSearch": "Palieskite, kad pradėtumėte paiešką",
   "noResults": "Degalinių nerasta.",
   "startSearch": "Ieškokite degalinių.",
   "open": "Atidaryta",
@@ -30,7 +27,6 @@
   "navigate": "Navigacija",
   "retry": "Bandyti dar kartą",
   "apiKeySetup": "API raktas",
-  "apiKeyDescription": "Užsiregistruokite vieną kartą nemokamam API raktui gauti.",
   "apiKeyLabel": "API raktas",
   "register": "Registracija",
   "continueButton": "Tęsti",
@@ -64,33 +60,12 @@
   "noFavoritesHint": "Bakstelėkite žvaigždutę prie degalinės, kad ją išsaugotumėte kaip mėgstamą.",
   "language": "Kalba",
   "country": "Šalis",
-  "demoMode": "Demo režimas — rodomi pavyzdiniai duomenys.",
-  "setupLiveData": "Nustatyti gyvus duomenis",
   "freeNoKey": "Nemokama — raktas nereikalingas",
   "apiKeyRequired": "Reikalingas API raktas",
-  "skipWithoutKey": "Tęsti be rakto",
   "dataTransparency": "Duomenų skaidrumas",
   "storageAndCache": "Saugykla ir podėlis",
   "clearCache": "Išvalyti podėlį",
-  "clearAllData": "Ištrinti visus duomenis",
-  "errorLog": "Klaidų žurnalas",
   "stationsFound": "Rasta {count} degalinių",
-  "whatIsShared": "Kas dalijama — ir su kuo?",
-  "gpsCoordinates": "GPS koordinatės",
-  "gpsReason": "Siunčiamos su kiekviena paieška netoliese esančių stočių radimui.",
-  "postalCodeData": "Pašto kodas",
-  "postalReason": "Konvertuojamas į koordinates per geokodavimo paslaugą.",
-  "mapViewport": "Žemėlapio vaizdas",
-  "mapReason": "Žemėlapio plytelės įkeliamos iš serverio. Asmeniniai duomenys neperduodami.",
-  "apiKeyData": "API raktas",
-  "apiKeyReason": "Jūsų asmeninis raktas siunčiamas su kiekviena API užklausa. Jis susietas su jūsų el. paštu.",
-  "notShared": "NĖRA dalijama:",
-  "searchHistory": "Paieškos istorija",
-  "favoritesData": "Mėgstami",
-  "profileNames": "Profilių pavadinimai",
-  "homeZipData": "Namų pašto kodas",
-  "usageData": "Naudojimo duomenys",
-  "privacyBanner": "Ši programa neturi serverio. Visi duomenys lieka jūsų įrenginyje. Jokios analitikos, sekimo ar reklamų.",
   "storageUsage": "Saugyklos naudojimas šiame įrenginyje",
   "settingsLabel": "Nustatymai",
   "profilesStored": "išsaugotų profilių",
@@ -116,12 +91,8 @@
   "deleteAllButton": "Ištrinti viską",
   "entries": "įrašų",
   "cacheEmpty": "Podėlis tuščias",
-  "noStorage": "Saugykla nenaudojama",
   "apiKeyNote": "Nemokama registracija. Duomenys iš vyriausybinių kainų skaidrumo agentūrų.",
   "apiKeyFormatError": "Netinkamas formatas — tikėtinas UUID (8-4-4-4-12)",
-  "supportProject": "Palaikykite šį projektą",
-  "supportDescription": "Ši programa yra nemokama, atviro kodo ir be reklamų. Jei manote, kad ji naudinga, apsvarstykite galimybę paremti kūrėją.",
-  "reportBug": "Pranešti apie klaidą / Pasiūlyti funkciją",
   "reportThisIssue": "Pranešti apie problemą",
   "reportAlreadySent": "Jūs jau pranešėte apie šią problemą.",
   "reportConsentTitle": "Pranešti GitHub?",
@@ -136,7 +107,6 @@
   "configApiKeysSection": "API raktai",
   "configTankerkoenigKey": "Tankerkoenig API raktas",
   "configApiKeyConfigured": "Sukonfigūruotas",
-  "configApiKeyNotSet": "Nenustatytas (demo režimas)",
   "configApiKeyCommunity": "Numatytasis (bendruomenės raktas)",
   "searchLocationPlaceholder": "Adresas, pašto kodas arba miestas",
   "configEvKey": "EV įkrovimo API raktas",
@@ -174,8 +144,6 @@
   "sortPriceDistance": "Kaina/km",
   "cheap": "pigu",
   "expensive": "brangu",
-  "stationsOnMap": "{count} stočių",
-  "loadingFavorites": "Įkeliami mėgstami...\nPirmiausia ieškokite stočių duomenims išsaugoti.",
   "reportPrice": "Pranešti apie kainą",
   "whatsWrong": "Kas negerai?",
   "correctPrice": "Teisinga kaina (pvz. 1,459)",
@@ -185,7 +153,6 @@
   "cacheCleared": "Podėlis išvalytas.",
   "yourPosition": "Jūsų pozicija",
   "positionUnknown": "Pozicija nežinoma",
-  "routeModeBannerLabel": "Maršruto režimas — atstumai išilgai koridoriaus",
   "distancesFromCenter": "Atstumai nuo paieškos centro",
   "autoUpdatePosition": "Automatiškai atnaujinti poziciją",
   "autoUpdateDescription": "Atnaujinti GPS poziciją prieš kiekvieną paiešką",
@@ -220,8 +187,6 @@
   "wrongDieselPrice": "Neteisinga dyzelino kaina",
   "wrongStatusOpen": "Rodoma kaip atidaryta, bet uždaryta",
   "wrongStatusClosed": "Rodoma kaip uždaryta, bet atidaryta",
-  "searchAlongRouteLabel": "Palei maršrutą",
-  "searchEvStations": "Ieškoti įkrovimo stočių",
   "allStations": "Visos stotys",
   "bestStops": "Geriausios stotelės",
   "openInMaps": "Atidaryti Žemėlapiuose",
@@ -253,7 +218,6 @@
   "cityOrAddress": "Miestas arba adresas",
   "useGps": "Naudoti GPS",
   "stop": "Stotelė",
-  "stopN": "Stotelė {n}",
   "addStop": "Pridėti stotelę",
   "searchAlongRoute": "Ieškoti palei maršrutą",
   "cheapest": "Pigiausia",
@@ -265,10 +229,8 @@
   "customKey": "Pasirinktinis raktas",
   "appDefaultKey": "Numatytasis programos raktas",
   "optionalOverrideKey": "Pasirinktinai: pakeiskite integruotą programos raktą savu",
-  "requiredForEvSearch": "Reikalingas EV įkrovimo stočių paieškai",
   "edit": "Redaguoti",
   "fuelPricesApiKey": "Degalų kainų API raktas",
-  "tankerkoenigApiKey": "Tankerkoenig API raktas",
   "evChargingApiKey": "EV įkrovimo API raktas",
   "openChargeMapApiKey": "OpenChargeMap API raktas",
   "routePlanningSection": "Maršruto planavimas",
@@ -303,18 +265,14 @@
   "noStationsAlongThisRoute": "Stočių palei šį maršrutą nerasta.",
   "fuelCostCalculator": "Degalų kaštų skaičiuoklė",
   "distanceKm": "Atstumas (km)",
-  "consumptionL100km": "Sąnaudos (L/100km)",
-  "fuelPriceEurL": "Degalų kaina (EUR/L)",
   "tripCost": "Kelionės kaina",
   "fuelNeeded": "Reikalingi degalai",
   "totalCost": "Bendra kaina",
-  "enterCalcValues": "Įveskite atstumą, sąnaudas ir kainą kelionės kainos apskaičiavimui",
   "priceHistory": "Kainų istorija",
   "ignoredStationsLabel": "Ignoruojama",
   "ratingsLabel": "Įvertinimai",
   "favoritesDataCache": "Mėgstamiausių duomenys",
   "citySearchCache": "Miesto paieška",
-  "dataDeletionNotAvailableCommunity": "Duomenų ištrynimas nepasiekiamas Bendruomenės režime. Pirmiausia atsijunkite arba naudokite privačią duomenų bazę.",
   "priceHistoryStationsTracked": "{count} stebimų stočių",
   "@priceHistoryStationsTracked": {
     "placeholders": {
@@ -348,22 +306,11 @@
     }
   },
   "noPriceHistory": "Kainų istorijos dar nėra",
-  "noHourlyData": "Nėra valandinių duomenų",
   "noStatistics": "Nėra prieinamų statistikų",
-  "statMin": "Min",
-  "statMax": "Maks",
-  "statAvg": "Vid",
   "showAllFuelTypes": "Rodyti visus degalų tipus",
   "connected": "Prisijungta",
-  "notConnected": "Neprisijungta",
-  "connectTankSync": "Prijungti TankSync",
   "disconnectTankSync": "Atjungti TankSync",
   "viewMyData": "Peržiūrėti mano duomenis",
-  "optionalCloudSync": "Pasirenkama debesų sinchronizacija įspėjimams, mėgstamiems ir push pranešimams",
-  "tapToUpdateGps": "Bakstelėkite GPS pozicijos atnaujinimui",
-  "gpsAutoUpdateHint": "GPS pozicija gaunama automatiškai ieškant. Čia galite ją atnaujinti ir rankiniu būdu.",
-  "clearGpsConfirm": "Išvalyti išsaugotą GPS poziciją? Galite ją bet kada atnaujinti iš naujo.",
-  "pageNotFound": "Puslapis nerastas",
   "deleteAllServerData": "Ištrinti visus serverio duomenis",
   "deleteServerDataConfirm": "Ištrinti visus serverio duomenis?",
   "deleteEverything": "Ištrinti viską",
@@ -373,7 +320,6 @@
   "forgetAllSyncedTripsConfirmBody": "Kiekvienas kelionės santraukos ir detalių blokas bus pašalintas iš serverio. Vietinė kelionių istorija šiame įrenginyje nebus paveikta.\n\nŠio veiksmo negalima atšaukti.",
   "forgetAllSyncedTripsConfirmAction": "Ištrinti viską",
   "forgetAllSyncedTripsSuccess": "Visos sinchronizuotos kelionės pašalintos iš serverio",
-  "disconnectConfirm": "Atjungti TankSync?",
   "disconnect": "Atjungti",
   "myServerData": "Mano serverio duomenys",
   "anonymousUuid": "Anoniminis UUID",
@@ -393,7 +339,6 @@
   "continueAsGuest": "Tęsti kaip svečias",
   "createAccount": "Sukurti paskyrą",
   "signIn": "Prisijungti",
-  "upgradeToEmail": "Sukurti el. pašto paskyrą",
   "savedRoutes": "Išsaugoti maršrutai",
   "noSavedRoutes": "Nėra išsaugotų maršrutų",
   "noSavedRoutesHint": "Ieškokite palei maršrutą ir išsaugokite jį greitai prieigai vėliau.",
@@ -424,11 +369,6 @@
   "onboardingNext": "Toliau",
   "onboardingSkip": "Praleisti",
   "onboardingFinish": "Pradėti",
-  "crossBorderNearby": "{country} yra netoliese",
-  "crossBorderDistance": "~{km} km iki sienos",
-  "crossBorderAvgPrice": "Vid. čia: {price} EUR ({count} stotelės)",
-  "allPricesView": "Visos kainos",
-  "compactView": "Kompaktiškas",
   "switchToAllPricesView": "Perjungti į visų kainų rodinį",
   "switchToCompactView": "Perjungti į kompaktišką rodinį",
   "unavailable": "N/A",
@@ -453,10 +393,6 @@
   "accountDeleted": "Paskyra ištrinta. Vietiniai duomenys išsaugoti.",
   "switchedToAnonymous": "Perjungta į anoniminę sesiją",
   "failedToSwitch": "Nepavyko perjungti: {error}",
-  "topicUrlCopied": "Temos URL nukopijuotas",
-  "testNotificationSent": "Bandomasis pranešimas išsiųstas!",
-  "testNotificationFailed": "Nepavyko išsiųsti bandomojo pranešimo",
-  "pushUpdateFailed": "Nepavyko atnaujinti stumtiamojo pranešimo nustatymo",
   "connectedAsGuest": "Prisijungta kaip svečias",
   "accountCreated": "Paskyra sukurta!",
   "signedIn": "Prisijungta!",
@@ -518,7 +454,6 @@
   "privacyClearErrorLog": "Išvalyti klaidų žurnalą",
   "privacyErrorLogCleared": "Klaidų žurnalas išvalytas",
   "privacyDeleteButton": "Ištrinti visus duomenis",
-  "privacyCopyErrorLog": "Kopijuoti klaidų žurnalą į iškarpinę ({count})",
   "privacyDeleteTitle": "Ištrinti visus duomenis?",
   "privacyDeleteBody": "Bus visam laikui ištrinta:\n\n- Visi mėgstami ir stotelių duomenys\n- Visi paieškos profiliai\n- Visi kainų įspėjimai\n- Visa kainų istorija\n- Visi talpykloje esantys duomenys\n- Jūsų API raktas\n- Visi programos nustatymai\n\nPrograma bus atstatyta į pradinę būseną. Šio veiksmo negalima atšaukti.",
   "privacyDeleteConfirm": "Ištrinti viską",
@@ -553,15 +488,8 @@
   "voiceAnnouncementsTitle": "Balso pranešimai",
   "voiceAnnouncementsDescription": "Pranešti apie artimas pigias degalines vairuojant",
   "voiceAnnouncementsEnabled": "Įjungti balso pranešimus",
-  "voiceAnnouncementThreshold": "Tik žemiau {price}",
-  "voiceAnnouncementCheapFuel": "{station}, {distance} kilometrų pirmyn, {fuelType} {price}",
   "voiceAnnouncementProximityRadius": "Pranešimų spindulys",
   "voiceAnnouncementCooldown": "Kartojimo intervalas",
-  "nearestStations": "Artimiausios degalines",
-  "nearestStationsHint": "Raskite artimiausias degalines pagal jusu dabartine vieta",
-  "consumptionLogTitle": "Kuro suvartojimas",
-  "consumptionLogMenuTitle": "Suvartojimo žurnalas",
-  "consumptionLogMenuSubtitle": "Sekite tankavimus ir skaičiuokite L/100km",
   "consumptionStatsTitle": "Suvartojimo statistika",
   "addFillUp": "Pridėti tankavimą",
   "noFillUpsTitle": "Dar nėra tankavimų",
@@ -595,14 +523,12 @@
   "vehiclesWizardYoursList": "Turite {count, plural, =1{1 transporto priemonę} other{{count} transporto priemones}}:",
   "vehiclesWizardSkipHint": "Praleiskite, kad baigtumėte sąranką — transporto priemones galite pridėti bet kada iš Nustatymų.",
   "fillUpVehicleLabel": "Transporto priemonė",
-  "fillUpVehicleNone": "Nėra transporto priemonės",
   "fillUpVehicleRequired": "Transporto priemonė būtina",
   "reportScanError": "Pranešti apie nuskaitymo klaidą",
   "pickStationTitle": "Pasirinkite stotelę",
   "pickStationHelper": "Pradėkite tankavimą iš žinomos stotelės, kad kainos, prekinis ženklas ir kuro tipas būtų užpildyti automatiškai.",
   "pickStationEmpty": "Dar nėra mėgstamų stotelių — pridėkite iš Paieškos arba Mėgstamų, arba praleiskite ir užpildykite rankiniu būdu.",
   "pickStationSkip": "Praleisti — pridėti be stotelės",
-  "scanPump": "Nuskaityti siurblį",
   "scanPayment": "Nuskaityti mokėjimo QR",
   "qrPaymentBeneficiary": "Gavėjas",
   "qrPaymentAmount": "Suma",
@@ -624,17 +550,10 @@
   "qrScannerRetry": "Bandyti dar kartą",
   "torchOn": "Įjungti blykstę",
   "torchOff": "Išjungti blykstę",
-  "obdNoAdapter": "Nėra OBD2 adapterio ryšio zonoje",
-  "obdOdometerUnavailable": "Nepavyko nuskaityti odometro",
   "obdPermissionDenied": "Suteikite Bluetooth leidimą sistemos nustatymuose",
-  "obdAdapterUnresponsive": "Adapteris neatsako — įjunkite uždegimą ir bandykite dar kartą",
   "obdPickerTitle": "Pasirinkite OBD2 adapterį",
   "obdPickerScanning": "Ieškoma adapterių…",
   "obdPickerConnecting": "Jungiamasi…",
-  "themeSettingTitle": "Tema",
-  "themeModeLight": "Šviesi",
-  "themeModeDark": "Tamsi",
-  "themeModeSystem": "Pagal sistemą",
   "tripRecordingTitle": "Kelionės įrašymas",
   "tripSummaryTitle": "Kelionės santrauka",
   "tripMetricDistance": "Atstumas",
@@ -676,18 +595,13 @@
   "syncBaselinesToggleTitle": "Bendrinti išmokytus transporto priemonių profilius",
   "syncBaselinesToggleSubtitle": "Įkelti kiekvienos transporto priemonės suvartojimo bazes, kad kitas įrenginys galėtų jas pakartotinai naudoti.",
   "obd2StatusConnected": "OBD2 adapteris: prijungtas",
-  "obd2StatusAttempting": "OBD2 adapteris: jungiamasi",
-  "obd2StatusUnreachable": "OBD2 adapteris: nepasiekiamas",
   "obd2StatusPermissionDenied": "OBD2 adapteris: reikalingas Bluetooth leidimas",
   "obd2StatusConnectedBody": "Paruošta įrašyti kelionę.",
-  "obd2StatusAttemptingBody": "Jungiamasi fone…",
-  "obd2StatusUnreachableBody": "Adapteris už ryšio zonos ribų arba jau naudojamas kitos programos.",
   "obd2StatusPermissionDeniedBody": "Suteikite Bluetooth leidimą sistemos nustatymuose, kad prisijungtumėte automatiškai.",
   "obd2StatusNoAdapter": "Nėra suporuoto adapterio",
   "obd2StatusForget": "Pašalinti adapterį",
   "tripHistoryTitle": "Kelionių istorija",
   "tripHistoryEmptyTitle": "Dar nėra kelionių",
-  "tripHistoryEmptySubtitle": "Prijunkite OBD2 adapterį ir įrašykite kelionę, kad pradėtumėte kaupti vairavimo istoriją.",
   "tripHistoryUnknownDate": "Nežinoma data",
   "situationIdle": "Tuščioji eiga",
   "situationStopAndGo": "Trūkčiojantis eismas",
@@ -697,12 +611,8 @@
   "situationClimbing": "Kalimas / pakrovimas",
   "situationHardAccel": "Staigus greitinimas",
   "situationFuelCut": "Kuro atjungimas — inercinė eiga",
-  "tripSaveAsFillUp": "Išsaugoti kaip tankavimą",
   "tripSaveRecording": "Išsaugoti kelionę",
-  "tripDiscard": "Atmesti",
-  "obdOdometerRead": "Odometras nuskaitytas: {km} km",
   "vehicleFuelNotSet": "Nenustatyta",
-  "wizardVehicleTapToEdit": "Palieskite, kad redaguotumėte",
   "wizardVehicleDefaultBadge": "Numatytasis",
   "wizardProfileChoiceHint": "Pasirinkite, kaip norite naudoti programą. Tai galite keisti vėliau Nustatymuose.",
   "wizardProfileChoiceFooter": "Savo pasirinkimą galite keisti bet kada Nustatymai → Naudojimo režimas.",
@@ -713,7 +623,6 @@
   "wizardProfileFullName": "Pilnas",
   "wizardProfileFullDescription": "Viskas iš Vidutinio, plius automatinis OBD2 kelionių įrašymas, vairavimo balai ir lojalumo kortelės.",
   "wizardProfileCustomName": "Pasirinktinis",
-  "wizardProfileCustomDescription": "Jūsų paties funkcijų derinys. Sureguliuokite kiekvieną jungiklį žemiau.",
   "useModeSectionHint": "Pritaikykite programą prie tikrojo naudojimo. Pasirinkus išankstinį nustatymą, įjungiamas atitinkamas funkcijų rinkinys.",
   "useModeCustomSettingsDescription": "Jūsų funkcijų derinys neatitinka jokio išankstinio nustatymo. Pasirinkite vieną aukščiau, kad perrašytumėte, arba toliau tinkinkite atskiras funkcijas žemiau esančiame skyriuje.",
   "useModeSwitchedSnack": "Naudojimo režimas nustatytas į {profile}.",
@@ -751,20 +660,15 @@
   "evShowOnMap": "Rodyti EV stoteles",
   "evAvailableOnly": "Tik laisvos",
   "evMinPower": "Min galia",
-  "evMaxPower": "Maks galia",
-  "evOperator": "Operatorius",
-  "evLastUpdate": "Paskutinis atnaujinimas",
   "evStatusAvailable": "Laisva",
   "evStatusOccupied": "Užimta",
   "evStatusOutOfOrder": "Neveikia",
   "openOnlyFilter": "Tik atidarytos",
   "saveAsDefaults": "Išsaugoti kaip numatytuosius",
   "criteriaSavedToProfile": "Išsaugota kaip numatytieji",
-  "profileNotFound": "Nėra aktyvaus profilio",
   "updatingFavorites": "Atnaujinami jūsų mėgstami...",
   "fetchingLatestPrices": "Gaunamos naujausios kainos",
   "noDataAvailable": "Nėra duomenų",
-  "configAndPrivacy": "Konfigūracija ir privatumas",
   "searchToSeeMap": "Ieškokite, kad matytumėte stoteles žemėlapyje",
   "evPowerAny": "Bet kokia",
   "evPowerKw": "{kw} kW+",
@@ -819,9 +723,6 @@
   "iosAutoRecordOnboardingBullet3Title": "Kai iOS prašo \"Visada\" vietos leidimo, prašome sutikti.",
   "iosAutoRecordOnboardingBullet3Body": "Atsarginė sistema, kuri įrašo jūsų kelionę, kai OBD2 adapteris lėtas, reikalauja foninės vietos. Mes jos niekada nebendrinsime.",
   "scanReceipt": "Nuskaityti kvitą",
-  "obdConnect": "OBD-II",
-  "stationTypeFuel": "Degalinė",
-  "stationTypeEv": "EV",
   "brandFilterHighway": "Greitkelis",
   "ratingModeLocal": "Vietinis",
   "ratingModePrivate": "Privatus",
@@ -841,7 +742,6 @@
   "errorHintRouting": "Maršruto skaičiavimas nepavyko. Patikrinkite interneto ryšį ir bandykite dar kartą.",
   "errorHintFallback": "Bandykite dar kartą arba ieškokite pagal pašto kodą / miesto pavadinimą.",
   "alertsLoadErrorTitle": "Nepavyko įkelti jūsų įspėjimų",
-  "alertsBackgroundCheckErrorTitle": "Foninė įspėjimų patikra nepavyko",
   "detailsLabel": "Detalės",
   "remove": "Pašalinti",
   "showKey": "Rodyti raktą",
@@ -950,19 +850,11 @@
   "linkDeviceHowItWorksBody": "1. Įrenginyje A: nukopijuokite įrenginio kodą aukščiau\n2. Įrenginyje B: įklijuokite jį į lauką \"Įrenginio kodas\"\n3. Palieskite \"Importuoti duomenis\", kad sujungtumėte mėgstamus, įspėjimus, transporto priemones ir suvartojimo žurnalus\n4. Abu įrenginiai turės visus sujungtus duomenis\n\nKiekvienas įrenginys turi savo anoniminę tapatybę ir savo profilį (pageidaujamas kuras, numatytoji transporto priemonė, pradinis ekranas). Duomenys sujungiami, o ne perkeliami.",
   "vehicleSetActive": "Nustatyti aktyvų",
   "swipeHide": "Slėpti",
-  "evChargingSection": "EV įkrovimas",
-  "fuelStationsSection": "Degalinės",
   "yourRating": "Jūsų įvertinimas",
   "noStorageUsed": "Saugykla nenaudojama",
   "aboutReportBug": "Pranešti apie klaidą / Pasiūlyti funkciją",
   "aboutSupportProject": "Palaikyti šį projektą",
   "aboutSupportDescription": "Ši programa yra nemokama, atvirojo kodo ir be reklamos. Jei ji jums naudinga, apsvarstykite galimybę palaikyti kūrėją.",
-  "luxembourgRegulatedPricesNotice": "Liuksemburgo kuro kainos yra valstybės reguliuojamos ir vienodos visoje šalyje.",
-  "luxembourgFuelUnleaded95": "95 be švino",
-  "luxembourgFuelUnleaded98": "98 be švino",
-  "luxembourgFuelDiesel": "Dyzelis",
-  "luxembourgFuelLpg": "LPG",
-  "luxembourgPricesUnavailable": "Liuksemburgo reguliuojamos kainos nepasiekiamos.",
   "reportIssueTitle": "Pranešti apie problemą",
   "enterCorrection": "Įveskite pataisymą",
   "reportNoBackendAvailable": "Pranešimo išsiųsti nepavyko: šiai šaliai nėra sukonfigūruotos pranešimų tarnybos. Įjunkite TankSync Nustatymuose, kad siųstumėte bendruomenės pranešimus.",
@@ -989,10 +881,6 @@
   "serviceReminderMarkDone": "Pažymėti kaip atliktą",
   "serviceReminderDueTitle": "Laikas priežiūrai",
   "serviceReminderDueBody": "{label} laikas — {kmOver} km praėjo intervalą.",
-  "southKoreaApiKeyRequired": "Užsiregistruokite OPINET, kad gautumėte nemokamą API raktą",
-  "southKoreaApiProvider": "OPINET (KNOC)",
-  "chileApiKeyRequired": "Užsiregistruokite CNE, kad gautumėte nemokamą API raktą",
-  "chileApiProvider": "CNE Bencina en Linea",
   "vinConfirmTitle": "Ar tai jūsų automobilis?",
   "vinConfirmBody": "{year} {make} {model} — {displacement}L, {cylinders} cilindrai, {fuel}",
   "vinPartialInfoNote": "Dalinė informacija (neprisijungus). Galite redaguoti žemiau.",
@@ -1011,17 +899,13 @@
   "alertsRadiusCreateTitle": "Sukurti spindulio įspėjimą",
   "alertsRadiusLabelHint": "Etiketė (pvz. Namų dyzelis)",
   "alertsRadiusFuelType": "Kuro tipas",
-  "alertsRadiusThreshold": "Riba (€/L)",
   "alertsRadiusKm": "Spindulys (km)",
   "alertsRadiusCenterGps": "Naudoti mano vietą",
   "alertsRadiusCenterPostalCode": "Pašto kodas",
   "alertsRadiusSave": "Išsaugoti",
   "alertsRadiusCancel": "Atšaukti",
-  "alertsRadiusDeleteConfirm": "Ištrinti spindulio įspėjimą?",
   "obd2ConnectedTooltip": "OBD2 prijungtas: {adapterName}",
   "obd2PairChipTooltip": "Suporuoti OBD2 adapterį",
-  "velocityAlertTitle": "{fuelLabel} nukrito artimose stotelėse",
-  "velocityAlertBody": "{stationCount} stotelių kaina nukrito iki {maxDropCents}¢ per paskutinę valandą",
   "fillUpSavedSnackbar": "Tankavimas išsaugotas",
   "radiusAlertsEntryTitle": "Spindulio įspėjimai ir statistika",
   "radiusAlertsEntrySubtitle": "Gaukite pranešimą, kai kainos nukris netoliese",
@@ -1060,8 +944,6 @@
   "autoRecordStatusPairAdapterCta": "Suporuoti adapterį",
   "autoRecordSpeedThresholdLabel": "Paleidimo greitis (km/h)",
   "autoRecordSaveDelayLabel": "Išsaugojimo delsimas po atsijungimo (sekundės)",
-  "autoRecordPairedAdapterLabel": "Suporuotas adapteris",
-  "autoRecordPairedAdapterNone": "Nėra suporuoto adapterio. Pirmiausia suporuokite per OBD2 diegimą.",
   "autoRecordBackgroundLocationLabel": "Foninė vieta leista",
   "autoRecordBackgroundLocationRequest": "Prašyti leidimo",
   "autoRecordBackgroundLocationRationaleTitle": "Kodėl \"Visada leisti\"?",
@@ -1069,18 +951,12 @@
   "autoRecordBackgroundLocationOpenSettings": "Atidaryti nustatymus",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Reikalingas vietos leidimas",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Nepavyko prašyti foninės vietos",
-  "autoRecordBadgeClearTooltip": "Išvalyti skaitiklį",
   "autoRecordPairAdapterLinkText": "Suporuokite adapterį žemiau esančiame skyriuje, kad įjungtumėte automatinį įrašymą",
-  "exportBackupTooltip": "Eksportuoti atsarginę kopiją",
   "exportBackupReady": "Atsarginė kopija paruošta — pasirinkite paskirties vietą",
   "exportBackupFailed": "Atsarginės kopijos eksportas nepavyko — bandykite dar kartą",
-  "brokenMapChipVerifying": "MAP jutiklis tikrinamas…",
   "brokenMapChipDisclaimer": "MAP rodymai įtartini",
   "brokenMapSnackbarUnreliable": "MAP jutiklis rodo neteisingai — kuro rodmenys gali būti 50–80% per maži. Išbandykite kitą adapterį.",
   "brokenMapBannerHardDisable": "MAP jutiklis nepatikimas. Rodomi tankavimo vidurkiai vietoj tiesioginės kuro normos.",
-  "brokenMapOverlayVerified": "MAP jutiklis: patikrintas ({confidence})",
-  "brokenMapOverlayUnverified": "MAP jutiklis: tikrinamas ({confidence})",
-  "brokenMapOverlaySuspicious": "MAP jutiklis: įtartinas ({confidence})",
   "brokenMapOverlayPosterior": "MAP jutiklis: {posterior}% ± {margin}%",
   "brokenMapOverlayPosteriorVerified": "MAP jutiklis: {posterior}% ± {margin}% (patikrintas)",
   "brokenMapDiagnosticsCardTitle": "MAP jutiklio diagnostika",
@@ -1142,7 +1018,6 @@
   "chargingCostTrendTitle": "Įkrovimo kainos tendencija",
   "chargingEfficiencyTitle": "Efektyvumas (kWh/100 km)",
   "chargingChartsEmpty": "Dar nepakanka duomenų",
-  "chargingChartsMonthAxis": "Mėnuo",
   "consoFeatureGroupTitle": "Suvartojimas",
   "consoFeatureGroupDescription": "Sekite suvartojimą — rankinis tankavimas arba automatinis OBD2 kelionių įrašymas.",
   "consoModeOff": "Išjungta",
@@ -1158,10 +1033,6 @@
   "fillUpCorrectionEditExplainer": "Šis įrašas buvo automatiškai sugeneruotas, kad užpildytų skirtumą tarp įrašytų kelionių ir supilto kuro. Sureguliuokite reikšmes, jei žinote tikruosius duomenis.",
   "fillUpCorrectionDelete": "Ištrinti pataisymą",
   "fillUpCorrectionStation": "Stotelės pavadinimas (neprivaloma)",
-  "greeceApiProvider": "Paratiritirio Timon (Graikija)",
-  "greeceCommunityApiNotice": "Veikia bendruomenės palaikomu fuelpricesgr API",
-  "romaniaApiProvider": "Monitorul Prețurilor (Rumunija)",
-  "romaniaScrapingNotice": "Veikia monitorulpreturilor.info (Konkurencijos taryba + ANPC)",
   "crossBorderCheaper": "{country} stotelės {km} km atstumu — €{price}/L pigiau",
   "crossBorderTapToSwitch": "Palieskite, kad perjungtumėte šalį",
   "crossBorderDismissTooltip": "Atmesti",
@@ -1186,9 +1057,6 @@
   "drivingScorePenaltyHardBrake": "Staigus stabdymas",
   "drivingScorePenaltyHighRpm": "Dideli apsukimai",
   "drivingScorePenaltyFullThrottle": "Pilnas akseleratorius",
-  "ecoRouteOption": "Eko",
-  "ecoRouteSavings": "≈ {liters} L sutaupyta",
-  "ecoRouteHint": "Protingesnis maršrutas — teikia pirmenybę tolygiam greitkeliui prieš vingiuotus kelius.",
   "favoritesShareAction": "Bendrinti",
   "favoritesShareSubject": "Sparkilo — mėgstami {date}",
   "favoritesShareError": "Nepavyko sugeneruoti bendrinimo vaizdo",
@@ -1206,8 +1074,6 @@
   "featureDescription_consumptionAnalytics": "Tankavimų ir kelionių analizės skirtukas.",
   "featureLabel_baselineSync": "Bazių sinchronizavimas",
   "featureDescription_baselineSync": "Sinchronizuoti vairavimo bazes per TankSync.",
-  "featureLabel_unifiedSearchResults": "Suvienodyti paieškos rezultatai",
-  "featureDescription_unifiedSearchResults": "Vienas rezultatų sąrašas, jungiantis degalines ir EV stotelės.",
   "featureLabel_priceAlerts": "Kainų įspėjimai",
   "featureDescription_priceAlerts": "Pranešimai apie kainos kritimą pagal ribą.",
   "featureLabel_priceHistory": "Kainų istorija",
@@ -1235,8 +1101,6 @@
   "featureBlockedEnable_glideCoach": "Pirmiausia įjunkite OBD2 kelionių įrašymą",
   "featureBlockedEnable_gpsTripPath": "Pirmiausia įjunkite OBD2 kelionių įrašymą",
   "featureBlockedEnable_autoRecord": "Pirmiausia įjunkite OBD2 kelionių įrašymą",
-  "featureBlockedEnable_showFuel": "Sąlygos neįvykdytos",
-  "featureBlockedEnable_showElectric": "Sąlygos neįvykdytos",
   "featureBlockedEnable_showConsumptionTab": "Pirmiausia įjunkite OBD2 kelionių įrašymą",
   "featureLabel_tflitePricePrediction": "TFLite kainų prognozavimas",
   "featureDescription_tflitePricePrediction": "Įrenginyje esantis kainų prognozavimo modelis — išvados vykdomos vietiškai; funkcijos ir prognozės nepalieka įrenginio.",
@@ -1281,15 +1145,12 @@
   "scanReceiptNoData": "Kvito duomenų nerasta — bandykite dar kartą",
   "scanReceiptSuccess": "Kvitas nuskaitytas — patikrinkite reikšmes. Palieskite \"Pranešti apie nuskaitymo klaidą\" žemiau, jei kas nors negerai.",
   "scanReceiptFailed": "Nuskaitymas nepavyko: {error}",
-  "scanPumpUnreadable": "Siurblio ekranas neįskaitomas — bandykite dar kartą",
-  "pumpCameraHint": "Sulygiuokite tris degalinės ekrano skaičius rėmelyje",
   "pumpCameraCapture": "Fotografuoti",
   "pumpCameraPermissionDenied": "Norint nuskaityti degalinės ekraną, reikia prieigos prie kameros. Įjunkite ją įrenginio nustatymuose.",
   "pumpCameraError": "Nepavyko paleisti kameros. Bandykite dar kartą arba įveskite reikšmes rankiniu būdu.",
   "scanPumpSuccess": "Siurblio ekranas nuskaitytas — patikrinkite reikšmes.",
   "scanPumpGlare": "Per daug atspindžių ekrane — bandykite dar kartą šiek tiek kampu, kad skaičiai nebūtų peršviesti.",
   "scanPumpFailed": "Siurblio nuskaitymas nepavyko: {error}",
-  "badScanReportTitle": "Pranešti apie nuskaitymo klaidą",
   "badScanReportTitleReceipt": "Pranešti apie nuskaitymo klaidą — Kvitas",
   "badScanReportTitlePumpDisplay": "Pranešti apie nuskaitymo klaidą — Siurblio ekranas",
   "pumpScanFailureTitle": "Ekranas neįskaitomas",
@@ -1298,7 +1159,6 @@
   "pumpScanFailureReport": "Pranešti",
   "pumpScanFailureRemove": "Pašalinti nuotrauką",
   "badScanReportHint": "Bendrinsime kvito nuotrauką ir abi reikšmių rinkinius, kad kitas versijos variantas galėtų išmokti šį išdėstymą.",
-  "badScanReportShareAction": "Bendrinti ataskaitą + nuotrauką",
   "badScanReportFieldBrandLayout": "Prekinio ženklo išdėstymas",
   "badScanReportFieldTotal": "Iš viso",
   "badScanReportFieldPricePerLiter": "Kaina/L",
@@ -1315,16 +1175,9 @@
   "fillUpSectionWhatSubtitle": "Kuras, kiekis, kaina",
   "fillUpSectionWhereTitle": "Kur buvote",
   "fillUpSectionWhereSubtitle": "Stotelė, odometras, pastabos",
-  "fillUpImportFromLabel": "Importuoti iš…",
-  "fillUpImportSheetTitle": "Importuoti tankavimo duomenis",
   "fillUpImportReceiptLabel": "Kvitas",
-  "fillUpImportReceiptDescription": "Nuskaitykite popieriaus kvitą su kamera",
   "fillUpImportPumpLabel": "Siurblio ekranas",
-  "fillUpImportPumpDescription": "Nuskaityti sumą / kainą iš siurblio LCD",
-  "fillUpImportObdLabel": "OBD-II adapteris",
-  "fillUpImportObdDescription": "Nuskaityti odometrą iš OBD-II prievado per Bluetooth",
   "fillUpPricePerLiterLabel": "Kaina už litrą",
-  "vehicleHeaderPlateLabel": "Numeriai",
   "vehicleHeaderUntitled": "Nauja transporto priemonė",
   "vehicleSectionIdentityTitle": "Tapatybė",
   "vehicleSectionIdentitySubtitle": "Pavadinimas ir VIN",
@@ -1340,7 +1193,6 @@
   "gpsDiagnosticsHeader": "{count} mėginiai · {span} · {gaps, plural, =0{nėra spragų} =1{1 spraga} other{{gaps} spragos}}",
   "gpsDiagnosticsCadence": "Medianinis intervalas: {ms} ms",
   "gpsDiagnosticsExplain": "Fiksuota įrašymo metu, siekiant patikrinti GPS ritmiką telefono miego režimo metu.",
-  "hapticEcoCoachSectionTitle": "Vairavimas",
   "hapticEcoCoachSettingTitle": "Realaus laiko eko mokymas",
   "hapticEcoCoachSettingSubtitle": "Švelnus haptikas ir ekrane rodomas patarimas, kai pilnai spaudžiate pedalą kruizinio valdymo metu",
   "hapticEcoCoachSnackBarMessage": "Atsargiau su akseleratoriumi — inercinė eiga taupo daugiau",
@@ -1370,9 +1222,6 @@
   "calculatorDistanceHint": "pvz. 150",
   "calculatorConsumptionHint": "pvz. 7,0",
   "calculatorPriceHint": "pvz. 1,899",
-  "routeStrategyLabel": "Strategija:",
-  "routeStrategyUniform": "Vienoda",
-  "routeStrategyBalanced": "Subalansuota",
   "glideCoachBetaTitle": "Slydimo trenerio beta versija (eksperimentinė)",
   "glideCoachBetaSubtitle": "Subtilus haptikas lėtėjant prieš raudoną šviesą. Numatytai išjungtas — blaškymosi pavojus.",
   "consentSyncTripsTitle": "Sinchronizuoti kelionių įrašus",
@@ -1428,7 +1277,6 @@
   "onboardingObd2ConnectButton": "Prijungti adapterį",
   "onboardingObd2SkipButton": "Gal vėliau",
   "onboardingObd2ReadingVin": "Nuskaitomas VIN…",
-  "onboardingObd2VinReadFailed": "Nepavyko nuskaityti VIN — įveskite rankiniu būdu",
   "onboardingObd2ConnectFailed": "Nepavyko prisijungti prie adapterio. Galite bandyti dar kartą arba praleisti.",
   "onboardingPickUseMode": "Norėdami tęsti, pasirinkite naudojimo režimą.",
   "alertsRadiusFrequencyLabel": "Patikrinimo dažnis",
@@ -1442,9 +1290,6 @@
   "radiusAlertMapPickerCancel": "Atšaukti",
   "radiusAlertMapPickerHint": "Vilkite žemėlapį, kad nustatytumėte įspėjimo centrą",
   "radiusAlertCenterFromMap": "Žemėlapio vieta",
-  "radiusAlertNotificationTitle": "{fuelLabel} prie {label}",
-  "radiusAlertNotificationBody": "Stotelė kainuoja {price} € (tikslas: {threshold} €)",
-  "refuelUnitPerLiter": "/L",
   "refuelUnitPerKwh": "/kWh",
   "refuelUnitPerSession": "/sesija",
   "speedConsumptionCardTitle": "Suvartojimas pagal greitį",
@@ -1463,9 +1308,6 @@
   "tankLevelLitersFormat": "{litres} L",
   "tankLevelRangeFormat": "≈ {kilometres} km rida",
   "tankLevelLastFillUpFormat": "Paskutinis tankavimas: {date} · {count} kelionė(s) nuo tada",
-  "tankLevelMethodObd2": "OBD2 matuojamas",
-  "tankLevelMethodDistanceFallback": "atstumo pagrįstas įvertis",
-  "tankLevelMethodMixed": "mišrus matavimas",
   "tankLevelEmptyNoFillUp": "Įveskite tankavimą, kad matytumėte bako lygį",
   "tankLevelDetailSheetTitle": "Kelionės nuo paskutinio tankavimo",
   "addFillUpIsFullTankLabel": "Pilnas bakas",
@@ -1536,7 +1378,6 @@
   "trajetDetailDeleteAction": "Ištrinti",
   "trajetDetailDeleteConfirmTitle": "Ištrinti šią kelionę?",
   "trajetDetailDeleteConfirmBody": "Ši kelionė bus visam laikui pašalinta iš jūsų istorijos.",
-  "trajetDetailDeleteConfirmCancel": "Atšaukti",
   "trajetDetailDeleteConfirmConfirm": "Ištrinti",
   "tripRecordingObd2NotResponding": "OBD2 adapteris prijungtas, bet negrąžina duomenų. Išbandykite kitą adapterį arba patikrinkite transporto priemonės diagnostikos protokolą.",
   "trajetsViewAllOnMap": "Rodyti visus žemėlapyje",
@@ -1552,7 +1393,6 @@
   "tripLengthBucketTripCount": "{count, plural, =0{nėra kelionių} one{1 kelionė} other{{count} kelionės}}",
   "tripPathCardTitle": "Kelionės maršrutas",
   "tripPathCardSubtitle": "GPS įrašytas maršrutas",
-  "tripPathLegendTitle": "Suvartojimas",
   "tripPathLegendEfficient": "Efektyvus (< 6 L/100km)",
   "tripPathLegendBorderline": "Ribinis (6–10 L/100km)",
   "tripPathLegendWasteful": "Švaistymas (≥ 10 L/100km)",
@@ -1563,13 +1403,8 @@
   "tripRecordingPinHelpTitle": "Apie prisegimą",
   "tripRecordingPinHelpBody": "Prisegimas palaiko ekraną įjungtą ir slepia sistemos juosteles, kad forma išliktų skaitoma, montuojant prietaisų skydelyje. Palieskite dar kartą, kad atleistumėte. Automatiškai atleidžiama, kai kelionė sustabdoma.",
   "tripRecordingResumeHintMessage": "Įrašymas tęsiamas fone. Palieskite raudoną juostą bet kurio ekrano viršuje, kad grįžtumėte.",
-  "tripBannerOpenFromConsumptionTab": "Atidarykite aktyvią kelionę iš suvartojimo skirtuko",
   "tripRecordingUnpinnedWarning": "Prisekite ekraną, kad GPS veiktų kelionės metu — Android gali riboti GPS miego režimo metu.",
   "tripRecordingMinimiseTooltip": "Sumažinti į slankųjį langelį",
-  "unifiedFilterFuel": "Kuras",
-  "unifiedFilterEv": "EV",
-  "unifiedFilterBoth": "Abu",
-  "unifiedNoResultsForFilter": "Nėra rezultatų, atitinkančių šį filtrą",
   "searchFailedSnackbar": "Paieška nepavyko — bandykite dar kartą",
   "vinLabel": "VIN (neprivaloma)",
   "vinDecodeTooltip": "Iššifruoti VIN",
@@ -1601,7 +1436,6 @@
   "gdprVinOnlineDecodeTitle": "VIN interneto iššifravimas",
   "gdprVinOnlineDecodeShort": "Iššifruoti VIN per NHTSA nemokamą viešą paslaugą",
   "gdprVinOnlineDecodeDescription": "Kai suporuojate adapterį, jūsų transporto priemonės VIN nuskaitomas vietiškai automobiliui identifikuoti. Įjungus tai, 17 simbolių VIN išsiunčiamas į NHTSA nemokamą vPIC paslaugą papildomoms detalėms peržiūrėti (modelis, variklio darbinis tūris, kuro tipas). VIN yra vieninteliai išsiunčiami duomenys — jokia kita informacija nepalieka jūsų įrenginio.",
-  "vehicleDetectedFromVinBadge": "(aptikta)",
   "vehicleDetectedFromVinSnackbar": "Aptikta iš VIN: {summary}. Taikyti?",
   "vehicleDetectedFromVinApply": "Taikyti",
   "widgetHelpSectionTitle": "Pradinio ekrano valdiklis",
@@ -1620,7 +1454,6 @@
   "widgetColorSchemeOrange": "Oranžinė",
   "widgetVariantDefault": "Tik dabartinė kaina",
   "widgetVariantPredictive": "Prognozuojama: geriausias laikas tankuoti",
-  "widgetPredictiveNowPrefix": "dabar",
   "@distance": {
     "placeholders": {
       "distance": {
@@ -1645,13 +1478,6 @@
   "@hours": {
     "placeholders": {
       "n": {
-        "type": "int"
-      }
-    }
-  },
-  "@stationsOnMap": {
-    "placeholders": {
-      "count": {
         "type": "int"
       }
     }
@@ -1700,13 +1526,6 @@
   "@evConnectors": {
     "placeholders": {
       "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@stopN": {
-    "placeholders": {
-      "n": {
         "type": "int"
       }
     }
@@ -1850,25 +1669,11 @@
       }
     }
   },
-  "approachStationDistance": "{meters} m atstumu",
-  "@approachStationDistance": {
-    "description": "PiP overlay caption (#2084) showing how far the driver is from the in-radius target station, in metres.",
-    "placeholders": {
-      "meters": {
-        "type": "String",
-        "example": "350"
-      }
-    }
-  },
   "tripRecordingPipElapsedCaption": "praėjo",
   "@tripRecordingPipElapsedCaption": {
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
-  "fabOpenCriteria": "Atidaryti paiešką",
-  "fabOpenResults": "Atidaryti rezultatus",
   "fabRunSearch": "Vykdyti paiešką",
-  "fabRefineCriteria": "Tikslinti paiešką",
-  "routeSearchPartialBanner": "Ieškoma daugiau stočių…",
   "privacySaveErrorLog": "Įrašyti klaidų žurnalą ({count})",
   "@privacySaveErrorLog": {
     "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
@@ -2418,10 +2223,6 @@
   "@trajetDetailChartCoolant": {
     "description": "MT — needs native review"
   },
-  "trajetDetailChartAltitude": "Aukštis (m)",
-  "@trajetDetailChartAltitude": {
-    "description": "MT — needs native review"
-  },
   "trajetDetailChartLambda": "Nurodytas λ",
   "@trajetDetailChartLambda": {
     "description": "MT — needs native review"
@@ -2654,14 +2455,6 @@
   "@obd2HealthHistorySection": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyJson": "Kopijuoti kaip JSON",
-  "@obd2HealthCopyJson": {
-    "description": "MT — needs native review"
-  },
-  "obd2HealthCopied": "OBD2 diagnostika nukopijuota į iškarpinę.",
-  "@obd2HealthCopied": {
-    "description": "MT — needs native review"
-  },
   "evStatusPartial": "Dalinai prieinama",
   "@evStatusPartial": {
     "description": "MT — needs native review"
@@ -2767,10 +2560,6 @@
   },
   "ocrTesterRunning": "Vykdomas OCR…",
   "@ocrTesterRunning": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterNoResult": "OCR negavo nuskaitomo rezultato.",
-  "@ocrTesterNoResult": {
     "description": "MT — needs native review"
   },
   "ocrTesterOverlaySection": "Bloko perdanga",
@@ -2937,10 +2726,6 @@
   "@obd2DiagnosticsInitCold": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyInitTranscript": "Kopijuoti tik inicijavimo stenogramą",
-  "@obd2HealthCopyInitTranscript": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterSaveFixture": "Išsaugoti kaip priedą",
   "@ocrTesterSaveFixture": {
     "description": "MT — needs native review"
@@ -3092,10 +2877,6 @@
   "@obd2GpsDegradedBannerTitle": {
     "description": "MT — needs native review"
   },
-  "restoreBackupTooltip": "Atkurti atsarginę kopiją",
-  "@restoreBackupTooltip": {
-    "description": "MT — needs native review"
-  },
   "restoreBackupDialogTitle": "Atkurti atsarginę kopiją",
   "@restoreBackupDialogTitle": {
     "description": "MT — needs native review"
@@ -3111,15 +2892,6 @@
   "restoreBackupReplaceAction": "Pakeisti viską",
   "@restoreBackupReplaceAction": {
     "description": "MT — needs native review"
-  },
-  "restoreBackupSuccess": "Atsarginė kopija atkurta — importuota {count} įrašų",
-  "@restoreBackupSuccess": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
   },
   "restoreBackupEmpty": "Atsarginė kopija atkurta — joje nebuvo įrašų",
   "@restoreBackupEmpty": {
@@ -3391,16 +3163,6 @@
   "voiceCoachingSettingSubtitle": "Gaukite balsinius patarimus vairuodami — stiprus greičio didinimas, staigus stabdymas ir pavarų užuominos",
   "@voiceCoachingSettingSubtitle": {
     "description": "MT — needs native review"
-  },
-  "fuelStationRadarDistanceKm": "{km} km atstumu",
-  "@fuelStationRadarDistanceKm": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "km": {
-        "type": "String",
-        "example": "2.4"
-      }
-    }
   },
   "fuelStationRadarProximity": "Artumas {percent}%",
   "@fuelStationRadarProximity": {
@@ -3733,10 +3495,6 @@
   },
   "consumptionStatsChartConsumption": "L/100km per mėnesį",
   "@consumptionStatsChartConsumption": {
-    "description": "MT — needs native review"
-  },
-  "shareReceiptImporting": "Importuojamas bendrinamas kvitas…",
-  "@shareReceiptImporting": {
     "description": "MT — needs native review"
   },
   "shareReceiptUnsupportedFormat": "Šis failo tipas dar negali būti importuotas — vietoj to bendrinkite kvito nuotrauką.",
@@ -4228,17 +3986,6 @@
       "count": {
         "type": "int",
         "example": "3"
-      }
-    }
-  },
-  "fuelEfficiencyMixedFootnote": "{count, plural, =1{1 mixed tank counted toward its main fuel} other{{count} mixed tanks counted toward their main fuel}}",
-  "@fuelEfficiencyMixedFootnote": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int",
-        "example": "1"
       }
     }
   },
@@ -4752,11 +4499,6 @@
         "example": "Oil change"
       }
     }
-  },
-  "radarAcquiringLocation": "Finding your location…",
-  "@radarAcquiringLocation": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
   },
   "radarUpdatingLocation": "Updating your location…",
   "@radarUpdatingLocation": {

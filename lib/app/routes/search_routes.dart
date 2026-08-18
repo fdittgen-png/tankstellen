@@ -7,6 +7,8 @@ import '../../core/navigation/app_routes.dart';
 import '../../features/alerts/presentation/screens/alerts_screen.dart';
 import '../../features/calculator/presentation/screens/calculator_screen.dart';
 import '../../features/driving/presentation/screens/driving_mode_screen.dart';
+import '../../features/feature_management/domain/feature.dart';
+import 'feature_gated_screen.dart';
 
 /// Search-adjacent routes that push on top of the bottom-nav shell:
 /// driving mode, alerts list, and the fuel-cost calculator. These all
@@ -19,7 +21,16 @@ List<RouteBase> get searchRoutes => [
       ),
       GoRoute(
         path: RoutePaths.alerts,
-        builder: (context, state) => const AlertsScreen(),
+        // Feature.priceAlerts finally gates its surface (2026-08-17
+        // review, dead-code finding 6): route-guarded like the #1613
+        // carbonDashboard precedent so a deep link cannot reach the
+        // alerts list when the toggle is off. Default-on — behavior
+        // unchanged unless the user disables it.
+        builder: (context, state) => const FeatureGatedScreen(
+          feature: Feature.priceAlerts,
+          fallbackPath: RoutePaths.favorites,
+          child: AlertsScreen(),
+        ),
       ),
       GoRoute(
         path: RoutePaths.calculator,

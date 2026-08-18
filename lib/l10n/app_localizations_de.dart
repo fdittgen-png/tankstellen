@@ -45,22 +45,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get searchNearby => 'Tankstellen in der Nähe';
 
   @override
-  String get searchButton => 'Suchen';
-
-  @override
-  String get fabOpenCriteria => 'Suche öffnen';
-
-  @override
-  String get fabOpenResults => 'Ergebnisse anzeigen';
-
-  @override
   String get fabRunSearch => 'Suche starten';
-
-  @override
-  String get fabRefineCriteria => 'Suche verfeinern';
-
-  @override
-  String get routeSearchPartialBanner => 'Weitere Tankstellen werden gesucht…';
 
   @override
   String get routeSearchingChip => 'Route wird gesucht…';
@@ -74,15 +59,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get searchCriteriaTitle => 'Suchkriterien';
 
   @override
-  String get searchCriteriaOpen => 'Suchen';
-
-  @override
   String searchCriteriaRadiusBadge(String km) {
     return 'Im Umkreis von $km km';
   }
-
-  @override
-  String get searchCriteriaTapToSearch => 'Tippen, um die Suche zu starten';
 
   @override
   String get noResults => 'Keine Tankstellen gefunden.';
@@ -124,10 +103,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get apiKeySetup => 'API-Schlüssel einrichten';
-
-  @override
-  String get apiKeyDescription =>
-      'Registrieren Sie sich einmalig für einen kostenlosen API-Schlüssel.';
 
   @override
   String get apiKeyLabel => 'API-Schlüssel';
@@ -234,19 +209,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get country => 'Land';
 
   @override
-  String get demoMode => 'Demo-Modus — Beispieldaten werden angezeigt.';
-
-  @override
-  String get setupLiveData => 'Für Live-Daten einrichten';
-
-  @override
   String get freeNoKey => 'Kostenlos — kein Schlüssel nötig';
 
   @override
   String get apiKeyRequired => 'API-Schlüssel erforderlich';
-
-  @override
-  String get skipWithoutKey => 'Ohne Schlüssel fortfahren';
 
   @override
   String get dataTransparency => 'Datentransparenz';
@@ -258,67 +224,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get clearCache => 'Cache leeren';
 
   @override
-  String get clearAllData => 'Alle Daten löschen';
-
-  @override
-  String get errorLog => 'Fehlerprotokoll';
-
-  @override
   String stationsFound(int count) {
     return '$count Tankstellen gefunden';
   }
-
-  @override
-  String get whatIsShared => 'Was wird geteilt — und mit wem?';
-
-  @override
-  String get gpsCoordinates => 'GPS-Koordinaten';
-
-  @override
-  String get gpsReason =>
-      'Wird bei jeder Standort-Suche gesendet, um Tankstellen in der Nähe zu finden.';
-
-  @override
-  String get postalCodeData => 'Postleitzahl';
-
-  @override
-  String get postalReason => 'Wird bei PLZ-Suche in Koordinaten umgewandelt.';
-
-  @override
-  String get mapViewport => 'Kartenausschnitt';
-
-  @override
-  String get mapReason =>
-      'Beim Öffnen der Karte werden Kartenkacheln geladen. Keine persönlichen Daten werden übertragen.';
-
-  @override
-  String get apiKeyData => 'API-Schlüssel';
-
-  @override
-  String get apiKeyReason =>
-      'Ihr persönlicher Schlüssel wird bei jeder API-Anfrage mitgesendet.';
-
-  @override
-  String get notShared => 'Wird NICHT geteilt:';
-
-  @override
-  String get searchHistory => 'Suchverlauf';
-
-  @override
-  String get favoritesData => 'Favoritenanlage';
-
-  @override
-  String get profileNames => 'Profilnamen';
-
-  @override
-  String get homeZipData => 'Heim-PLZ';
-
-  @override
-  String get usageData => 'App-Nutzungsdaten';
-
-  @override
-  String get privacyBanner =>
-      'Diese App hat keinen eigenen Server. Alle Daten bleiben auf Ihrem Gerät. Keine Analyse, kein Tracking, keine Werbung.';
 
   @override
   String get storageUsage => 'Speichernutzung auf diesem Gerät';
@@ -403,25 +311,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get cacheEmpty => 'Cache ist leer';
 
   @override
-  String get noStorage => 'Kein Speicher belegt';
-
-  @override
   String get apiKeyNote =>
       'Kostenlose Registrierung. Daten von den Markttransparenzstellen.';
 
   @override
   String get apiKeyFormatError =>
       'Ungültiges Format — UUID erwartet (8-4-4-4-12)';
-
-  @override
-  String get supportProject => 'Dieses Projekt unterstützen';
-
-  @override
-  String get supportDescription =>
-      'Diese App ist kostenlos, Open Source und ohne Werbung. Wenn Sie sie nützlich finden, unterstützen Sie den Entwickler.';
-
-  @override
-  String get reportBug => 'Fehler melden / Funktion vorschlagen';
 
   @override
   String get reportThisIssue => 'Dieses Problem melden';
@@ -465,9 +360,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get configApiKeyConfigured => 'Konfiguriert';
-
-  @override
-  String get configApiKeyNotSet => 'Nicht gesetzt (Demo-Modus)';
 
   @override
   String get configApiKeyCommunity => 'Standard-Community-Schlüssel';
@@ -587,15 +479,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get expensive => 'teuer';
 
   @override
-  String stationsOnMap(int count) {
-    return '$count Tankstellen';
-  }
-
-  @override
-  String get loadingFavorites =>
-      'Favoriten werden geladen...\nSuchen Sie zuerst Tankstellen, um Daten zu speichern.';
-
-  @override
   String get reportPrice => 'Preis melden';
 
   @override
@@ -621,10 +504,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get positionUnknown => 'Position unbekannt';
-
-  @override
-  String get routeModeBannerLabel =>
-      'Routenmodus — Entfernungen entlang des Korridors';
 
   @override
   String get distancesFromCenter => 'Entfernungen vom Suchzentrum';
@@ -757,12 +636,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get wrongStatusClosed => 'Als geschlossen angezeigt, aber geöffnet';
 
   @override
-  String get searchAlongRouteLabel => 'Entlang der Route';
-
-  @override
-  String get searchEvStations => 'Ladestationen suchen';
-
-  @override
   String get allStations => 'Alle Stationen';
 
   @override
@@ -885,11 +758,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get stop => 'Stopp';
 
   @override
-  String stopN(int n) {
-    return 'Stopp $n';
-  }
-
-  @override
   String get addStop => 'Stopp hinzufügen';
 
   @override
@@ -929,17 +797,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Optional: den integrierten App-Schlüssel mit Ihrem eigenen überschreiben';
 
   @override
-  String get requiredForEvSearch =>
-      'Erforderlich für die Suche nach E-Ladestationen';
-
-  @override
   String get edit => 'Bearbeiten';
 
   @override
   String get fuelPricesApiKey => 'Kraftstoffpreise API-Schlüssel';
-
-  @override
-  String get tankerkoenigApiKey => 'Tankerkoenig API-Schlüssel';
 
   @override
   String get evChargingApiKey => 'E-Laden API-Schlüssel';
@@ -1013,12 +874,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get distanceKm => 'Entfernung (km)';
 
   @override
-  String get consumptionL100km => 'Verbrauch (L/100km)';
-
-  @override
-  String get fuelPriceEurL => 'Kraftstoffpreis (EUR/L)';
-
-  @override
   String get tripCost => 'Fahrtkosten';
 
   @override
@@ -1026,10 +881,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get totalCost => 'Gesamtkosten';
-
-  @override
-  String get enterCalcValues =>
-      'Geben Sie Entfernung, Verbrauch und Preis ein, um die Fahrtkosten zu berechnen';
 
   @override
   String calculatorDistanceLabel(String unit) {
@@ -1099,10 +950,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get citySearchCache => 'Stadtsuche';
 
   @override
-  String get dataDeletionNotAvailableCommunity =>
-      'Datenlöschung ist im Community-Modus nicht verfügbar. Trennen Sie zuerst die Verbindung oder verwenden Sie eine private Datenbank.';
-
-  @override
   String priceHistoryStationsTracked(int count) {
     return '$count Tankstellen verfolgt';
   }
@@ -1126,19 +973,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get noPriceHistory => 'Noch kein Preisverlauf';
 
   @override
-  String get noHourlyData => 'Keine Stundendaten';
-
-  @override
   String get noStatistics => 'Keine Statistiken verfügbar';
-
-  @override
-  String get statMin => 'Min';
-
-  @override
-  String get statMax => 'Max';
-
-  @override
-  String get statAvg => 'Mittel';
 
   @override
   String get showAllFuelTypes => 'Alle Kraftstoffarten anzeigen';
@@ -1147,34 +982,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get connected => 'Verbunden';
 
   @override
-  String get notConnected => 'Nicht verbunden';
-
-  @override
-  String get connectTankSync => 'TankSync verbinden';
-
-  @override
   String get disconnectTankSync => 'TankSync trennen';
 
   @override
   String get viewMyData => 'Meine Daten anzeigen';
-
-  @override
-  String get optionalCloudSync =>
-      'Optionale Cloud-Synchronisierung für Alarme, Favoriten und Push-Benachrichtigungen';
-
-  @override
-  String get tapToUpdateGps => 'Tippen, um GPS-Position zu aktualisieren';
-
-  @override
-  String get gpsAutoUpdateHint =>
-      'Die GPS-Position wird automatisch bei der Suche ermittelt. Sie können sie auch hier manuell aktualisieren.';
-
-  @override
-  String get clearGpsConfirm =>
-      'Gespeicherte GPS-Position löschen? Sie können sie jederzeit erneut aktualisieren.';
-
-  @override
-  String get pageNotFound => 'Seite nicht gefunden';
 
   @override
   String get deleteAllServerData => 'Alle Serverdaten löschen';
@@ -1206,9 +1017,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get forgetAllSyncedTripsSuccess =>
       'Alle synchronisierten Fahrten vom Server entfernt';
-
-  @override
-  String get disconnectConfirm => 'TankSync trennen?';
 
   @override
   String get disconnect => 'Trennen';
@@ -1266,9 +1074,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get signIn => 'Anmelden';
-
-  @override
-  String get upgradeToEmail => 'E-Mail-Konto erstellen';
 
   @override
   String get savedRoutes => 'Gespeicherte Routen';
@@ -1375,27 +1180,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get onboardingFinish => 'Los geht\'s';
 
   @override
-  String crossBorderNearby(String country) {
-    return '$country ist in der Nähe';
-  }
-
-  @override
-  String crossBorderDistance(int km) {
-    return '~$km km bis zur Grenze';
-  }
-
-  @override
-  String crossBorderAvgPrice(String price, int count) {
-    return 'Ø hier: $price EUR ($count Tankstellen)';
-  }
-
-  @override
-  String get allPricesView => 'Alle Preise';
-
-  @override
-  String get compactView => 'Kompakt';
-
-  @override
   String get switchToAllPricesView => 'Zur Alle-Preise-Ansicht wechseln';
 
   @override
@@ -1483,20 +1267,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String failedToSwitch(String error) {
     return 'Wechsel fehlgeschlagen: $error';
   }
-
-  @override
-  String get topicUrlCopied => 'Themen-URL kopiert';
-
-  @override
-  String get testNotificationSent => 'Testbenachrichtigung gesendet!';
-
-  @override
-  String get testNotificationFailed =>
-      'Testbenachrichtigung konnte nicht gesendet werden';
-
-  @override
-  String get pushUpdateFailed =>
-      'Push-Benachrichtigungseinstellung konnte nicht aktualisiert werden';
 
   @override
   String get connectedAsGuest => 'Als Gast verbunden';
@@ -1704,11 +1474,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get privacyDeleteButton => 'Alle Daten löschen';
 
   @override
-  String privacyCopyErrorLog(int count) {
-    return 'Fehlerprotokoll in Zwischenablage kopieren ($count)';
-  }
-
-  @override
   String privacySaveErrorLog(int count) {
     return 'Fehlerprotokoll speichern ($count)';
   }
@@ -1833,21 +1598,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get voiceAnnouncementsEnabled => 'Sprachansagen aktivieren';
 
   @override
-  String voiceAnnouncementThreshold(String price) {
-    return 'Nur unter $price';
-  }
-
-  @override
-  String voiceAnnouncementCheapFuel(
-    String station,
-    String distance,
-    String fuelType,
-    String price,
-  ) {
-    return '$station, $distance Kilometer voraus, $fuelType $price';
-  }
-
-  @override
   String get voiceAnnouncementProximityRadius => 'Ansage-Radius';
 
   @override
@@ -1855,23 +1605,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get voiceAnnouncementPriceLimit => 'Höchstpreis';
-
-  @override
-  String get nearestStations => 'Nächste Tankstellen';
-
-  @override
-  String get nearestStationsHint =>
-      'Die nächstgelegenen Tankstellen über Ihren Standort finden';
-
-  @override
-  String get consumptionLogTitle => 'Verbrauch';
-
-  @override
-  String get consumptionLogMenuTitle => 'Verbrauchs-Log';
-
-  @override
-  String get consumptionLogMenuSubtitle =>
-      'Tankvorgänge erfassen und L/100km berechnen';
 
   @override
   String get consumptionStatsTitle => 'Verbrauchsstatistik';
@@ -1987,9 +1720,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get fillUpVehicleLabel => 'Fahrzeug';
 
   @override
-  String get fillUpVehicleNone => 'Kein Fahrzeug';
-
-  @override
   String get fillUpVehicleRequired => 'Fahrzeug erforderlich';
 
   @override
@@ -2008,9 +1738,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get pickStationSkip => 'Überspringen — ohne Tankstelle eintragen';
-
-  @override
-  String get scanPump => 'Zapfsäule scannen';
 
   @override
   String get scanPayment => 'Zahlungs-QR scannen';
@@ -2080,19 +1807,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get torchOff => 'Blitz ausschalten';
 
   @override
-  String get obdNoAdapter => 'Kein OBD2-Adapter in Reichweite';
-
-  @override
-  String get obdOdometerUnavailable =>
-      'Kilometerstand konnte nicht gelesen werden';
-
-  @override
   String get obdPermissionDenied =>
       'Bluetooth-Berechtigung in den Einstellungen erteilen';
-
-  @override
-  String get obdAdapterUnresponsive =>
-      'Keine Antwort — Zündung einschalten und neu versuchen';
 
   @override
   String get obdPickerTitle => 'OBD2-Adapter wählen';
@@ -2102,18 +1818,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get obdPickerConnecting => 'Verbinden…';
-
-  @override
-  String get themeSettingTitle => 'Design';
-
-  @override
-  String get themeModeLight => 'Hell';
-
-  @override
-  String get themeModeDark => 'Dunkel';
-
-  @override
-  String get themeModeSystem => 'Systemeinstellung';
 
   @override
   String get tripRecordingTitle => 'Fahrt wird aufgezeichnet';
@@ -2261,25 +1965,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get obd2StatusConnected => 'OBD2-Adapter: verbunden';
 
   @override
-  String get obd2StatusAttempting => 'OBD2-Adapter: verbindet';
-
-  @override
-  String get obd2StatusUnreachable => 'OBD2-Adapter: nicht erreichbar';
-
-  @override
   String get obd2StatusPermissionDenied =>
       'OBD2-Adapter: Bluetooth-Berechtigung erforderlich';
 
   @override
   String get obd2StatusConnectedBody => 'Bereit für eine Fahrtaufzeichnung.';
-
-  @override
-  String get obd2StatusAttemptingBody =>
-      'Verbindung wird im Hintergrund aufgebaut…';
-
-  @override
-  String get obd2StatusUnreachableBody =>
-      'Adapter ausser Reichweite oder wird von einer anderen App verwendet.';
 
   @override
   String get obd2StatusPermissionDeniedBody =>
@@ -2296,10 +1986,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get tripHistoryEmptyTitle => 'Noch keine Fahrten';
-
-  @override
-  String get tripHistoryEmptySubtitle =>
-      'OBD2-Adapter anschließen und eine Fahrt aufzeichnen, um deinen Fahrtenverlauf aufzubauen.';
 
   @override
   String get tripHistoryUnknownDate => 'Unbekanntes Datum';
@@ -2338,13 +2024,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get situationFuelCut => 'Schubabschaltung';
 
   @override
-  String get tripSaveAsFillUp => 'Als Tankfüllung speichern';
-
-  @override
   String get tripSaveRecording => 'Fahrt speichern';
-
-  @override
-  String get tripDiscard => 'Verwerfen';
 
   @override
   String get tripSummaryAutoSaved => 'Fahrt automatisch gespeichert';
@@ -2356,15 +2036,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tripSummaryDelete => 'Diese Fahrt löschen';
 
   @override
-  String obdOdometerRead(int km) {
-    return 'Kilometerstand gelesen: $km km';
-  }
-
-  @override
   String get vehicleFuelNotSet => 'Nicht gesetzt';
-
-  @override
-  String get wizardVehicleTapToEdit => 'Zum Bearbeiten tippen';
 
   @override
   String get wizardVehicleDefaultBadge => 'Standard';
@@ -2400,10 +2072,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get wizardProfileCustomName => 'Individuell';
-
-  @override
-  String get wizardProfileCustomDescription =>
-      'Deine eigene Kombination an Funktionen. Passe jeden Schalter unten an.';
 
   @override
   String get useModeSectionHint =>
@@ -2533,15 +2201,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get evMinPower => 'Min. Leistung';
 
   @override
-  String get evMaxPower => 'Max. Leistung';
-
-  @override
-  String get evOperator => 'Betreiber';
-
-  @override
-  String get evLastUpdate => 'Letzte Aktualisierung';
-
-  @override
   String get evStatusAvailable => 'Verfügbar';
 
   @override
@@ -2563,9 +2222,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get criteriaSavedToProfile => 'Als Standard gespeichert';
 
   @override
-  String get profileNotFound => 'Kein aktives Profil';
-
-  @override
   String get updatingFavorites => 'Favoriten werden aktualisiert…';
 
   @override
@@ -2573,9 +2229,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get noDataAvailable => 'Keine Daten';
-
-  @override
-  String get configAndPrivacy => 'Konfiguration & Datenschutz';
 
   @override
   String get searchToSeeMap =>
@@ -2868,15 +2521,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get scanReceipt => 'Beleg scannen';
 
   @override
-  String get obdConnect => 'OBD-II';
-
-  @override
-  String get stationTypeFuel => 'Kraftstoff';
-
-  @override
-  String get stationTypeEv => 'Elektro';
-
-  @override
   String get brandFilterHighway => 'Autobahn';
 
   @override
@@ -2943,10 +2587,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get alertsLoadErrorTitle => 'Alarme konnten nicht geladen werden';
-
-  @override
-  String get alertsBackgroundCheckErrorTitle =>
-      'Hintergrundprüfung der Alarme fehlgeschlagen';
 
   @override
   String get detailsLabel => 'Details';
@@ -3306,12 +2946,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get swipeHide => 'Ausblenden';
 
   @override
-  String get evChargingSection => 'Elektro-Laden';
-
-  @override
-  String get fuelStationsSection => 'Tankstellen';
-
-  @override
   String get yourRating => 'Ihre Bewertung';
 
   @override
@@ -3326,26 +2960,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get aboutSupportDescription =>
       'Diese App ist kostenlos, Open Source und werbefrei. Wenn sie Ihnen gefällt, unterstützen Sie bitte den Entwickler.';
-
-  @override
-  String get luxembourgRegulatedPricesNotice =>
-      'Die Kraftstoffpreise in Luxemburg sind staatlich reguliert und landesweit einheitlich.';
-
-  @override
-  String get luxembourgFuelUnleaded95 => 'Super bleifrei 95';
-
-  @override
-  String get luxembourgFuelUnleaded98 => 'Super bleifrei 98';
-
-  @override
-  String get luxembourgFuelDiesel => 'Diesel';
-
-  @override
-  String get luxembourgFuelLpg => 'Autogas';
-
-  @override
-  String get luxembourgPricesUnavailable =>
-      'Luxemburgs regulierte Preise sind nicht verfügbar.';
 
   @override
   String get reportIssueTitle => 'Problem melden';
@@ -3435,20 +3049,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get southKoreaApiKeyRequired =>
-      'Registrieren Sie sich bei OPINET, um einen kostenlosen API-Schlüssel zu erhalten';
-
-  @override
-  String get southKoreaApiProvider => 'OPINET (KNOC)';
-
-  @override
-  String get chileApiKeyRequired =>
-      'Registrieren Sie sich bei CNE, um einen kostenlosen API-Schlüssel zu erhalten';
-
-  @override
-  String get chileApiProvider => 'CNE Bencina en Linea';
-
-  @override
   String get vinConfirmTitle => 'Ist das Ihr Auto?';
 
   @override
@@ -3531,9 +3131,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get alertsRadiusFuelType => 'Kraftstoffart';
 
   @override
-  String get alertsRadiusThreshold => 'Schwelle (€/L)';
-
-  @override
   String get alertsRadiusKm => 'Radius (km)';
 
   @override
@@ -3549,9 +3146,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get alertsRadiusCancel => 'Abbrechen';
 
   @override
-  String get alertsRadiusDeleteConfirm => 'Umkreis-Alarm löschen?';
-
-  @override
   String radiusAlertDeleted(String name) {
     return 'Umkreis-Alarm \"$name\" gelöscht';
   }
@@ -3563,16 +3157,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get obd2PairChipTooltip => 'OBD2-Adapter koppeln';
-
-  @override
-  String velocityAlertTitle(String fuelLabel) {
-    return '$fuelLabel an Tankstellen in der Nähe gefallen';
-  }
-
-  @override
-  String velocityAlertBody(int stationCount, int maxDropCents) {
-    return '$stationCount Tankstellen um bis zu $maxDropCents¢ in der letzten Stunde gefallen';
-  }
 
   @override
   String get fillUpSavedSnackbar => 'Tankvorgang gespeichert';
@@ -3804,16 +3388,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Fügen Sie einen Favoriten hinzu, um den Tankstellen-Radar zu testen';
 
   @override
-  String approachStationDistance(String meters) {
-    return '$meters m entfernt';
-  }
-
-  @override
-  String fuelStationRadarDistanceKm(String km) {
-    return '$km km entfernt';
-  }
-
-  @override
   String fuelStationRadarProximity(int percent) {
     return 'Nähe $percent%';
   }
@@ -3907,13 +3481,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Speicherverzögerung nach Trennung (Sekunden)';
 
   @override
-  String get autoRecordPairedAdapterLabel => 'Verbundener Adapter';
-
-  @override
-  String get autoRecordPairedAdapterNone =>
-      'Kein Adapter verbunden. Verbinde zuerst einen über das OBD2-Onboarding.';
-
-  @override
   String get autoRecordBackgroundLocationLabel =>
       'Standort im Hintergrund erlaubt';
 
@@ -3940,14 +3507,8 @@ class AppLocalizationsDe extends AppLocalizations {
       'Hintergrundstandort konnte nicht angefordert werden';
 
   @override
-  String get autoRecordBadgeClearTooltip => 'Zähler zurücksetzen';
-
-  @override
   String get autoRecordPairAdapterLinkText =>
       'Adapter im Abschnitt unten koppeln, um automatisches Aufzeichnen zu aktivieren';
-
-  @override
-  String get exportBackupTooltip => 'Sicherung exportieren';
 
   @override
   String get exportBackupReady => 'Sicherung bereit – Ziel auswählen';
@@ -3965,9 +3526,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get restoreBackupTooltip => 'Sicherung wiederherstellen';
-
-  @override
   String get restoreBackupDialogTitle => 'Sicherung wiederherstellen';
 
   @override
@@ -3979,11 +3537,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get restoreBackupReplaceAction => 'Alles ersetzen';
-
-  @override
-  String restoreBackupSuccess(int count) {
-    return 'Sicherung wiederhergestellt – $count Datensätze importiert';
-  }
 
   @override
   String get restoreBackupEmpty =>
@@ -4021,9 +3574,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get brokenMapChipVerifying => 'MAP-Sensor wird geprüft…';
-
-  @override
   String get brokenMapChipDisclaimer => 'MAP-Werte verdächtig';
 
   @override
@@ -4033,21 +3583,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get brokenMapBannerHardDisable =>
       'MAP-Sensor unzuverlässig. Statt Live-Verbrauch wird der Tankdurchschnitt angezeigt.';
-
-  @override
-  String brokenMapOverlayVerified(String confidence) {
-    return 'MAP-Sensor: bestätigt ($confidence)';
-  }
-
-  @override
-  String brokenMapOverlayUnverified(String confidence) {
-    return 'MAP-Sensor: prüfen ($confidence)';
-  }
-
-  @override
-  String brokenMapOverlaySuspicious(String confidence) {
-    return 'MAP-Sensor: verdächtig ($confidence)';
-  }
 
   @override
   String brokenMapOverlayPosterior(String posterior, String margin) {
@@ -4268,9 +3803,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get chargingChartsEmpty => 'Noch nicht genügend Daten';
 
   @override
-  String get chargingChartsMonthAxis => 'Monat';
-
-  @override
   String get confirmDeleteTitle => 'Löschen?';
 
   @override
@@ -4468,20 +4000,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get fillUpCorrectionStation => 'Tankstelle (optional)';
-
-  @override
-  String get greeceApiProvider => 'Paratiritirio Timon (Greece)';
-
-  @override
-  String get greeceCommunityApiNotice =>
-      'Betrieben von der von der Community gepflegten fuelpricesgr-API';
-
-  @override
-  String get romaniaApiProvider => 'Monitorul Prețurilor (Romania)';
-
-  @override
-  String get romaniaScrapingNotice =>
-      'Betrieben von monitorulpreturilor.info (Wettbewerbsrat + ANPC)';
 
   @override
   String crossBorderCheaper(String country, String km, String price) {
@@ -4995,18 +4513,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Hohe Drehzahl beim Dahingleiten — früheres Hochschalten spart Kraftstoff';
 
   @override
-  String get ecoRouteOption => 'Sparsam';
-
-  @override
-  String ecoRouteSavings(String liters) {
-    return '≈ $liters L gespart';
-  }
-
-  @override
-  String get ecoRouteHint =>
-      'Smarter fahren — bevorzugt ruhige Autobahn statt Zickzack-Abkürzungen.';
-
-  @override
   String get obd2CoverageNoneNote =>
       'Auf dieser Fahrt kamen keine Motordaten vom OBD2-Adapter an — die Kraftstoffwerte sind GPS-basierte Schätzungen.';
 
@@ -5079,14 +4585,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get featureDescription_baselineSync =>
       'Fahrbasislinien über TankSync abgleichen.';
-
-  @override
-  String get featureLabel_unifiedSearchResults =>
-      'Vereinheitlichte Suchergebnisse';
-
-  @override
-  String get featureDescription_unifiedSearchResults =>
-      'Eine Ergebnisliste für Tankstellen und Ladesäulen.';
 
   @override
   String get featureLabel_priceAlerts => 'Preisalarme';
@@ -5183,13 +4681,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get featureBlockedEnable_autoRecord =>
       'Aktiviere zuerst die OBD2-Fahrtaufzeichnung';
-
-  @override
-  String get featureBlockedEnable_showFuel => 'Voraussetzungen nicht erfüllt';
-
-  @override
-  String get featureBlockedEnable_showElectric =>
-      'Voraussetzungen nicht erfüllt';
 
   @override
   String get featureBlockedEnable_showConsumptionTab =>
@@ -5541,10 +5032,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get scanPumpUnreadable =>
-      'Zapfsäule nicht lesbar — bitte erneut versuchen';
-
-  @override
   String get scanPumpSuccess => 'Zapfsäule gescannt — Werte prüfen.';
 
   @override
@@ -5559,9 +5046,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String scanPumpFailed(String error) {
     return 'Zapfsäulen-Scan fehlgeschlagen: $error';
   }
-
-  @override
-  String get badScanReportTitle => 'Scan-Fehler melden';
 
   @override
   String get badScanReportTitleReceipt => 'Scan-Fehler melden — Beleg';
@@ -5588,9 +5072,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get badScanReportHint =>
       'Wir teilen das Belegfoto und beide Wertesätze, damit die nächste Version dieses Layout lernen kann.';
-
-  @override
-  String get badScanReportShareAction => 'Bericht + Foto teilen';
 
   @override
   String get badScanReportFieldBrandLayout => 'Marken-Layout';
@@ -5628,10 +5109,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get badScanReportFallbackToShare =>
       'Senden fehlgeschlagen — manuell teilen';
-
-  @override
-  String get pumpCameraHint =>
-      'Richte die drei Zahlen der Zapfsäulenanzeige im Rahmen aus';
 
   @override
   String get pumpCameraCapture => 'Aufnehmen';
@@ -5696,37 +5173,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Tankstelle, Kilometerstand, Notizen';
 
   @override
-  String get fillUpImportFromLabel => 'Importieren aus…';
-
-  @override
-  String get fillUpImportSheetTitle => 'Tankvorgang importieren';
-
-  @override
   String get fillUpImportReceiptLabel => 'Beleg';
-
-  @override
-  String get fillUpImportReceiptDescription =>
-      'Papierbeleg mit der Kamera scannen';
 
   @override
   String get fillUpImportPumpLabel => 'Zapfsäulen-Display';
 
   @override
-  String get fillUpImportPumpDescription =>
-      'Betrag / Preis vom Zapfsäulen-Display lesen';
-
-  @override
-  String get fillUpImportObdLabel => 'OBD-II-Adapter';
-
-  @override
-  String get fillUpImportObdDescription =>
-      'Kilometerstand über OBD-II per Bluetooth abrufen';
-
-  @override
   String get fillUpPricePerLiterLabel => 'Preis pro Liter';
-
-  @override
-  String get vehicleHeaderPlateLabel => 'Kennzeichen';
 
   @override
   String get vehicleHeaderUntitled => 'Neues Fahrzeug';
@@ -5789,17 +5242,6 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other: '$count Tankungen',
       one: '1 Tankung',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String fuelEfficiencyMixedFootnote(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count gemischte Tankungen ihrem Hauptkraftstoff zugerechnet',
-      one: '1 gemischte Tankung dem Hauptkraftstoff zugerechnet',
     );
     return '$_temp0';
   }
@@ -6053,9 +5495,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gpsRoadUseSource => 'Aus deiner GPS-Aufzeichnung';
 
   @override
-  String get hapticEcoCoachSectionTitle => 'Fahrweise';
-
-  @override
   String get hapticEcoCoachSettingTitle => 'Echtzeit-Eco-Coaching';
 
   @override
@@ -6288,15 +5727,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get calculatorPriceHint => 'z. B. 1,899';
-
-  @override
-  String get routeStrategyLabel => 'Strategie:';
-
-  @override
-  String get routeStrategyUniform => 'Gleichmäßig';
-
-  @override
-  String get routeStrategyBalanced => 'Ausgewogen';
 
   @override
   String get glideCoachBetaTitle => 'Glide-Coach Beta (experimentell)';
@@ -6707,9 +6137,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get obd2DiagnosticsInitCold => 'kalt';
 
   @override
-  String get obd2HealthCopyInitTranscript => 'Nur Init-Protokoll kopieren';
-
-  @override
   String get obd2DiagnosticsEmpty =>
       'Noch keine OBD2-Sitzung aufgezeichnet — verbinde einen Adapter und zeichne eine Fahrt mit aktiviertem Entwicklermodus auf.';
 
@@ -6728,12 +6155,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get obd2HealthHistorySection => 'Letzte Sitzungen';
-
-  @override
-  String get obd2HealthCopyJson => 'Als JSON kopieren';
-
-  @override
-  String get obd2HealthCopied => 'OBD2-Diagnose in die Zwischenablage kopiert.';
 
   @override
   String get obd2HealthDownloadJson => 'Als JSON herunterladen';
@@ -6988,9 +6409,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get ocrTesterRunning => 'OCR läuft…';
 
   @override
-  String get ocrTesterNoResult => 'OCR lieferte kein lesbares Ergebnis.';
-
-  @override
   String get ocrTesterOverlaySection => 'Block-Overlay';
 
   @override
@@ -7100,10 +6518,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get onboardingObd2ReadingVin => 'VIN wird ausgelesen…';
-
-  @override
-  String get onboardingObd2VinReadFailed =>
-      'VIN konnte nicht ausgelesen werden — bitte manuell eingeben';
 
   @override
   String get onboardingObd2ConnectFailed =>
@@ -7304,16 +6718,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get radiusAlertCenterFromMap => 'Kartenposition';
 
   @override
-  String radiusAlertNotificationTitle(String fuelLabel, String label) {
-    return '$fuelLabel in der Nähe von $label';
-  }
-
-  @override
-  String radiusAlertNotificationBody(String price, String threshold) {
-    return 'Eine Tankstelle bietet $price € (Grenze: $threshold €)';
-  }
-
-  @override
   String get reconcileWorkflowTitle => 'Kraftstoff abgleichen';
 
   @override
@@ -7407,16 +6811,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Ungeklärte Kraftstoff- und Fahrten-Differenz klären';
 
   @override
-  String get refuelUnitPerLiter => '/L';
-
-  @override
   String get refuelUnitPerKwh => '/kWh';
 
   @override
   String get refuelUnitPerSession => '/Sitzung';
-
-  @override
-  String get shareReceiptImporting => 'Geteilte Quittung wird importiert …';
 
   @override
   String get shareReceiptUnsupportedFormat =>
@@ -7585,15 +6983,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String tankLevelLastFillUpFormat(String date, String count) {
     return 'Letzter Tankvorgang: $date · $count Fahrt(en) seit';
   }
-
-  @override
-  String get tankLevelMethodObd2 => 'OBD2-Messung';
-
-  @override
-  String get tankLevelMethodDistanceFallback => 'distanzbasierte Schätzung';
-
-  @override
-  String get tankLevelMethodMixed => 'gemischte Messung';
 
   @override
   String get tankLevelEmptyNoFillUp =>
@@ -7898,9 +7287,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get trajetDetailChartAltitudeRelative => 'Höhe (m, ab Start)';
 
   @override
-  String get trajetDetailChartAltitude => 'Höhe (m)';
-
-  @override
   String get trajetDetailChartLambda => 'Soll-λ';
 
   @override
@@ -7959,9 +7345,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get trajetDetailDeleteConfirmBody =>
       'Diese Fahrt wird dauerhaft aus deinem Verlauf entfernt.';
-
-  @override
-  String get trajetDetailDeleteConfirmCancel => 'Abbrechen';
 
   @override
   String get trajetDetailDeleteConfirmConfirm => 'Löschen';
@@ -8030,9 +7413,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tripPathCardSubtitle => 'Per GPS aufgezeichnete Strecke';
 
   @override
-  String get tripPathLegendTitle => 'Verbrauch';
-
-  @override
   String get tripPathLegendEfficient => 'Effizient (< 6 L/100km)';
 
   @override
@@ -8064,9 +7444,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get fuelStationRadarResultBadge => 'Tankstellen-Radar-Ergebnis';
-
-  @override
-  String get radarAcquiringLocation => 'Standort wird ermittelt…';
 
   @override
   String get radarUpdatingLocation => 'Standort wird aktualisiert…';
@@ -8101,10 +7478,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get tripRecordingResumeHintMessage =>
       'Die Aufnahme läuft im Hintergrund weiter. Tippe oben auf das rote Banner, um zurückzukehren.';
-
-  @override
-  String get tripBannerOpenFromConsumptionTab =>
-      'Aktive Fahrt aus dem Verbrauchs-Tab öffnen';
 
   @override
   String get tripRecordingUnpinnedWarning =>
@@ -8222,18 +7595,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get trajetDeletedUndoSnackbar => 'Aufzeichnung gelöscht';
-
-  @override
-  String get unifiedFilterFuel => 'Kraftstoff';
-
-  @override
-  String get unifiedFilterEv => 'EV';
-
-  @override
-  String get unifiedFilterBoth => 'Beide';
-
-  @override
-  String get unifiedNoResultsForFilter => 'Keine Ergebnisse für diesen Filter';
 
   @override
   String get searchFailedSnackbar =>
@@ -8406,9 +7767,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Beim Koppeln eines Adapters wird die VIN deines Fahrzeugs lokal gelesen, um das Auto zu identifizieren. Wenn du dies aktivierst, wird die 17-stellige VIN an den kostenlosen vPIC-Dienst der NHTSA gesendet, um zusätzliche Details (Modell, Hubraum, Kraftstofftyp) abzurufen. Es wird nur die VIN gesendet — keine weiteren Daten verlassen dein Gerät.';
 
   @override
-  String get vehicleDetectedFromVinBadge => '(erkannt)';
-
-  @override
   String vehicleDetectedFromVinSnackbar(String summary) {
     return 'Aus VIN erkannt: $summary. Übernehmen?';
   }
@@ -8479,7 +7837,4 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get widgetVariantPredictive => 'Prognose: bester Tankzeitpunkt';
-
-  @override
-  String get widgetPredictiveNowPrefix => 'jetzt';
 }

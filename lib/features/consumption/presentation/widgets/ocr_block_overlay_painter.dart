@@ -159,6 +159,7 @@ class OcrBlockOverlayPainter extends CustomPainter {
     final needle = value.toString();
     for (final b in blocks) {
       final t = b.text.replaceAll(',', '.');
+      // i18n-ignore-format: string-match against raw OCR text, not display output
       if (t.contains(needle) || t.contains(value.toStringAsFixed(2))) {
         return _scaled(b, size);
       }

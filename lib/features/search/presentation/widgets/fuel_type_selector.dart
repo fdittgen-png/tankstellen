@@ -9,9 +9,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../feature_management/api.dart';
 import '../../../profile/providers/show_electric_enabled_provider.dart';
 import '../../../profile/providers/show_fuel_enabled_provider.dart';
 import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/services/country_service_registry.dart'
+    show fuelTypesForCountry;
 import '../../providers/search_provider.dart';
 
 class FuelTypeSelector extends ConsumerWidget {
@@ -29,7 +32,13 @@ class FuelTypeSelector extends ConsumerWidget {
     // the legacy-toggle migrator; subsequent reads go through these
     // shims so the UI stays in sync with the central state.
     final showFuel = ref.watch(showFuelEnabledProvider);
-    final showElectric = ref.watch(showElectricEnabledProvider);
+    // Feature.evCharging finally gates the EV search entry (2026-08-17
+    // review, dead-code finding 6): the electric chip needs BOTH the
+    // per-profile showElectric visibility toggle AND the central
+    // EV-charging feature. Both default on, so behavior is unchanged
+    // until the user disables one.
+    final showElectric = ref.watch(showElectricEnabledProvider) &&
+        ref.watch(enabledFeaturesProvider).contains(Feature.evCharging);
 
     if (!showElectric) {
       types = types.where((t) => t != FuelType.electric).toList();

@@ -1,5 +1,4 @@
 {
-  "refuelUnitPerLiter": "/L",
   "refuelUnitPerKwh": "/kWh",
   "refuelUnitPerSession": "/Sitzung"
 }

@@ -1,5 +1,4 @@
 {
-  "shareReceiptImporting": "Geteilte Quittung wird importiert …",
   "shareReceiptUnsupportedFormat": "Dieser Dateityp kann noch nicht importiert werden — teile stattdessen ein Foto der Quittung.",
   "shareReceiptFailed": "Die geteilte Quittung konnte nicht gelesen werden — teile sie erneut oder füge den Tankvorgang manuell hinzu.",
   "featureLabel_addFillUpShareIntentReceipt": "Quittung zum Importieren teilen",

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/oem_pid_table.dart';
+import 'package:tankstellen/features/obd2/data/protocol/oem_pid_table.dart';
 
 /// Minimal in-memory [Obd2RawCommandPort] for exercising the
 /// [OemPidTable] contract (#1401 phase 3).

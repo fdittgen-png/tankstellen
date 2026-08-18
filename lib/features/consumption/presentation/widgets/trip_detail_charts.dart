@@ -13,6 +13,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/trip_recorder.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 // #2431 — the CustomPainter + its point model live in a part file so this
 // widget file stays under the 400-line guard after the estimated-series

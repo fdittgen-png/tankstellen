@@ -23,7 +23,7 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../data/adapter_capability.dart';
+import '../data/protocol/adapter_capability.dart';
 import 'obd2_connection_state_provider.dart';
 
 part 'obd2_capability_provider.g.dart';

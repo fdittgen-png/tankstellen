@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/approach_detector.dart';
 import 'package:tankstellen/core/utils/price_formatter.dart';
-import 'package:tankstellen/features/obd2/data/trip_recording_controller.dart';
+import 'package:tankstellen/features/obd2/data/session/trip_recording_controller.dart';
 import 'package:tankstellen/features/consumption/domain/cold_start_baselines.dart';
 import 'package:tankstellen/features/consumption/domain/situation_classifier.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/proximity_fill_bar.dart';
@@ -376,7 +376,7 @@ void main() {
         expect(find.text('~'), findsOneWidget);
         expect(find.text('est. L/100 km'), findsOneWidget);
         // Distance is demoted to the secondary row (km suffix, not a hero).
-        expect(find.text('4.0 km'), findsOneWidget);
+        expect(find.text('4,0 km'), findsOneWidget);
         expect(find.text('L/100 km'), findsNothing);
         // No bare "km" caption hero anymore.
         expect(find.text('km'), findsNothing);
@@ -490,7 +490,8 @@ void main() {
         );
         expect(find.text('~'), findsOneWidget);
         expect(find.text('est. L/100 km'), findsOneWidget);
-        expect(find.text('0.5 km'), findsOneWidget); // secondary row
+        // formatDistance renders sub-kilometre distances in metres.
+        expect(find.text('500 m'), findsOneWidget); // secondary row
         expect(find.text('km'), findsNothing);
         expect(find.text('L/100 km'), findsNothing);
 
@@ -504,7 +505,7 @@ void main() {
         expect(find.text('L/100 km'), findsOneWidget);
         // Distance + elapsed move to the secondary row — they're
         // still findable, just no longer the hero caption.
-        expect(find.textContaining('4.0'), findsOneWidget);
+        expect(find.textContaining('4,0'), findsOneWidget);
         expect(find.text('elapsed'), findsNothing);
         // The measured value carries no "~" / est caption.
         expect(find.text('est. L/100 km'), findsNothing);
@@ -549,7 +550,7 @@ void main() {
         // secondary row instead of leading the tile).
         expect(find.text('7m 7s'), findsOneWidget); // secondary row
         // Distance also stays in the secondary row.
-        expect(find.text('1.2 km'), findsOneWidget);
+        expect(find.text('1,2 km'), findsOneWidget);
       },
     );
 
@@ -594,7 +595,7 @@ void main() {
         );
         expect(find.text('~'), findsOneWidget);
         expect(find.text('est. L/100 km'), findsOneWidget);
-        expect(find.text('1.2 km'), findsOneWidget); // secondary row
+        expect(find.text('1,2 km'), findsOneWidget); // secondary row
         expect(find.text('L/100 km'), findsNothing);
         expect(find.text('km'), findsNothing);
       },

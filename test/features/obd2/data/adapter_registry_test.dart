@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/adapter_registry.dart';
-import 'package:tankstellen/features/obd2/data/adapters/smart_obd_adapter.dart';
-import 'package:tankstellen/features/obd2/data/adapters/v_linker_fs_adapter.dart';
-import 'package:tankstellen/features/obd2/data/elm327_adapter.dart';
+import 'package:tankstellen/features/obd2/data/protocol/adapter_registry.dart';
+import 'package:tankstellen/features/obd2/data/protocol/adapters/smart_obd_adapter.dart';
+import 'package:tankstellen/features/obd2/data/protocol/adapters/v_linker_fs_adapter.dart';
+import 'package:tankstellen/features/obd2/data/protocol/elm327_adapter.dart';
 
 void main() {
   final registry = Obd2AdapterRegistry.defaults();

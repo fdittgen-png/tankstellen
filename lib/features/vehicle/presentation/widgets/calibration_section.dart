@@ -299,8 +299,10 @@ class _CalibrationSectionState extends State<CalibrationSection> {
 
   String _formatDouble(double value) {
     if (value == value.roundToDouble()) {
+      // i18n-ignore-format: TextEditingController prefill — re-parsed as a dot-decimal number, not display text
       return value.toStringAsFixed(0);
     }
+    // i18n-ignore-format: TextEditingController prefill — re-parsed as a dot-decimal number, not display text
     return value.toStringAsFixed(2);
   }
 

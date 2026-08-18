@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/utils/price_formatter.dart';
 
 /// Read-only "Price per liter" strip rendered below the cost field on
 /// the Add-Fill-up form (#751 phase 2).
@@ -46,7 +47,7 @@ class FillUpPricePerLiterReadout extends StatelessWidget {
         // computed value is useful context), but the label is baked
         // into one string so only a single announcement fires.
         final label = l.fillUpPricePerLiterLabel;
-        final value = pricePerLiter.toStringAsFixed(3);
+        final value = PriceFormatter.formatPriceCompact(pricePerLiter);
         return Padding(
           padding: const EdgeInsets.only(top: 6, left: 56),
           child: Semantics(

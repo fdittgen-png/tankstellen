@@ -16,10 +16,6 @@
       }
     }
   },
-  "scanPumpUnreadable": "Pump display not readable — try again",
-  "@scanPumpUnreadable": {
-    "description": "Snackbar shown on the Add-Fill-Up screen when the pump-display scan returns no usable fields (#751)."
-  },
   "scanPumpSuccess": "Pump display scanned — verify the values.",
   "@scanPumpSuccess": {
     "description": "Snackbar shown after a successful pump-display scan (#751)."
@@ -40,10 +36,6 @@
         "type": "String"
       }
     }
-  },
-  "badScanReportTitle": "Report a scan error",
-  "@badScanReportTitle": {
-    "description": "Title of the bottom sheet that reports an incorrect receipt scan (#751)."
   },
   "badScanReportTitleReceipt": "Report a scan error — Receipt",
   "@badScanReportTitleReceipt": {
@@ -77,10 +69,6 @@
   "@badScanReportHint": {
     "description": "Subtitle under the bad-scan-report sheet title (#751)."
   },
-  "badScanReportShareAction": "Share report + photo",
-  "@badScanReportShareAction": {
-    "description": "Button on the bad-scan-report sheet that triggers the system share intent (#751)."
-  },
   "badScanReportFieldBrandLayout": "Brand layout",
   "badScanReportFieldTotal": "Total",
   "badScanReportFieldPricePerLiter": "Price/L",
@@ -101,10 +89,6 @@
   "badScanReportFallbackToShare": "Submission failed — manual share",
   "@badScanReportFallbackToShare": {
     "description": "Snackbar shown when the GitHub submission fails and we fall back to the system share sheet (#952 phase 2)."
-  },
-  "pumpCameraHint": "Line up the three pump-display numbers inside the frame",
-  "@pumpCameraHint": {
-    "description": "Hint shown over the in-app camera reticle for the pump-display capture (#1868)."
   },
   "pumpCameraCapture": "Capture",
   "@pumpCameraCapture": {

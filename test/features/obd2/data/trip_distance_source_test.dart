@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/trip_distance_source.dart';
+import 'package:tankstellen/features/obd2/domain/trip_distance_source.dart';
 
 void main() {
   group('trip distance source constants', () {

@@ -15,10 +15,14 @@
 library;
 
 export 'data/baseline_sync.dart';
+// #3743 (epic item 5) — the per-entity sync configs moved home from
+// lib/core/sync; exported so cross-feature consumers (device linking,
+// data transparency) keep going through the barrel.
+export 'data/fill_ups_sync.dart';
+export 'data/trips_sync.dart';
 export 'data/driving_score_calculator.dart';
-// #3137 — the OBD2/BLE stack moved to features/obd2; consumption's barrel
-// keeps re-exporting it so existing consumers stay source-compatible.
-export '../obd2/api.dart';
+// #3743 — the #3137 source-compat re-export of ../obd2/api.dart is gone:
+// consumers of the OBD2 stack import features/obd2/api.dart directly.
 export 'data/ocr/ocr_geometry.dart';
 export 'data/ocr/ocr_trace_package.dart';
 export 'data/ocr/ocr_trace_recorder.dart';

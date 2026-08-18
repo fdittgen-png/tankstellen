@@ -43,7 +43,7 @@ void main() {
       expect(find.text('Personal'), findsOneWidget);
       // Subtitle exposes the canonical brand and the formatted discount.
       expect(find.textContaining('TotalEnergies'), findsOneWidget);
-      expect(find.textContaining('−0.05 /L'), findsOneWidget);
+      expect(find.textContaining('−0,05 /L'), findsOneWidget);
     });
 
     testWidgets('falls back to canonical brand when label is empty',

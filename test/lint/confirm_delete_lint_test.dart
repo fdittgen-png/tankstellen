@@ -26,12 +26,10 @@ void main() {
     'lib/core/widgets/swipe_to_delete.dart': 'the shared component itself',
     'lib/features/consumption/presentation/widgets/radar_swipe_wrapper.dart':
         'radar paging — navigation, not deletion',
-    'lib/features/favorites/presentation/widgets/favorite_station_dismissible.dart':
-        'two-direction (navigate|delete); the delete branch calls '
-            'confirmDestructiveAction explicitly',
-    'lib/features/favorites/presentation/widgets/ev_favorite_dismissible.dart':
-        'two-direction (navigate|delete); the delete branch calls '
-            'confirmDestructiveAction explicitly',
+    'lib/core/widgets/favorite_dismissible.dart':
+        'the ONE shared two-direction (navigate|delete) favorites wrapper '
+            '(the fuel/EV twins consolidated onto it); its delete branch '
+            'calls confirmDestructiveAction explicitly',
     'lib/features/favorites/presentation/widgets/alerts_tab.dart':
         'labeled background variant; confirmDismiss calls '
             'confirmDestructiveAction explicitly',
@@ -90,8 +88,7 @@ void main() {
   test('the two-direction dismissibles DO call the shared confirmation '
       'in their delete branch', () {
     for (final f in [
-      'lib/features/favorites/presentation/widgets/favorite_station_dismissible.dart',
-      'lib/features/favorites/presentation/widgets/ev_favorite_dismissible.dart',
+      'lib/core/widgets/favorite_dismissible.dart',
       'lib/features/favorites/presentation/widgets/alerts_tab.dart',
       'lib/features/search/presentation/widgets/route_results_view.dart',
       'lib/features/search/presentation/widgets/swipeable_station_card.dart',

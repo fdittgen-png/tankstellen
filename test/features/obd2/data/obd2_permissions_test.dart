@@ -3,7 +3,7 @@
 
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/obd2_permissions.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_permissions.dart';
 
 void main() {
   group('Obd2PermissionState (#740)', () {

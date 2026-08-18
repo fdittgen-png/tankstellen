@@ -5,9 +5,9 @@ import 'dart:math' as math;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/telemetry/health_counters.dart';
-import 'package:tankstellen/features/obd2/data/trip_distance_resolver.dart';
-import 'package:tankstellen/features/obd2/data/trip_distance_source.dart';
-import 'package:tankstellen/features/obd2/data/virtual_odometer.dart';
+import 'package:tankstellen/features/obd2/domain/trip_distance_resolver.dart';
+import 'package:tankstellen/features/obd2/domain/trip_distance_source.dart';
+import 'package:tankstellen/features/obd2/domain/virtual_odometer.dart';
 
 /// Direct unit tests for [TripDistanceResolver] (#2187), exercising the
 /// three-tier resolution order (real → gps → virtual), the noise-floor /

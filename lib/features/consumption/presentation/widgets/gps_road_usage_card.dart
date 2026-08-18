@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/gps_driving_features.dart';
 import '../../domain/gps_driving_features_shares.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Coast share at or above which the road-use panel surfaces its
 /// positive coaching line (#2796 C7). ~25 % of moving time spent
@@ -175,7 +176,10 @@ class _ShareBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l = AppLocalizations.of(context);
-    final pct = (share.clamp(0.0, 1.0) * 100).toStringAsFixed(0);
+    final pct = UnitFormatter.formatDecimal(
+      share.clamp(0.0, 1.0) * 100,
+      fractionDigits: 0,
+    );
     final pctLabel = l.gpsRoadUseShare(pct);
 
     final filled = (share.clamp(0.0, 1.0) * 1000).round();

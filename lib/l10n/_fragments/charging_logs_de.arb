@@ -15,6 +15,5 @@
   "chargingLogButtonLabel": "Ladung protokollieren",
   "chargingCostTrendTitle": "Ladekosten-Trend",
   "chargingEfficiencyTitle": "Effizienz (kWh/100 km)",
-  "chargingChartsEmpty": "Noch nicht genügend Daten",
-  "chargingChartsMonthAxis": "Monat"
+  "chargingChartsEmpty": "Noch nicht genügend Daten"
 }

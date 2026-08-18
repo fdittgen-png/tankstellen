@@ -45,22 +45,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get searchNearby => 'Близки бензиностанции';
 
   @override
-  String get searchButton => 'Търсене';
-
-  @override
-  String get fabOpenCriteria => 'Отвори търсене';
-
-  @override
-  String get fabOpenResults => 'Отвори резултати';
-
-  @override
   String get fabRunSearch => 'Стартирай търсене';
-
-  @override
-  String get fabRefineCriteria => 'Прецизирай търсене';
-
-  @override
-  String get routeSearchPartialBanner => 'Търсене на още станции…';
 
   @override
   String get routeSearchingChip => 'Търсене по маршрута…';
@@ -74,16 +59,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get searchCriteriaTitle => 'Критерии за търсене';
 
   @override
-  String get searchCriteriaOpen => 'Търсене';
-
-  @override
   String searchCriteriaRadiusBadge(String km) {
     return 'В радиус $km км';
   }
-
-  @override
-  String get searchCriteriaTapToSearch =>
-      'Докоснете, за да започнете търсенето';
 
   @override
   String get noResults => 'Не са намерени бензиностанции.';
@@ -125,10 +103,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get apiKeySetup => 'API ключ';
-
-  @override
-  String get apiKeyDescription =>
-      'Регистрирайте се веднъж за безплатен API ключ.';
 
   @override
   String get apiKeyLabel => 'API ключ';
@@ -234,19 +208,10 @@ class AppLocalizationsBg extends AppLocalizations {
   String get country => 'Държава';
 
   @override
-  String get demoMode => 'Демо режим — показани са примерни данни.';
-
-  @override
-  String get setupLiveData => 'Настройка за реални данни';
-
-  @override
   String get freeNoKey => 'Безплатно — не е необходим ключ';
 
   @override
   String get apiKeyRequired => 'Необходим е API ключ';
-
-  @override
-  String get skipWithoutKey => 'Продължи без ключ';
 
   @override
   String get dataTransparency => 'Прозрачност на данните';
@@ -258,68 +223,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get clearCache => 'Изчистване на кеша';
 
   @override
-  String get clearAllData => 'Изтриване на всички данни';
-
-  @override
-  String get errorLog => 'Дневник на грешките';
-
-  @override
   String stationsFound(int count) {
     return 'Намерени $count бензиностанции';
   }
-
-  @override
-  String get whatIsShared => 'Какво се споделя — и с кого?';
-
-  @override
-  String get gpsCoordinates => 'GPS координати';
-
-  @override
-  String get gpsReason =>
-      'Изпращат се при всяко търсене за намиране на близки станции.';
-
-  @override
-  String get postalCodeData => 'Пощенски код';
-
-  @override
-  String get postalReason =>
-      'Преобразува се в координати чрез услуга за геокодиране.';
-
-  @override
-  String get mapViewport => 'Изглед на картата';
-
-  @override
-  String get mapReason =>
-      'Плочките на картата се зареждат от сървъра. Не се предават лични данни.';
-
-  @override
-  String get apiKeyData => 'API ключ';
-
-  @override
-  String get apiKeyReason =>
-      'Вашият личен ключ се изпраща с всяка API заявка. Свързан е с вашия имейл.';
-
-  @override
-  String get notShared => 'НЕ се споделя:';
-
-  @override
-  String get searchHistory => 'История на търсенето';
-
-  @override
-  String get favoritesData => 'Любими';
-
-  @override
-  String get profileNames => 'Имена на профили';
-
-  @override
-  String get homeZipData => 'Домашен пощенски код';
-
-  @override
-  String get usageData => 'Данни за използване';
-
-  @override
-  String get privacyBanner =>
-      'Това приложение няма сървър. Всички данни остават на вашето устройство. Без анализи, проследяване или реклами.';
 
   @override
   String get storageUsage => 'Използване на паметта на това устройство';
@@ -404,25 +310,12 @@ class AppLocalizationsBg extends AppLocalizations {
   String get cacheEmpty => 'Кешът е празен';
 
   @override
-  String get noStorage => 'Няма използвана памет';
-
-  @override
   String get apiKeyNote =>
       'Безплатна регистрация. Данни от държавни агенции за ценова прозрачност.';
 
   @override
   String get apiKeyFormatError =>
       'Невалиден формат — очакван UUID (8-4-4-4-12)';
-
-  @override
-  String get supportProject => 'Подкрепете този проект';
-
-  @override
-  String get supportDescription =>
-      'Това приложение е безплатно, с отворен код и без реклами. Ако го намирате за полезно, помислете да подкрепите разработчика.';
-
-  @override
-  String get reportBug => 'Докладване на грешка / Предложение за функция';
 
   @override
   String get reportThisIssue => 'Докладвай проблема';
@@ -466,9 +359,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get configApiKeyConfigured => 'Конфигуриран';
-
-  @override
-  String get configApiKeyNotSet => 'Не е зададен (демо режим)';
 
   @override
   String get configApiKeyCommunity => 'По подразбиране (общностен ключ)';
@@ -588,15 +478,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get expensive => 'скъпо';
 
   @override
-  String stationsOnMap(int count) {
-    return '$count станции';
-  }
-
-  @override
-  String get loadingFavorites =>
-      'Зареждане на любими...\nПърво потърсете станции, за да запазите данни.';
-
-  @override
   String get reportPrice => 'Докладване на цена';
 
   @override
@@ -622,10 +503,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get positionUnknown => 'Позицията е неизвестна';
-
-  @override
-  String get routeModeBannerLabel =>
-      'Режим на маршрута — разстоянията са по коридора';
 
   @override
   String get distancesFromCenter => 'Разстояния от центъра на търсенето';
@@ -758,12 +635,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get wrongStatusClosed => 'Показано като затворено, но отворено';
 
   @override
-  String get searchAlongRouteLabel => 'По маршрута';
-
-  @override
-  String get searchEvStations => 'Търсене на зарядни станции';
-
-  @override
   String get allStations => 'Всички станции';
 
   @override
@@ -886,11 +757,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get stop => 'Спирка';
 
   @override
-  String stopN(int n) {
-    return 'Спирка $n';
-  }
-
-  @override
   String get addStop => 'Добави спирка';
 
   @override
@@ -930,17 +796,10 @@ class AppLocalizationsBg extends AppLocalizations {
       'По избор: заменете вградения ключ с ваш собствен';
 
   @override
-  String get requiredForEvSearch =>
-      'Необходим за търсене на EV зарядни станции';
-
-  @override
   String get edit => 'Редактиране';
 
   @override
   String get fuelPricesApiKey => 'API ключ за цени на горива';
-
-  @override
-  String get tankerkoenigApiKey => 'API ключ Tankerkoenig';
 
   @override
   String get evChargingApiKey => 'API ключ за EV зареждане';
@@ -1014,12 +873,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get distanceKm => 'Разстояние (км)';
 
   @override
-  String get consumptionL100km => 'Разход (L/100км)';
-
-  @override
-  String get fuelPriceEurL => 'Цена на гориво (EUR/L)';
-
-  @override
   String get tripCost => 'Разход за пътуването';
 
   @override
@@ -1027,10 +880,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get totalCost => 'Общ разход';
-
-  @override
-  String get enterCalcValues =>
-      'Въведете разстояние, разход и цена за изчисляване на разхода за пътуването';
 
   @override
   String calculatorDistanceLabel(String unit) {
@@ -1100,10 +949,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get citySearchCache => 'Търсене на град';
 
   @override
-  String get dataDeletionNotAvailableCommunity =>
-      'Изтриването на данни не е достъпно в режим Общност. Първо прекъснете връзката или използвайте частна база данни.';
-
-  @override
   String priceHistoryStationsTracked(int count) {
     return '$count проследени станции';
   }
@@ -1127,19 +972,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get noPriceHistory => 'Все още няма ценова история';
 
   @override
-  String get noHourlyData => 'Няма почасови данни';
-
-  @override
   String get noStatistics => 'Няма налични статистики';
-
-  @override
-  String get statMin => 'Мин';
-
-  @override
-  String get statMax => 'Макс';
-
-  @override
-  String get statAvg => 'Ср';
 
   @override
   String get showAllFuelTypes => 'Показване на всички видове горива';
@@ -1148,34 +981,10 @@ class AppLocalizationsBg extends AppLocalizations {
   String get connected => 'Свързано';
 
   @override
-  String get notConnected => 'Не е свързано';
-
-  @override
-  String get connectTankSync => 'Свързване с TankSync';
-
-  @override
   String get disconnectTankSync => 'Прекъсване на TankSync';
 
   @override
   String get viewMyData => 'Преглед на моите данни';
-
-  @override
-  String get optionalCloudSync =>
-      'По избор облачна синхронизация за сигнали, любими и push известия';
-
-  @override
-  String get tapToUpdateGps => 'Натиснете за обновяване на GPS позицията';
-
-  @override
-  String get gpsAutoUpdateHint =>
-      'GPS позицията се получава автоматично при търсене. Можете също да я обновите ръчно тук.';
-
-  @override
-  String get clearGpsConfirm =>
-      'Изтриване на запазената GPS позиция? Можете да я обновите отново по всяко време.';
-
-  @override
-  String get pageNotFound => 'Страницата не е намерена';
 
   @override
   String get deleteAllServerData => 'Изтриване на всички данни от сървъра';
@@ -1207,9 +1016,6 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get forgetAllSyncedTripsSuccess =>
       'Всички синхронизирани пътувания са премахнати от сървъра';
-
-  @override
-  String get disconnectConfirm => 'Прекъсване на TankSync?';
 
   @override
   String get disconnect => 'Прекъсни';
@@ -1267,9 +1073,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get signIn => 'Вход';
-
-  @override
-  String get upgradeToEmail => 'Създай имейл акаунт';
 
   @override
   String get savedRoutes => 'Запазени маршрути';
@@ -1373,27 +1176,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get onboardingFinish => 'Начало';
 
   @override
-  String crossBorderNearby(String country) {
-    return '$country е наблизо';
-  }
-
-  @override
-  String crossBorderDistance(int km) {
-    return '~$km км до границата';
-  }
-
-  @override
-  String crossBorderAvgPrice(String price, int count) {
-    return 'Средна цена тук: $price EUR ($count станции)';
-  }
-
-  @override
-  String get allPricesView => 'Всички цени';
-
-  @override
-  String get compactView => 'Компактен';
-
-  @override
   String get switchToAllPricesView => 'Превключи към изглед с всички цени';
 
   @override
@@ -1482,20 +1264,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String failedToSwitch(String error) {
     return 'Неуспешно превключване: $error';
   }
-
-  @override
-  String get topicUrlCopied => 'URL на темата е копиран';
-
-  @override
-  String get testNotificationSent => 'Тестово известие е изпратено!';
-
-  @override
-  String get testNotificationFailed =>
-      'Неуспешно изпращане на тестово известие';
-
-  @override
-  String get pushUpdateFailed =>
-      'Неуспешно актуализиране на настройката за push известия';
 
   @override
   String get connectedAsGuest => 'Свързан като гост';
@@ -1703,11 +1471,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get privacyDeleteButton => 'Изтрий всички данни';
 
   @override
-  String privacyCopyErrorLog(int count) {
-    return 'Копирай журнала с грешки в клипборда ($count)';
-  }
-
-  @override
   String privacySaveErrorLog(int count) {
     return 'Запази дневник на грешки ($count)';
   }
@@ -1832,21 +1595,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get voiceAnnouncementsEnabled => 'Активирай гласови съобщения';
 
   @override
-  String voiceAnnouncementThreshold(String price) {
-    return 'Само под $price';
-  }
-
-  @override
-  String voiceAnnouncementCheapFuel(
-    String station,
-    String distance,
-    String fuelType,
-    String price,
-  ) {
-    return '$station, $distance километра напред, $fuelType $price';
-  }
-
-  @override
   String get voiceAnnouncementProximityRadius => 'Радиус на съобщенията';
 
   @override
@@ -1854,23 +1602,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get voiceAnnouncementPriceLimit => 'Maximum price';
-
-  @override
-  String get nearestStations => 'Nai-blizki stantsii';
-
-  @override
-  String get nearestStationsHint =>
-      'Namerete nai-blizkite stantsii chrez vashata aktualna pozitsiya';
-
-  @override
-  String get consumptionLogTitle => 'Разход на гориво';
-
-  @override
-  String get consumptionLogMenuTitle => 'Журнал на разхода';
-
-  @override
-  String get consumptionLogMenuSubtitle =>
-      'Проследявайте зарежданията и изчислявайте л/100км';
 
   @override
   String get consumptionStatsTitle => 'Статистика на разхода';
@@ -1987,9 +1718,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get fillUpVehicleLabel => 'Превозно средство';
 
   @override
-  String get fillUpVehicleNone => 'Без превозно средство';
-
-  @override
   String get fillUpVehicleRequired => 'Превозното средство е задължително';
 
   @override
@@ -2008,9 +1736,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get pickStationSkip => 'Пропусни — добави без станция';
-
-  @override
-  String get scanPump => 'Сканирай помпа';
 
   @override
   String get scanPayment => 'Сканирай QR за плащане';
@@ -2081,18 +1806,8 @@ class AppLocalizationsBg extends AppLocalizations {
   String get torchOff => 'Изключи светкавица';
 
   @override
-  String get obdNoAdapter => 'Няма OBD2 адаптер в обхват';
-
-  @override
-  String get obdOdometerUnavailable => 'Неуспешно четене на одометъра';
-
-  @override
   String get obdPermissionDenied =>
       'Разрешете Bluetooth в системните настройки';
-
-  @override
-  String get obdAdapterUnresponsive =>
-      'Адаптерът не отговори — включете запалването и опитайте отново';
 
   @override
   String get obdPickerTitle => 'Изберете OBD2 адаптер';
@@ -2102,18 +1817,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get obdPickerConnecting => 'Свързване...';
-
-  @override
-  String get themeSettingTitle => 'Тема';
-
-  @override
-  String get themeModeLight => 'Светла';
-
-  @override
-  String get themeModeDark => 'Тъмна';
-
-  @override
-  String get themeModeSystem => 'Следвай системата';
 
   @override
   String get tripRecordingTitle => 'Запис на пътуване';
@@ -2262,24 +1965,11 @@ class AppLocalizationsBg extends AppLocalizations {
   String get obd2StatusConnected => 'OBD2 адаптер: свързан';
 
   @override
-  String get obd2StatusAttempting => 'OBD2 адаптер: свързване';
-
-  @override
-  String get obd2StatusUnreachable => 'OBD2 адаптер: недостъпен';
-
-  @override
   String get obd2StatusPermissionDenied =>
       'OBD2 адаптер: необходимо е разрешение за Bluetooth';
 
   @override
   String get obd2StatusConnectedBody => 'Готов за запис на пътуване.';
-
-  @override
-  String get obd2StatusAttemptingBody => 'Свързване на заден план...';
-
-  @override
-  String get obd2StatusUnreachableBody =>
-      'Адаптерът е извън обхват или вече се използва от друго приложение.';
 
   @override
   String get obd2StatusPermissionDeniedBody =>
@@ -2296,10 +1986,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get tripHistoryEmptyTitle => 'Все още няма пътувания';
-
-  @override
-  String get tripHistoryEmptySubtitle =>
-      'Свържете OBD2 адаптер и запишете пътуване, за да започнете да изграждате историята на шофирането си.';
 
   @override
   String get tripHistoryUnknownDate => 'Неизвестна дата';
@@ -2338,13 +2024,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get situationFuelCut => 'Отрязване на гориво — инерция';
 
   @override
-  String get tripSaveAsFillUp => 'Запази като зареждане';
-
-  @override
   String get tripSaveRecording => 'Запази пътуване';
-
-  @override
-  String get tripDiscard => 'Отхвърли';
 
   @override
   String get tripSummaryAutoSaved => 'Trip saved automatically';
@@ -2356,15 +2036,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get tripSummaryDelete => 'Delete this trip';
 
   @override
-  String obdOdometerRead(int km) {
-    return 'Одометърът е прочетен: $km км';
-  }
-
-  @override
   String get vehicleFuelNotSet => 'Не е зададено';
-
-  @override
-  String get wizardVehicleTapToEdit => 'Докоснете за редактиране';
 
   @override
   String get wizardVehicleDefaultBadge => 'По подразбиране';
@@ -2400,10 +2072,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get wizardProfileCustomName => 'Персонален';
-
-  @override
-  String get wizardProfileCustomDescription =>
-      'Ваша собствена комбинация от функции. Настройте всеки превключвател по-долу.';
 
   @override
   String get useModeSectionHint =>
@@ -2534,15 +2202,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get evMinPower => 'Мин. мощност';
 
   @override
-  String get evMaxPower => 'Макс. мощност';
-
-  @override
-  String get evOperator => 'Оператор';
-
-  @override
-  String get evLastUpdate => 'Последна актуализация';
-
-  @override
   String get evStatusAvailable => 'Налично';
 
   @override
@@ -2565,9 +2224,6 @@ class AppLocalizationsBg extends AppLocalizations {
       'Запазено като настройки по подразбиране';
 
   @override
-  String get profileNotFound => 'Няма активен профил';
-
-  @override
   String get updatingFavorites => 'Актуализиране на любимите ви...';
 
   @override
@@ -2575,9 +2231,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get noDataAvailable => 'Няма данни';
-
-  @override
-  String get configAndPrivacy => 'Конфигурация и поверителност';
 
   @override
   String get searchToSeeMap => 'Търсете, за да видите станциите на картата';
@@ -2871,15 +2524,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get scanReceipt => 'Сканирай касова бележка';
 
   @override
-  String get obdConnect => 'OBD-II';
-
-  @override
-  String get stationTypeFuel => 'Горивна';
-
-  @override
-  String get stationTypeEv => 'EV';
-
-  @override
   String get brandFilterHighway => 'Магистрала';
 
   @override
@@ -2946,10 +2590,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get alertsLoadErrorTitle => 'Сигналите не можаха да бъдат заредени';
-
-  @override
-  String get alertsBackgroundCheckErrorTitle =>
-      'Неуспешна фонова проверка на сигналите';
 
   @override
   String get detailsLabel => 'Подробности';
@@ -3312,12 +2952,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get swipeHide => 'Скрий';
 
   @override
-  String get evChargingSection => 'EV зареждане';
-
-  @override
-  String get fuelStationsSection => 'Горивни станции';
-
-  @override
   String get yourRating => 'Вашата оценка';
 
   @override
@@ -3332,26 +2966,6 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get aboutSupportDescription =>
       'Това приложение е безплатно, с отворен код и без реклами. Ако го намирате за полезно, обмислете да подкрепите разработчика.';
-
-  @override
-  String get luxembourgRegulatedPricesNotice =>
-      'Цените на горивото в Люксембург са регулирани от правителството и са еднакви в цялата страна.';
-
-  @override
-  String get luxembourgFuelUnleaded95 => 'Безоловен 95';
-
-  @override
-  String get luxembourgFuelUnleaded98 => 'Безоловен 98';
-
-  @override
-  String get luxembourgFuelDiesel => 'Дизел';
-
-  @override
-  String get luxembourgFuelLpg => 'LPG';
-
-  @override
-  String get luxembourgPricesUnavailable =>
-      'Регулираните цени на горивото в Люксембург са недостъпни.';
 
   @override
   String get reportIssueTitle => 'Докладвай проблем';
@@ -3442,20 +3056,6 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
-  String get southKoreaApiKeyRequired =>
-      'Регистрирайте се в OPINET за безплатен API ключ';
-
-  @override
-  String get southKoreaApiProvider => 'OPINET (KNOC)';
-
-  @override
-  String get chileApiKeyRequired =>
-      'Регистрирайте се в CNE за безплатен API ключ';
-
-  @override
-  String get chileApiProvider => 'CNE Bencina en Linea';
-
-  @override
   String get vinConfirmTitle => 'Това ли е колата ви?';
 
   @override
@@ -3538,9 +3138,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get alertsRadiusFuelType => 'Вид гориво';
 
   @override
-  String get alertsRadiusThreshold => 'Праг (€/л)';
-
-  @override
   String get alertsRadiusKm => 'Радиус (км)';
 
   @override
@@ -3556,9 +3153,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get alertsRadiusCancel => 'Отказ';
 
   @override
-  String get alertsRadiusDeleteConfirm => 'Изтрий радиусния сигнал?';
-
-  @override
   String radiusAlertDeleted(String name) {
     return 'Радиус-сигналът „$name“ е изтрит';
   }
@@ -3570,16 +3164,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get obd2PairChipTooltip => 'Сдвои OBD2 адаптер';
-
-  @override
-  String velocityAlertTitle(String fuelLabel) {
-    return '$fuelLabel поевтиня в близките станции';
-  }
-
-  @override
-  String velocityAlertBody(int stationCount, int maxDropCents) {
-    return '$stationCount станции са намалили с до $maxDropCents¢ в последния час';
-  }
 
   @override
   String get fillUpSavedSnackbar => 'Зареждането е запазено';
@@ -3812,16 +3396,6 @@ class AppLocalizationsBg extends AppLocalizations {
       'Добавете любима станция, за да тествате наслагването при приближаване';
 
   @override
-  String approachStationDistance(String meters) {
-    return 'на $meters м';
-  }
-
-  @override
-  String fuelStationRadarDistanceKm(String km) {
-    return '$km km разстояние';
-  }
-
-  @override
   String fuelStationRadarProximity(int percent) {
     return 'Близост $percent%';
   }
@@ -3913,13 +3487,6 @@ class AppLocalizationsBg extends AppLocalizations {
       'Забавяне на запазване след прекъсване (секунди)';
 
   @override
-  String get autoRecordPairedAdapterLabel => 'Сдвоен адаптер';
-
-  @override
-  String get autoRecordPairedAdapterNone =>
-      'Няма сдвоен адаптер. Сдвоете такъв чрез OBD2 въвеждащия екран.';
-
-  @override
   String get autoRecordBackgroundLocationLabel =>
       'Разрешено фоново местоположение';
 
@@ -3946,14 +3513,8 @@ class AppLocalizationsBg extends AppLocalizations {
       'Не може да се поиска фоново местоположение';
 
   @override
-  String get autoRecordBadgeClearTooltip => 'Изчисти брояча';
-
-  @override
   String get autoRecordPairAdapterLinkText =>
       'Сдвоете адаптер в секцията по-долу, за да активирате автоматичния запис';
-
-  @override
-  String get exportBackupTooltip => 'Експортирай резервно копие';
 
   @override
   String get exportBackupReady =>
@@ -3972,9 +3533,6 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
-  String get restoreBackupTooltip => 'Възстанови резервно копие';
-
-  @override
   String get restoreBackupDialogTitle => 'Възстанови резервно копие';
 
   @override
@@ -3986,11 +3544,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get restoreBackupReplaceAction => 'Замени всичко';
-
-  @override
-  String restoreBackupSuccess(int count) {
-    return 'Резервното копие е възстановено — $count записа импортирани';
-  }
 
   @override
   String get restoreBackupEmpty =>
@@ -4028,9 +3581,6 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
-  String get brokenMapChipVerifying => 'MAP сензорът се проверява...';
-
-  @override
   String get brokenMapChipDisclaimer => 'Подозрителни MAP показания';
 
   @override
@@ -4040,21 +3590,6 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get brokenMapBannerHardDisable =>
       'MAP сензорът е ненадежден. Показват се средни стойности от зареждания вместо живия горивен поток.';
-
-  @override
-  String brokenMapOverlayVerified(String confidence) {
-    return 'MAP сензор: потвърден ($confidence)';
-  }
-
-  @override
-  String brokenMapOverlayUnverified(String confidence) {
-    return 'MAP сензор: проверява се ($confidence)';
-  }
-
-  @override
-  String brokenMapOverlaySuspicious(String confidence) {
-    return 'MAP сензор: подозрителен ($confidence)';
-  }
 
   @override
   String brokenMapOverlayPosterior(String posterior, String margin) {
@@ -4272,9 +3807,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get chargingChartsEmpty => 'Все още няма достатъчно данни';
 
   @override
-  String get chargingChartsMonthAxis => 'Месец';
-
-  @override
   String get confirmDeleteTitle => 'Delete?';
 
   @override
@@ -4471,20 +4003,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get fillUpCorrectionStation => 'Наименование на станция (по избор)';
-
-  @override
-  String get greeceApiProvider => 'Paratiritirio Timon (Гърция)';
-
-  @override
-  String get greeceCommunityApiNotice =>
-      'Работи с поддържания от общността fuelpricesgr API';
-
-  @override
-  String get romaniaApiProvider => 'Monitorul Prețurilor (Румъния)';
-
-  @override
-  String get romaniaScrapingNotice =>
-      'Работи с monitorulpreturilor.info (Съвет за конкуренция + ANPC)';
 
   @override
   String crossBorderCheaper(String country, String km, String price) {
@@ -4998,18 +4516,6 @@ class AppLocalizationsBg extends AppLocalizations {
       'High revs at cruise — shifting up earlier saves fuel';
 
   @override
-  String get ecoRouteOption => 'Еко';
-
-  @override
-  String ecoRouteSavings(String liters) {
-    return '≈ $liters л спестени';
-  }
-
-  @override
-  String get ecoRouteHint =>
-      'По-интелигентно пътуване — предпочита постоянна магистрала пред зигзагообразни преки пътища.';
-
-  @override
   String get obd2CoverageNoneNote =>
       'No engine data arrived from the OBD2 adapter on this trip — fuel figures are GPS-based estimates.';
 
@@ -5083,14 +4589,6 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get featureDescription_baselineSync =>
       'Синхронизиране на базови стойности за шофиране чрез TankSync.';
-
-  @override
-  String get featureLabel_unifiedSearchResults =>
-      'Обединени резултати от търсенето';
-
-  @override
-  String get featureDescription_unifiedSearchResults =>
-      'Единен списък с резултати, комбиниращ горивни и EV станции.';
 
   @override
   String get featureLabel_priceAlerts => 'Ценови сигнали';
@@ -5188,13 +4686,6 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get featureBlockedEnable_autoRecord =>
       'Първо активирайте записа на OBD2 пътувания';
-
-  @override
-  String get featureBlockedEnable_showFuel => 'Предпоставките не са изпълнени';
-
-  @override
-  String get featureBlockedEnable_showElectric =>
-      'Предпоставките не са изпълнени';
 
   @override
   String get featureBlockedEnable_showConsumptionTab =>
@@ -5547,10 +5038,6 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
-  String get scanPumpUnreadable =>
-      'Дисплеят на помпата не е четим — опитайте отново';
-
-  @override
   String get scanPumpSuccess =>
       'Дисплеят на помпата е сканиран — проверете стойностите.';
 
@@ -5566,9 +5053,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String scanPumpFailed(String error) {
     return 'Сканирането на помпата не успя: $error';
   }
-
-  @override
-  String get badScanReportTitle => 'Докладвай грешка при сканиране';
 
   @override
   String get badScanReportTitleReceipt =>
@@ -5597,9 +5081,6 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get badScanReportHint =>
       'Ще споделим снимката на касовата бележка и двата набора стойности, за да може следващата версия да научи това оформление.';
-
-  @override
-  String get badScanReportShareAction => 'Сподели доклад + снимка';
 
   @override
   String get badScanReportFieldBrandLayout => 'Оформление на марката';
@@ -5637,10 +5118,6 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get badScanReportFallbackToShare =>
       'Изпращането не успя — ръчно споделяне';
-
-  @override
-  String get pumpCameraHint =>
-      'Подравнете трите цифри от дисплея на колонката в рамката';
 
   @override
   String get pumpCameraCapture => 'Заснемане';
@@ -5705,37 +5182,13 @@ class AppLocalizationsBg extends AppLocalizations {
   String get fillUpSectionWhereSubtitle => 'Станция, одометър, бележки';
 
   @override
-  String get fillUpImportFromLabel => 'Импортирай от...';
-
-  @override
-  String get fillUpImportSheetTitle => 'Импортиране на данни за зареждане';
-
-  @override
   String get fillUpImportReceiptLabel => 'Касова бележка';
-
-  @override
-  String get fillUpImportReceiptDescription =>
-      'Сканирайте хартиена касова бележка с камерата';
 
   @override
   String get fillUpImportPumpLabel => 'Дисплей на помпата';
 
   @override
-  String get fillUpImportPumpDescription =>
-      'Прочетете Betrag / Preis от LCD на помпата';
-
-  @override
-  String get fillUpImportObdLabel => 'OBD-II адаптер';
-
-  @override
-  String get fillUpImportObdDescription =>
-      'Прочетете одометъра от OBD-II порта по Bluetooth';
-
-  @override
   String get fillUpPricePerLiterLabel => 'Цена на литър';
-
-  @override
-  String get vehicleHeaderPlateLabel => 'Регистрационен номер';
 
   @override
   String get vehicleHeaderUntitled => 'Ново превозно средство';
@@ -5798,17 +5251,6 @@ class AppLocalizationsBg extends AppLocalizations {
       locale: localeName,
       other: '$count fills',
       one: '1 fill',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String fuelEfficiencyMixedFootnote(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count mixed tanks counted toward their main fuel',
-      one: '1 mixed tank counted toward its main fuel',
     );
     return '$_temp0';
   }
@@ -6063,9 +5505,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get gpsRoadUseSource => 'From your GPS track';
 
   @override
-  String get hapticEcoCoachSectionTitle => 'Шофиране';
-
-  @override
   String get hapticEcoCoachSettingTitle => 'Еко-коучинг в реално време';
 
   @override
@@ -6303,15 +5742,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get calculatorPriceHint => 'напр. 1.899';
-
-  @override
-  String get routeStrategyLabel => 'Стратегия:';
-
-  @override
-  String get routeStrategyUniform => 'Равномерна';
-
-  @override
-  String get routeStrategyBalanced => 'Балансирана';
 
   @override
   String get glideCoachBetaTitle => 'Glide-coach бета (експериментален)';
@@ -6725,10 +6155,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get obd2DiagnosticsInitCold => 'студено';
 
   @override
-  String get obd2HealthCopyInitTranscript =>
-      'Копирай само протокола за инициализация';
-
-  @override
   String get obd2DiagnosticsEmpty =>
       'Все още няма записана OBD2 сесия — свържете адаптер и запишете пътуване с включен режим на разработчик.';
 
@@ -6747,12 +6173,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get obd2HealthHistorySection => 'Последни сесии';
-
-  @override
-  String get obd2HealthCopyJson => 'Копирай като JSON';
-
-  @override
-  String get obd2HealthCopied => 'OBD2 диагностиката е копирана в клипборда.';
 
   @override
   String get obd2HealthDownloadJson => 'Download as JSON';
@@ -7004,9 +6424,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get ocrTesterRunning => 'Изпълнява се OCR…';
 
   @override
-  String get ocrTesterNoResult => 'OCR не даде четлив резултат.';
-
-  @override
   String get ocrTesterOverlaySection => 'Блоков преглед';
 
   @override
@@ -7116,10 +6533,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get onboardingObd2ReadingVin => 'Четене на VIN...';
-
-  @override
-  String get onboardingObd2VinReadFailed =>
-      'Неуспешно четене на VIN — въведете ръчно';
 
   @override
   String get onboardingObd2ConnectFailed =>
@@ -7320,16 +6733,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get radiusAlertCenterFromMap => 'Местоположение от картата';
 
   @override
-  String radiusAlertNotificationTitle(String fuelLabel, String label) {
-    return '$fuelLabel близо до $label';
-  }
-
-  @override
-  String radiusAlertNotificationBody(String price, String threshold) {
-    return 'Станция е на цена $price € (цел: $threshold €)';
-  }
-
-  @override
   String get reconcileWorkflowTitle => 'Изравняване на горивото';
 
   @override
@@ -7423,17 +6826,10 @@ class AppLocalizationsBg extends AppLocalizations {
       'Разреши неизравнената разлика между гориво и пътувания';
 
   @override
-  String get refuelUnitPerLiter => '/л';
-
-  @override
   String get refuelUnitPerKwh => '/kWh';
 
   @override
   String get refuelUnitPerSession => '/сесия';
-
-  @override
-  String get shareReceiptImporting =>
-      'Импортиране на споделената касова бележка…';
 
   @override
   String get shareReceiptUnsupportedFormat =>
@@ -7600,16 +6996,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String tankLevelLastFillUpFormat(String date, String count) {
     return 'Последно зареждане: $date · $count пътуване(ия) оттогава';
   }
-
-  @override
-  String get tankLevelMethodObd2 => 'Измерено от OBD2';
-
-  @override
-  String get tankLevelMethodDistanceFallback =>
-      'приблизителна оценка по разстояние';
-
-  @override
-  String get tankLevelMethodMixed => 'смесено измерване';
 
   @override
   String get tankLevelEmptyNoFillUp =>
@@ -7912,9 +7298,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get trajetDetailChartAltitudeRelative => 'Altitude (m, from start)';
 
   @override
-  String get trajetDetailChartAltitude => 'Височина (m)';
-
-  @override
   String get trajetDetailChartLambda => 'Командвано λ';
 
   @override
@@ -7972,9 +7355,6 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get trajetDetailDeleteConfirmBody =>
       'Това пътуване ще бъде окончателно премахнато от историята ви.';
-
-  @override
-  String get trajetDetailDeleteConfirmCancel => 'Отказ';
 
   @override
   String get trajetDetailDeleteConfirmConfirm => 'Изтрий';
@@ -8041,9 +7421,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get tripPathCardSubtitle => 'GPS-записан маршрут';
 
   @override
-  String get tripPathLegendTitle => 'Разход';
-
-  @override
   String get tripPathLegendEfficient => 'Ефективен (< 6 л/100км)';
 
   @override
@@ -8078,9 +7455,6 @@ class AppLocalizationsBg extends AppLocalizations {
       'Резултат от радара за бензиностанции';
 
   @override
-  String get radarAcquiringLocation => 'Finding your location…';
-
-  @override
   String get radarUpdatingLocation => 'Updating your location…';
 
   @override
@@ -8113,10 +7487,6 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get tripRecordingResumeHintMessage =>
       'Записването продължава на заден план. Докоснете червения банер в горната част на всеки екран за връщане.';
-
-  @override
-  String get tripBannerOpenFromConsumptionTab =>
-      'Отвори активното пътуване от раздела Разход';
 
   @override
   String get tripRecordingUnpinnedWarning =>
@@ -8234,18 +7604,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get trajetDeletedUndoSnackbar => 'Recording deleted';
-
-  @override
-  String get unifiedFilterFuel => 'Гориво';
-
-  @override
-  String get unifiedFilterEv => 'EV';
-
-  @override
-  String get unifiedFilterBoth => 'И двете';
-
-  @override
-  String get unifiedNoResultsForFilter => 'Няма резултати за този филтър';
 
   @override
   String get searchFailedSnackbar =>
@@ -8419,9 +7777,6 @@ class AppLocalizationsBg extends AppLocalizations {
       'При сдвояване с адаптер, VIN номерът на превозното средство се чете локално за идентификация на автомобила. Активирането изпраща 17-символния VIN до безплатната услуга vPIC на NHTSA за търсене на допълнителни детайли (модел, обем на двигателя, вид гориво). VIN е единствените данни, изпратени — никакви други данни не напускат устройството.';
 
   @override
-  String get vehicleDetectedFromVinBadge => '(открито)';
-
-  @override
   String vehicleDetectedFromVinSnackbar(String summary) {
     return 'Открито от VIN: $summary. Да се приложи?';
   }
@@ -8493,7 +7848,4 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get widgetVariantPredictive =>
       'Прогностична: най-добро време за зареждане';
-
-  @override
-  String get widgetPredictiveNowPrefix => 'сега';
 }

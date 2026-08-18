@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/elm327_vin_parser.dart';
+import 'package:tankstellen/features/obd2/data/protocol/elm327_vin_parser.dart';
 
 /// #3278 — the framing-aware Mode 09 VIN decoder. These pin the EXACT decoded
 /// VIN (not just its length), which is what catches the real multiline bug the

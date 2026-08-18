@@ -13,6 +13,7 @@ import '../../domain/entities/consumption_stats.dart';
 import '../../providers/pending_reconciliation_provider.dart';
 import 'confidence_tier_badge.dart';
 import 'resolve_gap_banner.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 part 'consumption_stats_card_parts.dart';
 
@@ -178,7 +179,7 @@ class ConsumptionStatsCard extends ConsumerWidget {
                   icon: Icons.speed,
                   label: l.statAvgConsumption,
                   value: avgConsumption != null
-                      ? avgConsumption.toStringAsFixed(2)
+                      ? UnitFormatter.formatDecimal(avgConsumption, fractionDigits: 2)
                       : '—',
                 ),
               ),
@@ -201,7 +202,7 @@ class ConsumptionStatsCard extends ConsumerWidget {
                 child: _StatTile(
                   icon: Icons.local_gas_station,
                   label: l.statTotalLiters,
-                  value: stats.totalLiters.toStringAsFixed(1),
+                  value: UnitFormatter.formatDecimal(stats.totalLiters),
                 ),
               ),
               Expanded(
@@ -230,7 +231,7 @@ class ConsumptionStatsCard extends ConsumerWidget {
             const SizedBox(height: 4),
             Text(
               l.statCorrectionLiters(
-                stats.correctionLitersTotal.toStringAsFixed(1),
+                UnitFormatter.formatDecimal(stats.correctionLitersTotal),
               ),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,

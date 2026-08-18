@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/charging_log_readout.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Renders the EUR/100 km + kWh/100 km line below the cost field on
 /// the Add-Charging-Log form (#582 phase 2). Pulled out of
@@ -44,8 +45,8 @@ class ChargingLogDerivedReadoutPanel extends StatelessWidget {
         ),
       );
     }
-    final eurStr = r.eurPer100km!.toStringAsFixed(2);
-    final kwhStr = r.kwhPer100km!.toStringAsFixed(1);
+    final eurStr = UnitFormatter.formatDecimal(r.eurPer100km!, fractionDigits: 2);
+    final kwhStr = UnitFormatter.formatDecimal(r.kwhPer100km!);
     return Padding(
       padding: const EdgeInsets.only(top: 6, left: 12),
       child: Row(

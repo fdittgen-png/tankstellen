@@ -40,7 +40,7 @@ void main() {
       expect(find.textContaining('Peugeot'), findsOneWidget);
       expect(find.textContaining('107'), findsOneWidget);
       expect(find.textContaining('2008'), findsOneWidget);
-      expect(find.textContaining('1.0'), findsOneWidget);
+      expect(find.textContaining('1,0'), findsOneWidget);
       expect(find.textContaining('Gasoline'), findsOneWidget);
       // No partial-info note on a full vPIC result.
       expect(

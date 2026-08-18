@@ -189,7 +189,7 @@ void main() {
 
       expect(find.text('ACME GmbH'), findsOneWidget);
       expect(find.text('DE89370400440532013000'), findsOneWidget);
-      expect(find.text('42.50 €'), findsOneWidget);
+      expect(find.text('42,50 €'), findsOneWidget);
     });
 
     testWidgets('Cancel pops with false', (tester) async {

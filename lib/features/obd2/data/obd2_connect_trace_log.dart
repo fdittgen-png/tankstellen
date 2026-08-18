@@ -4,7 +4,7 @@
 import 'package:flutter/foundation.dart' show debugPrint;
 
 import 'obd2_comm_diagnostics.dart' show redactObd2Mac;
-import 'obd2_connect_classifier.dart';
+import '../domain/obd2_connect_classifier.dart';
 import 'obd2_connect_trace.dart';
 
 // #3014 — the mutable per-attempt builder lives in a `part` so this file stays

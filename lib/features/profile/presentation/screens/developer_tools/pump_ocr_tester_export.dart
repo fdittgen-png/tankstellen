@@ -14,21 +14,18 @@ import '../../../../../core/logging/error_logger.dart';
 import '../../../../../core/sharing/public_file_exporter.dart';
 import '../../../../consumption/data/ocr/ocr_trace_package.dart';
 import '../../../../consumption/data/ocr/ocr_trace_serializer.dart';
+import '../../../../../core/sharing/share_seam.dart';
 
-/// Test-only override for the OCR-package share-sheet handoff, mirroring
-/// `error_log_export_row.debugErrorLogShareSinkOverride` (#2518). Widget
-/// tests substitute a fake to assert the outgoing payload without
-/// launching the real OS share sheet.
-typedef OcrPackageShareSink = Future<void> Function(ShareParams params);
-
-/// See [OcrPackageShareSink].
+/// Test-only override for the OCR-package share-sheet handoff (#2518)
+/// — the shared [ShareSink] seam, mirroring
+/// `error_log_export_row.debugErrorLogShareSinkOverride`.
 @visibleForTesting
-OcrPackageShareSink? debugOcrPackageShareSinkOverride;
+ShareSink? debugOcrPackageShareSinkOverride;
 
 /// Test-only override for the temp-directory lookup used by the
-/// share-sheet path (#2518).
+/// share-sheet path (#2518) — the shared [ShareTempDirectoryProvider].
 @visibleForTesting
-Future<Directory> Function()? debugOcrPackageTempDirectoryOverride;
+ShareTempDirectoryProvider? debugOcrPackageTempDirectoryOverride;
 
 /// Byte threshold above which the JSON export prefers the OS share sheet
 /// over the clipboard — same rationale as the error-log export (#1301):
@@ -186,6 +183,7 @@ class OcrTesterExport {
 
   /// Formats a money/volume double into a slug fragment: `18.59` → `18_59`.
   static String _money(double v) =>
+      // i18n-ignore-format: export filename fragment — locale-neutral
       v.toStringAsFixed(2).replaceAll('.', '_');
 
   /// Returns a copy of [package] with `expected` seeded from `result` (when

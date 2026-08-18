@@ -7,14 +7,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/supabase_client.dart';
-import '../../../core/sync/alerts_sync.dart';
+import '../../alerts/api.dart';
 import '../../../core/sync/favorites_sync.dart';
-import '../../../core/sync/fill_ups_sync.dart';
+import '../../consumption/api.dart';
 import '../../../core/sync/vehicles_sync.dart';
-import '../../alerts/data/models/price_alert.dart';
-import '../../alerts/providers/alert_provider.dart';
-import '../../consumption/domain/entities/fill_up.dart';
-import '../../consumption/providers/consumption_providers.dart';
 import '../../favorites/providers/favorites_provider.dart';
 import '../../../core/domain/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';

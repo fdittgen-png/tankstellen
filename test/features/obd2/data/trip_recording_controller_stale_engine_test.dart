@@ -13,10 +13,10 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 import 'package:tankstellen/features/obd2/data/paused_trip_repository.dart';
-import 'package:tankstellen/features/obd2/data/trip_recording_controller.dart';
+import 'package:tankstellen/features/obd2/data/session/trip_recording_controller.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 
 void main() {

@@ -6,10 +6,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../../../core/time/app_clock.dart';
-import '../data/android_background_adapter_listener.dart';
+import '../data/transport/android_background_adapter_listener.dart';
 // The wake() action lives in the supervisor library's part extension —
 // importing the library brings it into scope.
-import '../data/obd2_link_supervisor.dart';
+import '../data/session/obd2_link_supervisor.dart';
 import 'obd2_reconnect_provider.dart';
 
 part 'obd2_engine_start_hint_provider.g.dart';

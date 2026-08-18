@@ -11,10 +11,10 @@ import 'dart:math';
 
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/obd2_link_drop_signal.dart';
-import 'package:tankstellen/features/obd2/data/obd2_link_supervisor.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_link_drop_signal.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_link_supervisor.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 
 Obd2Service _liveService() => Obd2Service(FakeObd2Transport());
 

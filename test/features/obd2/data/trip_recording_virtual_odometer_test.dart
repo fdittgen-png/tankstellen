@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
-import 'package:tankstellen/features/obd2/data/trip_recording_controller.dart';
-import 'package:tankstellen/features/obd2/data/virtual_odometer.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/session/trip_recording_controller.dart';
+import 'package:tankstellen/features/obd2/domain/virtual_odometer.dart';
 
 // Shared AT-init boilerplate for the FakeObd2Transport.
 const _initResponses = {

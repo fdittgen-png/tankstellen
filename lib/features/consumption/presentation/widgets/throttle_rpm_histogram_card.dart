@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/services/throttle_rpm_histogram_calculator.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Throttle / RPM time-share histogram card on the Trip detail screen
 /// (#1041 phase 3a — "Card C").
@@ -189,7 +190,8 @@ class _BarRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l = AppLocalizations.of(context);
-    final pctFormatted = (share * 100).toStringAsFixed(0);
+    final pctFormatted =
+        UnitFormatter.formatDecimal(share * 100, fractionDigits: 0);
     final pctLabel = l.throttleRpmHistogramBarShare(pctFormatted);
 
     // Convert share to integer flex so Flexible(flex:) stays consistent

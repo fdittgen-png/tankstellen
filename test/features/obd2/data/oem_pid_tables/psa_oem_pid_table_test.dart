@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/oem_pid_table.dart';
-import 'package:tankstellen/features/obd2/data/oem_pid_tables/psa_oem_pid_table.dart';
+import 'package:tankstellen/features/obd2/data/protocol/oem_pid_table.dart';
+import 'package:tankstellen/features/obd2/data/protocol/oem_pid_tables/psa_oem_pid_table.dart';
 
 /// Programmable in-memory [Obd2RawCommandPort]. Records every command
 /// the table sends so the integration test can assert the wire-level

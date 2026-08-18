@@ -8,7 +8,7 @@ import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/moderation/content_moderation_providers.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
-import 'package:tankstellen/core/sync/trip_shares_sync.dart';
+import 'package:tankstellen/features/consumption/data/trip_shares_sync.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_entry.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/shared_trips_section.dart';

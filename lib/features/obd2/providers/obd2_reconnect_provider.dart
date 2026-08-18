@@ -14,11 +14,11 @@ import '../data/last_good_adapter_store.dart';
 import '../data/obd2_comm_diagnostics.dart';
 import '../data/obd2_connect_trace.dart';
 import '../data/obd2_connect_trace_log.dart';
-import '../data/obd2_connection_service.dart';
-import '../data/obd2_dial_budget.dart';
-import '../data/obd2_disconnect_quietly.dart';
-import '../data/obd2_link_supervisor.dart';
-import '../data/obd2_service.dart';
+import '../data/session/obd2_connection_service.dart';
+import '../data/session/obd2_dial_budget.dart';
+import '../data/session/obd2_disconnect_quietly.dart';
+import '../data/session/obd2_link_supervisor.dart';
+import '../data/session/obd2_service.dart';
 import 'obd2_connection_state_provider.dart';
 
 part 'obd2_reconnect_provider.g.dart';

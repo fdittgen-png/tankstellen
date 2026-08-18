@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/elm_gatt_profiles.dart';
+import 'package:tankstellen/features/obd2/data/transport/elm_gatt_profiles.dart';
 
 /// #3014 (Epic #3013, Phase 2) — property-based ELM327 GATT discovery.
 ///

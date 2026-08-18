@@ -208,17 +208,17 @@ class GreeceStationService
         }
         rows = data;
       } on DioException catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.other, e, st,
-            context: const {'where': 'GR ranged fetch failed (#3539)'}));
-        final status = e.response?.statusCode;
         // 401/403 = the shared public key was revoked / a self-hosted
         // deployment is behind different auth — a hard, actionable error.
-        throw ApiException(
-          message: status == 401 || status == 403
-              ? 'Paratiritirio mirror rejected request (HTTP $status) — '
-                  'API key revoked?'
-              : 'Paratiritirio mirror unreachable: ${e.type.name}',
-          statusCode: status,
+        throwApiException(
+          e,
+          stackTrace: st,
+          logWhere: 'GR ranged fetch failed (#3539)',
+          authRejectedMessage: (status) =>
+              'Paratiritirio mirror rejected request (HTTP $status) — '
+              'API key revoked?',
+          customMessage: (e) =>
+              'Paratiritirio mirror unreachable: ${e.type.name}',
         );
       }
     }

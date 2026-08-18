@@ -3,11 +3,13 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/widgets/info_card.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Status card shown when the user is signed in with an email account.
 ///
-/// Displays the signed-in email and a button to switch to anonymous.
+/// Displays the signed-in email (via the shared [InfoCard] skeleton)
+/// and a button to switch to anonymous.
 class EmailUserStatusCard extends StatelessWidget {
   final String? userEmail;
   final bool isLoading;
@@ -27,41 +29,16 @@ class EmailUserStatusCard extends StatelessWidget {
 
     return Column(
       children: [
-        Card(
-          color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.verified_user,
-                      size: 20,
-                      color: theme.colorScheme.primary,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        l10n.syncSignedInAs(userEmail ?? ''),
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.syncEmailDescription,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
+        InfoCard(
+          icon: Icons.verified_user,
+          iconColor: theme.colorScheme.primary,
+          cardColor: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+          title: l10n.syncSignedInAs(userEmail ?? ''),
+          titleStyle: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w600,
           ),
+          expandTitle: true,
+          body: l10n.syncEmailDescription,
         ),
         const SizedBox(height: 12),
         Card(

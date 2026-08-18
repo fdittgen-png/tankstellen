@@ -4,8 +4,6 @@
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import '../services/country_service_registry.dart';
-
 /// Canonical fuel types across all countries.
 ///
 /// Sealed class hierarchy enables exhaustive pattern matching while allowing
@@ -298,14 +296,7 @@ class FuelTypeJsonConverter implements JsonConverter<FuelType, String> {
   String toJson(FuelType object) => object.apiValue;
 }
 
-// ── Country mappings ────────────────────────────────────────────────────────
-
-/// Returns fuel types available for a given country code.
-///
-/// Per-country fuel lists now live on [CountryServiceEntry.availableFuelTypes]
-/// in [CountryServiceRegistry.entries] (#1111) — adding a new country only
-/// requires appending one entry to the registry, never editing this file.
-/// Falls back to a default minimal set (E5, E10, Diesel, Electric, All) for
-/// unregistered countries.
-List<FuelType> fuelTypesForCountry(String countryCode) =>
-    CountryServiceRegistry.fuelTypesFor(countryCode);
+// #3743 (S-fix a) — `fuelTypesForCountry` moved next to the registry
+// (`core/services/country_service_registry.dart`): the domain kernel must
+// not depend on the service layer, and the forwarder was this file's only
+// service import.

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/classic_connect_timeout_message.dart';
+import 'package:tankstellen/features/obd2/data/transport/classic_connect_timeout_message.dart';
 
 /// #3558 — the whole-ladder timeout wording must tell a genuine platform
 /// wedge (the timer fired on schedule with no native answer) apart from a

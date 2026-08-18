@@ -3,10 +3,10 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
-import 'package:tankstellen/features/obd2/data/fuel_mixture_model.dart';
+import 'package:tankstellen/features/obd2/domain/fuel_mixture_model.dart';
 import 'package:tankstellen/features/obd2/data/obd2_breadcrumb_collector.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 
 /// Epic #3416 — the PULL mirror ([Obd2Service.readFuelRateLPerHour]) with
 /// the precision branches, driven through [FakeObd2Transport] raw

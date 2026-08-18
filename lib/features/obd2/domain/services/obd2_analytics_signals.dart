@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../data/fuel_rate_estimator.dart' show kPetrolAfr, kPetrolDensityGPerL, kDieselAfr, kDieselDensityGPerL;
+import '../fuel_rate_estimator.dart' show kPetrolAfr, kPetrolDensityGPerL, kDieselAfr, kDieselDensityGPerL;
 import '../../../consumption/domain/trip_recorder.dart';
 
 /// RPM operating band (#2286). Aligns with the throttle/RPM histogram

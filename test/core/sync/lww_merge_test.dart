@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/core/sync/fill_ups_sync.dart';
+import 'package:tankstellen/features/consumption/data/fill_ups_sync.dart';
 import 'package:tankstellen/core/sync/sync_helper.dart';
 import 'package:tankstellen/core/sync/sync_transport.dart';
 import 'package:tankstellen/core/sync/vehicles_sync.dart';

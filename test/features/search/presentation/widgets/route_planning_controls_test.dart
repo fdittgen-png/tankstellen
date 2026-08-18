@@ -54,7 +54,7 @@ void main() {
       expect(find.text('200 km'), findsOneWidget);
       expect(find.text('8 km'), findsOneWidget);
       // Min-saving default 0.05 €/L → the formatted amount label.
-      expect(find.text('0.05 €/L'), findsWidgets);
+      expect(find.text('0,05 €/L'), findsWidgets);
     });
 
     testWidgets('dragging the segment slider updates the provider', (

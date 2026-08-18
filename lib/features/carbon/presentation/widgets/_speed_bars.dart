@@ -110,7 +110,7 @@ class _SpeedBar extends StatelessWidget {
 
     final trailing = avg == null
         ? (isIdle ? '—' : l.speedConsumptionNeedMoreData)
-        : '${avg.toStringAsFixed(1)} L/100';
+        : '${UnitFormatter.formatDecimal(avg)} L/100';
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,

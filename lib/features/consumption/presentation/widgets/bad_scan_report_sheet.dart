@@ -21,6 +21,7 @@ import 'bad_scan_form_view.dart';
 import 'bad_scan_issue_created_surface.dart';
 import 'bad_scan_report_formatters.dart';
 import '../../../../core/error/guarded.dart';
+import '../../../../core/sharing/share_seam.dart';
 
 /// Test seams: widget tests substitute these for the real
 /// platform-channel / secure-storage backed implementations.
@@ -28,7 +29,10 @@ typedef ConsentPrompter =
     Future<FeedbackConsentChoice> Function(BuildContext context);
 typedef ConsentReader = Future<FeedbackConsentState> Function();
 typedef ConsentWriter = Future<void> Function(FeedbackConsentState state);
-typedef ShareFallback = Future<void> Function(ShareParams params);
+
+/// Alias of the shared [ShareSink] seam — kept because widget tests
+/// name this type for the sheet's constructor parameter.
+typedef ShareFallback = ShareSink;
 typedef UrlLauncher = Future<bool> Function(Uri uri);
 typedef ImageBytesReader = Future<Uint8List> Function(String path);
 

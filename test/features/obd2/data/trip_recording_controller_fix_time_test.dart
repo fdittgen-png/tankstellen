@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
-import 'package:tankstellen/features/obd2/data/trip_distance_source.dart';
-import 'package:tankstellen/features/obd2/data/trip_recording_controller.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/domain/trip_distance_source.dart';
+import 'package:tankstellen/features/obd2/data/session/trip_recording_controller.dart';
 
 import '../../../helpers/silence_error_logger.dart';
 

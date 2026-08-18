@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/elm327_commands.dart';
+import 'package:tankstellen/features/obd2/data/protocol/elm327_commands.dart';
 
 /// Pure-logic coverage for the ELM327 command catalog and the VIN-WMI
 /// brand mapping used to pick a manufacturer-specific odometer PID

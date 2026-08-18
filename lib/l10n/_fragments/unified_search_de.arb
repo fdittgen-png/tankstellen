@@ -1,8 +1,4 @@
 {
-  "unifiedFilterFuel": "Kraftstoff",
-  "unifiedFilterEv": "EV",
-  "unifiedFilterBoth": "Beide",
-  "unifiedNoResultsForFilter": "Keine Ergebnisse für diesen Filter",
   "searchFailedSnackbar": "Suche fehlgeschlagen – bitte erneut versuchen",
   "routeStationCount": "{count, plural, =1{1 Tankstelle} other{{count} Tankstellen}}",
   "stationUpdatedLabel": "Aktualisiert {time}",

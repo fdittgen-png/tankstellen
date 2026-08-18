@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/obd2_pairing_mode.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_pairing_mode.dart';
 
 /// #3181 — first-connect pairing mode: budget selection + the
 /// pairing-wait UI flag.

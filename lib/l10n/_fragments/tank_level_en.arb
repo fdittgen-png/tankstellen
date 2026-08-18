@@ -33,18 +33,6 @@
       }
     }
   },
-  "tankLevelMethodObd2": "OBD2 measured",
-  "@tankLevelMethodObd2": {
-    "description": "Method label appended to the tank-level caption when every trip since the last fill-up carried a measured OBD2 fuel-rate value (#1195)."
-  },
-  "tankLevelMethodDistanceFallback": "distance-based estimate",
-  "@tankLevelMethodDistanceFallback": {
-    "description": "Method label appended to the tank-level caption when no OBD2 fuel measurement was available and consumption was estimated from distance × avg L/100 km (#1195)."
-  },
-  "tankLevelMethodMixed": "mixed measurement",
-  "@tankLevelMethodMixed": {
-    "description": "Method label appended to the tank-level caption when some trips used OBD2 and some used the distance-based fallback (#1195)."
-  },
   "tankLevelEmptyNoFillUp": "Log a fill-up to see your tank level",
   "@tankLevelEmptyNoFillUp": {
     "description": "Empty-state message inside the tank-level card when the active vehicle has no fill-ups logged yet (#1195)."

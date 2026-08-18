@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/elm327_precision_pids.dart';
-import 'package:tankstellen/features/obd2/data/elm327_protocol.dart';
-import 'package:tankstellen/features/obd2/data/live_sample_snapshot.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
-import 'package:tankstellen/features/obd2/data/pid_scheduler.dart';
+import 'package:tankstellen/features/obd2/data/protocol/elm327_precision_pids.dart';
+import 'package:tankstellen/features/obd2/data/protocol/elm327_protocol.dart';
+import 'package:tankstellen/features/obd2/data/session/live_sample_snapshot.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/domain/pid_scheduler.dart';
 
 /// #2457 → #3532 — subscribeAllTiers wires the OPTIMISTIC UNION: the
 /// full target table subscribes regardless of the discovered bitmap

@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../../../core/logging/error_logger.dart';
-import 'obd2_connection_errors.dart';
+import '../domain/obd2_connection_errors.dart';
 
 /// Owns the "OBD2 adapter broadly unresponsive" diagnostic decision for
 /// the [PidScheduler] (#2379 / #2524), extracted so the scheduler's

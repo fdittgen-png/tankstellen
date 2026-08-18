@@ -12,11 +12,8 @@
   "fuelType": "Kütus",
   "searchRadius": "Raadius",
   "searchNearby": "Lähedalolevad tankla",
-  "searchButton": "Otsi",
   "searchCriteriaTitle": "Otsinguparameetrid",
-  "searchCriteriaOpen": "Otsi",
   "searchCriteriaRadiusBadge": "{km} km raadiuses",
-  "searchCriteriaTapToSearch": "Puuduta otsimise alustamiseks",
   "noResults": "Tanklasid ei leitud.",
   "startSearch": "Otsige tanklasid.",
   "open": "Avatud",
@@ -30,7 +27,6 @@
   "navigate": "Navigeeri",
   "retry": "Proovi uuesti",
   "apiKeySetup": "API võti",
-  "apiKeyDescription": "Registreeruge üks kord tasuta API võtme saamiseks.",
   "apiKeyLabel": "API võti",
   "register": "Registreerumine",
   "continueButton": "Jätka",
@@ -64,33 +60,12 @@
   "noFavoritesHint": "Puudutage tankla tähte, et salvestada see lemmikuks.",
   "language": "Keel",
   "country": "Riik",
-  "demoMode": "Demorežiim — näidisandmed.",
-  "setupLiveData": "Seadista reaalajas andmed",
   "freeNoKey": "Tasuta — võtit pole vaja",
   "apiKeyRequired": "API võti nõutud",
-  "skipWithoutKey": "Jätka ilma võtmeta",
   "dataTransparency": "Andmete läbipaistvus",
   "storageAndCache": "Salvestusruum ja vahemälu",
   "clearCache": "Tühjenda vahemälu",
-  "clearAllData": "Kustuta kõik andmed",
-  "errorLog": "Vigade logi",
   "stationsFound": "Leiti {count} tanklat",
-  "whatIsShared": "Mida jagatakse — ja kellega?",
-  "gpsCoordinates": "GPS koordinaadid",
-  "gpsReason": "Saadetakse iga otsinguga lähedalolevate jaamade leidmiseks.",
-  "postalCodeData": "Postiindeks",
-  "postalReason": "Teisendatakse koordinaatideks geokodeerimise teenuse kaudu.",
-  "mapViewport": "Kaardi vaade",
-  "mapReason": "Kaardi paanid laaditakse serverist. Isikuandmeid ei edastata.",
-  "apiKeyData": "API võti",
-  "apiKeyReason": "Teie isiklik võti saadetakse iga API päringuga. See on seotud teie e-postiga.",
-  "notShared": "EI jagata:",
-  "searchHistory": "Otsinguajalugu",
-  "favoritesData": "Lemmikud",
-  "profileNames": "Profiilide nimed",
-  "homeZipData": "Kodu postiindeks",
-  "usageData": "Kasutusandmed",
-  "privacyBanner": "Sellel rakendusel pole serverit. Kõik andmed jäävad teie seadmesse. Pole analüütikat, jälgimist ega reklaame.",
   "storageUsage": "Salvestusruumi kasutus selles seadmes",
   "settingsLabel": "Seaded",
   "profilesStored": "salvestatud profiili",
@@ -116,12 +91,8 @@
   "deleteAllButton": "Kustuta kõik",
   "entries": "kirjet",
   "cacheEmpty": "Vahemälu on tühi",
-  "noStorage": "Salvestusruum pole kasutuses",
   "apiKeyNote": "Tasuta registreerumine. Andmed riiklike hinnaläbipaistvuse asutuste käest.",
   "apiKeyFormatError": "Vigane vorming — oodatav UUID (8-4-4-4-12)",
-  "supportProject": "Toetage seda projekti",
-  "supportDescription": "See rakendus on tasuta, avatud lähtekoodiga ja reklaamivaba. Kui leiate selle kasulikuks, kaaluge arendaja toetamist.",
-  "reportBug": "Teata veast / Soovita funktsiooni",
   "reportThisIssue": "Teata probleemist",
   "reportAlreadySent": "Oled sellest probleemist juba teatanud.",
   "reportConsentTitle": "Teata GitHubis?",
@@ -136,7 +107,6 @@
   "configApiKeysSection": "API-võtmed",
   "configTankerkoenigKey": "Tankerkoenig API-võti",
   "configApiKeyConfigured": "Seadistatud",
-  "configApiKeyNotSet": "Määramata (demorežiim)",
   "configApiKeyCommunity": "Vaikimisi (ühenduse võti)",
   "searchLocationPlaceholder": "Aadress, sihtnumber või linn",
   "configEvKey": "EV laadimise API-võti",
@@ -174,8 +144,6 @@
   "sortPriceDistance": "Hind/km",
   "cheap": "odav",
   "expensive": "kallis",
-  "stationsOnMap": "{count} tanklat",
-  "loadingFavorites": "Lemmikute laadimine...\nOtsige kõigepealt tanklasid andmete salvestamiseks.",
   "reportPrice": "Teata hinnast",
   "whatsWrong": "Mis on valesti?",
   "correctPrice": "Õige hind (nt. 1,459)",
@@ -185,7 +153,6 @@
   "cacheCleared": "Vahemälu tühjendatud.",
   "yourPosition": "Teie asukoht",
   "positionUnknown": "Asukoht teadmata",
-  "routeModeBannerLabel": "Marsruudi režiim — vahemaad on piki koridori",
   "distancesFromCenter": "Kaugused otsingu keskpunktist",
   "autoUpdatePosition": "Uuenda asukohta automaatselt",
   "autoUpdateDescription": "Uuenda GPS asukohta enne iga otsingut",
@@ -220,8 +187,6 @@
   "wrongDieselPrice": "Vale diiselkütuse hind",
   "wrongStatusOpen": "Näidatud avatuna, kuid suletud",
   "wrongStatusClosed": "Näidatud suletuna, kuid avatud",
-  "searchAlongRouteLabel": "Marsruudi ääres",
-  "searchEvStations": "Otsi laadimisjaamu",
   "allStations": "Kõik jaamad",
   "bestStops": "Parimad peatused",
   "openInMaps": "Ava Kaartides",
@@ -253,7 +218,6 @@
   "cityOrAddress": "Linn või aadress",
   "useGps": "Kasuta GPS-i",
   "stop": "Peatus",
-  "stopN": "Peatus {n}",
   "addStop": "Lisa peatus",
   "searchAlongRoute": "Otsi marsruudi äärest",
   "cheapest": "Odavaim",
@@ -265,10 +229,8 @@
   "customKey": "Kohandatud võti",
   "appDefaultKey": "Rakenduse vaikevõti",
   "optionalOverrideKey": "Valikuline: asendage sisseehitatud rakenduse võti enda omaga",
-  "requiredForEvSearch": "Vajalik EV laadimisjaamade otsinguks",
   "edit": "Muuda",
   "fuelPricesApiKey": "Kütusehindade API võti",
-  "tankerkoenigApiKey": "Tankerkoenig API võti",
   "evChargingApiKey": "EV laadimise API võti",
   "openChargeMapApiKey": "OpenChargeMap API võti",
   "routePlanningSection": "Marsruudi planeerimine",
@@ -303,18 +265,14 @@
   "noStationsAlongThisRoute": "Selle marsruudi äärest jaamu ei leitud.",
   "fuelCostCalculator": "Kütusekulude kalkulaator",
   "distanceKm": "Kaugus (km)",
-  "consumptionL100km": "Tarbimine (L/100km)",
-  "fuelPriceEurL": "Kütuse hind (EUR/L)",
   "tripCost": "Reisikulu",
   "fuelNeeded": "Vajalik kütus",
   "totalCost": "Kogukulu",
-  "enterCalcValues": "Sisestage kaugus, tarbimine ja hind reisikulu arvutamiseks",
   "priceHistory": "Hinnaajalugu",
   "ignoredStationsLabel": "Ignoreeritud",
   "ratingsLabel": "Hinnangud",
   "favoritesDataCache": "Lemmikute andmed",
   "citySearchCache": "Linna otsing",
-  "dataDeletionNotAvailableCommunity": "Andmete kustutamine ei ole kogukonna režiimis saadaval. Esmalt katkestage ühendus või kasutage privaatset andmebaasi.",
   "priceHistoryStationsTracked": "{count} jälitatud tanklat",
   "@priceHistoryStationsTracked": {
     "placeholders": {
@@ -348,22 +306,11 @@
     }
   },
   "noPriceHistory": "Hinnaajalugu puudub",
-  "noHourlyData": "Tunniandmed puuduvad",
   "noStatistics": "Statistika pole saadaval",
-  "statMin": "Min",
-  "statMax": "Max",
-  "statAvg": "Kesk",
   "showAllFuelTypes": "Näita kõiki kütuseliike",
   "connected": "Ühendatud",
-  "notConnected": "Ühendamata",
-  "connectTankSync": "Ühenda TankSync",
   "disconnectTankSync": "Katkesta TankSync",
   "viewMyData": "Vaata minu andmeid",
-  "optionalCloudSync": "Valikuline pilvsünkroniseerimine hoiatuste, lemmikute ja tõuketeadete jaoks",
-  "tapToUpdateGps": "Puudutage GPS asukoha uuendamiseks",
-  "gpsAutoUpdateHint": "GPS asukoht hangitakse automaatselt otsimisel. Saate seda ka käsitsi siin uuendada.",
-  "clearGpsConfirm": "Kustutada salvestatud GPS asukoht? Saate seda igal ajal uuendada.",
-  "pageNotFound": "Lehte ei leitud",
   "deleteAllServerData": "Kustuta kõik serveriandmed",
   "deleteServerDataConfirm": "Kustutada kõik serveriandmed?",
   "deleteEverything": "Kustuta kõik",
@@ -373,7 +320,6 @@
   "forgetAllSyncedTripsConfirmBody": "Kõik reisikokkuvõtted ja üksikasjaandmed eemaldatakse serverist. Selle seadme kohalik reisiajalugu ei mõjutata.\n\nSeda toimingut ei saa tagasi võtta.",
   "forgetAllSyncedTripsConfirmAction": "Unusta kõik",
   "forgetAllSyncedTripsSuccess": "Kõik sünkroonitud reisid eemaldati serverist",
-  "disconnectConfirm": "Katkestada TankSync?",
   "disconnect": "Katkesta",
   "myServerData": "Minu serveriandmed",
   "anonymousUuid": "Anonüümne UUID",
@@ -393,7 +339,6 @@
   "continueAsGuest": "Jätka külalisena",
   "createAccount": "Loo konto",
   "signIn": "Logi sisse",
-  "upgradeToEmail": "Loo e-postiga konto",
   "savedRoutes": "Salvestatud marsruudid",
   "noSavedRoutes": "Salvestatud marsruute pole",
   "noSavedRoutesHint": "Otsi mööda marsruuti ja salvesta see hilisemaks kiirjuurdepääsuks.",
@@ -424,11 +369,6 @@
   "onboardingNext": "Edasi",
   "onboardingSkip": "Jäta vahele",
   "onboardingFinish": "Alusta",
-  "crossBorderNearby": "{country} on lähedal",
-  "crossBorderDistance": "~{km} km piirini",
-  "crossBorderAvgPrice": "Keskmine siin: {price} EUR ({count} jaama)",
-  "allPricesView": "Kõik hinnad",
-  "compactView": "Kompaktne",
   "switchToAllPricesView": "Lülitu kõigi hindade vaatesse",
   "switchToCompactView": "Lülitu kompaktsesse vaatesse",
   "unavailable": "N/A",
@@ -453,10 +393,6 @@
   "accountDeleted": "Konto kustutatud. Kohalikud andmed säilitatud.",
   "switchedToAnonymous": "Lülituti anonüümsele sessioonile",
   "failedToSwitch": "Lülitumine ebaõnnestus: {error}",
-  "topicUrlCopied": "Teema URL kopeeritud",
-  "testNotificationSent": "Testteatise saatmine õnnestus!",
-  "testNotificationFailed": "Testteatise saatmine ebaõnnestus",
-  "pushUpdateFailed": "Tõuketeate seade uuendamine ebaõnnestus",
   "connectedAsGuest": "Ühendatud külalisena",
   "accountCreated": "Konto loodud!",
   "signedIn": "Sisse logitud!",
@@ -518,7 +454,6 @@
   "privacyClearErrorLog": "Tühjenda vealogi",
   "privacyErrorLogCleared": "Vealogi tühjendatud",
   "privacyDeleteButton": "Kustuta kõik andmed",
-  "privacyCopyErrorLog": "Kopeeri tõrkepäevik lõikelauale ({count})",
   "privacyDeleteTitle": "Kustutada kõik andmed?",
   "privacyDeleteBody": "See kustutab jäädavalt:\n\n- Kõik lemmikud ja jaamaandmed\n- Kõik otsinguprofiilid\n- Kõik hinnateatised\n- Kogu hinnaloo\n- Kõik vahemälu andmed\n- Sinu API-võtme\n- Kõik rakenduse seaded\n\nRakendus lähtestatakse algsesse olekusse. Seda toimingut ei saa tagasi võtta.",
   "privacyDeleteConfirm": "Kustuta kõik",
@@ -553,15 +488,8 @@
   "voiceAnnouncementsTitle": "Häälteated",
   "voiceAnnouncementsDescription": "Teata lähedalolevatest odavatest jaamadest sõitmise ajal",
   "voiceAnnouncementsEnabled": "Luba häälteated",
-  "voiceAnnouncementThreshold": "Ainult alla {price}",
-  "voiceAnnouncementCheapFuel": "{station}, {distance} kilomeetrit ees, {fuelType} {price}",
   "voiceAnnouncementProximityRadius": "Teate raadius",
   "voiceAnnouncementCooldown": "Kordamise intervall",
-  "nearestStations": "Lahimad jaamad",
-  "nearestStationsHint": "Leidke lahimad jaamad oma praeguse asukoha jargi",
-  "consumptionLogTitle": "Kütusekulu",
-  "consumptionLogMenuTitle": "Kulupäevik",
-  "consumptionLogMenuSubtitle": "Jälgi tankimisi ja arvuta L/100km",
   "consumptionStatsTitle": "Kulu statistika",
   "addFillUp": "Lisa tankimine",
   "noFillUpsTitle": "Tankimisi pole veel",
@@ -595,14 +523,12 @@
   "vehiclesWizardYoursList": "Sul on {count, plural, =1{1 sõiduk} other{{count} sõidukit}}:",
   "vehiclesWizardSkipHint": "Jäta vahele seadistuse lõpetamiseks — sõidukeid saad igal ajal Seadetest lisada.",
   "fillUpVehicleLabel": "Sõiduk",
-  "fillUpVehicleNone": "Sõiduk puudub",
   "fillUpVehicleRequired": "Sõiduk on kohustuslik",
   "reportScanError": "Teata skaneerimisveast",
   "pickStationTitle": "Vali jaam",
   "pickStationHelper": "Alusta tankimist teadaoleva jaama juurest, et hinnad, bränd ja kütuse liik täituksid automaatselt.",
   "pickStationEmpty": "Lemmikjaamu pole veel — lisa neid Otsingust või Lemmikutest, või jäta vahele ja sisesta käsitsi.",
   "pickStationSkip": "Jäta vahele — lisa ilma jaamata",
-  "scanPump": "Skaneeri pump",
   "scanPayment": "Skaneeri makse QR",
   "qrPaymentBeneficiary": "Saaja",
   "qrPaymentAmount": "Summa",
@@ -624,17 +550,10 @@
   "qrScannerRetry": "Proovi uuesti",
   "torchOn": "Lülita välk sisse",
   "torchOff": "Lülita välk välja",
-  "obdNoAdapter": "OBD2 adapterit ei leitud",
-  "obdOdometerUnavailable": "Läbisõidumõõdikut ei saanud lugeda",
   "obdPermissionDenied": "Anna Bluetooth'i luba süsteemiseadetes",
-  "obdAdapterUnresponsive": "Adapter ei vastanud — lülita süütevool sisse ja proovi uuesti",
   "obdPickerTitle": "Vali OBD2 adapter",
   "obdPickerScanning": "Otsin adaptereid…",
   "obdPickerConnecting": "Ühendan…",
-  "themeSettingTitle": "Teema",
-  "themeModeLight": "Hele",
-  "themeModeDark": "Tume",
-  "themeModeSystem": "Järgi süsteemi",
   "tripRecordingTitle": "Reisi salvestamine",
   "tripSummaryTitle": "Reisi kokkuvõte",
   "tripMetricDistance": "Vahemaa",
@@ -676,18 +595,13 @@
   "syncBaselinesToggleTitle": "Jaga õpitud sõidukiprofiile",
   "syncBaselinesToggleSubtitle": "Laadi üles sõiduki kulubaasjoon, et teine seade saaks seda kasutada.",
   "obd2StatusConnected": "OBD2 adapter: ühendatud",
-  "obd2StatusAttempting": "OBD2 adapter: ühendub",
-  "obd2StatusUnreachable": "OBD2 adapter: kättesaamatu",
   "obd2StatusPermissionDenied": "OBD2 adapter: Bluetooth'i luba vajalik",
   "obd2StatusConnectedBody": "Valmis reisi salvestama.",
-  "obd2StatusAttemptingBody": "Ühendan taustal…",
-  "obd2StatusUnreachableBody": "Adapter on levialast väljas või kasutusel teises rakenduses.",
   "obd2StatusPermissionDeniedBody": "Anna Bluetooth'i luba süsteemiseadetes automaatseks uuesti ühendamiseks.",
   "obd2StatusNoAdapter": "Adapterit pole ühendatud",
   "obd2StatusForget": "Unusta adapter",
   "tripHistoryTitle": "Reisiajalugu",
   "tripHistoryEmptyTitle": "Reise pole veel",
-  "tripHistoryEmptySubtitle": "Ühenda OBD2 adapter ja salvesta reis, et hakata sõitmisajalugu koostama.",
   "tripHistoryUnknownDate": "Teadmata kuupäev",
   "situationIdle": "Tühikäik",
   "situationStopAndGo": "Stopp ja mine",
@@ -697,12 +611,8 @@
   "situationClimbing": "Tõus / koormatud",
   "situationHardAccel": "Järsk kiirendus",
   "situationFuelCut": "Kütuse katkestus — libisemine",
-  "tripSaveAsFillUp": "Salvesta tankimisena",
   "tripSaveRecording": "Salvesta reis",
-  "tripDiscard": "Hülga",
-  "obdOdometerRead": "Läbisõidumõõdik loetud: {km} km",
   "vehicleFuelNotSet": "Määramata",
-  "wizardVehicleTapToEdit": "Puuduta muutmiseks",
   "wizardVehicleDefaultBadge": "Vaikimisi",
   "wizardProfileChoiceHint": "Vali, kuidas soovid rakendust kasutada. Seda saab hiljem Seadetes muuta.",
   "wizardProfileChoiceFooter": "Valikut saab igal ajal muuta Seaded → Kasutusrežiim alt.",
@@ -713,7 +623,6 @@
   "wizardProfileFullName": "Täis",
   "wizardProfileFullDescription": "Kõik Kesktasemest, pluss automaatne OBD2 reisi salvestamine, sõiduhinded ja lojaalsuskaardid.",
   "wizardProfileCustomName": "Kohandatud",
-  "wizardProfileCustomDescription": "Sinu enda funktsioonide kombinatsioon. Kohanda iga lülitit allpool.",
   "useModeSectionHint": "Kohanda rakendust oma tegelikule kasutusele vastavaks. Eelseadistuse valimine lubab vastavad funktsioonid.",
   "useModeCustomSettingsDescription": "Sinu funktsioonide valik ei vasta ühelegi eelseadistusele. Vali eelseadistus ülalt ülekirjutamiseks või jätka individuaalsete funktsioonide kohandamist allpool.",
   "useModeSwitchedSnack": "Kasutusrežiim seatud: {profile}.",
@@ -751,20 +660,15 @@
   "evShowOnMap": "Näita EV jaamu",
   "evAvailableOnly": "Ainult saadaolevad",
   "evMinPower": "Min võimsus",
-  "evMaxPower": "Maks võimsus",
-  "evOperator": "Operaator",
-  "evLastUpdate": "Viimane uuendus",
   "evStatusAvailable": "Saadaval",
   "evStatusOccupied": "Hõivatud",
   "evStatusOutOfOrder": "Rikkes",
   "openOnlyFilter": "Ainult avatud",
   "saveAsDefaults": "Salvesta vaikimisi sätetena",
   "criteriaSavedToProfile": "Salvestatud vaikimisi sätetena",
-  "profileNotFound": "Aktiivset profiili pole",
   "updatingFavorites": "Uuendan sinu lemmikuid...",
   "fetchingLatestPrices": "Hangin uusimaid hindu",
   "noDataAvailable": "Andmed puuduvad",
-  "configAndPrivacy": "Seaded ja privaatsus",
   "searchToSeeMap": "Otsi jaamade kuvamiseks kaardil",
   "evPowerAny": "Kõik",
   "evPowerKw": "{kw} kW+",
@@ -819,9 +723,6 @@
   "iosAutoRecordOnboardingBullet3Title": "Kui iOS küsib \"Alati\" asukohta, palun ütle jah.",
   "iosAutoRecordOnboardingBullet3Body": "Varuvariант, mis salvestab sinu reisi, kui OBD2 adapter on aeglane, vajab taustaasukoht. Me ei jaga seda kunagi.",
   "scanReceipt": "Skaneeri kviitung",
-  "obdConnect": "OBD-II",
-  "stationTypeFuel": "Kütus",
-  "stationTypeEv": "EV",
   "brandFilterHighway": "Kiirtee",
   "ratingModeLocal": "Kohalik",
   "ratingModePrivate": "Privaatne",
@@ -841,7 +742,6 @@
   "errorHintRouting": "Marsruudi arvutamine ebaõnnestus. Kontrolli internetiühendust ja proovi uuesti.",
   "errorHintFallback": "Proovi uuesti või otsi sihtnumbri / linna nime järgi.",
   "alertsLoadErrorTitle": "Teatiste laadimine ebaõnnestus",
-  "alertsBackgroundCheckErrorTitle": "Teatiste taustakonkroll ebaõnnestus",
   "detailsLabel": "Üksikasjad",
   "remove": "Eemalda",
   "showKey": "Kuva võti",
@@ -950,19 +850,11 @@
   "linkDeviceHowItWorksBody": "1. Seadmel A: kopeeri ülal olev seadme kood\n2. Seadmel B: kleebi see „Seadme kood\" väljale\n3. Puuduta „Impordi andmed\", et ühendada lemmikud, teatised, sõidukid ja kulupäevikud\n4. Mõlemal seadmel on kõik kombineeritud andmed\n\nIga seade hoiab oma anonüümset identiteeti ja profiili (eelistatud kütus, vaikimisi sõiduk, avakuvar). Andmed ühendatakse, ei teisaldata.",
   "vehicleSetActive": "Sea aktiivseks",
   "swipeHide": "Peida",
-  "evChargingSection": "EV laadimine",
-  "fuelStationsSection": "Kütusejaamad",
   "yourRating": "Sinu hinnang",
   "noStorageUsed": "Salvestusruumi pole kasutatud",
   "aboutReportBug": "Teata veast / Tee ettepanek",
   "aboutSupportProject": "Toeta seda projekti",
   "aboutSupportDescription": "See rakendus on tasuta, avatud lähtekoodiga ja reklaamivaba. Kui leiad selle kasulikuks, kaalu arendaja toetamist.",
-  "luxembourgRegulatedPricesNotice": "Luksemburgi kütushinnad on riiklikult reguleeritud ja ühtlased kogu riigis.",
-  "luxembourgFuelUnleaded95": "Pliivabal 95",
-  "luxembourgFuelUnleaded98": "Pliivabal 98",
-  "luxembourgFuelDiesel": "Diisel",
-  "luxembourgFuelLpg": "LPG",
-  "luxembourgPricesUnavailable": "Luksemburgi reguleeritud hinnad pole saadaval.",
   "reportIssueTitle": "Teata probleemist",
   "enterCorrection": "Palun sisesta parandus",
   "reportNoBackendAvailable": "Raportit ei saanud saata: selle riigi jaoks pole raporteerimisteenus seadistatud. Luba TankSync Seadetes kogukonna raportite saatmiseks.",
@@ -989,10 +881,6 @@
   "serviceReminderMarkDone": "Märgi tehtuks",
   "serviceReminderDueTitle": "Hooldus tähtaeg",
   "serviceReminderDueBody": "{label} on tähtaeg — {kmOver} km üle intervalli.",
-  "southKoreaApiKeyRequired": "Registreeru OPINETis tasuta API-võtme saamiseks",
-  "southKoreaApiProvider": "OPINET (KNOC)",
-  "chileApiKeyRequired": "Registreeru CNEs tasuta API-võtme saamiseks",
-  "chileApiProvider": "CNE Bencina en Linea",
   "vinConfirmTitle": "Kas see on sinu auto?",
   "vinConfirmBody": "{year} {make} {model} — {displacement}L, {cylinders} silindrit, {fuel}",
   "vinPartialInfoNote": "Osaline teave (võrguühenduseta). Saad allpool muuta.",
@@ -1011,17 +899,13 @@
   "alertsRadiusCreateTitle": "Loo raadiusteatis",
   "alertsRadiusLabelHint": "Silt (nt Kodu diisel)",
   "alertsRadiusFuelType": "Kütuse liik",
-  "alertsRadiusThreshold": "Künnis (€/L)",
   "alertsRadiusKm": "Raadius (km)",
   "alertsRadiusCenterGps": "Kasuta minu asukohta",
   "alertsRadiusCenterPostalCode": "Sihtnumber",
   "alertsRadiusSave": "Salvesta",
   "alertsRadiusCancel": "Tühista",
-  "alertsRadiusDeleteConfirm": "Kustutada raadiusteatis?",
   "obd2ConnectedTooltip": "OBD2 ühendatud: {adapterName}",
   "obd2PairChipTooltip": "Ühenda OBD2 adapter",
-  "velocityAlertTitle": "{fuelLabel} langes lähedalasuvates jaamades",
-  "velocityAlertBody": "{stationCount} jaamas langes kuni {maxDropCents}¢ viimase tunni jooksul",
   "fillUpSavedSnackbar": "Tankimine salvestatud",
   "radiusAlertsEntryTitle": "Raadiusteatised ja statistika",
   "radiusAlertsEntrySubtitle": "Saa teadet, kui hinnad langevad sinu lähedal",
@@ -1060,8 +944,6 @@
   "autoRecordStatusPairAdapterCta": "Ühenda adapter",
   "autoRecordSpeedThresholdLabel": "Käivituskiirus (km/h)",
   "autoRecordSaveDelayLabel": "Salvestuse viivitus pärast katkestust (sekundid)",
-  "autoRecordPairedAdapterLabel": "Ühendatud adapter",
-  "autoRecordPairedAdapterNone": "Adapterit pole ühendatud. Ühenda esmalt OBD2 seadistuse kaudu.",
   "autoRecordBackgroundLocationLabel": "Taustakoht lubatud",
   "autoRecordBackgroundLocationRequest": "Taotle luba",
   "autoRecordBackgroundLocationRationaleTitle": "Miks „Alati lubada\"?",
@@ -1069,18 +951,12 @@
   "autoRecordBackgroundLocationOpenSettings": "Ava seaded",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Asukohaluba vajalik",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Taustaasukoha taotlemine ebaõnnestus",
-  "autoRecordBadgeClearTooltip": "Tühjenda loendur",
   "autoRecordPairAdapterLinkText": "Ühenda adapter allolevas jaotises automaatsalvestamise lubamiseks",
-  "exportBackupTooltip": "Ekspordi varukoopia",
   "exportBackupReady": "Varukoopia valmis — vali sihtkoht",
   "exportBackupFailed": "Varukoopia eksportimine ebaõnnestus — palun proovi uuesti",
-  "brokenMapChipVerifying": "MAP-sensor kontrollib…",
   "brokenMapChipDisclaimer": "MAP-näidud kahtlased",
   "brokenMapSnackbarUnreliable": "MAP-sensor loeb valesti — kütuse näidud võivad olla 50–80% liiga madalad. Proovi teist adapterit.",
   "brokenMapBannerHardDisable": "MAP-sensor ebausaldusväärsetu. Kuvab tankimise keskmised reaalajas kütusemäära asemel.",
-  "brokenMapOverlayVerified": "MAP-sensor: kontrollitud ({confidence})",
-  "brokenMapOverlayUnverified": "MAP-sensor: kontrollimine ({confidence})",
-  "brokenMapOverlaySuspicious": "MAP-sensor: kahtlane ({confidence})",
   "brokenMapOverlayPosterior": "MAP-sensor: {posterior}% ± {margin}%",
   "brokenMapOverlayPosteriorVerified": "MAP-sensor: {posterior}% ± {margin}% (kontrollitud)",
   "brokenMapDiagnosticsCardTitle": "MAP-sensori diagnostika",
@@ -1142,7 +1018,6 @@
   "chargingCostTrendTitle": "Laadimiskulu trend",
   "chargingEfficiencyTitle": "Efektiivsus (kWh/100 km)",
   "chargingChartsEmpty": "Andmeid pole veel piisavalt",
-  "chargingChartsMonthAxis": "Kuu",
   "consoFeatureGroupTitle": "Kulu",
   "consoFeatureGroupDescription": "Jälgi oma kütusekulu — käsitsi tankimised või automaatne OBD2 reisalvestamine.",
   "consoModeOff": "Väljas",
@@ -1158,10 +1033,6 @@
   "fillUpCorrectionEditExplainer": "See kirje loodi automaatselt salvestatud reiside ja pumbatava kütuse vahe sulgemiseks. Muuda väärtusi, kui tead tegelikke numbreid.",
   "fillUpCorrectionDelete": "Kustuta korrektsioon",
   "fillUpCorrectionStation": "Jaama nimi (vabatahtlik)",
-  "greeceApiProvider": "Paratiritirio Timon (Kreeka)",
-  "greeceCommunityApiNotice": "Põhineb kogukonna hallatava fuelpricesgr API-l",
-  "romaniaApiProvider": "Monitorul Prețurilor (Rumeenia)",
-  "romaniaScrapingNotice": "Põhineb monitorulpreturilor.info andmetel (Konkurentsiamet + ANPC)",
   "crossBorderCheaper": "{country} jaamad {km} km kaugusel — €{price}/L odavam",
   "crossBorderTapToSwitch": "Puuduta riigi vahetamiseks",
   "crossBorderDismissTooltip": "Sulge",
@@ -1186,9 +1057,6 @@
   "drivingScorePenaltyHardBrake": "Järsk pidurdus",
   "drivingScorePenaltyHighRpm": "Kõrge RPM",
   "drivingScorePenaltyFullThrottle": "Täisgaas",
-  "ecoRouteOption": "Öko",
-  "ecoRouteSavings": "≈ {liters} L säästetud",
-  "ecoRouteHint": "Targem sõit — eelistab ühtlast kiirteed sika-saka otseteedele.",
   "favoritesShareAction": "Jaga",
   "favoritesShareSubject": "Sparkilo — lemmikud {date}",
   "favoritesShareError": "Jagatava pildi loomine ebaõnnestus",
@@ -1206,8 +1074,6 @@
   "featureDescription_consumptionAnalytics": "Tankimise ja reisi analüüsi kaart.",
   "featureLabel_baselineSync": "Baasjoone sünkroonimine",
   "featureDescription_baselineSync": "Sünkrooni sõitmise baasjoon TankSync kaudu.",
-  "featureLabel_unifiedSearchResults": "Ühendatud otsingutulemused",
-  "featureDescription_unifiedSearchResults": "Üks tulemuste loend, mis ühendab kütuse ja EV jaamad.",
   "featureLabel_priceAlerts": "Hinnateatised",
   "featureDescription_priceAlerts": "Lävisepõhised hinnalanguse teatised.",
   "featureLabel_priceHistory": "Hinnaloo",
@@ -1235,8 +1101,6 @@
   "featureBlockedEnable_glideCoach": "Luba esmalt OBD2 reisi salvestamine",
   "featureBlockedEnable_gpsTripPath": "Luba esmalt OBD2 reisi salvestamine",
   "featureBlockedEnable_autoRecord": "Luba esmalt OBD2 reisi salvestamine",
-  "featureBlockedEnable_showFuel": "Eeltingimused pole täidetud",
-  "featureBlockedEnable_showElectric": "Eeltingimused pole täidetud",
   "featureBlockedEnable_showConsumptionTab": "Luba esmalt OBD2 reisi salvestamine",
   "featureLabel_tflitePricePrediction": "TFLite hinnprognoos",
   "featureDescription_tflitePricePrediction": "Seadmes töötav hinnaprognoosi mudel — tuletamine toimub lokaalselt; funktsioonid ja prognoosid ei lahku seadmest.",
@@ -1281,15 +1145,12 @@
   "scanReceiptNoData": "Kviitungiandmeid ei leitud — proovi uuesti",
   "scanReceiptSuccess": "Kviitung skaneeritud — kontrolli väärtusi. Puuduta allpool „Teata skaneerimisveast\", kui midagi on vale.",
   "scanReceiptFailed": "Skaneeriminen ebaõnnestus: {error}",
-  "scanPumpUnreadable": "Pumba kuvarit ei saa lugeda — proovi uuesti",
-  "pumpCameraHint": "Joonda tankla ekraani kolm numbrit raami sisse",
   "pumpCameraCapture": "Pildista",
   "pumpCameraPermissionDenied": "Tankla ekraani skannimiseks on vaja kaamera juurdepääsu. Lubage see seadme seadetes.",
   "pumpCameraError": "Kaamerat ei õnnestunud käivitada. Proovige uuesti või sisestage väärtused käsitsi.",
   "scanPumpSuccess": "Pumba kuvar skaneeritud — kontrolli väärtusi.",
   "scanPumpGlare": "Ekraanil on liiga palju peegeldust — proovige uuesti väikese nurga alt, et numbrid ei oleks ülevalgustatud.",
   "scanPumpFailed": "Pumba skaneerimineen ebaõnnestus: {error}",
-  "badScanReportTitle": "Teata skaneerimisveast",
   "badScanReportTitleReceipt": "Teata skaneerimisveast — kviitung",
   "badScanReportTitlePumpDisplay": "Teata skaneerimisveast — pumba kuvar",
   "pumpScanFailureTitle": "Kuvar loetamatu",
@@ -1298,7 +1159,6 @@
   "pumpScanFailureReport": "Teata",
   "pumpScanFailureRemove": "Eemalda foto",
   "badScanReportHint": "Jagame kviitungifoto ja mõlemad väärtuste komplektid, et järgmine versioon õpiks selle paigutust.",
-  "badScanReportShareAction": "Jaga raportit + fotot",
   "badScanReportFieldBrandLayout": "Brändi paigutus",
   "badScanReportFieldTotal": "Kokku",
   "badScanReportFieldPricePerLiter": "Hind/L",
@@ -1315,16 +1175,9 @@
   "fillUpSectionWhatSubtitle": "Kütus, kogus, hind",
   "fillUpSectionWhereTitle": "Kus olid",
   "fillUpSectionWhereSubtitle": "Jaam, läbisõidumõõdik, märkmed",
-  "fillUpImportFromLabel": "Impordi…",
-  "fillUpImportSheetTitle": "Impordi tankimise andmed",
   "fillUpImportReceiptLabel": "Kviitung",
-  "fillUpImportReceiptDescription": "Skaneeri paberist kviitung kaameraga",
   "fillUpImportPumpLabel": "Pumba kuvar",
-  "fillUpImportPumpDescription": "Loe Betrag / Preis pumba LCD-lt",
-  "fillUpImportObdLabel": "OBD-II adapter",
-  "fillUpImportObdDescription": "Loe läbisõidumõõdik OBD-II pordilt Bluetooth'i kaudu",
   "fillUpPricePerLiterLabel": "Hind liitri kohta",
-  "vehicleHeaderPlateLabel": "Registreerimisnumber",
   "vehicleHeaderUntitled": "Uus sõiduk",
   "vehicleSectionIdentityTitle": "Identiteet",
   "vehicleSectionIdentitySubtitle": "Nimi ja VIN",
@@ -1340,7 +1193,6 @@
   "gpsDiagnosticsHeader": "{count} näidist · {span} · {gaps, plural, =0{tühikuid pole} =1{1 tühik} other{{gaps} tühikut}}",
   "gpsDiagnosticsCadence": "Mediaanintervall: {ms} ms",
   "gpsDiagnosticsExplain": "Salvestatud salvestamise ajal, et kontrollida GPS sagedust telefoni une ajal.",
-  "hapticEcoCoachSectionTitle": "Sõitmine",
   "hapticEcoCoachSettingTitle": "Reaalajas ökonõustamine",
   "hapticEcoCoachSettingSubtitle": "Õrn haptika + ekraanivihje, kui lähed täisgaasiga kriisi ajal",
   "hapticEcoCoachSnackBarMessage": "Kerge gaasiga — libisemine säästab rohkem",
@@ -1370,9 +1222,6 @@
   "calculatorDistanceHint": "nt 150",
   "calculatorConsumptionHint": "nt 7,0",
   "calculatorPriceHint": "nt 1,899",
-  "routeStrategyLabel": "Strateegia:",
-  "routeStrategyUniform": "Ühtlane",
-  "routeStrategyBalanced": "Tasakaalustatud",
   "glideCoachBetaTitle": "Libisemise juhendaja beeta (eksperimentaalne)",
   "glideCoachBetaSubtitle": "Õrn haptika punase tule ees aeglustudes. Vaikimisi väljas — tähelepanu häirimise oht.",
   "consentSyncTripsTitle": "Sünkrooni reisi salvestisi",
@@ -1428,7 +1277,6 @@
   "onboardingObd2ConnectButton": "Ühenda adapter",
   "onboardingObd2SkipButton": "Ehk hiljem",
   "onboardingObd2ReadingVin": "Loen VIN-koodi…",
-  "onboardingObd2VinReadFailed": "VIN-koodi ei saanud lugeda — sisesta käsitsi",
   "onboardingObd2ConnectFailed": "Ei suutnud adapteriga ühendada. Saad uuesti proovida või vahele jätta.",
   "onboardingPickUseMode": "Jätkamiseks vali kasutusrežiim.",
   "alertsRadiusFrequencyLabel": "Kontrollimissagedus",
@@ -1442,9 +1290,6 @@
   "radiusAlertMapPickerCancel": "Tühista",
   "radiusAlertMapPickerHint": "Lohista kaarti teatise kese paigutamiseks",
   "radiusAlertCenterFromMap": "Kaardi asukoht",
-  "radiusAlertNotificationTitle": "{fuelLabel} lähedal {label}",
-  "radiusAlertNotificationBody": "Jaam on {price} € (eesmärk: {threshold} €)",
-  "refuelUnitPerLiter": "/L",
   "refuelUnitPerKwh": "/kWh",
   "refuelUnitPerSession": "/sessioon",
   "speedConsumptionCardTitle": "Tarbimine kiiruse järgi",
@@ -1463,9 +1308,6 @@
   "tankLevelLitersFormat": "{litres} L",
   "tankLevelRangeFormat": "≈ {kilometres} km läbisõiduvaru",
   "tankLevelLastFillUpFormat": "Viimane tankimine: {date} · {count} reis(i) sellest saadik",
-  "tankLevelMethodObd2": "OBD2 mõõdetud",
-  "tankLevelMethodDistanceFallback": "vahemaapõhine hinnang",
-  "tankLevelMethodMixed": "segamõõtmine",
   "tankLevelEmptyNoFillUp": "Lisa tankimine paagi taseme nägemiseks",
   "tankLevelDetailSheetTitle": "Reisid alates viimasest tankimisest",
   "addFillUpIsFullTankLabel": "Täistank",
@@ -1536,7 +1378,6 @@
   "trajetDetailDeleteAction": "Kustuta",
   "trajetDetailDeleteConfirmTitle": "Kustutada see reis?",
   "trajetDetailDeleteConfirmBody": "See reis eemaldatakse jäädavalt sinu ajaloost.",
-  "trajetDetailDeleteConfirmCancel": "Tühista",
   "trajetDetailDeleteConfirmConfirm": "Kustuta",
   "tripRecordingObd2NotResponding": "OBD2 adapter ühendatud, kuid ei tagasta andmeid. Proovi teist adapterit või kontrolli sõiduki diagnostikaprotokolli.",
   "trajetsViewAllOnMap": "Näita kõik kaardil",
@@ -1552,7 +1393,6 @@
   "tripLengthBucketTripCount": "{count, plural, =0{reise pole} one{1 reis} other{{count} reisi}}",
   "tripPathCardTitle": "Reisi marsruut",
   "tripPathCardSubtitle": "GPS-salvestatud marsruut",
-  "tripPathLegendTitle": "Tarbimine",
   "tripPathLegendEfficient": "Efektiivne (< 6 L/100km)",
   "tripPathLegendBorderline": "Piiripeal (6–10 L/100km)",
   "tripPathLegendWasteful": "Raiskav (≥ 10 L/100km)",
@@ -1563,13 +1403,8 @@
   "tripRecordingPinHelpTitle": "Kinnituse kohta",
   "tripRecordingPinHelpBody": "Kinnitus hoiab ekraani peal ja peidab süsteemiribad, et vorm jääks armatuurlauale kinnituna loetavaks. Puuduta uuesti vabastamiseks. Vabastub automaatselt, kui reis peatub.",
   "tripRecordingResumeHintMessage": "Salvestamine jätkub taustal. Puuduta punast ribareklaam ekraani ülaosas, et naasta.",
-  "tripBannerOpenFromConsumptionTab": "Ava aktiivne reis Kulu kaardilt",
   "tripRecordingUnpinnedWarning": "Kinnita ekraan, et GPS oleks aktiivne reisi ajal — Android võib GPS-i une ajal piirata.",
   "tripRecordingMinimiseTooltip": "Minimeeri hõljuvaks paaniks",
-  "unifiedFilterFuel": "Kütus",
-  "unifiedFilterEv": "EV",
-  "unifiedFilterBoth": "Mõlemad",
-  "unifiedNoResultsForFilter": "Selle filtri jaoks pole tulemusi",
   "searchFailedSnackbar": "Otsing ebaõnnestus — palun proovi uuesti",
   "vinLabel": "VIN (vabatahtlik)",
   "vinDecodeTooltip": "Dekodeeri VIN",
@@ -1601,7 +1436,6 @@
   "gdprVinOnlineDecodeTitle": "VIN veebidekodeerimine",
   "gdprVinOnlineDecodeShort": "Dekodeeri VIN NHTSA tasuta avaliku teenuse kaudu",
   "gdprVinOnlineDecodeDescription": "Kui ühendate adapteri, loetakse sinu sõiduki VIN lokaalselt auto tuvastamiseks. Selle lubamine saadab 17-kohalise VIN-i NHTSA tasuta vPIC teenusesse täiendavate andmete (mudel, mootori töömaht, kütuse liik) otsimiseks. VIN on ainus saadetav andmestik — muud teave ei lahku sinu seadmest.",
-  "vehicleDetectedFromVinBadge": "(tuvastatud)",
   "vehicleDetectedFromVinSnackbar": "Tuvastatud VIN-koodist: {summary}. Rakenda?",
   "vehicleDetectedFromVinApply": "Rakenda",
   "widgetHelpSectionTitle": "Avaekraani vidin",
@@ -1620,7 +1454,6 @@
   "widgetColorSchemeOrange": "Oranž",
   "widgetVariantDefault": "Ainult praegune hind",
   "widgetVariantPredictive": "Ennustav: parim tankimisaeg",
-  "widgetPredictiveNowPrefix": "praegu",
   "@distance": {
     "placeholders": {
       "distance": {
@@ -1645,13 +1478,6 @@
   "@hours": {
     "placeholders": {
       "n": {
-        "type": "int"
-      }
-    }
-  },
-  "@stationsOnMap": {
-    "placeholders": {
-      "count": {
         "type": "int"
       }
     }
@@ -1700,13 +1526,6 @@
   "@evConnectors": {
     "placeholders": {
       "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@stopN": {
-    "placeholders": {
-      "n": {
         "type": "int"
       }
     }
@@ -1850,25 +1669,11 @@
       }
     }
   },
-  "approachStationDistance": "{meters} m kaugusel",
-  "@approachStationDistance": {
-    "description": "PiP overlay caption (#2084) showing how far the driver is from the in-radius target station, in metres.",
-    "placeholders": {
-      "meters": {
-        "type": "String",
-        "example": "350"
-      }
-    }
-  },
   "tripRecordingPipElapsedCaption": "möödunud",
   "@tripRecordingPipElapsedCaption": {
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
-  "fabOpenCriteria": "Ava otsing",
-  "fabOpenResults": "Ava tulemused",
   "fabRunSearch": "Käivita otsing",
-  "fabRefineCriteria": "Täpsusta otsingut",
-  "routeSearchPartialBanner": "Otsitakse rohkem jaamu…",
   "privacySaveErrorLog": "Salvesta tõrkelogi ({count})",
   "@privacySaveErrorLog": {
     "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
@@ -2418,10 +2223,6 @@
   "@trajetDetailChartCoolant": {
     "description": "MT — needs native review"
   },
-  "trajetDetailChartAltitude": "Kõrgus (m)",
-  "@trajetDetailChartAltitude": {
-    "description": "MT — needs native review"
-  },
   "trajetDetailChartLambda": "Käskluslik λ",
   "@trajetDetailChartLambda": {
     "description": "MT — needs native review"
@@ -2654,14 +2455,6 @@
   "@obd2HealthHistorySection": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyJson": "Kopeeri JSON-ina",
-  "@obd2HealthCopyJson": {
-    "description": "MT — needs native review"
-  },
-  "obd2HealthCopied": "OBD2 diagnostika kopeeritud lõikelauale.",
-  "@obd2HealthCopied": {
-    "description": "MT — needs native review"
-  },
   "evStatusPartial": "Osaliselt saadaval",
   "@evStatusPartial": {
     "description": "MT — needs native review"
@@ -2767,10 +2560,6 @@
   },
   "ocrTesterRunning": "OCR töötab…",
   "@ocrTesterRunning": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterNoResult": "OCR ei andnud loetavat tulemust.",
-  "@ocrTesterNoResult": {
     "description": "MT — needs native review"
   },
   "ocrTesterOverlaySection": "Ploki ülekat",
@@ -2937,10 +2726,6 @@
   "@obd2DiagnosticsInitCold": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyInitTranscript": "Kopeeri ainult init-protokoll",
-  "@obd2HealthCopyInitTranscript": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterSaveFixture": "Salvesta fikseeritud andmestikuna",
   "@ocrTesterSaveFixture": {
     "description": "MT — needs native review"
@@ -3092,10 +2877,6 @@
   "@obd2GpsDegradedBannerTitle": {
     "description": "MT — needs native review"
   },
-  "restoreBackupTooltip": "Taasta varukoopia",
-  "@restoreBackupTooltip": {
-    "description": "MT — needs native review"
-  },
   "restoreBackupDialogTitle": "Taasta varukoopia",
   "@restoreBackupDialogTitle": {
     "description": "MT — needs native review"
@@ -3111,15 +2892,6 @@
   "restoreBackupReplaceAction": "Asenda kõik",
   "@restoreBackupReplaceAction": {
     "description": "MT — needs native review"
-  },
-  "restoreBackupSuccess": "Varukoopia taastatud — {count} kirjet imporditud",
-  "@restoreBackupSuccess": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
   },
   "restoreBackupEmpty": "Varukoopia taastatud — see ei sisaldanud ühtegi kirjet",
   "@restoreBackupEmpty": {
@@ -3391,16 +3163,6 @@
   "voiceCoachingSettingSubtitle": "Kuulake sõitmise ajal häälnõuandeid — järsk kiirendus, karm pidurdamine ja käiguvahetuse vihjed",
   "@voiceCoachingSettingSubtitle": {
     "description": "MT — needs native review"
-  },
-  "fuelStationRadarDistanceKm": "{km} km kaugusel",
-  "@fuelStationRadarDistanceKm": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "km": {
-        "type": "String",
-        "example": "2.4"
-      }
-    }
   },
   "fuelStationRadarProximity": "Lähedus {percent}%",
   "@fuelStationRadarProximity": {
@@ -3733,10 +3495,6 @@
   },
   "consumptionStatsChartConsumption": "L/100km kuus",
   "@consumptionStatsChartConsumption": {
-    "description": "MT — needs native review"
-  },
-  "shareReceiptImporting": "Jagatud kviitungi importimine…",
-  "@shareReceiptImporting": {
     "description": "MT — needs native review"
   },
   "shareReceiptUnsupportedFormat": "Seda failitüüpi pole veel võimalik importida — jagage hoopis kviitungi fotot.",
@@ -4228,17 +3986,6 @@
       "count": {
         "type": "int",
         "example": "3"
-      }
-    }
-  },
-  "fuelEfficiencyMixedFootnote": "{count, plural, =1{1 mixed tank counted toward its main fuel} other{{count} mixed tanks counted toward their main fuel}}",
-  "@fuelEfficiencyMixedFootnote": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int",
-        "example": "1"
       }
     }
   },
@@ -4752,11 +4499,6 @@
         "example": "Oil change"
       }
     }
-  },
-  "radarAcquiringLocation": "Finding your location…",
-  "@radarAcquiringLocation": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
   },
   "radarUpdatingLocation": "Updating your location…",
   "@radarUpdatingLocation": {

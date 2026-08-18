@@ -10,6 +10,7 @@ import '../../../core/logging/error_logger.dart';
 import '../../../core/services/sensitive_clipboard.dart';
 import '../../../l10n/app_localizations.dart';
 import '../domain/qr_payment_decoder.dart';
+import '../../../core/utils/unit_formatter.dart';
 
 /// Outcome returned by [ScanPaymentDispatcher.handle] so the UI knows
 /// what feedback to surface (snackbar, confirmation dialog, fallback
@@ -145,6 +146,8 @@ class ScanPaymentDispatcher {
     final iban = epc.iban?.trim();
     if (iban == null || iban.isEmpty) return EpcLaunchOutcome.failed;
 
+    // SEPA deep-link URI parameter — machine format, dot decimal.
+    // i18n-ignore-format: machine-format URI parameter, not display text
     final amountStr = epc.amountEur?.toStringAsFixed(2);
     final params = <String, String>{
       'iban': iban,
@@ -213,7 +216,8 @@ class ScanPaymentDispatcher {
         ListTile(
           dense: true,
           title: Text(l10n.qrPaymentAmount),
-          subtitle: Text('${epc.amountEur!.toStringAsFixed(2)} €'),
+          subtitle:
+              Text('${UnitFormatter.formatDecimal(epc.amountEur!, fractionDigits: 2)} €'),
         ),
     ];
     return AlertDialog(

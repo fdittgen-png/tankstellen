@@ -15,46 +15,49 @@
 /// `lib/core/`.
 library;
 
-export 'data/active_trip_recovery_service.dart';
 export 'data/active_trip_repository.dart';
-export 'data/adapter_capability.dart';
-export 'data/adapter_registry.dart';
-export 'data/android_background_adapter_listener.dart';
-export 'data/auto_trip_coordinator.dart';
-export 'data/background_adapter_listener.dart';
-export 'data/broken_map_belief.dart';
-export 'data/broken_map_detector.dart';
-export 'data/can_frame_decoders/psa_fuel_level_can_decoder.dart';
+export 'data/protocol/adapter_capability.dart';
+export 'data/protocol/adapter_registry.dart';
+export 'data/transport/android_background_adapter_listener.dart';
+export 'data/session/auto_trip_coordinator.dart';
+export 'data/transport/background_adapter_listener.dart';
+export 'domain/broken_map_belief.dart';
+export 'domain/broken_map_detector.dart';
+export 'data/protocol/can_frame_decoders/psa_fuel_level_can_decoder.dart';
 // #3437 — the consumption trip-start path fires the CDM association
 // trigger through this barrel (the one sanctioned growth: a NEW
 // cross-feature seam, not a legacy reach-in).
-export 'data/companion_auto_record_coordinator.dart';
-export 'data/elm327_protocol.dart';
-export 'data/ios_background_adapter_listener.dart';
-export 'data/ios_state_restoration_provider.dart';
-export 'data/ios_state_restoration_service.dart';
+export 'data/session/companion_auto_record_coordinator.dart';
+export 'data/protocol/elm327_protocol.dart';
+export 'data/transport/ios_background_adapter_listener.dart';
+export 'data/transport/ios_state_restoration_provider.dart';
+export 'data/transport/ios_state_restoration_service.dart';
 export 'data/obd2_comm_diagnostics.dart';
 export 'data/obd2_connect_trace.dart';
 export 'data/obd2_connect_trace_log.dart';
-export 'data/obd2_connect_trace_persistence.dart';
-export 'data/obd2_connection_errors.dart';
-export 'data/obd2_connection_service.dart';
-export 'data/obd2_disconnect_quietly.dart';
-export 'data/obd2_permissions.dart';
+export 'domain/obd2_connection_errors.dart';
+export 'data/session/obd2_connection_service.dart';
+export 'data/session/obd2_disconnect_quietly.dart';
+export 'data/transport/obd2_permissions.dart';
 export 'data/obd2_read_telemetry.dart';
-export 'data/obd2_link_supervisor.dart';
-export 'data/obd2_reattach_source.dart';
-export 'data/obd2_self_test_driver.dart';
-export 'data/obd2_service.dart';
+export 'data/session/obd2_link_supervisor.dart';
+export 'data/session/obd2_reattach_source.dart';
+// #3743 — the self-test DRIVER is internal (the app shell and the obd2
+// controller drive it); external consumers only render the REPORT types.
+export 'data/session/obd2_self_test_report.dart';
+export 'data/session/obd2_service.dart';
 export 'data/obd2_session_diagnostic.dart';
 export 'data/obd_adapter_blocklist.dart';
-export 'data/oem_pid_registry.dart';
-export 'data/oem_pid_table.dart';
-export 'data/paused_trip_recovery_service.dart';
+export 'data/protocol/oem_pid_registry.dart';
+export 'data/protocol/oem_pid_table.dart';
 export 'data/paused_trip_repository.dart';
-export 'data/trip_distance_source.dart';
-export 'data/trip_live_reading.dart';
-export 'data/trip_recording_controller.dart';
+export 'domain/trip_distance_source.dart';
+export 'domain/trip_live_reading.dart';
+export 'data/session/trip_recording_controller.dart';
+// #3743 — the TripRecordingController inversion seam (epic item 2): a NEW
+// cross-feature contract (consumption implements the obd2-owned overlay
+// interface), the same sanctioned-growth shape as the #3437 CDM seam.
+export 'data/session/trip_recording_sink.dart';
 export 'domain/services/obd2_analytics_signals.dart';
 export 'presentation/obd2_connection_reset_action.dart';
 export 'presentation/obd2_connect_telemetry.dart';
@@ -69,7 +72,6 @@ export 'presentation/widgets/obd2_status_chip.dart';
 export 'presentation/widgets/obd2_status_dot.dart';
 export 'providers/current_obd2_fuel_level_provider.dart';
 export 'providers/obd2_capability_provider.dart';
-export 'providers/obd2_comm_diagnostics_gate_provider.dart';
 export 'providers/obd2_connect_trace_revision_provider.dart';
 export 'providers/obd2_connection_state_provider.dart';
 export 'providers/obd2_debug_logging_provider.dart';

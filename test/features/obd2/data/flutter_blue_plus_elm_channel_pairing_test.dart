@@ -5,11 +5,11 @@ import 'dart:async';
 
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/flutter_blue_plus_elm_channel.dart';
+import 'package:tankstellen/features/obd2/data/transport/flutter_blue_plus_elm_channel.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connect_trace.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connect_trace_log.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connection_errors.dart';
-import 'package:tankstellen/features/obd2/data/obd2_pairing_mode.dart';
+import 'package:tankstellen/features/obd2/domain/obd2_connection_errors.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_pairing_mode.dart';
 
 const _mac = 'AA:BB:CC:DD:EE:31';
 

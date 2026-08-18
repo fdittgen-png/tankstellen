@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tankstellen/core/widgets/empty_state.dart';
-import 'package:tankstellen/features/obd2/data/adapter_registry.dart';
-import 'package:tankstellen/features/obd2/data/bluetooth_facade.dart';
-import 'package:tankstellen/features/obd2/data/elm_byte_channel.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connection_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_permissions.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/protocol/adapter_registry.dart';
+import 'package:tankstellen/features/obd2/data/transport/bluetooth_facade.dart';
+import 'package:tankstellen/features/obd2/data/transport/elm_byte_channel.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_connection_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_permissions.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trajets_record_fab.dart';
@@ -714,7 +714,7 @@ void main() {
         activeVehicle: combustionVehicle,
       );
 
-      expect(find.text('6.4 L/100 km'), findsOneWidget);
+      expect(find.text('6,4 L/100 km'), findsOneWidget);
       expect(find.textContaining('kWh'), findsNothing);
     });
 
@@ -736,7 +736,7 @@ void main() {
         activeVehicle: evVehicle,
       );
 
-      expect(find.text('18.5 kWh/100 km'), findsOneWidget);
+      expect(find.text('18,5 kWh/100 km'), findsOneWidget);
       expect(find.textContaining('L/100 km'), findsNothing);
     });
   });
@@ -815,7 +815,7 @@ void main() {
       expect(find.text('Cold start'), findsNothing);
       // Distance chip is still rendered — sanity check that the row
       // built correctly.
-      expect(find.text('25.0 km'), findsOneWidget);
+      expect(find.text('25,0 km'), findsOneWidget);
     });
   });
 

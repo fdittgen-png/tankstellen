@@ -6,8 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
-import 'package:tankstellen/features/obd2/data/obd2_permissions.dart';
-import 'package:tankstellen/features/obd2/data/obd2_scan_readiness.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_permissions.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_scan_readiness.dart';
 
 class _NoopRecorder implements TraceRecorder {
   @override

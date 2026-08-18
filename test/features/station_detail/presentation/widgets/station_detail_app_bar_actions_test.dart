@@ -118,5 +118,30 @@ void main() {
           reason: 'directions is the FAB now, not an app-bar icon (#3337)');
       expect(find.byIcon(Icons.notifications_outlined), findsOneWidget);
     });
+
+    testWidgets(
+        'dead-code finding 6 — hides the create-alert action when '
+        'Feature.priceAlerts is disabled', (tester) async {
+      await pumpApp(
+        tester,
+        const StationDetailAppBarActions(
+          stationId: '51d4b477-a095-1aa0-e100-80009459e03a',
+          station: testStation,
+        ),
+        overrides: [
+          favoritesOverride(const []),
+          isFavoriteOverride('51d4b477-a095-1aa0-e100-80009459e03a', false),
+          featureFlagsProvider.overrideWith(
+            () => _FlagsWithout({Feature.priceAlerts}),
+          ),
+        ],
+      );
+
+      expect(find.byKey(const Key('create_price_alert')), findsNothing);
+      expect(find.byIcon(Icons.notifications_outlined), findsNothing);
+      // The other actions stay (their features remain enabled).
+      expect(find.byKey(const Key('scan_payment_qr')), findsOneWidget);
+      expect(find.byKey(const Key('report_price')), findsOneWidget);
+    });
   });
 }

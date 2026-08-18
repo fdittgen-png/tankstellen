@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/sync/sync_config.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Account info card showing UUID and server URL.
 class AccountInfoCard extends StatelessWidget {
@@ -60,8 +61,10 @@ class SyncedDataCard extends StatelessWidget {
     final json = const JsonEncoder().convert(data);
     final bytes = utf8.encode(json).length;
     if (bytes < 1024) return '$bytes B';
-    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    if (bytes < 1024 * 1024) {
+      return '${UnitFormatter.formatDecimal(bytes / 1024)} KB';
+    }
+    return '${UnitFormatter.formatDecimal(bytes / (1024 * 1024))} MB';
   }
 
   @override

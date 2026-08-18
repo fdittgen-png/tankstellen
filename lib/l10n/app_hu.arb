@@ -12,11 +12,8 @@
   "fuelType": "Üzemanyag",
   "searchRadius": "Sugár",
   "searchNearby": "Közeli kutak",
-  "searchButton": "Keresés",
   "searchCriteriaTitle": "Keresési feltételek",
-  "searchCriteriaOpen": "Keresés",
   "searchCriteriaRadiusBadge": "{km} km-en belül",
-  "searchCriteriaTapToSearch": "Érintsen a keresés megkezdéséhez",
   "noResults": "Nem találhatók benzinkutak.",
   "startSearch": "Keressen benzinkutakat.",
   "open": "Nyitva",
@@ -30,7 +27,6 @@
   "navigate": "Navigálás",
   "retry": "Újrapróbálás",
   "apiKeySetup": "API-kulcs",
-  "apiKeyDescription": "Regisztráljon egyszer egy ingyenes API-kulcsért.",
   "apiKeyLabel": "API-kulcs",
   "register": "Regisztráció",
   "continueButton": "Tovább",
@@ -64,33 +60,12 @@
   "noFavoritesHint": "Érintse meg a csillagot egy kútnál a kedvencekhez adáshoz.",
   "language": "Nyelv",
   "country": "Ország",
-  "demoMode": "Demó mód — mintaadatok.",
-  "setupLiveData": "Élő adatok beállítása",
   "freeNoKey": "Ingyenes — kulcs nem szükséges",
   "apiKeyRequired": "API-kulcs szükséges",
-  "skipWithoutKey": "Folytatás kulcs nélkül",
   "dataTransparency": "Adatátláthatóság",
   "storageAndCache": "Tárhely és gyorsítótár",
   "clearCache": "Gyorsítótár törlése",
-  "clearAllData": "Összes adat törlése",
-  "errorLog": "Hibanapló",
   "stationsFound": "{count} kút találva",
-  "whatIsShared": "Mi kerül megosztásra — és kivel?",
-  "gpsCoordinates": "GPS-koordináták",
-  "gpsReason": "Minden kereséssel elküldve a közeli kutak megtalálásához.",
-  "postalCodeData": "Irányítószám",
-  "postalReason": "Koordinátákká alakítva a geokódolási szolgáltatáson keresztül.",
-  "mapViewport": "Térképnézet",
-  "mapReason": "A térképcsempék a szerverről töltődnek be. Személyes adatok nem kerülnek továbbításra.",
-  "apiKeyData": "API-kulcs",
-  "apiKeyReason": "Személyes kulcsa minden API-kéréssel elküldésre kerül. Az e-mail címéhez van kötve.",
-  "notShared": "NEM kerül megosztásra:",
-  "searchHistory": "Keresési előzmények",
-  "favoritesData": "Kedvencek",
-  "profileNames": "Profilnevek",
-  "homeZipData": "Otthoni irányítószám",
-  "usageData": "Használati adatok",
-  "privacyBanner": "Ennek az alkalmazásnak nincs szervere. Minden adat az eszközén marad. Nincs elemzés, nyomon követés vagy hirdetés.",
   "storageUsage": "Tárhelyhasználat ezen az eszközön",
   "settingsLabel": "Beállítások",
   "profilesStored": "profil mentve",
@@ -116,12 +91,8 @@
   "deleteAllButton": "Mindent töröl",
   "entries": "bejegyzés",
   "cacheEmpty": "A gyorsítótár üres",
-  "noStorage": "Nincs felhasznált tárhely",
   "apiKeyNote": "Ingyenes regisztráció. Adatok a kormányzati ártranszparencia-ügynökségektől.",
   "apiKeyFormatError": "Érvénytelen formátum — UUID elvárva (8-4-4-4-12)",
-  "supportProject": "Támogassa a projektet",
-  "supportDescription": "Ez az alkalmazás ingyenes, nyílt forráskódú és reklámmentes. Ha hasznosnak találja, fontolja meg a fejlesztő támogatását.",
-  "reportBug": "Hiba bejelentése / Funkció javaslata",
   "reportThisIssue": "Probléma jelentése",
   "reportAlreadySent": "Ezt a problémát már bejelentette.",
   "reportConsentTitle": "Bejelentés GitHub-ra?",
@@ -136,7 +107,6 @@
   "configApiKeysSection": "API-kulcsok",
   "configTankerkoenigKey": "Tankerkoenig API-kulcs",
   "configApiKeyConfigured": "Beállítva",
-  "configApiKeyNotSet": "Nincs megadva (demó mód)",
   "configApiKeyCommunity": "Alapértelmezett (közösségi kulcs)",
   "searchLocationPlaceholder": "Cím, irányítószám vagy város",
   "configEvKey": "EV töltési API-kulcs",
@@ -174,8 +144,6 @@
   "sortPriceDistance": "Ár/km",
   "cheap": "olcsó",
   "expensive": "drága",
-  "stationsOnMap": "{count} kút",
-  "loadingFavorites": "Kedvencek betöltése...\nElőször keressen kutakat az adatok mentéséhez.",
   "reportPrice": "Ár bejelentése",
   "whatsWrong": "Mi a probléma?",
   "correctPrice": "Helyes ár (pl. 1,459)",
@@ -185,7 +153,6 @@
   "cacheCleared": "Gyorsítótár törölve.",
   "yourPosition": "Az Ön pozíciója",
   "positionUnknown": "Pozíció ismeretlen",
-  "routeModeBannerLabel": "Útvonal mód — a távolságok az útvonal mentén",
   "distancesFromCenter": "Távolságok a keresés központjától",
   "autoUpdatePosition": "Pozíció automatikus frissítése",
   "autoUpdateDescription": "GPS-pozíció frissítése minden keresés előtt",
@@ -220,8 +187,6 @@
   "wrongDieselPrice": "Hibás dízel ár",
   "wrongStatusOpen": "Nyitottnak jelölve, de zárva van",
   "wrongStatusClosed": "Zártnak jelölve, de nyitva van",
-  "searchAlongRouteLabel": "Útvonal mentén",
-  "searchEvStations": "Töltőállomások keresése",
   "allStations": "Összes állomás",
   "bestStops": "Legjobb megállók",
   "openInMaps": "Megnyitás Térképben",
@@ -253,7 +218,6 @@
   "cityOrAddress": "Város vagy cím",
   "useGps": "GPS használata",
   "stop": "Megálló",
-  "stopN": "Megálló {n}",
   "addStop": "Megálló hozzáadása",
   "searchAlongRoute": "Keresés az útvonal mentén",
   "cheapest": "Legolcsóbb",
@@ -265,10 +229,8 @@
   "customKey": "Egyéni kulcs",
   "appDefaultKey": "Alkalmazás alapértelmezett kulcsa",
   "optionalOverrideKey": "Opcionális: a beépített alkalmazáskulcs felülírása sajáttal",
-  "requiredForEvSearch": "Szükséges az EV töltőállomás kereséséhez",
   "edit": "Szerkesztés",
   "fuelPricesApiKey": "Üzemanyagárak API-kulcs",
-  "tankerkoenigApiKey": "Tankerkoenig API-kulcs",
   "evChargingApiKey": "EV töltés API-kulcs",
   "openChargeMapApiKey": "OpenChargeMap API-kulcs",
   "routePlanningSection": "Útvonaltervezés",
@@ -303,18 +265,14 @@
   "noStationsAlongThisRoute": "Nem találhatók állomások ezen útvonal mentén.",
   "fuelCostCalculator": "Üzemanyagköltség-kalkulátor",
   "distanceKm": "Távolság (km)",
-  "consumptionL100km": "Fogyasztás (L/100km)",
-  "fuelPriceEurL": "Üzemanyag ára (EUR/L)",
   "tripCost": "Útköltség",
   "fuelNeeded": "Szükséges üzemanyag",
   "totalCost": "Összköltség",
-  "enterCalcValues": "Adja meg a távolságot, fogyasztást és árat az útköltség kiszámításához",
   "priceHistory": "Ártörténet",
   "ignoredStationsLabel": "Mellőzött",
   "ratingsLabel": "Értékelések",
   "favoritesDataCache": "Kedvencek adatai",
   "citySearchCache": "Városkeresés",
-  "dataDeletionNotAvailableCommunity": "Az adatok törlése nem érhető el a Közösségi módban. Először kapcsolódjon le, vagy használjon privát adatbázist.",
   "priceHistoryStationsTracked": "{count} követett kút",
   "@priceHistoryStationsTracked": {
     "placeholders": {
@@ -348,22 +306,11 @@
     }
   },
   "noPriceHistory": "Még nincs ártörténet",
-  "noHourlyData": "Nincsenek óránkénti adatok",
   "noStatistics": "Nincsenek elérhető statisztikák",
-  "statMin": "Min",
-  "statMax": "Max",
-  "statAvg": "Átl",
   "showAllFuelTypes": "Összes üzemanyagtípus mutatása",
   "connected": "Csatlakoztatva",
-  "notConnected": "Nincs csatlakoztatva",
-  "connectTankSync": "TankSync csatlakoztatása",
   "disconnectTankSync": "TankSync leválasztása",
   "viewMyData": "Adataim megtekintése",
-  "optionalCloudSync": "Opcionális felhőszinkronizálás riasztásokhoz, kedvencekhez és push értesítésekhez",
-  "tapToUpdateGps": "Érintse meg a GPS-pozíció frissítéséhez",
-  "gpsAutoUpdateHint": "A GPS-pozíció automatikusan lekérdezésre kerül kereséskor. Itt manuálisan is frissítheti.",
-  "clearGpsConfirm": "Tárolt GPS-pozíció törlése? Bármikor frissítheti újra.",
-  "pageNotFound": "Az oldal nem található",
   "deleteAllServerData": "Összes szerveradat törlése",
   "deleteServerDataConfirm": "Törli az összes szerveradatot?",
   "deleteEverything": "Mindent töröl",
@@ -373,7 +320,6 @@
   "forgetAllSyncedTripsConfirmBody": "Az összes út-összefoglaló és részletadat törlődik a szerverről. Az ezen az eszközön tárolt helyi útnapló nem érintett.\n\nEz a művelet nem vonható vissza.",
   "forgetAllSyncedTripsConfirmAction": "Összes törlése",
   "forgetAllSyncedTripsSuccess": "Az összes szinkronizált út eltávolítva a szerverről",
-  "disconnectConfirm": "TankSync leválasztása?",
   "disconnect": "Leválasztás",
   "myServerData": "Szerveradataim",
   "anonymousUuid": "Anonim UUID",
@@ -393,7 +339,6 @@
   "continueAsGuest": "Folytatás vendégként",
   "createAccount": "Fiók létrehozása",
   "signIn": "Bejelentkezés",
-  "upgradeToEmail": "E-mail fiók létrehozása",
   "savedRoutes": "Mentett útvonalak",
   "noSavedRoutes": "Nincsenek mentett útvonalak",
   "noSavedRoutesHint": "Keresés egy útvonalon, majd mentse el a gyors eléréshez.",
@@ -424,11 +369,6 @@
   "onboardingNext": "Tovább",
   "onboardingSkip": "Kihagyás",
   "onboardingFinish": "Kezdjük el",
-  "crossBorderNearby": "{country} a közelben van",
-  "crossBorderDistance": "~{km} km a határig",
-  "crossBorderAvgPrice": "Átlagár itt: {price} EUR ({count} állomás)",
-  "allPricesView": "Összes ár",
-  "compactView": "Kompakt",
   "switchToAllPricesView": "Váltás az összes áras nézetre",
   "switchToCompactView": "Váltás kompakt nézetre",
   "unavailable": "N/A",
@@ -453,10 +393,6 @@
   "accountDeleted": "Fiók törölve. A helyi adatok megmaradtak.",
   "switchedToAnonymous": "Névtelen munkamenetre váltva",
   "failedToSwitch": "A váltás sikertelen: {error}",
-  "topicUrlCopied": "Téma URL-je másolva",
-  "testNotificationSent": "Teszt értesítés elküldve!",
-  "testNotificationFailed": "A teszt értesítés küldése sikertelen",
-  "pushUpdateFailed": "A leküldéses értesítési beállítás frissítése sikertelen",
   "connectedAsGuest": "Csatlakozva vendégként",
   "accountCreated": "Fiók létrehozva!",
   "signedIn": "Bejelentkezve!",
@@ -518,7 +454,6 @@
   "privacyClearErrorLog": "Hibanapló törlése",
   "privacyErrorLogCleared": "Hibanapló törölve",
   "privacyDeleteButton": "Összes adat törlése",
-  "privacyCopyErrorLog": "Hibanapló másolása a vágólapra ({count})",
   "privacyDeleteTitle": "Törli az összes adatot?",
   "privacyDeleteBody": "Ez véglegesen törli:\n\n- Az összes kedvencet és állomásadatot\n- Az összes keresési profilt\n- Az összes áriasztást\n- Az összes ártörténetet\n- Az összes gyorsítótárazott adatot\n- Az Ön API-kulcsát\n- Az összes alkalmazásbeállítást\n\nAz alkalmazás visszaáll a kezdeti állapotára. Ez a művelet nem vonható vissza.",
   "privacyDeleteConfirm": "Mindent töröl",
@@ -553,15 +488,8 @@
   "voiceAnnouncementsTitle": "Hangos bejelentések",
   "voiceAnnouncementsDescription": "Közeli olcsó állomások bejelentése vezetés közben",
   "voiceAnnouncementsEnabled": "Hangos bejelentések engedélyezése",
-  "voiceAnnouncementThreshold": "Csak {price} alatt",
-  "voiceAnnouncementCheapFuel": "{station}, {distance} kilométerre előre, {fuelType} {price}",
   "voiceAnnouncementProximityRadius": "Bejelentési sugár",
   "voiceAnnouncementCooldown": "Ismétlési intervallum",
-  "nearestStations": "Legkozelebbi kutjak",
-  "nearestStationsHint": "Talalja meg a legkozelebbi kutjakat a jelenlegi helyzete alapjan",
-  "consumptionLogTitle": "Üzemanyag-fogyasztás",
-  "consumptionLogMenuTitle": "Fogyasztási napló",
-  "consumptionLogMenuSubtitle": "Tankolások követése és L/100km kiszámítása",
   "consumptionStatsTitle": "Fogyasztási statisztikák",
   "addFillUp": "Tankolás hozzáadása",
   "noFillUpsTitle": "Még nincs tankolás",
@@ -595,14 +523,12 @@
   "vehiclesWizardYoursList": "Önnek {count, plural, =1{1 járműve} other{{count} járműve}} van:",
   "vehiclesWizardSkipHint": "Kihagyja a befejezéshez — járműveket bármikor hozzáadhat a Beállításokban.",
   "fillUpVehicleLabel": "Jármű",
-  "fillUpVehicleNone": "Nincs jármű",
   "fillUpVehicleRequired": "Jármű megadása kötelező",
   "reportScanError": "Beolvasási hiba jelentése",
   "pickStationTitle": "Állomás kiválasztása",
   "pickStationHelper": "Kezdje el a tankolást egy ismert állomástól, hogy az árak, a márka és az üzemanyag típusa automatikusan kitöltődjön.",
   "pickStationEmpty": "Még nincsenek kedvenc állomások — adjon hozzá néhányat a Keresésből vagy a Kedvencekből, vagy ugorja át és töltse ki manuálisan.",
   "pickStationSkip": "Kihagyás — hozzáadás állomás nélkül",
-  "scanPump": "Kút beolvasása",
   "scanPayment": "Fizetési QR beolvasása",
   "qrPaymentBeneficiary": "Kedvezményezett",
   "qrPaymentAmount": "Összeg",
@@ -624,17 +550,10 @@
   "qrScannerRetry": "Próbálja újra",
   "torchOn": "Vaku bekapcsolása",
   "torchOff": "Vaku kikapcsolása",
-  "obdNoAdapter": "Nincs OBD2-adapter a hatótávolságban",
-  "obdOdometerUnavailable": "Nem sikerült olvasni a kilométer-számlálót",
   "obdPermissionDenied": "Adjon Bluetooth-engedélyt a rendszerbeállításokban",
-  "obdAdapterUnresponsive": "Az adapter nem válaszolt — kapcsolja be a gyújtást, és próbálja újra",
   "obdPickerTitle": "OBD2-adapter kiválasztása",
   "obdPickerScanning": "Adapterek keresése…",
   "obdPickerConnecting": "Csatlakozás…",
-  "themeSettingTitle": "Téma",
-  "themeModeLight": "Világos",
-  "themeModeDark": "Sötét",
-  "themeModeSystem": "Rendszer szerint",
   "tripRecordingTitle": "Út rögzítése",
   "tripSummaryTitle": "Út összefoglalója",
   "tripMetricDistance": "Távolság",
@@ -676,18 +595,13 @@
   "syncBaselinesToggleTitle": "Tanult járműprofilok megosztása",
   "syncBaselinesToggleSubtitle": "Töltse fel a jármű fogyasztási alapvonalait, hogy egy második eszköz is felhasználhassa azokat.",
   "obd2StatusConnected": "OBD2-adapter: csatlakoztatva",
-  "obd2StatusAttempting": "OBD2-adapter: csatlakozás folyamatban",
-  "obd2StatusUnreachable": "OBD2-adapter: nem elérhető",
   "obd2StatusPermissionDenied": "OBD2-adapter: Bluetooth-engedély szükséges",
   "obd2StatusConnectedBody": "Kész az út rögzítésére.",
-  "obd2StatusAttemptingBody": "Csatlakozás a háttérben…",
-  "obd2StatusUnreachableBody": "Az adapter hatótávolságon kívül van, vagy már egy másik alkalmazás használja.",
   "obd2StatusPermissionDeniedBody": "Adjon Bluetooth-engedélyt a rendszerbeállításokban az automatikus újracsatlakozáshoz.",
   "obd2StatusNoAdapter": "Nincs adapter párosítva",
   "obd2StatusForget": "Adapter elfelejtése",
   "tripHistoryTitle": "Úttörténet",
   "tripHistoryEmptyTitle": "Még nincs út",
-  "tripHistoryEmptySubtitle": "Csatlakoztasson OBD2-adaptert és rögzítsen egy utat a vezetési előzmények elkezdéséhez.",
   "tripHistoryUnknownDate": "Ismeretlen dátum",
   "situationIdle": "Alapjárat",
   "situationStopAndGo": "Megálló-haladás",
@@ -697,12 +611,8 @@
   "situationClimbing": "Emelkedő / terhelt",
   "situationHardAccel": "Erős gyorsítás",
   "situationFuelCut": "Üzemanyag-elvágás — gurulás",
-  "tripSaveAsFillUp": "Mentés tankolásként",
   "tripSaveRecording": "Út mentése",
-  "tripDiscard": "Elvetés",
-  "obdOdometerRead": "Kilométer-számláló olvasva: {km} km",
   "vehicleFuelNotSet": "Nincs beállítva",
-  "wizardVehicleTapToEdit": "Érintsen a szerkesztéshez",
   "wizardVehicleDefaultBadge": "Alapértelmezett",
   "wizardProfileChoiceHint": "Válassza ki, hogyan kívánja használni az alkalmazást. Ezt később megváltoztathatja a Beállításokban.",
   "wizardProfileChoiceFooter": "Bármikor megváltoztathatja a választását a Beállítások → Használati mód alatt.",
@@ -713,7 +623,6 @@
   "wizardProfileFullName": "Teljes",
   "wizardProfileFullDescription": "Minden, ami a Közepesben van, plusz automatikus OBD2-útfelvétel, vezetési pontszámok és hűségkártyák.",
   "wizardProfileCustomName": "Egyéni",
-  "wizardProfileCustomDescription": "Saját funkciókombináció. Testreszabhatja az egyes kapcsolókat.",
   "useModeSectionHint": "Szabja az alkalmazást a tényleges használatához. Egy előbeállítás kiválasztása engedélyezi a megfelelő funkciókat.",
   "useModeCustomSettingsDescription": "A funkcióválasztéka nem egyezik egyetlen előbeállítással sem. Válasszon egyet felül a felülíráshoz, vagy folytassa az egyes funkciók testreszabását az alábbi szakaszban.",
   "useModeSwitchedSnack": "Használati mód beállítva: {profile}.",
@@ -751,20 +660,15 @@
   "evShowOnMap": "EV-állomások megjelenítése",
   "evAvailableOnly": "Csak elérhető",
   "evMinPower": "Min. teljesítmény",
-  "evMaxPower": "Max. teljesítmény",
-  "evOperator": "Üzemeltető",
-  "evLastUpdate": "Utolsó frissítés",
   "evStatusAvailable": "Elérhető",
   "evStatusOccupied": "Foglalt",
   "evStatusOutOfOrder": "Meghibásodott",
   "openOnlyFilter": "Csak nyitva",
   "saveAsDefaults": "Mentés alapértelmezettként",
   "criteriaSavedToProfile": "Alapértelmezettként mentve",
-  "profileNotFound": "Nincs aktív profil",
   "updatingFavorites": "Kedvencek frissítése...",
   "fetchingLatestPrices": "Legújabb árak lekérése",
   "noDataAvailable": "Nincs adat",
-  "configAndPrivacy": "Konfiguráció és adatvédelem",
   "searchToSeeMap": "Keressen az állomások térképen való megjelenítéséhez",
   "evPowerAny": "Bármely",
   "evPowerKw": "{kw} kW+",
@@ -819,9 +723,6 @@
   "iosAutoRecordOnboardingBullet3Title": "Amikor az iOS \"Mindig\" helyadatot kér, kérjük, mondjon igent.",
   "iosAutoRecordOnboardingBullet3Body": "A tartalék, amely az OBD2-adapter késése esetén rögzíti az utat, háttéres helyadatot igényel. Soha nem osztjuk meg.",
   "scanReceipt": "Nyugta beolvasása",
-  "obdConnect": "OBD-II",
-  "stationTypeFuel": "Üzemanyag",
-  "stationTypeEv": "EV",
   "brandFilterHighway": "Autópálya",
   "ratingModeLocal": "Helyi",
   "ratingModePrivate": "Privát",
@@ -841,7 +742,6 @@
   "errorHintRouting": "Az útvonalszámítás sikertelen. Ellenőrizze az internetkapcsolatát, és próbálja újra.",
   "errorHintFallback": "Próbálja újra, vagy keressen irányítószám / városnév alapján.",
   "alertsLoadErrorTitle": "Nem sikerült betölteni a riasztásokat",
-  "alertsBackgroundCheckErrorTitle": "A riasztások háttér-ellenőrzése sikertelen",
   "detailsLabel": "Részletek",
   "remove": "Eltávolítás",
   "showKey": "Kulcs megjelenítése",
@@ -950,19 +850,11 @@
   "linkDeviceHowItWorksBody": "1. Az A eszközön: másolja a fenti eszközkódot\n2. A B eszközön: illessze be az \"Eszközkód\" mezőbe\n3. Érintse az \"Adatok importálása\" gombot a kedvencek, riasztások, járművek és fogyasztásnaplók egyesítéséhez\n4. Mindkét eszköznek meglesz az összes kombinált adat\n\nMinden eszköz megőrzi saját névtelen identitását és saját profilját (előnyben részesített üzemanyag, alapértelmezett jármű, indítóképernyő). Az adatok egyesülnek, nem mozdulnak.",
   "vehicleSetActive": "Aktívra állítás",
   "swipeHide": "Elrejtés",
-  "evChargingSection": "EV-töltés",
-  "fuelStationsSection": "Üzemanyag-állomások",
   "yourRating": "Az Ön értékelése",
   "noStorageUsed": "Nem használ tárhelyet",
   "aboutReportBug": "Hiba jelentése / Funkció javaslása",
   "aboutSupportProject": "Projekt támogatása",
   "aboutSupportDescription": "Ez az alkalmazás ingyenes, nyílt forráskódú és reklámok nélküli. Ha hasznosnak találja, fontolja meg a fejlesztő támogatását.",
-  "luxembourgRegulatedPricesNotice": "A luxemburgi üzemanyagárakat az állam szabályozza, és egységesek az országban.",
-  "luxembourgFuelUnleaded95": "Ólmozatlan 95",
-  "luxembourgFuelUnleaded98": "Ólmozatlan 98",
-  "luxembourgFuelDiesel": "Dízel",
-  "luxembourgFuelLpg": "LPG",
-  "luxembourgPricesUnavailable": "A luxemburgi szabályozott árak nem elérhetők.",
   "reportIssueTitle": "Probléma jelentése",
   "enterCorrection": "Kérjük, adja meg a javítást",
   "reportNoBackendAvailable": "A jelentés nem küldhető el: ehhez az országhoz nincs bejelentési szolgáltatás beállítva. Engedélyezze a TankSync-et a Beállításokban közösségi jelentések küldéséhez.",
@@ -989,10 +881,6 @@
   "serviceReminderMarkDone": "Megjelölés elvégzettként",
   "serviceReminderDueTitle": "Szerviz esedékes",
   "serviceReminderDueBody": "{label} esedékes — {kmOver} km-rel meghaladta az intervallumot.",
-  "southKoreaApiKeyRequired": "Regisztráljon az OPINET-en ingyenes API-kulcsért",
-  "southKoreaApiProvider": "OPINET (KNOC)",
-  "chileApiKeyRequired": "Regisztráljon a CNE-n ingyenes API-kulcsért",
-  "chileApiProvider": "CNE Bencina en Linea",
   "vinConfirmTitle": "Ez az Ön autója?",
   "vinConfirmBody": "{year} {make} {model} — {displacement}L, {cylinders} hengeres, {fuel}",
   "vinPartialInfoNote": "Részleges info (offline). Szerkesztheti az alábbiakban.",
@@ -1011,17 +899,13 @@
   "alertsRadiusCreateTitle": "Sugárkörös riasztás létrehozása",
   "alertsRadiusLabelHint": "Felirat (pl. Otthoni dízel)",
   "alertsRadiusFuelType": "Üzemanyag típusa",
-  "alertsRadiusThreshold": "Küszöbérték (€/L)",
   "alertsRadiusKm": "Sugár (km)",
   "alertsRadiusCenterGps": "Saját helyszín használata",
   "alertsRadiusCenterPostalCode": "Irányítószám",
   "alertsRadiusSave": "Mentés",
   "alertsRadiusCancel": "Mégse",
-  "alertsRadiusDeleteConfirm": "Törli a sugárkörös riasztást?",
   "obd2ConnectedTooltip": "OBD2 csatlakoztatva: {adapterName}",
   "obd2PairChipTooltip": "OBD2-adapter párosítása",
-  "velocityAlertTitle": "{fuelLabel} csökkent a közeli állomásokon",
-  "velocityAlertBody": "{stationCount} állomáson legfeljebb {maxDropCents}¢-vel csökkent az ár az elmúlt egy órában",
   "fillUpSavedSnackbar": "Tankolás mentve",
   "radiusAlertsEntryTitle": "Sugárkörös riasztások és statisztikák",
   "radiusAlertsEntrySubtitle": "Értesítés, ha az árak esnek a közelben",
@@ -1060,8 +944,6 @@
   "autoRecordStatusPairAdapterCta": "Adapter párosítása",
   "autoRecordSpeedThresholdLabel": "Indítási sebesség (km/h)",
   "autoRecordSaveDelayLabel": "Mentési késleltetés leválasztás után (másodperc)",
-  "autoRecordPairedAdapterLabel": "Párosított adapter",
-  "autoRecordPairedAdapterNone": "Nincs adapter párosítva. Párosítson egyet az OBD2-bevezetőn keresztül.",
   "autoRecordBackgroundLocationLabel": "Háttéres helyadat engedélyezve",
   "autoRecordBackgroundLocationRequest": "Engedély kérése",
   "autoRecordBackgroundLocationRationaleTitle": "Miért a \"Mindig engedélyezés\"?",
@@ -1069,18 +951,12 @@
   "autoRecordBackgroundLocationOpenSettings": "Beállítások megnyitása",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Helyadat-engedély szükséges",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Nem sikerült háttéres helyadatot kérni",
-  "autoRecordBadgeClearTooltip": "Számláló törlése",
   "autoRecordPairAdapterLinkText": "Párosítson adaptert az alábbi szakaszban az automatikus rögzítés engedélyezéséhez",
-  "exportBackupTooltip": "Biztonsági mentés exportálása",
   "exportBackupReady": "Biztonsági mentés kész — válasszon célmappát",
   "exportBackupFailed": "A biztonsági mentés exportálása sikertelen — kérjük, próbálja újra",
-  "brokenMapChipVerifying": "MAP-érzékelő ellenőrzése…",
   "brokenMapChipDisclaimer": "MAP-leolvasások gyanúsak",
   "brokenMapSnackbarUnreliable": "A MAP-érzékelő helytelenül olvas — az üzemanyag-leolvasások akár 50–80%-kal alacsonyabbak lehetnek. Próbáljon másik adaptert.",
   "brokenMapBannerHardDisable": "A MAP-érzékelő megbízhatatlan. Élő üzemanyag-arány helyett tankolási átlagokat mutat.",
-  "brokenMapOverlayVerified": "MAP-érzékelő: ellenőrzött ({confidence})",
-  "brokenMapOverlayUnverified": "MAP-érzékelő: ellenőrzés alatt ({confidence})",
-  "brokenMapOverlaySuspicious": "MAP-érzékelő: gyanús ({confidence})",
   "brokenMapOverlayPosterior": "MAP-érzékelő: {posterior}% ± {margin}%",
   "brokenMapOverlayPosteriorVerified": "MAP-érzékelő: {posterior}% ± {margin}% (ellenőrzött)",
   "brokenMapDiagnosticsCardTitle": "MAP-érzékelő diagnosztika",
@@ -1142,7 +1018,6 @@
   "chargingCostTrendTitle": "Töltési költség trendje",
   "chargingEfficiencyTitle": "Hatékonyság (kWh/100 km)",
   "chargingChartsEmpty": "Még nincs elég adat",
-  "chargingChartsMonthAxis": "Hónap",
   "consoFeatureGroupTitle": "Fogyasztás",
   "consoFeatureGroupDescription": "Fogyasztás követése — kézi tankolások vagy automatikus OBD2-útfelvétel.",
   "consoModeOff": "Ki",
@@ -1158,10 +1033,6 @@
   "fillUpCorrectionEditExplainer": "Ez a bejegyzés automatikusan jött létre, hogy áthidalja a rögzített utak és a betankolás közti különbséget. Módosítsa az értékeket, ha ismeri a tényleges adatokat.",
   "fillUpCorrectionDelete": "Korrekció törlése",
   "fillUpCorrectionStation": "Állomás neve (opcionális)",
-  "greeceApiProvider": "Paratiritirio Timon (Görögország)",
-  "greeceCommunityApiNotice": "A közösség által fenntartott fuelpricesgr API segítségével",
-  "romaniaApiProvider": "Monitorul Prețurilor (Románia)",
-  "romaniaScrapingNotice": "A monitorulpreturilor.info segítségével (Versenytanács + ANPC)",
   "crossBorderCheaper": "{country} állomások {km} km-re — €{price}/L olcsóbb",
   "crossBorderTapToSwitch": "Érintsen az ország váltásához",
   "crossBorderDismissTooltip": "Elvetés",
@@ -1186,9 +1057,6 @@
   "drivingScorePenaltyHardBrake": "Erős fékezés",
   "drivingScorePenaltyHighRpm": "Magas fordulatszám",
   "drivingScorePenaltyFullThrottle": "Teljes gáz",
-  "ecoRouteOption": "Öko",
-  "ecoRouteSavings": "≈ {liters} L megtakarítás",
-  "ecoRouteHint": "Okosabb menet — az egyenletes autópályát részesíti előnyben a tekervényes rövidítésekkel szemben.",
   "favoritesShareAction": "Megosztás",
   "favoritesShareSubject": "Sparkilo — kedvencek {date}-n",
   "favoritesShareError": "Nem sikerült megosztási képet generálni",
@@ -1206,8 +1074,6 @@
   "featureDescription_consumptionAnalytics": "Tankolás és útanalitika fül.",
   "featureLabel_baselineSync": "Alapvonal-szinkronizálás",
   "featureDescription_baselineSync": "Vezetési alapvonalak szinkronizálása TankSync-en keresztül.",
-  "featureLabel_unifiedSearchResults": "Egyesített keresési eredmények",
-  "featureDescription_unifiedSearchResults": "Egyetlen eredménylista, amely kombinálja az üzemanyag- és EV-állomásokat.",
   "featureLabel_priceAlerts": "Áriasztások",
   "featureDescription_priceAlerts": "Küszöbértéken alapuló áresés-értesítések.",
   "featureLabel_priceHistory": "Ártörténet",
@@ -1235,8 +1101,6 @@
   "featureBlockedEnable_glideCoach": "Először engedélyezze az OBD2-útfelvételt",
   "featureBlockedEnable_gpsTripPath": "Először engedélyezze az OBD2-útfelvételt",
   "featureBlockedEnable_autoRecord": "Először engedélyezze az OBD2-útfelvételt",
-  "featureBlockedEnable_showFuel": "Az előfeltételek nem teljesülnek",
-  "featureBlockedEnable_showElectric": "Az előfeltételek nem teljesülnek",
   "featureBlockedEnable_showConsumptionTab": "Először engedélyezze az OBD2-útfelvételt",
   "featureLabel_tflitePricePrediction": "TFLite ár-előrejelzés",
   "featureDescription_tflitePricePrediction": "Eszközön futó ár-előrejelzési modell — a következtetés helyileg fut; a funkciók és az előrejelzések soha nem hagyják el az eszközt.",
@@ -1281,15 +1145,12 @@
   "scanReceiptNoData": "Nem található nyugtaadat — próbálja újra",
   "scanReceiptSuccess": "Nyugta beolvasva — ellenőrizze az értékeket. Ha valami nem stimmel, érintse alul a \"Beolvasási hiba jelentése\" gombot.",
   "scanReceiptFailed": "Beolvasás sikertelen: {error}",
-  "scanPumpUnreadable": "A kút kijelzője nem olvasható — próbálja újra",
-  "pumpCameraHint": "Igazítsa a kút kijelzőjének három számát a kereten belülre",
   "pumpCameraCapture": "Rögzítés",
   "pumpCameraPermissionDenied": "A kút kijelzőjének beolvasásához kamera-hozzáférés szükséges. Engedélyezze az eszköz beállításaiban.",
   "pumpCameraError": "A kamerát nem sikerült elindítani. Próbálja újra, vagy adja meg az értékeket kézzel.",
   "scanPumpSuccess": "A kút kijelzője beolvasva — ellenőrizze az értékeket.",
   "scanPumpGlare": "Túl sok a tükröződés a kijelzőn — próbáld újra enyhe szögből, hogy a számok ne legyenek túlexponáltak.",
   "scanPumpFailed": "Kút beolvasása sikertelen: {error}",
-  "badScanReportTitle": "Beolvasási hiba jelentése",
   "badScanReportTitleReceipt": "Beolvasási hiba jelentése — Nyugta",
   "badScanReportTitlePumpDisplay": "Beolvasási hiba jelentése — Kút kijelzője",
   "pumpScanFailureTitle": "Kijelző nem olvasható",
@@ -1298,7 +1159,6 @@
   "pumpScanFailureReport": "Jelentés",
   "pumpScanFailureRemove": "Fotó eltávolítása",
   "badScanReportHint": "Megosztjuk a nyugtafotót és mindkét értékkészletet, hogy a következő build megtanulja ezt az elrendezést.",
-  "badScanReportShareAction": "Jelentés + fotó megosztása",
   "badScanReportFieldBrandLayout": "Márka-elrendezés",
   "badScanReportFieldTotal": "Összeg",
   "badScanReportFieldPricePerLiter": "Ár/L",
@@ -1315,16 +1175,9 @@
   "fillUpSectionWhatSubtitle": "Üzemanyag, mennyiség, ár",
   "fillUpSectionWhereTitle": "Hol volt",
   "fillUpSectionWhereSubtitle": "Állomás, kilométer-számláló, megjegyzések",
-  "fillUpImportFromLabel": "Importálás innen…",
-  "fillUpImportSheetTitle": "Tankolási adatok importálása",
   "fillUpImportReceiptLabel": "Nyugta",
-  "fillUpImportReceiptDescription": "Papír nyugta beolvasása kamerával",
   "fillUpImportPumpLabel": "Kút kijelzője",
-  "fillUpImportPumpDescription": "Összeg / Ár leolvasása a kút LCD-jéről",
-  "fillUpImportObdLabel": "OBD-II adapter",
-  "fillUpImportObdDescription": "Kilométer-számláló leolvasása az OBD-II portról Bluetooth-on",
   "fillUpPricePerLiterLabel": "Liter ára",
-  "vehicleHeaderPlateLabel": "Rendszám",
   "vehicleHeaderUntitled": "Új jármű",
   "vehicleSectionIdentityTitle": "Azonosítás",
   "vehicleSectionIdentitySubtitle": "Név és VIN",
@@ -1340,7 +1193,6 @@
   "gpsDiagnosticsHeader": "{count} minta · {span} · {gaps, plural, =0{nincs hiány} =1{1 hiány} other{{gaps} hiány}}",
   "gpsDiagnosticsCadence": "Mediánintervallum: {ms} ms",
   "gpsDiagnosticsExplain": "Rögzítés közben rögzítve a GPS-ütem ellenőrzéséhez alvó telefon esetén.",
-  "hapticEcoCoachSectionTitle": "Vezetés",
   "hapticEcoCoachSettingTitle": "Valós idejű öko-coaching",
   "hapticEcoCoachSettingSubtitle": "Enyhe haptikus visszajelzés + képernyős tipp, ha menetsebesség közben teljesen letapos",
   "hapticEcoCoachSnackBarMessage": "Kíméletes gáz — a gurulás több üzemanyagot takarít meg",
@@ -1370,9 +1222,6 @@
   "calculatorDistanceHint": "pl. 150",
   "calculatorConsumptionHint": "pl. 7,0",
   "calculatorPriceHint": "pl. 1,899",
-  "routeStrategyLabel": "Stratégia:",
-  "routeStrategyUniform": "Egyenletes",
-  "routeStrategyBalanced": "Kiegyensúlyozott",
   "glideCoachBetaTitle": "Glide-coach béta (kísérleti)",
   "glideCoachBetaSubtitle": "Enyhe haptikus visszajelzés lassításkor piros lámpa előtt. Alapból ki van kapcsolva — zavaró lehet.",
   "consentSyncTripsTitle": "Útfelvételek szinkronizálása",
@@ -1428,7 +1277,6 @@
   "onboardingObd2ConnectButton": "Adapter csatlakoztatása",
   "onboardingObd2SkipButton": "Talán később",
   "onboardingObd2ReadingVin": "VIN olvasása…",
-  "onboardingObd2VinReadFailed": "VIN nem olvasható — adja meg kézzel",
   "onboardingObd2ConnectFailed": "Nem sikerült csatlakozni az adapterhez. Újra próbálhatja, vagy kihagyhatja.",
   "onboardingPickUseMode": "Válasszon használati módot a folytatáshoz.",
   "alertsRadiusFrequencyLabel": "Ellenőrzési gyakoriság",
@@ -1442,9 +1290,6 @@
   "radiusAlertMapPickerCancel": "Mégse",
   "radiusAlertMapPickerHint": "Húzza a térképet a riasztás középpontjának beállításához",
   "radiusAlertCenterFromMap": "Térképi helyszín",
-  "radiusAlertNotificationTitle": "{fuelLabel} a(z) {label} közelében",
-  "radiusAlertNotificationBody": "Egy állomáson {price} € az ár (cél: {threshold} €)",
-  "refuelUnitPerLiter": "/L",
   "refuelUnitPerKwh": "/kWh",
   "refuelUnitPerSession": "/munkamenet",
   "speedConsumptionCardTitle": "Fogyasztás sebességenként",
@@ -1463,9 +1308,6 @@
   "tankLevelLitersFormat": "{litres} L",
   "tankLevelRangeFormat": "≈ {kilometres} km hatótávolság",
   "tankLevelLastFillUpFormat": "Utolsó tankolás: {date} · {count} út azóta",
-  "tankLevelMethodObd2": "OBD2 mért",
-  "tankLevelMethodDistanceFallback": "távolságalapú becslés",
-  "tankLevelMethodMixed": "vegyes mérés",
   "tankLevelEmptyNoFillUp": "Rögzítsen tankolást a tartályszint megtekintéséhez",
   "tankLevelDetailSheetTitle": "Utak az utolsó tankolás óta",
   "addFillUpIsFullTankLabel": "Teli tartály",
@@ -1536,7 +1378,6 @@
   "trajetDetailDeleteAction": "Törlés",
   "trajetDetailDeleteConfirmTitle": "Törli ezt az utat?",
   "trajetDetailDeleteConfirmBody": "Ez az út véglegesen eltávolításra kerül az előzményekből.",
-  "trajetDetailDeleteConfirmCancel": "Mégse",
   "trajetDetailDeleteConfirmConfirm": "Törlés",
   "tripRecordingObd2NotResponding": "Az OBD2-adapter csatlakoztatva van, de nem küld adatot. Próbáljon másik adaptert, vagy ellenőrizze a jármű diagnosztikai protokollját.",
   "trajetsViewAllOnMap": "Mind a térképen",
@@ -1552,7 +1393,6 @@
   "tripLengthBucketTripCount": "{count, plural, =0{nincs út} one{1 út} other{{count} út}}",
   "tripPathCardTitle": "Útvonal",
   "tripPathCardSubtitle": "GPS-sel rögzített útvonal",
-  "tripPathLegendTitle": "Fogyasztás",
   "tripPathLegendEfficient": "Hatékony (< 6 L/100km)",
   "tripPathLegendBorderline": "Határérték (6–10 L/100km)",
   "tripPathLegendWasteful": "Pazarló (≥ 10 L/100km)",
@@ -1563,13 +1403,8 @@
   "tripRecordingPinHelpTitle": "A rögzítésről",
   "tripRecordingPinHelpBody": "A rögzítés bekapcsolva tartja a képernyőt, és elrejti a rendszersávokat, hogy az űrlap olvasható maradjon a műszerfalon. Érintsen újra a feloldáshoz. Az út végén automatikusan feloldódik.",
   "tripRecordingResumeHintMessage": "A rögzítés a háttérben folytatódik. Érintse a bármelyik képernyő tetején lévő piros sávot a visszatéréshez.",
-  "tripBannerOpenFromConsumptionTab": "Nyissa meg az aktív utat a Fogyasztás fülről",
   "tripRecordingUnpinnedWarning": "Rögzítse a képernyőt a GPS aktív tartásához — az Android korlátozhatja a GPS-t alvás közben.",
   "tripRecordingMinimiseTooltip": "Kicsinyítés lebegő csempére",
-  "unifiedFilterFuel": "Üzemanyag",
-  "unifiedFilterEv": "EV",
-  "unifiedFilterBoth": "Mindkettő",
-  "unifiedNoResultsForFilter": "Nincs eredmény ehhez a szűrőhöz",
   "searchFailedSnackbar": "A keresés sikertelen — kérjük, próbálja újra",
   "vinLabel": "VIN (opcionális)",
   "vinDecodeTooltip": "VIN dekódolása",
@@ -1601,7 +1436,6 @@
   "gdprVinOnlineDecodeTitle": "VIN online dekódolás",
   "gdprVinOnlineDecodeShort": "VIN dekódolása az NHTSA ingyenes nyilvános szolgáltatásán keresztül",
   "gdprVinOnlineDecodeDescription": "Adapter párosításakor a jármű VIN-je helyileg kerül beolvasásra az autó azonosítása érdekében. Engedélyezés esetén a 17 karakteres VIN-t elküldi az NHTSA ingyenes vPIC szolgáltatásának további adatok kereséséhez (modell, motor lökettérfogata, üzemanyagtípus). Csak a VIN kerül elküldésre — más adat nem hagyja el az eszközt.",
-  "vehicleDetectedFromVinBadge": "(észlelt)",
   "vehicleDetectedFromVinSnackbar": "VIN alapján észlelve: {summary}. Alkalmazza?",
   "vehicleDetectedFromVinApply": "Alkalmazás",
   "widgetHelpSectionTitle": "Kezdőképernyő-widget",
@@ -1620,7 +1454,6 @@
   "widgetColorSchemeOrange": "Narancs",
   "widgetVariantDefault": "Csak jelenlegi ár",
   "widgetVariantPredictive": "Prediktív: legjobb tankolási időpont",
-  "widgetPredictiveNowPrefix": "most",
   "@distance": {
     "placeholders": {
       "distance": {
@@ -1645,13 +1478,6 @@
   "@hours": {
     "placeholders": {
       "n": {
-        "type": "int"
-      }
-    }
-  },
-  "@stationsOnMap": {
-    "placeholders": {
-      "count": {
         "type": "int"
       }
     }
@@ -1700,13 +1526,6 @@
   "@evConnectors": {
     "placeholders": {
       "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@stopN": {
-    "placeholders": {
-      "n": {
         "type": "int"
       }
     }
@@ -1850,25 +1669,11 @@
       }
     }
   },
-  "approachStationDistance": "{meters} m-re",
-  "@approachStationDistance": {
-    "description": "PiP overlay caption (#2084) showing how far the driver is from the in-radius target station, in metres.",
-    "placeholders": {
-      "meters": {
-        "type": "String",
-        "example": "350"
-      }
-    }
-  },
   "tripRecordingPipElapsedCaption": "eltelt",
   "@tripRecordingPipElapsedCaption": {
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
-  "fabOpenCriteria": "Keresés megnyitása",
-  "fabOpenResults": "Eredmények megnyitása",
   "fabRunSearch": "Keresés futtatása",
-  "fabRefineCriteria": "Keresés finomítása",
-  "routeSearchPartialBanner": "További állomások keresése…",
   "privacySaveErrorLog": "Hibanapló mentése ({count})",
   "@privacySaveErrorLog": {
     "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
@@ -2418,10 +2223,6 @@
   "@trajetDetailChartCoolant": {
     "description": "MT — needs native review"
   },
-  "trajetDetailChartAltitude": "Magasság (m)",
-  "@trajetDetailChartAltitude": {
-    "description": "MT — needs native review"
-  },
   "trajetDetailChartLambda": "Parancsolt λ",
   "@trajetDetailChartLambda": {
     "description": "MT — needs native review"
@@ -2654,14 +2455,6 @@
   "@obd2HealthHistorySection": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyJson": "Másolás JSON-ként",
-  "@obd2HealthCopyJson": {
-    "description": "MT — needs native review"
-  },
-  "obd2HealthCopied": "OBD2-diagnosztika másolva a vágólapra.",
-  "@obd2HealthCopied": {
-    "description": "MT — needs native review"
-  },
   "evStatusPartial": "Részlegesen elérhető",
   "@evStatusPartial": {
     "description": "MT — needs native review"
@@ -2767,10 +2560,6 @@
   },
   "ocrTesterRunning": "OCR futtatása…",
   "@ocrTesterRunning": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterNoResult": "Az OCR nem hozott olvasható eredményt.",
-  "@ocrTesterNoResult": {
     "description": "MT — needs native review"
   },
   "ocrTesterOverlaySection": "Blokk-réteg",
@@ -2937,10 +2726,6 @@
   "@obd2DiagnosticsInitCold": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyInitTranscript": "Csak inicializálási napló másolása",
-  "@obd2HealthCopyInitTranscript": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterSaveFixture": "Mentés fixture-ként",
   "@ocrTesterSaveFixture": {
     "description": "MT — needs native review"
@@ -3092,10 +2877,6 @@
   "@obd2GpsDegradedBannerTitle": {
     "description": "MT — needs native review"
   },
-  "restoreBackupTooltip": "Biztonsági mentés visszaállítása",
-  "@restoreBackupTooltip": {
-    "description": "MT — needs native review"
-  },
   "restoreBackupDialogTitle": "Biztonsági mentés visszaállítása",
   "@restoreBackupDialogTitle": {
     "description": "MT — needs native review"
@@ -3111,15 +2892,6 @@
   "restoreBackupReplaceAction": "Összes cseréje",
   "@restoreBackupReplaceAction": {
     "description": "MT — needs native review"
-  },
-  "restoreBackupSuccess": "Biztonsági mentés visszaállítva — {count} rekord importálva",
-  "@restoreBackupSuccess": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
   },
   "restoreBackupEmpty": "Biztonsági mentés visszaállítva — nem tartalmazott rekordokat",
   "@restoreBackupEmpty": {
@@ -3391,16 +3163,6 @@
   "voiceCoachingSettingSubtitle": "Halljon hangos tippeket vezetés közben — erős gyorsítás, hirtelen fékezés és sebességváltó-javaslatok",
   "@voiceCoachingSettingSubtitle": {
     "description": "MT — needs native review"
-  },
-  "fuelStationRadarDistanceKm": "{km} km-re",
-  "@fuelStationRadarDistanceKm": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "km": {
-        "type": "String",
-        "example": "2.4"
-      }
-    }
   },
   "fuelStationRadarProximity": "Közelség: {percent}%",
   "@fuelStationRadarProximity": {
@@ -3733,10 +3495,6 @@
   },
   "consumptionStatsChartConsumption": "L/100km havonta",
   "@consumptionStatsChartConsumption": {
-    "description": "MT — needs native review"
-  },
-  "shareReceiptImporting": "Megosztott bizonylat importálása…",
-  "@shareReceiptImporting": {
     "description": "MT — needs native review"
   },
   "shareReceiptUnsupportedFormat": "Ez a fájltípus még nem importálható — osszon meg helyette egy fényképet a bizonylatról.",
@@ -4228,17 +3986,6 @@
       "count": {
         "type": "int",
         "example": "3"
-      }
-    }
-  },
-  "fuelEfficiencyMixedFootnote": "{count, plural, =1{1 mixed tank counted toward its main fuel} other{{count} mixed tanks counted toward their main fuel}}",
-  "@fuelEfficiencyMixedFootnote": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int",
-        "example": "1"
       }
     }
   },
@@ -4752,11 +4499,6 @@
         "example": "Oil change"
       }
     }
-  },
-  "radarAcquiringLocation": "Finding your location…",
-  "@radarAcquiringLocation": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
   },
   "radarUpdatingLocation": "Updating your location…",
   "@radarUpdatingLocation": {

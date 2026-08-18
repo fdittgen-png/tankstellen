@@ -39,6 +39,7 @@ import '../widgets/fill_up_variance_prompt.dart';
 import '../widgets/fill_up_warning_dialog.dart';
 import 'pump_display_camera_screen.dart';
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Form to add a new [FillUp] entry.
 class AddFillUpScreen extends ConsumerStatefulWidget {
@@ -427,8 +428,8 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       if (FillUpVariance.isVarianceAbove5Percent(userLiters, adapterDelta)) {
         final choice = await showFillUpVarianceDialog(
           context: context,
-          userL: userLiters.toStringAsFixed(2),
-          adapterL: adapterDelta.toStringAsFixed(2),
+          userL: UnitFormatter.formatDecimal(userLiters, fractionDigits: 2),
+          adapterL: UnitFormatter.formatDecimal(adapterDelta, fractionDigits: 2),
         );
         if (!mounted) return;
         if (choice == FillUpVarianceChoice.useAdapter) {
@@ -506,8 +507,10 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       warnings: warnings,
       chosenFuel: _fuelType,
       vehicleFuel: AddFillUpFuelResolver.fuelForVehicle(vehicle),
-      enteredOdoKm: enteredOdo.toStringAsFixed(0),
-      previousOdoKm: previousOdo?.toStringAsFixed(0),
+      enteredOdoKm: UnitFormatter.formatDecimal(enteredOdo, fractionDigits: 0),
+      previousOdoKm: previousOdo == null
+          ? null
+          : UnitFormatter.formatDecimal(previousOdo, fractionDigits: 0),
     );
   }
 

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../../../l10n/app_localizations.dart';
-import '../data/obd2_connection_errors.dart';
+import '../domain/obd2_connection_errors.dart';
 
 /// Maps a typed [Obd2ConnectionError] to a localized, user-facing
 /// message (#1663).

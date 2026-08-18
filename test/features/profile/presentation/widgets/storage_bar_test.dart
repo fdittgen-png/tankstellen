@@ -164,7 +164,7 @@ void main() {
       expect(find.text('Cache'), findsOneWidget);
       expect(find.text('12 entries'), findsOneWidget);
       // 2048 bytes = 2.0 KB
-      expect(find.text('2.0 KB'), findsOneWidget);
+      expect(find.text('2,0 KB'), findsOneWidget);
     });
   });
 }

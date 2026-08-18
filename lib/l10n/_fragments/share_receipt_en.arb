@@ -1,8 +1,4 @@
 {
-  "shareReceiptImporting": "Importing shared receipt…",
-  "@shareReceiptImporting": {
-    "description": "Shown briefly while an inbound shared receipt image is being OCR'd on the Add fill-up screen (#2735)."
-  },
   "shareReceiptUnsupportedFormat": "That file type can't be imported yet — share a photo of the receipt instead.",
   "@shareReceiptUnsupportedFormat": {
     "description": "Snackbar shown when the user shares an unsupported file (e.g. a PDF) into the app. Image receipts work today; PDF rasterisation arrives in #2737 (#2735)."

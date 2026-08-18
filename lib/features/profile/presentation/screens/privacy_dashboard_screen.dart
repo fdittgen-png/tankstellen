@@ -3,20 +3,18 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/error/guarded.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/services/sensitive_clipboard.dart';
 import '../../../../core/sharing/public_file_exporter.dart';
+import '../../../../core/sharing/share_seam.dart';
 import '../../../../core/telemetry/storage/trace_storage.dart';
 import '../../../../core/export/data_exporter.dart';
 import '../../../../core/storage/storage_providers.dart';
@@ -26,35 +24,25 @@ import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/privacy_data_provider.dart';
 import '../widgets/config_verification_widget.dart';
+import '../widgets/error_log_export_row.dart'
+    show exportErrorLogSizeGated, errorLogExportSnackbar;
 import '../widgets/privacy_dashboard/local_data_card.dart';
 import '../widgets/privacy_dashboard/privacy_action_buttons.dart';
 import '../widgets/privacy_dashboard/privacy_banner.dart';
 import '../widgets/privacy_dashboard/synced_data_card.dart';
-
-/// Threshold above which the error-log export switches from clipboard
-/// to the OS share sheet. Some Samsung clipboard managers silently drop
-/// large payloads — see #1301.
-const int _errorLogClipboardThresholdBytes = 64 * 1024;
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Test-only override for the share-sheet handoff used by
-/// [_PrivacyDashboardScreenState._exportErrorLog]. Production sends
-/// [ShareParams] straight to [SharePlus.instance.share]; widget tests
-/// substitute a fake to assert the outgoing payload without launching
-/// the real OS share sheet. (#1301)
-typedef PrivacyShareSink = Future<void> Function(ShareParams params);
-
-/// See [PrivacyShareSink].
+/// [_PrivacyDashboardScreenState._exportErrorLog] — the shared
+/// [ShareSink] seam (#1301).
 @visibleForTesting
-PrivacyShareSink? debugPrivacyShareSinkOverride;
+ShareSink? debugPrivacyShareSinkOverride;
 
 /// Test-only override for the temporary-directory lookup used by the
-/// large-log share path. Returns a [Directory] the dashboard is allowed
-/// to write into. (#1301)
-typedef PrivacyTempDirectoryProvider = Future<Directory> Function();
-
-/// See [PrivacyTempDirectoryProvider].
+/// large-log share path — the shared [ShareTempDirectoryProvider] seam
+/// (#1301).
 @visibleForTesting
-PrivacyTempDirectoryProvider? debugPrivacyTempDirectoryOverride;
+ShareTempDirectoryProvider? debugPrivacyTempDirectoryOverride;
 
 /// GDPR-compliant privacy dashboard showing all locally stored data
 /// with options to export as JSON or delete everything.
@@ -156,73 +144,33 @@ class _PrivacyDashboardScreenState
     final traces = ref.read(traceStorageProvider);
     final json = traces.exportAsJson();
     final byteSize = utf8.encode(json).length;
-    final kb = (byteSize / 1024).toStringAsFixed(1);
+    final kb = UnitFormatter.formatDecimal(byteSize / 1024);
     final parsed = traces.parsedCount;
     final unparsed = traces.unparsedCount;
     final totalEntries = parsed + unparsed;
 
-    // Large payloads exceed Samsung One UI's clipboard preview budget
-    // (#1301); hand off to the OS share sheet instead so the user can
-    // route the JSON to email / files / a chat reliably.
-    if (byteSize > _errorLogClipboardThresholdBytes) {
-      try {
-        await _shareErrorLogAsFile(json);
-      } on Object catch (e, st) {
-        // Share-sheet wiring failed; fall back to clipboard so the bug
-        // report isn't blocked on a platform-channel hiccup. #2146 —
-        // also surface on the exportable log.
-        logFailure(
-          e,
-          st,
-          where: 'PrivacyDashboard._exportErrorLog: share fallback',
-        );
-        await SensitiveClipboard.copy(json); // #3611 — auto-clears in 60 s
-        if (!mounted) return;
-        SnackBarHelper.showSuccess(
-          context,
-          _formatCopySnackbar(parsed: parsed, unparsed: unparsed, kb: kb),
-        );
-        return;
-      }
-      if (!mounted) return;
-      // #1993 — drop a copy into Downloads so the user can grab the file
-      // from the file manager. This is the SINGLE Downloads write for the
-      // large-log path: [_shareErrorLogAsFile] no longer saves to
-      // Downloads itself (it only feeds the widget-test share seam), so
-      // the file is written exactly once instead of twice (the double
-      // `tankstellen-error-log.json` + `… (1).json` field bug).
-      await _saveExportToDownloads(
-        text: json,
-        fileName: 'tankstellen-error-log.json',
-        copySnackbar: 'Error log shared ($kb KB, $totalEntries entries)',
-      );
-      return;
-    }
-
-    await SensitiveClipboard.copy(json); // #3611 — auto-clears in 60 s
-    // #1993 — also persist to Downloads (small-path); snackbar now reports
-    // the saved path. Falls back to the legacy copy snackbar on save failure.
-    await _saveExportToDownloads(
-      text: json,
-      fileName: 'tankstellen-error-log.json',
-      copySnackbar: _formatCopySnackbar(
+    // The ONE size-gated clipboard / share-seam / single-Downloads-write
+    // flow (#1301 / #1993 / #2236 / #3611), shared with the Developer
+    // tools row (#2248) via `exportErrorLogSizeGated`.
+    final outcome = await exportErrorLogSizeGated(
+      json: json,
+      logWhere: 'PrivacyDashboard._exportErrorLog',
+      shareSink: debugPrivacyShareSinkOverride,
+      tempDirectoryProvider: debugPrivacyTempDirectoryOverride,
+    );
+    if (!mounted) return;
+    final l = AppLocalizations.of(context);
+    SnackBarHelper.showSuccess(
+      context,
+      errorLogExportSnackbar(
+        outcome: outcome,
+        savedToDownloadsMessage: l.savedToDownloadsFolder,
         parsed: parsed,
         unparsed: unparsed,
+        totalEntries: totalEntries,
         kb: kb,
       ),
     );
-  }
-
-  String _formatCopySnackbar({
-    required int parsed,
-    required int unparsed,
-    required String kb,
-  }) {
-    if (unparsed > 0) {
-      return 'Error log copied ($parsed parsed + $unparsed raw entries, '
-          '$kb KB) — some entries failed to parse';
-    }
-    return 'Error log copied to clipboard — $kb KB, $parsed entries';
   }
 
   /// Clears every buffered error trace and refreshes the dashboard so
@@ -235,32 +183,6 @@ class _PrivacyDashboardScreenState
     ref.invalidate(traceStorageProvider);
     final l = AppLocalizations.of(context);
     SnackBarHelper.showSuccess(context, l.privacyErrorLogCleared);
-  }
-
-  /// Routes the large error-log payload to the widget-test share seam
-  /// only. The actual Downloads write happens exactly once in the caller
-  /// via [_saveExportToDownloads] — see the duplicate-write fix note in
-  /// [_exportErrorLog].
-  ///
-  /// 2026-05-24 follow-up — file exports go straight to the device's
-  /// public Downloads folder. The test seam below is preserved so widget
-  /// tests can still observe the outgoing [ShareParams] payload; in
-  /// production (no sink installed) this is a no-op and the single save
-  /// is owned by the caller.
-  Future<void> _shareErrorLogAsFile(String json) async {
-    final sink = debugPrivacyShareSinkOverride;
-    if (sink == null) return;
-    final tempDirProvider =
-        debugPrivacyTempDirectoryOverride ?? getTemporaryDirectory;
-    final tempDir = await tempDirProvider();
-    final filePath = '${tempDir.path}/tankstellen-error-log.json';
-    final file = File(filePath);
-    await file.writeAsString(json, flush: true);
-    final params = ShareParams(
-      files: [XFile(filePath, mimeType: 'application/json')],
-      subject: 'tankstellen-error-log.json',
-    );
-    await sink(params);
   }
 
   Future<void> _exportDataCsv() async {

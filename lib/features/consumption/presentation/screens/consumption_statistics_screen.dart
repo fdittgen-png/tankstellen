@@ -21,6 +21,7 @@ import '../widgets/fuel_type_efficiency_card.dart';
 import '../widgets/localized_fuel_name.dart';
 import '../widgets/monthly_fuel_charts.dart';
 import '../widgets/monthly_fuel_comparison_card.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Full consumption-statistics detail page (#2698), opened from the Fuel
 /// tab's summary card. Composes:
@@ -145,7 +146,7 @@ class _HeaderTiles extends StatelessWidget {
       _TileData(
         icon: Icons.local_gas_station,
         label: l.statTotalLiters,
-        value: stats.totalLiters.toStringAsFixed(1),
+        value: UnitFormatter.formatDecimal(stats.totalLiters),
       ),
       _TileData(
         icon: Icons.payments_outlined,
@@ -161,7 +162,8 @@ class _HeaderTiles extends StatelessWidget {
         icon: Icons.speed,
         label: l.statAvgConsumption,
         value: stats.avgConsumptionL100km != null
-            ? stats.avgConsumptionL100km!.toStringAsFixed(2)
+            ? UnitFormatter.formatDecimal(stats.avgConsumptionL100km!,
+                fractionDigits: 2)
             : '—',
       ),
       _TileData(

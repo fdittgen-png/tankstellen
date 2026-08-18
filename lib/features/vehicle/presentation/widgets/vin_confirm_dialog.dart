@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/vin_data.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Outcome of the [VinConfirmDialog] (#812 phase 2).
 enum VinConfirmOutcome {
@@ -52,7 +53,7 @@ class VinConfirmDialog extends StatelessWidget {
     final make = data.make ?? '—';
     final model = data.model ?? '—';
     final displacement = data.displacementL != null
-        ? data.displacementL!.toStringAsFixed(1)
+        ? UnitFormatter.formatDecimal(data.displacementL!)
         : '—';
     final cylinders = data.cylinderCount?.toString() ?? '—';
     final fuel = data.fuelTypePrimary ?? '—';

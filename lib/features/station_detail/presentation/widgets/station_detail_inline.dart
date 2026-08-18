@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../feature_management/api.dart';
 import '../../providers/station_detail_provider.dart';
 import 'price_history_section.dart';
 import 'station_info_section.dart';
@@ -65,11 +66,19 @@ class StationDetailInline extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     StationInfoSection(station: detail.station, detail: detail),
-                    const SizedBox(height: 16),
-                    PriceHistorySection(
-                      stationId: stationId,
-                      station: detail.station,
-                    ),
+                    // Feature.priceHistory finally gates its entry point
+                    // (2026-08-17 review, dead-code finding 6) — mirrors
+                    // the PriceHistoryFoldable gate on the standalone
+                    // screen. Default-on.
+                    if (ref
+                        .watch(enabledFeaturesProvider)
+                        .contains(Feature.priceHistory)) ...[
+                      const SizedBox(height: 16),
+                      PriceHistorySection(
+                        stationId: stationId,
+                        station: detail.station,
+                      ),
+                    ],
                   ],
                 ),
               );

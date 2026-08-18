@@ -156,7 +156,7 @@ class FillUpCard extends StatelessWidget {
               // enough preceding same-fuel history for an EcoScoreBadge
               // trend chip. Plain text, no arrow, no comparison.
               Text(
-                l.ecoScoreConsumption(rawLPer100Km!.toStringAsFixed(1)),
+                l.ecoScoreConsumption(UnitFormatter.formatDecimal(rawLPer100Km!)),
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w600,

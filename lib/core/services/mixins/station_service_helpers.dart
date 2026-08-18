@@ -3,6 +3,8 @@
 
 import 'package:dio/dio.dart';
 
+import '../../error/guarded.dart';
+import '../../logging/error_logger.dart';
 import '../../domain/search_params.dart';
 import '../../domain/fuel_type.dart';
 import '../../domain/station.dart';
@@ -38,27 +40,88 @@ mixin StationServiceHelpers {
   ///
   /// Use in catch blocks:
   /// `on DioException catch (e, st) { throwApiException(e, stackTrace: st); }`
+  ///
+  /// The optional parameters absorb the hand-rolled classification
+  /// variants that used to be copy-pasted across the country services:
+  ///
+  ///  - [logWhere] — spool an errorLogger breadcrumb (ErrorLayer.other,
+  ///    `{'where': logWhere}`) before throwing, exactly the
+  ///    `unawaited(errorLogger.log(...))` line every hand-rolled block
+  ///    opened with.
+  ///  - [authRejectedMessage] — when the response is 401/403, throw an
+  ///    [ApiException] with this provider-specific message instead of
+  ///    the generic classification (the CL/KR/GR "rejected API key"
+  ///    branches). Message + statusCode only, mirroring the originals.
+  ///  - [customMessage] — full provider-specific message override for
+  ///    every non-auth failure (the RO/GR "unreachable" shapes).
+  ///    Message + statusCode only, mirroring the originals.
   Never throwApiException(
     DioException e, {
     String defaultMessage = 'Network error',
     StackTrace? stackTrace,
+    String? logWhere,
+    String Function(int status)? authRejectedMessage,
+    String Function(DioException e)? customMessage,
   }) {
+    if (logWhere != null) {
+      logDioFailure(e, stackTrace ?? StackTrace.current, logWhere);
+    }
+    final status = e.response?.statusCode;
+    if (authRejectedMessage != null &&
+        status != null &&
+        (status == 401 || status == 403)) {
+      _throwKeepingStack(
+        ApiException(message: authRejectedMessage(status), statusCode: status),
+        stackTrace,
+      );
+    }
+    if (customMessage != null) {
+      _throwKeepingStack(
+        ApiException(message: customMessage(e), statusCode: status),
+        stackTrace,
+      );
+    }
     final path = e.requestOptions.uri.replace(queryParameters: {}).path;
     final detail = e.message ?? defaultMessage;
-    final apiException = ApiException(
-      message: '${e.type.name}: $detail (path: $path)',
-      statusCode: e.response?.statusCode,
-      kind: failureKindFromDio(e),
-      // #2255 — the RetryAfterInterceptor stashes the parsed Retry-After on
-      // `requestOptions.extra` before the error propagates; fall back to
-      // parsing the response header directly for the (rare) path where no
-      // interceptor ran.
-      retryAfter: retryAfterFromDio(e),
+    _throwKeepingStack(
+      ApiException(
+        message: '${e.type.name}: $detail (path: $path)',
+        statusCode: status,
+        kind: failureKindFromDio(e),
+        // #2255 — the RetryAfterInterceptor stashes the parsed Retry-After on
+        // `requestOptions.extra` before the error propagates; fall back to
+        // parsing the response header directly for the (rare) path where no
+        // interceptor ran.
+        retryAfter: retryAfterFromDio(e),
+      ),
+      stackTrace,
     );
+  }
+
+  /// Throw [apiException], pinned to the original Dio call site when
+  /// [stackTrace] was captured (#1103) so Sentry / `TraceRecorder`
+  /// triage sees where the request actually failed.
+  Never _throwKeepingStack(ApiException apiException, StackTrace? stackTrace) {
     if (stackTrace != null) {
       Error.throwWithStackTrace(apiException, stackTrace);
     }
     throw apiException;
+  }
+
+  /// Breadcrumb-weight per-source failure log — the ONE spelling of the
+  /// `errorLogger` line the aggregate/multi-feed services (DK brand
+  /// feeds, UK feeds, FR batch prices) repeated around their
+  /// non-throwing `on DioException` control flow (rethrow / swallow /
+  /// return-null stays at the call site). Thin shim over [logFailure]
+  /// pinned to [ErrorLayer.other], the layer every one of those blocks
+  /// used.
+  void logDioFailure(
+    DioException e,
+    StackTrace st,
+    String where, {
+    Map<String, String> extra = const {},
+  }) {
+    logFailure(e, st, where: where, layer: ErrorLayer.other, extra: extra);
   }
 
   // ---------------------------------------------------------------------------

@@ -3,7 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/eco_nudge_engine.dart';
-import 'package:tankstellen/features/obd2/data/trip_live_reading.dart';
+import 'package:tankstellen/features/obd2/domain/trip_live_reading.dart';
 
 /// #3432 (epic #3416) — pure rate-limit + episode logic of the live
 /// eco-nudge engine (≥ 60 s apart, max 3 per trip, one per episode).

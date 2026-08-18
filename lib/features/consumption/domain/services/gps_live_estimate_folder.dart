@@ -63,7 +63,7 @@ class GpsLiveEstimate {
 /// implementation.
 ///
 /// Pure domain: no I/O, no providers, fully unit-testable.
-class GpsLiveEstimateFolder {
+class GpsLiveEstimateFolder implements TripGpsEstimateOverlay {
   GpsLiveEstimateFolder._({
     required GpsLiveFuelEstimator estimator,
     required Duration coachingWindow,
@@ -92,9 +92,11 @@ class GpsLiveEstimateFolder {
   /// onto [TripSummary.estimatedAvgLPer100Km] /
   /// [TripSummary.estimatedFuelLitersConsumed]. Null until the physics
   /// has warmed up (mirrors the live view's dash).
+  @override
   double? get finalAvgLPer100Km => _estimator.runningAvgLPer100Km;
 
   /// See [finalAvgLPer100Km]. Zero litres reads as "no estimate".
+  @override
   double? get finalFuelLiters {
     final liters = _estimator.litersSoFar;
     return liters > 0 ? liters : null;
@@ -201,6 +203,7 @@ class GpsLiveEstimateFolder {
   /// Pulls the per-tick fold + overlay out of the (god-class)
   /// `TripRecordingController._emit` so both the data and the
   /// divergence-prevention seam live in one place.
+  @override
   ({TripLiveReading reading, DrivingCoachingHint? coachingHint}) overlay({
     required TripLiveReading base,
     required DateTime now,

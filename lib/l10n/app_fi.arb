@@ -12,11 +12,8 @@
   "fuelType": "Polttoaine",
   "searchRadius": "Säde",
   "searchNearby": "Lähellä olevat asemat",
-  "searchButton": "Hae",
   "searchCriteriaTitle": "Hakukriteerit",
-  "searchCriteriaOpen": "Haku",
   "searchCriteriaRadiusBadge": "{km} km säteellä",
-  "searchCriteriaTapToSearch": "Aloita haku napauttamalla",
   "noResults": "Asemia ei löytynyt.",
   "startSearch": "Hae löytääksesi huoltoasemia.",
   "open": "Auki",
@@ -30,7 +27,6 @@
   "navigate": "Navigoi",
   "retry": "Yritä uudelleen",
   "apiKeySetup": "API-avain",
-  "apiKeyDescription": "Rekisteröidy kerran saadaksesi ilmaisen API-avaimen.",
   "apiKeyLabel": "API-avain",
   "register": "Rekisteröinti",
   "continueButton": "Jatka",
@@ -64,33 +60,12 @@
   "noFavoritesHint": "Napauta aseman tähteä tallentaaksesi sen suosikiksi.",
   "language": "Kieli",
   "country": "Maa",
-  "demoMode": "Demotila — esimerkkitiedot näytetään.",
-  "setupLiveData": "Määritä live-dataa varten",
   "freeNoKey": "Ilmainen — avainta ei tarvita",
   "apiKeyRequired": "API-avain vaaditaan",
-  "skipWithoutKey": "Jatka ilman avainta",
   "dataTransparency": "Tietojen läpinäkyvyys",
   "storageAndCache": "Tallennus ja välimuisti",
   "clearCache": "Tyhjennä välimuisti",
-  "clearAllData": "Poista kaikki tiedot",
-  "errorLog": "Virheloki",
   "stationsFound": "{count} asemaa löytyi",
-  "whatIsShared": "Mitä jaetaan — ja kenen kanssa?",
-  "gpsCoordinates": "GPS-koordinaatit",
-  "gpsReason": "Lähetetään jokaisessa haussa lähellä olevien asemien löytämiseksi.",
-  "postalCodeData": "Postinumero",
-  "postalReason": "Muunnetaan koordinaateiksi geokoodauspalvelun kautta.",
-  "mapViewport": "Karttanäkymä",
-  "mapReason": "Karttaruudut ladataan palvelimelta. Henkilötietoja ei lähetetä.",
-  "apiKeyData": "API-avain",
-  "apiKeyReason": "Henkilökohtainen avaimesi lähetetään jokaisen API-pyynnön mukana. Se on yhdistetty sähköpostiisi.",
-  "notShared": "EI jaeta:",
-  "searchHistory": "Hakuhistoria",
-  "favoritesData": "Suosikit",
-  "profileNames": "Profiilinimet",
-  "homeZipData": "Kotiosoitteen postinumero",
-  "usageData": "Käyttötiedot",
-  "privacyBanner": "Tällä sovelluksella ei ole palvelinta. Kaikki tiedot pysyvät laitteellasi. Ei analytiikkaa, ei seurantaa, ei mainoksia.",
   "storageUsage": "Tallennustilan käyttö tällä laitteella",
   "settingsLabel": "Asetukset",
   "profilesStored": "profiilia tallennettu",
@@ -116,12 +91,8 @@
   "deleteAllButton": "Poista kaikki",
   "entries": "merkintää",
   "cacheEmpty": "Välimuisti on tyhjä",
-  "noStorage": "Ei tallennustilaa käytössä",
   "apiKeyNote": "Ilmainen rekisteröinti. Tiedot valtion hintatransparenssitoimistoilta.",
   "apiKeyFormatError": "Virheellinen muoto — odotettu UUID (8-4-4-4-12)",
-  "supportProject": "Tue tätä projektia",
-  "supportDescription": "Tämä sovellus on ilmainen, avoimen lähdekoodin ja mainokseton. Jos se on hyödyllinen, harkitse kehittäjän tukemista.",
-  "reportBug": "Ilmoita virheestä / Ehdota ominaisuutta",
   "reportThisIssue": "Ilmoita ongelmasta",
   "reportAlreadySent": "Olet jo ilmoittanut tästä ongelmasta.",
   "reportConsentTitle": "Ilmoita GitHubiin?",
@@ -136,7 +107,6 @@
   "configApiKeysSection": "API-avaimet",
   "configTankerkoenigKey": "Tankerkoenig API-avain",
   "configApiKeyConfigured": "Määritetty",
-  "configApiKeyNotSet": "Ei asetettu (demotila)",
   "configApiKeyCommunity": "Oletus (yhteisöavain)",
   "searchLocationPlaceholder": "Osoite, postinumero tai kaupunki",
   "configEvKey": "Sähköautojen lataus API-avain",
@@ -174,8 +144,6 @@
   "sortPriceDistance": "Hinta/km",
   "cheap": "halpa",
   "expensive": "kallis",
-  "stationsOnMap": "{count} asemaa",
-  "loadingFavorites": "Ladataan suosikkeja...\nHae asemia ensin tietojen tallentamiseksi.",
   "reportPrice": "Ilmoita hinta",
   "whatsWrong": "Mikä on vialla?",
   "correctPrice": "Oikea hinta (esim. 1,459)",
@@ -185,7 +153,6 @@
   "cacheCleared": "Välimuisti tyhjennetty.",
   "yourPosition": "Sijaintisi",
   "positionUnknown": "Sijainti tuntematon",
-  "routeModeBannerLabel": "Reittitila — etäisyydet ovat reitin varrelta",
   "distancesFromCenter": "Etäisyydet hakukeskuksesta",
   "autoUpdatePosition": "Päivitä sijainti automaattisesti",
   "autoUpdateDescription": "Päivitä GPS-sijainti ennen jokaista hakua",
@@ -220,8 +187,6 @@
   "wrongDieselPrice": "Väärä Diesel hinta",
   "wrongStatusOpen": "Näytetään avoimena, mutta suljettu",
   "wrongStatusClosed": "Näytetään suljettuna, mutta avoinna",
-  "searchAlongRouteLabel": "Reitin varrella",
-  "searchEvStations": "Etsi latausasemia",
   "allStations": "Kaikki asemat",
   "bestStops": "Parhaat pysähdykset",
   "openInMaps": "Avaa Kartoissa",
@@ -253,7 +218,6 @@
   "cityOrAddress": "Kaupunki tai osoite",
   "useGps": "Käytä GPS:ää",
   "stop": "Pysähdys",
-  "stopN": "Pysähdys {n}",
   "addStop": "Lisää pysähdys",
   "searchAlongRoute": "Hae reitin varrelta",
   "cheapest": "Halvin",
@@ -265,10 +229,8 @@
   "customKey": "Oma avain",
   "appDefaultKey": "Sovelluksen oletusavain",
   "optionalOverrideKey": "Valinnainen: korvaa sovelluksen sisäänrakennettu avain omallasi",
-  "requiredForEvSearch": "Vaaditaan sähköauton latausasemien hakuun",
   "edit": "Muokkaa",
   "fuelPricesApiKey": "Polttoainehinnat API-avain",
-  "tankerkoenigApiKey": "Tankerkoenig API-avain",
   "evChargingApiKey": "Sähköauton lataus API-avain",
   "openChargeMapApiKey": "OpenChargeMap API-avain",
   "routePlanningSection": "Reittisuunnittelu",
@@ -303,18 +265,14 @@
   "noStationsAlongThisRoute": "Ei asemia tämän reitin varrella.",
   "fuelCostCalculator": "Polttoainekustannuslaskin",
   "distanceKm": "Matka (km)",
-  "consumptionL100km": "Kulutus (L/100km)",
-  "fuelPriceEurL": "Polttoaineen hinta (EUR/L)",
   "tripCost": "Matkan kustannus",
   "fuelNeeded": "Tarvittava polttoaine",
   "totalCost": "Kokonaiskustannus",
-  "enterCalcValues": "Syötä matka, kulutus ja hinta laskeaksesi matkan kustannuksen",
   "priceHistory": "Hintahistoria",
   "ignoredStationsLabel": "Ohitetut",
   "ratingsLabel": "Arvioinnit",
   "favoritesDataCache": "Suosikkien tiedot",
   "citySearchCache": "Kaupunkihaku",
-  "dataDeletionNotAvailableCommunity": "Tietojen poisto ei ole käytettävissä Yhteisö-tilassa. Katkaise ensin yhteys tai käytä yksityistä tietokantaa.",
   "priceHistoryStationsTracked": "{count} seurattua asemaa",
   "@priceHistoryStationsTracked": {
     "placeholders": {
@@ -348,22 +306,11 @@
     }
   },
   "noPriceHistory": "Ei hintahistoriaa vielä",
-  "noHourlyData": "Ei tuntidataa",
   "noStatistics": "Tilastoja ei saatavilla",
-  "statMin": "Min",
-  "statMax": "Max",
-  "statAvg": "Ka",
   "showAllFuelTypes": "Näytä kaikki polttoainetyypit",
   "connected": "Yhdistetty",
-  "notConnected": "Ei yhdistetty",
-  "connectTankSync": "Yhdistä TankSync",
   "disconnectTankSync": "Katkaise TankSync",
   "viewMyData": "Näytä omat tiedot",
-  "optionalCloudSync": "Valinnainen pilvisynkronointi hälytyksille, suosikeille ja push-ilmoituksille",
-  "tapToUpdateGps": "Napauta päivittääksesi GPS-sijainnin",
-  "gpsAutoUpdateHint": "GPS-sijainti haetaan automaattisesti hakiessa. Voit myös päivittää sen manuaalisesti täällä.",
-  "clearGpsConfirm": "Tyhjennä tallennettu GPS-sijainti? Voit päivittää sen uudelleen milloin tahansa.",
-  "pageNotFound": "Sivua ei löytynyt",
   "deleteAllServerData": "Poista kaikki palvelintiedot",
   "deleteServerDataConfirm": "Poista kaikki palvelintiedot?",
   "deleteEverything": "Poista kaikki",
@@ -373,7 +320,6 @@
   "forgetAllSyncedTripsConfirmBody": "Jokainen matkayhteenveto ja yksityiskohtainen tiedosto poistetaan palvelimelta. Laitteellasi oleva paikallinen matkahistoria ei muutu.\n\nTätä toimintoa ei voi peruuttaa.",
   "forgetAllSyncedTripsConfirmAction": "Unohda kaikki",
   "forgetAllSyncedTripsSuccess": "Kaikki synkronoidut matkat poistettu palvelimelta",
-  "disconnectConfirm": "Katkaise TankSync?",
   "disconnect": "Katkaise",
   "myServerData": "Omat palvelintiedot",
   "anonymousUuid": "Anonyymi UUID",
@@ -393,7 +339,6 @@
   "continueAsGuest": "Jatka vieraana",
   "createAccount": "Luo tili",
   "signIn": "Kirjaudu sisään",
-  "upgradeToEmail": "Luo sähköpostitili",
   "savedRoutes": "Tallennetut reitit",
   "noSavedRoutes": "Ei tallennettuja reittejä",
   "noSavedRoutesHint": "Hae reitin varrelta ja tallenna se myöhempää käyttöä varten.",
@@ -424,11 +369,6 @@
   "onboardingNext": "Seuraava",
   "onboardingSkip": "Ohita",
   "onboardingFinish": "Aloita",
-  "crossBorderNearby": "{country} on lähellä",
-  "crossBorderDistance": "~{km} km rajalle",
-  "crossBorderAvgPrice": "Keskim. täällä: {price} EUR ({count} asemaa)",
-  "allPricesView": "Kaikki hinnat",
-  "compactView": "Kompakti",
   "switchToAllPricesView": "Vaihda kaikkien hintojen näkymään",
   "switchToCompactView": "Vaihda kompaktiin näkymään",
   "unavailable": "N/A",
@@ -453,10 +393,6 @@
   "accountDeleted": "Tili poistettu. Paikalliset tiedot säilytetty.",
   "switchedToAnonymous": "Vaihdettu anonyymiin istuntoon",
   "failedToSwitch": "Vaihto epäonnistui: {error}",
-  "topicUrlCopied": "Aiheen URL kopioitu",
-  "testNotificationSent": "Testipush lähetetty!",
-  "testNotificationFailed": "Testipushin lähetys epäonnistui",
-  "pushUpdateFailed": "Push-ilmoituksen päivitys epäonnistui",
   "connectedAsGuest": "Yhdistetty vieraana",
   "accountCreated": "Tili luotu!",
   "signedIn": "Kirjauduttu sisään!",
@@ -518,7 +454,6 @@
   "privacyClearErrorLog": "Tyhjennä virheloki",
   "privacyErrorLogCleared": "Virheloki tyhjennetty",
   "privacyDeleteButton": "Poista kaikki tiedot",
-  "privacyCopyErrorLog": "Kopioi virheloki leikepöydälle ({count})",
   "privacyDeleteTitle": "Poistetaanko kaikki tiedot?",
   "privacyDeleteBody": "Tämä poistaa pysyvästi:\n\n- Kaikki suosikit ja asematiedot\n- Kaikki hakuprofiilit\n- Kaikki hintahälytykset\n- Kaikki hintahistoriat\n- Kaikki välimuistin tiedot\n- API-avaimesi\n- Kaikki sovelluksen asetukset\n\nSovellus palautuu alkutilaan. Tätä toimintoa ei voi peruuttaa.",
   "privacyDeleteConfirm": "Poista kaikki",
@@ -553,15 +488,8 @@
   "voiceAnnouncementsTitle": "Äänilmoitukset",
   "voiceAnnouncementsDescription": "Ilmoita lähellä olevista edullisista asemista ajon aikana",
   "voiceAnnouncementsEnabled": "Ota äänilmoitukset käyttöön",
-  "voiceAnnouncementThreshold": "Vain alle {price}",
-  "voiceAnnouncementCheapFuel": "{station}, {distance} kilometriä edessä, {fuelType} {price}",
   "voiceAnnouncementProximityRadius": "Ilmoitussäde",
   "voiceAnnouncementCooldown": "Toistumisväli",
-  "nearestStations": "Lahimmat asemat",
-  "nearestStationsHint": "Loyda lahimmat asemat nykyisella sijainnillasi",
-  "consumptionLogTitle": "Polttoainekulutus",
-  "consumptionLogMenuTitle": "Kulutuskirjanpito",
-  "consumptionLogMenuSubtitle": "Seuraa tankkauksia ja laske L/100km",
   "consumptionStatsTitle": "Kulutustilastot",
   "addFillUp": "Lisää tankkaus",
   "noFillUpsTitle": "Ei vielä tankkauksia",
@@ -595,14 +523,12 @@
   "vehiclesWizardYoursList": "Sinulla on {count, plural, =1{1 ajoneuvo} other{{count} ajoneuvoa}}:",
   "vehiclesWizardSkipHint": "Ohita ja viimeistele asennus — voit lisätä ajoneuvoja milloin tahansa Asetuksista.",
   "fillUpVehicleLabel": "Ajoneuvo",
-  "fillUpVehicleNone": "Ei ajoneuvoa",
   "fillUpVehicleRequired": "Ajoneuvo vaaditaan",
   "reportScanError": "Ilmoita skannauksesta",
   "pickStationTitle": "Valitse asema",
   "pickStationHelper": "Aloita tankkaus tunnetulta asemalta, jotta hinnat, merkki ja polttoainetyyppi täyttyvät automaattisesti.",
   "pickStationEmpty": "Ei vielä suosikkiasemia — lisää niitä Hausta tai Suosikeista, tai ohita ja täytä manuaalisesti.",
   "pickStationSkip": "Ohita — lisää ilman asemaa",
-  "scanPump": "Skannaa pumppu",
   "scanPayment": "Skannaa maksu-QR",
   "qrPaymentBeneficiary": "Saaja",
   "qrPaymentAmount": "Summa",
@@ -624,17 +550,10 @@
   "qrScannerRetry": "Yritä uudelleen",
   "torchOn": "Ota salama käyttöön",
   "torchOff": "Poista salama käytöstä",
-  "obdNoAdapter": "Ei OBD2-sovitinta kantaman sisällä",
-  "obdOdometerUnavailable": "Matkamittaria ei voitu lukea",
   "obdPermissionDenied": "Myönnä Bluetooth-lupa järjestelmäasetuksissa",
-  "obdAdapterUnresponsive": "Sovitin ei vastannut — käynnistä sytytin ja yritä uudelleen",
   "obdPickerTitle": "Valitse OBD2-sovitin",
   "obdPickerScanning": "Etsitään sovittimia…",
   "obdPickerConnecting": "Yhdistetään…",
-  "themeSettingTitle": "Teema",
-  "themeModeLight": "Vaalea",
-  "themeModeDark": "Tumma",
-  "themeModeSystem": "Seuraa järjestelmää",
   "tripRecordingTitle": "Tallennetaan matkaa",
   "tripSummaryTitle": "Matkan yhteenveto",
   "tripMetricDistance": "Etäisyys",
@@ -676,18 +595,13 @@
   "syncBaselinesToggleTitle": "Jaa opitut ajoneuvoprofiilit",
   "syncBaselinesToggleSubtitle": "Lataa ajoneuvokohtaiset kulutusperusarvot, jotta toinen laite voi käyttää niitä.",
   "obd2StatusConnected": "OBD2-sovitin: yhdistetty",
-  "obd2StatusAttempting": "OBD2-sovitin: yhdistetään",
-  "obd2StatusUnreachable": "OBD2-sovitin: ei tavoitettavissa",
   "obd2StatusPermissionDenied": "OBD2-sovitin: Bluetooth-lupa tarvitaan",
   "obd2StatusConnectedBody": "Valmis tallentamaan matkan.",
-  "obd2StatusAttemptingBody": "Yhdistetään taustalla…",
-  "obd2StatusUnreachableBody": "Sovitin kantaman ulkopuolella tai jo käytössä toisessa sovelluksessa.",
   "obd2StatusPermissionDeniedBody": "Myönnä Bluetooth-lupa järjestelmäasetuksissa yhdistääksesi automaattisesti.",
   "obd2StatusNoAdapter": "Ei paritettu sovitinta",
   "obd2StatusForget": "Unohda sovitin",
   "tripHistoryTitle": "Matkahistoria",
   "tripHistoryEmptyTitle": "Ei vielä matkoja",
-  "tripHistoryEmptySubtitle": "Yhdistä OBD2-sovitin ja tallenna matka aloittaaksesi ajohistorian rakentamisen.",
   "tripHistoryUnknownDate": "Tuntematon päivämäärä",
   "situationIdle": "Tyhjäkäynti",
   "situationStopAndGo": "Pysähtele-jatka",
@@ -697,12 +611,8 @@
   "situationClimbing": "Nousu / kuorma",
   "situationHardAccel": "Voimakas kiihdytys",
   "situationFuelCut": "Polttoaineen katkaisu — liuku",
-  "tripSaveAsFillUp": "Tallenna tankkauksena",
   "tripSaveRecording": "Tallenna matka",
-  "tripDiscard": "Hylkää",
-  "obdOdometerRead": "Matkamittari luettu: {km} km",
   "vehicleFuelNotSet": "Ei asetettu",
-  "wizardVehicleTapToEdit": "Napauta muokataksesi",
   "wizardVehicleDefaultBadge": "Oletus",
   "wizardProfileChoiceHint": "Valitse, miten haluat käyttää sovellusta. Voit muuttaa tätä myöhemmin Asetuksissa.",
   "wizardProfileChoiceFooter": "Voit muuttaa valintaasi milloin tahansa Asetukset → Käyttötapa.",
@@ -713,7 +623,6 @@
   "wizardProfileFullName": "Täysi",
   "wizardProfileFullDescription": "Kaikki Keskitasolta, lisäksi automaattinen OBD2-matkojen tallennus, ajopisteet ja kanta-asiakaskortit.",
   "wizardProfileCustomName": "Mukautettu",
-  "wizardProfileCustomDescription": "Oma yhdistelmäsi ominaisuuksia. Säädä kutakin kytkintä alla.",
   "useModeSectionHint": "Mitoita sovellus todelliseen käyttöön. Esiasetusten valinta aktivoi vastaavan ominaisuusjoukon.",
   "useModeCustomSettingsDescription": "Ominaisuusyhdistelmäsi ei vastaa mitään esiasetusta. Valitse yksi yllä ylikirjoittaaksesi tai jatka yksittäisten ominaisuuksien mukauttamista alla.",
   "useModeSwitchedSnack": "Käyttötavaksi asetettu {profile}.",
@@ -751,20 +660,15 @@
   "evShowOnMap": "Näytä sähköasemat",
   "evAvailableOnly": "Vain vapaat",
   "evMinPower": "Minimitehо",
-  "evMaxPower": "Maksimitehо",
-  "evOperator": "Operaattori",
-  "evLastUpdate": "Viimeisin päivitys",
   "evStatusAvailable": "Vapaa",
   "evStatusOccupied": "Varattu",
   "evStatusOutOfOrder": "Epäkunnossa",
   "openOnlyFilter": "Vain avoinna",
   "saveAsDefaults": "Tallenna oletuksiksi",
   "criteriaSavedToProfile": "Tallennettu oletuksiksi",
-  "profileNotFound": "Ei aktiivista profiilia",
   "updatingFavorites": "Päivitetään suosikkejasi...",
   "fetchingLatestPrices": "Haetaan uusimmat hinnat",
   "noDataAvailable": "Ei tietoja",
-  "configAndPrivacy": "Asetukset ja tietosuoja",
   "searchToSeeMap": "Hae nähdäksesi asemat kartalla",
   "evPowerAny": "Mikä tahansa",
   "evPowerKw": "{kw} kW+",
@@ -819,9 +723,6 @@
   "iosAutoRecordOnboardingBullet3Title": "Kun iOS pyytää \"Aina\"-sijaintia, sano kyllä.",
   "iosAutoRecordOnboardingBullet3Body": "Varajärjestelmä, joka tallentaa matkasi kun OBD2-sovitin on hidas, tarvitsee taustasijainnin. Emme koskaan jaa sitä.",
   "scanReceipt": "Skannaa kuitti",
-  "obdConnect": "OBD-II",
-  "stationTypeFuel": "Polttoaine",
-  "stationTypeEv": "Sähköauto",
   "brandFilterHighway": "Moottoritie",
   "ratingModeLocal": "Paikallinen",
   "ratingModePrivate": "Yksityinen",
@@ -841,7 +742,6 @@
   "errorHintRouting": "Reittilaskenta epäonnistui. Tarkista internet-yhteys ja yritä uudelleen.",
   "errorHintFallback": "Yritä uudelleen tai hae postinumerolla tai kaupungin nimellä.",
   "alertsLoadErrorTitle": "Hälytysten lataaminen epäonnistui",
-  "alertsBackgroundCheckErrorTitle": "Hälytysten taustatarkistus epäonnistui",
   "detailsLabel": "Tiedot",
   "remove": "Poista",
   "showKey": "Näytä avain",
@@ -950,19 +850,11 @@
   "linkDeviceHowItWorksBody": "1. Laitteella A: kopioi yllä oleva laitekoodi\n2. Laitteella B: liitä se \"Laitekoodi\"-kenttään\n3. Napauta \"Tuo tiedot\" yhdistääksesi suosikit, hälytykset, ajoneuvot ja kulutuslokit\n4. Molemmilla laitteilla on kaikki yhdistetyt tiedot\n\nKukin laite säilyttää oman anonyymiidentiteettinsä ja oman profiilинsa (ensisijainen polttoaine, oletusajoneuvo, aloitusnäyttö). Tiedot yhdistetään, ei siirretä.",
   "vehicleSetActive": "Aseta aktiiviseksi",
   "swipeHide": "Piilota",
-  "evChargingSection": "Sähköautojen lataus",
-  "fuelStationsSection": "Polttoaineasema",
   "yourRating": "Arvostelusi",
   "noStorageUsed": "Ei tallennustilaa käytetty",
   "aboutReportBug": "Ilmoita virheestä / Ehdota ominaisuutta",
   "aboutSupportProject": "Tue tätä projektia",
   "aboutSupportDescription": "Tämä sovellus on ilmainen, avoimen lähdekoodin eikä siinä ole mainoksia. Jos pidät siitä hyödyllisenä, harkitse kehittäjän tukemista.",
-  "luxembourgRegulatedPricesNotice": "Luxemburgin polttoainehinnat ovat valtion sääntelemiä ja yhtenäiset koko maassa.",
-  "luxembourgFuelUnleaded95": "Lyijytön 95",
-  "luxembourgFuelUnleaded98": "Lyijytön 98",
-  "luxembourgFuelDiesel": "Diesel",
-  "luxembourgFuelLpg": "LPG",
-  "luxembourgPricesUnavailable": "Luxemburgin säännellyt hinnat eivät ole saatavilla.",
   "reportIssueTitle": "Ilmoita ongelmasta",
   "enterCorrection": "Anna korjaus",
   "reportNoBackendAvailable": "Raporttia ei voitu lähettää: tälle maalle ei ole määritetty raportointipalvelua. Ota TankSync käyttöön Asetuksissa lähettääksesi yhteisöraportteja.",
@@ -989,10 +881,6 @@
   "serviceReminderMarkDone": "Merkitse tehdyksi",
   "serviceReminderDueTitle": "Huolto erääntynyt",
   "serviceReminderDueBody": "{label} on erääntynyt — {kmOver} km yli välimatkan.",
-  "southKoreaApiKeyRequired": "Rekisteröidy OPINETissä saadaksesi ilmaisen API-avaimen",
-  "southKoreaApiProvider": "OPINET (KNOC)",
-  "chileApiKeyRequired": "Rekisteröidy CNE:ssä saadaksesi ilmaisen API-avaimen",
-  "chileApiProvider": "CNE Bencina en Linea",
   "vinConfirmTitle": "Onko tämä autosi?",
   "vinConfirmBody": "{year} {make} {model} — {displacement}L, {cylinders}-syl, {fuel}",
   "vinPartialInfoNote": "Osittaiset tiedot (offline). Voit muokata alla.",
@@ -1011,17 +899,13 @@
   "alertsRadiusCreateTitle": "Luo säde-hälytys",
   "alertsRadiusLabelHint": "Nimike (esim. Koti diesel)",
   "alertsRadiusFuelType": "Polttoainetyyppi",
-  "alertsRadiusThreshold": "Raja (€/L)",
   "alertsRadiusKm": "Säde (km)",
   "alertsRadiusCenterGps": "Käytä sijaintiasi",
   "alertsRadiusCenterPostalCode": "Postinumero",
   "alertsRadiusSave": "Tallenna",
   "alertsRadiusCancel": "Peruuta",
-  "alertsRadiusDeleteConfirm": "Poistetaanko säde-hälytys?",
   "obd2ConnectedTooltip": "OBD2 yhdistetty: {adapterName}",
   "obd2PairChipTooltip": "Paritetaan OBD2-sovitin",
-  "velocityAlertTitle": "{fuelLabel} laski lähellä olevilla asemilla",
-  "velocityAlertBody": "{stationCount} asemalla hinta laski jopa {maxDropCents} ¢ viimeisen tunnin aikana",
   "fillUpSavedSnackbar": "Tankkaus tallennettu",
   "radiusAlertsEntryTitle": "Säde-hälytykset ja tilastot",
   "radiusAlertsEntrySubtitle": "Saat ilmoituksen kun hinnat laskevat lähellä sinua",
@@ -1060,8 +944,6 @@
   "autoRecordStatusPairAdapterCta": "Paritetaan sovitin",
   "autoRecordSpeedThresholdLabel": "Aloitusnopeus (km/h)",
   "autoRecordSaveDelayLabel": "Tallennusviive yhteyden katkaistua (sekuntia)",
-  "autoRecordPairedAdapterLabel": "Paritettu sovitin",
-  "autoRecordPairedAdapterNone": "Ei paritettu sovitinta. Paritetaan ensin OBD2-perehdytyksen kautta.",
   "autoRecordBackgroundLocationLabel": "Taustanäkymäsijainti sallittu",
   "autoRecordBackgroundLocationRequest": "Pyydä lupaa",
   "autoRecordBackgroundLocationRationaleTitle": "Miksi \"Aina sallittu\"?",
@@ -1069,18 +951,12 @@
   "autoRecordBackgroundLocationOpenSettings": "Avaa asetukset",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Sijaintilupa vaaditaan",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Taustasijainnin pyytäminen epäonnistui",
-  "autoRecordBadgeClearTooltip": "Tyhjennä laskuri",
   "autoRecordPairAdapterLinkText": "Paritetaan sovitin alla olevassa osiossa automaattisen tallennuksen ottamiseksi käyttöön",
-  "exportBackupTooltip": "Vie varmuuskopio",
   "exportBackupReady": "Varmuuskopio valmis — valitse kohde",
   "exportBackupFailed": "Varmuuskopion vienti epäonnistui — yritä uudelleen",
-  "brokenMapChipVerifying": "MAP-anturi tarkistaa…",
   "brokenMapChipDisclaimer": "MAP-lukema epäilyttävä",
   "brokenMapSnackbarUnreliable": "MAP-anturi lukee väärin — polttoainelukemat voivat olla 50–80 % liian pienet. Kokeile eri sovitinta.",
   "brokenMapBannerHardDisable": "MAP-anturi epäluotettava. Näytetään tankkauskeskiarvot live-polttoaineprosentin sijaan.",
-  "brokenMapOverlayVerified": "MAP-anturi: tarkistettu ({confidence})",
-  "brokenMapOverlayUnverified": "MAP-anturi: tarkistetaan ({confidence})",
-  "brokenMapOverlaySuspicious": "MAP-anturi: epäilyttävä ({confidence})",
   "brokenMapOverlayPosterior": "MAP-anturi: {posterior}% ± {margin}%",
   "brokenMapOverlayPosteriorVerified": "MAP-anturi: {posterior}% ± {margin}% (tarkistettu)",
   "brokenMapDiagnosticsCardTitle": "MAP-anturin diagnostiikka",
@@ -1142,7 +1018,6 @@
   "chargingCostTrendTitle": "Latauskulujen kehitys",
   "chargingEfficiencyTitle": "Tehokkuus (kWh/100 km)",
   "chargingChartsEmpty": "Ei vielä riittävästi tietoja",
-  "chargingChartsMonthAxis": "Kuukausi",
   "consoFeatureGroupTitle": "Kulutus",
   "consoFeatureGroupDescription": "Seuraa kulutustasi — manuaaliset tankkaukset tai automaattinen OBD2-matkojen tallennus.",
   "consoModeOff": "Pois",
@@ -1158,10 +1033,6 @@
   "fillUpCorrectionEditExplainer": "Tämä merkintä luotiin automaattisesti kuromaan umpeen tallennettujen matkojen ja pumpatun polttoaineen välinen ero. Muuta arvoja jos tiedät todelliset luvut.",
   "fillUpCorrectionDelete": "Poista korjaus",
   "fillUpCorrectionStation": "Aseman nimi (valinnainen)",
-  "greeceApiProvider": "Paratiritirio Timon (Kreikka)",
-  "greeceCommunityApiNotice": "Yhteisön ylläpitämä fuelpricesgr API",
-  "romaniaApiProvider": "Monitorul Prețurilor (Romania)",
-  "romaniaScrapingNotice": "Toteutettu monitorulpreturilor.info:n avulla (kilpailuneuvosto + ANPC)",
   "crossBorderCheaper": "{country}:n asemat {km} km päässä — €{price}/L halvempi",
   "crossBorderTapToSwitch": "Napauta vaihtaaksesi maata",
   "crossBorderDismissTooltip": "Sulje",
@@ -1186,9 +1057,6 @@
   "drivingScorePenaltyHardBrake": "Kova jarrutus",
   "drivingScorePenaltyHighRpm": "Korkea RPM",
   "drivingScorePenaltyFullThrottle": "Täysi kaasu",
-  "ecoRouteOption": "Eko",
-  "ecoRouteSavings": "≈ {liters} L säästöä",
-  "ecoRouteHint": "Älykkäämpi ajo — suosii tasaista moottoritietä kiemurtelevien oikoteiden sijaan.",
   "favoritesShareAction": "Jaa",
   "favoritesShareSubject": "Sparkilo — suosikit {date}",
   "favoritesShareError": "Jaettavan kuvan luominen epäonnistui",
@@ -1206,8 +1074,6 @@
   "featureDescription_consumptionAnalytics": "Tankkaus- ja matka-analyysivälilehti.",
   "featureLabel_baselineSync": "Perusarvojen synkronointi",
   "featureDescription_baselineSync": "Synkronoi ajon perusarvot TankSyncin kautta.",
-  "featureLabel_unifiedSearchResults": "Yhdistetyt hakutulokset",
-  "featureDescription_unifiedSearchResults": "Yksittäinen tulosluettelo yhdistellen polttoaine- ja sähköasemia.",
   "featureLabel_priceAlerts": "Hintahälytykset",
   "featureDescription_priceAlerts": "Rajapohjaiset hintamuutosilmoitukset.",
   "featureLabel_priceHistory": "Hintahistoria",
@@ -1235,8 +1101,6 @@
   "featureBlockedEnable_glideCoach": "Ota ensin OBD2-matkojen tallennus käyttöön",
   "featureBlockedEnable_gpsTripPath": "Ota ensin OBD2-matkojen tallennus käyttöön",
   "featureBlockedEnable_autoRecord": "Ota ensin OBD2-matkojen tallennus käyttöön",
-  "featureBlockedEnable_showFuel": "Edellytykset eivät täyty",
-  "featureBlockedEnable_showElectric": "Edellytykset eivät täyty",
   "featureBlockedEnable_showConsumptionTab": "Ota ensin OBD2-matkojen tallennus käyttöön",
   "featureLabel_tflitePricePrediction": "TFLite-hintaennuste",
   "featureDescription_tflitePricePrediction": "Laitteella toimiva hintaennustemalli — päätelmät ajetaan paikallisesti; ominaisuudet ja ennusteet eivät koskaan poistu laitteelta.",
@@ -1281,15 +1145,12 @@
   "scanReceiptNoData": "Kuitista ei löydy tietoja — yritä uudelleen",
   "scanReceiptSuccess": "Kuitti skannattu — tarkista arvot. Napauta alla \"Ilmoita skannauksesta\" jos jokin on pielessä.",
   "scanReceiptFailed": "Skannaus epäonnistui: {error}",
-  "scanPumpUnreadable": "Pumpun näyttöä ei voida lukea — yritä uudelleen",
-  "pumpCameraHint": "Aseta mittarin näytön kolme numeroa kehyksen sisään",
   "pumpCameraCapture": "Ota kuva",
   "pumpCameraPermissionDenied": "Kameran käyttöoikeus tarvitaan mittarin näytön skannaamiseen. Ota se käyttöön laitteen asetuksista.",
   "pumpCameraError": "Kameraa ei voitu käynnistää. Yritä uudelleen tai syötä arvot käsin.",
   "scanPumpSuccess": "Pumpun näyttö skannattu — tarkista arvot.",
   "scanPumpGlare": "Näytössä on liikaa heijastusta — yritä uudelleen hieman vinosta kulmasta, jotta numerot eivät pala puhki.",
   "scanPumpFailed": "Pumpun skannaus epäonnistui: {error}",
-  "badScanReportTitle": "Ilmoita skannauksesta",
   "badScanReportTitleReceipt": "Ilmoita skannauksesta — Kuitti",
   "badScanReportTitlePumpDisplay": "Ilmoita skannauksesta — Pumpun näyttö",
   "pumpScanFailureTitle": "Näyttöä ei voida lukea",
@@ -1298,7 +1159,6 @@
   "pumpScanFailureReport": "Ilmoita",
   "pumpScanFailureRemove": "Poista kuva",
   "badScanReportHint": "Jaamme kuitin kuvan ja molemmat arvojoukot, jotta seuraava versio voi oppia tämän asettelun.",
-  "badScanReportShareAction": "Jaa raportti + kuva",
   "badScanReportFieldBrandLayout": "Merkin asettelu",
   "badScanReportFieldTotal": "Yhteensä",
   "badScanReportFieldPricePerLiter": "Hinta/L",
@@ -1315,16 +1175,9 @@
   "fillUpSectionWhatSubtitle": "Polttoaine, määrä, hinta",
   "fillUpSectionWhereTitle": "Missä olitte",
   "fillUpSectionWhereSubtitle": "Asema, matkamittari, muistiinpanot",
-  "fillUpImportFromLabel": "Tuo kohteesta…",
-  "fillUpImportSheetTitle": "Tuo tankkauksen tiedot",
   "fillUpImportReceiptLabel": "Kuitti",
-  "fillUpImportReceiptDescription": "Skannaa paperikuitti kameralla",
   "fillUpImportPumpLabel": "Pumpun näyttö",
-  "fillUpImportPumpDescription": "Lue Betrag / Preis pumpun LCD-näytöltä",
-  "fillUpImportObdLabel": "OBD-II-sovitin",
-  "fillUpImportObdDescription": "Lue matkamittari OBD-II-portista Bluetoothin kautta",
   "fillUpPricePerLiterLabel": "Hinta litralta",
-  "vehicleHeaderPlateLabel": "Rekisteri",
   "vehicleHeaderUntitled": "Uusi ajoneuvo",
   "vehicleSectionIdentityTitle": "Tunnistetiedot",
   "vehicleSectionIdentitySubtitle": "Nimi ja VIN",
@@ -1340,7 +1193,6 @@
   "gpsDiagnosticsHeader": "{count} näytettä · {span} · {gaps, plural, =0{ei katkoksia} =1{1 katkos} other{{gaps} katkosta}}",
   "gpsDiagnosticsCadence": "Mediaaniväli: {ms} ms",
   "gpsDiagnosticsExplain": "Kerätty tallennuksen aikana GPS-tahdin tarkistamiseksi puhelimen nukkuessa.",
-  "hapticEcoCoachSectionTitle": "Ajaminen",
   "hapticEcoCoachSettingTitle": "Reaaliaikainen eko-valmennus",
   "hapticEcoCoachSettingSubtitle": "Kevyt haptiikka + näyttövinkki kun poljet kaasun pohjaan tasaajossa",
   "hapticEcoCoachSnackBarMessage": "Pehmeästi kaasulla — liuku säästää enemmän",
@@ -1370,9 +1222,6 @@
   "calculatorDistanceHint": "esim. 150",
   "calculatorConsumptionHint": "esim. 7,0",
   "calculatorPriceHint": "esim. 1,899",
-  "routeStrategyLabel": "Strategia:",
-  "routeStrategyUniform": "Yhtenäinen",
-  "routeStrategyBalanced": "Tasapainoinen",
   "glideCoachBetaTitle": "Liukuluekovalmentaja beta (kokeellinen)",
   "glideCoachBetaSubtitle": "Hienovarainen haptiikka jarrutettaessa punaisia valoja kohti. Oletuksena pois — hajautumisriski.",
   "consentSyncTripsTitle": "Synkronoi matkatallenteet",
@@ -1428,7 +1277,6 @@
   "onboardingObd2ConnectButton": "Yhdistä sovitin",
   "onboardingObd2SkipButton": "Ehkä myöhemmin",
   "onboardingObd2ReadingVin": "Luetaan VIN-koodia…",
-  "onboardingObd2VinReadFailed": "VIN-koodia ei voitu lukea — syötä manuaalisesti",
   "onboardingObd2ConnectFailed": "Sovittimeen ei saatu yhteyttä. Voit yrittää uudelleen tai ohittaa.",
   "onboardingPickUseMode": "Valitse käyttötapa jatkaaksesi.",
   "alertsRadiusFrequencyLabel": "Tarkistustiheys",
@@ -1442,9 +1290,6 @@
   "radiusAlertMapPickerCancel": "Peruuta",
   "radiusAlertMapPickerHint": "Vedä karttaa asettaaksesi hälytyksen keskipiste",
   "radiusAlertCenterFromMap": "Karttasijainti",
-  "radiusAlertNotificationTitle": "{fuelLabel} lähellä {label}",
-  "radiusAlertNotificationBody": "Asema on hintaan {price} € (tavoite: {threshold} €)",
-  "refuelUnitPerLiter": "/L",
   "refuelUnitPerKwh": "/kWh",
   "refuelUnitPerSession": "/lataus",
   "speedConsumptionCardTitle": "Kulutus nopeuden mukaan",
@@ -1463,9 +1308,6 @@
   "tankLevelLitersFormat": "{litres} L",
   "tankLevelRangeFormat": "≈ {kilometres} km kantama",
   "tankLevelLastFillUpFormat": "Viimeisin tankkaus: {date} · {count} matka(a) sen jälkeen",
-  "tankLevelMethodObd2": "OBD2-mitattu",
-  "tankLevelMethodDistanceFallback": "etäisyyspohjainen arvio",
-  "tankLevelMethodMixed": "yhdistelmämittaus",
   "tankLevelEmptyNoFillUp": "Kirjaa tankkaus nähdäksesi tankin tason",
   "tankLevelDetailSheetTitle": "Matkat viimeisen tankkauksen jälkeen",
   "addFillUpIsFullTankLabel": "Täysi tankki",
@@ -1536,7 +1378,6 @@
   "trajetDetailDeleteAction": "Poista",
   "trajetDetailDeleteConfirmTitle": "Poistetaanko tämä matka?",
   "trajetDetailDeleteConfirmBody": "Tämä matka poistetaan pysyvästi historiastasi.",
-  "trajetDetailDeleteConfirmCancel": "Peruuta",
   "trajetDetailDeleteConfirmConfirm": "Poista",
   "tripRecordingObd2NotResponding": "OBD2-sovitin yhdistetty mutta ei palauta tietoja. Kokeile toista sovitinta tai tarkista ajoneuvon diagnostiikkaprotokolla.",
   "trajetsViewAllOnMap": "Näytä kaikki kartalla",
@@ -1552,7 +1393,6 @@
   "tripLengthBucketTripCount": "{count, plural, =0{ei matkoja} one{1 matka} other{{count} matkaa}}",
   "tripPathCardTitle": "Matkapolku",
   "tripPathCardSubtitle": "GPS-tallennettu reitti",
-  "tripPathLegendTitle": "Kulutus",
   "tripPathLegendEfficient": "Tehokas (< 6 L/100km)",
   "tripPathLegendBorderline": "Rajoilla (6–10 L/100km)",
   "tripPathLegendWasteful": "Tuhlaava (≥ 10 L/100km)",
@@ -1563,13 +1403,8 @@
   "tripRecordingPinHelpTitle": "Tietoa kiinnittämisestä",
   "tripRecordingPinHelpBody": "Kiinnittäminen pitää näytön päällä ja piilottaa järjestelmäpalkit jotta lomake pysyy luettavana kojelauta-asennuksessa. Napauta uudelleen vapauttaaksesi. Vapautuu automaattisesti matkan päättyessä.",
   "tripRecordingResumeHintMessage": "Tallennus jatkuu taustalla. Napauta yläosan punaista banneria millä tahansa näytöllä palataksesi.",
-  "tripBannerOpenFromConsumptionTab": "Avaa aktiivinen matka Kulutus-välilehdeltä",
   "tripRecordingUnpinnedWarning": "Kiinnitä näyttö pitääksesi GPS aktiivisena matkan aikana — Android voi rajoittaa GPS:ää nukkuessa.",
   "tripRecordingMinimiseTooltip": "Pienennä kelluvaksi ruuduksi",
-  "unifiedFilterFuel": "Polttoaine",
-  "unifiedFilterEv": "Sähköauto",
-  "unifiedFilterBoth": "Molemmat",
-  "unifiedNoResultsForFilter": "Ei tuloksia tälle suodattimelle",
   "searchFailedSnackbar": "Haku epäonnistui — yritä uudelleen",
   "vinLabel": "VIN (valinnainen)",
   "vinDecodeTooltip": "Pura VIN-koodi",
@@ -1601,7 +1436,6 @@
   "gdprVinOnlineDecodeTitle": "VIN-verkkopurku",
   "gdprVinOnlineDecodeShort": "Pura VIN NHTSA:n ilmaisella julkisella palvelulla",
   "gdprVinOnlineDecodeDescription": "Kun paritat sovittimen, ajoneuvosi VIN luetaan paikallisesti auton tunnistamiseksi. Tämän ottaminen käyttöön lähettää 17-merkkisen VIN-koodin NHTSA:n ilmaiseen vPIC-palveluun lisätietojen hakemiseksi (malli, moottorin tilavuus, polttoainetyyppi). VIN on ainoa lähetetty tieto — muuta tietoa ei poistu laitteeltasi.",
-  "vehicleDetectedFromVinBadge": "(havaittu)",
   "vehicleDetectedFromVinSnackbar": "Havaittu VIN:stä: {summary}. Sovelletaanko?",
   "vehicleDetectedFromVinApply": "Sovella",
   "widgetHelpSectionTitle": "Aloitusnäytön widget",
@@ -1620,7 +1454,6 @@
   "widgetColorSchemeOrange": "Oranssi",
   "widgetVariantDefault": "Vain nykyinen hinta",
   "widgetVariantPredictive": "Ennustava: paras tankkausaika",
-  "widgetPredictiveNowPrefix": "nyt",
   "@distance": {
     "placeholders": {
       "distance": {
@@ -1629,13 +1462,6 @@
     }
   },
   "@stationsFound": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@stationsOnMap": {
     "placeholders": {
       "count": {
         "type": "int"
@@ -1700,13 +1526,6 @@
   "@evConnectors": {
     "placeholders": {
       "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@stopN": {
-    "placeholders": {
-      "n": {
         "type": "int"
       }
     }
@@ -1850,25 +1669,11 @@
       }
     }
   },
-  "approachStationDistance": "{meters} m päässä",
-  "@approachStationDistance": {
-    "description": "PiP overlay caption (#2084) showing how far the driver is from the in-radius target station, in metres.",
-    "placeholders": {
-      "meters": {
-        "type": "String",
-        "example": "350"
-      }
-    }
-  },
   "tripRecordingPipElapsedCaption": "kulunut",
   "@tripRecordingPipElapsedCaption": {
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
-  "fabOpenCriteria": "Avaa haku",
-  "fabOpenResults": "Avaa tulokset",
   "fabRunSearch": "Suorita haku",
-  "fabRefineCriteria": "Tarkenna hakua",
-  "routeSearchPartialBanner": "Etsitään lisää asemia…",
   "privacySaveErrorLog": "Tallenna virheloki ({count})",
   "@privacySaveErrorLog": {
     "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
@@ -2418,10 +2223,6 @@
   "@trajetDetailChartCoolant": {
     "description": "MT — needs native review"
   },
-  "trajetDetailChartAltitude": "Korkeus (m)",
-  "@trajetDetailChartAltitude": {
-    "description": "MT — needs native review"
-  },
   "trajetDetailChartLambda": "Ohjattu λ",
   "@trajetDetailChartLambda": {
     "description": "MT — needs native review"
@@ -2654,14 +2455,6 @@
   "@obd2HealthHistorySection": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyJson": "Kopioi JSON:na",
-  "@obd2HealthCopyJson": {
-    "description": "MT — needs native review"
-  },
-  "obd2HealthCopied": "OBD2-diagnostiikka kopioitu leikepöydälle.",
-  "@obd2HealthCopied": {
-    "description": "MT — needs native review"
-  },
   "evStatusPartial": "Osittain saatavilla",
   "@evStatusPartial": {
     "description": "MT — needs native review"
@@ -2767,10 +2560,6 @@
   },
   "ocrTesterRunning": "Suoritetaan OCR:ää…",
   "@ocrTesterRunning": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterNoResult": "OCR ei tuottanut luettavaa tulosta.",
-  "@ocrTesterNoResult": {
     "description": "MT — needs native review"
   },
   "ocrTesterOverlaySection": "Lohkon peite",
@@ -2937,10 +2726,6 @@
   "@obd2DiagnosticsInitCold": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyInitTranscript": "Kopioi vain alustusprotokolla",
-  "@obd2HealthCopyInitTranscript": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterSaveFixture": "Tallenna fixture-tiedostona",
   "@ocrTesterSaveFixture": {
     "description": "MT — needs native review"
@@ -3092,10 +2877,6 @@
   "@obd2GpsDegradedBannerTitle": {
     "description": "MT — needs native review"
   },
-  "restoreBackupTooltip": "Palauta varmuuskopio",
-  "@restoreBackupTooltip": {
-    "description": "MT — needs native review"
-  },
   "restoreBackupDialogTitle": "Palauta varmuuskopio",
   "@restoreBackupDialogTitle": {
     "description": "MT — needs native review"
@@ -3111,15 +2892,6 @@
   "restoreBackupReplaceAction": "Korvaa kaikki",
   "@restoreBackupReplaceAction": {
     "description": "MT — needs native review"
-  },
-  "restoreBackupSuccess": "Varmuuskopio palautettu — {count} tietuetta tuotu",
-  "@restoreBackupSuccess": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
   },
   "restoreBackupEmpty": "Varmuuskopio palautettu — se ei sisältänyt tietueita",
   "@restoreBackupEmpty": {
@@ -3391,16 +3163,6 @@
   "voiceCoachingSettingSubtitle": "Kuule sanallisia vinkkejä ajon aikana — kova kiihdytys, kova jarrutus ja vaihdevihjet",
   "@voiceCoachingSettingSubtitle": {
     "description": "MT — needs native review"
-  },
-  "fuelStationRadarDistanceKm": "{km} km päässä",
-  "@fuelStationRadarDistanceKm": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "km": {
-        "type": "String",
-        "example": "2.4"
-      }
-    }
   },
   "fuelStationRadarProximity": "Läheisyys {percent}%",
   "@fuelStationRadarProximity": {
@@ -3733,10 +3495,6 @@
   },
   "consumptionStatsChartConsumption": "L/100 km kuukaudessa",
   "@consumptionStatsChartConsumption": {
-    "description": "MT — needs native review"
-  },
-  "shareReceiptImporting": "Tuodaan jaettua kuittia…",
-  "@shareReceiptImporting": {
     "description": "MT — needs native review"
   },
   "shareReceiptUnsupportedFormat": "Tätä tiedostomuotoa ei voi vielä tuoda — jaa sen sijaan kuva kuitista.",
@@ -4228,17 +3986,6 @@
       "count": {
         "type": "int",
         "example": "3"
-      }
-    }
-  },
-  "fuelEfficiencyMixedFootnote": "{count, plural, =1{1 mixed tank counted toward its main fuel} other{{count} mixed tanks counted toward their main fuel}}",
-  "@fuelEfficiencyMixedFootnote": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int",
-        "example": "1"
       }
     }
   },
@@ -4752,11 +4499,6 @@
         "example": "Oil change"
       }
     }
-  },
-  "radarAcquiringLocation": "Finding your location…",
-  "@radarAcquiringLocation": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
   },
   "radarUpdatingLocation": "Updating your location…",
   "@radarUpdatingLocation": {

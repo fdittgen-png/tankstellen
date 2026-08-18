@@ -12,11 +12,8 @@
   "fuelType": "Carburant",
   "searchRadius": "Rază",
   "searchNearby": "Benzinării în apropiere",
-  "searchButton": "Caută",
   "searchCriteriaTitle": "Criterii de căutare",
-  "searchCriteriaOpen": "Căutare",
   "searchCriteriaRadiusBadge": "În raza de {km} km",
-  "searchCriteriaTapToSearch": "Apăsați pentru a căuta",
   "noResults": "Nu s-au găsit benzinării.",
   "startSearch": "Căutați pentru a găsi benzinării.",
   "open": "Deschis",
@@ -30,7 +27,6 @@
   "navigate": "Navigare",
   "retry": "Reîncearcă",
   "apiKeySetup": "Cheie API",
-  "apiKeyDescription": "Înregistrați-vă o dată pentru o cheie API gratuită.",
   "apiKeyLabel": "Cheie API",
   "register": "Înregistrare",
   "continueButton": "Continuă",
@@ -64,33 +60,12 @@
   "noFavoritesHint": "Atingeți steaua la o benzinărie pentru a o salva ca favorită.",
   "language": "Limbă",
   "country": "Țară",
-  "demoMode": "Mod demo — date exemplu.",
-  "setupLiveData": "Configurare date în timp real",
   "freeNoKey": "Gratuit — fără cheie necesară",
   "apiKeyRequired": "Cheie API necesară",
-  "skipWithoutKey": "Continuă fără cheie",
   "dataTransparency": "Transparența datelor",
   "storageAndCache": "Stocare și cache",
   "clearCache": "Golește cache",
-  "clearAllData": "Șterge toate datele",
-  "errorLog": "Jurnal erori",
   "stationsFound": "{count} benzinării găsite",
-  "whatIsShared": "Ce se partajează — și cu cine?",
-  "gpsCoordinates": "Coordonate GPS",
-  "gpsReason": "Trimise la fiecare căutare pentru a găsi benzinării în apropiere.",
-  "postalCodeData": "Cod poștal",
-  "postalReason": "Convertit în coordonate prin serviciul de geocodificare.",
-  "mapViewport": "Zona hărții",
-  "mapReason": "Plăcile hărții sunt încărcate de pe server. Nu se transmit date personale.",
-  "apiKeyData": "Cheie API",
-  "apiKeyReason": "Cheia dvs. personală este trimisă cu fiecare cerere API. Este legată de e-mailul dvs.",
-  "notShared": "NU se partajează:",
-  "searchHistory": "Istoric căutări",
-  "favoritesData": "Favorite",
-  "profileNames": "Nume profiluri",
-  "homeZipData": "Cod poștal de acasă",
-  "usageData": "Date de utilizare",
-  "privacyBanner": "Această aplicație nu are server. Toate datele rămân pe dispozitivul dvs. Fără analiză, fără urmărire, fără reclame.",
   "storageUsage": "Utilizare stocare pe acest dispozitiv",
   "settingsLabel": "Setări",
   "profilesStored": "profiluri salvate",
@@ -116,12 +91,8 @@
   "deleteAllButton": "Șterge tot",
   "entries": "intrări",
   "cacheEmpty": "Cache-ul este gol",
-  "noStorage": "Fără stocare utilizată",
   "apiKeyNote": "Înregistrare gratuită. Date de la agențiile guvernamentale de transparență a prețurilor.",
   "apiKeyFormatError": "Format invalid — UUID așteptat (8-4-4-4-12)",
-  "supportProject": "Susțineți acest proiect",
-  "supportDescription": "Această aplicație este gratuită, open source și fără reclame. Dacă o găsiți utilă, luați în considerare susținerea dezvoltatorului.",
-  "reportBug": "Raportează eroare / Sugerează funcție",
   "reportThisIssue": "Raportați această problemă",
   "reportAlreadySent": "Ați raportat deja această problemă.",
   "reportConsentTitle": "Raportați pe GitHub?",
@@ -136,7 +107,6 @@
   "configApiKeysSection": "Chei API",
   "configTankerkoenigKey": "Cheie API Tankerkoenig",
   "configApiKeyConfigured": "Configurată",
-  "configApiKeyNotSet": "Neconfigurată (mod demo)",
   "configApiKeyCommunity": "Implicită (cheie comunitate)",
   "searchLocationPlaceholder": "Adresă, cod poștal sau oraș",
   "configEvKey": "Cheie API stații EV",
@@ -174,8 +144,6 @@
   "sortPriceDistance": "Preț/km",
   "cheap": "ieftin",
   "expensive": "scump",
-  "stationsOnMap": "{count} benzinării",
-  "loadingFavorites": "Se încarcă favoritele...\nCăutați benzinării mai întâi pentru a salva date.",
   "reportPrice": "Raportează preț",
   "whatsWrong": "Ce nu este corect?",
   "correctPrice": "Preț corect (ex. 1,459)",
@@ -185,7 +153,6 @@
   "cacheCleared": "Cache golit.",
   "yourPosition": "Poziția dvs.",
   "positionUnknown": "Poziție necunoscută",
-  "routeModeBannerLabel": "Mod rută — distanțele sunt de-a lungul coridorului",
   "distancesFromCenter": "Distanțe de la centrul căutării",
   "autoUpdatePosition": "Actualizare automată a poziției",
   "autoUpdateDescription": "Actualizează poziția GPS înainte de fiecare căutare",
@@ -220,8 +187,6 @@
   "wrongDieselPrice": "Preț Diesel incorect",
   "wrongStatusOpen": "Afișat ca deschis, dar închis",
   "wrongStatusClosed": "Afișat ca închis, dar deschis",
-  "searchAlongRouteLabel": "De-a lungul rutei",
-  "searchEvStations": "Caută stații de încărcare",
   "allStations": "Toate stațiile",
   "bestStops": "Cele mai bune opriri",
   "openInMaps": "Deschide în Hărți",
@@ -253,7 +218,6 @@
   "cityOrAddress": "Oraș sau adresă",
   "useGps": "Folosește GPS",
   "stop": "Oprire",
-  "stopN": "Oprire {n}",
   "addStop": "Adaugă oprire",
   "searchAlongRoute": "Caută de-a lungul rutei",
   "cheapest": "Cea mai ieftină",
@@ -265,10 +229,8 @@
   "customKey": "Cheie personalizată",
   "appDefaultKey": "Cheie implicită a aplicației",
   "optionalOverrideKey": "Opțional: înlocuiți cheia încorporată cu a dvs.",
-  "requiredForEvSearch": "Necesar pentru căutarea stațiilor de încărcare EV",
   "edit": "Editare",
   "fuelPricesApiKey": "Cheie API prețuri carburanți",
-  "tankerkoenigApiKey": "Cheie API Tankerkoenig",
   "evChargingApiKey": "Cheie API încărcare EV",
   "openChargeMapApiKey": "Cheie API OpenChargeMap",
   "routePlanningSection": "Planificarea rutei",
@@ -303,18 +265,14 @@
   "noStationsAlongThisRoute": "Nu s-au găsit stații de-a lungul acestei rute.",
   "fuelCostCalculator": "Calculator cost carburant",
   "distanceKm": "Distanță (km)",
-  "consumptionL100km": "Consum (L/100km)",
-  "fuelPriceEurL": "Preț carburant (EUR/L)",
   "tripCost": "Costul călătoriei",
   "fuelNeeded": "Carburant necesar",
   "totalCost": "Cost total",
-  "enterCalcValues": "Introduceți distanța, consumul și prețul pentru a calcula costul călătoriei",
   "priceHistory": "Istoric prețuri",
   "ignoredStationsLabel": "Ignorate",
   "ratingsLabel": "Evaluări",
   "favoritesDataCache": "Date favorite",
   "citySearchCache": "Căutare oraș",
-  "dataDeletionNotAvailableCommunity": "Ștergerea datelor nu este disponibilă în modul Comunitate. Deconectați-vă mai întâi sau utilizați o bază de date privată.",
   "priceHistoryStationsTracked": "{count} stații urmărite",
   "@priceHistoryStationsTracked": {
     "placeholders": {
@@ -348,22 +306,11 @@
     }
   },
   "noPriceHistory": "Încă nu există istoric de prețuri",
-  "noHourlyData": "Fără date orare",
   "noStatistics": "Nu sunt statistici disponibile",
-  "statMin": "Min",
-  "statMax": "Max",
-  "statAvg": "Med",
   "showAllFuelTypes": "Arată toate tipurile de carburant",
   "connected": "Conectat",
-  "notConnected": "Neconectat",
-  "connectTankSync": "Conectare TankSync",
   "disconnectTankSync": "Deconectare TankSync",
   "viewMyData": "Vezi datele mele",
-  "optionalCloudSync": "Sincronizare cloud opțională pentru alerte, favorite și notificări push",
-  "tapToUpdateGps": "Atingeți pentru a actualiza poziția GPS",
-  "gpsAutoUpdateHint": "Poziția GPS este obținută automat la căutare. O puteți actualiza și manual aici.",
-  "clearGpsConfirm": "Ștergeți poziția GPS stocată? O puteți actualiza oricând.",
-  "pageNotFound": "Pagină negăsită",
   "deleteAllServerData": "Șterge toate datele de pe server",
   "deleteServerDataConfirm": "Ștergeți toate datele de pe server?",
   "deleteEverything": "Șterge tot",
@@ -373,7 +320,6 @@
   "forgetAllSyncedTripsConfirmBody": "Fiecare rezumat de călătorie și blob de detalii va fi eliminat de pe server. Istoricul local al călătoriilor de pe acest dispozitiv nu va fi afectat.\n\nAceastă acțiune nu poate fi anulată.",
   "forgetAllSyncedTripsConfirmAction": "Ștergeți toate",
   "forgetAllSyncedTripsSuccess": "Toate călătoriile sincronizate au fost eliminate de pe server",
-  "disconnectConfirm": "Deconectați TankSync?",
   "disconnect": "Deconectare",
   "myServerData": "Datele mele de pe server",
   "anonymousUuid": "UUID anonim",
@@ -393,7 +339,6 @@
   "continueAsGuest": "Continuați ca oaspete",
   "createAccount": "Creați cont",
   "signIn": "Conectați-vă",
-  "upgradeToEmail": "Creați cont cu email",
   "savedRoutes": "Rute salvate",
   "noSavedRoutes": "Nicio rută salvată",
   "noSavedRoutesHint": "Căutați de-a lungul unei rute și salvați-o pentru acces rapid ulterior.",
@@ -424,11 +369,6 @@
   "onboardingNext": "Înainte",
   "onboardingSkip": "Omiteți",
   "onboardingFinish": "Începeți",
-  "crossBorderNearby": "{country} este în apropiere",
-  "crossBorderDistance": "~{km} km până la frontieră",
-  "crossBorderAvgPrice": "Medie aici: {price} EUR ({count} stații)",
-  "allPricesView": "Toate prețurile",
-  "compactView": "Compact",
   "switchToAllPricesView": "Comutați la vizualizarea tuturor prețurilor",
   "switchToCompactView": "Comutați la vizualizarea compactă",
   "unavailable": "N/D",
@@ -453,10 +393,6 @@
   "accountDeleted": "Contul a fost șters. Datele locale păstrate.",
   "switchedToAnonymous": "Trecut la sesiune anonimă",
   "failedToSwitch": "Comutarea a eșuat: {error}",
-  "topicUrlCopied": "URL-ul temei copiat",
-  "testNotificationSent": "Notificare de test trimisă!",
-  "testNotificationFailed": "Trimiterea notificării de test a eșuat",
-  "pushUpdateFailed": "Actualizarea setării de notificare push a eșuat",
   "connectedAsGuest": "Conectat ca oaspete",
   "accountCreated": "Contul a fost creat!",
   "signedIn": "Conectat!",
@@ -518,7 +454,6 @@
   "privacyClearErrorLog": "Șterge jurnalul de erori",
   "privacyErrorLogCleared": "Jurnalul de erori a fost șters",
   "privacyDeleteButton": "Ștergeți toate datele",
-  "privacyCopyErrorLog": "Copiați jurnalul de erori în clipboard ({count})",
   "privacyDeleteTitle": "Ștergeți toate datele?",
   "privacyDeleteBody": "Aceasta va șterge permanent:\n\n- Toate favoritele și datele stațiilor\n- Toate profilurile de căutare\n- Toate alertele de prețuri\n- Tot istoricul prețurilor\n- Toate datele din cache\n- Cheia dvs. API\n- Toate setările aplicației\n\nAplicația se va reseta la starea inițială. Această acțiune nu poate fi anulată.",
   "privacyDeleteConfirm": "Ștergeți totul",
@@ -553,15 +488,8 @@
   "voiceAnnouncementsTitle": "Anunțuri vocale",
   "voiceAnnouncementsDescription": "Anunță stații ieftine din apropiere în timp ce conduceți",
   "voiceAnnouncementsEnabled": "Activați anunțurile vocale",
-  "voiceAnnouncementThreshold": "Doar sub {price}",
-  "voiceAnnouncementCheapFuel": "{station}, la {distance} kilometri înainte, {fuelType} {price}",
   "voiceAnnouncementProximityRadius": "Raza de anunț",
   "voiceAnnouncementCooldown": "Interval de repetare",
-  "nearestStations": "Cele mai apropiate statii",
-  "nearestStationsHint": "Gasiti cele mai apropiate statii cu locatia dvs. actuala",
-  "consumptionLogTitle": "Consum combustibil",
-  "consumptionLogMenuTitle": "Jurnal consum",
-  "consumptionLogMenuSubtitle": "Urmăriți alimentările și calculați L/100km",
   "consumptionStatsTitle": "Statistici consum",
   "addFillUp": "Adăugați alimentare",
   "noFillUpsTitle": "Nicio alimentare încă",
@@ -595,14 +523,12 @@
   "vehiclesWizardYoursList": "Aveți {count, plural, =1{1 vehicul} other{{count} vehicule}}:",
   "vehiclesWizardSkipHint": "Omiteți pentru a finaliza configurarea — puteți adăuga vehicule oricând din Setări.",
   "fillUpVehicleLabel": "Vehicul",
-  "fillUpVehicleNone": "Niciun vehicul",
   "fillUpVehicleRequired": "Vehiculul este obligatoriu",
   "reportScanError": "Raportați eroare de scanare",
   "pickStationTitle": "Alegeți o stație",
   "pickStationHelper": "Porniți alimentarea de la o stație cunoscută pentru a completa automat prețurile, marca și tipul de combustibil.",
   "pickStationEmpty": "Nicio stație favorită încă — adăugați din Căutare sau Favorite sau omiteți și completați manual.",
   "pickStationSkip": "Omiteți — adăugați fără stație",
-  "scanPump": "Scanați pompa",
   "scanPayment": "Scanați QR de plată",
   "qrPaymentBeneficiary": "Beneficiar",
   "qrPaymentAmount": "Suma",
@@ -624,17 +550,10 @@
   "qrScannerRetry": "Încercați din nou",
   "torchOn": "Activați blițul",
   "torchOff": "Dezactivați blițul",
-  "obdNoAdapter": "Niciun adaptor OBD2 în rază",
-  "obdOdometerUnavailable": "Nu s-a putut citi odometrul",
   "obdPermissionDenied": "Acordați permisiunea Bluetooth în setările sistemului",
-  "obdAdapterUnresponsive": "Adaptorul nu a răspuns — porniți contactul și reîncercați",
   "obdPickerTitle": "Alegeți un adaptor OBD2",
   "obdPickerScanning": "Se caută adaptoare…",
   "obdPickerConnecting": "Se conectează…",
-  "themeSettingTitle": "Temă",
-  "themeModeLight": "Luminos",
-  "themeModeDark": "Întunecat",
-  "themeModeSystem": "Urmați sistemul",
   "tripRecordingTitle": "Se înregistrează călătoria",
   "tripSummaryTitle": "Rezumat călătorie",
   "tripMetricDistance": "Distanță",
@@ -676,18 +595,13 @@
   "syncBaselinesToggleTitle": "Partajați profilurile vehiculelor învățate",
   "syncBaselinesToggleSubtitle": "Încărcați referințele de consum per vehicul pentru a le reutiliza pe un al doilea dispozitiv.",
   "obd2StatusConnected": "Adaptor OBD2: conectat",
-  "obd2StatusAttempting": "Adaptor OBD2: se conectează",
-  "obd2StatusUnreachable": "Adaptor OBD2: inaccesibil",
   "obd2StatusPermissionDenied": "Adaptor OBD2: permisiune Bluetooth necesară",
   "obd2StatusConnectedBody": "Gata pentru înregistrarea unei călătorii.",
-  "obd2StatusAttemptingBody": "Se conectează în fundal…",
-  "obd2StatusUnreachableBody": "Adaptorul este în afara razei sau deja utilizat de o altă aplicație.",
   "obd2StatusPermissionDeniedBody": "Acordați permisiunea Bluetooth în setările sistemului pentru a vă reconecta automat.",
   "obd2StatusNoAdapter": "Niciun adaptor asociat",
   "obd2StatusForget": "Uitați adaptorul",
   "tripHistoryTitle": "Istoricul călătoriilor",
   "tripHistoryEmptyTitle": "Nicio călătorie încă",
-  "tripHistoryEmptySubtitle": "Conectați un adaptor OBD2 și înregistrați o călătorie pentru a începe istoricul de condus.",
   "tripHistoryUnknownDate": "Dată necunoscută",
   "situationIdle": "Ralanti",
   "situationStopAndGo": "Stop & Go",
@@ -697,12 +611,8 @@
   "situationClimbing": "Urcare / încărcat",
   "situationHardAccel": "Accelerare bruscă",
   "situationFuelCut": "Tăiere combustibil — inerție",
-  "tripSaveAsFillUp": "Salvați ca alimentare",
   "tripSaveRecording": "Salvați călătoria",
-  "tripDiscard": "Renunțați",
-  "obdOdometerRead": "Odometru citit: {km} km",
   "vehicleFuelNotSet": "Nesetat",
-  "wizardVehicleTapToEdit": "Apăsați pentru a edita",
   "wizardVehicleDefaultBadge": "Implicit",
   "wizardProfileChoiceHint": "Alegeți cum doriți să utilizați aplicația. Puteți modifica aceasta mai târziu din Setări.",
   "wizardProfileChoiceFooter": "Puteți schimba oricând alegerea din Setări → Mod de utilizare.",
@@ -713,7 +623,6 @@
   "wizardProfileFullName": "Complet",
   "wizardProfileFullDescription": "Tot din Mediu, plus înregistrarea automată a călătoriilor OBD2, scoruri de condus și carduri de fidelitate.",
   "wizardProfileCustomName": "Personalizat",
-  "wizardProfileCustomDescription": "Propria combinație de funcționalități. Ajustați fiecare comutator mai jos.",
   "useModeSectionHint": "Adaptați aplicația la modul în care o utilizați efectiv. Alegând un preset se activează setul corespunzător de funcționalități.",
   "useModeCustomSettingsDescription": "Combinația dvs. de funcționalități nu corespunde niciunui preset. Alegeți unul de mai sus pentru a suprascrie sau continuați personalizarea funcționalităților individuale în secțiunea de mai jos.",
   "useModeSwitchedSnack": "Modul de utilizare setat la {profile}.",
@@ -751,20 +660,15 @@
   "evShowOnMap": "Afișați stații EV",
   "evAvailableOnly": "Numai disponibile",
   "evMinPower": "Putere minimă",
-  "evMaxPower": "Putere maximă",
-  "evOperator": "Operator",
-  "evLastUpdate": "Ultima actualizare",
   "evStatusAvailable": "Disponibil",
   "evStatusOccupied": "Ocupat",
   "evStatusOutOfOrder": "Defect",
   "openOnlyFilter": "Numai deschise",
   "saveAsDefaults": "Salvați ca setări implicite",
   "criteriaSavedToProfile": "Salvat ca setări implicite",
-  "profileNotFound": "Niciun profil activ",
   "updatingFavorites": "Se actualizează favoritele...",
   "fetchingLatestPrices": "Se preiau cele mai recente prețuri",
   "noDataAvailable": "Fără date",
-  "configAndPrivacy": "Configurare și confidențialitate",
   "searchToSeeMap": "Căutați pentru a vedea stațiile pe hartă",
   "evPowerAny": "Oricare",
   "evPowerKw": "{kw} kW+",
@@ -819,9 +723,6 @@
   "iosAutoRecordOnboardingBullet3Title": "Când iOS cere locație \"Întotdeauna\", vă rugăm să spuneți da.",
   "iosAutoRecordOnboardingBullet3Body": "Mecanismul de rezervă care înregistrează călătoria când adaptorul OBD2 este lent necesită locație în fundal. Nu o partajăm niciodată.",
   "scanReceipt": "Scanați bonul",
-  "obdConnect": "OBD-II",
-  "stationTypeFuel": "Combustibil",
-  "stationTypeEv": "EV",
   "brandFilterHighway": "Autostradă",
   "ratingModeLocal": "Local",
   "ratingModePrivate": "Privat",
@@ -841,7 +742,6 @@
   "errorHintRouting": "Calculul rutei a eșuat. Verificați conexiunea la internet și încercați din nou.",
   "errorHintFallback": "Încercați din nou sau căutați după cod poștal / nume de oraș.",
   "alertsLoadErrorTitle": "Nu s-au putut încărca alertele",
-  "alertsBackgroundCheckErrorTitle": "Verificarea alertei în fundal a eșuat",
   "detailsLabel": "Detalii",
   "remove": "Eliminați",
   "showKey": "Afișați cheia",
@@ -950,19 +850,11 @@
   "linkDeviceHowItWorksBody": "1. Pe Dispozitivul A: copiați codul dispozitivului de mai sus\n2. Pe Dispozitivul B: lipiți-l în câmpul \"Codul dispozitivului\"\n3. Apăsați \"Importați datele\" pentru a combina favoritele, alertele, vehiculele și jurnalele de consum\n4. Ambele dispozitive vor avea toate datele combinate\n\nFiecare dispozitiv își păstrează propria identitate anonimă și propriul profil (combustibil preferat, vehicul implicit, ecran de start). Datele sunt combinate, nu mutate.",
   "vehicleSetActive": "Setați ca activ",
   "swipeHide": "Ascundeți",
-  "evChargingSection": "Încărcare EV",
-  "fuelStationsSection": "Stații de combustibil",
   "yourRating": "Evaluarea dvs.",
   "noStorageUsed": "Niciun spațiu utilizat",
   "aboutReportBug": "Raportați un bug / Sugerați o funcționalitate",
   "aboutSupportProject": "Susțineți acest proiect",
   "aboutSupportDescription": "Această aplicație este gratuită, open source și fără reclame. Dacă o găsiți utilă, luați în considerare susținerea dezvoltatorului.",
-  "luxembourgRegulatedPricesNotice": "Prețurile combustibililor din Luxembourg sunt reglementate de guvern și uniforme la nivel național.",
-  "luxembourgFuelUnleaded95": "Fără plumb 95",
-  "luxembourgFuelUnleaded98": "Fără plumb 98",
-  "luxembourgFuelDiesel": "Motorină",
-  "luxembourgFuelLpg": "LPG",
-  "luxembourgPricesUnavailable": "Prețurile reglementate din Luxembourg sunt indisponibile.",
   "reportIssueTitle": "Raportați o problemă",
   "enterCorrection": "Introduceți corecția",
   "reportNoBackendAvailable": "Raportul nu a putut fi trimis: nu este configurat niciun serviciu de raportare pentru această țară. Activați TankSync în Setări pentru a trimite rapoarte comunității.",
@@ -989,10 +881,6 @@
   "serviceReminderMarkDone": "Marcați ca efectuat",
   "serviceReminderDueTitle": "Service scadent",
   "serviceReminderDueBody": "{label} este scadent — {kmOver} km peste interval.",
-  "southKoreaApiKeyRequired": "Înregistrați-vă la OPINET pentru a obține o cheie API gratuită",
-  "southKoreaApiProvider": "OPINET (KNOC)",
-  "chileApiKeyRequired": "Înregistrați-vă la CNE pentru a obține o cheie API gratuită",
-  "chileApiProvider": "CNE Bencina en Linea",
   "vinConfirmTitle": "Aceasta este mașina dvs.?",
   "vinConfirmBody": "{year} {make} {model} — {displacement}L, {cylinders} cilindri, {fuel}",
   "vinPartialInfoNote": "Informații parțiale (offline). Puteți edita mai jos.",
@@ -1011,17 +899,13 @@
   "alertsRadiusCreateTitle": "Creați alertă de rază",
   "alertsRadiusLabelHint": "Etichetă (ex. Motorină acasă)",
   "alertsRadiusFuelType": "Tip combustibil",
-  "alertsRadiusThreshold": "Prag (€/L)",
   "alertsRadiusKm": "Rază (km)",
   "alertsRadiusCenterGps": "Utilizați locația mea",
   "alertsRadiusCenterPostalCode": "Cod poștal",
   "alertsRadiusSave": "Salvați",
   "alertsRadiusCancel": "Anulare",
-  "alertsRadiusDeleteConfirm": "Ștergeți alerta de rază?",
   "obd2ConnectedTooltip": "OBD2 conectat: {adapterName}",
   "obd2PairChipTooltip": "Asociați un adaptor OBD2",
-  "velocityAlertTitle": "{fuelLabel} a scăzut la stații din apropiere",
-  "velocityAlertBody": "{stationCount} stații au scăzut cu până la {maxDropCents}¢ în ultima oră",
   "fillUpSavedSnackbar": "Alimentare salvată",
   "radiusAlertsEntryTitle": "Alerte de rază și statistici",
   "radiusAlertsEntrySubtitle": "Fiți notificat când prețurile scad în zona dvs.",
@@ -1060,8 +944,6 @@
   "autoRecordStatusPairAdapterCta": "Asociați un adaptor",
   "autoRecordSpeedThresholdLabel": "Viteză de pornire (km/h)",
   "autoRecordSaveDelayLabel": "Întârziere salvare după deconectare (secunde)",
-  "autoRecordPairedAdapterLabel": "Adaptor asociat",
-  "autoRecordPairedAdapterNone": "Niciun adaptor asociat. Asociați unul mai întâi prin configurarea OBD2.",
   "autoRecordBackgroundLocationLabel": "Locație în fundal permisă",
   "autoRecordBackgroundLocationRequest": "Solicitați permisiunea",
   "autoRecordBackgroundLocationRationaleTitle": "De ce \"Permite întotdeauna\"?",
@@ -1069,18 +951,12 @@
   "autoRecordBackgroundLocationOpenSettings": "Deschideți setările",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Permisiunea de locație este necesară",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Nu s-a putut solicita locația în fundal",
-  "autoRecordBadgeClearTooltip": "Resetați contorul",
   "autoRecordPairAdapterLinkText": "Asociați un adaptor în secțiunea de mai jos pentru a activa înregistrarea automată",
-  "exportBackupTooltip": "Exportați backup",
   "exportBackupReady": "Backup gata — alegeți destinația",
   "exportBackupFailed": "Exportul backup-ului a eșuat — vă rugăm să încercați din nou",
-  "brokenMapChipVerifying": "Se verifică senzorul MAP…",
   "brokenMapChipDisclaimer": "Citiri MAP suspecte",
   "brokenMapSnackbarUnreliable": "Senzorul MAP citește incorect — citirile de combustibil pot fi cu 50–80% prea mici. Încercați un adaptor diferit.",
   "brokenMapBannerHardDisable": "Senzorul MAP este nesigur. Se afișează mediile de alimentare în loc de debitul live de combustibil.",
-  "brokenMapOverlayVerified": "Senzor MAP: verificat ({confidence})",
-  "brokenMapOverlayUnverified": "Senzor MAP: se verifică ({confidence})",
-  "brokenMapOverlaySuspicious": "Senzor MAP: suspect ({confidence})",
   "brokenMapOverlayPosterior": "Senzor MAP: {posterior}% ± {margin}%",
   "brokenMapOverlayPosteriorVerified": "Senzor MAP: {posterior}% ± {margin}% (verificat)",
   "brokenMapDiagnosticsCardTitle": "Diagnostice senzor MAP",
@@ -1142,7 +1018,6 @@
   "chargingCostTrendTitle": "Tendința costului de încărcare",
   "chargingEfficiencyTitle": "Eficiență (kWh/100 km)",
   "chargingChartsEmpty": "Date insuficiente încă",
-  "chargingChartsMonthAxis": "Luna",
   "consoFeatureGroupTitle": "Conso",
   "consoFeatureGroupDescription": "Urmăriți consumul — alimentări manuale sau înregistrare automată de călătorii OBD2.",
   "consoModeOff": "Oprit",
@@ -1158,10 +1033,6 @@
   "fillUpCorrectionEditExplainer": "Această intrare a fost generată automat pentru a închide diferența dintre călătoriile înregistrate și combustibilul pompat. Ajustați valorile dacă cunoașteți cifrele reale.",
   "fillUpCorrectionDelete": "Ștergeți corecția",
   "fillUpCorrectionStation": "Nume stație (opțional)",
-  "greeceApiProvider": "Paratiritirio Timon (Grecia)",
-  "greeceCommunityApiNotice": "Alimentat de API-ul fuelpricesgr întreținut de comunitate",
-  "romaniaApiProvider": "Monitorul Prețurilor (România)",
-  "romaniaScrapingNotice": "Alimentat de monitorulpreturilor.info (Consiliul Concurenței + ANPC)",
   "crossBorderCheaper": "Stații în {country} la {km} km distanță — cu €{price}/L mai ieftin",
   "crossBorderTapToSwitch": "Apăsați pentru a schimba țara",
   "crossBorderDismissTooltip": "Respingeți",
@@ -1186,9 +1057,6 @@
   "drivingScorePenaltyHardBrake": "Frânări bruște",
   "drivingScorePenaltyHighRpm": "RPM ridicat",
   "drivingScorePenaltyFullThrottle": "Accelerator la maxim",
-  "ecoRouteOption": "Eco",
-  "ecoRouteSavings": "≈ {liters} L economisiți",
-  "ecoRouteHint": "Condus mai inteligent — favorizează autostrada constantă față de scurtăturile în zigzag.",
   "favoritesShareAction": "Partajați",
   "favoritesShareSubject": "Sparkilo — favorite din {date}",
   "favoritesShareError": "Nu s-a putut genera imaginea de partajare",
@@ -1206,8 +1074,6 @@
   "featureDescription_consumptionAnalytics": "Fila de analiză a alimentărilor și călătoriilor.",
   "featureLabel_baselineSync": "Sincronizare referință",
   "featureDescription_baselineSync": "Sincronizați referințele de condus prin TankSync.",
-  "featureLabel_unifiedSearchResults": "Rezultate de căutare unificate",
-  "featureDescription_unifiedSearchResults": "Listă unică de rezultate combinând stații de combustibil și EV.",
   "featureLabel_priceAlerts": "Alerte de prețuri",
   "featureDescription_priceAlerts": "Notificări de scădere a prețului bazate pe prag.",
   "featureLabel_priceHistory": "Istoricul prețurilor",
@@ -1235,8 +1101,6 @@
   "featureBlockedEnable_glideCoach": "Activați mai întâi înregistrarea călătoriilor OBD2",
   "featureBlockedEnable_gpsTripPath": "Activați mai întâi înregistrarea călătoriilor OBD2",
   "featureBlockedEnable_autoRecord": "Activați mai întâi înregistrarea călătoriilor OBD2",
-  "featureBlockedEnable_showFuel": "Condiții prealabile neîndeplinite",
-  "featureBlockedEnable_showElectric": "Condiții prealabile neîndeplinite",
   "featureBlockedEnable_showConsumptionTab": "Activați mai întâi înregistrarea călătoriilor OBD2",
   "featureLabel_tflitePricePrediction": "Predicție prețuri TFLite",
   "featureDescription_tflitePricePrediction": "Model de prognoză a prețurilor pe dispozitiv — inferența rulează local; funcționalitățile și predicțiile nu părăsesc niciodată dispozitivul.",
@@ -1281,15 +1145,12 @@
   "scanReceiptNoData": "Nicio dată găsită pe bon — încercați din nou",
   "scanReceiptSuccess": "Bon scanat — verificați valorile. Apăsați \"Raportați eroare de scanare\" mai jos dacă ceva este greșit.",
   "scanReceiptFailed": "Scanarea a eșuat: {error}",
-  "scanPumpUnreadable": "Afișajul pompei nu poate fi citit — încercați din nou",
-  "pumpCameraHint": "Aliniază cele trei cifre de pe afișajul pompei în interiorul cadrului",
   "pumpCameraCapture": "Capturează",
   "pumpCameraPermissionDenied": "Accesul la cameră este necesar pentru a scana afișajul pompei. Activează-l în setările dispozitivului.",
   "pumpCameraError": "Camera nu a putut porni. Încearcă din nou sau introdu valorile manual.",
   "scanPumpSuccess": "Afișajul pompei scanat — verificați valorile.",
   "scanPumpGlare": "Prea multă strălucire pe afișaj — încearcă din nou dintr-un unghi ușor, astfel încât cifrele să nu fie estompate.",
   "scanPumpFailed": "Scanarea pompei a eșuat: {error}",
-  "badScanReportTitle": "Raportați o eroare de scanare",
   "badScanReportTitleReceipt": "Raportați o eroare de scanare — Bon",
   "badScanReportTitlePumpDisplay": "Raportați o eroare de scanare — Afișaj pompă",
   "pumpScanFailureTitle": "Afișaj necitibil",
@@ -1298,7 +1159,6 @@
   "pumpScanFailureReport": "Raportați",
   "pumpScanFailureRemove": "Eliminați fotografia",
   "badScanReportHint": "Vom partaja fotografia bonului și ambele seturi de valori pentru ca viitoarea versiune să poată învăța acest format.",
-  "badScanReportShareAction": "Partajați raportul + fotografia",
   "badScanReportFieldBrandLayout": "Format brand",
   "badScanReportFieldTotal": "Total",
   "badScanReportFieldPricePerLiter": "Preț/L",
@@ -1315,16 +1175,9 @@
   "fillUpSectionWhatSubtitle": "Combustibil, cantitate, preț",
   "fillUpSectionWhereTitle": "Unde erați",
   "fillUpSectionWhereSubtitle": "Stație, odometru, note",
-  "fillUpImportFromLabel": "Importați din…",
-  "fillUpImportSheetTitle": "Importați date de alimentare",
   "fillUpImportReceiptLabel": "Bon",
-  "fillUpImportReceiptDescription": "Scanați un bon de hârtie cu camera",
   "fillUpImportPumpLabel": "Afișaj pompă",
-  "fillUpImportPumpDescription": "Citiți Betrag / Preis de pe LCD-ul pompei",
-  "fillUpImportObdLabel": "Adaptor OBD-II",
-  "fillUpImportObdDescription": "Citiți odometrul de la portul OBD-II prin Bluetooth",
   "fillUpPricePerLiterLabel": "Preț per litru",
-  "vehicleHeaderPlateLabel": "Număr",
   "vehicleHeaderUntitled": "Vehicul nou",
   "vehicleSectionIdentityTitle": "Identitate",
   "vehicleSectionIdentitySubtitle": "Nume și VIN",
@@ -1340,7 +1193,6 @@
   "gpsDiagnosticsHeader": "{count} eșantioane · {span} · {gaps, plural, =0{fără întreruperi} =1{1 întrerupere} other{{gaps} întreruperi}}",
   "gpsDiagnosticsCadence": "Interval mediu: {ms} ms",
   "gpsDiagnosticsExplain": "Capturat în timpul înregistrării pentru a verifica cadența GPS în timpul somnului telefonului.",
-  "hapticEcoCoachSectionTitle": "Condus",
   "hapticEcoCoachSettingTitle": "Coaching eco în timp real",
   "hapticEcoCoachSettingSubtitle": "Feedback haptic blând + sfat pe ecran când apăsați acceleratorul în croazieră",
   "hapticEcoCoachSnackBarMessage": "Ușor cu acceleratorul — inerția economisește mai mult",
@@ -1370,9 +1222,6 @@
   "calculatorDistanceHint": "ex. 150",
   "calculatorConsumptionHint": "ex. 7.0",
   "calculatorPriceHint": "ex. 1.899",
-  "routeStrategyLabel": "Strategie:",
-  "routeStrategyUniform": "Uniformă",
-  "routeStrategyBalanced": "Echilibrată",
   "glideCoachBetaTitle": "Glide-coach beta (experimental)",
   "glideCoachBetaSubtitle": "Feedback haptic subtil la decelerare înainte de semafor roșu. Dezactivat implicit — risc de distragere.",
   "consentSyncTripsTitle": "Sincronizați înregistrările de călătorii",
@@ -1428,7 +1277,6 @@
   "onboardingObd2ConnectButton": "Conectați adaptorul",
   "onboardingObd2SkipButton": "Poate mai târziu",
   "onboardingObd2ReadingVin": "Se citește VIN-ul…",
-  "onboardingObd2VinReadFailed": "Nu s-a putut citi VIN-ul — introduceți manual",
   "onboardingObd2ConnectFailed": "Nu s-a putut conecta la adaptor. Puteți reîncerca sau omite.",
   "onboardingPickUseMode": "Alegeți un mod de utilizare pentru a continua.",
   "alertsRadiusFrequencyLabel": "Frecvența verificărilor",
@@ -1442,9 +1290,6 @@
   "radiusAlertMapPickerCancel": "Anulare",
   "radiusAlertMapPickerHint": "Trageți harta pentru a poziționa centrul alertei",
   "radiusAlertCenterFromMap": "Locație pe hartă",
-  "radiusAlertNotificationTitle": "{fuelLabel} lângă {label}",
-  "radiusAlertNotificationBody": "O stație are prețul {price} € (țintă: {threshold} €)",
-  "refuelUnitPerLiter": "/L",
   "refuelUnitPerKwh": "/kWh",
   "refuelUnitPerSession": "/sesiune",
   "speedConsumptionCardTitle": "Consum pe viteză",
@@ -1463,9 +1308,6 @@
   "tankLevelLitersFormat": "{litres} L",
   "tankLevelRangeFormat": "≈ {kilometres} km autonomie",
   "tankLevelLastFillUpFormat": "Ultima alimentare: {date} · {count} călătorie(călătorii) de atunci",
-  "tankLevelMethodObd2": "Măsurat OBD2",
-  "tankLevelMethodDistanceFallback": "estimare bazată pe distanță",
-  "tankLevelMethodMixed": "măsurătoare mixtă",
   "tankLevelEmptyNoFillUp": "Înregistrați o alimentare pentru a vedea nivelul rezervorului",
   "tankLevelDetailSheetTitle": "Călătorii de la ultima alimentare",
   "addFillUpIsFullTankLabel": "Rezervor plin",
@@ -1536,7 +1378,6 @@
   "trajetDetailDeleteAction": "Ștergeți",
   "trajetDetailDeleteConfirmTitle": "Ștergeți această călătorie?",
   "trajetDetailDeleteConfirmBody": "Această călătorie va fi eliminată permanent din istoricul dvs.",
-  "trajetDetailDeleteConfirmCancel": "Anulare",
   "trajetDetailDeleteConfirmConfirm": "Ștergeți",
   "tripRecordingObd2NotResponding": "Adaptorul OBD2 este conectat dar nu returnează date. Încercați un adaptor diferit sau verificați protocolul de diagnosticare al vehiculului.",
   "trajetsViewAllOnMap": "Vezi toate pe hartă",
@@ -1552,7 +1393,6 @@
   "tripLengthBucketTripCount": "{count, plural, =0{nicio călătorie} one{1 călătorie} other{{count} călătorii}}",
   "tripPathCardTitle": "Traseul călătoriei",
   "tripPathCardSubtitle": "Rută înregistrată GPS",
-  "tripPathLegendTitle": "Consum",
   "tripPathLegendEfficient": "Eficient (< 6 L/100km)",
   "tripPathLegendBorderline": "La limită (6–10 L/100km)",
   "tripPathLegendWasteful": "Risipitor (≥ 10 L/100km)",
@@ -1563,13 +1403,8 @@
   "tripRecordingPinHelpTitle": "Despre fixare",
   "tripRecordingPinHelpBody": "Fixarea menține ecranul aprins și ascunde barele sistemului pentru ca formularul să rămână lizibil pe un suport de bord. Apăsați din nou pentru a elibera. Se eliberează automat când călătoria se oprește.",
   "tripRecordingResumeHintMessage": "Înregistrarea continuă în fundal. Apăsați bannerul roșu din partea de sus a oricărui ecran pentru a reveni.",
-  "tripBannerOpenFromConsumptionTab": "Deschideți călătoria activă din fila Conso",
   "tripRecordingUnpinnedWarning": "Fixați ecranul pentru a menține GPS-ul activ în timpul călătoriei — Android poate reduce GPS-ul în somn.",
   "tripRecordingMinimiseTooltip": "Minimizează într-o casetă flotantă",
-  "unifiedFilterFuel": "Combustibil",
-  "unifiedFilterEv": "EV",
-  "unifiedFilterBoth": "Ambele",
-  "unifiedNoResultsForFilter": "Niciun rezultat pentru acest filtru",
   "searchFailedSnackbar": "Căutarea a eșuat — vă rugăm să încercați din nou",
   "vinLabel": "VIN (opțional)",
   "vinDecodeTooltip": "Decodați VIN",
@@ -1601,7 +1436,6 @@
   "gdprVinOnlineDecodeTitle": "Decodare VIN online",
   "gdprVinOnlineDecodeShort": "Decodați VIN-ul prin serviciul public gratuit NHTSA",
   "gdprVinOnlineDecodeDescription": "Când asociați un adaptor, VIN-ul vehiculului dvs. este citit local pentru a identifica mașina. Activarea acestei opțiuni trimite VIN-ul de 17 caractere la serviciul gratuit vPIC al NHTSA pentru a obține detalii suplimentare (model, cilindree, tip combustibil). VIN-ul este singurul dat trimis — nicio altă informație nu părăsește dispozitivul.",
-  "vehicleDetectedFromVinBadge": "(detectat)",
   "vehicleDetectedFromVinSnackbar": "Detectat din VIN: {summary}. Aplicați?",
   "vehicleDetectedFromVinApply": "Aplicați",
   "widgetHelpSectionTitle": "Widget ecran principal",
@@ -1620,7 +1454,6 @@
   "widgetColorSchemeOrange": "Portocaliu",
   "widgetVariantDefault": "Numai prețul curent",
   "widgetVariantPredictive": "Predictiv: cel mai bun moment pentru alimentare",
-  "widgetPredictiveNowPrefix": "acum",
   "@distance": {
     "placeholders": {
       "distance": {
@@ -1645,13 +1478,6 @@
   "@hours": {
     "placeholders": {
       "n": {
-        "type": "int"
-      }
-    }
-  },
-  "@stationsOnMap": {
-    "placeholders": {
-      "count": {
         "type": "int"
       }
     }
@@ -1700,13 +1526,6 @@
   "@evConnectors": {
     "placeholders": {
       "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@stopN": {
-    "placeholders": {
-      "n": {
         "type": "int"
       }
     }
@@ -1850,25 +1669,11 @@
       }
     }
   },
-  "approachStationDistance": "la {meters} m",
-  "@approachStationDistance": {
-    "description": "PiP overlay caption (#2084) showing how far the driver is from the in-radius target station, in metres.",
-    "placeholders": {
-      "meters": {
-        "type": "String",
-        "example": "350"
-      }
-    }
-  },
   "tripRecordingPipElapsedCaption": "scurs",
   "@tripRecordingPipElapsedCaption": {
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
-  "fabOpenCriteria": "Deschide căutarea",
-  "fabOpenResults": "Deschide rezultatele",
   "fabRunSearch": "Execută căutarea",
-  "fabRefineCriteria": "Rafinează căutarea",
-  "routeSearchPartialBanner": "Se caută mai multe stații…",
   "privacySaveErrorLog": "Salvează jurnalul de erori ({count})",
   "@privacySaveErrorLog": {
     "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
@@ -2418,10 +2223,6 @@
   "@trajetDetailChartCoolant": {
     "description": "MT — needs native review"
   },
-  "trajetDetailChartAltitude": "Altitudine (m)",
-  "@trajetDetailChartAltitude": {
-    "description": "MT — needs native review"
-  },
   "trajetDetailChartLambda": "λ comandat",
   "@trajetDetailChartLambda": {
     "description": "MT — needs native review"
@@ -2654,14 +2455,6 @@
   "@obd2HealthHistorySection": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyJson": "Copiați ca JSON",
-  "@obd2HealthCopyJson": {
-    "description": "MT — needs native review"
-  },
-  "obd2HealthCopied": "Diagnosticele OBD2 au fost copiate în clipboard.",
-  "@obd2HealthCopied": {
-    "description": "MT — needs native review"
-  },
   "evStatusPartial": "Parțial disponibil",
   "@evStatusPartial": {
     "description": "MT — needs native review"
@@ -2767,10 +2560,6 @@
   },
   "ocrTesterRunning": "Se rulează OCR…",
   "@ocrTesterRunning": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterNoResult": "OCR nu a produs niciun rezultat lizibil.",
-  "@ocrTesterNoResult": {
     "description": "MT — needs native review"
   },
   "ocrTesterOverlaySection": "Suprapunere blocuri",
@@ -2937,10 +2726,6 @@
   "@obd2DiagnosticsInitCold": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyInitTranscript": "Copiați doar transcriptul de inițializare",
-  "@obd2HealthCopyInitTranscript": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterSaveFixture": "Salvați ca fixture",
   "@ocrTesterSaveFixture": {
     "description": "MT — needs native review"
@@ -3092,10 +2877,6 @@
   "@obd2GpsDegradedBannerTitle": {
     "description": "MT — needs native review"
   },
-  "restoreBackupTooltip": "Restaurați backup",
-  "@restoreBackupTooltip": {
-    "description": "MT — needs native review"
-  },
   "restoreBackupDialogTitle": "Restaurați backup",
   "@restoreBackupDialogTitle": {
     "description": "MT — needs native review"
@@ -3111,15 +2892,6 @@
   "restoreBackupReplaceAction": "Înlocuiți tot",
   "@restoreBackupReplaceAction": {
     "description": "MT — needs native review"
-  },
-  "restoreBackupSuccess": "Backup restaurat — {count} înregistrări importate",
-  "@restoreBackupSuccess": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
   },
   "restoreBackupEmpty": "Backup restaurat — nu conținea înregistrări",
   "@restoreBackupEmpty": {
@@ -3391,16 +3163,6 @@
   "voiceCoachingSettingSubtitle": "Primiți sfaturi vocale în timp ce conduceți — accelerare bruscă, frânare dură și indicii de schimbare a treptelor",
   "@voiceCoachingSettingSubtitle": {
     "description": "MT — needs native review"
-  },
-  "fuelStationRadarDistanceKm": "{km} km distanță",
-  "@fuelStationRadarDistanceKm": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "km": {
-        "type": "String",
-        "example": "2.4"
-      }
-    }
   },
   "fuelStationRadarProximity": "Proximitate {percent}%",
   "@fuelStationRadarProximity": {
@@ -3733,10 +3495,6 @@
   },
   "consumptionStatsChartConsumption": "L/100km pe lună",
   "@consumptionStatsChartConsumption": {
-    "description": "MT — needs native review"
-  },
-  "shareReceiptImporting": "Se importă bonul partajat…",
-  "@shareReceiptImporting": {
     "description": "MT — needs native review"
   },
   "shareReceiptUnsupportedFormat": "Acest tip de fișier nu poate fi importat încă — partajați o fotografie a bonului.",
@@ -4228,17 +3986,6 @@
       "count": {
         "type": "int",
         "example": "3"
-      }
-    }
-  },
-  "fuelEfficiencyMixedFootnote": "{count, plural, =1{1 mixed tank counted toward its main fuel} other{{count} mixed tanks counted toward their main fuel}}",
-  "@fuelEfficiencyMixedFootnote": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int",
-        "example": "1"
       }
     }
   },
@@ -4752,11 +4499,6 @@
         "example": "Oil change"
       }
     }
-  },
-  "radarAcquiringLocation": "Finding your location…",
-  "@radarAcquiringLocation": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
   },
   "radarUpdatingLocation": "Updating your location…",
   "@radarUpdatingLocation": {

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../route_search/providers/route_search_params_provider.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Route-planning controls for the criteria screen in route mode (#2592).
 ///
@@ -92,7 +93,7 @@ class RoutePlanningControls extends ConsumerWidget {
     final saving = ref.watch(minRouteSavingSearchParamProvider);
     final off = saving <= 0;
     // i18n-ignore: language-neutral currency-per-litre unit mask.
-    final amount = '${saving.toStringAsFixed(2)} €/L';
+    final amount = '${UnitFormatter.formatDecimal(saving, fractionDigits: 2)} €/L';
     final valueLabel = off ? (l10n.routeMinSavingOff) : amount;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -91,8 +91,8 @@ void main() {
     await tester.pumpWidget(_host(report));
 
     expect(find.text('Tank report'), findsOneWidget);
-    expect(find.text('12.0 L/100 km'), findsOneWidget);
-    expect(find.text('2.0 L/100 km more than the previous tank'),
+    expect(find.text('12,0 L/100 km'), findsOneWidget);
+    expect(find.text('2,0 L/100 km more than the previous tank'),
         findsOneWidget);
     expect(find.byIcon(Icons.trending_up), findsOneWidget);
     expect(find.text('Recordings cover 40 % of this tank'), findsOneWidget);

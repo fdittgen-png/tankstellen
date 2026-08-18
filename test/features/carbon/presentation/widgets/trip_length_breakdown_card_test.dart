@@ -81,8 +81,8 @@ void main() {
       );
 
       // Short avg 10.0 → "10.0 L/100"; long avg 6.0 → "6.0 L/100".
-      expect(find.text('10.0 L/100'), findsOneWidget);
-      expect(find.text('6.0 L/100'), findsOneWidget);
+      expect(find.text('10,0 L/100'), findsOneWidget);
+      expect(find.text('6,0 L/100'), findsOneWidget);
     });
   });
 
@@ -134,7 +134,7 @@ void main() {
         // medium bucket when below the floor — averaging 3 trips is
         // exactly the "swing-on-one-outlier" case the placeholder
         // exists to suppress.
-        expect(find.text('6.0 L/100'), findsNothing);
+        expect(find.text('6,0 L/100'), findsNothing);
       },
     );
   });

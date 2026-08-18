@@ -1459,6 +1459,9 @@ void main() {
 
     testWidgets('highway mode v2 (#3633): renders "via exit {ref} · +km" '
         'from the side-channel annotation', (tester) async {
+      // Pin the formatter locale so the +km detour figure below is
+      // deterministic regardless of test ordering (FR → comma decimal).
+      PriceFormatter.setCountry('FR');
       await pumpApp(
         tester,
         const StationCard(station: testStation, selectedFuelType: FuelType.e10),
@@ -1476,7 +1479,7 @@ void main() {
       );
       expect(find.byIcon(Icons.fork_right), findsOneWidget);
       expect(find.textContaining('via exit 36'), findsOneWidget);
-      expect(find.textContaining('+1.2 km'), findsOneWidget);
+      expect(find.textContaining('+1,2 km'), findsOneWidget);
     });
 
   });

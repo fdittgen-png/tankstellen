@@ -24,11 +24,11 @@ import 'dart:math';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/obd2_link_drop_signal.dart';
-import 'package:tankstellen/features/obd2/data/obd2_link_supervisor.dart';
-import 'package:tankstellen/features/obd2/data/obd2_reattach_source.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_link_drop_signal.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_link_supervisor.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_reattach_source.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 
 // #3625 — the reattach source only delivers a service whose transport
 // is actually OPEN; the fake must be connected to count as live.

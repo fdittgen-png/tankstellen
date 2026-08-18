@@ -10,7 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/feedback/auto_record_badge_provider.dart';
 import '../../../core/feedback/auto_record_badge_service.dart';
 import '../../../core/storage/hive_boxes.dart';
-import '../../../core/sync/trips_sync.dart';
+import '../data/trips_sync.dart';
 import '../../../core/sync/trips_sync_enabled_provider.dart';
 import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';

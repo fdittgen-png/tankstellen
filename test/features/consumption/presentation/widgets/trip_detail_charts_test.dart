@@ -322,7 +322,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // The readout shows the nearest sample's value + the km/h unit.
-        expect(find.textContaining('24.0 km/h'), findsOneWidget);
+        expect(find.textContaining('24,0 km/h'), findsOneWidget);
       },
     );
 
@@ -338,7 +338,7 @@ void main() {
       await tester.tapAt(Offset(box.left + 4, box.center.dy));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('20.0 km/h'), findsOneWidget);
+      expect(find.textContaining('20,0 km/h'), findsOneWidget);
     });
 
     testWidgets('the RPM chart readout carries the rpm unit', (tester) async {
@@ -351,7 +351,7 @@ void main() {
       await tester.tapAt(Offset(box.left + 4, box.center.dy));
       await tester.pumpAndSettle();
       // _withAllFields first sample rpm = 1500.
-      expect(find.textContaining('1500.0 rpm'), findsOneWidget);
+      expect(find.textContaining('1500,0 rpm'), findsOneWidget);
     });
 
     testWidgets('a single-sample chart never shows a readout (no scrub)',

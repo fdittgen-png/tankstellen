@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/broken_map_belief.dart';
-import 'package:tankstellen/features/obd2/data/broken_map_belief_updater.dart';
+import 'package:tankstellen/features/obd2/domain/broken_map_belief.dart';
+import 'package:tankstellen/features/obd2/domain/broken_map_belief_updater.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/reference_vehicle.dart';
 
 /// Membership-function tests are unchanged from the #1423 phase 1

@@ -78,7 +78,7 @@ class _LineChartPainter extends CustomPainter {
     // on the range without cluttering the plot with grid lines.
     _drawText(
       canvas,
-      '${geo.maxV.toStringAsFixed(1)} $unit',
+      '${UnitFormatter.formatDecimal(geo.maxV)} $unit',
       Offset(size.width - _TripChartGeometry.rightInset, 2),
       anchorRight: true,
       color: labelColor.withAlpha(160),
@@ -86,7 +86,7 @@ class _LineChartPainter extends CustomPainter {
     );
     _drawText(
       canvas,
-      geo.minV.toStringAsFixed(1),
+      UnitFormatter.formatDecimal(geo.minV),
       Offset(_TripChartGeometry.leftInset,
           size.height - _TripChartGeometry.bottomInset + 4),
       color: labelColor.withAlpha(160),

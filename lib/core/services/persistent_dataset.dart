@@ -109,3 +109,43 @@ class PersistentDataset<T> {
     return hit.age <= maxAge ? hit.value : null;
   }
 }
+
+/// The ONE `{'stations': [...]}` whole-country dataset wiring
+/// (#2264/#2270) that the DK / MX / FR-flux services used to
+/// copy-paste: wraps the per-item codec in the shared envelope
+/// (serialize maps every item through [itemToJson]; deserialize
+/// re-coerces each row to `Map<String, dynamic>` — Hive round-trips
+/// `Map<dynamic, dynamic>` — and feeds it to [itemFromJson], returning
+/// null on a missing `stations` key so a corrupt entry reads as a
+/// cache miss).
+///
+/// #3154 — the closures built here capture only [itemToJson] /
+/// [itemFromJson], so pass tear-offs of static/factory functions or
+/// capture-free closures to keep them isolate-sendable for
+/// [PersistentDataset.write] / [PersistentDataset.readAsync].
+PersistentDataset<List<T>> stationListDataset<T>({
+  required CacheStrategy cache,
+  required String countryCode,
+  required ServiceSource source,
+  String datasetName = 'stations',
+  required Map<String, dynamic> Function(T item) itemToJson,
+  required T Function(Map<String, dynamic> json) itemFromJson,
+}) {
+  return PersistentDataset<List<T>>(
+    cache: cache,
+    countryCode: countryCode,
+    datasetName: datasetName,
+    source: source,
+    serialize: (items) => {
+      'stations': [for (final item in items) itemToJson(item)],
+    },
+    deserialize: (json) {
+      final list = json['stations'] as List<dynamic>?;
+      if (list == null) return null;
+      return [
+        for (final j in list)
+          itemFromJson(Map<String, dynamic>.from(j as Map)),
+      ];
+    },
+  );
+}

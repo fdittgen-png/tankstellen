@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/adapter_capability.dart';
-import 'package:tankstellen/features/obd2/data/oem_pid_registry.dart';
-import 'package:tankstellen/features/obd2/data/oem_pid_table.dart';
-import 'package:tankstellen/features/obd2/data/oem_pid_tables/psa_oem_pid_table.dart';
+import 'package:tankstellen/features/obd2/data/protocol/adapter_capability.dart';
+import 'package:tankstellen/features/obd2/data/protocol/oem_pid_registry.dart';
+import 'package:tankstellen/features/obd2/data/protocol/oem_pid_table.dart';
+import 'package:tankstellen/features/obd2/data/protocol/oem_pid_tables/psa_oem_pid_table.dart';
 
 /// Lightweight [OemPidTable] stand-in that does not actually issue
 /// commands — registry tests only care about lookup mechanics, not

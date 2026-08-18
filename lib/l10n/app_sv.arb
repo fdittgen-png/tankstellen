@@ -12,11 +12,8 @@
   "fuelType": "Bränsle",
   "searchRadius": "Radie",
   "searchNearby": "Bensinstationer i närheten",
-  "searchButton": "Sök",
   "searchCriteriaTitle": "Sökkriterier",
-  "searchCriteriaOpen": "Sök",
   "searchCriteriaRadiusBadge": "Inom {km} km",
-  "searchCriteriaTapToSearch": "Tryck för att börja söka",
   "noResults": "Inga bensinstationer hittades.",
   "startSearch": "Sök för att hitta bensinstationer.",
   "open": "Öppen",
@@ -30,7 +27,6 @@
   "navigate": "Navigera",
   "retry": "Försök igen",
   "apiKeySetup": "API-nyckel",
-  "apiKeyDescription": "Registrera dig en gång för att få en gratis API-nyckel.",
   "apiKeyLabel": "API-nyckel",
   "register": "Registrering",
   "continueButton": "Fortsätt",
@@ -64,33 +60,12 @@
   "noFavoritesHint": "Tryck på stjärnan vid en bensinstation för att spara den som favorit.",
   "language": "Språk",
   "country": "Land",
-  "demoMode": "Demoläge — exempeldata visas.",
-  "setupLiveData": "Konfigurera för live-data",
   "freeNoKey": "Gratis — ingen nyckel behövs",
   "apiKeyRequired": "API-nyckel krävs",
-  "skipWithoutKey": "Fortsätt utan nyckel",
   "dataTransparency": "Datatransparens",
   "storageAndCache": "Lagring och cache",
   "clearCache": "Rensa cache",
-  "clearAllData": "Ta bort all data",
-  "errorLog": "Fellogg",
   "stationsFound": "{count} bensinstationer hittades",
-  "whatIsShared": "Vad delas — och med vem?",
-  "gpsCoordinates": "GPS-koordinater",
-  "gpsReason": "Skickas med varje sökning för att hitta närliggande stationer.",
-  "postalCodeData": "Postnummer",
-  "postalReason": "Konverteras till koordinater via geokodarens tjänst.",
-  "mapViewport": "Kartvy",
-  "mapReason": "Kartplattor laddas från servern. Inga personuppgifter överförs.",
-  "apiKeyData": "API-nyckel",
-  "apiKeyReason": "Din personliga nyckel skickas med varje API-förfrågan. Den är kopplad till din e-post.",
-  "notShared": "Delas INTE:",
-  "searchHistory": "Sökhistorik",
-  "favoritesData": "Favoriter",
-  "profileNames": "Profilnamn",
-  "homeZipData": "Hempostnummer",
-  "usageData": "Användningsdata",
-  "privacyBanner": "Denna app har ingen server. All data stannar på din enhet. Ingen analys, ingen spårning, ingen reklam.",
   "storageUsage": "Lagringsanvändning på denna enhet",
   "settingsLabel": "Inställningar",
   "profilesStored": "profiler sparade",
@@ -116,12 +91,8 @@
   "deleteAllButton": "Ta bort allt",
   "entries": "poster",
   "cacheEmpty": "Cachen är tom",
-  "noStorage": "Ingen lagring använd",
   "apiKeyNote": "Gratis registrering. Data från statliga pristransparensorgan.",
   "apiKeyFormatError": "Ogiltigt format — UUID förväntat (8-4-4-4-12)",
-  "supportProject": "Stöd detta projekt",
-  "supportDescription": "Denna app är gratis, öppen källkod och utan reklam. Om du tycker den är användbar, överväg att stödja utvecklaren.",
-  "reportBug": "Rapportera fel / Föreslå funktion",
   "reportThisIssue": "Rapportera detta problem",
   "reportAlreadySent": "Du har redan rapporterat det här problemet.",
   "reportConsentTitle": "Rapportera till GitHub?",
@@ -136,7 +107,6 @@
   "configApiKeysSection": "API-nycklar",
   "configTankerkoenigKey": "Tankerkoenig API-nyckel",
   "configApiKeyConfigured": "Konfigurerad",
-  "configApiKeyNotSet": "Inte inställd (demoläge)",
   "configApiKeyCommunity": "Standard (community-nyckel)",
   "searchLocationPlaceholder": "Adress, postnummer eller ort",
   "configEvKey": "EV-laddnings-API-nyckel",
@@ -174,8 +144,6 @@
   "sortPriceDistance": "Pris/km",
   "cheap": "billig",
   "expensive": "dyr",
-  "stationsOnMap": "{count} stationer",
-  "loadingFavorites": "Laddar favoriter...\nSök efter stationer först för att spara data.",
   "reportPrice": "Rapportera pris",
   "whatsWrong": "Vad är fel?",
   "correctPrice": "Korrekt pris (t.ex. 15,79)",
@@ -185,7 +153,6 @@
   "cacheCleared": "Cache rensad.",
   "yourPosition": "Din position",
   "positionUnknown": "Position okänd",
-  "routeModeBannerLabel": "Ruttläge — avstånd är längs korridoren",
   "distancesFromCenter": "Avstånd från sökcentrum",
   "autoUpdatePosition": "Uppdatera position automatiskt",
   "autoUpdateDescription": "Uppdatera GPS-position före varje sökning",
@@ -220,8 +187,6 @@
   "wrongDieselPrice": "Fel Diesel pris",
   "wrongStatusOpen": "Visas öppen, men stängd",
   "wrongStatusClosed": "Visas stängd, men öppen",
-  "searchAlongRouteLabel": "Längs rutten",
-  "searchEvStations": "Sök laddstationer",
   "allStations": "Alla stationer",
   "bestStops": "Bästa stopp",
   "openInMaps": "Öppna i Kartor",
@@ -253,7 +218,6 @@
   "cityOrAddress": "Stad eller adress",
   "useGps": "Använd GPS",
   "stop": "Stopp",
-  "stopN": "Stopp {n}",
   "addStop": "Lägg till stopp",
   "searchAlongRoute": "Sök längs rutten",
   "cheapest": "Billigast",
@@ -265,10 +229,8 @@
   "customKey": "Egen nyckel",
   "appDefaultKey": "App-standardnyckel",
   "optionalOverrideKey": "Valfritt: ersätt den inbyggda appnyckeln med din egen",
-  "requiredForEvSearch": "Krävs för sökning efter EV-laddstationer",
   "edit": "Redigera",
   "fuelPricesApiKey": "Bränslepriser API-nyckel",
-  "tankerkoenigApiKey": "Tankerkoenig API-nyckel",
   "evChargingApiKey": "EV-laddning API-nyckel",
   "openChargeMapApiKey": "OpenChargeMap API-nyckel",
   "routePlanningSection": "Ruttplanering",
@@ -303,18 +265,14 @@
   "noStationsAlongThisRoute": "Inga stationer hittades längs denna rutt.",
   "fuelCostCalculator": "Bränslekostnadskalkylator",
   "distanceKm": "Avstånd (km)",
-  "consumptionL100km": "Förbrukning (L/100km)",
-  "fuelPriceEurL": "Bränslepris (EUR/L)",
   "tripCost": "Resekostnad",
   "fuelNeeded": "Bränsle som behövs",
   "totalCost": "Total kostnad",
-  "enterCalcValues": "Ange avstånd, förbrukning och pris för att beräkna resekostnaden",
   "priceHistory": "Prishistorik",
   "ignoredStationsLabel": "Ignorerade",
   "ratingsLabel": "Betyg",
   "favoritesDataCache": "Favoritdata",
   "citySearchCache": "Stadsökning",
-  "dataDeletionNotAvailableCommunity": "Radering av data är inte tillgänglig i Community-läge. Koppla från först eller använd en privat databas.",
   "priceHistoryStationsTracked": "{count} bevakade stationer",
   "@priceHistoryStationsTracked": {
     "placeholders": {
@@ -348,22 +306,11 @@
     }
   },
   "noPriceHistory": "Ingen prishistorik ännu",
-  "noHourlyData": "Inga timdata",
   "noStatistics": "Ingen statistik tillgänglig",
-  "statMin": "Min",
-  "statMax": "Max",
-  "statAvg": "Medel",
   "showAllFuelTypes": "Visa alla bränsletyper",
   "connected": "Ansluten",
-  "notConnected": "Inte ansluten",
-  "connectTankSync": "Anslut TankSync",
   "disconnectTankSync": "Koppla från TankSync",
   "viewMyData": "Visa mina data",
-  "optionalCloudSync": "Valfri molnsynkronisering för varningar, favoriter och push-notiser",
-  "tapToUpdateGps": "Tryck för att uppdatera GPS-position",
-  "gpsAutoUpdateHint": "GPS-positionen hämtas automatiskt vid sökning. Du kan också uppdatera den manuellt här.",
-  "clearGpsConfirm": "Rensa den sparade GPS-positionen? Du kan uppdatera den igen när som helst.",
-  "pageNotFound": "Sidan hittades inte",
   "deleteAllServerData": "Ta bort all serverdata",
   "deleteServerDataConfirm": "Ta bort all serverdata?",
   "deleteEverything": "Ta bort allt",
@@ -373,7 +320,6 @@
   "forgetAllSyncedTripsConfirmBody": "Alla resesammanfattningar och detaljblobbar tas bort från servern. Din lokala resehistorik på den här enheten påverkas inte.\n\nDen här åtgärden kan inte ångras.",
   "forgetAllSyncedTripsConfirmAction": "Glöm alla",
   "forgetAllSyncedTripsSuccess": "Alla synkade resor borttagna från servern",
-  "disconnectConfirm": "Koppla från TankSync?",
   "disconnect": "Koppla från",
   "myServerData": "Min serverdata",
   "anonymousUuid": "Anonym UUID",
@@ -393,7 +339,6 @@
   "continueAsGuest": "Fortsätt som gäst",
   "createAccount": "Skapa konto",
   "signIn": "Logga in",
-  "upgradeToEmail": "Skapa e-postkonto",
   "savedRoutes": "Sparade rutter",
   "noSavedRoutes": "Inga sparade rutter",
   "noSavedRoutesHint": "Sök längs en rutt och spara den för snabb åtkomst senare.",
@@ -424,11 +369,6 @@
   "onboardingNext": "Nästa",
   "onboardingSkip": "Hoppa över",
   "onboardingFinish": "Kom igång",
-  "crossBorderNearby": "{country} är i närheten",
-  "crossBorderDistance": "~{km} km till gränsen",
-  "crossBorderAvgPrice": "Snittpris här: {price} EUR ({count} stationer)",
-  "allPricesView": "Alla priser",
-  "compactView": "Kompakt",
   "switchToAllPricesView": "Byt till alla priser-vy",
   "switchToCompactView": "Byt till kompaktvy",
   "unavailable": "N/A",
@@ -453,10 +393,6 @@
   "accountDeleted": "Konto raderat. Lokal data bevarad.",
   "switchedToAnonymous": "Bytte till anonym session",
   "failedToSwitch": "Byte misslyckades: {error}",
-  "topicUrlCopied": "Ämnes-URL kopierad",
-  "testNotificationSent": "Testavisering skickad!",
-  "testNotificationFailed": "Det gick inte att skicka testavisering",
-  "pushUpdateFailed": "Det gick inte att uppdatera push-aviseringsinställning",
   "connectedAsGuest": "Ansluten som gäst",
   "accountCreated": "Konto skapat!",
   "signedIn": "Inloggad!",
@@ -518,7 +454,6 @@
   "privacyClearErrorLog": "Rensa felloggen",
   "privacyErrorLogCleared": "Felloggen rensad",
   "privacyDeleteButton": "Radera all data",
-  "privacyCopyErrorLog": "Kopiera fellogg till urklipp ({count})",
   "privacyDeleteTitle": "Radera all data?",
   "privacyDeleteBody": "Det här raderar permanent:\n\n- Alla favoriter och stationsdata\n- Alla sökprofiler\n- Alla prisaviseringar\n- All prishistorik\n- All cachad data\n- Din API-nyckel\n- Alla appinställningar\n\nAppen återställs till ursprungligt läge. Den här åtgärden kan inte ångras.",
   "privacyDeleteConfirm": "Radera allt",
@@ -553,15 +488,8 @@
   "voiceAnnouncementsTitle": "Röstmeddelanden",
   "voiceAnnouncementsDescription": "Meddela om billiga stationer i närheten under körning",
   "voiceAnnouncementsEnabled": "Aktivera röstmeddelanden",
-  "voiceAnnouncementThreshold": "Endast under {price}",
-  "voiceAnnouncementCheapFuel": "{station}, {distance} kilometer framåt, {fuelType} {price}",
   "voiceAnnouncementProximityRadius": "Aviseringsradie",
   "voiceAnnouncementCooldown": "Upprepningsintervall",
-  "nearestStations": "Narmaste stationer",
-  "nearestStationsHint": "Hitta de narmaste stationerna med din nuvarande position",
-  "consumptionLogTitle": "Bränsleförbrukning",
-  "consumptionLogMenuTitle": "Förbrukningslogg",
-  "consumptionLogMenuSubtitle": "Logga tankningar och beräkna L/100km",
   "consumptionStatsTitle": "Förbrukningsstatistik",
   "addFillUp": "Lägg till tankning",
   "noFillUpsTitle": "Inga tankningar ännu",
@@ -595,14 +523,12 @@
   "vehiclesWizardYoursList": "Du har {count, plural, =1{1 fordon} other{{count} fordon}}:",
   "vehiclesWizardSkipHint": "Hoppa över för att slutföra konfiguration – du kan lägga till fordon när som helst från Inställningar.",
   "fillUpVehicleLabel": "Fordon",
-  "fillUpVehicleNone": "Inget fordon",
   "fillUpVehicleRequired": "Fordon krävs",
   "reportScanError": "Rapportera skanningsfel",
   "pickStationTitle": "Välj en station",
   "pickStationHelper": "Starta tankningen från en känd station så fylls priser, märke och bränsletyp i automatiskt.",
   "pickStationEmpty": "Inga favoritstationer ännu – lägg till några från Sök eller Favoriter, eller hoppa över och fyll i manuellt.",
   "pickStationSkip": "Hoppa över – lägg till utan station",
-  "scanPump": "Skanna pump",
   "scanPayment": "Skanna betalnings-QR",
   "qrPaymentBeneficiary": "Mottagare",
   "qrPaymentAmount": "Belopp",
@@ -624,17 +550,10 @@
   "qrScannerRetry": "Försök igen",
   "torchOn": "Slå på blixt",
   "torchOff": "Slå av blixt",
-  "obdNoAdapter": "Ingen OBD2-adapter i närheten",
-  "obdOdometerUnavailable": "Kunde inte läsa vägmätaren",
   "obdPermissionDenied": "Bevilja Bluetooth-behörighet i systeminställningarna",
-  "obdAdapterUnresponsive": "Adaptern svarade inte – slå på tändningen och försök igen",
   "obdPickerTitle": "Välj en OBD2-adapter",
   "obdPickerScanning": "Söker efter adaptrar…",
   "obdPickerConnecting": "Ansluter…",
-  "themeSettingTitle": "Tema",
-  "themeModeLight": "Ljust",
-  "themeModeDark": "Mörkt",
-  "themeModeSystem": "Följ system",
   "tripRecordingTitle": "Spelar in resa",
   "tripSummaryTitle": "Resesammanfattning",
   "tripMetricDistance": "Sträcka",
@@ -676,18 +595,13 @@
   "syncBaselinesToggleTitle": "Dela inlärda fordonsprofiler",
   "syncBaselinesToggleSubtitle": "Ladda upp förbrukningsgränser per fordon så att en andra enhet kan återanvända dem.",
   "obd2StatusConnected": "OBD2-adapter: ansluten",
-  "obd2StatusAttempting": "OBD2-adapter: ansluter",
-  "obd2StatusUnreachable": "OBD2-adapter: onåbar",
   "obd2StatusPermissionDenied": "OBD2-adapter: Bluetooth-behörighet krävs",
   "obd2StatusConnectedBody": "Redo att spela in en resa.",
-  "obd2StatusAttemptingBody": "Ansluter i bakgrunden…",
-  "obd2StatusUnreachableBody": "Adapter utom räckhåll eller används redan av en annan app.",
   "obd2StatusPermissionDeniedBody": "Bevilja Bluetooth-behörighet i systeminställningarna för att återansluta automatiskt.",
   "obd2StatusNoAdapter": "Ingen adapter ihopparad",
   "obd2StatusForget": "Glöm adapter",
   "tripHistoryTitle": "Resehistorik",
   "tripHistoryEmptyTitle": "Inga resor ännu",
-  "tripHistoryEmptySubtitle": "Anslut en OBD2-adapter och spela in en resa för att börja bygga din körhistorik.",
   "tripHistoryUnknownDate": "Okänt datum",
   "situationIdle": "Tomgång",
   "situationStopAndGo": "Stopp och kör",
@@ -697,12 +611,8 @@
   "situationClimbing": "Backkörning / lastad",
   "situationHardAccel": "Hård acceleration",
   "situationFuelCut": "Bränslebrytare – frifart",
-  "tripSaveAsFillUp": "Spara som tankning",
   "tripSaveRecording": "Spara resa",
-  "tripDiscard": "Kasta",
-  "obdOdometerRead": "Vägmätare avläst: {km} km",
   "vehicleFuelNotSet": "Ej inställt",
-  "wizardVehicleTapToEdit": "Tryck för att redigera",
   "wizardVehicleDefaultBadge": "Standard",
   "wizardProfileChoiceHint": "Välj hur du vill använda appen. Du kan ändra detta senare i Inställningar.",
   "wizardProfileChoiceFooter": "Du kan ändra ditt val när som helst från Inställningar → Användningsläge.",
@@ -713,7 +623,6 @@
   "wizardProfileFullName": "Full",
   "wizardProfileFullDescription": "Allt i Mellannivå, plus automatisk OBD2-reseinspelning, körpoäng och lojalitetskort.",
   "wizardProfileCustomName": "Anpassad",
-  "wizardProfileCustomDescription": "Din egen kombination av funktioner. Justera varje reglage nedan.",
   "useModeSectionHint": "Anpassa appen efter hur du faktiskt använder den. Att välja en förinställning aktiverar den matchande uppsättningen funktioner.",
   "useModeCustomSettingsDescription": "Din funktionsmix matchar ingen förinställning. Välj en ovan för att skriva över, eller fortsätt anpassa enskilda funktioner i avsnittet nedan.",
   "useModeSwitchedSnack": "Användningsläge inställt på {profile}.",
@@ -751,20 +660,15 @@
   "evShowOnMap": "Visa EV-stationer",
   "evAvailableOnly": "Endast tillgängliga",
   "evMinPower": "Min effekt",
-  "evMaxPower": "Max effekt",
-  "evOperator": "Operatör",
-  "evLastUpdate": "Senast uppdaterad",
   "evStatusAvailable": "Tillgänglig",
   "evStatusOccupied": "Upptagen",
   "evStatusOutOfOrder": "Ur funktion",
   "openOnlyFilter": "Endast öppna",
   "saveAsDefaults": "Spara som mina standardinställningar",
   "criteriaSavedToProfile": "Sparat som standardinställningar",
-  "profileNotFound": "Ingen aktiv profil",
   "updatingFavorites": "Uppdaterar dina favoriter...",
   "fetchingLatestPrices": "Hämtar de senaste priserna",
   "noDataAvailable": "Ingen data",
-  "configAndPrivacy": "Konfiguration och integritet",
   "searchToSeeMap": "Sök för att se stationer på kartan",
   "evPowerAny": "Valfri",
   "evPowerKw": "{kw} kW+",
@@ -819,9 +723,6 @@
   "iosAutoRecordOnboardingBullet3Title": "När iOS frågar om \"Alltid\" plats, säg ja.",
   "iosAutoRecordOnboardingBullet3Body": "Reservfunktionen som spelar in din resa när OBD2-adaptern är långsam behöver bakgrundsplats. Vi delar den aldrig.",
   "scanReceipt": "Skanna kvitto",
-  "obdConnect": "OBD-II",
-  "stationTypeFuel": "Bränsle",
-  "stationTypeEv": "EV",
   "brandFilterHighway": "Motorväg",
   "ratingModeLocal": "Lokal",
   "ratingModePrivate": "Privat",
@@ -841,7 +742,6 @@
   "errorHintRouting": "Ruttberäkning misslyckades. Kontrollera din internetanslutning och försök igen.",
   "errorHintFallback": "Försök igen eller sök med postnummer eller ortnamn.",
   "alertsLoadErrorTitle": "Det gick inte att ladda dina aviseringar",
-  "alertsBackgroundCheckErrorTitle": "Bakgrundskontroll av aviseringar misslyckades",
   "detailsLabel": "Detaljer",
   "remove": "Ta bort",
   "showKey": "Visa nyckel",
@@ -950,19 +850,11 @@
   "linkDeviceHowItWorksBody": "1. På Enhet A: kopiera enhetskoden ovan\n2. På Enhet B: klistra in den i fältet \"Enhetskod\"\n3. Tryck på \"Importera data\" för att slå samman favoriter, aviseringar, fordon och förbrukningsloggar\n4. Båda enheterna får all kombinerad data\n\nVarje enhet behåller sin egen anonyma identitet och sin egen profil (favoritbränsle, standardfordon, startskärm). Data slås samman, inte flyttas.",
   "vehicleSetActive": "Ange som aktiv",
   "swipeHide": "Dölj",
-  "evChargingSection": "EV-laddning",
-  "fuelStationsSection": "Bränslestationer",
   "yourRating": "Ditt betyg",
   "noStorageUsed": "Inget lagringsutrymme används",
   "aboutReportBug": "Rapportera ett fel / Föreslå en funktion",
   "aboutSupportProject": "Stöd det här projektet",
   "aboutSupportDescription": "Den här appen är gratis, öppen källkod och har inga annonser. Om du tycker den är användbar kan du överväga att stödja utvecklaren.",
-  "luxembourgRegulatedPricesNotice": "Luxemburgs bränslepriser är statligt reglerade och enhetliga i hela landet.",
-  "luxembourgFuelUnleaded95": "Blyfri 95",
-  "luxembourgFuelUnleaded98": "Blyfri 98",
-  "luxembourgFuelDiesel": "Diesel",
-  "luxembourgFuelLpg": "LPG",
-  "luxembourgPricesUnavailable": "Luxemburgs reglerade priser är inte tillgängliga.",
   "reportIssueTitle": "Rapportera ett problem",
   "enterCorrection": "Ange korrigeringen",
   "reportNoBackendAvailable": "Rapporten kunde inte skickas: ingen rapporteringstjänst är konfigurerad för det här landet. Aktivera TankSync i Inställningar för att skicka community-rapporter.",
@@ -989,10 +881,6 @@
   "serviceReminderMarkDone": "Markera som klar",
   "serviceReminderDueTitle": "Service förfaller",
   "serviceReminderDueBody": "{label} förfaller – {kmOver} km förbi intervallet.",
-  "southKoreaApiKeyRequired": "Registrera dig på OPINET för att få en gratis API-nyckel",
-  "southKoreaApiProvider": "OPINET (KNOC)",
-  "chileApiKeyRequired": "Registrera dig på CNE för att få en gratis API-nyckel",
-  "chileApiProvider": "CNE Bencina en Linea",
   "vinConfirmTitle": "Är det här din bil?",
   "vinConfirmBody": "{year} {make} {model} — {displacement}L, {cylinders}-cyl, {fuel}",
   "vinPartialInfoNote": "Partiell information (offline). Du kan redigera nedan.",
@@ -1011,17 +899,13 @@
   "alertsRadiusCreateTitle": "Skapa radieavisering",
   "alertsRadiusLabelHint": "Etikett (t.ex. Hemma diesel)",
   "alertsRadiusFuelType": "Bränsletyp",
-  "alertsRadiusThreshold": "Gränsvärde (€/L)",
   "alertsRadiusKm": "Radie (km)",
   "alertsRadiusCenterGps": "Använd min plats",
   "alertsRadiusCenterPostalCode": "Postnummer",
   "alertsRadiusSave": "Spara",
   "alertsRadiusCancel": "Avbryt",
-  "alertsRadiusDeleteConfirm": "Radera radieavisering?",
   "obd2ConnectedTooltip": "OBD2 ansluten: {adapterName}",
   "obd2PairChipTooltip": "Para ihop en OBD2-adapter",
-  "velocityAlertTitle": "{fuelLabel} sjönk vid närliggande stationer",
-  "velocityAlertBody": "{stationCount} stationer sjönk med upp till {maxDropCents}¢ under den senaste timmen",
   "fillUpSavedSnackbar": "Tankning sparad",
   "radiusAlertsEntryTitle": "Radiebaserade aviseringar och statistik",
   "radiusAlertsEntrySubtitle": "Bli aviserad när priserna sjunker nära dig",
@@ -1060,8 +944,6 @@
   "autoRecordStatusPairAdapterCta": "Para ihop en adapter",
   "autoRecordSpeedThresholdLabel": "Starthastighet (km/h)",
   "autoRecordSaveDelayLabel": "Sparfördröjning efter frånkoppling (sekunder)",
-  "autoRecordPairedAdapterLabel": "Ihopparad adapter",
-  "autoRecordPairedAdapterNone": "Ingen adapter ihopparad. Para ihop en via OBD2-introduktionen först.",
   "autoRecordBackgroundLocationLabel": "Bakgrundsplats tillåten",
   "autoRecordBackgroundLocationRequest": "Begär behörighet",
   "autoRecordBackgroundLocationRationaleTitle": "Varför \"Tillåt alltid\"?",
@@ -1069,18 +951,12 @@
   "autoRecordBackgroundLocationOpenSettings": "Öppna inställningar",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Platsbehörighet krävs",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Kunde inte begära bakgrundsplats",
-  "autoRecordBadgeClearTooltip": "Rensa räknare",
   "autoRecordPairAdapterLinkText": "Para ihop en adapter i avsnittet nedan för att aktivera autoinspelning",
-  "exportBackupTooltip": "Exportera säkerhetskopia",
   "exportBackupReady": "Säkerhetskopia klar – välj ett mål",
   "exportBackupFailed": "Export av säkerhetskopia misslyckades – försök igen",
-  "brokenMapChipVerifying": "MAP-sensor verifierar…",
   "brokenMapChipDisclaimer": "MAP-avläsningar misstänkta",
   "brokenMapSnackbarUnreliable": "MAP-sensor läser felaktigt – bränslevisningar kan vara 50–80 % för låga. Prova en annan adapter.",
   "brokenMapBannerHardDisable": "MAP-sensor otillförlitlig. Visar tankningssnitt istället för direktbränsleflöde.",
-  "brokenMapOverlayVerified": "MAP-sensor: verifierad ({confidence})",
-  "brokenMapOverlayUnverified": "MAP-sensor: verifierar ({confidence})",
-  "brokenMapOverlaySuspicious": "MAP-sensor: misstänkt ({confidence})",
   "brokenMapOverlayPosterior": "MAP-sensor: {posterior}% ± {margin}%",
   "brokenMapOverlayPosteriorVerified": "MAP-sensor: {posterior}% ± {margin}% (verifierad)",
   "brokenMapDiagnosticsCardTitle": "MAP-sensordiagnostik",
@@ -1142,7 +1018,6 @@
   "chargingCostTrendTitle": "Laddningskostnadstrend",
   "chargingEfficiencyTitle": "Effektivitet (kWh/100 km)",
   "chargingChartsEmpty": "Inte tillräckligt med data ännu",
-  "chargingChartsMonthAxis": "Månad",
   "consoFeatureGroupTitle": "Förbrukning",
   "consoFeatureGroupDescription": "Spåra din förbrukning – manuella tankningar eller automatisk OBD2-reseinspelning.",
   "consoModeOff": "Av",
@@ -1158,10 +1033,6 @@
   "fillUpCorrectionEditExplainer": "Den här posten genererades automatiskt för att stänga gapet mellan inspelade resor och tankat bränsle. Justera värdena om du känner till de faktiska siffrorna.",
   "fillUpCorrectionDelete": "Radera korrigering",
   "fillUpCorrectionStation": "Stationsnamn (valfritt)",
-  "greeceApiProvider": "Paratiritirio Timon (Grekland)",
-  "greeceCommunityApiNotice": "Drivs av det communityunderhållna fuelpricesgr API",
-  "romaniaApiProvider": "Monitorul Prețurilor (Rumänien)",
-  "romaniaScrapingNotice": "Drivs av monitorulpreturilor.info (Konkurrensrådet + ANPC)",
   "crossBorderCheaper": "{country}-stationer {km} km bort – €{price}/L billigare",
   "crossBorderTapToSwitch": "Tryck för att byta land",
   "crossBorderDismissTooltip": "Avfärda",
@@ -1186,9 +1057,6 @@
   "drivingScorePenaltyHardBrake": "Hård inbromsning",
   "drivingScorePenaltyHighRpm": "Högt RPM",
   "drivingScorePenaltyFullThrottle": "Fullgas",
-  "ecoRouteOption": "Eco",
-  "ecoRouteSavings": "≈ {liters} L sparade",
-  "ecoRouteHint": "Smartare körning – föredrar jämn motorväg framför slingrande genvägar.",
   "favoritesShareAction": "Dela",
   "favoritesShareSubject": "Sparkilo — favoriter den {date}",
   "favoritesShareError": "Kunde inte generera delningsbild",
@@ -1206,8 +1074,6 @@
   "featureDescription_consumptionAnalytics": "Fliken för analys av tankningar och resor.",
   "featureLabel_baselineSync": "Grundsynk",
   "featureDescription_baselineSync": "Synka körningsgränser via TankSync.",
-  "featureLabel_unifiedSearchResults": "Enhetliga sökresultat",
-  "featureDescription_unifiedSearchResults": "Enkel resultatlista som kombinerar bränsle- och EV-stationer.",
   "featureLabel_priceAlerts": "Prisaviseringar",
   "featureDescription_priceAlerts": "Tröskelbaserade aviseringar om prissänkningar.",
   "featureLabel_priceHistory": "Prishistorik",
@@ -1235,8 +1101,6 @@
   "featureBlockedEnable_glideCoach": "Aktivera OBD2-reseinspelning först",
   "featureBlockedEnable_gpsTripPath": "Aktivera OBD2-reseinspelning först",
   "featureBlockedEnable_autoRecord": "Aktivera OBD2-reseinspelning först",
-  "featureBlockedEnable_showFuel": "Förutsättningar ej uppfyllda",
-  "featureBlockedEnable_showElectric": "Förutsättningar ej uppfyllda",
   "featureBlockedEnable_showConsumptionTab": "Aktivera OBD2-reseinspelning först",
   "featureLabel_tflitePricePrediction": "TFLite-prisprognoser",
   "featureDescription_tflitePricePrediction": "Prismodell på enheten – slutledning sker lokalt; egenskaper och förutsägelser lämnar aldrig enheten.",
@@ -1281,15 +1145,12 @@
   "scanReceiptNoData": "Ingen kvittodata hittades – försök igen",
   "scanReceiptSuccess": "Kvitto skannat – kontrollera värdena. Tryck på \"Rapportera skanningsfel\" nedan om något är fel.",
   "scanReceiptFailed": "Skanning misslyckades: {error}",
-  "scanPumpUnreadable": "Pumpdisplayen är inte läsbar – försök igen",
-  "pumpCameraHint": "Rikta in de tre siffrorna på pumpdisplayen inom ramen",
   "pumpCameraCapture": "Ta bild",
   "pumpCameraPermissionDenied": "Kameraåtkomst krävs för att skanna pumpdisplayen. Aktivera den i enhetens inställningar.",
   "pumpCameraError": "Kameran kunde inte startas. Försök igen eller ange värdena manuellt.",
   "scanPumpSuccess": "Pumpdisplay skannad – kontrollera värdena.",
   "scanPumpGlare": "För mycket reflexer på displayen — försök igen i en liten vinkel så att siffrorna inte bleks ut.",
   "scanPumpFailed": "Pumpskanning misslyckades: {error}",
-  "badScanReportTitle": "Rapportera ett skanningsfel",
   "badScanReportTitleReceipt": "Rapportera ett skanningsfel – Kvitto",
   "badScanReportTitlePumpDisplay": "Rapportera ett skanningsfel – Pumpdisplay",
   "pumpScanFailureTitle": "Display oläslig",
@@ -1298,7 +1159,6 @@
   "pumpScanFailureReport": "Rapportera",
   "pumpScanFailureRemove": "Ta bort foto",
   "badScanReportHint": "Vi delar kvittofotot och båda uppsättningarna av värden så att nästa version kan lära sig den här layouten.",
-  "badScanReportShareAction": "Dela rapport + foto",
   "badScanReportFieldBrandLayout": "Märkeslayout",
   "badScanReportFieldTotal": "Totalt",
   "badScanReportFieldPricePerLiter": "Pris/L",
@@ -1315,16 +1175,9 @@
   "fillUpSectionWhatSubtitle": "Bränsle, mängd, pris",
   "fillUpSectionWhereTitle": "Var du var",
   "fillUpSectionWhereSubtitle": "Station, vägmätare, anteckningar",
-  "fillUpImportFromLabel": "Importera från…",
-  "fillUpImportSheetTitle": "Importera tankningsdata",
   "fillUpImportReceiptLabel": "Kvitto",
-  "fillUpImportReceiptDescription": "Skanna ett papperskvitto med kameran",
   "fillUpImportPumpLabel": "Pumpdisplay",
-  "fillUpImportPumpDescription": "Läs Betrag / Preis från pump-LCD:n",
-  "fillUpImportObdLabel": "OBD-II-adapter",
-  "fillUpImportObdDescription": "Läs vägmätare från OBD-II-porten via Bluetooth",
   "fillUpPricePerLiterLabel": "Pris per liter",
-  "vehicleHeaderPlateLabel": "Registreringsskylt",
   "vehicleHeaderUntitled": "Nytt fordon",
   "vehicleSectionIdentityTitle": "Identitet",
   "vehicleSectionIdentitySubtitle": "Namn och VIN",
@@ -1340,7 +1193,6 @@
   "gpsDiagnosticsHeader": "{count} prover · {span} · {gaps, plural, =0{inga luckor} =1{1 lucka} other{{gaps} luckor}}",
   "gpsDiagnosticsCadence": "Medianintervall: {ms} ms",
   "gpsDiagnosticsExplain": "Inspelat under inspelning för att verifiera GPS-kadensen under telefonsömn.",
-  "hapticEcoCoachSectionTitle": "Körning",
   "hapticEcoCoachSettingTitle": "Realtids-ecocoachning",
   "hapticEcoCoachSettingSubtitle": "Mjuk haptik + on-screen-tips när du gäspar under krysshastighet",
   "hapticEcoCoachSnackBarMessage": "Varsamt med gasen – frihjul sparar mer",
@@ -1370,9 +1222,6 @@
   "calculatorDistanceHint": "t.ex. 150",
   "calculatorConsumptionHint": "t.ex. 7,0",
   "calculatorPriceHint": "t.ex. 1,899",
-  "routeStrategyLabel": "Strategi:",
-  "routeStrategyUniform": "Enhetlig",
-  "routeStrategyBalanced": "Balanserad",
   "glideCoachBetaTitle": "Glide-coach beta (experimentell)",
   "glideCoachBetaSubtitle": "Subtil haptik vid inbromsning inför rött ljus. Av som standard – risk för distraktion.",
   "consentSyncTripsTitle": "Synka reseinspelningar",
@@ -1428,7 +1277,6 @@
   "onboardingObd2ConnectButton": "Anslut adapter",
   "onboardingObd2SkipButton": "Kanske senare",
   "onboardingObd2ReadingVin": "Läser VIN…",
-  "onboardingObd2VinReadFailed": "Kunde inte läsa VIN – ange manuellt",
   "onboardingObd2ConnectFailed": "Kunde inte ansluta till adaptern. Du kan försöka igen eller hoppa över.",
   "onboardingPickUseMode": "Välj ett användningsläge för att fortsätta.",
   "alertsRadiusFrequencyLabel": "Kontrollfrekvens",
@@ -1442,9 +1290,6 @@
   "radiusAlertMapPickerCancel": "Avbryt",
   "radiusAlertMapPickerHint": "Dra kartan för att placera aviseringscentret",
   "radiusAlertCenterFromMap": "Kartplats",
-  "radiusAlertNotificationTitle": "{fuelLabel} nära {label}",
-  "radiusAlertNotificationBody": "En station ligger på {price} € (mål: {threshold} €)",
-  "refuelUnitPerLiter": "/L",
   "refuelUnitPerKwh": "/kWh",
   "refuelUnitPerSession": "/session",
   "speedConsumptionCardTitle": "Förbrukning per hastighet",
@@ -1463,9 +1308,6 @@
   "tankLevelLitersFormat": "{litres} L",
   "tankLevelRangeFormat": "≈ {kilometres} km räckvidd",
   "tankLevelLastFillUpFormat": "Senaste tankning: {date} · {count} resa(or) sedan",
-  "tankLevelMethodObd2": "OBD2-mätt",
-  "tankLevelMethodDistanceFallback": "distansbaserad uppskattning",
-  "tankLevelMethodMixed": "blandad mätning",
   "tankLevelEmptyNoFillUp": "Logga en tankning för att se din tanknivå",
   "tankLevelDetailSheetTitle": "Resor sedan senaste tankning",
   "addFillUpIsFullTankLabel": "Full tank",
@@ -1536,7 +1378,6 @@
   "trajetDetailDeleteAction": "Radera",
   "trajetDetailDeleteConfirmTitle": "Radera den här resan?",
   "trajetDetailDeleteConfirmBody": "Den här resan tas bort permanent från din historik.",
-  "trajetDetailDeleteConfirmCancel": "Avbryt",
   "trajetDetailDeleteConfirmConfirm": "Radera",
   "tripRecordingObd2NotResponding": "OBD2-adapter ansluten men returnerar ingen data. Prova en annan adapter eller kontrollera fordonets diagnostikprotokoll.",
   "trajetsViewAllOnMap": "Visa alla på karta",
@@ -1552,7 +1393,6 @@
   "tripLengthBucketTripCount": "{count, plural, =0{inga resor} one{1 resa} other{{count} resor}}",
   "tripPathCardTitle": "Resespår",
   "tripPathCardSubtitle": "GPS-inspelad rutt",
-  "tripPathLegendTitle": "Förbrukning",
   "tripPathLegendEfficient": "Effektiv (< 6 L/100km)",
   "tripPathLegendBorderline": "Gränsvärde (6–10 L/100km)",
   "tripPathLegendWasteful": "Slösaktigt (≥ 10 L/100km)",
@@ -1563,13 +1403,8 @@
   "tripRecordingPinHelpTitle": "Om nålning",
   "tripRecordingPinHelpBody": "Nålning håller skärmen på och döljer systemfält så att formuläret förblir läsbart på ett instrumentbordsfäste. Tryck igen för att lossa. Lossas automatiskt när resan slutar.",
   "tripRecordingResumeHintMessage": "Inspelning fortsätter i bakgrunden. Tryck på det röda bandet längst upp på valfri skärm för att återgå.",
-  "tripBannerOpenFromConsumptionTab": "Öppna den aktiva resan från förbrukningsfliken",
   "tripRecordingUnpinnedWarning": "Nåla skärmen för att hålla GPS aktivt under resan – Android kan begränsa GPS under viloläge.",
   "tripRecordingMinimiseTooltip": "Minimera till en flytande ruta",
-  "unifiedFilterFuel": "Bränsle",
-  "unifiedFilterEv": "EV",
-  "unifiedFilterBoth": "Båda",
-  "unifiedNoResultsForFilter": "Inga resultat matchar det här filtret",
   "searchFailedSnackbar": "Sökning misslyckades – försök igen",
   "vinLabel": "VIN (valfritt)",
   "vinDecodeTooltip": "Avkoda VIN",
@@ -1601,7 +1436,6 @@
   "gdprVinOnlineDecodeTitle": "VIN online-avkodning",
   "gdprVinOnlineDecodeShort": "Avkoda VIN via NHTSA:s kostnadsfria offentliga tjänst",
   "gdprVinOnlineDecodeDescription": "När du parar ihop en adapter läses ditt fordons VIN lokalt för att identifiera bilen. Aktivering av detta skickar det 17-teckens VIN till NHTSA:s kostnadsfria vPIC-tjänst för att slå upp ytterligare detaljer (modell, motorvolym, bränsletyp). VIN är den enda datan som skickas – ingen annan information lämnar din enhet.",
-  "vehicleDetectedFromVinBadge": "(detekterad)",
   "vehicleDetectedFromVinSnackbar": "Detekterad från VIN: {summary}. Tillämpa?",
   "vehicleDetectedFromVinApply": "Tillämpa",
   "widgetHelpSectionTitle": "Hemskärmswidget",
@@ -1620,7 +1454,6 @@
   "widgetColorSchemeOrange": "Orange",
   "widgetVariantDefault": "Endast aktuellt pris",
   "widgetVariantPredictive": "Prediktiv: bästa tid att tanka",
-  "widgetPredictiveNowPrefix": "nu",
   "@distance": {
     "placeholders": {
       "distance": {
@@ -1629,13 +1462,6 @@
     }
   },
   "@stationsFound": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@stationsOnMap": {
     "placeholders": {
       "count": {
         "type": "int"
@@ -1700,13 +1526,6 @@
   "@evConnectors": {
     "placeholders": {
       "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@stopN": {
-    "placeholders": {
-      "n": {
         "type": "int"
       }
     }
@@ -1850,25 +1669,11 @@
       }
     }
   },
-  "approachStationDistance": "{meters} m bort",
-  "@approachStationDistance": {
-    "description": "PiP overlay caption (#2084) showing how far the driver is from the in-radius target station, in metres.",
-    "placeholders": {
-      "meters": {
-        "type": "String",
-        "example": "350"
-      }
-    }
-  },
   "tripRecordingPipElapsedCaption": "förflutit",
   "@tripRecordingPipElapsedCaption": {
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
-  "fabOpenCriteria": "Öppna sökning",
-  "fabOpenResults": "Öppna resultat",
   "fabRunSearch": "Kör sökning",
-  "fabRefineCriteria": "Förfina sökning",
-  "routeSearchPartialBanner": "Söker efter fler stationer…",
   "privacySaveErrorLog": "Spara felloggen ({count})",
   "@privacySaveErrorLog": {
     "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
@@ -2418,10 +2223,6 @@
   "@trajetDetailChartCoolant": {
     "description": "MT — needs native review"
   },
-  "trajetDetailChartAltitude": "Höjd (m)",
-  "@trajetDetailChartAltitude": {
-    "description": "MT — needs native review"
-  },
   "trajetDetailChartLambda": "Kommanderad λ",
   "@trajetDetailChartLambda": {
     "description": "MT — needs native review"
@@ -2654,14 +2455,6 @@
   "@obd2HealthHistorySection": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyJson": "Kopiera som JSON",
-  "@obd2HealthCopyJson": {
-    "description": "MT — needs native review"
-  },
-  "obd2HealthCopied": "OBD2-diagnostik kopierad till urklipp.",
-  "@obd2HealthCopied": {
-    "description": "MT — needs native review"
-  },
   "evStatusPartial": "Delvis tillgänglig",
   "@evStatusPartial": {
     "description": "MT — needs native review"
@@ -2767,10 +2560,6 @@
   },
   "ocrTesterRunning": "Kör OCR…",
   "@ocrTesterRunning": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterNoResult": "OCR gav inget läsbart resultat.",
-  "@ocrTesterNoResult": {
     "description": "MT — needs native review"
   },
   "ocrTesterOverlaySection": "Blocköverlager",
@@ -2937,10 +2726,6 @@
   "@obd2DiagnosticsInitCold": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyInitTranscript": "Kopiera bara initieringsutskriften",
-  "@obd2HealthCopyInitTranscript": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterSaveFixture": "Spara som testfixtur",
   "@ocrTesterSaveFixture": {
     "description": "MT — needs native review"
@@ -3092,10 +2877,6 @@
   "@obd2GpsDegradedBannerTitle": {
     "description": "MT — needs native review"
   },
-  "restoreBackupTooltip": "Återställ säkerhetskopia",
-  "@restoreBackupTooltip": {
-    "description": "MT — needs native review"
-  },
   "restoreBackupDialogTitle": "Återställ säkerhetskopia",
   "@restoreBackupDialogTitle": {
     "description": "MT — needs native review"
@@ -3111,15 +2892,6 @@
   "restoreBackupReplaceAction": "Ersätt allt",
   "@restoreBackupReplaceAction": {
     "description": "MT — needs native review"
-  },
-  "restoreBackupSuccess": "Säkerhetskopia återställd — {count} poster importerade",
-  "@restoreBackupSuccess": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
   },
   "restoreBackupEmpty": "Säkerhetskopia återställd — den innehöll inga poster",
   "@restoreBackupEmpty": {
@@ -3391,16 +3163,6 @@
   "voiceCoachingSettingSubtitle": "Hör talade tips medan du kör — hård acceleration, hård bromsning och växlingstips",
   "@voiceCoachingSettingSubtitle": {
     "description": "MT — needs native review"
-  },
-  "fuelStationRadarDistanceKm": "{km} km bort",
-  "@fuelStationRadarDistanceKm": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "km": {
-        "type": "String",
-        "example": "2.4"
-      }
-    }
   },
   "fuelStationRadarProximity": "Närhet {percent}%",
   "@fuelStationRadarProximity": {
@@ -3733,10 +3495,6 @@
   },
   "consumptionStatsChartConsumption": "L/100km per månad",
   "@consumptionStatsChartConsumption": {
-    "description": "MT — needs native review"
-  },
-  "shareReceiptImporting": "Importerar delat kvitto…",
-  "@shareReceiptImporting": {
     "description": "MT — needs native review"
   },
   "shareReceiptUnsupportedFormat": "Den filtypen kan inte importeras ännu — dela ett foto av kvittot istället.",
@@ -4228,17 +3986,6 @@
       "count": {
         "type": "int",
         "example": "3"
-      }
-    }
-  },
-  "fuelEfficiencyMixedFootnote": "{count, plural, =1{1 mixed tank counted toward its main fuel} other{{count} mixed tanks counted toward their main fuel}}",
-  "@fuelEfficiencyMixedFootnote": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int",
-        "example": "1"
       }
     }
   },
@@ -4752,11 +4499,6 @@
         "example": "Oil change"
       }
     }
-  },
-  "radarAcquiringLocation": "Finding your location…",
-  "@radarAcquiringLocation": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
   },
   "radarUpdatingLocation": "Updating your location…",
   "@radarUpdatingLocation": {

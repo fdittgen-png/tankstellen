@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/response_frame_buffer.dart';
+import 'package:tankstellen/features/obd2/data/transport/response_frame_buffer.dart';
 
 /// #3276 — the prompt-framing accumulator + hard size cap.
 void main() {

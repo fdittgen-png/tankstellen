@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/broken_map_belief.dart';
+import 'package:tankstellen/features/obd2/domain/broken_map_belief.dart';
 
 void main() {
   group('BrokenMapBelief defaults', () {

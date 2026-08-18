@@ -53,14 +53,14 @@ void main() {
     // #3747 — trip_shares_sync.dart entry removed (shrink): its test now
     // injects wire faults through the FakeTripShareTransport and asserts
     // shareWithEmail completes with a soft TripShareResult.failed.
-    'lib/features/obd2/data/adapter_capability.dart',
+    'lib/features/obd2/data/protocol/adapter_capability.dart',
     // #3727 — auto_trip_coordinator.dart entry removed (shrink): its only
     // never-throws boundary (the link-tuning swallow contract) moved into
     // auto_trip_session_opener.dart, which ships WITH its fault-injection
     // test (auto_trip_session_opener_test.dart) — no grandfathering needed.
-    'lib/features/obd2/data/broken_map_detector.dart',
+    'lib/features/obd2/domain/broken_map_detector.dart',
     'lib/features/obd2/data/obd2_cache_openers.dart',
-    'lib/features/obd2/data/obd2_service.dart',
+    'lib/features/obd2/data/session/obd2_service.dart',
     'lib/features/consumption/data/ocr/ocr_image_preprocessor.dart',
     'lib/features/consumption/data/ocr/seven_segment_recognizer.dart',
     'lib/features/consumption/providers/consumption_providers.dart',

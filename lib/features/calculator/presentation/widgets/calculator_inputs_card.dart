@@ -154,6 +154,7 @@ class CalculatorInputsCard extends ConsumerWidget {
     double value, {
     required int decimals,
   }) {
+    // i18n-ignore-format: TextEditingController prefill — re-parsed as a dot-decimal number, not display text
     controller.text = value.toStringAsFixed(decimals);
     set(value);
   }

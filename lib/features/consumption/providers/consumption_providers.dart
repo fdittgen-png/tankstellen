@@ -11,7 +11,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/data/storage_repository.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/storage/storage_providers.dart';
-import '../../../core/sync/fill_ups_sync.dart';
+import '../data/fill_ups_sync.dart';
 import '../../vehicle/data/reference_vehicle_catalog_provider.dart';
 import '../../vehicle/data/ve_learner.dart';
 import '../../vehicle/data/vehicle_profile_catalog_matcher.dart';

@@ -4,12 +4,12 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/bluetooth_obd2_transport.dart';
-import 'package:tankstellen/features/obd2/data/elm_byte_channel.dart';
-import 'package:tankstellen/features/obd2/data/elm327_adapter.dart';
-import 'package:tankstellen/features/obd2/data/elm327_protocol.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connection_errors.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/bluetooth_obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/transport/elm_byte_channel.dart';
+import 'package:tankstellen/features/obd2/data/protocol/elm327_adapter.dart';
+import 'package:tankstellen/features/obd2/data/protocol/elm327_protocol.dart';
+import 'package:tankstellen/features/obd2/domain/obd2_connection_errors.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
 
 /// TDD tests for the Bluetooth OBD2 transport (#716).
 ///

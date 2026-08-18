@@ -13,6 +13,7 @@ import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../providers/vehicle_providers.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Hands-free auto-record configuration card on the vehicle edit
 /// screen (#1004 phase 6).
@@ -589,7 +590,7 @@ class _SpeedThresholdSliderState extends State<_SpeedThresholdSlider> {
               child: Text(widget.label, style: theme.textTheme.bodyMedium),
             ),
             Text(
-              _current.toStringAsFixed(0),
+              UnitFormatter.formatDecimal(_current, fractionDigits: 0),
               style: theme.textTheme.titleMedium,
             ),
           ],

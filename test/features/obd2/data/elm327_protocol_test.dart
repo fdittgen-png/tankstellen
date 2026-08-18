@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/elm327_protocol.dart';
+import 'package:tankstellen/features/obd2/data/protocol/elm327_protocol.dart';
 
 void main() {
   group('Elm327Protocol PID expansion (#717)', () {

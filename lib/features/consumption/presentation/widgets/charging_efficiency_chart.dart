@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 // the dart:ui/material one (with `.ltr`).
 import 'package:intl/intl.dart' hide TextDirection;
 
+import '../../../../core/widgets/charts/monthly_bar_chart_base.dart'
+    show drawChartText;
 import '../../../../l10n/app_localizations.dart';
 
 /// Monthly kWh/100 km line chart (#582 phase 3).
@@ -126,7 +128,7 @@ class _EfficiencyPainter extends CustomPainter {
         ((v - yMin) / (yMax - yMin == 0 ? 1 : (yMax - yMin))) * chartHeight;
 
     // Max label top-right
-    _drawText(
+    drawChartText(
       canvas,
       '${maxV.toStringAsFixed(1)} kWh',
       Offset(size.width - rightInset, 2),
@@ -137,7 +139,7 @@ class _EfficiencyPainter extends CustomPainter {
 
     // Month labels along the bottom axis.
     for (int i = 0; i < entries.length; i++) {
-      _drawText(
+      drawChartText(
         canvas,
         monthFormat.format(entries[i].key),
         Offset(xForIndex(i), topInset + chartHeight + 4),
@@ -180,27 +182,6 @@ class _EfficiencyPainter extends CustomPainter {
     }
   }
 
-  void _drawText(
-    Canvas canvas,
-    String text,
-    Offset offset, {
-    bool anchorRight = false,
-    bool anchorCenter = false,
-    required Color color,
-    double fontSize = 10,
-  }) {
-    final tp = TextPainter(
-      text: TextSpan(
-        text: text,
-        style: TextStyle(color: color, fontSize: fontSize),
-      ),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    var dx = offset.dx;
-    if (anchorRight) dx -= tp.width;
-    if (anchorCenter) dx -= tp.width / 2;
-    tp.paint(canvas, Offset(dx, offset.dy));
-  }
 
   @override
   bool shouldRepaint(_EfficiencyPainter oldDelegate) =>

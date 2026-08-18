@@ -3,54 +3,41 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 
-import '../../../../core/error/guarded.dart';
-import '../../../../core/logging/error_logger.dart';
-import '../../../../core/services/sensitive_clipboard.dart';
-import '../../../../core/sharing/public_file_exporter.dart';
+import '../../../../core/sharing/share_seam.dart';
+import '../../../../core/sharing/size_gated_text_export.dart';
 import '../../../../core/telemetry/storage/trace_storage.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Threshold above which the error-log export switches from clipboard
-/// to the OS share sheet. Some Samsung clipboard managers silently drop
-/// large payloads — see #1301.
-const int kErrorLogClipboardThresholdBytes = 64 * 1024;
+/// to the OS share sheet (#1301) — the shared size gate.
+const int kErrorLogClipboardThresholdBytes = kExportClipboardThresholdBytes;
 
 /// Test-only override for the share-sheet handoff used by the
-/// large-log export path. Production sends [ShareParams] straight to
-/// [SharePlus.instance.share]; widget tests substitute a fake to assert
-/// the outgoing payload without launching the real OS share sheet
-/// (#1301). Shared by the privacy dashboard and the Developer tools
-/// screen (#2248) so there is a SINGLE export implementation.
-typedef ErrorLogShareSink = Future<void> Function(ShareParams params);
-
-/// See [ErrorLogShareSink].
+/// large-log export path — the shared [ShareSink] seam (#1301). Shared
+/// by the privacy dashboard and the Developer tools screen (#2248) so
+/// there is a SINGLE export implementation.
 @visibleForTesting
-ErrorLogShareSink? debugErrorLogShareSinkOverride;
+ShareSink? debugErrorLogShareSinkOverride;
 
 /// Test-only override for the temporary-directory lookup used by the
-/// large-log share path. Returns a [Directory] the export is allowed to
-/// write into. (#1301)
-typedef ErrorLogTempDirectoryProvider = Future<Directory> Function();
-
-/// See [ErrorLogTempDirectoryProvider].
+/// large-log share path — the shared [ShareTempDirectoryProvider]
+/// seam (#1301).
 @visibleForTesting
-ErrorLogTempDirectoryProvider? debugErrorLogTempDirectoryOverride;
+ShareTempDirectoryProvider? debugErrorLogTempDirectoryOverride;
 
 /// The error-log Save + Clear row, plus (optionally) a View action
 /// (#2248). Extracted from the privacy dashboard so the SAME
 /// single-write export logic is reused by both the privacy dashboard and
-/// the Developer tools screen — the #2236 double-write fix is preserved
-/// because the Downloads write happens exactly once in
-/// [_saveExportToDownloads]; the share-sheet seam never writes to
-/// Downloads itself.
+/// the Developer tools screen. The size-gated clipboard/share/Downloads
+/// flow itself lives in the shared [exportTextSizeGated] helper — the
+/// #2236 single-write fix and the #3611 sensitive-clipboard hygiene are
+/// preserved there.
 ///
 /// [onView] is null on the privacy dashboard (no raw viewer there) and
 /// wired on the Developer tools screen to push the in-app trace viewer.
@@ -110,63 +97,30 @@ class _ErrorLogExportRowState extends ConsumerState<ErrorLogExportRow> {
     final traces = ref.read(traceStorageProvider);
     final json = traces.exportAsJson();
     final byteSize = utf8.encode(json).length;
-    final kb = (byteSize / 1024).toStringAsFixed(1);
+    final kb = UnitFormatter.formatDecimal(byteSize / 1024);
     final parsed = traces.parsedCount;
     final unparsed = traces.unparsedCount;
     final totalEntries = parsed + unparsed;
 
-    // Large payloads exceed Samsung One UI's clipboard preview budget
-    // (#1301); hand off to the OS share sheet instead.
-    if (byteSize > kErrorLogClipboardThresholdBytes) {
-      try {
-        await _shareErrorLogAsFile(json);
-      } on Object catch (e, st) {
-        logFailure(
-          e,
-          st,
-          where: 'ErrorLogExportRow._exportErrorLog: share fallback',
-        );
-        await SensitiveClipboard.copy(json); // #3611 — auto-clears in 60 s
-        if (!mounted) return;
-        SnackBarHelper.showSuccess(
-          context,
-          _formatCopySnackbar(parsed: parsed, unparsed: unparsed, kb: kb),
-        );
-        return;
-      }
-      if (!mounted) return;
-      // #2236 — SINGLE Downloads write for the large-log path;
-      // [_shareErrorLogAsFile] only feeds the widget-test share seam.
-      await _saveExportToDownloads(
-        text: json,
-        copySnackbar: 'Error log shared ($kb KB, $totalEntries entries)',
-      );
-      return;
-    }
-
-    // #3611 — the error-log blob may carry pre-scrub payloads; use
-    // SensitiveClipboard so the clipboard is auto-cleared after 60 s.
-    await SensitiveClipboard.copy(json);
-    await _saveExportToDownloads(
-      text: json,
-      copySnackbar: _formatCopySnackbar(
+    final outcome = await exportErrorLogSizeGated(
+      json: json,
+      logWhere: 'ErrorLogExportRow._exportErrorLog',
+      shareSink: debugErrorLogShareSinkOverride,
+      tempDirectoryProvider: debugErrorLogTempDirectoryOverride,
+    );
+    if (!mounted) return;
+    final l = AppLocalizations.of(context);
+    SnackBarHelper.showSuccess(
+      context,
+      errorLogExportSnackbar(
+        outcome: outcome,
+        savedToDownloadsMessage: l.savedToDownloadsFolder,
         parsed: parsed,
         unparsed: unparsed,
+        totalEntries: totalEntries,
         kb: kb,
       ),
     );
-  }
-
-  String _formatCopySnackbar({
-    required int parsed,
-    required int unparsed,
-    required String kb,
-  }) {
-    if (unparsed > 0) {
-      return 'Error log copied ($parsed parsed + $unparsed raw entries, '
-          '$kb KB) — some entries failed to parse';
-    }
-    return 'Error log copied to clipboard — $kb KB, $parsed entries';
   }
 
   Future<void> _clearErrorLog() async {
@@ -176,50 +130,46 @@ class _ErrorLogExportRowState extends ConsumerState<ErrorLogExportRow> {
     final l = AppLocalizations.of(context);
     SnackBarHelper.showSuccess(context, l.privacyErrorLogCleared);
   }
+}
 
-  /// Routes the large payload to the widget-test share seam only. The
-  /// actual Downloads write happens exactly once in the caller via
-  /// [_saveExportToDownloads] — preserving the #2236 single-write fix.
-  Future<void> _shareErrorLogAsFile(String json) async {
-    final sink = debugErrorLogShareSinkOverride;
-    if (sink == null) return;
-    final tempDirProvider =
-        debugErrorLogTempDirectoryOverride ?? getTemporaryDirectory;
-    final tempDir = await tempDirProvider();
-    final filePath = '${tempDir.path}/tankstellen-error-log.json';
-    final file = File(filePath);
-    await file.writeAsString(json, flush: true);
-    final params = ShareParams(
-      files: [XFile(filePath, mimeType: 'application/json')],
-      subject: 'tankstellen-error-log.json',
-    );
-    await sink(params);
-  }
+/// Runs the shared size-gated export flow for an error-log JSON blob —
+/// the ONE implementation both the Developer tools row and the privacy
+/// dashboard call (#2248).
+Future<SizeGatedTextExportOutcome> exportErrorLogSizeGated({
+  required String json,
+  required String logWhere,
+  ShareSink? shareSink,
+  ShareTempDirectoryProvider? tempDirectoryProvider,
+}) {
+  return exportTextSizeGated(
+    text: json,
+    fileName: 'tankstellen-error-log.json',
+    mimeType: 'application/json',
+    logWhere: logWhere,
+    shareSink: shareSink,
+    tempDirectoryProvider: tempDirectoryProvider,
+  );
+}
 
-  Future<void> _saveExportToDownloads({
-    required String text,
-    required String copySnackbar,
-  }) async {
-    if (!mounted) return;
-    final l = AppLocalizations.of(context);
-    try {
-      await PublicFileExporter.saveTextToDownloads(
-        text: text,
-        fileName: 'tankstellen-error-log.json',
-        mimeType: 'application/json',
-      );
-      if (!mounted) return;
-      SnackBarHelper.showSuccess(context, l.savedToDownloadsFolder);
-    } on Object catch (e, st) {
-      logFailure(
-        e,
-        st,
-        where: 'ErrorLogExportRow._saveExportToDownloads',
-        layer: ErrorLayer.storage,
-        extra: const {'fileName': 'tankstellen-error-log.json'},
-      );
-      if (!mounted) return;
-      SnackBarHelper.showSuccess(context, copySnackbar);
-    }
+/// Maps a [SizeGatedTextExportOutcome] onto the error-log snackbar
+/// wording both call sites shared verbatim.
+String errorLogExportSnackbar({
+  required SizeGatedTextExportOutcome outcome,
+  required String savedToDownloadsMessage,
+  required int parsed,
+  required int unparsed,
+  required int totalEntries,
+  required String kb,
+}) {
+  if (outcome.savedToDownloads) return savedToDownloadsMessage;
+  if (outcome == SizeGatedTextExportOutcome.sharedOnly) {
+    return 'Error log shared ($kb KB, $totalEntries entries)';
   }
+  // Clipboard fallback (small path save failure, or large-path share
+  // failure).
+  if (unparsed > 0) {
+    return 'Error log copied ($parsed parsed + $unparsed raw entries, '
+        '$kb KB) — some entries failed to parse';
+  }
+  return 'Error log copied to clipboard — $kb KB, $parsed entries';
 }

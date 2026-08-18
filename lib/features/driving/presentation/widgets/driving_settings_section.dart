@@ -24,6 +24,7 @@ import '../../../profile/providers/voice_announcements_enabled_provider.dart';
 import '../../providers/haptic_eco_coach_provider.dart';
 import '../../providers/voice_announcement_settings_provider.dart';
 import '../../providers/voice_coaching_enabled_provider.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Consumption / driving settings group on the profile screen.
 ///
@@ -275,7 +276,7 @@ class _VoiceAnnouncementsTile extends ConsumerWidget {
             label: l.voiceAnnouncementProximityRadius,
             // i18n-ignore: " km" is a language-neutral unit suffix (matches
             // ProfileRadiusSlider + the {km} ARB masks).
-            valueLabel: '${radiusKm.toStringAsFixed(1)} km',
+            valueLabel: UnitFormatter.formatDistance(radiusKm),
             labelStyle: theme.textTheme.bodyMedium,
             value: radiusKm,
             min: 0.5,

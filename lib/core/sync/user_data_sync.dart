@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import 'supabase_client.dart';
-import 'trips_sync.dart';
+import '../../features/consumption/data/trips_sync.dart';
 import '../../core/logging/error_logger.dart';
 
 /// GDPR data-management operations over the user's full server-side

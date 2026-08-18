@@ -4,7 +4,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/moderation/content_moderation_providers.dart';
-import '../../../core/sync/trip_shares_sync.dart';
+import '../data/trip_shares_sync.dart';
 import '../../../core/sync/trip_shares_sync_enabled_provider.dart';
 
 part 'shared_trips_provider.g.dart';

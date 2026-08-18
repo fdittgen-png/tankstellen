@@ -51,6 +51,54 @@ void main() {
       PriceFormatter.setCountry('DE');
       expect(UnitFormatter.formatDistance(5, countryCode: 'ZZ'), '5,0 km');
     });
+
+    test('fractionDigits override renders whole-km and 2-dp figures', () {
+      // Odometer-style whole km (FR comma locale — no decimal at 0 dp).
+      expect(
+        UnitFormatter.formatDistance(123456.7, fractionDigits: 0),
+        '123457 km',
+      );
+      // Fine-grained live trip distance at 2 dp keeps the comma.
+      expect(
+        UnitFormatter.formatDistance(12.345, fractionDigits: 2),
+        '12,35 km',
+      );
+      // The imperial branch honours the override too (10 km ≈ 6.21 mi).
+      PriceFormatter.setCountry('GB');
+      expect(
+        UnitFormatter.formatDistance(10, fractionDigits: 2),
+        '6.21 mi',
+      );
+    });
+  });
+
+  group('formatDecimal (#3743)', () {
+    test('null returns placeholder', () {
+      expect(UnitFormatter.formatDecimal(null), '--');
+    });
+
+    test('French locale renders a comma decimal', () {
+      // Active country FR (setUp) → fr locale.
+      expect(UnitFormatter.formatDecimal(1.5), '1,5');
+      expect(UnitFormatter.formatDecimal(6.449, fractionDigits: 2), '6,45');
+    });
+
+    test('German locale renders a comma decimal', () {
+      PriceFormatter.setCountry('DE');
+      expect(UnitFormatter.formatDecimal(1.5), '1,5');
+      expect(UnitFormatter.formatDecimal(0.123, fractionDigits: 3), '0,123');
+    });
+
+    test('English locale renders a dot decimal', () {
+      PriceFormatter.setCountry('GB');
+      expect(UnitFormatter.formatDecimal(1.5), '1.5');
+      expect(UnitFormatter.formatDecimal(6.449, fractionDigits: 2), '6.45');
+    });
+
+    test('zero fractionDigits renders a rounded whole number', () {
+      expect(UnitFormatter.formatDecimal(87.6, fractionDigits: 0), '88');
+      expect(UnitFormatter.formatDecimal(-3.2, fractionDigits: 0), '-3');
+    });
   });
 
   group('formatVolume', () {

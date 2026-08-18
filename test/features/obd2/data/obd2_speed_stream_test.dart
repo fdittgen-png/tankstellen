@@ -8,10 +8,10 @@ import 'dart:collection';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/data/auto_record_trace_log.dart';
-import 'package:tankstellen/features/obd2/data/elm327_protocol.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_speed_stream.dart';
-import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/protocol/elm327_protocol.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_speed_stream.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// Unit tests for [Obd2SpeedStream] (#1004 phase 2b-3).

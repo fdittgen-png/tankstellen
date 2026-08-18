@@ -45,22 +45,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get searchNearby => 'Čerpací stanice poblíž';
 
   @override
-  String get searchButton => 'Hledat';
-
-  @override
-  String get fabOpenCriteria => 'Otevřít vyhledávání';
-
-  @override
-  String get fabOpenResults => 'Otevřít výsledky';
-
-  @override
   String get fabRunSearch => 'Spustit vyhledávání';
-
-  @override
-  String get fabRefineCriteria => 'Upřesnit vyhledávání';
-
-  @override
-  String get routeSearchPartialBanner => 'Hledání dalších stanic…';
 
   @override
   String get routeSearchingChip => 'Prohledávám trasu…';
@@ -74,15 +59,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get searchCriteriaTitle => 'Kritéria hledání';
 
   @override
-  String get searchCriteriaOpen => 'Hledat';
-
-  @override
   String searchCriteriaRadiusBadge(String km) {
     return 'Do $km km';
   }
-
-  @override
-  String get searchCriteriaTapToSearch => 'Klepněte pro zahájení hledání';
 
   @override
   String get noResults => 'Žádné čerpací stanice nenalezeny.';
@@ -124,10 +103,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get apiKeySetup => 'Klíč API';
-
-  @override
-  String get apiKeyDescription =>
-      'Zaregistrujte se jednou pro bezplatný klíč API.';
 
   @override
   String get apiKeyLabel => 'Klíč API';
@@ -233,19 +208,10 @@ class AppLocalizationsCs extends AppLocalizations {
   String get country => 'Země';
 
   @override
-  String get demoMode => 'Demo režim — ukázková data.';
-
-  @override
-  String get setupLiveData => 'Nastavit živá data';
-
-  @override
   String get freeNoKey => 'Zdarma — klíč není potřeba';
 
   @override
   String get apiKeyRequired => 'Vyžadován klíč API';
-
-  @override
-  String get skipWithoutKey => 'Pokračovat bez klíče';
 
   @override
   String get dataTransparency => 'Transparentnost dat';
@@ -257,68 +223,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get clearCache => 'Vymazat mezipaměť';
 
   @override
-  String get clearAllData => 'Smazat všechna data';
-
-  @override
-  String get errorLog => 'Protokol chyb';
-
-  @override
   String stationsFound(int count) {
     return 'Nalezeno $count stanic';
   }
-
-  @override
-  String get whatIsShared => 'Co se sdílí — a s kým?';
-
-  @override
-  String get gpsCoordinates => 'Souřadnice GPS';
-
-  @override
-  String get gpsReason =>
-      'Odesílány s každým vyhledáváním pro nalezení blízkých stanic.';
-
-  @override
-  String get postalCodeData => 'PSČ';
-
-  @override
-  String get postalReason =>
-      'Převedeno na souřadnice prostřednictvím geokódovací služby.';
-
-  @override
-  String get mapViewport => 'Výřez mapy';
-
-  @override
-  String get mapReason =>
-      'Mapové dlaždice se načítají ze serveru. Žádné osobní údaje se nepřenášejí.';
-
-  @override
-  String get apiKeyData => 'Klíč API';
-
-  @override
-  String get apiKeyReason =>
-      'Váš osobní klíč se odesílá s každým požadavkem API. Je spojen s vaším e-mailem.';
-
-  @override
-  String get notShared => 'NESDÍLÍ se:';
-
-  @override
-  String get searchHistory => 'Historie vyhledávání';
-
-  @override
-  String get favoritesData => 'Oblíbené';
-
-  @override
-  String get profileNames => 'Názvy profilů';
-
-  @override
-  String get homeZipData => 'PSČ domova';
-
-  @override
-  String get usageData => 'Údaje o používání';
-
-  @override
-  String get privacyBanner =>
-      'Tato aplikace nemá server. Všechna data zůstávají na vašem zařízení. Žádná analytika, žádné sledování, žádné reklamy.';
 
   @override
   String get storageUsage => 'Využití úložiště na tomto zařízení';
@@ -403,25 +310,12 @@ class AppLocalizationsCs extends AppLocalizations {
   String get cacheEmpty => 'Mezipaměť je prázdná';
 
   @override
-  String get noStorage => 'Žádné využité úložiště';
-
-  @override
   String get apiKeyNote =>
       'Bezplatná registrace. Data od vládních agentur pro cenovou transparentnost.';
 
   @override
   String get apiKeyFormatError =>
       'Neplatný formát — očekáváno UUID (8-4-4-4-12)';
-
-  @override
-  String get supportProject => 'Podpořte tento projekt';
-
-  @override
-  String get supportDescription =>
-      'Tato aplikace je zdarma, s otevřeným zdrojovým kódem a bez reklam. Pokud ji považujete za užitečnou, zvažte podporu vývojáře.';
-
-  @override
-  String get reportBug => 'Nahlásit chybu / Navrhnout funkci';
 
   @override
   String get reportThisIssue => 'Nahlásit problém';
@@ -465,9 +359,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get configApiKeyConfigured => 'Nakonfigurováno';
-
-  @override
-  String get configApiKeyNotSet => 'Nenastaveno (ukázkový režim)';
 
   @override
   String get configApiKeyCommunity => 'Výchozí (komunitní klíč)';
@@ -587,15 +478,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get expensive => 'drahé';
 
   @override
-  String stationsOnMap(int count) {
-    return '$count stanic';
-  }
-
-  @override
-  String get loadingFavorites =>
-      'Načítání oblíbených...\nNejprve vyhledejte stanice pro uložení dat.';
-
-  @override
   String get reportPrice => 'Nahlásit cenu';
 
   @override
@@ -621,10 +503,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get positionUnknown => 'Poloha neznámá';
-
-  @override
-  String get routeModeBannerLabel =>
-      'Režim trasy — vzdálenosti jsou podél koridoru';
 
   @override
   String get distancesFromCenter => 'Vzdálenosti od centra hledání';
@@ -757,12 +635,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get wrongStatusClosed => 'Zobrazeno jako zavřeno, ale otevřeno';
 
   @override
-  String get searchAlongRouteLabel => 'Podél trasy';
-
-  @override
-  String get searchEvStations => 'Hledat nabíjecí stanice';
-
-  @override
   String get allStations => 'Všechny stanice';
 
   @override
@@ -885,11 +757,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get stop => 'Zastávka';
 
   @override
-  String stopN(int n) {
-    return 'Zastávka $n';
-  }
-
-  @override
   String get addStop => 'Přidat zastávku';
 
   @override
@@ -929,17 +796,10 @@ class AppLocalizationsCs extends AppLocalizations {
       'Volitelné: nahradit vestavěný klíč aplikace vlastním';
 
   @override
-  String get requiredForEvSearch =>
-      'Vyžadováno pro vyhledávání nabíjecích stanic EV';
-
-  @override
   String get edit => 'Upravit';
 
   @override
   String get fuelPricesApiKey => 'Klíč API cen paliv';
-
-  @override
-  String get tankerkoenigApiKey => 'Klíč API Tankerkoenig';
 
   @override
   String get evChargingApiKey => 'Klíč API nabíjení EV';
@@ -1013,12 +873,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get distanceKm => 'Vzdálenost (km)';
 
   @override
-  String get consumptionL100km => 'Spotřeba (L/100km)';
-
-  @override
-  String get fuelPriceEurL => 'Cena paliva (EUR/L)';
-
-  @override
   String get tripCost => 'Náklady na cestu';
 
   @override
@@ -1026,10 +880,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get totalCost => 'Celkové náklady';
-
-  @override
-  String get enterCalcValues =>
-      'Zadejte vzdálenost, spotřebu a cenu pro výpočet nákladů na cestu';
 
   @override
   String calculatorDistanceLabel(String unit) {
@@ -1099,10 +949,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get citySearchCache => 'Hledání města';
 
   @override
-  String get dataDeletionNotAvailableCommunity =>
-      'Mazání dat není v komunitním režimu k dispozici. Nejprve se odpojte nebo použijte soukromou databázi.';
-
-  @override
   String priceHistoryStationsTracked(int count) {
     return '$count sledovaných stanic';
   }
@@ -1126,19 +972,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get noPriceHistory => 'Zatím žádná historie cen';
 
   @override
-  String get noHourlyData => 'Žádná hodinová data';
-
-  @override
   String get noStatistics => 'Žádné statistiky k dispozici';
-
-  @override
-  String get statMin => 'Min';
-
-  @override
-  String get statMax => 'Max';
-
-  @override
-  String get statAvg => 'Prům';
 
   @override
   String get showAllFuelTypes => 'Zobrazit všechny typy paliv';
@@ -1147,34 +981,10 @@ class AppLocalizationsCs extends AppLocalizations {
   String get connected => 'Připojeno';
 
   @override
-  String get notConnected => 'Nepřipojeno';
-
-  @override
-  String get connectTankSync => 'Připojit TankSync';
-
-  @override
   String get disconnectTankSync => 'Odpojit TankSync';
 
   @override
   String get viewMyData => 'Zobrazit moje data';
-
-  @override
-  String get optionalCloudSync =>
-      'Volitelná cloudová synchronizace pro výstrahy, oblíbené a push notifikace';
-
-  @override
-  String get tapToUpdateGps => 'Klepněte pro aktualizaci polohy GPS';
-
-  @override
-  String get gpsAutoUpdateHint =>
-      'Poloha GPS se získává automaticky při hledání. Můžete ji také aktualizovat ručně zde.';
-
-  @override
-  String get clearGpsConfirm =>
-      'Vymazat uloženou polohu GPS? Můžete ji kdykoli znovu aktualizovat.';
-
-  @override
-  String get pageNotFound => 'Stránka nenalezena';
 
   @override
   String get deleteAllServerData => 'Smazat všechna data serveru';
@@ -1206,9 +1016,6 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get forgetAllSyncedTripsSuccess =>
       'Všechny synchronizované cesty odstraněny ze serveru';
-
-  @override
-  String get disconnectConfirm => 'Odpojit TankSync?';
 
   @override
   String get disconnect => 'Odpojit';
@@ -1266,9 +1073,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get signIn => 'Přihlásit se';
-
-  @override
-  String get upgradeToEmail => 'Vytvořit e-mailový účet';
 
   @override
   String get savedRoutes => 'Uložené trasy';
@@ -1372,27 +1176,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get onboardingFinish => 'Začít';
 
   @override
-  String crossBorderNearby(String country) {
-    return '$country je poblíž';
-  }
-
-  @override
-  String crossBorderDistance(int km) {
-    return '~$km km k hranici';
-  }
-
-  @override
-  String crossBorderAvgPrice(String price, int count) {
-    return 'Průměr zde: $price EUR ($count stanic)';
-  }
-
-  @override
-  String get allPricesView => 'Všechny ceny';
-
-  @override
-  String get compactView => 'Kompaktní';
-
-  @override
   String get switchToAllPricesView => 'Přepnout na zobrazení všech cen';
 
   @override
@@ -1480,18 +1263,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String failedToSwitch(String error) {
     return 'Přepnutí selhalo: $error';
   }
-
-  @override
-  String get topicUrlCopied => 'URL tématu zkopírována';
-
-  @override
-  String get testNotificationSent => 'Testovací oznámení odesláno!';
-
-  @override
-  String get testNotificationFailed => 'Odeslání testovacího oznámení selhalo';
-
-  @override
-  String get pushUpdateFailed => 'Aktualizace nastavení push oznámení selhala';
 
   @override
   String get connectedAsGuest => 'Připojeno jako host';
@@ -1697,11 +1468,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get privacyDeleteButton => 'Smazat všechna data';
 
   @override
-  String privacyCopyErrorLog(int count) {
-    return 'Kopírovat protokol chyb do schránky ($count)';
-  }
-
-  @override
   String privacySaveErrorLog(int count) {
     return 'Uložit záznam chyb ($count)';
   }
@@ -1826,21 +1592,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get voiceAnnouncementsEnabled => 'Povolit hlasová oznámení';
 
   @override
-  String voiceAnnouncementThreshold(String price) {
-    return 'Pouze pod $price';
-  }
-
-  @override
-  String voiceAnnouncementCheapFuel(
-    String station,
-    String distance,
-    String fuelType,
-    String price,
-  ) {
-    return '$station, za $distance km, $fuelType $price';
-  }
-
-  @override
   String get voiceAnnouncementProximityRadius => 'Poloměr oznámení';
 
   @override
@@ -1848,23 +1599,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get voiceAnnouncementPriceLimit => 'Maximum price';
-
-  @override
-  String get nearestStations => 'Nejblizsi stanice';
-
-  @override
-  String get nearestStationsHint =>
-      'Najdete nejblizsi stanice pomoci vasi aktualni polohy';
-
-  @override
-  String get consumptionLogTitle => 'Spotřeba paliva';
-
-  @override
-  String get consumptionLogMenuTitle => 'Protokol spotřeby';
-
-  @override
-  String get consumptionLogMenuSubtitle =>
-      'Sledovat tankování a výpočet L/100km';
 
   @override
   String get consumptionStatsTitle => 'Statistiky spotřeby';
@@ -1979,9 +1713,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get fillUpVehicleLabel => 'Vozidlo';
 
   @override
-  String get fillUpVehicleNone => 'Žádné vozidlo';
-
-  @override
   String get fillUpVehicleRequired => 'Vozidlo je povinné';
 
   @override
@@ -2000,9 +1731,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get pickStationSkip => 'Přeskočit — přidat bez stanice';
-
-  @override
-  String get scanPump => 'Skenovat pumpu';
 
   @override
   String get scanPayment => 'Skenovat platební QR';
@@ -2072,18 +1800,8 @@ class AppLocalizationsCs extends AppLocalizations {
   String get torchOff => 'Vypnout blesk';
 
   @override
-  String get obdNoAdapter => 'V dosahu není žádný adaptér OBD2';
-
-  @override
-  String get obdOdometerUnavailable => 'Nepodařilo se přečíst tachometr';
-
-  @override
   String get obdPermissionDenied =>
       'Udělte oprávnění Bluetooth v nastavení systému';
-
-  @override
-  String get obdAdapterUnresponsive =>
-      'Adaptér neodpověděl — zapněte zapalování a zkuste znovu';
 
   @override
   String get obdPickerTitle => 'Vybrat adaptér OBD2';
@@ -2093,18 +1811,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get obdPickerConnecting => 'Připojování…';
-
-  @override
-  String get themeSettingTitle => 'Motiv';
-
-  @override
-  String get themeModeLight => 'Světlý';
-
-  @override
-  String get themeModeDark => 'Tmavý';
-
-  @override
-  String get themeModeSystem => 'Sledovat systém';
 
   @override
   String get tripRecordingTitle => 'Nahrávání cesty';
@@ -2251,24 +1957,11 @@ class AppLocalizationsCs extends AppLocalizations {
   String get obd2StatusConnected => 'Adaptér OBD2: připojen';
 
   @override
-  String get obd2StatusAttempting => 'Adaptér OBD2: připojování';
-
-  @override
-  String get obd2StatusUnreachable => 'Adaptér OBD2: nedostupný';
-
-  @override
   String get obd2StatusPermissionDenied =>
       'Adaptér OBD2: potřebné oprávnění Bluetooth';
 
   @override
   String get obd2StatusConnectedBody => 'Připraveno k nahrávání cesty.';
-
-  @override
-  String get obd2StatusAttemptingBody => 'Připojování na pozadí…';
-
-  @override
-  String get obd2StatusUnreachableBody =>
-      'Adaptér mimo dosah nebo používán jinou aplikací.';
 
   @override
   String get obd2StatusPermissionDeniedBody =>
@@ -2285,10 +1978,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get tripHistoryEmptyTitle => 'Zatím žádné cesty';
-
-  @override
-  String get tripHistoryEmptySubtitle =>
-      'Připojte adaptér OBD2 a zaznamenejte cestu pro vytváření vaší jízdní historie.';
 
   @override
   String get tripHistoryUnknownDate => 'Neznámé datum';
@@ -2327,13 +2016,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get situationFuelCut => 'Odříznutí paliva — výběh';
 
   @override
-  String get tripSaveAsFillUp => 'Uložit jako tankování';
-
-  @override
   String get tripSaveRecording => 'Uložit cestu';
-
-  @override
-  String get tripDiscard => 'Zahodit';
 
   @override
   String get tripSummaryAutoSaved => 'Trip saved automatically';
@@ -2345,15 +2028,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get tripSummaryDelete => 'Delete this trip';
 
   @override
-  String obdOdometerRead(int km) {
-    return 'Tachometr přečten: $km km';
-  }
-
-  @override
   String get vehicleFuelNotSet => 'Nenastaveno';
-
-  @override
-  String get wizardVehicleTapToEdit => 'Klepnutím upravit';
 
   @override
   String get wizardVehicleDefaultBadge => 'Výchozí';
@@ -2389,10 +2064,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get wizardProfileCustomName => 'Vlastní';
-
-  @override
-  String get wizardProfileCustomDescription =>
-      'Vaše vlastní kombinace funkcí. Upravte každý přepínač níže.';
 
   @override
   String get useModeSectionHint =>
@@ -2522,15 +2193,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get evMinPower => 'Min výkon';
 
   @override
-  String get evMaxPower => 'Max výkon';
-
-  @override
-  String get evOperator => 'Provozovatel';
-
-  @override
-  String get evLastUpdate => 'Poslední aktualizace';
-
-  @override
   String get evStatusAvailable => 'Dostupné';
 
   @override
@@ -2552,9 +2214,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get criteriaSavedToProfile => 'Uloženo jako výchozí';
 
   @override
-  String get profileNotFound => 'Žádný aktivní profil';
-
-  @override
   String get updatingFavorites => 'Aktualizace oblíbených...';
 
   @override
@@ -2562,9 +2221,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get noDataAvailable => 'Žádná data';
-
-  @override
-  String get configAndPrivacy => 'Konfigurace a soukromí';
 
   @override
   String get searchToSeeMap => 'Hledáním zobrazíte stanice na mapě';
@@ -2858,15 +2514,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get scanReceipt => 'Skenovat účtenku';
 
   @override
-  String get obdConnect => 'OBD-II';
-
-  @override
-  String get stationTypeFuel => 'Palivo';
-
-  @override
-  String get stationTypeEv => 'EV';
-
-  @override
   String get brandFilterHighway => 'Dálnice';
 
   @override
@@ -2933,10 +2580,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get alertsLoadErrorTitle => 'Nepodařilo se načíst upozornění';
-
-  @override
-  String get alertsBackgroundCheckErrorTitle =>
-      'Kontrola upozornění na pozadí selhala';
 
   @override
   String get detailsLabel => 'Podrobnosti';
@@ -3297,12 +2940,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get swipeHide => 'Skrýt';
 
   @override
-  String get evChargingSection => 'Nabíjení EV';
-
-  @override
-  String get fuelStationsSection => 'Čerpací stanice';
-
-  @override
   String get yourRating => 'Vaše hodnocení';
 
   @override
@@ -3317,26 +2954,6 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get aboutSupportDescription =>
       'Tato aplikace je zdarma, open source a bez reklam. Pokud vám přijde užitečná, zvažte podporu vývojáře.';
-
-  @override
-  String get luxembourgRegulatedPricesNotice =>
-      'Ceny paliv v Lucembursku jsou státem regulované a jednotné po celé zemi.';
-
-  @override
-  String get luxembourgFuelUnleaded95 => 'Natural 95';
-
-  @override
-  String get luxembourgFuelUnleaded98 => 'Natural 98';
-
-  @override
-  String get luxembourgFuelDiesel => 'Diesel';
-
-  @override
-  String get luxembourgFuelLpg => 'LPG';
-
-  @override
-  String get luxembourgPricesUnavailable =>
-      'Regulované ceny paliv v Lucembursku jsou nedostupné.';
 
   @override
   String get reportIssueTitle => 'Nahlásit problém';
@@ -3426,20 +3043,6 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
-  String get southKoreaApiKeyRequired =>
-      'Zaregistrujte se na OPINET pro získání bezplatného klíče API';
-
-  @override
-  String get southKoreaApiProvider => 'OPINET (KNOC)';
-
-  @override
-  String get chileApiKeyRequired =>
-      'Zaregistrujte se na CNE pro získání bezplatného klíče API';
-
-  @override
-  String get chileApiProvider => 'CNE Bencina en Linea';
-
-  @override
   String get vinConfirmTitle => 'Je toto vaše auto?';
 
   @override
@@ -3522,9 +3125,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get alertsRadiusFuelType => 'Typ paliva';
 
   @override
-  String get alertsRadiusThreshold => 'Práh (€/L)';
-
-  @override
   String get alertsRadiusKm => 'Poloměr (km)';
 
   @override
@@ -3540,9 +3140,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get alertsRadiusCancel => 'Zrušit';
 
   @override
-  String get alertsRadiusDeleteConfirm => 'Smazat polohové upozornění?';
-
-  @override
   String radiusAlertDeleted(String name) {
     return 'Polohové upozornění \"$name\" smazáno';
   }
@@ -3554,16 +3151,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get obd2PairChipTooltip => 'Spárovat adaptér OBD2';
-
-  @override
-  String velocityAlertTitle(String fuelLabel) {
-    return '$fuelLabel pokleslo na blízkých stanicích';
-  }
-
-  @override
-  String velocityAlertBody(int stationCount, int maxDropCents) {
-    return '$stationCount stanic kleslo až o $maxDropCents¢ za poslední hodinu';
-  }
 
   @override
   String get fillUpSavedSnackbar => 'Tankování uloženo';
@@ -3793,16 +3380,6 @@ class AppLocalizationsCs extends AppLocalizations {
       'Přidejte oblíbenou stanici, abyste mohli překryv přiblížení otestovat';
 
   @override
-  String approachStationDistance(String meters) {
-    return '$meters m daleko';
-  }
-
-  @override
-  String fuelStationRadarDistanceKm(String km) {
-    return '$km km vzdáleno';
-  }
-
-  @override
   String fuelStationRadarProximity(int percent) {
     return 'Blízkost $percent%';
   }
@@ -3894,13 +3471,6 @@ class AppLocalizationsCs extends AppLocalizations {
       'Prodleva před uložením po odpojení (sekundy)';
 
   @override
-  String get autoRecordPairedAdapterLabel => 'Spárovaný adaptér';
-
-  @override
-  String get autoRecordPairedAdapterNone =>
-      'Žádný adaptér není spárován. Nejprve ho spárujte přes OBD2 úvodní nastavení.';
-
-  @override
   String get autoRecordBackgroundLocationLabel => 'Poloha na pozadí povolena';
 
   @override
@@ -3926,14 +3496,8 @@ class AppLocalizationsCs extends AppLocalizations {
       'Nepodařilo se požádat o polohu na pozadí';
 
   @override
-  String get autoRecordBadgeClearTooltip => 'Vymazat počítadlo';
-
-  @override
   String get autoRecordPairAdapterLinkText =>
       'Spárujte adaptér v sekci níže pro povolení automatického nahrávání';
-
-  @override
-  String get exportBackupTooltip => 'Exportovat zálohu';
 
   @override
   String get exportBackupReady => 'Záloha připravena — vyberte cíl';
@@ -3950,9 +3514,6 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
-  String get restoreBackupTooltip => 'Obnovit zálohu';
-
-  @override
   String get restoreBackupDialogTitle => 'Obnovit zálohu';
 
   @override
@@ -3964,11 +3525,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get restoreBackupReplaceAction => 'Nahradit vše';
-
-  @override
-  String restoreBackupSuccess(int count) {
-    return 'Záloha obnovena — importováno $count záznamů';
-  }
 
   @override
   String get restoreBackupEmpty =>
@@ -4006,9 +3562,6 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
-  String get brokenMapChipVerifying => 'Ověřování snímače MAP…';
-
-  @override
   String get brokenMapChipDisclaimer => 'Odečty MAP jsou podezřelé';
 
   @override
@@ -4018,21 +3571,6 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get brokenMapBannerHardDisable =>
       'Snímač MAP není spolehlivý. Zobrazuji průměry tankování místo živého průtoku paliva.';
-
-  @override
-  String brokenMapOverlayVerified(String confidence) {
-    return 'Snímač MAP: ověřen ($confidence)';
-  }
-
-  @override
-  String brokenMapOverlayUnverified(String confidence) {
-    return 'Snímač MAP: ověřování ($confidence)';
-  }
-
-  @override
-  String brokenMapOverlaySuspicious(String confidence) {
-    return 'Snímač MAP: podezřelý ($confidence)';
-  }
 
   @override
   String brokenMapOverlayPosterior(String posterior, String margin) {
@@ -4252,9 +3790,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get chargingChartsEmpty => 'Zatím nedostatek dat';
 
   @override
-  String get chargingChartsMonthAxis => 'Měsíc';
-
-  @override
   String get confirmDeleteTitle => 'Delete?';
 
   @override
@@ -4448,20 +3983,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get fillUpCorrectionStation => 'Název stanice (volitelné)';
-
-  @override
-  String get greeceApiProvider => 'Paratiritirio Timon (Řecko)';
-
-  @override
-  String get greeceCommunityApiNotice =>
-      'Využívá komunitně spravované API fuelpricesgr';
-
-  @override
-  String get romaniaApiProvider => 'Monitorul Prețurilor (Rumunsko)';
-
-  @override
-  String get romaniaScrapingNotice =>
-      'Využívá monitorulpreturilor.info (Rada pro hospodářskou soutěž + ANPC)';
 
   @override
   String crossBorderCheaper(String country, String km, String price) {
@@ -4972,18 +4493,6 @@ class AppLocalizationsCs extends AppLocalizations {
       'High revs at cruise — shifting up earlier saves fuel';
 
   @override
-  String get ecoRouteOption => 'Eko';
-
-  @override
-  String ecoRouteSavings(String liters) {
-    return '≈ $liters L ušetřeno';
-  }
-
-  @override
-  String get ecoRouteHint =>
-      'Chytřejší jízda — upřednostňuje stabilní dálnici před klikatými zkratkami.';
-
-  @override
   String get obd2CoverageNoneNote =>
       'No engine data arrived from the OBD2 adapter on this trip — fuel figures are GPS-based estimates.';
 
@@ -5056,13 +4565,6 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get featureDescription_baselineSync =>
       'Synchronizace jízdních základen přes TankSync.';
-
-  @override
-  String get featureLabel_unifiedSearchResults => 'Sjednocené výsledky hledání';
-
-  @override
-  String get featureDescription_unifiedSearchResults =>
-      'Jeden seznam výsledků kombinující benzínové a EV stanice.';
 
   @override
   String get featureLabel_priceAlerts => 'Cenová upozornění';
@@ -5160,12 +4662,6 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get featureBlockedEnable_autoRecord =>
       'Nejprve povolte nahrávání cest OBD2';
-
-  @override
-  String get featureBlockedEnable_showFuel => 'Předpoklady nejsou splněny';
-
-  @override
-  String get featureBlockedEnable_showElectric => 'Předpoklady nejsou splněny';
 
   @override
   String get featureBlockedEnable_showConsumptionTab =>
@@ -5516,9 +5012,6 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
-  String get scanPumpUnreadable => 'Displej pumpy není čitelný — zkuste znovu';
-
-  @override
   String get scanPumpSuccess => 'Displej pumpy naskenován — ověřte hodnoty.';
 
   @override
@@ -5533,9 +5026,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String scanPumpFailed(String error) {
     return 'Skenování pumpy selhalo: $error';
   }
-
-  @override
-  String get badScanReportTitle => 'Nahlásit chybu skenování';
 
   @override
   String get badScanReportTitleReceipt => 'Nahlásit chybu skenování — Účtenka';
@@ -5563,9 +5053,6 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get badScanReportHint =>
       'Sdílíme fotografii účtenky a obě sady hodnot, aby se příští verze naučila toto rozvržení.';
-
-  @override
-  String get badScanReportShareAction => 'Sdílet hlášení + fotografii';
 
   @override
   String get badScanReportFieldBrandLayout => 'Rozvržení značky';
@@ -5602,10 +5089,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get badScanReportFallbackToShare => 'Odeslání selhalo — ruční sdílení';
-
-  @override
-  String get pumpCameraHint =>
-      'Zarovnejte tři čísla z displeje stojanu do rámečku';
 
   @override
   String get pumpCameraCapture => 'Vyfotit';
@@ -5669,37 +5152,13 @@ class AppLocalizationsCs extends AppLocalizations {
   String get fillUpSectionWhereSubtitle => 'Stanice, tachometr, poznámky';
 
   @override
-  String get fillUpImportFromLabel => 'Importovat z…';
-
-  @override
-  String get fillUpImportSheetTitle => 'Importovat data tankování';
-
-  @override
   String get fillUpImportReceiptLabel => 'Účtenka';
-
-  @override
-  String get fillUpImportReceiptDescription =>
-      'Naskenovat papírovou účtenku kamerou';
 
   @override
   String get fillUpImportPumpLabel => 'Displej pumpy';
 
   @override
-  String get fillUpImportPumpDescription =>
-      'Přečíst Betrag / Preis z LCD displeje pumpy';
-
-  @override
-  String get fillUpImportObdLabel => 'Adaptér OBD-II';
-
-  @override
-  String get fillUpImportObdDescription =>
-      'Přečíst tachometr z portu OBD-II přes Bluetooth';
-
-  @override
   String get fillUpPricePerLiterLabel => 'Cena za litr';
-
-  @override
-  String get vehicleHeaderPlateLabel => 'Poznávací značka';
 
   @override
   String get vehicleHeaderUntitled => 'Nové vozidlo';
@@ -5761,17 +5220,6 @@ class AppLocalizationsCs extends AppLocalizations {
       locale: localeName,
       other: '$count fills',
       one: '1 fill',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String fuelEfficiencyMixedFootnote(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count mixed tanks counted toward their main fuel',
-      one: '1 mixed tank counted toward its main fuel',
     );
     return '$_temp0';
   }
@@ -6025,9 +5473,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get gpsRoadUseSource => 'From your GPS track';
 
   @override
-  String get hapticEcoCoachSectionTitle => 'Jízda';
-
-  @override
   String get hapticEcoCoachSettingTitle => 'Eko coaching v reálném čase';
 
   @override
@@ -6262,15 +5707,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get calculatorPriceHint => 'např. 1,899';
-
-  @override
-  String get routeStrategyLabel => 'Strategie:';
-
-  @override
-  String get routeStrategyUniform => 'Rovnoměrná';
-
-  @override
-  String get routeStrategyBalanced => 'Vyvážená';
 
   @override
   String get glideCoachBetaTitle => 'Glide-coach beta (experimentální)';
@@ -6680,10 +6116,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get obd2DiagnosticsInitCold => 'studený';
 
   @override
-  String get obd2HealthCopyInitTranscript =>
-      'Kopírovat pouze přepis inicializace';
-
-  @override
   String get obd2DiagnosticsEmpty =>
       'Zatím žádná OBD2 relace — připojte adaptér a zaznamenejte jízdu s aktivovaným vývojářským režimem.';
 
@@ -6702,12 +6134,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get obd2HealthHistorySection => 'Nedávné relace';
-
-  @override
-  String get obd2HealthCopyJson => 'Kopírovat jako JSON';
-
-  @override
-  String get obd2HealthCopied => 'Diagnostika OBD2 zkopírována do schránky.';
 
   @override
   String get obd2HealthDownloadJson => 'Download as JSON';
@@ -6959,9 +6385,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get ocrTesterRunning => 'Probíhá OCR…';
 
   @override
-  String get ocrTesterNoResult => 'OCR nepřineslo čitelný výsledek.';
-
-  @override
   String get ocrTesterOverlaySection => 'Překryv bloků';
 
   @override
@@ -7071,10 +6494,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get onboardingObd2ReadingVin => 'Čtení VIN…';
-
-  @override
-  String get onboardingObd2VinReadFailed =>
-      'Nepodařilo se přečíst VIN — zadejte ručně';
 
   @override
   String get onboardingObd2ConnectFailed =>
@@ -7274,16 +6693,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get radiusAlertCenterFromMap => 'Poloha na mapě';
 
   @override
-  String radiusAlertNotificationTitle(String fuelLabel, String label) {
-    return '$fuelLabel poblíž $label';
-  }
-
-  @override
-  String radiusAlertNotificationBody(String price, String threshold) {
-    return 'Stanice je za $price € (cíl: $threshold €)';
-  }
-
-  @override
   String get reconcileWorkflowTitle => 'Vyrovnat spotřebu paliva';
 
   @override
@@ -7377,16 +6786,10 @@ class AppLocalizationsCs extends AppLocalizations {
       'Vyřešit nevyřešenou odchylku paliva a jízd';
 
   @override
-  String get refuelUnitPerLiter => '/L';
-
-  @override
   String get refuelUnitPerKwh => '/kWh';
 
   @override
   String get refuelUnitPerSession => '/relaci';
-
-  @override
-  String get shareReceiptImporting => 'Importuji sdílenou účtenku…';
 
   @override
   String get shareReceiptUnsupportedFormat =>
@@ -7553,15 +6956,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String tankLevelLastFillUpFormat(String date, String count) {
     return 'Poslední tankování: $date · $count cesta/cest od té doby';
   }
-
-  @override
-  String get tankLevelMethodObd2 => 'Měřeno OBD2';
-
-  @override
-  String get tankLevelMethodDistanceFallback => 'odhad podle vzdálenosti';
-
-  @override
-  String get tankLevelMethodMixed => 'kombinované měření';
 
   @override
   String get tankLevelEmptyNoFillUp =>
@@ -7862,9 +7256,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get trajetDetailChartAltitudeRelative => 'Altitude (m, from start)';
 
   @override
-  String get trajetDetailChartAltitude => 'Nadmořská výška (m)';
-
-  @override
   String get trajetDetailChartLambda => 'Požadované λ';
 
   @override
@@ -7922,9 +7313,6 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get trajetDetailDeleteConfirmBody =>
       'Tato cesta bude trvale odstraněna z vaší historie.';
-
-  @override
-  String get trajetDetailDeleteConfirmCancel => 'Zrušit';
 
   @override
   String get trajetDetailDeleteConfirmConfirm => 'Smazat';
@@ -7991,9 +7379,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get tripPathCardSubtitle => 'GPS zaznamenaná trasa';
 
   @override
-  String get tripPathLegendTitle => 'Spotřeba';
-
-  @override
   String get tripPathLegendEfficient => 'Úsporná (< 6 L/100km)';
 
   @override
@@ -8025,9 +7410,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get fuelStationRadarResultBadge => 'Výsledek Radaru čerpacích stanic';
-
-  @override
-  String get radarAcquiringLocation => 'Finding your location…';
 
   @override
   String get radarUpdatingLocation => 'Updating your location…';
@@ -8062,10 +7444,6 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get tripRecordingResumeHintMessage =>
       'Nahrávání pokračuje na pozadí. Klepněte na červený banner v horní části libovolné obrazovky pro návrat.';
-
-  @override
-  String get tripBannerOpenFromConsumptionTab =>
-      'Otevřít aktivní cestu ze záložky Spotřeba';
 
   @override
   String get tripRecordingUnpinnedWarning =>
@@ -8184,19 +7562,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get trajetDeletedUndoSnackbar => 'Recording deleted';
-
-  @override
-  String get unifiedFilterFuel => 'Palivo';
-
-  @override
-  String get unifiedFilterEv => 'EV';
-
-  @override
-  String get unifiedFilterBoth => 'Oboje';
-
-  @override
-  String get unifiedNoResultsForFilter =>
-      'Tomuto filtru neodpovídají žádné výsledky';
 
   @override
   String get searchFailedSnackbar => 'Hledání selhalo — zkuste to znovu';
@@ -8368,9 +7733,6 @@ class AppLocalizationsCs extends AppLocalizations {
       'Po spárování adaptéru je VIN vašeho vozidla přečten lokálně pro identifikaci auta. Povolením se 17místný VIN odešle do bezplatné služby NHTSA vPIC pro vyhledání dalších podrobností (model, zdvihový objem, typ paliva). VIN je jediný odeslaný údaj — žádné jiné informace neopustí zařízení.';
 
   @override
-  String get vehicleDetectedFromVinBadge => '(zjištěno)';
-
-  @override
   String vehicleDetectedFromVinSnackbar(String summary) {
     return 'Zjištěno z VIN: $summary. Použít?';
   }
@@ -8441,7 +7803,4 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get widgetVariantPredictive => 'Předpověď: nejlepší čas na tankování';
-
-  @override
-  String get widgetPredictiveNowPrefix => 'nyní';
 }

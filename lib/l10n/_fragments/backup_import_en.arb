@@ -1,8 +1,4 @@
 {
-  "restoreBackupTooltip": "Restore backup",
-  "@restoreBackupTooltip": {
-    "description": "AppBar IconButton tooltip on the consumption screen for the full-backup RESTORE flow (#2571)."
-  },
   "restoreBackupDialogTitle": "Restore backup",
   "@restoreBackupDialogTitle": {
     "description": "Title of the merge-vs-replace confirmation dialog shown after a backup .zip is picked (#2571)."
@@ -18,15 +14,6 @@
   "restoreBackupReplaceAction": "Replace all",
   "@restoreBackupReplaceAction": {
     "description": "Destructive action button in the restore dialog: wipe all current data then restore only the backup (#2571)."
-  },
-  "restoreBackupSuccess": "Backup restored — {count} records imported",
-  "@restoreBackupSuccess": {
-    "description": "Success SnackBar after a restore completes with at least one record (#2571).",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
   },
   "restoreBackupEmpty": "Backup restored — it contained no records",
   "@restoreBackupEmpty": {

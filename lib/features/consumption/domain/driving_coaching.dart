@@ -3,44 +3,18 @@
 
 import 'package:flutter/foundation.dart';
 
+import '../../../core/domain/driving_coaching_hint.dart';
 import '../../obd2/api.dart';
 import 'cold_start_baselines.dart';
 import 'situation_classifier.dart';
 import 'trip_recorder.dart' show TripSample;
 
-/// Eco-driving coaching hint emitted from a live OBD2 reading (#2007).
-///
-/// Three conservative hints; everything else (silence) is the default
-/// outcome of [coachingHint]. False suggestions are worse than missed
-/// ones — the user is supposed to trust the chip when it shows.
-enum DrivingCoachingHint {
-  /// Engine is spinning much higher than needed for the cruising
-  /// speed → next gear up would drop RPM into a more efficient range.
-  shiftUp,
-
-  /// Engine is bogging at very low RPM while the driver is asking for
-  /// real torque — the car is in too high a gear under load.
-  shiftDown,
-
-  /// Throttle is wide open during an aggressive cruise / acceleration
-  /// AND the live consumption band is already heavy. Backing off the
-  /// pedal would cut burn rate without losing real progress.
-  easePedal,
-
-  /// GPS-only coaching (#2058) — fires when the driver is at cruise
-  /// speed and the altitude trace is descending, with no recent brake
-  /// event. Suggests lifting off the throttle to coast.
-  gpsLiftOffCoast,
-
-  /// GPS-only (#2058) — fires when a brake event > 2 m/s² was
-  /// detected in the last few seconds. Suggests reading the road
-  /// further ahead and starting the lift-off earlier next time.
-  gpsAnticipateBrake,
-
-  /// GPS-only (#2058) — fires when an acceleration event > 2 m/s²
-  /// was detected in the last few seconds. Suggests a gentler ramp.
-  gpsSmoothAccel,
-}
+/// [DrivingCoachingHint] moved to the domain kernel (#3743) so the obd2
+/// recording controller's overlay seam can expose it without a
+/// consumption import; the re-export keeps every existing import site
+/// of this file compiling unchanged.
+export '../../../core/domain/driving_coaching_hint.dart'
+    show DrivingCoachingHint;
 
 /// Speed-relative thresholds picked to keep [coachingHint] silent in
 /// the vast majority of normal driving and only fire when the

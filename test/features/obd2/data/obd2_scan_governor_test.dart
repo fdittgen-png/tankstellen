@@ -4,7 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connect_trace.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connect_trace_log.dart';
-import 'package:tankstellen/features/obd2/data/obd2_scan_governor.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_scan_governor.dart';
 
 /// #3185 — token-bucket tests for the process-wide scan governor. Fake clock
 /// + injected wait, so nothing sleeps for real.

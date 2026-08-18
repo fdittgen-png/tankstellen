@@ -5,10 +5,10 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:tankstellen/features/obd2/data/elm327_protocol.dart';
+import 'package:tankstellen/features/obd2/data/protocol/elm327_protocol.dart';
 import 'package:tankstellen/features/obd2/data/negotiated_protocol_cache.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// #2261 concern 3 — ATDPN protocol cache + ATSP{n} on warm connect.

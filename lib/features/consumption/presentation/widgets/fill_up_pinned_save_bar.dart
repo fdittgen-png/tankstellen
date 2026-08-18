@@ -3,13 +3,12 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../../l10n/app_localizations.dart';
+import '../../../../core/widgets/pinned_save_bar.dart';
 
-/// Pinned bottom Save bar (#751 phase 2). Sits below the scroll view
-/// so the CTA is always one tap away regardless of how many cards
-/// the user has scrolled past. Respects the system nav-bar inset so
-/// it never clips under gesture pills (see
-/// `feedback_scaffold_inset_doubling.md`).
+/// Pinned bottom Save bar (#751 phase 2) on the Add fill-up screen.
+/// Thin delegate over the shared [PinnedSaveBar] — the chrome
+/// (elevation, M3 surface tier, nav-bar inset handling) lives in core
+/// since the vehicle twin proved identical.
 ///
 /// Pulled out of `add_fill_up_screen.dart` (#563 extraction) so the
 /// screen file drops well below 300 LOC.
@@ -19,29 +18,6 @@ class FillUpPinnedSaveBar extends StatelessWidget {
   const FillUpPinnedSaveBar({super.key, required this.onSave});
 
   @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    return Material(
-      elevation: 8,
-      // #2117 — pinned save bars sit visibly above scroll content;
-      // surfaceContainerHighest is the M3 tier for chrome surfaces
-      // that need to lift off `surface`.
-      color: theme.colorScheme.surfaceContainerHighest,
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-          child: FilledButton.icon(
-            onPressed: onSave,
-            style: FilledButton.styleFrom(
-              minimumSize: const Size.fromHeight(52),
-            ),
-            icon: const Icon(Icons.save_outlined),
-            label: Text(l.save),
-          ),
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) =>
+      PinnedSaveBar(onSave: onSave, icon: Icons.save_outlined);
 }

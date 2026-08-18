@@ -147,8 +147,8 @@ void main() {
       );
       // Assertion on formatted numbers — see ChargingCostCalculator
       // for the arithmetic.
-      expect(find.textContaining('2.40'), findsOneWidget);
-      expect(find.textContaining('6.0 kWh'), findsOneWidget);
+      expect(find.textContaining('2,40'), findsOneWidget);
+      expect(find.textContaining('6,0 kWh'), findsOneWidget);
     });
 
     testWidgets(

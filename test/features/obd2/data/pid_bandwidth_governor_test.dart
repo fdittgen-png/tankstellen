@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/pid_bandwidth_governor.dart';
-import 'package:tankstellen/features/obd2/data/scheduled_pid.dart';
+import 'package:tankstellen/features/obd2/domain/pid_bandwidth_governor.dart';
+import 'package:tankstellen/features/obd2/domain/scheduled_pid.dart';
 
 /// Unit tests for the #2457 bandwidth governor in isolation from the
 /// scheduler — driving it with synthetic read completions on a faked clock

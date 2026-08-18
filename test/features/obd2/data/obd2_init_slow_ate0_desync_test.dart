@@ -6,11 +6,11 @@ import 'dart:async';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:tankstellen/features/obd2/data/adapters/v_linker_fs_adapter.dart';
-import 'package:tankstellen/features/obd2/data/bluetooth_obd2_transport.dart';
-import 'package:tankstellen/features/obd2/data/elm_byte_channel.dart';
+import 'package:tankstellen/features/obd2/data/protocol/adapters/v_linker_fs_adapter.dart';
+import 'package:tankstellen/features/obd2/data/transport/bluetooth_obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/transport/elm_byte_channel.dart';
 import 'package:tankstellen/features/obd2/data/negotiated_protocol_cache.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/supported_pids_cache.dart';
 import '../../../helpers/silence_error_logger.dart';
 

@@ -135,9 +135,14 @@ void main() {
 
     test('scans the sync sources — no .from() table is unaccounted for', () {
       final fromCall = RegExp(r'''\.from\(\s*['"]([a-z0-9_]+)['"]''');
+      // #3743 (epic item 5) — the per-entity sync configs live in their
+      // owning features now (features/<f>/data/<entity>_sync.dart), so the
+      // scan sweeps ALL of lib/features too: a feature-side `.from()` on an
+      // unknown table must stay CI-fatal (HARD RULE 5), wherever it lives.
       final dirs = [
         Directory('lib/core/sync'),
         Directory('lib/core/data'),
+        Directory('lib/features'),
       ];
       final found = <String, String>{}; // table -> first file it appeared in
 

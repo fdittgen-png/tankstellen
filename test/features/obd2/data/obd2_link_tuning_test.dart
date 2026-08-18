@@ -4,9 +4,9 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/bluetooth_obd2_transport.dart';
-import 'package:tankstellen/features/obd2/data/elm_byte_channel.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/bluetooth_obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/transport/elm_byte_channel.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// #2261 concern 4 — link tuning (connection priority + best-effort MTU)

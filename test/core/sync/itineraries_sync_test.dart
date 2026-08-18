@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/core/sync/itineraries_sync.dart';
+import 'package:tankstellen/features/itinerary/data/itineraries_sync.dart';
 import 'package:tankstellen/features/itinerary/domain/entities/saved_itinerary.dart';
 
 /// Contract tests for [ItinerariesSync] (#727 extract). Higher-

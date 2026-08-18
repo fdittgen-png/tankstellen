@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/trip_recorder.dart';
 import '../../domain/trip_summary.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Trip-detail card surfacing the dongle-less hard-acceleration /
 /// hard-braking / sharp-cornering episode counts the phone's IMU detected on a
@@ -40,7 +41,7 @@ class ImuAccelBrakeCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     String fmt(int count, double perKm) =>
-        '$count (${perKm.toStringAsFixed(1)}/km)';
+        '$count (${UnitFormatter.formatDecimal(perKm)}/km)';
 
     return Card(
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 8),

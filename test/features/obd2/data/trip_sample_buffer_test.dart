@@ -3,7 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
-import 'package:tankstellen/features/obd2/data/trip_sample_buffer.dart';
+import 'package:tankstellen/features/obd2/domain/trip_sample_buffer.dart';
 
 /// #3741 (finding 3) — [TripSampleBuffer.capturedSamples] used to
 /// allocate a full `List.unmodifiable` COPY on every access; during a

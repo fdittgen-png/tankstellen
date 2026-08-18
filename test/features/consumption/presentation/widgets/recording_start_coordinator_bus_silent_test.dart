@@ -4,10 +4,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connection_errors.dart';
-import 'package:tankstellen/features/obd2/data/obd2_link_drop_signal.dart';
-import 'package:tankstellen/features/obd2/data/obd2_link_supervisor.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
+import 'package:tankstellen/features/obd2/domain/obd2_connection_errors.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_link_drop_signal.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_link_supervisor.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
 import 'package:tankstellen/features/obd2/providers/obd2_reconnect_provider.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/'
     'recording_start_coordinator.dart';

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connection_errors.dart';
+import 'package:tankstellen/features/obd2/domain/obd2_connection_errors.dart';
 
 void main() {
   group('Obd2ConnectionError typed hierarchy (#741/#742)', () {

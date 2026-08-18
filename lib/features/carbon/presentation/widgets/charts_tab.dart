@@ -16,6 +16,7 @@ import '../../domain/monthly_summary.dart';
 import 'monthly_bar_chart.dart';
 import 'speed_consumption_card.dart';
 import 'trip_length_breakdown_card.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Charts tab of the carbon dashboard. Renders the summary row,
 /// trip-length breakdown, speed-consumption histogram, and the two
@@ -189,7 +190,7 @@ class _SummaryRow extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${totalCost.toStringAsFixed(0)} ${PriceFormatter.currency}',
+                    '${UnitFormatter.formatDecimal(totalCost, fractionDigits: 0)} ${PriceFormatter.currency}',
                     style: theme.textTheme.titleLarge,
                   ),
                 ],
@@ -210,7 +211,7 @@ class _SummaryRow extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${totalCo2.toStringAsFixed(0)} kg',
+                    '${UnitFormatter.formatDecimal(totalCo2, fractionDigits: 0)} kg',
                     style: theme.textTheme.titleLarge,
                   ),
                 ],

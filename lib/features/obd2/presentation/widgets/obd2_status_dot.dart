@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../data/obd2_link_supervisor.dart';
+import '../../data/session/obd2_link_supervisor.dart';
 import '../../providers/obd2_connection_state_provider.dart';
 import '../../providers/obd2_reconnect_provider.dart';
 

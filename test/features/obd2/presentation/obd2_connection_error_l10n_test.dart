@@ -3,7 +3,7 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connection_errors.dart';
+import 'package:tankstellen/features/obd2/domain/obd2_connection_errors.dart';
 import 'package:tankstellen/features/obd2/presentation/obd2_connection_error_l10n.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 

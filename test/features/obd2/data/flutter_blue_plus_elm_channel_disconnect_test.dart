@@ -9,8 +9,8 @@ import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/telemetry/collectors/breadcrumb_collector.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
-import 'package:tankstellen/features/obd2/data/flutter_blue_plus_elm_channel.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connection_errors.dart';
+import 'package:tankstellen/features/obd2/data/transport/flutter_blue_plus_elm_channel.dart';
+import 'package:tankstellen/features/obd2/domain/obd2_connection_errors.dart';
 import 'package:tankstellen/features/obd2/data/obd2_read_telemetry.dart';
 
 /// #2900 — the BLE OBD2 channel flooded the error log with

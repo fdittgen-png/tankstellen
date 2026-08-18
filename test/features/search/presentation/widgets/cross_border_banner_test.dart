@@ -69,7 +69,7 @@ void main() {
         find.textContaining('France'),
         findsOneWidget,
       );
-      expect(find.textContaining('0.12'), findsOneWidget);
+      expect(find.textContaining('0,12'), findsOneWidget);
       expect(find.byIcon(Icons.close), findsOneWidget);
     });
 

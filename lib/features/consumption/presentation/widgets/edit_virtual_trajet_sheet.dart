@@ -58,6 +58,7 @@ class _EditVirtualTrajetSheetState
   }
 
   String _fmt(double v) =>
+      // i18n-ignore-format: TextEditingController prefill — re-parsed as a dot-decimal number, not display text
       v == v.truncateToDouble() ? v.toStringAsFixed(0) : v.toStringAsFixed(2);
 
   Future<void> _save() async {

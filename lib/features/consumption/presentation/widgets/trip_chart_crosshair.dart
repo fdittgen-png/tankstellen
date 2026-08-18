@@ -353,7 +353,7 @@ class _TripChartReadout extends StatelessWidget {
     // locale's medium time format — no new user-facing string.
     final timeFormat = DateFormat.Hms(locale.toString());
     final label =
-        '${point.value.toStringAsFixed(1)} $unit · ${timeFormat.format(point.timestamp)}';
+        '${UnitFormatter.formatDecimal(point.value)} $unit · ${timeFormat.format(point.timestamp)}';
     return Positioned(
       top: 0,
       left: 0,

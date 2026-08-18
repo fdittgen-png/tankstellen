@@ -3,8 +3,8 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
-import 'package:tankstellen/features/obd2/data/fuel_mixture_model.dart';
-import 'package:tankstellen/features/obd2/data/fuel_rate_estimator.dart';
+import 'package:tankstellen/features/obd2/domain/fuel_mixture_model.dart';
+import 'package:tankstellen/features/obd2/domain/fuel_rate_estimator.dart';
 
 /// Epic #3416 — the mixture policy: ethanol blend (#3429), diesel-aware
 /// effective AFR (#3430), mass-rate conversions (#3428), and the parity

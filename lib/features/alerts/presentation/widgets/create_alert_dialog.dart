@@ -70,6 +70,7 @@ class _CreateAlertDialogState extends State<CreateAlertDialog> {
               ? _alertFuelTypes.first
               : FuelType.diesel);
     final prefilled = widget.currentPrice != null
+        // i18n-ignore-format: TextEditingController prefill — re-parsed as a dot-decimal number, not display text
         ? (widget.currentPrice! - 0.05).toStringAsFixed(3)
         : '';
     _priceController = TextEditingController(text: prefilled);

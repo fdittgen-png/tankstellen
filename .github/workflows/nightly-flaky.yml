@@ -133,3 +133,89 @@ jobs:
               gh issue close "$N" \
                 --comment "Resolved by a green nightly-flaky run. Run: $RUN_URL"
             done
+
+  # The open-decomposition-issue invariant (2026-08-17 review,
+  # maintainability finding 2). The file-length ratchet
+  # (test/lint/file_length_test.dart, #3141) REQUIRES a 3+-bump
+  # grandfathered entry to reference an OPEN decomposition issue — but the
+  # test can only see the source tree, not GitHub, so "open" was pure
+  # honor system and issues were found closed while their files still sat
+  # over the cap (drift the review docked the maintainability grade for).
+  #
+  # This job closes that gap WITHOUT touching the start→merge autonomy
+  # path (the standing plan constraint: no new ratchet may block PR CI):
+  # it runs nightly, parses every `decompositionIssue:` reference out of
+  # the ratchet's snapshot map, asks the GitHub API for each issue's
+  # state, and — when one is closed while its file is still grandfathered
+  # — opens (or comments on, deduped by stable title) a triage issue.
+  # A green audit auto-closes any stale tracker. PR CI never sees it.
+  decomposition-issue-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: master
+      - name: Audit decompositionIssue references against GitHub state
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          # Extract "path bumps issue" triples from the snapshot map. The
+          # entry bodies contain comments (with parentheses and #NNNN
+          # references), so split on the `'lib/...':` anchors and take the
+          # FIRST bumps:/decompositionIssue: field match per segment —
+          # the real record fields always precede any later prose.
+          python3 - <<'PY' > refs.txt
+          import re
+          src = open('test/lint/file_length_test.dart').read()
+          anchors = list(re.finditer(r"'(lib/[^']+\.dart)':\s*\(", src))
+          for i, a in enumerate(anchors):
+              seg_end = anchors[i + 1].start() if i + 1 < len(anchors) else len(src)
+              seg = src[a.end():seg_end]
+              bumps = re.search(r"bumps:\s*(\d+)", seg)
+              issue = re.search(r"decompositionIssue:\s*(\d+)", seg)
+              if bumps and issue:
+                  print(a.group(1), bumps.group(1), issue.group(1))
+          PY
+          echo "referenced decomposition issues:"
+          cat refs.txt
+          # Sanity: the parse finding nothing means the regex drifted from
+          # the test's shape — fail loudly rather than green-by-empty
+          # (the #2348 zero-match lesson).
+          if ! [ -s refs.txt ]; then
+            echo "::error::decomposition-issue audit parsed ZERO decompositionIssue references out of test/lint/file_length_test.dart — the parser drifted from the snapshot-map shape." >&2
+            exit 1
+          fi
+          VIOLATIONS=""
+          while read -r FILE BUMPS ISSUE; do
+            STATE=$(gh api "repos/$REPO/issues/$ISSUE" --jq .state)
+            echo "#$ISSUE ($FILE, $BUMPS bumps): $STATE"
+            if [ "$STATE" = "closed" ]; then
+              VIOLATIONS="${VIOLATIONS}- \`$FILE\` ($BUMPS bumps) references decomposition issue #$ISSUE, which is CLOSED while the file is still grandfathered over the 400-line cap."$'\n'
+            fi
+          done < refs.txt
+          TITLE="file-length ratchet: closed decomposition issue still referenced"
+          RUN_URL="https://github.com/$REPO/actions/runs/${{ github.run_id }}"
+          EXISTING=$(gh issue list --state open --search "in:title \"$TITLE\"" \
+            --json number,title \
+            --jq ".[] | select(.title == \"$TITLE\") | .number" | head -n1)
+          if [ -n "$VIOLATIONS" ]; then
+            BODY="The nightly decomposition-issue audit found \`decompositionIssue:\` entries in \`test/lint/file_length_test.dart\` whose GitHub issue is closed while the file is still over the cap (#3141 requires the issue to stay OPEN until the file graduates):
+
+          $VIOLATIONS
+          Either reopen the issue, file a successor and update the \`decompositionIssue:\` reference, or finish the decomposition and remove the snapshot entry.
+
+          Run: $RUN_URL"
+            if [ -n "$EXISTING" ]; then
+              gh issue comment "$EXISTING" --body "$BODY"
+            else
+              gh issue create --title "$TITLE" \
+                --label "type/bug" --label "area/ci" \
+                --body "$BODY"
+            fi
+          elif [ -n "$EXISTING" ]; then
+            gh issue close "$EXISTING" \
+              --comment "Every referenced decomposition issue is open again (or its entry was retired) — audit green. Run: $RUN_URL"
+          fi

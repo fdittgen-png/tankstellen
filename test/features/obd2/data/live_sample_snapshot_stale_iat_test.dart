@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/elm327_protocol.dart';
-import 'package:tankstellen/features/obd2/data/live_sample_snapshot.dart';
+import 'package:tankstellen/features/obd2/data/protocol/elm327_protocol.dart';
+import 'package:tankstellen/features/obd2/data/session/live_sample_snapshot.dart';
 import 'package:tankstellen/features/obd2/data/obd2_breadcrumb_collector.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
-import 'package:tankstellen/features/obd2/data/pid_scheduler.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/domain/pid_scheduler.dart';
 
 /// #2505 — REGRESSION reproduction. `945f155e` (#2457) demoted IAT (PID
 /// 0x0F) to ~0.5 Hz on the bandwidth-demotable `slowCorrection` tier, so

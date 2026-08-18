@@ -79,6 +79,9 @@ class MinimalDriveSummary extends ConsumerWidget {
     final headline = instantText ??
         (gpsInstant != null
             // i18n-ignore: language-neutral consumption unit format mask
+            // Matches the dot-decimal L/100 mask of the measured
+            // formatInstantConsumption figure (#2185 convention).
+            // i18n-ignore-format: dot-decimal L/100 consumption mask (#2185)
             ? '~${gpsInstant.toStringAsFixed(1)} L/100'
             : '—');
     final avgText = liveAvg != null

@@ -7,8 +7,8 @@ import 'package:flutter/foundation.dart'
     show TargetPlatform, debugDefaultTargetPlatformOverride;
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/flutter_blue_plus_elm_channel.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connect_classifier.dart';
+import 'package:tankstellen/features/obd2/data/transport/flutter_blue_plus_elm_channel.dart';
+import 'package:tankstellen/features/obd2/domain/obd2_connect_classifier.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connect_trace.dart';
 
 /// #3014 (Epic #3013, Phase 2) — SCAN-BEFORE-CONNECT, the single

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/fuel_rate_estimator.dart';
+import 'package:tankstellen/features/obd2/domain/fuel_rate_estimator.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/reference_vehicle.dart';
 
 /// Tests for the #1625 per-RPM volumetric-efficiency curve: the

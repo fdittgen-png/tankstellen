@@ -12,11 +12,8 @@
   "fuelType": "Degviela",
   "searchRadius": "Rādiuss",
   "searchNearby": "Degvielas uzpildes stacijas tuvumā",
-  "searchButton": "Meklēt",
   "searchCriteriaTitle": "Meklēšanas kritēriji",
-  "searchCriteriaOpen": "Meklēt",
   "searchCriteriaRadiusBadge": "{km} km rādiusā",
-  "searchCriteriaTapToSearch": "Pieskarieties, lai sāktu meklēšanu",
   "noResults": "Degvielas uzpildes stacijas nav atrastas.",
   "startSearch": "Meklējiet degvielas uzpildes stacijas.",
   "open": "Atvērts",
@@ -30,7 +27,6 @@
   "navigate": "Navigēt",
   "retry": "Mēģināt vēlreiz",
   "apiKeySetup": "API atslēga",
-  "apiKeyDescription": "Reģistrējieties vienreiz, lai saņemtu bezmaksas API atslēgu.",
   "apiKeyLabel": "API atslēga",
   "register": "Reģistrācija",
   "continueButton": "Turpināt",
@@ -64,33 +60,12 @@
   "noFavoritesHint": "Pieskarieties zvaigznītei pie stacijas, lai saglabātu to izlasē.",
   "language": "Valoda",
   "country": "Valsts",
-  "demoMode": "Demo režīms — tiek rādīti paraugu dati.",
-  "setupLiveData": "Iestatīt reāllaika datus",
   "freeNoKey": "Bezmaksas — atslēga nav nepieciešama",
   "apiKeyRequired": "Nepieciešama API atslēga",
-  "skipWithoutKey": "Turpināt bez atslēgas",
   "dataTransparency": "Datu caurredzamība",
   "storageAndCache": "Krātuve un kešatmiņa",
   "clearCache": "Iztīrīt kešatmiņu",
-  "clearAllData": "Dzēst visus datus",
-  "errorLog": "Kļūdu žurnāls",
   "stationsFound": "Atrastas {count} stacijas",
-  "whatIsShared": "Kas tiek kopīgots — un ar ko?",
-  "gpsCoordinates": "GPS koordinātas",
-  "gpsReason": "Tiek nosūtītas ar katru meklējumu, lai atrastu tuvumā esošās stacijas.",
-  "postalCodeData": "Pasta indekss",
-  "postalReason": "Tiek pārveidots koordinātās, izmantojot ģeokodēšanas pakalpojumu.",
-  "mapViewport": "Kartes skats",
-  "mapReason": "Kartes flīzes tiek ielādētas no servera. Personas dati netiek pārsūtīti.",
-  "apiKeyData": "API atslēga",
-  "apiKeyReason": "Jūsu personīgā atslēga tiek nosūtīta ar katru API pieprasījumu. Tā ir saistīta ar jūsu e-pastu.",
-  "notShared": "NETIEK kopīgots:",
-  "searchHistory": "Meklēšanas vēsture",
-  "favoritesData": "Izlase",
-  "profileNames": "Profilu nosaukumi",
-  "homeZipData": "Mājas pasta indekss",
-  "usageData": "Lietošanas dati",
-  "privacyBanner": "Šai lietotnei nav servera. Visi dati paliek jūsu ierīcē. Bez analītikas, izsekošanas vai reklāmām.",
   "storageUsage": "Krātuves izmantošana šajā ierīcē",
   "settingsLabel": "Iestatījumi",
   "profilesStored": "saglabāti profili",
@@ -116,12 +91,8 @@
   "deleteAllButton": "Dzēst visu",
   "entries": "ieraksti",
   "cacheEmpty": "Kešatmiņa ir tukša",
-  "noStorage": "Krātuve netiek izmantota",
   "apiKeyNote": "Bezmaksas reģistrācija. Dati no valdības cenu caurredzamības aģentūrām.",
   "apiKeyFormatError": "Nederīgs formāts — gaidīts UUID (8-4-4-4-12)",
-  "supportProject": "Atbalstiet šo projektu",
-  "supportDescription": "Šī lietotne ir bezmaksas, atvērtā koda un bez reklāmām. Ja tā jums šķiet noderīga, apsveriet iespēju atbalstīt izstrādātāju.",
-  "reportBug": "Ziņot par kļūdu / Ieteikt funkciju",
   "reportThisIssue": "Ziņot par problēmu",
   "reportAlreadySent": "Jūs jau ziņojāt par šo problēmu.",
   "reportConsentTitle": "Ziņot GitHub?",
@@ -136,7 +107,6 @@
   "configApiKeysSection": "API atslēgas",
   "configTankerkoenigKey": "Tankerkoenig API atslēga",
   "configApiKeyConfigured": "Konfigurēta",
-  "configApiKeyNotSet": "Nav iestatīta (demonstrācijas režīms)",
   "configApiKeyCommunity": "Noklusējums (kopienas atslēga)",
   "searchLocationPlaceholder": "Adrese, pasta indekss vai pilsēta",
   "configEvKey": "EV uzlādes API atslēga",
@@ -174,8 +144,6 @@
   "sortPriceDistance": "Cena/km",
   "cheap": "lēti",
   "expensive": "dārgi",
-  "stationsOnMap": "{count} stacijas",
-  "loadingFavorites": "Ielādē izlasi...\nVispirms meklējiet stacijas, lai saglabātu datus.",
   "reportPrice": "Ziņot par cenu",
   "whatsWrong": "Kas nav pareizi?",
   "correctPrice": "Pareizā cena (piem. 1,459)",
@@ -185,7 +153,6 @@
   "cacheCleared": "Kešatmiņa iztīrīta.",
   "yourPosition": "Jūsu pozīcija",
   "positionUnknown": "Pozīcija nezināma",
-  "routeModeBannerLabel": "Maršruta režīms — attālumi gar koridoru",
   "distancesFromCenter": "Attālumi no meklēšanas centra",
   "autoUpdatePosition": "Automātiski atjaunināt pozīciju",
   "autoUpdateDescription": "Atjaunināt GPS pozīciju pirms katras meklēšanas",
@@ -220,8 +187,6 @@
   "wrongDieselPrice": "Nepareiza dīzeļa cena",
   "wrongStatusOpen": "Parādīts kā atvērts, bet slēgts",
   "wrongStatusClosed": "Parādīts kā slēgts, bet atvērts",
-  "searchAlongRouteLabel": "Gar maršrutu",
-  "searchEvStations": "Meklēt uzlādes stacijas",
   "allStations": "Visas stacijas",
   "bestStops": "Labākās pieturas",
   "openInMaps": "Atvērt Kartēs",
@@ -253,7 +218,6 @@
   "cityOrAddress": "Pilsēta vai adrese",
   "useGps": "Izmantot GPS",
   "stop": "Pietura",
-  "stopN": "Pietura {n}",
   "addStop": "Pievienot pieturu",
   "searchAlongRoute": "Meklēt gar maršrutu",
   "cheapest": "Lētākā",
@@ -265,10 +229,8 @@
   "customKey": "Pielāgota atslēga",
   "appDefaultKey": "Lietotnes noklusējuma atslēga",
   "optionalOverrideKey": "Pēc izvēles: aizstāt iebūvēto lietotnes atslēgu ar savu",
-  "requiredForEvSearch": "Nepieciešams EV uzlādes staciju meklēšanai",
   "edit": "Rediģēt",
   "fuelPricesApiKey": "Degvielas cenu API atslēga",
-  "tankerkoenigApiKey": "Tankerkoenig API atslēga",
   "evChargingApiKey": "EV uzlādes API atslēga",
   "openChargeMapApiKey": "OpenChargeMap API atslēga",
   "routePlanningSection": "Maršruta plānošana",
@@ -303,18 +265,14 @@
   "noStationsAlongThisRoute": "Stacijas gar šo maršrutu nav atrastas.",
   "fuelCostCalculator": "Degvielas izmaksu kalkulators",
   "distanceKm": "Attālums (km)",
-  "consumptionL100km": "Patēriņš (L/100km)",
-  "fuelPriceEurL": "Degvielas cena (EUR/L)",
   "tripCost": "Brauciena izmaksas",
   "fuelNeeded": "Nepieciešamā degviela",
   "totalCost": "Kopējās izmaksas",
-  "enterCalcValues": "Ievadiet attālumu, patēriņu un cenu, lai aprēķinātu brauciena izmaksas",
   "priceHistory": "Cenu vēsture",
   "ignoredStationsLabel": "Ignorētas",
   "ratingsLabel": "Vērtējumi",
   "favoritesDataCache": "Iecienīto dati",
   "citySearchCache": "Pilsētas meklēšana",
-  "dataDeletionNotAvailableCommunity": "Datu dzēšana nav pieejama Kopienas režīmā. Vispirms atvienojieties vai izmantojiet privātu datu bāzi.",
   "priceHistoryStationsTracked": "{count} izsekotas stacijas",
   "@priceHistoryStationsTracked": {
     "placeholders": {
@@ -348,22 +306,11 @@
     }
   },
   "noPriceHistory": "Vēl nav cenu vēstures",
-  "noHourlyData": "Nav stundu datu",
   "noStatistics": "Nav pieejamu statistiku",
-  "statMin": "Min",
-  "statMax": "Maks",
-  "statAvg": "Vid",
   "showAllFuelTypes": "Rādīt visus degvielas veidus",
   "connected": "Savienots",
-  "notConnected": "Nav savienots",
-  "connectTankSync": "Savienot TankSync",
   "disconnectTankSync": "Atvienot TankSync",
   "viewMyData": "Skatīt manus datus",
-  "optionalCloudSync": "Izvēles mākoņa sinhronizācija brīdinājumiem, izlasei un push paziņojumiem",
-  "tapToUpdateGps": "Pieskarieties, lai atjauninātu GPS pozīciju",
-  "gpsAutoUpdateHint": "GPS pozīcija tiek iegūta automātiski, meklējot. Varat to arī manuāli atjaunināt šeit.",
-  "clearGpsConfirm": "Notīrīt saglabāto GPS pozīciju? Varat to atjaunināt jebkurā laikā.",
-  "pageNotFound": "Lapa nav atrasta",
   "deleteAllServerData": "Dzēst visus servera datus",
   "deleteServerDataConfirm": "Dzēst visus servera datus?",
   "deleteEverything": "Dzēst visu",
@@ -373,7 +320,6 @@
   "forgetAllSyncedTripsConfirmBody": "Visi braucienu kopsavilkumi un detaļu dati tiks noņemti no servera. Lokālā braucienu vēsture šajā ierīcē netiks ietekmēta.\n\nŠo darbību nevar atcelt.",
   "forgetAllSyncedTripsConfirmAction": "Dzēst visu",
   "forgetAllSyncedTripsSuccess": "Visi sinhronizētie braucieni noņemti no servera",
-  "disconnectConfirm": "Atvienot TankSync?",
   "disconnect": "Atvienot",
   "myServerData": "Mani servera dati",
   "anonymousUuid": "Anonīms UUID",
@@ -393,7 +339,6 @@
   "continueAsGuest": "Turpināt kā viesis",
   "createAccount": "Izveidot kontu",
   "signIn": "Pierakstīties",
-  "upgradeToEmail": "Izveidot e-pasta kontu",
   "savedRoutes": "Saglabātie maršruti",
   "noSavedRoutes": "Nav saglabātu maršrutu",
   "noSavedRoutesHint": "Meklējiet gar maršrutu un saglabājiet to ātrai piekļuvei vēlāk.",
@@ -424,11 +369,6 @@
   "onboardingNext": "Tālāk",
   "onboardingSkip": "Izlaist",
   "onboardingFinish": "Sākt",
-  "crossBorderNearby": "{country} ir tuvumā",
-  "crossBorderDistance": "~{km} km līdz robežai",
-  "crossBorderAvgPrice": "Vid. šeit: {price} EUR ({count} stacijas)",
-  "allPricesView": "Visas cenas",
-  "compactView": "Kompakts",
   "switchToAllPricesView": "Pārslēgties uz visu cenu skatu",
   "switchToCompactView": "Pārslēgties uz kompakto skatu",
   "unavailable": "Nav pieejams",
@@ -453,10 +393,6 @@
   "accountDeleted": "Konts dzēsts. Lokālie dati saglabāti.",
   "switchedToAnonymous": "Pārslēgts uz anonīmo sesiju",
   "failedToSwitch": "Pārslēgšanās neizdevās: {error}",
-  "topicUrlCopied": "Tēmas URL nokopēts",
-  "testNotificationSent": "Testa paziņojums nosūtīts!",
-  "testNotificationFailed": "Testa paziņojuma nosūtīšana neizdevās",
-  "pushUpdateFailed": "Push paziņojuma iestatījuma atjaunināšana neizdevās",
   "connectedAsGuest": "Savienots kā viesis",
   "accountCreated": "Konts izveidots!",
   "signedIn": "Pierakstīšanās veiksmīga!",
@@ -518,7 +454,6 @@
   "privacyClearErrorLog": "Notīrīt kļūdu žurnālu",
   "privacyErrorLogCleared": "Kļūdu žurnāls notīrīts",
   "privacyDeleteButton": "Dzēst visus datus",
-  "privacyCopyErrorLog": "Kopēt kļūdu žurnālu starpliktuvē ({count})",
   "privacyDeleteTitle": "Dzēst visus datus?",
   "privacyDeleteBody": "Tiks neatgriezeniski dzēsts:\n\n- Visas izlases un staciju dati\n- Visi meklēšanas profili\n- Visi cenu brīdinājumi\n- Visa cenu vēsture\n- Visi kešatmiņas dati\n- Jūsu API atslēga\n- Visi lietotnes iestatījumi\n\nLietotne atiestatīsies uz sākotnējo stāvokli. Šo darbību nevar atcelt.",
   "privacyDeleteConfirm": "Dzēst visu",
@@ -553,15 +488,8 @@
   "voiceAnnouncementsTitle": "Balss paziņojumi",
   "voiceAnnouncementsDescription": "Paziņot par lētākajām tuvākajām stacijām braukšanas laikā",
   "voiceAnnouncementsEnabled": "Iespējot balss paziņojumus",
-  "voiceAnnouncementThreshold": "Tikai zem {price}",
-  "voiceAnnouncementCheapFuel": "{station}, {distance} kilometri priekšā, {fuelType} {price}",
   "voiceAnnouncementProximityRadius": "Paziņojumu rādiuss",
   "voiceAnnouncementCooldown": "Atkārtošanas intervāls",
-  "nearestStations": "Tuvakias degvielas uzpildes stacijas",
-  "nearestStationsHint": "Atrodiet tuvakias degvielas uzpildes stacijas pec jusu pasreizejas atrasanas vietas",
-  "consumptionLogTitle": "Degvielas patēriņš",
-  "consumptionLogMenuTitle": "Patēriņa žurnāls",
-  "consumptionLogMenuSubtitle": "Izsekot uzpildes un aprēķināt L/100km",
   "consumptionStatsTitle": "Patēriņa statistika",
   "addFillUp": "Pievienot uzpildi",
   "noFillUpsTitle": "Vēl nav uzpilžu",
@@ -595,14 +523,12 @@
   "vehiclesWizardYoursList": "Jums ir {count, plural, =1{1 transportlīdzeklis} other{{count} transportlīdzekļi}}:",
   "vehiclesWizardSkipHint": "Izlaist, lai pabeigtu iestatīšanu — transportlīdzekļus varat pievienot jebkurā laikā no Iestatījumiem.",
   "fillUpVehicleLabel": "Transportlīdzeklis",
-  "fillUpVehicleNone": "Nav transportlīdzekļa",
   "fillUpVehicleRequired": "Transportlīdzeklis ir obligāts",
   "reportScanError": "Ziņot par skenēšanas kļūdu",
   "pickStationTitle": "Izvēlieties staciju",
   "pickStationHelper": "Sāciet uzpildi no zināmas stacijas, lai cenas, zīmols un degvielas veids tiku aizpildīti automātiski.",
   "pickStationEmpty": "Vēl nav izlases staciju — pievienojiet no Meklēšanas vai Izlases, vai izlaidiet un aizpildiet manuāli.",
   "pickStationSkip": "Izlaist — pievienot bez stacijas",
-  "scanPump": "Skenēt sūkni",
   "scanPayment": "Skenēt maksājuma QR",
   "qrPaymentBeneficiary": "Saņēmējs",
   "qrPaymentAmount": "Summa",
@@ -624,17 +550,10 @@
   "qrScannerRetry": "Mēģināt vēlreiz",
   "torchOn": "Ieslēgt zibspuldzi",
   "torchOff": "Izslēgt zibspuldzi",
-  "obdNoAdapter": "Nav OBD2 adaptera diapazonā",
-  "obdOdometerUnavailable": "Nevarēja nolasīt odometru",
   "obdPermissionDenied": "Piešķiriet Bluetooth atļauju sistēmas iestatījumos",
-  "obdAdapterUnresponsive": "Adapteris neatbildēja — ieslēdziet aizdedzi un mēģiniet vēlreiz",
   "obdPickerTitle": "Izvēlieties OBD2 adapteru",
   "obdPickerScanning": "Meklē adapterus…",
   "obdPickerConnecting": "Savienojas…",
-  "themeSettingTitle": "Dizains",
-  "themeModeLight": "Gaišs",
-  "themeModeDark": "Tumšs",
-  "themeModeSystem": "Sekot sistēmai",
   "tripRecordingTitle": "Brauciena ierakstīšana",
   "tripSummaryTitle": "Brauciena kopsavilkums",
   "tripMetricDistance": "Attālums",
@@ -676,18 +595,13 @@
   "syncBaselinesToggleTitle": "Kopīgot apgūtos transportlīdzekļu profilus",
   "syncBaselinesToggleSubtitle": "Augšupielādēt patēriņa bāzlīnijas katram transportlīdzeklim, lai cita ierīce varētu tās izmantot.",
   "obd2StatusConnected": "OBD2 adapteris: savienots",
-  "obd2StatusAttempting": "OBD2 adapteris: savienojas",
-  "obd2StatusUnreachable": "OBD2 adapteris: nesasniedzams",
   "obd2StatusPermissionDenied": "OBD2 adapteris: nepieciešama Bluetooth atļauja",
   "obd2StatusConnectedBody": "Gatavs ierakstīt braucienu.",
-  "obd2StatusAttemptingBody": "Savienojas fonā…",
-  "obd2StatusUnreachableBody": "Adapteris ārpus diapazona vai jau tiek izmantots citā lietotnē.",
   "obd2StatusPermissionDeniedBody": "Piešķiriet Bluetooth atļauju sistēmas iestatījumos, lai automātiski atkārtoti savienotos.",
   "obd2StatusNoAdapter": "Nav savienota adaptera",
   "obd2StatusForget": "Aizmirst adapteru",
   "tripHistoryTitle": "Braucienu vēsture",
   "tripHistoryEmptyTitle": "Vēl nav braucienu",
-  "tripHistoryEmptySubtitle": "Savienojiet OBD2 adapteru un ierakstiet braucienu, lai sāktu veidot braukšanas vēsturi.",
   "tripHistoryUnknownDate": "Nezināms datums",
   "situationIdle": "Dīkstāvē",
   "situationStopAndGo": "Apstāšanās & braukšana",
@@ -697,12 +611,8 @@
   "situationClimbing": "Kāpšana / noslogots",
   "situationHardAccel": "Straujš paātrinājums",
   "situationFuelCut": "Degvielas pārtraukšana — skriešana",
-  "tripSaveAsFillUp": "Saglabāt kā uzpildi",
   "tripSaveRecording": "Saglabāt braucienu",
-  "tripDiscard": "Atmest",
-  "obdOdometerRead": "Odometrs nolasīts: {km} km",
   "vehicleFuelNotSet": "Nav iestatīts",
-  "wizardVehicleTapToEdit": "Pieskarieties, lai rediģētu",
   "wizardVehicleDefaultBadge": "Noklusējums",
   "wizardProfileChoiceHint": "Izvēlieties, kā vēlaties izmantot lietotni. To varat mainīt vēlāk Iestatījumos.",
   "wizardProfileChoiceFooter": "Savu izvēli varat mainīt jebkurā laikā no Iestatījumi → Lietošanas veids.",
@@ -713,7 +623,6 @@
   "wizardProfileFullName": "Pilns",
   "wizardProfileFullDescription": "Viss no Vidēja, plus automātiska OBD2 braucienu ierakstīšana, braukšanas novērtējumi un lojalitātes kartes.",
   "wizardProfileCustomName": "Pielāgots",
-  "wizardProfileCustomDescription": "Jūsu pašu funkciju kombinācija. Pielāgojiet katru slēdzi zemāk.",
   "useModeSectionHint": "Pielāgojiet lietotni tam, kā faktiski to izmantojat. Izvēloties sākotnējo iestatījumu, tiek iespējots atbilstošais funkciju kopums.",
   "useModeCustomSettingsDescription": "Jūsu funkciju kombinācija neatbilst nevienam sākotnējam iestatījumam. Izvēlieties vienu augstāk, lai pārrakstītu, vai turpiniet pielāgot atsevišķas funkcijas zemāk esošajā sadaļā.",
   "useModeSwitchedSnack": "Lietošanas veids iestatīts uz {profile}.",
@@ -751,20 +660,15 @@
   "evShowOnMap": "Rādīt EV stacijas",
   "evAvailableOnly": "Tikai pieejamās",
   "evMinPower": "Min jauda",
-  "evMaxPower": "Maks jauda",
-  "evOperator": "Operators",
-  "evLastUpdate": "Pēdējā atjaunināšana",
   "evStatusAvailable": "Pieejama",
   "evStatusOccupied": "Aizņemta",
   "evStatusOutOfOrder": "Nedarbojas",
   "openOnlyFilter": "Tikai atvērtās",
   "saveAsDefaults": "Saglabāt kā manus noklusējumus",
   "criteriaSavedToProfile": "Saglabāts kā noklusējums",
-  "profileNotFound": "Nav aktīva profila",
   "updatingFavorites": "Atjaunina jūsu izlasi...",
   "fetchingLatestPrices": "Iegūst jaunākās cenas",
   "noDataAvailable": "Nav datu",
-  "configAndPrivacy": "Konfigurācija un privātums",
   "searchToSeeMap": "Meklējiet, lai redzētu stacijas kartē",
   "evPowerAny": "Jebkāda",
   "evPowerKw": "{kw} kW+",
@@ -819,9 +723,6 @@
   "iosAutoRecordOnboardingBullet3Title": "Kad iOS jautā par \"Vienmēr\" atrašanās vietu, lūdzu sakiet jā.",
   "iosAutoRecordOnboardingBullet3Body": "Rezerves funkcija, kas ieraksta jūsu braucienu, kad OBD2 adapteris ir lēns, nepieciešama fona atrašanās vieta. Mēs to nekad nekopīgojam.",
   "scanReceipt": "Skenēt čeku",
-  "obdConnect": "OBD-II",
-  "stationTypeFuel": "Degviela",
-  "stationTypeEv": "EV",
   "brandFilterHighway": "Autoceļš",
   "ratingModeLocal": "Lokāls",
   "ratingModePrivate": "Privāts",
@@ -841,7 +742,6 @@
   "errorHintRouting": "Maršruta aprēķins neizdevās. Pārbaudiet interneta savienojumu un mēģiniet vēlreiz.",
   "errorHintFallback": "Mēģiniet vēlreiz vai meklējiet pēc pasta indeksa / pilsētas nosaukuma.",
   "alertsLoadErrorTitle": "Nevarēja ielādēt jūsu brīdinājumus",
-  "alertsBackgroundCheckErrorTitle": "Brīdinājumu fona pārbaude neizdevās",
   "detailsLabel": "Detaļas",
   "remove": "Noņemt",
   "showKey": "Rādīt atslēgu",
@@ -950,19 +850,11 @@
   "linkDeviceHowItWorksBody": "1. Ierīcē A: kopējiet ierīces kodu augstāk\n2. Ierīcē B: ielīmējiet to laukā \"Ierīces kods\"\n3. Pieskarieties \"Importēt datus\", lai apvienotu izlases, brīdinājumus, transportlīdzekļus un patēriņa žurnālus\n4. Abām ierīcēm būs visi apvienotie dati\n\nKatra ierīce saglabā savu anonīmo identitāti un savu profilu (vēlamā degviela, noklusējuma transportlīdzeklis, sākuma ekrāns). Dati tiek apvienoti, nevis pārvietoti.",
   "vehicleSetActive": "Iestatīt aktīvu",
   "swipeHide": "Slēpt",
-  "evChargingSection": "EV uzlāde",
-  "fuelStationsSection": "Degvielas stacijas",
   "yourRating": "Jūsu vērtējums",
   "noStorageUsed": "Krātuve netiek izmantota",
   "aboutReportBug": "Ziņot par kļūdu / Ieteikt funkciju",
   "aboutSupportProject": "Atbalstīt šo projektu",
   "aboutSupportDescription": "Šī lietotne ir bezmaksas, atvērtā koda un bez reklāmām. Ja tā ir noderīga, apsveriet iespēju atbalstīt izstrādātāju.",
-  "luxembourgRegulatedPricesNotice": "Luksemburgas degvielas cenas ir valsts regulētas un vienādas visā valstī.",
-  "luxembourgFuelUnleaded95": "Bezsvina 95",
-  "luxembourgFuelUnleaded98": "Bezsvina 98",
-  "luxembourgFuelDiesel": "Dīzelis",
-  "luxembourgFuelLpg": "LPG",
-  "luxembourgPricesUnavailable": "Luksemburgas regulētās cenas nav pieejamas.",
   "reportIssueTitle": "Ziņot par problēmu",
   "enterCorrection": "Lūdzu, ievadiet labojumu",
   "reportNoBackendAvailable": "Ziņojumu nevarēja nosūtīt: šai valstij nav konfigurēts ziņošanas pakalpojums. Iespējojiet TankSync Iestatījumos, lai nosūtītu kopienas ziņojumus.",
@@ -989,10 +881,6 @@
   "serviceReminderMarkDone": "Atzīmēt kā pabeigtu",
   "serviceReminderDueTitle": "Apkopes laiks",
   "serviceReminderDueBody": "{label} ir pienācis — {kmOver} km pāri intervālam.",
-  "southKoreaApiKeyRequired": "Reģistrējieties OPINET, lai iegūtu bezmaksas API atslēgu",
-  "southKoreaApiProvider": "OPINET (KNOC)",
-  "chileApiKeyRequired": "Reģistrējieties CNE, lai iegūtu bezmaksas API atslēgu",
-  "chileApiProvider": "CNE Bencina en Linea",
   "vinConfirmTitle": "Vai šī ir jūsu automašīna?",
   "vinConfirmBody": "{year} {make} {model} — {displacement}L, {cylinders} cilindri, {fuel}",
   "vinPartialInfoNote": "Daļēja informācija (bezsaistē). Varat rediģēt zemāk.",
@@ -1011,17 +899,13 @@
   "alertsRadiusCreateTitle": "Izveidot rādiusa brīdinājumu",
   "alertsRadiusLabelHint": "Apzīmējums (piem. Mājas dīzelis)",
   "alertsRadiusFuelType": "Degvielas veids",
-  "alertsRadiusThreshold": "Slieksnis (€/L)",
   "alertsRadiusKm": "Rādiuss (km)",
   "alertsRadiusCenterGps": "Izmantot manu atrašanās vietu",
   "alertsRadiusCenterPostalCode": "Pasta indekss",
   "alertsRadiusSave": "Saglabāt",
   "alertsRadiusCancel": "Atcelt",
-  "alertsRadiusDeleteConfirm": "Dzēst rādiusa brīdinājumu?",
   "obd2ConnectedTooltip": "OBD2 savienots: {adapterName}",
   "obd2PairChipTooltip": "Savienot OBD2 adapteru",
-  "velocityAlertTitle": "{fuelLabel} cena kritās tuvākajās stacijās",
-  "velocityAlertBody": "{stationCount} stacijas cena kritās par līdz {maxDropCents}¢ pēdējā stundā",
   "fillUpSavedSnackbar": "Uzpilde saglabāta",
   "radiusAlertsEntryTitle": "Rādiusa brīdinājumi un statistika",
   "radiusAlertsEntrySubtitle": "Saņemiet paziņojumu, kad cenas krītas jūsu tuvumā",
@@ -1060,8 +944,6 @@
   "autoRecordStatusPairAdapterCta": "Savienot adapteru",
   "autoRecordSpeedThresholdLabel": "Starta ātrums (km/h)",
   "autoRecordSaveDelayLabel": "Saglabāšanas aizkave pēc atvienošanas (sekundes)",
-  "autoRecordPairedAdapterLabel": "Savienotais adapteris",
-  "autoRecordPairedAdapterNone": "Nav savienota adaptera. Vispirms savienojiet caur OBD2 iestatīšanu.",
   "autoRecordBackgroundLocationLabel": "Fona atrašanās vieta atļauta",
   "autoRecordBackgroundLocationRequest": "Pieprasīt atļauju",
   "autoRecordBackgroundLocationRationaleTitle": "Kāpēc \"Vienmēr atļaut\"?",
@@ -1069,18 +951,12 @@
   "autoRecordBackgroundLocationOpenSettings": "Atvērt iestatījumus",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Nepieciešama atrašanās vietas atļauja",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Nevarēja pieprasīt fona atrašanās vietu",
-  "autoRecordBadgeClearTooltip": "Notīrīt skaitītāju",
   "autoRecordPairAdapterLinkText": "Savienojiet adapteru zemāk esošajā sadaļā, lai iespējotu automātisko ierakstīšanu",
-  "exportBackupTooltip": "Eksportēt rezerves kopiju",
   "exportBackupReady": "Rezerves kopija gatava — izvēlieties galamērķi",
   "exportBackupFailed": "Rezerves kopijas eksports neizdevās — lūdzu, mēģiniet vēlreiz",
-  "brokenMapChipVerifying": "MAP sensors tiek verificēts…",
   "brokenMapChipDisclaimer": "MAP rādījumi ir aizdomīgi",
   "brokenMapSnackbarUnreliable": "MAP sensors rāda nepareizi — degvielas rādījumi var būt par 50–80% par zemu. Mēģiniet ar citu adapteru.",
   "brokenMapBannerHardDisable": "MAP sensors neuzticams. Rāda uzpildes vidējos rādījumus, nevis reāllaika degvielas patēriņu.",
-  "brokenMapOverlayVerified": "MAP sensors: verificēts ({confidence})",
-  "brokenMapOverlayUnverified": "MAP sensors: verificē ({confidence})",
-  "brokenMapOverlaySuspicious": "MAP sensors: aizdomīgs ({confidence})",
   "brokenMapOverlayPosterior": "MAP sensors: {posterior}% ± {margin}%",
   "brokenMapOverlayPosteriorVerified": "MAP sensors: {posterior}% ± {margin}% (verificēts)",
   "brokenMapDiagnosticsCardTitle": "MAP sensora diagnostika",
@@ -1142,7 +1018,6 @@
   "chargingCostTrendTitle": "Uzlādes izmaksu tendence",
   "chargingEfficiencyTitle": "Efektivitāte (kWh/100 km)",
   "chargingChartsEmpty": "Vēl nav pietiekami datu",
-  "chargingChartsMonthAxis": "Mēnesis",
   "consoFeatureGroupTitle": "Patēriņš",
   "consoFeatureGroupDescription": "Izsekot patēriņu — manuālas uzpildes vai automātiska OBD2 braucienu ierakstīšana.",
   "consoModeOff": "Izslēgts",
@@ -1158,10 +1033,6 @@
   "fillUpCorrectionEditExplainer": "Šis ieraksts tika automātiski ģenerēts, lai aizpildītu plaisu starp ierakstītajiem braucieniem un iepildīto degvielu. Pielāgojiet vērtības, ja zināt faktiskos skaitļus.",
   "fillUpCorrectionDelete": "Dzēst labojumu",
   "fillUpCorrectionStation": "Stacijas nosaukums (neobligāti)",
-  "greeceApiProvider": "Paratiritirio Timon (Grieķija)",
-  "greeceCommunityApiNotice": "Nodrošina kopienas uzturēta fuelpricesgr API",
-  "romaniaApiProvider": "Monitorul Prețurilor (Rumānija)",
-  "romaniaScrapingNotice": "Nodrošina monitorulpreturilor.info (Konkurences padome + ANPC)",
   "crossBorderCheaper": "{country} stacijas {km} km tālāk — €{price}/L lētāk",
   "crossBorderTapToSwitch": "Pieskarieties, lai mainītu valsti",
   "crossBorderDismissTooltip": "Aizvērt",
@@ -1186,9 +1057,6 @@
   "drivingScorePenaltyHardBrake": "Asā bremzēšana",
   "drivingScorePenaltyHighRpm": "Augsts RPM",
   "drivingScorePenaltyFullThrottle": "Pilna gāze",
-  "ecoRouteOption": "Eko",
-  "ecoRouteSavings": "≈ {liters} L ietaupīts",
-  "ecoRouteHint": "Gudrāks brauciens — dod priekšroku vienmērīgam šosejas braucienam nevis izlocītiem saīsinājumiem.",
   "favoritesShareAction": "Kopīgot",
   "favoritesShareSubject": "Sparkilo — izlase {date}",
   "favoritesShareError": "Nevarēja ģenerēt kopīgošanas attēlu",
@@ -1206,8 +1074,6 @@
   "featureDescription_consumptionAnalytics": "Uzpilžu un braucienu analīzes cilne.",
   "featureLabel_baselineSync": "Bāzlīnijas sinhronizācija",
   "featureDescription_baselineSync": "Sinhronizēt braukšanas bāzlīnijas caur TankSync.",
-  "featureLabel_unifiedSearchResults": "Vienotie meklēšanas rezultāti",
-  "featureDescription_unifiedSearchResults": "Viens rezultātu saraksts, kas apvieno degvielas un EV stacijas.",
   "featureLabel_priceAlerts": "Cenu brīdinājumi",
   "featureDescription_priceAlerts": "Paziņojumi par cenu kritumu pēc sliekšņa.",
   "featureLabel_priceHistory": "Cenu vēsture",
@@ -1235,8 +1101,6 @@
   "featureBlockedEnable_glideCoach": "Vispirms iespējojiet OBD2 braucienu ierakstīšanu",
   "featureBlockedEnable_gpsTripPath": "Vispirms iespējojiet OBD2 braucienu ierakstīšanu",
   "featureBlockedEnable_autoRecord": "Vispirms iespējojiet OBD2 braucienu ierakstīšanu",
-  "featureBlockedEnable_showFuel": "Priekšnoteikumi nav izpildīti",
-  "featureBlockedEnable_showElectric": "Priekšnoteikumi nav izpildīti",
   "featureBlockedEnable_showConsumptionTab": "Vispirms iespējojiet OBD2 braucienu ierakstīšanu",
   "featureLabel_tflitePricePrediction": "TFLite cenu prognozēšana",
   "featureDescription_tflitePricePrediction": "Cenu prognozēšanas modelis ierīcē — secinājumi tiek veikti lokāli; pazīmes un prognozes nekad neatstāj ierīci.",
@@ -1281,15 +1145,12 @@
   "scanReceiptNoData": "Nav atrasti čeka dati — mēģiniet vēlreiz",
   "scanReceiptSuccess": "Čeks skenēts — pārbaudiet vērtības. Pieskarieties \"Ziņot par skenēšanas kļūdu\" zemāk, ja kaut kas nav pareizi.",
   "scanReceiptFailed": "Skenēšana neizdevās: {error}",
-  "scanPumpUnreadable": "Sūkņa displejs nav lasāms — mēģiniet vēlreiz",
-  "pumpCameraHint": "Salāgojiet trīs degvielas uzpildes ekrāna ciparus rāmī",
   "pumpCameraCapture": "Uzņemt",
   "pumpCameraPermissionDenied": "Lai skenētu uzpildes ekrānu, nepieciešama piekļuve kamerai. Iespējojiet to ierīces iestatījumos.",
   "pumpCameraError": "Kameru neizdevās palaist. Mēģiniet vēlreiz vai ievadiet vērtības manuāli.",
   "scanPumpSuccess": "Sūkņa displejs skenēts — pārbaudiet vērtības.",
   "scanPumpGlare": "Pārāk daudz atspīduma uz displeja — mēģiniet vēlreiz nelielā leņķī, lai cipari nebūtu pārgaismoti.",
   "scanPumpFailed": "Sūkņa skenēšana neizdevās: {error}",
-  "badScanReportTitle": "Ziņot par skenēšanas kļūdu",
   "badScanReportTitleReceipt": "Ziņot par skenēšanas kļūdu — čeks",
   "badScanReportTitlePumpDisplay": "Ziņot par skenēšanas kļūdu — sūkņa displejs",
   "pumpScanFailureTitle": "Displejs nav lasāms",
@@ -1298,7 +1159,6 @@
   "pumpScanFailureReport": "Ziņot",
   "pumpScanFailureRemove": "Noņemt fotoattēlu",
   "badScanReportHint": "Mēs kopīgosim čeka fotoattēlu un abas vērtību kopas, lai nākamā versija varētu apgūt šo izkārtojumu.",
-  "badScanReportShareAction": "Kopīgot ziņojumu + fotoattēlu",
   "badScanReportFieldBrandLayout": "Zīmola izkārtojums",
   "badScanReportFieldTotal": "Kopā",
   "badScanReportFieldPricePerLiter": "Cena/L",
@@ -1315,16 +1175,9 @@
   "fillUpSectionWhatSubtitle": "Degviela, daudzums, cena",
   "fillUpSectionWhereTitle": "Kur jūs bijāt",
   "fillUpSectionWhereSubtitle": "Stacija, odometrs, piezīmes",
-  "fillUpImportFromLabel": "Importēt no…",
-  "fillUpImportSheetTitle": "Importēt uzpildes datus",
   "fillUpImportReceiptLabel": "Čeks",
-  "fillUpImportReceiptDescription": "Skenēt papīra čeku ar kameru",
   "fillUpImportPumpLabel": "Sūkņa displejs",
-  "fillUpImportPumpDescription": "Nolasīt summu / cenu no sūkņa LCD displeja",
-  "fillUpImportObdLabel": "OBD-II adapteris",
-  "fillUpImportObdDescription": "Nolasīt odometru no OBD-II porta caur Bluetooth",
   "fillUpPricePerLiterLabel": "Cena par litru",
-  "vehicleHeaderPlateLabel": "Numura zīme",
   "vehicleHeaderUntitled": "Jauns transportlīdzeklis",
   "vehicleSectionIdentityTitle": "Identitāte",
   "vehicleSectionIdentitySubtitle": "Nosaukums un VIN",
@@ -1340,7 +1193,6 @@
   "gpsDiagnosticsHeader": "{count} paraugi · {span} · {gaps, plural, =0{bez atstarpēm} =1{1 atstarpē} other{{gaps} atstarpēs}}",
   "gpsDiagnosticsCadence": "Vidējais intervāls: {ms} ms",
   "gpsDiagnosticsExplain": "Uztverts ierakstīšanas laikā, lai verificētu GPS kadenci tālruņa miega laikā.",
-  "hapticEcoCoachSectionTitle": "Braukšana",
   "hapticEcoCoachSettingTitle": "Reāllaika eko trenēšana",
   "hapticEcoCoachSettingSubtitle": "Maiga haptika + ekrāna padoms, kad pilnībā spiedat gāzi kruīza laikā",
   "hapticEcoCoachSnackBarMessage": "Uzmanīgi ar gāzi — skriešana ietaupa vairāk",
@@ -1370,9 +1222,6 @@
   "calculatorDistanceHint": "piem. 150",
   "calculatorConsumptionHint": "piem. 7.0",
   "calculatorPriceHint": "piem. 1.899",
-  "routeStrategyLabel": "Stratēģija:",
-  "routeStrategyUniform": "Vienāda",
-  "routeStrategyBalanced": "Līdzsvarota",
   "glideCoachBetaTitle": "Slīdēšanas treneris beta (eksperimentāls)",
   "glideCoachBetaSubtitle": "Smalka haptika, palēninot pirms sarkanās gaismas. Pēc noklusējuma izslēgts — novēršanas risks.",
   "consentSyncTripsTitle": "Sinhronizēt braucienu ierakstus",
@@ -1428,7 +1277,6 @@
   "onboardingObd2ConnectButton": "Savienot adapteru",
   "onboardingObd2SkipButton": "Varbūt vēlāk",
   "onboardingObd2ReadingVin": "Nolasa VIN…",
-  "onboardingObd2VinReadFailed": "Nevarēja nolasīt VIN — ievadiet manuāli",
   "onboardingObd2ConnectFailed": "Nevarēja savienoties ar adapteru. Varat mēģināt vēlreiz vai izlaist.",
   "onboardingPickUseMode": "Izvēlieties lietošanas veidu, lai turpinātu.",
   "alertsRadiusFrequencyLabel": "Pārbaudes biežums",
@@ -1442,9 +1290,6 @@
   "radiusAlertMapPickerCancel": "Atcelt",
   "radiusAlertMapPickerHint": "Velciet karti, lai novietotu brīdinājuma centru",
   "radiusAlertCenterFromMap": "Kartes atrašanās vieta",
-  "radiusAlertNotificationTitle": "{fuelLabel} pie {label}",
-  "radiusAlertNotificationBody": "Stacija ir pie {price} € (mērķis: {threshold} €)",
-  "refuelUnitPerLiter": "/L",
   "refuelUnitPerKwh": "/kWh",
   "refuelUnitPerSession": "/sesija",
   "speedConsumptionCardTitle": "Patēriņš pēc ātruma",
@@ -1463,9 +1308,6 @@
   "tankLevelLitersFormat": "{litres} L",
   "tankLevelRangeFormat": "≈ {kilometres} km braukšanas",
   "tankLevelLastFillUpFormat": "Pēdējā uzpilde: {date} · {count} brauciens(-i) kopš",
-  "tankLevelMethodObd2": "OBD2 mērīts",
-  "tankLevelMethodDistanceFallback": "uz attālumu balstīts aprēķins",
-  "tankLevelMethodMixed": "jaukts mērījums",
   "tankLevelEmptyNoFillUp": "Reģistrējiet uzpildi, lai redzētu tvertnes līmeni",
   "tankLevelDetailSheetTitle": "Braucieni kopš pēdējās uzpildes",
   "addFillUpIsFullTankLabel": "Pilna tvertne",
@@ -1536,7 +1378,6 @@
   "trajetDetailDeleteAction": "Dzēst",
   "trajetDetailDeleteConfirmTitle": "Dzēst šo braucienu?",
   "trajetDetailDeleteConfirmBody": "Šis brauciens tiks neatgriezeniski noņemts no jūsu vēstures.",
-  "trajetDetailDeleteConfirmCancel": "Atcelt",
   "trajetDetailDeleteConfirmConfirm": "Dzēst",
   "tripRecordingObd2NotResponding": "OBD2 adapteris savienots, bet neatgriež datus. Mēģiniet ar citu adapteru vai pārbaudiet transportlīdzekļa diagnostikas protokolu.",
   "trajetsViewAllOnMap": "Rādīt visus kartē",
@@ -1552,7 +1393,6 @@
   "tripLengthBucketTripCount": "{count, plural, =0{nav braucienu} one{1 brauciens} other{{count} braucieni}}",
   "tripPathCardTitle": "Brauciena ceļš",
   "tripPathCardSubtitle": "GPS ierakstīts maršruts",
-  "tripPathLegendTitle": "Patēriņš",
   "tripPathLegendEfficient": "Efektīvs (< 6 L/100km)",
   "tripPathLegendBorderline": "Robežlīnija (6–10 L/100km)",
   "tripPathLegendWasteful": "Izšķērdīgs (≥ 10 L/100km)",
@@ -1563,13 +1403,8 @@
   "tripRecordingPinHelpTitle": "Par piespraušanu",
   "tripRecordingPinHelpBody": "Piespraušana patur ekrānu ieslēgtu un paslēpj sistēmas joslas, lai forma paliek lasāma uz paneļa stiprinājuma. Pieskarieties vēlreiz, lai atbrīvotu. Automātiski atbrīvojas, kad brauciens apstājas.",
   "tripRecordingResumeHintMessage": "Ierakstīšana turpinās fonā. Pieskarieties sarkanajam banerim jebkura ekrāna augšdaļā, lai atgrieztos.",
-  "tripBannerOpenFromConsumptionTab": "Atveriet aktīvo braucienu no Patēriņa cilnes",
   "tripRecordingUnpinnedWarning": "Piespraudiet ekrānu, lai GPS paliek aktīvs brauciena laikā — Android var ierobežot GPS miega laikā.",
   "tripRecordingMinimiseTooltip": "Minimizēt uz peldošu elementu",
-  "unifiedFilterFuel": "Degviela",
-  "unifiedFilterEv": "EV",
-  "unifiedFilterBoth": "Abi",
-  "unifiedNoResultsForFilter": "Šim filtram nav atbilstošu rezultātu",
   "searchFailedSnackbar": "Meklēšana neizdevās — lūdzu, mēģiniet vēlreiz",
   "vinLabel": "VIN (neobligāti)",
   "vinDecodeTooltip": "Atšifrēt VIN",
@@ -1601,7 +1436,6 @@
   "gdprVinOnlineDecodeTitle": "VIN tiešsaistes atšifrēšana",
   "gdprVinOnlineDecodeShort": "Atšifrēt VIN caur NHTSA bezmaksas publisku pakalpojumu",
   "gdprVinOnlineDecodeDescription": "Savienojot adapteru, jūsu transportlīdzekļa VIN tiek nolasīts lokāli, lai identificētu automašīnu. Iespējojot šo, 17 rakstzīmju VIN tiek nosūtīts uz NHTSA bezmaksas vPIC pakalpojumu, lai uzmeklētu papildu detaļas (modelis, dzinēja tilpums, degvielas veids). VIN ir vienīgie nosūtītie dati — nekas cits neatstāj jūsu ierīci.",
-  "vehicleDetectedFromVinBadge": "(noteikts)",
   "vehicleDetectedFromVinSnackbar": "Noteikts no VIN: {summary}. Lietot?",
   "vehicleDetectedFromVinApply": "Lietot",
   "widgetHelpSectionTitle": "Sākuma ekrāna logrīks",
@@ -1620,7 +1454,6 @@
   "widgetColorSchemeOrange": "Oranžs",
   "widgetVariantDefault": "Tikai pašreizējā cena",
   "widgetVariantPredictive": "Prognozējošs: labākais laiks uzpildei",
-  "widgetPredictiveNowPrefix": "tagad",
   "@distance": {
     "placeholders": {
       "distance": {
@@ -1645,13 +1478,6 @@
   "@hours": {
     "placeholders": {
       "n": {
-        "type": "int"
-      }
-    }
-  },
-  "@stationsOnMap": {
-    "placeholders": {
-      "count": {
         "type": "int"
       }
     }
@@ -1700,13 +1526,6 @@
   "@evConnectors": {
     "placeholders": {
       "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@stopN": {
-    "placeholders": {
-      "n": {
         "type": "int"
       }
     }
@@ -1850,25 +1669,11 @@
       }
     }
   },
-  "approachStationDistance": "{meters} m attālumā",
-  "@approachStationDistance": {
-    "description": "PiP overlay caption (#2084) showing how far the driver is from the in-radius target station, in metres.",
-    "placeholders": {
-      "meters": {
-        "type": "String",
-        "example": "350"
-      }
-    }
-  },
   "tripRecordingPipElapsedCaption": "pagājis",
   "@tripRecordingPipElapsedCaption": {
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
-  "fabOpenCriteria": "Atvērt meklēšanu",
-  "fabOpenResults": "Atvērt rezultātus",
   "fabRunSearch": "Veikt meklēšanu",
-  "fabRefineCriteria": "Precizēt meklēšanu",
-  "routeSearchPartialBanner": "Tiek meklētas vairāk staciju…",
   "privacySaveErrorLog": "Saglabāt kļūdu žurnālu ({count})",
   "@privacySaveErrorLog": {
     "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
@@ -2418,10 +2223,6 @@
   "@trajetDetailChartCoolant": {
     "description": "MT — needs native review"
   },
-  "trajetDetailChartAltitude": "Augstums (m)",
-  "@trajetDetailChartAltitude": {
-    "description": "MT — needs native review"
-  },
   "trajetDetailChartLambda": "Komandētais λ",
   "@trajetDetailChartLambda": {
     "description": "MT — needs native review"
@@ -2654,14 +2455,6 @@
   "@obd2HealthHistorySection": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyJson": "Kopēt kā JSON",
-  "@obd2HealthCopyJson": {
-    "description": "MT — needs native review"
-  },
-  "obd2HealthCopied": "OBD2 diagnostika nokopēta starpliktuvē.",
-  "@obd2HealthCopied": {
-    "description": "MT — needs native review"
-  },
   "evStatusPartial": "Daļēji pieejams",
   "@evStatusPartial": {
     "description": "MT — needs native review"
@@ -2767,10 +2560,6 @@
   },
   "ocrTesterRunning": "Notiek OCR…",
   "@ocrTesterRunning": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterNoResult": "OCR neradīja nolasāmu rezultātu.",
-  "@ocrTesterNoResult": {
     "description": "MT — needs native review"
   },
   "ocrTesterOverlaySection": "Bloku pārklājums",
@@ -2937,10 +2726,6 @@
   "@obd2DiagnosticsInitCold": {
     "description": "MT — needs native review"
   },
-  "obd2HealthCopyInitTranscript": "Kopēt tikai inicializācijas žurnālu",
-  "@obd2HealthCopyInitTranscript": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterSaveFixture": "Saglabāt kā fiksatoru",
   "@ocrTesterSaveFixture": {
     "description": "MT — needs native review"
@@ -3092,10 +2877,6 @@
   "@obd2GpsDegradedBannerTitle": {
     "description": "MT — needs native review"
   },
-  "restoreBackupTooltip": "Atjaunot dublējumu",
-  "@restoreBackupTooltip": {
-    "description": "MT — needs native review"
-  },
   "restoreBackupDialogTitle": "Atjaunot dublējumu",
   "@restoreBackupDialogTitle": {
     "description": "MT — needs native review"
@@ -3111,15 +2892,6 @@
   "restoreBackupReplaceAction": "Aizvietot visu",
   "@restoreBackupReplaceAction": {
     "description": "MT — needs native review"
-  },
-  "restoreBackupSuccess": "Dublējums atjaunots — importēti {count} ieraksti",
-  "@restoreBackupSuccess": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
   },
   "restoreBackupEmpty": "Dublējums atjaunots — tas nesaturēja ierakstus",
   "@restoreBackupEmpty": {
@@ -3391,16 +3163,6 @@
   "voiceCoachingSettingSubtitle": "Dzirdiet runātus padomus braukšanas laikā — strauja paātrināšana, skarba bremzēšana un pārnesumu norādījumi",
   "@voiceCoachingSettingSubtitle": {
     "description": "MT — needs native review"
-  },
-  "fuelStationRadarDistanceKm": "{km} km attālumā",
-  "@fuelStationRadarDistanceKm": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "km": {
-        "type": "String",
-        "example": "2.4"
-      }
-    }
   },
   "fuelStationRadarProximity": "Tuvums {percent}%",
   "@fuelStationRadarProximity": {
@@ -3733,10 +3495,6 @@
   },
   "consumptionStatsChartConsumption": "L/100km mēnesī",
   "@consumptionStatsChartConsumption": {
-    "description": "MT — needs native review"
-  },
-  "shareReceiptImporting": "Importē dalīto čeku…",
-  "@shareReceiptImporting": {
     "description": "MT — needs native review"
   },
   "shareReceiptUnsupportedFormat": "Šo faila tipu vēl nevar importēt — dalieties ar čeka fotoattēlu.",
@@ -4228,17 +3986,6 @@
       "count": {
         "type": "int",
         "example": "3"
-      }
-    }
-  },
-  "fuelEfficiencyMixedFootnote": "{count, plural, =1{1 mixed tank counted toward its main fuel} other{{count} mixed tanks counted toward their main fuel}}",
-  "@fuelEfficiencyMixedFootnote": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "count": {
-        "type": "int",
-        "example": "1"
       }
     }
   },
@@ -4752,11 +4499,6 @@
         "example": "Oil change"
       }
     }
-  },
-  "radarAcquiringLocation": "Finding your location…",
-  "@radarAcquiringLocation": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
   },
   "radarUpdatingLocation": "Updating your location…",
   "@radarUpdatingLocation": {

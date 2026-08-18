@@ -11,14 +11,14 @@ import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/features/obd2/data/auto_record_trace_log.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connection_errors.dart';
-import 'package:tankstellen/features/obd2/data/obd2_link_drop_signal.dart';
-import 'package:tankstellen/features/obd2/data/obd2_link_supervisor.dart';
-import 'package:tankstellen/features/obd2/data/obd2_reattach_source.dart';
-import 'package:tankstellen/features/obd2/data/obd2_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/domain/obd2_connection_errors.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_link_drop_signal.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_link_supervisor.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_reattach_source.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 import 'package:tankstellen/features/obd2/data/paused_trip_repository.dart';
-import 'package:tankstellen/features/obd2/data/trip_recording_controller.dart';
+import 'package:tankstellen/features/obd2/data/session/trip_recording_controller.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 
 /// Exercises the #797 phase 3 wiring between the controller's

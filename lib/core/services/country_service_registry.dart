@@ -266,3 +266,15 @@ class CountryServiceRegistry {
     }
   }
 }
+
+/// Returns fuel types available for a given country code.
+///
+/// Per-country fuel lists live on [CountryServiceEntry.availableFuelTypes]
+/// in [CountryServiceRegistry.entries] (#1111) — adding a new country only
+/// requires appending one entry to the registry. Falls back to a default
+/// minimal set (E5, E10, Diesel, Electric, All) for unregistered countries.
+///
+/// #3743 (S-fix a) — moved here from `core/domain/fuel_type.dart`: the
+/// forwarder was the domain kernel's only service-layer import.
+List<FuelType> fuelTypesForCountry(String countryCode) =>
+    CountryServiceRegistry.fuelTypesFor(countryCode);

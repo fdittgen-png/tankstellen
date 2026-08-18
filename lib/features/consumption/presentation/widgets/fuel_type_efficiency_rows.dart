@@ -102,7 +102,7 @@ class _BucketRow extends StatelessWidget {
               ),
               _MetricLine(
                 label: l.fuelEfficiencyColL100km,
-                value: l100 != null ? l100.toStringAsFixed(1) : '—',
+                value: l100 != null ? UnitFormatter.formatDecimal(l100) : '—',
               ),
               _MetricLine(
                 label: l.fuelEfficiencyColTotalSpent,

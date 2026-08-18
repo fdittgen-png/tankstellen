@@ -3,7 +3,7 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../data/obd2_self_test_driver.dart';
+import '../data/session/obd2_self_test_driver.dart';
 
 part 'obd2_self_test_state.freezed.dart';
 

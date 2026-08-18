@@ -5,6 +5,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Minimum flex weight a non-zero [StorageBar] segment is given so a
 /// small-but-real category stays visible next to a dominant one (#2490).
@@ -16,9 +17,9 @@ const int _kMinSegmentFlex = 30;
 String formatBytes(int bytes) {
   if (bytes < 1024) return '$bytes B';
   if (bytes < 1024 * 1024) {
-    return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    return '${UnitFormatter.formatDecimal(bytes / 1024)} KB';
   }
-  return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+  return '${UnitFormatter.formatDecimal(bytes / (1024 * 1024))} MB';
 }
 
 // ── Helper widgets for StorageSection ──

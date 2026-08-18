@@ -3,8 +3,8 @@
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/classic_method_channel.dart';
-import 'package:tankstellen/features/obd2/data/obd2_platform_budgets.dart';
+import 'package:tankstellen/features/obd2/data/transport/classic_method_channel.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_platform_budgets.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

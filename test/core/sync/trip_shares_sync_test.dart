@@ -5,7 +5,7 @@ import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:tankstellen/core/sync/trip_shares_sync.dart';
+import 'package:tankstellen/features/consumption/data/trip_shares_sync.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_entry.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import '../../helpers/silence_error_logger.dart';

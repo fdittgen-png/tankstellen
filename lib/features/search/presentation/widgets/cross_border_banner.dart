@@ -11,6 +11,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/cross_border_suggestion.dart';
 import '../../providers/cross_border_suggestion_provider.dart';
 import '../../providers/search_provider.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Banner shown above the nearby-search results when the user is close
 /// to a neighbor country whose fuel is currently cheaper.
@@ -59,8 +60,10 @@ class _CrossBorderSuggestionCard extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final colorScheme = theme.colorScheme;
 
-    final priceLabel = suggestion.priceDeltaPerLiter.toStringAsFixed(2);
-    final distanceLabel = suggestion.distanceKm.toStringAsFixed(0);
+    final priceLabel =
+        UnitFormatter.formatDecimal(suggestion.priceDeltaPerLiter, fractionDigits: 2);
+    final distanceLabel =
+        UnitFormatter.formatDecimal(suggestion.distanceKm, fractionDigits: 0);
 
     final headline = l10n.crossBorderCheaper(
       suggestion.neighborName,

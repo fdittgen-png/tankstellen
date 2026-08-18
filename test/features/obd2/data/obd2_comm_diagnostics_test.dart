@@ -3,7 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/data/obd2_comm_diagnostics.dart';
-import 'package:tankstellen/features/obd2/data/obd2_response_class.dart';
+import 'package:tankstellen/features/obd2/data/protocol/obd2_response_class.dart';
 import 'package:tankstellen/features/obd2/data/obd2_session_diagnostic.dart';
 
 void main() {

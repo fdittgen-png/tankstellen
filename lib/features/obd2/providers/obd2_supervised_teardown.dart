@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
-import '../data/obd2_service.dart';
+import '../data/session/obd2_service.dart';
 import '../data/obd2_session_context_block.dart';
 import 'obd2_reconnect_provider.dart';
 

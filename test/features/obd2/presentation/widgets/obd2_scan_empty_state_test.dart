@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/obd2_scan_readiness.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_scan_readiness.dart';
 import 'package:tankstellen/features/obd2/presentation/widgets/obd2_scan_empty_state.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 

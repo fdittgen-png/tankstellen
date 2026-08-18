@@ -100,6 +100,7 @@ class _GuidedReconciliationDialogState
   }
 
   String _fmt(double v) =>
+      // i18n-ignore-format: TextEditingController prefill — re-parsed as a dot-decimal number, not display text
       v == v.truncateToDouble() ? v.toStringAsFixed(0) : v.toStringAsFixed(2);
 
   /// Maintainer decision logic: a fill-up missing/wrong → Path A;

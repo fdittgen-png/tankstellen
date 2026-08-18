@@ -4,9 +4,9 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connect_classifier.dart';
+import 'package:tankstellen/features/obd2/domain/obd2_connect_classifier.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connect_trace.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connection_errors.dart';
+import 'package:tankstellen/features/obd2/domain/obd2_connection_errors.dart';
 
 /// #3181 — pairing classification. The OBDLink CX initiates BLE pairing
 /// via the first CCCD subscribe; auth/encryption/bond error strings — and

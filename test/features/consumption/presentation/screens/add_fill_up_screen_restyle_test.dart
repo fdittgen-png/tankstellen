@@ -137,7 +137,7 @@ void main() {
 
       // 60 / 30 = 2.000
       expect(find.textContaining('Price per liter'), findsOneWidget);
-      expect(find.textContaining('2.000'), findsOneWidget);
+      expect(find.textContaining('2,000'), findsOneWidget);
     });
 
     testWidgets('pins the Save action at the bottom of the Scaffold',
