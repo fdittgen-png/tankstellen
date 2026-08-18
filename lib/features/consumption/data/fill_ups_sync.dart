@@ -1,10 +1,10 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../features/consumption/domain/entities/fill_up.dart';
-import 'entity_sync.dart';
-import 'sync_isolate_decode.dart';
-import 'sync_transport.dart';
+import '../domain/entities/fill_up.dart';
+import '../../../core/sync/entity_sync.dart';
+import '../../../core/sync/sync_isolate_decode.dart';
+import '../../../core/sync/sync_transport.dart';
 
 /// #3451 — top-level PURE `compute()` entrypoint (no Hive / plugins /
 /// logging, so it can run on a worker isolate). Behaviour mirrors

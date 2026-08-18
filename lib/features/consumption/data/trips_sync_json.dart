@@ -3,9 +3,9 @@
 
 import 'dart:async';
 
-import '../../features/consumption/data/trip_history_repository.dart';
-import '../logging/error_logger.dart';
-import 'sync_isolate_decode.dart';
+import 'trip_history_repository.dart';
+import '../../../core/logging/error_logger.dart';
+import '../../../core/sync/sync_isolate_decode.dart';
 
 /// Trip-sync JSON payload shapers, split out of `trips_sync.dart` so the
 /// wire/merge class stays under the file-length cap (#2319). Both are

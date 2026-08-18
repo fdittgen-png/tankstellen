@@ -9,7 +9,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
 import '../../../core/storage/hive_boxes.dart';
-import '../../../core/sync/baselines_sync.dart';
+import '../data/baselines_sync.dart';
 import '../../sync/providers/baseline_sync_enabled_provider.dart';
 
 /// #3670 — test seam for the server baseline merge: the production path

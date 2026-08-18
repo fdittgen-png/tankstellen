@@ -379,10 +379,12 @@ const _featurePairBaseline = <String, int>{
   'station_detail -> sync': 1,
   'station_services -> station_detail': 1,
   // #3447 — data_transparency's "sync now" replays the app-layer pull
-  // registry instead of importing the feature notifiers directly; the
-  // remaining counts are link_device_provider's.
-  'sync -> alerts': 2,
-  'sync -> consumption': 2,
+  // registry instead of importing the feature notifiers directly.
+  // #3743 (epic item 5) — the entity sync configs moved into their owning
+  // features and the sync feature's consumers switched to the alerts /
+  // consumption barrels, zeroing 'sync -> alerts' (was 2) and
+  // 'sync -> consumption' (was 2) — which also breaks the
+  // consumption <-> sync cycle.
   'sync -> favorites': 1,
   'sync -> feature_management': 2,
   'sync -> vehicle': 1,
@@ -410,9 +412,16 @@ const _featurePairBaseline = <String, int>{
 // CountryServiceEntry carries a feature-side buildService factory and
 // country_service_data.dart imports ONE file per country (FR's two
 // service imports collapsed into france_service_builder.dart).
+// #3743 (epic item 5) — the per-entity sync configs moved into their
+// owning features: consumption 6→2 (baselines/fill_ups/trips/trips_json/
+// trip_shares configs left core; the one add-back is user_data_sync's
+// TripsSync.forgetAllForUser seam). alerts + itinerary stay flat: each
+// lost its config's model import but supabase_sync_repository now
+// imports the moved config (the legacy repo facade — its inversion is a
+// follow-up).
 const _coreImportBaseline = <String, int>{
   'alerts': 3,
-  'consumption': 6,
+  'consumption': 2,
   'feature_management': 3,
   'itinerary': 3,
   'map': 1,
@@ -438,4 +447,6 @@ const _shellImportBaseline = <String, int>{
 /// Post-#3130 measurement (2026-06-11): bidirectional feature↔feature
 /// cycles implied by [_featurePairBaseline]. Target **0**. ONLY EVER
 /// DECREASES.
-const _cycleBaseline = 19;
+// #3743 (epic item 5) — 19 → 18: 'sync -> consumption' hit zero (entity
+// sync configs moved home + barrel routing), breaking consumption <-> sync.
+const _cycleBaseline = 18;

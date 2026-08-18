@@ -9,7 +9,7 @@ import 'package:uuid/uuid.dart';
 import '../../../core/data/storage_repository.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/storage/storage_providers.dart';
-import '../../../core/sync/itineraries_sync.dart';
+import '../data/itineraries_sync.dart';
 import '../../../core/sync/sync_events.dart';
 import '../../../core/sync/sync_provider.dart';
 import '../../../core/utils/event_loop_yield.dart';

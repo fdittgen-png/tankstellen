@@ -6,12 +6,12 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 
-import '../../features/consumption/data/trip_history_repository.dart';
-import '../../core/logging/error_logger.dart';
-import 'supabase_client.dart';
-import 'trip_share_transport.dart';
+import 'trip_history_repository.dart';
+import '../../../core/logging/error_logger.dart';
+import '../../../core/sync/supabase_client.dart';
+import '../../../core/sync/trip_share_transport.dart';
 
-export 'trip_share_transport.dart' show TripShareResult, TripShareTransport;
+export '../../../core/sync/trip_share_transport.dart' show TripShareResult, TripShareTransport;
 
 /// The "shared with me" fetch result (#3726): the decoded read-only
 /// trip entries plus the trip-id → owner-id map, so the UI can attribute

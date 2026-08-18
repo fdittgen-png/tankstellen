@@ -7,11 +7,11 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
-import '../../core/logging/error_logger.dart';
-import '../../features/consumption/data/baseline_sync.dart';
-import 'deletions_sync.dart';
-import 'entity_sync.dart';
-import 'sync_transport.dart';
+import '../../../core/logging/error_logger.dart';
+import 'baseline_sync.dart';
+import '../../../core/sync/deletions_sync.dart';
+import '../../../core/sync/entity_sync.dart';
+import '../../../core/sync/sync_transport.dart';
 
 /// Per-vehicle OBD2 baseline sync with Supabase (#780), pulled out of
 /// [SyncService] (#727).

@@ -1,11 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../features/alerts/data/models/price_alert.dart';
-import '../telemetry/collectors/breadcrumb_collector.dart';
-import '../utils/json_extensions.dart';
-import 'entity_sync.dart';
-import 'sync_transport.dart';
+import 'models/price_alert.dart';
+import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
+import '../../../core/utils/json_extensions.dart';
+import '../../../core/sync/entity_sync.dart';
+import '../../../core/sync/sync_transport.dart';
 
 /// Price-alert sync with Supabase, pulled out of [SyncService] (#727).
 /// Since #3127 a thin codec config over the shared [EntitySync] engine.

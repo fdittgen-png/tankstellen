@@ -14,6 +14,10 @@
 /// cross-feature reach-ins are inverted or moved to `lib/core/`.
 library;
 
+// #3743 (epic item 5) — the per-entity sync config moved home from
+// lib/core/sync; exported so cross-feature consumers (device linking)
+// keep going through the barrel.
+export 'data/alerts_sync.dart';
 export 'data/price_snapshot_store.dart';
 export 'data/radius_alert_dedup.dart';
 export 'data/radius_alert_runner.dart';

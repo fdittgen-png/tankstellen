@@ -1,10 +1,10 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../sync/alerts_sync.dart';
+import '../../../features/alerts/data/alerts_sync.dart';
 import '../../sync/favorites_sync.dart';
 import '../../sync/ignored_stations_sync.dart';
-import '../../sync/itineraries_sync.dart';
+import '../../../features/itinerary/data/itineraries_sync.dart';
 import '../../sync/price_history_sync.dart';
 import '../../sync/ratings_sync.dart';
 import '../../sync/supabase_client.dart';

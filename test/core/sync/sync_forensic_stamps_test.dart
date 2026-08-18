@@ -3,7 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/sync/deletions_sync.dart';
-import 'package:tankstellen/core/sync/fill_ups_sync.dart';
+import 'package:tankstellen/features/consumption/data/fill_ups_sync.dart';
 import 'package:tankstellen/core/sync/pending_deletions_journal.dart';
 import 'package:tankstellen/core/sync/schema_sql.dart';
 import 'package:tankstellen/core/sync/schema_verifier.dart';

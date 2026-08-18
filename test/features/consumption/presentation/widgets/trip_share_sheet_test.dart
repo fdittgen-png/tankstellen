@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:tankstellen/core/sync/trip_shares_sync.dart';
+import 'package:tankstellen/features/consumption/data/trip_shares_sync.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_share_sheet.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 

@@ -11,7 +11,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/feedback/auto_record_badge_provider.dart';
 import '../../../../core/sharing/widget_share_renderer.dart';
 import '../../../../core/sync/trip_shares_sync_enabled_provider.dart';
-import '../../../../core/sync/trips_sync.dart';
+import '../../data/trips_sync.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';

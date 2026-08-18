@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/notifications/notification_providers.dart';
 import 'package:tankstellen/core/notifications/notification_service.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
-import 'package:tankstellen/core/sync/alerts_sync.dart';
+import 'package:tankstellen/features/alerts/data/alerts_sync.dart';
 import 'package:tankstellen/core/sync/sync_helper.dart';
 import 'package:tankstellen/features/alerts/data/models/price_alert.dart';
 import 'package:tankstellen/features/alerts/providers/alert_provider.dart';

@@ -5,13 +5,13 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import '../../core/logging/error_logger.dart';
-import '../../features/itinerary/domain/entities/saved_itinerary.dart';
-import '../utils/json_extensions.dart';
-import 'deletions_sync.dart';
-import 'entity_sync.dart';
-import 'sync_helper.dart';
-import 'sync_transport.dart';
+import '../../../core/logging/error_logger.dart';
+import '../domain/entities/saved_itinerary.dart';
+import '../../../core/utils/json_extensions.dart';
+import '../../../core/sync/deletions_sync.dart';
+import '../../../core/sync/entity_sync.dart';
+import '../../../core/sync/sync_helper.dart';
+import '../../../core/sync/sync_transport.dart';
 
 /// Saved-itinerary sync with Supabase, pulled out of [SyncService]
 /// (#727).

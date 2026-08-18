@@ -7,11 +7,11 @@ import 'package:flutter/foundation.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../features/consumption/data/trip_history_repository.dart';
-import 'deletions_sync.dart';
-import 'supabase_client.dart';
+import 'trip_history_repository.dart';
+import '../../../core/sync/deletions_sync.dart';
+import '../../../core/sync/supabase_client.dart';
 import 'trips_sync_json.dart';
-import '../../core/logging/error_logger.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Per-trip-summary sync with Supabase (#1479 phase 2).
 ///

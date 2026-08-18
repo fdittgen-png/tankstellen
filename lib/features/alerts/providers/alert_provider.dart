@@ -8,7 +8,7 @@ import '../background/background_service.dart';
 import '../../../core/notifications/notification_providers.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/sync_provider.dart';
-import '../../../core/sync/alerts_sync.dart';
+import '../data/alerts_sync.dart';
 import '../../../core/sync/sync_events.dart';
 import '../../../core/sync/sync_helper.dart';
 import '../../../core/utils/event_loop_yield.dart';

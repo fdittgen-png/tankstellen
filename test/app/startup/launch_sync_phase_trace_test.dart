@@ -16,7 +16,7 @@ import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/core/sync/sync_config.dart';
 import 'package:tankstellen/core/sync/sync_events.dart';
-import 'package:tankstellen/core/sync/fill_ups_sync.dart';
+import 'package:tankstellen/features/consumption/data/fill_ups_sync.dart';
 import 'package:tankstellen/core/sync/sync_provider.dart';
 import 'package:tankstellen/core/sync/sync_pull_coordinator.dart';
 import 'package:tankstellen/core/sync/vehicles_sync.dart';
