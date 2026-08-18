@@ -177,7 +177,9 @@ void main() {
     // `loadFull` hydration seam (doc + per-entry re-hydrate of the
     // local-only details-heal upload) so the launch pull can feed it
     // summary-only decoded entries without losing the trip_details heal.
-    'lib/core/sync/trips_sync.dart': (
+    // #3743 (epic item 5) — the config moved into its owning feature;
+    // the key follows the file, snapshot unchanged.
+    'lib/features/consumption/data/trips_sync.dart': (
       lines: 433,
       bumps: 1,
       decompositionIssue: null,

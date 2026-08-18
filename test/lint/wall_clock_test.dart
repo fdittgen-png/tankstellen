@@ -70,13 +70,15 @@ void main() {
     'lib/core/services/station_service_chain_coalescing.dart': 2,
     'lib/core/services/widgets/freshness_badge.dart': 1,
     'lib/core/storage/stores/cache_hive_store.dart': 2,
-    'lib/core/sync/baselines_sync.dart': 1,
+    // #3743 (epic item 5) — the entity sync configs moved into their
+    // owning features; keys follow the files, counts unchanged.
+    'lib/features/consumption/data/baselines_sync.dart': 1,
     'lib/core/sync/deletions_sync.dart': 1,
     'lib/core/sync/entity_sync.dart': 1,
-    'lib/core/sync/itineraries_sync.dart': 5,
+    'lib/features/itinerary/data/itineraries_sync.dart': 5,
     'lib/core/sync/price_history_sync.dart': 1,
     'lib/core/sync/ratings_sync.dart': 2,
-    'lib/core/sync/trips_sync.dart': 4,
+    'lib/features/consumption/data/trips_sync.dart': 4,
     'lib/core/telemetry/collectors/breadcrumb_collector.dart': 1,
     'lib/core/telemetry/storage/isolate_error_spool.dart': 1,
     'lib/core/telemetry/storage/startup_failure_store.dart': 1,

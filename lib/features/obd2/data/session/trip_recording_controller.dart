@@ -347,12 +347,10 @@ class TripRecordingController {
   /// capture the resolved [_now] clock.
   late final TripDistanceResolver _distance;
 
-  /// #2506 — shared GPS-physics estimate + coaching folder, injected by
-  /// `Obd2RecordingPipeline` so the OBD2 live path mirrors the GPS-only
-  /// pipeline through ONE implementation (the anti-divergence seam). Null
-  /// in harnesses that don't wire it → the live estimate fields stay null.
-  /// #3743 — typed as the obd2-owned [TripGpsEstimateOverlay] seam;
-  /// consumption's `GpsLiveEstimateFolder` is the one implementation.
+  /// #2506 — shared GPS-physics estimate + coaching folder (consumption's,
+  /// typed as the obd2-owned [TripGpsEstimateOverlay] seam since #3743),
+  /// injected by `Obd2RecordingPipeline` so the OBD2 live path mirrors the
+  /// GPS-only pipeline through ONE implementation. Null → fields stay null.
   final TripGpsEstimateOverlay? _gpsEstimateFolder;
 
   /// #2506 — latest GPS ground-speed (km/h) latched via [updateGpsFix];
