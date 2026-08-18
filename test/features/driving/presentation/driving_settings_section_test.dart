@@ -389,7 +389,7 @@ void main() {
       // The regression the user reported: each slider must show its value
       // as TEXT at rest, not only inside the (drag-only) Slider.label.
       expect(
-        find.text('2.5 km'),
+        find.text('2,5 km'),
         findsOneWidget,
         reason:
             'The announcement-radius slider must show "2.5 km" at rest '

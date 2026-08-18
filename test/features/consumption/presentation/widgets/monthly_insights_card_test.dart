@@ -70,8 +70,8 @@ void main() {
       expect(find.text('240 km'), findsOneWidget);
       expect(find.text('180 km'), findsOneWidget);
       // Avg consumption — one-decimal L/100.
-      expect(find.text('6.0 L/100'), findsOneWidget);
-      expect(find.text('7.0 L/100'), findsOneWidget);
+      expect(find.text('6,0 L/100'), findsOneWidget);
+      expect(find.text('7,0 L/100'), findsOneWidget);
     });
 
     testWidgets('renders delta arrows when values differ', (tester) async {
@@ -136,12 +136,12 @@ void main() {
       // Current month: 1 trip, 15 min, 7.0 km. All visible.
       expect(find.text('1'), findsOneWidget);
       expect(find.text('15 min'), findsOneWidget);
-      expect(find.text('7.0 km'), findsOneWidget);
-      // Previous-month "0" / "0 min" / "0.0 km" must NOT render — the
+      expect(find.text('7,0 km'), findsOneWidget);
+      // Previous-month "0" / "0 min" / "0 m" must NOT render — the
       // reliability gate hides the previous column entirely.
       expect(find.text('0'), findsNothing);
       expect(find.text('0 min'), findsNothing);
-      expect(find.text('0.0 km'), findsNothing);
+      expect(find.text('0 m'), findsNothing);
     });
 
     testWidgets('does not render delta arrows when comparison is unreliable',
@@ -179,10 +179,11 @@ void main() {
         find.text('Need at least 3 trips per month for comparison'),
         findsOneWidget,
       );
-      // Trips: 0, drive time: 0 min, distance: 0.0 km — all current.
+      // Trips: 0, drive time: 0 min, distance: 0 m — all current
+      // (formatDistance renders sub-kilometre values in metres).
       expect(find.text('0'), findsOneWidget);
       expect(find.text('0 min'), findsOneWidget);
-      expect(find.text('0.0 km'), findsOneWidget);
+      expect(find.text('0 m'), findsOneWidget);
     });
   });
 }

@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/utils/time_formatter.dart';
+import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/cold_start_baselines.dart';
 import '../../domain/driving_coaching.dart';
@@ -99,6 +100,9 @@ class TripRecordingBannerContent extends StatelessWidget {
     final isEstimate = measured == null && gpsEstimate != null;
     final instantConsumption =
         measured ??
+        // Matches the dot-decimal L/100 mask of the measured
+        // formatInstantConsumption figure (#2185 convention).
+        // i18n-ignore-format: dot-decimal L/100 consumption mask (#2185)
         (isEstimate ? '~${gpsEstimate.toStringAsFixed(1)} L/100' : null);
     final coachingHintValue = (live != null && !paused)
         ? coachingHint(live, situation: state.situation, band: state.band)
@@ -160,7 +164,7 @@ class TripRecordingBannerContent extends StatelessWidget {
         ],
         if (distance != null)
           Text(
-            '${distance.toStringAsFixed(1)} km',
+            UnitFormatter.formatDistance(distance),
             style: TextStyle(
               color: fg,
               fontFeatures: const [FontFeature.tabularFigures()],

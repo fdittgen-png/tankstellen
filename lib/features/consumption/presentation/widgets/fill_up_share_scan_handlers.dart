@@ -46,9 +46,11 @@ void applyReceiptOutcome(
 ) {
   final result = outcome.parse;
   if (result.liters != null) {
+    // i18n-ignore-format: TextEditingController prefill — re-parsed as a dot-decimal number, not display text
     state.litersCtrl.text = result.liters!.toStringAsFixed(2);
   }
   if (result.totalCost != null) {
+    // i18n-ignore-format: TextEditingController prefill — re-parsed as a dot-decimal number, not display text
     state.costCtrl.text = result.totalCost!.toStringAsFixed(2);
   }
   if (result.date != null) {

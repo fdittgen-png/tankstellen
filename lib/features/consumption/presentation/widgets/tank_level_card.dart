@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/time_formatter.dart';
+import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../../../core/error/guarded.dart';
@@ -110,7 +111,7 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
     final lowFuel = fraction != null && fraction < 0.15;
     final barColor = lowFuel ? theme.colorScheme.error : null;
 
-    final litresText = estimate.levelL.toStringAsFixed(1);
+    final litresText = UnitFormatter.formatDecimal(estimate.levelL);
     final rangeKm = estimate.rangeKm;
 
     return Card(
@@ -266,17 +267,18 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
                         final trip = relevant[index];
                         final startedAt = trip.summary.startedAt;
                         final dateText = _formatDate(startedAt);
-                        final distance = trip.summary.distanceKm
-                            .toStringAsFixed(1);
+                        final distance = UnitFormatter.formatDistance(
+                          trip.summary.distanceKm,
+                        );
                         final litres = trip.summary.fuelLitersConsumed;
                         final litresText = litres == null
                             ? ''
-                            : ' · ${litres.toStringAsFixed(1)} L';
+                            : ' · ${UnitFormatter.formatDecimal(litres)} L';
                         return ListTile(
                           dense: true,
                           contentPadding: EdgeInsets.zero,
                           leading: const Icon(Icons.route_outlined),
-                          title: Text('$dateText · $distance km$litresText'),
+                          title: Text('$dateText · $distance$litresText'),
                         );
                       },
                     ),

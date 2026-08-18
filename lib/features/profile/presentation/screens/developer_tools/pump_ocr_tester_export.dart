@@ -183,6 +183,7 @@ class OcrTesterExport {
 
   /// Formats a money/volume double into a slug fragment: `18.59` → `18_59`.
   static String _money(double v) =>
+      // i18n-ignore-format: export filename fragment — locale-neutral
       v.toStringAsFixed(2).replaceAll('.', '_');
 
   /// Returns a copy of [package] with `expected` seeded from `result` (when

@@ -122,7 +122,9 @@ class OcrTraceStepsPanel extends StatelessWidget {
     final p = package.preprocess;
     if (p == null) return const [];
     return [
+      // i18n-ignore-format: developer OCR trace diagnostics — locale-neutral debug values
       _kv('fraction', p.glareFraction.toStringAsFixed(3)),
+      // i18n-ignore-format: developer OCR trace diagnostics — locale-neutral debug values
       _kv('threshold', p.threshold.toStringAsFixed(3)),
       _kv('rejected', '${p.rejected}'),
     ];
@@ -181,6 +183,7 @@ class OcrTraceStepsPanel extends StatelessWidget {
     final c = package.confidence;
     if (c == null) return const [];
     return [
+      // i18n-ignore-format: developer OCR trace diagnostics — locale-neutral debug values
       _kv('total', c.total.toStringAsFixed(2)),
       _kv('hasTotal', '${c.hasTotal}'),
       _kv('hasVolume', '${c.hasVolume}'),
@@ -199,6 +202,7 @@ class OcrTraceStepsPanel extends StatelessWidget {
       _kv('verdict', verdict),
       _kv('reason', g.reason),
       if (g.identityDelta != null)
+        // i18n-ignore-format: developer OCR trace diagnostics — locale-neutral debug values
         _kv('identityDelta', g.identityDelta!.toStringAsFixed(4)),
       for (final c in g.checks) _kv(c.name, c.passed ? '✓' : '✗'),
     ];
@@ -260,6 +264,7 @@ class OcrTraceStepsPanel extends StatelessWidget {
         derived: r.derived,
         field: 'pricePerLitre',
       ),
+      // i18n-ignore-format: developer OCR trace diagnostics — locale-neutral debug values
       _kv('confidence', r.confidence.toStringAsFixed(2)),
       _kv('validated', '${r.validated}'),
       if (r.validationReason != null) _kv('reason', r.validationReason!),

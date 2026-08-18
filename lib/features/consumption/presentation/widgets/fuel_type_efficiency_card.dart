@@ -13,6 +13,7 @@ import '../../domain/entities/fuel_type_efficiency_stats.dart';
 import '../../domain/services/fuel_type_efficiency_aggregator.dart';
 import '../../providers/fuel_type_efficiency_provider.dart';
 import 'localized_fuel_name.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 part 'fuel_type_efficiency_rows.dart';
 

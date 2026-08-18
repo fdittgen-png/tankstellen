@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/utils/time_formatter.dart';
+import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../obd2/api.dart';
 import 'broken_map_widgets.dart';
@@ -88,7 +89,7 @@ class TripRecordingLandscapeBody extends StatelessWidget {
                   label: l.tripMetricSpeed,
                   value: r?.speedKmh == null
                       ? '—'
-                      : '${r!.speedKmh!.toStringAsFixed(0)} km/h',
+                      : '${UnitFormatter.formatDecimal(r!.speedKmh!, fractionDigits: 0)} km/h',
                 ),
               ),
             ],
@@ -120,7 +121,10 @@ class TripRecordingLandscapeBody extends StatelessWidget {
                               label: l.tripMetricDistance,
                               value: r == null
                                   ? '—'
-                                  : '${r.distanceKmSoFar.toStringAsFixed(2)} km',
+                                  : UnitFormatter.formatDistance(
+                                      r.distanceKmSoFar,
+                                      fractionDigits: 2,
+                                    ),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -165,9 +169,9 @@ class TripRecordingLandscapeBody extends StatelessWidget {
                               icon: Icons.local_gas_station,
                               label: l.tripMetricFuelUsed,
                               value: r?.fuelLitersSoFar != null
-                                  ? '${r!.fuelLitersSoFar!.toStringAsFixed(2)} L'
+                                  ? '${UnitFormatter.formatDecimal(r!.fuelLitersSoFar!, fractionDigits: 2)} L'
                                   : r?.gpsEstimatedFuelLitersSoFar != null
-                                  ? '~${r!.gpsEstimatedFuelLitersSoFar!.toStringAsFixed(2)} L'
+                                  ? '~${UnitFormatter.formatDecimal(r!.gpsEstimatedFuelLitersSoFar!, fractionDigits: 2)} L'
                                   : '—',
                             ),
                           ),

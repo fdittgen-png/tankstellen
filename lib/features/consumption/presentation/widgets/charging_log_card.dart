@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../ev/domain/entities/charging_log.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Compact list-tile card for a single [ChargingLog] row on the
 /// Consumption screen's Charging tab (#582 phase 2).
@@ -30,7 +31,7 @@ class ChargingLogCard extends StatelessWidget {
     final title = log.stationName?.trim().isNotEmpty == true
         ? log.stationName!
         : (l.chargingStationName);
-    final kwhStr = log.kWh.toStringAsFixed(1);
+    final kwhStr = UnitFormatter.formatDecimal(log.kWh);
     // #2491 — a charging-session cost is a TOTAL: route it through
     // formatTotal (locale-aware 2 dp + the active currency symbol)
     // instead of a hand-rolled toStringAsFixed(2) with a hardcoded

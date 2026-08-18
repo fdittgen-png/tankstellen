@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/time_formatter.dart';
+import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/services/monthly_insights_aggregator.dart';
 
@@ -268,13 +269,14 @@ String _fmtDuration(Duration d) {
 }
 
 String _fmtDistance(double km) {
-  if (km < 10) return '${km.toStringAsFixed(1)} km';
-  return '${km.toStringAsFixed(0)} km';
+  if (km < 10) return UnitFormatter.formatDistance(km);
+  return UnitFormatter.formatDistance(km, fractionDigits: 0);
 }
 
 String _fmtConsumption(double? lPer100Km) {
   if (lPer100Km == null) return '—';
-  return '${lPer100Km.toStringAsFixed(1)} L/100';
+  return '${UnitFormatter.formatDecimal(lPer100Km)} L/100';
 }
 
-String _fmtClimb(double meters) => '${meters.toStringAsFixed(0)} m';
+String _fmtClimb(double meters) =>
+    '${UnitFormatter.formatDecimal(meters, fractionDigits: 0)} m';

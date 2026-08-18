@@ -81,7 +81,7 @@ class _RouteSegmentSection extends StatelessWidget {
     final saving = state.minRouteSavingPerLiter;
     final off = saving <= 0;
     // i18n-ignore: language-neutral currency-per-litre unit mask.
-    final amount = '${saving.toStringAsFixed(2)} €/L';
+    final amount = '${UnitFormatter.formatDecimal(saving, fractionDigits: 2)} €/L';
     final valueLabel = off ? (l10n.routeMinSavingOff) : amount;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

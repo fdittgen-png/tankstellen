@@ -29,6 +29,7 @@ import 'country_change_dialog.dart';
 import 'profile_fuel_type_dropdown.dart';
 import 'profile_landing_screen_dropdown.dart';
 import 'profile_radius_slider.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 part 'profile_edit_sheet_parts.dart';
 part 'profile_edit_sheet_parts2.dart';

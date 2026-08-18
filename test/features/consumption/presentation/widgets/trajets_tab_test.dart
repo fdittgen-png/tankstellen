@@ -714,7 +714,7 @@ void main() {
         activeVehicle: combustionVehicle,
       );
 
-      expect(find.text('6.4 L/100 km'), findsOneWidget);
+      expect(find.text('6,4 L/100 km'), findsOneWidget);
       expect(find.textContaining('kWh'), findsNothing);
     });
 
@@ -736,7 +736,7 @@ void main() {
         activeVehicle: evVehicle,
       );
 
-      expect(find.text('18.5 kWh/100 km'), findsOneWidget);
+      expect(find.text('18,5 kWh/100 km'), findsOneWidget);
       expect(find.textContaining('L/100 km'), findsNothing);
     });
   });
@@ -815,7 +815,7 @@ void main() {
       expect(find.text('Cold start'), findsNothing);
       // Distance chip is still rendered — sanity check that the row
       // built correctly.
-      expect(find.text('25.0 km'), findsOneWidget);
+      expect(find.text('25,0 km'), findsOneWidget);
     });
   });
 

@@ -50,7 +50,7 @@ void main() {
       );
       // 60 / 30 = 2.000
       expect(find.textContaining('Price per liter'), findsOneWidget);
-      expect(find.textContaining('2.000'), findsOneWidget);
+      expect(find.textContaining('2,000'), findsOneWidget);
     });
 
     testWidgets('comma-decimals are treated as dots (50,25 € / 25 L)',
@@ -65,7 +65,7 @@ void main() {
         ),
       );
       // 50.25 / 25 = 2.010
-      expect(find.textContaining('2.010'), findsOneWidget);
+      expect(find.textContaining('2,010'), findsOneWidget);
     });
 
     testWidgets('reacts to live edits of the controllers', (tester) async {
@@ -86,7 +86,7 @@ void main() {
 
       // 74.36 / 40 = 1.859
       expect(find.textContaining('Price per liter'), findsOneWidget);
-      expect(find.textContaining('1.859'), findsOneWidget);
+      expect(find.textContaining('1,859'), findsOneWidget);
     });
 
     testWidgets('hides again when a value goes to zero', (tester) async {
@@ -99,7 +99,7 @@ void main() {
           costController: cost,
         ),
       );
-      expect(find.textContaining('2.000'), findsOneWidget);
+      expect(find.textContaining('2,000'), findsOneWidget);
 
       cost.text = '0';
       await tester.pump();

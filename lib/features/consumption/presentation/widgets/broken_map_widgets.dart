@@ -10,6 +10,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../../obd2/api.dart';
 import '../../providers/consumption_providers.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Confidence band thresholds shared by every broken-MAP UI surface
 /// (#1423 phase 5; #1424 reuses against the Bayesian
@@ -180,8 +181,11 @@ class BrokenMapOverlayRow extends ConsumerWidget {
     final pe = belief.pointEstimate;
     final band = brokenMapBandFor(pe);
     final ci = belief.credibleInterval;
-    final pePct = (pe * 100).toStringAsFixed(0);
-    final marginPct = ((ci.$2 - ci.$1) / 2 * 100).toStringAsFixed(0);
+    final pePct = UnitFormatter.formatDecimal(pe * 100, fractionDigits: 0);
+    final marginPct = UnitFormatter.formatDecimal(
+      (ci.$2 - ci.$1) / 2 * 100,
+      fractionDigits: 0,
+    );
     final String text;
     final Color color;
     switch (band) {
@@ -346,8 +350,11 @@ class _BrokenMapDiagnosticsCardState
     }
     final pe = belief!.pointEstimate;
     final ci = belief.credibleInterval;
-    final pePct = (pe * 100).toStringAsFixed(0);
-    final marginPct = ((ci.$2 - ci.$1) / 2 * 100).toStringAsFixed(0);
+    final pePct = UnitFormatter.formatDecimal(pe * 100, fractionDigits: 0);
+    final marginPct = UnitFormatter.formatDecimal(
+      (ci.$2 - ci.$1) / 2 * 100,
+      fractionDigits: 0,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -404,7 +411,7 @@ class _BlocklistRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final pct = (confidence * 100).toStringAsFixed(0);
+    final pct = UnitFormatter.formatDecimal(confidence * 100, fractionDigits: 0);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(

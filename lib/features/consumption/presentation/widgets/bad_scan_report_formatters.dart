@@ -37,16 +37,21 @@ List<BadScanDiffRow> buildBadScanDiffRows({
       ),
       BadScanDiffRow(
         l.liters,
+        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
         p.liters?.toStringAsFixed(2) ?? '—',
+        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
         enteredLiters?.toStringAsFixed(2) ?? '—',
       ),
       BadScanDiffRow(
         l.badScanReportFieldTotal,
+        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
         p.totalCost?.toStringAsFixed(2) ?? '—',
+        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
         enteredTotalCost?.toStringAsFixed(2) ?? '—',
       ),
       BadScanDiffRow(
         l.badScanReportFieldPricePerLiter,
+        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
         p.pricePerLiter?.toStringAsFixed(3) ?? '—',
         '—',
       ),
@@ -67,16 +72,21 @@ List<BadScanDiffRow> buildBadScanDiffRows({
   return [
     BadScanDiffRow(
       l.liters,
+      // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
       p.liters?.toStringAsFixed(2) ?? '—',
+      // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
       enteredLiters?.toStringAsFixed(2) ?? '—',
     ),
     BadScanDiffRow(
       l.badScanReportFieldTotal,
+      // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
       p.totalCost?.toStringAsFixed(2) ?? '—',
+      // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
       enteredTotalCost?.toStringAsFixed(2) ?? '—',
     ),
     BadScanDiffRow(
       l.badScanReportFieldPricePerLiter,
+      // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
       p.pricePerLiter?.toStringAsFixed(3) ?? '—',
       '—',
     ),
@@ -108,13 +118,18 @@ String buildBadScanShareBody({
       ..writeln('Scanned → Corrected')
       ..writeln('-------------------')
       ..writeln(
+        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
         'Liters:   ${p.liters?.toStringAsFixed(2) ?? '—'}'
+        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
         '   →   ${enteredLiters?.toStringAsFixed(2) ?? '(please fill)'}',
       )
       ..writeln(
+        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
         'Total:    ${p.totalCost?.toStringAsFixed(2) ?? '—'}'
+        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
         '   →   ${enteredTotalCost?.toStringAsFixed(2) ?? '(please fill)'}',
       )
+      // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
       ..writeln('Price/L:  ${p.pricePerLiter?.toStringAsFixed(3) ?? '—'}')
       ..writeln('Station:  ${p.stationName ?? '—'}')
       ..writeln('Fuel:     ${p.fuelType?.apiValue ?? '—'}')
@@ -129,15 +144,21 @@ String buildBadScanShareBody({
       ..writeln('Scanned → Corrected')
       ..writeln('-------------------')
       ..writeln(
+        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
         'Liters:   ${p.liters?.toStringAsFixed(2) ?? '—'}'
+        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
         '   →   ${enteredLiters?.toStringAsFixed(2) ?? '(please fill)'}',
       )
       ..writeln(
+        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
         'Total:    ${p.totalCost?.toStringAsFixed(2) ?? '—'}'
+        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
         '   →   ${enteredTotalCost?.toStringAsFixed(2) ?? '(please fill)'}',
       )
+      // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
       ..writeln('Price/L:  ${p.pricePerLiter?.toStringAsFixed(3) ?? '—'}')
       ..writeln('Pump #:   ${p.pumpNumber?.toString() ?? '—'}')
+      // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
       ..writeln('Confidence: ${p.confidence.toStringAsFixed(2)}');
   }
   buffer
@@ -161,8 +182,11 @@ Map<String, String?> buildBadScanParsedFields({
     final p = receiptScan!.parse;
     return <String, String?>{
       'brandLayout': p.brandLayout,
+      // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
       'liters': p.liters?.toStringAsFixed(2),
+      // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
       'totalCost': p.totalCost?.toStringAsFixed(2),
+      // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
       'pricePerLiter': p.pricePerLiter?.toStringAsFixed(3),
       'stationName': p.stationName,
       'fuelType': p.fuelType?.apiValue,
@@ -171,10 +195,14 @@ Map<String, String?> buildBadScanParsedFields({
   }
   final p = pumpScan!.parse;
   return <String, String?>{
+    // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
     'liters': p.liters?.toStringAsFixed(2),
+    // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
     'totalCost': p.totalCost?.toStringAsFixed(2),
+    // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
     'pricePerLiter': p.pricePerLiter?.toStringAsFixed(3),
     'pumpNumber': p.pumpNumber?.toString(),
+    // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
     'confidence': p.confidence.toStringAsFixed(2),
   };
 }
@@ -187,7 +215,9 @@ Map<String, String?> buildBadScanUserCorrections({
   required double? enteredTotalCost,
 }) {
   return <String, String?>{
+    // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
     'liters': enteredLiters?.toStringAsFixed(2),
+    // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
     'totalCost': enteredTotalCost?.toStringAsFixed(2),
   };
 }

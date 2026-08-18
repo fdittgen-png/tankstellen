@@ -77,7 +77,7 @@ void main() {
       );
 
       expect(find.text('Tank level'), findsOneWidget);
-      expect(find.text('32.4 L'), findsOneWidget);
+      expect(find.text('32,4 L'), findsOneWidget);
     });
 
     testWidgets('renders the range sub-text when rangeKm is non-null',

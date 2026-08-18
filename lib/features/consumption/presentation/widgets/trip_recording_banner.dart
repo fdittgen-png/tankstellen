@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/router.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/services/approach_detector.dart';
+import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../approach/providers/effective_approach_state_provider.dart';
 import '../../../approach/providers/nearest_station_radar_provider.dart';
@@ -377,7 +378,7 @@ class TripRecordingBanner extends ConsumerWidget {
     }
     final distance = state.live?.distanceKmSoFar;
     if (distance != null) {
-      parts.add('${distance.toStringAsFixed(1)} km');
+      parts.add(UnitFormatter.formatDistance(distance));
     }
     // #2393 — when the strip is showing the GPS estimate (no measured
     // OBD2 value, estimate present) append the approximate-value

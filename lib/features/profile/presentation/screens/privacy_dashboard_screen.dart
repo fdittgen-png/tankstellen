@@ -30,6 +30,7 @@ import '../widgets/privacy_dashboard/local_data_card.dart';
 import '../widgets/privacy_dashboard/privacy_action_buttons.dart';
 import '../widgets/privacy_dashboard/privacy_banner.dart';
 import '../widgets/privacy_dashboard/synced_data_card.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Test-only override for the share-sheet handoff used by
 /// [_PrivacyDashboardScreenState._exportErrorLog] — the shared
@@ -142,7 +143,8 @@ class _PrivacyDashboardScreenState
   Future<void> _exportErrorLog() async {
     final traces = ref.read(traceStorageProvider);
     final json = traces.exportAsJson();
-    final kb = (utf8.encode(json).length / 1024).toStringAsFixed(1);
+    final byteSize = utf8.encode(json).length;
+    final kb = UnitFormatter.formatDecimal(byteSize / 1024);
     final parsed = traces.parsedCount;
     final unparsed = traces.unparsedCount;
     final totalEntries = parsed + unparsed;

@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/eco_score.dart';
 
@@ -28,9 +29,9 @@ class EcoScoreBadge extends StatelessWidget {
     final (icon, color) = _styleFor(context, score.direction, theme);
 
     final deltaText =
-        '${score.deltaPercent >= 0 ? '+' : ''}${score.deltaPercent.toStringAsFixed(0)}%';
-    final lp100Text = score.litersPer100Km.toStringAsFixed(1);
-    final avgText = score.rollingAverage.toStringAsFixed(1);
+        '${score.deltaPercent >= 0 ? '+' : ''}${UnitFormatter.formatDecimal(score.deltaPercent, fractionDigits: 0)}%';
+    final lp100Text = UnitFormatter.formatDecimal(score.litersPer100Km);
+    final avgText = UnitFormatter.formatDecimal(score.rollingAverage);
 
     // Compose the badge text from the localised consumption unit +
     // the raw delta; the delta itself (+/− and %) is locale-neutral.

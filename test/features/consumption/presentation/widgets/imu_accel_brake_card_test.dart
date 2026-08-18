@@ -61,8 +61,8 @@ void main() {
     );
     expect(find.byKey(const Key('accel_brake_card_title')), findsOneWidget);
     // 2 hard accels over 10 km → "2 (0.2/km)".
-    expect(find.text('2 (0.2/km)'), findsOneWidget);
-    expect(find.text('1 (0.1/km)'), findsOneWidget); // 1 brake
+    expect(find.text('2 (0,2/km)'), findsOneWidget);
+    expect(find.text('1 (0,1/km)'), findsOneWidget); // 1 brake
     expect(find.byKey(const Key('accel_brake_source')), findsOneWidget);
   });
 }

@@ -45,20 +45,29 @@ class UnitFormatter {
   /// metric countries and as feet/yards for imperial (approximate
   /// short-distance guard — we only switch to the coarser unit
   /// above 1 km/mi).
-  static String formatDistance(double? km, {String? countryCode}) {
+  /// [fractionDigits] overrides the default single decimal on the
+  /// km/mi figure (#3743) — pass `0` for whole-unit surfaces like an
+  /// odometer reading, `2` for the fine-grained live trip distance.
+  /// The sub-unit branches (m / yd) always render whole numbers.
+  static String formatDistance(
+    double? km, {
+    String? countryCode,
+    int? fractionDigits,
+  }) {
     if (km == null) return '--';
     final cfg = _resolve(countryCode);
+    final digits = fractionDigits ?? 1;
     if (cfg.distanceUnit == 'mi') {
       final miles = km * _milesPerKm;
       if (miles < 1) {
         return '${(miles * 1760).round()} yd';
       }
-      return '${_oneDecimal(miles)} mi';
+      return '${formatDecimal(miles, fractionDigits: digits)} mi';
     }
     if (km < 1) {
       return '${(km * 1000).round()} m';
     }
-    return '${_oneDecimal(km)} km';
+    return '${formatDecimal(km, fractionDigits: digits)} km';
   }
 
   /// Format a fuel volume in the correct unit for the given country.
@@ -128,16 +137,26 @@ class UnitFormatter {
     return '${value.toStringAsFixed(1)} $mask';
   }
 
-  /// Format a double with one decimal in the *active locale* so
-  /// metric countries render "2,3 km" (comma) and English-locale
-  /// countries render "2.3 km" (dot). Using `toStringAsFixed` would
-  /// hard-code the dot and drop the comma that French/German users
-  /// expect.
-  static String _oneDecimal(double v) =>
-      NumberFormat('0.0', _activeLocale).format(v);
+  /// Format a bare decimal number in the *active locale* so metric
+  /// countries render "2,3" (comma) and English-locale countries
+  /// render "2.3" (dot). Using `toStringAsFixed` would hard-code the
+  /// dot and drop the comma that French/German users expect (#3743).
+  ///
+  /// This is the general-purpose value formatter for UI figures whose
+  /// unit/suffix is supplied by the surrounding string or label
+  /// (percentages, L/100 values, kWh, file sizes, …). Prefer the
+  /// dedicated helpers ([formatDistance], [formatVolume],
+  /// [formatPricePerUnit]) when a unit-aware one exists.
+  static String formatDecimal(double? value, {int fractionDigits = 1}) {
+    if (value == null) return '--';
+    final pattern = fractionDigits <= 0 ? '0' : '0.${'0' * fractionDigits}';
+    return NumberFormat(pattern, _activeLocale).format(value);
+  }
+
+  static String _oneDecimal(double v) => formatDecimal(v);
 
   static String _threeDecimals(double v) =>
-      NumberFormat('0.000', _activeLocale).format(v);
+      formatDecimal(v, fractionDigits: 3);
 
   /// The active country's CLDR locale, sourced from the same
   /// [CountryConfig] SSoT as [PriceFormatter] (#2168). Previously a

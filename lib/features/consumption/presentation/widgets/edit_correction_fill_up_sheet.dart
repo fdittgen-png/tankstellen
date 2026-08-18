@@ -81,8 +81,10 @@ class _EditCorrectionFillUpSheetState
   /// the field tidy for the typical "0 cost" correction case.
   String _formatNumber(double v) {
     if (v == v.truncateToDouble()) {
+      // i18n-ignore-format: TextEditingController prefill — re-parsed as a dot-decimal number, not display text
       return v.toStringAsFixed(0);
     }
+    // i18n-ignore-format: TextEditingController prefill — re-parsed as a dot-decimal number, not display text
     return v.toStringAsFixed(2);
   }
 

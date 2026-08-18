@@ -218,7 +218,7 @@ class _StationDetails extends StatelessWidget {
                     child: Text(
                       l10n.highwayViaExit(
                         info.exitLabel,
-                        info.detourKm.toStringAsFixed(1),
+                        UnitFormatter.formatDecimal(info.detourKm),
                       ),
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,

@@ -57,6 +57,7 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
     final hasRoutePrice = routePrice != null && routePrice > 0;
     final price = hasRoutePrice ? routePrice : state.pricePerLiter;
     _priceController = TextEditingController(
+      // i18n-ignore-format: TextEditingController prefill — re-parsed as a dot-decimal number, not display text
       text: price > 0 ? price.toStringAsFixed(3) : '',
     );
     _tripsPerMonthController = TextEditingController();

@@ -103,7 +103,8 @@ class _CalibrationChip extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final eta = volumetricEfficiency.toStringAsFixed(2);
+    final eta =
+        UnitFormatter.formatDecimal(volumetricEfficiency, fractionDigits: 2);
     final String label;
     if (samples == 0) {
       label = l.calibrationLearnerStatusNoSamples;

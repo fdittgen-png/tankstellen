@@ -119,7 +119,7 @@ void main() {
       expect(labels, contains('Recording trip'));
       expect(labels, contains('Highway'));
       expect(labels, contains('+8%'));
-      expect(labels, contains('5.2 km'));
+      expect(labels, contains('5,2 km'));
       handle.dispose();
     });
 
@@ -264,7 +264,7 @@ void main() {
       // row. Finding the distance value is enough proof the tile
       // didn't collapse to nothing.
       expect(find.text('~'), findsOneWidget);
-      expect(find.text('4.0 km'), findsOneWidget);
+      expect(find.text('4,0 km'), findsOneWidget);
     });
 
     testWidgets('outside PiP mode the shell child renders as usual',

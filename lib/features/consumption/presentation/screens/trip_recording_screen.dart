@@ -896,7 +896,10 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
             label: l.tripMetricDistance,
             value: r == null
                 ? '—'
-                : '${r.distanceKmSoFar.toStringAsFixed(2)} km',
+                : UnitFormatter.formatDistance(
+                    r.distanceKmSoFar,
+                    fractionDigits: 2,
+                  ),
           ),
           const SizedBox(height: 8),
           _MetricCard(
@@ -904,7 +907,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
             label: l.tripMetricSpeed,
             value: r?.speedKmh == null
                 ? '—'
-                : '${r!.speedKmh!.toStringAsFixed(0)} km/h',
+                : '${UnitFormatter.formatDecimal(r!.speedKmh!, fractionDigits: 0)} km/h',
           ),
           const SizedBox(height: 8),
           _MetricCard(
@@ -914,9 +917,9 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
             // integral with `~` (GPS-only trips no longer show `—` all
             // drive), else `—`.
             value: r?.fuelLitersSoFar != null
-                ? '${r!.fuelLitersSoFar!.toStringAsFixed(2)} L'
+                ? '${UnitFormatter.formatDecimal(r!.fuelLitersSoFar!, fractionDigits: 2)} L'
                 : r?.gpsEstimatedFuelLitersSoFar != null
-                ? '~${r!.gpsEstimatedFuelLitersSoFar!.toStringAsFixed(2)} L'
+                ? '~${UnitFormatter.formatDecimal(r!.gpsEstimatedFuelLitersSoFar!, fractionDigits: 2)} L'
                 : '—',
           ),
           const SizedBox(height: 8),
@@ -991,16 +994,16 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
         _MetricCard(
           icon: Icons.route,
           label: l.tripMetricDistance,
-          value: '${s.distanceKm.toStringAsFixed(2)} km',
+          value: UnitFormatter.formatDistance(s.distanceKm, fractionDigits: 2),
         ),
         const SizedBox(height: 8),
         _MetricCard(
           icon: Icons.local_gas_station,
           label: l.tripMetricFuelUsed,
           value: liters != null
-              ? '${liters.toStringAsFixed(2)} L'
+              ? '${UnitFormatter.formatDecimal(liters, fractionDigits: 2)} L'
               : estLiters != null
-                  ? '~${estLiters.toStringAsFixed(2)} L'
+                  ? '~${UnitFormatter.formatDecimal(estLiters, fractionDigits: 2)} L'
                   : '—',
         ),
         const SizedBox(height: 8),
@@ -1017,7 +1020,9 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
         _MetricCard(
           icon: Icons.speed,
           label: l.tripMetricOdometer,
-          value: endKm == null ? '—' : '${endKm.toStringAsFixed(0)} km',
+          value: endKm == null
+              ? '—'
+              : UnitFormatter.formatDistance(endKm, fractionDigits: 0),
         ),
         const Spacer(),
         // #3582 — the trip is ALREADY saved by `stop()` (#1185); this

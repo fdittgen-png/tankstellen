@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../consumption/domain/services/trip_length_aggregator.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Trip-length consumption breakdown card on the Carbon dashboard
 /// Charts tab (#1191).
@@ -174,12 +175,12 @@ class _BucketTile extends StatelessWidget {
         ? (tripCount == 0
             ? '—'
             : l.tripLengthBucketNeedMoreData)
-        : (avg == null ? '—' : '${avg.toStringAsFixed(1)} L/100');
+        : (avg == null ? '—' : '${UnitFormatter.formatDecimal(avg)} L/100');
 
     final subtitle = tripCount == 0
         ? l.tripLengthBucketTripCount(0)
         : '${l.tripLengthBucketTripCount(tripCount)} · '
-            '${stats.totalDistanceKm.toStringAsFixed(0)} km';
+            '${UnitFormatter.formatDistance(stats.totalDistanceKm, fractionDigits: 0)}';
 
     final showArrow = hasEnoughData &&
         avg != null &&

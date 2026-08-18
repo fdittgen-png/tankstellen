@@ -33,7 +33,7 @@ void main() {
               _score(lp100: 5.4, avg: 6.0, delta: -10, direction: EcoScoreDirection.improving),
         ),
       );
-      expect(find.textContaining('5.4 L/100 km'), findsOneWidget);
+      expect(find.textContaining('5,4 L/100 km'), findsOneWidget);
       expect(find.textContaining('-10%'), findsOneWidget);
     });
 
@@ -104,7 +104,7 @@ void main() {
       );
       final tip = tester.widget<Tooltip>(find.byType(Tooltip));
       expect(tip.message, contains('3 fill-ups'));
-      expect(tip.message, contains('6.0'));
+      expect(tip.message, contains('6,0'));
     });
 
     testWidgets('Semantics label states both numbers for TalkBack',
@@ -116,7 +116,7 @@ void main() {
         ),
       );
       final semantics = tester.getSemantics(find.byType(EcoScoreBadge));
-      expect(semantics.label, contains('5.4 L/100 km'));
+      expect(semantics.label, contains('5,4 L/100 km'));
       expect(semantics.label, contains('-10%'));
     });
   });

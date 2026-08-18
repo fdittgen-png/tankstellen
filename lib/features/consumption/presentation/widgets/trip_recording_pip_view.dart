@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/services/approach_detector.dart';
+import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/station.dart';
@@ -178,7 +179,7 @@ class TripRecordingPipView extends StatelessWidget {
       bigFigure = _stripUnit(raw);
       bigCaption = _unitOf(raw);
       secondaryRow = [
-        if (distance != null) '${distance.toStringAsFixed(1)} km',
+        if (distance != null) UnitFormatter.formatDistance(distance),
         if (elapsed != null) _fmtElapsed(elapsed),
       ];
     } else if (gpsEstimate != null) {
@@ -186,11 +187,14 @@ class TripRecordingPipView extends StatelessWidget {
       // caption is the dedicated localized "est. L/100 km" marker
       // (#2393) so the value reads distinctly from the OBD2-measured
       // "L/100 km"; the leading `~` carries the same meaning visually.
+      // Matches the dot-decimal L/100 mask of formatInstantConsumption
+      // in branch 1 (#2185 convention).
+      // i18n-ignore-format: dot-decimal L/100 consumption mask (#2185)
       bigFigure = '~${gpsEstimate.toStringAsFixed(1)}';
       bigCaption = l.tripRecordingPipEstConsumptionCaption;
       isEstimate = true;
       secondaryRow = [
-        if (distance != null) '${distance.toStringAsFixed(1)} km',
+        if (distance != null) UnitFormatter.formatDistance(distance),
         if (elapsed != null) _fmtElapsed(elapsed),
       ];
     } else if (live != null && !paused) {
@@ -204,7 +208,7 @@ class TripRecordingPipView extends StatelessWidget {
       isEstimate = true;
       secondaryRow = [
         if (distance != null && distance >= 0.1)
-          '${distance.toStringAsFixed(1)} km',
+          UnitFormatter.formatDistance(distance),
         if (elapsed != null) _fmtElapsed(elapsed),
       ];
     } else {

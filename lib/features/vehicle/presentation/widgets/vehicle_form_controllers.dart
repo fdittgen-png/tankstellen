@@ -110,6 +110,7 @@ class VehicleFormControllers {
   /// curated catalog capacities are whole litres, and "35" reads
   /// better in the field than "35.0".
   static String _formatLitres(double v) =>
+      // i18n-ignore-format: TextEditingController prefill — re-parsed as a dot-decimal number, not display text
       v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toString();
 
   /// Map the catalog's coarse fuel-type string onto a

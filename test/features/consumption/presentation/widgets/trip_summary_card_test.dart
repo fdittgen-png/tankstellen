@@ -172,7 +172,7 @@ void main() {
         ),
       );
       // 12.37 → 12.4 via toStringAsFixed(1)
-      expect(find.text('12.4 km'), findsOneWidget);
+      expect(find.text('12,4 km'), findsOneWidget);
     });
   });
 
@@ -292,7 +292,7 @@ void main() {
         ),
       );
       // 4.567 → 4.57 via toStringAsFixed(2)
-      expect(find.text('4.57 L'), findsOneWidget);
+      expect(find.text('4,57 L'), findsOneWidget);
     });
 
     testWidgets(
@@ -346,8 +346,8 @@ void main() {
           isEv: false,
         ),
       );
-      expect(find.text('60.0 km/h'), findsOneWidget);
-      expect(find.text('80.0 km/h'), findsOneWidget);
+      expect(find.text('60,0 km/h'), findsOneWidget);
+      expect(find.text('80,0 km/h'), findsOneWidget);
     });
   });
 

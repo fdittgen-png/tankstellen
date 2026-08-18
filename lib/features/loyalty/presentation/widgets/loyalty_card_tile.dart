@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/loyalty_card.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Single row in the loyalty settings list: brand badge + label +
 /// per-litre discount, with a `Switch` for enable/disable and a
@@ -31,7 +32,8 @@ class LoyaltyCardTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final discountText = '${card.discountPerLiter.toStringAsFixed(2)} /L';
+    final discountText =
+        '${UnitFormatter.formatDecimal(card.discountPerLiter, fractionDigits: 2)} /L';
     return Dismissible(
       key: ValueKey('loyalty-dismiss-${card.id}'),
       direction: DismissDirection.endToStart,

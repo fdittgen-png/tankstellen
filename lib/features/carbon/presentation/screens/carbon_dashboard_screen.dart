@@ -17,6 +17,7 @@ import '../../domain/monthly_summary.dart';
 import '../widgets/charts_tab.dart';
 import '../../../../core/error/guarded.dart';
 import '../../../../core/sharing/share_seam.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Test-only override for the share-sheet handoff used by
 /// [CarbonDashboardScreen] (#2005) — the shared [ShareSink] seam.
@@ -102,8 +103,8 @@ class CarbonDashboardScreen extends ConsumerWidget {
     // i18n-ignore: language-neutral number/unit format mask.
     final body =
         '$title\n\n'
-        '$costLabel: ${totalCost.toStringAsFixed(0)} ${PriceFormatter.currency}\n'
-        '$co2Label: ${totalCo2.toStringAsFixed(0)} kg';
+        '$costLabel: ${UnitFormatter.formatDecimal(totalCost, fractionDigits: 0)} ${PriceFormatter.currency}\n'
+        '$co2Label: ${UnitFormatter.formatDecimal(totalCo2, fractionDigits: 0)} kg';
     final sink = debugCarbonShareSinkOverride ?? _defaultCarbonShareSink;
     try {
       await sink(ShareParams(text: body, subject: title));

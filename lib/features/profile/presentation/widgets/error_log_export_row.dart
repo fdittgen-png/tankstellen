@@ -12,6 +12,7 @@ import '../../../../core/sharing/size_gated_text_export.dart';
 import '../../../../core/telemetry/storage/trace_storage.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Threshold above which the error-log export switches from clipboard
 /// to the OS share sheet (#1301) — the shared size gate.
@@ -95,7 +96,8 @@ class _ErrorLogExportRowState extends ConsumerState<ErrorLogExportRow> {
   Future<void> _exportErrorLog() async {
     final traces = ref.read(traceStorageProvider);
     final json = traces.exportAsJson();
-    final kb = (utf8.encode(json).length / 1024).toStringAsFixed(1);
+    final byteSize = utf8.encode(json).length;
+    final kb = UnitFormatter.formatDecimal(byteSize / 1024);
     final parsed = traces.parsedCount;
     final unparsed = traces.unparsedCount;
     final totalEntries = parsed + unparsed;

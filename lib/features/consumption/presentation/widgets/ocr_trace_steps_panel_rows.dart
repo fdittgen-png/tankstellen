@@ -132,6 +132,7 @@ class _AnchorRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Text(
         '${anchor.labelField}: "${anchor.labelText}" → ${anchor.numericValue}'
+        // i18n-ignore-format: developer OCR trace diagnostics — locale-neutral debug values
         ' (d²=${anchor.sqDistance.toStringAsFixed(0)})',
         style: theme.textTheme.bodySmall?.copyWith(
           fontWeight: anchor.chosen ? FontWeight.w700 : FontWeight.w400,

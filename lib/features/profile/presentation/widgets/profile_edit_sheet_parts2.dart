@@ -109,15 +109,16 @@ class _ApproachOverlaySection extends StatelessWidget {
                 min: 0.5,
                 max: 5.0,
                 divisions: 9,
-                label: '${state.approachRadiusKm.toStringAsFixed(1)} km',
+                label: UnitFormatter.formatDistance(state.approachRadiusKm),
                 onChanged: ctrl.setApproachRadiusKm,
               ),
             ),
-            Text('${state.approachRadiusKm.toStringAsFixed(1)} km'),
+            Text(UnitFormatter.formatDistance(state.approachRadiusKm)),
           ],
         ),
         Text(
-          l10n.approachRadiusCaption(state.approachRadiusKm.toStringAsFixed(1)),
+          l10n.approachRadiusCaption(
+              UnitFormatter.formatDecimal(state.approachRadiusKm)),
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/price_formatter.dart';
+import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/services/tank_report.dart';
 import '../../providers/tank_report_provider.dart';
@@ -56,7 +57,7 @@ class TankReportCard extends ConsumerWidget {
                       style: theme.textTheme.titleMedium),
                 ),
                 Text(
-                  l.tankReportHeadline(latest.lPer100Km.toStringAsFixed(1)),
+                  l.tankReportHeadline(UnitFormatter.formatDecimal(latest.lPer100Km)),
                   style: theme.textTheme.titleMedium
                       ?.copyWith(fontWeight: FontWeight.bold),
                 ),
@@ -67,8 +68,8 @@ class TankReportCard extends ConsumerWidget {
             const SizedBox(height: 4),
             Text(
               l.tankReportSincePrevious(
-                latest.distanceKm.toStringAsFixed(0),
-                latest.liters.toStringAsFixed(1),
+                UnitFormatter.formatDecimal(latest.distanceKm, fractionDigits: 0),
+                UnitFormatter.formatDecimal(latest.liters),
                 PriceFormatter.formatTotal(latest.pumpedCost),
               ),
               style: theme.textTheme.bodySmall,
@@ -79,7 +80,7 @@ class TankReportCard extends ConsumerWidget {
               const SizedBox(height: 4),
               Text(
                 l.tankReportRecordedAvg(
-                    behavior.recordedLPer100Km!.toStringAsFixed(1)),
+                    UnitFormatter.formatDecimal(behavior.recordedLPer100Km!)),
                 style: theme.textTheme.bodySmall,
               ),
             ],
@@ -139,8 +140,8 @@ class _TrendLine extends StatelessWidget {
     final text = flat
         ? l.tankReportTrendFlat
         : up
-            ? l.tankReportTrendUp(delta.abs().toStringAsFixed(1))
-            : l.tankReportTrendDown(delta.abs().toStringAsFixed(1));
+            ? l.tankReportTrendUp(UnitFormatter.formatDecimal(delta.abs()))
+            : l.tankReportTrendDown(UnitFormatter.formatDecimal(delta.abs()));
     return Row(
       children: [
         Icon(
@@ -210,14 +211,14 @@ class _FactorLine extends StatelessWidget {
         ),
       TankFactor.harshEvents => (
           Icons.warning_amber_outlined,
-          l.tankReportFactorHarsh(explanation.current.toStringAsFixed(1),
-              explanation.previous.toStringAsFixed(1)),
+          l.tankReportFactorHarsh(UnitFormatter.formatDecimal(explanation.current),
+              UnitFormatter.formatDecimal(explanation.previous)),
         ),
       TankFactor.coldStarts => (
           Icons.ac_unit,
           l.tankReportFactorColdStarts(
-              explanation.current.toStringAsFixed(0),
-              explanation.previous.toStringAsFixed(0)),
+              UnitFormatter.formatDecimal(explanation.current, fractionDigits: 0),
+              UnitFormatter.formatDecimal(explanation.previous, fractionDigits: 0)),
         ),
       TankFactor.idle => (
           Icons.hourglass_bottom,
@@ -252,8 +253,10 @@ class _CalibrationLine extends StatelessWidget {
     // effectively on pump truth — nothing worth a line.
     if (gap.abs() < 3) return const SizedBox.shrink();
     final text = gap > 0
-        ? l.tankReportCalibrationUnder(gap.abs().toStringAsFixed(0))
-        : l.tankReportCalibrationOver(gap.abs().toStringAsFixed(0));
+        ? l.tankReportCalibrationUnder(
+            UnitFormatter.formatDecimal(gap.abs(), fractionDigits: 0))
+        : l.tankReportCalibrationOver(
+            UnitFormatter.formatDecimal(gap.abs(), fractionDigits: 0));
     return Row(
       children: [
         Icon(Icons.tune, size: 16, color: theme.colorScheme.outline),

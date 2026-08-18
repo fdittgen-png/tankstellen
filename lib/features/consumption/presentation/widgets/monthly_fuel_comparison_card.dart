@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
+import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/services/fill_up_monthly_stats_aggregator.dart';
 
@@ -146,7 +147,7 @@ class MonthlyFuelComparisonCard extends StatelessWidget {
       final pct = (current - previous) / previous * 100;
       final sign = pct > 0 ? '+' : '';
       // i18n-ignore: numeric value forwarded into the ARB {pct} mask.
-      final value = '$sign${pct.toStringAsFixed(0)}';
+      final value = '$sign${UnitFormatter.formatDecimal(pct, fractionDigits: 0)}';
       percentText = l.consumptionStatsDeltaPercent(value);
     }
     return _MetricRow(
@@ -164,9 +165,11 @@ class MonthlyFuelComparisonCard extends StatelessWidget {
   }
 }
 
-String _fmtLiters(double? v) => v == null ? '—' : v.toStringAsFixed(1);
+String _fmtLiters(double? v) =>
+    v == null ? '—' : UnitFormatter.formatDecimal(v);
 
-String _fmtConsumption(double? v) => v == null ? '—' : v.toStringAsFixed(1);
+String _fmtConsumption(double? v) =>
+    v == null ? '—' : UnitFormatter.formatDecimal(v);
 
 String _fmtCount(double? v) => v == null ? '—' : v.round().toString();
 

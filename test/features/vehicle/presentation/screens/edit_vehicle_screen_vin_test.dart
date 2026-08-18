@@ -116,7 +116,7 @@ void main() {
         );
         expect(find.textContaining('107'), findsOneWidget);
         expect(find.textContaining('2008'), findsOneWidget);
-        expect(find.textContaining('1.0'), findsOneWidget);
+        expect(find.textContaining('1,0'), findsOneWidget);
         expect(find.textContaining('3'), findsWidgets);
         expect(find.textContaining('Gasoline'), findsOneWidget);
 

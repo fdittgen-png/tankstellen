@@ -9,6 +9,7 @@ import '../../domain/gps_driving_features.dart';
 import '../../domain/gps_kpi_verdict.dart';
 import '../../domain/trip_recorder.dart';
 import '../../providers/verdict_calibration_provider.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// GPS-only efficiency KPI card on the Trip detail screen (#2695 C9 /
 /// #2697 P3). Surfaces the speed-only energy KPIs — RPA, PKE, VAPOS,
@@ -80,7 +81,10 @@ class GpsEfficiencyKpiCard extends ConsumerWidget {
         l,
         key: const Key('gps_kpi_rpa'),
         label: l.gpsKpiRpa,
-        value: features.relativePositiveAcceleration.toStringAsFixed(2),
+        value: UnitFormatter.formatDecimal(
+          features.relativePositiveAcceleration,
+          fractionDigits: 2,
+        ),
         verdict: rpaVerdict,
       ),
       _kpiRow(
@@ -88,7 +92,10 @@ class GpsEfficiencyKpiCard extends ConsumerWidget {
         l,
         key: const Key('gps_kpi_pke'),
         label: l.gpsKpiPke,
-        value: features.positiveKineticEnergy.toStringAsFixed(2),
+        value: UnitFormatter.formatDecimal(
+          features.positiveKineticEnergy,
+          fractionDigits: 2,
+        ),
         verdict: pkeVerdict,
       ),
       _kpiRow(
@@ -96,7 +103,10 @@ class GpsEfficiencyKpiCard extends ConsumerWidget {
         l,
         key: const Key('gps_kpi_vapos'),
         label: l.gpsKpiVapos,
-        value: features.meanPositiveVa.toStringAsFixed(2),
+        value: UnitFormatter.formatDecimal(
+          features.meanPositiveVa,
+          fractionDigits: 2,
+        ),
         verdict: vaposVerdict,
       ),
       _kpiRow(
@@ -104,7 +114,8 @@ class GpsEfficiencyKpiCard extends ConsumerWidget {
         l,
         key: const Key('gps_kpi_coast'),
         label: l.gpsKpiCoast,
-        value: '${(features.coastShare * 100).toStringAsFixed(0)}%',
+        value:
+            '${UnitFormatter.formatDecimal(features.coastShare * 100, fractionDigits: 0)}%',
         verdict: coastVerdict,
       ),
       _kpiRow(
@@ -112,7 +123,8 @@ class GpsEfficiencyKpiCard extends ConsumerWidget {
         l,
         key: const Key('gps_kpi_climb'),
         label: l.gpsKpiClimbEnergy,
-        value: '${features.climbEnergyPerKm.toStringAsFixed(0)} m/km',
+        value:
+            '${UnitFormatter.formatDecimal(features.climbEnergyPerKm, fractionDigits: 0)} m/km',
       ),
     ];
 
@@ -140,7 +152,8 @@ class GpsEfficiencyKpiCard extends ConsumerWidget {
     final delta = baselineDeltaPercent;
     if (delta != null) {
       final sign = delta >= 0 ? '+' : '';
-      final pct = '$sign${delta.toStringAsFixed(0)}%';
+      final pct =
+          '$sign${UnitFormatter.formatDecimal(delta, fractionDigits: 0)}%';
       rows.add(const SizedBox(height: 8));
       rows.add(
         Text(

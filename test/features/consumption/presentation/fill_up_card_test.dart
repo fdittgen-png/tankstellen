@@ -230,9 +230,9 @@ void main() {
     // This file runs with the FR default formatter locale (see the
     // "50,0 L" / "1,600 €/L" assertions above), so #2491's locale-aware
     // formatTotal/formatPerKm print comma decimals + the € symbol.
-    expect(find.text('8.00'), findsOneWidget); // avg L/100km (toStringAsFixed)
+    expect(find.text('8,00'), findsOneWidget); // avg L/100km (formatDecimal)
     expect(find.text('0,120'), findsOneWidget); // avg cost/km (formatPerKm, FR)
-    expect(find.text('120.0'), findsOneWidget); // total liters (toStringAsFixed)
+    expect(find.text('120,0'), findsOneWidget); // total liters (formatDecimal)
     expect(find.text('180,00 €'), findsOneWidget); // total spent (formatTotal)
     expect(find.textContaining('3'), findsWidgets); // fill up count
   });

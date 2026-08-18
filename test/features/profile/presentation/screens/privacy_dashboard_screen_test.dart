@@ -360,7 +360,7 @@ void main() {
 
       expect(find.text('Estimated storage'), findsOneWidget);
       // 35136 bytes = 34.3 KB
-      expect(find.text('34.3 KB'), findsOneWidget);
+      expect(find.text('34,3 KB'), findsOneWidget);
     });
 
     /// #1301 — `_exportErrorLog` must (a) write the JSON to the system

@@ -60,7 +60,7 @@ class TripSummaryCard extends ConsumerWidget {
 
     final date = s.startedAt == null ? unknown : _fmtDate(s.startedAt!);
     final vehicleName = vehicle?.name ?? unknown;
-    final distance = '${s.distanceKm.toStringAsFixed(1)} km';
+    final distance = UnitFormatter.formatDistance(s.distanceKm);
     final duration =
         s.startedAt != null &&
             s.endedAt != null &&
@@ -76,9 +76,9 @@ class TripSummaryCard extends ConsumerWidget {
             ? '~${UnitFormatter.formatConsumption(s.estimatedAvgLPer100Km!, isEv: isEv)}'
             : unknown;
     final fuelUsed = s.fuelLitersConsumed != null
-        ? '${s.fuelLitersConsumed!.toStringAsFixed(2)} L'
+        ? '${UnitFormatter.formatDecimal(s.fuelLitersConsumed!, fractionDigits: 2)} L'
         : s.estimatedFuelLitersConsumed != null
-            ? '~${s.estimatedFuelLitersConsumed!.toStringAsFixed(2)} L'
+            ? '~${UnitFormatter.formatDecimal(s.estimatedFuelLitersConsumed!, fractionDigits: 2)} L'
             : unknown;
     final avgSpeed = _avgSpeedLabel(samples, unknown);
     final maxSpeed = _maxSpeedLabel(samples, unknown);
@@ -185,7 +185,7 @@ class TripSummaryCard extends ConsumerWidget {
   static String _avgSpeedLabel(List<TripDetailSample> samples, String unknown) {
     if (samples.isEmpty) return unknown;
     final avg = samples.map((s) => s.speedKmh).average;
-    return '${avg.toStringAsFixed(1)} km/h';
+    return '${UnitFormatter.formatDecimal(avg)} km/h';
   }
 
   static String _maxSpeedLabel(List<TripDetailSample> samples, String unknown) {
@@ -194,7 +194,7 @@ class TripSummaryCard extends ConsumerWidget {
     for (final s in samples) {
       if (s.speedKmh > maxV) maxV = s.speedKmh;
     }
-    return '${maxV.toStringAsFixed(1)} km/h';
+    return '${UnitFormatter.formatDecimal(maxV)} km/h';
   }
 
   /// Render the adapter identity as a single-line summary value

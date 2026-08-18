@@ -137,7 +137,7 @@ void main() {
     expect(find.text('Fuel used'), findsOneWidget);
 
     // The metric values render (not just labels).
-    expect(find.text('5.00 km'), findsOneWidget);
+    expect(find.text('5,00 km'), findsOneWidget);
     expect(find.text('88 km/h'), findsOneWidget);
 
     // No scrolling: the body must NOT introduce a scroll view of its own.

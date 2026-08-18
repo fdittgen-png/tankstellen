@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/responsive_layout.dart';
+import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../data/trip_history_repository.dart';
@@ -117,7 +118,7 @@ class TrajetRow extends StatelessWidget {
                         _Chip(
                           icon: Icons.straighten,
                           text: l.trajetsRowDistance(
-                            s.distanceKm.toStringAsFixed(1),
+                            UnitFormatter.formatDecimal(s.distanceKm),
                           ),
                         ),
                         if (durationMinutes != null && durationMinutes > 0)
@@ -131,7 +132,7 @@ class TrajetRow extends StatelessWidget {
                           _Chip(
                             icon: Icons.eco,
                             text: l.trajetsRowAvgConsumption(
-                              s.avgLPer100Km!.toStringAsFixed(1),
+                              UnitFormatter.formatDecimal(s.avgLPer100Km!),
                               avgUnit,
                             ),
                           )
@@ -141,7 +142,7 @@ class TrajetRow extends StatelessWidget {
                           _Chip(
                             icon: Icons.eco,
                             text: l.trajetsRowAvgConsumption(
-                              '~${s.estimatedAvgLPer100Km!.toStringAsFixed(1)}',
+                              '~${UnitFormatter.formatDecimal(s.estimatedAvgLPer100Km!)}',
                               avgUnit,
                             ),
                           ),
@@ -196,8 +197,8 @@ class _VirtualTrajetRow extends StatelessWidget {
     final s = entry.summary;
     final color = DarkModeColors.warning(context);
     final fuel = s.fuelLitersConsumed;
-    final detail = StringBuffer('${s.distanceKm.toStringAsFixed(1)} km');
-    if (fuel != null) detail.write(' · ${fuel.toStringAsFixed(1)} L');
+    final detail = StringBuffer(UnitFormatter.formatDistance(s.distanceKm));
+    if (fuel != null) detail.write(' · ${UnitFormatter.formatDecimal(fuel)} L');
 
     return Card(
       key: ValueKey('virtual-trajet-${entry.id}'),

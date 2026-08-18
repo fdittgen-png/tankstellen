@@ -778,9 +778,13 @@ void main() {
     // keyboard dismissal. Small iOS bug fix; decomposition still tracked (#2187).
     // 8 bumps — decomposition forced (#3141), tracked by the OPEN #3138
     // (trips/fillups feature split; this screen is fill-ups).
+    // #3743 — re-grandfathered 649 → 651: the locale-aware number
+    // migration (the UnitFormatter import + the previousOdoKm null
+    // branch wrapping formatDecimal so the odometer warning renders
+    // the active locale's decimal convention).
     'lib/features/consumption/presentation/screens/add_fill_up_screen.dart': (
-      lines: 649,
-      bumps: 8,
+      lines: 651,
+      bumps: 9,
       decompositionIssue: 3138,
     ),
     // #2380 — +5: closest-station radar card at the top of the
