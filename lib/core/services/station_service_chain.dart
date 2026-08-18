@@ -238,11 +238,22 @@ class StationServiceChain with _ChainCoalescing implements StationService {
           DataAccessHit.hiveStale, ServiceSource.cache,
           count: dataAccessResultCount(staleForRace!.data), isStale: true);
       return staleForRace;
-    } on Exception catch (e, st) {
+    } catch (e, st) {
+      // #3743 (S-fix) — catch-ALL, not `on Exception`: an implementor's
+      // contract is ServiceResult-or-throw-ApiException, but a decode bug
+      // (TypeError on drifted JSON shape) or a StateError throws an
+      // `Error` that used to sail straight past this handler and out of
+      // the chain as a raw crash. ANY throw from the primary is a
+      // transport fault to this chain: it is absorbed into the error
+      // accumulator and the stale-cache → ServiceChainExhaustedException
+      // ladder below, so `ServiceChainExhaustedException` stays the ONLY
+      // exception the polled chain surfaces (see the [StationService]
+      // contract note).
       recordDataAccessFailure(countryCode); // #3146 — always-on tally
       // #3370/#2296 — breadcrumb an EXPECTED `unsupported` gap (e.g. Luxembourg
       // has no per-station detail); ERROR-log any real failure (with stack).
-      logStationApiFailure(e, st, countryCode: countryCode, cacheKey: cacheKey);
+      logStationApiFailure(e is Exception ? e : Exception(e.toString()), st,
+          countryCode: countryCode, cacheKey: cacheKey);
       errors.add(ServiceError(
         source: _errorSource,
         message: e.toString(),

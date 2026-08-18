@@ -3,6 +3,8 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/services/country_service_registry.dart'
+    show fuelTypesForCountry;
 
 /// Behaviour-preservation tests for the declarative `_countryFuels` map
 /// (closes #1112). Each expected list below is hard-coded from the

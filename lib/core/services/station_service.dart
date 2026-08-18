@@ -26,6 +26,18 @@ export '../domain/station_prices.dart' show StationPrices;
 /// All implementations are wrapped in [StationServiceChain] which adds
 /// caching, fallback, and request deduplication on top.
 ///
+/// ### Error contract (#3743)
+///
+/// Implementor **throws are transport-faults-only**: an implementation
+/// either returns a [ServiceResult] or throws (ideally [ApiException];
+/// in practice a decode bug can throw an `Error`). The chain's polled
+/// path absorbs ANY thrown object into its error accumulator and falls
+/// back to stale cache — the only exception it surfaces to callers is
+/// `ServiceChainExhaustedException`. Implementations must never encode
+/// business outcomes ("no stations here") as throws. The `bulkFile`
+/// search path intentionally returns the primary's result verbatim
+/// (#2264), so its throws pass through unchanged.
+///
 /// To add a new country, implement this interface and register it in
 /// `service_providers.dart`. See docs/CONTRIBUTING.md for the full guide.
 abstract class StationService {
