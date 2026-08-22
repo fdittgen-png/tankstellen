@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../../../../../l10n/app_localizations.dart';
-import '../../../../consumption/domain/fuel_event_attribution.dart';
+import '../../../../trips/api.dart';
 import '../../../domain/lessons/driving_lesson.dart';
 import '../../../domain/lessons/driving_lesson_rule.dart';
 import '../lesson_format.dart';

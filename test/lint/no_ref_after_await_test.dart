@@ -48,7 +48,7 @@ void main() {
   const reviewedFalsePositives = <String>{
     // `_start`: the awaits live in the GPS-only branch which returns; the
     // flagged `ref.read(tripRecordingProvider)` runs await-free.
-    'lib/features/consumption/presentation/widgets/trajets_record_fab.dart',
+    'lib/features/trips/presentation/widgets/trajets_record_fab.dart',
     // `submit`: `await _routeToGitHub(...)` is followed by `return;`; the
     // flagged reads execute on the no-await path. The `finally` use is
     // `context.mounted`-guarded.

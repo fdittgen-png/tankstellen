@@ -16,8 +16,7 @@ import '../../features/obd2/data/active_trip_repository.dart';
 import '../../features/obd2/data/active_trip_sample_wal.dart';
 import '../../features/obd2/data/paused_trip_recovery_service.dart';
 import '../../features/obd2/data/paused_trip_repository.dart';
-import '../../features/consumption/data/trip_history_repository.dart';
-import '../../features/consumption/providers/trip_recording_provider.dart';
+import '../../features/trips/api.dart';
 import '../../core/navigation/app_routes.dart';
 import '../router.dart';
 

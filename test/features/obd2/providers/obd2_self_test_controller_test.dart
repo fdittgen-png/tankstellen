@@ -14,7 +14,7 @@ import 'package:tankstellen/features/obd2/data/session/obd2_self_test_driver.dar
 import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 import 'package:tankstellen/features/obd2/providers/obd2_self_test_controller.dart';
-import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
+import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
 
 const _happyPathResponses = {
   'ATZ': 'ELM327 v1.5>',

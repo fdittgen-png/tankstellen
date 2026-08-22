@@ -18,7 +18,7 @@ import '../../data/obd2_debug_session.dart';
 import '../../data/obd2_debug_session_xml.dart';
 import '../../data/obd2_diagnostic_report.dart';
 import '../../providers/obd2_breadcrumb_provider.dart';
-import '../../../consumption/presentation/widgets/broken_map_widgets.dart';
+import '../../../trips/api.dart';
 import 'obd2_breadcrumb_row.dart';
 import '../../../../core/error/guarded.dart';
 import '../../../../core/sharing/share_seam.dart';

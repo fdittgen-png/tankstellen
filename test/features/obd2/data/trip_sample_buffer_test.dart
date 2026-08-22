@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/features/obd2/domain/trip_sample_buffer.dart';
 
 /// #3741 (finding 3) — [TripSampleBuffer.capturedSamples] used to

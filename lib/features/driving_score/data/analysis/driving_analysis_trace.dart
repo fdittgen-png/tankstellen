@@ -4,13 +4,8 @@
 import 'dart:convert';
 
 import '../../domain/driving_score.dart';
-import '../../../consumption/domain/gps_coverage_report.dart';
-import '../../../consumption/domain/gps_driving_features.dart';
+import '../../../trips/api.dart';
 import '../../domain/lessons/driving_lesson.dart';
-import '../../../consumption/domain/obd2_engine_coverage.dart';
-import '../../../consumption/domain/obd2_trip_features.dart';
-import '../../../consumption/domain/trip_summary.dart';
-import '../../../consumption/domain/services/engine_off_transport.dart';
 
 /// A self-contained, JSON-serialisable snapshot of a single trip's
 /// driving-analysis inputs + outputs, for offline threshold calibration

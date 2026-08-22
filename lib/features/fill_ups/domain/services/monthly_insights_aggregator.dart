@@ -36,10 +36,7 @@
 /// the user shouldn't act on.
 library;
 
-import '../../../consumption/data/trip_history_repository.dart';
-import '../../../consumption/domain/trip_recorder.dart';
-import '../../../consumption/domain/services/trip_consumed_liters.dart';
-import '../../../consumption/domain/services/trip_consumption_reliability.dart';
+import '../../../trips/api.dart';
 
 /// Bands the aggregator considers "noise" for the consumption average.
 /// Below 5 km a single coast or a long warm-up dominates the figure.

@@ -3,10 +3,8 @@
 
 import 'package:flutter/foundation.dart';
 
-import '../../../consumption/data/trip_history_repository.dart';
+import '../../../trips/api.dart';
 import '../entities/fill_up.dart';
-import '../../../consumption/domain/trip_recorder.dart';
-import '../../../consumption/domain/services/trip_consumed_liters.dart';
 
 /// Outcome bucket for [Reconciler.reconcile] (#1361). Lets the caller
 /// distinguish "no correction needed because the gap was tiny" from

@@ -8,7 +8,7 @@ import 'package:hive/hive.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
-import 'package:tankstellen/features/consumption/api.dart'
+import 'package:tankstellen/features/trips/api.dart'
     show TripSample, TripSummary;
 import 'package:tankstellen/features/obd2/data/active_trip_repository.dart';
 import 'package:tankstellen/features/obd2/data/active_trip_sample_wal.dart';

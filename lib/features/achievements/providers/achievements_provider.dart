@@ -8,7 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/storage/hive_boxes.dart';
 import '../../fill_ups/api.dart';
-import '../../consumption/providers/trip_history_provider.dart';
+import '../../trips/api.dart';
 import '../../price_history/providers/price_history_provider.dart';
 import '../data/achievements_repository.dart';
 import '../domain/achievement.dart';

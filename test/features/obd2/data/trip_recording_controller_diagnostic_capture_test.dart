@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 import 'package:tankstellen/features/obd2/data/session/trip_recording_controller.dart';
-import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// #2458 / #2459 — end-to-end: the new PIDs flow scheduler → snapshot →

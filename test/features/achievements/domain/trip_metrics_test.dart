@@ -3,7 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/achievements/domain/trip_metrics.dart';
-import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 
 TripSummary _summary({
   required Duration duration,

@@ -6,7 +6,7 @@ import 'package:xml/xml.dart';
 import '../../../../ev/domain/entities/charging_log.dart';
 import '../../../../../core/domain/vehicle_profile.dart';
 import '../../../domain/entities/fill_up.dart';
-import '../../../../consumption/data/trip_history_repository.dart';
+import '../../../../trips/api.dart';
 
 /// Pure-Dart writer for the v1 Tankstellen backup XML
 /// (see `assets/schemas/tankstellen_backup_v1.xsd`).

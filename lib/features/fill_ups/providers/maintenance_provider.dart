@@ -8,7 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../data/maintenance_snooze_repository.dart';
 import '../domain/entities/maintenance_suggestion.dart';
 import '../domain/services/maintenance_analyzer.dart';
-import '../../consumption/providers/trip_history_provider.dart';
+import '../../trips/api.dart';
 import '../../../core/logging/error_logger.dart';
 
 part 'maintenance_provider.g.dart';

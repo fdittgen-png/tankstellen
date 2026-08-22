@@ -8,8 +8,7 @@ import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/widgets/page_scaffold.dart';
-import '../../../consumption/domain/direct_fuel_rate_detector.dart';
-import '../../../consumption/providers/trip_history_provider.dart';
+import '../../../trips/api.dart';
 import '../../data/reference_vehicle_catalog_provider.dart';
 import '../../data/vehicle_profile_catalog_matcher.dart';
 import '../../domain/entities/reference_vehicle.dart';
@@ -24,7 +23,6 @@ import 'vehicle_header.dart';
 import 'vehicle_identity_section.dart';
 import 'vehicle_save_actions.dart';
 import 'vehicle_save_bar.dart';
-import '../../../consumption/presentation/widgets/broken_map_widgets.dart';
 
 /// #3234 — the `EditVehicleScreen` form body (the `PageScaffold` + the scrolling
 /// stack of section cards) extracted out of `_EditVehicleScreenState.build` as

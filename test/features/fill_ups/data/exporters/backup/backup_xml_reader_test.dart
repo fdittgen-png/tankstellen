@@ -4,9 +4,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/fill_ups/data/exporters/backup/backup_xml_reader.dart';
 import 'package:tankstellen/features/fill_ups/data/exporters/backup/backup_xml_writer.dart';
-import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
+import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
-import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_log.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';

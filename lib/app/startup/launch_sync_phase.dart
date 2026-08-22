@@ -17,7 +17,7 @@ import '../../core/sync/sync_pull_coordinator.dart';
 import '../../core/sync/sync_run_trace.dart';
 import '../../core/sync/tanksync_init.dart';
 import '../../core/sync/tanksync_init_retry.dart';
-import '../../features/consumption/providers/trip_recording_provider.dart';
+import '../../features/trips/api.dart';
 import '../../features/feature_management/application/feature_flags_provider.dart';
 import '../../features/feature_management/domain/feature.dart';
 import 'launch_sync_pulls.dart';

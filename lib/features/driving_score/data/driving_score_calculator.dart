@@ -43,22 +43,20 @@ library;
 
 import 'dart:math' as math;
 
-import '../../consumption/domain/accel_event_gate.dart';
+import '../../trips/api.dart';
 import '../domain/driving_score.dart';
-import '../../consumption/domain/engine_power_factor.dart';
-import '../../consumption/domain/trip_recorder.dart';
 
 // #2667 — re-export the canonical accel/brake thresholds so existing
 // importers of this file (lessons, tests) keep resolving them, while the
 // SINGLE source of truth is `accel_event_gate.dart`.
-export '../../consumption/domain/accel_event_gate.dart'
+export '../../trips/api.dart'
     show kHardAccelThresholdMps2, kHardBrakeThresholdMps2;
 
 // Epic #3015 — re-export the engine-power-factor surface so importers of this
 // file (lessons, tests) resolve the constants/helper from the one canonical
 // place alongside the score thresholds; the source of truth stays
-// `engine_power_factor.dart`.
-export '../../consumption/domain/engine_power_factor.dart'
+// `engine_power_factor.dart` (in the trips feature since #3743).
+export '../../trips/api.dart'
     show
         kReferenceEnginePowerKw,
         kEnginePowerFactorMin,

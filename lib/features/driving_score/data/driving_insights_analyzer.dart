@@ -17,11 +17,8 @@
 /// throttle, coolant temp, and elevation data.
 library;
 
-import '../../consumption/domain/accel_event_gate.dart';
-import '../../consumption/domain/climb_restart_detector.dart';
+import '../../trips/api.dart';
 import '../domain/driving_insight.dart';
-import '../../consumption/domain/engine_power_factor.dart';
-import '../../consumption/domain/trip_recorder.dart';
 
 /// RPM above which a sample counts as "high RPM".
 const double _highRpmThreshold = 3000;

@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/carbon/presentation/widgets/speed_consumption_card.dart';
-import 'package:tankstellen/features/consumption/domain/services/speed_consumption_histogram.dart';
+import 'package:tankstellen/features/trips/domain/services/speed_consumption_histogram.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Widget-level coverage for [SpeedConsumptionCard] (#1192).

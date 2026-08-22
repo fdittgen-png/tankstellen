@@ -21,19 +21,15 @@ import '../../vehicle/providers/service_reminder_providers.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../../obd2/api.dart';
 import '../data/repositories/fill_up_repository.dart';
-import '../../consumption/data/trip_history_repository.dart';
+import '../../trips/api.dart';
 import '../domain/entities/consumption_stats.dart';
 import '../domain/entities/eco_score.dart';
 import '../domain/entities/fill_up.dart';
 import '../domain/entities/pending_reconciliation.dart';
-import '../../consumption/domain/gps_driving_features.dart';
 import '../domain/services/eco_score_calculator.dart';
 import '../domain/services/fill_up_trip_linker.dart';
-import '../../consumption/domain/services/gps_matrix_reconciler.dart';
 import '../domain/services/reconciler.dart';
-import '../../consumption/domain/trip_recorder.dart';
 import 'pending_reconciliation_provider.dart';
-import '../../consumption/providers/trip_history_provider.dart';
 
 part 'consumption_providers.g.dart';
 

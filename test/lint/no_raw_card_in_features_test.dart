@@ -55,8 +55,8 @@ void main() {
       const allowlist = <String>{
         'lib/features/consent/presentation/screens/gdpr_consent_screen.dart',
         'lib/features/consumption/presentation/screens/consumption_screen.dart',
-        'lib/features/consumption/presentation/screens/trip_detail_screen.dart',
-        'lib/features/consumption/presentation/screens/trip_recording_screen.dart',
+        'lib/features/trips/presentation/screens/trip_detail_screen.dart',
+        'lib/features/trips/presentation/screens/trip_recording_screen.dart',
         'lib/features/price_history/presentation/screens/price_history_screen.dart',
         'lib/features/profile/presentation/screens/profile_screen.dart',
         'lib/features/profile/presentation/screens/theme_settings_screen.dart',

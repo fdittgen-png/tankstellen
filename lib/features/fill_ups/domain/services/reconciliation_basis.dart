@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../entities/fill_up.dart';
-import '../../../consumption/domain/trip_summary.dart';
-import '../../../consumption/domain/services/trip_consumed_liters.dart';
+import '../../../trips/api.dart';
 
 /// The agreed comparison basis for the guided reconciliation workflow
 /// (Epic #2439, child #2440).

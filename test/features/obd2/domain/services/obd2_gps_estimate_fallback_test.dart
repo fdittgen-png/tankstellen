@@ -3,7 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/domain/services/obd2_gps_estimate_fallback.dart';
-import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 
 /// #2431 — the OBD2 GPS-estimate fallback. When an adapter+ECU supported

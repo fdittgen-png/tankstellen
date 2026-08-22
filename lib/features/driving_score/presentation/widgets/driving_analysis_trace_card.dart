@@ -9,13 +9,8 @@ import '../../../feature_management/api.dart';
 import '../../data/analysis/driving_analysis_trace.dart';
 import '../../data/analysis/driving_analysis_trace_export.dart';
 import '../../domain/driving_score.dart';
-import '../../../consumption/domain/gps_coverage_report.dart';
-import '../../../consumption/domain/gps_driving_features.dart';
+import '../../../trips/api.dart';
 import '../../domain/lessons/driving_lesson.dart';
-import '../../../consumption/domain/obd2_engine_coverage.dart';
-import '../../../consumption/domain/obd2_trip_features.dart';
-import '../../../consumption/domain/trip_sample.dart';
-import '../../../consumption/domain/trip_summary.dart';
 
 /// Dev-only and self-hiding: renders nothing unless [Feature.debugMode] is on
 /// (the GPS / OBD2 diagnostics-card convention). Exports the trip's

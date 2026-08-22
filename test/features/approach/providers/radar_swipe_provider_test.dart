@@ -4,7 +4,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/approach/providers/radar_swipe_provider.dart';
-import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
+import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
 
 /// #2661 — the distance-pagination index behind the swipe-to-page Fuel
 /// Station Radar card (replacing the #2633 ignore stack). The card shows

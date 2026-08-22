@@ -8,11 +8,9 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
-// #3739 — the canonical codec functions come through the consumption
+// #3739 — the canonical codec functions come through the trips
 // feature's public api.dart barrel (the feature-boundary contract).
-import '../../consumption/api.dart'
-    show tripSummaryFromJson, tripSummaryToJson;
-import '../../consumption/domain/trip_recorder.dart';
+import '../../trips/api.dart';
 import '../../../core/logging/error_logger.dart';
 
 /// Snapshot of an in-progress OBD2 recording that was paused because

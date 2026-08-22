@@ -16,9 +16,8 @@ import '../../../feature_management/domain/feature.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../../fill_ups/api.dart';
 import '../../../charging/api.dart';
-import '../../providers/trip_history_provider.dart';
+import '../../../trips/api.dart';
 import '../screens/consumption_screen.dart';
-import '../screens/trajets_map_screen.dart';
 import '../../../obd2/api.dart';
 
 /// Navigation targets the overflow kebab dispatches via its single

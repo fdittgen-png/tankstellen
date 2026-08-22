@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/eco_nudge_engine.dart';
-import '../../../consumption/providers/trip_recording_provider.dart';
+import '../../../trips/api.dart';
 
 /// Zero-size listener that surfaces live eco-coaching nudges as
 /// dismissible SnackBars while the recording screen is mounted

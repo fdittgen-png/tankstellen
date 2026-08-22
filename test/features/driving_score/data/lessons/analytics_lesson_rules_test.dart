@@ -7,7 +7,7 @@ import 'package:tankstellen/features/driving_score/data/lessons/rules/smooth_dri
 import 'package:tankstellen/features/driving_score/domain/driving_insight.dart';
 import 'package:tankstellen/features/driving_score/domain/driving_score.dart';
 import 'package:tankstellen/features/driving_score/domain/lessons/driving_lesson_rule.dart';
-import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 import 'package:tankstellen/l10n/app_localizations_en.dart';
 

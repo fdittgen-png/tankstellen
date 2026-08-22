@@ -26,7 +26,7 @@
 library;
 
 import '../entities/fill_up.dart';
-import '../../../consumption/domain/trip_summary.dart';
+import '../../../trips/api.dart';
 import 'tank_behavior.dart';
 
 export 'tank_behavior.dart' show TankBehavior, TankExplanation, TankFactor;

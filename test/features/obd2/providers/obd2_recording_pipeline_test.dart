@@ -9,17 +9,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/domain/obd2_connection_errors.dart';
 import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
-import 'package:tankstellen/features/consumption/domain/entities/gps_sample_diagnostic.dart';
-import 'package:tankstellen/features/consumption/domain/entities/trip_save_stage.dart';
-import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import 'package:tankstellen/features/trips/domain/entities/gps_sample_diagnostic.dart';
+import 'package:tankstellen/features/trips/domain/entities/trip_save_stage.dart';
+import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/features/obd2/providers/obd2_recording_pipeline.dart';
-import 'package:tankstellen/features/consumption/providers/recording_pipeline.dart';
-import 'package:tankstellen/features/consumption/providers/trip_baseline_recorder.dart';
-import 'package:tankstellen/features/consumption/providers/trip_gps_stream_controller.dart';
-import 'package:tankstellen/features/consumption/providers/trip_haptic_controller.dart';
-import 'package:tankstellen/features/consumption/providers/trip_oem_fuel_level_controller.dart';
-import 'package:tankstellen/features/consumption/providers/trip_recording_phase.dart';
-import 'package:tankstellen/features/consumption/providers/trip_recording_state.dart';
+import 'package:tankstellen/features/trips/providers/recording_pipeline.dart';
+import 'package:tankstellen/features/trips/providers/trip_baseline_recorder.dart';
+import 'package:tankstellen/features/trips/providers/trip_gps_stream_controller.dart';
+import 'package:tankstellen/features/trips/providers/trip_haptic_controller.dart';
+import 'package:tankstellen/features/trips/providers/trip_oem_fuel_level_controller.dart';
+import 'package:tankstellen/features/trips/providers/trip_recording_phase.dart';
+import 'package:tankstellen/features/trips/providers/trip_recording_state.dart';
 
 import '../../../helpers/silence_error_logger.dart';
 

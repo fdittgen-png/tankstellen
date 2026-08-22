@@ -12,7 +12,7 @@ import '../../../../core/error/guarded.dart';
 import '../../domain/services/tank_level_estimator.dart';
 import '../../providers/tank_level_provider.dart';
 import '../../providers/tank_mix_provider.dart';
-import '../../../consumption/providers/trip_history_provider.dart';
+import '../../../trips/api.dart';
 
 /// Tank-level card on the Fuel tab (#1195).
 ///

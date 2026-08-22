@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../fuel_rate_estimator.dart' show kPetrolAfr, kPetrolDensityGPerL, kDieselAfr, kDieselDensityGPerL;
-import '../../../consumption/domain/trip_recorder.dart';
+import '../../../trips/api.dart';
 
 /// RPM operating band (#2286). Aligns with the throttle/RPM histogram
 /// card's edges (idle ≤ 900, cruise ≤ 2000, spirited ≤ 3000, hard >

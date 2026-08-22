@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../data/session/trip_recording_controller.dart';
-import '../../consumption/providers/trip_recording_phase.dart';
+import '../../trips/api.dart';
 
 /// Maps the [TripRecordingController]'s lifecycle enum onto the
 /// provider-facing [TripRecordingPhase]. Extracted from

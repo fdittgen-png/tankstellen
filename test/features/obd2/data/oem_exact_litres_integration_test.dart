@@ -8,8 +8,8 @@ import 'package:tankstellen/features/obd2/data/protocol/oem_pid_registry.dart';
 import 'package:tankstellen/features/obd2/data/protocol/oem_pid_table.dart';
 import 'package:tankstellen/features/obd2/data/session/trip_recording_controller.dart';
 import 'package:tankstellen/features/obd2/providers/current_obd2_fuel_level_provider.dart';
-import 'package:tankstellen/features/consumption/providers/trip_oem_fuel_level_controller.dart';
-import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
+import 'package:tankstellen/features/trips/providers/trip_oem_fuel_level_controller.dart';
+import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 

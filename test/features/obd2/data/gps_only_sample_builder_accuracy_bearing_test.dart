@@ -5,8 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/domain/degraded_gps_emitter.dart';
 import 'package:tankstellen/features/obd2/domain/gps_only_sample_builder.dart';
 import 'package:tankstellen/features/obd2/domain/trip_sample_buffer.dart';
-import 'package:tankstellen/features/consumption/data/trip_sample_codec.dart';
-import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import 'package:tankstellen/features/trips/data/trip_sample_codec.dart';
+import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 
 /// #2648 — the DEGRADED GPS-only path (OBD2 dropped mid-trip) used to drop
 /// GPS horizontal accuracy + bearing along with the OBD2 path. The builder

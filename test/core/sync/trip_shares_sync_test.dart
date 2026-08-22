@@ -5,9 +5,9 @@ import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:tankstellen/features/consumption/data/trip_shares_sync.dart';
-import 'package:tankstellen/features/consumption/data/trip_history_entry.dart';
-import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import 'package:tankstellen/features/trips/data/trip_shares_sync.dart';
+import 'package:tankstellen/features/trips/data/trip_history_entry.dart';
+import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import '../../helpers/silence_error_logger.dart';
 import 'fake_trip_share_transport.dart';
 

@@ -11,7 +11,7 @@ import 'package:tankstellen/features/fill_ups/data/exporters/backup/backup_zip_r
 import 'package:tankstellen/features/fill_ups/data/exporters/backup/backup_zipper.dart';
 import 'package:tankstellen/features/fill_ups/data/exporters/backup/full_backup_exporter.dart';
 import 'package:tankstellen/features/fill_ups/data/exporters/backup/full_backup_importer.dart';
-import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
+import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 import 'package:tankstellen/features/fill_ups/domain/correction_fill_up.dart';
 import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_log.dart';

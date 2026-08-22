@@ -4,8 +4,7 @@
 import '../../../../core/domain/gps_calibration_matrix.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 // trip_recorder.dart re-exports trip_summary.dart (TripSample + TripSummary).
-import '../../../consumption/domain/trip_recorder.dart';
-import '../../../consumption/domain/services/gps_live_fuel_estimator.dart';
+import '../../../trips/api.dart';
 
 /// A trip summary paired with its (possibly estimate-stamped) samples —
 /// the result of [Obd2GpsEstimateFallback.fillWhenNoFuelPid] (#2431).

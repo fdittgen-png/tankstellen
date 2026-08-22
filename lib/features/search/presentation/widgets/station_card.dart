@@ -17,7 +17,7 @@ import '../../../../core/widgets/animated_favorite_star.dart';
 import '../../../../core/widgets/animated_price_text.dart';
 import '../../../../core/widgets/station_card_shell.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../consumption/presentation/widgets/proximity_fill_bar.dart';
+import '../../../trips/api.dart';
 import '../../../station_detail/presentation/widgets/station_brand_helpers.dart';
 import '../../domain/entities/brand_registry.dart';
 import '../../../../core/domain/fuel_type.dart';

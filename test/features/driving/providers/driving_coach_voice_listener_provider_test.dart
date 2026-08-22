@@ -9,9 +9,9 @@ import 'package:tankstellen/core/services/voice_announcement_service.dart';
 import 'package:tankstellen/features/obd2/domain/trip_live_reading.dart';
 import 'package:tankstellen/features/driving_score/domain/driving_coaching.dart'
     show DrivingCoachingHint;
-import 'package:tankstellen/features/consumption/domain/harsh_event.dart';
-import 'package:tankstellen/features/consumption/domain/situation_classifier.dart';
-import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
+import 'package:tankstellen/features/trips/domain/harsh_event.dart';
+import 'package:tankstellen/features/trips/domain/situation_classifier.dart';
+import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
 import 'package:tankstellen/features/driving/providers/driving_coach_voice_listener_provider.dart';
 import 'package:tankstellen/features/driving/providers/live_harsh_event_bus_provider.dart';
 import 'package:tankstellen/features/driving/providers/voice_coaching_enabled_provider.dart';

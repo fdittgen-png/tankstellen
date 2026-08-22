@@ -11,7 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart'
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../obd2/api.dart';
-import '../../consumption/providers/trip_recording_provider.dart';
+import '../../trips/api.dart';
 import '../../feature_management/application/feature_toggle_notifier.dart';
 import '../../feature_management/domain/feature.dart';
 import '../haptic_eco_coach.dart';

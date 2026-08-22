@@ -4,7 +4,7 @@
 import '../../../../l10n/app_localizations.dart';
 import '../driving_insight.dart';
 import '../driving_score.dart';
-import '../../../consumption/domain/trip_recorder.dart';
+import '../../../trips/api.dart';
 import 'driving_lesson.dart';
 
 /// Pre-computed inputs shared across every [DrivingLessonRule] for a

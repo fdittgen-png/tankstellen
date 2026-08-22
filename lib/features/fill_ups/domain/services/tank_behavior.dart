@@ -1,10 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../../consumption/domain/trip_summary.dart';
-import '../../../consumption/domain/services/engine_off_transport.dart';
+import '../../../trips/api.dart';
 import 'tank_report.dart' show TankPeriod, kTankExplainMinCoverage;
-import '../../../consumption/domain/services/trip_consumed_liters.dart';
 
 /// Recorded-behavior aggregate over one tank window's linked trips.
 /// Engine-off transport trips (#3599) are excluded wholesale — a towed

@@ -3,8 +3,8 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
-import 'package:tankstellen/features/consumption/providers/trip_history_provider.dart';
+import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
+import 'package:tankstellen/features/trips/providers/trip_history_provider.dart';
 import 'package:tankstellen/features/vehicle/data/vehicle_aggregate_updater.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_aggregate_updater_provider.dart';
 

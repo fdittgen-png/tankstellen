@@ -14,7 +14,7 @@ import '../../../core/location/recording_location_settings.dart'
     show approachLocationSettings;
 import '../../../core/logging/error_logger.dart';
 import '../../../core/services/approach_detector.dart';
-import '../../consumption/providers/trip_recording_provider.dart';
+import '../../trips/api.dart';
 import '../../profile/data/models/user_profile.dart' as profile_model;
 import '../../profile/providers/approach_overlay_enabled_provider.dart';
 import '../../profile/providers/effective_fuel_type_provider.dart';

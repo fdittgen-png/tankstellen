@@ -5,7 +5,7 @@ import '../../../../../l10n/app_localizations.dart';
 import '../../../domain/lessons/driving_lesson.dart';
 import '../../../domain/lessons/driving_lesson_rule.dart';
 import '../../../../obd2/api.dart';
-import '../../../../consumption/domain/trip_recorder.dart';
+import '../../../../trips/api.dart';
 
 /// Lesson id for the smooth-driving praise. Stable, non-localized.
 const String smoothDrivingLessonId = 'smoothDriving';

@@ -19,7 +19,7 @@ import 'package:tankstellen/features/driving_score/data/lessons/rules/restart_co
 import 'package:tankstellen/features/driving_score/data/lessons/rules/sharp_cornering_rule.dart';
 import 'package:tankstellen/features/driving_score/data/lessons/rules/smooth_driving_rule.dart';
 import 'package:tankstellen/features/driving_score/data/lessons/rules/upshift_cruise_rule.dart';
-import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 import 'package:tankstellen/l10n/app_localizations_en.dart';
 

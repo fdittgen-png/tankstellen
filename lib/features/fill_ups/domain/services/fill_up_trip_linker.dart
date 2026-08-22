@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../../consumption/data/trip_history_repository.dart';
+import '../../../trips/api.dart';
 import '../entities/fill_up.dart';
 
 /// The plein-to-plein window a fill-up's linked trips fall in (#1361).

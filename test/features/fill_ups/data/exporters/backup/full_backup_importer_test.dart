@@ -9,9 +9,9 @@ import 'package:tankstellen/features/fill_ups/data/exporters/backup/backup_xml_w
 import 'package:tankstellen/features/fill_ups/data/exporters/backup/backup_zip_reader.dart';
 import 'package:tankstellen/features/fill_ups/data/exporters/backup/backup_zipper.dart';
 import 'package:tankstellen/features/fill_ups/data/exporters/backup/full_backup_importer.dart';
-import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
+import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
-import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_log.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';

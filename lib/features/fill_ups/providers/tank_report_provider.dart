@@ -5,9 +5,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../vehicle/api.dart';
 import '../domain/services/tank_report.dart';
-import '../../consumption/domain/trip_summary.dart';
+import '../../trips/api.dart';
 import 'consumption_providers.dart';
-import '../../consumption/providers/trip_history_provider.dart';
 
 part 'tank_report_provider.g.dart';
 

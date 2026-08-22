@@ -6,10 +6,10 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/driving_score/data/analysis/driving_analysis_trace.dart';
 import 'package:tankstellen/features/driving_score/domain/driving_score.dart';
-import 'package:tankstellen/features/consumption/domain/entities/recording_lifecycle_mark.dart';
-import 'package:tankstellen/features/consumption/domain/gps_coverage_report.dart';
-import 'package:tankstellen/features/consumption/domain/trip_sample.dart';
-import 'package:tankstellen/features/consumption/domain/trip_summary.dart';
+import 'package:tankstellen/features/trips/domain/entities/recording_lifecycle_mark.dart';
+import 'package:tankstellen/features/trips/domain/gps_coverage_report.dart';
+import 'package:tankstellen/features/trips/domain/trip_sample.dart';
+import 'package:tankstellen/features/trips/domain/trip_summary.dart';
 
 /// #3465 — the driving-analysis export's `gpsCoverage` block (schema v3):
 /// present + JSON-round-trippable for a tracked trip, capped at 20 gaps,

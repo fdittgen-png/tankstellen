@@ -6,7 +6,7 @@ import 'package:tankstellen/features/driving_score/data/lessons/driving_lesson_r
 import 'package:tankstellen/features/driving_score/data/lessons/rules/coasting_recognition_rule.dart';
 import 'package:tankstellen/features/driving_score/data/lessons/rules/upshift_cruise_rule.dart';
 import 'package:tankstellen/features/driving_score/domain/lessons/driving_lesson.dart';
-import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 import 'package:tankstellen/l10n/app_localizations_en.dart';
 

@@ -10,7 +10,7 @@ import 'package:tankstellen/core/sharing/public_file_exporter.dart';
 import 'package:tankstellen/features/driving_score/data/analysis/driving_analysis_trace.dart';
 import 'package:tankstellen/features/driving_score/data/analysis/driving_analysis_trace_export.dart';
 import 'package:tankstellen/features/driving_score/domain/driving_score.dart';
-import 'package:tankstellen/features/consumption/domain/trip_summary.dart';
+import 'package:tankstellen/features/trips/domain/trip_summary.dart';
 
 TripSummary _summary() => const TripSummary(
       distanceKm: 12,

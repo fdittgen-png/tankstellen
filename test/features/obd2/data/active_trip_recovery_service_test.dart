@@ -7,8 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:tankstellen/features/obd2/data/active_trip_recovery_service.dart';
 import 'package:tankstellen/features/obd2/data/active_trip_repository.dart';
-import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
-import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
+import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// Direct unit tests for [ActiveTripRecoveryService] (#1303).

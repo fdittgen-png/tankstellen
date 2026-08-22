@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/data/baselines_sync.dart';
+import 'package:tankstellen/features/trips/data/baselines_sync.dart';
 
 /// Contract tests for [BaselinesSync] (#727 extract). The real
 /// bidirectional merge talks to Supabase + runs `mergeBaselineJson`;

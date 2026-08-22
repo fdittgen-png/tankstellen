@@ -283,13 +283,10 @@ void main() {
 /// `obd2/api.dart` barrel (exempt). Same graph, new attribution — the
 /// `obd2 -> *` entries are the decomposition's measured starting point.
 const _featurePairBaseline = <String, int>{
-  'achievements -> consumption': 4,
   'achievements -> price_history': 2,
   'alerts -> map': 1,
-  'approach -> consumption': 2,
   'approach -> favorites': 1,
   'approach -> profile': 8,
-  'calculator -> consumption': 1,
   'calculator -> profile': 1,
   'calculator -> search': 3,
   'calculator -> vehicle': 1,
@@ -299,21 +296,12 @@ const _featurePairBaseline = <String, int>{
   // edges hit ZERO: the moved charging surfaces now import the ev
   // barrel for ChargingLog + the cost calculator.
   'charging -> vehicle': 2,
-  'carbon -> consumption': 6,
   'carbon -> vehicle': 1,
-  'consumption -> approach': 8,
-  'consumption -> driving': 5,
   // #3743 (epic item 1, receipts_ocr extraction) — the share-receipt
   // handler moved out and now imports the feature_management barrel: 21→19.
-  'consumption -> feature_management': 13,
-  'consumption -> glide_coach': 4,
-  'consumption -> map': 2,
-  'consumption -> profile': 7,
-  'consumption -> search': 2,
-  'consumption -> sync': 1,
-  'consumption -> vehicle': 21,
+  'consumption -> feature_management': 2,
+  'consumption -> vehicle': 2,
   'driving -> approach': 1,
-  'driving -> consumption': 4,
   'driving -> feature_management': 6,
   'driving -> glide_coach': 2,
   'driving -> map': 3,
@@ -324,7 +312,6 @@ const _featurePairBaseline = <String, int>{
   // (trip_recorder/summary, accel gate, engine power factor, trip-detail
   // charts) — #3137-precedent decomposition edges that collapse onto the
   // trips barrel in step 5. All inbound edges are barrel-routed.
-  'driving_score -> consumption': 35,
   'ev -> search': 1,
   'ev -> vehicle': 1,
   'favorites -> alerts': 1,
@@ -343,7 +330,6 @@ const _featurePairBaseline = <String, int>{
   // consumption<->carbon cycles broke (17 -> 15).
   'fill_ups -> achievements': 1,
   'fill_ups -> carbon': 2,
-  'fill_ups -> consumption': 34,
   'fill_ups -> ev': 4,
   'fill_ups -> profile': 3,
   'fill_ups -> vehicle': 13,
@@ -361,7 +347,6 @@ const _featurePairBaseline = <String, int>{
   // the GPS-estimate folder now sits behind the obd2-owned
   // TripGpsEstimateOverlay seam (consumption implements it via the
   // barrel). 42 → 40.
-  'obd2 -> consumption': 39,
   'obd2 -> driving': 1,
   'obd2 -> feature_management': 4,
   'obd2 -> vehicle': 10,
@@ -382,7 +367,6 @@ const _featurePairBaseline = <String, int>{
   'route_search -> profile': 11,
   'route_search -> search': 1,
   'search -> approach': 1,
-  'search -> consumption': 4,
   'search -> ev': 4,
   'search -> favorites': 4,
   'search -> feature_management': 8,
@@ -415,7 +399,24 @@ const _featurePairBaseline = <String, int>{
   'sync -> favorites': 1,
   'sync -> feature_management': 2,
   'sync -> vehicle': 1,
-  'vehicle -> consumption': 11,
+  // #3743 (epic item 1, trips extraction, step 5/5) — the mega-feature's
+  // hub edges re-attributed to the trips feature; every inbound edge
+  // (obd2 39, driving_score 35, fill_ups 34, vehicle 11, carbon 6,
+  // achievements 4, driving 4, search 4, approach 2, calculator 1, core,
+  // shell) now routes through trips/api.dart — which broke the
+  // consumption<->{approach,driving,search,vehicle} cycles (15 -> 11)
+  // and zeroed EVERY '* -> consumption' pair. consumption itself is the
+  // thin conso-mode tab shell (2 fm + 2 vehicle edges). The trips -> *
+  // entries below are the decomposition's measured starting point for
+  // epic items 2 (TripSink inversion) and 3 (barrel pruning).
+  'trips -> approach': 8,
+  'trips -> driving': 5,
+  'trips -> glide_coach': 4,
+  'trips -> map': 2,
+  'trips -> profile': 7,
+  'trips -> search': 2,
+  'trips -> sync': 1,
+  'trips -> vehicle': 19,
   'vehicle -> profile': 1,
   'widget -> price_history': 2,
   'widget -> profile': 3,
@@ -452,7 +453,6 @@ const _featurePairBaseline = <String, int>{
 // into core would drag presentation into core's closure).
 const _coreImportBaseline = <String, int>{
   'alerts': 3,
-  'consumption': 1,
   'feature_management': 3,
   'fill_ups': 1,
   'itinerary': 3,
@@ -460,6 +460,9 @@ const _coreImportBaseline = <String, int>{
   'profile': 4,
   'search': 1,
   'station_services': 17,
+  // #3743 (step 5/5) — user_data_sync's TripsSync.forgetAllForUser seam
+  // followed the sync config into features/trips (was 'consumption').
+  'trips': 1,
 };
 
 /// Post-#3133 measurement (2026-06-11): `lib/features/` files importing
@@ -475,8 +478,10 @@ const _coreImportBaseline = <String, int>{
 // two router.dart importers) moved to features/receipts_ocr: same edge,
 // new attribution (consumption 2 → 1, receipts_ocr 0 → 1; total flat).
 const _shellImportBaseline = <String, int>{
-  'consumption': 1,
   'receipts_ocr': 1,
+  // #3743 (step 5/5) — the trip-recording banner's router.dart import
+  // followed it into features/trips (was 'consumption', now 0).
+  'trips': 1,
   'widget': 1,
 };
 
@@ -491,4 +496,7 @@ const _shellImportBaseline = <String, int>{
 // #3743 (epic item 1, step 2/5) — 17 → 15: 'consumption -> achievements'
 // and 'consumption -> carbon' hit zero (fuel_tab / monthly_fuel_charts
 // moved to fill_ups), breaking both cycles.
-const _cycleBaseline = 15;
+// #3743 (epic item 1, step 5/5) — 15 → 11: every remaining
+// consumption cycle (approach, driving, search, vehicle) broke when the
+// trip stack moved behind trips/api.dart.
+const _cycleBaseline = 11;

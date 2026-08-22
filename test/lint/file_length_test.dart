@@ -179,7 +179,7 @@ void main() {
     // summary-only decoded entries without losing the trip_details heal.
     // #3743 (epic item 5) — the config moved into its owning feature;
     // the key follows the file, snapshot unchanged.
-    'lib/features/consumption/data/trips_sync.dart': (
+    'lib/features/trips/data/trips_sync.dart': (
       lines: 433,
       bumps: 1,
       decompositionIssue: null,
@@ -837,9 +837,9 @@ void main() {
     // renders the `~` estimate fallback for fuel + average.
     // #3582 — re-grandfathered 1110 → 1135: the auto-saved summary
     // notice + the honest delete-saved-trip action.
-    'lib/features/consumption/presentation/screens/trip_recording_screen.dart':
+    'lib/features/trips/presentation/screens/trip_recording_screen.dart':
         (lines: 1135, bumps: 10, decompositionIssue: 3138),
-    'lib/features/consumption/presentation/widgets/broken_map_widgets.dart': (
+    'lib/features/trips/presentation/widgets/broken_map_widgets.dart': (
       lines: 439,
       bumps: 0,
       decompositionIssue: null,
@@ -893,7 +893,7 @@ void main() {
     // `MapOptions.initialCameraFit`, fixing the grey-tile cold-start race.
     // #3316 — shrank 450 → 412: the finite-point filter + zero-span bounds
     // padding moved to the pure trip_path_geometry.dart helper.
-    'lib/features/consumption/presentation/widgets/trip_path_map_card.dart': (
+    'lib/features/trips/presentation/widgets/trip_path_map_card.dart': (
       lines: 412,
       bumps: 0,
       decompositionIssue: null,
@@ -983,7 +983,7 @@ void main() {
     // #3573 — re-grandfathered 1262 → 1286: the comm-diagnostic capture
     // gate (GPS-only trips must not inherit the process-wide idle-link
     // session) + the debugSaveToHistory test seam that proves it.
-    'lib/features/consumption/providers/trip_recording_provider.dart': (
+    'lib/features/trips/providers/trip_recording_provider.dart': (
       // #3597 — the salvage path now rebuilds the recovered summary from
       // samples (comment + call, +10). Decomposition tracked by #3140.
       // #3758 — re-grandfathered 1296 → 1316: the append-WAL delta

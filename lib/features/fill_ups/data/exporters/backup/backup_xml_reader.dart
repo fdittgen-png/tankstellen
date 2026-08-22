@@ -7,8 +7,7 @@ import '../../../../ev/domain/entities/charging_log.dart';
 import '../../../../../core/domain/fuel_type.dart';
 import '../../../../../core/domain/vehicle_profile.dart';
 import '../../../domain/entities/fill_up.dart';
-import '../../../../consumption/domain/trip_recorder.dart';
-import '../../../../consumption/data/trip_history_repository.dart';
+import '../../../../trips/api.dart';
 import 'backup_xml_writer.dart';
 
 /// Decoded payload of a restore-side backup parse (#2571) — the same

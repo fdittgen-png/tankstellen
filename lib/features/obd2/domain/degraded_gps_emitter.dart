@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../consumption/domain/trip_recorder.dart';
+import '../../trips/api.dart';
 import 'gps_only_sample_builder.dart';
 import 'trip_distance_source.dart' show kDistanceSourceGps;
 import 'trip_live_reading.dart';

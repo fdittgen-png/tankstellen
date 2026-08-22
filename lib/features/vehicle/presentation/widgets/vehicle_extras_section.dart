@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../consumption/presentation/widgets/vehicle_adapter_section.dart';
-import '../../../consumption/presentation/widgets/vehicle_baseline_section.dart';
+import '../../../trips/api.dart';
 import 'service_reminder_section.dart';
 import 'vehicle_calibration_mode_selector.dart';
 

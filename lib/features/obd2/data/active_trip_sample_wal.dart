@@ -9,7 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../core/logging/error_logger.dart';
-import '../../consumption/api.dart'
+import '../../trips/api.dart'
     show TripSample, sampleFromJson, sampleToJson;
 
 /// #3758 — append-only sample WAL for the active trip.

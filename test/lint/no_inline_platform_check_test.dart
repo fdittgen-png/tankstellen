@@ -55,15 +55,15 @@ void main() {
     // platform fork for the OBD2 timing budgets (replaced the three
     // per-file forks in elm_channel / connect_by_mac).
     'lib/features/obd2/data/transport/obd2_platform_budgets.dart',
-    'lib/features/consumption/data/pip_controller.dart',
-    'lib/features/consumption/providers/auto_record_orchestrator_factories.dart',
+    'lib/features/trips/data/pip_controller.dart',
+    'lib/features/trips/providers/auto_record_orchestrator_factories.dart',
     'lib/features/setup/providers/onboarding_platform_steps_provider.dart',
     // #3169 — the SLC-wake factory seam (no-op off-iOS by design) and the
     // iOS-only best-effort disclosure render gate.
     'lib/features/alerts/background/slc_wake_monitor.dart',
     'lib/features/alerts/presentation/widgets/alerts_best_effort_note.dart',
     // #3170 — the Live Activity capability gate (ActivityKit is iOS-only).
-    'lib/features/consumption/data/live_activity_controller.dart',
+    'lib/features/trips/data/live_activity_controller.dart',
     // #3536 — App Review 3.1.1: donation links must not render on iOS.
     'lib/features/profile/providers/donation_links_provider.dart',
   };

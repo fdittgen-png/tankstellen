@@ -11,7 +11,7 @@ import 'package:tankstellen/features/obd2/data/session/obd2_connection_service.d
 import 'package:tankstellen/features/obd2/data/transport/obd2_permissions.dart';
 import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
-import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
+import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/profile/presentation/screens/developer_tools/obd2_health_screen.dart';

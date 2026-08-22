@@ -49,7 +49,7 @@ void main() {
       for (final path in const [
         'lib/core/location/location_service.dart',
         'lib/features/approach/providers/approach_state_provider.dart',
-        'lib/features/consumption/providers/trip_gps_stream_controller.dart',
+        'lib/features/trips/providers/trip_gps_stream_controller.dart',
       ]) {
         final callSite = File(path).readAsStringSync();
         expect(

@@ -5,9 +5,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/domain/driving_coaching_hint.dart';
 import '../../obd2/api.dart';
-import '../../consumption/domain/cold_start_baselines.dart';
-import '../../consumption/domain/situation_classifier.dart';
-import '../../consumption/domain/trip_recorder.dart' show TripSample;
+import '../../trips/api.dart';
 
 /// [DrivingCoachingHint] moved to the domain kernel (#3743) so the obd2
 /// recording controller's overlay seam can expose it without a

@@ -5,7 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../../fill_ups/api.dart';
-import '../../consumption/providers/trip_recording_provider.dart';
+import '../../trips/api.dart';
 
 part 'current_obd2_fuel_level_provider.g.dart';
 

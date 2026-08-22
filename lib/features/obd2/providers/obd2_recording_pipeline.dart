@@ -15,24 +15,12 @@ import '../data/session/obd2_disconnect_quietly.dart';
 import '../data/session/obd2_service.dart';
 import '../domain/obd2_trip_start_budgets.dart';
 import '../data/session/trip_recording_controller.dart';
-import '../../consumption/domain/entities/gps_sample_diagnostic.dart';
-import '../../consumption/domain/entities/trip_save_stage.dart';
-import '../../consumption/domain/services/gps_live_estimate_folder.dart';
+import '../../trips/api.dart';
 import '../domain/services/obd2_gps_estimate_fallback.dart';
-import '../../consumption/domain/trip_recorder.dart';
 import 'obd2_breadcrumb_provider.dart';
 import 'obd2_controller_phase_mapper.dart';
 import 'obd2_reconnect_provider.dart';
 import 'obd2_supervised_teardown.dart';
-import '../../consumption/providers/recording_pipeline.dart';
-import '../../consumption/providers/reconnect_scanner_factory.dart';
-import '../../consumption/providers/reference_vehicle_match.dart';
-import '../../consumption/providers/trip_baseline_recorder.dart';
-import '../../consumption/providers/trip_gps_stream_controller.dart';
-import '../../consumption/providers/trip_haptic_controller.dart';
-import '../../consumption/providers/trip_oem_fuel_level_controller.dart';
-import '../../consumption/providers/trip_recording_phase.dart';
-import '../../consumption/providers/trip_recording_state.dart';
 
 /// Concrete OBD2 recording strategy (#2227) behind the [RecordingPipeline]
 /// seam (#2190): owns the [Obd2Service], the [TripRecordingController] +

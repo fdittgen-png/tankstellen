@@ -19,7 +19,7 @@ import '../../data/exporters/backup/backup_zip_reader.dart';
 import '../../data/exporters/backup/full_backup_importer.dart';
 import '../../../charging/api.dart';
 import '../../providers/consumption_providers.dart';
-import '../../../consumption/providers/trip_history_provider.dart';
+import '../../../trips/api.dart';
 
 /// Picks a `.zip` backup the user supplies and returns its raw bytes,
 /// or null when the user cancelled (#2571). Injectable so widget tests

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/features/vehicle/data/vehicle_speed_consumption_aggregator.dart';
 import 'package:tankstellen/core/domain/speed_consumption_histogram.dart';
 

@@ -24,7 +24,7 @@ void main() {
   /// adding a new raw delete-swipe is forbidden — use SwipeToDelete.
   const dismissibleAllowlist = <String, String>{
     'lib/core/widgets/swipe_to_delete.dart': 'the shared component itself',
-    'lib/features/consumption/presentation/widgets/radar_swipe_wrapper.dart':
+    'lib/features/trips/presentation/widgets/radar_swipe_wrapper.dart':
         'radar paging — navigation, not deletion',
     'lib/core/widgets/favorite_dismissible.dart':
         'the ONE shared two-direction (navigate|delete) favorites wrapper '

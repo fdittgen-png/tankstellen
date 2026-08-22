@@ -16,10 +16,8 @@ import '../../../../core/domain/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../../fill_ups/api.dart';
 import '../../../charging/api.dart';
-import '../../providers/trip_history_provider.dart';
+import '../../../trips/api.dart';
 import '../widgets/consumption_app_bar_actions.dart';
-import '../widgets/trajets_record_fab.dart';
-import '../widgets/trajets_tab.dart';
 
 /// Which slice of the consumption feature a [ConsumptionScreen] renders.
 ///

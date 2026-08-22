@@ -7,8 +7,7 @@
 /// helper, not a cost-line producer, so it lives on its own.
 library;
 
-import '../../consumption/domain/accel_event_gate.dart';
-import '../../consumption/presentation/widgets/trip_detail_charts.dart';
+import '../../trips/api.dart';
 
 /// Returns one index per hard-acceleration EPISODE (in the
 /// sorted-by-timestamp ordering): the end index of the interval at which

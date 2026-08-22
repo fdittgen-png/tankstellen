@@ -6,11 +6,11 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/driving_score/data/analysis/driving_analysis_trace.dart';
 import 'package:tankstellen/features/driving_score/domain/driving_score.dart';
-import 'package:tankstellen/features/consumption/domain/gps_driving_features.dart';
+import 'package:tankstellen/features/trips/domain/gps_driving_features.dart';
 import 'package:tankstellen/features/driving_score/domain/lessons/driving_lesson.dart';
-import 'package:tankstellen/features/consumption/domain/obd2_trip_features.dart';
-import 'package:tankstellen/features/consumption/domain/trip_sample.dart';
-import 'package:tankstellen/features/consumption/domain/trip_summary.dart';
+import 'package:tankstellen/features/trips/domain/obd2_trip_features.dart';
+import 'package:tankstellen/features/trips/domain/trip_sample.dart';
+import 'package:tankstellen/features/trips/domain/trip_summary.dart';
 
 TripSummary _summary() => TripSummary(
       distanceKm: 20,

@@ -30,9 +30,8 @@ library;
 
 import 'dart:math' as math;
 
-import '../../../consumption/data/trip_history_repository.dart';
+import '../../../trips/api.dart';
 import '../entities/maintenance_suggestion.dart';
-import '../../../consumption/domain/trip_recorder.dart';
 
 part '_maf_deviation_detector.dart';
 
