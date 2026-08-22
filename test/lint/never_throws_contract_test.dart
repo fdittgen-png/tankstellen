@@ -60,7 +60,14 @@ void main() {
     // test (auto_trip_session_opener_test.dart) — no grandfathering needed.
     'lib/features/obd2/domain/broken_map_detector.dart',
     'lib/features/obd2/data/obd2_cache_openers.dart',
-    'lib/features/obd2/data/session/obd2_service.dart',
+    // #3760 — the two never-throws boundaries of obd2_service.dart
+    // (recoverVehicleProtocol; ensureCapabilityReconciled) moved verbatim
+    // into its `part` mixins during the sanctioned decomposition; the
+    // grandfather entry follows the code, exactly as the #3234 precedent
+    // below (a file move, not a new untested boundary — the documented
+    // boundary count is unchanged).
+    'lib/features/obd2/data/session/obd2_service_init.dart',
+    'lib/features/obd2/data/session/obd2_service_connect.dart',
     'lib/features/fill_ups/providers/consumption_providers.dart',
     'lib/features/vehicle/data/obd2_vin_reader.dart',
     'lib/features/vehicle/data/vin_adapter_pair_auto_populator.dart',
