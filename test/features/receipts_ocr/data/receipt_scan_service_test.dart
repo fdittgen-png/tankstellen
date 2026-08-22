@@ -8,6 +8,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
+import 'package:tankstellen/features/receipts_ocr/data/ocr/ocr_text_engine.dart';
+import 'package:tankstellen/features/receipts_ocr/data/ocr/recognized_text_block.dart';
 import 'package:tankstellen/features/receipts_ocr/data/ocr/ocr_trace_recorder.dart';
 import 'package:tankstellen/features/receipts_ocr/data/ocr/pump_ocr_config.dart';
 import 'package:tankstellen/features/receipts_ocr/data/receipt_parser.dart';
@@ -69,6 +71,32 @@ class _FakeRecognizer extends TextRecognizer {
   @override
   Future<void> close() async {
     closeCalls++;
+  }
+}
+
+/// Fake [OcrTextEngine] + counting factory for the #3766 per-scan
+/// engine-lifecycle contract: an OWNED engine must be created lazily for
+/// each scan and disposed as soon as recognition finishes.
+class _FakeEngine extends OcrTextEngine {
+  _FakeEngine(this.textToReturn);
+
+  final String textToReturn;
+  int recognizeCalls = 0;
+  int disposeCalls = 0;
+
+  @override
+  Future<OcrTextResult?> recognize(
+    String imagePath, {
+    bool languageCorrection = true,
+    List<String> languages = const [],
+  }) async {
+    recognizeCalls++;
+    return (text: textToReturn, blocks: const <RecognizedTextBlock>[]);
+  }
+
+  @override
+  void dispose() {
+    disposeCalls++;
   }
 }
 
@@ -257,6 +285,89 @@ void main() {
       expect(parser.lastProfile, isNull,
           reason: 'no country → no profile → EUR default, as before.');
 
+      await capture.dir.delete(recursive: true);
+    });
+  });
+
+  group('per-scan engine lifecycle (#3766)', () {
+    test(
+        'an OWNED engine is created per scan and disposed right after '
+        'recognition', () async {
+      final engines = <_FakeEngine>[];
+      final service = ReceiptScanService(
+        picker: _FakePicker(),
+        engineFactory: () {
+          final e = _FakeEngine('TOTAL 75.00');
+          engines.add(e);
+          return e;
+        },
+        parser: _StubReceiptParser(const ReceiptParseResult(totalCost: 75.0)),
+      );
+
+      final c1 = await _createTempCapture();
+      await service.parseReceiptImage(c1.path);
+      expect(engines, hasLength(1),
+          reason: 'first scan lazily creates the engine');
+      expect(engines[0].disposeCalls, 1,
+          reason: '#3766 — the native recognizer must be released as soon '
+              'as the scan finishes, not held until screen dispose.');
+
+      final c2 = await _createTempCapture();
+      await service.parseReceiptImage(c2.path);
+      expect(engines, hasLength(2),
+          reason: 'the next scan creates a FRESH engine');
+      expect(engines[1].disposeCalls, 1);
+
+      await File(c1.path).delete();
+      await c1.dir.delete(recursive: true);
+      await File(c2.path).delete();
+      await c2.dir.delete(recursive: true);
+    });
+
+    test(
+        'an INJECTED recognizer keeps the legacy service lifetime — '
+        'closed only by dispose()', () async {
+      final recognizer = _FakeRecognizer()..textToReturn = 'TOTAL 75.00';
+      final service = ReceiptScanService(
+        picker: _FakePicker(),
+        recognizer: recognizer,
+        parser: _StubReceiptParser(const ReceiptParseResult(totalCost: 75.0)),
+      );
+
+      final c1 = await _createTempCapture();
+      await service.parseReceiptImage(c1.path);
+      final c2 = await _createTempCapture();
+      await service.parseReceiptImage(c2.path);
+
+      expect(recognizer.processCalls, 2);
+      expect(recognizer.closeCalls, 0,
+          reason: 'the caller owns an injected recognizer — the service '
+              'must not close it between scans.');
+      service.dispose();
+      expect(recognizer.closeCalls, 1);
+
+      await File(c1.path).delete();
+      await c1.dir.delete(recursive: true);
+      await File(c2.path).delete();
+      await c2.dir.delete(recursive: true);
+    });
+
+    test('the upright OCR temp copy never lingers after a scan', () async {
+      final recognizer = _FakeRecognizer()..textToReturn = 'TOTAL 75.00';
+      final service = ReceiptScanService(
+        picker: _FakePicker(),
+        recognizer: recognizer,
+        parser: _StubReceiptParser(const ReceiptParseResult(totalCost: 75.0)),
+      );
+      final capture = await _createTempCapture();
+
+      await service.parseReceiptImage(capture.path);
+
+      expect(File('${capture.path}.upright.jpg').existsSync(), isFalse,
+          reason: '#3766 — the downscaled temp copy must be deleted the '
+              'moment recognition returns.');
+
+      await File(capture.path).delete();
       await capture.dir.delete(recursive: true);
     });
   });

@@ -19,10 +19,11 @@ import 'receipt_parser.dart';
 import 'receipt_scan_outcomes.dart';
 import '../../../core/logging/error_logger.dart';
 
-// Re-export the image-orientation helper (#1711) so existing callers /
-// tests that import it from this file keep resolving after it moved to
-// `ocr/image_orientation.dart` for the #2478 split.
-export 'ocr/image_orientation.dart' show bakeImageOrientation;
+// Re-export the image-orientation helpers (#1711/#3766) so existing
+// callers / tests that import them from this file keep resolving after
+// they moved to `ocr/image_orientation.dart` for the #2478 split.
+export 'ocr/image_orientation.dart'
+    show bakeImageOrientation, prepareReceiptImageForOcr;
 
 // Re-export the scan-outcome value type so existing importers that read
 // `ReceiptScanOutcome` from this file keep resolving after it moved to
@@ -43,7 +44,17 @@ class ReceiptScanService {
   /// #3052 — the OCR backend. iOS → Apple Vision, Android/host → ML Kit
   /// (selected by [createDefaultOcrTextEngine]). Tests inject `recognizer:`
   /// (wrapped in [MlKitOcrTextEngine]) so the ML Kit path stays covered.
-  final OcrTextEngine _engine;
+  ///
+  /// #3766 — lifecycle: when the service OWNS the engine (nothing was
+  /// injected, or an [engineFactory] test seam is used) it is created
+  /// lazily per scan and released again as soon as the scan finishes, so
+  /// ML Kit's native recognizer + model memory does not sit resident for
+  /// the whole life of the Add-fill-up screen. An injected [engine] /
+  /// [recognizer] keeps the legacy service-lifetime contract (the caller
+  /// owns something we must not recreate).
+  OcrTextEngine? _engine;
+  final OcrTextEngine Function() _engineFactory;
+  final bool _ownsEnginePerScan;
 
   final ReceiptParser _parser;
   final PumpOcrConfig _ocrConfig;
@@ -52,15 +63,20 @@ class ReceiptScanService {
     ImagePicker? picker,
     TextRecognizer? recognizer,
     OcrTextEngine? engine,
+    @visibleForTesting OcrTextEngine Function()? engineFactory,
     ReceiptParser? parser,
     PumpOcrConfig? ocrConfig,
   })  : _picker = picker ?? ImagePicker(),
         // An explicit [engine] wins; a legacy `recognizer:` (tests) keeps the
-        // ML Kit path; otherwise the platform default (iOS Vision / else ML Kit).
+        // ML Kit path; otherwise the platform default (iOS Vision / else ML
+        // Kit), created per scan via the factory (#3766).
         _engine = engine ??
             (recognizer != null
                 ? MlKitOcrTextEngine(recognizer: recognizer)
-                : createDefaultOcrTextEngine()),
+                : null),
+        _engineFactory = engineFactory ?? createDefaultOcrTextEngine,
+        _ownsEnginePerScan =
+            engine == null && recognizer == null,
         _parser = parser ?? const ReceiptParser(),
         _ocrConfig = ocrConfig ?? PumpOcrConfig();
 
@@ -107,7 +123,17 @@ class ReceiptScanService {
     OcrTraceRecorder? trace,
   }) async {
     trace?.input(country: country, brand: brand);
-    final recognised = await _recognise(path, trace: trace);
+    final OcrTextResult? recognised;
+    try {
+      recognised = await _recognise(path, trace: trace);
+    } finally {
+      // #3766 — an owned engine is released the moment recognition is
+      // done (success OR failure): ML Kit keeps tens of MB of native
+      // model memory alive per open recognizer, and holding it until
+      // screen dispose is what left the app crawling after a scan. The
+      // next scan lazily creates a fresh engine.
+      _releaseOwnedEngine();
+    }
     if (recognised == null) {
       await _tryDelete(path);
       return null;
@@ -132,7 +158,12 @@ class ReceiptScanService {
     final image = await _picker.pickImage(
       source: ImageSource.camera,
       preferredCameraDevice: CameraDevice.rear,
+      // #3766 — bound BOTH dimensions (maxWidth alone left a portrait
+      // shot at 1920×2560). 1920 keeps the on-disk capture sharp enough
+      // for the bad-scan report; the OCR temp copy is downscaled further
+      // to [kReceiptOcrMaxDimension] in [_writeUprightCopy].
       maxWidth: 1920,
+      maxHeight: 1920,
       imageQuality: 85,
     );
     return image?.path;
@@ -168,9 +199,11 @@ class ReceiptScanService {
     try {
       uprightTemp = await _writeUprightCopy(path);
       // #3052 — recognition is delegated to the platform engine (iOS Vision /
-      // Android ML Kit); the EXIF-upright preprocessing above is
-      // engine-agnostic.
-      return await _engine.recognize(uprightTemp ?? path);
+      // Android ML Kit); the EXIF-upright + downscale preprocessing above
+      // is engine-agnostic. #3766 — the engine is created lazily here so
+      // an owned (non-injected) engine only exists while a scan runs.
+      final engine = _engine ??= _engineFactory();
+      return await engine.recognize(uprightTemp ?? path);
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.storage, e, st,
           context: const {'where': 'OCR scan failed'}));
@@ -212,7 +245,17 @@ class ReceiptScanService {
   /// logged but never bubble up.
   Future<void> deleteCapturedImage(String path) => _tryDelete(path);
 
+  /// #3766 — drops the current engine when this service owns it. No-op
+  /// for injected engines/recognizers (their lifecycle belongs to the
+  /// caller until [dispose]).
+  void _releaseOwnedEngine() {
+    if (!_ownsEnginePerScan) return;
+    _engine?.dispose();
+    _engine = null;
+  }
+
   void dispose() {
-    _engine.dispose();
+    _engine?.dispose();
+    _engine = null;
   }
 }
