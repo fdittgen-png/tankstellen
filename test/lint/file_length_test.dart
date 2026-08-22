@@ -165,7 +165,7 @@ void main() {
       // this exact factory, so it cannot move out of the shell.
       lines: 716,
       bumps: 17,
-      decompositionIssue: 3139,
+      decompositionIssue: 3761,
     ),
     // #3078 — grandfathered at 414 (was 400, right at the cap on master). The
     // deletion-tombstone fix threads a tombstoned-id set through `merge` and
@@ -179,7 +179,7 @@ void main() {
     // summary-only decoded entries without losing the trip_details heal.
     // #3743 (epic item 5) — the config moved into its owning feature;
     // the key follows the file, snapshot unchanged.
-    'lib/features/consumption/data/trips_sync.dart': (
+    'lib/features/trips/data/trips_sync.dart': (
       lines: 433,
       bumps: 1,
       decompositionIssue: null,
@@ -234,7 +234,7 @@ void main() {
     'lib/features/obd2/data/protocol/adapter_registry.dart': (
       lines: 697,
       bumps: 5,
-      decompositionIssue: 3140,
+      decompositionIssue: 3760,
     ),
     // #2969 — grandfathered at 563 (was 389, under-cap before). The #2969
     // connect-trace instrumentation opens/finalises a trace at the FIVE public
@@ -319,7 +319,7 @@ void main() {
     'lib/features/obd2/data/session/obd2_connection_service.dart': (
       lines: 939,
       bumps: 12,
-      decompositionIssue: 3140,
+      decompositionIssue: 3760,
     ),
     // #2969 — grandfathered at 419 (was ~399, right at the cap on master). The
     // scan-path BLE `connect()` timeout bound (FBP could otherwise block ~35 s
@@ -377,7 +377,7 @@ void main() {
     'lib/features/obd2/data/transport/flutter_blue_plus_elm_channel.dart': (
       lines: 866,
       bumps: 6,
-      decompositionIssue: 3140,
+      decompositionIssue: 3760,
     ),
     // #3533 — adapter_reconnect_scanner.dart entry removed: the file was
     // deleted in the #3527 rewrite (the Obd2LinkSupervisor is the one
@@ -412,7 +412,7 @@ void main() {
     'lib/features/obd2/data/session/auto_trip_coordinator.dart': (
       lines: 470,
       bumps: 3,
-      decompositionIssue: 3727,
+      decompositionIssue: 3760,
     ),
     // #3279 — elm327_parsers.dart decomposed below the cap (419 → 345): the
     // final slice moved the shared decode plumbing — `cleanResponse`
@@ -468,7 +468,7 @@ void main() {
     'lib/features/obd2/data/session/live_sample_snapshot.dart': (
       lines: 846,
       bumps: 7,
-      decompositionIssue: 3140,
+      decompositionIssue: 3760,
     ),
     // #2379 — re-grandfathered 1457 → 1468: threaded the
     // `logFailureAsError` flag through `connect()` (param + doc + the
@@ -562,7 +562,7 @@ void main() {
       // (the stand-down suppression seam).
       lines: 1370,
       bumps: 15,
-      decompositionIssue: 3540,
+      decompositionIssue: 3760,
     ),
     // #2428 — re-grandfathered 1235 → 1241: the recoverable VIN-read catch
     // dropped its `errorLogger.log([storage], …)` (and the now-unused
@@ -708,7 +708,7 @@ void main() {
       // documents why every liveness guard depends on this flag (+16).
       lines: 430,
       bumps: 3,
-      decompositionIssue: 3141,
+      decompositionIssue: 3760,
     ),
     // route_search_provider.dart graduated in #3742 (the deprecated
     // countryCode plumbing was removed, dropping it below the 400 cap).
@@ -723,14 +723,14 @@ void main() {
       // Decomposition tracked by #3140.
       lines: 1875,
       bumps: 23,
-      decompositionIssue: 3140,
+      decompositionIssue: 3760,
     ),
     // #2798 — grandfathered at 408 (8 over): the pump path now retries OCR
     // with a contrast-stretched GRAYSCALE pass when the #2275 binarized pass
     // recovers nothing (the binarization erased faint 7-seg value digits). The
     // retry + its parseFor helper + the threaded `binarize` flag push this just
     // past 400; further compression would hurt readability of a real fix.
-    'lib/features/consumption/data/receipt_scan_service.dart': (
+    'lib/features/receipts_ocr/data/receipt_scan_service.dart': (
       lines: 408,
       bumps: 0,
       decompositionIssue: null,
@@ -785,10 +785,10 @@ void main() {
     // migration (the UnitFormatter import + the previousOdoKm null
     // branch wrapping formatDecimal so the odometer warning renders
     // the active locale's decimal convention).
-    'lib/features/consumption/presentation/screens/add_fill_up_screen.dart': (
+    'lib/features/fill_ups/presentation/screens/add_fill_up_screen.dart': (
       lines: 651,
       bumps: 9,
-      decompositionIssue: 3138,
+      decompositionIssue: 3762,
     ),
     // #2380 — +5: closest-station radar card at the top of the
     // recording column + a SingleChildScrollView wrap so the longer
@@ -837,9 +837,9 @@ void main() {
     // renders the `~` estimate fallback for fuel + average.
     // #3582 — re-grandfathered 1110 → 1135: the auto-saved summary
     // notice + the honest delete-saved-trip action.
-    'lib/features/consumption/presentation/screens/trip_recording_screen.dart':
-        (lines: 1135, bumps: 10, decompositionIssue: 3138),
-    'lib/features/consumption/presentation/widgets/broken_map_widgets.dart': (
+    'lib/features/trips/presentation/screens/trip_recording_screen.dart':
+        (lines: 1135, bumps: 10, decompositionIssue: 3762),
+    'lib/features/trips/presentation/widgets/broken_map_widgets.dart': (
       lines: 439,
       bumps: 0,
       decompositionIssue: null,
@@ -886,14 +886,14 @@ void main() {
     'lib/features/obd2/presentation/widgets/obd2_adapter_picker.dart': (
       lines: 554,
       bumps: 7,
-      decompositionIssue: 3140,
+      decompositionIssue: 3760,
     ),
     // #2624 — shrank 463 → 450: dropped the post-frame `fitCamera` block
     // (+ its dart:async / error_logger imports) in favour of
     // `MapOptions.initialCameraFit`, fixing the grey-tile cold-start race.
     // #3316 — shrank 450 → 412: the finite-point filter + zero-span bounds
     // padding moved to the pure trip_path_geometry.dart helper.
-    'lib/features/consumption/presentation/widgets/trip_path_map_card.dart': (
+    'lib/features/trips/presentation/widgets/trip_path_map_card.dart': (
       lines: 412,
       bumps: 0,
       decompositionIssue: null,
@@ -933,10 +933,10 @@ void main() {
     // `_relinkOpenWindow` moved into the pure, unit-tested FillUpTripLinker
     // (domain/services/fill_up_trip_linker.dart). First #3138 slice; the
     // trips/fillups feature split is the remaining work.
-    'lib/features/consumption/providers/consumption_providers.dart': (
+    'lib/features/fill_ups/providers/consumption_providers.dart': (
       lines: 938,
       bumps: 5,
-      decompositionIssue: 3138,
+      decompositionIssue: 3762,
     ),
     // #2509 — re-grandfathered 1180 → 1217: the persist guard in
     // `_saveToHistory` was tightened from the buggy disjunction
@@ -983,14 +983,14 @@ void main() {
     // #3573 — re-grandfathered 1262 → 1286: the comm-diagnostic capture
     // gate (GPS-only trips must not inherit the process-wide idle-link
     // session) + the debugSaveToHistory test seam that proves it.
-    'lib/features/consumption/providers/trip_recording_provider.dart': (
+    'lib/features/trips/providers/trip_recording_provider.dart': (
       // #3597 — the salvage path now rebuilds the recovered summary from
       // samples (comment + call, +10). Decomposition tracked by #3140.
       // #3758 — re-grandfathered 1296 → 1316: the append-WAL delta
       // streaming + fresh-WAL seed (the ~40 min crash fix).
       lines: 1316,
       bumps: 11,
-      decompositionIssue: 3140,
+      decompositionIssue: 3760,
     ),
     'lib/features/feature_management/data/legacy_toggle_migrator.dart': (
       lines: 647,

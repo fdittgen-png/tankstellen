@@ -11,7 +11,7 @@ import '../l10n/app_localizations.dart';
 import '../core/telemetry/integrations/navigation_trace_observer.dart';
 import '../core/storage/storage_keys.dart';
 import '../core/storage/storage_providers.dart';
-import '../features/consumption/providers/pending_shared_receipt_provider.dart';
+import '../features/receipts_ocr/api.dart';
 import '../features/widget/presentation/widget_uri_parser.dart';
 import '../features/widget/providers/pending_widget_uri_provider.dart';
 import 'routes/consumption_routes.dart';

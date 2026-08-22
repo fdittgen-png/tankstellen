@@ -7,7 +7,7 @@ import 'package:hive/hive.dart';
 
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/storage/hive_boxes.dart';
-import '../../../consumption/data/trip_history_repository.dart';
+import '../../../trips/api.dart';
 import '../active_trip_repository.dart';
 import '../active_trip_sample_wal.dart';
 import 'dropped_session_host.dart';

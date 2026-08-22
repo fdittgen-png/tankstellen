@@ -13,11 +13,9 @@ import '../../../core/logging/error_logger.dart';
 import '../../../core/services/voice_announcement_providers.dart';
 import '../../../core/services/voice_announcement_service.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../consumption/domain/driving_coaching.dart'
+import '../../driving_score/api.dart'
     show DrivingCoachingHint, coachingHint;
-import '../../consumption/domain/harsh_event.dart'
-    show HarshEvent, HarshEventType;
-import '../../consumption/providers/trip_recording_provider.dart';
+import '../../trips/api.dart';
 import 'live_harsh_event_bus_provider.dart';
 import 'voice_coaching_enabled_provider.dart';
 

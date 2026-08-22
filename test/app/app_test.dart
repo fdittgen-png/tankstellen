@@ -42,7 +42,7 @@ import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/core/notifications/notification_launch_listener.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/core/theme/theme_mode_provider.dart';
-import 'package:tankstellen/features/consumption/presentation/widgets/trip_recording_banner.dart';
+import 'package:tankstellen/features/trips/presentation/widgets/trip_recording_banner.dart';
 import 'package:tankstellen/features/widget/presentation/widget_click_listener.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 import '../helpers/silence_error_logger.dart';

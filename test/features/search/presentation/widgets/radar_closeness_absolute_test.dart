@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/utils/radar_closeness.dart';
-import 'package:tankstellen/features/consumption/presentation/widgets/proximity_fill_bar.dart';
+import 'package:tankstellen/features/trips/presentation/widgets/proximity_fill_bar.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
 import 'package:tankstellen/core/domain/station.dart';

@@ -16,13 +16,13 @@ import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/core/sync/sync_config.dart';
 import 'package:tankstellen/core/sync/sync_events.dart';
-import 'package:tankstellen/features/consumption/data/fill_ups_sync.dart';
+import 'package:tankstellen/features/fill_ups/data/fill_ups_sync.dart';
 import 'package:tankstellen/core/sync/sync_provider.dart';
 import 'package:tankstellen/core/sync/sync_pull_coordinator.dart';
 import 'package:tankstellen/core/sync/vehicles_sync.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
-import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
-import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
+import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
+import 'package:tankstellen/features/fill_ups/providers/consumption_providers.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../fakes/fake_hive_storage.dart';

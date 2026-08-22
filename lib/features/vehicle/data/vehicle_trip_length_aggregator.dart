@@ -1,7 +1,15 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../consumption/data/trip_history_repository.dart';
+// #3743 — hide the trips-side trip-length aggregation surface: this file
+// aggregates against the CORE TripLengthBreakdown model below.
+import '../../trips/api.dart'
+    hide
+        TripLengthBreakdown,
+        TripLengthBucketStats,
+        aggregateByTripLength,
+        tripLengthShortUpperKm,
+        tripLengthMediumUpperKm;
 import '../../../core/domain/trip_length_breakdown.dart';
 
 /// Below this trip count a length-bucket entry is treated as "not

@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 import 'package:tankstellen/features/obd2/data/session/trip_recording_controller.dart';
-import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 
 /// Integration test for #1263 phase 2: the controller wires

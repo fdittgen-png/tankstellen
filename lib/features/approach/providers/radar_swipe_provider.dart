@@ -4,7 +4,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../consumption/providers/trip_recording_provider.dart';
+import '../../trips/api.dart';
 
 part 'radar_swipe_provider.freezed.dart';
 part 'radar_swipe_provider.g.dart';

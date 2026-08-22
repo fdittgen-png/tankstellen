@@ -3,8 +3,7 @@
 
 import 'dart:collection';
 
-import '../../consumption/domain/entities/gps_sample_diagnostic.dart';
-import '../../consumption/domain/trip_recorder.dart';
+import '../../trips/api.dart';
 
 /// Owns the two per-trip ring buffers extracted from
 /// [TripRecordingController] (#1679):

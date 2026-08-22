@@ -11,7 +11,7 @@ import 'package:tankstellen/core/theme/fuel_colors.dart';
 import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/core/utils/price_tier.dart';
 import 'package:tankstellen/core/widgets/station_card_shell.dart';
-import 'package:tankstellen/features/consumption/presentation/widgets/proximity_fill_bar.dart';
+import 'package:tankstellen/features/trips/presentation/widgets/proximity_fill_bar.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/core/domain/station_amenity.dart';

@@ -1,0 +1,390 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../l10n/app_localizations.dart';
+import '../../../profile/providers/gamification_enabled_provider.dart';
+import '../../../../core/domain/vehicle_profile.dart';
+import '../../../vehicle/providers/vehicle_providers.dart';
+import 'trip_detail_lessons.dart';
+import '../../../driving_score/api.dart';
+import '../../data/trip_history_repository.dart';
+import '../../domain/fuel_event_attribution.dart';
+import '../../domain/gps_coverage_report.dart';
+import '../../domain/gps_driving_features.dart';
+import '../../domain/services/throttle_rpm_histogram_calculator.dart';
+import '../../domain/trip_recorder.dart';
+import '../../../fill_ups/api.dart';
+import 'gps_diagnostics_card.dart';
+import 'gps_efficiency_kpi_card.dart';
+import 'gps_road_usage_card.dart';
+import '../../../obd2/api.dart';
+import 'imu_accel_brake_card.dart';
+import 'throttle_rpm_histogram_card.dart';
+import 'trip_detail_charts.dart';
+import 'trip_detail_charts_section.dart';
+import 'trip_detail_to_trip_sample.dart';
+import 'trip_path_map_card.dart';
+import 'trip_summary_card.dart';
+import 'trip_verdict_prompt_card.dart';
+
+/// Scrollable body of the trip detail screen (#890): summary card
+/// followed by the driving-insights cost-line card (#1041 phase 2)
+/// and speed / fuel-rate / RPM line charts.
+///
+/// Uses [SingleChildScrollView] + [Column] (not a [ListView]) so every
+/// section stays in the widget tree — simplifies widget tests that
+/// assert on the presence / absence of the RPM chart below the fold,
+/// and keeps the screen compatible with [scrollUntilVisible] when the
+/// profile is long enough to require actual scrolling.
+///
+/// Stateful only so the [DrivingInsight] analysis is cached across
+/// rebuilds (the parent rebuilds on every Riverpod tick from the trip
+/// history list / vehicle providers). The analyzer is O(n) and
+/// pure, but for a 60-min trip that's still ~3 600 samples — re-running
+/// it on every theme switch / locale switch is wasteful.
+class TripDetailBody extends ConsumerStatefulWidget {
+  final TripHistoryEntry entry;
+  final VehicleProfile? vehicle;
+  final List<TripDetailSample> samples;
+  final bool isEv;
+
+  /// Optional [RepaintBoundary] key supplied by the parent screen so
+  /// the Share action (#1189) can rasterise the report into a PNG. The
+  /// key is hooked into the [RepaintBoundary] that wraps the report
+  /// content (Summary card + Insights cards + charts) — i.e. the
+  /// widget subtree the user expects to share.
+  final GlobalKey? shareBoundaryKey;
+
+  const TripDetailBody({
+    super.key,
+    required this.entry,
+    required this.vehicle,
+    required this.samples,
+    required this.isEv,
+    this.shareBoundaryKey,
+  });
+
+  @override
+  ConsumerState<TripDetailBody> createState() => _TripDetailBodyState();
+}
+
+class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
+  /// Lazily-computed driving insights for the trip. Cached for the
+  /// lifetime of this State so locale / theme rebuilds don't re-run
+  /// the analyzer. The widget tree is rebuilt from scratch (new State)
+  /// when the user navigates to a different trip — that's the natural
+  /// invalidation boundary, no manual cache key needed.
+  late final List<DrivingInsight> _insights = _computeInsights();
+
+  /// Lazily-computed throttle / RPM time-share histogram (#1041 phase
+  /// 3a). Cached alongside [_insights] for the same reason — the
+  /// calculator is O(n), pure, and cheap, but a long trip ticks at
+  /// ~1 Hz so re-running on every rebuild adds up.
+  ///
+  /// Persisted [TripSample]s carry both RPM and throttle % (#1261).
+  /// Cars without PID 0x11 still emit null throttle on every sample —
+  /// the calculator treats those nulls as "skip on the throttle axis"
+  /// so the RPM bars render alone in that case.
+  late final ThrottleRpmHistogram _histogram = _computeHistogram();
+
+  /// Lazily-computed composite driving score (#1041 phase 5a — Card A).
+  /// Cached alongside [_insights] and [_histogram] for the same
+  /// reason — the calculator is O(n), pure, and cheap, but a long trip
+  /// ticks at ~1 Hz so re-running on every locale / theme rebuild adds
+  /// up. EV trips and empty trips return [DrivingScore.perfect] from
+  /// the calculator; the parent gates rendering on the same conditions
+  /// it uses for [DrivingInsightsCard] so the card is hidden in those
+  /// cases.
+  late final DrivingScore _score = _computeScore();
+
+  /// The post-trip lesson registry (#2251). Stateless and cheap to
+  /// construct; held for the lifetime of this State so `build` reuses
+  /// the same instance across rebuilds. The card's lessons are resolved
+  /// in `build` (they depend on the active locale) but off the cached
+  /// [_insights] / [_score], so the O(n) analyzer / score passes don't
+  /// re-run on a theme / locale tick.
+  final DrivingLessonRegistry _lessonRegistry =
+      DrivingLessonRegistry.standard();
+
+  /// GPS-only efficiency features (#2697 P3) — null for OBD2/EV/empty.
+  late final GpsDrivingFeatures? _gpsFeatures =
+      GpsEfficiencyKpiCard.featuresFor(
+        widget.samples.map(tripDetailToTripSample),
+        isEv: widget.isEv,
+      );
+
+  /// The trip's samples in the domain shape, memoised so the O(n) conversion
+  /// runs once (not per rebuild). Feeds the driving-analysis trace's OBD2
+  /// telemetry aggregate (#3402).
+  late final List<TripSample> _tripSamples =
+      widget.samples.map(tripDetailToTripSample).toList(growable: false);
+
+  /// GPS coverage + gap-attribution report (#3465); null under two GPS
+  /// fixes. Memoised like [_insights]; feeds the card + the trace export.
+  late final GpsCoverageReport? _gpsCoverage = GpsCoverageReport.forTrip(
+    _tripSamples,
+    marks: widget.entry.lifecycleMarks,
+  );
+
+  /// Per-event fuel-cost attribution (#3432) — the "where your fuel
+  /// went" breakdown. Pure + O(n); memoised like the other analyses so
+  /// theme / locale rebuilds don't re-run it. Empty for EV trips (the
+  /// litre framing would be wrong — same gate as [_computeInsights]).
+  late final FuelAttribution _fuelAttribution = widget.isEv
+      ? FuelAttribution.empty
+      : FuelAttribution.fromSamples(_tripSamples);
+
+  List<DrivingInsight> _computeInsights() {
+    if (widget.samples.isEmpty) return const [];
+    // Insights are only meaningful for combustion trips — EV trips
+    // don't have RPM, hard-accel waste, or idling fuel cost in the
+    // same sense. Phase 1's analyzer would still surface hard-accel
+    // events for EVs, but framing it as "wasted L" would be wrong.
+    // Skip the analysis for EVs entirely; phase 4 will revisit once
+    // the kWh equivalent lands.
+    if (widget.isEv) return const [];
+    final tripSamples = widget.samples
+        .map(tripDetailToTripSample)
+        .toList(growable: false);
+    // Epic #3015 — scale the hard-accel wasted-litres by the active
+    // vehicle's engine power (a small engine wastes proportionally more for
+    // the same hard pull). Trips aren't tagged with a vehicle, so the
+    // currently-active profile is the source; null power → unchanged.
+    // #3368 — a virtual dead-reckoning trip's quantised speed manufactures
+    // phantom harsh events; suppress them in the lessons just like the score.
+    return analyzeTrip(tripSamples,
+        enginePowerKw: _activeEnginePowerKw(),
+        suppressSpeedHarsh: widget.entry.summary.isVirtualSource);
+  }
+
+  /// The active vehicle's engine power (kW) for the power-aware hard-accel
+  /// weight (Epic #3015), or `null` when no vehicle is selected OR the
+  /// profile store is unavailable (e.g. the Hive box is not open in a
+  /// widget test). `null` is the safe identity (factor 1.0) — the score /
+  /// insights must never fail to render because the vehicle store is in an
+  /// error state, so the lookup is deliberately tolerant.
+  int? _activeEnginePowerKw() {
+    try {
+      return ref.read(activeVehicleProfileProvider)?.enginePowerKw;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  DrivingScore _computeScore() {
+    if (widget.samples.isEmpty) return DrivingScore.perfect;
+    if (widget.isEv) return DrivingScore.perfect;
+    final tripSamples = widget.samples
+        .map(tripDetailToTripSample)
+        .toList(growable: false);
+    final summary = widget.entry.summary;
+    // #2460 — thread the trip-end lugging metric stored on the summary
+    // into the canonical score so the over-rev/shift family includes it
+    // (the calculator can't recompute gear inference from samples alone).
+    //
+    // #2794 / #2895 — when the phone IMU actually RAN for this trip, score
+    // against the pipeline's RESOLVED harsh counts (the accurate inertial
+    // figures, persisted on the summary) instead of re-deriving from the noisy
+    // GPS speed derivative. This is keyed off `imuActive`, not the trip kind:
+    // a gpsPlusObd2 trip that started dongle-less still has the inertial counts,
+    // and a genuine IMU zero must VETO a GPS over-count (the #2895 16-vs-0 bug).
+    // When no IMU ran, the (now physically-clamped, #2895) GPS-derived counts
+    // remain the source.
+    final useImu = summary.imuActive;
+    // Epic #3015 — weight the hard-accel penalty by the active vehicle's
+    // engine power; null power keeps the score byte-identical to before.
+    return computeDrivingScore(
+      tripSamples,
+      secondsBelowOptimalGear: summary.secondsBelowOptimalGear,
+      hardAccelEventsOverride: useImu ? summary.harshAccelerations : null,
+      hardBrakeEventsOverride: useImu ? summary.harshBrakes : null,
+      enginePowerKw: _activeEnginePowerKw(),
+      // #3368 — suppress the noisy virtual-odometer speed derivative (phantom
+      // harsh events) unless the IMU supplied real counts above.
+      suppressSpeedHarsh: summary.isVirtualSource,
+    );
+  }
+
+  ThrottleRpmHistogram _computeHistogram() {
+    if (widget.samples.isEmpty) return ThrottleRpmHistogram.empty;
+    // EV trips skip the histogram for the same reason they skip
+    // [DrivingInsightsCard] — RPM doesn't model EV motor behaviour
+    // and "throttle %" maps differently. Phase 4 will revisit.
+    if (widget.isEv) return ThrottleRpmHistogram.empty;
+    final histogramSamples = widget.samples
+        .map(
+          (s) => ThrottleRpmSample(
+            timestamp: s.timestamp,
+            // #1261: persisted samples now carry throttle %. Cars
+            // without PID 0x11 still emit null and the calculator
+            // treats nulls as "skip on the throttle axis" so the
+            // RPM bars render alone for those trips.
+            throttlePercent: s.throttlePercent,
+            rpm: s.rpm,
+          ),
+        )
+        .toList(growable: false);
+    return calculateThrottleRpmHistogram(histogramSamples);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    // #1194 — gamification opt-out gates the composite driving score
+    // card. The underlying calculator still runs (cheap, pure) so
+    // toggling back on instantly restores the score without a re-render.
+    final showGamification = ref.watch(gamificationEnabledProvider);
+
+    // Post-trip lessons (#2251/#3701) — see [buildTripDetailLessons].
+    // Empty for EV / empty trips on the same gating rule as the card
+    // below, and the registry returns [] when no rule fires (the
+    // empty-state path).
+    final List<DrivingLesson> lessons = (widget.isEv || widget.samples.isEmpty)
+        ? const []
+        : buildTripDetailLessons(
+            ref: ref,
+            registry: _lessonRegistry,
+            entry: widget.entry,
+            samples: widget.samples
+                .map(tripDetailToTripSample)
+                .toList(growable: false),
+            score: _score,
+            insights: _insights,
+            l: l,
+          );
+
+    // Wrap the report content in a [RepaintBoundary] so the Share
+    // action (#1189) can call `boundary.toImage(...)` to produce a PNG
+    // for the OS share sheet. The boundary covers Summary + Insights
+    // cards + charts — i.e. everything visible above the share button
+    // (which lives on the AppBar, outside the scroll view).
+    final reportContent = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TripSummaryCard(
+          entry: widget.entry,
+          vehicle: widget.vehicle,
+          samples: widget.samples,
+          isEv: widget.isEv,
+        ),
+        const SizedBox(height: 8),
+        // GPS path overlay (#1374): self-suppresses without GPS samples.
+        TripPathMapCard(samples: widget.samples),
+        // Composite driving score (#1041 phase 5a — Card A). Sits at
+        // the top of the Insights group: a single big 0..100 number
+        // with a brief breakdown chip row beneath it. EV trips and
+        // empty trips are skipped on the same gating rule as the
+        // cost-line card below. #1194: also gated by gamification
+        // toggle (the score is the most game-like trip element).
+        if (showGamification && !widget.isEv && widget.samples.isNotEmpty)
+          DrivingScoreCard(score: _score),
+        // Driving insights — combustion trips only. EV trips skip
+        // this card; phase 4 will land an EV-aware version. Since #2251
+        // the card renders the registry's ranked lessons (high-RPM,
+        // hard-accel, idling, and the low-gear coaching row) — the same
+        // rows the inline analyzer + gear metric produced before.
+        if (!widget.isEv && widget.samples.isNotEmpty)
+          DrivingInsightsCard(lessons: lessons),
+        // #3501 — 3-tap post-trip verdict (self-hides once answered).
+        if (widget.samples.isNotEmpty)
+          TripVerdictPromptCard(
+            entryId: widget.entry.id,
+            verdict: widget.entry.verdict,
+          ),
+        // "Where your fuel went" per-event fuel-cost breakdown (#3432)
+        // — right below the lessons so the ranked coaching is followed
+        // by the whole-trip litre attribution. The card self-hides when
+        // the attribution found nothing above the noise floor.
+        if (!widget.isEv && widget.samples.isNotEmpty)
+          FuelBreakdownCard(
+            attribution: _fuelAttribution,
+            totalTripLiters: widget.entry.summary.fuelLitersConsumed,
+          ),
+        // Throttle / RPM histogram (#1041 phase 3a — Card C). Slotted
+        // right below the insights card so the user reads "what was
+        // wasteful" then immediately sees "here's the engine
+        // distribution that produced that".
+        //
+        // #2796 C7 — gated to OBD2/engine-signal trips only. On a GPS-only
+        // trip (`_gpsFeatures != null`) throttle % and RPM are absent on
+        // every sample, so the card could only ever render its "no samples"
+        // empty state — dead UI. `_gpsFeatures != null` is the exact
+        // complement [GpsEfficiencyKpiCard.featuresFor] already computed
+        // (it returns features only when NO sample carried an engine RPM),
+        // so the two cards are mutually exclusive without re-scanning the
+        // samples. EV / empty trips still skip both.
+        if (!widget.isEv && widget.samples.isNotEmpty && _gpsFeatures == null)
+          ThrottleRpmHistogramCard(histogram: _histogram),
+        // GPS-only efficiency KPIs (#2697 P3) — only for engine-signal-less trips.
+        if (_gpsFeatures != null) GpsEfficiencyKpiCard(features: _gpsFeatures),
+        // #2796 C7 — the GPS-only replacement for the throttle/RPM card: a
+        // speed-only "how you used the road" panel (speed-band + movement-
+        // phase shares + a positive coasting line). Same gate as the KPI
+        // card above so the GPS-only trip gets the road-use view exactly
+        // where the engine card would have sat for an OBD2 trip.
+        if (_gpsFeatures != null) GpsRoadUsageCard(features: _gpsFeatures),
+        // #2792 — dongle-less hard-accel/brake/sharp-corner counts the phone IMU
+        // detected on a GPS-only trip (persisted but previously surfaced
+        // nowhere). Shown only when at least one harsh event was recorded.
+        if (ImuAccelBrakeCard.summaryFor(widget.entry.summary) != null)
+          ImuAccelBrakeCard(summary: widget.entry.summary),
+        // GPS sample diagnostics inspector (#1458 phase 2.5) + the #3465
+        // coverage/gap-attribution summary line. Read-only — rendered when
+        // a cadence diagnostic was captured OR the track supports a
+        // coverage report; trips with neither (legacy no-GPS trips) skip
+        // the card so their layout is unchanged.
+        if (widget.entry.gpsSampleDiagnostics.isNotEmpty ||
+            _gpsCoverage != null)
+          GpsDiagnosticsCard(
+            diagnostics: widget.entry.gpsSampleDiagnostics,
+            coverage: _gpsCoverage,
+          ),
+        // OBD2 comm-health diagnostics (#2470, #2912): dev-only, self-hides;
+        // fed the trip's PERSISTED diagnostic (restart-durable).
+        Obd2DiagnosticsTripCard(tripDiagnostic: widget.entry.obd2Diagnostic),
+        // Driving-analysis trace export (#2804). Dev-only — self-hides unless
+        // Feature.debugMode is on. Exports this trip's KPIs / score / lessons
+        // as an annotatable JSON so the maintainer can label real trips and
+        // calibrate the GPS verdict thresholds (Epic #2789 C6).
+        if (!widget.isEv && widget.samples.isNotEmpty)
+          DrivingAnalysisTraceCard(
+            summary: widget.entry.summary,
+            score: _score,
+            lessons: lessons,
+            gpsFeatures: _gpsFeatures,
+            gpsCoverage: _gpsCoverage,
+            samples: _tripSamples,
+            verdict: widget.entry.verdict, // #3501
+          ),
+        // #1895 — the per-trip telemetry charts, folded into one
+        // collapsed-by-default section. Extracted to its own widget (#2804)
+        // so this file stays under the 400-line norm; each chart still
+        // self-gates on its own non-null signal.
+        TripDetailChartsSection(samples: widget.samples),
+      ],
+    );
+
+    return SingleChildScrollView(
+      key: const Key('trip_detail_scroll'),
+      padding: EdgeInsets.only(
+        top: 8,
+        bottom: 16 + MediaQuery.of(context).viewPadding.bottom,
+      ),
+      child: RepaintBoundary(
+        key: widget.shareBoundaryKey,
+        child: Material(
+          // Painting the report into a PNG outside the screen's surface
+          // strips the [Scaffold] background, so wrap the boundary in
+          // a [Material] with the theme's surface colour. This keeps
+          // the captured image readable when shared into a chat where
+          // the receiver has a dark background.
+          color: Theme.of(context).colorScheme.surface,
+          child: reportContent,
+        ),
+      ),
+    );
+  }
+}

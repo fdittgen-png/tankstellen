@@ -7,12 +7,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/navigation/app_routes.dart';
 import '../../features/carbon/presentation/screens/carbon_dashboard_screen.dart';
-import '../../features/consumption/presentation/screens/add_fill_up_screen.dart';
-import '../../features/consumption/presentation/screens/consumption_statistics_screen.dart';
+import '../../features/fill_ups/api.dart';
 import '../../features/consumption/presentation/screens/consumption_screen.dart';
-import '../../features/consumption/presentation/screens/pick_station_for_fill_up_screen.dart';
-import '../../features/consumption/presentation/screens/trip_detail_screen.dart';
-import '../../features/consumption/presentation/screens/trip_recording_screen.dart';
+import '../../features/trips/api.dart';
 import '../../features/feature_management/application/feature_flags_provider.dart';
 import '../../features/feature_management/domain/feature.dart';
 import 'invalid_id_screen.dart';

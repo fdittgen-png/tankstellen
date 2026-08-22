@@ -6,8 +6,21 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../../../core/logging/error_logger.dart';
-import '../../consumption/data/trip_history_repository.dart';
-import '../../consumption/domain/trip_recorder.dart';
+// #3743 — hide the trips-side aggregation surfaces: this updater works
+// on the CORE speed-histogram / trip-length models + the vehicle-side
+// aggregators below.
+import '../../trips/api.dart'
+    hide
+        SpeedBand,
+        SpeedConsumptionBin,
+        aggregateSpeedConsumption,
+        aggregateSpeedConsumptionMultiTrip,
+        defaultMinSamplesPerBin,
+        TripLengthBreakdown,
+        TripLengthBucketStats,
+        aggregateByTripLength,
+        tripLengthShortUpperKm,
+        tripLengthMediumUpperKm;
 import '../../../core/domain/speed_consumption_histogram.dart';
 import '../../../core/domain/trip_length_breakdown.dart';
 import 'repositories/vehicle_profile_repository.dart';

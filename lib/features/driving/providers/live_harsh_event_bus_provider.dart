@@ -5,7 +5,7 @@ import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../consumption/domain/harsh_event.dart' show HarshEvent;
+import '../../trips/api.dart' show HarshEvent;
 
 part 'live_harsh_event_bus_provider.g.dart';
 

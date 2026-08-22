@@ -12,7 +12,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../consumption/domain/services/speed_consumption_histogram.dart';
+import '../../../trips/api.dart';
 import '../../../../core/utils/unit_formatter.dart';
 
 part '_speed_bars.dart';

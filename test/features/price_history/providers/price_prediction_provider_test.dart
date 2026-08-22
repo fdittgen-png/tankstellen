@@ -878,7 +878,7 @@ class _FixedActiveLanguage extends ActiveLanguage {
 
 /// Notifier override that returns a fixed enabled-set for the test's
 /// lifetime. Same shape as `_TestFeatureFlags` in
-/// `test/features/consumption/providers/auto_record_orchestrator_test.dart`.
+/// `test/features/trips/providers/auto_record_orchestrator_test.dart`.
 class _TestFeatureFlags extends FeatureFlags {
   _TestFeatureFlags(this._initial);
   final Set<Feature> _initial;

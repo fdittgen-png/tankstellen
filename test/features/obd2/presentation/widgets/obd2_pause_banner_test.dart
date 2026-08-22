@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/presentation/widgets/obd2_pause_banner.dart';
-import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
+import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
 
 import '../../../../helpers/pump_app.dart';
 

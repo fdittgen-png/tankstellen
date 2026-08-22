@@ -9,7 +9,7 @@ import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/supabase_client.dart';
 import '../../alerts/api.dart';
 import '../../../core/sync/favorites_sync.dart';
-import '../../consumption/api.dart';
+import '../../fill_ups/api.dart';
 import '../../../core/sync/vehicles_sync.dart';
 import '../../favorites/providers/favorites_provider.dart';
 import '../../../core/domain/vehicle_profile.dart';

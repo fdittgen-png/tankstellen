@@ -154,7 +154,7 @@ void main() {
   group('the committed first fixture is in sync with the generator', () {
     const pkgPath = 'test/fixtures/pump_displays/fr_tokheim/'
         'fr_tokheim_18_59eur_23_30l.ocrpkg.json';
-    const genPath = 'test/features/consumption/data/ocr/fixtures/'
+    const genPath = 'test/features/receipts_ocr/data/ocr/fixtures/'
         'fr_tokheim_18_59eur_23_30l_fixture_test.dart';
 
     test('regenerating the package reproduces the committed test verbatim',

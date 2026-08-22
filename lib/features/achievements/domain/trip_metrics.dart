@@ -4,9 +4,8 @@
 import 'dart:math' as math;
 
 import '../../../core/utils/num_extensions.dart';
-import '../../consumption/data/driving_score_calculator.dart';
-import '../../consumption/data/trip_history_repository.dart';
-import '../../consumption/domain/trip_recorder.dart';
+import '../../driving_score/api.dart';
+import '../../trips/api.dart';
 
 /// Pure helpers that derive achievement-grade metrics from a single
 /// trip (#1041 phase 5).

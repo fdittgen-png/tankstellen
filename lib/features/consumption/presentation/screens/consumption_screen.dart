@@ -14,16 +14,10 @@ import '../../../../core/widgets/tab_switcher.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
-import '../../data/exporters/backup/full_backup_exporter.dart';
-import '../../providers/charging_logs_provider.dart';
-import '../../providers/consumption_providers.dart';
-import '../../providers/trip_history_provider.dart';
-import '../widgets/charging_tab.dart';
+import '../../../fill_ups/api.dart';
+import '../../../charging/api.dart';
+import '../../../trips/api.dart';
 import '../widgets/consumption_app_bar_actions.dart';
-import '../widgets/fuel_tab.dart';
-import '../widgets/trajets_record_fab.dart';
-import '../widgets/trajets_tab.dart';
-import 'add_charging_log_screen.dart';
 
 /// Which slice of the consumption feature a [ConsumptionScreen] renders.
 ///

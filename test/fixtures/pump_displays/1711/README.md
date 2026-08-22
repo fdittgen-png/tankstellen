@@ -36,7 +36,7 @@ finding: the capture quality is the limiting factor.)
 
 The scan flow is `_capture()` → `InputImage.fromFilePath(path)` →
 ML Kit `TextRecognizer.processImage` → `PumpDisplayParser.parse` in
-`lib/features/consumption/data/receipt_scan_service.dart`.
+`lib/features/receipts_ocr/data/receipt_scan_service.dart`.
 
 1. **Orientation is lost (primary cause).** `InputImage.fromFilePath`
    hands the raw bitmap to ML Kit **without applying the JPEG's EXIF

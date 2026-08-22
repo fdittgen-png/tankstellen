@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../consumption/domain/services/trip_length_aggregator.dart';
+import '../../../trips/api.dart';
 import '../../../../core/utils/unit_formatter.dart';
 
 /// Trip-length consumption breakdown card on the Carbon dashboard

@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../consumption/providers/wakelock_facade.dart';
+import '../../../trips/api.dart';
 
 /// #2677 / #2785 — the radar-screen pin: a wake lock + immersive system bars
 /// so the closest-station readout stays readable on a dashboard mount. Mirrors

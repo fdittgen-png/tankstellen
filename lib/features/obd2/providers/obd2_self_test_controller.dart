@@ -12,7 +12,7 @@ import '../data/session/obd2_link_supervisor.dart';
 import '../data/session/obd2_self_test_driver.dart';
 import 'obd2_reconnect_provider.dart';
 import 'obd2_self_test_state.dart';
-import '../../consumption/providers/trip_recording_provider.dart';
+import '../../trips/api.dart';
 
 export 'obd2_self_test_state.dart';
 

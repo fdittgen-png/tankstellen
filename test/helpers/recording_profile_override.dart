@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:tankstellen/features/consumption/domain/entities/recording_profile.dart';
-import 'package:tankstellen/features/consumption/providers/recording_profile_provider.dart';
+import 'package:tankstellen/features/trips/domain/entities/recording_profile.dart';
+import 'package:tankstellen/features/trips/providers/recording_profile_provider.dart';
 
 class _FixedProfile extends RecordingProfileController {
   _FixedProfile(this._profile);

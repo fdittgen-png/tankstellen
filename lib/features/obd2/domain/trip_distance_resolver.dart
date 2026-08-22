@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../../../core/telemetry/health_counters.dart';
-import '../../consumption/domain/gps_track_distance.dart';
+import '../../trips/api.dart';
 import 'trip_distance_source.dart';
 import 'virtual_odometer.dart';
 

@@ -1,0 +1,254 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/achievements/domain/achievement.dart';
+import 'package:tankstellen/features/achievements/presentation/widgets/badge_shelf.dart';
+import 'package:tankstellen/features/achievements/providers/achievements_provider.dart';
+import 'package:tankstellen/features/fill_ups/domain/entities/consumption_stats.dart';
+import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
+import 'package:tankstellen/features/fill_ups/presentation/widgets/edit_correction_fill_up_sheet.dart';
+import 'package:tankstellen/features/fill_ups/presentation/widgets/fuel_tab.dart';
+import 'package:tankstellen/features/fill_ups/providers/consumption_providers.dart';
+import 'package:tankstellen/features/profile/providers/gamification_enabled_provider.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
+import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
+import '../../../../helpers/silence_error_logger.dart';
+
+import '../../../../helpers/pump_app.dart';
+import '../../../../helpers/confirm_delete.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
+
+/// Widget tests for the gamification opt-out gate on [FuelTab] (#1194).
+///
+/// The Fuel tab embeds a [BadgeShelf] inside its header column. When
+/// the gamification toggle is off the shelf must be omitted from the
+/// widget tree entirely (not merely hidden) so the consumption screen
+/// shows nothing achievement-related.
+void main() {
+  final AppLocalizations l10nEn = lookupAppLocalizations(const Locale('en'));
+
+  silenceErrorLoggerSpool();
+  final fillUps = <FillUp>[
+    FillUp(
+      id: 'f1',
+      date: DateTime(2026, 1, 1),
+      liters: 50,
+      totalCost: 80,
+      odometerKm: 10000,
+      fuelType: FuelType.diesel,
+    ),
+  ];
+  const stats = ConsumptionStats(
+    fillUpCount: 1,
+    totalLiters: 50,
+    totalSpent: 80,
+    totalDistanceKm: 0,
+  );
+  final earned = <EarnedAchievement>[
+    EarnedAchievement(
+      id: AchievementId.firstFillUp,
+      earnedAt: DateTime(2026, 1, 2),
+    ),
+  ];
+
+  List<Object> overrides({required bool gamification}) => [
+    achievementsProvider.overrideWithValue(earned),
+    gamificationEnabledProvider.overrideWithValue(gamification),
+    activeVehicleProfileProvider.overrideWith(() => _NoActiveVehicle()),
+    fillUpListProvider.overrideWith(() => _FixedFillUpList(fillUps)),
+  ];
+
+  testWidgets('mounts BadgeShelf when gamification is enabled', (tester) async {
+    await pumpApp(
+      tester,
+      FuelTab(fillUps: fillUps, stats: stats, l: l10nEn),
+      overrides: overrides(gamification: true),
+    );
+
+    expect(find.byType(BadgeShelf), findsOneWidget);
+    // Card from the BadgeShelf renders when at least one badge is earned.
+    expect(find.text('Achievements'), findsOneWidget);
+  });
+
+  testWidgets('omits BadgeShelf when gamification is disabled', (tester) async {
+    await pumpApp(
+      tester,
+      FuelTab(fillUps: fillUps, stats: stats, l: l10nEn),
+      overrides: overrides(gamification: false),
+    );
+
+    expect(find.byType(BadgeShelf), findsNothing);
+    // The Achievements heading from the badge shelf must not be in
+    // the tree either — that's the user-visible signal that the gate
+    // worked.
+    expect(find.text('Achievements'), findsNothing);
+  });
+
+  // #1361 phase 2b — tapping a correction card opens the editor sheet.
+  testWidgets(
+    'tapping a correction fill-up card opens EditCorrectionFillUpSheet',
+    (tester) async {
+      final correctionFills = <FillUp>[
+        FillUp(
+          id: 'correction_p1',
+          date: DateTime(2026, 4, 15),
+          liters: 3.4,
+          totalCost: 0,
+          odometerKm: 12500,
+          fuelType: FuelType.e10,
+          isCorrection: true,
+        ),
+      ];
+      await pumpApp(
+        tester,
+        FuelTab(fillUps: correctionFills, stats: stats, l: l10nEn),
+        overrides: [
+          achievementsProvider.overrideWithValue(const <EarnedAchievement>[]),
+          gamificationEnabledProvider.overrideWithValue(false),
+          activeVehicleProfileProvider.overrideWith(() => _NoActiveVehicle()),
+          fillUpListProvider.overrideWith(
+            () => _FixedFillUpList(correctionFills),
+          ),
+        ],
+      );
+
+      expect(find.byType(EditCorrectionFillUpSheet), findsNothing);
+
+      // Tap the correction card. The card lives inside a Dismissible so
+      // we target the auto_fix_high icon (only present on corrections)
+      // to disambiguate from the header column items.
+      await tester.tap(find.byIcon(Icons.auto_fix_high));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(
+        find.byType(EditCorrectionFillUpSheet),
+        findsOneWidget,
+        reason: 'Tapping a correction card must open the bottom-sheet editor.',
+      );
+    },
+  );
+
+  // #2530 — the wide-screen split now goes through the shared
+  // ResponsiveMasterDetail scaffold. Structural pane-count assertions.
+  group('#2530 responsive panes', () {
+    testWidgets('compact width renders a single pane (no VerticalDivider)', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await pumpApp(
+        tester,
+        FuelTab(fillUps: fillUps, stats: stats, l: l10nEn),
+        overrides: overrides(gamification: false),
+      );
+
+      expect(find.byType(VerticalDivider), findsNothing);
+    });
+
+    testWidgets('expanded width renders two panes with the 2:3 ratio', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1024, 768);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await pumpApp(
+        tester,
+        FuelTab(fillUps: fillUps, stats: stats, l: l10nEn),
+        overrides: overrides(gamification: false),
+      );
+
+      expect(find.byType(VerticalDivider), findsOneWidget);
+      // Master flex 2 (stats header), detail flex 3 (fill-up list).
+      final flexes = tester
+          .widgetList<Expanded>(find.byType(Expanded))
+          .map((e) => e.flex)
+          .toList();
+      expect(flexes, containsAllInOrder(<int>[2, 3]));
+    });
+  });
+
+  group('swipe-to-delete undo (#3664)', () {
+    testWidgets('dismissing a fill-up shows the undo snackbar and Undo '
+        'restores it in the provider state', (tester) async {
+      await pumpApp(
+        tester,
+        FuelTab(fillUps: fillUps, stats: stats, l: l10nEn),
+        overrides: [
+          achievementsProvider.overrideWithValue(earned),
+          gamificationEnabledProvider.overrideWithValue(false),
+          activeVehicleProfileProvider.overrideWith(() => _NoActiveVehicle()),
+          fillUpListProvider.overrideWith(() => _MutableFillUpList(fillUps)),
+        ],
+      );
+      await tester.pumpAndSettle();
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(FuelTab)),
+      );
+      expect(container.read(fillUpListProvider), hasLength(1));
+
+      await tester.drag(find.byType(Dismissible), const Offset(-500, 0));
+      await confirmPendingDelete(tester); // #3682
+
+      // Deleted from the provider; the undo affordance is up.
+      expect(container.read(fillUpListProvider), isEmpty);
+      expect(find.text(l10nEn.fillUpDeletedUndoSnackbar), findsOneWidget);
+
+      await tester.tap(find.text(l10nEn.undo));
+      await tester.pumpAndSettle();
+
+      // Restored: the captured fill-up is back, same id.
+      expect(
+        container.read(fillUpListProvider).map((f) => f.id),
+        contains('f1'),
+      );
+    });
+  });
+}
+
+/// Returns null for the active vehicle so [TankLevelCard] short-circuits
+/// without trying to read Hive.
+class _NoActiveVehicle extends ActiveVehicleProfile {
+  @override
+  VehicleProfile? build() => null;
+}
+
+/// Static fill-up list so the underlying repository never touches Hive.
+class _FixedFillUpList extends FillUpList {
+  _FixedFillUpList(this._value);
+  final List<FillUp> _value;
+
+  @override
+  List<FillUp> build() => _value;
+}
+
+/// In-memory FillUpList whose remove/update mutate state directly —
+/// no repository, so the swipe-to-delete + undo flow (#3664) can be
+/// exercised without Hive.
+class _MutableFillUpList extends FillUpList {
+  _MutableFillUpList(this._value);
+  final List<FillUp> _value;
+
+  @override
+  List<FillUp> build() => List.of(_value);
+
+  @override
+  Future<void> remove(String id) async {
+    state = state.where((f) => f.id != id).toList();
+  }
+
+  @override
+  Future<void> update(FillUp fillUp) async {
+    state = [...state.where((f) => f.id != fillUp.id), fillUp];
+  }
+
+}

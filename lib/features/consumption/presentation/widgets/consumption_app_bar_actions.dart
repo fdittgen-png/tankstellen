@@ -14,14 +14,10 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
 import '../../../feature_management/domain/feature.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
-import '../../data/exporters/backup/full_backup_exporter.dart';
-import '../../providers/charging_logs_provider.dart';
-import '../../providers/consumption_providers.dart';
-import '../../providers/trip_history_provider.dart';
+import '../../../fill_ups/api.dart';
+import '../../../charging/api.dart';
+import '../../../trips/api.dart';
 import '../screens/consumption_screen.dart';
-import '../screens/trajets_map_screen.dart';
-import 'backup_progress_dialog.dart';
-import 'backup_restore_flow.dart';
 import '../../../obd2/api.dart';
 
 /// Navigation targets the overflow kebab dispatches via its single

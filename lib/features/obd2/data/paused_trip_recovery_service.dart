@@ -5,7 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import '../../consumption/data/trip_history_repository.dart';
+import '../../trips/api.dart';
 import 'paused_trip_repository.dart';
 import '../../../core/logging/error_logger.dart';
 

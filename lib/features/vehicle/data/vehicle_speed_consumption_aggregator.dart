@@ -1,7 +1,15 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../consumption/domain/trip_recorder.dart';
+// #3743 — hide the trips-side speed-consumption surface: this file
+// aggregates against the CORE SpeedConsumptionHistogram model below.
+import '../../trips/api.dart'
+    hide
+        SpeedBand,
+        SpeedConsumptionBin,
+        aggregateSpeedConsumption,
+        aggregateSpeedConsumptionMultiTrip,
+        defaultMinSamplesPerBin;
 import '../../../core/domain/speed_consumption_histogram.dart';
 
 /// Below this sample count a speed band is excluded from the

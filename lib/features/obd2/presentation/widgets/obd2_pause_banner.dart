@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_radius.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../consumption/providers/trip_recording_provider.dart';
+import '../../../trips/api.dart';
 
 /// Banner shown when the OBD2 Bluetooth link drops mid-recording
 /// (#797 phase 2).

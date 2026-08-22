@@ -15,7 +15,7 @@ import '../../../../core/widgets/star_rating.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../consumption/presentation/screens/add_charging_log_screen.dart';
+import '../../../charging/api.dart';
 import '../../../../core/domain/ev/charging_station.dart';
 import '../../../favorites/providers/favorites_provider.dart';
 import '../../../../core/domain/fuel_type.dart';

@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/carbon/presentation/widgets/trip_length_breakdown_card.dart';
-import 'package:tankstellen/features/consumption/domain/services/trip_length_aggregator.dart';
+import 'package:tankstellen/features/trips/domain/services/trip_length_aggregator.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Widget-level coverage for [TripLengthBreakdownCard] (#1191).

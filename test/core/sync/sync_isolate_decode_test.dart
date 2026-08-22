@@ -6,13 +6,13 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
-import 'package:tankstellen/features/consumption/data/fill_ups_sync.dart';
+import 'package:tankstellen/features/fill_ups/data/fill_ups_sync.dart';
 import 'package:tankstellen/core/sync/sync_isolate_decode.dart';
-import 'package:tankstellen/features/consumption/data/trips_sync_json.dart';
+import 'package:tankstellen/features/trips/data/trips_sync_json.dart';
 import 'package:tankstellen/core/sync/vehicles_sync.dart';
-import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
-import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
-import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
+import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
+import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 
 import '../../helpers/silence_error_logger.dart';
 
@@ -176,10 +176,10 @@ void main() {
     // #3743 (epic item 5) — the fill-up / trip configs (and their decode
     // entrypoints) moved into their owning feature's data/ layer.
     const entrypoints = <String, String>{
-      'lib/features/consumption/data/fill_ups_sync.dart':
+      'lib/features/fill_ups/data/fill_ups_sync.dart':
           'decodeFillUpDataRows',
       'lib/core/sync/vehicles_sync.dart': 'decodeVehicleDataRows',
-      'lib/features/consumption/data/trips_sync_json.dart':
+      'lib/features/trips/data/trips_sync_json.dart':
           'decodeTripSummaryDataRows',
     };
     entrypoints.forEach((path, fn) {

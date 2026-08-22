@@ -12,9 +12,9 @@ import 'package:tankstellen/features/obd2/data/last_good_adapter_store.dart';
 import 'package:tankstellen/features/obd2/data/session/dropped_session_manager.dart';
 import 'package:tankstellen/features/obd2/data/session/obd2_reattach_source.dart';
 import 'package:tankstellen/features/obd2/data/paused_trip_repository.dart';
-import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
-import 'package:tankstellen/features/consumption/domain/entities/gps_sample_diagnostic.dart';
-import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
+import 'package:tankstellen/features/trips/domain/entities/gps_sample_diagnostic.dart';
+import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 
 /// Focused unit tests for the #2188 [DroppedSessionManager] — the
 /// connection-drop RECOVERY state machine extracted from

@@ -8,17 +8,9 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
-// #3739 — the canonical codec functions come through the consumption
-// feature's public api.dart barrel (the feature-boundary contract);
-// `show` keeps this file's dependency surface explicit.
-import '../../consumption/api.dart'
-    show
-        kTripSaveComputeSampleThreshold,
-        sampleFromJson,
-        sampleToJson,
-        tripSummaryFromJson,
-        tripSummaryToJson;
-import '../../consumption/domain/trip_recorder.dart';
+// #3739 — the canonical codec functions come through the trips
+// feature's public api.dart barrel (the feature-boundary contract).
+import '../../trips/api.dart';
 import 'active_trip_sample_wal.dart';
 import 'paused_trip_repository.dart';
 import '../../../core/logging/error_logger.dart';

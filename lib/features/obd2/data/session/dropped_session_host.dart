@@ -1,8 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../../consumption/domain/entities/gps_sample_diagnostic.dart';
-import '../../../consumption/domain/trip_recorder.dart';
+import '../../../trips/api.dart';
 
 /// Seam the `DroppedSessionManager` uses to read and drive the
 /// recording session it is recovering, without owning the recording

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../../../core/services/co2_calculator.dart';
-import '../../consumption/domain/entities/fill_up.dart';
+import '../../fill_ups/api.dart';
 
 /// Aggregated totals for a single calendar month.
 ///

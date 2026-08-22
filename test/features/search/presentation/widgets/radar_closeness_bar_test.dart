@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:tankstellen/features/consumption/presentation/widgets/proximity_fill_bar.dart';
+import 'package:tankstellen/features/trips/presentation/widgets/proximity_fill_bar.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
 import 'package:tankstellen/core/domain/station.dart';
@@ -231,7 +231,7 @@ void main() {
 
     test('ProximityFillBar delegates its fill to RadarCloseness', () {
       final bar = srcFile(
-        'lib/features/consumption/presentation/widgets/proximity_fill_bar.dart',
+        'lib/features/trips/presentation/widgets/proximity_fill_bar.dart',
       ).readAsStringSync();
       expect(bar.contains('RadarCloseness.fillFor'), isTrue,
           reason: 'the bar must delegate the fill formula to the shared helper');
@@ -242,14 +242,16 @@ void main() {
       // RadarCloseness. A re-introduced inline copy on any surface is exactly
       // how the bar desynced before.
       final formula = RegExp(r'1\.0?\s*-\s*\(?\s*\w*[Dd]istance');
-      const consumption = 'lib/features/consumption/presentation/widgets';
+      // #3743 — the three recording-side radar surfaces moved from the
+      // consumption mega-feature into features/trips.
+      const trips = 'lib/features/trips/presentation/widgets';
       const search = 'lib/features/search/presentation/widgets';
       final paths = <String>[
         '$search/station_card_status.dart',
         '$search/search_results_list.dart',
-        '$consumption/trip_radar_card.dart',
-        '$consumption/trip_recording_pip_price_layout.dart',
-        '$consumption/proximity_fill_bar.dart',
+        '$trips/trip_radar_card.dart',
+        '$trips/trip_recording_pip_price_layout.dart',
+        '$trips/proximity_fill_bar.dart',
       ];
       for (final path in paths) {
         expect(formula.hasMatch(srcFile(path).readAsStringSync()), isFalse,

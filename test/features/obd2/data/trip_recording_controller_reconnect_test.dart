@@ -19,7 +19,7 @@ import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 import 'package:tankstellen/features/obd2/data/paused_trip_repository.dart';
 import 'package:tankstellen/features/obd2/data/session/trip_recording_controller.dart';
-import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
+import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 
 /// Exercises the #797 phase 3 wiring between the controller's
 /// drop-detection path and the reattach source. Uses an

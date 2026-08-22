@@ -146,9 +146,9 @@ void main() {
 ///   * the OBD2 presentation widgets belong to the #3527-family scope.
 const _baseline = <String, int>{
   'lib/features/carbon/presentation/widgets/monthly_bar_chart.dart': 1,
-  'lib/features/consumption/presentation/widgets/charging_cost_trend_chart.dart':
+  'lib/features/charging/presentation/widgets/charging_cost_trend_chart.dart':
       1,
-  'lib/features/consumption/presentation/widgets/charging_efficiency_chart.dart':
+  'lib/features/charging/presentation/widgets/charging_efficiency_chart.dart':
       1,
   'lib/features/obd2/presentation/widgets/obd2_breadcrumb_row.dart': 2,
   'lib/features/obd2/presentation/widgets/obd2_diagnostics_card.dart': 3,

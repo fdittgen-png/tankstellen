@@ -19,11 +19,11 @@ import 'package:tankstellen/features/approach/providers/approach_state_provider.
 import 'package:tankstellen/features/approach/providers/effective_approach_state_provider.dart';
 import 'package:tankstellen/features/approach/providers/fuel_station_radar_provider.dart';
 import 'package:tankstellen/features/approach/providers/radar_candidate_list_provider.dart';
-import 'package:tankstellen/features/consumption/domain/entities/gps_sample_diagnostic.dart';
-import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
-import 'package:tankstellen/features/consumption/providers/gps_only_recording_pipeline.dart';
-import 'package:tankstellen/features/consumption/providers/recording_pipeline.dart';
-import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
+import 'package:tankstellen/features/trips/domain/entities/gps_sample_diagnostic.dart';
+import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
+import 'package:tankstellen/features/trips/providers/gps_only_recording_pipeline.dart';
+import 'package:tankstellen/features/trips/providers/recording_pipeline.dart';
+import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/approach_overlay_enabled_provider.dart';
 import 'package:tankstellen/features/profile/providers/effective_fuel_type_provider.dart';

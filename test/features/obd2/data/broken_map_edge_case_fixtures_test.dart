@@ -8,7 +8,7 @@ import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/features/obd2/domain/broken_map_belief.dart';
 import 'package:tankstellen/features/obd2/domain/broken_map_detector.dart';
 import 'package:tankstellen/features/obd2/data/protocol/oem_pid_table.dart';
-import 'package:tankstellen/features/consumption/presentation/widgets/broken_map_widgets.dart'
+import 'package:tankstellen/features/trips/presentation/widgets/broken_map_widgets.dart'
     show BrokenMapBand, brokenMapBandFor;
 import 'package:tankstellen/features/vehicle/domain/entities/reference_vehicle.dart';
 

@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../consumption/domain/trip_sample.dart';
+import '../../trips/api.dart';
 
 /// #2565 — builds the GPS-only [TripSample] the [TripRecordingController]
 /// feeds its recorder while in the `degradedGpsOnly` phase (OBD2 dropped

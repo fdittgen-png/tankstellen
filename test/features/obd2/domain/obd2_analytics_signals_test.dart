@@ -4,7 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/domain/fuel_rate_estimator.dart' show kPetrolAfr, kPetrolDensityGPerL, kDieselAfr, kDieselDensityGPerL;
 import 'package:tankstellen/features/obd2/domain/services/obd2_analytics_signals.dart';
-import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 
 /// Unit tests for the #2286 per-sample analytics derivation: the
 /// instantaneous L/100km math, the fuel-rate→MAF fallback, idle
