@@ -39,6 +39,10 @@ import '../widgets/fill_up_warning_dialog.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/utils/unit_formatter.dart';
 
+part 'add_fill_up_screen_form_state.dart';
+part 'add_fill_up_screen_save.dart';
+part 'add_fill_up_screen_scan.dart';
+
 /// Form to add a new [FillUp] entry.
 class AddFillUpScreen extends ConsumerStatefulWidget {
   /// Optional pre-fill from a selected station.
@@ -91,45 +95,18 @@ class AddFillUpScreen extends ConsumerStatefulWidget {
   ConsumerState<AddFillUpScreen> createState() => _AddFillUpScreenState();
 }
 
-class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
+class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen>
+    with _AddFillUpFormState, _AddFillUpScanFlow, _AddFillUpSaveFlow {
+  @override
   final _formKey = GlobalKey<FormState>();
+  @override
   final _litersCtrl = TextEditingController();
+  @override
   final _costCtrl = TextEditingController();
+  @override
   final _odoCtrl = TextEditingController();
+  @override
   final _notesCtrl = TextEditingController();
-  DateTime _date = DateTime.now();
-  late FuelType _fuelType = widget.preFilledFuelType ?? FuelType.e10;
-  // #1195 — defaults to ON because the typical European pattern is a
-  // full "plein". The toggle exposes the partial-top-up case so the
-  // tank-level estimator can branch correctly on subsequent reads.
-  bool _isFullTank = true;
-  bool _scanning = false;
-  ReceiptScanService? _scanService;
-  String? _vehicleId;
-  bool _vehicleInitialized = false;
-  ReceiptScanOutcome? _lastScan;
-  FillUpAutoCostCalculator? _autoCostCalc;
-
-  /// Unit price per litre read off the last receipt scan (#2689). Set by
-  /// the scan handler when the OCR parser extracts a `pricePerLiter`, and
-  /// persisted into the saved [FillUp.scannedPricePerLiter] so the exact
-  /// quoted price survives instead of the `totalCost / liters` quotient.
-  /// Null until a scan reads a price; manual entries leave it null.
-  double? _scannedPricePerLiter;
-
-  /// Adapter-captured tank level (litres) snapshotted at form-open
-  /// (#1434). Closes the producer-wiring gap from #1401 — paired with
-  /// [_fuelLevelAfterL] (captured at save) so the persisted [FillUp]
-  /// carries both reads, lighting up the verified-by-adapter badge
-  /// (#1430) and the variance prompt when the user-typed liters
-  /// disagrees with the adapter delta by >5 %.
-  ///
-  /// Null when no trip is recording, the adapter doesn't surface
-  /// PID 0x2F, or the active vehicle has no tankCapacityL configured.
-  /// Test seam [AddFillUpScreen.initialFuelLevelBeforeL] takes
-  /// precedence when set, so widget tests can drive the dialog flow
-  /// without standing up a live OBD2 stack.
-  double? _fuelLevelBeforeL;
 
   @override
   void initState() {
@@ -159,100 +136,6 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     );
   }
 
-  /// One-shot read of the OBD2 fuel-level provider at the current
-  /// instant. `ref.read` (not `watch`) — we capture a single snapshot,
-  /// not a reactive subscription. Returns null when the provider is
-  /// unavailable in the test container or any other read-time failure
-  /// (defensive: a missing OBD2 reading must never block save).
-  double? _readObd2FuelLevelLitres() {
-    try {
-      return ref.read(currentObd2FuelLevelLitresProvider);
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'AddFillUp: OBD2 fuel-level read failed'}));
-      return null;
-    }
-  }
-
-  /// Resolve the initial vehicle selection: prefer the profile's
-  /// [UserProfile.defaultVehicleId], fall back to the active vehicle,
-  /// otherwise to the first vehicle in the list (vehicle is mandatory —
-  /// #713). Each provider read is wrapped independently so one stray
-  /// failure (e.g. active profile missing in tests) doesn't skip the
-  /// later fallback branches.
-  void _initVehicleIfNeeded(List<VehicleProfile> vehicles) {
-    if (_vehicleInitialized) return;
-    if (vehicles.isEmpty) {
-      _vehicleInitialized = true;
-      return;
-    }
-    String? defaultId;
-    FuelType? profilePreferred;
-    try {
-      final profile = ref.read(activeProfileProvider);
-      defaultId = profile?.defaultVehicleId;
-      profilePreferred = profile?.preferredFuelType;
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'AddFillUp: active profile unavailable'}));
-    }
-    String? activeId;
-    try {
-      activeId = ref.read(activeVehicleProfileProvider)?.id;
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'AddFillUp: active vehicle unavailable'}));
-    }
-    _vehicleId = AddFillUpFuelResolver.pickInitialVehicleId(
-      vehicles: vehicles,
-      profileDefaultId: defaultId,
-      activeVehicleId: activeId,
-    );
-    final selected = vehicles.firstWhere(
-      (v) => v.id == _vehicleId,
-      orElse: () => vehicles.first,
-    );
-    // #2886 — a multi-fuel vehicle re-seeds the picker from the fuel the
-    // user actually pumped last tank (when the OCR/station pre-fill
-    // doesn't already pin one). Single-fuel vehicles keep the pre-#2886
-    // behaviour: `allowAnyCompatible` stays false, so `lastUsedFuel` is
-    // never consulted.
-    final lastUsed = selected.multiFuelCapable
-        ? AddFillUpFuelResolver.lastUsedFuelForVehicle(
-            _safeFillUps(),
-            vehicleId: selected.id,
-          )
-        : null;
-    _fuelType = AddFillUpFuelResolver.resolveDefaultFuel(
-      vehicle: selected,
-      profilePreferred: profilePreferred,
-      preFill: widget.preFilledFuelType,
-      allowAnyCompatible: selected.multiFuelCapable,
-      lastUsedFuel: lastUsed,
-    );
-    _vehicleInitialized = true;
-  }
-
-  /// Read the fill-up history defensively (#2886) — a partially-built
-  /// test container without Hive must degrade to an empty list rather
-  /// than throw while seeding the multi-fuel picker.
-  List<FillUp> _safeFillUps() {
-    try {
-      return ref.read(fillUpListProvider);
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st,
-          context: const {'where': 'AddFillUp: fill-up history unavailable'}));
-      return const [];
-    }
-  }
-
-  /// Listener bridging the liters controller to the auto-cost
-  /// calculator (extracted to `fill_up_auto_cost_calculator.dart`).
-  void _recomputeCost() {
-    final next = _autoCostCalc?.recompute(
-      litersText: _litersCtrl.text,
-      costText: _costCtrl.text,
-    );
-    if (next != null) _costCtrl.text = next;
-  }
-
   @override
   void dispose() {
     _litersCtrl.dispose();
@@ -266,224 +149,6 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       _scanService?.dispose();
     }
     super.dispose();
-  }
-
-  /// Bridge to the scan helpers in `fill_up_scan_handlers.dart`.
-  /// Bundles the controllers + per-field setters the helpers need so
-  /// the long async sequences live outside the screen file.
-  FillUpScanHostState _buildScanHostState() => FillUpScanHostState(
-        litersCtrl: _litersCtrl,
-        costCtrl: _costCtrl,
-        vehicleId: _vehicleId,
-        readService: () => _scanService,
-        writeService: (s) => _scanService = s,
-        setScanning: (v) => setState(() => _scanning = v),
-        setDate: (d) => setState(() => _date = d),
-        setFuelType: (f) => setState(() => _fuelType = f),
-        setScannedPricePerLiter: (p) =>
-            setState(() => _scannedPricePerLiter = p),
-        setLastScan: (o) => setState(() => _lastScan = o),
-        isMounted: () => mounted,
-        // #2275 — the active country drives the per-country validation
-        // gate. Read defensively: a partially-initialised container
-        // (some widget tests) must degrade to "no profile" rather than
-        // throw before the scan even runs.
-        activeCountry: _activeCountryCode(),
-      );
-
-  /// The active country code for OCR validation, or null when it can't
-  /// be resolved (so the parser skips range-checking instead of the
-  /// screen failing to build the scan host).
-  String? _activeCountryCode() {
-    try {
-      return ref.read(activeCountryProvider).code;
-    } catch (_) {
-      return null;
-    }
-  }
-
-  Future<void> _scanReceipt() => runReceiptScan(context, _buildScanHostState());
-
-  /// #2687 — the manual, on-device "paste receipt text" entry point.
-  /// Opens the paste dialog, parses the pasted text with the pure-Dart
-  /// [EReceiptTextParser] (no camera, no cloud) and pre-fills the form
-  /// through the SAME body the camera / share paths use. Never auto-saves.
-  Future<void> _pasteReceiptText() =>
-      runPasteReceiptText(context, _buildScanHostState());
-
-  Future<void> _reportBadScan() async {
-    final scan = _lastScan;
-    if (scan == null) return;
-    return reportBadReceiptScan(context, _buildScanHostState(), scan);
-  }
-
-  Future<void> _pickDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _date,
-      firstDate: DateTime(2000),
-      lastDate: DateTime.now().add(const Duration(days: 1)),
-    );
-    if (picked != null) {
-      setState(() => _date = picked);
-    }
-  }
-
-  Future<void> _save() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    // #2836 — data-quality gate: warn (don't block) when the chosen fuel
-    // doesn't match the vehicle's engine family, or the odometer is below
-    // the previous fill-up. A dismiss / "Go back" aborts the save.
-    if (!await _confirmDataQualityWarnings()) return;
-    if (!mounted) return;
-
-    final userLiters = AddFillUpValidators.parseDouble(_litersCtrl.text);
-    // #1434 — capture the post-fill tank level NOW (form-submit). The
-    // before-fill capture happened in initState and lives on the
-    // state field. The test seam takes precedence so widget tests can
-    // exercise the variance / no-variance flows without a live OBD2
-    // chain. Both nulls on a no-OBD2 phone leave the FillUp in the
-    // legacy "user-entered only" shape — variance prompt skips itself
-    // (FillUpVariance.hasAdapterCapture returns false).
-    final afterL =
-        widget.initialFuelLevelAfterL ?? _readObd2FuelLevelLitres();
-    var fillUp = FillUp(
-      id: DateTime.now().microsecondsSinceEpoch.toString(),
-      date: _date,
-      liters: userLiters,
-      totalCost: AddFillUpValidators.parseDouble(_costCtrl.text),
-      odometerKm: AddFillUpValidators.parseDouble(_odoCtrl.text),
-      fuelType: _fuelType,
-      stationId: widget.stationId,
-      stationName: widget.stationName,
-      notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
-      vehicleId: _vehicleId,
-      isFullTank: _isFullTank,
-      fuelLevelBeforeL: _fuelLevelBeforeL,
-      fuelLevelAfterL: afterL,
-      // #2689 — persist the receipt-scanned unit price verbatim when one
-      // was read; null for manual entries falls back to the computed
-      // pricePerLiter getter.
-      scannedPricePerLiter: _scannedPricePerLiter,
-    );
-
-    // #1401 phase 7b — when both adapter fuel-level captures are
-    // present and the user-entered litres differ from the adapter
-    // delta by more than 5 %, ask before persisting. Skip the gate
-    // entirely when either capture is missing — no baseline, no
-    // dialog. Dismissing the dialog is treated as "Keep my entry"
-    // (the user's typed value wins).
-    if (FillUpVariance.hasAdapterCapture(fillUp)) {
-      final adapterDelta = FillUpVariance.adapterDeltaL(fillUp)!;
-      if (FillUpVariance.isVarianceAbove5Percent(userLiters, adapterDelta)) {
-        final choice = await showFillUpVarianceDialog(
-          context: context,
-          userL: UnitFormatter.formatDecimal(userLiters, fractionDigits: 2),
-          adapterL: UnitFormatter.formatDecimal(adapterDelta, fractionDigits: 2),
-        );
-        if (!mounted) return;
-        if (choice == FillUpVarianceChoice.useAdapter) {
-          fillUp = fillUp.copyWith(liters: adapterDelta);
-        }
-      }
-    }
-
-    // Capture the root messenger + theme before the screen pops — the
-    // success confirmation appears on the surface we return to (#1692).
-    final messenger = ScaffoldMessenger.of(context);
-    final scheme = Theme.of(context).colorScheme;
-    final savedMessage = AppLocalizations.of(context).fillUpSavedSnackbar;
-
-    await ref.read(fillUpListProvider.notifier).add(fillUp);
-    if (!mounted) return;
-
-    // Guided reconciliation workflow (Epic #2439 / #2442) — the plein
-    // save above may have published a pending gap (recorded trips
-    // didn't account for all the pumped fuel). NEVER silent: raise the
-    // guided workflow now, before we pop, so the user attributes +
-    // resolves the gap. "Decide later" / dismiss leaves the pending
-    // gap intact (#2445). Logic lives in the extracted launcher so this
-    // save flow stays lean. Mirrors the await-choice-then-route shape
-    // of the variance prompt above.
-    await runReconciliationWorkflowIfPending(
-      context: context,
-      ref: ref,
-      savedFillUp: fillUp,
-    );
-    if (!mounted) return;
-
-    context.pop();
-    messenger.showSnackBar(
-      SnackBarHelper.successSnackBar(scheme, savedMessage),
-    );
-  }
-
-  /// #2836 — compute the fuel-mismatch / odometer-monotonicity warnings
-  /// for the pending entry and, when any fire, confirm with the user.
-  /// Returns true when it is OK to proceed (no warnings, or "Save
-  /// anyway"); false to abort the save ("Go back and fix" / dismiss).
-  Future<bool> _confirmDataQualityWarnings() async {
-    final vehicleId = _vehicleId;
-    if (vehicleId == null) return true; // no vehicle → no engine to match.
-    VehicleProfile? vehicle;
-    List<FillUp> allFills = const [];
-    try {
-      final vehicles = ref.read(vehicleProfileListProvider);
-      for (final v in vehicles) {
-        if (v.id == vehicleId) vehicle = v;
-      }
-      allFills = ref.read(fillUpListProvider);
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st,
-          context: const {'where': 'AddFillUp: warning-gate read failed'}));
-      return true; // can't evaluate → don't block the save.
-    }
-    if (vehicle == null) return true;
-    final enteredOdo = AddFillUpValidators.parseDouble(_odoCtrl.text);
-    final previousOdo = previousFillUpOdometerKm(
-      vehicleId: vehicleId,
-      date: _date,
-      allFillUps: allFills,
-    );
-    final warnings = computeFillUpWarnings(
-      vehicle: vehicle,
-      chosenFuel: _fuelType,
-      enteredOdometerKm: enteredOdo,
-      previousOdometerKm: previousOdo,
-    );
-    if (warnings.isEmpty) return true;
-    return showFillUpWarningDialog(
-      context: context,
-      warnings: warnings,
-      chosenFuel: _fuelType,
-      vehicleFuel: AddFillUpFuelResolver.fuelForVehicle(vehicle),
-      enteredOdoKm: UnitFormatter.formatDecimal(enteredOdo, fractionDigits: 0),
-      previousOdoKm: previousOdo == null
-          ? null
-          : UnitFormatter.formatDecimal(previousOdo, fractionDigits: 0),
-    );
-  }
-
-  /// #1693 — true once the user has entered any fill-up data (typed or
-  /// receipt-scanned). The form's controllers all start empty, so any
-  /// non-empty field means there is unsaved data the discard guard
-  /// should protect.
-  bool get _isDirty =>
-      _litersCtrl.text.isNotEmpty ||
-      _costCtrl.text.isNotEmpty ||
-      _odoCtrl.text.isNotEmpty ||
-      _notesCtrl.text.isNotEmpty;
-
-  /// #1693 — discard guard for a blocked pop (system back / the
-  /// leading button via `Navigator.maybePop`). Confirms with the user
-  /// before discarding the unsaved fill-up.
-  Future<void> _onPopInvoked(bool didPop, Object? result) async {
-    if (didPop) return;
-    final discard = await showDiscardChangesDialog(context);
-    if (discard && mounted) {
-      Navigator.of(context).pop();
-    }
   }
 
   @override
