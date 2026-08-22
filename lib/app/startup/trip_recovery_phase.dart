@@ -13,6 +13,7 @@ import '../../core/logging/error_logger.dart';
 import '../../core/storage/hive_boxes.dart';
 import '../../features/obd2/data/active_trip_recovery_service.dart';
 import '../../features/obd2/data/active_trip_repository.dart';
+import '../../features/obd2/data/active_trip_sample_wal.dart';
 import '../../features/obd2/data/paused_trip_recovery_service.dart';
 import '../../features/obd2/data/paused_trip_repository.dart';
 import '../../features/consumption/data/trip_history_repository.dart';
@@ -98,6 +99,7 @@ class TripRecoveryPhase {
     await HiveBoxes.initDeferred();
     if (!Hive.isBoxOpen(HiveBoxes.obd2ActiveTrip)) return;
     final activeRepo = ActiveTripRepository(
+      sampleWal: ActiveTripSampleWal.instance,
       box: Hive.box<String>(HiveBoxes.obd2ActiveTrip),
     );
     TripHistoryRepository? historyRepo;

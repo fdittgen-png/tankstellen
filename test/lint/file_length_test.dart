@@ -986,8 +986,10 @@ void main() {
     'lib/features/consumption/providers/trip_recording_provider.dart': (
       // #3597 — the salvage path now rebuilds the recovered summary from
       // samples (comment + call, +10). Decomposition tracked by #3140.
-      lines: 1296,
-      bumps: 10,
+      // #3758 — re-grandfathered 1296 → 1316: the append-WAL delta
+      // streaming + fresh-WAL seed (the ~40 min crash fix).
+      lines: 1316,
+      bumps: 11,
       decompositionIssue: 3140,
     ),
     'lib/features/feature_management/data/legacy_toggle_migrator.dart': (

@@ -225,6 +225,9 @@ class TripRecording extends _$TripRecording {
   /// gate so we don't pay a Hive write on every sample.
   DateTime? _lastSnapshotFlushAt;
 
+  /// #3758 — samples already streamed to the append-only WAL.
+  int _walWrittenCount = 0;
+
   /// Sample count since the last flush. Forces an out-of-band
   /// write when the user has been driving long enough to fill the
   /// buffer past the count threshold even if the time threshold
@@ -606,6 +609,7 @@ class TripRecording extends _$TripRecording {
     if (!Hive.isBoxOpen(HiveBoxes.obd2ActiveTrip)) return null;
     try {
       return ActiveTripRepository(
+        sampleWal: ActiveTripSampleWal.instance,
         box: Hive.box<String>(HiveBoxes.obd2ActiveTrip),
       );
     } catch (e, st) {
@@ -644,6 +648,10 @@ class TripRecording extends _$TripRecording {
     );
     _lastSnapshotFlushAt = null;
     _samplesSinceLastFlush = 0;
+    // #3758 — fresh trip, fresh sample WAL (truncates any stale file;
+    // recovery for a crashed session already ran at launch).
+    _walWrittenCount = 0;
+    unawaited(_resolveActiveRepo()?.sampleWal?.openFresh());
     // First-write seed so the recovery service has something on
     // disk even if the OS kills us before the first live sample
     // lands. Best-effort, fire-and-forget.
@@ -776,6 +784,19 @@ class TripRecording extends _$TripRecording {
     _lastSnapshotFlushAt = next.lastFlushedAt;
     _samplesSinceLastFlush = 0;
     try {
+      // #3758 — stream only the NEW samples into the append-only WAL
+      // (each written exactly once); saveSnapshot then persists meta
+      // only. This replaces the old whole-list re-serialization that
+      // crashed recordings at ~40 min.
+      final wal = repo.sampleWal;
+      if (wal != null) {
+        final samples = next.samples;
+        for (var i = _walWrittenCount; i < samples.length; i++) {
+          wal.append(samples[i]);
+        }
+        _walWrittenCount =
+            _walWrittenCount > samples.length ? _walWrittenCount : samples.length;
+      }
       await repo.saveSnapshot(next);
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording flush snapshot failed'}));

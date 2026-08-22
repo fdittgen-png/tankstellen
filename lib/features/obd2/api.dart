@@ -16,6 +16,7 @@
 library;
 
 export 'data/active_trip_repository.dart';
+export 'data/active_trip_sample_wal.dart';
 export 'data/protocol/adapter_capability.dart';
 export 'data/protocol/adapter_registry.dart';
 export 'data/transport/android_background_adapter_listener.dart';
