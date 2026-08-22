@@ -6998,6 +6998,16 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String tankLevelRangeLastIntervalFormat(String kilometres) {
+    return '≈ $kilometres km beim Verbrauch deiner letzten Tankfüllung';
+  }
+
+  @override
+  String tankLevelRangeLongRunFormat(String kilometres) {
+    return 'Langzeit-Durchschnitt: ≈ $kilometres km';
+  }
+
+  @override
   String tankLevelLastFillUpFormat(String date, String count) {
     return 'Letzter Tankvorgang: $date · $count Fahrt(en) seit';
   }

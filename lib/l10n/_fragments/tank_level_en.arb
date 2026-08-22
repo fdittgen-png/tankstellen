@@ -14,7 +14,25 @@
   },
   "tankLevelRangeFormat": "≈ {kilometres} km of range",
   "@tankLevelRangeFormat": {
-    "description": "Sub-text under the tank-level big number — distance the user can still drive at the vehicle's average L/100 km (#1195).",
+    "description": "Sub-text under the tank-level big number — distance the user can still drive at the vehicle's average L/100 km (#1195). Since #3764 shown only when no closed full-tank interval exists yet (the last-tank projection leads otherwise).",
+    "placeholders": {
+      "kilometres": {
+        "type": "String"
+      }
+    }
+  },
+  "tankLevelRangeLastIntervalFormat": "≈ {kilometres} km at your last tank's consumption",
+  "@tankLevelRangeLastIntervalFormat": {
+    "description": "Primary range sub-text under the tank-level big number (#3764) — distance the current tank content covers at the L/100 km measured over the LAST closed full-tank-to-full-tank interval.",
+    "placeholders": {
+      "kilometres": {
+        "type": "String"
+      }
+    }
+  },
+  "tankLevelRangeLongRunFormat": "Long-run average: ≈ {kilometres} km",
+  "@tankLevelRangeLongRunFormat": {
+    "description": "Secondary context line under the primary last-tank range projection (#3764) — the same tank content projected at the long-run tank-to-tank average consumption instead. Only shown when it differs from the primary figure.",
     "placeholders": {
       "kilometres": {
         "type": "String"

@@ -5556,5 +5556,25 @@
         "example": "2"
       }
     }
+  },
+  "tankLevelRangeLastIntervalFormat": "≈ {kilometres} km at your last tank's consumption",
+  "@tankLevelRangeLastIntervalFormat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "kilometres": {
+        "type": "String"
+      }
+    }
+  },
+  "tankLevelRangeLongRunFormat": "Long-run average: ≈ {kilometres} km",
+  "@tankLevelRangeLongRunFormat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "kilometres": {
+        "type": "String"
+      }
+    }
   }
 }

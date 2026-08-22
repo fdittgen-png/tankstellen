@@ -1971,6 +1971,8 @@
   "tankLevelTitle": "⟦Ŧáñķ łéṽéł ····⟧",
   "tankLevelLitersFormat": "⟦{litres} Ł⟧",
   "tankLevelRangeFormat": "⟦≈ {kilometres} ķɱ óƒ řáñǧé ····⟧",
+  "tankLevelRangeLastIntervalFormat": "⟦≈ {kilometres} ķɱ áŧ ýóúř łášŧ ŧáñķ'š çóñšúɱƥŧîóñ ·············⟧",
+  "tankLevelRangeLongRunFormat": "⟦Łóñǧ-řúñ áṽéřáǧé: ≈ {kilometres} ķɱ ·······⟧",
   "tankLevelLastFillUpFormat": "⟦Łášŧ ƒîłł-úƥ: {date} · {count} ŧřîƥ(š) šîñçé ·········⟧",
   "tankLevelEmptyNoFillUp": "⟦Łóǧ á ƒîłł-úƥ ŧó šéé ýóúř ŧáñķ łéṽéł ·············⟧",
   "tankLevelDetailSheetTitle": "⟦Ŧřîƥš šîñçé łášŧ ƒîłł-úƥ ·········⟧",

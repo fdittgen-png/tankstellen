@@ -3406,6 +3406,8 @@
   "tankLevelTitle": "Tankfüllstand",
   "tankLevelLitersFormat": "{litres} L",
   "tankLevelRangeFormat": "≈ {kilometres} km Reichweite",
+  "tankLevelRangeLastIntervalFormat": "≈ {kilometres} km beim Verbrauch deiner letzten Tankfüllung",
+  "tankLevelRangeLongRunFormat": "Langzeit-Durchschnitt: ≈ {kilometres} km",
   "tankLevelLastFillUpFormat": "Letzter Tankvorgang: {date} · {count} Fahrt(en) seit",
   "tankLevelEmptyNoFillUp": "Tankvorgang erfassen, um den Tankfüllstand zu sehen",
   "tankLevelDetailSheetTitle": "Fahrten seit dem letzten Tankvorgang",

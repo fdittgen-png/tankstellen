@@ -6930,6 +6930,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String tankLevelRangeLastIntervalFormat(String kilometres) {
+    return '≈ $kilometres km at your last tank\'s consumption';
+  }
+
+  @override
+  String tankLevelRangeLongRunFormat(String kilometres) {
+    return 'Long-run average: ≈ $kilometres km';
+  }
+
+  @override
   String tankLevelLastFillUpFormat(String date, String count) {
     return 'Last fill-up: $date · $count trip(s) since';
   }
@@ -14880,6 +14890,16 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String tankLevelRangeFormat(String kilometres) {
     return '⟦≈ $kilometres ķɱ óƒ řáñǧé ····⟧';
+  }
+
+  @override
+  String tankLevelRangeLastIntervalFormat(String kilometres) {
+    return '⟦≈ $kilometres ķɱ áŧ ýóúř łášŧ ŧáñķ\'š çóñšúɱƥŧîóñ ·············⟧';
+  }
+
+  @override
+  String tankLevelRangeLongRunFormat(String kilometres) {
+    return '⟦Łóñǧ-řúñ áṽéřáǧé: ≈ $kilometres ķɱ ·······⟧';
   }
 
   @override

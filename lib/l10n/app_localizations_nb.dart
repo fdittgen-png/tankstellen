@@ -6962,6 +6962,16 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
+  String tankLevelRangeLastIntervalFormat(String kilometres) {
+    return '≈ $kilometres km at your last tank\'s consumption';
+  }
+
+  @override
+  String tankLevelRangeLongRunFormat(String kilometres) {
+    return 'Long-run average: ≈ $kilometres km';
+  }
+
+  @override
   String tankLevelLastFillUpFormat(String date, String count) {
     return 'Siste tanking: $date · $count tur(er) siden';
   }

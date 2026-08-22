@@ -12045,11 +12045,23 @@ abstract class AppLocalizations {
   /// **'{litres} L'**
   String tankLevelLitersFormat(String litres);
 
-  /// Sub-text under the tank-level big number — distance the user can still drive at the vehicle's average L/100 km (#1195).
+  /// Sub-text under the tank-level big number — distance the user can still drive at the vehicle's average L/100 km (#1195). Since #3764 shown only when no closed full-tank interval exists yet (the last-tank projection leads otherwise).
   ///
   /// In en, this message translates to:
   /// **'≈ {kilometres} km of range'**
   String tankLevelRangeFormat(String kilometres);
+
+  /// Primary range sub-text under the tank-level big number (#3764) — distance the current tank content covers at the L/100 km measured over the LAST closed full-tank-to-full-tank interval.
+  ///
+  /// In en, this message translates to:
+  /// **'≈ {kilometres} km at your last tank\'s consumption'**
+  String tankLevelRangeLastIntervalFormat(String kilometres);
+
+  /// Secondary context line under the primary last-tank range projection (#3764) — the same tank content projected at the long-run tank-to-tank average consumption instead. Only shown when it differs from the primary figure.
+  ///
+  /// In en, this message translates to:
+  /// **'Long-run average: ≈ {kilometres} km'**
+  String tankLevelRangeLongRunFormat(String kilometres);
 
   /// Caption beneath the tank-level card — when the last fill-up was logged and how many trips have been recorded since (#1195).
   ///
