@@ -4418,6 +4418,16 @@
       }
     }
   },
+  "fuelEfficiencyIntervalCount": "{count, plural, =1{1 full tank} other{{count} full tanks}}",
+  "@fuelEfficiencyIntervalCount": {
+    "description": "Number of closed full-tank-to-full-tank intervals classified into a composition bucket, shown next to the fill count on the bucket's row in the per-fuel efficiency card (#3764). 'Full tank' matches the vocabulary of the insufficient-data footnote.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
   "fuelEfficiencyInsufficientData": "Log at least two full tanks per composition to crown the cheapest.",
   "@fuelEfficiencyInsufficientData": {
     "description": "Footnote shown on the per-fuel efficiency card when no winner can be crowned yet because at least one composition bucket has fewer than two closed plein-to-plein intervals (#2887, ADR 0015 verdict gate)."

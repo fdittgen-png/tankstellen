@@ -2397,6 +2397,7 @@
   "fuelEfficiencyColCostPerKm": "Kosten/km",
   "fuelEfficiencyColTotalSpent": "Gesamtausgaben",
   "fuelEfficiencyFillCount": "{count, plural, =1{1 Tankung} other{{count} Tankungen}}",
+  "fuelEfficiencyIntervalCount": "{count, plural, =1{1 volle Tankfüllung} other{{count} volle Tankfüllungen}}",
   "fuelEfficiencyInsufficientData": "Erfasse mindestens zwei volle Tankfüllungen pro Zusammensetzung, um den günstigsten zu küren.",
   "fuelEfficiencyCompositionFootnote": "Tankfüllungen werden nach Zusammensetzung gruppiert: rein, wenn ein Kraftstoff mindestens 85 % ausmacht, sonst eine Mischung.",
   "fuelNameE5": "Super E5",

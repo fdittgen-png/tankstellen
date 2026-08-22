@@ -5222,6 +5222,17 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
+  String fuelEfficiencyIntervalCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count full tanks',
+      one: '1 full tank',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get fuelEfficiencyInsufficientData =>
       'Log at least two full tanks per fuel to crown the cheapest.';
 

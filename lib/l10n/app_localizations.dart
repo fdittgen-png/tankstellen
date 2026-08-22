@@ -9199,6 +9199,12 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 fill} other{{count} fills}}'**
   String fuelEfficiencyFillCount(int count);
 
+  /// Number of closed full-tank-to-full-tank intervals classified into a composition bucket, shown next to the fill count on the bucket's row in the per-fuel efficiency card (#3764). 'Full tank' matches the vocabulary of the insufficient-data footnote.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 full tank} other{{count} full tanks}}'**
+  String fuelEfficiencyIntervalCount(int count);
+
   /// Footnote shown on the per-fuel efficiency card when no winner can be crowned yet because at least one composition bucket has fewer than two closed plein-to-plein intervals (#2887, ADR 0015 verdict gate).
   ///
   /// In en, this message translates to:

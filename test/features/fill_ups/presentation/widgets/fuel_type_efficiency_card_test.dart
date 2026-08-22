@@ -204,6 +204,47 @@ void main() {
   );
 
   testWidgets(
+    '#3764 — every bucket row (pure AND mix) shows its interval count '
+    'first-class next to the fill count',
+    (tester) async {
+      await pumpCard(
+        tester,
+        vehicle: flexCar,
+        data: [
+          pure(
+            fuel: FuelType.e85,
+            l100: 8.64,
+            costPerKm: 0.086,
+            totalSpent: 115,
+            fillCount: 3,
+            attributed: 2,
+          ),
+          mix(
+            dominant: FuelType.e85,
+            secondary: FuelType.e5,
+            l100: 7.5,
+            costPerKm: 0.072,
+            totalSpent: 80,
+            fillCount: 4,
+            attributed: 1,
+          ),
+        ],
+      );
+
+      // Both counts lines render, keyed per bucket.
+      expect(find.byKey(const ValueKey('fuel_efficiency_counts_e85')),
+          findsOneWidget);
+      expect(find.byKey(const ValueKey('fuel_efficiency_counts_e85|e5')),
+          findsOneWidget);
+      // Interval count + fill count on one line, per row.
+      expect(find.text('2 full tanks · 3 fills'), findsOneWidget);
+      expect(find.text('1 full tank · 4 fills'), findsOneWidget);
+      // The mix row still carries its blend label + metrics first-class.
+      expect(find.text('E85/E5'), findsWidgets);
+    },
+  );
+
+  testWidgets(
     'insufficient data → NO winner chip + placeholder for the null per-km '
     'bucket, total-spent kept',
     (tester) async {
