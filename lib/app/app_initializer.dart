@@ -52,54 +52,23 @@ import 'startup/telemetry_replay_phase.dart';
 import 'startup/trip_recovery_phase.dart';
 import 'widgets/storage_recovery_screen.dart';
 
-/// Drives the cold-start sequence in well-defined phases instead of one
-/// monolithic `main()` body. Splitting the work makes failures observable
-/// (each phase is wrapped in try/catch) and unblocks parallelisation of
-/// independent service inits — `LocalNotificationService`, `BackgroundService`
-/// and `HomeWidgetService` no longer run sequentially.
+part 'app_initializer_boot_support.dart';
+part 'app_initializer_deferred_tasks.dart';
+
+/// Drives the cold-start sequence in well-defined phases: **bootstrap** →
+/// **storage** → **services** (parallel) → **optional deferred**
+/// (post-first-frame) → **runApp**. Full phase narrative + #3139 notes:
+/// atop `app_initializer_deferred_tasks.dart` (`part`, move-only #3761).
 ///
-/// Phases (in order):
-///
-/// 1. **bootstrap** — Flutter binding, edge-to-edge, debug-print silencing.
-///    Synchronous and must succeed for any of the rest to make sense.
-/// 2. **storage** — Hive boxes, secure-storage API key, trace storage,
-///    profile migration, cache eviction. A failure here means the device
-///    can't write local data; we surface it but still attempt to keep
-///    going so the user isn't stuck on a black screen.
-///    The secure-storage API-key read and `TraceStorage.init()` run in
-///    parallel with each other (both only depend on `Hive.initFlutter` +
-///    the main-isolate box opens already being done) (#795 phase 1).
-/// 3. **services** — notifications, background tasks, home widget.
-///    Independent of each other → parallelised with `Future.wait`.
-/// 4. **optional (deferred)** — community config + TankSync, plus
-///    one-shot migrations (vehicle reference-catalog backfill #950, and
-///    the feature-flag legacy-toggle promoter #1373 phase 3a/3b/3e/3f).
-///    All scheduled for a post-first-frame microtask so the app paints
-///    before Supabase is touched (#795 phase 1) and before any Hive
-///    walks for the migrators run. Failures are logged but never block
-///    startup.
-/// 5. **runApp** — wires global error handlers and hands control to the
-///    Flutter framework. Wrapped in `SentryFlutter.init` when a DSN is
-///    configured so framework + platform errors land in Sentry.
-///
-/// ## Phase objects (#3139)
-///
-/// The bulky deferred work is decomposed into ordered phase objects under
-/// `lib/app/startup/` — [LaunchSyncPhase] (launch-time server→local
-/// merges), [TripRecoveryPhase] (paused-then-active trip crash recovery),
-/// [ProviderWarmupPhase] (one-shot migrations + keep-alive provider
-/// kick-offs) and [TelemetryReplayPhase] (background-isolate error-spool
-/// drain). This class stays the single ordering authority: every phase
-/// documents its slot in the sequence, and the scheduling (pre-Zone /
-/// post-bind / post-first-frame placement) lives ONLY here. The #3149
-/// storage catch-all stays inline in [run] because it must execute BEFORE
-/// `_launch` installs the global handlers — there is no Zone handler yet
-/// at that point, which is the entire reason it exists.
+/// This library stays the single ordering authority: every phase's slot
+/// and the scheduling (pre-Zone / post-bind / post-first-frame placement)
+/// live only here. The #3149 storage catch-all stays inline in [run]
+/// because it must execute BEFORE `_launch` installs the global handlers
+/// — there is no Zone handler yet at that point.
 class AppInitializer {
   AppInitializer._();
 
-  /// Runs the full cold-start sequence and starts the app. Designed to be
-  /// the *only* thing called from `main()`.
+  /// Runs the full cold-start sequence; the *only* thing `main()` calls.
   static Future<void> run({
     required Widget Function(ProviderContainer container) appBuilder,
   }) async {
@@ -108,20 +77,17 @@ class AppInitializer {
     _bootstrap();
     StartupTimer.instance.mark('binding');
 
-    // #2978 — load `intl` locale date-symbols so `DateFormat.EEEE` (the
-    // localized price-prediction weekday) works for non-`en_US` locales
-    // instead of throwing `LocaleDataException`. In-memory, off the I/O path.
+    // #2978 — load `intl` locale date-symbols so `DateFormat.EEEE` works
+    // for non-`en_US` locales instead of throwing `LocaleDataException`.
     await initializeDateFormatting();
 
     // #2294 — a Hive box damaged beyond crash recovery throws a
-    // HiveCorruptionException out of the storage phase. Previously it
-    // escaped uncaught — `_initStorage` had no try/catch, `run()`/`main()`
-    // had no Zone handler, and the error handlers are only installed in
-    // `_launch` (after storage) — so the user froze on the splash with no
-    // message and (debugPrint silenced in release) no telemetry. Surface
-    // a localized recovery screen and route the exception through
-    // errorLogger so it lands in the trace pipeline / Sentry. Startup
-    // cannot continue without local storage, so we stop here.
+    // HiveCorruptionException out of the storage phase; #3149 widened the
+    // net to ANY storage-phase fault. Both previously escaped uncaught —
+    // no Zone handler exists yet (handlers install only in `_launch`) —
+    // freezing the splash with no message and no telemetry. Surface a
+    // localized recovery screen and route the exception through
+    // errorLogger; startup cannot continue without local storage.
     try {
       await _initStorage();
     } on HiveCorruptionException catch (e, st) {
@@ -150,97 +116,40 @@ class AppInitializer {
 
     final storage = HiveStorage();
 
-    // #1794 / #1768 — post-first-frame storage work. `initDeferred()`
-    // opens the deep-feature Hive boxes; it is idempotent + cached, so
-    // the post-frame readers below (`_runTripsSyncMerge`, the trip
-    // recovery passes) await the same opens. Cache eviction and the
-    // country/language profile migration each walk an entire box and
-    // are not needed for the first frame, so they run here too.
+    // #1794/#1768 — post-first-frame storage work: deep-box opens
+    // (idempotent + cached; later post-frame readers await the same
+    // opens), #2264 bounded cache eviction (#3610 records the yield),
+    // the #2317 price-history retention trim, profile migrations.
     _deferPostFirstFrame(() async {
       unawaited(HiveBoxes.initDeferred());
-      // #2264 — bounded eviction (expiry + per-prefix budget + LRU byte
-      // ceiling) replaces the one-shot 500-key expiry cap.
       final evicted = await CacheManager(storage).evictBounded();
-      // #3610 — eviction volume is a field signal (a runaway cache shows
-      // up as a growing per-day count); record it instead of dropping it.
       if (evicted > 0) {
         healthCounters.increment('cache.evicted', by: evicted);
       }
-      // #2317 — trim price-history rows past the 30-day retention window
-      // once per cold start. The foreground record path (station detail)
-      // never trims, so without this hook a heavy user accumulates
-      // ~175k dead rows/year; reads already filter to the last 30 days,
-      // so this caps storage growth, not a correctness bug.
       await PriceHistoryRepository(storage).evictOldRecords();
-      final profileRepo = ProfileRepository(storage);
-      await profileRepo.migrateProfileCountryLanguage();
-      // #2597 — one profile per country: dedupe existing duplicates
-      // (idempotent, runs after the country backfill above).
-      await profileRepo.dedupeCountryProfiles();
+      await _migrateProfilesDeferred(storage);
     });
 
     // #795 phase 1 — defer Supabase/TankSync warm-up and community-config
-    // asset read until after the first frame (slow I/O, not needed for the
-    // landing UI). Call sites stay here (non-awaited) so structural
-    // ordering tests pinning `services < tankSync < launch` keep passing.
+    // asset read past the first frame. Call sites stay here (non-awaited)
+    // so structural ordering tests pinning `services < tankSync < launch`
+    // keep passing; the sequence body lives in [_runDeferredLaunchSync].
     _deferPostFirstFrame(() async {
       await CommunityConfig.load();
-      // #3445 — span the otherwise-invisible launch-sync phase when the
-      // Feature.startupTrace devtool is on (null = zero overhead).
-      final trace = LaunchSyncPhase.armTrace(container);
-      // #3447 — install the pull matrix + app-resume trigger BEFORE the
-      // init so a "sync now" tap can never observe an empty registry.
-      LaunchSyncPhase.registerPulls(container, storage);
-      LaunchSyncPhase.wireResumeSync(container);
-      await LaunchSyncTrace.spanned(
-          trace, 'tanksync_init', () => _maybeInitTankSync(storage));
-      // #3449 relink surface + #3450 background init-retry ladder.
-      LaunchSyncPhase.handleInitOutcome(container, storage);
-      // #3126 — one run id threads the launch merges into the trace.
-      if (TankSyncClient.client != null) SyncRunTrace.begin('launch');
-      // #3447/#3450 — every synced table pulls in parallel; each entry is
-      // consent-gated + time-boxed and no-ops when sync is off (see
-      // LaunchSyncPhase / LaunchSyncPulls).
-      await LaunchSyncPhase.runLaunchPulls(container, trace: trace);
-      trace?.finish();
+      await _runDeferredLaunchSync(container, storage,
+          initTankSync: _maybeInitTankSync);
     });
 
-    // Cache runtime version so AppConstants.appVersion is accurate (#570).
-    // Fire-and-forget: the value is read opportunistically (e.g. by the
-    // About screen), not on the first-frame critical path, so awaiting it
-    // would only delay `runApp`.
-    _deferPostFirstFrame(() async {
-      try {
-        final packageInfo = await _resolvePackageInfo();
-        AppConstants.setRuntimeVersion(
-          '${packageInfo.version}+${packageInfo.buildNumber}',
-        );
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.background, e, st,
-            context: {'where': 'resolveRuntimeVersion (#570)'}));
-      }
-    });
+    // #570 — cache the runtime version post-frame (About screen reads it).
+    _deferPostFirstFrame(_cacheRuntimeVersion);
 
-    // #950 phase 4 — one-shot `referenceVehicleId` backfill from the
-    // bundled reference catalog; deferred so the JSON asset read never
-    // blocks the landing UI (see ProviderWarmupPhase).
+    // #950 phase 4 — one-shot `referenceVehicleId` catalog backfill.
     _deferPostFirstFrame(
         () => ProviderWarmupPhase.migrateVehicleCatalog(container, storage));
 
-    // #1373 phase 3a/3b/3e/3f — kick off the legacy-toggle migrations
-    // at every cold start. Reading the provider's future triggers its
-    // `build`, which runs `migrateLegacyToggles` + `migrateUserProfileToggles`
-    // inside a microtask. The provider is `keepAlive: true` and idempotent
-    // (each migrator is gated on its own `*Migrated` flag), so re-firing
-    // on subsequent launches is a cheap no-op once the flags are set.
-    //
-    // Non-awaited: failures are non-fatal (the provider itself swallows +
-    // `debugPrint`s), and we don't want a slow Hive read to delay any
-    // other deferred work scheduled on the post-first-frame microtask.
-    // Previously this only fired when the user navigated to the
-    // feature-flags settings screen — see the docstring on
-    // `legacyToggleMigrationProvider` for why startup wiring was deferred
-    // during the original phase-3 dispatches.
+    // #1373 phase 3a/3b/3e/3f — legacy-toggle migration kick-off; reading
+    // `.future` triggers the build (keepAlive + idempotent no-op re-fire).
+    // Non-awaited, non-fatal — see `legacyToggleMigrationProvider`.
     _deferPostFirstFrame(() async {
       try {
         unawaited(container.read(legacyToggleMigrationProvider.future));
@@ -250,88 +159,30 @@ class AppInitializer {
       }
     });
 
-    // #3580 — crash forensics: restore the previous run's persisted
-    // breadcrumbs, start mirroring this run's ring to disk, then drain
-    // the native crash journal + ApplicationExitInfo so every abnormal
-    // process death (native crash / ANR / OOM kill — the "recording
-    // crashed with no traces" class) lands in the on-device error log
-    // with the context of what the app was doing when it died.
-    _deferPostFirstFrame(() async {
-      try {
-        final supportDir = await getApplicationSupportDirectory();
-        await BreadcrumbPersistence.init(supportDir.path);
-        await CrashForensicsHarvester.harvestAndLog();
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.background, e, st,
-            context: const {'where': 'crash forensics startup (#3580)'}));
-      }
-    });
+    // #3580 crash forensics + the #1858/#1925/#2465 provider warm-ups —
+    // four post-frame registrations, in order (see the part file).
+    _schedulePostFrameWarmups(container);
 
-    // #1858 — warm the keep-alive η_v recompute listener so it watches
-    // vehicle-profile edits before the user can reach the Edit-vehicle
-    // screen (see ProviderWarmupPhase).
-    _deferPostFirstFrame(
-        () => ProviderWarmupPhase.warmTripVeRecomputeListener(container));
-
-    // #1925 — arm the OBD2 debug-session recorder from the persisted
-    // opt-in flag (see ProviderWarmupPhase).
-    _deferPostFirstFrame(
-        () => ProviderWarmupPhase.armObd2DebugSessionLogging(container));
-
-    // #2465 — arm the OBD2 comm-health diagnostics collector from
-    // Feature.debugMode (see ProviderWarmupPhase).
-    _deferPostFirstFrame(
-        () => ProviderWarmupPhase.armObd2CommDiagnosticsGate(container));
-
-    // Eagerly resolve the home-widget cold-launch URI BEFORE we build
-    // the router so the very first redirect pass can land directly on
-    // the requested station detail (#widget-deeplink). Capped at 200 ms
-    // so a stuck plugin never blocks cold start — if the read overruns,
-    // the warm-click stream still handles the URI a moment later (one
-    // visible landing-screen flash is the worst case).
+    // Eagerly resolve the home-widget cold-launch URI BEFORE the router
+    // builds (#widget-deeplink); 200 ms cap — see [_stashWidgetLaunchUri].
     await _stashWidgetLaunchUri(container);
     StartupTimer.instance.mark('widget_launch_probe');
 
     StartupTimer.instance.mark('pre_run_app');
 
-    // #1769 — Sentry no longer wraps `runApp`; the old wrapper forced both
-    // `SentryFlutter.init` and the package-info round-trip onto the cold-start
-    // critical path. The app now paints first and Sentry initialises in the
-    // first post-first-frame microtask — native crash handlers come up a few
-    // hundred ms later, acceptable since Sentry only needs to be live before an
-    // error is *reported*, not before first paint. `_installErrorHandlers` is
-    // re-run afterwards so the `errorLogger` pipeline stays authoritative.
-    // #3492 — libre / F-Droid ships NO Sentry SDK (stub → no `io.sentry`), so
-    // never init there; `AppFlavor.isLibre` is const so R8 folds the block out.
+    // #1769 — Sentry no longer wraps `runApp`: the app paints first,
+    // Sentry initialises post-first-frame (it only needs to be live
+    // before an error is *reported*); `_installErrorHandlers` re-runs so
+    // `errorLogger` stays authoritative. #3492 — libre/F-Droid ships NO
+    // Sentry SDK; `AppFlavor.isLibre` is const so R8 folds the block out.
     final dsn = resolveSentryDsn(storage);
-    final consentGiven = storage
-            .getSetting('consent_error_reporting') as bool? ??
-        false;
+    final consentGiven =
+        storage.getSetting('consent_error_reporting') as bool? ?? false;
     if (!AppFlavor.isLibre && dsn.isNotEmpty && consentGiven) {
       _deferPostFirstFrame(() async {
         final packageInfo = await _resolvePackageInfo();
-        await SentryFlutter.init((options) {
-          options.dsn = dsn;
-          options.tracesSampleRate = 0.2;
-          options.environment = 'production';
-          options.release =
-              'tankstellen@${packageInfo.version}+${packageInfo.buildNumber}';
-          // #1109 — strip PII (emails, lat/lng, tokens, user/request blocks,
-          // long breadcrumbs) from every event before it leaves the device.
-          // The scrubber is a pure function shared with `TraceUploader`.
-          options.beforeSend = (event, hint) {
-            try {
-              return PiiScrubber.scrubSentryEvent(event);
-            } catch (e, st) {
-              // #3144 — breadcrumb-level (NOT errorLogger): a warn trace from
-              // inside beforeSend could recurse through the Sentry upload path.
-              // The breadcrumb still rides the next persisted trace.
-              log.info('Sentry beforeSend scrub failed: $e\n$st',
-                  tag: 'sentry');
-              return event;
-            }
-          };
-        });
+        await SentryFlutter.init(
+            (options) => _configureSentryOptions(options, dsn, packageInfo));
         _installErrorHandlers();
       });
     }
@@ -342,8 +193,7 @@ class AppInitializer {
   /// Builds the app's ONE root [ProviderContainer] — the production
   /// composition root (#3738). Every cross-boundary container override
   /// belongs here: `run()` used to build a bare `ProviderContainer()`,
-  /// which left the #3134 profile-language bridge overrides uninstalled
-  /// (dead code) while override-installing unit tests stayed green.
+  /// leaving the #3134 profile-language bridge overrides uninstalled.
   /// [overrides] lets the composition-root test append fakes after the
   /// real seams; production callers pass none.
   static ProviderContainer createContainer({
@@ -354,13 +204,9 @@ class AppInitializer {
       );
 
   /// Resolves the active Sentry DSN at startup. The user-stored
-  /// `sentry_dsn` setting (entered manually via Settings > Diagnostics)
-  /// always wins, otherwise we fall back to the build-time `SENTRY_DSN`
-  /// dart-define. Returns the empty string when neither is configured —
-  /// callers must check `dsn.isNotEmpty` before passing it to
-  /// `SentryFlutter.init` (#476).
-  ///
-  /// Exposed for unit tests.
+  /// `sentry_dsn` setting always wins, otherwise the build-time
+  /// `SENTRY_DSN` dart-define; empty string when neither is configured —
+  /// callers must check `dsn.isNotEmpty` (#476). Exposed for unit tests.
   static String resolveSentryDsn(HiveStorage storage) {
     final stored = storage.getSetting('sentry_dsn') as String?;
     if (stored != null && stored.isNotEmpty) return stored;
@@ -368,101 +214,34 @@ class AppInitializer {
     return buildDsn;
   }
 
-  /// #1769 — reading package info is a platform-channel round-trip.
-  /// Resolve it once, lazily; the same Future is shared by the
-  /// runtime-version cache and the Sentry release string so neither
-  /// path pays a second round-trip.
-  static Future<PackageInfo>? _packageInfoFuture;
-
-  static Future<PackageInfo> _resolvePackageInfo() =>
-      _packageInfoFuture ??= PackageInfo.fromPlatform();
-
-  // ---------------------------------------------------------------------------
-  // Phase 1 — bootstrap
-  // ---------------------------------------------------------------------------
-
-  static void _bootstrap() {
-    WidgetsFlutterBinding.ensureInitialized();
-    // Opt in to edge-to-edge display (required for Android 15+).
-    EdgeToEdge.enable();
-
-    // Note: we no longer override Flutter's default ImageCache size
-    // (was bumped to 200 MB / 2000 entries by #711 as a workaround
-    // for the persistent-gray-tile bug). The root cause was
-    // `TileLayer` caching failed fetches, now fixed at the
-    // tile-provider layer by #757 (RetryNetworkTileProvider +
-    // evictErrorTileStrategy). The Flutter default of
-    // 100 MB / 1 000 entries is sufficient for normal map usage.
-
-    // Silence debugPrint in release — it is NOT stripped by the compiler.
-    if (kReleaseMode) {
-      debugPrint = (String? message, {int? wrapWidth}) {};
-    }
-  }
-
-  // ---------------------------------------------------------------------------
-  // Phase 2 — storage
-  // ---------------------------------------------------------------------------
+  // Phase 2 — storage.
 
   static Future<void> _initStorage() async {
     await HiveStorage.init();
     StartupTimer.instance.mark('hive_init');
 
     // #795 phase 1 — API-key load (secure-storage read + legacy Hive
-    // settings migration) and trace-storage box-open are independent
-    // operations that both require `Hive.initFlutter` + the encrypted
-    // box opens already done above. Running them via `Future.wait`
-    // overlaps two I/O waits that used to be sequential.
+    // settings migration) and trace-storage box-open are independent;
+    // `Future.wait` overlaps I/O waits that used to be sequential.
     await Future.wait<void>([
       HiveStorage.loadApiKey(),
       TraceStorage.init(),
-      // #3184 — persisted OBD2 connect-trace ring: hydrates the in-memory
-      // ring, registers the persist hook + the `obd2ConnectTraces` export
-      // section. Independent of the other two (own box); best-effort.
+      // #3184 — persisted OBD2 connect-trace ring (own box; best-effort).
       Obd2ConnectTracePersistence.init(),
       HealthCounters.init(), // #3146 — always-on production counters
     ]);
 
-    // Verify all countries have registered service implementations.
-    // Fails fast in debug mode if country_config.dart and the registry diverge.
-    assert(() {
-      CountryServiceRegistry.assertAllCountriesRegistered();
-      return true;
-    }(), 'every configured country must have a registered service');
-
-    // Safety net: guarantee a default profile always exists (#555).
-    // The onboarding wizard calls ensureDefaultProfile() at completion,
-    // but if the wizard was ever skipped (e.g., by the #521 hasApiKey
-    // regression), the app would run without any profile. This stays on
-    // the critical path — the first route depends on a profile existing.
-    //
-    // #1768 — cache eviction and the country/language profile migration
-    // used to run here too; both walk an entire Hive box and neither
-    // result is needed to paint the first frame, so they are deferred
-    // past it (see `run()`'s post-first-frame block).
-    final profileRepo = ProfileRepository(HiveStorage());
-    await profileRepo.ensureDefaultProfile();
+    // Debug-mode country-registry check + the #555 default-profile safety
+    // net (critical path — the first route depends on a profile existing).
+    await _verifyRegistryAndSeedProfile();
   }
 
-  // ---------------------------------------------------------------------------
-  // Post-first-frame deferral
-  // ---------------------------------------------------------------------------
+  // Post-first-frame deferral.
 
-  /// Schedules [body] to run *after* Flutter has drawn the first frame.
-  ///
-  /// Introduced by #795 phase 1 so TankSync, CommunityConfig, and the
-  /// runtime-version PackageInfo read no longer block the first paint.
-  ///
-  /// Implementation detail: we enqueue a microtask that immediately
-  /// registers a post-frame callback. Doing it this way instead of a
-  /// plain `scheduleMicrotask(body)` guarantees the work is held back
-  /// until there's actually something on screen — on a slow device the
-  /// microtask queue is drained *before* the first frame paints, so we
-  /// need the scheduler hook to hit the intended "after first paint"
-  /// ordering.
-  ///
-  /// Errors inside [body] are caught and logged; a failure in the
-  /// deferred work must never crash the running app.
+  /// Schedules [body] to run *after* Flutter has drawn the first frame
+  /// (#795 phase 1) — a post-frame callback, NOT a bare microtask (the
+  /// microtask queue can drain *before* the first paint on slow devices).
+  /// Errors inside [body] are caught + logged, never crash the app.
   @visibleForTesting
   static void deferPostFirstFrame(Future<void> Function() body) =>
       _deferPostFirstFrame(body);
@@ -478,26 +257,18 @@ class AppInitializer {
       }
     }
 
-    // `SchedulerBinding.instance` is non-null once
-    // `WidgetsFlutterBinding.ensureInitialized()` has run, which
-    // `_bootstrap()` guarantees before we reach this point. The
-    // callback fires on the first post-frame phase and we then run
-    // the work as a microtask so it doesn't extend the frame budget.
+    // Non-null once `_bootstrap()` ran `ensureInitialized()`; the work
+    // then runs as a microtask off the frame budget.
     SchedulerBinding.instance.addPostFrameCallback((_) {
       unawaited(run());
     });
   }
 
-  // ---------------------------------------------------------------------------
-  // Phase 3 — services (parallel)
-  // ---------------------------------------------------------------------------
+  // Phase 3 — services (parallel).
 
-  /// Notifications, background tasks, and the home widget initialiser are
-  /// independent — running them in parallel cuts cold-start time on devices
-  /// where one of them blocks on a slow plugin handshake.
-  ///
-  /// Each future is individually error-protected so a failure in (say) the
-  /// home widget plugin doesn't prevent notifications from being available.
+  /// Notifications, background tasks and the home widget initialiser are
+  /// independent — parallelised; each future is individually
+  /// error-protected so one failing plugin doesn't block the others.
   static Future<void> _initServicesInParallel() async {
     await Future.wait<void>([
       _safe('notifications', LocalNotificationService().initialize),
@@ -507,46 +278,21 @@ class AppInitializer {
   }
 
   /// Schedule periodic price polling only when the user has at least one
-  /// active alert (#713). Alerts are the only user-consented reason to
-  /// poll the station APIs on a regular schedule — per Tankerkönig's
-  /// terms of service, apps must use "requests on demand" and avoid
-  /// regular non-user-initiated requests. #2210 — delegates to
-  /// BackgroundService.reconcile so BOTH price and radius alerts gate
-  /// the scheduler (radius-only users were previously never scheduled).
-  ///
-  /// #3169 — after reconciling the schedule, a cold launch also fires an
-  /// opportunistic scan: on iOS the app-open moment is one of the few
-  /// execution windows the OS reliably grants (Android implements it as
-  /// a no-op). The coordinator's cross-trigger cooldown keeps repeated
-  /// launches free.
+  /// active alert (#713 — per Tankerkönig's ToS, requests on demand only).
+  /// #2210 — reconcile gates BOTH price and radius alerts. #3169 — a cold
+  /// launch also fires an opportunistic scan (an execution window iOS
+  /// reliably grants; Android no-ops), cross-trigger-cooldown-gated.
   static Future<void> _maybeInitBackground() async {
     await BackgroundService.reconcile();
     await BackgroundService.onOpportunisticWake();
   }
 
-  static Future<void> _safe(String label, Future<void> Function() body) async {
-    try {
-      await body();
-    } catch (e, st) {
-      // #3143 — pre-bind, so this spools via IsolateErrorSpool and is
-      // drained into the trace pipeline post-first-frame.
-      unawaited(errorLogger.log(ErrorLayer.background, e, st,
-          context: {'where': 'serviceInit', 'service': label}));
-    }
-  }
+  // Phase 4 — optional TankSync.
 
-  // ---------------------------------------------------------------------------
-  // Phase 4 — optional TankSync
-  // ---------------------------------------------------------------------------
-
-  /// Initialises Supabase if the user has opted in. Wrapped in a hard 8-second
-  /// timeout: a stuck Supabase init must not block the first frame.
-  ///
-  /// The init body — including the #3449 stored-identity guard (a stored
-  /// `sync_user_id` with no session must NOT be papered over with a fresh
-  /// anonymous UUID) — lives in [TankSyncInit]; the deferred launch block
-  /// reads `TankSyncInit.lastOutcome` afterwards to surface the relink
-  /// state and arm the #3450 background retry ladder.
+  /// Initialises Supabase if the user has opted in, under a hard 8-second
+  /// timeout: a stuck init must not block the first frame. The body —
+  /// incl. the #3449 stored-identity guard — lives in [TankSyncInit]; the
+  /// deferred launch block reads `lastOutcome` (#3449 relink, #3450 retry).
   static Future<void> _maybeInitTankSync(HiveStorage storage) async {
     try {
       await TankSyncInit.run(storage).timeout(const Duration(seconds: 8));
@@ -561,82 +307,31 @@ class AppInitializer {
     }
   }
 
-  /// Reads the URI carried by the home-widget tap that cold-started
-  /// the app (if any) and stashes it in [pendingWidgetUriProvider] so
-  /// the router's redirect chain can land the user on the station
-  /// detail directly — no landing-screen flash, no post-frame race.
-  ///
-  /// Capped by a short timeout: the `home_widget` plugin's platform
-  /// channel is normally instant, but a stuck implementation must not
-  /// block cold start. On timeout / error the warm-click stream still
-  /// delivers the URI a few frames later — the cost is the very
-  /// situation this method was written to remove (a brief landing-
-  /// screen flash), not data loss.
+  /// Reads the URI carried by the home-widget tap that cold-started the
+  /// app (if any) and stashes it in [pendingWidgetUriProvider]. The probe
+  /// body (200 ms cap) lives in [_probeWidgetLaunchUri]; the stash
+  /// closure keeps the provider read lazy — only fired when a URI exists.
   static Future<void> _stashWidgetLaunchUri(
     ProviderContainer container,
-  ) async {
-    try {
-      final uri = await HomeWidget.initiallyLaunchedFromHomeWidget()
-          .timeout(const Duration(milliseconds: 200));
-      if (uri == null) return;
-      // #2600 — the only widget launch URI is a station deep-link now.
-      // The refresh button no longer launches the app (it is a native
-      // broadcast handled in place), so the former #2159 refresh-marker
-      // discrimination was removed: every launch URI is a route to stash.
-      container.read(pendingWidgetUriProvider.notifier).set(uri);
-    } on TimeoutException {
-      // Expected benign race (stuck plugin / slow channel) — the warm-click
-      // stream still delivers the URI. Breadcrumb, not an ERROR trace.
-      BreadcrumbCollector.add('widget-launch-probe-timeout',
-          detail: '200ms — falling back to the warm-click stream');
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st,
-          context: {'where': 'stashWidgetLaunchUri'}));
-    }
+  ) {
+    return _probeWidgetLaunchUri(
+      stash: (uri) =>
+          container.read(pendingWidgetUriProvider.notifier).set(uri),
+    );
   }
 
-  // ---------------------------------------------------------------------------
-  // Phase 5 — runApp
-  // ---------------------------------------------------------------------------
+  // Phase 5 — runApp.
 
   /// Wires the framework + platform error handlers onto the app's
-  /// [errorLogger] pipeline.
-  ///
-  /// Called from [_launch], and again right after the deferred
-  /// `SentryFlutter.init` (#1769): Sentry's `FlutterErrorIntegration`
-  /// and `OnErrorIntegration` chain themselves onto these hooks during
-  /// init, so re-running this keeps the app's `errorLogger` routing
-  /// authoritative — exactly as `_launch` did when it ran inside
-  /// Sentry's old `appRunner`.
+  /// [errorLogger] pipeline. Called from [_launch], and again right after
+  /// the deferred `SentryFlutter.init` (#1769): Sentry chains itself onto
+  /// these hooks during init, so re-running keeps the app's `errorLogger`
+  /// routing authoritative. Handler bodies live in the part file (#3761).
   static void _installErrorHandlers() {
     // Capture Flutter framework errors (build, layout, paint).
-    FlutterError.onError = (details) {
-      FlutterError.presentError(details);
-      if (isTileFetchNoise(details.exception) ||
-          isBenignStreamCancel(details.exception) ||
-          isHandledImageNetworkNoise(details.library, details.exception)) {
-        return;
-      }
-      unawaited(errorLogger.log(
-        ErrorLayer.ui,
-        details.exception,
-        details.stack ?? StackTrace.current,
-        context: <String, Object?>{
-          'where': 'FlutterError.onError', // #3150 — name the handler
-          'library': details.library,
-          'context': details.context?.toString(),
-        },
-      ));
-    };
+    FlutterError.onError = _onFlutterError;
     // Capture async / platform errors that escape the framework.
-    PlatformDispatcher.instance.onError = (error, stack) {
-      if (isTileFetchNoise(error) || isBenignStreamCancel(error)) return true;
-      // #3150 — context so a dispatcher-caught trace is distinguishable
-      // from a bare errorLogger call site.
-      unawaited(errorLogger.log(ErrorLayer.other, error, stack,
-          context: const {'where': 'PlatformDispatcher.onError'}));
-      return true;
-    };
+    PlatformDispatcher.instance.onError = _onPlatformDispatcherError;
   }
 
   static void _launch(
@@ -644,45 +339,15 @@ class AppInitializer {
     Widget Function(ProviderContainer container) appBuilder,
   ) {
     // #1104 — bind the unified errorLogger to this container so every
-    // call to `errorLogger.log(layer, e, st)` from the foreground
-    // isolate routes through TraceRecorder + Sentry. Background-isolate
-    // callsites never reach this path; they fall through to the Hive
-    // ring buffer (IsolateErrorSpool) and are replayed below.
+    // foreground `errorLogger.log(...)` routes through TraceRecorder +
+    // Sentry (background isolates spool via IsolateErrorSpool, replayed
+    // by TelemetryReplayPhase).
     errorLogger.bind(container);
     _installErrorHandlers();
 
-    // #609 — kick the 2-minute nearest-widget heartbeat so the home-screen
-    // widget stays fresh while the app is running (see ProviderWarmupPhase).
-    ProviderWarmupPhase.startNearestWidgetHeartbeat(container);
-
-    // #1004 phase 4-WAL — finalise paused trips that survived an app
-    // kill mid-grace-window. Sequenced BEFORE the active recovery AND
-    // the orchestrator start below so the user lands on a history list
-    // with the recovered trip already populated (see TripRecoveryPhase).
-    _deferPostFirstFrame(() => TripRecoveryPhase.recoverPausedTrips(container));
-
-    // #1303 — recover an in-progress trip whose process was killed
-    // before it could finalise. Sequenced AFTER the paused-trip recovery
-    // so a stale paused row from the same drive lands in history before
-    // the active recovery re-enters the recording UI
-    // (see TripRecoveryPhase).
-    _deferPostFirstFrame(() => TripRecoveryPhase.recoverActiveTrip(container));
-
-    // #1004 phase 2b-2 — start the auto-record orchestrator, with the
-    // #3167 iOS Core Bluetooth state-restoration opt-in sequenced first
-    // inside the same deferred block (see ProviderWarmupPhase).
-    _deferPostFirstFrame(
-        () => ProviderWarmupPhase.startAutoRecordOrchestrator(container));
-
-    // #1193 phase 2 — wire the vehicle aggregator's `runForVehicle` hook
-    // onto `TripHistoryRepository.onSavedHook` (see ProviderWarmupPhase).
-    _deferPostFirstFrame(
-        () => ProviderWarmupPhase.wireVehicleAggregatorHook(container));
-
-    // #1105 — drain the background-isolate error spool through the
-    // foreground TraceRecorder (see TelemetryReplayPhase).
-    _deferPostFirstFrame(
-        () => TelemetryReplayPhase.drainIsolateErrorSpool(container));
+    // #609 heartbeat, #1004/#1303 trip recoveries, orchestrator start,
+    // aggregator hook, isolate-spool drain — in order (see part file).
+    _scheduleLaunchDeferredPhases(container);
 
     // #3149 — replay a previous bricked launch's plain-file cause record
     // into the trace pipeline, so the frozen splash finally has a why.
@@ -700,9 +365,8 @@ class AppInitializer {
 
     StartupTimer.instance.mark('first_frame');
     StartupTimer.instance.finish();
-    // #2320 — surface the cold-start total as a trace breadcrumb (visible
-    // in production error traces — StartupTimer.finish() only prints under
-    // kDebugMode; BreadcrumbCollector is drained into every error trace).
+    // #2320 — surface the cold-start total as a trace breadcrumb (finish()
+    // only prints under kDebugMode; breadcrumbs ride every error trace).
     final totalMs = StartupTimer.instance.totalMs;
     if (totalMs != null) {
       BreadcrumbCollector.add('startup', detail: '${totalMs}ms');
