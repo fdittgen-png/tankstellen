@@ -7,7 +7,6 @@ import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as img;
 
 import '../../../../core/logging/error_logger.dart';
-import 'ocr_image_preprocessor.dart';
 
 /// Re-encodes [jpegBytes] with any EXIF orientation baked into the
 /// pixel data (#1711).
@@ -35,62 +34,49 @@ Uint8List? bakeImageOrientation(Uint8List jpegBytes) {
   }
 }
 
-/// Re-encodes a pump-display capture for OCR (#2275, replacing #1860).
+/// Longest-side cap (pixels) for the temp copy handed to the OCR engine
+/// (#3766). Receipt prose reads reliably from ~1080 px up; 1600 keeps
+/// comfortable headroom while bounding the decoded bitmap the engine
+/// (and this pipeline's own decode) must hold: a shared 4000×3000 photo
+/// decodes to ~46 MB RGBA, the 1600 px copy to ~7 MB.
+const int kReceiptOcrMaxDimension = 1600;
+
+/// Re-encodes [jpegBytes] for OCR (#3766): bakes any EXIF orientation
+/// into the pixels (#1711 — ML Kit ignores the tag) and, when the
+/// upright image's longest side exceeds [maxDimension], downscales it
+/// (aspect preserved) in the same single decode/encode pass. Images at
+/// or under the cap are never upscaled — they take the exact
+/// [bakeImageOrientation] output shape as before.
 ///
-/// The #1860 pass did `grayscale → normalize → contrast(140)` over the
-/// **whole frame** — a *global* operation that AMPLIFIES specular glare
-/// (a bright reflection drags the whole histogram and crushes the
-/// digits beside it) and never used the reticle the user framed. This
-/// rebuild:
+/// This runs on a temp COPY only — the original capture on disk keeps
+/// its full resolution for the bad-scan report flow (#713).
 ///
-///   1. **bakes EXIF orientation** (phone-hold correction);
-///   2. **crops to the reticle [roi]** FIRST so all downstream work is
-///      on the readout, not the metrology stickers / card reader;
-///   3. **grayscale** — colour is noise on a monochrome LCD;
-///   4. **denoise** — a light blur before thresholding;
-///   5. **Sauvola adaptive (local) binarization** — each pixel is
-///      thresholded against its own neighbourhood, so a reflection on
-///      one corner no longer blows out the digits elsewhere;
-///   6. **morphological close** — bridges the gaps adaptive
-///      thresholding leaves between a glyph's strokes.
-///
-/// Scoped to the pump-display path only — `scanReceipt`'s prose-receipt
-/// OCR keeps the plain [bakeImageOrientation] path. Returns the
-/// processed JPEG bytes, or `null` when the input cannot be decoded.
-Uint8List? preprocessPumpDisplayForOcr(
+/// Returns the processed JPEG bytes, or `null` when the input cannot be
+/// decoded as a JPEG — the caller then OCRs the original unchanged.
+Uint8List? prepareReceiptImageForOcr(
   Uint8List jpegBytes, {
-  OcrNormalizedRect? roi,
-  OcrImagePreprocessor preprocessor = const OcrImagePreprocessor(),
-  bool binarize = true,
+  int maxDimension = kReceiptOcrMaxDimension,
 }) {
   try {
     final decoded = img.decodeJpg(jpegBytes);
     if (decoded == null) return null;
-    final upright = img.bakeOrientation(decoded);
-    final cropped =
-        roi != null ? preprocessor.cropToRoi(upright, roi) : upright;
-    final gray = preprocessor.toGrayscale(cropped);
-    final denoised = preprocessor.denoise(gray);
-    if (!binarize) {
-      // #2798 — contrast-stretched GRAYSCALE (the originally-documented #1860
-      // intent). ML Kit is trained on natural/grayscale images, not 1-bit line
-      // art: the #2275 Sauvola binarization, run with a fixed window against a
-      // large crop, fits inside one fat 7-segment stroke and dissolves the
-      // value digits to background — only the thin printed labels survive. The
-      // pump path retries with this grayscale variant when the binarized pass
-      // recovers nothing.
-      return img.encodeJpg(img.normalize(denoised, min: 0, max: 255),
-          quality: 90);
+    var upright = img.bakeOrientation(decoded);
+    final longest =
+        upright.width > upright.height ? upright.width : upright.height;
+    if (longest > maxDimension) {
+      // `average` interpolation keeps thin receipt glyph strokes legible
+      // on the way down (plain nearest-neighbour aliases them).
+      upright = upright.width >= upright.height
+          ? img.copyResize(upright,
+              width: maxDimension, interpolation: img.Interpolation.average)
+          : img.copyResize(upright,
+              height: maxDimension, interpolation: img.Interpolation.average);
     }
-    final binary = preprocessor.sauvolaBinarize(denoised);
-    final closed = preprocessor.morphologicalClose(binary);
-    return img.encodeJpg(closed, quality: 90);
+    return img.encodeJpg(upright, quality: 90);
   } catch (e, st) {
     // A malformed / non-JPEG file is not fatal — OCR the original.
     unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-        context: const {
-          'where': 'preprocessPumpDisplayForOcr: decode failed'
-        }));
+        context: const {'where': 'prepareReceiptImageForOcr: decode failed'}));
     return null;
   }
 }

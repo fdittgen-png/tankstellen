@@ -4728,14 +4728,6 @@ class AppLocalizationsEt extends AppLocalizations {
       'Skannige trükitud tšekk lehel Lisa tankimine, et eeltäita kuupäev, liitrid, kogusumma ja tankla.';
 
   @override
-  String get featureLabel_addFillUpOcrPump =>
-      'Tankuri ekraani OCR (eksperimentaalne)';
-
-  @override
-  String get featureDescription_addFillUpOcrPump =>
-      'Skannige tankuri ekraani, et eeltäita vorm. Tuvastus pole tänapäeval usaldusväärne — aktiveerige ainult siis, kui soovite testida.';
-
-  @override
   String get featureLabel_developerPatToken =>
       'Arendaja tagasiside (GitHub PAT)';
 
@@ -5007,43 +4999,7 @@ class AppLocalizationsEt extends AppLocalizations {
   }
 
   @override
-  String get scanPumpSuccess => 'Pumba kuvar skaneeritud — kontrolli väärtusi.';
-
-  @override
-  String get scanPumpGlare =>
-      'Ekraanil on liiga palju peegeldust — proovige uuesti väikese nurga alt, et numbrid ei oleks ülevalgustatud.';
-
-  @override
-  String get scanPumpInconsistent =>
-      'Skaneeritud väärtused ei klapi — sisestage need käsitsi.';
-
-  @override
-  String scanPumpFailed(String error) {
-    return 'Pumba skaneerimineen ebaõnnestus: $error';
-  }
-
-  @override
   String get badScanReportTitleReceipt => 'Teata skaneerimisveast — kviitung';
-
-  @override
-  String get badScanReportTitlePumpDisplay =>
-      'Teata skaneerimisveast — pumba kuvar';
-
-  @override
-  String get pumpScanFailureTitle => 'Kuvar loetamatu';
-
-  @override
-  String get pumpScanFailureBody =>
-      'Skaneeriminen ei suutnud pumba kuvarit lugeda. Mida soovid teha?';
-
-  @override
-  String get pumpScanFailureCorrectManually => 'Paranda käsitsi';
-
-  @override
-  String get pumpScanFailureReport => 'Teata';
-
-  @override
-  String get pumpScanFailureRemove => 'Eemalda foto';
 
   @override
   String get badScanReportHint =>
@@ -5087,37 +5043,6 @@ class AppLocalizationsEt extends AppLocalizations {
       'Saatmine ebaõnnestus — käsitsi jagamine';
 
   @override
-  String get pumpCameraCapture => 'Pildista';
-
-  @override
-  String get pumpCameraPermissionDenied =>
-      'Tankla ekraani skannimiseks on vaja kaamera juurdepääsu. Lubage see seadme seadetes.';
-
-  @override
-  String get pumpCameraError =>
-      'Kaamerat ei õnnestunud käivitada. Proovige uuesti või sisestage väärtused käsitsi.';
-
-  @override
-  String get pumpCameraOrientationHorizontal =>
-      'Lülitu horisontaalsele paigutusele';
-
-  @override
-  String get pumpCameraOrientationVertical =>
-      'Lülitu vertikaalsele paigutusele';
-
-  @override
-  String get pumpCameraGlareWarning =>
-      'Liiga palju läiget — kallutage veidi, et vältida peegeldusi';
-
-  @override
-  String get pumpCameraAlignHint =>
-      'Joondage ekraan raami sisse ja seejärel tehke foto';
-
-  @override
-  String get pumpCameraRotateToLandscape =>
-      'Pöörake telefon külili — pumba ekraan on lai, nii tulevad numbrid suuremad ja püstised';
-
-  @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
 
   @override
@@ -5150,9 +5075,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get fillUpImportReceiptLabel => 'Kviitung';
-
-  @override
-  String get fillUpImportPumpLabel => 'Pumba kuvar';
 
   @override
   String get fillUpPricePerLiterLabel => 'Hind liitri kohta';
@@ -5217,6 +5139,17 @@ class AppLocalizationsEt extends AppLocalizations {
       locale: localeName,
       other: '$count fills',
       one: '1 fill',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fuelEfficiencyIntervalCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count full tanks',
+      one: '1 full tank',
     );
     return '$_temp0';
   }
@@ -6354,12 +6287,6 @@ class AppLocalizationsEt extends AppLocalizations {
       'Käivitage pumba / kviitungi OCR-konveier valitud fotol ja kontrollige iga sammu — saadaval ainult arendajarežiimis.';
 
   @override
-  String get ocrTesterModePump => 'Pump';
-
-  @override
-  String get ocrTesterModeReceipt => 'Kviitung';
-
-  @override
   String get ocrTesterCapture => 'Jäädvusta';
 
   @override
@@ -6468,13 +6395,6 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get ocrTesterExported =>
       'OCR pakett salvestatud allalaadimiste kausta.';
-
-  @override
-  String get ocrTesterSaveFixture => 'Salvesta fikseeritud andmestikuna';
-
-  @override
-  String get ocrTesterFixtureSaved =>
-      'Fikseeritud andmestik salvestatud allalaadimiste kausta. Teisaldage see kausta test/fixtures ja käivitage tool/promote_ocr_fixture.dart.';
 
   @override
   String get onboardingObd2StepTitle => 'Ühenda oma OBD2 adapter';
@@ -6946,6 +6866,16 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String tankLevelRangeFormat(String kilometres) {
     return '≈ $kilometres km läbisõiduvaru';
+  }
+
+  @override
+  String tankLevelRangeLastIntervalFormat(String kilometres) {
+    return '≈ $kilometres km at your last tank\'s consumption';
+  }
+
+  @override
+  String tankLevelRangeLongRunFormat(String kilometres) {
+    return 'Long-run average: ≈ $kilometres km';
   }
 
   @override

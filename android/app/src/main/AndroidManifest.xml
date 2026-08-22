@@ -7,7 +7,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET"/>
-    <!-- #1868 — in-app camera for the pump-display capture reticle. -->
+    <!-- Camera: mobile_scanner's payment-QR scanner, and required for
+         image_picker's ACTION_IMAGE_CAPTURE receipt capture once the
+         permission is declared at all (Android quirk). -->
     <uses-permission android:name="android.permission.CAMERA"/>
 
     <!-- #3506 — strip permissions merged in by libraries the app never

@@ -4727,14 +4727,6 @@ class AppLocalizationsDa extends AppLocalizations {
       'Scan en udskrevet kvittering på skærmen Tilføj påfyldning for at forudfylde dato, liter, total og station.';
 
   @override
-  String get featureLabel_addFillUpOcrPump =>
-      'Pumpedisplay OCR (eksperimentel)';
-
-  @override
-  String get featureDescription_addFillUpOcrPump =>
-      'Scan et brændstofpumpedisplay for at forudfylde formularen. Genkendelsen er upålidelig i dag — tilmeld dig kun, hvis du vil teste.';
-
-  @override
   String get featureLabel_developerPatToken => 'Udvikler-feedback (GitHub PAT)';
 
   @override
@@ -5004,44 +4996,8 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
-  String get scanPumpSuccess => 'Pumpedisplay scannet — verificér værdierne.';
-
-  @override
-  String get scanPumpGlare =>
-      'For meget genskin på displayet — prøv igen i en let vinkel, så tallene ikke bliver overstrålet.';
-
-  @override
-  String get scanPumpInconsistent =>
-      'De scannede værdier stemmer ikke overens — indtast dem venligst manuelt.';
-
-  @override
-  String scanPumpFailed(String error) {
-    return 'Pumpe-scanning mislykkedes: $error';
-  }
-
-  @override
   String get badScanReportTitleReceipt =>
       'Rapporter en scanningsfejl — Kvittering';
-
-  @override
-  String get badScanReportTitlePumpDisplay =>
-      'Rapporter en scanningsfejl — Pumpedisplay';
-
-  @override
-  String get pumpScanFailureTitle => 'Display kan ikke læses';
-
-  @override
-  String get pumpScanFailureBody =>
-      'Scanningen kunne ikke læse pumpedisplayet. Hvad vil du gøre?';
-
-  @override
-  String get pumpScanFailureCorrectManually => 'Ret manuelt';
-
-  @override
-  String get pumpScanFailureReport => 'Rapporter';
-
-  @override
-  String get pumpScanFailureRemove => 'Fjern foto';
 
   @override
   String get badScanReportHint =>
@@ -5085,35 +5041,6 @@ class AppLocalizationsDa extends AppLocalizations {
       'Indsendelse mislykkedes — manuel deling';
 
   @override
-  String get pumpCameraCapture => 'Tag billede';
-
-  @override
-  String get pumpCameraPermissionDenied =>
-      'Kameraadgang er nødvendig for at scanne standerdisplayet. Aktivér det i enhedens indstillinger.';
-
-  @override
-  String get pumpCameraError =>
-      'Kameraet kunne ikke starte. Prøv igen, eller indtast værdierne manuelt.';
-
-  @override
-  String get pumpCameraOrientationHorizontal => 'Skift til vandret layout';
-
-  @override
-  String get pumpCameraOrientationVertical => 'Skift til lodret layout';
-
-  @override
-  String get pumpCameraGlareWarning =>
-      'For meget blænding — vip lidt for at undgå refleksioner';
-
-  @override
-  String get pumpCameraAlignHint =>
-      'Juster displayet i rammen og tag derefter billede';
-
-  @override
-  String get pumpCameraRotateToLandscape =>
-      'Vend din telefon på siden — pumpevisningen er bred, så tallene bliver større og stående';
-
-  @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
 
   @override
@@ -5146,9 +5073,6 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get fillUpImportReceiptLabel => 'Kvittering';
-
-  @override
-  String get fillUpImportPumpLabel => 'Pumpedisplay';
 
   @override
   String get fillUpPricePerLiterLabel => 'Pris pr. liter';
@@ -5214,6 +5138,17 @@ class AppLocalizationsDa extends AppLocalizations {
       locale: localeName,
       other: '$count fills',
       one: '1 fill',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fuelEfficiencyIntervalCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count full tanks',
+      one: '1 full tank',
     );
     return '$_temp0';
   }
@@ -6354,12 +6289,6 @@ class AppLocalizationsDa extends AppLocalizations {
       'Kør pumpe/kvitterings-OCR-processen på et valgt foto og undersøg hvert trin — kun tilgængeligt i Udviklertilstand.';
 
   @override
-  String get ocrTesterModePump => 'Pumpe';
-
-  @override
-  String get ocrTesterModeReceipt => 'Kvittering';
-
-  @override
   String get ocrTesterCapture => 'Optag';
 
   @override
@@ -6468,13 +6397,6 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get ocrTesterExported => 'OCR-pakke gemt i mappen Downloads.';
-
-  @override
-  String get ocrTesterSaveFixture => 'Gem som fixture';
-
-  @override
-  String get ocrTesterFixtureSaved =>
-      'Fixture gemt i mappen Downloads. Flyt den under test/fixtures og kør tool/promote_ocr_fixture.dart.';
 
   @override
   String get onboardingObd2StepTitle => 'Tilslut din OBD2-adapter';
@@ -6947,6 +6869,16 @@ class AppLocalizationsDa extends AppLocalizations {
   @override
   String tankLevelRangeFormat(String kilometres) {
     return '≈ $kilometres km rækkevidde';
+  }
+
+  @override
+  String tankLevelRangeLastIntervalFormat(String kilometres) {
+    return '≈ $kilometres km at your last tank\'s consumption';
+  }
+
+  @override
+  String tankLevelRangeLongRunFormat(String kilometres) {
+    return 'Long-run average: ≈ $kilometres km';
   }
 
   @override

@@ -112,7 +112,19 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
     final barColor = lowFuel ? theme.colorScheme.error : null;
 
     final litresText = UnitFormatter.formatDecimal(estimate.levelL);
-    final rangeKm = estimate.rangeKm;
+    // #3764 — lead with the last-closed-interval projection ("km this
+    // reservoir conducts at the last per-100 km consumption"); the
+    // long-run average becomes secondary context. With no closed
+    // interval yet, primaryRangeKm IS the long-run figure and the card
+    // renders exactly as before #3764.
+    final rangeKm = estimate.primaryRangeKm;
+    final lastIntervalRangeKm = estimate.rangeKmLastInterval;
+    final longRunRangeKm = estimate.rangeKm;
+    // Secondary line only when it adds information: a last-interval
+    // primary exists AND the long-run rounds to a different figure.
+    final showLongRunContext = lastIntervalRangeKm != null &&
+        longRunRangeKm != null &&
+        longRunRangeKm.round() != lastIntervalRangeKm.round();
 
     return Card(
       margin: const EdgeInsets.fromLTRB(12, 6, 12, 6),
@@ -141,8 +153,25 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
               if (rangeKm != null) ...[
                 const SizedBox(height: 4),
                 Text(
-                  l.tankLevelRangeFormat(rangeKm.round().toString()),
+                  lastIntervalRangeKm != null
+                      ? l.tankLevelRangeLastIntervalFormat(
+                          lastIntervalRangeKm.round().toString(),
+                        )
+                      : l.tankLevelRangeFormat(rangeKm.round().toString()),
+                  key: const Key('tank_level_range_primary'),
                   style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+              if (showLongRunContext) ...[
+                const SizedBox(height: 2),
+                Text(
+                  l.tankLevelRangeLongRunFormat(
+                    longRunRangeKm.round().toString(),
+                  ),
+                  key: const Key('tank_level_range_long_run'),
+                  style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),

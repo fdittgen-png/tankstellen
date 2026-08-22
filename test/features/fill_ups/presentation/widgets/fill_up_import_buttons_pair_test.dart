@@ -9,30 +9,32 @@ import 'package:tankstellen/features/feature_management/application/feature_flag
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
-/// #2110 — the pair widget became a `ConsumerWidget` that gates each
-/// button on the matching `Feature` flag (receipt default-on, pump
-/// default-off). These tests assert the rendered shape with BOTH
-/// gates open — so we override `featureFlagsProvider` with an
-/// everything-enabled stub. A separate group below covers the
-/// default-off pump path.
-class _BothOcrEnabled extends FeatureFlags {
+/// #2110 — the widget became a `ConsumerWidget` that gates the receipt
+/// button on `Feature.addFillUpOcrReceipt`. These tests assert the
+/// rendered shape with the gate open — so we override
+/// `featureFlagsProvider` with a receipt-enabled stub. (#3765 removed
+/// the sibling pump-display button.)
+class _ReceiptOcrEnabled extends FeatureFlags {
   @override
   Set<Feature> build() => {
         Feature.addFillUpOcrReceipt,
-        Feature.addFillUpOcrPump,
       };
+}
+
+class _NothingEnabled extends FeatureFlags {
+  @override
+  Set<Feature> build() => const {};
 }
 
 void main() {
   Widget buildPair({
     bool scanningReceipt = false,
-    bool scanningPump = false,
     VoidCallback? onScanReceipt,
-    VoidCallback? onScanPumpDisplay,
+    FeatureFlags Function()? flags,
   }) {
     return ProviderScope(
       overrides: [
-        featureFlagsProvider.overrideWith(() => _BothOcrEnabled()),
+        featureFlagsProvider.overrideWith(flags ?? () => _ReceiptOcrEnabled()),
       ],
       child: MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -40,9 +42,7 @@ void main() {
         home: Scaffold(
           body: FillUpImportButtonsPair(
             scanningReceipt: scanningReceipt,
-            scanningPump: scanningPump,
             onScanReceipt: onScanReceipt ?? () {},
-            onScanPumpDisplay: onScanPumpDisplay ?? () {},
           ),
         ),
       ),
@@ -50,32 +50,27 @@ void main() {
   }
 
   group('FillUpImportButtonsPair', () {
-    testWidgets('renders both keyed buttons', (tester) async {
+    testWidgets('renders the keyed receipt button', (tester) async {
       await tester.pumpWidget(buildPair());
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('import_receipt_button')), findsOneWidget);
-      expect(find.byKey(const Key('import_pump_button')), findsOneWidget);
     });
 
-    testWidgets(
-        'default state renders both default icons (receipt + gas station)',
-        (tester) async {
+    testWidgets('default state renders the receipt icon', (tester) async {
       await tester.pumpWidget(buildPair());
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.document_scanner_outlined), findsOneWidget);
-      expect(find.byIcon(Icons.local_gas_station_outlined), findsOneWidget);
       expect(find.byType(CircularProgressIndicator), findsNothing);
     });
 
-    testWidgets('default state shows localized "Receipt" and "Pump display"',
+    testWidgets('default state shows the localized "Receipt" label',
         (tester) async {
       await tester.pumpWidget(buildPair());
       await tester.pumpAndSettle();
 
       expect(find.text('Receipt'), findsOneWidget);
-      expect(find.text('Pump display'), findsOneWidget);
     });
 
     testWidgets('scanningReceipt: true disables the receipt button',
@@ -101,50 +96,11 @@ void main() {
       expect(find.byIcon(Icons.document_scanner_outlined), findsNothing);
     });
 
-    testWidgets(
-        'scanningReceipt: true does NOT affect the pump button — pump remains '
-        'enabled with its icon', (tester) async {
-      await tester.pumpWidget(buildPair(scanningReceipt: true));
-      await tester.pump();
-
-      final pump = tester.widget<OutlinedButton>(
-        find.byKey(const Key('import_pump_button')),
-      );
-      expect(pump.onPressed, isNotNull);
-      expect(find.byIcon(Icons.local_gas_station_outlined), findsOneWidget);
-    });
-
-    testWidgets('scanningPump: true disables the pump button', (tester) async {
-      await tester.pumpWidget(buildPair(scanningPump: true));
-      await tester.pump();
-
-      final pump = tester.widget<OutlinedButton>(
-        find.byKey(const Key('import_pump_button')),
-      );
-      expect(pump.onPressed, isNull);
-    });
-
-    testWidgets(
-        'scanningPump: true replaces the pump icon with the only progress '
-        'indicator', (tester) async {
-      await tester.pumpWidget(buildPair(scanningPump: true));
-      await tester.pump();
-
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-      expect(find.byIcon(Icons.local_gas_station_outlined), findsNothing);
-      // The receipt side should still show its icon.
-      expect(find.byIcon(Icons.document_scanner_outlined), findsOneWidget);
-    });
-
     testWidgets('tapping the enabled receipt button calls onScanReceipt',
         (tester) async {
       var receiptTaps = 0;
-      var pumpTaps = 0;
       await tester.pumpWidget(
-        buildPair(
-          onScanReceipt: () => receiptTaps++,
-          onScanPumpDisplay: () => pumpTaps++,
-        ),
+        buildPair(onScanReceipt: () => receiptTaps++),
       );
       await tester.pumpAndSettle();
 
@@ -152,26 +108,6 @@ void main() {
       await tester.pump();
 
       expect(receiptTaps, 1);
-      expect(pumpTaps, 0);
-    });
-
-    testWidgets('tapping the enabled pump button calls onScanPumpDisplay',
-        (tester) async {
-      var receiptTaps = 0;
-      var pumpTaps = 0;
-      await tester.pumpWidget(
-        buildPair(
-          onScanReceipt: () => receiptTaps++,
-          onScanPumpDisplay: () => pumpTaps++,
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byKey(const Key('import_pump_button')));
-      await tester.pump();
-
-      expect(pumpTaps, 1);
-      expect(receiptTaps, 0);
     });
 
     testWidgets(
@@ -202,25 +138,13 @@ void main() {
     });
 
     testWidgets(
-        'both scanning flags true → both buttons disabled and two progress '
-        'indicators visible', (tester) async {
-      await tester.pumpWidget(
-        buildPair(scanningReceipt: true, scanningPump: true),
-      );
-      await tester.pump();
+        'receipt gate closed → widget collapses to nothing (#2110)',
+        (tester) async {
+      await tester.pumpWidget(buildPair(flags: () => _NothingEnabled()));
+      await tester.pumpAndSettle();
 
-      final receipt = tester.widget<OutlinedButton>(
-        find.byKey(const Key('import_receipt_button')),
-      );
-      final pump = tester.widget<OutlinedButton>(
-        find.byKey(const Key('import_pump_button')),
-      );
-      expect(receipt.onPressed, isNull);
-      expect(pump.onPressed, isNull);
-
-      expect(find.byType(CircularProgressIndicator), findsNWidgets(2));
-      expect(find.byIcon(Icons.document_scanner_outlined), findsNothing);
-      expect(find.byIcon(Icons.local_gas_station_outlined), findsNothing);
+      expect(find.byKey(const Key('import_receipt_button')), findsNothing);
+      expect(find.byType(OutlinedButton), findsNothing);
     });
   });
 }

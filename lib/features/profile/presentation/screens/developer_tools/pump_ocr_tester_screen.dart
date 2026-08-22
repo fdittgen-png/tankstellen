@@ -27,12 +27,9 @@ import 'pump_ocr_tester_export.dart';
 // 400-line norm; the screen + its view widgets are one unit.
 part 'pump_ocr_tester_widgets.dart';
 
-/// The two pipelines the OCR tester can run.
-enum _OcrTesterMode { pump, receipt }
-
 /// Gated developer OCR tester (#2518, Epic #2516 Child 2).
 ///
-/// Runs the REAL pump / receipt OCR pipeline on a captured or picked image
+/// Runs the REAL receipt OCR pipeline on a captured or picked image
 /// with a live [OcrTraceRecorder] wired through, then renders the full
 /// reasoning chain: a [OcrBlockOverlayPainter] over the source image in an
 /// [InteractiveViewer], the per-stage [OcrTraceStepsPanel], and a local
@@ -59,10 +56,8 @@ class PumpOcrTesterScreen extends ConsumerStatefulWidget {
 }
 
 class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
-  _OcrTesterMode _mode = _OcrTesterMode.pump;
   String? _country;
   String? _imagePath;
-  OcrNormalizedRect? _roi;
   bool _running = false;
   OcrTracePackage? _package;
   Size? _imageSize;
@@ -75,7 +70,6 @@ class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
   late final ReceiptScanService _service =
       widget.scanService ?? ReceiptScanService();
   late final ImagePicker _picker = widget.picker ?? ImagePicker();
-  final PumpOcrConfig _ocrConfig = PumpOcrConfig();
 
   /// Library-internal rebuild seam so the source/run/export methods, which
   /// live in the `pump_ocr_tester_widgets.dart` part (to keep this file
@@ -114,8 +108,6 @@ class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          _modeToggle(l),
-          const SizedBox(height: 12),
           _countryDropdown(l),
           const SizedBox(height: 12),
           _sourceRow(l),
@@ -131,31 +123,6 @@ class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
           SizedBox(height: MediaQuery.of(context).viewPadding.bottom + 16),
         ],
       ),
-    );
-  }
-
-  Widget _modeToggle(AppLocalizations l) {
-    return SegmentedButton<_OcrTesterMode>(
-      key: const Key('ocr_tester_mode'),
-      segments: [
-        ButtonSegment(
-          value: _OcrTesterMode.pump,
-          label: Text(l.ocrTesterModePump),
-          icon: const Icon(Icons.local_gas_station_outlined),
-        ),
-        ButtonSegment(
-          value: _OcrTesterMode.receipt,
-          label: Text(l.ocrTesterModeReceipt),
-          icon: const Icon(Icons.receipt_long_outlined),
-        ),
-      ],
-      selected: {_mode},
-      onSelectionChanged: (s) => setState(() {
-        _mode = s.first;
-        _package = null;
-        _imagePath = null;
-        _roi = null;
-      }),
     );
   }
 
@@ -248,8 +215,6 @@ class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
       OcrTraceStepsPanel(package: package),
       const SizedBox(height: 16),
       _exportRow(l, package),
-      const SizedBox(height: 8),
-      _saveFixtureButton(l, package),
     ];
   }
 
@@ -277,21 +242,4 @@ class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
     );
   }
 
-  /// "Save as fixture" turns the current trace into a committable
-  /// regression fixture (#2519): the source image + a `.ocrpkg.json` with
-  /// `expected` seeded from the read. Only pump-mode reads with a captured
-  /// image can promote (the replay harness drives the pump path).
-  Widget _saveFixtureButton(AppLocalizations l, OcrTracePackage package) {
-    final promotable =
-        package.kind == OcrTraceKind.pump && package.image != null;
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        key: const Key('ocr_tester_save_fixture'),
-        onPressed: promotable ? () => _saveAsFixture(package) : null,
-        icon: const Icon(Icons.bookmark_add_outlined),
-        label: Text(l.ocrTesterSaveFixture),
-      ),
-    );
-  }
 }

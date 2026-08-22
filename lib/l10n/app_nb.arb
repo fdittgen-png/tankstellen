@@ -1120,8 +1120,6 @@
   "featureDescription_obd2Optional": "Når av tar appen opp turer med kun GPS uten en OBD2-adapter. Coaching er redusert — ingen umiddelbar L/100 km, færre motorsignaler.",
   "featureLabel_addFillUpOcrReceipt": "Kvittering OCR",
   "featureDescription_addFillUpOcrReceipt": "Skann en utskrevet kvittering på skjermen Legg til fylling for å forhåndsutfylle dato, liter, totalt og stasjon.",
-  "featureLabel_addFillUpOcrPump": "Pumpedisplay OCR (eksperimentell)",
-  "featureDescription_addFillUpOcrPump": "Skann en drivstoffpumpedisplay for å forhåndsutfylle skjemaet. Gjenkjenningen er upålitelig i dag — aktiver kun hvis du vil teste.",
   "featureLabel_developerPatToken": "Utviklertilbakemelding (GitHub PAT)",
   "featureDescription_developerPatToken": "Aktiverer tilbakemeldingspanelet for mislykkede skanninger som automatisk oppretter GitHub-issues med et Personal Access Token. Funksjon for avanserte brukere / bidragsytere.",
   "feedbackConsentTitle": "Send rapport til GitHub?",
@@ -1145,19 +1143,7 @@
   "scanReceiptNoData": "Ingen kvitteringsdata funnet – prøv igjen",
   "scanReceiptSuccess": "Kvittering skannet – verifiser verdiene. Trykk «Rapporter skanningsfeil» nedenfor hvis noe er feil.",
   "scanReceiptFailed": "Skanning mislyktes: {error}",
-  "pumpCameraCapture": "Ta bilde",
-  "pumpCameraPermissionDenied": "Kameratilgang trengs for å skanne pumpedisplayet. Aktiver det i enhetsinnstillingene.",
-  "pumpCameraError": "Kameraet kunne ikke startes. Prøv igjen, eller skriv inn verdiene manuelt.",
-  "scanPumpSuccess": "Pumpevisning skannet – verifiser verdiene.",
-  "scanPumpGlare": "For mye gjenskinn på displayet — prøv igjen i en liten vinkel slik at tallene ikke blir overstrålt.",
-  "scanPumpFailed": "Pumpeskanning mislyktes: {error}",
   "badScanReportTitleReceipt": "Rapporter en skanningsfeil – Kvittering",
-  "badScanReportTitlePumpDisplay": "Rapporter en skanningsfeil – Pumpevisning",
-  "pumpScanFailureTitle": "Visning ulesbar",
-  "pumpScanFailureBody": "Skanningen kunne ikke lese pumpevisningen. Hva vil du gjøre?",
-  "pumpScanFailureCorrectManually": "Korriger manuelt",
-  "pumpScanFailureReport": "Rapporter",
-  "pumpScanFailureRemove": "Fjern bilde",
   "badScanReportHint": "Vi deler kvitteringsbildet og begge sett med verdier slik at neste versjon kan lære dette oppsettet.",
   "badScanReportFieldBrandLayout": "Merkevisning",
   "badScanReportFieldTotal": "Totalt",
@@ -1176,7 +1162,6 @@
   "fillUpSectionWhereTitle": "Hvor du var",
   "fillUpSectionWhereSubtitle": "Stasjon, kilometerstand, notater",
   "fillUpImportReceiptLabel": "Kvittering",
-  "fillUpImportPumpLabel": "Pumpevisning",
   "fillUpPricePerLiterLabel": "Pris per liter",
   "vehicleHeaderUntitled": "Nytt kjøretøy",
   "vehicleSectionIdentityTitle": "Identitet",
@@ -1758,10 +1743,6 @@
   "tripRecordingAutoPinTitle": "Fest alltid når opptaket starter",
   "tripRecordingAutoPinSubtitle": "Fest skjemaet automatisk hver tur i stedet for å trykke hver gang. Bruker mer batteri.",
   "tripRecordingConnectingTitle": "Starter opptak…",
-  "pumpCameraOrientationHorizontal": "Bytt til horisontal layout",
-  "pumpCameraOrientationVertical": "Bytt til vertikal layout",
-  "pumpCameraGlareWarning": "For mye blending — vipp litt for å unngå refleksjoner",
-  "pumpCameraAlignHint": "Juster displayet i rammen og ta deretter bilde",
   "insightHighSpeedBand": "Vedvarende høy fart ({pctTime} % av turen): sløst bort {liters} L",
   "insightHighSpeedBandNoFuel": "Vedvarende høy fart ({pctTime} % av turen)",
   "lessonAdviceHighSpeedBand": "Slipp opp gassen over 110 km/t – luftmotstanden øker kraftig, så litt saktere sparer mye drivstoff.",
@@ -2143,10 +2124,6 @@
   "@reconcileResolveGapSemanticLabel": {
     "description": "MT — needs native review"
   },
-  "pumpCameraRotateToLandscape": "Snu telefonen sidelengs — pumpevisningen er bred, så tallene blir større og rette",
-  "@pumpCameraRotateToLandscape": {
-    "description": "MT — needs native review"
-  },
   "insightFullThrottle": "Full gass ({pctTime}% av turen): kastet bort {liters} L",
   "@insightFullThrottle": {
     "description": "MT — needs native review",
@@ -2526,14 +2503,6 @@
   "@ocrTesterExplain": {
     "description": "MT — needs native review"
   },
-  "ocrTesterModePump": "Pumpe",
-  "@ocrTesterModePump": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterModeReceipt": "Kvittering",
-  "@ocrTesterModeReceipt": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterCapture": "Ta bilde",
   "@ocrTesterCapture": {
     "description": "MT — needs native review"
@@ -2724,14 +2693,6 @@
   },
   "obd2DiagnosticsInitCold": "kald",
   "@obd2DiagnosticsInitCold": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterSaveFixture": "Lagre som testfil",
-  "@ocrTesterSaveFixture": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterFixtureSaved": "Testfil lagret i Nedlastinger-mappen. Flytt den under test/fixtures og kjør tool/promote_ocr_fixture.dart.",
-  "@ocrTesterFixtureSaved": {
     "description": "MT — needs native review"
   },
   "situationColdStart": "Kaldstart",
@@ -3737,10 +3698,6 @@
   },
   "alertsStationAdd": "Legg til et stasjonsvarsling",
   "@alertsStationAdd": {
-    "description": "MT — needs native review"
-  },
-  "scanPumpInconsistent": "De skannede verdiene stemmer ikke overens — skriv dem inn manuelt.",
-  "@scanPumpInconsistent": {
     "description": "MT — needs native review"
   },
   "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",
@@ -5545,5 +5502,36 @@
   "@aclWakeNotificationBody": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "fuelEfficiencyIntervalCount": "{count, plural, =1{1 full tank} other{{count} full tanks}}",
+  "@fuelEfficiencyIntervalCount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "tankLevelRangeLastIntervalFormat": "≈ {kilometres} km at your last tank's consumption",
+  "@tankLevelRangeLastIntervalFormat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "kilometres": {
+        "type": "String"
+      }
+    }
+  },
+  "tankLevelRangeLongRunFormat": "Long-run average: ≈ {kilometres} km",
+  "@tankLevelRangeLongRunFormat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "kilometres": {
+        "type": "String"
+      }
+    }
   }
 }

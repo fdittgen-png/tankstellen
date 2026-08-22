@@ -167,42 +167,6 @@ extension _PumpOcrTesterActions on _PumpOcrTesterScreenState {
   // --- Source selection ----------------------------------------------------
 
   Future<void> _capture() async {
-    if (_mode == _OcrTesterMode.pump) {
-      await _capturePump();
-    } else {
-      await _captureReceipt();
-    }
-  }
-
-  Future<void> _capturePump() async {
-    OcrPumpFieldSpec? fieldSpec;
-    var orientation = OcrDisplayOrientation.horizontal;
-    final country = _country;
-    if (country != null) {
-      await _ocrConfig.load();
-      final template = _ocrConfig.templateFor(country: country);
-      fieldSpec = template?.pumpDisplay;
-      orientation = template?.displayOrientation ?? orientation;
-    }
-    if (!mounted) return;
-    final result = await Navigator.of(context).push<PumpCaptureResult>(
-      MaterialPageRoute(
-        builder: (_) => PumpDisplayCameraScreen(
-          initialOrientation: orientation,
-          fieldSpec: fieldSpec,
-        ),
-      ),
-    );
-    if (result == null || !mounted) return;
-    _rebuild(() {
-      _imagePath = result.path;
-      _roi = result.roi;
-      _package = null;
-      _bakedImageBytes = null;
-    });
-  }
-
-  Future<void> _captureReceipt() async {
     final shot = await _picker.pickImage(
       source: ImageSource.camera,
       preferredCameraDevice: CameraDevice.rear,
@@ -212,7 +176,6 @@ extension _PumpOcrTesterActions on _PumpOcrTesterScreenState {
     if (shot == null || !mounted) return;
     _rebuild(() {
       _imagePath = shot.path;
-      _roi = null;
       _package = null;
       _bakedImageBytes = null;
     });
@@ -223,7 +186,6 @@ extension _PumpOcrTesterActions on _PumpOcrTesterScreenState {
     if (shot == null || !mounted) return;
     _rebuild(() {
       _imagePath = shot.path;
-      _roi = null;
       _package = null;
       _bakedImageBytes = null;
     });
@@ -238,24 +200,11 @@ extension _PumpOcrTesterActions on _PumpOcrTesterScreenState {
       _running = true;
       _selectedBlock = null;
     });
-    final trace = OcrTraceRecorder(
-      kind: _mode == _OcrTesterMode.pump
-          ? OcrTraceKind.pump
-          : OcrTraceKind.receipt,
-    );
+    final trace = OcrTraceRecorder(kind: OcrTraceKind.receipt);
     try {
-      if (_mode == _OcrTesterMode.pump) {
-        await _service.parsePumpDisplayImage(
-          path,
-          country: _country,
-          roi: _roi,
-          trace: trace,
-        );
-      } else {
-        // The tester already holds a path, so run the receipt pipeline on
-        // the picked image without reopening a camera (#2518).
-        await _runReceipt(path, trace);
-      }
+      // The tester already holds a path, so run the receipt pipeline on
+      // the picked image without reopening a camera (#2518).
+      await _runReceipt(path, trace);
       await _attachImage(trace, path);
     } catch (e, st) {
       // Dev tool — log the failure for diagnosis, then build whatever was
@@ -333,12 +282,5 @@ extension _PumpOcrTesterActions on _PumpOcrTesterScreenState {
     if (!mounted) return;
     final l = AppLocalizations.of(context);
     SnackBarHelper.showSuccess(context, l.ocrTesterExported);
-  }
-
-  Future<void> _saveAsFixture(OcrTracePackage package) async {
-    await OcrTesterExport.saveAsFixture(package);
-    if (!mounted) return;
-    final l = AppLocalizations.of(context);
-    SnackBarHelper.showSuccess(context, l.ocrTesterFixtureSaved);
   }
 }

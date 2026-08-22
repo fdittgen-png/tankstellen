@@ -61,8 +61,6 @@ void main() {
     'lib/features/obd2/domain/broken_map_detector.dart',
     'lib/features/obd2/data/obd2_cache_openers.dart',
     'lib/features/obd2/data/session/obd2_service.dart',
-    'lib/features/receipts_ocr/data/ocr/ocr_image_preprocessor.dart',
-    'lib/features/receipts_ocr/data/ocr/seven_segment_recognizer.dart',
     'lib/features/fill_ups/providers/consumption_providers.dart',
     'lib/features/vehicle/data/obd2_vin_reader.dart',
     'lib/features/vehicle/data/vin_adapter_pair_auto_populator.dart',

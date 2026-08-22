@@ -4759,14 +4759,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'Escanea un tique impreso en la pantalla Añadir repostaje para rellenar fecha, litros, total y estación.';
 
   @override
-  String get featureLabel_addFillUpOcrPump =>
-      'OCR de pantalla de surtidor (experimental)';
-
-  @override
-  String get featureDescription_addFillUpOcrPump =>
-      'Escanea la pantalla de un surtidor para rellenar el formulario. El reconocimiento no es fiable hoy — actívalo solo si quieres probarlo.';
-
-  @override
   String get featureLabel_developerPatToken =>
       'Feedback de desarrollador (GitHub PAT)';
 
@@ -5041,45 +5033,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get scanPumpSuccess =>
-      'Pantalla del surtidor escaneada: verifica los valores.';
-
-  @override
-  String get scanPumpGlare =>
-      'Demasiado reflejo en la pantalla — inténtalo de nuevo desde un ángulo ligeramente distinto para que los números no se vean lavados.';
-
-  @override
-  String get scanPumpInconsistent =>
-      'Los valores escaneados no cuadran — introdúcelos manualmente.';
-
-  @override
-  String scanPumpFailed(String error) {
-    return 'Error al escanear el surtidor: $error';
-  }
-
-  @override
   String get badScanReportTitleReceipt =>
       'Informar de un error de escaneo: recibo';
-
-  @override
-  String get badScanReportTitlePumpDisplay =>
-      'Informar de un error de escaneo: pantalla del surtidor';
-
-  @override
-  String get pumpScanFailureTitle => 'Pantalla ilegible';
-
-  @override
-  String get pumpScanFailureBody =>
-      'El escaneo no pudo leer la pantalla del surtidor. ¿Qué quieres hacer?';
-
-  @override
-  String get pumpScanFailureCorrectManually => 'Corregir manualmente';
-
-  @override
-  String get pumpScanFailureReport => 'Informar';
-
-  @override
-  String get pumpScanFailureRemove => 'Quitar foto';
 
   @override
   String get badScanReportHint =>
@@ -5123,35 +5078,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'Error al enviar: uso compartido manual';
 
   @override
-  String get pumpCameraCapture => 'Capturar';
-
-  @override
-  String get pumpCameraPermissionDenied =>
-      'Se necesita acceso a la cámara para escanear el surtidor. Actívalo en los ajustes del dispositivo.';
-
-  @override
-  String get pumpCameraError =>
-      'La cámara no pudo iniciarse. Inténtalo de nuevo o introduce los valores a mano.';
-
-  @override
-  String get pumpCameraOrientationHorizontal =>
-      'Cambiar a disposición horizontal';
-
-  @override
-  String get pumpCameraOrientationVertical => 'Cambiar a disposición vertical';
-
-  @override
-  String get pumpCameraGlareWarning =>
-      'Demasiado brillo — inclina ligeramente para evitar reflejos';
-
-  @override
-  String get pumpCameraAlignHint => 'Alinea el surtidor en el marco y captura';
-
-  @override
-  String get pumpCameraRotateToLandscape =>
-      'Gira el móvil — la pantalla del surtidor es ancha, así los números salen más grandes y rectos';
-
-  @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
 
   @override
@@ -5184,9 +5110,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get fillUpImportReceiptLabel => 'Recibo';
-
-  @override
-  String get fillUpImportPumpLabel => 'Pantalla del surtidor';
 
   @override
   String get fillUpPricePerLiterLabel => 'Precio por litro';
@@ -5251,6 +5174,17 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other: '$count fills',
       one: '1 fill',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fuelEfficiencyIntervalCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count full tanks',
+      one: '1 full tank',
     );
     return '$_temp0';
   }
@@ -6394,12 +6328,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'Ejecuta el proceso OCR de surtidor/ticket en una foto seleccionada e inspecciona cada paso — solo disponible en modo Desarrollador.';
 
   @override
-  String get ocrTesterModePump => 'Surtidor';
-
-  @override
-  String get ocrTesterModeReceipt => 'Ticket';
-
-  @override
   String get ocrTesterCapture => 'Capturar';
 
   @override
@@ -6509,13 +6437,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get ocrTesterExported =>
       'Paquete OCR guardado en la carpeta Descargas.';
-
-  @override
-  String get ocrTesterSaveFixture => 'Guardar como fixture';
-
-  @override
-  String get ocrTesterFixtureSaved =>
-      'Fixture guardado en la carpeta Descargas. Muévelo a test/fixtures y ejecuta tool/promote_ocr_fixture.dart.';
 
   @override
   String get onboardingObd2StepTitle => 'Conecta tu adaptador OBD2';
@@ -6987,6 +6908,16 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String tankLevelRangeFormat(String kilometres) {
     return '≈ $kilometres km de autonomía';
+  }
+
+  @override
+  String tankLevelRangeLastIntervalFormat(String kilometres) {
+    return '≈ $kilometres km at your last tank\'s consumption';
+  }
+
+  @override
+  String tankLevelRangeLongRunFormat(String kilometres) {
+    return 'Long-run average: ≈ $kilometres km';
   }
 
   @override

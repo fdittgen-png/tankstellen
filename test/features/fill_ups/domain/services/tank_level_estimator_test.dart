@@ -319,4 +319,54 @@ void main() {
       expect(e.rangeKm, closeTo(24.0 / 6.0 * 100.0, 0.1));
     });
   });
+
+  group('range at last consumption (#3764)', () {
+    // Two closed windows with DIFFERENT consumption:
+    //   window 1: 30 L / 500 km = 6.0 L/100 km
+    //   window 2 (last): 50 L / 500 km = 10.0 L/100 km
+    // Long-run (km-weighted): 80 L / 1000 km = 8.0 L/100 km.
+    List<FillUp> twoWindows() => [
+          fill(date: DateTime(2026, 4, 20), liters: 50, odometerKm: 101000),
+          fill(date: DateTime(2026, 4, 10), liters: 30, odometerKm: 100500),
+          fill(date: DateTime(2026, 4, 1), liters: 45, odometerKm: 100000),
+        ];
+
+    test('rangeKmLastInterval projects at the LAST closed window\'s '
+        'L/100 km; rangeKm keeps the long-run average', () {
+      final e = estimateTankLevel(vehicle: vehicle, fillUps: twoWindows());
+      expect(e.levelL, 50.0); // full anchor
+      expect(e.rangeKmLastInterval, closeTo(50.0 / 10.0 * 100.0, 0.1));
+      expect(e.rangeKm, closeTo(50.0 / 8.0 * 100.0, 0.1));
+      // The UI leads with the last-interval figure.
+      expect(e.primaryRangeKm, closeTo(500.0, 0.1));
+    });
+
+    test('no closed interval yet → rangeKmLastInterval null, '
+        'primaryRangeKm falls back to today\'s long-run/default figure', () {
+      final e = estimateTankLevel(
+        vehicle: vehicle,
+        fillUps: [fill(date: DateTime(2026, 4, 1), liters: 45)],
+      );
+      expect(e.rangeKmLastInterval, isNull);
+      // Pre-#3764 behaviour: the 7.0 fleet-default projection leads.
+      expect(e.primaryRangeKm, closeTo(50.0 / 7.0 * 100.0, 0.1));
+    });
+
+    test('the last-interval projection follows the sensor level too', () {
+      final e = estimateTankLevel(
+        vehicle: vehicle,
+        fillUps: twoWindows(),
+        sensor: Obd2FuelLevelSnapshot(liters: 20, at: DateTime(2026, 4, 22)),
+      );
+      expect(e.levelL, 20.0);
+      expect(e.rangeKmLastInterval, closeTo(20.0 / 10.0 * 100.0, 0.1));
+      expect(e.rangeKm, closeTo(20.0 / 8.0 * 100.0, 0.1));
+    });
+
+    test('unknown sentinel carries no last-interval range', () {
+      const e = TankLevelEstimate.unknown();
+      expect(e.rangeKmLastInterval, isNull);
+      expect(e.primaryRangeKm, isNull);
+    });
+  });
 }

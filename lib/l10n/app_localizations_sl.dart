@@ -4733,14 +4733,6 @@ class AppLocalizationsSl extends AppLocalizations {
       'Skenirajte natisnjen račun na zaslonu Dodaj polnjenje, da vnaprej izpolnite datum, litre, skupno in postajo.';
 
   @override
-  String get featureLabel_addFillUpOcrPump =>
-      'OCR zaslona črpalke (eksperimentalno)';
-
-  @override
-  String get featureDescription_addFillUpOcrPump =>
-      'Skenirajte zaslon točilne črpalke za vnaprejšnje izpolnjevanje obrazca. Prepoznavanje je danes nezanesljivo — vklopite samo, če želite preizkusiti.';
-
-  @override
   String get featureLabel_developerPatToken =>
       'Razvijalska povratna informacija (GitHub PAT)';
 
@@ -5014,44 +5006,7 @@ class AppLocalizationsSl extends AppLocalizations {
   }
 
   @override
-  String get scanPumpSuccess =>
-      'Zaslon črpalke skeniran — preverite vrednosti.';
-
-  @override
-  String get scanPumpGlare =>
-      'Preveč bleščanja na zaslonu — poskusite znova pod rahlim kotom, da številke ne bodo presvetljene.';
-
-  @override
-  String get scanPumpInconsistent =>
-      'Skenirane vrednosti se ne ujemajo — vnesite jih ročno.';
-
-  @override
-  String scanPumpFailed(String error) {
-    return 'Skeniranje črpalke ni uspelo: $error';
-  }
-
-  @override
   String get badScanReportTitleReceipt => 'Prijavi napako skeniranja — račun';
-
-  @override
-  String get badScanReportTitlePumpDisplay =>
-      'Prijavi napako skeniranja — zaslon črpalke';
-
-  @override
-  String get pumpScanFailureTitle => 'Zaslon ni berljiv';
-
-  @override
-  String get pumpScanFailureBody =>
-      'Skeniranje ni moglo prebrati zaslona črpalke. Kaj bi radi naredili?';
-
-  @override
-  String get pumpScanFailureCorrectManually => 'Popravi ročno';
-
-  @override
-  String get pumpScanFailureReport => 'Prijavi';
-
-  @override
-  String get pumpScanFailureRemove => 'Odstrani fotografijo';
 
   @override
   String get badScanReportHint =>
@@ -5095,36 +5050,6 @@ class AppLocalizationsSl extends AppLocalizations {
       'Oddaja ni uspela — ročno deljenje';
 
   @override
-  String get pumpCameraCapture => 'Zajemi';
-
-  @override
-  String get pumpCameraPermissionDenied =>
-      'Za optično branje zaslona točilne naprave je potreben dostop do kamere. Omogočite ga v nastavitvah naprave.';
-
-  @override
-  String get pumpCameraError =>
-      'Kamere ni bilo mogoče zagnati. Poskusite znova ali vnesite vrednosti ročno.';
-
-  @override
-  String get pumpCameraOrientationHorizontal =>
-      'Preklopi na vodoravno postavitev';
-
-  @override
-  String get pumpCameraOrientationVertical => 'Preklopi na navpično postavitev';
-
-  @override
-  String get pumpCameraGlareWarning =>
-      'Preveč odbleska — rahlo nagnite, da se izognete odsevom';
-
-  @override
-  String get pumpCameraAlignHint =>
-      'Poravnajte zaslon v okvir in nato posnemite';
-
-  @override
-  String get pumpCameraRotateToLandscape =>
-      'Obrnite telefon vstran — zaslon črpalke je širok, zato so številke večje in pokončne';
-
-  @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
 
   @override
@@ -5157,9 +5082,6 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get fillUpImportReceiptLabel => 'Račun';
-
-  @override
-  String get fillUpImportPumpLabel => 'Zaslon črpalke';
 
   @override
   String get fillUpPricePerLiterLabel => 'Cena na liter';
@@ -5224,6 +5146,17 @@ class AppLocalizationsSl extends AppLocalizations {
       locale: localeName,
       other: '$count fills',
       one: '1 fill',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fuelEfficiencyIntervalCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count full tanks',
+      one: '1 full tank',
     );
     return '$_temp0';
   }
@@ -6361,12 +6294,6 @@ class AppLocalizationsSl extends AppLocalizations {
       'Zaženite cevovod OCR za črpalko/račun na izbrani fotografiji in preglejte vsak korak — na voljo le v načinu za razvijalce.';
 
   @override
-  String get ocrTesterModePump => 'Črpalka';
-
-  @override
-  String get ocrTesterModeReceipt => 'Račun';
-
-  @override
   String get ocrTesterCapture => 'Zajemi';
 
   @override
@@ -6474,13 +6401,6 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get ocrTesterExported => 'Paket OCR shranjen v mapo Prenosi.';
-
-  @override
-  String get ocrTesterSaveFixture => 'Shrani kot fiksacijo';
-
-  @override
-  String get ocrTesterFixtureSaved =>
-      'Fiksacija shranjena v mapo Prenosi. Premaknite jo v test/fixtures in zaženite tool/promote_ocr_fixture.dart.';
 
   @override
   String get onboardingObd2StepTitle => 'Povežite adapter OBD2';
@@ -6952,6 +6872,16 @@ class AppLocalizationsSl extends AppLocalizations {
   @override
   String tankLevelRangeFormat(String kilometres) {
     return '≈ $kilometres km dosega';
+  }
+
+  @override
+  String tankLevelRangeLastIntervalFormat(String kilometres) {
+    return '≈ $kilometres km at your last tank\'s consumption';
+  }
+
+  @override
+  String tankLevelRangeLongRunFormat(String kilometres) {
+    return 'Long-run average: ≈ $kilometres km';
   }
 
   @override

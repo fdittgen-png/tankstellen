@@ -16,60 +16,20 @@ import 'bad_scan_diff_table.dart';
 /// caller already holds plus the user-entered values.
 
 /// Builds the field-by-field diff table rendered above the action
-/// buttons. Receipt shows the rich layout (brand, station, fuel,
-/// date); pump-display shows only the three transaction numbers
-/// plus the pump number when available (#953).
+/// buttons: the rich receipt layout (brand, station, fuel, date).
 List<BadScanDiffRow> buildBadScanDiffRows({
-  required ScanKind kind,
   required ReceiptScanOutcome? receiptScan,
-  required PumpDisplayScanOutcome? pumpScan,
   required double? enteredLiters,
   required double? enteredTotalCost,
   required AppLocalizations l,
 }) {
-  if (kind == ScanKind.receipt) {
-    final p = receiptScan!.parse;
-    return [
-      BadScanDiffRow(
-        l.badScanReportFieldBrandLayout,
-        p.brandLayout,
-        p.brandLayout,
-      ),
-      BadScanDiffRow(
-        l.liters,
-        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-        p.liters?.toStringAsFixed(2) ?? '—',
-        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-        enteredLiters?.toStringAsFixed(2) ?? '—',
-      ),
-      BadScanDiffRow(
-        l.badScanReportFieldTotal,
-        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-        p.totalCost?.toStringAsFixed(2) ?? '—',
-        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-        enteredTotalCost?.toStringAsFixed(2) ?? '—',
-      ),
-      BadScanDiffRow(
-        l.badScanReportFieldPricePerLiter,
-        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-        p.pricePerLiter?.toStringAsFixed(3) ?? '—',
-        '—',
-      ),
-      BadScanDiffRow(l.badScanReportFieldStation, p.stationName ?? '—', '—'),
-      BadScanDiffRow(
-        l.badScanReportFieldFuel,
-        p.fuelType?.displayName ?? '—',
-        '—',
-      ),
-      BadScanDiffRow(
-        l.badScanReportFieldDate,
-        p.date?.toIso8601String().split('T').first ?? '—',
-        '—',
-      ),
-    ];
-  }
-  final p = pumpScan!.parse;
+  final p = receiptScan!.parse;
   return [
+    BadScanDiffRow(
+      l.badScanReportFieldBrandLayout,
+      p.brandLayout,
+      p.brandLayout,
+    ),
     BadScanDiffRow(
       l.liters,
       // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
@@ -90,6 +50,17 @@ List<BadScanDiffRow> buildBadScanDiffRows({
       p.pricePerLiter?.toStringAsFixed(3) ?? '—',
       '—',
     ),
+    BadScanDiffRow(l.badScanReportFieldStation, p.stationName ?? '—', '—'),
+    BadScanDiffRow(
+      l.badScanReportFieldFuel,
+      p.fuelType?.displayName ?? '—',
+      '—',
+    ),
+    BadScanDiffRow(
+      l.badScanReportFieldDate,
+      p.date?.toIso8601String().split('T').first ?? '—',
+      '—',
+    ),
   ];
 }
 
@@ -98,69 +69,39 @@ List<BadScanDiffRow> buildBadScanDiffRows({
 /// configured, consent denied, network failure). Mirrors the diff
 /// table rows but in a format that survives the system share sheet.
 String buildBadScanShareBody({
-  required ScanKind kind,
   required ReceiptScanOutcome? receiptScan,
-  required PumpDisplayScanOutcome? pumpScan,
   required double? enteredLiters,
   required double? enteredTotalCost,
   required String appVersion,
   required String ocrText,
 }) {
   final buffer = StringBuffer();
-  if (kind == ScanKind.receipt) {
-    final p = receiptScan!.parse;
-    buffer
-      ..writeln('Sparkilo receipt scan report')
-      ..writeln('================================')
-      ..writeln('App version: $appVersion')
-      ..writeln('Brand layout: ${p.brandLayout}')
-      ..writeln()
-      ..writeln('Scanned → Corrected')
-      ..writeln('-------------------')
-      ..writeln(
-        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-        'Liters:   ${p.liters?.toStringAsFixed(2) ?? '—'}'
-        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-        '   →   ${enteredLiters?.toStringAsFixed(2) ?? '(please fill)'}',
-      )
-      ..writeln(
-        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-        'Total:    ${p.totalCost?.toStringAsFixed(2) ?? '—'}'
-        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-        '   →   ${enteredTotalCost?.toStringAsFixed(2) ?? '(please fill)'}',
-      )
+  final p = receiptScan!.parse;
+  buffer
+    ..writeln('Sparkilo receipt scan report')
+    ..writeln('================================')
+    ..writeln('App version: $appVersion')
+    ..writeln('Brand layout: ${p.brandLayout}')
+    ..writeln()
+    ..writeln('Scanned → Corrected')
+    ..writeln('-------------------')
+    ..writeln(
       // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-      ..writeln('Price/L:  ${p.pricePerLiter?.toStringAsFixed(3) ?? '—'}')
-      ..writeln('Station:  ${p.stationName ?? '—'}')
-      ..writeln('Fuel:     ${p.fuelType?.apiValue ?? '—'}')
-      ..writeln('Date:     ${p.date?.toIso8601String() ?? '—'}');
-  } else {
-    final p = pumpScan!.parse;
-    buffer
-      ..writeln('Sparkilo pump-display scan report')
-      ..writeln('=====================================')
-      ..writeln('App version: $appVersion')
-      ..writeln()
-      ..writeln('Scanned → Corrected')
-      ..writeln('-------------------')
-      ..writeln(
-        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-        'Liters:   ${p.liters?.toStringAsFixed(2) ?? '—'}'
-        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-        '   →   ${enteredLiters?.toStringAsFixed(2) ?? '(please fill)'}',
-      )
-      ..writeln(
-        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-        'Total:    ${p.totalCost?.toStringAsFixed(2) ?? '—'}'
-        // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-        '   →   ${enteredTotalCost?.toStringAsFixed(2) ?? '(please fill)'}',
-      )
+      'Liters:   ${p.liters?.toStringAsFixed(2) ?? '—'}'
       // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-      ..writeln('Price/L:  ${p.pricePerLiter?.toStringAsFixed(3) ?? '—'}')
-      ..writeln('Pump #:   ${p.pumpNumber?.toString() ?? '—'}')
+      '   →   ${enteredLiters?.toStringAsFixed(2) ?? '(please fill)'}',
+    )
+    ..writeln(
       // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-      ..writeln('Confidence: ${p.confidence.toStringAsFixed(2)}');
-  }
+      'Total:    ${p.totalCost?.toStringAsFixed(2) ?? '—'}'
+      // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
+      '   →   ${enteredTotalCost?.toStringAsFixed(2) ?? '(please fill)'}',
+    )
+    // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
+    ..writeln('Price/L:  ${p.pricePerLiter?.toStringAsFixed(3) ?? '—'}')
+    ..writeln('Station:  ${p.stationName ?? '—'}')
+    ..writeln('Fuel:     ${p.fuelType?.apiValue ?? '—'}')
+    ..writeln('Date:     ${p.date?.toIso8601String() ?? '—'}');
   buffer
     ..writeln()
     ..writeln('Raw OCR text')
@@ -170,40 +111,23 @@ String buildBadScanShareBody({
 }
 
 /// Builds the structured `parsedFields` map handed to
-/// [GithubIssueReporter.reportBadScan]. Receipt and pump-display
-/// flows ship different keys; the reporter encodes them into the
-/// issue body.
+/// [GithubIssueReporter.reportBadScan]; the reporter encodes it into
+/// the issue body.
 Map<String, String?> buildBadScanParsedFields({
-  required ScanKind kind,
   required ReceiptScanOutcome? receiptScan,
-  required PumpDisplayScanOutcome? pumpScan,
 }) {
-  if (kind == ScanKind.receipt) {
-    final p = receiptScan!.parse;
-    return <String, String?>{
-      'brandLayout': p.brandLayout,
-      // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-      'liters': p.liters?.toStringAsFixed(2),
-      // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-      'totalCost': p.totalCost?.toStringAsFixed(2),
-      // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-      'pricePerLiter': p.pricePerLiter?.toStringAsFixed(3),
-      'stationName': p.stationName,
-      'fuelType': p.fuelType?.apiValue,
-      'date': p.date?.toIso8601String(),
-    };
-  }
-  final p = pumpScan!.parse;
+  final p = receiptScan!.parse;
   return <String, String?>{
+    'brandLayout': p.brandLayout,
     // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
     'liters': p.liters?.toStringAsFixed(2),
     // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
     'totalCost': p.totalCost?.toStringAsFixed(2),
     // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
     'pricePerLiter': p.pricePerLiter?.toStringAsFixed(3),
-    'pumpNumber': p.pumpNumber?.toString(),
-    // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-    'confidence': p.confidence.toStringAsFixed(2),
+    'stationName': p.stationName,
+    'fuelType': p.fuelType?.apiValue,
+    'date': p.date?.toIso8601String(),
   };
 }
 
@@ -230,7 +154,5 @@ String resolveBadScanTitle(ScanKind kind, AppLocalizations l) {
   switch (kind) {
     case ScanKind.receipt:
       return l.badScanReportTitleReceipt;
-    case ScanKind.pumpDisplay:
-      return l.badScanReportTitlePumpDisplay;
   }
 }

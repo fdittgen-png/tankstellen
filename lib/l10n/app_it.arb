@@ -1120,8 +1120,6 @@
   "featureDescription_obd2Optional": "Quando disattivato, l'app registra viaggi solo GPS senza un adattatore OBD2. Il coaching è ridotto — niente L/100 km istantanea, meno segnali motore.",
   "featureLabel_addFillUpOcrReceipt": "OCR scontrino",
   "featureDescription_addFillUpOcrReceipt": "Scansiona uno scontrino stampato nella schermata Aggiungi rifornimento per pre-compilare data, litri, totale e stazione.",
-  "featureLabel_addFillUpOcrPump": "OCR display pompa (sperimentale)",
-  "featureDescription_addFillUpOcrPump": "Scansiona il display di una pompa di carburante per pre-compilare il modulo. Il riconoscimento è inaffidabile oggi — attiva solo se vuoi testare.",
   "featureLabel_developerPatToken": "Feedback sviluppatore (GitHub PAT)",
   "featureDescription_developerPatToken": "Abilita il pannello di feedback per le scansioni non riuscite che crea automaticamente issue GitHub con un Personal Access Token. Funzione per utenti esperti / collaboratori.",
   "feedbackConsentTitle": "Inviare la segnalazione su GitHub?",
@@ -1145,19 +1143,7 @@
   "scanReceiptNoData": "Nessun dato scontrino trovato — riprova",
   "scanReceiptSuccess": "Scontrino scansionato — verifica i valori. Tocca \"Segnala errore di scansione\" di seguito se qualcosa non va.",
   "scanReceiptFailed": "Scansione non riuscita: {error}",
-  "pumpCameraCapture": "Scatta",
-  "pumpCameraPermissionDenied": "L'accesso alla fotocamera è necessario per scansionare il display della pompa. Abilitalo nelle impostazioni del dispositivo.",
-  "pumpCameraError": "La fotocamera non si è avviata. Riprova o inserisci i valori manualmente.",
-  "scanPumpSuccess": "Display pompa scansionato — verifica i valori.",
-  "scanPumpGlare": "Troppo riflesso sul display — riprova con una leggera angolazione in modo che i numeri non siano sovraesposti.",
-  "scanPumpFailed": "Scansione pompa non riuscita: {error}",
   "badScanReportTitleReceipt": "Segnala un errore di scansione — Scontrino",
-  "badScanReportTitlePumpDisplay": "Segnala un errore di scansione — Display pompa",
-  "pumpScanFailureTitle": "Display illeggibile",
-  "pumpScanFailureBody": "La scansione non è riuscita a leggere il display della pompa. Cosa vuoi fare?",
-  "pumpScanFailureCorrectManually": "Correggi manualmente",
-  "pumpScanFailureReport": "Segnala",
-  "pumpScanFailureRemove": "Rimuovi foto",
   "badScanReportHint": "Condivideremo la foto dello scontrino e entrambi i set di valori affinché la prossima build possa imparare questo layout.",
   "badScanReportFieldBrandLayout": "Layout marchio",
   "badScanReportFieldTotal": "Totale",
@@ -1176,7 +1162,6 @@
   "fillUpSectionWhereTitle": "Dove eri",
   "fillUpSectionWhereSubtitle": "Stazione, odometro, note",
   "fillUpImportReceiptLabel": "Scontrino",
-  "fillUpImportPumpLabel": "Display pompa",
   "fillUpPricePerLiterLabel": "Prezzo per litro",
   "vehicleHeaderUntitled": "Nuovo veicolo",
   "vehicleSectionIdentityTitle": "Identità",
@@ -1758,10 +1743,6 @@
   "tripRecordingAutoPinTitle": "Fissa sempre all'avvio della registrazione",
   "tripRecordingAutoPinSubtitle": "Fissa il modulo automaticamente a ogni viaggio invece di toccare ogni volta. Consuma più batteria.",
   "tripRecordingConnectingTitle": "Avvio della registrazione…",
-  "pumpCameraOrientationHorizontal": "Passa a layout orizzontale",
-  "pumpCameraOrientationVertical": "Passa a layout verticale",
-  "pumpCameraGlareWarning": "Troppi riflessi — inclina leggermente per evitare abbagliamenti",
-  "pumpCameraAlignHint": "Allinea il display nel riquadro, poi cattura",
   "insightHighSpeedBand": "Velocità elevata prolungata ({pctTime}% del tragitto): sprecati {liters} L",
   "insightHighSpeedBandNoFuel": "Velocità elevata prolungata ({pctTime}% del tragitto)",
   "lessonAdviceHighSpeedBand": "Sopra i 110 km/h alza il piede: la resistenza dell'aria aumenta molto, andare un po' più piano fa risparmiare parecchio carburante.",
@@ -2143,10 +2124,6 @@
   "@reconcileResolveGapSemanticLabel": {
     "description": "MT — needs native review"
   },
-  "pumpCameraRotateToLandscape": "Ruota il telefono di lato — il display del distributore è largo, così i numeri vengono più grandi e in verticale",
-  "@pumpCameraRotateToLandscape": {
-    "description": "MT — needs native review"
-  },
   "insightFullThrottle": "Acceleratore a fondo ({pctTime}% del viaggio): {liters} L sprecati",
   "@insightFullThrottle": {
     "description": "MT — needs native review",
@@ -2526,14 +2503,6 @@
   "@ocrTesterExplain": {
     "description": "MT — needs native review"
   },
-  "ocrTesterModePump": "Pompa",
-  "@ocrTesterModePump": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterModeReceipt": "Scontrino",
-  "@ocrTesterModeReceipt": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterCapture": "Scatta",
   "@ocrTesterCapture": {
     "description": "MT — needs native review"
@@ -2724,14 +2693,6 @@
   },
   "obd2DiagnosticsInitCold": "freddo",
   "@obd2DiagnosticsInitCold": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterSaveFixture": "Salva come fixture",
-  "@ocrTesterSaveFixture": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterFixtureSaved": "Fixture salvata nella cartella Download. Spostala in test/fixtures ed esegui tool/promote_ocr_fixture.dart.",
-  "@ocrTesterFixtureSaved": {
     "description": "MT — needs native review"
   },
   "situationColdStart": "Avvio a freddo",
@@ -3737,10 +3698,6 @@
   },
   "alertsStationAdd": "Aggiungi un avviso stazione",
   "@alertsStationAdd": {
-    "description": "MT — needs native review"
-  },
-  "scanPumpInconsistent": "I valori scansionati non tornano — inseriscili manualmente.",
-  "@scanPumpInconsistent": {
     "description": "MT — needs native review"
   },
   "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",
@@ -5545,5 +5502,36 @@
   "@aclWakeNotificationBody": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "fuelEfficiencyIntervalCount": "{count, plural, =1{1 full tank} other{{count} full tanks}}",
+  "@fuelEfficiencyIntervalCount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "tankLevelRangeLastIntervalFormat": "≈ {kilometres} km at your last tank's consumption",
+  "@tankLevelRangeLastIntervalFormat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "kilometres": {
+        "type": "String"
+      }
+    }
+  },
+  "tankLevelRangeLongRunFormat": "Long-run average: ≈ {kilometres} km",
+  "@tankLevelRangeLongRunFormat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "kilometres": {
+        "type": "String"
+      }
+    }
   }
 }

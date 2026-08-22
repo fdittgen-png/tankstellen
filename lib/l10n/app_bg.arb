@@ -1120,8 +1120,6 @@
   "featureDescription_obd2Optional": "Когато е изключено, приложението записва пътувания само с GPS без OBD2 адаптер. Коучингът е ограничен — без моментен L/100 km, по-малко сигнали от двигателя.",
   "featureLabel_addFillUpOcrReceipt": "OCR за касова бележка",
   "featureDescription_addFillUpOcrReceipt": "Сканирайте отпечатана касова бележка на екрана за добавяне на зареждане, за да попълните автоматично дата, литри, обща сума и станция.",
-  "featureLabel_addFillUpOcrPump": "OCR на дисплея на колонката (експериментално)",
-  "featureDescription_addFillUpOcrPump": "Сканирайте дисплея на колонката, за да попълните формуляра. Разпознаването е ненадеждно днес — активирайте само ако искате да тествате.",
   "featureLabel_developerPatToken": "Разработчик: GitHub PAT",
   "featureDescription_developerPatToken": "Активира панела за обратна връзка при неуспешен скан, който автоматично създава GitHub issues с Personal Access Token. За опитни потребители/сътрудници.",
   "feedbackConsentTitle": "Изпращане на доклад в GitHub?",
@@ -1145,19 +1143,7 @@
   "scanReceiptNoData": "Не са намерени данни от касовата бележка — опитайте отново",
   "scanReceiptSuccess": "Касовата бележка е сканирана — проверете стойностите. Докоснете Докладвай грешка при сканиране по-долу, ако нещо е грешно.",
   "scanReceiptFailed": "Сканирането не успя: {error}",
-  "pumpCameraCapture": "Заснемане",
-  "pumpCameraPermissionDenied": "Необходим е достъп до камерата за сканиране на дисплея на колонката. Активирайте го в настройките на устройството.",
-  "pumpCameraError": "Камерата не можа да се стартира. Опитайте отново или въведете стойностите ръчно.",
-  "scanPumpSuccess": "Дисплеят на помпата е сканиран — проверете стойностите.",
-  "scanPumpGlare": "Твърде много отблясъци по дисплея — опитайте отново под лек ъгъл, за да не са преекспонирани цифрите.",
-  "scanPumpFailed": "Сканирането на помпата не успя: {error}",
   "badScanReportTitleReceipt": "Докладвай грешка при сканиране — Касова бележка",
-  "badScanReportTitlePumpDisplay": "Докладвай грешка при сканиране — Дисплей на помпата",
-  "pumpScanFailureTitle": "Дисплеят не е четим",
-  "pumpScanFailureBody": "Сканирането не успя да прочете дисплея на помпата. Какво искате да направите?",
-  "pumpScanFailureCorrectManually": "Коригирай ръчно",
-  "pumpScanFailureReport": "Докладвай",
-  "pumpScanFailureRemove": "Премахни снимката",
   "badScanReportHint": "Ще споделим снимката на касовата бележка и двата набора стойности, за да може следващата версия да научи това оформление.",
   "badScanReportFieldBrandLayout": "Оформление на марката",
   "badScanReportFieldTotal": "Общо",
@@ -1176,7 +1162,6 @@
   "fillUpSectionWhereTitle": "Къде сте били",
   "fillUpSectionWhereSubtitle": "Станция, одометър, бележки",
   "fillUpImportReceiptLabel": "Касова бележка",
-  "fillUpImportPumpLabel": "Дисплей на помпата",
   "fillUpPricePerLiterLabel": "Цена на литър",
   "vehicleHeaderUntitled": "Ново превозно средство",
   "vehicleSectionIdentityTitle": "Идентификация",
@@ -1758,10 +1743,6 @@
   "tripRecordingAutoPinTitle": "Винаги фиксирай при старт на записа",
   "tripRecordingAutoPinSubtitle": "Фиксирай формуляра автоматично при всяко пътуване, вместо да докосваш всеки път. Изразходва повече батерия.",
   "tripRecordingConnectingTitle": "Стартиране на записа…",
-  "pumpCameraOrientationHorizontal": "Превключете към хоризонтално оформление",
-  "pumpCameraOrientationVertical": "Превключете към вертикално оформление",
-  "pumpCameraGlareWarning": "Прекалено много отблясъци — наклонете леко, за да избегнете отражения",
-  "pumpCameraAlignHint": "Наредете дисплея в рамката и след това заснемете",
   "insightHighSpeedBand": "Продължително висока скорост ({pctTime}% от пътуването): пропилени {liters} л",
   "insightHighSpeedBandNoFuel": "Продължително висока скорост ({pctTime}% от пътуването)",
   "lessonAdviceHighSpeedBand": "Над 110 км/ч отпуснете газта – въздушното съпротивление рязко нараства, малко по-бавно спестява много гориво.",
@@ -2143,10 +2124,6 @@
   "@reconcileResolveGapSemanticLabel": {
     "description": "MT — needs native review"
   },
-  "pumpCameraRotateToLandscape": "Завъртете телефона хоризонтално — дисплеят на помпата е широк, така числата ще се виждат по-едро и изправено",
-  "@pumpCameraRotateToLandscape": {
-    "description": "MT — needs native review"
-  },
   "insightFullThrottle": "Пълен газ ({pctTime}% от пътуването): похарчено {liters} л",
   "@insightFullThrottle": {
     "description": "MT — needs native review",
@@ -2526,14 +2503,6 @@
   "@ocrTesterExplain": {
     "description": "MT — needs native review"
   },
-  "ocrTesterModePump": "Помпа",
-  "@ocrTesterModePump": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterModeReceipt": "Касова бележка",
-  "@ocrTesterModeReceipt": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterCapture": "Снимай",
   "@ocrTesterCapture": {
     "description": "MT — needs native review"
@@ -2724,14 +2693,6 @@
   },
   "obd2DiagnosticsInitCold": "студено",
   "@obd2DiagnosticsInitCold": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterSaveFixture": "Запази като fixture",
-  "@ocrTesterSaveFixture": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterFixtureSaved": "Fixture е записан в папката Downloads. Преместете го в test/fixtures и стартирайте tool/promote_ocr_fixture.dart.",
-  "@ocrTesterFixtureSaved": {
     "description": "MT — needs native review"
   },
   "situationColdStart": "Студен старт",
@@ -3737,10 +3698,6 @@
   },
   "alertsStationAdd": "Добави станционен сигнал",
   "@alertsStationAdd": {
-    "description": "MT — needs native review"
-  },
-  "scanPumpInconsistent": "Сканираните стойности не се събират — моля, въведете ги ръчно.",
-  "@scanPumpInconsistent": {
     "description": "MT — needs native review"
   },
   "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",
@@ -5545,5 +5502,36 @@
   "@aclWakeNotificationBody": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "fuelEfficiencyIntervalCount": "{count, plural, =1{1 full tank} other{{count} full tanks}}",
+  "@fuelEfficiencyIntervalCount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "tankLevelRangeLastIntervalFormat": "≈ {kilometres} km at your last tank's consumption",
+  "@tankLevelRangeLastIntervalFormat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "kilometres": {
+        "type": "String"
+      }
+    }
+  },
+  "tankLevelRangeLongRunFormat": "Long-run average: ≈ {kilometres} km",
+  "@tankLevelRangeLongRunFormat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "kilometres": {
+        "type": "String"
+      }
+    }
   }
 }

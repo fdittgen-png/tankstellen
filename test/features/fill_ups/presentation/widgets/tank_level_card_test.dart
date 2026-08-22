@@ -125,6 +125,74 @@ void main() {
     });
   });
 
+  group('TankLevelCard — range at last consumption (#3764)', () {
+    TankLevelEstimate estimate({
+      double? rangeKm,
+      double? rangeKmLastInterval,
+    }) =>
+        TankLevelEstimate(
+          levelL: 32.4,
+          capacityL: 50,
+          lastFillUpDate: DateTime(2026, 4, 27),
+          source: TankLevelSource.fillUp,
+          sensorReadAt: null,
+          rangeKm: rangeKm,
+          rangeKmLastInterval: rangeKmLastInterval,
+        );
+
+    testWidgets('leads with the last-interval projection and shows the '
+        'long-run average as secondary context', (tester) async {
+      await pumpApp(
+        tester,
+        const TankLevelCard(),
+        overrides: _tankLevelOverride(
+          estimate(rangeKm: 405, rangeKmLastInterval: 324),
+        ),
+      );
+
+      // Primary line = the last-tank projection.
+      expect(
+        find.text("≈ 324 km at your last tank's consumption"),
+        findsOneWidget,
+      );
+      // Secondary context = the long-run figure.
+      expect(find.text('Long-run average: ≈ 405 km'), findsOneWidget);
+      // The generic range string does NOT render.
+      expect(find.textContaining('km of range'), findsNothing);
+    });
+
+    testWidgets('no closed interval yet → today\'s long-run range string, '
+        'no long-run context line', (tester) async {
+      await pumpApp(
+        tester,
+        const TankLevelCard(),
+        overrides: _tankLevelOverride(estimate(rangeKm: 462)),
+      );
+
+      expect(find.textContaining('462'), findsOneWidget);
+      expect(find.textContaining('km of range'), findsOneWidget);
+      expect(find.byKey(const Key('tank_level_range_long_run')), findsNothing);
+      expect(find.textContaining("last tank's consumption"), findsNothing);
+    });
+
+    testWidgets('long-run context hidden when it rounds to the same figure '
+        'as the last-interval projection', (tester) async {
+      await pumpApp(
+        tester,
+        const TankLevelCard(),
+        overrides: _tankLevelOverride(
+          estimate(rangeKm: 324.2, rangeKmLastInterval: 324.4),
+        ),
+      );
+
+      expect(
+        find.text("≈ 324 km at your last tank's consumption"),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('tank_level_range_long_run')), findsNothing);
+    });
+  });
+
   group('TankLevelCard — low-fuel colouring', () {
     testWidgets('applies error colour to the bar at < 15% capacity',
         (tester) async {

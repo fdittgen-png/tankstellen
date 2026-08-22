@@ -303,17 +303,6 @@ class FeatureManifest {
           'Scan a printed receipt on the Add fill-up screen to pre-fill '
               'date, litres, total, and station.',
     ),
-    Feature.addFillUpOcrPump: FeatureManifestEntry.allChannels(
-      feature: Feature.addFillUpOcrPump,
-      // Default-off (#2110): pump-display OCR doesn't read pump LEDs
-      // reliably yet. The button hides until the user opts in from
-      // Feature management. No prerequisites.
-      defaultOn: false,
-      displayName: 'Pump display OCR (experimental)',
-      description:
-          'Scan a fuel pump display to pre-fill the form. Recognition '
-              'is unreliable today — opt in only if you want to test.',
-    ),
     Feature.addFillUpShareIntentReceipt: FeatureManifestEntry.allChannels(
       feature: Feature.addFillUpShareIntentReceipt,
       // Default-off (#2735): opt-in. When on, Sparkilo appears in the OS

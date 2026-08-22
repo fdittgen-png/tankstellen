@@ -8377,18 +8377,6 @@ abstract class AppLocalizations {
   /// **'Scan a printed receipt on the Add fill-up screen to pre-fill date, litres, total, and station.'**
   String get featureDescription_addFillUpOcrReceipt;
 
-  /// Settings toggle label for the Add-fill-up pump-display-OCR import button (#2110). Default-off — recognizer unreliable.
-  ///
-  /// In en, this message translates to:
-  /// **'Pump display OCR (experimental)'**
-  String get featureLabel_addFillUpOcrPump;
-
-  /// Settings toggle description for the Add-fill-up pump-display-OCR button (#2110). Sets expectation that the recognizer is experimental.
-  ///
-  /// In en, this message translates to:
-  /// **'Scan a fuel pump display to pre-fill the form. Recognition is unreliable today — opt in only if you want to test.'**
-  String get featureDescription_addFillUpOcrPump;
-
   /// Settings toggle label for the bad-scan-feedback PAT panel (#2116-6). Default-off — most users never paste a token.
   ///
   /// In en, this message translates to:
@@ -8833,71 +8821,11 @@ abstract class AppLocalizations {
   /// **'Scan failed: {error}'**
   String scanReceiptFailed(String error);
 
-  /// Snackbar shown after a successful pump-display scan (#751).
-  ///
-  /// In en, this message translates to:
-  /// **'Pump display scanned — verify the values.'**
-  String get scanPumpSuccess;
-
-  /// Snackbar shown when the pump-display capture is rejected for excessive glare and the user is asked to re-angle (#2275).
-  ///
-  /// In en, this message translates to:
-  /// **'Too much glare on the display — try again at a slight angle so the numbers aren\'t washed out.'**
-  String get scanPumpGlare;
-
-  /// Snackbar shown when the pump-display scan read values that failed the country validation gate (the numbers don't reconcile or are out of range), so the app declines to auto-fill a plausible-but-wrong pair (#2828).
-  ///
-  /// In en, this message translates to:
-  /// **'The scanned values don\'t add up — please enter them manually.'**
-  String get scanPumpInconsistent;
-
-  /// Snackbar shown when the pump-display scan throws (#751).
-  ///
-  /// In en, this message translates to:
-  /// **'Pump scan failed: {error}'**
-  String scanPumpFailed(String error);
-
   /// Receipt-specific title for the bad-scan report sheet (#953). Used when ScanKind == receipt.
   ///
   /// In en, this message translates to:
   /// **'Report a scan error — Receipt'**
   String get badScanReportTitleReceipt;
-
-  /// Pump-display-specific title for the bad-scan report sheet (#953). Used when ScanKind == pumpDisplay.
-  ///
-  /// In en, this message translates to:
-  /// **'Report a scan error — Pump display'**
-  String get badScanReportTitlePumpDisplay;
-
-  /// Title of the bottom sheet shown when a pump-display scan returns no usable data (#953).
-  ///
-  /// In en, this message translates to:
-  /// **'Display unreadable'**
-  String get pumpScanFailureTitle;
-
-  /// Body text of the pump-scan failure sheet, prompting the user to choose between correcting manually, reporting, or removing the photo (#953).
-  ///
-  /// In en, this message translates to:
-  /// **'The scan couldn\'t read the pump display. What would you like to do?'**
-  String get pumpScanFailureBody;
-
-  /// Action: close the failure sheet and leave the form untouched so the user types values (#953).
-  ///
-  /// In en, this message translates to:
-  /// **'Correct manually'**
-  String get pumpScanFailureCorrectManually;
-
-  /// Action: open the bad-scan report flow so the unreadable photo is shipped to GitHub for triage (#953).
-  ///
-  /// In en, this message translates to:
-  /// **'Report'**
-  String get pumpScanFailureReport;
-
-  /// Action: delete the captured photo and forget the scan (#953).
-  ///
-  /// In en, this message translates to:
-  /// **'Remove photo'**
-  String get pumpScanFailureRemove;
 
   /// Subtitle under the bad-scan-report sheet title (#751).
   ///
@@ -8977,54 +8905,6 @@ abstract class AppLocalizations {
   /// **'Submission failed — manual share'**
   String get badScanReportFallbackToShare;
 
-  /// Label of the shutter button on the pump-display camera screen (#1868).
-  ///
-  /// In en, this message translates to:
-  /// **'Capture'**
-  String get pumpCameraCapture;
-
-  /// Shown when the camera permission is denied on the pump-display capture screen (#1868).
-  ///
-  /// In en, this message translates to:
-  /// **'Camera access is needed to scan the pump display. Enable it in your device settings.'**
-  String get pumpCameraPermissionDenied;
-
-  /// Shown when the in-app camera fails to initialise on the pump-display capture screen (#1868).
-  ///
-  /// In en, this message translates to:
-  /// **'The camera couldn\'t start. Try again or enter the values by hand.'**
-  String get pumpCameraError;
-
-  /// Tooltip on the orientation-toggle button when the overlay is currently vertical (#2276).
-  ///
-  /// In en, this message translates to:
-  /// **'Switch to horizontal layout'**
-  String get pumpCameraOrientationHorizontal;
-
-  /// Tooltip on the orientation-toggle button when the overlay is currently horizontal (#2276).
-  ///
-  /// In en, this message translates to:
-  /// **'Switch to vertical layout'**
-  String get pumpCameraOrientationVertical;
-
-  /// Live amber feedback bar shown when the framed region is over-exposed by glare (#2276).
-  ///
-  /// In en, this message translates to:
-  /// **'Too much glare — tilt slightly to avoid reflections'**
-  String get pumpCameraGlareWarning;
-
-  /// Default hint shown in the live feedback bar on the guided alignment overlay (#2276).
-  ///
-  /// In en, this message translates to:
-  /// **'Line up the display inside the frame, then capture'**
-  String get pumpCameraAlignHint;
-
-  /// Highest-priority feedback shown over the camera while the phone is held portrait; the shutter is disabled until the user rotates to landscape so the wide pump display fills the frame with large, upright digits (#2477).
-  ///
-  /// In en, this message translates to:
-  /// **'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright'**
-  String get pumpCameraRotateToLandscape;
-
   /// Title of the confirmation dialog shown on save when a fill-up has data-quality warnings (wrong fuel for the engine, or an odometer below the previous reading) before persisting (#2836).
   ///
   /// In en, this message translates to:
@@ -9084,12 +8964,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Receipt'**
   String get fillUpImportReceiptLabel;
-
-  /// Import option: OCR-scan the fuel-pump LCD (#751 phase 2).
-  ///
-  /// In en, this message translates to:
-  /// **'Pump display'**
-  String get fillUpImportPumpLabel;
 
   /// Read-only derived value shown below the cost field when liters + cost are both entered (#751 phase 2).
   ///
@@ -9198,6 +9072,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 fill} other{{count} fills}}'**
   String fuelEfficiencyFillCount(int count);
+
+  /// Number of closed full-tank-to-full-tank intervals classified into a composition bucket, shown next to the fill count on the bucket's row in the per-fuel efficiency card (#3764). 'Full tank' matches the vocabulary of the insufficient-data footnote.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 full tank} other{{count} full tanks}}'**
+  String fuelEfficiencyIntervalCount(int count);
 
   /// Footnote shown on the per-fuel efficiency card when no winner can be crowned yet because at least one composition bucket has fewer than two closed plein-to-plein intervals (#2887, ADR 0015 verdict gate).
   ///
@@ -10991,18 +10871,6 @@ abstract class AppLocalizations {
   /// **'Run the pump / receipt OCR pipeline on a chosen photo and inspect every step — only available in Developer mode.'**
   String get ocrTesterExplain;
 
-  /// Segmented-button label for the pump-display OCR mode on the OCR tester (#2518).
-  ///
-  /// In en, this message translates to:
-  /// **'Pump'**
-  String get ocrTesterModePump;
-
-  /// Segmented-button label for the paper-receipt OCR mode on the OCR tester (#2518).
-  ///
-  /// In en, this message translates to:
-  /// **'Receipt'**
-  String get ocrTesterModeReceipt;
-
   /// Button that opens the camera to capture a fresh image to run through the OCR pipeline (#2518).
   ///
   /// In en, this message translates to:
@@ -11218,18 +11086,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'OCR package saved to your Downloads folder.'**
   String get ocrTesterExported;
-
-  /// Button that saves the current OCR trace as a regression fixture — the source image plus a .ocrpkg.json with expected values — into the device Downloads folder, ready to commit and run through the fixture-promotion generator (#2519).
-  ///
-  /// In en, this message translates to:
-  /// **'Save as fixture'**
-  String get ocrTesterSaveFixture;
-
-  /// Snackbar confirming the OCR regression fixture (source image + .ocrpkg.json) was saved to Downloads, with a hint on the next step (#2519).
-  ///
-  /// In en, this message translates to:
-  /// **'Fixture saved to your Downloads folder. Move it under test/fixtures and run tool/promote_ocr_fixture.dart.'**
-  String get ocrTesterFixtureSaved;
 
   /// Title of the optional onboarding step (#816) that offers to connect an OBD2 adapter, read the VIN, and auto-fill the vehicle profile.
   ///
@@ -12039,11 +11895,23 @@ abstract class AppLocalizations {
   /// **'{litres} L'**
   String tankLevelLitersFormat(String litres);
 
-  /// Sub-text under the tank-level big number — distance the user can still drive at the vehicle's average L/100 km (#1195).
+  /// Sub-text under the tank-level big number — distance the user can still drive at the vehicle's average L/100 km (#1195). Since #3764 shown only when no closed full-tank interval exists yet (the last-tank projection leads otherwise).
   ///
   /// In en, this message translates to:
   /// **'≈ {kilometres} km of range'**
   String tankLevelRangeFormat(String kilometres);
+
+  /// Primary range sub-text under the tank-level big number (#3764) — distance the current tank content covers at the L/100 km measured over the LAST closed full-tank-to-full-tank interval.
+  ///
+  /// In en, this message translates to:
+  /// **'≈ {kilometres} km at your last tank\'s consumption'**
+  String tankLevelRangeLastIntervalFormat(String kilometres);
+
+  /// Secondary context line under the primary last-tank range projection (#3764) — the same tank content projected at the long-run tank-to-tank average consumption instead. Only shown when it differs from the primary figure.
+  ///
+  /// In en, this message translates to:
+  /// **'Long-run average: ≈ {kilometres} km'**
+  String tankLevelRangeLongRunFormat(String kilometres);
 
   /// Caption beneath the tank-level card — when the last fill-up was logged and how many trips have been recorded since (#1195).
   ///

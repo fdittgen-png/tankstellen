@@ -48,23 +48,13 @@ typedef ImageBytesReader = Future<Uint8List> Function(String path);
 ///    system-share intent so the user can still deliver the report via
 ///    email / GitHub Mobile / any share target.
 ///
-/// #953 generalised the sheet to also handle failed pump-display scans.
-/// Pass [scan] for the receipt path, or [pumpScan] for the pump-display
-/// path; exactly one must be non-null and [kind] selects which.
 class BadScanReportSheet extends ConsumerStatefulWidget {
-  /// Selects the rendering + GitHub issue title. Defaults to
-  /// [ScanKind.receipt] for backward compatibility with the original
-  /// (#751 / #952) callers — existing code that passes only [scan]
-  /// continues to render the receipt diff table unchanged.
+  /// Selects the rendering + GitHub issue title. Receipt-only since
+  /// #3765 removed the pump-display scanner.
   final ScanKind kind;
 
-  /// Receipt-side scan outcome. Required when [kind] is
-  /// [ScanKind.receipt]; ignored when [kind] is [ScanKind.pumpDisplay].
+  /// Receipt-side scan outcome.
   final ReceiptScanOutcome? scan;
-
-  /// Pump-display scan outcome (#953). Required when [kind] is
-  /// [ScanKind.pumpDisplay]; ignored when [kind] is [ScanKind.receipt].
-  final PumpDisplayScanOutcome? pumpScan;
 
   final double? enteredLiters;
   final double? enteredTotalCost;
@@ -89,7 +79,6 @@ class BadScanReportSheet extends ConsumerStatefulWidget {
     super.key,
     this.kind = ScanKind.receipt,
     this.scan,
-    this.pumpScan,
     required this.enteredLiters,
     required this.enteredTotalCost,
     required this.appVersion,
@@ -100,19 +89,15 @@ class BadScanReportSheet extends ConsumerStatefulWidget {
     this.consentReader,
     this.consentWriter,
   }) : assert(
-         kind == ScanKind.receipt ? scan != null : pumpScan != null,
-         'BadScanReportSheet: scan must be set for ScanKind.receipt, '
-         'pumpScan must be set for ScanKind.pumpDisplay.',
+         scan != null,
+         'BadScanReportSheet: scan must be set for ScanKind.receipt.',
        );
 
-  /// Path of the scanned image on disk. Resolves to either the receipt
-  /// or the pump-display capture depending on [kind].
-  String get _imagePath =>
-      kind == ScanKind.receipt ? scan!.imagePath : pumpScan!.imagePath;
+  /// Path of the scanned image on disk.
+  String get _imagePath => scan!.imagePath;
 
-  /// Raw OCR text. Same kind dispatch as [_imagePath].
-  String get _ocrText =>
-      kind == ScanKind.receipt ? scan!.ocrText : pumpScan!.ocrText;
+  /// Raw OCR text.
+  String get _ocrText => scan!.ocrText;
 
   @override
   ConsumerState<BadScanReportSheet> createState() => _BadScanReportSheetState();
@@ -144,7 +129,6 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
             ? BadScanFormView(
                 kind: widget.kind,
                 receiptScan: widget.scan,
-                pumpScan: widget.pumpScan,
                 enteredLiters: widget.enteredLiters,
                 enteredTotalCost: widget.enteredTotalCost,
                 submitting: _submitting,
@@ -205,11 +189,7 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
       final url = await reporter.reportBadScan(
         kind: widget.kind,
         rawOcrText: widget._ocrText,
-        parsedFields: buildBadScanParsedFields(
-          kind: widget.kind,
-          receiptScan: widget.scan,
-          pumpScan: widget.pumpScan,
-        ),
+        parsedFields: buildBadScanParsedFields(receiptScan: widget.scan),
         userCorrections: buildBadScanUserCorrections(
           enteredLiters: widget.enteredLiters,
           enteredTotalCost: widget.enteredTotalCost,
@@ -240,17 +220,13 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
     final params = ShareParams(
       files: [XFile(widget._imagePath)],
       text: buildBadScanShareBody(
-        kind: widget.kind,
         receiptScan: widget.scan,
-        pumpScan: widget.pumpScan,
         enteredLiters: widget.enteredLiters,
         enteredTotalCost: widget.enteredTotalCost,
         appVersion: widget.appVersion,
         ocrText: widget._ocrText,
       ),
-      subject: widget.kind == ScanKind.receipt
-          ? 'Sparkilo receipt scan issue'
-          : 'Sparkilo pump-display scan issue',
+      subject: 'Sparkilo receipt scan issue',
     );
 
     // Show the snackbar before awaiting share() so the message is

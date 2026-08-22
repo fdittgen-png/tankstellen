@@ -1120,8 +1120,6 @@
   "featureDescription_obd2Optional": "Kad izslēgts, lietotne ieraksta braucienus tikai ar GPS bez OBD2 adaptera. Treniņš ir ierobežots — nav momentānā L/100 km, mazāk dzinēja signālu.",
   "featureLabel_addFillUpOcrReceipt": "Čeka OCR",
   "featureDescription_addFillUpOcrReceipt": "Skenējiet izdrukāto čeku ekrānā Pievienot uzpildi, lai iepriekš aizpildītu datumu, litrus, summu un staciju.",
-  "featureLabel_addFillUpOcrPump": "Sūkņa displeja OCR (eksperimentāls)",
-  "featureDescription_addFillUpOcrPump": "Skenējiet degvielas sūkņa displeju, lai iepriekš aizpildītu veidlapu. Atpazīšana šodien nav uzticama — ieslēdziet tikai tad, ja vēlaties pārbaudīt.",
   "featureLabel_developerPatToken": "Izstrādātāja atsauksmes (GitHub PAT)",
   "featureDescription_developerPatToken": "Iespējo neveiksmīgu skenējumu atsauksmju paneli, kas ar Personal Access Token automātiski izveido GitHub problēmas. Pieredzējušu lietotāju / līdzdalībnieku funkcija.",
   "feedbackConsentTitle": "Nosūtīt ziņojumu uz GitHub?",
@@ -1145,19 +1143,7 @@
   "scanReceiptNoData": "Nav atrasti čeka dati — mēģiniet vēlreiz",
   "scanReceiptSuccess": "Čeks skenēts — pārbaudiet vērtības. Pieskarieties \"Ziņot par skenēšanas kļūdu\" zemāk, ja kaut kas nav pareizi.",
   "scanReceiptFailed": "Skenēšana neizdevās: {error}",
-  "pumpCameraCapture": "Uzņemt",
-  "pumpCameraPermissionDenied": "Lai skenētu uzpildes ekrānu, nepieciešama piekļuve kamerai. Iespējojiet to ierīces iestatījumos.",
-  "pumpCameraError": "Kameru neizdevās palaist. Mēģiniet vēlreiz vai ievadiet vērtības manuāli.",
-  "scanPumpSuccess": "Sūkņa displejs skenēts — pārbaudiet vērtības.",
-  "scanPumpGlare": "Pārāk daudz atspīduma uz displeja — mēģiniet vēlreiz nelielā leņķī, lai cipari nebūtu pārgaismoti.",
-  "scanPumpFailed": "Sūkņa skenēšana neizdevās: {error}",
   "badScanReportTitleReceipt": "Ziņot par skenēšanas kļūdu — čeks",
-  "badScanReportTitlePumpDisplay": "Ziņot par skenēšanas kļūdu — sūkņa displejs",
-  "pumpScanFailureTitle": "Displejs nav lasāms",
-  "pumpScanFailureBody": "Skenēšana nevarēja nolasīt sūkņa displeju. Ko vēlaties darīt?",
-  "pumpScanFailureCorrectManually": "Labot manuāli",
-  "pumpScanFailureReport": "Ziņot",
-  "pumpScanFailureRemove": "Noņemt fotoattēlu",
   "badScanReportHint": "Mēs kopīgosim čeka fotoattēlu un abas vērtību kopas, lai nākamā versija varētu apgūt šo izkārtojumu.",
   "badScanReportFieldBrandLayout": "Zīmola izkārtojums",
   "badScanReportFieldTotal": "Kopā",
@@ -1176,7 +1162,6 @@
   "fillUpSectionWhereTitle": "Kur jūs bijāt",
   "fillUpSectionWhereSubtitle": "Stacija, odometrs, piezīmes",
   "fillUpImportReceiptLabel": "Čeks",
-  "fillUpImportPumpLabel": "Sūkņa displejs",
   "fillUpPricePerLiterLabel": "Cena par litru",
   "vehicleHeaderUntitled": "Jauns transportlīdzeklis",
   "vehicleSectionIdentityTitle": "Identitāte",
@@ -1758,10 +1743,6 @@
   "tripRecordingAutoPinTitle": "Vienmēr piespraust, sākot ierakstu",
   "tripRecordingAutoPinSubtitle": "Automātiski piespraust veidlapu katrā braucienā, nevis pieskaroties katru reizi. Patērē vairāk akumulatora.",
   "tripRecordingConnectingTitle": "Notiek ieraksta sākšana…",
-  "pumpCameraOrientationHorizontal": "Pārslēgties uz horizontālo izkārtojumu",
-  "pumpCameraOrientationVertical": "Pārslēgties uz vertikālo izkārtojumu",
-  "pumpCameraGlareWarning": "Pārāk daudz atspulgu — nedaudz nolieciet, lai izvairītos no atspīdumiem",
-  "pumpCameraAlignHint": "Novietojiet displeju rāmītī un pēc tam fotografējiet",
   "insightHighSpeedBand": "Ilgstoši augsts ātrums ({pctTime}% no brauciena): izšķērdēti {liters} L",
   "insightHighSpeedBandNoFuel": "Ilgstoši augsts ātrums ({pctTime}% no brauciena)",
   "lessonAdviceHighSpeedBand": "Virs 110 km/h atlaidiet gāzi – gaisa pretestība strauji pieaug, nedaudz lēnāk ietaupa daudz degvielas.",
@@ -2143,10 +2124,6 @@
   "@reconcileResolveGapSemanticLabel": {
     "description": "MT — needs native review"
   },
-  "pumpCameraRotateToLandscape": "Pagrieziet tālruni sāniski — sūkņa displejs ir plats, tāpēc skaitļi ir lielāki un taisni",
-  "@pumpCameraRotateToLandscape": {
-    "description": "MT — needs native review"
-  },
   "insightFullThrottle": "Pilna gāze ({pctTime}% no brauciena): izniekots {liters} L",
   "@insightFullThrottle": {
     "description": "MT — needs native review",
@@ -2526,14 +2503,6 @@
   "@ocrTesterExplain": {
     "description": "MT — needs native review"
   },
-  "ocrTesterModePump": "Sūknis",
-  "@ocrTesterModePump": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterModeReceipt": "Čeks",
-  "@ocrTesterModeReceipt": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterCapture": "Uzņemt",
   "@ocrTesterCapture": {
     "description": "MT — needs native review"
@@ -2724,14 +2693,6 @@
   },
   "obd2DiagnosticsInitCold": "auksts",
   "@obd2DiagnosticsInitCold": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterSaveFixture": "Saglabāt kā fiksatoru",
-  "@ocrTesterSaveFixture": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterFixtureSaved": "Fiksators saglabāts lejupielāžu mapē. Pārvietojiet to zem test/fixtures un palaidiet tool/promote_ocr_fixture.dart.",
-  "@ocrTesterFixtureSaved": {
     "description": "MT — needs native review"
   },
   "situationColdStart": "Aukstā starta",
@@ -3737,10 +3698,6 @@
   },
   "alertsStationAdd": "Pievienot stacijas brīdinājumu",
   "@alertsStationAdd": {
-    "description": "MT — needs native review"
-  },
-  "scanPumpInconsistent": "Skenētās vērtības neatbilst — lūdzu, ievadiet tās manuāli.",
-  "@scanPumpInconsistent": {
     "description": "MT — needs native review"
   },
   "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",
@@ -5545,5 +5502,36 @@
   "@aclWakeNotificationBody": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "fuelEfficiencyIntervalCount": "{count, plural, =1{1 full tank} other{{count} full tanks}}",
+  "@fuelEfficiencyIntervalCount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "tankLevelRangeLastIntervalFormat": "≈ {kilometres} km at your last tank's consumption",
+  "@tankLevelRangeLastIntervalFormat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "kilometres": {
+        "type": "String"
+      }
+    }
+  },
+  "tankLevelRangeLongRunFormat": "Long-run average: ≈ {kilometres} km",
+  "@tankLevelRangeLongRunFormat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "kilometres": {
+        "type": "String"
+      }
+    }
   }
 }

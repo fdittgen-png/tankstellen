@@ -4760,13 +4760,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Scannen Sie eine gedruckte Quittung auf der Seite \"Tankvorgang hinzufügen\", um Datum, Liter, Gesamtbetrag und Tankstelle vorauszufüllen.';
 
   @override
-  String get featureLabel_addFillUpOcrPump => 'Zapfsäulen-OCR (experimentell)';
-
-  @override
-  String get featureDescription_addFillUpOcrPump =>
-      'Scannen Sie eine Zapfsäulenanzeige, um das Formular vorauszufüllen. Die Erkennung ist heute unzuverlässig — aktivieren Sie nur, wenn Sie testen möchten.';
-
-  @override
   String get featureLabel_developerPatToken =>
       'Entwickler-Feedback (GitHub PAT)';
 
@@ -5039,42 +5032,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get scanPumpSuccess => 'Zapfsäule gescannt — Werte prüfen.';
-
-  @override
-  String get scanPumpGlare =>
-      'Zu viel Blendung auf der Anzeige — bitte leicht schräg erneut versuchen, damit die Zahlen nicht überstrahlt werden.';
-
-  @override
-  String get scanPumpInconsistent =>
-      'Die gescannten Werte passen nicht zusammen — bitte manuell eingeben.';
-
-  @override
-  String scanPumpFailed(String error) {
-    return 'Zapfsäulen-Scan fehlgeschlagen: $error';
-  }
-
-  @override
   String get badScanReportTitleReceipt => 'Scan-Fehler melden — Beleg';
-
-  @override
-  String get badScanReportTitlePumpDisplay => 'Scan-Fehler melden — Zapfsäule';
-
-  @override
-  String get pumpScanFailureTitle => 'Anzeige nicht lesbar';
-
-  @override
-  String get pumpScanFailureBody =>
-      'Die Zapfsäulen-Anzeige konnte nicht gelesen werden. Wie möchtest du fortfahren?';
-
-  @override
-  String get pumpScanFailureCorrectManually => 'Manuell eingeben';
-
-  @override
-  String get pumpScanFailureReport => 'Melden';
-
-  @override
-  String get pumpScanFailureRemove => 'Foto entfernen';
 
   @override
   String get badScanReportHint =>
@@ -5118,36 +5076,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Senden fehlgeschlagen — manuell teilen';
 
   @override
-  String get pumpCameraCapture => 'Aufnehmen';
-
-  @override
-  String get pumpCameraPermissionDenied =>
-      'Für das Scannen der Zapfsäulenanzeige wird Kamerazugriff benötigt. Aktiviere ihn in den Geräteeinstellungen.';
-
-  @override
-  String get pumpCameraError =>
-      'Die Kamera konnte nicht gestartet werden. Versuche es erneut oder gib die Werte von Hand ein.';
-
-  @override
-  String get pumpCameraOrientationHorizontal =>
-      'Zu horizontaler Anzeige wechseln';
-
-  @override
-  String get pumpCameraOrientationVertical => 'Zu vertikaler Anzeige wechseln';
-
-  @override
-  String get pumpCameraGlareWarning =>
-      'Zu viel Blendung — leicht neigen, um Reflexionen zu vermeiden';
-
-  @override
-  String get pumpCameraAlignHint =>
-      'Anzeige im Rahmen ausrichten, dann aufnehmen';
-
-  @override
-  String get pumpCameraRotateToLandscape =>
-      'Drehe dein Telefon quer — die Zapfsäulenanzeige ist breit, so werden die Zahlen größer und stehen aufrecht';
-
-  @override
   String get fillUpWarningDialogTitle => 'Tankvorgang prüfen';
 
   @override
@@ -5181,9 +5109,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get fillUpImportReceiptLabel => 'Beleg';
-
-  @override
-  String get fillUpImportPumpLabel => 'Zapfsäulen-Display';
 
   @override
   String get fillUpPricePerLiterLabel => 'Preis pro Liter';
@@ -5249,6 +5174,17 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other: '$count Tankungen',
       one: '1 Tankung',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fuelEfficiencyIntervalCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count volle Tankfüllungen',
+      one: '1 volle Tankfüllung',
     );
     return '$_temp0';
   }
@@ -6388,12 +6324,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die Zapfsäulen-/Beleg-OCR auf einem ausgewählten Foto ausführen und jeden Schritt prüfen — nur im Entwicklermodus verfügbar.';
 
   @override
-  String get ocrTesterModePump => 'Zapfsäule';
-
-  @override
-  String get ocrTesterModeReceipt => 'Beleg';
-
-  @override
   String get ocrTesterCapture => 'Aufnehmen';
 
   @override
@@ -6502,13 +6432,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get ocrTesterExported => 'OCR-Paket im Downloads-Ordner gespeichert.';
-
-  @override
-  String get ocrTesterSaveFixture => 'Als Fixture speichern';
-
-  @override
-  String get ocrTesterFixtureSaved =>
-      'Fixture im Downloads-Ordner gespeichert. Nach test/fixtures verschieben und tool/promote_ocr_fixture.dart ausführen.';
 
   @override
   String get onboardingObd2StepTitle => 'OBD2-Adapter verbinden';
@@ -6984,6 +6907,16 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String tankLevelRangeFormat(String kilometres) {
     return '≈ $kilometres km Reichweite';
+  }
+
+  @override
+  String tankLevelRangeLastIntervalFormat(String kilometres) {
+    return '≈ $kilometres km beim Verbrauch deiner letzten Tankfüllung';
+  }
+
+  @override
+  String tankLevelRangeLongRunFormat(String kilometres) {
+    return 'Langzeit-Durchschnitt: ≈ $kilometres km';
   }
 
   @override

@@ -152,12 +152,6 @@ enum Feature {
   /// and station.
   addFillUpOcrReceipt,
 
-  /// Pump-display-OCR import button on the Add fill-up screen (#2110).
-  /// Default-off — the recognizer doesn't read pump LEDs reliably yet.
-  /// Power users can flip it on from Feature management to try it; the
-  /// flag will be flipped on by default once the model matures.
-  addFillUpOcrPump,
-
   /// Inbound OS share-intent receipt import (#2735 / Epic #2687).
   /// Default-off — opt-in. When on, a receipt image shared from another
   /// app (gallery, files, scanner) lands in Sparkilo, routes to the Add

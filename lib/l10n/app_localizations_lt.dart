@@ -4755,14 +4755,6 @@ class AppLocalizationsLt extends AppLocalizations {
       'Nuskaitykite atspausdintą kvitą Pridėti pildymą ekrane, kad iš anksto užpildytumėte datą, litrus, sumą ir stotį.';
 
   @override
-  String get featureLabel_addFillUpOcrPump =>
-      'Siurblio ekrano OCR (eksperimentinis)';
-
-  @override
-  String get featureDescription_addFillUpOcrPump =>
-      'Nuskaitykite degalų siurblio ekraną, kad iš anksto užpildytumėte formą. Atpažinimas šiandien nepatikimas — įjunkite tik jei norite išbandyti.';
-
-  @override
   String get featureLabel_developerPatToken =>
       'Kūrėjo atsiliepimai (GitHub PAT)';
 
@@ -5034,45 +5026,8 @@ class AppLocalizationsLt extends AppLocalizations {
   }
 
   @override
-  String get scanPumpSuccess =>
-      'Siurblio ekranas nuskaitytas — patikrinkite reikšmes.';
-
-  @override
-  String get scanPumpGlare =>
-      'Per daug atspindžių ekrane — bandykite dar kartą šiek tiek kampu, kad skaičiai nebūtų peršviesti.';
-
-  @override
-  String get scanPumpInconsistent =>
-      'Nuskaitytos reikšmės nesutampa — įveskite jas rankiniu būdu.';
-
-  @override
-  String scanPumpFailed(String error) {
-    return 'Siurblio nuskaitymas nepavyko: $error';
-  }
-
-  @override
   String get badScanReportTitleReceipt =>
       'Pranešti apie nuskaitymo klaidą — Kvitas';
-
-  @override
-  String get badScanReportTitlePumpDisplay =>
-      'Pranešti apie nuskaitymo klaidą — Siurblio ekranas';
-
-  @override
-  String get pumpScanFailureTitle => 'Ekranas neįskaitomas';
-
-  @override
-  String get pumpScanFailureBody =>
-      'Nuskaitymu nepavyko nuskaityti siurblio ekrano. Ką norėtumėte daryti?';
-
-  @override
-  String get pumpScanFailureCorrectManually => 'Taisyti rankiniu būdu';
-
-  @override
-  String get pumpScanFailureReport => 'Pranešti';
-
-  @override
-  String get pumpScanFailureRemove => 'Pašalinti nuotrauką';
 
   @override
   String get badScanReportHint =>
@@ -5116,36 +5071,6 @@ class AppLocalizationsLt extends AppLocalizations {
       'Pateikimas nepavyko — rankinis bendrinimas';
 
   @override
-  String get pumpCameraCapture => 'Fotografuoti';
-
-  @override
-  String get pumpCameraPermissionDenied =>
-      'Norint nuskaityti degalinės ekraną, reikia prieigos prie kameros. Įjunkite ją įrenginio nustatymuose.';
-
-  @override
-  String get pumpCameraError =>
-      'Nepavyko paleisti kameros. Bandykite dar kartą arba įveskite reikšmes rankiniu būdu.';
-
-  @override
-  String get pumpCameraOrientationHorizontal =>
-      'Perjungti į horizontalų išdėstymą';
-
-  @override
-  String get pumpCameraOrientationVertical => 'Perjungti į vertikalų išdėstymą';
-
-  @override
-  String get pumpCameraGlareWarning =>
-      'Per daug atspindžių — šiek tiek pakreipkite, kad išvengtumėte atspindžių';
-
-  @override
-  String get pumpCameraAlignHint =>
-      'Sulygiuokite ekraną rėme ir tada fotografuokite';
-
-  @override
-  String get pumpCameraRotateToLandscape =>
-      'Pasukite telefoną į šoną — degalų skaitiklio ekranas yra platus, todėl skaičiai bus didesni ir tiesūs';
-
-  @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
 
   @override
@@ -5178,9 +5103,6 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get fillUpImportReceiptLabel => 'Kvitas';
-
-  @override
-  String get fillUpImportPumpLabel => 'Siurblio ekranas';
 
   @override
   String get fillUpPricePerLiterLabel => 'Kaina už litrą';
@@ -5246,6 +5168,17 @@ class AppLocalizationsLt extends AppLocalizations {
       locale: localeName,
       other: '$count fills',
       one: '1 fill',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fuelEfficiencyIntervalCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count full tanks',
+      one: '1 full tank',
     );
     return '$_temp0';
   }
@@ -6387,12 +6320,6 @@ class AppLocalizationsLt extends AppLocalizations {
       'Paleiskite degalų skaitiklio / kvito OCR vamzdyną ant pasirinktos nuotraukos ir tikrinkite kiekvieną žingsnį — tik kūrėjo režimu.';
 
   @override
-  String get ocrTesterModePump => 'Skaitiklis';
-
-  @override
-  String get ocrTesterModeReceipt => 'Kvitas';
-
-  @override
   String get ocrTesterCapture => 'Fotografuoti';
 
   @override
@@ -6502,13 +6429,6 @@ class AppLocalizationsLt extends AppLocalizations {
   @override
   String get ocrTesterExported =>
       'OCR paketas išsaugotas jūsų atsisiuntimų aplanke.';
-
-  @override
-  String get ocrTesterSaveFixture => 'Išsaugoti kaip priedą';
-
-  @override
-  String get ocrTesterFixtureSaved =>
-      'Priedas išsaugotas jūsų atsisiuntimų aplanke. Perkelkite jį į test/fixtures ir paleiskite tool/promote_ocr_fixture.dart.';
 
   @override
   String get onboardingObd2StepTitle => 'Prijunkite savo OBD2 adapterį';
@@ -6982,6 +6902,16 @@ class AppLocalizationsLt extends AppLocalizations {
   @override
   String tankLevelRangeFormat(String kilometres) {
     return '≈ $kilometres km rida';
+  }
+
+  @override
+  String tankLevelRangeLastIntervalFormat(String kilometres) {
+    return '≈ $kilometres km at your last tank\'s consumption';
+  }
+
+  @override
+  String tankLevelRangeLongRunFormat(String kilometres) {
+    return 'Long-run average: ≈ $kilometres km';
   }
 
   @override

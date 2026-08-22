@@ -38,13 +38,11 @@ FillUpScanHostState _host({
       readService: () => null,
       writeService: (_) {},
       setScanning: (_) {},
-      setScanningPump: (_) {},
-      setDate: (_) {},
+        setDate: (_) {},
       setFuelType: (_) {},
       setScannedPricePerLiter: (_) {},
       setLastScan: (_) {},
       isMounted: () => true,
-      capturePumpImage: (BuildContext _) async => null,
       activeCountry: 'FR',
     );
 

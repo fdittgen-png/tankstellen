@@ -3,7 +3,7 @@
 
 import 'package:meta/meta.dart';
 
-import '../_pump_display_helpers.dart';
+import '../ocr_numeric_normalization.dart';
 import '../ocr/recognized_text_block.dart';
 
 /// Value-side tokenizing for the spatial receipt parser (#3458):

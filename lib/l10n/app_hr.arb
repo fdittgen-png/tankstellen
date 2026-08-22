@@ -1120,8 +1120,6 @@
   "featureDescription_obd2Optional": "Kada je isključeno, aplikacija snima putovanja samo s GPS-om bez OBD2 adaptera. Coaching je smanjen — nema trenutne L/100 km, manje motornih signala.",
   "featureLabel_addFillUpOcrReceipt": "OCR računa",
   "featureDescription_addFillUpOcrReceipt": "Skenirajte ispisani račun na zaslonu Dodaj točenje da unaprijed ispunite datum, litre, ukupno i postaju.",
-  "featureLabel_addFillUpOcrPump": "OCR zaslona crpke (eksperimentalno)",
-  "featureDescription_addFillUpOcrPump": "Skenirajte zaslon crpke goriva za prethodno popunjavanje obrasca. Prepoznavanje je danas nepouzdano — uključite samo ako želite testirati.",
   "featureLabel_developerPatToken": "Razvojni povratni podaci (GitHub PAT)",
   "featureDescription_developerPatToken": "Omogućuje ploču povratnih informacija za neuspjela skeniranja koja automatski stvara GitHub issues uz Personal Access Token. Funkcija za napredne korisnike / suradnike.",
   "feedbackConsentTitle": "Poslati izvješće na GitHub?",
@@ -1145,19 +1143,7 @@
   "scanReceiptNoData": "Nisu pronađeni podaci s računa — pokušajte ponovo",
   "scanReceiptSuccess": "Račun skeniran — provjerite vrijednosti. Dodirnite \"Prijavi grešku skeniranja\" ispod ako nešto nije ispravno.",
   "scanReceiptFailed": "Skeniranje nije uspjelo: {error}",
-  "pumpCameraCapture": "Snimi",
-  "pumpCameraPermissionDenied": "Pristup kameri potreban je za skeniranje zaslona crpke. Omogućite ga u postavkama uređaja.",
-  "pumpCameraError": "Kamera se nije mogla pokrenuti. Pokušajte ponovno ili unesite vrijednosti ručno.",
-  "scanPumpSuccess": "Zaslon pumpe skeniran — provjerite vrijednosti.",
-  "scanPumpGlare": "Previše odsjaja na zaslonu — pokušajte ponovno pod blagim kutom kako brojevi ne bi bili izblijedjeli.",
-  "scanPumpFailed": "Skeniranje pumpe nije uspjelo: {error}",
   "badScanReportTitleReceipt": "Prijavi grešku skeniranja — Račun",
-  "badScanReportTitlePumpDisplay": "Prijavi grešku skeniranja — Zaslon pumpe",
-  "pumpScanFailureTitle": "Zaslon nije čitljiv",
-  "pumpScanFailureBody": "Skeniranje nije moglo pročitati zaslon pumpe. Što želite napraviti?",
-  "pumpScanFailureCorrectManually": "Ispravi ručno",
-  "pumpScanFailureReport": "Prijavi",
-  "pumpScanFailureRemove": "Ukloni fotografiju",
   "badScanReportHint": "Dijelit ćemo fotografiju računa i oba skupa vrijednosti kako bi sljedeće verzije mogle naučiti ovaj raspored.",
   "badScanReportFieldBrandLayout": "Raspored brenda",
   "badScanReportFieldTotal": "Ukupno",
@@ -1176,7 +1162,6 @@
   "fillUpSectionWhereTitle": "Gdje ste bili",
   "fillUpSectionWhereSubtitle": "Postaja, kilometar-sat, napomene",
   "fillUpImportReceiptLabel": "Račun",
-  "fillUpImportPumpLabel": "Zaslon pumpe",
   "fillUpPricePerLiterLabel": "Cijena po litri",
   "vehicleHeaderUntitled": "Novo vozilo",
   "vehicleSectionIdentityTitle": "Identitet",
@@ -1758,10 +1743,6 @@
   "tripRecordingAutoPinTitle": "Uvijek prikvači pri pokretanju snimanja",
   "tripRecordingAutoPinSubtitle": "Automatski prikvači obrazac pri svakoj vožnji umjesto da dodirujete svaki put. Troši više baterije.",
   "tripRecordingConnectingTitle": "Pokretanje snimanja…",
-  "pumpCameraOrientationHorizontal": "Prebaci na vodoravni raspored",
-  "pumpCameraOrientationVertical": "Prebaci na okomiti raspored",
-  "pumpCameraGlareWarning": "Previše sjaja — malo nagnite kako biste izbjegli odsjaj",
-  "pumpCameraAlignHint": "Poravnajte zaslon unutar okvira i snimite",
   "insightHighSpeedBand": "Trajno visoka brzina ({pctTime}% vožnje): potrošeno bez potrebe {liters} L",
   "insightHighSpeedBandNoFuel": "Trajno visoka brzina ({pctTime}% vožnje)",
   "lessonAdviceHighSpeedBand": "Iznad 110 km/h skinite nogu s gasa – otpor zraka naglo raste, malo sporije štedi puno goriva.",
@@ -2143,10 +2124,6 @@
   "@reconcileResolveGapSemanticLabel": {
     "description": "MT — needs native review"
   },
-  "pumpCameraRotateToLandscape": "Okrenite telefon bočno — zaslon pumpe je širok, pa su brojevi veći i uspravni",
-  "@pumpCameraRotateToLandscape": {
-    "description": "MT — needs native review"
-  },
   "insightFullThrottle": "Puni gas ({pctTime}% puta): izgubljeno {liters} L",
   "@insightFullThrottle": {
     "description": "MT — needs native review",
@@ -2526,14 +2503,6 @@
   "@ocrTesterExplain": {
     "description": "MT — needs native review"
   },
-  "ocrTesterModePump": "Pumpa",
-  "@ocrTesterModePump": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterModeReceipt": "Račun",
-  "@ocrTesterModeReceipt": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterCapture": "Snimi",
   "@ocrTesterCapture": {
     "description": "MT — needs native review"
@@ -2724,14 +2693,6 @@
   },
   "obd2DiagnosticsInitCold": "hladno",
   "@obd2DiagnosticsInitCold": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterSaveFixture": "Spremi kao fixture",
-  "@ocrTesterSaveFixture": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterFixtureSaved": "Fixture spreman u mapu Downloads. Premjestite ga pod test/fixtures i pokrenite tool/promote_ocr_fixture.dart.",
-  "@ocrTesterFixtureSaved": {
     "description": "MT — needs native review"
   },
   "situationColdStart": "Hladan start",
@@ -3737,10 +3698,6 @@
   },
   "alertsStationAdd": "Dodaj upozorenje za postaju",
   "@alertsStationAdd": {
-    "description": "MT — needs native review"
-  },
-  "scanPumpInconsistent": "Skenirane vrijednosti se ne podudaraju — unesite ih ručno.",
-  "@scanPumpInconsistent": {
     "description": "MT — needs native review"
   },
   "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",
@@ -5545,5 +5502,36 @@
   "@aclWakeNotificationBody": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "fuelEfficiencyIntervalCount": "{count, plural, =1{1 full tank} other{{count} full tanks}}",
+  "@fuelEfficiencyIntervalCount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "tankLevelRangeLastIntervalFormat": "≈ {kilometres} km at your last tank's consumption",
+  "@tankLevelRangeLastIntervalFormat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "kilometres": {
+        "type": "String"
+      }
+    }
+  },
+  "tankLevelRangeLongRunFormat": "Long-run average: ≈ {kilometres} km",
+  "@tankLevelRangeLongRunFormat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "kilometres": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -725,16 +725,8 @@ void main() {
       bumps: 23,
       decompositionIssue: 3760,
     ),
-    // #2798 — grandfathered at 408 (8 over): the pump path now retries OCR
-    // with a contrast-stretched GRAYSCALE pass when the #2275 binarized pass
-    // recovers nothing (the binarization erased faint 7-seg value digits). The
-    // retry + its parseFor helper + the threaded `binarize` flag push this just
-    // past 400; further compression would hurt readability of a real fix.
-    'lib/features/receipts_ocr/data/receipt_scan_service.dart': (
-      lines: 408,
-      bumps: 0,
-      decompositionIssue: null,
-    ),
+    // receipt_scan_service.dart graduated in #3765 (the pump-display
+    // scan path was removed, dropping it well below the 400 cap).
     // #2442 — re-grandfathered 496 → 513: the save flow now raises the
     // guided reconciliation workflow after a plein save (a 7-line
     // await-then-route call into the extracted
@@ -785,8 +777,10 @@ void main() {
     // migration (the UnitFormatter import + the previousOdoKm null
     // branch wrapping formatDecimal so the odometer warning renders
     // the active locale's decimal convention).
+    // #3765 — ratcheted DOWN 651 → 603: the pump-display scan surface
+    // (capture seam, OCR config, pump handlers wiring) was removed.
     'lib/features/fill_ups/presentation/screens/add_fill_up_screen.dart': (
-      lines: 651,
+      lines: 603,
       bumps: 9,
       decompositionIssue: 3762,
     ),

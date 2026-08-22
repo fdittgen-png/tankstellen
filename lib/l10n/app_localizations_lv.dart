@@ -4758,14 +4758,6 @@ class AppLocalizationsLv extends AppLocalizations {
       'Skenējiet izdrukāto čeku ekrānā Pievienot uzpildi, lai iepriekš aizpildītu datumu, litrus, summu un staciju.';
 
   @override
-  String get featureLabel_addFillUpOcrPump =>
-      'Sūkņa displeja OCR (eksperimentāls)';
-
-  @override
-  String get featureDescription_addFillUpOcrPump =>
-      'Skenējiet degvielas sūkņa displeju, lai iepriekš aizpildītu veidlapu. Atpazīšana šodien nav uzticama — ieslēdziet tikai tad, ja vēlaties pārbaudīt.';
-
-  @override
   String get featureLabel_developerPatToken =>
       'Izstrādātāja atsauksmes (GitHub PAT)';
 
@@ -5038,43 +5030,7 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
-  String get scanPumpSuccess => 'Sūkņa displejs skenēts — pārbaudiet vērtības.';
-
-  @override
-  String get scanPumpGlare =>
-      'Pārāk daudz atspīduma uz displeja — mēģiniet vēlreiz nelielā leņķī, lai cipari nebūtu pārgaismoti.';
-
-  @override
-  String get scanPumpInconsistent =>
-      'Skenētās vērtības neatbilst — lūdzu, ievadiet tās manuāli.';
-
-  @override
-  String scanPumpFailed(String error) {
-    return 'Sūkņa skenēšana neizdevās: $error';
-  }
-
-  @override
   String get badScanReportTitleReceipt => 'Ziņot par skenēšanas kļūdu — čeks';
-
-  @override
-  String get badScanReportTitlePumpDisplay =>
-      'Ziņot par skenēšanas kļūdu — sūkņa displejs';
-
-  @override
-  String get pumpScanFailureTitle => 'Displejs nav lasāms';
-
-  @override
-  String get pumpScanFailureBody =>
-      'Skenēšana nevarēja nolasīt sūkņa displeju. Ko vēlaties darīt?';
-
-  @override
-  String get pumpScanFailureCorrectManually => 'Labot manuāli';
-
-  @override
-  String get pumpScanFailureReport => 'Ziņot';
-
-  @override
-  String get pumpScanFailureRemove => 'Noņemt fotoattēlu';
 
   @override
   String get badScanReportHint =>
@@ -5118,37 +5074,6 @@ class AppLocalizationsLv extends AppLocalizations {
       'Iesniegšana neizdevās — manuāla kopīgošana';
 
   @override
-  String get pumpCameraCapture => 'Uzņemt';
-
-  @override
-  String get pumpCameraPermissionDenied =>
-      'Lai skenētu uzpildes ekrānu, nepieciešama piekļuve kamerai. Iespējojiet to ierīces iestatījumos.';
-
-  @override
-  String get pumpCameraError =>
-      'Kameru neizdevās palaist. Mēģiniet vēlreiz vai ievadiet vērtības manuāli.';
-
-  @override
-  String get pumpCameraOrientationHorizontal =>
-      'Pārslēgties uz horizontālo izkārtojumu';
-
-  @override
-  String get pumpCameraOrientationVertical =>
-      'Pārslēgties uz vertikālo izkārtojumu';
-
-  @override
-  String get pumpCameraGlareWarning =>
-      'Pārāk daudz atspulgu — nedaudz nolieciet, lai izvairītos no atspīdumiem';
-
-  @override
-  String get pumpCameraAlignHint =>
-      'Novietojiet displeju rāmītī un pēc tam fotografējiet';
-
-  @override
-  String get pumpCameraRotateToLandscape =>
-      'Pagrieziet tālruni sāniski — sūkņa displejs ir plats, tāpēc skaitļi ir lielāki un taisni';
-
-  @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
 
   @override
@@ -5181,9 +5106,6 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get fillUpImportReceiptLabel => 'Čeks';
-
-  @override
-  String get fillUpImportPumpLabel => 'Sūkņa displejs';
 
   @override
   String get fillUpPricePerLiterLabel => 'Cena par litru';
@@ -5249,6 +5171,17 @@ class AppLocalizationsLv extends AppLocalizations {
       locale: localeName,
       other: '$count fills',
       one: '1 fill',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fuelEfficiencyIntervalCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count full tanks',
+      one: '1 full tank',
     );
     return '$_temp0';
   }
@@ -6390,12 +6323,6 @@ class AppLocalizationsLv extends AppLocalizations {
       'Palaist sūkņa/čeka OCR cauruļvadu uz izvēlētu fotoattēlu un pārbaudīt katru soli — pieejams tikai izstrādātāja režīmā.';
 
   @override
-  String get ocrTesterModePump => 'Sūknis';
-
-  @override
-  String get ocrTesterModeReceipt => 'Čeks';
-
-  @override
   String get ocrTesterCapture => 'Uzņemt';
 
   @override
@@ -6504,13 +6431,6 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get ocrTesterExported => 'OCR pakotne saglabāta lejupielāžu mapē.';
-
-  @override
-  String get ocrTesterSaveFixture => 'Saglabāt kā fiksatoru';
-
-  @override
-  String get ocrTesterFixtureSaved =>
-      'Fiksators saglabāts lejupielāžu mapē. Pārvietojiet to zem test/fixtures un palaidiet tool/promote_ocr_fixture.dart.';
 
   @override
   String get onboardingObd2StepTitle => 'Savienojiet savu OBD2 adapteru';
@@ -6984,6 +6904,16 @@ class AppLocalizationsLv extends AppLocalizations {
   @override
   String tankLevelRangeFormat(String kilometres) {
     return '≈ $kilometres km braukšanas';
+  }
+
+  @override
+  String tankLevelRangeLastIntervalFormat(String kilometres) {
+    return '≈ $kilometres km at your last tank\'s consumption';
+  }
+
+  @override
+  String tankLevelRangeLongRunFormat(String kilometres) {
+    return 'Long-run average: ≈ $kilometres km';
   }
 
   @override

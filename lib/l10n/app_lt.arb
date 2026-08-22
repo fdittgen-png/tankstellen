@@ -1120,8 +1120,6 @@
   "featureDescription_obd2Optional": "Kai išjungta, programa įrašo keliones tik su GPS be OBD2 adapterio. Vairavimo patarimai sumažėjo — nėra momentinio L/100 km, mažiau variklio signalų.",
   "featureLabel_addFillUpOcrReceipt": "Kvito OCR",
   "featureDescription_addFillUpOcrReceipt": "Nuskaitykite atspausdintą kvitą Pridėti pildymą ekrane, kad iš anksto užpildytumėte datą, litrus, sumą ir stotį.",
-  "featureLabel_addFillUpOcrPump": "Siurblio ekrano OCR (eksperimentinis)",
-  "featureDescription_addFillUpOcrPump": "Nuskaitykite degalų siurblio ekraną, kad iš anksto užpildytumėte formą. Atpažinimas šiandien nepatikimas — įjunkite tik jei norite išbandyti.",
   "featureLabel_developerPatToken": "Kūrėjo atsiliepimai (GitHub PAT)",
   "featureDescription_developerPatToken": "Įjungia nepavykusio nuskaitymo atsiliepimų skydelį, kuris su Personal Access Token automatiškai sukuria GitHub problemas. Pažangių vartotojų / talkininkų funkcija.",
   "feedbackConsentTitle": "Siųsti ataskaitą į GitHub?",
@@ -1145,19 +1143,7 @@
   "scanReceiptNoData": "Kvito duomenų nerasta — bandykite dar kartą",
   "scanReceiptSuccess": "Kvitas nuskaitytas — patikrinkite reikšmes. Palieskite \"Pranešti apie nuskaitymo klaidą\" žemiau, jei kas nors negerai.",
   "scanReceiptFailed": "Nuskaitymas nepavyko: {error}",
-  "pumpCameraCapture": "Fotografuoti",
-  "pumpCameraPermissionDenied": "Norint nuskaityti degalinės ekraną, reikia prieigos prie kameros. Įjunkite ją įrenginio nustatymuose.",
-  "pumpCameraError": "Nepavyko paleisti kameros. Bandykite dar kartą arba įveskite reikšmes rankiniu būdu.",
-  "scanPumpSuccess": "Siurblio ekranas nuskaitytas — patikrinkite reikšmes.",
-  "scanPumpGlare": "Per daug atspindžių ekrane — bandykite dar kartą šiek tiek kampu, kad skaičiai nebūtų peršviesti.",
-  "scanPumpFailed": "Siurblio nuskaitymas nepavyko: {error}",
   "badScanReportTitleReceipt": "Pranešti apie nuskaitymo klaidą — Kvitas",
-  "badScanReportTitlePumpDisplay": "Pranešti apie nuskaitymo klaidą — Siurblio ekranas",
-  "pumpScanFailureTitle": "Ekranas neįskaitomas",
-  "pumpScanFailureBody": "Nuskaitymu nepavyko nuskaityti siurblio ekrano. Ką norėtumėte daryti?",
-  "pumpScanFailureCorrectManually": "Taisyti rankiniu būdu",
-  "pumpScanFailureReport": "Pranešti",
-  "pumpScanFailureRemove": "Pašalinti nuotrauką",
   "badScanReportHint": "Bendrinsime kvito nuotrauką ir abi reikšmių rinkinius, kad kitas versijos variantas galėtų išmokti šį išdėstymą.",
   "badScanReportFieldBrandLayout": "Prekinio ženklo išdėstymas",
   "badScanReportFieldTotal": "Iš viso",
@@ -1176,7 +1162,6 @@
   "fillUpSectionWhereTitle": "Kur buvote",
   "fillUpSectionWhereSubtitle": "Stotelė, odometras, pastabos",
   "fillUpImportReceiptLabel": "Kvitas",
-  "fillUpImportPumpLabel": "Siurblio ekranas",
   "fillUpPricePerLiterLabel": "Kaina už litrą",
   "vehicleHeaderUntitled": "Nauja transporto priemonė",
   "vehicleSectionIdentityTitle": "Tapatybė",
@@ -1758,10 +1743,6 @@
   "tripRecordingAutoPinTitle": "Visada prisegti pradedant įrašymą",
   "tripRecordingAutoPinSubtitle": "Automatiškai prisegti formą kiekvienos kelionės metu, užuot lietus kiekvieną kartą. Naudoja daugiau baterijos.",
   "tripRecordingConnectingTitle": "Pradedamas įrašymas…",
-  "pumpCameraOrientationHorizontal": "Perjungti į horizontalų išdėstymą",
-  "pumpCameraOrientationVertical": "Perjungti į vertikalų išdėstymą",
-  "pumpCameraGlareWarning": "Per daug atspindžių — šiek tiek pakreipkite, kad išvengtumėte atspindžių",
-  "pumpCameraAlignHint": "Sulygiuokite ekraną rėme ir tada fotografuokite",
   "insightHighSpeedBand": "Ilgalaikis didelis greitis ({pctTime}% kelionės): iššvaistyta {liters} L",
   "insightHighSpeedBandNoFuel": "Ilgalaikis didelis greitis ({pctTime}% kelionės)",
   "lessonAdviceHighSpeedBand": "Viršijus 110 km/h atleiskite akceleratorių – oro pasipriešinimas smarkiai auga, šiek tiek lėčiau sutaupysite daug kuro.",
@@ -2143,10 +2124,6 @@
   "@reconcileResolveGapSemanticLabel": {
     "description": "MT — needs native review"
   },
-  "pumpCameraRotateToLandscape": "Pasukite telefoną į šoną — degalų skaitiklio ekranas yra platus, todėl skaičiai bus didesni ir tiesūs",
-  "@pumpCameraRotateToLandscape": {
-    "description": "MT — needs native review"
-  },
   "insightFullThrottle": "Pilnas dujas ({pctTime}% kelionės): iššvaistyta {liters} L",
   "@insightFullThrottle": {
     "description": "MT — needs native review",
@@ -2526,14 +2503,6 @@
   "@ocrTesterExplain": {
     "description": "MT — needs native review"
   },
-  "ocrTesterModePump": "Skaitiklis",
-  "@ocrTesterModePump": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterModeReceipt": "Kvitas",
-  "@ocrTesterModeReceipt": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterCapture": "Fotografuoti",
   "@ocrTesterCapture": {
     "description": "MT — needs native review"
@@ -2724,14 +2693,6 @@
   },
   "obd2DiagnosticsInitCold": "šaltas",
   "@obd2DiagnosticsInitCold": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterSaveFixture": "Išsaugoti kaip priedą",
-  "@ocrTesterSaveFixture": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterFixtureSaved": "Priedas išsaugotas jūsų atsisiuntimų aplanke. Perkelkite jį į test/fixtures ir paleiskite tool/promote_ocr_fixture.dart.",
-  "@ocrTesterFixtureSaved": {
     "description": "MT — needs native review"
   },
   "situationColdStart": "Šaltas paleidimas",
@@ -3737,10 +3698,6 @@
   },
   "alertsStationAdd": "Pridėti degalinės įspėjimą",
   "@alertsStationAdd": {
-    "description": "MT — needs native review"
-  },
-  "scanPumpInconsistent": "Nuskaitytos reikšmės nesutampa — įveskite jas rankiniu būdu.",
-  "@scanPumpInconsistent": {
     "description": "MT — needs native review"
   },
   "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",
@@ -5545,5 +5502,36 @@
   "@aclWakeNotificationBody": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "fuelEfficiencyIntervalCount": "{count, plural, =1{1 full tank} other{{count} full tanks}}",
+  "@fuelEfficiencyIntervalCount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "tankLevelRangeLastIntervalFormat": "≈ {kilometres} km at your last tank's consumption",
+  "@tankLevelRangeLastIntervalFormat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "kilometres": {
+        "type": "String"
+      }
+    }
+  },
+  "tankLevelRangeLongRunFormat": "Long-run average: ≈ {kilometres} km",
+  "@tankLevelRangeLongRunFormat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "kilometres": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -61,10 +61,6 @@ dependencies:
   # is swapped for a no-op stub so its com.google.mlkit refs leave the dex.
   flutter_zxing: ^2.3.0
   image_picker: ^1.2.3
-  # Live camera preview for the pump-display capture reticle (#1868).
-  # image_picker delegates to the OS camera app, which cannot host an
-  # overlay; the camera plugin gives an in-app CameraPreview to draw on.
-  camera: ^0.12.0
   # Constraint tracks the vendored third_party/ fork (see
   # dependency_overrides below), which is 0.15.1 — bump both together.
   google_mlkit_text_recognition: ^0.15.1

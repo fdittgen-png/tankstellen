@@ -56,8 +56,17 @@ class TankLevelEstimate {
   final DateTime? sensorReadAt;
 
   /// Estimated remaining range in kilometres, from the fill-anchored
-  /// tank-to-tank average (#3645) — recording-free by construction.
+  /// LONG-RUN tank-to-tank average (#3645, up to the last 8 windows) —
+  /// recording-free by construction. Since #3764 this is the SECONDARY
+  /// context figure; see [rangeKmLastInterval] / [primaryRangeKm].
   final double? rangeKm;
+
+  /// #3764 — range projected at the LAST closed plein-to-plein window's
+  /// L/100 km alone ("how far does the current tank get me if I keep
+  /// driving like the last one"). Null when no valid closed window
+  /// exists yet — [primaryRangeKm] then falls back to [rangeKm], i.e.
+  /// exactly the pre-#3764 behaviour.
+  final double? rangeKmLastInterval;
 
   const TankLevelEstimate({
     required this.levelL,
@@ -66,6 +75,7 @@ class TankLevelEstimate {
     required this.source,
     required this.sensorReadAt,
     required this.rangeKm,
+    this.rangeKmLastInterval,
   });
 
   /// Sentinel returned when no physical fill-ups exist for the vehicle.
@@ -77,7 +87,15 @@ class TankLevelEstimate {
         lastFillUpDate = null,
         source = TankLevelSource.fillUp,
         sensorReadAt = null,
-        rangeKm = null;
+        rangeKm = null,
+        rangeKmLastInterval = null;
+
+  /// The range figure the UI leads with (#3764): the last closed
+  /// window's projection when one exists, else the long-run average
+  /// (which itself falls back to the fleet default inside the
+  /// estimator) — so a history without a closed interval behaves
+  /// exactly as before #3764.
+  double? get primaryRangeKm => rangeKmLastInterval ?? rangeKm;
 
   /// True when the estimator returned a real estimate rather than the
   /// [unknown] sentinel.
@@ -158,6 +176,17 @@ TankLevelEstimate estimateTankLevel({
       fillAnchoredAvgLPer100Km(fillUps)?.avgLPer100Km ?? _defaultAvgLPer100Km;
   final rangeKm = avgLPer100Km > 0 ? (levelL / avgLPer100Km) * 100.0 : null;
 
+  // #3764 — the PRIMARY range projects at the LAST closed window's
+  // consumption alone: maxWindows 1 keeps only the most recent valid
+  // plein-to-plein window, i.e. "the km this reservoir conducts at the
+  // last per-100 km consumption". Null (no closed window yet) → the UI
+  // leads with the long-run figure above, the pre-#3764 behaviour.
+  final lastWindow = fillAnchoredAvgLPer100Km(fillUps, maxWindows: 1);
+  final rangeKmLastInterval =
+      (lastWindow != null && lastWindow.avgLPer100Km > 0)
+          ? (levelL / lastWindow.avgLPer100Km) * 100.0
+          : null;
+
   return TankLevelEstimate(
     levelL: levelL,
     capacityL: capacityL,
@@ -165,6 +194,7 @@ TankLevelEstimate estimateTankLevel({
     source: source,
     sensorReadAt: sensorReadAt,
     rangeKm: rangeKm,
+    rangeKmLastInterval: rangeKmLastInterval,
   );
 }
 

@@ -1120,8 +1120,6 @@
   "featureDescription_obd2Optional": "Gdy wyłączone, aplikacja nagrywa trasy tylko z GPS bez adaptera OBD2. Coaching jest ograniczony — brak chwilowego L/100 km, mniej sygnałów z silnika.",
   "featureLabel_addFillUpOcrReceipt": "OCR paragonu",
   "featureDescription_addFillUpOcrReceipt": "Zeskanuj wydrukowany paragon na ekranie Dodaj tankowanie, aby wypełnić datę, litry, sumę i stację.",
-  "featureLabel_addFillUpOcrPump": "OCR wyświetlacza dystrybutora (eksperymentalne)",
-  "featureDescription_addFillUpOcrPump": "Zeskanuj wyświetlacz dystrybutora paliwa, aby wstępnie wypełnić formularz. Rozpoznawanie jest dziś nierzetelne — włącz tylko, jeśli chcesz przetestować.",
   "featureLabel_developerPatToken": "Opinia dewelopera (GitHub PAT)",
   "featureDescription_developerPatToken": "Włącza panel opinii o nieudanych skanowaniach, który automatycznie tworzy issue na GitHubie z Personal Access Token. Funkcja dla zaawansowanych użytkowników / współtwórców.",
   "feedbackConsentTitle": "Wysłać zgłoszenie do GitHub?",
@@ -1145,19 +1143,7 @@
   "scanReceiptNoData": "Nie znaleziono danych paragonu — spróbuj ponownie",
   "scanReceiptSuccess": "Paragon zeskanowany — sprawdź wartości. Dotknij «Zgłoś błąd skanowania» poniżej, jeśli coś jest nie tak.",
   "scanReceiptFailed": "Skanowanie nie powiodło się: {error}",
-  "pumpCameraCapture": "Zrób zdjęcie",
-  "pumpCameraPermissionDenied": "Dostęp do aparatu jest potrzebny do zeskanowania wyświetlacza dystrybutora. Włącz go w ustawieniach urządzenia.",
-  "pumpCameraError": "Nie udało się uruchomić aparatu. Spróbuj ponownie lub wprowadź wartości ręcznie.",
-  "scanPumpSuccess": "Wyświetlacz dystrybutora zeskanowany — sprawdź wartości.",
-  "scanPumpGlare": "Zbyt duże odbicie na wyświetlaczu — spróbuj ponownie pod lekkim kątem, aby cyfry nie były prześwietlone.",
-  "scanPumpFailed": "Skanowanie dystrybutora nie powiodło się: {error}",
   "badScanReportTitleReceipt": "Zgłoś błąd skanowania — paragon",
-  "badScanReportTitlePumpDisplay": "Zgłoś błąd skanowania — wyświetlacz dystrybutora",
-  "pumpScanFailureTitle": "Wyświetlacz nieczytelny",
-  "pumpScanFailureBody": "Skanowanie nie mogło odczytać wyświetlacza dystrybutora. Co chcesz zrobić?",
-  "pumpScanFailureCorrectManually": "Popraw ręcznie",
-  "pumpScanFailureReport": "Zgłoś",
-  "pumpScanFailureRemove": "Usuń zdjęcie",
   "badScanReportHint": "Udostępnimy zdjęcie paragonu i obie zestawy wartości, aby następna wersja mogła nauczyć się tego układu.",
   "badScanReportFieldBrandLayout": "Układ marki",
   "badScanReportFieldTotal": "Łącznie",
@@ -1176,7 +1162,6 @@
   "fillUpSectionWhereTitle": "Gdzie byłeś",
   "fillUpSectionWhereSubtitle": "Stacja, licznik, notatki",
   "fillUpImportReceiptLabel": "Paragon",
-  "fillUpImportPumpLabel": "Wyświetlacz dystrybutora",
   "fillUpPricePerLiterLabel": "Cena za litr",
   "vehicleHeaderUntitled": "Nowy pojazd",
   "vehicleSectionIdentityTitle": "Identyfikacja",
@@ -1758,10 +1743,6 @@
   "tripRecordingAutoPinTitle": "Zawsze przypnij przy starcie nagrywania",
   "tripRecordingAutoPinSubtitle": "Przypnij formularz automatycznie podczas każdej jazdy, zamiast dotykać za każdym razem. Zużywa więcej baterii.",
   "tripRecordingConnectingTitle": "Rozpoczynanie nagrywania…",
-  "pumpCameraOrientationHorizontal": "Przełącz na układ poziomy",
-  "pumpCameraOrientationVertical": "Przełącz na układ pionowy",
-  "pumpCameraGlareWarning": "Zbyt duże odblaski — lekko przechyl, aby uniknąć odblasków",
-  "pumpCameraAlignHint": "Ustaw wyświetlacz w ramce, a następnie zrób zdjęcie",
   "insightHighSpeedBand": "Utrzymująca się wysoka prędkość ({pctTime}% trasy): zmarnowano {liters} L",
   "insightHighSpeedBandNoFuel": "Utrzymująca się wysoka prędkość ({pctTime}% trasy)",
   "lessonAdviceHighSpeedBand": "Powyżej 110 km/h zdejmij nogę z gazu – opór powietrza gwałtownie rośnie, nieco wolniej oszczędza dużo paliwa.",
@@ -2143,10 +2124,6 @@
   "@reconcileResolveGapSemanticLabel": {
     "description": "MT — needs native review"
   },
-  "pumpCameraRotateToLandscape": "Obróć telefon poziomo — wyświetlacz dystrybutora jest szeroki, więc cyfry wychodzą większe i wyprostowane",
-  "@pumpCameraRotateToLandscape": {
-    "description": "MT — needs native review"
-  },
   "insightFullThrottle": "Pełny gaz ({pctTime}% trasy): zmarnowano {liters} L",
   "@insightFullThrottle": {
     "description": "MT — needs native review",
@@ -2526,14 +2503,6 @@
   "@ocrTesterExplain": {
     "description": "MT — needs native review"
   },
-  "ocrTesterModePump": "Dystrybutor",
-  "@ocrTesterModePump": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterModeReceipt": "Paragon",
-  "@ocrTesterModeReceipt": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterCapture": "Zrób zdjęcie",
   "@ocrTesterCapture": {
     "description": "MT — needs native review"
@@ -2724,14 +2693,6 @@
   },
   "obd2DiagnosticsInitCold": "zimny",
   "@obd2DiagnosticsInitCold": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterSaveFixture": "Zapisz jako fixture",
-  "@ocrTesterSaveFixture": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterFixtureSaved": "Fixture zapisany w folderze Pobrane. Przenieś go do test/fixtures i uruchom tool/promote_ocr_fixture.dart.",
-  "@ocrTesterFixtureSaved": {
     "description": "MT — needs native review"
   },
   "situationColdStart": "Zimny rozruch",
@@ -3737,10 +3698,6 @@
   },
   "alertsStationAdd": "Dodaj alert stacji",
   "@alertsStationAdd": {
-    "description": "MT — needs native review"
-  },
-  "scanPumpInconsistent": "Zeskanowane wartości nie zgadzają się — wprowadź je ręcznie.",
-  "@scanPumpInconsistent": {
     "description": "MT — needs native review"
   },
   "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",
@@ -5545,5 +5502,36 @@
   "@aclWakeNotificationBody": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "fuelEfficiencyIntervalCount": "{count, plural, =1{1 full tank} other{{count} full tanks}}",
+  "@fuelEfficiencyIntervalCount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "tankLevelRangeLastIntervalFormat": "≈ {kilometres} km at your last tank's consumption",
+  "@tankLevelRangeLastIntervalFormat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "kilometres": {
+        "type": "String"
+      }
+    }
+  },
+  "tankLevelRangeLongRunFormat": "Long-run average: ≈ {kilometres} km",
+  "@tankLevelRangeLongRunFormat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "kilometres": {
+        "type": "String"
+      }
+    }
   }
 }

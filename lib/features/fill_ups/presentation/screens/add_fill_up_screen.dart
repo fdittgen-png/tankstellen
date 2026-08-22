@@ -56,10 +56,9 @@ class AddFillUpScreen extends ConsumerStatefulWidget {
   final double? preFilledPricePerLiter;
 
   /// Test seam (#953) — widget tests can swap in a fake
-  /// [ReceiptScanService] that returns a pre-canned failing
-  /// pump-display outcome without launching the camera. Production
-  /// callers leave this null and the screen instantiates a real
-  /// service on first use.
+  /// [ReceiptScanService] that returns a pre-canned outcome without
+  /// launching the camera. Production callers leave this null and the
+  /// screen instantiates a real service on first use.
   @visibleForTesting
   final ReceiptScanService? scanService;
 
@@ -77,13 +76,6 @@ class AddFillUpScreen extends ConsumerStatefulWidget {
   @visibleForTesting
   final double? initialFuelLevelAfterL;
 
-  /// Test seam (#1868 / #2275) — widget tests swap in a stub returning
-  /// a fixture [PumpCaptureResult] (path + reticle ROI) instead of
-  /// launching the in-app [PumpDisplayCameraScreen]. Production callers
-  /// leave this null.
-  @visibleForTesting
-  final Future<PumpCaptureResult?> Function(BuildContext)? pumpImageCapture;
-
   const AddFillUpScreen({
     super.key,
     this.stationId,
@@ -93,7 +85,6 @@ class AddFillUpScreen extends ConsumerStatefulWidget {
     this.scanService,
     this.initialFuelLevelBeforeL,
     this.initialFuelLevelAfterL,
-    this.pumpImageCapture,
   });
 
   @override
@@ -113,12 +104,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
   // tank-level estimator can branch correctly on subsequent reads.
   bool _isFullTank = true;
   bool _scanning = false;
-  bool _scanningPump = false;
   ReceiptScanService? _scanService;
-  // #2276 — loaded once on first pump-display scan; drives the guided
-  // alignment overlay with the correct orientation + field slots for
-  // the active country/brand pump template.
-  PumpOcrConfig? _ocrConfig;
   String? _vehicleId;
   bool _vehicleInitialized = false;
   ReceiptScanOutcome? _lastScan;
@@ -292,21 +278,16 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
         readService: () => _scanService,
         writeService: (s) => _scanService = s,
         setScanning: (v) => setState(() => _scanning = v),
-        setScanningPump: (v) => setState(() => _scanningPump = v),
         setDate: (d) => setState(() => _date = d),
         setFuelType: (f) => setState(() => _fuelType = f),
         setScannedPricePerLiter: (p) =>
             setState(() => _scannedPricePerLiter = p),
         setLastScan: (o) => setState(() => _lastScan = o),
         isMounted: () => mounted,
-        capturePumpImage: widget.pumpImageCapture ?? _capturePumpImage,
         // #2275 — the active country drives the per-country validation
-        // gate. Brand-template selection (a specific pump make) is a
-        // later signal; for now the country-only template is used, so
-        // we leave the brand null and let the config fall back. Read
-        // defensively: a partially-initialised container (some widget
-        // tests) must degrade to "no profile" rather than throw before
-        // the scan even runs.
+        // gate. Read defensively: a partially-initialised container
+        // (some widget tests) must degrade to "no profile" rather than
+        // throw before the scan even runs.
         activeCountry: _activeCountryCode(),
       );
 
@@ -321,35 +302,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     }
   }
 
-  /// Pushes the #1868 in-app camera screen and returns the capture
-  /// (photo path + overlay ROI), or null on cancel / camera unavailable.
-  ///
-  /// #2276 — loads the OCR brand template to seed the guided alignment
-  /// overlay with the correct orientation and per-field slot geometry.
-  Future<PumpCaptureResult?> _capturePumpImage(BuildContext context) async {
-    // Load the OCR config lazily (cached after first load).
-    final cfg = _ocrConfig ??= PumpOcrConfig();
-    await cfg.load();
-    final country = _activeCountryCode();
-    final template = country != null
-        ? cfg.templateFor(country: country)
-        : null;
-    if (!context.mounted) return null;
-    return Navigator.of(context).push<PumpCaptureResult>(
-      MaterialPageRoute(
-        builder: (_) => PumpDisplayCameraScreen(
-          initialOrientation:
-              template?.displayOrientation ?? OcrDisplayOrientation.horizontal,
-          fieldSpec: template?.pumpDisplay,
-        ),
-      ),
-    );
-  }
-
   Future<void> _scanReceipt() => runReceiptScan(context, _buildScanHostState());
-
-  Future<void> _scanPumpDisplay() =>
-      runPumpDisplayScan(context, _buildScanHostState());
 
   /// #2687 — the manual, on-device "paste receipt text" entry point.
   /// Opens the paste dialog, parses the pasted text with the pure-Dart
@@ -598,9 +551,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
           children: [
             AddFillUpFormFields(
               scanningReceipt: _scanning,
-              scanningPump: _scanningPump,
               onScanReceipt: _scanReceipt,
-              onScanPumpDisplay: _scanPumpDisplay,
               onPasteReceipt: _pasteReceiptText,
               stationName: widget.stationName,
               dateLabel: dateStr,

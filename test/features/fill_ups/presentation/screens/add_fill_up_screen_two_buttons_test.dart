@@ -5,34 +5,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:tankstellen/features/receipts_ocr/data/pump_display_parser.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/receipts_ocr/data/receipt_parser.dart';
-import 'package:tankstellen/features/receipts_ocr/data/ocr/ocr_geometry.dart';
 import 'package:tankstellen/features/receipts_ocr/data/ocr/ocr_trace_recorder.dart';
 import 'package:tankstellen/features/receipts_ocr/data/receipt_scan_service.dart';
 import 'package:tankstellen/features/fill_ups/presentation/screens/add_fill_up_screen.dart';
-import 'package:tankstellen/features/receipts_ocr/presentation/screens/pump_display_camera_screen.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../helpers/pump_app.dart';
 
-/// #951 — TDD acceptance test for the "restore two import buttons"
-/// rollback. The single "Import from…" chip + bottom-sheet was reverted
-/// because the OBD-II tile inside the sheet returned null for the
-/// odometer on real Peugeot hardware (PID 0xA6 is unsupported by the
-/// generic ELM327 BLE clone the user has). Until that gap is closed by
-/// a brand-specific UDS service $22 PID, the OBD-II import path is
-/// hidden from this screen.
+/// #951 — TDD acceptance test for the "restore import buttons" rollback.
+/// The single "Import from…" chip + bottom-sheet was reverted because
+/// the OBD-II tile inside the sheet returned null for the odometer on
+/// real Peugeot hardware (PID 0xA6 is unsupported by the generic ELM327
+/// BLE clone the user has). Until that gap is closed by a
+/// brand-specific UDS service $22 PID, the OBD-II import path is hidden
+/// from this screen.
+///
+/// (#3765 removed the sibling pump-display scan button; the receipt
+/// button is the remaining camera entry point.)
 ///
 /// Acceptance:
-///   1. Two visible buttons (Receipt + Pump display) are present.
+///   1. The Receipt import button is present.
 ///   2. The OBD2 import path is NOT shown on this screen.
-///   3. Tapping each button triggers the correct callback (Receipt
-///      hits scanReceipt, Pump display hits parsePumpDisplayImage via
-///      the #1868 in-app camera capture).
+///   3. Tapping the button triggers scanReceipt.
 class _NoopRecognizer extends TextRecognizer {
   _NoopRecognizer();
 
@@ -57,24 +55,22 @@ class _StubVehicleList extends VehicleProfileList {
       ];
 }
 
-/// #2110 — `Feature.addFillUpOcrPump` defaults OFF. Tests in this
-/// file tap the pump-display button, so force-enable both OCR flags.
-class _BothOcrEnabled extends FeatureFlags {
+/// #2110 — force-enable the receipt OCR flag so the button renders.
+class _ReceiptOcrEnabled extends FeatureFlags {
   @override
   Set<Feature> build() => {
         Feature.addFillUpOcrReceipt,
-        Feature.addFillUpOcrPump,
       };
 }
 
 final _withVehicle = <Object>[
   vehicleProfileListProvider.overrideWith(() => _StubVehicleList()),
-  featureFlagsProvider.overrideWith(() => _BothOcrEnabled()),
+  featureFlagsProvider.overrideWith(() => _ReceiptOcrEnabled()),
 ];
 
 /// Records which scan path the screen invoked so the test can assert
-/// that tapping a button routes to the expected entry point. Both
-/// methods short-circuit (return null) so the screen's finally-block
+/// that tapping the button routes to the expected entry point. The
+/// method short-circuits (returns null) so the screen's finally-block
 /// flips its busy flag back off and the test can settle.
 class _RoutingScanService extends ReceiptScanService {
   _RoutingScanService()
@@ -82,11 +78,9 @@ class _RoutingScanService extends ReceiptScanService {
           picker: _NoopPicker(),
           recognizer: _NoopRecognizer(),
           parser: const ReceiptParser(),
-          pumpParser: const PumpDisplayParser(),
         );
 
   int receiptCalls = 0;
-  int pumpCalls = 0;
 
   @override
   Future<ReceiptScanOutcome?> scanReceipt({
@@ -99,18 +93,6 @@ class _RoutingScanService extends ReceiptScanService {
   }
 
   @override
-  Future<PumpDisplayScanOutcome?> parsePumpDisplayImage(
-    String path, {
-    String? country,
-    String? brand,
-    OcrNormalizedRect? roi,
-    OcrTraceRecorder? trace,
-  }) async {
-    pumpCalls++;
-    return null;
-  }
-
-  @override
   void dispose() {
     // Test owns this fake's lifecycle — no-op so the screen's
     // disposeListener doesn't accidentally close the platform ML
@@ -119,8 +101,8 @@ class _RoutingScanService extends ReceiptScanService {
 }
 
 void main() {
-  group('AddFillUpScreen — restored two import buttons (#951)', () {
-    testWidgets('renders Receipt + Pump display buttons; OBD2 absent',
+  group('AddFillUpScreen — restored import button (#951)', () {
+    testWidgets('renders the Receipt button; OBD2 and pump absent',
         (tester) async {
       await pumpApp(
         tester,
@@ -128,19 +110,18 @@ void main() {
         overrides: _withVehicle,
       );
 
-      // Acceptance 1: both buttons present, keyed for stable lookup.
+      // Acceptance 1: the button is present, keyed for stable lookup.
       expect(
         find.byKey(const Key('import_receipt_button')),
         findsOneWidget,
         reason: 'Receipt button must be visible at the top of the form.',
       );
-      expect(
-        find.byKey(const Key('import_pump_button')),
-        findsOneWidget,
-        reason: 'Pump display button must be visible at the top of the form.',
-      );
       expect(find.text('Receipt'), findsOneWidget);
-      expect(find.text('Pump display'), findsOneWidget);
+
+      // #3765 — the pump-display scanner is gone for good.
+      expect(find.byKey(const Key('import_pump_button')), findsNothing,
+          reason: '#3765 — pump-display scan button removed.');
+      expect(find.text('Pump display'), findsNothing);
 
       // Acceptance 2: no OBD2 entry point on this screen — the
       // chip, the bottom-sheet title, and the OBD-II tile labels
@@ -154,7 +135,7 @@ void main() {
           reason: '#951 — bottom-sheet wrapper is gone, no title to render.');
     });
 
-    testWidgets('tapping Receipt invokes scanReceipt only', (tester) async {
+    testWidgets('tapping Receipt invokes scanReceipt', (tester) async {
       final fake = _RoutingScanService();
       await pumpApp(
         tester,
@@ -172,36 +153,6 @@ void main() {
 
       expect(fake.receiptCalls, 1,
           reason: 'Receipt button must call scanReceipt().');
-      expect(fake.pumpCalls, 0,
-          reason: 'Receipt button must NOT call scanPumpDisplay().');
-    });
-
-    testWidgets('tapping Pump display invokes the pump-scan path only',
-        (tester) async {
-      final fake = _RoutingScanService();
-      await pumpApp(
-        tester,
-        AddFillUpScreen(
-          scanService: fake,
-          // #1868 — stub the in-app camera so the handler reaches
-          // parsePumpDisplayImage without launching a real camera.
-          pumpImageCapture: (_) async => const PumpCaptureResult(
-            path: '/tmp/fake-pump.jpg',
-            roi: OcrNormalizedRect.full,
-          ),
-        ),
-        overrides: _withVehicle,
-      );
-
-      await tester.tap(find.byKey(const Key('import_pump_button')));
-      for (var i = 0; i < 10; i++) {
-        await tester.pump(const Duration(milliseconds: 50));
-      }
-
-      expect(fake.pumpCalls, 1,
-          reason: 'Pump display button must call parsePumpDisplayImage().');
-      expect(fake.receiptCalls, 0,
-          reason: 'Pump display button must NOT call scanReceipt().');
     });
   });
 }

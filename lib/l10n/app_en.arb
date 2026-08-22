@@ -3785,14 +3785,6 @@
   "@featureDescription_addFillUpOcrReceipt": {
     "description": "Settings toggle description for the Add-fill-up receipt-OCR button (#2110)."
   },
-  "featureLabel_addFillUpOcrPump": "Pump display OCR (experimental)",
-  "@featureLabel_addFillUpOcrPump": {
-    "description": "Settings toggle label for the Add-fill-up pump-display-OCR import button (#2110). Default-off — recognizer unreliable."
-  },
-  "featureDescription_addFillUpOcrPump": "Scan a fuel pump display to pre-fill the form. Recognition is unreliable today — opt in only if you want to test.",
-  "@featureDescription_addFillUpOcrPump": {
-    "description": "Settings toggle description for the Add-fill-up pump-display-OCR button (#2110). Sets expectation that the recognizer is experimental."
-  },
   "featureLabel_developerPatToken": "Developer feedback (GitHub PAT)",
   "@featureLabel_developerPatToken": {
     "description": "Settings toggle label for the bad-scan-feedback PAT panel (#2116-6). Default-off — most users never paste a token."
@@ -4158,54 +4150,9 @@
       }
     }
   },
-  "scanPumpSuccess": "Pump display scanned — verify the values.",
-  "@scanPumpSuccess": {
-    "description": "Snackbar shown after a successful pump-display scan (#751)."
-  },
-  "scanPumpGlare": "Too much glare on the display — try again at a slight angle so the numbers aren't washed out.",
-  "@scanPumpGlare": {
-    "description": "Snackbar shown when the pump-display capture is rejected for excessive glare and the user is asked to re-angle (#2275)."
-  },
-  "scanPumpInconsistent": "The scanned values don't add up — please enter them manually.",
-  "@scanPumpInconsistent": {
-    "description": "Snackbar shown when the pump-display scan read values that failed the country validation gate (the numbers don't reconcile or are out of range), so the app declines to auto-fill a plausible-but-wrong pair (#2828)."
-  },
-  "scanPumpFailed": "Pump scan failed: {error}",
-  "@scanPumpFailed": {
-    "description": "Snackbar shown when the pump-display scan throws (#751).",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
   "badScanReportTitleReceipt": "Report a scan error — Receipt",
   "@badScanReportTitleReceipt": {
     "description": "Receipt-specific title for the bad-scan report sheet (#953). Used when ScanKind == receipt."
-  },
-  "badScanReportTitlePumpDisplay": "Report a scan error — Pump display",
-  "@badScanReportTitlePumpDisplay": {
-    "description": "Pump-display-specific title for the bad-scan report sheet (#953). Used when ScanKind == pumpDisplay."
-  },
-  "pumpScanFailureTitle": "Display unreadable",
-  "@pumpScanFailureTitle": {
-    "description": "Title of the bottom sheet shown when a pump-display scan returns no usable data (#953)."
-  },
-  "pumpScanFailureBody": "The scan couldn't read the pump display. What would you like to do?",
-  "@pumpScanFailureBody": {
-    "description": "Body text of the pump-scan failure sheet, prompting the user to choose between correcting manually, reporting, or removing the photo (#953)."
-  },
-  "pumpScanFailureCorrectManually": "Correct manually",
-  "@pumpScanFailureCorrectManually": {
-    "description": "Action: close the failure sheet and leave the form untouched so the user types values (#953)."
-  },
-  "pumpScanFailureReport": "Report",
-  "@pumpScanFailureReport": {
-    "description": "Action: open the bad-scan report flow so the unreadable photo is shipped to GitHub for triage (#953)."
-  },
-  "pumpScanFailureRemove": "Remove photo",
-  "@pumpScanFailureRemove": {
-    "description": "Action: delete the captured photo and forget the scan (#953)."
   },
   "badScanReportHint": "We'll share the receipt photo and both sets of values so the next build can learn this layout.",
   "@badScanReportHint": {
@@ -4231,38 +4178,6 @@
   "badScanReportFallbackToShare": "Submission failed — manual share",
   "@badScanReportFallbackToShare": {
     "description": "Snackbar shown when the GitHub submission fails and we fall back to the system share sheet (#952 phase 2)."
-  },
-  "pumpCameraCapture": "Capture",
-  "@pumpCameraCapture": {
-    "description": "Label of the shutter button on the pump-display camera screen (#1868)."
-  },
-  "pumpCameraPermissionDenied": "Camera access is needed to scan the pump display. Enable it in your device settings.",
-  "@pumpCameraPermissionDenied": {
-    "description": "Shown when the camera permission is denied on the pump-display capture screen (#1868)."
-  },
-  "pumpCameraError": "The camera couldn't start. Try again or enter the values by hand.",
-  "@pumpCameraError": {
-    "description": "Shown when the in-app camera fails to initialise on the pump-display capture screen (#1868)."
-  },
-  "pumpCameraOrientationHorizontal": "Switch to horizontal layout",
-  "@pumpCameraOrientationHorizontal": {
-    "description": "Tooltip on the orientation-toggle button when the overlay is currently vertical (#2276)."
-  },
-  "pumpCameraOrientationVertical": "Switch to vertical layout",
-  "@pumpCameraOrientationVertical": {
-    "description": "Tooltip on the orientation-toggle button when the overlay is currently horizontal (#2276)."
-  },
-  "pumpCameraGlareWarning": "Too much glare — tilt slightly to avoid reflections",
-  "@pumpCameraGlareWarning": {
-    "description": "Live amber feedback bar shown when the framed region is over-exposed by glare (#2276)."
-  },
-  "pumpCameraAlignHint": "Line up the display inside the frame, then capture",
-  "@pumpCameraAlignHint": {
-    "description": "Default hint shown in the live feedback bar on the guided alignment overlay (#2276)."
-  },
-  "pumpCameraRotateToLandscape": "Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright",
-  "@pumpCameraRotateToLandscape": {
-    "description": "Highest-priority feedback shown over the camera while the phone is held portrait; the shutter is disabled until the user rotates to landscape so the wide pump display fills the frame with large, upright digits (#2477)."
   },
   "fillUpWarningDialogTitle": "Check this fill-up",
   "@fillUpWarningDialogTitle": {
@@ -4319,10 +4234,6 @@
   "fillUpImportReceiptLabel": "Receipt",
   "@fillUpImportReceiptLabel": {
     "description": "Import option: OCR-scan a paper receipt (#751 phase 2)."
-  },
-  "fillUpImportPumpLabel": "Pump display",
-  "@fillUpImportPumpLabel": {
-    "description": "Import option: OCR-scan the fuel-pump LCD (#751 phase 2)."
   },
   "fillUpPricePerLiterLabel": "Price per liter",
   "@fillUpPricePerLiterLabel": {
@@ -4415,6 +4326,16 @@
       "count": {
         "type": "int",
         "example": "3"
+      }
+    }
+  },
+  "fuelEfficiencyIntervalCount": "{count, plural, =1{1 full tank} other{{count} full tanks}}",
+  "@fuelEfficiencyIntervalCount": {
+    "description": "Number of closed full-tank-to-full-tank intervals classified into a composition bucket, shown next to the fill count on the bucket's row in the per-fuel efficiency card (#3764). 'Full tank' matches the vocabulary of the insufficient-data footnote.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
       }
     }
   },
@@ -5871,14 +5792,6 @@
   "@ocrTesterExplain": {
     "description": "One-line explanation under the OCR tester title clarifying it is a gated developer tool (#2518)."
   },
-  "ocrTesterModePump": "Pump",
-  "@ocrTesterModePump": {
-    "description": "Segmented-button label for the pump-display OCR mode on the OCR tester (#2518)."
-  },
-  "ocrTesterModeReceipt": "Receipt",
-  "@ocrTesterModeReceipt": {
-    "description": "Segmented-button label for the paper-receipt OCR mode on the OCR tester (#2518)."
-  },
   "ocrTesterCapture": "Capture",
   "@ocrTesterCapture": {
     "description": "Button that opens the camera to capture a fresh image to run through the OCR pipeline (#2518)."
@@ -6022,14 +5935,6 @@
   "ocrTesterExported": "OCR package saved to your Downloads folder.",
   "@ocrTesterExported": {
     "description": "Snackbar confirming the OCR trace package (image + JSON) was saved to Downloads (#2518)."
-  },
-  "ocrTesterSaveFixture": "Save as fixture",
-  "@ocrTesterSaveFixture": {
-    "description": "Button that saves the current OCR trace as a regression fixture — the source image plus a .ocrpkg.json with expected values — into the device Downloads folder, ready to commit and run through the fixture-promotion generator (#2519)."
-  },
-  "ocrTesterFixtureSaved": "Fixture saved to your Downloads folder. Move it under test/fixtures and run tool/promote_ocr_fixture.dart.",
-  "@ocrTesterFixtureSaved": {
-    "description": "Snackbar confirming the OCR regression fixture (source image + .ocrpkg.json) was saved to Downloads, with a hint on the next step (#2519)."
   },
   "onboardingObd2StepTitle": "Connect your OBD2 adapter",
   "@onboardingObd2StepTitle": {
@@ -6646,7 +6551,25 @@
   },
   "tankLevelRangeFormat": "≈ {kilometres} km of range",
   "@tankLevelRangeFormat": {
-    "description": "Sub-text under the tank-level big number — distance the user can still drive at the vehicle's average L/100 km (#1195).",
+    "description": "Sub-text under the tank-level big number — distance the user can still drive at the vehicle's average L/100 km (#1195). Since #3764 shown only when no closed full-tank interval exists yet (the last-tank projection leads otherwise).",
+    "placeholders": {
+      "kilometres": {
+        "type": "String"
+      }
+    }
+  },
+  "tankLevelRangeLastIntervalFormat": "≈ {kilometres} km at your last tank's consumption",
+  "@tankLevelRangeLastIntervalFormat": {
+    "description": "Primary range sub-text under the tank-level big number (#3764) — distance the current tank content covers at the L/100 km measured over the LAST closed full-tank-to-full-tank interval.",
+    "placeholders": {
+      "kilometres": {
+        "type": "String"
+      }
+    }
+  },
+  "tankLevelRangeLongRunFormat": "Long-run average: ≈ {kilometres} km",
+  "@tankLevelRangeLongRunFormat": {
+    "description": "Secondary context line under the primary last-tank range projection (#3764) — the same tank content projected at the long-run tank-to-tank average consumption instead. Only shown when it differs from the primary figure.",
     "placeholders": {
       "kilometres": {
         "type": "String"

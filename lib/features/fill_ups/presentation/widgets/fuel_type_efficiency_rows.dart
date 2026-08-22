@@ -108,8 +108,14 @@ class _BucketRow extends StatelessWidget {
                 label: l.fuelEfficiencyColTotalSpent,
                 value: PriceFormatter.formatTotal(stats.totalSpent),
               ),
+              // #3764 — interval count first-class next to the fill count:
+              // "2 full tanks · 3 fills". The interval count is what feeds
+              // the verdict gate, so surfacing it makes "why no crown yet"
+              // legible per row.
               Text(
-                l.fuelEfficiencyFillCount(stats.fillCount),
+                '${l.fuelEfficiencyIntervalCount(stats.attributedIntervalCount)}'
+                ' · ${l.fuelEfficiencyFillCount(stats.fillCount)}',
+                key: ValueKey('fuel_efficiency_counts_${bucket.key}'),
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),

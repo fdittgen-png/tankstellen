@@ -21,10 +21,10 @@ import '../../../feature_management/api.dart';
 /// Pulled out of `add_fill_up_screen.dart` (#563 extraction) so the
 /// screen file drops well below 300 LOC.
 ///
-/// As of #2110 the two buttons are independently gated by
-/// `Feature.addFillUpOcrReceipt` (default-on — works reliably) and
-/// `Feature.addFillUpOcrPump` (default-off — recognizer immature).
-/// When both flags are off the widget collapses to `SizedBox.shrink()`.
+/// As of #2110 the receipt button is gated by
+/// `Feature.addFillUpOcrReceipt` (default-on — works reliably). When
+/// the flag is off the widget collapses to `SizedBox.shrink()`.
+/// (#3765 removed the sibling pump-display scan button.)
 ///
 /// #2687 — a third, full-width "Paste text" affordance sits below the
 /// scan row when [onPasteReceipt] is provided. It opens the on-device
@@ -35,9 +35,7 @@ import '../../../feature_management/api.dart';
 /// "import a receipt" capability; one reads a photo, one reads text).
 class FillUpImportButtonsPair extends ConsumerWidget {
   final bool scanningReceipt;
-  final bool scanningPump;
   final VoidCallback onScanReceipt;
-  final VoidCallback onScanPumpDisplay;
 
   /// #2687 — opens the paste-receipt-text dialog. When null (e.g. a host
   /// that hasn't wired the manual path) the paste affordance is omitted.
@@ -46,9 +44,7 @@ class FillUpImportButtonsPair extends ConsumerWidget {
   const FillUpImportButtonsPair({
     super.key,
     required this.scanningReceipt,
-    required this.scanningPump,
     required this.onScanReceipt,
-    required this.onScanPumpDisplay,
     this.onPasteReceipt,
   });
 
@@ -57,11 +53,10 @@ class FillUpImportButtonsPair extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final enabled = ref.watch(enabledFeaturesProvider);
     final receiptOn = enabled.contains(Feature.addFillUpOcrReceipt);
-    final pumpOn = enabled.contains(Feature.addFillUpOcrPump);
 
-    // #2110 — neither button enabled → render nothing. The form
+    // #2110 — button not enabled → render nothing. The form
     // continues without the import row.
-    if (!receiptOn && !pumpOn) return const SizedBox.shrink();
+    if (!receiptOn) return const SizedBox.shrink();
 
     final receiptBtn = receiptOn
         ? Expanded(
@@ -84,28 +79,6 @@ class FillUpImportButtonsPair extends ConsumerWidget {
             ),
           )
         : null;
-    final pumpBtn = pumpOn
-        ? Expanded(
-            child: OutlinedButton.icon(
-              key: const Key('import_pump_button'),
-              onPressed: scanningPump ? null : onScanPumpDisplay,
-              icon: scanningPump
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.local_gas_station_outlined),
-              label: Text(
-                l.fillUpImportPumpLabel,
-                maxLines: 2,
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.visible,
-              ),
-            ),
-          )
-        : null;
-
     // #2687 — the camera-free "Paste text" affordance rides the receipt
     // gate. Full-width below the scan row so three controls never crowd a
     // single Row on narrow phones.
@@ -118,13 +91,7 @@ class FillUpImportButtonsPair extends ConsumerWidget {
           )
         : null;
 
-    final scanRow = Row(
-      children: [
-        ?receiptBtn,
-        if (receiptBtn != null && pumpBtn != null) const SizedBox(width: 8),
-        ?pumpBtn,
-      ],
-    );
+    final scanRow = Row(children: [?receiptBtn]);
 
     if (pasteBtn == null) return scanRow;
     return Column(

@@ -78,8 +78,8 @@ List<RouteBase> get profileRoutes => [
         path: RoutePaths.developerToolsObd2Health,
         builder: (context, state) => const Obd2HealthScreen(),
       ),
-      // #2518 — in-app OCR tester (Epic #2516 Child 2): runs the pump /
-      // receipt pipeline on a chosen image and shows the block overlay +
+      // #2518 — in-app OCR tester (Epic #2516 Child 2): runs the receipt
+      // pipeline on a chosen image and shows the block overlay +
       // step trace. Self-guards on `Feature.debugMode` like its siblings.
       GoRoute(
         path: RoutePaths.developerToolsOcrTester,

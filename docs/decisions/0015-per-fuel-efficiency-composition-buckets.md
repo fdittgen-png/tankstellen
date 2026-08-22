@@ -5,9 +5,9 @@
 
 # ADR 0015: Per-fuel efficiency comparison v2 — pure-vs-mix composition buckets
 
-**Status:** Accepted
+**Status:** Accepted (amended 2026-08-22 by the v3 carried-content section, #3764)
 **Date:** 2026-06-05
-**Issue:** #2928
+**Issue:** #2928 (v2) · #3764 (v3 amendment)
 **Parent Epic:** #2881
 **Supersedes:** ADR 0014 (dominant-fuel collapse)
 
@@ -154,3 +154,82 @@ pure `E85` — the verdict compares across pure + mix.)
   unbounded label is noisy and rare; the two-largest label (`E85/E10`) keeps
   rows scannable while still folding every litre into the bucket. Noted as the
   simplest reasonable default.
+
+## v3 amendment (2026-08-22, #3764) — the composition includes the carried-over tank content
+
+### Problem
+
+v2's composition tally saw only the interval's *contributing fills*, so the
+fuel already in the tank at the opening plein was invisible. The reporting
+user's case: **14 L of E5** still in the tank, topped with **21 L of E85 to
+full (35 L)** — the tank that then burns is a **~40/60 E5/E85 blend**, yet v2
+bucketed the following interval by its contributing fills alone (→ pure E85).
+The `TankMixEstimator` (#3652) already models exactly that prior-content
+chain; the aggregator simply never consulted it.
+
+### Decision
+
+v3 classifies each closed interval by **what the tank actually held while it
+was being burned**:
+
+```
+composition = opening content
+            + non-correction fills STRICTLY INSIDE the interval
+```
+
+1. **Opening content.** Knowable exactly when the interval opens at a
+   **physical plein** and the **tank capacity is known** (user-set
+   `tankCapacityL`, or backfilled from the reference catalog by the vehicle
+   editor): the content is the full tank —
+   `capacity × the mix shares as of that fill`, where the shares come from
+   `estimateTankMixForCapacity` (the #3652 prior-content chain, reused
+   verbatim) replayed over the fill-history **prefix up to and including the
+   opening fill**. For the very first fill the chain attributes the unknown
+   residual to that fill's own grade (its documented convergence rule).
+2. **The closing plein is EXCLUDED from the composition tally.** Its fuel
+   enters the tank *after* the interval's burn — it belongs to the **next**
+   interval's opening content, where the mix chain delivers it. (Including
+   it would, in the run-dry case, turn a pure-E5 burn closed by an E85 plein
+   into a fictitious 50/50 blend.) Under v2 the closing plein was the tally's
+   main ingredient; under v3 the burned tank replaces it. The canonical case
+   thus buckets as exactly the 40/60 `E85/E5` mix.
+3. **Capacity-unknown fallback.** When the opening content is NOT knowable —
+   capacity unset, the interval opens on a non-plein first fill, or the
+   opening entry is a synthetic correction (#1361) — the interval falls back
+   to the v2 contributing-fills tally (closing plein included) **exactly**,
+   and is counted in the new `legacyAttributedIntervalCount` on the bucket's
+   stats so the UI can disclose partially-legacy attribution. A history run
+   entirely without capacity is bit-for-bit v2.
+4. **Unchanged:** the interval walker, the 85 % purity rule
+   (`kMaxMinorityShareForPure`), dominant/secondary labelling, tie-breaks,
+   the corrections rules (a corrections-only interval still attributes
+   nothing, even with a known opening content), the verdict gate
+   (`kMinAttributedIntervalsForVerdict`), and the sort.
+
+### Metric folding stays v2
+
+Σlitres / Σcost / Σdistance still fold from the **contributing fills**
+(closing plein included): between two pleins, pumped litres ≈ burned litres,
+and that identity is the honest basis of `avgL100km`. Only the
+**classification** tally changed. Consequence, stated openly: on a
+fuel-switch interval the folded cost is the *closing* plein's price while the
+bucket names the *burned* blend — a one-interval price lag, exactly the v2
+"spend is credited to the tank it closed" approximation, which washes out
+over the bucket's intervals. Folding the opening content's historical prices
+instead was rejected as fabricated precision (those litres were paid inside
+earlier intervals at unrecorded blend ratios).
+
+### Consequences
+
+- The canonical flex-fuel pattern — run partway down on grade A, top to full
+  with grade B — finally produces the blend bucket the driver actually burns;
+  switching grades no longer mislabels whole tanks as pure.
+- A truly run-dry switch (prior content 0 at the plein) correctly stays
+  PURE: `capacity − pumped = 0` pins the mix to the new grade alone.
+- Attribution now depends (deliberately) on the tank capacity: adding or
+  correcting `tankCapacityL` can re-bucket past intervals. The
+  `legacyAttributedIntervalCount` field makes the mixed-provenance case
+  inspectable instead of silent.
+- The aggregator is no longer a pure function of the fill list alone — it
+  takes an optional `tankCapacityL` and replays the mix chain per interval
+  (O(n²) worst case; fill histories are small, measured in hundreds).

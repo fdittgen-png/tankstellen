@@ -121,8 +121,6 @@ class GithubIssueBodyFormatter {
     switch (kind) {
       case ScanKind.receipt:
         return 'Receipt';
-      case ScanKind.pumpDisplay:
-        return 'Pump display';
     }
   }
 

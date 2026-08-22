@@ -79,8 +79,6 @@ String featureLabel(AppLocalizations l, Feature f) {
       return l.featureLabel_obd2Optional;
     case Feature.addFillUpOcrReceipt:
       return l.featureLabel_addFillUpOcrReceipt;
-    case Feature.addFillUpOcrPump:
-      return l.featureLabel_addFillUpOcrPump;
     case Feature.addFillUpShareIntentReceipt:
       return l.featureLabel_addFillUpShareIntentReceipt;
     case Feature.developerPatToken:
@@ -164,8 +162,6 @@ String featureDescription(AppLocalizations l, Feature f) {
       return l.featureDescription_obd2Optional;
     case Feature.addFillUpOcrReceipt:
       return l.featureDescription_addFillUpOcrReceipt;
-    case Feature.addFillUpOcrPump:
-      return l.featureDescription_addFillUpOcrPump;
     case Feature.addFillUpShareIntentReceipt:
       return l.featureDescription_addFillUpShareIntentReceipt;
     case Feature.developerPatToken:
@@ -234,7 +230,6 @@ String blockedEnableMessage(AppLocalizations l, Feature f) {
     case Feature.communityPriceReports:
     case Feature.obd2Optional:
     case Feature.addFillUpOcrReceipt:
-    case Feature.addFillUpOcrPump:
     case Feature.addFillUpShareIntentReceipt:
     case Feature.developerPatToken:
     case Feature.debugMode:

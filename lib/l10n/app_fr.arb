@@ -26,12 +26,6 @@
   "badScanReportOpenInBrowser": "Ouvrir dans le navigateur",
   "badScanReportFallbackToShare": "Échec de création — partage manuel",
   "badScanReportTitleReceipt": "Signaler une erreur de scan — Reçu",
-  "badScanReportTitlePumpDisplay": "Signaler une erreur de scan — Display de pompe",
-  "pumpScanFailureTitle": "Display illisible",
-  "pumpScanFailureBody": "Le scan n'a pas pu lire le display. Que voulez-vous faire ?",
-  "pumpScanFailureCorrectManually": "Corriger manuellement",
-  "pumpScanFailureReport": "Signaler",
-  "pumpScanFailureRemove": "Retirer la photo",
   "feedbackConsentTitle": "Envoyer le rapport à GitHub ?",
   "feedbackConsentBody": "Cela crée un ticket public sur notre dépôt GitHub avec votre photo et le texte OCR. Aucune donnée personnelle (localisation, identifiant) n'est envoyée. Continuer ?",
   "feedbackConsentContinue": "Continuer",
@@ -1160,8 +1154,6 @@
   "featureDescription_obd2Optional": "Quand désactivé, l'app enregistre des trajets uniquement GPS sans avoir besoin d'un adaptateur OBD2. Le coaching est réduit — pas de L/100 km instantanée, moins de signaux moteur.",
   "featureLabel_addFillUpOcrReceipt": "OCR de l'écran ticket",
   "featureDescription_addFillUpOcrReceipt": "Scannez un ticket imprimé sur l'écran Ajouter un plein pour pré-remplir la date, les litres, le total et la station.",
-  "featureLabel_addFillUpOcrPump": "OCR de l'écran de pompe (expérimental)",
-  "featureDescription_addFillUpOcrPump": "Scannez l'afficheur d'une pompe à carburant pour pré-remplir le formulaire. La reconnaissance n'est pas fiable aujourd'hui — activez uniquement si vous voulez tester.",
   "featureLabel_developerPatToken": "Retour développeur (PAT GitHub)",
   "featureDescription_developerPatToken": "Active le panneau de retour pour les scans en échec qui crée automatiquement des issues GitHub à partir d'un Personal Access Token. Fonction pour utilisateurs avancés / contributeurs.",
   "featureBlockedEnable_experimentalOemPids": "Activez d'abord l'enregistrement OBD2 des trajets",
@@ -1568,12 +1560,6 @@
   "scanReceiptNoData": "Aucune donnée de reçu trouvée — réessayez",
   "scanReceiptSuccess": "Reçu scanné — vérifiez les valeurs. Touchez « Signaler une erreur de scan » ci-dessous si quelque chose ne va pas.",
   "scanReceiptFailed": "Échec du scan : {error}",
-  "pumpCameraCapture": "Capturer",
-  "pumpCameraPermissionDenied": "L'accès à la caméra est nécessaire pour scanner l'afficheur de la pompe. Activez-le dans les réglages de l'appareil.",
-  "pumpCameraError": "La caméra n'a pas pu démarrer. Réessayez ou saisissez les valeurs manuellement.",
-  "scanPumpSuccess": "Affichage de la pompe scanné — vérifiez les valeurs.",
-  "scanPumpGlare": "Trop de reflets sur l'afficheur — réessayez en vous plaçant légèrement de biais pour que les chiffres ne soient pas surexposés.",
-  "scanPumpFailed": "Échec du scan de la pompe : {error}",
   "badScanReportHint": "Nous partagerons la photo du reçu et les deux ensembles de valeurs pour que la prochaine version apprenne cette mise en page.",
   "badScanReportFieldBrandLayout": "Mise en page de la marque",
   "badScanReportFieldTotal": "Total",
@@ -1589,7 +1575,6 @@
   "fillUpSectionWhereTitle": "Où vous étiez",
   "fillUpSectionWhereSubtitle": "Station, compteur, notes",
   "fillUpImportReceiptLabel": "Reçu",
-  "fillUpImportPumpLabel": "Affichage de la pompe",
   "fillUpPricePerLiterLabel": "Prix par litre",
   "hapticEcoCoachSettingTitle": "Coaching éco en temps réel",
   "hapticEcoCoachSettingSubtitle": "Vibration légère + conseil à l'écran quand vous accélérez fort en vitesse de croisière",
@@ -1893,10 +1878,6 @@
   "tripRecordingAutoPinTitle": "Toujours épingler au démarrage de l'enregistrement",
   "tripRecordingAutoPinSubtitle": "Épingler le formulaire automatiquement à chaque trajet au lieu d'appuyer à chaque fois. Consomme plus de batterie.",
   "tripRecordingConnectingTitle": "Démarrage de l'enregistrement…",
-  "pumpCameraOrientationHorizontal": "Passer en affichage horizontal",
-  "pumpCameraOrientationVertical": "Passer en affichage vertical",
-  "pumpCameraGlareWarning": "Trop de reflets — inclinez légèrement pour éviter les éblouissements",
-  "pumpCameraAlignHint": "Alignez l'afficheur dans le cadre, puis capturez",
   "insightHighSpeedBand": "Vitesse élevée prolongée ({pctTime} % du trajet) : {liters} L gaspillés",
   "insightHighSpeedBandNoFuel": "Vitesse élevée prolongée ({pctTime} % du trajet)",
   "lessonAdviceHighSpeedBand": "Levez le pied au-dessus de 110 km/h : la résistance de l'air augmente fortement, rouler un peu moins vite économise beaucoup de carburant.",
@@ -2290,10 +2271,6 @@
   "@reconcileResolveGapSemanticLabel": {
     "description": "MT — needs native review"
   },
-  "pumpCameraRotateToLandscape": "Tournez votre téléphone en mode paysage — l'affichage de la pompe est large, les chiffres s'affichent ainsi plus grands et droits",
-  "@pumpCameraRotateToLandscape": {
-    "description": "MT — needs native review"
-  },
   "insightFullThrottle": "Plein gaz ({pctTime}% du trajet) : {liters} L gaspillés",
   "@insightFullThrottle": {
     "description": "MT — needs native review",
@@ -2673,14 +2650,6 @@
   "@ocrTesterExplain": {
     "description": "MT — needs native review"
   },
-  "ocrTesterModePump": "Pompe",
-  "@ocrTesterModePump": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterModeReceipt": "Ticket",
-  "@ocrTesterModeReceipt": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterCapture": "Capturer",
   "@ocrTesterCapture": {
     "description": "MT — needs native review"
@@ -2871,14 +2840,6 @@
   },
   "obd2DiagnosticsInitCold": "froid",
   "@obd2DiagnosticsInitCold": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterSaveFixture": "Enregistrer comme fixture",
-  "@ocrTesterSaveFixture": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterFixtureSaved": "Fixture enregistrée dans votre dossier Téléchargements. Déplacez-la sous test/fixtures et exécutez tool/promote_ocr_fixture.dart.",
-  "@ocrTesterFixtureSaved": {
     "description": "MT — needs native review"
   },
   "situationColdStart": "Démarrage à froid",
@@ -3835,10 +3796,6 @@
   },
   "alertsStationSectionTitle": "Alertes de stations",
   "alertsStationAdd": "Ajouter une alerte de station",
-  "scanPumpInconsistent": "Les valeurs scannées ne concordent pas — veuillez les saisir manuellement.",
-  "@scanPumpInconsistent": {
-    "description": "MT — needs native review"
-  },
   "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",
   "@obd2GpsDegradedPassiveWaitingBanner": {
     "x-mt": "needs-native-review",
@@ -5403,5 +5360,36 @@
   "@aclWakeNotificationBody": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "fuelEfficiencyIntervalCount": "{count, plural, =1{1 full tank} other{{count} full tanks}}",
+  "@fuelEfficiencyIntervalCount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "tankLevelRangeLastIntervalFormat": "≈ {kilometres} km at your last tank's consumption",
+  "@tankLevelRangeLastIntervalFormat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "kilometres": {
+        "type": "String"
+      }
+    }
+  },
+  "tankLevelRangeLongRunFormat": "Long-run average: ≈ {kilometres} km",
+  "@tankLevelRangeLongRunFormat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "kilometres": {
+        "type": "String"
+      }
+    }
   }
 }
