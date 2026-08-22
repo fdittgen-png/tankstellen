@@ -6,7 +6,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/core/sharing/public_file_exporter.dart';
 import 'package:tankstellen/features/receipts_ocr/data/ocr/ocr_trace_package.dart';
 import 'package:tankstellen/features/receipts_ocr/data/ocr/ocr_trace_recorder.dart';
 import 'package:tankstellen/features/receipts_ocr/data/ocr/ocr_trace_serializer.dart';
@@ -98,39 +97,26 @@ void main() {
         const PumpOcrTesterScreen(),
         overrides: overrides(debugOn: false),
       );
-      expect(find.byKey(const Key('ocr_tester_mode')), findsNothing);
+      expect(find.byKey(const Key('ocr_tester_run')), findsNothing);
     });
 
-    testWidgets('hosts the mode toggle, source picker + country dropdown',
+    testWidgets('hosts the source picker + country dropdown',
         (tester) async {
       await pumpApp(
         tester,
         const PumpOcrTesterScreen(),
         overrides: overrides(debugOn: true),
       );
-      expect(find.byKey(const Key('ocr_tester_mode')), findsOneWidget);
       expect(find.byKey(const Key('ocr_tester_capture')), findsOneWidget);
       expect(find.byKey(const Key('ocr_tester_pick')), findsOneWidget);
       expect(find.byKey(const Key('ocr_tester_country')), findsOneWidget);
       expect(find.byKey(const Key('ocr_tester_run')), findsOneWidget);
+      // #3765 — the pump/receipt mode toggle is gone: receipt-only.
+      expect(find.byKey(const Key('ocr_tester_mode')), findsNothing);
       // Run is disabled until an image is chosen.
       final run = tester.widget<FilledButton>(
           find.byKey(const Key('ocr_tester_run')));
       expect(run.onPressed, isNull);
-    });
-
-    testWidgets('Pump|Receipt segmented toggle switches mode',
-        (tester) async {
-      await pumpApp(
-        tester,
-        const PumpOcrTesterScreen(),
-        overrides: overrides(debugOn: true),
-      );
-      expect(find.text('Receipt'), findsOneWidget);
-      await tester.tap(find.text('Receipt'));
-      await tester.pumpAndSettle();
-      // Still rendered after the mode flip (no crash, toggle present).
-      expect(find.byKey(const Key('ocr_tester_mode')), findsOneWidget);
     });
   });
 
@@ -225,60 +211,6 @@ void main() {
         ),
       );
       expect(tester.takeException(), isNull);
-    });
-  });
-
-  /// A pump trace with a (fake) captured image attached — promotable to a
-  /// fixture (#2519).
-  OcrTracePackage seededPumpTraceWithImage() {
-    final trace = OcrTraceRecorder(kind: OcrTraceKind.pump);
-    trace.input(country: 'FR');
-    trace.blocks('PRIX 18,59', const [
-      RecognizedTextBlock(
-          text: 'PRIX', box: OcrBox(left: 10, top: 10, right: 60, bottom: 30)),
-    ]);
-    trace.result(totalCost: 18.59, liters: 23.30, pricePerLiter: 0.798);
-    trace.image(fileName: 'capture.jpg', base64: base64Encode(const [1, 2, 3]));
-    return trace.build();
-  }
-
-  group('OcrTesterExport.saveAsFixture (#2519)', () {
-    test('builds a slug from country + read values', () {
-      expect(OcrTesterExport.fixtureSlug(seededPumpTraceWithImage()),
-          'pump_fr_18_59eur_23_30l');
-    });
-
-    test('writes a <slug>.jpg + <slug>.ocrpkg.json with expected filled',
-        () async {
-      final writes = <String, Uint8List>{};
-      debugPublicFileExporterOverride =
-          ({required bytes, required fileName, required mimeType}) async {
-        writes[fileName] = bytes;
-        return fileName;
-      };
-      addTearDown(() => debugPublicFileExporterOverride = null);
-
-      final slug = await OcrTesterExport.saveAsFixture(
-          seededPumpTraceWithImage());
-
-      expect(slug, 'pump_fr_18_59eur_23_30l');
-      expect(writes.keys, contains('pump_fr_18_59eur_23_30l.jpg'));
-      expect(writes.keys, contains('pump_fr_18_59eur_23_30l.ocrpkg.json'));
-      final json = utf8.decode(writes['pump_fr_18_59eur_23_30l.ocrpkg.json']!);
-      final decoded = jsonDecode(json) as Map<String, dynamic>;
-      expect(decoded['expected'], isNotNull);
-      expect((decoded['expected'] as Map)['totalCost'], 18.59);
-      expect((decoded['expected'] as Map)['pricePerLiter'], 0.798);
-      // The image filename is pinned to the slug so the generator's
-      // sibling lookup finds the committed source.
-      expect((decoded['image'] as Map)['fileName'],
-          'pump_fr_18_59eur_23_30l.jpg');
-    });
-
-    test('returns null when the package carries no image', () async {
-      final trace = OcrTraceRecorder(kind: OcrTraceKind.pump)
-        ..result(totalCost: 1.0);
-      expect(await OcrTesterExport.saveAsFixture(trace.build()), isNull);
     });
   });
 

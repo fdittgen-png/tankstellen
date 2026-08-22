@@ -4710,13 +4710,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Scan a printed receipt on the Add fill-up screen to pre-fill date, litres, total, and station.';
 
   @override
-  String get featureLabel_addFillUpOcrPump => 'Pump display OCR (experimental)';
-
-  @override
-  String get featureDescription_addFillUpOcrPump =>
-      'Scan a fuel pump display to pre-fill the form. Recognition is unreliable today — opt in only if you want to test.';
-
-  @override
   String get featureLabel_developerPatToken =>
       'Developer feedback (GitHub PAT)';
 
@@ -4984,43 +4977,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get scanPumpSuccess => 'Pump display scanned — verify the values.';
-
-  @override
-  String get scanPumpGlare =>
-      'Too much glare on the display — try again at a slight angle so the numbers aren\'t washed out.';
-
-  @override
-  String get scanPumpInconsistent =>
-      'The scanned values don\'t add up — please enter them manually.';
-
-  @override
-  String scanPumpFailed(String error) {
-    return 'Pump scan failed: $error';
-  }
-
-  @override
   String get badScanReportTitleReceipt => 'Report a scan error — Receipt';
-
-  @override
-  String get badScanReportTitlePumpDisplay =>
-      'Report a scan error — Pump display';
-
-  @override
-  String get pumpScanFailureTitle => 'Display unreadable';
-
-  @override
-  String get pumpScanFailureBody =>
-      'The scan couldn\'t read the pump display. What would you like to do?';
-
-  @override
-  String get pumpScanFailureCorrectManually => 'Correct manually';
-
-  @override
-  String get pumpScanFailureReport => 'Report';
-
-  @override
-  String get pumpScanFailureRemove => 'Remove photo';
 
   @override
   String get badScanReportHint =>
@@ -5063,35 +5020,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get badScanReportFallbackToShare => 'Submission failed — manual share';
 
   @override
-  String get pumpCameraCapture => 'Capture';
-
-  @override
-  String get pumpCameraPermissionDenied =>
-      'Camera access is needed to scan the pump display. Enable it in your device settings.';
-
-  @override
-  String get pumpCameraError =>
-      'The camera couldn\'t start. Try again or enter the values by hand.';
-
-  @override
-  String get pumpCameraOrientationHorizontal => 'Switch to horizontal layout';
-
-  @override
-  String get pumpCameraOrientationVertical => 'Switch to vertical layout';
-
-  @override
-  String get pumpCameraGlareWarning =>
-      'Too much glare — tilt slightly to avoid reflections';
-
-  @override
-  String get pumpCameraAlignHint =>
-      'Line up the display inside the frame, then capture';
-
-  @override
-  String get pumpCameraRotateToLandscape =>
-      'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright';
-
-  @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
 
   @override
@@ -5124,9 +5052,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fillUpImportReceiptLabel => 'Receipt';
-
-  @override
-  String get fillUpImportPumpLabel => 'Pump display';
 
   @override
   String get fillUpPricePerLiterLabel => 'Price per liter';
@@ -6337,12 +6262,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Run the pump / receipt OCR pipeline on a chosen photo and inspect every step — only available in Developer mode.';
 
   @override
-  String get ocrTesterModePump => 'Pump';
-
-  @override
-  String get ocrTesterModeReceipt => 'Receipt';
-
-  @override
   String get ocrTesterCapture => 'Capture';
 
   @override
@@ -6450,13 +6369,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ocrTesterExported => 'OCR package saved to your Downloads folder.';
-
-  @override
-  String get ocrTesterSaveFixture => 'Save as fixture';
-
-  @override
-  String get ocrTesterFixtureSaved =>
-      'Fixture saved to your Downloads folder. Move it under test/fixtures and run tool/promote_ocr_fixture.dart.';
 
   @override
   String get onboardingObd2StepTitle => 'Connect your OBD2 adapter';
@@ -12622,14 +12534,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Šçáñ á ƥřîñŧéđ řéçéîƥŧ óñ ŧĥé Áđđ ƒîłł-úƥ šçřééñ ŧó ƥřé-ƒîłł đáŧé, łîŧřéš, ŧóŧáł, áñđ šŧáŧîóñ. ·································⟧';
 
   @override
-  String get featureLabel_addFillUpOcrPump =>
-      '⟦Ƥúɱƥ đîšƥłáý ÓÇŘ (éẋƥéřîɱéñŧáł) ············⟧';
-
-  @override
-  String get featureDescription_addFillUpOcrPump =>
-      '⟦Šçáñ á ƒúéł ƥúɱƥ đîšƥłáý ŧó ƥřé-ƒîłł ŧĥé ƒóřɱ. Řéçóǧñîŧîóñ îš úñřéłîáƀłé ŧóđáý — óƥŧ îñ óñłý îƒ ýóú ŵáñŧ ŧó ŧéšŧ. ········································⟧';
-
-  @override
   String get featureLabel_developerPatToken =>
       '⟦Đéṽéłóƥéř ƒééđƀáçķ (ǦîŧĤúƀ ƤÁŦ) ············⟧';
 
@@ -12907,45 +12811,8 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   }
 
   @override
-  String get scanPumpSuccess =>
-      '⟦Ƥúɱƥ đîšƥłáý šçáññéđ — ṽéřîƒý ŧĥé ṽáłúéš. ···············⟧';
-
-  @override
-  String get scanPumpGlare =>
-      '⟦Ŧóó ɱúçĥ ǧłářé óñ ŧĥé đîšƥłáý — ŧřý áǧáîñ áŧ á šłîǧĥŧ áñǧłé šó ŧĥé ñúɱƀéřš ářéñ\'ŧ ŵášĥéđ óúŧ. ································⟧';
-
-  @override
-  String get scanPumpInconsistent =>
-      '⟦Ŧĥé šçáññéđ ṽáłúéš đóñ\'ŧ áđđ úƥ — ƥłéášé éñŧéř ŧĥéɱ ɱáñúáłłý. ······················⟧';
-
-  @override
-  String scanPumpFailed(String error) {
-    return '⟦Ƥúɱƥ šçáñ ƒáîłéđ: $error ······⟧';
-  }
-
-  @override
   String get badScanReportTitleReceipt =>
       '⟦Řéƥóřŧ á šçáñ éřřóř — Řéçéîƥŧ ··········⟧';
-
-  @override
-  String get badScanReportTitlePumpDisplay =>
-      '⟦Řéƥóřŧ á šçáñ éřřóř — Ƥúɱƥ đîšƥłáý ············⟧';
-
-  @override
-  String get pumpScanFailureTitle => '⟦Đîšƥłáý úñřéáđáƀłé ········⟧';
-
-  @override
-  String get pumpScanFailureBody =>
-      '⟦Ŧĥé šçáñ çóúłđñ\'ŧ řéáđ ŧĥé ƥúɱƥ đîšƥłáý. Ŵĥáŧ ŵóúłđ ýóú łîķé ŧó đó? ·······················⟧';
-
-  @override
-  String get pumpScanFailureCorrectManually => '⟦Çóřřéçŧ ɱáñúáłłý ·······⟧';
-
-  @override
-  String get pumpScanFailureReport => '⟦Řéƥóřŧ ···⟧';
-
-  @override
-  String get pumpScanFailureRemove => '⟦Řéɱóṽé ƥĥóŧó ·····⟧';
 
   @override
   String get badScanReportHint =>
@@ -12989,37 +12856,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Šúƀɱîššîóñ ƒáîłéđ — ɱáñúáł šĥářé ············⟧';
 
   @override
-  String get pumpCameraCapture => '⟦Çáƥŧúřé ···⟧';
-
-  @override
-  String get pumpCameraPermissionDenied =>
-      '⟦Çáɱéřá áççéšš îš ñééđéđ ŧó šçáñ ŧĥé ƥúɱƥ đîšƥłáý. Éñáƀłé îŧ îñ ýóúř đéṽîçé šéŧŧîñǧš. ·······························⟧';
-
-  @override
-  String get pumpCameraError =>
-      '⟦Ŧĥé çáɱéřá çóúłđñ\'ŧ šŧářŧ. Ŧřý áǧáîñ óř éñŧéř ŧĥé ṽáłúéš ƀý ĥáñđ. ·······················⟧';
-
-  @override
-  String get pumpCameraOrientationHorizontal =>
-      '⟦Šŵîŧçĥ ŧó ĥóřîžóñŧáł łáýóúŧ ···········⟧';
-
-  @override
-  String get pumpCameraOrientationVertical =>
-      '⟦Šŵîŧçĥ ŧó ṽéřŧîçáł łáýóúŧ ··········⟧';
-
-  @override
-  String get pumpCameraGlareWarning =>
-      '⟦Ŧóó ɱúçĥ ǧłářé — ŧîłŧ šłîǧĥŧłý ŧó áṽóîđ řéƒłéçŧîóñš ···················⟧';
-
-  @override
-  String get pumpCameraAlignHint =>
-      '⟦Łîñé úƥ ŧĥé đîšƥłáý îñšîđé ŧĥé ƒřáɱé, ŧĥéñ çáƥŧúřé ··················⟧';
-
-  @override
-  String get pumpCameraRotateToLandscape =>
-      '⟦Ŧúřñ ýóúř ƥĥóñé šîđéŵáýš — ŧĥé ƥúɱƥ đîšƥłáý îš ŵîđé, šó ŧĥé ñúɱƀéřš çóɱé óúŧ łářǧéř áñđ úƥřîǧĥŧ ··································⟧';
-
-  @override
   String get fillUpWarningDialogTitle => '⟦Çĥéçķ ŧĥîš ƒîłł-úƥ ·······⟧';
 
   @override
@@ -13053,9 +12889,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get fillUpImportReceiptLabel => '⟦Řéçéîƥŧ ···⟧';
-
-  @override
-  String get fillUpImportPumpLabel => '⟦Ƥúɱƥ đîšƥłáý ·····⟧';
 
   @override
   String get fillUpPricePerLiterLabel => '⟦Ƥřîçé ƥéř łîŧéř ······⟧';
@@ -14291,12 +14124,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Řúñ ŧĥé ƥúɱƥ / řéçéîƥŧ ÓÇŘ ƥîƥéłîñé óñ á çĥóšéñ ƥĥóŧó áñđ îñšƥéçŧ éṽéřý šŧéƥ — óñłý áṽáîłáƀłé îñ Đéṽéłóƥéř ɱóđé. ········································⟧';
 
   @override
-  String get ocrTesterModePump => '⟦Ƥúɱƥ ··⟧';
-
-  @override
-  String get ocrTesterModeReceipt => '⟦Řéçéîƥŧ ···⟧';
-
-  @override
   String get ocrTesterCapture => '⟦Çáƥŧúřé ···⟧';
 
   @override
@@ -14406,13 +14233,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get ocrTesterExported =>
       '⟦ÓÇŘ ƥáçķáǧé šáṽéđ ŧó ýóúř Đóŵñłóáđš ƒółđéř. ················⟧';
-
-  @override
-  String get ocrTesterSaveFixture => '⟦Šáṽé áš ƒîẋŧúřé ······⟧';
-
-  @override
-  String get ocrTesterFixtureSaved =>
-      '⟦Ƒîẋŧúřé šáṽéđ ŧó ýóúř Đóŵñłóáđš ƒółđéř. Ṁóṽé îŧ úñđéř ŧéšŧ/ƒîẋŧúřéš áñđ řúñ ŧóół/ƥřóɱóŧé_óçř_ƒîẋŧúřé.đářŧ. ·······································⟧';
 
   @override
   String get onboardingObd2StepTitle => '⟦Çóññéçŧ ýóúř ÓƁĐ2 áđáƥŧéř ·········⟧';

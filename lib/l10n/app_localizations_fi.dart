@@ -4732,13 +4732,6 @@ class AppLocalizationsFi extends AppLocalizations {
       'Skannaa painettu kuitti Lisää tankkaus -näytöllä esitäyttääksesi päivämäärän, litrat, kokonaissumman ja aseman.';
 
   @override
-  String get featureLabel_addFillUpOcrPump => 'Pumpun näytön OCR (kokeellinen)';
-
-  @override
-  String get featureDescription_addFillUpOcrPump =>
-      'Skannaa polttoainepumpun näyttö esitäyttääksesi lomakkeen. Tunnistus on epäluotettavaa tänään — aktivoi vain, jos haluat testata.';
-
-  @override
   String get featureLabel_developerPatToken => 'Kehittäjäpalaute (GitHub PAT)';
 
   @override
@@ -5009,43 +5002,7 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
-  String get scanPumpSuccess => 'Pumpun näyttö skannattu — tarkista arvot.';
-
-  @override
-  String get scanPumpGlare =>
-      'Näytössä on liikaa heijastusta — yritä uudelleen hieman vinosta kulmasta, jotta numerot eivät pala puhki.';
-
-  @override
-  String get scanPumpInconsistent =>
-      'Skannatut arvot eivät täsmää — syötä ne manuaalisesti.';
-
-  @override
-  String scanPumpFailed(String error) {
-    return 'Pumpun skannaus epäonnistui: $error';
-  }
-
-  @override
   String get badScanReportTitleReceipt => 'Ilmoita skannauksesta — Kuitti';
-
-  @override
-  String get badScanReportTitlePumpDisplay =>
-      'Ilmoita skannauksesta — Pumpun näyttö';
-
-  @override
-  String get pumpScanFailureTitle => 'Näyttöä ei voida lukea';
-
-  @override
-  String get pumpScanFailureBody =>
-      'Skannaus ei voinut lukea pumpun näyttöä. Mitä haluaisit tehdä?';
-
-  @override
-  String get pumpScanFailureCorrectManually => 'Korjaa manuaalisesti';
-
-  @override
-  String get pumpScanFailureReport => 'Ilmoita';
-
-  @override
-  String get pumpScanFailureRemove => 'Poista kuva';
 
   @override
   String get badScanReportHint =>
@@ -5089,35 +5046,6 @@ class AppLocalizationsFi extends AppLocalizations {
       'Lähetys epäonnistui — manuaalinen jakaminen';
 
   @override
-  String get pumpCameraCapture => 'Ota kuva';
-
-  @override
-  String get pumpCameraPermissionDenied =>
-      'Kameran käyttöoikeus tarvitaan mittarin näytön skannaamiseen. Ota se käyttöön laitteen asetuksista.';
-
-  @override
-  String get pumpCameraError =>
-      'Kameraa ei voitu käynnistää. Yritä uudelleen tai syötä arvot käsin.';
-
-  @override
-  String get pumpCameraOrientationHorizontal => 'Vaihda vaakaasetteluun';
-
-  @override
-  String get pumpCameraOrientationVertical => 'Vaihda pystyasetteluun';
-
-  @override
-  String get pumpCameraGlareWarning =>
-      'Liikaa heijastusta — kallista hieman välttääksesi heijastukset';
-
-  @override
-  String get pumpCameraAlignHint =>
-      'Kohdista näyttö kehykseen ja ota sitten kuva';
-
-  @override
-  String get pumpCameraRotateToLandscape =>
-      'Käännä puhelimesi vaakatasolle — pumpun näyttö on leveä, joten numerot tulevat suurempina ja pystysuorassa';
-
-  @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
 
   @override
@@ -5150,9 +5078,6 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get fillUpImportReceiptLabel => 'Kuitti';
-
-  @override
-  String get fillUpImportPumpLabel => 'Pumpun näyttö';
 
   @override
   String get fillUpPricePerLiterLabel => 'Hinta litralta';
@@ -6366,12 +6291,6 @@ class AppLocalizationsFi extends AppLocalizations {
       'Suorita pumpun/kuitin OCR-putki valitulle kuvalle ja tutki jokainen vaihe — saatavilla vain kehittäjätilassa.';
 
   @override
-  String get ocrTesterModePump => 'Pumppu';
-
-  @override
-  String get ocrTesterModeReceipt => 'Kuitti';
-
-  @override
   String get ocrTesterCapture => 'Ota kuva';
 
   @override
@@ -6479,13 +6398,6 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get ocrTesterExported => 'OCR-paketti tallennettu Lataukset-kansioon.';
-
-  @override
-  String get ocrTesterSaveFixture => 'Tallenna fixture-tiedostona';
-
-  @override
-  String get ocrTesterFixtureSaved =>
-      'Fixture tallennettu Lataukset-kansioon. Siirrä se hakemistoon test/fixtures ja suorita tool/promote_ocr_fixture.dart.';
 
   @override
   String get onboardingObd2StepTitle => 'Yhdistä OBD2-sovitin';

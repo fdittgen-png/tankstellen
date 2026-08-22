@@ -101,7 +101,6 @@ void main() {
     'lib/features/trips/domain/services/motion_gate.dart': 1,
     'lib/features/charging/presentation/screens/add_charging_log_screen.dart': 3,
     'lib/features/fill_ups/presentation/screens/add_fill_up_screen.dart': 3,
-    'lib/features/receipts_ocr/presentation/screens/pump_display_camera_screen.dart': 1,
     'lib/features/trips/presentation/screens/trip_detail_screen.dart': 1,
     'lib/features/trips/presentation/screens/trip_recording_screen.dart': 3,
     'lib/features/driving_score/presentation/widgets/driving_analysis_trace_card.dart': 1,

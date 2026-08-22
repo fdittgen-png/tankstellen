@@ -129,7 +129,7 @@ void main() {
         ));
 
       final url = await reporter.reportBadScan(
-        kind: ScanKind.pumpDisplay,
+        kind: ScanKind.receipt,
         rawOcrText: 'x',
         parsedFields: const {},
         userCorrections: const {},
@@ -212,21 +212,12 @@ void main() {
     });
 
     test('scan kind drives the issue title', () async {
-      client.responses
-        ..add(_ok(
-          statusCode: 201,
-          body: {
-            'html_url':
-                'https://github.com/fdittgen-png/tankstellen/issues/1',
-          },
-        ))
-        ..add(_ok(
-          statusCode: 201,
-          body: {
-            'html_url':
-                'https://github.com/fdittgen-png/tankstellen/issues/2',
-          },
-        ));
+      client.responses.add(_ok(
+        statusCode: 201,
+        body: {
+          'html_url': 'https://github.com/fdittgen-png/tankstellen/issues/1',
+        },
+      ));
 
       await reporter.reportBadScan(
         kind: ScanKind.receipt,
@@ -235,20 +226,10 @@ void main() {
         userCorrections: const {},
         imageBytes: Uint8List.fromList(const [1]),
       );
-      await reporter.reportBadScan(
-        kind: ScanKind.pumpDisplay,
-        rawOcrText: 'x',
-        parsedFields: const {},
-        userCorrections: const {},
-        imageBytes: Uint8List.fromList(const [1]),
-      );
 
       final receipt =
           jsonDecode(client.requests[0].body) as Map<String, dynamic>;
-      final pump =
-          jsonDecode(client.requests[1].body) as Map<String, dynamic>;
       expect(receipt['title'], '[Scan] Receipt OCR failure');
-      expect(pump['title'], '[Scan] Pump display OCR failure');
     });
 
     test('sanitizes ANSI escape sequences and control chars from OCR text',

@@ -1120,8 +1120,6 @@
   "featureDescription_obd2Optional": "Cuando está apagado, la app graba viajes solo con GPS sin necesitar un adaptador OBD2. El coaching se reduce — sin L/100 km al instante, menos señales del motor.",
   "featureLabel_addFillUpOcrReceipt": "OCR de tique",
   "featureDescription_addFillUpOcrReceipt": "Escanea un tique impreso en la pantalla Añadir repostaje para rellenar fecha, litros, total y estación.",
-  "featureLabel_addFillUpOcrPump": "OCR de pantalla de surtidor (experimental)",
-  "featureDescription_addFillUpOcrPump": "Escanea la pantalla de un surtidor para rellenar el formulario. El reconocimiento no es fiable hoy — actívalo solo si quieres probarlo.",
   "featureLabel_developerPatToken": "Feedback de desarrollador (GitHub PAT)",
   "featureDescription_developerPatToken": "Activa el panel de feedback para escaneos fallidos que crea automáticamente issues de GitHub con un Personal Access Token. Función para usuarios avanzados/colaboradores.",
   "feedbackConsentTitle": "¿Enviar el informe a GitHub?",
@@ -1145,19 +1143,7 @@
   "scanReceiptNoData": "No se encontraron datos del recibo: inténtalo de nuevo",
   "scanReceiptSuccess": "Recibo escaneado: verifica los valores. Toca «Informar de error de escaneo» abajo si algo no cuadra.",
   "scanReceiptFailed": "Error de escaneo: {error}",
-  "pumpCameraCapture": "Capturar",
-  "pumpCameraPermissionDenied": "Se necesita acceso a la cámara para escanear el surtidor. Actívalo en los ajustes del dispositivo.",
-  "pumpCameraError": "La cámara no pudo iniciarse. Inténtalo de nuevo o introduce los valores a mano.",
-  "scanPumpSuccess": "Pantalla del surtidor escaneada: verifica los valores.",
-  "scanPumpGlare": "Demasiado reflejo en la pantalla — inténtalo de nuevo desde un ángulo ligeramente distinto para que los números no se vean lavados.",
-  "scanPumpFailed": "Error al escanear el surtidor: {error}",
   "badScanReportTitleReceipt": "Informar de un error de escaneo: recibo",
-  "badScanReportTitlePumpDisplay": "Informar de un error de escaneo: pantalla del surtidor",
-  "pumpScanFailureTitle": "Pantalla ilegible",
-  "pumpScanFailureBody": "El escaneo no pudo leer la pantalla del surtidor. ¿Qué quieres hacer?",
-  "pumpScanFailureCorrectManually": "Corregir manualmente",
-  "pumpScanFailureReport": "Informar",
-  "pumpScanFailureRemove": "Quitar foto",
   "badScanReportHint": "Compartiremos la foto del recibo y ambos conjuntos de valores para que la próxima versión pueda aprender este formato.",
   "badScanReportFieldBrandLayout": "Diseño de la marca",
   "badScanReportFieldTotal": "Total",
@@ -1176,7 +1162,6 @@
   "fillUpSectionWhereTitle": "Dónde estabas",
   "fillUpSectionWhereSubtitle": "Estación, cuentakilómetros, notas",
   "fillUpImportReceiptLabel": "Recibo",
-  "fillUpImportPumpLabel": "Pantalla del surtidor",
   "fillUpPricePerLiterLabel": "Precio por litro",
   "vehicleHeaderUntitled": "Vehículo nuevo",
   "vehicleSectionIdentityTitle": "Identidad",
@@ -1758,10 +1743,6 @@
   "tripRecordingAutoPinTitle": "Fijar siempre al iniciar la grabación",
   "tripRecordingAutoPinSubtitle": "Fija el formulario automáticamente en cada trayecto en lugar de tocar cada vez. Consume más batería.",
   "tripRecordingConnectingTitle": "Iniciando grabación…",
-  "pumpCameraOrientationHorizontal": "Cambiar a disposición horizontal",
-  "pumpCameraOrientationVertical": "Cambiar a disposición vertical",
-  "pumpCameraGlareWarning": "Demasiado brillo — inclina ligeramente para evitar reflejos",
-  "pumpCameraAlignHint": "Alinea el surtidor en el marco y captura",
   "insightHighSpeedBand": "Velocidad alta sostenida ({pctTime}% del trayecto): desperdiciados {liters} L",
   "insightHighSpeedBandNoFuel": "Velocidad alta sostenida ({pctTime}% del trayecto)",
   "lessonAdviceHighSpeedBand": "Levanta el pie por encima de 110 km/h: la resistencia del aire sube mucho, así que ir algo más despacio ahorra mucho combustible.",
@@ -2143,10 +2124,6 @@
   "@reconcileResolveGapSemanticLabel": {
     "description": "MT — needs native review"
   },
-  "pumpCameraRotateToLandscape": "Gira el móvil — la pantalla del surtidor es ancha, así los números salen más grandes y rectos",
-  "@pumpCameraRotateToLandscape": {
-    "description": "MT — needs native review"
-  },
   "insightFullThrottle": "Aceleración a fondo ({pctTime}% del viaje): malgastados {liters} L",
   "@insightFullThrottle": {
     "description": "MT — needs native review",
@@ -2526,14 +2503,6 @@
   "@ocrTesterExplain": {
     "description": "MT — needs native review"
   },
-  "ocrTesterModePump": "Surtidor",
-  "@ocrTesterModePump": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterModeReceipt": "Ticket",
-  "@ocrTesterModeReceipt": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterCapture": "Capturar",
   "@ocrTesterCapture": {
     "description": "MT — needs native review"
@@ -2724,14 +2693,6 @@
   },
   "obd2DiagnosticsInitCold": "frío",
   "@obd2DiagnosticsInitCold": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterSaveFixture": "Guardar como fixture",
-  "@ocrTesterSaveFixture": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterFixtureSaved": "Fixture guardado en la carpeta Descargas. Muévelo a test/fixtures y ejecuta tool/promote_ocr_fixture.dart.",
-  "@ocrTesterFixtureSaved": {
     "description": "MT — needs native review"
   },
   "situationColdStart": "Arranque en frío",
@@ -3737,10 +3698,6 @@
   },
   "alertsStationAdd": "Añadir una alerta de gasolinera",
   "@alertsStationAdd": {
-    "description": "MT — needs native review"
-  },
-  "scanPumpInconsistent": "Los valores escaneados no cuadran — introdúcelos manualmente.",
-  "@scanPumpInconsistent": {
     "description": "MT — needs native review"
   },
   "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",

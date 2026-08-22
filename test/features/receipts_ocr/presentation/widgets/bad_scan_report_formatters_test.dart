@@ -5,7 +5,6 @@ import 'dart:ui' show Locale;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/feedback/github_issue_reporter.dart';
-import 'package:tankstellen/features/receipts_ocr/data/pump_display_parse_result.dart';
 import 'package:tankstellen/features/receipts_ocr/data/receipt_parser.dart';
 import 'package:tankstellen/features/receipts_ocr/data/receipt_scan_service.dart';
 import 'package:tankstellen/features/receipts_ocr/presentation/widgets/bad_scan_report_formatters.dart';
@@ -45,38 +44,16 @@ void main() {
     );
   }
 
-  PumpDisplayScanOutcome buildPumpOutcome({
-    double? liters = 40.0,
-    double? totalCost = 70.0,
-    double? pricePerLiter = 1.75,
-    int? pumpNumber = 3,
-    double confidence = 0.9,
-  }) {
-    return PumpDisplayScanOutcome(
-      parse: PumpDisplayParseResult(
-        liters: liters,
-        totalCost: totalCost,
-        pricePerLiter: pricePerLiter,
-        pumpNumber: pumpNumber,
-        confidence: confidence,
-      ),
-      ocrText: 'Betrag 70.00\nAbgabe 40.00\nPreis/L 1.75',
-      imagePath: '/tmp/fake-pump.jpg',
-    );
-  }
-
   // ── buildBadScanDiffRows — receipt ─────────────────────────────────
 
   group('buildBadScanDiffRows (receipt)', () {
     test('returns 7 rows in canonical order with all values populated', () {
       final rows = buildBadScanDiffRows(
-        kind: ScanKind.receipt,
         receiptScan: buildReceiptOutcome(
           fuelType: FuelType.e10,
           date: DateTime.utc(2026, 4, 23, 10, 30),
           brandLayout: 'super_u',
         ),
-        pumpScan: null,
         enteredLiters: 32.4,
         enteredTotalCost: 55.20,
         l: l10nEn,
@@ -122,7 +99,6 @@ void main() {
 
     test('renders em-dash placeholders when every numeric field is null', () {
       final rows = buildBadScanDiffRows(
-        kind: ScanKind.receipt,
         receiptScan: buildReceiptOutcome(
           liters: null,
           totalCost: null,
@@ -131,7 +107,6 @@ void main() {
           fuelType: null,
           date: null,
         ),
-        pumpScan: null,
         enteredLiters: null,
         enteredTotalCost: null,
         l: l10nEn,
@@ -154,13 +129,11 @@ void main() {
 
     test('formats liters and total to 2 decimals, price to 3 decimals', () {
       final rows = buildBadScanDiffRows(
-        kind: ScanKind.receipt,
         receiptScan: buildReceiptOutcome(
           liters: 12,
           totalCost: 24.5,
           pricePerLiter: 1.7,
         ),
-        pumpScan: null,
         enteredLiters: 12.345,
         enteredTotalCost: 24,
         l: l10nEn,
@@ -174,67 +147,15 @@ void main() {
     });
   });
 
-  // ── buildBadScanDiffRows — pump display ────────────────────────────
-
-  group('buildBadScanDiffRows (pumpDisplay)', () {
-    test('returns 3 rows: liters, total, price/L (no pump-number row)', () {
-      final rows = buildBadScanDiffRows(
-        kind: ScanKind.pumpDisplay,
-        receiptScan: null,
-        pumpScan: buildPumpOutcome(),
-        enteredLiters: 39.9,
-        enteredTotalCost: 69.85,
-        l: l10nEn,
-      );
-
-      expect(rows, hasLength(3));
-
-      expect(rows[0].label, 'Liters');
-      expect(rows[0].scanned, '40.00');
-      expect(rows[0].real, '39.90');
-
-      expect(rows[1].label, 'Total');
-      expect(rows[1].scanned, '70.00');
-      expect(rows[1].real, '69.85');
-
-      expect(rows[2].label, 'Price/L');
-      expect(rows[2].scanned, '1.750');
-      expect(rows[2].real, '—');
-    });
-
-    test('em-dashes every value when pump-display fields are null', () {
-      final rows = buildBadScanDiffRows(
-        kind: ScanKind.pumpDisplay,
-        receiptScan: null,
-        pumpScan: buildPumpOutcome(
-          liters: null,
-          totalCost: null,
-          pricePerLiter: null,
-          pumpNumber: null,
-        ),
-        enteredLiters: null,
-        enteredTotalCost: null,
-        l: l10nEn,
-      );
-
-      for (final row in rows) {
-        expect(row.scanned, '—');
-        expect(row.real, '—');
-      }
-    });
-  });
-
   // ── buildBadScanShareBody ───────────────────────────────────────────
 
   group('buildBadScanShareBody', () {
     test('receipt body contains header, every field, and OCR text', () {
       final body = buildBadScanShareBody(
-        kind: ScanKind.receipt,
         receiptScan: buildReceiptOutcome(
           fuelType: FuelType.e10,
           date: DateTime.utc(2026, 4, 23, 10, 30),
         ),
-        pumpScan: null,
         enteredLiters: 32.4,
         enteredTotalCost: 55.20,
         appVersion: '4.3.0+1234',
@@ -258,9 +179,7 @@ void main() {
 
     test('receipt body uses "(please fill)" when user values are null', () {
       final body = buildBadScanShareBody(
-        kind: ScanKind.receipt,
         receiptScan: buildReceiptOutcome(),
-        pumpScan: null,
         enteredLiters: null,
         enteredTotalCost: null,
         appVersion: '4.3.0+1234',
@@ -270,42 +189,6 @@ void main() {
       expect(body, contains('Liters:   32.50   →   (please fill)'));
       expect(body, contains('Total:    55.12   →   (please fill)'));
     });
-
-    test('pump-display body has its own header and confidence row', () {
-      final body = buildBadScanShareBody(
-        kind: ScanKind.pumpDisplay,
-        receiptScan: null,
-        pumpScan: buildPumpOutcome(),
-        enteredLiters: 39.9,
-        enteredTotalCost: 69.85,
-        appVersion: '4.3.0+1234',
-        ocrText: 'PUMP OCR',
-      );
-
-      expect(body, contains('Sparkilo pump-display scan report'));
-      // No "Brand layout" line on pump-display.
-      expect(body, isNot(contains('Brand layout:')));
-      expect(body, contains('Liters:   40.00   →   39.90'));
-      expect(body, contains('Total:    70.00   →   69.85'));
-      expect(body, contains('Price/L:  1.750'));
-      expect(body, contains('Pump #:   3'));
-      expect(body, contains('Confidence: 0.90'));
-      expect(body, contains('PUMP OCR'));
-    });
-
-    test('pump-display body em-dashes Pump # when number is missing', () {
-      final body = buildBadScanShareBody(
-        kind: ScanKind.pumpDisplay,
-        receiptScan: null,
-        pumpScan: buildPumpOutcome(pumpNumber: null),
-        enteredLiters: 0,
-        enteredTotalCost: 0,
-        appVersion: '4.3.0',
-        ocrText: '',
-      );
-
-      expect(body, contains('Pump #:   —'));
-    });
   });
 
   // ── buildBadScanParsedFields ────────────────────────────────────────
@@ -313,13 +196,11 @@ void main() {
   group('buildBadScanParsedFields', () {
     test('receipt map ships the seven receipt-specific keys', () {
       final fields = buildBadScanParsedFields(
-        kind: ScanKind.receipt,
         receiptScan: buildReceiptOutcome(
           fuelType: FuelType.diesel,
           date: DateTime.utc(2026, 1, 5),
           brandLayout: 'carrefour',
         ),
-        pumpScan: null,
       );
 
       expect(
@@ -344,47 +225,18 @@ void main() {
       expect(fields['date'], '2026-01-05T00:00:00.000Z');
     });
 
-    test('pump-display map ships the five pump-specific keys', () {
-      final fields = buildBadScanParsedFields(
-        kind: ScanKind.pumpDisplay,
-        receiptScan: null,
-        pumpScan: buildPumpOutcome(),
-      );
-
-      expect(fields.keys, <String>[
-        'liters',
-        'totalCost',
-        'pricePerLiter',
-        'pumpNumber',
-        'confidence',
-      ]);
-      expect(fields['liters'], '40.00');
-      expect(fields['totalCost'], '70.00');
-      expect(fields['pricePerLiter'], '1.750');
-      expect(fields['pumpNumber'], '3');
-      expect(fields['confidence'], '0.90');
-    });
-
     test('null numeric fields surface as null in the parsed-fields map', () {
       final fields = buildBadScanParsedFields(
-        kind: ScanKind.pumpDisplay,
-        receiptScan: null,
-        pumpScan: buildPumpOutcome(
+        receiptScan: buildReceiptOutcome(
           liters: null,
           totalCost: null,
           pricePerLiter: null,
-          pumpNumber: null,
-          confidence: 0,
         ),
       );
 
       expect(fields['liters'], isNull);
       expect(fields['totalCost'], isNull);
       expect(fields['pricePerLiter'], isNull);
-      expect(fields['pumpNumber'], isNull);
-      // Confidence is non-nullable on the parse result, so it always
-      // round-trips as a 2-decimal string.
-      expect(fields['confidence'], '0.00');
     });
   });
 
@@ -424,13 +276,6 @@ void main() {
       expect(
         resolveBadScanTitle(ScanKind.receipt, l10nEn),
         l10nEn.badScanReportTitleReceipt,
-      );
-    });
-
-    test('pumpDisplay resolves its own localized title', () {
-      expect(
-        resolveBadScanTitle(ScanKind.pumpDisplay, l10nEn),
-        l10nEn.badScanReportTitlePumpDisplay,
       );
     });
   });

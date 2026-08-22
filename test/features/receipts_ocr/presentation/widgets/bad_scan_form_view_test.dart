@@ -4,7 +4,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/feedback/github_issue_reporter.dart';
-import 'package:tankstellen/features/receipts_ocr/data/pump_display_parse_result.dart';
 import 'package:tankstellen/features/receipts_ocr/data/receipt_parser.dart';
 import 'package:tankstellen/features/receipts_ocr/data/receipt_scan_service.dart';
 import 'package:tankstellen/features/receipts_ocr/presentation/widgets/bad_scan_diff_table.dart';
@@ -27,18 +26,6 @@ void main() {
     imagePath: '/tmp/fake.jpg',
   );
 
-  const pumpOutcome = PumpDisplayScanOutcome(
-    parse: PumpDisplayParseResult(
-      liters: 40.0,
-      totalCost: 70.0,
-      pricePerLiter: 1.75,
-      pumpNumber: 3,
-      confidence: 0.9,
-    ),
-    ocrText: 'Betrag 70.00\nAbgabe 40.00\nPreis/L 1.75',
-    imagePath: '/tmp/fake-pump.jpg',
-  );
-
   Future<void> pumpView(
     WidgetTester tester, {
     ScanKind kind = ScanKind.receipt,
@@ -55,8 +42,7 @@ void main() {
         home: Scaffold(
           body: BadScanFormView(
             kind: kind,
-            receiptScan: kind == ScanKind.receipt ? receiptOutcome : null,
-            pumpScan: kind == ScanKind.pumpDisplay ? pumpOutcome : null,
+            receiptScan: receiptOutcome,
             enteredLiters: 32.5,
             enteredTotalCost: 55.20,
             submitting: submitting,
@@ -186,18 +172,6 @@ void main() {
       );
       await tester.pump();
       expect(calls, 0);
-    });
-  });
-
-  group('BadScanFormView (pump-display kind)', () {
-    testWidgets('renders the pump-display title in bold', (tester) async {
-      await pumpView(tester, kind: ScanKind.pumpDisplay);
-      await tester.pumpAndSettle();
-
-      final titleFinder = find.text('Report a scan error — Pump display');
-      expect(titleFinder, findsOneWidget);
-      final title = tester.widget<Text>(titleFinder);
-      expect(title.style?.fontWeight, FontWeight.bold);
     });
   });
 }

@@ -20,13 +20,6 @@ void main() {
         'Receipt',
       );
     });
-
-    test('returns "Pump display" for ScanKind.pumpDisplay', () {
-      expect(
-        GithubIssueBodyFormatter.scanKindLabel(ScanKind.pumpDisplay),
-        'Pump display',
-      );
-    });
   });
 
   group('GithubIssueBodyFormatter.fieldTable', () {
@@ -154,7 +147,7 @@ void main() {
 
     test('contains the raw OCR text inside a fenced code block', () {
       final body = GithubIssueBodyFormatter.buildBody(
-        kind: ScanKind.pumpDisplay,
+        kind: ScanKind.receipt,
         rawOcrText: 'TOTAL 42.50',
         parsedFields: const <String, String?>{},
         userCorrections: const <String, String?>{},

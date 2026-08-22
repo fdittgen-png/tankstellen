@@ -1120,8 +1120,6 @@
   "featureDescription_obd2Optional": "Ha ki van kapcsolva, az alkalmazás csak GPS-szel rögzít utakat OBD2-adapter nélkül. A coaching csökkentett — nincs azonnali L/100 km, kevesebb motorjel.",
   "featureLabel_addFillUpOcrReceipt": "Számla OCR",
   "featureDescription_addFillUpOcrReceipt": "Olvasson be nyomtatott számlát a Tankolás hozzáadása képernyőn, hogy előre kitöltse a dátumot, a litereket, az összeget és a kutat.",
-  "featureLabel_addFillUpOcrPump": "Kút kijelző OCR (kísérleti)",
-  "featureDescription_addFillUpOcrPump": "Olvasson be egy üzemanyagkút kijelzőjét az űrlap előre kitöltéséhez. A felismerés ma megbízhatatlan — csak akkor kapcsolja be, ha tesztelni szeretné.",
   "featureLabel_developerPatToken": "Fejlesztői visszajelzés (GitHub PAT)",
   "featureDescription_developerPatToken": "Bekapcsolja a hibás szkenneléshez tartozó visszajelzési panelt, amely Personal Access Tokennel automatikusan létrehoz GitHub-issue-kat. Haladó felhasználói / közreműködői funkció.",
   "feedbackConsentTitle": "Elküldi a jelentést GitHub-ra?",
@@ -1145,19 +1143,7 @@
   "scanReceiptNoData": "Nem található nyugtaadat — próbálja újra",
   "scanReceiptSuccess": "Nyugta beolvasva — ellenőrizze az értékeket. Ha valami nem stimmel, érintse alul a \"Beolvasási hiba jelentése\" gombot.",
   "scanReceiptFailed": "Beolvasás sikertelen: {error}",
-  "pumpCameraCapture": "Rögzítés",
-  "pumpCameraPermissionDenied": "A kút kijelzőjének beolvasásához kamera-hozzáférés szükséges. Engedélyezze az eszköz beállításaiban.",
-  "pumpCameraError": "A kamerát nem sikerült elindítani. Próbálja újra, vagy adja meg az értékeket kézzel.",
-  "scanPumpSuccess": "A kút kijelzője beolvasva — ellenőrizze az értékeket.",
-  "scanPumpGlare": "Túl sok a tükröződés a kijelzőn — próbáld újra enyhe szögből, hogy a számok ne legyenek túlexponáltak.",
-  "scanPumpFailed": "Kút beolvasása sikertelen: {error}",
   "badScanReportTitleReceipt": "Beolvasási hiba jelentése — Nyugta",
-  "badScanReportTitlePumpDisplay": "Beolvasási hiba jelentése — Kút kijelzője",
-  "pumpScanFailureTitle": "Kijelző nem olvasható",
-  "pumpScanFailureBody": "A beolvasás nem tudta olvasni a kút kijelzőjét. Mit szeretne tenni?",
-  "pumpScanFailureCorrectManually": "Kézi javítás",
-  "pumpScanFailureReport": "Jelentés",
-  "pumpScanFailureRemove": "Fotó eltávolítása",
   "badScanReportHint": "Megosztjuk a nyugtafotót és mindkét értékkészletet, hogy a következő build megtanulja ezt az elrendezést.",
   "badScanReportFieldBrandLayout": "Márka-elrendezés",
   "badScanReportFieldTotal": "Összeg",
@@ -1176,7 +1162,6 @@
   "fillUpSectionWhereTitle": "Hol volt",
   "fillUpSectionWhereSubtitle": "Állomás, kilométer-számláló, megjegyzések",
   "fillUpImportReceiptLabel": "Nyugta",
-  "fillUpImportPumpLabel": "Kút kijelzője",
   "fillUpPricePerLiterLabel": "Liter ára",
   "vehicleHeaderUntitled": "Új jármű",
   "vehicleSectionIdentityTitle": "Azonosítás",
@@ -1758,10 +1743,6 @@
   "tripRecordingAutoPinTitle": "Mindig rögzítse a felvétel indításakor",
   "tripRecordingAutoPinSubtitle": "Az űrlap automatikus rögzítése minden út során, ahelyett, hogy mindig megérintené. Több akkumulátort használ.",
   "tripRecordingConnectingTitle": "Felvétel indítása…",
-  "pumpCameraOrientationHorizontal": "Váltás vízszintes elrendezésre",
-  "pumpCameraOrientationVertical": "Váltás függőleges elrendezésre",
-  "pumpCameraGlareWarning": "Túl sok fény — kissé döntse meg a tükröződések elkerülése érdekében",
-  "pumpCameraAlignHint": "Igazítsa a kijelzőt a keretbe, majd készítse el a felvételt",
   "insightHighSpeedBand": "Tartósan nagy sebesség (az út {pctTime}%-a): elpazarolt {liters} L",
   "insightHighSpeedBandNoFuel": "Tartósan nagy sebesség (az út {pctTime}%-a)",
   "lessonAdviceHighSpeedBand": "110 km/h fölött vegye le a gázt – a légellenállás meredeken nő, kicsit lassabban sok üzemanyag megspórolható.",
@@ -2143,10 +2124,6 @@
   "@reconcileResolveGapSemanticLabel": {
     "description": "MT — needs native review"
   },
-  "pumpCameraRotateToLandscape": "Fordítsa oldalra a telefont — a kút kijelzője széles, így a számok nagyobbak és egyenesek lesznek",
-  "@pumpCameraRotateToLandscape": {
-    "description": "MT — needs native review"
-  },
   "insightFullThrottle": "Teljes gáz (az út {pctTime}%-a): {liters} L pazarlás",
   "@insightFullThrottle": {
     "description": "MT — needs native review",
@@ -2526,14 +2503,6 @@
   "@ocrTesterExplain": {
     "description": "MT — needs native review"
   },
-  "ocrTesterModePump": "Kút",
-  "@ocrTesterModePump": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterModeReceipt": "Bizonylat",
-  "@ocrTesterModeReceipt": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterCapture": "Fénykép",
   "@ocrTesterCapture": {
     "description": "MT — needs native review"
@@ -2724,14 +2693,6 @@
   },
   "obd2DiagnosticsInitCold": "hideg",
   "@obd2DiagnosticsInitCold": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterSaveFixture": "Mentés fixture-ként",
-  "@ocrTesterSaveFixture": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterFixtureSaved": "Fixture mentve a Letöltések mappába. Helyezze a test/fixtures alá, és futtassa a tool/promote_ocr_fixture.dart-ot.",
-  "@ocrTesterFixtureSaved": {
     "description": "MT — needs native review"
   },
   "situationColdStart": "Hidegindítás",
@@ -3737,10 +3698,6 @@
   },
   "alertsStationAdd": "Állomásriasztás hozzáadása",
   "@alertsStationAdd": {
-    "description": "MT — needs native review"
-  },
-  "scanPumpInconsistent": "A beolvasott értékek nem adnak össze — adja meg manuálisan.",
-  "@scanPumpInconsistent": {
     "description": "MT — needs native review"
   },
   "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",

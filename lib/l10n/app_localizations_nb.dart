@@ -4729,14 +4729,6 @@ class AppLocalizationsNb extends AppLocalizations {
       'Skann en utskrevet kvittering på skjermen Legg til fylling for å forhåndsutfylle dato, liter, totalt og stasjon.';
 
   @override
-  String get featureLabel_addFillUpOcrPump =>
-      'Pumpedisplay OCR (eksperimentell)';
-
-  @override
-  String get featureDescription_addFillUpOcrPump =>
-      'Skann en drivstoffpumpedisplay for å forhåndsutfylle skjemaet. Gjenkjenningen er upålitelig i dag — aktiver kun hvis du vil teste.';
-
-  @override
   String get featureLabel_developerPatToken =>
       'Utviklertilbakemelding (GitHub PAT)';
 
@@ -5007,44 +4999,8 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
-  String get scanPumpSuccess => 'Pumpevisning skannet – verifiser verdiene.';
-
-  @override
-  String get scanPumpGlare =>
-      'For mye gjenskinn på displayet — prøv igjen i en liten vinkel slik at tallene ikke blir overstrålt.';
-
-  @override
-  String get scanPumpInconsistent =>
-      'De skannede verdiene stemmer ikke overens — skriv dem inn manuelt.';
-
-  @override
-  String scanPumpFailed(String error) {
-    return 'Pumpeskanning mislyktes: $error';
-  }
-
-  @override
   String get badScanReportTitleReceipt =>
       'Rapporter en skanningsfeil – Kvittering';
-
-  @override
-  String get badScanReportTitlePumpDisplay =>
-      'Rapporter en skanningsfeil – Pumpevisning';
-
-  @override
-  String get pumpScanFailureTitle => 'Visning ulesbar';
-
-  @override
-  String get pumpScanFailureBody =>
-      'Skanningen kunne ikke lese pumpevisningen. Hva vil du gjøre?';
-
-  @override
-  String get pumpScanFailureCorrectManually => 'Korriger manuelt';
-
-  @override
-  String get pumpScanFailureReport => 'Rapporter';
-
-  @override
-  String get pumpScanFailureRemove => 'Fjern bilde';
 
   @override
   String get badScanReportHint =>
@@ -5088,35 +5044,6 @@ class AppLocalizationsNb extends AppLocalizations {
       'Innsending mislyktes – manuell deling';
 
   @override
-  String get pumpCameraCapture => 'Ta bilde';
-
-  @override
-  String get pumpCameraPermissionDenied =>
-      'Kameratilgang trengs for å skanne pumpedisplayet. Aktiver det i enhetsinnstillingene.';
-
-  @override
-  String get pumpCameraError =>
-      'Kameraet kunne ikke startes. Prøv igjen, eller skriv inn verdiene manuelt.';
-
-  @override
-  String get pumpCameraOrientationHorizontal => 'Bytt til horisontal layout';
-
-  @override
-  String get pumpCameraOrientationVertical => 'Bytt til vertikal layout';
-
-  @override
-  String get pumpCameraGlareWarning =>
-      'For mye blending — vipp litt for å unngå refleksjoner';
-
-  @override
-  String get pumpCameraAlignHint =>
-      'Juster displayet i rammen og ta deretter bilde';
-
-  @override
-  String get pumpCameraRotateToLandscape =>
-      'Snu telefonen sidelengs — pumpevisningen er bred, så tallene blir større og rette';
-
-  @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
 
   @override
@@ -5149,9 +5076,6 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get fillUpImportReceiptLabel => 'Kvittering';
-
-  @override
-  String get fillUpImportPumpLabel => 'Pumpevisning';
 
   @override
   String get fillUpPricePerLiterLabel => 'Pris per liter';
@@ -6368,12 +6292,6 @@ class AppLocalizationsNb extends AppLocalizations {
       'Kjør OCR-prosessen for pumpe/kvittering på et valgt bilde og inspiser hvert trinn — kun tilgjengelig i utviklermodus.';
 
   @override
-  String get ocrTesterModePump => 'Pumpe';
-
-  @override
-  String get ocrTesterModeReceipt => 'Kvittering';
-
-  @override
   String get ocrTesterCapture => 'Ta bilde';
 
   @override
@@ -6481,13 +6399,6 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get ocrTesterExported => 'OCR-pakke lagret i Nedlastinger-mappen.';
-
-  @override
-  String get ocrTesterSaveFixture => 'Lagre som testfil';
-
-  @override
-  String get ocrTesterFixtureSaved =>
-      'Testfil lagret i Nedlastinger-mappen. Flytt den under test/fixtures og kjør tool/promote_ocr_fixture.dart.';
 
   @override
   String get onboardingObd2StepTitle => 'Koble til OBD2-adapteren din';

@@ -4762,13 +4762,6 @@ class AppLocalizationsRo extends AppLocalizations {
       'Scanați un bon imprimat pe ecranul Adăugare alimentare pentru a precompleta data, litrii, totalul și stația.';
 
   @override
-  String get featureLabel_addFillUpOcrPump => 'OCR afișaj pompă (experimental)';
-
-  @override
-  String get featureDescription_addFillUpOcrPump =>
-      'Scanați afișajul unei pompe de carburant pentru a precompleta formularul. Recunoașterea nu este fiabilă astăzi — activați doar dacă doriți să testați.';
-
-  @override
   String get featureLabel_developerPatToken =>
       'Feedback dezvoltator (GitHub PAT)';
 
@@ -5041,43 +5034,7 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
-  String get scanPumpSuccess => 'Afișajul pompei scanat — verificați valorile.';
-
-  @override
-  String get scanPumpGlare =>
-      'Prea multă strălucire pe afișaj — încearcă din nou dintr-un unghi ușor, astfel încât cifrele să nu fie estompate.';
-
-  @override
-  String get scanPumpInconsistent =>
-      'Valorile scanate nu se adună — introduceți-le manual.';
-
-  @override
-  String scanPumpFailed(String error) {
-    return 'Scanarea pompei a eșuat: $error';
-  }
-
-  @override
   String get badScanReportTitleReceipt => 'Raportați o eroare de scanare — Bon';
-
-  @override
-  String get badScanReportTitlePumpDisplay =>
-      'Raportați o eroare de scanare — Afișaj pompă';
-
-  @override
-  String get pumpScanFailureTitle => 'Afișaj necitibil';
-
-  @override
-  String get pumpScanFailureBody =>
-      'Scanarea nu a putut citi afișajul pompei. Ce doriți să faceți?';
-
-  @override
-  String get pumpScanFailureCorrectManually => 'Corectați manual';
-
-  @override
-  String get pumpScanFailureReport => 'Raportați';
-
-  @override
-  String get pumpScanFailureRemove => 'Eliminați fotografia';
 
   @override
   String get badScanReportHint =>
@@ -5121,36 +5078,6 @@ class AppLocalizationsRo extends AppLocalizations {
       'Trimiterea a eșuat — partajare manuală';
 
   @override
-  String get pumpCameraCapture => 'Capturează';
-
-  @override
-  String get pumpCameraPermissionDenied =>
-      'Accesul la cameră este necesar pentru a scana afișajul pompei. Activează-l în setările dispozitivului.';
-
-  @override
-  String get pumpCameraError =>
-      'Camera nu a putut porni. Încearcă din nou sau introdu valorile manual.';
-
-  @override
-  String get pumpCameraOrientationHorizontal =>
-      'Comutați la aspectul orizontal';
-
-  @override
-  String get pumpCameraOrientationVertical => 'Comutați la aspectul vertical';
-
-  @override
-  String get pumpCameraGlareWarning =>
-      'Prea multă strălucire — înclinați ușor pentru a evita reflexiile';
-
-  @override
-  String get pumpCameraAlignHint =>
-      'Aliniați afișajul în cadru, apoi capturați';
-
-  @override
-  String get pumpCameraRotateToLandscape =>
-      'Întoarceți telefonul pe orizontală — ecranul pompei este lat, astfel cifrele vor fi mai mari și drepte';
-
-  @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
 
   @override
@@ -5183,9 +5110,6 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get fillUpImportReceiptLabel => 'Bon';
-
-  @override
-  String get fillUpImportPumpLabel => 'Afișaj pompă';
 
   @override
   String get fillUpPricePerLiterLabel => 'Preț per litru';
@@ -6405,12 +6329,6 @@ class AppLocalizationsRo extends AppLocalizations {
       'Rulați pipeline-ul OCR pentru pompă / bon pe o fotografie aleasă și inspectați fiecare pas — disponibil doar în modul Dezvoltator.';
 
   @override
-  String get ocrTesterModePump => 'Pompă';
-
-  @override
-  String get ocrTesterModeReceipt => 'Bon';
-
-  @override
   String get ocrTesterCapture => 'Captură';
 
   @override
@@ -6519,13 +6437,6 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get ocrTesterExported => 'Pachetul OCR salvat în folderul Descărcări.';
-
-  @override
-  String get ocrTesterSaveFixture => 'Salvați ca fixture';
-
-  @override
-  String get ocrTesterFixtureSaved =>
-      'Fixture salvat în folderul Descărcări. Mutați-l sub test/fixtures și rulați tool/promote_ocr_fixture.dart.';
 
   @override
   String get onboardingObd2StepTitle => 'Conectați adaptorul OBD2';

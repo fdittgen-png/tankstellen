@@ -87,13 +87,11 @@ class _CapturedState {
     readService: () => service,
     writeService: (s) => service = s,
     setScanning: (v) => scanning = v,
-    setScanningPump: (_) {},
     setDate: (d) => date = d,
     setFuelType: (f) => fuelType = f,
     setScannedPricePerLiter: (p) => scannedPricePerLiter = p,
     setLastScan: (o) => lastScan = o,
     isMounted: () => true,
-    capturePumpImage: (_) async => null,
     activeCountry: country,
   );
 

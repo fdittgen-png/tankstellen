@@ -141,7 +141,7 @@ serving none of them gets pushed back before code is written.**
 
 ### Layer 3 — seeing what you spend
 
-- **Fill-up log** — manual, pump-display OCR, receipt OCR (incl. shared-PDF receipts
+- **Fill-up log** — manual, receipt OCR (incl. shared-PDF receipts
   rasterised on-device), or OBD auto-import on disconnect. Each fill shows L/100 km,
   % delta vs previous, €/L.
 - **Fuel tab** — live tank level + estimated range, consumption stats with an accuracy
@@ -182,7 +182,7 @@ serving none of them gets pushed back before code is written.**
 | Location | `geolocator` (GMS on Play, LocationManager on F-Droid), `geocoding`, Nominatim |  |
 | Sensors | `sensors_plus` (IMU, GMS-free) behind `lib/core/sensors/imu_sensor_source.dart` |  |
 | OBD2 | `flutter_blue_plus` **pinned to 1.x** (2.x is a commercial licence, #2072) + in-repo Classic RFCOMM channel |  |
-| OCR | ML Kit text recognition on **Android**, **Apple Vision** on iOS (ML Kit pods stripped via vendored `third_party/` forks, #3172); a bespoke 7-segment recogniser with label-anchored ROIs for pump displays |  |
+| OCR | ML Kit text recognition on **Android**, **Apple Vision** on iOS (ML Kit pods stripped via vendored `third_party/` forks, #3172) |  |
 | Background | **WorkManager** (Android); BGTaskScheduler on iOS (partial) |  |
 | Notifications | `flutter_local_notifications`, `app_badge_plus` |  |
 | Cloud (optional) | **Supabase** (`supabase_flutter`) — self-hostable |  |
@@ -357,10 +357,8 @@ flips the driving-mode PiP overlay to the large-price layout.
 
 ### OCR
 
-- ML Kit reads *labels* fine but cannot read 7-segment pump digits. The fix
-  (#3397) derives value ROIs from the **label boxes ML Kit actually reads**
-  (`resolveLabelAnchoredFields`, `OcrValueAnchor`, opt-in `valueAnchor` JSON key)
-  instead of fixed template ROIs, then runs `SevenSegmentRecognizer` inside that ROI.
+- The 7-segment pump-display scanner (#1868/#3397) was **removed** in #3765 —
+  it never read reliably in the field. Receipt OCR is the remaining camera path.
 - Receipt OCR also accepts shared PDFs, rasterised on-device by `pdfx`
   (`android.graphics.pdf.PdfRenderer` / `CGPDFPage` — **not** Pdfium, so the F-Droid
   GMS audit stays clean).

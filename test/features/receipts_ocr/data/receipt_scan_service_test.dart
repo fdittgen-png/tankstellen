@@ -8,25 +8,23 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
-import 'package:tankstellen/features/receipts_ocr/data/ocr/ocr_geometry.dart';
 import 'package:tankstellen/features/receipts_ocr/data/ocr/ocr_trace_recorder.dart';
 import 'package:tankstellen/features/receipts_ocr/data/ocr/pump_ocr_config.dart';
-import 'package:tankstellen/features/receipts_ocr/data/pump_display_parser.dart';
 import 'package:tankstellen/features/receipts_ocr/data/receipt_parser.dart';
 import 'package:tankstellen/features/receipts_ocr/data/receipt_scan_service.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// Unit tests for [ReceiptScanService] — the thin orchestration seam
 /// that glues the camera picker to the on-device OCR recognizer and
-/// dispatches to the correct parser (prose receipt vs. pump LCD).
+/// the receipt parser.
 ///
 /// The service itself contains no parsing logic — its value is the
 /// control flow: cancel → return null; OCR success → build outcome
-/// without deleting the file (receipt path keeps the image for the
-/// bad-scan report flow, #713); OCR failure → delete the file; pump
-/// display → always delete. These tests pin each branch via fakes
-/// because [ImagePicker] and [TextRecognizer] both go through
-/// platform channels that are unreachable in unit tests.
+/// without deleting the file (the receipt path keeps the image for the
+/// bad-scan report flow, #713); OCR failure → delete the file. These
+/// tests pin each branch via fakes because [ImagePicker] and
+/// [TextRecognizer] both go through platform channels that are
+/// unreachable in unit tests.
 
 /// Fake picker whose [pickImage] returns a caller-controlled path.
 class _FakePicker extends ImagePicker {
@@ -100,19 +98,6 @@ class _StubReceiptParser extends ReceiptParser {
   }
 }
 
-/// Stub [PumpDisplayParser] matching the same pattern as the receipt
-/// parser stub.
-class _StubPumpDisplayParser extends PumpDisplayParser {
-  const _StubPumpDisplayParser(this.result);
-
-  final PumpDisplayParseResult result;
-
-  @override
-  PumpDisplayParseResult parse(String rawText, {OcrLocaleProfile? profile}) {
-    return result;
-  }
-}
-
 /// Creates a temporary file on disk and returns (path, parentDir).
 /// The parent dir is the caller's to clean up at the end of the test,
 /// regardless of whether the service deleted the file itself.
@@ -150,7 +135,6 @@ void main() {
         picker: picker,
         recognizer: recognizer,
         parser: parser,
-        pumpParser: const _StubPumpDisplayParser(PumpDisplayParseResult()),
       );
     });
 
@@ -227,7 +211,7 @@ void main() {
 
     test('threads the active country profile into the parser (#2273)',
         () async {
-      // The receipt path must mirror the pump path: when a country is
+      // When a country is
       // passed, the country's OcrLocaleProfile (GB → GBP here) is loaded
       // from the OCR config and handed to the parser so currency-aware
       // extraction runs.
@@ -237,14 +221,12 @@ void main() {
   "localeProfiles": [
     {"country":"GB","currency":"GBP","decimalSeparator":".",
      "priceMin":0.8,"priceMax":3.0,"volumeMax":200.0,"totalMax":500.0}
-  ],
-  "brands": []
+  ]
 }''';
       final service = ReceiptScanService(
         picker: picker,
         recognizer: recognizer,
         parser: parser,
-        pumpParser: const _StubPumpDisplayParser(PumpDisplayParseResult()),
         ocrConfig: PumpOcrConfig.fromJsonString(configJson),
       );
       final capture = await _createTempCapture();
@@ -279,133 +261,6 @@ void main() {
     });
   });
 
-  group('ReceiptScanService.scanPumpDisplay', () {
-    late _FakePicker picker;
-    late _FakeRecognizer recognizer;
-    late ReceiptScanService service;
-
-    setUp(() {
-      picker = _FakePicker();
-      recognizer = _FakeRecognizer();
-      service = ReceiptScanService(
-        picker: picker,
-        recognizer: recognizer,
-        parser: _StubReceiptParser(const ReceiptParseResult()),
-        pumpParser: const _StubPumpDisplayParser(PumpDisplayParseResult(
-          liters: 40.0,
-          totalCost: 70.0,
-          pricePerLiter: 1.75,
-          confidence: 0.9,
-        )),
-      );
-    });
-
-    test('returns null when user cancels the camera', () async {
-      picker.pathToReturn = null;
-
-      final result = await service.scanPumpDisplay();
-
-      expect(result, isNull);
-      expect(recognizer.processCalls, 0);
-    });
-
-    test('returns parsed pump display and KEEPS the capture for #953',
-        () async {
-      final capture = await _createTempCapture();
-      picker.pathToReturn = capture.path;
-      recognizer.textToReturn = 'Betrag 70.00\nAbgabe 40.00\nPreis/L 1.75';
-
-      final outcome = await service.scanPumpDisplay();
-
-      expect(outcome, isNotNull);
-      expect(outcome!.parse.liters, 40.0);
-      expect(outcome.parse.totalCost, 70.0);
-      expect(outcome.parse.pricePerLiter, 1.75);
-      expect(outcome.imagePath, capture.path);
-      expect(outcome.ocrText, contains('Betrag'));
-      expect(File(capture.path).existsSync(), isTrue,
-          reason: '#953 — pump-display photo must survive scan so the '
-              'failure-flow / bad-scan report can ship the image.');
-
-      await File(capture.path).delete();
-      await capture.dir.delete(recursive: true);
-    });
-
-    test('returns null and deletes the capture when OCR itself fails',
-        () async {
-      final capture = await _createTempCapture();
-      picker.pathToReturn = capture.path;
-      recognizer.errorToThrow = Exception('OCR exploded');
-
-      final result = await service.scanPumpDisplay();
-
-      expect(result, isNull);
-      // OCR-recognition failure means we have no usable text to ship —
-      // there is nothing for the bad-scan flow to act on, so we still
-      // clean up the temp file. (Parse failure with usable text is a
-      // different path: the outcome is returned and the caller decides.)
-      expect(File(capture.path).existsSync(), isFalse,
-          reason: 'OCR-recognition error on pump-display path must clean '
-              'up the capture — there is no outcome for the failure flow.');
-
-      await capture.dir.delete(recursive: true);
-    });
-  });
-
-  group('ReceiptScanService.parsePumpDisplayImage (#1868)', () {
-    late ReceiptScanService service;
-    late _FakeRecognizer recognizer;
-
-    setUp(() {
-      recognizer = _FakeRecognizer();
-      service = ReceiptScanService(
-        picker: _FakePicker(),
-        recognizer: recognizer,
-        parser: _StubReceiptParser(const ReceiptParseResult()),
-        pumpParser: const _StubPumpDisplayParser(PumpDisplayParseResult(
-          liters: 40.0,
-          totalCost: 70.0,
-          pricePerLiter: 1.75,
-          confidence: 0.9,
-        )),
-      );
-    });
-
-    test('OCRs + parses an already-captured photo, keeping the file',
-        () async {
-      // #1868 — the in-app camera owns the capture; the service is
-      // handed the resulting path. No picker call.
-      final capture = await _createTempCapture();
-      recognizer.textToReturn = 'Betrag 70.00\nAbgabe 40.00\nPreis/L 1.75';
-
-      final outcome = await service.parsePumpDisplayImage(capture.path);
-
-      expect(outcome, isNotNull);
-      expect(outcome!.parse.liters, 40.0);
-      expect(outcome.imagePath, capture.path);
-      expect(outcome.ocrText, contains('Betrag'));
-      expect(recognizer.processCalls, 1);
-      expect(File(capture.path).existsSync(), isTrue,
-          reason: 'the photo must survive for the #953 bad-scan report.');
-
-      await File(capture.path).delete();
-      await capture.dir.delete(recursive: true);
-    });
-
-    test('returns null and deletes the capture when OCR fails', () async {
-      final capture = await _createTempCapture();
-      recognizer.errorToThrow = Exception('OCR exploded');
-
-      final outcome = await service.parsePumpDisplayImage(capture.path);
-
-      expect(outcome, isNull);
-      expect(File(capture.path).existsSync(), isFalse,
-          reason: 'an unreadable capture must not leak to disk.');
-
-      await capture.dir.delete(recursive: true);
-    });
-  });
-
   group('ReceiptScanService.dispose', () {
     test('closes the underlying text recognizer exactly once', () async {
       final recognizer = _FakeRecognizer();
@@ -413,7 +268,6 @@ void main() {
         picker: _FakePicker(),
         recognizer: recognizer,
         parser: _StubReceiptParser(const ReceiptParseResult()),
-        pumpParser: const _StubPumpDisplayParser(PumpDisplayParseResult()),
       );
 
       service.dispose();
@@ -446,7 +300,7 @@ void main() {
       // An 80×40 landscape image tagged orientation 6 ("rotate 90° CW")
       // displays as 40×80. Baking the rotation into the pixels must
       // produce a 40×80 upright image — the fix for the sideways
-      // pump-display photos that ML Kit could not read.
+      // capture photos that ML Kit could not read.
       final src = img.Image(width: 80, height: 40);
       img.fill(src, color: img.ColorRgb8(40, 80, 120));
       src.exif.imageIfd['Orientation'] = 6;
@@ -474,117 +328,6 @@ void main() {
     test('returns null for non-JPEG / garbage bytes', () {
       final garbage = Uint8List.fromList(List.generate(64, (i) => i % 256));
       expect(bakeImageOrientation(garbage), isNull);
-    });
-  });
-
-  group('preprocessPumpDisplayForOcr (#2275 — adaptive binarization)', () {
-    /// Histogram of the (grayscale) output, bucketed coarsely. Used to
-    /// assert the output is a binary mask (ink + background), not a
-    /// continuous-tone image.
-    ({int min, int max}) luminanceSpan(img.Image im) {
-      var lo = 255;
-      var hi = 0;
-      for (final p in im) {
-        final v = p.r.round();
-        if (v < lo) lo = v;
-        if (v > hi) hi = v;
-      }
-      return (min: lo, max: hi);
-    }
-
-    test('binarizes a low-contrast capture into separated ink + background',
-        () {
-      // A washed-out display: thin dark *strokes* (like 7-segment bars)
-      // on a slightly lighter field, both inside a narrow grey band. The
-      // #1860 global normalize+contrast amplified glare; #2275's local
-      // Sauvola pass must instead separate the strokes into ink (dark)
-      // from background (light) — so the output spans nearly the full
-      // 0..255 range even though the input barely spanned 40 levels.
-      final src = img.Image(width: 80, height: 80);
-      for (final p in src) {
-        // Two thin horizontal bars (top + middle segment) of the digit.
-        final onBar = (p.y >= 16 && p.y <= 22) || (p.y >= 38 && p.y <= 44);
-        final shade = onBar ? 100 : 140;
-        p.setRgb(shade, shade, shade);
-      }
-      final before = luminanceSpan(src);
-      expect(before.max - before.min, lessThan(60),
-          reason: 'fixture must start as a genuinely low-contrast image.');
-
-      final out = preprocessPumpDisplayForOcr(
-          Uint8List.fromList(img.encodeJpg(src)));
-      expect(out, isNotNull);
-      final after = luminanceSpan(img.decodeJpg(out!)!);
-      expect(after.max - after.min, greaterThan(150),
-          reason: 'adaptive thresholding must separate the dark strokes '
-              'from the lighter field so a washed-out LCD becomes legible.');
-    });
-
-    test('binarize:false keeps a continuous-tone grayscale (#2798 retry — not '
-        'a 1-bit mask, so ML Kit can read the 7-seg digits)', () {
-      // A smooth luminance ramp stands in for the soft gradients of a glary
-      // LCD photo. The default Sauvola pass collapses tone to ink+background;
-      // the grayscale retry must instead preserve the intermediate tones ML
-      // Kit is trained on.
-      final src = img.Image(width: 64, height: 64);
-      for (final p in src) {
-        final v = p.x * 255 ~/ 63;
-        p.setRgb(v, v, v);
-      }
-      int distinctLevels(img.Image im) {
-        final seen = <int>{};
-        for (final p in im) {
-          seen.add(p.r.round());
-        }
-        return seen.length;
-      }
-
-      final gray = preprocessPumpDisplayForOcr(
-          Uint8List.fromList(img.encodeJpg(src)),
-          binarize: false);
-      expect(gray, isNotNull);
-      expect(distinctLevels(img.decodeJpg(gray!)!), greaterThan(16),
-          reason: 'the grayscale retry preserves continuous tone, '
-              'not a two-cluster 1-bit mask');
-    });
-
-    test('bakes EXIF orientation upright — dimensions swap, like #1711',
-        () {
-      // An 80×40 image tagged orientation 6 displays as 40×80; the
-      // pump path must apply the same orientation bake the plain path
-      // does before it binarizes. (No ROI passed → full frame.)
-      final src = img.Image(width: 80, height: 40);
-      img.fill(src, color: img.ColorRgb8(60, 60, 60));
-      src.exif.imageIfd['Orientation'] = 6;
-
-      final out = preprocessPumpDisplayForOcr(
-          Uint8List.fromList(img.encodeJpg(src)));
-      expect(out, isNotNull);
-      final decoded = img.decodeJpg(out!)!;
-      expect(decoded.width, 40);
-      expect(decoded.height, 80);
-    });
-
-    test('crops to the ROI first when one is supplied', () {
-      // A 100×100 frame: passing a centred 0.2-wide ROI must shrink the
-      // processed output to ~that crop, proving the reticle is applied
-      // before anything else (#2275 concern 1).
-      final src = img.Image(width: 100, height: 100);
-      img.fill(src, color: img.ColorRgb8(60, 60, 60));
-      final out = preprocessPumpDisplayForOcr(
-        Uint8List.fromList(img.encodeJpg(src)),
-        roi: const OcrNormalizedRect(
-            left: 0.4, top: 0.4, width: 0.2, height: 0.2),
-      );
-      expect(out, isNotNull);
-      final decoded = img.decodeJpg(out!)!;
-      expect(decoded.width, lessThan(40));
-      expect(decoded.height, lessThan(40));
-    });
-
-    test('returns null for non-JPEG / garbage bytes', () {
-      final garbage = Uint8List.fromList(List.generate(64, (i) => i % 256));
-      expect(preprocessPumpDisplayForOcr(garbage), isNull);
     });
   });
 }

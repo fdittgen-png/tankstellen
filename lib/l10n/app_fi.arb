@@ -1120,8 +1120,6 @@
   "featureDescription_obd2Optional": "Kun pois päältä, sovellus tallentaa matkoja vain GPS:llä ilman OBD2-sovitinta. Valmennus on rajallisempaa — ei välitöntä L/100 km, vähemmän moottorisignaaleja.",
   "featureLabel_addFillUpOcrReceipt": "Kuitin OCR",
   "featureDescription_addFillUpOcrReceipt": "Skannaa painettu kuitti Lisää tankkaus -näytöllä esitäyttääksesi päivämäärän, litrat, kokonaissumman ja aseman.",
-  "featureLabel_addFillUpOcrPump": "Pumpun näytön OCR (kokeellinen)",
-  "featureDescription_addFillUpOcrPump": "Skannaa polttoainepumpun näyttö esitäyttääksesi lomakkeen. Tunnistus on epäluotettavaa tänään — aktivoi vain, jos haluat testata.",
   "featureLabel_developerPatToken": "Kehittäjäpalaute (GitHub PAT)",
   "featureDescription_developerPatToken": "Ottaa käyttöön epäonnistuneiden skannausten palautepaneelin, joka luo automaattisesti GitHub-issueja Personal Access Tokenilla. Edistyneiden käyttäjien / avustajien ominaisuus.",
   "feedbackConsentTitle": "Lähetetäänkö raportti GitHubiin?",
@@ -1145,19 +1143,7 @@
   "scanReceiptNoData": "Kuitista ei löydy tietoja — yritä uudelleen",
   "scanReceiptSuccess": "Kuitti skannattu — tarkista arvot. Napauta alla \"Ilmoita skannauksesta\" jos jokin on pielessä.",
   "scanReceiptFailed": "Skannaus epäonnistui: {error}",
-  "pumpCameraCapture": "Ota kuva",
-  "pumpCameraPermissionDenied": "Kameran käyttöoikeus tarvitaan mittarin näytön skannaamiseen. Ota se käyttöön laitteen asetuksista.",
-  "pumpCameraError": "Kameraa ei voitu käynnistää. Yritä uudelleen tai syötä arvot käsin.",
-  "scanPumpSuccess": "Pumpun näyttö skannattu — tarkista arvot.",
-  "scanPumpGlare": "Näytössä on liikaa heijastusta — yritä uudelleen hieman vinosta kulmasta, jotta numerot eivät pala puhki.",
-  "scanPumpFailed": "Pumpun skannaus epäonnistui: {error}",
   "badScanReportTitleReceipt": "Ilmoita skannauksesta — Kuitti",
-  "badScanReportTitlePumpDisplay": "Ilmoita skannauksesta — Pumpun näyttö",
-  "pumpScanFailureTitle": "Näyttöä ei voida lukea",
-  "pumpScanFailureBody": "Skannaus ei voinut lukea pumpun näyttöä. Mitä haluaisit tehdä?",
-  "pumpScanFailureCorrectManually": "Korjaa manuaalisesti",
-  "pumpScanFailureReport": "Ilmoita",
-  "pumpScanFailureRemove": "Poista kuva",
   "badScanReportHint": "Jaamme kuitin kuvan ja molemmat arvojoukot, jotta seuraava versio voi oppia tämän asettelun.",
   "badScanReportFieldBrandLayout": "Merkin asettelu",
   "badScanReportFieldTotal": "Yhteensä",
@@ -1176,7 +1162,6 @@
   "fillUpSectionWhereTitle": "Missä olitte",
   "fillUpSectionWhereSubtitle": "Asema, matkamittari, muistiinpanot",
   "fillUpImportReceiptLabel": "Kuitti",
-  "fillUpImportPumpLabel": "Pumpun näyttö",
   "fillUpPricePerLiterLabel": "Hinta litralta",
   "vehicleHeaderUntitled": "Uusi ajoneuvo",
   "vehicleSectionIdentityTitle": "Tunnistetiedot",
@@ -1758,10 +1743,6 @@
   "tripRecordingAutoPinTitle": "Kiinnitä aina tallennuksen alkaessa",
   "tripRecordingAutoPinSubtitle": "Kiinnitä lomake automaattisesti joka ajolla sen sijaan, että napautat joka kerta. Kuluttaa enemmän akkua.",
   "tripRecordingConnectingTitle": "Aloitetaan tallennusta…",
-  "pumpCameraOrientationHorizontal": "Vaihda vaakaasetteluun",
-  "pumpCameraOrientationVertical": "Vaihda pystyasetteluun",
-  "pumpCameraGlareWarning": "Liikaa heijastusta — kallista hieman välttääksesi heijastukset",
-  "pumpCameraAlignHint": "Kohdista näyttö kehykseen ja ota sitten kuva",
   "insightHighSpeedBand": "Jatkuva suuri nopeus ({pctTime} % matkasta): hukattu {liters} L",
   "insightHighSpeedBandNoFuel": "Jatkuva suuri nopeus ({pctTime} % matkasta)",
   "lessonAdviceHighSpeedBand": "Päästä kaasusta yli 110 km/h – ilmanvastus kasvaa jyrkästi, joten hieman hitaammin säästää paljon polttoainetta.",
@@ -2143,10 +2124,6 @@
   "@reconcileResolveGapSemanticLabel": {
     "description": "MT — needs native review"
   },
-  "pumpCameraRotateToLandscape": "Käännä puhelimesi vaakatasolle — pumpun näyttö on leveä, joten numerot tulevat suurempina ja pystysuorassa",
-  "@pumpCameraRotateToLandscape": {
-    "description": "MT — needs native review"
-  },
   "insightFullThrottle": "Täysi kaasu ({pctTime}% matkasta): tuhlattiin {liters} L",
   "@insightFullThrottle": {
     "description": "MT — needs native review",
@@ -2526,14 +2503,6 @@
   "@ocrTesterExplain": {
     "description": "MT — needs native review"
   },
-  "ocrTesterModePump": "Pumppu",
-  "@ocrTesterModePump": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterModeReceipt": "Kuitti",
-  "@ocrTesterModeReceipt": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterCapture": "Ota kuva",
   "@ocrTesterCapture": {
     "description": "MT — needs native review"
@@ -2724,14 +2693,6 @@
   },
   "obd2DiagnosticsInitCold": "kylmä",
   "@obd2DiagnosticsInitCold": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterSaveFixture": "Tallenna fixture-tiedostona",
-  "@ocrTesterSaveFixture": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterFixtureSaved": "Fixture tallennettu Lataukset-kansioon. Siirrä se hakemistoon test/fixtures ja suorita tool/promote_ocr_fixture.dart.",
-  "@ocrTesterFixtureSaved": {
     "description": "MT — needs native review"
   },
   "situationColdStart": "Kylmäkäynnistys",
@@ -3737,10 +3698,6 @@
   },
   "alertsStationAdd": "Lisää asemahälytys",
   "@alertsStationAdd": {
-    "description": "MT — needs native review"
-  },
-  "scanPumpInconsistent": "Skannatut arvot eivät täsmää — syötä ne manuaalisesti.",
-  "@scanPumpInconsistent": {
     "description": "MT — needs native review"
   },
   "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",

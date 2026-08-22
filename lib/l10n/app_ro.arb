@@ -1120,8 +1120,6 @@
   "featureDescription_obd2Optional": "Când este oprit, aplicația înregistrează călătorii doar cu GPS fără adaptor OBD2. Coachingul este redus — fără L/100 km instantaneu, mai puține semnale ale motorului.",
   "featureLabel_addFillUpOcrReceipt": "OCR bon",
   "featureDescription_addFillUpOcrReceipt": "Scanați un bon imprimat pe ecranul Adăugare alimentare pentru a precompleta data, litrii, totalul și stația.",
-  "featureLabel_addFillUpOcrPump": "OCR afișaj pompă (experimental)",
-  "featureDescription_addFillUpOcrPump": "Scanați afișajul unei pompe de carburant pentru a precompleta formularul. Recunoașterea nu este fiabilă astăzi — activați doar dacă doriți să testați.",
   "featureLabel_developerPatToken": "Feedback dezvoltator (GitHub PAT)",
   "featureDescription_developerPatToken": "Activează panoul de feedback pentru scanări eșuate care creează automat issues pe GitHub cu un Personal Access Token. Funcție pentru utilizatori avansați / contribuitori.",
   "feedbackConsentTitle": "Trimiteți raportul pe GitHub?",
@@ -1145,19 +1143,7 @@
   "scanReceiptNoData": "Nicio dată găsită pe bon — încercați din nou",
   "scanReceiptSuccess": "Bon scanat — verificați valorile. Apăsați \"Raportați eroare de scanare\" mai jos dacă ceva este greșit.",
   "scanReceiptFailed": "Scanarea a eșuat: {error}",
-  "pumpCameraCapture": "Capturează",
-  "pumpCameraPermissionDenied": "Accesul la cameră este necesar pentru a scana afișajul pompei. Activează-l în setările dispozitivului.",
-  "pumpCameraError": "Camera nu a putut porni. Încearcă din nou sau introdu valorile manual.",
-  "scanPumpSuccess": "Afișajul pompei scanat — verificați valorile.",
-  "scanPumpGlare": "Prea multă strălucire pe afișaj — încearcă din nou dintr-un unghi ușor, astfel încât cifrele să nu fie estompate.",
-  "scanPumpFailed": "Scanarea pompei a eșuat: {error}",
   "badScanReportTitleReceipt": "Raportați o eroare de scanare — Bon",
-  "badScanReportTitlePumpDisplay": "Raportați o eroare de scanare — Afișaj pompă",
-  "pumpScanFailureTitle": "Afișaj necitibil",
-  "pumpScanFailureBody": "Scanarea nu a putut citi afișajul pompei. Ce doriți să faceți?",
-  "pumpScanFailureCorrectManually": "Corectați manual",
-  "pumpScanFailureReport": "Raportați",
-  "pumpScanFailureRemove": "Eliminați fotografia",
   "badScanReportHint": "Vom partaja fotografia bonului și ambele seturi de valori pentru ca viitoarea versiune să poată învăța acest format.",
   "badScanReportFieldBrandLayout": "Format brand",
   "badScanReportFieldTotal": "Total",
@@ -1176,7 +1162,6 @@
   "fillUpSectionWhereTitle": "Unde erați",
   "fillUpSectionWhereSubtitle": "Stație, odometru, note",
   "fillUpImportReceiptLabel": "Bon",
-  "fillUpImportPumpLabel": "Afișaj pompă",
   "fillUpPricePerLiterLabel": "Preț per litru",
   "vehicleHeaderUntitled": "Vehicul nou",
   "vehicleSectionIdentityTitle": "Identitate",
@@ -1758,10 +1743,6 @@
   "tripRecordingAutoPinTitle": "Fixează întotdeauna la începerea înregistrării",
   "tripRecordingAutoPinSubtitle": "Fixează formularul automat la fiecare cursă în loc să atingi de fiecare dată. Consumă mai multă baterie.",
   "tripRecordingConnectingTitle": "Se pornește înregistrarea…",
-  "pumpCameraOrientationHorizontal": "Comutați la aspectul orizontal",
-  "pumpCameraOrientationVertical": "Comutați la aspectul vertical",
-  "pumpCameraGlareWarning": "Prea multă strălucire — înclinați ușor pentru a evita reflexiile",
-  "pumpCameraAlignHint": "Aliniați afișajul în cadru, apoi capturați",
   "insightHighSpeedBand": "Viteză mare susținută ({pctTime}% din traseu): risipiți {liters} L",
   "insightHighSpeedBandNoFuel": "Viteză mare susținută ({pctTime}% din traseu)",
   "lessonAdviceHighSpeedBand": "Peste 110 km/h ridicați piciorul de pe accelerație – rezistența aerului crește puternic, puțin mai încet economisește mult combustibil.",
@@ -2143,10 +2124,6 @@
   "@reconcileResolveGapSemanticLabel": {
     "description": "MT — needs native review"
   },
-  "pumpCameraRotateToLandscape": "Întoarceți telefonul pe orizontală — ecranul pompei este lat, astfel cifrele vor fi mai mari și drepte",
-  "@pumpCameraRotateToLandscape": {
-    "description": "MT — needs native review"
-  },
   "insightFullThrottle": "Accelerație completă ({pctTime}% din călătorie): risipit {liters} L",
   "@insightFullThrottle": {
     "description": "MT — needs native review",
@@ -2526,14 +2503,6 @@
   "@ocrTesterExplain": {
     "description": "MT — needs native review"
   },
-  "ocrTesterModePump": "Pompă",
-  "@ocrTesterModePump": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterModeReceipt": "Bon",
-  "@ocrTesterModeReceipt": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterCapture": "Captură",
   "@ocrTesterCapture": {
     "description": "MT — needs native review"
@@ -2724,14 +2693,6 @@
   },
   "obd2DiagnosticsInitCold": "rece",
   "@obd2DiagnosticsInitCold": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterSaveFixture": "Salvați ca fixture",
-  "@ocrTesterSaveFixture": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterFixtureSaved": "Fixture salvat în folderul Descărcări. Mutați-l sub test/fixtures și rulați tool/promote_ocr_fixture.dart.",
-  "@ocrTesterFixtureSaved": {
     "description": "MT — needs native review"
   },
   "situationColdStart": "Pornire la rece",
@@ -3737,10 +3698,6 @@
   },
   "alertsStationAdd": "Adăugați o alertă de stație",
   "@alertsStationAdd": {
-    "description": "MT — needs native review"
-  },
-  "scanPumpInconsistent": "Valorile scanate nu se adună — introduceți-le manual.",
-  "@scanPumpInconsistent": {
     "description": "MT — needs native review"
   },
   "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",

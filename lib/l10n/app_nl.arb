@@ -1120,8 +1120,6 @@
   "featureDescription_obd2Optional": "Indien uit, neemt de app alleen-GPS-ritten op zonder OBD2-adapter. Coaching is beperkt — geen direct L/100 km, minder motorgegevens.",
   "featureLabel_addFillUpOcrReceipt": "Bon OCR",
   "featureDescription_addFillUpOcrReceipt": "Scan een gedrukte bon op het scherm Tankbeurt toevoegen om datum, liters, totaal en station automatisch in te vullen.",
-  "featureLabel_addFillUpOcrPump": "Pomp-display OCR (experimenteel)",
-  "featureDescription_addFillUpOcrPump": "Scan een tankpompdisplay om het formulier vooraf in te vullen. Herkenning is vandaag onbetrouwbaar — schakel alleen in als je wilt testen.",
   "featureLabel_developerPatToken": "Ontwikkelaarsfeedback (GitHub PAT)",
   "featureDescription_developerPatToken": "Schakelt het feedbackpaneel voor mislukte scans in dat met een Personal Access Token automatisch GitHub-issues aanmaakt. Functie voor gevorderde gebruikers / bijdragers.",
   "feedbackConsentTitle": "Rapport versturen naar GitHub?",
@@ -1145,19 +1143,7 @@
   "scanReceiptNoData": "Geen bongegevens gevonden — probeer opnieuw",
   "scanReceiptSuccess": "Bon gescand — verifieer de waarden. Tik hieronder op \"Scanfout melden\" als er iets niet klopt.",
   "scanReceiptFailed": "Scan mislukt: {error}",
-  "pumpCameraCapture": "Vastleggen",
-  "pumpCameraPermissionDenied": "Cameratoegang is nodig om het pompdisplay te scannen. Schakel het in bij de apparaatinstellingen.",
-  "pumpCameraError": "De camera kon niet starten. Probeer opnieuw of voer de waarden handmatig in.",
-  "scanPumpSuccess": "Pompdisplay gescand — verifieer de waarden.",
-  "scanPumpGlare": "Te veel weerschijn op het display — probeer het opnieuw onder een lichte hoek zodat de cijfers niet overstraald zijn.",
-  "scanPumpFailed": "Pompscan mislukt: {error}",
   "badScanReportTitleReceipt": "Scanfout melden — Bon",
-  "badScanReportTitlePumpDisplay": "Scanfout melden — Pompdisplay",
-  "pumpScanFailureTitle": "Display niet leesbaar",
-  "pumpScanFailureBody": "De scan kon het pompdisplay niet lezen. Wat wil je doen?",
-  "pumpScanFailureCorrectManually": "Handmatig corrigeren",
-  "pumpScanFailureReport": "Melden",
-  "pumpScanFailureRemove": "Foto verwijderen",
   "badScanReportHint": "We delen de bonfoto en beide sets waarden zodat de volgende versie deze indeling kan leren.",
   "badScanReportFieldBrandLayout": "Merkindeling",
   "badScanReportFieldTotal": "Totaal",
@@ -1176,7 +1162,6 @@
   "fillUpSectionWhereTitle": "Waar je was",
   "fillUpSectionWhereSubtitle": "Station, kilometerstand, notities",
   "fillUpImportReceiptLabel": "Bon",
-  "fillUpImportPumpLabel": "Pompdisplay",
   "fillUpPricePerLiterLabel": "Prijs per liter",
   "vehicleHeaderUntitled": "Nieuw voertuig",
   "vehicleSectionIdentityTitle": "Identiteit",
@@ -1758,10 +1743,6 @@
   "tripRecordingAutoPinTitle": "Altijd vastzetten bij start van de opname",
   "tripRecordingAutoPinSubtitle": "Zet het formulier automatisch vast bij elke rit in plaats van elke keer te tikken. Verbruikt meer batterij.",
   "tripRecordingConnectingTitle": "Opname starten…",
-  "pumpCameraOrientationHorizontal": "Schakel naar horizontale weergave",
-  "pumpCameraOrientationVertical": "Schakel naar verticale weergave",
-  "pumpCameraGlareWarning": "Te veel glans — kantel iets om reflecties te vermijden",
-  "pumpCameraAlignHint": "Lijn het scherm uit in het kader en maak een foto",
   "insightHighSpeedBand": "Aanhoudend hoge snelheid ({pctTime}% van de rit): {liters} L verspild",
   "insightHighSpeedBandNoFuel": "Aanhoudend hoge snelheid ({pctTime}% van de rit)",
   "lessonAdviceHighSpeedBand": "Laat boven 110 km/u het gas los – de luchtweerstand neemt sterk toe, iets langzamer bespaart veel brandstof.",
@@ -2143,10 +2124,6 @@
   "@reconcileResolveGapSemanticLabel": {
     "description": "MT — needs native review"
   },
-  "pumpCameraRotateToLandscape": "Draai je telefoon zijwaarts — het pompscherm is breed, zodat de cijfers groter en rechtop komen",
-  "@pumpCameraRotateToLandscape": {
-    "description": "MT — needs native review"
-  },
   "insightFullThrottle": "Volledig gas ({pctTime}% van de rit): {liters} L verspild",
   "@insightFullThrottle": {
     "description": "MT — needs native review",
@@ -2526,14 +2503,6 @@
   "@ocrTesterExplain": {
     "description": "MT — needs native review"
   },
-  "ocrTesterModePump": "Pomp",
-  "@ocrTesterModePump": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterModeReceipt": "Bon",
-  "@ocrTesterModeReceipt": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterCapture": "Vastleggen",
   "@ocrTesterCapture": {
     "description": "MT — needs native review"
@@ -2724,14 +2693,6 @@
   },
   "obd2DiagnosticsInitCold": "koud",
   "@obd2DiagnosticsInitCold": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterSaveFixture": "Opslaan als fixture",
-  "@ocrTesterSaveFixture": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterFixtureSaved": "Fixture opgeslagen in de map Downloads. Verplaats het naar test/fixtures en voer tool/promote_ocr_fixture.dart uit.",
-  "@ocrTesterFixtureSaved": {
     "description": "MT — needs native review"
   },
   "situationColdStart": "Koude start",
@@ -3737,10 +3698,6 @@
   },
   "alertsStationAdd": "Stationmelding toevoegen",
   "@alertsStationAdd": {
-    "description": "MT — needs native review"
-  },
-  "scanPumpInconsistent": "De gescande waarden kloppen niet — voer ze handmatig in.",
-  "@scanPumpInconsistent": {
     "description": "MT — needs native review"
   },
   "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",

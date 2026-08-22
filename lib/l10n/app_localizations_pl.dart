@@ -4747,14 +4747,6 @@ class AppLocalizationsPl extends AppLocalizations {
       'Zeskanuj wydrukowany paragon na ekranie Dodaj tankowanie, aby wypełnić datę, litry, sumę i stację.';
 
   @override
-  String get featureLabel_addFillUpOcrPump =>
-      'OCR wyświetlacza dystrybutora (eksperymentalne)';
-
-  @override
-  String get featureDescription_addFillUpOcrPump =>
-      'Zeskanuj wyświetlacz dystrybutora paliwa, aby wstępnie wypełnić formularz. Rozpoznawanie jest dziś nierzetelne — włącz tylko, jeśli chcesz przetestować.';
-
-  @override
   String get featureLabel_developerPatToken => 'Opinia dewelopera (GitHub PAT)';
 
   @override
@@ -5027,44 +5019,7 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
-  String get scanPumpSuccess =>
-      'Wyświetlacz dystrybutora zeskanowany — sprawdź wartości.';
-
-  @override
-  String get scanPumpGlare =>
-      'Zbyt duże odbicie na wyświetlaczu — spróbuj ponownie pod lekkim kątem, aby cyfry nie były prześwietlone.';
-
-  @override
-  String get scanPumpInconsistent =>
-      'Zeskanowane wartości nie zgadzają się — wprowadź je ręcznie.';
-
-  @override
-  String scanPumpFailed(String error) {
-    return 'Skanowanie dystrybutora nie powiodło się: $error';
-  }
-
-  @override
   String get badScanReportTitleReceipt => 'Zgłoś błąd skanowania — paragon';
-
-  @override
-  String get badScanReportTitlePumpDisplay =>
-      'Zgłoś błąd skanowania — wyświetlacz dystrybutora';
-
-  @override
-  String get pumpScanFailureTitle => 'Wyświetlacz nieczytelny';
-
-  @override
-  String get pumpScanFailureBody =>
-      'Skanowanie nie mogło odczytać wyświetlacza dystrybutora. Co chcesz zrobić?';
-
-  @override
-  String get pumpScanFailureCorrectManually => 'Popraw ręcznie';
-
-  @override
-  String get pumpScanFailureReport => 'Zgłoś';
-
-  @override
-  String get pumpScanFailureRemove => 'Usuń zdjęcie';
 
   @override
   String get badScanReportHint =>
@@ -5108,35 +5063,6 @@ class AppLocalizationsPl extends AppLocalizations {
       'Przesyłanie nie powiodło się — ręczne udostępnienie';
 
   @override
-  String get pumpCameraCapture => 'Zrób zdjęcie';
-
-  @override
-  String get pumpCameraPermissionDenied =>
-      'Dostęp do aparatu jest potrzebny do zeskanowania wyświetlacza dystrybutora. Włącz go w ustawieniach urządzenia.';
-
-  @override
-  String get pumpCameraError =>
-      'Nie udało się uruchomić aparatu. Spróbuj ponownie lub wprowadź wartości ręcznie.';
-
-  @override
-  String get pumpCameraOrientationHorizontal => 'Przełącz na układ poziomy';
-
-  @override
-  String get pumpCameraOrientationVertical => 'Przełącz na układ pionowy';
-
-  @override
-  String get pumpCameraGlareWarning =>
-      'Zbyt duże odblaski — lekko przechyl, aby uniknąć odblasków';
-
-  @override
-  String get pumpCameraAlignHint =>
-      'Ustaw wyświetlacz w ramce, a następnie zrób zdjęcie';
-
-  @override
-  String get pumpCameraRotateToLandscape =>
-      'Obróć telefon poziomo — wyświetlacz dystrybutora jest szeroki, więc cyfry wychodzą większe i wyprostowane';
-
-  @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
 
   @override
@@ -5169,9 +5095,6 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get fillUpImportReceiptLabel => 'Paragon';
-
-  @override
-  String get fillUpImportPumpLabel => 'Wyświetlacz dystrybutora';
 
   @override
   String get fillUpPricePerLiterLabel => 'Cena za litr';
@@ -6389,12 +6312,6 @@ class AppLocalizationsPl extends AppLocalizations {
       'Uruchom potok OCR dystrybutora / paragonu na wybranym zdjęciu i sprawdź każdy krok — dostępne tylko w trybie deweloperskim.';
 
   @override
-  String get ocrTesterModePump => 'Dystrybutor';
-
-  @override
-  String get ocrTesterModeReceipt => 'Paragon';
-
-  @override
   String get ocrTesterCapture => 'Zrób zdjęcie';
 
   @override
@@ -6503,13 +6420,6 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get ocrTesterExported => 'Pakiet OCR zapisany w folderze Pobrane.';
-
-  @override
-  String get ocrTesterSaveFixture => 'Zapisz jako fixture';
-
-  @override
-  String get ocrTesterFixtureSaved =>
-      'Fixture zapisany w folderze Pobrane. Przenieś go do test/fixtures i uruchom tool/promote_ocr_fixture.dart.';
 
   @override
   String get onboardingObd2StepTitle => 'Podłącz adapter OBD2';

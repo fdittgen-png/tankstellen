@@ -28,27 +28,5 @@
       "volumeMax": 200.0,
       "totalMax": 500.0
     }
-  ],
-  "brands": [
-    {
-      "brand": "tokheim",
-      "country": "FR",
-      "label": "Tokheim pump (FR)",
-      "displayOrientation": "vertical",
-      "pumpDisplay": {
-        "total":        { "left": 0.30, "top": 0.30, "width": 0.20, "height": 0.07 },
-        "totalLabel":   "PRIX",
-        "volume":       { "left": 0.30, "top": 0.37, "width": 0.20, "height": 0.07 },
-        "volumeLabel":  "VOLUME",
-        "pricePerLitre":      { "left": 0.44, "top": 0.31, "width": 0.10, "height": 0.10 },
-        "pricePerLitreLabel": "PRIX DU LITRE"
-      },
-      "valueAnchor": {
-        "direction":    "above",
-        "gap":          0.15,
-        "widthFactor":  1.4,
-        "heightFactor": 2.4
-      }
-    }
   ]
 }

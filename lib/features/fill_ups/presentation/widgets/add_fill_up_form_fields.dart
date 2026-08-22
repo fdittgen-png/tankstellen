@@ -32,10 +32,7 @@ class AddFillUpFormFields extends StatelessWidget {
   /// Busy flag for the "Receipt" import button — drives its spinner.
   final bool scanningReceipt;
 
-  /// Busy flag for the "Pump display" import button.
-  final bool scanningPump;
   final VoidCallback onScanReceipt;
-  final VoidCallback onScanPumpDisplay;
 
   /// #2687 — opens the manual paste-receipt-text dialog (on-device,
   /// no camera / no cloud). Threaded to [FillUpImportButtonsPair].
@@ -76,9 +73,7 @@ class AddFillUpFormFields extends StatelessWidget {
   const AddFillUpFormFields({
     super.key,
     required this.scanningReceipt,
-    required this.scanningPump,
     required this.onScanReceipt,
-    required this.onScanPumpDisplay,
     required this.onPasteReceipt,
     required this.stationName,
     required this.dateLabel,
@@ -111,9 +106,7 @@ class AddFillUpFormFields extends StatelessWidget {
         // accessible from the Consumption screen.
         FillUpImportButtonsPair(
           scanningReceipt: scanningReceipt,
-          scanningPump: scanningPump,
           onScanReceipt: onScanReceipt,
-          onScanPumpDisplay: onScanPumpDisplay,
           onPasteReceipt: onPasteReceipt,
         ),
         const SizedBox(height: 16),

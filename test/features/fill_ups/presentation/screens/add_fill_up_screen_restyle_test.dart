@@ -97,9 +97,7 @@ void main() {
       expect(find.byKey(const Key('import_receipt_button')), findsOneWidget);
       expect(find.text('Receipt'), findsOneWidget);
 
-      // #2110 — `Feature.addFillUpOcrPump` defaults OFF because the
-      // pump-display OCR recognizer is unreliable. The button stays
-      // hidden until the user opts in from Feature management.
+      // #3765 — the pump-display scanner was removed outright.
       expect(find.byKey(const Key('import_pump_button')), findsNothing);
       expect(find.text('Pump display'), findsNothing);
 

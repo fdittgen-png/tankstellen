@@ -1120,8 +1120,6 @@
   "featureDescription_obd2Optional": "Όταν είναι απενεργοποιημένο, η εφαρμογή καταγράφει διαδρομές μόνο με GPS χωρίς προσαρμογέα OBD2. Το coaching είναι περιορισμένο — χωρίς στιγμιαία L/100 km, λιγότερα σήματα κινητήρα.",
   "featureLabel_addFillUpOcrReceipt": "OCR απόδειξης",
   "featureDescription_addFillUpOcrReceipt": "Σαρώστε μια τυπωμένη απόδειξη στην οθόνη Προσθήκη ανεφοδιασμού για να συμπληρώσετε αυτόματα ημερομηνία, λίτρα, σύνολο και πρατήριο.",
-  "featureLabel_addFillUpOcrPump": "OCR οθόνης αντλίας (πειραματικό)",
-  "featureDescription_addFillUpOcrPump": "Σαρώστε την οθόνη μιας αντλίας καυσίμου για να συμπληρώσετε αυτόματα τη φόρμα. Η αναγνώριση είναι αναξιόπιστη σήμερα — ενεργοποιήστε μόνο αν θέλετε να δοκιμάσετε.",
   "featureLabel_developerPatToken": "Σχόλια προγραμματιστή (GitHub PAT)",
   "featureDescription_developerPatToken": "Ενεργοποιεί τον πίνακα σχολίων για αποτυχημένες σαρώσεις, ο οποίος δημιουργεί αυτόματα GitHub issues με ένα Personal Access Token. Λειτουργία για προχωρημένους χρήστες/συνεισφέροντες.",
   "feedbackConsentTitle": "Αποστολή αναφοράς στο GitHub;",
@@ -1145,19 +1143,7 @@
   "scanReceiptNoData": "Δεν βρέθηκαν δεδομένα απόδειξης — δοκιμάστε ξανά",
   "scanReceiptSuccess": "Η απόδειξη σαρώθηκε — επαληθεύστε τις τιμές. Πατήστε «Αναφορά σφάλματος σάρωσης» παρακάτω αν κάτι είναι λάθος.",
   "scanReceiptFailed": "Αποτυχία σάρωσης: {error}",
-  "pumpCameraCapture": "Λήψη",
-  "pumpCameraPermissionDenied": "Απαιτείται πρόσβαση στην κάμερα για τη σάρωση της οθόνης της αντλίας. Ενεργοποιήστε την στις ρυθμίσεις της συσκευής.",
-  "pumpCameraError": "Η κάμερα δεν μπόρεσε να ξεκινήσει. Δοκιμάστε ξανά ή εισαγάγετε τις τιμές χειροκίνητα.",
-  "scanPumpSuccess": "Η οθόνη αντλίας σαρώθηκε — επαληθεύστε τις τιμές.",
-  "scanPumpGlare": "Πάρα πολλή αντανάκλαση στην οθόνη — δοκιμάστε ξανά υπό μικρή γωνία ώστε οι αριθμοί να μην ξεθωριάζουν.",
-  "scanPumpFailed": "Αποτυχία σάρωσης αντλίας: {error}",
   "badScanReportTitleReceipt": "Αναφορά σφάλματος σάρωσης — Απόδειξη",
-  "badScanReportTitlePumpDisplay": "Αναφορά σφάλματος σάρωσης — Οθόνη αντλίας",
-  "pumpScanFailureTitle": "Μη αναγνώσιμη οθόνη",
-  "pumpScanFailureBody": "Η σάρωση δεν μπόρεσε να διαβάσει την οθόνη αντλίας. Τι θέλετε να κάνετε;",
-  "pumpScanFailureCorrectManually": "Χειροκίνητη διόρθωση",
-  "pumpScanFailureReport": "Αναφορά",
-  "pumpScanFailureRemove": "Αφαίρεση φωτογραφίας",
   "badScanReportHint": "Θα μοιραστούμε τη φωτογραφία απόδειξης και και τα δύο σύνολα τιμών ώστε η επόμενη έκδοση να μάθει αυτή τη διάταξη.",
   "badScanReportFieldBrandLayout": "Διάταξη μάρκας",
   "badScanReportFieldTotal": "Σύνολο",
@@ -1176,7 +1162,6 @@
   "fillUpSectionWhereTitle": "Πού βρισκόσαστε",
   "fillUpSectionWhereSubtitle": "Σταθμός, χιλιόμετρα, σημειώσεις",
   "fillUpImportReceiptLabel": "Απόδειξη",
-  "fillUpImportPumpLabel": "Οθόνη αντλίας",
   "fillUpPricePerLiterLabel": "Τιμή ανά λίτρο",
   "vehicleHeaderUntitled": "Νέο όχημα",
   "vehicleSectionIdentityTitle": "Ταυτότητα",
@@ -1758,10 +1743,6 @@
   "tripRecordingAutoPinTitle": "Πάντα καρφίτσωμα κατά την έναρξη εγγραφής",
   "tripRecordingAutoPinSubtitle": "Καρφίτσωμα της φόρμας αυτόματα σε κάθε διαδρομή αντί να πατάτε κάθε φορά. Καταναλώνει περισσότερη μπαταρία.",
   "tripRecordingConnectingTitle": "Έναρξη εγγραφής…",
-  "pumpCameraOrientationHorizontal": "Εναλλαγή σε οριζόντια διάταξη",
-  "pumpCameraOrientationVertical": "Εναλλαγή σε κατακόρυφη διάταξη",
-  "pumpCameraGlareWarning": "Πάρα πολλή αντανάκλαση — γείρετε ελαφρά για να αποφύγετε τις αντανακλάσεις",
-  "pumpCameraAlignHint": "Στοιχίστε την οθόνη εντός του πλαισίου και στη συνέχεια τραβήξτε φωτογραφία",
   "insightHighSpeedBand": "Παρατεταμένη υψηλή ταχύτητα ({pctTime}% της διαδρομής): σπαταλήθηκαν {liters} L",
   "insightHighSpeedBandNoFuel": "Παρατεταμένη υψηλή ταχύτητα ({pctTime}% της διαδρομής)",
   "lessonAdviceHighSpeedBand": "Πάνω από 110 km/h αφήστε το γκάζι – η αντίσταση του αέρα αυξάνεται απότομα, λίγο πιο αργά εξοικονομεί πολύ καύσιμο.",
@@ -2143,10 +2124,6 @@
   "@reconcileResolveGapSemanticLabel": {
     "description": "MT — needs native review"
   },
-  "pumpCameraRotateToLandscape": "Γυρίστε το τηλέφωνό σας οριζόντια — η οθόνη της αντλίας είναι πλατιά, οπότε οι αριθμοί εμφανίζονται μεγαλύτεροι και όρθιοι",
-  "@pumpCameraRotateToLandscape": {
-    "description": "MT — needs native review"
-  },
   "insightFullThrottle": "Πλήρες γκάζι ({pctTime}% του ταξιδιού): σπάταλα {liters} L",
   "@insightFullThrottle": {
     "description": "MT — needs native review",
@@ -2526,14 +2503,6 @@
   "@ocrTesterExplain": {
     "description": "MT — needs native review"
   },
-  "ocrTesterModePump": "Αντλία",
-  "@ocrTesterModePump": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterModeReceipt": "Απόδειξη",
-  "@ocrTesterModeReceipt": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterCapture": "Λήψη",
   "@ocrTesterCapture": {
     "description": "MT — needs native review"
@@ -2724,14 +2693,6 @@
   },
   "obd2DiagnosticsInitCold": "κρύο",
   "@obd2DiagnosticsInitCold": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterSaveFixture": "Αποθήκευση ως fixture",
-  "@ocrTesterSaveFixture": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterFixtureSaved": "Το fixture αποθηκεύτηκε στο φάκελο Λήψεών σας. Μετακινήστε το στο test/fixtures και εκτελέστε tool/promote_ocr_fixture.dart.",
-  "@ocrTesterFixtureSaved": {
     "description": "MT — needs native review"
   },
   "situationColdStart": "Κρύα εκκίνηση",
@@ -3737,10 +3698,6 @@
   },
   "alertsStationAdd": "Προσθήκη ειδοποίησης πρατηρίου",
   "@alertsStationAdd": {
-    "description": "MT — needs native review"
-  },
-  "scanPumpInconsistent": "Οι σαρωμένες τιμές δεν συμφωνούν — εισαγάγετέ τες χειροκίνητα.",
-  "@scanPumpInconsistent": {
     "description": "MT — needs native review"
   },
   "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",

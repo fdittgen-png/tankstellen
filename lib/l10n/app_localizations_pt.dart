@@ -4761,14 +4761,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'Digitalize um recibo impresso na tela Adicionar abastecimento para preencher data, litros, total e estação.';
 
   @override
-  String get featureLabel_addFillUpOcrPump =>
-      'OCR do display da bomba (experimental)';
-
-  @override
-  String get featureDescription_addFillUpOcrPump =>
-      'Digitalize o display de uma bomba de combustível para preencher o formulário. O reconhecimento é hoje pouco confiável — ative apenas se quiser testar.';
-
-  @override
   String get featureLabel_developerPatToken =>
       'Feedback de desenvolvedor (GitHub PAT)';
 
@@ -5043,44 +5035,8 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get scanPumpSuccess => 'Visor da bomba lido — verifique os valores.';
-
-  @override
-  String get scanPumpGlare =>
-      'Reflexo em excesso no visor — tente novamente num ângulo ligeiro para que os números não fiquem apagados.';
-
-  @override
-  String get scanPumpInconsistent =>
-      'Os valores lidos não batem certo — introduza-os manualmente.';
-
-  @override
-  String scanPumpFailed(String error) {
-    return 'Leitura da bomba falhada: $error';
-  }
-
-  @override
   String get badScanReportTitleReceipt =>
       'Reportar um erro de leitura — Recibo';
-
-  @override
-  String get badScanReportTitlePumpDisplay =>
-      'Reportar um erro de leitura — Visor da bomba';
-
-  @override
-  String get pumpScanFailureTitle => 'Visor ilegível';
-
-  @override
-  String get pumpScanFailureBody =>
-      'A leitura não conseguiu ler o visor da bomba. O que pretende fazer?';
-
-  @override
-  String get pumpScanFailureCorrectManually => 'Corrigir manualmente';
-
-  @override
-  String get pumpScanFailureReport => 'Reportar';
-
-  @override
-  String get pumpScanFailureRemove => 'Remover foto';
 
   @override
   String get badScanReportHint =>
@@ -5123,35 +5079,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get badScanReportFallbackToShare => 'Envio falhado — partilha manual';
 
   @override
-  String get pumpCameraCapture => 'Capturar';
-
-  @override
-  String get pumpCameraPermissionDenied =>
-      'É necessário acesso à câmera para digitalizar o visor da bomba. Ative-o nas configurações do dispositivo.';
-
-  @override
-  String get pumpCameraError =>
-      'A câmera não pôde iniciar. Tente novamente ou insira os valores manualmente.';
-
-  @override
-  String get pumpCameraOrientationHorizontal => 'Mudar para layout horizontal';
-
-  @override
-  String get pumpCameraOrientationVertical => 'Mudar para layout vertical';
-
-  @override
-  String get pumpCameraGlareWarning =>
-      'Muito brilho — incline levemente para evitar reflexos';
-
-  @override
-  String get pumpCameraAlignHint =>
-      'Alinhe o visor dentro da moldura e capture';
-
-  @override
-  String get pumpCameraRotateToLandscape =>
-      'Rode o telemóvel para o lado — o ecrã da bomba é largo, pelo que os números ficam maiores e na vertical correta';
-
-  @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
 
   @override
@@ -5184,9 +5111,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get fillUpImportReceiptLabel => 'Recibo';
-
-  @override
-  String get fillUpImportPumpLabel => 'Visor da bomba';
 
   @override
   String get fillUpPricePerLiterLabel => 'Preço por litro';
@@ -6407,12 +6331,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'Execute o pipeline OCR da bomba/recibo numa foto escolhida e inspecione cada passo — apenas disponível em modo Programador.';
 
   @override
-  String get ocrTesterModePump => 'Bomba';
-
-  @override
-  String get ocrTesterModeReceipt => 'Recibo';
-
-  @override
   String get ocrTesterCapture => 'Capturar';
 
   @override
@@ -6523,13 +6441,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get ocrTesterExported =>
       'Pacote OCR guardado na pasta Transferências.';
-
-  @override
-  String get ocrTesterSaveFixture => 'Guardar como fixture';
-
-  @override
-  String get ocrTesterFixtureSaved =>
-      'Fixture guardado na pasta Transferências. Mova-o para test/fixtures e execute tool/promote_ocr_fixture.dart.';
 
   @override
   String get onboardingObd2StepTitle => 'Ligue o seu adaptador OBD2';

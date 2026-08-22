@@ -17,7 +17,6 @@ import 'bad_scan_report_formatters.dart';
 class BadScanFormView extends StatelessWidget {
   final ScanKind kind;
   final ReceiptScanOutcome? receiptScan;
-  final PumpDisplayScanOutcome? pumpScan;
   final double? enteredLiters;
   final double? enteredTotalCost;
   final bool submitting;
@@ -28,7 +27,6 @@ class BadScanFormView extends StatelessWidget {
     super.key,
     required this.kind,
     required this.receiptScan,
-    required this.pumpScan,
     required this.enteredLiters,
     required this.enteredTotalCost,
     required this.submitting,
@@ -60,9 +58,7 @@ class BadScanFormView extends StatelessWidget {
         const SizedBox(height: 16),
         BadScanDiffTable(
           rows: buildBadScanDiffRows(
-            kind: kind,
             receiptScan: receiptScan,
-            pumpScan: pumpScan,
             enteredLiters: enteredLiters,
             enteredTotalCost: enteredTotalCost,
             l: l,

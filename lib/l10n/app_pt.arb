@@ -1120,8 +1120,6 @@
   "featureDescription_obd2Optional": "Quando desligado, a app grava viagens só com GPS sem precisar de um adaptador OBD2. O coaching é reduzido — sem L/100 km instantânea, menos sinais do motor.",
   "featureLabel_addFillUpOcrReceipt": "OCR de recibo",
   "featureDescription_addFillUpOcrReceipt": "Digitalize um recibo impresso na tela Adicionar abastecimento para preencher data, litros, total e estação.",
-  "featureLabel_addFillUpOcrPump": "OCR do display da bomba (experimental)",
-  "featureDescription_addFillUpOcrPump": "Digitalize o display de uma bomba de combustível para preencher o formulário. O reconhecimento é hoje pouco confiável — ative apenas se quiser testar.",
   "featureLabel_developerPatToken": "Feedback de desenvolvedor (GitHub PAT)",
   "featureDescription_developerPatToken": "Ativa o painel de feedback para scans com falha que cria automaticamente issues no GitHub com um Personal Access Token. Função para usuários avançados / colaboradores.",
   "feedbackConsentTitle": "Enviar relatório para o GitHub?",
@@ -1145,19 +1143,7 @@
   "scanReceiptNoData": "Nenhum dado de recibo encontrado — tente novamente",
   "scanReceiptSuccess": "Recibo lido — verifique os valores. Toque em \"Reportar erro de leitura\" abaixo se algo estiver errado.",
   "scanReceiptFailed": "Leitura falhada: {error}",
-  "pumpCameraCapture": "Capturar",
-  "pumpCameraPermissionDenied": "É necessário acesso à câmera para digitalizar o visor da bomba. Ative-o nas configurações do dispositivo.",
-  "pumpCameraError": "A câmera não pôde iniciar. Tente novamente ou insira os valores manualmente.",
-  "scanPumpSuccess": "Visor da bomba lido — verifique os valores.",
-  "scanPumpGlare": "Reflexo em excesso no visor — tente novamente num ângulo ligeiro para que os números não fiquem apagados.",
-  "scanPumpFailed": "Leitura da bomba falhada: {error}",
   "badScanReportTitleReceipt": "Reportar um erro de leitura — Recibo",
-  "badScanReportTitlePumpDisplay": "Reportar um erro de leitura — Visor da bomba",
-  "pumpScanFailureTitle": "Visor ilegível",
-  "pumpScanFailureBody": "A leitura não conseguiu ler o visor da bomba. O que pretende fazer?",
-  "pumpScanFailureCorrectManually": "Corrigir manualmente",
-  "pumpScanFailureReport": "Reportar",
-  "pumpScanFailureRemove": "Remover foto",
   "badScanReportHint": "Vamos partilhar a foto do recibo e ambos os conjuntos de valores para que a próxima versão aprenda este layout.",
   "badScanReportFieldBrandLayout": "Layout de marca",
   "badScanReportFieldTotal": "Total",
@@ -1176,7 +1162,6 @@
   "fillUpSectionWhereTitle": "Onde estava",
   "fillUpSectionWhereSubtitle": "Posto, odómetro, notas",
   "fillUpImportReceiptLabel": "Recibo",
-  "fillUpImportPumpLabel": "Visor da bomba",
   "fillUpPricePerLiterLabel": "Preço por litro",
   "vehicleHeaderUntitled": "Novo veículo",
   "vehicleSectionIdentityTitle": "Identidade",
@@ -1758,10 +1743,6 @@
   "tripRecordingAutoPinTitle": "Fixar sempre ao iniciar a gravação",
   "tripRecordingAutoPinSubtitle": "Fixa o formulário automaticamente em cada viagem em vez de tocar todas as vezes. Consome mais bateria.",
   "tripRecordingConnectingTitle": "A iniciar a gravação…",
-  "pumpCameraOrientationHorizontal": "Mudar para layout horizontal",
-  "pumpCameraOrientationVertical": "Mudar para layout vertical",
-  "pumpCameraGlareWarning": "Muito brilho — incline levemente para evitar reflexos",
-  "pumpCameraAlignHint": "Alinhe o visor dentro da moldura e capture",
   "insightHighSpeedBand": "Velocidade alta prolongada ({pctTime}% da viagem): desperdiçados {liters} L",
   "insightHighSpeedBandNoFuel": "Velocidade alta prolongada ({pctTime}% da viagem)",
   "lessonAdviceHighSpeedBand": "Acima de 110 km/h alivie o acelerador – a resistência do ar sobe muito, ir um pouco mais devagar poupa bastante combustível.",
@@ -2143,10 +2124,6 @@
   "@reconcileResolveGapSemanticLabel": {
     "description": "MT — needs native review"
   },
-  "pumpCameraRotateToLandscape": "Rode o telemóvel para o lado — o ecrã da bomba é largo, pelo que os números ficam maiores e na vertical correta",
-  "@pumpCameraRotateToLandscape": {
-    "description": "MT — needs native review"
-  },
   "insightFullThrottle": "Aceleração total ({pctTime}% da viagem): desperdiçou {liters} L",
   "@insightFullThrottle": {
     "description": "MT — needs native review",
@@ -2526,14 +2503,6 @@
   "@ocrTesterExplain": {
     "description": "MT — needs native review"
   },
-  "ocrTesterModePump": "Bomba",
-  "@ocrTesterModePump": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterModeReceipt": "Recibo",
-  "@ocrTesterModeReceipt": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterCapture": "Capturar",
   "@ocrTesterCapture": {
     "description": "MT — needs native review"
@@ -2724,14 +2693,6 @@
   },
   "obd2DiagnosticsInitCold": "frio",
   "@obd2DiagnosticsInitCold": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterSaveFixture": "Guardar como fixture",
-  "@ocrTesterSaveFixture": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterFixtureSaved": "Fixture guardado na pasta Transferências. Mova-o para test/fixtures e execute tool/promote_ocr_fixture.dart.",
-  "@ocrTesterFixtureSaved": {
     "description": "MT — needs native review"
   },
   "situationColdStart": "Arranque a frio",
@@ -3737,10 +3698,6 @@
   },
   "alertsStationAdd": "Adicionar alerta de posto",
   "@alertsStationAdd": {
-    "description": "MT — needs native review"
-  },
-  "scanPumpInconsistent": "Os valores lidos não batem certo — introduza-os manualmente.",
-  "@scanPumpInconsistent": {
     "description": "MT — needs native review"
   },
   "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",

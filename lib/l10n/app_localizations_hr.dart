@@ -4742,14 +4742,6 @@ class AppLocalizationsHr extends AppLocalizations {
       'Skenirajte ispisani račun na zaslonu Dodaj točenje da unaprijed ispunite datum, litre, ukupno i postaju.';
 
   @override
-  String get featureLabel_addFillUpOcrPump =>
-      'OCR zaslona crpke (eksperimentalno)';
-
-  @override
-  String get featureDescription_addFillUpOcrPump =>
-      'Skenirajte zaslon crpke goriva za prethodno popunjavanje obrasca. Prepoznavanje je danas nepouzdano — uključite samo ako želite testirati.';
-
-  @override
   String get featureLabel_developerPatToken =>
       'Razvojni povratni podaci (GitHub PAT)';
 
@@ -5023,44 +5015,7 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
-  String get scanPumpSuccess =>
-      'Zaslon pumpe skeniran — provjerite vrijednosti.';
-
-  @override
-  String get scanPumpGlare =>
-      'Previše odsjaja na zaslonu — pokušajte ponovno pod blagim kutom kako brojevi ne bi bili izblijedjeli.';
-
-  @override
-  String get scanPumpInconsistent =>
-      'Skenirane vrijednosti se ne podudaraju — unesite ih ručno.';
-
-  @override
-  String scanPumpFailed(String error) {
-    return 'Skeniranje pumpe nije uspjelo: $error';
-  }
-
-  @override
   String get badScanReportTitleReceipt => 'Prijavi grešku skeniranja — Račun';
-
-  @override
-  String get badScanReportTitlePumpDisplay =>
-      'Prijavi grešku skeniranja — Zaslon pumpe';
-
-  @override
-  String get pumpScanFailureTitle => 'Zaslon nije čitljiv';
-
-  @override
-  String get pumpScanFailureBody =>
-      'Skeniranje nije moglo pročitati zaslon pumpe. Što želite napraviti?';
-
-  @override
-  String get pumpScanFailureCorrectManually => 'Ispravi ručno';
-
-  @override
-  String get pumpScanFailureReport => 'Prijavi';
-
-  @override
-  String get pumpScanFailureRemove => 'Ukloni fotografiju';
 
   @override
   String get badScanReportHint =>
@@ -5104,34 +5059,6 @@ class AppLocalizationsHr extends AppLocalizations {
       'Slanje nije uspjelo — ručno dijeljenje';
 
   @override
-  String get pumpCameraCapture => 'Snimi';
-
-  @override
-  String get pumpCameraPermissionDenied =>
-      'Pristup kameri potreban je za skeniranje zaslona crpke. Omogućite ga u postavkama uređaja.';
-
-  @override
-  String get pumpCameraError =>
-      'Kamera se nije mogla pokrenuti. Pokušajte ponovno ili unesite vrijednosti ručno.';
-
-  @override
-  String get pumpCameraOrientationHorizontal => 'Prebaci na vodoravni raspored';
-
-  @override
-  String get pumpCameraOrientationVertical => 'Prebaci na okomiti raspored';
-
-  @override
-  String get pumpCameraGlareWarning =>
-      'Previše sjaja — malo nagnite kako biste izbjegli odsjaj';
-
-  @override
-  String get pumpCameraAlignHint => 'Poravnajte zaslon unutar okvira i snimite';
-
-  @override
-  String get pumpCameraRotateToLandscape =>
-      'Okrenite telefon bočno — zaslon pumpe je širok, pa su brojevi veći i uspravni';
-
-  @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
 
   @override
@@ -5164,9 +5091,6 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get fillUpImportReceiptLabel => 'Račun';
-
-  @override
-  String get fillUpImportPumpLabel => 'Zaslon pumpe';
 
   @override
   String get fillUpPricePerLiterLabel => 'Cijena po litri';
@@ -6386,12 +6310,6 @@ class AppLocalizationsHr extends AppLocalizations {
       'Pokrenite OCR cjevovod pumpe/računa na odabranoj fotografiji i pregledajte svaki korak — dostupno samo u načinu Razvijatelj.';
 
   @override
-  String get ocrTesterModePump => 'Pumpa';
-
-  @override
-  String get ocrTesterModeReceipt => 'Račun';
-
-  @override
   String get ocrTesterCapture => 'Snimi';
 
   @override
@@ -6500,13 +6418,6 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get ocrTesterExported => 'OCR paket spreman u mapu Downloads.';
-
-  @override
-  String get ocrTesterSaveFixture => 'Spremi kao fixture';
-
-  @override
-  String get ocrTesterFixtureSaved =>
-      'Fixture spreman u mapu Downloads. Premjestite ga pod test/fixtures i pokrenite tool/promote_ocr_fixture.dart.';
 
   @override
   String get onboardingObd2StepTitle => 'Spojite vaš OBD2 adapter';

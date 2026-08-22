@@ -4748,14 +4748,6 @@ class AppLocalizationsSk extends AppLocalizations {
       'Naskenujte vytlačenú účtenku na obrazovke Pridať tankovanie, aby ste vopred vyplnili dátum, litre, celkovú sumu a čerpaciu stanicu.';
 
   @override
-  String get featureLabel_addFillUpOcrPump =>
-      'OCR displeja pumpy (experimentálne)';
-
-  @override
-  String get featureDescription_addFillUpOcrPump =>
-      'Naskenujte displej palivovej pumpy a predvyplňte formulár. Rozpoznávanie je dnes nespoľahlivé — aktivujte iba ak chcete testovať.';
-
-  @override
   String get featureLabel_developerPatToken =>
       'Vývojárska spätná väzba (GitHub PAT)';
 
@@ -5029,43 +5021,7 @@ class AppLocalizationsSk extends AppLocalizations {
   }
 
   @override
-  String get scanPumpSuccess => 'Displej pumpy naskenovaný — overte hodnoty.';
-
-  @override
-  String get scanPumpGlare =>
-      'Príliš veľa odleskov na displeji — skús to znova z mierneho uhla, aby čísla neboli prežiarené.';
-
-  @override
-  String get scanPumpInconsistent =>
-      'Naskenované hodnoty nesedí — zadajte ich prosím ručne.';
-
-  @override
-  String scanPumpFailed(String error) {
-    return 'Skenovanie pumpy zlyhalo: $error';
-  }
-
-  @override
   String get badScanReportTitleReceipt => 'Nahlásiť chybu skenovania — Doklad';
-
-  @override
-  String get badScanReportTitlePumpDisplay =>
-      'Nahlásiť chybu skenovania — Displej pumpy';
-
-  @override
-  String get pumpScanFailureTitle => 'Displej nečitateľný';
-
-  @override
-  String get pumpScanFailureBody =>
-      'Skenovanie nemohlo prečítať displej pumpy. Čo chcete urobiť?';
-
-  @override
-  String get pumpScanFailureCorrectManually => 'Opraviť ručne';
-
-  @override
-  String get pumpScanFailureReport => 'Nahlásiť';
-
-  @override
-  String get pumpScanFailureRemove => 'Odstrániť fotografiu';
 
   @override
   String get badScanReportHint =>
@@ -5109,36 +5065,6 @@ class AppLocalizationsSk extends AppLocalizations {
       'Odoslanie zlyhalo — ručné zdieľanie';
 
   @override
-  String get pumpCameraCapture => 'Odfotiť';
-
-  @override
-  String get pumpCameraPermissionDenied =>
-      'Na naskenovanie displeja stojana je potrebný prístup ku kamere. Povoľte ho v nastaveniach zariadenia.';
-
-  @override
-  String get pumpCameraError =>
-      'Kameru sa nepodarilo spustiť. Skúste to znova alebo zadajte hodnoty ručne.';
-
-  @override
-  String get pumpCameraOrientationHorizontal =>
-      'Prepnúť na vodorovné rozloženie';
-
-  @override
-  String get pumpCameraOrientationVertical => 'Prepnúť na zvislé rozloženie';
-
-  @override
-  String get pumpCameraGlareWarning =>
-      'Príliš veľa odleskov — mierne nakloňte, aby ste sa vyhli odrazom';
-
-  @override
-  String get pumpCameraAlignHint =>
-      'Zarovnajte displej do rámčeka a potom odfotografujte';
-
-  @override
-  String get pumpCameraRotateToLandscape =>
-      'Otočte telefón na šírku — displej pumpy je široký, takže čísla vychádzajú väčšie a vzpriamené';
-
-  @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
 
   @override
@@ -5171,9 +5097,6 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get fillUpImportReceiptLabel => 'Doklad';
-
-  @override
-  String get fillUpImportPumpLabel => 'Displej pumpy';
 
   @override
   String get fillUpPricePerLiterLabel => 'Cena za liter';
@@ -6387,12 +6310,6 @@ class AppLocalizationsSk extends AppLocalizations {
       'Spustí kanál OCR pre pumpu/paragon na vybranej fotografii a skontroluje každý krok — dostupné iba vo vývojárskom režime.';
 
   @override
-  String get ocrTesterModePump => 'Pumpa';
-
-  @override
-  String get ocrTesterModeReceipt => 'Paragon';
-
-  @override
   String get ocrTesterCapture => 'Zachytiť';
 
   @override
@@ -6501,13 +6418,6 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get ocrTesterExported => 'Balík OCR uložený do priečinka Stiahnuté.';
-
-  @override
-  String get ocrTesterSaveFixture => 'Uložiť ako fixture';
-
-  @override
-  String get ocrTesterFixtureSaved =>
-      'Fixture uložená do priečinka Stiahnuté. Presuňte ju do test/fixtures a spustite tool/promote_ocr_fixture.dart.';
 
   @override
   String get onboardingObd2StepTitle => 'Pripojiť OBD2 adaptér';

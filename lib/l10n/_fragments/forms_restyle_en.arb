@@ -19,10 +19,6 @@
   "@fillUpImportReceiptLabel": {
     "description": "Import option: OCR-scan a paper receipt (#751 phase 2)."
   },
-  "fillUpImportPumpLabel": "Pump display",
-  "@fillUpImportPumpLabel": {
-    "description": "Import option: OCR-scan the fuel-pump LCD (#751 phase 2)."
-  },
   "fillUpPricePerLiterLabel": "Price per liter",
   "@fillUpPricePerLiterLabel": {
     "description": "Read-only derived value shown below the cost field when liters + cost are both entered (#751 phase 2)."

@@ -4765,14 +4765,6 @@ class AppLocalizationsBg extends AppLocalizations {
       'Сканирайте отпечатана касова бележка на екрана за добавяне на зареждане, за да попълните автоматично дата, литри, обща сума и станция.';
 
   @override
-  String get featureLabel_addFillUpOcrPump =>
-      'OCR на дисплея на колонката (експериментално)';
-
-  @override
-  String get featureDescription_addFillUpOcrPump =>
-      'Сканирайте дисплея на колонката, за да попълните формуляра. Разпознаването е ненадеждно днес — активирайте само ако искате да тествате.';
-
-  @override
   String get featureLabel_developerPatToken => 'Разработчик: GitHub PAT';
 
   @override
@@ -5045,45 +5037,8 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
-  String get scanPumpSuccess =>
-      'Дисплеят на помпата е сканиран — проверете стойностите.';
-
-  @override
-  String get scanPumpGlare =>
-      'Твърде много отблясъци по дисплея — опитайте отново под лек ъгъл, за да не са преекспонирани цифрите.';
-
-  @override
-  String get scanPumpInconsistent =>
-      'Сканираните стойности не се събират — моля, въведете ги ръчно.';
-
-  @override
-  String scanPumpFailed(String error) {
-    return 'Сканирането на помпата не успя: $error';
-  }
-
-  @override
   String get badScanReportTitleReceipt =>
       'Докладвай грешка при сканиране — Касова бележка';
-
-  @override
-  String get badScanReportTitlePumpDisplay =>
-      'Докладвай грешка при сканиране — Дисплей на помпата';
-
-  @override
-  String get pumpScanFailureTitle => 'Дисплеят не е четим';
-
-  @override
-  String get pumpScanFailureBody =>
-      'Сканирането не успя да прочете дисплея на помпата. Какво искате да направите?';
-
-  @override
-  String get pumpScanFailureCorrectManually => 'Коригирай ръчно';
-
-  @override
-  String get pumpScanFailureReport => 'Докладвай';
-
-  @override
-  String get pumpScanFailureRemove => 'Премахни снимката';
 
   @override
   String get badScanReportHint =>
@@ -5127,37 +5082,6 @@ class AppLocalizationsBg extends AppLocalizations {
       'Изпращането не успя — ръчно споделяне';
 
   @override
-  String get pumpCameraCapture => 'Заснемане';
-
-  @override
-  String get pumpCameraPermissionDenied =>
-      'Необходим е достъп до камерата за сканиране на дисплея на колонката. Активирайте го в настройките на устройството.';
-
-  @override
-  String get pumpCameraError =>
-      'Камерата не можа да се стартира. Опитайте отново или въведете стойностите ръчно.';
-
-  @override
-  String get pumpCameraOrientationHorizontal =>
-      'Превключете към хоризонтално оформление';
-
-  @override
-  String get pumpCameraOrientationVertical =>
-      'Превключете към вертикално оформление';
-
-  @override
-  String get pumpCameraGlareWarning =>
-      'Прекалено много отблясъци — наклонете леко, за да избегнете отражения';
-
-  @override
-  String get pumpCameraAlignHint =>
-      'Наредете дисплея в рамката и след това заснемете';
-
-  @override
-  String get pumpCameraRotateToLandscape =>
-      'Завъртете телефона хоризонтално — дисплеят на помпата е широк, така числата ще се виждат по-едро и изправено';
-
-  @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
 
   @override
@@ -5190,9 +5114,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get fillUpImportReceiptLabel => 'Касова бележка';
-
-  @override
-  String get fillUpImportPumpLabel => 'Дисплей на помпата';
 
   @override
   String get fillUpPricePerLiterLabel => 'Цена на литър';
@@ -6414,12 +6335,6 @@ class AppLocalizationsBg extends AppLocalizations {
       'Изпълнете OCR конвейера за помпа/касова бележка върху избрана снимка и прегледайте всяка стъпка — достъпно само в режим на разработчик.';
 
   @override
-  String get ocrTesterModePump => 'Помпа';
-
-  @override
-  String get ocrTesterModeReceipt => 'Касова бележка';
-
-  @override
   String get ocrTesterCapture => 'Снимай';
 
   @override
@@ -6528,13 +6443,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get ocrTesterExported => 'OCR пакетът е записан в папката Downloads.';
-
-  @override
-  String get ocrTesterSaveFixture => 'Запази като fixture';
-
-  @override
-  String get ocrTesterFixtureSaved =>
-      'Fixture е записан в папката Downloads. Преместете го в test/fixtures и стартирайте tool/promote_ocr_fixture.dart.';
 
   @override
   String get onboardingObd2StepTitle => 'Свържете OBD2 адаптера';

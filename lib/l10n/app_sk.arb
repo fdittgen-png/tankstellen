@@ -1120,8 +1120,6 @@
   "featureDescription_obd2Optional": "Keď je vypnuté, aplikácia zaznamenáva jazdy iba pomocou GPS bez OBD2 adaptéra. Coaching je obmedzený — žiadne okamžité L/100 km, menej motorových signálov.",
   "featureLabel_addFillUpOcrReceipt": "OCR účtenky",
   "featureDescription_addFillUpOcrReceipt": "Naskenujte vytlačenú účtenku na obrazovke Pridať tankovanie, aby ste vopred vyplnili dátum, litre, celkovú sumu a čerpaciu stanicu.",
-  "featureLabel_addFillUpOcrPump": "OCR displeja pumpy (experimentálne)",
-  "featureDescription_addFillUpOcrPump": "Naskenujte displej palivovej pumpy a predvyplňte formulár. Rozpoznávanie je dnes nespoľahlivé — aktivujte iba ak chcete testovať.",
   "featureLabel_developerPatToken": "Vývojárska spätná väzba (GitHub PAT)",
   "featureDescription_developerPatToken": "Aktivuje panel spätnej väzby pre neúspešné skenovanie, ktorý automaticky vytvára GitHub issues s Personal Access Tokenom. Funkcia pre pokročilých používateľov / prispievateľov.",
   "feedbackConsentTitle": "Odoslať hlásenie na GitHub?",
@@ -1145,19 +1143,7 @@
   "scanReceiptNoData": "Nenašli sa žiadne údaje z dokladu — skúste znova",
   "scanReceiptSuccess": "Doklad naskenovaný — overte hodnoty. Klepnite na \"Nahlásiť chybu skenovania\" nižšie, ak je niečo nesprávne.",
   "scanReceiptFailed": "Skenovanie zlyhalo: {error}",
-  "pumpCameraCapture": "Odfotiť",
-  "pumpCameraPermissionDenied": "Na naskenovanie displeja stojana je potrebný prístup ku kamere. Povoľte ho v nastaveniach zariadenia.",
-  "pumpCameraError": "Kameru sa nepodarilo spustiť. Skúste to znova alebo zadajte hodnoty ručne.",
-  "scanPumpSuccess": "Displej pumpy naskenovaný — overte hodnoty.",
-  "scanPumpGlare": "Príliš veľa odleskov na displeji — skús to znova z mierneho uhla, aby čísla neboli prežiarené.",
-  "scanPumpFailed": "Skenovanie pumpy zlyhalo: {error}",
   "badScanReportTitleReceipt": "Nahlásiť chybu skenovania — Doklad",
-  "badScanReportTitlePumpDisplay": "Nahlásiť chybu skenovania — Displej pumpy",
-  "pumpScanFailureTitle": "Displej nečitateľný",
-  "pumpScanFailureBody": "Skenovanie nemohlo prečítať displej pumpy. Čo chcete urobiť?",
-  "pumpScanFailureCorrectManually": "Opraviť ručne",
-  "pumpScanFailureReport": "Nahlásiť",
-  "pumpScanFailureRemove": "Odstrániť fotografiu",
   "badScanReportHint": "Zdieľame fotografiu dokladu a obe sady hodnôt, aby sa nasledujúca verzia mohla naučiť toto rozloženie.",
   "badScanReportFieldBrandLayout": "Rozloženie značky",
   "badScanReportFieldTotal": "Celkom",
@@ -1176,7 +1162,6 @@
   "fillUpSectionWhereTitle": "Kde ste boli",
   "fillUpSectionWhereSubtitle": "Stanica, tachometer, poznámky",
   "fillUpImportReceiptLabel": "Doklad",
-  "fillUpImportPumpLabel": "Displej pumpy",
   "fillUpPricePerLiterLabel": "Cena za liter",
   "vehicleHeaderUntitled": "Nové vozidlo",
   "vehicleSectionIdentityTitle": "Identita",
@@ -1758,10 +1743,6 @@
   "tripRecordingAutoPinTitle": "Pri spustení nahrávania vždy pripnúť",
   "tripRecordingAutoPinSubtitle": "Pripnúť formulár automaticky pri každej jazde namiesto klepnutia zakaždým. Spotrebuje viac batérie.",
   "tripRecordingConnectingTitle": "Spúšťa sa nahrávanie…",
-  "pumpCameraOrientationHorizontal": "Prepnúť na vodorovné rozloženie",
-  "pumpCameraOrientationVertical": "Prepnúť na zvislé rozloženie",
-  "pumpCameraGlareWarning": "Príliš veľa odleskov — mierne nakloňte, aby ste sa vyhli odrazom",
-  "pumpCameraAlignHint": "Zarovnajte displej do rámčeka a potom odfotografujte",
   "insightHighSpeedBand": "Trvalo vysoká rýchlosť ({pctTime} % jazdy): zbytočne {liters} l",
   "insightHighSpeedBandNoFuel": "Trvalo vysoká rýchlosť ({pctTime} % jazdy)",
   "lessonAdviceHighSpeedBand": "Nad 110 km/h ubertte plyn – odpor vzduchu prudko rastie, mierne spomalenie ušetrí veľa paliva.",
@@ -2143,10 +2124,6 @@
   "@reconcileResolveGapSemanticLabel": {
     "description": "MT — needs native review"
   },
-  "pumpCameraRotateToLandscape": "Otočte telefón na šírku — displej pumpy je široký, takže čísla vychádzajú väčšie a vzpriamené",
-  "@pumpCameraRotateToLandscape": {
-    "description": "MT — needs native review"
-  },
   "insightFullThrottle": "Plný plyn ({pctTime}% výletu): premárnených {liters} L",
   "@insightFullThrottle": {
     "description": "MT — needs native review",
@@ -2526,14 +2503,6 @@
   "@ocrTesterExplain": {
     "description": "MT — needs native review"
   },
-  "ocrTesterModePump": "Pumpa",
-  "@ocrTesterModePump": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterModeReceipt": "Paragon",
-  "@ocrTesterModeReceipt": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterCapture": "Zachytiť",
   "@ocrTesterCapture": {
     "description": "MT — needs native review"
@@ -2724,14 +2693,6 @@
   },
   "obd2DiagnosticsInitCold": "studený",
   "@obd2DiagnosticsInitCold": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterSaveFixture": "Uložiť ako fixture",
-  "@ocrTesterSaveFixture": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterFixtureSaved": "Fixture uložená do priečinka Stiahnuté. Presuňte ju do test/fixtures a spustite tool/promote_ocr_fixture.dart.",
-  "@ocrTesterFixtureSaved": {
     "description": "MT — needs native review"
   },
   "situationColdStart": "Studený štart",
@@ -3737,10 +3698,6 @@
   },
   "alertsStationAdd": "Pridať alert stanice",
   "@alertsStationAdd": {
-    "description": "MT — needs native review"
-  },
-  "scanPumpInconsistent": "Naskenované hodnoty nesedí — zadajte ich prosím ručne.",
-  "@scanPumpInconsistent": {
     "description": "MT — needs native review"
   },
   "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",

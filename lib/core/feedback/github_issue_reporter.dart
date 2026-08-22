@@ -12,10 +12,10 @@ import 'github_issue_body_formatter.dart';
 import '../../core/logging/error_logger.dart';
 
 /// What kind of scan produced the failing OCR output — determines the
-/// issue title.
+/// issue title. Receipt-only since #3765 removed the pump-display
+/// scanner; kept as an enum so the report schema stays extensible.
 enum ScanKind {
   receipt,
-  pumpDisplay,
 }
 
 extension ScanKindLabel on ScanKind {
@@ -23,8 +23,6 @@ extension ScanKindLabel on ScanKind {
     switch (this) {
       case ScanKind.receipt:
         return '[Scan] Receipt OCR failure';
-      case ScanKind.pumpDisplay:
-        return '[Scan] Pump display OCR failure';
     }
   }
 }

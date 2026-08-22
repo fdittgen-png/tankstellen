@@ -4744,14 +4744,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Scan een gedrukte bon op het scherm Tankbeurt toevoegen om datum, liters, totaal en station automatisch in te vullen.';
 
   @override
-  String get featureLabel_addFillUpOcrPump =>
-      'Pomp-display OCR (experimenteel)';
-
-  @override
-  String get featureDescription_addFillUpOcrPump =>
-      'Scan een tankpompdisplay om het formulier vooraf in te vullen. Herkenning is vandaag onbetrouwbaar — schakel alleen in als je wilt testen.';
-
-  @override
   String get featureLabel_developerPatToken =>
       'Ontwikkelaarsfeedback (GitHub PAT)';
 
@@ -5024,42 +5016,7 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get scanPumpSuccess => 'Pompdisplay gescand — verifieer de waarden.';
-
-  @override
-  String get scanPumpGlare =>
-      'Te veel weerschijn op het display — probeer het opnieuw onder een lichte hoek zodat de cijfers niet overstraald zijn.';
-
-  @override
-  String get scanPumpInconsistent =>
-      'De gescande waarden kloppen niet — voer ze handmatig in.';
-
-  @override
-  String scanPumpFailed(String error) {
-    return 'Pompscan mislukt: $error';
-  }
-
-  @override
   String get badScanReportTitleReceipt => 'Scanfout melden — Bon';
-
-  @override
-  String get badScanReportTitlePumpDisplay => 'Scanfout melden — Pompdisplay';
-
-  @override
-  String get pumpScanFailureTitle => 'Display niet leesbaar';
-
-  @override
-  String get pumpScanFailureBody =>
-      'De scan kon het pompdisplay niet lezen. Wat wil je doen?';
-
-  @override
-  String get pumpScanFailureCorrectManually => 'Handmatig corrigeren';
-
-  @override
-  String get pumpScanFailureReport => 'Melden';
-
-  @override
-  String get pumpScanFailureRemove => 'Foto verwijderen';
 
   @override
   String get badScanReportHint =>
@@ -5103,36 +5060,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Verzending mislukt — handmatig delen';
 
   @override
-  String get pumpCameraCapture => 'Vastleggen';
-
-  @override
-  String get pumpCameraPermissionDenied =>
-      'Cameratoegang is nodig om het pompdisplay te scannen. Schakel het in bij de apparaatinstellingen.';
-
-  @override
-  String get pumpCameraError =>
-      'De camera kon niet starten. Probeer opnieuw of voer de waarden handmatig in.';
-
-  @override
-  String get pumpCameraOrientationHorizontal =>
-      'Schakel naar horizontale weergave';
-
-  @override
-  String get pumpCameraOrientationVertical => 'Schakel naar verticale weergave';
-
-  @override
-  String get pumpCameraGlareWarning =>
-      'Te veel glans — kantel iets om reflecties te vermijden';
-
-  @override
-  String get pumpCameraAlignHint =>
-      'Lijn het scherm uit in het kader en maak een foto';
-
-  @override
-  String get pumpCameraRotateToLandscape =>
-      'Draai je telefoon zijwaarts — het pompscherm is breed, zodat de cijfers groter en rechtop komen';
-
-  @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
 
   @override
@@ -5165,9 +5092,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get fillUpImportReceiptLabel => 'Bon';
-
-  @override
-  String get fillUpImportPumpLabel => 'Pompdisplay';
 
   @override
   String get fillUpPricePerLiterLabel => 'Prijs per liter';
@@ -6383,12 +6307,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Voer de OCR-pijplijn voor pomp / bon uit op een gekozen foto en bekijk elke stap — alleen beschikbaar in Ontwikkelaarsmodus.';
 
   @override
-  String get ocrTesterModePump => 'Pomp';
-
-  @override
-  String get ocrTesterModeReceipt => 'Bon';
-
-  @override
   String get ocrTesterCapture => 'Vastleggen';
 
   @override
@@ -6497,13 +6415,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get ocrTesterExported => 'OCR-pakket opgeslagen in de map Downloads.';
-
-  @override
-  String get ocrTesterSaveFixture => 'Opslaan als fixture';
-
-  @override
-  String get ocrTesterFixtureSaved =>
-      'Fixture opgeslagen in de map Downloads. Verplaats het naar test/fixtures en voer tool/promote_ocr_fixture.dart uit.';
 
   @override
   String get onboardingObd2StepTitle => 'Verbind je OBD2-adapter';

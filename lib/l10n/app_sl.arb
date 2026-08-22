@@ -1120,8 +1120,6 @@
   "featureDescription_obd2Optional": "Ko je izklopljeno, aplikacija snema vožnje samo z GPS brez OBD2 adapterja. Coaching je omejen — brez trenutne L/100 km, manj signalov motorja.",
   "featureLabel_addFillUpOcrReceipt": "OCR računa",
   "featureDescription_addFillUpOcrReceipt": "Skenirajte natisnjen račun na zaslonu Dodaj polnjenje, da vnaprej izpolnite datum, litre, skupno in postajo.",
-  "featureLabel_addFillUpOcrPump": "OCR zaslona črpalke (eksperimentalno)",
-  "featureDescription_addFillUpOcrPump": "Skenirajte zaslon točilne črpalke za vnaprejšnje izpolnjevanje obrazca. Prepoznavanje je danes nezanesljivo — vklopite samo, če želite preizkusiti.",
   "featureLabel_developerPatToken": "Razvijalska povratna informacija (GitHub PAT)",
   "featureDescription_developerPatToken": "Omogoča ploščo povratnih informacij za neuspešna skeniranja, ki s Personal Access Tokenom samodejno ustvarja težave v GitHubu. Funkcija za napredne uporabnike / sodelavce.",
   "feedbackConsentTitle": "Poslati poročilo na GitHub?",
@@ -1145,19 +1143,7 @@
   "scanReceiptNoData": "Ni najdenih podatkov o računu — poskusite znova",
   "scanReceiptSuccess": "Račun skeniran — preverite vrednosti. Tapnite »Prijavi napako skeniranja« spodaj, če kaj ni v redu.",
   "scanReceiptFailed": "Skeniranje ni uspelo: {error}",
-  "pumpCameraCapture": "Zajemi",
-  "pumpCameraPermissionDenied": "Za optično branje zaslona točilne naprave je potreben dostop do kamere. Omogočite ga v nastavitvah naprave.",
-  "pumpCameraError": "Kamere ni bilo mogoče zagnati. Poskusite znova ali vnesite vrednosti ročno.",
-  "scanPumpSuccess": "Zaslon črpalke skeniran — preverite vrednosti.",
-  "scanPumpGlare": "Preveč bleščanja na zaslonu — poskusite znova pod rahlim kotom, da številke ne bodo presvetljene.",
-  "scanPumpFailed": "Skeniranje črpalke ni uspelo: {error}",
   "badScanReportTitleReceipt": "Prijavi napako skeniranja — račun",
-  "badScanReportTitlePumpDisplay": "Prijavi napako skeniranja — zaslon črpalke",
-  "pumpScanFailureTitle": "Zaslon ni berljiv",
-  "pumpScanFailureBody": "Skeniranje ni moglo prebrati zaslona črpalke. Kaj bi radi naredili?",
-  "pumpScanFailureCorrectManually": "Popravi ročno",
-  "pumpScanFailureReport": "Prijavi",
-  "pumpScanFailureRemove": "Odstrani fotografijo",
   "badScanReportHint": "Delili bomo fotografijo računa in oba niza vrednosti, da se naslednja gradnja nauči te postavitve.",
   "badScanReportFieldBrandLayout": "Postavitev blagovne znamke",
   "badScanReportFieldTotal": "Skupaj",
@@ -1176,7 +1162,6 @@
   "fillUpSectionWhereTitle": "Kje ste bili",
   "fillUpSectionWhereSubtitle": "Postaja, števec km, opombe",
   "fillUpImportReceiptLabel": "Račun",
-  "fillUpImportPumpLabel": "Zaslon črpalke",
   "fillUpPricePerLiterLabel": "Cena na liter",
   "vehicleHeaderUntitled": "Novo vozilo",
   "vehicleSectionIdentityTitle": "Identiteta",
@@ -1758,10 +1743,6 @@
   "tripRecordingAutoPinTitle": "Ob začetku snemanja vedno pripni",
   "tripRecordingAutoPinSubtitle": "Obrazec samodejno pripni ob vsaki vožnji namesto dotika vsakič. Porabi več baterije.",
   "tripRecordingConnectingTitle": "Začenjanje snemanja…",
-  "pumpCameraOrientationHorizontal": "Preklopi na vodoravno postavitev",
-  "pumpCameraOrientationVertical": "Preklopi na navpično postavitev",
-  "pumpCameraGlareWarning": "Preveč odbleska — rahlo nagnite, da se izognete odsevom",
-  "pumpCameraAlignHint": "Poravnajte zaslon v okvir in nato posnemite",
   "insightHighSpeedBand": "Trajno visoka hitrost ({pctTime}% vožnje): zapravljeno {liters} L",
   "insightHighSpeedBandNoFuel": "Trajno visoka hitrost ({pctTime}% vožnje)",
   "lessonAdviceHighSpeedBand": "Nad 110 km/h spustite plin – zračni upor strmo narašča, malo počasneje prihrani veliko goriva.",
@@ -2143,10 +2124,6 @@
   "@reconcileResolveGapSemanticLabel": {
     "description": "MT — needs native review"
   },
-  "pumpCameraRotateToLandscape": "Obrnite telefon vstran — zaslon črpalke je širok, zato so številke večje in pokončne",
-  "@pumpCameraRotateToLandscape": {
-    "description": "MT — needs native review"
-  },
   "insightFullThrottle": "Polni plin ({pctTime}% vožnje): zapravljenih {liters} L",
   "@insightFullThrottle": {
     "description": "MT — needs native review",
@@ -2526,14 +2503,6 @@
   "@ocrTesterExplain": {
     "description": "MT — needs native review"
   },
-  "ocrTesterModePump": "Črpalka",
-  "@ocrTesterModePump": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterModeReceipt": "Račun",
-  "@ocrTesterModeReceipt": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterCapture": "Zajemi",
   "@ocrTesterCapture": {
     "description": "MT — needs native review"
@@ -2724,14 +2693,6 @@
   },
   "obd2DiagnosticsInitCold": "hladno",
   "@obd2DiagnosticsInitCold": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterSaveFixture": "Shrani kot fiksacijo",
-  "@ocrTesterSaveFixture": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterFixtureSaved": "Fiksacija shranjena v mapo Prenosi. Premaknite jo v test/fixtures in zaženite tool/promote_ocr_fixture.dart.",
-  "@ocrTesterFixtureSaved": {
     "description": "MT — needs native review"
   },
   "situationColdStart": "Hladen zagon",
@@ -3737,10 +3698,6 @@
   },
   "alertsStationAdd": "Dodaj opozorilo za postajo",
   "@alertsStationAdd": {
-    "description": "MT — needs native review"
-  },
-  "scanPumpInconsistent": "Skenirane vrednosti se ne ujemajo — vnesite jih ročno.",
-  "@scanPumpInconsistent": {
     "description": "MT — needs native review"
   },
   "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",

@@ -4760,13 +4760,6 @@ class AppLocalizationsHu extends AppLocalizations {
       'Olvasson be nyomtatott számlát a Tankolás hozzáadása képernyőn, hogy előre kitöltse a dátumot, a litereket, az összeget és a kutat.';
 
   @override
-  String get featureLabel_addFillUpOcrPump => 'Kút kijelző OCR (kísérleti)';
-
-  @override
-  String get featureDescription_addFillUpOcrPump =>
-      'Olvasson be egy üzemanyagkút kijelzőjét az űrlap előre kitöltéséhez. A felismerés ma megbízhatatlan — csak akkor kapcsolja be, ha tesztelni szeretné.';
-
-  @override
   String get featureLabel_developerPatToken =>
       'Fejlesztői visszajelzés (GitHub PAT)';
 
@@ -5039,44 +5032,7 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get scanPumpSuccess =>
-      'A kút kijelzője beolvasva — ellenőrizze az értékeket.';
-
-  @override
-  String get scanPumpGlare =>
-      'Túl sok a tükröződés a kijelzőn — próbáld újra enyhe szögből, hogy a számok ne legyenek túlexponáltak.';
-
-  @override
-  String get scanPumpInconsistent =>
-      'A beolvasott értékek nem adnak össze — adja meg manuálisan.';
-
-  @override
-  String scanPumpFailed(String error) {
-    return 'Kút beolvasása sikertelen: $error';
-  }
-
-  @override
   String get badScanReportTitleReceipt => 'Beolvasási hiba jelentése — Nyugta';
-
-  @override
-  String get badScanReportTitlePumpDisplay =>
-      'Beolvasási hiba jelentése — Kút kijelzője';
-
-  @override
-  String get pumpScanFailureTitle => 'Kijelző nem olvasható';
-
-  @override
-  String get pumpScanFailureBody =>
-      'A beolvasás nem tudta olvasni a kút kijelzőjét. Mit szeretne tenni?';
-
-  @override
-  String get pumpScanFailureCorrectManually => 'Kézi javítás';
-
-  @override
-  String get pumpScanFailureReport => 'Jelentés';
-
-  @override
-  String get pumpScanFailureRemove => 'Fotó eltávolítása';
 
   @override
   String get badScanReportHint =>
@@ -5120,36 +5076,6 @@ class AppLocalizationsHu extends AppLocalizations {
       'Beküldés sikertelen — kézi megosztás';
 
   @override
-  String get pumpCameraCapture => 'Rögzítés';
-
-  @override
-  String get pumpCameraPermissionDenied =>
-      'A kút kijelzőjének beolvasásához kamera-hozzáférés szükséges. Engedélyezze az eszköz beállításaiban.';
-
-  @override
-  String get pumpCameraError =>
-      'A kamerát nem sikerült elindítani. Próbálja újra, vagy adja meg az értékeket kézzel.';
-
-  @override
-  String get pumpCameraOrientationHorizontal =>
-      'Váltás vízszintes elrendezésre';
-
-  @override
-  String get pumpCameraOrientationVertical => 'Váltás függőleges elrendezésre';
-
-  @override
-  String get pumpCameraGlareWarning =>
-      'Túl sok fény — kissé döntse meg a tükröződések elkerülése érdekében';
-
-  @override
-  String get pumpCameraAlignHint =>
-      'Igazítsa a kijelzőt a keretbe, majd készítse el a felvételt';
-
-  @override
-  String get pumpCameraRotateToLandscape =>
-      'Fordítsa oldalra a telefont — a kút kijelzője széles, így a számok nagyobbak és egyenesek lesznek';
-
-  @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
 
   @override
@@ -5183,9 +5109,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get fillUpImportReceiptLabel => 'Nyugta';
-
-  @override
-  String get fillUpImportPumpLabel => 'Kút kijelzője';
 
   @override
   String get fillUpPricePerLiterLabel => 'Liter ára';
@@ -6402,12 +6325,6 @@ class AppLocalizationsHu extends AppLocalizations {
       'Futtassa a kút/blokk OCR-folyamatot egy kiválasztott fotón, és vizsgálja meg minden lépést — csak Fejlesztői módban érhető el.';
 
   @override
-  String get ocrTesterModePump => 'Kút';
-
-  @override
-  String get ocrTesterModeReceipt => 'Bizonylat';
-
-  @override
   String get ocrTesterCapture => 'Fénykép';
 
   @override
@@ -6516,13 +6433,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get ocrTesterExported => 'OCR-csomag mentve a Letöltések mappába.';
-
-  @override
-  String get ocrTesterSaveFixture => 'Mentés fixture-ként';
-
-  @override
-  String get ocrTesterFixtureSaved =>
-      'Fixture mentve a Letöltések mappába. Helyezze a test/fixtures alá, és futtassa a tool/promote_ocr_fixture.dart-ot.';
 
   @override
   String get onboardingObd2StepTitle => 'OBD2-adapter csatlakoztatása';

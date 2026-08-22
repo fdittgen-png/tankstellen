@@ -4,11 +4,9 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/receipts_ocr/data/ocr/label_anchored_extractor.dart';
 import 'package:tankstellen/features/receipts_ocr/data/ocr/ocr_trace_package.dart';
 import 'package:tankstellen/features/receipts_ocr/data/ocr/ocr_trace_recorder.dart';
 import 'package:tankstellen/features/receipts_ocr/data/ocr/ocr_trace_serializer.dart';
-import 'package:tankstellen/features/receipts_ocr/data/ocr/pump_display_orchestrator.dart';
 import 'package:tankstellen/features/receipts_ocr/data/ocr/pump_ocr_config.dart';
 import 'package:tankstellen/features/receipts_ocr/data/ocr/recognized_text_block.dart';
 
@@ -45,26 +43,56 @@ void main() {
         block('0,798', l: 40, t: 380, r: 180, b: 420),
       ];
 
-  OcrTraceRecorder runPump() {
-    final recorder = OcrTraceRecorder();
+  /// Feeds the recorder through its typed sinks with the same values
+  /// the (removed, #3765) pump pipeline used to produce — the recorder
+  /// and serializer are pipeline-agnostic, so the wire format is pinned
+  /// directly.
+  OcrTraceRecorder runTrace() {
+    final recorder = OcrTraceRecorder(kind: OcrTraceKind.receipt);
     recorder.input(country: 'FR', profile: frProfile.toTraceJson());
     recorder.glare(fraction: 0.12, threshold: 0.4, rejected: false);
     recorder.blocks('PRIX 18,59 ...', sampleBlocks());
-    orchestratePumpDisplayParse(
-      blocks: sampleBlocks(),
-      text: '',
-      profile: frProfile,
-      trace: recorder,
+    recorder.classify('PRIX', 'label', field: 'totalCost', weight: 4);
+    recorder.classify('18,59', 'numeric', value: 18.59, decimals: 2);
+    recorder.anchorCandidates(const [
+      OcrTraceAnchor(
+        labelField: 'totalCost',
+        labelText: 'PRIX',
+        numericValue: 18.59,
+        sqDistance: 1600,
+        chosen: true,
+      ),
+    ]);
+    recorder.confidence(
+        hasTotal: true,
+        hasVolume: true,
+        hasPrice: true,
+        isConsistent: true,
+        total: 1.0);
+    recorder.gateCheck(
+      checks: const [
+        OcrTraceGateCheck(name: 'enough-fields', passed: true),
+        OcrTraceGateCheck(name: 'identity', passed: true),
+      ],
+      reason: 'consistent',
+      accepted: true,
+      identityDelta: 0.005,
     );
+    recorder.result(
+        totalCost: 18.59,
+        liters: 23.30,
+        pricePerLiter: 0.798,
+        confidence: 1.0,
+        validated: true);
     return recorder;
   }
 
-  test('serialises schema 1, pump kind, and the input/profile section', () {
-    final json = formatOcrTracePackageJson(runPump().build());
+  test('serialises schema 1, the kind, and the input/profile section', () {
+    final json = formatOcrTracePackageJson(runTrace().build());
     final decoded = jsonDecode(json) as Map<String, dynamic>;
 
     expect(decoded['schema'], 1);
-    expect(decoded['kind'], 'pump');
+    expect(decoded['kind'], 'receipt');
     expect(decoded['capturedAt'], isA<String>());
     final input = decoded['input'] as Map<String, dynamic>;
     expect(input['country'], 'FR');
@@ -73,7 +101,7 @@ void main() {
 
   test('carries the whole reasoning chain through to JSON', () {
     final decoded =
-        jsonDecode(formatOcrTracePackageJson(runPump().build())) as Map;
+        jsonDecode(formatOcrTracePackageJson(runTrace().build())) as Map;
 
     expect((decoded['preprocess'] as Map)['rejected'], isFalse);
     expect((decoded['mlkit'] as Map)['flatText'], 'PRIX 18,59 ...');
@@ -90,7 +118,7 @@ void main() {
 
   test('a block carries its bounding box as [l, t, r, b]', () {
     final decoded =
-        jsonDecode(formatOcrTracePackageJson(runPump().build())) as Map;
+        jsonDecode(formatOcrTracePackageJson(runTrace().build())) as Map;
     final blocks = (decoded['mlkit'] as Map)['blocks'] as List;
     final first = blocks.first as Map;
     expect(first['text'], 'PRIX');
@@ -98,7 +126,7 @@ void main() {
   });
 
   test('round-trips: encode → decode → re-encode is stable', () {
-    final pkg = runPump().build();
+    final pkg = runTrace().build();
     final once = formatOcrTracePackageJson(pkg);
     // Re-encode the decoded tree with the same indent → identical string.
     final reencoded = const JsonEncoder.withIndent('  ')
@@ -119,9 +147,13 @@ void main() {
     expect(decoded.containsKey('classification'), isFalse);
   });
 
-  test('the recorder fed by the live extractor serialises end to end', () {
-    final recorder = OcrTraceRecorder();
-    extractByLabelAnchor(sampleBlocks(), profile: frProfile, trace: recorder);
+  test('a crossCheck section serialises end to end', () {
+    final recorder = runTrace();
+    recorder.crossCheck(
+        total: 18.59,
+        volume: 23.30,
+        derivedPath: 'pricePerLitre',
+        computed: 0.798);
     // No throw, valid JSON, schema present.
     final decoded =
         jsonDecode(formatOcrTracePackageJson(recorder.build())) as Map;
@@ -135,7 +167,7 @@ void main() {
     OcrTracePackage withLargeImage() {
       // 4 MB of bytes → ~5.3 MB base64, mirroring the real crash payload.
       final bytes = List<int>.filled(4 * 1024 * 1024, 7);
-      final recorder = runPump()
+      final recorder = runTrace()
         ..image(fileName: 'capture.jpg', base64: base64Encode(bytes));
       return recorder.build();
     }
@@ -161,12 +193,12 @@ void main() {
 
       // Eliding the image leaves the rest of the reasoning chain intact.
       final decoded = jsonDecode(clip) as Map<String, dynamic>;
-      expect(decoded['kind'], 'pump');
+      expect(decoded['kind'], 'receipt');
       expect((decoded['result'] as Map)['totalCost'], closeTo(18.59, 0.001));
     });
 
     test('an image-less trace serialises identically either way', () {
-      final pkg = runPump().build();
+      final pkg = runTrace().build();
       expect(
         formatOcrTracePackageJson(pkg, includeImage: false),
         formatOcrTracePackageJson(pkg),

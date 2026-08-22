@@ -4751,14 +4751,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Scansiona uno scontrino stampato nella schermata Aggiungi rifornimento per pre-compilare data, litri, totale e stazione.';
 
   @override
-  String get featureLabel_addFillUpOcrPump =>
-      'OCR display pompa (sperimentale)';
-
-  @override
-  String get featureDescription_addFillUpOcrPump =>
-      'Scansiona il display di una pompa di carburante per pre-compilare il modulo. Il riconoscimento è inaffidabile oggi — attiva solo se vuoi testare.';
-
-  @override
   String get featureLabel_developerPatToken =>
       'Feedback sviluppatore (GitHub PAT)';
 
@@ -5031,45 +5023,8 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get scanPumpSuccess =>
-      'Display pompa scansionato — verifica i valori.';
-
-  @override
-  String get scanPumpGlare =>
-      'Troppo riflesso sul display — riprova con una leggera angolazione in modo che i numeri non siano sovraesposti.';
-
-  @override
-  String get scanPumpInconsistent =>
-      'I valori scansionati non tornano — inseriscili manualmente.';
-
-  @override
-  String scanPumpFailed(String error) {
-    return 'Scansione pompa non riuscita: $error';
-  }
-
-  @override
   String get badScanReportTitleReceipt =>
       'Segnala un errore di scansione — Scontrino';
-
-  @override
-  String get badScanReportTitlePumpDisplay =>
-      'Segnala un errore di scansione — Display pompa';
-
-  @override
-  String get pumpScanFailureTitle => 'Display illeggibile';
-
-  @override
-  String get pumpScanFailureBody =>
-      'La scansione non è riuscita a leggere il display della pompa. Cosa vuoi fare?';
-
-  @override
-  String get pumpScanFailureCorrectManually => 'Correggi manualmente';
-
-  @override
-  String get pumpScanFailureReport => 'Segnala';
-
-  @override
-  String get pumpScanFailureRemove => 'Rimuovi foto';
 
   @override
   String get badScanReportHint =>
@@ -5113,35 +5068,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Invio non riuscito — condivisione manuale';
 
   @override
-  String get pumpCameraCapture => 'Scatta';
-
-  @override
-  String get pumpCameraPermissionDenied =>
-      'L\'accesso alla fotocamera è necessario per scansionare il display della pompa. Abilitalo nelle impostazioni del dispositivo.';
-
-  @override
-  String get pumpCameraError =>
-      'La fotocamera non si è avviata. Riprova o inserisci i valori manualmente.';
-
-  @override
-  String get pumpCameraOrientationHorizontal => 'Passa a layout orizzontale';
-
-  @override
-  String get pumpCameraOrientationVertical => 'Passa a layout verticale';
-
-  @override
-  String get pumpCameraGlareWarning =>
-      'Troppi riflessi — inclina leggermente per evitare abbagliamenti';
-
-  @override
-  String get pumpCameraAlignHint =>
-      'Allinea il display nel riquadro, poi cattura';
-
-  @override
-  String get pumpCameraRotateToLandscape =>
-      'Ruota il telefono di lato — il display del distributore è largo, così i numeri vengono più grandi e in verticale';
-
-  @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
 
   @override
@@ -5174,9 +5100,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get fillUpImportReceiptLabel => 'Scontrino';
-
-  @override
-  String get fillUpImportPumpLabel => 'Display pompa';
 
   @override
   String get fillUpPricePerLiterLabel => 'Prezzo per litro';
@@ -6397,12 +6320,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Esegui la pipeline OCR per pompa/scontrino su una foto scelta e controlla ogni passaggio — disponibile solo in modalità sviluppatore.';
 
   @override
-  String get ocrTesterModePump => 'Pompa';
-
-  @override
-  String get ocrTesterModeReceipt => 'Scontrino';
-
-  @override
   String get ocrTesterCapture => 'Scatta';
 
   @override
@@ -6511,13 +6428,6 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get ocrTesterExported =>
       'Pacchetto OCR salvato nella cartella Download.';
-
-  @override
-  String get ocrTesterSaveFixture => 'Salva come fixture';
-
-  @override
-  String get ocrTesterFixtureSaved =>
-      'Fixture salvata nella cartella Download. Spostala in test/fixtures ed esegui tool/promote_ocr_fixture.dart.';
 
   @override
   String get onboardingObd2StepTitle => 'Connetti il tuo adattatore OBD2';

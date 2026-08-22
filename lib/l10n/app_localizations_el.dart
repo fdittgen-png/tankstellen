@@ -4765,14 +4765,6 @@ class AppLocalizationsEl extends AppLocalizations {
       'Σαρώστε μια τυπωμένη απόδειξη στην οθόνη Προσθήκη ανεφοδιασμού για να συμπληρώσετε αυτόματα ημερομηνία, λίτρα, σύνολο και πρατήριο.';
 
   @override
-  String get featureLabel_addFillUpOcrPump =>
-      'OCR οθόνης αντλίας (πειραματικό)';
-
-  @override
-  String get featureDescription_addFillUpOcrPump =>
-      'Σαρώστε την οθόνη μιας αντλίας καυσίμου για να συμπληρώσετε αυτόματα τη φόρμα. Η αναγνώριση είναι αναξιόπιστη σήμερα — ενεργοποιήστε μόνο αν θέλετε να δοκιμάσετε.';
-
-  @override
   String get featureLabel_developerPatToken =>
       'Σχόλια προγραμματιστή (GitHub PAT)';
 
@@ -5047,45 +5039,8 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
-  String get scanPumpSuccess =>
-      'Η οθόνη αντλίας σαρώθηκε — επαληθεύστε τις τιμές.';
-
-  @override
-  String get scanPumpGlare =>
-      'Πάρα πολλή αντανάκλαση στην οθόνη — δοκιμάστε ξανά υπό μικρή γωνία ώστε οι αριθμοί να μην ξεθωριάζουν.';
-
-  @override
-  String get scanPumpInconsistent =>
-      'Οι σαρωμένες τιμές δεν συμφωνούν — εισαγάγετέ τες χειροκίνητα.';
-
-  @override
-  String scanPumpFailed(String error) {
-    return 'Αποτυχία σάρωσης αντλίας: $error';
-  }
-
-  @override
   String get badScanReportTitleReceipt =>
       'Αναφορά σφάλματος σάρωσης — Απόδειξη';
-
-  @override
-  String get badScanReportTitlePumpDisplay =>
-      'Αναφορά σφάλματος σάρωσης — Οθόνη αντλίας';
-
-  @override
-  String get pumpScanFailureTitle => 'Μη αναγνώσιμη οθόνη';
-
-  @override
-  String get pumpScanFailureBody =>
-      'Η σάρωση δεν μπόρεσε να διαβάσει την οθόνη αντλίας. Τι θέλετε να κάνετε;';
-
-  @override
-  String get pumpScanFailureCorrectManually => 'Χειροκίνητη διόρθωση';
-
-  @override
-  String get pumpScanFailureReport => 'Αναφορά';
-
-  @override
-  String get pumpScanFailureRemove => 'Αφαίρεση φωτογραφίας';
 
   @override
   String get badScanReportHint =>
@@ -5129,35 +5084,6 @@ class AppLocalizationsEl extends AppLocalizations {
       'Αποτυχία υποβολής — χειροκίνητη κοινοποίηση';
 
   @override
-  String get pumpCameraCapture => 'Λήψη';
-
-  @override
-  String get pumpCameraPermissionDenied =>
-      'Απαιτείται πρόσβαση στην κάμερα για τη σάρωση της οθόνης της αντλίας. Ενεργοποιήστε την στις ρυθμίσεις της συσκευής.';
-
-  @override
-  String get pumpCameraError =>
-      'Η κάμερα δεν μπόρεσε να ξεκινήσει. Δοκιμάστε ξανά ή εισαγάγετε τις τιμές χειροκίνητα.';
-
-  @override
-  String get pumpCameraOrientationHorizontal => 'Εναλλαγή σε οριζόντια διάταξη';
-
-  @override
-  String get pumpCameraOrientationVertical => 'Εναλλαγή σε κατακόρυφη διάταξη';
-
-  @override
-  String get pumpCameraGlareWarning =>
-      'Πάρα πολλή αντανάκλαση — γείρετε ελαφρά για να αποφύγετε τις αντανακλάσεις';
-
-  @override
-  String get pumpCameraAlignHint =>
-      'Στοιχίστε την οθόνη εντός του πλαισίου και στη συνέχεια τραβήξτε φωτογραφία';
-
-  @override
-  String get pumpCameraRotateToLandscape =>
-      'Γυρίστε το τηλέφωνό σας οριζόντια — η οθόνη της αντλίας είναι πλατιά, οπότε οι αριθμοί εμφανίζονται μεγαλύτεροι και όρθιοι';
-
-  @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
 
   @override
@@ -5190,9 +5116,6 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get fillUpImportReceiptLabel => 'Απόδειξη';
-
-  @override
-  String get fillUpImportPumpLabel => 'Οθόνη αντλίας';
 
   @override
   String get fillUpPricePerLiterLabel => 'Τιμή ανά λίτρο';
@@ -6413,12 +6336,6 @@ class AppLocalizationsEl extends AppLocalizations {
       'Εκτελέστε τον αγωγό OCR αντλίας/απόδειξης σε μια επιλεγμένη φωτογραφία και επιθεωρήστε κάθε βήμα — διαθέσιμο μόνο σε λειτουργία Προγραμματιστή.';
 
   @override
-  String get ocrTesterModePump => 'Αντλία';
-
-  @override
-  String get ocrTesterModeReceipt => 'Απόδειξη';
-
-  @override
   String get ocrTesterCapture => 'Λήψη';
 
   @override
@@ -6528,13 +6445,6 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get ocrTesterExported =>
       'Το πακέτο OCR αποθηκεύτηκε στο φάκελο Λήψεων.';
-
-  @override
-  String get ocrTesterSaveFixture => 'Αποθήκευση ως fixture';
-
-  @override
-  String get ocrTesterFixtureSaved =>
-      'Το fixture αποθηκεύτηκε στο φάκελο Λήψεών σας. Μετακινήστε το στο test/fixtures και εκτελέστε tool/promote_ocr_fixture.dart.';
 
   @override
   String get onboardingObd2StepTitle => 'Σύνδεση προσαρμογέα OBD2';

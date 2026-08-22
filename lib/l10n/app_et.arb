@@ -1120,8 +1120,6 @@
   "featureDescription_obd2Optional": "Kui välja lülitatud, salvestab rakendus sõite ainult GPS-iga ilma OBD2-adapterita. Coaching on piiratud — pole hetkelist L/100 km, vähem mootori signaale.",
   "featureLabel_addFillUpOcrReceipt": "Tšeki OCR",
   "featureDescription_addFillUpOcrReceipt": "Skannige trükitud tšekk lehel Lisa tankimine, et eeltäita kuupäev, liitrid, kogusumma ja tankla.",
-  "featureLabel_addFillUpOcrPump": "Tankuri ekraani OCR (eksperimentaalne)",
-  "featureDescription_addFillUpOcrPump": "Skannige tankuri ekraani, et eeltäita vorm. Tuvastus pole tänapäeval usaldusväärne — aktiveerige ainult siis, kui soovite testida.",
   "featureLabel_developerPatToken": "Arendaja tagasiside (GitHub PAT)",
   "featureDescription_developerPatToken": "Lubab vigaste skannimiste tagasisidepaneeli, mis loob isikliku juurdepääsuvõtmega automaatselt GitHubi probleeme. Edasijõudnud kasutajate / kaastöötajate funktsioon.",
   "feedbackConsentTitle": "Saata raport GitHubile?",
@@ -1145,19 +1143,7 @@
   "scanReceiptNoData": "Kviitungiandmeid ei leitud — proovi uuesti",
   "scanReceiptSuccess": "Kviitung skaneeritud — kontrolli väärtusi. Puuduta allpool „Teata skaneerimisveast\", kui midagi on vale.",
   "scanReceiptFailed": "Skaneeriminen ebaõnnestus: {error}",
-  "pumpCameraCapture": "Pildista",
-  "pumpCameraPermissionDenied": "Tankla ekraani skannimiseks on vaja kaamera juurdepääsu. Lubage see seadme seadetes.",
-  "pumpCameraError": "Kaamerat ei õnnestunud käivitada. Proovige uuesti või sisestage väärtused käsitsi.",
-  "scanPumpSuccess": "Pumba kuvar skaneeritud — kontrolli väärtusi.",
-  "scanPumpGlare": "Ekraanil on liiga palju peegeldust — proovige uuesti väikese nurga alt, et numbrid ei oleks ülevalgustatud.",
-  "scanPumpFailed": "Pumba skaneerimineen ebaõnnestus: {error}",
   "badScanReportTitleReceipt": "Teata skaneerimisveast — kviitung",
-  "badScanReportTitlePumpDisplay": "Teata skaneerimisveast — pumba kuvar",
-  "pumpScanFailureTitle": "Kuvar loetamatu",
-  "pumpScanFailureBody": "Skaneeriminen ei suutnud pumba kuvarit lugeda. Mida soovid teha?",
-  "pumpScanFailureCorrectManually": "Paranda käsitsi",
-  "pumpScanFailureReport": "Teata",
-  "pumpScanFailureRemove": "Eemalda foto",
   "badScanReportHint": "Jagame kviitungifoto ja mõlemad väärtuste komplektid, et järgmine versioon õpiks selle paigutust.",
   "badScanReportFieldBrandLayout": "Brändi paigutus",
   "badScanReportFieldTotal": "Kokku",
@@ -1176,7 +1162,6 @@
   "fillUpSectionWhereTitle": "Kus olid",
   "fillUpSectionWhereSubtitle": "Jaam, läbisõidumõõdik, märkmed",
   "fillUpImportReceiptLabel": "Kviitung",
-  "fillUpImportPumpLabel": "Pumba kuvar",
   "fillUpPricePerLiterLabel": "Hind liitri kohta",
   "vehicleHeaderUntitled": "Uus sõiduk",
   "vehicleSectionIdentityTitle": "Identiteet",
@@ -1758,10 +1743,6 @@
   "tripRecordingAutoPinTitle": "Salvestuse alustamisel alati kinnita",
   "tripRecordingAutoPinSubtitle": "Kinnita vorm igal sõidul automaatselt, selle asemel et iga kord puudutada. Kasutab rohkem akut.",
   "tripRecordingConnectingTitle": "Salvestuse alustamine…",
-  "pumpCameraOrientationHorizontal": "Lülitu horisontaalsele paigutusele",
-  "pumpCameraOrientationVertical": "Lülitu vertikaalsele paigutusele",
-  "pumpCameraGlareWarning": "Liiga palju läiget — kallutage veidi, et vältida peegeldusi",
-  "pumpCameraAlignHint": "Joondage ekraan raami sisse ja seejärel tehke foto",
   "insightHighSpeedBand": "Püsiv suur kiirus ({pctTime}% sõidust): raisatud {liters} L",
   "insightHighSpeedBandNoFuel": "Püsiv suur kiirus ({pctTime}% sõidust)",
   "lessonAdviceHighSpeedBand": "Üle 110 km/h võta gaasi maha – õhutakistus kasvab järsult, veidi aeglasemalt säästab palju kütust.",
@@ -2143,10 +2124,6 @@
   "@reconcileResolveGapSemanticLabel": {
     "description": "MT — needs native review"
   },
-  "pumpCameraRotateToLandscape": "Pöörake telefon külili — pumba ekraan on lai, nii tulevad numbrid suuremad ja püstised",
-  "@pumpCameraRotateToLandscape": {
-    "description": "MT — needs native review"
-  },
   "insightFullThrottle": "Täiskäigul ({pctTime}% sõidust): raisatud {liters} L",
   "@insightFullThrottle": {
     "description": "MT — needs native review",
@@ -2526,14 +2503,6 @@
   "@ocrTesterExplain": {
     "description": "MT — needs native review"
   },
-  "ocrTesterModePump": "Pump",
-  "@ocrTesterModePump": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterModeReceipt": "Kviitung",
-  "@ocrTesterModeReceipt": {
-    "description": "MT — needs native review"
-  },
   "ocrTesterCapture": "Jäädvusta",
   "@ocrTesterCapture": {
     "description": "MT — needs native review"
@@ -2724,14 +2693,6 @@
   },
   "obd2DiagnosticsInitCold": "külm",
   "@obd2DiagnosticsInitCold": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterSaveFixture": "Salvesta fikseeritud andmestikuna",
-  "@ocrTesterSaveFixture": {
-    "description": "MT — needs native review"
-  },
-  "ocrTesterFixtureSaved": "Fikseeritud andmestik salvestatud allalaadimiste kausta. Teisaldage see kausta test/fixtures ja käivitage tool/promote_ocr_fixture.dart.",
-  "@ocrTesterFixtureSaved": {
     "description": "MT — needs native review"
   },
   "situationColdStart": "Külmkäivitus",
@@ -3737,10 +3698,6 @@
   },
   "alertsStationAdd": "Lisa tankla teavitus",
   "@alertsStationAdd": {
-    "description": "MT — needs native review"
-  },
-  "scanPumpInconsistent": "Skaneeritud väärtused ei klapi — sisestage need käsitsi.",
-  "@scanPumpInconsistent": {
     "description": "MT — needs native review"
   },
   "obd2GpsDegradedPassiveWaitingBanner": "Recording with GPS — waiting for the OBD2 adapter",

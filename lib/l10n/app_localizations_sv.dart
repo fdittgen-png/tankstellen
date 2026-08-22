@@ -4729,13 +4729,6 @@ class AppLocalizationsSv extends AppLocalizations {
       'Skanna ett tryckt kvitto på skärmen Lägg till tankning för att fylla i datum, liter, totalt och station i förväg.';
 
   @override
-  String get featureLabel_addFillUpOcrPump => 'Pumpdisplay OCR (experimentell)';
-
-  @override
-  String get featureDescription_addFillUpOcrPump =>
-      'Skanna en bränslepumpsdisplay för att förfylla formuläret. Igenkänningen är opålitlig idag — aktivera endast om du vill testa.';
-
-  @override
   String get featureLabel_developerPatToken => 'Utvecklarfeedback (GitHub PAT)';
 
   @override
@@ -5003,44 +4996,8 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
-  String get scanPumpSuccess => 'Pumpdisplay skannad – kontrollera värdena.';
-
-  @override
-  String get scanPumpGlare =>
-      'För mycket reflexer på displayen — försök igen i en liten vinkel så att siffrorna inte bleks ut.';
-
-  @override
-  String get scanPumpInconsistent =>
-      'De skannade värdena stämmer inte — ange dem manuellt.';
-
-  @override
-  String scanPumpFailed(String error) {
-    return 'Pumpskanning misslyckades: $error';
-  }
-
-  @override
   String get badScanReportTitleReceipt =>
       'Rapportera ett skanningsfel – Kvitto';
-
-  @override
-  String get badScanReportTitlePumpDisplay =>
-      'Rapportera ett skanningsfel – Pumpdisplay';
-
-  @override
-  String get pumpScanFailureTitle => 'Display oläslig';
-
-  @override
-  String get pumpScanFailureBody =>
-      'Skanningen kunde inte läsa pumpdisplayen. Vad vill du göra?';
-
-  @override
-  String get pumpScanFailureCorrectManually => 'Korrigera manuellt';
-
-  @override
-  String get pumpScanFailureReport => 'Rapportera';
-
-  @override
-  String get pumpScanFailureRemove => 'Ta bort foto';
 
   @override
   String get badScanReportHint =>
@@ -5084,35 +5041,6 @@ class AppLocalizationsSv extends AppLocalizations {
       'Inlämning misslyckades – manuell delning';
 
   @override
-  String get pumpCameraCapture => 'Ta bild';
-
-  @override
-  String get pumpCameraPermissionDenied =>
-      'Kameraåtkomst krävs för att skanna pumpdisplayen. Aktivera den i enhetens inställningar.';
-
-  @override
-  String get pumpCameraError =>
-      'Kameran kunde inte startas. Försök igen eller ange värdena manuellt.';
-
-  @override
-  String get pumpCameraOrientationHorizontal => 'Byt till horisontell layout';
-
-  @override
-  String get pumpCameraOrientationVertical => 'Byt till vertikal layout';
-
-  @override
-  String get pumpCameraGlareWarning =>
-      'För mycket bländning — luta något för att undvika reflexer';
-
-  @override
-  String get pumpCameraAlignHint =>
-      'Rikta in displayen i ramen och ta sedan en bild';
-
-  @override
-  String get pumpCameraRotateToLandscape =>
-      'Vänd telefonen sidledes — pumpdisplayen är bred, så siffrorna blir större och rättvänta';
-
-  @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
 
   @override
@@ -5145,9 +5073,6 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get fillUpImportReceiptLabel => 'Kvitto';
-
-  @override
-  String get fillUpImportPumpLabel => 'Pumpdisplay';
 
   @override
   String get fillUpPricePerLiterLabel => 'Pris per liter';
@@ -6360,12 +6285,6 @@ class AppLocalizationsSv extends AppLocalizations {
       'Kör pump-/kvitto-OCR-pipelinen på ett valt foto och granska varje steg — endast tillgänglig i Utvecklarläge.';
 
   @override
-  String get ocrTesterModePump => 'Pump';
-
-  @override
-  String get ocrTesterModeReceipt => 'Kvitto';
-
-  @override
   String get ocrTesterCapture => 'Ta bild';
 
   @override
@@ -6473,13 +6392,6 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get ocrTesterExported => 'OCR-paket sparat i Hämtningar.';
-
-  @override
-  String get ocrTesterSaveFixture => 'Spara som testfixtur';
-
-  @override
-  String get ocrTesterFixtureSaved =>
-      'Fixtur sparad i Hämtningar. Flytta den till test/fixtures och kör tool/promote_ocr_fixture.dart.';
 
   @override
   String get onboardingObd2StepTitle => 'Anslut din OBD2-adapter';

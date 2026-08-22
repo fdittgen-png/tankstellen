@@ -2,8 +2,6 @@
   "ocrTesterTitle": "OCR-Tester",
   "ocrTesterNavLabel": "OCR-Tester",
   "ocrTesterExplain": "Die Zapfsäulen-/Beleg-OCR auf einem ausgewählten Foto ausführen und jeden Schritt prüfen — nur im Entwicklermodus verfügbar.",
-  "ocrTesterModePump": "Zapfsäule",
-  "ocrTesterModeReceipt": "Beleg",
   "ocrTesterCapture": "Aufnehmen",
   "ocrTesterPickImage": "Bild auswählen",
   "ocrTesterRun": "Ausführen",
@@ -39,7 +37,5 @@
   "ocrTesterCopyJson": "Als JSON kopieren",
   "ocrTesterExportPackage": "Paket exportieren",
   "ocrTesterCopied": "OCR-Trace in die Zwischenablage kopiert.",
-  "ocrTesterExported": "OCR-Paket im Downloads-Ordner gespeichert.",
-  "ocrTesterSaveFixture": "Als Fixture speichern",
-  "ocrTesterFixtureSaved": "Fixture im Downloads-Ordner gespeichert. Nach test/fixtures verschieben und tool/promote_ocr_fixture.dart ausführen."
+  "ocrTesterExported": "OCR-Paket im Downloads-Ordner gespeichert."
 }

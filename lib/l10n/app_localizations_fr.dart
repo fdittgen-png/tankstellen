@@ -4774,14 +4774,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Scannez un ticket imprimé sur l\'écran Ajouter un plein pour pré-remplir la date, les litres, le total et la station.';
 
   @override
-  String get featureLabel_addFillUpOcrPump =>
-      'OCR de l\'écran de pompe (expérimental)';
-
-  @override
-  String get featureDescription_addFillUpOcrPump =>
-      'Scannez l\'afficheur d\'une pompe à carburant pour pré-remplir le formulaire. La reconnaissance n\'est pas fiable aujourd\'hui — activez uniquement si vous voulez tester.';
-
-  @override
   String get featureLabel_developerPatToken =>
       'Retour développeur (PAT GitHub)';
 
@@ -5053,44 +5045,7 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get scanPumpSuccess =>
-      'Affichage de la pompe scanné — vérifiez les valeurs.';
-
-  @override
-  String get scanPumpGlare =>
-      'Trop de reflets sur l\'afficheur — réessayez en vous plaçant légèrement de biais pour que les chiffres ne soient pas surexposés.';
-
-  @override
-  String get scanPumpInconsistent =>
-      'Les valeurs scannées ne concordent pas — veuillez les saisir manuellement.';
-
-  @override
-  String scanPumpFailed(String error) {
-    return 'Échec du scan de la pompe : $error';
-  }
-
-  @override
   String get badScanReportTitleReceipt => 'Signaler une erreur de scan — Reçu';
-
-  @override
-  String get badScanReportTitlePumpDisplay =>
-      'Signaler une erreur de scan — Display de pompe';
-
-  @override
-  String get pumpScanFailureTitle => 'Display illisible';
-
-  @override
-  String get pumpScanFailureBody =>
-      'Le scan n\'a pas pu lire le display. Que voulez-vous faire ?';
-
-  @override
-  String get pumpScanFailureCorrectManually => 'Corriger manuellement';
-
-  @override
-  String get pumpScanFailureReport => 'Signaler';
-
-  @override
-  String get pumpScanFailureRemove => 'Retirer la photo';
 
   @override
   String get badScanReportHint =>
@@ -5134,36 +5089,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Échec de création — partage manuel';
 
   @override
-  String get pumpCameraCapture => 'Capturer';
-
-  @override
-  String get pumpCameraPermissionDenied =>
-      'L\'accès à la caméra est nécessaire pour scanner l\'afficheur de la pompe. Activez-le dans les réglages de l\'appareil.';
-
-  @override
-  String get pumpCameraError =>
-      'La caméra n\'a pas pu démarrer. Réessayez ou saisissez les valeurs manuellement.';
-
-  @override
-  String get pumpCameraOrientationHorizontal =>
-      'Passer en affichage horizontal';
-
-  @override
-  String get pumpCameraOrientationVertical => 'Passer en affichage vertical';
-
-  @override
-  String get pumpCameraGlareWarning =>
-      'Trop de reflets — inclinez légèrement pour éviter les éblouissements';
-
-  @override
-  String get pumpCameraAlignHint =>
-      'Alignez l\'afficheur dans le cadre, puis capturez';
-
-  @override
-  String get pumpCameraRotateToLandscape =>
-      'Tournez votre téléphone en mode paysage — l\'affichage de la pompe est large, les chiffres s\'affichent ainsi plus grands et droits';
-
-  @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
 
   @override
@@ -5196,9 +5121,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get fillUpImportReceiptLabel => 'Reçu';
-
-  @override
-  String get fillUpImportPumpLabel => 'Affichage de la pompe';
 
   @override
   String get fillUpPricePerLiterLabel => 'Prix par litre';
@@ -6421,12 +6343,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Exécutez le pipeline OCR pompe/ticket sur une photo choisie et inspectez chaque étape — disponible uniquement en mode Développeur.';
 
   @override
-  String get ocrTesterModePump => 'Pompe';
-
-  @override
-  String get ocrTesterModeReceipt => 'Ticket';
-
-  @override
   String get ocrTesterCapture => 'Capturer';
 
   @override
@@ -6536,13 +6452,6 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get ocrTesterExported =>
       'Paquet OCR enregistré dans votre dossier Téléchargements.';
-
-  @override
-  String get ocrTesterSaveFixture => 'Enregistrer comme fixture';
-
-  @override
-  String get ocrTesterFixtureSaved =>
-      'Fixture enregistrée dans votre dossier Téléchargements. Déplacez-la sous test/fixtures et exécutez tool/promote_ocr_fixture.dart.';
 
   @override
   String get onboardingObd2StepTitle => 'Connecter votre adaptateur OBD2';

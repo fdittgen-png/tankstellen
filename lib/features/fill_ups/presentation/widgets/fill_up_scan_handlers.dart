@@ -6,7 +6,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_constants.dart';
-import '../../../../core/feedback/github_issue_reporter.dart';
 import '../../../../core/error/guarded.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -47,7 +46,6 @@ class FillUpScanHostState {
   /// Setters for the screen's per-field state. Each setter wraps
   /// `setState`; the helpers never touch widget state directly.
   final void Function(bool) setScanning;
-  final void Function(bool) setScanningPump;
   final void Function(DateTime) setDate;
   final void Function(FuelType) setFuelType;
 
@@ -61,20 +59,13 @@ class FillUpScanHostState {
   /// `await` so we never call setState on a disposed screen.
   final bool Function() isMounted;
 
-  /// Opens the pump-display capture surface — the #1868 in-app camera
-  /// screen with the framing reticle — and returns the capture (photo
-  /// path + the normalized reticle rect the user framed, #2275), or
-  /// null when the user cancels or the camera is unavailable. A seam so
-  /// widget tests can stub the capture.
-  final Future<PumpCaptureResult?> Function(BuildContext) capturePumpImage;
-
   /// ISO country code of the active region, threaded into the OCR so the
   /// per-country validation gate (#2275) can range-check the read. Null
   /// when unknown — the parser then skips range validation.
   final String? activeCountry;
 
-  /// Station brand of the scanned pump, when known — selects the brand
-  /// template (FR/Tokheim pump-display ROIs) in the OCR config.
+  /// Station brand of the scanned receipt, when known — selects
+  /// brand-aware parsing in the OCR config.
   final String? stationBrand;
 
   const FillUpScanHostState({
@@ -84,13 +75,11 @@ class FillUpScanHostState {
     required this.readService,
     required this.writeService,
     required this.setScanning,
-    required this.setScanningPump,
     required this.setDate,
     required this.setFuelType,
     required this.setScannedPricePerLiter,
     required this.setLastScan,
     required this.isMounted,
-    required this.capturePumpImage,
     this.activeCountry,
     this.stationBrand,
   });
@@ -113,8 +102,7 @@ Future<void> runReceiptScan(
       state.writeService(service);
     }
     // #2273 — thread the active country/brand so the parser reads the
-    // receipt in the right currency (GBP/£/p, kr, $ …), mirroring how
-    // the pump path threads them into parsePumpDisplayImage.
+    // receipt in the right currency (GBP/£/p, kr, $ …).
     final outcome = await service.scanReceipt(
       country: state.activeCountry,
       brand: state.stationBrand,
@@ -141,144 +129,6 @@ Future<void> runReceiptScan(
   } finally {
     if (state.isMounted()) state.setScanning(false);
   }
-}
-
-/// Pump-display scan flow (#598). Mirrors [runReceiptScan] but on
-/// failure routes into [PumpScanFailureSheet] (#953) instead of
-/// dropping the photo silently.
-Future<void> runPumpDisplayScan(
-  BuildContext context,
-  FillUpScanHostState state,
-) async {
-  state.setScanningPump(true);
-  final l = AppLocalizations.of(context);
-  try {
-    var service = state.readService();
-    if (service == null) {
-      service = ReceiptScanService();
-      state.writeService(service);
-    }
-    // #1868 — capture through the in-app camera screen (framing
-    // reticle), then OCR + parse the returned photo. #2275 — pass the
-    // reticle ROI so the OCR crops to the framed readout first, and the
-    // active country/brand so the validation gate can range-check.
-    final capture = await state.capturePumpImage(context);
-    if (capture == null || !state.isMounted()) return;
-    final outcome = await service.parsePumpDisplayImage(
-      capture.path,
-      country: state.activeCountry,
-      brand: state.stationBrand,
-      roi: capture.roi,
-    );
-    if (outcome == null || !state.isMounted()) return;
-    // #2275 — an over-glared frame gets a "re-angle" prompt, not the
-    // generic failure sheet: the fix is a different shooting angle.
-    if (outcome.glareRejected) {
-      await state.readService()?.deleteCapturedImage(outcome.imagePath);
-      if (state.isMounted() && context.mounted) {
-        SnackBarHelper.show(context, l.scanPumpGlare);
-      }
-      return;
-    }
-    final result = outcome.parse;
-    switch (pumpScanDispositionFor(result)) {
-      case PumpScanDisposition.unreadable:
-        if (context.mounted) {
-          await _showPumpScanFailureSheet(context, state, outcome);
-        }
-        return;
-      case PumpScanDisposition.inconsistent:
-        // #2828 — the country gate rejected this read (the numbers don't
-        // reconcile, or a value is out of range). Auto-filling here would
-        // silently log a plausible-but-wrong pair, so drop the frame and
-        // ask the user to enter the values manually.
-        await state.readService()?.deleteCapturedImage(outcome.imagePath);
-        if (state.isMounted() && context.mounted) {
-          SnackBarHelper.show(context, l.scanPumpInconsistent);
-        }
-        return;
-      case PumpScanDisposition.autofill:
-        break;
-    }
-    if (result.liters != null) {
-      // i18n-ignore-format: TextEditingController prefill — re-parsed as a dot-decimal number, not display text
-      state.litersCtrl.text = result.liters!.toStringAsFixed(2);
-    }
-    if (result.totalCost != null) {
-      // i18n-ignore-format: TextEditingController prefill — re-parsed as a dot-decimal number, not display text
-      state.costCtrl.text = result.totalCost!.toStringAsFixed(2);
-    }
-    if (state.isMounted() && context.mounted) {
-      SnackBarHelper.show(context, l.scanPumpSuccess);
-    }
-  } catch (e, st) {
-    logFailure(e, st, where: 'runPumpDisplayScan: pump display scan failed');
-    if (state.isMounted() && context.mounted) {
-      SnackBarHelper.showError(context, l.scanPumpFailed(e.toString()));
-    }
-  } finally {
-    if (state.isMounted()) state.setScanningPump(false);
-  }
-}
-
-/// Opens the failure-flow bottom sheet for an unreadable pump-display
-/// scan (#953). The sheet is dismissable; the action the user picks
-/// determines the next step:
-///   - correctManually: close, leave the form untouched.
-///   - report: open [BadScanReportSheet] with [ScanKind.pumpDisplay].
-///   - removePhoto: delete the temp file and forget the scan.
-Future<void> _showPumpScanFailureSheet(
-  BuildContext context,
-  FillUpScanHostState state,
-  PumpDisplayScanOutcome outcome,
-) async {
-  final action = await showModalBottomSheet<PumpScanFailureAction>(
-    context: context,
-    isScrollControlled: true,
-    builder: (_) => const PumpScanFailureSheet(),
-  );
-  if (!state.isMounted()) return;
-  switch (action) {
-    case PumpScanFailureAction.report:
-      if (context.mounted) {
-        await reportBadPumpScan(context, state, outcome);
-      }
-      break;
-    case PumpScanFailureAction.removePhoto:
-      await state.readService()?.deleteCapturedImage(outcome.imagePath);
-      break;
-    case PumpScanFailureAction.correctManually:
-    case null:
-      // Sheet dismissed or "Correct manually" — keep the photo on
-      // disk so the user can still hit "Report scan error" via the
-      // existing affordance below the form. (The button currently
-      // surfaces only for receipt scans; pump-display reports are
-      // accessible via the failure sheet itself.)
-      break;
-  }
-}
-
-/// Opens the [BadScanReportSheet] for a failed pump-display scan
-/// (#953). Pre-fills the entered liters/cost so the GitHub issue
-/// captures the user's typed values alongside the OCR output.
-Future<void> reportBadPumpScan(
-  BuildContext context,
-  FillUpScanHostState state,
-  PumpDisplayScanOutcome outcome,
-) async {
-  final liters = double.tryParse(state.litersCtrl.text.replaceAll(',', '.'));
-  final cost = double.tryParse(state.costCtrl.text.replaceAll(',', '.'));
-  await showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    builder: (_) => BadScanReportSheet(
-      kind: ScanKind.pumpDisplay,
-      pumpScan: outcome,
-      enteredLiters: liters,
-      enteredTotalCost: cost,
-      appVersion: AppConstants.appVersion,
-    ),
-  );
 }
 
 /// Opens the [BadScanReportSheet] for a receipt scan whose values the
