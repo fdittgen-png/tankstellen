@@ -3486,6 +3486,13 @@ class AppLocalizationsEt extends AppLocalizations {
       'Taustaasukoha taotlemine ebaõnnestus';
 
   @override
+  String get aclWakeNotificationTitle => 'Car connected';
+
+  @override
+  String get aclWakeNotificationBody =>
+      'Tap to open Sparkilo — trip recording can start.';
+
+  @override
   String get autoRecordPairAdapterLinkText =>
       'Ühenda adapter allolevas jaotises automaatsalvestamise lubamiseks';
 

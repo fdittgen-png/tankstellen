@@ -3501,6 +3501,13 @@ class AppLocalizationsNl extends AppLocalizations {
       'Achtergrondlocatie kon niet worden aangevraagd';
 
   @override
+  String get aclWakeNotificationTitle => 'Car connected';
+
+  @override
+  String get aclWakeNotificationBody =>
+      'Tap to open Sparkilo — trip recording can start.';
+
+  @override
   String get autoRecordPairAdapterLinkText =>
       'Koppel een adapter in de onderstaande sectie om automatisch opnemen in te schakelen';
 

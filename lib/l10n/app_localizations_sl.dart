@@ -3486,6 +3486,13 @@ class AppLocalizationsSl extends AppLocalizations {
       'Zahtevanje lokacije v ozadju ni uspelo';
 
   @override
+  String get aclWakeNotificationTitle => 'Car connected';
+
+  @override
+  String get aclWakeNotificationBody =>
+      'Tap to open Sparkilo — trip recording can start.';
+
+  @override
   String get autoRecordPairAdapterLinkText =>
       'Sparajte adapter v spodnjem razdelku za omogočanje samodejnega snemanja';
 

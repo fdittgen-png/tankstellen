@@ -3509,6 +3509,13 @@ class AppLocalizationsLv extends AppLocalizations {
       'Nevarēja pieprasīt fona atrašanās vietu';
 
   @override
+  String get aclWakeNotificationTitle => 'Car connected';
+
+  @override
+  String get aclWakeNotificationBody =>
+      'Tap to open Sparkilo — trip recording can start.';
+
+  @override
   String get autoRecordPairAdapterLinkText =>
       'Savienojiet adapteru zemāk esošajā sadaļā, lai iespējotu automātisko ierakstīšanu';
 

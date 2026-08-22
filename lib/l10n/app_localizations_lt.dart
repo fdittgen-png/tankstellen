@@ -3507,6 +3507,13 @@ class AppLocalizationsLt extends AppLocalizations {
       'Nepavyko prašyti foninės vietos';
 
   @override
+  String get aclWakeNotificationTitle => 'Car connected';
+
+  @override
+  String get aclWakeNotificationBody =>
+      'Tap to open Sparkilo — trip recording can start.';
+
+  @override
   String get autoRecordPairAdapterLinkText =>
       'Suporuokite adapterį žemiau esančiame skyriuje, kad įjungtumėte automatinį įrašymą';
 

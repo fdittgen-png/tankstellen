@@ -3513,6 +3513,13 @@ class AppLocalizationsBg extends AppLocalizations {
       'Не може да се поиска фоново местоположение';
 
   @override
+  String get aclWakeNotificationTitle => 'Car connected';
+
+  @override
+  String get aclWakeNotificationBody =>
+      'Tap to open Sparkilo — trip recording can start.';
+
+  @override
   String get autoRecordPairAdapterLinkText =>
       'Сдвоете адаптер в секцията по-долу, за да активирате автоматичния запис';
 

@@ -1032,6 +1032,8 @@
   "autoRecordBackgroundLocationOpenSettings": "⟦Óƥéñ šéŧŧîñǧš ·····⟧",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "⟦Łóçáŧîóñ ƥéřɱîššîóñ řéɋúîřéđ ············⟧",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "⟦Çóúłđ ñóŧ řéɋúéšŧ ƀáçķǧřóúñđ łóçáŧîóñ ···············⟧",
+  "aclWakeNotificationTitle": "⟦Çář çóññéçŧéđ ·····⟧",
+  "aclWakeNotificationBody": "⟦Ŧáƥ ŧó óƥéñ Šƥářķîłó — ŧřîƥ řéçóřđîñǧ çáñ šŧářŧ. ·················⟧",
   "autoRecordPairAdapterLinkText": "⟦Ƥáîř áñ áđáƥŧéř îñ ŧĥé šéçŧîóñ ƀéłóŵ ŧó éñáƀłé áúŧó-řéçóřđîñǧ ·······················⟧",
   "exportBackupReady": "⟦Ɓáçķúƥ řéáđý — ƥîçķ á đéšŧîñáŧîóñ ············⟧",
   "exportBackupFailed": "⟦Ɓáçķúƥ éẋƥóřŧ ƒáîłéđ — ƥłéášé ŧřý áǧáîñ ··············⟧",

@@ -40,6 +40,11 @@ class Obd2ServiceSession {
     });
   }
 
+  /// #3756 — completed non-AT commands of the CURRENT session (0 when
+  /// none attached). The supervisor reads this at drop time for the
+  /// trafficked-ready flap exemption.
+  int get successfulObdSends => _session?.successfulObdSends ?? 0;
+
   /// Detach + dispose. Idempotent.
   void stop() {
     unawaited(_statesSub?.cancel());

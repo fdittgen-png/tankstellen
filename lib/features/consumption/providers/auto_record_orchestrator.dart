@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
+import 'acl_wake_config_mirror.dart';
 import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
 import '../../feature_management/domain/feature_dependency_graph.dart';
@@ -351,6 +352,7 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
     }
     try {
       await entry.coordinator.start();
+      await mirrorAclWakeConfig(ref, entry.armedMac);
     } catch (e, st) {
       // The coordinator already routes its own start failure through
       // errorLogger + AutoRecordTraceLog; the orchestrator's own
@@ -364,6 +366,7 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
   }
 
   Future<void> _stopAndDispose(_OrchestratorEntry entry) async {
+    await clearAclWakeConfig();
     try {
       await entry.coordinator.stop();
     } catch (e, st) {

@@ -37,6 +37,9 @@ class MainActivity : FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        // #3756 — the manifest AdapterWakeReceiver skips its notification
+        // while an engine is alive (the in-process ACL hint owns it).
+        de.tankstellen.tankstellen.autorecord.FlutterEngineLiveness.alive = true
         // Register the in-repo OBD2 Classic BT plugin (#763). Placed
         // here rather than a separate FlutterPlugin class to keep the
         // Android module free of extra Gradle artefacts; the plugin is
@@ -280,5 +283,12 @@ class MainActivity : FlutterActivity() {
 
         /** #3422 — OBD2 wedge-recovery intent bridge (rung 3 + deep-link). */
         private const val OBD2_RECOVERY_CHANNEL = "tankstellen.obd2/recovery"
+    }
+
+    override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        // #3756 — engine gone: the manifest AdapterWakeReceiver takes
+        // over dead-process ACL wakes from here.
+        de.tankstellen.tankstellen.autorecord.FlutterEngineLiveness.alive = false
+        super.cleanUpFlutterEngine(flutterEngine)
     }
 }

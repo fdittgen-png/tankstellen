@@ -258,6 +258,24 @@
             android:name=".TripMediaActionReceiver"
             android:exported="false" />
 
+        <!-- #3756 — dead-process wake on the pinned adapter's ACL connect.
+             ACTION_ACL_CONNECTED is implicit-broadcast-EXEMPT, so this
+             manifest receiver revives the (Flutter-engine-free) process
+             after a background low-memory kill and posts a localized
+             tap-to-record notification. exported=false: the SYSTEM
+             delivers broadcasts regardless of the flag (it only gates
+             third-party senders), so this both satisfies the exported-
+             component security ratchet and closes the spoof vector;
+             the receiver additionally validates the device MAC against
+             the Dart-mirrored pinned adapter. -->
+        <receiver
+            android:name=".autorecord.AdapterWakeReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
+            </intent-filter>
+        </receiver>
+
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

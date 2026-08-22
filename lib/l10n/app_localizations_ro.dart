@@ -3509,6 +3509,13 @@ class AppLocalizationsRo extends AppLocalizations {
       'Nu s-a putut solicita locația în fundal';
 
   @override
+  String get aclWakeNotificationTitle => 'Car connected';
+
+  @override
+  String get aclWakeNotificationBody =>
+      'Tap to open Sparkilo — trip recording can start.';
+
+  @override
   String get autoRecordPairAdapterLinkText =>
       'Asociați un adaptor în secțiunea de mai jos pentru a activa înregistrarea automată';
 

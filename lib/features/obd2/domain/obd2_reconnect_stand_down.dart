@@ -46,6 +46,15 @@ class ReconnectStandDown {
   bool get active =>
       _missStreak >= threshold || _flapStreak >= threshold;
 
+  /// #3756 — true when the streak is made of failures only the USER can
+  /// fix (a lost/rejected Classic bond): the engine-evidence suppression
+  /// must NOT fast-ladder these, or a bond loss mid-drive would re-pop
+  /// the OS pairing dialog on every retry (field 2026-08-17:
+  /// "Obd2PairingRequired x3 — holding 311s" was the CORRECT response).
+  bool get userActionRequired =>
+      _missStreak >= threshold &&
+      _lastMissSignature == 'Obd2PairingRequired';
+
   /// Breadcrumb payload naming WHY the loop stood down.
   String get detail => _flapStreak >= threshold
       ? 'flap x$_flapStreak'
@@ -76,15 +85,25 @@ class ReconnectStandDown {
     _readyAt = _now();
   }
 
+  /// #3756 — non-keepalive OBD commands a dying link must have
+  /// completed for its drop to count as PROOF the link worked (and
+  /// clear the flap streak) even when it died inside [flapWindow]. The
+  /// flap concept targets the corpse-adopt shape (dial → adopt → drop
+  /// with ZERO traffic); a link that answered real PID requests is not
+  /// that shape, and counting it silenced reconnects mid-drive.
+  static const int traffickedSendThreshold = 5;
+
   /// A drop: flap accounting. A ready that died within [flapWindow] is
-  /// a flap; one that survived the window proves the link works and
-  /// clears the streak. Drops with no prior ready leave the streak
-  /// unchanged (the miss streak owns that shape).
-  void noteDrop() {
+  /// a flap; one that survived the window — or that carried real
+  /// traffic ([traffickedSendThreshold]+ completed OBD commands,
+  /// [trafficked]) — proves the link works and clears the streak.
+  /// Drops with no prior ready leave the streak unchanged (the miss
+  /// streak owns that shape).
+  void noteDrop({bool trafficked = false}) {
     final readyAt = _readyAt;
     _readyAt = null;
     if (readyAt == null) return;
-    if (_now().difference(readyAt) < flapWindow) {
+    if (!trafficked && _now().difference(readyAt) < flapWindow) {
       _flapStreak++;
     } else {
       _flapStreak = 0;

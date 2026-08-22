@@ -6353,6 +6353,18 @@ abstract class AppLocalizations {
   /// **'Could not request background location'**
   String get autoRecordBackgroundLocationRequestFailedSnackbar;
 
+  /// #3756 native wake notification title: the pinned OBD2 adapter ACL-connected while the app process was dead (posted by AdapterWakeReceiver.kt from mirrored prefs).
+  ///
+  /// In en, this message translates to:
+  /// **'Car connected'**
+  String get aclWakeNotificationTitle;
+
+  /// #3756 native wake notification body.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to open Sparkilo — trip recording can start.'**
+  String get aclWakeNotificationBody;
+
   /// Passive informational link rendered on the auto-record card when no adapter is paired (#1400). Replaces the duplicate orange-tinted 'Pair an adapter' CTA that lived in the auto-record card before #1400; tapping the link scrolls to the canonical 'OBD2 adapter' card below and pulses its border.
   ///
   /// In en, this message translates to:

@@ -1532,6 +1532,14 @@
   "autoRecordBackgroundLocationOpenSettings": "Einstellungen öffnen",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Standortberechtigung erforderlich",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Hintergrundstandort konnte nicht angefordert werden",
+  "aclWakeNotificationTitle": "Auto verbunden",
+  "@aclWakeNotificationTitle": {
+    "description": "#3756 native wake notification title: the pinned OBD2 adapter ACL-connected while the app process was dead (posted by AdapterWakeReceiver.kt from mirrored prefs)."
+  },
+  "aclWakeNotificationBody": "Tippen, um Sparkilo zu öffnen — die Fahrtaufzeichnung kann starten.",
+  "@aclWakeNotificationBody": {
+    "description": "#3756 native wake notification body."
+  },
   "autoRecordPairAdapterLinkText": "Adapter im Abschnitt unten koppeln, um automatisches Aufzeichnen zu aktivieren",
   "exportBackupReady": "Sicherung bereit – Ziel auswählen",
   "exportBackupFailed": "Sicherungsexport fehlgeschlagen – bitte erneut versuchen",
