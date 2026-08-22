@@ -81,4 +81,50 @@ extension Obd2LinkSupervisorActions on Obd2LinkSupervisor {
       }
     }
   }
+
+  /// A drop or session death reported from below (channels via
+  /// [Obd2LinkDropSignal], the ElmSession dead event via the provider
+  /// wiring). Starts the reconnect loop unless the user or the engine
+  /// parked the supervisor.
+  void notifyDrop(String reason) {
+    if (_disposed) return;
+    // #3756 — read the dying session's traffic BEFORE releasing it: a
+    // link that completed real OBD commands is proof the link works,
+    // not the zero-traffic corpse-adopt shape the flap counter targets.
+    final trafficked = (_service?.sessionSuccessfulObdSends ?? 0) >=
+        ReconnectStandDown.traffickedSendThreshold;
+    _service = null;
+    if (!_mayAutoDial) {
+      debugPrint('Obd2LinkSupervisor: drop ($reason) while parked '
+          '(${_state.value}) — not dialing');
+      return;
+    }
+    _standDown.noteDrop(trafficked: trafficked); // #3603/#3756
+    // #3534 — the per-drop timeline starts here (detect → dial →
+    // recovered); the field-validation checklist reads this chain out
+    // of the breadcrumb export after an induced-drop drive.
+    BreadcrumbCollector.add('OBD2 link drop', detail: reason);
+    _setState(Obd2LinkState.reconnecting);
+    // Dial immediately on the first drop; backoff grows only on misses.
+    if (_attemptInFlight == null && _backoffTimer == null) {
+      if (_standDown.active && !inStandDown) {
+        // #3756 — the streaks WOULD stand down, but fresh engine
+        // evidence overrides: keep the fast ladder. One breadcrumb so
+        // field exports show the suppression working.
+        BreadcrumbCollector.add(
+          'OBD2 stand-down suppressed',
+          detail: 'engine evidence fresh — ${_standDown.detail}',
+        );
+      }
+      if (inStandDown) {
+        // #3603 — success-flap stand-down: the instant redial is what
+        // burned 20 dial→adopt→drop cycles in the field. Hold the
+        // storm cadence until a ready survives or the user acts.
+        _armBackoffTimer();
+        return;
+      }
+      _backoff.reset();
+      unawaited(_attempt(userInitiated: false));
+    }
+  }
 }

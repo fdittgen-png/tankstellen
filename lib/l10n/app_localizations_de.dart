@@ -3507,6 +3507,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Hintergrundstandort konnte nicht angefordert werden';
 
   @override
+  String get aclWakeNotificationTitle => 'Auto verbunden';
+
+  @override
+  String get aclWakeNotificationBody =>
+      'Tippen, um Sparkilo zu öffnen — die Fahrtaufzeichnung kann starten.';
+
+  @override
   String get autoRecordPairAdapterLinkText =>
       'Adapter im Abschnitt unten koppeln, um automatisches Aufzeichnen zu aktivieren';
 

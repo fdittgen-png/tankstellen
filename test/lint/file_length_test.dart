@@ -557,8 +557,11 @@ void main() {
     // the in-session ATSP0 + 0100 + ATDPN recovery for the
     // UNABLE-TO-CONNECT livelock (2026-07-13 field trip).
     'lib/features/obd2/data/session/obd2_service.dart': (
-      lines: 1357,
-      bumps: 14,
+      // #3756 — re-grandfathered 1357 → 1370: engine-evidence stamps on
+      // the parsed speed/rpm paths + the session traffic-counter getter
+      // (the stand-down suppression seam).
+      lines: 1370,
+      bumps: 15,
       decompositionIssue: 3540,
     ),
     // #2428 — re-grandfathered 1235 → 1241: the recoverable VIN-read catch

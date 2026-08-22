@@ -11,6 +11,7 @@ import '../../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../transport/obd2_link_drop_signal.dart';
 import '../../domain/obd2_link_state.dart';
 import '../../domain/obd2_reconnect_stand_down.dart';
+import '../../domain/obd2_engine_evidence.dart';
 import 'obd2_service.dart';
 
 export '../../domain/obd2_link_state.dart';
@@ -58,7 +59,9 @@ class Obd2LinkSupervisor {
     Duration stormBackoff = const Duration(minutes: 5),
     Random? jitter,
     DateTime Function()? now,
+    Obd2EngineEvidence? engineEvidence,
   })  : _dial = dial,
+        _engineEvidence = engineEvidence ?? Obd2EngineEvidence.instance,
         _standDown = ReconnectStandDown(now: now ?? DateTime.now),
         _backoff = ReconnectBackoff(
           initial: initialBackoff,
@@ -72,6 +75,9 @@ class Obd2LinkSupervisor {
 
   final Obd2LinkDialer _dial;
   final ReconnectStandDown _standDown;
+
+  /// #3756 — engine-on recency stamped by successful engine-PID parses.
+  final Obd2EngineEvidence _engineEvidence;
   final ReconnectBackoff _backoff;
 
   final ValueNotifier<Obd2LinkState> _state =
@@ -117,7 +123,15 @@ class Obd2LinkSupervisor {
 
   /// #3603 — true while the loop holds the storm cadence (telemetry /
   /// banner copy).
-  bool get inStandDown => _standDown.active;
+  /// #3756 — the EFFECTIVE stand-down: the #3603 streaks hold the storm
+  /// cadence only while there is no fresh engine evidence — a link that
+  /// drops mid-drive keeps the fast ladder; the 5–15 min holds belong
+  /// to the parked-car shape. EXCEPTION: a pairing-required streak
+  /// always stands down (user action needed; fast-laddering would spam
+  /// the OS pairing dialog mid-drive).
+  bool get inStandDown =>
+      _standDown.active &&
+      (_standDown.userActionRequired || !_engineEvidence.isFresh());
 
   /// User/policy-initiated connect. Clears the disconnect intent, exits
   /// any parked state, and dials now. Joins the in-flight attempt if
@@ -150,7 +164,7 @@ class Obd2LinkSupervisor {
     if (_disposed) return Future<Obd2Service?>.value();
     if (automated) {
       if (!_mayAutoDial) return Future<Obd2Service?>.value();
-      if (_standDown.active) {
+      if (inStandDown) {
         // Keep the hold: make sure a timer exists, but never dial now.
         if (_attemptInFlight == null && _backoffTimer == null) {
           _armBackoffTimer();
@@ -178,37 +192,6 @@ class Obd2LinkSupervisor {
     await _release(dead, 'disconnect');
   }
 
-  /// A drop or session death reported from below (channels via
-  /// [Obd2LinkDropSignal], the ElmSession dead event via the provider
-  /// wiring). Starts the reconnect loop unless the user or the engine
-  /// parked the supervisor.
-  void notifyDrop(String reason) {
-    if (_disposed) return;
-    _service = null;
-    if (!_mayAutoDial) {
-      debugPrint('Obd2LinkSupervisor: drop ($reason) while parked '
-          '(${_state.value}) — not dialing');
-      return;
-    }
-    _standDown.noteDrop(); // #3603 — flap accounting
-    // #3534 — the per-drop timeline starts here (detect → dial →
-    // recovered); the field-validation checklist reads this chain out
-    // of the breadcrumb export after an induced-drop drive.
-    BreadcrumbCollector.add('OBD2 link drop', detail: reason);
-    _setState(Obd2LinkState.reconnecting);
-    // Dial immediately on the first drop; backoff grows only on misses.
-    if (_attemptInFlight == null && _backoffTimer == null) {
-      if (_standDown.active) {
-        // #3603 — success-flap stand-down: the instant redial is what
-        // burned 20 dial→adopt→drop cycles in the field. Hold the
-        // storm cadence until a ready survives or the user acts.
-        _armBackoffTimer();
-        return;
-      }
-      _backoff.reset();
-      unawaited(_attempt(userInitiated: false));
-    }
-  }
 
 
   /// The single intent gate (research rule 7): auto-dialing is allowed

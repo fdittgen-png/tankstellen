@@ -68,10 +68,16 @@ class ElmSession {
   ElmSession(
     this._transport, {
     List<String>? initSequence,
-    this.staleAfter = const Duration(seconds: 15),
-    this.keepaliveIdle = const Duration(seconds: 7),
+    // #3756 — reliability-first liveness cadence: the previous
+    // 7 s-idle keepalive on a 2.5 s tick allowed up to ~9.5 s of link
+    // silence, losing the race against cheap adapters' auto-sleep
+    // timers; every sleep-kill then fed the #3603 flap counter. One
+    // tiny ATRV per ~4 s idle is negligible traffic, and the tighter
+    // stale bound turns a dead link around faster.
+    this.staleAfter = const Duration(seconds: 12),
+    this.keepaliveIdle = const Duration(seconds: 4),
     this.deadAfterConsecutiveTimeouts = 3,
-    Duration watchdogTick = const Duration(seconds: 2, milliseconds: 500),
+    Duration watchdogTick = const Duration(seconds: 1, milliseconds: 500),
     DateTime Function()? now,
   })  : _initSequence = initSequence ?? defaultInitSequence,
         _watchdogTick = watchdogTick,
@@ -108,6 +114,10 @@ class ElmSession {
   DateTime? _lastAliveAt;
   int _consecutiveTimeouts = 0;
   int _consecutiveGarbage = 0;
+  int _successfulObdSends = 0;
+
+  /// #3756 — completed non-AT commands over this session's lifetime.
+  int get successfulObdSends => _successfulObdSends;
   bool _recoveryInFlight = false;
   bool _keepaliveInFlight = false;
   bool _disposed = false;
@@ -203,6 +213,11 @@ class ElmSession {
       _consecutiveGarbage = 0;
       return reply;
     }
+    // #3756 — count completed OBD (non-AT) commands: the supervisor
+    // reads this at drop time to tell a trafficked link (real proof it
+    // worked) from the zero-traffic corpse-adopt flap shape. Keepalive
+    // ATRVs are AT commands and deliberately never count.
+    _successfulObdSends++;
     switch (classifyObd2Response(reply)) {
       case ResponseClass.ok:
       case ResponseClass.noData:

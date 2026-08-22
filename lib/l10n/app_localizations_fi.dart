@@ -3489,6 +3489,13 @@ class AppLocalizationsFi extends AppLocalizations {
       'Taustasijainnin pyytäminen epäonnistui';
 
   @override
+  String get aclWakeNotificationTitle => 'Car connected';
+
+  @override
+  String get aclWakeNotificationBody =>
+      'Tap to open Sparkilo — trip recording can start.';
+
+  @override
   String get autoRecordPairAdapterLinkText =>
       'Paritetaan sovitin alla olevassa osiossa automaattisen tallennuksen ottamiseksi käyttöön';
 

@@ -3486,6 +3486,13 @@ class AppLocalizationsSv extends AppLocalizations {
       'Kunde inte begära bakgrundsplats';
 
   @override
+  String get aclWakeNotificationTitle => 'Car connected';
+
+  @override
+  String get aclWakeNotificationBody =>
+      'Tap to open Sparkilo — trip recording can start.';
+
+  @override
   String get autoRecordPairAdapterLinkText =>
       'Para ihop en adapter i avsnittet nedan för att aktivera autoinspelning';
 

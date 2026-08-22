@@ -5393,5 +5393,15 @@
   "@contentModerationBlockedSnack": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "aclWakeNotificationTitle": "Car connected",
+  "@aclWakeNotificationTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "aclWakeNotificationBody": "Tap to open Sparkilo — trip recording can start.",
+  "@aclWakeNotificationBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

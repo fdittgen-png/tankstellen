@@ -3511,6 +3511,13 @@ class AppLocalizationsHu extends AppLocalizations {
       'Nem sikerült háttéres helyadatot kérni';
 
   @override
+  String get aclWakeNotificationTitle => 'Car connected';
+
+  @override
+  String get aclWakeNotificationBody =>
+      'Tap to open Sparkilo — trip recording can start.';
+
+  @override
   String get autoRecordPairAdapterLinkText =>
       'Párosítson adaptert az alábbi szakaszban az automatikus rögzítés engedélyezéséhez';
 

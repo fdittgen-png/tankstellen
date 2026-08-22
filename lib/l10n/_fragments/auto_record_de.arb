@@ -13,5 +13,13 @@
   "autoRecordBackgroundLocationRationaleBody": "Die automatische Aufzeichnung erfasst GPS-Koordinaten über den OBD-II-Vordergrunddienst, auch wenn der Bildschirm aus ist, damit deine Streckenführung korrekt bleibt. Android verlangt dafür die Option \"Immer erlauben\" — sonst stoppt die Standortabfrage, sobald das Gerät gesperrt wird.",
   "autoRecordBackgroundLocationOpenSettings": "Einstellungen öffnen",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Standortberechtigung erforderlich",
-  "autoRecordBackgroundLocationRequestFailedSnackbar": "Hintergrundstandort konnte nicht angefordert werden"
+  "autoRecordBackgroundLocationRequestFailedSnackbar": "Hintergrundstandort konnte nicht angefordert werden",
+  "aclWakeNotificationTitle": "Auto verbunden",
+  "@aclWakeNotificationTitle": {
+    "description": "#3756 native wake notification title: the pinned OBD2 adapter ACL-connected while the app process was dead (posted by AdapterWakeReceiver.kt from mirrored prefs)."
+  },
+  "aclWakeNotificationBody": "Tippen, um Sparkilo zu öffnen — die Fahrtaufzeichnung kann starten.",
+  "@aclWakeNotificationBody": {
+    "description": "#3756 native wake notification body."
+  }
 }

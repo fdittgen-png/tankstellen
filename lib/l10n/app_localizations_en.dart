@@ -3473,6 +3473,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Could not request background location';
 
   @override
+  String get aclWakeNotificationTitle => 'Car connected';
+
+  @override
+  String get aclWakeNotificationBody =>
+      'Tap to open Sparkilo — trip recording can start.';
+
+  @override
   String get autoRecordPairAdapterLinkText =>
       'Pair an adapter in the section below to enable auto-recording';
 
@@ -11318,6 +11325,13 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get autoRecordBackgroundLocationRequestFailedSnackbar =>
       '⟦Çóúłđ ñóŧ řéɋúéšŧ ƀáçķǧřóúñđ łóçáŧîóñ ···············⟧';
+
+  @override
+  String get aclWakeNotificationTitle => '⟦Çář çóññéçŧéđ ·····⟧';
+
+  @override
+  String get aclWakeNotificationBody =>
+      '⟦Ŧáƥ ŧó óƥéñ Šƥářķîłó — ŧřîƥ řéçóřđîñǧ çáñ šŧářŧ. ·················⟧';
 
   @override
   String get autoRecordPairAdapterLinkText =>

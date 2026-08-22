@@ -2089,6 +2089,14 @@
   "@autoRecordBackgroundLocationRequestFailedSnackbar": {
     "description": "Snackbar shown when the permission request itself threw an exception. Replaces the previous silent debugPrint catch (#1302)."
   },
+  "aclWakeNotificationTitle": "Car connected",
+  "@aclWakeNotificationTitle": {
+    "description": "#3756 native wake notification title: the pinned OBD2 adapter ACL-connected while the app process was dead (posted by AdapterWakeReceiver.kt from mirrored prefs)."
+  },
+  "aclWakeNotificationBody": "Tap to open Sparkilo — trip recording can start.",
+  "@aclWakeNotificationBody": {
+    "description": "#3756 native wake notification body."
+  },
   "autoRecordPairAdapterLinkText": "Pair an adapter in the section below to enable auto-recording",
   "@autoRecordPairAdapterLinkText": {
     "description": "Passive informational link rendered on the auto-record card when no adapter is paired (#1400). Replaces the duplicate orange-tinted 'Pair an adapter' CTA that lived in the auto-record card before #1400; tapping the link scrolls to the canonical 'OBD2 adapter' card below and pulses its border."

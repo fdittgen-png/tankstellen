@@ -14,6 +14,7 @@ import '../transport/bluetooth_obd2_transport.dart';
 import '../protocol/elm327_adapter.dart';
 import '../protocol/elm327_precision_pids.dart';
 import '../protocol/elm327_protocol.dart';
+import '../../domain/obd2_engine_evidence.dart';
 import '../../domain/fuel_rate_estimator.dart' as estimator;
 import '../negotiated_protocol_cache.dart';
 import '../transport/obd2_atpc_teardown.dart';
@@ -121,6 +122,11 @@ class Obd2Service implements Obd2RawCommandPort, Obd2FuelRateReads {
   /// through the connection layer (test fakes / direct transport
   /// construction).
   String? adapterMac;
+
+  /// #3756 — completed non-AT commands of the current protocol session
+  /// (the supervisor's trafficked-ready flap exemption reads this at
+  /// drop time).
+  int get sessionSuccessfulObdSends => _session.successfulObdSends;
 
   /// Friendly device name advertised by the adapter (#1312). Falls
   /// back to the registry's display name when the BLE advertisement
@@ -831,6 +837,9 @@ class Obd2Service implements Obd2RawCommandPort, Obd2FuelRateReads {
       final value = Elm327Protocol.parseVehicleSpeed(response);
       _pids.noteMode01Reply(Elm327Protocol.vehicleSpeedCommand, response,
           parsed: value != null); // #3532
+      // #3756 — a PARSED road speed only comes from an awake ECU:
+      // stamp the engine-on evidence the stand-down suppression reads.
+      if (value != null) Obd2EngineEvidence.instance.noteEngineOn();
       return value;
     } catch (e, st) {
       recordObd2ReadFailure(e, st, where: 'OBD2 readSpeed failed'); // #2855
@@ -914,6 +923,10 @@ class Obd2Service implements Obd2RawCommandPort, Obd2FuelRateReads {
       final value = Elm327Protocol.parseEngineRpm(response);
       _pids.noteMode01Reply(Elm327Protocol.engineRpmCommand, response,
           parsed: value != null); // #3532
+      // #3756 — rpm > 0 = the engine is literally turning.
+      if (value != null && value > 0) {
+        Obd2EngineEvidence.instance.noteEngineOn();
+      }
       return value;
     } catch (e, st) {
       recordObd2ReadFailure(e, st, where: 'OBD2 readRpm failed'); // #2855

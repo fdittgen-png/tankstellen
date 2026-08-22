@@ -3512,6 +3512,13 @@ class AppLocalizationsEl extends AppLocalizations {
       'Αδύνατη αίτηση τοποθεσίας παρασκηνίου';
 
   @override
+  String get aclWakeNotificationTitle => 'Car connected';
+
+  @override
+  String get aclWakeNotificationBody =>
+      'Tap to open Sparkilo — trip recording can start.';
+
+  @override
   String get autoRecordPairAdapterLinkText =>
       'Συζεύξτε έναν προσαρμογέα στην παρακάτω ενότητα για ενεργοποίηση αυτόματης καταγραφής';
 

@@ -197,7 +197,7 @@ final class AutoRecordOrchestratorProvider
 }
 
 String _$autoRecordOrchestratorHash() =>
-    r'6d03f40d2f3f4fb22c1cd1e463ae29b72daf873e';
+    r'72ef77f8d610b6b369fb78b8fb551a869cfd4031';
 
 /// Production wiring for the hands-free auto-record flow (#1004 phase 2b-3).
 ///
