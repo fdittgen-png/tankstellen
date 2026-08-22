@@ -100,7 +100,10 @@ void main() {
     'lib/features/fill_ups/domain/services/monthly_insights_aggregator.dart': 2,
     'lib/features/trips/domain/services/motion_gate.dart': 1,
     'lib/features/charging/presentation/screens/add_charging_log_screen.dart': 3,
-    'lib/features/fill_ups/presentation/screens/add_fill_up_screen.dart': 3,
+    // #3762 — add_fill_up_screen.dart's 3 raw reads moved verbatim into its
+    // `part` mixins (a file split, not new reads — net count unchanged).
+    'lib/features/fill_ups/presentation/screens/add_fill_up_screen_form_state.dart': 1,
+    'lib/features/fill_ups/presentation/screens/add_fill_up_screen_save.dart': 2,
     'lib/features/trips/presentation/screens/trip_detail_screen.dart': 1,
     'lib/features/trips/presentation/screens/trip_recording_screen.dart': 3,
     'lib/features/driving_score/presentation/widgets/driving_analysis_trace_card.dart': 1,
@@ -108,7 +111,13 @@ void main() {
     'lib/features/fill_ups/presentation/widgets/edit_correction_fill_up_sheet.dart': 1,
     'lib/features/trips/presentation/widgets/trajets_tab.dart': 1,
     'lib/features/charging/providers/charging_charts_provider.dart': 2,
-    'lib/features/fill_ups/providers/consumption_providers.dart': 6,
+    // #3762 — consumption_providers.dart kept 3 raw reads; the other 3 moved
+    // verbatim into its `part` mixins (a file split, not new reads — net
+    // count unchanged).
+    'lib/features/fill_ups/providers/consumption_providers.dart': 3,
+    'lib/features/fill_ups/providers/consumption_providers_calibration.dart': 1,
+    'lib/features/fill_ups/providers/consumption_providers_reconcile.dart': 1,
+    'lib/features/fill_ups/providers/consumption_providers_windows.dart': 1,
     'lib/features/trips/providers/gps_only_recording_pipeline.dart': 4,
     'lib/features/trips/providers/gps_only_trip_wal.dart': 2,
     'lib/features/trips/providers/live_activity_provider.dart': 1,
@@ -116,7 +125,12 @@ void main() {
     'lib/features/trips/providers/recording_lifecycle_marks_recorder.dart': 1,
     'lib/features/fill_ups/providers/tank_level_provider.dart': 1,
     'lib/features/trips/providers/trip_gps_stream_controller.dart': 1,
-    'lib/features/trips/providers/trip_recording_provider.dart': 10,
+    // #3760 decomposition: 10 reads split 2/1/2/5 across the part-file
+    // mixins — a move, not a widening (total unchanged).
+    'lib/features/trips/providers/trip_recording_provider.dart': 2,
+    'lib/features/trips/providers/trip_recording_provider_lifecycle.dart': 1,
+    'lib/features/trips/providers/trip_recording_provider_persist.dart': 2,
+    'lib/features/trips/providers/trip_recording_provider_snapshot.dart': 5,
     'lib/features/ev/data/services/fr_irve_price_service.dart': 2,
     'lib/features/ev/data/services/open_charge_map_service.dart': 1,
     'lib/features/favorites/presentation/screens/favorites_screen.dart': 2,

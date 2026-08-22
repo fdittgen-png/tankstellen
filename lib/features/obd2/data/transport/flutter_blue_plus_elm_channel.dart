@@ -23,30 +23,8 @@ import 'obd2_pairing_mode.dart';
 import 'obd2_platform_budgets.dart';
 import '../../../../core/logging/error_logger.dart';
 
-/// Standard SPP-over-BLE UUIDs exposed by Vgate vLinker and most
-/// ELM327 BLE clones (Nordic UART Service variant used by the
-/// adapter firmware). If the adapter in front of you doesn't match
-/// these, pass your own via [ble327ServiceUuid] / [writeCharUuid] /
-/// [notifyCharUuid].
-class Elm327BleUuids {
-  final Guid service;
-  final Guid writeChar;
-  final Guid notifyChar;
-
-  const Elm327BleUuids({
-    required this.service,
-    required this.writeChar,
-    required this.notifyChar,
-  });
-
-  /// Defaults observed on real vLinker FS / FD / MC adapters + most
-  /// BLE ELM327 clones.
-  static final vgate = Elm327BleUuids(
-    service: Guid('0000fff0-0000-1000-8000-00805f9b34fb'),
-    writeChar: Guid('0000fff2-0000-1000-8000-00805f9b34fb'),
-    notifyChar: Guid('0000fff1-0000-1000-8000-00805f9b34fb'),
-  );
-}
+part 'flutter_blue_plus_elm_channel_connect.dart';
+part 'flutter_blue_plus_elm_channel_gatt.dart';
 
 /// [ElmByteChannel] backed by flutter_blue_plus. Connects to a single
 /// [BluetoothDevice], discovers the ELM327 service, enables notifies
@@ -57,6 +35,12 @@ class Elm327BleUuids {
 /// It is untested on iOS — flutter_blue_plus is cross-platform but
 /// iOS BLE ELM adapters are rare; add iOS-specific handling when the
 /// app starts supporting them.
+///
+/// The connect / discovery / session-teardown bodies live in the
+/// `flutter_blue_plus_elm_channel_connect.dart` and
+/// `flutter_blue_plus_elm_channel_gatt.dart` parts (sanctioned #3760
+/// decomposition — move-only, behaviour preserved); the thin instance
+/// methods here stay virtually dispatchable for the test fakes.
 class FlutterBluePlusElmChannel with Obd2ChannelAbandonLatch
     implements ElmByteChannel, Obd2LinkTuner, Obd2GattRecoverable {
   /// #2969 — bound the scan-path `connect()` (the `connectTimeout == null`
@@ -118,7 +102,11 @@ class FlutterBluePlusElmChannel with Obd2ChannelAbandonLatch
 
   BluetoothCharacteristic? _writeChar;
   BluetoothCharacteristic? _notifyChar;
+  // Cancelled in the `flutter_blue_plus_elm_channel_gatt.dart` part's
+  // close/teardown paths (the lint can't see across part files).
+  // ignore: cancel_subscriptions
   StreamSubscription<List<int>>? _subscription;
+  // ignore: cancel_subscriptions — cancelled in the same part teardown.
   StreamSubscription<BluetoothConnectionState>? _connStateSubscription;
 
   /// #3179 — NOT final: [close] closes the broadcast controller, and the
@@ -194,28 +182,9 @@ class FlutterBluePlusElmChannel with Obd2ChannelAbandonLatch
 
   /// Push the typed disconnect onto the byte stream so the transport's
   /// in-flight `sendCommand` completer fails fast with a classified error
-  /// instead of waiting out the read timeout (#2261 concern 1).
-  void _onDropConfirmed() {
-    // #2466 — a debounce-CONFIRMED drop is a real mid-session link loss; count
-    // it (gated). Raw `disconnected` edges that self-heal inside the debounce
-    // are binned separately below as `raw-edge-drop`.
-    final diag = Obd2CommDiagnostics.instance;
-    if (diag.enabled) diag.noteConnectionEvent(drop: true);
-    // #3019 / Epic #3013 phase 3 — PROACTIVE drop signal. A debounce-confirmed
-    // BLE drop is a real link loss; emit the transport-agnostic link-drop
-    // signal so reconnect starts immediately (even idle / no command in
-    // flight). Suppressed during a deliberate [close] (`_closing`).
-    if (!_closing && !_dropSignalled) {
-      _dropSignalled = true;
-      Obd2LinkDropSignal.instance.notifyDrop(
-        transportKind: 'ble',
-        mac: _device.remoteId.str,
-        reason: 'ble-disconnect-edge', // #3346
-      );
-    }
-    if (_incoming.isClosed) return;
-    _incoming.addError(const Obd2DisconnectedException());
-  }
+  /// instead of waiting out the read timeout (#2261 concern 1). Body in
+  /// [_onDropConfirmedImpl] (#3760 part).
+  void _onDropConfirmed() => _onDropConfirmedImpl(this);
 
   @override
   bool get isOpen => _open;
@@ -223,176 +192,19 @@ class FlutterBluePlusElmChannel with Obd2ChannelAbandonLatch
   @override
   Stream<List<int>> get incoming => _incoming.stream;
 
+  /// Connect + discover + subscribe, wrapped with the gated
+  /// connect-lifecycle diagnostics tee (#2466) and the #2969 channel-open
+  /// outcome stamping. Body in [_openChannel] (#3760 part).
   @override
-  Future<void> open() async {
-    if (_open) return;
-    // #3244 — a preempt-abandoned channel is TERMINAL: never re-dial it
-    // (thrown before any trace stamping — see Obd2ChannelAbandonLatch).
-    throwIfAbandoned();
-    // #3179 — make the channel safely RE-openable. The transport's open-retry
-    // loop (#2906/#3014) and the reconnect path call close() + open() on the
-    // SAME instance; close() closed `_incoming` and latched `_closing`, and
-    // neither was ever undone — the "recovered" link was a zombie. Reset the
-    // deliberate-close + drop-signal latches and, when a prior close() closed
-    // the controller, recreate it + rebuild the disposed debouncer.
-    _closing = false;
-    _dropSignalled = false;
-    if (_incoming.isClosed) {
-      _incoming = StreamController<List<int>>.broadcast();
-      _dropDebouncer = ConnectionDropDebouncer(
-        debounce: _dropDebounce,
-        onConfirmed: _onDropConfirmed,
-      );
-    }
-    // #2466 — gated comm-diagnostics connect-lifecycle tee. A no-op unless
-    // `Feature.debugMode` armed the collector; each call early-returns on
-    // `!enabled`, so production pays one cached-bool read per event.
-    final diag = Obd2CommDiagnostics.instance;
-    final connectSw = diag.enabled ? (Stopwatch()..start()) : null;
-    if (diag.enabled) diag.noteConnectionEvent(attempt: true);
-    try {
-      await _connectAndDiscover();
-      // ignore: catch_no_st — rethrow-only: the original stack is preserved by rethrow
-    } catch (e) {
-      if (diag.enabled) {
-        diag.noteConnectionEvent(
-          failureReason: classifyBleConnectFailure(e),
-        );
-      }
-      // #2969 correction 3 — stamp the channel-open outcome on the active
-      // connect trace where the REAL FBP/StateError is in hand
-      // (Obd2Service.connect swallows it into a generic false). FIRST-wins, so
-      // the wrong-transport gattTimeout outlives the scan fallback's scanEmpty.
-      // #3244 — but NEVER from an abandoned zombie: by the time its hung open
-      // finally throws, `active` may already be the NEW holder's root trace.
-      if (!isAbandoned) {
-        Obd2ConnectTraceLog.stampOpenFailure(
-            classifyBleOpenOutcome(e), e.toString());
-      }
-      rethrow;
-    }
-    if (connectSw != null) {
-      connectSw.stop();
-      diag.noteConnectionEvent(
-        success: true,
-        timeToConnectMs: connectSw.elapsedMilliseconds,
-      );
-    }
-  }
-
-  /// The connect → service-discovery → notify-subscribe body of [open],
-  /// extracted so [open] can wrap it with the gated connect-lifecycle
-  /// diagnostics tee (#2466) without interleaving counters through the calls.
-  ///
-  /// #3014 — split into [connectDevice] (the FBP connect dispatch incl. the
-  /// scan-before-connect seed) and [discoverAndBind] (discovery + property
-  /// match + notify), both `@protected @visibleForTesting`, so the connect
-  /// ordering and discovery can be driven without a BLE stack (FBP's
-  /// `BluetoothService`/`BluetoothCharacteristic.properties` are not
-  /// constructible in a test — the pure [resolveElmGatt] matcher carries the
-  /// property-matching coverage, and these seams carry the ordering coverage).
-  Future<void> _connectAndDiscover() async {
-    // #3184 — stage-tag the pre-discover phases. The trace previously
-    // recorded NOTHING between `scan-seed` and the AT lines, so a connect
-    // dying in discover/setNotify was indistinguishable from one that
-    // never got a GATT link. Each step carries its elapsed ms.
-    final sw = Stopwatch()..start();
-    await connectDevice();
-    Obd2ConnectTraceLog.active?.addStep(
-      label: 'gatt-connect-ok',
-      status: Obd2ConnectStepStatus.ok,
-      latencyMs: sw.elapsedMilliseconds,
-    );
-    Obd2ConnectTraceLog.active?.addStep(
-      label: 'discover-start',
-      status: Obd2ConnectStepStatus.ok,
-      detail: 'budget ${_discoverTimeoutSecs}s',
-    );
-    await discoverAndBind();
-    // #2261 concern 1 — subscribe to the connection-state stream so a real
-    // disconnect is noticed in ~1–2 s. The first emission is the current state
-    // (`connected`); the debouncer ignores `connected` edges, so this is a
-    // no-op until the link actually drops.
-    _dropDebouncer.reset();
-    bindConnectionState();
-    _open = true;
-    // #2261 concern 4 — a freshly-opened ACTIVE link is a recording link: ask
-    // for high throughput (priority + best-effort MTU). Skipped on the passive
-    // autoConnect path (FBP forbids requestMtu; a parked-car wait wants low
-    // power). Best-effort: any rejection is swallowed.
-    if (!_autoConnect) {
-      await tuneForRecording();
-    }
-  }
+  Future<void> open() => _openChannel(this);
 
   /// #3014 — the FBP connect dispatch, including the scan-before-connect seed
   /// on the cold direct path. `@protected @visibleForTesting` so a test can
   /// drive the scan-then-connect ordering (FBP `device.connect` is not fakeable
-  /// otherwise). Production behaviour is exactly the per-path connect below.
+  /// otherwise). Body in [_connectDeviceImpl] (#3760 part).
   @protected
   @visibleForTesting
-  Future<void> connectDevice() async {
-    // #3182 — wait (bounded, best-effort) for `adapterState == on` before ANY
-    // connect dispatch. FBP's darwin side creates the CBCentralManager lazily
-    // in the first method call and instantly rejects a connect issued while
-    // it still reports `unknown` — so a cold-launch direct connect failed
-    // spuriously on iOS. On timeout the connect proceeds, so a genuinely-off
-    // adapter still surfaces through the existing error classification.
-    await waitForAdapterOn();
-    final timeout = _connectTimeout;
-    if (_autoConnect) {
-      // #2261 concern 2 — passive autoConnect GATT wait. No bounded timeout:
-      // the OS keeps a low-power background connection request that resolves
-      // the moment the adapter advertises again. requestMtu forbidden with
-      // autoConnect:true, so `mtu: null`.
-      await rawConnect(autoConnect: true, mtu: null);
-      return;
-    }
-    if (timeout == null) {
-      // #2969 — bound the scan-path open (was UNBOUNDED): FBP's
-      // `autoConnect:false` connect can otherwise block ~35 s on a candidate the
-      // scan saw but that has since vanished, freezing the connect (and any
-      // self-test / first-connect riding it). A miss now fails fast.
-      await rawConnect(
-          autoConnect: false, mtu: null, timeout: _scanPathConnectTimeout);
-      return;
-    }
-    // Direct-by-MAC path (#2242). Tear down any stale GATT client FIRST —
-    // Android returns GATT_ERROR 133 if a prior (dropped-but-not-closed)
-    // connection is still open, silently forcing a fall back to the scan
-    // path. disconnect() is idempotent (no-op when nothing is connected).
-    try {
-      await _device.disconnect();
-    } catch (e, _) {
-      // Best-effort pre-connect teardown of a stale GATT client. The connect
-      // below proceeds regardless — a failure here is RECOVERABLE and
-      // routine, never an error trace (#2379). Debug-only.
-      assert(() {
-        debugPrint('FlutterBluePlusElmChannel: pre-connect dead-GATT teardown '
-            'failed (proceeding): $e');
-        return true;
-      }(), 'debug-only breadcrumb — the closure always returns true');
-    }
-    // #3014 — SCAN-BEFORE-CONNECT (the single highest-leverage SmartOBD fix).
-    // Run a brief TARGETED scan for this MAC FIRST so Android holds a fresh
-    // scan-result handle before the cold `connect(autoConnect:false)`.
-    // Connecting to a raw MAC with no fresh handle is the textbook GATT-133 /
-    // 15 s timeout trap — discovery is never reached. The seed `stopScan`s
-    // before returning (fbp serializes BLE ops behind a global mutex, so a
-    // scan still winding down on the radio deadlocks the connect). A scan
-    // MISS is recorded but still proceeds to the bounded connect (the adapter
-    // may be reachable even if the brief scan missed it, and the connect is
-    // bounded so a miss fails fast → the service's scan / passive fallback).
-    await _runScanSeed();
-    // The explicit ~4 s timeout is LOAD-BEARING: FBP's
-    // autoConnect:false connect can otherwise block ~35 s.
-    // #3014 — ask for a larger MTU DURING connect on the bounded direct path
-    // (was the FBP default 512, which Android negotiates down anyway): a
-    // single round-trip negotiation beats a separate post-discovery
-    // requestMtu on a flaky clone link. `tuneForRecording` still requests it
-    // post-discovery as the fallback for clones that reject the in-connect ask.
-    await rawConnect(autoConnect: false, timeout: timeout, mtu: _preferredMtu);
-  }
+  Future<void> connectDevice() => _connectDeviceImpl(this);
 
   /// #3014 — the single raw FBP `device.connect` call, behind a `@protected`
   /// `@visibleForTesting` seam (the [writeRaw] precedent). A test overrides this
@@ -411,37 +223,6 @@ class FlutterBluePlusElmChannel with Obd2ChannelAbandonLatch
           : _device.connect(
               autoConnect: autoConnect, mtu: mtu, timeout: timeout);
 
-  /// #3014 — run the injected scan-before-connect seed (best-effort) and stamp
-  /// the outcome as a trace step. Exposed for the connect-ordering test to
-  /// observe via [debugScanSeedRan].
-  Future<void> _runScanSeed() async {
-    final seed = _scanSeed;
-    if (seed == null) return;
-    bool sawMac = false;
-    try {
-      sawMac = await seed();
-      // best-effort pre-warm; the message is enough, the stack adds nothing.
-      // ignore: catch_no_st
-    } catch (e) {
-      // A failing seed must never block the connect — it is a best-effort
-      // pre-warm. Proceed to the bounded connect regardless.
-      assert(() {
-        debugPrint('FlutterBluePlusElmChannel: scan-seed failed '
-            '(proceeding to connect): $e');
-        return true;
-      }(), 'debug-only breadcrumb — the closure always returns true');
-    }
-    _debugScanSeedRan = true;
-    _debugScanSeedSawMac = sawMac;
-    Obd2ConnectTraceLog.active?.addStep(
-      label: 'scan-seed',
-      status: sawMac ? Obd2ConnectStepStatus.ok : Obd2ConnectStepStatus.timeout,
-      detail: sawMac
-          ? 'targeted scan saw the MAC — fresh handle'
-          : 'targeted scan missed the MAC — connecting cold',
-    );
-  }
-
   bool _debugScanSeedRan = false;
   bool _debugScanSeedSawMac = false;
 
@@ -458,171 +239,19 @@ class FlutterBluePlusElmChannel with Obd2ChannelAbandonLatch
   /// (registry UUIDs as a first-priority hint), bind the chars + enable notify.
   /// `@protected @visibleForTesting` so a test can stub it out when driving
   /// [connectDevice] in isolation (the real FBP discovery is not fakeable).
+  /// Body in [_discoverAndBindImpl] (#3760 part).
   @protected
   @visibleForTesting
-  Future<void> discoverAndBind() async {
-    // #3014 — bound discoverServices on its own short budget (FBP default 15 s)
-    // so a clone whose GATT table never resolves fails in ~5 s as `gattTimeout`,
-    // not a 15 s hang.
-    // #3182 — the budget is now FBP's OWN `timeout:` parameter, not an outer
-    // Dart `.timeout()`: the outer form fired OUR TimeoutException at the
-    // budget but left FBP's GLOBAL per-device mutex held for the full 15 s
-    // default, serializing (deadlocking) every retry that followed. FBP's
-    // native timeout releases the mutex at our budget; its
-    // FlutterBluePlusException ("Timed out after Ns") still classifies as
-    // `gattTimeout` (see classifyBleOpenOutcome).
-    final services =
-        await _device.discoverServices(timeout: _discoverTimeoutSecs);
-    // #3014 — property-based discovery: adapt FBP services into the pure
-    // descriptor shape, then resolve the write+notify pair by characteristic
-    // PROPERTY across the known ELM families, with the registry UUIDs as a
-    // first-priority exact hint. This is what makes an HM-10-class clone
-    // (SmartOBD, FFE0 service / single dual-mode FFE1 char) connect — the old
-    // exact-UUID `firstWhere`-or-throw on FFF0/FFF2/FFF1 threw a StateError on
-    // any non-FFF0 layout.
-    final descriptors = _toDescriptors(services);
-    final resolved = resolveElmGatt(
-      descriptors,
-      hintServiceUuid: _uuids.service.str,
-      hintWriteCharUuid: _uuids.writeChar.str,
-      hintNotifyCharUuid: _uuids.notifyChar.str,
-    );
-    if (resolved == null) {
-      // No usable writable+notifiable pair on ANY discovered service. Log the
-      // device's ACTUAL layout into the trace so the maintainer can confirm a
-      // clone's real service/char/property table from the next capture (#3014).
-      final layout = describeGattLayout(descriptors);
-      Obd2ConnectTraceLog.active?.addStep(
-        label: 'gatt-discover',
-        status: Obd2ConnectStepStatus.fail,
-        detail: layout,
-      );
-      throw StateError(
-        'BLE device ${_device.remoteId.str} exposes no ELM327 service with a '
-        'writable + notifiable characteristic pair — discovered: $layout',
-      );
-    }
-    // #3014 — one-time success layout step (the maintainer asked to see the real
-    // SmartOBD layout). Records WHICH service/chars were picked and HOW.
-    Obd2ConnectTraceLog.active?.addStep(
-      label: 'gatt-discover',
-      status: Obd2ConnectStepStatus.ok,
-      detail: 'matched ${resolved.matchReason}: '
-          'svc=${resolved.serviceUuid} w=${resolved.writeCharUuid} '
-          'n=${resolved.notifyCharUuid}',
-    );
-    final service = services.firstWhere(
-      (s) => s.uuid.str.toLowerCase() == resolved.serviceUuid.toLowerCase(),
-    );
-    _writeChar = service.characteristics.firstWhere(
-      (c) => c.uuid.str.toLowerCase() == resolved.writeCharUuid.toLowerCase(),
-    );
-    _notifyChar = service.characteristics.firstWhere(
-      (c) => c.uuid.str.toLowerCase() == resolved.notifyCharUuid.toLowerCase(),
-    );
-    // #3014 — bound setNotifyValue on its own short budget too.
-    // #3182 — via FBP's own `timeout:` (mutex released at our budget; the
-    // outer Dart `.timeout()` left it held up to 15 s — see above).
-    // #3181 — through [enableNotify]: a FIRST-connect deviceId gets the
-    // generous pairing budget (the CX pairs via this very subscribe).
-    await enableNotify();
-    _subscription = _notifyChar!.lastValueStream.listen(
-      handleNotifyBytes,
-      onError: (Object e, StackTrace st) {
-        // #2900 — a mid-session disconnect can surface here too (the GATT/ATT
-        // stack errors the notify stream when the adapter drops). Clear the
-        // session and forward the RECLASSIFIED recoverable disconnect (not the
-        // raw FBP/GATT error) so the transport's completer fails fast AND the
-        // drop detector sees a typed disconnect — never an ERROR trace. A
-        // genuine non-disconnect error keeps its #2295 behaviour (below).
-        if (isBleAdapterDisconnect(e)) {
-          // #2907 — FULL session teardown on a confirmed drop (was clearing
-          // only `_open`/`_writeChar`, leaving stale notify state behind).
-          _clearSessionOnDrop();
-          if (!_incoming.isClosed) {
-            _incoming.addError(
-              const Obd2DisconnectedException(
-                'FlutterBluePlusElmChannel: notify stream dropped — '
-                'adapter not connected',
-              ),
-              st,
-            );
-          }
-          return;
-        }
-        // #2295 — forward the error so the transport's pending `sendCommand`
-        // completer fails IMMEDIATELY instead of waiting out the read timeout.
-        if (!_incoming.isClosed) _incoming.addError(e, st);
-        // OBD2/BLE GATT/ATT error → `other` ("not yet classified", #2379).
-        // Kept logged: a real link drop worth seeing in release triage.
-        unawaited(errorLogger.log(ErrorLayer.other, e, st,
-            context: const {'where': 'FlutterBluePlusElmChannel notify error'}));
-      },
-    );
-  }
+  Future<void> discoverAndBind() => _discoverAndBindImpl(this);
 
   /// #3181 — enable notifications on the resolved CCCD, with the
-  /// FIRST-CONNECT pairing budget. The OBDLink CX initiates BLE pairing
-  /// via this very subscribe: on a never-bonded phone `setNotifyValue`
-  /// blocks on the OS pairing dialog, and the steady-state budget (iOS
-  /// 7 s / Android 4 s) clipped the human tap. A deviceId in
-  /// [Obd2PairingMode] first-connect mode gets
-  /// [Obd2PairingMode.firstConnectSetNotifySecs] instead, the
-  /// `pairing-wait` trace step is stamped (#3184), and the
-  /// [Obd2PairingMode.pairingWaitPending] flag drives the "confirm the
-  /// pairing request" UI hint while the subscribe is in flight.
-  ///
-  /// A failure that classifies as pairing ([classifySetNotifyFailure] —
-  /// explicit auth/encryption/bond errors on any connect, or a timeout on
-  /// a first connect) is rethrown as the TYPED [Obd2PairingRequired] so
-  /// the transport's open-retry loop does NOT tear the link down and
-  /// re-dial mid-pairing, and the UI can show the power-cycle guidance.
-  ///
-  /// `@protected @visibleForTesting` so the budget selection + pairing
-  /// classification are drivable without a BLE stack (via [rawSetNotify]).
+  /// FIRST-CONNECT pairing budget (the OBDLink CX pairs via this very
+  /// subscribe). `@protected @visibleForTesting` so the budget selection +
+  /// pairing classification are drivable without a BLE stack (via
+  /// [rawSetNotify]). Body in [_enableNotifyImpl] (#3760 part).
   @protected
   @visibleForTesting
-  Future<void> enableNotify() async {
-    final deviceId = _device.remoteId.str;
-    final firstConnect = Obd2PairingMode.isFirstConnect(deviceId);
-    final notifySecs = Obd2PairingMode.setNotifyBudgetSecsFor(
-      deviceId,
-      platformDefaultSecs: _setNotifyTimeoutSecs,
-    );
-    // #3184 — stage-tag the subscribe so a persisted trace shows WHERE a
-    // failed connect died (set-notify was previously invisible).
-    Obd2ConnectTraceLog.active?.addStep(
-      label: 'set-notify-start',
-      status: Obd2ConnectStepStatus.ok,
-      detail: 'budget ${notifySecs}s',
-    );
-    if (firstConnect) {
-      Obd2ConnectTraceLog.active?.addStep(
-        label: 'pairing-wait',
-        status: Obd2ConnectStepStatus.ok,
-        detail: 'first connect — OS pairing dialog may be pending; '
-            'budget ${notifySecs}s (#3181)',
-      );
-      Obd2PairingMode.notePairingWaitStarted();
-    }
-    try {
-      await rawSetNotify(notifySecs);
-      // classification-only binding; the original stack is preserved by
-      // rethrow and the typed wrap carries the raw toString.
-      // ignore: catch_no_st
-    } catch (e) {
-      final outcome = classifySetNotifyFailure(e, firstConnect: firstConnect);
-      if (outcome == Obd2ConnectOutcome.pairingRequired) {
-        throw Obd2PairingRequired(
-            'BLE pairing did not complete during setNotify '
-            '(firstConnect: $firstConnect) — power-cycle the adapter and '
-            'retry within 5 minutes: $e');
-      }
-      rethrow;
-    } finally {
-      if (firstConnect) Obd2PairingMode.notePairingWaitEnded();
-    }
-  }
+  Future<void> enableNotify() => _enableNotifyImpl(this);
 
   /// The raw CCCD subscribe behind a `@protected @visibleForTesting` seam
   /// (the [writeRaw] precedent) so [enableNotify]'s budget selection and
@@ -664,52 +293,7 @@ class FlutterBluePlusElmChannel with Obd2ChannelAbandonLatch
   /// stream.)
   @protected
   @visibleForTesting
-  void bindConnectionState() => _bindConnectionState();
-
-  void _bindConnectionState() {
-    _connStateSubscription = _device.connectionState.listen(
-      (state) {
-        final disconnected = state == BluetoothConnectionState.disconnected;
-        // #2466 — a raw `disconnected` EDGE (before the debouncer confirms it)
-        // is binned as a recoverable transient: most edges self-heal inside the
-        // supervision window. Counted only while the debouncer is idle so one
-        // drop episode is one tally. Gated; no-op unless Feature.debugMode.
-        if (disconnected) {
-          final diag = Obd2CommDiagnostics.instance;
-          if (diag.enabled && !_dropDebouncer.isPending) {
-            diag.noteConnectionEvent(failureReason: 'raw-edge-drop');
-          }
-        }
-        _dropDebouncer.noteConnectionState(disconnected: disconnected);
-      },
-      onError: (Object e, StackTrace st) {
-        debugPrint('FlutterBluePlusElmChannel connectionState error: $e');
-      },
-    );
-  }
-
-  /// #3014 — adapt the discovered FBP [BluetoothService]s into the pure
-  /// [GattServiceDescriptor] shape the platform-free [resolveElmGatt] matcher
-  /// consumes. Reads each characteristic's GATT properties so the matcher can
-  /// pick write/notify by capability rather than exact UUID.
-  static List<GattServiceDescriptor> _toDescriptors(
-          List<BluetoothService> services) =>
-      [
-        for (final s in services)
-          GattServiceDescriptor(
-            uuid: s.uuid.str,
-            characteristics: [
-              for (final c in s.characteristics)
-                GattCharDescriptor(
-                  uuid: c.uuid.str,
-                  write: c.properties.write,
-                  writeWithoutResponse: c.properties.writeWithoutResponse,
-                  notify: c.properties.notify,
-                  indicate: c.properties.indicate,
-                ),
-            ],
-          ),
-      ];
+  void bindConnectionState() => _bindConnectionStateImpl(this);
 
   @override
   Future<void> tuneForRecording() =>
@@ -720,71 +304,17 @@ class FlutterBluePlusElmChannel with Obd2ChannelAbandonLatch
       const BleLinkTuner().tuneForBackground(_device);
 
   /// #3014 — best-effort drop of the native Android GATT service cache between
-  /// connect retries on a GATT_ERROR 133 (a cache-poisoned device). FBP's
-  /// `clearGattCache` is the Android-only hidden-API `BluetoothGatt.refresh()`
-  /// shim; it throws `androidOnly` off Android and can throw on an OEM that
-  /// blocks the reflection — both are swallowed (the retry proceeds regardless).
-  /// Never throws (#1103): the transport calls this on the failure path where
-  /// any escape would mask the real connect error.
+  /// connect retries on a GATT_ERROR 133 (a cache-poisoned device). Never
+  /// throws (#1103): the transport calls this on the failure path where any
+  /// escape would mask the real connect error. Body in
+  /// [_refreshGattCacheImpl] (#3760 part).
   @override
-  Future<void> refreshGattCache() async {
-    try {
-      await _device.clearGattCache();
-      // best-effort OEM-variable reflection; swallowed so a refresh failure
-      // can't mask the real connect error on the retry.
-      // ignore: catch_no_st
-    } catch (e) {
-      // OEM-variable / non-Android — best-effort only. Debug-only breadcrumb.
-      assert(() {
-        debugPrint('FlutterBluePlusElmChannel: clearGattCache best-effort '
-            'failed (proceeding with retry): $e');
-        return true;
-      }(), 'debug-only breadcrumb — the closure always returns true');
-    }
-  }
+  Future<void> refreshGattCache() => _refreshGattCacheImpl(this);
 
+  /// Write [bytes] to the resolved write characteristic, with the #2900
+  /// drop reclassification. Body in [_writeChannel] (#3760 part).
   @override
-  Future<void> write(List<int> bytes) async {
-    final char = _writeChar;
-    if (char == null) {
-      // #2900 — the session was cleared by a confirmed drop (the catch below,
-      // or a notify-stream error). Surface the recoverable typed disconnect —
-      // NOT a raw StateError — so `_isTypedDisconnect` routes a post-drop write
-      // through pause/reconnect and `recordObd2ReadFailure` de-noises it to a
-      // breadcrumb, mirroring [ClassicElmChannel.write]'s `!_open` guard.
-      throw const Obd2DisconnectedException(
-        'FlutterBluePlusElmChannel: not open',
-      );
-    }
-    // withoutResponse lets the adapter write as fast as BLE allows.
-    try {
-      await writeRaw(char, bytes);
-    } catch (e, st) {
-      // #2261 concern 1 — a write failure WHILE a disconnect edge is pending
-      // confirms the drop immediately; a lone failure on a live link is a
-      // debouncer no-op. #2466 — bin it as a recoverable transient (gated).
-      final diag = Obd2CommDiagnostics.instance;
-      if (diag.enabled) diag.noteConnectionEvent(failureReason: 'write-fail');
-      _dropDebouncer.noteCommandFailure();
-      // #2900 — a drop landing DURING the BLE write makes FBP throw a raw
-      // disconnect exception ([isBleAdapterDisconnect]) that, left unwrapped,
-      // [TripDropDetector] didn't recognise (error-log #23, 25×). Reclassify
-      // into the recoverable [Obd2DisconnectedException] (the #2671 / #2524
-      // precedents) and clear the session so the next write short-circuits.
-      if (isBleAdapterDisconnect(e)) {
-        // #2907 — full session teardown on a write-time drop (was clearing
-        // only `_open`/`_writeChar`), so a reconnect's open() starts clean.
-        _clearSessionOnDrop();
-        debugPrint('FlutterBluePlusElmChannel: write failed — reclassifying '
-            'as a recoverable disconnect (#2900): $e\n$st');
-        throw const Obd2DisconnectedException(
-          'FlutterBluePlusElmChannel: write failed — adapter not connected',
-        );
-      }
-      // A genuine non-disconnect BLE error still surfaces unchanged.
-      rethrow;
-    }
-  }
+  Future<void> write(List<int> bytes) => _writeChannel(this, bytes);
 
   /// The raw characteristic write, behind a [protected] [visibleForTesting]
   /// seam so a fault-injection test can drive [write]'s #2900 reclassification
@@ -827,42 +357,9 @@ class FlutterBluePlusElmChannel with Obd2ChannelAbandonLatch
       _subscription != null ||
       _connStateSubscription != null;
 
-  /// #2907 — fully clear per-session BLE state the instant a drop is confirmed
-  /// (notify-stream error / write failure) so a subsequent [open] starts
-  /// clean. Used to clear only `_open`/`_writeChar`, leaving `_notifyChar` +
-  /// both subscriptions dangling for the next open to double-wire. Cancels
-  /// fire-and-forget: it can run INSIDE the notify subscription's own
-  /// `onError`, where awaiting its own cancellation would deadlock. `_incoming`
-  /// is NOT closed here — [close] owns that.
-  void _clearSessionOnDrop() {
-    _open = false;
-    _writeChar = null;
-    _notifyChar = null;
-    unawaited(_subscription?.cancel());
-    _subscription = null;
-    unawaited(_connStateSubscription?.cancel());
-    _connStateSubscription = null;
-  }
-
+  /// Deliberate teardown: cancel subscriptions, disconnect the GATT client
+  /// and close the broadcast controller. Body in [_closeChannel] (#3760
+  /// part).
   @override
-  Future<void> close() async {
-    _closing = true;
-    _open = false;
-    _dropDebouncer.dispose();
-    await _connStateSubscription?.cancel();
-    _connStateSubscription = null;
-    await _subscription?.cancel();
-    _subscription = null;
-    try {
-      await _device.disconnect();
-    } catch (e, st) {
-      // OBD2/BLE layer, not local storage (#2379).
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'FlutterBluePlusElmChannel: disconnect failed'}));
-    }
-    // #2295 — close the broadcast controller (symmetry with
-    // ClassicElmChannel.close()) so it doesn't leak across a reconnect.
-    if (!_incoming.isClosed) await _incoming.close();
-    _writeChar = null;
-    _notifyChar = null;
-  }
+  Future<void> close() => _closeChannel(this);
 }

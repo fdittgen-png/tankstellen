@@ -20,6 +20,8 @@ import 'obd2_speed_stream.dart';
 // keep compiling unchanged.
 export 'auto_trip_contracts.dart';
 
+part 'auto_trip_coordinator_events.dart';
+
 /// Coordinates the hands-free auto-record state machine: BLE connect
 /// → OBD2 session opens → speed PID polled → start trip on
 /// threshold-cross → BLE disconnect (debounced) → stop and save
@@ -158,8 +160,8 @@ class AutoTripCoordinator {
     linkSupervisor: linkSupervisor,
     speedStreamFactory: speedStreamFactory,
     startTrip: startTrip,
-    onSpeedSample: _onSpeedSample,
-    onLinkDrop: _onDisconnected,
+    onSpeedSample: (kmh) => _onSpeedSample(this, kmh),
+    onLinkDrop: () => _onDisconnected(this),
     shouldAbandonOpen: () => !_started || _tripActive,
     clearTripActive: () => _tripActive = false,
   );
@@ -251,7 +253,8 @@ class AutoTripCoordinator {
       );
       return;
     }
-    _adapterSub = listener.events.listen(_onAdapterEvent);
+    _adapterSub =
+        listener.events.listen((event) => _onAdapterEvent(this, event));
   }
 
   /// Stop watching, cancel any pending disconnect timer, close any
@@ -302,66 +305,6 @@ class AutoTripCoordinator {
     }
   }
 
-  void _onAdapterEvent(BackgroundAdapterEvent event) {
-    // MAC filter — multi-vehicle support. A second paired car sharing
-    // the same listener (phase 2b may centralise the bridge) would
-    // emit events for an unrelated MAC; we drop them silently rather
-    // than risk auto-recording the wrong car's drive.
-    if (event.mac != config.mac) {
-      AutoRecordTraceLog.add(
-        switch (event) {
-          AdapterConnected() =>
-            AutoRecordEventKind.adapterConnectIgnoredOtherMac,
-          AdapterDisconnected() =>
-            AutoRecordEventKind.adapterDisconnectIgnoredOtherMac,
-        },
-        mac: event.mac,
-      );
-      return;
-    }
-
-    switch (event) {
-      case AdapterConnected():
-        AutoRecordTraceLog.add(
-          AutoRecordEventKind.adapterConnected,
-          mac: event.mac,
-        );
-        // Fire-and-forget — opening the OBD2 session is async (BLE
-        // scan + ELM327 init can take seconds) but the caller of
-        // `_onAdapterEvent` is a stream callback that must return
-        // synchronously. Errors are funnelled through `errorLogger`
-        // inside `_onConnected` so the subscription stays alive.
-        unawaited(_onConnected());
-      case AdapterDisconnected():
-        AutoRecordTraceLog.add(
-          AutoRecordEventKind.adapterDisconnected,
-          mac: event.mac,
-        );
-        unawaited(_onDisconnected());
-    }
-  }
-
-  Future<void> _onConnected() async {
-    // Reconnect within the disconnect-save window: cancel the timer
-    // and let the existing trip continue. We still re-open the OBD2
-    // session because the previous one died with the disconnect.
-    _debouncer.cancelIfPending();
-    _consecutiveSupraThreshold = 0;
-    await _watch.stopWatching();
-    // Close any orphan session from a prior connect cycle defensively
-    // — under normal flow the held session is null here because the
-    // disconnect path either handed it off (trip active) or closed
-    // it (no trip). Double-close is cheap on a disconnected service.
-    await _watch.closeSessionIfHeld();
-
-    // If a trip is already active (hand-off happened on a previous
-    // connect), the recorder owns the session and we don't need to
-    // open a new one — speed sampling is the recorder's job now.
-    if (_tripActive) return;
-
-    await _watch.openAndWatch(sessionOpener);
-  }
-
   /// Foreground-active arming fallback (#2282 concern 1).
   ///
   /// While the app is resumed and auto-record is on, the disabled
@@ -392,7 +335,7 @@ class AutoTripCoordinator {
         mac: config.mac,
         detail: 'held session is dead — tearing down before re-arm',
       );
-      await _onDisconnected();
+      await _onDisconnected(this);
     }
     // Already watching (session held) or recording — nothing to arm.
     if (_tripActive || _watch.hasOpenSession || _watch.isWatching) {
@@ -411,60 +354,5 @@ class AutoTripCoordinator {
     // Prefer the direct opener; fall back to the scan opener so a caller
     // that only wired one still arms.
     await _watch.openAndWatch(foregroundSessionOpener ?? sessionOpener);
-  }
-
-  Future<void> _onDisconnected() async {
-    // Stop counting movement samples — the OBD2 session is gone, no
-    // more speed will arrive until the adapter reappears.
-    _consecutiveSupraThreshold = 0;
-    await _watch.stopWatching();
-    // Close any orphan session if no trip is active. When a trip IS
-    // active the recorder owns the session, so we leave its
-    // pause-on-drop logic to handle teardown.
-    if (!_tripActive) {
-      await _watch.closeSessionIfHeld();
-    } else {
-      // A trip is active: ownership has already moved to the recorder
-      // on the threshold-cross hand-off, so the held session should
-      // already be null here. Defensive null-out covers the edge case
-      // where a test bypasses the hand-off.
-      _watch.takeSession();
-    }
-    _debouncer.arm();
-  }
-
-  void _onSpeedSample(double kmh) {
-    if (_tripActive) return;
-    if (kmh > config.movementStartThresholdKmh) {
-      _consecutiveSupraThreshold++;
-      AutoRecordTraceLog.add(
-        AutoRecordEventKind.speedSampleSupraThreshold,
-        mac: config.mac,
-        detail:
-            'speed=${kmh.toStringAsFixed(1)} kmh, '
-            'count=$_consecutiveSupraThreshold/$consecutiveSamplesWindow',
-      );
-    } else {
-      _consecutiveSupraThreshold = 0;
-      AutoRecordTraceLog.add(
-        AutoRecordEventKind.speedSampleSubThreshold,
-        mac: config.mac,
-        detail: 'speed=${kmh.toStringAsFixed(1)} kmh',
-      );
-    }
-    if (_consecutiveSupraThreshold >= consecutiveSamplesWindow) {
-      AutoRecordTraceLog.add(
-        AutoRecordEventKind.thresholdCrossed,
-        mac: config.mac,
-        detail: 'speed=${kmh.toStringAsFixed(1)} kmh',
-      );
-      _tripActive = true;
-      _consecutiveSupraThreshold = 0;
-      // Fire-and-forget — the coordinator's contract is "we observed
-      // movement, the provider knows what to do". Errors are logged
-      // through `errorLogger` rather than re-thrown into the speed
-      // stream, where they'd kill the subscription.
-      unawaited(_watch.handOffAndStartTrip(kmh));
-    }
   }
 }

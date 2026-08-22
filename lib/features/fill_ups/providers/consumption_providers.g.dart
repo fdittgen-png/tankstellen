@@ -310,7 +310,7 @@ final class BrokenMapBeliefByVehicleProvider
 }
 
 String _$brokenMapBeliefByVehicleHash() =>
-    r'e24a8c787a677ab5d83511c3e08f0994cc35177b';
+    r'71c88cb42b8e1b5a779e523225437a962a7f27e1';
 
 /// Holds the most recent per-vehicle [BrokenMapBelief] (#1423 phase 3).
 ///
@@ -469,7 +469,7 @@ final class FillUpListProvider
   }
 }
 
-String _$fillUpListHash() => r'd6434bb1948b5981249985f9f336e923f376c1a6';
+String _$fillUpListHash() => r'40ce45a13c8b174fd356103ca59650ff25504a23';
 
 /// Mutable list of all fill-ups, newest first.
 
