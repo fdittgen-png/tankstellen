@@ -19,6 +19,7 @@ import '../../consumption/api.dart'
         tripSummaryFromJson,
         tripSummaryToJson;
 import '../../consumption/domain/trip_recorder.dart';
+import 'active_trip_sample_wal.dart';
 import 'paused_trip_repository.dart';
 import '../../../core/logging/error_logger.dart';
 
@@ -192,7 +193,14 @@ class ActiveTripSnapshot {
 class ActiveTripRepository {
   final Box<String> _box;
 
-  ActiveTripRepository({required Box<String> box}) : _box = box;
+  /// #3758 — append-only sample WAL. When present, [saveSnapshot]
+  /// persists META ONLY (the samples live in the NDJSON file, written
+  /// once each) and [loadSnapshot] transparently merges them back, so
+  /// the recovery services see the exact pre-#3758 contract.
+  final ActiveTripSampleWal? sampleWal;
+
+  ActiveTripRepository({required Box<String> box, this.sampleWal})
+      : _box = box;
 
   /// Hive box name used by the production wiring. Matches
   /// `HiveBoxes.obd2ActiveTrip`.
@@ -214,9 +222,18 @@ class ActiveTripRepository {
   /// payloads stay inline because the ~10 ms isolate hand-off dominates.
   Future<void> saveSnapshot(ActiveTripSnapshot snapshot) async {
     try {
-      final json = snapshot.toJson();
+      // #3758 — with the sample WAL attached, the Hive row carries meta
+      // only: the samples were already appended once each, so the 5 s
+      // flush is O(1) instead of re-serializing the whole growing list
+      // (the ~40 min crash ramp: past 2,000 samples the old path ALSO
+      // spawned a compute() isolate per flush).
+      final wal = sampleWal;
+      final effective = wal == null || !wal.isWritable
+          ? snapshot
+          : snapshot.copyWith(samples: const []);
+      final json = effective.toJson();
       final encoded =
-          snapshot.samples.length > kTripSaveComputeSampleThreshold
+          effective.samples.length > kTripSaveComputeSampleThreshold
               ? await compute(jsonEncode, json)
               : jsonEncode(json);
       await _box.put(_singletonKey, encoded);
@@ -241,11 +258,28 @@ class ActiveTripRepository {
     }
   }
 
+  /// #3758 — [loadSnapshot] plus the WAL samples merged back in. The
+  /// recovery services use this so a post-crash snapshot carries the
+  /// full sample history (the old WAL lost everything since the last
+  /// 5 s flush; the NDJSON loses at most a torn final line).
+  Future<ActiveTripSnapshot?> loadSnapshotWithSamples() async {
+    final meta = loadSnapshot();
+    if (meta == null) return null;
+    final wal = sampleWal;
+    if (wal == null || meta.samples.isNotEmpty) return meta;
+    final samples = await wal.readAll();
+    if (samples.isEmpty) return meta;
+    return meta.copyWith(samples: samples);
+  }
+
   /// Drop the active snapshot. Called on `stop()` / `reset()` so
   /// the recovery service doesn't surface a phantom on next launch.
   Future<void> clearSnapshot() async {
     try {
+      // Row first: it is the recovery gate callers observe; the file
+      // cleanup follows (order also keeps pre-#3758 caller timing).
       await _box.delete(_singletonKey);
+      await sampleWal?.clear();
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'ActiveTripRepository.clearSnapshot'}));
     }

@@ -106,7 +106,9 @@ class ActiveTripRecoveryService {
   Future<ActiveTripRecoveryOutcome> recover() async {
     final ActiveTripSnapshot? snapshot;
     try {
-      snapshot = _activeRepo.loadSnapshot();
+      // #3758 — meta row + append-WAL samples merged back (identical
+      // contract to the old fat snapshot, better durability).
+      snapshot = await _activeRepo.loadSnapshotWithSamples();
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'ActiveTripRecoveryService loadSnapshot failed'}));
       return ActiveTripRecoveryOutcome.failed;

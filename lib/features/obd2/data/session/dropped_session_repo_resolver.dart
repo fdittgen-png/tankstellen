@@ -9,6 +9,7 @@ import '../../../../core/logging/error_logger.dart';
 import '../../../../core/storage/hive_boxes.dart';
 import '../../../consumption/data/trip_history_repository.dart';
 import '../active_trip_repository.dart';
+import '../active_trip_sample_wal.dart';
 import 'dropped_session_host.dart';
 import '../paused_trip_repository.dart';
 
@@ -71,6 +72,7 @@ class DroppedSessionRepoResolver {
     if (!Hive.isBoxOpen(ActiveTripRepository.boxName)) return null;
     try {
       return ActiveTripRepository(
+        sampleWal: ActiveTripSampleWal.instance,
         box: Hive.box<String>(ActiveTripRepository.boxName),
       );
     } catch (e, st) {

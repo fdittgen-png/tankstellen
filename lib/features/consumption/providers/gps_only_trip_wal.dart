@@ -41,11 +41,15 @@ class GpsOnlyTripWal {
   DateTime? _lastFlushAt;
   int _sinceFlush = 0;
 
+  /// #3758 — samples already streamed to the append-only WAL.
+  int _walWrittenCount = 0;
+
   ActiveTripRepository? _repo() {
     if (_repoOverride != null) return _repoOverride;
     if (!Hive.isBoxOpen(ActiveTripRepository.boxName)) return null;
     try {
       return ActiveTripRepository(
+          sampleWal: ActiveTripSampleWal.instance,
           box: Hive.box<String>(ActiveTripRepository.boxName));
     } on Object {
       return null;
@@ -65,6 +69,9 @@ class GpsOnlyTripWal {
     _vehicleId = vehicleId;
     _lastFlushAt = null;
     _sinceFlush = 0;
+    // #3758 — fresh trip, fresh append-only sample WAL.
+    _walWrittenCount = 0;
+    unawaited(_repo()?.sampleWal?.openFresh());
     _write(const [], _zeroSummary, force: true);
   }
 
@@ -98,6 +105,16 @@ class GpsOnlyTripWal {
     if (repo == null) return;
     _lastFlushAt = DateTime.now();
     _sinceFlush = 0;
+    // #3758 — new samples once each into the append WAL; the snapshot
+    // row below shrinks to meta-only via the repo.
+    final wal = repo.sampleWal;
+    if (wal != null) {
+      for (var i = _walWrittenCount; i < samples.length; i++) {
+        wal.append(samples[i]);
+      }
+      _walWrittenCount =
+          _walWrittenCount > samples.length ? _walWrittenCount : samples.length;
+    }
     unawaited(repo.saveSnapshot(ActiveTripSnapshot(
       id: id,
       vehicleId: _vehicleId,
