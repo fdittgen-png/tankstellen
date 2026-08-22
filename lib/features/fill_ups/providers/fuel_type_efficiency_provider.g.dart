@@ -97,4 +97,4 @@ final class FuelTypeEfficiencyComparisonProvider
 }
 
 String _$fuelTypeEfficiencyComparisonHash() =>
-    r'faf065883d386d67d73c549b8eb922004badccf6';
+    r'9ef10b1a0a3f227ef2f8a9dda495a018a6d23d9a';

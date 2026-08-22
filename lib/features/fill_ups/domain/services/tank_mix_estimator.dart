@@ -111,12 +111,31 @@ class TankMixEstimate {
 TankMixEstimate? estimateTankMix({
   required VehicleProfile vehicle,
   required List<FillUp> fillUps,
+}) =>
+    estimateTankMixForCapacity(
+      tankCapacityL: vehicle.tankCapacityL,
+      fillUps: fillUps,
+    );
+
+/// Capacity-parameterised core of [estimateTankMix] (#3764).
+///
+/// Identical model, but takes the tank capacity directly instead of a
+/// [VehicleProfile] — the only profile fact the chain consumes. This lets
+/// pure aggregation code (no profile in scope) replay the mix chain over a
+/// PREFIX of the fill history to obtain "the mix as of fill N": passing the
+/// fills up to and including a given fill returns the estimated tank
+/// composition right after that fill (`asOf` = that fill's date). The
+/// per-fuel efficiency aggregator uses exactly that to price an interval's
+/// carried-over opening content (ADR 0015 v3).
+TankMixEstimate? estimateTankMixForCapacity({
+  required double? tankCapacityL,
+  required List<FillUp> fillUps,
 }) {
   final physical = fillUps.where((f) => !f.isCorrection).toList()
     ..sort((a, b) => a.date.compareTo(b.date));
   if (physical.isEmpty) return null;
 
-  final capacity = vehicle.tankCapacityL;
+  final capacity = tankCapacityL;
   final avgLPer100Km =
       fillAnchoredAvgLPer100Km(fillUps)?.avgLPer100Km ?? _defaultAvgLPer100Km;
 

@@ -322,6 +322,21 @@ void main() {
       expect(e10.avgL100km, closeTo(30 / 600 * 100, 1e-9));
     });
 
+    test('v2 tests above pass NO tankCapacityL — v3 (#3764) is opt-in, so '
+        'every legacy assertion is unchanged and each interval is marked '
+        'legacy-attributed', () {
+      final fills = [
+        _f(id: 'a', date: _d(1), liters: 40, cost: 60, odo: 0,
+            fuelType: FuelType.e85),
+        _f(id: 'b', date: _d(2), liters: 30, cost: 45, odo: 600,
+            fuelType: FuelType.e85),
+      ];
+      final result = FuelTypeEfficiencyAggregator.byFuelType(fills);
+      expect(result.single.attributedIntervalCount, 1);
+      expect(result.single.legacyAttributedIntervalCount, 1,
+          reason: 'no capacity → contributing-fills-only fallback, marked');
+    });
+
     test('result is sorted by €/km ascending across buckets', () {
       // Pure E85 @ 0.10 €/km, pure E10 @ ~0.13 €/km → E85 sorts first.
       final fills = [
@@ -337,6 +352,155 @@ void main() {
       final result = FuelTypeEfficiencyAggregator.byFuelType(fills);
       expect(result.first.label, 'E85');
       expect(result.last.label, 'E10');
+    });
+  });
+
+  // ── v3 (#3764, ADR 0015 v3 amendment) — carried-content composition ──
+  //
+  // With a known tank capacity, each interval opening on a physical plein is
+  // classified by the tank content it actually burned: capacity × the #3652
+  // mix-chain shares as of the opening fill, plus the non-correction fills
+  // strictly inside the interval (the closing plein is excluded — its fuel
+  // enters the NEXT interval's tank). All v2 tests above pass no capacity
+  // and were reviewed: none needed changes, because v3 is capacity-opt-in.
+  group('FuelTypeEfficiencyAggregator.byFuelType — v3 carried content', () {
+    const capacity = 35.0;
+
+    test('the reporting user\'s case: 14 L E5 in the tank + 21 L E85 to '
+        'full → the next interval buckets as the 40/60 E85/E5 MIX', () {
+      final fills = [
+        // Opening plein: pure E5 full tank (35 L).
+        _f(id: 'f0', date: _d(1), liters: 35, cost: 60, odo: 0,
+            fuelType: FuelType.e5),
+        // 14 L E5 left, +21 L E85 to full → tank = 40 % E5 / 60 % E85.
+        // Closes interval A (which burned the pure-E5 tank).
+        _f(id: 'f1', date: _d(2), liters: 21, cost: 17, odo: 300,
+            fuelType: FuelType.e85),
+        // Next plein closes interval B — the one that burned the blend.
+        _f(id: 'f2', date: _d(3), liters: 30, cost: 24, odo: 700,
+            fuelType: FuelType.e85),
+      ];
+      final result = FuelTypeEfficiencyAggregator.byFuelType(
+        fills,
+        tankCapacityL: capacity,
+      );
+
+      // Interval A burned the pure-E5 opening tank — pure E5, even though
+      // its closing plein pumped E85 (v2 called this interval pure E85).
+      final e5 = _byLabel(result, 'E5');
+      expect(e5.isMix, isFalse);
+      expect(e5.attributedIntervalCount, 1);
+      expect(e5.legacyAttributedIntervalCount, 0);
+      // Metric folding unchanged: interval A = 21 L over 300 km, €17.
+      expect(e5.avgL100km, closeTo(21 / 300 * 100, 1e-9));
+      expect(e5.avgCostPerKm, closeTo(17 / 300, 1e-9));
+
+      // Interval B burned the 14/21 = 40/60 blend — MIX, dominant E85.
+      final blend = _byLabel(result, 'E85/E5');
+      expect(blend.isMix, isTrue);
+      expect(blend.dominant.apiValue, FuelType.e85.apiValue);
+      expect(blend.secondary?.apiValue, FuelType.e5.apiValue);
+      expect(blend.attributedIntervalCount, 1);
+      expect(blend.legacyAttributedIntervalCount, 0);
+      // Metric folding unchanged: interval B = 30 L over 400 km.
+      expect(blend.avgL100km, closeTo(30 / 400 * 100, 1e-9));
+
+      // No pure-E85 bucket exists — v2's misattribution is gone.
+      expect(_has(result, 'E85'), isFalse);
+    });
+
+    test('truly run dry before the switch → the new tank stays PURE '
+        '(prior content 0 pins the mix to the new grade)', () {
+      final fills = [
+        _f(id: 'f0', date: _d(1), liters: 35, cost: 60, odo: 0,
+            fuelType: FuelType.e5),
+        // Ran the E5 tank dry: a full 35 L E85 fill → prior = 35 − 35 = 0.
+        _f(id: 'f1', date: _d(2), liters: 35, cost: 28, odo: 500,
+            fuelType: FuelType.e85),
+        _f(id: 'f2', date: _d(3), liters: 30, cost: 24, odo: 900,
+            fuelType: FuelType.e85),
+      ];
+      final result = FuelTypeEfficiencyAggregator.byFuelType(
+        fills,
+        tankCapacityL: capacity,
+      );
+
+      // Interval A burned pure E5; interval B burned pure E85. No blend.
+      expect(_byLabel(result, 'E5').isMix, isFalse);
+      final e85 = _byLabel(result, 'E85');
+      expect(e85.isMix, isFalse);
+      expect(e85.attributedIntervalCount, 1);
+      expect(e85.legacyAttributedIntervalCount, 0);
+      expect(_has(result, 'E85/E5'), isFalse);
+      expect(_has(result, 'E5/E85'), isFalse);
+    });
+
+    test('capacity unknown → EXACT v2 fallback (contributing fills only), '
+        'every interval marked legacy-attributed', () {
+      // Same fills as the user's case, but no capacity: both closed
+      // intervals tally only their contributing E85 pleins → one pure E85
+      // bucket, no E5 anywhere — bit-for-bit the v2 outcome.
+      final fills = [
+        _f(id: 'f0', date: _d(1), liters: 35, cost: 60, odo: 0,
+            fuelType: FuelType.e5),
+        _f(id: 'f1', date: _d(2), liters: 21, cost: 17, odo: 300,
+            fuelType: FuelType.e85),
+        _f(id: 'f2', date: _d(3), liters: 30, cost: 24, odo: 700,
+            fuelType: FuelType.e85),
+      ];
+      final result = FuelTypeEfficiencyAggregator.byFuelType(fills);
+      expect(result.length, 1);
+      final e85 = result.single;
+      expect(e85.label, 'E85');
+      expect(e85.attributedIntervalCount, 2);
+      expect(e85.legacyAttributedIntervalCount, 2);
+      expect(_has(result, 'E5'), isFalse);
+      expect(_has(result, 'E85/E5'), isFalse);
+    });
+
+    test('interval opening on a NON-plein first fill is legacy-attributed '
+        'even with capacity; later plein-anchored intervals are not', () {
+      final fills = [
+        // First fill is PARTIAL → interval A's opening content unknowable.
+        _f(id: 'f0', date: _d(1), liters: 20, cost: 34, odo: 0,
+            fuelType: FuelType.e5, isFullTank: false),
+        _f(id: 'f1', date: _d(2), liters: 30, cost: 24, odo: 400,
+            fuelType: FuelType.e85), // closes A (legacy: pure E85)
+        _f(id: 'f2', date: _d(3), liters: 30, cost: 24, odo: 800,
+            fuelType: FuelType.e85), // closes B (v3: content 30 E85 + 5 E5
+        //                              → 85.7 % dominant → still pure E85)
+      ];
+      final result = FuelTypeEfficiencyAggregator.byFuelType(
+        fills,
+        tankCapacityL: capacity,
+      );
+      final e85 = _byLabel(result, 'E85');
+      expect(e85.attributedIntervalCount, 2);
+      expect(e85.legacyAttributedIntervalCount, 1,
+          reason: 'only the non-plein-opened interval fell back to v2');
+    });
+
+    test('partial fill inside the interval joins the burned-tank tally '
+        'alongside the carried content; folding still counts the close', () {
+      final fills = [
+        _f(id: 'f0', date: _d(1), liters: 35, cost: 30, odo: 0,
+            fuelType: FuelType.e85),
+        // Mid-interval E10 splash: burned tank = 35 E85 + 14 E10 (28.6 %).
+        _f(id: 'f1', date: _d(2), liters: 14, cost: 22, odo: 300,
+            fuelType: FuelType.e10, isFullTank: false),
+        _f(id: 'f2', date: _d(3), liters: 25, cost: 20, odo: 600,
+            fuelType: FuelType.e85), // closes
+      ];
+      final result = FuelTypeEfficiencyAggregator.byFuelType(
+        fills,
+        tankCapacityL: capacity,
+      );
+      final blend = _byLabel(result, 'E85/E10');
+      expect(blend.isMix, isTrue);
+      expect(blend.legacyAttributedIntervalCount, 0);
+      // Folding unchanged: contributing fills incl. the closing plein.
+      expect(blend.avgL100km, closeTo((14 + 25) / 600 * 100, 1e-9));
+      expect(blend.avgCostPerKm, closeTo((22 + 20) / 600, 1e-9));
     });
   });
 }

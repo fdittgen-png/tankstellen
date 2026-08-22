@@ -124,6 +124,14 @@ abstract class FuelTypeEfficiencyStats with _$FuelTypeEfficiencyStats {
     /// Number of closed plein-to-plein intervals classified into this bucket.
     /// 0 ⇒ [avgL100km] / [avgCostPerKm] null.
     required int attributedIntervalCount,
+
+    /// Of [attributedIntervalCount], how many were classified WITHOUT the
+    /// carried-over opening tank content — the v2 contributing-fills-only
+    /// fallback used when the opening content is unknowable (tank capacity
+    /// not set, or the interval opened on a non-plein first fill / a
+    /// synthetic correction). 0 ⇒ every interval used the full v3
+    /// carried-content composition (#3764, ADR 0015 v3).
+    @Default(0) int legacyAttributedIntervalCount,
   }) = _FuelTypeEfficiencyStats;
 
   /// The bucket's dominant fuel (the only fuel for a pure bucket, the

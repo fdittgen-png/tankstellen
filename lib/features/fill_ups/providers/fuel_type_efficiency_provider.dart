@@ -29,5 +29,14 @@ List<FuelTypeEfficiencyStats> fuelTypeEfficiencyComparison(Ref ref) {
   final scoped = vehicle == null
       ? fills
       : fills.where((f) => f.vehicleId == vehicle.id).toList(growable: false);
-  return FuelTypeEfficiencyAggregator.byFuelType(scoped);
+  // #3764 v3 — the vehicle's tank capacity (user-set, or backfilled from
+  // the reference catalog by the vehicle editor) unlocks the carried-content
+  // composition: each interval opening on a plein is classified including
+  // the full tank's estimated mix at that fill. Null capacity (or no active
+  // vehicle — capacity would be ambiguous across vehicles) keeps the v2
+  // contributing-fills behaviour.
+  return FuelTypeEfficiencyAggregator.byFuelType(
+    scoped,
+    tankCapacityL: vehicle?.tankCapacityL,
+  );
 }
