@@ -167,26 +167,36 @@ jobs:
           # references), so split on the `'lib/...':` anchors and take the
           # FIRST bumps:/decompositionIssue: field match per segment —
           # the real record fields always precede any later prose.
+          # Drift sanity (#2348 zero-match lesson, refined by #3769): an
+          # empty refs.txt is a LEGITIMATE steady state since #3768
+          # graduated every bump-heavy file (all remaining entries carry
+          # `decompositionIssue: null`). Parser drift is instead detected
+          # per anchor segment — every `'lib/...':` entry must parse all
+          # three record fields (lines/bumps/decompositionIssue, null
+          # included) or the script exits non-zero.
           python3 - <<'PY' > refs.txt
-          import re
+          import re, sys
           src = open('test/lint/file_length_test.dart').read()
           anchors = list(re.finditer(r"'(lib/[^']+\.dart)':\s*\(", src))
           for i, a in enumerate(anchors):
               seg_end = anchors[i + 1].start() if i + 1 < len(anchors) else len(src)
               seg = src[a.end():seg_end]
+              lines = re.search(r"lines:\s*(\d+)", seg)
               bumps = re.search(r"bumps:\s*(\d+)", seg)
-              issue = re.search(r"decompositionIssue:\s*(\d+)", seg)
-              if bumps and issue:
+              issue = re.search(r"decompositionIssue:\s*(\d+|null)", seg)
+              if not (lines and bumps and issue):
+                  print(f"::error::snapshot entry {a.group(1)} did not parse "
+                        "as (lines/bumps/decompositionIssue) — the audit "
+                        "parser drifted from the snapshot-map shape.",
+                        file=sys.stderr)
+                  sys.exit(1)
+              if issue.group(1) != 'null':
                   print(a.group(1), bumps.group(1), issue.group(1))
           PY
           echo "referenced decomposition issues:"
           cat refs.txt
-          # Sanity: the parse finding nothing means the regex drifted from
-          # the test's shape — fail loudly rather than green-by-empty
-          # (the #2348 zero-match lesson).
           if ! [ -s refs.txt ]; then
-            echo "::error::decomposition-issue audit parsed ZERO decompositionIssue references out of test/lint/file_length_test.dart — the parser drifted from the snapshot-map shape." >&2
-            exit 1
+            echo "no numeric decompositionIssue references — every bump-heavy file has graduated; audit trivially green."
           fi
           VIOLATIONS=""
           while read -r FILE BUMPS ISSUE; do
