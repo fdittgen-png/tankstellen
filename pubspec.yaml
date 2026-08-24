@@ -64,7 +64,7 @@ dependencies:
   # Constraint tracks the vendored third_party/ fork (see
   # dependency_overrides below), which is 0.15.1 — bump both together.
   google_mlkit_text_recognition: ^0.15.1
-  image: ^4.9.1
+  image: ^4.9.2
   # Disk-cached, decode-at-size network images — brand logos (#1761).
   cached_network_image: ^3.4.1
 
@@ -107,7 +107,7 @@ dependencies:
   # the OS-native android.graphics.pdf.PdfRenderer (NOT PdfiumAndroid /
   # AndroidPdfViewer) and iOS uses CGPDFPage — no Play Services / ML Kit, so
   # the fdroid GMS audit stays clean. See receipt_pdf_rasterizer.dart.
-  pdfx: ^2.9.2
+  pdfx: ^2.11.0
   # Pinned to 1.x — flutter_blue_plus 2.x is a major BLE-API rewrite,
   # and BLE is core to OBD2 trip recording. The 2.x upgrade is tracked
   # separately as part of #1542; do NOT bump it as routine drift.
@@ -118,7 +118,7 @@ dependencies:
   package_info_plus: ^10.2.1
   sentry_flutter: ^9.27.0
   home_widget: ^0.9.3
-  workmanager: ^0.10.7
+  workmanager: ^0.10.9
   shimmer: ^3.0.0
   flutter_tts: ^4.2.0
   flutter_local_notifications: ^22.3.0
