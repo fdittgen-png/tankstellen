@@ -395,4 +395,73 @@ void main() {
       expect(yaml, contains('flutter-version: "$pinnedVersion"'));
     });
   });
+
+  group('one scheduled tester cut for BOTH stores (#3792)', () {
+    // The two store legs used to carry their own crons 11.5 h apart, so
+    // Play beta and TestFlight shipped DIFFERENT master commits and no
+    // field report could be pinned to one code state. The Release Train is
+    // now the single scheduled entry point; these tests fail the moment a
+    // per-leg cron creeps back and silently re-splits the tester base.
+    String read(String name) =>
+        File('.github/workflows/$name').readAsStringSync();
+
+    /// True when the workflow declares its own `schedule:` trigger. Scans
+    /// only the `on:` block — a `schedule` word inside a comment or a job
+    /// body must not count.
+    bool hasOwnCron(String yaml) {
+      final lines = yaml.split('\n');
+      var inOn = false;
+      for (final line in lines) {
+        if (RegExp(r'^on:\s*$').hasMatch(line)) {
+          inOn = true;
+          continue;
+        }
+        if (inOn) {
+          // A new top-level key (unindented, not a comment) ends `on:`.
+          if (RegExp(r'^[A-Za-z]').hasMatch(line)) break;
+          if (RegExp(r'^  schedule:\s*$').hasMatch(line)) return true;
+        }
+      }
+      return false;
+    }
+
+    test('release-train owns the only cron, at the Play-beta hour', () {
+      final yaml = read('release-train.yml');
+      expect(hasOwnCron(yaml), isTrue,
+          reason: 'the train must carry the nightly schedule');
+      expect(yaml, contains("- cron: '0 16 * * *'"));
+    });
+
+    test('neither store leg keeps its own cron', () {
+      for (final leg in ['daily-beta.yml', 'ios-testflight.yml']) {
+        expect(hasOwnCron(read(leg)), isFalse,
+            reason: '$leg must NOT schedule itself — a second cron cuts a '
+                'different commit than the train and re-splits Android vs '
+                'iOS testers (and double-uploads to Play)');
+      }
+    });
+
+    test('both store legs stay callable + manually dispatchable', () {
+      for (final leg in ['daily-beta.yml', 'ios-testflight.yml']) {
+        final yaml = read(leg);
+        expect(yaml, contains('workflow_call:'),
+            reason: '$leg must stay callable by the train');
+        expect(yaml, contains('workflow_dispatch:'),
+            reason: '$leg must stay dispatchable for single-store hotfixes');
+      }
+    });
+
+    test('the train ships BOTH stores on the beta channel, from one commit',
+        () {
+      final yaml = read('release-train.yml');
+      for (final leg in ['android-beta', 'ios-testflight']) {
+        expect(_jobBody(yaml, leg), contains("(inputs.channel || 'beta')"),
+            reason: 'a `schedule` event carries NO inputs, so a bare '
+                '`inputs.channel == ...` guard skips the leg and the '
+                'nightly train would silently ship nothing');
+      }
+      expect(_jobBody(yaml, 'ios-testflight'), contains('distribute: true'),
+          reason: 'the nightly iOS build must reach the external testers');
+    });
+  });
 }

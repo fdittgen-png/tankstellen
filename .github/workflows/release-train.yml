@@ -23,6 +23,13 @@ name: Release Train
 #                  #3537 demo video + review notes; no automated lane yet.
 
 on:
+  # #3792 — THE nightly tester cut for BOTH stores. Previously daily-beta.yml
+  # (16:00 UTC) and ios-testflight.yml (04:30 UTC) each carried their own cron,
+  # so the two stores shipped different master commits 11.5 h apart and no
+  # field report could be pinned to one code state. The train builds every leg
+  # from ONE commit, so Play beta and TestFlight extern always match.
+  schedule:
+    - cron: '0 16 * * *'
   workflow_dispatch:
     inputs:
       channel:
@@ -49,7 +56,7 @@ concurrency:
 
 jobs:
   android-beta:
-    if: inputs.channel == 'beta'
+    if: (inputs.channel || 'beta') == 'beta'
     uses: ./.github/workflows/daily-beta.yml
     with:
       track: beta
@@ -57,7 +64,7 @@ jobs:
     secrets: inherit
 
   android-production:
-    if: inputs.channel == 'production'
+    if: (inputs.channel || 'beta') == 'production'
     uses: ./.github/workflows/promote-release.yml
     with:
       from_track: beta
@@ -65,7 +72,7 @@ jobs:
     secrets: inherit
 
   ios-testflight:
-    if: inputs.channel == 'beta'
+    if: (inputs.channel || 'beta') == 'beta'
     uses: ./.github/workflows/ios-testflight.yml
     with:
       release_notes: ${{ inputs.release_notes || 'Release train build.' }}
@@ -73,7 +80,7 @@ jobs:
     secrets: inherit
 
   fdroid:
-    if: inputs.channel == 'production'
+    if: (inputs.channel || 'beta') == 'production'
     uses: ./.github/workflows/fdroid-publish.yml
     secrets: inherit
 
@@ -93,7 +100,7 @@ jobs:
           R_AP: ${{ needs.android-production.result }}
           R_IOS: ${{ needs.ios-testflight.result }}
           R_FD: ${{ needs.fdroid.result }}
-          CHANNEL: ${{ inputs.channel }}
+          CHANNEL: ${{ inputs.channel || 'beta' }}
         run: |
           set -euo pipefail
           declare -A LEGS
@@ -140,7 +147,7 @@ jobs:
         if: steps.legs.outputs.failed != '0'
         env:
           GH_TOKEN: ${{ github.token }}
-          CHANNEL: ${{ inputs.channel }}
+          CHANNEL: ${{ inputs.channel || 'beta' }}
           R_AB: ${{ needs.android-beta.result }}
           R_AP: ${{ needs.android-production.result }}
           R_IOS: ${{ needs.ios-testflight.result }}
@@ -182,7 +189,7 @@ jobs:
           MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
           MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
           MAIL_TO: ${{ secrets.MAIL_TO }}
-          CHANNEL: ${{ inputs.channel }}
+          CHANNEL: ${{ inputs.channel || 'beta' }}
         run: |
           set -euo pipefail
           if [ -z "$MAIL_SMTP_SERVER" ] || [ -z "$MAIL_USERNAME" ] || [ -z "$MAIL_PASSWORD" ] || [ -z "$MAIL_TO" ]; then
