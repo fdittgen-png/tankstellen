@@ -287,9 +287,10 @@ void main() {
         obd2Features: obd2,
       ).toJson();
 
-      // #3499/#3501 bumped the trace schema to 4 (additive obd2Coverage +
+      // #3794 bumped the trace schema to 5 (additive session +
+      // obd2Link blocks). #3499/#3501 had bumped it to 4 (obd2Coverage +
       // verdict); the #3433 precision keys are unchanged.
-      expect(json['schema'], 4);
+      expect(json['schema'], 5);
       final block = json['obd2Features'] as Map<String, dynamic>;
       expect((block['measuredPhi'] as Map)['mean'], 1.0);
       expect((block['ethanolPercent'] as Map)['mean'], 10.0);

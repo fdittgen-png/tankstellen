@@ -26,6 +26,8 @@ import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../helpers/silence_error_logger.dart';
+import 'package:tankstellen/features/trips/domain/entities/trip_termination.dart';
+import 'package:tankstellen/features/trips/domain/recording_session_journal.dart';
 
 /// #2760 — GPS+IMU sensor-fusion integration tests for the dongle-optional
 /// pipeline. Drives the real [GpsOnlyRecordingPipeline] against a fake
@@ -425,6 +427,9 @@ class _PersistingHost implements RecordingPipelineHost {
     String? adapterName,
     String? adapterFirmware,
     int gpsFixCount = 0,
+    // #3794 — session-transparency payloads (unused by this fake).
+    TripTermination? termination,
+    RecordingSessionJournal? sessionJournal,
   }) async {
     final start = summary.startedAt ?? lastTripStartedAt ?? DateTime.now();
     await repo.save(TripHistoryEntry(

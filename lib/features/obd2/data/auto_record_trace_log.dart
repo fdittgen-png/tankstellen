@@ -245,6 +245,29 @@ class AutoRecordTraceLog {
   /// Read-only snapshot for debug screens / future log export.
   static List<AutoRecordEvent> snapshot() => List.unmodifiable(_ring);
 
+  /// #3798 — the ring as an export section.
+  ///
+  /// Until now this log's ONLY reader was the developer overlay, so the
+  /// 100 auto-record transitions it holds — including every drop verdict
+  /// and its reason — reached no exported artifact at all. The MAC is
+  /// redacted to its last block, matching the connect traces' contract:
+  /// enough to tell two adapters apart, not enough to identify a device.
+  static List<Map<String, dynamic>> exportSection() => [
+        for (final e in _ring.reversed)
+          <String, dynamic>{
+            't': e.timestamp.toIso8601String(),
+            'k': e.kind.name,
+            if (e.mac != null) 'mac': _redactMac(e.mac!),
+            if (e.detail != null) 'd': e.detail,
+          }
+      ];
+
+  /// Keep only the final MAC block (`··:7E`), as the connect traces do.
+  static String _redactMac(String mac) {
+    final tail = mac.length <= 5 ? mac : mac.substring(mac.length - 5);
+    return '\u00b7\u00b7$tail';
+  }
+
   /// Test reset — drops every entry. Production callers should not
   /// invoke this; the ring is meant to survive across tear-downs so
   /// post-mortem inspection is possible after the user stops the

@@ -23,6 +23,8 @@ import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../helpers/empty_imu_source.dart';
 import '../../../helpers/silence_error_logger.dart';
+import 'package:tankstellen/features/trips/domain/entities/trip_termination.dart';
+import 'package:tankstellen/features/trips/domain/recording_session_journal.dart';
 
 /// Direct unit tests for the #2190 [GpsOnlyRecordingPipeline] strategy,
 /// driving it against a fake [RecordingPipelineHost] + a controllable
@@ -579,6 +581,9 @@ class _FakeHost implements RecordingPipelineHost {
     String? adapterName,
     String? adapterFirmware,
     int gpsFixCount = 0,
+    // #3794 — session-transparency payloads (unused by this fake).
+    TripTermination? termination,
+    RecordingSessionJournal? sessionJournal,
   }) async {
     saved.add(_Saved(
       summary: summary,

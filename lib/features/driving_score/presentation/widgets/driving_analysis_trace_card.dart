@@ -30,6 +30,7 @@ class DrivingAnalysisTraceCard extends ConsumerWidget {
     this.gpsFeatures,
     this.gpsCoverage,
     this.verdict,
+    this.entry, // #3798
   });
 
   final TripSummary summary;
@@ -50,6 +51,15 @@ class DrivingAnalysisTraceCard extends ConsumerWidget {
   /// folded into the export so the calibration loop no longer relies on
   /// hand-edited comments. Null while unanswered.
   final String? verdict;
+
+  /// #3798 — the persisted trip row this card exports.
+  ///
+  /// Until now the card was handed only the derived pieces, so the
+  /// termination reason, the session timeline and the adapter identity —
+  /// all already captured and persisted — were silently dropped at
+  /// export time. Optional so existing call sites compile; when absent
+  /// the export simply carries less.
+  final TripHistoryEntry? entry;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -100,6 +110,14 @@ class DrivingAnalysisTraceCard extends ConsumerWidget {
       // obd2Features on a gpsPlusObd2 trip is no longer unexplained.
       obd2Coverage: Obd2EngineCoverage.fromTripSamples(samples),
       verdict: verdict, // #3501 — structured verdict beats the comment slot
+      // #3795/#3797/#3798 — the session-transparency blocks: why the
+      // recording ended, its link lifecycle timeline, and the adapter it
+      // ran on. All read off the persisted entry.
+      termination: entry?.termination,
+      sessionJournal: entry?.sessionJournal,
+      adapterName: entry?.adapterName,
+      adapterMac: entry?.adapterMac,
+      automatic: entry?.automatic ?? false,
     );
     final ok = await DrivingAnalysisTraceExport.export(trace);
     if (!context.mounted) return;

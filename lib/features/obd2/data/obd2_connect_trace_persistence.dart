@@ -11,6 +11,7 @@ import 'obd2_connect_trace.dart';
 import 'obd2_connect_trace_log.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/telemetry/storage/trace_storage.dart';
+import 'auto_record_trace_log.dart';
 
 /// #3184 — persistence for the OBD2 connect-trace ring.
 ///
@@ -62,6 +63,12 @@ class Obd2ConnectTracePersistence {
           (trace) => unawaited(persistence.append(trace));
       TraceStorage.extraExportSections['obd2ConnectTraces'] =
           () => [for (final t in persistence.load().reversed) t.toJson()];
+      // #3798 — the auto-record transition ring (drop verdicts + their
+      // reasons) rides the same export. Registered here because this is
+      // where the OBD2 export sections are wired; it is in-memory only,
+      // so it carries THIS session's history.
+      TraceStorage.extraExportSections['autoRecordEvents'] =
+          AutoRecordTraceLog.exportSection;
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
         'where': 'Obd2ConnectTracePersistence.init failed — connect traces '
