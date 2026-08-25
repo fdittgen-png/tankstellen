@@ -64,6 +64,11 @@ mixin _TripRecordingSessionState {
   // -------------------------------------------------------------------
   Obd2Service get _service;
   set _service(Obd2Service value);
+  // #3797 — the session lifecycle timeline (always-on, bounded).
+  RecordingSessionJournal get _sessionJournal;
+  // #3795 — how this session ended; null while running / unattributed.
+  TripTermination? get _termination;
+  set _termination(TripTermination? value);
   // #3776 — link-ownership seam (null without a supervisor graph). The
   // report seam is reached via the concrete controller (`_c.` in the
   // drop-host adapter), so only the predicate needs the mixin re-decl.

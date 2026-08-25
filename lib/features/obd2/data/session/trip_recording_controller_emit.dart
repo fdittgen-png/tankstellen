@@ -80,6 +80,8 @@ mixin _TripRecordingEmit
     if (engineStale) {
       if (!_staleEngineEscalated) {
         _staleEngineEscalated = true;
+        _sessionJournal.add(RecordingSessionEventKind.staleEngineFence,
+            detail: fresh == null ? 'no parse ever' : 'parse went stale');
         debugPrint(
           'TripRecordingController: engine data stale '
           '(lastParse=$fresh) — escalating as silent failure (#3602)',

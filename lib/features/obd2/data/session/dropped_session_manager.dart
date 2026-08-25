@@ -39,19 +39,13 @@ enum TripDropReason {
 /// Everything that happens AFTER the drop *detector* (#1679) decides
 /// "this is a drop": the #1904 silent-reconnect window, the visible-drop
 /// escalation, the #797 grace timer + auto-finalise, the reconnect-
-/// scanner orchestration (#797 phase 3) and the paused/history Hive
-/// persistence. The emit loop, the scheduler, the drop detector and the
-/// trip-identity fields stay on the controller; the manager reaches them
-/// through the injected [DroppedSessionHost] so the recording loop and
-/// the recovery state machine stay decoupled — mirroring the pure,
-/// dependency-light collaborator style of `TripDistanceResolver` (#2187)
-/// and `TripDropDetector` (#1679).
-///
-/// Every collaborator is injected (the clock, both Hive repo overrides,
-/// the scanner factory, the host seam) so a unit test can wire a fake
-/// host + in-memory repos + a hand-driven scanner and exercise every
-/// branch deterministically without a real `Obd2Service`, scheduler, or
-/// wall-clock timer.
+/// scanner orchestration and the paused/history Hive persistence. The
+/// emit loop, the scheduler, the drop detector and the trip-identity
+/// fields stay on the controller; the manager reaches them through the
+/// injected [DroppedSessionHost], so the recording loop and the recovery
+/// state machine stay decoupled and every collaborator (clock, both Hive
+/// repos, the scanner factory, the host) is injectable — a unit test
+/// drives every branch with no real service, scheduler or wall clock.
 class DroppedSessionManager {
   final DroppedSessionHost _host;
   final DateTime Function() _now;
@@ -133,9 +127,8 @@ class DroppedSessionManager {
   /// `debugReconnectScanner` test hook.
   Obd2ReattachSource? get reconnectScanner => _reconnectScanner;
 
-  /// #2767 — true while the in-flight reconnect scanner has given up active
-  /// scanning and is passive-waiting for the adapter to power back up. Drives
-  /// the calmer "passive-waiting" banner copy. False when no scanner runs.
+  /// #2767 — true while the reconnect scanner has given up active scanning
+  /// and is passive-waiting for the adapter. Drives the calmer banner copy.
   bool get reconnectPassiveWaiting =>
       _reconnectScanner?.isPassiveWaiting ?? false;
 
@@ -151,6 +144,7 @@ class DroppedSessionManager {
     if (_host.pausedDueToDrop || _silentlyReconnecting || degraded) return;
     // #1920 — trace every detected drop for the exportable OBD2 log.
     _trace(AutoRecordEventKind.dropDetected, detail: reason.name);
+    _note(RecordingSessionEventKind.linkDrop, reason.name); // #3797
     // #2905 — record the connected→dropped transition (gated comm-health).
     Obd2CommDiagnostics.instance
         .noteSessionTransition(Obd2SessionState.dropped, detail: reason.name);
@@ -196,6 +190,7 @@ class DroppedSessionManager {
   /// scanner is running, and emits so the pause banner appears.
   void _enterVisibleDrop(TripDropReason reason) {
     _host.pausedDueToDrop = true;
+    _note(RecordingSessionEventKind.pausedDueToDrop, reason.name);
     _dropReason = reason;
     _graceTimer?.cancel();
     _graceTimer = Timer(_pauseGraceWindow, _onGraceWindowElapsed);
@@ -212,6 +207,7 @@ class DroppedSessionManager {
   /// actively recording and must never auto-finalise / discard).
   void _enterDegradedGpsOnly(TripDropReason reason) {
     _host.degradedGpsOnly = true;
+    _note(RecordingSessionEventKind.degradedGpsOnly, reason.name);
     _dropReason = reason;
     // #2905 — stamp the GPS-only-fallback-activation marker the trajet omitted.
     Obd2CommDiagnostics.instance.noteFallbackActivated(detail: reason.name);
@@ -265,11 +261,9 @@ class DroppedSessionManager {
     unawaited(scanner.start());
   }
 
-  /// #2767 — the reconnect scanner gave up active scanning and dropped to a
-  /// passive autoConnect wait. Recording continues unchanged; we only re-emit
-  /// so the UI can swap the busy "reconnecting" banner for the calmer
-  /// "passive-waiting" one. A pure notification — no state transition, and the
-  /// scanner still periodically re-arms an active scan on its own.
+  /// #2767 — the scanner dropped to a passive autoConnect wait. Recording
+  /// continues; we re-emit only so the UI can swap to the calmer copy. A pure
+  /// notification: no state transition, and the scanner still re-arms.
   void _onScannerPassiveWait() {
     if (_host.stopped) return;
     _trace(AutoRecordEventKind.reconnectPassiveWaiting);
@@ -286,6 +280,7 @@ class DroppedSessionManager {
       // cancel and no pause-banner teardown; clear the degrade flag then
       // resume polling cleanly. The drop-window samples stay honestly GPS-only.
       _host.degradedGpsOnly = false;
+      _note(RecordingSessionEventKind.leftDegraded);
       _resumePollingAfterSilentReconnect();
       return;
     }
@@ -358,6 +353,10 @@ class DroppedSessionManager {
   void _trace(AutoRecordEventKind kind, {String? detail}) =>
       AutoRecordTraceLog.add(kind, mac: _pinnedAdapterMac, detail: detail);
 
+  /// #3797 — one lifecycle event onto the trip's session timeline.
+  void _note(RecordingSessionEventKind kind, [String? detail]) =>
+      _host.noteSessionEvent(kind, detail: detail);
+
   /// Grace-window auto-finalise (#797). Stops the scanner first (so a late
   /// reconnect can't race an already-finalised trip), finalises the partial
   /// into trip-history + deletes the paused row (#2565 — persistence in the
@@ -365,7 +364,8 @@ class DroppedSessionManager {
   Future<void> _onGraceWindowElapsed() async {
     if (!_host.pausedDueToDrop) return;
     await stopReconnectScanner();
-    await _repos.finaliseToHistory(_host);
+    _note(RecordingSessionEventKind.ended, 'graceWindowExpiry'); // #3795
+    await _repos.finaliseToHistory(_host, dropReason: _dropReason?.name);
     _host.pausedDueToDrop = false;
     _host.stopped = true;
     _host.started = false;
