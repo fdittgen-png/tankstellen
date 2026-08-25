@@ -58,8 +58,15 @@ class LiveSampleSnapshot
         _clock = clock ?? DateTime.now,
         _precision = PrecisionPidLatches(clock: clock);
 
+  /// #3784 — point the snapshot at the freshly-reconnected service after
+  /// a mid-trip rebind (`replaceService` swaps only the controller's
+  /// pointer): the per-PID support gates and any snapshot-side reads
+  /// must evaluate against the LIVE service's state, not the dead
+  /// original's.
+  void rebindService(Obd2Service service) => _service = service;
+
   @override
-  final Obd2Service _service;
+  Obd2Service _service;
   @override
   final VehicleProfile? _vehicle;
   @override

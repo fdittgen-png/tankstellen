@@ -53,7 +53,11 @@ class _DroppedSessionHostAdapter implements DroppedSessionHost {
   }
 
   @override
-  void startScheduler() => _c._scheduler?.start();
+  void startScheduler() =>
+      // #3783 — the manager's reconnect-resume restarts polling on a
+      // freshly-redialed link; the cadence must wait for a negotiated
+      // vehicle protocol or it livelocks the ELM auto-search (#3577).
+      _c._startSchedulerWithProtocolGate('reconnect-resume');
 
   @override
   void resetDropDetector() => _c._dropDetector.reset();

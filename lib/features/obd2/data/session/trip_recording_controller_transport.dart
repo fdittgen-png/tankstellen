@@ -44,10 +44,35 @@ mixin _TripRecordingTransportGuard on _TripRecordingSessionState {
   // Scheduler wiring
   // ---------------------------------------------------------------------------
 
+  /// #3783 — reliability-first cadence (user directive 2026-08-25:
+  /// reliability outranks sample rate). K-line buses (ELM DPN 3 =
+  /// ISO 9141-2, 4/5 = KWP) run at 10.4 kbaud and sustain only ~4–6
+  /// requests/s; the default 100 ms tick saturates the half-duplex
+  /// queue, starves the keepalive, and pressures every recovery window.
+  /// On a known K-line protocol the tick relaxes to 300 ms (~3 req/s —
+  /// inside the bus's real budget); CAN keeps the fast cadence. A test
+  /// override that is already slower is respected.
+  static const Set<String> _kLineProtocolDigits = {'3', '4', '5'};
+  static const Duration _kLineTickRate = Duration(milliseconds: 300);
+
+  Duration get _effectiveSchedulerTickRate {
+    final digit = _service.negotiatedProtocolDigit;
+    final kLine = digit != null && _kLineProtocolDigits.contains(digit);
+    if (kLine && _kLineTickRate > _schedulerTickRate) return _kLineTickRate;
+    return _schedulerTickRate;
+  }
+
   PidScheduler _buildScheduler() {
+    final tick = _effectiveSchedulerTickRate;
+    if (tick != _schedulerTickRate) {
+      BreadcrumbCollector.add(
+        'OBD2 recording: K-line cadence',
+        detail: 'tick ${tick.inMilliseconds}ms (#3783 reliability-first)',
+      );
+    }
     return PidScheduler(
       transport: _runTransport,
-      tickRate: _schedulerTickRate,
+      tickRate: tick,
       clock: _now,
       onNoProtocolEpisode: () => unawaited(_recoverVehicleProtocol()),
     );
@@ -64,33 +89,76 @@ mixin _TripRecordingTransportGuard on _TripRecordingSessionState {
   /// car whose engine starts mid-trip recovers within a minute instead
   /// of erring for the whole drive (field log 2026-07-13, 21 min of
   /// 100% err at 0% completeness).
-  bool _protocolRecoveryInFlight = false;
+  bool _protocolWorkInFlight = false;
   DateTime? _lastProtocolRecoveryAt;
   static const Duration _protocolRecoveryInterval = Duration(seconds: 45);
 
   Future<void> _recoverVehicleProtocol() async {
-    if (_protocolRecoveryInFlight) return;
+    if (_protocolWorkInFlight) return;
     final now = _now();
     final last = _lastProtocolRecoveryAt;
     if (last != null && now.difference(last) < _protocolRecoveryInterval) {
       return;
     }
     _lastProtocolRecoveryAt = now;
-    _protocolRecoveryInFlight = true;
+    await _runProtocolWork('no-protocol episode (#3575)');
+  }
+
+  /// #3783 — protocol-establishment gate: with a WARM supported-PID
+  /// cache no `0100` ever runs at connect time, so the poll cadence used
+  /// to start on a session whose vehicle protocol was never negotiated —
+  /// on a K-line car the first poll triggered the ELM auto-search, the
+  /// cadence interrupted it (#3577 livelock), and every fresh dial died
+  /// the same way. Runs the quiet-window recovery ONCE before polling
+  /// whenever the bus is not yet confirmed answering. Single-flight,
+  /// deliberately NOT throttled (unlike the episode path — a rebind must
+  /// never inherit the 45 s cooldown of an earlier aborted recovery).
+  Future<void> _ensureVehicleProtocol({required String where}) async {
+    if (_protocolWorkInFlight) return;
+    if (_service.busProbe == Obd2BusProbeResult.answered) return;
+    await _runProtocolWork('protocol establishment ($where)');
+  }
+
+  /// Shared body of the two protocol-work entry points: pause polling so
+  /// the `0100` search gets an uninterrupted window, HOLD the drop
+  /// detectors + the staleness fence for exactly the duration of the
+  /// work via [_protocolWorkInFlight] (#3783 — the fence used to fire
+  /// mid-search and tear down the recovering link), run the recovery,
+  /// then re-anchor the fence so polling gets a full fresh staleness
+  /// window from the true start of the cadence.
+  Future<void> _runProtocolWork(String label) async {
+    _protocolWorkInFlight = true;
     final scheduler = _scheduler;
     scheduler?.pause();
     try {
       final recovered = await _service.recoverVehicleProtocol();
       BreadcrumbCollector.add(
-        'OBD2 recording: no-protocol episode (#3575)',
+        'OBD2 recording: $label',
         detail: recovered
-            ? 'recovered — polling resumes with a live protocol'
-            : 'still no protocol — retrying in ${_protocolRecoveryInterval.inSeconds}s',
+            ? 'bus answered — polling runs with a live protocol'
+            : 'bus still silent — polling starts anyway '
+                '(episode recovery re-signals while it persists)',
       );
     } finally {
-      _protocolRecoveryInFlight = false;
+      _protocolWorkInFlight = false;
+      _lastFreshEngineParseAt = _now();
+      _staleEngineEscalated = false;
       scheduler?.resume();
     }
+  }
+
+  /// #3783 — every scheduler (re)start after a rebind funnels here: start
+  /// polling, and when the bus is not yet confirmed answering kick the
+  /// establishment (which gates dispatch itself within one tick). The
+  /// sub-tick window before the gate closes can emit at most one command,
+  /// which the half-duplex queue serializes AHEAD of the quiet window —
+  /// it cannot interrupt a search that has not started yet.
+  void _startSchedulerWithProtocolGate(String where) {
+    final s = _scheduler;
+    if (s == null) return;
+    s.start();
+    if (_service.busProbe == Obd2BusProbeResult.answered) return;
+    unawaited(_ensureVehicleProtocol(where: where));
   }
 
   /// Wrap [Obd2Service.sendCommand] with drop-detection bookkeeping
@@ -161,8 +229,9 @@ mixin _TripRecordingTransportGuard on _TripRecordingSessionState {
     if (_pausedDueToDrop || _stopped) return;
     // #3625 — inside the post-reconnect grace the fresh session is
     // still bringing the bus up; failures feed the #3575 protocol
-    // episode instead of the drop verdict.
-    if (_inReconnectGrace) return;
+    // episode instead of the drop verdict. #3783 — same while protocol
+    // work runs: its quiet window owns the link.
+    if (_inReconnectGrace || _protocolWorkInFlight) return;
     if (_dropDetector.registerTransportError(error)) {
       _droppedSession.handleDrop();
     }
@@ -201,8 +270,9 @@ mixin _TripRecordingTransportGuard on _TripRecordingSessionState {
     // stays here; the detector just counts.
     if (_pausedDueToDrop || _stopped) return;
     // #3625 — bus-init nulls during the post-reconnect grace are the
-    // K-line waking up, not a dead ECU.
-    if (_inReconnectGrace) return;
+    // K-line waking up, not a dead ECU. #3783 — same during protocol
+    // work: the quiet window legitimately parses nothing.
+    if (_inReconnectGrace || _protocolWorkInFlight) return;
     if (_dropDetector.observeHighPriorityParse(parsedValue)) {
       _onSilentFailure();
     }
