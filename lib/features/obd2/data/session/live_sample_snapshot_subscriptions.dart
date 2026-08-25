@@ -225,8 +225,11 @@ mixin _LiveSampleSnapshotSubscriptions on _LiveSampleSnapshotLatches {
     // support gate (resolved ∧ contains): rare modern PIDs are never
     // blind-subscribed, or an unresolved clone floods the round-robin
     // with NO DATA initial reads and starves the dynamics tier.
+    // #3784 — closure, not a tearoff: a tearoff pins the service instance
+    // at subscribe time, so after a mid-trip rebind the gate kept reading
+    // the DEAD original's per-connection state.
     _precision.subscribe(scheduler,
-        isPidSupported: _service.isPidKnownSupported);
+        isPidSupported: (pid) => _service.isPidKnownSupported(pid));
   }
 
   /// Register one tier subscription on [scheduler] (#2457): each PID is a
