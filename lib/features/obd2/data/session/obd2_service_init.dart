@@ -101,6 +101,13 @@ mixin _Obd2ServiceInit on _Obd2ServiceLink {
     Error.throwWithStackTrace(lastError, lastStack);
   }
 
+  /// #3783 — the negotiated protocol digit (ELM `ATDPN`, auto-flag
+  /// stripped) cached for this adapter+vehicle, or null when unknown.
+  /// Consumers pick a bus-appropriate poll cadence from it: K-line
+  /// digits (3 = ISO 9141-2, 4/5 = KWP) run at 10.4 kbaud and sustain
+  /// only ~4–6 requests/s.
+  String? get negotiatedProtocolDigit => _cachedProtocolDigit();
+
   /// Look up the protocol digit cached for this adapter+vehicle, or null
   /// when no cache is wired / no key resolves / no entry exists (#2261
   /// concern 3). A non-null result drives a warm `ATSP{n}` init.

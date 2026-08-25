@@ -85,7 +85,10 @@ mixin _TripRecordingLifecycle
       _scheduler?.resume();
     }
     _paused = false;
-    _scheduler?.start();
+    // #3783 — a drop-resume runs on a freshly-redialed link whose
+    // session may lack a negotiated protocol (warm cache ⇒ no 0100 at
+    // connect); gate the cadence behind the quiet-window establishment.
+    _startSchedulerWithProtocolGate('resume');
     _emitState();
   }
 
@@ -96,6 +99,9 @@ mixin _TripRecordingLifecycle
   void replaceService(Obd2Service service) {
     final old = _service;
     _service = service;
+    // #3784 — the snapshot layer holds its own reference; without the
+    // rebind its support gates kept evaluating the dead original.
+    _liveSampleSnapshot.rebindService(service);
     // #3776 — arm the grace + clear the detector even on an IDENTICAL
     // swap: the old early-return skipped both, so a reattach that fired
     // on the same instance resumed polling with no reconnect grace and a
@@ -144,6 +150,14 @@ mixin _TripRecordingLifecycle
     _stopped = false;
     _startedAt = _now();
     _sessionId = _startedAt!.toIso8601String();
+    // #3783 — establish the vehicle protocol BEFORE any OBD read: with a
+    // warm supported-PID cache the connect ran no `0100`, so the session
+    // may have NO negotiated protocol — the odometer/VIN reads below
+    // would then trigger the ELM auto-search, time out, burn ElmSession
+    // timeout strikes, and the poll cadence would livelock the search
+    // (#3577) for the rest of the trip. One quiet window here fixes all
+    // of them at once. No-op when the bus is already confirmed.
+    await _ensureVehicleProtocol(where: 'trip-start');
     // #3382 — odometer + VIN (#814) reads time-bounded (obd2_trip_start_budgets)
     // so a slow/silent adapter degrades them to null and the trip still starts.
     _odometerStartKm = await boundedStartRead(

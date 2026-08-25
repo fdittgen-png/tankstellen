@@ -36,7 +36,10 @@ const Duration kObd2TripStartFuelTypeBudget = Duration(seconds: 3);
 const Duration kObd2TripStartBaselinesBudget = Duration(seconds: 8);
 
 /// Hard backstop on the whole blocking init (baseline load + controller start).
-const Duration kObd2TripStartWatchdog = Duration(seconds: 25);
+/// #3783 — raised 25 → 45 s: controller start may now run the quiet-window
+/// protocol establishment (≤ ~20 s incl. the ELM search) BEFORE the
+/// odometer/VIN reads; the backstop still aborts a genuine hang.
+const Duration kObd2TripStartWatchdog = Duration(seconds: 45);
 
 /// Bound a best-effort trip-start identity read ([read]) by [budget],
 /// degrading to `null` on timeout so a slow/silent adapter can't stall the
