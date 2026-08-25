@@ -104,30 +104,27 @@ class Obd2RecordingPipeline implements RecordingPipeline {
   /// Begin a recording backed by [service] (pipeline takes ownership;
   /// [stop] tears down). The re-entrancy guard stays on the notifier.
   Future<void> start(Obd2Service service, {bool automatic = false}) async {
-    // #3527 — no lease, no arbitration: the one Obd2LinkSupervisor owns
-    // the link's health app-wide; this pipeline owns only the trip.
+    // #3527 — the one supervisor owns the link; this pipeline owns the trip.
     _service = service;
-    // #2261 concern 6 — re-arm the deferred capability probe (first sample).
-    _capabilityReconcileKicked = false;
+    _capabilityReconcileKicked = false; // #2261 — re-arm the probe.
     // #1312 — snapshot adapter identity NOW (stop disconnects pre-save).
     _adapterMac = service.adapterMac;
     _adapterName = service.adapterName;
     _adapterFirmware = service.adapterFirmware;
-    // #812 phase 3 — snapshot the active vehicle for `readFuelRateLPerHour`;
-    // vehicle id up-front to tag any pause-on-drop snapshot (#797 phase 1).
+    // #812/#797 — the active vehicle drives `readFuelRateLPerHour` and
+    // tags any pause-on-drop snapshot.
     final activeVehicle = _readActiveVehicle();
-    // #797/#3423 — reconnect pin: vehicle MAC, else the #3019 auto-pin;
-    // null skips the scanner (grace window is the sole recovery).
+    // #797/#3423 — reconnect pin: vehicle MAC, else the #3019 auto-pin.
     final pinnedMac = resolveAdapterPinMac(activeVehicle?.obd2AdapterMac,
         () => _ref.read(lastGoodAdapterStoreProvider).recall());
-    // #1395 — per-trip breadcrumb sink (keepAlive: survives screen pops).
+    // #1395 — per-trip breadcrumb sink; cleared for a fresh denominator.
     final breadcrumbs = _ref.read(obd2BreadcrumbsProvider.notifier);
-    breadcrumbs.clear(); // fresh suspicion-rate denominator for THIS trip
+    breadcrumbs.clear();
     service.breadcrumbCollector = breadcrumbs;
     // #1422 — catalog match → engine-tech η_v default (null on no-match).
     final matchedReference = tryMatchReferenceVehicle(_ref, activeVehicle);
     // #2506 — shared GPS-physics live-estimate + coaching folder (null
-    // vehicle/matrix → population defaults), mirrors the GPS-only pipeline.
+    // vehicle/matrix → population defaults).
     final gpsEstimateFolder = GpsLiveEstimateFolder.forVehicle(
       activeVehicle,
       activeVehicle?.gpsCalibration,
@@ -147,22 +144,21 @@ class Obd2RecordingPipeline implements RecordingPipeline {
           _service = svc;
           _controller?.replaceService(svc);
         },
-        // #2565 — read the live transport kind at handle-drop time so the
-        // reconnect dispatches over the SAME transport that dropped. The
-        // dead-but-typed service is still wired here.
+        // #2565/#3014 — read the live transport kind + adapter name at
+        // handle-drop time, so the reconnect dispatches over the SAME
+        // transport and the trace headline names the adapter.
         readLinkKind: () => _service?.linkKind,
-        // #3014 — the live adapter NAME the same way, so the in-trip
-        // reconnect trace headline names the adapter, not just the MAC.
         readAdapterName: () => _service?.adapterName,
       ),
-      // #3776 (Epic #3775) — the link-ownership seam: the trip layer
-      // never closes a supervisor-owned link; a dead one is handed to
-      // the owner, which closes the socket and redials on its ladder.
+      // #3776 — the trip layer never closes a supervisor-owned link; a
+      // dead one is handed to the owner, which closes + redials.
       isLinkSupervised: (svc) => supervisorOwnsService(_ref, svc),
       reportSupervisedLinkDead: (svc, reason) {
         try {
-          final sup = _ref.read(obd2ReconnectProvider.notifier).supervisor;
-          return sup.reportServiceDead(svc, reason: reason);
+          return _ref
+              .read(obd2ReconnectProvider.notifier)
+              .supervisor
+              .reportServiceDead(svc, reason: reason);
         } catch (_) {
           // No supervisor graph (widget tests / legacy path) — the
           // caller closes the service itself.
@@ -300,6 +296,13 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       _host.state = const TripRecordingState();
       return const StoppedTripResult.empty();
     }
+    // #3795 — attribute the end BEFORE teardown. First-writer-wins, so
+    // a cause already recorded (grace expiry, watchdog abort) survives.
+    ctl.noteTermination(TripTermination(automatic
+        ? TripTerminationReason.autoRecordDisconnect
+        : TripTerminationReason.userStopped));
+    final termination = ctl.termination;
+    final sessionJournal = ctl.sessionJournal;
     // #2548 — staged save-progress, beat 1 (odometer + summary).
     _host.setSaveStage(TripSaveStage.finalizingSummary);
     try {
@@ -358,6 +361,9 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       adapterName: _adapterName,
       adapterFirmware: _adapterFirmware,
       gpsFixCount: gpsFixCount,
+      // #3794 — how it ended + the lifecycle timeline, onto the trip.
+      termination: termination,
+      sessionJournal: sessionJournal,
     );
     // #2548 — third beat, shown ONLY when cloud sync is on (the upload
     // saveToHistory kicked off is fire-and-forget, so it is worded

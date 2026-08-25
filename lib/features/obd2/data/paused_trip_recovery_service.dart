@@ -117,6 +117,10 @@ class PausedTripRecoveryService {
           // shared "No samples recorded" caption — the honest answer
           // for a trip whose buffer never reached disk.
           samples: const [],
+          // #3795 — a paused row swept up on a later launch: the link
+          // never came back and the app never returned to finish it.
+          termination:
+              const TripTermination(TripTerminationReason.recoveredStalePaused),
         );
         await _historyRepo.save(historyEntry);
         final cb = _onAutomaticRecovered;

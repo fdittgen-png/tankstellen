@@ -122,6 +122,10 @@ mixin _TripRecordingLifecycle
     // recovery cycle re-runs — bounded, convergent.
     _lastFreshEngineParseAt = _now();
     _staleEngineEscalated = false;
+    _sessionJournal.add(
+      RecordingSessionEventKind.serviceRebound,
+      detail: identical(old, service) ? 'same instance' : null,
+    );
     if (identical(old, service)) return;
     // #3776 — never close a supervisor-owned link (the owner keeps
     // supervising it; a deliberate close here would be invisible to it).
@@ -150,6 +154,12 @@ mixin _TripRecordingLifecycle
     _stopped = false;
     _startedAt = _now();
     _sessionId = _startedAt!.toIso8601String();
+    // #3797 — anchor the lifecycle timeline at t=0 BEFORE any OBD work,
+    // so a session that dies during protocol establishment or the
+    // identity reads still exports a timeline that shows how far it got.
+    // (the auto-vs-manual flag rides the entry + the export's session
+    // block, so the timeline needn't repeat it)
+    _sessionJournal.start(at: _startedAt);
     // #3783 — establish the vehicle protocol BEFORE any OBD read: with a
     // warm supported-PID cache the connect ran no `0100`, so the session
     // may have NO negotiated protocol — the odometer/VIN reads below
@@ -190,6 +200,25 @@ mixin _TripRecordingLifecycle
   /// integrated-speed number — and a [TripSummary.distanceSource] flag
   /// distinguishing the two. This lets the fill-up flow and analytics
   /// decide whether the km figure is ground truth or an estimate.
+  /// #3795/#3797 — record HOW this session ended, before [stop] tears the
+  /// controller down. Idempotent-by-first-writer: the first attribution
+  /// wins, so a specific cause (a grace expiry, a watchdog abort) is never
+  /// overwritten by the generic user-stop that may follow it.
+  void noteTermination(TripTermination termination) {
+    if (_termination != null) return;
+    _termination = termination;
+    _sessionJournal.add(
+      RecordingSessionEventKind.ended,
+      detail: termination.detail == null
+          ? termination.reason.name
+          : '${termination.reason.name}: ${termination.detail}',
+    );
+  }
+
+  /// The recorded end of this session, or null while it is still running
+  /// (or if it ended without any site attributing a cause).
+  TripTermination? get termination => _termination;
+
   Future<TripSummary> stop() async {
     // #1925 — finalise the opt-in OBD2 debug session so its summary
     // (duration, reconnects, data gaps) is complete for export.

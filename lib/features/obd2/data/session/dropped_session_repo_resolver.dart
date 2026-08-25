@@ -115,7 +115,10 @@ class DroppedSessionRepoResolver {
   /// trip-history (with the still-live buffer + GPS diagnostics + the
   /// automatic flag, #2291) and delete the paused row. The lifecycle flag
   /// flips + emit stay on the manager.
-  Future<void> finaliseToHistory(DroppedSessionHost host) async {
+  Future<void> finaliseToHistory(
+    DroppedSessionHost host, {
+    String? dropReason,
+  }) async {
     final id = host.sessionId;
     final historyRepo = resolveHistory();
     if (historyRepo != null && id != null) {
@@ -127,6 +130,12 @@ class DroppedSessionRepoResolver {
           samples: host.capturedSamples,
           gpsSampleDiagnostics: host.capturedGpsSampleDiagnostics,
           automatic: host.automatic,
+          // #3795 — the link never came back and the grace elapsed; the
+          // drop reason that started it is the supplementary detail.
+          termination: TripTermination(
+            TripTerminationReason.graceWindowExpiry,
+            detail: dropReason,
+          ),
         ));
       } catch (e, st) {
         unawaited(errorLogger.log(ErrorLayer.storage, e, st,

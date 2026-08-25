@@ -37,6 +37,12 @@ export 'domain/cold_start_baselines.dart';
 export 'domain/direct_fuel_rate_detector.dart';
 export 'domain/engine_power_factor.dart';
 export 'domain/entities/gps_sample_diagnostic.dart';
+// #3794 — recording-session transparency: the termination taxonomy and
+// the lifecycle timeline are read by the obd2 feature (the controller
+// records them) and by the export/UI surfaces.
+export 'domain/entities/recording_session_event.dart';
+export 'domain/entities/trip_termination.dart';
+export 'domain/recording_session_journal.dart';
 export 'domain/entities/trip_save_stage.dart';
 export 'domain/fuel_event_attribution.dart';
 export 'domain/gps_coverage_report.dart';

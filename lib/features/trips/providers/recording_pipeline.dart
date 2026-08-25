@@ -5,6 +5,8 @@ import '../domain/entities/gps_sample_diagnostic.dart';
 import '../domain/entities/trip_save_stage.dart';
 import '../domain/trip_recorder.dart';
 import 'trip_recording_state.dart';
+import '../domain/entities/trip_termination.dart';
+import '../domain/recording_session_journal.dart';
 
 // #3500 — re-exported so the OBD2 pipeline reaches the shared per-trip IMU
 // fusion through this already-imported seam file instead of raising the
@@ -130,6 +132,11 @@ abstract class RecordingPipelineHost {
     String? adapterName,
     String? adapterFirmware,
     int gpsFixCount,
+    // #3794 — recording-session transparency: WHY the session ended and
+    // its lifecycle timeline. Optional so the GPS-only pipeline and the
+    // legacy/test call sites compile unchanged and simply record less.
+    TripTermination? termination,
+    RecordingSessionJournal? sessionJournal,
   });
 
   /// #2548 — flip the notifier into the transient
