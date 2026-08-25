@@ -45,6 +45,14 @@ class Obd2ServiceSession {
   /// trafficked-ready flap exemption.
   int get successfulObdSends => _session?.successfulObdSends ?? 0;
 
+  /// #3779 — declare a session-bypassing long read (the protocol-search
+  /// `0100`) so the liveness watchdog holds instead of stale-killing the
+  /// socket mid-search. No-op when no session is attached.
+  void holdLivenessFor(Duration window) => _session?.holdLivenessFor(window);
+
+  /// #3779 — the long read resolved: clear the hold + refresh liveness.
+  void noteExternalReply() => _session?.noteExternalReply();
+
   /// Detach + dispose. Idempotent.
   void stop() {
     unawaited(_statesSub?.cancel());
