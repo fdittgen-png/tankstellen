@@ -17,8 +17,11 @@ name: Daily Open-Testing Build
 # uploaded; (2_100_000_000 - base) / 10 leaves ~7M runs of head-room under
 # Android's version-code cap. pubspec.yaml's +N keeps tracking manual releases.
 on:
-  schedule:
-    - cron: '0 16 * * *'
+  # #3792 — no own cron any more: the nightly tester cut is driven by
+  # `release-train.yml` (schedule '0 16 * * *'), which calls this workflow
+  # AND the iOS one from the SAME commit so Play beta and TestFlight extern
+  # never diverge. A second cron here would also double-upload to Play.
+  # Manual dispatch stays for Android-only hotfixes / non-beta tracks.
   # #3720 — callable from the Release Train orchestrator.
   workflow_call:
     inputs:

@@ -10,8 +10,10 @@ name: iOS TestFlight Build
 # computed at build time, so there's no commit pushed back to master and every
 # run gets a distinct, strictly-increasing CFBundleVersion.
 #
-# Scheduled runs (and manual runs with distribute:true) push the build to the
-# external 'extern' TestFlight group; plain manual runs stay internal-only.
+# Runs with distribute:true push the build to the external 'extern' TestFlight
+# group (Beta App Review); plain manual runs stay internal-only. The nightly
+# external cut is driven by release-train.yml (#3792), which builds this and
+# the Play beta from the same commit.
 
 on:
   # #3720 — callable from the Release Train orchestrator.
@@ -46,11 +48,12 @@ on:
         required: false
         type: boolean
         default: false
-  schedule:
-    # 04:30 Europe/Paris is intentionally distinct from the other daily crons:
-    # daily-beta.yml runs at 16:00 and daily-github-release.yml at 21:00, so the
-    # iOS nightly external build never collides with them.
-    - cron: '30 4 * * *'
+  # #3792 — no own cron any more. The 04:30 iOS cron and daily-beta.yml's
+  # 16:00 one cut DIFFERENT master commits 11.5 h apart, so iPhone and
+  # Android testers were never on the same code and no field report could be
+  # pinned to one state. `release-train.yml` (schedule '0 16 * * *') now calls
+  # both from the SAME commit with `distribute: true`. Manual dispatch stays
+  # for iOS-only builds and the sync_certs repair mode.
 
 concurrency:
   group: ios-testflight
@@ -164,9 +167,10 @@ jobs:
           # Fastfile's `asc_api_key` helper picks up the on-disk .p8.
           IOS_BUILD_NUMBER: ${{ steps.bn.outputs.build_number }}
           TESTFLIGHT_CHANGELOG: ${{ inputs.release_notes || 'Daily build.' }}
-          # Scheduled runs always distribute externally; manual runs only when
-          # the distribute input is checked.
-          DISTRIBUTE: ${{ github.event_name == 'schedule' || inputs.distribute }}
+          # #3792 — the input is now the ONLY switch: the nightly external
+          # build comes from the Release Train (which passes distribute:true),
+          # and a plain manual dispatch stays internal-only unless checked.
+          DISTRIBUTE: ${{ inputs.distribute }}
           # Beta App Review contact block carried inline on an external build
           # (the Fastfile omits it gracefully when BETA_CONTACT_PHONE is unset).
           BETA_CONTACT_PHONE: ${{ secrets.BETA_CONTACT_PHONE }}
