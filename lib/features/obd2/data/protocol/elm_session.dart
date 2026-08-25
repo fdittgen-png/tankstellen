@@ -112,6 +112,7 @@ class ElmSession {
   ElmSessionDeathCause? _deathCause;
   Timer? _watchdog;
   DateTime? _lastAliveAt;
+  DateTime? _longReadHoldUntil;
   int _consecutiveTimeouts = 0;
   int _consecutiveGarbage = 0;
   int _successfulObdSends = 0;
@@ -136,6 +137,30 @@ class ElmSession {
   /// Instant of the last reply that proved the link alive (any framed
   /// reply — including `NO DATA`, which means the ECU answered).
   DateTime? get lastAliveAt => _lastAliveAt;
+
+  /// #3779 (Epic #3775) — declare a LONG read in flight for [window]:
+  /// the ELM protocol-search `0100` is a single deliberately-long read
+  /// (up to ~15 s) that BYPASSES [send] (a re-send would restart the
+  /// search), so it can never refresh the liveness clock — and #3757's
+  /// 12 s [staleAfter] then declared the session dead mid-search,
+  /// tearing down the very socket the search was running on. While the
+  /// hold is armed the watchdog neither stale-kills nor keepalives
+  /// (nothing can land on the half-duplex queue anyway). Cleared by the
+  /// next reply ([noteExternalReply] / any [send]) or by expiry — an
+  /// expired hold restarts the staleness window instead of instantly
+  /// killing a link whose search just resolved.
+  void holdLivenessFor(Duration window) {
+    if (_disposed || _state == ElmSessionState.dead) return;
+    _longReadHoldUntil = _now().add(window);
+  }
+
+  /// #3779 — a reply arrived on a path that bypasses [send] (the
+  /// protocol-search long read): clear the hold and refresh liveness.
+  void noteExternalReply() {
+    _longReadHoldUntil = null;
+    _consecutiveTimeouts = 0;
+    _noteAlive();
+  }
 
   /// Adopt a link the caller ALREADY initialized (#3528 integration —
   /// `Obd2Service.connect` runs a richer init than [initialize]: wake
@@ -205,6 +230,7 @@ class ElmSession {
     // Any framed reply proves the link + adapter alive — including error
     // vocabulary. Timeouts are the only silence.
     _noteAlive();
+    _longReadHoldUntil = null; // #3779 — live traffic ends any hold
     _consecutiveTimeouts = 0;
     // AT/ST replies are conversational ('OK', '12.4V') — the OBD
     // classifier reads them as garbage, so they must bypass the ladder
@@ -282,6 +308,18 @@ class ElmSession {
       if (_state != ElmSessionState.ready &&
           _state != ElmSessionState.recovering) {
         return;
+      }
+      // #3779 — a declared long read (protocol search) is in flight:
+      // its silence is legitimate, so neither staleness nor keepalive
+      // may fire. On expiry the staleness window restarts from now —
+      // the search path owns its own timeout verdict, and an instant
+      // stale-kill here would punish a search that resolved at second
+      // 13 with a death at second 13.1.
+      final hold = _longReadHoldUntil;
+      if (hold != null) {
+        if (_now().isBefore(hold)) return;
+        _longReadHoldUntil = null;
+        _noteAlive();
       }
       final last = _lastAliveAt;
       if (last == null) return;

@@ -147,9 +147,9 @@ class DroppedSessionManager {
   void handleDrop({
     TripDropReason reason = TripDropReason.transportError,
   }) {
-    if (_host.pausedDueToDrop || _silentlyReconnecting) return;
-    // #1920 — trace every detected drop so a failed recording session
-    // can be analysed from the exportable OBD2 diagnostic log.
+    final degraded = _host.degradedGpsOnly; // #3776 — already handled
+    if (_host.pausedDueToDrop || _silentlyReconnecting || degraded) return;
+    // #1920 — trace every detected drop for the exportable OBD2 log.
     _trace(AutoRecordEventKind.dropDetected, detail: reason.name);
     // #2905 — record the connected→dropped transition (gated comm-health).
     Obd2CommDiagnostics.instance

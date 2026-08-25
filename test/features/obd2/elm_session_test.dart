@@ -263,6 +263,73 @@ void main() {
     });
   });
 
+  group('#3779 long-read liveness hold (Epic #3775)', () {
+    // #3757 tightened staleAfter to 12 s while the ELM protocol-search
+    // read window stayed 15 s — and the search read BYPASSES send() (a
+    // re-send would restart the search), so it can never refresh the
+    // liveness clock: the watchdog stale-killed the session mid-search,
+    // tearing down the very socket the search was running on. The hold
+    // declares the long read; the watchdog must neither stale-kill nor
+    // keepalive until the hold resolves or expires.
+    test('a declared long read survives past staleAfter with no ATRV', () {
+      fakeAsync((async) {
+        final transport = _ScriptedTransport(_healthyInitReplies());
+        var now = DateTime(2026, 8, 25);
+        final session = ElmSession(transport, now: () => now);
+        unawaited(session.initialize());
+        async.flushMicrotasks();
+        expect(session.state, ElmSessionState.ready);
+        transport.sent.clear();
+
+        session.holdLivenessFor(const Duration(seconds: 17));
+        now = now.add(const Duration(seconds: 13));
+        async.elapse(const Duration(seconds: 13));
+
+        expect(session.state, ElmSessionState.ready,
+            reason: 'a 13 s silent search inside its declared window is '
+                'legitimate — the 12 s stale bound must hold');
+        expect(transport.sent.where((c) => c.startsWith('ATRV')), isEmpty,
+            reason: 'nothing can land on the half-duplex queue during '
+                'the long read — no keepalive');
+
+        // The search resolved: liveness refreshes, life goes on.
+        session.noteExternalReply();
+        now = now.add(const Duration(seconds: 3));
+        async.elapse(const Duration(seconds: 3));
+        expect(session.state, ElmSessionState.ready);
+        session.dispose();
+      });
+    });
+
+    test('an expired hold restarts the staleness window — no instant kill',
+        () {
+      fakeAsync((async) {
+        final transport = _ScriptedTransport(_healthyInitReplies());
+        var now = DateTime(2026, 8, 25);
+        final session = ElmSession(transport, now: () => now);
+        unawaited(session.initialize());
+        async.flushMicrotasks();
+        // Total silence after init: the keepalive hangs too.
+        transport.hangCommands.add('ATRV');
+
+        session.holdLivenessFor(const Duration(seconds: 5));
+        now = now.add(const Duration(seconds: 13));
+        async.elapse(const Duration(seconds: 13));
+        expect(session.state, ElmSessionState.ready,
+            reason: 'expiry restarts the 12 s window from the expiry '
+                'tick — a search that resolved at second 13 must not be '
+                'punished with a death at 13.1');
+
+        now = now.add(const Duration(seconds: 14));
+        async.elapse(const Duration(seconds: 14));
+        expect(session.state, ElmSessionState.dead,
+            reason: 'genuine post-expiry silence still dies (stale)');
+        expect(session.deathCause, ElmSessionDeathCause.stale);
+        session.dispose();
+      });
+    });
+  });
+
   test('the ladder uses the shared command constants', () {
     // Guard the constants the ladder depends on — a rename must break
     // loudly here, not silently change wire behavior.

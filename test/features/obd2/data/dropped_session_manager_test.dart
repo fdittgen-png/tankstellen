@@ -409,6 +409,33 @@ void main() {
     });
 
     group('#2565 GPS-only degrade', () {
+      test(
+          '#3776 — a second drop verdict while ALREADY degraded is a '
+          'no-op: no second teardown against the recovering link', () {
+        final host = _FakeHost()..gpsAlive = true;
+        final mgr = build(
+          host,
+          pinnedMac: 'AA:BB',
+          scannerFactory: (mac, onReconnect) =>
+              _FakeScanner()..onReconnect = onReconnect,
+        );
+
+        mgr.handleDrop();
+        expect(host.degradedGpsOnly, isTrue);
+        expect(host.disconnectDroppedServiceCalls, 1);
+        expect(host.stopSchedulerCalls, 1);
+
+        // The #3602 fence firing again — or a transport error landing on
+        // the corpse — must not re-run the teardown: the supervisor may
+        // already be dialing a FRESH link, and a second
+        // disconnectDroppedService would close it (or churn the trace).
+        mgr.handleDrop(reason: TripDropReason.silentFailure);
+        mgr.handleDrop();
+        expect(host.disconnectDroppedServiceCalls, 1,
+            reason: 'degraded is an already-handled drop (#3776)');
+        expect(host.stopSchedulerCalls, 1);
+      });
+
       test('a transportError drop when GPS is alive degrades to GPS-only '
           'instead of pausing — scanner probing, NO grace timer', () async {
         final host = _FakeHost()..gpsAlive = true;

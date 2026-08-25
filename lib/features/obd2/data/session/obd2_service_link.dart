@@ -246,10 +246,18 @@ mixin _Obd2ServiceLink implements Obd2RawCommandPort, Obd2FuelRateReads {
   /// `preParse` hook is applied to the raw reply exactly as in [_send].
   Future<String> _sendWithProtocolSearchWindow(String command) async {
     final transport = _transport;
+    // #3779 — this read bypasses the ElmSession (a re-send would restart
+    // the ELM's auto-search), so it cannot refresh the liveness clock;
+    // declare it so the watchdog holds for the window (+ a settle
+    // margin) instead of stale-killing the socket mid-search (#3757 cut
+    // staleAfter to 12 s while this window is 15 s).
+    _session.holdLivenessFor(
+        kObd2ProtocolSearchTimeout + const Duration(seconds: 2));
     final raw = transport is Obd2ProtocolSearchTransport
         ? await (transport as Obd2ProtocolSearchTransport)
             .sendCommandWithReadTimeout(command, kObd2ProtocolSearchTimeout)
         : await transport.sendCommand(command);
+    _session.noteExternalReply();
     return _adapter.preParse(raw);
   }
 }

@@ -116,6 +116,26 @@ void main() {
       expect(fake.stopCalls, 0);
     });
 
+    testWidgets(
+        '#3781 (Epic #3775) — a Reset-connection action is present and '
+        'never touches the recording state', (tester) async {
+      final fake = _FakeTripRecording(
+        const TripRecordingState(phase: TripRecordingPhase.pausedDueToDrop),
+      );
+      await pumpApp(
+        tester,
+        const _Host(),
+        overrides: [tripRecordingProvider.overrideWith(() => fake)],
+      );
+
+      expect(find.byKey(const Key('obd2PauseBannerReset')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('obd2PauseBannerReset')));
+      await tester.pumpAndSettle();
+      expect(fake.resumeCalls, 0,
+          reason: 'the reset recycles only the link, not the recording');
+      expect(fake.stopCalls, 0);
+    });
+
     testWidgets('End action calls provider.stop()', (tester) async {
       final fake = _FakeTripRecording(
         const TripRecordingState(phase: TripRecordingPhase.pausedDueToDrop),

@@ -19,6 +19,7 @@ import '../data/session/obd2_dial_budget.dart';
 import '../data/session/obd2_disconnect_quietly.dart';
 import '../data/session/obd2_link_supervisor.dart';
 import '../data/session/obd2_service.dart';
+import '../domain/obd2_engine_evidence.dart';
 import 'obd2_connection_state_provider.dart';
 
 part 'obd2_reconnect_provider.g.dart';
@@ -188,7 +189,7 @@ class Obd2Reconnect extends _$Obd2Reconnect {
         ),
         transportDecisionReason: 'reconnect-active-vehicle',
       );
-      final classified = _classify(byVehicle);
+      final classified = await _classify(byVehicle);
       if (classified != null || _supervisor?.userRequestedDisconnect == true) {
         return classified;
       }
@@ -205,7 +206,7 @@ class Obd2Reconnect extends _$Obd2Reconnect {
             ? 'reconnect-pinned-classic'
             : 'reconnect-pinned-ble',
       );
-      final classified = _classify(direct);
+      final classified = await _classify(direct);
       if (classified != null || _supervisor?.userRequestedDisconnect == true) {
         return classified;
       }
@@ -269,16 +270,45 @@ class Obd2Reconnect extends _$Obd2Reconnect {
 
   /// Engine-off gate for a dial result. Returns the service to keep, or
   /// null after parking/releasing.
-  Obd2Service? _classify(Obd2Service? svc) {
+  ///
+  /// #3780 (Epic #3775) — `probedSilent` is NOT a reliable engine-off
+  /// signal: `UNABLE TO CONNECT`/`STOPPED` classify as silent, yet the
+  /// K-line failed-search livelock produces exactly that reply with the
+  /// engine RUNNING (#3575). The trip-START gate got the #3551/#3571
+  /// recovery rungs; this reconnect gate never did — it parked the
+  /// supervisor mid-drive on the first silent verdict, disabling every
+  /// redial AND the trip's re-attach for the rest of the drive. With
+  /// fresh engine evidence (#3756 — an engine PID parsed within 10 min)
+  /// a drive is demonstrably in progress: pay one bounded
+  /// `recoverVehicleProtocol` pass, and even if the bus stays silent
+  /// KEEP the link instead of parking — the in-trip #3575/#3577 episode
+  /// recovery gets its chance, and a mid-drive park is the one
+  /// catastrophic outcome. A parked car produces no evidence and keeps
+  /// the zero-cost park exactly as before.
+  Future<Obd2Service?> _classify(Obd2Service? svc) async {
     if (svc == null) return null;
-    if (svc.busProbe == Obd2BusProbeResult.probedSilent) {
-      // Adapter back, ECU silent — a parked car. Release the link (the
-      // adapter sleeps on its own) and park the loop.
-      unawaited(svc.disconnectQuietly());
-      _supervisor?.noteEngineOff();
-      return null;
+    if (svc.busProbe != Obd2BusProbeResult.probedSilent) return svc;
+    if (Obd2EngineEvidence.instance.isFresh()) {
+      BreadcrumbCollector.add(
+        'OBD2 reconnect: silent bus but engine evidence fresh — '
+        'recovering protocol (#3780)',
+      );
+      final answered = await svc.recoverVehicleProtocol();
+      BreadcrumbCollector.add(
+        'OBD2 reconnect: post-recovery verdict (#3780)',
+        detail: answered
+            ? 'bus answered — kept'
+            : 'still silent — kept (mid-drive park refused; in-trip '
+                'recovery owns the rest)',
+      );
+      return svc;
     }
-    return svc;
+    // Adapter back, ECU silent, no evidence of a running engine — a
+    // parked car. Release the link (the adapter sleeps on its own) and
+    // park the loop.
+    unawaited(svc.disconnectQuietly());
+    _supervisor?.noteEngineOff();
+    return null;
   }
 
   void _logSeam(String where, Object e, StackTrace st) {

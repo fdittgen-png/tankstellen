@@ -64,6 +64,10 @@ mixin _TripRecordingSessionState {
   // -------------------------------------------------------------------
   Obd2Service get _service;
   set _service(Obd2Service value);
+  // #3776 — link-ownership seam (null without a supervisor graph). The
+  // report seam is reached via the concrete controller (`_c.` in the
+  // drop-host adapter), so only the predicate needs the mixin re-decl.
+  bool Function(Obd2Service service)? get _isLinkSupervised;
   TripRecorder get _recorder;
   Duration get _pollInterval;
   DateTime Function() get _now;

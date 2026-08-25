@@ -111,6 +111,35 @@ void main() {
       expect(find.byKey(const Key('obd2PauseBannerEnd')), findsNothing);
     });
 
+    testWidgets(
+        '#3781 (Epic #3775) — the banner carries a Reset-connection '
+        'action; tapping it never touches the recording state', (tester) async {
+      final fake = _FakeTripRecording(
+        const TripRecordingState(phase: TripRecordingPhase.degradedGpsOnly),
+      );
+      await pumpApp(
+        tester,
+        const _Host(),
+        overrides: [tripRecordingProvider.overrideWith(() => fake)],
+      );
+      await tester.pump(_pastDebounce);
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('gpsDegradedBannerReset')), findsOneWidget,
+          reason: 'the reset must be reachable exactly where the failure '
+              'surfaces — not only in the kebab overflow');
+
+      await tester.tap(find.byKey(const Key('gpsDegradedBannerReset')));
+      await tester.pumpAndSettle();
+
+      // Recording is NEVER interrupted by a reset: only the OBD2 link
+      // recycles (on this bare test graph the guarded run degrades to
+      // the "reconnecting in the background" outcome snackbar).
+      expect(fake.stopCalls, 0);
+      expect(fake.resumeCalls, 0);
+      expect(find.byType(SnackBar), findsOneWidget,
+          reason: 'the honest outcome snackbar surfaces');
+    });
+
     testWidgets('the pause banner does NOT render in degradedGpsOnly — '
         'the two banners are mutually exclusive', (tester) async {
       final fake = _FakeTripRecording(

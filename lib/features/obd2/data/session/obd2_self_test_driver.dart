@@ -252,7 +252,14 @@ Future<Obd2SelfTestReport> runObd2SelfTest(
           transport: transportHint,
           decisionReason: decisionReason,
           adapterName: adapterName,
-          connectDeadline: connectDeadline);
+          connectDeadline: connectDeadline,
+          // #3778 (Epic #3775) — the deliberate drop + redial must go
+          // THROUGH the owner: disconnecting a supervisor-owned service
+          // directly and redialing around the supervisor left it parked
+          // in `ready` holding a corpse — no keepalive, no drop signal,
+          // and `sup.service` handed that corpse to the next trip start
+          // (the 2026-08-25 zero-engine-data field trip).
+          linkSupervisor: linkSupervisor);
       emit(reconnected.result);
       if (reconnected.service != null) {
         // Re-tag the post-reconnect session so BOTH self-test sessions are

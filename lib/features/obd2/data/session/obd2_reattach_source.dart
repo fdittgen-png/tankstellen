@@ -55,14 +55,25 @@ class SupervisorReattachSource implements Obd2ReattachSource {
     this._supervisor, {
     required void Function(Obd2Service service) onConnected,
     required VoidCallback onReconnect,
+    Duration revalidateInterval = defaultRevalidateInterval,
   })  : _onConnected = onConnected,
-        _onReconnect = onReconnect;
+        _onReconnect = onReconnect,
+        _revalidateInterval = revalidateInterval;
+
+  /// #3777 — cadence of the level revalidation while unfired. Cheap (a
+  /// state + bool read); exists so NO missed edge can strand the trip:
+  /// the supervisor's `_setState` dedupes, so a supervisor already
+  /// parked in `ready` holding a corpse never emits a transition — the
+  /// 2026-08-25 field trip waited on that edge for the whole drive.
+  static const Duration defaultRevalidateInterval = Duration(seconds: 5);
 
   final Obd2LinkSupervisor _supervisor;
   final void Function(Obd2Service service) _onConnected;
   final VoidCallback _onReconnect;
+  final Duration _revalidateInterval;
 
   StreamSubscription<Obd2LinkState>? _sub;
+  Timer? _revalidate;
   VoidCallback? _onPassiveWait;
   bool _passiveNotified = false;
   bool _fired = false;
@@ -70,28 +81,9 @@ class SupervisorReattachSource implements Obd2ReattachSource {
   @override
   Future<void> start() async {
     if (_sub != null || _fired) return;
-    // The supervisor may have re-attached BEFORE the manager finished
-    // its drop bookkeeping and started us — deliver immediately. BUT
-    // (#3625) only a service whose transport is actually open counts:
-    // after an in-trip drop the supervisor can still HOLD the very
-    // corpse the trip just dropped (disconnectDroppedService closed its
-    // transport; the reference lingers until the next dial). Firing
-    // with it resumed the scheduler onto a dead socket → instant
-    // re-drop → new reattach source → same corpse — the ~4.7 s
-    // success-flap loop that recorded a whole field trip with zero
-    // engine data. A held-but-dead service waits for the next genuine
-    // ready below.
-    final live = _supervisor.service;
-    if (live != null && live.isConnected) {
-      _fire(live);
-      return;
-    }
     _sub = _supervisor.states.listen((next) {
       if (next == Obd2LinkState.ready) {
-        // #3625 — same guard: a ready racing a teardown must not hand
-        // the trip a corpse.
-        final svc = _supervisor.service;
-        if (svc != null && svc.isConnected) _fire(svc);
+        _poke();
         return;
       }
       if (next == Obd2LinkState.reconnecting &&
@@ -101,6 +93,30 @@ class SupervisorReattachSource implements Obd2ReattachSource {
         _onPassiveWait?.call();
       }
     });
+    // #3777 — LEVEL-triggered, not edge-triggered: evaluate the current
+    // state immediately (the supervisor may have re-attached before the
+    // manager finished its drop bookkeeping and started us) and keep
+    // revalidating on a slow tick until fired. Whatever upstream defect
+    // leaves the supervisor `ready` with a dead service, the poke routes
+    // it into `ensureLive` → recycle → a genuine ready.
+    _revalidate = Timer.periodic(_revalidateInterval, (_) => _poke());
+    _poke();
+  }
+
+  /// One level evaluation. `ready` + live transport fires the rebind
+  /// (#3625 — a held-but-dead corpse must never be handed to the trip);
+  /// `ready` + dead transport is the corpse shape → ask the owner to
+  /// self-heal; `reconnecting` means the ladder is already working;
+  /// `engineOff` waits for a wake trigger.
+  void _poke() {
+    if (_fired) return;
+    if (_supervisor.state.value != Obd2LinkState.ready) return;
+    final svc = _supervisor.service;
+    if (svc != null && svc.isConnected) {
+      _fire(svc);
+      return;
+    }
+    _supervisor.ensureLive(reason: 'trip-reattach');
   }
 
   void _fire(Obd2Service service) {
@@ -113,6 +129,8 @@ class SupervisorReattachSource implements Obd2ReattachSource {
 
   @override
   Future<void> stop() async {
+    _revalidate?.cancel();
+    _revalidate = null;
     await _sub?.cancel();
     _sub = null;
   }

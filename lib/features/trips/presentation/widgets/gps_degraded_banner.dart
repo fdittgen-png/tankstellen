@@ -8,6 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_radius.dart';
 import '../../../../l10n/app_localizations.dart';
+// #3781 — the one guarded reset run (barrel import: boundary-exempt).
+import '../../../obd2/api.dart' show runObd2ConnectionReset;
 // `trip_recording_provider.dart` re-exports `TripRecordingPhase`.
 import '../../providers/trip_recording_provider.dart';
 
@@ -68,6 +70,9 @@ class GpsDegradedBanner extends ConsumerStatefulWidget {
 class _GpsDegradedBannerState extends ConsumerState<GpsDegradedBanner> {
   /// Whether the banner is currently displayed (post-debounce, pre-grace).
   bool _visible = false;
+
+  /// #3781 — reset action in flight (double-tap guard + busy spinner).
+  bool _resetBusy = false;
 
   /// Pending appear (degrade still settling) / hide (grace) timer. Only
   /// one is ever live at a time — entering degraded cancels a pending
@@ -201,9 +206,39 @@ class _GpsDegradedBannerState extends ConsumerState<GpsDegradedBanner> {
                 ),
               ),
             ),
+            const SizedBox(width: 4),
+            // #3781 (Epic #3775) — the reset lived only in the kebab
+            // overflow; the moment the user actually needs it is THIS
+            // banner. Recording is never interrupted: the reset recycles
+            // the link through the supervisor's single flight and the
+            // trip re-binds when the fresh link reaches ready.
+            TextButton(
+              key: const Key('gpsDegradedBannerReset'),
+              style: TextButton.styleFrom(
+                visualDensity: VisualDensity.compact,
+                foregroundColor: theme.colorScheme.onSecondaryContainer,
+              ),
+              onPressed: _resetBusy ? null : _runReset,
+              child: _resetBusy
+                  ? const SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(l.obd2ResetConnection),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _runReset() async {
+    setState(() => _resetBusy = true);
+    try {
+      await runObd2ConnectionReset(context, ref);
+    } finally {
+      if (mounted) setState(() => _resetBusy = false);
+    }
   }
 }

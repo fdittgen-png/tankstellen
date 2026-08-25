@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../trips/api.dart';
+import '../obd2_connection_reset_action.dart';
 
 /// Banner shown when the OBD2 Bluetooth link drops mid-recording
 /// (#797 phase 2).
@@ -96,6 +97,18 @@ class Obd2PauseBanner extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  // #3781 (Epic #3775) — the reset, reachable exactly
+                  // where the failure surfaces. Recording state is
+                  // untouched; the link recycles through the supervisor.
+                  TextButton(
+                    key: const Key('obd2PauseBannerReset'),
+                    style: TextButton.styleFrom(
+                      visualDensity: VisualDensity.compact,
+                      foregroundColor: theme.colorScheme.onErrorContainer,
+                    ),
+                    onPressed: () => runObd2ConnectionReset(context, ref),
+                    child: Text(l.obd2ResetConnection),
+                  ),
                   TextButton(
                     key: const Key('obd2PauseBannerResume'),
                     style: TextButton.styleFrom(

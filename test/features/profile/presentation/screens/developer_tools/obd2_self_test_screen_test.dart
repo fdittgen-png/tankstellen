@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/data/protocol/adapter_registry.dart';
 import 'package:tankstellen/features/obd2/data/transport/bluetooth_facade.dart';
@@ -10,6 +11,7 @@ import 'package:tankstellen/features/obd2/data/obd2_comm_diagnostics.dart';
 import 'package:tankstellen/features/obd2/data/session/obd2_connection_service.dart';
 import 'package:tankstellen/features/obd2/data/transport/obd2_permissions.dart';
 import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/providers/obd2_reconnect_provider.dart';
 import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
@@ -43,6 +45,17 @@ const _happyPathResponses = {
 /// Widget coverage for the #2645 adapter self-test panel on the OBD2
 /// communication-health screen. No real BLE — the connection provider is
 /// overridden with a fake that returns a scripted [Obd2Service].
+
+/// #3778 KEEP-LINK — a supervised self-test run now deliberately leaves
+/// the reconnected link UP (the supervisor keeps supervising it). Release
+/// it so its ElmSession watchdog timer does not outlive the widget test.
+Future<void> _releaseKeptLink(WidgetTester tester) async {
+  final container =
+      ProviderScope.containerOf(tester.element(find.byType(Obd2HealthScreen)));
+  await container.read(obd2ReconnectProvider.notifier).supervisor.disconnect();
+  await tester.pump();
+}
+
 void main() {
   final collector = Obd2CommDiagnostics.instance;
   setUp(() => collector
@@ -99,6 +112,7 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Adapter test passed'), findsOneWidget);
+    await _releaseKeptLink(tester);
   });
 
   testWidgets('passed-step rows show an accessible-labelled check icon',
@@ -115,6 +129,7 @@ void main() {
           w.semanticLabel == 'OK',
     );
     expect(okIcons, findsWidgets);
+    await _releaseKeptLink(tester);
   });
 
   testWidgets('the run button is disabled while a recording is active',
@@ -174,6 +189,7 @@ void main() {
     expect(find.text('Connect to $_pairedName'), findsOneWidget);
     expect(find.text('Scan for adapter'), findsNothing);
     expect(find.text('Adapter test passed'), findsOneWidget);
+    await _releaseKeptLink(tester);
   });
 
   testWidgets(
@@ -198,6 +214,7 @@ void main() {
     // The legacy blind scan (connectBest) ran — no MAC was pinned.
     expect(conn.connectBestCalls, 1);
     expect(find.text('Adapter test passed'), findsOneWidget);
+    await _releaseKeptLink(tester);
   });
 }
 
