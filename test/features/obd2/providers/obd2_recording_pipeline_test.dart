@@ -22,6 +22,8 @@ import 'package:tankstellen/features/trips/providers/trip_recording_phase.dart';
 import 'package:tankstellen/features/trips/providers/trip_recording_state.dart';
 
 import '../../../helpers/silence_error_logger.dart';
+import 'package:tankstellen/features/trips/domain/entities/trip_termination.dart';
+import 'package:tankstellen/features/trips/domain/recording_session_journal.dart';
 
 /// Direct unit tests for the #2227 [Obd2RecordingPipeline] — the OBD2
 /// recording strategy extracted from the [TripRecording] notifier behind
@@ -343,6 +345,9 @@ class _FakeWalHost implements Obd2RecordingPipelineHost {
     String? adapterName,
     String? adapterFirmware,
     int gpsFixCount = 0,
+    // #3794 — session-transparency payloads (unused by this fake).
+    TripTermination? termination,
+    RecordingSessionJournal? sessionJournal,
   }) async {
     // Mirror the notifier's tightened stub-discard guard (#1923 / #2509) so
     // the test asserts the same persistence behaviour the real host

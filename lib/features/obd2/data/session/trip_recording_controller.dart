@@ -133,6 +133,20 @@ class TripRecordingController
   /// the original (closed) transport, every poll timed out at 2.5 s, a
   /// stranded `_pending` tripped the concurrent-sendCommand guard, and
   /// the rest of the drive recorded nothing.
+  /// #3797 — the recording session's lifecycle timeline. Always on and
+  /// bounded (see [RecordingSessionJournal]); read at save time so the
+  /// trip row and every export can explain how the session went.
+  @override
+  final RecordingSessionJournal _sessionJournal = RecordingSessionJournal();
+
+  /// The lifecycle timeline of this recording (#3797). Empty until
+  /// [start] anchors it.
+  RecordingSessionJournal get sessionJournal => _sessionJournal;
+
+  /// #3795 — how this session ended (set via [noteTermination]).
+  @override
+  TripTermination? _termination;
+
   @override
   Obd2Service _service;
   // #3776 — link-ownership seam (see the constructor doc).

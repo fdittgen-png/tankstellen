@@ -15,6 +15,7 @@ import 'package:tankstellen/features/obd2/data/paused_trip_repository.dart';
 import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 import 'package:tankstellen/features/trips/domain/entities/gps_sample_diagnostic.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
+import 'package:tankstellen/features/trips/domain/entities/recording_session_event.dart';
 
 /// Focused unit tests for the #2188 [DroppedSessionManager] — the
 /// connection-drop RECOVERY state machine extracted from
@@ -436,6 +437,33 @@ void main() {
         expect(host.stopSchedulerCalls, 1);
       });
 
+      test(
+          '#3797 — the drop→degrade→reconnect cycle writes a readable '
+          'timeline (the export must explain itself)', () {
+        final host = _FakeHost()..gpsAlive = true;
+        final mgr = build(
+          host,
+          pinnedMac: 'AA:BB',
+          scannerFactory: (mac, onReconnect) =>
+              _FakeScanner()..onReconnect = onReconnect,
+        );
+
+        mgr.handleDrop(reason: TripDropReason.silentFailure);
+        mgr.onScannerReconnect();
+
+        // The scheduler pause/resume events are journaled by the real
+        // host adapter (which mediates every gating call, so it catches
+        // callers this manager never sees); a fake host records only the
+        // manager's own transitions — which is exactly this contract.
+        expect(host.sessionEvents, [
+          'linkDrop:silentFailure',
+          'degradedGpsOnly:silentFailure',
+          'leftDegraded',
+        ], reason: 'the timeline is the whole point: a reader must see '
+            'WHAT dropped, that GPS carried the trip, and when OBD2 '
+            'came back — in order');
+      });
+
       test('a transportError drop when GPS is alive degrades to GPS-only '
           'instead of pausing — scanner probing, NO grace timer', () async {
         final host = _FakeHost()..gpsAlive = true;
@@ -737,6 +765,14 @@ class _FakeHost implements DroppedSessionHost {
 
   @override
   void emitState() => emitStateCalls++;
+
+  /// #3797 — the manager writes its lifecycle transitions here; the fake
+  /// records them so a test can assert the timeline the export will show.
+  final List<String> sessionEvents = [];
+
+  @override
+  void noteSessionEvent(RecordingSessionEventKind kind, {String? detail}) =>
+      sessionEvents.add(detail == null ? kind.name : '${kind.name}:$detail');
 
   @override
   void resumeFromReconnect() {

@@ -104,6 +104,19 @@ mixin _TripRecordingPersist
           summary: summary,
           automatic: snapshot.automatic,
           samples: snapshot.samples,
+          // #3796 — the honest label. A WAL row whose writing process is
+          // not this one was left behind by a process that died: an
+          // orderly stop always clears it. Until now this trip was saved
+          // indistinguishable from a normal one, after being surfaced to
+          // the user as a Bluetooth drop.
+          termination: ProcessDeathContext.diedWhileRecording(
+                  snapshot.processInstanceId)
+              ? TripTermination(
+                  TripTerminationReason.recoveredAfterProcessDeath,
+                  detail: ProcessDeathContext.terminationDetail(),
+                )
+              : const TripTermination(TripTerminationReason.userStopped,
+                  detail: 'finalised from a recovered snapshot'),
         ));
       } catch (e, st) {
         unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording recovered finalise: save failed'}));
@@ -155,6 +168,10 @@ mixin _TripRecordingPersist
     String? adapterName,
     String? adapterFirmware,
     int gpsFixCount = 0,
+    // #3794 — session transparency payloads (null on the GPS-only and
+    // legacy paths, which simply persist less).
+    TripTermination? termination,
+    RecordingSessionJournal? sessionJournal,
   }) async {
     // Skip stub / ghost trips so they never clutter history (#1923 / #2509
     // no-movement guard + #2692 C4-H virtual-ghost guard). The full decision
@@ -232,6 +249,15 @@ mixin _TripRecordingPersist
             : _lifecycleMarks.marksForWindow(
                 summary.startedAt!, summary.endedAt ?? DateTime.now()),
         obd2Diagnostic: obd2Diagnostic, // #2912 — per-trip comm-health
+        // #3795/#3797 — WHY the session ended + its lifecycle timeline.
+        // Defaulted to userStopped only when the caller attributed
+        // nothing: an unattributed manual save IS a user stop, whereas
+        // guessing on the automatic path would mislabel a grace expiry.
+        termination: termination ??
+            (automatic
+                ? null
+                : const TripTermination(TripTerminationReason.userStopped)),
+        sessionJournal: sessionJournal,
       ));
       ref.read(tripHistoryListProvider.notifier).refresh();
       // #2392 — calibrate the vehicle's physicsScale from this trip's

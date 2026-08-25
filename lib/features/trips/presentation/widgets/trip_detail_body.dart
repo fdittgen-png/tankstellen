@@ -358,6 +358,10 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
             gpsCoverage: _gpsCoverage,
             samples: _tripSamples,
             verdict: widget.entry.verdict, // #3501
+            // #3798 — hand over the persisted row so the export carries
+            // the termination reason, the session timeline and the
+            // adapter identity instead of discarding them.
+            entry: widget.entry,
           ),
         // #1895 — the per-trip telemetry charts, folded into one
         // collapsed-by-default section. Extracted to its own widget (#2804)

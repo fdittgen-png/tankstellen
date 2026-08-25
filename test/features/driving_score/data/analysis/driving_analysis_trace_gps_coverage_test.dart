@@ -57,7 +57,7 @@ void main() {
         gpsCoverage: coverage,
       );
 
-  test('schema is 3 and the gpsCoverage block round-trips through JSON',
+  test('the gpsCoverage block round-trips through JSON at the current schema',
       () {
     // A backgrounded 30 s hole on a no-FGS build — the field scenario.
     final samples = [
@@ -79,7 +79,10 @@ void main() {
 
     final json = trace(coverage: coverage).toJson();
 
-    expect(json['schema'], 4); // v4: additive obd2Coverage + verdict (#3499/#3501)
+    // v5 (#3794): additive session + obd2Link blocks, on top of v4's
+    // obd2Coverage + verdict (#3499/#3501). Every bump is additive, so
+    // this block's contract is unchanged.
+    expect(json['schema'], 5);
     final block = json['gpsCoverage'] as Map<String, dynamic>;
     expect(block['actualFixCount'], 12);
     expect(block['expectedFixCount'], 41);

@@ -130,8 +130,12 @@ mixin _TripRecordingTransportGuard on _TripRecordingSessionState {
     _protocolWorkInFlight = true;
     final scheduler = _scheduler;
     scheduler?.pause();
+    _sessionJournal.add(RecordingSessionEventKind.protocolEstablish,
+        detail: label);
     try {
       final recovered = await _service.recoverVehicleProtocol();
+      _sessionJournal.add(RecordingSessionEventKind.protocolVerdict,
+          detail: recovered ? 'answered' : 'silent');
       BreadcrumbCollector.add(
         'OBD2 recording: $label',
         detail: recovered

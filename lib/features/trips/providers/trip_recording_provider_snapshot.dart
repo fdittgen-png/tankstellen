@@ -109,6 +109,9 @@ mixin _TripRecordingSnapshot on _$TripRecording, _TripRecordingCore {
       odometerLatestKm: ctl.odometerLatestKm,
       startedAt: startedAt,
       lastFlushedAt: DateTime.now(),
+      // #3796 — whose process wrote this WAL row.
+
+      processInstanceId: ProcessDeathContext.instanceId,
     );
     _lastSnapshotFlushAt = null;
     _samplesSinceLastFlush = 0;

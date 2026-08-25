@@ -37,7 +37,23 @@ class DrivingAnalysisTrace {
   /// (full / partial / droppedMidTrip / noEngineData), so a `gpsPlusObd2`
   /// trip whose `obd2Features` are null is no longer unexplained. Purely
   /// additive — null on empty trips; v3 readers still parse.
-  static const int schema = 4;
+  /// v5 (#3798, Epic #3794) — recording-session transparency. Two new
+  /// top-level blocks answer the question every field report raises and
+  /// no earlier schema could: **why did the session end, and what
+  /// happened to the OBD2 link while it ran?**
+  ///
+  ///  * `session` — the termination class + detail (`userStopped`,
+  ///    `graceWindowExpiry`, `recoveredAfterProcessDeath`, …), the
+  ///    adapter identity, and the automatic flag.
+  ///  * `obd2Link` — the trip-scoped lifecycle timeline: link
+  ///    ready/drop/reconnect, protocol establishment and its verdict,
+  ///    service rebinds, scheduler gating, GPS-degrade, the staleness
+  ///    fence. Always captured (not debug-gated), so an ordinary
+  ///    tester's export explains itself.
+  ///
+  /// Purely additive: both null on legacy trips, and v4 readers that
+  /// ignore unknown keys still parse.
+  static const int schema = 5;
 
   final DateTime capturedAt;
 
@@ -88,7 +104,27 @@ class DrivingAnalysisTrace {
     this.obd2Coverage,
     this.verdict,
     this.comment = kDrivingAnalysisCommentPrompt,
+    this.termination,
+    this.sessionJournal,
+    this.adapterName,
+    this.adapterMac,
+    this.automatic = false,
   });
+
+  /// #3795 — how the recording ended. Null for trips saved before the
+  /// termination taxonomy existed.
+  final TripTermination? termination;
+
+  /// #3797 — the session's lifecycle timeline.
+  final RecordingSessionJournal? sessionJournal;
+
+  /// #1312 — adapter identity, already persisted on the trip and until
+  /// now dropped at export time.
+  final String? adapterName;
+  final String? adapterMac;
+
+  /// Whether auto-record started this trip.
+  final bool automatic;
 
   Map<String, dynamic> toJson() => {
         'schema': schema,
@@ -167,6 +203,34 @@ class DrivingAnalysisTrace {
         // #3499 (schema v4) — engine-sample coverage + reason, the honest
         // companion to a null obd2Features on a gpsPlusObd2 trip.
         'obd2Coverage': obd2Coverage?.toJson(),
+        // #3795/#3798 — WHY the session ended, plus the identity a field
+        // report needs to attribute it. Emitted even when the
+        // termination is unknown, so "not recorded" is explicit rather
+        // than a missing key the reader has to interpret.
+        'session': {
+          'terminationReason':
+              termination?.reason.name ?? 'unrecorded',
+          if (termination?.detail != null)
+            'terminationDetail': termination!.detail,
+          'automatic': automatic,
+          if (adapterName != null) 'adapterName': adapterName,
+          if (adapterMac != null) 'adapterMac': adapterMac,
+          'startedAt': summary.startedAt?.toIso8601String(),
+          'endedAt': summary.endedAt?.toIso8601String(),
+        },
+        // #3797/#3798 — the correlated lifecycle timeline. Null (not an
+        // empty object) when the trip never recorded one, so a legacy
+        // export stays visibly distinct from a trip that genuinely had
+        // no link events.
+        'obd2Link': sessionJournal == null
+            ? null
+            : {
+                'events': sessionJournal!.events
+                    .map((e) => e.toJson())
+                    .toList(growable: false),
+                if (sessionJournal!.droppedEvents > 0)
+                  'droppedEvents': sessionJournal!.droppedEvents,
+              },
         // #3465 — GPS coverage + attributed track gaps (schema v3). Null
         // when there is no track to judge; the gap list inside is capped
         // at [GpsCoverageReport.kExportGapCap] entries.

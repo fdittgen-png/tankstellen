@@ -34,6 +34,8 @@ import 'package:tankstellen/core/domain/station.dart';
 
 import '../../../helpers/empty_imu_source.dart';
 import '../../../helpers/silence_error_logger.dart';
+import 'package:tankstellen/features/trips/domain/entities/trip_termination.dart';
+import 'package:tankstellen/features/trips/domain/recording_session_journal.dart';
 
 /// #2646 integration regression — the fuel-station radar + swipe must work in
 /// GPS-only recording, not just OBD2.
@@ -236,6 +238,9 @@ class _Host implements RecordingPipelineHost {
     String? adapterName,
     String? adapterFirmware,
     int gpsFixCount = 0,
+    // #3794 — session-transparency payloads (unused by this fake).
+    TripTermination? termination,
+    RecordingSessionJournal? sessionJournal,
   }) async =>
       TripPersistOutcome.saved;
 }

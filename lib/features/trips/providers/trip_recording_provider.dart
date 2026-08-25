@@ -38,6 +38,9 @@ import 'trip_history_provider.dart';
 import 'trip_recording_phase.dart';
 import 'trip_recording_state.dart';
 import '../../../core/logging/error_logger.dart';
+import '../domain/entities/trip_termination.dart';
+import '../domain/recording_session_journal.dart';
+import '../../../core/telemetry/process_death_context.dart';
 
 // Re-exports so existing callers keep resolving after the #563 split;
 // new callers should import the individual files directly.

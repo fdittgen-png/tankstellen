@@ -47,6 +47,8 @@ class _RecordingPipelineHostAdapter implements Obd2RecordingPipelineHost {
     String? adapterName,
     String? adapterFirmware,
     int gpsFixCount = 0,
+    TripTermination? termination,
+    RecordingSessionJournal? sessionJournal,
   }) =>
       _n._saveToHistory(
         summary,
@@ -58,6 +60,8 @@ class _RecordingPipelineHostAdapter implements Obd2RecordingPipelineHost {
         adapterName: adapterName,
         adapterFirmware: adapterFirmware,
         gpsFixCount: gpsFixCount,
+        termination: termination,      // #3794
+        sessionJournal: sessionJournal, // #3794
       );
 
   // #2548 — staged save-progress: the pipeline drives the `saving` phase

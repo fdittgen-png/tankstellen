@@ -21,11 +21,21 @@ class _DroppedSessionHostAdapter implements DroppedSessionHost {
   @override
   void stopScheduler() => _c._scheduler?.stop();
 
+  // #3797 — the adapter mediates every scheduler gating call, so it is the
+  // complete place to journal them: the manager's drop path AND any other
+  // caller land here, and the timeline shows exactly when PID dispatch was
+  // closed and re-opened relative to the drop that caused it.
   @override
-  void pauseScheduler() => _c._scheduler?.pause();
+  void pauseScheduler() {
+    _c._sessionJournal.add(RecordingSessionEventKind.schedulerPaused);
+    _c._scheduler?.pause();
+  }
 
   @override
-  void resumeScheduler() => _c._scheduler?.resume();
+  void resumeScheduler() {
+    _c._sessionJournal.add(RecordingSessionEventKind.schedulerResumed);
+    _c._scheduler?.resume();
+  }
 
   @override
   void disconnectDroppedService() {
@@ -64,6 +74,10 @@ class _DroppedSessionHostAdapter implements DroppedSessionHost {
 
   @override
   void clearDropDetectorErrorWindow() => _c._dropDetector.clearErrorWindow();
+
+  @override
+  void noteSessionEvent(RecordingSessionEventKind kind, {String? detail}) =>
+      _c._sessionJournal.add(kind, detail: detail);
 
   @override
   void emitState() => _c._emitState();

@@ -56,6 +56,13 @@ abstract class DroppedSessionHost {
   /// errors from the same outage doesn't immediately re-trigger.
   void clearDropDetectorErrorWindow();
 
+  /// #3797 — append one typed event to the recording session's lifecycle
+  /// timeline. The manager owns the drop/degrade/recovery transitions, so
+  /// it is the natural writer for that half of the journal; routing it
+  /// through the host seam keeps the manager free of the journal type's
+  /// lifetime and keeps it unit-testable against a fake host.
+  void noteSessionEvent(RecordingSessionEventKind kind, {String? detail});
+
   /// Re-publish the recording state on the controller's state stream.
   void emitState();
 

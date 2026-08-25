@@ -5,6 +5,8 @@ import 'package:flutter/foundation.dart';
 
 import '../domain/entities/gps_sample_diagnostic.dart';
 import '../domain/entities/recording_lifecycle_mark.dart';
+import '../domain/entities/trip_termination.dart';
+import '../domain/recording_session_journal.dart';
 import '../domain/trip_recorder.dart';
 import '../../obd2/api.dart';
 import 'trip_sample_codec.dart';
@@ -127,6 +129,19 @@ class TripHistoryEntry {
   /// dismissal so the prompt never nags twice for the same trip.
   final String? verdict;
 
+  /// #3795 — WHY this recording ended. Null on rows written before the
+  /// termination taxonomy landed (and on the legacy paths that still
+  /// cannot attribute an end); never inferred at read time, so an absent
+  /// value stays honestly unknown.
+  final TripTermination? termination;
+
+  /// #3797 — the correlated lifecycle timeline of the recording session
+  /// (link ready/drop/reconnect, protocol establishment, rebinds,
+  /// scheduler gating, GPS-degrade, the terminal event). Null for trips
+  /// recorded before it existed; empty for a GPS-only trip that never
+  /// touched the link.
+  final RecordingSessionJournal? sessionJournal;
+
   const TripHistoryEntry({
     required this.id,
     required this.vehicleId,
@@ -141,6 +156,8 @@ class TripHistoryEntry {
     this.lifecycleMarks = const [],
     this.obd2Diagnostic,
     this.verdict,
+    this.termination,
+    this.sessionJournal,
   }) : _persistedSampleCount = sampleCount;
 
   /// Returns a copy with the given fields replaced (#1858). The
@@ -162,6 +179,8 @@ class TripHistoryEntry {
         lifecycleMarks: lifecycleMarks,
         obd2Diagnostic: obd2Diagnostic,
         verdict: verdict ?? this.verdict,
+        termination: termination,
+        sessionJournal: sessionJournal,
       );
 
   Map<String, dynamic> toJson() => {
@@ -204,6 +223,14 @@ class TripHistoryEntry {
         // legacy entries round-trip unchanged. A synced-entity FIELD add is
         // TankSync-transparent (JSONB data column, #2929).
         if (verdict != null) 'verdict': verdict,
+        // #3795 — termination class + detail. Compact key 'term',
+        // omitted when unknown so legacy rows round-trip byte-identical.
+        if (termination != null) 'term': termination!.toJson(),
+        // #3797 — the session lifecycle timeline. Compact key 'sj',
+        // omitted when no event was ever recorded (GPS-only / legacy),
+        // so trips that never touched the link add zero bytes.
+        if (sessionJournal != null && sessionJournal!.events.isNotEmpty)
+          'sj': sessionJournal!.toJson(),
       };
 
   static TripHistoryEntry fromJson(Map<String, dynamic> json) =>
@@ -254,6 +281,19 @@ class TripHistoryEntry {
               ),
         // #3501 — missing key → null (unanswered) on legacy entries.
         verdict: json['verdict'] as String?,
+        // #3795/#3797 — missing key → null on every pre-existing row, so
+        // the history decodes unchanged and an absent value reads as an
+        // honest "not recorded" rather than a guessed reason.
+        termination: json['term'] == null
+            ? null
+            : TripTermination.fromJson(
+                (json['term'] as Map).cast<String, dynamic>(),
+              ),
+        sessionJournal: json['sj'] == null
+            ? null
+            : RecordingSessionJournal.fromJson(
+                (json['sj'] as Map).cast<String, dynamic>(),
+              ),
       );
 
   /// Summary-only decode (#3613) — everything [fromJson] produces
@@ -280,5 +320,15 @@ class TripHistoryEntry {
         adapterName: json['adapterName'] as String?,
         adapterFirmware: json['adapterFirmware'] as String?,
         verdict: json['verdict'] as String?,
+        // #3795 — the termination is a single small map, not a per-tick
+        // payload, and the history LIST wants it (a crash-truncated trip
+        // should be flaggable without a full decode), so it is
+        // materialised on the summary path too. The journal is NOT —
+        // that one is a list and belongs to the detail/export path.
+        termination: json['term'] == null
+            ? null
+            : TripTermination.fromJson(
+                (json['term'] as Map).cast<String, dynamic>(),
+              ),
       );
 }
