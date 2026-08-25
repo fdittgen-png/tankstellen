@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 
 import '../logging/error_logger.dart';
 import 'collectors/breadcrumb_persistence.dart';
+import 'process_death_context.dart';
 
 /// #3580 — a death of the PREVIOUS app process, reconstructed on launch
 /// from the native crash journal / `ApplicationExitInfo`. Raised only
@@ -60,6 +61,21 @@ class CrashForensicsHarvester {
     }
 
     final breadcrumbs = BreadcrumbPersistence.lastRunSummary();
+
+    // #3796 — publish the OS's own word for the previous process's death
+    // so a trip recovered from the WAL this launch can name its cause.
+    // Newest-wins; purely supplementary (the WAL's process-identity
+    // mismatch is what actually PROVES the death).
+    for (final entry in (decoded['exits'] as List? ?? const [])) {
+      if (entry is! Map) continue;
+      final reason = entry['reason']?.toString();
+      if (reason == null || reason.isEmpty) continue;
+      ProcessDeathContext.noteExit(
+        reason: reason,
+        rssKb: (entry['rssKb'] as num?)?.toInt(),
+      );
+      break;
+    }
 
     for (final entry in (decoded['uncaught'] as List? ?? const [])) {
       if (entry is! Map) continue;

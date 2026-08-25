@@ -10,6 +10,7 @@ import 'package:hive/hive.dart';
 import '../../obd2/api.dart';
 import '../domain/trip_sample.dart';
 import '../domain/trip_summary.dart';
+import '../../../core/telemetry/process_death_context.dart';
 
 /// #3248 — write-ahead log for GPS-only recordings.
 ///
@@ -127,6 +128,9 @@ class GpsOnlyTripWal {
       odometerLatestKm: null,
       startedAt: startedAt,
       lastFlushedAt: _lastFlushAt!,
+      // #3796 — whose process wrote this WAL row.
+
+      processInstanceId: ProcessDeathContext.instanceId,
     )));
   }
 

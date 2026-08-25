@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import '../../trips/api.dart';
 import 'active_trip_repository.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/telemetry/process_death_context.dart';
 
 /// Outcome of [ActiveTripRecoveryService.recover].
 ///
@@ -132,8 +133,20 @@ class ActiveTripRecoveryService {
         }));
         return ActiveTripRecoveryOutcome.failed;
       }
-      debugPrint('ActiveTripRecoveryService: discarded already-finalised '
-          'snapshot id=${snapshot.id} phase=${snapshot.phase}');
+      // #3796 — no silent discard: a dropped recovery must be visible in
+      // the export, or a lost trip looks like it never existed.
+      unawaited(errorLogger.log(
+        ErrorLayer.storage,
+        StateError('active-trip snapshot discarded (already finalised)'),
+        StackTrace.current,
+        context: {
+          'where': 'ActiveTripRecoveryService: already-finalised snapshot',
+          'id': snapshot.id,
+          'phase': snapshot.phase,
+          'samples': snapshot.samples.length,
+          'lastFlushedAt': snapshot.lastFlushedAt.toIso8601String(),
+        },
+      ));
       return ActiveTripRecoveryOutcome.discarded;
     }
 
@@ -162,10 +175,26 @@ class ActiveTripRecoveryService {
           unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'ActiveTripRecoveryService stale badge bump failed'}));
         }
       }
-      debugPrint(
-        'ActiveTripRecoveryService: discarded stale snapshot id=${snapshot.id} '
-        'lastFlushedAt=${snapshot.lastFlushedAt.toIso8601String()}',
-      );
+      // #3796 — same: a trip abandoned past the recovery horizon is real
+      // data loss and must appear in the export, with the process-death
+      // attribution when the WAL row outlived its writing process.
+      unawaited(errorLogger.log(
+        ErrorLayer.storage,
+        StateError('active-trip snapshot discarded (stale)'),
+        StackTrace.current,
+        context: {
+          'where': 'ActiveTripRecoveryService: stale snapshot',
+          'id': snapshot.id,
+          'phase': snapshot.phase,
+          'samples': snapshot.samples.length,
+          'automatic': snapshot.automatic,
+          'lastFlushedAt': snapshot.lastFlushedAt.toIso8601String(),
+          'diedWhileRecording':
+              ProcessDeathContext.diedWhileRecording(snapshot.processInstanceId),
+          if (ProcessDeathContext.lastExitReason != null)
+            'previousExitReason': ProcessDeathContext.lastExitReason,
+        },
+      ));
       return ActiveTripRecoveryOutcome.discarded;
     }
 

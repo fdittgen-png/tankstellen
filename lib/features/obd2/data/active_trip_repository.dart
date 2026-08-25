@@ -84,6 +84,14 @@ class ActiveTripSnapshot {
   /// recover) and dropped.
   final DateTime lastFlushedAt;
 
+  /// #3796 — identity of the process that wrote this snapshot. At the
+  /// next launch a value differing from [ProcessDeathContext.instanceId]
+  /// proves the writer died without clearing the WAL (an orderly stop
+  /// always clears it), which is what turns a recovered trip from a fake
+  /// "Bluetooth drop" into an honest process-death record. Null on rows
+  /// written before this field existed.
+  final String? processInstanceId;
+
   const ActiveTripSnapshot({
     required this.id,
     required this.vehicleId,
@@ -96,6 +104,7 @@ class ActiveTripSnapshot {
     required this.odometerLatestKm,
     required this.startedAt,
     required this.lastFlushedAt,
+    this.processInstanceId,
   });
 
   ActiveTripSnapshot copyWith({
@@ -118,6 +127,7 @@ class ActiveTripSnapshot {
         odometerLatestKm: odometerLatestKm ?? this.odometerLatestKm,
         startedAt: startedAt,
         lastFlushedAt: lastFlushedAt ?? this.lastFlushedAt,
+        processInstanceId: processInstanceId,
       );
 
   Map<String, dynamic> toJson() => {
@@ -133,6 +143,7 @@ class ActiveTripSnapshot {
         if (odometerLatestKm != null) 'odometerLatestKm': odometerLatestKm,
         'startedAt': startedAt.toIso8601String(),
         'lastFlushedAt': lastFlushedAt.toIso8601String(),
+        if (processInstanceId != null) 'pid': processInstanceId,
       };
 
   static ActiveTripSnapshot fromJson(Map<String, dynamic> json) =>
@@ -152,6 +163,7 @@ class ActiveTripSnapshot {
             const [],
         odometerStartKm: (json['odometerStartKm'] as num?)?.toDouble(),
         odometerLatestKm: (json['odometerLatestKm'] as num?)?.toDouble(),
+        processInstanceId: json['pid'] as String?,
         startedAt: DateTime.parse(json['startedAt'] as String),
         lastFlushedAt: DateTime.parse(json['lastFlushedAt'] as String),
       );
