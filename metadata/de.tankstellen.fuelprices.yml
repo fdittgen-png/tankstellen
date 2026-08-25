@@ -17,9 +17,18 @@
 # needs neither — and Summary/Description, which F-Droid reads from the
 # upstream fastlane/metadata structure instead).
 
+AntiFeatures:
+  NonFreeNet:
+    en-US: >-
+      By default the map loads tiles through a developer-hosted proxy (a
+      fixed Supabase edge-function URL), and the optional community price
+      reports / TankSync features ship a default configuration
+      (assets/tanksync_config.json) pointing to the same developer-hosted
+      Supabase instance. The server software is FOSS and TankSync is
+      designed for self-hosting (the app provides the SQL to run your own
+      instance), but the shipped defaults use the developer's instance.
 Categories:
-  - Internet
-  - Navigation
+  - Market & Price
 License: MIT
 AuthorName: Florian DITTGEN
 AuthorEmail: fdittgen@gmail.com
