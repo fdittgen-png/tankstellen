@@ -11,11 +11,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tankstellen/features/obd2/data/transport/obd2_link_drop_signal.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 import 'package:tankstellen/features/obd2/data/session/obd2_link_supervisor.dart';
 import 'package:tankstellen/features/obd2/providers/obd2_reconnect_provider.dart';
 import 'package:tankstellen/features/obd2/data/last_good_adapter_store.dart';
 import 'package:tankstellen/features/obd2/data/session/obd2_connection_service.dart';
 import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/domain/obd2_engine_evidence.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import '../../../helpers/silence_error_logger.dart';
@@ -209,6 +211,117 @@ void main() {
       );
     });
   });
+
+  group('#3780 reconnect engine-off gate (Epic #3775)', () {
+    const silentResponses = {
+      'ATZ': 'ELM327 v1.5>',
+      'ATE0': 'OK>',
+      'ATL0': 'OK>',
+      'ATH0': 'OK>',
+      'ATSP0': 'OK>',
+      'ATI': 'ELM327 v1.5>',
+      // The K-line failed-search livelock signature — produced with the
+      // engine RUNNING (#3575), yet classified probedSilent.
+      '0100': 'UNABLE TO CONNECT>',
+      'ATDPN': 'A0>',
+    };
+
+    Future<Obd2Service> silentBusService() async {
+      final svc = Obd2Service(FakeObd2Transport(Map.of(silentResponses)));
+      await svc.connect();
+      await svc.discoverSupportedPids();
+      expect(svc.busProbe, Obd2BusProbeResult.probedSilent,
+          reason: 'precondition: the dial result reads as a silent bus');
+      return svc;
+    }
+
+    ProviderContainer buildContainer(_FakeConnectionWithService connection) {
+      final container = ProviderContainer(overrides: [
+        obd2ConnectionProvider.overrideWith((_) => connection),
+        lastGoodAdapterStoreProvider.overrideWithValue(_FakePinStore(
+            const LastGoodAdapter(
+                mac: 'D4:7E', transportKind: 'classic', name: 'vLinker FS'))),
+        activeVehicleProfileProvider.overrideWith(() => _StubVehicle(null)),
+      ]);
+      addTearDown(container.dispose);
+      return container;
+    }
+
+    tearDown(Obd2EngineEvidence.instance.reset);
+
+    test('probedSilent WITH fresh engine evidence: one recovery pass, the '
+        'link is KEPT — a mid-drive park is refused', () async {
+      final svc = await silentBusService();
+      final connection = _FakeConnectionWithService(svc);
+      final container = buildContainer(connection);
+      final sup = container.read(obd2ReconnectProvider.notifier).supervisor;
+
+      Obd2EngineEvidence.instance.noteEngineOn();
+      final got = await sup.connect();
+
+      expect(got, same(svc),
+          reason: 'evidence of a running engine outranks the silent '
+              'verdict — parking here silenced the rest of a real drive');
+      expect(sup.state.value, Obd2LinkState.ready);
+      expect(svc.isConnected, isTrue);
+    });
+
+    test('probedSilent WITHOUT evidence still parks (battery protection '
+        'for a genuinely parked car — unchanged)', () async {
+      final svc = await silentBusService();
+      final connection = _FakeConnectionWithService(svc);
+      final container = buildContainer(connection);
+      final sup = container.read(obd2ReconnectProvider.notifier).supervisor;
+
+      Obd2EngineEvidence.instance.reset();
+      final got = await sup.connect();
+
+      expect(got, isNull);
+      expect(sup.state.value, Obd2LinkState.engineOff);
+    });
+  });
+}
+
+/// Dial fake whose every path returns one prepared service.
+class _FakeConnectionWithService implements Obd2ConnectionService {
+  _FakeConnectionWithService(this._service);
+  final Obd2Service _service;
+
+  @override
+  Future<Obd2Service?> connectByMacTransportAware(
+    String mac, {
+    String? adapterName,
+    bool fallbackToScan = true,
+  }) async =>
+      _service;
+
+  @override
+  Future<Obd2Service?> connectByMacClassicDirect(String mac,
+          {String? adapterName}) async =>
+      _service;
+
+  @override
+  Future<Obd2Service?> connectByMacDirect(
+    String mac, {
+    Duration? timeout,
+    bool fallbackToScan = true,
+    String? adapterName,
+  }) async =>
+      _service;
+
+  @override
+  Future<Obd2Service?> connectByMac(
+    String mac, {
+    Duration timeout = const Duration(seconds: 5),
+    String? adapterName,
+  }) async =>
+      _service;
+
+  @override
+  Future<Obd2Service?> connectBest() async => _service;
+
+  @override
+  noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 /// Records every dial in order; all dials miss (return null) so the
