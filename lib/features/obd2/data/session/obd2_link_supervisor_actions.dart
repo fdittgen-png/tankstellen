@@ -94,6 +94,58 @@ extension Obd2LinkSupervisorActions on Obd2LinkSupervisor {
     final trafficked = (_service?.sessionSuccessfulObdSends ?? 0) >=
         ReconnectStandDown.traffickedSendThreshold;
     _service = null;
+    _dropTail(reason, trafficked: trafficked);
+  }
+
+  /// #3776 (Epic #3775) — a DELIBERATE death of a supervisor-owned link,
+  /// reported by the layer that decided it (the trip's drop verdict, the
+  /// self-test, a reset). Deliberate closes are suppressed from the
+  /// transport drop signal by design (`_closing` latches, the ElmSession
+  /// detach), so without this seam the supervisor keeps believing a dead
+  /// socket is `ready` — the 2026-08-25 zero-engine-data field trip.
+  ///
+  /// Returns false when [service] is not the supervised link: the caller
+  /// owns it and must close it itself. When it IS the supervised link:
+  /// takes it out of circulation synchronously (state leaves `ready`
+  /// before the first await, so no consumer adopts the corpse), closes
+  /// the socket FIRST (frees the adapter's single RFCOMM channel before
+  /// any redial), then runs the normal drop path.
+  bool reportServiceDead(Obd2Service service, {required String reason}) {
+    if (_disposed) return false;
+    if (!identical(_service, service)) return false;
+    final trafficked = service.sessionSuccessfulObdSends >=
+        ReconnectStandDown.traffickedSendThreshold;
+    _service = null;
+    if (_mayAutoDial) _setState(Obd2LinkState.reconnecting);
+    unawaited(() async {
+      await _release(service, 'reportServiceDead');
+      if (_disposed) return;
+      _dropTail('external:$reason', trafficked: trafficked);
+    }());
+    return true;
+  }
+
+  /// #3777 (Epic #3775) — level-triggered corpse self-heal: the state
+  /// says `ready` but the held service's transport is dead (a deliberate
+  /// close that bypassed [reportServiceDead], or a suppressed platform
+  /// teardown). Any consumer that finds itself dataless may call this at
+  /// any time; a genuinely live link is a no-op.
+  void ensureLive({String reason = 'ensureLive'}) {
+    if (_disposed || _state.value != Obd2LinkState.ready) return;
+    final svc = _service;
+    if (svc == null) {
+      // `ready` with no service is itself a corpse state — recycle.
+      _dropTail('external:$reason-null-service', trafficked: false);
+      return;
+    }
+    if (svc.isConnected) return;
+    reportServiceDead(svc, reason: reason);
+  }
+
+  /// Shared tail of every drop path: stand-down bookkeeping, the #3534
+  /// timeline breadcrumb, and the dial/backoff arming. The caller has
+  /// already nulled `_service` (and captured its trafficked flag).
+  void _dropTail(String reason, {required bool trafficked}) {
     if (!_mayAutoDial) {
       debugPrint('Obd2LinkSupervisor: drop ($reason) while parked '
           '(${_state.value}) — not dialing');

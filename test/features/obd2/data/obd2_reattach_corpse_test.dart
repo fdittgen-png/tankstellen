@@ -71,18 +71,21 @@ void main() {
       );
       unawaited(src.start());
       async.flushMicrotasks();
-      expect(fired, isEmpty,
+      expect(fired, isNot(contains(same(svcA))),
           reason: 'firing with the dropped service is the #3625 flap — '
-              'a dead transport must wait for the next genuine ready');
+              'a dead transport must never be handed to the trip');
 
-      // The shared drop signal reaches the supervisor → it redials and
-      // comes back ready with a LIVE service → the source fires now.
-      drops.add(const Obd2LinkDropEvent(
-          transportKind: 'classic', reason: 'socket-error'));
-      async.flushMicrotasks();
-      async.elapse(const Duration(seconds: 2));
+      // #3777 (Epic #3775) — the source is LEVEL-triggered: a deliberate
+      // close is suppressed from the drop signal by design, so waiting
+      // for an external drop event here was a dead end (the supervisor
+      // dedupes `ready`→`ready` and never emits again — the 2026-08-25
+      // field trip waited on that edge for the whole drive). The corpse
+      // now routes through `supervisor.ensureLive` → recycle → redial,
+      // with NO external event needed.
+      async.elapse(const Duration(seconds: 6));
       expect(fired, [same(svcB)],
-          reason: 'the fresh, connected service is the one to adopt');
+          reason: 'self-healed: the fresh, connected service is adopted '
+              'without any external drop signal (#3777)');
 
       unawaited(sup.dispose());
       async.flushMicrotasks();
