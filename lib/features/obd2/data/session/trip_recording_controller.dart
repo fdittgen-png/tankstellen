@@ -135,6 +135,11 @@ class TripRecordingController
   /// the rest of the drive recorded nothing.
   @override
   Obd2Service _service;
+  // #3776 — link-ownership seam (see the constructor doc).
+  @override
+  final bool Function(Obd2Service service)? _isLinkSupervised;
+  final bool Function(Obd2Service service, String reason)?
+      _reportSupervisedLinkDead;
   @override
   final TripRecorder _recorder;
   @override
@@ -251,10 +256,23 @@ class TripRecordingController
       String pinnedMac,
       VoidCallback onReconnect,
     )? reconnectScannerFactory,
+    // #3776 (Epic #3775) — the link-ownership seam. The trip layer must
+    // NEVER deliberately close a supervisor-owned link (the deliberate
+    // close is suppressed from the drop signal, so the owner keeps
+    // believing a dead socket is ready). [isLinkSupervised] answers
+    // "does the one owner hold this instance"; [reportSupervisedLinkDead]
+    // hands a dead supervised link to the owner (returns true — the
+    // owner closes + redials) or declines (false — the caller closes it
+    // itself). Both null in unit contexts without a supervisor graph.
+    bool Function(Obd2Service service)? isLinkSupervised,
+    bool Function(Obd2Service service, String reason)?
+        reportSupervisedLinkDead,
     Obd2BreadcrumbRecorder? breadcrumbCollector,
     TripGpsEstimateOverlay? gpsEstimateFolder,
     void Function(HarshEvent event)? onHarshEvent,
   })  : _service = service,
+        _isLinkSupervised = isLinkSupervised,
+        _reportSupervisedLinkDead = reportSupervisedLinkDead,
         _diagnosticCapture = diagnosticCapture,
         _gpsEstimateFolder = gpsEstimateFolder,
         _recorder = recorder ??

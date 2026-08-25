@@ -964,6 +964,76 @@ void main() {
         await ctl.stop();
       });
     });
+
+    group('#3776 link-ownership seam (Epic #3775)', () {
+      test('a drop REPORTS a supervised link to the owner — the trip '
+          'layer must not close it', () async {
+        final transport = FakeObd2Transport(initResponses());
+        await transport.connect();
+        final reported = <String>[];
+        final ctl = TripRecordingController(
+          service: Obd2Service(transport),
+          pollInterval: const Duration(minutes: 1),
+          vehicleId: 'car-3776',
+          pausedRepo: pausedRepo,
+          historyRepo: historyRepo,
+          silentReconnectWindow: Duration.zero,
+          isLinkSupervised: (_) => true,
+          reportSupervisedLinkDead: (svc, reason) {
+            reported.add(reason);
+            return true;
+          },
+        );
+
+        await ctl.start();
+        ctl.debugInjectSample(
+          speedKmh: 50,
+          rpm: 1800,
+          at: DateTime(2026, 8, 25, 10),
+        );
+        ctl.debugTriggerDrop();
+
+        expect(reported, ['trip-drop'],
+            reason: 'the deliberate death of a supervised link must reach '
+                'the ONE owner (deliberate closes are suppressed from the '
+                'drop signal, so nothing else would tell it)');
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        expect(transport.isConnected, isTrue,
+            reason: 'the trip layer must never close a supervisor-owned '
+                'link — the owner closes + redials on its own ladder');
+        await ctl.stop();
+      });
+
+      test('a DECLINED report (unsupervised link) falls back to the '
+          'legacy #2524 close', () async {
+        final transport = FakeObd2Transport(initResponses());
+        await transport.connect();
+        final ctl = TripRecordingController(
+          service: Obd2Service(transport),
+          pollInterval: const Duration(minutes: 1),
+          vehicleId: 'car-3776b',
+          pausedRepo: pausedRepo,
+          historyRepo: historyRepo,
+          silentReconnectWindow: Duration.zero,
+          isLinkSupervised: (_) => false,
+          reportSupervisedLinkDead: (svc, reason) => false,
+        );
+
+        await ctl.start();
+        ctl.debugInjectSample(
+          speedKmh: 50,
+          rpm: 1800,
+          at: DateTime(2026, 8, 25, 10),
+        );
+        ctl.debugTriggerDrop();
+
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        expect(transport.isConnected, isFalse,
+            reason: 'nobody else owns this link — the trip layer must '
+                'still tear it down so the stranded _pending fails');
+        await ctl.stop();
+      });
+    });
   });
 }
 

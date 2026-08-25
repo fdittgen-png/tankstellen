@@ -29,9 +29,19 @@ class _DroppedSessionHostAdapter implements DroppedSessionHost {
 
   @override
   void disconnectDroppedService() {
-    // #2524 — fail the dead transport's stranded `_pending` + close its
-    // channel off the hot path. Best-effort; the link is already gone.
     final svc = _c._service;
+    // #3776 (Epic #3775) — a supervisor-owned link is NEVER closed by
+    // the trip layer: the deliberate close is suppressed from the drop
+    // signal, so the owner would keep believing a dead socket is ready
+    // (the exact guard the auto-record layer has always had — see
+    // auto_trip_session_opener). Hand the corpse to the owner instead:
+    // it closes the socket and redials through its own ladder.
+    if (_c._reportSupervisedLinkDead?.call(svc, 'trip-drop') ?? false) {
+      return;
+    }
+    // #2524 — unsupervised link: fail the dead transport's stranded
+    // `_pending` + close its channel off the hot path. Best-effort; the
+    // link is already gone.
     unawaited(() async {
       try {
         await svc.disconnect();

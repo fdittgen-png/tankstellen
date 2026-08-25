@@ -95,8 +95,11 @@ mixin _TripRecordingLifecycle
 
   void replaceService(Obd2Service service) {
     final old = _service;
-    if (identical(old, service)) return;
     _service = service;
+    // #3776 — arm the grace + clear the detector even on an IDENTICAL
+    // swap: the old early-return skipped both, so a reattach that fired
+    // on the same instance resumed polling with no reconnect grace and a
+    // dirty error window — the first post-resume poll re-tripped a drop.
     _reconnectGraceUntil = _now().add(_reconnectGrace);
     // #2907 — the reconnected link is healthy: clear the drop detector's
     // error window (incl. any dead-transport short-circuits the [_runTransport]
@@ -105,6 +108,18 @@ mixin _TripRecordingLifecycle
     // path also resets it, but doing it AT the swap makes recovery robust to
     // swap-vs-resume call ordering.
     _dropDetector.reset();
+    // #3776 — re-arm the #3602 staleness fence with a fresh window: the
+    // latch only clears on a real parse, so a reconnect onto a link that
+    // ALSO stays silent could never fire a second drop (the trip froze
+    // unhandled). Anchoring "fresh" at the swap gives the new link the
+    // full staleness window, after which the fence fires again and the
+    // recovery cycle re-runs — bounded, convergent.
+    _lastFreshEngineParseAt = _now();
+    _staleEngineEscalated = false;
+    if (identical(old, service)) return;
+    // #3776 — never close a supervisor-owned link (the owner keeps
+    // supervising it; a deliberate close here would be invisible to it).
+    if (_isLinkSupervised?.call(old) ?? false) return;
     // Tear down the abandoned link off the hot path. `disconnect()` is
     // idempotent and never throws for the typed-closed states, but guard
     // anyway — the old transport is already dead, so any error here is

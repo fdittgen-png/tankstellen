@@ -12,6 +12,8 @@ import '../../../core/domain/vehicle_profile.dart';
 import '../data/adapter_pin_resolution.dart';
 import '../domain/obd2_connection_errors.dart';
 import '../data/session/obd2_disconnect_quietly.dart';
+// #3776 — Obd2LinkSupervisorActions.reportServiceDead (extension scope).
+import '../data/session/obd2_link_supervisor.dart';
 import '../data/session/obd2_service.dart';
 import '../domain/obd2_trip_start_budgets.dart';
 import '../data/session/trip_recording_controller.dart';
@@ -153,6 +155,20 @@ class Obd2RecordingPipeline implements RecordingPipeline {
         // reconnect trace headline names the adapter, not just the MAC.
         readAdapterName: () => _service?.adapterName,
       ),
+      // #3776 (Epic #3775) — the link-ownership seam: the trip layer
+      // never closes a supervisor-owned link; a dead one is handed to
+      // the owner, which closes the socket and redials on its ladder.
+      isLinkSupervised: (svc) => supervisorOwnsService(_ref, svc),
+      reportSupervisedLinkDead: (svc, reason) {
+        try {
+          final sup = _ref.read(obd2ReconnectProvider.notifier).supervisor;
+          return sup.reportServiceDead(svc, reason: reason);
+        } catch (_) {
+          // No supervisor graph (widget tests / legacy path) — the
+          // caller closes the service itself.
+          return false;
+        }
+      },
       breadcrumbCollector: breadcrumbs,
       gpsEstimateFolder: gpsEstimateFolder,
       // #2663 — forward every (de-noised, post-#2653) harsh event onto the
