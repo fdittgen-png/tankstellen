@@ -140,6 +140,10 @@ class TripGpsStreamController {
           ctl.recordGpsSampleDiagnostic(
             now: DateTime.now(),
             lifecycleState: _lifecycleState().name,
+            // #3785 — both clocks, so the arrival-vs-fix skew that
+            // distinguishes a stalled delivery from lost reception is
+            // recoverable on THIS pipeline too.
+            fixAt: pos.timestamp,
           );
           // #1125 phase 3b — opt-in glide-coach evaluation. The hook is
           // gated by:

@@ -113,10 +113,12 @@ mixin _TripRecordingTelemetryIngest on _TripRecordingSessionState {
   void recordGpsSampleDiagnostic({
     required DateTime now,
     required String lifecycleState,
+    DateTime? fixAt,
   }) {
     _sampleBuffer.recordGpsSampleDiagnostic(
       now: now,
       lifecycleState: lifecycleState,
+      fixAt: fixAt, // #3785
     );
   }
 

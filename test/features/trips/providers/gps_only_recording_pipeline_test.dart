@@ -397,9 +397,15 @@ void main() {
       expect(diags, hasLength(3),
           reason: 'one cadence diagnostic per GPS fix must reach '
               'saveToHistory — RED before #3253 (always const [])');
-      // Stamped with the fix's own clock, monotonic per-trip indices.
-      expect(diags.map((d) => d.timestamp),
+      // #3253's fix-clock cadence view is preserved — it moved to
+      // `fixAt` when #3785 split the two clocks, because `timestamp` is
+      // contractually the ARRIVAL instant and recording only one of them
+      // made an app-side delivery stall indistinguishable from lost
+      // reception (six 24.5 s foreground "signalLoss" gaps in the field).
+      expect(diags.map((d) => d.fixAt),
           [for (var i = 0; i < 3; i++) t0.add(Duration(seconds: i))]);
+      expect(diags.every((d) => d.timestamp.isAfter(t0)), isTrue,
+          reason: 'timestamp is the real arrival clock, not the fix clock');
       expect(diags.map((d) => d.index), [0, 1, 2]);
     });
 

@@ -220,8 +220,13 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
       bearingDeg: p.heading.isFinite ? p.heading : null,
     );
     _samples.add(sample);
-    // #3253 — fix-clock cadence diagnostic (OS batching stays visible).
-    _gpsDiagnostics.record(now: p.timestamp);
+    // #3253 kept the FIX clock here so OS batching stayed visible, while
+    // the OBD2 pipeline recorded the ARRIVAL clock — so the two paths
+    // disagreed and neither could show the skew between them. #3785 —
+    // record BOTH: arrival honours the entity's documented contract,
+    // fixAt preserves #3253's cadence view, and their difference is what
+    // separates a stalled delivery from genuinely lost reception.
+    _gpsDiagnostics.record(fixAt: p.timestamp);
     // #2760 — feed the latest GPS ground speed to the IMU detector so its
     // min-speed gate and accel-vs-brake direction classification track the
     // real vehicle speed (the inertial stream alone has no speed).

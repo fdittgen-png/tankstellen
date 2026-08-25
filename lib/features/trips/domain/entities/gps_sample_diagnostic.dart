@@ -40,11 +40,36 @@ class GpsSampleDiagnostic {
   /// restarted the GPS service mid-trip).
   final int index;
 
+  /// #3785 — the FIX clock: the instant the GNSS receiver stamped this
+  /// position, as opposed to [timestamp]'s arrival instant.
+  ///
+  /// Both are needed to tell the two failure shapes apart, and until now
+  /// only one was kept — differently on each pipeline, so a trip could
+  /// not even be compared with itself:
+  ///
+  ///  * **the receiver produced nothing** (real signal loss) — fix and
+  ///    arrival clocks advance together, both showing the hole;
+  ///  * **fixes were produced but delivery stalled** (a saturated
+  ///    looper; GMS then coalesces a batch and the platform layer keeps
+  ///    only the last one) — the arrival clock jumps while the fix
+  ///    clock shows an ordinary cadence, i.e. a SKEW.
+  ///
+  /// Null on entries recorded before this field existed.
+  final DateTime? fixAt;
+
   const GpsSampleDiagnostic({
     required this.timestamp,
     required this.lifecycleState,
     required this.index,
+    this.fixAt,
   });
+
+  /// #3785 — how far this fix's delivery lagged its creation. Null when
+  /// the fix clock was not recorded. A steadily-growing skew across a
+  /// coverage gap is the positive signature of an app-side stall rather
+  /// than lost reception.
+  Duration? get deliverySkew =>
+      fixAt == null ? null : timestamp.difference(fixAt!);
 
   /// Compact JSON encoding mirroring the [TripSample] convention
   /// already used by [TripHistoryEntry]: short keys keep per-trip
@@ -54,6 +79,8 @@ class GpsSampleDiagnostic {
         't': timestamp.millisecondsSinceEpoch,
         'ls': lifecycleState,
         'i': index,
+        // Elided when absent so legacy entries round-trip unchanged.
+        if (fixAt != null) 'f': fixAt!.millisecondsSinceEpoch,
       };
 
   static GpsSampleDiagnostic fromJson(Map<String, dynamic> json) =>
@@ -63,6 +90,9 @@ class GpsSampleDiagnostic {
         ),
         lifecycleState: json['ls'] as String,
         index: (json['i'] as num).toInt(),
+        fixAt: json['f'] == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch((json['f'] as num).toInt()),
       );
 
   @override

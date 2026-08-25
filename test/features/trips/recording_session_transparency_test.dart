@@ -151,6 +151,76 @@ void main() {
     });
   });
 
+  group('GPS delivery skew (#3785)', () {
+    // Six ~24.5 s "signalLoss" gaps on a FOREGROUND trip were the field
+    // shape that motivated this: `signalLoss` is a RESIDUAL bucket, so an
+    // app-side delivery stall (a saturated looper coalescing fixes) was
+    // indistinguishable from genuinely lost reception. The two clocks
+    // make it distinguishable — and they disagreed per pipeline before,
+    // so a trip could not even be compared with itself.
+    test('a stalled delivery shows a growing skew; lost reception does not',
+        () {
+      final fix = DateTime(2026, 8, 25, 19, 3);
+      // Real reception loss: the receiver produced nothing, so when it
+      // resumes both clocks have skipped together — no skew.
+      final lostReception = [
+        for (var i = 0; i < 3; i++)
+          GpsSampleDiagnostic(
+            timestamp: fix.add(Duration(seconds: i * 25)),
+            lifecycleState: 'resumed',
+            index: i,
+            fixAt: fix.add(Duration(seconds: i * 25)),
+          ),
+      ];
+      expect(lostReception.map((d) => d.deliverySkew!.inSeconds), [0, 0, 0],
+          reason: 'a gap the RECEIVER caused leaves both clocks aligned');
+      // Delivery stall: the receiver kept stamping fixes 1 s apart while
+      // delivery lagged further and further behind.
+      final stalled = [
+        for (var i = 0; i < 3; i++)
+          GpsSampleDiagnostic(
+            timestamp: fix.add(Duration(seconds: i + 10 * i)),
+            lifecycleState: 'resumed',
+            index: i,
+            fixAt: fix.add(Duration(seconds: i)),
+          ),
+      ];
+      expect(stalled.map((d) => d.deliverySkew!.inSeconds), [0, 10, 20],
+          reason: 'a growing arrival-vs-fix skew is the positive '
+              'signature of an app-side stall');
+    });
+
+    test('the skew is unknown — never zero — when the fix clock was not '
+        'recorded (legacy entries)', () {
+      final d = GpsSampleDiagnostic(
+        timestamp: DateTime(2026, 8, 25),
+        lifecycleState: 'resumed',
+        index: 0,
+      );
+      expect(d.deliverySkew, isNull,
+          reason: 'reporting 0 would assert perfect delivery we never '
+              'measured');
+    });
+
+    test('fixAt round-trips and is elided when absent', () {
+      final withFix = GpsSampleDiagnostic(
+        timestamp: DateTime(2026, 8, 25, 19, 3, 24),
+        lifecycleState: 'resumed',
+        index: 7,
+        fixAt: DateTime(2026, 8, 25, 19, 3),
+      );
+      expect(GpsSampleDiagnostic.fromJson(withFix.toJson()).fixAt,
+          withFix.fixAt);
+      final without = GpsSampleDiagnostic(
+        timestamp: DateTime(2026, 8, 25),
+        lifecycleState: 'resumed',
+        index: 0,
+      );
+      expect(without.toJson(), isNot(contains('f')));
+      expect(GpsSampleDiagnostic.fromJson(without.toJson()).fixAt, isNull);
+    });
+  });
+
   group('persistence on the trip row (#3795/#3797/#3798)', () {
     TripHistoryEntry entryWith({
       TripTermination? termination,
