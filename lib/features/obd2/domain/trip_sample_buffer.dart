@@ -133,11 +133,13 @@ class TripSampleBuffer {
   void recordGpsSampleDiagnostic({
     required DateTime now,
     required String lifecycleState,
+    DateTime? fixAt,
   }) {
     final entry = GpsSampleDiagnostic(
       timestamp: now,
       lifecycleState: lifecycleState,
       index: _gpsSampleDiagnostics.length,
+      fixAt: fixAt, // #3785 — the receiver clock, for the delivery skew
     );
     _gpsSampleDiagnostics.add(entry);
     _gpsSampleDiagnosticsView = null;

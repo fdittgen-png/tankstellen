@@ -4,6 +4,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../domain/entities/gps_sample_diagnostic.dart';
+import '../../../core/time/app_clock.dart';
 
 /// Capped per-trip GPS cadence-diagnostics recorder for the dongle-less
 /// pipeline (#3253).
@@ -28,8 +29,16 @@ class GpsSampleDiagnosticsRecorder {
   /// [WidgetsBinding.instance.lifecycleState] — the same signal the
   /// notifier's `didChangeAppLifecycleState` mirror is fed from, so the
   /// two recording paths report identical foreground/paused labels.
-  GpsSampleDiagnosticsRecorder({String Function()? lifecycleStateName})
-      : _lifecycleStateName = lifecycleStateName ?? _bindingLifecycleName;
+  GpsSampleDiagnosticsRecorder({
+    String Function()? lifecycleStateName,
+    AppClock? clock,
+  })  : _lifecycleStateName = lifecycleStateName ?? _bindingLifecycleName,
+        // #3785 — the ARRIVAL clock lives here, not at the call sites:
+        // every caller was passing its own read (and the two pipelines
+        // disagreed about which clock to pass at all). Reading it through
+        // the #3660 seam also makes the cadence assertable with a
+        // FixedClock instead of wall-clock timing.
+        _clock = clock ?? const SystemClock();
 
   /// Cap on the diagnostics buffer — mirrors `TripSampleBuffer`'s
   /// #1458 cap: ~33 h at 1 Hz, so it only bites on a forgotten
@@ -37,6 +46,7 @@ class GpsSampleDiagnosticsRecorder {
   static const int kCap = 120000;
 
   final String Function() _lifecycleStateName;
+  final AppClock _clock;
   final List<GpsSampleDiagnostic> _entries = <GpsSampleDiagnostic>[];
 
   /// Monotonic per-trip index. Deliberately NOT `_entries.length`: once
@@ -61,14 +71,20 @@ class GpsSampleDiagnosticsRecorder {
     }
   }
 
-  /// Append one cadence record at [now] with the current app lifecycle
-  /// state. Cheap (one allocation + one append, capped) — safe on the
-  /// per-fix hot path.
-  void record({required DateTime now}) {
+  /// Append one cadence record with the current app lifecycle state.
+  /// Cheap (one allocation + one append, capped) — safe on the per-fix
+  /// hot path.
+  ///
+  /// [fixAt] is the GNSS receiver's own stamp; the arrival instant comes
+  /// from this recorder's clock, so the two are guaranteed to be read
+  /// from the same place on every pipeline (#3785). [now] overrides the
+  /// arrival instant for callers that already hold one.
+  void record({DateTime? now, DateTime? fixAt}) {
     _entries.add(GpsSampleDiagnostic(
-      timestamp: now,
+      timestamp: now ?? _clock.now(),
       lifecycleState: _lifecycleStateName(),
       index: _nextIndex++,
+      fixAt: fixAt, // #3785 — the receiver's own clock, for the skew
     ));
     if (_entries.length > kCap) {
       // Drop the oldest slice — losing the early stretch is preferable
