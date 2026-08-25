@@ -67,7 +67,14 @@ mixin _TripRecordingEmit
     final started = _startedAt;
     final pastGrace = started == null ||
         nowTs.difference(started) > _engineDataStartGrace;
+    // #3783 — the fence holds while the reconnect grace / protocol work
+    // is active: the quiet-window `0100` search legitimately produces no
+    // parses for up to ~17 s, and the fence firing mid-search tore down
+    // the very link the recovery was bringing up (the 2026-08-25
+    // dial-storm spiral).
     final engineStale = pastGrace &&
+        !_inReconnectGrace &&
+        !_protocolWorkInFlight &&
         (fresh == null ||
             nowTs.difference(fresh) > _engineDataStalenessLimit);
     if (engineStale) {
