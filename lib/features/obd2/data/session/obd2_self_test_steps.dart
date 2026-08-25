@@ -24,7 +24,13 @@ Future<Obd2Service?> _superviseDial(
   Obd2LinkDialer dial,
 ) async {
   if (sup == null) return dial();
-  return sup.service ?? await sup.connectWith(dial);
+  // #3778 — reuse only a LIVE supervised link; a held-but-dead corpse
+  // routes through `connectWith`, whose single flight releases it first
+  // (research rule 8) instead of running the whole self-test against a
+  // closed transport.
+  final live = sup.service;
+  if (live != null && live.isConnected) return live;
+  return sup.connectWith(dial);
 }
 
 /// #2969 / #3380 — transport-aware pinned connect for the self-test, stamping
@@ -244,11 +250,22 @@ Future<({Obd2SelfTestStepResult result, Obd2Service? service})> _reconnectStep(
   String decisionReason = 'no-hint-transport-aware',
   String? adapterName,
   Duration connectDeadline = const Duration(seconds: 15),
+  Obd2LinkSupervisor? linkSupervisor,
 }) async {
-  try {
-    await service.disconnect();
-  } catch (_) {
-    // ignore: silent_catch — A failed deliberate drop still proceeds to attempt reconnect.
+  // #3778 — a supervisor-owned service dies THROUGH the supervisor's
+  // single flight, never around it: `connectWith` releases the held
+  // service first (research rule 8 — full close, fresh socket), so the
+  // deliberate drop truthfully leaves `ready`, and on success the fresh
+  // service is supervisor-owned (the driver's KEEP-LINK teardown then
+  // protects it instead of killing it against a stale comparison).
+  final supervised =
+      linkSupervisor != null && identical(linkSupervisor.service, service);
+  if (!supervised) {
+    try {
+      await service.disconnect();
+    } catch (_) {
+      // ignore: silent_catch — A failed deliberate drop still proceeds to attempt reconnect.
+    }
   }
   diag.noteConnectionEvent(drop: true);
   if (mac == null) {
@@ -262,11 +279,13 @@ Future<({Obd2SelfTestStepResult result, Obd2Service? service})> _reconnectStep(
   try {
     // #2969 — transport-aware reconnect (Classic → RFCOMM) on its OWN connect
     // budget, mirroring the initial connect step.
-    final reconnected = await _selfTestConnect(connection, mac,
-            transport: transport,
-            decisionReason: decisionReason,
-            adapterName: adapterName)
-        .timeout(connectDeadline);
+    Future<Obd2Service?> dial() => _selfTestConnect(connection, mac,
+        transport: transport,
+        decisionReason: decisionReason,
+        adapterName: adapterName);
+    final reconnected =
+        await (supervised ? linkSupervisor.connectWith(dial) : dial())
+            .timeout(connectDeadline);
     final elapsed = DateTime.now().difference(start).inMilliseconds;
     if (reconnected == null) {
       return (

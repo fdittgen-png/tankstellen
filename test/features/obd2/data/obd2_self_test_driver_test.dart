@@ -11,6 +11,8 @@ import 'package:tankstellen/features/obd2/data/obd2_comm_diagnostics.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connect_trace.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connect_trace_log.dart';
 import 'package:tankstellen/features/obd2/data/session/obd2_connection_service.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_link_supervisor.dart';
+import 'package:tankstellen/features/obd2/data/transport/obd2_link_drop_signal.dart';
 import 'package:tankstellen/features/obd2/data/transport/obd2_permissions.dart';
 import 'package:tankstellen/features/obd2/data/session/obd2_self_test_driver.dart';
 import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
@@ -206,6 +208,45 @@ void main() {
 
       // The driver armed the collector for the run, then restored it.
       expect(Obd2CommDiagnostics.instance.enabled, isFalse);
+    });
+  });
+
+  group('#3778 supervisor truth (Epic #3775)', () {
+    test('a supervisor-wired run leaves the supervisor TRUTHFUL — never '
+        '`ready` holding a dead service', () async {
+      final conn = _FakeConnection(
+        transportFor: () => FakeObd2Transport(Map.of(_happyPathResponses)),
+      );
+      final drops = StreamController<Obd2LinkDropEvent>.broadcast();
+      final sup = Obd2LinkSupervisor(
+        dial: () => conn.connectByMacDirect('AA:BB:CC:DD:EE:FF'),
+        drops: drops.stream,
+      );
+      addTearDown(() async {
+        await sup.dispose();
+        await drops.close();
+      });
+      expect(await sup.connect(), isNotNull);
+
+      final report = await runObd2SelfTest(
+        conn,
+        pinnedMac: 'AA:BB:CC:DD:EE:FF',
+        linkSupervisor: sup,
+      );
+      expect(report.passed, isTrue);
+
+      // The 2026-08-25 field corpse: the old flow disconnected the
+      // supervised service AROUND the supervisor, redialed around it,
+      // and the KEEP-LINK teardown then killed the replacement against
+      // a stale comparison — post-condition `ready` + closed transport,
+      // which `sup.service` handed to the next trip start 76 min later
+      // (0/309 engine samples). The invariant: ready ⟹ live.
+      final held = sup.service;
+      expect(held, isNotNull,
+          reason: 'a passed supervised run keeps a supervised link');
+      expect(held!.isConnected, isTrue,
+          reason: 'ready ⟹ live — a ready corpse strands every later '
+              'trip (#3778)');
     });
   });
 
