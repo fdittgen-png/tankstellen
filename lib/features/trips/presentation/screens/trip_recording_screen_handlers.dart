@@ -55,10 +55,7 @@ mixin _TripRecordingEventHandlers on _TripRecordingPinControls {
     // to keep the device awake at the user's expense.
     if (_pinned) {
       await ref.read(wakelockFacadeProvider).disable();
-      await SystemChrome.setEnabledSystemUIMode(
-        SystemUiMode.manual,
-        overlays: SystemUiOverlay.values,
-      );
+      await EdgeToEdge.restore();
       if (!mounted) return;
     }
     // #2509 — surface a "no movement detected" notice when the trip was

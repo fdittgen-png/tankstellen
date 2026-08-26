@@ -19,6 +19,7 @@ import '../widgets/driving_lock_overlay.dart';
 import '../widgets/driving_map_view.dart';
 import '../widgets/driving_station_sheet.dart';
 import '../widgets/driving_top_bar.dart';
+import '../../../../core/utils/edge_to_edge.dart';
 
 /// Full-screen driving mode with oversized touch targets and minimal UI.
 ///
@@ -57,10 +58,7 @@ class _DrivingModeScreenState extends ConsumerState<DrivingModeScreen> {
     _inactivityTimer?.cancel();
     _mapController.dispose();
     // Restore normal system UI when leaving driving mode
-    unawaited(SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.manual,
-      overlays: SystemUiOverlay.values,
-    ));
+    unawaited(EdgeToEdge.restore());
     super.dispose();
   }
 
