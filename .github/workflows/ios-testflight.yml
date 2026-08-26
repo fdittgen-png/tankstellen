@@ -205,6 +205,20 @@ jobs:
             bundle exec fastlane release_testflight build_number:"${IOS_BUILD_NUMBER}" changelog:"${TESTFLIGHT_CHANGELOG}" distribute_external:"${DISTRIBUTE}"
           fi
 
+      - name: Assert the build can actually reach external testers
+        # #3814 — pilot's "Successfully distributed build to External testers"
+        # means SUBMITTED, not DELIVERED. Taking it as proof let the `extern`
+        # group sit on a build from 2026-07-04 for seven weeks while every
+        # nightly run stayed green. Only runs when we actually distributed;
+        # must run BEFORE the API key is deleted.
+        if: inputs.distribute && inputs.sync_certs != true
+        working-directory: ios
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          FASTLANE_DISABLE_COLORS: '1'
+        run: bundle exec fastlane testflight_assert_delivery
+
       - name: Clean up decoded API key
         if: always()
         run: rm -f "$ASC_API_KEY_FILEPATH"
