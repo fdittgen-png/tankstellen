@@ -1,39 +1,39 @@
-Compara precios de gasolina y diésel y encuentra la gasolinera más barata cerca de ti. Sparkilo reúne los precios oficiales de las estaciones de servicio en tiempo real y te lleva a la gasolinera barata que más te conviene — gasolina, gasoil, GLP, GNC, E85 y recarga de coche eléctrico. En 17 países, gratis, sin anuncios, sin cuenta, de código abierto (MIT).
+10 céntimos de diferencia por litro parecen poca cosa. Multiplícalos por un depósito lleno y después por cada repostaje del año: eso es lo que vale de verdad elegir bien la gasolinera.
 
-POR QUÉ SPARKILO
-• Precios de combustible oficiales de datos abiertos, país por país — no estimaciones colaborativas.
-• Un único comparador de precios para gasolina, diésel y puntos de recarga, en el mismo mapa.
-• Lo barato primero: chinchetas de precio coloreadas de más barato a más caro, de un vistazo.
-• Privacidad ante todo: tu GPS y tus claves API nunca salen del dispositivo. Sin anuncios, sin rastreo, sin cuenta.
+Sparkilo te muestra cuál de las que tienes cerca es la más barata ahora mismo, con los datos oficiales de precios de cada país. Y después te ayuda a gastar menos de lo que has repostado.
 
-GASOLINERAS BARATAS CERCA DE TI
-• Busca gasolineras cerca o a lo largo de tu ruta: filtra por combustible, radio, abierto ahora, servicios y solo autopista.
-• El mejor precio de tu combustible primero, con una insignia "La más barata" en el mapa.
-• El modo ruta encuentra las mejores paradas del corredor para que el desvío siempre compense.
-• Detalle completo de la estación de servicio: marca, horario, pago, distancia y servicios.
+Gratis. Sin anuncios, sin cuenta, sin rastreo, código abierto.
 
-ALERTAS DE PRECIO Y FAVORITOS
-• Alertas por estación y por radio que se ejecutan en el dispositivo solo cuando estás cerca.
-• Favoritos con varias filas de precio, además de puntos de recarga con kW, conectores y disponibilidad.
+POR QUÉ PUEDES FIARTE
+• Precios oficiales en datos abiertos, país por país — no estimaciones de la comunidad que te mandan a dar un rodeo para nada.
+• Gasolina, diésel, GLP, GNC, E85 y recarga eléctrica en un solo mapa y una sola búsqueda.
+• La más barata primero: los marcadores van de barato a caro y el ganador lleva una insignia La más barata.
+• Tu posición GPS y tus claves de API nunca salen del dispositivo. Sin anuncios, sin cuenta, sin rastreo — y el código es público.
 
-COSTE Y CONSUMO
-• Seguimiento de consumo: nivel + autonomía, l/100 km medio, coste por kilómetro, gasto total e historial de repostajes con variaciones en porcentaje.
-• Registra repostajes a mano, por OCR del surtidor o por OCR del ticket.
-• Calculadora de coste de combustible integrada para cualquier viaje.
-• Panel de carbono: coste y CO₂ por longitud de trayecto y por velocidad.
+AHORRA EN EL PRECIO
+• Busca cerca de ti o a lo largo de toda tu ruta. Filtra por combustible, radio, abierto ahora, servicios y solo autopista.
+• El modo ruta encuentra la mejor parada dentro de tu corredor de viaje, para que el rodeo salga rentable.
+• Alertas de precio, por gasolinera o por radio, calculadas en tu dispositivo y que solo saltan cuando la oferta está realmente cerca.
+• Los favoritos muestran todos los precios de un vistazo; los puntos de recarga indican kW, conectores y disponibilidad en directo.
 
-LIBRO DE VIAJES Y ECOCONDUCCIÓN
-• Libro de viajes manos libres — registro automático con adaptador OBD2 ELM327 o solo GPS.
-• Ruta GPS por viaje coloreada según la eficiencia, además de un mapa de todos los viajes.
-• La ecoconducción detecta el derroche con histogramas de acelerador y revoluciones y comparación mensual.
+Y DESPUÉS EN LOS LITROS
+• Seguimiento de consumo: nivel y autonomía, media de L/100 km, coste por km, gasto total e historial de repostajes con diferencias.
+• Registra los repostajes a mano o escanea el display del surtidor o el ticket con OCR.
+• El cuaderno de viaje graba con manos libres mediante un adaptador OBD2 ELM327, o solo con GPS, y colorea tu ruta según la eficiencia.
+• El eco-coaching convierte los histogramas de acelerador y revoluciones en hábitos que puedes cambiar de verdad, mes a mes.
+• Panel de CO2: coste y CO2 desglosados por longitud de trayecto y franja de velocidad.
 
-MÁS
-• Precio en directo al acercarte, widget en pantalla de inicio y avisos por voz al conducir.
-• Ajustes Básico / Medio / Completo para adaptar la app; admite varios perfiles.
-• Panel de Privacidad para ver, exportar o borrar todos tus datos. Sincronización TankSync opcional.
+MIENTRAS CONDUCES
+• Superposición con el precio en directo de la gasolinera a la que te acercas.
+• Widget en la pantalla de inicio, Android Auto y anuncios de voz con los precios.
+• Los preajustes Básico, Medio y Completo mantienen la app tan sencilla o tan completa como quieras. Admite varios perfiles de conductor.
 
-PAÍSES COMPATIBLES (datos oficiales en tiempo real)
-Alemania, Argentina, Australia, Austria, Chile, Corea del Sur, Dinamarca, Eslovenia, España, Francia, Grecia, Italia, Luxemburgo, México, Portugal, Reino Unido, Rumanía. Recarga eléctrica en todo el mundo mediante Open Charge Map.
+TUS DATOS SIGUEN SIENDO TUYOS
+• Panel de privacidad: consulta, exporta o borra todo cuando quieras.
+• TankSync, opcional, sincroniza favoritos, vehículos, repostajes y alertas con un servidor que controlas tú — no nosotros.
 
-23 idiomas. Código abierto — incidencias y contribuciones bienvenidas:
+PAÍSES CON PRECIOS OFICIALES EN DIRECTO
+Austria, Argentina, Australia, Chile, Dinamarca, Francia, Alemania, Grecia, Italia, Luxemburgo, México, Portugal, Rumanía, Eslovenia, Corea del Sur, España y Reino Unido. Recarga eléctrica en todo el mundo mediante Open Charge Map.
+
+23 idiomas. Código abierto (MIT):
 https://github.com/fdittgen-png/tankstellen

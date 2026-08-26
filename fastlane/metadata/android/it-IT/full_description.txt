@@ -1,39 +1,39 @@
-Basta pagare troppo al distributore. Sparkilo confronta i prezzi del carburante in tempo reale e ti porta al distributore più economico vicino a te — benzina, diesel, GPL, metano, E85 e ricarica per auto elettrica. In 17 paesi, gratis, senza pubblicità, senza account, open source (MIT).
+10 centesimi di differenza al litro sembrano pochi. Moltiplicali per un pieno intero, poi per ogni rifornimento dell'anno: ecco quanto vale davvero scegliere il distributore giusto.
 
-PERCHÉ SPARKILO
-• Prezzi ufficiali da dati aperti, paese per paese — non stime degli utenti.
-• Un unico confronto prezzi per tutti i carburanti e le colonnine, sulla stessa mappa.
-• Prima l'economico: segnaposto colorati dal più economico al più caro, a colpo d'occhio.
-• Privacy prima di tutto: GPS e chiavi API non lasciano mai il dispositivo. Niente pubblicità, niente tracciamento, niente account.
+Sparkilo ti mostra quale distributore vicino a te è il più economico in questo momento, dai dati ufficiali sui prezzi di ogni paese. E poi ti aiuta a consumarne di meno.
 
-CARBURANTE ECONOMICO VICINO A TE
-• Cerca nelle vicinanze o lungo il percorso: filtri per carburante, raggio, aperto ora, servizi e solo autostrada.
-• Il miglior prezzo del tuo carburante in cima, con un badge "Il più economico" sulla mappa.
-• La modalità percorso trova le soste migliori nel corridoio così la deviazione conviene sempre.
-• Dettaglio completo della stazione: marca, orari, pagamento, distanza e servizi.
+Gratis. Senza pubblicità, senza account, senza tracciamento, open source.
 
-AVVISI PREZZO E PREFERITI
-• Avvisi per stazione e per raggio che girano sul dispositivo solo quando sei vicino.
-• Preferiti con più righe di prezzo, più colonnine con kW, connettori e disponibilità.
+PERCHÉ PUOI FIDARTI
+• Prezzi ufficiali in open data, paese per paese — non stime della community che ti mandano a fare una deviazione inutile.
+• Benzina, diesel, GPL, metano, E85 e ricarica elettrica su un'unica mappa, in un'unica ricerca.
+• Prima il più economico: i segnaposto sono colorati dal più conveniente al più caro e il vincitore porta un badge Il più economico.
+• La tua posizione GPS e le tue chiavi API non lasciano mai il dispositivo. Senza pubblicità, senza account, senza tracciamento — e il codice è pubblico.
 
-COSTI E CONSUMI
-• Monitoraggio consumi: livello + autonomia, l/100 km medi, costo al chilometro, spesa totale e storico dei rifornimenti con variazioni in percentuale.
-• Registra i rifornimenti a mano, con OCR del distributore o OCR dello scontrino.
-• Calcolatore del costo del carburante integrato per ogni viaggio.
-• Cruscotto carbonio: costo e CO₂ per lunghezza del tragitto e per velocità.
+RISPARMIA SUL PREZZO
+• Cerca nelle vicinanze o lungo tutto il tuo itinerario. Filtra per carburante, raggio, aperto adesso, servizi e solo autostrada.
+• La modalità itinerario trova la sosta migliore nel tuo corridoio di viaggio, così la deviazione si ripaga da sola.
+• Avvisi di prezzo, per distributore o per raggio, calcolati sul dispositivo e attivati solo quando l'offerta è davvero vicina.
+• I preferiti mostrano tutti i prezzi a colpo d'occhio; le colonnine indicano kW, connettori e disponibilità in tempo reale.
 
-DIARIO DI VIAGGIO ED ECO-GUIDA
-• Diario di viaggio a mani libere — registrazione automatica via adattatore OBD2 ELM327 o solo GPS.
-• Percorso GPS per viaggio colorato in base all'efficienza, più una mappa di tutti i viaggi.
-• L'eco-guida segnala gli sprechi con istogrammi di acceleratore e giri e confronto mensile.
+E POI SUI LITRI
+• Monitoraggio dei consumi: livello e autonomia, media L/100 km, costo al km, spesa totale e storico dei rifornimenti con le differenze.
+• Registra i rifornimenti a mano oppure scansiona il display della pompa o lo scontrino con l'OCR.
+• Il diario di bordo registra a mani libere tramite un adattatore OBD2 ELM327, o con il solo GPS, e colora il percorso in base all'efficienza.
+• L'eco-coaching trasforma gli istogrammi di acceleratore e giri motore in abitudini che puoi davvero cambiare, mese dopo mese.
+• Dashboard CO2: costi e CO2 suddivisi per lunghezza del viaggio e fascia di velocità.
 
-ALTRO
-• Prezzo in tempo reale all'avvicinamento, widget in home e annunci vocali alla guida.
-• Preset Base / Medio / Completo per dimensionare l'app; supporta più profili.
-• Cruscotto Privacy per vedere, esportare o eliminare tutti i tuoi dati. Sincronizzazione TankSync opzionale.
+MENTRE GUIDI
+• Sovrimpressione con il prezzo in tempo reale del distributore verso cui stai andando.
+• Widget nella schermata home, Android Auto e annunci vocali dei prezzi.
+• I preset Base, Medio e Completo mantengono l'app semplice o completa quanto vuoi. Supporta più profili conducente.
 
-PAESI SUPPORTATI (dati ufficiali in tempo reale)
-Argentina, Australia, Austria, Cile, Corea del Sud, Danimarca, Francia, Germania, Grecia, Italia, Lussemburgo, Messico, Portogallo, Regno Unito, Romania, Slovenia, Spagna. Ricarica elettrica in tutto il mondo tramite Open Charge Map.
+I TUOI DATI RESTANO TUOI
+• Dashboard privacy: consulta, esporta o cancella tutto, quando vuoi.
+• TankSync, opzionale, sincronizza preferiti, veicoli, rifornimenti e avvisi su un server che controlli tu — non il nostro.
 
-23 lingue. Open source — segnalazioni e contributi benvenuti:
+PAESI CON PREZZI UFFICIALI IN TEMPO REALE
+Austria, Argentina, Australia, Cile, Danimarca, Francia, Germania, Grecia, Italia, Lussemburgo, Messico, Portogallo, Romania, Slovenia, Corea del Sud, Spagna e Regno Unito. Ricarica elettrica in tutto il mondo tramite Open Charge Map.
+
+23 lingue. Open source (MIT):
 https://github.com/fdittgen-png/tankstellen

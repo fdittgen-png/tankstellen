@@ -1,31 +1,39 @@
-Sparkilo trouve le carburant et la recharge électrique les moins chers près de vous, puis vous aide à consommer moins au volant. Open source (MIT), sans publicité, sans compte, vie privée d'abord. Prix en temps réel dans 17 pays, en 23 langues.
+10 centimes d'écart par litre, cela paraît dérisoire. Multipliez-les par un plein complet, puis par chaque plein de l'année : voilà ce que vaut vraiment le choix de la bonne station.
 
-TROUVER LE PRIX LE PLUS BAS
-- Une seule recherche pour les stations à proximité ou le long de votre trajet. Filtres par type de carburant, rayon, ouvert maintenant, services et autoroute uniquement.
-- Prix en temps réel issus de la source open data officielle de chaque pays, plus la recharge électrique via Open Charge Map.
-- Repères de prix du moins cher au plus cher sur une carte claire. Sur un trajet, les meilleurs arrêts portent le badge Le moins cher.
-- Favoris pour le carburant (tous les prix) et les bornes électriques (kW, connecteurs, disponibilité en direct).
-- Alertes de prix par station ou par rayon, calculées sur votre appareil et déclenchées quand une bonne affaire est près de vous.
+Sparkilo vous montre quelle station proche de vous est la moins chère en ce moment, à partir des données officielles de chaque pays. Ensuite, il vous aide à en consommer moins.
 
-CONDUIRE MALIN, ÉCONOMISER DEUX FOIS
-- Suivi de consommation : niveau du réservoir et autonomie, moyenne L/100km, coût moyen au km, total dépensé et historique complet des pleins. Saisissez les pleins à la main ou scannez la pompe ou le ticket par OCR.
-- Tableau de bord carbone : coût et CO2 ventilés par longueur de trajet et par plage de vitesse.
-- Carnet de trajets : enregistrement manuel, mains libres via un adaptateur OBD2/ELM327, ou GPS seul. Votre trajet GPS est coloré selon l'efficacité.
-- L'éco-coaching met en évidence les habitudes gourmandes avec des histogrammes d'accélérateur et de régime, une comparaison mois par mois et une carte de tous les trajets.
-- Calculateur de coût de carburant, plusieurs profils de conducteur et préréglages Basic / Medium / Full pour garder l'app aussi simple ou complète que vous le souhaitez.
+Gratuit. Sans publicité, sans compte, sans pistage, open source.
 
-SUR LA ROUTE
-- L'aperçu d'approche affiche le prix en direct de la station vers laquelle vous roulez.
-- Widget d'écran d'accueil pour les favoris et les stations les plus proches.
-- Annonces vocales qui lisent les prix pendant que vous conduisez.
+POURQUOI VOUS POUVEZ VOUS Y FIER
+• Des prix officiels en open data, pays par pays — pas des estimations communautaires qui vous envoient faire un détour pour rien.
+• Essence, diesel, GPL, GNV, E85 et recharge électrique sur une seule carte, en une seule recherche.
+• Le moins cher d'abord : les repères sont colorés du moins cher au plus cher, et le gagnant porte un badge Le moins cher.
+• Votre position GPS et vos clés d'API ne quittent jamais l'appareil. Sans publicité, sans compte, sans pistage — et le code source est public.
 
-VIE PRIVÉE D'ABORD
-- Sans compte, sans publicité, sans traçage. Votre position GPS et vos clés d'API ne quittent jamais votre appareil.
-- Tableau de bord de confidentialité : tout consulter, exporter ou supprimer à tout moment.
-- TankSync optionnel pour synchroniser favoris, véhicules, pleins et alertes entre appareils, vers un serveur que vous contrôlez.
+ÉCONOMISEZ SUR LE PRIX
+• Cherchez à proximité ou tout au long de votre itinéraire. Filtrez par carburant, rayon, ouvert maintenant, services et autoroute uniquement.
+• Le mode itinéraire trouve le meilleur arrêt dans votre couloir de trajet : le détour est toujours rentable.
+• Alertes de prix, par station ou par rayon, calculées sur votre appareil et déclenchées seulement quand une bonne affaire est vraiment près de vous.
+• Les favoris affichent tous les prix d'un coup d'œil ; les bornes indiquent kW, connecteurs et disponibilité en direct.
 
-PAYS COUVERTS
-Autriche, Argentine, Australie, Chili, Danemark, France, Allemagne, Grèce, Italie, Luxembourg, Mexique, Portugal, Roumanie, Slovénie, Corée du Sud, Espagne et Royaume-Uni.
+PUIS SUR LES LITRES
+• Suivi de consommation : niveau et autonomie, moyenne L/100 km, coût au kilomètre, total dépensé et historique des pleins avec écarts.
+• Saisissez vos pleins à la main ou scannez l'afficheur de la pompe ou le ticket par OCR.
+• Le carnet de bord enregistre mains libres via un adaptateur OBD2 ELM327, ou par GPS seul, et colore votre trajet selon l'efficacité.
+• L'éco-coaching transforme les histogrammes d'accélérateur et de régime en habitudes que vous pouvez vraiment changer, d'un mois sur l'autre.
+• Tableau de bord CO2 : coût et CO2 par longueur de trajet et plage de vitesse.
 
-OPEN SOURCE
-Sparkilo est sous licence MIT. Le code source complet, la documentation de déploiement et les traductions sont sur GitHub. Les contributions et les nouvelles sources de pays sont les bienvenues.
+AU VOLANT
+• Superposition du prix en direct pour la station vers laquelle vous roulez.
+• Widget d'écran d'accueil pour vos favoris et les stations proches, plus les annonces vocales des prix.
+• Les préréglages Basique, Moyen et Complet gardent l'application aussi simple ou aussi complète que vous le souhaitez. Plusieurs profils de conducteur.
+
+VOS DONNÉES RESTENT LES VÔTRES
+• Tableau de bord Confidentialité : tout consulter, exporter ou supprimer, à tout moment.
+• TankSync, en option, synchronise favoris, véhicules, pleins et alertes vers un serveur que vous contrôlez — pas le nôtre.
+
+PAYS AVEC DES PRIX OFFICIELS EN DIRECT
+Autriche, Argentine, Australie, Chili, Danemark, France, Allemagne, Grèce, Italie, Luxembourg, Mexique, Portugal, Roumanie, Slovénie, Corée du Sud, Espagne et Royaume-Uni. Recharge électrique dans le monde entier via Open Charge Map.
+
+23 langues. Open source (MIT) :
+https://github.com/fdittgen-png/tankstellen
