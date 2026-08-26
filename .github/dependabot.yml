@@ -59,6 +59,12 @@ updates:
       # pins 0.20.2 on Flutter 3.41.9) — any bump is unsolvable until the
       # SDK moves (red on PR #3744, same class as the meta pin).
       - dependency-name: "intl"
+      # shimmer 4.x requires Dart ^3.12.0; we are on Flutter 3.41.9 =
+      # Dart 3.11.5, so version solving fails outright and EVERY job goes
+      # red for want of a `pub get` (closed PR #3774). Same class as the
+      # intl / meta pins — drop this with the SDK upgrade (#3801).
+      - dependency-name: "shimmer"
+        update-types: ["version-update:semver-major"]
 
       # Vendored as a stripped fork under third_party/ via
       # dependency_overrides (#3172) — the hosted constraint is inert, and
