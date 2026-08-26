@@ -787,6 +787,42 @@ platform :ios do
     # remaining question is WHICH identity is actually entitled. An invite that
     # was never accepted leaves a tester listed but empty-handed, and a build
     # installed in July may belong to a different Apple ID entirely.
+    # Apple's own per-build metrics are the ONLY server-side signal that
+    # separates "submitted" from "delivered": a build attached to a 3-tester
+    # group that reports zero invited/installed testers is a contradiction,
+    # and it is the number a CI guard can actually assert on. Everything else
+    # (approved, attached, enrolled) already reads correct while the tester
+    # sees a seven-week-old build.
+    UI.important("=== Delivery metrics for the newest external builds ===")
+    groups.reject(&:is_internal_group).each do |g|
+      begin
+        recent = Spaceship::ConnectAPI.get_builds(
+          filter: { betaGroups: g.id },
+          includes: "betaBuildMetrics,buildBetaDetail,preReleaseVersion",
+          sort: "-uploadedDate",
+          limit: 3,
+        ).to_models
+        recent.each_with_index do |b, i|
+          v = begin b.pre_release_version&.version rescue nil end
+          UI.message("  #{g.name}: #{v} #{b.version}")
+          # Dump the raw surface of the first one: the metrics association
+          # name is not worth another guess-and-wait cycle.
+          if i.zero?
+            raw = begin
+              b.instance_variables
+               .reject { |iv| iv.to_s.include?("pre_release") }
+               .map { |iv| "#{iv}=#{b.instance_variable_get(iv).inspect}" }.join(' ')
+            rescue StandardError => e
+              "!#{e.class}"
+            end
+            UI.message("    [raw] #{raw[0, 1500]}")
+          end
+        end
+      rescue StandardError => e
+        UI.error("  metrics query failed for #{g.name}: #{e.class}: #{e.message}")
+      end
+    end
+
     UI.important("=== External group rosters ===")
     groups.reject(&:is_internal_group).each do |g|
       UI.message("  --- #{g.name} ---")
