@@ -693,17 +693,74 @@ platform :ios do
     app = Spaceship::ConnectAPI::App.find("de.tankstellen.tankstellen")
     UI.user_error!("Could not find app de.tankstellen.tankstellen on App Store Connect.") if app.nil?
 
-    # Group membership first — "which builds is the extern group entitled to"
-    # is meaningless without knowing the group exists and has testers.
+    # THE decisive question is not "was the build approved" — the first run of
+    # this lane showed every build BETA_APPROVED while an external tester was
+    # still offered a seven-week-old one. It is "which builds is this group
+    # actually attached to", so ask the GROUP what builds it has rather than
+    # asking each build what groups it is in (that association is not exposed
+    # on Build in this spaceship version — it raised NoMethodError).
+    groups = app.get_beta_groups
     UI.important("=== Beta groups ===")
-    app.get_beta_groups.each do |g|
+    groups.each do |g|
       kind = g.is_internal_group ? "internal" : "external"
       testers = begin
-        g.get_beta_testers.count
+        Spaceship::ConnectAPI::BetaTester.all(
+          filter: { betaGroups: g.id }, limit: 200
+        ).count
       rescue StandardError => e
         "?(#{e.class})"
       end
-      UI.message("  #{g.name} (#{kind}) — #{testers} tester(s)")
+      UI.message("  #{g.name} (#{kind}) id=#{g.id} — #{testers} tester(s)")
+    end
+
+    UI.important("=== Builds attached to each EXTERNAL group (newest first) ===")
+    UI.message("This is what a tester in that group can actually install.")
+    groups.reject(&:is_internal_group).each do |g|
+      UI.message("  --- #{g.name} ---")
+      begin
+        gbuilds = Spaceship::ConnectAPI::Build.all(
+          app_id: app.id,
+          filter: { betaGroups: g.id },
+          sort: "-uploadedDate",
+          limit: 10,
+        )
+        if gbuilds.nil? || gbuilds.empty?
+          UI.error("    (NO builds attached to this group)")
+        else
+          gbuilds.each do |b|
+            v = begin b.pre_release_version&.version rescue nil end
+            UI.message("    #{v} #{b.version} uploaded=#{b.uploaded_date}")
+          end
+        end
+      rescue StandardError => e
+        UI.error("    group-build query failed: #{e.class}: #{e.message}")
+      end
+    end
+
+    # Named tester lookup — an address can be a group member yet sit in a state
+    # that never yields a build (e.g. an invite that was never accepted).
+    email = options[:tester] || ENV["TESTFLIGHT_STATUS_TESTER"]
+    if email && !email.to_s.strip.empty?
+      UI.important("=== Tester #{email} ===")
+      begin
+        found = Spaceship::ConnectAPI::BetaTester.all(
+          filter: { email: email.to_s.strip }, includes: "betaGroups", limit: 10
+        )
+        if found.nil? || found.empty?
+          UI.error("  NOT FOUND as a beta tester on this app")
+        else
+          found.each do |t|
+            gs = begin
+              t.beta_groups&.map(&:name)&.join("|")
+            rescue StandardError
+              "?"
+            end
+            UI.message("  id=#{t.id} state=#{begin t.state rescue '?' end} groups=#{gs}")
+          end
+        end
+      rescue StandardError => e
+        UI.error("  tester lookup failed: #{e.class}: #{e.message}")
+      end
     end
 
     # `includes` is best-effort: the association names have moved between
