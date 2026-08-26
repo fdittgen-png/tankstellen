@@ -5276,6 +5276,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gpsCoverageAttrGateRejected => 'Fixe gefiltert';
 
   @override
+  String get gpsCoverageAttrDeliveryStall => 'verzögerte Zustellung';
+
+  @override
   String get gpsCoverageAttrSignalLoss => 'Signalverlust';
 
   @override
@@ -5292,6 +5295,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get gpsCoverageHintGateRejected =>
       'Verrauschte Positionsdaten in diesem Abschnitt wurden herausgefiltert, damit die Distanzangabe ehrlich bleibt.';
+
+  @override
+  String get gpsCoverageHintDeliveryStall =>
+      'Die Positionsdaten wurden rechtzeitig erzeugt, kamen aber verspätet in der App an — das Telefon war ausgelastet (oft eine Bluetooth-Neuverbindung). Der Empfang war in Ordnung.';
 
   @override
   String get gpsCoverageHintSignalLoss =>

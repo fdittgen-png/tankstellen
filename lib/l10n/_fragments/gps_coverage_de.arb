@@ -35,6 +35,10 @@
   "@gpsCoverageAttrGateRejected": {
     "description": "Gap-cause label (#3465): the app's accuracy/teleport/decimation gates rejected the fixes in this stretch."
   },
+  "gpsCoverageAttrDeliveryStall": "verzögerte Zustellung",
+  "@gpsCoverageAttrDeliveryStall": {
+    "description": "Gap-cause label (#3785): fixes were produced on time but delivered late."
+  },
   "gpsCoverageAttrSignalLoss": "Signalverlust",
   "@gpsCoverageAttrSignalLoss": {
     "description": "Gap-cause label (#3465): GPS reception itself dropped while the app was foregrounded."
@@ -54,6 +58,10 @@
   "gpsCoverageHintGateRejected": "Verrauschte Positionsdaten in diesem Abschnitt wurden herausgefiltert, damit die Distanzangabe ehrlich bleibt.",
   "@gpsCoverageHintGateRejected": {
     "description": "Short hint under the coverage line (#3465) for the gateRejected cause."
+  },
+  "gpsCoverageHintDeliveryStall": "Die Positionsdaten wurden rechtzeitig erzeugt, kamen aber verspätet in der App an — das Telefon war ausgelastet (oft eine Bluetooth-Neuverbindung). Der Empfang war in Ordnung.",
+  "@gpsCoverageHintDeliveryStall": {
+    "description": "Gap-cause hint (#3785): delivery stall explained in plain language."
   },
   "gpsCoverageHintSignalLoss": "Der GPS-Empfang ist abgerissen — meist ein Tunnel, ein Parkhaus oder eine enge Häuserschlucht.",
   "@gpsCoverageHintSignalLoss": {

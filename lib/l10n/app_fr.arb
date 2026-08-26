@@ -5391,5 +5391,15 @@
         "type": "String"
       }
     }
+  },
+  "gpsCoverageAttrDeliveryStall": "delayed delivery",
+  "@gpsCoverageAttrDeliveryStall": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsCoverageHintDeliveryStall": "Position fixes were produced on time but reached the app late — the phone was busy (often a Bluetooth reconnect). Reception was fine.",
+  "@gpsCoverageHintDeliveryStall": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

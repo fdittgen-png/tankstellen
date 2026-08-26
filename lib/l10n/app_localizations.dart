@@ -9235,6 +9235,12 @@ abstract class AppLocalizations {
   /// **'fixes filtered'**
   String get gpsCoverageAttrGateRejected;
 
+  /// Gap-cause label (#3785): the receiver kept producing fixes but the app-side delivery path stalled, so they arrived late — the hole is a delivery problem, not lost reception.
+  ///
+  /// In en, this message translates to:
+  /// **'delayed delivery'**
+  String get gpsCoverageAttrDeliveryStall;
+
   /// Gap-cause label (#3465): the app was foregrounded and nothing else explains the gap — GPS reception itself dropped (tunnel, parking garage, urban canyon).
   ///
   /// In en, this message translates to:
@@ -9264,6 +9270,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Noisy position fixes in this stretch were filtered out to keep the distance figure honest.'**
   String get gpsCoverageHintGateRejected;
+
+  /// Gap-cause hint (#3785): explains a delivery stall in plain language and reassures that GPS reception itself was working.
+  ///
+  /// In en, this message translates to:
+  /// **'Position fixes were produced on time but reached the app late — the phone was busy (often a Bluetooth reconnect). Reception was fine.'**
+  String get gpsCoverageHintDeliveryStall;
 
   /// Short hint under the coverage line (#3465) when the longest gap was caused by genuine GPS signal loss while the app was foregrounded.
   ///

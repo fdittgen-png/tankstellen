@@ -5,6 +5,7 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/trips/domain/entities/recording_lifecycle_mark.dart';
+import 'package:tankstellen/features/trips/domain/entities/gps_sample_diagnostic.dart';
 import 'package:tankstellen/features/trips/domain/gps_coverage_report.dart';
 import 'package:tankstellen/features/trips/domain/gps_track_distance.dart';
 import 'package:tankstellen/features/trips/domain/trip_sample.dart';
@@ -465,4 +466,93 @@ void main() {
           isNot(GpsGapAttribution.linkRecovery));
     });
   });
+
+  group('#3785 — delivery stall vs signal loss', () {
+    // The field shape: six ~24.5 s gaps on a FOREGROUND trip, all
+    // labelled `signalLoss` — which is a RESIDUAL bucket, so it said
+    // nothing about the cause. With both clocks recorded, a gap whose
+    // fixes arrived materially later than they were stamped is now named
+    // positively instead of falling through.
+
+    /// Diagnostics whose arrival clock lags the fix clock by [skew].
+    GpsSampleDiagnostic diag(int i, Duration fixOffset, Duration skew) =>
+        GpsSampleDiagnostic(
+          timestamp: t0.add(fixOffset + skew),
+          lifecycleState: 'resumed',
+          index: i,
+          fixAt: t0.add(fixOffset),
+        );
+
+    // A gap from t+3 s to t+28 s on an otherwise 1 Hz track.
+    final samples = [
+      ...cadence(Duration.zero, 4), // 0..3 s
+      ...cadence(const Duration(seconds: 28), 4), // 28..31 s
+    ];
+    final marks = [
+      RecordingLifecycleMark(at: t0, backgrounded: false),
+    ];
+
+    test('delivery lagging ACROSS the gap is attributed deliveryStall', () {
+      final report = GpsCoverageReport.fromSamples(
+        samples,
+        expectedFixInterval: oneSecond,
+        marks: marks,
+        // Before the gap delivery was prompt; after it, fixes arrive a
+        // full 5 s late — the receiver kept working, the app did not.
+        diagnostics: [
+          diag(0, const Duration(seconds: 3), Duration.zero),
+          diag(1, const Duration(seconds: 28), const Duration(seconds: 5)),
+        ],
+        fgsEnabled: false,
+      );
+      expect(report.gaps, hasLength(1));
+      expect(report.gaps.single.attribution,
+          GpsGapAttribution.deliveryStall,
+          reason: 'a skew that JUMPS across the gap means fixes were '
+              'produced but delivery fell behind');
+    });
+
+    test('clocks aligned on both sides stays signalLoss — a real '
+        'reception hole is not renamed', () {
+      final report = GpsCoverageReport.fromSamples(
+        samples,
+        expectedFixInterval: oneSecond,
+        marks: marks,
+        diagnostics: [
+          diag(0, const Duration(seconds: 3), Duration.zero),
+          diag(1, const Duration(seconds: 28), Duration.zero),
+        ],
+        fgsEnabled: false,
+      );
+      expect(report.gaps.single.attribution, GpsGapAttribution.signalLoss);
+    });
+
+    test('a uniformly slow link is NOT a stall — only a jump across the '
+        'gap counts', () {
+      final report = GpsCoverageReport.fromSamples(
+        samples,
+        expectedFixInterval: oneSecond,
+        marks: marks,
+        // Both sides equally late: a constant delivery lag, not a stall.
+        diagnostics: [
+          diag(0, const Duration(seconds: 3), const Duration(seconds: 5)),
+          diag(1, const Duration(seconds: 28), const Duration(seconds: 5)),
+        ],
+        fgsEnabled: false,
+      );
+      expect(report.gaps.single.attribution, GpsGapAttribution.signalLoss);
+    });
+
+    test('no diagnostics (legacy trip) falls through unchanged — an '
+        'unmeasured gap is never asserted as a stall', () {
+      final report = GpsCoverageReport.fromSamples(
+        samples,
+        expectedFixInterval: oneSecond,
+        marks: marks,
+        fgsEnabled: false,
+      );
+      expect(report.gaps.single.attribution, GpsGapAttribution.signalLoss);
+    });
+  });
+
 }
