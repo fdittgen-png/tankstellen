@@ -75,12 +75,25 @@ jobs:
 
       - name: Compute monotonic build number
         id: bn
-        # Monotonic run-counter rather than a date stamp: a 2026060000 base
-        # offset (above every prior YYYYMMDDHH number) plus the run number and
-        # attempt guarantees a strictly-increasing, never-colliding
-        # CFBundleVersion across re-runs and re-attempts.
+        # #3812 — the SHARED #3513 wall-clock scheme (minutes since
+        # 2025-07-06 UTC on a 2026100000 base), identical to daily-beta.yml.
+        #
+        # The old `2026060000 + run_number * 10 + run_attempt` was a
+        # PER-WORKFLOW counter, and daily-beta abandoned that exact scheme
+        # in #3513 because such counters "leapfrog each other". #3792 made
+        # that concrete here: this workflow is now `workflow_call`-ed by
+        # release-train, and a called workflow inherits the CALLER's
+        # `run_number` — the train's 14 in place of this workflow's 136, so
+        # the CFBundleVersion fell from 2026061361 to 2026060141. Apple
+        # accepted that one, but every later train run walks numbers this
+        # workflow's own history already used, and a duplicate build is
+        # rejected outright.
+        #
+        # Wall-clock is invariant under `workflow_call`, strictly
+        # increasing, and lands ~2026698xxx — above every historical iOS
+        # build (max 2026061361), so monotonicity is restored immediately.
         run: |
-          BN=$(( 2026060000 + ${{ github.run_number }} * 10 + ${{ github.run_attempt }} ))
+          BN=$(( 2026100000 + ( $(date -u +%s) - 1751760000 ) / 60 )) # #3513 shared scheme
           echo "build_number=$BN" >> "$GITHUB_OUTPUT"
           echo "Build number: $BN"
 
