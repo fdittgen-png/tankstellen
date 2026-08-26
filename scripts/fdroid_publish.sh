@@ -75,7 +75,8 @@ dart run build_runner build --delete-conflicting-outputs
 echo "==> Building signed fdroid release APK"
 flutter build apk --release --flavor fdroid \
   --dart-define=FORCE_LOCATION_MANAGER=true \
-  --dart-define=FGS_FORM_APPROVED=true
+  --dart-define=FGS_FORM_APPROVED=true \
+  --dart-define=FDROID_LIBRE=true
 [[ -f "${APK_OUT}" ]] || fail "expected APK not found at ${APK_OUT}"
 
 # --- 5. Audit the release APK — abort on any GMS/MLKit hit -------------------
