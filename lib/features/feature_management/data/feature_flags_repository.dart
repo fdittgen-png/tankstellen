@@ -23,10 +23,9 @@ class FeatureFlagsRepository {
   final FeatureManifest _manifest;
 
   FeatureFlagsRepository({
-    required Box<dynamic> box,
-    FeatureManifest manifest = FeatureManifest.defaultManifest,
-  })  : _box = box,
-        _manifest = manifest;
+    required this._box,
+    this._manifest = FeatureManifest.defaultManifest,
+  });
 
   /// Hive box that holds the persisted feature-flag set.
   static const String boxName = 'feature_flags';

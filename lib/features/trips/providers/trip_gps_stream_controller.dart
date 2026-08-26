@@ -30,10 +30,9 @@ import '../../../core/logging/error_logger.dart';
 /// the `_lifecycleState` field itself stays the notifier's.
 class TripGpsStreamController {
   TripGpsStreamController({
-    required Ref ref,
-    required AppLifecycleState Function() lifecycleState,
-  })  : _ref = ref,
-        _lifecycleState = lifecycleState;
+    required this._ref,
+    required this._lifecycleState,
+  });
 
   final Ref _ref;
   final AppLifecycleState Function() _lifecycleState;

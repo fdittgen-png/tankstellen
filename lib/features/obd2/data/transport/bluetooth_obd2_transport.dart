@@ -76,8 +76,8 @@ class BluetoothObd2Transport
 
   BluetoothObd2Transport(
     this._channel, {
-    Duration readTimeout = const Duration(seconds: 5),
-  }) : _readTimeout = readTimeout;
+    this._readTimeout = const Duration(seconds: 5),
+  });
 
   @override
   bool get isConnected => _connected;

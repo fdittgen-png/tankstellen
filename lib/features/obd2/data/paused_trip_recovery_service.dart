@@ -59,21 +59,18 @@ class PausedTripRecoveryService {
 
   /// Construct the recovery service.
   ///
-  /// [pausedRepo] reads & deletes paused-trip rows.
-  /// [historyRepo] persists the finalised [TripHistoryEntry].
-  /// [onAutomaticRecovered] is invoked once per recovered entry whose
+  /// [_pausedRepo] reads & deletes paused-trip rows.
+  /// [_historyRepo] persists the finalised [TripHistoryEntry].
+  /// [_onAutomaticRecovered] is invoked once per recovered entry whose
   /// `automatic` flag is true. Pass null to skip the badge bump
   /// entirely (tests, manual-only deployments).
   /// [now] overrides the wall-clock for tests.
   PausedTripRecoveryService({
-    required PausedTripRepository pausedRepo,
-    required TripHistoryRepository historyRepo,
-    Future<void> Function()? onAutomaticRecovered,
+    required this._pausedRepo,
+    required this._historyRepo,
+    this._onAutomaticRecovered,
     DateTime Function()? now,
-  })  : _pausedRepo = pausedRepo,
-        _historyRepo = historyRepo,
-        _onAutomaticRecovered = onAutomaticRecovered,
-        _now = now ?? DateTime.now;
+  })  : _now = now ?? DateTime.now;
 
   /// Walk the paused-trips box, finalise stale entries into history,
   /// and return the count of recovered entries.

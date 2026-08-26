@@ -59,17 +59,15 @@ class BulkDatasetAlertStrategy implements CountryAlertStrategy {
   BulkDatasetAlertStrategy({
     required this.countryCode,
     required StorageRepository storage,
-    required CacheStrategy cache,
+    required this._cache,
     required FuelServicePolicy policy,
     DataAccessRecorder? recorder,
-    ProviderRequestBudget? budget,
+    this._budget,
     @visibleForTesting StationService? service,
     @visibleForTesting StationCoordsResolver? coordsResolver,
   })  : _storage = storage,
-        _cache = cache,
         _policy = policy,
         _recorder = recorder,
-        _budget = budget,
         _serviceOverride = service,
         _coordsResolver = coordsResolver ?? _defaultCoordsResolver(storage) {
     // #2866 — note the dataset-refresh interval so the trace can judge the

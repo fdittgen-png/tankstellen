@@ -84,8 +84,8 @@ class PolledAlertStrategy implements CountryAlertStrategy {
     this.countryCode,
     this._service, {
     this.minInterval,
-    ProviderRequestBudget? budget,
-  }) : _budget = budget;
+    this._budget,
+  });
 
   @override
   final String countryCode;

@@ -25,10 +25,10 @@ export '../protocol/supported_pids_probe.dart' show Obd2BusProbeResult;
 class SupportedPidsResolver {
   SupportedPidsResolver({
     required Future<String> Function(String command) send,
-    required bool Function() isConnected,
+    required this._isConnected,
     Future<String> Function(String command)? searchSend,
-    SupportedPidsCache? cache,
-    String? vehicleFallbackKey,
+    this._cache,
+    this._vehicleFallbackKey,
   })  : _send = send,
         // #3037 — the first `0100` probe sends through [searchSend] (the
         // host's GENEROUS protocol-search window, ~15 s) instead of [_send]'s
@@ -37,10 +37,7 @@ class SupportedPidsResolver {
         // Defaults to [_send] for callers / tests that don't supply a separate
         // long-window send (the plain send still applies its own first-command
         // search class).
-        _searchSend = searchSend ?? send,
-        _isConnected = isConnected,
-        _cache = cache,
-        _vehicleFallbackKey = vehicleFallbackKey;
+        _searchSend = searchSend ?? send;
 
   final Future<String> Function(String command) _send;
   final Future<String> Function(String command) _searchSend;

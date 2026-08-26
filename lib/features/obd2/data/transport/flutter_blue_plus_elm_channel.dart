@@ -165,14 +165,11 @@ class FlutterBluePlusElmChannel with Obd2ChannelAbandonLatch
   FlutterBluePlusElmChannel(
     this._device, {
     Elm327BleUuids? uuids,
-    Duration? connectTimeout,
-    bool autoConnect = false,
-    Future<bool> Function()? scanSeed,
+    this._connectTimeout,
+    this._autoConnect = false,
+    this._scanSeed,
     Duration dropDebounce = const Duration(milliseconds: 1500),
   })  : _uuids = uuids ?? Elm327BleUuids.vgate,
-        _connectTimeout = connectTimeout,
-        _autoConnect = autoConnect,
-        _scanSeed = scanSeed,
         _dropDebounce = dropDebounce {
     _dropDebouncer = ConnectionDropDebouncer(
       debounce: dropDebounce,

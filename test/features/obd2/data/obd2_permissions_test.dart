@@ -126,10 +126,9 @@ class _FakePermissions implements Obd2Permissions {
 
   _FakePermissions(
     this._current, {
-    Obd2PermissionState? onRequest,
-    bool notificationsGranted = true,
-  })  : _onRequest = onRequest,
-        _notificationsGranted = notificationsGranted;
+    this._onRequest,
+    this._notificationsGranted = true,
+  });
 
   @override
   Future<Obd2PermissionState> current() async => _current;

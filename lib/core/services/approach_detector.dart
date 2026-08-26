@@ -109,17 +109,9 @@ class ApproachDetector {
 
   ApproachDetector({
     required Stream<Position> gpsStream,
-    required Future<List<Station>> Function(
-      double lat,
-      double lng,
-      double radiusKm,
-      String fuelType, {
-      double? headingDegrees,
-    }) fetchStations,
-    required ApproachDetectorConfig config,
-  })  : _gps = gpsStream,
-        _fetchStations = fetchStations,
-        _config = config {
+    required this._fetchStations,
+    required this._config,
+  })  : _gps = gpsStream {
     _start();
   }
 

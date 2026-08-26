@@ -59,7 +59,7 @@ Map<String, Object?> obd2DisconnectTraceContext({
   final block = buildObd2SessionContextBlock(collector: collector);
   return <String, Object?>{
     'where': 'Obd2RecordingPipeline.stop: service disconnect failed',
-    if (block != null) ...block,
+    ...?block,
   };
 }
 

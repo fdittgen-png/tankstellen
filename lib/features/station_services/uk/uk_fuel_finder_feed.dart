@@ -95,11 +95,10 @@ class UkFuelFinderFeed {
   final String _baseUrl;
 
   UkFuelFinderFeed({
-    required UkFuelFinderAuth auth,
+    required this._auth,
     Dio? dio,
     String? baseUrl,
-  })  : _auth = auth,
-        _dio = dio ??
+  })  : _dio = dio ??
             DioFactory.create(
               connectTimeout: const Duration(seconds: 15),
               receiveTimeout: const Duration(seconds: 30),

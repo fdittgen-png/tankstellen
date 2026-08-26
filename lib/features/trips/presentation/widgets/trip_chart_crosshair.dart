@@ -247,18 +247,13 @@ class _TripChartGeometry {
   const _TripChartGeometry._({
     required this.minV,
     required this.maxV,
-    required double yMin,
-    required double ySpan,
-    required int firstTs,
-    required int tSpan,
-    required double chartWidth,
-    required double chartHeight,
-  }) : _yMin = yMin,
-       _ySpan = ySpan,
-       _firstTs = firstTs,
-       _tSpan = tSpan,
-       _chartWidth = chartWidth,
-       _chartHeight = chartHeight;
+    required this._yMin,
+    required this._ySpan,
+    required this._firstTs,
+    required this._tSpan,
+    required this._chartWidth,
+    required this._chartHeight,
+  });
 
   factory _TripChartGeometry.forSize(
     Size size,

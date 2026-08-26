@@ -68,14 +68,11 @@ class GithubIssueReporter {
   static const int _rateLimitFloor = 5;
 
   GithubIssueReporter({
-    required http.Client httpClient,
-    required String token,
-    required String repoOwner,
-    required String repoName,
-  })  : _httpClient = httpClient,
-        _token = token,
-        _repoOwner = repoOwner,
-        _repoName = repoName;
+    required this._httpClient,
+    required this._token,
+    required this._repoOwner,
+    required this._repoName,
+  });
 
   /// Creates a GitHub issue and returns the `html_url` of the created
   /// issue.

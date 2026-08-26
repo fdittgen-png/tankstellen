@@ -132,14 +132,13 @@ class ReceiptOverrideRegistry {
   final Map<String, OverrideSpec> _entries = <String, OverrideSpec>{};
   bool _loaded = false;
 
-  /// Construct a registry that pulls from [assetPath] (defaults to the
-  /// shipped override catalogue). [bundle] is mainly for tests — when
+  /// Construct a registry that pulls from [_assetPath] (defaults to the
+  /// shipped override catalogue). [_bundle] is mainly for tests — when
   /// `null`, [rootBundle] is used.
   ReceiptOverrideRegistry({
-    String assetPath = defaultAssetPath,
-    AssetBundle? bundle,
-  })  : _assetPath = assetPath,
-        _bundle = bundle;
+    this._assetPath = defaultAssetPath,
+    this._bundle,
+  });
 
   /// Build a registry from an in-memory JSON string. Handy for tests and
   /// for feature flags that source overrides from something other than

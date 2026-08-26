@@ -27,10 +27,9 @@ import '../transport/companion_device_association.dart';
 ///   * never throws into the caller's path.
 class CompanionAutoRecordCoordinator {
   CompanionAutoRecordCoordinator({
-    required CompanionDeviceAssociation association,
-    bool fgsEnabled = kGpsRecordingForegroundServiceEnabled,
-  })  : _association = association,
-        _fgsEnabled = fgsEnabled;
+    required this._association,
+    this._fgsEnabled = kGpsRecordingForegroundServiceEnabled,
+  });
 
   final CompanionDeviceAssociation _association;
   final bool _fgsEnabled;

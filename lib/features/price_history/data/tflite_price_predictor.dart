@@ -125,11 +125,9 @@ class TflitePredictionResult {
 /// static band degrades to a sanity check.
 class TflitePricePredictor {
   TflitePricePredictor({
-    required TfliteInterpreter interpreter,
-    Stopwatch Function() stopwatch = Stopwatch.new,
-  })  : _interpreter = interpreter,
-        _stopwatch = stopwatch,
-        _enabledOverride = null;
+    required this._interpreter,
+    this._stopwatch = Stopwatch.new,
+  })  : _enabledOverride = null;
 
   /// Test-only constructor — lets the test suite exercise the enabled
   /// inference path even though [kTflitePredictorEnabled] is `false` at
@@ -140,12 +138,10 @@ class TflitePricePredictor {
   /// warning.
   @visibleForTesting
   TflitePricePredictor.test({
-    required TfliteInterpreter interpreter,
-    Stopwatch Function() stopwatch = Stopwatch.new,
+    required this._interpreter,
+    this._stopwatch = Stopwatch.new,
     required bool enabled,
-  })  : _interpreter = interpreter,
-        _stopwatch = stopwatch,
-        _enabledOverride = enabled;
+  })  : _enabledOverride = enabled;
 
   final TfliteInterpreter _interpreter;
   final Stopwatch Function() _stopwatch;

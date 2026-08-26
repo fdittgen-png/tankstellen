@@ -69,12 +69,10 @@ class VehicleAggregateUpdater {
   final DateTime Function() _now;
 
   VehicleAggregateUpdater({
-    required VehicleProfileRepository vehicleRepo,
-    required TripHistoryRepository? Function() tripRepoLookup,
+    required this._vehicleRepo,
+    required this._tripRepoLookup,
     DateTime Function()? now,
-  })  : _vehicleRepo = vehicleRepo,
-        _tripRepoLookup = tripRepoLookup,
-        _now = now ?? DateTime.now;
+  })  : _now = now ?? DateTime.now;
 
   /// Full recompute for [vehicleId]. Loads the vehicle's trip history
   /// from the repository, classifies each trip by length, derives both

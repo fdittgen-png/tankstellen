@@ -68,12 +68,12 @@ abstract class Obd2Permissions {
 /// re-prompt — the picker UI offers an "Open Settings" deep link in
 /// that branch.
 class PluginObd2Permissions implements Obd2Permissions {
-  /// [sdkIntProvider] is the Android SDK-level probe (#3183) — injectable so
+  /// [_sdkIntProvider] is the Android SDK-level probe (#3183) — injectable so
   /// tests can drive the permission-set selection without a platform channel.
   /// Defaults to the real native `Build.VERSION.SDK_INT` probe.
   const PluginObd2Permissions({
-    Future<int> Function() sdkIntProvider = _probeAndroidSdkInt,
-  }) : _sdkIntProvider = sdkIntProvider;
+    this._sdkIntProvider = _probeAndroidSdkInt,
+  });
 
   final Future<int> Function() _sdkIntProvider;
 

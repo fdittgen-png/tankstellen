@@ -42,20 +42,14 @@ class LiveSampleSnapshot
         _LiveSampleSnapshotSubscriptions,
         _LiveSampleSnapshotFuelRate {
   LiveSampleSnapshot({
-    required Obd2Service service,
-    VehicleProfile? vehicle,
-    ReferenceVehicle? referenceVehicle,
-    Obd2BreadcrumbRecorder? breadcrumbCollector,
-    required void Function(Object? parsedValue) onHighPriorityParse,
-    required void Function(double speedKmh) onSpeedSample,
+    required this._service,
+    this._vehicle,
+    this._referenceVehicle,
+    this._breadcrumbCollector,
+    required this._onHighPriorityParse,
+    required this._onSpeedSample,
     DateTime Function()? clock,
-  })  : _service = service,
-        _vehicle = vehicle,
-        _referenceVehicle = referenceVehicle,
-        _breadcrumbCollector = breadcrumbCollector,
-        _onHighPriorityParse = onHighPriorityParse,
-        _onSpeedSample = onSpeedSample,
-        _clock = clock ?? DateTime.now,
+  })  : _clock = clock ?? DateTime.now,
         _precision = PrecisionPidLatches(clock: clock);
 
   /// #3784 — point the snapshot at the freshly-reconnected service after

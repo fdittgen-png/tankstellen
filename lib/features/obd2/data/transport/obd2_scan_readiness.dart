@@ -82,13 +82,12 @@ extension Obd2ScanReadinessX on Obd2ScanReadiness {
 /// whole matrix is unit-testable without a radio.
 class Obd2ScanReadinessProbe {
   Obd2ScanReadinessProbe({
-    required Obd2Permissions permissions,
+    required this._permissions,
     Future<bool> Function()? isSupported,
     Future<BluetoothAdapterState> Function()? adapterState,
     Future<bool> Function()? locationServicesEnabled,
     bool Function()? isAndroid,
-  })  : _permissions = permissions,
-        _isSupported = isSupported ?? _defaultIsSupported,
+  })  : _isSupported = isSupported ?? _defaultIsSupported,
         _adapterState = adapterState ?? _defaultAdapterState,
         _locationServicesEnabled =
             locationServicesEnabled ?? _defaultLocationServicesEnabled,

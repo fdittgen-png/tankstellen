@@ -44,9 +44,9 @@ class BaselineStore {
   final int fullConfidenceSamples;
 
   BaselineStore({
-    required Box<String> box,
+    required this._box,
     this.fullConfidenceSamples = 30,
-  }) : _box = box;
+  });
 
   /// Box name used by the production wiring. Tests use their own
   /// in-memory box with a different name so they don't collide.

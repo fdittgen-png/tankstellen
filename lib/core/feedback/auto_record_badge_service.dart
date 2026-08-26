@@ -43,9 +43,8 @@ class AutoRecordBadgeService {
 
   AutoRecordBadgeService({
     Future<void> Function(int)? setBadge,
-    required SharedPreferences prefs,
-  })  : _setBadge = setBadge ?? _defaultSetBadge,
-        _prefs = prefs;
+    required this._prefs,
+  })  : _setBadge = setBadge ?? _defaultSetBadge;
 
   /// Read current count without side effects. Defaults to 0 when no
   /// value has been persisted yet.

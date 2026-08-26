@@ -94,14 +94,13 @@ class RetryingTileHttpClient extends http.BaseClient {
   final Future<void> Function(Duration) _sleep;
 
   RetryingTileHttpClient({
-    required http.Client inner,
+    required this._inner,
     this.maxAttempts = 3,
     this.baseDelay = const Duration(milliseconds: 200),
     this.backoffMultiplier = 4.0,
     math.Random? random,
     Future<void> Function(Duration)? sleep,
-  })  : _inner = inner,
-        _maxAttempts = maxAttempts,
+  })  : _maxAttempts = maxAttempts,
         _baseDelay = baseDelay,
         _backoffMultiplier = backoffMultiplier,
         _random = random ?? math.Random(),

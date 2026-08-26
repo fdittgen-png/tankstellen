@@ -67,8 +67,8 @@ class TripDistanceResolver {
 
   TripDistanceResolver({
     required this.maxIntegrationGapSeconds,
-    required DateTime Function() now,
-  }) : _now = now;
+    required this._now,
+  });
 
   /// Append a speed sample to the virtual-odometer buffer, dropping the
   /// oldest entry when the cap is hit. Called from the 5 Hz vehicle-speed

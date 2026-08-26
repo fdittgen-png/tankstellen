@@ -42,17 +42,15 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
   final Duration _enrichBudget;
 
   PrixCarburantsStationService({
-    OsmBrandEnricher? enricher,
+    this._enricher,
     Dio? dio,
     String? baseUrl,
-    Duration enrichBudget = const Duration(seconds: 2),
-  })  : _enricher = enricher,
-        _dio = dio ?? DioFactory.create(
+    this._enrichBudget = const Duration(seconds: 2),
+  })  : _dio = dio ?? DioFactory.create(
           connectTimeout: const Duration(seconds: 15),
           receiveTimeout: const Duration(seconds: 15),
         ),
-        _baseUrl = baseUrl ?? defaultBaseUrl,
-        _enrichBudget = enrichBudget;
+        _baseUrl = baseUrl ?? defaultBaseUrl;
 
   static const String defaultBaseUrl =
       'https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets'

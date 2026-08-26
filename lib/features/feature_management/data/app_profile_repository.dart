@@ -23,7 +23,7 @@ import '../domain/app_profile.dart';
 class AppProfileRepository {
   final Box<dynamic> _box;
 
-  AppProfileRepository({required Box<dynamic> box}) : _box = box;
+  AppProfileRepository({required this._box});
 
   /// Hive box that holds the persisted profile.
   static const String boxName = 'app_profile';

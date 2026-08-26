@@ -15,14 +15,11 @@ import 'obd2_connection_errors.dart';
 /// sensitive lifecycle that doesn't belong here.
 class TripDropDetector {
   TripDropDetector({
-    required DateTime Function() now,
-    Duration dropWindow = const Duration(seconds: 5),
-    int dropThreshold = 3,
-    int silentFailureThreshold = 50,
-  })  : _now = now,
-        _dropWindow = dropWindow,
-        _dropThreshold = dropThreshold,
-        _silentFailureThreshold = silentFailureThreshold;
+    required this._now,
+    this._dropWindow = const Duration(seconds: 5),
+    this._dropThreshold = 3,
+    this._silentFailureThreshold = 50,
+  });
 
   final DateTime Function() _now;
 

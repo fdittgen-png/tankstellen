@@ -25,18 +25,13 @@ import '../../../core/background/provider_request_budget.dart';
 /// no buildable strategy is resolved only once.
 class CountryAlertStrategyResolver {
   CountryAlertStrategyResolver({
-    required StorageRepository storage,
-    required CacheStrategy cache,
-    String? apiKey,
-    DataAccessRecorder? recorder,
-    ProviderRequestBudget? budget,
-    PolledAlertStrategyDeps? polledDeps,
-  })  : _storage = storage,
-        _cache = cache,
-        _apiKey = apiKey,
-        _recorder = recorder,
-        _budget = budget,
-        _polledDeps = polledDeps;
+    required this._storage,
+    required this._cache,
+    this._apiKey,
+    this._recorder,
+    this._budget,
+    this._polledDeps,
+  });
 
   final StorageRepository _storage;
   final CacheStrategy _cache;

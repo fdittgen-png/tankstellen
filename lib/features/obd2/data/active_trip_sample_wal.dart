@@ -33,8 +33,7 @@ import '../../trips/api.dart'
 /// lines must never take down the recording it exists to protect. The
 /// contract is backed by fault-injection tests (#2349).
 class ActiveTripSampleWal {
-  ActiveTripSampleWal({Directory Function()? supportDirOverride})
-      : _supportDirOverride = supportDirOverride;
+  ActiveTripSampleWal({this._supportDirOverride});
 
   /// Process-wide instance for the production wiring: the recording
   /// provider (writer), the GPS-only WAL (writer) and the launch

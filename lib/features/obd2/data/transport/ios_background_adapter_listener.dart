@@ -63,11 +63,10 @@ typedef IosAdapterConnectionStates = Stream<bool> Function(String deviceId);
 ///   buffered and replayed on first listen.
 class IosBackgroundAdapterListener implements BackgroundAdapterListener {
   IosBackgroundAdapterListener({
-    required IosStateRestorationService restoration,
+    required this._restoration,
     IosAdapterConnectionStates? connectionStates,
     DateTime Function()? now,
-  })  : _restoration = restoration,
-        _connectionStates = connectionStates ?? _fbpConnectionStates,
+  })  : _connectionStates = connectionStates ?? _fbpConnectionStates,
         _now = now ?? DateTime.now;
 
   /// Production stream source: flutter_blue_plus's per-device

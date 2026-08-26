@@ -59,14 +59,13 @@ class MexicoStationService
   /// in-memory behaviour the existing parser tests rely on.
   MexicoStationService({
     Dio? dio,
-    String baseUrl = 'https://publicacionexterna.azurewebsites.net/publicaciones',
+    this._baseUrl = 'https://publicacionexterna.azurewebsites.net/publicaciones',
     CacheStrategy? cache,
   })  : _dio = dio ??
             DioFactory.create(
               connectTimeout: const Duration(seconds: 15),
               receiveTimeout: const Duration(seconds: 45),
             ),
-        _baseUrl = baseUrl,
         // The shared `{'stations': [...]}` envelope + per-item codec —
         // see [stationListDataset] (deduped from the DK/MX/FR copies).
         _persistent = cache == null

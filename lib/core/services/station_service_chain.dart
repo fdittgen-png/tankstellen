@@ -84,15 +84,12 @@ class StationServiceChain with _ChainCoalescing implements StationService {
   final ProviderRequestBudget? _budget;
 
   StationServiceChain(this._primary, this._cache, {
-    ServiceSource errorSource = ServiceSource.tankerkoenigApi,
+    this._errorSource = ServiceSource.tankerkoenigApi,
     this.countryCode = '',
-    FuelServicePolicy? policy,
-    DataAccessRecorder? recorder,
-    ProviderRequestBudget? budget,
-  })  : _errorSource = errorSource,
-        _policy = policy,
-        _recorder = recorder,
-        _budget = budget;
+    this._policy,
+    this._recorder,
+    this._budget,
+  });
 
   /// Generic cache-through + request coalescing.
   ///

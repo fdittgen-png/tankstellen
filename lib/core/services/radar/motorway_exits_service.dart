@@ -20,13 +20,12 @@ import 'motorway_exits.dart';
 /// offline grace. A never-fetched country simply yields an empty list —
 /// highway mode degrades to its exit-less v1 behaviour.
 class MotorwayExitsService with KeyedCachedDatasetMixin {
-  MotorwayExitsService({Dio? dio, CacheStrategy? cache, String? baseUrl})
+  MotorwayExitsService({Dio? dio, this._cache, String? baseUrl})
       : _dio = dio ??
             DioFactory.create(
               connectTimeout: const Duration(seconds: 10),
               receiveTimeout: const Duration(seconds: 20),
             ),
-        _cache = cache,
         _baseUrl = baseUrl ?? defaultBaseUrl;
 
   /// Rolling release the `motorway-exits-publish.yml` pipeline feeds.

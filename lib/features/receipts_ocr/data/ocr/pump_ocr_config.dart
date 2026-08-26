@@ -117,9 +117,7 @@ class PumpOcrConfig {
   final Map<String, OcrLocaleProfile> _profiles = {};
   bool _loaded = false;
 
-  PumpOcrConfig({String assetPath = defaultAssetPath, AssetBundle? bundle})
-    : _assetPath = assetPath,
-      _bundle = bundle;
+  PumpOcrConfig({this._assetPath = defaultAssetPath, this._bundle});
 
   /// Build from an in-memory JSON string — for tests and remote config.
   factory PumpOcrConfig.fromJsonString(String source) {

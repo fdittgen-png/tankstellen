@@ -53,12 +53,10 @@ class AnnouncementConfig {
 /// The actual TTS call is delegated to [VoiceAnnouncementService].
 class AnnouncementEngine {
   AnnouncementEngine({
-    required VoiceAnnouncementService ttsService,
-    AnnouncementConfig config = const AnnouncementConfig(),
+    required this._ttsService,
+    this._config = const AnnouncementConfig(),
     @visibleForTesting DateTime Function()? clock,
-  })  : _ttsService = ttsService,
-        _config = config,
-        _clock = clock ?? DateTime.now;
+  })  : _clock = clock ?? DateTime.now;
 
   final VoiceAnnouncementService _ttsService;
   AnnouncementConfig _config;

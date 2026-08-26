@@ -45,13 +45,11 @@ import 'trip_recording_state.dart';
 /// matrix) go through [_ref], mirroring [TripGpsStreamController].
 class GpsOnlyRecordingPipeline implements RecordingPipeline {
   GpsOnlyRecordingPipeline({
-    required Ref ref,
-    required RecordingPipelineHost host,
+    required this._ref,
+    required this._host,
     GpsOnlyTripWal? wal, // #3248 — injectable for tests
     GpsSampleDiagnosticsRecorder? gpsDiagnostics, // #3253 — injectable
-  })  : _ref = ref,
-        _host = host,
-        _wal = wal ?? GpsOnlyTripWal(),
+  })  : _wal = wal ?? GpsOnlyTripWal(),
         _gpsDiagnostics = gpsDiagnostics ?? GpsSampleDiagnosticsRecorder();
 
   final Ref _ref;

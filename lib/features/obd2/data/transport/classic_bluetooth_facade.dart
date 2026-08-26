@@ -46,8 +46,8 @@ class PluginClassicBluetoothFacade implements ClassicBluetoothFacade {
   final Obd2ClassicMethodChannel _plugin;
 
   const PluginClassicBluetoothFacade({
-    Obd2ClassicMethodChannel plugin = const Obd2ClassicMethodChannel(),
-  }) : _plugin = plugin;
+    this._plugin = const Obd2ClassicMethodChannel(),
+  });
 
   @override
   Stream<List<Obd2AdapterCandidate>> scan({

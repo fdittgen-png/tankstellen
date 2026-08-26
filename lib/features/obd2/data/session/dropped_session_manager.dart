@@ -92,24 +92,15 @@ class DroppedSessionManager {
   TripDropReason? _dropReason;
 
   DroppedSessionManager({
-    required DroppedSessionHost host,
-    required DateTime Function() now,
-    required Duration pauseGraceWindow,
-    required Duration silentReconnectWindow,
-    String? pinnedAdapterMac,
-    Obd2ReattachSource? Function(
-      String pinnedMac,
-      VoidCallback onReconnect,
-    )? reconnectScannerFactory,
+    required this._host,
+    required this._now,
+    required this._pauseGraceWindow,
+    required this._silentReconnectWindow,
+    this._pinnedAdapterMac,
+    this._reconnectScannerFactory,
     PausedTripRepository? pausedRepo,
     TripHistoryRepository? historyRepo,
-  })  : _host = host,
-        _now = now,
-        _pauseGraceWindow = pauseGraceWindow,
-        _silentReconnectWindow = silentReconnectWindow,
-        _pinnedAdapterMac = pinnedAdapterMac,
-        _reconnectScannerFactory = reconnectScannerFactory,
-        _repos = DroppedSessionRepoResolver(
+  })  : _repos = DroppedSessionRepoResolver(
           pausedOverride: pausedRepo,
           historyOverride: historyRepo,
         );

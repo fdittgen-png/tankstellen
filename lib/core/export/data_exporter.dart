@@ -38,10 +38,9 @@ class DataExporter {
 
   DataExporter(
     this._storage, {
-    String appVersion = '4.3.0',
+    this._appVersion = '4.3.0',
     DateTime Function()? now,
-  })  : _appVersion = appVersion,
-        _now = now ?? DateTime.now;
+  })  : _now = now ?? DateTime.now;
 
   // --------------------------------------------------------------------------
   // JSON

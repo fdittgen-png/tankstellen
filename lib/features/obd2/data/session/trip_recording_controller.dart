@@ -247,13 +247,13 @@ class TripRecordingController
   static const Duration _gpsAliveWindow = Duration(seconds: 15);
 
   TripRecordingController({
-    required Obd2Service service,
+    required this._service,
     TripRecorder? recorder,
-    Duration pollInterval = const Duration(milliseconds: 250),
+    this._pollInterval = const Duration(milliseconds: 250),
     DateTime Function()? now,
-    VehicleProfile? vehicle,
-    ReferenceVehicle? referenceVehicle,
-    String? vehicleId,
+    this._vehicle,
+    this._referenceVehicle,
+    this._vehicleId,
     PidScheduler? scheduler,
     PausedTripRepository? pausedRepo,
     TripHistoryRepository? historyRepo,
@@ -262,47 +262,26 @@ class TripRecordingController
     Duration dropWindow = const Duration(seconds: 5),
     int dropThreshold = 3,
     int silentFailureThreshold = 50,
-    Duration schedulerTickRate = const Duration(milliseconds: 100),
+    this._schedulerTickRate = const Duration(milliseconds: 100),
     String? pinnedAdapterMac,
-    bool automatic = false,
-    bool diagnosticCapture = false,
+    this._automatic = false,
+    this._diagnosticCapture = false,
     Obd2ReattachSource? Function(
       String pinnedMac,
       VoidCallback onReconnect,
     )? reconnectScannerFactory,
-    // #3776 (Epic #3775) — the link-ownership seam. The trip layer must
-    // NEVER deliberately close a supervisor-owned link (the deliberate
-    // close is suppressed from the drop signal, so the owner keeps
-    // believing a dead socket is ready). [isLinkSupervised] answers
-    // "does the one owner hold this instance"; [reportSupervisedLinkDead]
-    // hands a dead supervised link to the owner (returns true — the
-    // owner closes + redials) or declines (false — the caller closes it
-    // itself). Both null in unit contexts without a supervisor graph.
-    bool Function(Obd2Service service)? isLinkSupervised,
-    bool Function(Obd2Service service, String reason)?
-        reportSupervisedLinkDead,
-    Obd2BreadcrumbRecorder? breadcrumbCollector,
-    TripGpsEstimateOverlay? gpsEstimateFolder,
+    this._isLinkSupervised,
+    this._reportSupervisedLinkDead,
+    this._breadcrumbCollector,
+    this._gpsEstimateFolder,
     void Function(HarshEvent event)? onHarshEvent,
-  })  : _service = service,
-        _isLinkSupervised = isLinkSupervised,
-        _reportSupervisedLinkDead = reportSupervisedLinkDead,
-        _diagnosticCapture = diagnosticCapture,
-        _gpsEstimateFolder = gpsEstimateFolder,
-        _recorder = recorder ??
+  })  : _recorder = recorder ??
             TripRecorder(
               maxIntegrationGapSeconds: _integrationGapCapSeconds,
               onHarshEvent: onHarshEvent,
             ),
-        _pollInterval = pollInterval,
         _now = now ?? DateTime.now,
-        _vehicle = vehicle,
-        _referenceVehicle = referenceVehicle,
-        _vehicleId = vehicleId,
-        _schedulerOverride = scheduler,
-        _schedulerTickRate = schedulerTickRate,
-        _automatic = automatic,
-        _breadcrumbCollector = breadcrumbCollector {
+        _schedulerOverride = scheduler {
     _dropDetector = TripDropDetector(
       now: _now,
       dropWindow: dropWindow,

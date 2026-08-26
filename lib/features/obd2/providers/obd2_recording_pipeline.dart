@@ -35,28 +35,17 @@ import '../data/obd2_comm_diagnostics.dart';
 /// pipeline at all).
 class Obd2RecordingPipeline implements RecordingPipeline {
   Obd2RecordingPipeline({
-    required Ref ref,
-    required Obd2RecordingPipelineHost host,
-    required TripHapticController haptics,
-    required TripGpsStreamController gps,
-    required TripBaselineRecorder baselines,
-    required TripOemFuelLevelController oemFuel,
-    required VehicleProfile? Function() readActiveVehicle,
-    required bool Function() readOemPidsFlag,
-    required bool Function() readDiagnosticCaptureFlag,
-    Duration startWatchdog = kObd2TripStartWatchdog, // #3382, overridable in tests
-    Duration baselinesBudget = kObd2TripStartBaselinesBudget,
-  })  : _ref = ref,
-        _host = host,
-        _haptics = haptics,
-        _gps = gps,
-        _baselines = baselines,
-        _oemFuel = oemFuel,
-        _readActiveVehicle = readActiveVehicle,
-        _readOemPidsFlag = readOemPidsFlag,
-        _readDiagnosticCaptureFlag = readDiagnosticCaptureFlag,
-        _startWatchdog = startWatchdog,
-        _baselinesBudget = baselinesBudget;
+    required this._ref,
+    required this._host,
+    required this._haptics,
+    required this._gps,
+    required this._baselines,
+    required this._oemFuel,
+    required this._readActiveVehicle,
+    required this._readOemPidsFlag,
+    required this._readDiagnosticCaptureFlag,
+    this._startWatchdog = kObd2TripStartWatchdog, this._baselinesBudget = kObd2TripStartBaselinesBudget,
+  });
 
   final Ref _ref;
   final Obd2RecordingPipelineHost _host;
