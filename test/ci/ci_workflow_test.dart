@@ -525,4 +525,46 @@ void main() {
     });
   });
 
+  group('build numbers — the #3513 shared wall-clock scheme (#3812)', () {
+    String read(String n) =>
+        File('.github/workflows/$n').readAsStringSync();
+
+    // The formula both release-build workflows must share, character for
+    // character: minutes since 2025-07-06 UTC on a 2026100000 base.
+    const formula =
+        r'BN=$(( 2026100000 + ( $(date -u +%s) - 1751760000 ) / 60 ))';
+
+    for (final wf in ['daily-beta.yml', 'ios-testflight.yml']) {
+      test('$wf derives its build number from wall clock, not a run '
+          'counter', () {
+        final yaml = read(wf);
+        expect(yaml, contains(formula),
+            reason: 'per-workflow counters leapfrog each other (#3513); '
+                'wall clock is the one source that cannot');
+        expect(yaml, isNot(contains(r'github.run_number }} * 10')),
+            reason: 'the old counter scheme — and under `workflow_call` '
+                '`run_number` is the CALLER\'s, which is exactly how '
+                '#3792 walked the iOS build number BACKWARDS (#3812)');
+      });
+    }
+
+    test('a workflow_call-ed leg never reads github.run_number for a '
+        'build number', () {
+      // release-train calls both legs, so either one reading its "own"
+      // counter is really reading the train's.
+      final train = read('release-train.yml');
+      for (final wf in ['daily-beta.yml', 'ios-testflight.yml']) {
+        expect(train, contains('uses: ./.github/workflows/$wf'),
+            reason: 'the train is expected to call $wf');
+      }
+      for (final wf in ['daily-beta.yml', 'ios-testflight.yml']) {
+        final bnLines = read(wf)
+            .split('\n')
+            .where((l) => l.contains('BN=') && l.contains('run_number'));
+        expect(bnLines, isEmpty,
+            reason: '$wf must not compute a build number from a run '
+                'counter it does not own');
+      }
+    });
+  });
 }
