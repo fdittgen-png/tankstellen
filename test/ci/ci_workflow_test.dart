@@ -525,6 +525,40 @@ void main() {
     });
   });
 
+  group('TestFlight delivery is asserted, not assumed (#3814)', () {
+    String read(String n) =>
+        File('.github/workflows/$n').readAsStringSync();
+
+    test('an externally-distributing iOS build asserts testers can install',
+        () {
+      final yaml = read('ios-testflight.yml');
+      expect(yaml, contains('testflight_assert_delivery'),
+          reason: 'pilot\'s "Successfully distributed build to External '
+              'testers" means SUBMITTED, not DELIVERED — taking it as '
+              'proof left the extern group on a 2026-07-04 build for '
+              'seven weeks with every run green');
+      // The assert needs the decoded key, so it must come BEFORE the
+      // cleanup step or it can only ever fail on auth.
+      expect(yaml.indexOf('testflight_assert_delivery'),
+          lessThan(yaml.indexOf('Clean up decoded API key')),
+          reason: 'the assert must run while the ASC key still exists');
+    });
+
+    test('the assert lane exists and fails loudly rather than warning', () {
+      final fastfile = File('ios/fastlane/Fastfile').readAsStringSync();
+      expect(fastfile, contains('lane :testflight_assert_delivery'));
+      expect(fastfile, contains('UI.user_error!'),
+          reason: 'a warning would have been ignored for seven weeks just '
+              'as effectively as no check at all');
+      expect(fastfile, contains('READY_FOR_BETA_SUBMISSION'),
+          reason: 'build 2026061211 stranded in exactly that state while '
+              'its ~30 neighbours were approved');
+      expect(fastfile, contains('require "time"'),
+          reason: 'without it Time.parse raises, the rescue swallows it, '
+              'and the staleness check silently stops running');
+    });
+  });
+
   group('build numbers — the #3513 shared wall-clock scheme (#3812)', () {
     String read(String n) =>
         File('.github/workflows/$n').readAsStringSync();

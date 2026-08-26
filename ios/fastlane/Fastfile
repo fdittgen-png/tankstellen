@@ -1,6 +1,11 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: MIT
 
+# Time.parse for the #3814 delivery freshness assert. Without this the parse
+# raises NameError, the rescue swallows it, and the staleness check silently
+# stops running — the precise failure mode that guard exists to prevent.
+require "time"
+
 default_platform(:ios)
 
 # Builds an App Store Connect API key payload that match / pilot / sigh can
@@ -787,42 +792,12 @@ platform :ios do
     # remaining question is WHICH identity is actually entitled. An invite that
     # was never accepted leaves a tester listed but empty-handed, and a build
     # installed in July may belong to a different Apple ID entirely.
-    # Apple's own per-build metrics are the ONLY server-side signal that
-    # separates "submitted" from "delivered": a build attached to a 3-tester
-    # group that reports zero invited/installed testers is a contradiction,
-    # and it is the number a CI guard can actually assert on. Everything else
-    # (approved, attached, enrolled) already reads correct while the tester
-    # sees a seven-week-old build.
-    UI.important("=== Delivery metrics for the newest external builds ===")
-    groups.reject(&:is_internal_group).each do |g|
-      begin
-        recent = Spaceship::ConnectAPI.get_builds(
-          filter: { betaGroups: g.id },
-          includes: "betaBuildMetrics,buildBetaDetail,preReleaseVersion",
-          sort: "-uploadedDate",
-          limit: 3,
-        ).to_models
-        recent.each_with_index do |b, i|
-          v = begin b.pre_release_version&.version rescue nil end
-          UI.message("  #{g.name}: #{v} #{b.version}")
-          # Dump the raw surface of the first one: the metrics association
-          # name is not worth another guess-and-wait cycle.
-          if i.zero?
-            raw = begin
-              b.instance_variables
-               .reject { |iv| iv.to_s.include?("pre_release") }
-               .map { |iv| "#{iv}=#{b.instance_variable_get(iv).inspect}" }.join(' ')
-            rescue StandardError => e
-              "!#{e.class}"
-            end
-            UI.message("    [raw] #{raw[0, 1500]}")
-          end
-        end
-      rescue StandardError => e
-        UI.error("  metrics query failed for #{g.name}: #{e.class}: #{e.message}")
-      end
-    end
-
+    # NOTE — there is no per-tester delivery signal to query. `betaBuildMetrics`
+    # is rejected ("not a valid relationship name"), and App Store Connect
+    # exposes no "which testers can see build X" beyond group attachment, which
+    # already reads correct here. So the deliverable is not a richer read: it is
+    # `testflight_assert_delivery` below, asserting the states that CAN be
+    # measured, on every build, instead of nobody looking for seven weeks.
     UI.important("=== External group rosters ===")
     groups.reject(&:is_internal_group).each do |g|
       UI.message("  --- #{g.name} ---")
@@ -933,5 +908,95 @@ platform :ios do
     UI.message("APPROVED) AND the extern group is listed under groups.")
     UI.message("WAITING_FOR_BETA_REVIEW / IN_BETA_REVIEW / REJECTED all look")
     UI.message("like a successful upload in the CI log but ship nothing.")
+  end
+
+  desc "#3814 — FAIL if the newest external build is not actually shippable."
+  desc "The seven-week outage was not caused by a missing check on one flag;"
+  desc "it was caused by nobody looking at all, because 'Successfully"
+  desc "distributed build to External testers' reads like proof and is not."
+  desc "This asserts the states that CAN be measured — attached to the external"
+  desc "group, approved, valid, unexpired, and recent — and exits non-zero"
+  desc "otherwise. Options: max_age_hours (default 48), group (default extern)."
+  lane :testflight_assert_delivery do |options|
+    max_age_hours = (options[:max_age_hours] || ENV["TESTFLIGHT_MAX_AGE_HOURS"] || 48).to_i
+    group_name = (options[:group] || ENV["TESTFLIGHT_ASSERT_GROUP"] || "extern").to_s
+
+    Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.from(hash: asc_api_key)
+    app = Spaceship::ConnectAPI::App.find("de.tankstellen.tankstellen")
+    UI.user_error!("Could not find app de.tankstellen.tankstellen.") if app.nil?
+
+    group = app.get_beta_groups.find { |g| g.name == group_name }
+    UI.user_error!("Beta group '#{group_name}' does not exist.") if group.nil?
+
+    problems = []
+
+    # 1. The group must actually have builds. An empty external group is the
+    #    single most consequential failure and the hardest to notice.
+    attached = Spaceship::ConnectAPI.get_builds(
+      filter: { betaGroups: group.id },
+      includes: "preReleaseVersion,buildBetaDetail",
+      sort: "-uploadedDate",
+      limit: 5,
+    ).to_models
+
+    if attached.empty?
+      problems << "no builds are attached to '#{group_name}' at all"
+    else
+      newest = attached.first
+      version = begin newest.pre_release_version&.version rescue nil end
+      UI.message("Newest build in '#{group_name}': #{version} #{newest.version}")
+
+      state = begin newest.build_beta_detail&.external_build_state rescue nil end
+      unless state == "BETA_APPROVED"
+        problems << "newest build #{newest.version} externalState=#{state.inspect}, " \
+                    "not BETA_APPROVED — external testers cannot install it"
+      end
+
+      problems << "newest build #{newest.version} is EXPIRED" if newest.expired
+
+      unless newest.processing_state == "VALID"
+        problems << "newest build #{newest.version} processing=#{newest.processing_state}"
+      end
+
+      # 2. Freshness. Approved-and-attached but stale means the pipeline stopped
+      #    feeding the group — exactly the shape of the original outage.
+      begin
+        uploaded = Time.parse(newest.uploaded_date.to_s)
+        age_hours = ((Time.now.utc - uploaded.utc) / 3600.0).round(1)
+        UI.message("Age: #{age_hours}h (limit #{max_age_hours}h)")
+        if age_hours > max_age_hours
+          problems << "newest build in '#{group_name}' is #{age_hours}h old " \
+                      "(> #{max_age_hours}h): testers are being left behind"
+        end
+      rescue StandardError => e
+        UI.important("Could not parse uploaded_date: #{e.class}")
+      end
+    end
+
+    # 3. The orphan class actually observed: 2026061211 (v6.0.4, 2026-08-09)
+    #    sat at READY_FOR_BETA_SUBMISSION with no review record while ~30
+    #    neighbours were approved. External submission CAN silently skip.
+    recent = Spaceship::ConnectAPI::Build.all(
+      app_id: app.id, sort: "-uploadedDate", limit: 10,
+    )
+    stranded = recent.select do |b|
+      begin
+        b.build_beta_detail&.external_build_state == "READY_FOR_BETA_SUBMISSION"
+      rescue StandardError
+        false
+      end
+    end
+    unless stranded.empty?
+      problems << "never submitted for external review: " \
+                  "#{stranded.map(&:version).join(', ')}"
+    end
+
+    if problems.empty?
+      UI.success("TestFlight delivery OK for '#{group_name}'.")
+    else
+      problems.each { |p| UI.error("  - #{p}") }
+      UI.user_error!("TestFlight delivery is broken for '#{group_name}'. " \
+                     "A green upload log is NOT evidence testers can install.")
+    end
   end
 end
