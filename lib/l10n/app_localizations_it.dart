@@ -6238,6 +6238,47 @@ class AppLocalizationsIt extends AppLocalizations {
   String get obd2HealthConnectUnknownAdapter => 'Unknown adapter';
 
   @override
+  String obd2DiagnosticsTripRecordedHeader(int samples, int percent) {
+    return 'Session recorded · $samples engine samples · $percent% coverage';
+  }
+
+  @override
+  String get obd2DiagnosticsTripEvidenceSection => 'What this trip recorded';
+
+  @override
+  String obd2DiagnosticsTripSamplesLine(int samples, int total, int percent) {
+    return '$samples of $total samples carried engine data ($percent%)';
+  }
+
+  @override
+  String obd2DiagnosticsTripAdapterLine(String adapter) {
+    return 'Adapter: $adapter';
+  }
+
+  @override
+  String obd2DiagnosticsTripProtocolLine(String verdict) {
+    return 'Protocol handshake: $verdict';
+  }
+
+  @override
+  String obd2DiagnosticsTripEndedLine(String reason) {
+    return 'Session ended: $reason';
+  }
+
+  @override
+  String obd2DiagnosticsTripDurationLine(String duration) {
+    return 'Session length: $duration';
+  }
+
+  @override
+  String get obd2DiagnosticsTripFuelMeasured =>
+      'Fuel figures came from the adapter, not from GPS estimates.';
+
+  @override
+  String get obd2DiagnosticsTripNoPidDetail =>
+      'The per-PID communication breakdown was not captured for this trip. Turn on developer mode before recording to collect it.';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Impossibile raggiungere \'$adapterName\' — scegli un altro adattatore';
   }

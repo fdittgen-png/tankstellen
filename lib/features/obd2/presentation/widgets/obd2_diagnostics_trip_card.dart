@@ -8,6 +8,7 @@ import '../../../feature_management/application/feature_flags_provider.dart';
 import '../../../feature_management/domain/feature.dart';
 import '../../data/obd2_comm_diagnostics.dart';
 import '../../data/obd2_session_diagnostic.dart';
+import '../../data/obd2_trip_evidence.dart';
 import 'obd2_diagnostics_card.dart';
 
 /// Trip-detail mounting of the [Obd2DiagnosticsCard] (#2470, Epic #2463),
@@ -40,7 +41,20 @@ class Obd2DiagnosticsTripCard extends ConsumerWidget {
   /// never touched OBD2. Null falls back to the live singleton.
   final Obd2SessionDiagnostic? tripDiagnostic;
 
-  const Obd2DiagnosticsTripCard({super.key, this.tripDiagnostic});
+  /// #3824 — what the trip record itself proves about its OBD2 session.
+  ///
+  /// [tripDiagnostic] answers "was per-PID communication instrumented", NOT
+  /// "did this trip have OBD2". Treating the first as the second made the
+  /// card deny a session with 324 engine samples at 99.7% coverage. Built
+  /// from primitives at the call site so this feature never imports
+  /// `TripHistoryEntry`.
+  final Obd2TripEvidence? tripEvidence;
+
+  const Obd2DiagnosticsTripCard({
+    super.key,
+    this.tripDiagnostic,
+    this.tripEvidence,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -55,7 +69,11 @@ class Obd2DiagnosticsTripCard extends ConsumerWidget {
     // just-finished / in-progress trip.
     final persisted = tripDiagnostic;
     if (persisted != null) {
-      return Obd2DiagnosticsCard(session: persisted, enabled: true);
+      return Obd2DiagnosticsCard(
+        session: persisted,
+        enabled: true,
+        tripEvidence: tripEvidence,
+      );
     }
 
     final collector = Obd2CommDiagnostics.instance;
@@ -65,6 +83,7 @@ class Obd2DiagnosticsTripCard extends ConsumerWidget {
     return Obd2DiagnosticsCard(
       session: session,
       enabled: collector.enabled,
+      tripEvidence: tripEvidence,
     );
   }
 }

@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/obd2_diagnostics_summary.dart';
 import '../../data/obd2_session_diagnostic.dart';
+import '../../data/obd2_trip_evidence.dart';
 import 'obd2_init_transcript_section.dart';
+import 'obd2_trip_evidence_card.dart';
 import 'obd2_reconnect_section.dart';
 
 /// Read-only inspector card for one OBD2 communication-health session
@@ -38,10 +40,20 @@ class Obd2DiagnosticsCard extends StatelessWidget {
   /// renders the empty state regardless of [session].
   final bool enabled;
 
+  /// #3824 — what the TRIP RECORD proves about its OBD2 session, independent
+  /// of the per-PID instrument.
+  ///
+  /// Without this the card printed "no OBD2 session recorded" on a trip with
+  /// 324 engine samples at 99.7% coverage, because it treated a missing PID
+  /// diagnostic as proof that nothing was recorded. Those are different
+  /// facts, and only this one can answer the first question.
+  final Obd2TripEvidence? tripEvidence;
+
   const Obd2DiagnosticsCard({
     super.key,
     required this.session,
     this.enabled = true,
+    this.tripEvidence,
   });
 
   @override
@@ -55,6 +67,12 @@ class Obd2DiagnosticsCard extends StatelessWidget {
     final title = l.obd2DiagnosticsTitle;
 
     if (!summary.presentable) {
+      // The trip may still prove a healthy session even with no per-PID
+      // diagnostic; say what actually happened rather than denying it.
+      final evidence = tripEvidence;
+      if (evidence != null && evidence.hasObd2) {
+        return Obd2TripEvidenceCard(evidence: evidence);
+      }
       return Card(
         margin: const EdgeInsets.fromLTRB(12, 8, 12, 8),
         child: ListTile(
