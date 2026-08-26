@@ -730,23 +730,55 @@ platform :ios do
     UI.message("This is what a tester in that group can actually install.")
     groups.reject(&:is_internal_group).each do |g|
       UI.message("  --- #{g.name} ---")
-      begin
-        gbuilds = Spaceship::ConnectAPI::Build.all(
-          app_id: app.id,
-          filter: { betaGroups: g.id },
-          sort: "-uploadedDate",
-          limit: 10,
-        )
-        if gbuilds.nil? || gbuilds.empty?
-          UI.error("    (NO builds attached to this group)")
-        else
-          gbuilds.each do |b|
-            v = begin b.pre_release_version&.version rescue nil end
-            UI.message("    #{v} #{b.version} uploaded=#{b.uploaded_date}")
+      # `Build.all` rejected `filter:` (ArgumentError: unknown keyword), and
+      # the association name has moved between spaceship versions. Rather than
+      # burn one CI round-trip per guess, try each candidate in order and
+      # report which one answered.
+      strategies = {
+        "ConnectAPI.get_builds(filter: betaGroups)" => lambda do
+          Spaceship::ConnectAPI.get_builds(
+            filter: { betaGroups: g.id },
+            sort: "-uploadedDate",
+            includes: "preReleaseVersion",
+            limit: 10,
+          ).to_models
+        end,
+        "BetaGroup#builds" => -> { g.builds },
+        "ConnectAPI.get_builds(filter: betaGroups+app)" => lambda do
+          Spaceship::ConnectAPI.get_builds(
+            filter: { betaGroups: g.id, app: app.id },
+            sort: "-uploadedDate",
+            limit: 10,
+          ).to_models
+        end,
+      }
+
+      answered = false
+      strategies.each do |name, query|
+        break if answered
+        begin
+          gbuilds = query.call
+          answered = true
+          UI.message("    [via #{name}]")
+          if gbuilds.nil? || gbuilds.empty?
+            UI.error("    (NO builds attached to this group — this is the fault)")
+          else
+            gbuilds.each do |b|
+              v = begin b.pre_release_version&.version rescue nil end
+              UI.message("    #{v} #{b.version} uploaded=#{begin b.uploaded_date rescue '?' end}")
+            end
           end
+        rescue StandardError => e
+          UI.important("    #{name} -> #{e.class}: #{e.message}")
         end
-      rescue StandardError => e
-        UI.error("    group-build query failed: #{e.class}: #{e.message}")
+      end
+
+      unless answered
+        # Every candidate failed: dump the actual API surface so the NEXT run
+        # can use a real method name instead of another guess.
+        UI.important("    No strategy worked. Available surface:")
+        UI.message("      BetaGroup: #{g.public_methods(false).grep(/build/).sort.join(', ')}")
+        UI.message("      ConnectAPI: #{Spaceship::ConnectAPI.methods.grep(/build/).sort.join(', ')}")
       end
     end
 
