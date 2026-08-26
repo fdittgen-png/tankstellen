@@ -133,6 +133,9 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
     diagnostics: widget.entry.gpsSampleDiagnostics,
   );
 
+  /// #3824 evidence — see `Obd2EvidenceX.obd2Evidence`. Memoised.
+  late final _obd2Evidence = widget.entry.obd2Evidence(_tripSamples);
+
   /// Per-event fuel-cost attribution (#3432) — the "where your fuel
   /// went" breakdown. Pure + O(n); memoised like the other analyses so
   /// theme / locale rebuilds don't re-run it. Empty for EV trips (the
@@ -346,9 +349,11 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
             diagnostics: widget.entry.gpsSampleDiagnostics,
             coverage: _gpsCoverage,
           ),
-        // OBD2 comm-health diagnostics (#2470, #2912): dev-only, self-hides;
-        // fed the trip's PERSISTED diagnostic (restart-durable).
-        Obd2DiagnosticsTripCard(tripDiagnostic: widget.entry.obd2Diagnostic),
+        // OBD2 comm-health (#2470, #2912): dev-only. Fed the PERSISTED
+        // diagnostic + the trip's evidence (#3824) — reported, not denied.
+        Obd2DiagnosticsTripCard(
+            tripDiagnostic: widget.entry.obd2Diagnostic,
+            tripEvidence: _obd2Evidence),
         // Driving-analysis trace export (#2804). Dev-only — self-hides unless
         // Feature.debugMode is on. Exports this trip's KPIs / score / lessons
         // as an annotatable JSON so the maintainer can label real trips and

@@ -10733,6 +10733,60 @@ abstract class AppLocalizations {
   /// **'Unknown adapter'**
   String get obd2HealthConnectUnknownAdapter;
 
+  /// Collapsed header of the OBD2 health card on a trip that recorded a real OBD2 session but carries no per-PID diagnostic (#3824). {samples} is the engine-bearing sample count, {percent} the coverage share as a whole number.
+  ///
+  /// In en, this message translates to:
+  /// **'Session recorded · {samples} engine samples · {percent}% coverage'**
+  String obd2DiagnosticsTripRecordedHeader(int samples, int percent);
+
+  /// Section header above the OBD2 evidence reconstructed from the trip record itself when no per-PID diagnostic was captured (#3824).
+  ///
+  /// In en, this message translates to:
+  /// **'What this trip recorded'**
+  String get obd2DiagnosticsTripEvidenceSection;
+
+  /// Line stating how many recorded samples carried an engine PID on the OBD2 health card (#3824).
+  ///
+  /// In en, this message translates to:
+  /// **'{samples} of {total} samples carried engine data ({percent}%)'**
+  String obd2DiagnosticsTripSamplesLine(int samples, int total, int percent);
+
+  /// Line naming the OBD2 adapter used for the trip, name plus redacted MAC tail (#3824).
+  ///
+  /// In en, this message translates to:
+  /// **'Adapter: {adapter}'**
+  String obd2DiagnosticsTripAdapterLine(String adapter);
+
+  /// Line reporting the OBD2 protocol-establishment verdict from the trip's link journal, e.g. answered (#3824).
+  ///
+  /// In en, this message translates to:
+  /// **'Protocol handshake: {verdict}'**
+  String obd2DiagnosticsTripProtocolLine(String verdict);
+
+  /// Line reporting why the recording session ended, from the trip's termination taxonomy, e.g. userStopped (#3824).
+  ///
+  /// In en, this message translates to:
+  /// **'Session ended: {reason}'**
+  String obd2DiagnosticsTripEndedLine(String reason);
+
+  /// Line reporting how long the OBD2 recording session lasted (#3824).
+  ///
+  /// In en, this message translates to:
+  /// **'Session length: {duration}'**
+  String obd2DiagnosticsTripDurationLine(String duration);
+
+  /// Line shown when the trip's fuel data was measured over OBD2 rather than estimated from GPS physics — the strongest proof the link worked (#3824).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel figures came from the adapter, not from GPS estimates.'**
+  String get obd2DiagnosticsTripFuelMeasured;
+
+  /// Honest explanation that only the detailed per-PID table is missing, replacing the old text that wrongly claimed no OBD2 session existed at all (#3824).
+  ///
+  /// In en, this message translates to:
+  /// **'The per-PID communication breakdown was not captured for this trip. Turn on developer mode before recording to collect it.'**
+  String get obd2DiagnosticsTripNoPidDetail;
+
   /// Snackbar shown after the OBD2 picker falls back from a silent pinned-MAC connect to the manual sheet (#1188). The placeholder is the display name of the previously paired adapter so the user knows which one was unreachable.
   ///
   /// In en, this message translates to:

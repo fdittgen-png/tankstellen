@@ -48,6 +48,7 @@ export 'data/session/obd2_reattach_source.dart';
 export 'data/session/obd2_self_test_report.dart';
 export 'data/session/obd2_service.dart';
 export 'data/obd2_session_diagnostic.dart';
+export 'data/obd2_trip_evidence.dart';
 export 'data/obd_adapter_blocklist.dart';
 export 'data/protocol/oem_pid_registry.dart';
 export 'data/protocol/oem_pid_table.dart';

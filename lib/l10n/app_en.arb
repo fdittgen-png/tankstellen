@@ -5695,6 +5695,81 @@
   "@obd2HealthConnectUnknownAdapter": {
     "description": "Headline fallback on a connect-attempt trace card when the adapter's human name could not be resolved (an anonymous BLE advertiser) and only the redacted MAC is known (#3014)."
   },
+  "obd2DiagnosticsTripRecordedHeader": "Session recorded · {samples} engine samples · {percent}% coverage",
+  "@obd2DiagnosticsTripRecordedHeader": {
+    "description": "Collapsed header of the OBD2 health card on a trip that recorded a real OBD2 session but carries no per-PID diagnostic (#3824). {samples} is the engine-bearing sample count, {percent} the coverage share as a whole number.",
+    "placeholders": {
+      "samples": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsTripEvidenceSection": "What this trip recorded",
+  "@obd2DiagnosticsTripEvidenceSection": {
+    "description": "Section header above the OBD2 evidence reconstructed from the trip record itself when no per-PID diagnostic was captured (#3824)."
+  },
+  "obd2DiagnosticsTripSamplesLine": "{samples} of {total} samples carried engine data ({percent}%)",
+  "@obd2DiagnosticsTripSamplesLine": {
+    "description": "Line stating how many recorded samples carried an engine PID on the OBD2 health card (#3824).",
+    "placeholders": {
+      "samples": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsTripAdapterLine": "Adapter: {adapter}",
+  "@obd2DiagnosticsTripAdapterLine": {
+    "description": "Line naming the OBD2 adapter used for the trip, name plus redacted MAC tail (#3824).",
+    "placeholders": {
+      "adapter": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2DiagnosticsTripProtocolLine": "Protocol handshake: {verdict}",
+  "@obd2DiagnosticsTripProtocolLine": {
+    "description": "Line reporting the OBD2 protocol-establishment verdict from the trip's link journal, e.g. answered (#3824).",
+    "placeholders": {
+      "verdict": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2DiagnosticsTripEndedLine": "Session ended: {reason}",
+  "@obd2DiagnosticsTripEndedLine": {
+    "description": "Line reporting why the recording session ended, from the trip's termination taxonomy, e.g. userStopped (#3824).",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2DiagnosticsTripDurationLine": "Session length: {duration}",
+  "@obd2DiagnosticsTripDurationLine": {
+    "description": "Line reporting how long the OBD2 recording session lasted (#3824).",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2DiagnosticsTripFuelMeasured": "Fuel figures came from the adapter, not from GPS estimates.",
+  "@obd2DiagnosticsTripFuelMeasured": {
+    "description": "Line shown when the trip's fuel data was measured over OBD2 rather than estimated from GPS physics — the strongest proof the link worked (#3824)."
+  },
+  "obd2DiagnosticsTripNoPidDetail": "The per-PID communication breakdown was not captured for this trip. Turn on developer mode before recording to collect it.",
+  "@obd2DiagnosticsTripNoPidDetail": {
+    "description": "Honest explanation that only the detailed per-PID table is missing, replacing the old text that wrongly claimed no OBD2 session existed at all (#3824)."
+  },
   "obd2PickerPinnedFallback": "Couldn't reach '{adapterName}' — pick another adapter",
   "@obd2PickerPinnedFallback": {
     "description": "Snackbar shown after the OBD2 picker falls back from a silent pinned-MAC connect to the manual sheet (#1188). The placeholder is the display name of the previously paired adapter so the user knows which one was unreachable.",

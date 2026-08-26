@@ -6241,6 +6241,48 @@ class AppLocalizationsDe extends AppLocalizations {
   String get obd2HealthConnectUnknownAdapter => 'Unbekannter Adapter';
 
   @override
+  String obd2DiagnosticsTripRecordedHeader(int samples, int percent) {
+    return 'Sitzung aufgezeichnet · $samples Motor-Messwerte · $percent% Abdeckung';
+  }
+
+  @override
+  String get obd2DiagnosticsTripEvidenceSection =>
+      'Was diese Fahrt aufgezeichnet hat';
+
+  @override
+  String obd2DiagnosticsTripSamplesLine(int samples, int total, int percent) {
+    return '$samples von $total Messwerten enthielten Motordaten ($percent%)';
+  }
+
+  @override
+  String obd2DiagnosticsTripAdapterLine(String adapter) {
+    return 'Adapter: $adapter';
+  }
+
+  @override
+  String obd2DiagnosticsTripProtocolLine(String verdict) {
+    return 'Protokoll-Handshake: $verdict';
+  }
+
+  @override
+  String obd2DiagnosticsTripEndedLine(String reason) {
+    return 'Sitzung beendet: $reason';
+  }
+
+  @override
+  String obd2DiagnosticsTripDurationLine(String duration) {
+    return 'Sitzungsdauer: $duration';
+  }
+
+  @override
+  String get obd2DiagnosticsTripFuelMeasured =>
+      'Die Verbrauchswerte stammen vom Adapter, nicht aus GPS-Schätzungen.';
+
+  @override
+  String get obd2DiagnosticsTripNoPidDetail =>
+      'Die detaillierte PID-Kommunikationsaufschlüsselung wurde für diese Fahrt nicht erfasst. Aktivieren Sie vor der Aufzeichnung den Entwicklermodus, um sie zu erheben.';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Konnte \'$adapterName\' nicht erreichen — wähle einen anderen Adapter';
   }

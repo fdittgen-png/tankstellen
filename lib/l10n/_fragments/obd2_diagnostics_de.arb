@@ -253,5 +253,14 @@
   "obd2HealthConnectOutcome": "Ergebnis",
   "obd2HealthConnectScanList": "Gefundene Geräte",
   "obd2HealthConnectSteps": "Schritte",
-  "obd2HealthConnectUnknownAdapter": "Unbekannter Adapter"
+  "obd2HealthConnectUnknownAdapter": "Unbekannter Adapter",
+  "obd2DiagnosticsTripRecordedHeader": "Sitzung aufgezeichnet · {samples} Motor-Messwerte · {percent}% Abdeckung",
+  "obd2DiagnosticsTripEvidenceSection": "Was diese Fahrt aufgezeichnet hat",
+  "obd2DiagnosticsTripSamplesLine": "{samples} von {total} Messwerten enthielten Motordaten ({percent}%)",
+  "obd2DiagnosticsTripAdapterLine": "Adapter: {adapter}",
+  "obd2DiagnosticsTripProtocolLine": "Protokoll-Handshake: {verdict}",
+  "obd2DiagnosticsTripEndedLine": "Sitzung beendet: {reason}",
+  "obd2DiagnosticsTripDurationLine": "Sitzungsdauer: {duration}",
+  "obd2DiagnosticsTripFuelMeasured": "Die Verbrauchswerte stammen vom Adapter, nicht aus GPS-Schätzungen.",
+  "obd2DiagnosticsTripNoPidDetail": "Die detaillierte PID-Kommunikationsaufschlüsselung wurde für diese Fahrt nicht erfasst. Aktivieren Sie vor der Aufzeichnung den Entwicklermodus, um sie zu erheben."
 }
