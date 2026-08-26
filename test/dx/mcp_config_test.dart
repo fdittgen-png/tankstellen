@@ -73,6 +73,22 @@ void main() {
             'breaks for every other checkout');
   });
 
+  // `docs/guides/*` is deny-by-default with an explicit allowlist, so a new
+  // guide is invisible to git while sitting happily on the author's disk:
+  // every file-exists assertion passes locally and the same test dies on a
+  // fresh CI checkout. Ask git directly instead of trusting the filesystem.
+  test('the guide is actually TRACKED, not just present on this disk', () {
+    const path = 'docs/guides/mcp-servers.md';
+    final ignored = Process.runSync('git', ['check-ignore', path]);
+    expect(ignored.exitCode, isNot(0),
+        reason: '$path matches a .gitignore rule (docs/guides/* is '
+            'deny-by-default) — add `!$path` to the allowlist, or CI '
+            'checks out a tree without it');
+    final tracked = Process.runSync('git', ['ls-files', '--error-unmatch', path]);
+    expect(tracked.exitCode, 0,
+        reason: '$path is un-ignored but was never committed');
+  });
+
   test('every server is documented, with its rationale', () {
     final doc = File('docs/guides/mcp-servers.md').readAsStringSync();
     for (final name in servers.keys) {

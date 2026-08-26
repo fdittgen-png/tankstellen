@@ -113,6 +113,10 @@ docs/guides/*
 !docs/guides/i18n-hardcoded-worklist.md
 !docs/guides/driving-insights.md
 !docs/guides/auto-record.md
+# #3810 — the MCP dev-server setup. `.mcp.json` is committed, so the doc
+# explaining what each server is for (and why dart_format is excluded)
+# has to reach a fresh clone with it.
+!docs/guides/mcp-servers.md
 !docs/guides/SCHEMA-BACKUP-XML.md
 !docs/guides/ios-auto-record.md
 !docs/guides/ios-codesigning.md
