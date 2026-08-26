@@ -711,6 +711,19 @@ platform :ios do
         "?(#{e.class})"
       end
       UI.message("  #{g.name} (#{kind}) id=#{g.id} — #{testers} tester(s)")
+      # `has_access_to_all_builds` false means the group only ever sees builds
+      # explicitly attached to it, and the public link is the fastest way to
+      # get a stuck tester onto a current build without removing their
+      # existing (working) access.
+      %w[has_access_to_all_builds public_link_enabled public_link
+         public_link_limit_enabled public_link_limit feedback_enabled].each do |attr|
+        value = begin
+          g.respond_to?(attr) ? g.public_send(attr) : "(no such attr)"
+        rescue StandardError => e
+          "!#{e.class}"
+        end
+        UI.message("      #{attr}=#{value.nil? ? '-' : value}")
+      end
     end
 
     UI.important("=== Builds attached to each EXTERNAL group (newest first) ===")
