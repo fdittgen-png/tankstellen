@@ -3893,6 +3893,66 @@ class AppLocalizationsEn extends AppLocalizations {
   String get consumptionStatsChartConsumption => 'L/100km per month';
 
   @override
+  String get fuelCompareSectionTitle => 'Cost of driving, fuel by fuel';
+
+  @override
+  String get fuelComparePricePerLitre => 'Paid per litre';
+
+  @override
+  String get fuelCompareCostPer100km => 'Cost per 100 km';
+
+  @override
+  String get fuelCompareDistance => 'Distance measured';
+
+  @override
+  String get fuelCompareLitres => 'Litres burned';
+
+  @override
+  String fuelCompareVerdictCheaper(String winner) {
+    return '$winner is your cheapest fuel to drive on';
+  }
+
+  @override
+  String fuelCompareVerdictDelta(String loser, String amount) {
+    return '$loser costs $amount more per 1000 km';
+  }
+
+  @override
+  String fuelCompareBreakEven(String fuel, String rival, String price) {
+    return '$fuel beats $rival below $price per litre';
+  }
+
+  @override
+  String get fuelCompareBreakEvenExplain =>
+      'Break-even is calculated from each fuel\'s measured consumption, so it moves as your driving does.';
+
+  @override
+  String get fuelCompareLitresVsCostNote =>
+      'Litres and cost can disagree: a fuel can burn fewer litres per 100 km and still cost more per kilometre, because the pump price differs. Cost per kilometre is the verdict.';
+
+  @override
+  String fuelCompareProvisional(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count full tanks',
+      one: 'one full tank',
+    );
+    return 'Provisional — based on $_temp0';
+  }
+
+  @override
+  String fuelCompareBasedOn(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count full tanks',
+      one: 'one full tank',
+    );
+    return 'Based on $_temp0';
+  }
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -11737,6 +11797,67 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get consumptionStatsChartConsumption => '⟦Ł/100ķɱ ƥéř ɱóñŧĥ ·····⟧';
+
+  @override
+  String get fuelCompareSectionTitle =>
+      '⟦Çóšŧ óƒ đřîṽîñǧ, ƒúéł ƀý ƒúéł ··········⟧';
+
+  @override
+  String get fuelComparePricePerLitre => '⟦Ƥáîđ ƥéř łîŧřé ·····⟧';
+
+  @override
+  String get fuelCompareCostPer100km => '⟦Çóšŧ ƥéř 100 ķɱ ····⟧';
+
+  @override
+  String get fuelCompareDistance => '⟦Đîšŧáñçé ɱéášúřéđ ·······⟧';
+
+  @override
+  String get fuelCompareLitres => '⟦Łîŧřéš ƀúřñéđ ·····⟧';
+
+  @override
+  String fuelCompareVerdictCheaper(String winner) {
+    return '⟦$winner îš ýóúř çĥéáƥéšŧ ƒúéł ŧó đřîṽé óñ ············⟧';
+  }
+
+  @override
+  String fuelCompareVerdictDelta(String loser, String amount) {
+    return '⟦$loser çóšŧš $amount ɱóřé ƥéř 1000 ķɱ ······⟧';
+  }
+
+  @override
+  String fuelCompareBreakEven(String fuel, String rival, String price) {
+    return '⟦$fuel ƀéáŧš $rival ƀéłóŵ $price ƥéř łîŧřé ········⟧';
+  }
+
+  @override
+  String get fuelCompareBreakEvenExplain =>
+      '⟦Ɓřéáķ-éṽéñ îš çáłçúłáŧéđ ƒřóɱ éáçĥ ƒúéł\'š ɱéášúřéđ çóñšúɱƥŧîóñ, šó îŧ ɱóṽéš áš ýóúř đřîṽîñǧ đóéš. ····································⟧';
+
+  @override
+  String get fuelCompareLitresVsCostNote =>
+      '⟦Łîŧřéš áñđ çóšŧ çáñ đîšáǧřéé: á ƒúéł çáñ ƀúřñ ƒéŵéř łîŧřéš ƥéř 100 ķɱ áñđ šŧîłł çóšŧ ɱóřé ƥéř ķîłóɱéŧřé, ƀéçáúšé ŧĥé ƥúɱƥ ƥřîçé đîƒƒéřš. Çóšŧ ƥéř ķîłóɱéŧřé îš ŧĥé ṽéřđîçŧ. ····························································⟧';
+
+  @override
+  String fuelCompareProvisional(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count full tanks',
+      one: 'one full tank',
+    );
+    return '⟦Ƥřóṽîšîóñáł — ƀášéđ óñ $_temp0 ········⟧';
+  }
+
+  @override
+  String fuelCompareBasedOn(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count full tanks',
+      one: 'one full tank',
+    );
+    return '⟦Ɓášéđ óñ $_temp0 ···⟧';
+  }
 
   @override
   String consumptionStatsOpenWindowBanner(int count) {

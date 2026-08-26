@@ -3932,6 +3932,66 @@ class AppLocalizationsDe extends AppLocalizations {
   String get consumptionStatsChartConsumption => 'L/100km pro Monat';
 
   @override
+  String get fuelCompareSectionTitle => 'Fahrtkosten nach Kraftstoff';
+
+  @override
+  String get fuelComparePricePerLitre => 'Gezahlt pro Liter';
+
+  @override
+  String get fuelCompareCostPer100km => 'Kosten pro 100 km';
+
+  @override
+  String get fuelCompareDistance => 'Gemessene Strecke';
+
+  @override
+  String get fuelCompareLitres => 'Verbrauchte Liter';
+
+  @override
+  String fuelCompareVerdictCheaper(String winner) {
+    return '$winner ist Ihr günstigster Kraftstoff';
+  }
+
+  @override
+  String fuelCompareVerdictDelta(String loser, String amount) {
+    return '$loser kostet $amount mehr pro 1000 km';
+  }
+
+  @override
+  String fuelCompareBreakEven(String fuel, String rival, String price) {
+    return '$fuel schlägt $rival unter $price pro Liter';
+  }
+
+  @override
+  String get fuelCompareBreakEvenExplain =>
+      'Der Break-even wird aus dem gemessenen Verbrauch jedes Kraftstoffs berechnet und verschiebt sich mit Ihrer Fahrweise.';
+
+  @override
+  String get fuelCompareLitresVsCostNote =>
+      'Liter und Kosten können sich widersprechen: Ein Kraftstoff kann weniger Liter pro 100 km verbrauchen und trotzdem mehr pro Kilometer kosten, weil der Literpreis abweicht. Entscheidend sind die Kosten pro Kilometer.';
+
+  @override
+  String fuelCompareProvisional(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tankfüllungen',
+      one: 'einer Tankfüllung',
+    );
+    return 'Vorläufig — basiert auf $_temp0';
+  }
+
+  @override
+  String fuelCompareBasedOn(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tankfüllungen',
+      one: 'einer Tankfüllung',
+    );
+    return 'Basiert auf $_temp0';
+  }
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

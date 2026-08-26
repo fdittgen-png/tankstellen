@@ -132,6 +132,27 @@ abstract class FuelTypeEfficiencyStats with _$FuelTypeEfficiencyStats {
     /// synthetic correction). 0 ⇒ every interval used the full v3
     /// carried-content composition (#3764, ADR 0015 v3).
     @Default(0) int legacyAttributedIntervalCount,
+
+    /// Σ litres over this bucket's attributed intervals (#3828).
+    ///
+    /// The aggregator has always summed this to derive [avgL100km] and then
+    /// discarded it, which cost the screen its most comparable number: with
+    /// litres AND [intervalCost] we can state the **price per litre** each
+    /// fuel was actually bought at, instead of leaving the reader to infer
+    /// why one fuel costs more per km while burning fewer litres.
+    @Default(0) double totalLitres,
+
+    /// Σ distance (km) over this bucket's attributed intervals (#3828).
+    /// Says how much driving a row's verdict rests on.
+    @Default(0) double totalDistanceKm,
+
+    /// Σ cost over this bucket's attributed intervals (#3828).
+    ///
+    /// NOT the same as [totalSpent]: that is every non-correction fill folded
+    /// into the bucket, while this counts only the closed intervals the
+    /// averages are computed from. Mixing them would produce a price per
+    /// litre that disagrees with [avgCostPerKm].
+    @Default(0) double intervalCost,
   }) = _FuelTypeEfficiencyStats;
 
   /// The bucket's dominant fuel (the only fuel for a pure bucket, the
@@ -146,4 +167,44 @@ abstract class FuelTypeEfficiencyStats with _$FuelTypeEfficiencyStats {
 
   /// Language-neutral display label for this bucket (`E85` or `E85/E10`).
   String get label => bucket.label;
+
+  /// What a litre of this composition actually cost, averaged over the
+  /// attributed intervals (#3828). `null` when no litres were attributed.
+  ///
+  /// This is the number that drives the whole comparison and was previously
+  /// invisible: a fuel can burn FEWER litres per 100 km and still cost more
+  /// per km, which reads as a contradiction until the pump price is shown.
+  double? get avgPricePerLitre =>
+      totalLitres > 0 ? intervalCost / totalLitres : null;
+
+  /// [avgCostPerKm] in the unit people actually reason in. A per-km figure
+  /// like 0.057 is hard to feel; per 100 km is not.
+  double? get avgCostPer100km =>
+      avgCostPerKm == null ? null : avgCostPerKm! * 100;
+
+  /// Cost of driving 1000 km on this composition — the unit used to express
+  /// the gap between two fuels, where a per-km delta rounds to nothing.
+  double? get costPer1000km =>
+      avgCostPerKm == null ? null : avgCostPerKm! * 1000;
+
+  /// The pump price at which THIS composition would match [other]'s cost per
+  /// km, given the two measured consumptions (#3828).
+  ///
+  ///     costPerKm = (L/100km / 100) * pricePerLitre
+  ///     => breakEven = other.costPerKm * 100 / this.L100km
+  ///
+  /// For an E85 driver this is the single most actionable number on the
+  /// screen: below this price, the cheaper-per-litre fuel wins. `null` when
+  /// either side lacks a measured consumption — never guessed.
+  double? breakEvenPricePerLitreVersus(FuelTypeEfficiencyStats other) {
+    final myL100 = avgL100km;
+    final theirCostPerKm = other.avgCostPerKm;
+    if (myL100 == null || myL100 <= 0 || theirCostPerKm == null) return null;
+    return theirCostPerKm * 100 / myL100;
+  }
+
+  /// True when this row rests on at least two closed full-tank intervals —
+  /// the same bar the existing "record at least two full tanks" guard uses
+  /// before crowning a winner. One interval is a data point, not a verdict.
+  bool get isConfident => attributedIntervalCount >= 2;
 }

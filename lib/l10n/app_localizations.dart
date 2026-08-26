@@ -7059,6 +7059,78 @@ abstract class AppLocalizations {
   /// **'L/100km per month'**
   String get consumptionStatsChartConsumption;
 
+  /// Section title above the per-fuel efficiency comparison on the consumption statistics screen (#3828).
+  ///
+  /// In en, this message translates to:
+  /// **'Cost of driving, fuel by fuel'**
+  String get fuelCompareSectionTitle;
+
+  /// Label for the average pump price actually paid for a fuel, over the attributed full-tank intervals (#3828).
+  ///
+  /// In en, this message translates to:
+  /// **'Paid per litre'**
+  String get fuelComparePricePerLitre;
+
+  /// Label for the cost of driving 100 km on a fuel — the per-km figure restated in a unit people reason in (#3828).
+  ///
+  /// In en, this message translates to:
+  /// **'Cost per 100 km'**
+  String get fuelCompareCostPer100km;
+
+  /// Label for how many km of driving a fuel's figures are based on (#3828).
+  ///
+  /// In en, this message translates to:
+  /// **'Distance measured'**
+  String get fuelCompareDistance;
+
+  /// Label for the total litres of a fuel burned over the attributed intervals (#3828).
+  ///
+  /// In en, this message translates to:
+  /// **'Litres burned'**
+  String get fuelCompareLitres;
+
+  /// Headline verdict naming the fuel with the lowest cost per km (#3828). {winner} is a fuel label such as E85.
+  ///
+  /// In en, this message translates to:
+  /// **'{winner} is your cheapest fuel to drive on'**
+  String fuelCompareVerdictCheaper(String winner);
+
+  /// States the gap between a fuel and the cheapest one, per 1000 km (#3828). {amount} is a formatted currency amount.
+  ///
+  /// In en, this message translates to:
+  /// **'{loser} costs {amount} more per 1000 km'**
+  String fuelCompareVerdictDelta(String loser, String amount);
+
+  /// The pump price at which a fuel would match the cheapest one, given both measured consumptions (#3828).
+  ///
+  /// In en, this message translates to:
+  /// **'{fuel} beats {rival} below {price} per litre'**
+  String fuelCompareBreakEven(String fuel, String rival, String price);
+
+  /// Caption explaining where the break-even price comes from (#3828).
+  ///
+  /// In en, this message translates to:
+  /// **'Break-even is calculated from each fuel\'s measured consumption, so it moves as your driving does.'**
+  String get fuelCompareBreakEvenExplain;
+
+  /// Caption shown when one fuel has the lower L/100 km but the higher cost per km, so the two numbers do not appear to contradict each other (#3828).
+  ///
+  /// In en, this message translates to:
+  /// **'Litres and cost can disagree: a fuel can burn fewer litres per 100 km and still cost more per kilometre, because the pump price differs. Cost per kilometre is the verdict.'**
+  String get fuelCompareLitresVsCostNote;
+
+  /// Confidence marker on a fuel row computed from fewer than two full-tank intervals (#3828).
+  ///
+  /// In en, this message translates to:
+  /// **'Provisional — based on {count, plural, =1{one full tank} other{{count} full tanks}}'**
+  String fuelCompareProvisional(int count);
+
+  /// Confidence marker on a fuel row with enough full-tank intervals to be trusted (#3828).
+  ///
+  /// In en, this message translates to:
+  /// **'Based on {count, plural, =1{one full tank} other{{count} full tanks}}'**
+  String fuelCompareBasedOn(int count);
+
   /// Banner shown above the consumption stats card when one or more partial fill-ups have been logged after the most recent plein-complet (#1362). The fills are excluded from the L/100km average until the next plein-complet closes the window.
   ///
   /// In en, this message translates to:

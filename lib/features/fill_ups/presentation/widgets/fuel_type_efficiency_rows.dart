@@ -45,84 +45,100 @@ class _BucketRow extends StatelessWidget {
         ? (l.fuelEfficiencyMixDominant(dominantName))
         : dominantName;
 
-    return Row(
+    return Column(
       key: ValueKey('fuel_efficiency_row_${bucket.key}'),
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(bucket.dominant.icon, size: 20, color: scheme.primary),
-        const SizedBox(width: 8),
-        Expanded(
-          flex: 3,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(bucket.dominant.icon, size: 20, color: scheme.primary),
+            const SizedBox(width: 8),
+            Expanded(
+              flex: 3,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Flexible(
-                    child: Text(
-                      // The composition label is a language-neutral grade
-                      // code / A/B mix mask (see FuelEfficiencyBucket.label).
-                      bucket.label,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: isWinner
-                            ? FontWeight.w700
-                            : FontWeight.w600,
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          // The composition label is a language-neutral grade
+                          // code / A/B mix mask (see FuelEfficiencyBucket.label).
+                          bucket.label,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: isWinner
+                                ? FontWeight.w700
+                                : FontWeight.w600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                      const SizedBox(width: 6),
+                      _CompositionBadge(text: badge, isMix: stats.isMix),
+                    ],
                   ),
-                  const SizedBox(width: 6),
-                  _CompositionBadge(text: badge, isMix: stats.isMix),
+                  Text(
+                    secondaryLine,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ],
               ),
-              Text(
-                secondaryLine,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+            ),
+            Expanded(
+              flex: 4,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  _MetricLine(
+                    label: l.fuelEfficiencyColCostPerKm,
+                    value: costPerKm != null
+                        ? PriceFormatter.formatPerKm(costPerKm)
+                        : '—',
+                    trailing: _DeltaArrow(delta: delta),
+                    emphasised: true,
+                  ),
+                  _MetricLine(
+                    label: l.fuelEfficiencyColL100km,
+                    value: l100 != null ? UnitFormatter.formatDecimal(l100) : '—',
+                  ),
+                  // #3828 — the pump price actually paid. Previously invisible,
+                  // and it is the fact that explains how a fuel can burn fewer
+                  // litres per 100 km yet cost more per kilometre.
+                  _MetricLine(
+                    key: ValueKey('fuel_efficiency_perlitre_${bucket.key}'),
+                    label: l.fuelComparePricePerLitre,
+                    value: stats.avgPricePerLitre != null
+                        ? PriceFormatter.formatTotal(stats.avgPricePerLitre!)
+                        : '—',
+                  ),
+                  // #3764 — interval count first-class next to the fill count:
+                  // "2 full tanks · 3 fills". The interval count is what feeds
+                  // the verdict gate, so surfacing it makes "why no crown yet"
+                  // legible per row.
+                  Text(
+                    '${l.fuelEfficiencyIntervalCount(stats.attributedIntervalCount)}'
+                    ' · ${l.fuelEfficiencyFillCount(stats.fillCount)}',
+                    key: ValueKey('fuel_efficiency_counts_${bucket.key}'),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        Expanded(
-          flex: 4,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              _MetricLine(
-                label: l.fuelEfficiencyColCostPerKm,
-                value: costPerKm != null
-                    ? PriceFormatter.formatPerKm(costPerKm)
-                    : '—',
-                trailing: _DeltaArrow(delta: delta),
-                emphasised: true,
-              ),
-              _MetricLine(
-                label: l.fuelEfficiencyColL100km,
-                value: l100 != null ? UnitFormatter.formatDecimal(l100) : '—',
-              ),
-              _MetricLine(
-                label: l.fuelEfficiencyColTotalSpent,
-                value: PriceFormatter.formatTotal(stats.totalSpent),
-              ),
-              // #3764 — interval count first-class next to the fill count:
-              // "2 full tanks · 3 fills". The interval count is what feeds
-              // the verdict gate, so surfacing it makes "why no crown yet"
-              // legible per row.
-              Text(
-                '${l.fuelEfficiencyIntervalCount(stats.attributedIntervalCount)}'
-                ' · ${l.fuelEfficiencyFillCount(stats.fillCount)}',
-                key: ValueKey('fuel_efficiency_counts_${bucket.key}'),
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-        ),
+        // #3828 — supporting figures as a compact wrapped line instead of a
+        // ninth stacked metric: the three decisive numbers stay in the row,
+        // the evidence behind them sits underneath without blowing the row
+        // height (stacking them all overflowed by 86px).
+        _SupportingFigures(stats: stats),
       ],
     );
   }
@@ -171,6 +187,7 @@ class _MetricLine extends StatelessWidget {
   final bool emphasised;
 
   const _MetricLine({
+    super.key,
     required this.label,
     required this.value,
     this.trailing,
@@ -248,6 +265,107 @@ class _Footnote extends StatelessWidget {
       style: theme.textTheme.labelSmall?.copyWith(
         color: theme.colorScheme.onSurfaceVariant,
         fontStyle: FontStyle.italic,
+      ),
+    );
+  }
+}
+
+/// The evidence behind a row's three headline numbers (#3828), as a compact
+/// wrapped line of `label value` chips.
+///
+/// These began life as extra entries in the row's vertical metric stack,
+/// which took it from four lines to nine and overflowed the card by 86px —
+/// and read as a wall of figures rather than an analysis. Wrapping them
+/// keeps the row's height unchanged while still showing what the verdict
+/// rests on: the pump price paid, the cost over a distance people can feel,
+/// and how much driving is actually behind the average.
+class _SupportingFigures extends StatelessWidget {
+  const _SupportingFigures({required this.stats});
+
+  final FuelTypeEfficiencyStats stats;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    final chips = <Widget>[
+      if (stats.avgCostPer100km != null)
+        _FigureChip(
+          key: ValueKey('fuel_efficiency_cost100_${stats.bucket.key}'),
+          label: l.fuelCompareCostPer100km,
+          value: PriceFormatter.formatTotal(stats.avgCostPer100km!),
+        ),
+      _FigureChip(
+        label: l.fuelEfficiencyColTotalSpent,
+        value: PriceFormatter.formatTotal(stats.totalSpent),
+      ),
+      if (stats.totalDistanceKm > 0)
+        _FigureChip(
+          key: ValueKey('fuel_efficiency_distance_${stats.bucket.key}'),
+          label: l.fuelCompareDistance,
+          value: UnitFormatter.formatDistance(stats.totalDistanceKm,
+              fractionDigits: 0),
+        ),
+      if (stats.totalLitres > 0)
+        _FigureChip(
+          key: ValueKey('fuel_efficiency_litres_${stats.bucket.key}'),
+          label: l.fuelCompareLitres,
+          value: UnitFormatter.formatDecimal(stats.totalLitres),
+        ),
+      // Confidence travels WITH the figures — every number here is an
+      // average over full-tank intervals, and one interval is a data point,
+      // not a verdict. In the SAME wrap so the supporting block stays one
+      // line: the row lost `total spent` from its stack, so this nets to no
+      // extra height.
+      Text(
+        stats.isConfident
+            ? l.fuelCompareBasedOn(stats.attributedIntervalCount)
+            : l.fuelCompareProvisional(stats.attributedIntervalCount),
+        key: ValueKey('fuel_efficiency_confidence_${stats.bucket.key}'),
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: stats.isConfident ? scheme.onSurfaceVariant : scheme.tertiary,
+          fontStyle: stats.isConfident ? null : FontStyle.italic,
+        ),
+      ),
+    ];
+    if (chips.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 28, top: 2),
+      child: Wrap(spacing: 10, runSpacing: 2, children: chips),
+    );
+  }
+}
+
+/// One `label value` pair in the supporting-figures line.
+class _FigureChip extends StatelessWidget {
+  const _FigureChip({super.key, required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    return Text.rich(
+      TextSpan(
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: scheme.onSurfaceVariant,
+        ),
+        children: [
+          TextSpan(text: '$label '),
+          TextSpan(
+            text: value,
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              color: scheme.onSurface,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+        ],
       ),
     );
   }
