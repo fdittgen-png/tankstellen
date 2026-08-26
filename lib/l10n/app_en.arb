@@ -5487,9 +5487,9 @@
   "@obd2DiagnosticsInitCold": {
     "description": "Word for a cold (full-handshake) adapter start in the init-transcript header on the OBD2 diagnostics card (#2511)."
   },
-  "obd2DiagnosticsEmpty": "No OBD2 session recorded yet — connect an adapter and record a trip with Developer mode on.",
+  "obd2DiagnosticsEmpty": "No OBD2 comm-health details for this trip. The recording itself is unaffected — check the trip's own OBD2 coverage above.",
   "@obd2DiagnosticsEmpty": {
-    "description": "Empty-state line on the OBD2 diagnostics card / screen (#2470/#2471) shown when Developer mode is off or no diagnostics session has been captured yet."
+    "description": "Empty state of the per-trip OBD2 comm-health card (#3808). Must NOT instruct the user to connect an adapter or enable Developer mode: both are commonly already true (a trip that REUSES the kept-alive link opens no diagnostics session), so the old copy blamed the user for a recording that worked. States the fact and points at the trip's real coverage instead."
   },
   "obd2DiagnosticsExplain": "Captured while recording to debug the dongle↔app communication — only collected in Developer mode.",
   "@obd2DiagnosticsExplain": {

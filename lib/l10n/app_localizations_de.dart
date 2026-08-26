@@ -6088,7 +6088,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get obd2DiagnosticsEmpty =>
-      'Noch keine OBD2-Sitzung aufgezeichnet — verbinde einen Adapter und zeichne eine Fahrt mit aktiviertem Entwicklermodus auf.';
+      'Keine OBD2-Verbindungsdetails für diese Fahrt. Die Aufzeichnung selbst ist davon nicht betroffen — sieh dir die OBD2-Abdeckung der Fahrt oben an.';
 
   @override
   String get obd2DiagnosticsExplain =>

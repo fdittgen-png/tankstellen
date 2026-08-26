@@ -10451,10 +10451,10 @@ abstract class AppLocalizations {
   /// **'cold'**
   String get obd2DiagnosticsInitCold;
 
-  /// Empty-state line on the OBD2 diagnostics card / screen (#2470/#2471) shown when Developer mode is off or no diagnostics session has been captured yet.
+  /// Empty state of the per-trip OBD2 comm-health card (#3808). Must NOT instruct the user to connect an adapter or enable Developer mode: both are commonly already true (a trip that REUSES the kept-alive link opens no diagnostics session), so the old copy blamed the user for a recording that worked. States the fact and points at the trip's real coverage instead.
   ///
   /// In en, this message translates to:
-  /// **'No OBD2 session recorded yet — connect an adapter and record a trip with Developer mode on.'**
+  /// **'No OBD2 comm-health details for this trip. The recording itself is unaffected — check the trip\'s own OBD2 coverage above.'**
   String get obd2DiagnosticsEmpty;
 
   /// Subtle one-line explanation at the bottom of the OBD2 diagnostics card (#2470) reminding the developer why the card exists and that it is gated on Developer mode.

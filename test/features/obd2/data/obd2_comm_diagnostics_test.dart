@@ -314,4 +314,61 @@ void main() {
       expect(c.captureForTrip, returnsNormally);
     });
   });
+
+  group('#3808 — a REUSED link still gets a per-trip session', () {
+    // Field report 2026-08-26: a trip recorded 263/263 engine samples,
+    // yet the comm-health card said "no OBD2 session recorded — connect
+    // an adapter and record a trip with Developer mode on", with the
+    // adapter connected and Developer mode on. Cause: beginSession runs
+    // only inside Obd2Service.connect(), and a trip that reuses the
+    // #3527 kept-alive link never dials.
+    setUp(() {
+      Obd2CommDiagnostics.instance
+        ..reset()
+        ..enabled = true;
+    });
+    tearDown(() {
+      Obd2CommDiagnostics.instance
+        ..reset()
+        ..enabled = false;
+    });
+
+    test('opens a session when none is live, so captureForTrip has one',
+        () {
+      final d = Obd2CommDiagnostics.instance;
+      expect(d.hasLiveSession, isFalse);
+      expect(d.captureForTrip(), isNull, reason: 'the reported bug');
+
+      d.beginSessionIfAbsent(linkKind: 'classic', redactedMac: '..:7E');
+
+      expect(d.hasLiveSession, isTrue);
+      final captured = d.captureForTrip();
+      expect(captured, isNotNull,
+          reason: 'a reused-link trip must still produce a card');
+      expect(captured!.linkKind, 'classic');
+    });
+
+    test('NEVER discards a live session — the dial path keeps the '
+        'connect transcript it just captured', () {
+      final d = Obd2CommDiagnostics.instance;
+      d.beginSession(linkKind: 'ble', redactedMac: '..:AA');
+      d.recordHandshakeLine('ATZ', 'ELM327 v1.5', 1);
+
+      d.beginSessionIfAbsent(linkKind: 'classic', redactedMac: '..:BB');
+
+      final captured = d.captureForTrip()!;
+      expect(captured.linkKind, 'ble',
+          reason: 'the in-flight connect session must survive');
+      expect(captured.initTranscript, isNotEmpty,
+          reason: 'discarding it would lose the handshake transcript');
+    });
+
+    test('stays a no-op while the collector is disabled', () {
+      final d = Obd2CommDiagnostics.instance..enabled = false;
+      d.beginSessionIfAbsent(linkKind: 'classic', redactedMac: '..:7E');
+      expect(d.hasLiveSession, isFalse,
+          reason: 'production (Developer mode off) must stay untouched');
+    });
+  });
+
 }

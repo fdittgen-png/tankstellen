@@ -6029,7 +6029,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get obd2DiagnosticsEmpty =>
-      'No OBD2 session recorded yet — connect an adapter and record a trip with Developer mode on.';
+      'No OBD2 comm-health details for this trip. The recording itself is unaffected — check the trip\'s own OBD2 coverage above.';
 
   @override
   String get obd2DiagnosticsExplain =>
@@ -13892,7 +13892,7 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get obd2DiagnosticsEmpty =>
-      '⟦Ñó ÓƁĐ2 šéššîóñ řéçóřđéđ ýéŧ — çóññéçŧ áñ áđáƥŧéř áñđ řéçóřđ á ŧřîƥ ŵîŧĥ Đéṽéłóƥéř ɱóđé óñ. ································⟧';
+      '⟦Ñó ÓƁĐ2 çóɱɱ-ĥéáłŧĥ đéŧáîłš ƒóř ŧĥîš ŧřîƥ. Ŧĥé řéçóřđîñǧ îŧšéłƒ îš úñáƒƒéçŧéđ — çĥéçķ ŧĥé ŧřîƥ\'š óŵñ ÓƁĐ2 çóṽéřáǧé áƀóṽé. ···········································⟧';
 
   @override
   String get obd2DiagnosticsExplain =>
