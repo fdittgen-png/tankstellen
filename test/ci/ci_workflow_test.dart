@@ -544,6 +544,24 @@ void main() {
           reason: 'the assert must run while the ASC key still exists');
     });
 
+    test('a historical stranding backlog cannot pin the train red (#3823)',
+        () {
+      final fastfile = File('ios/fastlane/Fastfile').readAsStringSync();
+      // The guard's first live run found ELEVEN historical orphans and
+      // failed the release train on them. Real, but unfixable in
+      // retrospect — and a permanently red train is exactly as ignorable
+      // as the green log line this guard replaced.
+      expect(fastfile, contains('fresh_stranded'),
+          reason: 'the stranding check must be scoped to the freshness '
+              'window so only a NEW stranding fails the run');
+      expect(fastfile, contains('old_stranded'),
+          reason: 'older orphans must still be reported, just not fatal');
+      final failIndex = fastfile.indexOf('never submitted for external review');
+      expect(fastfile.substring(0, failIndex), contains('partition'),
+          reason: 'the fatal branch must consume the partitioned fresh '
+              'set, not the whole history');
+    });
+
     test('the assert lane exists and fails loudly rather than warning', () {
       final fastfile = File('ios/fastlane/Fastfile').readAsStringSync();
       expect(fastfile, contains('lane :testflight_assert_delivery'));

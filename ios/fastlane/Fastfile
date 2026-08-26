@@ -973,22 +973,50 @@ platform :ios do
       end
     end
 
-    # 3. The orphan class actually observed: 2026061211 (v6.0.4, 2026-08-09)
-    #    sat at READY_FOR_BETA_SUBMISSION with no review record while ~30
+    # 3. The orphan class actually observed: builds sitting at
+    #    READY_FOR_BETA_SUBMISSION with no review record while their
     #    neighbours were approved. External submission CAN silently skip.
-    recent = Spaceship::ConnectAPI::Build.all(
-      app_id: app.id, sort: "-uploadedDate", limit: 10,
+    #
+    #    Scoped to the freshness window ON PURPOSE. The first run of this
+    #    guard found ELEVEN historical orphans (2026060311 … 2026061211) and
+    #    failed the release train on them. Those are real, but they are
+    #    history: failing every future train over a backlog nobody can
+    #    retroactively submit would leave the train permanently red and
+    #    train everyone to ignore it — the precise fate of the log line this
+    #    guard exists to replace. Fail on a NEW stranding, report the rest.
+    #
+    #    `limit:` is not honoured by Build.all here (that first run returned
+    #    more than the 10 requested), so the window is applied client-side.
+    all_recent = Spaceship::ConnectAPI::Build.all(
+      app_id: app.id, sort: "-uploadedDate", limit: 25,
     )
-    stranded = recent.select do |b|
+    stranded = all_recent.select do |b|
       begin
         b.build_beta_detail&.external_build_state == "READY_FOR_BETA_SUBMISSION"
       rescue StandardError
         false
       end
     end
-    unless stranded.empty?
+
+    fresh_stranded, old_stranded = stranded.partition do |b|
+      begin
+        age = (Time.now.utc - Time.parse(b.uploaded_date.to_s).utc) / 3600.0
+        age <= max_age_hours
+      rescue StandardError
+        # Unparseable date: treat as fresh so a real stranding is never
+        # silently filtered out by a formatting change.
+        true
+      end
+    end
+
+    unless fresh_stranded.empty?
       problems << "never submitted for external review: " \
-                  "#{stranded.map(&:version).join(', ')}"
+                  "#{fresh_stranded.map(&:version).join(', ')}"
+    end
+    unless old_stranded.empty?
+      UI.important("#{old_stranded.count} older build(s) were never submitted " \
+                   "for external review (informational, not failing this run): " \
+                   "#{old_stranded.map(&:version).join(', ')}")
     end
 
     if problems.empty?
