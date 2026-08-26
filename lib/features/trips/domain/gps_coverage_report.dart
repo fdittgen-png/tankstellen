@@ -5,48 +5,14 @@ import '../../../core/location/recording_location_settings.dart';
 import 'entities/recording_lifecycle_mark.dart';
 import 'gps_track_distance.dart';
 import 'trip_sample.dart';
+import 'entities/gps_sample_diagnostic.dart';
+import 'gps_gap_attribution.dart';
+import 'gps_delivery_skew.dart';
 
-/// Why a stretch of the recorded GPS track has no fixes (#3465).
-///
-/// A field report of "my trace has holes" was previously unanswerable per
-/// trip: the causes were known in aggregate (#3253 tallies, #1458 cadence
-/// diagnostics) but never JOINED to the individual gap. Each gap in a
-/// [GpsCoverageReport] carries one of these verdicts.
-enum GpsGapAttribution {
-  /// The gap majority-overlaps a backgrounded stretch of the trip AND the
-  /// build ships without the recording foreground service
-  /// (`kGpsRecordingForegroundServiceEnabled` off, #3417 pending) — the
-  /// OS batched/paused the backgrounded stream. The dominant field cause.
-  backgroundThrottle,
+// #3785 — the gap-cause vocabulary lives in its own file (the report was
+// at the #1680 cap); re-exported so every existing import keeps working.
+export 'gps_gap_attribution.dart';
 
-  /// A burst of tightly-spaced fixes right after the gap carries roughly
-  /// the fixes that should have been spread across it — the OS queued
-  /// fixes and delivered them late in one batch (#3253 fix-clock
-  /// stamping makes the late delivery visible).
-  osBatching,
-
-  /// The gap is flanked by link-down samples on an OBD2 trip (RPM null on
-  /// both sides while most of the trip carries RPM): GPS ingest stalled
-  /// while an OBD2 reconnect episode monopolised the UI isolate /
-  /// serialized transport — the field-observed foreground-gap correlate
-  /// (flapping link, one connect cycle every ~9 s).
-  linkRecovery,
-
-  /// The #2963/#1979/#3004 distance gates rejected enough fixes/segments
-  /// (per the trip's [GpsGateRejectionTally]) to account for the fixes
-  /// missing from this gap.
-  gateRejected,
-
-  /// The app was foregrounded (per the lifecycle marks) and neither a
-  /// late burst nor the gate tally explains the gap: GPS reception
-  /// itself dropped (tunnel, parking garage, urban canyon).
-  signalLoss,
-
-  /// No verdict possible — typically a legacy trip persisted without
-  /// lifecycle marks, or a backgrounded gap on an FGS-enabled build
-  /// (where backgrounding should NOT throttle, so the cause is unclear).
-  unknown,
-}
 
 /// One attributed hole in the GPS track: no fix arrived for more than
 /// [GpsCoverageReport.kGapFactor] × the expected fix interval.
@@ -184,6 +150,9 @@ class GpsCoverageReport {
     required Duration expectedFixInterval,
     GpsGateRejectionTally? tally,
     List<RecordingLifecycleMark> marks = const [],
+    // #3785 — per-fix arrival/fix clock pairs; empty on legacy trips,
+    // where the delivery-stall verdict is simply never reached.
+    List<GpsSampleDiagnostic> diagnostics = const [],
     required bool fgsEnabled,
   }) {
     final interval = expectedFixInterval > Duration.zero
@@ -252,6 +221,9 @@ class GpsCoverageReport {
       } else if (_burstBackfillsGap(
           fixes, raw.endIndex, raw.dtUs, intervalUs)) {
         attribution = GpsGapAttribution.osBatching;
+      } else if (GpsDeliverySkew.stalledAcross(
+          diagnostics, gapStart, gapEnd, interval)) {
+        attribution = GpsGapAttribution.deliveryStall;
       } else if (tripHasObd2 &&
           gpsSamples[raw.endIndex - 1].rpm == null &&
           gpsSamples[raw.endIndex].rpm == null) {
@@ -307,6 +279,7 @@ class GpsCoverageReport {
   static GpsCoverageReport? forTrip(
     List<TripSample> samples, {
     List<RecordingLifecycleMark> marks = const [],
+    List<GpsSampleDiagnostic> diagnostics = const [], // #3785
     Duration expectedFixInterval = kGpsExpectedRecordingFixInterval,
     bool fgsEnabled = kGpsRecordingForegroundServiceEnabled,
   }) {
@@ -328,6 +301,7 @@ class GpsCoverageReport {
       expectedFixInterval: expectedFixInterval,
       tally: tally,
       marks: marks,
+      diagnostics: diagnostics,
       fgsEnabled: fgsEnabled,
     );
   }

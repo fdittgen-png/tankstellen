@@ -5218,6 +5218,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gpsCoverageAttrGateRejected => 'fixes filtered';
 
   @override
+  String get gpsCoverageAttrDeliveryStall => 'delayed delivery';
+
+  @override
   String get gpsCoverageAttrSignalLoss => 'signal loss';
 
   @override
@@ -5234,6 +5237,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get gpsCoverageHintGateRejected =>
       'Noisy position fixes in this stretch were filtered out to keep the distance figure honest.';
+
+  @override
+  String get gpsCoverageHintDeliveryStall =>
+      'Position fixes were produced on time but reached the app late — the phone was busy (often a Bluetooth reconnect). Reception was fine.';
 
   @override
   String get gpsCoverageHintSignalLoss =>
@@ -13058,6 +13065,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get gpsCoverageAttrGateRejected => '⟦ƒîẋéš ƒîłŧéřéđ ······⟧';
 
   @override
+  String get gpsCoverageAttrDeliveryStall => '⟦đéłáýéđ đéłîṽéřý ·······⟧';
+
+  @override
   String get gpsCoverageAttrSignalLoss => '⟦šîǧñáł łóšš ·····⟧';
 
   @override
@@ -13074,6 +13084,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get gpsCoverageHintGateRejected =>
       '⟦Ñóîšý ƥóšîŧîóñ ƒîẋéš îñ ŧĥîš šŧřéŧçĥ ŵéřé ƒîłŧéřéđ óúŧ ŧó ķééƥ ŧĥé đîšŧáñçé ƒîǧúřé ĥóñéšŧ. ··································⟧';
+
+  @override
+  String get gpsCoverageHintDeliveryStall =>
+      '⟦Ƥóšîŧîóñ ƒîẋéš ŵéřé ƥřóđúçéđ óñ ŧîɱé ƀúŧ řéáçĥéđ ŧĥé áƥƥ łáŧé — ŧĥé ƥĥóñé ŵáš ƀúšý (óƒŧéñ á Ɓłúéŧóóŧĥ řéçóññéçŧ). Řéçéƥŧîóñ ŵáš ƒîñé. ················································⟧';
 
   @override
   String get gpsCoverageHintSignalLoss =>

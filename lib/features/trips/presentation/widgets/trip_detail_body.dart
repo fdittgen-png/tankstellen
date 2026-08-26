@@ -127,6 +127,10 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
   late final GpsCoverageReport? _gpsCoverage = GpsCoverageReport.forTrip(
     _tripSamples,
     marks: widget.entry.lifecycleMarks,
+    // #3785 — the per-fix arrival/fix clock pairs, so a gap caused by a
+    // stalled delivery is named as such instead of falling through to
+    // the residual "signal loss" bucket.
+    diagnostics: widget.entry.gpsSampleDiagnostics,
   );
 
   /// Per-event fuel-cost attribution (#3432) — the "where your fuel

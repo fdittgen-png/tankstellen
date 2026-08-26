@@ -38,6 +38,8 @@ String? gpsCoverageHint(GpsCoverageReport? c, AppLocalizations l) {
       return l.gpsCoverageHintLinkRecovery;
     case GpsGapAttribution.gateRejected:
       return l.gpsCoverageHintGateRejected;
+    case GpsGapAttribution.deliveryStall:
+      return l.gpsCoverageHintDeliveryStall;
     case GpsGapAttribution.signalLoss:
       return l.gpsCoverageHintSignalLoss;
     case GpsGapAttribution.unknown:
@@ -57,6 +59,8 @@ String gpsGapAttributionLabel(GpsGapAttribution a, AppLocalizations l) {
       return l.gpsCoverageAttrLinkRecovery;
     case GpsGapAttribution.gateRejected:
       return l.gpsCoverageAttrGateRejected;
+    case GpsGapAttribution.deliveryStall:
+      return l.gpsCoverageAttrDeliveryStall;
     case GpsGapAttribution.signalLoss:
       return l.gpsCoverageAttrSignalLoss;
     case GpsGapAttribution.unknown:
