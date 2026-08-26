@@ -464,4 +464,65 @@ void main() {
           reason: 'the nightly iOS build must reach the external testers');
     });
   });
+
+  group('fdroid lockfile regen (#3806)', () {
+    String read(String n) =>
+        File('.github/workflows/$n').readAsStringSync();
+
+    /// The workflow's `on:` block only — the file's own rationale comment
+    /// names the trigger it deliberately avoids, and a whole-file match
+    /// would read that prose as a declaration.
+    String triggerBlock(String yaml) {
+      final out = StringBuffer();
+      var inOn = false;
+      for (final line in yaml.split('\n')) {
+        if (RegExp(r'^on:\s*$').hasMatch(line)) {
+          inOn = true;
+          continue;
+        }
+        if (inOn) {
+          if (RegExp(r'^[A-Za-z]').hasMatch(line)) break;
+          out.writeln(line);
+        }
+      }
+      return out.toString();
+    }
+
+    test('the regen workflow is dispatch-only — never pull_request_target',
+        () {
+      final triggers = triggerBlock(read('fdroid-lock-regen.yml'));
+      expect(triggers, contains('workflow_dispatch:'));
+      expect(triggers, isNot(contains('pull_request_target')),
+          reason: 'that trigger would run `pub get` — and therefore '
+              'arbitrary package build hooks — from an untrusted branch '
+              'with a write-scoped token');
+      expect(triggers, isNot(contains('pull_request:')),
+          reason: 'a Dependabot PR token is read-only — it could not push');
+    });
+
+    test('it pins the SAME Flutter as ci.yml — a lock resolved by another '
+        'SDK is not the one F-Droid reproduces', () {
+      final pin = RegExp('flutter-version:\\s*"([0-9.]+)"')
+          .firstMatch(read('ci.yml'))!
+          .group(1)!;
+      expect(read('fdroid-lock-regen.yml'),
+          contains('flutter-version: "$pin"'));
+    });
+
+    test('it verifies with the very step that fails in build-fdroid', () {
+      expect(read('fdroid-lock-regen.yml'),
+          contains('flutter pub get --enforce-lockfile'),
+          reason: 'regenerating without re-checking would let a bad lock '
+              'through and the PR would still be red');
+    });
+
+    test('build-fdroid names the fix when the lock is stale', () {
+      final yaml = read('fdroid.yml');
+      expect(yaml, contains('Regenerate fdroid lockfile'),
+          reason: 'the failure must point at the dispatch instead of '
+              'making the next person rediscover the cause');
+      expect(yaml, contains('#3806'));
+    });
+  });
+
 }
