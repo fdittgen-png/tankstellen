@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'libre_build.dart';
+
 class AppConstants {
   AppConstants._();
 
@@ -92,7 +94,12 @@ class AppConstants {
   /// this. The function MUST be deployed before the app flip ships, or every
   /// tile 404s — see `supabase/functions/tiles/README.md`. Set to empty to
   /// fall back to OSM-direct (see [effectiveTileUrl]). Not user-facing (URL).
-  static const String tileProxyUrl =
+  /// #3788 — empty on a [kLibreBuild] (F-Droid): that variant must reach
+  /// no developer-hosted service by default, and [effectiveTileUrl]
+  /// already falls back to OSM-direct for an empty proxy.
+  static const String tileProxyUrl = kLibreBuild ? '' : _developerTileProxy;
+
+  static const String _developerTileProxy =
       'https://klelxnkzrxlpzuddhpfg.supabase.co/functions/v1/tiles/{z}/{x}/{y}.png';
 
   /// The tile-URL template the app should actually use: the [tileProxyUrl]

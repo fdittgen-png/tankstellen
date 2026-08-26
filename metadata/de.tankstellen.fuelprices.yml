@@ -17,14 +17,6 @@
 # needs neither — and Summary/Description, which F-Droid reads from the
 # upstream fastlane/metadata structure instead).
 
-AntiFeatures:
-  NonFreeNet:
-    en-US: By default the map loads tiles through a developer-hosted proxy (a fixed
-      Supabase edge-function URL), and the optional community price reports / TankSync
-      features ship a default configuration (assets/tanksync_config.json) pointing
-      to the same developer-hosted Supabase instance. The server software is FOSS
-      and TankSync is designed for self-hosting (the app provides the SQL to run your
-      own instance), but the shipped defaults use the developer's instance.
 Categories:
   - Market & Price
 License: MIT
@@ -40,84 +32,6 @@ RepoType: git
 Repo: https://github.com/fdittgen-png/tankstellen.git
 
 Builds:
-  - versionName: 6.0.4
-    versionCode: 51371
-    commit: f85f238007aa7a85e6b52ebd24ac94604fb34051
-    output: build/app/outputs/flutter-apk/app-*-fdroid-release.apk
-    srclibs:
-      - flutter@stable
-    prebuild:
-      - flutterVersion=$(sed -n -E 's/.*flutter-version:\ "(.*)"/\1/p' .github/workflows/fdroid.yml)
-      - '[[ $flutterVersion ]]'
-      - git -C $$flutter$$ checkout -f $flutterVersion
-      - cp pubspec_overrides.fdroid.yaml pubspec_overrides.yaml
-      - cp pubspec.fdroid.lock pubspec.lock
-      - export PUB_CACHE=$(pwd)/.pub-cache
-      - $$flutter$$/bin/flutter config --no-analytics
-      - $$flutter$$/bin/flutter pub get --enforce-lockfile
-      - $$flutter$$/bin/dart run build_runner build --delete-conflicting-outputs
-    scandelete:
-      - .pub-cache
-      - third_party/google_mlkit_commons
-      - third_party/google_mlkit_text_recognition
-    build:
-      - export PUB_CACHE=$(pwd)/.pub-cache
-      - $$flutter$$/bin/flutter build apk --release --flavor fdroid --split-per-abi
-        --target-platform android-arm --build-number=$(( $$VERCODE$$ / 10 )) --dart-define=FORCE_LOCATION_MANAGER=true
-        --dart-define=FGS_FORM_APPROVED=true
-
-  - versionName: 6.0.4
-    versionCode: 51372
-    commit: f85f238007aa7a85e6b52ebd24ac94604fb34051
-    output: build/app/outputs/flutter-apk/app-*-fdroid-release.apk
-    srclibs:
-      - flutter@stable
-    prebuild:
-      - flutterVersion=$(sed -n -E 's/.*flutter-version:\ "(.*)"/\1/p' .github/workflows/fdroid.yml)
-      - '[[ $flutterVersion ]]'
-      - git -C $$flutter$$ checkout -f $flutterVersion
-      - cp pubspec_overrides.fdroid.yaml pubspec_overrides.yaml
-      - cp pubspec.fdroid.lock pubspec.lock
-      - export PUB_CACHE=$(pwd)/.pub-cache
-      - $$flutter$$/bin/flutter config --no-analytics
-      - $$flutter$$/bin/flutter pub get --enforce-lockfile
-      - $$flutter$$/bin/dart run build_runner build --delete-conflicting-outputs
-    scandelete:
-      - .pub-cache
-      - third_party/google_mlkit_commons
-      - third_party/google_mlkit_text_recognition
-    build:
-      - export PUB_CACHE=$(pwd)/.pub-cache
-      - $$flutter$$/bin/flutter build apk --release --flavor fdroid --split-per-abi
-        --target-platform android-arm64 --build-number=$(( $$VERCODE$$ / 10 )) --dart-define=FORCE_LOCATION_MANAGER=true
-        --dart-define=FGS_FORM_APPROVED=true
-
-  - versionName: 6.0.4
-    versionCode: 51373
-    commit: f85f238007aa7a85e6b52ebd24ac94604fb34051
-    output: build/app/outputs/flutter-apk/app-*-fdroid-release.apk
-    srclibs:
-      - flutter@stable
-    prebuild:
-      - flutterVersion=$(sed -n -E 's/.*flutter-version:\ "(.*)"/\1/p' .github/workflows/fdroid.yml)
-      - '[[ $flutterVersion ]]'
-      - git -C $$flutter$$ checkout -f $flutterVersion
-      - cp pubspec_overrides.fdroid.yaml pubspec_overrides.yaml
-      - cp pubspec.fdroid.lock pubspec.lock
-      - export PUB_CACHE=$(pwd)/.pub-cache
-      - $$flutter$$/bin/flutter config --no-analytics
-      - $$flutter$$/bin/flutter pub get --enforce-lockfile
-      - $$flutter$$/bin/dart run build_runner build --delete-conflicting-outputs
-    scandelete:
-      - .pub-cache
-      - third_party/google_mlkit_commons
-      - third_party/google_mlkit_text_recognition
-    build:
-      - export PUB_CACHE=$(pwd)/.pub-cache
-      - $$flutter$$/bin/flutter build apk --release --flavor fdroid --split-per-abi
-        --target-platform android-x64 --build-number=$(( $$VERCODE$$ / 10 )) --dart-define=FORCE_LOCATION_MANAGER=true
-        --dart-define=FGS_FORM_APPROVED=true
-
   - versionName: 6.0.5
     versionCode: 51381
     commit: 506fcf502d6d0d64f527b2f215f19cc8107361e1
@@ -142,7 +56,7 @@ Builds:
       - export PUB_CACHE=$(pwd)/.pub-cache
       - $$flutter$$/bin/flutter build apk --release --flavor fdroid --split-per-abi
         --target-platform android-arm --build-number=$(( $$VERCODE$$ / 10 )) --dart-define=FORCE_LOCATION_MANAGER=true
-        --dart-define=FGS_FORM_APPROVED=true
+        --dart-define=FGS_FORM_APPROVED=true --dart-define=FDROID_LIBRE=true
 
   - versionName: 6.0.5
     versionCode: 51382
@@ -168,7 +82,7 @@ Builds:
       - export PUB_CACHE=$(pwd)/.pub-cache
       - $$flutter$$/bin/flutter build apk --release --flavor fdroid --split-per-abi
         --target-platform android-arm64 --build-number=$(( $$VERCODE$$ / 10 )) --dart-define=FORCE_LOCATION_MANAGER=true
-        --dart-define=FGS_FORM_APPROVED=true
+        --dart-define=FGS_FORM_APPROVED=true --dart-define=FDROID_LIBRE=true
 
   - versionName: 6.0.5
     versionCode: 51383
@@ -194,7 +108,7 @@ Builds:
       - export PUB_CACHE=$(pwd)/.pub-cache
       - $$flutter$$/bin/flutter build apk --release --flavor fdroid --split-per-abi
         --target-platform android-x64 --build-number=$(( $$VERCODE$$ / 10 )) --dart-define=FORCE_LOCATION_MANAGER=true
-        --dart-define=FGS_FORM_APPROVED=true
+        --dart-define=FGS_FORM_APPROVED=true --dart-define=FDROID_LIBRE=true
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags ^v[0-9.]+$

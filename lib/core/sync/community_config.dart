@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../../core/logging/error_logger.dart';
+import '../constants/libre_build.dart';
 
 /// Pre-configured credentials for the TankSync community database.
 ///
@@ -41,6 +42,12 @@ class CommunityConfig {
     if (_loaded) return;
     _loaded = true;
 
+    // #3788 — a LIBRE build ships no developer-hosted default: skip the
+    // bundled credentials entirely so the community features start
+    // unconfigured and the user points them at their OWN Supabase
+    // project (the wizard's purpose). A `--dart-define` override still
+    // wins below, so the build stays configurable rather than crippled.
+    if (kLibreBuild) return;
     try {
       final jsonStr = await rootBundle.loadString('assets/tanksync_config.json');
       final config = json.decode(jsonStr) as Map<String, dynamic>;
