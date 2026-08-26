@@ -56,10 +56,7 @@ mixin _TripRecordingPinControls on ConsumerState<TripRecordingScreen> {
     final facade = ref.read(wakelockFacadeProvider);
     _cachedFacade = facade;
     await facade.disable();
-    await SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.manual,
-      overlays: SystemUiOverlay.values,
-    );
+    await EdgeToEdge.restore();
   }
 
   /// #2274 concern 1 — on a FRESH recording mount, honour the persisted

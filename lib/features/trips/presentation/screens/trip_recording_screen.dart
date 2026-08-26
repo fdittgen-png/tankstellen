@@ -41,6 +41,7 @@ import '../widgets/trip_recording_landscape_body.dart';
 import '../widgets/trip_save_progress.dart';
 import '../widgets/trip_start_progress.dart';
 import '../../../../core/error/guarded.dart';
+import '../../../../core/utils/edge_to_edge.dart';
 
 part 'trip_recording_screen_body.dart';
 part 'trip_recording_screen_build.dart';

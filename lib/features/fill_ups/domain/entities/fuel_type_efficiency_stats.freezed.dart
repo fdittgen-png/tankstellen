@@ -299,7 +299,22 @@ mixin _$FuelTypeEfficiencyStats {
 /// not set, or the interval opened on a non-plein first fill / a
 /// synthetic correction). 0 ⇒ every interval used the full v3
 /// carried-content composition (#3764, ADR 0015 v3).
- int get legacyAttributedIntervalCount;
+ int get legacyAttributedIntervalCount;/// Σ litres over this bucket's attributed intervals (#3828).
+///
+/// The aggregator has always summed this to derive [avgL100km] and then
+/// discarded it, which cost the screen its most comparable number: with
+/// litres AND [intervalCost] we can state the **price per litre** each
+/// fuel was actually bought at, instead of leaving the reader to infer
+/// why one fuel costs more per km while burning fewer litres.
+ double get totalLitres;/// Σ distance (km) over this bucket's attributed intervals (#3828).
+/// Says how much driving a row's verdict rests on.
+ double get totalDistanceKm;/// Σ cost over this bucket's attributed intervals (#3828).
+///
+/// NOT the same as [totalSpent]: that is every non-correction fill folded
+/// into the bucket, while this counts only the closed intervals the
+/// averages are computed from. Mixing them would produce a price per
+/// litre that disagrees with [avgCostPerKm].
+ double get intervalCost;
 /// Create a copy of FuelTypeEfficiencyStats
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -310,16 +325,16 @@ $FuelTypeEfficiencyStatsCopyWith<FuelTypeEfficiencyStats> get copyWith => _$Fuel
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FuelTypeEfficiencyStats&&(identical(other.bucket, bucket) || other.bucket == bucket)&&(identical(other.avgL100km, avgL100km) || other.avgL100km == avgL100km)&&(identical(other.avgCostPerKm, avgCostPerKm) || other.avgCostPerKm == avgCostPerKm)&&(identical(other.totalSpent, totalSpent) || other.totalSpent == totalSpent)&&(identical(other.fillCount, fillCount) || other.fillCount == fillCount)&&(identical(other.attributedIntervalCount, attributedIntervalCount) || other.attributedIntervalCount == attributedIntervalCount)&&(identical(other.legacyAttributedIntervalCount, legacyAttributedIntervalCount) || other.legacyAttributedIntervalCount == legacyAttributedIntervalCount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FuelTypeEfficiencyStats&&(identical(other.bucket, bucket) || other.bucket == bucket)&&(identical(other.avgL100km, avgL100km) || other.avgL100km == avgL100km)&&(identical(other.avgCostPerKm, avgCostPerKm) || other.avgCostPerKm == avgCostPerKm)&&(identical(other.totalSpent, totalSpent) || other.totalSpent == totalSpent)&&(identical(other.fillCount, fillCount) || other.fillCount == fillCount)&&(identical(other.attributedIntervalCount, attributedIntervalCount) || other.attributedIntervalCount == attributedIntervalCount)&&(identical(other.legacyAttributedIntervalCount, legacyAttributedIntervalCount) || other.legacyAttributedIntervalCount == legacyAttributedIntervalCount)&&(identical(other.totalLitres, totalLitres) || other.totalLitres == totalLitres)&&(identical(other.totalDistanceKm, totalDistanceKm) || other.totalDistanceKm == totalDistanceKm)&&(identical(other.intervalCost, intervalCost) || other.intervalCost == intervalCost));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,bucket,avgL100km,avgCostPerKm,totalSpent,fillCount,attributedIntervalCount,legacyAttributedIntervalCount);
+int get hashCode => Object.hash(runtimeType,bucket,avgL100km,avgCostPerKm,totalSpent,fillCount,attributedIntervalCount,legacyAttributedIntervalCount,totalLitres,totalDistanceKm,intervalCost);
 
 @override
 String toString() {
-  return 'FuelTypeEfficiencyStats(bucket: $bucket, avgL100km: $avgL100km, avgCostPerKm: $avgCostPerKm, totalSpent: $totalSpent, fillCount: $fillCount, attributedIntervalCount: $attributedIntervalCount, legacyAttributedIntervalCount: $legacyAttributedIntervalCount)';
+  return 'FuelTypeEfficiencyStats(bucket: $bucket, avgL100km: $avgL100km, avgCostPerKm: $avgCostPerKm, totalSpent: $totalSpent, fillCount: $fillCount, attributedIntervalCount: $attributedIntervalCount, legacyAttributedIntervalCount: $legacyAttributedIntervalCount, totalLitres: $totalLitres, totalDistanceKm: $totalDistanceKm, intervalCost: $intervalCost)';
 }
 
 
@@ -330,7 +345,7 @@ abstract mixin class $FuelTypeEfficiencyStatsCopyWith<$Res>  {
   factory $FuelTypeEfficiencyStatsCopyWith(FuelTypeEfficiencyStats value, $Res Function(FuelTypeEfficiencyStats) _then) = _$FuelTypeEfficiencyStatsCopyWithImpl;
 @useResult
 $Res call({
- FuelEfficiencyBucket bucket, double? avgL100km, double? avgCostPerKm, double totalSpent, int fillCount, int attributedIntervalCount, int legacyAttributedIntervalCount
+ FuelEfficiencyBucket bucket, double? avgL100km, double? avgCostPerKm, double totalSpent, int fillCount, int attributedIntervalCount, int legacyAttributedIntervalCount, double totalLitres, double totalDistanceKm, double intervalCost
 });
 
 
@@ -347,7 +362,7 @@ class _$FuelTypeEfficiencyStatsCopyWithImpl<$Res>
 
 /// Create a copy of FuelTypeEfficiencyStats
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? bucket = null,Object? avgL100km = freezed,Object? avgCostPerKm = freezed,Object? totalSpent = null,Object? fillCount = null,Object? attributedIntervalCount = null,Object? legacyAttributedIntervalCount = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? bucket = null,Object? avgL100km = freezed,Object? avgCostPerKm = freezed,Object? totalSpent = null,Object? fillCount = null,Object? attributedIntervalCount = null,Object? legacyAttributedIntervalCount = null,Object? totalLitres = null,Object? totalDistanceKm = null,Object? intervalCost = null,}) {
   return _then(_self.copyWith(
 bucket: null == bucket ? _self.bucket : bucket // ignore: cast_nullable_to_non_nullable
 as FuelEfficiencyBucket,avgL100km: freezed == avgL100km ? _self.avgL100km : avgL100km // ignore: cast_nullable_to_non_nullable
@@ -356,7 +371,10 @@ as double?,totalSpent: null == totalSpent ? _self.totalSpent : totalSpent // ign
 as double,fillCount: null == fillCount ? _self.fillCount : fillCount // ignore: cast_nullable_to_non_nullable
 as int,attributedIntervalCount: null == attributedIntervalCount ? _self.attributedIntervalCount : attributedIntervalCount // ignore: cast_nullable_to_non_nullable
 as int,legacyAttributedIntervalCount: null == legacyAttributedIntervalCount ? _self.legacyAttributedIntervalCount : legacyAttributedIntervalCount // ignore: cast_nullable_to_non_nullable
-as int,
+as int,totalLitres: null == totalLitres ? _self.totalLitres : totalLitres // ignore: cast_nullable_to_non_nullable
+as double,totalDistanceKm: null == totalDistanceKm ? _self.totalDistanceKm : totalDistanceKm // ignore: cast_nullable_to_non_nullable
+as double,intervalCost: null == intervalCost ? _self.intervalCost : intervalCost // ignore: cast_nullable_to_non_nullable
+as double,
   ));
 }
 /// Create a copy of FuelTypeEfficiencyStats
@@ -450,10 +468,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( FuelEfficiencyBucket bucket,  double? avgL100km,  double? avgCostPerKm,  double totalSpent,  int fillCount,  int attributedIntervalCount,  int legacyAttributedIntervalCount)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( FuelEfficiencyBucket bucket,  double? avgL100km,  double? avgCostPerKm,  double totalSpent,  int fillCount,  int attributedIntervalCount,  int legacyAttributedIntervalCount,  double totalLitres,  double totalDistanceKm,  double intervalCost)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FuelTypeEfficiencyStats() when $default != null:
-return $default(_that.bucket,_that.avgL100km,_that.avgCostPerKm,_that.totalSpent,_that.fillCount,_that.attributedIntervalCount,_that.legacyAttributedIntervalCount);case _:
+return $default(_that.bucket,_that.avgL100km,_that.avgCostPerKm,_that.totalSpent,_that.fillCount,_that.attributedIntervalCount,_that.legacyAttributedIntervalCount,_that.totalLitres,_that.totalDistanceKm,_that.intervalCost);case _:
   return orElse();
 
 }
@@ -471,10 +489,10 @@ return $default(_that.bucket,_that.avgL100km,_that.avgCostPerKm,_that.totalSpent
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( FuelEfficiencyBucket bucket,  double? avgL100km,  double? avgCostPerKm,  double totalSpent,  int fillCount,  int attributedIntervalCount,  int legacyAttributedIntervalCount)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( FuelEfficiencyBucket bucket,  double? avgL100km,  double? avgCostPerKm,  double totalSpent,  int fillCount,  int attributedIntervalCount,  int legacyAttributedIntervalCount,  double totalLitres,  double totalDistanceKm,  double intervalCost)  $default,) {final _that = this;
 switch (_that) {
 case _FuelTypeEfficiencyStats():
-return $default(_that.bucket,_that.avgL100km,_that.avgCostPerKm,_that.totalSpent,_that.fillCount,_that.attributedIntervalCount,_that.legacyAttributedIntervalCount);case _:
+return $default(_that.bucket,_that.avgL100km,_that.avgCostPerKm,_that.totalSpent,_that.fillCount,_that.attributedIntervalCount,_that.legacyAttributedIntervalCount,_that.totalLitres,_that.totalDistanceKm,_that.intervalCost);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -491,10 +509,10 @@ return $default(_that.bucket,_that.avgL100km,_that.avgCostPerKm,_that.totalSpent
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( FuelEfficiencyBucket bucket,  double? avgL100km,  double? avgCostPerKm,  double totalSpent,  int fillCount,  int attributedIntervalCount,  int legacyAttributedIntervalCount)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( FuelEfficiencyBucket bucket,  double? avgL100km,  double? avgCostPerKm,  double totalSpent,  int fillCount,  int attributedIntervalCount,  int legacyAttributedIntervalCount,  double totalLitres,  double totalDistanceKm,  double intervalCost)?  $default,) {final _that = this;
 switch (_that) {
 case _FuelTypeEfficiencyStats() when $default != null:
-return $default(_that.bucket,_that.avgL100km,_that.avgCostPerKm,_that.totalSpent,_that.fillCount,_that.attributedIntervalCount,_that.legacyAttributedIntervalCount);case _:
+return $default(_that.bucket,_that.avgL100km,_that.avgCostPerKm,_that.totalSpent,_that.fillCount,_that.attributedIntervalCount,_that.legacyAttributedIntervalCount,_that.totalLitres,_that.totalDistanceKm,_that.intervalCost);case _:
   return null;
 
 }
@@ -506,7 +524,7 @@ return $default(_that.bucket,_that.avgL100km,_that.avgCostPerKm,_that.totalSpent
 
 
 class _FuelTypeEfficiencyStats extends FuelTypeEfficiencyStats {
-  const _FuelTypeEfficiencyStats({required this.bucket, this.avgL100km, this.avgCostPerKm, required this.totalSpent, required this.fillCount, required this.attributedIntervalCount, this.legacyAttributedIntervalCount = 0}): super._();
+  const _FuelTypeEfficiencyStats({required this.bucket, this.avgL100km, this.avgCostPerKm, required this.totalSpent, required this.fillCount, required this.attributedIntervalCount, this.legacyAttributedIntervalCount = 0, this.totalLitres = 0, this.totalDistanceKm = 0, this.intervalCost = 0}): super._();
   
 
 /// The composition bucket this row aggregates (pure or mix — ADR 0015).
@@ -533,6 +551,24 @@ class _FuelTypeEfficiencyStats extends FuelTypeEfficiencyStats {
 /// synthetic correction). 0 ⇒ every interval used the full v3
 /// carried-content composition (#3764, ADR 0015 v3).
 @override@JsonKey() final  int legacyAttributedIntervalCount;
+/// Σ litres over this bucket's attributed intervals (#3828).
+///
+/// The aggregator has always summed this to derive [avgL100km] and then
+/// discarded it, which cost the screen its most comparable number: with
+/// litres AND [intervalCost] we can state the **price per litre** each
+/// fuel was actually bought at, instead of leaving the reader to infer
+/// why one fuel costs more per km while burning fewer litres.
+@override@JsonKey() final  double totalLitres;
+/// Σ distance (km) over this bucket's attributed intervals (#3828).
+/// Says how much driving a row's verdict rests on.
+@override@JsonKey() final  double totalDistanceKm;
+/// Σ cost over this bucket's attributed intervals (#3828).
+///
+/// NOT the same as [totalSpent]: that is every non-correction fill folded
+/// into the bucket, while this counts only the closed intervals the
+/// averages are computed from. Mixing them would produce a price per
+/// litre that disagrees with [avgCostPerKm].
+@override@JsonKey() final  double intervalCost;
 
 /// Create a copy of FuelTypeEfficiencyStats
 /// with the given fields replaced by the non-null parameter values.
@@ -544,16 +580,16 @@ _$FuelTypeEfficiencyStatsCopyWith<_FuelTypeEfficiencyStats> get copyWith => __$F
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FuelTypeEfficiencyStats&&(identical(other.bucket, bucket) || other.bucket == bucket)&&(identical(other.avgL100km, avgL100km) || other.avgL100km == avgL100km)&&(identical(other.avgCostPerKm, avgCostPerKm) || other.avgCostPerKm == avgCostPerKm)&&(identical(other.totalSpent, totalSpent) || other.totalSpent == totalSpent)&&(identical(other.fillCount, fillCount) || other.fillCount == fillCount)&&(identical(other.attributedIntervalCount, attributedIntervalCount) || other.attributedIntervalCount == attributedIntervalCount)&&(identical(other.legacyAttributedIntervalCount, legacyAttributedIntervalCount) || other.legacyAttributedIntervalCount == legacyAttributedIntervalCount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FuelTypeEfficiencyStats&&(identical(other.bucket, bucket) || other.bucket == bucket)&&(identical(other.avgL100km, avgL100km) || other.avgL100km == avgL100km)&&(identical(other.avgCostPerKm, avgCostPerKm) || other.avgCostPerKm == avgCostPerKm)&&(identical(other.totalSpent, totalSpent) || other.totalSpent == totalSpent)&&(identical(other.fillCount, fillCount) || other.fillCount == fillCount)&&(identical(other.attributedIntervalCount, attributedIntervalCount) || other.attributedIntervalCount == attributedIntervalCount)&&(identical(other.legacyAttributedIntervalCount, legacyAttributedIntervalCount) || other.legacyAttributedIntervalCount == legacyAttributedIntervalCount)&&(identical(other.totalLitres, totalLitres) || other.totalLitres == totalLitres)&&(identical(other.totalDistanceKm, totalDistanceKm) || other.totalDistanceKm == totalDistanceKm)&&(identical(other.intervalCost, intervalCost) || other.intervalCost == intervalCost));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,bucket,avgL100km,avgCostPerKm,totalSpent,fillCount,attributedIntervalCount,legacyAttributedIntervalCount);
+int get hashCode => Object.hash(runtimeType,bucket,avgL100km,avgCostPerKm,totalSpent,fillCount,attributedIntervalCount,legacyAttributedIntervalCount,totalLitres,totalDistanceKm,intervalCost);
 
 @override
 String toString() {
-  return 'FuelTypeEfficiencyStats(bucket: $bucket, avgL100km: $avgL100km, avgCostPerKm: $avgCostPerKm, totalSpent: $totalSpent, fillCount: $fillCount, attributedIntervalCount: $attributedIntervalCount, legacyAttributedIntervalCount: $legacyAttributedIntervalCount)';
+  return 'FuelTypeEfficiencyStats(bucket: $bucket, avgL100km: $avgL100km, avgCostPerKm: $avgCostPerKm, totalSpent: $totalSpent, fillCount: $fillCount, attributedIntervalCount: $attributedIntervalCount, legacyAttributedIntervalCount: $legacyAttributedIntervalCount, totalLitres: $totalLitres, totalDistanceKm: $totalDistanceKm, intervalCost: $intervalCost)';
 }
 
 
@@ -564,7 +600,7 @@ abstract mixin class _$FuelTypeEfficiencyStatsCopyWith<$Res> implements $FuelTyp
   factory _$FuelTypeEfficiencyStatsCopyWith(_FuelTypeEfficiencyStats value, $Res Function(_FuelTypeEfficiencyStats) _then) = __$FuelTypeEfficiencyStatsCopyWithImpl;
 @override @useResult
 $Res call({
- FuelEfficiencyBucket bucket, double? avgL100km, double? avgCostPerKm, double totalSpent, int fillCount, int attributedIntervalCount, int legacyAttributedIntervalCount
+ FuelEfficiencyBucket bucket, double? avgL100km, double? avgCostPerKm, double totalSpent, int fillCount, int attributedIntervalCount, int legacyAttributedIntervalCount, double totalLitres, double totalDistanceKm, double intervalCost
 });
 
 
@@ -581,7 +617,7 @@ class __$FuelTypeEfficiencyStatsCopyWithImpl<$Res>
 
 /// Create a copy of FuelTypeEfficiencyStats
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? bucket = null,Object? avgL100km = freezed,Object? avgCostPerKm = freezed,Object? totalSpent = null,Object? fillCount = null,Object? attributedIntervalCount = null,Object? legacyAttributedIntervalCount = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? bucket = null,Object? avgL100km = freezed,Object? avgCostPerKm = freezed,Object? totalSpent = null,Object? fillCount = null,Object? attributedIntervalCount = null,Object? legacyAttributedIntervalCount = null,Object? totalLitres = null,Object? totalDistanceKm = null,Object? intervalCost = null,}) {
   return _then(_FuelTypeEfficiencyStats(
 bucket: null == bucket ? _self.bucket : bucket // ignore: cast_nullable_to_non_nullable
 as FuelEfficiencyBucket,avgL100km: freezed == avgL100km ? _self.avgL100km : avgL100km // ignore: cast_nullable_to_non_nullable
@@ -590,7 +626,10 @@ as double?,totalSpent: null == totalSpent ? _self.totalSpent : totalSpent // ign
 as double,fillCount: null == fillCount ? _self.fillCount : fillCount // ignore: cast_nullable_to_non_nullable
 as int,attributedIntervalCount: null == attributedIntervalCount ? _self.attributedIntervalCount : attributedIntervalCount // ignore: cast_nullable_to_non_nullable
 as int,legacyAttributedIntervalCount: null == legacyAttributedIntervalCount ? _self.legacyAttributedIntervalCount : legacyAttributedIntervalCount // ignore: cast_nullable_to_non_nullable
-as int,
+as int,totalLitres: null == totalLitres ? _self.totalLitres : totalLitres // ignore: cast_nullable_to_non_nullable
+as double,totalDistanceKm: null == totalDistanceKm ? _self.totalDistanceKm : totalDistanceKm // ignore: cast_nullable_to_non_nullable
+as double,intervalCost: null == intervalCost ? _self.intervalCost : intervalCost // ignore: cast_nullable_to_non_nullable
+as double,
   ));
 }
 

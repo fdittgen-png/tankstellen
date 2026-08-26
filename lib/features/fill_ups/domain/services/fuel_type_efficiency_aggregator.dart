@@ -363,6 +363,12 @@ class _BucketAcc {
       fillCount: fillCount,
       attributedIntervalCount: attributedIntervalCount,
       legacyAttributedIntervalCount: legacyAttributedIntervalCount,
+      // #3828 — these three were summed here and then dropped on the floor.
+      // Surfacing them is what lets the screen state price per litre and
+      // distance driven instead of only the two derived averages.
+      totalLitres: intervalLitres,
+      totalDistanceKm: intervalDistance,
+      intervalCost: intervalCost,
     );
   }
 }

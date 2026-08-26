@@ -32,4 +32,26 @@ class EdgeToEdge {
     unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
     SystemChrome.setSystemUIOverlayStyle(overlayStyle);
   }
+
+  /// Restores the app's normal look after a screen went immersive (#3827).
+  ///
+  /// Every screen that hides the bars has to put them back, and six of them
+  /// did it with
+  ///
+  /// ```dart
+  /// SystemChrome.setEnabledSystemUIMode(
+  ///   SystemUiMode.manual, overlays: SystemUiOverlay.values);
+  /// ```
+  ///
+  /// which re-shows the bars but leaves edge-to-edge OFF and never re-applies
+  /// [overlayStyle]. Android then paints the status bar opaque black, and
+  /// because nothing else ever calls [enable] again, that survives leaving the
+  /// screen — the whole app stayed black-topped until restart.
+  ///
+  /// `manual` is not the inverse of `edgeToEdge`; [enable] is. This is that
+  /// inverse, in one place, so the seventh screen cannot get it wrong.
+  static Future<void> restore() async {
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(overlayStyle);
+  }
 }

@@ -289,11 +289,7 @@ mixin _TripRecordingLifecycle on _TripRecordingBuild {
       if (facade != null) {
         unawaited(facade.disable());
       }
-      unawaited(
-        SystemChrome.setEnabledSystemUIMode(
-          SystemUiMode.manual,
-          overlays: SystemUiOverlay.values,
-        ),
+      unawaited(EdgeToEdge.restore(),
       );
     }
     unawaited(_coachEventsSub?.cancel());

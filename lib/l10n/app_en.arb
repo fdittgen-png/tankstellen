@@ -2676,6 +2676,88 @@
   "@consumptionStatsChartConsumption": {
     "description": "Title of the monthly average L/100km evolution bar chart on the consumption-statistics page; months without a closed plein-to-plein window are skipped (#2698)."
   },
+  "fuelCompareSectionTitle": "Cost of driving, fuel by fuel",
+  "@fuelCompareSectionTitle": {
+    "description": "Section title above the per-fuel efficiency comparison on the consumption statistics screen (#3828)."
+  },
+  "fuelComparePricePerLitre": "Paid per litre",
+  "@fuelComparePricePerLitre": {
+    "description": "Label for the average pump price actually paid for a fuel, over the attributed full-tank intervals (#3828)."
+  },
+  "fuelCompareCostPer100km": "Cost per 100 km",
+  "@fuelCompareCostPer100km": {
+    "description": "Label for the cost of driving 100 km on a fuel — the per-km figure restated in a unit people reason in (#3828)."
+  },
+  "fuelCompareDistance": "Distance measured",
+  "@fuelCompareDistance": {
+    "description": "Label for how many km of driving a fuel's figures are based on (#3828)."
+  },
+  "fuelCompareLitres": "Litres burned",
+  "@fuelCompareLitres": {
+    "description": "Label for the total litres of a fuel burned over the attributed intervals (#3828)."
+  },
+  "fuelCompareVerdictCheaper": "{winner} is your cheapest fuel to drive on",
+  "@fuelCompareVerdictCheaper": {
+    "description": "Headline verdict naming the fuel with the lowest cost per km (#3828). {winner} is a fuel label such as E85.",
+    "placeholders": {
+      "winner": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelCompareVerdictDelta": "{loser} costs {amount} more per 1000 km",
+  "@fuelCompareVerdictDelta": {
+    "description": "States the gap between a fuel and the cheapest one, per 1000 km (#3828). {amount} is a formatted currency amount.",
+    "placeholders": {
+      "loser": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelCompareBreakEven": "{fuel} beats {rival} below {price} per litre",
+  "@fuelCompareBreakEven": {
+    "description": "The pump price at which a fuel would match the cheapest one, given both measured consumptions (#3828).",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "rival": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelCompareBreakEvenExplain": "Break-even is calculated from each fuel's measured consumption, so it moves as your driving does.",
+  "@fuelCompareBreakEvenExplain": {
+    "description": "Caption explaining where the break-even price comes from (#3828)."
+  },
+  "fuelCompareLitresVsCostNote": "Litres and cost can disagree: a fuel can burn fewer litres per 100 km and still cost more per kilometre, because the pump price differs. Cost per kilometre is the verdict.",
+  "@fuelCompareLitresVsCostNote": {
+    "description": "Caption shown when one fuel has the lower L/100 km but the higher cost per km, so the two numbers do not appear to contradict each other (#3828)."
+  },
+  "fuelCompareProvisional": "Provisional — based on {count, plural, =1{one full tank} other{{count} full tanks}}",
+  "@fuelCompareProvisional": {
+    "description": "Confidence marker on a fuel row computed from fewer than two full-tank intervals (#3828).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fuelCompareBasedOn": "Based on {count, plural, =1{one full tank} other{{count} full tanks}}",
+  "@fuelCompareBasedOn": {
+    "description": "Confidence marker on a fuel row with enough full-tank intervals to be trusted (#3828).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "consumptionStatsOpenWindowBanner": "{count, plural, =1{1 partial fill pending plein complet — not in average} other{{count} partial fills pending plein complet — not in average}}",
   "@consumptionStatsOpenWindowBanner": {
     "description": "Banner shown above the consumption stats card when one or more partial fill-ups have been logged after the most recent plein-complet (#1362). The fills are excluded from the L/100km average until the next plein-complet closes the window.",

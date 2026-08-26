@@ -76,7 +76,12 @@ void main() {
   }) async {
     await pumpApp(
       tester,
-      const FuelTypeEfficiencyCard(),
+      // #3828 — pump inside a scrollable, which is how the card is actually
+      // used: consumption_statistics_screen.dart puts it in a ListView. A
+      // bare Scaffold gives the card the screen's exact height, so the card
+      // growing by a few lines reads as a RenderFlex overflow rather than as
+      // the scrolling content it really is. Assertions are unchanged.
+      const SingleChildScrollView(child: FuelTypeEfficiencyCard()),
       overrides: [
         activeVehicleProfileProvider.overrideWith(() => _FakeActive(vehicle)),
         fuelTypeEfficiencyComparisonProvider.overrideWithValue(data),

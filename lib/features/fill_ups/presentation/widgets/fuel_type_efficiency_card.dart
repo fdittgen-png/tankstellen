@@ -16,6 +16,7 @@ import 'localized_fuel_name.dart';
 import '../../../../core/utils/unit_formatter.dart';
 
 part 'fuel_type_efficiency_rows.dart';
+part 'fuel_type_efficiency_analysis.dart';
 
 /// Per-fuel-composition cost-per-km comparison card (#2928, Epic #2881).
 ///
@@ -97,6 +98,11 @@ class FuelTypeEfficiencyCard extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
             ],
+            // #3828 — the analytical half: verdict, cost gap per 1000 km,
+            // break-even pump price, and the caption for when litres and
+            // cost point in opposite directions. Self-hides below two
+            // measured buckets, so a single-fuel history is unchanged.
+            _EfficiencyAnalysis(stats: withFills),
             if (winner == null) ...[
               const SizedBox(height: 2),
               _Footnote(text: l.fuelEfficiencyInsufficientData),

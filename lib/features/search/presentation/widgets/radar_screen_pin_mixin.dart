@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../trips/api.dart';
+import '../../../../core/utils/edge_to_edge.dart';
 
 /// #2677 / #2785 — the radar-screen pin: a wake lock + immersive system bars
 /// so the closest-station readout stays readable on a dashboard mount. Mirrors
@@ -59,10 +60,7 @@ mixin RadarScreenPinMixin<T extends ConsumerStatefulWidget>
     final facade = ref.read(wakelockFacadeProvider);
     _cachedFacade = facade;
     await facade.disable();
-    await SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.manual,
-      overlays: SystemUiOverlay.values,
-    );
+    await EdgeToEdge.restore();
   }
 
   /// Best-effort release on dispose (must stay sync). Call from `dispose`.
@@ -70,11 +68,7 @@ mixin RadarScreenPinMixin<T extends ConsumerStatefulWidget>
     if (!pinned) return;
     final facade = _cachedFacade;
     if (facade != null) unawaited(facade.disable());
-    unawaited(
-      SystemChrome.setEnabledSystemUIMode(
-        SystemUiMode.manual,
-        overlays: SystemUiOverlay.values,
-      ),
+    unawaited(EdgeToEdge.restore(),
     );
   }
 }
