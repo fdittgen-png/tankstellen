@@ -1,0 +1,88 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
+name: iOS TestFlight Status
+
+# #3814 — report what App Store Connect ACTUALLY thinks of recent builds.
+#
+# pilot printing "Successfully distributed build to External testers 🚀" means
+# the build was assigned to the group and submitted. It is NOT evidence that a
+# tester can install it: external distribution is gated on Beta App Review, and
+# nothing in CI ever observed that state. That blind spot let the `extern` group
+# sit on a seven-week-old build (v6.0.0) while ~50 newer builds uploaded
+# "successfully".
+#
+# Read-only: this lane mutates nothing, sends no invite, and touches no build.
+# API-only, so ubuntu-latest — no macOS runner needed.
+
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'How many recent builds to report (newest first)'
+        required: false
+        type: string
+        default: '15'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-testflight-status
+  cancel-in-progress: false
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Decode App Store Connect API key
+        # Same decode step as ios-testers.yml / ios-testflight.yml: the base64
+        # secret becomes a temp .p8 that the Fastfile's `asc_api_key` helper
+        # picks up via ASC_API_KEY_FILEPATH.
+        env:
+          ASC_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+        run: |
+          if [ -z "$ASC_KEY_BASE64" ]; then
+            echo "::error::APP_STORE_CONNECT_API_KEY_BASE64 secret is not set." >&2
+            exit 1
+          fi
+          KEY_PATH="$RUNNER_TEMP/asc-api-key.p8"
+          echo "$ASC_KEY_BASE64" | base64 --decode > "$KEY_PATH"
+          echo "ASC_API_KEY_FILEPATH=$KEY_PATH" >> "$GITHUB_ENV"
+
+      - name: fastlane testflight_status
+        working-directory: ios
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          FASTLANE_DISABLE_COLORS: '1'
+        run: |
+          set -o pipefail
+          bundle exec fastlane testflight_status \
+            limit:"${{ inputs.limit || '15' }}" 2>&1 | tee /tmp/tf-status.log
+
+      - name: Clean up decoded API key
+        if: always()
+        run: rm -f "$ASC_API_KEY_FILEPATH"
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## iOS TestFlight build status"
+            echo ""
+            echo '```'
+            # Keep only the lane's own report lines; fastlane's banner and the
+            # bundler chatter would bury the one table this exists to show.
+            sed -n '/=== Beta groups ===/,$p' /tmp/tf-status.log 2>/dev/null \
+              | sed 's/^\[[^]]*\]: //' | head -100 || echo "(no report captured)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
