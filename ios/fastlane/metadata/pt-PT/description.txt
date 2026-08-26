@@ -1,31 +1,39 @@
-O Sparkilo encontra o combustível e o carregamento de carro elétrico mais baratos perto de si e depois ajuda-o a gastar menos ao volante. De código aberto (MIT), sem publicidade, sem conta, privacidade em primeiro lugar. Preços oficiais em tempo real em 17 países, em 23 idiomas.
+10 cêntimos de diferença por litro parecem pouco. Multiplique-os por um depósito cheio e depois por cada abastecimento do ano: é isso que vale mesmo escolher a bomba certa.
 
-ENCONTRE O PREÇO MAIS BARATO
-- Uma única pesquisa para postos por perto ou ao longo da sua rota. Filtre por tipo de combustível, raio, aberto agora, serviços e só autoestrada.
-- Preços em tempo real da fonte oficial de dados abertos de cada país, mais carregamento EV via Open Charge Map.
-- Marcadores de preço do mais barato ao mais caro num mapa claro. Em rota, as melhores paragens levam um selo "O mais barato".
-- Favoritos para combustível (todos os preços) e carregadores EV (kW, conectores, disponibilidade em direto).
-- Alertas de preço, por posto ou por raio, calculados no seu dispositivo e a disparar quando um bom negócio está perto de si.
+O Sparkilo mostra-lhe qual a estação perto de si mais barata neste momento, a partir dos dados oficiais de preços de cada país. E depois ajuda-o a gastar menos do que abasteceu.
 
-CONDUZA MELHOR, POUPE EM DOBRO
-- Acompanhamento de consumo: nível do depósito e autonomia, l/100 km médio, custo médio por km, gasto total e histórico completo de abastecimentos. Adicione abastecimentos à mão ou faça OCR da bomba ou do recibo.
-- Painel de carbono: custo e CO2 por extensão da viagem e por velocidade.
-- Livro de viagens: registe à mão, mãos-livres por adaptador OBD2/ELM327, ou só GPS. A sua rota GPS é colorida segundo a eficiência.
-- A condução económica deteta hábitos de desperdício com histogramas de acelerador e rotações, uma comparação mês a mês e um mapa de todas as viagens.
-- Calculadora de custo de combustível, vários perfis de condutor e predefinições Básico / Médio / Completo para que a app seja tão simples ou tão completa quanto quiser.
+Grátis. Sem anúncios, sem conta, sem rastreio, código aberto.
 
-NA ESTRADA
-- O preço em direto do posto para onde se dirige aparece ao aproximar-se.
-- Widget no ecrã inicial para favoritos e postos mais próximos.
-- Anúncios por voz leem os preços enquanto conduz.
+PORQUE PODE CONFIAR
+• Preços oficiais em dados abertos, país a país — não estimativas da comunidade que o mandam dar uma volta em vão.
+• Gasolina, gasóleo, GPL, GNC, E85 e carregamento elétrico num só mapa, numa só pesquisa.
+• Mais barato primeiro: os marcadores vão do mais barato ao mais caro e o vencedor tem um emblema Mais barato.
+• A sua posição GPS e as suas chaves de API nunca saem do dispositivo. Sem anúncios, sem conta, sem rastreio — e o código é público.
 
-PRIVACIDADE EM PRIMEIRO LUGAR
-- Sem conta, sem publicidade, sem rastreio. A sua posição GPS e quaisquer chaves API nunca saem do dispositivo.
-- Painel de Privacidade: veja, exporte ou apague tudo a qualquer momento.
-- TankSync opcional para sincronizar favoritos, veículos, abastecimentos e alertas entre dispositivos num servidor que controla.
+POUPE NO PREÇO
+• Procure perto de si ou ao longo de todo o seu percurso. Filtre por combustível, raio, aberto agora, serviços e apenas autoestrada.
+• O modo percurso encontra a melhor paragem no seu corredor de viagem, para que o desvio compense sempre.
+• Alertas de preço, por estação ou por raio, calculados no seu dispositivo e disparados só quando o negócio está mesmo perto.
+• Os favoritos mostram todos os preços num relance; os carregadores indicam kW, conectores e disponibilidade em direto.
 
-PAÍSES SUPORTADOS
-Alemanha, Argentina, Austrália, Áustria, Chile, Coreia do Sul, Dinamarca, Eslovénia, Espanha, França, Grécia, Itália, Luxemburgo, México, Portugal, Reino Unido e Roménia.
+E DEPOIS NOS LITROS
+• Registo de consumo: nível e autonomia, média de L/100 km, custo por km, gasto total e histórico de abastecimentos com diferenças.
+• Registe os abastecimentos à mão ou digitalize o visor da bomba ou o talão com OCR.
+• O diário de bordo grava em mãos-livres através de um adaptador OBD2 ELM327, ou apenas por GPS, e colore o percurso conforme a eficiência.
+• O eco-coaching transforma os histogramas de acelerador e rotações em hábitos que consegue mesmo mudar, mês após mês.
+• Painel de CO2: custo e CO2 discriminados por duração da viagem e escalão de velocidade.
 
-CÓDIGO ABERTO
-O Sparkilo está licenciado sob MIT. O código-fonte completo, a documentação de implementação e as traduções vivem no GitHub. Problemas e contribuições — incluindo novas fontes de país — são bem-vindos.
+AO VOLANTE
+• Sobreposição com o preço em direto da estação para onde se dirige.
+• Widget no ecrã principal para favoritos e estações próximas, além de anúncios de voz com os preços.
+• As predefinições Básico, Médio e Completo mantêm a app tão simples ou tão completa quanto quiser. Suporta vários perfis de condutor.
+
+OS SEUS DADOS CONTINUAM SEUS
+• Painel de privacidade: ver, exportar ou apagar tudo, a qualquer momento.
+• O TankSync, opcional, sincroniza favoritos, veículos, abastecimentos e alertas para um servidor que controla — não o nosso.
+
+PAÍSES COM PREÇOS OFICIAIS EM DIRETO
+Áustria, Argentina, Austrália, Chile, Dinamarca, França, Alemanha, Grécia, Itália, Luxemburgo, México, Portugal, Roménia, Eslovénia, Coreia do Sul, Espanha e Reino Unido. Carregamento elétrico em todo o mundo através do Open Charge Map.
+
+23 idiomas. Código aberto (MIT):
+https://github.com/fdittgen-png/tankstellen

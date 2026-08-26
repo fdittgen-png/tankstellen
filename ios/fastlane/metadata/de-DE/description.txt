@@ -1,31 +1,39 @@
-Sparkilo findet den günstigsten Kraftstoff und die billigste EV-Ladung in Ihrer Nähe und hilft Ihnen, am Steuer weniger zu verbrauchen. Open Source (MIT), werbefrei, ohne Konto, Datenschutz zuerst. Echtzeitpreise aus 17 Ländern, in 23 Sprachen.
+10 Cent Unterschied pro Liter klingen nach wenig. Rechnen Sie sie auf eine volle Tankfüllung hoch, dann auf jede Tankfüllung dieses Jahres — genau so viel ist die richtige Tankstelle wert.
 
-DEN GÜNSTIGSTEN PREIS FINDEN
-- Eine Suche für Stationen in der Nähe oder entlang Ihrer Route. Filtern nach Kraftstoffart, Radius, jetzt geöffnet, Ausstattung und nur Autobahn.
-- Echtzeitpreise aus der offiziellen Open-Data-Quelle jedes Landes, plus EV-Laden über Open Charge Map.
-- Preis-Pins von günstig bis teuer auf einer klaren Karte. Auf einer Route tragen die besten Stopps das Abzeichen Günstigste.
-- Favoriten für Kraftstoff (alle Preise) und EV-Ladesäulen (kW, Stecker, Live-Verfügbarkeit).
-- Preisalarme pro Station oder nach Radius, auf Ihrem Gerät berechnet, und ausgelöst, wenn ein gutes Angebot in Ihrer Nähe ist.
+Sparkilo zeigt Ihnen, welche Tankstelle in Ihrer Nähe gerade am günstigsten ist, aus den offiziellen Preisdaten des jeweiligen Landes. Und danach hilft es Ihnen, weniger davon zu verbrauchen.
 
-KLÜGER FAHREN, DOPPELT SPAREN
-- Verbrauchsanalyse: Tankfüllstand und Reichweite, Durchschnitt L/100km, Durchschnittskosten pro km, Gesamtausgaben und vollständige Tank-Historie. Tankungen von Hand erfassen oder Zapfsäule/Beleg per OCR scannen.
-- CO2-Dashboard: Kosten und CO2 aufgeschlüsselt nach Streckenlänge und Geschwindigkeitsbereich.
-- Fahrtenbuch: von Hand aufzeichnen, freihändig über einen OBD2/ELM327-Adapter oder nur per GPS. Ihre GPS-Route wird nach Effizienz eingefärbt.
-- Eco-Coaching zeigt verschwenderische Gewohnheiten mit Gas- und Drehzahl-Histogrammen, einem Monatsvergleich und einer Karte aller Fahrten.
-- Spritkosten-Rechner, mehrere Fahrerprofile und die Voreinstellungen Basic / Medium / Full, damit die App so einfach oder so tief bleibt, wie Sie möchten.
+Kostenlos. Keine Werbung, kein Konto, kein Tracking, Open Source.
 
-UNTERWEGS
-- Die Annäherungs-Anzeige zeigt den Live-Preis der Station, auf die Sie zufahren.
-- Startbildschirm-Widget für Favoriten und die nächstgelegenen Stationen.
-- Sprachansagen lesen die Preise vor, während Sie fahren.
+WARUM SIE SICH DARAUF VERLASSEN KÖNNEN
+• Offizielle Open-Data-Preise, Land für Land — keine Community-Schätzungen, die Sie zu einem sinnlosen Umweg schicken.
+• Benzin, Diesel, LPG, CNG, E85 und Ladesäulen auf einer Karte, in einer Suche.
+• Günstigste zuerst: Preis-Pins sind von günstig nach teuer eingefärbt, die beste trägt ein Günstigste-Abzeichen.
+• Ihre GPS-Position und Ihre API-Schlüssel verlassen das Gerät nie. Keine Werbung, kein Konto, kein Tracking — und der Quellcode ist öffentlich.
 
-DATENSCHUTZ ZUERST
-- Kein Konto, keine Werbung, kein Tracking. Ihre GPS-Position und alle API-Schlüssel verlassen niemals Ihr Gerät.
-- Datenschutz-Dashboard: alles jederzeit einsehen, exportieren oder löschen.
-- Optionales TankSync für die geräteübergreifende Synchronisation von Favoriten, Fahrzeugen, Tankungen und Alarmen auf einen Server, den Sie selbst kontrollieren.
+SPAREN SIE BEIM PREIS
+• Suchen Sie in der Nähe oder entlang Ihrer gesamten Route. Filtern Sie nach Kraftstoff, Umkreis, jetzt geöffnet, Ausstattung und nur Autobahn.
+• Der Routenmodus findet den besten Stopp in Ihrem Reisekorridor, damit sich der Umweg auch lohnt.
+• Preisalarme, pro Tankstelle oder im Umkreis, werden auf dem Gerät berechnet und lösen nur aus, wenn ein Angebot wirklich in Ihrer Nähe ist.
+• Favoriten zeigen jeden Kraftstoffpreis auf einen Blick, Ladesäulen kW, Stecker und Live-Verfügbarkeit.
 
-ABGEDECKTE LÄNDER
-Österreich, Argentinien, Australien, Chile, Dänemark, Frankreich, Deutschland, Griechenland, Italien, Luxemburg, Mexiko, Portugal, Rumänien, Slowenien, Südkorea, Spanien und das Vereinigte Königreich.
+UND DANN BEI DEN LITERN
+• Verbrauchs-Tracker: Tankfüllstand und Reichweite, Durchschnitt l/100 km, Kosten pro km, Gesamtausgaben und eine Tankhistorie mit Veränderungen.
+• Tankvorgänge von Hand erfassen oder Zapfsäulen-Display bzw. Beleg per OCR scannen.
+• Das Fahrtenbuch zeichnet freihändig über einen OBD2-ELM327-Adapter oder nur per GPS auf und färbt Ihre Route nach Effizienz.
+• Eco-Coaching macht aus Gaspedal- und Drehzahl-Histogrammen Gewohnheiten, die Sie wirklich ändern können, Monat für Monat vergleichbar.
+• CO2-Dashboard: Kosten und CO2 nach Fahrtlänge und Geschwindigkeitsbereich.
 
-OPEN SOURCE
-Sparkilo ist unter MIT lizenziert. Der vollständige Quellcode, die Deployment-Dokumentation und Übersetzungen finden Sie auf GitHub. Beiträge und neue Länderquellen sind willkommen.
+WÄHREND DER FAHRT
+• Live-Preis-Overlay für die Tankstelle, auf die Sie zufahren.
+• Homescreen-Widget für Favoriten und Tankstellen in der Nähe, dazu gesprochene Preisansagen.
+• Die Voreinstellungen Basis, Mittel und Voll halten die App so einfach oder so tief, wie Sie möchten. Mehrere Fahrerprofile möglich.
+
+IHRE DATEN BLEIBEN IHRE
+• Privatsphäre-Dashboard: alles jederzeit einsehen, exportieren oder löschen.
+• Optionales TankSync synchronisiert Favoriten, Fahrzeuge, Tankvorgänge und Alarme auf einen Server, den Sie kontrollieren — nicht auf unseren.
+
+LÄNDER MIT OFFIZIELLEN LIVE-PREISEN
+Österreich, Argentinien, Australien, Chile, Dänemark, Frankreich, Deutschland, Griechenland, Italien, Luxemburg, Mexiko, Portugal, Rumänien, Slowenien, Südkorea, Spanien und das Vereinigte Königreich. Ladesäulen weltweit über Open Charge Map.
+
+23 Sprachen. Open Source (MIT):
+https://github.com/fdittgen-png/tankstellen
