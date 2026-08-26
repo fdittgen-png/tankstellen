@@ -782,6 +782,43 @@ platform :ios do
       end
     end
 
+    # Roster of every EXTERNAL group. The builds are attached and the reporting
+    # address is a member, yet its phone is offered nothing newer — so the
+    # remaining question is WHICH identity is actually entitled. An invite that
+    # was never accepted leaves a tester listed but empty-handed, and a build
+    # installed in July may belong to a different Apple ID entirely.
+    UI.important("=== External group rosters ===")
+    groups.reject(&:is_internal_group).each do |g|
+      UI.message("  --- #{g.name} ---")
+      begin
+        roster = Spaceship::ConnectAPI::BetaTester.all(
+          filter: { betaGroups: g.id }, limit: 200
+        )
+        roster.each_with_index do |t, i|
+          bits = %w[email first_name last_name state invite_type].map do |attr|
+            begin
+              t.respond_to?(attr) ? "#{attr}=#{t.public_send(attr).inspect}" : nil
+            rescue StandardError => e
+              "#{attr}=!#{e.class}"
+            end
+          end.compact
+          UI.message("    #{bits.join(' ')}")
+          # Dump the raw attribute surface once: `state` kept coming back as
+          # "?" and guessing the accessor name has already cost round-trips.
+          if i.zero?
+            raw = begin
+              t.instance_variables.map { |v| "#{v}=#{t.instance_variable_get(v).inspect}" }.join(' ')
+            rescue StandardError => e
+              "!#{e.class}"
+            end
+            UI.message("      [raw] #{raw[0, 900]}")
+          end
+        end
+      rescue StandardError => e
+        UI.error("    roster failed: #{e.class}: #{e.message}")
+      end
+    end
+
     # Named tester lookup — an address can be a group member yet sit in a state
     # that never yields a build (e.g. an invite that was never accepted).
     email = options[:tester] || ENV["TESTFLIGHT_STATUS_TESTER"]
