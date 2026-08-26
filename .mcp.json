@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "dart": {
+      "command": "dart",
+      "args": [
+        "mcp-server",
+        "--exclude-tool", "dart_format",
+        "--exclude-tool", "dart_fix"
+      ]
+    },
+    "adb": {
+      "command": "npx",
+      "args": ["-y", "adb-mcp"],
+      "env": {
+        "PATH": "${HOME}/android-toolchain/sdk/platform-tools:/opt/homebrew/bin:/usr/bin:/bin",
+        "ANDROID_HOME": "${HOME}/android-toolchain/sdk"
+      }
+    },
+    "ocr": {
+      "command": "${HOME}/.claude/mcp-venvs/ocr/bin/mcp-ocr",
+      "env": { "PATH": "/opt/homebrew/bin:/usr/bin:/bin" }
+    }
+  }
+}
