@@ -1032,10 +1032,10 @@ packages:
     dependency: "direct main"
     description:
       name: image
-      sha256: "6300175e00616bbc832e2fc91bfa4d776af5402c81c7151bee6905bb08473c52"
+      sha256: "1976370a4df3091bb0f72409c187ad1f9132a818bc6b95ca59c0bae1c75c688e"
       url: "https://pub.dev"
     source: hosted
-    version: "4.9.1"
+    version: "4.9.2"
   image_picker:
     dependency: "direct main"
     description:
@@ -1410,10 +1410,10 @@ packages:
     dependency: "direct main"
     description:
       name: pdfx
-      sha256: "29db9b71d46bf2335e001f91693f2c3fbbf0760e4c2eb596bf4bafab211471c1"
+      sha256: "83bcd2b971fc2f6ee4299659c96d7d66b2ba4807748571a8a4889f1cde14b754"
       url: "https://pub.dev"
     source: hosted
-    version: "2.9.2"
+    version: "2.11.0"
   permission_handler:
     dependency: "direct main"
     description:
@@ -2206,18 +2206,18 @@ packages:
     dependency: "direct main"
     description:
       name: workmanager
-      sha256: "06fc5bdd83e2da35f33b682e25167245d0ccb8b56e9a9ada5bfa079fa3af4b9c"
+      sha256: c2c7a3eb984cfcf5623308042fc8270e7e02f5021b34f491ffc0a1ec8e281d5c
       url: "https://pub.dev"
     source: hosted
-    version: "0.10.7"
+    version: "0.10.9"
   workmanager_android:
     dependency: transitive
     description:
       name: workmanager_android
-      sha256: f89029cbcf0695c772287aa8fbbd7af776f1ea63bc95b60a00617f69468ddaa0
+      sha256: "187d1d34864f57f9e388b33b88c001c494093c53679831a3dec2e8176e8829d1"
       url: "https://pub.dev"
     source: hosted
-    version: "0.10.6"
+    version: "0.10.8"
   workmanager_apple:
     dependency: transitive
     description:
