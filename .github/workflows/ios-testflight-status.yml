@@ -23,6 +23,11 @@ on:
         required: false
         type: string
         default: '15'
+      tester:
+        description: 'Optional tester email to look up (state + group membership)'
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -67,7 +72,8 @@ jobs:
         run: |
           set -o pipefail
           bundle exec fastlane testflight_status \
-            limit:"${{ inputs.limit || '15' }}" 2>&1 | tee /tmp/tf-status.log
+            limit:"${{ inputs.limit || '15' }}" \
+            tester:"${{ inputs.tester }}" 2>&1 | tee /tmp/tf-status.log
 
       - name: Clean up decoded API key
         if: always()
