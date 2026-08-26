@@ -677,4 +677,86 @@ platform :ios do
       skip_metadata: false,
     )
   end
+
+  desc "#3814 — report what App Store Connect ACTUALLY thinks of recent builds."
+  desc "Read-only diagnosis. pilot's 'Successfully distributed build to External"
+  desc "testers' only means the build was assigned to the group and submitted;"
+  desc "an external tester can install it only once Beta App Review approves it,"
+  desc "and nothing in CI observed that — which is how the extern group sat on a"
+  desc "seven-week-old build unnoticed. Prints per build: version, CFBundleVersion,"
+  desc "processing state, expiry, internal/external build state, beta-review state"
+  desc "and the beta groups it is attached to. Optional `limit` (default 15)."
+  lane :testflight_status do |options|
+    limit = (options[:limit] || ENV["TESTFLIGHT_STATUS_LIMIT"] || 15).to_i
+
+    Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.from(hash: asc_api_key)
+    app = Spaceship::ConnectAPI::App.find("de.tankstellen.tankstellen")
+    UI.user_error!("Could not find app de.tankstellen.tankstellen on App Store Connect.") if app.nil?
+
+    # Group membership first — "which builds is the extern group entitled to"
+    # is meaningless without knowing the group exists and has testers.
+    UI.important("=== Beta groups ===")
+    app.get_beta_groups.each do |g|
+      kind = g.is_internal_group ? "internal" : "external"
+      testers = begin
+        g.get_beta_testers.count
+      rescue StandardError => e
+        "?(#{e.class})"
+      end
+      UI.message("  #{g.name} (#{kind}) — #{testers} tester(s)")
+    end
+
+    # `includes` is best-effort: the association names have moved between
+    # spaceship versions, and a diagnostic that dies on an unknown include
+    # is worse than one that falls back to per-build lookups.
+    builds = begin
+      Spaceship::ConnectAPI::Build.all(
+        app_id: app.id,
+        sort: "-uploadedDate",
+        limit: limit,
+        includes: "preReleaseVersion,buildBetaDetail,betaAppReviewSubmission,betaGroups",
+      )
+    rescue StandardError => e
+      UI.important("Rich include failed (#{e.class}: #{e.message}) — retrying bare.")
+      Spaceship::ConnectAPI::Build.all(app_id: app.id, sort: "-uploadedDate", limit: limit)
+    end
+
+    UI.important("=== Last #{builds.count} build(s), newest first ===")
+    builds.each do |b|
+      # Every accessor is guarded: this lane's job is to REPORT state, so one
+      # missing association must not cost us the whole report.
+      safe = lambda do |label, &blk|
+        begin
+          v = blk.call
+          v.nil? ? "#{label}=-" : "#{label}=#{v}"
+        rescue StandardError => e
+          "#{label}=!#{e.class}"
+        end
+      end
+
+      version = safe.call("v") { b.pre_release_version&.version }
+      number = safe.call("build") { b.version }
+      processing = safe.call("processing") { b.processing_state }
+      expired = safe.call("expired") { b.expired }
+      uploaded = safe.call("uploaded") { b.uploaded_date }
+      external = safe.call("externalState") { b.build_beta_detail&.external_build_state }
+      internal = safe.call("internalState") { b.build_beta_detail&.internal_build_state }
+      review = safe.call("betaReview") { b.beta_app_review_submission&.beta_review_state }
+      groups = safe.call("groups") do
+        gs = b.get_beta_groups
+        gs.nil? || gs.empty? ? "(none)" : gs.map(&:name).join("|")
+      end
+
+      UI.message("  #{version} #{number} #{uploaded}")
+      UI.message("      #{processing} #{expired} #{internal} #{external} #{review}")
+      UI.message("      #{groups}")
+    end
+
+    UI.important("=== How to read this ===")
+    UI.message("An external tester can install a build only when its")
+    UI.message("externalState is READY_FOR_BETA_TESTING (or betaReview is")
+    UI.message("APPROVED) AND the extern group is listed under groups.")
+    UI.message("WAITING_FOR_BETA_REVIEW / IN_BETA_REVIEW / REJECTED all look")
+    UI.message("like a successful upload in the CI log but ship nothing.")
+  end
 end
