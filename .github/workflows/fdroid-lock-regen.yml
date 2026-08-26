@@ -59,7 +59,7 @@ jobs:
           channel: stable
           # Same pin as ci.yml — a lockfile resolved by a different SDK
           # would not be the one the F-Droid buildserver reproduces.
-          flutter-version: "3.41.9"
+          flutter-version: "3.44.9"
           cache: true
 
       - name: Regenerate pubspec.fdroid.lock

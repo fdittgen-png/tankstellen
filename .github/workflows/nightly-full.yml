@@ -43,7 +43,7 @@ jobs:
           # stable bumps, producing spurious red that masks real
           # regressions and spams #1591. Keep this value identical to
           # the ci.yml pin; bump both together, never by drift.
-          flutter-version: "3.41.9"
+          flutter-version: "3.44.9"
           cache: true
       - uses: actions/cache@v6
         with:
