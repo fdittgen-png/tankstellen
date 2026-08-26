@@ -89,6 +89,21 @@ class Obd2CommDiagnostics {
     );
   }
 
+  /// Open a session ONLY when none is live — the reused-link case
+  /// (#3808).
+
+  /// [beginSession] runs inside `Obd2Service.connect()`, so a trip that
+  /// starts on an already-connected link (#3527 KEEP-LINK) never opened
+  /// one, `captureForTrip()` returned null, and the health card told the
+  /// user to do two things they had already done. Never discards a live
+  /// session, so the dial path keeps its connect transcript.
+  void beginSessionIfAbsent({String? linkKind, String? redactedMac}) {
+    if (!enabled || _current != null) return;
+    beginSession(linkKind: linkKind, redactedMac: redactedMac);
+  }
+  /// Whether a live session is open (test seam + the guard above).
+  bool get hasLiveSession => _current != null;
+
   /// Stamp the adapter identity discovered during the handshake. No-op
   /// when disabled or before [beginSession].
   ///

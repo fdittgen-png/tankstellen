@@ -23,6 +23,7 @@ import 'obd2_breadcrumb_provider.dart';
 import 'obd2_controller_phase_mapper.dart';
 import 'obd2_reconnect_provider.dart';
 import 'obd2_supervised_teardown.dart';
+import '../data/obd2_comm_diagnostics.dart';
 
 /// Concrete OBD2 recording strategy (#2227) behind the [RecordingPipeline]
 /// seam (#2190): owns the [Obd2Service], the [TripRecordingController] +
@@ -107,6 +108,13 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     // #3527 — the one supervisor owns the link; this pipeline owns the trip.
     _service = service;
     _capabilityReconcileKicked = false; // #2261 — re-arm the probe.
+    // #3808 — a trip REUSING the kept-alive link never calls connect(),
+    // so it had no comm-diagnostics session and the health card claimed
+    // "no OBD2 session" on a good recording. No-op on the dial path.
+    Obd2CommDiagnostics.instance.beginSessionIfAbsent(
+      linkKind: service.linkKind,
+      redactedMac: redactObd2Mac(service.adapterMac),
+    );
     // #1312 — snapshot adapter identity NOW (stop disconnects pre-save).
     _adapterMac = service.adapterMac;
     _adapterName = service.adapterName;
@@ -121,10 +129,9 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     final breadcrumbs = _ref.read(obd2BreadcrumbsProvider.notifier);
     breadcrumbs.clear();
     service.breadcrumbCollector = breadcrumbs;
-    // #1422 — catalog match → engine-tech η_v default (null on no-match).
-    final matchedReference = tryMatchReferenceVehicle(_ref, activeVehicle);
-    // #2506 — shared GPS-physics live-estimate + coaching folder (null
-    // vehicle/matrix → population defaults).
+    final matchedReference = // #1422 — catalog η_v default; null on miss.
+        tryMatchReferenceVehicle(_ref, activeVehicle);
+    // #2506 — GPS-physics estimate + coaching folder.
     final gpsEstimateFolder = GpsLiveEstimateFolder.forVehicle(
       activeVehicle,
       activeVehicle?.gpsCalibration,
@@ -303,8 +310,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
         : TripTerminationReason.userStopped));
     final termination = ctl.termination;
     final sessionJournal = ctl.sessionJournal;
-    // #2548 — staged save-progress, beat 1 (odometer + summary).
-    _host.setSaveStage(TripSaveStage.finalizingSummary);
+    _host.setSaveStage(TripSaveStage.finalizingSummary); // #2548 beat 1
     try {
       await ctl.refreshOdometer();
     } catch (e, st) {
@@ -312,23 +318,19 @@ class Obd2RecordingPipeline implements RecordingPipeline {
         'where': 'Obd2RecordingPipeline.stop: refreshOdometer failed'
       }));
     }
-    // Snapshot the captured-samples buffer BEFORE stop() tears down the
-    // controller — else the trip-detail charts render empty (#1040).
+    // #1040/#1458 — snapshot both buffers BEFORE stop() tears the
+    // controller down, else the trip-detail charts render empty.
     final capturedSamples = List<TripSample>.unmodifiable(ctl.capturedSamples);
-    // #1458 phase 2 — snapshot GPS cadence diagnostics BEFORE teardown (same
-    // reason); always captured (empty when GPS off).
     final capturedGpsDiagnostics = List<GpsSampleDiagnostic>.unmodifiable(
       ctl.capturedGpsSampleDiagnostics,
     );
-    // #2431 — back-fill consumption from the GPS-physics estimate when the
-    // adapter+ECU supported no fuel PID; a no-op when real fuel was seen.
+    // #2431 — GPS-estimate back-fill when no fuel PID; no-op otherwise.
     final filled = Obd2GpsEstimateFallback.fillWhenNoFuelPid(
       summary: await ctl.stop(),
       samples: capturedSamples,
       vehicle: _readActiveVehicle(),
     );
-    // #3500 — harvest the IMU fusion (counts + the #2895 veto, as the
-    // GPS-only pipeline does); torn down before the summary persists.
+    // #3500 — harvest the IMU fusion before the summary persists.
     final imuFusion = _imuFusion;
     _imuFusion = null;
     await imuFusion?.stop();
@@ -337,8 +339,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
         : imuFusion.applyTo(filled.summary);
     final odometerStartKm = ctl.odometerStartKm;
     final odometerLatestKm = ctl.odometerLatestKm;
-    // #2509 — GPS-fix count BEFORE teardown: lets the guard keep a real
-    // dead-OBD2 GPS-tracked drive apart from a stationary stop.
+    // #2509 — fix count BEFORE teardown (stationary-discard guard).
     final gpsFixCount = ctl.gpsFixCount;
     await _liveSub?.cancel();
     _liveSub = null;
@@ -389,8 +390,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     // trip end (see obd2_supervised_teardown.dart for the rationale).
     await teardownServiceRespectingSupervisor(_ref, svc);
     _service = null;
-    // #1303 — trip finalised; clear the WAL so recovery doesn't resurrect it.
-    await _host.clearActiveSnapshot();
+    await _host.clearActiveSnapshot(); // #1303 — no resurrection
     _host.state = _host.state.copyWith(phase: TripRecordingPhase.finished);
     return StoppedTripResult(
       summary: summary,
