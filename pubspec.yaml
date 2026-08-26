@@ -125,7 +125,7 @@ dependencies:
   supabase_flutter: ^2.17.2
   wakelock_plus: ^1.7.0
   app_badge_plus: ^1.3.4
-  archive: ^4.0.9
+  archive: ^4.2.0
   # User-driven .zip picker for the full-backup RESTORE flow (#2571).
   # file_selector over file_picker: no runtime storage permission on
   # Android (it routes through the Storage Access Framework document
