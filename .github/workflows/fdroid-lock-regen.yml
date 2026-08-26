@@ -1,0 +1,116 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
+name: Regenerate fdroid lockfile
+
+# #3806 — one dispatch instead of a manual local dance.
+#
+# The F-Droid flavour pins its OWN lockfile: `pubspec.fdroid.lock` is
+# resolved with `pubspec_overrides.fdroid.yaml`, which swaps the
+# GMS / ML-Kit / Play-Core / Sentry plugins for libre stubs. Dependabot
+# only ever updates `pubspec.lock`, so the fdroid lock goes stale and the
+# `build-fdroid` job fails on
+#
+#     flutter pub get --enforce-lockfile
+#     -> Unable to satisfy `pubspec.yaml` using `pubspec.lock`.
+#
+# Nothing about the bump is wrong — a derived file simply was not
+# regenerated. This has now bitten on #3352, #3563, #3773 and #3804.
+#
+# ## Why dispatch-only, deliberately
+#
+# The obvious "just run it on the PR" needs `pull_request_target`,
+# because a Dependabot PR's own token is read-only. That combination
+# would run `flutter pub get` — and therefore arbitrary package BUILD
+# HOOKS — from an untrusted branch with a write-scoped token. That is a
+# supply-chain foot-gun in exchange for a few minutes of convenience, so
+# a human stays in the loop: you read the bump, then dispatch this.
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to regenerate on (e.g. a dependabot/pub/... branch)'
+        required: true
+        type: string
+
+concurrency:
+  group: fdroid-lock-regen-${{ inputs.branch }}
+  cancel-in-progress: false
+
+jobs:
+  regen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      # Required to push the regenerated lockfile back onto the branch.
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.branch }}
+          # A PAT-free push back to the same branch; the default token
+          # suffices because this workflow runs from a TRUSTED ref (the
+          # dispatch always uses the workflow file on the default branch).
+          persist-credentials: true
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          # Same pin as ci.yml — a lockfile resolved by a different SDK
+          # would not be the one the F-Droid buildserver reproduces.
+          flutter-version: "3.41.9"
+          cache: true
+
+      - name: Regenerate pubspec.fdroid.lock
+        run: |
+          set -euo pipefail
+          cp pubspec.lock /tmp/main.lock
+          # Resolve WITH the libre overrides — that combination is what
+          # the fdroid lock has to describe.
+          dart run tool/apply_fdroid_overrides.dart
+          flutter pub get
+          cp pubspec.lock pubspec.fdroid.lock
+          # Restore the normal flavour so only the fdroid lock is staged.
+          cp /tmp/main.lock pubspec.lock
+          rm -f pubspec_overrides.yaml
+
+      - name: Verify the regenerated lock satisfies the fdroid flavour
+        run: |
+          set -euo pipefail
+          # This is EXACTLY the build-fdroid step that was failing, so a
+          # green run here means the PR's job will pass too.
+          cp pubspec.lock /tmp/main.lock
+          dart run tool/apply_fdroid_overrides.dart
+          flutter pub get --enforce-lockfile
+          cp /tmp/main.lock pubspec.lock
+          rm -f pubspec_overrides.yaml
+
+      - name: Commit + push if the lock changed
+        env:
+          BRANCH: ${{ inputs.branch }}
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- pubspec.fdroid.lock; then
+            echo "pubspec.fdroid.lock already up to date — nothing to push."
+            echo "### fdroid lock already current on \`$BRANCH\`" \
+              >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pubspec.fdroid.lock
+          # Single-line subject + body via repeated -m: a raw multi-line
+          # string here would break out of this YAML block scalar.
+          git commit \
+            -m "build(deps): regenerate pubspec.fdroid.lock" \
+            -m "The F-Droid flavour pins its own lockfile and Dependabot only updates pubspec.lock, so build-fdroid's pub get --enforce-lockfile fails until this derived file is regenerated (#3806)."
+          git push origin "HEAD:$BRANCH"
+          {
+            echo "### Regenerated \`pubspec.fdroid.lock\` on \`$BRANCH\`"
+            echo ""
+            echo '```'
+            git diff HEAD~1 --stat -- pubspec.fdroid.lock
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

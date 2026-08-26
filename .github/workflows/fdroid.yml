@@ -70,7 +70,15 @@ jobs:
       # #3507 — enforce the committed LIBRE lockfile (pubspec.fdroid.lock,
       # swapped in by the apply tool): a dependency bump that forgets to
       # regenerate it fails HERE, not on F-Droid's buildserver.
-      - run: flutter pub get --enforce-lockfile
+      # #3806 — and when it does fail, say how to fix it: the cause is a
+      # DERIVED file left stale by Dependabot (which only updates
+      # pubspec.lock), not anything wrong with the bump.
+      - name: Enforce the libre lockfile
+        run: |
+          if ! flutter pub get --enforce-lockfile; then
+            echo "::error title=pubspec.fdroid.lock is stale::The F-Droid flavour pins its own lockfile and Dependabot only updates pubspec.lock. Fix it with one dispatch: Actions -> 'Regenerate fdroid lockfile' -> branch=${{ github.head_ref || github.ref_name }} (#3806)."
+            exit 1
+          fi
       - run: dart run build_runner build --delete-conflicting-outputs
       # Build the keyless-unsigned RELEASE fdroid APK with the GMS-free
       # runtime config (#3480 — release, not debug: only R8 strips the dead
