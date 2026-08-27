@@ -53,7 +53,7 @@ mixin RadarScreenPinMixin<T extends ConsumerStatefulWidget>
     final facade = ref.read(wakelockFacadeProvider);
     _cachedFacade = facade;
     await facade.enable();
-    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    // #3843 — wake lock only; see EdgeToEdge for why immersive was dropped.
   }
 
   Future<void> _disable() async {
