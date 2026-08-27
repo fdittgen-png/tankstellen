@@ -2279,7 +2279,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Pillanatnyi fogyasztás';
 
   @override
-  String get minimalDriveBehaviour => 'Driving behaviour';
+  String get minimalDriveBehaviour => 'Vezetési stílus';
 
   @override
   String get coachingShiftUp => 'Sebességet feljebb';
@@ -4559,7 +4559,7 @@ class AppLocalizationsHu extends AppLocalizations {
       'Nem sikerült exportálni az elemzési nyomkövetést.';
 
   @override
-  String get minimalDriveTripAverage => 'Trip average';
+  String get minimalDriveTripAverage => 'Út átlaga';
 
   @override
   String insightUpshiftCruise(String pctTime, String liters) {

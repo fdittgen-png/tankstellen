@@ -2269,7 +2269,7 @@ class AppLocalizationsNb extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Øyeblikksforbruk';
 
   @override
-  String get minimalDriveBehaviour => 'Driving behaviour';
+  String get minimalDriveBehaviour => 'Kjørestil';
 
   @override
   String get coachingShiftUp => 'Gir opp';
@@ -4530,7 +4530,7 @@ class AppLocalizationsNb extends AppLocalizations {
       'Kunne ikke eksportere analysesporingen.';
 
   @override
-  String get minimalDriveTripAverage => 'Trip average';
+  String get minimalDriveTripAverage => 'Turgjennomsnitt';
 
   @override
   String insightUpshiftCruise(String pctTime, String liters) {

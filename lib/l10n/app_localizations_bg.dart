@@ -2283,7 +2283,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Моментен разход';
 
   @override
-  String get minimalDriveBehaviour => 'Driving behaviour';
+  String get minimalDriveBehaviour => 'Стил на шофиране';
 
   @override
   String get coachingShiftUp => 'Превключи нагоре';
@@ -4563,7 +4563,7 @@ class AppLocalizationsBg extends AppLocalizations {
       'Трасиращият запис не можа да се експортира.';
 
   @override
-  String get minimalDriveTripAverage => 'Trip average';
+  String get minimalDriveTripAverage => 'Средно за курса';
 
   @override
   String insightUpshiftCruise(String pctTime, String liters) {

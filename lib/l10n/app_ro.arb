@@ -4653,11 +4653,7 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "minimalDriveTripAverage": "Trip average",
-  "@minimalDriveTripAverage": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
+  "minimalDriveTripAverage": "Media călătoriei",
   "insightUpshiftCruise": "High-RPM cruising ({pctTime}% of trip): shifting up earlier could save {liters} L",
   "@insightUpshiftCruise": {
     "x-mt": "needs-native-review",
@@ -5777,9 +5773,5 @@
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
   },
-  "minimalDriveBehaviour": "Driving behaviour",
-  "@minimalDriveBehaviour": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  }
+  "minimalDriveBehaviour": "Stil de condus"
 }

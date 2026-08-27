@@ -2270,7 +2270,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Momentanförbrukning';
 
   @override
-  String get minimalDriveBehaviour => 'Driving behaviour';
+  String get minimalDriveBehaviour => 'Körstil';
 
   @override
   String get coachingShiftUp => 'Växla upp';
@@ -4531,7 +4531,7 @@ class AppLocalizationsSv extends AppLocalizations {
       'Kunde inte exportera analysspårningen.';
 
   @override
-  String get minimalDriveTripAverage => 'Trip average';
+  String get minimalDriveTripAverage => 'Resegenomsnitt';
 
   @override
   String insightUpshiftCruise(String pctTime, String liters) {

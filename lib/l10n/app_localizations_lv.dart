@@ -2281,7 +2281,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Momentānais patēriņš';
 
   @override
-  String get minimalDriveBehaviour => 'Driving behaviour';
+  String get minimalDriveBehaviour => 'Braukšanas stils';
 
   @override
   String get coachingShiftUp => 'Pārslēgt augšup';
@@ -4557,7 +4557,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get drivingTraceExportFailed => 'Nevarēja eksportēt analīzes pēdu.';
 
   @override
-  String get minimalDriveTripAverage => 'Trip average';
+  String get minimalDriveTripAverage => 'Brauciena vidējais';
 
   @override
   String insightUpshiftCruise(String pctTime, String liters) {

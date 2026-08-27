@@ -2268,7 +2268,7 @@ class AppLocalizationsFi extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Hetkellinen kulutus';
 
   @override
-  String get minimalDriveBehaviour => 'Driving behaviour';
+  String get minimalDriveBehaviour => 'Ajotapa';
 
   @override
   String get coachingShiftUp => 'Vaihda ylös';
@@ -4533,7 +4533,7 @@ class AppLocalizationsFi extends AppLocalizations {
   String get drivingTraceExportFailed => 'Analyysijälkeä ei voitu viedä.';
 
   @override
-  String get minimalDriveTripAverage => 'Trip average';
+  String get minimalDriveTripAverage => 'Matkan keskiarvo';
 
   @override
   String insightUpshiftCruise(String pctTime, String liters) {

@@ -2281,7 +2281,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Consumo instantâneo';
 
   @override
-  String get minimalDriveBehaviour => 'Driving behaviour';
+  String get minimalDriveBehaviour => 'Estilo de condução';
 
   @override
   String get coachingShiftUp => 'Subir mudança';
@@ -4561,7 +4561,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Não foi possível exportar o rastreio de análise.';
 
   @override
-  String get minimalDriveTripAverage => 'Trip average';
+  String get minimalDriveTripAverage => 'Média da viagem';
 
   @override
   String insightUpshiftCruise(String pctTime, String liters) {
