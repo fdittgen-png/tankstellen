@@ -3936,52 +3936,52 @@ class AppLocalizationsHu extends AppLocalizations {
   String get consumptionStatsChartConsumption => 'L/100km havonta';
 
   @override
-  String get fuelCompareSectionTitle => 'Cost of driving, fuel by fuel';
+  String get fuelCompareSectionTitle => 'Vezetési költség üzemanyagonként';
 
   @override
-  String get fuelComparePricePerLitre => 'Paid per litre';
+  String get fuelComparePricePerLitre => 'Fizetett literenként';
 
   @override
-  String get fuelCompareCostPer100km => 'Cost per 100 km';
+  String get fuelCompareCostPer100km => 'Költség 100 km-enként';
 
   @override
-  String get fuelCompareDistance => 'Distance measured';
+  String get fuelCompareDistance => 'Mért távolság';
 
   @override
-  String get fuelCompareLitres => 'Litres burned';
+  String get fuelCompareLitres => 'Elfogyasztott liter';
 
   @override
   String fuelCompareVerdictCheaper(String winner) {
-    return '$winner is your cheapest fuel to drive on';
+    return 'A(z) $winner a legolcsóbb üzemanyagod a vezetéshez';
   }
 
   @override
   String fuelCompareVerdictDelta(String loser, String amount) {
-    return '$loser costs $amount more per 1000 km';
+    return 'A(z) $loser $amount-val többe kerül 1000 km-enként';
   }
 
   @override
   String fuelCompareBreakEven(String fuel, String rival, String price) {
-    return '$fuel beats $rival below $price per litre';
+    return 'A(z) $fuel legyőzi a(z) $rival üzemanyagot $price literár alatt';
   }
 
   @override
   String get fuelCompareBreakEvenExplain =>
-      'Break-even is calculated from each fuel\'s measured consumption, so it moves as your driving does.';
+      'A fordulópontot az egyes üzemanyagok mért fogyasztásából számoljuk, így a vezetéseddel együtt mozog.';
 
   @override
   String get fuelCompareLitresVsCostNote =>
-      'Litres and cost can disagree: a fuel can burn fewer litres per 100 km and still cost more per kilometre, because the pump price differs. Cost per kilometre is the verdict.';
+      'A liter és a költség ellentmondhat egymásnak: egy üzemanyag fogyaszthat kevesebb litert 100 km-en, és mégis többe kerülhet kilométerenként, mert más a literár. A kilométerenkénti költség dönt.';
 
   @override
   String fuelCompareProvisional(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count full tanks',
-      one: 'one full tank',
+      other: '$count teli tank',
+      one: 'egy teli tank',
     );
-    return 'Provisional — based on $_temp0';
+    return 'Ideiglenes — $_temp0 alapján';
   }
 
   @override
@@ -3989,28 +3989,28 @@ class AppLocalizationsHu extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count full tanks',
-      one: 'one full tank',
+      other: '$count teli tank',
+      one: 'Egy teli tank',
     );
-    return 'Based on $_temp0';
+    return '$_temp0 alapján';
   }
 
   @override
-  String get fuelCompareCo2Per100km => 'CO2 per 100 km';
+  String get fuelCompareCo2Per100km => 'CO2 100 km-enként';
 
   @override
   String fuelCompareCleanest(String winner) {
-    return '$winner is your lowest-emission fuel';
+    return 'A(z) $winner a legkisebb kibocsátású üzemanyagod';
   }
 
   @override
   String fuelCompareTradeoff(String fuel, String money, String co2) {
-    return '$fuel costs $money more per 1000 km but emits $co2 less CO2';
+    return 'A(z) $fuel $money-val többe kerül 1000 km-enként, de $co2-val kevesebb CO2-t bocsát ki';
   }
 
   @override
   String fuelCompareTradeoffBoth(String fuel, String rival) {
-    return '$fuel is both cheaper and cleaner than $rival';
+    return 'A(z) $fuel egyszerre olcsóbb és tisztább, mint a(z) $rival';
   }
 
   @override
@@ -4022,16 +4022,16 @@ class AppLocalizationsHu extends AppLocalizations {
     String rival,
     String saved,
   ) {
-    return 'Your $distance on $fuel emitted $actual instead of $alternative on $rival — $saved avoided';
+    return 'A(z) $fuel üzemanyaggal megtett $distance $actual kibocsátással járt $alternative helyett a(z) $rival esetén — $saved megtakarítva';
   }
 
   @override
   String get fuelCompareCo2Source =>
-      'CO2 figures are well-to-wheel estimates (EU JEC WTW v5) applied to your measured consumption — awareness, not audit-grade accounting.';
+      'A CO2-értékek kúttól a kerékig becslések (EU JEC WTW v5) a mért fogyasztásodra alkalmazva — tájékoztatásul, nem hitelesített elszámolás.';
 
   @override
   String get fuelCompareCo2BlendOmitted =>
-      'CO2 is shown for pure fuels only: a blend\'s emission factor depends on the mix, which this row does not record.';
+      'A CO2 csak tiszta üzemanyagokra jelenik meg: a keverék kibocsátási tényezője az összetételtől függ, amelyet ez a sor nem rögzít.';
 
   @override
   String consumptionStatsOpenWindowBanner(int count) {
@@ -6342,15 +6342,15 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String obd2DiagnosticsTripRecordedHeader(int samples, int percent) {
-    return 'Session recorded · $samples engine samples · $percent% coverage';
+    return 'Munkamenet rögzítve · $samples motoradat-minta · $percent% lefedettség';
   }
 
   @override
-  String get obd2DiagnosticsTripEvidenceSection => 'What this trip recorded';
+  String get obd2DiagnosticsTripEvidenceSection => 'Mit rögzített ez az út';
 
   @override
   String obd2DiagnosticsTripSamplesLine(int samples, int total, int percent) {
-    return '$samples of $total samples carried engine data ($percent%)';
+    return '$total mintából $samples tartalmazott motoradatot ($percent%)';
   }
 
   @override
@@ -6360,26 +6360,26 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String obd2DiagnosticsTripProtocolLine(String verdict) {
-    return 'Protocol handshake: $verdict';
+    return 'Protokoll-egyeztetés: $verdict';
   }
 
   @override
   String obd2DiagnosticsTripEndedLine(String reason) {
-    return 'Session ended: $reason';
+    return 'A munkamenet véget ért: $reason';
   }
 
   @override
   String obd2DiagnosticsTripDurationLine(String duration) {
-    return 'Session length: $duration';
+    return 'A munkamenet hossza: $duration';
   }
 
   @override
   String get obd2DiagnosticsTripFuelMeasured =>
-      'Fuel figures came from the adapter, not from GPS estimates.';
+      'A fogyasztási adatok az adaptertől származnak, nem GPS-becslésből.';
 
   @override
   String get obd2DiagnosticsTripNoPidDetail =>
-      'The per-PID communication breakdown was not captured for this trip. Turn on developer mode before recording to collect it.';
+      'A PID-enkénti kommunikációs részleteket nem rögzítettük ehhez az úthoz. A gyűjtéshez kapcsold be a fejlesztői módot a rögzítés előtt.';
 
   @override
   String obd2PickerPinnedFallback(String adapterName) {

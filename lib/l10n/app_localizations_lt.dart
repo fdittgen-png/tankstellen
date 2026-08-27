@@ -3930,52 +3930,52 @@ class AppLocalizationsLt extends AppLocalizations {
   String get consumptionStatsChartConsumption => 'L/100km per mėnesį';
 
   @override
-  String get fuelCompareSectionTitle => 'Cost of driving, fuel by fuel';
+  String get fuelCompareSectionTitle => 'Važiavimo kaina pagal degalus';
 
   @override
-  String get fuelComparePricePerLitre => 'Paid per litre';
+  String get fuelComparePricePerLitre => 'Sumokėta už litrą';
 
   @override
-  String get fuelCompareCostPer100km => 'Cost per 100 km';
+  String get fuelCompareCostPer100km => 'Kaina 100 km';
 
   @override
-  String get fuelCompareDistance => 'Distance measured';
+  String get fuelCompareDistance => 'Išmatuotas atstumas';
 
   @override
-  String get fuelCompareLitres => 'Litres burned';
+  String get fuelCompareLitres => 'Sunaudoti litrai';
 
   @override
   String fuelCompareVerdictCheaper(String winner) {
-    return '$winner is your cheapest fuel to drive on';
+    return '$winner yra pigiausi degalai važiuoti';
   }
 
   @override
   String fuelCompareVerdictDelta(String loser, String amount) {
-    return '$loser costs $amount more per 1000 km';
+    return '$loser kainuoja $amount daugiau 1000 km';
   }
 
   @override
   String fuelCompareBreakEven(String fuel, String rival, String price) {
-    return '$fuel beats $rival below $price per litre';
+    return '$fuel pranoksta $rival, kai litras pigesnis nei $price';
   }
 
   @override
   String get fuelCompareBreakEvenExplain =>
-      'Break-even is calculated from each fuel\'s measured consumption, so it moves as your driving does.';
+      'Lūžio taškas skaičiuojamas pagal kiekvienų degalų išmatuotas sąnaudas, todėl jis kinta kartu su tavo vairavimu.';
 
   @override
   String get fuelCompareLitresVsCostNote =>
-      'Litres and cost can disagree: a fuel can burn fewer litres per 100 km and still cost more per kilometre, because the pump price differs. Cost per kilometre is the verdict.';
+      'Litrai ir kaina gali nesutapti: degalai gali sunaudoti mažiau litrų 100 km ir vis tiek kainuoti daugiau už kilometrą, nes skiriasi litro kaina. Lemia kaina už kilometrą.';
 
   @override
   String fuelCompareProvisional(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count full tanks',
-      one: 'one full tank',
+      other: '$count pilnais bakais',
+      one: 'vienu pilnu baku',
     );
-    return 'Provisional — based on $_temp0';
+    return 'Preliminaru — remiantis $_temp0';
   }
 
   @override
@@ -3983,28 +3983,28 @@ class AppLocalizationsLt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count full tanks',
-      one: 'one full tank',
+      other: '$count pilnais bakais',
+      one: 'vienu pilnu baku',
     );
-    return 'Based on $_temp0';
+    return 'Remiantis $_temp0';
   }
 
   @override
-  String get fuelCompareCo2Per100km => 'CO2 per 100 km';
+  String get fuelCompareCo2Per100km => 'CO2 100 km';
 
   @override
   String fuelCompareCleanest(String winner) {
-    return '$winner is your lowest-emission fuel';
+    return '$winner yra maziausiai teršiantys tavo degalai';
   }
 
   @override
   String fuelCompareTradeoff(String fuel, String money, String co2) {
-    return '$fuel costs $money more per 1000 km but emits $co2 less CO2';
+    return '$fuel kainuoja $money daugiau 1000 km, bet išmeta $co2 mažiau CO2';
   }
 
   @override
   String fuelCompareTradeoffBoth(String fuel, String rival) {
-    return '$fuel is both cheaper and cleaner than $rival';
+    return '$fuel yra ir pigesni, ir švaresni nei $rival';
   }
 
   @override
@@ -4016,16 +4016,16 @@ class AppLocalizationsLt extends AppLocalizations {
     String rival,
     String saved,
   ) {
-    return 'Your $distance on $fuel emitted $actual instead of $alternative on $rival — $saved avoided';
+    return 'Tavo $distance su $fuel išmetė $actual, o ne $alternative su $rival — $saved išvengta';
   }
 
   @override
   String get fuelCompareCo2Source =>
-      'CO2 figures are well-to-wheel estimates (EU JEC WTW v5) applied to your measured consumption — awareness, not audit-grade accounting.';
+      'CO2 skaičiai yra viso ciklo (EU JEC WTW v5) įverčiai, pritaikyti tavo išmatuotoms sąnaudoms — orientaciniai, ne sertifikuota apskaita.';
 
   @override
   String get fuelCompareCo2BlendOmitted =>
-      'CO2 is shown for pure fuels only: a blend\'s emission factor depends on the mix, which this row does not record.';
+      'CO2 rodomas tik grynoms degalų rūšims: mišinio taršos koeficientas priklauso nuo sudėties, kurios ši eilutė nefiksuoja.';
 
   @override
   String consumptionStatsOpenWindowBanner(int count) {
@@ -6337,44 +6337,44 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String obd2DiagnosticsTripRecordedHeader(int samples, int percent) {
-    return 'Session recorded · $samples engine samples · $percent% coverage';
+    return 'Sesija įrašyta · $samples variklio matavimų · $percent% aprėptis';
   }
 
   @override
-  String get obd2DiagnosticsTripEvidenceSection => 'What this trip recorded';
+  String get obd2DiagnosticsTripEvidenceSection => 'Ką ši kelionė įrašė';
 
   @override
   String obd2DiagnosticsTripSamplesLine(int samples, int total, int percent) {
-    return '$samples of $total samples carried engine data ($percent%)';
+    return '$samples iš $total matavimų turėjo variklio duomenų ($percent%)';
   }
 
   @override
   String obd2DiagnosticsTripAdapterLine(String adapter) {
-    return 'Adapter: $adapter';
+    return 'Adapteris: $adapter';
   }
 
   @override
   String obd2DiagnosticsTripProtocolLine(String verdict) {
-    return 'Protocol handshake: $verdict';
+    return 'Protokolo suderinimas: $verdict';
   }
 
   @override
   String obd2DiagnosticsTripEndedLine(String reason) {
-    return 'Session ended: $reason';
+    return 'Sesija baigėsi: $reason';
   }
 
   @override
   String obd2DiagnosticsTripDurationLine(String duration) {
-    return 'Session length: $duration';
+    return 'Sesijos trukmė: $duration';
   }
 
   @override
   String get obd2DiagnosticsTripFuelMeasured =>
-      'Fuel figures came from the adapter, not from GPS estimates.';
+      'Sąnaudų duomenys gauti iš adapterio, o ne iš GPS įverčių.';
 
   @override
   String get obd2DiagnosticsTripNoPidDetail =>
-      'The per-PID communication breakdown was not captured for this trip. Turn on developer mode before recording to collect it.';
+      'Ryšio detalės pagal PID šiai kelionei nebuvo užfiksuotos. Kad jas surinktum, prieš įrašymą įjunk kūrėjo režimą.';
 
   @override
   String obd2PickerPinnedFallback(String adapterName) {
