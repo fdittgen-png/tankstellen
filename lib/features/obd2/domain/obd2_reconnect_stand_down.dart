@@ -26,7 +26,7 @@ import 'dart:math' show Random;
 /// signals (user intent, wake, engine-off park, a signature change, a
 /// ready that survives [flapWindow]) restore the fast ladder.
 class ReconnectStandDown {
-  ReconnectStandDown({required DateTime Function() now}) : _now = now;
+  ReconnectStandDown({required this._now});
 
   /// Consecutive identical failures (or flaps) before the loop stands
   /// down to the storm cadence.
@@ -128,8 +128,8 @@ class ReconnectBackoff {
     required this.initial,
     required this.max,
     required this.storm,
-    required Random jitter,
-  }) : _jitter = jitter;
+    required this._jitter,
+  });
 
   final Duration initial;
   final Duration max;

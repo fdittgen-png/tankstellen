@@ -61,12 +61,10 @@ class RadarInRadiusCache {
   List<Station> _cached = const [];
 
   RadarInRadiusCache({
-    required InRadiusFetch fetch,
-    required Duration Function() minInterval,
+    required this._fetch,
+    required this._minInterval,
     DateTime Function()? now,
-  })  : _fetch = fetch,
-        _minInterval = minInterval,
-        _now = now ?? DateTime.now;
+  })  : _now = now ?? DateTime.now;
 
   /// The in-radius rows around ([lat], [lng]) at [radiusKm] — freshly fetched
   /// only when the movement+time gate opens, otherwise the cached merge.

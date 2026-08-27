@@ -69,10 +69,9 @@ class ShareReceiptHandler {
   ShareReceiptHandler(
     this._ref, {
     ReceiptPdfRasterizer? pdfRasterizer,
-    EReceiptTextParser textParser = const EReceiptTextParser(),
+    this._textParser = const EReceiptTextParser(),
     int? Function(String path)? payloadSizeBytes,
   }) : _pdfRasterizer = pdfRasterizer ?? const ReceiptPdfRasterizer(),
-       _textParser = textParser,
        _payloadSizeBytes = payloadSizeBytes ?? sharePayloadSizeBytes;
 
   /// Handle one inbound [intent]. No-op for a null intent, an empty item

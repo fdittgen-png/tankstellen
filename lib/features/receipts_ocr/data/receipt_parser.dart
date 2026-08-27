@@ -31,8 +31,7 @@ class ReceiptParser {
   /// disables override dispatch — the parser behaves exactly as before.
   final ReceiptOverrideRegistry? _overrideRegistry;
 
-  const ReceiptParser({ReceiptOverrideRegistry? overrideRegistry})
-      : _overrideRegistry = overrideRegistry;
+  const ReceiptParser({this._overrideRegistry});
 
   /// Parse OCR [text] from a fuel receipt and return the extracted fields.
   ///

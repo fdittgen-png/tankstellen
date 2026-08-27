@@ -65,14 +65,11 @@ class GlideCoachEvaluator {
   DateTime? _lastLiftAt;
 
   GlideCoachEvaluator({
-    required ImminentSignalDetector detector,
-    Duration cooldown = kDefaultGlideCoachCooldown,
-    double throttleThresholdPercent = kDefaultThrottleThresholdPercent,
-    DateTime Function() now = DateTime.now,
-  })  : _detector = detector,
-        _cooldown = cooldown,
-        _throttleThresholdPercent = throttleThresholdPercent,
-        _now = now;
+    required this._detector,
+    this._cooldown = kDefaultGlideCoachCooldown,
+    this._throttleThresholdPercent = kDefaultThrottleThresholdPercent,
+    this._now = DateTime.now,
+  });
 
   /// Evaluate one tick. See the class doc for the 5-rule decision
   /// flow. The detector call is awaited; the caller throttles

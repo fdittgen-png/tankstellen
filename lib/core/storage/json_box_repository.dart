@@ -33,16 +33,13 @@ import 'hive_boxes.dart';
 ///     under [ErrorLayer.storage] and skipped.
 class JsonBoxRepository<T> {
   JsonBoxRepository({
-    required Box<dynamic> box,
-    required T? Function(Map<String, dynamic> json) fromJson,
-    required Map<String, dynamic> Function(T value) toJson,
-    required String Function(T value) keyOf,
+    required this._box,
+    required this._fromJson,
+    required this._toJson,
+    required this._keyOf,
     this.entryKeyPrefix = '',
     required this.debugName,
-  })  : _box = box,
-        _fromJson = fromJson,
-        _toJson = toJson,
-        _keyOf = keyOf;
+  });
 
   final Box<dynamic> _box;
   final T? Function(Map<String, dynamic> json) _fromJson;

@@ -24,13 +24,11 @@ import '../domain/services/motion_gate.dart';
 /// pipeline stays under the file-length cap.
 class MotionGatedGpsSource {
   MotionGatedGpsSource({
-    required Ref ref,
-    required void Function(Position) onPosition,
+    required this._ref,
+    required this._onPosition,
     MotionGate? gate,
     bool? foregroundServiceEnabled,
-  })  : _ref = ref,
-        _onPosition = onPosition,
-        _gate = gate ?? MotionGate(),
+  })  : _gate = gate ?? MotionGate(),
         _fgsEnabled =
             foregroundServiceEnabled ?? kGpsRecordingForegroundServiceEnabled;
 

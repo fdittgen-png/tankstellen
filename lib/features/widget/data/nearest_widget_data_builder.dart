@@ -340,7 +340,7 @@ class NearestWidgetDataBuilder {
       'e5': station.e5,
       'e10': station.e10,
       'diesel': station.diesel,
-      if (predictive != null) ...predictive,
+      ...?predictive,
     };
   }
 

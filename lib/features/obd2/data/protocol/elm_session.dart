@@ -77,10 +77,9 @@ class ElmSession {
     this.staleAfter = const Duration(seconds: 12),
     this.keepaliveIdle = const Duration(seconds: 4),
     this.deadAfterConsecutiveTimeouts = 3,
-    Duration watchdogTick = const Duration(seconds: 1, milliseconds: 500),
+    this._watchdogTick = const Duration(seconds: 1, milliseconds: 500),
     DateTime Function()? now,
   })  : _initSequence = initSequence ?? defaultInitSequence,
-        _watchdogTick = watchdogTick,
         _now = now ?? DateTime.now;
 
   /// The standard init burst — [Elm327Commands.initCommands] (ATZ →

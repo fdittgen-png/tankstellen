@@ -36,24 +36,20 @@ class PersistentDataset<T> {
   /// [countryCode] keys the dataset; [datasetName] disambiguates services that
   /// persist more than one dataset for the same country.
   ///
-  /// #3154 — [serialize] and [deserialize] are run in a background isolate by
+  /// #3154 — [_serialize] and [_deserialize] are run in a background isolate by
   /// [write] / [readAsync] (a whole-country dataset is ~11k `Station.fromJson`
   /// calls — far too heavy for the UI isolate). They must therefore be
   /// **isolate-sendable**: top-level / static functions, or closures that
   /// capture nothing non-sendable (every current call site passes a
   /// capture-free closure or a top-level function).
   PersistentDataset({
-    required CacheStrategy cache,
+    required this._cache,
     required String countryCode,
     required String datasetName,
-    required ServiceSource source,
-    required Map<String, dynamic> Function(T value) serialize,
-    required T? Function(Map<String, dynamic> json) deserialize,
-  })  : _cache = cache,
-        _key = datasetKey(countryCode, datasetName),
-        _source = source,
-        _serialize = serialize,
-        _deserialize = deserialize;
+    required this._source,
+    required this._serialize,
+    required this._deserialize,
+  })  : _key = datasetKey(countryCode, datasetName);
 
   /// Stable cache key for a country's bulk dataset. Public so the eviction
   /// policy and tests can reason about the `dataset:` prefix.

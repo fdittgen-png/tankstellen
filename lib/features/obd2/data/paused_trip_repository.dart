@@ -109,7 +109,7 @@ class PausedTripEntry {
 class PausedTripRepository {
   final Box<String> _box;
 
-  PausedTripRepository({required Box<String> box}) : _box = box;
+  PausedTripRepository({required this._box});
 
   /// Hive box name used by the production wiring. Kept in sync with
   /// [HiveBoxes.obd2PausedTrips].

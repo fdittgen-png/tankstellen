@@ -34,13 +34,11 @@ class RecordingBatteryExemption {
   final bool fgsEnabled;
 
   RecordingBatteryExemption({
-    required BatteryOptimizationPermissions permissions,
-    required bool Function() alreadyAsked,
-    required Future<void> Function() markAsked,
+    required this._permissions,
+    required this._alreadyAsked,
+    required this._markAsked,
     this.fgsEnabled = kGpsRecordingForegroundServiceEnabled,
-  })  : _permissions = permissions,
-        _alreadyAsked = alreadyAsked,
-        _markAsked = markAsked;
+  });
 
   /// Best-effort one-time prompt. Safe to fire-and-forget from a manual
   /// recording start; never throws into the recording path.

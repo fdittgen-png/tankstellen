@@ -25,8 +25,7 @@ import '../../../core/telemetry/process_death_context.dart';
 /// to the line-capped pipeline beyond the three thin seed/flush/clear calls,
 /// and never throws — a WAL is best-effort and must not derail recording.
 class GpsOnlyTripWal {
-  GpsOnlyTripWal({ActiveTripRepository? repoOverride})
-      : _repoOverride = repoOverride;
+  GpsOnlyTripWal({this._repoOverride});
 
   final ActiveTripRepository? _repoOverride;
 

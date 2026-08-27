@@ -53,12 +53,10 @@ abstract class Obd2ReattachSource {
 class SupervisorReattachSource implements Obd2ReattachSource {
   SupervisorReattachSource(
     this._supervisor, {
-    required void Function(Obd2Service service) onConnected,
-    required VoidCallback onReconnect,
-    Duration revalidateInterval = defaultRevalidateInterval,
-  })  : _onConnected = onConnected,
-        _onReconnect = onReconnect,
-        _revalidateInterval = revalidateInterval;
+    required this._onConnected,
+    required this._onReconnect,
+    this._revalidateInterval = defaultRevalidateInterval,
+  });
 
   /// #3777 — cadence of the level revalidation while unfired. Cheap (a
   /// state + bool read); exists so NO missed edge can strand the trip:

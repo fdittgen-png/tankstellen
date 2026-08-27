@@ -27,25 +27,14 @@ import 'trip_sample_buffer.dart';
 /// lifecycle state of its own and is unit-testable in isolation.
 class DegradedGpsEmitter {
   DegradedGpsEmitter({
-    required DateTime Function() now,
-    required TripRecorder recorder,
-    required TripSampleBuffer sampleBuffer,
-    required Duration gpsAliveWindow,
-    required void Function() onEscalate,
-    required void Function(DateTime at) onSampleAt,
-    required TripLiveReading Function(
-      TripLiveReading reading, {
-      required DateTime nowTs,
-      required double? effectiveSpeedKmh,
-      required double? altitudeM,
-    }) overlayEstimate,
-  })  : _now = now,
-        _recorder = recorder,
-        _sampleBuffer = sampleBuffer,
-        _gpsAliveWindow = gpsAliveWindow,
-        _onEscalate = onEscalate,
-        _onSampleAt = onSampleAt,
-        _overlayEstimate = overlayEstimate;
+    required this._now,
+    required this._recorder,
+    required this._sampleBuffer,
+    required this._gpsAliveWindow,
+    required this._onEscalate,
+    required this._onSampleAt,
+    required this._overlayEstimate,
+  });
 
   final DateTime Function() _now;
   final TripRecorder _recorder;

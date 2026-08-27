@@ -46,7 +46,7 @@ jobs:
         with:
           channel: stable
           # Pin to the build-android-green SDK (matches ci.yml's build-android).
-          flutter-version: "3.41.9"
+          flutter-version: "3.44.9"
           cache: true
       - uses: actions/cache@v6
         with:

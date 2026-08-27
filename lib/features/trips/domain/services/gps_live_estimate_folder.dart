@@ -65,10 +65,9 @@ class GpsLiveEstimate {
 /// Pure domain: no I/O, no providers, fully unit-testable.
 class GpsLiveEstimateFolder implements TripGpsEstimateOverlay {
   GpsLiveEstimateFolder._({
-    required GpsLiveFuelEstimator estimator,
-    required Duration coachingWindow,
-  })  : _estimator = estimator,
-        _coachingWindow = coachingWindow;
+    required this._estimator,
+    required this._coachingWindow,
+  });
 
   /// Build the folder for [vehicle] + its calibration [matrix]. Both are
   /// nullable — a null vehicle falls back to the population-default class

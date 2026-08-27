@@ -55,22 +55,15 @@ import 'gps_fuel_estimator.dart';
 ///     — the same plausibility band the post-trip estimator uses.
 class GpsLiveFuelEstimator {
   GpsLiveFuelEstimator._({
-    required double massKg,
-    required double dragCoefficient,
-    required double frontalAreaM2,
-    required double rollingResistance,
-    required double lowerHeatingValueMjPerL,
-    required double engineEfficiency,
-    required double idleLitersPerHour,
-    required double physicsScale,
-  })  : _massKg = massKg,
-        _dragCoefficient = dragCoefficient,
-        _frontalAreaM2 = frontalAreaM2,
-        _rollingResistance = rollingResistance,
-        _lowerHeatingValueMjPerL = lowerHeatingValueMjPerL,
-        _engineEfficiency = engineEfficiency,
-        _idleLitersPerHour = idleLitersPerHour,
-        _physicsScale = physicsScale;
+    required this._massKg,
+    required this._dragCoefficient,
+    required this._frontalAreaM2,
+    required this._rollingResistance,
+    required this._lowerHeatingValueMjPerL,
+    required this._engineEfficiency,
+    required this._idleLitersPerHour,
+    required this._physicsScale,
+  });
 
   // ─── Physical constants ───
   static const double _gravity = 9.81; // m/s²

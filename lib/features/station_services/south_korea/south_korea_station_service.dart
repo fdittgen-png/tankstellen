@@ -115,7 +115,7 @@ class SouthKoreaStationService
   final String _baseUrl;
 
   SouthKoreaStationService({
-    required String apiKey,
+    required this._apiKey,
     Dio? dio,
     String? baseUrl,
   })  : _dio = dio ??
@@ -123,7 +123,6 @@ class SouthKoreaStationService
               connectTimeout: const Duration(seconds: 10),
               receiveTimeout: const Duration(seconds: 15),
             ),
-        _apiKey = apiKey,
         _baseUrl = baseUrl ?? defaultBaseUrl;
 
   @override

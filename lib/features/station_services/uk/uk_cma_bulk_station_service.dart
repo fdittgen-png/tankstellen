@@ -97,16 +97,14 @@ class UkCmaBulkStationService
     Dio? dio,
     String? consolidatedUrl,
     CacheStrategy? cache,
-    UkFuelFinderAuth? auth,
-    UkFuelFinderFeed? feed,
+    this._auth,
+    this._feed,
   })  : _dio = dio ??
             DioFactory.create(
               connectTimeout: const Duration(seconds: 15),
               receiveTimeout: const Duration(seconds: 30),
               responseType: ResponseType.json,
             ),
-        _auth = auth,
-        _feed = feed,
         _consolidatedUrl = consolidatedUrl ?? defaultConsolidatedUrl,
         _persistent = cache == null
             ? null

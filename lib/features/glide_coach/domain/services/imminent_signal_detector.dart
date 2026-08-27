@@ -86,10 +86,9 @@ class ImminentSignalDetector {
   final double _horizonMeters;
 
   ImminentSignalDetector({
-    required TrafficSignalRepository repo,
-    double horizonMeters = _kDefaultHorizonMeters,
-  }) : _repo = repo,
-       _horizonMeters = horizonMeters;
+    required this._repo,
+    this._horizonMeters = _kDefaultHorizonMeters,
+  });
 
   /// Returns the closest [TrafficSignal] ahead of [reading] within the
   /// horizon, or `null` when none qualify. The repository call is

@@ -131,9 +131,12 @@ jobs:
           # #1936 — pin Flutter. A floating `channel: stable` picked up
           # a newer SDK whose bundled Gradle plugin hard-fails on the
           # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
-          # 3.41.9 is the last build-android-green version (and the
-          # local dev SDK). Bump deliberately, not by drift.
-          flutter-version: "3.41.9"
+          # The tflite_flutter mismatch is normalised in
+          # android/build.gradle.kts (a global subprojects JavaCompile
+          # JVM-17 override), so the pin is about determinism, not that
+          # workaround. 3.44.9 = Dart 3.12.2, the floor shimmer 4 needs
+          # (#3801). Bump deliberately, not by drift.
+          flutter-version: "3.44.9"
           cache: true
       - uses: actions/cache@v6
         with:
@@ -176,9 +179,12 @@ jobs:
           # #1936 — pin Flutter. A floating `channel: stable` picked up
           # a newer SDK whose bundled Gradle plugin hard-fails on the
           # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
-          # 3.41.9 is the last build-android-green version (and the
-          # local dev SDK). Bump deliberately, not by drift.
-          flutter-version: "3.41.9"
+          # The tflite_flutter mismatch is normalised in
+          # android/build.gradle.kts (a global subprojects JavaCompile
+          # JVM-17 override), so the pin is about determinism, not that
+          # workaround. 3.44.9 = Dart 3.12.2, the floor shimmer 4 needs
+          # (#3801). Bump deliberately, not by drift.
+          flutter-version: "3.44.9"
           cache: true
       # #2334 — deliberately do NOT cache `.dart_tool` here (only
       # `~/.pub-cache`). The cache key is `hashFiles('pubspec.lock')`,
@@ -233,7 +239,7 @@ jobs:
           channel: stable
           # #1936 — pin Flutter (see ci.yml analyze job). Coupled to the
           # ci.yml pin; bump deliberately, not by drift.
-          flutter-version: "3.41.9"
+          flutter-version: "3.44.9"
           cache: true
       - uses: actions/cache@v6
         with:
@@ -315,9 +321,12 @@ jobs:
           # #1936 — pin Flutter. A floating `channel: stable` picked up
           # a newer SDK whose bundled Gradle plugin hard-fails on the
           # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
-          # 3.41.9 is the last build-android-green version (and the
-          # local dev SDK). Bump deliberately, not by drift.
-          flutter-version: "3.41.9"
+          # The tflite_flutter mismatch is normalised in
+          # android/build.gradle.kts (a global subprojects JavaCompile
+          # JVM-17 override), so the pin is about determinism, not that
+          # workaround. 3.44.9 = Dart 3.12.2, the floor shimmer 4 needs
+          # (#3801). Bump deliberately, not by drift.
+          flutter-version: "3.44.9"
           cache: true
       - uses: actions/cache@v6
         if: ${{ needs.green-gate.outputs.cached != 'true' }}
@@ -423,9 +432,12 @@ jobs:
           # #1936 — pin Flutter. A floating `channel: stable` picked up
           # a newer SDK whose bundled Gradle plugin hard-fails on the
           # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
-          # 3.41.9 is the last build-android-green version (and the
-          # local dev SDK). Bump deliberately, not by drift.
-          flutter-version: "3.41.9"
+          # The tflite_flutter mismatch is normalised in
+          # android/build.gradle.kts (a global subprojects JavaCompile
+          # JVM-17 override), so the pin is about determinism, not that
+          # workaround. 3.44.9 = Dart 3.12.2, the floor shimmer 4 needs
+          # (#3801). Bump deliberately, not by drift.
+          flutter-version: "3.44.9"
           cache: true
       - uses: actions/cache@v6
         with:
@@ -475,9 +487,12 @@ jobs:
           # #1936 — pin Flutter. A floating `channel: stable` picked up
           # a newer SDK whose bundled Gradle plugin hard-fails on the
           # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
-          # 3.41.9 is the last build-android-green version (and the
-          # local dev SDK). Bump deliberately, not by drift.
-          flutter-version: "3.41.9"
+          # The tflite_flutter mismatch is normalised in
+          # android/build.gradle.kts (a global subprojects JavaCompile
+          # JVM-17 override), so the pin is about determinism, not that
+          # workaround. 3.44.9 = Dart 3.12.2, the floor shimmer 4 needs
+          # (#3801). Bump deliberately, not by drift.
+          flutter-version: "3.44.9"
           cache: true
       - uses: actions/cache@v6
         with:
@@ -513,9 +528,12 @@ jobs:
           # #1936 — pin Flutter. A floating `channel: stable` picked up
           # a newer SDK whose bundled Gradle plugin hard-fails on the
           # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
-          # 3.41.9 is the last build-android-green version (and the
-          # local dev SDK). Bump deliberately, not by drift.
-          flutter-version: "3.41.9"
+          # The tflite_flutter mismatch is normalised in
+          # android/build.gradle.kts (a global subprojects JavaCompile
+          # JVM-17 override), so the pin is about determinism, not that
+          # workaround. 3.44.9 = Dart 3.12.2, the floor shimmer 4 needs
+          # (#3801). Bump deliberately, not by drift.
+          flutter-version: "3.44.9"
           cache: true
       - uses: actions/cache@v6
         with:
@@ -547,9 +565,12 @@ jobs:
           # #1936 — pin Flutter. A floating `channel: stable` picked up
           # a newer SDK whose bundled Gradle plugin hard-fails on the
           # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
-          # 3.41.9 is the last build-android-green version (and the
-          # local dev SDK). Bump deliberately, not by drift.
-          flutter-version: "3.41.9"
+          # The tflite_flutter mismatch is normalised in
+          # android/build.gradle.kts (a global subprojects JavaCompile
+          # JVM-17 override), so the pin is about determinism, not that
+          # workaround. 3.44.9 = Dart 3.12.2, the floor shimmer 4 needs
+          # (#3801). Bump deliberately, not by drift.
+          flutter-version: "3.44.9"
           cache: true
       - run: flutter pub get
       - name: OSV vulnerability scan
@@ -570,9 +591,12 @@ jobs:
           # #1936 — pin Flutter. A floating `channel: stable` picked up
           # a newer SDK whose bundled Gradle plugin hard-fails on the
           # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
-          # 3.41.9 is the last build-android-green version (and the
-          # local dev SDK). Bump deliberately, not by drift.
-          flutter-version: "3.41.9"
+          # The tflite_flutter mismatch is normalised in
+          # android/build.gradle.kts (a global subprojects JavaCompile
+          # JVM-17 override), so the pin is about determinism, not that
+          # workaround. 3.44.9 = Dart 3.12.2, the floor shimmer 4 needs
+          # (#3801). Bump deliberately, not by drift.
+          flutter-version: "3.44.9"
           cache: true
       - uses: actions/cache@v6
         with:
@@ -597,9 +621,12 @@ jobs:
           # #1936 — pin Flutter. A floating `channel: stable` picked up
           # a newer SDK whose bundled Gradle plugin hard-fails on the
           # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
-          # 3.41.9 is the last build-android-green version (and the
-          # local dev SDK). Bump deliberately, not by drift.
-          flutter-version: "3.41.9"
+          # The tflite_flutter mismatch is normalised in
+          # android/build.gradle.kts (a global subprojects JavaCompile
+          # JVM-17 override), so the pin is about determinism, not that
+          # workaround. 3.44.9 = Dart 3.12.2, the floor shimmer 4 needs
+          # (#3801). Bump deliberately, not by drift.
+          flutter-version: "3.44.9"
           cache: true
       - uses: actions/cache@v6
         with:
@@ -638,9 +665,12 @@ jobs:
           # #1936 — pin Flutter. A floating `channel: stable` picked up
           # a newer SDK whose bundled Gradle plugin hard-fails on the
           # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
-          # 3.41.9 is the last build-android-green version (and the
-          # local dev SDK). Bump deliberately, not by drift.
-          flutter-version: "3.41.9"
+          # The tflite_flutter mismatch is normalised in
+          # android/build.gradle.kts (a global subprojects JavaCompile
+          # JVM-17 override), so the pin is about determinism, not that
+          # workaround. 3.44.9 = Dart 3.12.2, the floor shimmer 4 needs
+          # (#3801). Bump deliberately, not by drift.
+          flutter-version: "3.44.9"
           cache: true
       - uses: actions/cache@v6
         with:

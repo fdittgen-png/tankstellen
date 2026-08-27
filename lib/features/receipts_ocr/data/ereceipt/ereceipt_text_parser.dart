@@ -33,11 +33,10 @@ import 'ereceipt_locale_profiles.dart';
 class EReceiptTextParser {
   final ReceiptParser _parser;
 
-  /// [parser] defaults to a plain [ReceiptParser] (no override registry — an
+  /// [_parser] defaults to a plain [ReceiptParser] (no override registry — an
   /// e-receipt has no `stationId` to key per-station overrides on). Inject a
   /// configured parser only in tests that want to assert delegation.
-  const EReceiptTextParser({ReceiptParser parser = const ReceiptParser()})
-      : _parser = parser;
+  const EReceiptTextParser({this._parser = const ReceiptParser()});
 
   /// Parse the [text] of a shared / pasted e-receipt into the fuel field set.
   ///

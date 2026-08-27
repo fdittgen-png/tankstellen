@@ -15,13 +15,12 @@ class Obd2ConnectTraceHandle {
     required this.attemptId,
     required this.origin,
     required String? mac,
-    required String? adapterName,
+    required this._adapterName,
     required this.requestedTransport,
     required this.startedAt,
   })  : _parent = null,
         requestedMac = redactObd2Mac(mac),
-        _rawRequestedMac = mac,
-        _adapterName = adapterName;
+        _rawRequestedMac = mac;
 
   Obd2ConnectTraceHandle._child(Obd2ConnectTraceHandle parent)
       : _parent = parent,

@@ -123,7 +123,7 @@ class ChileStationService
   final String _baseUrl;
 
   ChileStationService({
-    required String apiKey,
+    required this._apiKey,
     Dio? dio,
     String? baseUrl,
   })  : _dio = dio ??
@@ -131,7 +131,6 @@ class ChileStationService
               connectTimeout: const Duration(seconds: 10),
               receiveTimeout: const Duration(seconds: 20),
             ),
-        _apiKey = apiKey,
         _baseUrl = baseUrl ?? defaultBaseUrl {
     // #3200 — CNE requires the token in an Authorization: Bearer header
     // (the old `?token=` query form 404s). Stamped once here so every

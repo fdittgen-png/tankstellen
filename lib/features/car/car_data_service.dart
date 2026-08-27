@@ -145,10 +145,9 @@ class CarDataService {
   CarDataService({
     CarStrategyFactory? strategyFactory,
     Future<void> Function(String key, String value)? writeSnapshot,
-    Duration fetchTimeout = kCarFetchTimeout,
+    this._fetchTimeout = kCarFetchTimeout,
   })  : _strategyFactory = strategyFactory ?? _defaultStrategyFactory,
-        _writeSnapshot = writeSnapshot ?? _defaultWriteSnapshot,
-        _fetchTimeout = fetchTimeout;
+        _writeSnapshot = writeSnapshot ?? _defaultWriteSnapshot;
 
   final CarStrategyFactory _strategyFactory;
   final Future<void> Function(String key, String value) _writeSnapshot;

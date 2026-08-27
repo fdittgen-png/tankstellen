@@ -123,24 +123,16 @@ class CorridorLocationCache {
   GeoTile? _inFlightTile;
 
   CorridorLocationCache({
-    required CorridorFetch fetchCorridor,
-    double corridorRadiusKm = defaultCorridorRadiusKm,
-    double tileStepDegrees = GeoTile.defaultStepDegrees,
-    Duration ttl = defaultTtl,
-    bool isBulk = false,
-    double proximityToleranceFactor = defaultProximityToleranceFactor,
-    CorridorRefetchGate? canRefetch,
-    CorridorRefetchSink? onRefetch,
+    required this._fetchCorridor,
+    this._corridorRadiusKm = defaultCorridorRadiusKm,
+    this._tileStepDegrees = GeoTile.defaultStepDegrees,
+    this._ttl = defaultTtl,
+    this._isBulk = false,
+    this._proximityToleranceFactor = defaultProximityToleranceFactor,
+    this._canRefetch,
+    this._onRefetch,
     DateTime Function()? now,
-  })  : _fetchCorridor = fetchCorridor,
-        _corridorRadiusKm = corridorRadiusKm,
-        _tileStepDegrees = tileStepDegrees,
-        _ttl = ttl,
-        _isBulk = isBulk,
-        _proximityToleranceFactor = proximityToleranceFactor,
-        _canRefetch = canRefetch,
-        _onRefetch = onRefetch,
-        _now = now ?? DateTime.now;
+  })  : _now = now ?? DateTime.now;
 
   /// The tiles the cache currently covers (read-only view for bookkeeping /
   /// tests). A position inside any of these is served without a network call.

@@ -41,14 +41,11 @@ class TrafficSignalRepository {
   static const String boxName = 'traffic_signals_cache';
 
   TrafficSignalRepository({
-    required OsmTrafficSignalClient client,
-    required Box<String> cacheBox,
-    Duration ttl = kTrafficSignalCacheTtl,
+    required this._client,
+    required this._cacheBox,
+    this._ttl = kTrafficSignalCacheTtl,
     DateTime Function()? now,
-  })  : _client = client,
-        _cacheBox = cacheBox,
-        _ttl = ttl,
-        _now = now ?? DateTime.now;
+  })  : _now = now ?? DateTime.now;
 
   /// Return every traffic signal inside the bounding box, prefering a
   /// fresh cache entry over a network round-trip.

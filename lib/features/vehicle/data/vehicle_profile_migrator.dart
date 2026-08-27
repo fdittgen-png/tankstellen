@@ -27,10 +27,9 @@ class VehicleProfileCatalogMigrator {
   final SettingsStorage _settings;
 
   VehicleProfileCatalogMigrator({
-    required VehicleProfileRepository repository,
-    required SettingsStorage settings,
-  })  : _repository = repository,
-        _settings = settings;
+    required this._repository,
+    required this._settings,
+  });
 
   /// True when the migration flag has been persisted in settings.
   bool get hasRun =>

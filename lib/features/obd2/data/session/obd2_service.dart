@@ -156,11 +156,10 @@ class Obd2Service
     this._transport, {
     SupportedPidsCache? pidsCache,
     String? vehicleFallbackKey,
-    NegotiatedProtocolCache? protocolCache,
-    String? protocolCacheKey,
+    this._protocolCache,
+    this._protocolCacheKey,
     this.breadcrumbCollector,
-  })  : _protocolCache = protocolCache,
-        _protocolCacheKey = protocolCacheKey {
+  }) {
     // #1916 — the supported-PIDs prime + discovery run during connect,
     // when the BLE link is least settled. Wrap their `_send` callback
     // with the same one-shot retry the init handshake now uses, so a

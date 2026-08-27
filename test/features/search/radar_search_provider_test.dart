@@ -66,8 +66,7 @@ FuelStationRadar _recordedRadar(List<Station> corridor) => FuelStationRadar(
     );
 
 class _FixedUserPosition extends UserPosition {
-  _FixedUserPosition(this._lat, this._lng, {({double lat, double lng})? refreshTo})
-      : _refreshTo = refreshTo;
+  _FixedUserPosition(this._lat, this._lng, {this._refreshTo});
   final double _lat;
   final double _lng;
 

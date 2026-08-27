@@ -23,12 +23,10 @@ import '../paused_trip_repository.dart';
 /// the persistence branches are exercised without Hive.
 class DroppedSessionRepoResolver {
   DroppedSessionRepoResolver({
-    PausedTripRepository? pausedOverride,
-    TripHistoryRepository? historyOverride,
-    ActiveTripRepository? activeOverride,
-  })  : _pausedOverride = pausedOverride,
-        _historyOverride = historyOverride,
-        _activeOverride = activeOverride;
+    this._pausedOverride,
+    this._historyOverride,
+    this._activeOverride,
+  });
 
   final PausedTripRepository? _pausedOverride;
   final TripHistoryRepository? _historyOverride;

@@ -40,12 +40,10 @@ import '../domain/imu_event_record.dart';
 /// veto never fires and the recorder counts stand).
 class TripImuFusion {
   TripImuFusion({
-    required ImuSensorSource source,
+    required this._source,
     void Function(HarshEvent event)? onEvent,
-    String where = 'TripImuFusion',
-  })  : _source = source,
-        _where = where,
-        _detector = ImuEventDetector(onEvent: onEvent);
+    this._where = 'TripImuFusion',
+  })  : _detector = ImuEventDetector(onEvent: onEvent);
 
   final ImuSensorSource _source;
   final String _where;

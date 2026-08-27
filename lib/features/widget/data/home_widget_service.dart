@@ -410,7 +410,7 @@ class HomeWidgetService {
         'preferred_fuel_code': preferredFuelType.apiValue,
       if (preferredFuelType != null) 'preferred_fuel_price': fuelPrice,
       'distance_km': distanceKm,
-      if (predictive != null) ...predictive,
+      ...?predictive,
     };
   }
 

@@ -51,10 +51,10 @@ class TripHistoryRepository {
   void Function(String vehicleId)? onSavedHook;
 
   TripHistoryRepository({
-    required Box<String> box,
+    required this._box,
     this.cap = 100,
     this.onSavedHook,
-  }) : _box = box;
+  });
 
   /// Box name used by the production wiring.
   static const String boxName = 'obd2_trip_history';

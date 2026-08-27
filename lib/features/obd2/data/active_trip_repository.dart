@@ -203,8 +203,7 @@ class ActiveTripRepository {
   /// the recovery services see the exact pre-#3758 contract.
   final ActiveTripSampleWal? sampleWal;
 
-  ActiveTripRepository({required Box<String> box, this.sampleWal})
-      : _box = box;
+  ActiveTripRepository({required this._box, this.sampleWal});
 
   /// Hive box name used by the production wiring. Matches
   /// `HiveBoxes.obd2ActiveTrip`.

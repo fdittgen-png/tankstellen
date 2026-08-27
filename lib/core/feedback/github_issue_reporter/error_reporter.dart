@@ -39,8 +39,7 @@ Future<bool> _defaultLauncher(Uri uri) =>
 class ErrorReporter {
   final UrlLauncher _launcher;
 
-  const ErrorReporter({UrlLauncher launcher = _defaultLauncher})
-    : _launcher = launcher;
+  const ErrorReporter({this._launcher = _defaultLauncher});
 
   /// Recently-reported error fingerprints — a process-lifetime ring
   /// buffer so the same failure reported twice in a session does not

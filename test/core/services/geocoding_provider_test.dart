@@ -18,14 +18,13 @@ class _FakeGeocodingProvider extends GeocodingProvider {
   Exception? error;
 
   _FakeGeocodingProvider({
-    ServiceSource source = ServiceSource.nominatimGeocoding,
-    bool isAvailable = true,
+    this._source = ServiceSource.nominatimGeocoding,
+    this._isAvailable = true,
     this.zipResult,
     this.addressResult,
     this.countryCodeResult,
     this.error,
-  })  : _source = source,
-        _isAvailable = isAvailable;
+  });
 
   @override
   ServiceSource get source => _source;

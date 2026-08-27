@@ -91,15 +91,13 @@ class PortugalStationService
 
   PortugalStationService({
     Dio? dio,
-    String baseUrl = 'https://precoscombustiveis.dgeg.gov.pt/api/PrecoComb',
-    String fuelTypeIds = defaultFuelTypeIds,
+    this._baseUrl = 'https://precoscombustiveis.dgeg.gov.pt/api/PrecoComb',
+    this._fuelTypeIds = defaultFuelTypeIds,
   })  : _dio = dio ??
             DioFactory.create(
               connectTimeout: const Duration(seconds: 15),
               receiveTimeout: const Duration(seconds: 30),
-            ),
-        _baseUrl = baseUrl,
-        _fuelTypeIds = fuelTypeIds;
+            );
 
   /// DGEG fuel type IDs we query (#3196 — extended from the original
   /// 95-simples + gasóleo-simples pair so the 98 / GPL merge branches in

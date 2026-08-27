@@ -32,10 +32,9 @@ import 'dart:async';
 /// ~15 s read timeout.
 class ConnectionDropDebouncer {
   ConnectionDropDebouncer({
-    required void Function() onConfirmed,
-    Duration debounce = const Duration(milliseconds: 1500),
-  })  : _onConfirmed = onConfirmed,
-        _debounce = debounce;
+    required this._onConfirmed,
+    this._debounce = const Duration(milliseconds: 1500),
+  });
 
   final void Function() _onConfirmed;
   final Duration _debounce;

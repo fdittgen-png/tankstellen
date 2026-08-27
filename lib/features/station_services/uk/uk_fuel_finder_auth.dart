@@ -56,15 +56,13 @@ import '../../../core/services/dio_factory.dart';
 /// token flow is unit-testable against a mock [Dio] without a live endpoint.
 class UkFuelFinderAuth {
   UkFuelFinderAuth({
-    required Dio dio,
+    required this._dio,
     String? tokenUrl,
     required this.clientId,
     required this.clientSecret,
     this.scope,
-    DateTime Function() now = DateTime.now,
-  })  : _dio = dio,
-        tokenUrl = tokenUrl ?? defaultTokenUrl,
-        _now = now;
+    this._now = DateTime.now,
+  })  : tokenUrl = tokenUrl ?? defaultTokenUrl;
 
   /// Live OAuth2 token endpoint of the statutory Fuel Finder API (#3190).
   // i18n-ignore: gov.uk API endpoint URL, not user-facing text

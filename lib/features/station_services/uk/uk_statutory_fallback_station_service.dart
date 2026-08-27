@@ -33,10 +33,9 @@ import '../../../core/services/station_service.dart';
 /// `emptyPricesResult`), so no fallback is meaningful.
 class UkStatutoryFallbackStationService implements StationService {
   UkStatutoryFallbackStationService({
-    required StationService primary,
-    required StationService fallback,
-  })  : _primary = primary,
-        _fallback = fallback;
+    required this._primary,
+    required this._fallback,
+  });
 
   final StationService _primary;
   final StationService _fallback;

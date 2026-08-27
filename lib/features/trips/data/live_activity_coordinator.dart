@@ -37,10 +37,9 @@ import 'live_activity_controller.dart';
 /// swallowed so the Live Activity can never take the recorder down.
 class LiveActivityCoordinator {
   LiveActivityCoordinator({
-    required LiveActivityController controller,
+    required this._controller,
     DateTime Function()? clock,
-  })  : _controller = controller,
-        _clock = clock ?? DateTime.now;
+  })  : _clock = clock ?? DateTime.now;
 
   /// Floor between two sends when the CONTENT meaning changed (a radar
   /// flip / pause toggle should feel immediate but still debounced).

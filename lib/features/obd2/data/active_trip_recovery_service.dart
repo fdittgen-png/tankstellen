@@ -86,15 +86,12 @@ class ActiveTripRecoveryService {
   ActiveTripSnapshot? _recoveredSnapshot;
 
   ActiveTripRecoveryService({
-    required ActiveTripRepository activeRepo,
-    TripHistoryRepository? historyRepo,
-    Future<void> Function()? onAutomaticRecovered,
+    required this._activeRepo,
+    this._historyRepo,
+    this._onAutomaticRecovered,
     DateTime Function()? now,
     this.staleAfter = const Duration(hours: 24),
-  })  : _activeRepo = activeRepo,
-        _historyRepo = historyRepo,
-        _onAutomaticRecovered = onAutomaticRecovered,
-        _now = now ?? DateTime.now;
+  })  : _now = now ?? DateTime.now;
 
   /// Snapshot that the wiring layer should rehydrate into the
   /// `TripRecording` provider. Non-null only after [recover]

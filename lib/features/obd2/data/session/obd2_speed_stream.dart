@@ -75,10 +75,10 @@ class Obd2SpeedStream {
 
   Obd2SpeedStream(
     this._service, {
-    String? mac,
+    this._mac,
     this.pollPeriod = const Duration(seconds: 1),
     this.failureLogThreshold = 5,
-  }) : _mac = mac {
+  }) {
     _controller = StreamController<double>(
       onListen: _start,
       onCancel: _stop,

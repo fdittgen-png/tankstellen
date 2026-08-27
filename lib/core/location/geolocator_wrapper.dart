@@ -185,8 +185,8 @@ class GeolocatorWrapper {
 /// joiners. Constructed lazily by [GeolocatorWrapper.sharedPositionStream].
 class _SharedPositionSource {
   _SharedPositionSource({
-    required Stream<Position> Function(LocationSettings? settings) open,
-  }) : _open = open;
+    required this._open,
+  });
 
   final Stream<Position> Function(LocationSettings? settings) _open;
   // The shared bus lives for the wrapper's (keepAlive, app-lifetime)

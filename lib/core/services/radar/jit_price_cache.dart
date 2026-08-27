@@ -45,12 +45,10 @@ class JitPriceCache {
   final Map<String, Future<Station?>> _inFlight = {};
 
   JitPriceCache({
-    required PriceFetch fetchPrice,
-    Duration ttl = defaultTtl,
+    required this._fetchPrice,
+    this._ttl = defaultTtl,
     DateTime Function()? now,
-  })  : _fetchPrice = fetchPrice,
-        _ttl = ttl,
-        _now = now ?? DateTime.now;
+  })  : _now = now ?? DateTime.now;
 
   /// `true` when [stationId] has a fresh (within [ttl]) cached price.
   bool isFresh(String stationId) {

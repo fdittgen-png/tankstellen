@@ -26,8 +26,7 @@ class NativeGeocodingProvider implements GeocodingProvider {
   // eagerly throws off-device (test hosts have no platform implementation).
   late final geo.Geocoding _geocoding = geo.Geocoding();
 
-  NativeGeocodingProvider({String countryName = 'Deutschland'})
-      : _countryName = countryName;
+  NativeGeocodingProvider({this._countryName = 'Deutschland'});
 
   @override
   ServiceSource get source => ServiceSource.nativeGeocoding;

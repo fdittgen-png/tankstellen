@@ -24,12 +24,10 @@ import '../domain/obd2_connection_errors.dart';
 /// genuinely new outage logs a fresh ERROR.
 class UnresponsiveAdapterDiagnostic {
   UnresponsiveAdapterDiagnostic({
-    required int backoffThreshold,
-    required Duration window,
-    required DateTime Function() clock,
-  })  : _backoffThreshold = backoffThreshold,
-        _window = window,
-        _clock = clock;
+    required this._backoffThreshold,
+    required this._window,
+    required this._clock,
+  });
 
   final int _backoffThreshold;
   final Duration _window;

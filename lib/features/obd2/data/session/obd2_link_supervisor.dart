@@ -52,7 +52,7 @@ typedef Obd2LinkDialer = Future<Obd2Service?> Function();
 ///    first (research rules 8 + 9).
 class Obd2LinkSupervisor {
   Obd2LinkSupervisor({
-    required Obd2LinkDialer dial,
+    required this._dial,
     Stream<Obd2LinkDropEvent>? drops,
     Duration initialBackoff = const Duration(milliseconds: 500),
     Duration maxBackoff = const Duration(seconds: 30),
@@ -60,8 +60,7 @@ class Obd2LinkSupervisor {
     Random? jitter,
     DateTime Function()? now,
     Obd2EngineEvidence? engineEvidence,
-  })  : _dial = dial,
-        _engineEvidence = engineEvidence ?? Obd2EngineEvidence.instance,
+  })  : _engineEvidence = engineEvidence ?? Obd2EngineEvidence.instance,
         _standDown = ReconnectStandDown(now: now ?? DateTime.now),
         _backoff = ReconnectBackoff(
           initial: initialBackoff,

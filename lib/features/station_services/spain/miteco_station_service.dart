@@ -44,7 +44,7 @@ class MitecoStationService
   /// #2181 — Dio injectable for tests; defaults to the standard factory.
   /// #2193 — [baseUrl] injectable too, harmonising the override surface
   /// with Portugal / Slovenia / South Korea; defaults to [defaultBaseUrl].
-  /// #2264 — [cache] enables per-province disk persistence (read-through);
+  /// #2264 — [_cache] enables per-province disk persistence (read-through);
   /// omit it for the pure in-memory behaviour the parser tests rely on.
   /// #3189 — [now] is the clock seam for the schedule-derived `isOpen`;
   /// defaults to the wall clock.
@@ -53,7 +53,7 @@ class MitecoStationService
   MitecoStationService({
     Dio? dio,
     String? baseUrl,
-    CacheStrategy? cache,
+    this._cache,
     DateTime Function()? now,
     WeeklyOpeningHours Function(String horario)? parseOpeningHours,
   })  : _dio = dio ??
@@ -62,7 +62,6 @@ class MitecoStationService
               receiveTimeout: const Duration(seconds: 30),
             ),
         _baseUrl = baseUrl ?? defaultBaseUrl,
-        _cache = cache,
         // #3198 — default the clock seam to SPAIN's wall clock, not the
         // device's, so a user browsing ES from another timezone gets the
         // open state at the station.

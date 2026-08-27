@@ -20,14 +20,14 @@ import '../../../core/utils/json_extensions.dart';
 /// background isolate (with a freshly-constructed Dio).
 class TankerkoenigBatchPriceFetcher {
   TankerkoenigBatchPriceFetcher({
-    required Dio dio,
+    required this._dio,
     this.batchSize = 10,
     this.url = 'https://creativecommons.tankerkoenig.de/json/prices.php',
     this.retryConfig = const BackgroundRetryConfig(
       maxAttempts: 3,
       baseDelay: Duration(seconds: 2),
     ),
-  }) : _dio = dio;
+  });
 
   final Dio _dio;
 

@@ -33,16 +33,12 @@ enum LocationPermissionOutcome { granted, denied, permanentlyDenied }
 /// the OS without binding either plugin.
 class LocationPermissions {
   const LocationPermissions({
-    Future<geo.LocationPermission> Function()? checkWhileInUseBackend,
-    Future<geo.LocationPermission> Function()? requestWhileInUseBackend,
-    Future<ph.PermissionStatus> Function()? foregroundPromptBackend,
-    Future<ph.PermissionStatus> Function()? alwaysPromptBackend,
-    Future<bool> Function()? openSettingsBackend,
-  })  : _checkWhileInUseBackend = checkWhileInUseBackend,
-        _requestWhileInUseBackend = requestWhileInUseBackend,
-        _foregroundPromptBackend = foregroundPromptBackend,
-        _alwaysPromptBackend = alwaysPromptBackend,
-        _openSettingsBackend = openSettingsBackend;
+    this._checkWhileInUseBackend,
+    this._requestWhileInUseBackend,
+    this._foregroundPromptBackend,
+    this._alwaysPromptBackend,
+    this._openSettingsBackend,
+  });
 
   final Future<geo.LocationPermission> Function()? _checkWhileInUseBackend;
   final Future<geo.LocationPermission> Function()? _requestWhileInUseBackend;
