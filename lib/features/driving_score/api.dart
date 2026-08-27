@@ -23,6 +23,7 @@ export 'data/lessons/driving_lesson_registry.dart';
 export 'data/lessons/lesson_format.dart';
 export 'domain/driving_coaching.dart';
 export 'domain/driving_insight.dart';
+export 'domain/live_driving_band.dart';
 export 'domain/driving_score.dart';
 export 'domain/lessons/driving_lesson.dart';
 export 'domain/lessons/driving_lesson_rule.dart';

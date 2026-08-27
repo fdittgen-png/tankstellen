@@ -65,6 +65,7 @@ class InstantConsumptionEma {
   InstantConsumptionEma({
     this.tau = const Duration(milliseconds: 2500),
     this.idleSpeedThresholdKmh = 5.0,
+    this.holdWindow = const Duration(seconds: 2),
   });
 
   /// EMA time constant. 2.5 s per the #3431 spec (τ ≈ 2–3 s).
@@ -74,6 +75,21 @@ class InstantConsumptionEma {
   /// to idle mode and consumers render L/h. Mirrors the 5 km/h guard
   /// `formatInstantConsumption` has used since #2007.
   final double idleSpeedThresholdKmh;
+
+  /// How long a measured value keeps answering for after the fuel-rate
+  /// PID stops responding (#3845).
+  ///
+  /// Field data: `signalCoverage.fuelRate: 0.209` — only ~21% of ticks
+  /// carry a fuel rate on the reporting car, so returning null whenever
+  /// the current tick lacks one blanked the headline roughly four ticks
+  /// out of five and the driver saw "—" for most of the drive.
+  ///
+  /// An engine's fuel rate does not change meaningfully between ticks,
+  /// so over a ~2 s gap holding the last smoothed value is far more
+  /// truthful than blanking. Beyond the window the value IS stale and
+  /// null returns — the original anti-staleness guarantee is kept, just
+  /// scoped to a real dropout instead of a single missed tick.
+  final Duration holdWindow;
 
   double? _emaLPerHour;
   DateTime? _lastAt;
@@ -91,7 +107,9 @@ class InstantConsumptionEma {
     required double? fuelRateLPerHour,
     required double? speedKmh,
   }) {
-    if (fuelRateLPerHour == null || fuelRateLPerHour < 0) return null;
+    if (fuelRateLPerHour == null || fuelRateLPerHour < 0) {
+      return _hold(now: now, speedKmh: speedKmh);
+    }
 
     final prev = _emaLPerHour;
     final last = _lastAt;
@@ -122,6 +140,35 @@ class InstantConsumptionEma {
       lPerHour: next,
       lPer100Km: idle ? null : next / speed * 100.0,
       isIdle: idle,
+    );
+  }
+
+  /// Answer from the retained EMA when this tick had no fuel rate
+  /// (#3845). Null once the value is genuinely stale, or at standstill —
+  /// where "blank" is the correct reading rather than a gap.
+  InstantConsumption? _hold({
+    required DateTime now,
+    required double? speedKmh,
+  }) {
+    final prev = _emaLPerHour;
+    final last = _lastAt;
+    if (prev == null || last == null) return null;
+    final age = now.difference(last);
+    if (age.isNegative || age > holdWindow) return null;
+
+    final speed = speedKmh;
+    final idle = speed == null || speed < idleSpeedThresholdKmh;
+    // At standstill the requirement is an EMPTY figure, not a held one:
+    // a stopped car is the one case where "no instant consumption" is
+    // the honest answer rather than a missing reading.
+    if (idle) return null;
+    // Recompute per-distance against the CURRENT speed rather than
+    // replaying the old one — holding the rate is defensible, holding a
+    // whole L/100 km figure through an acceleration is not.
+    return InstantConsumption(
+      lPerHour: prev,
+      lPer100Km: prev / speed * 100.0,
+      isIdle: false,
     );
   }
 

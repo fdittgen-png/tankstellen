@@ -4653,11 +4653,7 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "minimalDriveTripAverage": "Trip average",
-  "@minimalDriveTripAverage": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
+  "minimalDriveTripAverage": "Ritgemiddelde",
   "insightUpshiftCruise": "High-RPM cruising ({pctTime}% of trip): shifting up earlier could save {liters} L",
   "@insightUpshiftCruise": {
     "x-mt": "needs-native-review",
@@ -5776,5 +5772,6 @@
   "trajetObd2Degraded": "Gestart met de OBD2-adapter maar grotendeels via GPS opgenomen — motorgegevens zijn onvolledig",
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
-  }
+  },
+  "minimalDriveBehaviour": "Rijgedrag"
 }

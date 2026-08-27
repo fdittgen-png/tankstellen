@@ -4653,11 +4653,7 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "minimalDriveTripAverage": "Trip average",
-  "@minimalDriveTripAverage": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
+  "minimalDriveTripAverage": "Prosjek vožnje",
   "insightUpshiftCruise": "High-RPM cruising ({pctTime}% of trip): shifting up earlier could save {liters} L",
   "@insightUpshiftCruise": {
     "x-mt": "needs-native-review",
@@ -5776,5 +5772,6 @@
   "trajetObd2Degraded": "Pokrenuto s OBD2 adapterom, ali snimljeno uglavnom GPS-om — podaci motora su nepotpuni",
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
-  }
+  },
+  "minimalDriveBehaviour": "Stil vožnje"
 }

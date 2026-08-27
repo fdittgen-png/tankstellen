@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 import '../../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../../../core/telemetry/collectors/breadcrumb_collector.dart';
-import '../../../../core/domain/driving_coaching_hint.dart';
+import '../../../driving_score/api.dart';
 import '../../../trips/api.dart';
 import 'obd2_reattach_source.dart';
 import '../../domain/degraded_gps_emitter.dart';

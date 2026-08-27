@@ -4653,11 +4653,7 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "minimalDriveTripAverage": "Trip average",
-  "@minimalDriveTripAverage": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
+  "minimalDriveTripAverage": "Средно за курса",
   "insightUpshiftCruise": "High-RPM cruising ({pctTime}% of trip): shifting up earlier could save {liters} L",
   "@insightUpshiftCruise": {
     "x-mt": "needs-native-review",
@@ -5776,5 +5772,6 @@
   "trajetObd2Degraded": "Стартирано с OBD2 адаптер, но записано предимно чрез GPS — данните от двигателя са непълни",
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
-  }
+  },
+  "minimalDriveBehaviour": "Стил на шофиране"
 }

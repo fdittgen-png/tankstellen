@@ -154,6 +154,11 @@ mixin _TripRecordingSessionState {
   // (a controller is built per trip), so no explicit reset is needed.
   final InstantConsumptionEma _instantEma = InstantConsumptionEma();
 
+  /// #3845 — rolling driving-behaviour band for the live surfaces. Runs
+  /// the canonical end-of-trip calculator over a sliding window, so the
+  /// live colour and the trip's final grade share one implementation.
+  final LiveDrivingBandTracker _liveBandTracker = LiveDrivingBandTracker();
+
   // #1858 — η_v recompute provenance, accumulated per emit tick.
   // [_veWeightedFuelSum] is Σ(η_v_i × fuelRate_i) and
   // [_veDerivedFuelRateSum] is Σ(fuelRate_i), both over speed-density

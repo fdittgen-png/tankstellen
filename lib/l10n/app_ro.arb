@@ -4653,11 +4653,7 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "minimalDriveTripAverage": "Trip average",
-  "@minimalDriveTripAverage": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
+  "minimalDriveTripAverage": "Media călătoriei",
   "insightUpshiftCruise": "High-RPM cruising ({pctTime}% of trip): shifting up earlier could save {liters} L",
   "@insightUpshiftCruise": {
     "x-mt": "needs-native-review",
@@ -5776,5 +5772,6 @@
   "trajetObd2Degraded": "Pornit cu adaptorul OBD2, dar înregistrat mai ales prin GPS — datele de motor sunt incomplete",
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
-  }
+  },
+  "minimalDriveBehaviour": "Stil de condus"
 }

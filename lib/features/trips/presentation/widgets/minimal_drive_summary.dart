@@ -187,6 +187,14 @@ class MinimalDriveSummary extends ConsumerWidget {
                   ),
                 ],
               ),
+            // #3845 — always-on driving-behaviour band. Present on every
+            // trajet including GPS-only ones (it is scored from the
+            // speed series, not from a fuel-rate PID), and absent only
+            // while the tracker is still filling its first window.
+            if (reading?.liveDrivingScore != null) ...[
+              const SizedBox(height: 8),
+              _BehaviourBand(score: reading!.liveDrivingScore!),
+            ],
             const SizedBox(height: 6),
             // #2903 — each symbol gets an equal Expanded share so the
             // triplet fits a narrow pane (the landscape split's left
@@ -241,6 +249,113 @@ class _CoachingSymbol extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The live driving-behaviour band (#3845): one traffic-light colour
+/// for the rolling 0..100 score, with the band name and the number
+/// beside it.
+///
+/// Colour is never the only channel — the band name and score are both
+/// rendered, so the widget still reads correctly for a colour-blind
+/// driver and in a screen-reader announcement.
+class _BehaviourBand extends StatelessWidget {
+  const _BehaviourBand({required this.score});
+
+  final int score;
+
+  /// The four bands the user asked for, in order good → bad. Fixed
+  /// traffic-light colours rather than scheme roles: "green / yellow /
+  /// orange / red" is the shared driving vocabulary here, and a theme
+  /// that maps `tertiary` to something else would break the reading.
+  static Color _colorFor(DrivingStyleClass c) {
+    switch (c) {
+      case DrivingStyleClass.veryGood:
+        return const Color(0xFF2E7D32); // green 800
+      case DrivingStyleClass.good:
+        return const Color(0xFFF9A825); // yellow 800
+      case DrivingStyleClass.average:
+        return const Color(0xFFEF6C00); // orange 800
+      case DrivingStyleClass.bad:
+        return const Color(0xFFC62828); // red 800
+    }
+  }
+
+  static String _labelFor(AppLocalizations l, DrivingStyleClass c) {
+    switch (c) {
+      case DrivingStyleClass.veryGood:
+        return l.drivingScoreClassVeryGood;
+      case DrivingStyleClass.good:
+        return l.drivingScoreClassGood;
+      case DrivingStyleClass.average:
+        return l.drivingScoreClassAverage;
+      case DrivingStyleClass.bad:
+        return l.drivingScoreClassBad;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final styleClass = DrivingStyleClass.fromScore(score);
+    final color = _colorFor(styleClass);
+    final bandLabel = _labelFor(l, styleClass);
+
+    return Semantics(
+      key: const Key('minimal_drive_behaviour_band'),
+      label: '${l.minimalDriveBehaviour}: $bandLabel',
+      value: '$score',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Text(
+                l.minimalDriveBehaviour,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                bandLabel,
+                key: const Key('minimal_drive_behaviour_label'),
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                // The 0..100 score through the locale-aware formatter —
+                // a bare '$score' would render Western digits on locales
+                // that use their own numerals.
+                UnitFormatter.formatDecimal(score.toDouble(),
+                    fractionDigits: 0),
+                key: const Key('minimal_drive_behaviour_score'),
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          // The bar fills in proportion to the score, so the colour and
+          // the length say the same thing twice.
+          ClipRRect(
+            borderRadius: BorderRadius.circular(3),
+            child: LinearProgressIndicator(
+              value: score / 100.0,
+              minHeight: 6,
+              backgroundColor: theme.colorScheme.surfaceContainerHighest,
+              valueColor: AlwaysStoppedAnimation<Color>(color),
+            ),
           ),
         ],
       ),

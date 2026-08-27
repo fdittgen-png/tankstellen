@@ -2268,6 +2268,9 @@ class AppLocalizationsSl extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Trenutna poraba';
 
   @override
+  String get minimalDriveBehaviour => 'Slog vožnje';
+
+  @override
   String get coachingShiftUp => 'Prestavi navzgor';
 
   @override
@@ -4529,7 +4532,7 @@ class AppLocalizationsSl extends AppLocalizations {
       'Sledi analize ni bilo mogoče izvoziti.';
 
   @override
-  String get minimalDriveTripAverage => 'Trip average';
+  String get minimalDriveTripAverage => 'Povprečje vožnje';
 
   @override
   String insightUpshiftCruise(String pctTime, String liters) {

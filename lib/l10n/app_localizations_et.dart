@@ -2265,6 +2265,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Hetketarbimine';
 
   @override
+  String get minimalDriveBehaviour => 'Sõidustiil';
+
+  @override
   String get coachingShiftUp => 'Vaheta üles';
 
   @override
@@ -4526,7 +4529,7 @@ class AppLocalizationsEt extends AppLocalizations {
       'Analüüsijälje eksportimine ebaõnnestus.';
 
   @override
-  String get minimalDriveTripAverage => 'Trip average';
+  String get minimalDriveTripAverage => 'Sõidu keskmine';
 
   @override
   String insightUpshiftCruise(String pctTime, String liters) {

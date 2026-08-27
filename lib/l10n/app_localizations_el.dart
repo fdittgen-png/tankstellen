@@ -2282,6 +2282,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Στιγμιαία κατανάλωση';
 
   @override
+  String get minimalDriveBehaviour => 'Οδηγική συμπεριφορά';
+
+  @override
   String get coachingShiftUp => 'Ανέβα σχέση';
 
   @override
@@ -4561,7 +4564,7 @@ class AppLocalizationsEl extends AppLocalizations {
       'Δεν ήταν δυνατή η εξαγωγή του ίχνους ανάλυσης.';
 
   @override
-  String get minimalDriveTripAverage => 'Trip average';
+  String get minimalDriveTripAverage => 'Μέσος όρος διαδρομής';
 
   @override
   String insightUpshiftCruise(String pctTime, String liters) {

@@ -393,7 +393,12 @@ void main() {
       expect(e5.legacyAttributedIntervalCount, 0);
       // Metric folding unchanged: interval A = 21 L over 300 km, €17.
       expect(e5.avgL100km, closeTo(21 / 300 * 100, 1e-9));
-      expect(e5.avgCostPerKm, closeTo(17 / 300, 1e-9));
+      // #3846: the money follows the fuel BURNED, not the cash handed over
+      // at the close. This interval burned 21 L of the pure-E5 tank, so it
+      // is charged E5's own price (60/35), NOT the 17 EUR paid for the E85
+      // that refilled it. Charging the 17 EUR here is what made the E5
+      // bucket report E85's cheap per-litre rate on the user's screen.
+      expect(e5.avgCostPerKm, closeTo(21 * (60 / 35) / 300, 1e-9));
 
       // Interval B burned the 14/21 = 40/60 blend — MIX, dominant E85.
       final blend = _byLabel(result, 'E85/E5');
@@ -500,7 +505,105 @@ void main() {
       expect(blend.legacyAttributedIntervalCount, 0);
       // Folding unchanged: contributing fills incl. the closing plein.
       expect(blend.avgL100km, closeTo((14 + 25) / 600 * 100, 1e-9));
-      expect(blend.avgCostPerKm, closeTo((22 + 20) / 600, 1e-9));
+      // #3846: 39 L burned from a 71.4 % E85 / 28.6 % E10 tank, each share
+      // at its own observed price (E85 = 50/60, E10 = 22/14) — not the
+      // 42 EUR of cash that happened to change hands in the window.
+      expect(
+          blend.avgCostPerKm,
+          closeTo(
+              39 * (35 / 49 * (50 / 60) + 14 / 49 * (22 / 14)) / 600, 1e-9));
+    });
+  });
+
+  group('#3846 money follows the fuel BURNED, not the next tank', () {
+    // The reporting user's actual fill-ups. Before this fix the aggregator
+    // charged each interval with the cost of the fill that CLOSED it — the
+    // NEXT tank — so E5 was priced with E85's cheap money (0,90 EUR/L) and
+    // the E85 bucket swallowed the 78,03 EUR E5 fill (showing an impossible
+    // 1,27 EUR/L for a fuel never bought above 0,90). The screen therefore
+    // recommended E5, which is backwards.
+    //
+    // The capacity MATTERS: it is what puts the bug on screen. Without it
+    // the v2 fallback attributes each interval to its own closing fill, so
+    // E5 already prices itself right and these tests would pass on master —
+    // false green. With a 45 L tank the v3 walker attributes the 559 km
+    // interval to the E5 tank content while the fill that CLOSES it is the
+    // 35,7 L E85 one, reproducing the screenshot exactly (E5 shown as
+    // 35,7 L / 32,12 EUR / 0,90 EUR/L).
+    const capacityL = 45.0;
+    final fills = [
+      _f(id: 'a', date: DateTime(2026, 7, 24), liters: 27.7, cost: 22.69,
+          odo: 120696, fuelType: FuelType.e85),
+      _f(id: 'b', date: DateTime(2026, 8, 1), liters: 35.5, cost: 29.37,
+          odo: 121645, fuelType: FuelType.e85),
+      _f(id: 'c', date: DateTime(2026, 8, 10), liters: 39.2, cost: 78.03,
+          odo: 122141, fuelType: FuelType.e5),
+      _f(id: 'd', date: DateTime(2026, 8, 21), liters: 35.7, cost: 32.12,
+          odo: 122700, fuelType: FuelType.e85),
+    ];
+
+    FuelTypeEfficiencyStats? bucketFor(
+        List<FuelTypeEfficiencyStats> stats, FuelType fuel) {
+      for (final s in stats) {
+        if (!s.isMix && s.bucket.dominant == fuel) return s;
+      }
+      return null;
+    }
+
+    test('E5 is priced at what E5 cost, not at the next E85 fill', () {
+      final stats = FuelTypeEfficiencyAggregator.byFuelType(fills, tankCapacityL: capacityL);
+      final e5 = bucketFor(stats, FuelType.e5);
+      expect(e5, isNotNull, reason: 'the E5 interval must be attributed');
+      // E5 itself was bought at 78.03 / 39.2 = 1.99 EUR/L. The bucket lands
+      // slightly under that on purpose: the tank it burned was 39.2 L of
+      // fresh E5 on top of 5.8 L of E85 carried over, so 12.9 % of the
+      // litres are honestly priced at E85's rate:
+      //   39.2/45 * 1.9906 + 5.8/45 * 0.8512 = 1.844
+      // Pinning 1.99 here would mean pricing carried-over E85 as if it were
+      // E5 — the same class of lie as the bug, pointing the other way.
+      expect(e5!.avgPricePerLitre, isNotNull);
+      expect(e5.avgPricePerLitre!, closeTo(1.844, 0.02),
+          reason: 'showing 0.90 here means the closing E85 fill is still '
+              'paying for the E5 tank');
+      // Whatever the blend arithmetic, it can never land in E85 territory.
+      expect(e5.avgPricePerLitre!, greaterThan(1.5),
+          reason: 'no reading near E85 prices is defensible for a tank that '
+              'is 87 % E5 bought at 1.99 EUR/L');
+    });
+
+    test('E85 is not charged the 78 EUR E5 fill', () {
+      final stats = FuelTypeEfficiencyAggregator.byFuelType(fills, tankCapacityL: capacityL);
+      final e85 = bucketFor(stats, FuelType.e85);
+      expect(e85, isNotNull);
+      // Every E85 fill here is under 0.90 EUR/L, so any figure above that
+      // is money borrowed from the E5 fill (the old code showed 1.27).
+      expect(e85!.avgPricePerLitre, isNotNull);
+      expect(e85.avgPricePerLitre!, lessThan(0.95),
+          reason: 'no E85 fill was above 0.90 EUR/L; a higher average means '
+              'the E5 fill leaked into this bucket');
+    });
+
+    test('THE VERDICT: E5 costs MORE per km than E85, not less', () {
+      // This is what the user sees. The old code produced the opposite and
+      // told them "E5 est votre carburant le moins cher a l'usage".
+      final stats = FuelTypeEfficiencyAggregator.byFuelType(fills, tankCapacityL: capacityL);
+      final e5 = bucketFor(stats, FuelType.e5)!;
+      final e85 = bucketFor(stats, FuelType.e85)!;
+      expect(e5.avgCostPerKm, isNotNull);
+      expect(e85.avgCostPerKm, isNotNull);
+      expect(e5.avgCostPerKm!, greaterThan(e85.avgCostPerKm!),
+          reason: 'E5 at ~1.99 EUR/L cannot be cheaper to drive on than E85 '
+              'at ~0.85 EUR/L when the two consume comparably');
+    });
+
+    test('consumption is untouched — only the money moved', () {
+      // The plein-to-plein litres/distance are correct and must stay so:
+      // 122700 - 122141 = 559 km on the 35.7 L refill => 6.4 L/100km.
+      final stats = FuelTypeEfficiencyAggregator.byFuelType(fills, tankCapacityL: capacityL);
+      final e5 = bucketFor(stats, FuelType.e5)!;
+      expect(e5.totalDistanceKm, closeTo(559, 0.5));
+      expect(e5.avgL100km, isNotNull);
+      expect(e5.avgL100km!, closeTo(6.4, 0.2));
     });
   });
 }

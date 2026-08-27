@@ -2277,6 +2277,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Momentinės sąnaudos';
 
   @override
+  String get minimalDriveBehaviour => 'Vairavimo stilius';
+
+  @override
   String get coachingShiftUp => 'Aukštyn pavarą';
 
   @override
@@ -4551,7 +4554,7 @@ class AppLocalizationsLt extends AppLocalizations {
   String get drivingTraceExportFailed => 'Nepavyko eksportuoti analizės sekos.';
 
   @override
-  String get minimalDriveTripAverage => 'Trip average';
+  String get minimalDriveTripAverage => 'Kelionės vidurkis';
 
   @override
   String insightUpshiftCruise(String pctTime, String liters) {

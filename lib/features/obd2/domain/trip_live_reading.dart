@@ -156,6 +156,16 @@ class TripLiveReading {
   /// no instant signal exists this tick.
   final bool? instantIsIdle;
 
+  /// Rolling driving-behaviour score, 0..100, over the last ~90 s
+  /// (#3845). Produced by `LiveDrivingBandTracker` in the controller's
+  /// emit loop from the SAME calculator the end-of-trip score uses, so
+  /// the live colour and the trip's final grade cannot disagree.
+  ///
+  /// Null only while the tracker is still filling its first window —
+  /// unlike the instant-consumption fields this does NOT depend on a
+  /// fuel-rate PID, so it stays populated on GPS-only trajets.
+  final int? liveDrivingScore;
+
   const TripLiveReading({
     this.speedKmh,
     this.rpm,
@@ -186,6 +196,7 @@ class TripLiveReading {
     this.instantLPer100Km,
     this.instantLPerHour,
     this.instantIsIdle,
+    this.liveDrivingScore,
   });
 
   /// Overlay one or more fields onto a copy of this reading (#2506).
@@ -228,6 +239,7 @@ class TripLiveReading {
     double? instantLPer100Km,
     double? instantLPerHour,
     bool? instantIsIdle,
+    int? liveDrivingScore,
   }) {
     return TripLiveReading(
       speedKmh: speedKmh ?? this.speedKmh,
@@ -262,6 +274,7 @@ class TripLiveReading {
       instantLPer100Km: instantLPer100Km ?? this.instantLPer100Km,
       instantLPerHour: instantLPerHour ?? this.instantLPerHour,
       instantIsIdle: instantIsIdle ?? this.instantIsIdle,
+      liveDrivingScore: liveDrivingScore ?? this.liveDrivingScore,
     );
   }
 

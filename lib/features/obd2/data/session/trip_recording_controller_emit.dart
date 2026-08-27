@@ -233,6 +233,25 @@ mixin _TripRecordingEmit
     // fuel-rate PID is measurable; the surfaces then fall back).
     final instant = _instantEma.update(
         now: nowTs, fuelRateLPerHour: fuelRate, speedKmh: effectiveSpeedKmh);
+    // #3845 — fold this tick into the rolling driving-behaviour band.
+    // Fed with the EFFECTIVE speed (OBD2 PID, else the GPS fallback) so
+    // the band is "always on" as asked: a GPS-only trajet still scores
+    // its accel / brake / smoothness behaviour, and the engine-only
+    // penalties simply contribute nothing.
+    final liveBand = effectiveSpeedKmh == null
+        ? _liveBandTracker.band
+        : _liveBandTracker.add(
+            at: nowTs,
+            speedKmh: effectiveSpeedKmh,
+            rpm: rpm,
+            throttlePercent: throttlePercent,
+            engineLoadPercent: engineLoadPercent,
+            fuelRateLPerHour: fuelRate,
+            // #2653 — the same provenance guard the persisted score
+            // uses: harsh events off a dead-reckoned speed series are
+            // manufactured, not driven.
+            suppressSpeedHarsh: distanceSource == 'virtual',
+          );
     final resolverDistanceKm = currentDistanceKm;
     final effectiveDistanceKm = resolverDistanceKm > summary.distanceKm
         ? resolverDistanceKm
@@ -278,6 +297,8 @@ mixin _TripRecordingEmit
       instantLPer100Km: instant?.lPer100Km,
       instantLPerHour: instant?.lPerHour,
       instantIsIdle: instant?.isIdle,
+      // #3845 — rolling behaviour band (green/yellow/orange/red).
+      liveDrivingScore: liveBand?.score,
     );
     // #2506 — when NO fuel-rate PID is measurable (every tick null), fold
     // the GPS-physics estimate + coaching into the live reading so the

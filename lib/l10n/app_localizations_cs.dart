@@ -2273,6 +2273,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Okamžitá spotřeba';
 
   @override
+  String get minimalDriveBehaviour => 'Styl jízdy';
+
+  @override
   String get coachingShiftUp => 'Zařadit vyšší';
 
   @override
@@ -4537,7 +4540,7 @@ class AppLocalizationsCs extends AppLocalizations {
       'Stopu analýzy se nepodařilo exportovat.';
 
   @override
-  String get minimalDriveTripAverage => 'Trip average';
+  String get minimalDriveTripAverage => 'Průměr jízdy';
 
   @override
   String insightUpshiftCruise(String pctTime, String liters) {

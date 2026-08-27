@@ -2278,6 +2278,9 @@ class AppLocalizationsRo extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Consum instantaneu';
 
   @override
+  String get minimalDriveBehaviour => 'Stil de condus';
+
+  @override
   String get coachingShiftUp => 'Schimbă în sus';
 
   @override
@@ -4559,7 +4562,7 @@ class AppLocalizationsRo extends AppLocalizations {
       'Nu s-a putut exporta urma de analiză.';
 
   @override
-  String get minimalDriveTripAverage => 'Trip average';
+  String get minimalDriveTripAverage => 'Media călătoriei';
 
   @override
   String insightUpshiftCruise(String pctTime, String liters) {
