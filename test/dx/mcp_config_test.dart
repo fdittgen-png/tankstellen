@@ -100,4 +100,30 @@ void main() {
         reason: 'the formatter exclusion is the least obvious decision '
             'here — it must be explained, not just enforced');
   });
+
+  // #3837 — the guide previously claimed 27 tools and named eight that the
+  // configured server does not have, because it was written from an upstream
+  // README rather than from a probe. A tool list without a version and a date
+  // beside it cannot be checked for staleness, so it silently rots.
+  test('the tool list records the version and date it was verified against',
+      () {
+    final doc = File('docs/guides/mcp-servers.md').readAsStringSync();
+    expect(doc, contains(RegExp(r'0\.1\.4')),
+        reason: 'name the server version the list was probed from');
+    expect(doc, contains(RegExp(r'20\d{2}-\d{2}-\d{2}')),
+        reason: 'date it, so the next reader can judge staleness');
+    // Tools upstream removed must not be LISTED AS AVAILABLE. Scoped to the
+    // tool table on purpose: the prose legitimately says "there is no
+    // `run_tests`", and a blunt whole-document ban would forbid warning the
+    // reader about the very tool that misled them.
+    final table = RegExp(r'\| Group \| Tools \|[\s\S]*?\n\n')
+        .firstMatch(doc)
+        ?.group(0);
+    expect(table, isNotNull, reason: 'the tool table must exist to be checked');
+    for (final gone in ['run_tests', 'get_widget_tree', 'launch_app']) {
+      expect(table!.contains(gone), isFalse,
+          reason: '$gone does not exist in the configured server; listing it '
+              'in the tool table is how the previous version misled');
+    }
+  });
 }

@@ -23,26 +23,68 @@ failures of 2026‑08‑25/26:
 
 ## `dart` — Dart & Flutter MCP server
 
-Ships **inside the Dart SDK** (3.9+; this repo pins Flutter 3.41.9 =
-Dart 3.11.5), so there is nothing to install. 27 tools, of which the
-ones that change the loop are:
+Ships **inside the Dart SDK**, so there is nothing to install.
 
-| Tool | Why it matters here |
+> **Verified 2026-08-27 against `dart mcp-server` version 0.1.4** by probing
+> `tools/list` over stdio (recipe at the bottom of this file). Re-probe before
+> trusting this list: the tool set changes between builds, and a list copied
+> from an upstream README is stale within days (#3837).
+
+**13 tools in 0.1.4:**
+
+| Group | Tools |
 |---|---|
-| `analyze_files`, `run_tests` | Go through the **persistent** analysis server — incremental, not an ~80 s cold start. `run_tests` is explicitly built for agent use. |
-| `launch_app`, `connect_dart_tooling_daemon` | Attach to a **running** app instead of only its exports. |
-| `get_runtime_errors`, `get_widget_tree`, `get_selected_widget` | Read live errors and UI state directly. |
-| `hot_reload`, `hot_restart`, `flutter_driver` | Drive the app and apply changes without a rebuild. |
-| `pub`, `pub_dev_search`, `resolve_workspace_symbol`, `hover` | Dependency and symbol work without shelling out. |
+| Static analysis | `analyze_files`, `lsp` |
+| Packages | `pub`, `pub_dev_search`, `read_package_uris`, `rip_grep_packages` |
+| Live app | `dtd`, `widget_inspector`, `get_runtime_errors`, `hot_reload`, `hot_restart`, `flutter_driver_command` |
+| Scope | `roots` |
 
-### `dart_format` and `dart_fix` are excluded on purpose
+**`analyze_files` is the reason this is wired.** It goes through the
+*persistent* analysis server, so it is incremental rather than paying the
+~80 s cold start `flutter analyze` costs on every invocation — half an hour
+of pure waiting across the 20+ analyze runs of one debugging session.
 
-Not an oversight — a guard. The SDK's formatter uses the new **tall**
-style; this repo is written in the **short** style and has **no format
-gate** to catch a mass rewrite. Running it on 2026‑08‑25 reformatted 20
-files and turned a ~700-line diff into **2 656 lines**, which had to be
-reverted and re-applied by hand. Match the surrounding style manually.
-See the `feedback-no-whole-file-dart-format` memory.
+The **live-app group** is the other real gain: `dtd` → `widget_inspector` +
+`get_runtime_errors` reads a RUNNING app instead of reasoning from an
+exported JSON, and `hot_reload` applies a change without a rebuild.
+
+### There is no `run_tests` — use `flutter test`
+
+Earlier versions had one and it was the best tool in the set; upstream
+removed it. Tests run through the CLI as before.
+
+### `dart_format` and `dart_fix`
+
+`.mcp.json` passes `--exclude-tool dart_format --exclude-tool dart_fix`.
+**Those flags are currently no-ops** — both tools are already absent from
+0.1.4, and the flags are accepted silently. They are kept as a statement of
+intent in case a later build reinstates the tools.
+
+The reason behind them is a **repo rule that stands on its own**, enforced by
+convention rather than by the flag: the SDK formatter uses the new **tall**
+style, this repo is written in the **short** style, and there is **no format
+gate** to catch a mass rewrite. Running it on 2026-08-25 reformatted 20 files
+and turned a ~700-line diff into **2 656 lines**, which had to be reverted and
+re-applied by hand. Match the surrounding style by hand. See the
+`feedback-no-whole-file-dart-format` memory.
+
+Scoped `dart fix` from the CLI is a different matter and remains useful when
+an SDK bump introduces lints — one rule at a time, then read the diff:
+
+```sh
+dart fix --apply --code=prefer_initializing_formals
+git diff --stat
+```
+
+#3801 used exactly that for the 224 infos the Dart 3.12 analyzer newly
+reports: 222 fixes across 92 files, with no reformatting.
+
+### If a tool name is "not found", look for a rename first
+
+Most disappearances are consolidations: `get_widget_tree` → `widget_inspector`,
+`connect_dart_tooling_daemon` → `dtd`, `flutter_driver` →
+`flutter_driver_command`, and `hover` / `resolveWorkspaceSymbol` → `lsp` with
+a `command` argument.
 
 ## `adb` — Android device access
 
