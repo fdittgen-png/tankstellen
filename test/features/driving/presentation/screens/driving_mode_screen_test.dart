@@ -254,7 +254,13 @@ void main() {
   // `driving_map_view_test.dart` (the wiring).
 
   group('DrivingModeScreen fullscreen', () {
-    testWidgets('enters immersive mode on init', (tester) async {
+    // #3843 — INVERTED. This used to assert the screen enters immersive on
+    // init. It no longer may: immersiveSticky is designed to re-hide the
+    // bars, so it fights being exited, and four fixes trying to reverse it
+    // reliably all failed in the field across five user reports. Driving
+    // mode keeps the WAKE LOCK — the actual feature — and leaves the system
+    // bars alone, so there is nothing left to restore.
+    testWidgets('does NOT enter immersive mode on init', (tester) async {
       final log = <MethodCall>[];
       tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
         SystemChannels.platform,
@@ -270,11 +276,13 @@ void main() {
         overrides: _drivingScreenOverrides(),
       );
 
-      final immersiveCall = log.where(
-        (c) => c.method == 'SystemChrome.setEnabledSystemUIMode',
-      );
-      expect(immersiveCall, isNotEmpty,
-          reason: 'Should call setEnabledSystemUIMode on init');
+      final immersive = log.where((c) =>
+          c.method == 'SystemChrome.setEnabledSystemUIMode' &&
+          '${c.arguments}'.contains('immersive'));
+      expect(immersive, isEmpty,
+          reason: 'entering immersiveSticky reintroduces the black status '
+              'bar that survived four fixes; the wake lock stays, the bars '
+              'do not get hidden');
 
       tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
         SystemChannels.platform,
