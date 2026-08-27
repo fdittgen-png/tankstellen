@@ -3993,6 +3993,44 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get fuelCompareCo2Per100km => 'CO2 per 100 km';
+
+  @override
+  String fuelCompareCleanest(String winner) {
+    return '$winner is your lowest-emission fuel';
+  }
+
+  @override
+  String fuelCompareTradeoff(String fuel, String money, String co2) {
+    return '$fuel costs $money more per 1000 km but emits $co2 less CO2';
+  }
+
+  @override
+  String fuelCompareTradeoffBoth(String fuel, String rival) {
+    return '$fuel is both cheaper and cleaner than $rival';
+  }
+
+  @override
+  String fuelCompareCo2Avoided(
+    String distance,
+    String fuel,
+    String actual,
+    String alternative,
+    String rival,
+    String saved,
+  ) {
+    return 'Your $distance on $fuel emitted $actual instead of $alternative on $rival — $saved avoided';
+  }
+
+  @override
+  String get fuelCompareCo2Source =>
+      'CO2 figures are well-to-wheel estimates (EU JEC WTW v5) applied to your measured consumption — awareness, not audit-grade accounting.';
+
+  @override
+  String get fuelCompareCo2BlendOmitted =>
+      'CO2 is shown for pure fuels only: a blend\'s emission factor depends on the mix, which this row does not record.';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

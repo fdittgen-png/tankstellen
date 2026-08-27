@@ -3953,6 +3953,44 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get fuelCompareCo2Per100km => 'CO2 per 100 km';
+
+  @override
+  String fuelCompareCleanest(String winner) {
+    return '$winner is your lowest-emission fuel';
+  }
+
+  @override
+  String fuelCompareTradeoff(String fuel, String money, String co2) {
+    return '$fuel costs $money more per 1000 km but emits $co2 less CO2';
+  }
+
+  @override
+  String fuelCompareTradeoffBoth(String fuel, String rival) {
+    return '$fuel is both cheaper and cleaner than $rival';
+  }
+
+  @override
+  String fuelCompareCo2Avoided(
+    String distance,
+    String fuel,
+    String actual,
+    String alternative,
+    String rival,
+    String saved,
+  ) {
+    return 'Your $distance on $fuel emitted $actual instead of $alternative on $rival — $saved avoided';
+  }
+
+  @override
+  String get fuelCompareCo2Source =>
+      'CO2 figures are well-to-wheel estimates (EU JEC WTW v5) applied to your measured consumption — awareness, not audit-grade accounting.';
+
+  @override
+  String get fuelCompareCo2BlendOmitted =>
+      'CO2 is shown for pure fuels only: a blend\'s emission factor depends on the mix, which this row does not record.';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -11858,6 +11896,44 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
     );
     return '⟦Ɓášéđ óñ $_temp0 ···⟧';
   }
+
+  @override
+  String get fuelCompareCo2Per100km => '⟦ÇÓ2 ƥéř 100 ķɱ ···⟧';
+
+  @override
+  String fuelCompareCleanest(String winner) {
+    return '⟦$winner îš ýóúř łóŵéšŧ-éɱîššîóñ ƒúéł ···········⟧';
+  }
+
+  @override
+  String fuelCompareTradeoff(String fuel, String money, String co2) {
+    return '⟦$fuel çóšŧš $money ɱóřé ƥéř 1000 ķɱ ƀúŧ éɱîŧš $co2 łéšš ÇÓ2 ·············⟧';
+  }
+
+  @override
+  String fuelCompareTradeoffBoth(String fuel, String rival) {
+    return '⟦$fuel îš ƀóŧĥ çĥéáƥéř áñđ çłéáñéř ŧĥáñ $rival ············⟧';
+  }
+
+  @override
+  String fuelCompareCo2Avoided(
+    String distance,
+    String fuel,
+    String actual,
+    String alternative,
+    String rival,
+    String saved,
+  ) {
+    return '⟦Ýóúř $distance óñ $fuel éɱîŧŧéđ $actual îñšŧéáđ óƒ $alternative óñ $rival — $saved áṽóîđéđ ··············⟧';
+  }
+
+  @override
+  String get fuelCompareCo2Source =>
+      '⟦ÇÓ2 ƒîǧúřéš ářé ŵéłł-ŧó-ŵĥééł éšŧîɱáŧéš (ÉÚ ĴÉÇ ŴŦŴ ṽ5) áƥƥłîéđ ŧó ýóúř ɱéášúřéđ çóñšúɱƥŧîóñ — áŵářéñéšš, ñóŧ áúđîŧ-ǧřáđé áççóúñŧîñǧ. ···············································⟧';
+
+  @override
+  String get fuelCompareCo2BlendOmitted =>
+      '⟦ÇÓ2 îš šĥóŵñ ƒóř ƥúřé ƒúéłš óñłý: á ƀłéñđ\'š éɱîššîóñ ƒáçŧóř đéƥéñđš óñ ŧĥé ɱîẋ, ŵĥîçĥ ŧĥîš řóŵ đóéš ñóŧ řéçóřđ. ·······································⟧';
 
   @override
   String consumptionStatsOpenWindowBanner(int count) {

@@ -125,5 +125,77 @@
         "type": "int"
       }
     }
+  },
+  "fuelCompareCo2Per100km": "CO2 per 100 km",
+  "@fuelCompareCo2Per100km": {
+    "description": "Label for a fuel's CO2 emissions over 100 km, derived from its measured consumption and its well-to-wheel emission factor (#3828)."
+  },
+  "fuelCompareCleanest": "{winner} is your lowest-emission fuel",
+  "@fuelCompareCleanest": {
+    "description": "Headline naming the fuel with the lowest CO2 per km (#3828).",
+    "placeholders": {
+      "winner": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelCompareTradeoff": "{fuel} costs {money} more per 1000 km but emits {co2} less CO2",
+  "@fuelCompareTradeoff": {
+    "description": "The central trade-off sentence: a fuel can be more expensive per km and still cleaner (#3828). {money} and {co2} are formatted amounts.",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "money": {
+        "type": "String"
+      },
+      "co2": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelCompareTradeoffBoth": "{fuel} is both cheaper and cleaner than {rival}",
+  "@fuelCompareTradeoffBoth": {
+    "description": "Shown when one fuel wins on cost AND emissions, so no trade-off has to be weighed (#3828).",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "rival": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelCompareCo2Avoided": "Your {distance} on {fuel} emitted {actual} instead of {alternative} on {rival} — {saved} avoided",
+  "@fuelCompareCo2Avoided": {
+    "description": "Counterfactual over the distance actually measured for a fuel, comparing its emissions against the same distance on the rival fuel (#3828).",
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      },
+      "fuel": {
+        "type": "String"
+      },
+      "actual": {
+        "type": "String"
+      },
+      "alternative": {
+        "type": "String"
+      },
+      "rival": {
+        "type": "String"
+      },
+      "saved": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelCompareCo2Source": "CO2 figures are well-to-wheel estimates (EU JEC WTW v5) applied to your measured consumption — awareness, not audit-grade accounting.",
+  "@fuelCompareCo2Source": {
+    "description": "Caption naming the source and the intended precision of the CO2 numbers (#3828)."
+  },
+  "fuelCompareCo2BlendOmitted": "CO2 is shown for pure fuels only: a blend's emission factor depends on the mix, which this row does not record.",
+  "@fuelCompareCo2BlendOmitted": {
+    "description": "Caption explaining why blend rows carry no CO2 figure rather than an estimated one (#3828)."
   }
 }

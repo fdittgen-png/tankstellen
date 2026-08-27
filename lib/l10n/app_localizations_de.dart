@@ -3992,6 +3992,44 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get fuelCompareCo2Per100km => 'CO2 pro 100 km';
+
+  @override
+  String fuelCompareCleanest(String winner) {
+    return '$winner ist Ihr emissionsärmster Kraftstoff';
+  }
+
+  @override
+  String fuelCompareTradeoff(String fuel, String money, String co2) {
+    return '$fuel kostet $money mehr pro 1000 km, stößt aber $co2 weniger CO2 aus';
+  }
+
+  @override
+  String fuelCompareTradeoffBoth(String fuel, String rival) {
+    return '$fuel ist günstiger UND sauberer als $rival';
+  }
+
+  @override
+  String fuelCompareCo2Avoided(
+    String distance,
+    String fuel,
+    String actual,
+    String alternative,
+    String rival,
+    String saved,
+  ) {
+    return 'Ihre $distance mit $fuel verursachten $actual statt $alternative mit $rival — $saved vermieden';
+  }
+
+  @override
+  String get fuelCompareCo2Source =>
+      'CO2-Werte sind Well-to-Wheel-Schätzungen (EU JEC WTW v5), angewandt auf Ihren gemessenen Verbrauch — zur Orientierung, nicht als Bilanzierung.';
+
+  @override
+  String get fuelCompareCo2BlendOmitted =>
+      'CO2 wird nur für reine Kraftstoffe angezeigt: Der Emissionsfaktor eines Gemischs hängt von der Mischung ab, die diese Zeile nicht erfasst.';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
