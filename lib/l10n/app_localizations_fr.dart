@@ -3944,52 +3944,53 @@ class AppLocalizationsFr extends AppLocalizations {
   String get consumptionStatsChartConsumption => 'L/100km par mois';
 
   @override
-  String get fuelCompareSectionTitle => 'Cost of driving, fuel by fuel';
+  String get fuelCompareSectionTitle =>
+      'Coût d\'utilisation, carburant par carburant';
 
   @override
-  String get fuelComparePricePerLitre => 'Paid per litre';
+  String get fuelComparePricePerLitre => 'Payé au litre';
 
   @override
-  String get fuelCompareCostPer100km => 'Cost per 100 km';
+  String get fuelCompareCostPer100km => 'Coût aux 100 km';
 
   @override
-  String get fuelCompareDistance => 'Distance measured';
+  String get fuelCompareDistance => 'Distance mesurée';
 
   @override
-  String get fuelCompareLitres => 'Litres burned';
+  String get fuelCompareLitres => 'Litres consommés';
 
   @override
   String fuelCompareVerdictCheaper(String winner) {
-    return '$winner is your cheapest fuel to drive on';
+    return '$winner est votre carburant le moins cher à l\'usage';
   }
 
   @override
   String fuelCompareVerdictDelta(String loser, String amount) {
-    return '$loser costs $amount more per 1000 km';
+    return '$loser coûte $amount de plus aux 1000 km';
   }
 
   @override
   String fuelCompareBreakEven(String fuel, String rival, String price) {
-    return '$fuel beats $rival below $price per litre';
+    return '$fuel devient plus avantageux que $rival en dessous de $price le litre';
   }
 
   @override
   String get fuelCompareBreakEvenExplain =>
-      'Break-even is calculated from each fuel\'s measured consumption, so it moves as your driving does.';
+      'Le seuil de rentabilité est calculé à partir de la consommation mesurée de chaque carburant : il évolue avec votre conduite.';
 
   @override
   String get fuelCompareLitresVsCostNote =>
-      'Litres and cost can disagree: a fuel can burn fewer litres per 100 km and still cost more per kilometre, because the pump price differs. Cost per kilometre is the verdict.';
+      'Litres et coût peuvent diverger : un carburant peut consommer moins de litres aux 100 km et coûter quand même plus cher au kilomètre, car le prix à la pompe diffère. C\'est le coût au kilomètre qui tranche.';
 
   @override
   String fuelCompareProvisional(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count full tanks',
-      one: 'one full tank',
+      other: '$count pleins complets',
+      one: 'un plein complet',
     );
-    return 'Provisional — based on $_temp0';
+    return 'Provisoire — basé sur $_temp0';
   }
 
   @override
@@ -3997,28 +3998,28 @@ class AppLocalizationsFr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count full tanks',
-      one: 'one full tank',
+      other: '$count pleins complets',
+      one: 'un plein complet',
     );
-    return 'Based on $_temp0';
+    return 'Basé sur $_temp0';
   }
 
   @override
-  String get fuelCompareCo2Per100km => 'CO2 per 100 km';
+  String get fuelCompareCo2Per100km => 'CO2 aux 100 km';
 
   @override
   String fuelCompareCleanest(String winner) {
-    return '$winner is your lowest-emission fuel';
+    return '$winner est votre carburant le moins émetteur';
   }
 
   @override
   String fuelCompareTradeoff(String fuel, String money, String co2) {
-    return '$fuel costs $money more per 1000 km but emits $co2 less CO2';
+    return '$fuel coûte $money de plus aux 1000 km mais émet $co2 de CO2 en moins';
   }
 
   @override
   String fuelCompareTradeoffBoth(String fuel, String rival) {
-    return '$fuel is both cheaper and cleaner than $rival';
+    return '$fuel est à la fois moins cher et plus propre que $rival';
   }
 
   @override
@@ -4030,16 +4031,16 @@ class AppLocalizationsFr extends AppLocalizations {
     String rival,
     String saved,
   ) {
-    return 'Your $distance on $fuel emitted $actual instead of $alternative on $rival — $saved avoided';
+    return 'Vos $distance avec $fuel ont émis $actual au lieu de $alternative avec $rival — $saved évités';
   }
 
   @override
   String get fuelCompareCo2Source =>
-      'CO2 figures are well-to-wheel estimates (EU JEC WTW v5) applied to your measured consumption — awareness, not audit-grade accounting.';
+      'Les valeurs CO2 sont des estimations du puits à la roue (EU JEC WTW v5) appliquées à votre consommation mesurée — à titre indicatif, ce n\'est pas un bilan carbone certifié.';
 
   @override
   String get fuelCompareCo2BlendOmitted =>
-      'CO2 is shown for pure fuels only: a blend\'s emission factor depends on the mix, which this row does not record.';
+      'Le CO2 n\'est affiché que pour les carburants purs : le facteur d\'émission d\'un mélange dépend de sa composition, que cette ligne n\'enregistre pas.';
 
   @override
   String consumptionStatsOpenWindowBanner(int count) {
@@ -6360,44 +6361,45 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String obd2DiagnosticsTripRecordedHeader(int samples, int percent) {
-    return 'Session recorded · $samples engine samples · $percent% coverage';
+    return 'Session enregistrée · $samples mesures moteur · $percent % de couverture';
   }
 
   @override
-  String get obd2DiagnosticsTripEvidenceSection => 'What this trip recorded';
+  String get obd2DiagnosticsTripEvidenceSection =>
+      'Ce que ce trajet a enregistré';
 
   @override
   String obd2DiagnosticsTripSamplesLine(int samples, int total, int percent) {
-    return '$samples of $total samples carried engine data ($percent%)';
+    return '$samples mesures sur $total contenaient des données moteur ($percent %)';
   }
 
   @override
   String obd2DiagnosticsTripAdapterLine(String adapter) {
-    return 'Adapter: $adapter';
+    return 'Adaptateur : $adapter';
   }
 
   @override
   String obd2DiagnosticsTripProtocolLine(String verdict) {
-    return 'Protocol handshake: $verdict';
+    return 'Établissement du protocole : $verdict';
   }
 
   @override
   String obd2DiagnosticsTripEndedLine(String reason) {
-    return 'Session ended: $reason';
+    return 'Fin de session : $reason';
   }
 
   @override
   String obd2DiagnosticsTripDurationLine(String duration) {
-    return 'Session length: $duration';
+    return 'Durée de la session : $duration';
   }
 
   @override
   String get obd2DiagnosticsTripFuelMeasured =>
-      'Fuel figures came from the adapter, not from GPS estimates.';
+      'Les valeurs de consommation viennent de l\'adaptateur, pas d\'estimations GPS.';
 
   @override
   String get obd2DiagnosticsTripNoPidDetail =>
-      'The per-PID communication breakdown was not captured for this trip. Turn on developer mode before recording to collect it.';
+      'Le détail de communication par PID n\'a pas été capturé pour ce trajet. Activez le mode développeur avant l\'enregistrement pour le collecter.';
 
   @override
   String obd2PickerPinnedFallback(String adapterName) {
@@ -7485,6 +7487,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get trajetDetailChartTiming => 'Ignition timing advance';
+
+  @override
+  String get trajetObd2Degraded =>
+      'Démarré avec l\'adaptateur OBD2 mais enregistré surtout en GPS — les données moteur sont incomplètes';
 
   @override
   String get tripLengthCardTitle => 'Consommation par longueur de trajet';

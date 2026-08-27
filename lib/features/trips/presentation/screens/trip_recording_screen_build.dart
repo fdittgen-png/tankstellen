@@ -284,14 +284,20 @@ mixin _TripRecordingLifecycle on _TripRecordingBuild {
     // exits the screen without unpinning. Best-effort; the facade
     // swallows plugin errors on unsupported platforms. Fire-and-
     // forget — `dispose` must stay synchronous.
+    // #3834 — the wake lock is released only if we took it, but the system
+    // UI is restored UNCONDITIONALLY. #3827 fixed WHAT the restore does and
+    // left it behind this `_pinned` gate, so on any path that reaches
+    // immersive without the flag surviving to dispose the bars stayed
+    // immersive for the rest of the session — the black status bar users
+    // kept reporting. restore() is idempotent and costs one platform call,
+    // so running it needlessly is free; skipping it is not.
     if (_pinned) {
       final facade = _cachedFacade;
       if (facade != null) {
         unawaited(facade.disable());
       }
-      unawaited(EdgeToEdge.restore(),
-      );
     }
+    unawaited(EdgeToEdge.restore());
     unawaited(_coachEventsSub?.cancel());
     _coachEventsSub = null;
     // #1458 phase 2 — cancel any pending unpinned-warning fire so the

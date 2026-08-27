@@ -5544,9 +5544,8 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsTripRecordedHeader": "Session recorded · {samples} engine samples · {percent}% coverage",
+  "obd2DiagnosticsTripRecordedHeader": "Relácia zaznamenaná · {samples} vzoriek motora · {percent}% pokrytie",
   "@obd2DiagnosticsTripRecordedHeader": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "samples": {
@@ -5557,14 +5556,12 @@
       }
     }
   },
-  "obd2DiagnosticsTripEvidenceSection": "What this trip recorded",
+  "obd2DiagnosticsTripEvidenceSection": "Čo táto jazda zaznamenala",
   "@obd2DiagnosticsTripEvidenceSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsTripSamplesLine": "{samples} of {total} samples carried engine data ({percent}%)",
+  "obd2DiagnosticsTripSamplesLine": "{samples} z {total} vzoriek obsahovalo údaje motora ({percent}%)",
   "@obd2DiagnosticsTripSamplesLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "samples": {
@@ -5578,9 +5575,8 @@
       }
     }
   },
-  "obd2DiagnosticsTripAdapterLine": "Adapter: {adapter}",
+  "obd2DiagnosticsTripAdapterLine": "Adaptér: {adapter}",
   "@obd2DiagnosticsTripAdapterLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "adapter": {
@@ -5588,9 +5584,8 @@
       }
     }
   },
-  "obd2DiagnosticsTripProtocolLine": "Protocol handshake: {verdict}",
+  "obd2DiagnosticsTripProtocolLine": "Dohodnutie protokolu: {verdict}",
   "@obd2DiagnosticsTripProtocolLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "verdict": {
@@ -5598,9 +5593,8 @@
       }
     }
   },
-  "obd2DiagnosticsTripEndedLine": "Session ended: {reason}",
+  "obd2DiagnosticsTripEndedLine": "Relácia ukončená: {reason}",
   "@obd2DiagnosticsTripEndedLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "reason": {
@@ -5608,9 +5602,8 @@
       }
     }
   },
-  "obd2DiagnosticsTripDurationLine": "Session length: {duration}",
+  "obd2DiagnosticsTripDurationLine": "Dĺžka relácie: {duration}",
   "@obd2DiagnosticsTripDurationLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "duration": {
@@ -5618,44 +5611,36 @@
       }
     }
   },
-  "obd2DiagnosticsTripFuelMeasured": "Fuel figures came from the adapter, not from GPS estimates.",
+  "obd2DiagnosticsTripFuelMeasured": "Údaje o spotrebe pochádzajú z adaptéra, nie z odhadov podľa GPS.",
   "@obd2DiagnosticsTripFuelMeasured": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsTripNoPidDetail": "The per-PID communication breakdown was not captured for this trip. Turn on developer mode before recording to collect it.",
+  "obd2DiagnosticsTripNoPidDetail": "Podrobnosti komunikácie podľa PID neboli pri tejto jazde zachytené. Ak ich chcete zbierať, pred nahrávaním zapnite vývojársky režim.",
   "@obd2DiagnosticsTripNoPidDetail": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelCompareSectionTitle": "Cost of driving, fuel by fuel",
+  "fuelCompareSectionTitle": "Náklady na jazdu podľa paliva",
   "@fuelCompareSectionTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelComparePricePerLitre": "Paid per litre",
+  "fuelComparePricePerLitre": "Zaplatené za liter",
   "@fuelComparePricePerLitre": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelCompareCostPer100km": "Cost per 100 km",
+  "fuelCompareCostPer100km": "Náklady na 100 km",
   "@fuelCompareCostPer100km": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelCompareDistance": "Distance measured",
+  "fuelCompareDistance": "Nameraná vzdialenosť",
   "@fuelCompareDistance": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelCompareLitres": "Litres burned",
+  "fuelCompareLitres": "Spotrebované litre",
   "@fuelCompareLitres": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelCompareVerdictCheaper": "{winner} is your cheapest fuel to drive on",
+  "fuelCompareVerdictCheaper": "{winner} je vaše najlacnejšie palivo na jazdenie",
   "@fuelCompareVerdictCheaper": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "winner": {
@@ -5663,9 +5648,8 @@
       }
     }
   },
-  "fuelCompareVerdictDelta": "{loser} costs {amount} more per 1000 km",
+  "fuelCompareVerdictDelta": "{loser} stojí o {amount} viac na 1000 km",
   "@fuelCompareVerdictDelta": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "loser": {
@@ -5676,9 +5660,8 @@
       }
     }
   },
-  "fuelCompareBreakEven": "{fuel} beats {rival} below {price} per litre",
+  "fuelCompareBreakEven": "{fuel} poráža {rival} pod {price} za liter",
   "@fuelCompareBreakEven": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "fuel": {
@@ -5692,19 +5675,16 @@
       }
     }
   },
-  "fuelCompareBreakEvenExplain": "Break-even is calculated from each fuel's measured consumption, so it moves as your driving does.",
+  "fuelCompareBreakEvenExplain": "Bod zvratu sa počíta z nameranej spotreby každého paliva, takže sa posúva spolu s vašou jazdou.",
   "@fuelCompareBreakEvenExplain": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelCompareLitresVsCostNote": "Litres and cost can disagree: a fuel can burn fewer litres per 100 km and still cost more per kilometre, because the pump price differs. Cost per kilometre is the verdict.",
+  "fuelCompareLitresVsCostNote": "Litre a náklady si môžu protirečiť: palivo môže spotrebovať menej litrov na 100 km a napriek tomu stáť viac za kilometer, pretože sa líši cena za liter. Rozhodujú náklady na kilometer.",
   "@fuelCompareLitresVsCostNote": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelCompareProvisional": "Provisional — based on {count, plural, =1{one full tank} other{{count} full tanks}}",
+  "fuelCompareProvisional": "Predbežné — na základe {count, plural, =1{jednej plnej nádrže} other{{count} plných nádrží}}",
   "@fuelCompareProvisional": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -5712,9 +5692,8 @@
       }
     }
   },
-  "fuelCompareBasedOn": "Based on {count, plural, =1{one full tank} other{{count} full tanks}}",
+  "fuelCompareBasedOn": "Na základe {count, plural, =1{jednej plnej nádrže} other{{count} plných nádrží}}",
   "@fuelCompareBasedOn": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -5722,14 +5701,12 @@
       }
     }
   },
-  "fuelCompareCo2Per100km": "CO2 per 100 km",
+  "fuelCompareCo2Per100km": "CO2 na 100 km",
   "@fuelCompareCo2Per100km": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelCompareCleanest": "{winner} is your lowest-emission fuel",
+  "fuelCompareCleanest": "{winner} je vaše palivo s najnižšími emisiami",
   "@fuelCompareCleanest": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "winner": {
@@ -5737,9 +5714,8 @@
       }
     }
   },
-  "fuelCompareTradeoff": "{fuel} costs {money} more per 1000 km but emits {co2} less CO2",
+  "fuelCompareTradeoff": "{fuel} stojí o {money} viac na 1000 km, ale vypustí o {co2} menej CO2",
   "@fuelCompareTradeoff": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "fuel": {
@@ -5753,9 +5729,8 @@
       }
     }
   },
-  "fuelCompareTradeoffBoth": "{fuel} is both cheaper and cleaner than {rival}",
+  "fuelCompareTradeoffBoth": "{fuel} je zároveň lacnejšie aj čistejšie než {rival}",
   "@fuelCompareTradeoffBoth": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "fuel": {
@@ -5766,9 +5741,8 @@
       }
     }
   },
-  "fuelCompareCo2Avoided": "Your {distance} on {fuel} emitted {actual} instead of {alternative} on {rival} — {saved} avoided",
+  "fuelCompareCo2Avoided": "Vašich {distance} na {fuel} vypustilo {actual} namiesto {alternative} na {rival} — {saved} ušetrených",
   "@fuelCompareCo2Avoided": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "distance": {
@@ -5791,14 +5765,16 @@
       }
     }
   },
-  "fuelCompareCo2Source": "CO2 figures are well-to-wheel estimates (EU JEC WTW v5) applied to your measured consumption — awareness, not audit-grade accounting.",
+  "fuelCompareCo2Source": "Hodnoty CO2 sú odhady „od zdroja ku kolesu“ (EU JEC WTW v5) použité na vašu nameranú spotrebu — orientačné, nie certifikované účtovníctvo.",
   "@fuelCompareCo2Source": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelCompareCo2BlendOmitted": "CO2 is shown for pure fuels only: a blend's emission factor depends on the mix, which this row does not record.",
+  "fuelCompareCo2BlendOmitted": "CO2 sa zobrazuje len pri čistých palivách: emisný faktor zmesi závisí od jej zloženia, ktoré tento riadok nezaznamenáva.",
   "@fuelCompareCo2BlendOmitted": {
-    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "trajetObd2Degraded": "Spustené s adaptérom OBD2, ale zaznamenané prevažne cez GPS — údaje motora sú neúplné",
+  "@trajetObd2Degraded": {
     "description": "MT — needs native review"
   }
 }

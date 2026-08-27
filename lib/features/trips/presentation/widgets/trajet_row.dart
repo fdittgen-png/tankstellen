@@ -9,6 +9,7 @@ import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../data/trip_history_repository.dart';
+import '../../domain/trajet_data_quality.dart';
 import 'trajet_stripe_colors.dart';
 
 /// One row in the Trajets list (#889). Shows date/time + chips for
@@ -78,7 +79,23 @@ class TrajetRow extends StatelessWidget {
     // in `TrajetStripeColors` so a future theme rework doesn't
     // silently collapse the two hues onto the same olive/brown like
     // the Eco theme's `primary` / `tertiary` did pre-#2108.
-    final stripeColor = TrajetStripeColors.forKind(s.kind, theme.brightness);
+    // #3835 — keyed on what the trip DELIVERED, not on what was chosen at
+    // start: a recording that began on the adapter and degraded to GPS used
+    // to keep the green stripe of a healthy one.
+    final quality = classifyTrajetQuality(
+      kind: s.kind,
+      hadAdapter: entry.adapterMac != null || entry.adapterName != null,
+      engineShare: entry.engineSampleShare,
+      maxRpm: s.maxRpm,
+    );
+    final stripeColor =
+        TrajetStripeColors.forQuality(quality, theme.brightness);
+
+    // #3835 — colour must not be the ONLY carrier of the meaning: the red
+    // stripe is paired with a warning icon and a semantics label, so the
+    // "adapter was there, engine data is not" state reaches a colour-blind
+    // user and a screen reader too.
+    final degraded = quality == TrajetDataQuality.obd2Degraded;
 
     return Card(
       key: ValueKey('trajet-${entry.id}'),
@@ -94,7 +111,19 @@ class TrajetRow extends StatelessWidget {
           padding: innerPadding,
           child: Row(
             children: [
-              Icon(Icons.route, size: compact ? 18 : 24),
+              if (degraded)
+                Tooltip(
+                  message: l.trajetObd2Degraded,
+                  child: Icon(
+                    Icons.warning_amber_rounded,
+                    key: const ValueKey('trajet_obd2_degraded_icon'),
+                    size: compact ? 18 : 24,
+                    color: stripeColor,
+                    semanticLabel: l.trajetObd2Degraded,
+                  ),
+                )
+              else
+                Icon(Icons.route, size: compact ? 18 : 24),
               SizedBox(width: compact ? 8 : 12),
               Expanded(
                 child: Column(

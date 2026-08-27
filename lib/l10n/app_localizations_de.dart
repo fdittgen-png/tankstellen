@@ -7467,6 +7467,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get trajetDetailChartTiming => 'Zündzeitpunkt (Frühzündung)';
 
   @override
+  String get trajetObd2Degraded =>
+      'Mit dem OBD2-Adapter gestartet, aber überwiegend GPS aufgezeichnet — Motordaten sind unvollständig';
+
+  @override
   String get tripLengthCardTitle => 'Verbrauch nach Fahrtlänge';
 
   @override

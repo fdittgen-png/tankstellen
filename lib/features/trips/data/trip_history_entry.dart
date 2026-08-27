@@ -15,6 +15,8 @@ import '../../obd2/api.dart';
 import 'trip_sample_codec.dart';
 import 'trip_summary_codec.dart';
 
+part 'trip_history_entry_obd2_evidence.dart';
+
 /// One finalised trip as shown in the Trip history list (#726).
 ///
 /// Wraps a [TripSummary] with the persisted bookkeeping fields — a
@@ -70,6 +72,28 @@ class TripHistoryEntry {
   /// ghosts from their sampled twins — keep working unchanged.
   int get sampleCount => _persistedSampleCount ?? samples.length;
   final int? _persistedSampleCount;
+
+  /// #3835 — how many stored samples carried an engine PID, persisted so
+  /// the history LIST can tell a healthy OBD2 trip from one that started on
+  /// the adapter and degraded to GPS, without materialising a single
+  /// [TripSample].
+  ///
+  /// The list uses [summaryFromJson], which deliberately does NOT build
+  /// sample objects; counting engine-bearing samples per row would undo
+  /// exactly the cost that decode exists to avoid. Writing the count once,
+  /// at serialisation, keeps the read side free.
+  ///
+  /// Null on rows written before this landed — [engineSampleShare] falls
+  /// back to the summary for those rather than reporting a false zero.
+  final int? engineSampleCount;
+
+  /// Engine-bearing share of the stored samples, 0..1, or null when it
+  /// cannot be known (legacy row, or no samples at all).
+  double? get engineSampleShare {
+    final engine = engineSampleCount;
+    if (engine == null || sampleCount <= 0) return null;
+    return engine / sampleCount;
+  }
 
   /// Stable BLE remote-id / Classic MAC of the OBD2 adapter that was
   /// connected when this trip was recorded (#1312). Lets the trip
@@ -161,6 +185,7 @@ class TripHistoryEntry {
     this.verdict,
     this.termination,
     this.sessionJournal,
+    this.engineSampleCount,
   }) : _persistedSampleCount = sampleCount;
 
   /// Returns a copy with the given fields replaced (#1858). The
@@ -184,6 +209,7 @@ class TripHistoryEntry {
         verdict: verdict ?? this.verdict,
         termination: termination,
         sessionJournal: sessionJournal,
+        engineSampleCount: engineSampleCount,
       );
 
   Map<String, dynamic> toJson() => {
@@ -193,6 +219,17 @@ class TripHistoryEntry {
         if (automatic) 'automatic': true,
         if (samples.isNotEmpty)
           'samples': samples.map(sampleToJson).toList(growable: false),
+        // #3835 — same engine predicate as Obd2EngineCoverage / the fuel
+        // pipeline, so the list badge can never disagree with the trip
+        // detail. Written here (once) rather than counted on every read.
+        if (samples.isNotEmpty)
+          'esc': samples
+              .where((s) =>
+                  s.rpm != null ||
+                  s.engineLoadPercent != null ||
+                  s.throttlePercent != null ||
+                  s.fuelRateLPerHour != null)
+              .length,
         // #1312 — adapter identity. Compact keys so the per-trip JSON
         // payload doesn't balloon (most trips carry one MAC + one
         // name; firmware stays null until the connect path captures
@@ -253,6 +290,7 @@ class TripHistoryEntry {
         // entries written before this field landed deserialise with
         // null rather than throwing (mirrors the schema-drift lesson
         // from #1301).
+        engineSampleCount: json['esc'] as int?,
         adapterMac: json['adapterMac'] as String?,
         adapterName: json['adapterName'] as String?,
         adapterFirmware: json['adapterFirmware'] as String?,
@@ -319,6 +357,7 @@ class TripHistoryEntry {
         automatic: (json['automatic'] as bool?) ?? false,
         samples: const [],
         sampleCount: (json['samples'] as List?)?.length ?? 0,
+        engineSampleCount: json['esc'] as int?,
         adapterMac: json['adapterMac'] as String?,
         adapterName: json['adapterName'] as String?,
         adapterFirmware: json['adapterFirmware'] as String?,
@@ -334,54 +373,4 @@ class TripHistoryEntry {
                 (json['term'] as Map).cast<String, dynamic>(),
               ),
       );
-}
-
-/// #3824 — what this trip proves about its OBD2 session, independent of
-/// whether per-PID communication was instrumented.
-///
-/// [obd2Diagnostic] answers "was per-PID polling recorded", which is a much
-/// narrower question than "did this trip have OBD2". Treating the first as
-/// the second made the trip-detail card announce *"No OBD2 session
-/// recorded"* for a trip with 324 engine samples at 99.7% coverage.
-///
-/// Lives here rather than in a new file because this one already imports
-/// `obd2/api.dart`: `feature_boundary_test` counts cross-feature imports
-/// per file against an exact baseline, so a new trips->obd2 file would read
-/// as a regression.
-extension Obd2EvidenceX on TripHistoryEntry {
-  /// Null when the trip has no samples to judge.
-  Obd2TripEvidence? obd2Evidence(List<TripSample> tripSamples) {
-    // The SAME engine predicate the fuel pipeline uses, so this can never
-    // disagree with the fuel chart rendered beside it.
-    final coverage = Obd2EngineCoverage.fromTripSamples(tripSamples);
-    if (coverage == null) return null;
-
-    // Last verdict wins: a reconnect can re-establish the protocol, and the
-    // final state is the one that describes the session.
-    String? verdict;
-    for (final e in sessionJournal?.events ??
-        const <RecordingSessionEvent>[]) {
-      if (e.kind == RecordingSessionEventKind.protocolVerdict) {
-        verdict = e.detail ?? verdict;
-      }
-    }
-
-    final started = summary.startedAt;
-    final ended = summary.endedAt;
-
-    return Obd2TripEvidence(
-      engineSamples: coverage.engineSamples,
-      totalSamples: coverage.totalSamples,
-      coverageShare: coverage.share,
-      adapterName: adapterName,
-      adapterMac: adapterMac,
-      protocolVerdict: verdict,
-      terminationReason: termination?.reason.name,
-      duration: (started != null && ended != null)
-          ? ended.difference(started)
-          : null,
-      fuelMeasured: Obd2TripFeatures.fromSamples(tripSamples)?.fuelSource ==
-          Obd2FuelSource.measured,
-    );
-  }
 }

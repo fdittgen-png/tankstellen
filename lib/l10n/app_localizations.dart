@@ -12772,6 +12772,12 @@ abstract class AppLocalizations {
   /// **'Ignition timing advance'**
   String get trajetDetailChartTiming;
 
+  /// Accessibility label and tooltip on a trajet whose recording began with the OBD2 adapter but delivered mostly GPS (#3835). Pairs with the red stripe so colour is not the only carrier of the meaning.
+  ///
+  /// In en, this message translates to:
+  /// **'Started with the OBD2 adapter but recorded mostly GPS — engine data is incomplete'**
+  String get trajetObd2Degraded;
+
   /// Title of the trip-length consumption card on the Carbon dashboard Charts tab — splits trips into short/medium/long buckets so the user can see cold-start fuel waste vs. cruising efficiency (#1191).
   ///
   /// In en, this message translates to:

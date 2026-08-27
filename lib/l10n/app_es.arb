@@ -5544,9 +5544,8 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsTripRecordedHeader": "Session recorded · {samples} engine samples · {percent}% coverage",
+  "obd2DiagnosticsTripRecordedHeader": "Sesión registrada · {samples} muestras del motor · {percent} % de cobertura",
   "@obd2DiagnosticsTripRecordedHeader": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "samples": {
@@ -5557,14 +5556,12 @@
       }
     }
   },
-  "obd2DiagnosticsTripEvidenceSection": "What this trip recorded",
+  "obd2DiagnosticsTripEvidenceSection": "Lo que registró este trayecto",
   "@obd2DiagnosticsTripEvidenceSection": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsTripSamplesLine": "{samples} of {total} samples carried engine data ({percent}%)",
+  "obd2DiagnosticsTripSamplesLine": "{samples} de {total} muestras traían datos del motor ({percent} %)",
   "@obd2DiagnosticsTripSamplesLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "samples": {
@@ -5578,9 +5575,8 @@
       }
     }
   },
-  "obd2DiagnosticsTripAdapterLine": "Adapter: {adapter}",
+  "obd2DiagnosticsTripAdapterLine": "Adaptador: {adapter}",
   "@obd2DiagnosticsTripAdapterLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "adapter": {
@@ -5588,9 +5584,8 @@
       }
     }
   },
-  "obd2DiagnosticsTripProtocolLine": "Protocol handshake: {verdict}",
+  "obd2DiagnosticsTripProtocolLine": "Negociación del protocolo: {verdict}",
   "@obd2DiagnosticsTripProtocolLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "verdict": {
@@ -5598,9 +5593,8 @@
       }
     }
   },
-  "obd2DiagnosticsTripEndedLine": "Session ended: {reason}",
+  "obd2DiagnosticsTripEndedLine": "Sesión finalizada: {reason}",
   "@obd2DiagnosticsTripEndedLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "reason": {
@@ -5608,9 +5602,8 @@
       }
     }
   },
-  "obd2DiagnosticsTripDurationLine": "Session length: {duration}",
+  "obd2DiagnosticsTripDurationLine": "Duración de la sesión: {duration}",
   "@obd2DiagnosticsTripDurationLine": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "duration": {
@@ -5618,44 +5611,36 @@
       }
     }
   },
-  "obd2DiagnosticsTripFuelMeasured": "Fuel figures came from the adapter, not from GPS estimates.",
+  "obd2DiagnosticsTripFuelMeasured": "Las cifras de consumo vienen del adaptador, no de estimaciones por GPS.",
   "@obd2DiagnosticsTripFuelMeasured": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "obd2DiagnosticsTripNoPidDetail": "The per-PID communication breakdown was not captured for this trip. Turn on developer mode before recording to collect it.",
+  "obd2DiagnosticsTripNoPidDetail": "El desglose de comunicación por PID no se capturó en este trayecto. Activa el modo desarrollador antes de grabar para recogerlo.",
   "@obd2DiagnosticsTripNoPidDetail": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelCompareSectionTitle": "Cost of driving, fuel by fuel",
+  "fuelCompareSectionTitle": "Coste de circular, combustible por combustible",
   "@fuelCompareSectionTitle": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelComparePricePerLitre": "Paid per litre",
+  "fuelComparePricePerLitre": "Pagado por litro",
   "@fuelComparePricePerLitre": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelCompareCostPer100km": "Cost per 100 km",
+  "fuelCompareCostPer100km": "Coste por 100 km",
   "@fuelCompareCostPer100km": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelCompareDistance": "Distance measured",
+  "fuelCompareDistance": "Distancia medida",
   "@fuelCompareDistance": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelCompareLitres": "Litres burned",
+  "fuelCompareLitres": "Litros consumidos",
   "@fuelCompareLitres": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelCompareVerdictCheaper": "{winner} is your cheapest fuel to drive on",
+  "fuelCompareVerdictCheaper": "{winner} es tu combustible más barato para circular",
   "@fuelCompareVerdictCheaper": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "winner": {
@@ -5663,9 +5648,8 @@
       }
     }
   },
-  "fuelCompareVerdictDelta": "{loser} costs {amount} more per 1000 km",
+  "fuelCompareVerdictDelta": "{loser} cuesta {amount} más por cada 1000 km",
   "@fuelCompareVerdictDelta": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "loser": {
@@ -5676,9 +5660,8 @@
       }
     }
   },
-  "fuelCompareBreakEven": "{fuel} beats {rival} below {price} per litre",
+  "fuelCompareBreakEven": "{fuel} supera a {rival} por debajo de {price} el litro",
   "@fuelCompareBreakEven": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "fuel": {
@@ -5692,19 +5675,16 @@
       }
     }
   },
-  "fuelCompareBreakEvenExplain": "Break-even is calculated from each fuel's measured consumption, so it moves as your driving does.",
+  "fuelCompareBreakEvenExplain": "El punto de equilibrio se calcula con el consumo medido de cada combustible, así que cambia con tu forma de conducir.",
   "@fuelCompareBreakEvenExplain": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelCompareLitresVsCostNote": "Litres and cost can disagree: a fuel can burn fewer litres per 100 km and still cost more per kilometre, because the pump price differs. Cost per kilometre is the verdict.",
+  "fuelCompareLitresVsCostNote": "Litros y coste pueden no coincidir: un combustible puede gastar menos litros por 100 km y aun así costar más por kilómetro, porque el precio del surtidor es distinto. El coste por kilómetro es lo que decide.",
   "@fuelCompareLitresVsCostNote": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelCompareProvisional": "Provisional — based on {count, plural, =1{one full tank} other{{count} full tanks}}",
+  "fuelCompareProvisional": "Provisional — basado en {count, plural, =1{un depósito lleno} other{{count} depósitos llenos}}",
   "@fuelCompareProvisional": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -5712,9 +5692,8 @@
       }
     }
   },
-  "fuelCompareBasedOn": "Based on {count, plural, =1{one full tank} other{{count} full tanks}}",
+  "fuelCompareBasedOn": "Basado en {count, plural, =1{un depósito lleno} other{{count} depósitos llenos}}",
   "@fuelCompareBasedOn": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "count": {
@@ -5722,14 +5701,12 @@
       }
     }
   },
-  "fuelCompareCo2Per100km": "CO2 per 100 km",
+  "fuelCompareCo2Per100km": "CO2 por 100 km",
   "@fuelCompareCo2Per100km": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelCompareCleanest": "{winner} is your lowest-emission fuel",
+  "fuelCompareCleanest": "{winner} es tu combustible con menos emisiones",
   "@fuelCompareCleanest": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "winner": {
@@ -5737,9 +5714,8 @@
       }
     }
   },
-  "fuelCompareTradeoff": "{fuel} costs {money} more per 1000 km but emits {co2} less CO2",
+  "fuelCompareTradeoff": "{fuel} cuesta {money} más por 1000 km pero emite {co2} menos de CO2",
   "@fuelCompareTradeoff": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "fuel": {
@@ -5753,9 +5729,8 @@
       }
     }
   },
-  "fuelCompareTradeoffBoth": "{fuel} is both cheaper and cleaner than {rival}",
+  "fuelCompareTradeoffBoth": "{fuel} es más barato y más limpio que {rival}",
   "@fuelCompareTradeoffBoth": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "fuel": {
@@ -5766,9 +5741,8 @@
       }
     }
   },
-  "fuelCompareCo2Avoided": "Your {distance} on {fuel} emitted {actual} instead of {alternative} on {rival} — {saved} avoided",
+  "fuelCompareCo2Avoided": "Tus {distance} con {fuel} emitieron {actual} en lugar de {alternative} con {rival} — {saved} evitados",
   "@fuelCompareCo2Avoided": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
       "distance": {
@@ -5791,14 +5765,16 @@
       }
     }
   },
-  "fuelCompareCo2Source": "CO2 figures are well-to-wheel estimates (EU JEC WTW v5) applied to your measured consumption — awareness, not audit-grade accounting.",
+  "fuelCompareCo2Source": "Las cifras de CO2 son estimaciones del pozo a la rueda (EU JEC WTW v5) aplicadas a tu consumo medido: son orientativas, no una contabilidad certificada.",
   "@fuelCompareCo2Source": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelCompareCo2BlendOmitted": "CO2 is shown for pure fuels only: a blend's emission factor depends on the mix, which this row does not record.",
+  "fuelCompareCo2BlendOmitted": "El CO2 solo se muestra para combustibles puros: el factor de emisión de una mezcla depende de su composición, que esta fila no registra.",
   "@fuelCompareCo2BlendOmitted": {
-    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "trajetObd2Degraded": "Iniciado con el adaptador OBD2 pero grabado sobre todo por GPS: los datos del motor están incompletos",
+  "@trajetObd2Degraded": {
     "description": "MT — needs native review"
   }
 }
