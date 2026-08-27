@@ -25,19 +25,30 @@ failures of 2026‑08‑25/26:
 
 Ships **inside the Dart SDK**, so there is nothing to install.
 
-> **Verified 2026-08-27 against `dart mcp-server` version 0.1.4** by probing
-> `tools/list` over stdio (recipe at the bottom of this file). Re-probe before
-> trusting this list: the tool set changes between builds, and a list copied
-> from an upstream README is stale within days (#3837).
+> **Verified 2026-08-27 against the CONFIGURED command** — `dart pub global
+> run dart_mcp_server`, version **1.1.1** — by probing `tools/list` over stdio
+> (recipe at the bottom of this file). Re-probe before trusting this list: it
+> changes between builds, a list copied from an upstream README is stale
+> within days (#3837), and this very file described the SDK-bundled 0.1.4 for
+> a few hours after `.mcp.json` had already moved to the pub build.
 
-**13 tools in 0.1.4:**
+**14 tools in 1.1.1:**
 
 | Group | Tools |
 |---|---|
 | Static analysis | `analyze_files`, `lsp` |
 | Packages | `pub`, `pub_dev_search`, `read_package_uris`, `rip_grep_packages` |
-| Live app | `dtd`, `widget_inspector`, `get_runtime_errors`, `hot_reload`, `hot_restart`, `flutter_driver_command` |
+| Live app | `dtd`, `vm_service`, `widget_inspector`, `get_runtime_errors`, `hot_reload`, `hot_restart`, `flutter_driver_command` |
 | Scope | `roots` |
+
+### Which build, and why it matters
+
+`.mcp.json` runs the **pub** build (`dart pub global run dart_mcp_server`),
+which needs Dart ≥ 3.12 — available here since the #3801 SDK bump. It is a
+strict superset of the SDK-bundled `dart mcp-server` (0.1.4, 13 tools):
+same tools **plus `vm_service`**, verified by probing both side by side.
+Global activation resolves independently, so it cannot disturb another
+project's dependency graph the way a dev-dependency would.
 
 **`analyze_files` is the reason this is wired.** It goes through the
 *persistent* analysis server, so it is incremental rather than paying the
