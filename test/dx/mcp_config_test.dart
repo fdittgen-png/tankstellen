@@ -50,9 +50,16 @@ void main() {
       expect(flags, greaterThanOrEqualTo(excluded));
     });
 
-    test('it runs the SDK-bundled server, not a pinned copy', () {
+    test('it runs the globally-activated pub build, not the SDK-bundled one',
+        () {
+      // Changed deliberately from `dart mcp-server` (SDK-bundled 0.1.4).
+      // The pub build is a strict superset — same 13 tools plus
+      // `vm_service` — and needs Dart >= 3.12, which #3801 provides.
+      // `pub global` resolves independently, so unlike a dev dependency it
+      // cannot disturb this project's own dependency graph.
       expect(servers['dart']['command'], 'dart');
-      expect((servers['dart']['args'] as List).first, 'mcp-server');
+      expect((servers['dart']['args'] as List).take(4).toList(),
+          ['pub', 'global', 'run', 'dart_mcp_server']);
     });
   });
 
@@ -108,7 +115,10 @@ void main() {
   test('the tool list records the version and date it was verified against',
       () {
     final doc = File('docs/guides/mcp-servers.md').readAsStringSync();
-    expect(doc, contains(RegExp(r'0\.1\.4')),
+    // Must name the version of the server .mcp.json ACTUALLY runs — the
+    // guide once documented the SDK-bundled 0.1.4 while the config had
+    // already moved to the pub build (#3837 follow-up).
+    expect(doc, contains(RegExp(r'1\.1\.1')),
         reason: 'name the server version the list was probed from');
     expect(doc, contains(RegExp(r'20\d{2}-\d{2}-\d{2}')),
         reason: 'date it, so the next reader can judge staleness');
