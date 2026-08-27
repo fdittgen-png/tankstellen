@@ -5776,5 +5776,10 @@
   "trajetObd2Degraded": "Zahájeno s adaptérem OBD2, ale zaznamenáno převážně přes GPS — data motoru jsou neúplná",
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
+  },
+  "minimalDriveBehaviour": "Driving behaviour",
+  "@minimalDriveBehaviour": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

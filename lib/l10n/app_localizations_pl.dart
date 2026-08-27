@@ -2273,6 +2273,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Chwilowe zużycie';
 
   @override
+  String get minimalDriveBehaviour => 'Driving behaviour';
+
+  @override
   String get coachingShiftUp => 'Zmień bieg w górę';
 
   @override

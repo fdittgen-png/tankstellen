@@ -5776,5 +5776,10 @@
   "trajetObd2Degraded": "Sākts ar OBD2 adapteri, bet ierakstīts galvenokārt ar GPS — dzinēja dati ir nepilnīgi",
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
+  },
+  "minimalDriveBehaviour": "Driving behaviour",
+  "@minimalDriveBehaviour": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

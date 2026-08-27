@@ -71,15 +71,17 @@ void main() {
       expect(resumed.lPerHour, closeTo(4.0, 0.01));
     });
 
-    test('null fuel rate returns null and leaves state untouched', () {
+    test('null fuel rate leaves the EMA state untouched', () {
+      // #3845 changed what a gap RETURNS (see the hold group below), but
+      // not what it stores: a tick with no fuel rate must never fold a
+      // fabricated value into the average.
       final ema = InstantConsumptionEma();
       ema.update(now: t0, fuelRateLPerHour: 6.0, speedKmh: 60.0);
-      final gap = ema.update(
+      ema.update(
         now: t0.add(const Duration(milliseconds: 250)),
         fuelRateLPerHour: null,
         speedKmh: 60.0,
       );
-      expect(gap, isNull);
       expect(ema.smoothedLPerHour, 6.0);
     });
 
@@ -125,6 +127,19 @@ void main() {
       expect(moving.lPer100Km, closeTo(moving.lPerHour / 50.0 * 100.0, 1e-9));
     });
 
+    test('a gap AT STANDSTILL is the one case that stays blank', () {
+      // The user's requirement, verbatim: the figure "must only be unset
+      // if the car stands still".
+      final ema = InstantConsumptionEma();
+      ema.update(now: t0, fuelRateLPerHour: 6.0, speedKmh: 60.0);
+      final stopped = ema.update(
+        now: t0.add(const Duration(milliseconds: 250)),
+        fuelRateLPerHour: null,
+        speedKmh: 0.0,
+      );
+      expect(stopped, isNull);
+    });
+
     test('reset drops the state so the next tick re-seeds', () {
       final ema = InstantConsumptionEma();
       ema.update(now: t0, fuelRateLPerHour: 12.0, speedKmh: 80.0);
@@ -136,6 +151,150 @@ void main() {
         speedKmh: 80.0,
       )!;
       expect(out.lPerHour, 4.0);
+    });
+  });
+
+  group('#3845 the figure holds across a fuel-rate gap while moving', () {
+    // Field data from the reporting drive: emit runs at 4 Hz (250 ms) and
+    // `signalCoverage.fuelRate` was 0.209 — roughly four ticks in five
+    // carry NO fuel rate, so returning null on every gap blanked the
+    // headline for most of the drive. Mean gap at that coverage is
+    // ~1.2 s, which the 2 s window covers; a genuine dropout still
+    // blanks, which is what keeps a stale number off the screen.
+    test('a gap while moving holds the last smoothed value', () {
+      final ema = InstantConsumptionEma();
+      ema.update(now: t0, fuelRateLPerHour: 6.0, speedKmh: 60.0);
+      final held = ema.update(
+        now: t0.add(const Duration(milliseconds: 250)),
+        fuelRateLPerHour: null,
+        speedKmh: 60.0,
+      );
+      expect(held, isNotNull, reason: 'this is the blanking the user saw');
+      expect(held!.lPerHour, 6.0);
+      expect(held.lPer100Km, closeTo(10.0, 1e-9));
+      expect(held.isIdle, isFalse);
+    });
+
+    test('four gap ticks in a row all answer — the 4:1 field pattern', () {
+      final ema = InstantConsumptionEma();
+      ema.update(now: t0, fuelRateLPerHour: 6.0, speedKmh: 60.0);
+      for (var i = 1; i <= 4; i++) {
+        final out = ema.update(
+          now: t0.add(Duration(milliseconds: 250 * i)),
+          fuelRateLPerHour: null,
+          speedKmh: 60.0,
+        );
+        expect(out, isNotNull, reason: 'blanked on gap tick $i of 4');
+      }
+    });
+
+    test('the held figure tracks the CURRENT speed, not the stored one', () {
+      // Holding the rate is defensible; replaying a whole L/100 km figure
+      // through an acceleration is not — 6 L/h at 60 km/h is 10 L/100 km,
+      // the same rate at 120 km/h is 5.
+      final ema = InstantConsumptionEma();
+      ema.update(now: t0, fuelRateLPerHour: 6.0, speedKmh: 60.0);
+      final held = ema.update(
+        now: t0.add(const Duration(milliseconds: 250)),
+        fuelRateLPerHour: null,
+        speedKmh: 120.0,
+      )!;
+      expect(held.lPerHour, 6.0);
+      expect(held.lPer100Km, closeTo(5.0, 1e-9));
+    });
+
+    test('past the 2 s window the value is stale and blanks again', () {
+      final ema = InstantConsumptionEma();
+      ema.update(now: t0, fuelRateLPerHour: 6.0, speedKmh: 60.0);
+      expect(
+        ema.update(
+          now: t0.add(const Duration(milliseconds: 2000)),
+          fuelRateLPerHour: null,
+          speedKmh: 60.0,
+        ),
+        isNotNull,
+        reason: 'exactly at the window the value is still fresh',
+      );
+      expect(
+        ema.update(
+          now: t0.add(const Duration(milliseconds: 2001)),
+          fuelRateLPerHour: null,
+          speedKmh: 60.0,
+        ),
+        isNull,
+        reason: 'one ms past the window it is a stale number on a live '
+            'screen — the anti-staleness guarantee #3431 shipped',
+      );
+    });
+
+    test('the window measures from the last MEASURED tick, not the last '
+        'held answer', () {
+      // Otherwise a chain of held answers would keep re-arming the window
+      // and pin one value on screen for the whole drive.
+      final ema = InstantConsumptionEma();
+      ema.update(now: t0, fuelRateLPerHour: 6.0, speedKmh: 60.0);
+      for (var i = 1; i <= 8; i++) {
+        ema.update(
+          now: t0.add(Duration(milliseconds: 250 * i)),
+          fuelRateLPerHour: null,
+          speedKmh: 60.0,
+        );
+      }
+      expect(
+        ema.update(
+          now: t0.add(const Duration(milliseconds: 2250)),
+          fuelRateLPerHour: null,
+          speedKmh: 60.0,
+        ),
+        isNull,
+      );
+    });
+
+    test('nothing is held before the first measured tick', () {
+      final ema = InstantConsumptionEma();
+      expect(
+        ema.update(now: t0, fuelRateLPerHour: null, speedKmh: 60.0),
+        isNull,
+      );
+    });
+
+    test('a negative fuel rate is treated as a gap, not folded in', () {
+      final ema = InstantConsumptionEma();
+      ema.update(now: t0, fuelRateLPerHour: 6.0, speedKmh: 60.0);
+      final held = ema.update(
+        now: t0.add(const Duration(milliseconds: 250)),
+        fuelRateLPerHour: -3.0,
+        speedKmh: 60.0,
+      )!;
+      expect(held.lPerHour, 6.0);
+      expect(ema.smoothedLPerHour, 6.0);
+    });
+
+    test('a backwards clock during a gap blanks rather than answers', () {
+      final ema = InstantConsumptionEma();
+      ema.update(now: t0, fuelRateLPerHour: 6.0, speedKmh: 60.0);
+      expect(
+        ema.update(
+          now: t0.subtract(const Duration(seconds: 1)),
+          fuelRateLPerHour: null,
+          speedKmh: 60.0,
+        ),
+        isNull,
+      );
+    });
+
+    test('the window is configurable and 2 s by default', () {
+      expect(InstantConsumptionEma().holdWindow, const Duration(seconds: 2));
+      final wide = InstantConsumptionEma(holdWindow: const Duration(seconds: 6));
+      wide.update(now: t0, fuelRateLPerHour: 6.0, speedKmh: 60.0);
+      expect(
+        wide.update(
+          now: t0.add(const Duration(seconds: 5)),
+          fuelRateLPerHour: null,
+          speedKmh: 60.0,
+        ),
+        isNotNull,
+      );
     });
   });
 }

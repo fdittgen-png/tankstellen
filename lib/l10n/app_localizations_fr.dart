@@ -2284,6 +2284,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Consommation instantanée';
 
   @override
+  String get minimalDriveBehaviour => 'Driving behaviour';
+
+  @override
   String get coachingShiftUp => 'Monter un rapport';
 
   @override

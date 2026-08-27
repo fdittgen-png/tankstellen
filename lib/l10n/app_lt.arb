@@ -5776,5 +5776,10 @@
   "trajetObd2Degraded": "Pradėta su OBD2 adapteriu, bet įrašyta daugiausia per GPS — variklio duomenys nepilni",
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
+  },
+  "minimalDriveBehaviour": "Driving behaviour",
+  "@minimalDriveBehaviour": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

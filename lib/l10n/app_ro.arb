@@ -5776,5 +5776,10 @@
   "trajetObd2Degraded": "Pornit cu adaptorul OBD2, dar înregistrat mai ales prin GPS — datele de motor sunt incomplete",
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
+  },
+  "minimalDriveBehaviour": "Driving behaviour",
+  "@minimalDriveBehaviour": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

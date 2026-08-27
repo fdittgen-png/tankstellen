@@ -2270,6 +2270,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Momentanförbrukning';
 
   @override
+  String get minimalDriveBehaviour => 'Driving behaviour';
+
+  @override
   String get coachingShiftUp => 'Växla upp';
 
   @override

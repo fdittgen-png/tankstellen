@@ -2269,6 +2269,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Aktuelt forbrug';
 
   @override
+  String get minimalDriveBehaviour => 'Driving behaviour';
+
+  @override
   String get coachingShiftUp => 'Skift op';
 
   @override

@@ -2281,6 +2281,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Momentānais patēriņš';
 
   @override
+  String get minimalDriveBehaviour => 'Driving behaviour';
+
+  @override
   String get coachingShiftUp => 'Pārslēgt augšup';
 
   @override

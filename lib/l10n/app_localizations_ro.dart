@@ -2278,6 +2278,9 @@ class AppLocalizationsRo extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Consum instantaneu';
 
   @override
+  String get minimalDriveBehaviour => 'Driving behaviour';
+
+  @override
   String get coachingShiftUp => 'Schimbă în sus';
 
   @override

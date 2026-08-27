@@ -2262,6 +2262,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Instant consumption';
 
   @override
+  String get minimalDriveBehaviour => 'Driving behaviour';
+
+  @override
   String get coachingShiftUp => 'Shift up';
 
   @override
@@ -10151,6 +10154,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get minimalDriveInstantConsumption => '⟦Îñšŧáñŧ çóñšúɱƥŧîóñ ········⟧';
+
+  @override
+  String get minimalDriveBehaviour => '⟦Đřîṽîñǧ ƀéĥáṽîóúř ·······⟧';
 
   @override
   String get coachingShiftUp => '⟦Šĥîƒŧ úƥ ···⟧';

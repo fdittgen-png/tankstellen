@@ -2269,6 +2269,9 @@ class AppLocalizationsNb extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Øyeblikksforbruk';
 
   @override
+  String get minimalDriveBehaviour => 'Driving behaviour';
+
+  @override
   String get coachingShiftUp => 'Gir opp';
 
   @override

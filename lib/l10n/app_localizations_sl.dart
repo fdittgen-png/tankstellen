@@ -2268,6 +2268,9 @@ class AppLocalizationsSl extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Trenutna poraba';
 
   @override
+  String get minimalDriveBehaviour => 'Driving behaviour';
+
+  @override
   String get coachingShiftUp => 'Prestavi navzgor';
 
   @override

@@ -5776,5 +5776,10 @@
   "trajetObd2Degraded": "Alustatud OBD2-adapteriga, kuid salvestatud peamiselt GPS-iga — mootoriandmed on puudulikud",
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
+  },
+  "minimalDriveBehaviour": "Driving behaviour",
+  "@minimalDriveBehaviour": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

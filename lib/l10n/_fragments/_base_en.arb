@@ -1126,6 +1126,10 @@
   "@minimalDriveInstantConsumption": {
     "description": "Label above the headline instant-L/100km figure in the MinimalDriveSummary card on the trip-recording screen (#2026). Replaces the five-card 'Distance/Speed/Fuel/Avg/Elapsed' wall as the primary live-drive surface."
   },
+  "minimalDriveBehaviour": "Driving behaviour",
+  "@minimalDriveBehaviour": {
+    "description": "Label of the always-on live driving-behaviour band on the trip-recording screen (#3845). The band shows a green/yellow/orange/red colour plus the 0-100 rolling score for the last ~90 seconds of driving."
+  },
   "coachingShiftUp": "Shift up",
   "coachingShiftDown": "Shift down",
   "coachingEasePedal": "Ease off",

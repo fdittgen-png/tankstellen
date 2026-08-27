@@ -5776,5 +5776,10 @@
   "trajetObd2Degraded": "Rozpoczęto z adapterem OBD2, ale zapisano głównie z GPS — dane silnika są niepełne",
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
+  },
+  "minimalDriveBehaviour": "Driving behaviour",
+  "@minimalDriveBehaviour": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

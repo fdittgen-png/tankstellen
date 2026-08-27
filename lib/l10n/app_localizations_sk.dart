@@ -2276,6 +2276,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Okamžitá spotreba';
 
   @override
+  String get minimalDriveBehaviour => 'Driving behaviour';
+
+  @override
   String get coachingShiftUp => 'Zaraď vyššie';
 
   @override

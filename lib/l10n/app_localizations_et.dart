@@ -2265,6 +2265,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Hetketarbimine';
 
   @override
+  String get minimalDriveBehaviour => 'Driving behaviour';
+
+  @override
   String get coachingShiftUp => 'Vaheta üles';
 
   @override

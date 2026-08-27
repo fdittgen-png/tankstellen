@@ -2276,6 +2276,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Consumo istantaneo';
 
   @override
+  String get minimalDriveBehaviour => 'Driving behaviour';
+
+  @override
   String get coachingShiftUp => 'Marcia su';
 
   @override

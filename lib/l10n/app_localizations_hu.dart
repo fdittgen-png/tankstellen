@@ -2279,6 +2279,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Pillanatnyi fogyasztás';
 
   @override
+  String get minimalDriveBehaviour => 'Driving behaviour';
+
+  @override
   String get coachingShiftUp => 'Sebességet feljebb';
 
   @override

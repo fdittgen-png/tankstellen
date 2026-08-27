@@ -70,4 +70,80 @@ void main() {
       expect(find.byIcon(Icons.eco), findsOneWidget);
     });
   });
+
+  group('#3845 live driving-behaviour band', () {
+    TripRecordingState stateWithScore(int? score) => TripRecordingState(
+          live: TripLiveReading(
+            elapsed: Duration(minutes: 5),
+            distanceKmSoFar: 10.0,
+            liveDrivingScore: score,
+          ),
+        );
+
+    testWidgets('hidden while the tracker has not earned a band yet',
+        (tester) async {
+      await tester.pumpWidget(_harness(stateWithScore(null)));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('minimal_drive_behaviour_band')), findsNothing,
+          reason: 'a colour shown before the score is earned would be '
+              'reporting "no data" as "driving well"');
+    });
+
+    // The four bands the user asked for, good -> bad, with the colour
+    // each must paint. Colour is asserted directly: "green yellow orange
+    // red" WAS the requirement, so a theme-role regression that silently
+    // repainted them has to fail here.
+    const bands = <String, (int, Color)>{
+      'green': (92, Color(0xFF2E7D32)),
+      'yellow': (75, Color(0xFFF9A825)),
+      'orange': (58, Color(0xFFEF6C00)),
+      'red': (30, Color(0xFFC62828)),
+    };
+
+    bands.forEach((colourName, spec) {
+      final (score, colour) = spec;
+      testWidgets('score $score paints $colourName', (tester) async {
+        await tester.pumpWidget(_harness(stateWithScore(score)));
+        await tester.pumpAndSettle();
+        expect(
+            find.byKey(const Key('minimal_drive_behaviour_band')),
+            findsOneWidget);
+        final label = tester.widget<Text>(
+            find.byKey(const Key('minimal_drive_behaviour_label')));
+        expect(label.style?.color, colour);
+        final bar = tester.widget<LinearProgressIndicator>(
+            find.byType(LinearProgressIndicator));
+        expect(bar.value, closeTo(score / 100.0, 1e-9));
+      });
+    });
+
+    testWidgets('the number is rendered beside the colour', (tester) async {
+      // Colour must never be the only channel — a colour-blind driver and
+      // a screen reader both need the value.
+      await tester.pumpWidget(_harness(stateWithScore(64)));
+      await tester.pumpAndSettle();
+      final score = tester.widget<Text>(
+          find.byKey(const Key('minimal_drive_behaviour_score')));
+      expect(score.data, '64',
+          reason: 'the score must be readable without relying on colour');
+    });
+
+    testWidgets('the band survives a GPS-only reading (no fuel-rate PID)',
+        (tester) async {
+      // The always-on requirement: no fuelRateLPerHour anywhere in this
+      // reading, and the band still shows.
+      const state = TripRecordingState(
+        live: TripLiveReading(
+          elapsed: Duration(minutes: 5),
+          distanceKmSoFar: 10.0,
+          speedKmh: 60.0,
+          liveDrivingScore: 88,
+        ),
+      );
+      await tester.pumpWidget(_harness(state));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('minimal_drive_behaviour_band')),
+          findsOneWidget);
+    });
+  });
 }

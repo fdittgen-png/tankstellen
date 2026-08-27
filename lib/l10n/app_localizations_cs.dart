@@ -2273,6 +2273,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Okamžitá spotřeba';
 
   @override
+  String get minimalDriveBehaviour => 'Driving behaviour';
+
+  @override
   String get coachingShiftUp => 'Zařadit vyšší';
 
   @override

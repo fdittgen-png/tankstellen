@@ -5776,5 +5776,10 @@
   "trajetObd2Degraded": "Startet med OBD2-adapteren, men optaget mest via GPS — motordata er ufuldstændige",
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
+  },
+  "minimalDriveBehaviour": "Driving behaviour",
+  "@minimalDriveBehaviour": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

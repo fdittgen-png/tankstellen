@@ -2268,6 +2268,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Hetkellinen kulutus';
 
   @override
+  String get minimalDriveBehaviour => 'Driving behaviour';
+
+  @override
   String get coachingShiftUp => 'Vaihda ylös';
 
   @override

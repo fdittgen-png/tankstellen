@@ -4263,6 +4263,12 @@ abstract class AppLocalizations {
   /// **'Instant consumption'**
   String get minimalDriveInstantConsumption;
 
+  /// Label of the always-on live driving-behaviour band on the trip-recording screen (#3845). The band shows a green/yellow/orange/red colour plus the 0-100 rolling score for the last ~90 seconds of driving.
+  ///
+  /// In en, this message translates to:
+  /// **'Driving behaviour'**
+  String get minimalDriveBehaviour;
+
   /// No description provided for @coachingShiftUp.
   ///
   /// In en, this message translates to:

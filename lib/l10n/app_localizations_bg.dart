@@ -2283,6 +2283,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Моментен разход';
 
   @override
+  String get minimalDriveBehaviour => 'Driving behaviour';
+
+  @override
   String get coachingShiftUp => 'Превключи нагоре';
 
   @override

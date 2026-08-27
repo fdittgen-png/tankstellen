@@ -2269,6 +2269,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get minimalDriveInstantConsumption => 'Trenutna potrošnja';
 
   @override
+  String get minimalDriveBehaviour => 'Driving behaviour';
+
+  @override
   String get coachingShiftUp => 'Prebaci gore';
 
   @override

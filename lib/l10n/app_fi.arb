@@ -5776,5 +5776,10 @@
   "trajetObd2Degraded": "Aloitettu OBD2-sovittimella mutta tallennettu enimmäkseen GPS:llä — moottoritiedot ovat puutteellisia",
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
+  },
+  "minimalDriveBehaviour": "Driving behaviour",
+  "@minimalDriveBehaviour": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }
