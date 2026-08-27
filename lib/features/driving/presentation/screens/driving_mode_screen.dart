@@ -4,7 +4,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -50,7 +49,7 @@ class _DrivingModeScreenState extends ConsumerState<DrivingModeScreen> {
     _mapController = MapController();
     _resetInactivityTimer();
     // Enter immersive full-screen mode — hides status bar and nav bar
-    unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky));
+    // #3843 — wake lock only; immersiveSticky removed app-wide.
   }
 
   @override

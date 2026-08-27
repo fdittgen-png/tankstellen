@@ -49,7 +49,11 @@ mixin _TripRecordingPinControls on ConsumerState<TripRecordingScreen> {
     // after the widget has been deactivated.
     _cachedFacade = facade;
     await facade.enable();
-    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    // #3843 — the pin no longer hides the system bars. immersiveSticky is
+    // designed to RE-hide them, so it actively fights being exited, and four
+    // fixes trying to reverse it reliably all failed in the field. The wake
+    // lock is the feature; hiding the clock on a live-driving screen was
+    // polish. With nothing entering immersive there is nothing to restore.
   }
 
   Future<void> _disablePin() async {

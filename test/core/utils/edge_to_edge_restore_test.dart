@@ -45,18 +45,25 @@ void main() {
               'EdgeToEdge.restore() instead. Offenders: $offenders');
     });
 
-    test('every screen that goes immersive also restores', () {
-      // Going immersive without restoring is the same user-visible bug by a
-      // different route, so pair the two calls per file.
-      final unpaired = <String>[];
+    test('#3843 NOTHING enters immersiveSticky any more', () {
+      // Flipped from "anything going immersive must restore". Four fixes
+      // tried to reverse sticky immersive reliably and all failed in the
+      // field across five user reports. immersiveSticky is designed to
+      // RE-hide the bars, so it fights being exited; the only way to be
+      // sure the black band cannot come back is for no screen to enter it.
+      // The wake lock — the actual feature — is untouched.
+      final offenders = <String>[];
       for (final file in _libDartFiles()) {
-        final src = file.readAsStringSync();
-        if (!src.contains('SystemUiMode.immersiveSticky')) continue;
-        if (!src.contains('EdgeToEdge.restore()')) unpaired.add(file.path);
+        // edge_to_edge.dart names it in prose explaining why it is gone.
+        if (file.path.endsWith('core/utils/edge_to_edge.dart')) continue;
+        if (file.readAsStringSync().contains('SystemUiMode.immersiveSticky')) {
+          offenders.add(file.path);
+        }
       }
-      expect(unpaired, isEmpty,
-          reason: 'these go immersive but never restore, so the bars stay '
-              'hidden or opaque after the screen is gone: $unpaired');
+      expect(offenders, isEmpty,
+          reason: 'entering immersiveSticky reintroduces a bug that survived '
+              'four fixes. Keep the wake lock, leave the bars alone. '
+              'Offenders: $offenders');
     });
 
     test('every dispose that can go immersive restores UNCONDITIONALLY', () {
