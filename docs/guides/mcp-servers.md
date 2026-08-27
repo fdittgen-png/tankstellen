@@ -50,10 +50,26 @@ same tools **plus `vm_service`**, verified by probing both side by side.
 Global activation resolves independently, so it cannot disturb another
 project's dependency graph the way a dev-dependency would.
 
-**`analyze_files` is the reason this is wired.** It goes through the
-*persistent* analysis server, so it is incremental rather than paying the
-~80 s cold start `flutter analyze` costs on every invocation — half an hour
-of pure waiting across the 20+ analyze runs of one debugging session.
+**`analyze_files` is the reason this is wired** — measured, 2026-08-27, on
+this repo (3 413 dart files):
+
+| | cold | warm |
+|---|---|---|
+| `flutter analyze` | 16 s | 12 s |
+| MCP `analyze_files` | 9.5 s | **0.0 s** |
+
+The analysis server persists across calls within a session, so only the first
+one pays. The gain is ~12 s saved on **every re-analysis after the first**,
+which is what a tight edit/check loop is made of — not a faster first run.
+
+An earlier version of this file claimed `flutter analyze` costs "~80 s per
+invocation". That was wrong: runs that slow were re-resolving dependencies
+(`pub get` after a pubspec/lock change) before analysing at all.
+
+`analyze_files` also needs the CLIENT to advertise `roots` and answer the
+server's `roots/list` request — its own `roots` argument does not satisfy it,
+and a call without roots returns `isError` instantly, which looks like a fast
+success if you only time it.
 
 The **live-app group** is the other real gain: `dtd` → `widget_inspector` +
 `get_runtime_errors` reads a RUNNING app instead of reasoning from an
