@@ -4,6 +4,7 @@
 import '../../../../core/domain/fuel_type.dart';
 import '../entities/fill_up.dart';
 import '../entities/fuel_type_efficiency_stats.dart';
+import 'fuel_type_efficiency_internals.dart';
 import 'tank_mix_estimator.dart';
 
 /// Minimum attributed closed intervals a bucket must have before the
@@ -87,10 +88,17 @@ class FuelTypeEfficiencyAggregator {
     // ConsumptionStats.fromFillUps.
     final sorted = [...fills]..sort((a, b) => a.date.compareTo(b.date));
 
+    // #3846 — what each fuel actually COST per litre, volume-weighted over
+    // every real fill of that fuel. The interval's money must come from the
+    // fuel that was BURNED; before this, it came from the fill that CLOSED
+    // the interval, i.e. the next tank — so E5 was priced with E85's money
+    // and vice versa, and the "cheapest to drive on" verdict inverted.
+    final pricePerLitre = weightedPricePerLitre(sorted);
+
     // Per-bucket accumulators, keyed by FuelEfficiencyBucket.key.
-    final acc = <String, _BucketAcc>{};
-    _BucketAcc accFor(FuelEfficiencyBucket bucket) =>
-        acc.putIfAbsent(bucket.key, () => _BucketAcc(bucket));
+    final acc = <String, BucketAcc>{};
+    BucketAcc accFor(FuelEfficiencyBucket bucket) =>
+        acc.putIfAbsent(bucket.key, () => BucketAcc(bucket));
 
     // ── Closed-interval walker (mirrors consumption_stats.dart) ──
     // An interval opens at sorted[openingIndex] (first fill, or the prior
@@ -115,6 +123,7 @@ class FuelTypeEfficiencyAggregator {
         distance,
         accFor,
         openingContent: _openingContentAt(sorted, openingIndex, tankCapacityL),
+        pricePerLitre: pricePerLitre,
       );
 
       openingIndex = i;
@@ -178,7 +187,7 @@ class FuelTypeEfficiencyAggregator {
   /// when the capacity is unknown/non-positive, the opening fill is not a
   /// full tank (only possible for the very first fill), or it is a
   /// synthetic correction (#1361 — never a physical visit to a pump).
-  static _OpeningContent? _openingContentAt(
+  static OpeningContent? _openingContentAt(
     List<FillUp> sorted,
     int openingIndex,
     double? tankCapacityL,
@@ -205,7 +214,7 @@ class FuelTypeEfficiencyAggregator {
       fuelByApiValue[s.fuel.apiValue] = s.fuel;
     }
     if (litresByFuel.isEmpty) return null;
-    return _OpeningContent(litresByFuel, fuelByApiValue);
+    return OpeningContent(litresByFuel, fuelByApiValue);
   }
 
   /// Classify the interval into a PURE or MIX [FuelEfficiencyBucket] by its
@@ -221,8 +230,9 @@ class FuelTypeEfficiencyAggregator {
   static void _attributeInterval(
     List<FillUp> contributing,
     double distance,
-    _BucketAcc Function(FuelEfficiencyBucket) accFor, {
-    required _OpeningContent? openingContent,
+    BucketAcc Function(FuelEfficiencyBucket) accFor, {
+    required OpeningContent? openingContent,
+    required Map<String, double> pricePerLitre,
   }) {
     if (contributing.isEmpty) return;
 
@@ -263,12 +273,38 @@ class FuelTypeEfficiencyAggregator {
     // is the whole interval's odometer delta. fillCount counts only the
     // non-correction fills folded into this bucket.
     var intervalLitres = 0.0;
-    var intervalCost = 0.0;
+    var pricedLitres = 0.0;
     var intervalFills = 0;
     for (final f in contributing) {
+      // Litres stay the plein-to-plein REFILL volume — that is what was
+      // burned over the interval, and it is what avgL100km must use.
+      // Corrections are included here (they inherit the bucket and DO
+      // represent fuel that went through the engine).
       intervalLitres += f.liters;
-      intervalCost += f.totalCost; // corrections carry 0
-      if (!f.isCorrection) intervalFills += 1;
+      if (f.isCorrection) continue;
+      // ...but they are never PRICED: a correction is a bookkeeping
+      // adjustment, not a visit to a pump, and carries no money. Pricing
+      // its litres would invent a purchase — a 999 L correction priced at
+      // the fuel's rate produced 2.57 EUR/km in the #3846 first draft.
+      pricedLitres += f.liters;
+      intervalFills += 1;
+    }
+
+    // #3846 — money follows the fuel BURNED. Split the burned volume across
+    // the interval's composition and price each share at what that fuel
+    // actually cost, instead of charging the interval whatever was paid at
+    // the pump that closed it (which bought the NEXT tank, often a
+    // different fuel).
+    final compositionLitres =
+        litresByFuel.values.fold<double>(0, (a, b) => a + b);
+    var intervalCost = 0.0;
+    if (compositionLitres > 0) {
+      for (final entry in litresByFuel.entries) {
+        final price = pricePerLitre[entry.key];
+        if (price == null) continue; // never invent a price
+        final burnedShare = entry.value / compositionLitres;
+        intervalCost += pricedLitres * burnedShare * price;
+      }
     }
 
     final a = accFor(bucket);
@@ -324,51 +360,5 @@ class FuelTypeEfficiencyAggregator {
     // MIX: dominant + the next-largest (the two largest for a 3-way blend).
     final secondary = fuelByApiValue[ordered[1]]!;
     return FuelEfficiencyBucket(dominant: dominant, secondary: secondary);
-  }
-}
-
-/// An interval's carried-over opening tank content (v3, #3764): litres per
-/// `FuelType.apiValue` plus the fuel objects for label resolution.
-class _OpeningContent {
-  const _OpeningContent(this.litresByFuel, this.fuelByApiValue);
-
-  final Map<String, double> litresByFuel;
-  final Map<String, FuelType> fuelByApiValue;
-}
-
-/// Mutable per-bucket accumulator used only inside [byFuelType].
-class _BucketAcc {
-  _BucketAcc(this.bucket);
-
-  final FuelEfficiencyBucket bucket;
-
-  // Per-bucket sums over the intervals classified into this bucket.
-  double intervalLitres = 0;
-  double intervalDistance = 0;
-  double intervalCost = 0;
-  int attributedIntervalCount = 0;
-  int legacyAttributedIntervalCount = 0;
-
-  // Per-fill facts folded from this bucket's intervals.
-  double totalSpent = 0;
-  int fillCount = 0;
-
-  FuelTypeEfficiencyStats toStats() {
-    final hasDistance = attributedIntervalCount > 0 && intervalDistance > 0;
-    return FuelTypeEfficiencyStats(
-      bucket: bucket,
-      avgL100km: hasDistance ? (intervalLitres / intervalDistance) * 100 : null,
-      avgCostPerKm: hasDistance ? intervalCost / intervalDistance : null,
-      totalSpent: totalSpent,
-      fillCount: fillCount,
-      attributedIntervalCount: attributedIntervalCount,
-      legacyAttributedIntervalCount: legacyAttributedIntervalCount,
-      // #3828 — these three were summed here and then dropped on the floor.
-      // Surfacing them is what lets the screen state price per litre and
-      // distance driven instead of only the two derived averages.
-      totalLitres: intervalLitres,
-      totalDistanceKm: intervalDistance,
-      intervalCost: intervalCost,
-    );
   }
 }
