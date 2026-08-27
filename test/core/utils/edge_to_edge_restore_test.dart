@@ -105,7 +105,13 @@ void main() {
       final calls = <String>[];
       tester.binding.defaultBinaryMessenger
           .setMockMethodCallHandler(SystemChannels.platform, (call) async {
+        // NOTE: `SystemUiMode.manual` does NOT dispatch
+        // `setEnabledSystemUIMode` — Flutter routes it to
+        // `setEnabledSystemUIOverlays` (system_chrome.dart:613-624). Filtering
+        // on the mode method alone made this test blind to step 1 of the
+        // two-step exit.
         if (call.method == 'SystemChrome.setEnabledSystemUIMode' ||
+            call.method == 'SystemChrome.setEnabledSystemUIOverlays' ||
             call.method == 'SystemChrome.setSystemUIOverlayStyle') {
           calls.add('${call.method}:${call.arguments}');
         }
@@ -117,9 +123,25 @@ void main() {
       // still null until a frame runs.
       await tester.pump();
 
-      expect(calls.where((c) => c.contains('setEnabledSystemUIMode')).single,
-          contains('edgeToEdge'),
-          reason: 'restore must return to edge-to-edge, not manual');
+      // #3841 — the ORDER is the fix. Sticky immersive is designed to
+      // re-hide the bars, so asking straight for edgeToEdge can leave the
+      // app in the transient-overlay state Android draws as a dark scrim.
+      // Restore the overlays first to end immersive for certain, THEN go
+      // edge-to-edge so the app draws behind the bars again.
+      final modes = calls
+          .where((c) =>
+              c.contains('setEnabledSystemUIMode') ||
+              c.contains('setEnabledSystemUIOverlays'))
+          .toList();
+      expect(modes.length, 2,
+          reason: 'expected the two-step immersive exit, got: $modes');
+      expect(modes.first, contains('setEnabledSystemUIOverlays'),
+          reason: 'step 1 must force the overlays back, ending sticky '
+              'immersive — edgeToEdge alone does not reliably clear it');
+      expect(modes.last, contains('edgeToEdge'),
+          reason: 'step 2 must re-establish edge-to-edge, or the app stops '
+              'drawing behind the bars and the native window background '
+              '(black) shows through the transparent status bar');
       // The overlay style is batched to the next frame rather than sent as an
       // immediate platform message, so assert the value Flutter actually
       // holds — re-showing the bars WITHOUT this is how the black band

@@ -21,6 +21,7 @@ import '../l10n/app_localizations.dart';
 import 'router.dart';
 import 'theme.dart';
 import 'widgets/startup_reveal.dart';
+import '../core/utils/edge_to_edge.dart';
 
 /// Top-level Material app for Tankstellen. This is the *only* widget
 /// constructed directly from `main()` (via [AppInitializer]); everything
@@ -92,6 +93,18 @@ class _TankstellenAppState extends ConsumerState<TankstellenApp>
       // (≥15 min since the last completed pass, never while a trip is
       // recording) and the #3450 init-retry fast path. Never throws.
       unawaited(AppResumeSync.instance.onAppResumed());
+    }
+    // #3841 — self-heal the system UI on every resume.
+    //
+    // Three fixes have now tried to restore the bars from a screen's dispose,
+    // and the user still saw a black status bar for a whole session. Rather
+    // than add a fourth event to hope for, re-assert on RESUME: it depends on
+    // no dispose running, no pin flag being right, and no particular route
+    // being popped. Idempotent and one platform call, so the cost of running
+    // it when it was not needed is nil.
+    if (state == AppLifecycleState.resumed) {
+      unawaited(EdgeToEdge.restore());
+      return;
     }
     if (state != AppLifecycleState.paused &&
         state != AppLifecycleState.inactive) {
