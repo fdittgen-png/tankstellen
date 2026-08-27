@@ -5772,5 +5772,9 @@
   "fuelCompareCo2BlendOmitted": "CO2 se prikazuje samo za čista goriva: faktor emisije mješavine ovisi o sastavu koji ovaj redak ne bilježi.",
   "@fuelCompareCo2BlendOmitted": {
     "description": "MT — needs native review"
+  },
+  "trajetObd2Degraded": "Pokrenuto s OBD2 adapterom, ali snimljeno uglavnom GPS-om — podaci motora su nepotpuni",
+  "@trajetObd2Degraded": {
+    "description": "MT — needs native review"
   }
 }

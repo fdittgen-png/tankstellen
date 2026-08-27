@@ -7454,6 +7454,10 @@ class AppLocalizationsLt extends AppLocalizations {
   String get trajetDetailChartTiming => 'Ignition timing advance';
 
   @override
+  String get trajetObd2Degraded =>
+      'Pradėta su OBD2 adapteriu, bet įrašyta daugiausia per GPS — variklio duomenys nepilni';
+
+  @override
   String get tripLengthCardTitle => 'Suvartojimas pagal kelionės ilgį';
 
   @override

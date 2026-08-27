@@ -7415,6 +7415,10 @@ class AppLocalizationsEt extends AppLocalizations {
   String get trajetDetailChartTiming => 'Ignition timing advance';
 
   @override
+  String get trajetObd2Degraded =>
+      'Alustatud OBD2-adapteriga, kuid salvestatud peamiselt GPS-iga — mootoriandmed on puudulikud';
+
+  @override
   String get tripLengthCardTitle => 'Tarbimine reisi pikkuse järgi';
 
   @override

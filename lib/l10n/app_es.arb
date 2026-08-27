@@ -5772,5 +5772,9 @@
   "fuelCompareCo2BlendOmitted": "El CO2 solo se muestra para combustibles puros: el factor de emisión de una mezcla depende de su composición, que esta fila no registra.",
   "@fuelCompareCo2BlendOmitted": {
     "description": "MT — needs native review"
+  },
+  "trajetObd2Degraded": "Iniciado con el adaptador OBD2 pero grabado sobre todo por GPS: los datos del motor están incompletos",
+  "@trajetObd2Degraded": {
+    "description": "MT — needs native review"
   }
 }

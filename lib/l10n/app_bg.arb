@@ -5772,5 +5772,9 @@
   "fuelCompareCo2BlendOmitted": "CO2 се показва само за чисти горива: емисионният фактор на смес зависи от състава, който този ред не записва.",
   "@fuelCompareCo2BlendOmitted": {
     "description": "MT — needs native review"
+  },
+  "trajetObd2Degraded": "Стартирано с OBD2 адаптер, но записано предимно чрез GPS — данните от двигателя са непълни",
+  "@trajetObd2Degraded": {
+    "description": "MT — needs native review"
   }
 }

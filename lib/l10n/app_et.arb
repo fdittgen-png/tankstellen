@@ -5772,5 +5772,9 @@
   "fuelCompareCo2BlendOmitted": "CO2 kuvatakse ainult puhaste kütuste kohta: segu heitetegur sõltub segu koostisest, mida see rida ei salvesta.",
   "@fuelCompareCo2BlendOmitted": {
     "description": "MT — needs native review"
+  },
+  "trajetObd2Degraded": "Alustatud OBD2-adapteriga, kuid salvestatud peamiselt GPS-iga — mootoriandmed on puudulikud",
+  "@trajetObd2Degraded": {
+    "description": "MT — needs native review"
   }
 }

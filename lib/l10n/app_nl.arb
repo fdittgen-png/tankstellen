@@ -5772,5 +5772,9 @@
   "fuelCompareCo2BlendOmitted": "CO2 wordt alleen getoond voor pure brandstoffen: de emissiefactor van een mengsel hangt af van de samenstelling, die deze regel niet vastlegt.",
   "@fuelCompareCo2BlendOmitted": {
     "description": "MT — needs native review"
+  },
+  "trajetObd2Degraded": "Gestart met de OBD2-adapter maar grotendeels via GPS opgenomen — motorgegevens zijn onvolledig",
+  "@trajetObd2Degraded": {
+    "description": "MT — needs native review"
   }
 }

@@ -7443,6 +7443,10 @@ class AppLocalizationsHr extends AppLocalizations {
   String get trajetDetailChartTiming => 'Ignition timing advance';
 
   @override
+  String get trajetObd2Degraded =>
+      'Pokrenuto s OBD2 adapterom, ali snimljeno uglavnom GPS-om — podaci motora su nepotpuni';
+
+  @override
   String get tripLengthCardTitle => 'Potrošnja prema duljini vožnje';
 
   @override

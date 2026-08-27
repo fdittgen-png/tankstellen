@@ -7470,6 +7470,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get trajetDetailChartTiming => 'Ignition timing advance';
 
   @override
+  String get trajetObd2Degraded =>
+      'Iniciado com o adaptador OBD2 mas gravado sobretudo por GPS — os dados do motor estão incompletos';
+
+  @override
   String get tripLengthCardTitle => 'Consumo por duração da viagem';
 
   @override

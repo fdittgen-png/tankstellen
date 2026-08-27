@@ -5772,5 +5772,9 @@
   "fuelCompareCo2BlendOmitted": "CO2 tiek rādīts tikai tīrām degvielām: maisījuma emisiju faktors atkarīgs no sastāva, ko šī rinda nereģistrē.",
   "@fuelCompareCo2BlendOmitted": {
     "description": "MT — needs native review"
+  },
+  "trajetObd2Degraded": "Sākts ar OBD2 adapteri, bet ierakstīts galvenokārt ar GPS — dzinēja dati ir nepilnīgi",
+  "@trajetObd2Degraded": {
+    "description": "MT — needs native review"
   }
 }

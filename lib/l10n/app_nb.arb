@@ -5772,5 +5772,9 @@
   "fuelCompareCo2BlendOmitted": "CO2 vises bare for rene drivstoff: utslippsfaktoren til en blanding avhenger av blandingsforholdet, som denne raden ikke registrerer.",
   "@fuelCompareCo2BlendOmitted": {
     "description": "MT — needs native review"
+  },
+  "trajetObd2Degraded": "Startet med OBD2-adapteren, men tatt opp for det meste via GPS — motordata er ufullstendige",
+  "@trajetObd2Degraded": {
+    "description": "MT — needs native review"
   }
 }

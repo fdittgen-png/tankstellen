@@ -5772,5 +5772,9 @@
   "fuelCompareCo2BlendOmitted": "A CO2 csak tiszta üzemanyagokra jelenik meg: a keverék kibocsátási tényezője az összetételtől függ, amelyet ez a sor nem rögzít.",
   "@fuelCompareCo2BlendOmitted": {
     "description": "MT — needs native review"
+  },
+  "trajetObd2Degraded": "OBD2-adapterrel indult, de főként GPS-szel rögzült — a motoradatok hiányosak",
+  "@trajetObd2Degraded": {
+    "description": "MT — needs native review"
   }
 }

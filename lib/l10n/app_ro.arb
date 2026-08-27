@@ -5772,5 +5772,9 @@
   "fuelCompareCo2BlendOmitted": "CO2 se afișează doar pentru carburanții puri: factorul de emisie al unui amestec depinde de compoziție, pe care acest rând nu o înregistrează.",
   "@fuelCompareCo2BlendOmitted": {
     "description": "MT — needs native review"
+  },
+  "trajetObd2Degraded": "Pornit cu adaptorul OBD2, dar înregistrat mai ales prin GPS — datele de motor sunt incomplete",
+  "@trajetObd2Degraded": {
+    "description": "MT — needs native review"
   }
 }

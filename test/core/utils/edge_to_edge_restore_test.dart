@@ -59,6 +59,45 @@ void main() {
               'hidden or opaque after the screen is gone: $unpaired');
     });
 
+    test('every dispose that can go immersive restores UNCONDITIONALLY', () {
+      // #3834 — #3827 fixed WHAT the restore does and left it behind a
+      // `if (_pinned)` / `if (!pinned) return` gate, so on the path users
+      // actually took it never ran and the bars stayed immersive for the
+      // rest of the session. The app's normal appearance must not depend
+      // on a bool surviving to dispose.
+      final offenders = <String>[];
+      for (final file in _libDartFiles()) {
+        final src = file.readAsStringSync();
+        if (!src.contains('EdgeToEdge.restore()')) continue;
+        for (final m in RegExp(r'(?:void|Future<void>)\s+\w*[Dd]ispose\w*\s*\([^)]*\)\s*(?:async\s*)?\{')
+            .allMatches(src)) {
+          // Scan the dispose body to its closing brace.
+          var depth = 0, i = m.end - 1;
+          final start = i;
+          do {
+            if (src[i] == '{') depth++;
+            if (src[i] == '}') depth--;
+            i++;
+          } while (depth > 0 && i < src.length);
+          final body = src.substring(start, i);
+          if (!body.contains('EdgeToEdge.restore()')) continue;
+          // The restore must appear OUTSIDE any pin-state conditional.
+          final gated = RegExp(
+                  r'if\s*\(\s*!?\s*_?pinned\s*\)[^}]*EdgeToEdge\.restore\(\)')
+              .hasMatch(body);
+          // ...and must not be unreachable behind an early return.
+          final earlyReturn = RegExp(r'if\s*\(\s*!\s*_?pinned\s*\)\s*return\s*;')
+              .hasMatch(body.substring(0, body.indexOf('EdgeToEdge.restore()')));
+          if (gated || earlyReturn) offenders.add(file.path);
+        }
+      }
+      expect(offenders, isEmpty,
+          reason: 'restore() is idempotent and costs one platform call, so '
+              'running it needlessly is free — skipping it leaves the user '
+              'with a black status bar until they restart. Offenders: '
+              '$offenders');
+    });
+
     testWidgets('restore re-establishes exactly what enable() set',
         (tester) async {
       // The regression was restore() and enable() disagreeing, so assert they

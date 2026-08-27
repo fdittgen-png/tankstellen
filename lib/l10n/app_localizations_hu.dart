@@ -7459,6 +7459,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trajetDetailChartTiming => 'Ignition timing advance';
 
   @override
+  String get trajetObd2Degraded =>
+      'OBD2-adapterrel indult, de főként GPS-szel rögzült — a motoradatok hiányosak';
+
+  @override
   String get tripLengthCardTitle => 'Fogyasztás úthossz szerint';
 
   @override

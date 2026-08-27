@@ -7424,6 +7424,10 @@ class AppLocalizationsFi extends AppLocalizations {
   String get trajetDetailChartTiming => 'Ignition timing advance';
 
   @override
+  String get trajetObd2Degraded =>
+      'Aloitettu OBD2-sovittimella mutta tallennettu enimmäkseen GPS:llä — moottoritiedot ovat puutteellisia';
+
+  @override
   String get tripLengthCardTitle => 'Kulutus matkan pituuden mukaan';
 
   @override

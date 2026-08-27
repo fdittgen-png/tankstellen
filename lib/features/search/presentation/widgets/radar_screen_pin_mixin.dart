@@ -65,10 +65,11 @@ mixin RadarScreenPinMixin<T extends ConsumerStatefulWidget>
 
   /// Best-effort release on dispose (must stay sync). Call from `dispose`.
   void disposePin() {
+    // #3834 — restore FIRST and unconditionally: an early return here left
+    // the system UI immersive whenever `pinned` did not survive to dispose.
+    unawaited(EdgeToEdge.restore());
     if (!pinned) return;
     final facade = _cachedFacade;
     if (facade != null) unawaited(facade.disable());
-    unawaited(EdgeToEdge.restore(),
-    );
   }
 }

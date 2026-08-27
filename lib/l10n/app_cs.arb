@@ -5772,5 +5772,9 @@
   "fuelCompareCo2BlendOmitted": "CO2 se zobrazuje jen u čistých paliv: emisní faktor směsi závisí na jejím složení, které tento řádek nezaznamenává.",
   "@fuelCompareCo2BlendOmitted": {
     "description": "MT — needs native review"
+  },
+  "trajetObd2Degraded": "Zahájeno s adaptérem OBD2, ale zaznamenáno převážně přes GPS — data motoru jsou neúplná",
+  "@trajetObd2Degraded": {
+    "description": "MT — needs native review"
   }
 }

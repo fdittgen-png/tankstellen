@@ -5772,5 +5772,9 @@
   "fuelCompareCo2BlendOmitted": "Το CO2 εμφανίζεται μόνο για καθαρά καύσιμα: ο συντελεστής εκπομπών ενός μείγματος εξαρτάται από τη σύνθεση, την οποία αυτή η γραμμή δεν καταγράφει.",
   "@fuelCompareCo2BlendOmitted": {
     "description": "MT — needs native review"
+  },
+  "trajetObd2Degraded": "Ξεκίνησε με τον προσαρμογέα OBD2 αλλά καταγράφηκε κυρίως με GPS — τα δεδομένα κινητήρα είναι ελλιπή",
+  "@trajetObd2Degraded": {
+    "description": "MT — needs native review"
   }
 }

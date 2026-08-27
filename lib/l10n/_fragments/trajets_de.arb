@@ -68,5 +68,6 @@
   "trajetDetailChartTiming": "Zündzeitpunkt (Frühzündung)",
   "@trajetDetailChartTiming": {
     "description": "Trip-detail chart title: ignition timing advance °CA, PID 0x0E (#3692)"
-  }
+  },
+  "trajetObd2Degraded": "Mit dem OBD2-Adapter gestartet, aber überwiegend GPS aufgezeichnet — Motordaten sind unvollständig"
 }

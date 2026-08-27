@@ -5772,5 +5772,9 @@
   "fuelCompareCo2BlendOmitted": "CO2 rodomas tik grynoms degalų rūšims: mišinio taršos koeficientas priklauso nuo sudėties, kurios ši eilutė nefiksuoja.",
   "@fuelCompareCo2BlendOmitted": {
     "description": "MT — needs native review"
+  },
+  "trajetObd2Degraded": "Pradėta su OBD2 adapteriu, bet įrašyta daugiausia per GPS — variklio duomenys nepilni",
+  "@trajetObd2Degraded": {
+    "description": "MT — needs native review"
   }
 }

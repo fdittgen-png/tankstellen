@@ -265,5 +265,9 @@
   "trajetDetailChartTiming": "Ignition timing advance",
   "@trajetDetailChartTiming": {
     "description": "Trip-detail chart title: ignition timing advance °CA, PID 0x0E (#3692)"
+  },
+  "trajetObd2Degraded": "Started with the OBD2 adapter but recorded mostly GPS — engine data is incomplete",
+  "@trajetObd2Degraded": {
+    "description": "Accessibility label and tooltip on a trajet whose recording began with the OBD2 adapter but delivered mostly GPS (#3835). Pairs with the red stripe so colour is not the only carrier of the meaning."
   }
 }

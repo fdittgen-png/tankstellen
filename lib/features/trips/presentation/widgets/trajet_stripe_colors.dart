@@ -3,7 +3,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../../domain/trip_recorder.dart' show TripKind;
+import '../../domain/trajet_data_quality.dart';
 
 /// Resolves the left-edge stripe colour for a trajet card (#2108
 /// refinement of #2059).
@@ -42,14 +42,28 @@ class TrajetStripeColors {
   static const Color gpsOnlyLight = Color(0xFF3A6EA5);
   static const Color gpsOnlyDark = Color(0xFF7BAEDF);
 
-  /// Pick the stripe colour for the trip kind at the current theme
-  /// brightness. Anything other than `gpsPlusObd2` (including hybrid
-  /// partial-coverage trips) gets the GPS-only blue.
-  static Color forKind(TripKind kind, Brightness brightness) {
-    final isObd2 = kind == TripKind.gpsPlusObd2;
-    if (brightness == Brightness.dark) {
-      return isObd2 ? obd2Dark : gpsOnlyDark;
+  /// OBD2 was attempted and did NOT deliver (#3835) — the adapter was
+  /// there and the engine data is not. Red, because unlike the other two
+  /// this state means something went wrong; it previously wore the same
+  /// green as a clean recording.
+  static const Color degradedLight = Color(0xFFC62828); // Material red 800
+  static const Color degradedDark = Color(0xFFEF5350); // Material red 400
+
+  /// Pick the stripe colour for a trajet's DELIVERED data quality at the
+  /// current theme brightness.
+  ///
+  /// Keyed on [TrajetDataQuality] rather than `TripKind` (#3835): the kind
+  /// records what was chosen at start, so a trip that began on the adapter
+  /// and degraded to GPS kept the green stripe of a healthy recording.
+  static Color forQuality(TrajetDataQuality quality, Brightness brightness) {
+    final dark = brightness == Brightness.dark;
+    switch (quality) {
+      case TrajetDataQuality.gpsOnly:
+        return dark ? gpsOnlyDark : gpsOnlyLight;
+      case TrajetDataQuality.obd2Healthy:
+        return dark ? obd2Dark : obd2Light;
+      case TrajetDataQuality.obd2Degraded:
+        return dark ? degradedDark : degradedLight;
     }
-    return isObd2 ? obd2Light : gpsOnlyLight;
   }
 }
