@@ -14,6 +14,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/services/co2_calculator.dart';
 import 'package:tankstellen/features/fill_ups/domain/entities/fuel_type_efficiency_stats.dart';
 
 FuelTypeEfficiencyStats _stats({
@@ -131,6 +132,61 @@ void main() {
       );
       expect(noData.breakEvenPricePerLitreVersus(e5), isNull);
       expect(e85.breakEvenPricePerLitreVersus(noData), isNull);
+    });
+  });
+
+  group('#3828 the emissions axis', () {
+    // Real WTW factors from Co2Calculator: E85 1.40 kg/L, E5 2.31 kg/L.
+    // This is the case the cost-only comparison could not express — E85 is
+    // dearer per km here and still much cleaner.
+    final e5 = _stats(
+        fuel: FuelType.e5, litres: 64, distanceKm: 1000, cost: 57); // 6.4 L
+    final e85 = _stats(
+        fuel: FuelType.e85, litres: 55, distanceKm: 1000, cost: 70); // 5.5 L
+
+    test('CO2 per km follows measured consumption, not litres alone', () {
+      // 6.4 L/100km * 2.31 kg/L / 100 = 0.14784 kg/km
+      expect(e5.co2PerKmWith(2.31), closeTo(0.14784, 1e-9));
+      // 5.5 L/100km * 1.40 kg/L / 100 = 0.077 kg/km
+      expect(e85.co2PerKmWith(1.40), closeTo(0.077, 1e-9));
+    });
+
+    test('the cheaper fuel per km is NOT the cleaner one here', () {
+      // The entire reason this axis had to be added.
+      expect(e5.avgCostPerKm! < e85.avgCostPerKm!, isTrue,
+          reason: 'E5 is cheaper to drive');
+      expect(e85.co2PerKmWith(1.40)! < e5.co2PerKmWith(2.31)!, isTrue,
+          reason: 'yet E85 emits far less — a cost-only screen cannot say so');
+    });
+
+    test('per 1000 km restates per km, matching the cost delta unit', () {
+      expect(e85.co2Per1000kmWith(1.40),
+          closeTo(e85.co2PerKmWith(1.40)! * 1000, 1e-9));
+    });
+
+    test('no factor or no measured consumption yields null, never a guess',
+        () {
+      expect(e85.co2PerKmWith(null), isNull);
+      const noConsumption = FuelTypeEfficiencyStats(
+        bucket: FuelEfficiencyBucket(dominant: FuelType.e85),
+        totalSpent: 0,
+        fillCount: 0,
+        attributedIntervalCount: 0,
+      );
+      expect(noConsumption.co2PerKmWith(1.40), isNull);
+      expect(noConsumption.co2Per1000kmWith(1.40), isNull);
+    });
+
+    test('Co2Calculator has a factor for the pure fuels we compare', () {
+      // The widget omits CO2 for blends deliberately; pure buckets must
+      // resolve, or the axis silently disappears.
+      for (final f in [FuelType.e5, FuelType.e10, FuelType.e85,
+                       FuelType.diesel, FuelType.lpg]) {
+        expect(Co2Calculator.emissionFactorFor(f), isNotNull,
+            reason: 'no WTW factor for $f');
+      }
+      expect(Co2Calculator.emissionFactorFor(FuelType.e85)!
+          < Co2Calculator.emissionFactorFor(FuelType.e5)!, isTrue);
     });
   });
 }

@@ -352,6 +352,108 @@ void main() {
     expect(find.byKey(const ValueKey('fuel_type_efficiency_card')),
         findsOneWidget);
   });
+
+  testWidgets('#3828 states the cost/emissions trade-off, not just prices',
+      (tester) async {
+    // The field shape: E5 cheaper per km, E85 markedly cleaner (WTW 1.40 vs
+    // 2.31 kg/L). A cost-only screen cannot express that, which is exactly
+    // why the emissions axis was added.
+    await pumpCard(
+      tester,
+      vehicle: flexCar,
+      data: [
+        pure(
+            fuel: FuelType.e5,
+            l100: 6.4,
+            costPerKm: 0.057,
+            totalSpent: 32.12,
+            fillCount: 2,
+            attributed: 2),
+        pure(
+            fuel: FuelType.e85,
+            l100: 5.5,
+            costPerKm: 0.070,
+            totalSpent: 130.09,
+            fillCount: 3,
+            attributed: 3),
+      ],
+    );
+
+    expect(find.byKey(const ValueKey('fuel_compare_analysis')), findsOneWidget);
+    expect(find.byKey(const ValueKey('fuel_compare_verdict')), findsOneWidget);
+    // Cheapest and cleanest are DIFFERENT fuels here, so a trade-off must be
+    // stated rather than the "wins on both" line.
+    expect(find.byKey(const ValueKey('fuel_compare_cleanest')), findsOneWidget);
+    expect(find.byKey(const ValueKey('fuel_compare_tradeoff')), findsOneWidget);
+    // Break-even is the actionable number for a flex-fuel driver.
+    expect(find.byKey(const ValueKey('fuel_compare_breakeven_e85')),
+        findsOneWidget);
+    // The CO2 figures name their source and intended precision.
+    expect(find.byKey(const ValueKey('fuel_compare_co2_source')),
+        findsOneWidget);
+  });
+
+  testWidgets('#3828 says so plainly when one fuel wins on BOTH axes',
+      (tester) async {
+    // E10 is cheaper per km AND has the lower factor (2.27 vs 2.31), so
+    // there is nothing to weigh.
+    await pumpCard(
+      tester,
+      vehicle: flexCar,
+      data: [
+        pure(
+            fuel: FuelType.e10,
+            l100: 6.0,
+            costPerKm: 0.050,
+            totalSpent: 60,
+            fillCount: 2,
+            attributed: 2),
+        pure(
+            fuel: FuelType.e5,
+            l100: 6.4,
+            costPerKm: 0.060,
+            totalSpent: 60,
+            fillCount: 2,
+            attributed: 2),
+      ],
+    );
+    expect(find.byKey(const ValueKey('fuel_compare_both_e5')), findsOneWidget);
+    expect(find.byKey(const ValueKey('fuel_compare_tradeoff')), findsNothing,
+        reason: 'inventing a trade-off where none exists would be noise');
+  });
+
+  testWidgets('#3828 a blend carries no invented CO2 figure', (tester) async {
+    await pumpCard(
+      tester,
+      vehicle: flexCar,
+      data: [
+        pure(
+            fuel: FuelType.e85,
+            l100: 8.6,
+            costPerKm: 0.086,
+            totalSpent: 115,
+            fillCount: 3,
+            attributed: 2),
+        mix(
+            dominant: FuelType.e85,
+            secondary: FuelType.e10,
+            l100: 7.5,
+            costPerKm: 0.072,
+            totalSpent: 80,
+            fillCount: 4,
+            attributed: 2),
+      ],
+    );
+    // A blend's true factor depends on shares the row does not record.
+    expect(find.byKey(const ValueKey('fuel_efficiency_co2_e85|e10')),
+        findsNothing);
+    expect(find.byKey(const ValueKey('fuel_efficiency_co2_e85')),
+        findsOneWidget);
+    // And the omission is explained rather than left as a silent gap.
+    expect(find.byKey(const ValueKey('fuel_compare_co2_blend_note')),
+        findsOneWidget);
+  });
+
 }
 
 /// Override that pins the active vehicle for the card under test.

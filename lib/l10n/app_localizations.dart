@@ -7131,6 +7131,55 @@ abstract class AppLocalizations {
   /// **'Based on {count, plural, =1{one full tank} other{{count} full tanks}}'**
   String fuelCompareBasedOn(int count);
 
+  /// Label for a fuel's CO2 emissions over 100 km, derived from its measured consumption and its well-to-wheel emission factor (#3828).
+  ///
+  /// In en, this message translates to:
+  /// **'CO2 per 100 km'**
+  String get fuelCompareCo2Per100km;
+
+  /// Headline naming the fuel with the lowest CO2 per km (#3828).
+  ///
+  /// In en, this message translates to:
+  /// **'{winner} is your lowest-emission fuel'**
+  String fuelCompareCleanest(String winner);
+
+  /// The central trade-off sentence: a fuel can be more expensive per km and still cleaner (#3828). {money} and {co2} are formatted amounts.
+  ///
+  /// In en, this message translates to:
+  /// **'{fuel} costs {money} more per 1000 km but emits {co2} less CO2'**
+  String fuelCompareTradeoff(String fuel, String money, String co2);
+
+  /// Shown when one fuel wins on cost AND emissions, so no trade-off has to be weighed (#3828).
+  ///
+  /// In en, this message translates to:
+  /// **'{fuel} is both cheaper and cleaner than {rival}'**
+  String fuelCompareTradeoffBoth(String fuel, String rival);
+
+  /// Counterfactual over the distance actually measured for a fuel, comparing its emissions against the same distance on the rival fuel (#3828).
+  ///
+  /// In en, this message translates to:
+  /// **'Your {distance} on {fuel} emitted {actual} instead of {alternative} on {rival} — {saved} avoided'**
+  String fuelCompareCo2Avoided(
+    String distance,
+    String fuel,
+    String actual,
+    String alternative,
+    String rival,
+    String saved,
+  );
+
+  /// Caption naming the source and the intended precision of the CO2 numbers (#3828).
+  ///
+  /// In en, this message translates to:
+  /// **'CO2 figures are well-to-wheel estimates (EU JEC WTW v5) applied to your measured consumption — awareness, not audit-grade accounting.'**
+  String get fuelCompareCo2Source;
+
+  /// Caption explaining why blend rows carry no CO2 figure rather than an estimated one (#3828).
+  ///
+  /// In en, this message translates to:
+  /// **'CO2 is shown for pure fuels only: a blend\'s emission factor depends on the mix, which this row does not record.'**
+  String get fuelCompareCo2BlendOmitted;
+
   /// Banner shown above the consumption stats card when one or more partial fill-ups have been logged after the most recent plein-complet (#1362). The fills are excluded from the L/100km average until the next plein-complet closes the window.
   ///
   /// In en, this message translates to:

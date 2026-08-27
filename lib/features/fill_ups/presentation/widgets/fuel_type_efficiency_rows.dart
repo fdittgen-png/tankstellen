@@ -289,6 +289,12 @@ class _SupportingFigures extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
+    final co2PerKm = stats.isMix
+        ? null
+        : stats.co2PerKmWith(
+            Co2Calculator.emissionFactorFor(stats.bucket.dominant),
+          );
+    final co2Per100 = co2PerKm == null ? null : co2PerKm * 100;
 
     final chips = <Widget>[
       if (stats.avgCostPer100km != null)
@@ -313,6 +319,15 @@ class _SupportingFigures extends StatelessWidget {
           key: ValueKey('fuel_efficiency_litres_${stats.bucket.key}'),
           label: l.fuelCompareLitres,
           value: UnitFormatter.formatDecimal(stats.totalLitres),
+        ),
+      // #3828 — the emissions axis. Pure buckets only: a blend's factor
+      // depends on shares this row does not carry, and an invented factor
+      // would be worse than no number.
+      if (co2Per100 != null)
+        _FigureChip(
+          key: ValueKey('fuel_efficiency_co2_${stats.bucket.key}'),
+          label: l.fuelCompareCo2Per100km,
+          value: '${UnitFormatter.formatDecimal(co2Per100)} kg',
         ),
       // Confidence travels WITH the figures — every number here is an
       // average over full-tank intervals, and one interval is a data point,

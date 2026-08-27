@@ -203,6 +203,30 @@ abstract class FuelTypeEfficiencyStats with _$FuelTypeEfficiencyStats {
     return theirCostPerKm * 100 / myL100;
   }
 
+  /// CO2 per km for this composition, given [kgCo2PerLitre] (#3828).
+  ///
+  /// The factor is passed IN rather than looked up here, so this entity stays
+  /// pure and testable without reaching into `core/services`. Callers resolve
+  /// it from `Co2Calculator.emissionFactorFor` — and only for PURE buckets,
+  /// because a blend's true factor depends on shares this row does not carry.
+  /// Guessing one would be worse than omitting the number.
+  ///
+  /// This is the axis the comparison was missing: a fuel can cost more per km
+  /// and still be the better choice on emissions, which for E85 (1.40 kg/L
+  /// vs E5's 2.31) is the entire point of running it.
+  double? co2PerKmWith(double? kgCo2PerLitre) {
+    final l100 = avgL100km;
+    if (kgCo2PerLitre == null || l100 == null) return null;
+    return (l100 / 100) * kgCo2PerLitre;
+  }
+
+  /// [co2PerKmWith] over 1000 km — the unit the cost delta already uses, so
+  /// the two sides of the trade-off are directly comparable.
+  double? co2Per1000kmWith(double? kgCo2PerLitre) {
+    final perKm = co2PerKmWith(kgCo2PerLitre);
+    return perKm == null ? null : perKm * 1000;
+  }
+
   /// True when this row rests on at least two closed full-tank intervals —
   /// the same bar the existing "record at least two full tanks" guard uses
   /// before crowning a winner. One interval is a data point, not a verdict.

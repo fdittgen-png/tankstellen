@@ -20,5 +20,12 @@
   "fuelCompareBreakEvenExplain": "Der Break-even wird aus dem gemessenen Verbrauch jedes Kraftstoffs berechnet und verschiebt sich mit Ihrer Fahrweise.",
   "fuelCompareLitresVsCostNote": "Liter und Kosten können sich widersprechen: Ein Kraftstoff kann weniger Liter pro 100 km verbrauchen und trotzdem mehr pro Kilometer kosten, weil der Literpreis abweicht. Entscheidend sind die Kosten pro Kilometer.",
   "fuelCompareProvisional": "Vorläufig — basiert auf {count, plural, =1{einer Tankfüllung} other{{count} Tankfüllungen}}",
-  "fuelCompareBasedOn": "Basiert auf {count, plural, =1{einer Tankfüllung} other{{count} Tankfüllungen}}"
+  "fuelCompareBasedOn": "Basiert auf {count, plural, =1{einer Tankfüllung} other{{count} Tankfüllungen}}",
+  "fuelCompareCo2Per100km": "CO2 pro 100 km",
+  "fuelCompareCleanest": "{winner} ist Ihr emissionsärmster Kraftstoff",
+  "fuelCompareTradeoff": "{fuel} kostet {money} mehr pro 1000 km, stößt aber {co2} weniger CO2 aus",
+  "fuelCompareTradeoffBoth": "{fuel} ist günstiger UND sauberer als {rival}",
+  "fuelCompareCo2Avoided": "Ihre {distance} mit {fuel} verursachten {actual} statt {alternative} mit {rival} — {saved} vermieden",
+  "fuelCompareCo2Source": "CO2-Werte sind Well-to-Wheel-Schätzungen (EU JEC WTW v5), angewandt auf Ihren gemessenen Verbrauch — zur Orientierung, nicht als Bilanzierung.",
+  "fuelCompareCo2BlendOmitted": "CO2 wird nur für reine Kraftstoffe angezeigt: Der Emissionsfaktor eines Gemischs hängt von der Mischung ab, die diese Zeile nicht erfasst."
 }

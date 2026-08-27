@@ -5579,5 +5579,84 @@
         "type": "int"
       }
     }
+  },
+  "fuelCompareCo2Per100km": "CO2 per 100 km",
+  "@fuelCompareCo2Per100km": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelCompareCleanest": "{winner} is your lowest-emission fuel",
+  "@fuelCompareCleanest": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "winner": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelCompareTradeoff": "{fuel} costs {money} more per 1000 km but emits {co2} less CO2",
+  "@fuelCompareTradeoff": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "money": {
+        "type": "String"
+      },
+      "co2": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelCompareTradeoffBoth": "{fuel} is both cheaper and cleaner than {rival}",
+  "@fuelCompareTradeoffBoth": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "rival": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelCompareCo2Avoided": "Your {distance} on {fuel} emitted {actual} instead of {alternative} on {rival} — {saved} avoided",
+  "@fuelCompareCo2Avoided": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      },
+      "fuel": {
+        "type": "String"
+      },
+      "actual": {
+        "type": "String"
+      },
+      "alternative": {
+        "type": "String"
+      },
+      "rival": {
+        "type": "String"
+      },
+      "saved": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelCompareCo2Source": "CO2 figures are well-to-wheel estimates (EU JEC WTW v5) applied to your measured consumption — awareness, not audit-grade accounting.",
+  "@fuelCompareCo2Source": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelCompareCo2BlendOmitted": "CO2 is shown for pure fuels only: a blend's emission factor depends on the mix, which this row does not record.",
+  "@fuelCompareCo2BlendOmitted": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }
