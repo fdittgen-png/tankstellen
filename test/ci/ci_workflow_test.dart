@@ -525,6 +525,71 @@ void main() {
     });
   });
 
+  group('the App Store version state is checkable, not guessed (#3851)', () {
+    test('the status lane exists and stays read-only', () {
+      final fastfile = File('ios/fastlane/Fastfile').readAsStringSync();
+      expect(fastfile, contains('lane :app_store_status'));
+      // A report that can mutate is not a report. Anything that creates a
+      // version, selects a build or submits belongs in the deliver path,
+      // behind the #3849 demo-video guard — never in a status check the
+      // maintainer runs casually to answer a question.
+      final lane = fastfile.substring(fastfile.indexOf('lane :app_store_status'));
+      final body = lane.substring(0, lane.indexOf('\n  lane :'));
+      // Strip comments and string literals before looking for mutating
+      // calls: the lane's own guidance text says "submit" and "submitting"
+      // a lot, and matching prose would make this test about wording
+      // rather than about behaviour.
+      final code = body
+          .split('\n')
+          .map((l) => l.replaceFirst(RegExp(r'#.*$'), ''))
+          .join('\n')
+          .replaceAll(RegExp(r'"[^"]*"'), '""')
+          .replaceAll(RegExp(r"'[^']*'"), "''");
+      for (final call in [
+        'Spaceship::ConnectAPI.post',
+        'Spaceship::ConnectAPI.patch',
+        'Spaceship::ConnectAPI.delete',
+        '.create',
+        '.save!',
+        'upload_to_app_store',
+        'deliver(',
+        'pilot(',
+      ]) {
+        expect(code, isNot(contains(call)),
+            reason: 'app_store_status called $call — a report that can '
+                'mutate is not a report; anything that creates a version, '
+                'selects a build or submits belongs in the deliver path '
+                'behind the #3849 demo-video guard');
+      }
+    });
+
+    test('it names whether an editable version exists, not just a table', () {
+      final fastfile = File('ios/fastlane/Fastfile').readAsStringSync();
+      expect(fastfile, contains('EDITABLE_APP_STORE_STATES'),
+          reason: 'the editable set must be declared once, not re-guessed '
+              'at each call site');
+      expect(fastfile, contains('PREPARE_FOR_SUBMISSION'),
+          reason: 'that is the state deliver --submit_for_review requires');
+      expect(fastfile, contains('NO editable version'),
+          reason: 'the whole point is a verdict line — a version table '
+              'leaves the reader to infer the answer, which is how the '
+              'question went unanswered in the first place');
+    });
+
+    test('the workflow is dispatch-only and needs no macOS runner', () {
+      final yaml =
+          File('.github/workflows/app-store-status.yml').readAsStringSync();
+      expect(yaml, contains('workflow_dispatch'));
+      expect(yaml, isNot(contains('schedule:')),
+          reason: 'a status report on a timer is noise nobody reads');
+      expect(yaml, contains('runs-on: ubuntu-latest'),
+          reason: 'API-only — a macOS runner would cost minutes for '
+              'nothing (the ios-testflight-status.yml precedent)');
+      expect(yaml, contains('rm -f'),
+          reason: 'the decoded ASC key must be cleaned up');
+    });
+  });
+
   group('an App Store submission carries the demo video (#3849, #3537)', () {
     String readWorkflow(String n) =>
         File('.github/workflows/$n').readAsStringSync();

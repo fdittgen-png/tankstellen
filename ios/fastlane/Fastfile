@@ -17,6 +17,28 @@ default_platform(:ios)
 #
 # Locally: set ASC_API_KEY_FILEPATH to the on-disk .p8.
 # In CI:    set APP_STORE_CONNECT_API_KEY_BASE64 to the base64 of the .p8.
+# #3851 — App Store version states in which `deliver` can still write
+# metadata and submit. Anything else (READY_FOR_SALE, IN_REVIEW, ...) is
+# read-only as far as a submission is concerned.
+EDITABLE_APP_STORE_STATES = %w[
+  PREPARE_FOR_SUBMISSION
+  DEVELOPER_REJECTED
+  REJECTED
+  METADATA_REJECTED
+  INVALID_BINARY
+].freeze
+
+# Read one Spaceship attribute without letting a model/API drift turn a
+# read-only report into a crash — the same defensive style testflight_status
+# uses for its beta-group attributes.
+def safe_attr(model, attr)
+  return "(no such attr)" unless model.respond_to?(attr)
+  value = model.public_send(attr)
+  value.nil? ? "-" : value
+rescue StandardError => e
+  "!#{e.class}"
+end
+
 def asc_api_key
   base64_content = ENV["APP_STORE_CONNECT_API_KEY_BASE64"]
   app_store_connect_api_key(
@@ -917,6 +939,78 @@ platform :ios do
   desc "This asserts the states that CAN be measured — attached to the external"
   desc "group, approved, valid, unexpired, and recent — and exits non-zero"
   desc "otherwise. Options: max_age_hours (default 48), group (default extern)."
+  # #3851 — READ-ONLY App Store version report.
+  #
+  # `deliver --submit_for_review` needs a version in PREPARE_FOR_SUBMISSION
+  # with a build attached. Nothing else in the repo can answer whether that
+  # state exists, so a submission dispatch was a blind guess on a path where
+  # a careless dispatch is exactly what #3849 exists to prevent.
+  #
+  # Mutates nothing: no version is created, no build selected, nothing
+  # submitted.
+  lane :app_store_status do |options|
+    limit = (options[:limit] || 10).to_i
+
+    Spaceship::ConnectAPI.token =
+      Spaceship::ConnectAPI::Token.from(hash: asc_api_key)
+    app = Spaceship::ConnectAPI::App.find("de.tankstellen.tankstellen")
+    UI.user_error!(
+      "Could not find app de.tankstellen.tankstellen on App Store Connect.",
+    ) if app.nil?
+
+    UI.important("=== App Store versions (newest first, limit #{limit}) ===")
+    versions = begin
+      app.get_app_store_versions(
+        filter: { platform: "IOS" },
+        includes: "build",
+      ).first(limit)
+    rescue StandardError => e
+      UI.error("Could not list App Store versions: #{e.class}: #{e.message}")
+      []
+    end
+
+    editable = nil
+    versions.each do |v|
+      state = safe_attr(v, "app_store_state")
+      build = begin
+        v.build.nil? ? "-" : v.build.version
+      rescue StandardError
+        "?"
+      end
+      UI.message(
+        "  #{safe_attr(v, 'version_string')}  state=#{state}  " \
+        "build=#{build}  releaseType=#{safe_attr(v, 'release_type')}",
+      )
+      editable ||= v if EDITABLE_APP_STORE_STATES.include?(state.to_s)
+    end
+
+    # THE question a submission turns on, answered in one line rather than
+    # left for the reader to infer from the table above.
+    if editable.nil?
+      UI.important(
+        "NO editable version — every version above is past the editable " \
+        "states #{EDITABLE_APP_STORE_STATES.join('/')}. `deliver " \
+        "--submit_for_review` WOULD FAIL: create the version in App Store " \
+        "Connect first (My Apps -> the app -> + next to iOS App).",
+      )
+    else
+      attached = begin
+        editable.build.nil? ? nil : editable.build.version
+      rescue StandardError
+        nil
+      end
+      UI.success(
+        "EDITABLE version #{safe_attr(editable, 'version_string')} " \
+        "(#{safe_attr(editable, 'app_store_state')}) — " \
+        "build #{attached || 'NOT YET ATTACHED'}.",
+      )
+      UI.important(
+        "No build attached yet: pass build_number to app-store-listing.yml, " \
+        "or select one in the console before submitting.",
+      ) if attached.nil?
+    end
+  end
+
   lane :testflight_assert_delivery do |options|
     max_age_hours = (options[:max_age_hours] || ENV["TESTFLIGHT_MAX_AGE_HOURS"] || 48).to_i
     group_name = (options[:group] || ENV["TESTFLIGHT_ASSERT_GROUP"] || "extern").to_s
