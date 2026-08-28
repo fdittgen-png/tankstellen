@@ -49,11 +49,19 @@ def testflight_raw_client
     -> { Spaceship::ConnectAPI::TestFlight::Client.instance },
     -> { Spaceship::ConnectAPI.test_flight_request_client },
   ]
-  candidates.each do |c|
+  candidates.each_with_index do |c, i|
     begin
       client = c.call
-      return client if client.respond_to?(:get)
-    rescue StandardError
+      next unless client.respond_to?(:get)
+      host = begin
+        client.respond_to?(:hostname) ? client.hostname : "(no hostname)"
+      rescue StandardError
+        "?"
+      end
+      UI.message("[raw client] candidate #{i}: #{client.class} hostname=#{host}")
+      return client
+    rescue StandardError => e
+      UI.message("[raw client] candidate #{i} failed: #{e.class}")
       next
     end
   end
@@ -867,7 +875,7 @@ platform :ios do
           begin
             client = testflight_raw_client
             usage = client.get(
-              "apps/#{app.id}/metrics/betaTesterUsages",
+              "https://api.appstoreconnect.apple.com/v1/apps/#{app.id}/metrics/betaTesterUsages",
               { "groupBy" => "betaTesters", "filter[betaTesters]" => t.id,
                 "period" => "P90D" },
             )
@@ -935,7 +943,7 @@ platform :ios do
           # requested via fields[], and this is the cheapest way to prove
           # whether the API has it at all.
           raw = testflight_raw_client.get(
-            "betaTesters",
+            "https://api.appstoreconnect.apple.com/v1/betaTesters",
             { "filter[email]" => email.to_s.strip, "limit" => 10,
               "fields[betaTesters]" => "email,inviteType,state" },
           )
