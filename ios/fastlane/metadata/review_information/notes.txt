@@ -1,0 +1,5 @@
+App uses anonymous auth on launch — no sign-in or account is needed to reach any feature, so no demo credentials are required.
+
+Free, ad-free, open-source (MIT). Fuel and EV charging price comparison across 23 countries, using public national price feeds.
+
+Background modes: location is used to keep a trip recording running while the app is backgrounded (the trip's distance and consumption depend on an uninterrupted track), and Bluetooth is used to stay connected to the user's OBD2 adapter for the same recording. Both are user-initiated — a recording only starts when the driver taps Start, and a Live Activity shows on the lock screen for as long as one is running.

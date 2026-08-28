@@ -1,1 +1,7 @@
-Carte des prix plus nette et recherche plus rapide à proximité et le long du trajet, un tableau de bord consommation et carbone plus clair, un enregistrement OBD2 et GPS plus fluide, et l'aperçu du prix de la station à l'approche. Corrections de bugs et optimisations partout.
+L'analyse du coût par carburant utilise désormais le prix propre à chaque carburant — en alternant deux carburants, le verdict du moins cher pouvait s'inverser.
+
+La consommation instantanée ne disparaît plus entre deux relevés moteur : elle ne s'efface qu'à l'arrêt.
+
+Nouvelle barre de comportement de conduite en couleur, qui note votre conduite en temps réel, y compris sur les trajets GPS seuls.
+
+Corrections de bugs et optimisations.

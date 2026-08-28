@@ -1,1 +1,7 @@
-Schärfere Preiskarte und schnellere Suche in der Nähe und entlang der Route, ein klareres Verbrauchs- und CO2-Dashboard, geschmeidigere OBD2- und GPS-Aufzeichnung und die Live-Annäherungs-Preisanzeige. Fehlerbehebungen und Performance-Politur durchgängig.
+Die Verbrauchskosten pro Kraftstoffart werden jetzt mit dem eigenen Preis der jeweiligen Sorte berechnet — bei Wechsel zwischen zwei Sorten konnte die Empfehlung bisher umgekehrt ausfallen.
+
+Der Momentanverbrauch bleibt zwischen zwei Motormesswerten sichtbar und wird nur noch im Stand ausgeblendet.
+
+Neues farbcodiertes Fahrverhalten-Band bewertet deinen aktuellen Fahrstil — auch auf reinen GPS-Fahrten.
+
+Fehlerbehebungen und Performance-Verbesserungen.

@@ -46,6 +46,10 @@ on:
         description: 'Submit for review after upload (DANGER — only when intentional; ignored on a dry run)'
         type: boolean
         default: false
+      build_number:
+        description: 'Build to submit (#3849 — the ASC build number, e.g. 2026701964). Empty leaves whatever ASC has selected.'
+        required: false
+        type: string
       upload_screenshots:
         description: 'Also upload ios/fastlane/screenshots/<locale>/ (#3521)'
         type: boolean
@@ -105,12 +109,47 @@ jobs:
           rm -f "$P8_PATH"
           echo "ASC_API_KEY_JSON=$KEY_JSON" >> "$GITHUB_ENV"
 
+      # #3849 — App Review notes. The base text is committed under
+      # ios/fastlane/metadata/review_information/notes.txt; the demo-video
+      # link is a secret and is appended here, exactly the way
+      # `beta_review_notes` composes it for the TestFlight lane, so the two
+      # review paths cannot drift apart.
+      - name: Compose App Review notes
+        working-directory: ios
+        env:
+          DEMO_VIDEO_URL: ${{ secrets.DEMO_VIDEO_URL }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          SUBMIT: ${{ inputs.submit }}
+        run: |
+          set -euo pipefail
+          NOTES=fastlane/metadata/review_information/notes.txt
+          test -f "$NOTES" || { echo "::error::$NOTES is missing." >&2; exit 1; }
+
+          # Apple, on the 6.0.0 guideline 2.1 rejection (#3537): "updated
+          # demo videos will need to be provided for EVERY app submission".
+          # Submitting without one is a known, repeatable rejection — so it
+          # is refused here rather than left one careless dispatch away.
+          if [ "$DRY_RUN" != "true" ] && [ "$SUBMIT" = "true" ] \
+             && [ -z "${DEMO_VIDEO_URL:-}" ]; then
+            echo "::error::submit=true but the DEMO_VIDEO_URL secret is empty. Apple requires a fresh demo video with EVERY submission (guideline 2.1, #3537): record it on a physical device, upload it as an unlisted link, set the DEMO_VIDEO_URL repository secret, then dispatch again." >&2
+            exit 1
+          fi
+
+          if [ -n "${DEMO_VIDEO_URL:-}" ]; then
+            printf '\n\nDemo video (recorded on a physical iOS device, showing the background location and Bluetooth trip recording including every permission prompt): %s\n' \
+              "$DEMO_VIDEO_URL" >> "$NOTES"
+            echo "::notice::Demo-video link appended to the App Review notes."
+          else
+            echo "::notice::No DEMO_VIDEO_URL set — notes staged without a demo video (fine for a metadata-only run; a submission would have been refused above)."
+          fi
+
       - name: fastlane deliver (text metadata only)
         working-directory: ios
         env:
           DRY_RUN: ${{ inputs.dry_run }}
           # `submit` only matters on a real run; on a dry run it is ignored.
           SUBMIT: ${{ inputs.submit }}
+          BUILD_NUMBER: ${{ inputs.build_number }}
           UPLOAD_SCREENSHOTS: ${{ inputs.upload_screenshots }}
           OVERWRITE_SCREENSHOTS: ${{ inputs.overwrite_screenshots }}
           FASTLANE_DISABLE_COLORS: '1'
@@ -126,12 +165,28 @@ jobs:
           #     prompt, which would hang a CI run forever).
           #   --precheck_include_in_app_purchases false — we have no IAPs;
           #     skip the precheck IAP scan.
+          # #3849 — name the version and the build explicitly. Without
+          # these, `deliver` acts on whatever version ASC happens to have
+          # open and whatever build is selected in it; a submission must
+          # say which build it means. The marketing version is the single
+          # source of truth in pubspec.yaml.
+          APP_VERSION=$(sed -n 's/^version: *\([0-9][^+]*\)+.*/\1/p' ../pubspec.yaml)
+          if [ -z "$APP_VERSION" ]; then
+            echo "::error::could not read the marketing version from pubspec.yaml" >&2
+            exit 1
+          fi
+          echo "::notice::App version $APP_VERSION, build ${BUILD_NUMBER:-<whatever ASC has selected>}."
+
           ARGS=(
             --api_key_path "$ASC_API_KEY_JSON"
+            --app_version "$APP_VERSION"
             --skip_binary_upload true
             --force true
             --precheck_include_in_app_purchases false
           )
+          if [ -n "${BUILD_NUMBER:-}" ]; then
+            ARGS+=( --build_number "$BUILD_NUMBER" )
+          fi
 
           # #3521 — screenshots ship only on explicit opt-in, and only if the
           # harness output is actually committed. overwrite keeps ASC exactly
@@ -191,6 +246,8 @@ jobs:
             echo "- **Bundle ID:** de.tankstellen.tankstellen"
             echo "- **Dry run:** ${{ inputs.dry_run }}"
             echo "- **Submit for review:** ${{ inputs.submit }} (ignored on a dry run)"
+            echo "- **Build:** ${{ inputs.build_number || 'whatever ASC has selected' }}"
+            echo "- **Demo video (#3537):** required for every submission; a submit with an empty DEMO_VIDEO_URL secret is refused before deliver runs."
             echo "- **Screenshots:** ${{ inputs.upload_screenshots }}"
             echo "- **Uploaded:** text metadata${{ inputs.upload_screenshots == true && ' + screenshots' || ' only' }} (never the binary)"
             echo ""
