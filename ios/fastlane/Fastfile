@@ -39,6 +39,35 @@ rescue StandardError => e
   "!#{e.class}"
 end
 
+# #3814 — the raw TestFlight request client, for endpoints spaceship has no
+# model for (betaTesterUsages metrics, fields[] selection). The accessor has
+# moved between spaceship versions, so try each known home in turn rather
+# than pin one and crash a diagnostic on a gem bump.
+def testflight_raw_client
+  candidates = [
+    -> { Spaceship::ConnectAPI.client.test_flight_request_client },
+    -> { Spaceship::ConnectAPI::TestFlight::Client.instance },
+    -> { Spaceship::ConnectAPI.test_flight_request_client },
+  ]
+  candidates.each_with_index do |c, i|
+    begin
+      client = c.call
+      next unless client.respond_to?(:get)
+      host = begin
+        client.respond_to?(:hostname) ? client.hostname : "(no hostname)"
+      rescue StandardError
+        "?"
+      end
+      UI.message("[raw client] candidate #{i}: #{client.class} hostname=#{host}")
+      return client
+    rescue StandardError => e
+      UI.message("[raw client] candidate #{i} failed: #{e.class}")
+      next
+    end
+  end
+  raise "no TestFlight request client accessor found in this spaceship version"
+end
+
 def asc_api_key
   base64_content = ENV["APP_STORE_CONNECT_API_KEY_BASE64"]
   app_store_connect_api_key(
@@ -836,6 +865,36 @@ platform :ios do
             end
           end.compact
           UI.message("    #{bits.join(' ')}")
+          # #3814 — the roster attribute `state` is NOT exposed by the API
+          # (verified on the wire: only email / inviteType / names come
+          # back). What IS exposed is per-tester USAGE: sessions and
+          # installs per app over the period. Zero sessions on a record
+          # means that identity has never run a build from this group —
+          # which is the "in the group but cannot install" state by
+          # another name, measured rather than inferred.
+          begin
+            client = testflight_raw_client
+            usage = client.get(
+              "https://api.appstoreconnect.apple.com/v1/apps/#{app.id}/metrics/betaTesterUsages",
+              { "groupBy" => "betaTesters", "filter[betaTesters]" => t.id,
+                "period" => "P90D" },
+            )
+            points = (usage.body["data"] || []).flat_map { |d| d["dataPoints"] || [] }
+            sums = Hash.new(0)
+            points.each { |pt| (pt["values"] || {}).each { |k, v| sums[k] += v.to_i } }
+            if sums.empty?
+              UI.message("      usage(90d): no data points")
+            else
+              line = sums.map { |k, v| "#{k}=#{v}" }.join(" ")
+              if sums["sessionCount"].to_i.zero?
+                UI.error("      usage(90d): #{line} — NEVER RAN A BUILD under this identity")
+              else
+                UI.success("      usage(90d): #{line}")
+              end
+            end
+          rescue StandardError => e
+            UI.message("      usage(90d): unavailable (#{e.class}: #{e.message[0, 160]})")
+          end
           # Dump the raw attribute surface once: `state` kept coming back as
           # "?" and guessing the accessor name has already cost round-trips.
           if i.zero?
@@ -872,6 +931,43 @@ platform :ios do
             end
             UI.message("  id=#{t.id} state=#{begin t.state rescue '?' end} groups=#{gs}")
           end
+        end
+        # #3814 — the invite STATE is the one attribute this lookup never
+        # read, and it is the one that separates "in the group" from "can
+        # install": an EMAIL invite that was never accepted yields no build,
+        # ever, however many builds the group carries. The spaceship model
+        # drops unknown attributes (the raw dump above shows only id / name
+        # / invite_type / email), so read the wire response directly.
+        begin
+          # Ask for `state` by name — some attributes are only returned when
+          # requested via fields[], and this is the cheapest way to prove
+          # whether the API has it at all.
+          raw = testflight_raw_client.get(
+            "https://api.appstoreconnect.apple.com/v1/betaTesters",
+            { "filter[email]" => email.to_s.strip, "limit" => 10,
+              "fields[betaTesters]" => "email,inviteType,state" },
+          )
+          (raw.body["data"] || []).each do |d|
+            a = d["attributes"] || {}
+            UI.important(
+              "  [raw] id=#{d['id']} email=#{a['email']} " \
+              "inviteType=#{a['inviteType']} state=#{a['state'] || '(not exposed)'}",
+            )
+            case a["state"]
+            when "INVITED", "NOT_INVITED"
+              UI.error(
+                "  → invite for #{a['email']} was NEVER ACCEPTED. No build can " \
+                "reach this tester until it is — an email invite must be opened " \
+                "on the device, or the group's public link joined from it.",
+              )
+            when "REVOKED"
+              UI.error("  → access for #{a['email']} was REVOKED.")
+            when "ACCEPTED", "INSTALLED"
+              UI.success("  → #{a['email']} has accepted; builds attached to the group are installable.")
+            end
+          end
+        rescue StandardError => e
+          UI.error("  raw tester read failed: #{e.class}: #{e.message}")
         end
       rescue StandardError => e
         UI.error("  tester lookup failed: #{e.class}: #{e.message}")

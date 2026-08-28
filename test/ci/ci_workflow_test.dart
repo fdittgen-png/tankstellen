@@ -707,6 +707,28 @@ void main() {
               'set, not the whole history');
     });
 
+    test('tester state is MEASURED via usage metrics, on absolute URLs', () {
+      final fastfile = File('ios/fastlane/Fastfile').readAsStringSync();
+      // The roster resource never exposes invite state (verified on the
+      // wire, #3814); per-tester usage is the only measurement of
+      // "in the group but has never run a build". Keep it.
+      expect(fastfile, contains('metrics/betaTesterUsages'),
+          reason: 'without usage, the tester report is a roster — it '
+              'cannot say whether an identity has ever run a build');
+      expect(fastfile, contains('NEVER RAN A BUILD'),
+          reason: 'zero sessions must be named as the finding it is');
+      // The raw client's hostname is the API root WITHOUT /v1/, so a
+      // relative path is rejected as an unknown resource. Three runs
+      // failed that way before the absolute URL fixed it.
+      expect(fastfile,
+          contains('https://api.appstoreconnect.apple.com/v1/apps/'),
+          reason: 'relative paths on the raw client 404 — keep the URL '
+              'absolute');
+      expect(fastfile, contains('def testflight_raw_client'),
+          reason: 'the accessor moves between spaceship versions; the '
+              'helper tries each known home rather than pinning one');
+    });
+
     test('the assert lane exists and fails loudly rather than warning', () {
       final fastfile = File('ios/fastlane/Fastfile').readAsStringSync();
       expect(fastfile, contains('lane :testflight_assert_delivery'));
