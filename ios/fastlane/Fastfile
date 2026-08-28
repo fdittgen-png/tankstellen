@@ -836,6 +836,36 @@ platform :ios do
             end
           end.compact
           UI.message("    #{bits.join(' ')}")
+          # #3814 — the roster attribute `state` is NOT exposed by the API
+          # (verified on the wire: only email / inviteType / names come
+          # back). What IS exposed is per-tester USAGE: sessions and
+          # installs per app over the period. Zero sessions on a record
+          # means that identity has never run a build from this group —
+          # which is the "in the group but cannot install" state by
+          # another name, measured rather than inferred.
+          begin
+            client = Spaceship::ConnectAPI.testflight_request_client
+            usage = client.get(
+              "apps/#{app.id}/metrics/betaTesterUsages",
+              { "groupBy" => "betaTesters", "filter[betaTesters]" => t.id,
+                "period" => "P90D" },
+            )
+            points = (usage.body["data"] || []).flat_map { |d| d["dataPoints"] || [] }
+            sums = Hash.new(0)
+            points.each { |pt| (pt["values"] || {}).each { |k, v| sums[k] += v.to_i } }
+            if sums.empty?
+              UI.message("      usage(90d): no data points")
+            else
+              line = sums.map { |k, v| "#{k}=#{v}" }.join(" ")
+              if sums["sessionCount"].to_i.zero?
+                UI.error("      usage(90d): #{line} — NEVER RAN A BUILD under this identity")
+              else
+                UI.success("      usage(90d): #{line}")
+              end
+            end
+          rescue StandardError => e
+            UI.message("      usage(90d): unavailable (#{e.class}: #{e.message[0, 160]})")
+          end
           # Dump the raw attribute surface once: `state` kept coming back as
           # "?" and guessing the accessor name has already cost round-trips.
           if i.zero?
@@ -880,8 +910,13 @@ platform :ios do
         # drops unknown attributes (the raw dump above shows only id / name
         # / invite_type / email), so read the wire response directly.
         begin
-          raw = Spaceship::ConnectAPI.get_beta_testers(
-            filter: { email: email.to_s.strip }, limit: 10
+          # Ask for `state` by name — some attributes are only returned when
+          # requested via fields[], and this is the cheapest way to prove
+          # whether the API has it at all.
+          raw = Spaceship::ConnectAPI.testflight_request_client.get(
+            "betaTesters",
+            { "filter[email]" => email.to_s.strip, "limit" => 10,
+              "fields[betaTesters]" => "email,inviteType,state" },
           )
           (raw.body["data"] || []).each do |d|
             a = d["attributes"] || {}
