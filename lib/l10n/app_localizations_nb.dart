@@ -1227,10 +1227,10 @@ class AppLocalizationsNb extends AppLocalizations {
       'Rettslig grunnlag: Art. 6(1)(a) GDPR (Samtykke). Du kan trekke tilbake samtykket når som helst i Innstillinger.';
 
   @override
-  String get gdprContinueAll => 'Continue with all';
+  String get gdprContinueAll => 'Fortsett med alt';
 
   @override
-  String get gdprContinueSelected => 'Continue with selected';
+  String get gdprContinueSelected => 'Fortsett med valgte';
 
   @override
   String get gdprSettingsHint =>
@@ -1593,7 +1593,7 @@ class AppLocalizationsNb extends AppLocalizations {
   String get voiceAnnouncementCooldown => 'Gjentakelsesintervall';
 
   @override
-  String get voiceAnnouncementPriceLimit => 'Maximum price';
+  String get voiceAnnouncementPriceLimit => 'Makspris';
 
   @override
   String get consumptionStatsTitle => 'Forbruksstatistikk';
@@ -2015,13 +2015,13 @@ class AppLocalizationsNb extends AppLocalizations {
   String get tripSaveRecording => 'Lagre tur';
 
   @override
-  String get tripSummaryAutoSaved => 'Trip saved automatically';
+  String get tripSummaryAutoSaved => 'Tur lagret automatisk';
 
   @override
-  String get tripSummaryDone => 'Done';
+  String get tripSummaryDone => 'Ferdig';
 
   @override
-  String get tripSummaryDelete => 'Delete this trip';
+  String get tripSummaryDelete => 'Slett denne turen';
 
   @override
   String get vehicleFuelNotSet => 'Ikke angitt';
@@ -2148,11 +2148,11 @@ class AppLocalizationsNb extends AppLocalizations {
   String get vehicleTankLabel => 'Tankkapasitet (L)';
 
   @override
-  String get vehiclePowerLabel => 'Engine power (kW)';
+  String get vehiclePowerLabel => 'Motoreffekt (kW)';
 
   @override
   String vehiclePowerHelper(String ps) {
-    return '≈ $ps PS';
+    return '≈ $ps hk';
   }
 
   @override
@@ -2308,19 +2308,19 @@ class AppLocalizationsNb extends AppLocalizations {
   String get coachingVoiceSmoothAccel => 'Akselerér mer jevnt';
 
   @override
-  String get coachingVoiceSharpCorner => 'Take corners a little gentler';
+  String get coachingVoiceSharpCorner => 'Ta svingene litt mykere';
 
   @override
   String get coachingVoiceHarshBrakingStrong =>
-      'That was a very hard stop — leave more distance';
+      'Det var en svært hard nedbremsing — hold lengre avstand';
 
   @override
   String get coachingVoiceHardAccelerationStrong =>
-      'Very hard acceleration — that burns real fuel';
+      'Svært hard akselerasjon — det bruker virkelig drivstoff';
 
   @override
   String get coachingVoiceSharpCornerStrong =>
-      'Very sharp corner — slow in, gentle out';
+      'Svært krapp sving — sakte inn, mykt ut';
 
   @override
   String coachingVoiceTripSummary(
@@ -2331,16 +2331,16 @@ class AppLocalizationsNb extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       harshCount,
       locale: localeName,
-      other: '$harshCount harsh events.',
-      one: 'One harsh event.',
-      zero: 'Nice and smooth — no harsh events.',
+      other: '$harshCount harde manøvrer.',
+      one: 'Én hard manøver.',
+      zero: 'Fint og mykt — ingen harde manøvrer.',
     );
-    return 'Trip saved: $distanceKm kilometres, $consumption. $_temp0';
+    return 'Tur lagret: $distanceKm kilometer, $consumption. $_temp0';
   }
 
   @override
   String coachingVoiceConsumptionPhrase(String value) {
-    return '$value litres per 100 kilometres';
+    return '$value liter per 100 kilometer';
   }
 
   @override
@@ -2406,11 +2406,12 @@ class AppLocalizationsNb extends AppLocalizations {
       'Valgfritt: synkroniser favoritter, varsler og vurderinger på tvers av enheter';
 
   @override
-  String get tankSyncSchemaOutdatedTitle => 'Cloud database needs an update';
+  String get tankSyncSchemaOutdatedTitle =>
+      'Skydatabasen trenger en oppdatering';
 
   @override
   String get tankSyncSchemaOutdatedSubtitle =>
-      'Your self-hosted TankSync schema is outdated — some data cannot sync. Open the sync wizard and run the update SQL on your Supabase project.';
+      'Det selvdriftede TankSync-skjemaet ditt er utdatert — noen data kan ikke synkroniseres. Åpne synkroniseringsveiviseren og kjør oppdaterings-SQL-en på Supabase-prosjektet ditt.';
 
   @override
   String get setupCloudSync => 'Sett opp skysynkronisering';
@@ -2671,7 +2672,7 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get syncSchemaOutdated =>
-      'Your TankSync schema is outdated — re-run the setup SQL below to enable the latest synced features.';
+      'TankSync-skjemaet ditt er utdatert — kjør oppsetts-SQL-en nedenfor på nytt for å aktivere de nyeste synkroniserte funksjonene.';
 
   @override
   String get syncDoneButton => 'Ferdig';
@@ -3031,7 +3032,7 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String serviceReminderDueNowBody(String label) {
-    return '$label is due now.';
+    return '$label skal gjøres nå.';
   }
 
   @override
@@ -3074,7 +3075,7 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get obd2GpsDegradedPassiveWaitingBanner =>
-      'Recording with GPS — waiting for the OBD2 adapter';
+      'Tar opp med GPS — venter på OBD2-adapteren';
 
   @override
   String veCalibratedTitle(String vehicleName, String percent) {
@@ -3227,7 +3228,7 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get obd2ErrorEngineOff =>
-      'No data from the vehicle — start the engine and try again.';
+      'Ingen data fra kjøretøyet — start motoren og prøv igjen.';
 
   @override
   String get obd2ErrorProtocolInitFailed =>
@@ -3239,7 +3240,7 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get obd2ErrorPairingRequired =>
-      'The adapter needs Bluetooth pairing. Unplug the adapter, plug it back in, then retry within 5 minutes.';
+      'Adapteren må pares via Bluetooth. Trekk ut adapteren, sett den inn igjen og prøv på nytt innen 5 minutter.';
 
   @override
   String get onboardingExploreDemoData => 'Utforsk med demodata';
@@ -3306,16 +3307,16 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String alertsLastChecked(String when) {
-    return 'Last checked: $when';
+    return 'Sist sjekket: $when';
   }
 
   @override
   String get alertsLastCheckedNever =>
-      'Prices haven\'t been checked in the background yet';
+      'Prisene er ennå ikke sjekket i bakgrunnen';
 
   @override
   String get alertsIosBestEffortNote =>
-      'On iPhone, alert checks are best effort: iOS decides when the app may check prices in the background, so an alert can arrive late or occasionally not at all. Opening the app always runs a fresh check.';
+      'På iPhone gjøres varselsjekker etter beste evne: iOS bestemmer når appen får sjekke priser i bakgrunnen, så et varsel kan komme sent eller iblant ikke i det hele tatt. Å åpne appen kjører alltid en ny sjekk.';
 
   @override
   String alertTargetPriceWithCurrency(String currency) {
@@ -3376,7 +3377,7 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
-  String get pipTapToRestore => 'Tap to open the full app';
+  String get pipTapToRestore => 'Trykk for å åpne hele appen';
 
   @override
   String get authErrorNoNetwork =>
@@ -3398,20 +3399,20 @@ class AppLocalizationsNb extends AppLocalizations {
   String get authErrorGeneric => 'Innlogging mislyktes. Prøv igjen.';
 
   @override
-  String get authLinkEmailTitle => 'Link an email';
+  String get authLinkEmailTitle => 'Koble til en e-post';
 
   @override
   String get authLinkEmailSubtitle =>
-      'Link an email so your data syncs across devices. Your current favorites and trips stay on this account.';
+      'Koble til en e-post så dataene dine synkroniseres mellom enheter. Favorittene og turene du har nå, blir på denne kontoen.';
 
   @override
   String authGuestLinkPrompt(String idPrefix) {
-    return 'You\'re using a guest account ($idPrefix…). Link an email so your favorites and trips sync to your other devices.';
+    return 'Du bruker en gjestekonto ($idPrefix…). Koble til en e-post så favorittene og turene dine synkroniseres til de andre enhetene dine.';
   }
 
   @override
   String get authConfirmationPending =>
-      'Almost there — check your email and click the link to finish linking it. Your data is already saved on this account.';
+      'Nesten i mål — sjekk e-posten din og klikk på lenken for å fullføre koblingen. Dataene dine er allerede lagret på denne kontoen.';
 
   @override
   String get autoRecordConsentBadgeLabel =>
@@ -3488,11 +3489,11 @@ class AppLocalizationsNb extends AppLocalizations {
       'Kunne ikke be om bakgrunnsposisjon';
 
   @override
-  String get aclWakeNotificationTitle => 'Car connected';
+  String get aclWakeNotificationTitle => 'Bilen er tilkoblet';
 
   @override
   String get aclWakeNotificationBody =>
-      'Tap to open Sparkilo — trip recording can start.';
+      'Trykk for å åpne Sparkilo — turopptaket kan starte.';
 
   @override
   String get autoRecordPairAdapterLinkText =>
@@ -3704,7 +3705,7 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get calibrationDirectFuelRateNote =>
-      'This vehicle reports its fuel rate directly (PID 5E), so volumetric-efficiency calibration is not used — your consumption is measured, not modelled.';
+      'Dette kjøretøyet rapporterer drivstofforbruket direkte (PID 5E), så kalibrering av volumetrisk virkningsgrad brukes ikke — forbruket ditt måles, det modelleres ikke.';
 
   @override
   String catalogReresolveSnackbarMessage(String makeModel) {
@@ -3715,23 +3716,23 @@ class AppLocalizationsNb extends AppLocalizations {
   String get catalogReresolveSnackbarAction => 'Oppdater';
 
   @override
-  String get catalogResetAction => 'Reset from vehicle database';
+  String get catalogResetAction => 'Tilbakestill fra kjøretøydatabasen';
 
   @override
-  String get catalogResetConfirmTitle => 'Reset from the vehicle database?';
+  String get catalogResetConfirmTitle => 'Tilbakestille fra kjøretøydatabasen?';
 
   @override
   String catalogResetConfirmBody(String vehicle) {
-    return 'This replaces the tank capacity, engine power and displacement of this vehicle with the database values for $vehicle. Other fields and your fill-up history are not touched.';
+    return 'Dette erstatter tankvolum, motoreffekt og slagvolum for kjøretøyet med databasens verdier for $vehicle. Andre felt og fyllingshistorikken din røres ikke.';
   }
 
   @override
   String get catalogResetNoMatchSnackbar =>
-      'No matching entry in the vehicle database for this vehicle.';
+      'Ingen treff i kjøretøydatabasen for dette kjøretøyet.';
 
   @override
   String get catalogResetDoneSnackbar =>
-      'Vehicle data reset from the database.';
+      'Kjøretøydata tilbakestilt fra databasen.';
 
   @override
   String get consumptionTabFuel => 'Drivstoff';
@@ -3791,10 +3792,10 @@ class AppLocalizationsNb extends AppLocalizations {
   String get chargingChartsEmpty => 'Ikke nok data ennå';
 
   @override
-  String get confirmDeleteTitle => 'Delete?';
+  String get confirmDeleteTitle => 'Slette?';
 
   @override
-  String get confirmDeleteBody => 'Do you really want to delete this?';
+  String get confirmDeleteBody => 'Vil du virkelig slette dette?';
 
   @override
   String get consoFeatureGroupTitle => 'Forbruk';
@@ -4032,42 +4033,43 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
-  String get contentModerationReportAction => 'Report content';
+  String get contentModerationReportAction => 'Rapporter innhold';
 
   @override
-  String get contentModerationBlockAction => 'Block author';
+  String get contentModerationBlockAction => 'Blokker forfatter';
 
   @override
-  String get contentModerationReportDialogTitle => 'Report this content?';
+  String get contentModerationReportDialogTitle =>
+      'Rapportere dette innholdet?';
 
   @override
   String get contentModerationReportDialogBody =>
-      'A report is sent to your TankSync server for review, and this content is hidden on your device.';
+      'En rapport sendes til TankSync-serveren din for gjennomgang, og dette innholdet skjules på enheten din.';
 
   @override
-  String get contentModerationReportConfirmButton => 'Report';
+  String get contentModerationReportConfirmButton => 'Rapporter';
 
   @override
-  String get contentModerationBlockDialogTitle => 'Block this author?';
+  String get contentModerationBlockDialogTitle => 'Blokkere denne forfatteren?';
 
   @override
   String get contentModerationBlockDialogBody =>
-      'Everything this account shares with you will be hidden on this device.';
+      'Alt denne kontoen deler med deg, skjules på denne enheten.';
 
   @override
-  String get contentModerationBlockConfirmButton => 'Block';
+  String get contentModerationBlockConfirmButton => 'Blokker';
 
   @override
   String get contentModerationReportedSnack =>
-      'Report submitted — content hidden.';
+      'Rapport sendt — innholdet er skjult.';
 
   @override
   String get contentModerationReportFailedSnack =>
-      'Couldn\'t submit the report. Try again.';
+      'Kunne ikke sende rapporten. Prøv igjen.';
 
   @override
   String get contentModerationBlockedSnack =>
-      'Author blocked — their shared content is hidden.';
+      'Forfatter blokkert — delt innhold er skjult.';
 
   @override
   String get fillUpCorrectionLabel => 'Autokorreksjon – trykk for å redigere';
@@ -4110,19 +4112,19 @@ class AppLocalizationsNb extends AppLocalizations {
   String get developerToolsSectionTitle => 'Utviklerverktøy';
 
   @override
-  String get dataAccessTracerExport => 'Export data-access trace';
+  String get dataAccessTracerExport => 'Eksporter datatilgangslogg';
 
   @override
   String get dataAccessTracerExportSuccess =>
-      'Data-access trace saved to Downloads.';
+      'Datatilgangslogg lagret i Nedlastinger.';
 
   @override
   String get dataAccessTracerExportFailure =>
-      'Couldn\'t export the data-access trace.';
+      'Kunne ikke eksportere datatilgangsloggen.';
 
   @override
   String get dataAccessTracerEmpty =>
-      'No data-access events recorded yet — search or open stations first, then export.';
+      'Ingen datatilgangshendelser registrert ennå — søk eller åpne stasjoner først, og eksporter deretter.';
 
   @override
   String get developerToolsSubtitle =>
@@ -4223,17 +4225,17 @@ class AppLocalizationsNb extends AppLocalizations {
   String get developerToolsBuildChannel => 'Build-kanal';
 
   @override
-  String get startupTraceSectionTitle => 'Startup initialization trace';
+  String get startupTraceSectionTitle => 'Initialiseringslogg ved oppstart';
 
   @override
-  String get startupTraceExportButton => 'Export startup trace';
+  String get startupTraceExportButton => 'Eksporter oppstartslogg';
 
   @override
-  String get startupTraceEmpty => 'No startup trace recorded yet.';
+  String get startupTraceEmpty => 'Ingen oppstartslogg registrert ennå.';
 
   @override
   String startupTraceTotalMs(int ms) {
-    return 'Total: $ms ms';
+    return 'Totalt: $ms ms';
   }
 
   @override
@@ -4242,31 +4244,33 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
-  String get startupTraceExportSuccess => 'Startup trace saved to Downloads.';
+  String get startupTraceExportSuccess =>
+      'Oppstartslogg lagret i Nedlastinger.';
 
   @override
-  String get startupTraceExportFailure => 'Couldn\'t export the startup trace.';
+  String get startupTraceExportFailure =>
+      'Kunne ikke eksportere oppstartsloggen.';
 
   @override
-  String get distanceSourceOdometer => 'Odometer';
+  String get distanceSourceOdometer => 'Kilometerteller';
 
   @override
   String get distanceSourceOdometerTooltip =>
-      'Distance read from the car\'s odometer — a measured ground truth.';
+      'Avstand avlest fra bilens kilometerteller — en målt referanse.';
 
   @override
-  String get distanceSourceGps => 'GPS track';
+  String get distanceSourceGps => 'GPS-spor';
 
   @override
   String get distanceSourceGpsTooltip =>
-      'Distance summed from the recorded GPS track — true road distance.';
+      'Avstand summert fra det registrerte GPS-sporet — den faktiske veiavstanden.';
 
   @override
-  String get distanceSourceEstimated => 'Estimated';
+  String get distanceSourceEstimated => 'Anslått';
 
   @override
   String get distanceSourceEstimatedTooltip =>
-      'Distance integrated from the speed sensor — an estimate; the sensor typically over-reads slightly.';
+      'Avstand integrert fra hastighetssensoren — et anslag; sensoren viser vanligvis litt for mye.';
 
   @override
   String get insightCardTitle => 'Topp ineffektive vaner';
@@ -4384,52 +4388,51 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'Mixture looks a little lean — the engine added fuel ($pctTrim% trim) to compensate';
+    return 'Blandingen ser litt mager ut — motoren tilførte drivstoff ($pctTrim % korreksjon) for å kompensere';
   }
 
   @override
   String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'Mixture looks lean — the engine sustained a large $pctTrim% fuel addition, a possible inefficiency';
+    return 'Blandingen ser mager ut — motoren holdt et stort drivstofftillegg på $pctTrim %, en mulig ineffektivitet';
   }
 
   @override
   String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'Mixture looks a little rich — the engine pulled fuel ($pctTrim% trim) to compensate';
+    return 'Blandingen ser litt fet ut — motoren trakk fra drivstoff ($pctTrim % korreksjon) for å kompensere';
   }
 
   @override
   String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'Mixture looks rich — the engine sustained a large $pctTrim% fuel cut, a possible inefficiency';
+    return 'Blandingen ser fet ut — motoren holdt en stor drivstoffreduksjon på $pctTrim %, en mulig ineffektivitet';
   }
 
   @override
   String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'Engine ran rich under load ($pctShare% of the warm drive) — possible wasted fuel';
+    return 'Motoren gikk fett under belastning ($pctShare % av den varme kjøringen) — mulig drivstoffsløsing';
   }
 
   @override
   String get lessonCombustionHealthSubtitle =>
-      'Heuristic health signal, not a diagnosis';
+      'Heuristisk helsesignal, ikke en diagnose';
 
   @override
   String get lessonAdviceCombustionHealthLean =>
-      'A sustained lean-correcting trim can mean an intake-air leak, a weak fuel supply, or an ageing sensor. If consumption or running quality worsens, a workshop scan can confirm.';
+      'En vedvarende korreksjon mot mager blanding kan bety en luftlekkasje i innsuget, svak drivstofftilførsel eller en aldrende sensor. Blir forbruket eller motorgangen dårligere, kan en verksteddiagnose bekrefte det.';
 
   @override
   String get lessonAdviceCombustionHealthRich =>
-      'A sustained rich-correcting trim can mean a leaking injector, high fuel pressure, or an over-reading sensor. If consumption or running quality worsens, a workshop scan can confirm.';
+      'En vedvarende korreksjon mot fet blanding kan bety en lekkende injektor, for høyt drivstofftrykk eller en sensor som viser for mye. Blir forbruket eller motorgangen dårligere, kan en verksteddiagnose bekrefte det.';
 
   @override
   String get lessonAdviceCombustionHealthEnrichment =>
-      'Running rich under heavy load burns extra fuel. Short-shift and ease off on long pulls so the engine can stay near a stoichiometric mixture.';
+      'Fet blanding under høy belastning brenner ekstra drivstoff. Gir opp tidlig og lett på gassen ved lange akselerasjoner, så motoren kan holde seg nær en støkiometrisk blanding.';
 
   @override
-  String get lessonTransportTitle =>
-      'Vehicle was transported — engine off while moving';
+  String get lessonTransportTitle => 'Motordata mangler for det meste av turen';
 
   @override
   String get lessonTransportAdvice =>
-      'This trip looks like a tow, flatbed or train transport: the engine was off for almost the whole distance. Its consumption is excluded from your statistics.';
+      'Motoren rapporterte ingen aktivitet på nesten hele strekningen. Enten sviktet OBD2-strømmen midt i turen, eller så ble bilen flyttet uten å bli kjørt — forbrukstallet er upålitelig og utelates fra statistikken din.';
 
   @override
   String get drivingScoreCardTitle => 'Kjørescore';
@@ -4534,21 +4537,21 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String insightUpshiftCruise(String pctTime, String liters) {
-    return 'High-RPM cruising ($pctTime% of trip): shifting up earlier could save $liters L';
+    return 'Jevn fart på høyt turtall ($pctTime % av turen): å gire opp tidligere kunne spart $liters L';
   }
 
   @override
   String get lessonAdviceUpshiftCruise =>
-      'Shift up earlier when cruising — the same speed at lower RPM burns noticeably less fuel.';
+      'Gir opp tidligere i jevn fart — samme hastighet på lavere turtall bruker merkbart mindre drivstoff.';
 
   @override
   String insightCoastingFuelCut(String pctTime, String liters) {
-    return 'Fuel-cut coasting ($pctTime% of trip): saved about $liters L';
+    return 'Trilling med drivstoffkutt ($pctTime % av turen): sparte omtrent $liters L';
   }
 
   @override
   String get lessonAdviceCoastingFuelCut =>
-      'Nicely anticipated — lifting off early lets the engine cut fuel completely while coasting.';
+      'Godt forutsett — å slippe gassen tidlig lar motoren kutte drivstoffet helt mens bilen triller.';
 
   @override
   String insightTrailingLitersSaved(String liters) {
@@ -4556,22 +4559,22 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
-  String get fuelBreakdownTitle => 'Where your fuel went';
+  String get fuelBreakdownTitle => 'Hvor drivstoffet ditt ble av';
 
   @override
-  String get fuelBreakdownIdle => 'Idling';
+  String get fuelBreakdownIdle => 'Tomgang';
 
   @override
-  String get fuelBreakdownHarshAccel => 'Hard accelerations';
+  String get fuelBreakdownHarshAccel => 'Harde akselerasjoner';
 
   @override
-  String get fuelBreakdownHighRpmCruise => 'High-RPM cruising';
+  String get fuelBreakdownHighRpmCruise => 'Jevn fart på høyt turtall';
 
   @override
-  String get fuelBreakdownCoastingSaved => 'Saved by coasting';
+  String get fuelBreakdownCoastingSaved => 'Spart ved å trille';
 
   @override
-  String get fuelBreakdownEfficient => 'Normal driving';
+  String get fuelBreakdownEfficient => 'Normal kjøring';
 
   @override
   String fuelBreakdownLiters(String liters) {
@@ -4580,28 +4583,28 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get ecoNudgeIdle =>
-      'Idling for a while — switching the engine off saves fuel';
+      'Tomgang en stund nå — å slå av motoren sparer drivstoff';
 
   @override
   String get ecoNudgeHarshAccel =>
-      'Strong acceleration — a gentler pedal saves fuel';
+      'Kraftig akselerasjon — en mykere gassfot sparer drivstoff';
 
   @override
   String get ecoNudgeHighRpm =>
-      'High revs at cruise — shifting up earlier saves fuel';
+      'Høyt turtall i jevn fart — å gire opp tidligere sparer drivstoff';
 
   @override
   String get obd2CoverageNoneNote =>
-      'No engine data arrived from the OBD2 adapter on this trip — fuel figures are GPS-based estimates.';
+      'Ingen motordata kom fra OBD2-adapteren på denne turen — drivstofftallene er GPS-baserte anslag.';
 
   @override
   String obd2CoverageDroppedNote(int percent) {
-    return 'Engine data stopped $percent% into the trip (connection dropped) — fuel figures after that point are GPS-based estimates.';
+    return 'Motordata stoppet $percent % inn i turen (tilkoblingen ble brutt) — drivstofftallene etter det er GPS-baserte anslag.';
   }
 
   @override
   String obd2CoveragePartialNote(int percent) {
-    return 'Engine data covered only $percent% of this trip — gaps use GPS-based estimates.';
+    return 'Motordata dekket bare $percent % av turen — hullene bruker GPS-baserte anslag.';
   }
 
   @override
@@ -4903,11 +4906,12 @@ class AppLocalizationsNb extends AppLocalizations {
       'Verktøy for avanserte brukere og bidragsytere.';
 
   @override
-  String get featureLabel_voiceFeedback => 'Spoken feedback (text-to-speech)';
+  String get featureLabel_voiceFeedback =>
+      'Opplest tilbakemelding (talesyntese)';
 
   @override
   String get featureDescription_voiceFeedback =>
-      'Master switch for every spoken surface — the driving voice coach and station announcements. When off, the app never opens a text-to-speech engine.';
+      'Hovedbryter for alt som leses opp — kjørecoachen og stasjonsmeldingene. Avslått åpner appen aldri en talesyntesemotor.';
 
   @override
   String get feedbackConsentTitle => 'Send rapport til GitHub?';
@@ -4953,7 +4957,7 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get fillUpMultiFuelHint =>
-      'This vehicle can use different fuels — log the one you actually pumped';
+      'Dette kjøretøyet kan bruke ulike drivstoff — registrer det du faktisk fylte';
 
   @override
   String get fillUpGuidanceTitle => 'Beste tidspunkt å fylle';
@@ -5048,24 +5052,24 @@ class AppLocalizationsNb extends AppLocalizations {
   String get fillUpGuidancePartNight => 'netter';
 
   @override
-  String get fillUpImportPasteLabel => 'Paste text';
+  String get fillUpImportPasteLabel => 'Lim inn tekst';
 
   @override
-  String get pasteReceiptDialogTitle => 'Paste receipt text';
+  String get pasteReceiptDialogTitle => 'Lim inn kvitteringstekst';
 
   @override
   String get pasteReceiptDialogHint =>
-      'Paste the text of a fuel receipt — e-mail, SMS, or a shared PDF. The litres, price per litre, fuel grade, total and station are read on-device and used to pre-fill the form. Nothing is sent to a server.';
+      'Lim inn teksten fra en drivstoffkvittering — e-post, SMS eller en delt PDF. Liter, literpris, drivstofftype, totalsum og stasjon leses på enheten og fyller inn skjemaet på forhånd. Ingenting sendes til en server.';
 
   @override
-  String get pasteReceiptFieldHint => 'Receipt text';
+  String get pasteReceiptFieldHint => 'Kvitteringstekst';
 
   @override
-  String get pasteReceiptParseAction => 'Pre-fill';
+  String get pasteReceiptParseAction => 'Fyll inn';
 
   @override
   String get pasteReceiptNoData =>
-      'Couldn\'t read any fuel data from that text — check it\'s a fuel receipt and try again.';
+      'Kunne ikke lese drivstoffdata fra den teksten — sjekk at det er en drivstoffkvittering, og prøv igjen.';
 
   @override
   String get fillUpReconciliationVerifiedBadgeLabel => 'Verifisert av adapter';
@@ -5145,23 +5149,23 @@ class AppLocalizationsNb extends AppLocalizations {
       'Innsending mislyktes – manuell deling';
 
   @override
-  String get fillUpWarningDialogTitle => 'Check this fill-up';
+  String get fillUpWarningDialogTitle => 'Sjekk denne fyllingen';
 
   @override
   String fillUpWarningFuelMismatch(String chosenFuel, String vehicleFuel) {
-    return 'You picked $chosenFuel, but this vehicle runs on $vehicleFuel.';
+    return 'Du valgte $chosenFuel, men dette kjøretøyet går på $vehicleFuel.';
   }
 
   @override
   String fillUpWarningOdometerBelowPrevious(String entered, String previous) {
-    return 'Odometer $entered km is below the previous fill-up\'s $previous km — distance can\'t go backwards.';
+    return 'Kilometerstanden $entered km er lavere enn forrige fyllings $previous km — avstanden kan ikke gå baklengs.';
   }
 
   @override
-  String get fillUpWarningGoBack => 'Go back and fix';
+  String get fillUpWarningGoBack => 'Gå tilbake og rett';
 
   @override
-  String get fillUpWarningSaveAnyway => 'Save anyway';
+  String get fillUpWarningSaveAnyway => 'Lagre likevel';
 
   @override
   String get fillUpSectionWhatTitle => 'Hva du fylte';
@@ -5204,44 +5208,44 @@ class AppLocalizationsNb extends AppLocalizations {
   String get profileSectionRegion => 'Region';
 
   @override
-  String get fuelEfficiencyCardTitle => 'Cost per kilometre by fuel';
+  String get fuelEfficiencyCardTitle => 'Kostnad per kilometer etter drivstoff';
 
   @override
   String get fuelEfficiencyCardSubtitle =>
-      'Which fuel is actually cheapest to drive on';
+      'Hvilken drivstoffblanding som faktisk er billigst å kjøre på';
 
   @override
   String fuelEfficiencyWinnerChip(String fuel, String costPerKm) {
-    return 'Cheapest per km: $fuel ($costPerKm)';
+    return 'Billigst per km: $fuel ($costPerKm)';
   }
 
   @override
-  String get fuelEfficiencyPureBadge => 'Pure';
+  String get fuelEfficiencyPureBadge => 'Ren';
 
   @override
-  String get fuelEfficiencyMixBadge => 'Blend';
+  String get fuelEfficiencyMixBadge => 'Blanding';
 
   @override
   String fuelEfficiencyMixDominant(String fuel) {
-    return 'Mostly $fuel';
+    return 'Mest $fuel';
   }
 
   @override
-  String get fuelEfficiencyColL100km => 'L/100km';
+  String get fuelEfficiencyColL100km => 'L/100 km';
 
   @override
-  String get fuelEfficiencyColCostPerKm => 'Cost/km';
+  String get fuelEfficiencyColCostPerKm => 'Kostnad/km';
 
   @override
-  String get fuelEfficiencyColTotalSpent => 'Total spent';
+  String get fuelEfficiencyColTotalSpent => 'Totalt brukt';
 
   @override
   String fuelEfficiencyFillCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count fills',
-      one: '1 fill',
+      other: '$count fyllinger',
+      one: '1 fylling',
     );
     return '$_temp0';
   }
@@ -5251,7 +5255,7 @@ class AppLocalizationsNb extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count full tanks',
+      other: '$count fulle tanker',
       one: '1 full tank',
     );
     return '$_temp0';
@@ -5259,20 +5263,20 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get fuelEfficiencyInsufficientData =>
-      'Log at least two full tanks per fuel to crown the cheapest.';
+      'Registrer minst to fulle tanker per sammensetning for å kåre den billigste.';
 
   @override
   String get fuelEfficiencyCompositionFootnote =>
-      'Tanks are grouped by composition: a tank is pure when one fuel is at least 85% of it, otherwise a blend.';
+      'Tanker grupperes etter sammensetning: en tank er ren når ett drivstoff utgjør minst 85 % av den, ellers en blanding.';
 
   @override
-  String get fuelNameE5 => 'Super E5';
+  String get fuelNameE5 => 'Bensin 95';
 
   @override
-  String get fuelNameE10 => 'Super E10';
+  String get fuelNameE10 => 'Bensin 95 E10';
 
   @override
-  String get fuelNameE98 => 'Super 98';
+  String get fuelNameE98 => 'Bensin 98';
 
   @override
   String get fuelNameDiesel => 'Diesel';
@@ -5281,19 +5285,19 @@ class AppLocalizationsNb extends AppLocalizations {
   String get fuelNameDieselPremium => 'Diesel Premium';
 
   @override
-  String get fuelNameE85 => 'E85 Bioethanol';
+  String get fuelNameE85 => 'Bioetanol E85';
 
   @override
-  String get fuelNameLpg => 'LPG';
+  String get fuelNameLpg => 'Propan (LPG)';
 
   @override
-  String get fuelNameCng => 'CNG';
+  String get fuelNameCng => 'Naturgass (CNG)';
 
   @override
   String get fuelNameHydrogen => 'Hydrogen';
 
   @override
-  String get fuelNameElectric => 'Electric';
+  String get fuelNameElectric => 'Elektrisk';
 
   @override
   String get calibrationModeLabel => 'Kalibreringsmodus';
@@ -5326,62 +5330,63 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String gpsCoverageSummary(int pct, String gap, String cause) {
-    return 'Track covers $pct% — longest gap $gap ($cause)';
+    return 'Sporet dekker $pct % — lengste hull $gap ($cause)';
   }
 
   @override
   String gpsCoverageSummaryNoGaps(int pct) {
-    return 'Track covers $pct% — no gaps detected';
+    return 'Sporet dekker $pct % — ingen hull funnet';
   }
 
   @override
-  String get gpsCoverageAttrBackgroundThrottle => 'app in background';
+  String get gpsCoverageAttrBackgroundThrottle => 'appen i bakgrunnen';
 
   @override
-  String get gpsCoverageAttrOsBatching => 'OS fix batching';
+  String get gpsCoverageAttrOsBatching => 'systemet buntet posisjoner';
 
   @override
-  String get gpsCoverageAttrGateRejected => 'fixes filtered';
+  String get gpsCoverageAttrGateRejected => 'posisjoner filtrert bort';
 
   @override
-  String get gpsCoverageAttrDeliveryStall => 'delayed delivery';
+  String get gpsCoverageAttrDeliveryStall => 'forsinket levering';
 
   @override
-  String get gpsCoverageAttrSignalLoss => 'signal loss';
+  String get gpsCoverageAttrSignalLoss => 'signaltap';
 
   @override
-  String get gpsCoverageAttrUnknown => 'unknown cause';
+  String get gpsCoverageAttrUnknown => 'ukjent årsak';
 
   @override
   String get gpsCoverageHintBackgroundThrottle =>
-      'The app was in the background without a foreground service, so the system throttled GPS. Keep the screen on while recording, or enable background recording when available.';
+      'Appen lå i bakgrunnen uten forgrunnstjeneste, så systemet strupte GPS-en. Hold skjermen på under opptaket, eller slå på bakgrunnsopptak når det er tilgjengelig.';
 
   @override
   String get gpsCoverageHintOsBatching =>
-      'The system delivered position fixes late in batches; the track filled in afterwards, so little data was actually lost.';
+      'Systemet leverte posisjonene sent og i bunter; sporet ble fylt inn etterpå, så lite data gikk faktisk tapt.';
 
   @override
   String get gpsCoverageHintGateRejected =>
-      'Noisy position fixes in this stretch were filtered out to keep the distance figure honest.';
+      'Støyete posisjoner på denne strekningen ble filtrert bort for å holde avstanden ærlig.';
 
   @override
   String get gpsCoverageHintDeliveryStall =>
-      'Position fixes were produced on time but reached the app late — the phone was busy (often a Bluetooth reconnect). Reception was fine.';
+      'Posisjonene ble beregnet i tide, men nådde appen sent — telefonen var opptatt (ofte en Bluetooth-gjenoppkobling). Mottaket var fint.';
 
   @override
   String get gpsCoverageHintSignalLoss =>
-      'GPS reception dropped — this usually means a tunnel, parking garage or dense urban canyon.';
+      'GPS-mottaket falt ut — som regel en tunnel, et parkeringshus eller tett bybebyggelse.';
 
   @override
   String get gpsCoverageHintUnknown =>
-      'This trip carries no app-lifecycle information for the gap, so the cause can\'t be determined.';
+      'Turen har ingen informasjon om appens tilstand under hullet, så årsaken kan ikke fastslås.';
 
   @override
-  String get gpsCoverageAttrLinkRecovery => 'OBD2 reconnection interference';
+  String get gpsCoverageAttrLinkRecovery =>
+      'forstyrrelse fra OBD2-gjenoppkobling';
 
   @override
   String get gpsCoverageHintLinkRecovery =>
-      'The gap coincides with an OBD2 reconnection episode — the adapter link was recovering while GPS ingest stalled. Fixing the adapter connection also fixes the track.';
+      'Hullet faller sammen med en OBD2-gjenoppkobling — adapterlenken holdt på å komme seg mens GPS-mottaket stoppet opp. Løser du adaptertilkoblingen, løser du også sporet.';
 
   @override
   String get gpsDiagnosticsTitle => 'GPS-prøvetakingsdiagnostikk';
@@ -5422,25 +5427,25 @@ class AppLocalizationsNb extends AppLocalizations {
   String get gpsLifecycleInactive => 'Inaktiv';
 
   @override
-  String get gpsKpiVerdictGood => 'Efficient';
+  String get gpsKpiVerdictGood => 'Effektiv';
 
   @override
-  String get gpsKpiVerdictModerate => 'Moderate';
+  String get gpsKpiVerdictModerate => 'Moderat';
 
   @override
-  String get gpsKpiVerdictAggressive => 'Aggressive';
+  String get gpsKpiVerdictAggressive => 'Aggressiv';
 
   @override
   String get gpsKpiInterpretationGood =>
-      'Smooth, energy-light driving — this is what efficient looks like.';
+      'Myk, energigjerrig kjøring — slik ser effektivitet ut.';
 
   @override
   String get gpsKpiInterpretationModerate =>
-      'Fairly typical driving — a little smoother on the throttle would save more.';
+      'Ganske typisk kjøring — litt mykere på gassen ville spart mer.';
 
   @override
   String get gpsKpiInterpretationAggressive =>
-      'Energy-heavy driving — easing off the accelerator and coasting more would cut fuel use.';
+      'Energikrevende kjøring — å slippe gassen og trille mer ville redusert drivstofforbruket.';
 
   @override
   String get gpsMatrixMaturityCold => 'Kald';
@@ -5471,46 +5476,46 @@ class AppLocalizationsNb extends AppLocalizations {
       'GPS-estimat (~) — ingen drivstoffsensor på denne turen. Verdien er modellert fra hastighet og kjøretøyets kalibrering; nøyaktigheten forbedres etter hvert som matrisen modnes.';
 
   @override
-  String get gpsRoadUseCardTitle => 'How you used the road';
+  String get gpsRoadUseCardTitle => 'Slik brukte du veien';
 
   @override
-  String get gpsRoadUseSpeedSection => 'Where you spent your time';
+  String get gpsRoadUseSpeedSection => 'Hvor du brukte tiden';
 
   @override
-  String get gpsRoadUseSpeedIdle => 'Stopped (<5 km/h)';
+  String get gpsRoadUseSpeedIdle => 'Står stille (<5 km/t)';
 
   @override
-  String get gpsRoadUseSpeedLow => 'Town (5–50 km/h)';
+  String get gpsRoadUseSpeedLow => 'By (5–50 km/t)';
 
   @override
-  String get gpsRoadUseSpeedCruise => 'Cruise (50–110 km/h)';
+  String get gpsRoadUseSpeedCruise => 'Landevei (50–110 km/t)';
 
   @override
-  String get gpsRoadUseSpeedHigh => 'Fast (≥110 km/h)';
+  String get gpsRoadUseSpeedHigh => 'Raskt (≥110 km/t)';
 
   @override
-  String get gpsRoadUsePhaseSection => 'How you moved';
+  String get gpsRoadUsePhaseSection => 'Slik beveget du deg';
 
   @override
-  String get gpsRoadUsePhaseAccel => 'Accelerating';
+  String get gpsRoadUsePhaseAccel => 'Akselererer';
 
   @override
-  String get gpsRoadUsePhaseSteady => 'Holding speed';
+  String get gpsRoadUsePhaseSteady => 'Jevn fart';
 
   @override
-  String get gpsRoadUsePhaseCoast => 'Coasting';
+  String get gpsRoadUsePhaseCoast => 'Triller';
 
   @override
   String gpsRoadUseShare(String pct) {
-    return '$pct%';
+    return '$pct %';
   }
 
   @override
   String get gpsRoadUseCoastPraise =>
-      'Lots of coasting — letting the car roll instead of braking saves fuel. Nice.';
+      'Mye trilling — å la bilen trille i stedet for å bremse sparer drivstoff. Bra.';
 
   @override
-  String get gpsRoadUseSource => 'From your GPS track';
+  String get gpsRoadUseSource => 'Fra GPS-sporet ditt';
 
   @override
   String get hapticEcoCoachSettingTitle => 'Sanntids øko-coaching';
@@ -5525,7 +5530,7 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String highwayViaExit(String ref, String km) {
-    return 'via exit $ref · +$km km';
+    return 'via avkjøring $ref · +$km km';
   }
 
   @override
@@ -5769,7 +5774,7 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get consentSyncTripsAnonymousHint =>
-      'Trips back up under this device\'s anonymous account. Sign in with an email to reach them from other devices.';
+      'Turer sikkerhetskopieres under enhetens anonyme konto. Logg inn med en e-post for å nå dem fra andre enheter.';
 
   @override
   String get consentHideDetails => 'Skjul detaljer';
@@ -6021,7 +6026,7 @@ class AppLocalizationsNb extends AppLocalizations {
   String get obd2DiagnosticsPidSection => 'Per-PID-resultater';
 
   @override
-  String get obd2DiagnosticsReconnectSection => 'Reconnect telemetry';
+  String get obd2DiagnosticsReconnectSection => 'Gjenoppkoblingstelemetri';
 
   @override
   String obd2DiagnosticsReconnectAttemptsLine(
@@ -6030,7 +6035,7 @@ class AppLocalizationsNb extends AppLocalizations {
     int transitions,
     int disconnects,
   ) {
-    return '$attempts reconnect attempts · $successes ok · $transitions transitions · $disconnects typed drops';
+    return '$attempts gjenoppkoblingsforsøk · $successes vellykkede · $transitions overganger · $disconnects typede frakoblinger';
   }
 
   @override
@@ -6040,7 +6045,7 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get obd2DiagnosticsFallbackLine =>
-      'GPS-only fallback activated this session.';
+      'Reserveløsning med bare GPS aktivert i denne økten.';
 
   @override
   String get obd2DiagnosticsSchedulerSection => 'Planlegghelse';
@@ -6179,24 +6184,24 @@ class AppLocalizationsNb extends AppLocalizations {
   String get obd2HealthHistorySection => 'Siste økter';
 
   @override
-  String get obd2HealthDownloadJson => 'Download as JSON';
+  String get obd2HealthDownloadJson => 'Last ned som JSON';
 
   @override
   String get obd2HealthDownloadInitTranscript =>
-      'Download init transcript only';
+      'Last ned bare initialiseringsutskriften';
 
   @override
-  String get obd2HealthDownloadError => 'Couldn\'t save the diagnostics file';
+  String get obd2HealthDownloadError => 'Kunne ikke lagre diagnosefilen';
 
   @override
-  String get obd2TestAdapterLabel => 'Adapter to test';
+  String get obd2TestAdapterLabel => 'Adapter som skal testes';
 
   @override
-  String get obd2TestAdapterScanOption => 'Scan for adapter';
+  String get obd2TestAdapterScanOption => 'Søk etter adapter';
 
   @override
   String obd2TestStepConnectTo(String adapter) {
-    return 'Connect to $adapter';
+    return 'Kobler til $adapter';
   }
 
   @override
@@ -6213,7 +6218,7 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get obd2TestRunEngineOff =>
-      'Adapter OK — engine off; start the engine to read live data';
+      'Adapter OK — motoren er av; start motoren for å lese sanntidsdata';
 
   @override
   String obd2TestRunSummary(int passed, int total, int elapsed) {
@@ -6228,7 +6233,7 @@ class AppLocalizationsNb extends AppLocalizations {
   String get obd2TestStepScan => 'Søk etter adapter';
 
   @override
-  String get obd2TestStepBluetooth => 'Phone Bluetooth';
+  String get obd2TestStepBluetooth => 'Telefonens Bluetooth';
 
   @override
   String get obd2TestStepConnect => 'Koble til og initialiser';
@@ -6240,13 +6245,13 @@ class AppLocalizationsNb extends AppLocalizations {
   String get obd2TestStepSupportedPids => 'Støttede PIDs';
 
   @override
-  String get obd2TestStepProtocol => 'Vehicle protocol';
+  String get obd2TestStepProtocol => 'Kjøretøyprotokoll';
 
   @override
   String get obd2TestStepSampleReads => 'Prøvelesinger';
 
   @override
-  String get obd2TestStepSoak => 'Sustained polling';
+  String get obd2TestStepSoak => 'Vedvarende avlesing';
 
   @override
   String get obd2TestStepReconnect => 'Gjenoppkoblingstest';
@@ -6276,39 +6281,39 @@ class AppLocalizationsNb extends AppLocalizations {
   String get obd2TestAdapterTransportBle => 'Bluetooth LE';
 
   @override
-  String get obd2TestAdapterTransportUnknown => 'unknown — defaulting to BLE';
+  String get obd2TestAdapterTransportUnknown => 'ukjent — BLE som standard';
 
   @override
-  String get obd2HealthConnectAttemptsSection => 'Recent connect attempts';
+  String get obd2HealthConnectAttemptsSection => 'Nylige tilkoblingsforsøk';
 
   @override
   String get obd2HealthConnectAttemptsEmpty =>
-      'No connect attempts recorded yet.';
+      'Ingen tilkoblingsforsøk registrert ennå.';
 
   @override
-  String get obd2HealthDownloadConnectTrace => 'Download connect trace';
+  String get obd2HealthDownloadConnectTrace => 'Last ned tilkoblingslogg';
 
   @override
   String get obd2HealthDownloadAllConnectTraces =>
-      'Download all connect traces';
+      'Last ned alle tilkoblingslogger';
 
   @override
-  String get obd2HealthConnectOrigin => 'Origin';
+  String get obd2HealthConnectOrigin => 'Opprinnelse';
 
   @override
   String get obd2HealthConnectTransport => 'Transport';
 
   @override
-  String get obd2HealthConnectOutcome => 'Outcome';
+  String get obd2HealthConnectOutcome => 'Resultat';
 
   @override
-  String get obd2HealthConnectScanList => 'Scanned devices';
+  String get obd2HealthConnectScanList => 'Enheter funnet';
 
   @override
-  String get obd2HealthConnectSteps => 'Steps';
+  String get obd2HealthConnectSteps => 'Trinn';
 
   @override
-  String get obd2HealthConnectUnknownAdapter => 'Unknown adapter';
+  String get obd2HealthConnectUnknownAdapter => 'Ukjent adapter';
 
   @override
   String obd2DiagnosticsTripRecordedHeader(int samples, int percent) {
@@ -6358,78 +6363,79 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
-  String get obd2PickerOtherDevices => 'Other Bluetooth devices';
+  String get obd2PickerOtherDevices => 'Andre Bluetooth-enheter';
 
   @override
-  String get obd2PickerTapToTry => 'Unrecognized — tap to try';
+  String get obd2PickerTapToTry => 'Ikke gjenkjent — trykk for å prøve';
 
   @override
   String get obd2PickerBleOnlyNotice =>
-      'iPhone works with Bluetooth-LE adapters only. A Classic-only adapter (e.g. vLinker BM, Konnwei KW902) must be used on Android.';
+      'iPhone fungerer bare med Bluetooth LE-adaptere. En adapter som bare støtter Classic (f.eks. vLinker BM, Konnwei KW902), må brukes på Android.';
 
   @override
   String get obd2PairingConfirmHint =>
-      'Confirm the pairing request on your phone';
+      'Bekreft paringsforespørselen på telefonen';
 
   @override
-  String get obd2ScanEmptyTitle => 'No adapter found';
+  String get obd2ScanEmptyTitle => 'Fant ingen adapter';
 
   @override
   String get obd2ScanEmptyReady =>
-      'Bluetooth is on and permissions are granted. Make sure the adapter is plugged into the OBD2 port and the ignition is on, then scan again.';
+      'Bluetooth er på og tillatelsene er gitt. Sørg for at adapteren står i OBD2-porten og at tenningen er på, og søk så igjen.';
 
   @override
   String get obd2ScanBlockedUnsupported =>
-      'This device has no Bluetooth Low Energy hardware, so it cannot connect to an OBD2 adapter.';
+      'Denne enheten har ingen Bluetooth Low Energy-maskinvare og kan derfor ikke koble til en OBD2-adapter.';
 
   @override
   String get obd2ScanBlockedBluetoothOff =>
-      'Bluetooth is switched off. Turn it on to scan for your adapter.';
+      'Bluetooth er slått av. Slå det på for å søke etter adapteren din.';
 
   @override
   String get obd2ScanBlockedPermission =>
-      'Sparkilo needs Bluetooth permission to find your adapter.';
+      'Sparkilo trenger Bluetooth-tillatelse for å finne adapteren din.';
 
   @override
   String get obd2ScanBlockedPermissionSettings =>
-      'Bluetooth permission was denied permanently. Grant it in system settings to scan for your adapter.';
+      'Bluetooth-tillatelsen ble avslått permanent. Gi den i systeminnstillingene for å søke etter adapteren din.';
 
   @override
   String get obd2ScanBlockedLocationServices =>
-      'Location services are switched off on this device. Android needs them enabled to scan for Bluetooth adapters — no location is recorded or shared.';
+      'Stedstjenester er slått av på denne enheten. Android krever at de er på for å søke etter Bluetooth-adaptere — ingen posisjon registreres eller deles.';
 
   @override
-  String get obd2ScanOpenSettings => 'Open settings';
+  String get obd2ScanOpenSettings => 'Åpne innstillinger';
 
   @override
-  String get obd2ReconnectInProgress => 'Reconnecting to your OBD2 adapter…';
+  String get obd2ReconnectInProgress =>
+      'Kobler til OBD2-adapteren din på nytt…';
 
   @override
-  String get obd2StatusEngineOff => 'OBD2 paused — engine off';
+  String get obd2StatusEngineOff => 'OBD2 satt på pause — motoren er av';
 
   @override
   String get obd2StatusEngineOffBody =>
-      'The adapter was reachable but the vehicle bus stayed silent, so automatic reconnection is paused. It resumes when you drive or reopen the app — or reconnect now.';
+      'Adapteren kunne nås, men kjøretøyets buss forble taus, så automatisk gjenoppkobling er satt på pause. Den fortsetter når du kjører eller åpner appen igjen — eller koble til på nytt nå.';
 
   @override
-  String get obd2StatusReconnectNow => 'Reconnect now';
+  String get obd2StatusReconnectNow => 'Koble til på nytt nå';
 
   @override
-  String get autoRecordNotificationTitle => 'Trip auto-record';
+  String get autoRecordNotificationTitle => 'Automatisk turopptak';
 
   @override
-  String get autoRecordNotificationText => 'Watching for your OBD2 adapter';
+  String get autoRecordNotificationText => 'Ser etter OBD2-adapteren din';
 
   @override
-  String get obd2ResetConnection => 'Reset connection';
+  String get obd2ResetConnection => 'Tilbakestill tilkoblingen';
 
   @override
   String get obd2ResetConnectionDone =>
-      'Adapter reset — connection re-established';
+      'Adapter tilbakestilt — tilkoblingen er gjenopprettet';
 
   @override
   String get obd2ResetConnectionNoLink =>
-      'Adapter reset — reconnecting in the background';
+      'Adapter tilbakestilt — kobler til på nytt i bakgrunnen';
 
   @override
   String get ocrTesterTitle => 'OCR-tester';
@@ -6575,7 +6581,7 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get onboardingObd2LaterNote =>
-      'You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.';
+      'Du kan når som helst pare en Bluetooth-OBD2-adapter senere fra kjøretøyskjermen for å ta opp turer og lese motordata.';
 
   @override
   String get openNow => 'Åpent';
@@ -6673,14 +6679,14 @@ class AppLocalizationsNb extends AppLocalizations {
   String get showLessHours => 'Vis mindre';
 
   @override
-  String get openStateUnknown => 'Unknown';
+  String get openStateUnknown => 'Ukjent';
 
   @override
   String stationOpenStateSemantic(String open) {
     String _temp0 = intl.Intl.selectLogic(open, {
-      'true': 'Station is open',
-      'false': 'Station is closed',
-      'other': 'Open state unknown',
+      'true': 'Stasjonen er åpen',
+      'false': 'Stasjonen er stengt',
+      'other': 'Åpningsstatus ukjent',
     });
     return '$_temp0';
   }
@@ -6696,18 +6702,18 @@ class AppLocalizationsNb extends AppLocalizations {
   String get tripRecordingPipElapsedCaption => 'forløpt';
 
   @override
-  String get qrLaunchConfirmTitle => 'Open scanned link?';
+  String get qrLaunchConfirmTitle => 'Åpne den skannede lenken?';
 
   @override
   String qrLaunchConfirmBody(String host) {
-    return 'This QR code points to $host. Only open links you trust.';
+    return 'Denne QR-koden peker til $host. Åpne bare lenker du stoler på.';
   }
 
   @override
-  String get qrLaunchConfirmOpen => 'Open link';
+  String get qrLaunchConfirmOpen => 'Åpne lenke';
 
   @override
-  String get qrLaunchConfirmCancel => 'Cancel';
+  String get qrLaunchConfirmCancel => 'Avbryt';
 
   @override
   String get radarPinHelpTitle => 'Om festing';
@@ -6724,10 +6730,10 @@ class AppLocalizationsNb extends AppLocalizations {
       'Fest radaren automatisk hver gang i stedet for å trykke hver gang. Bruker mer batteri.';
 
   @override
-  String get radarScopeShowScope => 'Radar view';
+  String get radarScopeShowScope => 'Radarvisning';
 
   @override
-  String get radarScopeShowList => 'List view';
+  String get radarScopeShowList => 'Listevisning';
 
   @override
   String get alertsRadiusFrequencyLabel => 'Sjekkhyppighet';
@@ -6929,85 +6935,86 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String syncAdoptTitle(String email) {
-    return 'Join $email\'s account';
+    return 'Bli med i kontoen $email';
   }
 
   @override
   String get syncAdoptSubtitle =>
-      'Sign in with this account\'s password to share its data across both devices.';
+      'Logg inn med kontoens passord for å dele dataene dens på begge enhetene.';
 
   @override
-  String get syncAdoptPasswordLabel => 'Account password';
+  String get syncAdoptPasswordLabel => 'Kontoens passord';
 
   @override
-  String get syncAdoptJoinButton => 'Join account';
+  String get syncAdoptJoinButton => 'Bli med i kontoen';
 
   @override
-  String get syncAdoptUseDifferentAccount => 'Use a different account instead';
+  String get syncAdoptUseDifferentAccount => 'Bruk en annen konto i stedet';
 
   @override
-  String get syncDeleteDataTitle => 'Delete synced data';
+  String get syncDeleteDataTitle => 'Slett synkroniserte data';
 
   @override
   String get syncDeleteDataSubtitle =>
-      'Remove your trips, vehicles or fill-ups from the sync database';
+      'Fjern turene, kjøretøyene eller fyllingene dine fra synkroniseringsdatabasen';
 
   @override
-  String get syncDeleteDataPickTitle => 'Delete which synced data?';
+  String get syncDeleteDataPickTitle =>
+      'Hvilke synkroniserte data skal slettes?';
 
   @override
-  String get syncDeleteDataCategoryTrips => 'Trips';
+  String get syncDeleteDataCategoryTrips => 'Turer';
 
   @override
-  String get syncDeleteDataCategoryVehicles => 'Vehicles';
+  String get syncDeleteDataCategoryVehicles => 'Kjøretøy';
 
   @override
-  String get syncDeleteDataCategoryFillUps => 'Fill-ups';
+  String get syncDeleteDataCategoryFillUps => 'Fyllinger';
 
   @override
-  String get syncDeleteDataCategoryEverything => 'Everything';
+  String get syncDeleteDataCategoryEverything => 'Alt';
 
   @override
   String syncDeleteDataConfirmTitle(String category) {
-    return 'Delete $category from the sync database?';
+    return 'Slette $category fra synkroniseringsdatabasen?';
   }
 
   @override
   String get syncDeleteDataConfirmBody =>
-      'This removes the selected data from your sync database and it will not re-sync from your other devices. Data stored locally on this device is kept.';
+      'Dette fjerner de valgte dataene fra synkroniseringsdatabasen din, og de synkroniseres ikke tilbake fra de andre enhetene dine. Data som er lagret lokalt på denne enheten, beholdes.';
 
   @override
-  String get syncDeleteDataConfirmAction => 'Delete from server';
+  String get syncDeleteDataConfirmAction => 'Slett fra serveren';
 
   @override
-  String get syncDeleteDataDone => 'Synced data deleted';
+  String get syncDeleteDataDone => 'Synkroniserte data slettet';
 
   @override
   String get syncDeleteDataFailed =>
-      'Deleting synced data failed — please try again';
+      'Sletting av synkroniserte data mislyktes — prøv igjen';
 
   @override
-  String get syncRelinkTitle => 'Cloud sync needs re-linking';
+  String get syncRelinkTitle => 'Skysynkronisering må kobles på nytt';
 
   @override
   String get syncRelinkBody =>
-      'This device\'s saved sync identity is signed out. Sign in with your email to re-link your synced data, or start fresh with a new identity.';
+      'Enhetens lagrede synkroniseringsidentitet er logget ut. Logg inn med e-posten din for å koble de synkroniserte dataene dine på nytt, eller start på nytt med en ny identitet.';
 
   @override
-  String get syncRelinkSignInAction => 'Sign in to re-link';
+  String get syncRelinkSignInAction => 'Logg inn for å koble på nytt';
 
   @override
-  String get syncRelinkStartFreshAction => 'Start fresh';
+  String get syncRelinkStartFreshAction => 'Start på nytt';
 
   @override
-  String get syncRelinkStartFreshTitle => 'Start fresh?';
+  String get syncRelinkStartFreshTitle => 'Starte på nytt?';
 
   @override
   String get syncRelinkStartFreshBody =>
-      'A new anonymous identity will be created for this device. Data synced under the old identity stays on the server but will no longer be reachable from here unless you sign in with its email account.';
+      'En ny anonym identitet opprettes for denne enheten. Data synkronisert under den gamle identiteten blir på serveren, men kan ikke lenger nås herfra med mindre du logger inn med dens e-postkonto.';
 
   @override
-  String get syncRelinkStartFreshConfirm => 'Start fresh';
+  String get syncRelinkStartFreshConfirm => 'Start på nytt';
 
   @override
   String get tankLevelTitle => 'Tanknivå';
@@ -7024,12 +7031,12 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String tankLevelRangeLastIntervalFormat(String kilometres) {
-    return '≈ $kilometres km at your last tank\'s consumption';
+    return '≈ $kilometres km med forbruket fra forrige tank';
   }
 
   @override
   String tankLevelRangeLongRunFormat(String kilometres) {
-    return 'Long-run average: ≈ $kilometres km';
+    return 'Langtidsgjennomsnitt: ≈ $kilometres km';
   }
 
   @override
@@ -7053,21 +7060,21 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String tankLevelSourceFillUp(String date) {
-    return 'Anchored at the last fill-up: $date';
+    return 'Forankret ved siste fylling: $date';
   }
 
   @override
   String tankLevelSourceObd2(String date) {
-    return 'OBD2 tank sensor · $date';
+    return 'OBD2-tanksensor · $date';
   }
 
   @override
   String tankMixCaption(String mix) {
-    return 'Tank mix: $mix';
+    return 'Tankblanding: $mix';
   }
 
   @override
-  String get tankReportTitle => 'Tank report';
+  String get tankReportTitle => 'Tankrapport';
 
   @override
   String tankReportHeadline(String value) {
@@ -7076,71 +7083,71 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String tankReportSincePrevious(String km, String liters, String cost) {
-    return 'Since the previous full tank: $km km · $liters L · $cost';
+    return 'Siden forrige fulle tank: $km km · $liters L · $cost';
   }
 
   @override
   String tankReportTrendUp(String delta) {
-    return '$delta L/100 km more than the previous tank';
+    return '$delta L/100 km mer enn forrige tank';
   }
 
   @override
   String tankReportTrendDown(String delta) {
-    return '$delta L/100 km less than the previous tank';
+    return '$delta L/100 km mindre enn forrige tank';
   }
 
   @override
-  String get tankReportTrendFlat => 'Level with the previous tank';
+  String get tankReportTrendFlat => 'På nivå med forrige tank';
 
   @override
   String get tankReportNoPrevious =>
-      'Evolution appears after your next full tank.';
+      'Utviklingen vises etter neste fulle tank.';
 
   @override
   String tankReportCoverage(String pct) {
-    return 'Recordings cover $pct % of this tank';
+    return 'Opptakene dekker $pct % av denne tanken';
   }
 
   @override
   String tankReportRecordedAvg(String value) {
-    return 'Recorded slice: $value L/100 km';
+    return 'Registrert del: $value L/100 km';
   }
 
   @override
-  String get tankReportExplainHeader => 'What the recordings suggest';
+  String get tankReportExplainHeader => 'Hva opptakene antyder';
 
   @override
   String tankReportFactorHighRpm(String cur, String prev) {
-    return 'High-RPM share $cur % (was $prev %)';
+    return 'Andel høyt turtall $cur % (var $prev %)';
   }
 
   @override
   String tankReportFactorHarsh(String cur, String prev) {
-    return 'Harsh events $cur/100 km (was $prev)';
+    return 'Harde manøvrer $cur/100 km (var $prev)';
   }
 
   @override
   String tankReportFactorColdStarts(String cur, String prev) {
-    return 'Cold starts $cur (was $prev)';
+    return 'Kaldstarter $cur (var $prev)';
   }
 
   @override
   String tankReportFactorIdle(String cur, String prev) {
-    return 'Idle share $cur % (was $prev %)';
+    return 'Andel tomgang $cur % (var $prev %)';
   }
 
   @override
   String get tankReportCaveat =>
-      'Recordings are spontaneous and cover only part of this tank — these hints are indicative, not the full story.';
+      'Opptakene er spontane og dekker bare en del av denne tanken — disse hintene er veiledende, ikke hele historien.';
 
   @override
   String tankReportCalibrationUnder(String pct) {
-    return 'Recorded estimates run $pct % under pump truth';
+    return 'Registrerte anslag ligger $pct % under pumpens tall';
   }
 
   @override
   String tankReportCalibrationOver(String pct) {
-    return 'Recorded estimates run $pct % over pump truth';
+    return 'Registrerte anslag ligger $pct % over pumpens tall';
   }
 
   @override
@@ -7331,7 +7338,7 @@ class AppLocalizationsNb extends AppLocalizations {
   String get trajetDetailChartCoolant => 'Kjølevæske (°C)';
 
   @override
-  String get trajetDetailChartAltitudeRelative => 'Altitude (m, from start)';
+  String get trajetDetailChartAltitudeRelative => 'Høyde (m, fra start)';
 
   @override
   String get trajetDetailChartLambda => 'Kommandert λ';
@@ -7414,13 +7421,13 @@ class AppLocalizationsNb extends AppLocalizations {
   String get trajetsMapShareError => 'Kunne ikke dele GPX-filen';
 
   @override
-  String get trajetDetailChartBoost => 'Boost pressure (MAP − ambient)';
+  String get trajetDetailChartBoost => 'Ladetrykk (MAP − omgivelse)';
 
   @override
-  String get trajetDetailChartIat => 'Intake air temperature';
+  String get trajetDetailChartIat => 'Innsugsluftens temperatur';
 
   @override
-  String get trajetDetailChartTiming => 'Ignition timing advance';
+  String get trajetDetailChartTiming => 'Tenningsforstilling';
 
   @override
   String get trajetObd2Degraded =>
@@ -7493,14 +7500,14 @@ class AppLocalizationsNb extends AppLocalizations {
   String get fuelStationRadarResultBadge => 'Bensinstasjonradar-resultat';
 
   @override
-  String get radarUpdatingLocation => 'Updating your location…';
+  String get radarUpdatingLocation => 'Oppdaterer posisjonen din…';
 
   @override
-  String get radarSearching => 'Searching…';
+  String get radarSearching => 'Søker…';
 
   @override
   String get highwayModeChip =>
-      'Highway mode — showing stations ahead on your route';
+      'Motorveimodus — viser stasjoner lenger fremme langs ruten din';
 
   @override
   String get tripRecordingPinTooltip =>
@@ -7618,29 +7625,29 @@ class AppLocalizationsNb extends AppLocalizations {
   String get trajetsSharedBadge => 'Delt';
 
   @override
-  String get tripVerdictPromptTitle => 'How did this trip feel?';
+  String get tripVerdictPromptTitle => 'Hvordan føltes denne turen?';
 
   @override
-  String get tripVerdictSmooth => 'Smooth';
+  String get tripVerdictSmooth => 'Myk';
 
   @override
-  String get tripVerdictModerate => 'Moderate';
+  String get tripVerdictModerate => 'Moderat';
 
   @override
-  String get tripVerdictAggressive => 'Aggressive';
+  String get tripVerdictAggressive => 'Aggressiv';
 
   @override
-  String get tripVerdictDismiss => 'Not now';
+  String get tripVerdictDismiss => 'Ikke nå';
 
   @override
   String get tripVerdictThanks =>
-      'Thanks — this helps calibrate your driving analysis.';
+      'Takk — dette hjelper til med å kalibrere kjøreanalysen din.';
 
   @override
-  String get fillUpDeletedUndoSnackbar => 'Fill-up deleted';
+  String get fillUpDeletedUndoSnackbar => 'Fylling slettet';
 
   @override
-  String get trajetDeletedUndoSnackbar => 'Recording deleted';
+  String get trajetDeletedUndoSnackbar => 'Opptak slettet';
 
   @override
   String get searchFailedSnackbar => 'Søk mislyktes – prøv igjen';
@@ -7683,32 +7690,32 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
-  String get stationUnbrandedTitle => 'Unbranded station';
+  String get stationUnbrandedTitle => 'Stasjon uten kjede';
 
   @override
-  String get unsupportedRegionTitle => 'Not available in your region yet';
+  String get unsupportedRegionTitle => 'Ikke tilgjengelig i regionen din ennå';
 
   @override
   String get unsupportedRegionBody =>
-      'We don\'t have fuel prices for your country yet, so results may be empty or from another country. You can still pick a supported country in the search settings.';
+      'Vi har ingen drivstoffpriser for landet ditt ennå, så resultatene kan være tomme eller fra et annet land. Du kan likevel velge et støttet land i søkeinnstillingene.';
 
   @override
-  String get unsupportedRegionDismiss => 'Got it';
+  String get unsupportedRegionDismiss => 'Skjønner';
 
   @override
-  String get configureCountryTitle => 'Set your country';
+  String get configureCountryTitle => 'Velg landet ditt';
 
   @override
   String get configureCountryBody =>
-      'Your country is supported, but it isn\'t set up yet — so prices may be from another country. Choose your country in the search settings to see local prices.';
+      'Landet ditt støttes, men er ikke satt opp ennå — så prisene kan være fra et annet land. Velg landet ditt i søkeinnstillingene for å se lokale priser.';
 
   @override
   String get vehicleMultiFuelCapableLabel =>
-      'I may fill up with different fuel types';
+      'Jeg fyller kanskje ulike drivstofftyper';
 
   @override
   String get vehicleMultiFuelCapableHelper =>
-      'Tracks which fuel is cheapest per kilometre';
+      'Holder oversikt over hvilket drivstoff som er billigst per kilometer';
 
   @override
   String get vinLabel => 'VIN (valgfritt)';
