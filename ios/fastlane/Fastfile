@@ -873,6 +873,38 @@ platform :ios do
             UI.message("  id=#{t.id} state=#{begin t.state rescue '?' end} groups=#{gs}")
           end
         end
+        # #3814 — the invite STATE is the one attribute this lookup never
+        # read, and it is the one that separates "in the group" from "can
+        # install": an EMAIL invite that was never accepted yields no build,
+        # ever, however many builds the group carries. The spaceship model
+        # drops unknown attributes (the raw dump above shows only id / name
+        # / invite_type / email), so read the wire response directly.
+        begin
+          raw = Spaceship::ConnectAPI.get_beta_testers(
+            filter: { email: email.to_s.strip }, limit: 10
+          )
+          (raw.body["data"] || []).each do |d|
+            a = d["attributes"] || {}
+            UI.important(
+              "  [raw] id=#{d['id']} email=#{a['email']} " \
+              "inviteType=#{a['inviteType']} state=#{a['state'] || '(not exposed)'}",
+            )
+            case a["state"]
+            when "INVITED", "NOT_INVITED"
+              UI.error(
+                "  → invite for #{a['email']} was NEVER ACCEPTED. No build can " \
+                "reach this tester until it is — an email invite must be opened " \
+                "on the device, or the group's public link joined from it.",
+              )
+            when "REVOKED"
+              UI.error("  → access for #{a['email']} was REVOKED.")
+            when "ACCEPTED", "INSTALLED"
+              UI.success("  → #{a['email']} has accepted; builds attached to the group are installable.")
+            end
+          end
+        rescue StandardError => e
+          UI.error("  raw tester read failed: #{e.class}: #{e.message}")
+        end
       rescue StandardError => e
         UI.error("  tester lookup failed: #{e.class}: #{e.message}")
       end
