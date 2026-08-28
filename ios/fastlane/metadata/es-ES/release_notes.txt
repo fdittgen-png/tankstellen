@@ -1,1 +1,7 @@
-Mapa de precios más nítido y búsqueda más rápida cerca y a lo largo de la ruta, un panel de consumo y carbono más claro, un registro OBD2 y GPS más fluido, y la vista de precio en directo de la estación a la que te acercas. Correcciones y mejoras de rendimiento.
+El análisis de coste por combustible ahora usa el precio propio de cada combustible: al alternar entre dos, el veredicto del más barato podía salir invertido.
+
+El consumo instantáneo ya no se queda en blanco entre lecturas del motor; solo se vacía con el coche parado.
+
+Nueva barra de estilo de conducción con código de color que califica tu conducción en tiempo real, también en trayectos solo por GPS.
+
+Corrección de errores y mejoras de rendimiento.

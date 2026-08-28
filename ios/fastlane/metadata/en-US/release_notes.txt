@@ -1,1 +1,7 @@
-Sharper price map and faster nearby and route search, a cleaner consumption and carbon dashboard, smoother OBD2 and GPS trip recording, and the live approach-station price overlay. Bug fixes and performance polish throughout.
+Per-fuel cost analysis now prices each fuel with its own money — the cheapest-fuel verdict could come out inverted when you alternated between two fuels.
+
+Live consumption no longer blanks between engine readings, so the figure stays readable while you drive; it clears only at a standstill.
+
+New colour-coded driving-behaviour band grades how you are driving right now, on GPS-only trips as well as OBD2 ones.
+
+Bug fixes and performance polish throughout.

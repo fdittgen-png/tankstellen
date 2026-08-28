@@ -525,6 +525,86 @@ void main() {
     });
   });
 
+  group('an App Store submission carries the demo video (#3849, #3537)', () {
+    String readWorkflow(String n) =>
+        File('.github/workflows/$n').readAsStringSync();
+
+    test('review notes exist as committed metadata deliver can find', () {
+      // Without this directory `deliver` submits with NO review notes at
+      // all, so the demo-video link cannot reach App Review however the
+      // secret is set — a guaranteed repeat of the 6.0.0 guideline 2.1
+      // rejection.
+      final notes =
+          File('ios/fastlane/metadata/review_information/notes.txt');
+      expect(notes.existsSync(), isTrue,
+          reason: 'deliver reads App Store review notes from '
+              'metadata/review_information/, NOT from the Fastfile '
+              'beta_review_notes that feeds TestFlight');
+      final text = notes.readAsStringSync();
+      expect(text, contains('anonymous auth'),
+          reason: 'App Review must be told no sign-in is needed, or they '
+              'ask for demo credentials that do not exist');
+      expect(text.toLowerCase(), contains('background'),
+          reason: 'the background location / Bluetooth justification is '
+              'what guideline 2.1 turned on');
+      // The link itself is a secret and must never be committed.
+      expect(text, isNot(contains('http')),
+          reason: 'the demo-video URL belongs in the DEMO_VIDEO_URL '
+              'secret, appended at run time — never in git');
+    });
+
+    test('submitting without a demo video is refused, not attempted', () {
+      final yaml = readWorkflow('app-store-listing.yml');
+      expect(yaml, contains('DEMO_VIDEO_URL'),
+          reason: 'Apple: "updated demo videos will need to be provided '
+              'for EVERY app submission"');
+      expect(yaml, contains('secret is empty'),
+          reason: 'a submit with no video is a known repeatable rejection '
+              '— it must fail the run, not ship');
+      // The refusal has to happen BEFORE deliver runs, or the submission
+      // is already away by the time anyone reads the error.
+      // Anchor on the STEP declarations — 'fastlane deliver' also appears
+      // in the file header comment, which would make this pass on order
+      // that does not exist.
+      final guardStep = yaml.indexOf('- name: Compose App Review notes');
+      final deliverStep = yaml.indexOf('- name: fastlane deliver');
+      expect(guardStep, greaterThan(-1));
+      expect(deliverStep, greaterThan(-1));
+      expect(guardStep, lessThan(deliverStep),
+          reason: 'the guard must precede the submission it guards');
+    });
+
+    test('a submission names the build it means', () {
+      final yaml = readWorkflow('app-store-listing.yml');
+      expect(yaml, contains('--app_version'),
+          reason: 'otherwise deliver acts on whatever version ASC has '
+              'open');
+      expect(yaml, contains('--build_number'),
+          reason: 'otherwise the submitted build is whatever happened to '
+              'be selected in the console');
+    });
+
+    test('release notes exist for every shipped App Store locale', () {
+      final locales = Directory('ios/fastlane/metadata')
+          .listSync()
+          .whereType<Directory>()
+          .map((d) => d.path.split(Platform.pathSeparator).last)
+          .where((n) => n != 'review_information')
+          .toList()
+        ..sort();
+      expect(locales, isNotEmpty);
+      for (final loc in locales) {
+        final f = File('ios/fastlane/metadata/$loc/release_notes.txt');
+        expect(f.existsSync(), isTrue, reason: '$loc has no release notes');
+        final text = f.readAsStringSync().trim();
+        expect(text, isNotEmpty, reason: '$loc release notes are empty');
+        // App Store hard limit.
+        expect(text.length, lessThanOrEqualTo(4000),
+            reason: '$loc release notes exceed the App Store limit');
+      }
+    });
+  });
+
   group('TestFlight delivery is asserted, not assumed (#3814)', () {
     String read(String n) =>
         File('.github/workflows/$n').readAsStringSync();

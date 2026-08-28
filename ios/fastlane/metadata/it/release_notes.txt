@@ -1,1 +1,7 @@
-Mappa dei prezzi più nitida e ricerca più veloce nelle vicinanze e lungo il percorso, una dashboard consumi e carbonio più chiara, registrazione OBD2 e GPS più fluida, e la vista in tempo reale del prezzo del distributore in avvicinamento. Correzioni e ottimizzazioni.
+L'analisi del costo per carburante usa ora il prezzo proprio di ciascun carburante: alternando due carburanti, il verdetto sul più economico poteva risultare invertito.
+
+Il consumo istantaneo non si azzera più tra due letture del motore: si svuota solo da fermo.
+
+Nuova barra dello stile di guida a colori che valuta la guida in tempo reale, anche nei viaggi solo GPS.
+
+Correzioni di bug e miglioramenti delle prestazioni.
