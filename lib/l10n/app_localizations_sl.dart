@@ -1227,10 +1227,10 @@ class AppLocalizationsSl extends AppLocalizations {
       'Pravna podlaga: čl. 6(1)(a) GDPR (Privolitev). Privolitev lahko kadar koli umaknete v Nastavitvah.';
 
   @override
-  String get gdprContinueAll => 'Continue with all';
+  String get gdprContinueAll => 'Nadaljuj z vsem';
 
   @override
-  String get gdprContinueSelected => 'Continue with selected';
+  String get gdprContinueSelected => 'Nadaljuj z izbranim';
 
   @override
   String get gdprSettingsHint =>
@@ -1593,7 +1593,7 @@ class AppLocalizationsSl extends AppLocalizations {
   String get voiceAnnouncementCooldown => 'Interval ponavljanja';
 
   @override
-  String get voiceAnnouncementPriceLimit => 'Maximum price';
+  String get voiceAnnouncementPriceLimit => 'Najvišja cena';
 
   @override
   String get consumptionStatsTitle => 'Statistika porabe';
@@ -2014,13 +2014,13 @@ class AppLocalizationsSl extends AppLocalizations {
   String get tripSaveRecording => 'Shrani vožnjo';
 
   @override
-  String get tripSummaryAutoSaved => 'Trip saved automatically';
+  String get tripSummaryAutoSaved => 'Vožnja samodejno shranjena';
 
   @override
-  String get tripSummaryDone => 'Done';
+  String get tripSummaryDone => 'Končano';
 
   @override
-  String get tripSummaryDelete => 'Delete this trip';
+  String get tripSummaryDelete => 'Izbriši to vožnjo';
 
   @override
   String get vehicleFuelNotSet => 'Ni nastavljeno';
@@ -2147,11 +2147,11 @@ class AppLocalizationsSl extends AppLocalizations {
   String get vehicleTankLabel => 'Kapaciteta rezervoarja (L)';
 
   @override
-  String get vehiclePowerLabel => 'Engine power (kW)';
+  String get vehiclePowerLabel => 'Moč motorja (kW)';
 
   @override
   String vehiclePowerHelper(String ps) {
-    return '≈ $ps PS';
+    return '≈ $ps KM';
   }
 
   @override
@@ -2306,19 +2306,19 @@ class AppLocalizationsSl extends AppLocalizations {
   String get coachingVoiceSmoothAccel => 'Pospeševajte bolj enakomerno';
 
   @override
-  String get coachingVoiceSharpCorner => 'Take corners a little gentler';
+  String get coachingVoiceSharpCorner => 'Ovinke vozite malo bolj mehko';
 
   @override
   String get coachingVoiceHarshBrakingStrong =>
-      'That was a very hard stop — leave more distance';
+      'To je bilo zelo močno zaviranje — ohranite večjo razdaljo';
 
   @override
   String get coachingVoiceHardAccelerationStrong =>
-      'Very hard acceleration — that burns real fuel';
+      'Zelo močno pospeševanje — to res porabi gorivo';
 
   @override
   String get coachingVoiceSharpCornerStrong =>
-      'Very sharp corner — slow in, gentle out';
+      'Zelo oster ovinek — počasi noter, gladko ven';
 
   @override
   String coachingVoiceTripSummary(
@@ -2329,16 +2329,18 @@ class AppLocalizationsSl extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       harshCount,
       locale: localeName,
-      other: '$harshCount harsh events.',
-      one: 'One harsh event.',
-      zero: 'Nice and smooth — no harsh events.',
+      other: '$harshCount sunkovitih manevrov.',
+      few: '$harshCount sunkoviti manevri.',
+      two: '$harshCount sunkovita manevra.',
+      one: 'En sunkovit manever.',
+      zero: 'Lepo in gladko — brez sunkovitih manevrov.',
     );
-    return 'Trip saved: $distanceKm kilometres, $consumption. $_temp0';
+    return 'Vožnja shranjena: $distanceKm kilometrov, $consumption. $_temp0';
   }
 
   @override
   String coachingVoiceConsumptionPhrase(String value) {
-    return '$value litres per 100 kilometres';
+    return '$value litra na 100 kilometrov';
   }
 
   @override
@@ -2404,11 +2406,12 @@ class AppLocalizationsSl extends AppLocalizations {
       'Neobvezno: sinhronizirajte priljubljene, opozorila in ocene med napravami';
 
   @override
-  String get tankSyncSchemaOutdatedTitle => 'Cloud database needs an update';
+  String get tankSyncSchemaOutdatedTitle =>
+      'Baza v oblaku potrebuje posodobitev';
 
   @override
   String get tankSyncSchemaOutdatedSubtitle =>
-      'Your self-hosted TankSync schema is outdated — some data cannot sync. Open the sync wizard and run the update SQL on your Supabase project.';
+      'Vaša samostojno gostovana shema TankSync je zastarela — nekaterih podatkov ni mogoče sinhronizirati. Odprite čarovnika za sinhronizacijo in zaženite posodobitveni SQL v svojem projektu Supabase.';
 
   @override
   String get setupCloudSync => 'Nastavi sinhronizacijo v oblaku';
@@ -2669,7 +2672,7 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get syncSchemaOutdated =>
-      'Your TankSync schema is outdated — re-run the setup SQL below to enable the latest synced features.';
+      'Vaša shema TankSync je zastarela — znova zaženite spodnji namestitveni SQL, da omogočite najnovejše sinhronizirane funkcije.';
 
   @override
   String get syncDoneButton => 'Končano';
@@ -3031,7 +3034,7 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String serviceReminderDueNowBody(String label) {
-    return '$label is due now.';
+    return '$label je na vrsti zdaj.';
   }
 
   @override
@@ -3075,7 +3078,7 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get obd2GpsDegradedPassiveWaitingBanner =>
-      'Recording with GPS — waiting for the OBD2 adapter';
+      'Snemanje z GPS — čakanje na adapter OBD2';
 
   @override
   String veCalibratedTitle(String vehicleName, String percent) {
@@ -3227,7 +3230,7 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get obd2ErrorEngineOff =>
-      'No data from the vehicle — start the engine and try again.';
+      'Ni podatkov iz vozila — zaženite motor in poskusite znova.';
 
   @override
   String get obd2ErrorProtocolInitFailed =>
@@ -3239,7 +3242,7 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get obd2ErrorPairingRequired =>
-      'The adapter needs Bluetooth pairing. Unplug the adapter, plug it back in, then retry within 5 minutes.';
+      'Adapter zahteva seznanjanje Bluetooth. Izklopite adapter, ga znova priklopite in poskusite znova v 5 minutah.';
 
   @override
   String get onboardingExploreDemoData => 'Razišči z demo podatki';
@@ -3306,16 +3309,15 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String alertsLastChecked(String when) {
-    return 'Last checked: $when';
+    return 'Nazadnje preverjeno: $when';
   }
 
   @override
-  String get alertsLastCheckedNever =>
-      'Prices haven\'t been checked in the background yet';
+  String get alertsLastCheckedNever => 'Cene še niso bile preverjene v ozadju';
 
   @override
   String get alertsIosBestEffortNote =>
-      'On iPhone, alert checks are best effort: iOS decides when the app may check prices in the background, so an alert can arrive late or occasionally not at all. Opening the app always runs a fresh check.';
+      'Na iPhonu se opozorila preverjajo po najboljših močeh: iOS odloča, kdaj sme aplikacija preveriti cene v ozadju, zato lahko opozorilo pride pozno ali občasno sploh ne. Odprtje aplikacije vedno sproži novo preverjanje.';
 
   @override
   String alertTargetPriceWithCurrency(String currency) {
@@ -3377,7 +3379,7 @@ class AppLocalizationsSl extends AppLocalizations {
   }
 
   @override
-  String get pipTapToRestore => 'Tap to open the full app';
+  String get pipTapToRestore => 'Dotaknite se, da odprete celotno aplikacijo';
 
   @override
   String get authErrorNoNetwork =>
@@ -3399,20 +3401,20 @@ class AppLocalizationsSl extends AppLocalizations {
   String get authErrorGeneric => 'Prijava ni uspela. Prosimo, poskusite znova.';
 
   @override
-  String get authLinkEmailTitle => 'Link an email';
+  String get authLinkEmailTitle => 'Poveži e-pošto';
 
   @override
   String get authLinkEmailSubtitle =>
-      'Link an email so your data syncs across devices. Your current favorites and trips stay on this account.';
+      'Povežite e-pošto, da se bodo vaši podatki sinhronizirali med napravami. Trenutne priljubljene postaje in vožnje ostanejo na tem računu.';
 
   @override
   String authGuestLinkPrompt(String idPrefix) {
-    return 'You\'re using a guest account ($idPrefix…). Link an email so your favorites and trips sync to your other devices.';
+    return 'Uporabljate račun gosta ($idPrefix…). Povežite e-pošto, da se bodo vaše priljubljene postaje in vožnje sinhronizirale z drugimi napravami.';
   }
 
   @override
   String get authConfirmationPending =>
-      'Almost there — check your email and click the link to finish linking it. Your data is already saved on this account.';
+      'Skoraj končano — preverite e-pošto in kliknite povezavo, da dokončate povezovanje. Vaši podatki so že shranjeni na tem računu.';
 
   @override
   String get autoRecordConsentBadgeLabel =>
@@ -3489,11 +3491,11 @@ class AppLocalizationsSl extends AppLocalizations {
       'Zahtevanje lokacije v ozadju ni uspelo';
 
   @override
-  String get aclWakeNotificationTitle => 'Car connected';
+  String get aclWakeNotificationTitle => 'Avto povezan';
 
   @override
   String get aclWakeNotificationBody =>
-      'Tap to open Sparkilo — trip recording can start.';
+      'Dotaknite se, da odprete Sparkilo — snemanje vožnje se lahko začne.';
 
   @override
   String get autoRecordPairAdapterLinkText =>
@@ -3705,7 +3707,7 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get calibrationDirectFuelRateNote =>
-      'This vehicle reports its fuel rate directly (PID 5E), so volumetric-efficiency calibration is not used — your consumption is measured, not modelled.';
+      'To vozilo neposredno sporoča porabo goriva (PID 5E), zato se umerjanje volumetrične učinkovitosti ne uporablja — vaša poraba je izmerjena, ne modelirana.';
 
   @override
   String catalogReresolveSnackbarMessage(String makeModel) {
@@ -3716,23 +3718,23 @@ class AppLocalizationsSl extends AppLocalizations {
   String get catalogReresolveSnackbarAction => 'Posodobi';
 
   @override
-  String get catalogResetAction => 'Reset from vehicle database';
+  String get catalogResetAction => 'Ponastavi iz baze vozil';
 
   @override
-  String get catalogResetConfirmTitle => 'Reset from the vehicle database?';
+  String get catalogResetConfirmTitle => 'Ponastaviti iz baze vozil?';
 
   @override
   String catalogResetConfirmBody(String vehicle) {
-    return 'This replaces the tank capacity, engine power and displacement of this vehicle with the database values for $vehicle. Other fields and your fill-up history are not touched.';
+    return 'To zamenja prostornino rezervoarja, moč motorja in delovno prostornino tega vozila z vrednostmi iz baze za $vehicle. Druga polja in zgodovina točenj ostanejo nespremenjeni.';
   }
 
   @override
   String get catalogResetNoMatchSnackbar =>
-      'No matching entry in the vehicle database for this vehicle.';
+      'V bazi vozil ni ustreznega vnosa za to vozilo.';
 
   @override
   String get catalogResetDoneSnackbar =>
-      'Vehicle data reset from the database.';
+      'Podatki o vozilu ponastavljeni iz baze.';
 
   @override
   String get consumptionTabFuel => 'Gorivo';
@@ -3792,10 +3794,10 @@ class AppLocalizationsSl extends AppLocalizations {
   String get chargingChartsEmpty => 'Še ni dovolj podatkov';
 
   @override
-  String get confirmDeleteTitle => 'Delete?';
+  String get confirmDeleteTitle => 'Izbrisati?';
 
   @override
-  String get confirmDeleteBody => 'Do you really want to delete this?';
+  String get confirmDeleteBody => 'Ali res želite to izbrisati?';
 
   @override
   String get consoFeatureGroupTitle => 'Poraba';
@@ -4033,42 +4035,42 @@ class AppLocalizationsSl extends AppLocalizations {
   }
 
   @override
-  String get contentModerationReportAction => 'Report content';
+  String get contentModerationReportAction => 'Prijavi vsebino';
 
   @override
-  String get contentModerationBlockAction => 'Block author';
+  String get contentModerationBlockAction => 'Blokiraj avtorja';
 
   @override
-  String get contentModerationReportDialogTitle => 'Report this content?';
+  String get contentModerationReportDialogTitle => 'Prijaviti to vsebino?';
 
   @override
   String get contentModerationReportDialogBody =>
-      'A report is sent to your TankSync server for review, and this content is hidden on your device.';
+      'Prijava se pošlje vašemu strežniku TankSync v pregled, ta vsebina pa se na vaši napravi skrije.';
 
   @override
-  String get contentModerationReportConfirmButton => 'Report';
+  String get contentModerationReportConfirmButton => 'Prijavi';
 
   @override
-  String get contentModerationBlockDialogTitle => 'Block this author?';
+  String get contentModerationBlockDialogTitle => 'Blokirati tega avtorja?';
 
   @override
   String get contentModerationBlockDialogBody =>
-      'Everything this account shares with you will be hidden on this device.';
+      'Vse, kar ta račun deli z vami, bo na tej napravi skrito.';
 
   @override
-  String get contentModerationBlockConfirmButton => 'Block';
+  String get contentModerationBlockConfirmButton => 'Blokiraj';
 
   @override
   String get contentModerationReportedSnack =>
-      'Report submitted — content hidden.';
+      'Prijava poslana — vsebina skrita.';
 
   @override
   String get contentModerationReportFailedSnack =>
-      'Couldn\'t submit the report. Try again.';
+      'Prijave ni bilo mogoče poslati. Poskusite znova.';
 
   @override
   String get contentModerationBlockedSnack =>
-      'Author blocked — their shared content is hidden.';
+      'Avtor blokiran — njegova deljena vsebina je skrita.';
 
   @override
   String get fillUpCorrectionLabel =>
@@ -4112,19 +4114,19 @@ class AppLocalizationsSl extends AppLocalizations {
   String get developerToolsSectionTitle => 'Razvijalska orodja';
 
   @override
-  String get dataAccessTracerExport => 'Export data-access trace';
+  String get dataAccessTracerExport => 'Izvozi dnevnik dostopa do podatkov';
 
   @override
   String get dataAccessTracerExportSuccess =>
-      'Data-access trace saved to Downloads.';
+      'Dnevnik dostopa do podatkov shranjen v Prenose.';
 
   @override
   String get dataAccessTracerExportFailure =>
-      'Couldn\'t export the data-access trace.';
+      'Dnevnika dostopa do podatkov ni bilo mogoče izvoziti.';
 
   @override
   String get dataAccessTracerEmpty =>
-      'No data-access events recorded yet — search or open stations first, then export.';
+      'Zabeleženih še ni nobenih dogodkov dostopa do podatkov — najprej poiščite ali odprite postaje, nato izvozite.';
 
   @override
   String get developerToolsSubtitle =>
@@ -4226,17 +4228,18 @@ class AppLocalizationsSl extends AppLocalizations {
   String get developerToolsBuildChannel => 'Kanal gradnje';
 
   @override
-  String get startupTraceSectionTitle => 'Startup initialization trace';
+  String get startupTraceSectionTitle => 'Dnevnik inicializacije ob zagonu';
 
   @override
-  String get startupTraceExportButton => 'Export startup trace';
+  String get startupTraceExportButton => 'Izvozi dnevnik zagona';
 
   @override
-  String get startupTraceEmpty => 'No startup trace recorded yet.';
+  String get startupTraceEmpty =>
+      'Zabeleženega še ni nobenega dnevnika zagona.';
 
   @override
   String startupTraceTotalMs(int ms) {
-    return 'Total: $ms ms';
+    return 'Skupaj: $ms ms';
   }
 
   @override
@@ -4245,31 +4248,32 @@ class AppLocalizationsSl extends AppLocalizations {
   }
 
   @override
-  String get startupTraceExportSuccess => 'Startup trace saved to Downloads.';
+  String get startupTraceExportSuccess => 'Dnevnik zagona shranjen v Prenose.';
 
   @override
-  String get startupTraceExportFailure => 'Couldn\'t export the startup trace.';
+  String get startupTraceExportFailure =>
+      'Dnevnika zagona ni bilo mogoče izvoziti.';
 
   @override
-  String get distanceSourceOdometer => 'Odometer';
+  String get distanceSourceOdometer => 'Števec kilometrov';
 
   @override
   String get distanceSourceOdometerTooltip =>
-      'Distance read from the car\'s odometer — a measured ground truth.';
+      'Razdalja, odčitana s števca kilometrov avtomobila — izmerjena referenčna vrednost.';
 
   @override
-  String get distanceSourceGps => 'GPS track';
+  String get distanceSourceGps => 'Sled GPS';
 
   @override
   String get distanceSourceGpsTooltip =>
-      'Distance summed from the recorded GPS track — true road distance.';
+      'Razdalja, seštevek iz posnete sledi GPS — dejanska razdalja po cesti.';
 
   @override
-  String get distanceSourceEstimated => 'Estimated';
+  String get distanceSourceEstimated => 'Ocenjeno';
 
   @override
   String get distanceSourceEstimatedTooltip =>
-      'Distance integrated from the speed sensor — an estimate; the sensor typically over-reads slightly.';
+      'Razdalja, integrirana iz senzorja hitrosti — ocena; senzor običajno kaže nekoliko preveč.';
 
   @override
   String get insightCardTitle => 'Najbolj potratna vedenja';
@@ -4386,52 +4390,52 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'Mixture looks a little lean — the engine added fuel ($pctTrim% trim) to compensate';
+    return 'Zmes se zdi nekoliko revna — motor je dodajal gorivo (korekcija $pctTrim %), da bi to nadomestil';
   }
 
   @override
   String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'Mixture looks lean — the engine sustained a large $pctTrim% fuel addition, a possible inefficiency';
+    return 'Zmes se zdi revna — motor je trajno dodajal veliko goriva ($pctTrim %), možna neučinkovitost';
   }
 
   @override
   String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'Mixture looks a little rich — the engine pulled fuel ($pctTrim% trim) to compensate';
+    return 'Zmes se zdi nekoliko bogata — motor je odvzemal gorivo (korekcija $pctTrim %), da bi to nadomestil';
   }
 
   @override
   String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'Mixture looks rich — the engine sustained a large $pctTrim% fuel cut, a possible inefficiency';
+    return 'Zmes se zdi bogata — motor je trajno odvzemal veliko goriva ($pctTrim %), možna neučinkovitost';
   }
 
   @override
   String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'Engine ran rich under load ($pctShare% of the warm drive) — possible wasted fuel';
+    return 'Motor je pod obremenitvijo tekel bogato ($pctShare % ogrete vožnje) — možna potrata goriva';
   }
 
   @override
   String get lessonCombustionHealthSubtitle =>
-      'Heuristic health signal, not a diagnosis';
+      'Hevristični signal stanja, ne diagnoza';
 
   @override
   String get lessonAdviceCombustionHealthLean =>
-      'A sustained lean-correcting trim can mean an intake-air leak, a weak fuel supply, or an ageing sensor. If consumption or running quality worsens, a workshop scan can confirm.';
+      'Trajna korekcija proti revni zmesi lahko pomeni uhajanje zraka v sesalnem delu, šibko oskrbo z gorivom ali starajoč se senzor. Če se poraba ali tek poslabšata, lahko diagnostika v delavnici to potrdi.';
 
   @override
   String get lessonAdviceCombustionHealthRich =>
-      'A sustained rich-correcting trim can mean a leaking injector, high fuel pressure, or an over-reading sensor. If consumption or running quality worsens, a workshop scan can confirm.';
+      'Trajna korekcija proti bogati zmesi lahko pomeni puščajočo šobo, previsok tlak goriva ali senzor, ki kaže preveč. Če se poraba ali tek poslabšata, lahko diagnostika v delavnici to potrdi.';
 
   @override
   String get lessonAdviceCombustionHealthEnrichment =>
-      'Running rich under heavy load burns extra fuel. Short-shift and ease off on long pulls so the engine can stay near a stoichiometric mixture.';
+      'Bogata zmes pri veliki obremenitvi porabi dodatno gorivo. Prestavljajte navzgor prej in pri dolgih pospeševanjih popustite plin, da motor ostane blizu stehiometrične zmesi.';
 
   @override
   String get lessonTransportTitle =>
-      'Vehicle was transported — engine off while moving';
+      'Podatki motorja manjkajo za večino te vožnje';
 
   @override
   String get lessonTransportAdvice =>
-      'This trip looks like a tow, flatbed or train transport: the engine was off for almost the whole distance. Its consumption is excluded from your statistics.';
+      'Motor skoraj celotno razdaljo ni sporočal nobene dejavnosti. Ali je tok OBD2 med vožnjo odpovedal ali pa je bil avto premaknjen brez vožnje — vrednost porabe je nezanesljiva in izključena iz vaše statistike.';
 
   @override
   String get drivingScoreCardTitle => 'Ocena vožnje';
@@ -4536,21 +4540,21 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String insightUpshiftCruise(String pctTime, String liters) {
-    return 'High-RPM cruising ($pctTime% of trip): shifting up earlier could save $liters L';
+    return 'Vožnja pri visokih vrtljajih ($pctTime % vožnje): zgodnejše prestavljanje navzgor bi lahko prihranilo $liters L';
   }
 
   @override
   String get lessonAdviceUpshiftCruise =>
-      'Shift up earlier when cruising — the same speed at lower RPM burns noticeably less fuel.';
+      'Pri enakomerni vožnji prestavljajte navzgor prej — enaka hitrost pri nižjih vrtljajih porabi opazno manj.';
 
   @override
   String insightCoastingFuelCut(String pctTime, String liters) {
-    return 'Fuel-cut coasting ($pctTime% of trip): saved about $liters L';
+    return 'Kotaljenje s prekinitvijo dovoda goriva ($pctTime % vožnje): prihranjenih približno $liters L';
   }
 
   @override
   String get lessonAdviceCoastingFuelCut =>
-      'Nicely anticipated — lifting off early lets the engine cut fuel completely while coasting.';
+      'Dobro predvideno — zgodnje popuščanje plina omogoči motorju, da med kotaljenjem povsem prekine dovod goriva.';
 
   @override
   String insightTrailingLitersSaved(String liters) {
@@ -4558,22 +4562,22 @@ class AppLocalizationsSl extends AppLocalizations {
   }
 
   @override
-  String get fuelBreakdownTitle => 'Where your fuel went';
+  String get fuelBreakdownTitle => 'Kam je šlo vaše gorivo';
 
   @override
-  String get fuelBreakdownIdle => 'Idling';
+  String get fuelBreakdownIdle => 'Prosti tek';
 
   @override
-  String get fuelBreakdownHarshAccel => 'Hard accelerations';
+  String get fuelBreakdownHarshAccel => 'Sunkovita pospeševanja';
 
   @override
-  String get fuelBreakdownHighRpmCruise => 'High-RPM cruising';
+  String get fuelBreakdownHighRpmCruise => 'Vožnja pri visokih vrtljajih';
 
   @override
-  String get fuelBreakdownCoastingSaved => 'Saved by coasting';
+  String get fuelBreakdownCoastingSaved => 'Prihranjeno s kotaljenjem';
 
   @override
-  String get fuelBreakdownEfficient => 'Normal driving';
+  String get fuelBreakdownEfficient => 'Običajna vožnja';
 
   @override
   String fuelBreakdownLiters(String liters) {
@@ -4582,28 +4586,28 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get ecoNudgeIdle =>
-      'Idling for a while — switching the engine off saves fuel';
+      'Prosti tek že nekaj časa — ugasnitev motorja prihrani gorivo';
 
   @override
   String get ecoNudgeHarshAccel =>
-      'Strong acceleration — a gentler pedal saves fuel';
+      'Močno pospeševanje — nežnejša noga na plinu prihrani gorivo';
 
   @override
   String get ecoNudgeHighRpm =>
-      'High revs at cruise — shifting up earlier saves fuel';
+      'Visoki vrtljaji pri enakomerni vožnji — zgodnejše prestavljanje navzgor prihrani gorivo';
 
   @override
   String get obd2CoverageNoneNote =>
-      'No engine data arrived from the OBD2 adapter on this trip — fuel figures are GPS-based estimates.';
+      'Med to vožnjo iz adapterja OBD2 ni prispel noben podatek motorja — vrednosti goriva so ocene na podlagi GPS.';
 
   @override
   String obd2CoverageDroppedNote(int percent) {
-    return 'Engine data stopped $percent% into the trip (connection dropped) — fuel figures after that point are GPS-based estimates.';
+    return 'Podatki motorja so se ustavili pri $percent % vožnje (povezava prekinjena) — vrednosti goriva po tem so ocene na podlagi GPS.';
   }
 
   @override
   String obd2CoveragePartialNote(int percent) {
-    return 'Engine data covered only $percent% of this trip — gaps use GPS-based estimates.';
+    return 'Podatki motorja so pokrili le $percent % te vožnje — vrzeli uporabljajo ocene na podlagi GPS.';
   }
 
   @override
@@ -4909,11 +4913,12 @@ class AppLocalizationsSl extends AppLocalizations {
       'Orodja za napredne uporabnike in sodelavce.';
 
   @override
-  String get featureLabel_voiceFeedback => 'Spoken feedback (text-to-speech)';
+  String get featureLabel_voiceFeedback =>
+      'Govorne povratne informacije (sinteza govora)';
 
   @override
   String get featureDescription_voiceFeedback =>
-      'Master switch for every spoken surface — the driving voice coach and station announcements. When off, the app never opens a text-to-speech engine.';
+      'Glavno stikalo za vse govorjeno — glasovnega trenerja vožnje in napovedi postaj. Ko je izklopljeno, aplikacija nikoli ne odpre sinteze govora.';
 
   @override
   String get feedbackConsentTitle => 'Poslati poročilo na GitHub?';
@@ -4959,7 +4964,7 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get fillUpMultiFuelHint =>
-      'This vehicle can use different fuels — log the one you actually pumped';
+      'To vozilo lahko uporablja različna goriva — zabeležite tisto, ki ste ga dejansko natočili';
 
   @override
   String get fillUpGuidanceTitle => 'Najboljši čas za polnjenje';
@@ -5054,24 +5059,24 @@ class AppLocalizationsSl extends AppLocalizations {
   String get fillUpGuidancePartNight => 'ponoči';
 
   @override
-  String get fillUpImportPasteLabel => 'Paste text';
+  String get fillUpImportPasteLabel => 'Prilepi besedilo';
 
   @override
-  String get pasteReceiptDialogTitle => 'Paste receipt text';
+  String get pasteReceiptDialogTitle => 'Prilepi besedilo računa';
 
   @override
   String get pasteReceiptDialogHint =>
-      'Paste the text of a fuel receipt — e-mail, SMS, or a shared PDF. The litres, price per litre, fuel grade, total and station are read on-device and used to pre-fill the form. Nothing is sent to a server.';
+      'Prilepite besedilo računa za gorivo — e-pošta, SMS ali deljen PDF. Litri, cena na liter, vrsta goriva, skupni znesek in postaja se preberejo v napravi in vnaprej izpolnijo obrazec. Nič se ne pošlje na strežnik.';
 
   @override
-  String get pasteReceiptFieldHint => 'Receipt text';
+  String get pasteReceiptFieldHint => 'Besedilo računa';
 
   @override
-  String get pasteReceiptParseAction => 'Pre-fill';
+  String get pasteReceiptParseAction => 'Vnaprej izpolni';
 
   @override
   String get pasteReceiptNoData =>
-      'Couldn\'t read any fuel data from that text — check it\'s a fuel receipt and try again.';
+      'Iz tega besedila ni bilo mogoče prebrati podatkov o gorivu — preverite, ali gre za račun za gorivo, in poskusite znova.';
 
   @override
   String get fillUpReconciliationVerifiedBadgeLabel =>
@@ -5151,23 +5156,23 @@ class AppLocalizationsSl extends AppLocalizations {
       'Oddaja ni uspela — ročno deljenje';
 
   @override
-  String get fillUpWarningDialogTitle => 'Check this fill-up';
+  String get fillUpWarningDialogTitle => 'Preverite to točenje';
 
   @override
   String fillUpWarningFuelMismatch(String chosenFuel, String vehicleFuel) {
-    return 'You picked $chosenFuel, but this vehicle runs on $vehicleFuel.';
+    return 'Izbrali ste $chosenFuel, a to vozilo vozi na $vehicleFuel.';
   }
 
   @override
   String fillUpWarningOdometerBelowPrevious(String entered, String previous) {
-    return 'Odometer $entered km is below the previous fill-up\'s $previous km — distance can\'t go backwards.';
+    return 'Stanje števca $entered km je nižje od $previous km prejšnjega točenja — razdalja ne more iti nazaj.';
   }
 
   @override
-  String get fillUpWarningGoBack => 'Go back and fix';
+  String get fillUpWarningGoBack => 'Nazaj in popravi';
 
   @override
-  String get fillUpWarningSaveAnyway => 'Save anyway';
+  String get fillUpWarningSaveAnyway => 'Vseeno shrani';
 
   @override
   String get fillUpSectionWhatTitle => 'Kaj ste natočili';
@@ -5209,44 +5214,46 @@ class AppLocalizationsSl extends AppLocalizations {
   String get profileSectionRegion => 'Regija';
 
   @override
-  String get fuelEfficiencyCardTitle => 'Cost per kilometre by fuel';
+  String get fuelEfficiencyCardTitle => 'Strošek na kilometer po gorivu';
 
   @override
   String get fuelEfficiencyCardSubtitle =>
-      'Which fuel is actually cheapest to drive on';
+      'Katera mešanica goriva je za vožnjo dejansko najcenejša';
 
   @override
   String fuelEfficiencyWinnerChip(String fuel, String costPerKm) {
-    return 'Cheapest per km: $fuel ($costPerKm)';
+    return 'Najcenejše na km: $fuel ($costPerKm)';
   }
 
   @override
-  String get fuelEfficiencyPureBadge => 'Pure';
+  String get fuelEfficiencyPureBadge => 'Čisto';
 
   @override
-  String get fuelEfficiencyMixBadge => 'Blend';
+  String get fuelEfficiencyMixBadge => 'Mešanica';
 
   @override
   String fuelEfficiencyMixDominant(String fuel) {
-    return 'Mostly $fuel';
+    return 'Večinoma $fuel';
   }
 
   @override
-  String get fuelEfficiencyColL100km => 'L/100km';
+  String get fuelEfficiencyColL100km => 'L/100 km';
 
   @override
-  String get fuelEfficiencyColCostPerKm => 'Cost/km';
+  String get fuelEfficiencyColCostPerKm => 'Strošek/km';
 
   @override
-  String get fuelEfficiencyColTotalSpent => 'Total spent';
+  String get fuelEfficiencyColTotalSpent => 'Skupaj porabljeno';
 
   @override
   String fuelEfficiencyFillCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count fills',
-      one: '1 fill',
+      other: '$count točenj',
+      few: '$count točenja',
+      two: '$count točenji',
+      one: '1 točenje',
     );
     return '$_temp0';
   }
@@ -5256,49 +5263,51 @@ class AppLocalizationsSl extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count full tanks',
-      one: '1 full tank',
+      other: '$count polnih rezervoarjev',
+      few: '$count polni rezervoarji',
+      two: '$count polna rezervoarja',
+      one: '1 poln rezervoar',
     );
     return '$_temp0';
   }
 
   @override
   String get fuelEfficiencyInsufficientData =>
-      'Log at least two full tanks per fuel to crown the cheapest.';
+      'Zabeležite vsaj dva polna rezervoarja na sestavo, da določite najcenejšo.';
 
   @override
   String get fuelEfficiencyCompositionFootnote =>
-      'Tanks are grouped by composition: a tank is pure when one fuel is at least 85% of it, otherwise a blend.';
+      'Rezervoarji so združeni po sestavi: rezervoar je čist, ko eno gorivo predstavlja vsaj 85 %, sicer je mešanica.';
 
   @override
-  String get fuelNameE5 => 'Super E5';
+  String get fuelNameE5 => 'Bencin 95';
 
   @override
-  String get fuelNameE10 => 'Super E10';
+  String get fuelNameE10 => 'Bencin 95 E10';
 
   @override
-  String get fuelNameE98 => 'Super 98';
+  String get fuelNameE98 => 'Bencin 98';
 
   @override
-  String get fuelNameDiesel => 'Diesel';
+  String get fuelNameDiesel => 'Dizel';
 
   @override
-  String get fuelNameDieselPremium => 'Diesel Premium';
+  String get fuelNameDieselPremium => 'Dizel Premium';
 
   @override
-  String get fuelNameE85 => 'E85 Bioethanol';
+  String get fuelNameE85 => 'Bioetanol E85';
 
   @override
-  String get fuelNameLpg => 'LPG';
+  String get fuelNameLpg => 'Avtoplin (LPG)';
 
   @override
   String get fuelNameCng => 'CNG';
 
   @override
-  String get fuelNameHydrogen => 'Hydrogen';
+  String get fuelNameHydrogen => 'Vodik';
 
   @override
-  String get fuelNameElectric => 'Electric';
+  String get fuelNameElectric => 'Električno';
 
   @override
   String get calibrationModeLabel => 'Način umerjanja';
@@ -5331,62 +5340,63 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String gpsCoverageSummary(int pct, String gap, String cause) {
-    return 'Track covers $pct% — longest gap $gap ($cause)';
+    return 'Sled pokriva $pct % — najdaljša vrzel $gap ($cause)';
   }
 
   @override
   String gpsCoverageSummaryNoGaps(int pct) {
-    return 'Track covers $pct% — no gaps detected';
+    return 'Sled pokriva $pct % — brez zaznanih vrzeli';
   }
 
   @override
-  String get gpsCoverageAttrBackgroundThrottle => 'app in background';
+  String get gpsCoverageAttrBackgroundThrottle => 'aplikacija v ozadju';
 
   @override
-  String get gpsCoverageAttrOsBatching => 'OS fix batching';
+  String get gpsCoverageAttrOsBatching => 'sistem je združeval položaje';
 
   @override
-  String get gpsCoverageAttrGateRejected => 'fixes filtered';
+  String get gpsCoverageAttrGateRejected => 'položaji filtrirani';
 
   @override
-  String get gpsCoverageAttrDeliveryStall => 'delayed delivery';
+  String get gpsCoverageAttrDeliveryStall => 'zakasnela dostava';
 
   @override
-  String get gpsCoverageAttrSignalLoss => 'signal loss';
+  String get gpsCoverageAttrSignalLoss => 'izguba signala';
 
   @override
-  String get gpsCoverageAttrUnknown => 'unknown cause';
+  String get gpsCoverageAttrUnknown => 'neznan vzrok';
 
   @override
   String get gpsCoverageHintBackgroundThrottle =>
-      'The app was in the background without a foreground service, so the system throttled GPS. Keep the screen on while recording, or enable background recording when available.';
+      'Aplikacija je bila v ozadju brez storitve v ospredju, zato je sistem omejil GPS. Med snemanjem imejte zaslon vklopljen ali vklopite snemanje v ozadju, ko bo na voljo.';
 
   @override
   String get gpsCoverageHintOsBatching =>
-      'The system delivered position fixes late in batches; the track filled in afterwards, so little data was actually lost.';
+      'Sistem je položaje dostavil pozno in v paketih; sled se je naknadno dopolnila, zato je bilo dejansko izgubljenih malo podatkov.';
 
   @override
   String get gpsCoverageHintGateRejected =>
-      'Noisy position fixes in this stretch were filtered out to keep the distance figure honest.';
+      'Šumni položaji na tem odseku so bili filtrirani, da razdalja ostane poštena.';
 
   @override
   String get gpsCoverageHintDeliveryStall =>
-      'Position fixes were produced on time but reached the app late — the phone was busy (often a Bluetooth reconnect). Reception was fine.';
+      'Položaji so bili določeni pravočasno, a so do aplikacije prispeli pozno — telefon je bil zaseden (pogosto ponovno povezovanje Bluetooth). Sprejem je bil dober.';
 
   @override
   String get gpsCoverageHintSignalLoss =>
-      'GPS reception dropped — this usually means a tunnel, parking garage or dense urban canyon.';
+      'Sprejem GPS je izpadel — običajno predor, pokrito parkirišče ali gosta mestna pozidava.';
 
   @override
   String get gpsCoverageHintUnknown =>
-      'This trip carries no app-lifecycle information for the gap, so the cause can\'t be determined.';
+      'Ta vožnja ne vsebuje informacij o stanju aplikacije med vrzeljo, zato vzroka ni mogoče določiti.';
 
   @override
-  String get gpsCoverageAttrLinkRecovery => 'OBD2 reconnection interference';
+  String get gpsCoverageAttrLinkRecovery =>
+      'motnja zaradi ponovnega povezovanja OBD2';
 
   @override
   String get gpsCoverageHintLinkRecovery =>
-      'The gap coincides with an OBD2 reconnection episode — the adapter link was recovering while GPS ingest stalled. Fixing the adapter connection also fixes the track.';
+      'Vrzel sovpada z epizodo ponovnega povezovanja OBD2 — povezava z adapterjem si je opomogla, medtem ko se je sprejem GPS ustavil. Popravilo povezave z adapterjem popravi tudi sled.';
 
   @override
   String get gpsDiagnosticsTitle => 'Diagnostika vzorčenja GPS';
@@ -5427,25 +5437,25 @@ class AppLocalizationsSl extends AppLocalizations {
   String get gpsLifecycleInactive => 'Neaktivno';
 
   @override
-  String get gpsKpiVerdictGood => 'Efficient';
+  String get gpsKpiVerdictGood => 'Učinkovita';
 
   @override
-  String get gpsKpiVerdictModerate => 'Moderate';
+  String get gpsKpiVerdictModerate => 'Zmerna';
 
   @override
-  String get gpsKpiVerdictAggressive => 'Aggressive';
+  String get gpsKpiVerdictAggressive => 'Agresivna';
 
   @override
   String get gpsKpiInterpretationGood =>
-      'Smooth, energy-light driving — this is what efficient looks like.';
+      'Gladka, varčna vožnja — tako je videti učinkovitost.';
 
   @override
   String get gpsKpiInterpretationModerate =>
-      'Fairly typical driving — a little smoother on the throttle would save more.';
+      'Dokaj običajna vožnja — malo mehkejši plin bi prihranil več.';
 
   @override
   String get gpsKpiInterpretationAggressive =>
-      'Energy-heavy driving — easing off the accelerator and coasting more would cut fuel use.';
+      'Energijsko potratna vožnja — popuščanje plina in več kotaljenja bi zmanjšala porabo.';
 
   @override
   String get gpsMatrixMaturityCold => 'Hladna';
@@ -5476,46 +5486,46 @@ class AppLocalizationsSl extends AppLocalizations {
       'Ocena GPS (~) — na tej vožnji ni tipala za gorivo. Vrednost je modelirana iz hitrosti in kalibracije vašega vozila; natančnost se izboljša, ko se matrika dozori.';
 
   @override
-  String get gpsRoadUseCardTitle => 'How you used the road';
+  String get gpsRoadUseCardTitle => 'Kako ste uporabljali cesto';
 
   @override
-  String get gpsRoadUseSpeedSection => 'Where you spent your time';
+  String get gpsRoadUseSpeedSection => 'Kje ste preživeli čas';
 
   @override
-  String get gpsRoadUseSpeedIdle => 'Stopped (<5 km/h)';
+  String get gpsRoadUseSpeedIdle => 'Mirovanje (<5 km/h)';
 
   @override
-  String get gpsRoadUseSpeedLow => 'Town (5–50 km/h)';
+  String get gpsRoadUseSpeedLow => 'Mesto (5–50 km/h)';
 
   @override
-  String get gpsRoadUseSpeedCruise => 'Cruise (50–110 km/h)';
+  String get gpsRoadUseSpeedCruise => 'Odprta cesta (50–110 km/h)';
 
   @override
-  String get gpsRoadUseSpeedHigh => 'Fast (≥110 km/h)';
+  String get gpsRoadUseSpeedHigh => 'Hitro (≥110 km/h)';
 
   @override
-  String get gpsRoadUsePhaseSection => 'How you moved';
+  String get gpsRoadUsePhaseSection => 'Kako ste se premikali';
 
   @override
-  String get gpsRoadUsePhaseAccel => 'Accelerating';
+  String get gpsRoadUsePhaseAccel => 'Pospeševanje';
 
   @override
-  String get gpsRoadUsePhaseSteady => 'Holding speed';
+  String get gpsRoadUsePhaseSteady => 'Enakomerna hitrost';
 
   @override
-  String get gpsRoadUsePhaseCoast => 'Coasting';
+  String get gpsRoadUsePhaseCoast => 'Kotaljenje';
 
   @override
   String gpsRoadUseShare(String pct) {
-    return '$pct%';
+    return '$pct %';
   }
 
   @override
   String get gpsRoadUseCoastPraise =>
-      'Lots of coasting — letting the car roll instead of braking saves fuel. Nice.';
+      'Veliko kotaljenja — pustiti avto, da se kotali, namesto zaviranja prihrani gorivo. Odlično.';
 
   @override
-  String get gpsRoadUseSource => 'From your GPS track';
+  String get gpsRoadUseSource => 'Iz vaše sledi GPS';
 
   @override
   String get hapticEcoCoachSettingTitle => 'Eko coaching v realnem času';
@@ -5530,7 +5540,7 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String highwayViaExit(String ref, String km) {
-    return 'via exit $ref · +$km km';
+    return 'prek izvoza $ref · +$km km';
   }
 
   @override
@@ -5772,7 +5782,7 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get consentSyncTripsAnonymousHint =>
-      'Trips back up under this device\'s anonymous account. Sign in with an email to reach them from other devices.';
+      'Vožnje se varnostno kopirajo pod anonimnim računom te naprave. Prijavite se z e-pošto, da do njih dostopate z drugih naprav.';
 
   @override
   String get consentHideDetails => 'Skrij podrobnosti';
@@ -6023,7 +6033,8 @@ class AppLocalizationsSl extends AppLocalizations {
   String get obd2DiagnosticsPidSection => 'Rezultati po PID';
 
   @override
-  String get obd2DiagnosticsReconnectSection => 'Reconnect telemetry';
+  String get obd2DiagnosticsReconnectSection =>
+      'Telemetrija ponovnega povezovanja';
 
   @override
   String obd2DiagnosticsReconnectAttemptsLine(
@@ -6032,7 +6043,7 @@ class AppLocalizationsSl extends AppLocalizations {
     int transitions,
     int disconnects,
   ) {
-    return '$attempts reconnect attempts · $successes ok · $transitions transitions · $disconnects typed drops';
+    return '$attempts poskusov ponovne povezave · $successes uspešnih · $transitions prehodov · $disconnects razvrščenih prekinitev';
   }
 
   @override
@@ -6042,7 +6053,7 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get obd2DiagnosticsFallbackLine =>
-      'GPS-only fallback activated this session.';
+      'V tej seji je bil vklopljen rezervni način samo z GPS.';
 
   @override
   String get obd2DiagnosticsSchedulerSection => 'Zdravje razporejanja';
@@ -6181,24 +6192,25 @@ class AppLocalizationsSl extends AppLocalizations {
   String get obd2HealthHistorySection => 'Nedavne seje';
 
   @override
-  String get obd2HealthDownloadJson => 'Download as JSON';
+  String get obd2HealthDownloadJson => 'Prenesi kot JSON';
 
   @override
   String get obd2HealthDownloadInitTranscript =>
-      'Download init transcript only';
+      'Prenesi samo zapis inicializacije';
 
   @override
-  String get obd2HealthDownloadError => 'Couldn\'t save the diagnostics file';
+  String get obd2HealthDownloadError =>
+      'Diagnostične datoteke ni bilo mogoče shraniti';
 
   @override
-  String get obd2TestAdapterLabel => 'Adapter to test';
+  String get obd2TestAdapterLabel => 'Adapter za preizkus';
 
   @override
-  String get obd2TestAdapterScanOption => 'Scan for adapter';
+  String get obd2TestAdapterScanOption => 'Poišči adapter';
 
   @override
   String obd2TestStepConnectTo(String adapter) {
-    return 'Connect to $adapter';
+    return 'Povezovanje z $adapter';
   }
 
   @override
@@ -6215,7 +6227,7 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get obd2TestRunEngineOff =>
-      'Adapter OK — engine off; start the engine to read live data';
+      'Adapter OK — motor ugasnjen; zaženite motor za branje podatkov v živo';
 
   @override
   String obd2TestRunSummary(int passed, int total, int elapsed) {
@@ -6230,7 +6242,7 @@ class AppLocalizationsSl extends AppLocalizations {
   String get obd2TestStepScan => 'Iskanje adapterja';
 
   @override
-  String get obd2TestStepBluetooth => 'Phone Bluetooth';
+  String get obd2TestStepBluetooth => 'Bluetooth telefona';
 
   @override
   String get obd2TestStepConnect => 'Poveži in inicializiraj';
@@ -6242,13 +6254,13 @@ class AppLocalizationsSl extends AppLocalizations {
   String get obd2TestStepSupportedPids => 'Podprti PID';
 
   @override
-  String get obd2TestStepProtocol => 'Vehicle protocol';
+  String get obd2TestStepProtocol => 'Protokol vozila';
 
   @override
   String get obd2TestStepSampleReads => 'Vzorčna branja';
 
   @override
-  String get obd2TestStepSoak => 'Sustained polling';
+  String get obd2TestStepSoak => 'Dolgotrajno poizvedovanje';
 
   @override
   String get obd2TestStepReconnect => 'Test ponovne povezave';
@@ -6278,39 +6290,39 @@ class AppLocalizationsSl extends AppLocalizations {
   String get obd2TestAdapterTransportBle => 'Bluetooth LE';
 
   @override
-  String get obd2TestAdapterTransportUnknown => 'unknown — defaulting to BLE';
+  String get obd2TestAdapterTransportUnknown => 'neznano — privzeto BLE';
 
   @override
-  String get obd2HealthConnectAttemptsSection => 'Recent connect attempts';
+  String get obd2HealthConnectAttemptsSection => 'Nedavni poskusi povezave';
 
   @override
   String get obd2HealthConnectAttemptsEmpty =>
-      'No connect attempts recorded yet.';
+      'Zabeleženih še ni nobenih poskusov povezave.';
 
   @override
-  String get obd2HealthDownloadConnectTrace => 'Download connect trace';
+  String get obd2HealthDownloadConnectTrace => 'Prenesi dnevnik povezave';
 
   @override
   String get obd2HealthDownloadAllConnectTraces =>
-      'Download all connect traces';
+      'Prenesi vse dnevnike povezav';
 
   @override
-  String get obd2HealthConnectOrigin => 'Origin';
+  String get obd2HealthConnectOrigin => 'Izvor';
 
   @override
-  String get obd2HealthConnectTransport => 'Transport';
+  String get obd2HealthConnectTransport => 'Prenos';
 
   @override
-  String get obd2HealthConnectOutcome => 'Outcome';
+  String get obd2HealthConnectOutcome => 'Izid';
 
   @override
-  String get obd2HealthConnectScanList => 'Scanned devices';
+  String get obd2HealthConnectScanList => 'Najdene naprave';
 
   @override
-  String get obd2HealthConnectSteps => 'Steps';
+  String get obd2HealthConnectSteps => 'Koraki';
 
   @override
-  String get obd2HealthConnectUnknownAdapter => 'Unknown adapter';
+  String get obd2HealthConnectUnknownAdapter => 'Neznan adapter';
 
   @override
   String obd2DiagnosticsTripRecordedHeader(int samples, int percent) {
@@ -6360,78 +6372,79 @@ class AppLocalizationsSl extends AppLocalizations {
   }
 
   @override
-  String get obd2PickerOtherDevices => 'Other Bluetooth devices';
+  String get obd2PickerOtherDevices => 'Druge naprave Bluetooth';
 
   @override
-  String get obd2PickerTapToTry => 'Unrecognized — tap to try';
+  String get obd2PickerTapToTry => 'Neprepoznano — dotaknite se za poskus';
 
   @override
   String get obd2PickerBleOnlyNotice =>
-      'iPhone works with Bluetooth-LE adapters only. A Classic-only adapter (e.g. vLinker BM, Konnwei KW902) must be used on Android.';
+      'iPhone deluje samo z adapterji Bluetooth LE. Adapter, ki podpira samo Classic (npr. vLinker BM, Konnwei KW902), je treba uporabiti na Androidu.';
 
   @override
   String get obd2PairingConfirmHint =>
-      'Confirm the pairing request on your phone';
+      'Potrdite zahtevo za seznanjanje na telefonu';
 
   @override
-  String get obd2ScanEmptyTitle => 'No adapter found';
+  String get obd2ScanEmptyTitle => 'Adapter ni najden';
 
   @override
   String get obd2ScanEmptyReady =>
-      'Bluetooth is on and permissions are granted. Make sure the adapter is plugged into the OBD2 port and the ignition is on, then scan again.';
+      'Bluetooth je vklopljen in dovoljenja so dodeljena. Preverite, ali je adapter priklopljen v vtičnico OBD2 in ali je kontakt vklopljen, nato znova poiščite.';
 
   @override
   String get obd2ScanBlockedUnsupported =>
-      'This device has no Bluetooth Low Energy hardware, so it cannot connect to an OBD2 adapter.';
+      'Ta naprava nima strojne opreme Bluetooth Low Energy, zato se ne more povezati z adapterjem OBD2.';
 
   @override
   String get obd2ScanBlockedBluetoothOff =>
-      'Bluetooth is switched off. Turn it on to scan for your adapter.';
+      'Bluetooth je izklopljen. Vklopite ga, da poiščete svoj adapter.';
 
   @override
   String get obd2ScanBlockedPermission =>
-      'Sparkilo needs Bluetooth permission to find your adapter.';
+      'Sparkilo potrebuje dovoljenje za Bluetooth, da najde vaš adapter.';
 
   @override
   String get obd2ScanBlockedPermissionSettings =>
-      'Bluetooth permission was denied permanently. Grant it in system settings to scan for your adapter.';
+      'Dovoljenje za Bluetooth je bilo trajno zavrnjeno. Dodelite ga v sistemskih nastavitvah, da poiščete adapter.';
 
   @override
   String get obd2ScanBlockedLocationServices =>
-      'Location services are switched off on this device. Android needs them enabled to scan for Bluetooth adapters — no location is recorded or shared.';
+      'Lokacijske storitve so na tej napravi izklopljene. Android jih zahteva za iskanje adapterjev Bluetooth — nobena lokacija se ne beleži ali deli.';
 
   @override
-  String get obd2ScanOpenSettings => 'Open settings';
+  String get obd2ScanOpenSettings => 'Odpri nastavitve';
 
   @override
-  String get obd2ReconnectInProgress => 'Reconnecting to your OBD2 adapter…';
+  String get obd2ReconnectInProgress =>
+      'Ponovno povezovanje z vašim adapterjem OBD2…';
 
   @override
-  String get obd2StatusEngineOff => 'OBD2 paused — engine off';
+  String get obd2StatusEngineOff => 'OBD2 zaustavljen — motor ugasnjen';
 
   @override
   String get obd2StatusEngineOffBody =>
-      'The adapter was reachable but the vehicle bus stayed silent, so automatic reconnection is paused. It resumes when you drive or reopen the app — or reconnect now.';
+      'Adapter je bil dosegljiv, a vodilo vozila je ostalo tiho, zato je samodejno ponovno povezovanje zaustavljeno. Nadaljuje se, ko se peljete ali znova odprete aplikacijo — ali se povežite zdaj.';
 
   @override
-  String get obd2StatusReconnectNow => 'Reconnect now';
+  String get obd2StatusReconnectNow => 'Poveži znova zdaj';
 
   @override
-  String get autoRecordNotificationTitle => 'Trip auto-record';
+  String get autoRecordNotificationTitle => 'Samodejno snemanje voženj';
 
   @override
-  String get autoRecordNotificationText => 'Watching for your OBD2 adapter';
+  String get autoRecordNotificationText => 'Čakanje na vaš adapter OBD2';
 
   @override
-  String get obd2ResetConnection => 'Reset connection';
+  String get obd2ResetConnection => 'Ponastavi povezavo';
 
   @override
   String get obd2ResetConnectionDone =>
-      'Adapter reset — connection re-established';
+      'Adapter ponastavljen — povezava znova vzpostavljena';
 
   @override
   String get obd2ResetConnectionNoLink =>
-      'Adapter reset — reconnecting in the background';
+      'Adapter ponastavljen — ponovno povezovanje v ozadju';
 
   @override
   String get ocrTesterTitle => 'Tester OCR';
@@ -6577,7 +6590,7 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get onboardingObd2LaterNote =>
-      'You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.';
+      'Adapter Bluetooth OBD2 lahko kadar koli pozneje seznanite z zaslona vozila, da snemate vožnje in berete podatke motorja.';
 
   @override
   String get openNow => 'Odprto';
@@ -6675,14 +6688,14 @@ class AppLocalizationsSl extends AppLocalizations {
   String get showLessHours => 'Prikaži manj';
 
   @override
-  String get openStateUnknown => 'Unknown';
+  String get openStateUnknown => 'Neznano';
 
   @override
   String stationOpenStateSemantic(String open) {
     String _temp0 = intl.Intl.selectLogic(open, {
-      'true': 'Station is open',
-      'false': 'Station is closed',
-      'other': 'Open state unknown',
+      'true': 'Postaja je odprta',
+      'false': 'Postaja je zaprta',
+      'other': 'Stanje odprtosti neznano',
     });
     return '$_temp0';
   }
@@ -6698,18 +6711,18 @@ class AppLocalizationsSl extends AppLocalizations {
   String get tripRecordingPipElapsedCaption => 'preteklo';
 
   @override
-  String get qrLaunchConfirmTitle => 'Open scanned link?';
+  String get qrLaunchConfirmTitle => 'Odpreti skenirano povezavo?';
 
   @override
   String qrLaunchConfirmBody(String host) {
-    return 'This QR code points to $host. Only open links you trust.';
+    return 'Ta koda QR vodi na $host. Odpirajte samo povezave, ki jim zaupate.';
   }
 
   @override
-  String get qrLaunchConfirmOpen => 'Open link';
+  String get qrLaunchConfirmOpen => 'Odpri povezavo';
 
   @override
-  String get qrLaunchConfirmCancel => 'Cancel';
+  String get qrLaunchConfirmCancel => 'Prekliči';
 
   @override
   String get radarPinHelpTitle => 'O pritrdilu';
@@ -6726,10 +6739,10 @@ class AppLocalizationsSl extends AppLocalizations {
       'Radar se samodejno pritrdi vsakič namesto da tapnete vsak krat. Porabi več baterije.';
 
   @override
-  String get radarScopeShowScope => 'Radar view';
+  String get radarScopeShowScope => 'Pogled radarja';
 
   @override
-  String get radarScopeShowList => 'List view';
+  String get radarScopeShowList => 'Pogled seznama';
 
   @override
   String get alertsRadiusFrequencyLabel => 'Pogostost preverjanja';
@@ -6931,85 +6944,87 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String syncAdoptTitle(String email) {
-    return 'Join $email\'s account';
+    return 'Pridruži se računu $email';
   }
 
   @override
   String get syncAdoptSubtitle =>
-      'Sign in with this account\'s password to share its data across both devices.';
+      'Prijavite se z geslom tega računa, da njegove podatke delite na obeh napravah.';
 
   @override
-  String get syncAdoptPasswordLabel => 'Account password';
+  String get syncAdoptPasswordLabel => 'Geslo računa';
 
   @override
-  String get syncAdoptJoinButton => 'Join account';
+  String get syncAdoptJoinButton => 'Pridruži se računu';
 
   @override
-  String get syncAdoptUseDifferentAccount => 'Use a different account instead';
+  String get syncAdoptUseDifferentAccount => 'Raje uporabi drug račun';
 
   @override
-  String get syncDeleteDataTitle => 'Delete synced data';
+  String get syncDeleteDataTitle => 'Izbriši sinhronizirane podatke';
 
   @override
   String get syncDeleteDataSubtitle =>
-      'Remove your trips, vehicles or fill-ups from the sync database';
+      'Odstranite svoje vožnje, vozila ali točenja iz baze za sinhronizacijo';
 
   @override
-  String get syncDeleteDataPickTitle => 'Delete which synced data?';
+  String get syncDeleteDataPickTitle =>
+      'Katere sinhronizirane podatke izbrisati?';
 
   @override
-  String get syncDeleteDataCategoryTrips => 'Trips';
+  String get syncDeleteDataCategoryTrips => 'Vožnje';
 
   @override
-  String get syncDeleteDataCategoryVehicles => 'Vehicles';
+  String get syncDeleteDataCategoryVehicles => 'Vozila';
 
   @override
-  String get syncDeleteDataCategoryFillUps => 'Fill-ups';
+  String get syncDeleteDataCategoryFillUps => 'Točenja';
 
   @override
-  String get syncDeleteDataCategoryEverything => 'Everything';
+  String get syncDeleteDataCategoryEverything => 'Vse';
 
   @override
   String syncDeleteDataConfirmTitle(String category) {
-    return 'Delete $category from the sync database?';
+    return 'Izbrisati $category iz baze za sinhronizacijo?';
   }
 
   @override
   String get syncDeleteDataConfirmBody =>
-      'This removes the selected data from your sync database and it will not re-sync from your other devices. Data stored locally on this device is kept.';
+      'To odstrani izbrane podatke iz vaše baze za sinhronizacijo in se ne bodo znova sinhronizirali z vaših drugih naprav. Podatki, shranjeni lokalno na tej napravi, ostanejo.';
 
   @override
-  String get syncDeleteDataConfirmAction => 'Delete from server';
+  String get syncDeleteDataConfirmAction => 'Izbriši s strežnika';
 
   @override
-  String get syncDeleteDataDone => 'Synced data deleted';
+  String get syncDeleteDataDone => 'Sinhronizirani podatki izbrisani';
 
   @override
   String get syncDeleteDataFailed =>
-      'Deleting synced data failed — please try again';
+      'Brisanje sinhroniziranih podatkov ni uspelo — poskusite znova';
 
   @override
-  String get syncRelinkTitle => 'Cloud sync needs re-linking';
+  String get syncRelinkTitle =>
+      'Sinhronizacijo v oblaku je treba znova povezati';
 
   @override
   String get syncRelinkBody =>
-      'This device\'s saved sync identity is signed out. Sign in with your email to re-link your synced data, or start fresh with a new identity.';
+      'Shranjena identiteta za sinhronizacijo te naprave je odjavljena. Prijavite se z e-pošto, da znova povežete sinhronizirane podatke, ali začnite znova z novo identiteto.';
 
   @override
-  String get syncRelinkSignInAction => 'Sign in to re-link';
+  String get syncRelinkSignInAction => 'Prijavi se za ponovno povezavo';
 
   @override
-  String get syncRelinkStartFreshAction => 'Start fresh';
+  String get syncRelinkStartFreshAction => 'Začni znova';
 
   @override
-  String get syncRelinkStartFreshTitle => 'Start fresh?';
+  String get syncRelinkStartFreshTitle => 'Začeti znova?';
 
   @override
   String get syncRelinkStartFreshBody =>
-      'A new anonymous identity will be created for this device. Data synced under the old identity stays on the server but will no longer be reachable from here unless you sign in with its email account.';
+      'Za to napravo bo ustvarjena nova anonimna identiteta. Podatki, sinhronizirani pod staro identiteto, ostanejo na strežniku, a od tu ne bodo več dosegljivi, razen če se prijavite z njenim e-poštnim računom.';
 
   @override
-  String get syncRelinkStartFreshConfirm => 'Start fresh';
+  String get syncRelinkStartFreshConfirm => 'Začni znova';
 
   @override
   String get tankLevelTitle => 'Raven goriva';
@@ -7026,12 +7041,12 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String tankLevelRangeLastIntervalFormat(String kilometres) {
-    return '≈ $kilometres km at your last tank\'s consumption';
+    return '≈ $kilometres km pri porabi vašega zadnjega rezervoarja';
   }
 
   @override
   String tankLevelRangeLongRunFormat(String kilometres) {
-    return 'Long-run average: ≈ $kilometres km';
+    return 'Dolgoročno povprečje: ≈ $kilometres km';
   }
 
   @override
@@ -7055,21 +7070,21 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String tankLevelSourceFillUp(String date) {
-    return 'Anchored at the last fill-up: $date';
+    return 'Zasidrano na zadnjem točenju: $date';
   }
 
   @override
   String tankLevelSourceObd2(String date) {
-    return 'OBD2 tank sensor · $date';
+    return 'Senzor rezervoarja OBD2 · $date';
   }
 
   @override
   String tankMixCaption(String mix) {
-    return 'Tank mix: $mix';
+    return 'Mešanica v rezervoarju: $mix';
   }
 
   @override
-  String get tankReportTitle => 'Tank report';
+  String get tankReportTitle => 'Poročilo o rezervoarju';
 
   @override
   String tankReportHeadline(String value) {
@@ -7078,71 +7093,71 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String tankReportSincePrevious(String km, String liters, String cost) {
-    return 'Since the previous full tank: $km km · $liters L · $cost';
+    return 'Od prejšnjega polnega rezervoarja: $km km · $liters L · $cost';
   }
 
   @override
   String tankReportTrendUp(String delta) {
-    return '$delta L/100 km more than the previous tank';
+    return '$delta L/100 km več kot prejšnji rezervoar';
   }
 
   @override
   String tankReportTrendDown(String delta) {
-    return '$delta L/100 km less than the previous tank';
+    return '$delta L/100 km manj kot prejšnji rezervoar';
   }
 
   @override
-  String get tankReportTrendFlat => 'Level with the previous tank';
+  String get tankReportTrendFlat => 'Na ravni prejšnjega rezervoarja';
 
   @override
   String get tankReportNoPrevious =>
-      'Evolution appears after your next full tank.';
+      'Razvoj se prikaže po vašem naslednjem polnem rezervoarju.';
 
   @override
   String tankReportCoverage(String pct) {
-    return 'Recordings cover $pct % of this tank';
+    return 'Posnetki pokrivajo $pct % tega rezervoarja';
   }
 
   @override
   String tankReportRecordedAvg(String value) {
-    return 'Recorded slice: $value L/100 km';
+    return 'Posneti del: $value L/100 km';
   }
 
   @override
-  String get tankReportExplainHeader => 'What the recordings suggest';
+  String get tankReportExplainHeader => 'Kaj nakazujejo posnetki';
 
   @override
   String tankReportFactorHighRpm(String cur, String prev) {
-    return 'High-RPM share $cur % (was $prev %)';
+    return 'Delež visokih vrtljajev $cur % (prej $prev %)';
   }
 
   @override
   String tankReportFactorHarsh(String cur, String prev) {
-    return 'Harsh events $cur/100 km (was $prev)';
+    return 'Sunkoviti manevri $cur/100 km (prej $prev)';
   }
 
   @override
   String tankReportFactorColdStarts(String cur, String prev) {
-    return 'Cold starts $cur (was $prev)';
+    return 'Hladni zagoni $cur (prej $prev)';
   }
 
   @override
   String tankReportFactorIdle(String cur, String prev) {
-    return 'Idle share $cur % (was $prev %)';
+    return 'Delež prostega teka $cur % (prej $prev %)';
   }
 
   @override
   String get tankReportCaveat =>
-      'Recordings are spontaneous and cover only part of this tank — these hints are indicative, not the full story.';
+      'Posnetki so naključni in pokrivajo le del tega rezervoarja — ti namigi so okvirni, ne celotna slika.';
 
   @override
   String tankReportCalibrationUnder(String pct) {
-    return 'Recorded estimates run $pct % under pump truth';
+    return 'Posnete ocene so $pct % pod dejansko vrednostjo na črpalki';
   }
 
   @override
   String tankReportCalibrationOver(String pct) {
-    return 'Recorded estimates run $pct % over pump truth';
+    return 'Posnete ocene so $pct % nad dejansko vrednostjo na črpalki';
   }
 
   @override
@@ -7334,7 +7349,8 @@ class AppLocalizationsSl extends AppLocalizations {
   String get trajetDetailChartCoolant => 'Hladilna tekočina (°C)';
 
   @override
-  String get trajetDetailChartAltitudeRelative => 'Altitude (m, from start)';
+  String get trajetDetailChartAltitudeRelative =>
+      'Nadmorska višina (m, od začetka)';
 
   @override
   String get trajetDetailChartLambda => 'Komandirani λ';
@@ -7418,13 +7434,13 @@ class AppLocalizationsSl extends AppLocalizations {
   String get trajetsMapShareError => 'Datoteke GPX ni bilo mogoče deliti';
 
   @override
-  String get trajetDetailChartBoost => 'Boost pressure (MAP − ambient)';
+  String get trajetDetailChartBoost => 'Polnilni tlak (MAP − okolica)';
 
   @override
-  String get trajetDetailChartIat => 'Intake air temperature';
+  String get trajetDetailChartIat => 'Temperatura vstopnega zraka';
 
   @override
-  String get trajetDetailChartTiming => 'Ignition timing advance';
+  String get trajetDetailChartTiming => 'Predvžig';
 
   @override
   String get trajetObd2Degraded =>
@@ -7497,14 +7513,14 @@ class AppLocalizationsSl extends AppLocalizations {
   String get fuelStationRadarResultBadge => 'Rezultat radarja bencinski servis';
 
   @override
-  String get radarUpdatingLocation => 'Updating your location…';
+  String get radarUpdatingLocation => 'Posodabljanje vaše lokacije…';
 
   @override
-  String get radarSearching => 'Searching…';
+  String get radarSearching => 'Iskanje…';
 
   @override
   String get highwayModeChip =>
-      'Highway mode — showing stations ahead on your route';
+      'Avtocestni način — prikazuje postaje pred vami na poti';
 
   @override
   String get tripRecordingPinTooltip =>
@@ -7622,29 +7638,29 @@ class AppLocalizationsSl extends AppLocalizations {
   String get trajetsSharedBadge => 'Deljeno';
 
   @override
-  String get tripVerdictPromptTitle => 'How did this trip feel?';
+  String get tripVerdictPromptTitle => 'Kakšna je bila ta vožnja?';
 
   @override
-  String get tripVerdictSmooth => 'Smooth';
+  String get tripVerdictSmooth => 'Gladka';
 
   @override
-  String get tripVerdictModerate => 'Moderate';
+  String get tripVerdictModerate => 'Zmerna';
 
   @override
-  String get tripVerdictAggressive => 'Aggressive';
+  String get tripVerdictAggressive => 'Agresivna';
 
   @override
-  String get tripVerdictDismiss => 'Not now';
+  String get tripVerdictDismiss => 'Ne zdaj';
 
   @override
   String get tripVerdictThanks =>
-      'Thanks — this helps calibrate your driving analysis.';
+      'Hvala — to pomaga umeriti analizo vaše vožnje.';
 
   @override
-  String get fillUpDeletedUndoSnackbar => 'Fill-up deleted';
+  String get fillUpDeletedUndoSnackbar => 'Točenje izbrisano';
 
   @override
-  String get trajetDeletedUndoSnackbar => 'Recording deleted';
+  String get trajetDeletedUndoSnackbar => 'Posnetek izbrisan';
 
   @override
   String get searchFailedSnackbar => 'Iskanje ni uspelo — poskusite znova';
@@ -7687,32 +7703,32 @@ class AppLocalizationsSl extends AppLocalizations {
   }
 
   @override
-  String get stationUnbrandedTitle => 'Unbranded station';
+  String get stationUnbrandedTitle => 'Postaja brez blagovne znamke';
 
   @override
-  String get unsupportedRegionTitle => 'Not available in your region yet';
+  String get unsupportedRegionTitle => 'V vaši regiji še ni na voljo';
 
   @override
   String get unsupportedRegionBody =>
-      'We don\'t have fuel prices for your country yet, so results may be empty or from another country. You can still pick a supported country in the search settings.';
+      'Za vašo državo še nimamo cen goriva, zato so rezultati lahko prazni ali iz druge države. Kljub temu lahko v nastavitvah iskanja izberete podprto državo.';
 
   @override
-  String get unsupportedRegionDismiss => 'Got it';
+  String get unsupportedRegionDismiss => 'Razumem';
 
   @override
-  String get configureCountryTitle => 'Set your country';
+  String get configureCountryTitle => 'Nastavite svojo državo';
 
   @override
   String get configureCountryBody =>
-      'Your country is supported, but it isn\'t set up yet — so prices may be from another country. Choose your country in the search settings to see local prices.';
+      'Vaša država je podprta, a še ni nastavljena — cene so zato lahko iz druge države. Izberite svojo državo v nastavitvah iskanja, da vidite lokalne cene.';
 
   @override
   String get vehicleMultiFuelCapableLabel =>
-      'I may fill up with different fuel types';
+      'Morda točim različne vrste goriva';
 
   @override
   String get vehicleMultiFuelCapableHelper =>
-      'Tracks which fuel is cheapest per kilometre';
+      'Spremlja, katero gorivo je najcenejše na kilometer';
 
   @override
   String get vinLabel => 'VIN (neobvezno)';
