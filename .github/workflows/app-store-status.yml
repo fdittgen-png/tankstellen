@@ -1,0 +1,91 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
+name: App Store status
+
+# #3851 — READ-ONLY report of the App Store version state.
+#
+# `deliver --submit_for_review` (app-store-listing.yml) needs a version in
+# PREPARE_FOR_SUBMISSION with a build attached. Nothing else in the repo could
+# answer whether that state exists, so a submission dispatch was a blind guess
+# on a path where a careless dispatch is exactly what #3849 exists to prevent.
+#
+# Read-only: this lane creates no version, selects no build, submits nothing.
+# API-only, so ubuntu-latest — no macOS runner needed (mirrors
+# ios-testflight-status.yml).
+#
+# Secrets required (App Store Connect API key — same as ios-testflight.yml):
+# - APP_STORE_CONNECT_API_KEY_BASE64  base64 of the .p8 key file
+# - APP_STORE_CONNECT_API_KEY_ID      the key's Key ID
+# - APP_STORE_CONNECT_API_ISSUER_ID   the issuer ID
+
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'How many recent App Store versions to report (newest first)'
+        required: false
+        type: string
+        default: '10'
+
+concurrency:
+  group: app-store-status
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Decode App Store Connect API key
+        env:
+          ASC_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+        run: |
+          set -euo pipefail
+          if [ -z "${ASC_KEY_BASE64:-}" ]; then
+            echo "::error::APP_STORE_CONNECT_API_KEY_BASE64 is not set." >&2
+            exit 1
+          fi
+          echo "$ASC_KEY_BASE64" | base64 --decode > "$RUNNER_TEMP/asc-api-key.p8"
+          echo "ASC_API_KEY_FILEPATH=$RUNNER_TEMP/asc-api-key.p8" >> "$GITHUB_ENV"
+
+      - name: fastlane app_store_status
+        working-directory: ios
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          FASTLANE_DISABLE_COLORS: '1'
+        run: |
+          set -euo pipefail
+          bundle exec fastlane app_store_status \
+            limit:"${{ inputs.limit || '10' }}" 2>&1 | tee /tmp/as-status.log
+
+      - name: Clean up decoded API key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/asc-api-key.p8"
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## App Store version status"
+            echo ""
+            echo '```'
+            # The lane's own verdict lines are the point of the report; the
+            # rest is fastlane noise.
+            grep -E 'state=|EDITABLE|NO editable|No build attached' \
+              /tmp/as-status.log || echo '(no version lines — see the job log)'
+            echo '```'
+            echo ""
+            echo "Read-only: no version created, no build selected, nothing submitted."
+          } >> "$GITHUB_STEP_SUMMARY"
