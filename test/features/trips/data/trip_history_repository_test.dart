@@ -217,7 +217,7 @@ void main() {
       final hookCalls = <String>[];
       final repo = TripHistoryRepository(
         box: box,
-        onSavedHook: hookCalls.add,
+        onSavedHook: (e) => hookCalls.add(e.vehicleId!),
       );
       final start = DateTime(2026, 4, 21);
       await repo.save(TripHistoryEntry(
@@ -234,7 +234,7 @@ void main() {
       final hookCalls = <String>[];
       final repo = TripHistoryRepository(
         box: box,
-        onSavedHook: hookCalls.add,
+        onSavedHook: (e) => hookCalls.add(e.vehicleId!),
       );
       final start = DateTime(2026, 4, 21);
       await repo.save(TripHistoryEntry(
@@ -272,7 +272,7 @@ void main() {
         () async {
       final repo = TripHistoryRepository(box: box);
       final hookCalls = <String>[];
-      repo.onSavedHook = hookCalls.add;
+      repo.onSavedHook = (e) => hookCalls.add(e.vehicleId!);
 
       final start = DateTime(2026, 4, 21);
       await repo.save(TripHistoryEntry(

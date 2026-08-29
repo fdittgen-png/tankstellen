@@ -5,6 +5,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 import 'trip_detail_charts.dart';
+import '../../domain/services/series_downsampling.dart';
 
 /// Pure geometry helpers for the trip-detail map (#3316), kept out of the
 /// widget so they're unit-testable without a live `FlutterMap` and so the
@@ -44,8 +45,25 @@ TripPathPoints buildTripPathPoints(List<TripDetailSample> samples) {
       kept.add(s);
     }
   }
+  // #3878 — a long 1 Hz track is simplified for the map (Douglas–Peucker,
+  // a few metres): every vertex the eye can see stays, the jitter goes.
+  if (points.length > kPathPointBudget) {
+    final idx = douglasPeuckerIndices(
+      length: points.length,
+      lat: (i) => points[i].latitude,
+      lng: (i) => points[i].longitude,
+      toleranceM: kPathSimplifyToleranceM,
+    );
+    return TripPathPoints(pickIndices(points, idx), pickIndices(kept, idx));
+  }
   return TripPathPoints(points, kept);
 }
+
+/// #3878 — above this many fixes the polyline is simplified.
+const int kPathPointBudget = 2000;
+
+/// #3878 — Douglas–Peucker tolerance for the map track, in metres.
+const double kPathSimplifyToleranceM = 4;
 
 /// The polyline bounds, with any near-zero span padded by [eps] so
 /// `CameraFit.bounds` always has a finite area to fit. Folds the

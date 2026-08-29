@@ -131,12 +131,14 @@ mixin _TripRecordingSnapshot on _$TripRecording, _TripRecordingCore {
     final base = _activeSnapshot;
     if (base == null) return null;
     final phaseStr = _phaseStringFor(ctl);
-    // #3741 — read the captured buffer ONCE per flush (was twice: here
-    // and inside _summaryFromCtl, each a full O(n) copy pre-#3741).
-    final samples = ctl.capturedSamples;
+    // #3878 — the Hive row is meta-only whenever the WAL is writable (the
+    // samples are on disk, the in-memory ring only holds the live window);
+    // a broken WAL keeps the pre-#3758 fat row so no sample is lost.
+    final walWritable = _resolveActiveRepo()?.sampleWal?.isWritable ?? false;
+    final samples = walWritable ? const <TripSample>[] : ctl.capturedSamples;
     return base.copyWith(
       phase: phaseStr,
-      summary: _summaryFromCtl(ctl, samples),
+      summary: _summaryFromCtl(ctl),
       samples: samples,
       odometerStartKm: ctl.odometerStartKm,
       odometerLatestKm: ctl.odometerLatestKm,
@@ -171,15 +173,16 @@ mixin _TripRecordingSnapshot on _$TripRecording, _TripRecordingCore {
   /// the latest distance / fuel / harsh counts without forcing the
   /// controller to expose more debug surface than [capturedSamples].
   /// [samples] is the buffer view the caller read for this flush (#3741).
-  TripSummary _summaryFromCtl(
-      TripRecordingController ctl, List<TripSample> samples) {
+  TripSummary _summaryFromCtl(TripRecordingController ctl) {
     // The controller has no public mid-trip summary accessor; rather
-    // than reach into its recorder we use the captured buffer — the
-    // post-debounce 1 Hz feed, plenty for the staleness / preview
-    // rendering recovery does. A perfect mid-trip summary (idle/harsh
-    // counters) would need the controller to expose its own recorder
-    // snapshot; deferred until recovery acquires a richer preview.
-    if (samples.isEmpty) {
+    // than reach into its recorder we use the captured buffer's O(1)
+    // facts — the post-debounce 1 Hz feed, plenty for the staleness /
+    // preview rendering recovery does. A perfect mid-trip summary
+    // (idle/harsh counters) would need the controller to expose its own
+    // recorder snapshot; deferred until recovery acquires a richer preview.
+    final first = ctl.firstCapturedAt;
+    final last = ctl.latestSample?.timestamp;
+    if (first == null || last == null) {
       return const TripSummary(
         distanceKm: 0,
         maxRpm: 0,
@@ -204,8 +207,8 @@ mixin _TripRecordingSnapshot on _$TripRecording, _TripRecordingCore {
       idleSeconds: 0,
       harshBrakes: 0,
       harshAccelerations: 0,
-      startedAt: samples.first.timestamp,
-      endedAt: samples.last.timestamp,
+      startedAt: first,
+      endedAt: last,
       distanceSource: ctl.distanceSource,
     );
   }
@@ -255,19 +258,40 @@ mixin _TripRecordingSnapshot on _$TripRecording, _TripRecordingCore {
       // (each written exactly once); saveSnapshot then persists meta
       // only. This replaces the old whole-list re-serialization that
       // crashed recordings at ~40 min.
+      // #3878 — the unwritten tail comes from the controller's ring by
+      // ABSOLUTE index, and once on disk the ring releases everything
+      // older than its live window.
       final wal = repo.sampleWal;
-      if (wal != null) {
-        final samples = next.samples;
-        for (var i = _walWrittenCount; i < samples.length; i++) {
-          wal.append(samples[i]);
+      if (wal != null && wal.isWritable) {
+        for (final s in ctl.capturedSince(_walWrittenCount)) {
+          wal.append(s);
         }
-        _walWrittenCount =
-            _walWrittenCount > samples.length ? _walWrittenCount : samples.length;
+        _walWrittenCount = ctl.capturedTotal;
+        ctl.releaseWrittenSamples(_walWrittenCount);
       }
       await repo.saveSnapshot(next);
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording flush snapshot failed'}));
     }
+  }
+
+  /// #3878 — every captured sample of the running trip, for the stop path
+  /// and the grace-window finalise: flush the tail, then read the WAL back
+  /// in one isolate hop. Without a writable WAL the controller's buffer
+  /// still holds everything (nothing was released).
+  Future<List<TripSample>> readAllCapturedSamples() async {
+    final ctl = _obd2?.controller;
+    if (ctl == null) return const [];
+    await _flushActiveSnapshot(force: true);
+    final wal = _resolveActiveRepo()?.sampleWal;
+    if (wal == null || !wal.isWritable) {
+      return List<TripSample>.unmodifiable(ctl.capturedSamples);
+    }
+    final fromDisk = await wal.readAll();
+    // The WAL is the whole trip; the ring can only lag it (a torn final
+    // line after a crash is the recovery path's problem, not ours).
+    if (fromDisk.length >= ctl.capturedTotal) return fromDisk;
+    return [...fromDisk, ...ctl.capturedSince(fromDisk.length)];
   }
 
   /// Drop the persisted snapshot + clear in-memory bookkeeping.

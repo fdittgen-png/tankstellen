@@ -21,6 +21,20 @@ class TripSampleBuffer {
   /// only kicks in if the user forgets to stop a recording overnight.
   static const int _capturedSampleCap = 120000;
 
+  /// #3878 — the LIVE window kept in memory once samples are safely on the
+  /// WAL: 900 samples = 15 min at 1 Hz, enough for the live UI, the glide
+  /// coach and the running-trip charts. Everything older lives only in the
+  /// append-only WAL file until the stop path reads it back in one go.
+  /// The buffer never drops a sample that has NOT been written yet — a
+  /// broken WAL keeps the pre-#3878 behaviour (full list in memory).
+  static const int kLiveWindow = 900;
+
+  /// #3878 — samples captured over the whole trip (monotonic; the ring
+  /// may hold fewer) and the absolute index of `_capturedSamples[0]`.
+  int _capturedTotal = 0;
+  int _droppedFromFront = 0;
+  DateTime? _firstCapturedAt;
+
   /// Cap on the GPS diagnostics buffer (#1458 phase 2). At ~1 Hz GPS
   /// fix cadence the cap covers ~33 hours — comfortably above any
   /// plausible single trip and well below the trip-detail JSON
@@ -80,8 +94,40 @@ class TripSampleBuffer {
   /// captured sample carried an rpm (GPS-only trips, empty buffer).
   double get maxCapturedRpm => _maxCapturedRpm;
 
+  /// #3878 — samples captured since the trip began, INCLUDING those the
+  /// ring already released to the WAL.
+  int get capturedTotal => _capturedTotal;
+
+  /// #3878 — timestamp of the very first captured sample (survives the
+  /// ring releasing it).
+  DateTime? get firstCapturedAt => _firstCapturedAt;
+
+  /// #3878 — the captured samples from absolute index [from] on (a live
+  /// view; empty when everything from [from] was already released).
+  List<TripSample> capturedSince(int from) {
+    final start = from - _droppedFromFront;
+    if (start >= _capturedSamples.length) return const [];
+    return UnmodifiableListView(
+        _capturedSamples.sublist(start < 0 ? 0 : start));
+  }
+
+  /// #3878 — the WAL has [writtenTotal] samples on disk: release every
+  /// released-safe sample older than the live window. Never drops an
+  /// unwritten sample, never shrinks below [kLiveWindow].
+  void releaseWritten(int writtenTotal) {
+    final keepFrom = _capturedTotal - kLiveWindow;
+    final releasable = writtenTotal < keepFrom ? writtenTotal : keepFrom;
+    final drop = releasable - _droppedFromFront;
+    if (drop <= 0) return;
+    _capturedSamples.removeRange(0, drop);
+    _droppedFromFront += drop;
+    _capturedSamplesView = null;
+  }
+
   void _onCapture(TripSample sample) {
     _capturedSamplesView = null;
+    _capturedTotal++;
+    _firstCapturedAt ??= sample.timestamp;
     final rpm = sample.rpm ?? 0; // #2692 C4-G null→0
     if (rpm > _maxCapturedRpm) _maxCapturedRpm = rpm;
   }
@@ -105,11 +151,11 @@ class TripSampleBuffer {
     _lastCapturedAt = sample.timestamp;
     if (_capturedSamples.length > _capturedSampleCap) {
       // Drop the oldest slice — losing the early stretch is preferable
-      // to letting a forgotten overnight recording eat unbounded memory.
-      _capturedSamples.removeRange(
-        0,
-        _capturedSamples.length - _capturedSampleCap,
-      );
+      // to letting a forgotten overnight recording eat unbounded memory
+      // (only reachable with a broken WAL, #3878).
+      final drop = _capturedSamples.length - _capturedSampleCap;
+      _capturedSamples.removeRange(0, drop);
+      _droppedFromFront += drop;
     }
   }
 

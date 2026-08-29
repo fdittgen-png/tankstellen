@@ -183,6 +183,15 @@ mixin _TripRecordingSessionState {
   /// driven since), the last refresh attempt, and the in-flight guard of
   /// the periodic refresh.
   DateTime? _odometerLatestAt;
+
+  /// #3878 — the whole-trip sample list the stop path read back from the
+  /// WAL, for the finalise passes that need every sample (gear coaching);
+  /// null on the legacy in-memory path.
+  List<TripSample>? _allSamplesForFinalise;
+
+  /// #3878 — injected by the pipeline: reads the whole trip (WAL + ring)
+  /// for the grace-window finalise; null = legacy in-memory buffer.
+  Future<List<TripSample>> Function()? _allSamplesReader;
   double? _distanceKmAtOdometerLatest;
   DateTime? _odometerRefreshAt;
   bool _odometerRefreshInFlight = false;
@@ -269,6 +278,15 @@ mixin _TripRecordingSessionState {
   /// controller's state — the provider clones it into the persisted
   /// [TripHistoryEntry] at stop time.
   List<TripSample> get capturedSamples => _sampleBuffer.capturedSamples;
+
+  /// #3878 — whole-trip capture count and the unwritten tail for the WAL
+  /// flush; [releaseWrittenSamples] lets the flush shrink the in-memory
+  /// ring once the samples are on disk.
+  int get capturedTotal => _sampleBuffer.capturedTotal;
+  DateTime? get firstCapturedAt => _sampleBuffer.firstCapturedAt;
+  List<TripSample> capturedSince(int from) => _sampleBuffer.capturedSince(from);
+  void releaseWrittenSamples(int writtenTotal) =>
+      _sampleBuffer.releaseWritten(writtenTotal);
 
   /// O(1) newest captured sample (#3741) — glide-coach per-fix read.
   TripSample? get latestSample => _sampleBuffer.latestSample;

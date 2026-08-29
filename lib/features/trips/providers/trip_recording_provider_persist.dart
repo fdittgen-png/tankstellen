@@ -226,7 +226,9 @@ mixin _TripRecordingPersist
       final obd2Diagnostic = adapterMac == null
           ? null
           : Obd2CommDiagnostics.instance.captureForTrip();
-      await repo.save(TripHistoryEntry(
+      // #3878 — ONE entry: saved, then reused for the upload (no re-decode
+      // of the row just written).
+      final entry = TripHistoryEntry(
         id: id,
         vehicleId: vehicleId,
         summary: summary,
@@ -258,7 +260,8 @@ mixin _TripRecordingPersist
                 ? null
                 : const TripTermination(TripTerminationReason.userStopped)),
         sessionJournal: sessionJournal,
-      ));
+      );
+      await repo.save(entry);
       ref.read(tripHistoryListProvider.notifier).refresh();
       // #2392 — calibrate the vehicle's physicsScale from this trip's
       // OBD2 ground truth (no-op for GPS-only / suspect / too-short
@@ -288,13 +291,8 @@ mixin _TripRecordingPersist
           // upload, instead of deserialising + sorting every entry just
           // to discard all but the just-saved id. Falls back to a
           // freshly-built entry if the read missed (corrupt payload).
-          final entry = repo.loadById(id) ??
-              TripHistoryEntry(
-                id: id,
-                vehicleId: vehicleId,
-                summary: summary,
-                automatic: automatic,
-              );
+          // #3878 — the entry in hand IS the row (same fields, same
+          // samples); the old O(1) box lookup re-decoded every sample.
           // Fire-and-forget: an upload failure must not roll back the
           // local save. TripsSync swallows + debugPrints internally.
           unawaited(TripsSync.uploadSummary(entry));

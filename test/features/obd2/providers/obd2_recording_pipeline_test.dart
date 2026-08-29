@@ -243,6 +243,10 @@ class _Harness {
     // breadcrumb / reconnect / catalog reads exercise the same Riverpod
     // path the production notifier uses.
     pipeline = container.read(_pipelineProvider(host));
+    // #3878 — no WAL in this harness: the whole trip IS the controller's
+    // buffer (nothing was ever released).
+    host.allSamplesSource =
+        () => pipeline.controller?.capturedSamples.toList() ?? const [];
   }
 
   static const fakeMac = 'AA:BB:CC:00:11:22';
@@ -333,6 +337,13 @@ class _FakeWalHost implements Obd2RecordingPipelineHost {
 
   @override
   Future<void> clearActiveSnapshot() async => clearCount++;
+
+  /// #3878 — the pipeline reads the whole trip through the host; tests
+  /// point this at the controller's buffer.
+  List<TripSample> Function()? allSamplesSource;
+  @override
+  Future<List<TripSample>> readAllCapturedSamples() async =>
+      allSamplesSource?.call() ?? const [];
 
   @override
   Future<TripPersistOutcome> saveToHistory(

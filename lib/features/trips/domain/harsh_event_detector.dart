@@ -148,15 +148,16 @@ class HarshEventDetector {
   double _accelBelowSec = 0;
   double _brakeBelowSec = 0;
 
+  // #3878 — running counters; the getters used to scan the whole event
+  // list twice per buildSummary(), i.e. 8×/s at the 4 Hz emit cadence.
+  int _brakes = 0;
+  int _accelerations = 0;
+
   /// Number of harsh-braking events counted so far.
-  int get brakes => _events
-      .where((e) => e.type == HarshEventType.brake)
-      .length;
+  int get brakes => _brakes;
 
   /// Number of harsh-acceleration events counted so far.
-  int get accelerations => _events
-      .where((e) => e.type == HarshEventType.acceleration)
-      .length;
+  int get accelerations => _accelerations;
 
   /// Per-event detail captured since the detector was last reset
   /// (#2029). Surfaces the timestamped magnitude + speed needed for
@@ -293,6 +294,11 @@ class HarshEventDetector {
   /// flow through.
   void _record(HarshEvent event) {
     _events.add(event);
+    if (event.type == HarshEventType.brake) {
+      _brakes++;
+    } else {
+      _accelerations++;
+    }
     onEvent?.call(event);
   }
 
@@ -312,6 +318,8 @@ class HarshEventDetector {
   /// trip without discarding the detector instance.
   void reset() {
     _events.clear();
+    _brakes = 0;
+    _accelerations = 0;
     _speedWindow.clear();
     _anchorSpeedKmh = null;
     _anchorAt = null;

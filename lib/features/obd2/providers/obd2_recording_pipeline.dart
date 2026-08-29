@@ -163,6 +163,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       },
       breadcrumbCollector: breadcrumbs,
       gpsEstimateFolder: gpsEstimateFolder,
+      allSamplesReader: _host.readAllCapturedSamples, // #3878
       // #2663 — forward every (de-noised, post-#2653) harsh event onto the
       // app-wide bus so the driving-coach voice listener can speak it live.
       onHarshEvent: _ref.read(liveHarshEventBusProvider.notifier).add,
@@ -314,15 +315,14 @@ class Obd2RecordingPipeline implements RecordingPipeline {
         'where': 'Obd2RecordingPipeline.stop: refreshOdometer failed'
       }));
     }
-    // #1040/#1458 — snapshot both buffers BEFORE stop() tears the
-    // controller down, else the trip-detail charts render empty.
-    final capturedSamples = List<TripSample>.unmodifiable(ctl.capturedSamples);
-    final capturedGpsDiagnostics = List<GpsSampleDiagnostic>.unmodifiable(
-      ctl.capturedGpsSampleDiagnostics,
-    );
+    // #1040/#1458 — snapshot both buffers BEFORE stop() tears the controller
+    // down. #3878 — the whole trip comes back from the WAL (one isolate hop).
+    final capturedSamples = await _host.readAllCapturedSamples();
+    final capturedGpsDiagnostics =
+        List<GpsSampleDiagnostic>.unmodifiable(ctl.capturedGpsSampleDiagnostics);
     // #2431 — GPS-estimate back-fill when no fuel PID; no-op otherwise.
     final filled = Obd2GpsEstimateFallback.fillWhenNoFuelPid(
-      summary: await ctl.stop(),
+      summary: await ctl.stop(allSamples: capturedSamples),
       samples: capturedSamples,
       vehicle: _readActiveVehicle(),
     );
@@ -330,13 +330,9 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     final imuFusion = _imuFusion;
     _imuFusion = null;
     await imuFusion?.stop();
-    final summary = imuFusion == null
-        ? filled.summary
-        : imuFusion.applyTo(filled.summary);
+    final summary = imuFusion?.applyTo(filled.summary) ?? filled.summary;
     final odometerStartKm = ctl.odometerStartKm;
     final odometerLatestKm = ctl.odometerLatestKm;
-    final odometerLatestAt = ctl.odometerLatestAt; // #3877
-    final distanceKmAtOdometerLatest = ctl.distanceKmAtOdometerLatest;
     // #2509 — fix count BEFORE teardown (stationary-discard guard).
     final gpsFixCount = ctl.gpsFixCount;
     await _liveSub?.cancel();
@@ -394,8 +390,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       summary: summary,
       odometerStartKm: odometerStartKm,
       odometerLatestKm: odometerLatestKm,
-      odometerLatestAt: odometerLatestAt, // #3877
-      distanceKmAtOdometerLatest: distanceKmAtOdometerLatest,
+      odometerLatestAt: ctl.odometerLatestAt, // #3877
+      distanceKmAtOdometerLatest: ctl.distanceKmAtOdometerLatest,
       // #2509 — surface "no movement detected" only on a stationary discard.
       discardedNoMovement: outcome.isStationaryDiscard,
     );

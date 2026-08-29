@@ -84,6 +84,10 @@ class _RecordingPipelineHostAdapter implements Obd2RecordingPipelineHost {
 
   @override
   Future<void> clearActiveSnapshot() => _n._clearActiveSnapshot();
+
+  @override
+  Future<List<TripSample>> readAllCapturedSamples() =>
+      _n.readAllCapturedSamples(); // #3878
 }
 
 /// Outcome surfaced by [TripRecording.startTrip] so the UI layer can

@@ -50,3 +50,4 @@ reused. If a decision is reversed, the original ADR is marked
 | 0014 | Per-fuel-type efficiency attribution (dominant-fuel, Epic #2881) | Superseded |
 | 0015 | Per-fuel efficiency v2 — pure-vs-mix composition buckets (Epic #2881) | Accepted |
 | 0016 | Vehicle power state — engine-off start/stop as a car state, not a link failure (Epic #3855) | Accepted |
+| 0017 | Bounded-memory trip recording — live ring, WAL as source of truth, incremental aggregates, downsampled rendering (#3878) | Accepted |

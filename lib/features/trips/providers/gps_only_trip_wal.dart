@@ -41,8 +41,11 @@ class GpsOnlyTripWal {
   DateTime? _lastFlushAt;
   int _sinceFlush = 0;
 
-  /// #3758 — samples already streamed to the append-only WAL.
-  int _walWrittenCount = 0;
+  /// #3878 — samples captured since the last flush (appended to the WAL
+  /// at the next write), and — ONLY when the WAL is not writable — the
+  /// whole trip, so the legacy fat-row path still saves every sample.
+  final List<TripSample> _pending = <TripSample>[];
+  final List<TripSample> _fallbackAll = <TripSample>[];
 
   ActiveTripRepository? _repo() {
     if (_repoOverride != null) return _repoOverride;
@@ -70,24 +73,42 @@ class GpsOnlyTripWal {
     _lastFlushAt = null;
     _sinceFlush = 0;
     // #3758 — fresh trip, fresh append-only sample WAL.
-    _walWrittenCount = 0;
+    _pending.clear();
+    _fallbackAll.clear();
     unawaited(_repo()?.sampleWal?.openFresh());
-    _write(const [], _zeroSummary, force: true);
+    _write(_zeroSummary, force: true);
   }
 
-  /// Debounced flush — call after each appended sample.
-  void onSample(List<TripSample> samples, TripSummary summary) {
+  /// #3878 — true while the append-only WAL sink is open: the pipeline
+  /// may then keep only its live window in memory.
+  bool get walWritable => _repo()?.sampleWal?.isWritable ?? false;
+
+  /// Debounced flush — call after each captured sample (#3878: the
+  /// sample itself is queued here; the pipeline keeps no full list).
+  void onSample(TripSample sample, TripSummary summary) {
+    _pending.add(sample);
+    if (!walWritable) _fallbackAll.add(sample);
     _sinceFlush++;
     final now = DateTime.now();
     final due = _lastFlushAt == null ||
         now.difference(_lastFlushAt!) >= _flushInterval ||
         _sinceFlush >= _flushEveryNSamples;
-    if (due) _write(samples, summary, force: true);
+    if (due) _write(summary, force: true);
   }
 
   /// Force a flush now (app backgrounded — OS may kill us next).
-  void flushNow(List<TripSample> samples, TripSummary summary) =>
-      _write(samples, summary, force: true);
+  void flushNow(TripSummary summary) => _write(summary, force: true);
+
+  /// #3878 — every sample of the trip for the stop path: flush the
+  /// pending tail, then read the WAL back (one isolate hop); the
+  /// in-memory fallback list when the WAL was never writable.
+  Future<List<TripSample>> readAll() async {
+    _write(_zeroSummary, force: true, metaOnly: true);
+    final wal = _repo()?.sampleWal;
+    if (wal == null || !wal.isWritable) return List.unmodifiable(_fallbackAll);
+    final fromDisk = await wal.readAll();
+    return fromDisk.length >= _fallbackAll.length ? fromDisk : _fallbackAll;
+  }
 
   /// The trip is finished (saved to history) — drop the WAL so launch recovery
   /// never resurrects it.
@@ -96,8 +117,8 @@ class GpsOnlyTripWal {
     unawaited(_repo()?.clearSnapshot());
   }
 
-  void _write(List<TripSample> samples, TripSummary summary,
-      {required bool force}) {
+  void _write(TripSummary summary,
+      {required bool force, bool metaOnly = false}) {
     final id = _id;
     final startedAt = _startedAt;
     if (id == null || startedAt == null) return;
@@ -105,16 +126,19 @@ class GpsOnlyTripWal {
     if (repo == null) return;
     _lastFlushAt = DateTime.now();
     _sinceFlush = 0;
-    // #3758 — new samples once each into the append WAL; the snapshot
-    // row below shrinks to meta-only via the repo.
+    // #3758/#3878 — the pending samples once each into the append WAL;
+    // the snapshot row below is meta-only via the repo whenever the WAL
+    // is writable, else it carries the whole trip (legacy fat row).
     final wal = repo.sampleWal;
-    if (wal != null) {
-      for (var i = _walWrittenCount; i < samples.length; i++) {
-        wal.append(samples[i]);
+    if (wal != null && wal.isWritable) {
+      for (final s in _pending) {
+        wal.append(s);
       }
-      _walWrittenCount =
-          _walWrittenCount > samples.length ? _walWrittenCount : samples.length;
     }
+    _pending.clear();
+    if (metaOnly) return;
+    final samples =
+        (wal != null && wal.isWritable) ? const <TripSample>[] : _fallbackAll;
     unawaited(repo.saveSnapshot(ActiveTripSnapshot(
       id: id,
       vehicleId: _vehicleId,

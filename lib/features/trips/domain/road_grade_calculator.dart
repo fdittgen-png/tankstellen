@@ -63,6 +63,10 @@ class RoadGradeCalculator {
   /// noise-sensitive but slower to react to a real slope change.
   final double windowMeters;
 
+  /// #3878 — hard cap on retained points (a stationary car adds points
+  /// without advancing distance, so the distance trim alone never fires).
+  static const int kMaxPoints = 4000;
+
   /// Exponential-smoothing factor for altitude (0..1]. Lower is
   /// smoother (more noise rejection, more lag).
   final double smoothingFactor;
@@ -103,6 +107,11 @@ class RoadGradeCalculator {
     // Keep memory bounded — nothing past 2x the window is ever read.
     final cutoff = distanceM - windowMeters * 2;
     _points.removeWhere((p) => p.distanceM < cutoff);
+    // #3878 — and by COUNT: a stationary car adds points at the fold
+    // rate without advancing distance, so the distance trim never fires.
+    if (_points.length > kMaxPoints) {
+      _points.removeRange(0, _points.length - kMaxPoints);
+    }
   }
 
   /// The current grade estimate over the trailing [windowMeters].

@@ -125,6 +125,10 @@ abstract class DroppedSessionHost {
   /// auto-finalise can persist the same charts a normal stop would.
   List<TripSample> get capturedSamples;
 
+  /// #3878 — EVERY captured sample of the trip (the WAL plus the live
+  /// ring). The grace-window finalise persists this, not the ring.
+  Future<List<TripSample>> collectAllSamples();
+
   /// The per-fix GPS cadence diagnostics captured so far (#2291).
   /// Persisted alongside [capturedSamples] so a grace-finalised trip
   /// carries the same diagnostics payload as a normally-stopped one.

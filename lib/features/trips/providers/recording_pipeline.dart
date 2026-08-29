@@ -199,6 +199,9 @@ abstract class Obd2RecordingPipelineHost implements RecordingPipelineHost {
 
   /// Drop the persisted snapshot once the trip is finalised in history.
   Future<void> clearActiveSnapshot();
+
+  /// #3878 — every captured sample of the running trip (WAL + ring).
+  Future<List<TripSample>> readAllCapturedSamples();
 }
 
 /// Returned by [TripRecording.stop] / [RecordingPipeline.stop]. Bundles

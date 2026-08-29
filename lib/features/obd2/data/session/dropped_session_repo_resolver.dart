@@ -125,7 +125,7 @@ class DroppedSessionRepoResolver {
           id: id,
           vehicleId: host.vehicleId,
           summary: host.buildFinalSummary(),
-          samples: host.capturedSamples,
+          samples: await host.collectAllSamples(), // #3878
           gpsSampleDiagnostics: host.capturedGpsSampleDiagnostics,
           automatic: host.automatic,
           // #3795 — the link never came back and the grace elapsed; the
