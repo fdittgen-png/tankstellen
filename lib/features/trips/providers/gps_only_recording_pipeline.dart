@@ -71,6 +71,9 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
   @override
   bool resume() => false;
 
+  @override
+  bool dismissParkedPrompt() => false; // #3862 — no engine to be off
+
   /// #3438 — the app was backgrounded: force-flush the WAL immediately so
   /// an imminent OS kill loses at most the fixes since this write, not the
   /// whole debounce window. No-op between trips (the recorder is null).

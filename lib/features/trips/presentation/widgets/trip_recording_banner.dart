@@ -23,6 +23,7 @@ import '../../../obd2/api.dart';
 import '../../../driving_score/api.dart';
 import '../../domain/situation_classifier.dart';
 import '../../providers/live_activity_provider.dart';
+import 'parked_prompt_pill.dart';
 import '../../../fill_ups/api.dart';
 import '../../providers/pip_mode_provider.dart';
 import '../../providers/trip_recording_provider.dart';
@@ -288,10 +289,10 @@ class TripRecordingBanner extends ConsumerWidget {
                 top: 8,
                 left: 12,
                 right: 12,
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: GpsDegradedBanner(),
-                ),
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  GpsDegradedBanner(),
+                  ParkedPromptPill(), // #3862 — stacks under the engine pill
+                ]),
               ),
             ],
           ),

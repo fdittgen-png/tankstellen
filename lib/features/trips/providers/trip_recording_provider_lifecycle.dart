@@ -72,6 +72,12 @@ mixin _TripRecordingLifecycle
     }
   }
 
+  /// #3862 — "Keep": stay recording, do not ask again this session.
+  void dismissParkedPrompt() {
+    _pipeline?.dismissParkedPrompt();
+    state = state.copyWith(parkedPromptDue: false);
+  }
+
   void resume() {
     // #2227 — a live pipeline owns the controller. Mirror the original
     // ordering exactly: the phase guard is checked BEFORE the controller
