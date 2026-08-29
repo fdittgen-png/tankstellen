@@ -205,10 +205,10 @@ void main() {
       final raw =
           Hive.box<dynamic>(Obd2ConnectTracePersistence.boxName).values.single
               as String;
-      expect(raw, isNot(contains('AA:BB')),
+      expect(raw, isNot(contains('EE:F')),
           reason: 'the raw MAC must never reach disk');
       expect((jsonDecode(raw) as Map<String, dynamic>)['mac'],
-          endsWith('E:F1'));
+          startsWith('AA:BB:CC'));
     });
   });
 }

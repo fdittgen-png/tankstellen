@@ -145,8 +145,8 @@ void main() {
     final service = svc(classic: _RealClassicFacade(plugin));
     await service.connectByMacClassicDirect('AA:BB:CC:DD:EE:F1');
     final trace = lastTrace();
-    expect(trace.requestedMac, endsWith('E:F1'));
-    expect(trace.requestedMac, isNot(contains('AA:BB')));
+    expect(trace.requestedMac, startsWith('AA:BB:CC'));
+    expect(trace.requestedMac, isNot(contains('EE:F')));
   });
 
   // ---- #3014 (Epic #3013, Phase 1) — every attempt traced WITH the name -----
@@ -188,7 +188,7 @@ void main() {
         adapterName: 'vLinker FS 1234');
     final trace = lastTrace();
     // The PII redaction still holds…
-    expect(trace.requestedMac, endsWith('E:F1'));
+    expect(trace.requestedMac, startsWith('AA:BB:CC'));
     // …AND the human name is now carried (the assertion the prior test only
     // checked the MAC for — false-green on the name).
     expect(trace.adapterName, 'vLinker FS 1234');

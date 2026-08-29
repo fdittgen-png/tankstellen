@@ -58,14 +58,14 @@ void main() {
     expect(doc.rootElement.getAttribute('schema'), '1');
   });
 
-  test('redacts the BLE MAC to its last four characters', () {
+  test('redacts the BLE MAC to its vendor prefix (#3870)', () {
     final xml = formatObd2DebugSessionXml(buildSession());
     expect(xml, isNot(contains('AA:BB:CC:DD:EE:FF')));
     final mac = XmlDocument.parse(xml)
         .rootElement
         .getElement('Adapter')!
         .getAttribute('mac')!;
-    expect(mac, endsWith('E:FF'));
+    expect(mac, startsWith('AA:BB:CC'));
     expect(mac, contains('·'));
   });
 

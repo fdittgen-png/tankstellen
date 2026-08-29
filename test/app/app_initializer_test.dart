@@ -162,8 +162,13 @@ void main() {
       expect(runBody, isNot(contains('appRunner')),
           reason: 'Sentry.init must not wrap runApp via appRunner — that '
               'forces it onto the cold-start critical path (#1769)');
-      expect(runBody, contains('SentryFlutter.init'),
+      // #3866 — the init moved into _startSentry so the consent hook can
+      // start/stop the SDK in-session; run() still schedules it deferred.
+      expect(runBody, contains('_startSentry'),
           reason: 'Sentry is still initialised, just off the critical path');
+      final startBody =
+          _extractMethodBody(initSource, 'static Future<void> _startSentry');
+      expect(startBody, contains('SentryFlutter.init'));
     });
   });
 

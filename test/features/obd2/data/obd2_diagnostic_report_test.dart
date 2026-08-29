@@ -65,7 +65,7 @@ void main() {
         reason: 'the firmware detail must survive into the report');
   });
 
-  test('MAC is redacted to its last four characters', () {
+  test('MAC is redacted to its vendor prefix (#3870)', () {
     final String report = formatObd2DiagnosticReport(
       <AutoRecordEvent>[
         AutoRecordEvent(
@@ -79,8 +79,8 @@ void main() {
     // The full MAC is PII and must never appear verbatim.
     expect(report, isNot(contains('AA:BB:CC:DD:EE:FF')));
     // Only the trailing four characters survive, the rest masked.
-    expect(report, contains('E:FF'));
-    expect(report, isNot(contains('AA:BB')));
+    expect(report, contains('AA:BB:CC'));
+    expect(report, isNot(contains('EE:F')));
     expect(report, contains('·'),
         reason: 'redacted characters are shown as the middle dot');
   });

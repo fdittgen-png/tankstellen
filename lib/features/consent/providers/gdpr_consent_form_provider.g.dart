@@ -44,7 +44,7 @@ final class GdprConsentFormControllerProvider
 }
 
 String _$gdprConsentFormControllerHash() =>
-    r'08bff108a5d26e421e1d2893eb6697f2dc27839a';
+    r'e6f62321060d296dc8be932e4a41c4489ab3392e';
 
 abstract class _$GdprConsentFormController
     extends $Notifier<GdprConsentFormState> {

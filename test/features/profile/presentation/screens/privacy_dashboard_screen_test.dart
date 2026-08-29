@@ -16,6 +16,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/sharing/public_file_exporter.dart';
 import 'package:tankstellen/core/telemetry/storage/trace_storage.dart';
+import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/core/sync/sync_config.dart';
 import 'package:tankstellen/core/sync/sync_provider.dart';
@@ -348,6 +349,38 @@ void main() {
       );
 
       expect(find.textContaining('Your data belongs to you'), findsOneWidget);
+    });
+
+    // #3871 — the device-local block list is managed from the dashboard.
+    testWidgets('mounts the blocked-users card with the persisted ids and '
+        'their Unblock action', (tester) async {
+      await _setTallSurface(tester);
+      when(() => mockStorage.getSetting(StorageKeys.blockedContentAuthorIds))
+          .thenReturn(['user-alice']);
+      when(() => mockStorage.putSetting(any<String>(), any<dynamic>()))
+          .thenAnswer((_) async {});
+      await pumpApp(
+        tester,
+        const PrivacyDashboardScreen(),
+        overrides: overrides(),
+      );
+
+      expect(find.text('Blocked users'), findsOneWidget);
+      expect(find.text('user-alice'), findsOneWidget);
+
+      await tester.tap(
+        find.byKey(const Key('blocked_author_unblock_user-alice')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('user-alice'), findsNothing);
+      expect(find.text('No blocked users'), findsOneWidget);
+      verify(
+        () => mockStorage.putSetting(
+          StorageKeys.blockedContentAuthorIds,
+          <String>[],
+        ),
+      ).called(1);
     });
 
     testWidgets('shows estimated storage size', (tester) async {
