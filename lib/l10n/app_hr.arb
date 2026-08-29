@@ -4815,5 +4815,22 @@
   "permissionRationaleNotificationsBulletLocal": "Obavijesti se koriste za lokalna upozorenja o cijenama i status snimanja putovanja.",
   "permissionRationaleNotificationsBulletNothingLeaves": "Generiraju se na vašem uređaju — ništa ne napušta uređaj.",
   "permissionRationaleRevoke": "To možete opozvati u bilo kojem trenutku u postavkama uređaja.",
-  "permissionRationaleLegalBasis": "Pravna osnova: čl. 6. st. 1. t. (a) GDPR-a (privola)"
+  "permissionRationaleLegalBasis": "Pravna osnova: čl. 6. st. 1. t. (a) GDPR-a (privola)",
+  "fillUpOdometerFromCarJustNow": "Iz vašeg vozila · upravo sada",
+  "fillUpOdometerFromCarAt": "Iz vašeg vozila · {when}",
+  "@fillUpOdometerFromCarAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpOdometerEstimatedAt": "Procijenjeno iz zadnjeg očitanja vozila i udaljenosti prijeđene otada ({when})",
+  "@fillUpOdometerEstimatedAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  }
 }

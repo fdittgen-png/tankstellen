@@ -31,6 +31,23 @@ mixin _TripRecordingPowerWatch
         if (v != null) _pendingVoltageStamp = v;
       }));
     }
+    // #3877 — re-read the odometer every few minutes while the engine
+    // runs, only on a car that answered at trip start (no stalls on an
+    // unsupported car) and never over protocol work.
+    final lastRefresh = _odometerRefreshAt ?? _odometerLatestAt;
+    if (_odometerLatestKm != null &&
+        !_odometerRefreshInFlight &&
+        _service.isConnected &&
+        !_protocolWorkInFlight &&
+        !_degradedGpsOnly &&
+        power.engineRunning &&
+        (lastRefresh == null ||
+            now.difference(lastRefresh) >=
+                TripRecordingController.odometerRefreshInterval)) {
+      _odometerRefreshInFlight = true;
+      unawaited(refreshOdometer()
+          .whenComplete(() => _odometerRefreshInFlight = false));
+    }
     power.tick();
     final engineOffWait = _degradedGpsOnly &&
         _droppedSession.dropReason == TripDropReason.engineOff;

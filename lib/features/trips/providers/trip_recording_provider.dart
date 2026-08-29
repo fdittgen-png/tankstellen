@@ -10,11 +10,15 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/feedback/auto_record_badge_provider.dart';
 import '../../../core/feedback/auto_record_badge_service.dart';
 import '../../../core/storage/hive_boxes.dart';
+import '../../../core/time/app_clock.dart';
 import '../data/trips_sync.dart';
 import '../../../core/sync/trips_sync_enabled_provider.dart';
 import '../../feature_management/api.dart';
 import '../../../core/domain/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
+import '../../vehicle/api.dart'
+    show VehicleOdometerSnapshot, VehicleOdometerSource,
+        vehicleOdometerSnapshotStoreProvider;
 import '../../obd2/api.dart';
 import '../data/trip_history_repository.dart';
 import '../domain/entities/gps_sample_diagnostic.dart';

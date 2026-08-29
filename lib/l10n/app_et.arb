@@ -4815,5 +4815,22 @@
   "permissionRationaleNotificationsBulletLocal": "Teavitusi kasutatakse kohalike hinnateatiste ja sõidu salvestamise oleku jaoks.",
   "permissionRationaleNotificationsBulletNothingLeaves": "Need luuakse teie seadmes — miski ei lahku seadmest.",
   "permissionRationaleRevoke": "Saate selle igal ajal seadme seadetes tühistada.",
-  "permissionRationaleLegalBasis": "Õiguslik alus: isikuandmete kaitse üldmääruse art 6 lg 1 p a (nõusolek)"
+  "permissionRationaleLegalBasis": "Õiguslik alus: isikuandmete kaitse üldmääruse art 6 lg 1 p a (nõusolek)",
+  "fillUpOdometerFromCarJustNow": "Teie autost · just praegu",
+  "fillUpOdometerFromCarAt": "Teie autost · {when}",
+  "@fillUpOdometerFromCarAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpOdometerEstimatedAt": "Hinnang auto viimase näidu ja sellest ajast läbitud vahemaa põhjal ({when})",
+  "@fillUpOdometerEstimatedAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  }
 }

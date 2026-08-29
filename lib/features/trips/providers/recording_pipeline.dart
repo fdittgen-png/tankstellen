@@ -215,6 +215,11 @@ class StoppedTripResult {
   final double? odometerStartKm;
   final double? odometerLatestKm;
 
+  /// #3877 — when [odometerLatestKm] was read and the trip distance at
+  /// that instant; both null on the legacy path.
+  final DateTime? odometerLatestAt;
+  final double? distanceKmAtOdometerLatest;
+
   /// #2509 — true when the trip was discarded as genuinely stationary (no
   /// distance, no usable signal). The recording screen surfaces a
   /// localized "no movement detected" notice in this case so a Stop tap
@@ -227,6 +232,8 @@ class StoppedTripResult {
     required this.summary,
     required this.odometerStartKm,
     required this.odometerLatestKm,
+    this.odometerLatestAt,
+    this.distanceKmAtOdometerLatest,
     this.discardedNoMovement = false,
   });
 
@@ -241,14 +248,29 @@ class StoppedTripResult {
         ),
         odometerStartKm = null,
         odometerLatestKm = null,
+        odometerLatestAt = null,
+        distanceKmAtOdometerLatest = null,
         discardedNoMovement = false;
 
   /// End-of-trip km, derived: latest odometer read if we have one,
   /// otherwise start + integrated distance. Null when neither
   /// odometer read ever succeeded.
-  double? get endOdometerKm =>
-      odometerLatestKm ??
-      (odometerStartKm == null
-          ? null
-          : odometerStartKm! + summary.distanceKm);
+  double? get endOdometerKm {
+    final latest = odometerLatestKm;
+    if (latest != null) return latest + _distanceSinceLatestKm;
+    final start = odometerStartKm;
+    return start == null ? null : start + summary.distanceKm;
+  }
+
+  /// #3877 — true when [endOdometerKm] IS a reading (the car answered
+  /// within the last ~50 m of the trip), false when it is a reading plus
+  /// the distance driven since, or start + distance.
+  bool get endOdometerIsReading =>
+      odometerLatestKm != null && _distanceSinceLatestKm < 0.05;
+
+  double get _distanceSinceLatestKm {
+    final since =
+        summary.distanceKm - (distanceKmAtOdometerLatest ?? summary.distanceKm);
+    return since > 0 ? since : 0;
+  }
 }

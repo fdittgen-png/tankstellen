@@ -23,6 +23,7 @@ import '../../../obd2/api.dart';
 import '../../../driving_score/api.dart';
 import '../../domain/situation_classifier.dart';
 import '../../providers/live_activity_provider.dart';
+import '../../providers/vehicle_odometer_tracker.dart';
 import 'parked_prompt_pill.dart';
 import '../../../fill_ups/api.dart';
 import '../../providers/pip_mode_provider.dart';
@@ -95,6 +96,7 @@ class TripRecordingBanner extends ConsumerWidget {
     // keeps it alive for backgrounded recordings on every route.
     try {
       ref.watch(obd2FuelLevelTrackerProvider);
+      ref.watch(vehicleOdometerTrackerProvider); // #3877
     } on Object {
       // best-effort — a harness without the recording graph skips it
     }

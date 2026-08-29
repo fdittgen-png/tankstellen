@@ -34,3 +34,5 @@ export 'providers/vehicle_providers.dart';
 export 'providers/vin_decoder_provider.dart';
 // #3869 — the one-ZIP export serialises service reminders.
 export 'domain/entities/service_reminder.dart' show ServiceReminder;
+// #3877 — the per-vehicle OBD2 odometer snapshot (fill-up prefill source).
+export 'data/vehicle_odometer_snapshot_store.dart';

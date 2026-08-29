@@ -27,6 +27,10 @@ import '../../domain/fill_up_auto_cost_calculator.dart';
 import '../../domain/fill_up_variance.dart';
 import '../../providers/consumption_providers.dart';
 import '../../../obd2/api.dart';
+import '../../../vehicle/api.dart'
+    show VehicleOdometerSnapshot, VehicleOdometerSource,
+        vehicleOdometerSnapshotStoreProvider;
+import '../../../../core/time/app_clock.dart';
 import '../widgets/add_fill_up_form_fields.dart';
 import '../widgets/fill_up_no_vehicle_cta.dart';
 import '../widgets/fill_up_paste_receipt_handler.dart';
@@ -125,6 +129,14 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen>
     // value without spinning up the trip-recording graph.
     _fuelLevelBeforeL =
         widget.initialFuelLevelBeforeL ?? _readObd2FuelLevelLitres();
+    // #3877 — a user edit of a prefilled odometer drops the "from your
+    // car" note (and makes the field count as dirty again).
+    _odoCtrl.addListener(() {
+      final p = _odometerPrefill;
+      if (p != null && _odoCtrl.text != p.text) {
+        setState(() => _odometerPrefill = null);
+      }
+    });
     // #2735/#2838 — when an OS share intent routed the user here, prefill
     // from it after the first frame: image/PDF OCR'd, e-receipt text applied
     // (one helper drains both stashes; lives in the widgets file, #1680).
@@ -168,6 +180,13 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen>
       vehicles = const [];
     }
     _initVehicleIfNeeded(vehicles);
+    // #3877 — prefill the odometer from the car once the vehicle is known.
+    if (!_odometerPrefillScheduled && _vehicleId != null) {
+      _odometerPrefillScheduled = true;
+      final id = _vehicleId;
+      WidgetsBinding.instance.addPostFrameCallback(
+          (_) => unawaited(_prefillOdometerFromCar(id)));
+    }
 
     // #706 — consumption requires a vehicle. When none are configured,
     // show an empty-state CTA instead of the full form.
@@ -224,6 +243,12 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen>
               vehicleId: _vehicleId,
               vehicles: vehicles,
               onVehicleChanged: (id, selected) {
+                // #3877 — a different car has a different odometer.
+                if (_odometerPrefill != null) {
+                  _odoCtrl.clear();
+                  _odometerPrefill = null;
+                }
+                unawaited(_prefillOdometerFromCar(id));
                 setState(() {
                   _vehicleId = id;
                   if (selected.multiFuelCapable) {
@@ -255,6 +280,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen>
               litersCtrl: _litersCtrl,
               costCtrl: _costCtrl,
               odoCtrl: _odoCtrl,
+              odometerNote: _odometerPrefillNote(l, context), // #3877
               notesCtrl: _notesCtrl,
               onReportBadScan: _lastScan != null ? _reportBadScan : null,
             ),

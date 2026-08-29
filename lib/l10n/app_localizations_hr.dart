@@ -5067,6 +5067,19 @@ class AppLocalizationsHr extends AppLocalizations {
   String get fillUpGuidancePartNight => 'noću';
 
   @override
+  String get fillUpOdometerFromCarJustNow => 'Iz vašeg vozila · upravo sada';
+
+  @override
+  String fillUpOdometerFromCarAt(String when) {
+    return 'Iz vašeg vozila · $when';
+  }
+
+  @override
+  String fillUpOdometerEstimatedAt(String when) {
+    return 'Procijenjeno iz zadnjeg očitanja vozila i udaljenosti prijeđene otada ($when)';
+  }
+
+  @override
   String get fillUpImportPasteLabel => 'Zalijepi tekst';
 
   @override

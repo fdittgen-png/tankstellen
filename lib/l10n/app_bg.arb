@@ -4815,5 +4815,22 @@
   "permissionRationaleNotificationsBulletLocal": "Известията се използват за локални ценови сигнали и за състоянието на записа на пътуването.",
   "permissionRationaleNotificationsBulletNothingLeaves": "Те се генерират на вашето устройство — нищо не напуска устройството.",
   "permissionRationaleRevoke": "Можете да отмените това по всяко време в настройките на устройството.",
-  "permissionRationaleLegalBasis": "Правно основание: чл. 6, пар. 1, б. „а“ от ОРЗД (съгласие)"
+  "permissionRationaleLegalBasis": "Правно основание: чл. 6, пар. 1, б. „а“ от ОРЗД (съгласие)",
+  "fillUpOdometerFromCarJustNow": "От автомобила ви · току-що",
+  "fillUpOdometerFromCarAt": "От автомобила ви · {when}",
+  "@fillUpOdometerFromCarAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpOdometerEstimatedAt": "Изчислено от последното отчитане на автомобила плюс изминатото оттогава разстояние ({when})",
+  "@fillUpOdometerEstimatedAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  }
 }

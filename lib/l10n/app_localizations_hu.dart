@@ -5084,6 +5084,19 @@ class AppLocalizationsHu extends AppLocalizations {
   String get fillUpGuidancePartNight => 'éjjel';
 
   @override
+  String get fillUpOdometerFromCarJustNow => 'Az autójából · az imént';
+
+  @override
+  String fillUpOdometerFromCarAt(String when) {
+    return 'Az autójából · $when';
+  }
+
+  @override
+  String fillUpOdometerEstimatedAt(String when) {
+    return 'Becslés az autó utolsó leolvasásából és az azóta megtett távolságból ($when)';
+  }
+
+  @override
   String get fillUpImportPasteLabel => 'Szöveg beillesztése';
 
   @override

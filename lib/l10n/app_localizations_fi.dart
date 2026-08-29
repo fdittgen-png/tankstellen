@@ -5055,6 +5055,19 @@ class AppLocalizationsFi extends AppLocalizations {
   String get fillUpGuidancePartNight => 'öisin';
 
   @override
+  String get fillUpOdometerFromCarJustNow => 'Autostasi · juuri nyt';
+
+  @override
+  String fillUpOdometerFromCarAt(String when) {
+    return 'Autostasi · $when';
+  }
+
+  @override
+  String fillUpOdometerEstimatedAt(String when) {
+    return 'Arvioitu auton viimeisimmästä lukemasta ja sen jälkeen ajetusta matkasta ($when)';
+  }
+
+  @override
   String get fillUpImportPasteLabel => 'Liitä teksti';
 
   @override

@@ -4815,5 +4815,22 @@
   "permissionRationaleNotificationsBulletLocal": "Notificările sunt folosite pentru alerte de prețuri locale și starea înregistrării călătoriei.",
   "permissionRationaleNotificationsBulletNothingLeaves": "Sunt generate pe dispozitivul dvs. — nimic nu părăsește dispozitivul.",
   "permissionRationaleRevoke": "Puteți revoca acest lucru oricând din setările dispozitivului.",
-  "permissionRationaleLegalBasis": "Temei juridic: art. 6 alin. (1) lit. (a) din RGPD (consimțământ)"
+  "permissionRationaleLegalBasis": "Temei juridic: art. 6 alin. (1) lit. (a) din RGPD (consimțământ)",
+  "fillUpOdometerFromCarJustNow": "Din mașina dvs. · chiar acum",
+  "fillUpOdometerFromCarAt": "Din mașina dvs. · {when}",
+  "@fillUpOdometerFromCarAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpOdometerEstimatedAt": "Estimat din ultima citire a mașinii plus distanța parcursă de atunci ({when})",
+  "@fillUpOdometerEstimatedAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -5048,6 +5048,19 @@ class AppLocalizationsDa extends AppLocalizations {
   String get fillUpGuidancePartNight => 'om natten';
 
   @override
+  String get fillUpOdometerFromCarJustNow => 'Fra din bil · lige nu';
+
+  @override
+  String fillUpOdometerFromCarAt(String when) {
+    return 'Fra din bil · $when';
+  }
+
+  @override
+  String fillUpOdometerEstimatedAt(String when) {
+    return 'Anslået ud fra bilens seneste aflæsning plus den kørte afstand siden da ($when)';
+  }
+
+  @override
   String get fillUpImportPasteLabel => 'Indsæt tekst';
 
   @override

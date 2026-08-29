@@ -204,6 +204,10 @@ class StorageKeys {
   static const String obd2FuelLevelSnapshotPrefix =
       'obd2_fuel_level_snapshot_';
 
+  /// #3877 — per-vehicle latest odometer from OBD2 (`{km, at, src}`), the
+  /// fill-up form's prefill source. One entry per vehicle id.
+  static const String obd2OdometerSnapshotPrefix = 'obd2_odometer_snapshot_';
+
   /// #3726 — device-local block list for community-content authors
   /// (Play UGC policy). Stores the TankSync user ids whose shared
   /// content ("Shared with me" trips, and any future community surface)

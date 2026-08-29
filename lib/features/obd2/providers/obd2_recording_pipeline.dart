@@ -335,6 +335,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
         : imuFusion.applyTo(filled.summary);
     final odometerStartKm = ctl.odometerStartKm;
     final odometerLatestKm = ctl.odometerLatestKm;
+    final odometerLatestAt = ctl.odometerLatestAt; // #3877
+    final distanceKmAtOdometerLatest = ctl.distanceKmAtOdometerLatest;
     // #2509 — fix count BEFORE teardown (stationary-discard guard).
     final gpsFixCount = ctl.gpsFixCount;
     await _liveSub?.cancel();
@@ -392,6 +394,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       summary: summary,
       odometerStartKm: odometerStartKm,
       odometerLatestKm: odometerLatestKm,
+      odometerLatestAt: odometerLatestAt, // #3877
+      distanceKmAtOdometerLatest: distanceKmAtOdometerLatest,
       // #2509 — surface "no movement detected" only on a stationary discard.
       discardedNoMovement: outcome.isStationaryDiscard,
     );

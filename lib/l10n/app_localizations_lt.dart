@@ -5081,6 +5081,19 @@ class AppLocalizationsLt extends AppLocalizations {
   String get fillUpGuidancePartNight => 'naktimis';
 
   @override
+  String get fillUpOdometerFromCarJustNow => 'Iš jūsų automobilio · ką tik';
+
+  @override
+  String fillUpOdometerFromCarAt(String when) {
+    return 'Iš jūsų automobilio · $when';
+  }
+
+  @override
+  String fillUpOdometerEstimatedAt(String when) {
+    return 'Apskaičiuota pagal paskutinį automobilio rodmenį ir nuo tada nuvažiuotą atstumą ($when)';
+  }
+
+  @override
   String get fillUpImportPasteLabel => 'Įklijuoti tekstą';
 
   @override

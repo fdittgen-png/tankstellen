@@ -4815,5 +4815,22 @@
   "permissionRationaleNotificationsBulletLocal": "Varsler brukes til lokale prisalarmer og status for turopptaket.",
   "permissionRationaleNotificationsBulletNothingLeaves": "De genereres på enheten din — ingenting forlater enheten.",
   "permissionRationaleRevoke": "Du kan når som helst trekke dette tilbake i enhetsinnstillingene.",
-  "permissionRationaleLegalBasis": "Rettslig grunnlag: GDPR art. 6 nr. 1 bokstav a (samtykke)"
+  "permissionRationaleLegalBasis": "Rettslig grunnlag: GDPR art. 6 nr. 1 bokstav a (samtykke)",
+  "fillUpOdometerFromCarJustNow": "Fra bilen din · akkurat nå",
+  "fillUpOdometerFromCarAt": "Fra bilen din · {when}",
+  "@fillUpOdometerFromCarAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpOdometerEstimatedAt": "Anslått ut fra bilens siste avlesning pluss distansen kjørt siden da ({when})",
+  "@fillUpOdometerEstimatedAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  }
 }

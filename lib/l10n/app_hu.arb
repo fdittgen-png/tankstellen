@@ -4815,5 +4815,22 @@
   "permissionRationaleNotificationsBulletLocal": "Az értesítések helyi áriasztásokhoz és az útrögzítés állapotához használatosak.",
   "permissionRationaleNotificationsBulletNothingLeaves": "Az Ön eszközén jönnek létre — semmi nem hagyja el az eszközt.",
   "permissionRationaleRevoke": "Ezt bármikor visszavonhatja az eszköz beállításaiban.",
-  "permissionRationaleLegalBasis": "Jogalap: a GDPR 6. cikk (1) bekezdés a) pontja (hozzájárulás)"
+  "permissionRationaleLegalBasis": "Jogalap: a GDPR 6. cikk (1) bekezdés a) pontja (hozzájárulás)",
+  "fillUpOdometerFromCarJustNow": "Az autójából · az imént",
+  "fillUpOdometerFromCarAt": "Az autójából · {when}",
+  "@fillUpOdometerFromCarAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpOdometerEstimatedAt": "Becslés az autó utolsó leolvasásából és az azóta megtett távolságból ({when})",
+  "@fillUpOdometerEstimatedAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  }
 }

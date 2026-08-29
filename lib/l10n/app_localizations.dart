@@ -8864,6 +8864,24 @@ abstract class AppLocalizations {
   /// **'nights'**
   String get fillUpGuidancePartNight;
 
+  /// Note under the odometer field of the Add fill-up form when the value was just read from the car over OBD2.
+  ///
+  /// In en, this message translates to:
+  /// **'From your car · just now'**
+  String get fillUpOdometerFromCarJustNow;
+
+  /// Note under the odometer field when the value is the car's last OBD2 reading; {when} is a formatted date/time.
+  ///
+  /// In en, this message translates to:
+  /// **'From your car · {when}'**
+  String fillUpOdometerFromCarAt(String when);
+
+  /// Note under the odometer field when the value is the car's last reading plus GPS/OBD distance driven since; {when} is a formatted date/time.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated from your car\'s last reading plus the distance driven since ({when})'**
+  String fillUpOdometerEstimatedAt(String when);
+
   /// Label of the third import button on the Add-Fill-Up form that opens a dialog to paste a digital fuel-receipt's text (no camera, no cloud) and pre-fill the form from it (#2687).
   ///
   /// In en, this message translates to:

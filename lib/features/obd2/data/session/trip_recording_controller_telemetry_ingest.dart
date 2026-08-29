@@ -188,8 +188,30 @@ mixin _TripRecordingTelemetryIngest on _TripRecordingSessionState {
   /// the save-as-fill-up gets a ground-truth end km rather than a
   /// derived value.
   Future<void> refreshOdometer() async {
+    _odometerRefreshAt = _now();
     final km = await _service.readOdometerKm();
-    if (km != null) _odometerLatestKm = km;
+    if (km == null) return;
+    _odometerLatestKm = km;
+    // #3877 — remember WHEN and at WHICH trip distance, so a stop that
+    // happens after this reading can add the distance driven since.
+    _odometerLatestAt = _now();
+    _distanceKmAtOdometerLatest = currentDistanceKm;
+  }
+
+  /// #3877 — instant of the latest successful odometer reading.
+  DateTime? get odometerLatestAt => _odometerLatestAt;
+
+  /// #3877 — trip distance at the latest reading (see [refreshOdometer]).
+  double? get distanceKmAtOdometerLatest => _distanceKmAtOdometerLatest;
+
+  /// #3877 — the best current odometer: the latest reading plus the
+  /// distance driven since it; null when the car never answered.
+  double? get estimatedOdometerNowKm {
+    final latest = _odometerLatestKm;
+    if (latest == null) return null;
+    final since = currentDistanceKm -
+        (_distanceKmAtOdometerLatest ?? currentDistanceKm);
+    return latest + (since > 0 ? since : 0);
   }
 
   /// Distance covered by the current trip so far (#800).

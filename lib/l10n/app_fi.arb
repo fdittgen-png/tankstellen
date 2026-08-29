@@ -4815,5 +4815,22 @@
   "permissionRationaleNotificationsBulletLocal": "Ilmoituksia käytetään paikallisiin hintahälytyksiin ja matkan tallennuksen tilaan.",
   "permissionRationaleNotificationsBulletNothingLeaves": "Ne luodaan laitteellasi — mikään ei poistu laitteelta.",
   "permissionRationaleRevoke": "Voit peruuttaa tämän milloin tahansa laitteen asetuksista.",
-  "permissionRationaleLegalBasis": "Oikeusperuste: yleisen tietosuoja-asetuksen 6 artiklan 1 kohdan a alakohta (suostumus)"
+  "permissionRationaleLegalBasis": "Oikeusperuste: yleisen tietosuoja-asetuksen 6 artiklan 1 kohdan a alakohta (suostumus)",
+  "fillUpOdometerFromCarJustNow": "Autostasi · juuri nyt",
+  "fillUpOdometerFromCarAt": "Autostasi · {when}",
+  "@fillUpOdometerFromCarAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpOdometerEstimatedAt": "Arvioitu auton viimeisimmästä lukemasta ja sen jälkeen ajetusta matkasta ({when})",
+  "@fillUpOdometerEstimatedAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  }
 }

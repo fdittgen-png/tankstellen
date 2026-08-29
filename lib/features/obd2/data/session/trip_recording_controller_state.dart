@@ -177,6 +177,15 @@ mixin _TripRecordingSessionState {
   DateTime? _gpsEndedAt;
   double? _odometerStartKm;
   double? _odometerLatestKm;
+
+  /// #3877 — when [_odometerLatestKm] was read, the trip distance at that
+  /// instant (so the end-of-trip km can be estimated as reading + distance
+  /// driven since), the last refresh attempt, and the in-flight guard of
+  /// the periodic refresh.
+  DateTime? _odometerLatestAt;
+  double? _distanceKmAtOdometerLatest;
+  DateTime? _odometerRefreshAt;
+  bool _odometerRefreshInFlight = false;
   double _fuelLitersSoFar = 0;
   bool _fuelRateSeen = false;
 

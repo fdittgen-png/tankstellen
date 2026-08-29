@@ -5075,6 +5075,19 @@ class AppLocalizationsSk extends AppLocalizations {
   String get fillUpGuidancePartNight => 'v noci';
 
   @override
+  String get fillUpOdometerFromCarJustNow => 'Z vášho vozidla · práve teraz';
+
+  @override
+  String fillUpOdometerFromCarAt(String when) {
+    return 'Z vášho vozidla · $when';
+  }
+
+  @override
+  String fillUpOdometerEstimatedAt(String when) {
+    return 'Odhad z posledného údaja z vozidla plus vzdialenosť prejdená odvtedy ($when)';
+  }
+
+  @override
   String get fillUpImportPasteLabel => 'Vložiť text';
 
   @override

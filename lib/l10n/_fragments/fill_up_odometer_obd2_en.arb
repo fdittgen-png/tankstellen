@@ -1,0 +1,8 @@
+{
+  "fillUpOdometerFromCarJustNow": "From your car · just now",
+  "@fillUpOdometerFromCarJustNow": {"description": "Note under the odometer field of the Add fill-up form when the value was just read from the car over OBD2."},
+  "fillUpOdometerFromCarAt": "From your car · {when}",
+  "@fillUpOdometerFromCarAt": {"description": "Note under the odometer field when the value is the car's last OBD2 reading; {when} is a formatted date/time.", "placeholders": {"when": {"type": "String"}}},
+  "fillUpOdometerEstimatedAt": "Estimated from your car's last reading plus the distance driven since ({when})",
+  "@fillUpOdometerEstimatedAt": {"description": "Note under the odometer field when the value is the car's last reading plus GPS/OBD distance driven since; {when} is a formatted date/time.", "placeholders": {"when": {"type": "String"}}}
+}

@@ -202,6 +202,11 @@ class TripRecordingController
   /// itself instead.
   static const Duration parkedPromptAfter = Duration(minutes: 3);
 
+  /// #3877 — cadence of the odometer re-read while the engine runs (one
+  /// PID per interval; the start value alone was up to a whole trip stale
+  /// when the stop came with the engine already off).
+  static const Duration odometerRefreshInterval = Duration(minutes: 5);
+
   /// Per-trip 'diagnostic capture' flag (#2459 — default off; an
   /// internal/dev flag, not a user setting, wired from
   /// `Feature.debugMode`). When ON, `_emit` ALSO stamps the raw mixture
