@@ -32,3 +32,5 @@ export 'providers/service_reminder_providers.dart';
 export 'providers/vehicle_aggregate_updater_provider.dart';
 export 'providers/vehicle_providers.dart';
 export 'providers/vin_decoder_provider.dart';
+// #3869 — the one-ZIP export serialises service reminders.
+export 'domain/entities/service_reminder.dart' show ServiceReminder;
