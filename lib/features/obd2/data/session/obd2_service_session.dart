@@ -3,6 +3,7 @@
 
 import 'dart:async';
 
+import '../../domain/vehicle_power_state.dart';
 import '../protocol/elm_session.dart';
 import '../transport/obd2_link_drop_signal.dart';
 import '../transport/obd2_transport.dart';
@@ -29,6 +30,10 @@ class Obd2ServiceSession {
   }) {
     stop();
     final session = ElmSession(transport)..adoptReady();
+    // #3857 — every ATRV reply (the ~4 s keepalive already pays for it)
+    // becomes vehicle power evidence: the one engine signal that needs
+    // no bus traffic, so it keeps reporting while the ECU is silent.
+    session.onVoltage = Obd2VehiclePower.instance.noteVoltage;
     _session = session;
     _statesSub = session.states.listen((next) {
       if (next != ElmSessionState.dead) return;
@@ -44,6 +49,10 @@ class Obd2ServiceSession {
   /// none attached). The supervisor reads this at drop time for the
   /// trafficked-ready flap exemption.
   int get successfulObdSends => _session?.successfulObdSends ?? 0;
+
+  /// #3857 — battery voltage from the current session's last `ATRV`
+  /// reply; null before the first one or with no session attached.
+  double? get lastVoltageV => _session?.lastVoltageV;
 
   /// #3779 — declare a session-bypassing long read (the protocol-search
   /// `0100`) so the liveness watchdog holds instead of stale-killing the

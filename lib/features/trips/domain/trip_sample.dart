@@ -182,6 +182,14 @@ class TripSample {
   /// safety on hot/low-octane charge is directly consumption-relevant.
   final double? timingAdvanceDeg;
 
+  // ---- #3857 (Epic #3855) — vehicle power evidence --------------------
+
+  /// Adapter-measured battery voltage in V (`ATRV`), stamped at slow
+  /// cadence (~10 s) so a forensic export can show the alternator going
+  /// on/off around every engine-state verdict. Null between stamps, on
+  /// GPS-only trips and on legacy trips.
+  final double? batteryVoltageV;
+
   const TripSample({
     required this.timestamp,
     required this.speedKmh,
@@ -212,6 +220,7 @@ class TripSample {
     this.ltft,
     this.iatC,
     this.timingAdvanceDeg,
+    this.batteryVoltageV,
   });
 
   /// Return a copy with [estimatedFuelRateLPerHour] replaced (#2431).
@@ -251,5 +260,6 @@ class TripSample {
         ltft: ltft,
         iatC: iatC,
         timingAdvanceDeg: timingAdvanceDeg,
+        batteryVoltageV: batteryVoltageV,
       );
 }

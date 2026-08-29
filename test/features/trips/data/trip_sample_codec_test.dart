@@ -185,4 +185,29 @@ void main() {
       expect(sampleFromJson(legacy).rpm, 1700.0);
     });
   });
+
+  group('#3857 battery voltage "bv"', () {
+    test('round-trips when present and adds zero bytes when absent', () {
+      final ts = DateTime(2026, 8, 29, 8);
+      final stamped = TripSample(
+          timestamp: ts, speedKmh: 50, rpm: 900, batteryVoltageV: 14.2);
+      final json = sampleToJson(stamped);
+      expect(json['bv'], 14.2);
+      expect(sampleFromJson(json).batteryVoltageV, 14.2);
+
+      final plain = TripSample(timestamp: ts, speedKmh: 50, rpm: 900);
+      expect(sampleToJson(plain).containsKey('bv'), isFalse,
+          reason: 'stamped at ~10 s cadence, so every other tick must '
+              'cost nothing');
+      expect(sampleFromJson(sampleToJson(plain)).batteryVoltageV, isNull);
+    });
+
+    test('copyWithEstimatedFuelRate carries the voltage through', () {
+      final s = TripSample(
+          timestamp: DateTime(2026, 8, 29, 8),
+          speedKmh: 50,
+          batteryVoltageV: 12.4);
+      expect(s.copyWithEstimatedFuelRate(2.0).batteryVoltageV, 12.4);
+    });
+  });
 }

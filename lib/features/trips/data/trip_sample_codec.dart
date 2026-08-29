@@ -65,6 +65,9 @@ Map<String, dynamic> sampleToJson(TripSample s) => {
       // #3692 — IAT + timing advance (always-on engine signals).
       if (s.iatC != null) 'ia': s.iatC,
       if (s.timingAdvanceDeg != null) 'ta': s.timingAdvanceDeg,
+      // #3857 — adapter battery voltage at slow cadence; absent between
+      // stamps and on GPS-only / legacy trips.
+      if (s.batteryVoltageV != null) 'bv': s.batteryVoltageV,
     };
 
 TripSample sampleFromJson(Map<String, dynamic> j) => TripSample(
@@ -107,4 +110,6 @@ TripSample sampleFromJson(Map<String, dynamic> j) => TripSample(
       // #3692 — legacy trips carry neither key → null.
       iatC: (j['ia'] as num?)?.toDouble(),
       timingAdvanceDeg: (j['ta'] as num?)?.toDouble(),
+      // #3857 — missing key → null (legacy trips, GPS-only).
+      batteryVoltageV: (j['bv'] as num?)?.toDouble(),
     );

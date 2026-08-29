@@ -36,7 +36,13 @@ mixin _LiveSampleSnapshotSubscriptions on _LiveSampleSnapshotLatches {
     _sub(scheduler, Elm327Protocol.engineRpmCommand,
         hz: 5.0, priority: PidPriority.high, tier: PidTier.dynamics, (r) {
       final v = Elm327Protocol.parseEngineRpm(r);
-      if (v != null) _latestRpm = v;
+      if (v != null) {
+        _latestRpm = v;
+        // #3856 — the recording loop's parses bypass the typed read
+        // helpers, so the power model is stamped here: rpm is the
+        // authoritative running/awake reading.
+        Obd2VehiclePower.instance.noteRpm(v);
+      }
       _onHighPriorityParse(v);
     });
     _sub(scheduler, Elm327Protocol.vehicleSpeedCommand,
@@ -45,6 +51,7 @@ mixin _LiveSampleSnapshotSubscriptions on _LiveSampleSnapshotLatches {
       if (v != null) {
         _latestSpeedKmh = v.toDouble();
         _onSpeedSample(v.toDouble());
+        Obd2VehiclePower.instance.noteBusAnswered(); // #3856 — awake
       }
       _onHighPriorityParse(v);
     });

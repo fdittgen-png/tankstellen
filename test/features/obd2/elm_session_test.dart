@@ -231,6 +231,66 @@ void main() {
       });
     });
 
+    test('the keepalive reply is kept as battery voltage (#3857)', () {
+      // The session was already paying for an ATRV every few idle seconds
+      // and discarding the reply — the one engine signal that needs no
+      // bus traffic. Now it is retained and pushed to the listener.
+      fakeAsync((async) {
+        final transport = _ScriptedTransport(_healthyInitReplies());
+        transport.responses['ATRV'] = '14.2V';
+        var now = DateTime(2026, 8, 29);
+        final seen = <double>[];
+        final session = ElmSession(
+          transport,
+          keepaliveIdle: const Duration(seconds: 7),
+          staleAfter: const Duration(seconds: 15),
+          now: () => now,
+        )..onVoltage = seen.add;
+        unawaited(session.initialize());
+        async.flushMicrotasks();
+        expect(session.lastVoltageV, isNull,
+            reason: 'init sends no ATRV — nothing to know yet');
+
+        now = now.add(const Duration(seconds: 8));
+        async.elapse(const Duration(seconds: 8));
+
+        expect(session.lastVoltageV, 14.2);
+        expect(seen, isNotEmpty);
+        expect(seen.first, 14.2);
+        session.dispose();
+      });
+    });
+
+    test('an explicit ATRV send through the ladder also reports (#3857)',
+        () async {
+      final transport = _ScriptedTransport(_healthyInitReplies());
+      transport.responses['ATRV'] = '12.3 V';
+      final seen = <double>[];
+      final session = ElmSession(transport,
+          keepaliveIdle: const Duration(days: 1))
+        ..onVoltage = seen.add;
+      await session.initialize();
+      final reply = await session.send('ATRV\r');
+      expect(reply, '12.3 V');
+      expect(session.lastVoltageV, 12.3);
+      expect(seen, [12.3]);
+      session.dispose();
+    });
+
+    test('a garbage ATRV reply leaves the last voltage untouched (#3857)',
+        () async {
+      final transport = _ScriptedTransport(_healthyInitReplies());
+      transport.responses['ATRV'] = '?';
+      final session = ElmSession(transport,
+          keepaliveIdle: const Duration(days: 1));
+      await session.initialize();
+      await session.send('ATRV\r');
+      expect(session.lastVoltageV, isNull);
+      expect(session.state, ElmSessionState.ready,
+          reason: 'an AT reply must never feed the garbage/ATWS ladder');
+      session.dispose();
+    });
+
     test('staleness declares the session dead (zombie socket)', () {
       fakeAsync((async) {
         final transport = _ScriptedTransport(_healthyInitReplies());
