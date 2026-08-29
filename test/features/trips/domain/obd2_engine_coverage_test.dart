@@ -67,4 +67,92 @@ void main() {
     expect(json['engineSampleShare'], 0.25);
     expect(json['reason'], 'droppedMidTrip');
   });
+
+  group('#3861 the engine-running envelope', () {
+    // 'r' = running (rpm at the floor, engine-bearing), 'e' = engine-bearing
+    // but rpm 0 (ignition on), '.' = GPS-only.
+    Obd2EngineCoverage build(String pattern, {int secondsPerSample = 10}) {
+      final chars = pattern.split('');
+      final t0 = DateTime(2026, 8, 29, 8);
+      return Obd2EngineCoverage.fromFlags(
+        [for (final c in chars) c != '.'],
+        isRunningBySample: [for (final c in chars) c == 'r'],
+        timestamps: [
+          for (var i = 0; i < chars.length; i++)
+            t0.add(Duration(seconds: i * secondsPerSample)),
+        ],
+      )!;
+    }
+
+    test('a parked tail is NOT a mid-trip drop', () {
+      // 12 running samples, then 8 GPS-only — the user switched the engine
+      // off with the recording running. Whole-trip this read 60 % and
+      // "engine data stopped 58 % into the trip (connection dropped)".
+      final c = build('rrrrrrrrrrrr........');
+      expect(c.reason, Obd2EngineCoverageReason.full);
+      expect(c.share, 1.0);
+      expect(c.envelopeSamples, 12);
+      expect(c.headOffSeconds, 0);
+      expect(c.tailOffSeconds, closeTo(80, 0.01));
+      expect(c.hasEngineOffEdges, isTrue);
+    });
+
+    test('an engine-off start is a head, not missing data', () {
+      final c = build('......rrrrrrrrrrrrrr');
+      expect(c.reason, Obd2EngineCoverageReason.full);
+      expect(c.headOffSeconds, closeTo(60, 0.01));
+      expect(c.tailOffSeconds, 0);
+    });
+
+    test('a real drop INSIDE the envelope is still a drop', () {
+      // Engine ran at both ends; the link died for the middle 60 %.
+      final c = build('rrrr............rrrr');
+      expect(c.envelopeSamples, 20);
+      expect(c.share, closeTo(0.4, 0.001));
+      expect(c.reason, Obd2EngineCoverageReason.partial,
+          reason: 'engine data reaches the trip end, so patchy, not dropped');
+      expect(c.hasEngineOffEdges, isFalse);
+    });
+
+    test('a link that died and never came back inside the envelope reads '
+        'droppedMidTrip — the envelope ends where running data ends', () {
+      // Running, then the ADAPTER died: rpm gone, but GPS-only samples
+      // carry no running flag either, so the envelope ends at the drop.
+      // That is indistinguishable from an engine-off tail on samples
+      // alone — which is exactly why the recording session classifies
+      // the drop live (#3859) and the envelope note only fires on `full`.
+      final c = build('rrrrrrrrrr..........');
+      expect(c.reason, Obd2EngineCoverageReason.full);
+      expect(c.tailOffSeconds, closeTo(100, 0.01));
+    });
+
+    test('ignition-on samples (rpm 0) count as engine data but do not open '
+        'the envelope', () {
+      final c = build('eeeerrrrrrrrrrrreeee');
+      expect(c.envelopeSamples, 12);
+      expect(c.reason, Obd2EngineCoverageReason.full);
+      expect(c.headOffSeconds, closeTo(40, 0.01));
+    });
+
+    test('a short key-on shuffle is below the note floor', () {
+      final c = build('..rrrrrrrrrrrrrrrrrr', secondsPerSample: 5);
+      expect(c.headOffSeconds, closeTo(10, 0.01));
+      expect(c.hasEngineOffEdges, isFalse);
+    });
+
+    test('no running sample at all keeps the whole-trip behaviour', () {
+      final c = build('eeeeeeeeee..........');
+      expect(c.envelopeSamples, 20,
+          reason: 'no envelope → the whole trip, exactly as before');
+      expect(c.reason, Obd2EngineCoverageReason.droppedMidTrip);
+    });
+
+    test('toJson carries the envelope only when it exists', () {
+      final c = build('rrrrrrrrrr..........');
+      expect(c.toJson()['envelopeSamples'], 10);
+      expect(c.toJson()['tailOffSeconds'], 100.0);
+      final legacy = Obd2EngineCoverage.fromFlags([true, true, false])!;
+      expect(legacy.toJson().containsKey('envelopeSamples'), isFalse);
+    });
+  });
 }
