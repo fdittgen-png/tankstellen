@@ -163,7 +163,8 @@ mixin _AddFillUpSaveFlow on _AddFillUpFormState {
   bool get _isDirty =>
       _litersCtrl.text.isNotEmpty ||
       _costCtrl.text.isNotEmpty ||
-      _odoCtrl.text.isNotEmpty ||
+      // #3877 — an untouched car-prefilled odometer is not user data.
+      (_odoCtrl.text.isNotEmpty && _odoCtrl.text != _odometerPrefill?.text) ||
       _notesCtrl.text.isNotEmpty;
 
   /// #1693 — discard guard for a blocked pop (system back / the

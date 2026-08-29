@@ -2310,6 +2310,9 @@
   "@fillUpGuidancePartNight": {
     "description": "Time-of-day part name (00:00-05:59) used inside the cheap-window phrase (#1543)."
   },
+  "fillUpOdometerFromCarJustNow": "Vom Fahrzeug · gerade eben",
+  "fillUpOdometerFromCarAt": "Vom Fahrzeug · {when}",
+  "fillUpOdometerEstimatedAt": "Geschätzt aus dem letzten Fahrzeugwert plus der seitdem gefahrenen Strecke ({when})",
   "fillUpImportPasteLabel": "Text einfügen",
   "pasteReceiptDialogTitle": "Belegtext einfügen",
   "pasteReceiptDialogHint": "Füge den Text eines Tankbelegs ein — E-Mail, SMS oder ein geteiltes PDF. Liter, Preis pro Liter, Kraftstoffsorte, Gesamtbetrag und Tankstelle werden auf dem Gerät ausgelesen und zum Vorausfüllen des Formulars verwendet. Es wird nichts an einen Server gesendet.",

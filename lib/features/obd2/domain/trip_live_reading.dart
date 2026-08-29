@@ -101,6 +101,9 @@ class TripLiveReading {
   final double? odometerStartKm;
   final double? odometerNowKm;
 
+  /// #3877 — latest reading + distance driven since (null without a reading).
+  final double? odometerEstimateKm;
+
   /// Live GPS-only fuel estimate in L/100 km (Epic #2385 / #2389),
   /// produced by the calibrated physics road-load `GpsLiveFuelEstimator`
   /// on trajets that have **no** OBD2 fuel-rate signal. Non-null only on
@@ -190,6 +193,7 @@ class TripLiveReading {
     required this.elapsed,
     this.odometerStartKm,
     this.odometerNowKm,
+    this.odometerEstimateKm,
     this.gpsEstimatedLPer100Km,
     this.gpsEstimatedAvgLPer100Km,
     this.gpsEstimatedFuelLitersSoFar,

@@ -1,0 +1,5 @@
+{
+  "fillUpOdometerFromCarJustNow": "Vom Fahrzeug · gerade eben",
+  "fillUpOdometerFromCarAt": "Vom Fahrzeug · {when}",
+  "fillUpOdometerEstimatedAt": "Geschätzt aus dem letzten Fahrzeugwert plus der seitdem gefahrenen Strecke ({when})"
+}

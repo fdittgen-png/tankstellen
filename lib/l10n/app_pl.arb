@@ -4815,5 +4815,22 @@
   "permissionRationaleNotificationsBulletLocal": "Powiadomienia są używane do lokalnych alertów cenowych i stanu rejestrowania trasy.",
   "permissionRationaleNotificationsBulletNothingLeaves": "Są generowane na Twoim urządzeniu — nic nie opuszcza urządzenia.",
   "permissionRationaleRevoke": "Możesz to cofnąć w dowolnym momencie w ustawieniach urządzenia.",
-  "permissionRationaleLegalBasis": "Podstawa prawna: art. 6 ust. 1 lit. a) RODO (zgoda)"
+  "permissionRationaleLegalBasis": "Podstawa prawna: art. 6 ust. 1 lit. a) RODO (zgoda)",
+  "fillUpOdometerFromCarJustNow": "Z Twojego auta · przed chwilą",
+  "fillUpOdometerFromCarAt": "Z Twojego auta · {when}",
+  "@fillUpOdometerFromCarAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpOdometerEstimatedAt": "Oszacowano na podstawie ostatniego odczytu z auta i przejechanego od tego czasu dystansu ({when})",
+  "@fillUpOdometerEstimatedAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  }
 }

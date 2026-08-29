@@ -69,6 +69,93 @@ mixin _AddFillUpFormState on ConsumerState<AddFillUpScreen> {
     }
   }
 
+  /// #3877 — the odometer value prefilled from the car (null when nothing
+  /// was prefilled or the user edited the field since).
+  _OdometerPrefill? _odometerPrefill;
+  bool _odometerPrefillScheduled = false;
+
+  /// #3877 — fill the odometer from the car so a receipt scan is enough:
+  /// a bounded live read over the kept-alive link when the ignition is
+  /// on and the form's vehicle is the adapter's vehicle, else the
+  /// per-vehicle snapshot the last recording left (a reading, or reading +
+  /// distance driven since). Never overwrites a user-typed value; never
+  /// prefills a km below the vehicle's previous fill-up.
+  Future<void> _prefillOdometerFromCar(String? vehicleId) async {
+    if (vehicleId == null || _odoCtrl.text.isNotEmpty) return;
+    final now = _clockNow();
+    _OdometerPrefill? candidate;
+    final live = await _readLiveOdometerKm(vehicleId);
+    if (live != null) {
+      candidate = _OdometerPrefill(
+          km: live, at: now, source: VehicleOdometerSource.obd2, live: true);
+    } else {
+      final snap = _readOdometerSnapshot(vehicleId);
+      if (snap != null && now.difference(snap.at) <= const Duration(days: 14)) {
+        candidate = _OdometerPrefill(
+            km: snap.km, at: snap.at, source: snap.source, live: false);
+      }
+    }
+    if (candidate == null || !mounted) return;
+    final previous = previousFillUpOdometerKm(
+        vehicleId: vehicleId, date: _date, allFillUps: _safeFillUps());
+    if (previous != null && candidate.km < previous) return;
+    if (_odoCtrl.text.isNotEmpty || _vehicleId != vehicleId) return;
+    setState(() {
+      _odometerPrefill = candidate;
+      _odoCtrl.text = candidate!.text;
+    });
+  }
+
+  /// One bounded PID read on the supervisor's live service — only when the
+  /// link is `ready` and the form's vehicle is the active (adapter) one.
+  Future<double?> _readLiveOdometerKm(String vehicleId) async {
+    try {
+      final activeId = ref.read(activeVehicleProfileProvider)?.id;
+      if (activeId != vehicleId) return null;
+      final sup = ref.read(obd2ReconnectProvider.notifier).supervisor;
+      final svc = sup.service;
+      if (svc == null || sup.state.value != Obd2LinkState.ready) return null;
+      return await svc
+          .readOdometerKm()
+          .timeout(const Duration(seconds: 3), onTimeout: () => null);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st,
+          context: const {'where': 'AddFillUp: live odometer read failed'}));
+      return null;
+    }
+  }
+
+  VehicleOdometerSnapshot? _readOdometerSnapshot(String vehicleId) {
+    try {
+      return ref.read(vehicleOdometerSnapshotStoreProvider).read(vehicleId);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st,
+          context: const {'where': 'AddFillUp: odometer snapshot read failed'}));
+      return null;
+    }
+  }
+
+  DateTime _clockNow() {
+    try {
+      return ref.read(appClockProvider).now();
+    } catch (_) {
+      return _date;
+    }
+  }
+
+  /// The note rendered under the odometer field, null without a prefill.
+  String? _odometerPrefillNote(AppLocalizations l, BuildContext context) {
+    final p = _odometerPrefill;
+    if (p == null) return null;
+    final locale = Localizations.localeOf(context).toString();
+    final when = DateFormat.yMMMd(locale).add_Hm().format(p.at);
+    if (p.source == VehicleOdometerSource.obd2Estimate) {
+      return l.fillUpOdometerEstimatedAt(when);
+    }
+    final fresh = p.live || _clockNow().difference(p.at) < const Duration(minutes: 1);
+    return fresh ? l.fillUpOdometerFromCarJustNow : l.fillUpOdometerFromCarAt(when);
+  }
+
   /// Resolve the initial vehicle selection: prefer the profile's
   /// [UserProfile.defaultVehicleId], fall back to the active vehicle,
   /// otherwise to the first vehicle in the list (vehicle is mandatory —
@@ -148,4 +235,21 @@ mixin _AddFillUpFormState on ConsumerState<AddFillUpScreen> {
     );
     if (next != null) _costCtrl.text = next;
   }
+}
+
+/// #3877 — what was prefilled into the odometer field and where from.
+class _OdometerPrefill {
+  const _OdometerPrefill({
+    required this.km,
+    required this.at,
+    required this.source,
+    required this.live,
+  });
+  final double km;
+  final DateTime at;
+  final VehicleOdometerSource source;
+  final bool live;
+
+  /// Odometers are whole kilometres on every dashboard.
+  String get text => km.round().toString();
 }

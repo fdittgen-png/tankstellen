@@ -303,6 +303,7 @@ mixin _TripRecordingEmit
       elapsed: nowTs.difference(_startedAt ?? nowTs),
       odometerStartKm: _odometerStartKm,
       odometerNowKm: _odometerLatestKm,
+      odometerEstimateKm: estimatedOdometerNowKm, // #3877
       instantLPer100Km: instant?.lPer100Km,
       instantLPerHour: instant?.lPerHour,
       instantIsIdle: instant?.isIdle,

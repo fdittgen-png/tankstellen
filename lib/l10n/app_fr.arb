@@ -4787,5 +4787,22 @@
   "permissionRationaleNotificationsBulletLocal": "Les notifications servent aux alertes de prix locales et à l'état de l'enregistrement du trajet.",
   "permissionRationaleNotificationsBulletNothingLeaves": "Elles sont générées sur votre appareil — rien ne quitte l'appareil.",
   "permissionRationaleRevoke": "Vous pouvez révoquer ceci à tout moment dans les paramètres de votre appareil.",
-  "permissionRationaleLegalBasis": "Base juridique : art. 6, §1, a) du RGPD (consentement)"
+  "permissionRationaleLegalBasis": "Base juridique : art. 6, §1, a) du RGPD (consentement)",
+  "fillUpOdometerFromCarJustNow": "De votre voiture · à l'instant",
+  "fillUpOdometerFromCarAt": "De votre voiture · {when}",
+  "@fillUpOdometerFromCarAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpOdometerEstimatedAt": "Estimé à partir de la dernière valeur relevée dans votre voiture plus la distance parcourue depuis ({when})",
+  "@fillUpOdometerEstimatedAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  }
 }

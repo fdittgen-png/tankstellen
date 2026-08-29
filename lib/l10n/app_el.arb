@@ -4815,5 +4815,22 @@
   "permissionRationaleNotificationsBulletLocal": "Οι ειδοποιήσεις χρησιμοποιούνται για τοπικές ειδοποιήσεις τιμών και για την κατάσταση της καταγραφής διαδρομής.",
   "permissionRationaleNotificationsBulletNothingLeaves": "Δημιουργούνται στη συσκευή σας — τίποτα δεν φεύγει από τη συσκευή.",
   "permissionRationaleRevoke": "Μπορείτε να το ανακαλέσετε ανά πάσα στιγμή στις ρυθμίσεις της συσκευής σας.",
-  "permissionRationaleLegalBasis": "Νομική βάση: άρθρο 6 παρ. 1 στοιχ. α) ΓΚΠΔ (συγκατάθεση)"
+  "permissionRationaleLegalBasis": "Νομική βάση: άρθρο 6 παρ. 1 στοιχ. α) ΓΚΠΔ (συγκατάθεση)",
+  "fillUpOdometerFromCarJustNow": "Από το αυτοκίνητό σας · μόλις τώρα",
+  "fillUpOdometerFromCarAt": "Από το αυτοκίνητό σας · {when}",
+  "@fillUpOdometerFromCarAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpOdometerEstimatedAt": "Εκτίμηση από την τελευταία ένδειξη του αυτοκινήτου συν την απόσταση που διανύθηκε έκτοτε ({when})",
+  "@fillUpOdometerEstimatedAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -5027,6 +5027,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fillUpGuidancePartNight => 'nights';
 
   @override
+  String get fillUpOdometerFromCarJustNow => 'From your car · just now';
+
+  @override
+  String fillUpOdometerFromCarAt(String when) {
+    return 'From your car · $when';
+  }
+
+  @override
+  String fillUpOdometerEstimatedAt(String when) {
+    return 'Estimated from your car\'s last reading plus the distance driven since ($when)';
+  }
+
+  @override
   String get fillUpImportPasteLabel => 'Paste text';
 
   @override
@@ -13210,6 +13223,20 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get fillUpGuidancePartNight => '⟦ñîǧĥŧš ···⟧';
+
+  @override
+  String get fillUpOdometerFromCarJustNow =>
+      '⟦Ƒřóɱ ýóúř çář · ĵúšŧ ñóŵ ········⟧';
+
+  @override
+  String fillUpOdometerFromCarAt(String when) {
+    return '⟦Ƒřóɱ ýóúř çář · $when ·····⟧';
+  }
+
+  @override
+  String fillUpOdometerEstimatedAt(String when) {
+    return '⟦Éšŧîɱáŧéđ ƒřóɱ ýóúř çář\'š łášŧ řéáđîñǧ ƥłúš ŧĥé đîšŧáñçé đřîṽéñ šîñçé ($when) ··························⟧';
+  }
 
   @override
   String get fillUpImportPasteLabel => '⟦Ƥášŧé ŧéẋŧ ····⟧';

@@ -5064,6 +5064,19 @@ class AppLocalizationsCs extends AppLocalizations {
   String get fillUpGuidancePartNight => 'v noci';
 
   @override
+  String get fillUpOdometerFromCarJustNow => 'Z vašeho vozu · právě teď';
+
+  @override
+  String fillUpOdometerFromCarAt(String when) {
+    return 'Z vašeho vozu · $when';
+  }
+
+  @override
+  String fillUpOdometerEstimatedAt(String when) {
+    return 'Odhad z posledního údaje z vozu plus vzdálenost ujetá od té doby ($when)';
+  }
+
+  @override
   String get fillUpImportPasteLabel => 'Vložit text';
 
   @override

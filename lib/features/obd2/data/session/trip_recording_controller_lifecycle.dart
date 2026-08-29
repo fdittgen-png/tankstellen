@@ -220,6 +220,10 @@ mixin _TripRecordingLifecycle
     _odometerStartKm = await boundedStartRead(
         _service.readOdometerKm(), kObd2TripStartOdometerBudget);
     _odometerLatestKm = _odometerStartKm;
+    if (_odometerStartKm != null) {
+      _odometerLatestAt = _now(); // #3877
+      _distanceKmAtOdometerLatest = 0;
+    }
     _vin = await boundedStartRead(
         readTripVinOnce(_service), kObd2TripStartVinBudget);
     // #3429 — one-shot ECU fuel-type read (PID 0x51), promoted from the

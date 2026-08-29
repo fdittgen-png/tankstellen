@@ -4815,5 +4815,22 @@
   "permissionRationaleNotificationsBulletLocal": "Paziņojumi tiek izmantoti vietējiem cenu brīdinājumiem un brauciena ierakstīšanas statusam.",
   "permissionRationaleNotificationsBulletNothingLeaves": "Tie tiek ģenerēti jūsu ierīcē — nekas nepamet ierīci.",
   "permissionRationaleRevoke": "To varat jebkurā laikā atsaukt ierīces iestatījumos.",
-  "permissionRationaleLegalBasis": "Juridiskais pamats: VDAR 6. panta 1. punkta a) apakšpunkts (piekrišana)"
+  "permissionRationaleLegalBasis": "Juridiskais pamats: VDAR 6. panta 1. punkta a) apakšpunkts (piekrišana)",
+  "fillUpOdometerFromCarJustNow": "No jūsu automašīnas · tikko",
+  "fillUpOdometerFromCarAt": "No jūsu automašīnas · {when}",
+  "@fillUpOdometerFromCarAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpOdometerEstimatedAt": "Aprēķināts no automašīnas pēdējā rādījuma plus kopš tā nobrauktā attāluma ({when})",
+  "@fillUpOdometerEstimatedAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  }
 }

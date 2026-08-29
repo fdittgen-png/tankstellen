@@ -63,6 +63,9 @@ class AddFillUpFormFields extends StatelessWidget {
   final TextEditingController litersCtrl;
   final TextEditingController costCtrl;
   final TextEditingController odoCtrl;
+
+  /// #3877 — "From your car · …" under the odometer field; null = none.
+  final String? odometerNote;
   final TextEditingController notesCtrl;
 
   /// When non-null, shown after the notes field as an affordance to
@@ -89,6 +92,7 @@ class AddFillUpFormFields extends StatelessWidget {
     required this.litersCtrl,
     required this.costCtrl,
     required this.odoCtrl,
+    this.odometerNote,
     required this.notesCtrl,
     required this.onReportBadScan,
   });
@@ -223,6 +227,20 @@ class AddFillUpFormFields extends StatelessWidget {
                 validator: (v) => AddFillUpValidators.positiveNumber(v, l),
               ),
             ),
+            if (odometerNote != null)
+              Padding(
+                key: const Key('fillUpOdometerPrefillNote'),
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                child: Row(children: [
+                  Icon(Icons.directions_car_outlined,
+                      size: 16, color: Theme.of(context).colorScheme.primary),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(odometerNote!,
+                        style: Theme.of(context).textTheme.bodySmall),
+                  ),
+                ]),
+              ),
             FormFieldTile(
               icon: Icons.edit_note_outlined,
               content: FillUpNotesField(controller: notesCtrl),

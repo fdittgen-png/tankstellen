@@ -4815,5 +4815,22 @@
   "permissionRationaleNotificationsBulletLocal": "Pranešimai naudojami vietiniams kainų įspėjimams ir kelionės įrašymo būsenai.",
   "permissionRationaleNotificationsBulletNothingLeaves": "Jie sukuriami jūsų įrenginyje — niekas nepalieka įrenginio.",
   "permissionRationaleRevoke": "Tai galite bet kada atšaukti įrenginio nustatymuose.",
-  "permissionRationaleLegalBasis": "Teisinis pagrindas: BDAR 6 str. 1 d. a punktas (sutikimas)"
+  "permissionRationaleLegalBasis": "Teisinis pagrindas: BDAR 6 str. 1 d. a punktas (sutikimas)",
+  "fillUpOdometerFromCarJustNow": "Iš jūsų automobilio · ką tik",
+  "fillUpOdometerFromCarAt": "Iš jūsų automobilio · {when}",
+  "@fillUpOdometerFromCarAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpOdometerEstimatedAt": "Apskaičiuota pagal paskutinį automobilio rodmenį ir nuo tada nuvažiuotą atstumą ({when})",
+  "@fillUpOdometerEstimatedAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  }
 }

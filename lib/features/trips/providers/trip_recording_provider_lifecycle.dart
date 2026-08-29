@@ -125,6 +125,7 @@ mixin _TripRecordingLifecycle
     if (pipeline != null) {
       final result = await pipeline.stop(automatic: automatic);
       _pipeline = null;
+      _recordEndOdometer(result); // #3877
       return result;
     }
     // #1347 — cold-start recovery left us with a snapshot on disk but no
@@ -138,6 +139,25 @@ mixin _TripRecordingLifecycle
     }
     state = const TripRecordingState();
     return const StoppedTripResult.empty();
+  }
+
+  /// #3877 — persist the end-of-trip odometer per vehicle so the next
+  /// fill-up form can prefill it (the car's reading, or reading + distance
+  /// driven since when the stop came with the engine already off).
+  void _recordEndOdometer(StoppedTripResult result) {
+    final km = result.endOdometerKm;
+    final vehicleId = _lastTripVehicleId;
+    if (km == null || vehicleId == null || vehicleId.isEmpty) return;
+    unawaited(ref.read(vehicleOdometerSnapshotStoreProvider).write(
+          vehicleId,
+          VehicleOdometerSnapshot(
+            km: km,
+            at: ref.read(appClockProvider).now(),
+            source: result.endOdometerIsReading
+                ? VehicleOdometerSource.obd2
+                : VehicleOdometerSource.obd2Estimate,
+          ),
+        ));
   }
 
   /// Typed entry point for the hands-free [AutoTripCoordinator]

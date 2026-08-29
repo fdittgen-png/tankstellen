@@ -4815,5 +4815,22 @@
   "permissionRationaleNotificationsBulletLocal": "Meldingen worden gebruikt voor lokale prijswaarschuwingen en de status van de ritregistratie.",
   "permissionRationaleNotificationsBulletNothingLeaves": "Ze worden op je apparaat gegenereerd — niets verlaat het apparaat.",
   "permissionRationaleRevoke": "Je kunt dit op elk moment intrekken in de instellingen van je apparaat.",
-  "permissionRationaleLegalBasis": "Rechtsgrondslag: art. 6, lid 1, onder a) AVG (toestemming)"
+  "permissionRationaleLegalBasis": "Rechtsgrondslag: art. 6, lid 1, onder a) AVG (toestemming)",
+  "fillUpOdometerFromCarJustNow": "Van je auto · zojuist",
+  "fillUpOdometerFromCarAt": "Van je auto · {when}",
+  "@fillUpOdometerFromCarAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpOdometerEstimatedAt": "Geschat op basis van de laatste meting van je auto plus de sindsdien gereden afstand ({when})",
+  "@fillUpOdometerEstimatedAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  }
 }

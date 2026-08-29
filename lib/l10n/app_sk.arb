@@ -4815,5 +4815,22 @@
   "permissionRationaleNotificationsBulletLocal": "Oznámenia sa používajú na miestne cenové upozornenia a stav záznamu jazdy.",
   "permissionRationaleNotificationsBulletNothingLeaves": "Vytvárajú sa vo vašom zariadení — nič zariadenie neopúšťa.",
   "permissionRationaleRevoke": "Toto môžete kedykoľvek odvolať v nastaveniach zariadenia.",
-  "permissionRationaleLegalBasis": "Právny základ: čl. 6 ods. 1 písm. a) GDPR (súhlas)"
+  "permissionRationaleLegalBasis": "Právny základ: čl. 6 ods. 1 písm. a) GDPR (súhlas)",
+  "fillUpOdometerFromCarJustNow": "Z vášho vozidla · práve teraz",
+  "fillUpOdometerFromCarAt": "Z vášho vozidla · {when}",
+  "@fillUpOdometerFromCarAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpOdometerEstimatedAt": "Odhad z posledného údaja z vozidla plus vzdialenosť prejdená odvtedy ({when})",
+  "@fillUpOdometerEstimatedAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  }
 }

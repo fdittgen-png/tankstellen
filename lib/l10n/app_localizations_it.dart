@@ -5078,6 +5078,19 @@ class AppLocalizationsIt extends AppLocalizations {
   String get fillUpGuidancePartNight => 'di notte';
 
   @override
+  String get fillUpOdometerFromCarJustNow => 'Dalla tua auto · adesso';
+
+  @override
+  String fillUpOdometerFromCarAt(String when) {
+    return 'Dalla tua auto · $when';
+  }
+
+  @override
+  String fillUpOdometerEstimatedAt(String when) {
+    return 'Stimato dall\'ultima lettura della tua auto più la distanza percorsa da allora ($when)';
+  }
+
+  @override
   String get fillUpImportPasteLabel => 'Incolla testo';
 
   @override
