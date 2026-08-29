@@ -49,3 +49,4 @@ reused. If a decision is reversed, the original ADR is marked
 | 0013 | Map tile proxy + `initialCameraFit` camera + `bestDisplayPrice` markers | Accepted |
 | 0014 | Per-fuel-type efficiency attribution (dominant-fuel, Epic #2881) | Superseded |
 | 0015 | Per-fuel efficiency v2 — pure-vs-mix composition buckets (Epic #2881) | Accepted |
+| 0016 | Vehicle power state — engine-off start/stop as a car state, not a link failure (Epic #3855) | Accepted |
