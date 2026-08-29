@@ -7,7 +7,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/country/country_config.dart';
+import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/permissions/permission_rationale_dialog.dart';
+import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/features/alerts/domain/entities/radius_alert.dart';
 import 'package:tankstellen/features/alerts/presentation/widgets/radius_alert_create_sheet.dart';
 import 'package:tankstellen/features/alerts/presentation/widgets/radius_alert_form_fields.dart';
@@ -101,6 +104,11 @@ void main() {
     ) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+      // #3872 — fresh install: the notifications rationale flag is unset,
+      // so Save must surface the rationale BEFORE `add()` (= the OS prompt).
+      when(() => test.mockStorage.getSetting(any<String>())).thenReturn(null);
+      when(() => test.mockStorage.putSetting(any<String>(), any<dynamic>()))
+          .thenAnswer((_) async {});
 
       final fake = _CapturingRadiusAlerts();
 
@@ -146,6 +154,18 @@ void main() {
       await tester.tap(saveBtn);
       await tester.pumpAndSettle();
 
+      // #3872 — rationale up, nothing added (= no OS prompt) yet; Continue
+      // is the only action and always proceeds.
+      expect(find.byKey(PermissionRationaleDialog.dialogKey), findsOneWidget);
+      expect(fake.addedAlerts, isEmpty);
+      await tester.tap(find.byKey(PermissionRationaleDialog.continueKey));
+      await tester.pumpAndSettle();
+      expect(find.byKey(PermissionRationaleDialog.dialogKey), findsNothing);
+      verify(() => test.mockStorage.putSetting(
+            'permission_rationale_shown_notifications',
+            true,
+          )).called(1);
+
       expect(fake.addedAlerts, hasLength(1));
       final a = fake.addedAlerts.single;
       expect(a.id, 'fixed-id-123');
@@ -188,6 +208,7 @@ void main() {
       (tester) async {
         final test = standardTestOverrides();
         when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+        _stubRationaleShown(test.mockStorage);
 
         final fake = _CapturingRadiusAlerts();
 
@@ -305,6 +326,7 @@ void main() {
         '(#1012 phase 1)', (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+      _stubRationaleShown(test.mockStorage);
 
       final fake = _CapturingRadiusAlerts();
 
@@ -362,6 +384,7 @@ void main() {
         '(#1012 phase 1)', (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+      _stubRationaleShown(test.mockStorage);
 
       final fake = _CapturingRadiusAlerts();
 
@@ -446,6 +469,14 @@ void main() {
       expect(fake.addedAlerts, isEmpty);
     });
   });
+}
+
+/// #3872 — pre-acknowledge the once-per-install notifications rationale so
+/// a Save-path test exercises the surface BEHIND it (the mocktail storage
+/// returns null for every other key, which is the "not shown" state).
+void _stubRationaleShown(StorageRepository storage) {
+  when(() => storage.getSetting(StorageKeys.permissionRationaleShownNotifications))
+      .thenReturn(true);
 }
 
 class _CapturingRadiusAlerts extends RadiusAlerts {

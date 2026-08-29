@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/error/guarded.dart';
 import '../../../../core/navigation/app_routes.dart';
+import '../../../../core/permissions/permission_rationale_dialog.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -71,7 +72,17 @@ class AlertStationPickerSheet extends ConsumerWidget {
     );
     if (alert == null || !context.mounted) return;
 
-    await ref.read(alertProvider.notifier).addAlert(alert);
+    // #3872 (GDPR) — `addAlert` requests the OS notification permission on
+    // the first alert (#2209); the one-time rationale precedes it. Captured
+    // pre-await so `ref` is never read after a possible unmount.
+    final alerts = ref.read(alertProvider.notifier);
+    await PermissionRationaleDialog.show(
+      context,
+      kind: PermissionRationaleKind.notifications,
+      storage: ref.read(settingsStorageProvider),
+    );
+    if (!context.mounted) return;
+    await alerts.addAlert(alert);
     if (!context.mounted) return;
     final l10n = AppLocalizations.of(context);
     SnackBarHelper.showSuccess(context, l10n.alertCreated);

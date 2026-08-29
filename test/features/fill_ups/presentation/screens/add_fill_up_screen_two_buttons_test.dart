@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tankstellen/core/permissions/permission_rationale_dialog.dart';
+import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/receipts_ocr/data/receipt_parser.dart';
@@ -14,6 +16,7 @@ import 'package:tankstellen/features/fill_ups/presentation/screens/add_fill_up_s
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
+import '../../../../helpers/fake_settings_storage.dart';
 import '../../../../helpers/pump_app.dart';
 
 /// #951 — TDD acceptance test for the "restore import buttons" rollback.
@@ -66,6 +69,12 @@ class _ReceiptOcrEnabled extends FeatureFlags {
 final _withVehicle = <Object>[
   vehicleProfileListProvider.overrideWith(() => _StubVehicleList()),
   featureFlagsProvider.overrideWith(() => _ReceiptOcrEnabled()),
+  // #3872 — the receipt scan gates on the once-per-install camera
+  // rationale; pre-acknowledged so the existing tests keep exercising the
+  // scan BEHIND it (the fresh-install case has its own test below).
+  settingsStorageProvider.overrideWithValue(
+    FakeSettingsStorage.rationalesShown(),
+  ),
 ];
 
 /// Records which scan path the screen invoked so the test can assert
@@ -153,6 +162,50 @@ void main() {
 
       expect(fake.receiptCalls, 1,
           reason: 'Receipt button must call scanReceipt().');
+    });
+
+    testWidgets(
+        '#3872 — a fresh install sees the camera rationale BEFORE the scan '
+        '(= the OS camera prompt); Continue then runs scanReceipt', (
+      tester,
+    ) async {
+      final fake = _RoutingScanService();
+      final storage = FakeSettingsStorage();
+      await pumpApp(
+        tester,
+        AddFillUpScreen(scanService: fake),
+        overrides: [
+          vehicleProfileListProvider.overrideWith(() => _StubVehicleList()),
+          featureFlagsProvider.overrideWith(() => _ReceiptOcrEnabled()),
+          settingsStorageProvider.overrideWithValue(storage),
+        ],
+      );
+
+      await tester.tap(find.byKey(const Key('import_receipt_button')));
+      for (var i = 0; i < 10; i++) {
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+
+      // Rationale up, scan (= OS prompt) NOT yet started.
+      expect(find.byKey(PermissionRationaleDialog.dialogKey), findsOneWidget);
+      expect(find.text('Camera Access'), findsOneWidget);
+      expect(fake.receiptCalls, 0);
+
+      await tester.tap(find.byKey(PermissionRationaleDialog.continueKey));
+      for (var i = 0; i < 10; i++) {
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+
+      expect(find.byKey(PermissionRationaleDialog.dialogKey), findsNothing);
+      expect(fake.receiptCalls, 1,
+          reason: 'Continue must always proceed to the scan (5.1.1(iv)).');
+      expect(
+        PermissionRationaleDialog.hasBeenShown(
+          storage,
+          PermissionRationaleKind.camera,
+        ),
+        isTrue,
+      );
     });
   });
 }

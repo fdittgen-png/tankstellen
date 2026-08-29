@@ -8,6 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/navigation/app_routes.dart';
+import '../../../../core/permissions/permission_rationale_dialog.dart';
+import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/animated_favorite_star.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -118,7 +120,17 @@ class StationDetailAppBarActions extends ConsumerWidget {
     );
 
     if (alert != null && context.mounted) {
-      await ref.read(alertProvider.notifier).addAlert(alert);
+      // #3872 (GDPR) — `addAlert` requests the OS notification permission
+      // on the first alert (#2209); the one-time rationale precedes it.
+      // Captured pre-await so `ref` is never read after a possible unmount.
+      final alerts = ref.read(alertProvider.notifier);
+      await PermissionRationaleDialog.show(
+        context,
+        kind: PermissionRationaleKind.notifications,
+        storage: ref.read(settingsStorageProvider),
+      );
+      if (!context.mounted) return;
+      await alerts.addAlert(alert);
       if (context.mounted) {
         final l10n = AppLocalizations.of(context);
         SnackBarHelper.showSuccess(context, l10n.alertCreated);

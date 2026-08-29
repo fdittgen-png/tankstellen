@@ -1,0 +1,78 @@
+{
+  "permissionRationaleCameraTitle": "Camera Access",
+  "@permissionRationaleCameraTitle": {
+    "description": "Title of the GDPR pre-permission rationale shown once before the OS camera prompt (receipt / pump-display / QR scan) (#3872)."
+  },
+  "permissionRationaleCameraSubtitle": "This app would like to use your camera to read receipts, pump displays and QR codes.",
+  "@permissionRationaleCameraSubtitle": {
+    "description": "Bold lead sentence of the camera rationale explaining why the camera is requested (#3872)."
+  },
+  "permissionRationaleCameraWhatHappens": "What happens with the camera image:",
+  "@permissionRationaleCameraWhatHappens": {
+    "description": "Heading above the transparency bullets in the camera rationale (#3872)."
+  },
+  "permissionRationaleCameraBulletOnDevice": "The image is used only to read the receipt, the pump display or the QR code — recognition runs on your device.",
+  "@permissionRationaleCameraBulletOnDevice": {
+    "description": "First camera bullet: the image is read by on-device OCR / QR decoding only (#3872)."
+  },
+  "permissionRationaleCameraBulletDiscarded": "The photo is discarded after the scan.",
+  "@permissionRationaleCameraBulletDiscarded": {
+    "description": "Second camera bullet: no photo is kept after the scan (#3872)."
+  },
+  "permissionRationaleCameraBulletNoUpload": "Nothing is uploaded unless you file a bad-scan report and confirm it.",
+  "@permissionRationaleCameraBulletNoUpload": {
+    "description": "Third camera bullet: the only upload is the explicit, confirmed bad-scan report (#3872)."
+  },
+  "permissionRationaleBluetoothTitle": "Bluetooth Access",
+  "@permissionRationaleBluetoothTitle": {
+    "description": "Title of the GDPR pre-permission rationale shown once before the OS Bluetooth prompt (OBD2 adapter) (#3872)."
+  },
+  "permissionRationaleBluetoothSubtitle": "This app would like to use Bluetooth to connect to your OBD2 adapter.",
+  "@permissionRationaleBluetoothSubtitle": {
+    "description": "Bold lead sentence of the Bluetooth rationale explaining why Bluetooth is requested. 'OBD2' is a technical standard name (#3872)."
+  },
+  "permissionRationaleBluetoothWhatHappens": "What happens with Bluetooth:",
+  "@permissionRationaleBluetoothWhatHappens": {
+    "description": "Heading above the transparency bullets in the Bluetooth rationale (#3872)."
+  },
+  "permissionRationaleBluetoothBulletAdapterOnly": "Bluetooth is used only to find and talk to your OBD2 adapter.",
+  "@permissionRationaleBluetoothBulletAdapterOnly": {
+    "description": "First Bluetooth bullet: the radio is used for the OBD2 adapter only (#3872)."
+  },
+  "permissionRationaleBluetoothBulletIdentifierLocal": "The adapter identifier stays on your device — it is synced only with TankSync, as part of the vehicle profile.",
+  "@permissionRationaleBluetoothBulletIdentifierLocal": {
+    "description": "Second Bluetooth bullet: the adapter MAC / identifier is local, synced only through the user's own TankSync as part of the vehicle profile. 'TankSync' is a product name (#3872)."
+  },
+  "permissionRationaleBluetoothBulletLegacyLocation": "On Android 11 and below the system also asks for location, because Bluetooth scanning is a location-class permission there.",
+  "@permissionRationaleBluetoothBulletLegacyLocation": {
+    "description": "Third Bluetooth bullet: explains the legacy Android ≤ 11 location prompt that Bluetooth scanning triggers. 'Android' is a platform name (#3872)."
+  },
+  "permissionRationaleNotificationsTitle": "Notifications",
+  "@permissionRationaleNotificationsTitle": {
+    "description": "Title of the GDPR pre-permission rationale shown once before the OS notification prompt (price alerts, trip auto-record status) (#3872)."
+  },
+  "permissionRationaleNotificationsSubtitle": "This app would like to send you notifications for price alerts and the trip-recording status.",
+  "@permissionRationaleNotificationsSubtitle": {
+    "description": "Bold lead sentence of the notifications rationale explaining why notifications are requested (#3872)."
+  },
+  "permissionRationaleNotificationsWhatHappens": "What happens with notifications:",
+  "@permissionRationaleNotificationsWhatHappens": {
+    "description": "Heading above the transparency bullets in the notifications rationale (#3872)."
+  },
+  "permissionRationaleNotificationsBulletLocal": "Notifications are used for local price alerts and the trip-recording status.",
+  "@permissionRationaleNotificationsBulletLocal": {
+    "description": "First notifications bullet: the two local uses of notifications (#3872)."
+  },
+  "permissionRationaleNotificationsBulletNothingLeaves": "They are generated on your device — nothing leaves the device.",
+  "@permissionRationaleNotificationsBulletNothingLeaves": {
+    "description": "Second notifications bullet: notifications are local, no push service, nothing is sent anywhere (#3872)."
+  },
+  "permissionRationaleRevoke": "You can revoke this in your device settings at any time.",
+  "@permissionRationaleRevoke": {
+    "description": "Revoke hint shared by the camera / Bluetooth / notifications rationale dialogs (#3872)."
+  },
+  "permissionRationaleLegalBasis": "Legal basis: Art. 6(1)(a) GDPR (Consent)",
+  "@permissionRationaleLegalBasis": {
+    "description": "Legal-basis footnote shared by the camera / Bluetooth / notifications rationale dialogs. 'GDPR' is the established English/EU abbreviation; the article reference is the legal citation (#3872)."
+  }
+}

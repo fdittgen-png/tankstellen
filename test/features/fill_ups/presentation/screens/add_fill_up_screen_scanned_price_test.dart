@@ -18,9 +18,11 @@ import 'package:tankstellen/features/feature_management/application/feature_flag
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
+import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
+import '../../../../helpers/fake_settings_storage.dart';
 import '../../../../helpers/silence_error_logger.dart';
 
 /// Seam test for #2689 — e-receipt Phase 1.
@@ -202,6 +204,11 @@ void main() {
           vehicleProfileListProvider.overrideWith(() => _StubVehicleList()),
           fillUpListProvider.overrideWith(() => fillUpList),
           featureFlagsProvider.overrideWith(() => _ReceiptOcrEnabled()),
+          // #3872 — camera rationale pre-acknowledged; this test is about
+          // the scan → save seam BEHIND it.
+          settingsStorageProvider.overrideWithValue(
+            FakeSettingsStorage.rationalesShown(),
+          ),
         ],
         screen: AddFillUpScreen(scanService: fake),
       );

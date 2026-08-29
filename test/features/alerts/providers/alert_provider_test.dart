@@ -391,6 +391,7 @@ void main() {
     setUp(() async {
       // sync_enabled=true so _syncAlertsIfConnected actually runs the merge.
       await fakeStorage.putSetting('sync_enabled', true);
+      await fakeStorage.putSetting('consent_cloud_sync', true); // #3866
       noopNotifier = _NoopNotificationService();
       mergeCalls = 0;
       mergeReturn = const [];

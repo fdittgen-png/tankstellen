@@ -6,10 +6,14 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../../../core/data/storage_repository.dart';
 import '../../../../core/permissions/camera_permissions.dart';
+import '../../../../core/permissions/permission_rationale_dialog.dart';
 import '../../../../core/platform/app_flavor.dart';
+import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'qr_scanner_helpers.dart';
@@ -52,6 +56,11 @@ class QrScannerScreen extends StatefulWidget {
   /// be a const default because `openAppSettings` isn't const).
   final CameraPermissions? permissions;
 
+  /// #3872 — injectable settings storage for the once-per-kind camera
+  /// rationale flag. Null in production resolves the app-wide
+  /// `settingsStorageProvider` from the enclosing [ProviderScope].
+  final SettingsStorage? settingsStorage;
+
   /// How long to wait for a decode before showing the retry prompt.
   /// Exposed so tests can use a short duration.
   final Duration scanTimeout;
@@ -61,6 +70,7 @@ class QrScannerScreen extends StatefulWidget {
     this.guidance,
     this.controllerOverride,
     this.permissions,
+    this.settingsStorage,
     this.scanTimeout = const Duration(seconds: 30),
   });
 
@@ -104,6 +114,16 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
       case CameraPermissionState.granted:
         _enterScanning();
       case CameraPermissionState.denied:
+        // #3872 (GDPR) — the one-time camera rationale precedes the FIRST
+        // OS camera prompt; Continue-only, so the request always follows.
+        await PermissionRationaleDialog.show(
+          context,
+          kind: PermissionRationaleKind.camera,
+          storage: widget.settingsStorage ??
+              ProviderScope.containerOf(context, listen: false)
+                  .read(settingsStorageProvider),
+        );
+        if (!mounted) return;
         final requested = await widget._permissions.request();
         if (!mounted) return;
         if (requested == CameraPermissionState.granted) {

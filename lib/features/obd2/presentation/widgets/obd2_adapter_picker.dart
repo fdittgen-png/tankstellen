@@ -9,6 +9,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/vehicle_profile.dart';
+import '../../../../core/permissions/permission_rationale_dialog.dart';
+import '../../../../core/storage/storage_providers.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/protocol/adapter_registry.dart';
 import '../../data/session/obd2_adapter_identity.dart';
@@ -51,6 +53,12 @@ Future<Obd2Service?> showObd2AdapterPicker(
   String? pinnedMac,
   String? pinnedAdapterName,
 }) async {
+  // #3872 (GDPR) — the one-time Bluetooth rationale precedes the FIRST OS
+  // Bluetooth prompt. Both paths below end in `permissions.request()` (the
+  // pinned direct connect as much as the sheet's scan), so it sits at the
+  // entry. Continue-only: the connect / scan always follows.
+  await _showBluetoothRationale(context);
+  if (!context.mounted) return null;
   // Pinned-MAC fast path (#1188). When the active vehicle has an
   // adapter paired we want zero UI — connect silently and resolve
   // immediately, falling back to the sheet on any failure.
@@ -133,12 +141,31 @@ Future<Obd2Service?> _showPickerSheet(
 /// [ResolvedObd2Candidate] instead of connecting. Used by the vehicle
 /// edit screen to persist the adapter's name+MAC on a vehicle without
 /// initiating a full trip-recording session.
-Future<ResolvedObd2Candidate?> showObd2AdapterPairer(BuildContext context) {
+Future<ResolvedObd2Candidate?> showObd2AdapterPairer(
+  BuildContext context,
+) async {
+  // #3872 — same GDPR rationale gate as [showObd2AdapterPicker]: the
+  // pair-only sheet scans too, and the scan IS the OS prompt.
+  await _showBluetoothRationale(context);
+  if (!context.mounted) return null;
   return showModalBottomSheet<ResolvedObd2Candidate>(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
     builder: (_) => const Obd2AdapterPickerSheet(pairOnly: true),
+  );
+}
+
+/// #3872 — show the once-per-install Bluetooth pre-permission rationale
+/// (returns immediately once acknowledged). Reads the app-wide settings
+/// storage off the enclosing [ProviderScope] — both entry functions are
+/// plain functions with a [BuildContext], not widgets with a `ref`.
+Future<void> _showBluetoothRationale(BuildContext context) {
+  return PermissionRationaleDialog.show(
+    context,
+    kind: PermissionRationaleKind.bluetooth,
+    storage: ProviderScope.containerOf(context, listen: false)
+        .read(settingsStorageProvider),
   );
 }
 
