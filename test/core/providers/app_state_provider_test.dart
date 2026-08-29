@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/providers/app_state_provider.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
+import 'package:tankstellen/core/constants/app_constants.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 
 import '../../fakes/fake_hive_storage.dart';
@@ -175,10 +176,20 @@ void main() {
       expect(c.read(hasGdprConsentProvider), isFalse);
     });
 
-    test('returns true when consent given', () async {
+    test('returns true when consent given against the current policy '
+        'version (#3866)', () async {
       await fakeStorage.putSetting(StorageKeys.gdprConsentGiven, true);
+      await fakeStorage.putSetting(StorageKeys.consentPolicyVersion,
+          AppConstants.privacyPolicyVersion);
       final c = createContainer();
       expect(c.read(hasGdprConsentProvider), isTrue);
+    });
+
+    test('#3866 — consent given against an older policy version is stale '
+        '(the consent screen re-surfaces once)', () async {
+      await fakeStorage.putSetting(StorageKeys.gdprConsentGiven, true);
+      final c = createContainer();
+      expect(c.read(hasGdprConsentProvider), isFalse);
     });
   });
 

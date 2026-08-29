@@ -112,6 +112,7 @@ void main() {
   group('alert delete propagation + resurrection (#3121)', () {
     test('removeAlert propagates the delete to the server', () async {
       await fakeStorage.putSetting('sync_enabled', true);
+      await fakeStorage.putSetting('consent_cloud_sync', true); // #3866
       final keep = _makeAlert(id: 'keep');
       final gone = _makeAlert(id: 'gone', stationId: 'station-2');
       await fakeStorage.saveAlerts([keep.toJson(), gone.toJson()]);
@@ -129,6 +130,7 @@ void main() {
 
     test('deleted alert stays dead through the #3077 launch pull', () async {
       await fakeStorage.putSetting('sync_enabled', true);
+      await fakeStorage.putSetting('consent_cloud_sync', true); // #3866
       final keep = _makeAlert(id: 'keep');
       final gone = _makeAlert(id: 'gone', stationId: 'station-2');
       await fakeStorage.saveAlerts([keep.toJson(), gone.toJson()]);
@@ -152,6 +154,7 @@ void main() {
     test('local delete succeeds even when the server delete throws',
         () async {
       await fakeStorage.putSetting('sync_enabled', true);
+      await fakeStorage.putSetting('consent_cloud_sync', true); // #3866
       final gone = _makeAlert(id: 'gone');
       await fakeStorage.saveAlerts([gone.toJson()]);
       serverStore = [gone];

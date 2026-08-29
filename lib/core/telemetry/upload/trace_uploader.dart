@@ -42,6 +42,18 @@ class TraceUploader {
     }
   }
 
+  /// #3866 (Epic #3865) — transmission of diagnostics rides the Error
+  /// reporting CONSENT, exactly like Sentry, on top of the endpoint config.
+  bool uploadPermitted([TraceUploadConfig? config]) {
+    final consented =
+        _storage.getSetting('consent_error_reporting') as bool? ?? false;
+    final c = config ?? getConfig();
+    return consented &&
+        c.enabled &&
+        c.serverUrl != null &&
+        c.serverUrl!.isNotEmpty;
+  }
+
   Future<void> saveConfig(TraceUploadConfig config) async {
     await _storage.putSetting(_configKey, config.toJson());
   }
@@ -56,11 +68,7 @@ class TraceUploader {
   Future<void> uploadIfEnabled(ErrorTrace trace) async {
     try {
       final config = getConfig();
-      if (!config.enabled ||
-          config.serverUrl == null ||
-          config.serverUrl!.isEmpty) {
-        return;
-      }
+      if (!uploadPermitted(config)) return;
 
       final dio = DioFactory.create(
         connectTimeout: const Duration(seconds: 5),

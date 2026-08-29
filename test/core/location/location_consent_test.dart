@@ -35,9 +35,10 @@ void main() {
         () async {
       final storage = _FakeSettingsStorage();
       await LocationConsentDialog.recordConsent(storage);
-      // The hasConsent method reads `location_consent_given`; verify
-      // the storage saw exactly that write so the two helpers agree.
-      expect(storage.data, {'location_consent_given': true});
+      // #3866 — ONE location consent: the consent-screen key is canonical;
+      // the legacy key is written in step for pre-#3866 readers.
+      expect(storage.data,
+          {'consent_location': true, 'location_consent_given': true});
     });
 
     test('hasConsent is false when only the legacy key is stored', () {
