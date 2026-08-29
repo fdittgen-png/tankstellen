@@ -17,7 +17,8 @@ repo_name: Sparkilo
 repo_description: >-
   Free, privacy-first fuel & EV charging price comparison — the GMS-free
   F-Droid build (no Google Mobile Services, OpenStreetMap maps,
-  LocationManager positioning). 17 countries, 23 languages.
+  LocationManager positioning). 17 countries, 23 languages. GDPR-compliant:
+  export and delete everything in-app, no trackers, EU-hosted optional sync.
 repo_icon: icon.png
 
 # --- Repo signing key (separate from the app signing key) --------------------

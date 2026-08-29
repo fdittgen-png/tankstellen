@@ -124,7 +124,7 @@ echo "==> fdroid update"
 
 # --- 9. Print the repo fingerprint + next steps ------------------------------
 echo ""
-echo "==> Repo SHA-256 fingerprint (paste into docs/index.html):"
+echo "==> Repo SHA-256 fingerprint (paste into the landing page, docs/landing/index.html):"
 (cd "${FDROID_DIR}" && fdroid signindex --help >/dev/null 2>&1 || true)
 # `fdroid update` prints the fingerprint, but surface it explicitly too:
 if [[ -f "${FDROID_DIR}/repo/index-v1.json" ]]; then
@@ -147,8 +147,9 @@ cat <<EOF
 ==> DONE. Next git steps (commit the generated repo, then deploy):
 
     git add fdroid/repo fdroid/metadata fdroid/config.yml
-    # paste the fingerprint above into docs/index.html (<REPO_FINGERPRINT>)
-    git add docs/index.html
+    # paste the fingerprint above into the landing page's F-Droid section
+    # (docs/landing/index.html — docs/index.html is only a redirect now)
+    git add docs/landing/index.html
     git commit -m "chore(fdroid): publish repo index + APK"
     git push                # pages.yml deploys docs/ + fdroid/repo to Pages
 

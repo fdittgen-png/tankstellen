@@ -8,6 +8,12 @@
 All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased]
+
+### Privacy
+
+- **Privacy/GDPR (Epic #3865)** — policy v3 in 23 languages; every consent enforced at the data flow; complete local + server erasure; one-ZIP export of all data; tile proxy and brand-logo switches; pre-permission explanations for camera, Bluetooth, notifications; controller notice in the sync-mode picker; blocked-authors list.
+
 ## [5.0.0] - 2026-04-28 (Build 5112)
 
 The "cheaper kilometre" release. Where 4.x found you a cheaper litre, 5.x helps you burn fewer of them and shows you exactly what each one cost.

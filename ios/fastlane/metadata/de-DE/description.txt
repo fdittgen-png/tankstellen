@@ -8,7 +8,7 @@ WARUM SIE SICH DARAUF VERLASSEN KÖNNEN
 • Offizielle Open-Data-Preise, Land für Land — keine Community-Schätzungen, die Sie zu einem sinnlosen Umweg schicken.
 • Benzin, Diesel, LPG, CNG, E85 und Ladesäulen auf einer Karte, in einer Suche.
 • Günstigste zuerst: Preis-Pins sind von günstig nach teuer eingefärbt, die beste trägt ein Günstigste-Abzeichen.
-• Ihre GPS-Position und Ihre API-Schlüssel verlassen das Gerät nie. Keine Werbung, kein Konto, kein Tracking — und der Quellcode ist öffentlich.
+• API-Schlüssel gehen nur an den Dienst, zu dem sie gehören, Suchkoordinaten nur an die offizielle Preisquelle des Landes, in dem Sie sich befinden, und aufgezeichnete GPS-Fahrten verlassen Ihr Gerät nur, wenn Sie die TankSync-Fahrtensynchronisation einschalten. Keine Werbung, kein Konto, kein Tracking — und der Quellcode ist öffentlich.
 
 SPAREN SIE BEIM PREIS
 • Suchen Sie in der Nähe oder entlang Ihrer gesamten Route. Filtern Sie nach Kraftstoff, Umkreis, jetzt geöffnet, Ausstattung und nur Autobahn.
@@ -30,7 +30,8 @@ WÄHREND DER FAHRT
 
 IHRE DATEN BLEIBEN IHRE
 • Privatsphäre-Dashboard: alles jederzeit einsehen, exportieren oder löschen.
-• Optionales TankSync synchronisiert Favoriten, Fahrzeuge, Tankvorgänge und Alarme auf einen Server, den Sie kontrollieren — nicht auf unseren.
+• Optionales TankSync synchronisiert Favoriten, Fahrzeuge, Tankvorgänge und Alarme auf einen Server, den Sie kontrollieren — oder, wenn Sie möchten, in die in der EU gehostete Sparkilo-Community-Datenbank.
+• DSGVO: keine Tracker, keine Werbe-SDKs. Exportieren Sie alles als eine ZIP-Datei und löschen Sie alles, auf dem Gerät und auf dem Server, direkt in der App. Jede Einwilligung lässt sich jederzeit widerrufen. Datenschutzerklärung: https://fdittgen-png.github.io/tankstellen/privacy-policy/
 
 LÄNDER MIT OFFIZIELLEN LIVE-PREISEN
 Österreich, Argentinien, Australien, Chile, Dänemark, Frankreich, Deutschland, Griechenland, Italien, Luxemburg, Mexiko, Portugal, Rumänien, Slowenien, Südkorea, Spanien und das Vereinigte Königreich. Ladesäulen weltweit über Open Charge Map.

@@ -8,7 +8,7 @@ POURQUOI VOUS POUVEZ VOUS Y FIER
 • Des prix officiels en open data, pays par pays — pas des estimations communautaires qui vous envoient faire un détour pour rien.
 • Essence, diesel, GPL, GNV, E85 et recharge électrique sur une seule carte, en une seule recherche.
 • Le moins cher d'abord : les repères sont colorés du moins cher au plus cher, et le gagnant porte un badge Le moins cher.
-• Votre position GPS et vos clés d'API ne quittent jamais l'appareil. Sans publicité, sans compte, sans pistage — et le code source est public.
+• Vos clés d'API ne sont envoyées qu'au service auquel elles appartiennent, vos coordonnées de recherche qu'à la source officielle des prix du pays où vous êtes, et vos trajets GPS enregistrés ne quittent votre appareil que si vous activez la synchronisation des trajets TankSync. Sans publicité, sans compte, sans pistage — et le code source est public.
 
 ÉCONOMISEZ SUR LE PRIX
 • Cherchez à proximité ou tout au long de votre itinéraire. Filtrez par carburant, rayon, ouvert maintenant, services et autoroute uniquement.
@@ -30,7 +30,8 @@ AU VOLANT
 
 VOS DONNÉES RESTENT LES VÔTRES
 • Tableau de bord Confidentialité : tout consulter, exporter ou supprimer, à tout moment.
-• TankSync, en option, synchronise favoris, véhicules, pleins et alertes vers un serveur que vous contrôlez — pas le nôtre.
+• TankSync, en option, synchronise favoris, véhicules, pleins et alertes vers un serveur que vous contrôlez — ou, si vous le choisissez, vers la base Sparkilo Community hébergée dans l'UE.
+• RGPD : aucun traceur, aucun SDK publicitaire. Exportez tout en un seul fichier ZIP et supprimez tout, sur l'appareil comme sur le serveur, directement dans l'application. Chaque consentement peut être retiré à tout moment. Politique de confidentialité : https://fdittgen-png.github.io/tankstellen/privacy-policy/
 
 PAYS AVEC DES PRIX OFFICIELS EN DIRECT
 Autriche, Argentine, Australie, Chili, Danemark, France, Allemagne, Grèce, Italie, Luxembourg, Mexique, Portugal, Roumanie, Slovénie, Corée du Sud, Espagne et Royaume-Uni. Recharge électrique dans le monde entier via Open Charge Map.
