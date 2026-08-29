@@ -1,0 +1,43 @@
+{
+  "syncModeCommunityControllerNotice": "Operated by {operator} · Supabase, EU (Frankfurt) · syncs favorites, alerts, vehicles incl. VIN, fill-ups, ratings, reports and — if you enable it — trips with GPS",
+  "@syncModeCommunityControllerNotice": {
+    "description": "Controller notice under the 'Sparkilo Community' card of the TankSync mode picker (#3871, Epic #3865 GDPR). Names the data controller (privacy policy v3 Section 2), the hosting processor/region and every data category the shared database receives. {operator} is the developer's name (a proper noun, never translated).",
+    "placeholders": {
+      "operator": {
+        "type": "String"
+      }
+    }
+  },
+  "syncModePrivateControllerNotice": "You are the controller — your own Supabase project, we never see it",
+  "@syncModePrivateControllerNotice": {
+    "description": "Controller notice under the 'Private Database' card of the TankSync mode picker (#3871): the user connects their own Supabase project and is the data controller themselves."
+  },
+  "syncModeJoinControllerNotice": "The person who owns the shared database is the controller of your data",
+  "@syncModeJoinControllerNotice": {
+    "description": "Controller notice under the 'Join a Group' card of the TankSync mode picker (#3871): the family member / friend who runs the shared Supabase project is the data controller."
+  },
+  "ugcPublicNoticeTitle": "Shared with other users",
+  "@ugcPublicNoticeTitle": {
+    "description": "Title of the one-time dialog shown before the user's FIRST public contribution — a community price report, or switching station ratings to 'shared' (#3871, Epic #3865 GDPR)."
+  },
+  "ugcPublicNoticeBody": "This is stored in the sync database under your pseudonymous user ID. In Sparkilo Community every signed-in user can read it. You can delete it any time from TankSync → Data Transparency.",
+  "@ugcPublicNoticeBody": {
+    "description": "Body of the one-time public-contribution notice (#3871): where the content is stored, who can read it, and how to delete it. 'Sparkilo Community' is the product name of the shared database; 'TankSync' and 'Data Transparency' are the sync feature and its screen title as shown in the app."
+  },
+  "blockedAuthorsTitle": "Blocked users",
+  "@blockedAuthorsTitle": {
+    "description": "Title of the Privacy Dashboard card listing the community-content authors the user blocked on this device (#3871; block flow from #3726)."
+  },
+  "blockedAuthorsDescription": "Content shared by these users is hidden on this device. Unblock to see it again.",
+  "@blockedAuthorsDescription": {
+    "description": "Explainer under the 'Blocked users' card title (#3871): the block list is device-local and hides the author's shared content; Unblock reverses it."
+  },
+  "blockedAuthorsEmpty": "No blocked users",
+  "@blockedAuthorsEmpty": {
+    "description": "Empty state of the 'Blocked users' card when the device-local block list is empty (#3871)."
+  },
+  "blockedAuthorsUnblock": "Unblock",
+  "@blockedAuthorsUnblock": {
+    "description": "Button next to each blocked user id in the 'Blocked users' card that removes the block so their shared content shows again (#3871)."
+  }
+}

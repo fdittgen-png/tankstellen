@@ -1,0 +1,18 @@
+{
+  "syncModeCommunityControllerNotice": "Betrieben von {operator} · Supabase, EU (Frankfurt) · synchronisiert Favoriten, Alarme, Fahrzeuge inkl. FIN, Tankvorgänge, Bewertungen, Meldungen und — falls aktiviert — Fahrten mit GPS",
+  "@syncModeCommunityControllerNotice": {
+    "placeholders": {
+      "operator": {
+        "type": "String"
+      }
+    }
+  },
+  "syncModePrivateControllerNotice": "Du bist der Verantwortliche — dein eigenes Supabase-Projekt, wir sehen es nie",
+  "syncModeJoinControllerNotice": "Wer die gemeinsame Datenbank besitzt, ist der Verantwortliche für deine Daten",
+  "ugcPublicNoticeTitle": "Für andere Nutzer sichtbar",
+  "ugcPublicNoticeBody": "Dies wird in der Sync-Datenbank unter deiner pseudonymen Nutzer-ID gespeichert. In der Sparkilo Community kann es jeder angemeldete Nutzer lesen. Du kannst es jederzeit unter TankSync → Datentransparenz löschen.",
+  "blockedAuthorsTitle": "Blockierte Nutzer",
+  "blockedAuthorsDescription": "Inhalte dieser Nutzer werden auf diesem Gerät ausgeblendet. Blockierung aufheben, um sie wieder zu sehen.",
+  "blockedAuthorsEmpty": "Keine blockierten Nutzer",
+  "blockedAuthorsUnblock": "Freigeben"
+}

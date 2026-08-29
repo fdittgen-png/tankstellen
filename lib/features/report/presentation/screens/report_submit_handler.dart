@@ -18,6 +18,7 @@ import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/sync/supabase_client.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../core/widgets/ugc_public_notice_dialog.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/community_report_service.dart';
 import '../../domain/entities/report_type.dart';
@@ -91,6 +92,19 @@ class ReportSubmitHandler {
       //     sent anywhere.
       final country = ref.read(activeCountryProvider);
       final syncConfig = ref.read(syncStateProvider);
+
+      // #3871 (Epic #3865, GDPR) — with TankSync set up this report is
+      // destined for the shared sync database, where other users can
+      // read it. Before the FIRST such contribution show the one-time
+      // "Shared with other users" notice; Cancel aborts the submit.
+      if (syncConfig.userId != null) {
+        final accepted = await ensureUgcPublicNoticeAccepted(
+          context,
+          settings: ref.read(settingsStorageProvider),
+        );
+        if (!accepted || !context.mounted) return;
+      }
+
       // #484 — Tankerkoenig only accepts the 5 original report types.
       // Metadata and extended-fuel types (wrongE85, wrongName, etc.)
       // route to TankSync only, even in Germany with a key set.
