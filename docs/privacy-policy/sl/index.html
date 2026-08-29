@@ -3,107 +3,150 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sparkilo — Pravilnik o zasebnosti</title>
+  <title>Sparkilo — Politika zasebnosti</title>
   <link rel="stylesheet" href="../assets/styles.css">
 </head>
 <body>
 
-<h1>Pravilnik o zasebnosti</h1>
-<p class="meta">Sparkilo (de.tankstellen.tankstellen v iOS-u, de.tankstellen.fuelprices v Androidu) &mdash; Zadnja posodobitev: 15. avgust 2026</p>
-<p class="langs">Razpoložljivi jeziki: <a href="../">English</a> <a href="../de/">Deutsch</a> <a href="../fr/">Français</a> <a href="../es/">Español</a> <a href="../it/">Italiano</a> <a href="../nl/">Nederlands</a> <a href="../pt/">Português</a> <a href="../sv/">Svenska</a> <a href="../fi/">Suomi</a> <a href="../da/">Dansk</a> <a href="../pl/">Polski</a> <a href="../sl/">Slovenščina</a> <a href="../ko/">한국어</a></p>
+<h1>Politika zasebnosti</h1>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen v sistemu iOS, de.tankstellen.fuelprices v sistemu Android) &mdash; Version 3 &mdash; Zadnja posodobitev: 29. avgust 2026</p>
+<p class="langs">Razpoložljivi jeziki: <a href="../">English</a> <a href="../bg/">Български</a> <a href="../cs/">Čeština</a> <a href="../da/">Dansk</a> <a href="../de/">Deutsch</a> <a href="../el/">Ελληνικά</a> <a href="../es/">Español</a> <a href="../et/">Eesti</a> <a href="../fi/">Suomi</a> <a href="../fr/">Français</a> <a href="../hr/">Hrvatski</a> <a href="../hu/">Magyar</a> <a href="../it/">Italiano</a> <a href="../ko/">한국어</a> <a href="../lt/">Lietuvių</a> <a href="../lv/">Latviešu</a> <a href="../nb/">Norsk</a> <a href="../nl/">Nederlands</a> <a href="../pl/">Polski</a> <a href="../pt/">Português</a> <a href="../ro/">Română</a> <a href="../sk/">Slovenčina</a> <a href="../sl/">Slovenščina</a> <a href="../sv/">Svenska</a></p>
 
 <h2>1. Pregled</h2>
-<p>Sparkilo (prej Fuel Prices Europe & More) je brezplačna odprtokodna aplikacija za primerjavo cen goriv in polnilnih postaj za električna vozila. Zgrajena je po <strong>local-first, zasebnost spoštujočem</strong> načelu. Brez oglasov, brez sledilnih pikslov, brez oglaševalskih ID-jev.</p>
+<p>Sparkilo je brezplačna odprtokodna aplikacija za primerjavo cen goriva in polnjenja električnih vozil z izbirnim beleženjem poti. Zgrajena je po načelu <strong>local-first</strong> (podatki najprej na napravi): vse, kar aplikacija ve o Vas, je shranjeno na Vašem telefonu, razen če vklopite funkcijo, ki izrecno navaja drugače. Ni oglasov, ni sledilnih pikslov, ni oglaševalskih identifikatorjev in ni analitičnega SDK-ja. Ta politika je napisana v skladu s Splošno uredbo EU o varstvu podatkov (GDPR); velja za vsakega uporabnika, ne glede na to, kje ste.</p>
+<p>Aplikacija je <a href="https://github.com/fdittgen-png/tankstellen">odprtokodna</a> — vsako spodnjo trditev je mogoče preveriti v kodi. Strojno berljiv povzetek obdelanih podatkov je shranjen v <code>docs/privacy/data_inventory.json</code>, lastni testi aplikacije pa ne uspejo, če se ta stran, izjave v trgovinah z aplikacijami in koda med seboj razhajajo.</p>
 
-<h2>2. Podatki, ki jih uporabljamo</h2>
-
-<h3>2.1 Lokacija</h3>
-<p>Ko dovolite dostop do lokacije, aplikacija prebere vaš položaj, da poišče bližnje črpalke in polnilne postaje; te koordinate iskanja se kot del poizvedbe pošljejo API-jem tretjih oseb (glejte razdelek 4) in se ne shranjujejo na noben naš strežnik. Če uporabljate beleženje poti, aplikacija dodatno zabeleži vašo <strong>natančno GPS-pot</strong>; zabeležene poti se shranjujejo na vaši napravi in, samo če omogočite TankSync, sinhronizirajo z vašim zaledjem TankSync. Zabeležene poti se nikoli ne delijo s tretjimi osebami.</p>
-
-<h3>2.2 API ključi, ki jih posredujete sami</h3>
-<p>Če posredujete svoj API ključ (npr. Tankerkönig), je shranjen lokalno v šifriranem shranjevalniku (Android Keystore / iOS Keychain). Ključ se pošlje samo ustreznemu ponudniku API-ja, nikoli nam ali tretjim osebam.</p>
-
-<h3>2.3 Priljubljene, profili in nastavitve</h3>
-<p>Vaše priljubljene, iskalni profili, nastavitve goriv in nastavitve aplikacije se shranjujejo lokalno na vašo napravo v zbirko Hive.</p>
-
-<h3>2.4 TankSync (neobvezna sinhronizacija v oblaku)</h3>
-<p>Če omogočite TankSync, se prek storitve Supabase ustvari anonimni račun. Sinhronizirani podatki:</p>
-<ul>
-  <li>Identifikator uporabnika — privzeto anonimen UUID; po želji lahko z računom TankSync povežete e-poštni naslov za sinhronizacijo med napravami</li>
-  <li>ID-ji priljubljenih črpalk</li>
-  <li>Nastavitve cenovnih opozoril</li>
-  <li>Skupnostni podatki o cenah (ID črpalke, vrsta goriva, cena, časovni žig)</li>
-  <li>Zabeležene poti (GPS-pot, razdalje, statistika porabe)</li>
-  <li>Točenja goriva (strošek, litri, števec kilometrov) in profili vozil</li>
-</ul>
-<p>TankSync je neobvezen in privzeto izklopljen. Vse podatke na strežniku si lahko ogledate, izvozite in izbrišete iz zaslona « Preglednost podatkov » znotraj aplikacije.</p>
-
-<h3>2.5 Poročila o sesutjih in diagnostika (po izbiri)</h3>
-<p>Če v Nastavitvah omogočite diagnostiko, se v Sentry pošljejo anonimna poročila o sesutjih in sledi delovanja. Vključenih ni nobenih osebnih podatkov, lokacije ali vsebine. Diagnostika je privzeto izklopljena.</p>
-
-<h2>3. Podatki, ki jih NE zbiramo</h2>
-<ul>
-  <li>Ime ali telefonsko številko (e-poštni naslov se shrani samo, če ga izrecno povežete s svojim neobveznim računom TankSync)</li>
-  <li>Finančne ali plačilne podatke</li>
-  <li>Zdravstvene ali fitnes podatke</li>
-  <li>Stike, sporočila ali dnevnike klicev</li>
-  <li>Fotografije, video posnetke ali datoteke (dostop do kamere in galerije se uporablja le za skeniranje računov, ki ga sami sprožite)</li>
-  <li>Zgodovino brskanja</li>
-  <li>Oglaševalske identifikatorje naprave</li>
-</ul>
-
-<h2>4. Storitve tretjih oseb</h2>
-<p>Aplikacija komunicira z naslednjimi API-ji tretjih oseb:</p>
-<ul>
-  <li><strong>Tankerkönig</strong> (creativecommons.tankerkoenig.de) — nemške cene. Prejme: koordinate iskanja, vaš API ključ.</li>
-  <li><strong>Prix Carburants</strong> (data.economie.gouv.fr) — francoske cene. Prejme: koordinate iskanja.</li>
-  <li><strong>Italijanski API cen</strong> (osservaprezzi.mise.gov.it) — italijanske cene. Prejme: koordinate iskanja.</li>
-  <li><strong>Španski API cen</strong> (sedeaplicaciones.minetur.gob.es) — španske cene. Prejme: koordinate iskanja.</li>
-  <li><strong>Spritpreisrechner</strong> (spritpreisrechner.at) — avstrijske cene. Prejme: koordinate iskanja.</li>
-  <li><strong>FuelWatch</strong> (fuelwatch.be) — belgijske cene. Prejme: koordinate iskanja.</li>
-  <li><strong>data.public.lu</strong> — luksemburške cene. Prejme: koordinate iskanja.</li>
-  <li><strong>OpenChargeMap</strong> (api.openchargemap.io) — polnilne postaje. Prejme: koordinate iskanja.</li>
-  <li><strong>Nominatim / OpenStreetMap</strong> (nominatim.openstreetmap.org) — geokodiranje. Prejme: iskalno besedilo ali koordinate.</li>
-  <li><strong>Strežniki ploščic OpenStreetMap</strong> (tile.openstreetmap.org) — zemljevidne ploščice. Prejme: koordinate ploščice.</li>
-  <li><strong>Supabase</strong> (samo če je TankSync omogočen) — zaledje za sinhronizacijo v oblaku.</li>
-  <li><strong>Sentry</strong> (samo če je diagnostika omogočena) — anonimna poročila o sesutjih in delovanju.</li>
-</ul>
-<p>Vsak ponudnik ima svoj pravilnik o zasebnosti. Priporočamo, da jih preberete. Aplikacija med temi ponudniki ne deli podatkov.</p>
-
-<h2>5. Varnost podatkov</h2>
-<ul>
-  <li>Vsa omrežna komunikacija poteka prek HTTPS (TLS šifriranje med prenosom).</li>
-  <li>API ključi se shranjujejo v platformi lastnem šifriranem shranjevalniku (Android Keystore / iOS Keychain).</li>
-  <li>Lokalni podatki se shranjujejo na vaši napravi prek Hive.</li>
-  <li>Nobeni podatki se ne pošiljajo na strežnik, razen če sami sprožite iskanje ali omogočite TankSync / diagnostiko.</li>
-</ul>
-
-<h2>6. Vaše pravice</h2>
-<p>Imate pravico do:</p>
-<ul>
-  <li><strong>Vpogleda</strong> — vse lokalno shranjene podatke si lahko ogledate v razdelku Shramba znotraj aplikacije.</li>
-  <li><strong>Izvoza</strong> — podatke TankSync lahko izvozite v JSON s zaslona Preglednost podatkov.</li>
-  <li><strong>Izbrisa</strong> — vse lokalne podatke izbrišete prek Nastavitve → Izbriši vse podatke; vse strežniške podatke prek TankSync → Preglednost podatkov → Izbriši vse.</li>
-  <li><strong>Preklica privolitve</strong> — preklicati dovoljenje za lokacijo v sistemskih nastavitvah ali kadar koli onemogočiti TankSync / diagnostiko.</li>
-</ul>
-
-<h2>7. Brisanje računa in podatkov</h2>
-<p>Vse lahko izbrišete sami, neposredno v aplikaciji — brez potrebe po stiku s podporo:</p>
-<ul>
-  <li><strong>Lokalni podatki:</strong> Nastavitve → Izbriši vse podatke odstrani vse profile, priljubljene, API ključe, predpomnjene cene, zabeležene poti in nastavitve z vaše naprave.</li>
-  <li><strong>Račun TankSync in podatki na strežniku:</strong> TankSync → Preglednost podatkov → Izbriši račun najprej izbriše vsak zapis, ki je vaš (priljubljene, opozorila, poročila o cenah, vozila, točenja goriva, poti, ocene), nato pa izbriše samo identiteto računa, vključno z morebitnim povezanim e-poštnim naslovom. Tega dejanja ni mogoče razveljaviti.</li>
-</ul>
-<p>Če do aplikacije ne morete več dostopati, lahko zahtevate izbris tako, da se obrnete na razvijalca (razdelek 10); prosimo, pišite z e-poštnega naslova, povezanega z vašim računom, da bomo lahko preverili lastništvo.</p>
-
-<h2>8. Zasebnost otrok</h2>
-<p>Aplikacija ni namenjena otrokom, mlajšim od 13 let. Zavestno ne zbiramo osebnih podatkov otrok.</p>
-
-<h2>9. Spremembe tega pravilnika</h2>
-<p>Pravilnik lahko občasno posodobimo. Spremembe bomo objavili na tem URL-ju z ažurnim datumom. Z nadaljnjo uporabo aplikacije se strinjate s posodobljenim pravilnikom.</p>
-
-<h2>10. Kontakt</h2>
+<h2>2. Kdo je odgovoren (upravljavec)</h2>
+<p>Upravljavec aplikacije in izbirne storitve sinhronizacije Sparkilo Community je:</p>
 <div class="contact">
-  <p><strong>Razvijalec:</strong> Florian DITTGEN</p>
+  <p><strong>Florian DITTGEN</strong> (samostojni razvijalec)</p>
+  <p><strong>E-pošta:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
+  <p><strong>Izvorna koda in sledilnik težav:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
+</div>
+<p>Glede na to, kako uporabljate TankSync, se upravljavec Vaših sinhroniziranih podatkov spreminja:</p>
+<ul>
+  <li><strong>Brez TankSynca (privzeto):</strong> nič se ne shranjuje na nobenem strežniku, ki ga upravljamo mi. Vaši podatki ostanejo na Vaši napravi in imate izključni nadzor nad njimi.</li>
+  <li><strong>Zasebna podatkovna zbirka:</strong> povežete svoj lastni projekt Supabase. Vi ste upravljavec; mi teh podatkov nikoli ne vidimo.</li>
+  <li><strong>Pridružitev skupini:</strong> povežete projekt Supabase, ki ga upravlja nekdo, ki ga poznate (družina, prijatelji). Ta oseba je upravljavec skupne podatkovne zbirke.</li>
+  <li><strong>Sparkilo Community:</strong> povežete skupno podatkovno zbirko, ki jo upravlja zgoraj navedeni razvijalec (Supabase, gostovano v EU — AWS eu-central-1, Frankfurt). Razvijalec je upravljavec; Supabase, Inc. je obdelovalec, zavezan s svojimi pogoji obdelave podatkov.</li>
+</ul>
+<p>Aplikacija Vam pove, kateri od teh primerov velja, preden se povežete, in to znova prikaže v Nastavitve → Nadzorna plošča zasebnosti.</p>
+
+<h2>3. Podatki, ki jih uporabljamo</h2>
+<p>Tabela navaja vsako vrsto osebnih podatkov, ki jih aplikacija obdeluje, zakaj, na kateri pravni podlagi (6. člen GDPR), kam gredo in kako dolgo se hranijo. »Naprava« pomeni, da nikoli ne zapustijo Vašega telefona.</p>
+<table>
+  <thead><tr><th>Podatki</th><th>Namen</th><th>Pravna podlaga</th><th>Kam gredo</th><th>Obdobje hrambe</th></tr></thead>
+  <tbody>
+    <tr><td>Približna / natančna lokacija (iskanje)</td><td>Iskanje postaj v Vaši bližini</td><td>Privolitev (podelite dovoljenje za lokacijo in potrdite razlago v aplikaciji)</td><td>Pošlje se kot koordinate iskanja viru podatkov o cenah za državo, v kateri ste (razdelek 5). Ne shranjuje se na nobenem strežniku, ki ga upravljamo mi.</td><td>Zadnji položaj se hrani na napravi za pripomoček na začetnem zaslonu, dokler ne izbrišete podatkov</td></tr>
+    <tr><td>Natančna pot GPS, hitrost, nadmorska višina, senzorji gibanja (beleženje poti)</td><td>Beleženje poti, izračun razdalje in porabe</td><td>Privolitev (Vi začnete beleženje; samodejno beleženje zahteva ločeno dovoljenje za lokacijo v ozadju za vsako vozilo)</td><td>Naprava. Z vklopljenim TankSyncom <em>in</em> sinhronizacijo poti: Vaša podatkovna zbirka TankSync.</td><td>Naprava: dokler ne izbrišete poti ali vseh podatkov. Strežnik: povzetki poti, dokler jih ne izbrišete; podrobni vzorci GPS se izbrišejo 90 dni po poti.</td></tr>
+    <tr><td>Profil vozila (znamka, model, letnik, prostornina rezervoarja, VIN, identifikator adapterja OBD2)</td><td>Izračun porabe, ponovna povezava adapterja</td><td>Pogodba (zagotavljanje funkcije, ki ste jo nastavili)</td><td>Naprava. S TankSyncom: Vaša podatkovna zbirka TankSync.</td><td>Dokler ne izbrišete vozila ali vseh podatkov</td></tr>
+    <tr><td>VIN (17 znakov)</td><td>Spletno dekodiranje znamke/modela/motorja</td><td>Privolitev (ločeno stikalo, privzeto izklopljeno; sicer deluje dekoder brez povezave)</td><td>NHTSA vPIC (javna služba ZDA), samo VIN</td><td>Mi ga ne shranjujemo; glejte politiko NHTSA</td></tr>
+    <tr><td>Točenja goriva (datum, postaja, litri, strošek, stanje števca kilometrov), dnevniki polnjenja, opomniki za servis</td><td>Vaš dnevnik goriva in statistika</td><td>Pogodba</td><td>Naprava. S TankSyncom: Vaša podatkovna zbirka TankSync.</td><td>Dokler jih ne izbrišete ali ne izbrišete vseh podatkov</td></tr>
+    <tr><td>Priljubljene, prezrte postaje, opozorila o cenah, iskalni profili, načrti poti, nastavitve</td><td>Prilagoditev aplikacije; sprožanje lokalnih obvestil o opozorilih na cene</td><td>Pogodba</td><td>Naprava. S TankSyncom: Vaša podatkovna zbirka TankSync.</td><td>Dokler jih ne izbrišete ali ne izbrišete vseh podatkov</td></tr>
+    <tr><td>Anonimni uporabniški ID (naključni UUID), izbirni e-poštni naslov, ID naprave za vsako namestitev</td><td>Prepoznavanje Vašega računa TankSync na več napravah; označevanje, katera naprava je izbrisala zapis</td><td>Privolitev (stikalo Sinhronizacija v oblaku) / Pogodba</td><td>Vaša podatkovna zbirka TankSync (Supabase)</td><td>Dokler ne izbrišete računa</td></tr>
+    <tr><td>Prijave cen iz skupnosti, deljene ocene postaj, prijave vsebine</td><td>Popravki cen s strani skupnosti in moderiranje</td><td>Privolitev (Vi jih pošljete; obvestilo pojasnjuje, da so shranjene pod Vašim psevdonimnim ID-jem in da jih lahko berejo drugi prijavljeni uporabniki)</td><td>Vaša podatkovna zbirka TankSync — v Sparkilo Community berljive vsakemu prijavljenemu uporabniku</td><td>Dokler ne izbrišete prijave ali računa</td></tr>
+    <tr><td>Poročila o zrušitvah in sledi zmogljivosti (različica aplikacije, različica OS, velikost zaslona, jezikovna nastavitev, sled sklada, zadnja dejanja v aplikaciji)</td><td>Odpravljanje napak</td><td>Privolitev (stikalo Poročanje o napakah, privzeto izklopljeno)</td><td>Sentry</td><td>Naprava: 50 najnovejših sledi, 7 dni, pred shranjevanjem očiščene e-poštnih naslovov, koordinat in žetonov. Sentry: 90 dni.</td></tr>
+    <tr><td>Fotografija računa ali črpalke (kamera / fotogalerija)</td><td>Branje računa na napravi (OCR na napravi)</td><td>Privolitev (Vi posnamete ali izberete fotografijo)</td><td>Samo naprava. Priloži se težavi (issue) na GitHubu le, če oddate prijavo »slabo skeniranje« in jo potrdite.</td><td>Izbrisana po skeniranju; kopija v prijavi ostane na GitHubu, dokler ne izbrišete težave</td></tr>
+    <tr><td>Prikazani del zemljevida (koordinate ploščic) in naslov IP</td><td>Izris zemljevida</td><td>Zakoniti interes (zemljevid potrebuje ploščice) — posredniški strežnik lahko izklopite</td><td>Posredniški strežnik Sparkilo za ploščice (isti projekt Supabase, EU), ki jih pridobi z OpenStreetMapa; ali neposredno tile.openstreetmap.org, kadar je posredniški strežnik izklopljen (Nastavitve → Zasebnost) ali v različici za F-Droid</td><td>Ne shranjuje se dlje od standardnih strežniških dnevnikov (posredniški strežnik: 7 dni)</td></tr>
+    <tr><td>Izhodišče in cilj poti, poizvedbe po cestnem omrežju</td><td>Iskanje poti, nasveti za varčno vožnjo</td><td>Pogodba</td><td>OSRM (router.project-osrm.org), Overpass API (overpass-api.de), Nominatim (nominatim.openstreetmap.org)</td><td>Mi jih ne shranjujemo</td></tr>
+    <tr><td>Besedilo naslova ali koordinate, ki jih vnesete</td><td>Geokodiranje</td><td>Pogodba</td><td>Nominatim ali vgrajeni geokoder Vašega telefona (Apple / Google)</td><td>Mi jih ne shranjujemo</td></tr>
+    <tr><td>Ključi API, ki jih vnesete (Tankerkönig, OpenChargeMap)</td><td>Klicanje teh storitev v Vašem imenu</td><td>Pogodba</td><td>Samo ponudniku, ki mu ključ pripada</td><td>Šifrirani na napravi (Keystore / Keychain), dokler jih ne izbrišete</td></tr>
+    <tr><td>Prijave postaj z napačnim imenom / napačnim naslovom, prijave slabega skeniranja</td><td>Popravljanje podatkov</td><td>Privolitev (potrdite pred pošiljanjem; potreben je osebni žeton GitHub)</td><td>GitHub (javna težava v repozitoriju projekta)</td><td>Javno, dokler težava ni izbrisana</td></tr>
+  </tbody>
+</table>
+<p>Aplikacija ne sprejema avtomatiziranih odločitev s pravnimi ali podobno pomembnimi učinki za Vas. Napovedi cen se izračunajo na napravi iz javnih podatkov o cenah.</p>
+
+<h2>4. Podatki, ki jih NE zbiramo</h2>
+<ul>
+  <li>Ime ali telefonska številka (e-poštni naslov se shrani le, če ga povežete s svojim izbirnim računom TankSync)</li>
+  <li>Plačilni ali bančni podatki</li>
+  <li>Zdravstveni ali fitnes podatki</li>
+  <li>Stiki, sporočila ali dnevniki klicev</li>
+  <li>Fotografije, videoposnetki ali datoteke, razen fotografije računa, ki jo izberete za skeniranje</li>
+  <li>Zgodovina brskanja</li>
+  <li>Oglaševalski identifikatorji</li>
+</ul>
+<p>Logotipi znamk so priloženi aplikaciji. Njihovo nalaganje iz interneta (logo.clearbit.com, ki bi prejel Vaš naslov IP) je izklopljeno, razen če ga vklopite v Nastavitve → Zasebnost.</p>
+
+<h2>5. Storitve tretjih oseb in viri podatkov</h2>
+<p>Aplikacija komunicira z naslednjimi storitvami. Vsaka ima svojo politiko zasebnosti. Aplikacija nikoli ne deli podatkov med njimi in nikoli ne pošlje več, kot opisujejo zgornji stolpci.</p>
+<h3>5.1 Infrastruktura (samo kadar je ustrezna funkcija vklopljena)</h3>
+<ul>
+  <li><strong>Supabase</strong> (klelxnkzrxlpzuddhpfg.supabase.co, AWS eu-central-1) — zaledje TankSync za Sparkilo Community in posredniški strežnik za ploščice. Obdelovalec v skladu z dodatkom Supabase o obdelavi podatkov.</li>
+  <li><strong>Sentry</strong> (sentry.io) — poročila o zrušitvah in sledi zmogljivosti, samo s privolitvijo. Sentry lahko obdeluje podatke v Združenih državah Amerike; prenosi so zajeti z Okvirom za varstvo podatkov EU–ZDA in standardnimi pogodbenimi klavzulami.</li>
+  <li><strong>GitHub</strong> (api.github.com, github.com) — prijave težav, ki jih izrecno oddate; aplikacija iz izdaj projekta prenaša tudi javne podatkovne datoteke (izvozi z avtocest, seznami postaj), kar GitHubu razkrije Vaš naslov IP.</li>
+  <li><strong>OpenStreetMap</strong> (tile.openstreetmap.org, nominatim.openstreetmap.org), <strong>OSRM</strong> (router.project-osrm.org), <strong>Overpass API</strong> (overpass-api.de) — zemljevidi, geokodiranje, usmerjanje.</li>
+  <li><strong>OpenChargeMap</strong> (api.openchargemap.io) in <strong>ODRÉ / IRVE</strong> (odre.opendatasoft.com) — polnilne postaje za električna vozila in cene. Prejmejo: koordinate iskanja.</li>
+  <li><strong>NHTSA vPIC</strong> (vpic.nhtsa.dot.gov) — dekodiranje VIN, samo s privolitvijo.</li>
+  <li><strong>Clearbit Logo API</strong> (logo.clearbit.com) — logotipi znamk, privzeto izklopljeno.</li>
+  <li><strong>Apple Maps / Google Maps</strong> (www.google.com) — odprejo se v Vašem brskalniku ali aplikaciji za zemljevide le, ko tapnete »Navigiraj«.</li>
+</ul>
+<h3>5.2 Uradni viri podatkov o cenah goriva (prejmejo Vaše koordinate iskanja ali regijo, nikoli Vaše identitete)</h3>
+<ul>
+  <li>Nemčija — Tankerkönig (creativecommons.tankerkoenig.de), z Vašim lastnim ključem API</li>
+  <li>Francija — Prix Carburants (data.economie.gouv.fr, donnees.roulez-eco.fr)</li>
+  <li>Italija — MIMIT osservaprezzi (carburanti.mise.gov.it)</li>
+  <li>Španija — MITECO / Geoportal Gasolineras (sedeaplicaciones.minetur.gob.es, geoportalgasolineras.es)</li>
+  <li>Avstrija — E-Control Spritpreisrechner (api.e-control.at)</li>
+  <li>Belgija in Luksemburg — data.public.lu, STATEC (lustat.statec.lu)</li>
+  <li>Portugalska — DGEG (precoscombustiveis.dgeg.gov.pt)</li>
+  <li>Danska — OK (mobility-prices.ok.dk), Shell (shellpumpepriser.geoapp.me)</li>
+  <li>Združeno kraljestvo — Fuel Finder (www.fuel-finder.service.gov.uk) in viri cen trgovcev, ki jih navaja: applegreenstores.com, fuelprices.asconagroup.co.uk, storelocator.asda.com, www.bp.com, fuelprices.esso.co.uk, jetlocal.co.uk, api2.krlmedia.com, www.morrisons.com, moto-way.com, fuel.motorfuelgroup.com, www.rontec-servicestations.co.uk, api.sainsburys.co.uk, www.sgnretail.uk, www.shell.co.uk, www.tesco.com</li>
+  <li>Slovenija — goriva.si</li>
+  <li>Romunija — Monitorul Prețurilor (monitorulpreturilor.info)</li>
+  <li>Grčija — Παρατηρητήριο Τιμών (paratiritirio.mindev.gov.gr) prek zrcalnega strežnika skupnosti, gostovanega na AWS eu-west-3 (5fcbs3i0z4.execute-api.eu-west-3.amazonaws.com)</li>
+  <li>Južna Koreja — Opinet (www.opinet.co.kr)</li>
+  <li>Čile — CNE (api.cne.cl)</li>
+  <li>Argentina — datos.energia.gob.ar</li>
+  <li>Mehika — CRE (publicacionexterna.azurewebsites.net)</li>
+  <li>Avstralija — FuelCheck NSW (www.fuelcheck.nsw.gov.au)</li>
+</ul>
+
+<h2>6. Varnost podatkov</h2>
+<ul>
+  <li>Vsa omrežna komunikacija uporablja HTTPS (TLS med prenosom); aplikacija zavrne končne točke sinhronizacije prek navadnega HTTP.</li>
+  <li>Ključi API, Vaš žeton GitHub in seja TankSync so shranjeni v šifrirani shrambi, lastni platformi (Android Keystore / iOS Keychain).</li>
+  <li>Lokalne podatkovne zbirke so šifrirane z AES s ključem, shranjenim v Keystore / Keychain — vključno z zabeleženimi potmi, podatki o vozilih, opomniki za servis in predpomnjenimi cenami.</li>
+  <li>Na strežniku je vsaka tabela zaščitena z varnostjo na ravni vrstic, tako da lahko račun vedno bere ali briše samo svoje vrstice; deljene ocene in prijave cen iz skupnosti so edine vrstice, vidne drugim prijavljenim uporabnikom.</li>
+  <li>Sledi napak so pred shranjevanjem ali pošiljanjem očiščene e-poštnih naslovov, koordinat in žetonov.</li>
+  <li>Nobeni podatki se ne pošljejo na noben strežnik, razen če zaženete iskanje, odprete zemljevid ali vklopite TankSync / diagnostiko.</li>
+</ul>
+
+<h2>7. Vaše pravice</h2>
+<p>Po členih 15–22 GDPR imate pravico do dostopa do svojih podatkov, njihovega popravka, izbrisa, omejitve obdelave in prenosljivosti, pravico do ugovora obdelavi na podlagi zakonitega interesa ter pravico do preklica privolitve kadar koli, ne da bi to vplivalo na zakonitost prejšnje obdelave. Vsaka pravica ima gumb v aplikaciji:</p>
+<ul>
+  <li><strong>Dostop</strong> — Nastavitve → Nadzorna plošča zasebnosti prikaže vsako kategorijo, shranjeno na napravi, in, kadar ste povezani, vsako vrstico v Vaši podatkovni zbirki TankSync.</li>
+  <li><strong>Izvoz (prenosljivost)</strong> — Nadzorna plošča zasebnosti → Izvozi vse moje podatke zapiše eno datoteko ZIP s strojno berljivim JSON-om za vsako kategorijo (priljubljene, opozorila, profili, načrti poti, zgodovina cen, vozila, točenja goriva, poti z vzorci GPS in enim GPX-om na pot, izhodiščne vrednosti, opomniki za servis, dnevniki polnjenja, Vaš zapis privolitev) ter izvoz JSON vsake strežniške tabele.</li>
+  <li><strong>Popravek</strong> — uredite kateri koli vnos neposredno v aplikaciji; sprememba se sinhronizira, če je TankSync vklopljen.</li>
+  <li><strong>Izbris</strong> — glejte razdelek 8.</li>
+  <li><strong>Omejitev / ugovor</strong> — v Nastavitvah izklopite TankSync, sinhronizacijo poti, posredniški strežnik za ploščice ali diagnostiko; v nastavitvah naprave prekličite dovoljenje za lokacijo, Bluetooth, kamero ali obvestila.</li>
+  <li><strong>Preklic privolitve</strong> — Nastavitve → Zasebnost in podatki navaja vsako privolitev z datumom, ko ste jo dali, in različico politike, ki ste jo videli; vsako je mogoče izklopiti in aplikacija takoj ustavi ustrezno obdelavo.</li>
+  <li><strong>Pritožba</strong> — pritožbo lahko vložite pri nadzornem organu, zlasti v državi članici EU Vašega običajnega prebivališča, kraja dela ali kraja domnevne kršitve. Hvaležni bi bili za priložnost, da Vašo težavo najprej rešimo sami: <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a>.</li>
+</ul>
+
+<h2>8. Izbris Vašega računa in podatkov</h2>
+<p>Vse lahko izbrišete sami, neposredno v aplikaciji — zahteva za podporo ni potrebna:</p>
+<ul>
+  <li><strong>Lokalni podatki:</strong> Nastavitve → Nadzorna plošča zasebnosti → Izbriši vse podatke odstrani vsako podatkovno zbirko, ki jo aplikacija hrani na napravi — profile, priljubljene, opozorila, zgodovino cen, predpomnjene cene, vozila, točenja goriva, zabeležene poti in njihove vzorce GPS, izhodiščne vrednosti OBD2 in predpomnilnike adapterja, opomnike za servis, dosežke, sledi napak, ključe API, žetone in podatke pripomočka na začetnem zaslonu — ter aplikacijo vrne v stanje ob prvem zagonu.</li>
+  <li><strong>Račun TankSync in podatki na strežniku:</strong> TankSync → Preglednost podatkov → Izbriši račun v eni transakciji izbriše vsako vrstico, ki jo imate (priljubljene, opozorila, prezrte postaje, prijave cen, prijave vsebine, vozila, točenja goriva, načrte poti, izhodiščne vrednosti, ocene, poti, deljenja poti, ki ste jih dali ali prejeli, obvestila o čakalnih časih, nastavitve sinhronizacije, zapise o izbrisu in Vašo uporabniško vrstico), nato pa izbriše še samo identiteto računa, vključno z vsakim povezanim e-poštnim naslovom. Če katere tabele ni bilo mogoče izbrisati, Vam aplikacija pove, katere, namesto da bi trdila, da je uspela. Tega ni mogoče razveljaviti.</li>
+  <li><strong>Posamezni elementi:</strong> vsako priljubljeno, opozorilo, vozilo, točenje goriva, pot, prijavo cene in prijavo vsebine je mogoče izbrisati posamezno; izbrisi se prenesejo na Vaše druge naprave.</li>
+</ul>
+<p>Če do aplikacije ne morete več dostopati, lahko izbris zahtevate tako, da se obrnete na razvijalca (razdelek 11); prosimo, pišite z e-poštnega naslova, povezanega z Vašim računom, da lahko preverimo lastništvo. Anonimnega računa, ki nikoli ni bil povezan z e-poštnim naslovom, ne more identificirati nihče — tudi mi ne — brez naprave, na kateri je bil ustvarjen.</p>
+
+<h2>9. Zasebnost otrok</h2>
+<p>Aplikacija ni namenjena otrokom, mlajšim od 16 let. Osebnih podatkov otrok zavestno ne zbiramo; če menite, da je otrok ustvaril račun TankSync, se obrnite na nas in ga bomo izbrisali.</p>
+
+<h2>10. Spremembe te politike</h2>
+<p>Spremembe se objavijo na tem naslovu URL z novo številko različice in datumom; aplikacija zabeleži različico, s katero ste soglašali, in to stran znova prikaže, ko se različica spremeni.</p>
+<ul>
+  <li><strong>v3 — 29. avgust 2026:</strong> upravljavec in vloge po načinu delovanja, tabela obdelave s pravnimi podlagami in obdobji hrambe, popoln seznam obdelovalcev (posredniški strežnik za ploščice, geokoder, usmerjanje, GitHub, logotipi znamk), poti za uveljavljanje pravic, popoln izbris in izvoz.</li>
+  <li><strong>v2 — 15. avgust 2026:</strong> razdelek o izbrisu računa; navedeni e-pošta in podatki računa TankSync.</li>
+  <li><strong>v1 — 7. april 2026:</strong> prva različica.</li>
+</ul>
+
+<h2>11. Kontakt</h2>
+<div class="contact">
+  <p><strong>Razvijalec in upravljavec:</strong> Florian DITTGEN</p>
   <p><strong>E-pošta:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
   <p><strong>Izvorna koda:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
 </div>

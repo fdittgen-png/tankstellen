@@ -781,7 +781,7 @@
   "syncHowToSyncQuestion": "Kā vēlaties sinhronizēt?",
   "syncOfflineDescription": "Jūsu lietotne darbojas pilnībā bezsaistē. Mākoņa sinhronizācija ir neobligāta.",
   "syncModeCommunityTitle": "Sparkilo kopiena",
-  "syncModeCommunitySubtitle": "Kopīgot izlases un vērtējumus ar visiem lietotājiem",
+  "syncModeCommunitySubtitle": "Koplietota datubāze, ko uztur izstrādātājs — zemāk redzams, kas tiek sinhronizēts",
   "syncModePrivateTitle": "Privāta datu bāze",
   "syncModePrivateSubtitle": "Jūsu pašu Supabase — pilna datu kontrole",
   "syncModeGroupTitle": "Pievienoties grupai",
@@ -4721,5 +4721,99 @@
         "type": "String"
       }
     }
-  }
+  },
+  "gdprPolicyLink": "Privātuma politika (versija {version})",
+  "@gdprPolicyLink": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentRecordedAt": "Piekrišana sniegta {date} · politikas versija {version}",
+  "@consentRecordedAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentNotRecorded": "Piekrišana vēl nav reģistrēta",
+  "serverErasurePartial": "Dažus servera datus neizdevās dzēst: {tables}. Mēģiniet vēlreiz vai sazinieties ar izstrādātāju, norādot šo sarakstu.",
+  "@serverErasurePartial": {
+    "placeholders": {
+      "tables": {
+        "type": "String"
+      }
+    }
+  },
+  "localErasurePartial": "Dažus lokālos datus neizdevās dzēst: {steps}. Restartējiet lietotni un mēģiniet vēlreiz.",
+  "@localErasurePartial": {
+    "placeholders": {
+      "steps": {
+        "type": "String"
+      }
+    }
+  },
+  "myCommunityReportsTitle": "Mani kopienas ziņojumi",
+  "myCommunityReportsEmpty": "Nav iesniegts neviens ziņojums",
+  "deleteReportTooltip": "Dzēst šo ziņojumu",
+  "reportDeleted": "Ziņojums dzēsts",
+  "reportDeleteFailed": "Neizdevās dzēst ziņojumu",
+  "privacyControlsTitle": "Privātuma iestatījumi",
+  "tileProxyToggleTitle": "Ielādēt kartes flīzes caur Sparkilo starpniekserveri",
+  "tileProxyToggleSubtitle": "Ieslēgts: redzamais kartes apgabals un jūsu IP adrese nonāk izstrādātāja ES serverī, kas flīzes iegūst no OpenStreetMap. Izslēgts: flīzes tiek ielādētas tieši no tile.openstreetmap.org.",
+  "remoteLogosToggleTitle": "Ielādēt zīmolu logotipus no interneta",
+  "remoteLogosToggleSubtitle": "Pēc noklusējuma izslēgts: tiek rādīti lietotnē iekļautie aizstājēji. Ieslēgts: logotipi tiek iegūti no logo.clearbit.com, kas redz jūsu IP adresi.",
+  "privacyExportAllButton": "Eksportēt visus manus datus (ZIP)",
+  "privacyExportAllSuccess": "{fileName} saglabāts lejupielādēs — iekšā {count} faili",
+  "@privacyExportAllSuccess": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "privacyExportAllFailed": "Neizdevās ierakstīt eksporta failu",
+  "syncModeCommunityControllerNotice": "Uztur {operator} · Supabase, ES (Frankfurt) · sinhronizē izlasi, brīdinājumus, transportlīdzekļus ar VIN, uzpildes, vērtējumus, ziņojumus un — ja to ieslēdzat — braucienus ar GPS",
+  "@syncModeCommunityControllerNotice": {
+    "placeholders": {
+      "operator": {
+        "type": "String"
+      }
+    }
+  },
+  "syncModePrivateControllerNotice": "Datu pārzinis esat jūs — jūsu pašu Supabase projekts, mēs to nekad neredzam",
+  "syncModeJoinControllerNotice": "Koplietotās datubāzes īpašnieks ir jūsu datu pārzinis",
+  "ugcPublicNoticeTitle": "Koplietots ar citiem lietotājiem",
+  "ugcPublicNoticeBody": "Tas tiek glabāts sinhronizācijas datubāzē ar jūsu pseidonīmo lietotāja ID. Sparkilo kopienā to var izlasīt ikviens pierakstījies lietotājs. Jebkurā laikā varat to dzēst sadaļā TankSync → Datu caurredzamība.",
+  "blockedAuthorsTitle": "Bloķētie lietotāji",
+  "blockedAuthorsDescription": "Šo lietotāju koplietotais saturs šajā ierīcē ir paslēpts. Atbloķējiet, lai to atkal redzētu.",
+  "blockedAuthorsEmpty": "Nav bloķētu lietotāju",
+  "blockedAuthorsUnblock": "Atbloķēt",
+  "permissionRationaleCameraTitle": "Kameras piekļuve",
+  "permissionRationaleCameraSubtitle": "Šī lietotne vēlas izmantot jūsu kameru, lai nolasītu čekus, sūkņu displejus un QR kodus.",
+  "permissionRationaleCameraWhatHappens": "Kas notiek ar kameras attēlu:",
+  "permissionRationaleCameraBulletOnDevice": "Attēls tiek izmantots tikai čeka, sūkņa displeja vai QR koda nolasīšanai — atpazīšana notiek jūsu ierīcē.",
+  "permissionRationaleCameraBulletDiscarded": "Fotoattēls pēc skenēšanas tiek dzēsts.",
+  "permissionRationaleCameraBulletNoUpload": "Nekas netiek augšupielādēts, ja vien neiesniedzat ziņojumu par kļūdainu skenēšanu un to neapstiprināt.",
+  "permissionRationaleBluetoothTitle": "Bluetooth piekļuve",
+  "permissionRationaleBluetoothSubtitle": "Šī lietotne vēlas izmantot Bluetooth, lai izveidotu savienojumu ar jūsu OBD2 adapteri.",
+  "permissionRationaleBluetoothWhatHappens": "Kas notiek ar Bluetooth:",
+  "permissionRationaleBluetoothBulletAdapterOnly": "Bluetooth tiek izmantots tikai jūsu OBD2 adaptera atrašanai un saziņai ar to.",
+  "permissionRationaleBluetoothBulletIdentifierLocal": "Adaptera identifikators paliek jūsu ierīcē — tas tiek sinhronizēts tikai caur TankSync kā transportlīdzekļa profila daļa.",
+  "permissionRationaleBluetoothBulletLegacyLocation": "Android 11 un vecākās versijās sistēma pieprasa arī atrašanās vietu, jo Bluetooth meklēšana tur tiek uzskatīta par atrašanās vietas atļauju.",
+  "permissionRationaleNotificationsTitle": "Paziņojumi",
+  "permissionRationaleNotificationsSubtitle": "Šī lietotne vēlas sūtīt jums paziņojumus par cenu brīdinājumiem un brauciena ierakstīšanas statusu.",
+  "permissionRationaleNotificationsWhatHappens": "Kas notiek ar paziņojumiem:",
+  "permissionRationaleNotificationsBulletLocal": "Paziņojumi tiek izmantoti vietējiem cenu brīdinājumiem un brauciena ierakstīšanas statusam.",
+  "permissionRationaleNotificationsBulletNothingLeaves": "Tie tiek ģenerēti jūsu ierīcē — nekas nepamet ierīci.",
+  "permissionRationaleRevoke": "To varat jebkurā laikā atsaukt ierīces iestatījumos.",
+  "permissionRationaleLegalBasis": "Juridiskais pamats: VDAR 6. panta 1. punkta a) apakšpunkts (piekrišana)"
 }

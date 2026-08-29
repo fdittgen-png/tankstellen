@@ -9,101 +9,144 @@
 <body>
 
 <h1>Tietosuojakäytäntö</h1>
-<p class="meta">Sparkilo (de.tankstellen.tankstellen iOS:llä, de.tankstellen.fuelprices Androidilla) &mdash; Viimeksi päivitetty: 15. elokuuta 2026</p>
-<p class="langs">Saatavilla olevat kielet: <a href="../">English</a> <a href="../de/">Deutsch</a> <a href="../fr/">Français</a> <a href="../es/">Español</a> <a href="../it/">Italiano</a> <a href="../nl/">Nederlands</a> <a href="../pt/">Português</a> <a href="../sv/">Svenska</a> <a href="../fi/">Suomi</a> <a href="../da/">Dansk</a> <a href="../pl/">Polski</a> <a href="../sl/">Slovenščina</a> <a href="../ko/">한국어</a></p>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen iOS:llä, de.tankstellen.fuelprices Androidilla) &mdash; Version 3 &mdash; Päivitetty viimeksi: 29.8.2026</p>
+<p class="langs">Saatavilla olevat kielet: <a href="../">English</a> <a href="../bg/">Български</a> <a href="../cs/">Čeština</a> <a href="../da/">Dansk</a> <a href="../de/">Deutsch</a> <a href="../el/">Ελληνικά</a> <a href="../es/">Español</a> <a href="../et/">Eesti</a> <a href="../fi/">Suomi</a> <a href="../fr/">Français</a> <a href="../hr/">Hrvatski</a> <a href="../hu/">Magyar</a> <a href="../it/">Italiano</a> <a href="../ko/">한국어</a> <a href="../lt/">Lietuvių</a> <a href="../lv/">Latviešu</a> <a href="../nb/">Norsk</a> <a href="../nl/">Nederlands</a> <a href="../pl/">Polski</a> <a href="../pt/">Português</a> <a href="../ro/">Română</a> <a href="../sk/">Slovenčina</a> <a href="../sl/">Slovenščina</a> <a href="../sv/">Svenska</a></p>
 
 <h2>1. Yleiskatsaus</h2>
-<p>Sparkilo (aiemmin Fuel Prices Europe & More) on ilmainen avoimen lähdekoodin sovellus polttoaine- ja latausasemien hintojen vertailuun. Se on rakennettu <strong>local-first, yksityisyyttä kunnioittavalle</strong> arkkitehtuurille. Ei mainoksia, ei seurantapikseleitä, ei mainostunnisteita.</p>
+<p>Sparkilo on ilmainen, avoimen lähdekoodin polttoaine- ja sähköautojen latauhintojen vertailusovellus, jossa on valinnainen matkojen tallennus. Se on rakennettu <strong>local-first</strong>-periaatteella: kaikki, mitä sovellus tietää sinusta, pysyy puhelimessasi, ellet ota käyttöön ominaisuutta, jonka kohdalla nimenomaisesti todetaan toisin. Sovelluksessa ei ole mainoksia, seurantapikseleitä, mainostunnisteita eikä analytiikka-SDK:ta. Tämä käytäntö on laadittu täyttämään EU:n yleisen tietosuoja-asetuksen (GDPR) vaatimukset; se koskee jokaista käyttäjää riippumatta siitä, missä olet.</p>
+<p>Sovellus on <a href="https://github.com/fdittgen-png/tankstellen">avointa lähdekoodia</a> — jokainen alla oleva väite on tarkistettavissa koodista. Koneellisesti luettava yhteenveto käsiteltävistä tiedoista säilytetään tiedostossa <code>docs/privacy/data_inventory.json</code>, ja sovelluksen omat testit epäonnistuvat, jos tämä sivu, sovelluskauppojen ilmoitukset ja koodi ajautuvat erilleen.</p>
 
-<h2>2. Käyttämämme tiedot</h2>
-
-<h3>2.1 Sijainti</h3>
-<p>Kun annat sijaintiluvan, sovellus lukee sijaintisi löytääkseen lähimmät polttoaine- ja latausasemat; nämä hakukoordinaatit lähetetään kolmansien osapuolien rajapintoihin (ks. luku 4) osana hakua eikä niitä tallenneta millekään ylläpitämällemme palvelimelle. Jos käytät matkan tallennusta, sovellus tallentaa lisäksi <strong>tarkan GPS-reittisi</strong>; tallennetut matkat säilytetään laitteellasi ja, vain jos otat TankSyncin käyttöön, synkronoidaan TankSync-taustajärjestelmääsi. Tallennettuja matkoja ei koskaan jaeta kolmansille osapuolille.</p>
-
-<h3>2.2 Itse antamasi API-avaimet</h3>
-<p>Jos annat oman API-avaimesi (esim. Tankerkönig), se tallennetaan paikallisesti salattuun säilöön (Android Keystore / iOS Keychain). Avain lähetetään vain vastaavalle API-tarjoajalle, ei meille eikä kolmansille osapuolille.</p>
-
-<h3>2.3 Suosikit, profiilit ja asetukset</h3>
-<p>Suosikkisi, hakuprofiilisi, polttoainemieltymyksesi ja sovellusasetuksesi tallennetaan paikallisesti laitteellesi Hive-tietokantaan.</p>
-
-<h3>2.4 TankSync (valinnainen pilvisynkronointi)</h3>
-<p>Jos otat TankSyncin käyttöön, Supabaseen luodaan anonyymi tili. Synkronoitavat tiedot:</p>
-<ul>
-  <li>Käyttäjätunnus — oletuksena anonyymi UUID; voit halutessasi liittää sähköpostiosoitteen TankSync-tiliisi laitteiden välistä synkronointia varten</li>
-  <li>Suosikkiasemien tunnukset</li>
-  <li>Hintahälytysten asetukset</li>
-  <li>Yhteisön hintailmoitukset (aseman tunnus, polttoainetyyppi, hinta, aikaleima)</li>
-  <li>Tallennetut matkat (GPS-reitti, matkat, kulutustilastot)</li>
-  <li>Tankkaukset (hinta, litrat, mittarilukema) ja ajoneuvoprofiilit</li>
-</ul>
-<p>TankSync on valinnainen ja oletuksena pois käytöstä. Voit tarkastella, viedä ja poistaa kaikki palvelinpuolen tiedot sovelluksen « Tietojen läpinäkyvyys » -näytöltä.</p>
-
-<h3>2.5 Kaatumis- ja diagnostiikkaraportit (opt-in)</h3>
-<p>Jos otat diagnostiikan käyttöön Asetuksissa, anonyymejä kaatumisraportteja ja suorituskykyjälkiä lähetetään Sentryyn. Mitään henkilötietoja, sijaintia tai sisältöä ei sisällytetä. Diagnostiikka on oletuksena pois käytöstä.</p>
-
-<h2>3. Tiedot, joita EMME kerää</h2>
-<ul>
-  <li>Nimi tai puhelinnumero (sähköpostiosoite tallennetaan vain, jos liität sen nimenomaisesti valinnaiseen TankSync-tiliisi)</li>
-  <li>Talous- tai maksutiedot</li>
-  <li>Terveys- tai kuntotiedot</li>
-  <li>Yhteystiedot, viestit tai puhelulokit</li>
-  <li>Valokuvat, videot tai tiedostot (kameran ja kuvakirjaston käyttö on vain kuittien skannaukseen, jonka aloitat itse)</li>
-  <li>Selaushistoria</li>
-  <li>Laitteen mainostunnisteet</li>
-</ul>
-
-<h2>4. Kolmannen osapuolen palvelut</h2>
-<p>Sovellus on yhteydessä seuraaviin kolmannen osapuolen rajapintoihin:</p>
-<ul>
-  <li><strong>Tankerkönig</strong> (creativecommons.tankerkoenig.de) — Saksan hinnat. Vastaanottaa: hakukoordinaatit, API-avaimesi.</li>
-  <li><strong>Prix Carburants</strong> (data.economie.gouv.fr) — Ranskan hinnat. Vastaanottaa: hakukoordinaatit.</li>
-  <li><strong>Italian hintarajapinta</strong> (osservaprezzi.mise.gov.it) — Italian hinnat. Vastaanottaa: hakukoordinaatit.</li>
-  <li><strong>Espanjan hintarajapinta</strong> (sedeaplicaciones.minetur.gob.es) — Espanjan hinnat. Vastaanottaa: hakukoordinaatit.</li>
-  <li><strong>Spritpreisrechner</strong> (spritpreisrechner.at) — Itävallan hinnat. Vastaanottaa: hakukoordinaatit.</li>
-  <li><strong>FuelWatch</strong> (fuelwatch.be) — Belgian hinnat. Vastaanottaa: hakukoordinaatit.</li>
-  <li><strong>data.public.lu</strong> — Luxemburgin hinnat. Vastaanottaa: hakukoordinaatit.</li>
-  <li><strong>OpenChargeMap</strong> (api.openchargemap.io) — latauspisteet. Vastaanottaa: hakukoordinaatit.</li>
-  <li><strong>Nominatim / OpenStreetMap</strong> (nominatim.openstreetmap.org) — geokoodaus. Vastaanottaa: hakuteksti tai koordinaatit.</li>
-  <li><strong>OpenStreetMap-tile-palvelimet</strong> (tile.openstreetmap.org) — karttalaatat. Vastaanottaa: laatan koordinaatit.</li>
-  <li><strong>Supabase</strong> (vain jos TankSync on käytössä) — pilvisynkronoinnin taustajärjestelmä.</li>
-  <li><strong>Sentry</strong> (vain jos diagnostiikka on käytössä) — anonyymit kaatumis- ja suorituskykyraportit.</li>
-</ul>
-<p>Jokaisella tarjoajalla on oma tietosuojakäytäntönsä. Suosittelemme tutustumaan niihin. Sovellus ei jaa tietoja näiden tarjoajien välillä.</p>
-
-<h2>5. Tietoturva</h2>
-<ul>
-  <li>Kaikki verkkoliikenne kulkee HTTPS:n kautta (TLS-salaus siirron aikana).</li>
-  <li>API-avaimet tallennetaan alustan natiiviin salattuun säilöön (Android Keystore / iOS Keychain).</li>
-  <li>Paikalliset tiedot tallennetaan laitteellesi Hiven kautta.</li>
-  <li>Mitään tietoja ei lähetetä millekään palvelimelle, ellet käynnistä hakua tai ota TankSynciä / diagnostiikkaa käyttöön.</li>
-</ul>
-
-<h2>6. Oikeutesi</h2>
-<p>Sinulla on oikeus:</p>
-<ul>
-  <li><strong>Tutustua</strong> — kaikkiin paikallisesti tallennettuihin tietoihin sovelluksen Tallennustila-osiossa.</li>
-  <li><strong>Viedä</strong> — TankSync-tietosi JSON-muodossa Tietojen läpinäkyvyys -näytöltä.</li>
-  <li><strong>Poistaa</strong> — kaikki paikalliset tiedot kohdasta Asetukset → Poista kaikki tiedot; kaikki palvelintiedot kohdasta TankSync → Tietojen läpinäkyvyys → Poista kaikki.</li>
-  <li><strong>Peruuttaa suostumuksesi</strong> — peruuta sijaintilupa laitteen asetuksista tai poista TankSync / diagnostiikka käytöstä milloin tahansa.</li>
-</ul>
-
-<h2>7. Tilisi ja tietojesi poistaminen</h2>
-<p>Voit poistaa kaiken itse, suoraan sovelluksessa — ilman tukipyyntöä:</p>
-<ul>
-  <li><strong>Paikalliset tiedot:</strong> Asetukset → Poista kaikki tiedot poistaa kaikki profiilit, suosikit, API-avaimet, välimuistiin tallennetut hinnat, tallennetut matkat ja asetukset laitteeltasi.</li>
-  <li><strong>TankSync-tili ja palvelintiedot:</strong> TankSync → Tietojen läpinäkyvyys → Poista tili tyhjentää ensin jokaisen omistamasi rivin (suosikit, hälytykset, hintailmoitukset, ajoneuvot, tankkaukset, matkat, arvostelut) ja poistaa sitten itse tilin identiteetin, mukaan lukien mahdollisesti liitetyn sähköpostiosoitteen. Tätä ei voi peruuttaa.</li>
-</ul>
-<p>Jos et enää pääse sovellukseen, voit pyytää poistoa ottamalla yhteyttä kehittäjään (luku 10); kirjoita tilisi sähköpostiosoitteesta, jotta voimme vahvistaa omistajuuden.</p>
-
-<h2>8. Lasten yksityisyys</h2>
-<p>Sovellusta ei ole suunnattu alle 13-vuotiaille lapsille. Emme tietoisesti kerää henkilötietoja lapsilta.</p>
-
-<h2>9. Muutokset tähän käytäntöön</h2>
-<p>Voimme päivittää tätä käytäntöä ajoittain. Muutokset julkaistaan tässä osoitteessa päivitetyllä päivämäärällä. Sovelluksen käytön jatkaminen tarkoittaa päivitetyn käytännön hyväksymistä.</p>
-
-<h2>10. Yhteystiedot</h2>
+<h2>2. Kuka on vastuussa (rekisterinpitäjä)</h2>
+<p>Sovelluksen ja valinnaisen Sparkilo Community -synkronointipalvelun rekisterinpitäjä on:</p>
 <div class="contact">
-  <p><strong>Kehittäjä:</strong> Florian DITTGEN</p>
+  <p><strong>Florian DITTGEN</strong> (yksityinen kehittäjä)</p>
+  <p><strong>Sähköposti:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
+  <p><strong>Lähdekoodi ja virheiden seuranta:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
+</div>
+<p>Synkronoitujen tietojesi rekisterinpitäjä vaihtelee sen mukaan, miten käytät TankSynciä:</p>
+<ul>
+  <li><strong>Ei TankSynciä (oletus):</strong> mitään ei tallenneta millekään ylläpitämällemme palvelimelle. Tietosi pysyvät laitteellasi ja ne ovat yksin sinun hallinnassasi.</li>
+  <li><strong>Yksityinen tietokanta:</strong> yhdistät oman Supabase-projektisi. Sinä olet rekisterinpitäjä; me emme koskaan näe näitä tietoja.</li>
+  <li><strong>Liity ryhmään:</strong> yhdistät Supabase-projektin, jota ylläpitää joku tuntemasi henkilö (perhe, ystävät). Kyseinen henkilö on jaetun tietokannan rekisterinpitäjä.</li>
+  <li><strong>Sparkilo Community:</strong> yhdistät edellä mainitun kehittäjän ylläpitämän jaetun tietokannan (Supabase, isännöity EU:ssa — AWS eu-central-1, Frankfurt). Kehittäjä on rekisterinpitäjä; Supabase, Inc. on henkilötietojen käsittelijä, jota sitovat sen tietojenkäsittelyehdot.</li>
+</ul>
+<p>Sovellus kertoo sinulle ennen yhdistämistä, mikä näistä on voimassa, ja näyttää sen uudelleen kohdassa Asetukset → Tietosuojan hallintapaneeli.</p>
+
+<h2>3. Käyttämämme tiedot</h2>
+<p>Taulukossa luetellaan kaikki sovelluksen käsittelemät henkilötietotyypit, käsittelyn tarkoitus, oikeusperuste (tietosuoja-asetuksen 6 artikla), minne tiedot lähetetään ja kuinka kauan niitä säilytetään. ”Laite” tarkoittaa, että tieto ei koskaan poistu puhelimestasi.</p>
+<table>
+  <thead><tr><th>Tieto</th><th>Tarkoitus</th><th>Oikeusperuste</th><th>Minne se lähetetään</th><th>Säilytys</th></tr></thead>
+  <tbody>
+    <tr><td>Likimääräinen / tarkka sijainti (haku)</td><td>Lähellä olevien asemien löytäminen</td><td>Suostumus (myönnät sijaintiluvan ja vahvistat sovelluksen sisäisen selityksen)</td><td>Lähetetään hakukoordinaatteina sen maan hintatietolähteelle, jossa olet (kohta 5). Ei tallenneta millekään ylläpitämällemme palvelimelle.</td><td>Viimeisin sijainti säilytetään laitteella aloitusnäytön widgetiä varten, kunnes poistat tiedot</td></tr>
+    <tr><td>Tarkka GPS-reitti, nopeus, korkeus, liikeanturit (matkan tallennus)</td><td>Matkan tallentaminen, matkan pituuden ja kulutuksen laskeminen</td><td>Suostumus (käynnistät tallennuksen; automaattinen tallennus vaatii erillisen taustasijaintiluvan ajoneuvokohtaisesti)</td><td>Laite. Kun TankSync <em>ja</em> matkojen synkronointi ovat käytössä: TankSync-tietokantasi.</td><td>Laite: kunnes poistat matkan tai kaikki tiedot. Palvelin: matkojen yhteenvedot, kunnes poistat ne; yksityiskohtaiset GPS-näytteet karsitaan 90 päivää matkan jälkeen.</td></tr>
+    <tr><td>Ajoneuvoprofiili (merkki, malli, vuosimalli, tankin koko, VIN, OBD2-sovittimen tunniste)</td><td>Kulutuksen laskenta, sovittimen uudelleenyhdistäminen</td><td>Sopimus (määrittämäsi ominaisuuden tarjoaminen)</td><td>Laite. TankSyncin kanssa: TankSync-tietokantasi.</td><td>Kunnes poistat ajoneuvon tai kaikki tiedot</td></tr>
+    <tr><td>VIN (17 merkkiä)</td><td>Merkin/mallin/moottorin tulkinta verkossa</td><td>Suostumus (erillinen kytkin, oletuksena pois päältä; muutoin käytetään offline-tulkkia)</td><td>NHTSA vPIC (Yhdysvaltain julkinen palvelu), vain VIN</td><td>Emme tallenna; katso NHTSA:n käytäntö</td></tr>
+    <tr><td>Tankkaukset (päivämäärä, asema, litrat, kustannus, matkamittarin lukema), latauslokit, huoltomuistutukset</td><td>Polttoainepäiväkirjasi ja tilastosi</td><td>Sopimus</td><td>Laite. TankSyncin kanssa: TankSync-tietokantasi.</td><td>Kunnes poistat ne tai kaikki tiedot</td></tr>
+    <tr><td>Suosikit, ohitetut asemat, hintahälytykset, hakuprofiilit, reittisuunnitelmat, asetukset</td><td>Sovelluksen mukauttaminen; paikallisten hintahälytysilmoitusten lähettäminen</td><td>Sopimus</td><td>Laite. TankSyncin kanssa: TankSync-tietokantasi.</td><td>Kunnes poistat ne tai kaikki tiedot</td></tr>
+    <tr><td>Anonyymi käyttäjätunnus (satunnainen UUID), valinnainen sähköpostiosoite, asennuskohtainen laitetunnus</td><td>TankSync-tilisi tunnistaminen eri laitteilla; sen merkitseminen, mikä laite poisti tietueen</td><td>Suostumus (Pilvisynkronointi-kytkin) / Sopimus</td><td>TankSync-tietokantasi (Supabase)</td><td>Kunnes poistat tilin</td></tr>
+    <tr><td>Yhteisön hintailmoitukset, jaetut asema-arviot, sisältöilmoitukset</td><td>Joukkoistetut hintakorjaukset ja moderointi</td><td>Suostumus (lähetät ne itse; ilmoitus kertoo, että ne tallennetaan pseudonyymin tunnuksesi alle ja että muut kirjautuneet käyttäjät voivat lukea niitä)</td><td>TankSync-tietokantasi — Sparkilo Communityssä jokaisen kirjautuneen käyttäjän luettavissa</td><td>Kunnes poistat ilmoituksen tai tilin</td></tr>
+    <tr><td>Kaatumisraportit ja suorituskykyjäljet (sovelluksen versio, käyttöjärjestelmän versio, näytön koko, kieliasetus, pinojäljitys, viimeisimmät sovellustoiminnot)</td><td>Virheiden korjaaminen</td><td>Suostumus (Virheraportointi-kytkin, oletuksena pois päältä)</td><td>Sentry</td><td>Laite: 50 viimeisintä jälkeä, 7 päivää, sähköpostiosoitteet, koordinaatit ja tunnukset poistetaan ennen tallennusta. Sentry: 90 päivää.</td></tr>
+    <tr><td>Kuitin tai mittarin valokuva (kamera / kuvakirjasto)</td><td>Kuitin lukeminen laitteella (laitteella toimiva tekstintunnistus)</td><td>Suostumus (otat tai valitset kuvan)</td><td>Vain laitteella. Liitetään GitHub-issueen vain, jos teet ”huono skannaus” -ilmoituksen ja vahvistat sen.</td><td>Poistetaan skannauksen jälkeen; ilmoituksen kopio säilyy GitHubissa, kunnes poistat issuen</td></tr>
+    <tr><td>Kartan näkymä (ruutukoordinaatit) ja IP-osoite</td><td>Kartan piirtäminen</td><td>Oikeutettu etu (kartta tarvitsee ruutuja) — voit kytkeä välityspalvelimen pois päältä</td><td>Sparkilon karttaruutujen välityspalvelin (sama Supabase-projekti, EU), joka hakee ruudut OpenStreetMapista; tai suoraan tile.openstreetmap.org, kun välityspalvelin on pois päältä (Asetukset → Tietosuoja) tai F-Droid-versiossa</td><td>Ei tallenneta tavanomaisia palvelinlokeja pidempään (välityspalvelin: 7 päivää)</td></tr>
+    <tr><td>Reitin lähtöpiste ja määränpää, tieverkkokyselyt</td><td>Reittihaku, liukuvalmennus</td><td>Sopimus</td><td>OSRM (router.project-osrm.org), Overpass API (overpass-api.de), Nominatim (nominatim.openstreetmap.org)</td><td>Emme tallenna</td></tr>
+    <tr><td>Kirjoittamasi osoiteteksti tai koordinaatit</td><td>Geokoodaus</td><td>Sopimus</td><td>Nominatim tai puhelimesi sisäänrakennettu geokooderi (Apple / Google)</td><td>Emme tallenna</td></tr>
+    <tr><td>Syöttämäsi API-avaimet (Tankerkönig, OpenChargeMap)</td><td>Kyseisten palveluiden kutsuminen puolestasi</td><td>Sopimus</td><td>Vain sille palveluntarjoajalle, jolle avain kuuluu</td><td>Salattuna laitteella (Keystore / Keychain), kunnes poistat ne</td></tr>
+    <tr><td>Ilmoitukset asemien virheellisestä nimestä / osoitteesta, huono skannaus -ilmoitukset</td><td>Tietojen korjaaminen</td><td>Suostumus (vahvistat ennen lähettämistä; henkilökohtainen GitHub-tunnus vaaditaan)</td><td>GitHub (julkinen issue projektin koodivarastossa)</td><td>Julkinen, kunnes issue poistetaan</td></tr>
+  </tbody>
+</table>
+<p>Sovellus ei tee sinua koskevia automatisoituja päätöksiä, joilla on oikeudellisia tai vastaavia merkittäviä vaikutuksia. Hintaennusteet lasketaan laitteella julkisista hintatiedoista.</p>
+
+<h2>4. Tiedot, joita EMME kerää</h2>
+<ul>
+  <li>Nimi tai puhelinnumero (sähköpostiosoite tallennetaan vain, jos liität sellaisen valinnaiseen TankSync-tiliisi)</li>
+  <li>Maksu- tai pankkitiedot</li>
+  <li>Terveys- tai kuntoilutiedot</li>
+  <li>Yhteystiedot, viestit tai puhelulokit</li>
+  <li>Valokuvat, videot tai tiedostot skannattavaksi valitsemaasi kuittikuvaa lukuun ottamatta</li>
+  <li>Selaushistoria</li>
+  <li>Mainostunnisteet</li>
+</ul>
+<p>Brändilogot toimitetaan sovelluksen mukana. Niiden lataaminen internetistä (logo.clearbit.com, joka saisi IP-osoitteesi) on pois päältä, ellet ota sitä käyttöön kohdassa Asetukset → Tietosuoja.</p>
+
+<h2>5. Kolmansien osapuolten palvelut ja tietolähteet</h2>
+<p>Sovellus viestii seuraavien palveluiden kanssa. Jokaisella on oma tietosuojakäytäntönsä. Sovellus ei koskaan jaa tietoja niiden välillä eikä koskaan lähetä enempää kuin yllä olevissa sarakkeissa kuvataan.</p>
+<h3>5.1 Infrastruktuuri (vain kun vastaava ominaisuus on käytössä)</h3>
+<ul>
+  <li><strong>Supabase</strong> (klelxnkzrxlpzuddhpfg.supabase.co, AWS eu-central-1) — TankSync-taustajärjestelmä Sparkilo Communitylle ja karttaruutujen välityspalvelimelle. Henkilötietojen käsittelijä Supabasen tietojenkäsittelyliitteen nojalla.</li>
+  <li><strong>Sentry</strong> (sentry.io) — kaatumisraportit ja suorituskykyjäljet, vain suostumuksella. Sentry voi käsitellä tietoja Yhdysvalloissa; siirrot katetaan EU:n ja Yhdysvaltojen välisellä tietosuojakehyksellä ja vakiosopimuslausekkeilla.</li>
+  <li><strong>GitHub</strong> (api.github.com, github.com) — nimenomaisesti tekemäsi vikailmoitukset; sovellus lataa myös julkisia data-aineistoja (moottoritieliittymät, asemaluettelot) projektin julkaisuista, mikä paljastaa IP-osoitteesi GitHubille.</li>
+  <li><strong>OpenStreetMap</strong> (tile.openstreetmap.org, nominatim.openstreetmap.org), <strong>OSRM</strong> (router.project-osrm.org), <strong>Overpass API</strong> (overpass-api.de) — kartat, geokoodaus, reititys.</li>
+  <li><strong>OpenChargeMap</strong> (api.openchargemap.io) ja <strong>ODRÉ / IRVE</strong> (odre.opendatasoft.com) — sähköautojen latausasemat ja hinnat. Vastaanottavat: hakukoordinaatit.</li>
+  <li><strong>NHTSA vPIC</strong> (vpic.nhtsa.dot.gov) — VIN-tulkinta, edellyttää suostumusta.</li>
+  <li><strong>Clearbit Logo API</strong> (logo.clearbit.com) — brändilogot, oletuksena pois päältä.</li>
+  <li><strong>Apple Maps / Google Maps</strong> (www.google.com) — avataan selaimessasi tai karttasovelluksessasi vain, kun napautat ”Navigoi”.</li>
+</ul>
+<h3>5.2 Viralliset polttoainehintojen tietolähteet (vastaanottavat hakukoordinaattisi tai alueesi, eivät koskaan henkilöllisyyttäsi)</h3>
+<ul>
+  <li>Saksa — Tankerkönig (creativecommons.tankerkoenig.de), omalla API-avaimellasi</li>
+  <li>Ranska — Prix Carburants (data.economie.gouv.fr, donnees.roulez-eco.fr)</li>
+  <li>Italia — MIMIT osservaprezzi (carburanti.mise.gov.it)</li>
+  <li>Espanja — MITECO / Geoportal Gasolineras (sedeaplicaciones.minetur.gob.es, geoportalgasolineras.es)</li>
+  <li>Itävalta — E-Control Spritpreisrechner (api.e-control.at)</li>
+  <li>Belgia ja Luxemburg — data.public.lu, STATEC (lustat.statec.lu)</li>
+  <li>Portugali — DGEG (precoscombustiveis.dgeg.gov.pt)</li>
+  <li>Tanska — OK (mobility-prices.ok.dk), Shell (shellpumpepriser.geoapp.me)</li>
+  <li>Yhdistynyt kuningaskunta — Fuel Finder (www.fuel-finder.service.gov.uk) ja sen luettelemat vähittäismyyjien hintasyötteet: applegreenstores.com, fuelprices.asconagroup.co.uk, storelocator.asda.com, www.bp.com, fuelprices.esso.co.uk, jetlocal.co.uk, api2.krlmedia.com, www.morrisons.com, moto-way.com, fuel.motorfuelgroup.com, www.rontec-servicestations.co.uk, api.sainsburys.co.uk, www.sgnretail.uk, www.shell.co.uk, www.tesco.com</li>
+  <li>Slovenia — goriva.si</li>
+  <li>Romania — Monitorul Prețurilor (monitorulpreturilor.info)</li>
+  <li>Kreikka — Παρατηρητήριο Τιμών (paratiritirio.mindev.gov.gr) AWS eu-west-3 -alueella isännöidyn yhteisön peilipalvelimen kautta (5fcbs3i0z4.execute-api.eu-west-3.amazonaws.com)</li>
+  <li>Etelä-Korea — Opinet (www.opinet.co.kr)</li>
+  <li>Chile — CNE (api.cne.cl)</li>
+  <li>Argentiina — datos.energia.gob.ar</li>
+  <li>Meksiko — CRE (publicacionexterna.azurewebsites.net)</li>
+  <li>Australia — FuelCheck NSW (www.fuelcheck.nsw.gov.au)</li>
+</ul>
+
+<h2>6. Tietoturva</h2>
+<ul>
+  <li>Kaikki verkkoliikenne käyttää HTTPS-yhteyttä (TLS siirron aikana); sovellus hylkää salaamattomat HTTP-synkronointipäätepisteet.</li>
+  <li>API-avaimet, GitHub-tunnuksesi ja TankSync-istunto säilytetään alustan omassa salatussa tallennustilassa (Android Keystore / iOS Keychain).</li>
+  <li>Paikalliset tietokannat on AES-salattu avaimella, jota säilytetään Keystoressa / Keychainissa — mukaan lukien tallennetut matkat, ajoneuvotiedot, huoltomuistutukset ja välimuistiin tallennetut hinnat.</li>
+  <li>Palvelimella jokainen taulu on suojattu rivitason käyttöoikeuksilla, joten tili voi lukea tai poistaa vain omia rivejään; jaetut arviot ja yhteisön hintailmoitukset ovat ainoat rivit, jotka näkyvät muille kirjautuneille käyttäjille.</li>
+  <li>Virhejäljistä poistetaan sähköpostiosoitteet, koordinaatit ja tunnukset ennen niiden tallentamista tai lähettämistä.</li>
+  <li>Mitään tietoja ei lähetetä millekään palvelimelle, ellet tee hakua, avaa karttaa tai ota käyttöön TankSynciä / diagnostiikkaa.</li>
+</ul>
+
+<h2>7. Oikeutesi</h2>
+<p>Tietosuoja-asetuksen 15–22 artiklan nojalla sinulla on oikeus saada pääsy tietoihisi, oikaista, poistaa ja siirtää ne sekä rajoittaa niiden käsittelyä, vastustaa oikeutettuun etuun perustuvaa käsittelyä ja peruuttaa suostumuksesi milloin tahansa ilman, että se vaikuttaa aiemman käsittelyn lainmukaisuuteen. Jokaiselle oikeudelle on painike sovelluksessa:</p>
+<ul>
+  <li><strong>Pääsy tietoihin</strong> — Asetukset → Tietosuojan hallintapaneeli näyttää jokaisen laitteelle tallennetun tietoluokan ja, kun yhteys on muodostettu, jokaisen rivin TankSync-tietokannassasi.</li>
+  <li><strong>Vienti (siirrettävyys)</strong> — Tietosuojan hallintapaneeli → Vie kaikki tietoni luo yhden ZIP-tiedoston, jossa on koneellisesti luettava JSON-tiedosto jokaista luokkaa kohti (suosikit, hälytykset, profiilit, reittisuunnitelmat, hintahistoria, ajoneuvot, tankkaukset, matkat GPS-näytteineen ja yksi GPX-tiedosto matkaa kohti, perustasot, huoltomuistutukset, latauslokit, suostumustietosi) sekä JSON-vienti jokaisesta palvelintaulusta.</li>
+  <li><strong>Oikaisu</strong> — muokkaa mitä tahansa merkintää suoraan sovelluksessa; muutos synkronoidaan, jos TankSync on käytössä.</li>
+  <li><strong>Poisto</strong> — katso kohta 8.</li>
+  <li><strong>Rajoittaminen / vastustaminen</strong> — kytke TankSync, matkojen synkronointi, karttaruutujen välityspalvelin tai diagnostiikka pois päältä Asetuksissa; peruuta sijainti-, Bluetooth-, kamera- tai ilmoituslupa laitteesi asetuksissa.</li>
+  <li><strong>Suostumuksen peruuttaminen</strong> — Asetukset → Tietosuoja ja tiedot luettelee jokaisen suostumuksen sekä päivämäärän, jolloin annoit sen, ja käytännön version, jonka näit; jokaisen voi kytkeä pois päältä, ja sovellus lopettaa vastaavan käsittelyn välittömästi.</li>
+  <li><strong>Valitus</strong> — voit tehdä valituksen valvontaviranomaiselle, erityisesti siinä EU:n jäsenvaltiossa, jossa on vakinainen asuinpaikkasi tai työpaikkasi tai jossa väitetty rikkominen on tapahtunut. Arvostaisimme mahdollisuutta käsitellä huolenaiheesi ensin: <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a>.</li>
+</ul>
+
+<h2>8. Tilin ja tietojen poistaminen</h2>
+<p>Voit poistaa kaiken itse, suoraan sovelluksessa — tukipyyntöä ei tarvita:</p>
+<ul>
+  <li><strong>Paikalliset tiedot:</strong> Asetukset → Tietosuojan hallintapaneeli → Poista kaikki tiedot poistaa jokaisen tietokannan, jota sovellus säilyttää laitteella — profiilit, suosikit, hälytykset, hintahistorian, välimuistiin tallennetut hinnat, ajoneuvot, tankkaukset, tallennetut matkat ja niiden GPS-näytteet, OBD2-perustasot ja sovittimen välimuistit, huoltomuistutukset, saavutukset, virhejäljet, API-avaimet, tunnukset ja aloitusnäytön widgetin tiedot — ja palauttaa sovelluksen ensimmäisen käynnistyksen tilaan.</li>
+  <li><strong>TankSync-tili ja palvelintiedot:</strong> TankSync → Tietojen läpinäkyvyys → Poista tili pyyhkii jokaisen omistamasi rivin yhdessä tapahtumassa (suosikit, hälytykset, ohitetut asemat, hintailmoitukset, sisältöilmoitukset, ajoneuvot, tankkaukset, reittisuunnitelmat, perustasot, arviot, matkat, antamasi tai vastaanottamasi matkajaot, odotusaikailmoitukset, synkronointiasetukset, poistotietueet ja käyttäjärivisi) ja poistaa sen jälkeen itse tili-identiteetin, mukaan lukien mahdollisesti liitetyn sähköpostiosoitteen. Jos jotakin taulua ei voitu tyhjentää, sovellus kertoo, mitä, sen sijaan että väittäisi onnistuneensa. Tätä ei voi perua.</li>
+  <li><strong>Yksittäiset kohteet:</strong> jokaisen suosikin, hälytyksen, ajoneuvon, tankkauksen, matkan, hintailmoituksen ja sisältöilmoituksen voi poistaa erikseen; poistot välittyvät muille laitteillesi.</li>
+</ul>
+<p>Jos et enää pääse sovellukseen, voit pyytää poistoa ottamalla yhteyttä kehittäjään (kohta 11); kirjoita tiliisi liitetystä sähköpostiosoitteesta, jotta voimme varmistaa omistajuuden. Anonyymiä tiliä, jota ei ole koskaan liitetty sähköpostiosoitteeseen, ei kukaan — emme mekään — voi tunnistaa ilman laitetta, jolla se luotiin.</p>
+
+<h2>9. Lasten yksityisyys</h2>
+<p>Sovellusta ei ole suunnattu alle 16-vuotiaille lapsille. Emme tietoisesti kerää henkilötietoja lapsilta; jos uskot, että lapsi on luonut TankSync-tilin, ota meihin yhteyttä, niin poistamme sen.</p>
+
+<h2>10. Muutokset tähän käytäntöön</h2>
+<p>Muutokset julkaistaan tässä URL-osoitteessa uudella versionumerolla ja päivämäärällä; sovellus tallentaa version, johon annoit suostumuksesi, ja näyttää tämän sivun uudelleen, kun versio muuttuu.</p>
+<ul>
+  <li><strong>v3 — 29.8.2026:</strong> rekisterinpitäjä ja tilakohtaiset roolit, käsittelytaulukko oikeusperusteineen ja säilytysaikoineen, täydellinen käsittelijäluettelo (karttaruutujen välityspalvelin, geokooderi, reititys, GitHub, brändilogot), oikeuksien käyttöpolut, täydellinen poisto ja vienti.</li>
+  <li><strong>v2 — 15.8.2026:</strong> tilin poistoa koskeva kohta; sähköposti- ja TankSync-tilitiedot ilmoitettu.</li>
+  <li><strong>v1 — 7.4.2026:</strong> ensimmäinen versio.</li>
+</ul>
+
+<h2>11. Yhteystiedot</h2>
+<div class="contact">
+  <p><strong>Kehittäjä ja rekisterinpitäjä:</strong> Florian DITTGEN</p>
   <p><strong>Sähköposti:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
   <p><strong>Lähdekoodi:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
 </div>

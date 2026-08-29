@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sparkilo — Privaatsuspoliitika</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+
+<h1>Privaatsuspoliitika</h1>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen iOS-is, de.tankstellen.fuelprices Androidis) &mdash; Version 3 &mdash; Viimati uuendatud: 29. august 2026</p>
+<p class="langs">Saadaolevad keeled: <a href="../">English</a> <a href="../bg/">Български</a> <a href="../cs/">Čeština</a> <a href="../da/">Dansk</a> <a href="../de/">Deutsch</a> <a href="../el/">Ελληνικά</a> <a href="../es/">Español</a> <a href="../et/">Eesti</a> <a href="../fi/">Suomi</a> <a href="../fr/">Français</a> <a href="../hr/">Hrvatski</a> <a href="../hu/">Magyar</a> <a href="../it/">Italiano</a> <a href="../ko/">한국어</a> <a href="../lt/">Lietuvių</a> <a href="../lv/">Latviešu</a> <a href="../nb/">Norsk</a> <a href="../nl/">Nederlands</a> <a href="../pl/">Polski</a> <a href="../pt/">Português</a> <a href="../ro/">Română</a> <a href="../sk/">Slovenčina</a> <a href="../sl/">Slovenščina</a> <a href="../sv/">Svenska</a></p>
+
+<h2>1. Ülevaade</h2>
+<p>Sparkilo on tasuta avatud lähtekoodiga kütuse- ja elektriautode laadimishindade võrdlusrakendus, millel on valikuline sõitude salvestamine. See on üles ehitatud <strong>local-first</strong> põhimõttel: kõik, mida rakendus teie kohta teab, jääb teie telefoni, välja arvatud juhul, kui lülitate sisse funktsiooni, mille puhul on sõnaselgelt öeldud teisiti. Rakenduses ei ole reklaame, jälgimispiksleid, reklaamiidentifikaatoreid ega analüütika-SDK-d. See poliitika on koostatud vastavalt ELi isikuandmete kaitse üldmäärusele (GDPR); see kehtib iga kasutaja kohta, olenemata teie asukohast.</p>
+<p>Rakendus on <a href="https://github.com/fdittgen-png/tankstellen">avatud lähtekoodiga</a> — iga allpool esitatud väidet saab koodist kontrollida. Töödeldavate andmete masinloetav kokkuvõte on failis <code>docs/privacy/data_inventory.json</code> ning rakenduse enda testid ebaõnnestuvad, kui see leht, rakendusepoodide deklaratsioonid ja kood lähevad omavahel lahku.</p>
+
+<h2>2. Kes vastutab (vastutav töötleja)</h2>
+<p>Rakenduse ja valikulise Sparkilo Community sünkroonimisteenuse vastutav töötleja on:</p>
+<div class="contact">
+  <p><strong>Florian DITTGEN</strong> (üksikarendaja)</p>
+  <p><strong>E-post:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
+  <p><strong>Lähtekood ja probleemide haldus:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
+</div>
+<p>Sõltuvalt sellest, kuidas te TankSynci kasutate, muutub teie sünkroonitud andmete vastutav töötleja:</p>
+<ul>
+  <li><strong>Ilma TankSyncita (vaikimisi):</strong> ühelegi meie hallatavale serverile ei salvestata midagi. Teie andmed jäävad teie seadmesse ja ainult teie kontrollite neid.</li>
+  <li><strong>Privaatne andmebaas:</strong> ühendate oma Supabase'i projekti. Teie olete vastutav töötleja; meie neid andmeid kunagi ei näe.</li>
+  <li><strong>Grupiga liitumine:</strong> ühendate Supabase'i projekti, mida haldab keegi teile tuttav isik (pere, sõbrad). See isik on jagatud andmebaasi vastutav töötleja.</li>
+  <li><strong>Sparkilo Community:</strong> ühendate eespool nimetatud arendaja hallatava jagatud andmebaasi (Supabase, majutatud ELis — AWS eu-central-1, Frankfurt). Arendaja on vastutav töötleja; Supabase, Inc. on volitatud töötleja, keda seovad tema andmetöötlustingimused.</li>
+</ul>
+<p>Rakendus ütleb teile enne ühendamist, milline neist kehtib, ja näitab seda uuesti jaotises Seaded → Privaatsuse juhtpaneel.</p>
+
+<h2>3. Andmed, mida me kasutame</h2>
+<p>Tabelis on loetletud kõik rakenduse töödeldavad isikuandmete liigid, miks neid töödeldakse, millisel õiguslikul alusel (isikuandmete kaitse üldmääruse artikkel 6), kuhu need saadetakse ja kui kaua neid säilitatakse. „Seade” tähendab, et andmed ei lahku kunagi teie telefonist.</p>
+<table>
+  <thead><tr><th>Andmed</th><th>Eesmärk</th><th>Õiguslik alus</th><th>Kuhu need saadetakse</th><th>Säilitamine</th></tr></thead>
+  <tbody>
+    <tr><td>Ligikaudne / täpne asukoht (otsing)</td><td>Teie lähedal asuvate jaamade leidmine</td><td>Nõusolek (annate asukohaloa ja kinnitate rakendusesisese selgituse)</td><td>Saadetakse otsingukoordinaatidena selle riigi hinnaandmete allikale, kus te viibite (5. jaotis). Ei salvestata ühelegi meie hallatavale serverile.</td><td>Viimane asukoht säilitatakse seadmes avakuva vidina jaoks, kuni te andmed kustutate</td></tr>
+    <tr><td>Täpne GPS-marsruut, kiirus, kõrgus, liikumisandurid (sõidu salvestamine)</td><td>Sõidu salvestamine, vahemaa ja kütusekulu arvutamine</td><td>Nõusolek (alustate salvestamist; automaatne salvestamine vajab iga sõiduki kohta eraldi taustaasukoha luba)</td><td>Seade. Kui TankSync <em>ja</em> sõitude sünkroonimine on sisse lülitatud: teie TankSynci andmebaas.</td><td>Seade: kuni kustutate sõidu või kõik andmed. Server: sõitude kokkuvõtted, kuni te need kustutate; üksikasjalikud GPS-proovid eemaldatakse 90 päeva pärast sõitu.</td></tr>
+    <tr><td>Sõidukiprofiil (mark, mudel, aasta, paagi maht, VIN, OBD2-adapteri identifikaator)</td><td>Kütusekulu arvutamine, adapteri taasühendamine</td><td>Leping (teie seadistatud funktsiooni pakkumine)</td><td>Seade. TankSynciga: teie TankSynci andmebaas.</td><td>Kuni kustutate sõiduki või kõik andmed</td></tr>
+    <tr><td>VIN (17 märki)</td><td>Margi/mudeli/mootori dekodeerimine veebis</td><td>Nõusolek (eraldi lüliti, vaikimisi väljas; muul juhul töötab võrguühenduseta dekooder)</td><td>NHTSA vPIC (USA avalik teenus), ainult VIN</td><td>Meie ei salvesta; vt NHTSA poliitikat</td></tr>
+    <tr><td>Tankimised (kuupäev, jaam, liitrid, maksumus, läbisõit), laadimislogid, hooldusmeeldetuletused</td><td>Teie kütusepäevik ja statistika</td><td>Leping</td><td>Seade. TankSynciga: teie TankSynci andmebaas.</td><td>Kuni kustutate need või kõik andmed</td></tr>
+    <tr><td>Lemmikud, ignoreeritud jaamad, hinnateavitused, otsinguprofiilid, marsruudid, seaded</td><td>Rakenduse isikupärastamine; kohalike hinnateavituste saatmine</td><td>Leping</td><td>Seade. TankSynciga: teie TankSynci andmebaas.</td><td>Kuni kustutate need või kõik andmed</td></tr>
+    <tr><td>Anonüümne kasutaja-ID (juhuslik UUID), valikuline e-posti aadress, paigalduspõhine seadme-ID</td><td>Teie TankSynci konto tuvastamine eri seadmetes; märkimine, milline seade kirje kustutas</td><td>Nõusolek (pilvesünkroonimise lüliti) / Leping</td><td>Teie TankSynci andmebaas (Supabase)</td><td>Kuni kustutate konto</td></tr>
+    <tr><td>Kogukonna hinnateated, jagatud jaamahinnangud, sisuteated</td><td>Ühisloomelised hinnaparandused ja modereerimine</td><td>Nõusolek (esitate need ise; teade selgitab, et need salvestatakse teie pseudonüümse ID all ja on loetavad teistele sisse loginud kasutajatele)</td><td>Teie TankSynci andmebaas — Sparkilo Community puhul loetav igale sisse loginud kasutajale</td><td>Kuni kustutate teate või konto</td></tr>
+    <tr><td>Krahhiaruanded ja jõudlusjäljed (rakenduse versioon, OS-i versioon, ekraani suurus, lokaat, pinujälg, viimased rakenduse toimingud)</td><td>Vigade parandamine</td><td>Nõusolek (vigadest teatamise lüliti, vaikimisi väljas)</td><td>Sentry</td><td>Seade: 50 viimast jälge, 7 päeva, enne salvestamist puhastatakse e-posti aadressidest, koordinaatidest ja tõenditest. Sentry: 90 päeva.</td></tr>
+    <tr><td>Kviitungi või tankuri foto (kaamera / fotogalerii)</td><td>Kviitungi lugemine seadmes (seadmesisene tekstituvastus)</td><td>Nõusolek (teete või valite foto ise)</td><td>Ainult seadmes. Lisatakse GitHubi probleemile ainult siis, kui esitate „halva skannimise” teate ja kinnitate selle.</td><td>Kustutatakse pärast skannimist; teate koopia säilib GitHubis, kuni te probleemi kustutate</td></tr>
+    <tr><td>Kaardivaade (paanikoordinaadid) ja IP-aadress</td><td>Kaardi joonistamine</td><td>Õigustatud huvi (kaart vajab paane) — saate puhverserveri välja lülitada</td><td>Sparkilo paanipuhverserver (sama Supabase'i projekt, EL), mis laadib paanid OpenStreetMapist; või otse tile.openstreetmap.org, kui puhverserver on välja lülitatud (Seaded → Privaatsus) või F-Droidi versioonis</td><td>Ei säilitata kauem kui tavalistes serverilogides (puhverserver: 7 päeva)</td></tr>
+    <tr><td>Marsruudi algus- ja sihtpunkt, teedevõrgu päringud</td><td>Marsruudiotsing, libisemisjuhendamine</td><td>Leping</td><td>OSRM (router.project-osrm.org), Overpass API (overpass-api.de), Nominatim (nominatim.openstreetmap.org)</td><td>Meie ei salvesta</td></tr>
+    <tr><td>Teie sisestatud aadressitekst või koordinaadid</td><td>Geokodeerimine</td><td>Leping</td><td>Nominatim või teie telefoni sisseehitatud geokodeerija (Apple / Google)</td><td>Meie ei salvesta</td></tr>
+    <tr><td>Teie sisestatud API-võtmed (Tankerkönig, OpenChargeMap)</td><td>Nende teenuste kasutamine teie nimel</td><td>Leping</td><td>Ainult teenusepakkujale, kellele võti kuulub</td><td>Krüpteeritult seadmes (Keystore / Keychain), kuni te need kustutate</td></tr>
+    <tr><td>Teated jaama vale nime / vale aadressi kohta, halva skannimise teated</td><td>Andmete parandamine</td><td>Nõusolek (kinnitate enne saatmist; nõutav on isiklik GitHubi tõend)</td><td>GitHub (avalik probleem projekti hoidlas)</td><td>Avalik, kuni probleem kustutatakse</td></tr>
+  </tbody>
+</table>
+<p>Rakendus ei tee teie kohta automatiseeritud otsuseid, millel on õiguslikud või sarnaselt olulised tagajärjed. Hinnaprognoosid arvutatakse seadmes avalike hinnaandmete põhjal.</p>
+
+<h2>4. Andmed, mida me EI kogu</h2>
+<ul>
+  <li>Nimi või telefoninumber (e-posti aadress salvestatakse ainult siis, kui seote selle oma valikulise TankSynci kontoga)</li>
+  <li>Makse- või pangaandmed</li>
+  <li>Tervise- või treeninguandmed</li>
+  <li>Kontaktid, sõnumid või kõnelogid</li>
+  <li>Fotod, videod või failid peale teie skannimiseks valitud kviitungifoto</li>
+  <li>Sirvimisajalugu</li>
+  <li>Reklaamiidentifikaatorid</li>
+</ul>
+<p>Brändilogod on rakendusega kaasas. Nende laadimine internetist (logo.clearbit.com, mis saaks teie IP-aadressi) on väljas, kui te seda jaotises Seaded → Privaatsus sisse ei lülita.</p>
+
+<h2>5. Kolmandate osapoolte teenused ja andmeallikad</h2>
+<p>Rakendus suhtleb järgmiste teenustega. Igaühel neist on oma privaatsuspoliitika. Rakendus ei jaga kunagi andmeid nende vahel ega saada kunagi rohkem, kui eespool toodud veergudes kirjeldatud.</p>
+<h3>5.1 Taristu (ainult siis, kui vastav funktsioon on sisse lülitatud)</h3>
+<ul>
+  <li><strong>Supabase</strong> (klelxnkzrxlpzuddhpfg.supabase.co, AWS eu-central-1) — TankSynci taustsüsteem Sparkilo Community ja paanipuhverserveri jaoks. Volitatud töötleja Supabase'i andmetöötluslisa alusel.</li>
+  <li><strong>Sentry</strong> (sentry.io) — krahhiaruanded ja jõudlusjäljed, ainult nõusolekul. Sentry võib töödelda andmeid Ameerika Ühendriikides; edastamised on kaetud ELi-USA andmekaitseraamistiku ja lepingu tüüptingimustega.</li>
+  <li><strong>GitHub</strong> (api.github.com, github.com) — probleemiteated, mille te sõnaselgelt esitate; rakendus laadib projekti väljalasetest alla ka avalikke andmefaile (kiirteede mahasõidud, jaamade loendid), mis avaldab GitHubile teie IP-aadressi.</li>
+  <li><strong>OpenStreetMap</strong> (tile.openstreetmap.org, nominatim.openstreetmap.org), <strong>OSRM</strong> (router.project-osrm.org), <strong>Overpass API</strong> (overpass-api.de) — kaardid, geokodeerimine, marsruutimine.</li>
+  <li><strong>OpenChargeMap</strong> (api.openchargemap.io) ja <strong>ODRÉ / IRVE</strong> (odre.opendatasoft.com) — elektriautode laadimisjaamad ja hinnad. Saavad: otsingukoordinaadid.</li>
+  <li><strong>NHTSA vPIC</strong> (vpic.nhtsa.dot.gov) — VIN-i dekodeerimine, nõusolekuga piiratud.</li>
+  <li><strong>Clearbit Logo API</strong> (logo.clearbit.com) — brändilogod, vaikimisi väljas.</li>
+  <li><strong>Apple Maps / Google Maps</strong> (www.google.com) — avatakse teie brauseris või kaardirakenduses ainult siis, kui puudutate „Navigeeri”.</li>
+</ul>
+<h3>5.2 Ametlikud kütusehindade andmeallikad (saavad teie otsingukoordinaadid või piirkonna, mitte kunagi teie identiteeti)</h3>
+<ul>
+  <li>Saksamaa — Tankerkönig (creativecommons.tankerkoenig.de), teie enda API-võtmega</li>
+  <li>Prantsusmaa — Prix Carburants (data.economie.gouv.fr, donnees.roulez-eco.fr)</li>
+  <li>Itaalia — MIMIT osservaprezzi (carburanti.mise.gov.it)</li>
+  <li>Hispaania — MITECO / Geoportal Gasolineras (sedeaplicaciones.minetur.gob.es, geoportalgasolineras.es)</li>
+  <li>Austria — E-Control Spritpreisrechner (api.e-control.at)</li>
+  <li>Belgia ja Luksemburg — data.public.lu, STATEC (lustat.statec.lu)</li>
+  <li>Portugal — DGEG (precoscombustiveis.dgeg.gov.pt)</li>
+  <li>Taani — OK (mobility-prices.ok.dk), Shell (shellpumpepriser.geoapp.me)</li>
+  <li>Ühendkuningriik — Fuel Finder (www.fuel-finder.service.gov.uk) ja selles loetletud jaemüüjate hinnavood: applegreenstores.com, fuelprices.asconagroup.co.uk, storelocator.asda.com, www.bp.com, fuelprices.esso.co.uk, jetlocal.co.uk, api2.krlmedia.com, www.morrisons.com, moto-way.com, fuel.motorfuelgroup.com, www.rontec-servicestations.co.uk, api.sainsburys.co.uk, www.sgnretail.uk, www.shell.co.uk, www.tesco.com</li>
+  <li>Sloveenia — goriva.si</li>
+  <li>Rumeenia — Monitorul Prețurilor (monitorulpreturilor.info)</li>
+  <li>Kreeka — Παρατηρητήριο Τιμών (paratiritirio.mindev.gov.gr) AWS eu-west-3 piirkonnas majutatud kogukonna peegelserveri kaudu (5fcbs3i0z4.execute-api.eu-west-3.amazonaws.com)</li>
+  <li>Lõuna-Korea — Opinet (www.opinet.co.kr)</li>
+  <li>Tšiili — CNE (api.cne.cl)</li>
+  <li>Argentina — datos.energia.gob.ar</li>
+  <li>Mehhiko — CRE (publicacionexterna.azurewebsites.net)</li>
+  <li>Austraalia — FuelCheck NSW (www.fuelcheck.nsw.gov.au)</li>
+</ul>
+
+<h2>6. Andmeturve</h2>
+<ul>
+  <li>Kogu võrguside kasutab HTTPS-i (TLS edastamisel); rakendus keeldub krüpteerimata HTTP-sünkroonimisotspunktidest.</li>
+  <li>API-võtmed, teie GitHubi tõend ja TankSynci seanss hoitakse platvormi omases krüpteeritud salvestuskohas (Android Keystore / iOS Keychain).</li>
+  <li>Kohalikud andmebaasid on AES-krüpteeritud võtmega, mida hoitakse Keystore'is / Keychainis — sealhulgas salvestatud sõidud, sõidukiandmed, hooldusmeeldetuletused ja vahemällu salvestatud hinnad.</li>
+  <li>Serveris on iga tabel kaitstud reataseme turbega, nii et konto saab lugeda või kustutada ainult oma ridu; jagatud hinnangud ja kogukonna hinnateated on ainsad read, mis on teistele sisse loginud kasutajatele nähtavad.</li>
+  <li>Veajäljed puhastatakse e-posti aadressidest, koordinaatidest ja tõenditest enne nende salvestamist või saatmist.</li>
+  <li>Ühelegi serverile ei saadeta andmeid, kui te ei tee otsingut, ei ava kaarti ega lülita sisse TankSynci / diagnostikat.</li>
+</ul>
+
+<h2>7. Teie õigused</h2>
+<p>Isikuandmete kaitse üldmääruse artiklite 15–22 alusel on teil õigus oma andmetega tutvuda, neid parandada, kustutada, nende töötlemist piirata ja neid üle kanda, esitada vastuväiteid õigustatud huvil põhinevale töötlemisele ning oma nõusolek igal ajal tagasi võtta, ilma et see mõjutaks varasema töötlemise seaduslikkust. Iga õiguse jaoks on rakenduses nupp:</p>
+<ul>
+  <li><strong>Tutvumine</strong> — Seaded → Privaatsuse juhtpaneel näitab iga seadmes salvestatud kategooriat ja ühendatud olekus iga rida teie TankSynci andmebaasis.</li>
+  <li><strong>Eksport (ülekantavus)</strong> — Privaatsuse juhtpaneel → Ekspordi kõik minu andmed loob ühe ZIP-faili, mis sisaldab iga kategooria kohta masinloetavat JSON-faili (lemmikud, teavitused, profiilid, marsruudid, hinnaajalugu, sõidukid, tankimised, sõidud koos GPS-proovide ja iga sõidu kohta ühe GPX-failiga, baasväärtused, hooldusmeeldetuletused, laadimislogid, teie nõusolekukirje) ning iga serveritabeli JSON-ekspordi.</li>
+  <li><strong>Parandamine</strong> — muutke mis tahes kirjet otse rakenduses; muudatus sünkroonitakse, kui TankSync on sisse lülitatud.</li>
+  <li><strong>Kustutamine</strong> — vt 8. jaotist.</li>
+  <li><strong>Piiramine / vastuväide</strong> — lülitage Seadetes välja TankSync, sõitude sünkroonimine, paanipuhverserver või diagnostika; tühistage seadme seadetes asukoha-, Bluetoothi, kaamera- või teavitusluba.</li>
+  <li><strong>Nõusoleku tagasivõtmine</strong> — Seaded → Privaatsus ja andmed loetleb iga nõusoleku koos selle andmise kuupäeva ja poliitika versiooniga, mida te nägite; igaühe saab välja lülitada ja rakendus lõpetab vastava töötlemise kohe.</li>
+  <li><strong>Kaebuse esitamine</strong> — võite esitada kaebuse järelevalveasutusele, eelkõige selles ELi liikmesriigis, kus on teie alaline elukoht, töökoht või väidetava rikkumise toimumise koht. Oleksime tänulikud võimaluse eest teie mure esmalt ise lahendada: <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a>.</li>
+</ul>
+
+<h2>8. Konto ja andmete kustutamine</h2>
+<p>Saate kõik ise kustutada, otse rakenduses — tugipäringut pole vaja:</p>
+<ul>
+  <li><strong>Kohalikud andmed:</strong> Seaded → Privaatsuse juhtpaneel → Kustuta kõik andmed eemaldab iga andmebaasi, mida rakendus seadmes hoiab — profiilid, lemmikud, teavitused, hinnaajaloo, vahemällu salvestatud hinnad, sõidukid, tankimised, salvestatud sõidud ja nende GPS-proovid, OBD2-baasväärtused ja adapteri vahemälud, hooldusmeeldetuletused, saavutused, veajäljed, API-võtmed, tõendid ja avakuva vidina andmed — ning taastab rakenduse esmakäivituse oleku.</li>
+  <li><strong>TankSynci konto ja serveriandmed:</strong> TankSync → Andmete läbipaistvus → Kustuta konto kustutab ühe tehinguga kõik teile kuuluvad read (lemmikud, teavitused, ignoreeritud jaamad, hinnateated, sisuteated, sõidukid, tankimised, marsruudid, baasväärtused, hinnangud, sõidud, teie antud või saadud sõidujagamised, ooteaja teated, sünkroonimisseaded, kustutuskirjed ja teie kasutajarida) ning seejärel kustutab konto identiteedi enda, sealhulgas mis tahes seotud e-posti aadressi. Kui mõnda tabelit ei õnnestunud kustutada, ütleb rakendus teile, millist, selle asemel et väita edu. Seda ei saa tagasi võtta.</li>
+  <li><strong>Üksikud kirjed:</strong> iga lemmiku, teavituse, sõiduki, tankimise, sõidu, hinnateate ja sisuteate saab eraldi kustutada; kustutamised kanduvad edasi teie teistesse seadmetesse.</li>
+</ul>
+<p>Kui teil ei ole enam rakendusele juurdepääsu, saate kustutamist taotleda arendajaga ühendust võttes (11. jaotis); palun kirjutage oma kontoga seotud e-posti aadressilt, et saaksime omandiõigust kontrollida. Anonüümset kontot, mida ei ole kunagi e-posti aadressiga seotud, ei saa keegi — ka meie mitte — tuvastada ilma seadmeta, milles see loodi.</p>
+
+<h2>9. Laste privaatsus</h2>
+<p>Rakendus ei ole suunatud alla 16-aastastele lastele. Me ei kogu teadlikult lastelt isikuandmeid; kui arvate, et laps on loonud TankSynci konto, võtke meiega ühendust ja me kustutame selle.</p>
+
+<h2>10. Poliitika muudatused</h2>
+<p>Muudatused avaldatakse sellel URL-il uue versiooninumbri ja kuupäevaga; rakendus salvestab versiooni, millega te nõustusite, ja näitab seda lehte versiooni muutumisel uuesti.</p>
+<ul>
+  <li><strong>v3 — 29. august 2026:</strong> vastutav töötleja ja režiimipõhised rollid, töötlemistabel õiguslike aluste ja säilitamisaegadega, täielik volitatud töötlejate loend (paanipuhverserver, geokodeerija, marsruutimine, GitHub, brändilogod), õiguste kasutamise teed, täielik kustutamine ja eksport.</li>
+  <li><strong>v2 — 15. august 2026:</strong> konto kustutamise jaotis; e-posti ja TankSynci konto andmete deklareerimine.</li>
+  <li><strong>v1 — 7. aprill 2026:</strong> esimene versioon.</li>
+</ul>
+
+<h2>11. Kontakt</h2>
+<div class="contact">
+  <p><strong>Arendaja ja vastutav töötleja:</strong> Florian DITTGEN</p>
+  <p><strong>E-post:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
+  <p><strong>Lähtekood:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
+</div>
+
+</body>
+</html>

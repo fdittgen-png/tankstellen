@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sparkilo — Privatumo politika</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+
+<h1>Privatumo politika</h1>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen sistemoje iOS, de.tankstellen.fuelprices sistemoje Android) &mdash; Version 3 &mdash; Paskutinį kartą atnaujinta: 2026 m. rugpjūčio 29 d.</p>
+<p class="langs">Galimos kalbos: <a href="../">English</a> <a href="../bg/">Български</a> <a href="../cs/">Čeština</a> <a href="../da/">Dansk</a> <a href="../de/">Deutsch</a> <a href="../el/">Ελληνικά</a> <a href="../es/">Español</a> <a href="../et/">Eesti</a> <a href="../fi/">Suomi</a> <a href="../fr/">Français</a> <a href="../hr/">Hrvatski</a> <a href="../hu/">Magyar</a> <a href="../it/">Italiano</a> <a href="../ko/">한국어</a> <a href="../lt/">Lietuvių</a> <a href="../lv/">Latviešu</a> <a href="../nb/">Norsk</a> <a href="../nl/">Nederlands</a> <a href="../pl/">Polski</a> <a href="../pt/">Português</a> <a href="../ro/">Română</a> <a href="../sk/">Slovenčina</a> <a href="../sl/">Slovenščina</a> <a href="../sv/">Svenska</a></p>
+
+<h2>1. Apžvalga</h2>
+<p>Sparkilo – tai nemokama atvirojo kodo degalų ir elektromobilių įkrovimo kainų palyginimo programėlė su pasirenkama kelionių įrašymo funkcija. Ji sukurta pagal <strong>„local-first“</strong> principą: viskas, ką programėlė žino apie Jus, saugoma Jūsų telefone, nebent įjungiate funkciją, kurioje aiškiai nurodyta kitaip. Nėra jokių reklamų, sekimo pikselių, reklamos identifikatorių ir analitikos SDK. Ši politika parengta taip, kad atitiktų ES Bendrąjį duomenų apsaugos reglamentą (BDAR / GDPR); ji taikoma kiekvienam naudotojui, nepriklausomai nuo to, kur esate.</p>
+<p>Programėlė yra <a href="https://github.com/fdittgen-png/tankstellen">atvirojo kodo</a> – kiekvieną toliau pateiktą teiginį galima patikrinti kode. Kompiuteriu nuskaitoma tvarkomų duomenų santrauka saugoma faile <code>docs/privacy/data_inventory.json</code>, o pačios programėlės testai nepavyksta, jei šis puslapis, parduotuvių deklaracijos ir kodas ima nesutapti.</p>
+
+<h2>2. Kas atsakingas (duomenų valdytojas)</h2>
+<p>Programėlės ir pasirenkamos sinchronizavimo paslaugos „Sparkilo Community“ duomenų valdytojas yra:</p>
+<div class="contact">
+  <p><strong>Florian DITTGEN</strong> (individualus kūrėjas)</p>
+  <p><strong>El. paštas:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
+  <p><strong>Pirminis kodas ir problemų registras:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
+</div>
+<p>Priklausomai nuo to, kaip naudojate TankSync, keičiasi Jūsų sinchronizuojamų duomenų valdytojas:</p>
+<ul>
+  <li><strong>Be TankSync (numatytoji parinktis):</strong> jokiame mūsų valdomame serveryje niekas nesaugoma. Jūsų duomenys lieka Jūsų įrenginyje ir tik Jūs juos kontroliuojate.</li>
+  <li><strong>Privati duomenų bazė:</strong> prijungiate savo paties Supabase projektą. Jūs esate duomenų valdytojas; mes šių duomenų niekada nematome.</li>
+  <li><strong>Prisijungimas prie grupės:</strong> prijungiate Supabase projektą, kurį valdo Jums pažįstamas asmuo (šeima, draugai). Tas asmuo yra bendros duomenų bazės valdytojas.</li>
+  <li><strong>Sparkilo Community:</strong> prijungiate bendrą duomenų bazę, kurią valdo pirmiau nurodytas kūrėjas (Supabase, talpinama ES – AWS eu-central-1, Frankfurtas). Kūrėjas yra duomenų valdytojas; „Supabase, Inc.“ yra duomenų tvarkytojas, saistomas savo duomenų tvarkymo sąlygų.</li>
+</ul>
+<p>Programėlė prieš prisijungiant praneša, kuris iš šių variantų taikomas, ir dar kartą tai parodo skiltyje Nustatymai → Privatumo skydelis.</p>
+
+<h2>3. Mūsų naudojami duomenys</h2>
+<p>Lentelėje išvardyti visi programėlės tvarkomų asmens duomenų tipai, jų tvarkymo tikslas, teisinis pagrindas (BDAR 6 str.), kur jie perduodami ir kiek laiko saugomi. „Įrenginys“ reiškia, kad duomenys niekada nepalieka Jūsų telefono.</p>
+<table>
+  <thead><tr><th>Duomenys</th><th>Tikslas</th><th>Teisinis pagrindas</th><th>Kur perduodami</th><th>Saugojimo trukmė</th></tr></thead>
+  <tbody>
+    <tr><td>Apytikslė / tiksli buvimo vieta (paieška)</td><td>Rasti netoliese esančias stotis</td><td>Sutikimas (suteikiate vietos leidimą ir patvirtinate programėlės paaiškinimą)</td><td>Siunčiama kaip paieškos koordinatės į šalies, kurioje esate, kainų duomenų šaltinį (5 skyrius). Nesaugoma jokiame mūsų valdomame serveryje.</td><td>Paskutinė padėtis saugoma įrenginyje pagrindinio ekrano valdikliui, kol ištrinate duomenis</td></tr>
+    <tr><td>Tikslus GPS maršrutas, greitis, aukštis, judesio jutikliai (kelionių įrašymas)</td><td>Įrašyti kelionę, apskaičiuoti atstumą ir sąnaudas</td><td>Sutikimas (pradedate įrašymą; automatiniam įrašymui reikia atskiro fono vietos leidimo kiekvienai transporto priemonei)</td><td>Įrenginys. Įjungus TankSync <em>ir</em> kelionių sinchronizavimą: Jūsų TankSync duomenų bazė.</td><td>Įrenginys: kol ištrinate kelionę arba visus duomenis. Serveris: kelionių santraukos, kol jas ištrinate; išsamūs GPS mėginiai pašalinami praėjus 90 dienų po kelionės.</td></tr>
+    <tr><td>Transporto priemonės profilis (markė, modelis, metai, bako talpa, VIN, OBD2 adapterio identifikatorius)</td><td>Sąnaudų skaičiavimas, pakartotinis adapterio prijungimas</td><td>Sutartis (Jūsų sukonfigūruotos funkcijos teikimas)</td><td>Įrenginys. Su TankSync: Jūsų TankSync duomenų bazė.</td><td>Kol ištrinate transporto priemonę arba visus duomenis</td></tr>
+    <tr><td>VIN (17 simbolių)</td><td>Iššifruoti markę / modelį / variklį internetu</td><td>Sutikimas (atskiras jungiklis, pagal numatytuosius nustatymus išjungtas; kitu atveju veikia neprisijungus veikiantis dekoderis)</td><td>NHTSA vPIC (JAV viešoji tarnyba), tik VIN</td><td>Mes nesaugome; žr. NHTSA politiką</td></tr>
+    <tr><td>Degalų pylimai (data, stotis, litrai, kaina, odometras), įkrovimo žurnalai, priežiūros priminimai</td><td>Jūsų degalų žurnalas ir statistika</td><td>Sutartis</td><td>Įrenginys. Su TankSync: Jūsų TankSync duomenų bazė.</td><td>Kol juos arba visus duomenis ištrinate</td></tr>
+    <tr><td>Mėgstamiausios, ignoruojamos stotys, kainų įspėjimai, paieškos profiliai, maršrutai, nustatymai</td><td>Pritaikyti programėlę; siųsti vietinius kainų įspėjimų pranešimus</td><td>Sutartis</td><td>Įrenginys. Su TankSync: Jūsų TankSync duomenų bazė.</td><td>Kol juos arba visus duomenis ištrinate</td></tr>
+    <tr><td>Anoniminis naudotojo ID (atsitiktinis UUID), pasirenkamas el. pašto adresas, kiekvieno diegimo įrenginio ID</td><td>Identifikuoti Jūsų TankSync paskyrą įvairiuose įrenginiuose; pažymėti, kuris įrenginys ištrynė įrašą</td><td>Sutikimas (jungiklis „Sinchronizavimas debesyje“) / Sutartis</td><td>Jūsų TankSync duomenų bazė (Supabase)</td><td>Kol ištrinate paskyrą</td></tr>
+    <tr><td>Bendruomenės kainų pranešimai, bendrinami stočių įvertinimai, pranešimai apie turinį</td><td>Bendruomenės atliekami kainų taisymai ir moderavimas</td><td>Sutikimas (Jūs juos pateikiate; pranešime paaiškinama, kad jie saugomi su Jūsų pseudoniminiu ID ir gali būti matomi kitiems prisijungusiems naudotojams)</td><td>Jūsų TankSync duomenų bazė – „Sparkilo Community“ atveju matoma kiekvienam prisijungusiam naudotojui</td><td>Kol ištrinate pranešimą arba paskyrą</td></tr>
+    <tr><td>Strigčių ataskaitos ir našumo pėdsakai (programėlės versija, OS versija, ekrano dydis, lokalė, dėklo pėdsakas, paskutiniai veiksmai programėlėje)</td><td>Taisyti klaidas</td><td>Sutikimas (jungiklis „Klaidų ataskaitos“, pagal numatytuosius nustatymus išjungtas)</td><td>Sentry</td><td>Įrenginys: 50 naujausių pėdsakų, 7 dienos, prieš saugant iš jų pašalinami el. pašto adresai, koordinatės ir prieigos raktai. Sentry: 90 dienų.</td></tr>
+    <tr><td>Kvito arba kolonėlės nuotrauka (kamera / nuotraukų biblioteka)</td><td>Nuskaityti kvitą įrenginyje (OCR įrenginyje)</td><td>Sutikimas (Jūs nufotografuojate arba pasirenkate nuotrauką)</td><td>Tik įrenginys. Pridedama prie GitHub problemos tik tuo atveju, jei pateikiate pranešimą „blogas nuskaitymas“ ir tai patvirtinate.</td><td>Ištrinama po nuskaitymo; pranešimo kopija lieka GitHub, kol ištrinate problemą</td></tr>
+    <tr><td>Žemėlapio rodinys (plytelių koordinatės) ir IP adresas</td><td>Pavaizduoti žemėlapį</td><td>Teisėtas interesas (žemėlapiui reikia plytelių) – tarpinį serverį galite išjungti</td><td>Sparkilo plytelių tarpinis serveris (tas pats Supabase projektas, ES), kuris jas gauna iš OpenStreetMap; arba tiesiogiai tile.openstreetmap.org, kai tarpinis serveris išjungtas (Nustatymai → Privatumas) arba F-Droid versijoje</td><td>Nesaugoma ilgiau nei standartiniuose serverio žurnaluose (tarpinis serveris: 7 dienos)</td></tr>
+    <tr><td>Maršruto pradžia ir paskirties vieta, kelių tinklo užklausos</td><td>Maršruto paieška, sklandaus važiavimo patarimai</td><td>Sutartis</td><td>OSRM (router.project-osrm.org), Overpass API (overpass-api.de), Nominatim (nominatim.openstreetmap.org)</td><td>Mes nesaugome</td></tr>
+    <tr><td>Jūsų įvedamas adreso tekstas arba koordinatės</td><td>Geokodavimas</td><td>Sutartis</td><td>Nominatim arba Jūsų telefone įdiegtas geokoderis (Apple / Google)</td><td>Mes nesaugome</td></tr>
+    <tr><td>Jūsų įvedami API raktai (Tankerkönig, OpenChargeMap)</td><td>Kreiptis į šias paslaugas Jūsų vardu</td><td>Sutartis</td><td>Tik tam teikėjui, kuriam raktas priklauso</td><td>Užšifruoti įrenginyje (Keystore / Keychain), kol juos ištrinate</td></tr>
+    <tr><td>Pranešimai apie neteisingą stoties pavadinimą / adresą, pranešimai apie blogą nuskaitymą</td><td>Taisyti duomenis</td><td>Sutikimas (patvirtinate prieš siųsdami; reikalingas asmeninis GitHub prieigos raktas)</td><td>GitHub (vieša problema projekto saugykloje)</td><td>Vieša, kol problema ištrinama</td></tr>
+  </tbody>
+</table>
+<p>Programėlė nepriima dėl Jūsų automatizuotų sprendimų, sukeliančių teisines ar panašiai reikšmingas pasekmes. Kainų prognozės skaičiuojamos įrenginyje pagal viešus kainų duomenis.</p>
+
+<h2>4. Duomenys, kurių NERENKAME</h2>
+<ul>
+  <li>Vardas ar telefono numeris (el. pašto adresas saugomas tik tuo atveju, jei jį susiejate su savo pasirenkama TankSync paskyra)</li>
+  <li>Mokėjimo ar banko duomenys</li>
+  <li>Sveikatos ar fizinio aktyvumo duomenys</li>
+  <li>Kontaktai, žinutės ar skambučių žurnalai</li>
+  <li>Nuotraukos, vaizdo įrašai ar failai, išskyrus kvito nuotrauką, kurią pasirenkate nuskaityti</li>
+  <li>Naršymo istorija</li>
+  <li>Reklamos identifikatoriai</li>
+</ul>
+<p>Prekių ženklų logotipai pateikiami kartu su programėle. Jų įkėlimas iš interneto (logo.clearbit.com, kuris gautų Jūsų IP adresą) yra išjungtas, nebent jį įjungiate skiltyje Nustatymai → Privatumas.</p>
+
+<h2>5. Trečiųjų šalių paslaugos ir duomenų šaltiniai</h2>
+<p>Programėlė bendrauja su toliau nurodytomis paslaugomis. Kiekviena jų turi savo privatumo politiką. Programėlė niekada nesidalija duomenimis tarp jų ir niekada nesiunčia daugiau, nei aprašyta pirmiau pateiktuose stulpeliuose.</p>
+<h3>5.1 Infrastruktūra (tik kai įjungta atitinkama funkcija)</h3>
+<ul>
+  <li><strong>Supabase</strong> (klelxnkzrxlpzuddhpfg.supabase.co, AWS eu-central-1) – „Sparkilo Community“ TankSync serverinė dalis ir plytelių tarpinis serveris. Duomenų tvarkytojas pagal Supabase duomenų tvarkymo priedą.</li>
+  <li><strong>Sentry</strong> (sentry.io) – strigčių ataskaitos ir našumo pėdsakai, tik gavus sutikimą. Sentry gali tvarkyti duomenis Jungtinėse Valstijose; perdavimams taikoma ES ir JAV duomenų privatumo sistema (EU-US Data Privacy Framework) ir standartinės sutarčių sąlygos.</li>
+  <li><strong>GitHub</strong> (api.github.com, github.com) – problemų pranešimai, kuriuos aiškiai pateikiate; programėlė taip pat atsisiunčia viešus duomenų išteklius (greitkelių išvažiavimus, stočių sąrašus) iš projekto leidimų, todėl GitHub sužino Jūsų IP adresą.</li>
+  <li><strong>OpenStreetMap</strong> (tile.openstreetmap.org, nominatim.openstreetmap.org), <strong>OSRM</strong> (router.project-osrm.org), <strong>Overpass API</strong> (overpass-api.de) – žemėlapiai, geokodavimas, maršrutų sudarymas.</li>
+  <li><strong>OpenChargeMap</strong> (api.openchargemap.io) ir <strong>ODRÉ / IRVE</strong> (odre.opendatasoft.com) – elektromobilių įkrovimo stotys ir kainos. Gauna: paieškos koordinates.</li>
+  <li><strong>NHTSA vPIC</strong> (vpic.nhtsa.dot.gov) – VIN iššifravimas, tik gavus sutikimą.</li>
+  <li><strong>Clearbit Logo API</strong> (logo.clearbit.com) – prekių ženklų logotipai, pagal numatytuosius nustatymus išjungta.</li>
+  <li><strong>Apple Maps / Google Maps</strong> (www.google.com) – atidaroma Jūsų naršyklėje arba žemėlapių programėlėje tik paspaudus „Naviguoti“.</li>
+</ul>
+<h3>5.2 Oficialūs degalų kainų duomenų šaltiniai (gauna Jūsų paieškos koordinates arba regioną, bet niekada Jūsų tapatybės)</h3>
+<ul>
+  <li>Vokietija – Tankerkönig (creativecommons.tankerkoenig.de), su Jūsų paties API raktu</li>
+  <li>Prancūzija – Prix Carburants (data.economie.gouv.fr, donnees.roulez-eco.fr)</li>
+  <li>Italija – MIMIT osservaprezzi (carburanti.mise.gov.it)</li>
+  <li>Ispanija – MITECO / Geoportal Gasolineras (sedeaplicaciones.minetur.gob.es, geoportalgasolineras.es)</li>
+  <li>Austrija – E-Control Spritpreisrechner (api.e-control.at)</li>
+  <li>Belgija ir Liuksemburgas – data.public.lu, STATEC (lustat.statec.lu)</li>
+  <li>Portugalija – DGEG (precoscombustiveis.dgeg.gov.pt)</li>
+  <li>Danija – OK (mobility-prices.ok.dk), Shell (shellpumpepriser.geoapp.me)</li>
+  <li>Jungtinė Karalystė – Fuel Finder (www.fuel-finder.service.gov.uk) ir jame nurodyti mažmenininkų kainų srautai: applegreenstores.com, fuelprices.asconagroup.co.uk, storelocator.asda.com, www.bp.com, fuelprices.esso.co.uk, jetlocal.co.uk, api2.krlmedia.com, www.morrisons.com, moto-way.com, fuel.motorfuelgroup.com, www.rontec-servicestations.co.uk, api.sainsburys.co.uk, www.sgnretail.uk, www.shell.co.uk, www.tesco.com</li>
+  <li>Slovėnija – goriva.si</li>
+  <li>Rumunija – Monitorul Prețurilor (monitorulpreturilor.info)</li>
+  <li>Graikija – Παρατηρητήριο Τιμών (paratiritirio.mindev.gov.gr) per bendruomenės veidrodinį serverį, talpinamą AWS eu-west-3 (5fcbs3i0z4.execute-api.eu-west-3.amazonaws.com)</li>
+  <li>Pietų Korėja – Opinet (www.opinet.co.kr)</li>
+  <li>Čilė – CNE (api.cne.cl)</li>
+  <li>Argentina – datos.energia.gob.ar</li>
+  <li>Meksika – CRE (publicacionexterna.azurewebsites.net)</li>
+  <li>Australija – FuelCheck NSW (www.fuelcheck.nsw.gov.au)</li>
+</ul>
+
+<h2>6. Duomenų saugumas</h2>
+<ul>
+  <li>Visas tinklo ryšys vyksta per HTTPS (TLS perdavimo metu); programėlė atsisako naudoti nešifruotus HTTP sinchronizavimo galinius taškus.</li>
+  <li>API raktai, Jūsų GitHub prieigos raktas ir TankSync sesija saugomi platformos vietinėje šifruotoje saugykloje (Android Keystore / iOS Keychain).</li>
+  <li>Vietinės duomenų bazės šifruojamos AES algoritmu raktu, saugomu Keystore / Keychain – įskaitant įrašytas keliones, transporto priemonių duomenis, priežiūros priminimus ir podėlyje laikomas kainas.</li>
+  <li>Serveryje kiekviena lentelė apsaugota eilučių lygio saugumu, todėl paskyra gali skaityti arba ištrinti tik savo eilutes; bendrinami įvertinimai ir bendruomenės kainų pranešimai yra vienintelės eilutės, matomos kitiems prisijungusiems naudotojams.</li>
+  <li>Iš klaidų pėdsakų prieš saugant ar siunčiant pašalinami el. pašto adresai, koordinatės ir prieigos raktai.</li>
+  <li>Jokie duomenys nesiunčiami į jokį serverį, nebent atliekate paiešką, atidarote žemėlapį arba įjungiate TankSync / diagnostiką.</li>
+</ul>
+
+<h2>7. Jūsų teisės</h2>
+<p>Pagal BDAR 15–22 str. Jūs turite teisę susipažinti su savo duomenimis, juos ištaisyti, ištrinti, apriboti jų tvarkymą ir juos perkelti, nesutikti su teisėtu interesu grindžiamu tvarkymu ir bet kada atšaukti sutikimą, nedarant poveikio ankstesnio tvarkymo teisėtumui. Kiekvienai teisei programėlėje yra mygtukas:</p>
+<ul>
+  <li><strong>Susipažinimas</strong> – Nustatymai → Privatumo skydelis rodo kiekvieną įrenginyje saugomą kategoriją ir, kai esate prisijungę, kiekvieną Jūsų TankSync duomenų bazės eilutę.</li>
+  <li><strong>Eksportas (perkeliamumas)</strong> – Privatumo skydelis → Eksportuoti visus mano duomenis sukuria vieną ZIP archyvą su kompiuteriu nuskaitomu JSON failu kiekvienai kategorijai (mėgstamiausios, įspėjimai, profiliai, maršrutai, kainų istorija, transporto priemonės, degalų pylimai, kelionės su GPS mėginiais ir po vieną GPX failą kiekvienai kelionei, bazinės vertės, priežiūros priminimai, įkrovimo žurnalai, Jūsų sutikimų įrašas) bei kiekvienos serverio lentelės JSON eksportą.</li>
+  <li><strong>Ištaisymas</strong> – redaguokite bet kurį įrašą tiesiogiai programėlėje; jei TankSync įjungtas, pakeitimas sinchronizuojamas.</li>
+  <li><strong>Ištrynimas</strong> – žr. 8 skyrių.</li>
+  <li><strong>Apribojimas / nesutikimas</strong> – nustatymuose išjunkite TankSync, kelionių sinchronizavimą, plytelių tarpinį serverį arba diagnostiką; įrenginio nustatymuose atšaukite vietos, „Bluetooth“, kameros arba pranešimų leidimą.</li>
+  <li><strong>Sutikimo atšaukimas</strong> – Nustatymai → Privatumas ir duomenys pateikia kiekvieno sutikimo sąrašą su jo suteikimo data ir Jūsų matyta politikos versija; kiekvieną galima išjungti, ir programėlė nedelsdama nutraukia atitinkamą tvarkymą.</li>
+  <li><strong>Skundas</strong> – galite pateikti skundą priežiūros institucijai, visų pirma ES valstybėje narėje, kurioje yra Jūsų nuolatinė gyvenamoji vieta, darbo vieta arba įtariamo pažeidimo vieta. Būtume dėkingi už galimybę pirmiausia patiems išspręsti Jūsų klausimą: <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a>.</li>
+</ul>
+
+<h2>8. Paskyros ir duomenų ištrynimas</h2>
+<p>Viską galite ištrinti patys, tiesiogiai programėlėje – kreiptis į pagalbos tarnybą nereikia:</p>
+<ul>
+  <li><strong>Vietiniai duomenys:</strong> Nustatymai → Privatumo skydelis → Ištrinti visus duomenis pašalina kiekvieną programėlės įrenginyje laikomą duomenų bazę – profilius, mėgstamiausias, įspėjimus, kainų istoriją, podėlyje laikomas kainas, transporto priemones, degalų pylimus, įrašytas keliones ir jų GPS mėginius, OBD2 bazines vertes ir adapterių podėlius, priežiūros priminimus, pasiekimus, klaidų pėdsakus, API raktus, prieigos raktus ir pagrindinio ekrano valdiklio duomenis – ir grąžina programėlę į pirmojo paleidimo būseną.</li>
+  <li><strong>TankSync paskyra ir serverio duomenys:</strong> TankSync → Duomenų skaidrumas → Ištrinti paskyrą viena operacija ištrina kiekvieną Jums priklausančią eilutę (mėgstamiausias, įspėjimus, ignoruojamas stotis, kainų pranešimus, pranešimus apie turinį, transporto priemones, degalų pylimus, maršrutus, bazines vertes, įvertinimus, keliones, Jūsų suteiktus ar gautus kelionių bendrinimus, laukimo laiko signalus, sinchronizavimo nustatymus, ištrynimo įrašus ir Jūsų naudotojo eilutę), o tada ištrina pačią paskyros tapatybę, įskaitant bet kokį susietą el. pašto adresą. Jei kurios nors lentelės nepavyko ištrinti, programėlė praneša, kurios, užuot teigusi, kad viskas pavyko. Šio veiksmo atšaukti negalima.</li>
+  <li><strong>Atskiri elementai:</strong> kiekvieną mėgstamiausią, įspėjimą, transporto priemonę, degalų pylimą, kelionę, kainų pranešimą ir pranešimą apie turinį galima ištrinti atskirai; ištrynimai perduodami į kitus Jūsų įrenginius.</li>
+</ul>
+<p>Jei nebegalite pasiekti programėlės, ištrynimo galite paprašyti susisiekę su kūrėju (11 skyrius); rašykite iš su Jūsų paskyra susieto el. pašto adreso, kad galėtume patikrinti nuosavybę. Anoniminės paskyros, kuri niekada nebuvo susieta su el. paštu, niekas – įskaitant mus – negali identifikuoti be įrenginio, kuriame ji buvo sukurta.</p>
+
+<h2>9. Vaikų privatumas</h2>
+<p>Programėlė nėra skirta jaunesniems nei 16 metų vaikams. Mes sąmoningai nerenkame vaikų asmens duomenų; jei manote, kad vaikas sukūrė TankSync paskyrą, susisiekite su mumis ir mes ją ištrinsime.</p>
+
+<h2>10. Šios politikos pakeitimai</h2>
+<p>Pakeitimai skelbiami šiuo URL adresu su nauju versijos numeriu ir data; programėlė įrašo versiją, su kuria sutikote, ir, pasikeitus versijai, vėl parodo šį puslapį.</p>
+<ul>
+  <li><strong>v3 – 2026 m. rugpjūčio 29 d.:</strong> duomenų valdytojas ir vaidmenys pagal režimą, tvarkymo lentelė su teisiniais pagrindais ir saugojimo trukmėmis, išsamus duomenų tvarkytojų sąrašas (plytelių tarpinis serveris, geokoderis, maršrutų sudarymas, GitHub, prekių ženklų logotipai), teisių įgyvendinimo keliai, visiškas ištrynimas ir eksportas.</li>
+  <li><strong>v2 – 2026 m. rugpjūčio 15 d.:</strong> paskyros ištrynimo skyrius; deklaruoti el. pašto ir TankSync paskyros duomenys.</li>
+  <li><strong>v1 – 2026 m. balandžio 7 d.:</strong> pirmoji versija.</li>
+</ul>
+
+<h2>11. Kontaktai</h2>
+<div class="contact">
+  <p><strong>Kūrėjas ir duomenų valdytojas:</strong> Florian DITTGEN</p>
+  <p><strong>El. paštas:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
+  <p><strong>Pirminis kodas:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
+</div>
+
+</body>
+</html>

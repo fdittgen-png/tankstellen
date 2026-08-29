@@ -9,101 +9,144 @@
 <body>
 
 <h1>Integritetspolicy</h1>
-<p class="meta">Sparkilo (de.tankstellen.tankstellen på iOS, de.tankstellen.fuelprices på Android) &mdash; Senast uppdaterad: 15 augusti 2026</p>
-<p class="langs">Tillgängliga språk: <a href="../">English</a> <a href="../de/">Deutsch</a> <a href="../fr/">Français</a> <a href="../es/">Español</a> <a href="../it/">Italiano</a> <a href="../nl/">Nederlands</a> <a href="../pt/">Português</a> <a href="../sv/">Svenska</a> <a href="../fi/">Suomi</a> <a href="../da/">Dansk</a> <a href="../pl/">Polski</a> <a href="../sl/">Slovenščina</a> <a href="../ko/">한국어</a></p>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen på iOS, de.tankstellen.fuelprices på Android) &mdash; Version 3 &mdash; Senast uppdaterad: 29 augusti 2026</p>
+<p class="langs">Tillgängliga språk: <a href="../">English</a> <a href="../bg/">Български</a> <a href="../cs/">Čeština</a> <a href="../da/">Dansk</a> <a href="../de/">Deutsch</a> <a href="../el/">Ελληνικά</a> <a href="../es/">Español</a> <a href="../et/">Eesti</a> <a href="../fi/">Suomi</a> <a href="../fr/">Français</a> <a href="../hr/">Hrvatski</a> <a href="../hu/">Magyar</a> <a href="../it/">Italiano</a> <a href="../ko/">한국어</a> <a href="../lt/">Lietuvių</a> <a href="../lv/">Latviešu</a> <a href="../nb/">Norsk</a> <a href="../nl/">Nederlands</a> <a href="../pl/">Polski</a> <a href="../pt/">Português</a> <a href="../ro/">Română</a> <a href="../sk/">Slovenčina</a> <a href="../sl/">Slovenščina</a> <a href="../sv/">Svenska</a></p>
 
 <h2>1. Översikt</h2>
-<p>Sparkilo (tidigare Fuel Prices Europe & More) är en gratis öppen källkods-app för jämförelse av drivmedels- och laddpriser. Den är byggd kring en <strong>local-first, integritetsvänlig</strong> arkitektur. Inga annonser, inga spårningspixlar, inga annons-ID:n.</p>
+<p>Sparkilo är en kostnadsfri app med öppen källkod för jämförelse av bränsle- och elbilsladdningspriser, med valfri resregistrering. Den är byggd <strong>lokalt först</strong>: allt appen vet om dig finns på din telefon, om du inte aktiverar en funktion som uttryckligen anger något annat. Det finns inga annonser, inga spårningspixlar, inga reklamidentifierare och inget analys-SDK. Denna policy är skriven för att uppfylla EU:s allmänna dataskyddsförordning (GDPR); den gäller för alla användare, var du än befinner dig.</p>
+<p>Appen har <a href="https://github.com/fdittgen-png/tankstellen">öppen källkod</a> — varje påstående nedan kan verifieras i koden. En maskinläsbar sammanfattning av vad som behandlas finns i <code>docs/privacy/data_inventory.json</code>, och appens egna tester misslyckas om denna sida, butiksdeklarationerna och koden inte längre stämmer överens.</p>
 
-<h2>2. Data vi använder</h2>
-
-<h3>2.1 Plats</h3>
-<p>När du beviljar platsbehörighet läser appen din position för att hitta drivmedels- och laddstationer i närheten; dessa sökkoordinater skickas till tredje parts API:er (se avsnitt 4) som en del av sökningen och lagras inte på någon server vi driver. Om du använder färdregistrering registrerar appen dessutom din <strong>exakta GPS-rutt</strong>; registrerade färder lagras på din enhet och, endast om du aktiverar TankSync, synkroniseras till ditt TankSync-backend. Registrerade färder delas aldrig med tredje part.</p>
-
-<h3>2.2 API-nycklar du anger själv</h3>
-<p>Om du anger en egen API-nyckel (t.ex. Tankerkönig) lagras den lokalt i krypterad lagring (Android Keystore / iOS Keychain). Nyckeln skickas endast till motsvarande API-leverantör, aldrig till oss eller till tredje part.</p>
-
-<h3>2.3 Favoriter, profiler och inställningar</h3>
-<p>Dina favoriter, sökprofiler, drivmedelsval och appinställningar lagras lokalt på din enhet via Hive, en inbyggd lokal databas.</p>
-
-<h3>2.4 TankSync (valfri molnsynkronisering)</h3>
-<p>Om du aktiverar TankSync skapas ett anonymt konto via Supabase. Synkroniserade data:</p>
+<h2>2. Vem är ansvarig (personuppgiftsansvarig)</h2>
+<p>Personuppgiftsansvarig för appen och för den valfria synkroniseringstjänsten Sparkilo Community är:</p>
+<div class="contact">
+  <p><strong>Florian DITTGEN</strong> (enskild utvecklare)</p>
+  <p><strong>E-post:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
+  <p><strong>Källkod och ärendehantering:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
+</div>
+<p>Beroende på hur du använder TankSync ändras vem som är personuppgiftsansvarig för dina synkroniserade data:</p>
 <ul>
-  <li>Användaridentifierare — anonymt UUID som standard; du kan valfritt länka en e-postadress till ditt TankSync-konto för synkronisering mellan enheter</li>
-  <li>ID:n för favoritstationer</li>
-  <li>Konfigurationer för prislarm</li>
-  <li>Communityrapporter om priser (stations-ID, drivmedelstyp, pris, tidsstämpel)</li>
-  <li>Registrerade färder (GPS-rutt, avstånd, förbrukningsstatistik)</li>
-  <li>Tankningar (kostnad, liter, mätarställning) och fordonsprofiler</li>
+  <li><strong>Ingen TankSync (standard):</strong> ingenting lagras på någon server som vi driver. Dina data stannar på din enhet och du har ensam kontroll över dem.</li>
+  <li><strong>Privat databas:</strong> du ansluter ditt eget Supabase-projekt. Du är personuppgiftsansvarig; vi ser aldrig dessa data.</li>
+  <li><strong>Gå med i en grupp:</strong> du ansluter ett Supabase-projekt som drivs av någon du känner (familj, vänner). Den personen är personuppgiftsansvarig för den delade databasen.</li>
+  <li><strong>Sparkilo Community:</strong> du ansluter den delade databas som drivs av utvecklaren ovan (Supabase, driftad i EU — AWS eu-central-1, Frankfurt). Utvecklaren är personuppgiftsansvarig; Supabase, Inc. är personuppgiftsbiträde, bundet av sina villkor för databehandling.</li>
 </ul>
-<p>TankSync är valfritt och inaktiverat som standard. Du kan visa, exportera och radera all serverdata från skärmen « Datatransparens » i appen.</p>
+<p>Appen talar om vilket av dessa alternativ som gäller innan du ansluter, och visar det igen under Inställningar → Integritetspanel.</p>
 
-<h3>2.5 Krasch- och diagnosrapporter (opt-in)</h3>
-<p>Om du aktiverar diagnos i Inställningar skickas anonyma kraschrapporter och prestandaspår till Sentry. Ingen personlig information, plats eller innehåll ingår. Diagnos är avstängd som standard.</p>
+<h2>3. Data vi använder</h2>
+<p>Tabellen listar varje typ av personuppgift som appen behandlar, varför, på vilken rättslig grund (artikel 6 i GDPR), vart den skickas och hur länge den sparas. ”Enhet” betyder att den aldrig lämnar din telefon.</p>
+<table>
+  <thead><tr><th>Data</th><th>Ändamål</th><th>Rättslig grund</th><th>Vart den skickas</th><th>Lagringstid</th></tr></thead>
+  <tbody>
+    <tr><td>Ungefärlig / exakt position (sökning)</td><td>Hitta stationer nära dig</td><td>Samtycke (du beviljar platsbehörigheten och bekräftar förklaringen i appen)</td><td>Skickas som sökkoordinater till priskällan för det land du befinner dig i (avsnitt 5). Lagras inte på någon server som vi driver.</td><td>Senaste positionen sparas på enheten för hemskärmswidgeten tills du raderar data</td></tr>
+    <tr><td>Exakt GPS-rutt, hastighet, höjd, rörelsesensorer (resregistrering)</td><td>Registrera en resa, beräkna sträcka och förbrukning</td><td>Samtycke (du startar en inspelning; automatisk registrering kräver ett separat tillstånd för platsåtkomst i bakgrunden per fordon)</td><td>Enhet. Med TankSync <em>och</em> resesynkronisering aktiverade: din TankSync-databas.</td><td>Enhet: tills du raderar resan eller alla data. Server: resesammanfattningar tills du raderar dem; de detaljerade GPS-punkterna gallras 90 dagar efter resan.</td></tr>
+    <tr><td>Fordonsprofil (märke, modell, årsmodell, tankvolym, VIN, OBD2-adapterns identifierare)</td><td>Förbrukningsberäkning, återanslutning av adapter</td><td>Avtal (tillhandahållande av den funktion du konfigurerat)</td><td>Enhet. Med TankSync: din TankSync-databas.</td><td>Tills du raderar fordonet eller alla data</td></tr>
+    <tr><td>VIN (17 tecken)</td><td>Avkoda märke/modell/motor online</td><td>Samtycke (separat reglage, avstängt som standard; annars körs en offline-avkodare)</td><td>NHTSA vPIC (amerikansk offentlig tjänst), endast VIN-numret</td><td>Lagras inte av oss; se NHTSA:s policy</td></tr>
+    <tr><td>Tankningar (datum, station, liter, kostnad, mätarställning), laddningsloggar, servicepåminnelser</td><td>Din bränslelogg och statistik</td><td>Avtal</td><td>Enhet. Med TankSync: din TankSync-databas.</td><td>Tills du raderar dem eller alla data</td></tr>
+    <tr><td>Favoriter, ignorerade stationer, prislarm, sökprofiler, resvägar, inställningar</td><td>Anpassa appen; skicka lokala prislarmsnotiser</td><td>Avtal</td><td>Enhet. Med TankSync: din TankSync-databas.</td><td>Tills du raderar dem eller alla data</td></tr>
+    <tr><td>Anonymt användar-ID (slumpmässig UUID), valfri e-postadress, enhets-ID per installation</td><td>Identifiera ditt TankSync-konto på flera enheter; markera vilken enhet som raderade en post</td><td>Samtycke (reglaget Molnsynkronisering) / Avtal</td><td>Din TankSync-databas (Supabase)</td><td>Tills du raderar kontot</td></tr>
+    <tr><td>Community-prisrapporter, delade stationsbetyg, innehållsanmälningar</td><td>Gemensamma priskorrigeringar och moderering</td><td>Samtycke (du skickar in dem; ett meddelande förklarar att de lagras under ditt pseudonyma ID och kan läsas av andra inloggade användare)</td><td>Din TankSync-databas — i Sparkilo Community läsbar för alla inloggade användare</td><td>Tills du raderar rapporten eller kontot</td></tr>
+    <tr><td>Kraschrapporter och prestandaspår (appversion, OS-version, skärmstorlek, språkinställning, stackspår, de senaste åtgärderna i appen)</td><td>Åtgärda buggar</td><td>Samtycke (reglaget Felrapportering, avstängt som standard)</td><td>Sentry</td><td>Enhet: de 50 senaste spåren, 7 dagar, rensade från e-postadresser, koordinater och tokens innan de lagras. Sentry: 90 dagar.</td></tr>
+    <tr><td>Foto av kvitto eller pump (kamera / bildbibliotek)</td><td>Läsa kvittot på enheten (OCR på enheten)</td><td>Samtycke (du tar eller väljer fotot)</td><td>Endast enheten. Bifogas ett GitHub-ärende endast om du skickar en rapport om ”dålig skanning” och bekräftar.</td><td>Raderas efter skanningen; rapportkopian finns kvar på GitHub tills du raderar ärendet</td></tr>
+    <tr><td>Kartutsnitt (kartrutekoordinater) och IP-adress</td><td>Rita kartan</td><td>Berättigat intresse (en karta behöver kartrutor) — du kan stänga av proxyn</td><td>Sparkilos kartruteproxy (samma Supabase-projekt, EU) som hämtar från OpenStreetMap; eller tile.openstreetmap.org direkt när proxyn är avstängd (Inställningar → Integritet) eller i F-Droid-versionen</td><td>Lagras inte utöver vanliga serverloggar (proxy: 7 dagar)</td></tr>
+    <tr><td>Ruttens start och mål, vägnätsfrågor</td><td>Ruttsökning, glidcoachning</td><td>Avtal</td><td>OSRM (router.project-osrm.org), Overpass API (overpass-api.de), Nominatim (nominatim.openstreetmap.org)</td><td>Lagras inte av oss</td></tr>
+    <tr><td>Adresstext eller koordinater som du skriver in</td><td>Geokodning</td><td>Avtal</td><td>Nominatim, eller telefonens inbyggda geokodare (Apple / Google)</td><td>Lagras inte av oss</td></tr>
+    <tr><td>API-nycklar som du anger (Tankerkönig, OpenChargeMap)</td><td>Anropa dessa tjänster för din räkning</td><td>Avtal</td><td>Endast till den leverantör som nyckeln tillhör</td><td>Krypterade på enheten (Keystore / Keychain) tills du raderar dem</td></tr>
+    <tr><td>Rapporter om fel namn / fel adress på stationer, rapporter om dålig skanning</td><td>Rätta uppgifterna</td><td>Samtycke (du bekräftar innan de skickas; en personlig GitHub-token krävs)</td><td>GitHub (ett offentligt ärende i projektets kodförråd)</td><td>Offentligt tills ärendet raderas</td></tr>
+  </tbody>
+</table>
+<p>Appen fattar inga automatiserade beslut om dig med rättsliga eller liknande betydande följder. Prisprognoser beräknas på enheten utifrån offentliga prisdata.</p>
 
-<h2>3. Data vi INTE samlar in</h2>
+<h2>4. Data vi INTE samlar in</h2>
 <ul>
-  <li>Namn eller telefonnummer (en e-postadress lagras endast om du uttryckligen länkar en till ditt valfria TankSync-konto)</li>
-  <li>Finansiell information eller betalningsuppgifter</li>
+  <li>Namn eller telefonnummer (en e-postadress lagras endast om du kopplar en till ditt valfria TankSync-konto)</li>
+  <li>Betalnings- eller bankuppgifter</li>
   <li>Hälso- eller träningsdata</li>
   <li>Kontakter, meddelanden eller samtalsloggar</li>
-  <li>Foton, videor eller filer (åtkomst till kamera och bildbibliotek används endast för kvittoskanning som du själv startar)</li>
+  <li>Foton, videor eller filer utöver det kvittofoto du själv väljer att skanna</li>
   <li>Webbhistorik</li>
-  <li>Annons-ID:n från enheten</li>
+  <li>Reklamidentifierare</li>
 </ul>
+<p>Varumärkeslogotyper levereras med appen. Hämtning av dem från internet (logo.clearbit.com, som då skulle ta emot din IP-adress) är avstängd om du inte aktiverar den under Inställningar → Integritet.</p>
 
-<h2>4. Tredjepartstjänster</h2>
-<p>Appen kommunicerar med följande tredjeparts-API:er:</p>
+<h2>5. Tredjepartstjänster och datakällor</h2>
+<p>Appen kommunicerar med följande tjänster. Var och en har sin egen integritetspolicy. Appen delar aldrig data mellan dem och skickar aldrig mer än vad kolumnerna ovan beskriver.</p>
+<h3>5.1 Infrastruktur (endast när motsvarande funktion är aktiverad)</h3>
 <ul>
-  <li><strong>Tankerkönig</strong> (creativecommons.tankerkoenig.de) — tyska priser. Tar emot: sökkoordinater, din API-nyckel.</li>
-  <li><strong>Prix Carburants</strong> (data.economie.gouv.fr) — franska priser. Tar emot: sökkoordinater.</li>
-  <li><strong>Italiensk pris-API</strong> (osservaprezzi.mise.gov.it) — italienska priser. Tar emot: sökkoordinater.</li>
-  <li><strong>Spansk pris-API</strong> (sedeaplicaciones.minetur.gob.es) — spanska priser. Tar emot: sökkoordinater.</li>
-  <li><strong>Spritpreisrechner</strong> (spritpreisrechner.at) — österrikiska priser. Tar emot: sökkoordinater.</li>
-  <li><strong>FuelWatch</strong> (fuelwatch.be) — belgiska priser. Tar emot: sökkoordinater.</li>
-  <li><strong>data.public.lu</strong> — luxemburgska priser. Tar emot: sökkoordinater.</li>
-  <li><strong>OpenChargeMap</strong> (api.openchargemap.io) — laddstationer. Tar emot: sökkoordinater.</li>
-  <li><strong>Nominatim / OpenStreetMap</strong> (nominatim.openstreetmap.org) — geokodning. Tar emot: söktext eller koordinater.</li>
-  <li><strong>OpenStreetMap-tile-servrar</strong> (tile.openstreetmap.org) — kartrutor. Tar emot: rutkoordinater.</li>
-  <li><strong>Supabase</strong> (endast om TankSync är aktivt) — backend för molnsynkronisering.</li>
-  <li><strong>Sentry</strong> (endast om diagnos är aktiv) — anonyma krasch- och prestandarapporter.</li>
+  <li><strong>Supabase</strong> (klelxnkzrxlpzuddhpfg.supabase.co, AWS eu-central-1) — TankSync-backend för Sparkilo Community samt kartruteproxyn. Personuppgiftsbiträde enligt Supabases databehandlingstillägg.</li>
+  <li><strong>Sentry</strong> (sentry.io) — kraschrapporter och prestandaspår, endast med aktivt samtycke. Sentry kan behandla data i USA; överföringarna omfattas av EU-US Data Privacy Framework och standardavtalsklausuler.</li>
+  <li><strong>GitHub</strong> (api.github.com, github.com) — ärenderapporter som du uttryckligen skickar; appen hämtar även offentliga datafiler (motorvägsavfarter, stationslistor) från projektets releaser, vilket avslöjar din IP-adress för GitHub.</li>
+  <li><strong>OpenStreetMap</strong> (tile.openstreetmap.org, nominatim.openstreetmap.org), <strong>OSRM</strong> (router.project-osrm.org), <strong>Overpass API</strong> (overpass-api.de) — kartor, geokodning, ruttberäkning.</li>
+  <li><strong>OpenChargeMap</strong> (api.openchargemap.io) och <strong>ODRÉ / IRVE</strong> (odre.opendatasoft.com) — laddstationer och priser för elbilar. Tar emot: sökkoordinater.</li>
+  <li><strong>NHTSA vPIC</strong> (vpic.nhtsa.dot.gov) — VIN-avkodning, kräver samtycke.</li>
+  <li><strong>Clearbit Logo API</strong> (logo.clearbit.com) — varumärkeslogotyper, avstängt som standard.</li>
+  <li><strong>Apple Maps / Google Maps</strong> (www.google.com) — öppnas i din webbläsare eller kartapp endast när du trycker på ”Navigera”.</li>
 </ul>
-<p>Varje leverantör har en egen integritetspolicy. Vi rekommenderar att du läser dem. Appen delar inte data mellan dessa leverantörer.</p>
-
-<h2>5. Datasäkerhet</h2>
+<h3>5.2 Officiella bränsleprisdatakällor (tar emot dina sökkoordinater eller region, aldrig din identitet)</h3>
 <ul>
-  <li>All nätverkskommunikation använder HTTPS (TLS-kryptering under transport).</li>
-  <li>API-nycklar lagras i plattformens nativa krypterade lagring (Android Keystore / iOS Keychain).</li>
-  <li>Lokal data lagras på din enhet via Hive.</li>
-  <li>Inga data skickas till någon server om du inte själv startar en sökning eller aktiverar TankSync / diagnos.</li>
+  <li>Tyskland — Tankerkönig (creativecommons.tankerkoenig.de), med din egen API-nyckel</li>
+  <li>Frankrike — Prix Carburants (data.economie.gouv.fr, donnees.roulez-eco.fr)</li>
+  <li>Italien — MIMIT osservaprezzi (carburanti.mise.gov.it)</li>
+  <li>Spanien — MITECO / Geoportal Gasolineras (sedeaplicaciones.minetur.gob.es, geoportalgasolineras.es)</li>
+  <li>Österrike — E-Control Spritpreisrechner (api.e-control.at)</li>
+  <li>Belgien och Luxemburg — data.public.lu, STATEC (lustat.statec.lu)</li>
+  <li>Portugal — DGEG (precoscombustiveis.dgeg.gov.pt)</li>
+  <li>Danmark — OK (mobility-prices.ok.dk), Shell (shellpumpepriser.geoapp.me)</li>
+  <li>Storbritannien — Fuel Finder (www.fuel-finder.service.gov.uk) och de återförsäljarprisflöden som den listar: applegreenstores.com, fuelprices.asconagroup.co.uk, storelocator.asda.com, www.bp.com, fuelprices.esso.co.uk, jetlocal.co.uk, api2.krlmedia.com, www.morrisons.com, moto-way.com, fuel.motorfuelgroup.com, www.rontec-servicestations.co.uk, api.sainsburys.co.uk, www.sgnretail.uk, www.shell.co.uk, www.tesco.com</li>
+  <li>Slovenien — goriva.si</li>
+  <li>Rumänien — Monitorul Prețurilor (monitorulpreturilor.info)</li>
+  <li>Grekland — Παρατηρητήριο Τιμών (paratiritirio.mindev.gov.gr) via en community-spegel driftad på AWS eu-west-3 (5fcbs3i0z4.execute-api.eu-west-3.amazonaws.com)</li>
+  <li>Sydkorea — Opinet (www.opinet.co.kr)</li>
+  <li>Chile — CNE (api.cne.cl)</li>
+  <li>Argentina — datos.energia.gob.ar</li>
+  <li>Mexiko — CRE (publicacionexterna.azurewebsites.net)</li>
+  <li>Australien — FuelCheck NSW (www.fuelcheck.nsw.gov.au)</li>
 </ul>
 
-<h2>6. Dina rättigheter</h2>
-<p>Du har rätt att:</p>
+<h2>6. Datasäkerhet</h2>
 <ul>
-  <li><strong>Få åtkomst</strong> — visa all lokalt lagrad data i appens Lagring-avsnitt.</li>
-  <li><strong>Exportera</strong> — exportera dina TankSync-data som JSON från skärmen Datatransparens.</li>
-  <li><strong>Radera</strong> — radera all lokal data via Inställningar → Radera all data; radera all serverdata via TankSync → Datatransparens → Radera allt.</li>
-  <li><strong>Återkalla samtycke</strong> — återkalla platsbehörigheten i enhetens inställningar, eller stänga av TankSync / diagnos när som helst.</li>
+  <li>All nätverkskommunikation sker via HTTPS (TLS under överföring); appen vägrar att använda okrypterade HTTP-synkroniseringsslutpunkter.</li>
+  <li>API-nycklar, din GitHub-token och TankSync-sessionen lagras i plattformens inbyggda krypterade lagring (Android Keystore / iOS Keychain).</li>
+  <li>Lokala databaser är AES-krypterade med en nyckel som förvaras i Keystore / Keychain — inklusive registrerade resor, fordonsdata, servicepåminnelser och cachade priser.</li>
+  <li>På servern skyddas varje tabell av radnivåsäkerhet så att ett konto endast kan läsa eller radera sina egna rader; delade betyg och community-prisrapporter är de enda rader som är synliga för andra inloggade användare.</li>
+  <li>Felspår rensas från e-postadresser, koordinater och tokens innan de lagras eller skickas.</li>
+  <li>Inga data skickas till någon server om du inte gör en sökning, öppnar en karta eller aktiverar TankSync / diagnostik.</li>
 </ul>
 
-<h2>7. Radera ditt konto och dina data</h2>
-<p>Du kan radera allt själv, direkt i appen — ingen supportförfrågan behövs:</p>
+<h2>7. Dina rättigheter</h2>
+<p>Enligt artiklarna 15–22 i GDPR har du rätt att få tillgång till, rätta, radera, begränsa och flytta dina uppgifter, att invända mot behandling som grundas på berättigat intresse och att när som helst återkalla ditt samtycke utan att det påverkar lagligheten av tidigare behandling. Varje rättighet har en knapp i appen:</p>
 <ul>
-  <li><strong>Lokal data:</strong> Inställningar → Radera all data tar bort alla profiler, favoriter, API-nycklar, cachade priser, registrerade färder och inställningar från din enhet.</li>
-  <li><strong>TankSync-konto och serverdata:</strong> TankSync → Datatransparens → Radera konto raderar först varje post du äger (favoriter, larm, prisrapporter, fordon, tankningar, färder, betyg) och tar sedan bort själva kontoidentiteten, inklusive en eventuellt länkad e-postadress. Detta kan inte ångras.</li>
+  <li><strong>Tillgång</strong> — Inställningar → Integritetspanel visar varje kategori som lagras på enheten och, när du är ansluten, varje rad i din TankSync-databas.</li>
+  <li><strong>Export (dataportabilitet)</strong> — Integritetspanel → Exportera alla mina data skapar en ZIP-fil med en maskinläsbar JSON per kategori (favoriter, larm, profiler, resvägar, prishistorik, fordon, tankningar, resor med GPS-punkter och en GPX per resa, referensvärden, servicepåminnelser, laddningsloggar, ditt samtyckesregister) samt en JSON-export av varje servertabell.</li>
+  <li><strong>Rättelse</strong> — redigera valfri post direkt i appen; ändringen synkroniseras om TankSync är aktiverat.</li>
+  <li><strong>Radering</strong> — se avsnitt 8.</li>
+  <li><strong>Begränsning / invändning</strong> — stäng av TankSync, resesynkronisering, kartruteproxyn eller diagnostik i Inställningar; återkalla plats-, Bluetooth-, kamera- eller notisbehörigheten i enhetens inställningar.</li>
+  <li><strong>Återkalla samtycke</strong> — Inställningar → Integritet & data listar varje samtycke med datumet då du gav det och den policyversion du såg; vart och ett kan stängas av, och appen avbryter motsvarande behandling omedelbart.</li>
+  <li><strong>Klaga</strong> — du kan lämna in ett klagomål till en tillsynsmyndighet, särskilt i den EU-medlemsstat där du har din vanliga vistelseort, din arbetsplats eller där den påstådda överträdelsen ägde rum. Vi skulle uppskatta möjligheten att först få bemöta ditt ärende: <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a>.</li>
 </ul>
-<p>Om du inte längre har åtkomst till appen kan du begära radering genom att kontakta utvecklaren (avsnitt 10); skriv från den e-postadress som är länkad till ditt konto så att vi kan verifiera ägarskapet.</p>
 
-<h2>8. Barns integritet</h2>
-<p>Appen riktar sig inte till barn under 13 år. Vi samlar inte medvetet in personlig information från barn.</p>
+<h2>8. Radera ditt konto och dina data</h2>
+<p>Du kan själv radera allt, direkt i appen — ingen supportförfrågan behövs:</p>
+<ul>
+  <li><strong>Lokala data:</strong> Inställningar → Integritetspanel → Radera alla data tar bort varje databas som appen har på enheten — profiler, favoriter, larm, prishistorik, cachade priser, fordon, tankningar, registrerade resor och deras GPS-punkter, OBD2-referensvärden och adaptercacher, servicepåminnelser, prestationer, felspår, API-nycklar, tokens och hemskärmswidgetens data — och återställer appen till samma tillstånd som vid första starten.</li>
+  <li><strong>TankSync-konto och serverdata:</strong> TankSync → Datatransparens → Radera konto raderar varje rad du äger i en enda transaktion (favoriter, larm, ignorerade stationer, prisrapporter, innehållsanmälningar, fordon, tankningar, resvägar, referensvärden, betyg, resor, resedelningar som du gett eller tagit emot, väntetidspingar, synkroniseringsinställningar, raderingsposter och din användarrad) och raderar därefter själva kontoidentiteten, inklusive eventuell kopplad e-postadress. Om någon tabell inte kunde raderas talar appen om vilken, i stället för att påstå att det lyckades. Detta kan inte ångras.</li>
+  <li><strong>Enskilda poster:</strong> varje favorit, larm, fordon, tankning, resa, prisrapport och innehållsanmälan kan raderas för sig; raderingar sprids till dina andra enheter.</li>
+</ul>
+<p>Om du inte längre har tillgång till appen kan du begära radering genom att kontakta utvecklaren (avsnitt 11); skriv från den e-postadress som är kopplad till ditt konto så att vi kan verifiera att kontot är ditt. Ett anonymt konto som aldrig kopplats till en e-postadress kan inte identifieras av någon — inte heller av oss — utan den enhet det skapades på.</p>
 
-<h2>9. Ändringar i denna policy</h2>
-<p>Vi kan uppdatera denna policy från tid till annan. Ändringar publiceras på denna URL med ett uppdaterat datum. Fortsatt användning av appen utgör godkännande av den uppdaterade policyn.</p>
+<h2>9. Barns integritet</h2>
+<p>Appen riktar sig inte till barn under 16 år. Vi samlar inte medvetet in personuppgifter från barn; om du tror att ett barn har skapat ett TankSync-konto, kontakta oss så raderar vi det.</p>
 
-<h2>10. Kontakt</h2>
+<h2>10. Ändringar av denna policy</h2>
+<p>Ändringar publiceras på denna URL med nytt versionsnummer och datum; appen registrerar vilken version du samtyckt till och visar denna sida igen när versionen ändras.</p>
+<ul>
+  <li><strong>v3 — 29 augusti 2026:</strong> personuppgiftsansvarig och roller per läge, behandlingstabell med rättsliga grunder och lagringstider, fullständig lista över personuppgiftsbiträden (kartruteproxy, geokodare, ruttberäkning, GitHub, varumärkeslogotyper), vägar för att utöva rättigheter, fullständig radering och export.</li>
+  <li><strong>v2 — 15 augusti 2026:</strong> avsnitt om kontoradering; e-post- och TankSync-kontouppgifter deklarerade.</li>
+  <li><strong>v1 — 7 april 2026:</strong> första versionen.</li>
+</ul>
+
+<h2>11. Kontakt</h2>
 <div class="contact">
-  <p><strong>Utvecklare:</strong> Florian DITTGEN</p>
+  <p><strong>Utvecklare och personuppgiftsansvarig:</strong> Florian DITTGEN</p>
   <p><strong>E-post:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
   <p><strong>Källkod:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
 </div>

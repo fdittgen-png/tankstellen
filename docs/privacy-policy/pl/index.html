@@ -9,101 +9,144 @@
 <body>
 
 <h1>Polityka prywatności</h1>
-<p class="meta">Sparkilo (de.tankstellen.tankstellen w iOS, de.tankstellen.fuelprices w Androidzie) &mdash; Ostatnia aktualizacja: 15 sierpnia 2026</p>
-<p class="langs">Dostępne języki: <a href="../">English</a> <a href="../de/">Deutsch</a> <a href="../fr/">Français</a> <a href="../es/">Español</a> <a href="../it/">Italiano</a> <a href="../nl/">Nederlands</a> <a href="../pt/">Português</a> <a href="../sv/">Svenska</a> <a href="../fi/">Suomi</a> <a href="../da/">Dansk</a> <a href="../pl/">Polski</a> <a href="../sl/">Slovenščina</a> <a href="../ko/">한국어</a></p>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen w systemie iOS, de.tankstellen.fuelprices w systemie Android) &mdash; Version 3 &mdash; Ostatnia aktualizacja: 29 sierpnia 2026 r.</p>
+<p class="langs">Dostępne języki: <a href="../">English</a> <a href="../bg/">Български</a> <a href="../cs/">Čeština</a> <a href="../da/">Dansk</a> <a href="../de/">Deutsch</a> <a href="../el/">Ελληνικά</a> <a href="../es/">Español</a> <a href="../et/">Eesti</a> <a href="../fi/">Suomi</a> <a href="../fr/">Français</a> <a href="../hr/">Hrvatski</a> <a href="../hu/">Magyar</a> <a href="../it/">Italiano</a> <a href="../ko/">한국어</a> <a href="../lt/">Lietuvių</a> <a href="../lv/">Latviešu</a> <a href="../nb/">Norsk</a> <a href="../nl/">Nederlands</a> <a href="../pl/">Polski</a> <a href="../pt/">Português</a> <a href="../ro/">Română</a> <a href="../sk/">Slovenčina</a> <a href="../sl/">Slovenščina</a> <a href="../sv/">Svenska</a></p>
 
-<h2>1. Omówienie</h2>
-<p>Sparkilo (wcześniej Fuel Prices Europe & More) to bezpłatna aplikacja open source do porównywania cen paliw i punktów ładowania pojazdów elektrycznych. Zaprojektowano ją w architekturze <strong>local-first, szanującej prywatność</strong>. Bez reklam, bez pikseli śledzących, bez identyfikatorów reklamowych.</p>
+<h2>1. Informacje ogólne</h2>
+<p>Sparkilo to bezpłatna aplikacja o otwartym kodzie źródłowym do porównywania cen paliw i ładowania pojazdów elektrycznych, z opcjonalną funkcją rejestrowania przejazdów. Została zbudowana w architekturze <strong>local-first</strong>: wszystko, co aplikacja wie o Państwu, znajduje się na Państwa telefonie, chyba że włączą Państwo funkcję, która wyraźnie stanowi inaczej. Nie ma reklam, pikseli śledzących, identyfikatorów reklamowych ani pakietów SDK do analityki. Niniejsza polityka została napisana tak, aby spełniać wymogi Ogólnego rozporządzenia o ochronie danych UE (RODO / GDPR); ma zastosowanie do każdego użytkownika, niezależnie od miejsca pobytu.</p>
+<p>Aplikacja ma <a href="https://github.com/fdittgen-png/tankstellen">otwarty kod źródłowy</a> — każde poniższe stwierdzenie można zweryfikować w kodzie. Czytelne maszynowo podsumowanie przetwarzanych danych znajduje się w pliku <code>docs/privacy/data_inventory.json</code>, a własne testy aplikacji kończą się niepowodzeniem, jeśli niniejsza strona, deklaracje w sklepach z aplikacjami i kod przestaną być ze sobą zgodne.</p>
 
-<h2>2. Wykorzystywane dane</h2>
-
-<h3>2.1 Lokalizacja</h3>
-<p>Po przyznaniu uprawnienia do lokalizacji aplikacja odczytuje Twoją pozycję, by znaleźć pobliskie stacje paliw i punkty ładowania; te współrzędne wyszukiwania są wysyłane do interfejsów API stron trzecich (zob. sekcja 4) jako część zapytania i nie są przechowywane na żadnym z naszych serwerów. Jeśli korzystasz z rejestrowania tras, aplikacja dodatkowo rejestruje Twoją <strong>precyzyjną trasę GPS</strong>; zarejestrowane trasy są przechowywane na Twoim urządzeniu i tylko wtedy, gdy włączysz TankSync, synchronizowane z Twoim zapleczem TankSync. Zarejestrowane trasy nigdy nie są udostępniane osobom trzecim.</p>
-
-<h3>2.2 Klucze API podawane przez Ciebie</h3>
-<p>Jeśli podasz własny klucz API (np. Tankerkönig), zostanie on zapisany lokalnie w szyfrowanym magazynie (Android Keystore / iOS Keychain). Klucz wysyłany jest wyłącznie do odpowiedniego dostawcy API — nigdy do nas ani do osób trzecich.</p>
-
-<h3>2.3 Ulubione, profile i ustawienia</h3>
-<p>Twoje ulubione, profile wyszukiwania, preferencje paliw i ustawienia aplikacji przechowywane są lokalnie na urządzeniu w bazie Hive.</p>
-
-<h3>2.4 TankSync (opcjonalna synchronizacja w chmurze)</h3>
-<p>Po włączeniu TankSync tworzone jest anonimowe konto w Supabase. Synchronizowane są:</p>
-<ul>
-  <li>Identyfikator użytkownika — domyślnie anonimowy UUID; opcjonalnie możesz powiązać adres e-mail ze swoim kontem TankSync w celu synchronizacji między urządzeniami</li>
-  <li>Identyfikatory ulubionych stacji</li>
-  <li>Konfiguracje alertów cenowych</li>
-  <li>Społecznościowe zgłoszenia cen (ID stacji, rodzaj paliwa, cena, znacznik czasu)</li>
-  <li>Zarejestrowane trasy (trasa GPS, dystanse, statystyki zużycia)</li>
-  <li>Tankowania (koszt, litry, przebieg) i profile pojazdów</li>
-</ul>
-<p>TankSync jest opcjonalny i domyślnie wyłączony. Możesz przeglądać, eksportować i usuwać wszystkie dane po stronie serwera z ekranu « Przejrzystość danych » w aplikacji.</p>
-
-<h3>2.5 Raporty awarii i diagnostyki (opt-in)</h3>
-<p>Po włączeniu diagnostyki w Ustawieniach do Sentry wysyłane są anonimowe raporty awarii i ślady wydajności. Nie są przekazywane żadne dane osobowe, lokalizacja ani treści. Diagnostyka jest domyślnie wyłączona.</p>
-
-<h2>3. Dane, których NIE zbieramy</h2>
-<ul>
-  <li>Imię i nazwisko lub numer telefonu (adres e-mail jest zapisywany tylko wtedy, gdy wyraźnie powiążesz go ze swoim opcjonalnym kontem TankSync)</li>
-  <li>Dane finansowe lub płatnicze</li>
-  <li>Dane zdrowotne lub fitness</li>
-  <li>Kontakty, wiadomości lub rejestry połączeń</li>
-  <li>Zdjęcia, filmy lub pliki (dostęp do aparatu i biblioteki zdjęć jest używany tylko do skanowania paragonów, gdy Ty go uruchamiasz)</li>
-  <li>Historia przeglądania</li>
-  <li>Identyfikatory reklamowe urządzenia</li>
-</ul>
-
-<h2>4. Usługi stron trzecich</h2>
-<p>Aplikacja komunikuje się z następującymi interfejsami API stron trzecich:</p>
-<ul>
-  <li><strong>Tankerkönig</strong> (creativecommons.tankerkoenig.de) — ceny niemieckie. Otrzymuje: współrzędne wyszukiwania, Twój klucz API.</li>
-  <li><strong>Prix Carburants</strong> (data.economie.gouv.fr) — ceny francuskie. Otrzymuje: współrzędne wyszukiwania.</li>
-  <li><strong>Włoskie API cen</strong> (osservaprezzi.mise.gov.it) — ceny włoskie. Otrzymuje: współrzędne wyszukiwania.</li>
-  <li><strong>Hiszpańskie API cen</strong> (sedeaplicaciones.minetur.gob.es) — ceny hiszpańskie. Otrzymuje: współrzędne wyszukiwania.</li>
-  <li><strong>Spritpreisrechner</strong> (spritpreisrechner.at) — ceny austriackie. Otrzymuje: współrzędne wyszukiwania.</li>
-  <li><strong>FuelWatch</strong> (fuelwatch.be) — ceny belgijskie. Otrzymuje: współrzędne wyszukiwania.</li>
-  <li><strong>data.public.lu</strong> — ceny luksemburskie. Otrzymuje: współrzędne wyszukiwania.</li>
-  <li><strong>OpenChargeMap</strong> (api.openchargemap.io) — punkty ładowania. Otrzymuje: współrzędne wyszukiwania.</li>
-  <li><strong>Nominatim / OpenStreetMap</strong> (nominatim.openstreetmap.org) — geokodowanie. Otrzymuje: tekst lub współrzędne wyszukiwania.</li>
-  <li><strong>Serwery kafelków OpenStreetMap</strong> (tile.openstreetmap.org) — kafelki mapy. Otrzymuje: współrzędne kafelka.</li>
-  <li><strong>Supabase</strong> (tylko gdy TankSync jest włączony) — backend synchronizacji w chmurze.</li>
-  <li><strong>Sentry</strong> (tylko gdy diagnostyka jest włączona) — anonimowe raporty awarii i wydajności.</li>
-</ul>
-<p>Każdy dostawca ma własną politykę prywatności. Zachęcamy do zapoznania się z nimi. Aplikacja nie udostępnia danych pomiędzy tymi dostawcami.</p>
-
-<h2>5. Bezpieczeństwo danych</h2>
-<ul>
-  <li>Cała komunikacja sieciowa odbywa się przez HTTPS (szyfrowanie TLS w transporcie).</li>
-  <li>Klucze API są przechowywane w natywnym, szyfrowanym magazynie platformy (Android Keystore / iOS Keychain).</li>
-  <li>Dane lokalne są przechowywane na Twoim urządzeniu w bazie Hive.</li>
-  <li>Żadne dane nie są wysyłane do serwerów, dopóki nie uruchomisz wyszukiwania ani nie włączysz TankSync / diagnostyki.</li>
-</ul>
-
-<h2>6. Twoje prawa</h2>
-<p>Masz prawo do:</p>
-<ul>
-  <li><strong>Dostępu</strong> — przeglądania wszystkich lokalnie zapisanych danych w sekcji Pamięć w aplikacji.</li>
-  <li><strong>Eksportu</strong> — eksportu danych TankSync w formacie JSON z ekranu Przejrzystość danych.</li>
-  <li><strong>Usunięcia</strong> — usunięcia wszystkich danych lokalnych przez Ustawienia → Usuń wszystkie dane; usunięcia wszystkich danych po stronie serwera przez TankSync → Przejrzystość danych → Usuń wszystko.</li>
-  <li><strong>Wycofania zgody</strong> — odebranie uprawnienia do lokalizacji w ustawieniach urządzenia lub wyłączenie TankSync / diagnostyki w dowolnej chwili.</li>
-</ul>
-
-<h2>7. Usuwanie konta i danych</h2>
-<p>Możesz usunąć wszystko samodzielnie, bezpośrednio w aplikacji — bez konieczności kontaktu z pomocą techniczną:</p>
-<ul>
-  <li><strong>Dane lokalne:</strong> Ustawienia → Usuń wszystkie dane usuwa z Twojego urządzenia wszystkie profile, ulubione, klucze API, buforowane ceny, zarejestrowane trasy i ustawienia.</li>
-  <li><strong>Konto TankSync i dane na serwerze:</strong> TankSync → Przejrzystość danych → Usuń konto najpierw usuwa każdy należący do Ciebie rekord (ulubione, alerty, zgłoszenia cen, pojazdy, tankowania, trasy, oceny), a następnie usuwa samą tożsamość konta, w tym powiązany adres e-mail. Tej czynności nie można cofnąć.</li>
-</ul>
-<p>Jeśli nie masz już dostępu do aplikacji, możesz poprosić o usunięcie danych, kontaktując się z deweloperem (sekcja 10); napisz z adresu e-mail powiązanego z Twoim kontem, abyśmy mogli zweryfikować własność.</p>
-
-<h2>8. Prywatność dzieci</h2>
-<p>Aplikacja nie jest skierowana do dzieci poniżej 13 roku życia. Świadomie nie zbieramy danych osobowych od dzieci.</p>
-
-<h2>9. Zmiany w niniejszej polityce</h2>
-<p>Co pewien czas możemy aktualizować tę politykę. Zmiany będą publikowane pod tym adresem URL z aktualną datą. Dalsze korzystanie z aplikacji oznacza akceptację zaktualizowanej polityki.</p>
-
-<h2>10. Kontakt</h2>
+<h2>2. Kto jest odpowiedzialny (administrator)</h2>
+<p>Administratorem danych w odniesieniu do aplikacji oraz opcjonalnej usługi synchronizacji Sparkilo Community jest:</p>
 <div class="contact">
-  <p><strong>Programista:</strong> Florian DITTGEN</p>
+  <p><strong>Florian DITTGEN</strong> (deweloper indywidualny)</p>
+  <p><strong>E-mail:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
+  <p><strong>Kod źródłowy i system zgłoszeń:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
+</div>
+<p>W zależności od sposobu korzystania z TankSync administrator Państwa zsynchronizowanych danych jest inny:</p>
+<ul>
+  <li><strong>Bez TankSync (ustawienie domyślne):</strong> nic nie jest przechowywane na żadnym serwerze, którym zarządzamy. Państwa dane pozostają na Państwa urządzeniu i wyłącznie Państwo mają nad nimi kontrolę.</li>
+  <li><strong>Prywatna baza danych:</strong> łączą się Państwo z własnym projektem Supabase. Państwo są administratorem; my nigdy nie widzimy tych danych.</li>
+  <li><strong>Dołączenie do grupy:</strong> łączą się Państwo z projektem Supabase prowadzonym przez znaną Państwu osobę (rodzina, znajomi). Ta osoba jest administratorem współdzielonej bazy danych.</li>
+  <li><strong>Sparkilo Community:</strong> łączą się Państwo ze współdzieloną bazą danych prowadzoną przez wskazanego powyżej dewelopera (Supabase, hostowana w UE — AWS eu-central-1, Frankfurt). Deweloper jest administratorem; Supabase, Inc. jest podmiotem przetwarzającym, związanym swoimi warunkami przetwarzania danych.</li>
+</ul>
+<p>Aplikacja informuje, który z tych przypadków ma zastosowanie, przed nawiązaniem połączenia, a następnie wyświetla tę informację ponownie w sekcji Ustawienia → Panel prywatności.</p>
+
+<h2>3. Dane, które wykorzystujemy</h2>
+<p>Tabela zawiera każdą kategorię danych osobowych przetwarzanych przez aplikację, cel przetwarzania, podstawę prawną (art. 6 RODO), miejsce, do którego dane trafiają, oraz okres ich przechowywania. „Urządzenie” oznacza, że dane nigdy nie opuszczają Państwa telefonu.</p>
+<table>
+  <thead><tr><th>Dane</th><th>Cel</th><th>Podstawa prawna</th><th>Dokąd trafiają</th><th>Okres przechowywania</th></tr></thead>
+  <tbody>
+    <tr><td>Przybliżona / dokładna lokalizacja (wyszukiwanie)</td><td>Znalezienie stacji w Państwa pobliżu</td><td>Zgoda (udzielają Państwo uprawnienia do lokalizacji i potwierdzają wyjaśnienie w aplikacji)</td><td>Wysyłane jako współrzędne wyszukiwania do źródła danych o cenach właściwego dla kraju, w którym się Państwo znajdują (sekcja 5). Nie są przechowywane na żadnym serwerze, którym zarządzamy.</td><td>Ostatnia pozycja jest przechowywana na urządzeniu na potrzeby widżetu ekranu głównego do czasu usunięcia danych</td></tr>
+    <tr><td>Dokładna trasa GPS, prędkość, wysokość, czujniki ruchu (rejestrowanie przejazdów)</td><td>Zarejestrowanie przejazdu, obliczenie dystansu i zużycia paliwa</td><td>Zgoda (uruchamiają Państwo rejestrowanie; automatyczne rejestrowanie wymaga odrębnego uprawnienia do lokalizacji w tle dla każdego pojazdu)</td><td>Urządzenie. Przy włączonym TankSync <em>oraz</em> synchronizacji przejazdów: Państwa baza danych TankSync.</td><td>Urządzenie: do czasu usunięcia przejazdu lub wszystkich danych. Serwer: podsumowania przejazdów do czasu ich usunięcia; szczegółowe próbki GPS są usuwane 90 dni po przejeździe.</td></tr>
+    <tr><td>Profil pojazdu (marka, model, rok, pojemność zbiornika, VIN, identyfikator adaptera OBD2)</td><td>Obliczanie zużycia paliwa, ponowne łączenie z adapterem</td><td>Umowa (świadczenie skonfigurowanej przez Państwa funkcji)</td><td>Urządzenie. Z TankSync: Państwa baza danych TankSync.</td><td>Do czasu usunięcia pojazdu lub wszystkich danych</td></tr>
+    <tr><td>VIN (17 znaków)</td><td>Dekodowanie marki/modelu/silnika online</td><td>Zgoda (odrębny przełącznik, domyślnie wyłączony; w przeciwnym razie działa dekoder offline)</td><td>NHTSA vPIC (publiczna usługa w USA), wyłącznie numer VIN</td><td>Nie jest przechowywany przez nas; zob. politykę NHTSA</td></tr>
+    <tr><td>Tankowania (data, stacja, litry, koszt, przebieg), dzienniki ładowania, przypomnienia serwisowe</td><td>Państwa dziennik paliwowy i statystyki</td><td>Umowa</td><td>Urządzenie. Z TankSync: Państwa baza danych TankSync.</td><td>Do czasu ich usunięcia lub usunięcia wszystkich danych</td></tr>
+    <tr><td>Ulubione, ignorowane stacje, alerty cenowe, profile wyszukiwania, trasy, ustawienia</td><td>Personalizacja aplikacji; wyświetlanie lokalnych powiadomień o alertach cenowych</td><td>Umowa</td><td>Urządzenie. Z TankSync: Państwa baza danych TankSync.</td><td>Do czasu ich usunięcia lub usunięcia wszystkich danych</td></tr>
+    <tr><td>Anonimowy identyfikator użytkownika (losowy UUID), opcjonalny adres e-mail, identyfikator urządzenia dla każdej instalacji</td><td>Identyfikacja Państwa konta TankSync na różnych urządzeniach; oznaczenie, które urządzenie usunęło rekord</td><td>Zgoda (przełącznik synchronizacji w chmurze) / Umowa</td><td>Państwa baza danych TankSync (Supabase)</td><td>Do czasu usunięcia konta</td></tr>
+    <tr><td>Zgłoszenia cen od społeczności, udostępnione oceny stacji, zgłoszenia treści</td><td>Społecznościowe korekty cen i moderacja</td><td>Zgoda (przesyłają je Państwo; komunikat wyjaśnia, że są przechowywane pod Państwa pseudonimowym identyfikatorem i widoczne dla innych zalogowanych użytkowników)</td><td>Państwa baza danych TankSync — w Sparkilo Community widoczne dla każdego zalogowanego użytkownika</td><td>Do czasu usunięcia zgłoszenia lub konta</td></tr>
+    <tr><td>Raporty o awariach i ślady wydajności (wersja aplikacji, wersja systemu, rozmiar ekranu, ustawienia regionalne, zrzut stosu, ostatnie działania w aplikacji)</td><td>Naprawianie błędów</td><td>Zgoda (przełącznik raportowania błędów, domyślnie wyłączony)</td><td>Sentry</td><td>Urządzenie: 50 najnowszych śladów, 7 dni, przed zapisaniem oczyszczone z adresów e-mail, współrzędnych i tokenów. Sentry: 90 dni.</td></tr>
+    <tr><td>Zdjęcie paragonu lub dystrybutora (aparat / biblioteka zdjęć)</td><td>Odczytanie paragonu na urządzeniu (OCR na urządzeniu)</td><td>Zgoda (robią lub wybierają Państwo zdjęcie)</td><td>Wyłącznie urządzenie. Dołączane do zgłoszenia na GitHub tylko wtedy, gdy zgłoszą Państwo „błędny skan” i to potwierdzą.</td><td>Usuwane po zeskanowaniu; kopia w zgłoszeniu pozostaje na GitHub do czasu usunięcia zgłoszenia</td></tr>
+    <tr><td>Widoczny obszar mapy (współrzędne kafelków) i adres IP</td><td>Wyświetlanie mapy</td><td>Prawnie uzasadniony interes (mapa wymaga kafelków) — mogą Państwo wyłączyć serwer proxy</td><td>Serwer proxy kafelków Sparkilo (ten sam projekt Supabase, UE), który pobiera je z OpenStreetMap; lub bezpośrednio tile.openstreetmap.org, gdy proxy jest wyłączone (Ustawienia → Prywatność) lub w wersji F-Droid</td><td>Nie są przechowywane poza standardowymi dziennikami serwera (proxy: 7 dni)</td></tr>
+    <tr><td>Punkt początkowy i docelowy trasy, zapytania do sieci drogowej</td><td>Wyszukiwanie tras, coaching płynnej jazdy</td><td>Umowa</td><td>OSRM (router.project-osrm.org), Overpass API (overpass-api.de), Nominatim (nominatim.openstreetmap.org)</td><td>Nie są przechowywane przez nas</td></tr>
+    <tr><td>Wpisywany przez Państwa tekst adresu lub współrzędne</td><td>Geokodowanie</td><td>Umowa</td><td>Nominatim lub wbudowany geokoder Państwa telefonu (Apple / Google)</td><td>Nie są przechowywane przez nas</td></tr>
+    <tr><td>Wprowadzane przez Państwa klucze API (Tankerkönig, OpenChargeMap)</td><td>Wywoływanie tych usług w Państwa imieniu</td><td>Umowa</td><td>Wyłącznie do dostawcy, do którego należy klucz</td><td>Zaszyfrowane na urządzeniu (Keystore / Keychain) do czasu ich usunięcia</td></tr>
+    <tr><td>Zgłoszenia błędnej nazwy / błędnego adresu stacji, zgłoszenia błędnych skanów</td><td>Poprawianie danych</td><td>Zgoda (potwierdzają Państwo przed wysłaniem; wymagany jest osobisty token GitHub)</td><td>GitHub (publiczne zgłoszenie w repozytorium projektu)</td><td>Publiczne do czasu usunięcia zgłoszenia</td></tr>
+  </tbody>
+</table>
+<p>Aplikacja nie podejmuje wobec Państwa zautomatyzowanych decyzji wywołujących skutki prawne lub podobnie istotne. Prognozy cen są obliczane na urządzeniu na podstawie publicznych danych o cenach.</p>
+
+<h2>4. Dane, których NIE gromadzimy</h2>
+<ul>
+  <li>Imię i nazwisko ani numer telefonu (adres e-mail jest przechowywany wyłącznie wtedy, gdy powiążą go Państwo ze swoim opcjonalnym kontem TankSync)</li>
+  <li>Dane płatnicze ani bankowe</li>
+  <li>Dane dotyczące zdrowia ani aktywności fizycznej</li>
+  <li>Kontakty, wiadomości ani rejestry połączeń</li>
+  <li>Zdjęcia, filmy ani pliki poza zdjęciem paragonu, które sami Państwo wybiorą do zeskanowania</li>
+  <li>Historia przeglądania</li>
+  <li>Identyfikatory reklamowe</li>
+</ul>
+<p>Logotypy marek są dołączone do aplikacji. Ich pobieranie z internetu (logo.clearbit.com, który otrzymałby Państwa adres IP) jest wyłączone, chyba że włączą je Państwo w sekcji Ustawienia → Prywatność.</p>
+
+<h2>5. Usługi i źródła danych podmiotów trzecich</h2>
+<p>Aplikacja komunikuje się z następującymi usługami. Każda z nich ma własną politykę prywatności. Aplikacja nigdy nie udostępnia danych pomiędzy nimi i nigdy nie wysyła więcej, niż opisano w powyższych kolumnach.</p>
+<h3>5.1 Infrastruktura (tylko gdy odpowiednia funkcja jest włączona)</h3>
+<ul>
+  <li><strong>Supabase</strong> (klelxnkzrxlpzuddhpfg.supabase.co, AWS eu-central-1) — backend TankSync dla Sparkilo Community oraz serwer proxy kafelków. Podmiot przetwarzający na podstawie aneksu o przetwarzaniu danych Supabase.</li>
+  <li><strong>Sentry</strong> (sentry.io) — raporty o awariach i ślady wydajności, wyłącznie po wyrażeniu zgody. Sentry może przetwarzać dane w Stanach Zjednoczonych; przekazywanie danych jest objęte Ramami ochrony danych UE-USA oraz standardowymi klauzulami umownymi.</li>
+  <li><strong>GitHub</strong> (api.github.com, github.com) — zgłoszenia, które wyraźnie Państwo składają; aplikacja pobiera również publiczne zasoby danych (zjazdy z autostrad, listy stacji) z wydań projektu, co ujawnia Państwa adres IP serwisowi GitHub.</li>
+  <li><strong>OpenStreetMap</strong> (tile.openstreetmap.org, nominatim.openstreetmap.org), <strong>OSRM</strong> (router.project-osrm.org), <strong>Overpass API</strong> (overpass-api.de) — mapy, geokodowanie, wyznaczanie tras.</li>
+  <li><strong>OpenChargeMap</strong> (api.openchargemap.io) oraz <strong>ODRÉ / IRVE</strong> (odre.opendatasoft.com) — stacje ładowania pojazdów elektrycznych i ceny. Otrzymują: współrzędne wyszukiwania.</li>
+  <li><strong>NHTSA vPIC</strong> (vpic.nhtsa.dot.gov) — dekodowanie VIN, wymaga zgody.</li>
+  <li><strong>Clearbit Logo API</strong> (logo.clearbit.com) — logotypy marek, domyślnie wyłączone.</li>
+  <li><strong>Apple Maps / Google Maps</strong> (www.google.com) — otwierane w przeglądarce lub aplikacji map wyłącznie po naciśnięciu „Nawiguj”.</li>
+</ul>
+<h3>5.2 Oficjalne źródła danych o cenach paliw (otrzymują Państwa współrzędne wyszukiwania lub region, nigdy Państwa tożsamość)</h3>
+<ul>
+  <li>Niemcy — Tankerkönig (creativecommons.tankerkoenig.de), z Państwa własnym kluczem API</li>
+  <li>Francja — Prix Carburants (data.economie.gouv.fr, donnees.roulez-eco.fr)</li>
+  <li>Włochy — MIMIT osservaprezzi (carburanti.mise.gov.it)</li>
+  <li>Hiszpania — MITECO / Geoportal Gasolineras (sedeaplicaciones.minetur.gob.es, geoportalgasolineras.es)</li>
+  <li>Austria — E-Control Spritpreisrechner (api.e-control.at)</li>
+  <li>Belgia i Luksemburg — data.public.lu, STATEC (lustat.statec.lu)</li>
+  <li>Portugalia — DGEG (precoscombustiveis.dgeg.gov.pt)</li>
+  <li>Dania — OK (mobility-prices.ok.dk), Shell (shellpumpepriser.geoapp.me)</li>
+  <li>Wielka Brytania — Fuel Finder (www.fuel-finder.service.gov.uk) oraz wymienione w nim źródła cen sprzedawców detalicznych: applegreenstores.com, fuelprices.asconagroup.co.uk, storelocator.asda.com, www.bp.com, fuelprices.esso.co.uk, jetlocal.co.uk, api2.krlmedia.com, www.morrisons.com, moto-way.com, fuel.motorfuelgroup.com, www.rontec-servicestations.co.uk, api.sainsburys.co.uk, www.sgnretail.uk, www.shell.co.uk, www.tesco.com</li>
+  <li>Słowenia — goriva.si</li>
+  <li>Rumunia — Monitorul Prețurilor (monitorulpreturilor.info)</li>
+  <li>Grecja — Παρατηρητήριο Τιμών (paratiritirio.mindev.gov.gr) za pośrednictwem społecznościowego serwera lustrzanego hostowanego w AWS eu-west-3 (5fcbs3i0z4.execute-api.eu-west-3.amazonaws.com)</li>
+  <li>Korea Południowa — Opinet (www.opinet.co.kr)</li>
+  <li>Chile — CNE (api.cne.cl)</li>
+  <li>Argentyna — datos.energia.gob.ar</li>
+  <li>Meksyk — CRE (publicacionexterna.azurewebsites.net)</li>
+  <li>Australia — FuelCheck NSW (www.fuelcheck.nsw.gov.au)</li>
+</ul>
+
+<h2>6. Bezpieczeństwo danych</h2>
+<ul>
+  <li>Cała komunikacja sieciowa odbywa się przez HTTPS (TLS podczas przesyłania); aplikacja odrzuca punkty końcowe synchronizacji korzystające z nieszyfrowanego HTTP.</li>
+  <li>Klucze API, Państwa token GitHub i sesja TankSync są przechowywane w natywnym szyfrowanym magazynie platformy (Android Keystore / iOS Keychain).</li>
+  <li>Lokalne bazy danych są szyfrowane algorytmem AES kluczem przechowywanym w Keystore / Keychain — w tym zarejestrowane przejazdy, dane pojazdów, przypomnienia serwisowe i zapisane w pamięci podręcznej ceny.</li>
+  <li>Na serwerze każda tabela jest chroniona zabezpieczeniami na poziomie wierszy, dzięki czemu konto może odczytywać lub usuwać wyłącznie własne wiersze; udostępnione oceny i społecznościowe zgłoszenia cen są jedynymi wierszami widocznymi dla innych zalogowanych użytkowników.</li>
+  <li>Ślady błędów są oczyszczane z adresów e-mail, współrzędnych i tokenów przed ich zapisaniem lub wysłaniem.</li>
+  <li>Żadne dane nie są wysyłane na żaden serwer, dopóki nie uruchomią Państwo wyszukiwania, nie otworzą mapy lub nie włączą TankSync / diagnostyki.</li>
+</ul>
+
+<h2>7. Państwa prawa</h2>
+<p>Na podstawie art. 15–22 RODO mają Państwo prawo dostępu do swoich danych, ich sprostowania, usunięcia, ograniczenia przetwarzania i przenoszenia, prawo do sprzeciwu wobec przetwarzania opartego na prawnie uzasadnionym interesie oraz prawo do wycofania zgody w dowolnym momencie bez wpływu na zgodność z prawem wcześniejszego przetwarzania. Każdemu z tych praw odpowiada przycisk w aplikacji:</p>
+<ul>
+  <li><strong>Dostęp</strong> — Ustawienia → Panel prywatności wyświetla każdą kategorię danych przechowywanych na urządzeniu oraz, po nawiązaniu połączenia, każdy wiersz w Państwa bazie danych TankSync.</li>
+  <li><strong>Eksport (przenoszenie)</strong> — Panel prywatności → Eksportuj wszystkie moje dane tworzy jeden plik ZIP zawierający czytelny maszynowo plik JSON dla każdej kategorii (ulubione, alerty, profile, trasy, historia cen, pojazdy, tankowania, przejazdy z próbkami GPS i jednym plikiem GPX na przejazd, dane bazowe, przypomnienia serwisowe, dzienniki ładowania, Państwa rejestr zgód) oraz eksport JSON każdej tabeli serwerowej.</li>
+  <li><strong>Sprostowanie</strong> — każdy wpis mogą Państwo edytować bezpośrednio w aplikacji; zmiana jest synchronizowana, jeśli TankSync jest włączony.</li>
+  <li><strong>Usunięcie</strong> — zob. sekcja 8.</li>
+  <li><strong>Ograniczenie / sprzeciw</strong> — wyłączenie TankSync, synchronizacji przejazdów, serwera proxy kafelków lub diagnostyki w Ustawieniach; cofnięcie uprawnień do lokalizacji, Bluetooth, aparatu lub powiadomień w ustawieniach urządzenia.</li>
+  <li><strong>Wycofanie zgody</strong> — Ustawienia → Prywatność i dane zawiera listę wszystkich zgód wraz z datą ich udzielenia i wersją polityki, którą Państwo widzieli; każdą z nich można wyłączyć, a aplikacja natychmiast zaprzestaje odpowiedniego przetwarzania.</li>
+  <li><strong>Skarga</strong> — mogą Państwo wnieść skargę do organu nadzorczego, w szczególności w państwie członkowskim UE swojego zwykłego pobytu, miejsca pracy lub miejsca domniemanego naruszenia. Będziemy wdzięczni za możliwość rozpatrzenia Państwa zastrzeżeń w pierwszej kolejności: <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a>.</li>
+</ul>
+
+<h2>8. Usuwanie konta i danych</h2>
+<p>Wszystko mogą Państwo usunąć samodzielnie, bezpośrednio w aplikacji — bez konieczności kontaktu z pomocą techniczną:</p>
+<ul>
+  <li><strong>Dane lokalne:</strong> Ustawienia → Panel prywatności → Usuń wszystkie dane usuwa każdą bazę danych przechowywaną przez aplikację na urządzeniu — profile, ulubione, alerty, historię cen, ceny w pamięci podręcznej, pojazdy, tankowania, zarejestrowane przejazdy wraz z ich próbkami GPS, dane bazowe OBD2 i pamięć podręczną adapterów, przypomnienia serwisowe, osiągnięcia, ślady błędów, klucze API, tokeny oraz dane widżetu ekranu głównego — i przywraca aplikację do stanu z pierwszego uruchomienia.</li>
+  <li><strong>Konto TankSync i dane na serwerze:</strong> TankSync → Przejrzystość danych → Usuń konto usuwa w jednej transakcji każdy należący do Państwa wiersz (ulubione, alerty, ignorowane stacje, zgłoszenia cen, zgłoszenia treści, pojazdy, tankowania, trasy, dane bazowe, oceny, przejazdy, udostępnienia przejazdów przekazane lub otrzymane przez Państwa, sygnały o czasie oczekiwania, ustawienia synchronizacji, rejestry usunięć oraz Państwa wiersz użytkownika), a następnie usuwa samą tożsamość konta, w tym wszelki powiązany adres e-mail. Jeśli którejś tabeli nie udało się usunąć, aplikacja informuje, której, zamiast zgłaszać sukces. Tej operacji nie można cofnąć.</li>
+  <li><strong>Pojedyncze elementy:</strong> każde ulubione, alert, pojazd, tankowanie, przejazd, zgłoszenie ceny i zgłoszenie treści można usunąć osobno; usunięcia są propagowane na pozostałe Państwa urządzenia.</li>
+</ul>
+<p>Jeśli nie mają już Państwo dostępu do aplikacji, mogą Państwo zażądać usunięcia danych, kontaktując się z deweloperem (sekcja 11); prosimy pisać z adresu e-mail powiązanego z kontem, abyśmy mogli zweryfikować, że konto należy do Państwa. Anonimowego konta, które nigdy nie zostało powiązane z adresem e-mail, nie może zidentyfikować nikt — również my — bez urządzenia, na którym zostało utworzone.</p>
+
+<h2>9. Prywatność dzieci</h2>
+<p>Aplikacja nie jest skierowana do dzieci poniżej 16. roku życia. Nie gromadzimy świadomie danych osobowych dzieci; jeśli podejrzewają Państwo, że dziecko utworzyło konto TankSync, prosimy o kontakt — usuniemy je.</p>
+
+<h2>10. Zmiany niniejszej polityki</h2>
+<p>Zmiany są publikowane pod tym adresem URL z nowym numerem wersji i datą; aplikacja zapisuje wersję, na którą wyrazili Państwo zgodę, i ponownie wyświetla tę stronę, gdy wersja się zmieni.</p>
+<ul>
+  <li><strong>v3 — 29 sierpnia 2026 r.:</strong> administrator i role w poszczególnych trybach, tabela przetwarzania z podstawami prawnymi i okresami przechowywania, pełna lista podmiotów przetwarzających (serwer proxy kafelków, geokoder, wyznaczanie tras, GitHub, logotypy marek), ścieżki realizacji praw, pełne usuwanie i eksport.</li>
+  <li><strong>v2 — 15 sierpnia 2026 r.:</strong> sekcja o usuwaniu konta; zadeklarowanie adresu e-mail i danych konta TankSync.</li>
+  <li><strong>v1 — 7 kwietnia 2026 r.:</strong> pierwsza wersja.</li>
+</ul>
+
+<h2>11. Kontakt</h2>
+<div class="contact">
+  <p><strong>Deweloper i administrator:</strong> Florian DITTGEN</p>
   <p><strong>E-mail:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
   <p><strong>Kod źródłowy:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
 </div>

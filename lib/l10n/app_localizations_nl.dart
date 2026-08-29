@@ -2721,7 +2721,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get syncModeCommunitySubtitle =>
-      'Favorieten & beoordelingen delen met alle gebruikers';
+      'Gedeelde database beheerd door de ontwikkelaar — zie hieronder wat er wordt gesynchroniseerd';
 
   @override
   String get syncModePrivateTitle => 'Privédatabase';
@@ -5336,6 +5336,105 @@ class AppLocalizationsNl extends AppLocalizations {
       'Als uitgeschakeld, zijn badges, scores en trofee-iconen overal in de app verborgen.';
 
   @override
+  String gdprPolicyLink(int version) {
+    return 'Privacybeleid (versie $version)';
+  }
+
+  @override
+  String consentRecordedAt(String date, int version) {
+    return 'Toestemming gegeven op $date · beleidsversie $version';
+  }
+
+  @override
+  String get consentNotRecorded => 'Nog geen toestemming vastgelegd';
+
+  @override
+  String serverErasurePartial(String tables) {
+    return 'Sommige servergegevens konden niet worden gewist: $tables. Probeer opnieuw of neem contact op met de ontwikkelaar met deze lijst.';
+  }
+
+  @override
+  String localErasurePartial(String steps) {
+    return 'Sommige lokale gegevens konden niet worden gewist: $steps. Herstart de app en probeer opnieuw.';
+  }
+
+  @override
+  String get myCommunityReportsTitle => 'Mijn community-meldingen';
+
+  @override
+  String get myCommunityReportsEmpty => 'Je hebt nog geen meldingen ingediend';
+
+  @override
+  String get deleteReportTooltip => 'Deze melding verwijderen';
+
+  @override
+  String get reportDeleted => 'Melding verwijderd';
+
+  @override
+  String get reportDeleteFailed => 'Kon de melding niet verwijderen';
+
+  @override
+  String get privacyControlsTitle => 'Privacy-instellingen';
+
+  @override
+  String get tileProxyToggleTitle => 'Kaarttegels via de Sparkilo-proxy laden';
+
+  @override
+  String get tileProxyToggleSubtitle =>
+      'Aan: het zichtbare kaartgebied en je IP-adres bereiken de EU-server van de ontwikkelaar, die de tegels bij OpenStreetMap ophaalt. Uit: tegels worden rechtstreeks van tile.openstreetmap.org geladen.';
+
+  @override
+  String get remoteLogosToggleTitle => 'Merklogo\'s van internet laden';
+
+  @override
+  String get remoteLogosToggleSubtitle =>
+      'Standaard uit: er worden meegeleverde plaatshouders getoond. Aan: logo\'s worden opgehaald van logo.clearbit.com, dat je IP-adres ziet.';
+
+  @override
+  String get privacyExportAllButton => 'Al mijn gegevens exporteren (ZIP)';
+
+  @override
+  String privacyExportAllSuccess(String fileName, int count) {
+    return '$fileName opgeslagen in Downloads — $count bestanden erin';
+  }
+
+  @override
+  String get privacyExportAllFailed => 'Kon het exportbestand niet schrijven';
+
+  @override
+  String syncModeCommunityControllerNotice(String operator) {
+    return 'Beheerd door $operator · Supabase, EU (Frankfurt) · synchroniseert favorieten, alerts, voertuigen incl. VIN, tankbeurten, beoordelingen, meldingen en — als je het inschakelt — ritten met GPS';
+  }
+
+  @override
+  String get syncModePrivateControllerNotice =>
+      'Jij bent de verwerkingsverantwoordelijke — je eigen Supabase-project, wij zien het nooit';
+
+  @override
+  String get syncModeJoinControllerNotice =>
+      'De eigenaar van de gedeelde database is de verwerkingsverantwoordelijke voor je gegevens';
+
+  @override
+  String get ugcPublicNoticeTitle => 'Gedeeld met andere gebruikers';
+
+  @override
+  String get ugcPublicNoticeBody =>
+      'Dit wordt in de sync-database opgeslagen onder je pseudonieme gebruikers-ID. In Sparkilo Community kan elke ingelogde gebruiker het lezen. Je kunt het altijd verwijderen via TankSync → Gegevenstransparantie.';
+
+  @override
+  String get blockedAuthorsTitle => 'Geblokkeerde gebruikers';
+
+  @override
+  String get blockedAuthorsDescription =>
+      'Inhoud van deze gebruikers wordt op dit apparaat verborgen. Deblokkeer ze om het weer te zien.';
+
+  @override
+  String get blockedAuthorsEmpty => 'Geen geblokkeerde gebruikers';
+
+  @override
+  String get blockedAuthorsUnblock => 'Deblokkeren';
+
+  @override
   String get coachingGpsLiftOff => 'Loslaten';
 
   @override
@@ -6734,6 +6833,79 @@ class AppLocalizationsNl extends AppLocalizations {
     });
     return '$_temp0';
   }
+
+  @override
+  String get permissionRationaleCameraTitle => 'Cameratoegang';
+
+  @override
+  String get permissionRationaleCameraSubtitle =>
+      'Deze app wil je camera gebruiken om bonnen, pompdisplays en QR-codes te lezen.';
+
+  @override
+  String get permissionRationaleCameraWhatHappens =>
+      'Wat er met het camerabeeld gebeurt:';
+
+  @override
+  String get permissionRationaleCameraBulletOnDevice =>
+      'Het beeld wordt alleen gebruikt om de bon, het pompdisplay of de QR-code te lezen — de herkenning draait op je apparaat.';
+
+  @override
+  String get permissionRationaleCameraBulletDiscarded =>
+      'De foto wordt na het scannen verwijderd.';
+
+  @override
+  String get permissionRationaleCameraBulletNoUpload =>
+      'Er wordt niets geüpload, tenzij je een melding van een mislukte scan indient en die bevestigt.';
+
+  @override
+  String get permissionRationaleBluetoothTitle => 'Bluetooth-toegang';
+
+  @override
+  String get permissionRationaleBluetoothSubtitle =>
+      'Deze app wil Bluetooth gebruiken om verbinding te maken met je OBD2-adapter.';
+
+  @override
+  String get permissionRationaleBluetoothWhatHappens =>
+      'Wat er met Bluetooth gebeurt:';
+
+  @override
+  String get permissionRationaleBluetoothBulletAdapterOnly =>
+      'Bluetooth wordt alleen gebruikt om je OBD2-adapter te vinden en ermee te communiceren.';
+
+  @override
+  String get permissionRationaleBluetoothBulletIdentifierLocal =>
+      'De adapter-ID blijft op je apparaat — die wordt alleen via TankSync gesynchroniseerd, als onderdeel van het voertuigprofiel.';
+
+  @override
+  String get permissionRationaleBluetoothBulletLegacyLocation =>
+      'Op Android 11 en lager vraagt het systeem ook om locatie, omdat Bluetooth-scannen daar als locatiemachtiging geldt.';
+
+  @override
+  String get permissionRationaleNotificationsTitle => 'Meldingen';
+
+  @override
+  String get permissionRationaleNotificationsSubtitle =>
+      'Deze app wil je meldingen sturen voor prijswaarschuwingen en de status van de ritregistratie.';
+
+  @override
+  String get permissionRationaleNotificationsWhatHappens =>
+      'Wat er met meldingen gebeurt:';
+
+  @override
+  String get permissionRationaleNotificationsBulletLocal =>
+      'Meldingen worden gebruikt voor lokale prijswaarschuwingen en de status van de ritregistratie.';
+
+  @override
+  String get permissionRationaleNotificationsBulletNothingLeaves =>
+      'Ze worden op je apparaat gegenereerd — niets verlaat het apparaat.';
+
+  @override
+  String get permissionRationaleRevoke =>
+      'Je kunt dit op elk moment intrekken in de instellingen van je apparaat.';
+
+  @override
+  String get permissionRationaleLegalBasis =>
+      'Rechtsgrondslag: art. 6, lid 1, onder a) AVG (toestemming)';
 
   @override
   String get tripRecordingPipEstConsumptionCaption => 'gesch. L/100 km';

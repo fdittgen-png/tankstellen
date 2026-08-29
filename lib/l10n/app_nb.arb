@@ -781,7 +781,7 @@
   "syncHowToSyncQuestion": "Hvordan vil du synkronisere?",
   "syncOfflineDescription": "Appen fungerer fullt ut frakoblet. Skysynkronisering er valgfritt.",
   "syncModeCommunityTitle": "Sparkilo-fellesskap",
-  "syncModeCommunitySubtitle": "Del favoritter og vurderinger med alle brukere",
+  "syncModeCommunitySubtitle": "Delt database drevet av utvikleren — se nedenfor hva som synkroniseres",
   "syncModePrivateTitle": "Privat database",
   "syncModePrivateSubtitle": "Din egen Supabase – full datakontroll",
   "syncModeGroupTitle": "Bli med i en gruppe",
@@ -4721,5 +4721,99 @@
         "type": "String"
       }
     }
-  }
+  },
+  "gdprPolicyLink": "Personvernerklæring (versjon {version})",
+  "@gdprPolicyLink": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentRecordedAt": "Samtykke gitt {date} · erklæringsversjon {version}",
+  "@consentRecordedAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentNotRecorded": "Ingen samtykke registrert ennå",
+  "serverErasurePartial": "Noen serverdata kunne ikke slettes: {tables}. Prøv igjen, eller kontakt utvikleren med denne listen.",
+  "@serverErasurePartial": {
+    "placeholders": {
+      "tables": {
+        "type": "String"
+      }
+    }
+  },
+  "localErasurePartial": "Noen lokale data kunne ikke slettes: {steps}. Start appen på nytt og prøv igjen.",
+  "@localErasurePartial": {
+    "placeholders": {
+      "steps": {
+        "type": "String"
+      }
+    }
+  },
+  "myCommunityReportsTitle": "Mine fellesskapsrapporter",
+  "myCommunityReportsEmpty": "Du har ikke sendt inn noen rapporter",
+  "deleteReportTooltip": "Slett denne rapporten",
+  "reportDeleted": "Rapport slettet",
+  "reportDeleteFailed": "Kunne ikke slette rapporten",
+  "privacyControlsTitle": "Personverninnstillinger",
+  "tileProxyToggleTitle": "Last kartfliser via Sparkilo-proxyen",
+  "tileProxyToggleSubtitle": "På: det viste kartutsnittet og IP-adressen din når utviklerens EU-server, som henter flisene fra OpenStreetMap. Av: flisene lastes direkte fra tile.openstreetmap.org.",
+  "remoteLogosToggleTitle": "Last merkelogoer fra internett",
+  "remoteLogosToggleSubtitle": "Av som standard: medfølgende plassholdere vises. På: logoer hentes fra logo.clearbit.com, som ser IP-adressen din.",
+  "privacyExportAllButton": "Eksporter alle dataene mine (ZIP)",
+  "privacyExportAllSuccess": "{fileName} lagret i Nedlastinger — {count} filer inni",
+  "@privacyExportAllSuccess": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "privacyExportAllFailed": "Kunne ikke skrive eksportfilen",
+  "syncModeCommunityControllerNotice": "Drives av {operator} · Supabase, EU (Frankfurt) · synkroniserer favoritter, varsler, kjøretøy inkl. VIN, fyllinger, vurderinger, rapporter og — hvis du slår det på — turer med GPS",
+  "@syncModeCommunityControllerNotice": {
+    "placeholders": {
+      "operator": {
+        "type": "String"
+      }
+    }
+  },
+  "syncModePrivateControllerNotice": "Du er behandlingsansvarlig — ditt eget Supabase-prosjekt, vi ser det aldri",
+  "syncModeJoinControllerNotice": "Den som eier den delte databasen, er behandlingsansvarlig for dataene dine",
+  "ugcPublicNoticeTitle": "Delt med andre brukere",
+  "ugcPublicNoticeBody": "Dette lagres i synkroniseringsdatabasen under den pseudonyme bruker-ID-en din. I Sparkilo Community kan alle innloggede brukere lese det. Du kan når som helst slette det under TankSync → Datatransparens.",
+  "blockedAuthorsTitle": "Blokkerte brukere",
+  "blockedAuthorsDescription": "Innhold delt av disse brukerne skjules på denne enheten. Opphev blokkeringen for å se det igjen.",
+  "blockedAuthorsEmpty": "Ingen blokkerte brukere",
+  "blockedAuthorsUnblock": "Opphev blokkering",
+  "permissionRationaleCameraTitle": "Kameratilgang",
+  "permissionRationaleCameraSubtitle": "Denne appen vil bruke kameraet ditt til å lese kvitteringer, pumpedisplayer og QR-koder.",
+  "permissionRationaleCameraWhatHappens": "Hva som skjer med kamerabildet:",
+  "permissionRationaleCameraBulletOnDevice": "Bildet brukes bare til å lese kvitteringen, pumpedisplayet eller QR-koden — gjenkjenningen kjører på enheten din.",
+  "permissionRationaleCameraBulletDiscarded": "Bildet forkastes etter skanningen.",
+  "permissionRationaleCameraBulletNoUpload": "Ingenting lastes opp med mindre du sender inn en rapport om feilskanning og bekrefter den.",
+  "permissionRationaleBluetoothTitle": "Bluetooth-tilgang",
+  "permissionRationaleBluetoothSubtitle": "Denne appen vil bruke Bluetooth til å koble til OBD2-adapteren din.",
+  "permissionRationaleBluetoothWhatHappens": "Hva som skjer med Bluetooth:",
+  "permissionRationaleBluetoothBulletAdapterOnly": "Bluetooth brukes bare til å finne og kommunisere med OBD2-adapteren din.",
+  "permissionRationaleBluetoothBulletIdentifierLocal": "Adapter-ID-en blir på enheten din — den synkroniseres bare via TankSync, som en del av kjøretøyprofilen.",
+  "permissionRationaleBluetoothBulletLegacyLocation": "På Android 11 og eldre ber systemet også om plassering, fordi Bluetooth-skanning regnes som en plasseringstillatelse der.",
+  "permissionRationaleNotificationsTitle": "Varsler",
+  "permissionRationaleNotificationsSubtitle": "Denne appen vil sende deg varsler om prisalarmer og status for turopptaket.",
+  "permissionRationaleNotificationsWhatHappens": "Hva som skjer med varsler:",
+  "permissionRationaleNotificationsBulletLocal": "Varsler brukes til lokale prisalarmer og status for turopptaket.",
+  "permissionRationaleNotificationsBulletNothingLeaves": "De genereres på enheten din — ingenting forlater enheten.",
+  "permissionRationaleRevoke": "Du kan når som helst trekke dette tilbake i enhetsinnstillingene.",
+  "permissionRationaleLegalBasis": "Rettslig grunnlag: GDPR art. 6 nr. 1 bokstav a (samtykke)"
 }

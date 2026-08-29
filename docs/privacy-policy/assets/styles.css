@@ -41,3 +41,12 @@ a:hover { text-decoration: underline; }
 .contact { background: var(--border); padding: 1rem; border-radius: 8px; margin-top: 2rem; }
 .langs { font-size: 0.85rem; color: var(--muted); margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
 .langs a { margin-right: 0.6rem; }
+
+/* v3 (Epic #3865) — the processing table (purpose / legal basis / retention). */
+table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; font-size: 0.9rem; }
+th, td { border: 1px solid var(--border); padding: 0.4rem 0.5rem; text-align: left; vertical-align: top; }
+th { background: color-mix(in srgb, var(--border) 40%, var(--bg)); }
+@media (max-width: 600px) {
+  table { display: block; overflow-x: auto; }
+}
+code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }

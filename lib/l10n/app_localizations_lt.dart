@@ -2725,7 +2725,7 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get syncModeCommunitySubtitle =>
-      'Bendrinkite mėgstamus ir įvertinimus su visais naudotojais';
+      'Bendra duomenų bazė, kurią valdo kūrėjas — žemiau matote, kas sinchronizuojama';
 
   @override
   String get syncModePrivateTitle => 'Privati duomenų bazė';
@@ -5350,6 +5350,107 @@ class AppLocalizationsLt extends AppLocalizations {
       'Kai išjungta, ženkleliai, balai ir trofėjaus piktogramos slepiamos visoje programoje.';
 
   @override
+  String gdprPolicyLink(int version) {
+    return 'Privatumo politika (versija $version)';
+  }
+
+  @override
+  String consentRecordedAt(String date, int version) {
+    return 'Sutikimas duotas $date · politikos versija $version';
+  }
+
+  @override
+  String get consentNotRecorded => 'Sutikimas dar neužregistruotas';
+
+  @override
+  String serverErasurePartial(String tables) {
+    return 'Kai kurių serverio duomenų nepavyko ištrinti: $tables. Bandykite dar kartą arba susisiekite su kūrėju pateikdami šį sąrašą.';
+  }
+
+  @override
+  String localErasurePartial(String steps) {
+    return 'Kai kurių vietinių duomenų nepavyko ištrinti: $steps. Paleiskite programą iš naujo ir bandykite dar kartą.';
+  }
+
+  @override
+  String get myCommunityReportsTitle => 'Mano pranešimai bendruomenei';
+
+  @override
+  String get myCommunityReportsEmpty => 'Nepateikėte nė vieno pranešimo';
+
+  @override
+  String get deleteReportTooltip => 'Ištrinti šį pranešimą';
+
+  @override
+  String get reportDeleted => 'Pranešimas ištrintas';
+
+  @override
+  String get reportDeleteFailed => 'Nepavyko ištrinti pranešimo';
+
+  @override
+  String get privacyControlsTitle => 'Privatumo valdymas';
+
+  @override
+  String get tileProxyToggleTitle =>
+      'Įkelti žemėlapio plyteles per Sparkilo tarpinį serverį';
+
+  @override
+  String get tileProxyToggleSubtitle =>
+      'Įjungta: matoma žemėlapio sritis ir jūsų IP adresas pasiekia kūrėjo ES serverį, kuris plyteles gauna iš OpenStreetMap. Išjungta: plytelės įkeliamos tiesiai iš tile.openstreetmap.org.';
+
+  @override
+  String get remoteLogosToggleTitle =>
+      'Įkelti prekių ženklų logotipus iš interneto';
+
+  @override
+  String get remoteLogosToggleSubtitle =>
+      'Pagal numatytuosius nustatymus išjungta: rodomi programoje įtraukti vietos rezervavimo ženklai. Įjungta: logotipai gaunami iš logo.clearbit.com, kuris mato jūsų IP adresą.';
+
+  @override
+  String get privacyExportAllButton => 'Eksportuoti visus mano duomenis (ZIP)';
+
+  @override
+  String privacyExportAllSuccess(String fileName, int count) {
+    return '$fileName išsaugota atsisiuntimų aplanke — viduje $count failų';
+  }
+
+  @override
+  String get privacyExportAllFailed => 'Nepavyko įrašyti eksporto failo';
+
+  @override
+  String syncModeCommunityControllerNotice(String operator) {
+    return 'Valdo $operator · Supabase, ES (Frankfurt) · sinchronizuoja mėgstamiausius, įspėjimus, transporto priemones su VIN, degalų pylimus, įvertinimus, pranešimus ir — jei įjungsite — keliones su GPS';
+  }
+
+  @override
+  String get syncModePrivateControllerNotice =>
+      'Duomenų valdytojas esate jūs — jūsų paties Supabase projektas, mes jo niekada nematome';
+
+  @override
+  String get syncModeJoinControllerNotice =>
+      'Bendros duomenų bazės savininkas yra jūsų duomenų valdytojas';
+
+  @override
+  String get ugcPublicNoticeTitle => 'Bendrinama su kitais naudotojais';
+
+  @override
+  String get ugcPublicNoticeBody =>
+      'Tai saugoma sinchronizavimo duomenų bazėje su jūsų pseudoniminiu naudotojo ID. Sparkilo bendruomenėje tai gali perskaityti kiekvienas prisijungęs naudotojas. Bet kada galite tai ištrinti čia: TankSync → Duomenų skaidrumas.';
+
+  @override
+  String get blockedAuthorsTitle => 'Užblokuoti naudotojai';
+
+  @override
+  String get blockedAuthorsDescription =>
+      'Šių naudotojų bendrinamas turinys šiame įrenginyje paslėptas. Atblokuokite, kad vėl jį matytumėte.';
+
+  @override
+  String get blockedAuthorsEmpty => 'Užblokuotų naudotojų nėra';
+
+  @override
+  String get blockedAuthorsUnblock => 'Atblokuoti';
+
+  @override
   String get coachingGpsLiftOff => 'Atleisk dujas';
 
   @override
@@ -6754,6 +6855,79 @@ class AppLocalizationsLt extends AppLocalizations {
     });
     return '$_temp0';
   }
+
+  @override
+  String get permissionRationaleCameraTitle => 'Kameros prieiga';
+
+  @override
+  String get permissionRationaleCameraSubtitle =>
+      'Ši programa nori naudoti jūsų kamerą kvitams, kolonėlių ekranams ir QR kodams nuskaityti.';
+
+  @override
+  String get permissionRationaleCameraWhatHappens =>
+      'Kas vyksta su kameros vaizdu:';
+
+  @override
+  String get permissionRationaleCameraBulletOnDevice =>
+      'Vaizdas naudojamas tik kvitui, kolonėlės ekranui arba QR kodui nuskaityti — atpažinimas vyksta jūsų įrenginyje.';
+
+  @override
+  String get permissionRationaleCameraBulletDiscarded =>
+      'Nuotrauka po nuskaitymo pašalinama.';
+
+  @override
+  String get permissionRationaleCameraBulletNoUpload =>
+      'Niekas neįkeliama, nebent pateikiate pranešimą apie klaidingą nuskaitymą ir jį patvirtinate.';
+
+  @override
+  String get permissionRationaleBluetoothTitle => 'Bluetooth prieiga';
+
+  @override
+  String get permissionRationaleBluetoothSubtitle =>
+      'Ši programa nori naudoti Bluetooth, kad prisijungtų prie jūsų OBD2 adapterio.';
+
+  @override
+  String get permissionRationaleBluetoothWhatHappens =>
+      'Kas vyksta su Bluetooth:';
+
+  @override
+  String get permissionRationaleBluetoothBulletAdapterOnly =>
+      'Bluetooth naudojamas tik jūsų OBD2 adapteriui rasti ir su juo susisiekti.';
+
+  @override
+  String get permissionRationaleBluetoothBulletIdentifierLocal =>
+      'Adapterio identifikatorius lieka jūsų įrenginyje — jis sinchronizuojamas tik per TankSync kaip transporto priemonės profilio dalis.';
+
+  @override
+  String get permissionRationaleBluetoothBulletLegacyLocation =>
+      'Android 11 ir senesnėse versijose sistema taip pat prašo vietos, nes Bluetooth paieška ten laikoma vietos leidimu.';
+
+  @override
+  String get permissionRationaleNotificationsTitle => 'Pranešimai';
+
+  @override
+  String get permissionRationaleNotificationsSubtitle =>
+      'Ši programa nori siųsti jums pranešimus apie kainų įspėjimus ir kelionės įrašymo būseną.';
+
+  @override
+  String get permissionRationaleNotificationsWhatHappens =>
+      'Kas vyksta su pranešimais:';
+
+  @override
+  String get permissionRationaleNotificationsBulletLocal =>
+      'Pranešimai naudojami vietiniams kainų įspėjimams ir kelionės įrašymo būsenai.';
+
+  @override
+  String get permissionRationaleNotificationsBulletNothingLeaves =>
+      'Jie sukuriami jūsų įrenginyje — niekas nepalieka įrenginio.';
+
+  @override
+  String get permissionRationaleRevoke =>
+      'Tai galite bet kada atšaukti įrenginio nustatymuose.';
+
+  @override
+  String get permissionRationaleLegalBasis =>
+      'Teisinis pagrindas: BDAR 6 str. 1 d. a punktas (sutikimas)';
 
   @override
   String get tripRecordingPipEstConsumptionCaption => 'įvert. L/100 km';

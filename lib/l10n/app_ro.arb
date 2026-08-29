@@ -781,7 +781,7 @@
   "syncHowToSyncQuestion": "Cum doriți să sincronizați?",
   "syncOfflineDescription": "Aplicația funcționează complet offline. Sincronizarea cloud este opțională.",
   "syncModeCommunityTitle": "Comunitatea Sparkilo",
-  "syncModeCommunitySubtitle": "Partajați favorite și evaluări cu toți utilizatorii",
+  "syncModeCommunitySubtitle": "Bază de date partajată administrată de dezvoltator — vedeți mai jos ce se sincronizează",
   "syncModePrivateTitle": "Bază de date privată",
   "syncModePrivateSubtitle": "Propriul Supabase — control total al datelor",
   "syncModeGroupTitle": "Alăturați-vă unui grup",
@@ -4721,5 +4721,99 @@
         "type": "String"
       }
     }
-  }
+  },
+  "gdprPolicyLink": "Politica de confidențialitate (versiunea {version})",
+  "@gdprPolicyLink": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentRecordedAt": "Consimțământ acordat la {date} · versiunea politicii {version}",
+  "@consentRecordedAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentNotRecorded": "Niciun consimțământ înregistrat încă",
+  "serverErasurePartial": "Unele date de pe server nu au putut fi șterse: {tables}. Reîncercați sau contactați dezvoltatorul cu această listă.",
+  "@serverErasurePartial": {
+    "placeholders": {
+      "tables": {
+        "type": "String"
+      }
+    }
+  },
+  "localErasurePartial": "Unele date locale nu au putut fi șterse: {steps}. Reporniți aplicația și reîncercați.",
+  "@localErasurePartial": {
+    "placeholders": {
+      "steps": {
+        "type": "String"
+      }
+    }
+  },
+  "myCommunityReportsTitle": "Rapoartele mele pentru comunitate",
+  "myCommunityReportsEmpty": "Nu ați trimis niciun raport",
+  "deleteReportTooltip": "Șterge acest raport",
+  "reportDeleted": "Raport șters",
+  "reportDeleteFailed": "Raportul nu a putut fi șters",
+  "privacyControlsTitle": "Controale de confidențialitate",
+  "tileProxyToggleTitle": "Încarcă plăcile hărții prin proxy-ul Sparkilo",
+  "tileProxyToggleSubtitle": "Activat: zona vizibilă a hărții și adresa dvs. IP ajung la serverul din UE al dezvoltatorului, care preia plăcile de la OpenStreetMap. Dezactivat: plăcile se încarcă direct de la tile.openstreetmap.org.",
+  "remoteLogosToggleTitle": "Încarcă logourile mărcilor de pe internet",
+  "remoteLogosToggleSubtitle": "Dezactivat implicit: se afișează substituenți incluși în aplicație. Activat: logourile sunt preluate de la logo.clearbit.com, care vede adresa dvs. IP.",
+  "privacyExportAllButton": "Exportă toate datele mele (ZIP)",
+  "privacyExportAllSuccess": "{fileName} salvat în Descărcări — {count} fișiere incluse",
+  "@privacyExportAllSuccess": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "privacyExportAllFailed": "Fișierul de export nu a putut fi scris",
+  "syncModeCommunityControllerNotice": "Operat de {operator} · Supabase, UE (Frankfurt) · sincronizează favorite, alerte, vehicule incl. VIN, alimentări, evaluări, rapoarte și — dacă activați — călătorii cu GPS",
+  "@syncModeCommunityControllerNotice": {
+    "placeholders": {
+      "operator": {
+        "type": "String"
+      }
+    }
+  },
+  "syncModePrivateControllerNotice": "Dvs. sunteți operatorul de date — propriul proiect Supabase, noi nu îl vedem niciodată",
+  "syncModeJoinControllerNotice": "Proprietarul bazei de date partajate este operatorul datelor dvs.",
+  "ugcPublicNoticeTitle": "Partajat cu alți utilizatori",
+  "ugcPublicNoticeBody": "Acesta este stocat în baza de date de sincronizare sub ID-ul dvs. de utilizator pseudonim. În Comunitatea Sparkilo orice utilizator autentificat îl poate citi. Îl puteți șterge oricând din TankSync → Transparența datelor.",
+  "blockedAuthorsTitle": "Utilizatori blocați",
+  "blockedAuthorsDescription": "Conținutul partajat de acești utilizatori este ascuns pe acest dispozitiv. Deblocați-i pentru a-l vedea din nou.",
+  "blockedAuthorsEmpty": "Niciun utilizator blocat",
+  "blockedAuthorsUnblock": "Deblochează",
+  "permissionRationaleCameraTitle": "Acces la cameră",
+  "permissionRationaleCameraSubtitle": "Această aplicație dorește să vă folosească camera pentru a citi bonuri, afișaje ale pompelor și coduri QR.",
+  "permissionRationaleCameraWhatHappens": "Ce se întâmplă cu imaginea camerei:",
+  "permissionRationaleCameraBulletOnDevice": "Imaginea este folosită doar pentru a citi bonul, afișajul pompei sau codul QR — recunoașterea rulează pe dispozitivul dvs.",
+  "permissionRationaleCameraBulletDiscarded": "Fotografia este eliminată după scanare.",
+  "permissionRationaleCameraBulletNoUpload": "Nimic nu este încărcat decât dacă trimiteți un raport de scanare eronată și îl confirmați.",
+  "permissionRationaleBluetoothTitle": "Acces la Bluetooth",
+  "permissionRationaleBluetoothSubtitle": "Această aplicație dorește să folosească Bluetooth pentru a se conecta la adaptorul dvs. OBD2.",
+  "permissionRationaleBluetoothWhatHappens": "Ce se întâmplă cu Bluetooth:",
+  "permissionRationaleBluetoothBulletAdapterOnly": "Bluetooth este folosit doar pentru a găsi adaptorul dvs. OBD2 și a comunica cu acesta.",
+  "permissionRationaleBluetoothBulletIdentifierLocal": "Identificatorul adaptorului rămâne pe dispozitivul dvs. — este sincronizat doar prin TankSync, ca parte a profilului vehiculului.",
+  "permissionRationaleBluetoothBulletLegacyLocation": "Pe Android 11 și versiuni anterioare, sistemul cere și locația, deoarece acolo scanarea Bluetooth este considerată o permisiune de locație.",
+  "permissionRationaleNotificationsTitle": "Notificări",
+  "permissionRationaleNotificationsSubtitle": "Această aplicație dorește să vă trimită notificări pentru alertele de prețuri și starea înregistrării călătoriei.",
+  "permissionRationaleNotificationsWhatHappens": "Ce se întâmplă cu notificările:",
+  "permissionRationaleNotificationsBulletLocal": "Notificările sunt folosite pentru alerte de prețuri locale și starea înregistrării călătoriei.",
+  "permissionRationaleNotificationsBulletNothingLeaves": "Sunt generate pe dispozitivul dvs. — nimic nu părăsește dispozitivul.",
+  "permissionRationaleRevoke": "Puteți revoca acest lucru oricând din setările dispozitivului.",
+  "permissionRationaleLegalBasis": "Temei juridic: art. 6 alin. (1) lit. (a) din RGPD (consimțământ)"
 }

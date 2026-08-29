@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sparkilo — Zásady ochrany osobních údajů</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+
+<h1>Zásady ochrany osobních údajů</h1>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen v systému iOS, de.tankstellen.fuelprices v systému Android) &mdash; Version 3 &mdash; Poslední aktualizace: 29. srpna 2026</p>
+<p class="langs">Dostupné jazyky: <a href="../">English</a> <a href="../bg/">Български</a> <a href="../cs/">Čeština</a> <a href="../da/">Dansk</a> <a href="../de/">Deutsch</a> <a href="../el/">Ελληνικά</a> <a href="../es/">Español</a> <a href="../et/">Eesti</a> <a href="../fi/">Suomi</a> <a href="../fr/">Français</a> <a href="../hr/">Hrvatski</a> <a href="../hu/">Magyar</a> <a href="../it/">Italiano</a> <a href="../ko/">한국어</a> <a href="../lt/">Lietuvių</a> <a href="../lv/">Latviešu</a> <a href="../nb/">Norsk</a> <a href="../nl/">Nederlands</a> <a href="../pl/">Polski</a> <a href="../pt/">Português</a> <a href="../ro/">Română</a> <a href="../sk/">Slovenčina</a> <a href="../sl/">Slovenščina</a> <a href="../sv/">Svenska</a></p>
+
+<h2>1. Přehled</h2>
+<p>Sparkilo je bezplatná aplikace s otevřeným zdrojovým kódem pro porovnávání cen pohonných hmot a nabíjení elektromobilů s volitelným záznamem jízd. Je postavena na principu <strong>local-first</strong>: vše, co o Vás aplikace ví, zůstává ve Vašem telefonu, pokud nezapnete funkci, která výslovně stanoví jinak. Neobsahuje žádné reklamy, sledovací pixely, reklamní identifikátory ani analytické sady SDK. Tyto zásady jsou napsány tak, aby splňovaly Obecné nařízení EU o ochraně osobních údajů (GDPR); vztahují se na každého uživatele bez ohledu na to, kde se nacházíte.</p>
+<p>Aplikace má <a href="https://github.com/fdittgen-png/tankstellen">otevřený zdrojový kód</a> — každé níže uvedené tvrzení lze ověřit v kódu. Strojově čitelný přehled toho, co je zpracováváno, je uložen v souboru <code>docs/privacy/data_inventory.json</code> a vlastní testy aplikace selžou, pokud se tato stránka, prohlášení v obchodech s aplikacemi a kód rozejdou.</p>
+
+<h2>2. Kdo je odpovědný (správce)</h2>
+<p>Správcem osobních údajů pro aplikaci a pro volitelnou synchronizační službu Sparkilo Community je:</p>
+<div class="contact">
+  <p><strong>Florian DITTGEN</strong> (nezávislý vývojář)</p>
+  <p><strong>E-mail:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
+  <p><strong>Zdrojový kód a systém hlášení chyb:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
+</div>
+<p>V závislosti na tom, jak TankSync používáte, se správce Vašich synchronizovaných údajů liší:</p>
+<ul>
+  <li><strong>Bez TankSync (výchozí nastavení):</strong> na žádném serveru, který provozujeme, není nic uloženo. Vaše údaje zůstávají ve Vašem zařízení a máte nad nimi výhradní kontrolu.</li>
+  <li><strong>Soukromá databáze:</strong> připojíte vlastní projekt Supabase. Správcem jste Vy; my tyto údaje nikdy nevidíme.</li>
+  <li><strong>Připojení ke skupině:</strong> připojíte projekt Supabase provozovaný někým, koho znáte (rodina, přátelé). Tato osoba je správcem sdílené databáze.</li>
+  <li><strong>Sparkilo Community:</strong> připojíte sdílenou databázi provozovanou výše uvedeným vývojářem (Supabase, hostováno v EU — AWS eu-central-1, Frankfurt). Správcem je vývojář; Supabase, Inc. je zpracovatelem vázaným svými podmínkami zpracování údajů.</li>
+</ul>
+<p>Aplikace Vám před připojením sdělí, který z těchto případů platí, a znovu to zobrazí v Nastavení → Přehled soukromí.</p>
+
+<h2>3. Údaje, které používáme</h2>
+<p>Tabulka uvádí každý druh osobních údajů, které aplikace zpracovává, proč, na jakém právním základě (čl. 6 GDPR), kam směřují a jak dlouho jsou uchovávány. „Zařízení“ znamená, že údaje nikdy neopustí Váš telefon.</p>
+<table>
+  <thead><tr><th>Údaje</th><th>Účel</th><th>Právní základ</th><th>Kam směřují</th><th>Doba uchování</th></tr></thead>
+  <tbody>
+    <tr><td>Přibližná / přesná poloha (vyhledávání)</td><td>Nalezení stanic ve Vašem okolí</td><td>Souhlas (udělíte oprávnění k poloze a potvrdíte vysvětlení v aplikaci)</td><td>Odesílá se jako souřadnice vyhledávání do zdroje cenových údajů země, ve které se nacházíte (oddíl 5). Neukládá se na žádném serveru, který provozujeme.</td><td>Poslední poloha je uchována v zařízení pro widget domovské obrazovky, dokud údaje nesmažete</td></tr>
+    <tr><td>Přesná trasa GPS, rychlost, nadmořská výška, pohybové senzory (záznam jízd)</td><td>Záznam jízdy, výpočet vzdálenosti a spotřeby</td><td>Souhlas (záznam spustíte Vy; automatický záznam vyžaduje samostatné udělení oprávnění k poloze na pozadí pro každé vozidlo)</td><td>Zařízení. Se zapnutým TankSync <em>a</em> synchronizací jízd: Vaše databáze TankSync.</td><td>Zařízení: dokud jízdu nebo všechna data nesmažete. Server: souhrny jízd, dokud je nesmažete; podrobné vzorky GPS jsou odstraněny 90 dní po jízdě.</td></tr>
+    <tr><td>Profil vozidla (značka, model, rok, objem nádrže, VIN, identifikátor adaptéru OBD2)</td><td>Výpočet spotřeby, opětovné připojení adaptéru</td><td>Smlouva (poskytování funkce, kterou jste nakonfigurovali)</td><td>Zařízení. S TankSync: Vaše databáze TankSync.</td><td>Dokud vozidlo nebo všechna data nesmažete</td></tr>
+    <tr><td>VIN (17 znaků)</td><td>Online dekódování značky/modelu/motoru</td><td>Souhlas (samostatný přepínač, ve výchozím nastavení vypnutý; jinak běží offline dekodér)</td><td>NHTSA vPIC (veřejná služba USA), pouze VIN</td><td>Neukládáme; viz zásady NHTSA</td></tr>
+    <tr><td>Tankování (datum, stanice, litry, cena, stav tachometru), záznamy o nabíjení, servisní připomínky</td><td>Váš deník tankování a statistiky</td><td>Smlouva</td><td>Zařízení. S TankSync: Vaše databáze TankSync.</td><td>Dokud je nebo všechna data nesmažete</td></tr>
+    <tr><td>Oblíbené, ignorované stanice, cenová upozornění, vyhledávací profily, itineráře, nastavení</td><td>Personalizace aplikace; spouštění místních oznámení o cenových upozorněních</td><td>Smlouva</td><td>Zařízení. S TankSync: Vaše databáze TankSync.</td><td>Dokud je nebo všechna data nesmažete</td></tr>
+    <tr><td>Anonymní ID uživatele (náhodné UUID), volitelná e-mailová adresa, ID zařízení pro každou instalaci</td><td>Identifikace Vašeho účtu TankSync napříč zařízeními; označení, které zařízení záznam smazalo</td><td>Souhlas (přepínač Cloudová synchronizace) / Smlouva</td><td>Vaše databáze TankSync (Supabase)</td><td>Dokud účet nesmažete</td></tr>
+    <tr><td>Komunitní hlášení cen, sdílená hodnocení stanic, hlášení obsahu</td><td>Komunitní opravy cen a moderování</td><td>Souhlas (odesíláte je Vy; upozornění vysvětluje, že jsou uložena pod Vaším pseudonymním ID a čitelná pro ostatní přihlášené uživatele)</td><td>Vaše databáze TankSync — v Sparkilo Community čitelná pro každého přihlášeného uživatele</td><td>Dokud hlášení nebo účet nesmažete</td></tr>
+    <tr><td>Hlášení pádů a výkonnostní záznamy (verze aplikace, verze OS, velikost obrazovky, jazykové nastavení, zásobník volání, poslední akce v aplikaci)</td><td>Oprava chyb</td><td>Souhlas (přepínač Hlášení chyb, ve výchozím nastavení vypnutý)</td><td>Sentry</td><td>Zařízení: 50 nejnovějších záznamů, 7 dní, před uložením očištěny od e-mailů, souřadnic a tokenů. Sentry: 90 dní.</td></tr>
+    <tr><td>Fotografie účtenky nebo stojanu (fotoaparát / knihovna fotografií)</td><td>Přečtení účtenky v zařízení (OCR v zařízení)</td><td>Souhlas (fotografii pořídíte nebo vyberete Vy)</td><td>Pouze zařízení. K hlášení na GitHubu se přiloží pouze tehdy, pokud podáte hlášení „špatné skenování“ a potvrdíte je.</td><td>Smazána po skenování; kopie v hlášení zůstává na GitHubu, dokud hlášení nesmažete</td></tr>
+    <tr><td>Výřez mapy (souřadnice dlaždic) a IP adresa</td><td>Vykreslení mapy</td><td>Oprávněný zájem (mapa potřebuje dlaždice) — proxy můžete vypnout</td><td>Dlaždicová proxy Sparkilo (stejný projekt Supabase, EU), která data stahuje z OpenStreetMap; nebo přímo tile.openstreetmap.org, pokud je proxy vypnutá (Nastavení → Soukromí) nebo v sestavení F-Droid</td><td>Neukládá se nad rámec standardních serverových protokolů (proxy: 7 dní)</td></tr>
+    <tr><td>Výchozí a cílový bod trasy, dotazy na silniční síť</td><td>Vyhledávání trasy, koučování plynulé jízdy</td><td>Smlouva</td><td>OSRM (router.project-osrm.org), Overpass API (overpass-api.de), Nominatim (nominatim.openstreetmap.org)</td><td>Neukládáme</td></tr>
+    <tr><td>Text adresy nebo souřadnice, které zadáte</td><td>Geokódování</td><td>Smlouva</td><td>Nominatim nebo vestavěný geokodér Vašeho telefonu (Apple / Google)</td><td>Neukládáme</td></tr>
+    <tr><td>Klíče API, které zadáte (Tankerkönig, OpenChargeMap)</td><td>Volání těchto služeb Vaším jménem</td><td>Smlouva</td><td>Pouze poskytovateli, kterému klíč patří</td><td>Šifrovány v zařízení (Keystore / Keychain), dokud je nesmažete</td></tr>
+    <tr><td>Hlášení nesprávného názvu / nesprávné adresy stanice, hlášení špatného skenování</td><td>Oprava údajů</td><td>Souhlas (před odesláním potvrdíte; je vyžadován osobní token GitHub)</td><td>GitHub (veřejné hlášení v repozitáři projektu)</td><td>Veřejné, dokud není hlášení smazáno</td></tr>
+  </tbody>
+</table>
+<p>Aplikace o Vás nečiní automatizovaná rozhodnutí s právními nebo obdobně významnými účinky. Předpovědi cen se počítají v zařízení z veřejných cenových údajů.</p>
+
+<h2>4. Údaje, které NESHROMAŽĎUJEME</h2>
+<ul>
+  <li>Jméno ani telefonní číslo (e-mailová adresa je uložena pouze tehdy, pokud ji propojíte se svým volitelným účtem TankSync)</li>
+  <li>Platební ani bankovní údaje</li>
+  <li>Údaje o zdraví ani tělesné kondici</li>
+  <li>Kontakty, zprávy ani záznamy hovorů</li>
+  <li>Fotografie, videa ani soubory nad rámec fotografie účtenky, kterou se rozhodnete naskenovat</li>
+  <li>Historie prohlížení</li>
+  <li>Reklamní identifikátory</li>
+</ul>
+<p>Loga značek jsou součástí aplikace. Jejich načítání z internetu (logo.clearbit.com, který by obdržel Vaši IP adresu) je vypnuto, pokud je nezapnete v Nastavení → Soukromí.</p>
+
+<h2>5. Služby a zdroje dat třetích stran</h2>
+<p>Aplikace komunikuje s následujícími službami. Každá má vlastní zásady ochrany osobních údajů. Aplikace mezi nimi nikdy nesdílí údaje a nikdy neodesílá více, než popisují výše uvedené sloupce.</p>
+<h3>5.1 Infrastruktura (pouze pokud je zapnuta odpovídající funkce)</h3>
+<ul>
+  <li><strong>Supabase</strong> (klelxnkzrxlpzuddhpfg.supabase.co, AWS eu-central-1) — backend TankSync pro Sparkilo Community a dlaždicová proxy. Zpracovatel podle dodatku o zpracování údajů Supabase.</li>
+  <li><strong>Sentry</strong> (sentry.io) — hlášení pádů a výkonnostní záznamy, pouze se souhlasem. Sentry může údaje zpracovávat ve Spojených státech; předávání je kryto Rámcem EU–USA pro ochranu údajů a standardními smluvními doložkami.</li>
+  <li><strong>GitHub</strong> (api.github.com, github.com) — hlášení, která výslovně podáte; aplikace rovněž stahuje veřejné datové soubory (dálniční sjezdy, seznamy stanic) z vydání projektu, což GitHubu odhalí Vaši IP adresu.</li>
+  <li><strong>OpenStreetMap</strong> (tile.openstreetmap.org, nominatim.openstreetmap.org), <strong>OSRM</strong> (router.project-osrm.org), <strong>Overpass API</strong> (overpass-api.de) — mapy, geokódování, plánování tras.</li>
+  <li><strong>OpenChargeMap</strong> (api.openchargemap.io) a <strong>ODRÉ / IRVE</strong> (odre.opendatasoft.com) — nabíjecí stanice pro elektromobily a ceny. Obdrží: souřadnice vyhledávání.</li>
+  <li><strong>NHTSA vPIC</strong> (vpic.nhtsa.dot.gov) — dekódování VIN, podmíněno souhlasem.</li>
+  <li><strong>Clearbit Logo API</strong> (logo.clearbit.com) — loga značek, ve výchozím nastavení vypnuto.</li>
+  <li><strong>Apple Maps / Google Maps</strong> (www.google.com) — otevřou se ve Vašem prohlížeči nebo mapové aplikaci pouze po klepnutí na „Navigovat“.</li>
+</ul>
+<h3>5.2 Oficiální zdroje údajů o cenách pohonných hmot (obdrží Vaše souřadnice vyhledávání nebo region, nikdy Vaši identitu)</h3>
+<ul>
+  <li>Německo — Tankerkönig (creativecommons.tankerkoenig.de), s Vaším vlastním klíčem API</li>
+  <li>Francie — Prix Carburants (data.economie.gouv.fr, donnees.roulez-eco.fr)</li>
+  <li>Itálie — MIMIT osservaprezzi (carburanti.mise.gov.it)</li>
+  <li>Španělsko — MITECO / Geoportal Gasolineras (sedeaplicaciones.minetur.gob.es, geoportalgasolineras.es)</li>
+  <li>Rakousko — E-Control Spritpreisrechner (api.e-control.at)</li>
+  <li>Belgie a Lucembursko — data.public.lu, STATEC (lustat.statec.lu)</li>
+  <li>Portugalsko — DGEG (precoscombustiveis.dgeg.gov.pt)</li>
+  <li>Dánsko — OK (mobility-prices.ok.dk), Shell (shellpumpepriser.geoapp.me)</li>
+  <li>Spojené království — Fuel Finder (www.fuel-finder.service.gov.uk) a cenové zdroje prodejců, které uvádí: applegreenstores.com, fuelprices.asconagroup.co.uk, storelocator.asda.com, www.bp.com, fuelprices.esso.co.uk, jetlocal.co.uk, api2.krlmedia.com, www.morrisons.com, moto-way.com, fuel.motorfuelgroup.com, www.rontec-servicestations.co.uk, api.sainsburys.co.uk, www.sgnretail.uk, www.shell.co.uk, www.tesco.com</li>
+  <li>Slovinsko — goriva.si</li>
+  <li>Rumunsko — Monitorul Prețurilor (monitorulpreturilor.info)</li>
+  <li>Řecko — Παρατηρητήριο Τιμών (paratiritirio.mindev.gov.gr) prostřednictvím komunitního zrcadla hostovaného na AWS eu-west-3 (5fcbs3i0z4.execute-api.eu-west-3.amazonaws.com)</li>
+  <li>Jižní Korea — Opinet (www.opinet.co.kr)</li>
+  <li>Chile — CNE (api.cne.cl)</li>
+  <li>Argentina — datos.energia.gob.ar</li>
+  <li>Mexiko — CRE (publicacionexterna.azurewebsites.net)</li>
+  <li>Austrálie — FuelCheck NSW (www.fuelcheck.nsw.gov.au)</li>
+</ul>
+
+<h2>6. Zabezpečení údajů</h2>
+<ul>
+  <li>Veškerá síťová komunikace používá HTTPS (TLS při přenosu); aplikace odmítá synchronizační koncové body používající nešifrované HTTP.</li>
+  <li>Klíče API, Váš token GitHub a relace TankSync jsou uloženy v nativním šifrovaném úložišti platformy (Android Keystore / iOS Keychain).</li>
+  <li>Místní databáze jsou šifrovány AES klíčem uloženým v Keystore / Keychain — včetně zaznamenaných jízd, údajů o vozidlech, servisních připomínek a cen v mezipaměti.</li>
+  <li>Na serveru je každá tabulka chráněna zabezpečením na úrovni řádků, takže účet může vždy číst nebo mazat pouze své vlastní řádky; sdílená hodnocení a komunitní hlášení cen jsou jedinými řádky viditelnými pro ostatní přihlášené uživatele.</li>
+  <li>Chybové záznamy jsou před uložením nebo odesláním očištěny od e-mailových adres, souřadnic a tokenů.</li>
+  <li>Na žádný server se neodesílají žádné údaje, dokud nespustíte vyhledávání, neotevřete mapu nebo nezapnete TankSync / diagnostiku.</li>
+</ul>
+
+<h2>7. Vaše práva</h2>
+<p>Podle čl. 15–22 GDPR máte právo na přístup ke svým údajům, jejich opravu, výmaz, omezení zpracování a přenositelnost, právo vznést námitku proti zpracování založenému na oprávněném zájmu a právo kdykoli odvolat souhlas, aniž by tím byla dotčena zákonnost dřívějšího zpracování. Každé právo má v aplikaci své tlačítko:</p>
+<ul>
+  <li><strong>Přístup</strong> — Nastavení → Přehled soukromí zobrazuje každou kategorii uloženou v zařízení a po připojení každý řádek ve Vaší databázi TankSync.</li>
+  <li><strong>Export (přenositelnost)</strong> — Přehled soukromí → Exportovat všechna má data vytvoří jeden soubor ZIP se strojově čitelným souborem JSON pro každou kategorii (oblíbené, upozornění, profily, itineráře, historie cen, vozidla, tankování, jízdy se vzorky GPS a jedním souborem GPX na jízdu, základní hodnoty, servisní připomínky, záznamy o nabíjení, Váš záznam o souhlasech) a exportem JSON každé serverové tabulky.</li>
+  <li><strong>Oprava</strong> — jakýkoli záznam upravíte přímo v aplikaci; změna se synchronizuje, pokud je TankSync zapnutý.</li>
+  <li><strong>Výmaz</strong> — viz oddíl 8.</li>
+  <li><strong>Omezení / námitka</strong> — v Nastavení vypněte TankSync, synchronizaci jízd, dlaždicovou proxy nebo diagnostiku; v nastavení zařízení odvolejte oprávnění k poloze, Bluetooth, fotoaparátu nebo oznámením.</li>
+  <li><strong>Odvolání souhlasu</strong> — Nastavení → Soukromí a data uvádí každý souhlas s datem jeho udělení a verzí zásad, kterou jste viděli; každý lze vypnout a aplikace odpovídající zpracování okamžitě ukončí.</li>
+  <li><strong>Stížnost</strong> — můžete podat stížnost u dozorového úřadu, zejména v členském státě EU Vašeho obvyklého bydliště, místa výkonu práce nebo místa údajného porušení. Ocenili bychom možnost Vaši záležitost nejprve vyřešit sami: <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a>.</li>
+</ul>
+
+<h2>8. Smazání účtu a údajů</h2>
+<p>Vše můžete smazat sami, přímo v aplikaci — bez žádosti o podporu:</p>
+<ul>
+  <li><strong>Místní data:</strong> Nastavení → Přehled soukromí → Smazat všechna data odstraní každou databázi, kterou aplikace v zařízení uchovává — profily, oblíbené, upozornění, historii cen, ceny v mezipaměti, vozidla, tankování, zaznamenané jízdy a jejich vzorky GPS, základní hodnoty OBD2 a mezipaměti adaptérů, servisní připomínky, úspěchy, chybové záznamy, klíče API, tokeny a data widgetu domovské obrazovky — a vrátí aplikaci do stavu po prvním spuštění.</li>
+  <li><strong>Účet TankSync a data na serveru:</strong> TankSync → Transparentnost dat → Smazat účet vymaže v jedné transakci každý řádek, který vlastníte (oblíbené, upozornění, ignorované stanice, hlášení cen, hlášení obsahu, vozidla, tankování, itineráře, základní hodnoty, hodnocení, jízdy, sdílení jízd, která jste poskytli nebo obdrželi, signály o čekací době, nastavení synchronizace, záznamy o smazání a Váš uživatelský řádek), a poté smaže samotnou identitu účtu včetně případné propojené e-mailové adresy. Pokud některou tabulku nebylo možné vymazat, aplikace Vám sdělí kterou, místo aby hlásila úspěch. Tuto akci nelze vrátit zpět.</li>
+  <li><strong>Jednotlivé položky:</strong> každou oblíbenou položku, upozornění, vozidlo, tankování, jízdu, hlášení ceny a hlášení obsahu lze smazat samostatně; smazání se přenese na Vaše ostatní zařízení.</li>
+</ul>
+<p>Pokud již k aplikaci nemáte přístup, můžete o smazání požádat kontaktováním vývojáře (oddíl 11); pište prosím z e-mailové adresy propojené s Vaším účtem, abychom mohli ověřit vlastnictví. Anonymní účet, který nikdy nebyl propojen s e-mailem, nemůže bez zařízení, na němž byl vytvořen, identifikovat nikdo — ani my.</p>
+
+<h2>9. Soukromí dětí</h2>
+<p>Aplikace není určena dětem mladším 16 let. Vědomě neshromažďujeme osobní údaje dětí; pokud se domníváte, že si dítě vytvořilo účet TankSync, kontaktujte nás a my jej smažeme.</p>
+
+<h2>10. Změny těchto zásad</h2>
+<p>Změny jsou zveřejňovány na této adrese URL s novým číslem verze a datem; aplikace zaznamenává verzi, se kterou jste souhlasili, a při změně verze tuto stránku znovu zobrazí.</p>
+<ul>
+  <li><strong>v3 — 29. srpna 2026:</strong> správce a role v jednotlivých režimech, tabulka zpracování s právními základy a dobami uchování, úplný seznam zpracovatelů (dlaždicová proxy, geokodér, plánování tras, GitHub, loga značek), cesty k uplatnění práv, úplný výmaz a export.</li>
+  <li><strong>v2 — 15. srpna 2026:</strong> oddíl o smazání účtu; deklarován e-mail a údaje účtu TankSync.</li>
+  <li><strong>v1 — 7. dubna 2026:</strong> první verze.</li>
+</ul>
+
+<h2>11. Kontakt</h2>
+<div class="contact">
+  <p><strong>Vývojář a správce:</strong> Florian DITTGEN</p>
+  <p><strong>E-mail:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
+  <p><strong>Zdrojový kód:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
+</div>
+
+</body>
+</html>

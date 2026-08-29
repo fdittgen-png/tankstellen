@@ -2709,7 +2709,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get syncModeCommunitySubtitle =>
-      'Dela favoriter och betyg med alla användare';
+      'Delad databas som drivs av utvecklaren — se nedan vad som synkroniseras';
 
   @override
   String get syncModePrivateTitle => 'Privat databas';
@@ -5314,6 +5314,107 @@ class AppLocalizationsSv extends AppLocalizations {
       'När av döljs märken, poäng och troféikoner i hela appen.';
 
   @override
+  String gdprPolicyLink(int version) {
+    return 'Integritetspolicy (version $version)';
+  }
+
+  @override
+  String consentRecordedAt(String date, int version) {
+    return 'Samtycke lämnat $date · policyversion $version';
+  }
+
+  @override
+  String get consentNotRecorded => 'Inget samtycke registrerat ännu';
+
+  @override
+  String serverErasurePartial(String tables) {
+    return 'Vissa serverdata kunde inte raderas: $tables. Försök igen eller kontakta utvecklaren med den här listan.';
+  }
+
+  @override
+  String localErasurePartial(String steps) {
+    return 'Vissa lokala data kunde inte raderas: $steps. Starta om appen och försök igen.';
+  }
+
+  @override
+  String get myCommunityReportsTitle => 'Mina communityrapporter';
+
+  @override
+  String get myCommunityReportsEmpty =>
+      'Du har inte skickat in några rapporter';
+
+  @override
+  String get deleteReportTooltip => 'Radera den här rapporten';
+
+  @override
+  String get reportDeleted => 'Rapport raderad';
+
+  @override
+  String get reportDeleteFailed => 'Det gick inte att radera rapporten';
+
+  @override
+  String get privacyControlsTitle => 'Integritetsinställningar';
+
+  @override
+  String get tileProxyToggleTitle => 'Hämta kartrutor via Sparkilo-proxyn';
+
+  @override
+  String get tileProxyToggleSubtitle =>
+      'På: det visade kartutsnittet och din IP-adress når utvecklarens EU-server, som hämtar rutorna från OpenStreetMap. Av: rutorna hämtas direkt från tile.openstreetmap.org.';
+
+  @override
+  String get remoteLogosToggleTitle =>
+      'Hämta varumärkeslogotyper från internet';
+
+  @override
+  String get remoteLogosToggleSubtitle =>
+      'Av som standard: medföljande platshållare visas. På: logotyper hämtas från logo.clearbit.com, som ser din IP-adress.';
+
+  @override
+  String get privacyExportAllButton => 'Exportera alla mina data (ZIP)';
+
+  @override
+  String privacyExportAllSuccess(String fileName, int count) {
+    return '$fileName sparad i Hämtningar — $count filer inuti';
+  }
+
+  @override
+  String get privacyExportAllFailed => 'Det gick inte att skriva exportfilen';
+
+  @override
+  String syncModeCommunityControllerNotice(String operator) {
+    return 'Drivs av $operator · Supabase, EU (Frankfurt) · synkroniserar favoriter, aviseringar, fordon inkl. VIN, tankningar, betyg, rapporter och — om du aktiverar det — resor med GPS';
+  }
+
+  @override
+  String get syncModePrivateControllerNotice =>
+      'Du är personuppgiftsansvarig — ditt eget Supabase-projekt, vi ser det aldrig';
+
+  @override
+  String get syncModeJoinControllerNotice =>
+      'Den som äger den delade databasen är personuppgiftsansvarig för dina data';
+
+  @override
+  String get ugcPublicNoticeTitle => 'Delas med andra användare';
+
+  @override
+  String get ugcPublicNoticeBody =>
+      'Detta lagras i synkroniseringsdatabasen under ditt pseudonyma användar-ID. I Sparkilo Community kan alla inloggade användare läsa det. Du kan när som helst radera det under TankSync → Datatransparens.';
+
+  @override
+  String get blockedAuthorsTitle => 'Blockerade användare';
+
+  @override
+  String get blockedAuthorsDescription =>
+      'Innehåll som delas av dessa användare döljs på den här enheten. Avblockera för att se det igen.';
+
+  @override
+  String get blockedAuthorsEmpty => 'Inga blockerade användare';
+
+  @override
+  String get blockedAuthorsUnblock => 'Avblockera';
+
+  @override
   String get coachingGpsLiftOff => 'Släpp gasen';
 
   @override
@@ -6707,6 +6808,79 @@ class AppLocalizationsSv extends AppLocalizations {
     });
     return '$_temp0';
   }
+
+  @override
+  String get permissionRationaleCameraTitle => 'Kameraåtkomst';
+
+  @override
+  String get permissionRationaleCameraSubtitle =>
+      'Den här appen vill använda din kamera för att läsa kvitton, pumpdisplayer och QR-koder.';
+
+  @override
+  String get permissionRationaleCameraWhatHappens =>
+      'Vad som händer med kamerabilden:';
+
+  @override
+  String get permissionRationaleCameraBulletOnDevice =>
+      'Bilden används bara för att läsa kvittot, pumpdisplayen eller QR-koden — igenkänningen körs på din enhet.';
+
+  @override
+  String get permissionRationaleCameraBulletDiscarded =>
+      'Fotot kastas efter skanningen.';
+
+  @override
+  String get permissionRationaleCameraBulletNoUpload =>
+      'Inget laddas upp om du inte skickar en rapport om felaktig skanning och bekräftar den.';
+
+  @override
+  String get permissionRationaleBluetoothTitle => 'Bluetooth-åtkomst';
+
+  @override
+  String get permissionRationaleBluetoothSubtitle =>
+      'Den här appen vill använda Bluetooth för att ansluta till din OBD2-adapter.';
+
+  @override
+  String get permissionRationaleBluetoothWhatHappens =>
+      'Vad som händer med Bluetooth:';
+
+  @override
+  String get permissionRationaleBluetoothBulletAdapterOnly =>
+      'Bluetooth används bara för att hitta och kommunicera med din OBD2-adapter.';
+
+  @override
+  String get permissionRationaleBluetoothBulletIdentifierLocal =>
+      'Adapterns identifierare stannar på din enhet — den synkroniseras bara via TankSync, som en del av fordonsprofilen.';
+
+  @override
+  String get permissionRationaleBluetoothBulletLegacyLocation =>
+      'På Android 11 och äldre ber systemet även om plats, eftersom Bluetooth-sökning räknas som en platsbehörighet där.';
+
+  @override
+  String get permissionRationaleNotificationsTitle => 'Aviseringar';
+
+  @override
+  String get permissionRationaleNotificationsSubtitle =>
+      'Den här appen vill skicka aviseringar till dig om prisvarningar och status för resinspelningen.';
+
+  @override
+  String get permissionRationaleNotificationsWhatHappens =>
+      'Vad som händer med aviseringar:';
+
+  @override
+  String get permissionRationaleNotificationsBulletLocal =>
+      'Aviseringar används för lokala prisvarningar och status för resinspelningen.';
+
+  @override
+  String get permissionRationaleNotificationsBulletNothingLeaves =>
+      'De skapas på din enhet — inget lämnar enheten.';
+
+  @override
+  String get permissionRationaleRevoke =>
+      'Du kan när som helst återkalla detta i enhetens inställningar.';
+
+  @override
+  String get permissionRationaleLegalBasis =>
+      'Rättslig grund: art. 6.1 a i GDPR (samtycke)';
 
   @override
   String get tripRecordingPipEstConsumptionCaption => 'uppsk. L/100 km';

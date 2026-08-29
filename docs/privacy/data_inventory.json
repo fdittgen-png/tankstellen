@@ -1,0 +1,202 @@
+{
+  "$comment": "Single source of truth for what Sparkilo processes (Epic #3865). test/docs/privacy_surfaces_agree_test.dart asserts that the privacy policy, docs/play-store/DATA_SAFETY.md, ios/Runner/PrivacyInfo.xcprivacy and README.md all state exactly these facts. Edit here first, then the surfaces.",
+  "policyVersion": 3,
+  "policyDate": "2026-08-29",
+  "policyUrl": "https://fdittgen-png.github.io/tankstellen/privacy-policy/",
+  "controller": {
+    "name": "Florian DITTGEN",
+    "email": "fdittgen@gmail.com"
+  },
+  "locales": [
+    "en",
+    "bg",
+    "cs",
+    "da",
+    "de",
+    "el",
+    "es",
+    "et",
+    "fi",
+    "fr",
+    "hr",
+    "hu",
+    "it",
+    "ko",
+    "lt",
+    "lv",
+    "nb",
+    "nl",
+    "pl",
+    "pt",
+    "ro",
+    "sk",
+    "sl",
+    "sv"
+  ],
+  "collected": [
+    {
+      "id": "precise_location",
+      "label": "Precise location",
+      "optional": true,
+      "linkedToUser": true,
+      "purpose": "Nearby search (sent to price data sources), trip recording (stored on the device; synced only with TankSync + trip sync)",
+      "xcprivacy": "NSPrivacyCollectedDataTypePreciseLocation",
+      "playDataSafety": "Precise location",
+      "policyPhrase": "GPS route"
+    },
+    {
+      "id": "user_id",
+      "label": "User ID (anonymous UUID)",
+      "optional": true,
+      "linkedToUser": true,
+      "purpose": "TankSync identity",
+      "xcprivacy": "NSPrivacyCollectedDataTypeUserID",
+      "playDataSafety": "User IDs",
+      "policyPhrase": "random UUID"
+    },
+    {
+      "id": "email",
+      "label": "E-mail address",
+      "optional": true,
+      "linkedToUser": true,
+      "purpose": "Only when you link an e-mail to your TankSync account",
+      "xcprivacy": "NSPrivacyCollectedDataTypeEmailAddress",
+      "playDataSafety": "Email address",
+      "policyPhrase": "e-mail address"
+    },
+    {
+      "id": "purchase_history",
+      "label": "Purchase history (fill-ups)",
+      "optional": true,
+      "linkedToUser": true,
+      "purpose": "Fill-up log (cost, litres, odometer) synced with TankSync",
+      "xcprivacy": "NSPrivacyCollectedDataTypePurchaseHistory",
+      "playDataSafety": "Purchase history",
+      "policyPhrase": "Fill-ups"
+    },
+    {
+      "id": "other_ugc",
+      "label": "Other user-generated content",
+      "optional": true,
+      "linkedToUser": true,
+      "purpose": "Community price reports, shared ratings, content reports",
+      "xcprivacy": "NSPrivacyCollectedDataTypeOtherUserContent",
+      "playDataSafety": "Other user-generated content",
+      "policyPhrase": "Community price reports"
+    },
+    {
+      "id": "crash_data",
+      "label": "Crash logs",
+      "optional": true,
+      "linkedToUser": false,
+      "purpose": "Opt-in diagnostics (Sentry)",
+      "xcprivacy": "NSPrivacyCollectedDataTypeCrashData",
+      "playDataSafety": "Crash logs",
+      "policyPhrase": "Crash reports"
+    },
+    {
+      "id": "diagnostics",
+      "label": "Other diagnostic data",
+      "optional": true,
+      "linkedToUser": false,
+      "purpose": "Opt-in performance traces (Sentry)",
+      "xcprivacy": "NSPrivacyCollectedDataTypeOtherDiagnosticData",
+      "playDataSafety": "Diagnostics",
+      "policyPhrase": "performance traces"
+    }
+  ],
+  "notCollected": [
+    "Name or phone number",
+    "Payment or bank details",
+    "Health or fitness data",
+    "Contacts, messages or call logs",
+    "Photos, videos or files",
+    "Browsing history",
+    "Advertising identifiers"
+  ],
+  "tracking": false,
+  "processors": [
+    {
+      "name": "Supabase (TankSync)",
+      "role": "processor",
+      "region": "EU (AWS eu-central-1, Frankfurt)",
+      "hosts": [
+        "klelxnkzrxlpzuddhpfg.supabase.co"
+      ],
+      "optional": true
+    },
+    {
+      "name": "Sentry",
+      "role": "processor",
+      "region": "EU/US under the EU-US Data Privacy Framework",
+      "hosts": [
+        "sentry.io"
+      ],
+      "optional": true
+    },
+    {
+      "name": "OpenStreetMap tiles",
+      "hosts": [
+        "tile.openstreetmap.org"
+      ],
+      "optional": false
+    },
+    {
+      "name": "Sparkilo tile proxy",
+      "hosts": [
+        "klelxnkzrxlpzuddhpfg.supabase.co"
+      ],
+      "optional": true
+    },
+    {
+      "name": "Nominatim",
+      "hosts": [
+        "nominatim.openstreetmap.org"
+      ],
+      "optional": false
+    },
+    {
+      "name": "OSRM",
+      "hosts": [
+        "router.project-osrm.org"
+      ],
+      "optional": false
+    },
+    {
+      "name": "Overpass API",
+      "hosts": [
+        "overpass-api.de"
+      ],
+      "optional": false
+    },
+    {
+      "name": "OpenChargeMap",
+      "hosts": [
+        "api.openchargemap.io"
+      ],
+      "optional": false
+    },
+    {
+      "name": "NHTSA vPIC",
+      "hosts": [
+        "vpic.nhtsa.dot.gov"
+      ],
+      "optional": true
+    },
+    {
+      "name": "Clearbit Logo API",
+      "hosts": [
+        "logo.clearbit.com"
+      ],
+      "optional": true
+    },
+    {
+      "name": "GitHub",
+      "hosts": [
+        "api.github.com",
+        "github.com"
+      ],
+      "optional": true
+    }
+  ]
+}

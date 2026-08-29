@@ -2713,7 +2713,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get syncModeCommunitySubtitle =>
-      'Dijelite favourite i ocjene sa svim korisnicima';
+      'Zajednička baza podataka koju vodi razvojni programer — u nastavku pogledajte što se sinkronizira';
 
   @override
   String get syncModePrivateTitle => 'Privatna baza podataka';
@@ -5335,6 +5335,107 @@ class AppLocalizationsHr extends AppLocalizations {
       'Kada je isključeno, značke, ocjene i ikone trofeja su skrivene u cijeloj aplikaciji.';
 
   @override
+  String gdprPolicyLink(int version) {
+    return 'Pravila privatnosti (verzija $version)';
+  }
+
+  @override
+  String consentRecordedAt(String date, int version) {
+    return 'Privola dana $date · verzija pravila $version';
+  }
+
+  @override
+  String get consentNotRecorded => 'Još nije zabilježena nikakva privola';
+
+  @override
+  String serverErasurePartial(String tables) {
+    return 'Neki podaci na poslužitelju nisu mogli biti izbrisani: $tables. Pokušajte ponovno ili kontaktirajte razvojnog programera s ovim popisom.';
+  }
+
+  @override
+  String localErasurePartial(String steps) {
+    return 'Neki lokalni podaci nisu mogli biti izbrisani: $steps. Ponovno pokrenite aplikaciju i pokušajte ponovno.';
+  }
+
+  @override
+  String get myCommunityReportsTitle => 'Moje prijave zajednici';
+
+  @override
+  String get myCommunityReportsEmpty => 'Niste poslali nijednu prijavu';
+
+  @override
+  String get deleteReportTooltip => 'Izbriši ovu prijavu';
+
+  @override
+  String get reportDeleted => 'Prijava izbrisana';
+
+  @override
+  String get reportDeleteFailed => 'Prijavu nije bilo moguće izbrisati';
+
+  @override
+  String get privacyControlsTitle => 'Postavke privatnosti';
+
+  @override
+  String get tileProxyToggleTitle =>
+      'Učitavaj pločice karte putem Sparkilo proxyja';
+
+  @override
+  String get tileProxyToggleSubtitle =>
+      'Uključeno: prikazani dio karte i vaša IP adresa stižu na EU poslužitelj razvojnog programera, koji dohvaća pločice s OpenStreetMapa. Isključeno: pločice se učitavaju izravno s tile.openstreetmap.org.';
+
+  @override
+  String get remoteLogosToggleTitle => 'Učitavaj logotipe marki s interneta';
+
+  @override
+  String get remoteLogosToggleSubtitle =>
+      'Zadano isključeno: prikazuju se ugrađene zamjenske slike. Uključeno: logotipi se dohvaćaju s logo.clearbit.com, koji vidi vašu IP adresu.';
+
+  @override
+  String get privacyExportAllButton => 'Izvezi sve moje podatke (ZIP)';
+
+  @override
+  String privacyExportAllSuccess(String fileName, int count) {
+    return '$fileName spremljeno u Downloads — $count datoteka unutra';
+  }
+
+  @override
+  String get privacyExportAllFailed =>
+      'Izvoznu datoteku nije bilo moguće zapisati';
+
+  @override
+  String syncModeCommunityControllerNotice(String operator) {
+    return 'Upravlja $operator · Supabase, EU (Frankfurt) · sinkronizira favorite, upozorenja, vozila uklj. VIN, točenja goriva, ocjene, prijave i — ako to uključite — putovanja s GPS-om';
+  }
+
+  @override
+  String get syncModePrivateControllerNotice =>
+      'Vi ste voditelj obrade — vaš vlastiti Supabase projekt, mi ga nikada ne vidimo';
+
+  @override
+  String get syncModeJoinControllerNotice =>
+      'Vlasnik zajedničke baze podataka voditelj je obrade vaših podataka';
+
+  @override
+  String get ugcPublicNoticeTitle => 'Podijeljeno s drugim korisnicima';
+
+  @override
+  String get ugcPublicNoticeBody =>
+      'Ovo se pohranjuje u bazi za sinkronizaciju pod vašim pseudonimnim korisničkim ID-om. U Sparkilo zajednici to može pročitati svaki prijavljeni korisnik. Možete to izbrisati u bilo kojem trenutku u TankSync → Transparentnost podataka.';
+
+  @override
+  String get blockedAuthorsTitle => 'Blokirani korisnici';
+
+  @override
+  String get blockedAuthorsDescription =>
+      'Sadržaj koji dijele ovi korisnici skriven je na ovom uređaju. Deblokirajte ih da biste ga ponovno vidjeli.';
+
+  @override
+  String get blockedAuthorsEmpty => 'Nema blokiranih korisnika';
+
+  @override
+  String get blockedAuthorsUnblock => 'Deblokiraj';
+
+  @override
   String get coachingGpsLiftOff => 'Otpusti gas';
 
   @override
@@ -6739,6 +6840,79 @@ class AppLocalizationsHr extends AppLocalizations {
     });
     return '$_temp0';
   }
+
+  @override
+  String get permissionRationaleCameraTitle => 'Pristup kameri';
+
+  @override
+  String get permissionRationaleCameraSubtitle =>
+      'Ova aplikacija želi koristiti vašu kameru za čitanje računa, zaslona crpki i QR kodova.';
+
+  @override
+  String get permissionRationaleCameraWhatHappens =>
+      'Što se događa sa slikom s kamere:';
+
+  @override
+  String get permissionRationaleCameraBulletOnDevice =>
+      'Slika se koristi samo za čitanje računa, zaslona crpke ili QR koda — prepoznavanje se izvodi na vašem uređaju.';
+
+  @override
+  String get permissionRationaleCameraBulletDiscarded =>
+      'Fotografija se odbacuje nakon skeniranja.';
+
+  @override
+  String get permissionRationaleCameraBulletNoUpload =>
+      'Ništa se ne prenosi osim ako ne pošaljete prijavu pogrešnog skeniranja i ne potvrdite je.';
+
+  @override
+  String get permissionRationaleBluetoothTitle => 'Pristup Bluetoothu';
+
+  @override
+  String get permissionRationaleBluetoothSubtitle =>
+      'Ova aplikacija želi koristiti Bluetooth za povezivanje s vašim OBD2 adapterom.';
+
+  @override
+  String get permissionRationaleBluetoothWhatHappens =>
+      'Što se događa s Bluetoothom:';
+
+  @override
+  String get permissionRationaleBluetoothBulletAdapterOnly =>
+      'Bluetooth se koristi samo za pronalaženje vašeg OBD2 adaptera i komunikaciju s njim.';
+
+  @override
+  String get permissionRationaleBluetoothBulletIdentifierLocal =>
+      'Identifikator adaptera ostaje na vašem uređaju — sinkronizira se samo putem TankSynca kao dio profila vozila.';
+
+  @override
+  String get permissionRationaleBluetoothBulletLegacyLocation =>
+      'Na Androidu 11 i starijim verzijama sustav traži i lokaciju jer se Bluetooth skeniranje ondje smatra dozvolom za lokaciju.';
+
+  @override
+  String get permissionRationaleNotificationsTitle => 'Obavijesti';
+
+  @override
+  String get permissionRationaleNotificationsSubtitle =>
+      'Ova aplikacija želi vam slati obavijesti o upozorenjima o cijenama i statusu snimanja putovanja.';
+
+  @override
+  String get permissionRationaleNotificationsWhatHappens =>
+      'Što se događa s obavijestima:';
+
+  @override
+  String get permissionRationaleNotificationsBulletLocal =>
+      'Obavijesti se koriste za lokalna upozorenja o cijenama i status snimanja putovanja.';
+
+  @override
+  String get permissionRationaleNotificationsBulletNothingLeaves =>
+      'Generiraju se na vašem uređaju — ništa ne napušta uređaj.';
+
+  @override
+  String get permissionRationaleRevoke =>
+      'To možete opozvati u bilo kojem trenutku u postavkama uređaja.';
+
+  @override
+  String get permissionRationaleLegalBasis =>
+      'Pravna osnova: čl. 6. st. 1. t. (a) GDPR-a (privola)';
 
   @override
   String get tripRecordingPipEstConsumptionCaption => 'proci. L/100 km';

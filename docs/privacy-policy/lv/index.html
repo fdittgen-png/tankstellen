@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sparkilo — Privātuma politika</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+
+<h1>Privātuma politika</h1>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen sistēmā iOS, de.tankstellen.fuelprices sistēmā Android) &mdash; Version 3 &mdash; Pēdējoreiz atjaunināta: 2026. gada 29. augustā</p>
+<p class="langs">Pieejamās valodas: <a href="../">English</a> <a href="../bg/">Български</a> <a href="../cs/">Čeština</a> <a href="../da/">Dansk</a> <a href="../de/">Deutsch</a> <a href="../el/">Ελληνικά</a> <a href="../es/">Español</a> <a href="../et/">Eesti</a> <a href="../fi/">Suomi</a> <a href="../fr/">Français</a> <a href="../hr/">Hrvatski</a> <a href="../hu/">Magyar</a> <a href="../it/">Italiano</a> <a href="../ko/">한국어</a> <a href="../lt/">Lietuvių</a> <a href="../lv/">Latviešu</a> <a href="../nb/">Norsk</a> <a href="../nl/">Nederlands</a> <a href="../pl/">Polski</a> <a href="../pt/">Português</a> <a href="../ro/">Română</a> <a href="../sk/">Slovenčina</a> <a href="../sl/">Slovenščina</a> <a href="../sv/">Svenska</a></p>
+
+<h2>1. Pārskats</h2>
+<p>Sparkilo ir bezmaksas atvērtā pirmkoda lietotne degvielas un elektroauto uzlādes cenu salīdzināšanai ar izvēles braucienu ierakstīšanas funkciju. Tā ir veidota pēc <strong>„local-first”</strong> principa: viss, ko lietotne zina par Jums, atrodas Jūsu tālrunī, ja vien Jūs neieslēdzat funkciju, kurā skaidri norādīts citādi. Nav reklāmu, izsekošanas pikseļu, reklāmas identifikatoru un analītikas SDK. Šī politika ir izstrādāta tā, lai atbilstu ES Vispārīgajai datu aizsardzības regulai (VDAR / GDPR); tā attiecas uz ikvienu lietotāju neatkarīgi no tā, kur Jūs atrodaties.</p>
+<p>Lietotne ir <a href="https://github.com/fdittgen-png/tankstellen">atvērtā pirmkoda</a> — katru turpmāk minēto apgalvojumu var pārbaudīt kodā. Mašīnlasāms apstrādāto datu kopsavilkums glabājas failā <code>docs/privacy/data_inventory.json</code>, un lietotnes pašas testi neizdodas, ja šī lapa, veikalu deklarācijas un kods vairs nesakrīt.</p>
+
+<h2>2. Kas ir atbildīgs (pārzinis)</h2>
+<p>Lietotnes un izvēles sinhronizācijas pakalpojuma „Sparkilo Community” pārzinis ir:</p>
+<div class="contact">
+  <p><strong>Florian DITTGEN</strong> (individuāls izstrādātājs)</p>
+  <p><strong>E-pasts:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
+  <p><strong>Pirmkods un problēmu reģistrs:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
+</div>
+<p>Atkarībā no tā, kā Jūs izmantojat TankSync, mainās Jūsu sinhronizēto datu pārzinis:</p>
+<ul>
+  <li><strong>Bez TankSync (noklusējums):</strong> nevienā mūsu uzturētā serverī nekas netiek glabāts. Jūsu dati paliek Jūsu ierīcē, un tikai Jūs tos kontrolējat.</li>
+  <li><strong>Privāta datubāze:</strong> Jūs pievienojat savu Supabase projektu. Jūs esat pārzinis; mēs šos datus nekad neredzam.</li>
+  <li><strong>Pievienošanās grupai:</strong> Jūs pievienojat Supabase projektu, ko uztur Jums pazīstama persona (ģimene, draugi). Šī persona ir kopīgās datubāzes pārzinis.</li>
+  <li><strong>Sparkilo Community:</strong> Jūs pievienojat kopīgo datubāzi, ko uztur iepriekš minētais izstrādātājs (Supabase, mitināta ES — AWS eu-central-1, Frankfurte). Izstrādātājs ir pārzinis; „Supabase, Inc.” ir apstrādātājs, kam saistoši tā datu apstrādes noteikumi.</li>
+</ul>
+<p>Lietotne pirms pievienošanās paziņo, kurš no šiem variantiem ir spēkā, un atkārtoti to parāda sadaļā Iestatījumi → Privātuma panelis.</p>
+
+<h2>3. Mūsu izmantotie dati</h2>
+<p>Tabulā uzskaitīti visi lietotnes apstrādāto personas datu veidi, apstrādes nolūks, tiesiskais pamats (VDAR 6. pants), kurp dati tiek nosūtīti un cik ilgi tie tiek glabāti. „Ierīce” nozīmē, ka dati nekad nepamet Jūsu tālruni.</p>
+<table>
+  <thead><tr><th>Dati</th><th>Nolūks</th><th>Tiesiskais pamats</th><th>Kurp tiek nosūtīti</th><th>Glabāšanas ilgums</th></tr></thead>
+  <tbody>
+    <tr><td>Aptuvena / precīza atrašanās vieta (meklēšana)</td><td>Atrast tuvumā esošās stacijas</td><td>Piekrišana (Jūs piešķirat atrašanās vietas atļauju un apstiprināt lietotnes skaidrojumu)</td><td>Nosūtīta kā meklēšanas koordinātas tās valsts cenu datu avotam, kurā Jūs atrodaties (5. sadaļa). Netiek glabāta nevienā mūsu uzturētā serverī.</td><td>Pēdējā pozīcija tiek glabāta ierīcē sākuma ekrāna logrīkam, līdz Jūs dzēšat datus</td></tr>
+    <tr><td>Precīzs GPS maršruts, ātrums, augstums, kustības sensori (braucienu ierakstīšana)</td><td>Ierakstīt braucienu, aprēķināt attālumu un patēriņu</td><td>Piekrišana (Jūs sākat ierakstīšanu; automātiskai ierakstīšanai katram transportlīdzeklim nepieciešama atsevišķa fona atrašanās vietas atļauja)</td><td>Ierīce. Ja ieslēgts TankSync <em>un</em> braucienu sinhronizācija: Jūsu TankSync datubāze.</td><td>Ierīce: līdz Jūs dzēšat braucienu vai visus datus. Serveris: braucienu kopsavilkumi, līdz Jūs tos dzēšat; detalizētie GPS paraugi tiek dzēsti 90 dienas pēc brauciena.</td></tr>
+    <tr><td>Transportlīdzekļa profils (marka, modelis, gads, tvertnes tilpums, VIN, OBD2 adaptera identifikators)</td><td>Patēriņa aprēķins, adaptera atkārtota pievienošana</td><td>Līgums (Jūsu konfigurētās funkcijas nodrošināšana)</td><td>Ierīce. Ar TankSync: Jūsu TankSync datubāze.</td><td>Līdz Jūs dzēšat transportlīdzekli vai visus datus</td></tr>
+    <tr><td>VIN (17 rakstzīmes)</td><td>Atšifrēt marku / modeli / dzinēju tiešsaistē</td><td>Piekrišana (atsevišķs slēdzis, pēc noklusējuma izslēgts; pretējā gadījumā darbojas bezsaistes dekoders)</td><td>NHTSA vPIC (ASV publisks dienests), tikai VIN</td><td>Mēs neglabājam; skatīt NHTSA politiku</td></tr>
+    <tr><td>Uzpildes (datums, stacija, litri, izmaksas, odometrs), uzlādes žurnāli, apkopes atgādinājumi</td><td>Jūsu degvielas žurnāls un statistika</td><td>Līgums</td><td>Ierīce. Ar TankSync: Jūsu TankSync datubāze.</td><td>Līdz Jūs dzēšat tos vai visus datus</td></tr>
+    <tr><td>Izlase, ignorētās stacijas, cenu brīdinājumi, meklēšanas profili, maršruti, iestatījumi</td><td>Personalizēt lietotni; nosūtīt lokālus cenu brīdinājumu paziņojumus</td><td>Līgums</td><td>Ierīce. Ar TankSync: Jūsu TankSync datubāze.</td><td>Līdz Jūs dzēšat tos vai visus datus</td></tr>
+    <tr><td>Anonīms lietotāja ID (nejaušs UUID), izvēles e-pasta adrese, katras instalācijas ierīces ID</td><td>Identificēt Jūsu TankSync kontu dažādās ierīcēs; atzīmēt, kura ierīce dzēsa ierakstu</td><td>Piekrišana (slēdzis „Mākoņa sinhronizācija”) / Līgums</td><td>Jūsu TankSync datubāze (Supabase)</td><td>Līdz Jūs dzēšat kontu</td></tr>
+    <tr><td>Kopienas cenu ziņojumi, kopīgotie staciju vērtējumi, ziņojumi par saturu</td><td>Kopienas veiktie cenu labojumi un moderēšana</td><td>Piekrišana (Jūs tos iesniedzat; paziņojumā paskaidrots, ka tie tiek glabāti ar Jūsu pseidonīmo ID un ir lasāmi citiem pierakstījušamies lietotājiem)</td><td>Jūsu TankSync datubāze — „Sparkilo Community” gadījumā lasāma ikvienam pierakstījušamies lietotājam</td><td>Līdz Jūs dzēšat ziņojumu vai kontu</td></tr>
+    <tr><td>Avāriju ziņojumi un veiktspējas pēdas (lietotnes versija, OS versija, ekrāna izmērs, lokalizācija, steka pēda, pēdējās darbības lietotnē)</td><td>Labot kļūdas</td><td>Piekrišana (slēdzis „Kļūdu ziņošana”, pēc noklusējuma izslēgts)</td><td>Sentry</td><td>Ierīce: 50 jaunākās pēdas, 7 dienas, pirms glabāšanas no tām tiek izņemtas e-pasta adreses, koordinātas un pilnvaras. Sentry: 90 dienas.</td></tr>
+    <tr><td>Čeka vai sūkņa fotoattēls (kamera / fotoattēlu bibliotēka)</td><td>Nolasīt čeku ierīcē (OCR ierīcē)</td><td>Piekrišana (Jūs uzņemat vai izvēlaties fotoattēlu)</td><td>Tikai ierīce. Tiek pievienots GitHub problēmai tikai tad, ja Jūs iesniedzat ziņojumu „slikta skenēšana” un to apstiprināt.</td><td>Dzēsts pēc skenēšanas; ziņojuma kopija paliek GitHub, līdz Jūs dzēšat problēmu</td></tr>
+    <tr><td>Kartes skats (flīžu koordinātas) un IP adrese</td><td>Attēlot karti</td><td>Leģitīmas intereses (kartei nepieciešamas flīzes) — starpniekserveri Jūs varat izslēgt</td><td>Sparkilo flīžu starpniekserveris (tas pats Supabase projekts, ES), kas tās iegūst no OpenStreetMap; vai tieši tile.openstreetmap.org, ja starpniekserveris ir izslēgts (Iestatījumi → Privātums) vai F-Droid versijā</td><td>Netiek glabāts ilgāk par standarta servera žurnāliem (starpniekserveris: 7 dienas)</td></tr>
+    <tr><td>Maršruta sākums un galamērķis, ceļu tīkla vaicājumi</td><td>Maršruta meklēšana, plūdenas braukšanas padomi</td><td>Līgums</td><td>OSRM (router.project-osrm.org), Overpass API (overpass-api.de), Nominatim (nominatim.openstreetmap.org)</td><td>Mēs neglabājam</td></tr>
+    <tr><td>Jūsu ievadītais adreses teksts vai koordinātas</td><td>Ģeokodēšana</td><td>Līgums</td><td>Nominatim vai Jūsu tālruņa iebūvētais ģeokodētājs (Apple / Google)</td><td>Mēs neglabājam</td></tr>
+    <tr><td>Jūsu ievadītās API atslēgas (Tankerkönig, OpenChargeMap)</td><td>Izsaukt šos pakalpojumus Jūsu vārdā</td><td>Līgums</td><td>Tikai tam pakalpojumu sniedzējam, kuram atslēga pieder</td><td>Šifrētas ierīcē (Keystore / Keychain), līdz Jūs tās dzēšat</td></tr>
+    <tr><td>Ziņojumi par nepareizu stacijas nosaukumu / adresi, ziņojumi par sliktu skenēšanu</td><td>Labot datus</td><td>Piekrišana (Jūs apstiprināt pirms nosūtīšanas; nepieciešama personīga GitHub pilnvara)</td><td>GitHub (publiska problēma projekta repozitorijā)</td><td>Publiski, līdz problēma tiek dzēsta</td></tr>
+  </tbody>
+</table>
+<p>Lietotne nepieņem par Jums automatizētus lēmumus ar juridiskām vai līdzīgi būtiskām sekām. Cenu prognozes tiek aprēķinātas ierīcē, pamatojoties uz publiskiem cenu datiem.</p>
+
+<h2>4. Dati, kurus mēs NEVĀCAM</h2>
+<ul>
+  <li>Vārds vai tālruņa numurs (e-pasta adrese tiek glabāta tikai tad, ja Jūs to piesaistāt savam izvēles TankSync kontam)</li>
+  <li>Maksājumu vai bankas dati</li>
+  <li>Veselības vai fiziskās sagatavotības dati</li>
+  <li>Kontakti, ziņas vai zvanu žurnāli</li>
+  <li>Fotoattēli, video vai faili, izņemot čeka fotoattēlu, kuru Jūs izvēlaties skenēt</li>
+  <li>Pārlūkošanas vēsture</li>
+  <li>Reklāmas identifikatori</li>
+</ul>
+<p>Zīmolu logotipi tiek piegādāti kopā ar lietotni. To ielāde no interneta (logo.clearbit.com, kas saņemtu Jūsu IP adresi) ir izslēgta, ja vien Jūs to neieslēdzat sadaļā Iestatījumi → Privātums.</p>
+
+<h2>5. Trešo pušu pakalpojumi un datu avoti</h2>
+<p>Lietotne sazinās ar šādiem pakalpojumiem. Katram no tiem ir sava privātuma politika. Lietotne nekad nekopīgo datus starp tiem un nekad nenosūta vairāk, nekā aprakstīts iepriekš minētajās kolonnās.</p>
+<h3>5.1 Infrastruktūra (tikai tad, kad ieslēgta attiecīgā funkcija)</h3>
+<ul>
+  <li><strong>Supabase</strong> (klelxnkzrxlpzuddhpfg.supabase.co, AWS eu-central-1) — „Sparkilo Community” TankSync aizmugursistēma un flīžu starpniekserveris. Apstrādātājs saskaņā ar Supabase datu apstrādes pielikumu.</li>
+  <li><strong>Sentry</strong> (sentry.io) — avāriju ziņojumi un veiktspējas pēdas, tikai ar piekrišanu. Sentry var apstrādāt datus Amerikas Savienotajās Valstīs; nosūtīšanu sedz ES un ASV datu privātuma regulējums (EU-US Data Privacy Framework) un līguma standartklauzulas.</li>
+  <li><strong>GitHub</strong> (api.github.com, github.com) — problēmu ziņojumi, ko Jūs skaidri iesniedzat; lietotne no projekta laidieniem lejupielādē arī publiskus datu resursus (automaģistrāļu nobrauktuves, staciju sarakstus), kas atklāj GitHub Jūsu IP adresi.</li>
+  <li><strong>OpenStreetMap</strong> (tile.openstreetmap.org, nominatim.openstreetmap.org), <strong>OSRM</strong> (router.project-osrm.org), <strong>Overpass API</strong> (overpass-api.de) — kartes, ģeokodēšana, maršrutēšana.</li>
+  <li><strong>OpenChargeMap</strong> (api.openchargemap.io) un <strong>ODRÉ / IRVE</strong> (odre.opendatasoft.com) — elektroauto uzlādes stacijas un cenas. Saņem: meklēšanas koordinātas.</li>
+  <li><strong>NHTSA vPIC</strong> (vpic.nhtsa.dot.gov) — VIN atšifrēšana, tikai ar piekrišanu.</li>
+  <li><strong>Clearbit Logo API</strong> (logo.clearbit.com) — zīmolu logotipi, pēc noklusējuma izslēgts.</li>
+  <li><strong>Apple Maps / Google Maps</strong> (www.google.com) — tiek atvērts Jūsu pārlūkprogrammā vai karšu lietotnē tikai tad, kad Jūs pieskaraties „Navigēt”.</li>
+</ul>
+<h3>5.2 Oficiālie degvielas cenu datu avoti (saņem Jūsu meklēšanas koordinātas vai reģionu, nekad Jūsu identitāti)</h3>
+<ul>
+  <li>Vācija — Tankerkönig (creativecommons.tankerkoenig.de), ar Jūsu pašu API atslēgu</li>
+  <li>Francija — Prix Carburants (data.economie.gouv.fr, donnees.roulez-eco.fr)</li>
+  <li>Itālija — MIMIT osservaprezzi (carburanti.mise.gov.it)</li>
+  <li>Spānija — MITECO / Geoportal Gasolineras (sedeaplicaciones.minetur.gob.es, geoportalgasolineras.es)</li>
+  <li>Austrija — E-Control Spritpreisrechner (api.e-control.at)</li>
+  <li>Beļģija un Luksemburga — data.public.lu, STATEC (lustat.statec.lu)</li>
+  <li>Portugāle — DGEG (precoscombustiveis.dgeg.gov.pt)</li>
+  <li>Dānija — OK (mobility-prices.ok.dk), Shell (shellpumpepriser.geoapp.me)</li>
+  <li>Apvienotā Karaliste — Fuel Finder (www.fuel-finder.service.gov.uk) un tajā uzskaitītās mazumtirgotāju cenu plūsmas: applegreenstores.com, fuelprices.asconagroup.co.uk, storelocator.asda.com, www.bp.com, fuelprices.esso.co.uk, jetlocal.co.uk, api2.krlmedia.com, www.morrisons.com, moto-way.com, fuel.motorfuelgroup.com, www.rontec-servicestations.co.uk, api.sainsburys.co.uk, www.sgnretail.uk, www.shell.co.uk, www.tesco.com</li>
+  <li>Slovēnija — goriva.si</li>
+  <li>Rumānija — Monitorul Prețurilor (monitorulpreturilor.info)</li>
+  <li>Grieķija — Παρατηρητήριο Τιμών (paratiritirio.mindev.gov.gr) caur kopienas spoguļserveri, kas mitināts AWS eu-west-3 (5fcbs3i0z4.execute-api.eu-west-3.amazonaws.com)</li>
+  <li>Dienvidkoreja — Opinet (www.opinet.co.kr)</li>
+  <li>Čīle — CNE (api.cne.cl)</li>
+  <li>Argentīna — datos.energia.gob.ar</li>
+  <li>Meksika — CRE (publicacionexterna.azurewebsites.net)</li>
+  <li>Austrālija — FuelCheck NSW (www.fuelcheck.nsw.gov.au)</li>
+</ul>
+
+<h2>6. Datu drošība</h2>
+<ul>
+  <li>Visa tīkla saziņa notiek, izmantojot HTTPS (TLS pārsūtīšanas laikā); lietotne atsakās izmantot nešifrētus HTTP sinhronizācijas galapunktus.</li>
+  <li>API atslēgas, Jūsu GitHub pilnvara un TankSync sesija glabājas platformas iebūvētajā šifrētajā krātuvē (Android Keystore / iOS Keychain).</li>
+  <li>Lokālās datubāzes ir šifrētas ar AES, izmantojot atslēgu, kas glabājas Keystore / Keychain — tostarp ierakstītie braucieni, transportlīdzekļu dati, apkopes atgādinājumi un kešatmiņā saglabātās cenas.</li>
+  <li>Serverī katru tabulu aizsargā rindu līmeņa drošība, tāpēc konts var lasīt vai dzēst tikai savas rindas; kopīgotie vērtējumi un kopienas cenu ziņojumi ir vienīgās rindas, kas redzamas citiem pierakstījušamies lietotājiem.</li>
+  <li>No kļūdu pēdām pirms glabāšanas vai nosūtīšanas tiek izņemtas e-pasta adreses, koordinātas un pilnvaras.</li>
+  <li>Nekādi dati netiek nosūtīti nevienam serverim, ja vien Jūs neveicat meklēšanu, neatverat karti vai neieslēdzat TankSync / diagnostiku.</li>
+</ul>
+
+<h2>7. Jūsu tiesības</h2>
+<p>Saskaņā ar VDAR 15.–22. pantu Jums ir tiesības piekļūt saviem datiem, tos labot, dzēst, ierobežot to apstrādi un tos pārnest, iebilst pret apstrādi, kas balstīta uz leģitīmām interesēm, un jebkurā laikā atsaukt piekrišanu, neietekmējot iepriekšējās apstrādes likumību. Katrai tiesībai lietotnē ir poga:</p>
+<ul>
+  <li><strong>Piekļuve</strong> — Iestatījumi → Privātuma panelis parāda katru ierīcē glabāto kategoriju un, ja esat pievienojies, katru rindu Jūsu TankSync datubāzē.</li>
+  <li><strong>Eksports (pārnesamība)</strong> — Privātuma panelis → Eksportēt visus manus datus izveido vienu ZIP failu ar mašīnlasāmu JSON failu katrai kategorijai (izlase, brīdinājumi, profili, maršruti, cenu vēsture, transportlīdzekļi, uzpildes, braucieni ar GPS paraugiem un viens GPX fails katram braucienam, bāzes vērtības, apkopes atgādinājumi, uzlādes žurnāli, Jūsu piekrišanu reģistrs), kā arī katras servera tabulas JSON eksportu.</li>
+  <li><strong>Labošana</strong> — rediģējiet jebkuru ierakstu tieši lietotnē; ja TankSync ir ieslēgts, izmaiņas tiek sinhronizētas.</li>
+  <li><strong>Dzēšana</strong> — skatīt 8. sadaļu.</li>
+  <li><strong>Ierobežošana / iebildumi</strong> — iestatījumos izslēdziet TankSync, braucienu sinhronizāciju, flīžu starpniekserveri vai diagnostiku; ierīces iestatījumos atsauciet atrašanās vietas, Bluetooth, kameras vai paziņojumu atļauju.</li>
+  <li><strong>Piekrišanas atsaukšana</strong> — Iestatījumi → Privātums un dati uzskaita katru piekrišanu ar tās sniegšanas datumu un Jūsu redzēto politikas versiju; katru var izslēgt, un lietotne nekavējoties pārtrauc attiecīgo apstrādi.</li>
+  <li><strong>Sūdzība</strong> — Jūs varat iesniegt sūdzību uzraudzības iestādei, jo īpaši tajā ES dalībvalstī, kurā ir Jūsu pastāvīgā dzīvesvieta, darba vieta vai iespējamā pārkāpuma izdarīšanas vieta. Mēs būtu pateicīgi par iespēju vispirms pašiem atrisināt Jūsu jautājumu: <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a>.</li>
+</ul>
+
+<h2>8. Konta un datu dzēšana</h2>
+<p>Visu varat izdzēst paši, tieši lietotnē — atbalsta pieprasījums nav nepieciešams:</p>
+<ul>
+  <li><strong>Lokālie dati:</strong> Iestatījumi → Privātuma panelis → Dzēst visus datus noņem katru datubāzi, ko lietotne glabā ierīcē — profilus, izlasi, brīdinājumus, cenu vēsturi, kešatmiņā saglabātās cenas, transportlīdzekļus, uzpildes, ierakstītos braucienus un to GPS paraugus, OBD2 bāzes vērtības un adapteru kešatmiņas, apkopes atgādinājumus, sasniegumus, kļūdu pēdas, API atslēgas, pilnvaras un sākuma ekrāna logrīka datus — un atgriež lietotni pirmās palaišanas stāvoklī.</li>
+  <li><strong>TankSync konts un servera dati:</strong> TankSync → Datu caurskatāmība → Dzēst kontu vienā transakcijā dzēš katru Jums piederošo rindu (izlasi, brīdinājumus, ignorētās stacijas, cenu ziņojumus, ziņojumus par saturu, transportlīdzekļus, uzpildes, maršrutus, bāzes vērtības, vērtējumus, braucienus, Jūsu sniegtos vai saņemtos braucienu kopīgojumus, gaidīšanas laika signālus, sinhronizācijas iestatījumus, dzēšanas ierakstus un Jūsu lietotāja rindu) un pēc tam dzēš pašu konta identitāti, tostarp jebkuru piesaistīto e-pasta adresi. Ja kādu tabulu neizdevās dzēst, lietotne paziņo, kuru, nevis apgalvo, ka viss izdevies. Šo darbību nevar atsaukt.</li>
+  <li><strong>Atsevišķi vienumi:</strong> katru izlases ierakstu, brīdinājumu, transportlīdzekli, uzpildi, braucienu, cenu ziņojumu un ziņojumu par saturu var dzēst atsevišķi; dzēšana tiek pārnesta uz citām Jūsu ierīcēm.</li>
+</ul>
+<p>Ja Jūs vairs nevarat piekļūt lietotnei, dzēšanu varat pieprasīt, sazinoties ar izstrādātāju (11. sadaļa); lūdzu, rakstiet no kontam piesaistītās e-pasta adreses, lai mēs varētu pārbaudīt piederību. Anonīmu kontu, kas nekad nav bijis piesaistīts e-pastam, neviens — arī mēs — nevar identificēt bez ierīces, kurā tas tika izveidots.</p>
+
+<h2>9. Bērnu privātums</h2>
+<p>Lietotne nav paredzēta bērniem, kas jaunāki par 16 gadiem. Mēs apzināti nevācam bērnu personas datus; ja Jūs uzskatāt, ka bērns ir izveidojis TankSync kontu, sazinieties ar mums, un mēs to dzēsīsim.</p>
+
+<h2>10. Šīs politikas izmaiņas</h2>
+<p>Izmaiņas tiek publicētas šajā URL ar jaunu versijas numuru un datumu; lietotne reģistrē versiju, kurai Jūs piekritāt, un, versijai mainoties, atkārtoti parāda šo lapu.</p>
+<ul>
+  <li><strong>v3 — 2026. gada 29. augusts:</strong> pārzinis un lomas katram režīmam, apstrādes tabula ar tiesiskajiem pamatiem un glabāšanas ilgumu, pilns apstrādātāju saraksts (flīžu starpniekserveris, ģeokodētājs, maršrutēšana, GitHub, zīmolu logotipi), tiesību īstenošanas ceļi, pilnīga dzēšana un eksports.</li>
+  <li><strong>v2 — 2026. gada 15. augusts:</strong> konta dzēšanas sadaļa; deklarēti e-pasta un TankSync konta dati.</li>
+  <li><strong>v1 — 2026. gada 7. aprīlis:</strong> pirmā versija.</li>
+</ul>
+
+<h2>11. Kontakti</h2>
+<div class="contact">
+  <p><strong>Izstrādātājs un pārzinis:</strong> Florian DITTGEN</p>
+  <p><strong>E-pasts:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
+  <p><strong>Pirmkods:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
+</div>
+
+</body>
+</html>

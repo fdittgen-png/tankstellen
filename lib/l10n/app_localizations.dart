@@ -5020,7 +5020,7 @@ abstract class AppLocalizations {
   /// No description provided for @syncModeCommunitySubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Share favorites & ratings with all users'**
+  /// **'Shared database run by the developer — see what syncs below'**
   String get syncModeCommunitySubtitle;
 
   /// No description provided for @syncModePrivateTitle.
@@ -9314,6 +9314,168 @@ abstract class AppLocalizations {
   /// **'When off, badges, scores and trophy icons are hidden across the app.'**
   String get profileGamificationToggleSubtitle;
 
+  /// Link label on the consent screen and in Settings → Privacy & data; opens the online privacy policy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy policy (version {version})'**
+  String gdprPolicyLink(int version);
+
+  /// Settings → Privacy & data footer: when the user last saved their consent choices and against which policy version.
+  ///
+  /// In en, this message translates to:
+  /// **'Consent given on {date} · policy version {version}'**
+  String consentRecordedAt(String date, int version);
+
+  /// Settings → Privacy & data footer when the consent record is missing (pre-3866 install).
+  ///
+  /// In en, this message translates to:
+  /// **'No consent recorded yet'**
+  String get consentNotRecorded;
+
+  /// Error snackbar after Delete account / Delete everything when one or more tables failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Some server data could not be erased: {tables}. Retry, or contact the developer with this list.'**
+  String serverErasurePartial(String tables);
+
+  /// Error snackbar after Delete all data when a step failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Some local data could not be erased: {steps}. Restart the app and retry.'**
+  String localErasurePartial(String steps);
+
+  /// Data Transparency card listing the user's own price reports and content reports with a delete action each.
+  ///
+  /// In en, this message translates to:
+  /// **'My community reports'**
+  String get myCommunityReportsTitle;
+
+  /// Empty state of the My community reports card.
+  ///
+  /// In en, this message translates to:
+  /// **'You have not submitted any reports'**
+  String get myCommunityReportsEmpty;
+
+  /// Tooltip of the per-report delete icon.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this report'**
+  String get deleteReportTooltip;
+
+  /// Snackbar after a single report was deleted from the server.
+  ///
+  /// In en, this message translates to:
+  /// **'Report deleted'**
+  String get reportDeleted;
+
+  /// Snackbar when a single-report delete failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not delete the report'**
+  String get reportDeleteFailed;
+
+  /// Settings → Privacy & data: header of the non-consent privacy switches (tile proxy, internet logos).
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy controls'**
+  String get privacyControlsTitle;
+
+  /// Switch title. Sparkilo is the app name.
+  ///
+  /// In en, this message translates to:
+  /// **'Route map tiles through the Sparkilo proxy'**
+  String get tileProxyToggleTitle;
+
+  /// Switch explanation for the tile proxy.
+  ///
+  /// In en, this message translates to:
+  /// **'On: the map viewport and your IP address reach the developer\'s EU server, which fetches the tiles from OpenStreetMap. Off: tiles load from tile.openstreetmap.org directly.'**
+  String get tileProxyToggleSubtitle;
+
+  /// Switch title for fetching station brand logos from logo.clearbit.com.
+  ///
+  /// In en, this message translates to:
+  /// **'Load brand logos from the internet'**
+  String get remoteLogosToggleTitle;
+
+  /// Switch explanation for internet brand logos.
+  ///
+  /// In en, this message translates to:
+  /// **'Off by default: bundled placeholders are shown. On: logos are fetched from logo.clearbit.com, which sees your IP address.'**
+  String get remoteLogosToggleSubtitle;
+
+  /// Privacy Dashboard button: one ZIP with every local category and every server table (GDPR Art. 20).
+  ///
+  /// In en, this message translates to:
+  /// **'Export all my data (ZIP)'**
+  String get privacyExportAllButton;
+
+  /// Snackbar after the full export ZIP was written.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved {fileName} to Downloads — {count} files inside'**
+  String privacyExportAllSuccess(String fileName, int count);
+
+  /// Error snackbar when the full export ZIP could not be saved to Downloads.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not write the export file'**
+  String get privacyExportAllFailed;
+
+  /// Controller notice under the 'Sparkilo Community' card of the TankSync mode picker (#3871, Epic #3865 GDPR). Names the data controller (privacy policy v3 Section 2), the hosting processor/region and every data category the shared database receives. {operator} is the developer's name (a proper noun, never translated).
+  ///
+  /// In en, this message translates to:
+  /// **'Operated by {operator} · Supabase, EU (Frankfurt) · syncs favorites, alerts, vehicles incl. VIN, fill-ups, ratings, reports and — if you enable it — trips with GPS'**
+  String syncModeCommunityControllerNotice(String operator);
+
+  /// Controller notice under the 'Private Database' card of the TankSync mode picker (#3871): the user connects their own Supabase project and is the data controller themselves.
+  ///
+  /// In en, this message translates to:
+  /// **'You are the controller — your own Supabase project, we never see it'**
+  String get syncModePrivateControllerNotice;
+
+  /// Controller notice under the 'Join a Group' card of the TankSync mode picker (#3871): the family member / friend who runs the shared Supabase project is the data controller.
+  ///
+  /// In en, this message translates to:
+  /// **'The person who owns the shared database is the controller of your data'**
+  String get syncModeJoinControllerNotice;
+
+  /// Title of the one-time dialog shown before the user's FIRST public contribution — a community price report, or switching station ratings to 'shared' (#3871, Epic #3865 GDPR).
+  ///
+  /// In en, this message translates to:
+  /// **'Shared with other users'**
+  String get ugcPublicNoticeTitle;
+
+  /// Body of the one-time public-contribution notice (#3871): where the content is stored, who can read it, and how to delete it. 'Sparkilo Community' is the product name of the shared database; 'TankSync' and 'Data Transparency' are the sync feature and its screen title as shown in the app.
+  ///
+  /// In en, this message translates to:
+  /// **'This is stored in the sync database under your pseudonymous user ID. In Sparkilo Community every signed-in user can read it. You can delete it any time from TankSync → Data Transparency.'**
+  String get ugcPublicNoticeBody;
+
+  /// Title of the Privacy Dashboard card listing the community-content authors the user blocked on this device (#3871; block flow from #3726).
+  ///
+  /// In en, this message translates to:
+  /// **'Blocked users'**
+  String get blockedAuthorsTitle;
+
+  /// Explainer under the 'Blocked users' card title (#3871): the block list is device-local and hides the author's shared content; Unblock reverses it.
+  ///
+  /// In en, this message translates to:
+  /// **'Content shared by these users is hidden on this device. Unblock to see it again.'**
+  String get blockedAuthorsDescription;
+
+  /// Empty state of the 'Blocked users' card when the device-local block list is empty (#3871).
+  ///
+  /// In en, this message translates to:
+  /// **'No blocked users'**
+  String get blockedAuthorsEmpty;
+
+  /// Button next to each blocked user id in the 'Blocked users' card that removes the block so their shared content shows again (#3871).
+  ///
+  /// In en, this message translates to:
+  /// **'Unblock'**
+  String get blockedAuthorsUnblock;
+
   /// GPS-only coaching tile (#2058): the driver is cruising downhill with no recent brake event; lifting off would let the car coast more efficiently.
   ///
   /// In en, this message translates to:
@@ -11555,6 +11717,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{open, select, true{Station is open} false{Station is closed} other{Open state unknown}}'**
   String stationOpenStateSemantic(String open);
+
+  /// Title of the GDPR pre-permission rationale shown once before the OS camera prompt (receipt / pump-display / QR scan) (#3872).
+  ///
+  /// In en, this message translates to:
+  /// **'Camera Access'**
+  String get permissionRationaleCameraTitle;
+
+  /// Bold lead sentence of the camera rationale explaining why the camera is requested (#3872).
+  ///
+  /// In en, this message translates to:
+  /// **'This app would like to use your camera to read receipts, pump displays and QR codes.'**
+  String get permissionRationaleCameraSubtitle;
+
+  /// Heading above the transparency bullets in the camera rationale (#3872).
+  ///
+  /// In en, this message translates to:
+  /// **'What happens with the camera image:'**
+  String get permissionRationaleCameraWhatHappens;
+
+  /// First camera bullet: the image is read by on-device OCR / QR decoding only (#3872).
+  ///
+  /// In en, this message translates to:
+  /// **'The image is used only to read the receipt, the pump display or the QR code — recognition runs on your device.'**
+  String get permissionRationaleCameraBulletOnDevice;
+
+  /// Second camera bullet: no photo is kept after the scan (#3872).
+  ///
+  /// In en, this message translates to:
+  /// **'The photo is discarded after the scan.'**
+  String get permissionRationaleCameraBulletDiscarded;
+
+  /// Third camera bullet: the only upload is the explicit, confirmed bad-scan report (#3872).
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing is uploaded unless you file a bad-scan report and confirm it.'**
+  String get permissionRationaleCameraBulletNoUpload;
+
+  /// Title of the GDPR pre-permission rationale shown once before the OS Bluetooth prompt (OBD2 adapter) (#3872).
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth Access'**
+  String get permissionRationaleBluetoothTitle;
+
+  /// Bold lead sentence of the Bluetooth rationale explaining why Bluetooth is requested. 'OBD2' is a technical standard name (#3872).
+  ///
+  /// In en, this message translates to:
+  /// **'This app would like to use Bluetooth to connect to your OBD2 adapter.'**
+  String get permissionRationaleBluetoothSubtitle;
+
+  /// Heading above the transparency bullets in the Bluetooth rationale (#3872).
+  ///
+  /// In en, this message translates to:
+  /// **'What happens with Bluetooth:'**
+  String get permissionRationaleBluetoothWhatHappens;
+
+  /// First Bluetooth bullet: the radio is used for the OBD2 adapter only (#3872).
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth is used only to find and talk to your OBD2 adapter.'**
+  String get permissionRationaleBluetoothBulletAdapterOnly;
+
+  /// Second Bluetooth bullet: the adapter MAC / identifier is local, synced only through the user's own TankSync as part of the vehicle profile. 'TankSync' is a product name (#3872).
+  ///
+  /// In en, this message translates to:
+  /// **'The adapter identifier stays on your device — it is synced only with TankSync, as part of the vehicle profile.'**
+  String get permissionRationaleBluetoothBulletIdentifierLocal;
+
+  /// Third Bluetooth bullet: explains the legacy Android ≤ 11 location prompt that Bluetooth scanning triggers. 'Android' is a platform name (#3872).
+  ///
+  /// In en, this message translates to:
+  /// **'On Android 11 and below the system also asks for location, because Bluetooth scanning is a location-class permission there.'**
+  String get permissionRationaleBluetoothBulletLegacyLocation;
+
+  /// Title of the GDPR pre-permission rationale shown once before the OS notification prompt (price alerts, trip auto-record status) (#3872).
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get permissionRationaleNotificationsTitle;
+
+  /// Bold lead sentence of the notifications rationale explaining why notifications are requested (#3872).
+  ///
+  /// In en, this message translates to:
+  /// **'This app would like to send you notifications for price alerts and the trip-recording status.'**
+  String get permissionRationaleNotificationsSubtitle;
+
+  /// Heading above the transparency bullets in the notifications rationale (#3872).
+  ///
+  /// In en, this message translates to:
+  /// **'What happens with notifications:'**
+  String get permissionRationaleNotificationsWhatHappens;
+
+  /// First notifications bullet: the two local uses of notifications (#3872).
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are used for local price alerts and the trip-recording status.'**
+  String get permissionRationaleNotificationsBulletLocal;
+
+  /// Second notifications bullet: notifications are local, no push service, nothing is sent anywhere (#3872).
+  ///
+  /// In en, this message translates to:
+  /// **'They are generated on your device — nothing leaves the device.'**
+  String get permissionRationaleNotificationsBulletNothingLeaves;
+
+  /// Revoke hint shared by the camera / Bluetooth / notifications rationale dialogs (#3872).
+  ///
+  /// In en, this message translates to:
+  /// **'You can revoke this in your device settings at any time.'**
+  String get permissionRationaleRevoke;
+
+  /// Legal-basis footnote shared by the camera / Bluetooth / notifications rationale dialogs. 'GDPR' is the established English/EU abbreviation; the article reference is the legal citation (#3872).
+  ///
+  /// In en, this message translates to:
+  /// **'Legal basis: Art. 6(1)(a) GDPR (Consent)'**
+  String get permissionRationaleLegalBasis;
 
   /// #2393 — unit caption under the big GPS-estimated consumption figure on the PiP tile (the GPS-only branch added by #2390). Marks the value as an estimate ('est.') so it reads distinctly from the OBD2-measured 'L/100 km' caption — the leading '~' on the figure carries the same meaning visually. Short, fits a narrow PiP window.
   ///

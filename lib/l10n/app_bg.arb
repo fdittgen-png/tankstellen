@@ -781,7 +781,7 @@
   "syncHowToSyncQuestion": "Как искате да синхронизирате?",
   "syncOfflineDescription": "Приложението работи напълно офлайн. Облачната синхронизация е незадължителна.",
   "syncModeCommunityTitle": "Sparkilo общност",
-  "syncModeCommunitySubtitle": "Споделяйте любими и оценки с всички потребители",
+  "syncModeCommunitySubtitle": "Споделена база данни, управлявана от разработчика — вижте по-долу какво се синхронизира",
   "syncModePrivateTitle": "Частна база данни",
   "syncModePrivateSubtitle": "Ваш собствен Supabase — пълен контрол върху данните",
   "syncModeGroupTitle": "Присъедини се към група",
@@ -4721,5 +4721,99 @@
         "type": "String"
       }
     }
-  }
+  },
+  "gdprPolicyLink": "Политика за поверителност (версия {version})",
+  "@gdprPolicyLink": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentRecordedAt": "Съгласие, дадено на {date} · версия на политиката {version}",
+  "@consentRecordedAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentNotRecorded": "Все още няма записано съгласие",
+  "serverErasurePartial": "Някои данни на сървъра не можаха да бъдат изтрити: {tables}. Опитайте отново или се свържете с разработчика с този списък.",
+  "@serverErasurePartial": {
+    "placeholders": {
+      "tables": {
+        "type": "String"
+      }
+    }
+  },
+  "localErasurePartial": "Някои локални данни не можаха да бъдат изтрити: {steps}. Рестартирайте приложението и опитайте отново.",
+  "@localErasurePartial": {
+    "placeholders": {
+      "steps": {
+        "type": "String"
+      }
+    }
+  },
+  "myCommunityReportsTitle": "Моите доклади към общността",
+  "myCommunityReportsEmpty": "Не сте изпратили нито един доклад",
+  "deleteReportTooltip": "Изтриване на този доклад",
+  "reportDeleted": "Докладът е изтрит",
+  "reportDeleteFailed": "Докладът не можа да бъде изтрит",
+  "privacyControlsTitle": "Настройки за поверителност",
+  "tileProxyToggleTitle": "Зареждане на картните плочки през проксито на Sparkilo",
+  "tileProxyToggleSubtitle": "Вкл.: видимата област на картата и вашият IP адрес достигат до сървъра на разработчика в ЕС, който взема плочките от OpenStreetMap. Изкл.: плочките се зареждат директно от tile.openstreetmap.org.",
+  "remoteLogosToggleTitle": "Зареждане на лога на марки от интернет",
+  "remoteLogosToggleSubtitle": "По подразбиране изкл.: показват се вградени заместващи изображения. Вкл.: логата се вземат от logo.clearbit.com, който вижда вашия IP адрес.",
+  "privacyExportAllButton": "Експортиране на всички мои данни (ZIP)",
+  "privacyExportAllSuccess": "{fileName} е записан в Downloads — {count} файла вътре",
+  "@privacyExportAllSuccess": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "privacyExportAllFailed": "Експортният файл не можа да бъде записан",
+  "syncModeCommunityControllerNotice": "Управлява се от {operator} · Supabase, ЕС (Франкфурт) · синхронизира любими, известия, превозни средства вкл. VIN, зареждания, оценки, доклади и — ако го включите — пътувания с GPS",
+  "@syncModeCommunityControllerNotice": {
+    "placeholders": {
+      "operator": {
+        "type": "String"
+      }
+    }
+  },
+  "syncModePrivateControllerNotice": "Вие сте администраторът на данните — вашият собствен Supabase проект, ние никога не го виждаме",
+  "syncModeJoinControllerNotice": "Собственикът на споделената база данни е администратор на вашите данни",
+  "ugcPublicNoticeTitle": "Споделено с други потребители",
+  "ugcPublicNoticeBody": "Това се съхранява в базата данни за синхронизация под вашия псевдонимен потребителски идентификатор. В Sparkilo общността всеки влязъл потребител може да го прочете. Можете да го изтриете по всяко време от TankSync → Прозрачност на данните.",
+  "blockedAuthorsTitle": "Блокирани потребители",
+  "blockedAuthorsDescription": "Съдържанието, споделено от тези потребители, е скрито на това устройство. Отблокирайте ги, за да го видите отново.",
+  "blockedAuthorsEmpty": "Няма блокирани потребители",
+  "blockedAuthorsUnblock": "Отблокиране",
+  "permissionRationaleCameraTitle": "Достъп до камерата",
+  "permissionRationaleCameraSubtitle": "Това приложение иска да използва камерата ви, за да чете касови бележки, дисплеи на колонки и QR кодове.",
+  "permissionRationaleCameraWhatHappens": "Какво се случва с изображението от камерата:",
+  "permissionRationaleCameraBulletOnDevice": "Изображението се използва само за прочитане на касовата бележка, дисплея на колонката или QR кода — разпознаването се извършва на вашето устройство.",
+  "permissionRationaleCameraBulletDiscarded": "Снимката се изтрива след сканирането.",
+  "permissionRationaleCameraBulletNoUpload": "Нищо не се качва, освен ако не подадете сигнал за грешно сканиране и не го потвърдите.",
+  "permissionRationaleBluetoothTitle": "Достъп до Bluetooth",
+  "permissionRationaleBluetoothSubtitle": "Това приложение иска да използва Bluetooth, за да се свърже с вашия OBD2 адаптер.",
+  "permissionRationaleBluetoothWhatHappens": "Какво се случва с Bluetooth:",
+  "permissionRationaleBluetoothBulletAdapterOnly": "Bluetooth се използва само за намиране на вашия OBD2 адаптер и за комуникация с него.",
+  "permissionRationaleBluetoothBulletIdentifierLocal": "Идентификаторът на адаптера остава на вашето устройство — той се синхронизира само чрез TankSync като част от профила на превозното средство.",
+  "permissionRationaleBluetoothBulletLegacyLocation": "На Android 11 и по-стари версии системата иска и достъп до местоположението, защото там Bluetooth сканирането се счита за разрешение за местоположение.",
+  "permissionRationaleNotificationsTitle": "Известия",
+  "permissionRationaleNotificationsSubtitle": "Това приложение иска да ви изпраща известия за ценови сигнали и за състоянието на записа на пътуването.",
+  "permissionRationaleNotificationsWhatHappens": "Какво се случва с известията:",
+  "permissionRationaleNotificationsBulletLocal": "Известията се използват за локални ценови сигнали и за състоянието на записа на пътуването.",
+  "permissionRationaleNotificationsBulletNothingLeaves": "Те се генерират на вашето устройство — нищо не напуска устройството.",
+  "permissionRationaleRevoke": "Можете да отмените това по всяко време в настройките на устройството.",
+  "permissionRationaleLegalBasis": "Правно основание: чл. 6, пар. 1, б. „а“ от ОРЗД (съгласие)"
 }

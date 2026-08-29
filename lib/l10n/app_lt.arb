@@ -781,7 +781,7 @@
   "syncHowToSyncQuestion": "Kaip norėtumėte sinchronizuoti?",
   "syncOfflineDescription": "Jūsų programa veikia visapusiškai neprisijungus. Debesų sinchronizavimas yra neprivalomas.",
   "syncModeCommunityTitle": "Sparkilo bendruomenė",
-  "syncModeCommunitySubtitle": "Bendrinkite mėgstamus ir įvertinimus su visais naudotojais",
+  "syncModeCommunitySubtitle": "Bendra duomenų bazė, kurią valdo kūrėjas — žemiau matote, kas sinchronizuojama",
   "syncModePrivateTitle": "Privati duomenų bazė",
   "syncModePrivateSubtitle": "Jūsų paties Supabase — visiškas duomenų valdymas",
   "syncModeGroupTitle": "Prisijungti prie grupės",
@@ -4721,5 +4721,99 @@
         "type": "String"
       }
     }
-  }
+  },
+  "gdprPolicyLink": "Privatumo politika (versija {version})",
+  "@gdprPolicyLink": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentRecordedAt": "Sutikimas duotas {date} · politikos versija {version}",
+  "@consentRecordedAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentNotRecorded": "Sutikimas dar neužregistruotas",
+  "serverErasurePartial": "Kai kurių serverio duomenų nepavyko ištrinti: {tables}. Bandykite dar kartą arba susisiekite su kūrėju pateikdami šį sąrašą.",
+  "@serverErasurePartial": {
+    "placeholders": {
+      "tables": {
+        "type": "String"
+      }
+    }
+  },
+  "localErasurePartial": "Kai kurių vietinių duomenų nepavyko ištrinti: {steps}. Paleiskite programą iš naujo ir bandykite dar kartą.",
+  "@localErasurePartial": {
+    "placeholders": {
+      "steps": {
+        "type": "String"
+      }
+    }
+  },
+  "myCommunityReportsTitle": "Mano pranešimai bendruomenei",
+  "myCommunityReportsEmpty": "Nepateikėte nė vieno pranešimo",
+  "deleteReportTooltip": "Ištrinti šį pranešimą",
+  "reportDeleted": "Pranešimas ištrintas",
+  "reportDeleteFailed": "Nepavyko ištrinti pranešimo",
+  "privacyControlsTitle": "Privatumo valdymas",
+  "tileProxyToggleTitle": "Įkelti žemėlapio plyteles per Sparkilo tarpinį serverį",
+  "tileProxyToggleSubtitle": "Įjungta: matoma žemėlapio sritis ir jūsų IP adresas pasiekia kūrėjo ES serverį, kuris plyteles gauna iš OpenStreetMap. Išjungta: plytelės įkeliamos tiesiai iš tile.openstreetmap.org.",
+  "remoteLogosToggleTitle": "Įkelti prekių ženklų logotipus iš interneto",
+  "remoteLogosToggleSubtitle": "Pagal numatytuosius nustatymus išjungta: rodomi programoje įtraukti vietos rezervavimo ženklai. Įjungta: logotipai gaunami iš logo.clearbit.com, kuris mato jūsų IP adresą.",
+  "privacyExportAllButton": "Eksportuoti visus mano duomenis (ZIP)",
+  "privacyExportAllSuccess": "{fileName} išsaugota atsisiuntimų aplanke — viduje {count} failų",
+  "@privacyExportAllSuccess": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "privacyExportAllFailed": "Nepavyko įrašyti eksporto failo",
+  "syncModeCommunityControllerNotice": "Valdo {operator} · Supabase, ES (Frankfurt) · sinchronizuoja mėgstamiausius, įspėjimus, transporto priemones su VIN, degalų pylimus, įvertinimus, pranešimus ir — jei įjungsite — keliones su GPS",
+  "@syncModeCommunityControllerNotice": {
+    "placeholders": {
+      "operator": {
+        "type": "String"
+      }
+    }
+  },
+  "syncModePrivateControllerNotice": "Duomenų valdytojas esate jūs — jūsų paties Supabase projektas, mes jo niekada nematome",
+  "syncModeJoinControllerNotice": "Bendros duomenų bazės savininkas yra jūsų duomenų valdytojas",
+  "ugcPublicNoticeTitle": "Bendrinama su kitais naudotojais",
+  "ugcPublicNoticeBody": "Tai saugoma sinchronizavimo duomenų bazėje su jūsų pseudoniminiu naudotojo ID. Sparkilo bendruomenėje tai gali perskaityti kiekvienas prisijungęs naudotojas. Bet kada galite tai ištrinti čia: TankSync → Duomenų skaidrumas.",
+  "blockedAuthorsTitle": "Užblokuoti naudotojai",
+  "blockedAuthorsDescription": "Šių naudotojų bendrinamas turinys šiame įrenginyje paslėptas. Atblokuokite, kad vėl jį matytumėte.",
+  "blockedAuthorsEmpty": "Užblokuotų naudotojų nėra",
+  "blockedAuthorsUnblock": "Atblokuoti",
+  "permissionRationaleCameraTitle": "Kameros prieiga",
+  "permissionRationaleCameraSubtitle": "Ši programa nori naudoti jūsų kamerą kvitams, kolonėlių ekranams ir QR kodams nuskaityti.",
+  "permissionRationaleCameraWhatHappens": "Kas vyksta su kameros vaizdu:",
+  "permissionRationaleCameraBulletOnDevice": "Vaizdas naudojamas tik kvitui, kolonėlės ekranui arba QR kodui nuskaityti — atpažinimas vyksta jūsų įrenginyje.",
+  "permissionRationaleCameraBulletDiscarded": "Nuotrauka po nuskaitymo pašalinama.",
+  "permissionRationaleCameraBulletNoUpload": "Niekas neįkeliama, nebent pateikiate pranešimą apie klaidingą nuskaitymą ir jį patvirtinate.",
+  "permissionRationaleBluetoothTitle": "Bluetooth prieiga",
+  "permissionRationaleBluetoothSubtitle": "Ši programa nori naudoti Bluetooth, kad prisijungtų prie jūsų OBD2 adapterio.",
+  "permissionRationaleBluetoothWhatHappens": "Kas vyksta su Bluetooth:",
+  "permissionRationaleBluetoothBulletAdapterOnly": "Bluetooth naudojamas tik jūsų OBD2 adapteriui rasti ir su juo susisiekti.",
+  "permissionRationaleBluetoothBulletIdentifierLocal": "Adapterio identifikatorius lieka jūsų įrenginyje — jis sinchronizuojamas tik per TankSync kaip transporto priemonės profilio dalis.",
+  "permissionRationaleBluetoothBulletLegacyLocation": "Android 11 ir senesnėse versijose sistema taip pat prašo vietos, nes Bluetooth paieška ten laikoma vietos leidimu.",
+  "permissionRationaleNotificationsTitle": "Pranešimai",
+  "permissionRationaleNotificationsSubtitle": "Ši programa nori siųsti jums pranešimus apie kainų įspėjimus ir kelionės įrašymo būseną.",
+  "permissionRationaleNotificationsWhatHappens": "Kas vyksta su pranešimais:",
+  "permissionRationaleNotificationsBulletLocal": "Pranešimai naudojami vietiniams kainų įspėjimams ir kelionės įrašymo būsenai.",
+  "permissionRationaleNotificationsBulletNothingLeaves": "Jie sukuriami jūsų įrenginyje — niekas nepalieka įrenginio.",
+  "permissionRationaleRevoke": "Tai galite bet kada atšaukti įrenginio nustatymuose.",
+  "permissionRationaleLegalBasis": "Teisinis pagrindas: BDAR 6 str. 1 d. a punktas (sutikimas)"
 }

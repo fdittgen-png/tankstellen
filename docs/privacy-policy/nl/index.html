@@ -9,101 +9,144 @@
 <body>
 
 <h1>Privacybeleid</h1>
-<p class="meta">Sparkilo (de.tankstellen.tankstellen op iOS, de.tankstellen.fuelprices op Android) &mdash; Laatst bijgewerkt: 15 augustus 2026</p>
-<p class="langs">Beschikbare talen: <a href="../">English</a> <a href="../de/">Deutsch</a> <a href="../fr/">Français</a> <a href="../es/">Español</a> <a href="../it/">Italiano</a> <a href="../nl/">Nederlands</a> <a href="../pt/">Português</a> <a href="../sv/">Svenska</a> <a href="../fi/">Suomi</a> <a href="../da/">Dansk</a> <a href="../pl/">Polski</a> <a href="../sl/">Slovenščina</a> <a href="../ko/">한국어</a></p>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen op iOS, de.tankstellen.fuelprices op Android) &mdash; Version 3 &mdash; Laatst bijgewerkt: 29 augustus 2026</p>
+<p class="langs">Beschikbare talen: <a href="../">English</a> <a href="../bg/">Български</a> <a href="../cs/">Čeština</a> <a href="../da/">Dansk</a> <a href="../de/">Deutsch</a> <a href="../el/">Ελληνικά</a> <a href="../es/">Español</a> <a href="../et/">Eesti</a> <a href="../fi/">Suomi</a> <a href="../fr/">Français</a> <a href="../hr/">Hrvatski</a> <a href="../hu/">Magyar</a> <a href="../it/">Italiano</a> <a href="../ko/">한국어</a> <a href="../lt/">Lietuvių</a> <a href="../lv/">Latviešu</a> <a href="../nb/">Norsk</a> <a href="../nl/">Nederlands</a> <a href="../pl/">Polski</a> <a href="../pt/">Português</a> <a href="../ro/">Română</a> <a href="../sk/">Slovenčina</a> <a href="../sl/">Slovenščina</a> <a href="../sv/">Svenska</a></p>
 
 <h2>1. Overzicht</h2>
-<p>Sparkilo (voorheen Fuel Prices Europe & More) is een gratis open-source app om brandstof- en laadprijzen te vergelijken. De app is gebouwd op een <strong>local-first, privacyvriendelijke</strong> architectuur. Geen advertenties, geen tracking pixels, geen advertentie-ID's.</p>
+<p>Sparkilo is een gratis, opensource-app voor het vergelijken van brandstof- en laadprijzen, met optionele ritregistratie. De app is <strong>local-first</strong> opgebouwd: alles wat de app over u weet, blijft op uw telefoon, tenzij u een functie inschakelt die uitdrukkelijk iets anders aangeeft. Er zijn geen advertenties, geen trackingpixels, geen advertentie-ID's en geen analyse-SDK. Dit beleid is opgesteld om te voldoen aan de Algemene verordening gegevensbescherming van de EU (AVG, ook bekend als GDPR); het geldt voor elke gebruiker, waar u zich ook bevindt.</p>
+<p>De app is <a href="https://github.com/fdittgen-png/tankstellen">open source</a> — elke bewering hieronder kan in de code worden gecontroleerd. Een machineleesbaar overzicht van wat wordt verwerkt, wordt bijgehouden in <code>docs/privacy/data_inventory.json</code>, en de eigen tests van de app mislukken als deze pagina, de winkelverklaringen en de code uit elkaar gaan lopen.</p>
 
-<h2>2. Welke gegevens we gebruiken</h2>
-
-<h3>2.1 Locatie</h3>
-<p>Wanneer u de locatietoestemming verleent, leest de app uw positie om tankstations en laadpunten in de buurt te vinden; deze zoekcoördinaten worden als onderdeel van de zoekopdracht naar API's van derden gestuurd (zie sectie 4) en niet opgeslagen op een server die wij beheren. Als u ritregistratie gebruikt, registreert de app bovendien uw <strong>nauwkeurige gps-route</strong>; geregistreerde ritten worden op uw toestel opgeslagen en, alleen als u TankSync inschakelt, gesynchroniseerd met uw TankSync-backend. Geregistreerde ritten worden nooit gedeeld met derden.</p>
-
-<h3>2.2 API-sleutels die u zelf opgeeft</h3>
-<p>Als u een eigen API-sleutel opgeeft (bijv. Tankerkönig), wordt deze lokaal opgeslagen in versleutelde opslag (Android Keystore / iOS Keychain). De sleutel wordt alleen naar de bijbehorende API-aanbieder verzonden, nooit naar ons of derden.</p>
-
-<h3>2.3 Favorieten, profielen en instellingen</h3>
-<p>Uw favorieten, zoekprofielen, brandstofvoorkeuren en app-instellingen worden lokaal op uw toestel opgeslagen via Hive, een ingebedde lokale database.</p>
-
-<h3>2.4 TankSync (optionele cloud-sync)</h3>
-<p>Als u TankSync inschakelt, wordt een anoniem account aangemaakt via Supabase. Gesynchroniseerde gegevens:</p>
-<ul>
-  <li>Gebruikers-ID — standaard een anonieme UUID; u kunt optioneel een e-mailadres koppelen aan uw TankSync-account voor synchronisatie tussen apparaten</li>
-  <li>ID's van favoriete tankstations</li>
-  <li>Configuraties van prijswaarschuwingen</li>
-  <li>Community-prijsmeldingen (station-ID, brandstofsoort, prijs, tijdstempel)</li>
-  <li>Geregistreerde ritten (gps-route, afstanden, verbruiksstatistieken)</li>
-  <li>Tankbeurten (kosten, liters, kilometerstand) en voertuigprofielen</li>
-</ul>
-<p>TankSync is optioneel en standaard uitgeschakeld. U kunt alle servergegevens bekijken, exporteren en verwijderen via het scherm « Datatransparantie » in de app.</p>
-
-<h3>2.5 Crash- en diagnoserapporten (opt-in)</h3>
-<p>Als u diagnose inschakelt in Instellingen, worden anonieme crashrapporten en performance-traces naar Sentry verzonden. Er worden geen persoonlijke gegevens, locatie of inhoud meegestuurd. Diagnose staat standaard uit.</p>
-
-<h2>3. Gegevens die we NIET verzamelen</h2>
-<ul>
-  <li>Naam of telefoonnummer (een e-mailadres wordt alleen opgeslagen als u dit expliciet koppelt aan uw optionele TankSync-account)</li>
-  <li>Financiële of betalingsgegevens</li>
-  <li>Gezondheids- of fitnessgegevens</li>
-  <li>Contacten, berichten of belregistraties</li>
-  <li>Foto's, video's of bestanden (toegang tot camera en fotomappen wordt alleen gebruikt om bonnetjes te scannen wanneer u dat zelf start)</li>
-  <li>Browse-geschiedenis</li>
-  <li>Reclame-ID's van het toestel</li>
-</ul>
-
-<h2>4. Diensten van derden</h2>
-<p>De app communiceert met de volgende API's van derden:</p>
-<ul>
-  <li><strong>Tankerkönig</strong> (creativecommons.tankerkoenig.de) — Duitse prijzen. Ontvangt: zoekcoördinaten, uw API-sleutel.</li>
-  <li><strong>Prix Carburants</strong> (data.economie.gouv.fr) — Franse prijzen. Ontvangt: zoekcoördinaten.</li>
-  <li><strong>Italiaanse prijs-API</strong> (osservaprezzi.mise.gov.it) — Italiaanse prijzen. Ontvangt: zoekcoördinaten.</li>
-  <li><strong>Spaanse prijs-API</strong> (sedeaplicaciones.minetur.gob.es) — Spaanse prijzen. Ontvangt: zoekcoördinaten.</li>
-  <li><strong>Spritpreisrechner</strong> (spritpreisrechner.at) — Oostenrijkse prijzen. Ontvangt: zoekcoördinaten.</li>
-  <li><strong>FuelWatch</strong> (fuelwatch.be) — Belgische prijzen. Ontvangt: zoekcoördinaten.</li>
-  <li><strong>data.public.lu</strong> — Luxemburgse prijzen. Ontvangt: zoekcoördinaten.</li>
-  <li><strong>OpenChargeMap</strong> (api.openchargemap.io) — laadpunten voor EV's. Ontvangt: zoekcoördinaten.</li>
-  <li><strong>Nominatim / OpenStreetMap</strong> (nominatim.openstreetmap.org) — geocodering. Ontvangt: zoektekst of coördinaten.</li>
-  <li><strong>OpenStreetMap-tile-servers</strong> (tile.openstreetmap.org) — kaarttegels. Ontvangt: tegelcoördinaten.</li>
-  <li><strong>Supabase</strong> (alleen als TankSync is ingeschakeld) — cloud-sync-backend.</li>
-  <li><strong>Sentry</strong> (alleen als diagnose is ingeschakeld) — anonieme crash- en performance-rapporten.</li>
-</ul>
-<p>Elke aanbieder heeft een eigen privacybeleid. We raden u aan deze te lezen. De app deelt geen gegevens tussen deze aanbieders.</p>
-
-<h2>5. Gegevensbeveiliging</h2>
-<ul>
-  <li>Alle netwerkcommunicatie verloopt via HTTPS (TLS-versleuteling tijdens transport).</li>
-  <li>API-sleutels worden opgeslagen in de native versleutelde opslag van het platform (Android Keystore / iOS Keychain).</li>
-  <li>Lokale gegevens worden op uw toestel opgeslagen via Hive.</li>
-  <li>Er worden geen gegevens naar een server verzonden tenzij u een zoekopdracht start of TankSync / diagnose inschakelt.</li>
-</ul>
-
-<h2>6. Uw rechten</h2>
-<p>U heeft het recht om:</p>
-<ul>
-  <li><strong>Inzage</strong> — alle lokaal opgeslagen gegevens te bekijken in de Opslag-sectie van de app.</li>
-  <li><strong>Export</strong> — uw TankSync-gegevens als JSON te exporteren via het scherm Datatransparantie.</li>
-  <li><strong>Verwijdering</strong> — alle lokale gegevens te verwijderen via Instellingen → Alle gegevens verwijderen; alle servergegevens via TankSync → Datatransparantie → Alles verwijderen.</li>
-  <li><strong>Toestemming intrekken</strong> — locatietoestemming intrekken in de toestelinstellingen of TankSync / diagnose op elk moment uitschakelen.</li>
-</ul>
-
-<h2>7. Uw account en gegevens verwijderen</h2>
-<p>U kunt alles zelf verwijderen, rechtstreeks in de app — geen ondersteuningsverzoek nodig:</p>
-<ul>
-  <li><strong>Lokale gegevens:</strong> Instellingen → Alle gegevens verwijderen verwijdert alle profielen, favorieten, API-sleutels, gecachte prijzen, geregistreerde ritten en instellingen van uw toestel.</li>
-  <li><strong>TankSync-account en servergegevens:</strong> TankSync → Datatransparantie → Account verwijderen wist eerst elke rij die u bezit (favorieten, waarschuwingen, prijsmeldingen, voertuigen, tankbeurten, ritten, beoordelingen) en verwijdert vervolgens de accountidentiteit zelf, inclusief een eventueel gekoppeld e-mailadres. Dit kan niet ongedaan worden gemaakt.</li>
-</ul>
-<p>Als u geen toegang meer heeft tot de app, kunt u verwijdering aanvragen door contact op te nemen met de ontwikkelaar (sectie 10); schrijf vanaf het e-mailadres dat aan uw account is gekoppeld, zodat we het eigendom kunnen verifiëren.</p>
-
-<h2>8. Privacy van kinderen</h2>
-<p>De app is niet gericht op kinderen jonger dan 13. We verzamelen niet bewust persoonlijke gegevens van kinderen.</p>
-
-<h2>9. Wijzigingen in dit beleid</h2>
-<p>We kunnen dit beleid van tijd tot tijd aanpassen. Wijzigingen worden op deze URL gepubliceerd met een bijgewerkte datum. Voortgezet gebruik van de app betekent aanvaarding van het bijgewerkte beleid.</p>
-
-<h2>10. Contact</h2>
+<h2>2. Wie verantwoordelijk is (de verwerkingsverantwoordelijke)</h2>
+<p>De verwerkingsverantwoordelijke voor de app en voor de optionele synchronisatiedienst Sparkilo Community is:</p>
 <div class="contact">
-  <p><strong>Ontwikkelaar:</strong> Florian DITTGEN</p>
+  <p><strong>Florian DITTGEN</strong> (zelfstandig ontwikkelaar)</p>
+  <p><strong>E-mail:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
+  <p><strong>Broncode en issuetracker:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
+</div>
+<p>Afhankelijk van hoe u TankSync gebruikt, verandert de verwerkingsverantwoordelijke voor uw gesynchroniseerde gegevens:</p>
+<ul>
+  <li><strong>Geen TankSync (standaard):</strong> er wordt niets opgeslagen op een server die wij beheren. Uw gegevens blijven op uw apparaat en u heeft er als enige controle over.</li>
+  <li><strong>Privédatabase:</strong> u verbindt uw eigen Supabase-project. U bent de verwerkingsverantwoordelijke; wij zien die gegevens nooit.</li>
+  <li><strong>Deelnemen aan een groep:</strong> u verbindt een Supabase-project dat wordt beheerd door iemand die u kent (familie, vrienden). Die persoon is de verwerkingsverantwoordelijke voor de gedeelde database.</li>
+  <li><strong>Sparkilo Community:</strong> u verbindt de gedeelde database die wordt beheerd door de hierboven genoemde ontwikkelaar (Supabase, gehost in de EU — AWS eu-central-1, Frankfurt). De ontwikkelaar is de verwerkingsverantwoordelijke; Supabase, Inc. is een verwerker die gebonden is aan zijn verwerkersvoorwaarden.</li>
+</ul>
+<p>De app vertelt u welke van deze situaties van toepassing is voordat u verbinding maakt, en toont dit opnieuw onder Instellingen → Privacydashboard.</p>
+
+<h2>3. Gegevens die wij gebruiken</h2>
+<p>De tabel vermeldt elk soort persoonsgegevens dat de app verwerkt, waarom, op welke rechtsgrond (art. 6 AVG), waar ze naartoe gaan en hoe lang ze worden bewaard. „Apparaat” betekent dat de gegevens uw telefoon nooit verlaten.</p>
+<table>
+  <thead><tr><th>Gegevens</th><th>Doel</th><th>Rechtsgrond</th><th>Waar ze naartoe gaan</th><th>Bewaartermijn</th></tr></thead>
+  <tbody>
+    <tr><td>Geschatte / nauwkeurige locatie (zoeken)</td><td>Stations bij u in de buurt vinden</td><td>Toestemming (u verleent de locatiemachtiging en bevestigt de uitleg in de app)</td><td>Als zoekcoördinaten verzonden naar de prijsgegevensbron van het land waarin u zich bevindt (paragraaf 5). Niet opgeslagen op een server die wij beheren.</td><td>Laatste positie wordt op het apparaat bewaard voor de widget op het startscherm totdat u gegevens verwijdert</td></tr>
+    <tr><td>Nauwkeurige gps-route, snelheid, hoogte, bewegingssensoren (ritregistratie)</td><td>Een rit registreren, afstand en verbruik berekenen</td><td>Toestemming (u start een registratie; automatisch registreren vereist een aparte machtiging voor achtergrondlocatie per voertuig)</td><td>Apparaat. Met TankSync <em>en</em> ritsynchronisatie ingeschakeld: uw TankSync-database.</td><td>Apparaat: totdat u de rit of alle gegevens verwijdert. Server: ritsamenvattingen totdat u ze verwijdert; de gedetailleerde gps-meetpunten worden 90 dagen na de rit opgeschoond.</td></tr>
+    <tr><td>Voertuigprofiel (merk, model, bouwjaar, tankinhoud, VIN, OBD2-adapter-identificatie)</td><td>Verbruiksberekening, opnieuw verbinden met de adapter</td><td>Overeenkomst (leveren van de functie die u hebt ingesteld)</td><td>Apparaat. Met TankSync: uw TankSync-database.</td><td>Totdat u het voertuig of alle gegevens verwijdert</td></tr>
+    <tr><td>VIN (17 tekens)</td><td>Merk/model/motor online decoderen</td><td>Toestemming (aparte schakelaar, standaard uit; anders draait een offline decoder)</td><td>NHTSA vPIC (Amerikaanse openbare dienst), alleen het VIN</td><td>Niet door ons opgeslagen; zie het beleid van de NHTSA</td></tr>
+    <tr><td>Tankbeurten (datum, station, liters, kosten, kilometerstand), laadlogboeken, onderhoudsherinneringen</td><td>Uw brandstoflogboek en statistieken</td><td>Overeenkomst</td><td>Apparaat. Met TankSync: uw TankSync-database.</td><td>Totdat u ze of alle gegevens verwijdert</td></tr>
+    <tr><td>Favorieten, genegeerde stations, prijsalarmen, zoekprofielen, reisroutes, instellingen</td><td>De app personaliseren; lokale prijsalarmmeldingen activeren</td><td>Overeenkomst</td><td>Apparaat. Met TankSync: uw TankSync-database.</td><td>Totdat u ze of alle gegevens verwijdert</td></tr>
+    <tr><td>Anonieme gebruikers-ID (willekeurige UUID), optioneel e-mailadres, apparaat-ID per installatie</td><td>Uw TankSync-account op meerdere apparaten identificeren; markeren welk apparaat een record heeft verwijderd</td><td>Toestemming (schakelaar Cloudsynchronisatie) / Overeenkomst</td><td>Uw TankSync-database (Supabase)</td><td>Totdat u het account verwijdert</td></tr>
+    <tr><td>Community-prijsmeldingen, gedeelde stationsbeoordelingen, inhoudsmeldingen</td><td>Crowdsourced prijscorrecties en moderatie</td><td>Toestemming (u dient ze in; een melding legt uit dat ze onder uw pseudonieme ID worden opgeslagen en leesbaar zijn voor andere aangemelde gebruikers)</td><td>Uw TankSync-database — in Sparkilo Community leesbaar voor elke aangemelde gebruiker</td><td>Totdat u de melding of het account verwijdert</td></tr>
+    <tr><td>Crashrapporten en prestatietraces (app-versie, OS-versie, schermgrootte, taal, stacktrace, de laatste app-acties)</td><td>Fouten herstellen</td><td>Toestemming (schakelaar Foutrapportage, standaard uit)</td><td>Sentry</td><td>Apparaat: 50 meest recente traces, 7 dagen, ontdaan van e-mails, coördinaten en tokens voordat ze worden opgeslagen. Sentry: 90 dagen.</td></tr>
+    <tr><td>Foto van bon of pomp (camera / fotobibliotheek)</td><td>De bon op het apparaat lezen (OCR op het apparaat)</td><td>Toestemming (u maakt of kiest de foto)</td><td>Alleen apparaat. Alleen aan een GitHub-issue gekoppeld als u een „slechte scan”-melding indient en bevestigt.</td><td>Verwijderd na de scan; de kopie in de melding blijft op GitHub staan totdat u het issue verwijdert</td></tr>
+    <tr><td>Kaartweergave (tegelcoördinaten) en IP-adres</td><td>De kaart tekenen</td><td>Gerechtvaardigd belang (een kaart heeft tegels nodig) — u kunt de proxy uitschakelen</td><td>De Sparkilo-tegelproxy (hetzelfde Supabase-project, EU), die ophaalt bij OpenStreetMap; of rechtstreeks tile.openstreetmap.org wanneer de proxy is uitgeschakeld (Instellingen → Privacy) of in de F-Droid-build</td><td>Niet bewaard buiten de standaard serverlogboeken (proxy: 7 dagen)</td></tr>
+    <tr><td>Vertrekpunt en bestemming van de route, wegennetwerkquery's</td><td>Routezoeken, glide-coaching</td><td>Overeenkomst</td><td>OSRM (router.project-osrm.org), Overpass API (overpass-api.de), Nominatim (nominatim.openstreetmap.org)</td><td>Niet door ons opgeslagen</td></tr>
+    <tr><td>Adrestekst of coördinaten die u invoert</td><td>Geocodering</td><td>Overeenkomst</td><td>Nominatim, of de ingebouwde geocoder van uw telefoon (Apple / Google)</td><td>Niet door ons opgeslagen</td></tr>
+    <tr><td>API-sleutels die u invoert (Tankerkönig, OpenChargeMap)</td><td>Die diensten namens u aanroepen</td><td>Overeenkomst</td><td>Alleen naar de aanbieder waartoe de sleutel behoort</td><td>Versleuteld op het apparaat (Keystore / Keychain) totdat u ze verwijdert</td></tr>
+    <tr><td>Meldingen van verkeerde naam / verkeerd adres van een station, meldingen van slechte scans</td><td>De gegevens corrigeren</td><td>Toestemming (u bevestigt vóór verzending; een persoonlijk GitHub-token is vereist)</td><td>GitHub (een openbaar issue in de projectrepository)</td><td>Openbaar totdat het issue wordt verwijderd</td></tr>
+  </tbody>
+</table>
+<p>De app neemt geen geautomatiseerde besluiten over u met rechtsgevolgen of vergelijkbare aanzienlijke gevolgen. Prijsvoorspellingen worden op het apparaat berekend op basis van openbare prijsgegevens.</p>
+
+<h2>4. Gegevens die wij NIET verzamelen</h2>
+<ul>
+  <li>Naam of telefoonnummer (een e-mailadres wordt alleen opgeslagen als u er een koppelt aan uw optionele TankSync-account)</li>
+  <li>Betalings- of bankgegevens</li>
+  <li>Gezondheids- of fitnessgegevens</li>
+  <li>Contacten, berichten of oproeplogboeken</li>
+  <li>Foto's, video's of bestanden, anders dan de bonfoto die u zelf kiest om te scannen</li>
+  <li>Browsegeschiedenis</li>
+  <li>Advertentie-ID's</li>
+</ul>
+<p>Merklogo's worden met de app meegeleverd. Het laden ervan via internet (logo.clearbit.com, dat dan uw IP-adres zou ontvangen) staat uit, tenzij u het inschakelt onder Instellingen → Privacy.</p>
+
+<h2>5. Diensten van derden en gegevensbronnen</h2>
+<p>De app communiceert met de volgende diensten. Elk daarvan heeft een eigen privacybeleid. De app deelt nooit gegevens tussen deze diensten en verzendt nooit meer dan de kolommen hierboven beschrijven.</p>
+<h3>5.1 Infrastructuur (alleen wanneer de bijbehorende functie is ingeschakeld)</h3>
+<ul>
+  <li><strong>Supabase</strong> (klelxnkzrxlpzuddhpfg.supabase.co, AWS eu-central-1) — TankSync-backend voor Sparkilo Community en de tegelproxy. Verwerker onder het verwerkersaddendum van Supabase.</li>
+  <li><strong>Sentry</strong> (sentry.io) — crashrapporten en prestatietraces, uitsluitend na opt-in. Sentry kan gegevens verwerken in de Verenigde Staten; doorgiften vallen onder het EU-VS Data Privacy Framework en standaardcontractbepalingen.</li>
+  <li><strong>GitHub</strong> (api.github.com, github.com) — issuemeldingen die u uitdrukkelijk indient; de app downloadt ook openbare gegevensbestanden (snelwegafritten, stationslijsten) uit de releases van het project, waardoor GitHub uw IP-adres te zien krijgt.</li>
+  <li><strong>OpenStreetMap</strong> (tile.openstreetmap.org, nominatim.openstreetmap.org), <strong>OSRM</strong> (router.project-osrm.org), <strong>Overpass API</strong> (overpass-api.de) — kaarten, geocodering, routeberekening.</li>
+  <li><strong>OpenChargeMap</strong> (api.openchargemap.io) en <strong>ODRÉ / IRVE</strong> (odre.opendatasoft.com) — laadstations en laadprijzen. Ontvangen: zoekcoördinaten.</li>
+  <li><strong>NHTSA vPIC</strong> (vpic.nhtsa.dot.gov) — VIN-decodering, alleen met toestemming.</li>
+  <li><strong>Clearbit Logo API</strong> (logo.clearbit.com) — merklogo's, standaard uit.</li>
+  <li><strong>Apple Maps / Google Maps</strong> (www.google.com) — wordt alleen in uw browser of kaarten-app geopend wanneer u op „Navigeren” tikt.</li>
+</ul>
+<h3>5.2 Officiële brandstofprijsbronnen (ontvangen uw zoekcoördinaten of regio, nooit uw identiteit)</h3>
+<ul>
+  <li>Duitsland — Tankerkönig (creativecommons.tankerkoenig.de), met uw eigen API-sleutel</li>
+  <li>Frankrijk — Prix Carburants (data.economie.gouv.fr, donnees.roulez-eco.fr)</li>
+  <li>Italië — MIMIT osservaprezzi (carburanti.mise.gov.it)</li>
+  <li>Spanje — MITECO / Geoportal Gasolineras (sedeaplicaciones.minetur.gob.es, geoportalgasolineras.es)</li>
+  <li>Oostenrijk — E-Control Spritpreisrechner (api.e-control.at)</li>
+  <li>België en Luxemburg — data.public.lu, STATEC (lustat.statec.lu)</li>
+  <li>Portugal — DGEG (precoscombustiveis.dgeg.gov.pt)</li>
+  <li>Denemarken — OK (mobility-prices.ok.dk), Shell (shellpumpepriser.geoapp.me)</li>
+  <li>Verenigd Koninkrijk — Fuel Finder (www.fuel-finder.service.gov.uk) en de daar vermelde prijsfeeds van de detailhandelaren: applegreenstores.com, fuelprices.asconagroup.co.uk, storelocator.asda.com, www.bp.com, fuelprices.esso.co.uk, jetlocal.co.uk, api2.krlmedia.com, www.morrisons.com, moto-way.com, fuel.motorfuelgroup.com, www.rontec-servicestations.co.uk, api.sainsburys.co.uk, www.sgnretail.uk, www.shell.co.uk, www.tesco.com</li>
+  <li>Slovenië — goriva.si</li>
+  <li>Roemenië — Monitorul Prețurilor (monitorulpreturilor.info)</li>
+  <li>Griekenland — Παρατηρητήριο Τιμών (paratiritirio.mindev.gov.gr) via een community-mirror gehost op AWS eu-west-3 (5fcbs3i0z4.execute-api.eu-west-3.amazonaws.com)</li>
+  <li>Zuid-Korea — Opinet (www.opinet.co.kr)</li>
+  <li>Chili — CNE (api.cne.cl)</li>
+  <li>Argentinië — datos.energia.gob.ar</li>
+  <li>Mexico — CRE (publicacionexterna.azurewebsites.net)</li>
+  <li>Australië — FuelCheck NSW (www.fuelcheck.nsw.gov.au)</li>
+</ul>
+
+<h2>6. Gegevensbeveiliging</h2>
+<ul>
+  <li>Alle netwerkcommunicatie gebruikt HTTPS (TLS tijdens de overdracht); de app weigert onversleutelde HTTP-synchronisatie-eindpunten.</li>
+  <li>API-sleutels, uw GitHub-token en de TankSync-sessie staan in platformeigen versleutelde opslag (Android Keystore / iOS Keychain).</li>
+  <li>Lokale databases zijn AES-versleuteld met een sleutel die in de Keystore / Keychain wordt bewaard — inclusief geregistreerde ritten, voertuiggegevens, onderhoudsherinneringen en in de cache opgeslagen prijzen.</li>
+  <li>Op de server is elke tabel beveiligd met row-level security, zodat een account alleen ooit zijn eigen rijen kan lezen of verwijderen; gedeelde beoordelingen en community-prijsmeldingen zijn de enige rijen die zichtbaar zijn voor andere aangemelde gebruikers.</li>
+  <li>Fouttraces worden ontdaan van e-mailadressen, coördinaten en tokens voordat ze worden opgeslagen of verzonden.</li>
+  <li>Er worden geen gegevens naar een server verzonden, tenzij u een zoekopdracht uitvoert, een kaart opent of TankSync / diagnose inschakelt.</li>
+</ul>
+
+<h2>7. Uw rechten</h2>
+<p>Op grond van de artikelen 15–22 AVG heeft u het recht op inzage, rectificatie, wissing, beperking van de verwerking en overdraagbaarheid van uw gegevens, het recht om bezwaar te maken tegen verwerking op basis van gerechtvaardigd belang, en het recht om uw toestemming te allen tijde in te trekken zonder dat dit de rechtmatigheid van de eerdere verwerking aantast. Voor elk recht is er een knop in de app:</p>
+<ul>
+  <li><strong>Inzage</strong> — Instellingen → Privacydashboard toont elke categorie die op het apparaat is opgeslagen en, indien verbonden, elke rij in uw TankSync-database.</li>
+  <li><strong>Exporteren (overdraagbaarheid)</strong> — Privacydashboard → Al mijn gegevens exporteren maakt één ZIP-bestand met een machineleesbare JSON per categorie (favorieten, alarmen, profielen, reisroutes, prijsgeschiedenis, voertuigen, tankbeurten, ritten met gps-meetpunten en één GPX per rit, referentiewaarden, onderhoudsherinneringen, laadlogboeken, uw toestemmingsregister) plus een JSON-export van elke servertabel.</li>
+  <li><strong>Rectificatie</strong> — bewerk elk item rechtstreeks in de app; de wijziging wordt gesynchroniseerd als TankSync is ingeschakeld.</li>
+  <li><strong>Wissing</strong> — zie paragraaf 8.</li>
+  <li><strong>Beperking / bezwaar</strong> — schakel TankSync, ritsynchronisatie, de tegelproxy of diagnose uit in de Instellingen; trek de locatie-, Bluetooth-, camera- of meldingsmachtiging in via de instellingen van uw apparaat.</li>
+  <li><strong>Toestemming intrekken</strong> — Instellingen → Privacy &amp; gegevens vermeldt elke toestemming met de datum waarop u die gaf en de beleidsversie die u zag; elke toestemming kan worden uitgeschakeld, en de app stopt de bijbehorende verwerking onmiddellijk.</li>
+  <li><strong>Klacht indienen</strong> — u kunt een klacht indienen bij een toezichthoudende autoriteit, met name in de EU-lidstaat van uw gewone verblijfplaats, uw werkplek of de plaats van de vermeende inbreuk. Wij stellen het op prijs als wij eerst de kans krijgen uw zorg zelf te behandelen: <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a>.</li>
+</ul>
+
+<h2>8. Uw account en gegevens verwijderen</h2>
+<p>U kunt alles zelf verwijderen, rechtstreeks in de app — geen supportverzoek nodig:</p>
+<ul>
+  <li><strong>Lokale gegevens:</strong> Instellingen → Privacydashboard → Alle gegevens verwijderen verwijdert elke database die de app op het apparaat bijhoudt — profielen, favorieten, alarmen, prijsgeschiedenis, in de cache opgeslagen prijzen, voertuigen, tankbeurten, geregistreerde ritten en hun gps-meetpunten, OBD2-referentiewaarden en adaptercaches, onderhoudsherinneringen, prestaties, fouttraces, API-sleutels, tokens en de gegevens van de widget op het startscherm — en zet de app terug in de staat van de eerste start.</li>
+  <li><strong>TankSync-account en servergegevens:</strong> TankSync → Gegevenstransparantie → Account verwijderen wist in één transactie elke rij die van u is (favorieten, alarmen, genegeerde stations, prijsmeldingen, inhoudsmeldingen, voertuigen, tankbeurten, reisroutes, referentiewaarden, beoordelingen, ritten, ritten die u hebt gedeeld of ontvangen, wachttijdmeldingen, synchronisatie-instellingen, verwijderingsrecords en uw gebruikersrij) en verwijdert daarna de accountidentiteit zelf, inclusief een eventueel gekoppeld e-mailadres. Als een tabel niet kon worden gewist, vertelt de app u welke, in plaats van succes te claimen. Dit kan niet ongedaan worden gemaakt.</li>
+  <li><strong>Afzonderlijke items:</strong> elke favoriet, elk alarm, voertuig, elke tankbeurt, rit, prijsmelding en inhoudsmelding kan afzonderlijk worden verwijderd; verwijderingen worden doorgegeven aan uw andere apparaten.</li>
+</ul>
+<p>Als u geen toegang meer heeft tot de app, kunt u verwijdering aanvragen door contact op te nemen met de ontwikkelaar (paragraaf 11); schrijf daarbij vanaf het e-mailadres dat aan uw account is gekoppeld, zodat wij het eigendom kunnen verifiëren. Een anoniem account dat nooit aan een e-mailadres is gekoppeld, kan door niemand — ook niet door ons — worden geïdentificeerd zonder het apparaat waarop het is aangemaakt.</p>
+
+<h2>9. Privacy van kinderen</h2>
+<p>De app is niet gericht op kinderen jonger dan 16 jaar. Wij verzamelen niet bewust persoonsgegevens van kinderen; als u denkt dat een kind een TankSync-account heeft aangemaakt, neem dan contact met ons op en wij verwijderen het.</p>
+
+<h2>10. Wijzigingen in dit beleid</h2>
+<p>Wijzigingen worden op deze URL gepubliceerd met een nieuw versienummer en een nieuwe datum; de app registreert de versie waarmee u hebt ingestemd en toont deze pagina opnieuw wanneer de versie verandert.</p>
+<ul>
+  <li><strong>v3 — 29 augustus 2026:</strong> verwerkingsverantwoordelijke en rollen per modus, verwerkingstabel met rechtsgronden en bewaartermijnen, volledige lijst van verwerkers (tegelproxy, geocoder, routeberekening, GitHub, merklogo's), wegen om rechten uit te oefenen, volledige wissing en export.</li>
+  <li><strong>v2 — 15 augustus 2026:</strong> paragraaf over accountverwijdering; e-mail- en TankSync-accountgegevens vermeld.</li>
+  <li><strong>v1 — 7 april 2026:</strong> eerste versie.</li>
+</ul>
+
+<h2>11. Contact</h2>
+<div class="contact">
+  <p><strong>Ontwikkelaar en verwerkingsverantwoordelijke:</strong> Florian DITTGEN</p>
   <p><strong>E-mail:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
   <p><strong>Broncode:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
 </div>

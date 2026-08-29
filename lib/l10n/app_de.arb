@@ -1156,7 +1156,7 @@
   "syncHowToSyncQuestion": "Wie möchten Sie synchronisieren?",
   "syncOfflineDescription": "Die App funktioniert vollständig offline. Cloud-Sync ist optional.",
   "syncModeCommunityTitle": "Tankstellen-Gemeinschaft",
-  "syncModeCommunitySubtitle": "Favoriten & Bewertungen mit allen Nutzern teilen",
+  "syncModeCommunitySubtitle": "Gemeinsame Datenbank, betrieben vom Entwickler — was synchronisiert wird, steht unten",
   "syncModePrivateTitle": "Private Datenbank",
   "syncModePrivateSubtitle": "Eigene Supabase — volle Datenkontrolle",
   "syncModeGroupTitle": "Gruppe beitreten",
@@ -2421,6 +2421,40 @@
   "@profileGamificationToggleSubtitle": {
     "description": "Subtitle explaining what the gamification opt-out toggle hides (#1194)."
   },
+  "gdprPolicyLink": "Datenschutzerklärung (Version {version})",
+  "consentRecordedAt": "Einwilligung erteilt am {date} · Datenschutzerklärung Version {version}",
+  "consentNotRecorded": "Noch keine Einwilligung gespeichert",
+  "serverErasurePartial": "Einige Serverdaten konnten nicht gelöscht werden: {tables}. Bitte erneut versuchen oder den Entwickler mit dieser Liste kontaktieren.",
+  "localErasurePartial": "Einige lokale Daten konnten nicht gelöscht werden: {steps}. App neu starten und erneut versuchen.",
+  "myCommunityReportsTitle": "Meine Community-Meldungen",
+  "myCommunityReportsEmpty": "Du hast noch keine Meldungen eingereicht",
+  "deleteReportTooltip": "Diese Meldung löschen",
+  "reportDeleted": "Meldung gelöscht",
+  "reportDeleteFailed": "Meldung konnte nicht gelöscht werden",
+  "privacyControlsTitle": "Datenschutz-Einstellungen",
+  "tileProxyToggleTitle": "Kartenkacheln über den Sparkilo-Proxy laden",
+  "tileProxyToggleSubtitle": "An: Kartenausschnitt und IP-Adresse erreichen den EU-Server des Entwicklers, der die Kacheln von OpenStreetMap holt. Aus: Kacheln kommen direkt von tile.openstreetmap.org.",
+  "remoteLogosToggleTitle": "Markenlogos aus dem Internet laden",
+  "remoteLogosToggleSubtitle": "Standardmäßig aus: es werden mitgelieferte Platzhalter angezeigt. An: Logos werden von logo.clearbit.com geladen, das deine IP-Adresse sieht.",
+  "privacyExportAllButton": "Alle meine Daten exportieren (ZIP)",
+  "privacyExportAllSuccess": "{fileName} in Downloads gespeichert — {count} Dateien enthalten",
+  "privacyExportAllFailed": "Die Exportdatei konnte nicht gespeichert werden",
+  "syncModeCommunityControllerNotice": "Betrieben von {operator} · Supabase, EU (Frankfurt) · synchronisiert Favoriten, Alarme, Fahrzeuge inkl. FIN, Tankvorgänge, Bewertungen, Meldungen und — falls aktiviert — Fahrten mit GPS",
+  "@syncModeCommunityControllerNotice": {
+    "placeholders": {
+      "operator": {
+        "type": "String"
+      }
+    }
+  },
+  "syncModePrivateControllerNotice": "Du bist der Verantwortliche — dein eigenes Supabase-Projekt, wir sehen es nie",
+  "syncModeJoinControllerNotice": "Wer die gemeinsame Datenbank besitzt, ist der Verantwortliche für deine Daten",
+  "ugcPublicNoticeTitle": "Für andere Nutzer sichtbar",
+  "ugcPublicNoticeBody": "Dies wird in der Sync-Datenbank unter deiner pseudonymen Nutzer-ID gespeichert. In der Sparkilo Community kann es jeder angemeldete Nutzer lesen. Du kannst es jederzeit unter TankSync → Datentransparenz löschen.",
+  "blockedAuthorsTitle": "Blockierte Nutzer",
+  "blockedAuthorsDescription": "Inhalte dieser Nutzer werden auf diesem Gerät ausgeblendet. Blockierung aufheben, um sie wieder zu sehen.",
+  "blockedAuthorsEmpty": "Keine blockierten Nutzer",
+  "blockedAuthorsUnblock": "Freigeben",
   "coachingGpsLiftOff": "Vom Gas",
   "@coachingGpsLiftOff": {
     "description": "GPS-only coaching tile (#2058): the driver is cruising downhill with no recent brake event; lifting off would let the car coast more efficiently."
@@ -3197,6 +3231,25 @@
   "showLessHours": "Weniger anzeigen",
   "openStateUnknown": "Unbekannt",
   "stationOpenStateSemantic": "{open, select, true{Station ist geöffnet} false{Station ist geschlossen} other{Öffnungsstatus unbekannt}}",
+  "permissionRationaleCameraTitle": "Kamerazugriff",
+  "permissionRationaleCameraSubtitle": "Diese App möchte Ihre Kamera verwenden, um Belege, Zapfsäulen-Displays und QR-Codes zu lesen.",
+  "permissionRationaleCameraWhatHappens": "Was passiert mit dem Kamerabild:",
+  "permissionRationaleCameraBulletOnDevice": "Das Bild wird nur verwendet, um den Beleg, das Zapfsäulen-Display oder den QR-Code zu lesen — die Erkennung läuft auf Ihrem Gerät.",
+  "permissionRationaleCameraBulletDiscarded": "Das Foto wird nach dem Scan verworfen.",
+  "permissionRationaleCameraBulletNoUpload": "Es wird nichts hochgeladen, es sei denn, Sie melden einen fehlerhaften Scan und bestätigen dies.",
+  "permissionRationaleBluetoothTitle": "Bluetooth-Zugriff",
+  "permissionRationaleBluetoothSubtitle": "Diese App möchte Bluetooth verwenden, um sich mit Ihrem OBD2-Adapter zu verbinden.",
+  "permissionRationaleBluetoothWhatHappens": "Was passiert mit Bluetooth:",
+  "permissionRationaleBluetoothBulletAdapterOnly": "Bluetooth wird nur verwendet, um Ihren OBD2-Adapter zu finden und mit ihm zu kommunizieren.",
+  "permissionRationaleBluetoothBulletIdentifierLocal": "Die Adapterkennung bleibt auf Ihrem Gerät — sie wird nur über TankSync als Teil des Fahrzeugprofils synchronisiert.",
+  "permissionRationaleBluetoothBulletLegacyLocation": "Unter Android 11 und älter fragt das System zusätzlich nach dem Standort, weil die Bluetooth-Suche dort als Standortberechtigung gilt.",
+  "permissionRationaleNotificationsTitle": "Benachrichtigungen",
+  "permissionRationaleNotificationsSubtitle": "Diese App möchte Ihnen Benachrichtigungen für Preisalarme und den Status der Fahrtaufzeichnung senden.",
+  "permissionRationaleNotificationsWhatHappens": "Was passiert mit Benachrichtigungen:",
+  "permissionRationaleNotificationsBulletLocal": "Benachrichtigungen werden für lokale Preisalarme und den Status der Fahrtaufzeichnung verwendet.",
+  "permissionRationaleNotificationsBulletNothingLeaves": "Sie werden auf Ihrem Gerät erzeugt — nichts verlässt das Gerät.",
+  "permissionRationaleRevoke": "Sie können dies jederzeit in den Geräteeinstellungen widerrufen.",
+  "permissionRationaleLegalBasis": "Rechtsgrundlage: Art. 6 Abs. 1 lit. a DSGVO (Einwilligung)",
   "tripRecordingPipEstConsumptionCaption": "gesch. L/100 km",
   "@tripRecordingPipEstConsumptionCaption": {
     "description": "#2393 — unit caption under the big GPS-estimated consumption figure on the PiP tile (the GPS-only branch added by #2390). Marks the value as an estimate ('est.') so it reads distinctly from the OBD2-measured 'L/100 km' caption — the leading '~' on the figure carries the same meaning visually. Short, fits a narrow PiP window."

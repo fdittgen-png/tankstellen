@@ -2724,7 +2724,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get syncModeCommunitySubtitle =>
-      'Kedvencek és értékelések megosztása az összes felhasználóval';
+      'A fejlesztő által üzemeltetett megosztott adatbázis — lent látható, mi szinkronizálódik';
 
   @override
   String get syncModePrivateTitle => 'Privát adatbázis';
@@ -5354,6 +5354,106 @@ class AppLocalizationsHu extends AppLocalizations {
       'Ha ki van kapcsolva, a jelvények, pontszámok és trófeaikonok el vannak rejtve az egész alkalmazásban.';
 
   @override
+  String gdprPolicyLink(int version) {
+    return 'Adatvédelmi tájékoztató ($version verzió)';
+  }
+
+  @override
+  String consentRecordedAt(String date, int version) {
+    return 'Hozzájárulás megadva: $date · tájékoztató verziója: $version';
+  }
+
+  @override
+  String get consentNotRecorded => 'Még nincs rögzített hozzájárulás';
+
+  @override
+  String serverErasurePartial(String tables) {
+    return 'Néhány szerveradatot nem sikerült törölni: $tables. Próbálja újra, vagy küldje el ezt a listát a fejlesztőnek.';
+  }
+
+  @override
+  String localErasurePartial(String steps) {
+    return 'Néhány helyi adatot nem sikerült törölni: $steps. Indítsa újra az alkalmazást, és próbálja újra.';
+  }
+
+  @override
+  String get myCommunityReportsTitle => 'Közösségi jelentéseim';
+
+  @override
+  String get myCommunityReportsEmpty => 'Még nem küldött be jelentést';
+
+  @override
+  String get deleteReportTooltip => 'Jelentés törlése';
+
+  @override
+  String get reportDeleted => 'Jelentés törölve';
+
+  @override
+  String get reportDeleteFailed => 'A jelentést nem sikerült törölni';
+
+  @override
+  String get privacyControlsTitle => 'Adatvédelmi beállítások';
+
+  @override
+  String get tileProxyToggleTitle =>
+      'Térképcsempék betöltése a Sparkilo proxyn keresztül';
+
+  @override
+  String get tileProxyToggleSubtitle =>
+      'Be: a látható térképrészlet és az Ön IP-címe a fejlesztő EU-s szerverére kerül, amely a csempéket az OpenStreetMaptől kéri le. Ki: a csempék közvetlenül a tile.openstreetmap.org címről töltődnek be.';
+
+  @override
+  String get remoteLogosToggleTitle => 'Márkalogók betöltése az internetről';
+
+  @override
+  String get remoteLogosToggleSubtitle =>
+      'Alapértelmezés szerint ki: a beépített helyettesítő képek jelennek meg. Be: a logók a logo.clearbit.com címről töltődnek le, amely látja az Ön IP-címét.';
+
+  @override
+  String get privacyExportAllButton => 'Összes adatom exportálása (ZIP)';
+
+  @override
+  String privacyExportAllSuccess(String fileName, int count) {
+    return '$fileName mentve a Letöltésekbe — $count fájlt tartalmaz';
+  }
+
+  @override
+  String get privacyExportAllFailed => 'Az exportfájlt nem sikerült kiírni';
+
+  @override
+  String syncModeCommunityControllerNotice(String operator) {
+    return 'Üzemeltető: $operator · Supabase, EU (Frankfurt) · szinkronizálja a kedvenceket, riasztásokat, járműveket az alvázszámmal együtt, tankolásokat, értékeléseket, jelentéseket és — ha bekapcsolja — a GPS-es utakat';
+  }
+
+  @override
+  String get syncModePrivateControllerNotice =>
+      'Az adatkezelő Ön — a saját Supabase-projektje, mi soha nem látjuk';
+
+  @override
+  String get syncModeJoinControllerNotice =>
+      'A megosztott adatbázis tulajdonosa az Ön adatainak adatkezelője';
+
+  @override
+  String get ugcPublicNoticeTitle => 'Megosztva más felhasználókkal';
+
+  @override
+  String get ugcPublicNoticeBody =>
+      'Ez a szinkronizációs adatbázisban tárolódik az Ön álnevesített felhasználói azonosítója alatt. A Sparkilo közösségben minden bejelentkezett felhasználó elolvashatja. Bármikor törölheti itt: TankSync → Adatátláthatóság.';
+
+  @override
+  String get blockedAuthorsTitle => 'Letiltott felhasználók';
+
+  @override
+  String get blockedAuthorsDescription =>
+      'Ezeknek a felhasználóknak a megosztott tartalma rejtve marad ezen az eszközön. A feloldás után ismét látható lesz.';
+
+  @override
+  String get blockedAuthorsEmpty => 'Nincs letiltott felhasználó';
+
+  @override
+  String get blockedAuthorsUnblock => 'Feloldás';
+
+  @override
   String get coachingGpsLiftOff => 'Levenni a lábat';
 
   @override
@@ -6754,6 +6854,79 @@ class AppLocalizationsHu extends AppLocalizations {
     });
     return '$_temp0';
   }
+
+  @override
+  String get permissionRationaleCameraTitle => 'Kamera-hozzáférés';
+
+  @override
+  String get permissionRationaleCameraSubtitle =>
+      'Ez az alkalmazás szeretné használni a kameráját nyugták, kútoszlop-kijelzők és QR-kódok beolvasásához.';
+
+  @override
+  String get permissionRationaleCameraWhatHappens =>
+      'Mi történik a kameraképpel:';
+
+  @override
+  String get permissionRationaleCameraBulletOnDevice =>
+      'A kép kizárólag a nyugta, a kútoszlop kijelzője vagy a QR-kód beolvasására szolgál — a felismerés az Ön eszközén fut.';
+
+  @override
+  String get permissionRationaleCameraBulletDiscarded =>
+      'A fotó a beolvasás után törlődik.';
+
+  @override
+  String get permissionRationaleCameraBulletNoUpload =>
+      'Semmi nem kerül feltöltésre, hacsak nem küld jelentést egy hibás beolvasásról, és azt meg nem erősíti.';
+
+  @override
+  String get permissionRationaleBluetoothTitle => 'Bluetooth-hozzáférés';
+
+  @override
+  String get permissionRationaleBluetoothSubtitle =>
+      'Ez az alkalmazás szeretné használni a Bluetooth-t, hogy csatlakozzon az OBD2-adapteréhez.';
+
+  @override
+  String get permissionRationaleBluetoothWhatHappens =>
+      'Mi történik a Bluetooth-szal:';
+
+  @override
+  String get permissionRationaleBluetoothBulletAdapterOnly =>
+      'A Bluetooth kizárólag az OBD2-adapter megkeresésére és az azzal való kommunikációra szolgál.';
+
+  @override
+  String get permissionRationaleBluetoothBulletIdentifierLocal =>
+      'Az adapter azonosítója az Ön eszközén marad — csak a TankSync révén szinkronizálódik, a járműprofil részeként.';
+
+  @override
+  String get permissionRationaleBluetoothBulletLegacyLocation =>
+      'Android 11 és korábbi verziókon a rendszer a helyzetet is elkéri, mert ott a Bluetooth-keresés helyhozzáférési engedélynek számít.';
+
+  @override
+  String get permissionRationaleNotificationsTitle => 'Értesítések';
+
+  @override
+  String get permissionRationaleNotificationsSubtitle =>
+      'Ez az alkalmazás értesítéseket szeretne küldeni Önnek az áriasztásokról és az útrögzítés állapotáról.';
+
+  @override
+  String get permissionRationaleNotificationsWhatHappens =>
+      'Mi történik az értesítésekkel:';
+
+  @override
+  String get permissionRationaleNotificationsBulletLocal =>
+      'Az értesítések helyi áriasztásokhoz és az útrögzítés állapotához használatosak.';
+
+  @override
+  String get permissionRationaleNotificationsBulletNothingLeaves =>
+      'Az Ön eszközén jönnek létre — semmi nem hagyja el az eszközt.';
+
+  @override
+  String get permissionRationaleRevoke =>
+      'Ezt bármikor visszavonhatja az eszköz beállításaiban.';
+
+  @override
+  String get permissionRationaleLegalBasis =>
+      'Jogalap: a GDPR 6. cikk (1) bekezdés a) pontja (hozzájárulás)';
 
   @override
   String get tripRecordingPipEstConsumptionCaption => 'becsült L/100 km';
