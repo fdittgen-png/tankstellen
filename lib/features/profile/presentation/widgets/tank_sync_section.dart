@@ -236,12 +236,17 @@ class TankSyncSection extends ConsumerWidget {
       ),
     );
     if (confirmed == true && context.mounted) {
-      await ref.read(syncStateProvider.notifier).deleteAccount();
+      final result =
+          await ref.read(syncStateProvider.notifier).deleteAccount();
       if (context.mounted) {
-        SnackBarHelper.show(
-          context,
-          AppLocalizations.of(context).accountDeleted,
-        );
+        // #3868 — honest outcome: name what could not be erased.
+        final l = AppLocalizations.of(context);
+        if (result.complete) {
+          SnackBarHelper.show(context, l.accountDeleted);
+        } else {
+          SnackBarHelper.showError(
+              context, l.serverErasurePartial(result.failedTables.join(', ')));
+        }
       }
     }
   }

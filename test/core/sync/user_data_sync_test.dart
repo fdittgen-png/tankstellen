@@ -65,6 +65,8 @@ void main() {
       const reporterKeyed = {
         'price_reports': 'reporter_id',
         'content_reports': 'reporter_user_id', // #3726
+        'trip_shares': 'owner_id', // #3868 — grants the user GAVE
+        'users': 'id', // #3868 — the public.users row itself
       };
       for (final entry in UserDataSync.deletableTables.entries) {
         expect(entry.value, reporterKeyed[entry.key] ?? 'user_id',
