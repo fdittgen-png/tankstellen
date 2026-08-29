@@ -126,11 +126,28 @@ class HiveBoxes {
     alerts,
   };
 
+  /// #3867 (Epic #3865) — EVERY box the app owns, for the local erasure
+  /// (`LocalDataEraser`) and the export drift guards. A new box constant
+  /// must be added here too: `test/core/storage/local_data_eraser_test.dart`
+  /// scans this file's `static const String` declarations and fails when
+  /// one is missing from this set.
+  static const Set<String> allBoxes = {
+    settings, favorites, cache, profiles, priceHistory, alerts,
+    obd2Baselines, obd2TripHistory, achievements, obd2SupportedPids,
+    obd2NegotiatedProtocol, serviceReminders, obd2PausedTrips,
+    obd2ActiveTrip, priceSnapshots, isolateErrorSpool, trafficSignalsCache,
+    featureFlags, appProfile, boxSchema, errorTraces,
+  };
+
   /// Meta box recording the schema version of each persistent box
   /// (#1686). Unencrypted — it holds only small integers, no PII — and
   /// is keyed by box name. Lets a future release detect and run a
   /// schema migration instead of silently mis-reading old on-disk data.
   static const String boxSchema = 'box_schema';
+
+  /// The error-trace box `TraceStorage` opens (#3867 — registered so the
+  /// local erasure and the export drift guard know it exists).
+  static const String errorTraces = 'error_traces';
 
   /// Current persistent-storage schema version. Bump when the on-disk shape of
   /// any box changes; pair the bump with a migration step.
@@ -174,6 +191,11 @@ class HiveBoxes {
   /// #3611, with a crash-safe migration in [HiveTripBoxEncryption].
   static const _encryptedDeferredBoxes = {
     obd2Baselines, obd2TripHistory, obd2PausedTrips, obd2ActiveTrip,
+    // #3870 (Epic #3865) — VIN-keyed, adapter-MAC-keyed and odometer data
+    // were the last plaintext identifiers on disk; same crash-safe
+    // one-time migration. (`priceSnapshots` holds public station data
+    // and is opened by the alert isolate — deliberately left as is.)
+    obd2SupportedPids, obd2NegotiatedProtocol, serviceReminders,
   };
 
   static Future<void>? _deferredInit;
