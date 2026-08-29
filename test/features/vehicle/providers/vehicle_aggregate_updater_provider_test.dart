@@ -3,6 +3,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/trips/domain/trip_summary.dart';
 import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 import 'package:tankstellen/features/trips/providers/trip_history_provider.dart';
 import 'package:tankstellen/features/vehicle/data/vehicle_aggregate_updater.dart';
@@ -71,7 +72,13 @@ void main() {
       expect(wired, isTrue);
 
       // Invoke the hook the way TripHistoryRepository.save does.
-      fakeRepo.onSavedHook!('vehicle-abc');
+      fakeRepo.onSavedHook!(const TripHistoryEntry(
+        id: 't-1',
+        vehicleId: 'vehicle-abc',
+        summary: TripSummary(
+            distanceKm: 1, maxRpm: 0, highRpmSeconds: 0, idleSeconds: 0,
+            harshBrakes: 0, harshAccelerations: 0),
+      ));
 
       // The hook fire-and-forgets via unawaited(...); let any
       // microtasks queued by the future flush before asserting.
@@ -89,7 +96,7 @@ void main() {
 /// helper ever starts calling something else.
 class _FakeTripHistoryRepository implements TripHistoryRepository {
   @override
-  void Function(String vehicleId)? onSavedHook;
+  void Function(TripHistoryEntry entry)? onSavedHook;
 
   @override
   dynamic noSuchMethod(Invocation invocation) =>
@@ -104,6 +111,12 @@ class _FakeTripHistoryRepository implements TripHistoryRepository {
 /// [runForVehicle] on the updater (via the installed hook).
 class _FakeVehicleAggregateUpdater implements VehicleAggregateUpdater {
   final List<String> runCalls = <String>[];
+
+  // #3878 — the hook folds the saved trip in; record its vehicle id.
+  @override
+  Future<void> runForSavedTrip(TripHistoryEntry entry) async {
+    runCalls.add(entry.vehicleId!);
+  }
 
   @override
   Future<void> runForVehicle(String vehicleId) async {

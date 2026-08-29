@@ -502,12 +502,21 @@ final _pipelineProvider = Provider.family<GpsOnlyRecordingPipeline,
 /// #3438 — counts + captures WAL flushes without touching Hive.
 class _CountingWal extends GpsOnlyTripWal {
   int flushNowCalls = 0;
+  final List<TripSample> _seen = [];
   List<TripSample>? lastFlushedSamples;
   TripSummary? lastFlushedSummary;
+  // #3878 — samples now arrive one by one; mirror the old "everything so
+  // far" capture so the backgrounding assertions keep their meaning.
   @override
-  void flushNow(List<TripSample> samples, TripSummary summary) {
+  void onSample(TripSample sample, TripSummary summary) {
+    _seen.add(sample);
+    super.onSample(sample, summary);
+  }
+
+  @override
+  void flushNow(TripSummary summary) {
     flushNowCalls++;
-    lastFlushedSamples = List.of(samples);
+    lastFlushedSamples = List.of(_seen);
     lastFlushedSummary = summary;
   }
 }
@@ -516,7 +525,7 @@ class _CountingWal extends GpsOnlyTripWal {
 /// lifecycle hook must hold its own guard against a misbehaving override.
 class _ThrowingWal extends GpsOnlyTripWal {
   @override
-  void flushNow(List<TripSample> samples, TripSummary summary) =>
+  void flushNow(TripSummary summary) =>
       throw StateError('wal write blew up');
 }
 

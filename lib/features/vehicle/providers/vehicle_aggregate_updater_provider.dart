@@ -50,8 +50,11 @@ bool wireAggregatorIntoTripHistory(ProviderContainer container) {
   // Fire-and-forget; the hook itself stays sync (the repo passes a
   // `void Function`), and `runForVehicle` swallows + logs every
   // failure so this is safe.
-  tripRepo.onSavedHook = (vehicleId) {
-    unawaited(updater.runForVehicle(vehicleId));
+  // #3878 — fold the saved trip in (O(one trip)); the full recompute over
+  // every stored trip is reserved for the below-threshold / no-priors
+  // cases inside foldInTrip and for the admin "recompute" action.
+  tripRepo.onSavedHook = (entry) {
+    unawaited(updater.runForSavedTrip(entry));
   };
   return true;
 }

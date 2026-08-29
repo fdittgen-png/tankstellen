@@ -139,7 +139,9 @@ mixin _TripRecordingSummary on _TripRecordingTelemetryIngest {
     // gears. Hybrids DO have a step-ratio transmission on the
     // combustion side, so they fall through to the inference path.
     if (vehicle.type == VehicleType.ev) return null;
-    final captured = _sampleBuffer.capturedSamples;
+    // #3878 — the ring holds only the live window; the stop path hands
+    // the whole trip in.
+    final captured = _allSamplesForFinalise ?? _sampleBuffer.capturedSamples;
     if (captured.isEmpty) return null;
     final tireC = vehicle.tireCircumferenceMeters;
     if (tireC <= 0) return null;

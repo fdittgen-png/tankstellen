@@ -516,7 +516,7 @@ class _FakeTripHistory implements TripHistoryRepository {
   }
 
   @override
-  void Function(String vehicleId)? onSavedHook;
+  void Function(TripHistoryEntry entry)? onSavedHook;
 
   @override
   int get cap => 100;

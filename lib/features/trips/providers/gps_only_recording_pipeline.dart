@@ -82,7 +82,7 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     final recorder = _recorder;
     if (recorder == null) return;
     try {
-      _wal.flushNow(_samples, recorder.buildSummary());
+      _wal.flushNow(recorder.buildSummary());
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
         'where': 'GpsOnlyRecordingPipeline.onAppBackgrounded'
@@ -98,7 +98,10 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
   /// (fine while moving, coarse once stationary). Null between trips; opened
   /// on [start], cancelled on [stop].
   MotionGatedGpsSource? _gpsSource;
+  /// #3878 — the LIVE window only (the WAL holds the whole trip); the
+  /// full list is retained only while the WAL is not writable.
   final List<TripSample> _samples = [];
+  static const int kGpsOnlyLiveWindow = 900;
   DateTime? _startedAt;
 
   /// #2760/#3500 — per-trip IMU sensor-fusion lifecycle, now the SHARED
@@ -220,7 +223,6 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
       hAccuracyM: p.accuracy.isFinite ? p.accuracy : null,
       bearingDeg: p.heading.isFinite ? p.heading : null,
     );
-    _samples.add(sample);
     // #3253 kept the FIX clock here so OS batching stayed visible, while
     // the OBD2 pipeline recorded the ARRIVAL clock — so the two paths
     // disagreed and neither could show the skew between them. #3785 —
@@ -244,17 +246,22 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     // suppressed (the `virtual` source's wholesale suppression isn't needed).
     recorder.onSample(sample, distanceSource: kDistanceSourceGps);
     final summary = recorder.buildSummary();
-    _wal.onSample(_samples, summary); // #3248 — debounced WAL flush
     // #2389 / #2506 — fold the fix into the SHARED estimate + coaching folder
     // (also the OBD2 live path). It does its own accel low-pass + warm-up; the
     // figures are null at standstill / before warm-up, which is correct then.
     final estimate = _estimateFolder?.fold(sample) ?? GpsLiveEstimate.none;
     // #3329 — stamp the per-fix GPS fuel estimate (L/h) onto the sample so the
-    // trip-path heatmap colours by consumption, not all-green.
+    // trip-path heatmap colours by consumption, not all-green. #3878 — the
+    // stamp happens BEFORE the sample reaches the WAL (the WAL is now what
+    // the saved trip is built from); the ring keeps only the live window.
     final instant = estimate.instantLPer100Km;
-    if (instant != null && sample.speedKmh > 0 && _samples.isNotEmpty) {
-      _samples[_samples.length - 1] =
-          _samples.last.copyWithEstimatedFuelRate(instant / 100.0 * sample.speedKmh);
+    final stamped = (instant != null && sample.speedKmh > 0)
+        ? sample.copyWithEstimatedFuelRate(instant / 100.0 * sample.speedKmh)
+        : sample;
+    _samples.add(stamped);
+    _wal.onSample(stamped, summary); // #3248 — debounced WAL flush
+    if (_wal.walWritable && _samples.length > kGpsOnlyLiveWindow) {
+      _samples.removeRange(0, _samples.length - kGpsOnlyLiveWindow);
     }
     final coaching = estimate.coachingHint;
     _host.state = _host.state.copyWith(
@@ -283,12 +290,15 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     final imuFusion = _imuFusion;
     _imuFusion = null;
     await imuFusion?.stop();
-    _wal.clear(); // #3248 — trip is ending; drop the WAL (saved below).
     if (recorder == null) {
+      _wal.clear();
       _host.state = const TripRecordingState();
       return const StoppedTripResult.empty();
     }
-    final samples = List<TripSample>.unmodifiable(_samples);
+    // #3878 — the whole trip comes back from the WAL (the ring only held
+    // the live window), THEN the WAL is dropped (saved below).
+    final samples = List<TripSample>.unmodifiable(await _wal.readAll());
+    _wal.clear(); // #3248 — trip is ending; drop the WAL (saved below).
     // #2548 — staged save-progress: flip into the transient `saving` phase
     // so the recording screen shows the inline TripSaveProgress card
     // while the dongle-less trip is wrapped up. Building the summary
@@ -380,5 +390,11 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     if (recorder == null) return;
     _samples.add(sample);
     recorder.onSample(sample);
+    // #3878 — the WAL is what the saved trip is built from: every sample
+    // that enters the ring enters the WAL too.
+    _wal.onSample(sample, recorder.buildSummary());
+    if (_wal.walWritable && _samples.length > kGpsOnlyLiveWindow) {
+      _samples.removeRange(0, _samples.length - kGpsOnlyLiveWindow);
+    }
   }
 }

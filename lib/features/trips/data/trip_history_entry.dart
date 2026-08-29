@@ -224,7 +224,10 @@ class TripHistoryEntry {
         envelopeSampleCount: envelopeSampleCount,
       );
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() {
+    // #3878 — the engine-coverage pass runs ONCE per save.
+    final cov = samples.isEmpty ? null : _coverage(samples);
+    return {
         'id': id,
         'vehicleId': vehicleId,
         'summary': tripSummaryToJson(summary),
@@ -237,9 +240,9 @@ class TripHistoryEntry {
         // #3861 — counted INSIDE the engine-running envelope, with the
         // envelope size beside it, so the badge and the detail agree.
         if (samples.isNotEmpty) ...{
-          'esc': _coverage(samples)?.engineSamples ?? 0,
-          if (_coverage(samples)?.envelopeSamples case final int evc)
-            'evc': evc,
+          // #3878 — one pass, not two.
+          'esc': cov?.engineSamples ?? 0,
+          if (cov?.envelopeSamples case final int evc) 'evc': evc,
         },
         // #1312 — adapter identity. Compact keys so the per-trip JSON
         // payload doesn't balloon (most trips carry one MAC + one
@@ -282,7 +285,8 @@ class TripHistoryEntry {
         // so trips that never touched the link add zero bytes.
         if (sessionJournal != null && sessionJournal!.events.isNotEmpty)
           'sj': sessionJournal!.toJson(),
-      };
+    };
+  }
 
   static TripHistoryEntry fromJson(Map<String, dynamic> json) =>
       TripHistoryEntry(

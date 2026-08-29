@@ -140,6 +140,13 @@ class _DroppedSessionHostAdapter implements DroppedSessionHost {
   bool get automatic => _c._automatic;
 
   @override
+  Future<List<TripSample>> collectAllSamples() async {
+    final reader = _c._allSamplesReader; // #3878
+    if (reader == null) return List.unmodifiable(_c._sampleBuffer.capturedSamples);
+    return reader();
+  }
+
+  @override
   List<TripSample> get capturedSamples => _c._sampleBuffer.capturedSamples;
 
   @override

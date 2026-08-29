@@ -269,6 +269,8 @@ class TripRecordingController
     this._referenceVehicle,
     this._vehicleId,
     PidScheduler? scheduler,
+    // #3878 — reads the whole trip (WAL + ring) for the grace finalise.
+    Future<List<TripSample>> Function()? allSamplesReader,
     PausedTripRepository? pausedRepo,
     TripHistoryRepository? historyRepo,
     Duration pauseGraceWindow = const Duration(minutes: 15),
@@ -296,6 +298,7 @@ class TripRecordingController
             ),
         _now = now ?? DateTime.now,
         _schedulerOverride = scheduler {
+    _allSamplesReader = allSamplesReader;
     _dropDetector = TripDropDetector(
       now: _now,
       dropWindow: dropWindow,

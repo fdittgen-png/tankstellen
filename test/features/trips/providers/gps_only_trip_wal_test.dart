@@ -63,7 +63,10 @@ void main() {
 
     test('flushNow persists the current samples + summary', () {
       wal.seed(startedAt: start, automatic: false, vehicleId: null);
-      wal.flushNow([fix(0), fix(1), fix(2)], summary);
+      for (var i = 0; i < 3; i++) {
+        wal.onSample(fix(i), summary);
+      }
+      wal.flushNow(summary);
       final snap = repo.loadSnapshot()!;
       expect(snap.samples, hasLength(3));
       expect(snap.summary.distanceKm, 1.2);
@@ -82,19 +85,19 @@ void main() {
       wal.seed(startedAt: start, automatic: false, vehicleId: null);
       // The seed just wrote; the next few samples are debounced out.
       for (var i = 0; i < 9; i++) {
-        wal.onSample([for (var k = 0; k <= i; k++) fix(k)], summary);
+        wal.onSample(fix(i), summary);
       }
       expect(repo.loadSnapshot()!.samples, isEmpty,
           reason: 'still inside the debounce window after the seed');
       // The 10th sample crosses the count threshold → flush.
-      wal.onSample([for (var k = 0; k < 10; k++) fix(k)], summary);
+      wal.onSample(fix(9), summary);
       expect(repo.loadSnapshot()!.samples, hasLength(10),
           reason: 'a kill now loses at most the debounce window, not the trip');
     });
 
     test('writes are best-effort no-ops before a seed', () {
       // No seed → nothing to write; must not throw.
-      expect(() => wal.flushNow([fix(0)], summary), returnsNormally);
+      expect(() => wal.flushNow(summary), returnsNormally);
       expect(repo.loadSnapshot(), isNull);
     });
   });

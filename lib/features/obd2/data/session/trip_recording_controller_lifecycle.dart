@@ -271,7 +271,8 @@ mixin _TripRecordingLifecycle
   /// (or if it ended without any site attributing a cause).
   TripTermination? get termination => _termination;
 
-  Future<TripSummary> stop() async {
+  Future<TripSummary> stop({List<TripSample>? allSamples}) async {
+    _allSamplesForFinalise = allSamples;
     // #1925 — finalise the opt-in OBD2 debug session so its summary
     // (duration, reconnects, data gaps) is complete for export.
     Obd2DebugSessionRecorder.endSession();

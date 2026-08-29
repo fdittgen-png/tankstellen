@@ -210,6 +210,27 @@ class VehicleAggregateUpdater {
   ///
   /// Production wiring uses this with `unawaited(...)`; tests can
   /// `await` it directly.
+  /// #3878 — trip-save hook: fold [entry] into its vehicle's aggregates
+  /// (the samples are in hand — no decode of every stored trip). Never
+  /// throws.
+  Future<void> runForSavedTrip(TripHistoryEntry entry) async {
+    final vehicleId = entry.vehicleId;
+    if (vehicleId == null) return;
+    try {
+      await foldInTrip(vehicleId, entry, entry.samples);
+    } catch (e, st) {
+      await errorLogger.log(
+        ErrorLayer.background,
+        e,
+        st,
+        context: <String, Object?>{
+          'op': 'VehicleAggregateUpdater.foldInTrip',
+          'vehicleId': vehicleId,
+        },
+      );
+    }
+  }
+
   Future<void> runForVehicle(String vehicleId) async {
     try {
       await updateForVehicle(vehicleId);

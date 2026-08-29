@@ -237,6 +237,8 @@ class _Host implements DroppedSessionHost {
   @override
   List<TripSample> capturedSamples = [];
   @override
+  Future<List<TripSample>> collectAllSamples() async => capturedSamples;
+  @override
   List<GpsSampleDiagnostic> capturedGpsSampleDiagnostics = [];
 
   @override

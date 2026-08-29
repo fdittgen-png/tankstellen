@@ -48,7 +48,9 @@ class TripHistoryRepository {
   /// never derailed by an aggregator failure. The hook itself should
   /// fire-and-forget any async work it kicks off (use `unawaited(...)`
   /// at the call site).
-  void Function(String vehicleId)? onSavedHook;
+  /// #3878 — receives the saved entry (samples in hand) so the vehicle
+  /// aggregates can be FOLDED in instead of recomputed over every trip.
+  void Function(TripHistoryEntry entry)? onSavedHook;
 
   TripHistoryRepository({
     required this._box,
@@ -112,7 +114,7 @@ class TripHistoryRepository {
     final hook = onSavedHook;
     if (vehicleId != null && hook != null) {
       try {
-        hook(vehicleId);
+        hook(entry);
       } catch (e, st) {
         unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'TripHistoryRepository.save onSavedHook'}));
       }
