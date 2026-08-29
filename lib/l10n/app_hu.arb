@@ -4697,5 +4697,29 @@
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
   },
-  "minimalDriveBehaviour": "Vezetési stílus"
+  "minimalDriveBehaviour": "Vezetési stílus",
+  "obd2WaitingForEngineBanner": "Várakozás a motorra — rögzítés GPS-szel",
+  "obd2StartEngineToReconnect": "Indítsd be a motort az újracsatlakozáshoz",
+  "obd2ResetConnectionEngineOff": "A motor áll — indítsd be az újracsatlakozáshoz",
+  "obd2ParkedPromptTitle": "A motor {minutes} perce áll — leállítod a rögzítést?",
+  "@obd2ParkedPromptTitle": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2ParkedPromptStop": "Leállítás",
+  "obd2ParkedPromptKeep": "Folytatás",
+  "obd2CoverageEngineOffEnvelopeNote": "A motor az út első {head} és utolsó {tail} részében állt — a lefedettséget járó motor mellett mérjük.",
+  "@obd2CoverageEngineOffEnvelopeNote": {
+    "placeholders": {
+      "head": {
+        "type": "String"
+      },
+      "tail": {
+        "type": "String"
+      }
+    }
+  }
 }

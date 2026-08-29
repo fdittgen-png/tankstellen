@@ -4697,5 +4697,29 @@
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
   },
-  "minimalDriveBehaviour": "Kjørestil"
+  "minimalDriveBehaviour": "Kjørestil",
+  "obd2WaitingForEngineBanner": "Venter på motoren — tar opp med GPS",
+  "obd2StartEngineToReconnect": "Start motoren for å koble til på nytt",
+  "obd2ResetConnectionEngineOff": "Motoren er av — start den for å koble til på nytt",
+  "obd2ParkedPromptTitle": "Motoren har vært av i {minutes} min — stoppe opptaket?",
+  "@obd2ParkedPromptTitle": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2ParkedPromptStop": "Stopp",
+  "obd2ParkedPromptKeep": "Fortsett",
+  "obd2CoverageEngineOffEnvelopeNote": "Motoren var av de første {head} og de siste {tail} av turen — dekningen måles mens motoren går.",
+  "@obd2CoverageEngineOffEnvelopeNote": {
+    "placeholders": {
+      "head": {
+        "type": "String"
+      },
+      "tail": {
+        "type": "String"
+      }
+    }
+  }
 }

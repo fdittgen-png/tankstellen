@@ -4697,5 +4697,29 @@
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
   },
-  "minimalDriveBehaviour": "Οδηγική συμπεριφορά"
+  "minimalDriveBehaviour": "Οδηγική συμπεριφορά",
+  "obd2WaitingForEngineBanner": "Αναμονή για τον κινητήρα — καταγραφή με GPS",
+  "obd2StartEngineToReconnect": "Βάλτε μπροστά τον κινητήρα για επανασύνδεση",
+  "obd2ResetConnectionEngineOff": "Ο κινητήρας είναι σβηστός — βάλτε τον μπροστά για επανασύνδεση",
+  "obd2ParkedPromptTitle": "Κινητήρας σβηστός εδώ και {minutes} λεπτά — διακοπή καταγραφής;",
+  "@obd2ParkedPromptTitle": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2ParkedPromptStop": "Διακοπή",
+  "obd2ParkedPromptKeep": "Συνέχεια",
+  "obd2CoverageEngineOffEnvelopeNote": "Κινητήρας σβηστός στα πρώτα {head} και στα τελευταία {tail} αυτής της διαδρομής — η κάλυψη μετριέται με τον κινητήρα σε λειτουργία.",
+  "@obd2CoverageEngineOffEnvelopeNote": {
+    "placeholders": {
+      "head": {
+        "type": "String"
+      },
+      "tail": {
+        "type": "String"
+      }
+    }
+  }
 }

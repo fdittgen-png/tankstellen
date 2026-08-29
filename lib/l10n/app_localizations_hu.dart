@@ -6442,6 +6442,34 @@ class AppLocalizationsHu extends AppLocalizations {
   String get obd2ScanOpenSettings => 'Beállítások megnyitása';
 
   @override
+  String get obd2WaitingForEngineBanner =>
+      'Várakozás a motorra — rögzítés GPS-szel';
+
+  @override
+  String get obd2StartEngineToReconnect =>
+      'Indítsd be a motort az újracsatlakozáshoz';
+
+  @override
+  String get obd2ResetConnectionEngineOff =>
+      'A motor áll — indítsd be az újracsatlakozáshoz';
+
+  @override
+  String obd2ParkedPromptTitle(int minutes) {
+    return 'A motor $minutes perce áll — leállítod a rögzítést?';
+  }
+
+  @override
+  String get obd2ParkedPromptStop => 'Leállítás';
+
+  @override
+  String get obd2ParkedPromptKeep => 'Folytatás';
+
+  @override
+  String obd2CoverageEngineOffEnvelopeNote(String head, String tail) {
+    return 'A motor az út első $head és utolsó $tail részében állt — a lefedettséget járó motor mellett mérjük.';
+  }
+
+  @override
   String get obd2ReconnectInProgress => 'Újracsatlakozás az OBD2-adapteredhez…';
 
   @override

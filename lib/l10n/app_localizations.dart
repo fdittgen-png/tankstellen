@@ -10992,6 +10992,48 @@ abstract class AppLocalizations {
   /// **'Open settings'**
   String get obd2ScanOpenSettings;
 
+  /// Calm floating pill on the trip-recording screen (#3858/#3859, Epic #3855) while the car's engine is off — either the recording started before the engine, or the driver switched it off with the recording still running. GPS keeps recording; engine data attaches by itself when the engine starts. Not an error.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for the engine — recording on GPS'**
+  String get obd2WaitingForEngineBanner;
+
+  /// Replaces the 'Reset connection' button on the OBD2 pause banner while the vehicle power model says the car is asleep (#3860): a reset would only dial a sleeping adapter. States what is actually needed.
+  ///
+  /// In en, this message translates to:
+  /// **'Start the engine to reconnect'**
+  String get obd2StartEngineToReconnect;
+
+  /// Snackbar when the user taps 'Reset connection' while the car is asleep (#3860). No dial is attempted.
+  ///
+  /// In en, this message translates to:
+  /// **'Engine is off — start it to reconnect'**
+  String get obd2ResetConnectionEngineOff;
+
+  /// Prompt pill on the trip-recording screen (#3862) after the engine has been off and the car stationary for a few minutes with a manual recording still running. {minutes} is the whole number of minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Engine off for {minutes} min — stop recording?'**
+  String obd2ParkedPromptTitle(int minutes);
+
+  /// Parked-prompt action (#3862): stop and save the recording now.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get obd2ParkedPromptStop;
+
+  /// Parked-prompt action (#3862): keep recording; the prompt does not return this session.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep'**
+  String get obd2ParkedPromptKeep;
+
+  /// Trip-detail coverage note (#3861) replacing the false 'connection dropped' verdict when a trip began and/or ended with the engine off. {head} and {tail} are pre-formatted durations such as '1:40' or '0:00'.
+  ///
+  /// In en, this message translates to:
+  /// **'Engine off for the first {head} and the last {tail} of this trip — coverage is measured while the engine ran.'**
+  String obd2CoverageEngineOffEnvelopeNote(String head, String tail);
+
   /// Shown while the trip-independent auto-reconnect controller is actively trying to re-establish a dropped OBD2 adapter link (Epic #3013 phase 3, #3019). Bounded backoff loop in flight.
   ///
   /// In en, this message translates to:

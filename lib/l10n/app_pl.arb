@@ -4697,5 +4697,29 @@
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
   },
-  "minimalDriveBehaviour": "Styl jazdy"
+  "minimalDriveBehaviour": "Styl jazdy",
+  "obd2WaitingForEngineBanner": "Oczekiwanie na silnik — nagrywanie z GPS",
+  "obd2StartEngineToReconnect": "Uruchom silnik, aby połączyć ponownie",
+  "obd2ResetConnectionEngineOff": "Silnik wyłączony — uruchom go, aby połączyć ponownie",
+  "obd2ParkedPromptTitle": "Silnik wyłączony od {minutes} min — zakończyć nagrywanie?",
+  "@obd2ParkedPromptTitle": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2ParkedPromptStop": "Zakończ",
+  "obd2ParkedPromptKeep": "Kontynuuj",
+  "obd2CoverageEngineOffEnvelopeNote": "Silnik wyłączony przez pierwsze {head} i ostatnie {tail} tej podróży — pokrycie jest mierzone przy pracującym silniku.",
+  "@obd2CoverageEngineOffEnvelopeNote": {
+    "placeholders": {
+      "head": {
+        "type": "String"
+      },
+      "tail": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -6442,6 +6442,33 @@ class AppLocalizationsLt extends AppLocalizations {
   String get obd2ScanOpenSettings => 'Atidaryti nustatymus';
 
   @override
+  String get obd2WaitingForEngineBanner => 'Laukiama variklio — įrašoma GPS';
+
+  @override
+  String get obd2StartEngineToReconnect =>
+      'Užveskite variklį, kad prisijungtumėte iš naujo';
+
+  @override
+  String get obd2ResetConnectionEngineOff =>
+      'Variklis išjungtas — užveskite jį, kad prisijungtumėte iš naujo';
+
+  @override
+  String obd2ParkedPromptTitle(int minutes) {
+    return 'Variklis išjungtas jau $minutes min — sustabdyti įrašymą?';
+  }
+
+  @override
+  String get obd2ParkedPromptStop => 'Sustabdyti';
+
+  @override
+  String get obd2ParkedPromptKeep => 'Tęsti';
+
+  @override
+  String obd2CoverageEngineOffEnvelopeNote(String head, String tail) {
+    return 'Variklis buvo išjungtas pirmąsias $head ir paskutines $tail šios kelionės — aprėptis matuojama varikliui veikiant.';
+  }
+
+  @override
   String get obd2ReconnectInProgress =>
       'Iš naujo jungiamasi prie OBD2 adapterio…';
 

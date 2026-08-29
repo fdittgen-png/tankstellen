@@ -4697,5 +4697,29 @@
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
   },
-  "minimalDriveBehaviour": "Kørestil"
+  "minimalDriveBehaviour": "Kørestil",
+  "obd2WaitingForEngineBanner": "Venter på motoren — optager med GPS",
+  "obd2StartEngineToReconnect": "Start motoren for at genforbinde",
+  "obd2ResetConnectionEngineOff": "Motoren er slukket — start den for at genforbinde",
+  "obd2ParkedPromptTitle": "Motoren har været slukket i {minutes} min — stop optagelsen?",
+  "@obd2ParkedPromptTitle": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2ParkedPromptStop": "Stop",
+  "obd2ParkedPromptKeep": "Fortsæt",
+  "obd2CoverageEngineOffEnvelopeNote": "Motoren var slukket de første {head} og de sidste {tail} af turen — dækningen måles, mens motoren kører.",
+  "@obd2CoverageEngineOffEnvelopeNote": {
+    "placeholders": {
+      "head": {
+        "type": "String"
+      },
+      "tail": {
+        "type": "String"
+      }
+    }
+  }
 }

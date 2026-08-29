@@ -4697,5 +4697,29 @@
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
   },
-  "minimalDriveBehaviour": "Braukšanas stils"
+  "minimalDriveBehaviour": "Braukšanas stils",
+  "obd2WaitingForEngineBanner": "Gaida dzinēju — ieraksta ar GPS",
+  "obd2StartEngineToReconnect": "Iedarbiniet dzinēju, lai savienotos atkārtoti",
+  "obd2ResetConnectionEngineOff": "Dzinējs ir izslēgts — iedarbiniet to, lai savienotos atkārtoti",
+  "obd2ParkedPromptTitle": "Dzinējs izslēgts jau {minutes} min — apturēt ierakstīšanu?",
+  "@obd2ParkedPromptTitle": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2ParkedPromptStop": "Apturēt",
+  "obd2ParkedPromptKeep": "Turpināt",
+  "obd2CoverageEngineOffEnvelopeNote": "Dzinējs bija izslēgts šī brauciena pirmajās {head} un pēdējās {tail} — pārklājums tiek mērīts, dzinējam darbojoties.",
+  "@obd2CoverageEngineOffEnvelopeNote": {
+    "placeholders": {
+      "head": {
+        "type": "String"
+      },
+      "tail": {
+        "type": "String"
+      }
+    }
+  }
 }

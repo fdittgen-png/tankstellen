@@ -6433,6 +6433,34 @@ class AppLocalizationsPl extends AppLocalizations {
   String get obd2ScanOpenSettings => 'Otwórz ustawienia';
 
   @override
+  String get obd2WaitingForEngineBanner =>
+      'Oczekiwanie na silnik — nagrywanie z GPS';
+
+  @override
+  String get obd2StartEngineToReconnect =>
+      'Uruchom silnik, aby połączyć ponownie';
+
+  @override
+  String get obd2ResetConnectionEngineOff =>
+      'Silnik wyłączony — uruchom go, aby połączyć ponownie';
+
+  @override
+  String obd2ParkedPromptTitle(int minutes) {
+    return 'Silnik wyłączony od $minutes min — zakończyć nagrywanie?';
+  }
+
+  @override
+  String get obd2ParkedPromptStop => 'Zakończ';
+
+  @override
+  String get obd2ParkedPromptKeep => 'Kontynuuj';
+
+  @override
+  String obd2CoverageEngineOffEnvelopeNote(String head, String tail) {
+    return 'Silnik wyłączony przez pierwsze $head i ostatnie $tail tej podróży — pokrycie jest mierzone przy pracującym silniku.';
+  }
+
+  @override
   String get obd2ReconnectInProgress => 'Ponowne łączenie z adapterem OBD2…';
 
   @override

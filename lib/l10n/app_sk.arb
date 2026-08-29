@@ -4697,5 +4697,29 @@
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
   },
-  "minimalDriveBehaviour": "Štýl jazdy"
+  "minimalDriveBehaviour": "Štýl jazdy",
+  "obd2WaitingForEngineBanner": "Čaká sa na motor — záznam pomocou GPS",
+  "obd2StartEngineToReconnect": "Naštartujte motor na opätovné pripojenie",
+  "obd2ResetConnectionEngineOff": "Motor je vypnutý — naštartujte ho na opätovné pripojenie",
+  "obd2ParkedPromptTitle": "Motor je vypnutý {minutes} min — ukončiť záznam?",
+  "@obd2ParkedPromptTitle": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2ParkedPromptStop": "Ukončiť",
+  "obd2ParkedPromptKeep": "Pokračovať",
+  "obd2CoverageEngineOffEnvelopeNote": "Motor bol vypnutý prvých {head} a posledných {tail} tejto jazdy — pokrytie sa meria pri bežiacom motore.",
+  "@obd2CoverageEngineOffEnvelopeNote": {
+    "placeholders": {
+      "head": {
+        "type": "String"
+      },
+      "tail": {
+        "type": "String"
+      }
+    }
+  }
 }

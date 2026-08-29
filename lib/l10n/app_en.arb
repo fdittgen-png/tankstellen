@@ -5985,6 +5985,47 @@
   "@obd2ScanOpenSettings": {
     "description": "Button in the OBD2 empty-scan state that deep-links to the relevant system settings screen."
   },
+  "obd2WaitingForEngineBanner": "Waiting for the engine — recording on GPS",
+  "@obd2WaitingForEngineBanner": {
+    "description": "Calm floating pill on the trip-recording screen (#3858/#3859, Epic #3855) while the car's engine is off — either the recording started before the engine, or the driver switched it off with the recording still running. GPS keeps recording; engine data attaches by itself when the engine starts. Not an error."
+  },
+  "obd2StartEngineToReconnect": "Start the engine to reconnect",
+  "@obd2StartEngineToReconnect": {
+    "description": "Replaces the 'Reset connection' button on the OBD2 pause banner while the vehicle power model says the car is asleep (#3860): a reset would only dial a sleeping adapter. States what is actually needed."
+  },
+  "obd2ResetConnectionEngineOff": "Engine is off — start it to reconnect",
+  "@obd2ResetConnectionEngineOff": {
+    "description": "Snackbar when the user taps 'Reset connection' while the car is asleep (#3860). No dial is attempted."
+  },
+  "obd2ParkedPromptTitle": "Engine off for {minutes} min — stop recording?",
+  "@obd2ParkedPromptTitle": {
+    "description": "Prompt pill on the trip-recording screen (#3862) after the engine has been off and the car stationary for a few minutes with a manual recording still running. {minutes} is the whole number of minutes.",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2ParkedPromptStop": "Stop",
+  "@obd2ParkedPromptStop": {
+    "description": "Parked-prompt action (#3862): stop and save the recording now."
+  },
+  "obd2ParkedPromptKeep": "Keep",
+  "@obd2ParkedPromptKeep": {
+    "description": "Parked-prompt action (#3862): keep recording; the prompt does not return this session."
+  },
+  "obd2CoverageEngineOffEnvelopeNote": "Engine off for the first {head} and the last {tail} of this trip — coverage is measured while the engine ran.",
+  "@obd2CoverageEngineOffEnvelopeNote": {
+    "description": "Trip-detail coverage note (#3861) replacing the false 'connection dropped' verdict when a trip began and/or ended with the engine off. {head} and {tail} are pre-formatted durations such as '1:40' or '0:00'.",
+    "placeholders": {
+      "head": {
+        "type": "String"
+      },
+      "tail": {
+        "type": "String"
+      }
+    }
+  },
   "obd2ReconnectInProgress": "Reconnecting to your OBD2 adapter…",
   "@obd2ReconnectInProgress": {
     "description": "Shown while the trip-independent auto-reconnect controller is actively trying to re-establish a dropped OBD2 adapter link (Epic #3013 phase 3, #3019). Bounded backoff loop in flight."

@@ -6371,6 +6371,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get obd2ScanOpenSettings => 'Open settings';
 
   @override
+  String get obd2WaitingForEngineBanner =>
+      'Waiting for the engine — recording on GPS';
+
+  @override
+  String get obd2StartEngineToReconnect => 'Start the engine to reconnect';
+
+  @override
+  String get obd2ResetConnectionEngineOff =>
+      'Engine is off — start it to reconnect';
+
+  @override
+  String obd2ParkedPromptTitle(int minutes) {
+    return 'Engine off for $minutes min — stop recording?';
+  }
+
+  @override
+  String get obd2ParkedPromptStop => 'Stop';
+
+  @override
+  String get obd2ParkedPromptKeep => 'Keep';
+
+  @override
+  String obd2CoverageEngineOffEnvelopeNote(String head, String tail) {
+    return 'Engine off for the first $head and the last $tail of this trip — coverage is measured while the engine ran.';
+  }
+
+  @override
   String get obd2ReconnectInProgress => 'Reconnecting to your OBD2 adapter…';
 
   @override
@@ -14384,6 +14411,34 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get obd2ScanOpenSettings => '⟦Óƥéñ šéŧŧîñǧš ·····⟧';
+
+  @override
+  String get obd2WaitingForEngineBanner =>
+      '⟦Ŵáîŧîñǧ ƒóř ŧĥé éñǧîñé — řéçóřđîñǧ óñ ǦƤŠ ···············⟧';
+
+  @override
+  String get obd2StartEngineToReconnect =>
+      '⟦Šŧářŧ ŧĥé éñǧîñé ŧó řéçóññéçŧ ···········⟧';
+
+  @override
+  String get obd2ResetConnectionEngineOff =>
+      '⟦Éñǧîñé îš óƒƒ — šŧářŧ îŧ ŧó řéçóññéçŧ ·············⟧';
+
+  @override
+  String obd2ParkedPromptTitle(int minutes) {
+    return '⟦Éñǧîñé óƒƒ ƒóř $minutes ɱîñ — šŧóƥ řéçóřđîñǧ? ·············⟧';
+  }
+
+  @override
+  String get obd2ParkedPromptStop => '⟦Šŧóƥ ··⟧';
+
+  @override
+  String get obd2ParkedPromptKeep => '⟦Ķééƥ ··⟧';
+
+  @override
+  String obd2CoverageEngineOffEnvelopeNote(String head, String tail) {
+    return '⟦Éñǧîñé óƒƒ ƒóř ŧĥé ƒîřšŧ $head áñđ ŧĥé łášŧ $tail óƒ ŧĥîš ŧřîƥ — çóṽéřáǧé îš ɱéášúřéđ ŵĥîłé ŧĥé éñǧîñé řáñ. ··································⟧';
+  }
 
   @override
   String get obd2ReconnectInProgress =>

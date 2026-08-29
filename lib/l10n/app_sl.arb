@@ -4697,5 +4697,29 @@
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
   },
-  "minimalDriveBehaviour": "Slog vožnje"
+  "minimalDriveBehaviour": "Slog vožnje",
+  "obd2WaitingForEngineBanner": "Čakanje na motor — snemanje z GPS",
+  "obd2StartEngineToReconnect": "Zaženite motor za ponovno povezavo",
+  "obd2ResetConnectionEngineOff": "Motor je ugasnjen — zaženite ga za ponovno povezavo",
+  "obd2ParkedPromptTitle": "Motor ugasnjen že {minutes} min — ustaviti snemanje?",
+  "@obd2ParkedPromptTitle": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2ParkedPromptStop": "Ustavi",
+  "obd2ParkedPromptKeep": "Nadaljuj",
+  "obd2CoverageEngineOffEnvelopeNote": "Motor ugasnjen prvih {head} in zadnjih {tail} te vožnje — pokritost se meri med delovanjem motorja.",
+  "@obd2CoverageEngineOffEnvelopeNote": {
+    "placeholders": {
+      "head": {
+        "type": "String"
+      },
+      "tail": {
+        "type": "String"
+      }
+    }
+  }
 }

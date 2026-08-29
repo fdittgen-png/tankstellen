@@ -6452,6 +6452,34 @@ class AppLocalizationsRo extends AppLocalizations {
   String get obd2ScanOpenSettings => 'Deschide setările';
 
   @override
+  String get obd2WaitingForEngineBanner =>
+      'Se așteaptă motorul — înregistrare cu GPS';
+
+  @override
+  String get obd2StartEngineToReconnect =>
+      'Pornește motorul pentru a reconecta';
+
+  @override
+  String get obd2ResetConnectionEngineOff =>
+      'Motorul este oprit — pornește-l pentru a reconecta';
+
+  @override
+  String obd2ParkedPromptTitle(int minutes) {
+    return 'Motor oprit de $minutes min — oprești înregistrarea?';
+  }
+
+  @override
+  String get obd2ParkedPromptStop => 'Oprește';
+
+  @override
+  String get obd2ParkedPromptKeep => 'Continuă';
+
+  @override
+  String obd2CoverageEngineOffEnvelopeNote(String head, String tail) {
+    return 'Motor oprit în primele $head și ultimele $tail ale acestei călătorii — acoperirea se măsoară cu motorul pornit.';
+  }
+
+  @override
   String get obd2ReconnectInProgress => 'Reconectare la adaptorul tău OBD2…';
 
   @override

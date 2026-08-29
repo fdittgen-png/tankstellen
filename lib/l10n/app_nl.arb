@@ -4697,5 +4697,29 @@
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
   },
-  "minimalDriveBehaviour": "Rijgedrag"
+  "minimalDriveBehaviour": "Rijgedrag",
+  "obd2WaitingForEngineBanner": "Wacht op de motor — registreren met gps",
+  "obd2StartEngineToReconnect": "Start de motor om opnieuw te verbinden",
+  "obd2ResetConnectionEngineOff": "Motor is uit — start hem om opnieuw te verbinden",
+  "obd2ParkedPromptTitle": "Motor al {minutes} min uit — registratie stoppen?",
+  "@obd2ParkedPromptTitle": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2ParkedPromptStop": "Stoppen",
+  "obd2ParkedPromptKeep": "Doorgaan",
+  "obd2CoverageEngineOffEnvelopeNote": "Motor uit tijdens de eerste {head} en de laatste {tail} van deze rit — de dekking wordt gemeten terwijl de motor draait.",
+  "@obd2CoverageEngineOffEnvelopeNote": {
+    "placeholders": {
+      "head": {
+        "type": "String"
+      },
+      "tail": {
+        "type": "String"
+      }
+    }
+  }
 }

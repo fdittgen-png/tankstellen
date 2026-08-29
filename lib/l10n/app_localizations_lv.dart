@@ -6446,6 +6446,33 @@ class AppLocalizationsLv extends AppLocalizations {
   String get obd2ScanOpenSettings => 'Atvērt iestatījumus';
 
   @override
+  String get obd2WaitingForEngineBanner => 'Gaida dzinēju — ieraksta ar GPS';
+
+  @override
+  String get obd2StartEngineToReconnect =>
+      'Iedarbiniet dzinēju, lai savienotos atkārtoti';
+
+  @override
+  String get obd2ResetConnectionEngineOff =>
+      'Dzinējs ir izslēgts — iedarbiniet to, lai savienotos atkārtoti';
+
+  @override
+  String obd2ParkedPromptTitle(int minutes) {
+    return 'Dzinējs izslēgts jau $minutes min — apturēt ierakstīšanu?';
+  }
+
+  @override
+  String get obd2ParkedPromptStop => 'Apturēt';
+
+  @override
+  String get obd2ParkedPromptKeep => 'Turpināt';
+
+  @override
+  String obd2CoverageEngineOffEnvelopeNote(String head, String tail) {
+    return 'Dzinējs bija izslēgts šī brauciena pirmajās $head un pēdējās $tail — pārklājums tiek mērīts, dzinējam darbojoties.';
+  }
+
+  @override
   String get obd2ReconnectInProgress =>
       'Atkārtoti savienojas ar jūsu OBD2 adapteri…';
 

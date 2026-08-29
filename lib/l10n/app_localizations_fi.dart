@@ -6405,6 +6405,34 @@ class AppLocalizationsFi extends AppLocalizations {
   String get obd2ScanOpenSettings => 'Avaa asetukset';
 
   @override
+  String get obd2WaitingForEngineBanner =>
+      'Odotetaan moottoria — tallennetaan GPS:llä';
+
+  @override
+  String get obd2StartEngineToReconnect =>
+      'Käynnistä moottori yhdistääksesi uudelleen';
+
+  @override
+  String get obd2ResetConnectionEngineOff =>
+      'Moottori on sammuksissa — käynnistä se yhdistääksesi uudelleen';
+
+  @override
+  String obd2ParkedPromptTitle(int minutes) {
+    return 'Moottori sammuksissa $minutes min — lopetetaanko tallennus?';
+  }
+
+  @override
+  String get obd2ParkedPromptStop => 'Lopeta';
+
+  @override
+  String get obd2ParkedPromptKeep => 'Jatka';
+
+  @override
+  String obd2CoverageEngineOffEnvelopeNote(String head, String tail) {
+    return 'Moottori sammuksissa matkan ensimmäiset $head ja viimeiset $tail — kattavuus mitataan moottorin käydessä.';
+  }
+
+  @override
   String get obd2ReconnectInProgress =>
       'Yhdistetään uudelleen OBD2-sovittimeesi…';
 
