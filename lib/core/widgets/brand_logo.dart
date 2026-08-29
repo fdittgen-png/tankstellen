@@ -3,8 +3,10 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../providers/privacy_controls_provider.dart';
 import '../theme/app_radius.dart';
 import '../utils/brand_logo_mapper.dart';
 
@@ -15,7 +17,7 @@ import '../utils/brand_logo_mapper.dart';
 /// disk-cached and decoded at the display size (#1761): a logo is
 /// fetched and decoded once, then reused from disk across scroll-away
 /// and app restarts instead of re-downloading.
-class BrandLogo extends StatelessWidget {
+class BrandLogo extends ConsumerWidget {
   /// The brand name (e.g. "Shell", "TotalEnergies", "ARAL").
   final String brand;
 
@@ -25,8 +27,11 @@ class BrandLogo extends StatelessWidget {
   const BrandLogo({super.key, required this.brand, this.size = 48});
 
   @override
-  Widget build(BuildContext context) {
-    final url = BrandLogoMapper.logoUrl(brand);
+  Widget build(BuildContext context, WidgetRef ref) {
+    // #3870 (Epic #3865) — internet logos (logo.clearbit.com) only when the
+    // user switched them on in Settings → Privacy; the monogram otherwise.
+    final remote = ref.watch(remoteBrandLogosProvider);
+    final url = remote ? BrandLogoMapper.logoUrl(brand) : null;
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
 

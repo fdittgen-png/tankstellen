@@ -55,7 +55,7 @@ void main() {
       expect(snap.linkKind, 'ble');
       expect(snap.redactedMac, redactObd2Mac('AA:BB:CC:DD:EE:FF'));
       expect(snap.redactedMac, isNot(contains('AA:BB:CC:DD')));
-      expect(snap.redactedMac, endsWith('E:FF'));
+      expect(snap.redactedMac, startsWith('AA:BB:CC'));
 
       // Adapter identity resolved during the handshake.
       expect(snap.elmVersion, 'ELM327 v1.5');
@@ -108,8 +108,8 @@ void main() {
   });
 
   group('redactObd2Mac (#2465)', () {
-    test('hides all but the last four characters', () {
-      expect(redactObd2Mac('AA:BB:CC:DD:EE:FF'), '·············E:FF');
+    test('keeps the vendor prefix and masks the device-unique tail (#3870)', () {
+      expect(redactObd2Mac('AA:BB:CC:DD:EE:FF'), 'AA:BB:CC·········');
     });
 
     test('null and short inputs pass through', () {

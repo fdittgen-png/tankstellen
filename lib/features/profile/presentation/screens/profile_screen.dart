@@ -11,7 +11,8 @@ import '../../../../core/theme/theme_mode_provider.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/settings_menu_tile.dart';
-import '../../../consent/presentation/widgets/consent_settings_section.dart';
+import '../../../consent/api.dart'
+    show ConsentSettingsSection, PrivacyControlsSection;
 import '../../../driving/presentation/widgets/driving_settings_section.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
 import '../../../feature_management/domain/consumption_tab_visibility.dart';
@@ -241,7 +242,10 @@ class ProfileScreen extends ConsumerWidget {
           _FoldableSection(
             icon: Icons.privacy_tip_outlined,
             title: l.gdprTitle,
-            child: const ConsentSettingsSection(),
+            child: const Column(children: [
+              ConsentSettingsSection(),
+              PrivacyControlsSection(), // #3870
+            ]),
           ),
           const SizedBox(height: 8),
           // Privacy Dashboard

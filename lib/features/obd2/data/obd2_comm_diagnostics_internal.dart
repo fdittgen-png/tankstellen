@@ -14,8 +14,13 @@ part of 'obd2_comm_diagnostics.dart';
 String? redactObd2Mac(String? mac) {
   if (mac == null) return null;
   if (mac.length <= 4) return mac;
-  final visible = mac.substring(mac.length - 4);
-  return '${'·' * (mac.length - 4)}$visible';
+  // #3870 (Epic #3865) — keep the VENDOR prefix (the OUI, the first three
+  // octets of a MAC / the first block of a BLE UUID) and mask the
+  // device-unique tail. The old form kept the tail, which is exactly the
+  // part that makes two sightings of the same adapter linkable.
+  final keep = mac.length >= 17 ? 8 : (mac.length / 2).floor();
+  final visible = mac.substring(0, keep);
+  return '$visible${'·' * (mac.length - keep)}';
 }
 
 /// Reconnect-telemetry record API (#2905) — split into this part so the

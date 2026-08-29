@@ -4,6 +4,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/providers/privacy_controls_provider.dart';
 import 'package:tankstellen/core/widgets/brand_logo.dart';
 
 import '../../helpers/pump_app.dart';
@@ -25,9 +26,25 @@ void main() {
       expect(find.byIcon(Icons.local_gas_station), findsOneWidget);
     });
 
-    testWidgets('uses a disk-cached network image for a known brand',
-        (tester) async {
+    testWidgets('#3870 — internet logos are OFF by default: a known brand '
+        'renders the bundled fallback and touches no network', (tester) async {
       await pumpApp(tester, const BrandLogo(brand: 'Shell'));
+
+      expect(find.byType(CachedNetworkImage), findsNothing,
+          reason: 'logo.clearbit.com must not see the user\'s IP unless '
+              'the Settings → Privacy switch is on');
+      expect(find.byIcon(Icons.local_gas_station), findsOneWidget);
+    });
+
+    testWidgets('uses a disk-cached network image for a known brand once '
+        'the user switched internet logos on', (tester) async {
+      await pumpApp(
+        tester,
+        const BrandLogo(brand: 'Shell'),
+        overrides: [
+          remoteBrandLogosProvider.overrideWith(() => _RemoteLogosOn()),
+        ],
+      );
 
       // #1761 — the logo loads through CachedNetworkImage (disk cache +
       // decode-at-size), not a bare Image.network.
@@ -45,7 +62,13 @@ void main() {
     });
 
     testWidgets('uses ClipRRect for known brand', (tester) async {
-      await pumpApp(tester, const BrandLogo(brand: 'ARAL'));
+      await pumpApp(
+        tester,
+        const BrandLogo(brand: 'ARAL'),
+        overrides: [
+          remoteBrandLogosProvider.overrideWith(() => _RemoteLogosOn()),
+        ],
+      );
 
       expect(find.byType(ClipRRect), findsOneWidget);
     });
@@ -63,7 +86,13 @@ void main() {
     // announced nothing for the brand graphic on every station card.
     testWidgets('exposes an image semantic label naming the brand',
         (tester) async {
-      await pumpApp(tester, const BrandLogo(brand: 'Shell'));
+      await pumpApp(
+        tester,
+        const BrandLogo(brand: 'Shell'),
+        overrides: [
+          remoteBrandLogosProvider.overrideWith(() => _RemoteLogosOn()),
+        ],
+      );
 
       final semantics = tester
           .widgetList<Semantics>(
@@ -93,4 +122,10 @@ void main() {
       expect(semantics.properties.image, isTrue);
     });
   });
+}
+
+/// #3870 — the switch flipped on, without touching storage.
+class _RemoteLogosOn extends RemoteBrandLogos {
+  @override
+  bool build() => true;
 }

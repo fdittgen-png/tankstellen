@@ -20,6 +20,14 @@ class AppConstants {
 
   // Developer / Publisher
   static const String developerName = 'Florian DITTGEN';
+
+  /// #3871 (Epic #3865, GDPR) — the data controller of the Sparkilo
+  /// Community sync database, as named in privacy policy v3 Section 2.
+  /// Fed into the `{operator}` placeholder of the sync-mode picker's
+  /// controller notice so the picker says WHO is responsible before the
+  /// user connects. A proper noun (like [developerName] above) — it never
+  /// goes through the ARB.
+  static const String dataControllerName = 'Florian DITTGEN';
   static const String developerEmail = 'fdittgen@gmail.com';
   static const String developerWebsite =
       'https://github.com/fdittgen-png/tankstellen';
@@ -108,7 +116,17 @@ class AppConstants {
   /// of grey (#2396). This is the single source the map surfaces resolve
   /// through.
   static String get effectiveTileUrl =>
-      tileProxyUrl.isEmpty ? osmTileUrl : tileProxyUrl;
+      (tileProxyUrl.isEmpty || tileProxyDisabledByUser)
+          ? osmTileUrl
+          : tileProxyUrl;
+
+  /// #3870 (Epic #3865) — Settings → Privacy → "Route map tiles through
+  /// the Sparkilo proxy" switched OFF: tiles go to tile.openstreetmap.org
+  /// directly and the developer's edge function never sees the viewport.
+  /// Mirrored from `StorageKeys.tileProxyEnabled` at startup and on
+  /// toggle (`TileProxyEnabled` provider); a runtime flag because every
+  /// map surface resolves through this const-class getter.
+  static bool tileProxyDisabledByUser = false;
 
   /// Stable OSM-facing User-Agent the [tileProxyUrl] edge function imports
   /// to identify itself to OSM (LAYER 2 / #2397). Carries a contact URL
@@ -131,8 +149,17 @@ class AppConstants {
   static const String tankerkoenigCreativeCommonsUrl =
       'https://creativecommons.tankerkoenig.de/';
 
+  /// The privacy policy page. #3873 (Epic #3865) — the Pages ROOT has been
+  /// the marketing landing page since #3066; the policy lives under
+  /// `/privacy-policy/` (the URL every store listing declares).
   static const String privacyPolicyUrl =
-      'https://fdittgen-png.github.io/tankstellen/';
+      'https://fdittgen-png.github.io/tankstellen/privacy-policy/';
+
+  /// #3866 — the policy version the consent record stores. Bump together
+  /// with `docs/privacy/data_inventory.json` (`policyVersion`) and the
+  /// policy page; a bump re-surfaces the consent screen once.
+  static const int privacyPolicyVersion = 3;
+  static const String privacyPolicyDate = '2026-08-29';
 
   // Donation links
   static const String paypalUrl = 'https://www.paypal.me/FlorianDITTGEN';

@@ -14,6 +14,7 @@ import '../network/dio_offline.dart';
 import '../services/service_result.dart';
 import 'collectors/app_state_collector.dart';
 import 'collectors/breadcrumb_collector.dart';
+import 'pii_scrubber.dart';
 import 'collectors/device_info_collector.dart';
 import 'collectors/network_state_collector.dart';
 import 'error_classifier.dart';
@@ -143,7 +144,11 @@ class TraceRecorder {
       breadcrumbs: BreadcrumbCollector.snapshot(),
     );
 
-    await _storage.store(trace);
+    // #3870 (Epic #3865) — scrub BEFORE persisting: the stored trace is
+    // what "Save error log" hands to the share sheet / Downloads, so it
+    // must carry no e-mails, coordinates or tokens either. The uploader
+    // scrubs its own copy (idempotent).
+    await _storage.store(PiiScrubber.scrubErrorTrace(trace));
     await _uploader.uploadIfEnabled(trace);
   }
 

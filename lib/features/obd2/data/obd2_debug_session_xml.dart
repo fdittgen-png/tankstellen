@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:xml/xml.dart';
+import 'obd2_comm_diagnostics.dart';
 
 import 'obd2_debug_session.dart';
 
@@ -115,8 +116,4 @@ String _num(double v) =>
 /// stable hardware identifier (PII). Everything before the final four
 /// characters becomes the middle-dot `·` so the length stays visible.
 /// A string of four characters or fewer is returned unchanged.
-String _redactMac(String mac) {
-  if (mac.length <= 4) return mac;
-  final visible = mac.substring(mac.length - 4);
-  return '${'·' * (mac.length - 4)}$visible';
-}
+String _redactMac(String mac) => redactObd2Mac(mac)!; // #3870 — one rule
