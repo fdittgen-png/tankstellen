@@ -4697,5 +4697,29 @@
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
   },
-  "minimalDriveBehaviour": "Estilo de conducción"
+  "minimalDriveBehaviour": "Estilo de conducción",
+  "obd2WaitingForEngineBanner": "Esperando al motor: grabando con GPS",
+  "obd2StartEngineToReconnect": "Arranca el motor para reconectar",
+  "obd2ResetConnectionEngineOff": "Motor apagado: arráncalo para reconectar",
+  "obd2ParkedPromptTitle": "Motor apagado desde hace {minutes} min: ¿detener la grabación?",
+  "@obd2ParkedPromptTitle": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2ParkedPromptStop": "Detener",
+  "obd2ParkedPromptKeep": "Seguir",
+  "obd2CoverageEngineOffEnvelopeNote": "Motor apagado durante los primeros {head} y los últimos {tail} de este viaje: la cobertura se mide con el motor en marcha.",
+  "@obd2CoverageEngineOffEnvelopeNote": {
+    "placeholders": {
+      "head": {
+        "type": "String"
+      },
+      "tail": {
+        "type": "String"
+      }
+    }
+  }
 }

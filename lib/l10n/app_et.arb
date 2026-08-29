@@ -4697,5 +4697,29 @@
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
   },
-  "minimalDriveBehaviour": "Sõidustiil"
+  "minimalDriveBehaviour": "Sõidustiil",
+  "obd2WaitingForEngineBanner": "Ootab mootorit — salvestab GPS-iga",
+  "obd2StartEngineToReconnect": "Käivitage mootor uuesti ühendamiseks",
+  "obd2ResetConnectionEngineOff": "Mootor on väljas — käivitage see uuesti ühendamiseks",
+  "obd2ParkedPromptTitle": "Mootor on {minutes} min olnud väljas — kas lõpetada salvestus?",
+  "@obd2ParkedPromptTitle": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2ParkedPromptStop": "Lõpeta",
+  "obd2ParkedPromptKeep": "Jätka",
+  "obd2CoverageEngineOffEnvelopeNote": "Mootor oli väljas selle sõidu esimesed {head} ja viimased {tail} — katvust mõõdetakse töötava mootoriga.",
+  "@obd2CoverageEngineOffEnvelopeNote": {
+    "placeholders": {
+      "head": {
+        "type": "String"
+      },
+      "tail": {
+        "type": "String"
+      }
+    }
+  }
 }

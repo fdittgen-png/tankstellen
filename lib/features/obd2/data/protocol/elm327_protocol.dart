@@ -115,6 +115,10 @@ class Elm327Protocol {
   static double? parseEngineRpm(String raw) =>
       Elm327Parsers.parseEngineRpm(raw);
 
+  /// #3857 — the adapter's `ATRV` battery-voltage reply.
+  static double? parseBatteryVoltage(String raw) =>
+      Elm327Parsers.parseBatteryVoltage(raw);
+
   static int? parseDistanceSinceDtcCleared(String raw) =>
       Elm327Parsers.parseDistanceSinceDtcCleared(raw);
 

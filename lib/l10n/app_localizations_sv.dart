@@ -6397,6 +6397,33 @@ class AppLocalizationsSv extends AppLocalizations {
   String get obd2ScanOpenSettings => 'Öppna inställningar';
 
   @override
+  String get obd2WaitingForEngineBanner =>
+      'Väntar på motorn — registrerar med GPS';
+
+  @override
+  String get obd2StartEngineToReconnect => 'Starta motorn för att återansluta';
+
+  @override
+  String get obd2ResetConnectionEngineOff =>
+      'Motorn är av — starta den för att återansluta';
+
+  @override
+  String obd2ParkedPromptTitle(int minutes) {
+    return 'Motorn har varit av i $minutes min — stoppa registreringen?';
+  }
+
+  @override
+  String get obd2ParkedPromptStop => 'Stoppa';
+
+  @override
+  String get obd2ParkedPromptKeep => 'Fortsätt';
+
+  @override
+  String obd2CoverageEngineOffEnvelopeNote(String head, String tail) {
+    return 'Motorn var av under de första $head och de sista $tail av resan — täckningen mäts medan motorn går.';
+  }
+
+  @override
   String get obd2ReconnectInProgress => 'Återansluter till din OBD2-adapter…';
 
   @override

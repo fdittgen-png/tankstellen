@@ -15,6 +15,7 @@ import '../protocol/elm327_adapter.dart';
 import '../protocol/elm327_precision_pids.dart';
 import '../protocol/elm327_protocol.dart';
 import '../../domain/obd2_engine_evidence.dart';
+import '../../domain/vehicle_power_state.dart';
 import '../../domain/fuel_rate_estimator.dart' as estimator;
 import '../negotiated_protocol_cache.dart';
 import '../transport/obd2_atpc_teardown.dart';

@@ -5,6 +5,7 @@ import '../../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../protocol/elm327_protocol.dart';
 import '../../domain/fuel_mixture_model.dart';
+import '../../domain/vehicle_power_state.dart';
 import '../obd2_breadcrumb_collector.dart';
 import 'obd2_service.dart';
 import '../../domain/pid_scheduler.dart';

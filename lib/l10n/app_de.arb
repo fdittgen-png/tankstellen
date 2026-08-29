@@ -3097,6 +3097,13 @@
   "obd2ScanBlockedPermissionSettings": "Die Bluetooth-Berechtigung wurde dauerhaft verweigert. Erteile sie in den Systemeinstellungen, um nach deinem Adapter zu suchen.",
   "obd2ScanBlockedLocationServices": "Die Standortdienste sind auf diesem Gerät ausgeschaltet. Android benötigt sie, um nach Bluetooth-Adaptern zu suchen — es wird kein Standort aufgezeichnet oder geteilt.",
   "obd2ScanOpenSettings": "Einstellungen öffnen",
+  "obd2WaitingForEngineBanner": "Warte auf den Motor — Aufzeichnung per GPS",
+  "obd2StartEngineToReconnect": "Motor starten, um neu zu verbinden",
+  "obd2ResetConnectionEngineOff": "Motor ist aus — zum Neuverbinden starten",
+  "obd2ParkedPromptTitle": "Motor seit {minutes} Min. aus — Aufzeichnung beenden?",
+  "obd2ParkedPromptStop": "Beenden",
+  "obd2ParkedPromptKeep": "Weiter",
+  "obd2CoverageEngineOffEnvelopeNote": "Motor in den ersten {head} und den letzten {tail} dieser Fahrt aus — die Abdeckung wird bei laufendem Motor gemessen.",
   "obd2ReconnectInProgress": "Verbindung zum OBD2-Adapter wird wiederhergestellt…",
   "@obd2ReconnectInProgress": {
     "description": "Shown while the trip-independent auto-reconnect controller is actively trying to re-establish a dropped OBD2 adapter link (Epic #3013 phase 3, #3019). Bounded backoff loop in flight."

@@ -60,6 +60,11 @@ class TripRecordingState {
   /// [connectStage]. Null in every other phase.
   final TripSaveStage? saveStage;
 
+  /// #3862 (Epic #3855) — the engine has been off and the car stationary
+  /// for a few minutes with this manual recording still running; the
+  /// recording screen shows the Stop / Keep pill. False otherwise.
+  final bool parkedPromptDue;
+
   const TripRecordingState({
     this.phase = TripRecordingPhase.idle,
     this.live,
@@ -71,7 +76,15 @@ class TripRecordingState {
     this.gpsCoachingHint,
     this.connectStage,
     this.saveStage,
+    this.parkedPromptDue = false,
   });
+
+  /// #3859 — true while the trip records on GPS because the engine is
+  /// off (started before the engine, or switched off mid-recording). The
+  /// calm "waiting for the engine" state, distinct from a link failure.
+  bool get awaitingEngine =>
+      phase == TripRecordingPhase.degradedGpsOnly &&
+      dropReason == TripDropReason.engineOff;
 
   TripRecordingState copyWith({
     TripRecordingPhase? phase,
@@ -89,6 +102,7 @@ class TripRecordingState {
     bool clearConnectStage = false,
     TripSaveStage? saveStage,
     bool clearSaveStage = false,
+    bool? parkedPromptDue,
   }) =>
       TripRecordingState(
         phase: phase ?? this.phase,
@@ -112,6 +126,7 @@ class TripRecordingState {
         saveStage: clearSaveStage
             ? null
             : (saveStage ?? this.saveStage),
+        parkedPromptDue: parkedPromptDue ?? this.parkedPromptDue,
       );
 
   bool get isActive =>

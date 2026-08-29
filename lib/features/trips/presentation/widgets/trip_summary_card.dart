@@ -12,7 +12,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../data/trip_history_repository.dart';
 import '../../domain/obd2_engine_coverage.dart';
-import '../../domain/trip_summary.dart';
+import '../../domain/trip_recorder.dart';
 import '../../providers/trip_fuel_cost_provider.dart';
 import 'distance_source_badge.dart';
 import 'trip_detail_charts.dart';
@@ -162,16 +162,35 @@ class TripSummaryCard extends ConsumerWidget {
   /// saying (full coverage, GPS-only trips, EV, empty trips).
   String? _engineCoverageNote(AppLocalizations l) {
     if (isEv || entry.summary.kind != TripKind.gpsPlusObd2) return null;
-    final coverage = Obd2EngineCoverage.fromFlags([
-      for (final d in samples)
-        d.rpm != null ||
-            d.engineLoadPercent != null ||
-            d.throttlePercent != null ||
-            // MEASURED fuel rate only — the GPS-physics estimated series
-            // (d.estimatedFuelRateLPerHour) is exactly what this note
-            // explains, so it must not count as engine data.
-            d.fuelRateLPerHour != null,
-    ]);
+    final coverage = Obd2EngineCoverage.fromFlags(
+      [
+        for (final d in samples)
+          d.rpm != null ||
+              d.engineLoadPercent != null ||
+              d.throttlePercent != null ||
+              // MEASURED fuel rate only — the GPS-physics estimated series
+              // (d.estimatedFuelRateLPerHour) is exactly what this note
+              // explains, so it must not count as engine data.
+              d.fuelRateLPerHour != null,
+      ],
+      // #3861 — measure inside the engine-running envelope; the parked
+      // head/tail is reported as engine-off, never as a dropped link.
+      isRunningBySample: [
+        for (final d in samples)
+          (d.rpm ?? 0) >= TripRecorder.kEngineRunningRpmFloor,
+      ],
+      timestamps: [for (final d in samples) d.timestamp],
+    );
+    if (coverage != null &&
+        coverage.reason == Obd2EngineCoverageReason.full &&
+        coverage.hasEngineOffEdges) {
+      return l.obd2CoverageEngineOffEnvelopeNote(
+        formatMinutesSeconds(
+            Duration(seconds: coverage.headOffSeconds.round())),
+        formatMinutesSeconds(
+            Duration(seconds: coverage.tailOffSeconds.round())),
+      );
+    }
     return switch (coverage?.reason) {
       null || Obd2EngineCoverageReason.full => null,
       Obd2EngineCoverageReason.noEngineData => l.obd2CoverageNoneNote,

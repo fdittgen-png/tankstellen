@@ -24,6 +24,19 @@ import '../providers/obd2_reconnect_provider.dart';
 Future<void> runObd2ConnectionReset(BuildContext context, WidgetRef ref) async {
   final l = AppLocalizations.of(context);
   final messenger = ScaffoldMessenger.maybeOf(context);
+  // #3860 (Epic #3855) — retry-with-reset only while the engine runs.
+  // With the car asleep a reset is a dial ladder against a sleeping
+  // dongle: say what is actually needed instead of spinning.
+  final asleep = guard(
+    () => ref.read(obd2ReconnectProvider.notifier).carAsleep,
+    where: 'runObd2ConnectionReset power read failed',
+    fallback: false,
+  );
+  if (asleep) {
+    messenger?.showSnackBar(
+        SnackBarHelper.infoSnackBar(l.obd2ResetConnectionEngineOff));
+    return;
+  }
   final linked = await guardAsync(
     () => ref.read(obd2ReconnectProvider.notifier).resetConnection(),
     where: 'runObd2ConnectionReset failed',

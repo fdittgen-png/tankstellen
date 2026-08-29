@@ -4669,5 +4669,29 @@
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
   },
-  "minimalDriveBehaviour": "Comportement de conduite"
+  "minimalDriveBehaviour": "Comportement de conduite",
+  "obd2WaitingForEngineBanner": "En attente du moteur — enregistrement par GPS",
+  "obd2StartEngineToReconnect": "Démarrez le moteur pour reconnecter",
+  "obd2ResetConnectionEngineOff": "Moteur éteint — démarrez-le pour reconnecter",
+  "obd2ParkedPromptTitle": "Moteur éteint depuis {minutes} min — arrêter l'enregistrement ?",
+  "@obd2ParkedPromptTitle": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2ParkedPromptStop": "Arrêter",
+  "obd2ParkedPromptKeep": "Continuer",
+  "obd2CoverageEngineOffEnvelopeNote": "Moteur éteint pendant les premières {head} et les dernières {tail} de ce trajet — la couverture est mesurée moteur en marche.",
+  "@obd2CoverageEngineOffEnvelopeNote": {
+    "placeholders": {
+      "head": {
+        "type": "String"
+      },
+      "tail": {
+        "type": "String"
+      }
+    }
+  }
 }

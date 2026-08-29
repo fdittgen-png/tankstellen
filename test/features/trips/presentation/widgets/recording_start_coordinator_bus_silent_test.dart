@@ -54,12 +54,15 @@ void main() {
   }
 
   testWidgets(
-      'a CONFIRMED engine-off connect (probedSilent) surfaces Obd2EngineOff, '
-      'disconnects, and never calls notifier.start (#2892, #3009, #3101)',
-      (tester) async {
+      '#3858 (Epic #3855) — a CONFIRMED engine-off connect (probedSilent) '
+      'STARTS the trip GPS-first on the live link: no Obd2EngineOff, no '
+      'teardown (supersedes the #2892/#3009 refusal)', (tester) async {
     // #3101 — only a `probedSilent` probe (ECU silent through every retry) is
-    // a genuine engine-off. `busAnswered` is false here too, but the gate now
-    // keys off the finer tri-state, not the coarse boolean.
+    // a genuine engine-off. Before #3858 the coordinator refused to start here
+    // ("start the engine and try again") and tore the link down — the driver
+    // who wanted the recording running before turning the key got an error
+    // and a retry loop that re-sent `0100` into a silent bus (#3575). Now the
+    // recording starts and the controller waits for the engine.
     final service = _FakeObd2Service(
       busAnswered: false,
       busProbe: Obd2BusProbeResult.probedSilent,
@@ -81,26 +84,20 @@ void main() {
       );
     });
 
-    // #3009 — the engine-off condition is surfaced with the accurate
-    // "start the engine" exception, NOT the adapter-blaming one.
-    expect(errors, hasLength(1));
-    expect(errors.single, isA<Obd2EngineOff>(),
-        reason: 'silent bus must surface the engine-off condition');
+    expect(errors, isEmpty,
+        reason: 'an engine that is off is a recording condition, not a '
+            'connection error');
+    expect(recording.startCallCount, 1,
+        reason: 'the trip starts GPS-first and waits for the engine');
+    expect(recording.lastStartedService, same(service));
+    expect(service.disconnectCallCount, 0,
+        reason: 'the link is KEPT — its keepalive carries the voltage watch '
+            'that will see the engine start');
 
-    // A degraded GPS-only trip is NOT started.
-    expect(recording.startCallCount, 0,
-        reason: 'notifier.start must NOT run when the bus did not answer');
-
-    // The dead link is torn down + the connecting phase rolled back.
-    expect(service.disconnectCallCount, 1,
-        reason: 'the unusable link must be disconnected');
-    expect(recording.cancelConnectingCallCount, greaterThanOrEqualTo(1),
-        reason: 'the connecting phase must roll back to idle');
-
-    // #3551 — the verdict was re-checked with ONE fresh probe before the
-    // engine-off conclusion (it stayed silent here, so the error stands).
+    // #3551 — the verdict is still re-checked with ONE fresh probe first
+    // (a stale silent verdict from a prewarm dial answers here at no cost).
     expect(service.reprobeCallCount, 1,
-        reason: 'a silent verdict must be re-probed once before bailing');
+        reason: 'a silent verdict is re-probed once before the GPS-first start');
   });
 
   testWidgets(

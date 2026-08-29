@@ -7,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../trips/api.dart';
+import '../../domain/vehicle_power_state.dart';
+import '../../providers/vehicle_power_provider.dart';
 import '../obd2_connection_reset_action.dart';
 
 /// Banner shown when the OBD2 Bluetooth link drops mid-recording
@@ -51,6 +53,9 @@ class Obd2PauseBanner extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final isSilentFailure = dropReason == TripDropReason.silentFailure;
+    // #3860 — retry-with-reset only while the engine runs.
+    final carAsleep =
+        ref.watch(vehiclePowerProvider) == VehiclePowerState.asleep;
     // #3545 — a compact floating pill instead of a full-width
     // MaterialBanner: the widget now lives in an overlay Stack, so it
     // must never claim more width than its content (hits beside it fall
@@ -100,15 +105,31 @@ class Obd2PauseBanner extends ConsumerWidget {
                   // #3781 (Epic #3775) — the reset, reachable exactly
                   // where the failure surfaces. Recording state is
                   // untouched; the link recycles through the supervisor.
-                  TextButton(
-                    key: const Key('obd2PauseBannerReset'),
-                    style: TextButton.styleFrom(
-                      visualDensity: VisualDensity.compact,
-                      foregroundColor: theme.colorScheme.onErrorContainer,
+                  // #3860 — only while the engine runs; with the car
+                  // asleep its place says what is actually needed.
+                  if (carAsleep)
+                    Flexible(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Text(
+                          l.obd2StartEngineToReconnect,
+                          key: const Key('obd2PauseBannerStartEngine'),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onErrorContainer,
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    TextButton(
+                      key: const Key('obd2PauseBannerReset'),
+                      style: TextButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                        foregroundColor: theme.colorScheme.onErrorContainer,
+                      ),
+                      onPressed: () => runObd2ConnectionReset(context, ref),
+                      child: Text(l.obd2ResetConnection),
                     ),
-                    onPressed: () => runObd2ConnectionReset(context, ref),
-                    child: Text(l.obd2ResetConnection),
-                  ),
                   TextButton(
                     key: const Key('obd2PauseBannerResume'),
                     style: TextButton.styleFrom(

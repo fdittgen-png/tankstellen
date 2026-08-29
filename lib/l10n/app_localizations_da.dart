@@ -6402,6 +6402,33 @@ class AppLocalizationsDa extends AppLocalizations {
   String get obd2ScanOpenSettings => 'Åbn indstillinger';
 
   @override
+  String get obd2WaitingForEngineBanner =>
+      'Venter på motoren — optager med GPS';
+
+  @override
+  String get obd2StartEngineToReconnect => 'Start motoren for at genforbinde';
+
+  @override
+  String get obd2ResetConnectionEngineOff =>
+      'Motoren er slukket — start den for at genforbinde';
+
+  @override
+  String obd2ParkedPromptTitle(int minutes) {
+    return 'Motoren har været slukket i $minutes min — stop optagelsen?';
+  }
+
+  @override
+  String get obd2ParkedPromptStop => 'Stop';
+
+  @override
+  String get obd2ParkedPromptKeep => 'Fortsæt';
+
+  @override
+  String obd2CoverageEngineOffEnvelopeNote(String head, String tail) {
+    return 'Motoren var slukket de første $head og de sidste $tail af turen — dækningen måles, mens motoren kører.';
+  }
+
+  @override
   String get obd2ReconnectInProgress => 'Genforbinder til din OBD2-adapter…';
 
   @override

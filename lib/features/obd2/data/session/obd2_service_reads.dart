@@ -37,9 +37,14 @@ mixin _Obd2ServiceReads on _Obd2ServiceLink {
       final value = Elm327Protocol.parseVehicleSpeed(response);
       _pids.noteMode01Reply(Elm327Protocol.vehicleSpeedCommand, response,
           parsed: value != null); // #3532
-      // #3756 — a PARSED road speed only comes from an awake ECU:
-      // stamp the engine-on evidence the stand-down suppression reads.
-      if (value != null) Obd2EngineEvidence.instance.noteEngineOn();
+      // #3756 — a PARSED road speed only comes from an awake ECU. #3856:
+      // awake is all it proves — a speed of 0 with the key on is
+      // ignition-on/engine-off, so the engine-RUNNING stamp needs a
+      // moving car (rpm is the authoritative running signal below).
+      if (value != null) {
+        Obd2VehiclePower.instance.noteBusAnswered();
+        if (value > 0) Obd2EngineEvidence.instance.noteEngineOn();
+      }
       return value;
     } catch (e, st) {
       recordObd2ReadFailure(e, st, where: 'OBD2 readSpeed failed'); // #2855
@@ -57,13 +62,40 @@ mixin _Obd2ServiceReads on _Obd2ServiceLink {
       final value = Elm327Protocol.parseEngineRpm(response);
       _pids.noteMode01Reply(Elm327Protocol.engineRpmCommand, response,
           parsed: value != null); // #3532
-      // #3756 — rpm > 0 = the engine is literally turning.
-      if (value != null && value > 0) {
-        Obd2EngineEvidence.instance.noteEngineOn();
+      // #3756 — rpm > 0 = the engine is literally turning. #3856 — rpm
+      // is the authoritative power-state reading either way (0 = awake).
+      if (value != null) {
+        Obd2VehiclePower.instance.noteRpm(value);
+        if (value > 0) Obd2EngineEvidence.instance.noteEngineOn();
       }
       return value;
     } catch (e, st) {
       recordObd2ReadFailure(e, st, where: 'OBD2 readRpm failed'); // #2855
+      return null;
+    }
+  }
+
+  /// #3857 (Epic #3855) — read the adapter's own battery-voltage
+  /// measurement (`ATRV`). An AT command: answered by the ELM chip
+  /// without any vehicle-bus traffic, so it is safe to poll while the
+  /// ECU is silent, mid protocol-search, and through the UNABLE-TO-
+  /// CONNECT livelock — every case where PIDs say nothing. The parsed
+  /// value feeds the vehicle power model through the session hook; this
+  /// returns it for the caller's own bookkeeping (the recording loop's
+  /// slow-cadence `bv` stamp). Null when not connected or unparsable.
+  Future<double?> readBatteryVoltageV() async {
+    if (!_transport.isConnected) return null;
+    try {
+      final response = await _rawSend(Elm327Commands.readVoltageCommand);
+      final volts = Elm327Protocol.parseBatteryVoltage(response);
+      // The session hook already stamped the model when a session is
+      // attached; a pre-session read (connect-time) stamps here.
+      if (volts != null && _session.lastVoltageV != volts) {
+        Obd2VehiclePower.instance.noteVoltage(volts);
+      }
+      return volts;
+    } catch (e, st) {
+      recordObd2ReadFailure(e, st, where: 'OBD2 readBatteryVoltage failed');
       return null;
     }
   }

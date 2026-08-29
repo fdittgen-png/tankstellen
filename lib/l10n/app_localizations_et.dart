@@ -6399,6 +6399,33 @@ class AppLocalizationsEt extends AppLocalizations {
   String get obd2ScanOpenSettings => 'Ava seaded';
 
   @override
+  String get obd2WaitingForEngineBanner => 'Ootab mootorit — salvestab GPS-iga';
+
+  @override
+  String get obd2StartEngineToReconnect =>
+      'Käivitage mootor uuesti ühendamiseks';
+
+  @override
+  String get obd2ResetConnectionEngineOff =>
+      'Mootor on väljas — käivitage see uuesti ühendamiseks';
+
+  @override
+  String obd2ParkedPromptTitle(int minutes) {
+    return 'Mootor on $minutes min olnud väljas — kas lõpetada salvestus?';
+  }
+
+  @override
+  String get obd2ParkedPromptStop => 'Lõpeta';
+
+  @override
+  String get obd2ParkedPromptKeep => 'Jätka';
+
+  @override
+  String obd2CoverageEngineOffEnvelopeNote(String head, String tail) {
+    return 'Mootor oli väljas selle sõidu esimesed $head ja viimased $tail — katvust mõõdetakse töötava mootoriga.';
+  }
+
+  @override
   String get obd2ReconnectInProgress => 'Taasühendamine teie OBD2-adapteriga…';
 
   @override

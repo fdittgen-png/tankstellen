@@ -12,6 +12,7 @@ import '../transport/obd2_link_drop_signal.dart';
 import '../../domain/obd2_link_state.dart';
 import '../../domain/obd2_reconnect_stand_down.dart';
 import '../../domain/obd2_engine_evidence.dart';
+import '../../domain/vehicle_power_state.dart';
 import 'obd2_service.dart';
 
 export '../../domain/obd2_link_state.dart';
@@ -60,7 +61,9 @@ class Obd2LinkSupervisor {
     Random? jitter,
     DateTime Function()? now,
     Obd2EngineEvidence? engineEvidence,
+    Obd2VehiclePower? vehiclePower,
   })  : _engineEvidence = engineEvidence ?? Obd2EngineEvidence.instance,
+        _vehiclePower = vehiclePower ?? Obd2VehiclePower.instance,
         _standDown = ReconnectStandDown(now: now ?? DateTime.now),
         _backoff = ReconnectBackoff(
           initial: initialBackoff,
@@ -77,6 +80,10 @@ class Obd2LinkSupervisor {
 
   /// #3756 — engine-on recency stamped by successful engine-PID parses.
   final Obd2EngineEvidence _engineEvidence;
+
+  /// #3859 (Epic #3855) — the fused vehicle power state. A drop on a car
+  /// the model knows is asleep parks the loop instead of dialing.
+  final Obd2VehiclePower _vehiclePower;
   final ReconnectBackoff _backoff;
 
   final ValueNotifier<Obd2LinkState> _state =

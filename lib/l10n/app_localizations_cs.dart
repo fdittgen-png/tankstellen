@@ -6416,6 +6416,34 @@ class AppLocalizationsCs extends AppLocalizations {
   String get obd2ScanOpenSettings => 'Otevřít nastavení';
 
   @override
+  String get obd2WaitingForEngineBanner =>
+      'Čeká se na motor — záznam pomocí GPS';
+
+  @override
+  String get obd2StartEngineToReconnect =>
+      'Nastartujte motor pro opětovné připojení';
+
+  @override
+  String get obd2ResetConnectionEngineOff =>
+      'Motor je vypnutý — nastartujte jej pro opětovné připojení';
+
+  @override
+  String obd2ParkedPromptTitle(int minutes) {
+    return 'Motor je vypnutý $minutes min — ukončit záznam?';
+  }
+
+  @override
+  String get obd2ParkedPromptStop => 'Ukončit';
+
+  @override
+  String get obd2ParkedPromptKeep => 'Pokračovat';
+
+  @override
+  String obd2CoverageEngineOffEnvelopeNote(String head, String tail) {
+    return 'Motor byl vypnutý prvních $head a posledních $tail této jízdy — pokrytí se měří při běžícím motoru.';
+  }
+
+  @override
   String get obd2ReconnectInProgress => 'Opětovné připojování k adaptéru OBD2…';
 
   @override

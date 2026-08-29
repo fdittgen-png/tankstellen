@@ -20,6 +20,7 @@ import '../data/session/obd2_disconnect_quietly.dart';
 import '../data/session/obd2_link_supervisor.dart';
 import '../data/session/obd2_service.dart';
 import '../domain/obd2_engine_evidence.dart';
+import '../domain/vehicle_power_state.dart';
 import 'obd2_connection_state_provider.dart';
 
 part 'obd2_reconnect_provider.g.dart';
@@ -50,6 +51,7 @@ LastGoodAdapterStore lastGoodAdapterStore(Ref ref) =>
 class Obd2Reconnect extends _$Obd2Reconnect {
   Obd2LinkSupervisor? _supervisor;
   StreamSubscription<Obd2LinkState>? _statesSub;
+  StreamSubscription<VehiclePowerState>? _powerSub;
 
   /// THE supervisor. Interactive surfaces (picker, VIN reader,
   /// self-test) route their one-shot dials through
@@ -70,9 +72,19 @@ class Obd2Reconnect extends _$Obd2Reconnect {
     final sup = Obd2LinkSupervisor(dial: _dialDefault);
     _supervisor = sup;
     _statesSub = sup.states.listen(_onLinkState);
+    // #3860 — the engine transition is a wake source: rpm parsed, the
+    // alternator came up on a voltage read, an EV went READY. `wake()`
+    // is a no-op in every state where waking is meaningless.
+    _powerSub = Obd2VehiclePower.instance.states.listen((next) {
+      if (next != VehiclePowerState.engineRunning) return;
+      BreadcrumbCollector.add('OBD2 engine running — waking reconnect');
+      sup.wake();
+    });
     ref.onDispose(() {
       unawaited(_statesSub?.cancel());
       _statesSub = null;
+      unawaited(_powerSub?.cancel());
+      _powerSub = null;
       unawaited(sup.dispose());
       _supervisor = null;
     });
@@ -287,11 +299,22 @@ class Obd2Reconnect extends _$Obd2Reconnect {
   /// the zero-cost park exactly as before.
   Future<Obd2Service?> _classify(Obd2Service? svc) async {
     if (svc == null) return null;
+    // #3860 (Epic #3855) — the probe verdict is a power-state MEASUREMENT;
+    // stamp it so the fused model (rpm / voltage / bus / hint) decides,
+    // and read the adapter's voltage on the fresh link: the one engine
+    // signal a silent bus cannot hide.
+    final power = Obd2VehiclePower.instance;
+    if (svc.busProbe == Obd2BusProbeResult.answered) power.noteBusAnswered();
     if (svc.busProbe != Obd2BusProbeResult.probedSilent) return svc;
-    if (Obd2EngineEvidence.instance.isFresh()) {
+    power.noteBusSilent();
+    await svc.readBatteryVoltageV();
+    // Retry-with-reset ONLY while the engine runs (the user's rule):
+    // alternator voltage or a recent rpm parse says a drive is in
+    // progress → pay one bounded protocol recovery and KEEP the link.
+    if (power.engineRunning || Obd2EngineEvidence.instance.isFresh()) {
       BreadcrumbCollector.add(
-        'OBD2 reconnect: silent bus but engine evidence fresh — '
-        'recovering protocol (#3780)',
+        'OBD2 reconnect: silent bus but engine running (${power.detail}) — '
+        'recovering protocol (#3780/#3860)',
       );
       final answered = await svc.recoverVehicleProtocol();
       BreadcrumbCollector.add(
@@ -306,10 +329,18 @@ class Obd2Reconnect extends _$Obd2Reconnect {
     // Adapter back, ECU silent, no evidence of a running engine — a
     // parked car. Release the link (the adapter sleeps on its own) and
     // park the loop.
+    BreadcrumbCollector.add(
+      'OBD2 reconnect: silent bus, engine off (${power.detail}) — parking',
+    );
     unawaited(svc.disconnectQuietly());
     _supervisor?.noteEngineOff();
     return null;
   }
+
+  /// #3860 — true while the fused power model says the car is asleep:
+  /// the reset action refuses to dial and says so, instead of running a
+  /// ladder against a sleeping dongle.
+  bool get carAsleep => Obd2VehiclePower.instance.asleep;
 
   void _logSeam(String where, Object e, StackTrace st) {
     unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: {

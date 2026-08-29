@@ -160,6 +160,36 @@ mixin _TripRecordingLifecycle
     // (the auto-vs-manual flag rides the entry + the export's session
     // block, so the timeline needn't repeat it)
     _sessionJournal.start(at: _startedAt);
+    // #3858 (Epic #3855) — the vehicle's power state decides how a
+    // recording begins. EVs have no rpm to trust; tell the model.
+    final power = Obd2VehiclePower.instance;
+    power.evMode = _vehicle?.type == VehicleType.ev;
+    if (_service.busProbe == Obd2BusProbeResult.probedSilent) {
+      power.noteBusSilent();
+      await _service.readBatteryVoltageV();
+    }
+    if (_service.busProbe == Obd2BusProbeResult.probedSilent &&
+        !power.engineRunning) {
+      // Engine off at start: GPS-first. NO `0100` (the quiet-window
+      // establishment would re-send it into a silent bus — the #3575
+      // livelock trigger), no odometer / VIN / fuel-type reads (they are
+      // bus traffic too and would only time out). The scheduler is built
+      // and wired but NOT started; the emit loop records GPS samples and
+      // watches the adapter's voltage, and the engine transition runs
+      // the whole deferred start — protocol, identity, polling.
+      BreadcrumbCollector.add(
+        'OBD2 recording: engine off at start — GPS-first, waiting for '
+        'the engine (#3858)',
+        detail: power.detail,
+      );
+      _scheduler = _schedulerOverride ?? _buildScheduler();
+      _liveSampleSnapshot.subscribeAllTiers(_scheduler!);
+      _engineOffSince = _startedAt;
+      _droppedSession.enterEngineOffWait();
+      _emitTimer = Timer.periodic(_pollInterval, (_) => _emit());
+      _emitState();
+      return;
+    }
     // #3783 — establish the vehicle protocol BEFORE any OBD read: with a
     // warm supported-PID cache the connect ran no `0100`, so the session
     // may have NO negotiated protocol — the odometer/VIN reads below
@@ -168,8 +198,25 @@ mixin _TripRecordingLifecycle
     // (#3577) for the rest of the trip. One quiet window here fixes all
     // of them at once. No-op when the bus is already confirmed.
     await _ensureVehicleProtocol(where: 'trip-start');
-    // #3382 — odometer + VIN (#814) reads time-bounded (obd2_trip_start_budgets)
-    // so a slow/silent adapter degrades them to null and the trip still starts.
+    await _readTripIdentity();
+
+    _scheduler = _schedulerOverride ?? _buildScheduler();
+    _liveSampleSnapshot.subscribeAllTiers(_scheduler!);
+    _scheduler!.start();
+
+    _emitTimer = Timer.periodic(_pollInterval, (_) => _emit());
+    _emitState();
+  }
+
+  /// #3382 — odometer + VIN (#814) reads time-bounded
+  /// (obd2_trip_start_budgets) so a slow/silent adapter degrades them to
+  /// null and the trip still starts. #3858 — runs once per session, at
+  /// start on a live bus or at the engine transition of a recording that
+  /// began with the engine off.
+  @override
+  Future<void> _readTripIdentity() async {
+    if (_identityRead) return;
+    _identityRead = true;
     _odometerStartKm = await boundedStartRead(
         _service.readOdometerKm(), kObd2TripStartOdometerBudget);
     _odometerLatestKm = _odometerStartKm;
@@ -183,12 +230,13 @@ mixin _TripRecordingLifecycle
     unawaited(boundedStartRead(_service.readFuelType(),
             kObd2TripStartFuelTypeBudget)
         .then((k) => _liveSampleSnapshot.sessionFuelTypeKey = k));
+  }
 
-    _scheduler = _schedulerOverride ?? _buildScheduler();
-    _liveSampleSnapshot.subscribeAllTiers(_scheduler!);
-    _scheduler!.start();
-
-    _emitTimer = Timer.periodic(_pollInterval, (_) => _emit());
+  /// #3862 — the driver answered "Keep" on the parked prompt: stay
+  /// recording, do not ask again this session.
+  void dismissParkedPrompt() {
+    _parkedPromptDismissed = true;
+    _parkedPromptDue = false;
     _emitState();
   }
 
@@ -249,6 +297,7 @@ mixin _TripRecordingLifecycle
     return _finaliseSummary();
   }
 
+  @override
   void _emitState() {
     if (_stateController.isClosed) return;
     _stateController.add(currentState);

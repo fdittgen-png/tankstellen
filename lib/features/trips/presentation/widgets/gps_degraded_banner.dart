@@ -157,6 +157,13 @@ class _GpsDegradedBannerState extends ConsumerState<GpsDegradedBanner> {
     final passiveWaiting = ref.watch(
       tripRecordingProvider.select((s) => s.reconnectPassiveWaiting),
     );
+    // #3859 (Epic #3855) — the engine is off, nothing is broken: the
+    // calm "waiting for the engine" copy, and NO reset (a reset is a
+    // dial ladder against a sleeping dongle — the user's rule is retry
+    // only while the engine runs).
+    final awaitingEngine = ref.watch(
+      tripRecordingProvider.select((s) => s.awaitingEngine),
+    );
 
     // #3545 — the widget now floats in an overlay Stack, so there is no
     // layout below to ease: the fade alone softens the appearance. When
@@ -166,12 +173,17 @@ class _GpsDegradedBannerState extends ConsumerState<GpsDegradedBanner> {
       duration: GpsDegradedBanner._animDuration,
       opacity: _visible ? 1.0 : 0.0,
       child: _visible
-          ? _pill(context, passiveWaiting: passiveWaiting)
+          ? _pill(context,
+              passiveWaiting: passiveWaiting, awaitingEngine: awaitingEngine)
           : const SizedBox.shrink(),
     );
   }
 
-  Widget _pill(BuildContext context, {required bool passiveWaiting}) {
+  Widget _pill(
+    BuildContext context, {
+    required bool passiveWaiting,
+    required bool awaitingEngine,
+  }) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     // A compact floating pill on a neutral/informational surface (not the
@@ -190,43 +202,53 @@ class _GpsDegradedBannerState extends ConsumerState<GpsDegradedBanner> {
             Icon(
               // A steady "fix held" glyph for the busy reconnect, a quieter
               // "still listening" glyph once we've dropped to the passive
-              // wait.
-              passiveWaiting ? Icons.bluetooth_searching : Icons.gps_fixed,
+              // wait, and the key for an engine that is simply off.
+              awaitingEngine
+                  ? Icons.key_off_outlined
+                  : passiveWaiting
+                      ? Icons.bluetooth_searching
+                      : Icons.gps_fixed,
               size: 18,
               color: theme.colorScheme.onSecondaryContainer,
             ),
             const SizedBox(width: 8),
             Flexible(
               child: Text(
-                passiveWaiting
-                    ? (l.obd2GpsDegradedPassiveWaitingBanner)
-                    : (l.obd2GpsDegradedBannerTitle),
+                awaitingEngine
+                    ? l.obd2WaitingForEngineBanner
+                    : passiveWaiting
+                        ? (l.obd2GpsDegradedPassiveWaitingBanner)
+                        : (l.obd2GpsDegradedBannerTitle),
+                key: const Key('gpsDegradedBannerText'),
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSecondaryContainer,
                 ),
               ),
             ),
-            const SizedBox(width: 4),
-            // #3781 (Epic #3775) — the reset lived only in the kebab
-            // overflow; the moment the user actually needs it is THIS
-            // banner. Recording is never interrupted: the reset recycles
-            // the link through the supervisor's single flight and the
-            // trip re-binds when the fresh link reaches ready.
-            TextButton(
-              key: const Key('gpsDegradedBannerReset'),
-              style: TextButton.styleFrom(
-                visualDensity: VisualDensity.compact,
-                foregroundColor: theme.colorScheme.onSecondaryContainer,
+            if (!awaitingEngine) ...[
+              const SizedBox(width: 4),
+              // #3781 (Epic #3775) — the reset lived only in the kebab
+              // overflow; the moment the user actually needs it is THIS
+              // banner. Recording is never interrupted: the reset recycles
+              // the link through the supervisor's single flight and the
+              // trip re-binds when the fresh link reaches ready.
+              // #3860 — absent while the engine is off: nothing to reset.
+              TextButton(
+                key: const Key('gpsDegradedBannerReset'),
+                style: TextButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                  foregroundColor: theme.colorScheme.onSecondaryContainer,
+                ),
+                onPressed: _resetBusy ? null : _runReset,
+                child: _resetBusy
+                    ? const SizedBox(
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(l.obd2ResetConnection),
               ),
-              onPressed: _resetBusy ? null : _runReset,
-              child: _resetBusy
-                  ? const SizedBox(
-                      width: 14,
-                      height: 14,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(l.obd2ResetConnection),
-            ),
+            ],
           ],
         ),
       ),

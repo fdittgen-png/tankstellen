@@ -87,12 +87,22 @@ class TripHistoryEntry {
   /// back to the summary for those rather than reporting a false zero.
   final int? engineSampleCount;
 
+  /// #3861 (Epic #3855) — samples inside the engine-RUNNING envelope
+  /// (first..last sample with rpm at the running floor). [engineSampleCount]
+  /// is counted inside it, so the list badge measures coverage while the
+  /// engine ran and a parked head/tail can never paint a trip red. Null on
+  /// rows written before this landed — the share then falls back to the
+  /// whole-trip denominator, exactly as before.
+  final int? envelopeSampleCount;
+
   /// Engine-bearing share of the stored samples, 0..1, or null when it
-  /// cannot be known (legacy row, or no samples at all).
+  /// cannot be known (legacy row, or no samples at all). #3861 — inside the
+  /// engine-running envelope when the row carries one.
   double? get engineSampleShare {
     final engine = engineSampleCount;
-    if (engine == null || sampleCount <= 0) return null;
-    return engine / sampleCount;
+    final denominator = envelopeSampleCount ?? sampleCount;
+    if (engine == null || denominator <= 0) return null;
+    return engine / denominator;
   }
 
   /// Stable BLE remote-id / Classic MAC of the OBD2 adapter that was
@@ -186,6 +196,7 @@ class TripHistoryEntry {
     this.termination,
     this.sessionJournal,
     this.engineSampleCount,
+    this.envelopeSampleCount,
   }) : _persistedSampleCount = sampleCount;
 
   /// Returns a copy with the given fields replaced (#1858). The
@@ -210,6 +221,7 @@ class TripHistoryEntry {
         termination: termination,
         sessionJournal: sessionJournal,
         engineSampleCount: engineSampleCount,
+        envelopeSampleCount: envelopeSampleCount,
       );
 
   Map<String, dynamic> toJson() => {
@@ -222,14 +234,13 @@ class TripHistoryEntry {
         // #3835 — same engine predicate as Obd2EngineCoverage / the fuel
         // pipeline, so the list badge can never disagree with the trip
         // detail. Written here (once) rather than counted on every read.
-        if (samples.isNotEmpty)
-          'esc': samples
-              .where((s) =>
-                  s.rpm != null ||
-                  s.engineLoadPercent != null ||
-                  s.throttlePercent != null ||
-                  s.fuelRateLPerHour != null)
-              .length,
+        // #3861 — counted INSIDE the engine-running envelope, with the
+        // envelope size beside it, so the badge and the detail agree.
+        if (samples.isNotEmpty) ...{
+          'esc': _coverage(samples)?.engineSamples ?? 0,
+          if (_coverage(samples)?.envelopeSamples case final int evc)
+            'evc': evc,
+        },
         // #1312 — adapter identity. Compact keys so the per-trip JSON
         // payload doesn't balloon (most trips carry one MAC + one
         // name; firmware stays null until the connect path captures
@@ -291,6 +302,7 @@ class TripHistoryEntry {
         // null rather than throwing (mirrors the schema-drift lesson
         // from #1301).
         engineSampleCount: json['esc'] as int?,
+        envelopeSampleCount: json['evc'] as int?,
         adapterMac: json['adapterMac'] as String?,
         adapterName: json['adapterName'] as String?,
         adapterFirmware: json['adapterFirmware'] as String?,
@@ -358,6 +370,7 @@ class TripHistoryEntry {
         samples: const [],
         sampleCount: (json['samples'] as List?)?.length ?? 0,
         engineSampleCount: json['esc'] as int?,
+        envelopeSampleCount: json['evc'] as int?,
         adapterMac: json['adapterMac'] as String?,
         adapterName: json['adapterName'] as String?,
         adapterFirmware: json['adapterFirmware'] as String?,
@@ -374,3 +387,8 @@ class TripHistoryEntry {
               ),
       );
 }
+
+/// #3861 — one envelope-aware coverage pass per serialisation (memoised
+/// per call site by the `...{}` spread evaluating it twice at most).
+Obd2EngineCoverage? _coverage(List<TripSample> samples) =>
+    Obd2EngineCoverage.fromTripSamples(samples);

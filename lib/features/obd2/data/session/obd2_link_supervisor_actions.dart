@@ -151,6 +151,24 @@ extension Obd2LinkSupervisorActions on Obd2LinkSupervisor {
           '(${_state.value}) — not dialing');
       return;
     }
+    // #3859 (Epic #3855) — the car is ASLEEP (alternator voltage gone,
+    // bus silent): this drop is the adapter going to sleep behind a
+    // parked car, not a link to recover. Dialing now is what the field
+    // storms were made of — 23 s RFCOMM timeouts against a dongle at
+    // 3 mA, feeding the stand-down with failures that were never
+    // failures. Park; the engine transition (rpm / voltage / ACL hint /
+    // movement / resume) wakes the loop exactly as an engine-off
+    // classification always did. This costs nothing on the reliability
+    // floor: with no evidence the model is `unknown`, not `asleep`.
+    if (_vehiclePower.asleep) {
+      BreadcrumbCollector.add(
+        'OBD2 link drop',
+        detail: '$reason — car asleep (${_vehiclePower.detail}), '
+            'parking without a dial (#3859)',
+      );
+      noteEngineOff();
+      return;
+    }
     _standDown.noteDrop(trafficked: trafficked); // #3603/#3756
     // #3534 — the per-drop timeline starts here (detect → dial →
     // recovered); the field-validation checklist reads this chain out

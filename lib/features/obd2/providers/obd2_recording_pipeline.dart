@@ -244,18 +244,21 @@ class Obd2RecordingPipeline implements RecordingPipeline {
               newPhase == TripRecordingPhase.pausedDueToDrop) &&
           ctl.reconnectPassiveWaiting;
       // #1330 phase 3 — surface the controller's drop reason. Cleared
-      // when leaving the drop state.
-      if (newPhase == TripRecordingPhase.pausedDueToDrop) {
+      // when leaving the drop state (#3859: the GPS-degraded phase too).
+      if (newPhase == TripRecordingPhase.pausedDueToDrop ||
+          newPhase == TripRecordingPhase.degradedGpsOnly) {
         _host.state = _host.state.copyWith(
           phase: newPhase,
           dropReason: ctl.dropReason,
           reconnectPassiveWaiting: passiveWaiting,
+          parkedPromptDue: ctl.parkedPromptDue, // #3862
         );
       } else {
         _host.state = _host.state.copyWith(
           phase: newPhase,
           clearDropReason: true,
           reconnectPassiveWaiting: passiveWaiting,
+          parkedPromptDue: false,
         );
       }
       // #1303 — phase transitions force an immediate snapshot.
@@ -283,6 +286,10 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     ctl.resume();
     return true;
   }
+
+  @override // #3862
+  bool dismissParkedPrompt() =>
+      (_controller?..dismissParkedPrompt()) != null;
 
   @override
   Future<StoppedTripResult> stop({bool automatic = false}) async {

@@ -4697,5 +4697,29 @@
   "@trajetObd2Degraded": {
     "description": "MT — needs native review"
   },
-  "minimalDriveBehaviour": "Ajotapa"
+  "minimalDriveBehaviour": "Ajotapa",
+  "obd2WaitingForEngineBanner": "Odotetaan moottoria — tallennetaan GPS:llä",
+  "obd2StartEngineToReconnect": "Käynnistä moottori yhdistääksesi uudelleen",
+  "obd2ResetConnectionEngineOff": "Moottori on sammuksissa — käynnistä se yhdistääksesi uudelleen",
+  "obd2ParkedPromptTitle": "Moottori sammuksissa {minutes} min — lopetetaanko tallennus?",
+  "@obd2ParkedPromptTitle": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2ParkedPromptStop": "Lopeta",
+  "obd2ParkedPromptKeep": "Jatka",
+  "obd2CoverageEngineOffEnvelopeNote": "Moottori sammuksissa matkan ensimmäiset {head} ja viimeiset {tail} — kattavuus mitataan moottorin käydessä.",
+  "@obd2CoverageEngineOffEnvelopeNote": {
+    "placeholders": {
+      "head": {
+        "type": "String"
+      },
+      "tail": {
+        "type": "String"
+      }
+    }
+  }
 }

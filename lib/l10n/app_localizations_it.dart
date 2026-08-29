@@ -6442,6 +6442,33 @@ class AppLocalizationsIt extends AppLocalizations {
   String get obd2ScanOpenSettings => 'Apri impostazioni';
 
   @override
+  String get obd2WaitingForEngineBanner =>
+      'In attesa del motore: registrazione con GPS';
+
+  @override
+  String get obd2StartEngineToReconnect => 'Avvia il motore per riconnettere';
+
+  @override
+  String get obd2ResetConnectionEngineOff =>
+      'Motore spento: avvialo per riconnettere';
+
+  @override
+  String obd2ParkedPromptTitle(int minutes) {
+    return 'Motore spento da $minutes min: interrompere la registrazione?';
+  }
+
+  @override
+  String get obd2ParkedPromptStop => 'Interrompi';
+
+  @override
+  String get obd2ParkedPromptKeep => 'Continua';
+
+  @override
+  String obd2CoverageEngineOffEnvelopeNote(String head, String tail) {
+    return 'Motore spento nei primi $head e negli ultimi $tail di questo viaggio: la copertura è misurata a motore acceso.';
+  }
+
+  @override
   String get obd2ReconnectInProgress => 'Riconnessione all\'adattatore OBD2…';
 
   @override

@@ -161,6 +161,13 @@ mixin _TripRecordingTransportGuard on _TripRecordingSessionState {
     final s = _scheduler;
     if (s == null) return;
     s.start();
+    // #3858 — a recording that began with the engine off deferred its
+    // identity reads to this moment; a normal start already did them.
+    if (!_identityRead) {
+      unawaited(_ensureVehicleProtocol(where: where).then((_) =>
+          _readTripIdentity()));
+      return;
+    }
     if (_service.busProbe == Obd2BusProbeResult.answered) return;
     unawaited(_ensureVehicleProtocol(where: where));
   }
@@ -294,6 +301,25 @@ mixin _TripRecordingTransportGuard on _TripRecordingSessionState {
       'TripRecordingController: silent-failure detected — '
       '${_dropDetector.consecutiveNullReads} consecutive null PID parses',
     );
-    _droppedSession.handleDrop(reason: TripDropReason.silentFailure);
+    // #3859 (Epic #3855) — a silent bus is a MEASUREMENT of the car's
+    // power state, so stamp it, then ask the fused model which of the two
+    // very different things just happened: the ECU died on a running car
+    // (a real silent failure), or the driver switched the engine off. The
+    // classification needs voltage evidence (the ~10 s `ATRV` watch) to
+    // call it engine-off — without any, the old verdict stands.
+    final power = Obd2VehiclePower.instance;
+    power.noteBusSilent();
+    final engineOff = power.asleep && power.lastVoltageV != null;
+    BreadcrumbCollector.add(
+      'OBD2 recording: silent bus',
+      detail: engineOff
+          ? 'engine off (${power.detail}) — waiting, not recovering'
+          : 'silent failure (${power.detail})',
+    );
+    _droppedSession.handleDrop(
+      reason: engineOff
+          ? TripDropReason.engineOff
+          : TripDropReason.silentFailure,
+    );
   }
 }

@@ -6451,6 +6451,33 @@ class AppLocalizationsPt extends AppLocalizations {
   String get obd2ScanOpenSettings => 'Abrir definições';
 
   @override
+  String get obd2WaitingForEngineBanner =>
+      'À espera do motor — a gravar com GPS';
+
+  @override
+  String get obd2StartEngineToReconnect => 'Ligue o motor para reconectar';
+
+  @override
+  String get obd2ResetConnectionEngineOff =>
+      'Motor desligado — ligue-o para reconectar';
+
+  @override
+  String obd2ParkedPromptTitle(int minutes) {
+    return 'Motor desligado há $minutes min — parar a gravação?';
+  }
+
+  @override
+  String get obd2ParkedPromptStop => 'Parar';
+
+  @override
+  String get obd2ParkedPromptKeep => 'Manter';
+
+  @override
+  String obd2CoverageEngineOffEnvelopeNote(String head, String tail) {
+    return 'Motor desligado nos primeiros $head e nos últimos $tail desta viagem — a cobertura é medida com o motor a trabalhar.';
+  }
+
+  @override
   String get obd2ReconnectInProgress => 'A reconectar ao seu adaptador OBD2…';
 
   @override

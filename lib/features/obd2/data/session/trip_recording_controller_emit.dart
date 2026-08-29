@@ -11,7 +11,10 @@ part of 'trip_recording_controller.dart';
 /// TripLiveReading publish), the shared #2506 GPS-estimate overlay, and
 /// the #2565 degraded GPS-only tick delegation.
 mixin _TripRecordingEmit
-    on _TripRecordingTelemetryIngest, _TripRecordingTransportGuard {
+    on
+        _TripRecordingTelemetryIngest,
+        _TripRecordingTransportGuard,
+        _TripRecordingPowerWatch {
   /// Minimum wall-clock spacing between diagnostic-capture raw-input
   /// stamps (#2459). The fuel-derivation signals drift slowly, so a
   /// ~1 Hz sample is ample for post-hoc re-derivation and keeps the
@@ -43,6 +46,10 @@ mixin _TripRecordingEmit
       return;
     }
     if (_liveController.isClosed) return;
+    // #3857 / #3859 — the vehicle power tick: read the adapter's voltage
+    // every ~10 s (cheap AT reply, no bus traffic), publish evidence
+    // decay, and act on the engine transition while waiting for it.
+    _powerTick();
     // #2565 — `degradedGpsOnly` is NOT gated above: OBD2 is gone (the PID
     // snapshot is stale) but GPS is alive, so build a GPS-only sample +
     // run the estimate overlay instead of freezing.
@@ -198,6 +205,8 @@ mixin _TripRecordingEmit
         // consumption on a boosted engine.
         iatC: snap.latestIatCelsius,
         timingAdvanceDeg: snap.latestTimingAdvanceDeg,
+        // #3857 — one `bv` stamp per voltage read (~10 s); null between.
+        batteryVoltageV: _takeVoltageStamp(),
       );
       // #2653 — thread the live distance provenance so the detector
       // suppresses harsh scoring on the `virtual` dead-reckoning source.

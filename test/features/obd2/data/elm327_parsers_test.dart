@@ -1193,4 +1193,36 @@ void main() {
       expect(Elm327Parsers.parseAmbientAirTempCelsius('NO DATA'), isNull);
     });
   });
+
+  group('parseBatteryVoltage (ATRV) — #3857', () {
+    test('the canonical reply', () {
+      expect(Elm327Parsers.parseBatteryVoltage('12.4V'), 12.4);
+    });
+
+    test('clone spacing, prompt and CRLF noise', () {
+      expect(Elm327Parsers.parseBatteryVoltage('14.1 V\r\r>'), 14.1);
+      expect(Elm327Parsers.parseBatteryVoltage('\r12V\r>'), 12.0);
+      expect(Elm327Parsers.parseBatteryVoltage('atrv\r13.8v\r>'), 13.8,
+          reason: 'an echoing clone repeats the command before the value');
+    });
+
+    test('error vocabulary is null, never a number', () {
+      expect(Elm327Parsers.parseBatteryVoltage('?'), isNull);
+      expect(Elm327Parsers.parseBatteryVoltage('NO DATA'), isNull);
+      expect(Elm327Parsers.parseBatteryVoltage('OK'), isNull);
+      expect(Elm327Parsers.parseBatteryVoltage(''), isNull);
+    });
+
+    test('an OBD frame is not a voltage', () {
+      // '41 0C 1A F8' contains no V; a stray hex "1A F8 V" must not parse.
+      expect(Elm327Parsers.parseBatteryVoltage('41 0C 1A F8'), isNull);
+    });
+
+    test('implausible readings are rejected', () {
+      expect(Elm327Parsers.parseBatteryVoltage('0.0V'), isNull,
+          reason: 'the adapter cannot run on 0 V — this is garbage');
+      expect(Elm327Parsers.parseBatteryVoltage('48.0V'), isNull,
+          reason: 'no 12 V system reads 48 V');
+    });
+  });
 }

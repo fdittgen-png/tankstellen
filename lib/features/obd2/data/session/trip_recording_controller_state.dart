@@ -76,6 +76,12 @@ mixin _TripRecordingSessionState {
   TripRecorder get _recorder;
   Duration get _pollInterval;
   DateTime Function() get _now;
+  // #3862 — auto-record trips end themselves when parked; manual ones ask.
+  bool get _automatic;
+  // Implemented by the lifecycle part; reached from the emit / transport
+  // parts, which sit BELOW it in the mixin chain.
+  void _emitState();
+  Future<void> _readTripIdentity();
   VehicleProfile? get _vehicle;
   bool get _diagnosticCapture;
   PidScheduler? get _schedulerOverride;
@@ -131,6 +137,31 @@ mixin _TripRecordingSessionState {
   DateTime? _lastFreshEngineParseAt;
   bool _staleEngineEscalated = false;
   DateTime? _lastSampleAt;
+
+  // #3857 (Epic #3855) — the ~10 s `ATRV` voltage watch. The reply feeds
+  // the vehicle power model through the session hook; the value is also
+  // held here for ONE slow-cadence `bv` stamp on the next sample.
+  DateTime? _lastVoltageReadAt;
+  double? _pendingVoltageStamp;
+
+  // #3858 — trip identity (odometer / VIN / fuel type) is read once the
+  // bus can answer; a recording that starts with the engine off defers it
+  // to the engine transition.
+  bool _identityRead = false;
+
+  // #3862 — parked-prompt bookkeeping: when the engine-off wait began,
+  // how long the car has been stationary in it, whether the prompt is
+  // due / was dismissed by the driver ("Keep").
+  DateTime? _engineOffSince;
+  DateTime? _stationarySince;
+  bool _parkedPromptDue = false;
+  bool _parkedPromptDismissed = false;
+  bool _parkedFinaliseInFlight = false;
+
+  /// #3862 — true when the recording has been parked (engine off, car
+  /// stationary) past [TripRecordingController.parkedPromptAfter] and the
+  /// driver has not yet answered. Surfaced to the UI as a Stop / Keep pill.
+  bool get parkedPromptDue => _parkedPromptDue;
 
   // #2509 — timestamps of the FIRST and LATEST valid GPS fixes that
   // arrived while the OBD2 link delivered no speed/RPM (so

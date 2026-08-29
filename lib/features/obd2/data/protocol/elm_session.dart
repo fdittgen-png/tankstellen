@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import 'elm327_commands.dart';
+import 'elm327_parsers.dart';
 import 'obd2_response_class.dart';
 import '../transport/obd2_transport.dart';
 
@@ -118,6 +119,17 @@ class ElmSession {
 
   /// #3756 — completed non-AT commands over this session's lifetime.
   int get successfulObdSends => _successfulObdSends;
+
+  /// #3857 (Epic #3855) — battery voltage parsed from the most recent
+  /// `ATRV` reply, whoever sent it (keepalive or explicit read). The adapter
+  /// measures it itself: the one engine signal needing no bus traffic, and
+  /// the keepalive was already paying for the reply and throwing it away.
+  double? get lastVoltageV => _lastVoltageV;
+  double? _lastVoltageV;
+
+  /// #3857 — fired with every parsed `ATRV` value; the service session
+  /// wires it to the vehicle power model (no domain import here).
+  void Function(double volts)? onVoltage;
   bool _recoveryInFlight = false;
   bool _keepaliveInFlight = false;
   bool _disposed = false;
@@ -236,6 +248,7 @@ class ElmSession {
     // entirely or every keepalive reply would feed the ATWS trigger.
     if (_isAtCommand(command)) {
       _consecutiveGarbage = 0;
+      _noteVoltageReply(command, reply);
       return reply;
     }
     // #3756 — count completed OBD (non-AT) commands: the supervisor
@@ -338,6 +351,16 @@ class ElmSession {
             .whenComplete(() => _keepaliveInFlight = false));
       }
     });
+  }
+
+  /// #3857 — an `ATRV` reply carries the battery voltage: keep + notify.
+  void _noteVoltageReply(String command, String reply) {
+    final atrv = Elm327Commands.readVoltageCommand.trim().toUpperCase();
+    if (command.trim().toUpperCase() != atrv) return;
+    final volts = Elm327Parsers.parseBatteryVoltage(reply);
+    if (volts == null) return;
+    _lastVoltageV = volts;
+    onVoltage?.call(volts);
   }
 
   /// Whether [command] is an AT/ST configuration command (vs an OBD

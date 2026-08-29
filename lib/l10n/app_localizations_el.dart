@@ -6456,6 +6456,34 @@ class AppLocalizationsEl extends AppLocalizations {
   String get obd2ScanOpenSettings => 'Άνοιγμα ρυθμίσεων';
 
   @override
+  String get obd2WaitingForEngineBanner =>
+      'Αναμονή για τον κινητήρα — καταγραφή με GPS';
+
+  @override
+  String get obd2StartEngineToReconnect =>
+      'Βάλτε μπροστά τον κινητήρα για επανασύνδεση';
+
+  @override
+  String get obd2ResetConnectionEngineOff =>
+      'Ο κινητήρας είναι σβηστός — βάλτε τον μπροστά για επανασύνδεση';
+
+  @override
+  String obd2ParkedPromptTitle(int minutes) {
+    return 'Κινητήρας σβηστός εδώ και $minutes λεπτά — διακοπή καταγραφής;';
+  }
+
+  @override
+  String get obd2ParkedPromptStop => 'Διακοπή';
+
+  @override
+  String get obd2ParkedPromptKeep => 'Συνέχεια';
+
+  @override
+  String obd2CoverageEngineOffEnvelopeNote(String head, String tail) {
+    return 'Κινητήρας σβηστός στα πρώτα $head και στα τελευταία $tail αυτής της διαδρομής — η κάλυψη μετριέται με τον κινητήρα σε λειτουργία.';
+  }
+
+  @override
   String get obd2ReconnectInProgress => 'Επανασύνδεση με τον προσαρμογέα OBD2…';
 
   @override

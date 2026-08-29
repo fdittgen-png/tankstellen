@@ -15,6 +15,8 @@ import 'dropped_session_host.dart';
 import 'dropped_session_repo_resolver.dart';
 import '../paused_trip_repository.dart';
 
+part 'dropped_session_manager_engine_off.dart';
+
 /// Why a recording transitioned into the paused-due-to-drop state
 /// (#1330 phase 3). Distinguishes the two failure modes that share the
 /// pause-with-grace recovery path:
@@ -27,9 +29,17 @@ import '../paused_trip_repository.dart';
 ///    priority PID parse returns null for the silent-failure threshold's
 ///    worth of consecutive ticks (ECU off, protocol mismatch, defective
 ///    adapter firmware).
+///  * [engineOff] — #3859 (Epic #3855): the same silent bus, but the
+///    vehicle power model says the car is asleep (alternator voltage
+///    gone, no engine evidence). Nothing is broken — the driver switched
+///    the engine off with the recording still running, or started the
+///    recording before starting the engine. The reaction is the calm
+///    one: keep recording on GPS, keep the link on a voltage watch, dial
+///    nothing, and re-attach on the engine transition.
 enum TripDropReason {
   transportError,
   silentFailure,
+  engineOff,
 }
 
 /// Owns the connection-drop RECOVERY lifecycle for a single recording
@@ -133,6 +143,15 @@ class DroppedSessionManager {
   }) {
     final degraded = _host.degradedGpsOnly; // #3776 — already handled
     if (_host.pausedDueToDrop || _silentlyReconnecting || degraded) return;
+    // #3859 — the engine was switched off with GPS alive: not a drop to
+    // recover from, a state to wait out. Everything below (tearing the
+    // service down, the fallback marker, the reconnect scanner) is the
+    // machinery for a BROKEN link, and it is exactly what turned a
+    // parked car into dial storms and a "connection dropped" verdict.
+    if (reason == TripDropReason.engineOff && _host.gpsAlive) {
+      enterEngineOffWait();
+      return;
+    }
     // #1920 — trace every detected drop for the exportable OBD2 log.
     _trace(AutoRecordEventKind.dropDetected, detail: reason.name);
     _note(RecordingSessionEventKind.linkDrop, reason.name); // #3797
@@ -188,34 +207,6 @@ class DroppedSessionManager {
     // The scanner may already be running from the silent window.
     if (_reconnectScanner == null) _startReconnectScanner();
     _host.emitState();
-  }
-
-  /// #2565 — enter GPS-only degraded recording: OBD2 is gone but GPS is
-  /// alive, so the trip keeps capturing GPS samples. The scheduler is
-  /// already stopped + the dead service disconnected (by [handleDrop]);
-  /// this flips the host flag, starts the reconnect scanner so OBD2 can
-  /// re-attach, and emits — but starts NO grace timer (the trip is
-  /// actively recording and must never auto-finalise / discard).
-  void _enterDegradedGpsOnly(TripDropReason reason) {
-    _host.degradedGpsOnly = true;
-    _note(RecordingSessionEventKind.degradedGpsOnly, reason.name);
-    _dropReason = reason;
-    // #2905 — stamp the GPS-only-fallback-activation marker the trajet omitted.
-    Obd2CommDiagnostics.instance.noteFallbackActivated(detail: reason.name);
-    _trace(AutoRecordEventKind.silentReconnectStarted);
-    if (_reconnectScanner == null) _startReconnectScanner();
-    _host.emitState();
-  }
-
-  /// #2565 — while degraded, GPS has ALSO gone silent past the gap-cap
-  /// window: now BOTH sources are dead, so escalate to the visible pause
-  /// banner exactly as a dead-GPS drop would. Clears the degrade flag and
-  /// routes through the ordinary visible-drop path (grace timer + banner).
-  void escalateDegradedToPaused() {
-    if (!_host.degradedGpsOnly || _host.stopped) return;
-    _host.degradedGpsOnly = false;
-    _trace(AutoRecordEventKind.dropEscalatedToVisible);
-    _enterVisibleDrop(_dropReason ?? TripDropReason.transportError);
   }
 
   /// #1904 — the silent reconnect window elapsed without the adapter

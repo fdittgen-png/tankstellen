@@ -88,6 +88,24 @@ class Elm327Parsers {
     return ((bytes[2] * 256) + bytes[3]) / 4.0;
   }
 
+  /// Parse the adapter's `ATRV` battery-voltage reply (#3857).
+  ///
+  /// The ELM327 answers `12.4V` (some clones `12.4 V`, `12V`, or with an
+  /// echo / prompt around it). This is an AT reply, not an OBD frame, so
+  /// it never goes through [cleanResponse]'s hex path. Returns null on
+  /// `?` / NO DATA / anything without a number followed by `V`, and
+  /// rejects readings outside 5–20 V — the adapter's own supply can't be
+  /// lower and no 12 V system reads higher; anything else is garbage.
+  static double? parseBatteryVoltage(String raw) {
+    final s = raw.replaceAll('>', ' ').toUpperCase();
+    if (s.contains('?') || s.contains('NO DATA')) return null;
+    final match = RegExp(r'(\d+(?:\.\d+)?)\s*V\b').firstMatch(s);
+    if (match == null) return null;
+    final volts = double.tryParse(match.group(1)!);
+    if (volts == null || volts < 5.0 || volts > 20.0) return null;
+    return volts;
+  }
+
   /// Parse distance since DTC cleared from Mode 01 PID 31 response.
   /// Response format: "41 31 XX YY" where distance = (XX * 256) + YY km.
   static int? parseDistanceSinceDtcCleared(String raw) {

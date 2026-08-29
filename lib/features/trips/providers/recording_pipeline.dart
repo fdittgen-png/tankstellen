@@ -66,6 +66,10 @@ abstract class RecordingPipeline {
   /// is a no-op. Returns true when a live recording was resumed.
   bool resume() => false;
 
+  /// #3862 — the driver answered "Keep" on the parked prompt. GPS-only
+  /// pipelines have no engine to be off, so nothing to dismiss.
+  bool dismissParkedPrompt() => false;
+
   /// Tear the pipeline down, persist the finished trip, and return the
   /// [StoppedTripResult] the recording screen renders into its summary
   /// view. [automatic] tags the saved entry as auto-recorded (#1004).
