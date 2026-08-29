@@ -30,6 +30,7 @@ import '../../domain/trip_distance_resolver.dart';
 import '../../domain/trip_drop_detector.dart';
 import '../../domain/trip_live_reading.dart';
 import '../../domain/trip_sample_buffer.dart';
+import '../../domain/vehicle_power_state.dart';
 import '../../domain/virtual_odometer.dart';
 
 // Re-export the live-reading DTO so existing callers (providers,
@@ -53,6 +54,7 @@ part 'trip_recording_controller_debug.dart';
 part 'trip_recording_controller_drop_host.dart';
 part 'trip_recording_controller_emit.dart';
 part 'trip_recording_controller_lifecycle.dart';
+part 'trip_recording_controller_power.dart';
 part 'trip_recording_controller_state.dart';
 part 'trip_recording_controller_summary.dart';
 part 'trip_recording_controller_telemetry_ingest.dart';
@@ -119,6 +121,7 @@ class TripRecordingController
         _TripRecordingSessionState,
         _TripRecordingTelemetryIngest,
         _TripRecordingTransportGuard,
+        _TripRecordingPowerWatch,
         _TripRecordingEmit,
         _TripRecordingSummary,
         _TripRecordingDebugSeams,
@@ -191,7 +194,13 @@ class TripRecordingController
   /// finalises a stale entry — manual trips never counted toward
   /// "unseen" and must not retroactively start counting just because
   /// the app was killed before the disconnect-save timer fired.
+  @override
   final bool _automatic;
+
+  /// #3862 (Epic #3855) — engine off AND stationary this long during a
+  /// manual recording → the Stop / Keep prompt; an auto-record trip ends
+  /// itself instead.
+  static const Duration parkedPromptAfter = Duration(minutes: 3);
 
   /// Per-trip 'diagnostic capture' flag (#2459 — default off; an
   /// internal/dev flag, not a user setting, wired from

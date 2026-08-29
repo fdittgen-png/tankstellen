@@ -246,15 +246,19 @@ class RecordingStartCoordinator {
         if (fresh != null) service = fresh;
       }
       if (service.busProbe == Obd2BusProbeResult.probedSilent) {
-        notifier.cancelConnecting();
-        onConnectionError(const Obd2EngineOff());
-        // #3527 KEEP-LINK — never disconnect a service the supervisor
-        // owns; deliberately closing it would leave the supervisor
-        // believing a dead socket is ready.
-        if (!identical(sup?.service, service)) {
-          unawaited(service.disconnectQuietly());
-        }
-        return;
+        // #3858 (Epic #3855) — the bus is silent after every rung: the
+        // engine is off. This used to be an ERROR that refused to start
+        // ("start the engine and try again"), and every retry re-sent a
+        // `0100` into a silent bus — the K-line livelock trigger. Now
+        // the recording STARTS: GPS-first, the link held on its keepalive
+        // with no bus traffic, and the controller attaches the engine
+        // data itself on the power transition (alternator voltage / rpm
+        // / the BT-ACL hint). The driver sees "waiting for the engine",
+        // not a failure, and does nothing.
+        BreadcrumbCollector.add(
+          'OBD2 start: bus silent — starting GPS-first, waiting for the '
+          'engine (#3858)',
+        );
       }
       // #3335 — the user may have hit Cancel on the connecting card while
       // the BLE connect was in flight. If the session is no longer
