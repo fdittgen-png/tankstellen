@@ -18,6 +18,7 @@ import 'package:tankstellen/features/obd2/data/last_good_adapter_store.dart';
 import 'package:tankstellen/features/obd2/data/session/obd2_connection_service.dart';
 import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
 import 'package:tankstellen/features/obd2/domain/obd2_engine_evidence.dart';
+import 'package:tankstellen/features/obd2/domain/vehicle_power_state.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import '../../../helpers/silence_error_logger.dart';
@@ -248,6 +249,7 @@ void main() {
     }
 
     tearDown(Obd2EngineEvidence.instance.reset);
+    tearDown(Obd2VehiclePower.instance.reset); // #3860 — process-wide model
 
     test('probedSilent WITH fresh engine evidence: one recovery pass, the '
         'link is KEPT — a mid-drive park is refused', () async {
