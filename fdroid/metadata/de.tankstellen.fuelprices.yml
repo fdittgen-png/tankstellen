@@ -24,9 +24,11 @@ Summary: Find the cheapest fuel and EV charging nearby and cut driving costs
 Description: |-
   Sparkilo compares real-time fuel and EV-charging prices and helps you spend
   less to run your car: pay less per litre, burn less per kilometre, and keep a
-  clear record of what you actually spend. It is free, ad-free, has no account
-  and is privacy-first — your GPS position and any API keys never leave the
-  device. The interface is available in 23 languages.
+  clear record of what you actually spend. It is free, ad-free, needs no account
+  and is privacy-first: API keys go only to the service they belong to, search
+  coordinates only to the official price source of the country you are in, and
+  recorded GPS trips leave the device only if you switch on the optional
+  TankSync trip sync. The interface is available in 23 languages.
 
   Prices come from each country's official open-data source, not from
   crowdsourcing, covering Austria, Argentina, Australia, Chile, Denmark, France,
@@ -56,9 +58,13 @@ Description: |-
 
   '''Privacy'''
 
-  A Privacy Dashboard lets you view, export or delete all of your data at any
-  time. Optional TankSync synchronises favourites, vehicles, fill-ups and alerts
-  to a server you control.
+  GDPR-compliant: export everything as one ZIP and delete everything in-app, no
+  trackers, EU-hosted optional sync. A Privacy Dashboard lets you view, export
+  or delete all of your data at any time, and every consent can be revoked
+  under Settings. Optional TankSync synchronises favourites, vehicles, fill-ups
+  and alerts to a server you control, or to the Sparkilo Community database
+  hosted in the EU. Privacy policy (v3):
+  https://fdittgen-png.github.io/tankstellen/privacy-policy/
 
   '''About this F-Droid build'''
 

@@ -353,7 +353,6 @@ const _featurePairBaseline = <String, int>{
   'price_history -> feature_management': 6,
   'profile -> alerts': 2,
   'profile -> approach': 1,
-  'profile -> consent': 1,
   // #3743 (epic item 1) — 'profile -> consumption' hit ZERO: all 10 edges
   // were the developer-tools pump-OCR tester reaching into the OCR stack,
   // which now lives in features/receipts_ocr behind its api.dart barrel.

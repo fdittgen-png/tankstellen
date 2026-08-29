@@ -91,3 +91,5 @@ export 'providers/trip_recording_state.dart';
 export 'providers/trip_tile_action_listener_provider.dart';
 export 'providers/trip_ve_recompute_provider.dart';
 export 'providers/wakelock_facade.dart';
+// #3869 — the one-ZIP export writes one GPX per trip.
+export 'data/exporters/gpx_exporter.dart' show buildGpxXml;

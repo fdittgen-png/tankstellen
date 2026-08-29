@@ -2701,7 +2701,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get syncModeCommunitySubtitle =>
-      'Share favorites & ratings with all users';
+      'Shared database run by the developer — see what syncs below';
 
   @override
   String get syncModePrivateTitle => 'Private Database';
@@ -5291,6 +5291,106 @@ class AppLocalizationsEn extends AppLocalizations {
       'When off, badges, scores and trophy icons are hidden across the app.';
 
   @override
+  String gdprPolicyLink(int version) {
+    return 'Privacy policy (version $version)';
+  }
+
+  @override
+  String consentRecordedAt(String date, int version) {
+    return 'Consent given on $date · policy version $version';
+  }
+
+  @override
+  String get consentNotRecorded => 'No consent recorded yet';
+
+  @override
+  String serverErasurePartial(String tables) {
+    return 'Some server data could not be erased: $tables. Retry, or contact the developer with this list.';
+  }
+
+  @override
+  String localErasurePartial(String steps) {
+    return 'Some local data could not be erased: $steps. Restart the app and retry.';
+  }
+
+  @override
+  String get myCommunityReportsTitle => 'My community reports';
+
+  @override
+  String get myCommunityReportsEmpty => 'You have not submitted any reports';
+
+  @override
+  String get deleteReportTooltip => 'Delete this report';
+
+  @override
+  String get reportDeleted => 'Report deleted';
+
+  @override
+  String get reportDeleteFailed => 'Could not delete the report';
+
+  @override
+  String get privacyControlsTitle => 'Privacy controls';
+
+  @override
+  String get tileProxyToggleTitle =>
+      'Route map tiles through the Sparkilo proxy';
+
+  @override
+  String get tileProxyToggleSubtitle =>
+      'On: the map viewport and your IP address reach the developer\'s EU server, which fetches the tiles from OpenStreetMap. Off: tiles load from tile.openstreetmap.org directly.';
+
+  @override
+  String get remoteLogosToggleTitle => 'Load brand logos from the internet';
+
+  @override
+  String get remoteLogosToggleSubtitle =>
+      'Off by default: bundled placeholders are shown. On: logos are fetched from logo.clearbit.com, which sees your IP address.';
+
+  @override
+  String get privacyExportAllButton => 'Export all my data (ZIP)';
+
+  @override
+  String privacyExportAllSuccess(String fileName, int count) {
+    return 'Saved $fileName to Downloads — $count files inside';
+  }
+
+  @override
+  String get privacyExportAllFailed => 'Could not write the export file';
+
+  @override
+  String syncModeCommunityControllerNotice(String operator) {
+    return 'Operated by $operator · Supabase, EU (Frankfurt) · syncs favorites, alerts, vehicles incl. VIN, fill-ups, ratings, reports and — if you enable it — trips with GPS';
+  }
+
+  @override
+  String get syncModePrivateControllerNotice =>
+      'You are the controller — your own Supabase project, we never see it';
+
+  @override
+  String get syncModeJoinControllerNotice =>
+      'The person who owns the shared database is the controller of your data';
+
+  @override
+  String get ugcPublicNoticeTitle => 'Shared with other users';
+
+  @override
+  String get ugcPublicNoticeBody =>
+      'This is stored in the sync database under your pseudonymous user ID. In Sparkilo Community every signed-in user can read it. You can delete it any time from TankSync → Data Transparency.';
+
+  @override
+  String get blockedAuthorsTitle => 'Blocked users';
+
+  @override
+  String get blockedAuthorsDescription =>
+      'Content shared by these users is hidden on this device. Unblock to see it again.';
+
+  @override
+  String get blockedAuthorsEmpty => 'No blocked users';
+
+  @override
+  String get blockedAuthorsUnblock => 'Unblock';
+
+  @override
   String get coachingGpsLiftOff => 'Lift off';
 
   @override
@@ -6680,6 +6780,79 @@ class AppLocalizationsEn extends AppLocalizations {
     });
     return '$_temp0';
   }
+
+  @override
+  String get permissionRationaleCameraTitle => 'Camera Access';
+
+  @override
+  String get permissionRationaleCameraSubtitle =>
+      'This app would like to use your camera to read receipts, pump displays and QR codes.';
+
+  @override
+  String get permissionRationaleCameraWhatHappens =>
+      'What happens with the camera image:';
+
+  @override
+  String get permissionRationaleCameraBulletOnDevice =>
+      'The image is used only to read the receipt, the pump display or the QR code — recognition runs on your device.';
+
+  @override
+  String get permissionRationaleCameraBulletDiscarded =>
+      'The photo is discarded after the scan.';
+
+  @override
+  String get permissionRationaleCameraBulletNoUpload =>
+      'Nothing is uploaded unless you file a bad-scan report and confirm it.';
+
+  @override
+  String get permissionRationaleBluetoothTitle => 'Bluetooth Access';
+
+  @override
+  String get permissionRationaleBluetoothSubtitle =>
+      'This app would like to use Bluetooth to connect to your OBD2 adapter.';
+
+  @override
+  String get permissionRationaleBluetoothWhatHappens =>
+      'What happens with Bluetooth:';
+
+  @override
+  String get permissionRationaleBluetoothBulletAdapterOnly =>
+      'Bluetooth is used only to find and talk to your OBD2 adapter.';
+
+  @override
+  String get permissionRationaleBluetoothBulletIdentifierLocal =>
+      'The adapter identifier stays on your device — it is synced only with TankSync, as part of the vehicle profile.';
+
+  @override
+  String get permissionRationaleBluetoothBulletLegacyLocation =>
+      'On Android 11 and below the system also asks for location, because Bluetooth scanning is a location-class permission there.';
+
+  @override
+  String get permissionRationaleNotificationsTitle => 'Notifications';
+
+  @override
+  String get permissionRationaleNotificationsSubtitle =>
+      'This app would like to send you notifications for price alerts and the trip-recording status.';
+
+  @override
+  String get permissionRationaleNotificationsWhatHappens =>
+      'What happens with notifications:';
+
+  @override
+  String get permissionRationaleNotificationsBulletLocal =>
+      'Notifications are used for local price alerts and the trip-recording status.';
+
+  @override
+  String get permissionRationaleNotificationsBulletNothingLeaves =>
+      'They are generated on your device — nothing leaves the device.';
+
+  @override
+  String get permissionRationaleRevoke =>
+      'You can revoke this in your device settings at any time.';
+
+  @override
+  String get permissionRationaleLegalBasis =>
+      'Legal basis: Art. 6(1)(a) GDPR (Consent)';
 
   @override
   String get tripRecordingPipEstConsumptionCaption => 'est. L/100 km';
@@ -10639,7 +10812,7 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get syncModeCommunitySubtitle =>
-      '⟦Šĥářé ƒáṽóřîŧéš & řáŧîñǧš ŵîŧĥ áłł úšéřš ···············⟧';
+      '⟦Šĥářéđ đáŧáƀášé řúñ ƀý ŧĥé đéṽéłóƥéř — šéé ŵĥáŧ šýñçš ƀéłóŵ ······················⟧';
 
   @override
   String get syncModePrivateTitle => '⟦Ƥřîṽáŧé Đáŧáƀášé ·······⟧';
@@ -13312,6 +13485,109 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Ŵĥéñ óƒƒ, ƀáđǧéš, šçóřéš áñđ ŧřóƥĥý îçóñš ářé ĥîđđéñ áçřóšš ŧĥé áƥƥ. ························⟧';
 
   @override
+  String gdprPolicyLink(int version) {
+    return '⟦Ƥřîṽáçý ƥółîçý (ṽéřšîóñ $version) ·········⟧';
+  }
+
+  @override
+  String consentRecordedAt(String date, int version) {
+    return '⟦Çóñšéñŧ ǧîṽéñ óñ $date · ƥółîçý ṽéřšîóñ $version ············⟧';
+  }
+
+  @override
+  String get consentNotRecorded => '⟦Ñó çóñšéñŧ řéçóřđéđ ýéŧ ·········⟧';
+
+  @override
+  String serverErasurePartial(String tables) {
+    return '⟦Šóɱé šéřṽéř đáŧá çóúłđ ñóŧ ƀé éřášéđ: $tables. Řéŧřý, óř çóñŧáçŧ ŧĥé đéṽéłóƥéř ŵîŧĥ ŧĥîš łîšŧ. ·······························⟧';
+  }
+
+  @override
+  String localErasurePartial(String steps) {
+    return '⟦Šóɱé łóçáł đáŧá çóúłđ ñóŧ ƀé éřášéđ: $steps. Řéšŧářŧ ŧĥé áƥƥ áñđ řéŧřý. ·······················⟧';
+  }
+
+  @override
+  String get myCommunityReportsTitle => '⟦Ṁý çóɱɱúñîŧý řéƥóřŧš ········⟧';
+
+  @override
+  String get myCommunityReportsEmpty =>
+      '⟦Ýóú ĥáṽé ñóŧ šúƀɱîŧŧéđ áñý řéƥóřŧš ·············⟧';
+
+  @override
+  String get deleteReportTooltip => '⟦Đéłéŧé ŧĥîš řéƥóřŧ ·······⟧';
+
+  @override
+  String get reportDeleted => '⟦Řéƥóřŧ đéłéŧéđ ······⟧';
+
+  @override
+  String get reportDeleteFailed => '⟦Çóúłđ ñóŧ đéłéŧé ŧĥé řéƥóřŧ ··········⟧';
+
+  @override
+  String get privacyControlsTitle => '⟦Ƥřîṽáçý çóñŧřółš ·······⟧';
+
+  @override
+  String get tileProxyToggleTitle =>
+      '⟦Řóúŧé ɱáƥ ŧîłéš ŧĥřóúǧĥ ŧĥé Šƥářķîłó ƥřóẋý ················⟧';
+
+  @override
+  String get tileProxyToggleSubtitle =>
+      '⟦Óñ: ŧĥé ɱáƥ ṽîéŵƥóřŧ áñđ ýóúř ÎƤ áđđřéšš řéáçĥ ŧĥé đéṽéłóƥéř\'š ÉÚ šéřṽéř, ŵĥîçĥ ƒéŧçĥéš ŧĥé ŧîłéš ƒřóɱ ÓƥéñŠŧřééŧṀáƥ. Óƒƒ: ŧîłéš łóáđ ƒřóɱ ŧîłé.óƥéñšŧřééŧɱáƥ.óřǧ đîřéçŧłý. ·······························································⟧';
+
+  @override
+  String get remoteLogosToggleTitle =>
+      '⟦Łóáđ ƀřáñđ łóǧóš ƒřóɱ ŧĥé îñŧéřñéŧ ·············⟧';
+
+  @override
+  String get remoteLogosToggleSubtitle =>
+      '⟦Óƒƒ ƀý đéƒáúłŧ: ƀúñđłéđ ƥłáçéĥółđéřš ářé šĥóŵñ. Óñ: łóǧóš ářé ƒéŧçĥéđ ƒřóɱ łóǧó.çłéářƀîŧ.çóɱ, ŵĥîçĥ šééš ýóúř ÎƤ áđđřéšš. ············································⟧';
+
+  @override
+  String get privacyExportAllButton => '⟦Éẋƥóřŧ áłł ɱý đáŧá (ŽÎƤ) ········⟧';
+
+  @override
+  String privacyExportAllSuccess(String fileName, int count) {
+    return '⟦Šáṽéđ $fileName ŧó Đóŵñłóáđš — $count ƒîłéš îñšîđé ············⟧';
+  }
+
+  @override
+  String get privacyExportAllFailed =>
+      '⟦Çóúłđ ñóŧ ŵřîŧé ŧĥé éẋƥóřŧ ƒîłé ············⟧';
+
+  @override
+  String syncModeCommunityControllerNotice(String operator) {
+    return '⟦Óƥéřáŧéđ ƀý $operator · Šúƥáƀášé, ÉÚ (Ƒřáñķƒúřŧ) · šýñçš ƒáṽóřîŧéš, áłéřŧš, ṽéĥîçłéš îñçł. ṼÎÑ, ƒîłł-úƥš, řáŧîñǧš, řéƥóřŧš áñđ — îƒ ýóú éñáƀłé îŧ — ŧřîƥš ŵîŧĥ ǦƤŠ ···················································⟧';
+  }
+
+  @override
+  String get syncModePrivateControllerNotice =>
+      '⟦Ýóú ářé ŧĥé çóñŧřółłéř — ýóúř óŵñ Šúƥáƀášé ƥřóĵéçŧ, ŵé ñéṽéř šéé îŧ ························⟧';
+
+  @override
+  String get syncModeJoinControllerNotice =>
+      '⟦Ŧĥé ƥéřšóñ ŵĥó óŵñš ŧĥé šĥářéđ đáŧáƀášé îš ŧĥé çóñŧřółłéř óƒ ýóúř đáŧá ··························⟧';
+
+  @override
+  String get ugcPublicNoticeTitle => '⟦Šĥářéđ ŵîŧĥ óŧĥéř úšéřš ·········⟧';
+
+  @override
+  String get ugcPublicNoticeBody =>
+      '⟦Ŧĥîš îš šŧóřéđ îñ ŧĥé šýñç đáŧáƀášé úñđéř ýóúř ƥšéúđóñýɱóúš úšéř ÎĐ. Îñ Šƥářķîłó Çóɱɱúñîŧý éṽéřý šîǧñéđ-îñ úšéř çáñ řéáđ îŧ. Ýóú çáñ đéłéŧé îŧ áñý ŧîɱé ƒřóɱ ŦáñķŠýñç → Đáŧá Ŧřáñšƥářéñçý. ····································································⟧';
+
+  @override
+  String get blockedAuthorsTitle => '⟦Ɓłóçķéđ úšéřš ·····⟧';
+
+  @override
+  String get blockedAuthorsDescription =>
+      '⟦Çóñŧéñŧ šĥářéđ ƀý ŧĥéšé úšéřš îš ĥîđđéñ óñ ŧĥîš đéṽîçé. Úñƀłóçķ ŧó šéé îŧ áǧáîñ. ·····························⟧';
+
+  @override
+  String get blockedAuthorsEmpty => '⟦Ñó ƀłóçķéđ úšéřš ······⟧';
+
+  @override
+  String get blockedAuthorsUnblock => '⟦Úñƀłóçķ ···⟧';
+
+  @override
   String get coachingGpsLiftOff => '⟦Łîƒŧ óƒƒ ···⟧';
 
   @override
@@ -14729,6 +15005,79 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
     });
     return '⟦$_temp0⟧';
   }
+
+  @override
+  String get permissionRationaleCameraTitle => '⟦Çáɱéřá Áççéšš ·····⟧';
+
+  @override
+  String get permissionRationaleCameraSubtitle =>
+      '⟦Ŧĥîš áƥƥ ŵóúłđ łîķé ŧó úšé ýóúř çáɱéřá ŧó řéáđ řéçéîƥŧš, ƥúɱƥ đîšƥłáýš áñđ ɊŘ çóđéš. ······························⟧';
+
+  @override
+  String get permissionRationaleCameraWhatHappens =>
+      '⟦Ŵĥáŧ ĥáƥƥéñš ŵîŧĥ ŧĥé çáɱéřá îɱáǧé: ·············⟧';
+
+  @override
+  String get permissionRationaleCameraBulletOnDevice =>
+      '⟦Ŧĥé îɱáǧé îš úšéđ óñłý ŧó řéáđ ŧĥé řéçéîƥŧ, ŧĥé ƥúɱƥ đîšƥłáý óř ŧĥé ɊŘ çóđé — řéçóǧñîŧîóñ řúñš óñ ýóúř đéṽîçé. ·······································⟧';
+
+  @override
+  String get permissionRationaleCameraBulletDiscarded =>
+      '⟦Ŧĥé ƥĥóŧó îš đîšçářđéđ áƒŧéř ŧĥé šçáñ. ··············⟧';
+
+  @override
+  String get permissionRationaleCameraBulletNoUpload =>
+      '⟦Ñóŧĥîñǧ îš úƥłóáđéđ úñłéšš ýóú ƒîłé á ƀáđ-šçáñ řéƥóřŧ áñđ çóñƒîřɱ îŧ. ·························⟧';
+
+  @override
+  String get permissionRationaleBluetoothTitle => '⟦Ɓłúéŧóóŧĥ Áççéšš ·······⟧';
+
+  @override
+  String get permissionRationaleBluetoothSubtitle =>
+      '⟦Ŧĥîš áƥƥ ŵóúłđ łîķé ŧó úšé Ɓłúéŧóóŧĥ ŧó çóññéçŧ ŧó ýóúř ÓƁĐ2 áđáƥŧéř. ·························⟧';
+
+  @override
+  String get permissionRationaleBluetoothWhatHappens =>
+      '⟦Ŵĥáŧ ĥáƥƥéñš ŵîŧĥ Ɓłúéŧóóŧĥ: ···········⟧';
+
+  @override
+  String get permissionRationaleBluetoothBulletAdapterOnly =>
+      '⟦Ɓłúéŧóóŧĥ îš úšéđ óñłý ŧó ƒîñđ áñđ ŧáłķ ŧó ýóúř ÓƁĐ2 áđáƥŧéř. ······················⟧';
+
+  @override
+  String get permissionRationaleBluetoothBulletIdentifierLocal =>
+      '⟦Ŧĥé áđáƥŧéř îđéñŧîƒîéř šŧáýš óñ ýóúř đéṽîçé — îŧ îš šýñçéđ óñłý ŵîŧĥ ŦáñķŠýñç, áš ƥářŧ óƒ ŧĥé ṽéĥîçłé ƥřóƒîłé. ········································⟧';
+
+  @override
+  String get permissionRationaleBluetoothBulletLegacyLocation =>
+      '⟦Óñ Áñđřóîđ 11 áñđ ƀéłóŵ ŧĥé šýšŧéɱ áłšó ášķš ƒóř łóçáŧîóñ, ƀéçáúšé Ɓłúéŧóóŧĥ šçáññîñǧ îš á łóçáŧîóñ-çłášš ƥéřɱîššîóñ ŧĥéřé. ·············································⟧';
+
+  @override
+  String get permissionRationaleNotificationsTitle => '⟦Ñóŧîƒîçáŧîóñš ······⟧';
+
+  @override
+  String get permissionRationaleNotificationsSubtitle =>
+      '⟦Ŧĥîš áƥƥ ŵóúłđ łîķé ŧó šéñđ ýóú ñóŧîƒîçáŧîóñš ƒóř ƥřîçé áłéřŧš áñđ ŧĥé ŧřîƥ-řéçóřđîñǧ šŧáŧúš. ···································⟧';
+
+  @override
+  String get permissionRationaleNotificationsWhatHappens =>
+      '⟦Ŵĥáŧ ĥáƥƥéñš ŵîŧĥ ñóŧîƒîçáŧîóñš: ·············⟧';
+
+  @override
+  String get permissionRationaleNotificationsBulletLocal =>
+      '⟦Ñóŧîƒîçáŧîóñš ářé úšéđ ƒóř łóçáł ƥřîçé áłéřŧš áñđ ŧĥé ŧřîƥ-řéçóřđîñǧ šŧáŧúš. ·····························⟧';
+
+  @override
+  String get permissionRationaleNotificationsBulletNothingLeaves =>
+      '⟦Ŧĥéý ářé ǧéñéřáŧéđ óñ ýóúř đéṽîçé — ñóŧĥîñǧ łéáṽéš ŧĥé đéṽîçé. ·······················⟧';
+
+  @override
+  String get permissionRationaleRevoke =>
+      '⟦Ýóú çáñ řéṽóķé ŧĥîš îñ ýóúř đéṽîçé šéŧŧîñǧš áŧ áñý ŧîɱé. ····················⟧';
+
+  @override
+  String get permissionRationaleLegalBasis =>
+      '⟦Łéǧáł ƀášîš: Ářŧ. 6(1)(á) ǦĐƤŘ (Çóñšéñŧ) ···········⟧';
 
   @override
   String get tripRecordingPipEstConsumptionCaption => '⟦éšŧ. Ł/100 ķɱ ···⟧';

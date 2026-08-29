@@ -1,0 +1,105 @@
+{
+  "gdprPolicyLink": "Privacy policy (version {version})",
+  "@gdprPolicyLink": {
+    "description": "Link label on the consent screen and in Settings → Privacy & data; opens the online privacy policy.",
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentRecordedAt": "Consent given on {date} · policy version {version}",
+  "@consentRecordedAt": {
+    "description": "Settings → Privacy & data footer: when the user last saved their consent choices and against which policy version.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentNotRecorded": "No consent recorded yet",
+  "@consentNotRecorded": {
+    "description": "Settings → Privacy & data footer when the consent record is missing (pre-3866 install)."
+  },
+  "serverErasurePartial": "Some server data could not be erased: {tables}. Retry, or contact the developer with this list.",
+  "@serverErasurePartial": {
+    "description": "Error snackbar after Delete account / Delete everything when one or more tables failed.",
+    "placeholders": {
+      "tables": {
+        "type": "String"
+      }
+    }
+  },
+  "localErasurePartial": "Some local data could not be erased: {steps}. Restart the app and retry.",
+  "@localErasurePartial": {
+    "description": "Error snackbar after Delete all data when a step failed.",
+    "placeholders": {
+      "steps": {
+        "type": "String"
+      }
+    }
+  },
+  "myCommunityReportsTitle": "My community reports",
+  "@myCommunityReportsTitle": {
+    "description": "Data Transparency card listing the user's own price reports and content reports with a delete action each."
+  },
+  "myCommunityReportsEmpty": "You have not submitted any reports",
+  "@myCommunityReportsEmpty": {
+    "description": "Empty state of the My community reports card."
+  },
+  "deleteReportTooltip": "Delete this report",
+  "@deleteReportTooltip": {
+    "description": "Tooltip of the per-report delete icon."
+  },
+  "reportDeleted": "Report deleted",
+  "@reportDeleted": {
+    "description": "Snackbar after a single report was deleted from the server."
+  },
+  "reportDeleteFailed": "Could not delete the report",
+  "@reportDeleteFailed": {
+    "description": "Snackbar when a single-report delete failed."
+  },
+  "privacyControlsTitle": "Privacy controls",
+  "@privacyControlsTitle": {
+    "description": "Settings → Privacy & data: header of the non-consent privacy switches (tile proxy, internet logos)."
+  },
+  "tileProxyToggleTitle": "Route map tiles through the Sparkilo proxy",
+  "@tileProxyToggleTitle": {
+    "description": "Switch title. Sparkilo is the app name."
+  },
+  "tileProxyToggleSubtitle": "On: the map viewport and your IP address reach the developer's EU server, which fetches the tiles from OpenStreetMap. Off: tiles load from tile.openstreetmap.org directly.",
+  "@tileProxyToggleSubtitle": {
+    "description": "Switch explanation for the tile proxy."
+  },
+  "remoteLogosToggleTitle": "Load brand logos from the internet",
+  "@remoteLogosToggleTitle": {
+    "description": "Switch title for fetching station brand logos from logo.clearbit.com."
+  },
+  "remoteLogosToggleSubtitle": "Off by default: bundled placeholders are shown. On: logos are fetched from logo.clearbit.com, which sees your IP address.",
+  "@remoteLogosToggleSubtitle": {
+    "description": "Switch explanation for internet brand logos."
+  },
+  "privacyExportAllButton": "Export all my data (ZIP)",
+  "@privacyExportAllButton": {
+    "description": "Privacy Dashboard button: one ZIP with every local category and every server table (GDPR Art. 20)."
+  },
+  "privacyExportAllSuccess": "Saved {fileName} to Downloads — {count} files inside",
+  "@privacyExportAllSuccess": {
+    "description": "Snackbar after the full export ZIP was written.",
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "privacyExportAllFailed": "Could not write the export file",
+  "@privacyExportAllFailed": {
+    "description": "Error snackbar when the full export ZIP could not be saved to Downloads."
+  }
+}

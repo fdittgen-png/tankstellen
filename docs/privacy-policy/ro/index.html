@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sparkilo — Politica de confidențialitate</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+
+<h1>Politica de confidențialitate</h1>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen pe iOS, de.tankstellen.fuelprices pe Android) &mdash; Version 3 &mdash; Ultima actualizare: 29 august 2026</p>
+<p class="langs">Limbi disponibile: <a href="../">English</a> <a href="../bg/">Български</a> <a href="../cs/">Čeština</a> <a href="../da/">Dansk</a> <a href="../de/">Deutsch</a> <a href="../el/">Ελληνικά</a> <a href="../es/">Español</a> <a href="../et/">Eesti</a> <a href="../fi/">Suomi</a> <a href="../fr/">Français</a> <a href="../hr/">Hrvatski</a> <a href="../hu/">Magyar</a> <a href="../it/">Italiano</a> <a href="../ko/">한국어</a> <a href="../lt/">Lietuvių</a> <a href="../lv/">Latviešu</a> <a href="../nb/">Norsk</a> <a href="../nl/">Nederlands</a> <a href="../pl/">Polski</a> <a href="../pt/">Português</a> <a href="../ro/">Română</a> <a href="../sk/">Slovenčina</a> <a href="../sl/">Slovenščina</a> <a href="../sv/">Svenska</a></p>
+
+<h2>1. Prezentare generală</h2>
+<p>Sparkilo este o aplicație gratuită, cu sursă deschisă, pentru compararea prețurilor la carburanți și la încărcarea vehiculelor electrice, cu înregistrare opțională a călătoriilor. Este construită după principiul <strong>local-first</strong>: tot ceea ce aplicația știe despre dumneavoastră rămâne pe telefonul dumneavoastră, cu excepția cazului în care activați o funcție care precizează contrariul. Nu există reclame, pixeli de urmărire, identificatori publicitari și niciun SDK de analiză. Această politică este redactată pentru a respecta Regulamentul general privind protecția datelor al UE (RGPD / GDPR); ea se aplică fiecărui utilizator, oriunde v-ați afla.</p>
+<p>Aplicația este <a href="https://github.com/fdittgen-png/tankstellen">cu sursă deschisă</a> — fiecare afirmație de mai jos poate fi verificată în cod. Un rezumat al datelor prelucrate, lizibil automat, este păstrat în <code>docs/privacy/data_inventory.json</code>, iar testele proprii ale aplicației eșuează dacă această pagină, declarațiile din magazinele de aplicații și codul nu mai concordă.</p>
+
+<h2>2. Cine este responsabil (operatorul)</h2>
+<p>Operatorul pentru aplicație și pentru serviciul opțional de sincronizare Sparkilo Community este:</p>
+<div class="contact">
+  <p><strong>Florian DITTGEN</strong> (dezvoltator individual)</p>
+  <p><strong>E-mail:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
+  <p><strong>Cod sursă și sistem de raportare a problemelor:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
+</div>
+<p>În funcție de modul în care utilizați TankSync, operatorul datelor dumneavoastră sincronizate se schimbă:</p>
+<ul>
+  <li><strong>Fără TankSync (implicit):</strong> nimic nu este stocat pe vreun server operat de noi. Datele dumneavoastră rămân pe dispozitivul dumneavoastră și numai dumneavoastră le controlați.</li>
+  <li><strong>Bază de date privată:</strong> conectați propriul proiect Supabase. Dumneavoastră sunteți operatorul; noi nu vedem niciodată aceste date.</li>
+  <li><strong>Alăturarea la un grup:</strong> conectați un proiect Supabase operat de o persoană pe care o cunoașteți (familie, prieteni). Acea persoană este operatorul bazei de date partajate.</li>
+  <li><strong>Sparkilo Community:</strong> conectați baza de date partajată operată de dezvoltatorul menționat mai sus (Supabase, găzduită în UE — AWS eu-central-1, Frankfurt). Dezvoltatorul este operatorul; Supabase, Inc. este o persoană împuternicită de operator, obligată prin termenii săi de prelucrare a datelor.</li>
+</ul>
+<p>Aplicația vă spune care dintre aceste situații se aplică înainte de conectare și o afișează din nou în Setări → Panoul de confidențialitate.</p>
+
+<h2>3. Datele pe care le utilizăm</h2>
+<p>Tabelul enumeră fiecare tip de date cu caracter personal pe care aplicația le prelucrează, de ce, pe ce temei juridic (art. 6 RGPD), unde ajung și cât timp sunt păstrate. „Dispozitiv” înseamnă că nu părăsesc niciodată telefonul dumneavoastră.</p>
+<table>
+  <thead><tr><th>Date</th><th>Scop</th><th>Temei juridic</th><th>Destinație</th><th>Păstrare</th></tr></thead>
+  <tbody>
+    <tr><td>Locație aproximativă / precisă (căutare)</td><td>Găsirea stațiilor din apropierea dumneavoastră</td><td>Consimțământ (acordați permisiunea de localizare și confirmați explicația din aplicație)</td><td>Trimisă sub formă de coordonate de căutare către sursa de date privind prețurile din țara în care vă aflați (Secțiunea 5). Nu este stocată pe niciun server operat de noi.</td><td>Ultima poziție este păstrată pe dispozitiv pentru widgetul de pe ecranul principal până când ștergeți datele</td></tr>
+    <tr><td>Traseu GPS precis, viteză, altitudine, senzori de mișcare (înregistrarea călătoriilor)</td><td>Înregistrarea unei călătorii, calcularea distanței și a consumului</td><td>Consimțământ (porniți o înregistrare; înregistrarea automată necesită o permisiune separată de localizare în fundal, pentru fiecare vehicul)</td><td>Dispozitiv. Cu TankSync <em>și</em> sincronizarea călătoriilor activate: baza dumneavoastră de date TankSync.</td><td>Dispozitiv: până când ștergeți călătoria sau toate datele. Server: rezumatele călătoriilor până când le ștergeți; eșantioanele GPS detaliate sunt eliminate la 90 de zile după călătorie.</td></tr>
+    <tr><td>Profilul vehiculului (marcă, model, an, capacitatea rezervorului, VIN, identificatorul adaptorului OBD2)</td><td>Calcularea consumului, reconectarea adaptorului</td><td>Contract (furnizarea funcției pe care ați configurat-o)</td><td>Dispozitiv. Cu TankSync: baza dumneavoastră de date TankSync.</td><td>Până când ștergeți vehiculul sau toate datele</td></tr>
+    <tr><td>VIN (17 caractere)</td><td>Decodarea online a mărcii/modelului/motorului</td><td>Consimțământ (comutator separat, dezactivat implicit; în caz contrar rulează un decodor offline)</td><td>NHTSA vPIC (serviciu public din SUA), numai VIN-ul</td><td>Nu este stocat de noi; consultați politica NHTSA</td></tr>
+    <tr><td>Alimentări (dată, stație, litri, cost, kilometraj), jurnale de încărcare, mementouri de service</td><td>Jurnalul dumneavoastră de carburant și statisticile</td><td>Contract</td><td>Dispozitiv. Cu TankSync: baza dumneavoastră de date TankSync.</td><td>Până când le ștergeți sau ștergeți toate datele</td></tr>
+    <tr><td>Favorite, stații ignorate, alerte de preț, profiluri de căutare, itinerarii, setări</td><td>Personalizarea aplicației; declanșarea notificărilor locale de alertă de preț</td><td>Contract</td><td>Dispozitiv. Cu TankSync: baza dumneavoastră de date TankSync.</td><td>Până când le ștergeți sau ștergeți toate datele</td></tr>
+    <tr><td>ID de utilizator anonim (UUID aleatoriu), adresă de e-mail opțională, ID de dispozitiv per instalare</td><td>Identificarea contului dumneavoastră TankSync pe mai multe dispozitive; marcarea dispozitivului care a șters o înregistrare</td><td>Consimțământ (comutatorul Sincronizare în cloud) / Contract</td><td>Baza dumneavoastră de date TankSync (Supabase)</td><td>Până când ștergeți contul</td></tr>
+    <tr><td>Raportări de prețuri din comunitate, evaluări partajate ale stațiilor, raportări de conținut</td><td>Corecții de prețuri colaborative și moderare</td><td>Consimțământ (le trimiteți dumneavoastră; o notificare explică faptul că sunt stocate sub ID-ul dumneavoastră pseudonim și pot fi citite de alți utilizatori autentificați)</td><td>Baza dumneavoastră de date TankSync — în Sparkilo Community, lizibile de fiecare utilizator autentificat</td><td>Până când ștergeți raportarea sau contul</td></tr>
+    <tr><td>Rapoarte de eroare și urme de performanță (versiunea aplicației, versiunea SO, dimensiunea ecranului, limba, stack trace, ultimele acțiuni din aplicație)</td><td>Remedierea erorilor</td><td>Consimțământ (comutatorul Raportare erori, dezactivat implicit)</td><td>Sentry</td><td>Dispozitiv: cele mai recente 50 de urme, 7 zile, curățate de adrese de e-mail, coordonate și tokenuri înainte de stocare. Sentry: 90 de zile.</td></tr>
+    <tr><td>Fotografia bonului sau a pompei (cameră / galerie foto)</td><td>Citirea bonului pe dispozitiv (OCR pe dispozitiv)</td><td>Consimțământ (dumneavoastră faceți sau alegeți fotografia)</td><td>Numai pe dispozitiv. Atașată unui issue pe GitHub numai dacă trimiteți un raport de „scanare greșită” și confirmați.</td><td>Ștearsă după scanare; copia din raport rămâne pe GitHub până când ștergeți issue-ul</td></tr>
+    <tr><td>Zona vizibilă a hărții (coordonatele dalelor) și adresa IP</td><td>Afișarea hărții</td><td>Interes legitim (o hartă are nevoie de dale) — puteți dezactiva proxy-ul</td><td>Proxy-ul de dale Sparkilo (același proiect Supabase, UE), care le preia de la OpenStreetMap; sau direct tile.openstreetmap.org atunci când proxy-ul este dezactivat (Setări → Confidențialitate) sau în versiunea F-Droid</td><td>Nu sunt stocate dincolo de jurnalele standard de server (proxy: 7 zile)</td></tr>
+    <tr><td>Originea și destinația rutei, interogări ale rețelei rutiere</td><td>Căutarea rutelor, asistență pentru condusul eficient</td><td>Contract</td><td>OSRM (router.project-osrm.org), Overpass API (overpass-api.de), Nominatim (nominatim.openstreetmap.org)</td><td>Nu sunt stocate de noi</td></tr>
+    <tr><td>Textul adresei sau coordonatele pe care le introduceți</td><td>Geocodare</td><td>Contract</td><td>Nominatim sau geocodificatorul încorporat al telefonului dumneavoastră (Apple / Google)</td><td>Nu sunt stocate de noi</td></tr>
+    <tr><td>Cheile API pe care le introduceți (Tankerkönig, OpenChargeMap)</td><td>Apelarea acestor servicii în numele dumneavoastră</td><td>Contract</td><td>Numai către furnizorul căruia îi aparține cheia</td><td>Criptate pe dispozitiv (Keystore / Keychain) până când le ștergeți</td></tr>
+    <tr><td>Raportări de nume/adresă greșită a stației, rapoarte de scanare greșită</td><td>Corectarea datelor</td><td>Consimțământ (confirmați înainte de trimitere; este necesar un token GitHub personal)</td><td>GitHub (un issue public în depozitul proiectului)</td><td>Publice până când issue-ul este șters</td></tr>
+  </tbody>
+</table>
+<p>Aplicația nu ia decizii automatizate care produc efecte juridice sau efecte similare semnificative cu privire la dumneavoastră. Previziunile de preț sunt calculate pe dispozitiv din date publice privind prețurile.</p>
+
+<h2>4. Date pe care NU le colectăm</h2>
+<ul>
+  <li>Numele sau numărul de telefon (o adresă de e-mail este stocată numai dacă o asociați contului dumneavoastră opțional TankSync)</li>
+  <li>Date de plată sau bancare</li>
+  <li>Date privind sănătatea sau activitatea fizică</li>
+  <li>Contacte, mesaje sau jurnale de apeluri</li>
+  <li>Fotografii, videoclipuri sau fișiere, în afara fotografiei bonului pe care alegeți să o scanați</li>
+  <li>Istoricul de navigare</li>
+  <li>Identificatori publicitari</li>
+</ul>
+<p>Logourile mărcilor sunt incluse în aplicație. Încărcarea lor de pe internet (logo.clearbit.com, care ar primi adresa dumneavoastră IP) este dezactivată, cu excepția cazului în care o activați în Setări → Confidențialitate.</p>
+
+<h2>5. Servicii terțe și surse de date</h2>
+<p>Aplicația comunică cu următoarele servicii. Fiecare are propria politică de confidențialitate. Aplicația nu partajează niciodată date între ele și nu trimite niciodată mai mult decât descriu coloanele de mai sus.</p>
+<h3>5.1 Infrastructură (numai atunci când funcția corespunzătoare este activată)</h3>
+<ul>
+  <li><strong>Supabase</strong> (klelxnkzrxlpzuddhpfg.supabase.co, AWS eu-central-1) — backend TankSync pentru Sparkilo Community și pentru proxy-ul de dale. Persoană împuternicită de operator în temeiul actului adițional privind prelucrarea datelor al Supabase.</li>
+  <li><strong>Sentry</strong> (sentry.io) — rapoarte de eroare și urme de performanță, numai cu acordul dumneavoastră. Sentry poate prelucra date în Statele Unite; transferurile sunt acoperite de Cadrul UE-SUA privind confidențialitatea datelor și de clauze contractuale standard.</li>
+  <li><strong>GitHub</strong> (api.github.com, github.com) — rapoarte de probleme pe care le trimiteți explicit; aplicația descarcă de asemenea resurse de date publice (ieșiri de autostradă, liste de stații) din release-urile proiectului, ceea ce dezvăluie adresa dumneavoastră IP către GitHub.</li>
+  <li><strong>OpenStreetMap</strong> (tile.openstreetmap.org, nominatim.openstreetmap.org), <strong>OSRM</strong> (router.project-osrm.org), <strong>Overpass API</strong> (overpass-api.de) — hărți, geocodare, rutare.</li>
+  <li><strong>OpenChargeMap</strong> (api.openchargemap.io) și <strong>ODRÉ / IRVE</strong> (odre.opendatasoft.com) — stații de încărcare pentru vehicule electrice și prețuri. Primesc: coordonate de căutare.</li>
+  <li><strong>NHTSA vPIC</strong> (vpic.nhtsa.dot.gov) — decodarea VIN, condiționată de consimțământ.</li>
+  <li><strong>Clearbit Logo API</strong> (logo.clearbit.com) — logouri ale mărcilor, dezactivat implicit.</li>
+  <li><strong>Apple Maps / Google Maps</strong> (www.google.com) — deschise în browserul sau aplicația de hărți numai atunci când atingeți „Navighează”.</li>
+</ul>
+<h3>5.2 Surse oficiale de date privind prețurile la carburanți (primesc coordonatele sau regiunea de căutare, niciodată identitatea dumneavoastră)</h3>
+<ul>
+  <li>Germania — Tankerkönig (creativecommons.tankerkoenig.de), cu propria dumneavoastră cheie API</li>
+  <li>Franța — Prix Carburants (data.economie.gouv.fr, donnees.roulez-eco.fr)</li>
+  <li>Italia — MIMIT osservaprezzi (carburanti.mise.gov.it)</li>
+  <li>Spania — MITECO / Geoportal Gasolineras (sedeaplicaciones.minetur.gob.es, geoportalgasolineras.es)</li>
+  <li>Austria — E-Control Spritpreisrechner (api.e-control.at)</li>
+  <li>Belgia și Luxemburg — data.public.lu, STATEC (lustat.statec.lu)</li>
+  <li>Portugalia — DGEG (precoscombustiveis.dgeg.gov.pt)</li>
+  <li>Danemarca — OK (mobility-prices.ok.dk), Shell (shellpumpepriser.geoapp.me)</li>
+  <li>Regatul Unit — Fuel Finder (www.fuel-finder.service.gov.uk) și fluxurile de prețuri ale comercianților pe care le enumeră: applegreenstores.com, fuelprices.asconagroup.co.uk, storelocator.asda.com, www.bp.com, fuelprices.esso.co.uk, jetlocal.co.uk, api2.krlmedia.com, www.morrisons.com, moto-way.com, fuel.motorfuelgroup.com, www.rontec-servicestations.co.uk, api.sainsburys.co.uk, www.sgnretail.uk, www.shell.co.uk, www.tesco.com</li>
+  <li>Slovenia — goriva.si</li>
+  <li>România — Monitorul Prețurilor (monitorulpreturilor.info)</li>
+  <li>Grecia — Παρατηρητήριο Τιμών (paratiritirio.mindev.gov.gr) printr-o oglindă comunitară găzduită pe AWS eu-west-3 (5fcbs3i0z4.execute-api.eu-west-3.amazonaws.com)</li>
+  <li>Coreea de Sud — Opinet (www.opinet.co.kr)</li>
+  <li>Chile — CNE (api.cne.cl)</li>
+  <li>Argentina — datos.energia.gob.ar</li>
+  <li>Mexic — CRE (publicacionexterna.azurewebsites.net)</li>
+  <li>Australia — FuelCheck NSW (www.fuelcheck.nsw.gov.au)</li>
+</ul>
+
+<h2>6. Securitatea datelor</h2>
+<ul>
+  <li>Toate comunicațiile în rețea folosesc HTTPS (TLS în tranzit); aplicația refuză punctele finale de sincronizare prin HTTP simplu.</li>
+  <li>Cheile API, tokenul dumneavoastră GitHub și sesiunea TankSync sunt păstrate în spațiul de stocare criptat nativ al platformei (Android Keystore / iOS Keychain).</li>
+  <li>Bazele de date locale sunt criptate AES cu o cheie păstrată în Keystore / Keychain — inclusiv călătoriile înregistrate, datele vehiculelor, mementourile de service și prețurile din cache.</li>
+  <li>Pe server, fiecare tabel este protejat prin securitate la nivel de rând, astfel încât un cont poate citi sau șterge numai propriile rânduri; evaluările partajate și raportările de prețuri din comunitate sunt singurele rânduri vizibile altor utilizatori autentificați.</li>
+  <li>Urmele de eroare sunt curățate de adrese de e-mail, coordonate și tokenuri înainte de a fi stocate sau trimise.</li>
+  <li>Nicio dată nu este trimisă către vreun server decât dacă efectuați o căutare, deschideți o hartă sau activați TankSync / diagnosticarea.</li>
+</ul>
+
+<h2>7. Drepturile dumneavoastră</h2>
+<p>În temeiul art. 15–22 RGPD aveți dreptul de acces, de rectificare, de ștergere, de restricționare și de portabilitate a datelor dumneavoastră, dreptul de a vă opune prelucrării bazate pe interes legitim și dreptul de a vă retrage consimțământul în orice moment, fără a afecta legalitatea prelucrării efectuate anterior. Fiecare drept are un buton în aplicație:</p>
+<ul>
+  <li><strong>Acces</strong> — Setări → Panoul de confidențialitate afișează fiecare categorie stocată pe dispozitiv și, atunci când sunteți conectat, fiecare rând din baza dumneavoastră de date TankSync.</li>
+  <li><strong>Export (portabilitate)</strong> — Panoul de confidențialitate → Exportă toate datele mele creează o arhivă ZIP cu câte un fișier JSON lizibil automat pentru fiecare categorie (favorite, alerte, profiluri, itinerarii, istoricul prețurilor, vehicule, alimentări, călătorii cu eșantioane GPS și câte un GPX per călătorie, valori de referință, mementouri de service, jurnale de încărcare, evidența consimțămintelor dumneavoastră) plus un export JSON al fiecărui tabel de pe server.</li>
+  <li><strong>Rectificare</strong> — editați orice înregistrare direct în aplicație; modificarea se sincronizează dacă TankSync este activat.</li>
+  <li><strong>Ștergere</strong> — vedeți Secțiunea 8.</li>
+  <li><strong>Restricționare / opoziție</strong> — dezactivați TankSync, sincronizarea călătoriilor, proxy-ul de dale sau diagnosticarea din Setări; revocați permisiunea de localizare, Bluetooth, cameră sau notificări din setările dispozitivului dumneavoastră.</li>
+  <li><strong>Retragerea consimțământului</strong> — Setări → Confidențialitate și date enumeră fiecare consimțământ cu data la care l-ați acordat și versiunea politicii pe care ați văzut-o; fiecare poate fi dezactivat, iar aplicația oprește imediat prelucrarea corespunzătoare.</li>
+  <li><strong>Plângere</strong> — puteți depune o plângere la o autoritate de supraveghere, în special în statul membru al UE în care aveți reședința obișnuită, locul de muncă sau în care a avut loc presupusa încălcare. Am aprecia ocazia de a răspunde mai întâi noi preocupării dumneavoastră: <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a>.</li>
+</ul>
+
+<h2>8. Ștergerea contului și a datelor dumneavoastră</h2>
+<p>Puteți șterge totul singur, direct din aplicație — fără a fi nevoie de o solicitare de asistență:</p>
+<ul>
+  <li><strong>Date locale:</strong> Setări → Panoul de confidențialitate → Șterge toate datele elimină fiecare bază de date pe care aplicația o păstrează pe dispozitiv — profiluri, favorite, alerte, istoricul prețurilor, prețuri din cache, vehicule, alimentări, călătorii înregistrate și eșantioanele lor GPS, valori de referință OBD2 și cache-uri ale adaptoarelor, mementouri de service, realizări, urme de eroare, chei API, tokenuri și datele widgetului de pe ecranul principal — și readuce aplicația la starea de la prima lansare.</li>
+  <li><strong>Contul TankSync și datele de pe server:</strong> TankSync → Transparența datelor → Șterge contul elimină într-o singură tranzacție fiecare rând care vă aparține (favorite, alerte, stații ignorate, raportări de prețuri, raportări de conținut, vehicule, alimentări, itinerarii, valori de referință, evaluări, călătorii, partajări de călătorii pe care le-ați oferit sau primit, semnalări ale timpului de așteptare, setări de sincronizare, evidențe de ștergere și rândul dumneavoastră de utilizator), apoi șterge însăși identitatea contului, inclusiv orice adresă de e-mail asociată. Dacă vreun tabel nu a putut fi șters, aplicația vă spune care, în loc să pretindă că a reușit. Această acțiune nu poate fi anulată.</li>
+  <li><strong>Elemente individuale:</strong> fiecare favorit, alertă, vehicul, alimentare, călătorie, raportare de preț și raportare de conținut poate fi șters(ă) separat; ștergerile se propagă către celelalte dispozitive ale dumneavoastră.</li>
+</ul>
+<p>Dacă nu mai puteți accesa aplicația, puteți solicita ștergerea contactând dezvoltatorul (Secțiunea 11); vă rugăm să scrieți de la adresa de e-mail asociată contului dumneavoastră, pentru a putea verifica faptul că sunteți titularul. Un cont anonim care nu a fost niciodată asociat unui e-mail nu poate fi identificat de nimeni — nici de noi — fără dispozitivul pe care a fost creat.</p>
+
+<h2>9. Confidențialitatea copiilor</h2>
+<p>Aplicația nu se adresează copiilor sub 16 ani. Nu colectăm cu bună știință date cu caracter personal de la copii; dacă credeți că un copil a creat un cont TankSync, contactați-ne și îl vom șterge.</p>
+
+<h2>10. Modificări ale acestei politici</h2>
+<p>Modificările sunt publicate la acest URL cu un nou număr de versiune și o nouă dată; aplicația reține versiunea pentru care v-ați dat consimțământul și afișează din nou această pagină atunci când versiunea se schimbă.</p>
+<ul>
+  <li><strong>v3 — 29 august 2026:</strong> operatorul și rolurile pentru fiecare mod, tabel de prelucrare cu temeiuri juridice și perioade de păstrare, lista completă a persoanelor împuternicite (proxy de dale, geocodificator, rutare, GitHub, logouri ale mărcilor), căile de exercitare a drepturilor, ștergere și export complete.</li>
+  <li><strong>v2 — 15 august 2026:</strong> secțiunea privind ștergerea contului; declararea datelor de e-mail și ale contului TankSync.</li>
+  <li><strong>v1 — 7 aprilie 2026:</strong> prima versiune.</li>
+</ul>
+
+<h2>11. Contact</h2>
+<div class="contact">
+  <p><strong>Dezvoltator și operator:</strong> Florian DITTGEN</p>
+  <p><strong>E-mail:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
+  <p><strong>Cod sursă:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
+</div>
+
+</body>
+</html>

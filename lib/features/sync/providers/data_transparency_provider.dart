@@ -22,16 +22,23 @@ class DataTransparencyState {
   final bool loading;
   final String? error;
 
+  /// #3868 — tables the last "delete everything" could NOT erase (empty
+  /// when it was complete). The screen names them instead of claiming
+  /// success.
+  final List<String> erasureFailures;
+
   const DataTransparencyState({
     this.data,
     this.loading = true,
     this.error,
+    this.erasureFailures = const [],
   });
 
   DataTransparencyState copyWith({
     Map<String, dynamic>? data,
     bool? loading,
     String? error,
+    List<String>? erasureFailures,
     bool clearError = false,
     bool clearData = false,
   }) {
@@ -39,6 +46,7 @@ class DataTransparencyState {
       data: clearData ? null : (data ?? this.data),
       loading: loading ?? this.loading,
       error: clearError ? null : (error ?? this.error),
+      erasureFailures: erasureFailures ?? this.erasureFailures,
     );
   }
 }
@@ -133,14 +141,29 @@ class DataTransparencyController extends _$DataTransparencyController {
     await load();
   }
 
+  /// #3868 — delete one of the user's own community rows (price report /
+  /// content report) and reload.
+  Future<bool> deleteOwnRow({
+    required String table,
+    required String idColumn,
+    required Object id,
+  }) async {
+    final ok = await UserDataSync.deleteOwnRow(
+        table: table, idColumn: idColumn, id: id);
+    if (ok) await load();
+    return ok;
+  }
+
   Future<void> deleteAllData() async {
     final syncConfig = ref.read(syncStateProvider);
     if (syncConfig.userId == null) return;
 
-    state = state.copyWith(loading: true, clearError: true);
+    state = state.copyWith(
+        loading: true, clearError: true, erasureFailures: const []);
     try {
-      await UserDataSync.deleteAll();
+      final result = await UserDataSync.deleteAll();
       await load();
+      state = state.copyWith(erasureFailures: result.failedTables);
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
         'where': 'DataTransparencyController.deleteAllData: delete failed'

@@ -17,12 +17,28 @@ import '../../../../core/sharing/public_file_exporter.dart';
 import '../../../../core/sharing/share_seam.dart';
 import '../../../../core/telemetry/storage/trace_storage.dart';
 import '../../../../core/export/data_exporter.dart';
+import '../../../../core/storage/local_data_eraser.dart';
 import '../../../../core/storage/storage_providers.dart';
+import '../../../obd2/api.dart' show ActiveTripSampleWal;
+import '../../../widget/api.dart' show clearHomeWidgetData;
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../moderation/api.dart';
 import '../../providers/privacy_data_provider.dart';
+import '../../data/full_data_export.dart';
+import '../../../../core/constants/app_constants.dart';
+import '../../../../core/providers/app_state_provider.dart';
+import '../../../../core/storage/hive_boxes.dart';
+import '../../../../core/sync/sync_provider.dart';
+import '../../../../core/sync/user_data_sync.dart';
+import '../../../../core/time/app_clock.dart';
+import '../../../charging/api.dart' show chargingLogsProvider;
+import '../../../fill_ups/api.dart' show fillUpListProvider;
+import '../../../trips/api.dart' show tripHistoryRepositoryProvider;
+import '../../../vehicle/api.dart'
+    show serviceReminderRepositoryProvider, vehicleProfileListProvider;
 import '../widgets/config_verification_widget.dart';
 import '../widgets/error_log_export_row.dart'
     show exportErrorLogSizeGated, errorLogExportSnackbar;
@@ -81,8 +97,14 @@ class _PrivacyDashboardScreenState
           const SizedBox(height: 16),
           LocalDataCard(snapshot: snapshot),
           const SizedBox(height: 16),
+          // #3871 — the device-local block list with its Unblock action
+          // (the management UI #3726 deliberately left out).
+          const BlockedAuthorsSection(),
+          const SizedBox(height: 16),
           SyncedDataCard(snapshot: snapshot),
           const SizedBox(height: 24),
+          PrivacyExportAllButton(onPressed: _exportAll), // #3869
+          const SizedBox(height: 8),
           PrivacyExportJsonButton(onPressed: _exportData),
           const SizedBox(height: 12),
           PrivacyExportCsvButton(onPressed: _exportDataCsv),
@@ -120,6 +142,67 @@ class _PrivacyDashboardScreenState
         ],
       ),
     );
+  }
+
+  /// #3869 (Epic #3865, GDPR Art. 20) — one ZIP with everything.
+  Future<void> _exportAll() async {
+    final l = AppLocalizations.of(context);
+    final consent = ref.read(gdprConsentProvider);
+    final syncConfig = ref.read(syncStateProvider);
+    final server =
+        syncConfig.userId != null ? await UserDataSync.fetchAll() : null;
+    if (!mounted) return;
+    Map<String, dynamic> box(String name) => Hive.isBoxOpen(name)
+        ? decodeJsonBox(Hive.box<String>(name).toMap())
+        : const {};
+    final input = FullDataExportInput(
+      appVersion: AppConstants.appVersion,
+      exportedAt: ref.read(appClockProvider).now(),
+      policyVersion: AppConstants.privacyPolicyVersion,
+      appDataJson: ref.read(exportPrivacyDataProvider),
+      vehicles: ref.read(vehicleProfileListProvider),
+      fillUps: ref.read(fillUpListProvider),
+      trips: ref.read(tripHistoryRepositoryProvider)?.loadAll() ?? const [],
+      chargingLogs: ref.read(chargingLogsProvider).asData?.value ?? const [],
+      serviceReminders: ref.read(serviceReminderRepositoryProvider).getAll(),
+      baselines: box(HiveBoxes.obd2Baselines),
+      achievements: box(HiveBoxes.achievements),
+      obd2Caches: {
+        HiveBoxes.obd2SupportedPids: box(HiveBoxes.obd2SupportedPids),
+        HiveBoxes.obd2NegotiatedProtocol:
+            box(HiveBoxes.obd2NegotiatedProtocol),
+      },
+      inProgressTrips: {
+        HiveBoxes.obd2PausedTrips: box(HiveBoxes.obd2PausedTrips),
+        HiveBoxes.obd2ActiveTrip: box(HiveBoxes.obd2ActiveTrip),
+      },
+      consent: {
+        'location': consent.location,
+        'errorReporting': consent.errorReporting,
+        'cloudSync': consent.cloudSync,
+        'syncTrips': consent.syncTrips,
+        'vinOnlineDecode': consent.vinOnlineDecode,
+        'recordedAt': consent.recordedAt?.toIso8601String(),
+        'policyVersion': consent.policyVersion,
+      },
+      server: server,
+    );
+    final bytes = buildFullDataExportZip(input);
+    final stamp = input.exportedAt.toIso8601String().substring(0, 10);
+    final fileName = 'sparkilo-my-data-$stamp.zip';
+    try {
+      await PublicFileExporter.saveBytesToDownloads(
+          bytes: bytes, fileName: fileName, mimeType: 'application/zip');
+    } catch (e, st) {
+      await errorLogger.log(ErrorLayer.storage, e, st,
+          context: const {'where': 'PrivacyDashboard._exportAll'});
+      if (!mounted) return;
+      SnackBarHelper.showError(context, l.privacyExportAllFailed);
+      return;
+    }
+    if (!mounted) return;
+    SnackBarHelper.showSuccess(context,
+        l.privacyExportAllSuccess(fileName, fullDataExportEntryCount(input)));
   }
 
   Future<void> _exportData() async {
@@ -247,17 +330,20 @@ class _PrivacyDashboardScreenState
     final confirmed = await _confirmDelete();
     if (confirmed != true || !mounted) return;
 
-    final storageMgmt = ref.read(storageManagementProvider);
-    await storageMgmt.clearCache();
-    await storageMgmt.clearPriceHistory();
-    await storageMgmt.deleteApiKey();
-    for (final boxName in ['settings', 'favorites', 'profiles']) {
-      final box = Hive.box<dynamic>(boxName);
-      await box.clear();
+    // #3867 (Epic #3865) — the ONE registry-driven local erasure: every
+    // box, secure storage, prefs, the widget container and the trip WAL.
+    final result = await LocalDataEraser.eraseAll(
+      storage: ref.read(storageRepositoryProvider),
+      extraWipes: [clearHomeWidgetData, ActiveTripSampleWal.instance.clear],
+    );
+    if (!mounted) return;
+    ref.invalidate(storageManagementProvider);
+    if (!result.complete) {
+      SnackBarHelper.showError(context,
+          AppLocalizations.of(context)
+              .localErasurePartial(result.failedSteps.join(', ')));
     }
-    if (mounted) {
-      context.go(RoutePaths.setup);
-    }
+    context.go(RoutePaths.setup);
   }
 
   Future<bool?> _confirmDelete() {

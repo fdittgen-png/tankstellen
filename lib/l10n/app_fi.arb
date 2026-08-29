@@ -781,7 +781,7 @@
   "syncHowToSyncQuestion": "Miten haluaisit synkronoida?",
   "syncOfflineDescription": "Sovelluksesi toimii täysin offline-tilassa. Pilvisynkronointi on valinnainen.",
   "syncModeCommunityTitle": "Sparkilo-yhteisö",
-  "syncModeCommunitySubtitle": "Jaa suosikit ja arvostelut kaikkien käyttäjien kanssa",
+  "syncModeCommunitySubtitle": "Kehittäjän ylläpitämä jaettu tietokanta — katso alta, mitä synkronoidaan",
   "syncModePrivateTitle": "Yksityinen tietokanta",
   "syncModePrivateSubtitle": "Oma Supabase — täysi hallinta tietoihin",
   "syncModeGroupTitle": "Liity ryhmään",
@@ -4721,5 +4721,99 @@
         "type": "String"
       }
     }
-  }
+  },
+  "gdprPolicyLink": "Tietosuojakäytäntö (versio {version})",
+  "@gdprPolicyLink": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentRecordedAt": "Suostumus annettu {date} · käytännön versio {version}",
+  "@consentRecordedAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentNotRecorded": "Suostumusta ei ole vielä tallennettu",
+  "serverErasurePartial": "Joitakin palvelintietoja ei voitu poistaa: {tables}. Yritä uudelleen tai ota yhteyttä kehittäjään tällä listalla.",
+  "@serverErasurePartial": {
+    "placeholders": {
+      "tables": {
+        "type": "String"
+      }
+    }
+  },
+  "localErasurePartial": "Joitakin paikallisia tietoja ei voitu poistaa: {steps}. Käynnistä sovellus uudelleen ja yritä uudelleen.",
+  "@localErasurePartial": {
+    "placeholders": {
+      "steps": {
+        "type": "String"
+      }
+    }
+  },
+  "myCommunityReportsTitle": "Omat yhteisöilmoitukseni",
+  "myCommunityReportsEmpty": "Et ole lähettänyt yhtään ilmoitusta",
+  "deleteReportTooltip": "Poista tämä ilmoitus",
+  "reportDeleted": "Ilmoitus poistettu",
+  "reportDeleteFailed": "Ilmoitusta ei voitu poistaa",
+  "privacyControlsTitle": "Tietosuoja-asetukset",
+  "tileProxyToggleTitle": "Lataa karttaruudut Sparkilo-välityspalvelimen kautta",
+  "tileProxyToggleSubtitle": "Päällä: näkyvä kartta-alue ja IP-osoitteesi päätyvät kehittäjän EU-palvelimelle, joka hakee ruudut OpenStreetMapista. Pois: ruudut ladataan suoraan osoitteesta tile.openstreetmap.org.",
+  "remoteLogosToggleTitle": "Lataa merkkien logot internetistä",
+  "remoteLogosToggleSubtitle": "Oletuksena pois: näytetään sovelluksen mukana tulevat paikkamerkit. Päällä: logot haetaan osoitteesta logo.clearbit.com, joka näkee IP-osoitteesi.",
+  "privacyExportAllButton": "Vie kaikki tietoni (ZIP)",
+  "privacyExportAllSuccess": "{fileName} tallennettu Lataukset-kansioon — sisältää {count} tiedostoa",
+  "@privacyExportAllSuccess": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "privacyExportAllFailed": "Vientitiedostoa ei voitu kirjoittaa",
+  "syncModeCommunityControllerNotice": "Ylläpitäjä {operator} · Supabase, EU (Frankfurt) · synkronoi suosikit, hälytykset, ajoneuvot VIN-numeroineen, tankkaukset, arviot, ilmoitukset ja — jos otat sen käyttöön — matkat GPS-tiedoin",
+  "@syncModeCommunityControllerNotice": {
+    "placeholders": {
+      "operator": {
+        "type": "String"
+      }
+    }
+  },
+  "syncModePrivateControllerNotice": "Sinä olet rekisterinpitäjä — oma Supabase-projektisi, me emme koskaan näe sitä",
+  "syncModeJoinControllerNotice": "Jaetun tietokannan omistaja on tietojesi rekisterinpitäjä",
+  "ugcPublicNoticeTitle": "Jaettu muiden käyttäjien kanssa",
+  "ugcPublicNoticeBody": "Tämä tallennetaan synkronointitietokantaan pseudonyymin käyttäjätunnuksesi alle. Sparkilo-yhteisössä jokainen kirjautunut käyttäjä voi lukea sen. Voit poistaa sen milloin tahansa kohdasta TankSync → Tietojen läpinäkyvyys.",
+  "blockedAuthorsTitle": "Estetyt käyttäjät",
+  "blockedAuthorsDescription": "Näiden käyttäjien jakama sisältö piilotetaan tällä laitteella. Poista esto nähdäksesi sen uudelleen.",
+  "blockedAuthorsEmpty": "Ei estettyjä käyttäjiä",
+  "blockedAuthorsUnblock": "Poista esto",
+  "permissionRationaleCameraTitle": "Kameran käyttö",
+  "permissionRationaleCameraSubtitle": "Tämä sovellus haluaa käyttää kameraasi kuittien, mittarinäyttöjen ja QR-koodien lukemiseen.",
+  "permissionRationaleCameraWhatHappens": "Mitä kamerakuvalle tapahtuu:",
+  "permissionRationaleCameraBulletOnDevice": "Kuvaa käytetään vain kuitin, mittarinäytön tai QR-koodin lukemiseen — tunnistus tapahtuu laitteellasi.",
+  "permissionRationaleCameraBulletDiscarded": "Kuva hylätään skannauksen jälkeen.",
+  "permissionRationaleCameraBulletNoUpload": "Mitään ei lähetetä, ellet tee ilmoitusta virheellisestä skannauksesta ja vahvista sitä.",
+  "permissionRationaleBluetoothTitle": "Bluetoothin käyttö",
+  "permissionRationaleBluetoothSubtitle": "Tämä sovellus haluaa käyttää Bluetoothia yhteyden muodostamiseen OBD2-sovittimeesi.",
+  "permissionRationaleBluetoothWhatHappens": "Mitä Bluetoothilla tehdään:",
+  "permissionRationaleBluetoothBulletAdapterOnly": "Bluetoothia käytetään vain OBD2-sovittimesi löytämiseen ja sen kanssa viestimiseen.",
+  "permissionRationaleBluetoothBulletIdentifierLocal": "Sovittimen tunniste pysyy laitteellasi — se synkronoidaan vain TankSyncin kautta osana ajoneuvoprofiilia.",
+  "permissionRationaleBluetoothBulletLegacyLocation": "Android 11:ssä ja sitä vanhemmissa versioissa järjestelmä pyytää myös sijaintia, koska Bluetooth-haku lasketaan siellä sijaintiluvaksi.",
+  "permissionRationaleNotificationsTitle": "Ilmoitukset",
+  "permissionRationaleNotificationsSubtitle": "Tämä sovellus haluaa lähettää sinulle ilmoituksia hintahälytyksistä ja matkan tallennuksen tilasta.",
+  "permissionRationaleNotificationsWhatHappens": "Mitä ilmoituksille tapahtuu:",
+  "permissionRationaleNotificationsBulletLocal": "Ilmoituksia käytetään paikallisiin hintahälytyksiin ja matkan tallennuksen tilaan.",
+  "permissionRationaleNotificationsBulletNothingLeaves": "Ne luodaan laitteellasi — mikään ei poistu laitteelta.",
+  "permissionRationaleRevoke": "Voit peruuttaa tämän milloin tahansa laitteen asetuksista.",
+  "permissionRationaleLegalBasis": "Oikeusperuste: yleisen tietosuoja-asetuksen 6 artiklan 1 kohdan a alakohta (suostumus)"
 }

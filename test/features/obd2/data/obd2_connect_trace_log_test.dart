@@ -182,9 +182,9 @@ void main() {
 
       final trace = Obd2ConnectTraceLog.snapshot().single;
       // MAC is redacted (last 4 visible).
-      expect(trace.requestedMac, endsWith('E:FF'));
-      expect(trace.requestedMac, isNot(contains('AA:BB')));
-      expect(trace.scanned.single.redactedMac, endsWith('E:FF'));
+      expect(trace.requestedMac, startsWith('AA:BB:CC'));
+      expect(trace.requestedMac, isNot(contains('EE:F')));
+      expect(trace.scanned.single.redactedMac, startsWith('AA:BB:CC'));
       expect(trace.scanned.single.matchedProfileId, 'vlinker-fs-classic');
       expect(trace.resolvedTransport, Obd2ConnectTransport.classic);
       expect(trace.transportDecisionReason, 'name-matched-classic');

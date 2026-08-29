@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../data/storage_repository.dart';
+import '../providers/app_state_provider.dart';
 import '../storage/storage_providers.dart';
 import 'community_config.dart';
 import 'supabase_client.dart';
@@ -26,6 +27,7 @@ import '../../core/logging/error_logger.dart';
 export 'sync_auth_types.dart';
 
 part 'sync_provider.g.dart';
+part 'sync_provider_account.dart';
 
 /// Manages the cloud sync connection state.
 ///
@@ -45,7 +47,11 @@ class SyncState extends _$SyncState {
     final storage = ref.watch(storageRepositoryProvider);
     final modeStr = storage.getSetting('sync_mode') as String?;
     return SyncConfig(
-      enabled: storage.getSetting('sync_enabled') as bool? ?? false,
+      // #3866 (Epic #3865) — the Cloud Sync CONSENT gates the whole sync
+      // path (coordinator, writers, helper): withdrawing it stops every
+      // upload, not only trips. `sync_enabled` alone is the wizard state.
+      enabled: (storage.getSetting('sync_enabled') as bool? ?? false) &&
+          ref.watch(gdprConsentProvider).cloudSync,
       supabaseUrl: storage.getSetting('supabase_url') as String?,
       supabaseAnonKey: storage.getSupabaseAnonKey(),
       userId: storage.getSetting('sync_user_id') as String?,
@@ -244,36 +250,6 @@ class SyncState extends _$SyncState {
       unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'switchToAnonymous failed'}));
       rethrow;
     }
-  }
-
-  /// Delete the user's account: wipe server data, sign out, clear local sync state.
-  ///
-  /// Works in every mode, including community (#3081). Every synced table's
-  /// RLS policy is `FOR ALL USING (user_id = auth.uid())`, so
-  /// [UserDataSync.deleteAll] can only ever remove the *caller's own* rows —
-  /// deleting your own data can never reach another community user's rows in
-  /// the shared database. The destructive UI action stays gated behind a
-  /// confirmation dialog before this runs.
-  Future<void> deleteAccount() async {
-    try {
-      await UserDataSync.deleteAll();
-      // #3712 — Play's account-deletion requirement: the auth identity
-      // (e-mail) must go too, not just the data rows. The delete_user()
-      // RPC (schema v6) deletes the caller's own auth.users record.
-      // Best-effort in its own guard: a self-host schema older than v6
-      // lacks the RPC, and the wipe + sign-out must still complete —
-      // the verifier's version check flags the outdated schema.
-      try {
-        await TankSyncClient.client?.rpc<void>('delete_user');
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-            context: const {'where': 'delete_user RPC failed (schema < v6?)'}));
-      }
-      await TankSyncClient.signOut();
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'Delete account failed'}));
-    }
-    await disconnect();
   }
 
   /// Disconnect and clear all sync settings. Local data is preserved.

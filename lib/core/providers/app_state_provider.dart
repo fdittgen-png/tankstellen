@@ -2,7 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../constants/app_constants.dart';
+import '../privacy/consent_enforcement.dart';
 import '../storage/storage_keys.dart';
+import '../time/app_clock.dart';
 import '../storage/storage_providers.dart';
 
 part 'app_state_provider.g.dart';
@@ -115,11 +118,12 @@ class AutoSwitchProfile extends _$AutoSwitchProfile {
   }
 }
 
-/// Whether GDPR consent has been given (any choices made).
+/// Whether GDPR consent has been given against the CURRENT policy
+/// version (#3866 — a policy bump re-surfaces the consent screen once).
 @riverpod
 bool hasGdprConsent(Ref ref) {
   final storage = ref.watch(storageRepositoryProvider);
-  return storage.getSetting(StorageKeys.gdprConsentGiven) == true;
+  return ConsentRecord.isCurrent(storage);
 }
 
 /// GDPR consent state: location, error reporting, cloud sync,
@@ -134,9 +138,13 @@ class GdprConsent extends _$GdprConsent {
     bool cloudSync,
     bool vinOnlineDecode,
     bool syncTrips,
+    DateTime? recordedAt,
+    int policyVersion,
   }) build() {
     final storage = ref.watch(storageRepositoryProvider);
     return (
+      recordedAt: ConsentRecord.recordedAt(storage),
+      policyVersion: ConsentRecord.policyVersionOf(storage),
       location: storage.getSetting(StorageKeys.consentLocation) as bool? ?? false,
       errorReporting: storage.getSetting(StorageKeys.consentErrorReporting) as bool? ?? false,
       cloudSync: storage.getSetting(StorageKeys.consentCloudSync) as bool? ?? false,
@@ -155,7 +163,15 @@ class GdprConsent extends _$GdprConsent {
     bool syncTrips = false,
   }) async {
     final storage = ref.read(storageRepositoryProvider);
+    final previousErrorReporting =
+        storage.getSetting(StorageKeys.consentErrorReporting) as bool? ?? false;
     await storage.putSetting(StorageKeys.gdprConsentGiven, true);
+    // #3866 — the consent record: when, and against which policy text.
+    final recordedAt = ref.read(appClockProvider).now().toUtc();
+    await storage.putSetting(
+        StorageKeys.consentRecordedAt, recordedAt.toIso8601String());
+    await storage.putSetting(
+        StorageKeys.consentPolicyVersion, AppConstants.privacyPolicyVersion);
     await storage.putSetting(StorageKeys.consentLocation, location);
     await storage.putSetting(StorageKeys.consentErrorReporting, errorReporting);
     await storage.putSetting(StorageKeys.consentCloudSync, cloudSync);
@@ -179,7 +195,13 @@ class GdprConsent extends _$GdprConsent {
       cloudSync: cloudSync,
       vinOnlineDecode: vinOnlineDecode,
       syncTrips: effectiveSyncTrips,
+      recordedAt: recordedAt,
+      policyVersion: AppConstants.privacyPolicyVersion,
     );
+    // #3866 — withdrawal takes effect NOW, not at the next launch.
+    if (previousErrorReporting != errorReporting) {
+      await ConsentEnforcement.notifyErrorReporting(errorReporting);
+    }
   }
 }
 

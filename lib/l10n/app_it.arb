@@ -781,7 +781,7 @@
   "syncHowToSyncQuestion": "Come vorresti sincronizzare?",
   "syncOfflineDescription": "La tua app funziona completamente offline. La sincronizzazione cloud è opzionale.",
   "syncModeCommunityTitle": "Sparkilo Community",
-  "syncModeCommunitySubtitle": "Condividi preferiti e valutazioni con tutti gli utenti",
+  "syncModeCommunitySubtitle": "Database condiviso gestito dallo sviluppatore — qui sotto vedi cosa viene sincronizzato",
   "syncModePrivateTitle": "Database privato",
   "syncModePrivateSubtitle": "Il tuo Supabase — controllo completo dei dati",
   "syncModeGroupTitle": "Unisciti a un gruppo",
@@ -4721,5 +4721,99 @@
         "type": "String"
       }
     }
-  }
+  },
+  "gdprPolicyLink": "Informativa sulla privacy (versione {version})",
+  "@gdprPolicyLink": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentRecordedAt": "Consenso dato il {date} · versione {version} dell'informativa",
+  "@consentRecordedAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentNotRecorded": "Nessun consenso registrato finora",
+  "serverErasurePartial": "Alcuni dati sul server non sono stati eliminati: {tables}. Riprova o contatta lo sviluppatore con questo elenco.",
+  "@serverErasurePartial": {
+    "placeholders": {
+      "tables": {
+        "type": "String"
+      }
+    }
+  },
+  "localErasurePartial": "Alcuni dati locali non sono stati eliminati: {steps}. Riavvia l'app e riprova.",
+  "@localErasurePartial": {
+    "placeholders": {
+      "steps": {
+        "type": "String"
+      }
+    }
+  },
+  "myCommunityReportsTitle": "Le mie segnalazioni alla community",
+  "myCommunityReportsEmpty": "Non hai inviato alcuna segnalazione",
+  "deleteReportTooltip": "Elimina questa segnalazione",
+  "reportDeleted": "Segnalazione eliminata",
+  "reportDeleteFailed": "Impossibile eliminare la segnalazione",
+  "privacyControlsTitle": "Controlli sulla privacy",
+  "tileProxyToggleTitle": "Carica le tessere della mappa tramite il proxy Sparkilo",
+  "tileProxyToggleSubtitle": "Attivo: l'area della mappa visualizzata e il tuo indirizzo IP raggiungono il server UE dello sviluppatore, che recupera le tessere da OpenStreetMap. Disattivo: le tessere vengono caricate direttamente da tile.openstreetmap.org.",
+  "remoteLogosToggleTitle": "Carica i loghi dei marchi da internet",
+  "remoteLogosToggleSubtitle": "Disattivo per impostazione predefinita: vengono mostrati segnaposto inclusi nell'app. Attivo: i loghi vengono scaricati da logo.clearbit.com, che vede il tuo indirizzo IP.",
+  "privacyExportAllButton": "Esporta tutti i miei dati (ZIP)",
+  "privacyExportAllSuccess": "{fileName} salvato in Download — {count} file all'interno",
+  "@privacyExportAllSuccess": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "privacyExportAllFailed": "Impossibile scrivere il file di esportazione",
+  "syncModeCommunityControllerNotice": "Gestito da {operator} · Supabase, UE (Frankfurt) · sincronizza preferiti, avvisi, veicoli incl. VIN, rifornimenti, valutazioni, segnalazioni e — se lo attivi — viaggi con GPS",
+  "@syncModeCommunityControllerNotice": {
+    "placeholders": {
+      "operator": {
+        "type": "String"
+      }
+    }
+  },
+  "syncModePrivateControllerNotice": "Sei tu il titolare del trattamento — il tuo progetto Supabase, noi non lo vediamo mai",
+  "syncModeJoinControllerNotice": "Chi possiede il database condiviso è il titolare del trattamento dei tuoi dati",
+  "ugcPublicNoticeTitle": "Condiviso con altri utenti",
+  "ugcPublicNoticeBody": "Questo viene salvato nel database di sincronizzazione sotto il tuo ID utente pseudonimo. Nella Sparkilo Community ogni utente che ha effettuato l'accesso può leggerlo. Puoi eliminarlo in qualsiasi momento da TankSync → Trasparenza dei dati.",
+  "blockedAuthorsTitle": "Utenti bloccati",
+  "blockedAuthorsDescription": "I contenuti condivisi da questi utenti sono nascosti su questo dispositivo. Sbloccali per vederli di nuovo.",
+  "blockedAuthorsEmpty": "Nessun utente bloccato",
+  "blockedAuthorsUnblock": "Sblocca",
+  "permissionRationaleCameraTitle": "Accesso alla fotocamera",
+  "permissionRationaleCameraSubtitle": "Questa app vorrebbe usare la tua fotocamera per leggere scontrini, display delle pompe e codici QR.",
+  "permissionRationaleCameraWhatHappens": "Cosa succede con l'immagine della fotocamera:",
+  "permissionRationaleCameraBulletOnDevice": "L'immagine viene usata solo per leggere lo scontrino, il display della pompa o il codice QR — il riconoscimento avviene sul tuo dispositivo.",
+  "permissionRationaleCameraBulletDiscarded": "La foto viene eliminata dopo la scansione.",
+  "permissionRationaleCameraBulletNoUpload": "Non viene caricato nulla, a meno che tu non invii una segnalazione di scansione errata e la confermi.",
+  "permissionRationaleBluetoothTitle": "Accesso al Bluetooth",
+  "permissionRationaleBluetoothSubtitle": "Questa app vorrebbe usare il Bluetooth per connettersi al tuo adattatore OBD2.",
+  "permissionRationaleBluetoothWhatHappens": "Cosa succede con il Bluetooth:",
+  "permissionRationaleBluetoothBulletAdapterOnly": "Il Bluetooth viene usato solo per trovare il tuo adattatore OBD2 e comunicare con esso.",
+  "permissionRationaleBluetoothBulletIdentifierLocal": "L'identificativo dell'adattatore resta sul tuo dispositivo — viene sincronizzato solo tramite TankSync, come parte del profilo del veicolo.",
+  "permissionRationaleBluetoothBulletLegacyLocation": "Su Android 11 e versioni precedenti il sistema chiede anche la posizione, perché lì la ricerca Bluetooth è considerata un permesso di posizione.",
+  "permissionRationaleNotificationsTitle": "Notifiche",
+  "permissionRationaleNotificationsSubtitle": "Questa app vorrebbe inviarti notifiche per gli avvisi di prezzo e lo stato della registrazione del viaggio.",
+  "permissionRationaleNotificationsWhatHappens": "Cosa succede con le notifiche:",
+  "permissionRationaleNotificationsBulletLocal": "Le notifiche vengono usate per gli avvisi di prezzo locali e lo stato della registrazione del viaggio.",
+  "permissionRationaleNotificationsBulletNothingLeaves": "Vengono generate sul tuo dispositivo — nulla lascia il dispositivo.",
+  "permissionRationaleRevoke": "Puoi revocare questa autorizzazione in qualsiasi momento nelle impostazioni del dispositivo.",
+  "permissionRationaleLegalBasis": "Base giuridica: art. 6, par. 1, lett. a) del GDPR (consenso)"
 }

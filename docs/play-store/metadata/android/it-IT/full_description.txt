@@ -8,7 +8,7 @@ PERCHÉ PUOI FIDARTI
 • Prezzi ufficiali in open data, paese per paese — non stime della community che ti mandano a fare una deviazione inutile.
 • Benzina, diesel, GPL, metano, E85 e ricarica elettrica su un'unica mappa, in un'unica ricerca.
 • Prima il più economico: i segnaposto sono colorati dal più conveniente al più caro e il vincitore porta un badge Il più economico.
-• La tua posizione GPS e le tue chiavi API non lasciano mai il dispositivo. Senza pubblicità, senza account, senza tracciamento — e il codice è pubblico.
+• Le chiavi API vengono inviate solo al servizio a cui appartengono, le coordinate di ricerca solo alla fonte ufficiale dei prezzi del paese in cui ti trovi, e i viaggi GPS registrati lasciano il dispositivo solo se attivi la sincronizzazione dei viaggi di TankSync. Senza pubblicità, senza account, senza tracciamento — e il codice è pubblico.
 
 RISPARMIA SUL PREZZO
 • Cerca nelle vicinanze o lungo tutto il tuo itinerario. Filtra per carburante, raggio, aperto adesso, servizi e solo autostrada.
@@ -30,7 +30,8 @@ MENTRE GUIDI
 
 I TUOI DATI RESTANO TUOI
 • Dashboard privacy: consulta, esporta o cancella tutto, quando vuoi.
-• TankSync, opzionale, sincronizza preferiti, veicoli, rifornimenti e avvisi su un server che controlli tu — non il nostro.
+• TankSync, opzionale, sincronizza preferiti, veicoli, rifornimenti e avvisi su un server che controlli tu — oppure, se lo scegli, sul database Sparkilo Community ospitato nell'UE.
+• GDPR: nessun tracker, nessun SDK pubblicitario. Esporta tutto in un unico ZIP e cancella tutto, sul dispositivo e sul server, direttamente dall'app. Ogni consenso può essere revocato in qualsiasi momento. Informativa sulla privacy: https://fdittgen-png.github.io/tankstellen/privacy-policy/
 
 PAESI CON PREZZI UFFICIALI IN TEMPO REALE
 Austria, Argentina, Australia, Cile, Danimarca, Francia, Germania, Grecia, Italia, Lussemburgo, Messico, Portogallo, Romania, Slovenia, Corea del Sud, Spagna e Regno Unito. Ricarica elettrica in tutto il mondo tramite Open Charge Map.

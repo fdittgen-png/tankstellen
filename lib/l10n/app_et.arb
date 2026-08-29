@@ -781,7 +781,7 @@
   "syncHowToSyncQuestion": "Kuidas soovid sünkroonida?",
   "syncOfflineDescription": "Sinu rakendus töötab täielikult võrguühenduseta. Pilvsünkroonimine on vabatahtlik.",
   "syncModeCommunityTitle": "Sparkilo kogukond",
-  "syncModeCommunitySubtitle": "Jaga lemmikuid ja hinnanguid kõigi kasutajatega",
+  "syncModeCommunitySubtitle": "Arendaja hallatav jagatud andmebaas — allpool näed, mida sünkroonitakse",
   "syncModePrivateTitle": "Privaatne andmebaas",
   "syncModePrivateSubtitle": "Sinu oma Supabase — täielik andmekontroll",
   "syncModeGroupTitle": "Liitu grupiga",
@@ -4721,5 +4721,99 @@
         "type": "String"
       }
     }
-  }
+  },
+  "gdprPolicyLink": "Privaatsuspoliitika (versioon {version})",
+  "@gdprPolicyLink": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentRecordedAt": "Nõusolek antud {date} · poliitika versioon {version}",
+  "@consentRecordedAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentNotRecorded": "Nõusolekut pole veel salvestatud",
+  "serverErasurePartial": "Mõningaid serveriandmeid ei õnnestunud kustutada: {tables}. Proovi uuesti või võta selle loendiga ühendust arendajaga.",
+  "@serverErasurePartial": {
+    "placeholders": {
+      "tables": {
+        "type": "String"
+      }
+    }
+  },
+  "localErasurePartial": "Mõningaid kohalikke andmeid ei õnnestunud kustutada: {steps}. Taaskäivita rakendus ja proovi uuesti.",
+  "@localErasurePartial": {
+    "placeholders": {
+      "steps": {
+        "type": "String"
+      }
+    }
+  },
+  "myCommunityReportsTitle": "Minu kogukonnateated",
+  "myCommunityReportsEmpty": "Sa pole ühtegi teadet saatnud",
+  "deleteReportTooltip": "Kustuta see teade",
+  "reportDeleted": "Teade kustutatud",
+  "reportDeleteFailed": "Teadet ei õnnestunud kustutada",
+  "privacyControlsTitle": "Privaatsusseaded",
+  "tileProxyToggleTitle": "Laadi kaardipaanid Sparkilo puhverserveri kaudu",
+  "tileProxyToggleSubtitle": "Sees: nähtav kaardiala ja sinu IP-aadress jõuavad arendaja EL-i serverisse, mis hangib paanid OpenStreetMapist. Väljas: paanid laaditakse otse aadressilt tile.openstreetmap.org.",
+  "remoteLogosToggleTitle": "Laadi brändilogod internetist",
+  "remoteLogosToggleSubtitle": "Vaikimisi väljas: kuvatakse rakendusega kaasas olevad kohatäited. Sees: logod hangitakse aadressilt logo.clearbit.com, mis näeb sinu IP-aadressi.",
+  "privacyExportAllButton": "Ekspordi kõik minu andmed (ZIP)",
+  "privacyExportAllSuccess": "{fileName} salvestatud allalaadimiste kausta — sisaldab {count} faili",
+  "@privacyExportAllSuccess": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "privacyExportAllFailed": "Ekspordifaili ei õnnestunud kirjutada",
+  "syncModeCommunityControllerNotice": "Haldab {operator} · Supabase, EL (Frankfurt) · sünkroonib lemmikud, hoiatused, sõidukid koos VIN-koodiga, tankimised, hinnangud, teated ja — kui sa selle sisse lülitad — GPS-iga sõidud",
+  "@syncModeCommunityControllerNotice": {
+    "placeholders": {
+      "operator": {
+        "type": "String"
+      }
+    }
+  },
+  "syncModePrivateControllerNotice": "Sina oled vastutav töötleja — sinu enda Supabase'i projekt, meie ei näe seda kunagi",
+  "syncModeJoinControllerNotice": "Jagatud andmebaasi omanik on sinu andmete vastutav töötleja",
+  "ugcPublicNoticeTitle": "Jagatud teiste kasutajatega",
+  "ugcPublicNoticeBody": "See salvestatakse sünkroonimisandmebaasi sinu pseudonüümse kasutaja-ID all. Sparkilo kogukonnas saab seda lugeda iga sisse loginud kasutaja. Saad selle igal ajal kustutada: TankSync → Andmete läbipaistvus.",
+  "blockedAuthorsTitle": "Blokeeritud kasutajad",
+  "blockedAuthorsDescription": "Nende kasutajate jagatud sisu on selles seadmes peidetud. Selle uuesti nägemiseks eemalda blokeering.",
+  "blockedAuthorsEmpty": "Blokeeritud kasutajaid pole",
+  "blockedAuthorsUnblock": "Eemalda blokeering",
+  "permissionRationaleCameraTitle": "Kaamera juurdepääs",
+  "permissionRationaleCameraSubtitle": "See rakendus soovib kasutada teie kaamerat kviitungite, tankuri ekraanide ja QR-koodide lugemiseks.",
+  "permissionRationaleCameraWhatHappens": "Mis juhtub kaamerapildiga:",
+  "permissionRationaleCameraBulletOnDevice": "Pilti kasutatakse ainult kviitungi, tankuri ekraani või QR-koodi lugemiseks — tuvastamine toimub teie seadmes.",
+  "permissionRationaleCameraBulletDiscarded": "Foto kustutatakse pärast skaneerimist.",
+  "permissionRationaleCameraBulletNoUpload": "Midagi ei laadita üles, kui te ei esita vigase skaneerimise teadet ega kinnita seda.",
+  "permissionRationaleBluetoothTitle": "Bluetoothi juurdepääs",
+  "permissionRationaleBluetoothSubtitle": "See rakendus soovib kasutada Bluetoothi, et luua ühendus teie OBD2 adapteriga.",
+  "permissionRationaleBluetoothWhatHappens": "Mis juhtub Bluetoothiga:",
+  "permissionRationaleBluetoothBulletAdapterOnly": "Bluetoothi kasutatakse ainult teie OBD2 adapteri leidmiseks ja sellega suhtlemiseks.",
+  "permissionRationaleBluetoothBulletIdentifierLocal": "Adapteri identifikaator jääb teie seadmesse — see sünkroonitakse ainult TankSynci kaudu sõidukiprofiili osana.",
+  "permissionRationaleBluetoothBulletLegacyLocation": "Android 11 ja vanemates versioonides küsib süsteem ka asukohta, sest Bluetoothi otsing kuulub seal asukohalubade hulka.",
+  "permissionRationaleNotificationsTitle": "Teavitused",
+  "permissionRationaleNotificationsSubtitle": "See rakendus soovib saata teile teavitusi hinnateatiste ja sõidu salvestamise oleku kohta.",
+  "permissionRationaleNotificationsWhatHappens": "Mis juhtub teavitustega:",
+  "permissionRationaleNotificationsBulletLocal": "Teavitusi kasutatakse kohalike hinnateatiste ja sõidu salvestamise oleku jaoks.",
+  "permissionRationaleNotificationsBulletNothingLeaves": "Need luuakse teie seadmes — miski ei lahku seadmest.",
+  "permissionRationaleRevoke": "Saate selle igal ajal seadme seadetes tühistada.",
+  "permissionRationaleLegalBasis": "Õiguslik alus: isikuandmete kaitse üldmääruse art 6 lg 1 p a (nõusolek)"
 }

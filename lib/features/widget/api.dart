@@ -16,6 +16,7 @@ library;
 
 export 'data/car_station_data.dart';
 export 'data/car_station_writer.dart';
+export 'data/home_widget_eraser.dart';
 export 'data/home_widget_service.dart';
 export 'presentation/widget_click_listener.dart';
 export 'presentation/widget_help_section.dart';

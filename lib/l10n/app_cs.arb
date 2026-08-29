@@ -781,7 +781,7 @@
   "syncHowToSyncQuestion": "Jak chcete synchronizovat?",
   "syncOfflineDescription": "Aplikace funguje plně offline. Cloudová synchronizace je volitelná.",
   "syncModeCommunityTitle": "Komunita Sparkilo",
-  "syncModeCommunitySubtitle": "Sdílejte oblíbené a hodnocení se všemi uživateli",
+  "syncModeCommunitySubtitle": "Sdílená databáze provozovaná vývojářem — níže vidíte, co se synchronizuje",
   "syncModePrivateTitle": "Soukromá databáze",
   "syncModePrivateSubtitle": "Vlastní Supabase — plná kontrola nad daty",
   "syncModeGroupTitle": "Připojit se ke skupině",
@@ -4721,5 +4721,99 @@
         "type": "String"
       }
     }
-  }
+  },
+  "gdprPolicyLink": "Zásady ochrany osobních údajů (verze {version})",
+  "@gdprPolicyLink": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentRecordedAt": "Souhlas udělen {date} · verze zásad {version}",
+  "@consentRecordedAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentNotRecorded": "Zatím nebyl zaznamenán žádný souhlas",
+  "serverErasurePartial": "Některá data na serveru se nepodařilo smazat: {tables}. Zkuste to znovu nebo kontaktujte vývojáře s tímto seznamem.",
+  "@serverErasurePartial": {
+    "placeholders": {
+      "tables": {
+        "type": "String"
+      }
+    }
+  },
+  "localErasurePartial": "Některá místní data se nepodařilo smazat: {steps}. Restartujte aplikaci a zkuste to znovu.",
+  "@localErasurePartial": {
+    "placeholders": {
+      "steps": {
+        "type": "String"
+      }
+    }
+  },
+  "myCommunityReportsTitle": "Moje komunitní hlášení",
+  "myCommunityReportsEmpty": "Zatím jste neodeslali žádné hlášení",
+  "deleteReportTooltip": "Smazat toto hlášení",
+  "reportDeleted": "Hlášení smazáno",
+  "reportDeleteFailed": "Hlášení se nepodařilo smazat",
+  "privacyControlsTitle": "Nastavení soukromí",
+  "tileProxyToggleTitle": "Načítat mapové dlaždice přes proxy Sparkilo",
+  "tileProxyToggleSubtitle": "Zapnuto: zobrazený výřez mapy a vaše IP adresa se dostanou na server vývojáře v EU, který dlaždice stáhne z OpenStreetMap. Vypnuto: dlaždice se načítají přímo z tile.openstreetmap.org.",
+  "remoteLogosToggleTitle": "Načítat loga značek z internetu",
+  "remoteLogosToggleSubtitle": "Ve výchozím stavu vypnuto: zobrazují se vestavěné zástupné obrázky. Zapnuto: loga se stahují z logo.clearbit.com, které vidí vaši IP adresu.",
+  "privacyExportAllButton": "Exportovat všechna moje data (ZIP)",
+  "privacyExportAllSuccess": "{fileName} uloženo do Stažené — obsahuje {count} souborů",
+  "@privacyExportAllSuccess": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "privacyExportAllFailed": "Exportní soubor se nepodařilo zapsat",
+  "syncModeCommunityControllerNotice": "Provozuje {operator} · Supabase, EU (Frankfurt) · synchronizuje oblíbené, upozornění, vozidla vč. VIN, tankování, hodnocení, hlášení a — pokud to zapnete — jízdy s GPS",
+  "@syncModeCommunityControllerNotice": {
+    "placeholders": {
+      "operator": {
+        "type": "String"
+      }
+    }
+  },
+  "syncModePrivateControllerNotice": "Správcem údajů jste vy — váš vlastní projekt Supabase, my ho nikdy nevidíme",
+  "syncModeJoinControllerNotice": "Správcem vašich údajů je ten, kdo vlastní sdílenou databázi",
+  "ugcPublicNoticeTitle": "Sdíleno s ostatními uživateli",
+  "ugcPublicNoticeBody": "Toto je uloženo v synchronizační databázi pod vaším pseudonymním ID uživatele. V Komunitě Sparkilo si to může přečíst každý přihlášený uživatel. Kdykoli to můžete smazat v TankSync → Transparentnost dat.",
+  "blockedAuthorsTitle": "Blokovaní uživatelé",
+  "blockedAuthorsDescription": "Obsah sdílený těmito uživateli je na tomto zařízení skrytý. Odblokujte je, abyste ho znovu viděli.",
+  "blockedAuthorsEmpty": "Žádní blokovaní uživatelé",
+  "blockedAuthorsUnblock": "Odblokovat",
+  "permissionRationaleCameraTitle": "Přístup ke kameře",
+  "permissionRationaleCameraSubtitle": "Tato aplikace chce použít vaši kameru ke čtení účtenek, displejů stojanů a QR kódů.",
+  "permissionRationaleCameraWhatHappens": "Co se děje s obrazem z kamery:",
+  "permissionRationaleCameraBulletOnDevice": "Obraz se používá pouze ke čtení účtenky, displeje stojanu nebo QR kódu — rozpoznávání probíhá ve vašem zařízení.",
+  "permissionRationaleCameraBulletDiscarded": "Fotografie je po naskenování zahozena.",
+  "permissionRationaleCameraBulletNoUpload": "Nic se nenahrává, pokud nenahlásíte chybné skenování a nepotvrdíte to.",
+  "permissionRationaleBluetoothTitle": "Přístup k Bluetooth",
+  "permissionRationaleBluetoothSubtitle": "Tato aplikace chce použít Bluetooth k připojení k vašemu adaptéru OBD2.",
+  "permissionRationaleBluetoothWhatHappens": "Co se děje s Bluetooth:",
+  "permissionRationaleBluetoothBulletAdapterOnly": "Bluetooth se používá pouze k vyhledání vašeho adaptéru OBD2 a ke komunikaci s ním.",
+  "permissionRationaleBluetoothBulletIdentifierLocal": "Identifikátor adaptéru zůstává ve vašem zařízení — synchronizuje se pouze přes TankSync jako součást profilu vozidla.",
+  "permissionRationaleBluetoothBulletLegacyLocation": "V systému Android 11 a starším si systém vyžádá také polohu, protože vyhledávání Bluetooth tam spadá pod oprávnění k poloze.",
+  "permissionRationaleNotificationsTitle": "Oznámení",
+  "permissionRationaleNotificationsSubtitle": "Tato aplikace vám chce posílat oznámení o cenových upozorněních a o stavu záznamu jízdy.",
+  "permissionRationaleNotificationsWhatHappens": "Co se děje s oznámeními:",
+  "permissionRationaleNotificationsBulletLocal": "Oznámení se používají pro místní cenová upozornění a stav záznamu jízdy.",
+  "permissionRationaleNotificationsBulletNothingLeaves": "Vytvářejí se ve vašem zařízení — nic zařízení neopouští.",
+  "permissionRationaleRevoke": "Toto můžete kdykoli odvolat v nastavení zařízení.",
+  "permissionRationaleLegalBasis": "Právní základ: čl. 6 odst. 1 písm. a) GDPR (souhlas)"
 }

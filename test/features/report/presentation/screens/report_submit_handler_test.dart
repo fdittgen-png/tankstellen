@@ -8,6 +8,9 @@ import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/feedback/github_issue_reporter/error_report_payload.dart';
 import 'package:tankstellen/core/feedback/github_issue_reporter/error_reporter.dart';
+import 'package:tankstellen/core/storage/storage_keys.dart';
+import 'package:tankstellen/core/sync/sync_config.dart';
+import 'package:tankstellen/core/sync/sync_provider.dart';
 import 'package:tankstellen/features/report/domain/entities/report_type.dart';
 import 'package:tankstellen/features/report/presentation/screens/report_submit_handler.dart';
 import 'package:tankstellen/features/report/providers/report_form_provider.dart';
@@ -418,6 +421,129 @@ void main() {
       },
     );
   });
+
+  // #3871 (Epic #3865, GDPR) — with TankSync set up (a userId exists)
+  // the report is destined for the shared database, so the FIRST submit
+  // shows the one-time "Shared with other users" notice. Cancel aborts
+  // before any backend is consulted; Continue proceeds (here into the
+  // no-backend branch, because the static TankSyncClient is never
+  // connected in tests) and persists the flag so the second submit
+  // asks no more.
+  group('ReportSubmitHandler — first-contribution notice (#3871)', () {
+    List<Object> syncConfiguredOverrides(Object storageOverride) => [
+      storageOverride,
+      activeCountryOverride(Countries.france),
+      favoritesOverride(const []),
+      syncStateProvider.overrideWith(() => _ConfiguredSyncState()),
+    ];
+
+    testWidgets('first submit shows the notice; Cancel aborts the submit',
+        (tester) async {
+      // Stateful fake: the persisted flag is read back for real.
+      final storage = fakeStorageRepositoryOverride();
+
+      final priceCtrl = TextEditingController(text: '1.459');
+      final textCtrl = TextEditingController();
+      late ReportSubmitHandler handler;
+
+      await mountHandler(
+        tester,
+        overrides: syncConfiguredOverrides(storage.override),
+        selectedType: ReportType.wrongE5,
+        priceController: priceCtrl,
+        textController: textCtrl,
+        reporter: null,
+        stationId: 'station-fr',
+        onReady: (h) => handler = h,
+      );
+
+      final submit = handler.submit();
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('ugc_public_notice_dialog')), findsOneWidget);
+      expect(find.text('Shared with other users'), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('ugc_public_notice_cancel')));
+      await tester.pumpAndSettle();
+      await submit;
+
+      expect(find.textContaining('could not be sent'), findsNothing,
+          reason: 'Cancel must abort BEFORE the backend branch runs');
+      expect(
+        storage.fake.getSetting(StorageKeys.ugcPublicNoticeShown),
+        isNull,
+        reason: 'Cancel must not persist the accepted flag',
+      );
+
+      priceCtrl.dispose();
+      textCtrl.dispose();
+    });
+
+    testWidgets('Continue proceeds, persists the flag, and the second submit '
+        'shows no notice', (tester) async {
+      final storage = fakeStorageRepositoryOverride();
+
+      final priceCtrl = TextEditingController(text: '1.459');
+      final textCtrl = TextEditingController();
+      late ReportSubmitHandler handler;
+
+      await mountHandler(
+        tester,
+        overrides: syncConfiguredOverrides(storage.override),
+        selectedType: ReportType.wrongE5,
+        priceController: priceCtrl,
+        textController: textCtrl,
+        reporter: null,
+        stationId: 'station-fr',
+        onReady: (h) => handler = h,
+      );
+
+      final first = handler.submit();
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('ugc_public_notice_dialog')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('ugc_public_notice_continue')));
+      await tester.pumpAndSettle();
+      await first;
+
+      expect(
+        storage.fake.getSetting(StorageKeys.ugcPublicNoticeShown),
+        isTrue,
+        reason: 'Continue must persist the flag',
+      );
+      expect(
+        find.textContaining('could not be sent'),
+        findsOneWidget,
+        reason: 'after Continue the submit proceeds into the backend branch',
+      );
+
+      // Let the first snackbar go away so the second one is countable.
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pumpAndSettle();
+
+      await handler.submit();
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('ugc_public_notice_dialog')), findsNothing,
+          reason: 'the notice is one-time');
+      expect(find.textContaining('could not be sent'), findsOneWidget);
+
+      priceCtrl.dispose();
+      textCtrl.dispose();
+    });
+  });
+}
+
+/// TankSync configured (a pseudonymous user id exists) — the state in
+/// which a report is destined for the shared database (#3871).
+class _ConfiguredSyncState extends SyncState {
+  @override
+  SyncConfig build() => const SyncConfig(
+    enabled: true,
+    supabaseUrl: 'https://test.supabase.co',
+    supabaseAnonKey: 'test-key',
+    userId: 'user-abcdef12-3456-7890',
+    mode: SyncMode.community,
+  );
 }
 
 /// Counts the number of routes currently on the navigator stack.

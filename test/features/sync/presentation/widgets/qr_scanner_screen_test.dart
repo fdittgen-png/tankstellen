@@ -6,8 +6,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:tankstellen/core/permissions/camera_permissions.dart';
+import 'package:tankstellen/core/permissions/permission_rationale_dialog.dart';
 import 'package:tankstellen/features/sync/presentation/widgets/qr_scanner_screen.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
+
+import '../../../../helpers/fake_settings_storage.dart';
 
 void main() {
   group('QrScannerTorchButton (#721 subset)', () {
@@ -152,7 +155,12 @@ void _registerQrScannerFlowTests() {
         MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: QrScannerScreen(permissions: perms),
+          home: QrScannerScreen(
+            permissions: perms,
+            // #3872 — rationale pre-acknowledged; this test is about the
+            // re-prompt BEHIND it.
+            settingsStorage: FakeSettingsStorage.rationalesShown(),
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -178,7 +186,10 @@ void _registerQrScannerFlowTests() {
         MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: QrScannerScreen(permissions: perms),
+          home: QrScannerScreen(
+            permissions: perms,
+            settingsStorage: FakeSettingsStorage.rationalesShown(),
+          ),
         ),
       );
       // Intentionally don't settle — MobileScanner will start
@@ -188,6 +199,47 @@ void _registerQrScannerFlowTests() {
       await tester.pump();
       expect(find.byKey(const Key('qrScannerDenied')), findsNothing);
       expect(find.byKey(const Key('qrScannerPermanentlyDenied')), findsNothing);
+    });
+
+    testWidgets('#3872 — a fresh install sees the camera rationale BEFORE '
+        'the OS prompt; Continue then requests the permission', (
+      tester,
+    ) async {
+      final perms = _FakeCameraPermissions(
+        currentState: CameraPermissionState.denied,
+        requestResult: CameraPermissionState.denied,
+      );
+      final storage = FakeSettingsStorage();
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: QrScannerScreen(permissions: perms, settingsStorage: storage),
+        ),
+      );
+      // The screen stays in its `probing` phase (indeterminate spinner)
+      // while the rationale is up, so pump frames instead of settling.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      // Rationale up, OS prompt NOT yet requested.
+      expect(find.byKey(PermissionRationaleDialog.dialogKey), findsOneWidget);
+      expect(find.text('Camera Access'), findsOneWidget);
+      expect(perms.requestCalls, 0);
+
+      await tester.tap(find.byKey(PermissionRationaleDialog.continueKey));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(PermissionRationaleDialog.dialogKey), findsNothing);
+      expect(perms.requestCalls, 1);
+      expect(find.byKey(const Key('qrScannerDenied')), findsOneWidget);
+      expect(
+        PermissionRationaleDialog.hasBeenShown(
+          storage,
+          PermissionRationaleKind.camera,
+        ),
+        isTrue,
+      );
     });
   });
 }

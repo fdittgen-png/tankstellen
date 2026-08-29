@@ -114,10 +114,21 @@ Features that don't serve at least one of those three layers don't belong.
 - **Voice announcements** — spoken price/stop callouts while driving, in-car friendly.
 - **Local-first** — Hive storage, smart caching, offline-capable.
 - **Cross-device sync** — optional TankSync cloud backend (self-hostable via Supabase), free, anonymous-or-email auth, opt-in trajet sync for favourites, alerts, and trips.
-- **Privacy** — no Firebase, no Google Play Services, no Apple analytics SDKs, no tracking, no ads, GDPR-compliant. Your GPS position and API keys **never leave the device**. The Privacy Dashboard surfaces every stored row with one-tap JSON / CSV export, a "Save" button to dump the local error log, an in-app approach-overlay test surface, and a one-tap delete-all.
+- **Privacy** — no Firebase, no Google Play Services, no Apple analytics SDKs, no tracking, no ads, GDPR-compliant. API keys are sent only to the service they belong to; search coordinates go to the official price source of the country you are in; recorded GPS trips leave the device only if you switch on TankSync trip sync. The Privacy Dashboard surfaces every stored row with one-tap JSON / CSV export, a one-ZIP *Export all my data*, a "Save" button to dump the local error log, an in-app approach-overlay test surface, and a one-tap delete-all. Details in [Privacy & GDPR](#privacy--gdpr).
 - **23 locales fully translated** — every UI label, including new feature surfaces; no English fallbacks except for brand names and unit masks.
 - **Accessibility** — meets Android tap-target and Apple Human Interface tap-target guidelines, semantic labels throughout.
 - **Cross-platform architecture** — iOS and Android share the same Dart codebase; platform-specific surfaces (BLE OBD2, background tasks, widgets) live behind plugin interfaces, never inline `Platform.isIOS` branches. Android is the verified platform; the iOS background-wake path for auto-record is pending #1542.
+
+## Privacy & GDPR
+
+Sparkilo is **local-first**: everything the app knows about you lives on your phone unless you switch on a feature that says otherwise. There are no ads, no advertising identifiers, no analytics SDK and no trackers. The app tells you what leaves the device, and to whom, before it happens.
+
+- **Optional, off by default** — TankSync (cloud sync), TankSync trip sync (your recorded GPS trips), diagnostics (crash reports and performance traces to Sentry), online VIN decoding (NHTSA vPIC), the Sparkilo tile proxy (switch it off and map tiles come straight from OpenStreetMap), and internet brand logos (Clearbit). Each is a consent you give in the app and can withdraw at any time.
+- **What leaves the device** — API keys are sent only to the service they belong to; search coordinates go to the official price source of the country you are in; recorded GPS trips leave the device only if you switch on TankSync trip sync.
+- **Who the controller is** depends on the sync mode you pick, and the sync-mode picker says so before you connect: *no TankSync* (default) — nobody but you, nothing is stored on any server; *private database* — you, in your own Supabase project; *join a group* — the group's owner; *Sparkilo Community* — Florian DITTGEN, the developer, on Supabase hosted in the EU (AWS eu-central-1, Frankfurt), with Supabase as processor.
+- **Your rights, in the app** — no support ticket needed. **Privacy Dashboard → Export all my data** writes one ZIP (a machine-readable JSON per category, one GPX per trip, your consent record and every server table). **Privacy Dashboard → Delete all data** wipes every local database and returns the app to its first-launch state. **TankSync → Data Transparency → Delete account** erases every server row you own and the account identity itself in one transaction, and names any table it could not erase instead of claiming success. **Settings → Privacy & data** lists every consent with the date you gave it and the policy version you saw; each can be switched off on the spot, and the corresponding processing stops immediately.
+- Privacy policy (v3, 29 August 2026): https://fdittgen-png.github.io/tankstellen/privacy-policy/ — available in all 23 app languages.
+- `docs/privacy/data_inventory.json` is the machine-readable inventory of what is processed; tests pin the privacy policy, the Play Data Safety answers, the iOS privacy manifest and this README to it, so the surfaces cannot drift apart silently.
 
 ## Screenshots
 
@@ -158,8 +169,8 @@ Captured 2026-06 on Android running Sparkilo against the live `Prix-Carburants` 
 
 | Feature presets | Privacy dashboard |
 |:--:|:--:|
-| ![Settings — Feature management with Basic / Medium / Full / Custom preset cards, each describing the feature set it enables](docs/screenshots/14-feature-presets.jpg) | ![Privacy Dashboard — your data belongs to you, with Profile, API keys (community + shared defaults), Cloud Sync status and a privacy summary noting GPS and API keys never leave the device](docs/screenshots/13-privacy-dashboard.jpg) |
-| Right-size the app: Basic (cheapest fuel + EV, favourites, alerts), Medium (+ manual fill-up & EV tracking), Full (+ OBD2 auto-record, driving scores, loyalty), or Custom. | See, export or delete everything stored on-device in one place; GPS position and API keys never leave the device, with optional TankSync for cross-device access. |
+| ![Settings — Feature management with Basic / Medium / Full / Custom preset cards, each describing the feature set it enables](docs/screenshots/14-feature-presets.jpg) | ![Privacy Dashboard — your data belongs to you, with Profile, API keys (community + shared defaults), Cloud Sync status and a privacy summary](docs/screenshots/13-privacy-dashboard.jpg) |
+| Right-size the app: Basic (cheapest fuel + EV, favourites, alerts), Medium (+ manual fill-up & EV tracking), Full (+ OBD2 auto-record, driving scores, loyalty), or Custom. | See, export or delete everything stored on-device in one place; API keys go only to the service they belong to, and recorded trips leave the device only with optional TankSync trip sync. |
 
 ### Fuel Station Radar & cross-border search
 

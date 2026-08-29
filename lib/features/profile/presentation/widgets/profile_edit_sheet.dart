@@ -29,6 +29,7 @@ import 'country_change_dialog.dart';
 import 'profile_fuel_type_dropdown.dart';
 import 'profile_landing_screen_dropdown.dart';
 import 'profile_radius_slider.dart';
+import 'rating_mode_section.dart';
 import '../../../../core/utils/unit_formatter.dart';
 
 part 'profile_edit_sheet_parts.dart';
@@ -203,7 +204,10 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
       SectionCard(
         title: l10n.privacyRatings,
         leadingIcon: Icons.reviews_outlined,
-        child: _RatingModeSection(state: editState, ctrl: editCtrl),
+        child: RatingModeSection(
+          ratingMode: editState.ratingMode,
+          onChanged: editCtrl.setRatingMode,
+        ),
       ),
       // 6 — Start screen.
       SectionCard(

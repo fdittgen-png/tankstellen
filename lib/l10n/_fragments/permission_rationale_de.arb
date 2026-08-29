@@ -1,0 +1,21 @@
+{
+  "permissionRationaleCameraTitle": "Kamerazugriff",
+  "permissionRationaleCameraSubtitle": "Diese App möchte Ihre Kamera verwenden, um Belege, Zapfsäulen-Displays und QR-Codes zu lesen.",
+  "permissionRationaleCameraWhatHappens": "Was passiert mit dem Kamerabild:",
+  "permissionRationaleCameraBulletOnDevice": "Das Bild wird nur verwendet, um den Beleg, das Zapfsäulen-Display oder den QR-Code zu lesen — die Erkennung läuft auf Ihrem Gerät.",
+  "permissionRationaleCameraBulletDiscarded": "Das Foto wird nach dem Scan verworfen.",
+  "permissionRationaleCameraBulletNoUpload": "Es wird nichts hochgeladen, es sei denn, Sie melden einen fehlerhaften Scan und bestätigen dies.",
+  "permissionRationaleBluetoothTitle": "Bluetooth-Zugriff",
+  "permissionRationaleBluetoothSubtitle": "Diese App möchte Bluetooth verwenden, um sich mit Ihrem OBD2-Adapter zu verbinden.",
+  "permissionRationaleBluetoothWhatHappens": "Was passiert mit Bluetooth:",
+  "permissionRationaleBluetoothBulletAdapterOnly": "Bluetooth wird nur verwendet, um Ihren OBD2-Adapter zu finden und mit ihm zu kommunizieren.",
+  "permissionRationaleBluetoothBulletIdentifierLocal": "Die Adapterkennung bleibt auf Ihrem Gerät — sie wird nur über TankSync als Teil des Fahrzeugprofils synchronisiert.",
+  "permissionRationaleBluetoothBulletLegacyLocation": "Unter Android 11 und älter fragt das System zusätzlich nach dem Standort, weil die Bluetooth-Suche dort als Standortberechtigung gilt.",
+  "permissionRationaleNotificationsTitle": "Benachrichtigungen",
+  "permissionRationaleNotificationsSubtitle": "Diese App möchte Ihnen Benachrichtigungen für Preisalarme und den Status der Fahrtaufzeichnung senden.",
+  "permissionRationaleNotificationsWhatHappens": "Was passiert mit Benachrichtigungen:",
+  "permissionRationaleNotificationsBulletLocal": "Benachrichtigungen werden für lokale Preisalarme und den Status der Fahrtaufzeichnung verwendet.",
+  "permissionRationaleNotificationsBulletNothingLeaves": "Sie werden auf Ihrem Gerät erzeugt — nichts verlässt das Gerät.",
+  "permissionRationaleRevoke": "Sie können dies jederzeit in den Geräteeinstellungen widerrufen.",
+  "permissionRationaleLegalBasis": "Rechtsgrundlage: Art. 6 Abs. 1 lit. a DSGVO (Einwilligung)"
+}

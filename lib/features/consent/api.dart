@@ -16,3 +16,4 @@ library;
 
 export 'presentation/screens/gdpr_consent_screen.dart';
 export 'presentation/widgets/consent_settings_section.dart';
+export 'presentation/widgets/privacy_controls_section.dart';

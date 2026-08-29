@@ -167,56 +167,9 @@ class _TogglesSection extends ConsumerWidget {
   }
 }
 
-/// Segmented button for rating sharing mode plus a live description below.
-class _RatingModeSection extends StatelessWidget {
-  final ProfileEditState state;
-  final ProfileEditController ctrl;
-
-  const _RatingModeSection({required this.state, required this.ctrl});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SegmentedButton<String>(
-          segments: [
-            ButtonSegment(
-              value: 'local',
-              label: Text(l10n.ratingModeLocal),
-              icon: const Icon(Icons.phone_android, size: 16),
-            ),
-            ButtonSegment(
-              value: 'private',
-              label: Text(l10n.ratingModePrivate),
-              icon: const Icon(Icons.lock, size: 16),
-            ),
-            ButtonSegment(
-              value: 'shared',
-              label: Text(l10n.ratingModeShared),
-              icon: const Icon(Icons.people, size: 16),
-            ),
-          ],
-          selected: {state.ratingMode},
-          onSelectionChanged: (s) => ctrl.setRatingMode(s.first),
-        ),
-        const SizedBox(height: Spacing.sm),
-        Text(
-          state.ratingMode == 'local'
-              ? (l10n.ratingDescLocal)
-              : state.ratingMode == 'private'
-              ? (l10n.ratingDescPrivate)
-              : (l10n.ratingDescShared),
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-      ],
-    );
-  }
-}
+// The rating-mode segmented button moved to `rating_mode_section.dart`
+// (public `RatingModeSection`, #3871) so the one-time public-contribution
+// notice that gates the switch to "shared" is testable in isolation.
 
 /// Dropdown to pick the default [VehicleProfile] used when the user opens
 /// the Add fill-up form (#694). Null means "no vehicle pre-selected" —

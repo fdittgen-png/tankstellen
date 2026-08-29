@@ -781,7 +781,7 @@
   "syncHowToSyncQuestion": "Πώς θέλετε να συγχρονίσετε;",
   "syncOfflineDescription": "Η εφαρμογή λειτουργεί πλήρως εκτός σύνδεσης. Ο συγχρονισμός cloud είναι προαιρετικός.",
   "syncModeCommunityTitle": "Κοινότητα Sparkilo",
-  "syncModeCommunitySubtitle": "Κοινοποίηση αγαπημένων & αξιολογήσεων με όλους τους χρήστες",
+  "syncModeCommunitySubtitle": "Κοινόχρηστη βάση δεδομένων που λειτουργεί ο προγραμματιστής — δείτε παρακάτω τι συγχρονίζεται",
   "syncModePrivateTitle": "Ιδιωτική βάση δεδομένων",
   "syncModePrivateSubtitle": "Το δικό σας Supabase — πλήρης έλεγχος δεδομένων",
   "syncModeGroupTitle": "Σύνδεση σε ομάδα",
@@ -4721,5 +4721,99 @@
         "type": "String"
       }
     }
-  }
+  },
+  "gdprPolicyLink": "Πολιτική απορρήτου (έκδοση {version})",
+  "@gdprPolicyLink": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentRecordedAt": "Συγκατάθεση δόθηκε στις {date} · έκδοση πολιτικής {version}",
+  "@consentRecordedAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentNotRecorded": "Δεν έχει καταγραφεί ακόμη συγκατάθεση",
+  "serverErasurePartial": "Ορισμένα δεδομένα στον διακομιστή δεν ήταν δυνατό να διαγραφούν: {tables}. Δοκιμάστε ξανά ή επικοινωνήστε με τον προγραμματιστή στέλνοντας αυτή τη λίστα.",
+  "@serverErasurePartial": {
+    "placeholders": {
+      "tables": {
+        "type": "String"
+      }
+    }
+  },
+  "localErasurePartial": "Ορισμένα τοπικά δεδομένα δεν ήταν δυνατό να διαγραφούν: {steps}. Επανεκκινήστε την εφαρμογή και δοκιμάστε ξανά.",
+  "@localErasurePartial": {
+    "placeholders": {
+      "steps": {
+        "type": "String"
+      }
+    }
+  },
+  "myCommunityReportsTitle": "Οι αναφορές μου στην κοινότητα",
+  "myCommunityReportsEmpty": "Δεν έχετε υποβάλει καμία αναφορά",
+  "deleteReportTooltip": "Διαγραφή αυτής της αναφοράς",
+  "reportDeleted": "Η αναφορά διαγράφηκε",
+  "reportDeleteFailed": "Δεν ήταν δυνατή η διαγραφή της αναφοράς",
+  "privacyControlsTitle": "Ρυθμίσεις απορρήτου",
+  "tileProxyToggleTitle": "Φόρτωση πλακιδίων χάρτη μέσω του διακομιστή μεσολάβησης Sparkilo",
+  "tileProxyToggleSubtitle": "Ενεργό: η ορατή περιοχή του χάρτη και η διεύθυνση IP σας φτάνουν στον διακομιστή του προγραμματιστή στην ΕΕ, ο οποίος λαμβάνει τα πλακίδια από το OpenStreetMap. Ανενεργό: τα πλακίδια φορτώνονται απευθείας από το tile.openstreetmap.org.",
+  "remoteLogosToggleTitle": "Φόρτωση λογότυπων εταιρειών από το διαδίκτυο",
+  "remoteLogosToggleSubtitle": "Ανενεργό από προεπιλογή: εμφανίζονται ενσωματωμένα εικονίδια αντικατάστασης. Ενεργό: τα λογότυπα λαμβάνονται από το logo.clearbit.com, το οποίο βλέπει τη διεύθυνση IP σας.",
+  "privacyExportAllButton": "Εξαγωγή όλων των δεδομένων μου (ZIP)",
+  "privacyExportAllSuccess": "Το {fileName} αποθηκεύτηκε στις Λήψεις — περιέχει {count} αρχεία",
+  "@privacyExportAllSuccess": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "privacyExportAllFailed": "Δεν ήταν δυνατή η εγγραφή του αρχείου εξαγωγής",
+  "syncModeCommunityControllerNotice": "Λειτουργεί από {operator} · Supabase, ΕΕ (Φρανκφούρτη) · συγχρονίζει αγαπημένα, ειδοποιήσεις, οχήματα με VIN, ανεφοδιασμούς, βαθμολογίες, αναφορές και — αν το ενεργοποιήσετε — διαδρομές με GPS",
+  "@syncModeCommunityControllerNotice": {
+    "placeholders": {
+      "operator": {
+        "type": "String"
+      }
+    }
+  },
+  "syncModePrivateControllerNotice": "Ο υπεύθυνος επεξεργασίας είστε εσείς — το δικό σας έργο Supabase, εμείς δεν το βλέπουμε ποτέ",
+  "syncModeJoinControllerNotice": "Ο κάτοχος της κοινόχρηστης βάσης δεδομένων είναι ο υπεύθυνος επεξεργασίας των δεδομένων σας",
+  "ugcPublicNoticeTitle": "Κοινόχρηστο με άλλους χρήστες",
+  "ugcPublicNoticeBody": "Αυτό αποθηκεύεται στη βάση δεδομένων συγχρονισμού με το ψευδώνυμο αναγνωριστικό χρήστη σας. Στην Κοινότητα Sparkilo μπορεί να το διαβάσει κάθε συνδεδεμένος χρήστης. Μπορείτε να το διαγράψετε ανά πάσα στιγμή από TankSync → Διαφάνεια δεδομένων.",
+  "blockedAuthorsTitle": "Αποκλεισμένοι χρήστες",
+  "blockedAuthorsDescription": "Το περιεχόμενο που κοινοποιούν αυτοί οι χρήστες είναι κρυφό σε αυτή τη συσκευή. Άρετε τον αποκλεισμό για να το δείτε ξανά.",
+  "blockedAuthorsEmpty": "Δεν υπάρχουν αποκλεισμένοι χρήστες",
+  "blockedAuthorsUnblock": "Άρση αποκλεισμού",
+  "permissionRationaleCameraTitle": "Πρόσβαση στην κάμερα",
+  "permissionRationaleCameraSubtitle": "Αυτή η εφαρμογή θέλει να χρησιμοποιήσει την κάμερά σας για να διαβάζει αποδείξεις, οθόνες αντλιών και κωδικούς QR.",
+  "permissionRationaleCameraWhatHappens": "Τι γίνεται με την εικόνα της κάμερας:",
+  "permissionRationaleCameraBulletOnDevice": "Η εικόνα χρησιμοποιείται μόνο για την ανάγνωση της απόδειξης, της οθόνης της αντλίας ή του κωδικού QR — η αναγνώριση εκτελείται στη συσκευή σας.",
+  "permissionRationaleCameraBulletDiscarded": "Η φωτογραφία απορρίπτεται μετά τη σάρωση.",
+  "permissionRationaleCameraBulletNoUpload": "Τίποτα δεν μεταφορτώνεται, εκτός αν υποβάλετε αναφορά εσφαλμένης σάρωσης και την επιβεβαιώσετε.",
+  "permissionRationaleBluetoothTitle": "Πρόσβαση στο Bluetooth",
+  "permissionRationaleBluetoothSubtitle": "Αυτή η εφαρμογή θέλει να χρησιμοποιήσει το Bluetooth για να συνδεθεί με τον προσαρμογέα OBD2 σας.",
+  "permissionRationaleBluetoothWhatHappens": "Τι γίνεται με το Bluetooth:",
+  "permissionRationaleBluetoothBulletAdapterOnly": "Το Bluetooth χρησιμοποιείται μόνο για την εύρεση του προσαρμογέα OBD2 σας και την επικοινωνία μαζί του.",
+  "permissionRationaleBluetoothBulletIdentifierLocal": "Το αναγνωριστικό του προσαρμογέα παραμένει στη συσκευή σας — συγχρονίζεται μόνο μέσω του TankSync, ως μέρος του προφίλ οχήματος.",
+  "permissionRationaleBluetoothBulletLegacyLocation": "Σε Android 11 και παλαιότερες εκδόσεις, το σύστημα ζητά επίσης την τοποθεσία, επειδή εκεί η σάρωση Bluetooth θεωρείται άδεια τοποθεσίας.",
+  "permissionRationaleNotificationsTitle": "Ειδοποιήσεις",
+  "permissionRationaleNotificationsSubtitle": "Αυτή η εφαρμογή θέλει να σας στέλνει ειδοποιήσεις για τις τιμές και για την κατάσταση της καταγραφής διαδρομής.",
+  "permissionRationaleNotificationsWhatHappens": "Τι γίνεται με τις ειδοποιήσεις:",
+  "permissionRationaleNotificationsBulletLocal": "Οι ειδοποιήσεις χρησιμοποιούνται για τοπικές ειδοποιήσεις τιμών και για την κατάσταση της καταγραφής διαδρομής.",
+  "permissionRationaleNotificationsBulletNothingLeaves": "Δημιουργούνται στη συσκευή σας — τίποτα δεν φεύγει από τη συσκευή.",
+  "permissionRationaleRevoke": "Μπορείτε να το ανακαλέσετε ανά πάσα στιγμή στις ρυθμίσεις της συσκευής σας.",
+  "permissionRationaleLegalBasis": "Νομική βάση: άρθρο 6 παρ. 1 στοιχ. α) ΓΚΠΔ (συγκατάθεση)"
 }

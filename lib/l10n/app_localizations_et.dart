@@ -2709,7 +2709,7 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get syncModeCommunitySubtitle =>
-      'Jaga lemmikuid ja hinnanguid kõigi kasutajatega';
+      'Arendaja hallatav jagatud andmebaas — allpool näed, mida sünkroonitakse';
 
   @override
   String get syncModePrivateTitle => 'Privaatne andmebaas';
@@ -5317,6 +5317,106 @@ class AppLocalizationsEt extends AppLocalizations {
       'Kui väljas, on märgid, hinded ja trofee ikoonid kogu rakenduses peidetud.';
 
   @override
+  String gdprPolicyLink(int version) {
+    return 'Privaatsuspoliitika (versioon $version)';
+  }
+
+  @override
+  String consentRecordedAt(String date, int version) {
+    return 'Nõusolek antud $date · poliitika versioon $version';
+  }
+
+  @override
+  String get consentNotRecorded => 'Nõusolekut pole veel salvestatud';
+
+  @override
+  String serverErasurePartial(String tables) {
+    return 'Mõningaid serveriandmeid ei õnnestunud kustutada: $tables. Proovi uuesti või võta selle loendiga ühendust arendajaga.';
+  }
+
+  @override
+  String localErasurePartial(String steps) {
+    return 'Mõningaid kohalikke andmeid ei õnnestunud kustutada: $steps. Taaskäivita rakendus ja proovi uuesti.';
+  }
+
+  @override
+  String get myCommunityReportsTitle => 'Minu kogukonnateated';
+
+  @override
+  String get myCommunityReportsEmpty => 'Sa pole ühtegi teadet saatnud';
+
+  @override
+  String get deleteReportTooltip => 'Kustuta see teade';
+
+  @override
+  String get reportDeleted => 'Teade kustutatud';
+
+  @override
+  String get reportDeleteFailed => 'Teadet ei õnnestunud kustutada';
+
+  @override
+  String get privacyControlsTitle => 'Privaatsusseaded';
+
+  @override
+  String get tileProxyToggleTitle =>
+      'Laadi kaardipaanid Sparkilo puhverserveri kaudu';
+
+  @override
+  String get tileProxyToggleSubtitle =>
+      'Sees: nähtav kaardiala ja sinu IP-aadress jõuavad arendaja EL-i serverisse, mis hangib paanid OpenStreetMapist. Väljas: paanid laaditakse otse aadressilt tile.openstreetmap.org.';
+
+  @override
+  String get remoteLogosToggleTitle => 'Laadi brändilogod internetist';
+
+  @override
+  String get remoteLogosToggleSubtitle =>
+      'Vaikimisi väljas: kuvatakse rakendusega kaasas olevad kohatäited. Sees: logod hangitakse aadressilt logo.clearbit.com, mis näeb sinu IP-aadressi.';
+
+  @override
+  String get privacyExportAllButton => 'Ekspordi kõik minu andmed (ZIP)';
+
+  @override
+  String privacyExportAllSuccess(String fileName, int count) {
+    return '$fileName salvestatud allalaadimiste kausta — sisaldab $count faili';
+  }
+
+  @override
+  String get privacyExportAllFailed => 'Ekspordifaili ei õnnestunud kirjutada';
+
+  @override
+  String syncModeCommunityControllerNotice(String operator) {
+    return 'Haldab $operator · Supabase, EL (Frankfurt) · sünkroonib lemmikud, hoiatused, sõidukid koos VIN-koodiga, tankimised, hinnangud, teated ja — kui sa selle sisse lülitad — GPS-iga sõidud';
+  }
+
+  @override
+  String get syncModePrivateControllerNotice =>
+      'Sina oled vastutav töötleja — sinu enda Supabase\'i projekt, meie ei näe seda kunagi';
+
+  @override
+  String get syncModeJoinControllerNotice =>
+      'Jagatud andmebaasi omanik on sinu andmete vastutav töötleja';
+
+  @override
+  String get ugcPublicNoticeTitle => 'Jagatud teiste kasutajatega';
+
+  @override
+  String get ugcPublicNoticeBody =>
+      'See salvestatakse sünkroonimisandmebaasi sinu pseudonüümse kasutaja-ID all. Sparkilo kogukonnas saab seda lugeda iga sisse loginud kasutaja. Saad selle igal ajal kustutada: TankSync → Andmete läbipaistvus.';
+
+  @override
+  String get blockedAuthorsTitle => 'Blokeeritud kasutajad';
+
+  @override
+  String get blockedAuthorsDescription =>
+      'Nende kasutajate jagatud sisu on selles seadmes peidetud. Selle uuesti nägemiseks eemalda blokeering.';
+
+  @override
+  String get blockedAuthorsEmpty => 'Blokeeritud kasutajaid pole';
+
+  @override
+  String get blockedAuthorsUnblock => 'Eemalda blokeering';
+
+  @override
   String get coachingGpsLiftOff => 'Vabasta gaas';
 
   @override
@@ -6709,6 +6809,79 @@ class AppLocalizationsEt extends AppLocalizations {
     });
     return '$_temp0';
   }
+
+  @override
+  String get permissionRationaleCameraTitle => 'Kaamera juurdepääs';
+
+  @override
+  String get permissionRationaleCameraSubtitle =>
+      'See rakendus soovib kasutada teie kaamerat kviitungite, tankuri ekraanide ja QR-koodide lugemiseks.';
+
+  @override
+  String get permissionRationaleCameraWhatHappens =>
+      'Mis juhtub kaamerapildiga:';
+
+  @override
+  String get permissionRationaleCameraBulletOnDevice =>
+      'Pilti kasutatakse ainult kviitungi, tankuri ekraani või QR-koodi lugemiseks — tuvastamine toimub teie seadmes.';
+
+  @override
+  String get permissionRationaleCameraBulletDiscarded =>
+      'Foto kustutatakse pärast skaneerimist.';
+
+  @override
+  String get permissionRationaleCameraBulletNoUpload =>
+      'Midagi ei laadita üles, kui te ei esita vigase skaneerimise teadet ega kinnita seda.';
+
+  @override
+  String get permissionRationaleBluetoothTitle => 'Bluetoothi juurdepääs';
+
+  @override
+  String get permissionRationaleBluetoothSubtitle =>
+      'See rakendus soovib kasutada Bluetoothi, et luua ühendus teie OBD2 adapteriga.';
+
+  @override
+  String get permissionRationaleBluetoothWhatHappens =>
+      'Mis juhtub Bluetoothiga:';
+
+  @override
+  String get permissionRationaleBluetoothBulletAdapterOnly =>
+      'Bluetoothi kasutatakse ainult teie OBD2 adapteri leidmiseks ja sellega suhtlemiseks.';
+
+  @override
+  String get permissionRationaleBluetoothBulletIdentifierLocal =>
+      'Adapteri identifikaator jääb teie seadmesse — see sünkroonitakse ainult TankSynci kaudu sõidukiprofiili osana.';
+
+  @override
+  String get permissionRationaleBluetoothBulletLegacyLocation =>
+      'Android 11 ja vanemates versioonides küsib süsteem ka asukohta, sest Bluetoothi otsing kuulub seal asukohalubade hulka.';
+
+  @override
+  String get permissionRationaleNotificationsTitle => 'Teavitused';
+
+  @override
+  String get permissionRationaleNotificationsSubtitle =>
+      'See rakendus soovib saata teile teavitusi hinnateatiste ja sõidu salvestamise oleku kohta.';
+
+  @override
+  String get permissionRationaleNotificationsWhatHappens =>
+      'Mis juhtub teavitustega:';
+
+  @override
+  String get permissionRationaleNotificationsBulletLocal =>
+      'Teavitusi kasutatakse kohalike hinnateatiste ja sõidu salvestamise oleku jaoks.';
+
+  @override
+  String get permissionRationaleNotificationsBulletNothingLeaves =>
+      'Need luuakse teie seadmes — miski ei lahku seadmest.';
+
+  @override
+  String get permissionRationaleRevoke =>
+      'Saate selle igal ajal seadme seadetes tühistada.';
+
+  @override
+  String get permissionRationaleLegalBasis =>
+      'Õiguslik alus: isikuandmete kaitse üldmääruse art 6 lg 1 p a (nõusolek)';
 
   @override
   String get tripRecordingPipEstConsumptionCaption => 'hinn. L/100 km';

@@ -781,7 +781,7 @@
   "syncHowToSyncQuestion": "Hoe wil je synchroniseren?",
   "syncOfflineDescription": "Je app werkt volledig offline. Cloudsync is optioneel.",
   "syncModeCommunityTitle": "Sparkilo Community",
-  "syncModeCommunitySubtitle": "Favorieten & beoordelingen delen met alle gebruikers",
+  "syncModeCommunitySubtitle": "Gedeelde database beheerd door de ontwikkelaar — zie hieronder wat er wordt gesynchroniseerd",
   "syncModePrivateTitle": "Privédatabase",
   "syncModePrivateSubtitle": "Je eigen Supabase — volledige controle over gegevens",
   "syncModeGroupTitle": "Groep joinen",
@@ -4721,5 +4721,99 @@
         "type": "String"
       }
     }
-  }
+  },
+  "gdprPolicyLink": "Privacybeleid (versie {version})",
+  "@gdprPolicyLink": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentRecordedAt": "Toestemming gegeven op {date} · beleidsversie {version}",
+  "@consentRecordedAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentNotRecorded": "Nog geen toestemming vastgelegd",
+  "serverErasurePartial": "Sommige servergegevens konden niet worden gewist: {tables}. Probeer opnieuw of neem contact op met de ontwikkelaar met deze lijst.",
+  "@serverErasurePartial": {
+    "placeholders": {
+      "tables": {
+        "type": "String"
+      }
+    }
+  },
+  "localErasurePartial": "Sommige lokale gegevens konden niet worden gewist: {steps}. Herstart de app en probeer opnieuw.",
+  "@localErasurePartial": {
+    "placeholders": {
+      "steps": {
+        "type": "String"
+      }
+    }
+  },
+  "myCommunityReportsTitle": "Mijn community-meldingen",
+  "myCommunityReportsEmpty": "Je hebt nog geen meldingen ingediend",
+  "deleteReportTooltip": "Deze melding verwijderen",
+  "reportDeleted": "Melding verwijderd",
+  "reportDeleteFailed": "Kon de melding niet verwijderen",
+  "privacyControlsTitle": "Privacy-instellingen",
+  "tileProxyToggleTitle": "Kaarttegels via de Sparkilo-proxy laden",
+  "tileProxyToggleSubtitle": "Aan: het zichtbare kaartgebied en je IP-adres bereiken de EU-server van de ontwikkelaar, die de tegels bij OpenStreetMap ophaalt. Uit: tegels worden rechtstreeks van tile.openstreetmap.org geladen.",
+  "remoteLogosToggleTitle": "Merklogo's van internet laden",
+  "remoteLogosToggleSubtitle": "Standaard uit: er worden meegeleverde plaatshouders getoond. Aan: logo's worden opgehaald van logo.clearbit.com, dat je IP-adres ziet.",
+  "privacyExportAllButton": "Al mijn gegevens exporteren (ZIP)",
+  "privacyExportAllSuccess": "{fileName} opgeslagen in Downloads — {count} bestanden erin",
+  "@privacyExportAllSuccess": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "privacyExportAllFailed": "Kon het exportbestand niet schrijven",
+  "syncModeCommunityControllerNotice": "Beheerd door {operator} · Supabase, EU (Frankfurt) · synchroniseert favorieten, alerts, voertuigen incl. VIN, tankbeurten, beoordelingen, meldingen en — als je het inschakelt — ritten met GPS",
+  "@syncModeCommunityControllerNotice": {
+    "placeholders": {
+      "operator": {
+        "type": "String"
+      }
+    }
+  },
+  "syncModePrivateControllerNotice": "Jij bent de verwerkingsverantwoordelijke — je eigen Supabase-project, wij zien het nooit",
+  "syncModeJoinControllerNotice": "De eigenaar van de gedeelde database is de verwerkingsverantwoordelijke voor je gegevens",
+  "ugcPublicNoticeTitle": "Gedeeld met andere gebruikers",
+  "ugcPublicNoticeBody": "Dit wordt in de sync-database opgeslagen onder je pseudonieme gebruikers-ID. In Sparkilo Community kan elke ingelogde gebruiker het lezen. Je kunt het altijd verwijderen via TankSync → Gegevenstransparantie.",
+  "blockedAuthorsTitle": "Geblokkeerde gebruikers",
+  "blockedAuthorsDescription": "Inhoud van deze gebruikers wordt op dit apparaat verborgen. Deblokkeer ze om het weer te zien.",
+  "blockedAuthorsEmpty": "Geen geblokkeerde gebruikers",
+  "blockedAuthorsUnblock": "Deblokkeren",
+  "permissionRationaleCameraTitle": "Cameratoegang",
+  "permissionRationaleCameraSubtitle": "Deze app wil je camera gebruiken om bonnen, pompdisplays en QR-codes te lezen.",
+  "permissionRationaleCameraWhatHappens": "Wat er met het camerabeeld gebeurt:",
+  "permissionRationaleCameraBulletOnDevice": "Het beeld wordt alleen gebruikt om de bon, het pompdisplay of de QR-code te lezen — de herkenning draait op je apparaat.",
+  "permissionRationaleCameraBulletDiscarded": "De foto wordt na het scannen verwijderd.",
+  "permissionRationaleCameraBulletNoUpload": "Er wordt niets geüpload, tenzij je een melding van een mislukte scan indient en die bevestigt.",
+  "permissionRationaleBluetoothTitle": "Bluetooth-toegang",
+  "permissionRationaleBluetoothSubtitle": "Deze app wil Bluetooth gebruiken om verbinding te maken met je OBD2-adapter.",
+  "permissionRationaleBluetoothWhatHappens": "Wat er met Bluetooth gebeurt:",
+  "permissionRationaleBluetoothBulletAdapterOnly": "Bluetooth wordt alleen gebruikt om je OBD2-adapter te vinden en ermee te communiceren.",
+  "permissionRationaleBluetoothBulletIdentifierLocal": "De adapter-ID blijft op je apparaat — die wordt alleen via TankSync gesynchroniseerd, als onderdeel van het voertuigprofiel.",
+  "permissionRationaleBluetoothBulletLegacyLocation": "Op Android 11 en lager vraagt het systeem ook om locatie, omdat Bluetooth-scannen daar als locatiemachtiging geldt.",
+  "permissionRationaleNotificationsTitle": "Meldingen",
+  "permissionRationaleNotificationsSubtitle": "Deze app wil je meldingen sturen voor prijswaarschuwingen en de status van de ritregistratie.",
+  "permissionRationaleNotificationsWhatHappens": "Wat er met meldingen gebeurt:",
+  "permissionRationaleNotificationsBulletLocal": "Meldingen worden gebruikt voor lokale prijswaarschuwingen en de status van de ritregistratie.",
+  "permissionRationaleNotificationsBulletNothingLeaves": "Ze worden op je apparaat gegenereerd — niets verlaat het apparaat.",
+  "permissionRationaleRevoke": "Je kunt dit op elk moment intrekken in de instellingen van je apparaat.",
+  "permissionRationaleLegalBasis": "Rechtsgrondslag: art. 6, lid 1, onder a) AVG (toestemming)"
 }

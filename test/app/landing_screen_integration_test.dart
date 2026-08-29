@@ -8,6 +8,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/app/router.dart';
 import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
+import 'package:tankstellen/core/constants/app_constants.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/features/favorites/presentation/screens/favorites_screen.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
@@ -67,6 +68,8 @@ List<Object> _readyAppOverrides({
   when(() => test.mockStorage.isSetupComplete).thenReturn(true);
   when(() => test.mockStorage.getSetting(StorageKeys.gdprConsentGiven))
       .thenReturn(true);
+  when(() => test.mockStorage.getSetting(StorageKeys.consentPolicyVersion))
+      .thenReturn(AppConstants.privacyPolicyVersion); // #3866
   // #494 — swipe tutorial banner was added to search results, pre-dismiss
   // it here so the extra banner height doesn't overflow the test viewport.
   when(() => test.mockStorage.getSetting(StorageKeys.swipeTutorialShown))

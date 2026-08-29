@@ -9,101 +9,144 @@
 <body>
 
 <h1>개인정보 처리방침</h1>
-<p class="meta">Sparkilo (iOS의 de.tankstellen.tankstellen, Android의 de.tankstellen.fuelprices) &mdash; 최종 업데이트: 2026년 8월 15일</p>
-<p class="langs">지원 언어: <a href="../">English</a> <a href="../de/">Deutsch</a> <a href="../fr/">Français</a> <a href="../es/">Español</a> <a href="../it/">Italiano</a> <a href="../nl/">Nederlands</a> <a href="../pt/">Português</a> <a href="../sv/">Svenska</a> <a href="../fi/">Suomi</a> <a href="../da/">Dansk</a> <a href="../pl/">Polski</a> <a href="../sl/">Slovenščina</a> <a href="../ko/">한국어</a></p>
+<p class="meta">Sparkilo (iOS: de.tankstellen.tankstellen, Android: de.tankstellen.fuelprices) &mdash; Version 3 &mdash; 최종 업데이트: 2026년 8월 29일</p>
+<p class="langs">지원 언어: <a href="../">English</a> <a href="../bg/">Български</a> <a href="../cs/">Čeština</a> <a href="../da/">Dansk</a> <a href="../de/">Deutsch</a> <a href="../el/">Ελληνικά</a> <a href="../es/">Español</a> <a href="../et/">Eesti</a> <a href="../fi/">Suomi</a> <a href="../fr/">Français</a> <a href="../hr/">Hrvatski</a> <a href="../hu/">Magyar</a> <a href="../it/">Italiano</a> <a href="../ko/">한국어</a> <a href="../lt/">Lietuvių</a> <a href="../lv/">Latviešu</a> <a href="../nb/">Norsk</a> <a href="../nl/">Nederlands</a> <a href="../pl/">Polski</a> <a href="../pt/">Português</a> <a href="../ro/">Română</a> <a href="../sk/">Slovenčina</a> <a href="../sl/">Slovenščina</a> <a href="../sv/">Svenska</a></p>
 
 <h2>1. 개요</h2>
-<p>Sparkilo(이전 명칭: Fuel Prices Europe & More)는 무료 오픈소스 연료 및 전기차 충전 가격 비교 앱입니다. <strong>로컬 우선, 개인정보를 존중하는</strong> 아키텍처로 설계되었습니다. 광고도, 추적 픽셀도, 광고 식별자도 사용하지 않습니다.</p>
+<p>Sparkilo는 주행 기록 기능(선택 사항)을 갖춘 무료 오픈소스 연료 및 전기차 충전 가격 비교 앱입니다. 이 앱은 <strong>로컬 우선(local-first)</strong> 원칙으로 설계되었습니다. 즉, 앱이 귀하에 관해 알고 있는 모든 정보는 귀하가 별도로 명시된 기능을 켜지 않는 한 귀하의 휴대전화에만 저장됩니다. 광고, 추적 픽셀, 광고 식별자, 분석 SDK는 일절 없습니다. 본 방침은 EU 일반개인정보보호법(GDPR)을 준수하도록 작성되었으며, 귀하가 어디에 계시든 모든 이용자에게 적용됩니다.</p>
+<p>이 앱은 <a href="https://github.com/fdittgen-png/tankstellen">오픈소스</a>입니다. 아래의 모든 내용은 코드에서 직접 확인하실 수 있습니다. 처리되는 정보에 대한 기계 판독 가능한 요약은 <code>docs/privacy/data_inventory.json</code>에 유지되며, 본 페이지, 스토어 신고 내용, 코드가 서로 어긋나면 앱 자체의 테스트가 실패하도록 되어 있습니다.</p>
 
-<h2>2. 사용하는 데이터</h2>
-
-<h3>2.1 위치</h3>
-<p>위치 권한을 허용하면 앱은 근처 주유소와 충전소를 찾기 위해 위치를 읽으며, 이 검색 좌표는 검색 쿼리의 일부로 제3자 가격 API(섹션 4 참조)에 전송되고 당사가 운영하는 서버에는 저장되지 않습니다. 주행 기록 기능을 사용하는 경우 앱은 추가로 <strong>정밀 GPS 경로</strong>를 기록하며, 기록된 주행은 기기에 저장되고 TankSync를 활성화한 경우에만 TankSync 백엔드에 동기화됩니다. 기록된 주행은 제3자와 절대 공유되지 않습니다.</p>
-
-<h3>2.2 사용자가 제공하는 API 키</h3>
-<p>사용자가 직접 API 키(예: Tankerkönig)를 제공하면, 해당 키는 암호화된 로컬 저장소(Android Keystore / iOS Keychain)에 저장됩니다. 키는 해당 API 제공자에게만 전송되며, 당사나 제3자에게는 전송되지 않습니다.</p>
-
-<h3>2.3 즐겨찾기, 프로필 및 설정</h3>
-<p>즐겨찾기, 검색 프로필, 연료 환경설정 및 앱 설정은 임베디드 로컬 데이터베이스인 Hive를 통해 기기에 로컬로 저장됩니다.</p>
-
-<h3>2.4 TankSync(선택적 클라우드 동기화)</h3>
-<p>TankSync를 활성화하면 Supabase를 통해 익명 계정이 생성됩니다. 동기화되는 데이터:</p>
-<ul>
-  <li>사용자 식별자 — 기본값은 익명 UUID이며, 기기 간 동기화를 위해 선택적으로 TankSync 계정에 이메일 주소를 연결할 수 있습니다</li>
-  <li>즐겨찾는 주유소 ID</li>
-  <li>가격 알림 구성</li>
-  <li>커뮤니티 가격 보고(주유소 ID, 연료 종류, 가격, 타임스탬프)</li>
-  <li>기록된 주행(GPS 경로, 거리, 연비 통계)</li>
-  <li>주유 기록(비용, 리터, 주행거리계) 및 차량 프로필</li>
-</ul>
-<p>TankSync는 선택사항이며 기본적으로 비활성화되어 있습니다. 앱 내 « 데이터 투명성 » 화면에서 모든 서버 측 데이터를 확인, 내보내기 및 삭제할 수 있습니다.</p>
-
-<h3>2.5 충돌 및 진단 보고서(옵트인)</h3>
-<p>설정에서 진단 보고를 활성화하면 익명 충돌 보고서와 성능 추적이 Sentry로 전송됩니다. 개인 식별 정보, 위치 또는 콘텐츠는 포함되지 않습니다. 진단 보고는 기본적으로 꺼져 있습니다.</p>
-
-<h2>3. 수집하지 않는 데이터</h2>
-<ul>
-  <li>이름 또는 전화번호(이메일 주소는 선택적인 TankSync 계정에 명시적으로 연결한 경우에만 저장됩니다)</li>
-  <li>금융 또는 결제 정보</li>
-  <li>건강 또는 피트니스 데이터</li>
-  <li>연락처, 메시지 또는 통화 기록</li>
-  <li>사진, 동영상 또는 파일(카메라 및 사진 라이브러리 접근은 사용자가 직접 시작한 영수증 스캔에만 사용됨)</li>
-  <li>브라우저 기록</li>
-  <li>기기 광고 식별자</li>
-</ul>
-
-<h2>4. 제3자 서비스</h2>
-<p>앱은 다음 제3자 API와 통신합니다:</p>
-<ul>
-  <li><strong>Tankerkönig</strong>(creativecommons.tankerkoenig.de) — 독일 가격. 수신: 검색 좌표, 사용자 API 키.</li>
-  <li><strong>Prix Carburants</strong>(data.economie.gouv.fr) — 프랑스 가격. 수신: 검색 좌표.</li>
-  <li><strong>이탈리아 가격 API</strong>(osservaprezzi.mise.gov.it) — 이탈리아 가격. 수신: 검색 좌표.</li>
-  <li><strong>스페인 가격 API</strong>(sedeaplicaciones.minetur.gob.es) — 스페인 가격. 수신: 검색 좌표.</li>
-  <li><strong>Spritpreisrechner</strong>(spritpreisrechner.at) — 오스트리아 가격. 수신: 검색 좌표.</li>
-  <li><strong>FuelWatch</strong>(fuelwatch.be) — 벨기에 가격. 수신: 검색 좌표.</li>
-  <li><strong>data.public.lu</strong> — 룩셈부르크 가격. 수신: 검색 좌표.</li>
-  <li><strong>OpenChargeMap</strong>(api.openchargemap.io) — 전기차 충전소. 수신: 검색 좌표.</li>
-  <li><strong>Nominatim / OpenStreetMap</strong>(nominatim.openstreetmap.org) — 지오코딩. 수신: 검색 텍스트 또는 좌표.</li>
-  <li><strong>OpenStreetMap 타일 서버</strong>(tile.openstreetmap.org) — 지도 타일. 수신: 타일 좌표.</li>
-  <li><strong>Supabase</strong>(TankSync 활성화 시에만) — 클라우드 동기화 백엔드.</li>
-  <li><strong>Sentry</strong>(진단 보고 활성화 시에만) — 익명 충돌 및 성능 보고서.</li>
-</ul>
-<p>각 제공자는 자체 개인정보 처리방침을 보유합니다. 검토하시기 바랍니다. 앱은 이러한 제공자 간에 데이터를 공유하지 않습니다.</p>
-
-<h2>5. 데이터 보안</h2>
-<ul>
-  <li>모든 네트워크 통신은 HTTPS(전송 중 TLS 암호화)를 사용합니다.</li>
-  <li>API 키는 플랫폼 기본 암호화 저장소(Android Keystore / iOS Keychain)에 저장됩니다.</li>
-  <li>로컬 데이터는 Hive를 통해 기기에 저장됩니다.</li>
-  <li>사용자가 검색을 시작하거나 TankSync / 진단을 활성화하지 않는 한 어떤 서버에도 데이터가 전송되지 않습니다.</li>
-</ul>
-
-<h2>6. 사용자의 권리</h2>
-<p>사용자는 다음 권리를 갖습니다:</p>
-<ul>
-  <li><strong>접근</strong> — 앱의 저장 공간 섹션에서 로컬에 저장된 모든 데이터를 확인할 수 있습니다.</li>
-  <li><strong>내보내기</strong> — 데이터 투명성 화면에서 TankSync 데이터를 JSON으로 내보낼 수 있습니다.</li>
-  <li><strong>삭제</strong> — 설정 → 모든 데이터 삭제로 모든 로컬 데이터를 삭제하고, TankSync → 데이터 투명성 → 모두 삭제로 모든 서버 데이터를 삭제할 수 있습니다.</li>
-  <li><strong>동의 철회</strong> — 기기 설정에서 위치 권한을 취소하거나 언제든 TankSync / 진단을 비활성화할 수 있습니다.</li>
-</ul>
-
-<h2>7. 계정 및 데이터 삭제</h2>
-<p>고객 지원에 문의할 필요 없이 앱에서 직접 모든 것을 삭제할 수 있습니다:</p>
-<ul>
-  <li><strong>로컬 데이터:</strong> 설정 → 모든 데이터 삭제를 실행하면 기기에서 모든 프로필, 즐겨찾기, API 키, 캐시된 가격, 기록된 주행 및 설정이 제거됩니다.</li>
-  <li><strong>TankSync 계정 및 서버 데이터:</strong> TankSync → 데이터 투명성 → 계정 삭제를 실행하면 먼저 사용자가 소유한 모든 행(즐겨찾기, 알림, 가격 보고, 차량, 주유 기록, 주행, 평가)이 삭제된 후 연결된 이메일 주소를 포함한 계정 자체의 신원이 삭제됩니다. 이 작업은 되돌릴 수 없습니다.</li>
-</ul>
-<p>더 이상 앱에 접근할 수 없는 경우 개발자에게 문의하여(섹션 10) 삭제를 요청할 수 있습니다. 소유권을 확인할 수 있도록 계정에 연결된 이메일 주소로 문의해 주세요.</p>
-
-<h2>8. 아동 개인정보</h2>
-<p>이 앱은 13세 미만 아동을 대상으로 하지 않습니다. 당사는 아동으로부터 개인정보를 고의로 수집하지 않습니다.</p>
-
-<h2>9. 정책 변경</h2>
-<p>당사는 이 정책을 수시로 업데이트할 수 있습니다. 변경사항은 업데이트된 날짜와 함께 이 URL에 게시됩니다. 앱을 계속 사용하는 것은 업데이트된 정책에 대한 동의로 간주됩니다.</p>
-
-<h2>10. 연락처</h2>
+<h2>2. 책임 주체(개인정보처리자)</h2>
+<p>이 앱과 선택 사항인 Sparkilo Community 동기화 서비스의 개인정보처리자는 다음과 같습니다.</p>
 <div class="contact">
-  <p><strong>개발자:</strong> Florian DITTGEN</p>
+  <p><strong>Florian DITTGEN</strong> (개인 개발자)</p>
+  <p><strong>이메일:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
+  <p><strong>소스 코드 및 이슈 트래커:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
+</div>
+<p>TankSync를 어떻게 사용하시는지에 따라 동기화된 데이터의 개인정보처리자가 달라집니다.</p>
+<ul>
+  <li><strong>TankSync 미사용(기본값):</strong> 당사가 운영하는 어떤 서버에도 아무것도 저장되지 않습니다. 귀하의 데이터는 귀하의 기기에 남아 있으며, 귀하만이 이를 통제합니다.</li>
+  <li><strong>개인 데이터베이스:</strong> 귀하가 직접 소유한 Supabase 프로젝트에 연결합니다. 귀하가 개인정보처리자이며, 당사는 해당 데이터를 전혀 볼 수 없습니다.</li>
+  <li><strong>그룹 참여:</strong> 귀하가 아는 사람(가족, 친구)이 운영하는 Supabase 프로젝트에 연결합니다. 그 사람이 공유 데이터베이스의 개인정보처리자입니다.</li>
+  <li><strong>Sparkilo Community:</strong> 위에 명시된 개발자가 운영하는 공유 데이터베이스에 연결합니다(Supabase, EU 내 호스팅 — AWS eu-central-1, 프랑크푸르트). 개발자가 개인정보처리자이며, Supabase, Inc.는 자사의 데이터 처리 약관에 구속되는 수탁자(처리자)입니다.</li>
+</ul>
+<p>앱은 연결하기 전에 이 중 어느 경우에 해당하는지 알려 드리며, 설정 → 개인정보 대시보드에서 다시 표시합니다.</p>
+
+<h2>3. 당사가 이용하는 데이터</h2>
+<p>아래 표는 앱이 처리하는 모든 종류의 개인정보와 그 목적, 법적 근거(GDPR 제6조), 전송 대상, 보유 기간을 나열합니다. "기기"는 해당 데이터가 귀하의 휴대전화를 절대 벗어나지 않음을 의미합니다.</p>
+<table>
+  <thead><tr><th>데이터</th><th>목적</th><th>법적 근거</th><th>전송 대상</th><th>보유 기간</th></tr></thead>
+  <tbody>
+    <tr><td>대략적 / 정밀 위치(검색)</td><td>주변 주유소 찾기</td><td>동의(귀하가 위치 권한을 부여하고 앱 내 설명을 확인함)</td><td>귀하가 있는 국가의 가격 데이터 출처(제5절)에 검색 좌표로 전송됩니다. 당사가 운영하는 어떤 서버에도 저장되지 않습니다.</td><td>마지막 위치는 홈 화면 위젯을 위해 귀하가 데이터를 삭제할 때까지 기기에 보관됨</td></tr>
+    <tr><td>정밀 GPS 경로, 속도, 고도, 모션 센서(주행 기록)</td><td>주행 기록, 거리 및 연비 계산</td><td>동의(귀하가 기록을 시작함; 자동 기록은 차량별로 별도의 백그라운드 위치 권한 부여가 필요함)</td><td>기기. TankSync<em>와</em> 주행 동기화가 모두 켜진 경우: 귀하의 TankSync 데이터베이스.</td><td>기기: 귀하가 해당 주행 또는 모든 데이터를 삭제할 때까지. 서버: 주행 요약은 귀하가 삭제할 때까지; 상세 GPS 샘플은 주행 후 90일이 지나면 정리됨.</td></tr>
+    <tr><td>차량 프로필(제조사, 모델, 연식, 연료탱크 용량, VIN, OBD2 어댑터 식별자)</td><td>연비 계산, 어댑터 재연결</td><td>계약(귀하가 구성한 기능의 제공)</td><td>기기. TankSync 사용 시: 귀하의 TankSync 데이터베이스.</td><td>귀하가 해당 차량 또는 모든 데이터를 삭제할 때까지</td></tr>
+    <tr><td>VIN(17자)</td><td>제조사/모델/엔진 온라인 해독</td><td>동의(별도 토글, 기본적으로 꺼짐; 그 외에는 오프라인 해독기가 동작함)</td><td>NHTSA vPIC(미국 공공 서비스), VIN만 전송</td><td>당사는 저장하지 않음; NHTSA의 방침 참조</td></tr>
+    <tr><td>주유 기록(날짜, 주유소, 리터, 비용, 주행거리계), 충전 기록, 정비 알림</td><td>귀하의 연료 기록 및 통계</td><td>계약</td><td>기기. TankSync 사용 시: 귀하의 TankSync 데이터베이스.</td><td>귀하가 해당 항목 또는 모든 데이터를 삭제할 때까지</td></tr>
+    <tr><td>즐겨찾기, 무시한 주유소, 가격 알림, 검색 프로필, 여정, 설정</td><td>앱 개인화; 로컬 가격 알림 발송</td><td>계약</td><td>기기. TankSync 사용 시: 귀하의 TankSync 데이터베이스.</td><td>귀하가 해당 항목 또는 모든 데이터를 삭제할 때까지</td></tr>
+    <tr><td>익명 사용자 ID(무작위 UUID), 선택적 이메일 주소, 설치별 기기 ID</td><td>여러 기기에서 귀하의 TankSync 계정 식별; 어느 기기가 레코드를 삭제했는지 표시</td><td>동의(클라우드 동기화 토글) / 계약</td><td>귀하의 TankSync 데이터베이스(Supabase)</td><td>귀하가 계정을 삭제할 때까지</td></tr>
+    <tr><td>커뮤니티 가격 제보, 공유 주유소 평가, 콘텐츠 신고</td><td>크라우드소싱 가격 수정 및 관리(모더레이션)</td><td>동의(귀하가 직접 제출함; 안내문을 통해 귀하의 가명 ID로 저장되며 로그인한 다른 이용자가 읽을 수 있음을 설명함)</td><td>귀하의 TankSync 데이터베이스 — Sparkilo Community에서는 로그인한 모든 이용자가 읽을 수 있음</td><td>귀하가 해당 제보 또는 계정을 삭제할 때까지</td></tr>
+    <tr><td>충돌 보고서 및 성능 추적(앱 버전, OS 버전, 화면 크기, 로케일, 스택 트레이스, 마지막 앱 동작)</td><td>버그 수정</td><td>동의(오류 보고 토글, 기본적으로 꺼짐)</td><td>Sentry</td><td>기기: 최근 50개의 추적, 7일, 저장 전에 이메일·좌표·토큰이 제거됨. Sentry: 90일.</td></tr>
+    <tr><td>영수증 또는 주유기 사진(카메라 / 사진 보관함)</td><td>기기에서 영수증 판독(기기 내 OCR)</td><td>동의(귀하가 사진을 촬영하거나 선택함)</td><td>기기에만 저장. 귀하가 "잘못된 스캔" 신고를 제출하고 확인하는 경우에만 GitHub 이슈에 첨부됨.</td><td>스캔 후 삭제됨; 신고 사본은 귀하가 이슈를 삭제할 때까지 GitHub에 남아 있음</td></tr>
+    <tr><td>지도 표시 영역(타일 좌표) 및 IP 주소</td><td>지도 그리기</td><td>정당한 이익(지도에는 타일이 필요함) — 프록시를 끌 수 있음</td><td>OpenStreetMap에서 타일을 가져오는 Sparkilo 타일 프록시(동일한 Supabase 프로젝트, EU); 또는 프록시를 끈 경우(설정 → 개인정보) 또는 F-Droid 빌드에서는 tile.openstreetmap.org에 직접 전송</td><td>표준 서버 로그 외에는 저장되지 않음(프록시: 7일)</td></tr>
+    <tr><td>경로 출발지 및 목적지, 도로망 조회</td><td>경로 검색, 관성 주행 코칭</td><td>계약</td><td>OSRM (router.project-osrm.org), Overpass API (overpass-api.de), Nominatim (nominatim.openstreetmap.org)</td><td>당사는 저장하지 않음</td></tr>
+    <tr><td>귀하가 입력한 주소 텍스트 또는 좌표</td><td>지오코딩</td><td>계약</td><td>Nominatim 또는 휴대전화 내장 지오코더(Apple / Google)</td><td>당사는 저장하지 않음</td></tr>
+    <tr><td>귀하가 입력한 API 키(Tankerkönig, OpenChargeMap)</td><td>귀하를 대신하여 해당 서비스 호출</td><td>계약</td><td>해당 키가 속한 제공자에게만 전송</td><td>귀하가 삭제할 때까지 기기에 암호화되어 저장됨(Keystore / Keychain)</td></tr>
+    <tr><td>주유소 이름 오류 / 주소 오류 신고, 잘못된 스캔 신고</td><td>데이터 수정</td><td>동의(전송 전 귀하가 확인함; 개인 GitHub 토큰이 필요함)</td><td>GitHub(프로젝트 저장소의 공개 이슈)</td><td>이슈가 삭제될 때까지 공개됨</td></tr>
+  </tbody>
+</table>
+<p>앱은 귀하에게 법적 효력 또는 이와 유사한 중대한 영향을 미치는 자동화된 결정을 내리지 않습니다. 가격 예측은 공개 가격 데이터를 바탕으로 기기에서 계산됩니다.</p>
+
+<h2>4. 당사가 수집하지 않는 데이터</h2>
+<ul>
+  <li>이름 또는 전화번호(이메일 주소는 귀하가 선택 사항인 TankSync 계정에 연결한 경우에만 저장됨)</li>
+  <li>결제 또는 은행 정보</li>
+  <li>건강 또는 운동 데이터</li>
+  <li>연락처, 메시지 또는 통화 기록</li>
+  <li>귀하가 스캔하기로 선택한 영수증 사진 이외의 사진, 동영상 또는 파일</li>
+  <li>검색 기록(브라우징 기록)</li>
+  <li>광고 식별자</li>
+</ul>
+<p>브랜드 로고는 앱에 내장되어 있습니다. 인터넷에서 로고를 불러오는 기능(logo.clearbit.com, 이 경우 귀하의 IP 주소가 전송됨)은 귀하가 설정 → 개인정보에서 켜지 않는 한 꺼져 있습니다.</p>
+
+<h2>5. 제3자 서비스 및 데이터 출처</h2>
+<p>앱은 다음 서비스와 통신합니다. 각 서비스는 자체 개인정보 처리방침을 갖고 있습니다. 앱은 이들 서비스 간에 데이터를 공유하지 않으며, 위 표의 각 열에 기재된 것 이상을 전송하지 않습니다.</p>
+<h3>5.1 인프라(해당 기능이 켜진 경우에만)</h3>
+<ul>
+  <li><strong>Supabase</strong> (klelxnkzrxlpzuddhpfg.supabase.co, AWS eu-central-1) — Sparkilo Community용 TankSync 백엔드 및 타일 프록시. Supabase의 데이터 처리 부속 계약에 따른 수탁자(처리자).</li>
+  <li><strong>Sentry</strong> (sentry.io) — 충돌 보고서 및 성능 추적, 동의 시에만. Sentry는 미국에서 데이터를 처리할 수 있으며, 이전은 EU-US Data Privacy Framework 및 표준계약조항에 의해 보호됩니다.</li>
+  <li><strong>GitHub</strong> (api.github.com, github.com) — 귀하가 명시적으로 제출한 이슈 신고; 앱은 또한 프로젝트 릴리스에서 공개 데이터 자산(고속도로 출구, 주유소 목록)을 다운로드하며, 이 과정에서 귀하의 IP 주소가 GitHub에 노출됩니다.</li>
+  <li><strong>OpenStreetMap</strong> (tile.openstreetmap.org, nominatim.openstreetmap.org), <strong>OSRM</strong> (router.project-osrm.org), <strong>Overpass API</strong> (overpass-api.de) — 지도, 지오코딩, 경로 안내.</li>
+  <li><strong>OpenChargeMap</strong> (api.openchargemap.io) 및 <strong>ODRÉ / IRVE</strong> (odre.opendatasoft.com) — 전기차 충전소 및 가격. 수신 데이터: 검색 좌표.</li>
+  <li><strong>NHTSA vPIC</strong> (vpic.nhtsa.dot.gov) — VIN 해독, 동의 필요.</li>
+  <li><strong>Clearbit Logo API</strong> (logo.clearbit.com) — 브랜드 로고, 기본적으로 꺼짐.</li>
+  <li><strong>Apple Maps / Google Maps</strong> (www.google.com) — "길찾기"를 누를 때에만 브라우저 또는 지도 앱에서 열림.</li>
+</ul>
+<h3>5.2 공식 연료 가격 데이터 출처(귀하의 검색 좌표 또는 지역만 수신하며, 신원은 절대 수신하지 않음)</h3>
+<ul>
+  <li>독일 — Tankerkönig (creativecommons.tankerkoenig.de), 귀하 본인의 API 키 사용</li>
+  <li>프랑스 — Prix Carburants (data.economie.gouv.fr, donnees.roulez-eco.fr)</li>
+  <li>이탈리아 — MIMIT osservaprezzi (carburanti.mise.gov.it)</li>
+  <li>스페인 — MITECO / Geoportal Gasolineras (sedeaplicaciones.minetur.gob.es, geoportalgasolineras.es)</li>
+  <li>오스트리아 — E-Control Spritpreisrechner (api.e-control.at)</li>
+  <li>벨기에 및 룩셈부르크 — data.public.lu, STATEC (lustat.statec.lu)</li>
+  <li>포르투갈 — DGEG (precoscombustiveis.dgeg.gov.pt)</li>
+  <li>덴마크 — OK (mobility-prices.ok.dk), Shell (shellpumpepriser.geoapp.me)</li>
+  <li>영국 — Fuel Finder (www.fuel-finder.service.gov.uk) 및 여기에 등재된 소매업체 가격 피드: applegreenstores.com, fuelprices.asconagroup.co.uk, storelocator.asda.com, www.bp.com, fuelprices.esso.co.uk, jetlocal.co.uk, api2.krlmedia.com, www.morrisons.com, moto-way.com, fuel.motorfuelgroup.com, www.rontec-servicestations.co.uk, api.sainsburys.co.uk, www.sgnretail.uk, www.shell.co.uk, www.tesco.com</li>
+  <li>슬로베니아 — goriva.si</li>
+  <li>루마니아 — Monitorul Prețurilor (monitorulpreturilor.info)</li>
+  <li>그리스 — Παρατηρητήριο Τιμών (paratiritirio.mindev.gov.gr), AWS eu-west-3에 호스팅된 커뮤니티 미러(5fcbs3i0z4.execute-api.eu-west-3.amazonaws.com)를 통해</li>
+  <li>대한민국 — Opinet (www.opinet.co.kr)</li>
+  <li>칠레 — CNE (api.cne.cl)</li>
+  <li>아르헨티나 — datos.energia.gob.ar</li>
+  <li>멕시코 — CRE (publicacionexterna.azurewebsites.net)</li>
+  <li>호주 — FuelCheck NSW (www.fuelcheck.nsw.gov.au)</li>
+</ul>
+
+<h2>6. 데이터 보안</h2>
+<ul>
+  <li>모든 네트워크 통신은 HTTPS(전송 중 TLS)를 사용하며, 앱은 암호화되지 않은 HTTP 동기화 엔드포인트를 거부합니다.</li>
+  <li>API 키, 귀하의 GitHub 토큰 및 TankSync 세션은 플랫폼 고유의 암호화 저장소(Android Keystore / iOS Keychain)에 보관됩니다.</li>
+  <li>로컬 데이터베이스는 Keystore / Keychain에 보관된 키로 AES 암호화됩니다 — 기록된 주행, 차량 데이터, 정비 알림 및 캐시된 가격을 포함합니다.</li>
+  <li>서버에서는 모든 테이블이 행 수준 보안으로 보호되어 계정은 자신의 행만 읽거나 삭제할 수 있습니다. 공유 평가와 커뮤니티 가격 제보만이 로그인한 다른 이용자에게 표시되는 유일한 행입니다.</li>
+  <li>오류 추적은 저장 또는 전송 전에 이메일 주소, 좌표 및 토큰이 제거됩니다.</li>
+  <li>귀하가 검색을 실행하거나, 지도를 열거나, TankSync / 진단을 켜지 않는 한 어떤 서버로도 데이터가 전송되지 않습니다.</li>
+</ul>
+
+<h2>7. 귀하의 권리</h2>
+<p>GDPR 제15조~제22조에 따라 귀하는 데이터에 대한 열람, 정정, 삭제, 처리 제한 및 이동을 요구할 권리, 정당한 이익에 근거한 처리에 반대할 권리, 그리고 이전 처리의 적법성에 영향을 미치지 않으면서 언제든지 동의를 철회할 권리를 갖습니다. 각 권리는 앱 내 버튼으로 행사할 수 있습니다.</p>
+<ul>
+  <li><strong>열람</strong> — 설정 → 개인정보 대시보드에서 기기에 저장된 모든 범주와, 연결된 경우 귀하의 TankSync 데이터베이스의 모든 행을 확인할 수 있습니다.</li>
+  <li><strong>내보내기(이동권)</strong> — 개인정보 대시보드 → 내 모든 데이터 내보내기는 범주별 기계 판독 가능 JSON(즐겨찾기, 알림, 프로필, 여정, 가격 이력, 차량, 주유 기록, GPS 샘플이 포함된 주행 및 주행별 GPX 파일, 기준값, 정비 알림, 충전 기록, 귀하의 동의 기록)과 모든 서버 테이블의 JSON 내보내기를 담은 ZIP 파일 하나를 생성합니다.</li>
+  <li><strong>정정</strong> — 앱에서 직접 모든 항목을 편집할 수 있으며, TankSync가 켜져 있으면 변경 사항이 동기화됩니다.</li>
+  <li><strong>삭제</strong> — 제8절을 참조하십시오.</li>
+  <li><strong>처리 제한 / 반대</strong> — 설정에서 TankSync, 주행 동기화, 타일 프록시 또는 진단을 끄고, 기기 설정에서 위치, Bluetooth, 카메라 또는 알림 권한을 철회할 수 있습니다.</li>
+  <li><strong>동의 철회</strong> — 설정 → 개인정보 및 데이터에는 귀하가 동의한 날짜와 당시 확인한 방침 버전과 함께 모든 동의 항목이 나열됩니다. 각 항목을 끌 수 있으며, 앱은 해당 처리를 즉시 중단합니다.</li>
+  <li><strong>불만 제기</strong> — 귀하는 감독기관, 특히 귀하의 상거소, 근무지 또는 침해 혐의가 발생한 장소가 있는 EU 회원국의 감독기관에 불만을 제기할 수 있습니다. 먼저 귀하의 우려 사항을 해결할 기회를 주시면 감사하겠습니다: <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a>.</li>
+</ul>
+
+<h2>8. 계정 및 데이터 삭제</h2>
+<p>고객 지원 요청 없이 앱에서 직접 모든 것을 삭제하실 수 있습니다.</p>
+<ul>
+  <li><strong>로컬 데이터:</strong> 설정 → 개인정보 대시보드 → 모든 데이터 삭제는 앱이 기기에 보관하는 모든 데이터베이스 — 프로필, 즐겨찾기, 알림, 가격 이력, 캐시된 가격, 차량, 주유 기록, 기록된 주행 및 GPS 샘플, OBD2 기준값 및 어댑터 캐시, 정비 알림, 업적, 오류 추적, API 키, 토큰 및 홈 화면 위젯 데이터 — 를 제거하고 앱을 최초 실행 상태로 되돌립니다.</li>
+  <li><strong>TankSync 계정 및 서버 데이터:</strong> TankSync → 데이터 투명성 → 계정 삭제는 귀하가 소유한 모든 행(즐겨찾기, 알림, 무시한 주유소, 가격 제보, 콘텐츠 신고, 차량, 주유 기록, 여정, 기준값, 평가, 주행, 귀하가 주고받은 주행 공유, 대기 시간 핑, 동기화 설정, 삭제 기록 및 귀하의 사용자 행)을 하나의 트랜잭션으로 지운 다음, 연결된 이메일 주소를 포함하여 계정 신원 자체를 삭제합니다. 어떤 테이블이라도 지울 수 없었던 경우, 앱은 성공했다고 주장하는 대신 어느 테이블인지 알려 드립니다. 이 작업은 되돌릴 수 없습니다.</li>
+  <li><strong>개별 항목:</strong> 모든 즐겨찾기, 알림, 차량, 주유 기록, 주행, 가격 제보 및 콘텐츠 신고는 개별적으로 삭제할 수 있으며, 삭제는 귀하의 다른 기기에도 전파됩니다.</li>
+</ul>
+<p>더 이상 앱에 접근할 수 없는 경우, 개발자에게 연락하여(제11절) 삭제를 요청하실 수 있습니다. 소유권을 확인할 수 있도록 계정에 연결된 이메일 주소로 보내 주시기 바랍니다. 이메일에 연결된 적이 없는 익명 계정은 계정이 생성된 기기 없이는 당사를 포함한 누구도 식별할 수 없습니다.</p>
+
+<h2>9. 아동의 개인정보</h2>
+<p>이 앱은 만 16세 미만 아동을 대상으로 하지 않습니다. 당사는 아동의 개인정보를 고의로 수집하지 않습니다. 아동이 TankSync 계정을 생성했다고 판단되시면 당사에 연락해 주십시오. 해당 계정을 삭제하겠습니다.</p>
+
+<h2>10. 본 방침의 변경</h2>
+<p>변경 사항은 새로운 버전 번호와 날짜와 함께 이 URL에 게시됩니다. 앱은 귀하가 동의한 버전을 기록하며, 버전이 변경되면 이 페이지를 다시 표시합니다.</p>
+<ul>
+  <li><strong>v3 — 2026년 8월 29일:</strong> 개인정보처리자 및 모드별 역할, 법적 근거와 보유 기간이 포함된 처리 표, 완전한 수탁자 목록(타일 프록시, 지오코더, 경로 안내, GitHub, 브랜드 로고), 권리 행사 경로, 완전한 삭제 및 내보내기.</li>
+  <li><strong>v2 — 2026년 8월 15일:</strong> 계정 삭제 절 추가; 이메일 및 TankSync 계정 데이터 명시.</li>
+  <li><strong>v1 — 2026년 4월 7일:</strong> 최초 버전.</li>
+</ul>
+
+<h2>11. 연락처</h2>
+<div class="contact">
+  <p><strong>개발자 및 개인정보처리자:</strong> Florian DITTGEN</p>
   <p><strong>이메일:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
   <p><strong>소스 코드:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
 </div>

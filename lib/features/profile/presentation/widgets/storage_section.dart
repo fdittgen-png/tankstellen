@@ -4,10 +4,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import '../../../../core/cache/cache_manager.dart';
 import '../../../../core/navigation/app_routes.dart';
+import '../../../../core/storage/local_data_eraser.dart';
 import '../../../../core/storage/storage_providers.dart';
+import '../../../obd2/api.dart' show ActiveTripSampleWal;
+import '../../../widget/api.dart' show clearHomeWidgetData;
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'storage_bar.dart';
@@ -269,20 +271,20 @@ class StorageSection extends ConsumerWidget {
 
     if (confirmed == true) {
       if (!ctx.mounted) return; // #3159 — see _clearCache.
-      final storageMgmt = ref.read(storageManagementProvider);
-      await storageMgmt.clearCache();
-      await storageMgmt.clearPriceHistory();
-      await storageMgmt.deleteApiKey();
-      // Drop in-memory tile images too so the rebuilt app sees a
-      // blank slate for the map layer (#711).
-      PaintingBinding.instance.imageCache.clear();
-      PaintingBinding.instance.imageCache.clearLiveImages();
-      for (final boxName in ['settings', 'favorites', 'profiles']) {
-        final box = Hive.box<dynamic>(boxName);
-        await box.clear();
-      }
+      // #3867 (Epic #3865) — the ONE registry-driven local erasure (every
+      // box incl. trips/baselines/caches/traces, secure storage, prefs,
+      // the image cache, the widget container and the trip WAL).
+      final result = await LocalDataEraser.eraseAll(
+        storage: ref.read(storageRepositoryProvider),
+        extraWipes: [clearHomeWidgetData, ActiveTripSampleWal.instance.clear],
+      );
       if (!ctx.mounted) return; // #3159 — see _clearCache.
       ref.invalidate(storageManagementProvider);
+      if (!result.complete) {
+        SnackBarHelper.showError(ctx,
+            AppLocalizations.of(ctx)
+                .localErasurePartial(result.failedSteps.join(', ')));
+      }
       ctx.go(RoutePaths.setup);
     }
   }

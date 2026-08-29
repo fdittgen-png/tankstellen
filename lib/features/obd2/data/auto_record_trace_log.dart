@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/foundation.dart';
+import 'obd2_comm_diagnostics.dart';
 
 import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import 'obd2_debug_session.dart';
@@ -263,10 +264,7 @@ class AutoRecordTraceLog {
       ];
 
   /// Keep only the final MAC block (`··:7E`), as the connect traces do.
-  static String _redactMac(String mac) {
-    final tail = mac.length <= 5 ? mac : mac.substring(mac.length - 5);
-    return '\u00b7\u00b7$tail';
-  }
+  static String _redactMac(String mac) => redactObd2Mac(mac)!; // #3870
 
   /// Test reset — drops every entry. Production callers should not
   /// invoke this; the ring is meant to survive across tear-downs so

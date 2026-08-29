@@ -1348,7 +1348,7 @@
   "syncHowToSyncQuestion": "How would you like to sync?",
   "syncOfflineDescription": "Your app works fully offline. Cloud sync is optional.",
   "syncModeCommunityTitle": "Sparkilo Community",
-  "syncModeCommunitySubtitle": "Share favorites & ratings with all users",
+  "syncModeCommunitySubtitle": "Shared database run by the developer — see what syncs below",
   "syncModePrivateTitle": "Private Database",
   "syncModePrivateSubtitle": "Your own Supabase — full data control",
   "syncModeGroupTitle": "Join a Group",

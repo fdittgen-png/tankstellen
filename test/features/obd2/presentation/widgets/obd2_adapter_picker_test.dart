@@ -25,6 +25,9 @@ import 'package:tankstellen/features/obd2/presentation/widgets/obd2_adapter_pick
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
+import 'package:tankstellen/core/permissions/permission_rationale_dialog.dart';
+import 'package:tankstellen/core/storage/storage_providers.dart';
+import '../../../../helpers/fake_settings_storage.dart';
 import '../../../../helpers/silence_error_logger.dart';
 
 void main() {
@@ -155,7 +158,15 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [obd2ConnectionProvider.overrideWith((_) => svc)],
+          overrides: [
+            obd2ConnectionProvider.overrideWith((_) => svc),
+            // #3872 — the entry functions gate on the once-per-install
+            // Bluetooth rationale; pre-acknowledged so these tests keep
+            // exercising the surface BEHIND it.
+            settingsStorageProvider.overrideWithValue(
+              FakeSettingsStorage.rationalesShown(),
+            ),
+          ],
           child: MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
@@ -184,6 +195,64 @@ void main() {
     });
 
     testWidgets(
+        '#3872 — a fresh install sees the Bluetooth rationale BEFORE the '
+        'sheet; Continue proceeds to the scan and persists the flag',
+        (tester) async {
+      final svc = _RecordingFakeConnection.success();
+      final storage = FakeSettingsStorage();
+      final completer = Completer<Obd2Service?>();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            obd2ConnectionProvider.overrideWith((_) => svc),
+            settingsStorageProvider.overrideWithValue(storage),
+          ],
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: Builder(
+                builder: (ctx) => ElevatedButton(
+                  onPressed: () {
+                    completer.complete(showObd2AdapterPicker(ctx));
+                  },
+                  child: const Text('open'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
+      // Rationale up, sheet (= the scan = the OS prompt) NOT yet.
+      expect(find.byKey(PermissionRationaleDialog.dialogKey), findsOneWidget);
+      expect(find.text('Bluetooth Access'), findsOneWidget);
+      expect(find.text('Pick an OBD2 adapter'), findsNothing);
+
+      await tester.tap(find.byKey(PermissionRationaleDialog.continueKey));
+      // Dialog-pop + sheet-open transitions; the scanning sheet animates
+      // indefinitely, so pump frames instead of settling.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(find.byKey(PermissionRationaleDialog.dialogKey), findsNothing);
+      expect(find.text('Pick an OBD2 adapter'), findsOneWidget);
+      expect(
+        PermissionRationaleDialog.hasBeenShown(
+          storage,
+          PermissionRationaleKind.bluetooth,
+        ),
+        isTrue,
+      );
+
+      Navigator.of(tester.element(find.text('Pick an OBD2 adapter'))).pop();
+      await tester.pumpAndSettle();
+      await completer.future;
+    });
+
+    testWidgets(
       'pinnedMac with successful connect resolves silently (no sheet)',
       (tester) async {
         final fakeService = _NoopObd2Service();
@@ -192,7 +261,15 @@ void main() {
 
         await tester.pumpWidget(
           ProviderScope(
-            overrides: [obd2ConnectionProvider.overrideWith((_) => svc)],
+            overrides: [
+            obd2ConnectionProvider.overrideWith((_) => svc),
+            // #3872 — the entry functions gate on the once-per-install
+            // Bluetooth rationale; pre-acknowledged so these tests keep
+            // exercising the surface BEHIND it.
+            settingsStorageProvider.overrideWithValue(
+              FakeSettingsStorage.rationalesShown(),
+            ),
+          ],
             child: MaterialApp(
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
@@ -237,7 +314,15 @@ void main() {
 
         await tester.pumpWidget(
           ProviderScope(
-            overrides: [obd2ConnectionProvider.overrideWith((_) => svc)],
+            overrides: [
+            obd2ConnectionProvider.overrideWith((_) => svc),
+            // #3872 — the entry functions gate on the once-per-install
+            // Bluetooth rationale; pre-acknowledged so these tests keep
+            // exercising the surface BEHIND it.
+            settingsStorageProvider.overrideWithValue(
+              FakeSettingsStorage.rationalesShown(),
+            ),
+          ],
             child: MaterialApp(
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
@@ -300,7 +385,15 @@ void main() {
       final svc = _RecordingFakeConnection(connectByMacError: thrown);
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [obd2ConnectionProvider.overrideWith((_) => svc)],
+          overrides: [
+            obd2ConnectionProvider.overrideWith((_) => svc),
+            // #3872 — the entry functions gate on the once-per-install
+            // Bluetooth rationale; pre-acknowledged so these tests keep
+            // exercising the surface BEHIND it.
+            settingsStorageProvider.overrideWithValue(
+              FakeSettingsStorage.rationalesShown(),
+            ),
+          ],
           child: MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,

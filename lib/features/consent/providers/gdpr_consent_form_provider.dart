@@ -3,6 +3,8 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/providers/app_state_provider.dart';
+
 part 'gdpr_consent_form_provider.g.dart';
 
 /// UI state for the first-launch GDPR consent screen toggles.
@@ -43,7 +45,26 @@ class GdprConsentFormState {
 @riverpod
 class GdprConsentFormController extends _$GdprConsentFormController {
   @override
-  GdprConsentFormState build() => const GdprConsentFormState();
+  GdprConsentFormState build() {
+    // #3866 — when the screen re-surfaces after a policy bump, start from
+    // the choices the user already made instead of all-off.
+    final ({bool location, bool errorReporting, bool cloudSync,
+        bool vinOnlineDecode}) saved;
+    try {
+      final c = ref.read(gdprConsentProvider);
+      saved = (location: c.location, errorReporting: c.errorReporting,
+          cloudSync: c.cloudSync, vinOnlineDecode: c.vinOnlineDecode);
+    } catch (_) {
+      // No storage yet (first launch before the boxes, unit tests).
+      return const GdprConsentFormState();
+    }
+    return GdprConsentFormState(
+      locationConsent: saved.location,
+      errorReportingConsent: saved.errorReporting,
+      cloudSyncConsent: saved.cloudSync,
+      vinOnlineDecodeConsent: saved.vinOnlineDecode,
+    );
+  }
 
   void setLocation(bool value) {
     state = state.copyWith(locationConsent: value);

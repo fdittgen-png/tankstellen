@@ -14,6 +14,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/app/router.dart';
 import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
+import 'package:tankstellen/core/constants/app_constants.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
@@ -110,6 +111,8 @@ void main() {
       // GDPR consent given so redirect skips consent screen
       when(() => test.mockStorage.getSetting(StorageKeys.gdprConsentGiven))
           .thenReturn(true);
+      when(() => test.mockStorage.getSetting(StorageKeys.consentPolicyVersion))
+          .thenReturn(AppConstants.privacyPolicyVersion); // #3866
 
       overrides = [
         ...test.overrides,
@@ -136,6 +139,8 @@ void main() {
       // GDPR consent already given so redirect goes to /setup, not /consent
       when(() => test.mockStorage.getSetting(StorageKeys.gdprConsentGiven))
           .thenReturn(true);
+      when(() => test.mockStorage.getSetting(StorageKeys.consentPolicyVersion))
+          .thenReturn(AppConstants.privacyPolicyVersion); // #3866
 
       final testOverrides = <Object>[
         ...test.overrides,

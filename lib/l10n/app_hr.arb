@@ -781,7 +781,7 @@
   "syncHowToSyncQuestion": "Kako se želite sinkronizirati?",
   "syncOfflineDescription": "Vaša aplikacija radi potpuno izvan mreže. Sinkronizacija u oblaku je neobavezna.",
   "syncModeCommunityTitle": "Sparkilo zajednica",
-  "syncModeCommunitySubtitle": "Dijelite favourite i ocjene sa svim korisnicima",
+  "syncModeCommunitySubtitle": "Zajednička baza podataka koju vodi razvojni programer — u nastavku pogledajte što se sinkronizira",
   "syncModePrivateTitle": "Privatna baza podataka",
   "syncModePrivateSubtitle": "Vlastiti Supabase — potpuna kontrola podataka",
   "syncModeGroupTitle": "Pridruži se grupi",
@@ -4721,5 +4721,99 @@
         "type": "String"
       }
     }
-  }
+  },
+  "gdprPolicyLink": "Pravila privatnosti (verzija {version})",
+  "@gdprPolicyLink": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentRecordedAt": "Privola dana {date} · verzija pravila {version}",
+  "@consentRecordedAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentNotRecorded": "Još nije zabilježena nikakva privola",
+  "serverErasurePartial": "Neki podaci na poslužitelju nisu mogli biti izbrisani: {tables}. Pokušajte ponovno ili kontaktirajte razvojnog programera s ovim popisom.",
+  "@serverErasurePartial": {
+    "placeholders": {
+      "tables": {
+        "type": "String"
+      }
+    }
+  },
+  "localErasurePartial": "Neki lokalni podaci nisu mogli biti izbrisani: {steps}. Ponovno pokrenite aplikaciju i pokušajte ponovno.",
+  "@localErasurePartial": {
+    "placeholders": {
+      "steps": {
+        "type": "String"
+      }
+    }
+  },
+  "myCommunityReportsTitle": "Moje prijave zajednici",
+  "myCommunityReportsEmpty": "Niste poslali nijednu prijavu",
+  "deleteReportTooltip": "Izbriši ovu prijavu",
+  "reportDeleted": "Prijava izbrisana",
+  "reportDeleteFailed": "Prijavu nije bilo moguće izbrisati",
+  "privacyControlsTitle": "Postavke privatnosti",
+  "tileProxyToggleTitle": "Učitavaj pločice karte putem Sparkilo proxyja",
+  "tileProxyToggleSubtitle": "Uključeno: prikazani dio karte i vaša IP adresa stižu na EU poslužitelj razvojnog programera, koji dohvaća pločice s OpenStreetMapa. Isključeno: pločice se učitavaju izravno s tile.openstreetmap.org.",
+  "remoteLogosToggleTitle": "Učitavaj logotipe marki s interneta",
+  "remoteLogosToggleSubtitle": "Zadano isključeno: prikazuju se ugrađene zamjenske slike. Uključeno: logotipi se dohvaćaju s logo.clearbit.com, koji vidi vašu IP adresu.",
+  "privacyExportAllButton": "Izvezi sve moje podatke (ZIP)",
+  "privacyExportAllSuccess": "{fileName} spremljeno u Downloads — {count} datoteka unutra",
+  "@privacyExportAllSuccess": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "privacyExportAllFailed": "Izvoznu datoteku nije bilo moguće zapisati",
+  "syncModeCommunityControllerNotice": "Upravlja {operator} · Supabase, EU (Frankfurt) · sinkronizira favorite, upozorenja, vozila uklj. VIN, točenja goriva, ocjene, prijave i — ako to uključite — putovanja s GPS-om",
+  "@syncModeCommunityControllerNotice": {
+    "placeholders": {
+      "operator": {
+        "type": "String"
+      }
+    }
+  },
+  "syncModePrivateControllerNotice": "Vi ste voditelj obrade — vaš vlastiti Supabase projekt, mi ga nikada ne vidimo",
+  "syncModeJoinControllerNotice": "Vlasnik zajedničke baze podataka voditelj je obrade vaših podataka",
+  "ugcPublicNoticeTitle": "Podijeljeno s drugim korisnicima",
+  "ugcPublicNoticeBody": "Ovo se pohranjuje u bazi za sinkronizaciju pod vašim pseudonimnim korisničkim ID-om. U Sparkilo zajednici to može pročitati svaki prijavljeni korisnik. Možete to izbrisati u bilo kojem trenutku u TankSync → Transparentnost podataka.",
+  "blockedAuthorsTitle": "Blokirani korisnici",
+  "blockedAuthorsDescription": "Sadržaj koji dijele ovi korisnici skriven je na ovom uređaju. Deblokirajte ih da biste ga ponovno vidjeli.",
+  "blockedAuthorsEmpty": "Nema blokiranih korisnika",
+  "blockedAuthorsUnblock": "Deblokiraj",
+  "permissionRationaleCameraTitle": "Pristup kameri",
+  "permissionRationaleCameraSubtitle": "Ova aplikacija želi koristiti vašu kameru za čitanje računa, zaslona crpki i QR kodova.",
+  "permissionRationaleCameraWhatHappens": "Što se događa sa slikom s kamere:",
+  "permissionRationaleCameraBulletOnDevice": "Slika se koristi samo za čitanje računa, zaslona crpke ili QR koda — prepoznavanje se izvodi na vašem uređaju.",
+  "permissionRationaleCameraBulletDiscarded": "Fotografija se odbacuje nakon skeniranja.",
+  "permissionRationaleCameraBulletNoUpload": "Ništa se ne prenosi osim ako ne pošaljete prijavu pogrešnog skeniranja i ne potvrdite je.",
+  "permissionRationaleBluetoothTitle": "Pristup Bluetoothu",
+  "permissionRationaleBluetoothSubtitle": "Ova aplikacija želi koristiti Bluetooth za povezivanje s vašim OBD2 adapterom.",
+  "permissionRationaleBluetoothWhatHappens": "Što se događa s Bluetoothom:",
+  "permissionRationaleBluetoothBulletAdapterOnly": "Bluetooth se koristi samo za pronalaženje vašeg OBD2 adaptera i komunikaciju s njim.",
+  "permissionRationaleBluetoothBulletIdentifierLocal": "Identifikator adaptera ostaje na vašem uređaju — sinkronizira se samo putem TankSynca kao dio profila vozila.",
+  "permissionRationaleBluetoothBulletLegacyLocation": "Na Androidu 11 i starijim verzijama sustav traži i lokaciju jer se Bluetooth skeniranje ondje smatra dozvolom za lokaciju.",
+  "permissionRationaleNotificationsTitle": "Obavijesti",
+  "permissionRationaleNotificationsSubtitle": "Ova aplikacija želi vam slati obavijesti o upozorenjima o cijenama i statusu snimanja putovanja.",
+  "permissionRationaleNotificationsWhatHappens": "Što se događa s obavijestima:",
+  "permissionRationaleNotificationsBulletLocal": "Obavijesti se koriste za lokalna upozorenja o cijenama i status snimanja putovanja.",
+  "permissionRationaleNotificationsBulletNothingLeaves": "Generiraju se na vašem uređaju — ništa ne napušta uređaj.",
+  "permissionRationaleRevoke": "To možete opozvati u bilo kojem trenutku u postavkama uređaja.",
+  "permissionRationaleLegalBasis": "Pravna osnova: čl. 6. st. 1. t. (a) GDPR-a (privola)"
 }

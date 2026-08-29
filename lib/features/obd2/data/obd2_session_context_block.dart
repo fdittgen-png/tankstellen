@@ -91,8 +91,4 @@ Map<String, Object?> _compact(Obd2SessionDiagnostic session) {
 /// is a stable hardware identifier (PII). Mirrors the `_redactMac` helper
 /// in `obd2_diagnostic_report.dart`; a string already in the middle-dot
 /// redacted form passes through unchanged (its last four chars are kept).
-String _redactMac(String mac) {
-  if (mac.length <= 4) return mac;
-  final visible = mac.substring(mac.length - 4);
-  return '${'·' * (mac.length - 4)}$visible';
-}
+String _redactMac(String mac) => redactObd2Mac(mac)!; // #3870 — one rule

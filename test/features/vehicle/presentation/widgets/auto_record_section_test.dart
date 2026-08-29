@@ -3,11 +3,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/core/permissions/location_permissions.dart';
+import 'package:tankstellen/core/permissions/permission_rationale_dialog.dart';
+import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/features/vehicle/presentation/widgets/auto_record_section.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
+import '../../../../helpers/fake_settings_storage.dart';
 import '../../../../helpers/pump_app.dart';
 
 /// Fake [VehicleProfileList] that lets tests seed an initial list and
@@ -42,6 +46,10 @@ Future<_FakeVehicleProfileList> _pumpSection(
   Future<LocationPermissionOutcome> Function()? requestForegroundLocation,
   Future<void> Function()? openSettings,
   VoidCallback? onScrollToObd2Card,
+  // #3872 — the master toggle gates on the once-per-install notifications
+  // rationale; defaults to pre-acknowledged so the existing tests keep
+  // exercising the surface BEHIND it.
+  SettingsStorage? settingsStorage,
 }) async {
   // Tall canvas so the slider/banner stack does not overflow when the
   // master toggle is on. Mirror the size used by the extras section
@@ -64,6 +72,9 @@ Future<_FakeVehicleProfileList> _pumpSection(
     ),
     overrides: [
       vehicleProfileListProvider.overrideWith(() => list),
+      settingsStorageProvider.overrideWithValue(
+        settingsStorage ?? FakeSettingsStorage.rationalesShown(),
+      ),
     ],
   );
   return list;
@@ -160,6 +171,49 @@ void main() {
       expect(list.savedProfiles.single.autoRecord, isTrue);
       // Other fields round-trip.
       expect(list.savedProfiles.single.name, 'Golf');
+    });
+
+    testWidgets(
+        '#3872 — a fresh install sees the notifications rationale on the '
+        'first enable, BEFORE the persist that arms the orchestrator',
+        (tester) async {
+      final list = _FakeVehicleProfileList([
+        const VehicleProfile(id: 'v1', name: 'Golf'),
+      ]);
+      final storage = FakeSettingsStorage();
+      await _pumpSection(
+        tester,
+        vehicleId: 'v1',
+        list: list,
+        settingsStorage: storage,
+      );
+
+      await tester.tap(find.byKey(const Key('autoRecordToggle')));
+      await tester.pumpAndSettle();
+
+      // Rationale up, nothing persisted (= nothing armed, no OS prompt) yet.
+      expect(find.byKey(PermissionRationaleDialog.dialogKey), findsOneWidget);
+      expect(find.text('Notifications'), findsOneWidget);
+      expect(list.savedProfiles, isEmpty);
+
+      await tester.tap(find.byKey(PermissionRationaleDialog.continueKey));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(PermissionRationaleDialog.dialogKey), findsNothing);
+      expect(list.savedProfiles, hasLength(1));
+      expect(list.savedProfiles.single.autoRecord, isTrue);
+      expect(
+        PermissionRationaleDialog.hasBeenShown(
+          storage,
+          PermissionRationaleKind.notifications,
+        ),
+        isTrue,
+      );
+
+      // Disabling never re-prompts (only the enable transition gates).
+      await tester.tap(find.byKey(const Key('autoRecordToggle')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(PermissionRationaleDialog.dialogKey), findsNothing);
     });
 
     // #1949 — the auto-record section no longer renders a separate

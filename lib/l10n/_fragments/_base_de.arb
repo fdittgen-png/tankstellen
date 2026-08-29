@@ -1156,7 +1156,7 @@
   "syncHowToSyncQuestion": "Wie möchten Sie synchronisieren?",
   "syncOfflineDescription": "Die App funktioniert vollständig offline. Cloud-Sync ist optional.",
   "syncModeCommunityTitle": "Tankstellen-Gemeinschaft",
-  "syncModeCommunitySubtitle": "Favoriten & Bewertungen mit allen Nutzern teilen",
+  "syncModeCommunitySubtitle": "Gemeinsame Datenbank, betrieben vom Entwickler — was synchronisiert wird, steht unten",
   "syncModePrivateTitle": "Private Datenbank",
   "syncModePrivateSubtitle": "Eigene Supabase — volle Datenkontrolle",
   "syncModeGroupTitle": "Gruppe beitreten",

@@ -9,7 +9,7 @@ import '../core/navigation/app_routes.dart';
 import '../core/navigation/root_navigator_key.dart';
 import '../l10n/app_localizations.dart';
 import '../core/telemetry/integrations/navigation_trace_observer.dart';
-import '../core/storage/storage_keys.dart';
+import '../core/privacy/consent_enforcement.dart';
 import '../core/storage/storage_providers.dart';
 import '../features/receipts_ocr/api.dart';
 import '../features/widget/presentation/widget_uri_parser.dart';
@@ -127,7 +127,8 @@ GoRouter router(Ref ref) {
     },
     redirect: (context, state) {
       // Read live from storage each redirect — not cached at provider creation
-      final hasConsent = storage.getSetting(StorageKeys.gdprConsentGiven) == true;
+      // #3866 — consent counts only against the CURRENT policy version.
+      final hasConsent = ConsentRecord.isCurrent(storage);
       final isConsent = state.matchedLocation == RoutePaths.consent;
       final isReady = storage.isSetupComplete;
       final isSetup = state.matchedLocation == RoutePaths.setup;

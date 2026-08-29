@@ -2711,7 +2711,7 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get syncModeCommunitySubtitle =>
-      'Jaa suosikit ja arvostelut kaikkien käyttäjien kanssa';
+      'Kehittäjän ylläpitämä jaettu tietokanta — katso alta, mitä synkronoidaan';
 
   @override
   String get syncModePrivateTitle => 'Yksityinen tietokanta';
@@ -5321,6 +5321,106 @@ class AppLocalizationsFi extends AppLocalizations {
       'Kun pois päältä, palkinnot, pisteet ja trofeekuvakkeet piilotetaan koko sovelluksesta.';
 
   @override
+  String gdprPolicyLink(int version) {
+    return 'Tietosuojakäytäntö (versio $version)';
+  }
+
+  @override
+  String consentRecordedAt(String date, int version) {
+    return 'Suostumus annettu $date · käytännön versio $version';
+  }
+
+  @override
+  String get consentNotRecorded => 'Suostumusta ei ole vielä tallennettu';
+
+  @override
+  String serverErasurePartial(String tables) {
+    return 'Joitakin palvelintietoja ei voitu poistaa: $tables. Yritä uudelleen tai ota yhteyttä kehittäjään tällä listalla.';
+  }
+
+  @override
+  String localErasurePartial(String steps) {
+    return 'Joitakin paikallisia tietoja ei voitu poistaa: $steps. Käynnistä sovellus uudelleen ja yritä uudelleen.';
+  }
+
+  @override
+  String get myCommunityReportsTitle => 'Omat yhteisöilmoitukseni';
+
+  @override
+  String get myCommunityReportsEmpty => 'Et ole lähettänyt yhtään ilmoitusta';
+
+  @override
+  String get deleteReportTooltip => 'Poista tämä ilmoitus';
+
+  @override
+  String get reportDeleted => 'Ilmoitus poistettu';
+
+  @override
+  String get reportDeleteFailed => 'Ilmoitusta ei voitu poistaa';
+
+  @override
+  String get privacyControlsTitle => 'Tietosuoja-asetukset';
+
+  @override
+  String get tileProxyToggleTitle =>
+      'Lataa karttaruudut Sparkilo-välityspalvelimen kautta';
+
+  @override
+  String get tileProxyToggleSubtitle =>
+      'Päällä: näkyvä kartta-alue ja IP-osoitteesi päätyvät kehittäjän EU-palvelimelle, joka hakee ruudut OpenStreetMapista. Pois: ruudut ladataan suoraan osoitteesta tile.openstreetmap.org.';
+
+  @override
+  String get remoteLogosToggleTitle => 'Lataa merkkien logot internetistä';
+
+  @override
+  String get remoteLogosToggleSubtitle =>
+      'Oletuksena pois: näytetään sovelluksen mukana tulevat paikkamerkit. Päällä: logot haetaan osoitteesta logo.clearbit.com, joka näkee IP-osoitteesi.';
+
+  @override
+  String get privacyExportAllButton => 'Vie kaikki tietoni (ZIP)';
+
+  @override
+  String privacyExportAllSuccess(String fileName, int count) {
+    return '$fileName tallennettu Lataukset-kansioon — sisältää $count tiedostoa';
+  }
+
+  @override
+  String get privacyExportAllFailed => 'Vientitiedostoa ei voitu kirjoittaa';
+
+  @override
+  String syncModeCommunityControllerNotice(String operator) {
+    return 'Ylläpitäjä $operator · Supabase, EU (Frankfurt) · synkronoi suosikit, hälytykset, ajoneuvot VIN-numeroineen, tankkaukset, arviot, ilmoitukset ja — jos otat sen käyttöön — matkat GPS-tiedoin';
+  }
+
+  @override
+  String get syncModePrivateControllerNotice =>
+      'Sinä olet rekisterinpitäjä — oma Supabase-projektisi, me emme koskaan näe sitä';
+
+  @override
+  String get syncModeJoinControllerNotice =>
+      'Jaetun tietokannan omistaja on tietojesi rekisterinpitäjä';
+
+  @override
+  String get ugcPublicNoticeTitle => 'Jaettu muiden käyttäjien kanssa';
+
+  @override
+  String get ugcPublicNoticeBody =>
+      'Tämä tallennetaan synkronointitietokantaan pseudonyymin käyttäjätunnuksesi alle. Sparkilo-yhteisössä jokainen kirjautunut käyttäjä voi lukea sen. Voit poistaa sen milloin tahansa kohdasta TankSync → Tietojen läpinäkyvyys.';
+
+  @override
+  String get blockedAuthorsTitle => 'Estetyt käyttäjät';
+
+  @override
+  String get blockedAuthorsDescription =>
+      'Näiden käyttäjien jakama sisältö piilotetaan tällä laitteella. Poista esto nähdäksesi sen uudelleen.';
+
+  @override
+  String get blockedAuthorsEmpty => 'Ei estettyjä käyttäjiä';
+
+  @override
+  String get blockedAuthorsUnblock => 'Poista esto';
+
+  @override
   String get coachingGpsLiftOff => 'Päästä kaasusta';
 
   @override
@@ -6715,6 +6815,79 @@ class AppLocalizationsFi extends AppLocalizations {
     });
     return '$_temp0';
   }
+
+  @override
+  String get permissionRationaleCameraTitle => 'Kameran käyttö';
+
+  @override
+  String get permissionRationaleCameraSubtitle =>
+      'Tämä sovellus haluaa käyttää kameraasi kuittien, mittarinäyttöjen ja QR-koodien lukemiseen.';
+
+  @override
+  String get permissionRationaleCameraWhatHappens =>
+      'Mitä kamerakuvalle tapahtuu:';
+
+  @override
+  String get permissionRationaleCameraBulletOnDevice =>
+      'Kuvaa käytetään vain kuitin, mittarinäytön tai QR-koodin lukemiseen — tunnistus tapahtuu laitteellasi.';
+
+  @override
+  String get permissionRationaleCameraBulletDiscarded =>
+      'Kuva hylätään skannauksen jälkeen.';
+
+  @override
+  String get permissionRationaleCameraBulletNoUpload =>
+      'Mitään ei lähetetä, ellet tee ilmoitusta virheellisestä skannauksesta ja vahvista sitä.';
+
+  @override
+  String get permissionRationaleBluetoothTitle => 'Bluetoothin käyttö';
+
+  @override
+  String get permissionRationaleBluetoothSubtitle =>
+      'Tämä sovellus haluaa käyttää Bluetoothia yhteyden muodostamiseen OBD2-sovittimeesi.';
+
+  @override
+  String get permissionRationaleBluetoothWhatHappens =>
+      'Mitä Bluetoothilla tehdään:';
+
+  @override
+  String get permissionRationaleBluetoothBulletAdapterOnly =>
+      'Bluetoothia käytetään vain OBD2-sovittimesi löytämiseen ja sen kanssa viestimiseen.';
+
+  @override
+  String get permissionRationaleBluetoothBulletIdentifierLocal =>
+      'Sovittimen tunniste pysyy laitteellasi — se synkronoidaan vain TankSyncin kautta osana ajoneuvoprofiilia.';
+
+  @override
+  String get permissionRationaleBluetoothBulletLegacyLocation =>
+      'Android 11:ssä ja sitä vanhemmissa versioissa järjestelmä pyytää myös sijaintia, koska Bluetooth-haku lasketaan siellä sijaintiluvaksi.';
+
+  @override
+  String get permissionRationaleNotificationsTitle => 'Ilmoitukset';
+
+  @override
+  String get permissionRationaleNotificationsSubtitle =>
+      'Tämä sovellus haluaa lähettää sinulle ilmoituksia hintahälytyksistä ja matkan tallennuksen tilasta.';
+
+  @override
+  String get permissionRationaleNotificationsWhatHappens =>
+      'Mitä ilmoituksille tapahtuu:';
+
+  @override
+  String get permissionRationaleNotificationsBulletLocal =>
+      'Ilmoituksia käytetään paikallisiin hintahälytyksiin ja matkan tallennuksen tilaan.';
+
+  @override
+  String get permissionRationaleNotificationsBulletNothingLeaves =>
+      'Ne luodaan laitteellasi — mikään ei poistu laitteelta.';
+
+  @override
+  String get permissionRationaleRevoke =>
+      'Voit peruuttaa tämän milloin tahansa laitteen asetuksista.';
+
+  @override
+  String get permissionRationaleLegalBasis =>
+      'Oikeusperuste: yleisen tietosuoja-asetuksen 6 artiklan 1 kohdan a alakohta (suostumus)';
 
   @override
   String get tripRecordingPipEstConsumptionCaption => 'arv. L/100 km';

@@ -26,6 +26,7 @@ void main() {
 
   Future<void> configureSync({String? storedUserId}) async {
     await storage.putSetting('sync_enabled', true);
+    await storage.putSetting('consent_cloud_sync', true); // #3866
     await storage.putSetting('supabase_url', 'https://test.supabase.co');
     await storage.setSupabaseAnonKey('key');
     if (storedUserId != null) {
@@ -111,6 +112,7 @@ void main() {
       expect(calls, isEmpty);
 
       await storage.putSetting('sync_enabled', true);
+    await storage.putSetting('consent_cloud_sync', true); // #3866
       expect(await run(), TankSyncInitOutcome.notConfigured,
           reason: 'enabled but no url/key stored');
       expect(calls, isEmpty);

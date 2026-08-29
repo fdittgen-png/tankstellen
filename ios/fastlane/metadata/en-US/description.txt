@@ -8,7 +8,7 @@ WHY IT IS WORTH TRUSTING
 • Official open-data prices, country by country — not crowdsourced guesses that send you on a wasted detour.
 • Petrol, diesel, LPG, CNG, E85 and EV charging on one map, in one search.
 • Cheapest first: pins are coloured cheap-to-expensive and the winner carries a Cheapest badge.
-• Your GPS position and any API keys never leave your device. No ads, no account, no tracking — and the source code is public.
+• API keys are sent only to the service they belong to, search coordinates only to the official price source of the country you are in, and recorded GPS trips leave your device only if you switch on TankSync trip sync. No ads, no account, no tracking — and the source code is public.
 
 SAVE ON THE PRICE
 • Search nearby or along your entire route. Filter by fuel type, radius, open now, amenities and highway-only.
@@ -30,7 +30,8 @@ WHILE YOU DRIVE
 
 YOUR DATA STAYS YOURS
 • Privacy Dashboard: see, export or delete everything, at any time.
-• Optional TankSync syncs favourites, vehicles, fill-ups and alerts to a server you control — not to ours.
+• Optional TankSync syncs favourites, vehicles, fill-ups and alerts to a server you control — or, if you choose, to the Sparkilo Community database hosted in the EU.
+• GDPR: no trackers, no ad SDKs. Export everything as one ZIP and delete everything, on the device and on the server, from inside the app. Every consent can be revoked at any time. Privacy policy: https://fdittgen-png.github.io/tankstellen/privacy-policy/
 
 COUNTRIES WITH OFFICIAL LIVE PRICES
 Austria, Argentina, Australia, Chile, Denmark, France, Germany, Greece, Italy, Luxembourg, Mexico, Portugal, Romania, Slovenia, South Korea, Spain and the United Kingdom. EV charging worldwide via Open Charge Map.

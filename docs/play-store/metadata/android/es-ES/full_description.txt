@@ -8,7 +8,7 @@ POR QUÉ PUEDES FIARTE
 • Precios oficiales en datos abiertos, país por país — no estimaciones de la comunidad que te mandan a dar un rodeo para nada.
 • Gasolina, diésel, GLP, GNC, E85 y recarga eléctrica en un solo mapa y una sola búsqueda.
 • La más barata primero: los marcadores van de barato a caro y el ganador lleva una insignia La más barata.
-• Tu posición GPS y tus claves de API nunca salen del dispositivo. Sin anuncios, sin cuenta, sin rastreo — y el código es público.
+• Tus claves de API solo se envían al servicio al que pertenecen, las coordenadas de búsqueda solo a la fuente oficial de precios del país en el que estás, y los trayectos GPS grabados solo salen de tu dispositivo si activas la sincronización de trayectos de TankSync. Sin anuncios, sin cuenta, sin rastreo — y el código es público.
 
 AHORRA EN EL PRECIO
 • Busca cerca de ti o a lo largo de toda tu ruta. Filtra por combustible, radio, abierto ahora, servicios y solo autopista.
@@ -30,7 +30,8 @@ MIENTRAS CONDUCES
 
 TUS DATOS SIGUEN SIENDO TUYOS
 • Panel de privacidad: consulta, exporta o borra todo cuando quieras.
-• TankSync, opcional, sincroniza favoritos, vehículos, repostajes y alertas con un servidor que controlas tú — no nosotros.
+• TankSync, opcional, sincroniza favoritos, vehículos, repostajes y alertas con un servidor que controlas tú — o, si lo eliges, con la base de datos Sparkilo Community alojada en la UE.
+• RGPD: sin rastreadores ni SDK publicitarios. Exporta todo en un único ZIP y borra todo, en el dispositivo y en el servidor, desde la propia app. Cada consentimiento se puede revocar en cualquier momento. Política de privacidad: https://fdittgen-png.github.io/tankstellen/privacy-policy/
 
 PAÍSES CON PRECIOS OFICIALES EN DIRECTO
 Austria, Argentina, Australia, Chile, Dinamarca, Francia, Alemania, Grecia, Italia, Luxemburgo, México, Portugal, Rumanía, Eslovenia, Corea del Sur, España y Reino Unido. Recarga eléctrica en todo el mundo mediante Open Charge Map.

@@ -2720,7 +2720,7 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get syncModeCommunitySubtitle =>
-      'Sdílejte oblíbené a hodnocení se všemi uživateli';
+      'Sdílená databáze provozovaná vývojářem — níže vidíte, co se synchronizuje';
 
   @override
   String get syncModePrivateTitle => 'Soukromá databáze';
@@ -5332,6 +5332,106 @@ class AppLocalizationsCs extends AppLocalizations {
       'Pokud je vypnuto, odznaky, skóre a ikony pohárů jsou v celé aplikaci skryty.';
 
   @override
+  String gdprPolicyLink(int version) {
+    return 'Zásady ochrany osobních údajů (verze $version)';
+  }
+
+  @override
+  String consentRecordedAt(String date, int version) {
+    return 'Souhlas udělen $date · verze zásad $version';
+  }
+
+  @override
+  String get consentNotRecorded => 'Zatím nebyl zaznamenán žádný souhlas';
+
+  @override
+  String serverErasurePartial(String tables) {
+    return 'Některá data na serveru se nepodařilo smazat: $tables. Zkuste to znovu nebo kontaktujte vývojáře s tímto seznamem.';
+  }
+
+  @override
+  String localErasurePartial(String steps) {
+    return 'Některá místní data se nepodařilo smazat: $steps. Restartujte aplikaci a zkuste to znovu.';
+  }
+
+  @override
+  String get myCommunityReportsTitle => 'Moje komunitní hlášení';
+
+  @override
+  String get myCommunityReportsEmpty => 'Zatím jste neodeslali žádné hlášení';
+
+  @override
+  String get deleteReportTooltip => 'Smazat toto hlášení';
+
+  @override
+  String get reportDeleted => 'Hlášení smazáno';
+
+  @override
+  String get reportDeleteFailed => 'Hlášení se nepodařilo smazat';
+
+  @override
+  String get privacyControlsTitle => 'Nastavení soukromí';
+
+  @override
+  String get tileProxyToggleTitle =>
+      'Načítat mapové dlaždice přes proxy Sparkilo';
+
+  @override
+  String get tileProxyToggleSubtitle =>
+      'Zapnuto: zobrazený výřez mapy a vaše IP adresa se dostanou na server vývojáře v EU, který dlaždice stáhne z OpenStreetMap. Vypnuto: dlaždice se načítají přímo z tile.openstreetmap.org.';
+
+  @override
+  String get remoteLogosToggleTitle => 'Načítat loga značek z internetu';
+
+  @override
+  String get remoteLogosToggleSubtitle =>
+      'Ve výchozím stavu vypnuto: zobrazují se vestavěné zástupné obrázky. Zapnuto: loga se stahují z logo.clearbit.com, které vidí vaši IP adresu.';
+
+  @override
+  String get privacyExportAllButton => 'Exportovat všechna moje data (ZIP)';
+
+  @override
+  String privacyExportAllSuccess(String fileName, int count) {
+    return '$fileName uloženo do Stažené — obsahuje $count souborů';
+  }
+
+  @override
+  String get privacyExportAllFailed => 'Exportní soubor se nepodařilo zapsat';
+
+  @override
+  String syncModeCommunityControllerNotice(String operator) {
+    return 'Provozuje $operator · Supabase, EU (Frankfurt) · synchronizuje oblíbené, upozornění, vozidla vč. VIN, tankování, hodnocení, hlášení a — pokud to zapnete — jízdy s GPS';
+  }
+
+  @override
+  String get syncModePrivateControllerNotice =>
+      'Správcem údajů jste vy — váš vlastní projekt Supabase, my ho nikdy nevidíme';
+
+  @override
+  String get syncModeJoinControllerNotice =>
+      'Správcem vašich údajů je ten, kdo vlastní sdílenou databázi';
+
+  @override
+  String get ugcPublicNoticeTitle => 'Sdíleno s ostatními uživateli';
+
+  @override
+  String get ugcPublicNoticeBody =>
+      'Toto je uloženo v synchronizační databázi pod vaším pseudonymním ID uživatele. V Komunitě Sparkilo si to může přečíst každý přihlášený uživatel. Kdykoli to můžete smazat v TankSync → Transparentnost dat.';
+
+  @override
+  String get blockedAuthorsTitle => 'Blokovaní uživatelé';
+
+  @override
+  String get blockedAuthorsDescription =>
+      'Obsah sdílený těmito uživateli je na tomto zařízení skrytý. Odblokujte je, abyste ho znovu viděli.';
+
+  @override
+  String get blockedAuthorsEmpty => 'Žádní blokovaní uživatelé';
+
+  @override
+  String get blockedAuthorsUnblock => 'Odblokovat';
+
+  @override
   String get coachingGpsLiftOff => 'Uvolnit plyn';
 
   @override
@@ -6726,6 +6826,79 @@ class AppLocalizationsCs extends AppLocalizations {
     });
     return '$_temp0';
   }
+
+  @override
+  String get permissionRationaleCameraTitle => 'Přístup ke kameře';
+
+  @override
+  String get permissionRationaleCameraSubtitle =>
+      'Tato aplikace chce použít vaši kameru ke čtení účtenek, displejů stojanů a QR kódů.';
+
+  @override
+  String get permissionRationaleCameraWhatHappens =>
+      'Co se děje s obrazem z kamery:';
+
+  @override
+  String get permissionRationaleCameraBulletOnDevice =>
+      'Obraz se používá pouze ke čtení účtenky, displeje stojanu nebo QR kódu — rozpoznávání probíhá ve vašem zařízení.';
+
+  @override
+  String get permissionRationaleCameraBulletDiscarded =>
+      'Fotografie je po naskenování zahozena.';
+
+  @override
+  String get permissionRationaleCameraBulletNoUpload =>
+      'Nic se nenahrává, pokud nenahlásíte chybné skenování a nepotvrdíte to.';
+
+  @override
+  String get permissionRationaleBluetoothTitle => 'Přístup k Bluetooth';
+
+  @override
+  String get permissionRationaleBluetoothSubtitle =>
+      'Tato aplikace chce použít Bluetooth k připojení k vašemu adaptéru OBD2.';
+
+  @override
+  String get permissionRationaleBluetoothWhatHappens =>
+      'Co se děje s Bluetooth:';
+
+  @override
+  String get permissionRationaleBluetoothBulletAdapterOnly =>
+      'Bluetooth se používá pouze k vyhledání vašeho adaptéru OBD2 a ke komunikaci s ním.';
+
+  @override
+  String get permissionRationaleBluetoothBulletIdentifierLocal =>
+      'Identifikátor adaptéru zůstává ve vašem zařízení — synchronizuje se pouze přes TankSync jako součást profilu vozidla.';
+
+  @override
+  String get permissionRationaleBluetoothBulletLegacyLocation =>
+      'V systému Android 11 a starším si systém vyžádá také polohu, protože vyhledávání Bluetooth tam spadá pod oprávnění k poloze.';
+
+  @override
+  String get permissionRationaleNotificationsTitle => 'Oznámení';
+
+  @override
+  String get permissionRationaleNotificationsSubtitle =>
+      'Tato aplikace vám chce posílat oznámení o cenových upozorněních a o stavu záznamu jízdy.';
+
+  @override
+  String get permissionRationaleNotificationsWhatHappens =>
+      'Co se děje s oznámeními:';
+
+  @override
+  String get permissionRationaleNotificationsBulletLocal =>
+      'Oznámení se používají pro místní cenová upozornění a stav záznamu jízdy.';
+
+  @override
+  String get permissionRationaleNotificationsBulletNothingLeaves =>
+      'Vytvářejí se ve vašem zařízení — nic zařízení neopouští.';
+
+  @override
+  String get permissionRationaleRevoke =>
+      'Toto můžete kdykoli odvolat v nastavení zařízení.';
+
+  @override
+  String get permissionRationaleLegalBasis =>
+      'Právní základ: čl. 6 odst. 1 písm. a) GDPR (souhlas)';
 
   @override
   String get tripRecordingPipEstConsumptionCaption => 'odh. L/100 km';

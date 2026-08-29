@@ -158,3 +158,7 @@ fdroid/archive/
 
 # Generated per-build fdroid dependency overrides (#3473); source = pubspec_overrides.fdroid.yaml
 pubspec_overrides.yaml
+
+# Epic #3865 — the GDPR data inventory is the source of truth the surfaces tests read
+!docs/privacy/
+!docs/privacy/data_inventory.json

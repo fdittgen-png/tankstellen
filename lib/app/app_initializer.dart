@@ -20,6 +20,7 @@ import '../core/cache/cache_manager.dart';
 import '../core/telemetry/collectors/breadcrumb_persistence.dart';
 import '../core/telemetry/crash_forensics_harvester.dart';
 import '../core/platform/app_flavor.dart';
+import '../core/privacy/consent_enforcement.dart';
 import '../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../core/telemetry/health_counters.dart';
 import '../core/telemetry/storage/startup_failure_store.dart';
@@ -175,16 +176,25 @@ class AppInitializer {
     // before an error is *reported*); `_installErrorHandlers` re-runs so
     // `errorLogger` stays authoritative. #3492 — libre/F-Droid ships NO
     // Sentry SDK; `AppFlavor.isLibre` is const so R8 folds the block out.
+    // #3870 — mirror the tile-proxy switch before the first map paints.
+    AppConstants.tileProxyDisabledByUser =
+        !(storage.getSetting('tile_proxy_enabled') as bool? ?? true);
     final dsn = resolveSentryDsn(storage);
     final consentGiven =
         storage.getSetting('consent_error_reporting') as bool? ?? false;
     if (!AppFlavor.isLibre && dsn.isNotEmpty && consentGiven) {
-      _deferPostFirstFrame(() async {
-        final packageInfo = await _resolvePackageInfo();
-        await SentryFlutter.init(
-            (options) => _configureSentryOptions(options, dsn, packageInfo));
-        _installErrorHandlers();
-      });
+      _deferPostFirstFrame(() => _startSentry(dsn));
+    }
+    // #3866 (Epic #3865) — withdrawing the Error reporting consent closes
+    // Sentry in-session; granting it starts the SDK without a relaunch.
+    if (!AppFlavor.isLibre && dsn.isNotEmpty) {
+      ConsentEnforcement.errorReportingHook = (enabled) async {
+        if (enabled) {
+          if (!Sentry.isEnabled) await _startSentry(dsn);
+        } else if (Sentry.isEnabled) {
+          await Sentry.close();
+        }
+      };
     }
 
     _launch(container, appBuilder);
@@ -212,6 +222,15 @@ class AppInitializer {
     if (stored != null && stored.isNotEmpty) return stored;
     const buildDsn = String.fromEnvironment('SENTRY_DSN');
     return buildDsn;
+  }
+
+  /// Starts the Sentry SDK against [dsn] and re-installs the error
+  /// handlers so `errorLogger` stays authoritative (#1769).
+  static Future<void> _startSentry(String dsn) async {
+    final packageInfo = await _resolvePackageInfo();
+    await SentryFlutter.init(
+        (options) => _configureSentryOptions(options, dsn, packageInfo));
+    _installErrorHandlers();
   }
 
   // Phase 2 — storage.

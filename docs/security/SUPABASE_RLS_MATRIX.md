@@ -56,7 +56,7 @@ Legend:
 | Table              | SELECT       | INSERT          | UPDATE     | DELETE             | Notes |
 |--------------------|--------------|-----------------|------------|--------------------|-------|
 | `users`            | own          | own             | own        | own + owner-or-svc | Splits `users_own` into per-op policies. Delete is gated by `is_database_owner()` so a single compromised account can't wipe the user table. |
-| `favorites`        | own          | own             | own        | own                | Single `favorites_own` `FOR ALL`. Bulk-delete trigger caps each statement at 100 rows. |
+| `favorites`        | own          | own             | own        | own                | Single `favorites_own` `FOR ALL`. Bulk-delete trigger caps each statement at 100 rows. The `kind` (`'fuel'`/`'ev'`) and JSONB `data` payload columns (#3452, schema v5) sit under the same policy — no column-level grant. |
 | `alerts`           | own          | own             | own        | own                | Single `alerts_own` `FOR ALL`. Bulk-delete trigger applies. |
 | `price_snapshots`  | all          | (svc)           | (svc)      | (svc)              | Aggregate prices visible to every authenticated client; only Edge Functions write. |
 | `price_reports`    | all          | own (`reporter_id = auth.uid()`) | (none) | own + owner-or-svc | Reports are crowdsourced; reads are public among authenticated users. There is no UPDATE policy on purpose — corrections are new reports, not edits. |
@@ -69,11 +69,32 @@ Legend:
 | `vehicles`         | own          | own             | own        | own                | Single `vehicles_own` `FOR ALL`. |
 | `fill_ups`         | own          | own             | own        | own                | Single `fill_ups_own` `FOR ALL`. |
 | `obd2_baselines`   | own          | own             | own        | own                | Single `obd2_baselines_own` `FOR ALL`. |
-| `trip_summaries`   | own          | own             | own        | own                | Single `trip_summaries_own` `FOR ALL`. |
-| `trip_details`     | own          | own             | own        | own                | Single `trip_details_own` `FOR ALL`.   |
-| `wait_time_pings`  | own          | own             | own        | own                | Single `wait_time_pings_own` `FOR ALL`. Aggregator runs as service_role and bypasses RLS. |
+| `trip_summaries`   | own + shared-with-me | own     | own        | own                | `trip_summaries_own` `FOR ALL` plus the additive SELECT-only `trip_summaries_shared_read` (a `trip_shares` row with `shared_with_id = auth.uid()` exists for the trip). Recipients read, never write. |
+| `trip_details`     | own + shared-with-me | own     | own        | own                | `trip_details_own` `FOR ALL` plus the additive SELECT-only `trip_details_shared_read`, same predicate as above. |
+| `trip_shares`      | own (`owner_id = auth.uid()`) + recipient (`shared_with_id = auth.uid()`) | own (`owner_id`, `WITH CHECK`) | own | own | Per-op `trip_shares_owner_select/insert/update/delete` policies plus SELECT-only `trip_shares_recipient_select`. Only the owner can revoke; a recipient can list grants pointing at them but never insert, update or delete one. Both FKs `ON DELETE CASCADE` from `users`, so an account wipe tears down shares given *and* received. |
+| `content_reports`  | own (`reporter_user_id`) | own (`WITH CHECK`) | (none) | own            | Per-op `content_reports_insert_own/select_own/delete_own` (#3726). No UPDATE policy on purpose; nobody reads another user's reports — moderation runs as service_role / SQL editor. The DELETE path serves the GDPR wipe. |
+| `deletions`        | own          | own             | own        | own                | Single `deletions_own` `FOR ALL`. Deletion tombstones (#3078) stamped with `device_id` / `app_version` (#3125); read before every union-merge so a deleted id never resurrects. |
+| `wait_time_pings`  | own          | own             | own        | own                | Single `wait_time_pings_own` `FOR ALL`. Aggregator runs as service_role and bypasses RLS. Wiped by the account-erasure path like every other own-row table. |
 | `wait_time_aggregates` | all      | (svc)           | (svc)      | (svc)              | Single `wait_aggregates_read` SELECT-only policy. Anonymized rolling-median rows are visible to every authenticated client; only Edge Functions write. |
 | `tanksync_meta`    | all          | (svc)           | (svc)      | (svc)              | Single `tanksync_meta_read` SELECT-only policy. Carries only the schema-version marker (#2929) the verifier probes; world-readable, written via the SQL editor / service_role. |
+
+## RPCs (SECURITY DEFINER functions)
+
+RLS does not apply inside a `SECURITY DEFINER` function, so each one is
+its own trust boundary: every function below is pinned to `auth.uid()`
+(a caller can only ever act on themselves), has `search_path` set
+explicitly, and is `REVOKE`d from `PUBLIC` and `anon` before being
+`GRANT`ed to the role listed.
+
+| Function | Callable by | What it does | Notes |
+|----------|-------------|--------------|-------|
+| `delete_user()` | `authenticated` | `DELETE FROM auth.users WHERE id = auth.uid()` — removes the auth identity, including any linked e-mail. | #3712, schema v6. The client wipes the data rows first; a null uid deletes nothing. |
+| `erase_my_data()` | `authenticated` | Deletes every row owned by `auth.uid()` across **all** user tables — `favorites`, `alerts`, `ignored_stations`, `price_reports`, `content_reports`, `vehicles`, `fill_ups`, `itineraries`, `obd2_baselines`, `station_ratings`, `trip_summaries`, `trip_details`, `trip_shares` (given and received), `wait_time_pings`, `push_tokens`, `sync_settings`, `deletions` and finally `public.users` — in **one transaction**, so a partial wipe cannot leave orphaned rows behind. | Being added in Epic #3865 (GDPR). Replaces the client-side per-table delete loop for the "Delete account" path; the app still reports any table it could not erase instead of claiming success. |
+| `share_trip_with_email(p_trip_id, p_email)` | `authenticated` | Resolves the recipient e-mail to a user id server-side and upserts the `trip_shares` row with `owner_id = auth.uid()`. Returns only `true`/`false`. | #3747. Closes the e-mail → UUID oracle: the recipient id never crosses the wire. |
+| `claim_trip_share(token)` | `authenticated` | Writes `auth.uid()` into the unclaimed link-share row matching `token`, after which the `*_shared_read` policies start matching. | #3747 predecessor migration (`trip_shares`). |
+| `resolve_share_recipient(email)` | `service_role` only | Legacy e-mail → UUID lookup. | `REVOKE`d from `authenticated` in `20260818000002` — kept defined for idempotent re-runs and SQL-editor use. |
+| `is_database_owner()` / `auto_register_owner()` | policy / trigger internals | Owner gate on `users` DELETE; first-user registration into `database_owner`. | `search_path` pinned in `20260818000001`. |
+| `audit_rls_policies()` | `service_role` only | Lists every `public.*` table with its RLS state and policy count for the security test. | `REVOKE`d from `anon` and `authenticated`. |
 
 The migration source-of-truth lives in `supabase/migrations/`:
 
@@ -96,8 +117,33 @@ The migration source-of-truth lives in `supabase/migrations/`:
 - `20260506000002_wait_time_aggregator_schedule.sql` — schedule only,
   service-role-driven, no public-table RLS change.
 - `20260507000001_trip_summaries_and_details.sql` — `trip_summaries`, `trip_details`.
+- `20260327000003_indexes.sql` — indexes only, no RLS change.
+- `20260426000001_rls_audit_function.sql` — `audit_rls_policies()` helper,
+  service-role-only; no public-table RLS change.
+- `20260529000001_trip_shares.sql` — `trip_shares` with owner/recipient
+  policies, additive `trip_summaries_shared_read` / `trip_details_shared_read`,
+  `resolve_share_recipient()` and `claim_trip_share()` RPCs.
+- `20260530000001_osm_tiles_bucket.sql` — private Storage bucket for the
+  tile proxy, service-role-only; no public-table RLS change.
 - `20260605000001_tanksync_meta.sql` — `tanksync_meta` schema-version marker
   (#2929), `tanksync_meta_read` SELECT-only policy.
+- `20260609000001_deletion_tombstones.sql` — `deletions`, `deletions_own`
+  (#3078, schema v3).
+- `20260610000001_deletion_forensics.sql` — `deletions.device_id` /
+  `app_version` columns (#3125, schema v4); no RLS change.
+- `20260703000001_favorites_kind_and_payload.sql` — `favorites.kind` /
+  `favorites.data` columns (#3452, schema v5); no RLS change.
+- `20260815000001_delete_user_rpc.sql` — `delete_user()` RPC (#3712,
+  schema v6); no public-table RLS change.
+- `20260816000001_content_reports.sql` — `content_reports` with per-op own
+  policies (#3726).
+- `20260818000001_pin_owner_fn_search_path.sql` — pins `search_path` on
+  `is_database_owner()`, `auto_register_owner()`, `limit_bulk_delete()`;
+  no RLS change.
+- `20260818000002_share_trip_with_email.sql` — `share_trip_with_email()`
+  RPC; revokes `resolve_share_recipient()` from `authenticated` (#3747).
+- *(Epic #3865, pending)* — `erase_my_data()` RPC; no public-table RLS
+  change.
 
 If a migration not listed above is found in `supabase/migrations/`,
 this matrix is stale. See "How to update" below.

@@ -4,15 +4,18 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/features/receipts_ocr/data/receipt_parser.dart';
 import 'package:tankstellen/features/receipts_ocr/data/receipt_scan_service.dart';
 import 'package:tankstellen/features/fill_ups/presentation/widgets/fill_up_scan_handlers.dart';
 import 'package:tankstellen/features/fill_ups/presentation/widgets/fill_up_share_scan_handlers.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
+import '../../../../helpers/fake_settings_storage.dart';
 import '../../../../helpers/silence_error_logger.dart';
 
 /// Reuse-fidelity coverage for the #2734 shared receipt-outcome prefill.
@@ -143,15 +146,25 @@ Future<({String path, Directory dir})> _tempCapture() async {
 Future<BuildContext> _localizedContext(WidgetTester tester) async {
   late BuildContext captured;
   await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      locale: const Locale('en'),
-      home: Builder(
-        builder: (context) {
-          captured = context;
-          return const Scaffold(body: SizedBox());
-        },
+    ProviderScope(
+      overrides: [
+        // #3872 — the camera path gates on the once-per-install camera
+        // rationale (read off the ProviderScope); pre-acknowledged so
+        // these tests keep exercising the scan BEHIND it.
+        settingsStorageProvider.overrideWithValue(
+          FakeSettingsStorage.rationalesShown(),
+        ),
+      ],
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
+        home: Builder(
+          builder: (context) {
+            captured = context;
+            return const Scaffold(body: SizedBox());
+          },
+        ),
       ),
     ),
   );

@@ -191,8 +191,9 @@ void main() {
           steps.singleWhere((s) => s.label == 'pinned-id-mismatch');
       expect(mismatch.status, Obd2ConnectStepStatus.fail);
       // PII stays redacted in the step detail.
-      expect(mismatch.detail, isNot(contains('11:22:33')));
-      expect(mismatch.detail, isNot(contains('AA:BB:CC')));
+      // #3870 — the vendor prefix stays visible; the device-unique tail must not.
+      expect(mismatch.detail, isNot(contains('44:55:66')));
+      expect(mismatch.detail, isNot(contains('DD:EE:F1')));
     });
 
     test('the SAME id (case-insensitive) does NOT stamp a mismatch',

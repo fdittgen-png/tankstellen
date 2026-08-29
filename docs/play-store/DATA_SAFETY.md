@@ -6,27 +6,37 @@
 # Play Store Data Safety Form Responses
 
 > Reference document mirroring the Google Play Console Data Safety section.
-> Last updated: 15 August 2026 — matches the corrected declaration sent for
-> review on 14 August 2026 (#3712). The April 2026 version of this file
-> declared "no data collection", which stopped being true when TankSync grew
-> accounts and server-side sync — do NOT re-import the old answers.
+> Last updated: 29 August 2026 — reconciled with privacy policy **v3**
+> (29 August 2026, Epic #3865) and the machine-readable inventory
+> `docs/privacy/data_inventory.json`, which is the source of truth for the
+> collected types below. The 15 August 2026 revision matched the corrected
+> declaration sent for review on 14 August 2026 (#3712). The April 2026
+> version of this file declared "no data collection", which stopped being
+> true when TankSync grew accounts and server-side sync — do NOT re-import
+> the old answers.
 
 ## Overview
 
 - **App collects or shares user data?** Yes
 - **All data encrypted in transit?** Yes (all network calls use HTTPS/TLS)
-- **Users can request data deletion?** Yes (local: Settings > Delete all data;
-  account + server data: TankSync > Data Transparency > Delete account —
-  wipes every owned row AND deletes the auth identity via the `delete_user`
-  RPC, schema v6)
+- **Users can request data deletion?** Yes (local: Settings > Privacy
+  Dashboard > Delete all data; account + server data: TankSync > Data
+  Transparency > Delete account — wipes every owned row in one transaction
+  AND deletes the auth identity, including any linked e-mail)
 - **Account/data deletion URL (Console field):** https://fdittgen-png.github.io/tankstellen/privacy-policy/
 - **Privacy policy URL:** https://fdittgen-png.github.io/tankstellen/privacy-policy/
   (NOT the GitHub repo URL — that was the pre-2026-08-14 mistake)
 
 All collected types below share these answers: **optional / user-controlled**
-(TankSync is off by default), **encrypted in transit**, **no third-party
-sharing**, **not processed ephemerally** (synced data persists server-side
-until the user deletes it).
+(TankSync and Error reporting are off by default), **encrypted in transit**,
+**no third-party sharing** in Play's sense (Supabase and Sentry act as
+processors on the developer's behalf), **not processed ephemerally** (synced
+data persists server-side until the user deletes it; Sentry keeps crash
+reports 90 days).
+
+Collected types, exactly as the inventory lists them: **Email address**,
+**User IDs**, **Precise location**, **Purchase history** (fill-ups), **Other
+user-generated content**, **Crash logs**, **Diagnostics**.
 
 ---
 
@@ -69,6 +79,20 @@ until the user deletes it).
 | **Required or optional?** | Optional |
 | **Purpose** | App functionality (community price reports, ratings, sharing) |
 
+### App info and performance
+
+| Question | Answer |
+|----------|--------|
+| **Crash logs** | Yes — opt-in via the **Error reporting** consent (off by default), sent to Sentry |
+| **Diagnostics** | Yes — opt-in performance traces via the same consent, sent to Sentry |
+| **Linked to the user's identity?** | No — traces are scrubbed of e-mail addresses, coordinates and tokens before they are stored or sent; no user ID is attached |
+| **Shared with third parties?** | No (Sentry is a processor; EU/US under the EU-US Data Privacy Framework) |
+| **Required or optional?** | Optional (Error reporting consent; revocable under Settings > Privacy & data) |
+| **Purpose** | Analytics in Play's taxonomy (crash diagnostics — fixing bugs) |
+
+The Sentry SDK ships in the Play and iOS builds and stays dormant until the
+user opts in; the F-Droid flavor has it compiled out entirely.
+
 ---
 
 ## Data NOT collected
@@ -76,8 +100,7 @@ until the user deletes it).
 Name, phone number, physical address, health info, messages, photos/videos
 (camera is only used for on-device receipt scanning the user initiates —
 images never leave the device), audio, files, calendar, contacts, web
-browsing history, installed apps, advertising ID, crash logs / performance
-diagnostics (no Sentry or analytics SDK is active in shipped builds).
+browsing history, installed apps, advertising ID.
 
 ---
 
@@ -85,10 +108,13 @@ diagnostics (no Sentry or analytics SDK is active in shipped builds).
 
 Search coordinates are sent as query parameters to the fuel-price /
 charging / geocoding APIs (Tankerkönig, Prix Carburants, national fuel
-APIs, OpenChargeMap, Nominatim, OSM tiles) to answer the user's own
-search. Nothing is sold or shared for advertising/analytics. TankSync data
-goes only to the **user's chosen Supabase backend** (the developer-hosted
-default or their own self-hosted project).
+APIs, OpenChargeMap, Nominatim, OSM tiles — by default through the
+Sparkilo tile proxy on the same EU Supabase project, which the user can
+switch off under Settings > Privacy) to answer the user's own search.
+Nothing is sold or shared for advertising/analytics. TankSync data goes
+only to the **user's chosen Supabase backend** (the developer-hosted
+Sparkilo Community project in the EU, AWS eu-central-1, or their own
+self-hosted project).
 
 ---
 
@@ -107,14 +133,25 @@ default or their own self-hosted project).
 ## Data deletion
 
 ### Local data
-**Settings > Delete all data** removes profiles, favorites, API keys,
-cached prices, trips and settings from the device.
+**Settings > Privacy Dashboard > Delete all data** removes every database
+the app keeps on the device — profiles, favorites, alerts, price history,
+cached prices, vehicles, fill-ups, recorded trips and their GPS samples,
+OBD2 baselines, service reminders, error traces, API keys, tokens and the
+widget data — and returns the app to its first-launch state.
+
+### Export
+**Settings > Privacy Dashboard > Export all my data** writes one ZIP with a
+machine-readable JSON per category, one GPX per trip, the consent record and
+a JSON export of every server table (Art. 20 GDPR portability).
 
 ### Account + server data (TankSync)
 **TankSync > Data Transparency > Delete account** performs, in order:
-1. Row wipe of every owned table (`UserDataSync.deleteAll` — favorites,
-   alerts, push tokens, price reports, vehicles, fill-ups, itineraries,
-   OBD2 baselines, ratings, tombstones, trips).
+1. Row wipe of every owned table in one transaction (favorites, alerts,
+   ignored stations, price reports, content reports, vehicles, fill-ups,
+   itineraries, OBD2 baselines, ratings, trips, trip shares given or
+   received, wait-time pings, sync settings, deletion tombstones and the
+   `users` row). If a table could not be erased the app names it instead of
+   claiming success.
 2. **Auth identity deletion** via the `delete_user` SECURITY DEFINER RPC
    (schema v6, #3712) — removes the `auth.users` row, including any
    linked e-mail. Self-hosted schemas older than v6 are flagged by the
@@ -132,6 +169,7 @@ After deletion the account cannot be recovered.
 3. **Location** → **Precise location**: collected, optional, app functionality, not shared, not ephemeral
 4. **Financial info** → Purchase history: collected, optional, app functionality, not shared
 5. **App activity** → Other user-generated content: collected, optional, app functionality, not shared
-6. Everything else → **Not collected**
-7. Encrypted in transit → Yes; deletion mechanism → Yes
-8. Privacy policy URL: `https://fdittgen-png.github.io/tankstellen/privacy-policy/`
+6. **App info and performance** → Crash logs + Diagnostics: collected, optional (Error reporting consent), analytics, not shared, not linked to identity
+7. Everything else → **Not collected**
+8. Encrypted in transit → Yes; deletion mechanism → Yes
+9. Privacy policy URL: `https://fdittgen-png.github.io/tankstellen/privacy-policy/` (policy v3, 29 August 2026)

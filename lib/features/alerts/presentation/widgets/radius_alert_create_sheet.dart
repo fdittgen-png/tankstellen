@@ -10,7 +10,9 @@ import '../../background/fuel_price_fields.dart';
 import '../../../../core/country/country_config.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/location/user_position_provider.dart';
+import '../../../../core/permissions/permission_rationale_dialog.dart';
 import '../../../../core/services/country_service_registry.dart';
+import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/fuel_type.dart';
@@ -198,7 +200,17 @@ class _RadiusAlertCreateSheetState
       frequencyPerDay: _frequencyPerDay,
     );
 
-    await ref.read(radiusAlertsProvider.notifier).add(alert);
+    // #3872 (GDPR) — `add` requests the OS notification permission for an
+    // enabled radius alert (#2246); the one-time rationale precedes it.
+    // Captured pre-await so `ref` is never read after a possible unmount.
+    final radiusAlerts = ref.read(radiusAlertsProvider.notifier);
+    await PermissionRationaleDialog.show(
+      context,
+      kind: PermissionRationaleKind.notifications,
+      storage: ref.read(settingsStorageProvider),
+    );
+    if (!mounted) return;
+    await radiusAlerts.add(alert);
     if (!mounted) return;
     Navigator.of(context).pop();
   }

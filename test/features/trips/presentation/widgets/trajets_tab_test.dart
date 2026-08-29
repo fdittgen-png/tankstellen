@@ -18,6 +18,8 @@ import 'package:tankstellen/features/trips/presentation/widgets/trajets_tab.dart
 import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
+import 'package:tankstellen/core/storage/storage_providers.dart';
+import '../../../../helpers/fake_settings_storage.dart';
 import '../../../../helpers/silence_error_logger.dart';
 
 import '../../../../helpers/pump_app.dart';
@@ -308,6 +310,12 @@ Future<void> _pumpTab(
       ),
       if (obd2Connection != null)
         obd2ConnectionProvider.overrideWith((_) => obd2Connection),
+      // #3872 — the picker entry gates on the once-per-install Bluetooth
+      // rationale; pre-acknowledged so the CTA tests keep exercising the
+      // sheet BEHIND it.
+      settingsStorageProvider.overrideWithValue(
+        FakeSettingsStorage.rationalesShown(),
+      ),
     ],
   );
 }

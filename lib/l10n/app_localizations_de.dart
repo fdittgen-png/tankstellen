@@ -2725,7 +2725,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get syncModeCommunitySubtitle =>
-      'Favoriten & Bewertungen mit allen Nutzern teilen';
+      'Gemeinsame Datenbank, betrieben vom Entwickler — was synchronisiert wird, steht unten';
 
   @override
   String get syncModePrivateTitle => 'Private Datenbank';
@@ -5349,6 +5349,108 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wenn aus, sind Abzeichen, Punkte und Pokal-Symbole überall ausgeblendet.';
 
   @override
+  String gdprPolicyLink(int version) {
+    return 'Datenschutzerklärung (Version $version)';
+  }
+
+  @override
+  String consentRecordedAt(String date, int version) {
+    return 'Einwilligung erteilt am $date · Datenschutzerklärung Version $version';
+  }
+
+  @override
+  String get consentNotRecorded => 'Noch keine Einwilligung gespeichert';
+
+  @override
+  String serverErasurePartial(String tables) {
+    return 'Einige Serverdaten konnten nicht gelöscht werden: $tables. Bitte erneut versuchen oder den Entwickler mit dieser Liste kontaktieren.';
+  }
+
+  @override
+  String localErasurePartial(String steps) {
+    return 'Einige lokale Daten konnten nicht gelöscht werden: $steps. App neu starten und erneut versuchen.';
+  }
+
+  @override
+  String get myCommunityReportsTitle => 'Meine Community-Meldungen';
+
+  @override
+  String get myCommunityReportsEmpty =>
+      'Du hast noch keine Meldungen eingereicht';
+
+  @override
+  String get deleteReportTooltip => 'Diese Meldung löschen';
+
+  @override
+  String get reportDeleted => 'Meldung gelöscht';
+
+  @override
+  String get reportDeleteFailed => 'Meldung konnte nicht gelöscht werden';
+
+  @override
+  String get privacyControlsTitle => 'Datenschutz-Einstellungen';
+
+  @override
+  String get tileProxyToggleTitle =>
+      'Kartenkacheln über den Sparkilo-Proxy laden';
+
+  @override
+  String get tileProxyToggleSubtitle =>
+      'An: Kartenausschnitt und IP-Adresse erreichen den EU-Server des Entwicklers, der die Kacheln von OpenStreetMap holt. Aus: Kacheln kommen direkt von tile.openstreetmap.org.';
+
+  @override
+  String get remoteLogosToggleTitle => 'Markenlogos aus dem Internet laden';
+
+  @override
+  String get remoteLogosToggleSubtitle =>
+      'Standardmäßig aus: es werden mitgelieferte Platzhalter angezeigt. An: Logos werden von logo.clearbit.com geladen, das deine IP-Adresse sieht.';
+
+  @override
+  String get privacyExportAllButton => 'Alle meine Daten exportieren (ZIP)';
+
+  @override
+  String privacyExportAllSuccess(String fileName, int count) {
+    return '$fileName in Downloads gespeichert — $count Dateien enthalten';
+  }
+
+  @override
+  String get privacyExportAllFailed =>
+      'Die Exportdatei konnte nicht gespeichert werden';
+
+  @override
+  String syncModeCommunityControllerNotice(String operator) {
+    return 'Betrieben von $operator · Supabase, EU (Frankfurt) · synchronisiert Favoriten, Alarme, Fahrzeuge inkl. FIN, Tankvorgänge, Bewertungen, Meldungen und — falls aktiviert — Fahrten mit GPS';
+  }
+
+  @override
+  String get syncModePrivateControllerNotice =>
+      'Du bist der Verantwortliche — dein eigenes Supabase-Projekt, wir sehen es nie';
+
+  @override
+  String get syncModeJoinControllerNotice =>
+      'Wer die gemeinsame Datenbank besitzt, ist der Verantwortliche für deine Daten';
+
+  @override
+  String get ugcPublicNoticeTitle => 'Für andere Nutzer sichtbar';
+
+  @override
+  String get ugcPublicNoticeBody =>
+      'Dies wird in der Sync-Datenbank unter deiner pseudonymen Nutzer-ID gespeichert. In der Sparkilo Community kann es jeder angemeldete Nutzer lesen. Du kannst es jederzeit unter TankSync → Datentransparenz löschen.';
+
+  @override
+  String get blockedAuthorsTitle => 'Blockierte Nutzer';
+
+  @override
+  String get blockedAuthorsDescription =>
+      'Inhalte dieser Nutzer werden auf diesem Gerät ausgeblendet. Blockierung aufheben, um sie wieder zu sehen.';
+
+  @override
+  String get blockedAuthorsEmpty => 'Keine blockierten Nutzer';
+
+  @override
+  String get blockedAuthorsUnblock => 'Freigeben';
+
+  @override
   String get coachingGpsLiftOff => 'Vom Gas';
 
   @override
@@ -6745,6 +6847,79 @@ class AppLocalizationsDe extends AppLocalizations {
     });
     return '$_temp0';
   }
+
+  @override
+  String get permissionRationaleCameraTitle => 'Kamerazugriff';
+
+  @override
+  String get permissionRationaleCameraSubtitle =>
+      'Diese App möchte Ihre Kamera verwenden, um Belege, Zapfsäulen-Displays und QR-Codes zu lesen.';
+
+  @override
+  String get permissionRationaleCameraWhatHappens =>
+      'Was passiert mit dem Kamerabild:';
+
+  @override
+  String get permissionRationaleCameraBulletOnDevice =>
+      'Das Bild wird nur verwendet, um den Beleg, das Zapfsäulen-Display oder den QR-Code zu lesen — die Erkennung läuft auf Ihrem Gerät.';
+
+  @override
+  String get permissionRationaleCameraBulletDiscarded =>
+      'Das Foto wird nach dem Scan verworfen.';
+
+  @override
+  String get permissionRationaleCameraBulletNoUpload =>
+      'Es wird nichts hochgeladen, es sei denn, Sie melden einen fehlerhaften Scan und bestätigen dies.';
+
+  @override
+  String get permissionRationaleBluetoothTitle => 'Bluetooth-Zugriff';
+
+  @override
+  String get permissionRationaleBluetoothSubtitle =>
+      'Diese App möchte Bluetooth verwenden, um sich mit Ihrem OBD2-Adapter zu verbinden.';
+
+  @override
+  String get permissionRationaleBluetoothWhatHappens =>
+      'Was passiert mit Bluetooth:';
+
+  @override
+  String get permissionRationaleBluetoothBulletAdapterOnly =>
+      'Bluetooth wird nur verwendet, um Ihren OBD2-Adapter zu finden und mit ihm zu kommunizieren.';
+
+  @override
+  String get permissionRationaleBluetoothBulletIdentifierLocal =>
+      'Die Adapterkennung bleibt auf Ihrem Gerät — sie wird nur über TankSync als Teil des Fahrzeugprofils synchronisiert.';
+
+  @override
+  String get permissionRationaleBluetoothBulletLegacyLocation =>
+      'Unter Android 11 und älter fragt das System zusätzlich nach dem Standort, weil die Bluetooth-Suche dort als Standortberechtigung gilt.';
+
+  @override
+  String get permissionRationaleNotificationsTitle => 'Benachrichtigungen';
+
+  @override
+  String get permissionRationaleNotificationsSubtitle =>
+      'Diese App möchte Ihnen Benachrichtigungen für Preisalarme und den Status der Fahrtaufzeichnung senden.';
+
+  @override
+  String get permissionRationaleNotificationsWhatHappens =>
+      'Was passiert mit Benachrichtigungen:';
+
+  @override
+  String get permissionRationaleNotificationsBulletLocal =>
+      'Benachrichtigungen werden für lokale Preisalarme und den Status der Fahrtaufzeichnung verwendet.';
+
+  @override
+  String get permissionRationaleNotificationsBulletNothingLeaves =>
+      'Sie werden auf Ihrem Gerät erzeugt — nichts verlässt das Gerät.';
+
+  @override
+  String get permissionRationaleRevoke =>
+      'Sie können dies jederzeit in den Geräteeinstellungen widerrufen.';
+
+  @override
+  String get permissionRationaleLegalBasis =>
+      'Rechtsgrundlage: Art. 6 Abs. 1 lit. a DSGVO (Einwilligung)';
 
   @override
   String get tripRecordingPipEstConsumptionCaption => 'gesch. L/100 km';

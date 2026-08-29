@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sparkilo — Adatvédelmi tájékoztató</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+
+<h1>Adatvédelmi tájékoztató</h1>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen iOS-en, de.tankstellen.fuelprices Androidon) &mdash; Version 3 &mdash; Utolsó frissítés: 2026. augusztus 29.</p>
+<p class="langs">Elérhető nyelvek: <a href="../">English</a> <a href="../bg/">Български</a> <a href="../cs/">Čeština</a> <a href="../da/">Dansk</a> <a href="../de/">Deutsch</a> <a href="../el/">Ελληνικά</a> <a href="../es/">Español</a> <a href="../et/">Eesti</a> <a href="../fi/">Suomi</a> <a href="../fr/">Français</a> <a href="../hr/">Hrvatski</a> <a href="../hu/">Magyar</a> <a href="../it/">Italiano</a> <a href="../ko/">한국어</a> <a href="../lt/">Lietuvių</a> <a href="../lv/">Latviešu</a> <a href="../nb/">Norsk</a> <a href="../nl/">Nederlands</a> <a href="../pl/">Polski</a> <a href="../pt/">Português</a> <a href="../ro/">Română</a> <a href="../sk/">Slovenčina</a> <a href="../sl/">Slovenščina</a> <a href="../sv/">Svenska</a></p>
+
+<h2>1. Áttekintés</h2>
+<p>A Sparkilo egy ingyenes, nyílt forráskódú üzemanyagár- és elektromos töltési ár-összehasonlító alkalmazás, opcionális útrögzítéssel. <strong>Local-first</strong> elven épül: minden, amit az alkalmazás Önről tud, az Ön telefonján marad, hacsak nem kapcsol be egy olyan funkciót, amely kifejezetten mást ír le. Nincsenek hirdetések, nincsenek nyomkövető pixelek, nincsenek hirdetési azonosítók és nincs analitikai SDK. Ez a tájékoztató az EU általános adatvédelmi rendeletének (GDPR) való megfelelés céljával készült; minden felhasználóra vonatkozik, bárhol is tartózkodik.</p>
+<p>Az alkalmazás <a href="https://github.com/fdittgen-png/tankstellen">nyílt forráskódú</a> — az alábbi állítások mindegyike ellenőrizhető a kódban. A feldolgozott adatok gépileg olvasható összefoglalója a <code>docs/privacy/data_inventory.json</code> fájlban található, és az alkalmazás saját tesztjei hibát jeleznek, ha ez az oldal, az áruházi nyilatkozatok és a kód eltérnek egymástól.</p>
+
+<h2>2. Ki a felelős (az adatkezelő)</h2>
+<p>Az alkalmazás és az opcionális Sparkilo Community szinkronizálási szolgáltatás adatkezelője:</p>
+<div class="contact">
+  <p><strong>Florian DITTGEN</strong> (egyéni fejlesztő)</p>
+  <p><strong>E-mail:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
+  <p><strong>Forráskód és hibakövető:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
+</div>
+<p>Attól függően, hogyan használja a TankSync szolgáltatást, a szinkronizált adatainak adatkezelője változik:</p>
+<ul>
+  <li><strong>Nincs TankSync (alapértelmezett):</strong> semmi sem kerül tárolásra az általunk üzemeltetett szervereken. Az adatai az Ön eszközén maradnak, és kizárólag Ön rendelkezik felettük.</li>
+  <li><strong>Privát adatbázis:</strong> Ön a saját Supabase projektjét csatlakoztatja. Ön az adatkezelő; mi soha nem látjuk ezeket az adatokat.</li>
+  <li><strong>Csatlakozás egy csoporthoz:</strong> Ön egy olyan Supabase projektet csatlakoztat, amelyet egy Ön által ismert személy (család, barátok) üzemeltet. Ez a személy a megosztott adatbázis adatkezelője.</li>
+  <li><strong>Sparkilo Community:</strong> Ön a fent megnevezett fejlesztő által üzemeltetett megosztott adatbázishoz csatlakozik (Supabase, az EU-ban üzemeltetve — AWS eu-central-1, Frankfurt). Az adatkezelő a fejlesztő; a Supabase, Inc. adatfeldolgozó, amelyet az adatfeldolgozási feltételei kötnek.</li>
+</ul>
+<p>Az alkalmazás a csatlakozás előtt közli Önnel, hogy ezek közül melyik érvényes, és ezt újra megjeleníti a Beállítások → Adatvédelmi irányítópult alatt.</p>
+
+<h2>3. Az általunk használt adatok</h2>
+<p>A táblázat felsorolja az alkalmazás által feldolgozott személyes adatok minden fajtáját, hogy miért, milyen jogalapon (GDPR 6. cikk), hová kerülnek, és meddig őrizzük meg őket. Az „Eszköz” azt jelenti, hogy az adat soha nem hagyja el a telefonját.</p>
+<table>
+  <thead><tr><th>Adat</th><th>Cél</th><th>Jogalap</th><th>Hová kerül</th><th>Megőrzés</th></tr></thead>
+  <tbody>
+    <tr><td>Hozzávetőleges / pontos helyzet (keresés)</td><td>Az Ön közelében lévő töltőállomások megtalálása</td><td>Hozzájárulás (Ön megadja a helymeghatározási engedélyt, és megerősíti az alkalmazáson belüli magyarázatot)</td><td>Keresési koordinátákként elküldjük annak az országnak az áradatforrásához, ahol Ön tartózkodik (5. szakasz). Nem tároljuk az általunk üzemeltetett szervereken.</td><td>Az utolsó pozíciót az eszközön őrizzük a kezdőképernyő-widget számára, amíg Ön nem törli az adatokat</td></tr>
+    <tr><td>Pontos GPS-útvonal, sebesség, magasság, mozgásérzékelők (útrögzítés)</td><td>Út rögzítése, távolság és fogyasztás kiszámítása</td><td>Hozzájárulás (Ön indítja el a rögzítést; az automatikus rögzítéshez járművenként külön háttérbeli helymeghatározási engedély szükséges)</td><td>Eszköz. Bekapcsolt TankSync <em>és</em> útszinkronizálás esetén: az Ön TankSync-adatbázisa.</td><td>Eszköz: amíg Ön nem törli az utat vagy az összes adatot. Szerver: az útösszefoglalók, amíg Ön nem törli őket; a részletes GPS-minták az út után 90 nappal törlődnek.</td></tr>
+    <tr><td>Járműprofil (gyártó, modell, évjárat, tankméret, alvázszám, OBD2-adapter azonosítója)</td><td>Fogyasztásszámítás, adapter újracsatlakoztatása</td><td>Szerződés (az Ön által beállított funkció biztosítása)</td><td>Eszköz. TankSync esetén: az Ön TankSync-adatbázisa.</td><td>Amíg Ön nem törli a járművet vagy az összes adatot</td></tr>
+    <tr><td>Alvázszám (17 karakter)</td><td>Gyártó/modell/motor online dekódolása</td><td>Hozzájárulás (külön kapcsoló, alapértelmezés szerint kikapcsolva; egyébként offline dekóder fut)</td><td>NHTSA vPIC (amerikai közszolgáltatás), csak az alvázszám</td><td>Mi nem tároljuk; lásd az NHTSA tájékoztatóját</td></tr>
+    <tr><td>Tankolások (dátum, töltőállomás, liter, költség, kilométeróra-állás), töltési naplók, szervizemlékeztetők</td><td>Az Ön üzemanyagnaplója és statisztikái</td><td>Szerződés</td><td>Eszköz. TankSync esetén: az Ön TankSync-adatbázisa.</td><td>Amíg Ön nem törli őket vagy az összes adatot</td></tr>
+    <tr><td>Kedvencek, figyelmen kívül hagyott töltőállomások, árértesítések, keresési profilok, útitervek, beállítások</td><td>Az alkalmazás személyre szabása; helyi árértesítési értesítések küldése</td><td>Szerződés</td><td>Eszköz. TankSync esetén: az Ön TankSync-adatbázisa.</td><td>Amíg Ön nem törli őket vagy az összes adatot</td></tr>
+    <tr><td>Anonim felhasználói azonosító (véletlenszerű UUID), opcionális e-mail-cím, telepítésenkénti eszközazonosító</td><td>TankSync-fiókjának azonosítása az eszközök között; annak jelölése, hogy melyik eszköz törölt egy rekordot</td><td>Hozzájárulás (Felhőszinkronizálás kapcsoló) / Szerződés</td><td>Az Ön TankSync-adatbázisa (Supabase)</td><td>Amíg Ön nem törli a fiókot</td></tr>
+    <tr><td>Közösségi árbejelentések, megosztott töltőállomás-értékelések, tartalombejelentések</td><td>Közösségi árkorrekciók és moderálás</td><td>Hozzájárulás (Ön küldi be őket; egy figyelmeztetés elmagyarázza, hogy az Ön álnevesített azonosítója alatt tároljuk őket, és más bejelentkezett felhasználók számára olvashatók)</td><td>Az Ön TankSync-adatbázisa — a Sparkilo Community esetében minden bejelentkezett felhasználó számára olvasható</td><td>Amíg Ön nem törli a bejelentést vagy a fiókot</td></tr>
+    <tr><td>Hibajelentések és teljesítménynyomok (alkalmazásverzió, operációs rendszer verziója, képernyőméret, nyelvi beállítás, veremkiíratás, az utolsó alkalmazásműveletek)</td><td>Hibák javítása</td><td>Hozzájárulás (Hibajelentés kapcsoló, alapértelmezés szerint kikapcsolva)</td><td>Sentry</td><td>Eszköz: az 50 legutóbbi nyom, 7 napig, tárolás előtt megtisztítva az e-mail-címektől, koordinátáktól és tokenektől. Sentry: 90 nap.</td></tr>
+    <tr><td>Nyugta- vagy kútfotó (kamera / fotógaléria)</td><td>A nyugta olvasása az eszközön (eszközön futó OCR)</td><td>Hozzájárulás (Ön készíti vagy választja ki a fotót)</td><td>Csak az eszközön. Csak akkor csatoljuk egy GitHub-issue-hoz, ha Ön „rossz beolvasás” jelentést küld és ezt megerősíti.</td><td>A beolvasás után törlődik; a jelentésben szereplő másolat a GitHubon marad, amíg Ön nem törli az issue-t</td></tr>
+    <tr><td>Térképnézet (csempekoordináták) és IP-cím</td><td>A térkép megrajzolása</td><td>Jogos érdek (a térképhez csempék kellenek) — a proxyt Ön kikapcsolhatja</td><td>A Sparkilo csempeproxy (ugyanaz a Supabase projekt, EU), amely az OpenStreetMap szervereiről tölt le; vagy közvetlenül a tile.openstreetmap.org, ha a proxy ki van kapcsolva (Beállítások → Adatvédelem) vagy az F-Droid buildben</td><td>A szokásos szervernaplókon túl nem tároljuk (proxy: 7 nap)</td></tr>
+    <tr><td>Útvonal kiindulási pontja és célja, úthálózati lekérdezések</td><td>Útvonalkeresés, siklás-tanácsadás</td><td>Szerződés</td><td>OSRM (router.project-osrm.org), Overpass API (overpass-api.de), Nominatim (nominatim.openstreetmap.org)</td><td>Mi nem tároljuk</td></tr>
+    <tr><td>Az Ön által beírt címszöveg vagy koordináták</td><td>Geokódolás</td><td>Szerződés</td><td>Nominatim, vagy a telefon beépített geokódolója (Apple / Google)</td><td>Mi nem tároljuk</td></tr>
+    <tr><td>Az Ön által megadott API-kulcsok (Tankerkönig, OpenChargeMap)</td><td>E szolgáltatások meghívása az Ön nevében</td><td>Szerződés</td><td>Csak ahhoz a szolgáltatóhoz, amelyhez a kulcs tartozik</td><td>Titkosítva az eszközön (Keystore / Keychain), amíg Ön nem törli őket</td></tr>
+    <tr><td>Hibás név / hibás cím töltőállomás-bejelentések, rossz beolvasás bejelentések</td><td>Az adatok javítása</td><td>Hozzájárulás (Ön küldés előtt megerősíti; személyes GitHub-token szükséges)</td><td>GitHub (nyilvános issue a projekt tárolójában)</td><td>Nyilvános, amíg az issue-t nem törlik</td></tr>
+  </tbody>
+</table>
+<p>Az alkalmazás nem hoz Önre nézve joghatással vagy hasonlóan jelentős hatással járó automatizált döntéseket. Az árelőrejelzéseket az eszköz nyilvános áradatokból számítja ki.</p>
+
+<h2>4. Adatok, amelyeket NEM gyűjtünk</h2>
+<ul>
+  <li>Név vagy telefonszám (e-mail-címet csak akkor tárolunk, ha Ön összekapcsol egyet az opcionális TankSync-fiókjával)</li>
+  <li>Fizetési vagy banki adatok</li>
+  <li>Egészségügyi vagy fitneszadatok</li>
+  <li>Névjegyek, üzenetek vagy hívásnaplók</li>
+  <li>Fotók, videók vagy fájlok az Ön által beolvasásra kiválasztott nyugtafotón kívül</li>
+  <li>Böngészési előzmények</li>
+  <li>Hirdetési azonosítók</li>
+</ul>
+<p>A márkalogók az alkalmazással együtt kerülnek telepítésre. Az internetről való betöltésük (logo.clearbit.com, amely megkapná az Ön IP-címét) ki van kapcsolva, hacsak Ön be nem kapcsolja a Beállítások → Adatvédelem alatt.</p>
+
+<h2>5. Harmadik felek szolgáltatásai és adatforrások</h2>
+<p>Az alkalmazás a következő szolgáltatásokkal kommunikál. Mindegyiknek saját adatvédelmi tájékoztatója van. Az alkalmazás soha nem oszt meg adatokat közöttük, és soha nem küld többet, mint amit a fenti oszlopok leírnak.</p>
+<h3>5.1 Infrastruktúra (csak ha a megfelelő funkció be van kapcsolva)</h3>
+<ul>
+  <li><strong>Supabase</strong> (klelxnkzrxlpzuddhpfg.supabase.co, AWS eu-central-1) — TankSync-háttérrendszer a Sparkilo Community és a csempeproxy számára. Adatfeldolgozó a Supabase adatfeldolgozási kiegészítő megállapodása alapján.</li>
+  <li><strong>Sentry</strong> (sentry.io) — hibajelentések és teljesítménynyomok, kizárólag hozzájárulás alapján. A Sentry az Egyesült Államokban is feldolgozhat adatokat; az adattovábbításokat az EU–USA adatvédelmi keretrendszer és általános szerződési feltételek fedik le.</li>
+  <li><strong>GitHub</strong> (api.github.com, github.com) — az Ön által kifejezetten benyújtott hibajelentések; az alkalmazás emellett nyilvános adatállományokat (autópálya-kijáratok, töltőállomás-listák) tölt le a projekt kiadásaiból, ami felfedi az Ön IP-címét a GitHub számára.</li>
+  <li><strong>OpenStreetMap</strong> (tile.openstreetmap.org, nominatim.openstreetmap.org), <strong>OSRM</strong> (router.project-osrm.org), <strong>Overpass API</strong> (overpass-api.de) — térképek, geokódolás, útvonaltervezés.</li>
+  <li><strong>OpenChargeMap</strong> (api.openchargemap.io) és <strong>ODRÉ / IRVE</strong> (odre.opendatasoft.com) — elektromos töltőállomások és árak. Kapják: keresési koordináták.</li>
+  <li><strong>NHTSA vPIC</strong> (vpic.nhtsa.dot.gov) — alvázszám-dekódolás, hozzájáruláshoz kötve.</li>
+  <li><strong>Clearbit Logo API</strong> (logo.clearbit.com) — márkalogók, alapértelmezés szerint kikapcsolva.</li>
+  <li><strong>Apple Maps / Google Maps</strong> (www.google.com) — csak akkor nyílik meg a böngészőjében vagy térképalkalmazásában, ha Ön a „Navigálás” gombra koppint.</li>
+</ul>
+<h3>5.2 Hivatalos üzemanyagár-adatforrások (az Ön keresési koordinátáit vagy régióját kapják, az Ön személyazonosságát soha)</h3>
+<ul>
+  <li>Németország — Tankerkönig (creativecommons.tankerkoenig.de), az Ön saját API-kulcsával</li>
+  <li>Franciaország — Prix Carburants (data.economie.gouv.fr, donnees.roulez-eco.fr)</li>
+  <li>Olaszország — MIMIT osservaprezzi (carburanti.mise.gov.it)</li>
+  <li>Spanyolország — MITECO / Geoportal Gasolineras (sedeaplicaciones.minetur.gob.es, geoportalgasolineras.es)</li>
+  <li>Ausztria — E-Control Spritpreisrechner (api.e-control.at)</li>
+  <li>Belgium és Luxemburg — data.public.lu, STATEC (lustat.statec.lu)</li>
+  <li>Portugália — DGEG (precoscombustiveis.dgeg.gov.pt)</li>
+  <li>Dánia — OK (mobility-prices.ok.dk), Shell (shellpumpepriser.geoapp.me)</li>
+  <li>Egyesült Királyság — Fuel Finder (www.fuel-finder.service.gov.uk) és az általa felsorolt kiskereskedői árfolyamok: applegreenstores.com, fuelprices.asconagroup.co.uk, storelocator.asda.com, www.bp.com, fuelprices.esso.co.uk, jetlocal.co.uk, api2.krlmedia.com, www.morrisons.com, moto-way.com, fuel.motorfuelgroup.com, www.rontec-servicestations.co.uk, api.sainsburys.co.uk, www.sgnretail.uk, www.shell.co.uk, www.tesco.com</li>
+  <li>Szlovénia — goriva.si</li>
+  <li>Románia — Monitorul Prețurilor (monitorulpreturilor.info)</li>
+  <li>Görögország — Παρατηρητήριο Τιμών (paratiritirio.mindev.gov.gr) egy AWS eu-west-3 régióban üzemeltetett közösségi tükrön keresztül (5fcbs3i0z4.execute-api.eu-west-3.amazonaws.com)</li>
+  <li>Dél-Korea — Opinet (www.opinet.co.kr)</li>
+  <li>Chile — CNE (api.cne.cl)</li>
+  <li>Argentína — datos.energia.gob.ar</li>
+  <li>Mexikó — CRE (publicacionexterna.azurewebsites.net)</li>
+  <li>Ausztrália — FuelCheck NSW (www.fuelcheck.nsw.gov.au)</li>
+</ul>
+
+<h2>6. Adatbiztonság</h2>
+<ul>
+  <li>Minden hálózati kommunikáció HTTPS-t használ (TLS átvitel közben); az alkalmazás elutasítja a sima HTTP szinkronizálási végpontokat.</li>
+  <li>Az API-kulcsok, az Ön GitHub-tokenje és a TankSync-munkamenet a platform natív titkosított tárolójában találhatók (Android Keystore / iOS Keychain).</li>
+  <li>A helyi adatbázisok AES-titkosításúak, a kulcsot a Keystore / Keychain őrzi — beleértve a rögzített utakat, a járműadatokat, a szervizemlékeztetőket és a gyorsítótárazott árakat.</li>
+  <li>A szerveren minden táblát sorszintű biztonság véd, így egy fiók kizárólag a saját sorait olvashatja vagy törölheti; a megosztott értékelések és a közösségi árbejelentések az egyetlen sorok, amelyek más bejelentkezett felhasználók számára láthatók.</li>
+  <li>A hibanyomokat tárolás vagy elküldés előtt megtisztítjuk az e-mail-címektől, koordinátáktól és tokenektől.</li>
+  <li>Semmilyen adat nem kerül elküldésre egyetlen szerverre sem, hacsak Ön nem indít keresést, nem nyit meg egy térképet, vagy nem kapcsolja be a TankSync / diagnosztika funkciót.</li>
+</ul>
+
+<h2>7. Az Ön jogai</h2>
+<p>A GDPR 15–22. cikke alapján Önnek joga van az adataihoz való hozzáféréshez, azok helyesbítéséhez, törléséhez, kezelésük korlátozásához és hordozhatóságához, a jogos érdeken alapuló adatkezelés elleni tiltakozáshoz, valamint hozzájárulásának bármikori visszavonásához anélkül, hogy ez érintené a korábbi adatkezelés jogszerűségét. Minden joghoz tartozik egy gomb az alkalmazásban:</p>
+<ul>
+  <li><strong>Hozzáférés</strong> — a Beállítások → Adatvédelmi irányítópult megjeleníti az eszközön tárolt minden kategóriát, és csatlakozott állapotban a TankSync-adatbázisának minden sorát.</li>
+  <li><strong>Exportálás (hordozhatóság)</strong> — az Adatvédelmi irányítópult → Összes adatom exportálása egyetlen ZIP-fájlt hoz létre kategóriánként egy gépileg olvasható JSON-nal (kedvencek, értesítések, profilok, útitervek, árelőzmények, járművek, tankolások, utak GPS-mintákkal és utanként egy GPX-fájllal, alapértékek, szervizemlékeztetők, töltési naplók, az Ön hozzájárulási nyilvántartása), valamint minden szervertábla JSON-exportjával.</li>
+  <li><strong>Helyesbítés</strong> — bármely bejegyzést közvetlenül az alkalmazásban szerkeszthet; a módosítás szinkronizálódik, ha a TankSync be van kapcsolva.</li>
+  <li><strong>Törlés</strong> — lásd a 8. szakaszt.</li>
+  <li><strong>Korlátozás / tiltakozás</strong> — kapcsolja ki a TankSync, az útszinkronizálás, a csempeproxy vagy a diagnosztika funkciót a Beállításokban; vonja vissza a helymeghatározási, Bluetooth-, kamera- vagy értesítési engedélyt az eszköz beállításaiban.</li>
+  <li><strong>Hozzájárulás visszavonása</strong> — a Beállítások → Adatvédelem és adatok felsorolja az összes hozzájárulást a megadás dátumával és a tájékoztató Ön által látott verziójával; mindegyik kikapcsolható, és az alkalmazás azonnal leállítja a megfelelő adatkezelést.</li>
+  <li><strong>Panasz</strong> — panaszt nyújthat be egy felügyeleti hatóságnál, különösen a szokásos tartózkodási helye, a munkahelye vagy a feltételezett jogsértés helye szerinti EU-tagállamban. Örülnénk, ha először nekünk adna lehetőséget a probléma kezelésére: <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a>.</li>
+</ul>
+
+<h2>8. Fiókjának és adatainak törlése</h2>
+<p>Mindent saját maga törölhet, közvetlenül az alkalmazásban — nincs szükség támogatási kérelemre:</p>
+<ul>
+  <li><strong>Helyi adatok:</strong> a Beállítások → Adatvédelmi irányítópult → Összes adat törlése eltávolít minden adatbázist, amelyet az alkalmazás az eszközön tárol — profilokat, kedvenceket, értesítéseket, árelőzményeket, gyorsítótárazott árakat, járműveket, tankolásokat, rögzített utakat és azok GPS-mintáit, OBD2-alapértékeket és adapter-gyorsítótárakat, szervizemlékeztetőket, eredményeket, hibanyomokat, API-kulcsokat, tokeneket és a kezdőképernyő-widget adatait —, és visszaállítja az alkalmazást az első indításkori állapotába.</li>
+  <li><strong>TankSync-fiók és szerveradatok:</strong> a TankSync → Adatátláthatóság → Fiók törlése egyetlen tranzakcióban törli az Ön tulajdonában lévő összes sort (kedvencek, értesítések, figyelmen kívül hagyott töltőállomások, árbejelentések, tartalombejelentések, járművek, tankolások, útitervek, alapértékek, értékelések, utak, az Ön által adott vagy kapott útmegosztások, várakozási idő jelzések, szinkronizálási beállítások, törlési rekordok és az Ön felhasználói sora), majd törli magát a fiókidentitást is, beleértve bármely összekapcsolt e-mail-címet. Ha valamelyik táblát nem sikerült törölni, az alkalmazás megmondja, melyiket, ahelyett, hogy sikert jelentene. Ez nem vonható vissza.</li>
+  <li><strong>Egyedi elemek:</strong> minden kedvenc, értesítés, jármű, tankolás, út, árbejelentés és tartalombejelentés önállóan törölhető; a törlések átterjednek az Ön többi eszközére.</li>
+</ul>
+<p>Ha már nem fér hozzá az alkalmazáshoz, a törlést a fejlesztővel való kapcsolatfelvétel útján kérheti (11. szakasz); kérjük, a fiókjához kapcsolt e-mail-címről írjon, hogy ellenőrizhessük a tulajdonjogot. Egy anonim fiókot, amelyet soha nem kapcsoltak össze e-mail-címmel, senki — beleértve minket is — nem tud azonosítani annak az eszköznek a hiányában, amelyen létrehozták.</p>
+
+<h2>9. Gyermekek adatainak védelme</h2>
+<p>Az alkalmazás nem 16 év alatti gyermekeknek szól. Tudatosan nem gyűjtünk személyes adatokat gyermekektől; ha úgy véli, hogy egy gyermek TankSync-fiókot hozott létre, lépjen kapcsolatba velünk, és töröljük azt.</p>
+
+<h2>10. A tájékoztató módosításai</h2>
+<p>A módosításokat ezen az URL-en tesszük közzé új verziószámmal és dátummal; az alkalmazás rögzíti, hogy Ön melyik verzióhoz járult hozzá, és a verzió változásakor újra megjeleníti ezt az oldalt.</p>
+<ul>
+  <li><strong>v3 — 2026. augusztus 29.:</strong> adatkezelő és módonkénti szerepek, adatkezelési táblázat jogalapokkal és megőrzési idővel, teljes adatfeldolgozói lista (csempeproxy, geokódoló, útvonaltervezés, GitHub, márkalogók), jogérvényesítési útvonalak, teljes törlés és exportálás.</li>
+  <li><strong>v2 — 2026. augusztus 15.:</strong> fióktörlési szakasz; e-mail és TankSync-fiókadatok bejelentése.</li>
+  <li><strong>v1 — 2026. április 7.:</strong> első verzió.</li>
+</ul>
+
+<h2>11. Kapcsolat</h2>
+<div class="contact">
+  <p><strong>Fejlesztő és adatkezelő:</strong> Florian DITTGEN</p>
+  <p><strong>E-mail:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
+  <p><strong>Forráskód:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
+</div>
+
+</body>
+</html>

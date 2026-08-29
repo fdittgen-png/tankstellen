@@ -12,6 +12,7 @@ import 'package:tankstellen/app/router.dart';
 import 'package:tankstellen/core/location/user_position_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
+import 'package:tankstellen/core/constants/app_constants.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/core/sync/sync_config.dart';
@@ -141,6 +142,8 @@ void main() {
     // `GdprConsentProvider.save(...)` writes (see
     // lib/core/providers/app_state_provider.dart).
     await storage.putSetting(StorageKeys.gdprConsentGiven, true);
+    await storage.putSetting(
+        StorageKeys.consentPolicyVersion, AppConstants.privacyPolicyVersion);
     await storage.putSetting(StorageKeys.consentLocation, false);
     await storage.putSetting(StorageKeys.consentErrorReporting, false);
     await storage.putSetting(StorageKeys.consentCloudSync, false);
@@ -181,6 +184,8 @@ void main() {
 
     // Replay phase 2 state first.
     await storage.putSetting(StorageKeys.gdprConsentGiven, true);
+    await storage.putSetting(
+        StorageKeys.consentPolicyVersion, AppConstants.privacyPolicyVersion);
     await storage.putSetting(StorageKeys.consentLocation, false);
     await storage.putSetting(StorageKeys.consentErrorReporting, false);
     await storage.putSetting(StorageKeys.consentCloudSync, false);

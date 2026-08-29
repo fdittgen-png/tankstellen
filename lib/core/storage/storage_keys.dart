@@ -40,7 +40,31 @@ class StorageKeys {
   /// enabled at all.
   static const String consentSyncTrips = 'consent_sync_trips';
 
+  /// #3866 (Epic #3865) — the consent record: ISO-8601 instant of the last
+  /// save and the privacy-policy version the user was shown. A version
+  /// bump re-surfaces the consent screen once (`ConsentRecord.isCurrent`).
+  static const String consentRecordedAt = 'consent_recorded_at';
+
+  /// #3870 (Epic #3865) — privacy controls that are not consents: the
+  /// developer tile proxy (default on, disclosed) and internet brand
+  /// logos from logo.clearbit.com (default OFF — bundled fallback).
+  static const String tileProxyEnabled = 'tile_proxy_enabled';
+  static const String remoteBrandLogos = 'remote_brand_logos';
+  static const String consentPolicyVersion = 'consent_policy_version';
+
   static const String swipeTutorialShown = 'swipe_tutorial_shown';
+
+  /// #3872 (epic #3865, GDPR) — set once the pre-permission rationale
+  /// for the given runtime permission has been shown and acknowledged
+  /// (Continue). One-time per kind: the explainer must precede the FIRST
+  /// OS prompt, never nag afterwards. Read/written only through
+  /// `PermissionRationaleDialog` (#3592 one-accessor rule).
+  static const String permissionRationaleShownCamera =
+      'permission_rationale_shown_camera';
+  static const String permissionRationaleShownBluetooth =
+      'permission_rationale_shown_bluetooth';
+  static const String permissionRationaleShownNotifications =
+      'permission_rationale_shown_notifications';
 
   /// #3313 — set once we've prompted the user to exempt the app from
   /// battery optimization (so a recording foreground service survives
@@ -192,4 +216,10 @@ class StorageKeys {
   /// locally right away, and stays hidden across restarts, without
   /// waiting for any server-side moderation outcome.
   static const String reportedContentTargetIds = 'reported_content_target_ids';
+
+  /// #3871 (Epic #3865, GDPR) — `true` once the one-time "Shared with
+  /// other users" notice was accepted. Shown before the FIRST public
+  /// contribution (a community price report, or switching ratings to
+  /// "shared"); never again after Continue. Cancel leaves it unset.
+  static const String ugcPublicNoticeShown = 'ugc_public_notice_shown';
 }

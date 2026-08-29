@@ -8,6 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/error/guarded.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/permissions/location_permissions.dart';
+import '../../../../core/permissions/permission_rationale_dialog.dart';
+import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -146,8 +148,7 @@ class AutoRecordSection extends ConsumerWidget {
             contentPadding: EdgeInsets.zero,
             title: Text(l.autoRecordToggleLabel),
             value: profile.autoRecord,
-            onChanged: (next) =>
-                _persist(ref, profile.copyWith(autoRecord: next)),
+            onChanged: (next) => _onMasterToggle(context, ref, profile, next),
           ),
           if (profile.autoRecord) ...[
             const SizedBox(height: 8),
@@ -206,6 +207,32 @@ class AutoRecordSection extends ConsumerWidget {
 
   Future<void> _persist(WidgetRef ref, VehicleProfile next) {
     return ref.read(vehicleProfileListProvider.notifier).save(next);
+  }
+
+  /// Master toggle. #3872 (GDPR) — arming auto-record makes the
+  /// orchestrator request POST_NOTIFICATIONS (`auto_record_orchestrator`
+  /// runs in a provider with no [BuildContext]), so the one-time
+  /// notifications rationale lives HERE, on the enable transition, before
+  /// the persist that arms it. Continue-only: the enable always follows.
+  Future<void> _onMasterToggle(
+    BuildContext context,
+    WidgetRef ref,
+    VehicleProfile profile,
+    bool next,
+  ) async {
+    // Capture pre-await (errorlog_30): `ref` must not be read after the
+    // dialog if the card unmounted meanwhile.
+    final listNotifier = ref.read(vehicleProfileListProvider.notifier);
+    if (next) {
+      final storage = ref.read(settingsStorageProvider);
+      await PermissionRationaleDialog.show(
+        context,
+        kind: PermissionRationaleKind.notifications,
+        storage: storage,
+      );
+      if (!context.mounted) return;
+    }
+    await listNotifier.save(profile.copyWith(autoRecord: next));
   }
 
   /// Persist [next] at drag-end and surface any write error to the user

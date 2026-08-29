@@ -15,6 +15,7 @@ import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/data_transparency_provider.dart';
 import '../widgets/data_transparency_cards.dart';
+import '../widgets/my_community_reports_card.dart';
 
 /// Shows all data stored on the server for the current user.
 class DataTransparencyScreen extends ConsumerWidget {
@@ -98,10 +99,18 @@ class DataTransparencyScreen extends ConsumerWidget {
 
     await ref.read(dataTransparencyControllerProvider.notifier).deleteAllData();
     if (!context.mounted) return;
-    SnackBarHelper.showSuccess(
-      context,
-      AppLocalizations.of(context).allDataDeleted,
-    );
+    // #3868 — honest outcome: name the tables that could not be erased.
+    final failures =
+        ref.read(dataTransparencyControllerProvider).erasureFailures;
+    if (failures.isEmpty) {
+      SnackBarHelper.showSuccess(
+        context,
+        AppLocalizations.of(context).allDataDeleted,
+      );
+    } else {
+      SnackBarHelper.showError(context,
+          AppLocalizations.of(context).serverErasurePartial(failures.join(', ')));
+    }
   }
 
   Future<void> _forgetAllTrips(BuildContext context, WidgetRef ref) async {
@@ -194,6 +203,8 @@ class DataTransparencyScreen extends ConsumerWidget {
                 const SizedBox(height: 12),
                 if (uiState.data != null) ...[
                   SyncedDataCard(data: uiState.data!),
+                  const SizedBox(height: 12),
+                  MyCommunityReportsCard(data: uiState.data!), // #3868
                   const SizedBox(height: 16),
                   DataActionButtons(
                     loading: uiState.loading,

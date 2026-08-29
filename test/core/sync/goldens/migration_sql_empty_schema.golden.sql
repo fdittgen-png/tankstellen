@@ -1,4 +1,4 @@
--- TankSync Schema Setup (schema version 8)
+-- TankSync Schema Setup (schema version 9)
 -- Run this in your Supabase SQL Editor
 -- Dashboard → SQL Editor → New Query → Paste → Run
 
@@ -573,6 +573,66 @@ REVOKE ALL ON FUNCTION public.delete_user() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.delete_user() TO authenticated;
 REVOKE EXECUTE ON FUNCTION public.delete_user() FROM anon;
 
+-- v9 (#3868, GDPR Art. 17) — erase every row the caller owns in ONE
+-- transaction, bypassing limit_bulk_delete for the caller's own rows;
+-- public.users, sync_settings, wait_time_pings and trip_shares included.
+CREATE OR REPLACE FUNCTION public.erase_my_data()
+RETURNS TABLE(table_name TEXT, rows_deleted BIGINT)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  uid UUID := auth.uid();
+  spec TEXT[];
+  n BIGINT;
+BEGIN
+  IF uid IS NULL THEN
+    RETURN;
+  END IF;
+  -- Transaction-local: lets limit_bulk_delete() pass for this erase only.
+  PERFORM set_config('request.jwt.claims',
+                     json_build_object('role', 'service_role')::text, true);
+
+  FOREACH spec SLICE 1 IN ARRAY ARRAY[
+    ARRAY['trip_shares',      'owner_id'],
+    ARRAY['trip_shares',      'shared_with_id'],
+    ARRAY['trip_details',     'user_id'],
+    ARRAY['trip_summaries',   'user_id'],
+    ARRAY['content_reports',  'reporter_user_id'],
+    ARRAY['price_reports',    'reporter_id'],
+    ARRAY['wait_time_pings',  'user_id'],
+    ARRAY['push_tokens',      'user_id'],
+    ARRAY['obd2_baselines',   'user_id'],
+    ARRAY['station_ratings',  'user_id'],
+    ARRAY['ignored_stations', 'user_id'],
+    ARRAY['itineraries',      'user_id'],
+    ARRAY['fill_ups',         'user_id'],
+    ARRAY['vehicles',         'user_id'],
+    ARRAY['alerts',           'user_id'],
+    ARRAY['favorites',        'user_id'],
+    ARRAY['sync_settings',    'user_id'],
+    ARRAY['deletions',        'user_id'],
+    ARRAY['users',            'id']
+  ]
+  LOOP
+    IF to_regclass('public.' || spec[1]) IS NULL THEN
+      CONTINUE;
+    END IF;
+    EXECUTE format('DELETE FROM public.%I WHERE %I = $1', spec[1], spec[2])
+      USING uid;
+    GET DIAGNOSTICS n = ROW_COUNT;
+    table_name := spec[1] || CASE WHEN spec[2] = 'shared_with_id'
+                                  THEN ' (received)' ELSE '' END;
+    rows_deleted := n;
+    RETURN NEXT;
+  END LOOP;
+END;
+$$;
+REVOKE ALL ON FUNCTION public.erase_my_data() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.erase_my_data() TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.erase_my_data() FROM anon;
+
 CREATE TABLE IF NOT EXISTS public.tanksync_meta (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL,
@@ -583,7 +643,7 @@ DROP POLICY IF EXISTS tanksync_meta_read ON public.tanksync_meta;
 CREATE POLICY tanksync_meta_read ON public.tanksync_meta
   FOR SELECT USING (true);
 INSERT INTO public.tanksync_meta (key, value, updated_at)
-  VALUES ('schema_version', '8', now())
+  VALUES ('schema_version', '9', now())
   ON CONFLICT (key)
   DO UPDATE SET value = EXCLUDED.value, updated_at = now();
 

@@ -90,3 +90,10 @@ abstract final class SentryFlutter {
     if (appRunner != null) await appRunner();
   }
 }
+
+/// #3866 — the consent hook reads `Sentry.isEnabled` / calls `Sentry.close()`;
+/// the libre build folds the block out but must still compile against it.
+abstract final class Sentry {
+  static bool get isEnabled => false;
+  static Future<void> close() async {}
+}

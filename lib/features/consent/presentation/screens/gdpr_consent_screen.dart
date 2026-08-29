@@ -4,8 +4,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/navigation/app_routes.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/providers/app_state_provider.dart';
+import '../../../../core/storage/storage_providers.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/gdpr_consent_form_provider.dart';
 
@@ -26,6 +29,9 @@ class GdprConsentScreen extends ConsumerWidget {
 
   Future<void> _acceptSelected(BuildContext context, WidgetRef ref) async {
     final form = ref.read(gdprConsentFormControllerProvider);
+    // #3866 — keep the trip-sync choice (it lives in Settings → TankSync).
+    final keepSyncTrips = ref.read(gdprConsentProvider).syncTrips;
+    final isReady = ref.read(storageRepositoryProvider).isSetupComplete;
     await ref
         .read(gdprConsentProvider.notifier)
         .save(
@@ -33,11 +39,19 @@ class GdprConsentScreen extends ConsumerWidget {
           errorReporting: form.errorReportingConsent,
           cloudSync: form.cloudSyncConsent,
           vinOnlineDecode: form.vinOnlineDecodeConsent,
+          syncTrips: keepSyncTrips,
         );
-    if (context.mounted) context.go(RoutePaths.setup);
+    if (context.mounted) context.go(_next(isReady));
   }
 
+  /// #3866 — an existing user re-confirming after a policy bump goes
+  /// back to the app, not through the setup wizard again.
+  static String _next(bool isSetupComplete) =>
+      isSetupComplete ? RoutePaths.search : RoutePaths.setup;
+
   Future<void> _acceptAll(BuildContext context, WidgetRef ref) async {
+    final keepSyncTrips = ref.read(gdprConsentProvider).syncTrips;
+    final isReady = ref.read(storageRepositoryProvider).isSetupComplete;
     await ref
         .read(gdprConsentProvider.notifier)
         .save(
@@ -45,8 +59,9 @@ class GdprConsentScreen extends ConsumerWidget {
           errorReporting: true,
           cloudSync: true,
           vinOnlineDecode: true,
+          syncTrips: keepSyncTrips,
         );
-    if (context.mounted) context.go(RoutePaths.setup);
+    if (context.mounted) context.go(_next(isReady));
   }
 
   @override
@@ -135,6 +150,16 @@ class GdprConsentScreen extends ConsumerWidget {
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
+                    ),
+                    // #3866 — the policy the consent refers to, one tap away.
+                    TextButton.icon(
+                      key: const Key('gdprConsentPolicyLink'),
+                      onPressed: () => launchUrl(
+                          Uri.parse(AppConstants.privacyPolicyUrl),
+                          mode: LaunchMode.externalApplication),
+                      icon: const Icon(Icons.open_in_new, size: 16),
+                      label: Text(l10n.gdprPolicyLink(
+                          AppConstants.privacyPolicyVersion)),
                     ),
                   ],
                 ),

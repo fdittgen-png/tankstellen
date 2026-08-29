@@ -21,7 +21,10 @@ import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/presentation/screens/edit_vehicle_screen.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/features/vehicle/providers/vin_adapter_pair_auto_populator_provider.dart';
+import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
+
+import '../../../../helpers/fake_settings_storage.dart';
 
 /// #2960 — adding or removing the OBD2 adapter on the Edit-vehicle
 /// screen must update the adapter section IN PLACE and keep the form
@@ -208,6 +211,12 @@ Future<void> _pumpPushedEditScreen(
     ProviderScope(
       overrides: [
         vehicleProfileRepositoryProvider.overrideWithValue(repo),
+        // #3872 — the pair sheet's entry gates on the once-per-install
+        // Bluetooth rationale; pre-acknowledged so this test keeps
+        // exercising the in-place pair flow BEHIND it.
+        settingsStorageProvider.overrideWithValue(
+          FakeSettingsStorage.rationalesShown(),
+        ),
         ...extraOverrides,
       ],
       child: MaterialApp(

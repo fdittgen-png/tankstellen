@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'auto_record_trace_log.dart';
+import 'obd2_comm_diagnostics.dart';
 
 /// Formats a list of [AutoRecordEvent]s into a plain-text OBD2
 /// connection/recording diagnostic report (#1920).
@@ -84,8 +85,4 @@ String _formatClock(DateTime ts) {
 /// `AA:BB:CC:DD:EE:FF` → `···············E:FF`. A string of four
 /// characters or fewer is returned unchanged (there is nothing to
 /// hide).
-String _redactMac(String mac) {
-  if (mac.length <= 4) return mac;
-  final String visible = mac.substring(mac.length - 4);
-  return '${'·' * (mac.length - 4)}$visible';
-}
+String _redactMac(String mac) => redactObd2Mac(mac)!; // #3870 — one rule

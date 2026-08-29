@@ -4,18 +4,27 @@
 import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
 import '../data/storage_repository.dart';
+import '../storage/storage_keys.dart';
 
 class LocationConsentDialog {
-  static const String _consentKey = 'location_consent_given';
+  /// Pre-#3866 key — this dialog and the consent screen used to write two
+  /// different booleans, so switching Location off in Settings never
+  /// stopped the search from reading GPS. Kept only for the migration.
+  static const String legacyConsentKey = 'location_consent_given';
 
-  /// Check consent using the narrow SettingsStorage interface.
+  /// #3866 (Epic #3865) — ONE location consent: the consent screen's
+  /// `consent_location`. An explicit value wins; a pre-#3866 install that
+  /// only has the legacy key carries it over once.
   static bool hasConsent(SettingsStorage storage) {
-    return storage.getSetting(_consentKey) == true;
+    final current = storage.getSetting(StorageKeys.consentLocation);
+    if (current is bool) return current;
+    return storage.getSetting(legacyConsentKey) == true;
   }
 
   /// Record consent using the narrow SettingsStorage interface.
   static Future<void> recordConsent(SettingsStorage storage) async {
-    await storage.putSetting(_consentKey, true);
+    await storage.putSetting(StorageKeys.consentLocation, true);
+    await storage.putSetting(legacyConsentKey, true);
   }
 
   /// Show the GDPR Art. 6(1)(a) location-consent dialog.

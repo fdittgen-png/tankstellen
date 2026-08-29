@@ -69,3 +69,22 @@ class PrivacyDeleteAllButton extends StatelessWidget {
     );
   }
 }
+
+/// #3869 (Epic #3865, GDPR Art. 20) — the ONE export: every local
+/// category (incl. trips as JSON + GPX, vehicles, fill-ups, baselines,
+/// reminders, the consent record) and every server table, as a ZIP.
+class PrivacyExportAllButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  const PrivacyExportAllButton({super.key, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return FilledButton.icon(
+      key: const ValueKey('privacy-export-all-button'),
+      onPressed: onPressed,
+      icon: const Icon(Icons.archive_outlined),
+      label: Text(AppLocalizations.of(context).privacyExportAllButton),
+    );
+  }
+}

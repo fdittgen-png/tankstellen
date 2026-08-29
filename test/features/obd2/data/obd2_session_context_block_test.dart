@@ -63,9 +63,9 @@ void main() {
       final mac = session['mac'] as String;
 
       // Last four chars kept, everything before is the middle-dot mask.
-      expect(mac, endsWith('E:FF'));
+      expect(mac, startsWith('AA:BB:CC'));
       expect(mac, contains('·'));
-      expect(mac, isNot(contains('AA:BB')));
+      expect(mac, isNot(contains('EE:F')));
       expect(mac, isNot(contains('CC:DD')));
     });
 

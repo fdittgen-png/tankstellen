@@ -781,7 +781,7 @@
   "syncHowToSyncQuestion": "Hogyan szeretne szinkronizálni?",
   "syncOfflineDescription": "Az alkalmazás teljesen offline is működik. A felhőszinkronizálás opcionális.",
   "syncModeCommunityTitle": "Sparkilo közösség",
-  "syncModeCommunitySubtitle": "Kedvencek és értékelések megosztása az összes felhasználóval",
+  "syncModeCommunitySubtitle": "A fejlesztő által üzemeltetett megosztott adatbázis — lent látható, mi szinkronizálódik",
   "syncModePrivateTitle": "Privát adatbázis",
   "syncModePrivateSubtitle": "Saját Supabase — teljes adatellenőrzés",
   "syncModeGroupTitle": "Csoporthoz csatlakozás",
@@ -4721,5 +4721,99 @@
         "type": "String"
       }
     }
-  }
+  },
+  "gdprPolicyLink": "Adatvédelmi tájékoztató ({version} verzió)",
+  "@gdprPolicyLink": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentRecordedAt": "Hozzájárulás megadva: {date} · tájékoztató verziója: {version}",
+  "@consentRecordedAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "consentNotRecorded": "Még nincs rögzített hozzájárulás",
+  "serverErasurePartial": "Néhány szerveradatot nem sikerült törölni: {tables}. Próbálja újra, vagy küldje el ezt a listát a fejlesztőnek.",
+  "@serverErasurePartial": {
+    "placeholders": {
+      "tables": {
+        "type": "String"
+      }
+    }
+  },
+  "localErasurePartial": "Néhány helyi adatot nem sikerült törölni: {steps}. Indítsa újra az alkalmazást, és próbálja újra.",
+  "@localErasurePartial": {
+    "placeholders": {
+      "steps": {
+        "type": "String"
+      }
+    }
+  },
+  "myCommunityReportsTitle": "Közösségi jelentéseim",
+  "myCommunityReportsEmpty": "Még nem küldött be jelentést",
+  "deleteReportTooltip": "Jelentés törlése",
+  "reportDeleted": "Jelentés törölve",
+  "reportDeleteFailed": "A jelentést nem sikerült törölni",
+  "privacyControlsTitle": "Adatvédelmi beállítások",
+  "tileProxyToggleTitle": "Térképcsempék betöltése a Sparkilo proxyn keresztül",
+  "tileProxyToggleSubtitle": "Be: a látható térképrészlet és az Ön IP-címe a fejlesztő EU-s szerverére kerül, amely a csempéket az OpenStreetMaptől kéri le. Ki: a csempék közvetlenül a tile.openstreetmap.org címről töltődnek be.",
+  "remoteLogosToggleTitle": "Márkalogók betöltése az internetről",
+  "remoteLogosToggleSubtitle": "Alapértelmezés szerint ki: a beépített helyettesítő képek jelennek meg. Be: a logók a logo.clearbit.com címről töltődnek le, amely látja az Ön IP-címét.",
+  "privacyExportAllButton": "Összes adatom exportálása (ZIP)",
+  "privacyExportAllSuccess": "{fileName} mentve a Letöltésekbe — {count} fájlt tartalmaz",
+  "@privacyExportAllSuccess": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "privacyExportAllFailed": "Az exportfájlt nem sikerült kiírni",
+  "syncModeCommunityControllerNotice": "Üzemeltető: {operator} · Supabase, EU (Frankfurt) · szinkronizálja a kedvenceket, riasztásokat, járműveket az alvázszámmal együtt, tankolásokat, értékeléseket, jelentéseket és — ha bekapcsolja — a GPS-es utakat",
+  "@syncModeCommunityControllerNotice": {
+    "placeholders": {
+      "operator": {
+        "type": "String"
+      }
+    }
+  },
+  "syncModePrivateControllerNotice": "Az adatkezelő Ön — a saját Supabase-projektje, mi soha nem látjuk",
+  "syncModeJoinControllerNotice": "A megosztott adatbázis tulajdonosa az Ön adatainak adatkezelője",
+  "ugcPublicNoticeTitle": "Megosztva más felhasználókkal",
+  "ugcPublicNoticeBody": "Ez a szinkronizációs adatbázisban tárolódik az Ön álnevesített felhasználói azonosítója alatt. A Sparkilo közösségben minden bejelentkezett felhasználó elolvashatja. Bármikor törölheti itt: TankSync → Adatátláthatóság.",
+  "blockedAuthorsTitle": "Letiltott felhasználók",
+  "blockedAuthorsDescription": "Ezeknek a felhasználóknak a megosztott tartalma rejtve marad ezen az eszközön. A feloldás után ismét látható lesz.",
+  "blockedAuthorsEmpty": "Nincs letiltott felhasználó",
+  "blockedAuthorsUnblock": "Feloldás",
+  "permissionRationaleCameraTitle": "Kamera-hozzáférés",
+  "permissionRationaleCameraSubtitle": "Ez az alkalmazás szeretné használni a kameráját nyugták, kútoszlop-kijelzők és QR-kódok beolvasásához.",
+  "permissionRationaleCameraWhatHappens": "Mi történik a kameraképpel:",
+  "permissionRationaleCameraBulletOnDevice": "A kép kizárólag a nyugta, a kútoszlop kijelzője vagy a QR-kód beolvasására szolgál — a felismerés az Ön eszközén fut.",
+  "permissionRationaleCameraBulletDiscarded": "A fotó a beolvasás után törlődik.",
+  "permissionRationaleCameraBulletNoUpload": "Semmi nem kerül feltöltésre, hacsak nem küld jelentést egy hibás beolvasásról, és azt meg nem erősíti.",
+  "permissionRationaleBluetoothTitle": "Bluetooth-hozzáférés",
+  "permissionRationaleBluetoothSubtitle": "Ez az alkalmazás szeretné használni a Bluetooth-t, hogy csatlakozzon az OBD2-adapteréhez.",
+  "permissionRationaleBluetoothWhatHappens": "Mi történik a Bluetooth-szal:",
+  "permissionRationaleBluetoothBulletAdapterOnly": "A Bluetooth kizárólag az OBD2-adapter megkeresésére és az azzal való kommunikációra szolgál.",
+  "permissionRationaleBluetoothBulletIdentifierLocal": "Az adapter azonosítója az Ön eszközén marad — csak a TankSync révén szinkronizálódik, a járműprofil részeként.",
+  "permissionRationaleBluetoothBulletLegacyLocation": "Android 11 és korábbi verziókon a rendszer a helyzetet is elkéri, mert ott a Bluetooth-keresés helyhozzáférési engedélynek számít.",
+  "permissionRationaleNotificationsTitle": "Értesítések",
+  "permissionRationaleNotificationsSubtitle": "Ez az alkalmazás értesítéseket szeretne küldeni Önnek az áriasztásokról és az útrögzítés állapotáról.",
+  "permissionRationaleNotificationsWhatHappens": "Mi történik az értesítésekkel:",
+  "permissionRationaleNotificationsBulletLocal": "Az értesítések helyi áriasztásokhoz és az útrögzítés állapotához használatosak.",
+  "permissionRationaleNotificationsBulletNothingLeaves": "Az Ön eszközén jönnek létre — semmi nem hagyja el az eszközt.",
+  "permissionRationaleRevoke": "Ezt bármikor visszavonhatja az eszköz beállításaiban.",
+  "permissionRationaleLegalBasis": "Jogalap: a GDPR 6. cikk (1) bekezdés a) pontja (hozzájárulás)"
 }

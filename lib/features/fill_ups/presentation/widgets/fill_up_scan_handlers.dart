@@ -4,9 +4,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/error/guarded.dart';
+import '../../../../core/permissions/permission_rationale_dialog.dart';
+import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/fuel_type.dart';
@@ -101,6 +104,16 @@ Future<void> runReceiptScan(
       service = ReceiptScanService();
       state.writeService(service);
     }
+    // #3872 (GDPR) — the one-time camera rationale precedes the FIRST OS
+    // camera prompt, which `ImagePicker` raises on first use. Continue-only:
+    // the scan always follows.
+    await PermissionRationaleDialog.show(
+      context,
+      kind: PermissionRationaleKind.camera,
+      storage: ProviderScope.containerOf(context, listen: false)
+          .read(settingsStorageProvider),
+    );
+    if (!context.mounted || !state.isMounted()) return;
     // #2273 — thread the active country/brand so the parser reads the
     // receipt in the right currency (GBP/£/p, kr, $ …).
     final outcome = await service.scanReceipt(

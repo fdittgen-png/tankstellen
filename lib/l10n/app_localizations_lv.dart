@@ -2726,7 +2726,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get syncModeCommunitySubtitle =>
-      'Kopīgot izlases un vērtējumus ar visiem lietotājiem';
+      'Koplietota datubāze, ko uztur izstrādātājs — zemāk redzams, kas tiek sinhronizēts';
 
   @override
   String get syncModePrivateTitle => 'Privāta datu bāze';
@@ -5353,6 +5353,106 @@ class AppLocalizationsLv extends AppLocalizations {
       'Kad izslēgts, visā lietotnē tiek paslēptas zīmotnes, novērtējumi un trofeju ikonas.';
 
   @override
+  String gdprPolicyLink(int version) {
+    return 'Privātuma politika (versija $version)';
+  }
+
+  @override
+  String consentRecordedAt(String date, int version) {
+    return 'Piekrišana sniegta $date · politikas versija $version';
+  }
+
+  @override
+  String get consentNotRecorded => 'Piekrišana vēl nav reģistrēta';
+
+  @override
+  String serverErasurePartial(String tables) {
+    return 'Dažus servera datus neizdevās dzēst: $tables. Mēģiniet vēlreiz vai sazinieties ar izstrādātāju, norādot šo sarakstu.';
+  }
+
+  @override
+  String localErasurePartial(String steps) {
+    return 'Dažus lokālos datus neizdevās dzēst: $steps. Restartējiet lietotni un mēģiniet vēlreiz.';
+  }
+
+  @override
+  String get myCommunityReportsTitle => 'Mani kopienas ziņojumi';
+
+  @override
+  String get myCommunityReportsEmpty => 'Nav iesniegts neviens ziņojums';
+
+  @override
+  String get deleteReportTooltip => 'Dzēst šo ziņojumu';
+
+  @override
+  String get reportDeleted => 'Ziņojums dzēsts';
+
+  @override
+  String get reportDeleteFailed => 'Neizdevās dzēst ziņojumu';
+
+  @override
+  String get privacyControlsTitle => 'Privātuma iestatījumi';
+
+  @override
+  String get tileProxyToggleTitle =>
+      'Ielādēt kartes flīzes caur Sparkilo starpniekserveri';
+
+  @override
+  String get tileProxyToggleSubtitle =>
+      'Ieslēgts: redzamais kartes apgabals un jūsu IP adrese nonāk izstrādātāja ES serverī, kas flīzes iegūst no OpenStreetMap. Izslēgts: flīzes tiek ielādētas tieši no tile.openstreetmap.org.';
+
+  @override
+  String get remoteLogosToggleTitle => 'Ielādēt zīmolu logotipus no interneta';
+
+  @override
+  String get remoteLogosToggleSubtitle =>
+      'Pēc noklusējuma izslēgts: tiek rādīti lietotnē iekļautie aizstājēji. Ieslēgts: logotipi tiek iegūti no logo.clearbit.com, kas redz jūsu IP adresi.';
+
+  @override
+  String get privacyExportAllButton => 'Eksportēt visus manus datus (ZIP)';
+
+  @override
+  String privacyExportAllSuccess(String fileName, int count) {
+    return '$fileName saglabāts lejupielādēs — iekšā $count faili';
+  }
+
+  @override
+  String get privacyExportAllFailed => 'Neizdevās ierakstīt eksporta failu';
+
+  @override
+  String syncModeCommunityControllerNotice(String operator) {
+    return 'Uztur $operator · Supabase, ES (Frankfurt) · sinhronizē izlasi, brīdinājumus, transportlīdzekļus ar VIN, uzpildes, vērtējumus, ziņojumus un — ja to ieslēdzat — braucienus ar GPS';
+  }
+
+  @override
+  String get syncModePrivateControllerNotice =>
+      'Datu pārzinis esat jūs — jūsu pašu Supabase projekts, mēs to nekad neredzam';
+
+  @override
+  String get syncModeJoinControllerNotice =>
+      'Koplietotās datubāzes īpašnieks ir jūsu datu pārzinis';
+
+  @override
+  String get ugcPublicNoticeTitle => 'Koplietots ar citiem lietotājiem';
+
+  @override
+  String get ugcPublicNoticeBody =>
+      'Tas tiek glabāts sinhronizācijas datubāzē ar jūsu pseidonīmo lietotāja ID. Sparkilo kopienā to var izlasīt ikviens pierakstījies lietotājs. Jebkurā laikā varat to dzēst sadaļā TankSync → Datu caurredzamība.';
+
+  @override
+  String get blockedAuthorsTitle => 'Bloķētie lietotāji';
+
+  @override
+  String get blockedAuthorsDescription =>
+      'Šo lietotāju koplietotais saturs šajā ierīcē ir paslēpts. Atbloķējiet, lai to atkal redzētu.';
+
+  @override
+  String get blockedAuthorsEmpty => 'Nav bloķētu lietotāju';
+
+  @override
+  String get blockedAuthorsUnblock => 'Atbloķēt';
+
+  @override
   String get coachingGpsLiftOff => 'Atlaid gāzi';
 
   @override
@@ -6759,6 +6859,79 @@ class AppLocalizationsLv extends AppLocalizations {
     });
     return '$_temp0';
   }
+
+  @override
+  String get permissionRationaleCameraTitle => 'Kameras piekļuve';
+
+  @override
+  String get permissionRationaleCameraSubtitle =>
+      'Šī lietotne vēlas izmantot jūsu kameru, lai nolasītu čekus, sūkņu displejus un QR kodus.';
+
+  @override
+  String get permissionRationaleCameraWhatHappens =>
+      'Kas notiek ar kameras attēlu:';
+
+  @override
+  String get permissionRationaleCameraBulletOnDevice =>
+      'Attēls tiek izmantots tikai čeka, sūkņa displeja vai QR koda nolasīšanai — atpazīšana notiek jūsu ierīcē.';
+
+  @override
+  String get permissionRationaleCameraBulletDiscarded =>
+      'Fotoattēls pēc skenēšanas tiek dzēsts.';
+
+  @override
+  String get permissionRationaleCameraBulletNoUpload =>
+      'Nekas netiek augšupielādēts, ja vien neiesniedzat ziņojumu par kļūdainu skenēšanu un to neapstiprināt.';
+
+  @override
+  String get permissionRationaleBluetoothTitle => 'Bluetooth piekļuve';
+
+  @override
+  String get permissionRationaleBluetoothSubtitle =>
+      'Šī lietotne vēlas izmantot Bluetooth, lai izveidotu savienojumu ar jūsu OBD2 adapteri.';
+
+  @override
+  String get permissionRationaleBluetoothWhatHappens =>
+      'Kas notiek ar Bluetooth:';
+
+  @override
+  String get permissionRationaleBluetoothBulletAdapterOnly =>
+      'Bluetooth tiek izmantots tikai jūsu OBD2 adaptera atrašanai un saziņai ar to.';
+
+  @override
+  String get permissionRationaleBluetoothBulletIdentifierLocal =>
+      'Adaptera identifikators paliek jūsu ierīcē — tas tiek sinhronizēts tikai caur TankSync kā transportlīdzekļa profila daļa.';
+
+  @override
+  String get permissionRationaleBluetoothBulletLegacyLocation =>
+      'Android 11 un vecākās versijās sistēma pieprasa arī atrašanās vietu, jo Bluetooth meklēšana tur tiek uzskatīta par atrašanās vietas atļauju.';
+
+  @override
+  String get permissionRationaleNotificationsTitle => 'Paziņojumi';
+
+  @override
+  String get permissionRationaleNotificationsSubtitle =>
+      'Šī lietotne vēlas sūtīt jums paziņojumus par cenu brīdinājumiem un brauciena ierakstīšanas statusu.';
+
+  @override
+  String get permissionRationaleNotificationsWhatHappens =>
+      'Kas notiek ar paziņojumiem:';
+
+  @override
+  String get permissionRationaleNotificationsBulletLocal =>
+      'Paziņojumi tiek izmantoti vietējiem cenu brīdinājumiem un brauciena ierakstīšanas statusam.';
+
+  @override
+  String get permissionRationaleNotificationsBulletNothingLeaves =>
+      'Tie tiek ģenerēti jūsu ierīcē — nekas nepamet ierīci.';
+
+  @override
+  String get permissionRationaleRevoke =>
+      'To varat jebkurā laikā atsaukt ierīces iestatījumos.';
+
+  @override
+  String get permissionRationaleLegalBasis =>
+      'Juridiskais pamats: VDAR 6. panta 1. punkta a) apakšpunkts (piekrišana)';
 
   @override
   String get tripRecordingPipEstConsumptionCaption => 'aprēķ. L/100 km';

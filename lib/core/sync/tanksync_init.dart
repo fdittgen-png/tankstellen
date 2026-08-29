@@ -97,7 +97,10 @@ class TankSyncInit {
     required Future<void> Function(String userId) ensurePublicUser,
   }) async {
     final syncEnabled = storage.getSetting('sync_enabled') as bool? ?? false;
-    if (!syncEnabled) return TankSyncInitOutcome.notConfigured;
+    // #3866 — no client without the Cloud Sync consent.
+    final consented =
+        storage.getSetting('consent_cloud_sync') as bool? ?? false;
+    if (!syncEnabled || !consented) return TankSyncInitOutcome.notConfigured;
     final url = storage.getSetting('supabase_url') as String?;
     final key = storage.getSupabaseAnonKey();
     if (url == null || key == null) return TankSyncInitOutcome.notConfigured;

@@ -494,16 +494,19 @@ abstract class _$AutoSwitchProfile extends $Notifier<bool> {
   }
 }
 
-/// Whether GDPR consent has been given (any choices made).
+/// Whether GDPR consent has been given against the CURRENT policy
+/// version (#3866 — a policy bump re-surfaces the consent screen once).
 
 @ProviderFor(hasGdprConsent)
 final hasGdprConsentProvider = HasGdprConsentProvider._();
 
-/// Whether GDPR consent has been given (any choices made).
+/// Whether GDPR consent has been given against the CURRENT policy
+/// version (#3866 — a policy bump re-surfaces the consent screen once).
 
 final class HasGdprConsentProvider extends $FunctionalProvider<bool, bool, bool>
     with $Provider<bool> {
-  /// Whether GDPR consent has been given (any choices made).
+  /// Whether GDPR consent has been given against the CURRENT policy
+  /// version (#3866 — a policy bump re-surfaces the consent screen once).
   HasGdprConsentProvider._()
     : super(
         from: null,
@@ -537,7 +540,7 @@ final class HasGdprConsentProvider extends $FunctionalProvider<bool, bool, bool>
   }
 }
 
-String _$hasGdprConsentHash() => r'712d0d516ea832af3bc75b97776e595ce699d2dc';
+String _$hasGdprConsentHash() => r'629f99cb27b36f919e214dd1e6800c6a23319641';
 
 /// GDPR consent state: location, error reporting, cloud sync,
 /// community wait-time pings (#1119), VIN online decode (#1399),
@@ -557,6 +560,8 @@ final class GdprConsentProvider
             bool cloudSync,
             bool errorReporting,
             bool location,
+            int policyVersion,
+            DateTime? recordedAt,
             bool syncTrips,
             bool vinOnlineDecode,
           })
@@ -588,6 +593,8 @@ final class GdprConsentProvider
       bool cloudSync,
       bool errorReporting,
       bool location,
+      int policyVersion,
+      DateTime? recordedAt,
       bool syncTrips,
       bool vinOnlineDecode,
     })
@@ -601,6 +608,8 @@ final class GdprConsentProvider
               bool cloudSync,
               bool errorReporting,
               bool location,
+              int policyVersion,
+              DateTime? recordedAt,
               bool syncTrips,
               bool vinOnlineDecode,
             })
@@ -609,7 +618,7 @@ final class GdprConsentProvider
   }
 }
 
-String _$gdprConsentHash() => r'8c47e3e59a46eca0abc334f08234f3410cc5b0f6';
+String _$gdprConsentHash() => r'9c17016c37b961bb52f51bdbca6c5a286c0ad8b3';
 
 /// GDPR consent state: location, error reporting, cloud sync,
 /// community wait-time pings (#1119), VIN online decode (#1399),
@@ -622,6 +631,8 @@ abstract class _$GdprConsent
             bool cloudSync,
             bool errorReporting,
             bool location,
+            int policyVersion,
+            DateTime? recordedAt,
             bool syncTrips,
             bool vinOnlineDecode,
           })
@@ -630,6 +641,8 @@ abstract class _$GdprConsent
     bool cloudSync,
     bool errorReporting,
     bool location,
+    int policyVersion,
+    DateTime? recordedAt,
     bool syncTrips,
     bool vinOnlineDecode,
   })
@@ -644,6 +657,8 @@ abstract class _$GdprConsent
                 bool cloudSync,
                 bool errorReporting,
                 bool location,
+                int policyVersion,
+                DateTime? recordedAt,
                 bool syncTrips,
                 bool vinOnlineDecode,
               }),
@@ -651,6 +666,8 @@ abstract class _$GdprConsent
                 bool cloudSync,
                 bool errorReporting,
                 bool location,
+                int policyVersion,
+                DateTime? recordedAt,
                 bool syncTrips,
                 bool vinOnlineDecode,
               })
@@ -663,6 +680,8 @@ abstract class _$GdprConsent
                   bool cloudSync,
                   bool errorReporting,
                   bool location,
+                  int policyVersion,
+                  DateTime? recordedAt,
                   bool syncTrips,
                   bool vinOnlineDecode,
                 }),
@@ -670,6 +689,8 @@ abstract class _$GdprConsent
                   bool cloudSync,
                   bool errorReporting,
                   bool location,
+                  int policyVersion,
+                  DateTime? recordedAt,
                   bool syncTrips,
                   bool vinOnlineDecode,
                 })
@@ -678,6 +699,8 @@ abstract class _$GdprConsent
                 bool cloudSync,
                 bool errorReporting,
                 bool location,
+                int policyVersion,
+                DateTime? recordedAt,
                 bool syncTrips,
                 bool vinOnlineDecode,
               }),
