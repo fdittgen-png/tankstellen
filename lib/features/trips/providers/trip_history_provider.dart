@@ -9,11 +9,11 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/storage/hive_boxes.dart';
 import '../../../core/sync/sync_events.dart';
 import '../data/trip_history_repository.dart';
+import '../domain/trip_sample.dart';
 import '../domain/trip_verdict.dart';
 import '../domain/gps_driving_features.dart';
 import 'verdict_calibration_provider.dart';
 import '../../../core/logging/error_logger.dart';
-import 'package:collection/collection.dart' show IterableExtension;
 
 part 'trip_history_provider.g.dart';
 
@@ -25,9 +25,14 @@ part 'trip_history_provider.g.dart';
 @Riverpod(keepAlive: true)
 TripHistoryRepository? tripHistoryRepository(Ref ref) {
   if (!Hive.isBoxOpen(HiveBoxes.obd2TripHistory)) return null;
-  return TripHistoryRepository(
+  final repo = TripHistoryRepository(
     box: Hive.box<String>(HiveBoxes.obd2TripHistory),
   );
+  // #3882 — rewrite any legacy single-row trips into the v2 meta +
+  // chunk layout, one row at a time off the critical path (a no-op —
+  // no timers, no writes — once every row is v2).
+  unawaited(repo.migrateLegacyRowsInBackground());
+  return repo;
 }
 
 /// List of finalised trips, newest-first. Empty when the box is
@@ -139,9 +144,70 @@ class TripHistoryList extends _$TripHistoryList {
 /// between refreshes.
 @riverpod
 TripHistoryEntry? tripHistoryDetail(Ref ref, String id) {
-  final listed =
-      ref.watch(tripHistoryListProvider).where((t) => t.id == id).firstOrNull;
+  final listed = ref.watch(_listedTripProvider(id));
   final repo = ref.watch(tripHistoryRepositoryProvider);
   if (repo == null) return listed;
   return repo.loadById(id) ?? listed;
+}
+
+/// The list's own (summary-only) entry for [id], rebuilt only when THIS
+/// trip's identity changes — the sample count moves on hydration, the
+/// verdict on the post-trip prompt — not on every list refresh (#3882).
+@riverpod
+TripHistoryEntry? _listedTrip(Ref ref, String id) =>
+    ref.watch(tripHistoryListProvider).where((t) => t.id == id).firstOrNull;
+
+/// The identity of the listed trip's CONTENT — a record, so dependents
+/// rebuild on a value change only (Riverpod filters on `==`), not on
+/// every list refresh that hands out a fresh instance (#3882).
+@riverpod
+(int?, String?, int?) _listedTripKey(Ref ref, String id) {
+  final t = ref.watch(_listedTripProvider(id));
+  return (t?.sampleCount, t?.verdict, t?.gpsSampleDiagnostics.length);
+}
+
+/// #3882 — the trip-detail screen's loader: the FULL entry decoded on a
+/// background isolate ([TripHistoryRepository.loadByIdAsync]), exposed as
+/// an [AsyncValue] so the screen paints a skeleton instead of blocking
+/// the UI isolate on a 40-minute trip's 34-column decode.
+///
+/// Re-decodes only when the trip's own `(sampleCount, verdict)` moves
+/// (hydration, verdict) — a list refresh for an unrelated save/delete no
+/// longer re-reads the row. With no repository (closed box in widget
+/// tests) the list's fixture entry is served synchronously, so
+/// fixture-driven screens render on the first pump exactly as before.
+@riverpod
+class TripDetailLoader extends _$TripDetailLoader {
+  @override
+  AsyncValue<TripHistoryEntry?> build(String id) {
+    // Keyed on the identity that changes the row's content, not on the
+    // list instance.
+    ref.watch(_listedTripKeyProvider(id));
+    final listed = ref.read(_listedTripProvider(id));
+    final repo = ref.read(tripHistoryRepositoryProvider);
+    if (repo == null) return AsyncData(listed);
+    unawaited(_load(repo, listed));
+    return const AsyncLoading();
+  }
+
+  Future<void> _load(
+      TripHistoryRepository repo, TripHistoryEntry? listed) async {
+    final entry = await repo.loadByIdAsync(id);
+    if (!ref.mounted) return;
+    state = AsyncData(entry ?? listed);
+  }
+}
+
+/// #3882 — only the speed + fuel-rate columns of one trip, as light
+/// samples, for the speed-consumption histogram (the carbon charts tab):
+/// a 2-column read instead of the 34-column full decode. Refreshes with
+/// the list like [tripHistoryDetailProvider].
+@riverpod
+List<TripSample> tripSpeedFuelSamples(Ref ref, String id) {
+  ref.watch(_listedTripProvider(id));
+  final repo = ref.watch(tripHistoryRepositoryProvider);
+  if (repo == null) {
+    return ref.watch(tripHistoryDetailProvider(id))?.samples ?? const [];
+  }
+  return repo.loadSamplesWith(id, const {'s', 'f'});
 }

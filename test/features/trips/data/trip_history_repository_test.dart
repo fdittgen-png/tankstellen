@@ -7,9 +7,23 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:tankstellen/features/trips/data/trip_column_chunk.dart';
 import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
+import 'package:tankstellen/features/trips/data/trip_history_store_v2.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import '../../../helpers/silence_error_logger.dart';
+
+/// #3882 — the per-sample codec maps of a stored trip, read back from its
+/// v2 chunk rows (the meta row carries no samples any more).
+List<Map<String, dynamic>> storedSampleMaps(Box<String> box, String id) {
+  final out = <Map<String, dynamic>>[];
+  for (var i = 0;; i++) {
+    final c = box.get(tripChunkKey(id, i));
+    if (c == null) break;
+    out.addAll(decodeTripChunkMaps((jsonDecode(c) as Map).cast<String, dynamic>()));
+  }
+  return out;
+}
 
 void main() {
   silenceErrorLoggerSpool();
@@ -341,9 +355,7 @@ void main() {
       expect(sample.fuelRateLPerHour, isNull);
 
       // Stored under the compact 'fe' key; the measured 'f' key is absent.
-      final raw = box.get(start.toIso8601String())!;
-      final decoded = (jsonDecode(raw) as Map).cast<String, dynamic>();
-      final stored = (decoded['samples'] as List).cast<Map<dynamic, dynamic>>().first;
+      final stored = storedSampleMaps(box, start.toIso8601String()).first;
       expect(stored.containsKey('fe'), isTrue);
       expect(stored.containsKey('f'), isFalse);
     });
@@ -439,9 +451,7 @@ void main() {
       ));
 
       // Read the raw stored JSON and inspect the sample's keys.
-      final raw = box.get(start.toIso8601String())!;
-      final decoded = (jsonDecode(raw) as Map).cast<String, dynamic>();
-      final samples = (decoded['samples'] as List).cast<Map<dynamic, dynamic>>();
+      final samples = storedSampleMaps(box, start.toIso8601String());
       expect(samples.first.containsKey('th'), isFalse);
       expect(samples.first.containsKey('f'), isFalse);
     });
@@ -818,9 +828,7 @@ void main() {
         ],
       ));
 
-      final raw = box.get(start.toIso8601String())!;
-      final decoded = (jsonDecode(raw) as Map).cast<String, dynamic>();
-      final samples = (decoded['samples'] as List).cast<Map<dynamic, dynamic>>();
+      final samples = storedSampleMaps(box, start.toIso8601String());
       expect(samples.first.containsKey('el'), isFalse);
       expect(samples.first.containsKey('ct'), isFalse);
     });
@@ -939,9 +947,7 @@ void main() {
         ],
       ));
 
-      final raw = box.get(start.toIso8601String())!;
-      final decoded = (jsonDecode(raw) as Map).cast<String, dynamic>();
-      final samples = (decoded['samples'] as List).cast<Map<dynamic, dynamic>>();
+      final samples = storedSampleMaps(box, start.toIso8601String());
       expect(samples.first.containsKey('la'), isFalse,
           reason: 'flag-off ticks must not bloat the JSON');
       expect(samples.first.containsKey('lo'), isFalse,
@@ -1235,7 +1241,7 @@ void main() {
         ),
       ));
 
-      expect(box.length, 1, reason: 'the ghost must not be persisted');
+      expect(repo.storedIds.length, 1, reason: 'the ghost must not be persisted');
       expect(repo.loadAll().single.samples, hasLength(30));
     });
 
@@ -1258,7 +1264,7 @@ void main() {
         samples: mkSamples(start, 30),
       ));
 
-      expect(box.length, 1, reason: 'the sampled twin replaces the ghost');
+      expect(repo.storedIds.length, 1, reason: 'the sampled twin replaces the ghost');
       expect(repo.loadAll().single.sampleCount, 30);
     });
 

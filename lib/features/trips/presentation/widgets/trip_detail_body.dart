@@ -112,7 +112,7 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
   /// GPS-only efficiency features (#2697 P3) — null for OBD2/EV/empty.
   late final GpsDrivingFeatures? _gpsFeatures =
       GpsEfficiencyKpiCard.featuresFor(
-        widget.samples.map(tripDetailToTripSample),
+        _tripSamples,
         isEv: widget.isEv,
       );
 
@@ -153,9 +153,7 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
     // Skip the analysis for EVs entirely; phase 4 will revisit once
     // the kWh equivalent lands.
     if (widget.isEv) return const [];
-    final tripSamples = widget.samples
-        .map(tripDetailToTripSample)
-        .toList(growable: false);
+    final tripSamples = _tripSamples; // #3882 — converted once
     // Epic #3015 — scale the hard-accel wasted-litres by the active
     // vehicle's engine power (a small engine wastes proportionally more for
     // the same hard pull). Trips aren't tagged with a vehicle, so the
@@ -184,9 +182,7 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
   DrivingScore _computeScore() {
     if (widget.samples.isEmpty) return DrivingScore.perfect;
     if (widget.isEv) return DrivingScore.perfect;
-    final tripSamples = widget.samples
-        .map(tripDetailToTripSample)
-        .toList(growable: false);
+    final tripSamples = _tripSamples; // #3882 — converted once
     final summary = widget.entry.summary;
     // #2460 — thread the trip-end lugging metric stored on the summary
     // into the canonical score so the over-rev/shift family includes it
@@ -255,9 +251,7 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
             ref: ref,
             registry: _lessonRegistry,
             entry: widget.entry,
-            samples: widget.samples
-                .map(tripDetailToTripSample)
-                .toList(growable: false),
+            samples: _tripSamples,
             score: _score,
             insights: _insights,
             l: l,
@@ -376,7 +370,11 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
         // collapsed-by-default section. Extracted to its own widget (#2804)
         // so this file stays under the 400-line norm; each chart still
         // self-gates on its own non-null signal.
-        TripDetailChartsSection(samples: widget.samples),
+        // #3882 — the stored column set decides chart visibility in O(1).
+        TripDetailChartsSection(
+          samples: widget.samples,
+          columnsPresent: widget.entry.columnsPresent,
+        ),
       ],
     );
 

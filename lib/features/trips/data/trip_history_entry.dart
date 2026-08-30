@@ -73,18 +73,16 @@ class TripHistoryEntry {
   int get sampleCount => _persistedSampleCount ?? samples.length;
   final int? _persistedSampleCount;
 
+  /// #3882 — codec keys (`s`, `r`, `f`, …) with ≥ 1 value, from the v2
+  /// meta row; null on legacy rows (see `trip_history_entry_columns.dart`).
+  final Set<String>? columnsPresent;
+
   /// #3835 — how many stored samples carried an engine PID, persisted so
-  /// the history LIST can tell a healthy OBD2 trip from one that started on
-  /// the adapter and degraded to GPS, without materialising a single
-  /// [TripSample].
-  ///
-  /// The list uses [summaryFromJson], which deliberately does NOT build
-  /// sample objects; counting engine-bearing samples per row would undo
-  /// exactly the cost that decode exists to avoid. Writing the count once,
-  /// at serialisation, keeps the read side free.
-  ///
-  /// Null on rows written before this landed — [engineSampleShare] falls
-  /// back to the summary for those rather than reporting a false zero.
+  /// the history LIST can tell a healthy OBD2 trip from one that degraded
+  /// to GPS without materialising a [TripSample] ([summaryFromJson] builds
+  /// none; counting at serialisation keeps the read side free). Null on
+  /// rows written before this landed — [engineSampleShare] falls back to
+  /// the summary for those rather than reporting a false zero.
   final int? engineSampleCount;
 
   /// #3861 (Epic #3855) — samples inside the engine-RUNNING envelope
@@ -197,6 +195,7 @@ class TripHistoryEntry {
     this.sessionJournal,
     this.engineSampleCount,
     this.envelopeSampleCount,
+    this.columnsPresent,
   }) : _persistedSampleCount = sampleCount;
 
   /// Returns a copy with the given fields replaced (#1858). The
@@ -353,14 +352,10 @@ class TripHistoryEntry {
               ),
       );
 
-  /// Summary-only decode (#3613) — everything [fromJson] produces
-  /// EXCEPT the heavy per-tick payloads: `samples`, `gpsd`, `lcm` and
-  /// `obd2d` are NOT materialised (jsonDecode has already parsed them
-  /// into raw maps; the dominant cost this path avoids is constructing
-  /// a [TripSample] / [GpsSampleDiagnostic] object per tick — tens of
-  /// thousands per long trip). The stored sample count is preserved on
-  /// [sampleCount] so the #2833 ghost de-dupe stays correct.
-  ///
+  /// Summary-only decode (#3613) — everything [fromJson] produces EXCEPT
+  /// the per-tick payloads (`samples`, `gpsd`, `lcm`, `obd2d`): no
+  /// [TripSample] / [GpsSampleDiagnostic] object is constructed. The
+  /// stored count is preserved on [sampleCount] (#2833 ghost de-dupe).
   /// Only [TripHistoryRepository.loadSummaries] should call this;
   /// consumers that render samples must go through the full decode.
   static TripHistoryEntry summaryFromJson(Map<String, dynamic> json) =>
@@ -372,7 +367,9 @@ class TripHistoryEntry {
         ),
         automatic: (json['automatic'] as bool?) ?? false,
         samples: const [],
-        sampleCount: (json['samples'] as List?)?.length ?? 0,
+        sampleCount: // #3882 — a v2 meta row carries the count as `sc`.
+            (json['samples'] as List?)?.length ?? (json['sc'] as int?) ?? 0,
+        columnsPresent: (json['cols'] as List?)?.cast<String>().toSet(),
         engineSampleCount: json['esc'] as int?,
         envelopeSampleCount: json['evc'] as int?,
         adapterMac: json['adapterMac'] as String?,
