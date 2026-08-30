@@ -4832,5 +4832,42 @@
         "type": "String"
       }
     }
+  },
+  "liveConsumptionWindowLabel": "Posledních {seconds} s",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Jednotka spotřeby",
+  "consumptionUnitSettingSubtitle": "Jak se spotřeba paliva zobrazuje v celé aplikaci",
+  "consumptionUnitAuto": "Automaticky ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Okno živé spotřeby",
+  "consumptionWindowSettingSubtitle": "Průměruje živou hodnotu za posledních několik sekund – delší je klidnější, kratší reaguje rychleji",
+  "consumptionWindowOption": "{seconds} s",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionDisplaySectionTitle": "Zobrazení spotřeby",
+  "tripRecordingPipEstConsumptionCaptionUnit": "odh. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
   }
 }

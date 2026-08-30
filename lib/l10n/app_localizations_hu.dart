@@ -5975,6 +5975,43 @@ class AppLocalizationsHu extends AppLocalizations {
       'Lassítson a kanyar előtt, ne benne — az éles kanyar elveszi a sebességet, amelyet aztán vissza kell nyerni.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Utolsó $seconds mp';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Fogyasztás mértékegysége';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Így jelenik meg az üzemanyag-fogyasztás az egész alkalmazásban';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automatikus ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Élő fogyasztás időablaka';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Az élő értéket az utolsó néhány másodpercre átlagolja – hosszabb nyugodtabb, rövidebb gyorsabban reagál';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds mp';
+  }
+
+  @override
+  String get consumptionDisplaySectionTitle => 'Fogyasztás megjelenítése';
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'becs. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Helyhozzáférés';
 
   @override

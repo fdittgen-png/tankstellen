@@ -5953,6 +5953,43 @@ class AppLocalizationsSl extends AppLocalizations {
       'Upočasnite pred zavojem, ne v njem — ostro zavijanje izgubi hitrost, ki jo nato morate pridobiti nazaj.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Zadnjih $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Enota porabe';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Kako je poraba goriva prikazana povsod v aplikaciji';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Samodejno ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Okno porabe v živo';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Povpreči vrednost v živo čez zadnjih nekaj sekund – daljše je mirnejše, krajše se odziva hitreje';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String get consumptionDisplaySectionTitle => 'Prikaz porabe';
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'ocen. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Dostop do lokacije';
 
   @override

@@ -5976,6 +5976,43 @@ class AppLocalizationsLv extends AppLocalizations {
       'Palēniniet pirms līkuma, nevis tajā — strauja pagriešanās zaudē ātrumu, kas pēc tam jāatgūst.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Pēdējās $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Patēriņa mērvienība';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Kā degvielas patēriņš tiek rādīts visā lietotnē';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automātiski ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Tiešā patēriņa logs';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Vidējo tiešo vērtību aprēķina par pēdējām sekundēm — garāks ir stabilāks, īsāks reaģē ātrāk';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String get consumptionDisplaySectionTitle => 'Patēriņa attēlojums';
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'apt. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Atrašanās vietas piekļuve';
 
   @override

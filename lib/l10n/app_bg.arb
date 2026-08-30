@@ -4832,5 +4832,42 @@
         "type": "String"
       }
     }
+  },
+  "liveConsumptionWindowLabel": "Последните {seconds} с",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Единица за разход",
+  "consumptionUnitSettingSubtitle": "Как се показва разходът на гориво навсякъде в приложението",
+  "consumptionUnitAuto": "Автоматично ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Прозорец на разхода на живо",
+  "consumptionWindowSettingSubtitle": "Усреднява стойността на живо за последните секунди — по-дълъг е по-спокоен, по-кратък реагира по-бързо",
+  "consumptionWindowOption": "{seconds} с",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionDisplaySectionTitle": "Показване на разхода",
+  "tripRecordingPipEstConsumptionCaptionUnit": "прибл. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
   }
 }

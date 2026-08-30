@@ -4832,5 +4832,42 @@
         "type": "String"
       }
     }
+  },
+  "liveConsumptionWindowLabel": "Ultimele {seconds} s",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Unitatea de consum",
+  "consumptionUnitSettingSubtitle": "Cum este afișat consumul de combustibil în toată aplicația",
+  "consumptionUnitAuto": "Automat ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Fereastra consumului în timp real",
+  "consumptionWindowSettingSubtitle": "Mediază valoarea în timp real pe ultimele secunde — mai lungă este mai stabilă, mai scurtă reacționează mai repede",
+  "consumptionWindowOption": "{seconds} s",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionDisplaySectionTitle": "Afișarea consumului",
+  "tripRecordingPipEstConsumptionCaptionUnit": "est. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
   }
 }

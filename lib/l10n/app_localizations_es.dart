@@ -5985,6 +5985,43 @@ class AppLocalizationsEs extends AppLocalizations {
       'Frena antes de la curva, no en ella — tomar las curvas con fuerza reduce la velocidad que luego hay que recuperar.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Últimos $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Unidad de consumo';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Cómo se muestra el consumo de combustible en toda la app';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automático ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Ventana de consumo en directo';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Promedia el valor en directo sobre los últimos segundos: más largo es más estable, más corto reacciona antes';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String get consumptionDisplaySectionTitle => 'Visualización del consumo';
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'est. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Acceso a la ubicación';
 
   @override

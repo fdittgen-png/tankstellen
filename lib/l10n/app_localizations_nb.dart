@@ -5942,6 +5942,43 @@ class AppLocalizationsNb extends AppLocalizations {
       'Bremse før svingen, ikke i den — hard svingkjøring reduserer farten du deretter må bygge opp igjen.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Siste $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Forbruksenhet';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Slik vises drivstofforbruket overalt i appen';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automatisk ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Vindu for sanntidsforbruk';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Gjennomsnitt av sanntidsverdien over de siste sekundene – lengre er roligere, kortere reagerer raskere';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String get consumptionDisplaySectionTitle => 'Visning av forbruk';
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'ansl. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Plasseringstilgang';
 
   @override

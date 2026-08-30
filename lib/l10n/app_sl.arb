@@ -4832,5 +4832,42 @@
         "type": "String"
       }
     }
+  },
+  "liveConsumptionWindowLabel": "Zadnjih {seconds} s",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Enota porabe",
+  "consumptionUnitSettingSubtitle": "Kako je poraba goriva prikazana povsod v aplikaciji",
+  "consumptionUnitAuto": "Samodejno ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Okno porabe v živo",
+  "consumptionWindowSettingSubtitle": "Povpreči vrednost v živo čez zadnjih nekaj sekund – daljše je mirnejše, krajše se odziva hitreje",
+  "consumptionWindowOption": "{seconds} s",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionDisplaySectionTitle": "Prikaz porabe",
+  "tripRecordingPipEstConsumptionCaptionUnit": "ocen. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
   }
 }

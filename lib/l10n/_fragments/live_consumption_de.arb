@@ -1,0 +1,38 @@
+{
+  "liveConsumptionWindowLabel": "Letzte {seconds} s",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Verbrauchseinheit",
+  "consumptionUnitSettingSubtitle": "So wird der Kraftstoffverbrauch überall in der App angezeigt",
+  "consumptionUnitAuto": "Automatisch ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Live-Verbrauchsfenster",
+  "consumptionWindowSettingSubtitle": "Mittelt den Live-Wert über die letzten Sekunden – länger ist ruhiger, kürzer reagiert schneller",
+  "consumptionWindowOption": "{seconds} s",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "tripRecordingPipEstConsumptionCaptionUnit": "gesch. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  }
+}

@@ -5997,6 +5997,44 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ralentissez avant le virage, pas dans le virage — virer fort fait perdre de la vitesse qu\'il faudra ensuite regagner.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return '$seconds dernières s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Unité de consommation';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Comment la consommation de carburant est affichée partout dans l\'app';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automatique ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle =>
+      'Fenêtre de consommation en direct';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Moyenne la valeur en direct sur les dernières secondes — plus long est plus stable, plus court réagit plus vite';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String get consumptionDisplaySectionTitle => 'Affichage de la consommation';
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'est. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Accès à la localisation';
 
   @override

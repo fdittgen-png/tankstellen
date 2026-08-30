@@ -10249,6 +10249,60 @@ abstract class AppLocalizations {
   /// **'Slow before the bend, not in it — hard cornering scrubs off speed you then have to rebuild.'**
   String get lessonAdviceSharpCornering;
 
+  /// #3883 — label above the recording screen's headline consumption figure when it is the rolling average over the user's configured window (e.g. 'Last 5 s'). Replaces 'Instant consumption' whenever the window figure is available.
+  ///
+  /// In en, this message translates to:
+  /// **'Last {seconds} s'**
+  String liveConsumptionWindowLabel(int seconds);
+
+  /// #3883 — Settings tile title: how fuel consumption figures are displayed app-wide (L/100 km, km/L, mpg).
+  ///
+  /// In en, this message translates to:
+  /// **'Consumption unit'**
+  String get consumptionUnitSettingTitle;
+
+  /// #3883 — subtitle of the consumption-unit setting.
+  ///
+  /// In en, this message translates to:
+  /// **'How fuel consumption is shown everywhere in the app'**
+  String get consumptionUnitSettingSubtitle;
+
+  /// #3883 — the 'follow the country convention' choice of the consumption-unit picker; {unit} is the unit the active country resolves to (e.g. 'L/100 km', 'mpg (UK)').
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic ({unit})'**
+  String consumptionUnitAuto(String unit);
+
+  /// #3883 — Settings tile title: the length of the rolling window the live 'Last N s' consumption figure averages over while recording.
+  ///
+  /// In en, this message translates to:
+  /// **'Live consumption window'**
+  String get consumptionWindowSettingTitle;
+
+  /// #3883 — subtitle of the live-window setting.
+  ///
+  /// In en, this message translates to:
+  /// **'Average the live figure over the last few seconds — longer is steadier, shorter reacts faster'**
+  String get consumptionWindowSettingSubtitle;
+
+  /// #3883 — one choice of the live-window picker, in seconds (3 s, 5 s, 10 s, 30 s).
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds} s'**
+  String consumptionWindowOption(int seconds);
+
+  /// #3883 — Settings section header grouping the consumption-unit and live-window settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Consumption display'**
+  String get consumptionDisplaySectionTitle;
+
+  /// #3883 — unit caption under the big GPS-estimated consumption figure on the PiP tile / Live Activity, in the user's display unit ('est. mpg (UK)'). Generalises tripRecordingPipEstConsumptionCaption.
+  ///
+  /// In en, this message translates to:
+  /// **'est. {unit}'**
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit);
+
   /// Title of the GDPR location-consent dialog (#2306). Replaces the legacy _ConsentTexts map that only covered 10 of 23 locales for the title.
   ///
   /// In en, this message translates to:

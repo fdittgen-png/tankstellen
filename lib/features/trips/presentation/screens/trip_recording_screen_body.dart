@@ -83,6 +83,7 @@ mixin _TripRecordingBodySections on _TripRecordingEventHandlers {
       return TripRecordingLandscapeBody(
         reading: r,
         brokenMapOverride: brokenMapOverride,
+        unit: ref.watch(consumptionDisplaySettingProvider).unit, // #3883
       );
     }
 

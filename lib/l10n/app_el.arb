@@ -4832,5 +4832,42 @@
         "type": "String"
       }
     }
+  },
+  "liveConsumptionWindowLabel": "Τελευταία {seconds} δ",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Μονάδα κατανάλωσης",
+  "consumptionUnitSettingSubtitle": "Πώς εμφανίζεται η κατανάλωση καυσίμου σε όλη την εφαρμογή",
+  "consumptionUnitAuto": "Αυτόματα ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Παράθυρο ζωντανής κατανάλωσης",
+  "consumptionWindowSettingSubtitle": "Μέσος όρος της ζωντανής τιμής στα τελευταία δευτερόλεπτα — μεγαλύτερο είναι σταθερότερο, μικρότερο αντιδρά πιο γρήγορα",
+  "consumptionWindowOption": "{seconds} δ",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionDisplaySectionTitle": "Εμφάνιση κατανάλωσης",
+  "tripRecordingPipEstConsumptionCaptionUnit": "εκτ. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
   }
 }

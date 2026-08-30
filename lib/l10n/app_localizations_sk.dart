@@ -5967,6 +5967,43 @@ class AppLocalizationsSk extends AppLocalizations {
       'Spomaľte pred zákrutou, nie v nej — prudké kútovanie shodí rýchlosť, ktorú potom musíte znova nabrať.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Posledných $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Jednotka spotreby';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Ako sa spotreba paliva zobrazuje v celej aplikácii';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automaticky ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Okno živej spotreby';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Priemeruje živú hodnotu za posledných niekoľko sekúnd – dlhšie je pokojnejšie, kratšie reaguje rýchlejšie';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String get consumptionDisplaySectionTitle => 'Zobrazenie spotreby';
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'odh. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Prístup k polohe';
 
   @override

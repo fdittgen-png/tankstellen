@@ -4832,5 +4832,42 @@
         "type": "String"
       }
     }
+  },
+  "liveConsumptionWindowLabel": "Laatste {seconds} s",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Verbruikseenheid",
+  "consumptionUnitSettingSubtitle": "Hoe het brandstofverbruik overal in de app wordt getoond",
+  "consumptionUnitAuto": "Automatisch ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Venster voor live verbruik",
+  "consumptionWindowSettingSubtitle": "Middelt de live waarde over de laatste seconden — langer is rustiger, korter reageert sneller",
+  "consumptionWindowOption": "{seconds} s",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionDisplaySectionTitle": "Verbruiksweergave",
+  "tripRecordingPipEstConsumptionCaptionUnit": "gesch. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
   }
 }

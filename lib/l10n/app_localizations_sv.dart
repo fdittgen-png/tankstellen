@@ -5936,6 +5936,43 @@ class AppLocalizationsSv extends AppLocalizations {
       'Sakta ner före kurvan, inte i den — hård kurvtagning skrapar av fart som du sedan måste bygga upp igen.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Senaste $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Förbrukningsenhet';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Så visas bränsleförbrukningen överallt i appen';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automatisk ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Fönster för liveförbrukning';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Medelvärde av livevärdet över de senaste sekunderna – längre är lugnare, kortare reagerar snabbare';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String get consumptionDisplaySectionTitle => 'Visning av förbrukning';
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'uppsk. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Platsåtkomst';
 
   @override

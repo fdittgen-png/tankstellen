@@ -5939,6 +5939,43 @@ class AppLocalizationsDa extends AppLocalizations {
       'Sæt farten ned før svingen, ikke i den — hård sving reducerer farten, som du derefter skal genopbygge.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Seneste $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Forbrugsenhed';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Sådan vises brændstofforbruget overalt i appen';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automatisk ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Vindue for live-forbrug';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Gennemsnit af live-værdien over de seneste sekunder – længere er roligere, kortere reagerer hurtigere';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String get consumptionDisplaySectionTitle => 'Visning af forbrug';
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'ansl. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Placeringsadgang';
 
   @override

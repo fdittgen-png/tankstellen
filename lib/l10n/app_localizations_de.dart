@@ -5970,6 +5970,43 @@ class AppLocalizationsDe extends AppLocalizations {
       'Bremse vor der Kurve, nicht in ihr — hartes Kurvenfahren baut Geschwindigkeit ab, die du danach wieder aufbauen musst.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Letzte $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Verbrauchseinheit';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'So wird der Kraftstoffverbrauch überall in der App angezeigt';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automatisch ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Live-Verbrauchsfenster';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Mittelt den Live-Wert über die letzten Sekunden – länger ist ruhiger, kürzer reagiert schneller';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String get consumptionDisplaySectionTitle => 'Verbrauchsanzeige';
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'gesch. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Standortfreigabe';
 
   @override

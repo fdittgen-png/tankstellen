@@ -3,6 +3,7 @@
 
 import 'package:flutter/foundation.dart';
 
+import '../../../core/domain/consumption_unit.dart';
 import '../../../core/domain/driving_coaching_hint.dart';
 import '../../obd2/api.dart';
 import '../../trips/api.dart';
@@ -130,26 +131,104 @@ DrivingCoachingHint? coachingHint(
 /// Returns `null` when the OBD2 stream hasn't surfaced a fuel-rate
 /// reading yet (the banner suppresses the value in that case rather
 /// than rendering a placeholder).
-String? formatInstantConsumption(TripLiveReading r) {
-  // Smoothed instant signal (#3431) — the preferred source.
+String? formatInstantConsumption(
+  TripLiveReading r, {
+  ConsumptionUnit unit = ConsumptionUnit.lPer100Km,
+}) {
+  final f = resolveLiveConsumption(r, unit: unit);
+  return f == null ? null : '${f.figure} ${f.shortUnit}';
+}
+
+/// The live consumption figure split into its parts (#3883) — the PiP
+/// and the Live Activity render the number huge and the unit beneath.
+@immutable
+class LiveConsumptionFigure {
+  const LiveConsumptionFigure({
+    required this.figure,
+    required this.shortUnit,
+    required this.unitMask,
+    required this.isIdle,
+    required this.windowSeconds,
+  });
+
+  /// The number, already in the display unit.
+  final String figure;
+
+  /// Narrow unit token (`L/100`, `mpg`, `L/h`).
+  final String shortUnit;
+
+  /// Full unit caption (`L/100 km`, `mpg (UK)`, `L/h`).
+  final String unitMask;
+
+  /// True when the figure is the per-time L/h fallback.
+  final bool isIdle;
+
+  /// The rolling window the figure averages over, or null when it is
+  /// the EMA / raw instant fallback.
+  final int? windowSeconds;
+}
+
+/// Resolve the live consumption headline (#3883): the rolling-window
+/// average ([TripLiveReading.windowLPer100Km], the user's "last N s")
+/// when the pipeline stamped one, else the EMA instant (#3431), else the
+/// raw `fuelRate / speed` for readings built without either. Per-time
+/// L/h whenever the per-distance figure is not meaningful (standstill).
+/// Null when no fuel-rate signal exists at all.
+LiveConsumptionFigure? resolveLiveConsumption(
+  TripLiveReading r, {
+  ConsumptionUnit unit = ConsumptionUnit.lPer100Km,
+}) {
+  LiveConsumptionFigure perTime(double lPerHour, int? window) =>
+      LiveConsumptionFigure(
+        figure: lPerHour.toStringAsFixed(1),
+        shortUnit: 'L/h',
+        unitMask: 'L/h',
+        isIdle: true,
+        windowSeconds: window,
+      );
+  LiveConsumptionFigure? perDistance(double lPer100, int? window) {
+    final v = unit.fromLPer100Km(lPer100);
+    if (v == null) return null;
+    return LiveConsumptionFigure(
+      figure: v.toStringAsFixed(unit.fractionDigits),
+      shortUnit: unit.shortMask,
+      unitMask: unit.mask,
+      isIdle: false,
+      windowSeconds: window,
+    );
+  }
+
+  final windowRate = r.windowLPerHour;
+  if (windowRate != null) {
+    final lPer100 = r.windowLPer100Km;
+    if (r.windowIsIdle == true || lPer100 == null) {
+      return perTime(windowRate, r.windowSeconds);
+    }
+    return perDistance(lPer100, r.windowSeconds);
+  }
+  // Smoothed instant signal (#3431).
   final smoothedRate = r.instantLPerHour;
   if (smoothedRate != null) {
     final lPer100 = r.instantLPer100Km;
     if (r.instantIsIdle == true || lPer100 == null) {
-      return '${smoothedRate.toStringAsFixed(1)} L/h';
+      return perTime(smoothedRate, null);
     }
-    return '${lPer100.toStringAsFixed(1)} L/100';
+    return perDistance(lPer100, null);
   }
   final fuelRate = r.fuelRateLPerHour;
   if (fuelRate == null) return null;
   final speed = r.speedKmh ?? 0;
   // Below ~5 km/h the L/100 km figure explodes toward infinity and
   // stops being meaningful — fall back to the L/h value.
-  if (speed < 5) {
-    return '${fuelRate.toStringAsFixed(1)} L/h';
-  }
-  final lPer100 = fuelRate / speed * 100.0;
-  return '${lPer100.toStringAsFixed(1)} L/100';
+  if (speed < 5) return perTime(fuelRate, null);
+  return perDistance(fuelRate / speed * 100.0, null);
+}
+
+/// A GPS-estimated L/100 km figure in the display [unit], with the `~`
+/// estimate marker (ADR 0012) and no unit — the caller adds the caption.
+String formatEstimatedConsumptionFigure(double lPer100Km, ConsumptionUnit unit) {
+  final v = unit.fromLPer100Km(lPer100Km);
+  return v == null ? '~' : '~${v.toStringAsFixed(unit.fractionDigits)}';
 }
 
 /// GPS-only coaching hint (#2058) — selects one of the three GPS

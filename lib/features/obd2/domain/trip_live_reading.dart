@@ -169,6 +169,27 @@ class TripLiveReading {
   /// fuel-rate PID, so it stays populated on GPS-only trajets.
   final int? liveDrivingScore;
 
+  // --- #3883 (epic #3881) — rolling-window consumption -------------
+  // ∫fuelRate·dt ÷ ∫speed·dt over the user's window (default 5 s),
+  // produced by `RollingConsumptionWindow` in both recording pipelines.
+  // This is the recording screen's headline; the EMA instant fields
+  // above stay as the banner / PiP fallback.
+
+  /// Average consumption over the last [windowSeconds] in L/100 km.
+  /// Null while [windowIsIdle] (too little distance) or when no fuel
+  /// rate (measured or GPS-estimated) reached the window.
+  final double? windowLPer100Km;
+
+  /// Average fuel rate over the window in L/h — present whenever the
+  /// window has data; the figure to show while [windowIsIdle].
+  final double? windowLPerHour;
+
+  /// True when the window covered too little distance for L/100 km.
+  final bool? windowIsIdle;
+
+  /// The configured window length the figures integrate over.
+  final int? windowSeconds;
+
   const TripLiveReading({
     this.speedKmh,
     this.rpm,
@@ -201,6 +222,10 @@ class TripLiveReading {
     this.instantLPerHour,
     this.instantIsIdle,
     this.liveDrivingScore,
+    this.windowLPer100Km,
+    this.windowLPerHour,
+    this.windowIsIdle,
+    this.windowSeconds,
   });
 
   /// Overlay one or more fields onto a copy of this reading (#2506).
@@ -244,6 +269,10 @@ class TripLiveReading {
     double? instantLPerHour,
     bool? instantIsIdle,
     int? liveDrivingScore,
+    double? windowLPer100Km,
+    double? windowLPerHour,
+    bool? windowIsIdle,
+    int? windowSeconds,
   }) {
     return TripLiveReading(
       speedKmh: speedKmh ?? this.speedKmh,
@@ -279,6 +308,10 @@ class TripLiveReading {
       instantLPerHour: instantLPerHour ?? this.instantLPerHour,
       instantIsIdle: instantIsIdle ?? this.instantIsIdle,
       liveDrivingScore: liveDrivingScore ?? this.liveDrivingScore,
+      windowLPer100Km: windowLPer100Km ?? this.windowLPer100Km,
+      windowLPerHour: windowLPerHour ?? this.windowLPerHour,
+      windowIsIdle: windowIsIdle ?? this.windowIsIdle,
+      windowSeconds: windowSeconds ?? this.windowSeconds,
     );
   }
 

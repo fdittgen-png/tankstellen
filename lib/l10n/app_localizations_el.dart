@@ -5991,6 +5991,43 @@ class AppLocalizationsEl extends AppLocalizations {
       'Επιβραδύνετε πριν από τη στροφή, όχι μέσα σε αυτή — το δυνατό κόψιμο στροφής χάνει ταχύτητα που πρέπει να κερδίσετε ξανά.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Τελευταία $seconds δ';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Μονάδα κατανάλωσης';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Πώς εμφανίζεται η κατανάλωση καυσίμου σε όλη την εφαρμογή';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Αυτόματα ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Παράθυρο ζωντανής κατανάλωσης';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Μέσος όρος της ζωντανής τιμής στα τελευταία δευτερόλεπτα — μεγαλύτερο είναι σταθερότερο, μικρότερο αντιδρά πιο γρήγορα';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds δ';
+  }
+
+  @override
+  String get consumptionDisplaySectionTitle => 'Εμφάνιση κατανάλωσης';
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'εκτ. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Πρόσβαση στην τοποθεσία';
 
   @override

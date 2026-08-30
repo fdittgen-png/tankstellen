@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/domain/consumption_unit.dart';
 import '../../../../core/utils/time_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -54,10 +55,14 @@ class TripRecordingBannerContent extends StatelessWidget {
   final TripRecordingState state;
   final BannerPalette palette;
 
+  /// #3883 — the display unit of the live consumption figure.
+  final ConsumptionUnit unit;
+
   const TripRecordingBannerContent({
     super.key,
     required this.state,
     required this.palette,
+    this.unit = ConsumptionUnit.lPer100Km,
   });
 
   @override
@@ -91,18 +96,19 @@ class TripRecordingBannerContent extends StatelessWidget {
         ? live.gpsEstimatedLPer100Km
         : null;
     final measured = (live != null && !paused)
-        ? formatInstantConsumption(live)
+        ? formatInstantConsumption(live, unit: unit)
         : null;
     // #2393 — true only when the value shown is the GPS estimate (no
     // measured value, estimate present). Drives the approximate tooltip /
     // accessibility disclaimer; the OBD2-measured value never carries it.
     final isEstimate = measured == null && gpsEstimate != null;
-    final instantConsumption =
-        measured ??
-        // Matches the dot-decimal L/100 mask of the measured
-        // formatInstantConsumption figure (#2185 convention).
-        // i18n-ignore-format: dot-decimal L/100 consumption mask (#2185)
-        (isEstimate ? '~${gpsEstimate.toStringAsFixed(1)} L/100' : null);
+    final instantConsumption = measured ??
+        // #3883 — the estimate in the same display unit as the measured
+        // figure, `~`-marked (ADR 0012).
+        (isEstimate
+            ? '${formatEstimatedConsumptionFigure(gpsEstimate, unit)} '
+                '${unit.shortMask}'
+            : null);
     final coachingHintValue = (live != null && !paused)
         ? coachingHint(live, situation: state.situation, band: state.band)
         : null;

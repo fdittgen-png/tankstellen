@@ -5910,6 +5910,43 @@ class AppLocalizationsEn extends AppLocalizations {
       'Slow before the bend, not in it — hard cornering scrubs off speed you then have to rebuild.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Last $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Consumption unit';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'How fuel consumption is shown everywhere in the app';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automatic ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Live consumption window';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Average the live figure over the last few seconds — longer is steadier, shorter reacts faster';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String get consumptionDisplaySectionTitle => 'Consumption display';
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'est. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Location Access';
 
   @override
@@ -14128,6 +14165,44 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get lessonAdviceSharpCornering =>
       '⟦Šłóŵ ƀéƒóřé ŧĥé ƀéñđ, ñóŧ îñ îŧ — ĥářđ çóřñéřîñǧ šçřúƀš óƒƒ šƥééđ ýóú ŧĥéñ ĥáṽé ŧó řéƀúîłđ. ································⟧';
+
+  @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return '⟦Łášŧ $seconds š ··⟧';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => '⟦Çóñšúɱƥŧîóñ úñîŧ ·······⟧';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      '⟦Ĥóŵ ƒúéł çóñšúɱƥŧîóñ îš šĥóŵñ éṽéřýŵĥéřé îñ ŧĥé áƥƥ ···················⟧';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return '⟦Áúŧóɱáŧîç ($unit) ····⟧';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle =>
+      '⟦Łîṽé çóñšúɱƥŧîóñ ŵîñđóŵ ·········⟧';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      '⟦Áṽéřáǧé ŧĥé łîṽé ƒîǧúřé óṽéř ŧĥé łášŧ ƒéŵ šéçóñđš — łóñǧéř îš šŧéáđîéř, šĥóřŧéř řéáçŧš ƒášŧéř ··································⟧';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '⟦$seconds š⟧';
+  }
+
+  @override
+  String get consumptionDisplaySectionTitle => '⟦Çóñšúɱƥŧîóñ đîšƥłáý ········⟧';
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return '⟦éšŧ. $unit ·⟧';
+  }
 
   @override
   String get locationConsentTitle => '⟦Łóçáŧîóñ Áççéšš ······⟧';

@@ -20,6 +20,7 @@ import '../../../feature_management/domain/feature_dependency_graph.dart';
 import '../../../glide_coach/providers/glide_coach_enabled_provider.dart';
 import '../../../glide_coach/providers/glide_coach_settings_provider.dart';
 import '../../../profile/presentation/widgets/gamification_settings_tile.dart';
+import '../../../trips/api.dart' show ConsumptionDisplaySettingsTiles;
 import '../../../profile/providers/voice_announcements_enabled_provider.dart';
 import '../../providers/haptic_eco_coach_provider.dart';
 import '../../providers/voice_announcement_settings_provider.dart';
@@ -134,6 +135,15 @@ class DrivingSettingsSection extends ConsumerWidget {
         // driving guidance, like the haptic coaches above.
         if (ref.watch(voiceAnnouncementsEnabledProvider))
           const _VoiceAnnouncementsTile(),
+
+        // #3883 — consumption display: app-wide unit + live window.
+        const SizedBox(height: Spacing.md),
+        SectionHeader(
+          title: l.consumptionDisplaySectionTitle,
+          leadingIcon: Icons.speed,
+          padding: const EdgeInsets.fromLTRB(0, Spacing.sm, 0, Spacing.sm),
+        ),
+        const ConsumptionDisplaySettingsTiles(),
 
         // 3. Rewards & savings — the fuel-club entry-point (when
         //    [Feature.loyaltyCards] is on) and the gamification opt-out.

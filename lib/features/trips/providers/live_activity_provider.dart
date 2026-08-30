@@ -7,6 +7,7 @@ import 'dart:ui' as ui;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/language/language_provider.dart';
+import '../../../core/providers/consumption_display_provider.dart';
 import '../../../core/services/approach_detector.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../approach/providers/effective_approach_state_provider.dart';
@@ -113,6 +114,7 @@ class LiveActivitySync extends _$LiveActivitySync {
       radiusMeters: radiusMeters,
       l: _l10n(),
       now: DateTime.now(),
+      unit: ref.watch(consumptionDisplaySettingProvider).unit, // #3883
     );
     unawaited(coordinator.apply(content));
   }

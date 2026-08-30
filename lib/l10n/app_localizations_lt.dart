@@ -5975,6 +5975,43 @@ class AppLocalizationsLt extends AppLocalizations {
       'Lėtinkite prieš posūkį, o ne jame — staigus posūkis sumažina greitį, kurį tada reikia atgauti.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Paskutinės $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Sąnaudų vienetas';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Kaip degalų sąnaudos rodomos visoje programoje';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automatiškai ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Tiesioginių sąnaudų langas';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Tiesioginės vertės vidurkis per paskutines sekundes — ilgesnis stabilesnis, trumpesnis reaguoja greičiau';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String get consumptionDisplaySectionTitle => 'Sąnaudų rodymas';
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'apyt. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Vietos prieiga';
 
   @override

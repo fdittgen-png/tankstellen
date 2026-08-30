@@ -7,7 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/router.dart';
+import '../../../../core/domain/consumption_unit.dart';
 import '../../../../core/navigation/app_routes.dart';
+import '../../../../core/providers/consumption_display_provider.dart';
 import '../../../../core/services/approach_detector.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -49,14 +51,10 @@ class TripRecordingBanner extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // #3613 — this wrapper sits above EVERY screen and the recording
-    // state emits at ~1 Hz, so watch only the fields the banner strip
-    // actually renders: phase (isActive / paused / palette), situation,
-    // band, liveDeltaFraction and the live reading (distance / elapsed /
-    // instant consumption / coaching hint / a11y label). Mutations to
-    // the non-rendered fields (dropReason, reconnectPassiveWaiting,
-    // gpsCoachingHint, connectStage, saveStage — each drawn by its own
-    // dedicated widget) no longer rebuild the whole app subtree. The
-    // record's == is structural, so an identical projection is a no-op.
+    // state emits at ~1 Hz, so watch only the fields the strip renders
+    // (phase, situation, band, liveDeltaFraction, live reading); the
+    // non-rendered fields each have their own widget and no longer
+    // rebuild the whole app subtree (the record's == is structural).
     // The PiP branch below re-watches the full state: the PiP tile is
     // the ONLY thing on screen there, so selecting buys nothing.
     final view = ref.watch(tripRecordingProvider.select((s) => (
@@ -169,8 +167,7 @@ class TripRecordingBanner extends ConsumerWidget {
 
       return _pipView(
         context,
-        // #3613 — the compact tile is the whole UI in PiP; hand it the
-        // full state so it can keep reading any field it needs.
+        // #3613 — the tile is the whole UI in PiP: hand it the full state.
         ref.watch(tripRecordingProvider),
         approachState: approach,
         fuelType: fuel,
@@ -178,6 +175,7 @@ class TripRecordingBanner extends ConsumerWidget {
         radiusMeters: radiusMeters,
         searchRadarActive: searchRadarActive,
         onBodyTap: onBodyTap,
+        unit: ref.watch(consumptionDisplaySettingProvider).unit, // #3883
       );
     }
 
@@ -261,6 +259,7 @@ class TripRecordingBanner extends ConsumerWidget {
                     child: TripRecordingBannerContent(
                       state: state,
                       palette: bandColor,
+                      unit: ref.watch(consumptionDisplaySettingProvider).unit,
                     ),
                   ),
                 ),
@@ -303,8 +302,7 @@ class TripRecordingBanner extends ConsumerWidget {
     );
   }
 
-  /// Full-bleed compact tile shown while the app is a PiP window
-  /// (#1977 + #2068 — layout lives in [TripRecordingPipView]).
+  /// Full-bleed PiP tile (#1977/#2068 — layout in [TripRecordingPipView]).
   Widget _pipView(
     BuildContext context,
     TripRecordingState state, {
@@ -314,6 +312,7 @@ class TripRecordingBanner extends ConsumerWidget {
     required double? radiusMeters,
     bool searchRadarActive = false,
     VoidCallback? onBodyTap,
+    ConsumptionUnit unit = ConsumptionUnit.lPer100Km, // #3883
   }) {
     if (!state.isActive) {
       // #2677 — the on-search Fuel Station Radar runs WITHOUT a trip. When it
@@ -354,6 +353,7 @@ class TripRecordingBanner extends ConsumerWidget {
       state: state,
       backgroundColor: palette.background,
       foregroundColor: palette.foreground,
+      unit: unit, // #3883
       // #2163 — null outside any radius → PiP keeps the default layout.
       approachState: approachState,
       fuelType: fuelType,

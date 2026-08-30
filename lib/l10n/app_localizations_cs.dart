@@ -5954,6 +5954,43 @@ class AppLocalizationsCs extends AppLocalizations {
       'Zpomalujte před zatáčkou, ne v ní — ostré projíždění zatáčkami ztrácí rychlost, kterou pak musíte znovu dobývat.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Posledních $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Jednotka spotřeby';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Jak se spotřeba paliva zobrazuje v celé aplikaci';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automaticky ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Okno živé spotřeby';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Průměruje živou hodnotu za posledních několik sekund – delší je klidnější, kratší reaguje rychleji';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String get consumptionDisplaySectionTitle => 'Zobrazení spotřeby';
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'odh. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Přístup k poloze';
 
   @override

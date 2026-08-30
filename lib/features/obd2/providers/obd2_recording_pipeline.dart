@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/providers/consumption_display_provider.dart';
 import '../../../core/sync/trips_sync_enabled_provider.dart';
 import '../../driving/providers/live_harsh_event_bus_provider.dart';
 import '../../../core/domain/vehicle_profile.dart';
@@ -169,6 +170,9 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       onHarshEvent: _ref.read(liveHarshEventBusProvider.notifier).add,
     );
     _controller = ctl;
+    // #3883 — the live "last N s" window length follows Settings live.
+    ctl.readLiveConsumptionWindowSeconds = () =>
+        _ref.read(consumptionDisplaySettingProvider).windowSeconds;
 
     // #3500 — shared per-trip IMU fusion: confirmed inertial episodes feed
     // the live harsh-event bus (spoken coaching on OBD2 trips too); sensor

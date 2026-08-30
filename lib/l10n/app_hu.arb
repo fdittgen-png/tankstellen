@@ -4832,5 +4832,42 @@
         "type": "String"
       }
     }
+  },
+  "liveConsumptionWindowLabel": "Utolsó {seconds} mp",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Fogyasztás mértékegysége",
+  "consumptionUnitSettingSubtitle": "Így jelenik meg az üzemanyag-fogyasztás az egész alkalmazásban",
+  "consumptionUnitAuto": "Automatikus ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Élő fogyasztás időablaka",
+  "consumptionWindowSettingSubtitle": "Az élő értéket az utolsó néhány másodpercre átlagolja – hosszabb nyugodtabb, rövidebb gyorsabban reagál",
+  "consumptionWindowOption": "{seconds} mp",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionDisplaySectionTitle": "Fogyasztás megjelenítése",
+  "tripRecordingPipEstConsumptionCaptionUnit": "becs. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
   }
 }

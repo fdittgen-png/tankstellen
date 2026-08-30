@@ -5984,6 +5984,44 @@ class AppLocalizationsRo extends AppLocalizations {
       'Reduceți viteza înainte de curbă, nu în ea — virajele strânse frânează viteza pe care trebuie apoi să o recâștigați.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Ultimele $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Unitatea de consum';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Cum este afișat consumul de combustibil în toată aplicația';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automat ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle =>
+      'Fereastra consumului în timp real';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Mediază valoarea în timp real pe ultimele secunde — mai lungă este mai stabilă, mai scurtă reacționează mai repede';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String get consumptionDisplaySectionTitle => 'Afișarea consumului';
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'est. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Acces la locație';
 
   @override

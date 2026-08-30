@@ -5991,6 +5991,43 @@ class AppLocalizationsBg extends AppLocalizations {
       'Намалете преди завоя, не в него — рязкото вземане на завои губи скоростта, която после трябва да наберете отново.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Последните $seconds с';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Единица за разход';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Как се показва разходът на гориво навсякъде в приложението';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Автоматично ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Прозорец на разхода на живо';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Усреднява стойността на живо за последните секунди — по-дълъг е по-спокоен, по-кратък реагира по-бързо';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds с';
+  }
+
+  @override
+  String get consumptionDisplaySectionTitle => 'Показване на разхода';
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'прибл. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Достъп до местоположението';
 
   @override

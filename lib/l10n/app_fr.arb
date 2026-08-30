@@ -4804,5 +4804,42 @@
         "type": "String"
       }
     }
+  },
+  "liveConsumptionWindowLabel": "{seconds} dernières s",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Unité de consommation",
+  "consumptionUnitSettingSubtitle": "Comment la consommation de carburant est affichée partout dans l'app",
+  "consumptionUnitAuto": "Automatique ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Fenêtre de consommation en direct",
+  "consumptionWindowSettingSubtitle": "Moyenne la valeur en direct sur les dernières secondes — plus long est plus stable, plus court réagit plus vite",
+  "consumptionWindowOption": "{seconds} s",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionDisplaySectionTitle": "Affichage de la consommation",
+  "tripRecordingPipEstConsumptionCaptionUnit": "est. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
   }
 }

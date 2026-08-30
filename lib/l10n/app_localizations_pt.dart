@@ -5986,6 +5986,43 @@ class AppLocalizationsPt extends AppLocalizations {
       'Reduza antes da curva, não durante — fazer curvas bruscas perde velocidade que terá de recuperar.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Últimos $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Unidade de consumo';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Como o consumo de combustível é mostrado em toda a app';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automático ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Janela de consumo em direto';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Faz a média do valor em direto nos últimos segundos — mais longa é mais estável, mais curta reage mais depressa';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String get consumptionDisplaySectionTitle => 'Apresentação do consumo';
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'est. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Acesso à localização';
 
   @override

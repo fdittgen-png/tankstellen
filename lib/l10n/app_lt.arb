@@ -4832,5 +4832,42 @@
         "type": "String"
       }
     }
+  },
+  "liveConsumptionWindowLabel": "Paskutinės {seconds} s",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Sąnaudų vienetas",
+  "consumptionUnitSettingSubtitle": "Kaip degalų sąnaudos rodomos visoje programoje",
+  "consumptionUnitAuto": "Automatiškai ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Tiesioginių sąnaudų langas",
+  "consumptionWindowSettingSubtitle": "Tiesioginės vertės vidurkis per paskutines sekundes — ilgesnis stabilesnis, trumpesnis reaguoja greičiau",
+  "consumptionWindowOption": "{seconds} s",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionDisplaySectionTitle": "Sąnaudų rodymas",
+  "tripRecordingPipEstConsumptionCaptionUnit": "apyt. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
   }
 }

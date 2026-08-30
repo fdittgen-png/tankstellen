@@ -4832,5 +4832,42 @@
         "type": "String"
       }
     }
+  },
+  "liveConsumptionWindowLabel": "Viimased {seconds} s",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Kulu ühik",
+  "consumptionUnitSettingSubtitle": "Kuidas kütusekulu kogu rakenduses kuvatakse",
+  "consumptionUnitAuto": "Automaatne ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Reaalajas kulu aken",
+  "consumptionWindowSettingSubtitle": "Keskmistab reaalajas väärtuse viimaste sekundite üle – pikem on rahulikum, lühem reageerib kiiremini",
+  "consumptionWindowOption": "{seconds} s",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionDisplaySectionTitle": "Kulu kuvamine",
+  "tripRecordingPipEstConsumptionCaptionUnit": "hinn. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -5942,6 +5942,44 @@ class AppLocalizationsFi extends AppLocalizations {
       'Hidasta ennen mutkaa, ei mutkassa — kova kaarros hidastaa vauhtia, jonka sitten täytyy rakentaa uudelleen.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Viimeiset $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Kulutuksen yksikkö';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Miten polttoaineenkulutus näytetään kaikkialla sovelluksessa';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automaattinen ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle =>
+      'Reaaliaikaisen kulutuksen ikkuna';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Keskiarvoistaa reaaliaikaisen arvon viime sekunneilta – pidempi on tasaisempi, lyhyempi reagoi nopeammin';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String get consumptionDisplaySectionTitle => 'Kulutuksen näyttö';
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'arv. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Sijainnin käyttö';
 
   @override

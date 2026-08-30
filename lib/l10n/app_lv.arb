@@ -4832,5 +4832,42 @@
         "type": "String"
       }
     }
+  },
+  "liveConsumptionWindowLabel": "Pēdējās {seconds} s",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Patēriņa mērvienība",
+  "consumptionUnitSettingSubtitle": "Kā degvielas patēriņš tiek rādīts visā lietotnē",
+  "consumptionUnitAuto": "Automātiski ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Tiešā patēriņa logs",
+  "consumptionWindowSettingSubtitle": "Vidējo tiešo vērtību aprēķina par pēdējām sekundēm — garāks ir stabilāks, īsāks reaģē ātrāk",
+  "consumptionWindowOption": "{seconds} s",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionDisplaySectionTitle": "Patēriņa attēlojums",
+  "tripRecordingPipEstConsumptionCaptionUnit": "apt. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
   }
 }

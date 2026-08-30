@@ -103,6 +103,36 @@ void main() {
     });
 
     testWidgets(
+        '#3883 — a rolling-window figure takes the headline under a '
+        '"Last N s" label; the EMA instant is not shown in its place',
+        (tester) async {
+      const state = TripRecordingState(
+        live: TripLiveReading(
+          elapsed: Duration(minutes: 5),
+          distanceKmSoFar: 10.0,
+          fuelLitersSoFar: 0.83,
+          instantLPer100Km: 12.0,
+          instantLPerHour: 7.2,
+          instantIsIdle: false,
+          windowLPer100Km: 9.0,
+          windowLPerHour: 5.4,
+          windowIsIdle: false,
+          windowSeconds: 5,
+        ),
+      );
+      await tester.pumpWidget(_harness(state));
+      await tester.pumpAndSettle();
+
+      final headline = tester.widget<Text>(
+          find.byKey(const Key('minimal_drive_instant_value')));
+      expect(headline.data, '9.0 L/100');
+      final label = tester.widget<Text>(
+          find.byKey(const Key('minimal_drive_headline_label')));
+      expect(label.data, 'Last 5 s');
+      expect(find.text('Instant consumption'), findsNothing);
+    });
+
+    testWidgets(
         'no instant signal and no average → headline dashes, no avg row',
         (tester) async {
       const state = TripRecordingState(

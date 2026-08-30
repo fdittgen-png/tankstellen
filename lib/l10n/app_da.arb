@@ -4832,5 +4832,42 @@
         "type": "String"
       }
     }
+  },
+  "liveConsumptionWindowLabel": "Seneste {seconds} s",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Forbrugsenhed",
+  "consumptionUnitSettingSubtitle": "Sådan vises brændstofforbruget overalt i appen",
+  "consumptionUnitAuto": "Automatisk ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Vindue for live-forbrug",
+  "consumptionWindowSettingSubtitle": "Gennemsnit af live-værdien over de seneste sekunder – længere er roligere, kortere reagerer hurtigere",
+  "consumptionWindowOption": "{seconds} s",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionDisplaySectionTitle": "Visning af forbrug",
+  "tripRecordingPipEstConsumptionCaptionUnit": "ansl. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
   }
 }

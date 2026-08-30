@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/providers/consumption_display_provider.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../driving_score/api.dart';
@@ -73,22 +74,28 @@ class MinimalDriveSummary extends ConsumerWidget {
     // L/h at idle) via the shared formatter; GPS-only trajets fall back
     // to the live physics estimate with the `~` estimate marker
     // (matching the banner / PiP convention, ADR 0012).
-    final instantText =
-        reading == null ? null : formatInstantConsumption(reading);
+    // #3883 — the headline is the rolling "last N s" average in the
+    // user's unit when the pipeline stamped one (labelled with the
+    // window), else the EMA instant under the "Instant" label.
+    final unit = ref.watch(consumptionDisplaySettingProvider).unit;
+    final figure =
+        reading == null ? null : resolveLiveConsumption(reading, unit: unit);
     final gpsInstant = reading?.gpsEstimatedLPer100Km;
-    final headline = instantText ??
-        (gpsInstant != null
-            // i18n-ignore: language-neutral consumption unit format mask
-            // Matches the dot-decimal L/100 mask of the measured
-            // formatInstantConsumption figure (#2185 convention).
-            // i18n-ignore-format: dot-decimal L/100 consumption mask (#2185)
-            ? '~${gpsInstant.toStringAsFixed(1)} L/100'
+    final headline = figure != null
+        ? '${figure.figure} ${figure.shortUnit}'
+        : (gpsInstant != null
+            ? '${formatEstimatedConsumptionFigure(gpsInstant, unit)} '
+                '${unit.shortMask}'
             : '—');
+    final windowSeconds = figure?.windowSeconds;
+    final headlineLabel = windowSeconds != null
+        ? l.liveConsumptionWindowLabel(windowSeconds)
+        : l.minimalDriveInstantConsumption;
     final avgText = liveAvg != null
-        ? UnitFormatter.formatConsumption(liveAvg, isEv: false)
+        ? UnitFormatter.formatConsumption(liveAvg, isEv: false, unit: unit)
         : (gpsAvg != null
             // i18n-ignore: `~` estimate marker on a language-neutral mask
-            ? '~${UnitFormatter.formatConsumption(gpsAvg, isEv: false)}'
+            ? '~${UnitFormatter.formatConsumption(gpsAvg, isEv: false, unit: unit)}'
             : null);
 
     // #2058 — when the trajet has no fuel-rate data (GPS-only mode),
@@ -151,7 +158,8 @@ class MinimalDriveSummary extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              l.minimalDriveInstantConsumption,
+              headlineLabel,
+              key: const Key('minimal_drive_headline_label'),
               style: theme.textTheme.labelSmall?.copyWith(
                 color: scheme.onSurfaceVariant,
               ),

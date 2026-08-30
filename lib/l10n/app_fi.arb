@@ -4832,5 +4832,42 @@
         "type": "String"
       }
     }
+  },
+  "liveConsumptionWindowLabel": "Viimeiset {seconds} s",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Kulutuksen yksikkö",
+  "consumptionUnitSettingSubtitle": "Miten polttoaineenkulutus näytetään kaikkialla sovelluksessa",
+  "consumptionUnitAuto": "Automaattinen ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Reaaliaikaisen kulutuksen ikkuna",
+  "consumptionWindowSettingSubtitle": "Keskiarvoistaa reaaliaikaisen arvon viime sekunneilta – pidempi on tasaisempi, lyhyempi reagoi nopeammin",
+  "consumptionWindowOption": "{seconds} s",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionDisplaySectionTitle": "Kulutuksen näyttö",
+  "tripRecordingPipEstConsumptionCaptionUnit": "arv. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
   }
 }

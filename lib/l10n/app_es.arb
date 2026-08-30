@@ -4832,5 +4832,42 @@
         "type": "String"
       }
     }
+  },
+  "liveConsumptionWindowLabel": "Últimos {seconds} s",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Unidad de consumo",
+  "consumptionUnitSettingSubtitle": "Cómo se muestra el consumo de combustible en toda la app",
+  "consumptionUnitAuto": "Automático ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Ventana de consumo en directo",
+  "consumptionWindowSettingSubtitle": "Promedia el valor en directo sobre los últimos segundos: más largo es más estable, más corto reacciona antes",
+  "consumptionWindowOption": "{seconds} s",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionDisplaySectionTitle": "Visualización del consumo",
+  "tripRecordingPipEstConsumptionCaptionUnit": "est. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
   }
 }

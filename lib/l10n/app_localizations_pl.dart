@@ -5967,6 +5967,43 @@ class AppLocalizationsPl extends AppLocalizations {
       'Zwalniaj przed zakrętem, a nie w nim — gwałtowne pokonywanie zakrętów traci prędkość, którą trzeba odbudować.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Ostatnie $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Jednostka zużycia paliwa';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Jak zużycie paliwa jest pokazywane w całej aplikacji';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automatycznie ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Okno zużycia na żywo';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Uśrednia wartość na żywo z ostatnich sekund — dłuższe jest stabilniejsze, krótsze reaguje szybciej';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String get consumptionDisplaySectionTitle => 'Wyświetlanie zużycia';
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'szac. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Dostęp do lokalizacji';
 
   @override

@@ -4832,5 +4832,42 @@
         "type": "String"
       }
     }
+  },
+  "liveConsumptionWindowLabel": "Ostatnie {seconds} s",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Jednostka zużycia paliwa",
+  "consumptionUnitSettingSubtitle": "Jak zużycie paliwa jest pokazywane w całej aplikacji",
+  "consumptionUnitAuto": "Automatycznie ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Okno zużycia na żywo",
+  "consumptionWindowSettingSubtitle": "Uśrednia wartość na żywo z ostatnich sekund — dłuższe jest stabilniejsze, krótsze reaguje szybciej",
+  "consumptionWindowOption": "{seconds} s",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionDisplaySectionTitle": "Wyświetlanie zużycia",
+  "tripRecordingPipEstConsumptionCaptionUnit": "szac. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
   }
 }

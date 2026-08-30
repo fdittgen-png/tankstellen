@@ -5958,6 +5958,43 @@ class AppLocalizationsNl extends AppLocalizations {
       'Rem voor de bocht, niet erin — hard door een bocht rijden kost snelheid die je daarna opnieuw moet opbouwen.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Laatste $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Verbruikseenheid';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Hoe het brandstofverbruik overal in de app wordt getoond';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automatisch ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Venster voor live verbruik';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Middelt de live waarde over de laatste seconden — langer is rustiger, korter reageert sneller';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String get consumptionDisplaySectionTitle => 'Verbruiksweergave';
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'gesch. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Locatietoegang';
 
   @override

@@ -14,7 +14,8 @@ mixin _TripRecordingEmit
     on
         _TripRecordingTelemetryIngest,
         _TripRecordingTransportGuard,
-        _TripRecordingPowerWatch {
+        _TripRecordingPowerWatch,
+        _TripRecordingWindowStamp {
   /// Minimum wall-clock spacing between diagnostic-capture raw-input
   /// stamps (#2459). The fuel-derivation signals drift slowly, so a
   /// ~1 Hz sample is ample for post-hoc re-derivation and keeps the
@@ -329,6 +330,9 @@ mixin _TripRecordingEmit
       rpm: rpm,
       altitudeM: snap.latestAltitudeM,
     );
+    // #3883 — rolling "last N s" window (trip_recording_controller_window).
+    reading = _stampRollingWindow(reading,
+        nowTs: nowTs, fuelRate: fuelRate, speedKmh: effectiveSpeedKmh);
     _liveController.add(reading);
   }
 

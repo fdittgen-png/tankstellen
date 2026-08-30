@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/providers/app_state_provider.dart';
+import '../../../../core/providers/consumption_display_provider.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/utils/time_formatter.dart';

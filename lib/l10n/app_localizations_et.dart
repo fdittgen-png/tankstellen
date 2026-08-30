@@ -5938,6 +5938,43 @@ class AppLocalizationsEt extends AppLocalizations {
       'Aeglustage enne kurvi, mitte selles — järsk kurvisõit kaotab kiiruse, mille peate seejärel taastama.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Viimased $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Kulu ühik';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Kuidas kütusekulu kogu rakenduses kuvatakse';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automaatne ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Reaalajas kulu aken';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Keskmistab reaalajas väärtuse viimaste sekundite üle – pikem on rahulikum, lühem reageerib kiiremini';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String get consumptionDisplaySectionTitle => 'Kulu kuvamine';
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'hinn. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Asukoha juurdepääs';
 
   @override
