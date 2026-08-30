@@ -69,15 +69,51 @@ class TrafficSignalRepository {
 
     final cached = _readCache(key);
     if (cached != null) return cached;
-
-    final fresh = await _client.fetchInBoundingBox(
-      south: south,
-      west: west,
-      north: north,
-      east: east,
-    );
+    // #3890 — circuit breaker: after a failed Overpass call the endpoint
+    // is not dialled again for [breakerHold] (5 min, doubling to 1 h on
+    // consecutive failures); a stale cache entry is served meanwhile,
+    // else an empty list. The field log had 50/50 error traces from one
+    // unreachable Overpass — now one probe per hold window, one trace.
+    final until = _breakerUntil;
+    if (until != null && _now().isBefore(until)) {
+      return _readCache(key, ignoreTtl: true) ?? const <TrafficSignal>[];
+    }
+    final List<TrafficSignal> fresh;
+    try {
+      fresh = await _client.fetchInBoundingBox(
+        south: south,
+        west: west,
+        north: north,
+        east: east,
+      );
+    } catch (_) {
+      _tripBreaker();
+      rethrow;
+    }
+    _breakerFailures = 0;
+    _breakerUntil = null;
     await _writeCache(key, fresh);
     return fresh;
+  }
+
+  int _breakerFailures = 0;
+  DateTime? _breakerUntil;
+
+  /// When the breaker re-allows a network probe, or null when closed.
+  @visibleForTesting
+  DateTime? get breakerUntil => _breakerUntil;
+
+  /// The current hold: 5 min after the first failure, doubling per
+  /// consecutive failure, capped at 1 h.
+  Duration get breakerHold {
+    if (_breakerFailures <= 0) return Duration.zero;
+    final minutes = (5 << (_breakerFailures - 1)).clamp(5, 60);
+    return Duration(minutes: minutes);
+  }
+
+  void _tripBreaker() {
+    _breakerFailures++;
+    _breakerUntil = _now().add(breakerHold);
   }
 
   /// Build a cache key from the bounding box, snapping each corner to
@@ -102,7 +138,7 @@ class TrafficSignalRepository {
     return 'bbox:${snap(south)}:${snap(west)}:${snap(north)}:${snap(east)}';
   }
 
-  List<TrafficSignal>? _readCache(String key) {
+  List<TrafficSignal>? _readCache(String key, {bool ignoreTtl = false}) {
     final raw = _cacheBox.get(key);
     if (raw == null || raw.isEmpty) return null;
 
@@ -119,7 +155,7 @@ class TrafficSignalRepository {
     final cachedAtMs = envelope['cachedAt'];
     if (cachedAtMs is! int) return null;
     final cachedAt = DateTime.fromMillisecondsSinceEpoch(cachedAtMs);
-    if (_now().difference(cachedAt) > _ttl) return null;
+    if (!ignoreTtl && _now().difference(cachedAt) > _ttl) return null;
 
     final signalsRaw = envelope['signals'];
     if (signalsRaw is! List) return null;
