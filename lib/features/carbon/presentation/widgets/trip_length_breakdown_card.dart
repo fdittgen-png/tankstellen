@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/providers/consumption_display_provider.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../trips/api.dart';
@@ -149,7 +151,7 @@ class TripLengthBreakdownCard extends StatelessWidget {
 ///     more data" placeholder, count subtitle. No arrow.
 ///   * `tripCount >= 5` → tile shows the bucket label, average
 ///     L/100 km, count + distance subtitle, arrow vs. overall avg.
-class _BucketTile extends StatelessWidget {
+class _BucketTile extends ConsumerWidget {
   final String label;
   final TripLengthBucketStats stats;
   final double? overallAvgLPer100Km;
@@ -166,7 +168,9 @@ class _BucketTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // #3889 — the app-wide consumption unit.
+    final unit = ref.watch(consumptionDisplaySettingProvider).unit;
     final tripCount = stats.tripCount;
     final hasEnoughData = tripCount >= TripLengthBreakdownCard.minTripsForAverage;
     final avg = stats.avgLPer100Km;
@@ -175,7 +179,7 @@ class _BucketTile extends StatelessWidget {
         ? (tripCount == 0
             ? '—'
             : l.tripLengthBucketNeedMoreData)
-        : (avg == null ? '—' : '${UnitFormatter.formatDecimal(avg)} L/100');
+        : (avg == null ? '—' : UnitFormatter.formatConsumptionLocalized(avg, unit));
 
     final subtitle = tripCount == 0
         ? l.tripLengthBucketTripCount(0)

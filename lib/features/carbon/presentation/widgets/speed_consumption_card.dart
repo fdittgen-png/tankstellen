@@ -10,9 +10,11 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../trips/api.dart';
+import '../../../../core/providers/consumption_display_provider.dart';
 import '../../../../core/utils/unit_formatter.dart';
 
 part '_speed_bars.dart';
