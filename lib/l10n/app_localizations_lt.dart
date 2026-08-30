@@ -294,13 +294,6 @@ class AppLocalizationsLt extends AppLocalizations {
   String get clearCacheButton => 'Išvalyti podėlį';
 
   @override
-  String get deleteAllTitle => 'Ištrinti visus duomenis?';
-
-  @override
-  String get deleteAllBody =>
-      'Tai visam laikui ištrina visus profilius, mėgstamus, API raktą, nustatymus ir podėlį. Programa bus atstatyta.';
-
-  @override
   String get deleteAllButton => 'Ištrinti viską';
 
   @override
@@ -848,20 +841,6 @@ class AppLocalizationsLt extends AppLocalizations {
   @override
   String get avoidHighwaysDesc =>
       'Maršruto skaičiavimas vengia mokamų kelių ir greitkelių';
-
-  @override
-  String get showFuelStations => 'Rodyti degalines';
-
-  @override
-  String get showFuelStationsDesc =>
-      'Įtraukti benzino, dyzelino, LPG, CNG stotis';
-
-  @override
-  String get showEvStations => 'Rodyti įkrovimo stotis';
-
-  @override
-  String get showEvStationsDesc =>
-      'Įtraukti elektrinius įkrovimo stotis į rezultatus';
 
   @override
   String get noStationsAlongThisRoute => 'Stočių palei šį maršrutą nerasta.';
@@ -1854,9 +1833,6 @@ class AppLocalizationsLt extends AppLocalizations {
       'Kelionė pristabdyta — palieskite, kad tęstumėte';
 
   @override
-  String get navConsumption => 'Suvartojimas';
-
-  @override
   String get vehicleBaselineSectionTitle => 'Bazinė kalibracija';
 
   @override
@@ -2242,18 +2218,6 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get sectionLocation => 'Vieta';
-
-  @override
-  String get sectionSetupDataSources => 'Sąranka ir duomenų šaltiniai';
-
-  @override
-  String get sectionFeaturesUsage => 'Funkcijos ir naudojimas';
-
-  @override
-  String get sectionAccountSync => 'Paskyra ir sinchronizavimas';
-
-  @override
-  String get sectionAppearanceWidgets => 'Išvaizda ir valdikliai';
 
   @override
   String get sectionPrivacyData => 'Privatumas ir duomenys';
@@ -5975,6 +5939,40 @@ class AppLocalizationsLt extends AppLocalizations {
       'Lėtinkite prieš posūkį, o ne jame — staigus posūkis sumažina greitį, kurį tada reikia atgauti.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Paskutinės $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Sąnaudų vienetas';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Kaip degalų sąnaudos rodomos visoje programoje';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automatiškai ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Tiesioginių sąnaudų langas';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Tiesioginės vertės vidurkis per paskutines sekundes — ilgesnis stabilesnis, trumpesnis reaguoja greičiau';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'apyt. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Vietos prieiga';
 
   @override
@@ -7120,6 +7118,260 @@ class AppLocalizationsLt extends AppLocalizations {
   String get refuelUnitPerSession => '/sesija';
 
   @override
+  String get settingsSearchHint => 'Ieškoti nustatymuose';
+
+  @override
+  String settingsSearchNoResults(String query) {
+    return 'Nė vienas nustatymas neatitinka „$query“';
+  }
+
+  @override
+  String get settingsTopicProfilesTitle => 'Profiliai ir regionas';
+
+  @override
+  String get settingsTopicProfilesSubtitle =>
+      'Šalis, kalba, degalai, paieškos spindulys, maršruto planavimas';
+
+  @override
+  String get settingsTopicProfilesKeywords =>
+      'profilis, šalis, kalba, degalai, spindulys, pašto kodas, maršrutas, namai, įvertinimas, pradžios ekranas, profile, country, language, fuel, radius, route, home, rating';
+
+  @override
+  String get settingsTopicVehiclesTitle => 'Transporto priemonės ir OBD2';
+
+  @override
+  String get settingsTopicVehiclesSubtitle =>
+      'Jūsų automobiliai, bako talpa, OBD2 adapterio susiejimas';
+
+  @override
+  String get settingsTopicVehiclesKeywords =>
+      'transporto priemonė, automobilis, obd, obd2, adapteris, bluetooth, bakas, variklis, vin, kalibravimas, vehicle, car, adapter, tank, engine, calibration';
+
+  @override
+  String get settingsTopicDrivingTitle => 'Vairavimas ir sąnaudos';
+
+  @override
+  String get settingsTopicDrivingSubtitle =>
+      'Treniravimas, apdovanojimai, degalinių radaras, trikčių šalinimas';
+
+  @override
+  String get settingsTopicDrivingKeywords =>
+      'treneris, eko, haptinis, balsas, žaidybinimas, radaras, riedėjimas, kelionė, sąnaudos, degalų klubas, lojalumas, obd2 žurnalas, prisegti, coach, eco, haptic, voice, gamification, radar, glide, trip, consumption, loyalty, pin';
+
+  @override
+  String get settingsTopicPricesTitle => 'Kainos ir įspėjimai';
+
+  @override
+  String get settingsTopicPricesSubtitle =>
+      'Kainų įspėjimai, balso pranešimai, kainų istorija, bendruomenės pranešimai';
+
+  @override
+  String get settingsTopicPricesKeywords =>
+      'įspėjimas, pranešimas, kaina, istorija, prognozė, geriausias laikas, bendruomenė, ataskaita, qr, mokėjimas, balsas, alert, notification, price, history, prediction, community, report, payment, voice, announcement';
+
+  @override
+  String get settingsTopicUnitsTitle => 'Vienetai ir rodymas';
+
+  @override
+  String get settingsTopicUnitsSubtitle =>
+      'Tema, atstumo vienetas, pradžios ekrano valdiklis';
+
+  @override
+  String get settingsTopicUnitsKeywords =>
+      'tema, tamsi, šviesi, eko, vienetas, km, mylios, valdiklis, spalva, rodymas, išvaizda, theme, dark, light, eco, unit, miles, widget, colour, display, appearance';
+
+  @override
+  String get settingsTopicFeaturesTitle => 'Funkcijos ir naudojimo režimas';
+
+  @override
+  String get settingsTopicFeaturesSubtitle =>
+      'Naudojimo režimo šablonai ir kiekvienas funkcijų jungiklis';
+
+  @override
+  String get settingsTopicFeaturesKeywords =>
+      'funkcija, režimas, pagrindinis, vidutinis, pilnas, pasirinktinis, jungiklis, stočių tipai, degalinės, įkroviklių stotys, įkrovimas, feature, mode, basic, medium, full, custom, switch, toggle, charging';
+
+  @override
+  String get settingsTopicDataSourcesTitle => 'Duomenų šaltiniai ir vieta';
+
+  @override
+  String get settingsTopicDataSourcesSubtitle =>
+      'API raktai, GPS padėtis, automatinis profilio keitimas';
+
+  @override
+  String get settingsTopicDataSourcesKeywords =>
+      'api, raktas, gps, vieta, padėtis, duomenų šaltinis, tankerkoenig, opencharge, key, location, data source';
+
+  @override
+  String get settingsTopicSyncTitle => 'Sinchronizavimas ir paskyra';
+
+  @override
+  String get settingsTopicSyncKeywords =>
+      'tanksync, debesis, paskyra, el. paštas, susieti įrenginį, sinchronizavimas, bendrinti duomenų bazę, anonimiškas, cloud, account, email, link device, sync, share database, anonymous';
+
+  @override
+  String get settingsTopicPrivacySubtitle =>
+      'Sutikimai, privatumo skydelis, saugykla ir podėlis';
+
+  @override
+  String get settingsTopicPrivacyKeywords =>
+      'privatumas, sutikimas, bdar, ištrinti, išvalyti, saugykla, podėlis, duomenys, klaidų pranešimai, vin, privacy, consent, gdpr, delete, erase, storage, cache, data, error reporting';
+
+  @override
+  String get settingsTopicBackupTitle => 'Atsarginė kopija ir atkūrimas';
+
+  @override
+  String get settingsTopicBackupSubtitle =>
+      'Eksportuokite arba atkurkite visą savo duomenų atsarginę kopiją';
+
+  @override
+  String get settingsTopicBackupKeywords =>
+      'atsarginė kopija, eksportas, atkurti, importas, zip, xml, perkėlimas, backup, export, restore, import, transfer';
+
+  @override
+  String get settingsTopicAdvancedSubtitle => 'GitHub žetonas, kūrėjo įrankiai';
+
+  @override
+  String get settingsTopicAdvancedKeywords =>
+      'kūrėjas, derinimas, žetonas, pat, github, diagnostika, klaidų žurnalas, sekimas, developer, debug, token, diagnostics, error log, trace';
+
+  @override
+  String get settingsTopicAboutSubtitle => 'Versija, licencijos, nuorodos';
+
+  @override
+  String get settingsTopicAboutKeywords =>
+      'apie, versija, licencija, paaukoti, github, priskyrimas, about, version, license, donate, attribution';
+
+  @override
+  String get settingsConsumptionOffHint =>
+      'Įjunkite sąnaudų stebėjimą skiltyje Funkcijos ir naudojimo režimas, kad sukonfigūruotumėte transporto priemones, treniravimą ir apdovanojimus.';
+
+  @override
+  String get settingsOpenFeaturesLink =>
+      'Atidaryti Funkcijos ir naudojimo režimas';
+
+  @override
+  String get settingsRadarTileSubtitle =>
+      'Spindulys, kainų režimas, apklausa ir ekrano prisegimas aktyviam profiliui';
+
+  @override
+  String get settingsRadarNoProfileHint =>
+      'Pirmiausia sukurkite profilį — radaro nustatymai saugomi kiekvienam profiliui atskirai.';
+
+  @override
+  String get settingsRadarPinHeader => 'Ekrano prisegimas';
+
+  @override
+  String get settingsAlertsTileSubtitle =>
+      'Stočių ir spindulio įspėjimai, pranešantys apie kainų kritimą';
+
+  @override
+  String get settingsPriceFeaturesHeader => 'Kainų funkcijos';
+
+  @override
+  String get settingsVoiceAnnouncementsOffHint =>
+      'Balso pranešimai išjungti. Įjunkite Balso atsiliepimą ir Balso pranešimus skiltyje Funkcijos ir naudojimo režimas, kad vairuodami girdėtumėte apie pigius degalus netoliese.';
+
+  @override
+  String get settingsDistanceUnitTitle => 'Atstumo vienetas';
+
+  @override
+  String get settingsDistanceUnitSubtitle => 'Pagal aktyvaus profilio šalį';
+
+  @override
+  String get settingsObd2AdapterTitle => 'OBD2 adapteris';
+
+  @override
+  String get settingsObd2AdapterSubtitle =>
+      'Adapteriai susiejami kiekvienai transporto priemonei — atidarykite transporto priemonę, kad susietumėte arba pakeistumėte jos adapterį';
+
+  @override
+  String get settingsStorageDeleteHint =>
+      'Visi vietiniai duomenys ištrinami iš privatumo skydelio.';
+
+  @override
+  String get settingsPrivacyCrossLinkTitle => 'Sutikimai';
+
+  @override
+  String get settingsPrivacyCrossLinkSubtitle =>
+      'Cloud Sync ir kelionių sinchronizavimo sutikimai yra skiltyje Privatumas ir duomenys';
+
+  @override
+  String get settingsBackupExportSubtitle =>
+      'Transporto priemonės, degalų pylimai, kelionės ir įkrovimo žurnalai kaip ZIP failas';
+
+  @override
+  String get settingsBackupRestoreSubtitle =>
+      'Sujunkite arba pakeiskite savo duomenis iš ankstesnės atsarginės kopijos ZIP';
+
+  @override
+  String get settingsStationTypesLink =>
+      'Stočių tipai nustatomi skiltyje Funkcijos ir naudojimo režimas';
+
+  @override
+  String get routeSearchCriterionLabel =>
+      'Stoties pasirinkimas kiekvienai maršruto atkarpai';
+
+  @override
+  String get routeSearchCriterionCheapest => 'Pigiausia';
+
+  @override
+  String get routeSearchCriterionNearest => 'Arčiausiai maršruto';
+
+  @override
+  String get routeSearchTopNLabel => 'Kandidatų viename imties taške';
+
+  @override
+  String routeSearchTopNCaption(int count) {
+    return 'Kiekviename maršruto taške atsižvelgiama į iki $count stočių.';
+  }
+
+  @override
+  String get hybridFuelChoiceLabel => 'Degalai kainų paieškai (hibridas)';
+
+  @override
+  String get hybridFuelChoiceVehicleDefault =>
+      'Transporto priemonės numatytasis';
+
+  @override
+  String get scopeThisProfile => 'Šis profilis';
+
+  @override
+  String get scopeAllProfiles => 'Visi profiliai';
+
+  @override
+  String get scopeThisVehicle => 'Ši transporto priemonė';
+
+  @override
+  String get featureLabel_manualConsumption => 'Rankinis sąnaudų registravimas';
+
+  @override
+  String get featureDescription_manualConsumption =>
+      'Registruokite degalų pylimus ir įkrovimo sesijas rankiniu būdu (OBD2 adapteris nereikalingas).';
+
+  @override
+  String get featureLabel_loyaltyCards => 'Lojalumo kortelės';
+
+  @override
+  String get featureDescription_loyaltyCards =>
+      'Degalų klubų / lojalumo kortelės su nuolaida už litrą kainų palyginimuose.';
+
+  @override
+  String get featureLabel_startupTrace => 'Paleidimo inicijavimo sekimas';
+
+  @override
+  String get featureDescription_startupTrace =>
+      'Įrašo laiku matuojamas programos paleidimo fazes, rodo jas kaip krioklį ir eksportuoja — kūrėjo diagnostika.';
+
+  @override
+  String get locationGpsAutoHint =>
+      'GPS padėtis gaunama automatiškai ieškant. Čia ją galite atnaujinti ir rankiniu būdu.';
+
+  @override
+  String get locationClearGpsBody =>
+      'Išvalyti išsaugotą GPS padėtį? Ją galite bet kada atnaujinti iš naujo.';
+
+  @override
   String get shareReceiptUnsupportedFormat =>
       'Šis failo tipas dar negali būti importuotas — vietoj to bendrinkite kvito nuotrauką.';
 
@@ -8114,8 +8366,8 @@ class AppLocalizationsLt extends AppLocalizations {
       'Android aplinkoje ilgai spauskite valdiklį ir pasirinkite Konfigūruoti iš naujo, kad pakeistumėte profilį, spalvą ir turinį.';
 
   @override
-  String get widgetDefaultsApplyToAllHint =>
-      'Toliau pateikti pasirinkimai taikomi kiekvienam įdiegtam valdikliui kito atnaujinimo metu.';
+  String get widgetDefaultsThisProfileHint =>
+      'Toliau pateikti pasirinkimai galioja kiekvienam įdiegtam valdikliui, rodančiam šį profilį, kito atnaujinimo metu.';
 
   @override
   String get widgetDefaultsColorLabel => 'Spalvų schema';

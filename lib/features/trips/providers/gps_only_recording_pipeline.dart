@@ -7,12 +7,14 @@ import 'package:geolocator/geolocator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/providers/consumption_display_provider.dart';
 import '../../driving/providers/live_harsh_event_bus_provider.dart';
 import '../../obd2/api.dart';
 import 'active_vehicle_read.dart';
 import '../domain/entities/trip_save_stage.dart';
 import '../domain/services/gps_live_estimate_folder.dart';
 import '../domain/trip_recorder.dart';
+import 'gps_only_live_window.dart';
 import 'gps_only_trip_wal.dart';
 import 'gps_movement_wake_nudge.dart';
 import 'gps_trip_fuel_backfill.dart';
@@ -59,6 +61,8 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
   // #3253 — per-fix cadence diagnostics (#1458), OBD2 parity: lights up
   // the trip-detail GpsDiagnosticsCard for GPS-only trips too.
   final GpsSampleDiagnosticsRecorder _gpsDiagnostics;
+
+  final GpsOnlyLiveWindow _liveWindow = GpsOnlyLiveWindow(); // #3883
 
   @override
   bool get isGpsOnly => true;
@@ -223,37 +227,27 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
       hAccuracyM: p.accuracy.isFinite ? p.accuracy : null,
       bearingDeg: p.heading.isFinite ? p.heading : null,
     );
-    // #3253 kept the FIX clock here so OS batching stayed visible, while
-    // the OBD2 pipeline recorded the ARRIVAL clock — so the two paths
-    // disagreed and neither could show the skew between them. #3785 —
-    // record BOTH: arrival honours the entity's documented contract,
-    // fixAt preserves #3253's cadence view, and their difference is what
-    // separates a stalled delivery from genuinely lost reception.
+    // #3253 kept the FIX clock (OS batching visible); #3785 records BOTH
+    // arrival and fixAt — their difference separates a stalled delivery
+    // from genuinely lost reception.
     _gpsDiagnostics.record(fixAt: p.timestamp);
-    // #2760 — feed the latest GPS ground speed to the IMU detector so its
-    // min-speed gate and accel-vs-brake direction classification track the
-    // real vehicle speed (the inertial stream alone has no speed).
+    // #2760 — the IMU detector's gates track the real speed (it has none).
     _imuFusion?.feedSpeedKmh(sample.speedKmh);
-    // #3570 — sustained GPS movement is the other documented exit from the
-    // supervisor's engineOff park: recording a moving trip proves the
-    // engine runs, so a parked link must redial (wake() no-ops otherwise).
+    // #3570 — sustained movement proves the engine runs: a parked
+    // (engineOff) link must redial (wake() no-ops otherwise).
     _wakeNudge.onSpeed(sample.speedKmh);
     // #3319 — motion-gate the receiver (FGS-approved builds only).
-    _gpsSource?.onSpeed(
-        sample.speedKmh, DateTime.now().difference(startedAt));
-    // #2653 — GPS-only speed is Doppler ground speed (differentiable, not
-    // 1 km/h dead reckoning); tag it `gps` so harsh scoring stays gated-not-
-    // suppressed (the `virtual` source's wholesale suppression isn't needed).
+    _gpsSource?.onSpeed(sample.speedKmh, DateTime.now().difference(startedAt));
+    // #2653 — Doppler ground speed is differentiable: tag it `gps` so harsh
+    // scoring stays gated-not-suppressed (unlike the `virtual` source).
     recorder.onSample(sample, distanceSource: kDistanceSourceGps);
     final summary = recorder.buildSummary();
-    // #2389 / #2506 — fold the fix into the SHARED estimate + coaching folder
-    // (also the OBD2 live path). It does its own accel low-pass + warm-up; the
-    // figures are null at standstill / before warm-up, which is correct then.
+    // #2389 / #2506 — the SHARED estimate + coaching folder (also the OBD2
+    // live path); null at standstill / before warm-up, which is correct.
     final estimate = _estimateFolder?.fold(sample) ?? GpsLiveEstimate.none;
-    // #3329 — stamp the per-fix GPS fuel estimate (L/h) onto the sample so the
-    // trip-path heatmap colours by consumption, not all-green. #3878 — the
-    // stamp happens BEFORE the sample reaches the WAL (the WAL is now what
-    // the saved trip is built from); the ring keeps only the live window.
+    // #3329 — stamp the per-fix GPS fuel estimate (L/h) onto the sample so
+    // the trip-path heatmap colours by consumption; #3878 — BEFORE the
+    // sample reaches the WAL (the saved trip is built from it).
     final instant = estimate.instantLPer100Km;
     final stamped = (instant != null && sample.speedKmh > 0)
         ? sample.copyWithEstimatedFuelRate(instant / 100.0 * sample.speedKmh)
@@ -264,16 +258,22 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
       _samples.removeRange(0, _samples.length - kGpsOnlyLiveWindow);
     }
     final coaching = estimate.coachingHint;
+    final live = TripLiveReading(
+      speedKmh: sample.speedKmh,
+      distanceKmSoFar: summary.distanceKm,
+      elapsed: DateTime.now().difference(startedAt),
+      gpsEstimatedLPer100Km: estimate.instantLPer100Km,
+      gpsEstimatedAvgLPer100Km: estimate.avgLPer100Km,
+      gpsEstimatedFuelLitersSoFar: estimate.fuelLitersSoFar,
+    );
     _host.state = _host.state.copyWith(
       phase: TripRecordingPhase.recording,
-      live: TripLiveReading(
-        speedKmh: sample.speedKmh,
-        distanceKmSoFar: summary.distanceKm,
-        elapsed: DateTime.now().difference(startedAt),
-        gpsEstimatedLPer100Km: estimate.instantLPer100Km,
-        gpsEstimatedAvgLPer100Km: estimate.avgLPer100Km,
-        gpsEstimatedFuelLitersSoFar: estimate.fuelLitersSoFar,
-      ),
+      // #3883 — rolling "last N s" window stamped from the estimate.
+      live: _liveWindow.stamp(live,
+          sample: sample,
+          instantLPer100Km: instant,
+          windowSeconds:
+              _ref.read(consumptionDisplaySettingProvider).windowSeconds),
       gpsCoachingHint: coaching,
       clearGpsCoachingHint: coaching == null,
     );

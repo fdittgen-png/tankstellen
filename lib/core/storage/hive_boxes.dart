@@ -313,6 +313,18 @@ class HiveBoxes {
             encryptionCipher:
                 _encryptedDeferredBoxes.contains(name) ? cipher : null),
     ]);
+    // #3882 — the deferred trip boxes carry a schema stamp too (the trip
+    // history box changed its row layout to meta + columnar chunks; the
+    // rewrite of legacy rows is opportunistic + background in
+    // `TripHistoryRepository`, so the stamp only records the version).
+    if (Hive.isBoxOpen(boxSchema)) {
+      await HiveSchemaMigration.ensureSchemaVersions(
+        boxSchema: boxSchema,
+        encryptedBoxes: _encryptedDeferredBoxes,
+        cacheBox: cache,
+        currentSchemaVersion: currentSchemaVersion,
+      );
+    }
   }
 
   /// Initialize Hive in a background isolate with proper encryption.

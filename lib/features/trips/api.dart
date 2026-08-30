@@ -68,6 +68,7 @@ export 'presentation/screens/trajets_map_screen.dart';
 export 'presentation/screens/trip_detail_screen.dart';
 export 'presentation/screens/trip_recording_screen.dart';
 export 'presentation/widgets/broken_map_widgets.dart';
+export 'presentation/widgets/consumption_display_settings_tiles.dart'; // #3883
 export 'presentation/widgets/proximity_fill_bar.dart';
 export 'presentation/widgets/trajets_record_fab.dart';
 export 'presentation/widgets/trajets_tab.dart';

@@ -4,6 +4,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/domain/consumption_unit.dart';
+import '../../../../core/providers/consumption_display_provider.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/gps_calibration_matrix.dart';
@@ -71,6 +73,7 @@ class TripAvgConsumptionCard extends ConsumerWidget {
   static ({String value, bool isEstimate}) resolveDisplay(
     TripLiveReading? live, {
     String? brokenMapOverride,
+    ConsumptionUnit unit = ConsumptionUnit.lPer100Km, // #3883
   }) {
     final measured = live?.liveAvgLPer100Km;
     final estimated = live?.gpsEstimatedAvgLPer100Km;
@@ -79,13 +82,12 @@ class TripAvgConsumptionCard extends ConsumerWidget {
       return (value: override, isEstimate: false);
     } else if (measured != null) {
       return (
-        value: UnitFormatter.formatConsumption(measured, isEv: false),
+        value: UnitFormatter.formatConsumption(measured, isEv: false, unit: unit),
         isEstimate: false,
       );
     } else if (estimated != null) {
       return (
-        value:
-            '$_tilde${UnitFormatter.formatConsumption(estimated, isEv: false)}',
+        value: '$_tilde${UnitFormatter.formatConsumption(estimated, isEv: false, unit: unit)}',
         isEstimate: true,
       );
     }
@@ -100,7 +102,9 @@ class TripAvgConsumptionCard extends ConsumerWidget {
 
     // Mode selection (override → measured → estimate) lives in the
     // shared resolver so the landscape grid tile stays in sync.
-    final display = resolveDisplay(r, brokenMapOverride: brokenMapOverride);
+    final display = resolveDisplay(r,
+        brokenMapOverride: brokenMapOverride,
+        unit: ref.watch(consumptionDisplaySettingProvider).unit); // #3883
     final value = display.value;
     final isEstimate = display.isEstimate;
 

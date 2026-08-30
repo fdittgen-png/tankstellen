@@ -1,635 +1,195 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-// The mocktail Mock* storage doubles are deprecated as a steering hint
-// (prefer the stateful fakes) but remain sanctioned for widget tests that
-// stub reads exclusively -- see test/helpers/mock_providers.dart (#3742).
-// ignore_for_file: deprecated_member_use_from_same_package
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mocktail/mocktail.dart';
-import 'package:tankstellen/app/router.dart';
-import 'package:tankstellen/core/storage/hive_storage.dart';
-import 'package:tankstellen/core/storage/storage_keys.dart';
-import 'package:tankstellen/core/storage/storage_providers.dart';
-import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
+import 'package:tankstellen/app/routes/profile_routes.dart';
+import 'package:tankstellen/core/widgets/settings_menu_tile.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/profile/presentation/screens/profile_screen.dart';
-import 'package:tankstellen/core/widgets/settings_menu_tile.dart';
+import 'package:tankstellen/features/profile/presentation/screens/settings/backup_restore_screen.dart';
+import 'package:tankstellen/features/profile/presentation/screens/settings/settings_topics.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
-import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
-import '../../../../mocks/mocks.dart';
+import 'settings/settings_test_harness.dart';
 
+/// Settings root (#3884, Epic #3881): a scannable list of topic tiles
+/// plus a search field — no collapsed foldables, no inline controls.
 void main() {
-  group('ProfileScreen', () {
-    late MockHiveStorage mockStorage;
-    late List<Object> overrides;
+  group('ProfileScreen — settings root (#3884)', () {
+    /// The topics every install sees (Sync & account needs tankSync,
+    /// Advanced & developer needs the PAT/debug flag).
+    const alwaysVisible = <SettingsTopicId>[
+      SettingsTopicId.profiles,
+      SettingsTopicId.vehicles,
+      SettingsTopicId.driving,
+      SettingsTopicId.prices,
+      SettingsTopicId.units,
+      SettingsTopicId.features,
+      SettingsTopicId.dataSources,
+      SettingsTopicId.privacy,
+      SettingsTopicId.backup,
+      SettingsTopicId.about,
+    ];
 
-    setUp(() {
-      mockStorage = MockHiveStorage();
-      when(() => mockStorage.hasApiKey(any())).thenReturn(false);
-      when(() => mockStorage.getApiKey(any())).thenReturn(null);
-      when(() => mockStorage.getActiveProfileId()).thenReturn(null);
-      when(() => mockStorage.getAllProfiles()).thenReturn([]);
-      when(() => mockStorage.getRatings()).thenReturn({});
-      when(() => mockStorage.getIgnoredIds()).thenReturn([]);
-      when(() => mockStorage.getSetting(any())).thenReturn(null);
-      when(() => mockStorage.storageStats).thenReturn((
-        settings: 0,
-        profiles: 0,
-        favorites: 0,
-        cache: 0,
-        priceHistory: 0,
-        alerts: 0,
-        total: 0,
-      ));
-      when(() => mockStorage.profileCount).thenReturn(0);
-      when(() => mockStorage.favoriteCount).thenReturn(0);
-      when(() => mockStorage.cacheEntryCount).thenReturn(0);
-      when(() => mockStorage.priceHistoryEntryCount).thenReturn(0);
-      when(() => mockStorage.alertCount).thenReturn(0);
-      when(() => mockStorage.getFavoriteIds()).thenReturn([]);
-      when(() => mockStorage.getAlerts()).thenReturn([]);
-      when(() => mockStorage.getEvApiKey()).thenReturn(null);
-      when(() => mockStorage.hasCustomEvApiKey()).thenReturn(false);
+    Finder tile(SettingsTopicId id) =>
+        find.byKey(Key('settingsTopic_${id.name}'), skipOffstage: false);
 
-      final test = standardTestOverrides();
-      overrides = test.overrides;
-      // Replace the mockStorage used in standardTestOverrides
-      overrides = [
-        hiveStorageProvider.overrideWithValue(mockStorage),
-        ...test.overrides.skip(1), // Skip the default storage override
-      ];
-    });
-
-    testWidgets('renders Scaffold with Settings title', (tester) async {
+    testWidgets('renders Scaffold with Settings title and the search field',
+        (tester) async {
       await pumpApp(
         tester,
         const ProfileScreen(),
-        overrides: overrides,
+        overrides: settingsTestOverrides(),
       );
 
       expect(find.byType(Scaffold), findsAtLeast(1));
       expect(find.text('Settings'), findsOneWidget);
+      expect(find.byKey(const Key('settingsSearchField')), findsOneWidget);
     });
 
-    testWidgets('renders section headers', (tester) async {
-      await pumpApp(
-        tester,
-        const ProfileScreen(),
-        overrides: overrides,
-      );
-
-      expect(find.text('Profile'), findsOneWidget);
-      expect(find.text('Location'), findsOneWidget);
-    });
-
-    testWidgets(
-        '#2521: renders the always-visible group headers in '
-        'frequently-used-first order', (tester) async {
-      // The #2521 information-architecture refactor groups the flat
-      // Settings list under labelled SectionHeader rows. For a default
-      // (no gated feature) profile the always-visible groups are
-      // Profiles → Setup & data sources → Features & usage →
-      // Appearance & widgets → Privacy & data → About. The gated
-      // groups (Account & sync, Advanced & developer) are absent here
-      // because their only children are feature-gated off by default.
-      //
-      // A tall surface forces the lazy ListView to materialise every
-      // header so we can assert their relative vertical order in one
-      // pass (mirrors the #1545 pattern in the gating test).
-      await tester.binding.setSurfaceSize(const Size(1200, 4000));
+    testWidgets('renders every always-visible topic tile, in order, and '
+        'hides the gated ones by default', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(600, 2000));
       addTearDown(() => tester.binding.setSurfaceSize(null));
       await pumpApp(
         tester,
         const ProfileScreen(),
-        overrides: overrides,
+        overrides: settingsTestOverrides(),
       );
 
-      // Ordered list of the headers that must always render, top-down.
-      const orderedHeaders = <String>[
-        'Profile',
-        'Setup & data sources',
-        'Features & usage',
-        'Appearance & widgets',
-        'Privacy & data',
-        'About',
-      ];
-
-      double headerTop(String label) {
-        final finder = find.text(label, skipOffstage: false);
-        expect(finder, findsOneWidget,
-            reason: '#2521: group header "$label" must render');
-        return tester.getTopLeft(finder).dy;
-      }
-
-      var previousTop = double.negativeInfinity;
-      for (final label in orderedHeaders) {
-        final top = headerTop(label);
-        expect(top, greaterThan(previousTop),
-            reason: '#2521: "$label" must sit below the previous group '
-                'header in the frequently-used-first order');
-        previousTop = top;
-      }
-
-      // The two gated group headers must NOT render for a default
-      // profile (TankSync + PAT + debug all off) — a gated-empty group
-      // never shows a lone heading.
-      expect(find.text('Account & sync', skipOffstage: false), findsNothing,
-          reason: '#2521: Account & sync header must not render when '
-              'TankSync is off');
-      expect(
-          find.text('Advanced & developer', skipOffstage: false), findsNothing,
-          reason: '#2521: Advanced & developer header must not render '
-              'when neither the PAT nor debug-mode feature is enabled');
-    });
-
-    testWidgets('does not render Data Transparency section', (tester) async {
-      await pumpApp(
-        tester,
-        const ProfileScreen(),
-        overrides: overrides,
-      );
-
-      // Data Transparency was removed in favor of the Privacy Dashboard
-      expect(find.text('Data transparency'), findsNothing);
-    });
-
-    testWidgets('does not render Data & Privacy section title', (tester) async {
-      await pumpApp(
-        tester,
-        const ProfileScreen(),
-        overrides: overrides,
-      );
-
-      // #519 — Data & Privacy was removed from the Settings screen
-      // entirely; the ConfigVerificationWidget and its "Configuration
-      // & Privacy" header moved into the Privacy Dashboard. The
-      // Settings screen must contain neither.
-      expect(find.text('Data & Privacy'), findsNothing);
-      expect(find.text('Configuration & Privacy'), findsNothing);
-    });
-
-    testWidgets(
-        '#530: no vertical SizedBox spacer taller than 16 dp on the '
-        'Settings screen body', (tester) async {
-      // Regression guard for #530 — the previous layout had four
-      // `SizedBox(height: 32)` spacers between major sections,
-      // eating ~100 dp of whitespace. A *vertical spacer* is a
-      // `SizedBox` whose width is null / infinite and whose height
-      // exceeds 16 dp. Square boxes (icons) and fixed-width sized
-      // boxes (avatar wrappers) are excluded by the width-is-null
-      // filter.
-      await pumpApp(
-        tester,
-        const ProfileScreen(),
-        overrides: overrides,
-      );
-
-      final verticalSpacers = tester
-          .widgetList<SizedBox>(find.byType(SizedBox))
-          .where((s) => s.width == null)
-          .where((s) => (s.height ?? 0) > 16)
-          .toList();
-
-      expect(
-        verticalSpacers,
-        isEmpty,
-        reason: '#530: no vertical spacer should exceed 16 dp — found '
-            '${verticalSpacers.map((s) => s.height).toList()}',
-      );
-    });
-
-    testWidgets('does not render the ConfigVerificationWidget (#519)',
-        (tester) async {
-      await pumpApp(
-        tester,
-        const ProfileScreen(),
-        overrides: overrides,
-      );
-
-      // The whole ConfigVerificationWidget now lives inside the
-      // Privacy Dashboard. No hardcoded profile/API key/cloud sync
-      // labels should appear on the Settings screen any more.
-      expect(find.text('Active profile'), findsNothing);
-      expect(find.text('Preferred fuel'), findsNothing);
-      expect(find.text('API keys'), findsNothing);
-      expect(find.text('Cloud Sync'), findsNothing);
-      expect(find.text('Privacy summary'), findsNothing);
-      expect(find.text('Profil actif'), findsNothing);
-      expect(find.text('Résumé de confidentialité'), findsNothing);
-      expect(find.text('0 stations'), findsNothing);
-      expect(find.text('0 configured'), findsNothing);
-      expect(find.text('0 hidden'), findsNothing);
-      expect(find.text('0 rated'), findsNothing);
-    });
-
-    testWidgets('renders Privacy Dashboard navigation link', (tester) async {
-      await pumpApp(
-        tester,
-        const ProfileScreen(),
-        overrides: overrides,
-      );
-
-      // Scroll down to find the Privacy Dashboard link
-      await tester.scrollUntilVisible(
-        find.text('Privacy Dashboard'),
-        200,
-        scrollable: find.byType(Scrollable).first,
-      );
-
-      expect(find.text('Privacy Dashboard'), findsOneWidget);
-      expect(find.text('View, export, or delete your data'), findsOneWidget);
-    });
-
-    testWidgets(
-        '#896: does not render the Consumption log menu entry '
-        '(duplicate of bottom-nav Consumption tab)', (tester) async {
-      await pumpApp(
-        tester,
-        const ProfileScreen(),
-        overrides: overrides,
-      );
-
-      // English (default ARB) — the menu title string must be gone.
-      expect(find.text('Consumption log'), findsNothing);
-      // The English subtitle copy must also be gone.
-      expect(
-        find.text('Track fill-ups and calculate L/100km'),
-        findsNothing,
-      );
-      // Sanity check against the icon that was paired with the old row
-      // — `Icons.local_gas_station` used to identify the consumption
-      // tile and is not used by any other `SettingsMenuTile` on the
-      // Settings screen.
-      final gasStationIcons = tester
-          .widgetList<Icon>(find.byIcon(Icons.local_gas_station))
-          .toList();
-      expect(
-        gasStationIcons,
-        isEmpty,
-        reason: '#896: the local_gas_station icon for the Consumption '
-            'log row should no longer appear on the Settings screen',
-      );
-    });
-
-    testWidgets(
-        'Settings screen renders Theme + Privacy Dashboard tiles at top '
-        'level; My vehicles + Fuel club cards live INSIDE the Consumption '
-        'foldable (#1242 — Console grouping)',
-        (tester) async {
-      await pumpApp(
-        tester,
-        const ProfileScreen(),
-        overrides: overrides,
-      );
-
-      // Scroll through so every realized tile gets a chance to mount.
-      await tester.scrollUntilVisible(
-        find.text('Privacy Dashboard'),
-        200,
-        scrollable: find.byType(Scrollable).first,
-      );
-
-      final observedTitles = <String>{};
-      void collect() {
-        for (final t in tester
-            .widgetList<SettingsMenuTile>(find.byType(SettingsMenuTile))) {
-          observedTitles.add(t.title);
+      double top(SettingsTopicId id) => tester.getTopLeft(tile(id)).dy;
+      for (var i = 0; i < alwaysVisible.length; i++) {
+        expect(tile(alwaysVisible[i]), findsOneWidget,
+            reason: 'topic ${alwaysVisible[i].name} must render a tile');
+        if (i > 0) {
+          expect(top(alwaysVisible[i]), greaterThan(top(alwaysVisible[i - 1])),
+              reason: '${alwaysVisible[i].name} must follow '
+                  '${alwaysVisible[i - 1].name}');
         }
       }
-
-      collect();
-      await tester.drag(find.byType(Scrollable).first, const Offset(0, 2000));
-      await tester.pumpAndSettle();
-      collect();
-
-      // Theme + Privacy Dashboard remain at the screen's top level;
-      // they are not vehicle-specific so they don't belong inside
-      // the Consumption foldable.
+      expect(tile(SettingsTopicId.sync), findsNothing,
+          reason: 'Sync & account is gated on Feature.tankSync');
+      expect(tile(SettingsTopicId.advanced), findsNothing,
+          reason: 'Advanced & developer is gated on the PAT/debug flag');
+      // Every tile is a SettingsMenuTile with a one-line subtitle.
       expect(
-        observedTitles.contains('Theme'),
-        isTrue,
-        reason: '#897: Theme tile must render as a SettingsMenuTile '
-            '(card matching Privacy + Storage pattern)',
-      );
-      expect(
-        observedTitles.contains('Privacy Dashboard'),
-        isTrue,
-        reason: 'Privacy Dashboard tile should still render at the '
-            'top level of the Settings screen',
-      );
-
-      // My vehicles + Fuel club cards must NOT appear at the top
-      // level — they were folded into the Consumption section.
-      // #1568 reversed this for "My vehicles" only: it's now a
-      // top-level Settings entry so Medium-tier users can reach
-      // vehicle config without first expanding the Conso foldable.
-      // Fuel club cards stays inside.
-      expect(
-        observedTitles.contains('Fuel club cards'),
-        isFalse,
-        reason: 'Fuel club cards tile moved INSIDE the Consumption '
-            'foldable; it must not render as a top-level entry too.',
-      );
-
-      expect(
-        observedTitles.contains('Consumption log'),
-        isFalse,
-        reason: '#896: Consumption log tile must not render any more',
+        tester.widgetList<SettingsMenuTile>(find.byType(SettingsMenuTile)),
+        hasLength(alwaysVisible.length),
       );
     });
 
-    testWidgets(
-        'Consumption foldable header uses the same label as the bottom-nav '
-        '"Conso" tab and contains vehicles + fuel-club cards entries '
-        '(#1242)',
+    testWidgets('has NO collapsed foldables or inline controls at the root',
         (tester) async {
-      // Phase 3 of #1447 hides the Consumption section when its root
-      // feature (`obd2TripRecording`) is effectively-disabled. #1520
-      // adds an OR with `manualConsumption` and gates the loyalty tile
-      // separately on `loyaltyCards`. Seed the full Consumption
-      // surface so the section renders AND both inner tiles show.
-      final seededOverrides = [
-        ...overrides,
-        featureFlagsProvider.overrideWith(
-          () => _ProfileTestFeatureFlags(<Feature>{
-            Feature.obd2TripRecording,
-            Feature.showConsumptionTab,
-            Feature.loyaltyCards,
-          }),
-        ),
-      ];
+      await tester.binding.setSurfaceSize(const Size(600, 2000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
       await pumpApp(
         tester,
         const ProfileScreen(),
-        overrides: seededOverrides,
+        overrides: settingsTestOverrides(),
       );
 
-      // The new section header replaces the old "Driving" copy. We
-      // must find the `navConsumption` label ("Consumption" in
-      // English) on the screen, and tapping it must reveal the
-      // vehicles + fuel-club tiles that were moved inside.
-      final consumptionHeader = find.text('Consumption');
-      await tester.scrollUntilVisible(
-        consumptionHeader,
-        200,
-        scrollable: find.byType(Scrollable).first,
-      );
-      expect(
-        consumptionHeader,
-        findsOneWidget,
-        reason:
-            'Foldable section title must match navConsumption ("Consumption") '
-            'so users correlate the Settings group with the bottom-nav tab.',
-      );
-
-      // #1572 — Mes véhicules is a labelled sub-section INSIDE the
-      // Conso foldable, not a top-level Settings tile. Reverses #1568.
-      expect(
-        find.byKey(const Key('settingsRootVehiclesTile')),
-        findsNothing,
-        reason: 'My vehicles must NOT render as a top-level Settings '
-            'tile after #1572 — it is a sub-section inside the Conso '
-            'foldable.',
-      );
-
-      // Expand the foldable to verify the sub-sections render inside.
-      await tester.tap(consumptionHeader);
-      await tester.pumpAndSettle();
-
-      expect(
-        find.byKey(const Key('consoleVehiclesTile')),
-        findsOneWidget,
-        reason: 'My vehicles tile lives inside the expanded Conso '
-            'foldable as the first sub-section (#1572).',
-      );
-      expect(
-        find.byKey(const Key('consoleFuelClubCardsTile')),
-        findsOneWidget,
-        reason: 'Fuel club cards tile lives inside the Driving '
-            'sub-section of the Conso foldable.',
-      );
-      expect(
-        find.byKey(const Key('hapticEcoCoachToggle')),
-        findsOneWidget,
-        reason: 'The eco-coach haptic toggle is part of the Driving '
-            'sub-section alongside the fuel-club tile.',
-      );
+      expect(find.byType(ExpansionTile, skipOffstage: false), findsNothing);
+      expect(find.byType(SwitchListTile, skipOffstage: false), findsNothing);
+      expect(find.byType(Slider, skipOffstage: false), findsNothing);
     });
 
-    test(
-        '#896: /consumption route stays registered even after the '
-        'Settings menu entry is removed', () {
-      // The Settings menu entry to /consumption was removed, but the
-      // route itself is still used by the bottom-nav Consumption tab
-      // (#778), the station detail add-fill-up CTA, and potential
-      // deep links. This test builds the real router via
-      // `routerProvider` and asserts `/consumption` is still declared
-      // on the route tree.
-
-      final mock = MockStorageRepository();
-      when(() => mock.getFavoriteIds()).thenReturn([]);
-      when(() => mock.getFavoriteStationData(any())).thenReturn(null);
-      when(() => mock.getEvFavoriteIds()).thenReturn([]);
-      when(() => mock.getEvFavoriteStationData(any())).thenReturn(null);
-      when(() => mock.isFavorite(any())).thenReturn(false);
-      when(() => mock.isEvFavorite(any())).thenReturn(false);
-      when(() => mock.isSetupComplete).thenReturn(true);
-      when(() => mock.getSetting(StorageKeys.gdprConsentGiven))
-          .thenReturn(true);
-
-      final container = ProviderContainer(overrides: [
-        storageRepositoryProvider.overrideWithValue(mock),
-      ]);
-      addTearDown(container.dispose);
-
-      final GoRouter testRouter = container.read(routerProvider);
-
-      // Walk the top-level route tree looking for a GoRoute at
-      // `/consumption`. Using `router.configuration.findMatch` would
-      // execute the redirect pipeline (which needs more provider
-      // setup); inspecting the route list is enough to prove the
-      // route remains registered.
-      bool pathRegistered(List<RouteBase> routes, String target) {
-        for (final r in routes) {
-          if (r is GoRoute && r.path == target) return true;
-          if (pathRegistered(r.routes, target)) return true;
-        }
-        return false;
-      }
-
-      expect(
-        pathRegistered(testRouter.configuration.routes, '/consumption'),
-        isTrue,
-        reason: '#896 scope: route /consumption must remain registered '
-            '— only the duplicate Settings menu entry was removed',
-      );
-    });
-
-    testWidgets('renders body as a scrollable ListView', (tester) async {
+    testWidgets('search filters the tiles by title, subtitle and keywords',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(600, 2000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
       await pumpApp(
         tester,
         const ProfileScreen(),
-        overrides: overrides,
+        overrides: settingsTestOverrides(),
       );
+      final l = AppLocalizations.of(tester.element(find.byType(ProfileScreen)));
 
-      // ProfileScreen body is a ListView
-      expect(find.byType(ListView), findsAtLeast(1));
-    });
-
-    testWidgets(
-        '#520: AppBar title sits directly under the status bar '
-        '(no doubled top inset, single Scaffold)', (tester) async {
-      // Baseline — a bare Scaffold with an AppBar should place the
-      // title within [statusBarHeight, statusBarHeight + kToolbarHeight].
-      const statusBarHeight = 48.0;
-      await tester.binding.setSurfaceSize(const Size(412, 915));
-      addTearDown(() => tester.binding.setSurfaceSize(null));
-
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(
-            padding: EdgeInsets.only(top: statusBarHeight),
-            viewPadding: EdgeInsets.only(top: statusBarHeight),
-            size: Size(412, 915),
-            devicePixelRatio: 1,
-          ),
-          child: MaterialApp(
-            home: Scaffold(
-              appBar: AppBar(title: const Text('BARE_TITLE')),
-              body: const SizedBox.shrink(),
-            ),
-          ),
-        ),
-      );
+      // Title match.
+      await tester.enterText(
+          find.byKey(const Key('settingsSearchField')), 'backup');
       await tester.pumpAndSettle();
+      expect(tile(SettingsTopicId.backup), findsOneWidget);
+      expect(find.byType(SettingsMenuTile), findsOneWidget);
 
-      final bareTitleOffset = tester.getTopLeft(find.text('BARE_TITLE')).dy;
-      expect(bareTitleOffset, greaterThanOrEqualTo(statusBarHeight - 4));
-      expect(bareTitleOffset, lessThanOrEqualTo(statusBarHeight + kToolbarHeight));
-    });
-
-    testWidgets(
-        '#528: Scaffold.bottomNavigationBar wrapped in SafeArea(top: false) '
-        'does not double the gesture-bar inset', (tester) async {
-      // Baseline for the #528 fix pattern. A bare bottomNavigationBar
-      // built with SafeArea(top: false) inside it must have its bottom
-      // edge sitting at screenHeight - viewPadding.bottom, not
-      // screenHeight - 2 * viewPadding.bottom (the doubled-inset bug).
-      const gestureBarHeight = 24.0;
-      const barContentHeight = 64.0;
-      await tester.binding.setSurfaceSize(const Size(412, 915));
-      addTearDown(() => tester.binding.setSurfaceSize(null));
-
-      await tester.pumpWidget(
-        const MediaQuery(
-          data: MediaQueryData(
-            padding: EdgeInsets.only(bottom: gestureBarHeight),
-            viewPadding: EdgeInsets.only(bottom: gestureBarHeight),
-            size: Size(412, 915),
-            devicePixelRatio: 1,
-          ),
-          child: MaterialApp(
-            home: Scaffold(
-              body: SizedBox.shrink(),
-              bottomNavigationBar: SafeArea(
-                top: false,
-                child: SizedBox(
-                  key: ValueKey('nav-bar-test'),
-                  height: barContentHeight,
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
+      // Keyword-only match ("gps" is not in the tile title/subtitle of
+      // Data sources & location's title but is in its keyword list).
+      await tester.enterText(
+          find.byKey(const Key('settingsSearchField')), 'GPS');
       await tester.pumpAndSettle();
+      expect(tile(SettingsTopicId.dataSources), findsOneWidget);
+      expect(tile(SettingsTopicId.backup), findsNothing);
 
-      final navBarRect = tester.getRect(find.byKey(const ValueKey('nav-bar-test')));
-      // The SizedBox contents should sit ABOVE the gesture bar, with
-      // its bottom edge at screenHeight - gestureBarHeight. The SafeArea
-      // absorbs the inset so we never get a doubled gap below.
-      expect(
-        navBarRect.bottom,
-        closeTo(915 - gestureBarHeight, 0.5),
-        reason: 'bottom nav content must sit directly above the gesture '
-            'bar — doubled-inset regression (#528)',
-      );
-      expect(
-        navBarRect.height,
-        closeTo(barContentHeight, 0.5),
-        reason: 'SafeArea must not grow the bar height — it should '
-            'only consume the inset from the surrounding space',
-      );
+      // No match → empty state naming the query.
+      await tester.enterText(
+          find.byKey(const Key('settingsSearchField')), 'zzzz');
+      await tester.pumpAndSettle();
+      expect(find.byType(SettingsMenuTile), findsNothing);
+      expect(find.byKey(const Key('settingsSearchEmpty')), findsOneWidget);
+      expect(find.text(l.settingsSearchNoResults('zzzz')), findsOneWidget);
+
+      // Clear restores every tile.
+      await tester.tap(find.byKey(const Key('settingsSearchClear')));
+      await tester.pumpAndSettle();
+      expect(find.byType(SettingsMenuTile), findsNWidgets(alwaysVisible.length));
     });
 
-    testWidgets(
-        '#520: nested Scaffold (shell pattern) with primary: false on '
-        'the outer keeps the inner AppBar title in the correct band',
+    testWidgets('Sync & account tile appears with Feature.tankSync on',
         (tester) async {
-      // Reproduces the shell's structure: an outer Scaffold with no
-      // AppBar (primary: false per #520) wrapping an inner Scaffold
-      // that does have an AppBar. Before #520 the inner AppBar was
-      // pushed down by a duplicated top inset; the primary: false
-      // annotation on the outer Scaffold restores the expected band.
-      const statusBarHeight = 48.0;
-      await tester.binding.setSurfaceSize(const Size(412, 915));
+      await tester.binding.setSurfaceSize(const Size(600, 2000));
       addTearDown(() => tester.binding.setSurfaceSize(null));
+      await pumpApp(
+        tester,
+        const ProfileScreen(),
+        overrides: settingsTestOverrides(flags: {Feature.tankSync}),
+      );
+      expect(tile(SettingsTopicId.sync), findsOneWidget);
+      expect(tile(SettingsTopicId.advanced), findsNothing);
+    });
 
+    testWidgets('Advanced & developer tile appears with debugMode on',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(600, 2000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await pumpApp(
+        tester,
+        const ProfileScreen(),
+        overrides: settingsTestOverrides(flags: {Feature.debugMode}),
+      );
+      expect(tile(SettingsTopicId.advanced), findsOneWidget);
+      expect(tile(SettingsTopicId.sync), findsNothing);
+    });
+
+    testWidgets('tapping a tile pushes its registered topic route',
+        (tester) async {
+      await tester.binding.setSurfaceSize(const Size(600, 2000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      final router = GoRouter(
+        initialLocation: '/',
+        routes: [
+          GoRoute(path: '/', builder: (_, _) => const ProfileScreen()),
+          ...profileRoutes,
+        ],
+      );
       await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(
-            padding: EdgeInsets.only(top: statusBarHeight),
-            viewPadding: EdgeInsets.only(top: statusBarHeight),
-            size: Size(412, 915),
-            devicePixelRatio: 1,
-          ),
-          child: MaterialApp(
-            home: Scaffold(
-              primary: false, // the #520 fix on ShellScreen
-              body: Scaffold(
-                appBar: AppBar(title: const Text('SHELL_TITLE')),
-                body: const SizedBox.shrink(),
-              ),
-              bottomNavigationBar: const SizedBox(height: 56),
-            ),
+        ProviderScope(
+          overrides: settingsTestOverrides().cast(),
+          child: MaterialApp.router(
+            routerConfig: router,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('en'),
           ),
         ),
       );
       await tester.pumpAndSettle();
 
-      final shellTitleOffset =
-          tester.getTopLeft(find.text('SHELL_TITLE')).dy;
-      expect(
-        shellTitleOffset,
-        greaterThanOrEqualTo(statusBarHeight - 4),
-        reason: 'title must not hide under the status bar',
-      );
-      expect(
-        shellTitleOffset,
-        lessThanOrEqualTo(statusBarHeight + kToolbarHeight),
-        reason: 'nested inner AppBar must not be pushed below the '
-            'first toolbar-sized band — doubled inset regression (#520)',
-      );
+      await tester.tap(tile(SettingsTopicId.backup));
+      await tester.pumpAndSettle();
+      expect(find.byType(BackupRestoreScreen), findsOneWidget);
     });
   });
-}
-
-/// Pinned FeatureFlags notifier for tests that need to assert section
-/// visibility (#1447 phase 3) without waiting on the Hive load path.
-class _ProfileTestFeatureFlags extends FeatureFlags {
-  _ProfileTestFeatureFlags(this._initial);
-
-  final Set<Feature> _initial;
-
-  @override
-  Set<Feature> build() {
-    ref.watch(featureManifestProvider);
-    return _initial;
-  }
 }

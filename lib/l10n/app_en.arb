@@ -139,8 +139,6 @@
   "clearCacheTitle": "Clear cache?",
   "clearCacheBody": "Cached search results and prices will be deleted. Profiles, favorites and settings are preserved.",
   "clearCacheButton": "Clear cache",
-  "deleteAllTitle": "Delete all data?",
-  "deleteAllBody": "This permanently deletes all profiles, favorites, API key, settings, and cache. The app will reset.",
   "deleteAllButton": "Delete all",
   "entries": "entries",
   "cacheEmpty": "Cache is empty",
@@ -446,10 +444,6 @@
   },
   "avoidHighways": "Avoid highways",
   "avoidHighwaysDesc": "Route calculation avoids toll roads and highways",
-  "showFuelStations": "Show fuel stations",
-  "showFuelStationsDesc": "Include gas, diesel, LPG, CNG stations",
-  "showEvStations": "Show EV charging stations",
-  "showEvStationsDesc": "Include electric charging stations in search results",
   "noStationsAlongThisRoute": "No stations found along this route.",
   "fuelCostCalculator": "Fuel Cost Calculator",
   "distanceKm": "Distance (km)",
@@ -929,7 +923,6 @@
   "tripResume": "Resume",
   "tripBannerRecording": "Recording trip",
   "tripBannerPaused": "Trip paused — tap to resume",
-  "navConsumption": "Consumption",
   "vehicleBaselineSectionTitle": "Baseline calibration",
   "vehicleBaselineEmpty": "No samples yet — start an OBD2 trip to begin learning this vehicle's fuel profile.",
   "vehicleBaselineProgress": "Learned from samples across driving situations.",
@@ -1094,29 +1087,13 @@
   },
   "sectionProfile": "Profile",
   "sectionLocation": "Location",
-  "sectionSetupDataSources": "Setup & data sources",
-  "@sectionSetupDataSources": {
-    "description": "Settings group header (#2521) over the API Key + Location entries — the first-run configuration the app needs to find prices."
-  },
-  "sectionFeaturesUsage": "Features & usage",
-  "@sectionFeaturesUsage": {
-    "description": "Settings group header (#2521) over Feature management + Consumption — the toggles that decide which surfaces appear and how they're used."
-  },
-  "sectionAccountSync": "Account & sync",
-  "@sectionAccountSync": {
-    "description": "Settings group header (#2521) over the TankSync cloud-sync entry."
-  },
-  "sectionAppearanceWidgets": "Appearance & widgets",
-  "@sectionAppearanceWidgets": {
-    "description": "Settings group header (#2521) over the Theme chooser + Home-screen widget help entries."
-  },
   "sectionPrivacyData": "Privacy & data",
   "@sectionPrivacyData": {
-    "description": "Settings group header (#2521) over Privacy consent + Privacy Dashboard + Storage & cache — one data-control concern."
+    "description": "Settings topic title (#2521 group header, #3884 root tile) over Privacy consent + Privacy Dashboard + Storage & cache — one data-control concern."
   },
   "sectionAdvancedDeveloper": "Advanced & developer",
   "@sectionAdvancedDeveloper": {
-    "description": "Settings group header (#2521) over the bad-scan PAT entry + Developer tools — power-user controls hidden by default."
+    "description": "Settings topic title (#2521 group header, #3884 root tile) over the bad-scan PAT entry + Developer tools — power-user controls hidden by default."
   },
   "tooltipBack": "Back",
   "tooltipClose": "Close",
@@ -5305,6 +5282,58 @@
   "@lessonAdviceSharpCornering": {
     "description": "Advice sub-line under the sharp-cornering lesson (#2793)."
   },
+  "liveConsumptionWindowLabel": "Last {seconds} s",
+  "@liveConsumptionWindowLabel": {
+    "description": "#3883 — label above the recording screen's headline consumption figure when it is the rolling average over the user's configured window (e.g. 'Last 5 s'). Replaces 'Instant consumption' whenever the window figure is available.",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Consumption unit",
+  "@consumptionUnitSettingTitle": {
+    "description": "#3883 — Settings tile title: how fuel consumption figures are displayed app-wide (L/100 km, km/L, mpg)."
+  },
+  "consumptionUnitSettingSubtitle": "How fuel consumption is shown everywhere in the app",
+  "@consumptionUnitSettingSubtitle": {
+    "description": "#3883 — subtitle of the consumption-unit setting."
+  },
+  "consumptionUnitAuto": "Automatic ({unit})",
+  "@consumptionUnitAuto": {
+    "description": "#3883 — the 'follow the country convention' choice of the consumption-unit picker; {unit} is the unit the active country resolves to (e.g. 'L/100 km', 'mpg (UK)').",
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Live consumption window",
+  "@consumptionWindowSettingTitle": {
+    "description": "#3883 — Settings tile title: the length of the rolling window the live 'Last N s' consumption figure averages over while recording."
+  },
+  "consumptionWindowSettingSubtitle": "Average the live figure over the last few seconds — longer is steadier, shorter reacts faster",
+  "@consumptionWindowSettingSubtitle": {
+    "description": "#3883 — subtitle of the live-window setting."
+  },
+  "consumptionWindowOption": "{seconds} s",
+  "@consumptionWindowOption": {
+    "description": "#3883 — one choice of the live-window picker, in seconds (3 s, 5 s, 10 s, 30 s).",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "tripRecordingPipEstConsumptionCaptionUnit": "est. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "description": "#3883 — unit caption under the big GPS-estimated consumption figure on the PiP tile / Live Activity, in the user's display unit ('est. mpg (UK)'). Generalises tripRecordingPipEstConsumptionCaption.",
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
   "locationConsentTitle": "Location Access",
   "@locationConsentTitle": {
     "description": "Title of the GDPR location-consent dialog (#2306). Replaces the legacy _ConsentTexts map that only covered 10 of 23 locales for the title."
@@ -6871,6 +6900,296 @@
   "@refuelUnitPerSession": {
     "description": "Trailing unit suffix when an EV network bills a flat per-session price instead of per-kWh in the unified RefuelOptionCard (#1116 phase 3b)."
   },
+  "settingsSearchHint": "Search settings",
+  "@settingsSearchHint": {
+    "description": "Hint text of the search field at the top of the Settings root (#3884). Typing filters the topic tiles by title, subtitle and keywords."
+  },
+  "settingsSearchNoResults": "No settings match \"{query}\"",
+  "@settingsSearchNoResults": {
+    "description": "Empty state under the Settings search field when no topic tile matches the typed query (#3884).",
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTopicProfilesTitle": "Profiles & region",
+  "@settingsTopicProfilesTitle": {
+    "description": "Settings root tile title (#3884): the user profiles list — country, language, fuel type, search radius, route planning."
+  },
+  "settingsTopicProfilesSubtitle": "Country, language, fuel type, search radius, route planning",
+  "@settingsTopicProfilesSubtitle": {
+    "description": "One-line subtitle of the Profiles & region tile naming what is inside (#3884)."
+  },
+  "settingsTopicProfilesKeywords": "profile, country, language, fuel, radius, postal code, route, home, rating, start screen",
+  "@settingsTopicProfilesKeywords": {
+    "description": "Comma-separated search keywords for the Profiles & region tile (#3884). Not shown; matched against the Settings search field."
+  },
+  "settingsTopicVehiclesTitle": "Vehicles & OBD2",
+  "@settingsTopicVehiclesTitle": {
+    "description": "Settings root tile title (#3884): the vehicle list and OBD2 adapter pairing."
+  },
+  "settingsTopicVehiclesSubtitle": "Your cars, tank size, OBD2 adapter pairing",
+  "@settingsTopicVehiclesSubtitle": {
+    "description": "One-line subtitle of the Vehicles & OBD2 tile (#3884)."
+  },
+  "settingsTopicVehiclesKeywords": "vehicle, car, obd, obd2, adapter, bluetooth, tank, engine, vin, calibration",
+  "@settingsTopicVehiclesKeywords": {
+    "description": "Comma-separated search keywords for the Vehicles & OBD2 tile (#3884)."
+  },
+  "settingsTopicDrivingTitle": "Driving & consumption",
+  "@settingsTopicDrivingTitle": {
+    "description": "Settings root tile title (#3884): coaching while driving, rewards, the fuel-station radar and trip troubleshooting."
+  },
+  "settingsTopicDrivingSubtitle": "Coaching, rewards, fuel-station radar, troubleshooting",
+  "@settingsTopicDrivingSubtitle": {
+    "description": "One-line subtitle of the Driving & consumption tile (#3884)."
+  },
+  "settingsTopicDrivingKeywords": "coach, eco, haptic, voice, gamification, radar, glide, trip, consumption, fuel club, loyalty, obd2 log, pin",
+  "@settingsTopicDrivingKeywords": {
+    "description": "Comma-separated search keywords for the Driving & consumption tile (#3884)."
+  },
+  "settingsTopicPricesTitle": "Prices & alerts",
+  "@settingsTopicPricesTitle": {
+    "description": "Settings root tile title (#3884): price alerts, voice announcements and the price-related feature switches."
+  },
+  "settingsTopicPricesSubtitle": "Price alerts, voice announcements, price history, community reports",
+  "@settingsTopicPricesSubtitle": {
+    "description": "One-line subtitle of the Prices & alerts tile (#3884)."
+  },
+  "settingsTopicPricesKeywords": "alert, notification, price, history, prediction, best time, community, report, qr, payment, voice, announcement",
+  "@settingsTopicPricesKeywords": {
+    "description": "Comma-separated search keywords for the Prices & alerts tile (#3884)."
+  },
+  "settingsTopicUnitsTitle": "Units & display",
+  "@settingsTopicUnitsTitle": {
+    "description": "Settings root tile title (#3884): theme, distance unit and the home-screen widget."
+  },
+  "settingsTopicUnitsSubtitle": "Theme, distance unit, home-screen widget",
+  "@settingsTopicUnitsSubtitle": {
+    "description": "One-line subtitle of the Units & display tile (#3884)."
+  },
+  "settingsTopicUnitsKeywords": "theme, dark, light, eco, unit, km, miles, widget, colour, color, display, appearance",
+  "@settingsTopicUnitsKeywords": {
+    "description": "Comma-separated search keywords for the Units & display tile (#3884)."
+  },
+  "settingsTopicFeaturesTitle": "Features & use mode",
+  "@settingsTopicFeaturesTitle": {
+    "description": "Settings root tile title (#3884): the use-mode presets and every feature switch."
+  },
+  "settingsTopicFeaturesSubtitle": "Use-mode presets and every feature switch",
+  "@settingsTopicFeaturesSubtitle": {
+    "description": "One-line subtitle of the Features & use mode tile (#3884)."
+  },
+  "settingsTopicFeaturesKeywords": "feature, mode, basic, medium, full, custom, switch, toggle, station types, fuel stations, ev stations, charging",
+  "@settingsTopicFeaturesKeywords": {
+    "description": "Comma-separated search keywords for the Features & use mode tile (#3884)."
+  },
+  "settingsTopicDataSourcesTitle": "Data sources & location",
+  "@settingsTopicDataSourcesTitle": {
+    "description": "Settings root tile title (#3884): API keys and the GPS position."
+  },
+  "settingsTopicDataSourcesSubtitle": "API keys, GPS position, automatic profile switching",
+  "@settingsTopicDataSourcesSubtitle": {
+    "description": "One-line subtitle of the Data sources & location tile (#3884)."
+  },
+  "settingsTopicDataSourcesKeywords": "api, key, gps, location, position, data source, tankerkoenig, opencharge",
+  "@settingsTopicDataSourcesKeywords": {
+    "description": "Comma-separated search keywords for the Data sources & location tile (#3884)."
+  },
+  "settingsTopicSyncTitle": "Sync & account",
+  "@settingsTopicSyncTitle": {
+    "description": "Settings root tile title (#3884): TankSync cloud sync and the account. Only shown when the TankSync feature is on."
+  },
+  "settingsTopicSyncKeywords": "tanksync, cloud, account, email, link device, sync, share database, anonymous",
+  "@settingsTopicSyncKeywords": {
+    "description": "Comma-separated search keywords for the Sync & account tile (#3884)."
+  },
+  "settingsTopicPrivacySubtitle": "Consents, privacy dashboard, storage & cache",
+  "@settingsTopicPrivacySubtitle": {
+    "description": "One-line subtitle of the Privacy & data tile (#3884)."
+  },
+  "settingsTopicPrivacyKeywords": "privacy, consent, gdpr, delete, erase, storage, cache, data, error reporting, vin",
+  "@settingsTopicPrivacyKeywords": {
+    "description": "Comma-separated search keywords for the Privacy & data tile (#3884)."
+  },
+  "settingsTopicBackupTitle": "Backup & restore",
+  "@settingsTopicBackupTitle": {
+    "description": "Settings root tile title (#3884): export and restore a full backup."
+  },
+  "settingsTopicBackupSubtitle": "Export or restore a full backup of your data",
+  "@settingsTopicBackupSubtitle": {
+    "description": "One-line subtitle of the Backup & restore tile (#3884)."
+  },
+  "settingsTopicBackupKeywords": "backup, export, restore, import, zip, xml, transfer",
+  "@settingsTopicBackupKeywords": {
+    "description": "Comma-separated search keywords for the Backup & restore tile (#3884)."
+  },
+  "settingsTopicAdvancedSubtitle": "GitHub token, developer tools",
+  "@settingsTopicAdvancedSubtitle": {
+    "description": "One-line subtitle of the Advanced & developer tile (#3884). Only shown when the PAT or debug feature is on."
+  },
+  "settingsTopicAdvancedKeywords": "developer, debug, token, pat, github, diagnostics, error log, trace",
+  "@settingsTopicAdvancedKeywords": {
+    "description": "Comma-separated search keywords for the Advanced & developer tile (#3884)."
+  },
+  "settingsTopicAboutSubtitle": "Version, licences, links",
+  "@settingsTopicAboutSubtitle": {
+    "description": "One-line subtitle of the About tile (#3884)."
+  },
+  "settingsTopicAboutKeywords": "about, version, licence, license, donate, github, attribution",
+  "@settingsTopicAboutKeywords": {
+    "description": "Comma-separated search keywords for the About tile (#3884)."
+  },
+  "settingsConsumptionOffHint": "Turn on consumption tracking in Features & use mode to configure vehicles, coaching and rewards.",
+  "@settingsConsumptionOffHint": {
+    "description": "Hint on the Driving & consumption screen when the consumption surface is not reachable (no data source / tab flag on) (#3884)."
+  },
+  "settingsOpenFeaturesLink": "Open Features & use mode",
+  "@settingsOpenFeaturesLink": {
+    "description": "Link/button label that opens the Features & use mode screen from a hint (#3884)."
+  },
+  "settingsRadarTileSubtitle": "Radius, price mode, polling and screen pinning for the active profile",
+  "@settingsRadarTileSubtitle": {
+    "description": "Subtitle of the Fuel Station Radar tile on the Driving & consumption screen (#3884)."
+  },
+  "settingsRadarNoProfileHint": "Create a profile first — the radar settings are stored per profile.",
+  "@settingsRadarNoProfileHint": {
+    "description": "Empty state of the radar settings screen when there is no active profile (#3884)."
+  },
+  "settingsRadarPinHeader": "Screen pinning",
+  "@settingsRadarPinHeader": {
+    "description": "Section header above the radar auto-pin switch on the radar settings screen (#3884)."
+  },
+  "settingsAlertsTileSubtitle": "Station and radius alerts that notify you of price drops",
+  "@settingsAlertsTileSubtitle": {
+    "description": "Subtitle of the Price alerts tile on the Prices & alerts screen (#3884)."
+  },
+  "settingsPriceFeaturesHeader": "Price features",
+  "@settingsPriceFeaturesHeader": {
+    "description": "Section header above the price-related feature switches on the Prices & alerts screen (#3884)."
+  },
+  "settingsVoiceAnnouncementsOffHint": "Voice announcements are off. Turn on Voice feedback and Voice announcements in Features & use mode to hear nearby cheap fuel while driving.",
+  "@settingsVoiceAnnouncementsOffHint": {
+    "description": "Hint on the Prices & alerts screen when the voice-announcements feature is not effectively enabled (#3884)."
+  },
+  "settingsDistanceUnitTitle": "Distance unit",
+  "@settingsDistanceUnitTitle": {
+    "description": "Read-only row on the Units & display screen showing the distance unit (km / mi) (#3884)."
+  },
+  "settingsDistanceUnitSubtitle": "From the active profile's country",
+  "@settingsDistanceUnitSubtitle": {
+    "description": "Subtitle of the read-only distance-unit row explaining where the unit comes from (#3884)."
+  },
+  "settingsObd2AdapterTitle": "OBD2 adapter",
+  "@settingsObd2AdapterTitle": {
+    "description": "Tile title on the Vehicles & OBD2 screen leading to the per-vehicle adapter pairing (#3884)."
+  },
+  "settingsObd2AdapterSubtitle": "Adapters are paired per vehicle — open a vehicle to pair or change its adapter",
+  "@settingsObd2AdapterSubtitle": {
+    "description": "Subtitle of the OBD2 adapter tile on the Vehicles & OBD2 screen (#3884)."
+  },
+  "settingsStorageDeleteHint": "Deleting all local data is done from the Privacy Dashboard.",
+  "@settingsStorageDeleteHint": {
+    "description": "One-line hint at the bottom of Storage & cache replacing the former duplicate Delete-all button (#3884)."
+  },
+  "settingsPrivacyCrossLinkTitle": "Consents",
+  "@settingsPrivacyCrossLinkTitle": {
+    "description": "Cross-link tile inside the TankSync section that opens Privacy & data (#3884)."
+  },
+  "settingsPrivacyCrossLinkSubtitle": "Cloud Sync and trip-sync consents live under Privacy & data",
+  "@settingsPrivacyCrossLinkSubtitle": {
+    "description": "Subtitle of the TankSync → Privacy & data cross-link tile (#3884)."
+  },
+  "settingsBackupExportSubtitle": "Vehicles, fill-ups, trips and charging logs as a ZIP file",
+  "@settingsBackupExportSubtitle": {
+    "description": "Subtitle of the Export backup action on the Backup & restore screen (#3884)."
+  },
+  "settingsBackupRestoreSubtitle": "Merge or replace your data from a previous backup ZIP",
+  "@settingsBackupRestoreSubtitle": {
+    "description": "Subtitle of the Restore backup action on the Backup & restore screen (#3884)."
+  },
+  "settingsStationTypesLink": "Station types are set in Features & use mode",
+  "@settingsStationTypesLink": {
+    "description": "Tile in the profile edit sheet replacing the former show-fuel / show-EV switches; tapping opens Features & use mode (#3884)."
+  },
+  "routeSearchCriterionLabel": "Station choice per route segment",
+  "@routeSearchCriterionLabel": {
+    "description": "Label of the segmented control in the Route planning card choosing which stations are kept at each sample point (#3884)."
+  },
+  "routeSearchCriterionCheapest": "Cheapest",
+  "@routeSearchCriterionCheapest": {
+    "description": "Segment label: keep the cheapest stations around each route sample point (#3884)."
+  },
+  "routeSearchCriterionNearest": "Nearest to route",
+  "@routeSearchCriterionNearest": {
+    "description": "Segment label: keep the stations nearest to the route at each sample point (#3884)."
+  },
+  "routeSearchTopNLabel": "Candidates per sample point",
+  "@routeSearchTopNLabel": {
+    "description": "Label of the slider (3–20) bounding how many stations are considered at each point along the route (#3884)."
+  },
+  "routeSearchTopNCaption": "Up to {count} stations are considered at each point along the route.",
+  "@routeSearchTopNCaption": {
+    "description": "Caption under the candidates-per-sample-point slider (#3884).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hybridFuelChoiceLabel": "Fuel for price search (hybrid)",
+  "@hybridFuelChoiceLabel": {
+    "description": "Dropdown label in the profile edit sheet's Vehicle card, shown only when the default vehicle is a hybrid: which of its fuels drives price search (#3884)."
+  },
+  "hybridFuelChoiceVehicleDefault": "Vehicle default",
+  "@hybridFuelChoiceVehicleDefault": {
+    "description": "Dropdown option meaning 'no explicit hybrid fuel choice — use the vehicle's combustion fuel' (#3884)."
+  },
+  "scopeThisProfile": "This profile",
+  "@scopeThisProfile": {
+    "description": "Scope badge on a setting that is stored per user profile (#3884)."
+  },
+  "scopeAllProfiles": "All profiles",
+  "@scopeAllProfiles": {
+    "description": "Scope badge on a setting that applies app-wide, regardless of the active profile (#3884)."
+  },
+  "scopeThisVehicle": "This vehicle",
+  "@scopeThisVehicle": {
+    "description": "Scope badge on a setting that is stored per vehicle (#3884)."
+  },
+  "featureLabel_manualConsumption": "Manual consumption logging",
+  "@featureLabel_manualConsumption": {
+    "description": "Display name for the manual fill-up / charging-log feature gate (#1517, localised in #3884)."
+  },
+  "featureDescription_manualConsumption": "Track fuel fill-ups and EV charging sessions by hand (no OBD2 adapter required).",
+  "@featureDescription_manualConsumption": {
+    "description": "One-line description for the manual consumption logging feature gate (#3884)."
+  },
+  "featureLabel_loyaltyCards": "Loyalty cards",
+  "@featureLabel_loyaltyCards": {
+    "description": "Display name for the fuel-club / loyalty cards feature gate (#1517, localised in #3884)."
+  },
+  "featureDescription_loyaltyCards": "Fuel-club / loyalty program cards with per-litre discounts in price comparisons.",
+  "@featureDescription_loyaltyCards": {
+    "description": "One-line description for the loyalty cards feature gate (#3884)."
+  },
+  "featureLabel_startupTrace": "Startup initialization trace",
+  "@featureLabel_startupTrace": {
+    "description": "Display name for the developer startup-trace feature gate (#3383, localised in #3884)."
+  },
+  "featureDescription_startupTrace": "Record the timed phases of app startup, view them as a waterfall and export them — a developer diagnostic.",
+  "@featureDescription_startupTrace": {
+    "description": "One-line description for the startup-trace feature gate (#3884)."
+  },
+  "locationGpsAutoHint": "GPS position is acquired automatically when you search. You can also update it manually here.",
+  "@locationGpsAutoHint": {
+    "description": "Hint under the 'Tap to update GPS position' row in the Location section (was hard-coded English; #3884)."
+  },
+  "locationClearGpsBody": "Clear the stored GPS position? You can update it again at any time.",
+  "@locationClearGpsBody": {
+    "description": "Body of the confirmation dialog when deleting the stored GPS position (was hard-coded English; #3884)."
+  },
   "shareReceiptUnsupportedFormat": "That file type can't be imported yet — share a photo of the receipt instead.",
   "@shareReceiptUnsupportedFormat": {
     "description": "Snackbar shown when the user shares an unsupported file (e.g. a PDF) into the app. Image receipts work today; PDF rasterisation arrives in #2737 (#2735)."
@@ -8183,9 +8502,9 @@
   "@widgetHelpConfigure": {
     "description": "Help line explaining how to reconfigure the Android home-screen widget (#1806). Shown only on fresh installs without an active profile; otherwise the in-app defaults editor (#2106) renders instead."
   },
-  "widgetDefaultsApplyToAllHint": "Choices below apply to every installed widget on the next refresh.",
-  "@widgetDefaultsApplyToAllHint": {
-    "description": "#2106 — italicised hint above the in-Settings widget-defaults editor explaining the live-override semantics."
+  "widgetDefaultsThisProfileHint": "Choices below apply to every installed widget showing this profile, on the next refresh.",
+  "@widgetDefaultsThisProfileHint": {
+    "description": "#2106 / #3884 — italicised hint above the in-Settings widget-defaults editor. The colour + variant persist on the ACTIVE UserProfile, so the hint names the profile scope instead of the former 'applies to all widgets' wording."
   },
   "widgetDefaultsColorLabel": "Colour scheme",
   "@widgetDefaultsColorLabel": {

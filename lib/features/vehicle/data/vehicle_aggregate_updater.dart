@@ -97,13 +97,14 @@ class VehicleAggregateUpdater {
     final profile = _vehicleRepo.getById(vehicleId);
     if (profile == null) return;
 
-    // #3741 — filter on the cheap summary-only decode, then full-decode
-    // (samples materialised) ONLY this vehicle's trips. `loadAll()` used
+    // #3741 — filter on the cheap summary-only decode; `loadAll()` used
     // to decode every stored trip's 1 Hz sample array just to throw the
-    // other vehicles' away.
+    // other vehicles' away. #3882 — the length breakdown needs summaries
+    // only and the speed histogram needs the speed + fuel-rate columns,
+    // so no trip is ever fully materialised here.
     final trips = <TripHistoryEntry>[
       for (final s in tripRepo.loadSummaries())
-        if (s.vehicleId == vehicleId) ?tripRepo.loadById(s.id),
+        if (s.vehicleId == vehicleId) s,
     ];
 
     if (trips.length < kMinTripsForAggregates) {
@@ -125,7 +126,9 @@ class VehicleAggregateUpdater {
     // need to re-walk the trips just to count samples.
     final samples = <TripSample>[];
     for (final t in trips) {
-      samples.addAll(t.samples);
+      if (t.sampleCount > 0) {
+        samples.addAll(tripRepo.loadSamplesWith(t.id, const {'s', 'f'}));
+      }
     }
 
     // The pure functions are isolate-safe. For datasets above the

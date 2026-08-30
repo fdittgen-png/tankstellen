@@ -15,7 +15,7 @@ import 'package:tankstellen/features/feature_management/application/feature_flag
 import 'package:tankstellen/features/feature_management/domain/build_channel.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/feature_management/domain/feature_manifest.dart';
-import 'package:tankstellen/features/profile/presentation/screens/profile_screen.dart';
+import 'package:tankstellen/features/profile/presentation/screens/settings/features_use_mode_screen.dart';
 import 'package:tankstellen/features/profile/presentation/widgets/feature_management_section.dart';
 
 import '../../../../helpers/mock_providers.dart';
@@ -50,7 +50,7 @@ FeatureManifest _manifestWithBetaOnly(Feature f) {
 }
 
 void main() {
-  group('ProfileScreen — Feature management section (#1373 phase 2)', () {
+  group('FeaturesUseModeScreen — Feature management section (#1373 phase 2, hosted per #3884)', () {
     late MockHiveStorage mockStorage;
     late List<Object> baseOverrides;
 
@@ -93,9 +93,9 @@ void main() {
       ];
     });
 
-    /// Expand the Feature management foldable so its child SwitchListTiles
-    /// mount in the widget tree. The section sits near the bottom of the
-    /// settings ListView; we scroll it into view first.
+    /// #3884 — the section is hosted EXPANDED on Settings → Features &
+    /// use mode (no foldable to open any more); scroll its header into
+    /// view so the lazy ListView materialises the switches below it.
     Future<void> openSection(WidgetTester tester) async {
       final header = find.text('Feature management');
       await tester.scrollUntilVisible(
@@ -103,14 +103,13 @@ void main() {
         300,
         scrollable: find.byType(Scrollable).first,
       );
-      await tester.tap(header);
       await tester.pumpAndSettle();
     }
 
     testWidgets(
       'section renders one toggle per feature (minus Conso-mode flags)',
       (tester) async {
-        await pumpApp(tester, const ProfileScreen(), overrides: baseOverrides);
+        await pumpApp(tester, const FeaturesUseModeScreen(), overrides: baseOverrides);
         await openSection(tester);
 
         // #1571 — three Conso-surface flags are no longer rendered as
@@ -370,7 +369,7 @@ void main() {
         'production build', (tester) async {
       await pumpApp(
         tester,
-        const ProfileScreen(),
+        const FeaturesUseModeScreen(),
         overrides: [
           ...baseOverrides,
           featureManifestProvider.overrideWithValue(
@@ -400,7 +399,7 @@ void main() {
     ) async {
       await pumpApp(
         tester,
-        const ProfileScreen(),
+        const FeaturesUseModeScreen(),
         overrides: [
           ...baseOverrides,
           featureManifestProvider.overrideWithValue(

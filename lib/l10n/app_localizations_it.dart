@@ -295,13 +295,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get clearCacheButton => 'Svuota cache';
 
   @override
-  String get deleteAllTitle => 'Eliminare tutti i dati?';
-
-  @override
-  String get deleteAllBody =>
-      'Questo elimina definitivamente tutti i profili, i preferiti, la chiave API, le impostazioni e la cache. L\'app verrà reimpostata.';
-
-  @override
   String get deleteAllButton => 'Elimina tutto';
 
   @override
@@ -848,20 +841,6 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get avoidHighwaysDesc =>
       'Il calcolo del percorso evita strade a pedaggio e autostrade';
-
-  @override
-  String get showFuelStations => 'Mostra distributori';
-
-  @override
-  String get showFuelStationsDesc =>
-      'Includi stazioni benzina, diesel, GPL, metano';
-
-  @override
-  String get showEvStations => 'Mostra stazioni di ricarica';
-
-  @override
-  String get showEvStationsDesc =>
-      'Includi stazioni di ricarica elettrica nei risultati';
 
   @override
   String get noStationsAlongThisRoute =>
@@ -1855,9 +1834,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get tripBannerPaused => 'Percorso in pausa — tocca per riprendere';
 
   @override
-  String get navConsumption => 'Consumo';
-
-  @override
   String get vehicleBaselineSectionTitle => 'Calibrazione di riferimento';
 
   @override
@@ -2241,18 +2217,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get sectionLocation => 'Posizione';
-
-  @override
-  String get sectionSetupDataSources => 'Configurazione e fonti dati';
-
-  @override
-  String get sectionFeaturesUsage => 'Funzioni e utilizzo';
-
-  @override
-  String get sectionAccountSync => 'Account e sincronizzazione';
-
-  @override
-  String get sectionAppearanceWidgets => 'Aspetto e widget';
 
   @override
   String get sectionPrivacyData => 'Privacy e dati';
@@ -5974,6 +5938,41 @@ class AppLocalizationsIt extends AppLocalizations {
       'Rallenta prima della curva, non in curva — le curve strette disperdono velocità che poi devi recuperare.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Ultimi $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Unità di consumo';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Come viene mostrato il consumo di carburante in tutta l\'app';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automatica ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle =>
+      'Finestra del consumo in tempo reale';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Media del valore in tempo reale sugli ultimi secondi: più lunga è più stabile, più corta reagisce prima';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'stim. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Accesso alla posizione';
 
   @override
@@ -7120,6 +7119,262 @@ class AppLocalizationsIt extends AppLocalizations {
   String get refuelUnitPerSession => '/sessione';
 
   @override
+  String get settingsSearchHint => 'Cerca nelle impostazioni';
+
+  @override
+  String settingsSearchNoResults(String query) {
+    return 'Nessuna impostazione corrisponde a \"$query\"';
+  }
+
+  @override
+  String get settingsTopicProfilesTitle => 'Profili e regione';
+
+  @override
+  String get settingsTopicProfilesSubtitle =>
+      'Paese, lingua, carburante, raggio di ricerca, pianificazione del percorso';
+
+  @override
+  String get settingsTopicProfilesKeywords =>
+      'profilo, paese, lingua, carburante, raggio, cap, percorso, casa, valutazione, schermata iniziale, profile, country, language, fuel, radius, route, home, rating';
+
+  @override
+  String get settingsTopicVehiclesTitle => 'Veicoli e OBD2';
+
+  @override
+  String get settingsTopicVehiclesSubtitle =>
+      'Le tue auto, capacità del serbatoio, abbinamento dell\'adattatore OBD2';
+
+  @override
+  String get settingsTopicVehiclesKeywords =>
+      'veicolo, auto, obd, obd2, adattatore, bluetooth, serbatoio, motore, vin, calibrazione, vehicle, car, adapter, tank, engine';
+
+  @override
+  String get settingsTopicDrivingTitle => 'Guida e consumo';
+
+  @override
+  String get settingsTopicDrivingSubtitle =>
+      'Coaching, premi, radar distributori, risoluzione problemi';
+
+  @override
+  String get settingsTopicDrivingKeywords =>
+      'coach, eco, aptico, voce, gamification, radar, veleggio, viaggio, consumo, club carburante, fedeltà, log obd2, blocco schermo, haptic, voice, trip, consumption, loyalty, pin';
+
+  @override
+  String get settingsTopicPricesTitle => 'Prezzi e avvisi';
+
+  @override
+  String get settingsTopicPricesSubtitle =>
+      'Avvisi prezzo, annunci vocali, storico prezzi, segnalazioni della community';
+
+  @override
+  String get settingsTopicPricesKeywords =>
+      'avviso, notifica, prezzo, storico, previsione, momento migliore, community, segnalazione, qr, pagamento, voce, annuncio, alert, price, history, prediction, report, payment, voice';
+
+  @override
+  String get settingsTopicUnitsTitle => 'Unità e visualizzazione';
+
+  @override
+  String get settingsTopicUnitsSubtitle =>
+      'Tema, unità di distanza, widget della schermata Home';
+
+  @override
+  String get settingsTopicUnitsKeywords =>
+      'tema, scuro, chiaro, eco, unità, km, miglia, widget, colore, visualizzazione, aspetto, theme, dark, light, unit, miles, display';
+
+  @override
+  String get settingsTopicFeaturesTitle => 'Funzioni e modalità d\'uso';
+
+  @override
+  String get settingsTopicFeaturesSubtitle =>
+      'Preimpostazioni della modalità d\'uso e ogni interruttore delle funzioni';
+
+  @override
+  String get settingsTopicFeaturesKeywords =>
+      'funzione, modalità, base, media, completa, personalizzata, interruttore, tipi di stazione, distributori, colonnine, ricarica, feature, basic, medium, full, custom, switch, toggle, charging';
+
+  @override
+  String get settingsTopicDataSourcesTitle => 'Fonti dati e posizione';
+
+  @override
+  String get settingsTopicDataSourcesSubtitle =>
+      'Chiavi API, posizione GPS, cambio automatico del profilo';
+
+  @override
+  String get settingsTopicDataSourcesKeywords =>
+      'api, chiave, gps, posizione, fonte dati, tankerkoenig, opencharge, key, location';
+
+  @override
+  String get settingsTopicSyncTitle => 'Sincronizzazione e account';
+
+  @override
+  String get settingsTopicSyncKeywords =>
+      'tanksync, cloud, account, e-mail, collega dispositivo, sincronizzazione, condividi database, anonimo, email, link device, sync, share database, anonymous';
+
+  @override
+  String get settingsTopicPrivacySubtitle =>
+      'Consensi, dashboard privacy, archiviazione e cache';
+
+  @override
+  String get settingsTopicPrivacyKeywords =>
+      'privacy, consenso, gdpr, elimina, cancella, archiviazione, cache, dati, segnalazione errori, vin, consent, delete, erase, storage, data, error reporting';
+
+  @override
+  String get settingsTopicBackupTitle => 'Backup e ripristino';
+
+  @override
+  String get settingsTopicBackupSubtitle =>
+      'Esporta o ripristina un backup completo dei tuoi dati';
+
+  @override
+  String get settingsTopicBackupKeywords =>
+      'backup, esporta, ripristina, importa, zip, xml, trasferimento, export, restore, import, transfer';
+
+  @override
+  String get settingsTopicAdvancedSubtitle =>
+      'Token GitHub, strumenti per sviluppatori';
+
+  @override
+  String get settingsTopicAdvancedKeywords =>
+      'sviluppatore, debug, token, pat, github, diagnostica, log errori, traccia, developer, diagnostics, error log, trace';
+
+  @override
+  String get settingsTopicAboutSubtitle => 'Versione, licenze, link';
+
+  @override
+  String get settingsTopicAboutKeywords =>
+      'informazioni, versione, licenza, dona, github, attribuzione, about, license, donate';
+
+  @override
+  String get settingsConsumptionOffHint =>
+      'Attiva il monitoraggio dei consumi in Funzioni e modalità d\'uso per configurare veicoli, coaching e premi.';
+
+  @override
+  String get settingsOpenFeaturesLink => 'Apri Funzioni e modalità d\'uso';
+
+  @override
+  String get settingsRadarTileSubtitle =>
+      'Raggio, modalità prezzo, polling e blocco schermo per il profilo attivo';
+
+  @override
+  String get settingsRadarNoProfileHint =>
+      'Crea prima un profilo: le impostazioni del radar sono salvate per profilo.';
+
+  @override
+  String get settingsRadarPinHeader => 'Blocco schermo';
+
+  @override
+  String get settingsAlertsTileSubtitle =>
+      'Avvisi per stazione e per raggio che ti segnalano i cali di prezzo';
+
+  @override
+  String get settingsPriceFeaturesHeader => 'Funzioni prezzi';
+
+  @override
+  String get settingsVoiceAnnouncementsOffHint =>
+      'Gli annunci vocali sono disattivati. Attiva Feedback vocale e Annunci vocali in Funzioni e modalità d\'uso per sentire il carburante economico nelle vicinanze mentre guidi.';
+
+  @override
+  String get settingsDistanceUnitTitle => 'Unità di distanza';
+
+  @override
+  String get settingsDistanceUnitSubtitle => 'Dal paese del profilo attivo';
+
+  @override
+  String get settingsObd2AdapterTitle => 'Adattatore OBD2';
+
+  @override
+  String get settingsObd2AdapterSubtitle =>
+      'Gli adattatori sono abbinati per veicolo: apri un veicolo per abbinare o cambiare il suo adattatore';
+
+  @override
+  String get settingsStorageDeleteHint =>
+      'L\'eliminazione di tutti i dati locali avviene dalla dashboard privacy.';
+
+  @override
+  String get settingsPrivacyCrossLinkTitle => 'Consensi';
+
+  @override
+  String get settingsPrivacyCrossLinkSubtitle =>
+      'I consensi per Cloud Sync e la sincronizzazione dei viaggi si trovano in Privacy e dati';
+
+  @override
+  String get settingsBackupExportSubtitle =>
+      'Veicoli, rifornimenti, viaggi e registri di ricarica in un file ZIP';
+
+  @override
+  String get settingsBackupRestoreSubtitle =>
+      'Unisci o sostituisci i tuoi dati da uno ZIP di backup precedente';
+
+  @override
+  String get settingsStationTypesLink =>
+      'I tipi di stazione si impostano in Funzioni e modalità d\'uso';
+
+  @override
+  String get routeSearchCriterionLabel =>
+      'Scelta della stazione per tratto di percorso';
+
+  @override
+  String get routeSearchCriterionCheapest => 'Più economica';
+
+  @override
+  String get routeSearchCriterionNearest => 'Più vicina al percorso';
+
+  @override
+  String get routeSearchTopNLabel => 'Candidate per punto di campionamento';
+
+  @override
+  String routeSearchTopNCaption(int count) {
+    return 'Fino a $count stazioni vengono considerate in ogni punto lungo il percorso.';
+  }
+
+  @override
+  String get hybridFuelChoiceLabel =>
+      'Carburante per la ricerca prezzi (ibrido)';
+
+  @override
+  String get hybridFuelChoiceVehicleDefault => 'Predefinito del veicolo';
+
+  @override
+  String get scopeThisProfile => 'Questo profilo';
+
+  @override
+  String get scopeAllProfiles => 'Tutti i profili';
+
+  @override
+  String get scopeThisVehicle => 'Questo veicolo';
+
+  @override
+  String get featureLabel_manualConsumption =>
+      'Registrazione manuale dei consumi';
+
+  @override
+  String get featureDescription_manualConsumption =>
+      'Registra rifornimenti e sessioni di ricarica a mano (nessun adattatore OBD2 richiesto).';
+
+  @override
+  String get featureLabel_loyaltyCards => 'Carte fedeltà';
+
+  @override
+  String get featureDescription_loyaltyCards =>
+      'Carte di club carburante / fedeltà con sconti al litro nei confronti dei prezzi.';
+
+  @override
+  String get featureLabel_startupTrace =>
+      'Traccia di inizializzazione all\'avvio';
+
+  @override
+  String get featureDescription_startupTrace =>
+      'Registra le fasi cronometrate dell\'avvio dell\'app, le mostra a cascata e le esporta: una diagnostica per sviluppatori.';
+
+  @override
+  String get locationGpsAutoHint =>
+      'La posizione GPS viene acquisita automaticamente durante la ricerca. Puoi anche aggiornarla manualmente qui.';
+
+  @override
+  String get locationClearGpsBody =>
+      'Cancellare la posizione GPS salvata? Puoi aggiornarla di nuovo in qualsiasi momento.';
+
+  @override
   String get shareReceiptUnsupportedFormat =>
       'Questo tipo di file non può ancora essere importato — condividi invece una foto dello scontrino.';
 
@@ -8119,8 +8374,8 @@ class AppLocalizationsIt extends AppLocalizations {
       'Su Android, tieni premuto il widget e scegli Riconfigura per cambiare il profilo, il colore e il contenuto.';
 
   @override
-  String get widgetDefaultsApplyToAllHint =>
-      'Le scelte qui sotto si applicano a ogni widget installato al prossimo aggiornamento.';
+  String get widgetDefaultsThisProfileHint =>
+      'Le scelte qui sotto valgono per ogni widget installato che mostra questo profilo, al prossimo aggiornamento.';
 
   @override
   String get widgetDefaultsColorLabel => 'Schema di colori';

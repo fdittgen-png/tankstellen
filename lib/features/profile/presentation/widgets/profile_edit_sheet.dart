@@ -1,13 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/country/country_config.dart';
 import '../../../../core/language/language_provider.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/theme/spacing.dart';
@@ -23,17 +23,17 @@ import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../domain/entities/user_profile.dart';
 import '../../providers/profile_edit_provider.dart';
 import '../../providers/profile_provider.dart';
-import '../../providers/show_electric_enabled_provider.dart';
-import '../../providers/show_fuel_enabled_provider.dart';
 import 'country_change_dialog.dart';
 import 'profile_fuel_type_dropdown.dart';
 import 'profile_landing_screen_dropdown.dart';
 import 'profile_radius_slider.dart';
+import 'radar_settings_card.dart';
 import 'rating_mode_section.dart';
 import '../../../../core/utils/unit_formatter.dart';
 
 part 'profile_edit_sheet_parts.dart';
 part 'profile_edit_sheet_parts2.dart';
+part 'profile_edit_sheet_route_section.dart';
 
 /// Profile edit bottom sheet. Form state (fuel, radius, rating mode, etc.)
 /// lives in [profileEditControllerProvider] so changes trigger selective

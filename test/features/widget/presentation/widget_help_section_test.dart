@@ -55,7 +55,9 @@ void main() {
       );
       // Legacy hint is suppressed — the editor took its place.
       expect(find.text(l.widgetHelpConfigure), findsNothing);
-      expect(find.text(l.widgetDefaultsApplyToAllHint), findsOneWidget);
+      // #3884 — the hint names the profile scope (colour + variant
+      // persist on the ACTIVE profile), not "all widgets".
+      expect(find.text(l.widgetDefaultsThisProfileHint), findsOneWidget);
       expect(find.text(l.widgetDefaultsColorLabel), findsOneWidget);
       expect(find.text(l.widgetDefaultsVariantLabel), findsOneWidget);
       expect(

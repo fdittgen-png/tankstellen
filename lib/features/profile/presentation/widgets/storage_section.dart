@@ -6,10 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/cache/cache_manager.dart';
 import '../../../../core/navigation/app_routes.dart';
-import '../../../../core/storage/local_data_eraser.dart';
 import '../../../../core/storage/storage_providers.dart';
-import '../../../obd2/api.dart' show ActiveTripSampleWal;
-import '../../../widget/api.dart' show clearHomeWidgetData;
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'storage_bar.dart';
@@ -184,19 +181,23 @@ class StorageSection extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => _clearAllData(context, ref),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: theme.colorScheme.error,
-                    ),
-                    icon: const Icon(Icons.delete_forever),
-                    label: Text(l.deleteAllButton),
-                  ),
-                ),
-              ],
+            // #3884 — the duplicate "Delete all" button is gone: the
+            // Privacy Dashboard owns local erasure (#3867). One line
+            // says where, one link goes there.
+            Text(
+              l.settingsStorageDeleteHint,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: TextButton.icon(
+                key: const Key('storagePrivacyDashboardLink'),
+                onPressed: () => context.push(RoutePaths.privacyDashboard),
+                icon: const Icon(Icons.privacy_tip_outlined, size: 18),
+                label: Text(l.privacyDashboardTitle),
+              ),
             ),
           ],
         ),
@@ -242,50 +243,4 @@ class StorageSection extends ConsumerWidget {
     }
   }
 
-  Future<void> _clearAllData(BuildContext ctx, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
-      context: ctx,
-      builder: (context) => AlertDialog(
-        icon: Icon(
-          Icons.warning_amber_rounded,
-          color: Theme.of(context).colorScheme.error,
-          size: 48,
-        ),
-        title: Text(AppLocalizations.of(context).deleteAllTitle),
-        content: Text(AppLocalizations.of(context).deleteAllBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(AppLocalizations.of(context).cancel),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(AppLocalizations.of(context).deleteAllButton),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true) {
-      if (!ctx.mounted) return; // #3159 — see _clearCache.
-      // #3867 (Epic #3865) — the ONE registry-driven local erasure (every
-      // box incl. trips/baselines/caches/traces, secure storage, prefs,
-      // the image cache, the widget container and the trip WAL).
-      final result = await LocalDataEraser.eraseAll(
-        storage: ref.read(storageRepositoryProvider),
-        extraWipes: [clearHomeWidgetData, ActiveTripSampleWal.instance.clear],
-      );
-      if (!ctx.mounted) return; // #3159 — see _clearCache.
-      ref.invalidate(storageManagementProvider);
-      if (!result.complete) {
-        SnackBarHelper.showError(ctx,
-            AppLocalizations.of(ctx)
-                .localErasurePartial(result.failedSteps.join(', ')));
-      }
-      ctx.go(RoutePaths.setup);
-    }
-  }
 }

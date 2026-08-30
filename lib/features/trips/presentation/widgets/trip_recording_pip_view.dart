@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/services/approach_detector.dart';
+import '../../../../core/domain/consumption_unit.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/fuel_type.dart';
@@ -37,6 +38,9 @@ class TripRecordingPipView extends StatelessWidget {
   final TripRecordingState state;
   final Color backgroundColor;
   final Color foregroundColor;
+
+  /// #3883 — the display unit of the live consumption figure.
+  final ConsumptionUnit unit;
 
   /// Optional approach-detector state (#2084 / Epic #2065). When set
   /// to [ApproachInRadius] or [ApproachLeaving], the PiP tile flips
@@ -83,6 +87,7 @@ class TripRecordingPipView extends StatelessWidget {
     this.radarDistanceMeters,
     this.radiusMeters,
     this.onBodyTap,
+    this.unit = ConsumptionUnit.lPer100Km,
   });
 
   @override
@@ -156,9 +161,11 @@ class TripRecordingPipView extends StatelessWidget {
     final distance = live?.distanceKmSoFar;
     final elapsed = live?.elapsed;
 
-    // Resolve OBD2-derived live L/100 km (or L/h at idle).
-    final raw = (live != null && !paused)
-        ? formatInstantConsumption(live)
+    // Resolve OBD2-derived live consumption (or L/h at idle) — #3883:
+    // the rolling-window figure in the user's unit, split into figure +
+    // caption by the shared resolver.
+    final figure = (live != null && !paused)
+        ? resolveLiveConsumption(live, unit: unit)
         : null;
     // #2390 — GPS-only live estimate (null on OBD2 trips + during the
     // estimator's warm-up). The OBD2 `raw` figure always wins over it.
@@ -174,10 +181,10 @@ class TripRecordingPipView extends StatelessWidget {
     // label. OBD2-measured branches stay false (the figure is real).
     var isEstimate = false;
 
-    if (raw != null) {
+    if (figure != null) {
       // Branch 1 — OBD2 live consumption is the most informative.
-      bigFigure = _stripUnit(raw);
-      bigCaption = _unitOf(raw);
+      bigFigure = figure.figure;
+      bigCaption = figure.unitMask;
       secondaryRow = [
         if (distance != null) UnitFormatter.formatDistance(distance),
         if (elapsed != null) _fmtElapsed(elapsed),
@@ -187,11 +194,9 @@ class TripRecordingPipView extends StatelessWidget {
       // caption is the dedicated localized "est. L/100 km" marker
       // (#2393) so the value reads distinctly from the OBD2-measured
       // "L/100 km"; the leading `~` carries the same meaning visually.
-      // Matches the dot-decimal L/100 mask of formatInstantConsumption
-      // in branch 1 (#2185 convention).
-      // i18n-ignore-format: dot-decimal L/100 consumption mask (#2185)
-      bigFigure = '~${gpsEstimate.toStringAsFixed(1)}';
-      bigCaption = l.tripRecordingPipEstConsumptionCaption;
+      // #3883 — in the user's display unit, like branch 1.
+      bigFigure = formatEstimatedConsumptionFigure(gpsEstimate, unit);
+      bigCaption = l.tripRecordingPipEstConsumptionCaptionUnit(unit.mask);
       isEstimate = true;
       secondaryRow = [
         if (distance != null) UnitFormatter.formatDistance(distance),
@@ -347,24 +352,6 @@ class TripRecordingPipView extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  /// Strip the trailing unit token from
-  /// [formatInstantConsumption]'s output. The function returns either
-  /// `"5.8 L/100"` (driving) or `"1.2 L/h"` (idle). We render the
-  /// figure + unit on separate lines so the figure can grow huge.
-  static String _stripUnit(String raw) {
-    final idx = raw.indexOf(' ');
-    return idx < 0 ? raw : raw.substring(0, idx);
-  }
-
-  /// Return just the unit suffix from `formatInstantConsumption`'s
-  /// output. Appends `" km"` to the "L/100" variant so the user reads
-  /// "L/100 km" — matching the standard unit caption.
-  static String _unitOf(String raw) {
-    if (raw.contains('L/100')) return 'L/100 km';
-    if (raw.contains('L/h')) return 'L/h';
-    return '';
   }
 
   /// Format an elapsed [Duration] so it reads as a duration, not a clock

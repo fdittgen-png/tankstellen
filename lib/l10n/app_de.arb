@@ -131,8 +131,6 @@
   "clearCacheTitle": "Cache leeren?",
   "clearCacheBody": "Zwischengespeicherte Suchergebnisse und Preise werden gelöscht. Profile, Favoriten und Einstellungen bleiben erhalten.",
   "clearCacheButton": "Cache leeren",
-  "deleteAllTitle": "Alle Daten löschen?",
-  "deleteAllBody": "Dies löscht unwiderruflich alle Profile, Favoriten, den API-Schlüssel, alle Einstellungen und den gesamten Cache.",
   "deleteAllButton": "Alles löschen",
   "entries": "Einträge",
   "cacheEmpty": "Cache ist leer",
@@ -406,10 +404,6 @@
   },
   "avoidHighways": "Autobahnen vermeiden",
   "avoidHighwaysDesc": "Routenberechnung vermeidet Mautstraßen und Autobahnen",
-  "showFuelStations": "Tankstellen anzeigen",
-  "showFuelStationsDesc": "Benzin-, Diesel-, LPG-, CNG-Stationen einbeziehen",
-  "showEvStations": "E-Ladestationen anzeigen",
-  "showEvStationsDesc": "Elektrische Ladestationen in Suchergebnissen einbeziehen",
   "noStationsAlongThisRoute": "Keine Stationen entlang dieser Route gefunden.",
   "fuelCostCalculator": "Kraftstoffkostenrechner",
   "distanceKm": "Entfernung (km)",
@@ -843,7 +837,6 @@
   "tripResume": "Fortsetzen",
   "tripBannerRecording": "Fahrt wird aufgezeichnet",
   "tripBannerPaused": "Fahrt pausiert — zum Fortsetzen tippen",
-  "navConsumption": "Verbrauch",
   "vehicleBaselineSectionTitle": "Baseline-Kalibrierung",
   "vehicleBaselineEmpty": "Noch keine Messwerte — starte eine OBD2-Fahrt, um das Verbrauchsprofil dieses Fahrzeugs zu lernen.",
   "vehicleBaselineProgress": "Anhand der Messwerte aus verschiedenen Fahrsituationen gelernt.",
@@ -983,10 +976,6 @@
   },
   "sectionProfile": "Profil",
   "sectionLocation": "Standort",
-  "sectionSetupDataSources": "Einrichtung & Datenquellen",
-  "sectionFeaturesUsage": "Funktionen & Nutzung",
-  "sectionAccountSync": "Konto & Synchronisierung",
-  "sectionAppearanceWidgets": "Darstellung & Widgets",
   "sectionPrivacyData": "Datenschutz & Daten",
   "sectionAdvancedDeveloper": "Erweitert & Entwickler",
   "tooltipBack": "Zurück",
@@ -2787,6 +2776,42 @@
   "@lessonAdviceSharpCornering": {
     "description": "Advice sub-line under the sharp-cornering lesson (#2793)."
   },
+  "liveConsumptionWindowLabel": "Letzte {seconds} s",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Verbrauchseinheit",
+  "consumptionUnitSettingSubtitle": "So wird der Kraftstoffverbrauch überall in der App angezeigt",
+  "consumptionUnitAuto": "Automatisch ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Live-Verbrauchsfenster",
+  "consumptionWindowSettingSubtitle": "Mittelt den Live-Wert über die letzten Sekunden – länger ist ruhiger, kürzer reagiert schneller",
+  "consumptionWindowOption": "{seconds} s",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "tripRecordingPipEstConsumptionCaptionUnit": "gesch. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
   "locationConsentTitle": "Standortfreigabe",
   "locationConsentSubtitle": "Diese App möchte Ihren Standort verwenden, um Tankstellen in Ihrer Nähe zu finden.",
   "locationConsentWhatHappens": "Was passiert mit Ihren Standortdaten:",
@@ -3348,6 +3373,90 @@
   "reconcileResolveGapSemanticLabel": "Ungeklärte Kraftstoff- und Fahrten-Differenz klären",
   "refuelUnitPerKwh": "/kWh",
   "refuelUnitPerSession": "/Sitzung",
+  "settingsSearchHint": "Einstellungen durchsuchen",
+  "settingsSearchNoResults": "Keine Einstellungen passen zu „{query}“",
+  "@settingsSearchNoResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTopicProfilesTitle": "Profile & Region",
+  "settingsTopicProfilesSubtitle": "Land, Sprache, Kraftstoff, Suchradius, Routenplanung",
+  "settingsTopicProfilesKeywords": "profil, land, sprache, kraftstoff, radius, postleitzahl, route, zuhause, bewertung, startseite",
+  "settingsTopicVehiclesTitle": "Fahrzeuge & OBD2",
+  "settingsTopicVehiclesSubtitle": "Deine Autos, Tankgröße, OBD2-Adapter koppeln",
+  "settingsTopicVehiclesKeywords": "fahrzeug, auto, obd, obd2, adapter, bluetooth, tank, motor, vin, kalibrierung",
+  "settingsTopicDrivingTitle": "Fahren & Verbrauch",
+  "settingsTopicDrivingSubtitle": "Coaching, Belohnungen, Tankstellen-Radar, Fehlersuche",
+  "settingsTopicDrivingKeywords": "coach, eco, haptik, sprache, gamification, radar, gleiten, fahrt, verbrauch, tankclub, treue, obd2-protokoll, anheften",
+  "settingsTopicPricesTitle": "Preise & Alarme",
+  "settingsTopicPricesSubtitle": "Preisalarme, Sprachansagen, Preisverlauf, Community-Meldungen",
+  "settingsTopicPricesKeywords": "alarm, benachrichtigung, preis, verlauf, vorhersage, beste zeit, community, meldung, qr, bezahlen, sprache, ansage",
+  "settingsTopicUnitsTitle": "Einheiten & Darstellung",
+  "settingsTopicUnitsSubtitle": "Design, Entfernungseinheit, Startbildschirm-Widget",
+  "settingsTopicUnitsKeywords": "design, dunkel, hell, eco, einheit, km, meilen, widget, farbe, darstellung, aussehen",
+  "settingsTopicFeaturesTitle": "Funktionen & Nutzungsmodus",
+  "settingsTopicFeaturesSubtitle": "Nutzungsmodus-Vorlagen und jeder Funktionsschalter",
+  "settingsTopicFeaturesKeywords": "funktion, modus, basis, mittel, voll, benutzerdefiniert, schalter, umschalten, stationstypen, tankstellen, ladestationen, laden",
+  "settingsTopicDataSourcesTitle": "Datenquellen & Standort",
+  "settingsTopicDataSourcesSubtitle": "API-Schlüssel, GPS-Position, automatischer Profilwechsel",
+  "settingsTopicDataSourcesKeywords": "api, schlüssel, gps, standort, position, datenquelle, tankerkönig, opencharge",
+  "settingsTopicSyncTitle": "Synchronisierung & Konto",
+  "settingsTopicSyncKeywords": "tanksync, cloud, konto, e-mail, gerät verknüpfen, synchronisierung, datenbank teilen, anonym",
+  "settingsTopicPrivacySubtitle": "Einwilligungen, Datenschutz-Dashboard, Speicher & Cache",
+  "settingsTopicPrivacyKeywords": "datenschutz, einwilligung, dsgvo, löschen, speicher, cache, daten, fehlerberichte, vin",
+  "settingsTopicBackupTitle": "Sicherung & Wiederherstellung",
+  "settingsTopicBackupSubtitle": "Vollständige Sicherung deiner Daten exportieren oder wiederherstellen",
+  "settingsTopicBackupKeywords": "sicherung, backup, export, wiederherstellen, import, zip, xml, übertragen",
+  "settingsTopicAdvancedSubtitle": "GitHub-Token, Entwicklerwerkzeuge",
+  "settingsTopicAdvancedKeywords": "entwickler, debug, token, pat, github, diagnose, fehlerprotokoll, trace",
+  "settingsTopicAboutSubtitle": "Version, Lizenzen, Links",
+  "settingsTopicAboutKeywords": "über, version, lizenz, spenden, github, quellenangabe",
+  "settingsConsumptionOffHint": "Aktiviere die Verbrauchserfassung unter Funktionen & Nutzungsmodus, um Fahrzeuge, Coaching und Belohnungen einzurichten.",
+  "settingsOpenFeaturesLink": "Funktionen & Nutzungsmodus öffnen",
+  "settingsRadarTileSubtitle": "Radius, Preismodus, Abfrage und Bildschirm-Anheften für das aktive Profil",
+  "settingsRadarNoProfileHint": "Lege zuerst ein Profil an – die Radar-Einstellungen werden pro Profil gespeichert.",
+  "settingsRadarPinHeader": "Bildschirm anheften",
+  "settingsAlertsTileSubtitle": "Stations- und Umkreisalarme, die dich bei Preissenkungen benachrichtigen",
+  "settingsPriceFeaturesHeader": "Preisfunktionen",
+  "settingsVoiceAnnouncementsOffHint": "Sprachansagen sind aus. Aktiviere Sprachausgabe und Sprachansagen unter Funktionen & Nutzungsmodus, um günstigen Kraftstoff in der Nähe beim Fahren angesagt zu bekommen.",
+  "settingsDistanceUnitTitle": "Entfernungseinheit",
+  "settingsDistanceUnitSubtitle": "Aus dem Land des aktiven Profils",
+  "settingsObd2AdapterTitle": "OBD2-Adapter",
+  "settingsObd2AdapterSubtitle": "Adapter werden pro Fahrzeug gekoppelt – öffne ein Fahrzeug, um seinen Adapter zu koppeln oder zu ändern",
+  "settingsStorageDeleteHint": "Alle lokalen Daten werden über das Datenschutz-Dashboard gelöscht.",
+  "settingsPrivacyCrossLinkTitle": "Einwilligungen",
+  "settingsPrivacyCrossLinkSubtitle": "Die Einwilligungen für Cloud-Sync und Fahrten-Sync findest du unter Datenschutz & Daten",
+  "settingsBackupExportSubtitle": "Fahrzeuge, Tankvorgänge, Fahrten und Ladeprotokolle als ZIP-Datei",
+  "settingsBackupRestoreSubtitle": "Daten aus einer früheren Sicherungs-ZIP zusammenführen oder ersetzen",
+  "settingsStationTypesLink": "Stationstypen werden unter Funktionen & Nutzungsmodus festgelegt",
+  "routeSearchCriterionLabel": "Stationswahl pro Routenabschnitt",
+  "routeSearchCriterionCheapest": "Günstigste",
+  "routeSearchCriterionNearest": "Nächste zur Route",
+  "routeSearchTopNLabel": "Kandidaten pro Stützpunkt",
+  "routeSearchTopNCaption": "An jedem Punkt entlang der Route werden bis zu {count} Stationen berücksichtigt.",
+  "@routeSearchTopNCaption": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hybridFuelChoiceLabel": "Kraftstoff für die Preissuche (Hybrid)",
+  "hybridFuelChoiceVehicleDefault": "Fahrzeugstandard",
+  "scopeThisProfile": "Dieses Profil",
+  "scopeAllProfiles": "Alle Profile",
+  "scopeThisVehicle": "Dieses Fahrzeug",
+  "featureLabel_manualConsumption": "Manuelle Verbrauchserfassung",
+  "featureDescription_manualConsumption": "Tankvorgänge und Ladevorgänge von Hand erfassen (kein OBD2-Adapter nötig).",
+  "featureLabel_loyaltyCards": "Kundenkarten",
+  "featureDescription_loyaltyCards": "Tankclub-/Treuekarten mit Rabatt pro Liter im Preisvergleich.",
+  "featureLabel_startupTrace": "Start-Initialisierungs-Trace",
+  "featureDescription_startupTrace": "Zeichnet die Phasen des App-Starts mit Zeiten auf, zeigt sie als Wasserfall und exportiert sie – eine Entwicklerdiagnose.",
+  "locationGpsAutoHint": "Die GPS-Position wird bei der Suche automatisch ermittelt. Du kannst sie hier auch manuell aktualisieren.",
+  "locationClearGpsBody": "Gespeicherte GPS-Position löschen? Du kannst sie jederzeit erneut aktualisieren.",
   "shareReceiptUnsupportedFormat": "Dieser Dateityp kann noch nicht importiert werden — teile stattdessen ein Foto der Quittung.",
   "shareReceiptFailed": "Die geteilte Quittung konnte nicht gelesen werden — teile sie erneut oder füge den Tankvorgang manuell hinzu.",
   "featureLabel_addFillUpShareIntentReceipt": "Quittung zum Importieren teilen",
@@ -3830,7 +3939,7 @@
   "widgetHelpAdd": "Füge es über die Widget-Auswahl deines Launchers hinzu — halte einen leeren Bereich des Startbildschirms gedrückt, wähle „Widgets“ und suche SparKilo.",
   "widgetHelpTap": "Tippe im Widget auf eine Station, um sie in der App zu öffnen. Tippe auf das Aktualisieren-Symbol, um die Preise zu aktualisieren.",
   "widgetHelpConfigure": "Halte das Widget unter Android gedrückt und wähle „Neu konfigurieren“, um Profil, Farbe und Inhalt zu ändern.",
-  "widgetDefaultsApplyToAllHint": "Die untenstehenden Einstellungen gelten ab der nächsten Aktualisierung für alle installierten Widgets.",
+  "widgetDefaultsThisProfileHint": "Die untenstehenden Einstellungen gelten ab der nächsten Aktualisierung für alle installierten Widgets, die dieses Profil anzeigen.",
   "widgetDefaultsColorLabel": "Farbschema",
   "widgetDefaultsVariantLabel": "Inhaltsvariante",
   "widgetColorSchemeSystem": "System folgen",

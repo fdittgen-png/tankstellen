@@ -48,15 +48,41 @@ void main() {
   }
 
   group('ConsentSettingsSection', () {
-    testWidgets('shows four toggle switches', (tester) async {
-      // #1665 — the 5th toggle (Sync trip recordings) moved to the
-      // TankSync settings section. #2063 — the community wait-time
-      // toggle was removed alongside the wait-time feature. Four
-      // consent toggles remain here.
+    testWidgets('shows five toggle switches', (tester) async {
+      // #1665 moved the Sync-trip-recordings toggle to TankSync; #3884
+      // brought it back here next to the Cloud Sync master it depends on
+      // (one home per parameter). #2063 removed the community wait-time
+      // toggle. Five consent toggles live here.
       await tester.pumpWidget(buildWidget());
       await tester.pumpAndSettle();
 
-      expect(find.byType(SwitchListTile), findsNWidgets(4));
+      expect(find.byType(SwitchListTile), findsNWidgets(5));
+      expect(find.byKey(const Key('tripsSyncToggle')), findsOneWidget);
+    });
+
+    testWidgets('#3884 — trip-sync toggle is disabled while Cloud Sync is off',
+        (tester) async {
+      await tester.pumpWidget(buildWidget(cloudSync: false));
+      await tester.pumpAndSettle();
+      final off = tester.widget<SwitchListTile>(
+          find.byKey(const Key('tripsSyncToggle')));
+      expect(off.onChanged, isNull);
+    });
+
+    testWidgets('#3884 — trip-sync toggle saves only its own key once Cloud '
+        'Sync is on', (tester) async {
+      await tester.pumpWidget(buildWidget(cloudSync: true));
+      await tester.pumpAndSettle();
+      final on = tester.widget<SwitchListTile>(
+          find.byKey(const Key('tripsSyncToggle')));
+      expect(on.onChanged, isNotNull);
+      expect(on.value, isFalse);
+
+      await tester.tap(find.byKey(const Key('tripsSyncToggle')));
+      await tester.pumpAndSettle();
+      expect(fakeStorage.getSetting(StorageKeys.consentSyncTrips), true);
+      expect(fakeStorage.getSetting(StorageKeys.consentCloudSync), true);
+      expect(fakeStorage.getSetting(StorageKeys.consentLocation), false);
     });
 
     testWidgets('shows correct labels', (tester) async {

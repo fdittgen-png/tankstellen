@@ -89,7 +89,10 @@ void main() {
       expect(find.text('Cache is empty'), findsOneWidget);
     });
 
-    testWidgets('shows delete all button', (tester) async {
+    testWidgets(
+        '#3884 — no Delete-all button; a hint + link to the Privacy '
+        'Dashboard (which owns deletion) replace the duplicate',
+        (tester) async {
       final storage = fakeHiveStorageOverride();
       _seedStorageStats(storage.fake);
 
@@ -99,8 +102,16 @@ void main() {
         overrides: [storage.override],
       );
 
-      expect(find.byIcon(Icons.delete_forever), findsOneWidget);
-      expect(find.text('Delete all'), findsOneWidget);
+      expect(find.byIcon(Icons.delete_forever), findsNothing);
+      expect(find.text('Delete all'), findsNothing);
+      expect(
+        find.text('Deleting all local data is done from the Privacy Dashboard.'),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('storagePrivacyDashboardLink')),
+        findsOneWidget,
+      );
     });
 
     testWidgets('shows total storage size', (tester) async {

@@ -294,13 +294,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get clearCacheButton => 'Изчисти кеша';
 
   @override
-  String get deleteAllTitle => 'Изтриване на всички данни?';
-
-  @override
-  String get deleteAllBody =>
-      'Това ще изтрие завинаги всички профили, любими, API ключ, настройки и кеш. Приложението ще се нулира.';
-
-  @override
   String get deleteAllButton => 'Изтрий всичко';
 
   @override
@@ -847,20 +840,6 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get avoidHighwaysDesc =>
       'Изчисляването на маршрута избягва платени пътища и магистрали';
-
-  @override
-  String get showFuelStations => 'Показвай бензиностанции';
-
-  @override
-  String get showFuelStationsDesc =>
-      'Включи бензинови, дизелови, LPG, CNG станции';
-
-  @override
-  String get showEvStations => 'Показвай зарядни станции';
-
-  @override
-  String get showEvStationsDesc =>
-      'Включи електрически зарядни станции в резултатите';
 
   @override
   String get noStationsAlongThisRoute =>
@@ -1859,9 +1838,6 @@ class AppLocalizationsBg extends AppLocalizations {
       'Пътуването е на пауза — докоснете за продължаване';
 
   @override
-  String get navConsumption => 'Разход';
-
-  @override
   String get vehicleBaselineSectionTitle => 'Базова калибровка';
 
   @override
@@ -2248,18 +2224,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get sectionLocation => 'Местоположение';
-
-  @override
-  String get sectionSetupDataSources => 'Настройка и източници на данни';
-
-  @override
-  String get sectionFeaturesUsage => 'Функции и използване';
-
-  @override
-  String get sectionAccountSync => 'Акаунт и синхронизация';
-
-  @override
-  String get sectionAppearanceWidgets => 'Изглед и джаджи';
 
   @override
   String get sectionPrivacyData => 'Поверителност и данни';
@@ -5991,6 +5955,40 @@ class AppLocalizationsBg extends AppLocalizations {
       'Намалете преди завоя, не в него — рязкото вземане на завои губи скоростта, която после трябва да наберете отново.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Последните $seconds с';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Единица за разход';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Как се показва разходът на гориво навсякъде в приложението';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Автоматично ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Прозорец на разхода на живо';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Усреднява стойността на живо за последните секунди — по-дълъг е по-спокоен, по-кратък реагира по-бързо';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds с';
+  }
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'прибл. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Достъп до местоположението';
 
   @override
@@ -7138,6 +7136,262 @@ class AppLocalizationsBg extends AppLocalizations {
   String get refuelUnitPerSession => '/сесия';
 
   @override
+  String get settingsSearchHint => 'Търсене в настройките';
+
+  @override
+  String settingsSearchNoResults(String query) {
+    return 'Няма настройки, отговарящи на „$query“';
+  }
+
+  @override
+  String get settingsTopicProfilesTitle => 'Профили и регион';
+
+  @override
+  String get settingsTopicProfilesSubtitle =>
+      'Държава, език, гориво, радиус на търсене, планиране на маршрут';
+
+  @override
+  String get settingsTopicProfilesKeywords =>
+      'профил, държава, език, гориво, радиус, пощенски код, маршрут, дом, оценка, начален екран, profile, country, language, fuel, radius, route, home, rating';
+
+  @override
+  String get settingsTopicVehiclesTitle => 'Превозни средства и OBD2';
+
+  @override
+  String get settingsTopicVehiclesSubtitle =>
+      'Вашите автомобили, обем на резервоара, сдвояване на OBD2 адаптер';
+
+  @override
+  String get settingsTopicVehiclesKeywords =>
+      'превозно средство, автомобил, кола, obd, obd2, адаптер, bluetooth, резервоар, двигател, vin, калибриране, vehicle, car, adapter, tank, engine, calibration';
+
+  @override
+  String get settingsTopicDrivingTitle => 'Шофиране и разход';
+
+  @override
+  String get settingsTopicDrivingSubtitle =>
+      'Коучинг, награди, радар за бензиностанции, отстраняване на проблеми';
+
+  @override
+  String get settingsTopicDrivingKeywords =>
+      'коуч, еко, хаптичен, глас, геймификация, радар, плъзгане, пътуване, разход, горивен клуб, лоялност, obd2 дневник, закачване, coach, eco, haptic, voice, gamification, radar, glide, trip, consumption, loyalty, pin';
+
+  @override
+  String get settingsTopicPricesTitle => 'Цени и известия';
+
+  @override
+  String get settingsTopicPricesSubtitle =>
+      'Ценови известия, гласови съобщения, история на цените, сигнали от общността';
+
+  @override
+  String get settingsTopicPricesKeywords =>
+      'известие, уведомление, цена, история, прогноза, най-добро време, общност, сигнал, qr, плащане, глас, съобщение, alert, notification, price, history, prediction, community, report, payment, voice, announcement';
+
+  @override
+  String get settingsTopicUnitsTitle => 'Единици и изглед';
+
+  @override
+  String get settingsTopicUnitsSubtitle =>
+      'Тема, единица за разстояние, уиджет на началния екран';
+
+  @override
+  String get settingsTopicUnitsKeywords =>
+      'тема, тъмна, светла, еко, единица, км, мили, уиджет, цвят, изглед, външен вид, theme, dark, light, eco, unit, km, miles, widget, colour, display, appearance';
+
+  @override
+  String get settingsTopicFeaturesTitle => 'Функции и режим на използване';
+
+  @override
+  String get settingsTopicFeaturesSubtitle =>
+      'Предварителни настройки на режима на използване и всеки превключвател на функция';
+
+  @override
+  String get settingsTopicFeaturesKeywords =>
+      'функция, режим, основен, среден, пълен, персонализиран, превключвател, типове станции, бензиностанции, зарядни, зареждане, feature, mode, basic, medium, full, custom, switch, toggle, charging';
+
+  @override
+  String get settingsTopicDataSourcesTitle =>
+      'Източници на данни и местоположение';
+
+  @override
+  String get settingsTopicDataSourcesSubtitle =>
+      'API ключове, GPS позиция, автоматично превключване на профил';
+
+  @override
+  String get settingsTopicDataSourcesKeywords =>
+      'api, ключ, gps, местоположение, позиция, източник на данни, tankerkoenig, opencharge, key, location, data source';
+
+  @override
+  String get settingsTopicSyncTitle => 'Синхронизация и акаунт';
+
+  @override
+  String get settingsTopicSyncKeywords =>
+      'tanksync, облак, акаунт, имейл, свързване на устройство, синхронизация, споделяне на база данни, анонимен, cloud, account, email, link device, sync, share database, anonymous';
+
+  @override
+  String get settingsTopicPrivacySubtitle =>
+      'Съгласия, табло за поверителност, хранилище и кеш';
+
+  @override
+  String get settingsTopicPrivacyKeywords =>
+      'поверителност, съгласие, gdpr, изтриване, изчистване, хранилище, кеш, данни, докладване на грешки, vin, privacy, consent, delete, erase, storage, cache, data, error reporting';
+
+  @override
+  String get settingsTopicBackupTitle => 'Резервно копие и възстановяване';
+
+  @override
+  String get settingsTopicBackupSubtitle =>
+      'Експортирайте или възстановете пълно резервно копие на данните си';
+
+  @override
+  String get settingsTopicBackupKeywords =>
+      'резервно копие, експорт, възстановяване, импорт, zip, xml, прехвърляне, backup, export, restore, import, transfer';
+
+  @override
+  String get settingsTopicAdvancedSubtitle =>
+      'GitHub токен, инструменти за разработчици';
+
+  @override
+  String get settingsTopicAdvancedKeywords =>
+      'разработчик, дебъг, токен, pat, github, диагностика, дневник на грешките, трасиране, developer, debug, token, diagnostics, error log, trace';
+
+  @override
+  String get settingsTopicAboutSubtitle => 'Версия, лицензи, връзки';
+
+  @override
+  String get settingsTopicAboutKeywords =>
+      'относно, версия, лиценз, дарение, github, признание, about, version, license, donate, attribution';
+
+  @override
+  String get settingsConsumptionOffHint =>
+      'Включете проследяването на разхода във Функции и режим на използване, за да настроите превозни средства, коучинг и награди.';
+
+  @override
+  String get settingsOpenFeaturesLink => 'Отвори Функции и режим на използване';
+
+  @override
+  String get settingsRadarTileSubtitle =>
+      'Радиус, ценови режим, запитване и закачване на екрана за активния профил';
+
+  @override
+  String get settingsRadarNoProfileHint =>
+      'Първо създайте профил — настройките на радара се съхраняват за всеки профил.';
+
+  @override
+  String get settingsRadarPinHeader => 'Закачване на екрана';
+
+  @override
+  String get settingsAlertsTileSubtitle =>
+      'Известия за станции и радиус, които ви уведомяват при спад на цените';
+
+  @override
+  String get settingsPriceFeaturesHeader => 'Ценови функции';
+
+  @override
+  String get settingsVoiceAnnouncementsOffHint =>
+      'Гласовите съобщения са изключени. Включете Гласова обратна връзка и Гласови съобщения във Функции и режим на използване, за да чувате за евтино гориво наблизо, докато шофирате.';
+
+  @override
+  String get settingsDistanceUnitTitle => 'Единица за разстояние';
+
+  @override
+  String get settingsDistanceUnitSubtitle => 'От държавата на активния профил';
+
+  @override
+  String get settingsObd2AdapterTitle => 'OBD2 адаптер';
+
+  @override
+  String get settingsObd2AdapterSubtitle =>
+      'Адаптерите се сдвояват за всяко превозно средство — отворете превозно средство, за да сдвоите или смените адаптера му';
+
+  @override
+  String get settingsStorageDeleteHint =>
+      'Изтриването на всички локални данни става от таблото за поверителност.';
+
+  @override
+  String get settingsPrivacyCrossLinkTitle => 'Съгласия';
+
+  @override
+  String get settingsPrivacyCrossLinkSubtitle =>
+      'Съгласията за Cloud Sync и синхронизация на пътуванията са в Поверителност и данни';
+
+  @override
+  String get settingsBackupExportSubtitle =>
+      'Превозни средства, зареждания, пътувания и дневници на зареждане като ZIP файл';
+
+  @override
+  String get settingsBackupRestoreSubtitle =>
+      'Обединете или заменете данните си от предишно резервно копие ZIP';
+
+  @override
+  String get settingsStationTypesLink =>
+      'Типовете станции се задават във Функции и режим на използване';
+
+  @override
+  String get routeSearchCriterionLabel =>
+      'Избор на станция за всеки участък от маршрута';
+
+  @override
+  String get routeSearchCriterionCheapest => 'Най-евтина';
+
+  @override
+  String get routeSearchCriterionNearest => 'Най-близо до маршрута';
+
+  @override
+  String get routeSearchTopNLabel => 'Кандидати на точка за извадка';
+
+  @override
+  String routeSearchTopNCaption(int count) {
+    return 'Във всяка точка по маршрута се разглеждат до $count станции.';
+  }
+
+  @override
+  String get hybridFuelChoiceLabel => 'Гориво за търсене на цени (хибрид)';
+
+  @override
+  String get hybridFuelChoiceVehicleDefault =>
+      'По подразбиране за превозното средство';
+
+  @override
+  String get scopeThisProfile => 'Този профил';
+
+  @override
+  String get scopeAllProfiles => 'Всички профили';
+
+  @override
+  String get scopeThisVehicle => 'Това превозно средство';
+
+  @override
+  String get featureLabel_manualConsumption => 'Ръчно записване на разхода';
+
+  @override
+  String get featureDescription_manualConsumption =>
+      'Записвайте зареждания с гориво и сесии на зареждане на ток ръчно (не е нужен OBD2 адаптер).';
+
+  @override
+  String get featureLabel_loyaltyCards => 'Карти за лоялност';
+
+  @override
+  String get featureDescription_loyaltyCards =>
+      'Карти на горивни клубове / за лоялност с отстъпка на литър в сравненията на цени.';
+
+  @override
+  String get featureLabel_startupTrace =>
+      'Трасиране на инициализацията при стартиране';
+
+  @override
+  String get featureDescription_startupTrace =>
+      'Записва хронометрираните фази на стартирането на приложението, показва ги като водопад и ги експортира — диагностика за разработчици.';
+
+  @override
+  String get locationGpsAutoHint =>
+      'GPS позицията се получава автоматично при търсене. Можете да я обновите и ръчно тук.';
+
+  @override
+  String get locationClearGpsBody =>
+      'Да се изчисти ли запазената GPS позиция? Можете да я обновите отново по всяко време.';
+
+  @override
   String get shareReceiptUnsupportedFormat =>
       'Този тип файл все още не може да се импортира — споделете снимка на касовата бележка.';
 
@@ -8138,8 +8392,8 @@ class AppLocalizationsBg extends AppLocalizations {
       'На Android, задръжте върху джаджата и изберете Преконфигурирай за промяна на профила, цвета и съдържанието.';
 
   @override
-  String get widgetDefaultsApplyToAllHint =>
-      'Изборите по-долу се прилагат за всеки инсталиран уиджет при следващото обновяване.';
+  String get widgetDefaultsThisProfileHint =>
+      'Изборите по-долу важат за всеки инсталиран уиджет, показващ този профил, при следващото опресняване.';
 
   @override
   String get widgetDefaultsColorLabel => 'Цветова схема';

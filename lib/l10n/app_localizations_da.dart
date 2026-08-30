@@ -294,13 +294,6 @@ class AppLocalizationsDa extends AppLocalizations {
   String get clearCacheButton => 'Ryd cache';
 
   @override
-  String get deleteAllTitle => 'Slet alle data?';
-
-  @override
-  String get deleteAllBody =>
-      'Dette sletter permanent alle profiler, favoritter, API-nøgle, indstillinger og cache. Appen nulstilles.';
-
-  @override
   String get deleteAllButton => 'Slet alt';
 
   @override
@@ -845,20 +838,6 @@ class AppLocalizationsDa extends AppLocalizations {
   @override
   String get avoidHighwaysDesc =>
       'Ruteberegning undgår betalingsveje og motorveje';
-
-  @override
-  String get showFuelStations => 'Vis tankstationer';
-
-  @override
-  String get showFuelStationsDesc =>
-      'Inkluder benzin-, diesel-, LPG-, CNG-stationer';
-
-  @override
-  String get showEvStations => 'Vis ladestationer';
-
-  @override
-  String get showEvStationsDesc =>
-      'Inkluder elektriske ladestationer i søgeresultater';
 
   @override
   String get noStationsAlongThisRoute =>
@@ -1849,9 +1828,6 @@ class AppLocalizationsDa extends AppLocalizations {
   String get tripBannerPaused => 'Tur på pause — tryk for at genoptage';
 
   @override
-  String get navConsumption => 'Forbrug';
-
-  @override
   String get vehicleBaselineSectionTitle => 'Basisliniekalibrering';
 
   @override
@@ -2234,18 +2210,6 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get sectionLocation => 'Placering';
-
-  @override
-  String get sectionSetupDataSources => 'Opsætning og datakilder';
-
-  @override
-  String get sectionFeaturesUsage => 'Funktioner og brug';
-
-  @override
-  String get sectionAccountSync => 'Konto og synkronisering';
-
-  @override
-  String get sectionAppearanceWidgets => 'Udseende og widgets';
 
   @override
   String get sectionPrivacyData => 'Privatliv og data';
@@ -5939,6 +5903,40 @@ class AppLocalizationsDa extends AppLocalizations {
       'Sæt farten ned før svingen, ikke i den — hård sving reducerer farten, som du derefter skal genopbygge.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Seneste $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Forbrugsenhed';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Sådan vises brændstofforbruget overalt i appen';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automatisk ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Vindue for live-forbrug';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Gennemsnit af live-værdien over de seneste sekunder – længere er roligere, kortere reagerer hurtigere';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'ansl. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Placeringsadgang';
 
   @override
@@ -7076,6 +7074,257 @@ class AppLocalizationsDa extends AppLocalizations {
   String get refuelUnitPerSession => '/session';
 
   @override
+  String get settingsSearchHint => 'Søg i indstillinger';
+
+  @override
+  String settingsSearchNoResults(String query) {
+    return 'Ingen indstillinger matcher \"$query\"';
+  }
+
+  @override
+  String get settingsTopicProfilesTitle => 'Profiler & region';
+
+  @override
+  String get settingsTopicProfilesSubtitle =>
+      'Land, sprog, brændstof, søgeradius, ruteplanlægning';
+
+  @override
+  String get settingsTopicProfilesKeywords =>
+      'profil, land, sprog, brændstof, radius, postnummer, rute, hjem, vurdering, startskærm, profile, country, language, fuel, route, home, rating';
+
+  @override
+  String get settingsTopicVehiclesTitle => 'Køretøjer & OBD2';
+
+  @override
+  String get settingsTopicVehiclesSubtitle =>
+      'Dine biler, tankstørrelse, parring af OBD2-adapter';
+
+  @override
+  String get settingsTopicVehiclesKeywords =>
+      'køretøj, bil, obd, obd2, adapter, bluetooth, tank, motor, vin, kalibrering, vehicle, car, engine, calibration';
+
+  @override
+  String get settingsTopicDrivingTitle => 'Kørsel & forbrug';
+
+  @override
+  String get settingsTopicDrivingSubtitle =>
+      'Coaching, belønninger, tankstationsradar, fejlfinding';
+
+  @override
+  String get settingsTopicDrivingKeywords =>
+      'coach, eco, haptisk, stemme, gamification, radar, glid, tur, forbrug, brændstofklub, loyalitet, obd2-log, fastgør, haptic, voice, glide, trip, consumption, loyalty, pin';
+
+  @override
+  String get settingsTopicPricesTitle => 'Priser & advarsler';
+
+  @override
+  String get settingsTopicPricesSubtitle =>
+      'Prisadvarsler, stemmemeddelelser, prishistorik, fællesskabsrapporter';
+
+  @override
+  String get settingsTopicPricesKeywords =>
+      'advarsel, notifikation, pris, historik, forudsigelse, bedste tidspunkt, fællesskab, rapport, qr, betaling, stemme, meddelelse, alert, price, history, prediction, community, report, payment, voice';
+
+  @override
+  String get settingsTopicUnitsTitle => 'Enheder & visning';
+
+  @override
+  String get settingsTopicUnitsSubtitle =>
+      'Tema, afstandsenhed, widget på startskærmen';
+
+  @override
+  String get settingsTopicUnitsKeywords =>
+      'tema, mørk, lys, eco, enhed, km, miles, widget, farve, visning, udseende, theme, dark, light, unit, colour, display';
+
+  @override
+  String get settingsTopicFeaturesTitle => 'Funktioner & brugstilstand';
+
+  @override
+  String get settingsTopicFeaturesSubtitle =>
+      'Forudindstillinger for brugstilstand og alle funktionskontakter';
+
+  @override
+  String get settingsTopicFeaturesKeywords =>
+      'funktion, tilstand, basis, medium, fuld, tilpasset, kontakt, stationstyper, tankstationer, ladestandere, opladning, feature, mode, basic, full, custom, switch, toggle, charging';
+
+  @override
+  String get settingsTopicDataSourcesTitle => 'Datakilder & placering';
+
+  @override
+  String get settingsTopicDataSourcesSubtitle =>
+      'API-nøgler, GPS-position, automatisk profilskift';
+
+  @override
+  String get settingsTopicDataSourcesKeywords =>
+      'api, nøgle, gps, placering, position, datakilde, tankerkoenig, opencharge, key, location, data source';
+
+  @override
+  String get settingsTopicSyncTitle => 'Synkronisering & konto';
+
+  @override
+  String get settingsTopicSyncKeywords =>
+      'tanksync, cloud, konto, e-mail, tilknyt enhed, synkronisering, del database, anonym, account, email, link device, sync, share database, anonymous';
+
+  @override
+  String get settingsTopicPrivacySubtitle =>
+      'Samtykker, privatlivsoversigt, lager & cache';
+
+  @override
+  String get settingsTopicPrivacyKeywords =>
+      'privatliv, samtykke, gdpr, slet, ryd, lager, cache, data, fejlrapportering, vin, privacy, consent, delete, erase, storage, error reporting';
+
+  @override
+  String get settingsTopicBackupTitle => 'Sikkerhedskopi & gendannelse';
+
+  @override
+  String get settingsTopicBackupSubtitle =>
+      'Eksportér eller gendan en fuld sikkerhedskopi af dine data';
+
+  @override
+  String get settingsTopicBackupKeywords =>
+      'sikkerhedskopi, eksport, gendan, import, zip, xml, overførsel, backup, export, restore, transfer';
+
+  @override
+  String get settingsTopicAdvancedSubtitle => 'GitHub-token, udviklerværktøjer';
+
+  @override
+  String get settingsTopicAdvancedKeywords =>
+      'udvikler, fejlsøgning, token, pat, github, diagnostik, fejllog, trace, developer, debug, diagnostics, error log';
+
+  @override
+  String get settingsTopicAboutSubtitle => 'Version, licenser, links';
+
+  @override
+  String get settingsTopicAboutKeywords =>
+      'om, version, licens, donér, github, kreditering, about, license, donate, attribution';
+
+  @override
+  String get settingsConsumptionOffHint =>
+      'Slå forbrugsregistrering til under Funktioner & brugstilstand for at konfigurere køretøjer, coaching og belønninger.';
+
+  @override
+  String get settingsOpenFeaturesLink => 'Åbn Funktioner & brugstilstand';
+
+  @override
+  String get settingsRadarTileSubtitle =>
+      'Radius, pristilstand, forespørgsel og skærmfastgørelse for den aktive profil';
+
+  @override
+  String get settingsRadarNoProfileHint =>
+      'Opret først en profil — radarindstillingerne gemmes pr. profil.';
+
+  @override
+  String get settingsRadarPinHeader => 'Skærmfastgørelse';
+
+  @override
+  String get settingsAlertsTileSubtitle =>
+      'Stations- og radiusadvarsler, der giver besked om prisfald';
+
+  @override
+  String get settingsPriceFeaturesHeader => 'Prisfunktioner';
+
+  @override
+  String get settingsVoiceAnnouncementsOffHint =>
+      'Stemmemeddelelser er slået fra. Slå Stemmefeedback og Stemmemeddelelser til under Funktioner & brugstilstand for at høre billigt brændstof i nærheden, mens du kører.';
+
+  @override
+  String get settingsDistanceUnitTitle => 'Afstandsenhed';
+
+  @override
+  String get settingsDistanceUnitSubtitle => 'Fra den aktive profils land';
+
+  @override
+  String get settingsObd2AdapterTitle => 'OBD2-adapter';
+
+  @override
+  String get settingsObd2AdapterSubtitle =>
+      'Adaptere parres pr. køretøj — åbn et køretøj for at parre eller skifte dets adapter';
+
+  @override
+  String get settingsStorageDeleteHint =>
+      'Sletning af alle lokale data sker fra privatlivsoversigten.';
+
+  @override
+  String get settingsPrivacyCrossLinkTitle => 'Samtykker';
+
+  @override
+  String get settingsPrivacyCrossLinkSubtitle =>
+      'Samtykker til Cloud Sync og tursynkronisering findes under Privatliv & data';
+
+  @override
+  String get settingsBackupExportSubtitle =>
+      'Køretøjer, tankninger, ture og opladningslogs som ZIP-fil';
+
+  @override
+  String get settingsBackupRestoreSubtitle =>
+      'Flet eller erstat dine data fra en tidligere sikkerhedskopi-ZIP';
+
+  @override
+  String get settingsStationTypesLink =>
+      'Stationstyper vælges under Funktioner & brugstilstand';
+
+  @override
+  String get routeSearchCriterionLabel => 'Stationsvalg pr. rutesegment';
+
+  @override
+  String get routeSearchCriterionCheapest => 'Billigste';
+
+  @override
+  String get routeSearchCriterionNearest => 'Nærmest ruten';
+
+  @override
+  String get routeSearchTopNLabel => 'Kandidater pr. målepunkt';
+
+  @override
+  String routeSearchTopNCaption(int count) {
+    return 'Op til $count stationer tages i betragtning ved hvert punkt langs ruten.';
+  }
+
+  @override
+  String get hybridFuelChoiceLabel => 'Brændstof til prissøgning (hybrid)';
+
+  @override
+  String get hybridFuelChoiceVehicleDefault => 'Køretøjets standard';
+
+  @override
+  String get scopeThisProfile => 'Denne profil';
+
+  @override
+  String get scopeAllProfiles => 'Alle profiler';
+
+  @override
+  String get scopeThisVehicle => 'Dette køretøj';
+
+  @override
+  String get featureLabel_manualConsumption => 'Manuel forbrugsregistrering';
+
+  @override
+  String get featureDescription_manualConsumption =>
+      'Registrér tankninger og opladninger manuelt (ingen OBD2-adapter nødvendig).';
+
+  @override
+  String get featureLabel_loyaltyCards => 'Loyalitetskort';
+
+  @override
+  String get featureDescription_loyaltyCards =>
+      'Brændstofklub-/loyalitetskort med rabat pr. liter i prissammenligninger.';
+
+  @override
+  String get featureLabel_startupTrace => 'Opstartsinitialiseringsspor';
+
+  @override
+  String get featureDescription_startupTrace =>
+      'Registrerer de tidsmålte faser i appens opstart, viser dem som et vandfald og eksporterer dem — en udviklerdiagnostik.';
+
+  @override
+  String get locationGpsAutoHint =>
+      'GPS-positionen hentes automatisk, når du søger. Du kan også opdatere den manuelt her.';
+
+  @override
+  String get locationClearGpsBody =>
+      'Ryd den gemte GPS-position? Du kan opdatere den igen når som helst.';
+
+  @override
   String get shareReceiptUnsupportedFormat =>
       'Denne filtype kan ikke importeres endnu — del et foto af kvitteringen i stedet.';
 
@@ -8068,8 +8317,8 @@ class AppLocalizationsDa extends AppLocalizations {
       'På Android: langt tryk på widgetten og vælg Genkonfigurér for at ændre profil, farve og indhold.';
 
   @override
-  String get widgetDefaultsApplyToAllHint =>
-      'Valgene nedenfor gælder for alle installerede widgets ved næste opdatering.';
+  String get widgetDefaultsThisProfileHint =>
+      'Valgene nedenfor gælder for alle installerede widgets, der viser denne profil, ved næste opdatering.';
 
   @override
   String get widgetDefaultsColorLabel => 'Farvetema';

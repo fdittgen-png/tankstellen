@@ -86,8 +86,6 @@
   "clearCacheTitle": "Tühjenda vahemälu?",
   "clearCacheBody": "Vahemällu salvestatud otsingutulemused ja hinnad kustutatakse. Profiilid, lemmikud ja seaded säilitatakse.",
   "clearCacheButton": "Tühjenda vahemälu",
-  "deleteAllTitle": "Kustuta kõik andmed?",
-  "deleteAllBody": "See kustutab jäädavalt kõik profiilid, lemmikud, API võtme, seaded ja vahemälu. Rakendus lähtestatakse.",
   "deleteAllButton": "Kustuta kõik",
   "entries": "kirjet",
   "cacheEmpty": "Vahemälu on tühi",
@@ -258,10 +256,6 @@
   "showCheapestEveryNKm": "Näita odavaimat tanklat iga {km} km tagant marsruudil",
   "avoidHighways": "Väldi kiirteid",
   "avoidHighwaysDesc": "Marsruudi arvutus väldib tasulisi teid ja kiirteid",
-  "showFuelStations": "Näita tanklasid",
-  "showFuelStationsDesc": "Kaasa bensiini-, diisli-, LPG-, CNG-jaamad",
-  "showEvStations": "Näita laadimisjaamu",
-  "showEvStationsDesc": "Kaasa elektrilaadimise jaamad otsingutulemustes",
   "noStationsAlongThisRoute": "Selle marsruudi äärest jaamu ei leitud.",
   "fuelCostCalculator": "Kütusekulude kalkulaator",
   "distanceKm": "Kaugus (km)",
@@ -567,7 +561,6 @@
   "tripResume": "Jätka",
   "tripBannerRecording": "Salvestatakse reisi",
   "tripBannerPaused": "Reis peatatud — puuduta jätkamiseks",
-  "navConsumption": "Kulu",
   "vehicleBaselineSectionTitle": "Baasjooné kalibreerimine",
   "vehicleBaselineEmpty": "Näidiseid pole veel — alusta OBD2 reisi, et hakata selle sõiduki kütuseprofiili õppima.",
   "vehicleBaselineProgress": "Õpitud näidistest erinevates sõitusituatsioonides.",
@@ -1428,7 +1421,6 @@
   "widgetHelpAdd": "Lisa see oma käivitaja vidinate valijast — hoia pikalt all avaekraani tühja ala, vali Vidinad ja leia SparKilo.",
   "widgetHelpTap": "Puuduta vidinat jaama avamiseks rakenduses. Puuduta värskendamise ikooni hindade uuendamiseks.",
   "widgetHelpConfigure": "Androidis hoia vidinat pikalt all ja vali Konfigureeri uuesti, et muuta profiili, värvi ja sisu.",
-  "widgetDefaultsApplyToAllHint": "Valikud allpool kehtivad kõikidele paigaldatud vidinatele järgmisel värskendamisel.",
   "widgetDefaultsColorLabel": "Värviskeem",
   "widgetDefaultsVariantLabel": "Sisuvariant",
   "widgetColorSchemeSystem": "Süsteem",
@@ -2447,22 +2439,6 @@
   },
   "tripRecordingDiscardedNoMovement": "Salvestus kustutatud — liikumist ei tuvastatud",
   "@tripRecordingDiscardedNoMovement": {
-    "description": "MT — needs native review"
-  },
-  "sectionSetupDataSources": "Seadistus ja andmeallikad",
-  "@sectionSetupDataSources": {
-    "description": "MT — needs native review"
-  },
-  "sectionFeaturesUsage": "Funktsioonid ja kasutus",
-  "@sectionFeaturesUsage": {
-    "description": "MT — needs native review"
-  },
-  "sectionAccountSync": "Konto ja sünkroniseerimine",
-  "@sectionAccountSync": {
-    "description": "MT — needs native review"
-  },
-  "sectionAppearanceWidgets": "Välimus ja vidinad",
-  "@sectionAppearanceWidgets": {
     "description": "MT — needs native review"
   },
   "sectionPrivacyData": "Privaatsus ja andmed",
@@ -4832,5 +4808,126 @@
         "type": "String"
       }
     }
-  }
+  },
+  "liveConsumptionWindowLabel": "Viimased {seconds} s",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Kulu ühik",
+  "consumptionUnitSettingSubtitle": "Kuidas kütusekulu kogu rakenduses kuvatakse",
+  "consumptionUnitAuto": "Automaatne ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Reaalajas kulu aken",
+  "consumptionWindowSettingSubtitle": "Keskmistab reaalajas väärtuse viimaste sekundite üle – pikem on rahulikum, lühem reageerib kiiremini",
+  "consumptionWindowOption": "{seconds} s",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "tripRecordingPipEstConsumptionCaptionUnit": "hinn. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsSearchHint": "Otsi seadetest",
+  "settingsSearchNoResults": "Ükski seade ei vasta päringule „{query}”",
+  "@settingsSearchNoResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTopicProfilesTitle": "Profiilid ja piirkond",
+  "settingsTopicProfilesSubtitle": "Riik, keel, kütus, otsinguraadius, marsruudi planeerimine",
+  "settingsTopicProfilesKeywords": "profiil, riik, keel, kütus, raadius, postiindeks, marsruut, kodu, hinnang, avakuva, profile, country, language, fuel, radius, route, home, rating",
+  "settingsTopicVehiclesTitle": "Sõidukid ja OBD2",
+  "settingsTopicVehiclesSubtitle": "Sinu autod, paagi maht, OBD2-adapteri sidumine",
+  "settingsTopicVehiclesKeywords": "sõiduk, auto, obd, obd2, adapter, bluetooth, paak, mootor, vin, kalibreerimine, vehicle, car, tank, engine, calibration",
+  "settingsTopicDrivingTitle": "Sõitmine ja kulu",
+  "settingsTopicDrivingSubtitle": "Juhendamine, auhinnad, tanklaradar, tõrkeotsing",
+  "settingsTopicDrivingKeywords": "juhendaja, öko, haptiline, hääl, mängustamine, radar, vabakäik, sõit, kulu, kütuseklubi, püsiklient, obd2 logi, kinnita, coach, eco, haptic, voice, gamification, glide, trip, consumption, loyalty, pin",
+  "settingsTopicPricesTitle": "Hinnad ja hoiatused",
+  "settingsTopicPricesSubtitle": "Hinnahoiatused, häälteated, hinnaajalugu, kogukonna teated",
+  "settingsTopicPricesKeywords": "hoiatus, teavitus, hind, ajalugu, prognoos, parim aeg, kogukond, teade, qr, makse, hääl, alert, notification, price, history, prediction, community, report, payment, voice, announcement",
+  "settingsTopicUnitsTitle": "Ühikud ja kuva",
+  "settingsTopicUnitsSubtitle": "Teema, kauguse ühik, avakuva vidin",
+  "settingsTopicUnitsKeywords": "teema, tume, hele, öko, ühik, km, miilid, vidin, värv, kuva, välimus, theme, dark, light, eco, unit, miles, widget, colour, display, appearance",
+  "settingsTopicFeaturesTitle": "Funktsioonid ja kasutusrežiim",
+  "settingsTopicFeaturesSubtitle": "Kasutusrežiimi eelseaded ja iga funktsioonilüliti",
+  "settingsTopicFeaturesKeywords": "funktsioon, režiim, põhi, keskmine, täis, kohandatud, lüliti, jaamatüübid, tanklad, laadijad, laadimine, feature, mode, basic, medium, full, custom, switch, toggle, charging",
+  "settingsTopicDataSourcesTitle": "Andmeallikad ja asukoht",
+  "settingsTopicDataSourcesSubtitle": "API-võtmed, GPS-asukoht, automaatne profiilivahetus",
+  "settingsTopicDataSourcesKeywords": "api, võti, gps, asukoht, positsioon, andmeallikas, tankerkoenig, opencharge, key, location, data source",
+  "settingsTopicSyncTitle": "Sünkroonimine ja konto",
+  "settingsTopicSyncKeywords": "tanksync, pilv, konto, e-post, seo seade, sünkroonimine, jaga andmebaasi, anonüümne, cloud, account, email, link device, sync, share database, anonymous",
+  "settingsTopicPrivacySubtitle": "Nõusolekud, privaatsuse juhtpaneel, salvestusruum ja vahemälu",
+  "settingsTopicPrivacyKeywords": "privaatsus, nõusolek, gdpr, kustuta, tühjenda, salvestusruum, vahemälu, andmed, veateavitus, vin, privacy, consent, delete, erase, storage, cache, data, error reporting",
+  "settingsTopicBackupTitle": "Varundamine ja taastamine",
+  "settingsTopicBackupSubtitle": "Ekspordi või taasta oma andmete täielik varukoopia",
+  "settingsTopicBackupKeywords": "varukoopia, eksport, taasta, import, zip, xml, ülekanne, backup, export, restore, transfer",
+  "settingsTopicAdvancedSubtitle": "GitHubi luba, arendaja tööriistad",
+  "settingsTopicAdvancedKeywords": "arendaja, silumine, luba, pat, github, diagnostika, vealogi, jälg, developer, debug, token, diagnostics, error log, trace",
+  "settingsTopicAboutSubtitle": "Versioon, litsentsid, lingid",
+  "settingsTopicAboutKeywords": "teave, versioon, litsents, anneta, github, viide, about, version, license, donate, attribution",
+  "settingsConsumptionOffHint": "Lülita kulu jälgimine sisse jaotises Funktsioonid ja kasutusrežiim, et seadistada sõidukeid, juhendamist ja auhindu.",
+  "settingsOpenFeaturesLink": "Ava Funktsioonid ja kasutusrežiim",
+  "settingsRadarTileSubtitle": "Raadius, hinnarežiim, päringud ja ekraani kinnitamine aktiivse profiili jaoks",
+  "settingsRadarNoProfileHint": "Loo kõigepealt profiil – radari seaded salvestatakse profiili kohta.",
+  "settingsRadarPinHeader": "Ekraani kinnitamine",
+  "settingsAlertsTileSubtitle": "Tankla- ja raadiusehoiatused, mis teavitavad hinnalangusest",
+  "settingsPriceFeaturesHeader": "Hinnafunktsioonid",
+  "settingsVoiceAnnouncementsOffHint": "Häälteated on välja lülitatud. Lülita Hääletagasiside ja Häälteated sisse jaotises Funktsioonid ja kasutusrežiim, et kuulda sõidu ajal lähedal olevast odavast kütusest.",
+  "settingsDistanceUnitTitle": "Kauguse ühik",
+  "settingsDistanceUnitSubtitle": "Aktiivse profiili riigi järgi",
+  "settingsObd2AdapterTitle": "OBD2-adapter",
+  "settingsObd2AdapterSubtitle": "Adapterid seotakse sõiduki kohta – ava sõiduk, et selle adapter siduda või vahetada",
+  "settingsStorageDeleteHint": "Kõigi kohalike andmete kustutamine toimub privaatsuse juhtpaneelilt.",
+  "settingsPrivacyCrossLinkTitle": "Nõusolekud",
+  "settingsPrivacyCrossLinkSubtitle": "Cloud Synci ja sõitude sünkroonimise nõusolekud asuvad jaotises Privaatsus ja andmed",
+  "settingsBackupExportSubtitle": "Sõidukid, tankimised, sõidud ja laadimislogid ZIP-failina",
+  "settingsBackupRestoreSubtitle": "Ühenda või asenda oma andmed varasemast varukoopia-ZIPist",
+  "settingsStationTypesLink": "Jaamatüübid määratakse jaotises Funktsioonid ja kasutusrežiim",
+  "routeSearchCriterionLabel": "Tankla valik marsruudilõigu kohta",
+  "routeSearchCriterionCheapest": "Odavaim",
+  "routeSearchCriterionNearest": "Marsruudile lähim",
+  "routeSearchTopNLabel": "Kandidaate valimipunkti kohta",
+  "routeSearchTopNCaption": "Igas marsruudi punktis kaalutakse kuni {count} tanklat.",
+  "@routeSearchTopNCaption": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hybridFuelChoiceLabel": "Kütus hinnaotsinguks (hübriid)",
+  "hybridFuelChoiceVehicleDefault": "Sõiduki vaikimisi",
+  "scopeThisProfile": "See profiil",
+  "scopeAllProfiles": "Kõik profiilid",
+  "scopeThisVehicle": "See sõiduk",
+  "featureLabel_manualConsumption": "Käsitsi kulu kirjendamine",
+  "featureDescription_manualConsumption": "Kirjenda tankimisi ja laadimisi käsitsi (OBD2-adapterit pole vaja).",
+  "featureLabel_loyaltyCards": "Püsikliendikaardid",
+  "featureDescription_loyaltyCards": "Kütuseklubi-/püsikliendikaardid liitripõhiste soodustustega hinnavõrdlustes.",
+  "featureLabel_startupTrace": "Käivituse lähtestamise jälg",
+  "featureDescription_startupTrace": "Salvestab rakenduse käivituse ajastatud faasid, näitab neid koskvaatena ja ekspordib – arendaja diagnostika.",
+  "locationGpsAutoHint": "GPS-asukoht hangitakse otsingul automaatselt. Saad seda siin ka käsitsi uuendada.",
+  "locationClearGpsBody": "Kas kustutada salvestatud GPS-asukoht? Saad seda igal ajal uuesti uuendada.",
+  "widgetDefaultsThisProfileHint": "Allolevad valikud kehtivad igale paigaldatud vidinale, mis näitab seda profiili, järgmisel värskendusel."
 }

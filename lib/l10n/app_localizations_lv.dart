@@ -294,13 +294,6 @@ class AppLocalizationsLv extends AppLocalizations {
   String get clearCacheButton => 'Iztīrīt kešatmiņu';
 
   @override
-  String get deleteAllTitle => 'Dzēst visus datus?';
-
-  @override
-  String get deleteAllBody =>
-      'Tas neatgriezeniski dzēš visus profilus, izlasi, API atslēgu, iestatījumus un kešatmiņu. Lietotne tiks atiestatīta.';
-
-  @override
   String get deleteAllButton => 'Dzēst visu';
 
   @override
@@ -848,20 +841,6 @@ class AppLocalizationsLv extends AppLocalizations {
   @override
   String get avoidHighwaysDesc =>
       'Maršruta aprēķins izvairās no maksas ceļiem un automaģistrālēm';
-
-  @override
-  String get showFuelStations => 'Rādīt degvielas uzpildes stacijas';
-
-  @override
-  String get showFuelStationsDesc =>
-      'Iekļaut benzīna, dīzeļa, LPG, CNG stacijas';
-
-  @override
-  String get showEvStations => 'Rādīt uzlādes stacijas';
-
-  @override
-  String get showEvStationsDesc =>
-      'Iekļaut elektriskās uzlādes stacijas meklēšanas rezultātos';
 
   @override
   String get noStationsAlongThisRoute =>
@@ -1857,9 +1836,6 @@ class AppLocalizationsLv extends AppLocalizations {
       'Brauciens pauzēts — pieskarieties, lai turpinātu';
 
   @override
-  String get navConsumption => 'Patēriņš';
-
-  @override
   String get vehicleBaselineSectionTitle => 'Bāzlīnijas kalibrēšana';
 
   @override
@@ -2246,18 +2222,6 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get sectionLocation => 'Atrašanās vieta';
-
-  @override
-  String get sectionSetupDataSources => 'Iestatīšana un datu avoti';
-
-  @override
-  String get sectionFeaturesUsage => 'Funkcijas un lietošana';
-
-  @override
-  String get sectionAccountSync => 'Konts un sinhronizācija';
-
-  @override
-  String get sectionAppearanceWidgets => 'Izskats un logrīki';
 
   @override
   String get sectionPrivacyData => 'Privātums un dati';
@@ -5976,6 +5940,40 @@ class AppLocalizationsLv extends AppLocalizations {
       'Palēniniet pirms līkuma, nevis tajā — strauja pagriešanās zaudē ātrumu, kas pēc tam jāatgūst.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Pēdējās $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Patēriņa mērvienība';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Kā degvielas patēriņš tiek rādīts visā lietotnē';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automātiski ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Tiešā patēriņa logs';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Vidējo tiešo vērtību aprēķina par pēdējām sekundēm — garāks ir stabilāks, īsāks reaģē ātrāk';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'apt. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Atrašanās vietas piekļuve';
 
   @override
@@ -7124,6 +7122,261 @@ class AppLocalizationsLv extends AppLocalizations {
   String get refuelUnitPerSession => '/sesija';
 
   @override
+  String get settingsSearchHint => 'Meklēt iestatījumos';
+
+  @override
+  String settingsSearchNoResults(String query) {
+    return 'Neviens iestatījums neatbilst vaicājumam “$query”';
+  }
+
+  @override
+  String get settingsTopicProfilesTitle => 'Profili un reģions';
+
+  @override
+  String get settingsTopicProfilesSubtitle =>
+      'Valsts, valoda, degviela, meklēšanas rādiuss, maršruta plānošana';
+
+  @override
+  String get settingsTopicProfilesKeywords =>
+      'profils, valsts, valoda, degviela, rādiuss, pasta indekss, maršruts, mājas, vērtējums, sākuma ekrāns, profile, country, language, fuel, radius, route, home, rating';
+
+  @override
+  String get settingsTopicVehiclesTitle => 'Transportlīdzekļi un OBD2';
+
+  @override
+  String get settingsTopicVehiclesSubtitle =>
+      'Tavas automašīnas, tvertnes tilpums, OBD2 adaptera savienošana pārī';
+
+  @override
+  String get settingsTopicVehiclesKeywords =>
+      'transportlīdzeklis, auto, obd, obd2, adapteris, bluetooth, tvertne, dzinējs, vin, kalibrēšana, vehicle, car, adapter, tank, engine, calibration';
+
+  @override
+  String get settingsTopicDrivingTitle => 'Braukšana un patēriņš';
+
+  @override
+  String get settingsTopicDrivingSubtitle =>
+      'Trenēšana, balvas, degvielas uzpildes staciju radars, problēmu novēršana';
+
+  @override
+  String get settingsTopicDrivingKeywords =>
+      'treneris, eko, haptisks, balss, spēlifikācija, radars, ripošana, brauciens, patēriņš, degvielas klubs, lojalitāte, obd2 žurnāls, piespraust, coach, eco, haptic, voice, gamification, radar, glide, trip, consumption, loyalty, pin';
+
+  @override
+  String get settingsTopicPricesTitle => 'Cenas un brīdinājumi';
+
+  @override
+  String get settingsTopicPricesSubtitle =>
+      'Cenu brīdinājumi, balss paziņojumi, cenu vēsture, kopienas ziņojumi';
+
+  @override
+  String get settingsTopicPricesKeywords =>
+      'brīdinājums, paziņojums, cena, vēsture, prognoze, labākais laiks, kopiena, ziņojums, qr, maksājums, balss, alert, notification, price, history, prediction, community, report, payment, voice, announcement';
+
+  @override
+  String get settingsTopicUnitsTitle => 'Mērvienības un attēlojums';
+
+  @override
+  String get settingsTopicUnitsSubtitle =>
+      'Motīvs, attāluma mērvienība, sākuma ekrāna logrīks';
+
+  @override
+  String get settingsTopicUnitsKeywords =>
+      'motīvs, tumšs, gaišs, eko, mērvienība, km, jūdzes, logrīks, krāsa, attēlojums, izskats, theme, dark, light, eco, unit, miles, widget, colour, display, appearance';
+
+  @override
+  String get settingsTopicFeaturesTitle => 'Funkcijas un lietošanas režīms';
+
+  @override
+  String get settingsTopicFeaturesSubtitle =>
+      'Lietošanas režīma sagataves un katrs funkciju slēdzis';
+
+  @override
+  String get settingsTopicFeaturesKeywords =>
+      'funkcija, režīms, pamata, vidējs, pilns, pielāgots, slēdzis, staciju veidi, degvielas stacijas, uzlādes stacijas, uzlāde, feature, mode, basic, medium, full, custom, switch, toggle, charging';
+
+  @override
+  String get settingsTopicDataSourcesTitle => 'Datu avoti un atrašanās vieta';
+
+  @override
+  String get settingsTopicDataSourcesSubtitle =>
+      'API atslēgas, GPS pozīcija, automātiska profila maiņa';
+
+  @override
+  String get settingsTopicDataSourcesKeywords =>
+      'api, atslēga, gps, atrašanās vieta, pozīcija, datu avots, tankerkoenig, opencharge, key, location, data source';
+
+  @override
+  String get settingsTopicSyncTitle => 'Sinhronizācija un konts';
+
+  @override
+  String get settingsTopicSyncKeywords =>
+      'tanksync, mākonis, konts, e-pasts, saistīt ierīci, sinhronizācija, koplietot datubāzi, anonīms, cloud, account, email, link device, sync, share database, anonymous';
+
+  @override
+  String get settingsTopicPrivacySubtitle =>
+      'Piekrišanas, privātuma panelis, krātuve un kešatmiņa';
+
+  @override
+  String get settingsTopicPrivacyKeywords =>
+      'privātums, piekrišana, vdar, dzēst, notīrīt, krātuve, kešatmiņa, dati, kļūdu ziņošana, vin, privacy, consent, gdpr, delete, erase, storage, cache, data, error reporting';
+
+  @override
+  String get settingsTopicBackupTitle => 'Dublēšana un atjaunošana';
+
+  @override
+  String get settingsTopicBackupSubtitle =>
+      'Eksportē vai atjauno pilnu savu datu dublējumu';
+
+  @override
+  String get settingsTopicBackupKeywords =>
+      'dublējums, eksports, atjaunot, imports, zip, xml, pārsūtīšana, backup, export, restore, import, transfer';
+
+  @override
+  String get settingsTopicAdvancedSubtitle =>
+      'GitHub pilnvara, izstrādātāja rīki';
+
+  @override
+  String get settingsTopicAdvancedKeywords =>
+      'izstrādātājs, atkļūdošana, pilnvara, pat, github, diagnostika, kļūdu žurnāls, izsekošana, developer, debug, token, diagnostics, error log, trace';
+
+  @override
+  String get settingsTopicAboutSubtitle => 'Versija, licences, saites';
+
+  @override
+  String get settingsTopicAboutKeywords =>
+      'par, versija, licence, ziedot, github, atsauce, about, version, license, donate, attribution';
+
+  @override
+  String get settingsConsumptionOffHint =>
+      'Ieslēdz patēriņa izsekošanu sadaļā Funkcijas un lietošanas režīms, lai konfigurētu transportlīdzekļus, trenēšanu un balvas.';
+
+  @override
+  String get settingsOpenFeaturesLink =>
+      'Atvērt Funkcijas un lietošanas režīms';
+
+  @override
+  String get settingsRadarTileSubtitle =>
+      'Rādiuss, cenu režīms, aptaujāšana un ekrāna piespraušana aktīvajam profilam';
+
+  @override
+  String get settingsRadarNoProfileHint =>
+      'Vispirms izveido profilu — radara iestatījumi tiek glabāti katram profilam.';
+
+  @override
+  String get settingsRadarPinHeader => 'Ekrāna piespraušana';
+
+  @override
+  String get settingsAlertsTileSubtitle =>
+      'Staciju un rādiusa brīdinājumi, kas paziņo par cenu kritumu';
+
+  @override
+  String get settingsPriceFeaturesHeader => 'Cenu funkcijas';
+
+  @override
+  String get settingsVoiceAnnouncementsOffHint =>
+      'Balss paziņojumi ir izslēgti. Ieslēdz Balss atgriezenisko saiti un Balss paziņojumus sadaļā Funkcijas un lietošanas režīms, lai braucot dzirdētu par lētu degvielu tuvumā.';
+
+  @override
+  String get settingsDistanceUnitTitle => 'Attāluma mērvienība';
+
+  @override
+  String get settingsDistanceUnitSubtitle => 'No aktīvā profila valsts';
+
+  @override
+  String get settingsObd2AdapterTitle => 'OBD2 adapteris';
+
+  @override
+  String get settingsObd2AdapterSubtitle =>
+      'Adapteri tiek savienoti pārī katram transportlīdzeklim — atver transportlīdzekli, lai savienotu vai mainītu tā adapteri';
+
+  @override
+  String get settingsStorageDeleteHint =>
+      'Visu vietējo datu dzēšana notiek no privātuma paneļa.';
+
+  @override
+  String get settingsPrivacyCrossLinkTitle => 'Piekrišanas';
+
+  @override
+  String get settingsPrivacyCrossLinkSubtitle =>
+      'Cloud Sync un braucienu sinhronizācijas piekrišanas atrodas sadaļā Privātums un dati';
+
+  @override
+  String get settingsBackupExportSubtitle =>
+      'Transportlīdzekļi, uzpildes, braucieni un uzlādes žurnāli kā ZIP fails';
+
+  @override
+  String get settingsBackupRestoreSubtitle =>
+      'Apvieno vai aizstāj savus datus no iepriekšēja dublējuma ZIP';
+
+  @override
+  String get settingsStationTypesLink =>
+      'Staciju veidus iestata sadaļā Funkcijas un lietošanas režīms';
+
+  @override
+  String get routeSearchCriterionLabel =>
+      'Stacijas izvēle katram maršruta posmam';
+
+  @override
+  String get routeSearchCriterionCheapest => 'Lētākā';
+
+  @override
+  String get routeSearchCriterionNearest => 'Tuvākā maršrutam';
+
+  @override
+  String get routeSearchTopNLabel => 'Kandidāti katrā paraugpunktā';
+
+  @override
+  String routeSearchTopNCaption(int count) {
+    return 'Katrā maršruta punktā tiek ņemtas vērā līdz $count stacijām.';
+  }
+
+  @override
+  String get hybridFuelChoiceLabel => 'Degviela cenu meklēšanai (hibrīds)';
+
+  @override
+  String get hybridFuelChoiceVehicleDefault => 'Transportlīdzekļa noklusējums';
+
+  @override
+  String get scopeThisProfile => 'Šis profils';
+
+  @override
+  String get scopeAllProfiles => 'Visi profili';
+
+  @override
+  String get scopeThisVehicle => 'Šis transportlīdzeklis';
+
+  @override
+  String get featureLabel_manualConsumption => 'Manuāla patēriņa reģistrēšana';
+
+  @override
+  String get featureDescription_manualConsumption =>
+      'Reģistrē uzpildes un uzlādes sesijas manuāli (OBD2 adapteris nav nepieciešams).';
+
+  @override
+  String get featureLabel_loyaltyCards => 'Lojalitātes kartes';
+
+  @override
+  String get featureDescription_loyaltyCards =>
+      'Degvielas klubu / lojalitātes kartes ar atlaidi par litru cenu salīdzinājumos.';
+
+  @override
+  String get featureLabel_startupTrace =>
+      'Palaišanas inicializācijas izsekošana';
+
+  @override
+  String get featureDescription_startupTrace =>
+      'Reģistrē lietotnes palaišanas laikā mērītās fāzes, rāda tās kā ūdenskritumu un eksportē — izstrādātāja diagnostika.';
+
+  @override
+  String get locationGpsAutoHint =>
+      'GPS pozīcija tiek iegūta automātiski meklējot. Šeit to vari atjaunināt arī manuāli.';
+
+  @override
+  String get locationClearGpsBody =>
+      'Vai notīrīt saglabāto GPS pozīciju? To vari jebkurā laikā atjaunināt vēlreiz.';
+
+  @override
   String get shareReceiptUnsupportedFormat =>
       'Šo faila tipu vēl nevar importēt — dalieties ar čeka fotoattēlu.';
 
@@ -8122,8 +8375,8 @@ class AppLocalizationsLv extends AppLocalizations {
       'Android lietotnē ilgi spiediet logrīku un izvēlieties Pārkonfigurēt, lai mainītu profilu, krāsu un saturu.';
 
   @override
-  String get widgetDefaultsApplyToAllHint =>
-      'Turpmākās izvēles tiek piemērotas katram instalētajam logrīkam nākamajā atjaunināšanā.';
+  String get widgetDefaultsThisProfileHint =>
+      'Tālāk norādītās izvēles attiecas uz katru instalēto logrīku, kas rāda šo profilu, nākamajā atsvaidzināšanā.';
 
   @override
   String get widgetDefaultsColorLabel => 'Krāsu shēma';

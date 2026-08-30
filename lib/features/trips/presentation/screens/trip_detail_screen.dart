@@ -123,10 +123,25 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     // #3741 — the history list is summaries-only now; the detail screen
-    // is the sample consumer, so it full-decodes exactly ONE trip via
-    // the per-id family (which watches the list, keeping every
-    // save/delete/verdict refresh reactive).
-    final ownedEntry = ref.watch(tripHistoryDetailProvider(widget.tripId));
+    // is the sample consumer, so it full-decodes exactly ONE trip.
+    // #3882 — on a background isolate: a skeleton paints until the
+    // 34-column decode of a long trip lands, and only this trip's own
+    // (sampleCount, verdict) changes trigger a re-decode.
+    final owned = ref.watch(tripDetailLoaderProvider(widget.tripId));
+    if (owned.isLoading && !owned.hasValue) {
+      return PageScaffold(
+        title: l.tripHistoryTitle,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          tooltip: l.tooltipBack,
+          onPressed: () => context.pop(),
+        ),
+        body: const Center(
+          child: CircularProgressIndicator(key: Key('trip_detail_loading')),
+        ),
+      );
+    }
+    final ownedEntry = owned.value;
     // #2240 — a trip shared WITH the user isn't in their local Hive
     // history; fall back to the live "shared with me" list so tapping a
     // shared row opens a read-only detail. `isShared` gates the owner-

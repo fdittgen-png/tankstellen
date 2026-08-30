@@ -80,6 +80,14 @@ enum AppProfile {
 ///   `hapticEcoCoach`, `glideCoach` (the last two
 ///   `requires: {obd2TripRecording}` per the manifest)
 ///
+/// **Default-on features kept on by the presets (#3884)** — because the
+/// bundles are exhaustive, a default-on feature missing from a bundle was
+/// silently turned OFF the moment a preset was applied:
+/// - `fuelCalculator`, `paymentQrScan`, `communityPriceReports` — price
+///   tools with no prerequisite: every preset (Basic upwards)
+/// - `carbonDashboard`, `addFillUpOcrReceipt` — need fill-up / trip
+///   data: Medium and Full
+///
 /// Off in **every** preset (user opts in individually):
 /// - `tflitePricePrediction` (model artifact still off-band; #1543)
 const Map<AppProfile, Set<Feature>> appProfileBundles = {
@@ -92,6 +100,11 @@ const Map<AppProfile, Set<Feature>> appProfileBundles = {
     Feature.evCharging,
     Feature.tankSync,
     Feature.baselineSync,
+    // #3884 — default-on price tools; applying Basic no longer hides
+    // the calculator, scan-to-pay and community price reports.
+    Feature.fuelCalculator,
+    Feature.paymentQrScan,
+    Feature.communityPriceReports,
   },
   AppProfile.medium: {
     Feature.showFuel,
@@ -102,6 +115,12 @@ const Map<AppProfile, Set<Feature>> appProfileBundles = {
     Feature.evCharging,
     Feature.tankSync,
     Feature.baselineSync,
+    Feature.fuelCalculator,
+    Feature.paymentQrScan,
+    Feature.communityPriceReports,
+    // #3884 — default-on and meaningful once fill-ups exist.
+    Feature.carbonDashboard,
+    Feature.addFillUpOcrReceipt,
     Feature.manualConsumption,
     // #1568 — without this the `isConsumptionTabReachable` gate
     // short-circuits to false and the Conso settings section vanishes,
@@ -131,6 +150,12 @@ const Map<AppProfile, Set<Feature>> appProfileBundles = {
     Feature.evCharging,
     Feature.tankSync,
     Feature.baselineSync,
+    // #3884 — the five default-on features every preset must keep on.
+    Feature.fuelCalculator,
+    Feature.paymentQrScan,
+    Feature.communityPriceReports,
+    Feature.carbonDashboard,
+    Feature.addFillUpOcrReceipt,
     Feature.manualConsumption,
     Feature.loyaltyCards,
     Feature.obd2TripRecording,

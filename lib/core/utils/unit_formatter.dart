@@ -4,6 +4,7 @@
 import 'package:intl/intl.dart';
 
 import '../country/country_config.dart';
+import '../domain/consumption_unit.dart';
 import '../domain/fuel_type.dart';
 import 'price_formatter.dart';
 
@@ -131,10 +132,23 @@ class UnitFormatter {
   /// locale's separator: the shipped consumption widget tests assert
   /// exact strings like `6.4 L/100 km`, and the mask itself is a
   /// language-neutral format mask, so it stays as-is.
-  static String formatConsumption(double value, {required bool isEv}) {
-    // i18n-ignore: language-neutral consumption unit format mask (#2185)
-    final mask = isEv ? 'kWh/100 km' : 'L/100 km';
-    return '${value.toStringAsFixed(1)} $mask';
+  ///
+  /// #3883 — [unit] renders a combustion value (always COMPUTED in
+  /// L/100 km) in the user's display unit (km/L, mpg). Null keeps the
+  /// L/100 km mask; EV values ignore it (kWh/100 km has no mpg twin).
+  static String formatConsumption(
+    double value, {
+    required bool isEv,
+    ConsumptionUnit? unit,
+  }) {
+    if (isEv) {
+      // i18n-ignore: language-neutral consumption unit format mask (#2185)
+      return '${value.toStringAsFixed(1)} kWh/100 km';
+    }
+    final u = unit ?? ConsumptionUnit.lPer100Km;
+    final converted = u.fromLPer100Km(value);
+    if (converted == null) return '--';
+    return '${converted.toStringAsFixed(u.fractionDigits)} ${u.mask}';
   }
 
   /// Format a bare decimal number in the *active locale* so metric

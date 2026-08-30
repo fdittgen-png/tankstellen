@@ -300,12 +300,18 @@ const _featurePairBaseline = <String, int>{
   // #3743 (epic item 1, receipts_ocr extraction) — the share-receipt
   // handler moved out and now imports the feature_management barrel: 21→19.
   'consumption -> feature_management': 2,
-  'consumption -> vehicle': 2,
+  // #3884 — 2 → 1: the backup export moved into fill_ups' shared
+  // BackupExportFlow, so consumption_app_bar_actions dropped its direct
+  // vehicle_providers import.
+  'consumption -> vehicle': 1,
   'driving -> approach': 1,
   'driving -> feature_management': 6,
   'driving -> glide_coach': 2,
   'driving -> map': 3,
-  'driving -> profile': 5,
+  // #3884 — 5 → 4: the voice-announcements tile (and its
+  // voiceAnnouncementsEnabledProvider gate) left driving_settings_section
+  // for Settings → Prices & alerts.
+  'driving -> profile': 4,
   'driving -> search': 1,
   // #3743 (epic item 1, driving_score extraction, step 3/5) — the 35
   // edges are former INTRA-consumption imports of the trip stack
@@ -357,12 +363,16 @@ const _featurePairBaseline = <String, int>{
   // were the developer-tools pump-OCR tester reaching into the OCR stack,
   // which now lives in features/receipts_ocr behind its api.dart barrel.
   // This also breaks the profile <-> consumption cycle (18 → 17).
-  'profile -> driving': 1,
-  'profile -> feature_management': 52,
+  // #3884 — 52 → 47: the Settings root + topic screens import the
+  // feature_management barrel; the old root's 4 direct imports and the
+  // three manifest-fallback reads in feature_localization are gone.
+  // 'profile -> driving' (1 → 0) and 'profile -> widget' (1 → 0) hit
+  // zero the same way (driving/api.dart + widget/api.dart), which also
+  // broke the driving <-> profile and widget <-> profile cycles.
+  'profile -> feature_management': 47,
   'profile -> search': 2,
   'profile -> sync': 2,
   'profile -> vehicle': 3,
-  'profile -> widget': 1,
   'route_search -> profile': 11,
   'route_search -> search': 1,
   'search -> approach': 1,
@@ -498,4 +508,7 @@ const _shellImportBaseline = <String, int>{
 // #3743 (epic item 1, step 5/5) — 15 → 11: every remaining
 // consumption cycle (approach, driving, search, vehicle) broke when the
 // trip stack moved behind trips/api.dart.
-const _cycleBaseline = 11;
+// #3884 — 11 → 9: 'profile -> driving' and 'profile -> widget' hit zero
+// (barrel imports from the new Settings topic screens), breaking the
+// driving <-> profile and widget <-> profile cycles.
+const _cycleBaseline = 9;

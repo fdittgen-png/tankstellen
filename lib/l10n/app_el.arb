@@ -86,8 +86,6 @@
   "clearCacheTitle": "Εκκαθάριση προσωρινής μνήμης;",
   "clearCacheBody": "Τα αποθηκευμένα αποτελέσματα αναζήτησης και τιμές θα διαγραφούν. Τα προφίλ, αγαπημένα και ρυθμίσεις διατηρούνται.",
   "clearCacheButton": "Εκκαθάριση",
-  "deleteAllTitle": "Διαγραφή όλων των δεδομένων;",
-  "deleteAllBody": "Αυτό θα διαγράψει μόνιμα όλα τα προφίλ, αγαπημένα, κλειδί API, ρυθμίσεις και προσωρινή μνήμη. Η εφαρμογή θα επαναφερθεί.",
   "deleteAllButton": "Διαγραφή όλων",
   "entries": "εγγραφές",
   "cacheEmpty": "Η προσωρινή μνήμη είναι κενή",
@@ -258,10 +256,6 @@
   "showCheapestEveryNKm": "Εμφάνιση φθηνότερου σταθμού κάθε {km} χλμ κατά μήκος της διαδρομής",
   "avoidHighways": "Αποφυγή αυτοκινητοδρόμων",
   "avoidHighwaysDesc": "Ο υπολογισμός διαδρομής αποφεύγει δρόμους με διόδια και αυτοκινητοδρόμους",
-  "showFuelStations": "Εμφάνιση βενζινάδικων",
-  "showFuelStationsDesc": "Συμπερίληψη σταθμών βενζίνης, ντίζελ, LPG, CNG",
-  "showEvStations": "Εμφάνιση σταθμών φόρτισης",
-  "showEvStationsDesc": "Συμπερίληψη ηλεκτρικών σταθμών φόρτισης στα αποτελέσματα",
   "noStationsAlongThisRoute": "Δεν βρέθηκαν σταθμοί κατά μήκος αυτής της διαδρομής.",
   "fuelCostCalculator": "Υπολογιστής κόστους καυσίμου",
   "distanceKm": "Απόσταση (χλμ)",
@@ -567,7 +561,6 @@
   "tripResume": "Συνέχεια",
   "tripBannerRecording": "Καταγραφή διαδρομής",
   "tripBannerPaused": "Διαδρομή σε παύση — πατήστε για συνέχεια",
-  "navConsumption": "Κατανάλωση",
   "vehicleBaselineSectionTitle": "Βαθμονόμηση βάσης",
   "vehicleBaselineEmpty": "Δεν υπάρχουν δείγματα ακόμα — ξεκινήστε ένα ταξίδι OBD2 για να αρχίσετε να μαθαίνετε το καυσιμοκατανάλωσης αυτού του οχήματος.",
   "vehicleBaselineProgress": "Εκμαθήθηκε από δείγματα σε διαφορετικές οδηγικές καταστάσεις.",
@@ -1428,7 +1421,6 @@
   "widgetHelpAdd": "Προσθέστε το από τον επιλογέα widget του launcher — πατήστε παρατεταμένα σε κενή περιοχή της αρχικής οθόνης, επιλέξτε Widget και βρείτε το SparKilo.",
   "widgetHelpTap": "Πατήστε σταθμό στο widget για άνοιγμά του στην εφαρμογή. Πατήστε το εικονίδιο ανανέωσης για ενημέρωση τιμών.",
   "widgetHelpConfigure": "Στο Android, πατήστε παρατεταμένα το widget και επιλέξτε Επαναρύθμιση για αλλαγή προφίλ, χρώματος και περιεχομένου.",
-  "widgetDefaultsApplyToAllHint": "Οι επιλογές παρακάτω εφαρμόζονται σε κάθε εγκατεστημένο widget στην επόμενη ανανέωση.",
   "widgetDefaultsColorLabel": "Χρωματικό σχήμα",
   "widgetDefaultsVariantLabel": "Παραλλαγή περιεχομένου",
   "widgetColorSchemeSystem": "Σύστημα",
@@ -2447,22 +2439,6 @@
   },
   "tripRecordingDiscardedNoMovement": "Η καταγραφή απορρίφθηκε — δεν ανιχνεύτηκε κίνηση",
   "@tripRecordingDiscardedNoMovement": {
-    "description": "MT — needs native review"
-  },
-  "sectionSetupDataSources": "Ρύθμιση & πηγές δεδομένων",
-  "@sectionSetupDataSources": {
-    "description": "MT — needs native review"
-  },
-  "sectionFeaturesUsage": "Λειτουργίες & χρήση",
-  "@sectionFeaturesUsage": {
-    "description": "MT — needs native review"
-  },
-  "sectionAccountSync": "Λογαριασμός & συγχρονισμός",
-  "@sectionAccountSync": {
-    "description": "MT — needs native review"
-  },
-  "sectionAppearanceWidgets": "Εμφάνιση & γραφικά στοιχεία",
-  "@sectionAppearanceWidgets": {
     "description": "MT — needs native review"
   },
   "sectionPrivacyData": "Απόρρητο & δεδομένα",
@@ -4832,5 +4808,126 @@
         "type": "String"
       }
     }
-  }
+  },
+  "liveConsumptionWindowLabel": "Τελευταία {seconds} δ",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Μονάδα κατανάλωσης",
+  "consumptionUnitSettingSubtitle": "Πώς εμφανίζεται η κατανάλωση καυσίμου σε όλη την εφαρμογή",
+  "consumptionUnitAuto": "Αυτόματα ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Παράθυρο ζωντανής κατανάλωσης",
+  "consumptionWindowSettingSubtitle": "Μέσος όρος της ζωντανής τιμής στα τελευταία δευτερόλεπτα — μεγαλύτερο είναι σταθερότερο, μικρότερο αντιδρά πιο γρήγορα",
+  "consumptionWindowOption": "{seconds} δ",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "tripRecordingPipEstConsumptionCaptionUnit": "εκτ. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsSearchHint": "Αναζήτηση ρυθμίσεων",
+  "settingsSearchNoResults": "Καμία ρύθμιση δεν ταιριάζει με «{query}»",
+  "@settingsSearchNoResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTopicProfilesTitle": "Προφίλ & περιοχή",
+  "settingsTopicProfilesSubtitle": "Χώρα, γλώσσα, καύσιμο, ακτίνα αναζήτησης, σχεδιασμός διαδρομής",
+  "settingsTopicProfilesKeywords": "προφίλ, χώρα, γλώσσα, καύσιμο, ακτίνα, ταχυδρομικός κώδικας, διαδρομή, σπίτι, αξιολόγηση, αρχική οθόνη, profile, country, language, fuel, radius, route, home, rating",
+  "settingsTopicVehiclesTitle": "Οχήματα & OBD2",
+  "settingsTopicVehiclesSubtitle": "Τα αυτοκίνητά σας, χωρητικότητα ρεζερβουάρ, σύζευξη προσαρμογέα OBD2",
+  "settingsTopicVehiclesKeywords": "όχημα, αυτοκίνητο, obd, obd2, προσαρμογέας, bluetooth, ρεζερβουάρ, κινητήρας, vin, βαθμονόμηση, vehicle, car, adapter, tank, engine, calibration",
+  "settingsTopicDrivingTitle": "Οδήγηση & κατανάλωση",
+  "settingsTopicDrivingSubtitle": "Καθοδήγηση, ανταμοιβές, ραντάρ πρατηρίων, αντιμετώπιση προβλημάτων",
+  "settingsTopicDrivingKeywords": "καθοδήγηση, οικολογικό, απτικό, φωνή, παιχνιδοποίηση, ραντάρ, ελεύθερη κύλιση, διαδρομή, κατανάλωση, λέσχη καυσίμων, πιστότητα, αρχείο obd2, καρφίτσωμα, coach, eco, haptic, voice, gamification, radar, glide, trip, consumption, loyalty, pin",
+  "settingsTopicPricesTitle": "Τιμές & ειδοποιήσεις",
+  "settingsTopicPricesSubtitle": "Ειδοποιήσεις τιμών, φωνητικές ανακοινώσεις, ιστορικό τιμών, αναφορές κοινότητας",
+  "settingsTopicPricesKeywords": "ειδοποίηση, τιμή, ιστορικό, πρόβλεψη, καλύτερη στιγμή, κοινότητα, αναφορά, qr, πληρωμή, φωνή, ανακοίνωση, alert, notification, price, history, prediction, community, report, payment, voice, announcement",
+  "settingsTopicUnitsTitle": "Μονάδες & εμφάνιση",
+  "settingsTopicUnitsSubtitle": "Θέμα, μονάδα απόστασης, γραφικό στοιχείο αρχικής οθόνης",
+  "settingsTopicUnitsKeywords": "θέμα, σκούρο, ανοιχτό, οικολογικό, μονάδα, χλμ, μίλια, γραφικό στοιχείο, χρώμα, εμφάνιση, theme, dark, light, eco, unit, km, miles, widget, colour, display, appearance",
+  "settingsTopicFeaturesTitle": "Λειτουργίες & τρόπος χρήσης",
+  "settingsTopicFeaturesSubtitle": "Προεπιλογές τρόπου χρήσης και κάθε διακόπτης λειτουργίας",
+  "settingsTopicFeaturesKeywords": "λειτουργία, τρόπος, βασικό, μεσαίο, πλήρες, προσαρμοσμένο, διακόπτης, τύποι σταθμών, πρατήρια, φορτιστές, φόρτιση, feature, mode, basic, medium, full, custom, switch, toggle, charging",
+  "settingsTopicDataSourcesTitle": "Πηγές δεδομένων & τοποθεσία",
+  "settingsTopicDataSourcesSubtitle": "Κλειδιά API, θέση GPS, αυτόματη εναλλαγή προφίλ",
+  "settingsTopicDataSourcesKeywords": "api, κλειδί, gps, τοποθεσία, θέση, πηγή δεδομένων, tankerkoenig, opencharge, key, location, data source",
+  "settingsTopicSyncTitle": "Συγχρονισμός & λογαριασμός",
+  "settingsTopicSyncKeywords": "tanksync, cloud, λογαριασμός, email, σύνδεση συσκευής, συγχρονισμός, κοινή χρήση βάσης, ανώνυμος, account, link device, sync, share database, anonymous",
+  "settingsTopicPrivacySubtitle": "Συγκαταθέσεις, πίνακας απορρήτου, αποθήκευση & cache",
+  "settingsTopicPrivacyKeywords": "απόρρητο, συγκατάθεση, gdpr, διαγραφή, αποθήκευση, cache, δεδομένα, αναφορά σφαλμάτων, vin, privacy, consent, delete, erase, storage, data, error reporting",
+  "settingsTopicBackupTitle": "Αντίγραφο ασφαλείας & επαναφορά",
+  "settingsTopicBackupSubtitle": "Εξαγωγή ή επαναφορά πλήρους αντιγράφου ασφαλείας των δεδομένων σας",
+  "settingsTopicBackupKeywords": "αντίγραφο ασφαλείας, εξαγωγή, επαναφορά, εισαγωγή, zip, xml, μεταφορά, backup, export, restore, import, transfer",
+  "settingsTopicAdvancedSubtitle": "Διακριτικό GitHub, εργαλεία προγραμματιστή",
+  "settingsTopicAdvancedKeywords": "προγραμματιστής, αποσφαλμάτωση, διακριτικό, pat, github, διαγνωστικά, αρχείο σφαλμάτων, ίχνος, developer, debug, token, diagnostics, error log, trace",
+  "settingsTopicAboutSubtitle": "Έκδοση, άδειες, σύνδεσμοι",
+  "settingsTopicAboutKeywords": "σχετικά, έκδοση, άδεια, δωρεά, github, αναφορά, about, version, license, donate, attribution",
+  "settingsConsumptionOffHint": "Ενεργοποιήστε την παρακολούθηση κατανάλωσης στις Λειτουργίες & τρόπος χρήσης για να ρυθμίσετε οχήματα, καθοδήγηση και ανταμοιβές.",
+  "settingsOpenFeaturesLink": "Άνοιγμα Λειτουργίες & τρόπος χρήσης",
+  "settingsRadarTileSubtitle": "Ακτίνα, λειτουργία τιμών, ανίχνευση και καρφίτσωμα οθόνης για το ενεργό προφίλ",
+  "settingsRadarNoProfileHint": "Δημιουργήστε πρώτα ένα προφίλ — οι ρυθμίσεις ραντάρ αποθηκεύονται ανά προφίλ.",
+  "settingsRadarPinHeader": "Καρφίτσωμα οθόνης",
+  "settingsAlertsTileSubtitle": "Ειδοποιήσεις σταθμού και ακτίνας που σας ενημερώνουν για πτώσεις τιμών",
+  "settingsPriceFeaturesHeader": "Λειτουργίες τιμών",
+  "settingsVoiceAnnouncementsOffHint": "Οι φωνητικές ανακοινώσεις είναι απενεργοποιημένες. Ενεργοποιήστε τη Φωνητική ανατροφοδότηση και τις Φωνητικές ανακοινώσεις στις Λειτουργίες & τρόπος χρήσης για να ακούτε για φθηνό καύσιμο κοντά σας ενώ οδηγείτε.",
+  "settingsDistanceUnitTitle": "Μονάδα απόστασης",
+  "settingsDistanceUnitSubtitle": "Από τη χώρα του ενεργού προφίλ",
+  "settingsObd2AdapterTitle": "Προσαρμογέας OBD2",
+  "settingsObd2AdapterSubtitle": "Οι προσαρμογείς συζευγνύονται ανά όχημα — ανοίξτε ένα όχημα για να συζεύξετε ή να αλλάξετε τον προσαρμογέα του",
+  "settingsStorageDeleteHint": "Η διαγραφή όλων των τοπικών δεδομένων γίνεται από τον πίνακα απορρήτου.",
+  "settingsPrivacyCrossLinkTitle": "Συγκαταθέσεις",
+  "settingsPrivacyCrossLinkSubtitle": "Οι συγκαταθέσεις για Cloud Sync και συγχρονισμό διαδρομών βρίσκονται στο Απόρρητο & δεδομένα",
+  "settingsBackupExportSubtitle": "Οχήματα, ανεφοδιασμοί, διαδρομές και αρχεία φόρτισης ως αρχείο ZIP",
+  "settingsBackupRestoreSubtitle": "Συγχωνεύστε ή αντικαταστήστε τα δεδομένα σας από προηγούμενο ZIP αντιγράφου ασφαλείας",
+  "settingsStationTypesLink": "Οι τύποι σταθμών ορίζονται στις Λειτουργίες & τρόπος χρήσης",
+  "routeSearchCriterionLabel": "Επιλογή σταθμού ανά τμήμα διαδρομής",
+  "routeSearchCriterionCheapest": "Φθηνότερος",
+  "routeSearchCriterionNearest": "Πλησιέστερος στη διαδρομή",
+  "routeSearchTopNLabel": "Υποψήφιοι ανά σημείο δειγματοληψίας",
+  "routeSearchTopNCaption": "Έως {count} σταθμοί εξετάζονται σε κάθε σημείο κατά μήκος της διαδρομής.",
+  "@routeSearchTopNCaption": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hybridFuelChoiceLabel": "Καύσιμο για αναζήτηση τιμών (υβριδικό)",
+  "hybridFuelChoiceVehicleDefault": "Προεπιλογή οχήματος",
+  "scopeThisProfile": "Αυτό το προφίλ",
+  "scopeAllProfiles": "Όλα τα προφίλ",
+  "scopeThisVehicle": "Αυτό το όχημα",
+  "featureLabel_manualConsumption": "Χειροκίνητη καταγραφή κατανάλωσης",
+  "featureDescription_manualConsumption": "Καταγράψτε ανεφοδιασμούς και συνεδρίες φόρτισης χειροκίνητα (δεν απαιτείται προσαρμογέας OBD2).",
+  "featureLabel_loyaltyCards": "Κάρτες πιστότητας",
+  "featureDescription_loyaltyCards": "Κάρτες λέσχης καυσίμων / πιστότητας με εκπτώσεις ανά λίτρο στις συγκρίσεις τιμών.",
+  "featureLabel_startupTrace": "Ίχνος αρχικοποίησης εκκίνησης",
+  "featureDescription_startupTrace": "Καταγράφει τις χρονομετρημένες φάσεις εκκίνησης της εφαρμογής, τις εμφανίζει ως καταρράκτη και τις εξάγει — διαγνωστικό για προγραμματιστές.",
+  "locationGpsAutoHint": "Η θέση GPS λαμβάνεται αυτόματα κατά την αναζήτηση. Μπορείτε επίσης να την ενημερώσετε χειροκίνητα εδώ.",
+  "locationClearGpsBody": "Να διαγραφεί η αποθηκευμένη θέση GPS; Μπορείτε να την ενημερώσετε ξανά ανά πάσα στιγμή.",
+  "widgetDefaultsThisProfileHint": "Οι παρακάτω επιλογές ισχύουν για κάθε εγκατεστημένο γραφικό στοιχείο που εμφανίζει αυτό το προφίλ, στην επόμενη ανανέωση."
 }

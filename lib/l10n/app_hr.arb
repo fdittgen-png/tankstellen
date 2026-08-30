@@ -86,8 +86,6 @@
   "clearCacheTitle": "Očistiti predmemoriju?",
   "clearCacheBody": "Predmemorirani rezultati pretrage i cijene bit će obrisani. Profili, favoriti i postavke su sačuvani.",
   "clearCacheButton": "Očisti predmemoriju",
-  "deleteAllTitle": "Obrisati sve podatke?",
-  "deleteAllBody": "Ovo trajno briše sve profile, favorite, API ključ, postavke i predmemoriju. Aplikacija će se resetirati.",
   "deleteAllButton": "Obriši sve",
   "entries": "unosa",
   "cacheEmpty": "Predmemorija je prazna",
@@ -258,10 +256,6 @@
   "showCheapestEveryNKm": "Prikaži najjeftiniju postaju svakih {km} km duž rute",
   "avoidHighways": "Izbjegavaj autoceste",
   "avoidHighwaysDesc": "Izračun rute izbjegava cestarine i autoceste",
-  "showFuelStations": "Prikaži benzinske postaje",
-  "showFuelStationsDesc": "Uključi benzin, dizel, LPG, CNG postaje",
-  "showEvStations": "Prikaži stanice za punjenje",
-  "showEvStationsDesc": "Uključi električne stanice za punjenje u rezultatima",
   "noStationsAlongThisRoute": "Nisu pronađene postaje duž ove rute.",
   "fuelCostCalculator": "Kalkulator troškova goriva",
   "distanceKm": "Udaljenost (km)",
@@ -567,7 +561,6 @@
   "tripResume": "Nastavi",
   "tripBannerRecording": "Snimanje vožnje",
   "tripBannerPaused": "Vožnja pauzirana — dodirnite za nastavak",
-  "navConsumption": "Potrošnja",
   "vehicleBaselineSectionTitle": "Osnovna kalibracija",
   "vehicleBaselineEmpty": "Još nema uzoraka — pokrenite OBD2 vožnju za početak učenja profila goriva ovog vozila.",
   "vehicleBaselineProgress": "Naučeno iz uzoraka u raznim situacijama vožnje.",
@@ -1428,7 +1421,6 @@
   "widgetHelpAdd": "Dodajte ga iz birača widgeta pokretača — dugo pritisnite prazno područje početnog zaslona, odaberite Widgeti i pronađite SparKilo.",
   "widgetHelpTap": "Dodirnite postaju u widgetu za otvaranje u aplikaciji. Dodirnite ikonu osvježavanja za ažuriranje cijena.",
   "widgetHelpConfigure": "Na Androidu, dugo pritisnite widget i odaberite Rekonfiguriraj za promjenu profila, boje i sadržaja.",
-  "widgetDefaultsApplyToAllHint": "Izbori ispod primjenjuju se na svaki instalirani widget pri sljedećem osvježavanju.",
   "widgetDefaultsColorLabel": "Shema boja",
   "widgetDefaultsVariantLabel": "Varijanta sadržaja",
   "widgetColorSchemeSystem": "Slijedi sustav",
@@ -2447,22 +2439,6 @@
   },
   "tripRecordingDiscardedNoMovement": "Snimanje odbačeno — nije otkriveno kretanje",
   "@tripRecordingDiscardedNoMovement": {
-    "description": "MT — needs native review"
-  },
-  "sectionSetupDataSources": "Postavljanje i izvori podataka",
-  "@sectionSetupDataSources": {
-    "description": "MT — needs native review"
-  },
-  "sectionFeaturesUsage": "Značajke i upotreba",
-  "@sectionFeaturesUsage": {
-    "description": "MT — needs native review"
-  },
-  "sectionAccountSync": "Račun i sinkronizacija",
-  "@sectionAccountSync": {
-    "description": "MT — needs native review"
-  },
-  "sectionAppearanceWidgets": "Izgled i widgeti",
-  "@sectionAppearanceWidgets": {
     "description": "MT — needs native review"
   },
   "sectionPrivacyData": "Privatnost i podaci",
@@ -4832,5 +4808,126 @@
         "type": "String"
       }
     }
-  }
+  },
+  "liveConsumptionWindowLabel": "Zadnjih {seconds} s",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Jedinica potrošnje",
+  "consumptionUnitSettingSubtitle": "Kako se potrošnja goriva prikazuje u cijeloj aplikaciji",
+  "consumptionUnitAuto": "Automatski ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Prozor potrošnje uživo",
+  "consumptionWindowSettingSubtitle": "Prosjek vrijednosti uživo u zadnjih nekoliko sekundi — dulji je mirniji, kraći reagira brže",
+  "consumptionWindowOption": "{seconds} s",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "tripRecordingPipEstConsumptionCaptionUnit": "proc. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsSearchHint": "Pretraži postavke",
+  "settingsSearchNoResults": "Nijedna postavka ne odgovara „{query}”",
+  "@settingsSearchNoResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTopicProfilesTitle": "Profili i regija",
+  "settingsTopicProfilesSubtitle": "Država, jezik, gorivo, radijus pretrage, planiranje rute",
+  "settingsTopicProfilesKeywords": "profil, država, jezik, gorivo, radijus, poštanski broj, ruta, dom, ocjena, početni zaslon, profile, country, language, fuel, radius, route, home, rating",
+  "settingsTopicVehiclesTitle": "Vozila i OBD2",
+  "settingsTopicVehiclesSubtitle": "Vaši automobili, veličina spremnika, uparivanje OBD2 adaptera",
+  "settingsTopicVehiclesKeywords": "vozilo, auto, obd, obd2, adapter, bluetooth, spremnik, motor, vin, kalibracija, vehicle, car, tank, engine, calibration",
+  "settingsTopicDrivingTitle": "Vožnja i potrošnja",
+  "settingsTopicDrivingSubtitle": "Coaching, nagrade, radar benzinskih postaja, rješavanje problema",
+  "settingsTopicDrivingKeywords": "coach, eko, haptički, glas, gamifikacija, radar, klizanje, putovanje, potrošnja, klub goriva, vjernost, obd2 zapisnik, prikvači, eco, haptic, voice, gamification, glide, trip, consumption, loyalty, pin",
+  "settingsTopicPricesTitle": "Cijene i upozorenja",
+  "settingsTopicPricesSubtitle": "Upozorenja o cijenama, glasovne najave, povijest cijena, prijave zajednice",
+  "settingsTopicPricesKeywords": "upozorenje, obavijest, cijena, povijest, predviđanje, najbolje vrijeme, zajednica, prijava, qr, plaćanje, glas, najava, alert, notification, price, history, prediction, community, report, payment, voice, announcement",
+  "settingsTopicUnitsTitle": "Jedinice i prikaz",
+  "settingsTopicUnitsSubtitle": "Tema, jedinica udaljenosti, widget na početnom zaslonu",
+  "settingsTopicUnitsKeywords": "tema, tamna, svijetla, eko, jedinica, km, milje, widget, boja, prikaz, izgled, theme, dark, light, eco, unit, miles, colour, display, appearance",
+  "settingsTopicFeaturesTitle": "Značajke i način korištenja",
+  "settingsTopicFeaturesSubtitle": "Predlošci načina korištenja i svaki prekidač značajki",
+  "settingsTopicFeaturesKeywords": "značajka, način, osnovni, srednji, puni, prilagođeni, prekidač, vrste postaja, benzinske postaje, punjači, punjenje, feature, mode, basic, medium, full, custom, switch, toggle, charging",
+  "settingsTopicDataSourcesTitle": "Izvori podataka i lokacija",
+  "settingsTopicDataSourcesSubtitle": "API ključevi, GPS položaj, automatska promjena profila",
+  "settingsTopicDataSourcesKeywords": "api, ključ, gps, lokacija, položaj, izvor podataka, tankerkoenig, opencharge, key, location, data source",
+  "settingsTopicSyncTitle": "Sinkronizacija i račun",
+  "settingsTopicSyncKeywords": "tanksync, oblak, račun, e-pošta, poveži uređaj, sinkronizacija, dijeli bazu, anoniman, cloud, account, email, link device, sync, share database, anonymous",
+  "settingsTopicPrivacySubtitle": "Privole, nadzorna ploča privatnosti, pohrana i predmemorija",
+  "settingsTopicPrivacyKeywords": "privatnost, privola, gdpr, izbriši, obriši, pohrana, predmemorija, podaci, izvještavanje o pogreškama, vin, privacy, consent, delete, erase, storage, cache, data, error reporting",
+  "settingsTopicBackupTitle": "Sigurnosna kopija i vraćanje",
+  "settingsTopicBackupSubtitle": "Izvezite ili vratite potpunu sigurnosnu kopiju svojih podataka",
+  "settingsTopicBackupKeywords": "sigurnosna kopija, izvoz, vraćanje, uvoz, zip, xml, prijenos, backup, export, restore, import, transfer",
+  "settingsTopicAdvancedSubtitle": "GitHub token, razvojni alati",
+  "settingsTopicAdvancedKeywords": "razvojni programer, otklanjanje pogrešaka, token, pat, github, dijagnostika, zapisnik pogrešaka, trag, developer, debug, diagnostics, error log, trace",
+  "settingsTopicAboutSubtitle": "Verzija, licence, poveznice",
+  "settingsTopicAboutKeywords": "o aplikaciji, verzija, licenca, doniraj, github, navođenje autora, about, version, license, donate, attribution",
+  "settingsConsumptionOffHint": "Uključite praćenje potrošnje u odjeljku Značajke i način korištenja da biste postavili vozila, coaching i nagrade.",
+  "settingsOpenFeaturesLink": "Otvori Značajke i način korištenja",
+  "settingsRadarTileSubtitle": "Radijus, način cijena, ispitivanje i prikvačivanje zaslona za aktivni profil",
+  "settingsRadarNoProfileHint": "Najprije izradite profil — postavke radara spremaju se po profilu.",
+  "settingsRadarPinHeader": "Prikvačivanje zaslona",
+  "settingsAlertsTileSubtitle": "Upozorenja za postaje i radijus koja vas obavještavaju o padu cijena",
+  "settingsPriceFeaturesHeader": "Značajke cijena",
+  "settingsVoiceAnnouncementsOffHint": "Glasovne najave su isključene. Uključite Glasovne povratne informacije i Glasovne najave u odjeljku Značajke i način korištenja da biste tijekom vožnje čuli za jeftino gorivo u blizini.",
+  "settingsDistanceUnitTitle": "Jedinica udaljenosti",
+  "settingsDistanceUnitSubtitle": "Iz države aktivnog profila",
+  "settingsObd2AdapterTitle": "OBD2 adapter",
+  "settingsObd2AdapterSubtitle": "Adapteri se uparuju po vozilu — otvorite vozilo da biste uparili ili promijenili njegov adapter",
+  "settingsStorageDeleteHint": "Brisanje svih lokalnih podataka obavlja se s nadzorne ploče privatnosti.",
+  "settingsPrivacyCrossLinkTitle": "Privole",
+  "settingsPrivacyCrossLinkSubtitle": "Privole za Cloud Sync i sinkronizaciju putovanja nalaze se pod Privatnost i podaci",
+  "settingsBackupExportSubtitle": "Vozila, točenja, putovanja i zapisnici punjenja kao ZIP datoteka",
+  "settingsBackupRestoreSubtitle": "Spojite ili zamijenite podatke iz prethodne sigurnosne kopije ZIP",
+  "settingsStationTypesLink": "Vrste postaja postavljaju se u odjeljku Značajke i način korištenja",
+  "routeSearchCriterionLabel": "Izbor postaje po dionici rute",
+  "routeSearchCriterionCheapest": "Najjeftinija",
+  "routeSearchCriterionNearest": "Najbliža ruti",
+  "routeSearchTopNLabel": "Kandidata po točki uzorkovanja",
+  "routeSearchTopNCaption": "Na svakoj točki duž rute razmatra se do {count} postaja.",
+  "@routeSearchTopNCaption": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hybridFuelChoiceLabel": "Gorivo za pretragu cijena (hibrid)",
+  "hybridFuelChoiceVehicleDefault": "Zadano za vozilo",
+  "scopeThisProfile": "Ovaj profil",
+  "scopeAllProfiles": "Svi profili",
+  "scopeThisVehicle": "Ovo vozilo",
+  "featureLabel_manualConsumption": "Ručno bilježenje potrošnje",
+  "featureDescription_manualConsumption": "Ručno bilježite točenja goriva i punjenja (OBD2 adapter nije potreban).",
+  "featureLabel_loyaltyCards": "Kartice vjernosti",
+  "featureDescription_loyaltyCards": "Kartice klubova goriva / vjernosti s popustom po litri u usporedbama cijena.",
+  "featureLabel_startupTrace": "Trag inicijalizacije pri pokretanju",
+  "featureDescription_startupTrace": "Bilježi vremenski mjerene faze pokretanja aplikacije, prikazuje ih kao vodopad i izvozi — dijagnostika za razvojne programere.",
+  "locationGpsAutoHint": "GPS položaj dohvaća se automatski pri pretraživanju. Ovdje ga možete ažurirati i ručno.",
+  "locationClearGpsBody": "Obrisati spremljeni GPS položaj? Možete ga ponovno ažurirati u bilo kojem trenutku.",
+  "widgetDefaultsThisProfileHint": "Odabiri u nastavku vrijede za svaki instalirani widget koji prikazuje ovaj profil, pri sljedećem osvježavanju."
 }

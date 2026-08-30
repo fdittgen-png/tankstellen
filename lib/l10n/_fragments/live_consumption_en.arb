@@ -1,0 +1,54 @@
+{
+  "liveConsumptionWindowLabel": "Last {seconds} s",
+  "@liveConsumptionWindowLabel": {
+    "description": "#3883 — label above the recording screen's headline consumption figure when it is the rolling average over the user's configured window (e.g. 'Last 5 s'). Replaces 'Instant consumption' whenever the window figure is available.",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Consumption unit",
+  "@consumptionUnitSettingTitle": {
+    "description": "#3883 — Settings tile title: how fuel consumption figures are displayed app-wide (L/100 km, km/L, mpg)."
+  },
+  "consumptionUnitSettingSubtitle": "How fuel consumption is shown everywhere in the app",
+  "@consumptionUnitSettingSubtitle": {
+    "description": "#3883 — subtitle of the consumption-unit setting."
+  },
+  "consumptionUnitAuto": "Automatic ({unit})",
+  "@consumptionUnitAuto": {
+    "description": "#3883 — the 'follow the country convention' choice of the consumption-unit picker; {unit} is the unit the active country resolves to (e.g. 'L/100 km', 'mpg (UK)').",
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Live consumption window",
+  "@consumptionWindowSettingTitle": {
+    "description": "#3883 — Settings tile title: the length of the rolling window the live 'Last N s' consumption figure averages over while recording."
+  },
+  "consumptionWindowSettingSubtitle": "Average the live figure over the last few seconds — longer is steadier, shorter reacts faster",
+  "@consumptionWindowSettingSubtitle": {
+    "description": "#3883 — subtitle of the live-window setting."
+  },
+  "consumptionWindowOption": "{seconds} s",
+  "@consumptionWindowOption": {
+    "description": "#3883 — one choice of the live-window picker, in seconds (3 s, 5 s, 10 s, 30 s).",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "tripRecordingPipEstConsumptionCaptionUnit": "est. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "description": "#3883 — unit caption under the big GPS-estimated consumption figure on the PiP tile / Live Activity, in the user's display unit ('est. mpg (UK)'). Generalises tripRecordingPipEstConsumptionCaption.",
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  }
+}

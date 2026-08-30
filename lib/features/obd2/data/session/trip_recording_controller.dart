@@ -16,6 +16,9 @@ import 'dropped_session_host.dart';
 import 'dropped_session_manager.dart';
 import '../../domain/gps_only_sample_builder.dart';
 import '../../domain/instant_consumption_ema.dart';
+import '../../domain/rolling_consumption_window.dart';
+import '../../../../core/providers/consumption_display_provider.dart'
+    show kDefaultLiveConsumptionWindowSeconds;
 import 'live_sample_snapshot.dart';
 import 'trip_recording_sink.dart';
 import '../obd2_breadcrumb_collector.dart';
@@ -59,6 +62,7 @@ part 'trip_recording_controller_state.dart';
 part 'trip_recording_controller_summary.dart';
 part 'trip_recording_controller_telemetry_ingest.dart';
 part 'trip_recording_controller_transport.dart';
+part 'trip_recording_controller_window.dart';
 
 /// Drives the priority-tiered PID polling loop that feeds an
 /// [Obd2Service]'s live PIDs into a [TripRecorder] (#726, #814).
@@ -122,6 +126,7 @@ class TripRecordingController
         _TripRecordingTelemetryIngest,
         _TripRecordingTransportGuard,
         _TripRecordingPowerWatch,
+        _TripRecordingWindowStamp,
         _TripRecordingEmit,
         _TripRecordingSummary,
         _TripRecordingDebugSeams,

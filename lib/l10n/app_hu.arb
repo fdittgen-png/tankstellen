@@ -86,8 +86,6 @@
   "clearCacheTitle": "Gyorsítótár törlése?",
   "clearCacheBody": "A tárolt keresési eredmények és árak törlődnek. A profilok, kedvencek és beállítások megmaradnak.",
   "clearCacheButton": "Gyorsítótár törlése",
-  "deleteAllTitle": "Összes adat törlése?",
-  "deleteAllBody": "Ez véglegesen törli az összes profilt, kedvencet, API-kulcsot, beállítást és gyorsítótárat. Az alkalmazás visszaáll.",
   "deleteAllButton": "Mindent töröl",
   "entries": "bejegyzés",
   "cacheEmpty": "A gyorsítótár üres",
@@ -258,10 +256,6 @@
   "showCheapestEveryNKm": "Legolcsóbb kút mutatása {km} km-enként az útvonal mentén",
   "avoidHighways": "Autópályák elkerülése",
   "avoidHighwaysDesc": "Az útvonaltervezés elkerüli a fizetős utakat és autópályákat",
-  "showFuelStations": "Benzinkutak mutatása",
-  "showFuelStationsDesc": "Benzin, dízel, LPG, CNG kutak bevonása",
-  "showEvStations": "Töltőállomások mutatása",
-  "showEvStationsDesc": "Elektromos töltőállomások bevonása a keresési eredményekbe",
   "noStationsAlongThisRoute": "Nem találhatók állomások ezen útvonal mentén.",
   "fuelCostCalculator": "Üzemanyagköltség-kalkulátor",
   "distanceKm": "Távolság (km)",
@@ -567,7 +561,6 @@
   "tripResume": "Folytatás",
   "tripBannerRecording": "Út rögzítése folyamatban",
   "tripBannerPaused": "Út szüneteltetve — érintsen a folytatáshoz",
-  "navConsumption": "Fogyasztás",
   "vehicleBaselineSectionTitle": "Alapvonal-kalibráció",
   "vehicleBaselineEmpty": "Még nincsenek minták — indítson OBD2-utat a jármű üzemanyag-profiljának megtanulásához.",
   "vehicleBaselineProgress": "Különböző vezetési helyzetekből tanult minták alapján.",
@@ -1428,7 +1421,6 @@
   "widgetHelpAdd": "Adja hozzá az indítóprogram widget-választójából — nyomjon hosszan egy üres területre a kezdőképernyőn, válassza a Widgetek lehetőséget, és keresse meg a SparKilo-t.",
   "widgetHelpTap": "Érintsen egy állomást a widgeten az alkalmazásban való megnyitáshoz. Érintse a frissítés ikont az árak frissítéséhez.",
   "widgetHelpConfigure": "Android-on nyomjon hosszan a widgetre, és válassza az Újrakonfigurálás lehetőséget a profil, szín és tartalom megváltoztatásához.",
-  "widgetDefaultsApplyToAllHint": "Az alábbi beállítások a következő frissítéskor minden telepített widgetre érvényesek.",
   "widgetDefaultsColorLabel": "Színséma",
   "widgetDefaultsVariantLabel": "Tartalomváltozat",
   "widgetColorSchemeSystem": "Rendszer szerint",
@@ -2447,22 +2439,6 @@
   },
   "tripRecordingDiscardedNoMovement": "Rögzítés elvetve — nem észlelt mozgás",
   "@tripRecordingDiscardedNoMovement": {
-    "description": "MT — needs native review"
-  },
-  "sectionSetupDataSources": "Beállítás és adatforrások",
-  "@sectionSetupDataSources": {
-    "description": "MT — needs native review"
-  },
-  "sectionFeaturesUsage": "Funkciók és használat",
-  "@sectionFeaturesUsage": {
-    "description": "MT — needs native review"
-  },
-  "sectionAccountSync": "Fiók és szinkronizálás",
-  "@sectionAccountSync": {
-    "description": "MT — needs native review"
-  },
-  "sectionAppearanceWidgets": "Megjelenés és widgetek",
-  "@sectionAppearanceWidgets": {
     "description": "MT — needs native review"
   },
   "sectionPrivacyData": "Adatvédelem és adatok",
@@ -4832,5 +4808,126 @@
         "type": "String"
       }
     }
-  }
+  },
+  "liveConsumptionWindowLabel": "Utolsó {seconds} mp",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Fogyasztás mértékegysége",
+  "consumptionUnitSettingSubtitle": "Így jelenik meg az üzemanyag-fogyasztás az egész alkalmazásban",
+  "consumptionUnitAuto": "Automatikus ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Élő fogyasztás időablaka",
+  "consumptionWindowSettingSubtitle": "Az élő értéket az utolsó néhány másodpercre átlagolja – hosszabb nyugodtabb, rövidebb gyorsabban reagál",
+  "consumptionWindowOption": "{seconds} mp",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "tripRecordingPipEstConsumptionCaptionUnit": "becs. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsSearchHint": "Keresés a beállításokban",
+  "settingsSearchNoResults": "Nincs a következőre illeszkedő beállítás: „{query}”",
+  "@settingsSearchNoResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTopicProfilesTitle": "Profilok és régió",
+  "settingsTopicProfilesSubtitle": "Ország, nyelv, üzemanyag, keresési sugár, útvonaltervezés",
+  "settingsTopicProfilesKeywords": "profil, ország, nyelv, üzemanyag, sugár, irányítószám, útvonal, otthon, értékelés, kezdőképernyő, profile, country, language, fuel, radius, route, home, rating",
+  "settingsTopicVehiclesTitle": "Járművek és OBD2",
+  "settingsTopicVehiclesSubtitle": "Autóid, tankméret, OBD2-adapter párosítása",
+  "settingsTopicVehiclesKeywords": "jármű, autó, obd, obd2, adapter, bluetooth, tank, motor, vin, kalibrálás, vehicle, car, engine, calibration",
+  "settingsTopicDrivingTitle": "Vezetés és fogyasztás",
+  "settingsTopicDrivingSubtitle": "Coaching, jutalmak, benzinkút-radar, hibaelhárítás",
+  "settingsTopicDrivingKeywords": "coach, öko, haptikus, hang, gamifikáció, radar, gurulás, út, fogyasztás, üzemanyagklub, hűség, obd2 napló, rögzítés, eco, haptic, voice, gamification, glide, trip, consumption, loyalty, pin",
+  "settingsTopicPricesTitle": "Árak és riasztások",
+  "settingsTopicPricesSubtitle": "Árriasztások, hangbemondás, árelőzmények, közösségi jelentések",
+  "settingsTopicPricesKeywords": "riasztás, értesítés, ár, előzmények, előrejelzés, legjobb időpont, közösség, jelentés, qr, fizetés, hang, bemondás, alert, notification, price, history, prediction, community, report, payment, voice, announcement",
+  "settingsTopicUnitsTitle": "Mértékegységek és megjelenés",
+  "settingsTopicUnitsSubtitle": "Téma, távolság mértékegysége, kezdőképernyő-widget",
+  "settingsTopicUnitsKeywords": "téma, sötét, világos, öko, mértékegység, km, mérföld, widget, szín, megjelenés, kinézet, theme, dark, light, eco, unit, miles, colour, display, appearance",
+  "settingsTopicFeaturesTitle": "Funkciók és használati mód",
+  "settingsTopicFeaturesSubtitle": "Használati mód sablonok és minden funkciókapcsoló",
+  "settingsTopicFeaturesKeywords": "funkció, mód, alap, közepes, teljes, egyéni, kapcsoló, állomástípusok, benzinkutak, töltők, töltés, feature, mode, basic, medium, full, custom, switch, toggle, charging",
+  "settingsTopicDataSourcesTitle": "Adatforrások és helyzet",
+  "settingsTopicDataSourcesSubtitle": "API-kulcsok, GPS-pozíció, automatikus profilváltás",
+  "settingsTopicDataSourcesKeywords": "api, kulcs, gps, helyzet, pozíció, adatforrás, tankerkoenig, opencharge, key, location, data source",
+  "settingsTopicSyncTitle": "Szinkronizálás és fiók",
+  "settingsTopicSyncKeywords": "tanksync, felhő, fiók, e-mail, eszköz összekapcsolása, szinkronizálás, adatbázis megosztása, névtelen, cloud, account, email, link device, sync, share database, anonymous",
+  "settingsTopicPrivacySubtitle": "Hozzájárulások, adatvédelmi irányítópult, tárhely és gyorsítótár",
+  "settingsTopicPrivacyKeywords": "adatvédelem, hozzájárulás, gdpr, törlés, tárhely, gyorsítótár, adatok, hibajelentés, vin, privacy, consent, delete, erase, storage, cache, data, error reporting",
+  "settingsTopicBackupTitle": "Biztonsági mentés és visszaállítás",
+  "settingsTopicBackupSubtitle": "Adataid teljes biztonsági mentésének exportálása vagy visszaállítása",
+  "settingsTopicBackupKeywords": "biztonsági mentés, exportálás, visszaállítás, importálás, zip, xml, átvitel, backup, export, restore, import, transfer",
+  "settingsTopicAdvancedSubtitle": "GitHub-token, fejlesztői eszközök",
+  "settingsTopicAdvancedKeywords": "fejlesztő, hibakeresés, token, pat, github, diagnosztika, hibanapló, nyomkövetés, developer, debug, diagnostics, error log, trace",
+  "settingsTopicAboutSubtitle": "Verzió, licencek, hivatkozások",
+  "settingsTopicAboutKeywords": "névjegy, verzió, licenc, adományozás, github, forrásmegjelölés, about, version, license, donate, attribution",
+  "settingsConsumptionOffHint": "Kapcsold be a fogyasztáskövetést a Funkciók és használati mód alatt a járművek, a coaching és a jutalmak beállításához.",
+  "settingsOpenFeaturesLink": "Funkciók és használati mód megnyitása",
+  "settingsRadarTileSubtitle": "Sugár, ármód, lekérdezés és képernyőrögzítés az aktív profilhoz",
+  "settingsRadarNoProfileHint": "Először hozz létre egy profilt – a radar beállításai profilonként tárolódnak.",
+  "settingsRadarPinHeader": "Képernyőrögzítés",
+  "settingsAlertsTileSubtitle": "Állomás- és sugárriasztások, amelyek árcsökkenésről értesítenek",
+  "settingsPriceFeaturesHeader": "Árfunkciók",
+  "settingsVoiceAnnouncementsOffHint": "A hangbemondás ki van kapcsolva. Kapcsold be a Hangvisszajelzést és a Hangbemondást a Funkciók és használati mód alatt, hogy vezetés közben halld a közeli olcsó üzemanyagot.",
+  "settingsDistanceUnitTitle": "Távolság mértékegysége",
+  "settingsDistanceUnitSubtitle": "Az aktív profil országa alapján",
+  "settingsObd2AdapterTitle": "OBD2-adapter",
+  "settingsObd2AdapterSubtitle": "Az adapterek járművenként párosíthatók – nyiss meg egy járművet az adapter párosításához vagy cseréjéhez",
+  "settingsStorageDeleteHint": "Az összes helyi adat törlése az adatvédelmi irányítópultról történik.",
+  "settingsPrivacyCrossLinkTitle": "Hozzájárulások",
+  "settingsPrivacyCrossLinkSubtitle": "A Cloud Sync és az útszinkronizálás hozzájárulásai az Adatvédelem és adatok alatt találhatók",
+  "settingsBackupExportSubtitle": "Járművek, tankolások, utak és töltési naplók ZIP-fájlként",
+  "settingsBackupRestoreSubtitle": "Adatok egyesítése vagy cseréje egy korábbi biztonsági mentés ZIP-fájljából",
+  "settingsStationTypesLink": "Az állomástípusok a Funkciók és használati mód alatt állíthatók be",
+  "routeSearchCriterionLabel": "Állomásválasztás útvonalszakaszonként",
+  "routeSearchCriterionCheapest": "Legolcsóbb",
+  "routeSearchCriterionNearest": "Az útvonalhoz legközelebbi",
+  "routeSearchTopNLabel": "Jelöltek mintavételi pontonként",
+  "routeSearchTopNCaption": "Az útvonal minden pontján legfeljebb {count} állomást veszünk figyelembe.",
+  "@routeSearchTopNCaption": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hybridFuelChoiceLabel": "Üzemanyag az árkereséshez (hibrid)",
+  "hybridFuelChoiceVehicleDefault": "A jármű alapértelmezése",
+  "scopeThisProfile": "Ez a profil",
+  "scopeAllProfiles": "Minden profil",
+  "scopeThisVehicle": "Ez a jármű",
+  "featureLabel_manualConsumption": "Kézi fogyasztásnaplózás",
+  "featureDescription_manualConsumption": "Tankolások és töltések kézi rögzítése (nem kell OBD2-adapter).",
+  "featureLabel_loyaltyCards": "Hűségkártyák",
+  "featureDescription_loyaltyCards": "Üzemanyagklub-/hűségkártyák literenkénti kedvezménnyel az ár-összehasonlításban.",
+  "featureLabel_startupTrace": "Indítási inicializálási nyomkövetés",
+  "featureDescription_startupTrace": "Rögzíti az alkalmazás indításának időmért fázisait, vízesésként mutatja és exportálja – fejlesztői diagnosztika.",
+  "locationGpsAutoHint": "A GPS-pozíciót kereséskor automatikusan lekérjük. Itt kézzel is frissítheted.",
+  "locationClearGpsBody": "Törlöd a tárolt GPS-pozíciót? Bármikor újra frissítheted.",
+  "widgetDefaultsThisProfileHint": "Az alábbi választások minden telepített, ezt a profilt mutató widgetre érvényesek a következő frissítéskor."
 }

@@ -294,13 +294,6 @@ class AppLocalizationsHr extends AppLocalizations {
   String get clearCacheButton => 'Očisti predmemoriju';
 
   @override
-  String get deleteAllTitle => 'Obrisati sve podatke?';
-
-  @override
-  String get deleteAllBody =>
-      'Ovo trajno briše sve profile, favorite, API ključ, postavke i predmemoriju. Aplikacija će se resetirati.';
-
-  @override
   String get deleteAllButton => 'Obriši sve';
 
   @override
@@ -847,19 +840,6 @@ class AppLocalizationsHr extends AppLocalizations {
   @override
   String get avoidHighwaysDesc =>
       'Izračun rute izbjegava cestarine i autoceste';
-
-  @override
-  String get showFuelStations => 'Prikaži benzinske postaje';
-
-  @override
-  String get showFuelStationsDesc => 'Uključi benzin, dizel, LPG, CNG postaje';
-
-  @override
-  String get showEvStations => 'Prikaži stanice za punjenje';
-
-  @override
-  String get showEvStationsDesc =>
-      'Uključi električne stanice za punjenje u rezultatima';
 
   @override
   String get noStationsAlongThisRoute => 'Nisu pronađene postaje duž ove rute.';
@@ -1849,9 +1829,6 @@ class AppLocalizationsHr extends AppLocalizations {
   String get tripBannerPaused => 'Vožnja pauzirana — dodirnite za nastavak';
 
   @override
-  String get navConsumption => 'Potrošnja';
-
-  @override
   String get vehicleBaselineSectionTitle => 'Osnovna kalibracija';
 
   @override
@@ -2234,18 +2211,6 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get sectionLocation => 'Lokacija';
-
-  @override
-  String get sectionSetupDataSources => 'Postavljanje i izvori podataka';
-
-  @override
-  String get sectionFeaturesUsage => 'Značajke i upotreba';
-
-  @override
-  String get sectionAccountSync => 'Račun i sinkronizacija';
-
-  @override
-  String get sectionAppearanceWidgets => 'Izgled i widgeti';
 
   @override
   String get sectionPrivacyData => 'Privatnost i podaci';
@@ -5962,6 +5927,40 @@ class AppLocalizationsHr extends AppLocalizations {
       'Usporite prije zavoja, ne u njemu — naglo skretanje gubi brzinu koju zatim morate obnavljati.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Zadnjih $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Jedinica potrošnje';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Kako se potrošnja goriva prikazuje u cijeloj aplikaciji';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automatski ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Prozor potrošnje uživo';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Prosjek vrijednosti uživo u zadnjih nekoliko sekundi — dulji je mirniji, kraći reagira brže';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'proc. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Pristup lokaciji';
 
   @override
@@ -7105,6 +7104,257 @@ class AppLocalizationsHr extends AppLocalizations {
   String get refuelUnitPerSession => '/sesija';
 
   @override
+  String get settingsSearchHint => 'Pretraži postavke';
+
+  @override
+  String settingsSearchNoResults(String query) {
+    return 'Nijedna postavka ne odgovara „$query”';
+  }
+
+  @override
+  String get settingsTopicProfilesTitle => 'Profili i regija';
+
+  @override
+  String get settingsTopicProfilesSubtitle =>
+      'Država, jezik, gorivo, radijus pretrage, planiranje rute';
+
+  @override
+  String get settingsTopicProfilesKeywords =>
+      'profil, država, jezik, gorivo, radijus, poštanski broj, ruta, dom, ocjena, početni zaslon, profile, country, language, fuel, radius, route, home, rating';
+
+  @override
+  String get settingsTopicVehiclesTitle => 'Vozila i OBD2';
+
+  @override
+  String get settingsTopicVehiclesSubtitle =>
+      'Vaši automobili, veličina spremnika, uparivanje OBD2 adaptera';
+
+  @override
+  String get settingsTopicVehiclesKeywords =>
+      'vozilo, auto, obd, obd2, adapter, bluetooth, spremnik, motor, vin, kalibracija, vehicle, car, tank, engine, calibration';
+
+  @override
+  String get settingsTopicDrivingTitle => 'Vožnja i potrošnja';
+
+  @override
+  String get settingsTopicDrivingSubtitle =>
+      'Coaching, nagrade, radar benzinskih postaja, rješavanje problema';
+
+  @override
+  String get settingsTopicDrivingKeywords =>
+      'coach, eko, haptički, glas, gamifikacija, radar, klizanje, putovanje, potrošnja, klub goriva, vjernost, obd2 zapisnik, prikvači, eco, haptic, voice, gamification, glide, trip, consumption, loyalty, pin';
+
+  @override
+  String get settingsTopicPricesTitle => 'Cijene i upozorenja';
+
+  @override
+  String get settingsTopicPricesSubtitle =>
+      'Upozorenja o cijenama, glasovne najave, povijest cijena, prijave zajednice';
+
+  @override
+  String get settingsTopicPricesKeywords =>
+      'upozorenje, obavijest, cijena, povijest, predviđanje, najbolje vrijeme, zajednica, prijava, qr, plaćanje, glas, najava, alert, notification, price, history, prediction, community, report, payment, voice, announcement';
+
+  @override
+  String get settingsTopicUnitsTitle => 'Jedinice i prikaz';
+
+  @override
+  String get settingsTopicUnitsSubtitle =>
+      'Tema, jedinica udaljenosti, widget na početnom zaslonu';
+
+  @override
+  String get settingsTopicUnitsKeywords =>
+      'tema, tamna, svijetla, eko, jedinica, km, milje, widget, boja, prikaz, izgled, theme, dark, light, eco, unit, miles, colour, display, appearance';
+
+  @override
+  String get settingsTopicFeaturesTitle => 'Značajke i način korištenja';
+
+  @override
+  String get settingsTopicFeaturesSubtitle =>
+      'Predlošci načina korištenja i svaki prekidač značajki';
+
+  @override
+  String get settingsTopicFeaturesKeywords =>
+      'značajka, način, osnovni, srednji, puni, prilagođeni, prekidač, vrste postaja, benzinske postaje, punjači, punjenje, feature, mode, basic, medium, full, custom, switch, toggle, charging';
+
+  @override
+  String get settingsTopicDataSourcesTitle => 'Izvori podataka i lokacija';
+
+  @override
+  String get settingsTopicDataSourcesSubtitle =>
+      'API ključevi, GPS položaj, automatska promjena profila';
+
+  @override
+  String get settingsTopicDataSourcesKeywords =>
+      'api, ključ, gps, lokacija, položaj, izvor podataka, tankerkoenig, opencharge, key, location, data source';
+
+  @override
+  String get settingsTopicSyncTitle => 'Sinkronizacija i račun';
+
+  @override
+  String get settingsTopicSyncKeywords =>
+      'tanksync, oblak, račun, e-pošta, poveži uređaj, sinkronizacija, dijeli bazu, anoniman, cloud, account, email, link device, sync, share database, anonymous';
+
+  @override
+  String get settingsTopicPrivacySubtitle =>
+      'Privole, nadzorna ploča privatnosti, pohrana i predmemorija';
+
+  @override
+  String get settingsTopicPrivacyKeywords =>
+      'privatnost, privola, gdpr, izbriši, obriši, pohrana, predmemorija, podaci, izvještavanje o pogreškama, vin, privacy, consent, delete, erase, storage, cache, data, error reporting';
+
+  @override
+  String get settingsTopicBackupTitle => 'Sigurnosna kopija i vraćanje';
+
+  @override
+  String get settingsTopicBackupSubtitle =>
+      'Izvezite ili vratite potpunu sigurnosnu kopiju svojih podataka';
+
+  @override
+  String get settingsTopicBackupKeywords =>
+      'sigurnosna kopija, izvoz, vraćanje, uvoz, zip, xml, prijenos, backup, export, restore, import, transfer';
+
+  @override
+  String get settingsTopicAdvancedSubtitle => 'GitHub token, razvojni alati';
+
+  @override
+  String get settingsTopicAdvancedKeywords =>
+      'razvojni programer, otklanjanje pogrešaka, token, pat, github, dijagnostika, zapisnik pogrešaka, trag, developer, debug, diagnostics, error log, trace';
+
+  @override
+  String get settingsTopicAboutSubtitle => 'Verzija, licence, poveznice';
+
+  @override
+  String get settingsTopicAboutKeywords =>
+      'o aplikaciji, verzija, licenca, doniraj, github, navođenje autora, about, version, license, donate, attribution';
+
+  @override
+  String get settingsConsumptionOffHint =>
+      'Uključite praćenje potrošnje u odjeljku Značajke i način korištenja da biste postavili vozila, coaching i nagrade.';
+
+  @override
+  String get settingsOpenFeaturesLink => 'Otvori Značajke i način korištenja';
+
+  @override
+  String get settingsRadarTileSubtitle =>
+      'Radijus, način cijena, ispitivanje i prikvačivanje zaslona za aktivni profil';
+
+  @override
+  String get settingsRadarNoProfileHint =>
+      'Najprije izradite profil — postavke radara spremaju se po profilu.';
+
+  @override
+  String get settingsRadarPinHeader => 'Prikvačivanje zaslona';
+
+  @override
+  String get settingsAlertsTileSubtitle =>
+      'Upozorenja za postaje i radijus koja vas obavještavaju o padu cijena';
+
+  @override
+  String get settingsPriceFeaturesHeader => 'Značajke cijena';
+
+  @override
+  String get settingsVoiceAnnouncementsOffHint =>
+      'Glasovne najave su isključene. Uključite Glasovne povratne informacije i Glasovne najave u odjeljku Značajke i način korištenja da biste tijekom vožnje čuli za jeftino gorivo u blizini.';
+
+  @override
+  String get settingsDistanceUnitTitle => 'Jedinica udaljenosti';
+
+  @override
+  String get settingsDistanceUnitSubtitle => 'Iz države aktivnog profila';
+
+  @override
+  String get settingsObd2AdapterTitle => 'OBD2 adapter';
+
+  @override
+  String get settingsObd2AdapterSubtitle =>
+      'Adapteri se uparuju po vozilu — otvorite vozilo da biste uparili ili promijenili njegov adapter';
+
+  @override
+  String get settingsStorageDeleteHint =>
+      'Brisanje svih lokalnih podataka obavlja se s nadzorne ploče privatnosti.';
+
+  @override
+  String get settingsPrivacyCrossLinkTitle => 'Privole';
+
+  @override
+  String get settingsPrivacyCrossLinkSubtitle =>
+      'Privole za Cloud Sync i sinkronizaciju putovanja nalaze se pod Privatnost i podaci';
+
+  @override
+  String get settingsBackupExportSubtitle =>
+      'Vozila, točenja, putovanja i zapisnici punjenja kao ZIP datoteka';
+
+  @override
+  String get settingsBackupRestoreSubtitle =>
+      'Spojite ili zamijenite podatke iz prethodne sigurnosne kopije ZIP';
+
+  @override
+  String get settingsStationTypesLink =>
+      'Vrste postaja postavljaju se u odjeljku Značajke i način korištenja';
+
+  @override
+  String get routeSearchCriterionLabel => 'Izbor postaje po dionici rute';
+
+  @override
+  String get routeSearchCriterionCheapest => 'Najjeftinija';
+
+  @override
+  String get routeSearchCriterionNearest => 'Najbliža ruti';
+
+  @override
+  String get routeSearchTopNLabel => 'Kandidata po točki uzorkovanja';
+
+  @override
+  String routeSearchTopNCaption(int count) {
+    return 'Na svakoj točki duž rute razmatra se do $count postaja.';
+  }
+
+  @override
+  String get hybridFuelChoiceLabel => 'Gorivo za pretragu cijena (hibrid)';
+
+  @override
+  String get hybridFuelChoiceVehicleDefault => 'Zadano za vozilo';
+
+  @override
+  String get scopeThisProfile => 'Ovaj profil';
+
+  @override
+  String get scopeAllProfiles => 'Svi profili';
+
+  @override
+  String get scopeThisVehicle => 'Ovo vozilo';
+
+  @override
+  String get featureLabel_manualConsumption => 'Ručno bilježenje potrošnje';
+
+  @override
+  String get featureDescription_manualConsumption =>
+      'Ručno bilježite točenja goriva i punjenja (OBD2 adapter nije potreban).';
+
+  @override
+  String get featureLabel_loyaltyCards => 'Kartice vjernosti';
+
+  @override
+  String get featureDescription_loyaltyCards =>
+      'Kartice klubova goriva / vjernosti s popustom po litri u usporedbama cijena.';
+
+  @override
+  String get featureLabel_startupTrace => 'Trag inicijalizacije pri pokretanju';
+
+  @override
+  String get featureDescription_startupTrace =>
+      'Bilježi vremenski mjerene faze pokretanja aplikacije, prikazuje ih kao vodopad i izvozi — dijagnostika za razvojne programere.';
+
+  @override
+  String get locationGpsAutoHint =>
+      'GPS položaj dohvaća se automatski pri pretraživanju. Ovdje ga možete ažurirati i ručno.';
+
+  @override
+  String get locationClearGpsBody =>
+      'Obrisati spremljeni GPS položaj? Možete ga ponovno ažurirati u bilo kojem trenutku.';
+
+  @override
   String get shareReceiptUnsupportedFormat =>
       'Ovaj format datoteke još se ne može uvesti — umjesto toga podijelite fotografiju računa.';
 
@@ -8103,8 +8353,8 @@ class AppLocalizationsHr extends AppLocalizations {
       'Na Androidu, dugo pritisnite widget i odaberite Rekonfiguriraj za promjenu profila, boje i sadržaja.';
 
   @override
-  String get widgetDefaultsApplyToAllHint =>
-      'Izbori ispod primjenjuju se na svaki instalirani widget pri sljedećem osvježavanju.';
+  String get widgetDefaultsThisProfileHint =>
+      'Odabiri u nastavku vrijede za svaki instalirani widget koji prikazuje ovaj profil, pri sljedećem osvježavanju.';
 
   @override
   String get widgetDefaultsColorLabel => 'Shema boja';

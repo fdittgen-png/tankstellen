@@ -7,8 +7,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
-import '../../../../core/utils/price_formatter.dart';
-import '../../../../core/widgets/labeled_value_slider.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/settings_menu_tile.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -20,16 +18,14 @@ import '../../../feature_management/domain/feature_dependency_graph.dart';
 import '../../../glide_coach/providers/glide_coach_enabled_provider.dart';
 import '../../../glide_coach/providers/glide_coach_settings_provider.dart';
 import '../../../profile/presentation/widgets/gamification_settings_tile.dart';
-import '../../../profile/providers/voice_announcements_enabled_provider.dart';
 import '../../providers/haptic_eco_coach_provider.dart';
-import '../../providers/voice_announcement_settings_provider.dart';
 import '../../providers/voice_coaching_enabled_provider.dart';
-import '../../../../core/utils/unit_formatter.dart';
 
 /// Consumption / driving settings group on the profile screen.
 ///
-/// Surfaced inside the Settings → Conso foldable, this widget is the
-/// single child responsible for rendering every Conso-related
+/// Hosted expanded on Settings → Driving & consumption (#3884; formerly
+/// the Settings → Conso foldable), this widget is the single child
+/// responsible for rendering every Conso-related
 /// parameter. After #2566 it groups parameters by *purpose* — each group
 /// gathers controls that serve the same job, so the user can tell at a
 /// glance what each setting affects:
@@ -127,13 +123,10 @@ class DrivingSettingsSection extends ConsumerWidget {
         // overlay. Always visible so the user can mute it.
         const _VoiceCoachingToggleTile(),
         if (ref.watch(glideCoachEnabledProvider)) const _GlideCoachToggleTile(),
-        // #2569 — spoken nearby-cheap-fuel announcements. Visible only
-        // when the `Feature.voiceAnnouncements` flag is effectively on
-        // (it requires the approach overlay, so the gate is false unless
-        // both are enabled). Fits the coaching theme: it is hands-free
-        // driving guidance, like the haptic coaches above.
-        if (ref.watch(voiceAnnouncementsEnabledProvider))
-          const _VoiceAnnouncementsTile(),
+        // #2569 — the spoken nearby-cheap-fuel announcements (and their
+        // three sliders) moved to Settings → Prices & alerts (#3884):
+        // `VoiceAnnouncementsSettingsTile`. They are price guidance, not
+        // driving coaching, and sat four levels deep here.
 
         // 3. Rewards & savings — the fuel-club entry-point (when
         //    [Feature.loyaltyCards] is on) and the gamification opt-out.
@@ -224,98 +217,6 @@ class _VoiceCoachingToggleTile extends ConsumerWidget {
       onChanged: (v) =>
           ref.read(voiceCoachingEnabledProvider.notifier).setEnabled(v),
       contentPadding: EdgeInsets.zero,
-    );
-  }
-}
-
-/// Voice-announcement settings surface (#2569).
-///
-/// Rendered only when the `Feature.voiceAnnouncements` flag is
-/// effectively enabled (the call site gates visibility via
-/// `if (ref.watch(voiceAnnouncementsEnabledProvider))`). Exposes the
-/// enable toggle plus the three tunables the dormant
-/// `AnnouncementEngine` already reads — cheap-fuel price threshold,
-/// proximity radius, and repeat cooldown — persisted by
-/// [VoiceAnnouncementSettings]. The sliders are shown only while the
-/// toggle is on, so the off-state stays a single compact row.
-class _VoiceAnnouncementsTile extends ConsumerWidget {
-  const _VoiceAnnouncementsTile();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final l = AppLocalizations.of(context);
-    final config = ref.watch(voiceAnnouncementSettingsProvider);
-    final notifier = ref.read(voiceAnnouncementSettingsProvider.notifier);
-
-    final double radiusKm = config.proximityRadiusKm.clamp(0.5, 5.0);
-    final int cooldownMin = config.cooldown.inMinutes.clamp(5, 60);
-    final double thresholdEur = (config.priceThreshold ?? 2.0).clamp(1.0, 2.5);
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SwitchListTile(
-          key: const Key('voiceAnnouncementsToggle'),
-          value: config.enabled,
-          title: Text(l.voiceAnnouncementsTitle),
-          subtitle: Text(
-            l.voiceAnnouncementsDescription,
-            style: theme.textTheme.bodySmall,
-          ),
-          onChanged: (v) => notifier.setEnabled(v),
-          contentPadding: EdgeInsets.zero,
-        ),
-        if (config.enabled) ...[
-          // Proximity radius — 0.5 … 5 km in 0.5 km steps. The current
-          // value is shown as a persistent trailing readout (#2920) — a
-          // bare `Slider.label` is only visible while dragging.
-          LabeledValueSlider(
-            sliderKey: const Key('voiceAnnouncementRadiusSlider'),
-            label: l.voiceAnnouncementProximityRadius,
-            // i18n-ignore: " km" is a language-neutral unit suffix (matches
-            // ProfileRadiusSlider + the {km} ARB masks).
-            valueLabel: UnitFormatter.formatDistance(radiusKm),
-            labelStyle: theme.textTheme.bodyMedium,
-            value: radiusKm,
-            min: 0.5,
-            max: 5.0,
-            divisions: 9,
-            onChanged: (v) => notifier.setProximityRadiusKm(v),
-          ),
-          // Repeat cooldown — 5 … 60 minutes in 5-minute steps.
-          LabeledValueSlider(
-            sliderKey: const Key('voiceAnnouncementCooldownSlider'),
-            label: l.voiceAnnouncementCooldown,
-            // i18n-ignore: " min" is a language-neutral unit abbreviation.
-            valueLabel: '$cooldownMin min',
-            labelStyle: theme.textTheme.bodyMedium,
-            value: cooldownMin.toDouble(),
-            min: 5,
-            max: 60,
-            divisions: 11,
-            onChanged: (v) =>
-                notifier.setCooldown(Duration(minutes: v.round())),
-          ),
-          // Cheap-fuel price ceiling — only stations at or below this
-          // per-litre figure are announced. Its own distinct label
-          // ("Maximum price") fixes the #2920 fallback that duplicated the
-          // section subtitle; the value shows in the active currency.
-          LabeledValueSlider(
-            key: const Key('voiceAnnouncementThresholdTile'),
-            sliderKey: const Key('voiceAnnouncementThresholdSlider'),
-            label: l.voiceAnnouncementPriceLimit,
-            valueLabel: PriceFormatter.formatPrice(thresholdEur),
-            labelStyle: theme.textTheme.bodyMedium,
-            value: thresholdEur,
-            min: 1.0,
-            max: 2.5,
-            divisions: 30,
-            onChanged: (v) => notifier.setPriceThreshold(v),
-          ),
-        ],
-      ],
     );
   }
 }

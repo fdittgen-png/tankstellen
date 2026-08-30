@@ -86,8 +86,6 @@
   "clearCacheTitle": "Vymazat mezipaměť?",
   "clearCacheBody": "Uložené výsledky hledání a ceny budou smazány. Profily, oblíbené a nastavení zůstanou zachovány.",
   "clearCacheButton": "Vymazat mezipaměť",
-  "deleteAllTitle": "Smazat všechna data?",
-  "deleteAllBody": "Tím trvale smažete všechny profily, oblíbené, klíč API, nastavení a mezipaměť. Aplikace bude resetována.",
   "deleteAllButton": "Smazat vše",
   "entries": "záznamů",
   "cacheEmpty": "Mezipaměť je prázdná",
@@ -258,10 +256,6 @@
   "showCheapestEveryNKm": "Zobrazit nejlevnější stanici každých {km} km podél trasy",
   "avoidHighways": "Vyhnout se dálnicím",
   "avoidHighwaysDesc": "Výpočet trasy se vyhýbá placeným silnicím a dálnicím",
-  "showFuelStations": "Zobrazit čerpací stanice",
-  "showFuelStationsDesc": "Zahrnout benzínové, naftové, LPG, CNG stanice",
-  "showEvStations": "Zobrazit nabíjecí stanice",
-  "showEvStationsDesc": "Zahrnout elektrické nabíjecí stanice ve výsledcích",
   "noStationsAlongThisRoute": "Podél této trasy nebyly nalezeny žádné stanice.",
   "fuelCostCalculator": "Kalkulačka nákladů na palivo",
   "distanceKm": "Vzdálenost (km)",
@@ -567,7 +561,6 @@
   "tripResume": "Pokračovat",
   "tripBannerRecording": "Nahrávání cesty",
   "tripBannerPaused": "Cesta pozastavena — klepnutím pokračujte",
-  "navConsumption": "Spotřeba",
   "vehicleBaselineSectionTitle": "Základní kalibrace",
   "vehicleBaselineEmpty": "Zatím žádné vzorky — začněte cestu s OBD2 pro učení profilu spotřeby vozidla.",
   "vehicleBaselineProgress": "Naučeno ze vzorků v různých jízdních situacích.",
@@ -1428,7 +1421,6 @@
   "widgetHelpAdd": "Přidejte ho z výběru widgetů ve spouštěči — podržte prázdnou oblast domovské obrazovky, vyberte Widgety a najděte SparKilo.",
   "widgetHelpTap": "Klepnutím na stanici ve widgetu ji otevřete v aplikaci. Klepnutím na ikonu obnovení aktualizujete ceny.",
   "widgetHelpConfigure": "Na Androidu podržte widget a vyberte Překonfigurovat pro změnu profilu, barvy a obsahu.",
-  "widgetDefaultsApplyToAllHint": "Volby níže se použijí na všechny instalované widgety při příští aktualizaci.",
   "widgetDefaultsColorLabel": "Barevné schéma",
   "widgetDefaultsVariantLabel": "Varianta obsahu",
   "widgetColorSchemeSystem": "Systémové",
@@ -2447,22 +2439,6 @@
   },
   "tripRecordingDiscardedNoMovement": "Záznam zrušen — žádný pohyb nezjištěn",
   "@tripRecordingDiscardedNoMovement": {
-    "description": "MT — needs native review"
-  },
-  "sectionSetupDataSources": "Nastavení a zdroje dat",
-  "@sectionSetupDataSources": {
-    "description": "MT — needs native review"
-  },
-  "sectionFeaturesUsage": "Funkce a použití",
-  "@sectionFeaturesUsage": {
-    "description": "MT — needs native review"
-  },
-  "sectionAccountSync": "Účet a synchronizace",
-  "@sectionAccountSync": {
-    "description": "MT — needs native review"
-  },
-  "sectionAppearanceWidgets": "Vzhled a widgety",
-  "@sectionAppearanceWidgets": {
     "description": "MT — needs native review"
   },
   "sectionPrivacyData": "Soukromí a data",
@@ -4832,5 +4808,126 @@
         "type": "String"
       }
     }
-  }
+  },
+  "liveConsumptionWindowLabel": "Posledních {seconds} s",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Jednotka spotřeby",
+  "consumptionUnitSettingSubtitle": "Jak se spotřeba paliva zobrazuje v celé aplikaci",
+  "consumptionUnitAuto": "Automaticky ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Okno živé spotřeby",
+  "consumptionWindowSettingSubtitle": "Průměruje živou hodnotu za posledních několik sekund – delší je klidnější, kratší reaguje rychleji",
+  "consumptionWindowOption": "{seconds} s",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "tripRecordingPipEstConsumptionCaptionUnit": "odh. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsSearchHint": "Hledat v nastavení",
+  "settingsSearchNoResults": "Žádné nastavení neodpovídá „{query}“",
+  "@settingsSearchNoResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTopicProfilesTitle": "Profily a region",
+  "settingsTopicProfilesSubtitle": "Země, jazyk, palivo, okruh hledání, plánování trasy",
+  "settingsTopicProfilesKeywords": "profil, země, jazyk, palivo, okruh, psč, trasa, domov, hodnocení, úvodní obrazovka, profile, country, language, fuel, radius, route, home, rating",
+  "settingsTopicVehiclesTitle": "Vozidla a OBD2",
+  "settingsTopicVehiclesSubtitle": "Vaše auta, objem nádrže, párování adaptéru OBD2",
+  "settingsTopicVehiclesKeywords": "vozidlo, auto, obd, obd2, adaptér, bluetooth, nádrž, motor, vin, kalibrace, vehicle, car, adapter, tank, engine, calibration",
+  "settingsTopicDrivingTitle": "Jízda a spotřeba",
+  "settingsTopicDrivingSubtitle": "Koučování, odměny, radar čerpacích stanic, řešení potíží",
+  "settingsTopicDrivingKeywords": "kouč, eko, haptický, hlas, gamifikace, radar, dojezd, jízda, spotřeba, palivový klub, věrnost, log obd2, připnout, coach, eco, haptic, voice, gamification, glide, trip, consumption, loyalty, pin",
+  "settingsTopicPricesTitle": "Ceny a upozornění",
+  "settingsTopicPricesSubtitle": "Cenová upozornění, hlasová oznámení, historie cen, hlášení komunity",
+  "settingsTopicPricesKeywords": "upozornění, oznámení, cena, historie, předpověď, nejlepší čas, komunita, hlášení, qr, platba, hlas, alert, notification, price, history, prediction, community, report, payment, voice, announcement",
+  "settingsTopicUnitsTitle": "Jednotky a zobrazení",
+  "settingsTopicUnitsSubtitle": "Motiv, jednotka vzdálenosti, widget na domovské obrazovce",
+  "settingsTopicUnitsKeywords": "motiv, tmavý, světlý, eko, jednotka, km, míle, widget, barva, zobrazení, vzhled, theme, dark, light, eco, unit, miles, colour, display, appearance",
+  "settingsTopicFeaturesTitle": "Funkce a režim použití",
+  "settingsTopicFeaturesSubtitle": "Předvolby režimu použití a všechny přepínače funkcí",
+  "settingsTopicFeaturesKeywords": "funkce, režim, základní, střední, plný, vlastní, přepínač, typy stanic, čerpací stanice, nabíječky, nabíjení, feature, mode, basic, medium, full, custom, switch, toggle, charging",
+  "settingsTopicDataSourcesTitle": "Zdroje dat a poloha",
+  "settingsTopicDataSourcesSubtitle": "Klíče API, poloha GPS, automatické přepínání profilu",
+  "settingsTopicDataSourcesKeywords": "api, klíč, gps, poloha, pozice, zdroj dat, tankerkoenig, opencharge, key, location, data source",
+  "settingsTopicSyncTitle": "Synchronizace a účet",
+  "settingsTopicSyncKeywords": "tanksync, cloud, účet, e-mail, propojit zařízení, synchronizace, sdílet databázi, anonymní, account, email, link device, sync, share database, anonymous",
+  "settingsTopicPrivacySubtitle": "Souhlasy, panel soukromí, úložiště a mezipaměť",
+  "settingsTopicPrivacyKeywords": "soukromí, souhlas, gdpr, smazat, vymazat, úložiště, mezipaměť, data, hlášení chyb, vin, privacy, consent, delete, erase, storage, cache, error reporting",
+  "settingsTopicBackupTitle": "Záloha a obnovení",
+  "settingsTopicBackupSubtitle": "Exportujte nebo obnovte úplnou zálohu svých dat",
+  "settingsTopicBackupKeywords": "záloha, export, obnovit, import, zip, xml, přenos, backup, restore, transfer",
+  "settingsTopicAdvancedSubtitle": "Token GitHub, vývojářské nástroje",
+  "settingsTopicAdvancedKeywords": "vývojář, ladění, token, pat, github, diagnostika, protokol chyb, trasování, developer, debug, diagnostics, error log, trace",
+  "settingsTopicAboutSubtitle": "Verze, licence, odkazy",
+  "settingsTopicAboutKeywords": "o aplikaci, verze, licence, přispět, github, autorství, about, version, license, donate, attribution",
+  "settingsConsumptionOffHint": "Zapněte sledování spotřeby v části Funkce a režim použití, abyste mohli nastavit vozidla, koučování a odměny.",
+  "settingsOpenFeaturesLink": "Otevřít Funkce a režim použití",
+  "settingsRadarTileSubtitle": "Okruh, cenový režim, dotazování a připnutí obrazovky pro aktivní profil",
+  "settingsRadarNoProfileHint": "Nejprve vytvořte profil – nastavení radaru se ukládá pro každý profil zvlášť.",
+  "settingsRadarPinHeader": "Připnutí obrazovky",
+  "settingsAlertsTileSubtitle": "Upozornění na stanice a okruh, která vás informují o poklesu cen",
+  "settingsPriceFeaturesHeader": "Cenové funkce",
+  "settingsVoiceAnnouncementsOffHint": "Hlasová oznámení jsou vypnutá. Zapněte Hlasovou zpětnou vazbu a Hlasová oznámení v části Funkce a režim použití, abyste během jízdy slyšeli o levném palivu v okolí.",
+  "settingsDistanceUnitTitle": "Jednotka vzdálenosti",
+  "settingsDistanceUnitSubtitle": "Podle země aktivního profilu",
+  "settingsObd2AdapterTitle": "Adaptér OBD2",
+  "settingsObd2AdapterSubtitle": "Adaptéry se párují pro každé vozidlo – otevřete vozidlo, chcete-li spárovat nebo změnit jeho adaptér",
+  "settingsStorageDeleteHint": "Smazání všech místních dat se provádí z panelu soukromí.",
+  "settingsPrivacyCrossLinkTitle": "Souhlasy",
+  "settingsPrivacyCrossLinkSubtitle": "Souhlasy pro Cloud Sync a synchronizaci jízd najdete v části Soukromí a data",
+  "settingsBackupExportSubtitle": "Vozidla, tankování, jízdy a záznamy nabíjení jako soubor ZIP",
+  "settingsBackupRestoreSubtitle": "Sloučit nebo nahradit data z dřívější zálohy ZIP",
+  "settingsStationTypesLink": "Typy stanic se nastavují v části Funkce a režim použití",
+  "routeSearchCriterionLabel": "Výběr stanice pro úsek trasy",
+  "routeSearchCriterionCheapest": "Nejlevnější",
+  "routeSearchCriterionNearest": "Nejblíže trase",
+  "routeSearchTopNLabel": "Kandidátů na bod vzorkování",
+  "routeSearchTopNCaption": "V každém bodě podél trasy se zvažuje až {count} stanic.",
+  "@routeSearchTopNCaption": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hybridFuelChoiceLabel": "Palivo pro hledání cen (hybrid)",
+  "hybridFuelChoiceVehicleDefault": "Výchozí pro vozidlo",
+  "scopeThisProfile": "Tento profil",
+  "scopeAllProfiles": "Všechny profily",
+  "scopeThisVehicle": "Toto vozidlo",
+  "featureLabel_manualConsumption": "Ruční záznam spotřeby",
+  "featureDescription_manualConsumption": "Zaznamenávejte tankování a nabíjení ručně (adaptér OBD2 není potřeba).",
+  "featureLabel_loyaltyCards": "Věrnostní karty",
+  "featureDescription_loyaltyCards": "Karty palivových klubů / věrnostní karty se slevou na litr v porovnání cen.",
+  "featureLabel_startupTrace": "Trasování inicializace při spuštění",
+  "featureDescription_startupTrace": "Zaznamenává časované fáze spuštění aplikace, zobrazuje je jako vodopád a exportuje – diagnostika pro vývojáře.",
+  "locationGpsAutoHint": "Poloha GPS se získává automaticky při hledání. Zde ji můžete také aktualizovat ručně.",
+  "locationClearGpsBody": "Vymazat uloženou polohu GPS? Kdykoli ji můžete znovu aktualizovat.",
+  "widgetDefaultsThisProfileHint": "Níže uvedené volby platí pro všechny nainstalované widgety zobrazující tento profil, při příští aktualizaci."
 }

@@ -295,13 +295,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get clearCacheButton => 'Cache wissen';
 
   @override
-  String get deleteAllTitle => 'Alle gegevens verwijderen?';
-
-  @override
-  String get deleteAllBody =>
-      'Dit verwijdert permanent alle profielen, favorieten, API-sleutel, instellingen en cache. De app wordt gereset.';
-
-  @override
   String get deleteAllButton => 'Alles verwijderen';
 
   @override
@@ -849,20 +842,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get avoidHighwaysDesc =>
       'Routeberekening vermijdt tolwegen en snelwegen';
-
-  @override
-  String get showFuelStations => 'Tankstations tonen';
-
-  @override
-  String get showFuelStationsDesc =>
-      'Inclusief benzine-, diesel-, LPG-, CNG-stations';
-
-  @override
-  String get showEvStations => 'Laadstations tonen';
-
-  @override
-  String get showEvStationsDesc =>
-      'Elektrische laadstations opnemen in zoekresultaten';
 
   @override
   String get noStationsAlongThisRoute =>
@@ -1856,9 +1835,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get tripBannerPaused => 'Rit gepauzeerd — tik om te hervatten';
 
   @override
-  String get navConsumption => 'Verbruik';
-
-  @override
   String get vehicleBaselineSectionTitle => 'Basiskalibratie';
 
   @override
@@ -2242,18 +2218,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get sectionLocation => 'Locatie';
-
-  @override
-  String get sectionSetupDataSources => 'Instellingen & gegevensbronnen';
-
-  @override
-  String get sectionFeaturesUsage => 'Functies & gebruik';
-
-  @override
-  String get sectionAccountSync => 'Account & synchronisatie';
-
-  @override
-  String get sectionAppearanceWidgets => 'Weergave & widgets';
 
   @override
   String get sectionPrivacyData => 'Privacy & gegevens';
@@ -5958,6 +5922,40 @@ class AppLocalizationsNl extends AppLocalizations {
       'Rem voor de bocht, niet erin — hard door een bocht rijden kost snelheid die je daarna opnieuw moet opbouwen.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Laatste $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Verbruikseenheid';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Hoe het brandstofverbruik overal in de app wordt getoond';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automatisch ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Venster voor live verbruik';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Middelt de live waarde over de laatste seconden — langer is rustiger, korter reageert sneller';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'gesch. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Locatietoegang';
 
   @override
@@ -7097,6 +7095,261 @@ class AppLocalizationsNl extends AppLocalizations {
   String get refuelUnitPerSession => '/sessie';
 
   @override
+  String get settingsSearchHint => 'Instellingen doorzoeken';
+
+  @override
+  String settingsSearchNoResults(String query) {
+    return 'Geen instellingen gevonden voor \"$query\"';
+  }
+
+  @override
+  String get settingsTopicProfilesTitle => 'Profielen & regio';
+
+  @override
+  String get settingsTopicProfilesSubtitle =>
+      'Land, taal, brandstof, zoekstraal, routeplanning';
+
+  @override
+  String get settingsTopicProfilesKeywords =>
+      'profiel, land, taal, brandstof, straal, postcode, route, thuis, beoordeling, startscherm, profile, country, language, fuel, radius, home, rating';
+
+  @override
+  String get settingsTopicVehiclesTitle => 'Voertuigen & OBD2';
+
+  @override
+  String get settingsTopicVehiclesSubtitle =>
+      'Je auto\'s, tankinhoud, OBD2-adapter koppelen';
+
+  @override
+  String get settingsTopicVehiclesKeywords =>
+      'voertuig, auto, obd, obd2, adapter, bluetooth, tank, motor, vin, kalibratie, vehicle, car, engine, calibration';
+
+  @override
+  String get settingsTopicDrivingTitle => 'Rijden & verbruik';
+
+  @override
+  String get settingsTopicDrivingSubtitle =>
+      'Coaching, beloningen, tankstation-radar, probleemoplossing';
+
+  @override
+  String get settingsTopicDrivingKeywords =>
+      'coach, eco, haptisch, spraak, gamification, radar, uitrollen, rit, verbruik, tankclub, klantenkaart, obd2-log, vastzetten, haptic, voice, glide, trip, consumption, loyalty, pin';
+
+  @override
+  String get settingsTopicPricesTitle => 'Prijzen & meldingen';
+
+  @override
+  String get settingsTopicPricesSubtitle =>
+      'Prijsmeldingen, spraakaankondigingen, prijshistorie, community-meldingen';
+
+  @override
+  String get settingsTopicPricesKeywords =>
+      'melding, notificatie, prijs, historie, voorspelling, beste moment, community, rapport, qr, betaling, spraak, aankondiging, alert, notification, price, history, prediction, report, payment, voice, announcement';
+
+  @override
+  String get settingsTopicUnitsTitle => 'Eenheden & weergave';
+
+  @override
+  String get settingsTopicUnitsSubtitle =>
+      'Thema, afstandseenheid, widget op het startscherm';
+
+  @override
+  String get settingsTopicUnitsKeywords =>
+      'thema, donker, licht, eco, eenheid, km, mijl, widget, kleur, weergave, uiterlijk, theme, dark, light, unit, miles, colour, display';
+
+  @override
+  String get settingsTopicFeaturesTitle => 'Functies & gebruiksmodus';
+
+  @override
+  String get settingsTopicFeaturesSubtitle =>
+      'Voorinstellingen voor de gebruiksmodus en elke functieschakelaar';
+
+  @override
+  String get settingsTopicFeaturesKeywords =>
+      'functie, modus, basis, gemiddeld, volledig, aangepast, schakelaar, stationstypen, tankstations, laadpalen, laden, feature, mode, basic, medium, full, custom, switch, toggle, charging';
+
+  @override
+  String get settingsTopicDataSourcesTitle => 'Gegevensbronnen & locatie';
+
+  @override
+  String get settingsTopicDataSourcesSubtitle =>
+      'API-sleutels, GPS-positie, automatisch profiel wisselen';
+
+  @override
+  String get settingsTopicDataSourcesKeywords =>
+      'api, sleutel, gps, locatie, positie, gegevensbron, tankerkoenig, opencharge, key, location, data source';
+
+  @override
+  String get settingsTopicSyncTitle => 'Synchronisatie & account';
+
+  @override
+  String get settingsTopicSyncKeywords =>
+      'tanksync, cloud, account, e-mail, apparaat koppelen, synchronisatie, database delen, anoniem, email, link device, sync, share database, anonymous';
+
+  @override
+  String get settingsTopicPrivacySubtitle =>
+      'Toestemmingen, privacydashboard, opslag & cache';
+
+  @override
+  String get settingsTopicPrivacyKeywords =>
+      'privacy, toestemming, avg, verwijderen, wissen, opslag, cache, gegevens, foutrapportage, vin, consent, gdpr, delete, erase, storage, data, error reporting';
+
+  @override
+  String get settingsTopicBackupTitle => 'Back-up & herstel';
+
+  @override
+  String get settingsTopicBackupSubtitle =>
+      'Een volledige back-up van je gegevens exporteren of herstellen';
+
+  @override
+  String get settingsTopicBackupKeywords =>
+      'back-up, exporteren, herstellen, importeren, zip, xml, overzetten, backup, export, restore, import, transfer';
+
+  @override
+  String get settingsTopicAdvancedSubtitle =>
+      'GitHub-token, ontwikkelaarstools';
+
+  @override
+  String get settingsTopicAdvancedKeywords =>
+      'ontwikkelaar, debug, token, pat, github, diagnose, foutenlog, trace, developer, diagnostics, error log';
+
+  @override
+  String get settingsTopicAboutSubtitle => 'Versie, licenties, links';
+
+  @override
+  String get settingsTopicAboutKeywords =>
+      'over, versie, licentie, doneren, github, naamsvermelding, about, version, license, donate, attribution';
+
+  @override
+  String get settingsConsumptionOffHint =>
+      'Zet verbruiksregistratie aan in Functies & gebruiksmodus om voertuigen, coaching en beloningen in te stellen.';
+
+  @override
+  String get settingsOpenFeaturesLink => 'Functies & gebruiksmodus openen';
+
+  @override
+  String get settingsRadarTileSubtitle =>
+      'Straal, prijsmodus, polling en scherm vastzetten voor het actieve profiel';
+
+  @override
+  String get settingsRadarNoProfileHint =>
+      'Maak eerst een profiel aan — de radarinstellingen worden per profiel opgeslagen.';
+
+  @override
+  String get settingsRadarPinHeader => 'Scherm vastzetten';
+
+  @override
+  String get settingsAlertsTileSubtitle =>
+      'Station- en straalmeldingen die je waarschuwen bij prijsdalingen';
+
+  @override
+  String get settingsPriceFeaturesHeader => 'Prijsfuncties';
+
+  @override
+  String get settingsVoiceAnnouncementsOffHint =>
+      'Spraakaankondigingen staan uit. Zet Spraakfeedback en Spraakaankondigingen aan in Functies & gebruiksmodus om goedkope brandstof in de buurt te horen tijdens het rijden.';
+
+  @override
+  String get settingsDistanceUnitTitle => 'Afstandseenheid';
+
+  @override
+  String get settingsDistanceUnitSubtitle =>
+      'Van het land van het actieve profiel';
+
+  @override
+  String get settingsObd2AdapterTitle => 'OBD2-adapter';
+
+  @override
+  String get settingsObd2AdapterSubtitle =>
+      'Adapters worden per voertuig gekoppeld — open een voertuig om zijn adapter te koppelen of te wijzigen';
+
+  @override
+  String get settingsStorageDeleteHint =>
+      'Alle lokale gegevens verwijder je via het privacydashboard.';
+
+  @override
+  String get settingsPrivacyCrossLinkTitle => 'Toestemmingen';
+
+  @override
+  String get settingsPrivacyCrossLinkSubtitle =>
+      'De toestemmingen voor Cloud Sync en ritsynchronisatie staan onder Privacy & gegevens';
+
+  @override
+  String get settingsBackupExportSubtitle =>
+      'Voertuigen, tankbeurten, ritten en laadlogs als ZIP-bestand';
+
+  @override
+  String get settingsBackupRestoreSubtitle =>
+      'Je gegevens samenvoegen of vervangen vanuit een eerdere back-up-ZIP';
+
+  @override
+  String get settingsStationTypesLink =>
+      'Stationstypen stel je in onder Functies & gebruiksmodus';
+
+  @override
+  String get routeSearchCriterionLabel => 'Stationskeuze per routesegment';
+
+  @override
+  String get routeSearchCriterionCheapest => 'Goedkoopste';
+
+  @override
+  String get routeSearchCriterionNearest => 'Dichtst bij de route';
+
+  @override
+  String get routeSearchTopNLabel => 'Kandidaten per meetpunt';
+
+  @override
+  String routeSearchTopNCaption(int count) {
+    return 'Op elk punt langs de route worden maximaal $count stations overwogen.';
+  }
+
+  @override
+  String get hybridFuelChoiceLabel =>
+      'Brandstof voor de prijszoektocht (hybride)';
+
+  @override
+  String get hybridFuelChoiceVehicleDefault => 'Standaard van het voertuig';
+
+  @override
+  String get scopeThisProfile => 'Dit profiel';
+
+  @override
+  String get scopeAllProfiles => 'Alle profielen';
+
+  @override
+  String get scopeThisVehicle => 'Dit voertuig';
+
+  @override
+  String get featureLabel_manualConsumption =>
+      'Handmatige verbruiksregistratie';
+
+  @override
+  String get featureDescription_manualConsumption =>
+      'Tankbeurten en laadsessies handmatig bijhouden (geen OBD2-adapter nodig).';
+
+  @override
+  String get featureLabel_loyaltyCards => 'Klantenkaarten';
+
+  @override
+  String get featureDescription_loyaltyCards =>
+      'Tankclub-/klantenkaarten met korting per liter in prijsvergelijkingen.';
+
+  @override
+  String get featureLabel_startupTrace => 'Opstart-initialisatietrace';
+
+  @override
+  String get featureDescription_startupTrace =>
+      'Legt de getimede fasen van het opstarten van de app vast, toont ze als waterval en exporteert ze — een ontwikkelaarsdiagnose.';
+
+  @override
+  String get locationGpsAutoHint =>
+      'De GPS-positie wordt automatisch bepaald bij het zoeken. Je kunt hem hier ook handmatig bijwerken.';
+
+  @override
+  String get locationClearGpsBody =>
+      'Opgeslagen GPS-positie wissen? Je kunt hem op elk moment opnieuw bijwerken.';
+
+  @override
   String get shareReceiptUnsupportedFormat =>
       'Dit bestandstype kan nog niet worden geïmporteerd — deel in plaats daarvan een foto van de bon.';
 
@@ -8095,8 +8348,8 @@ class AppLocalizationsNl extends AppLocalizations {
       'Op Android: houd de widget ingedrukt en kies Herconfigueren om het profiel, de kleur en de inhoud te wijzigen.';
 
   @override
-  String get widgetDefaultsApplyToAllHint =>
-      'De keuzes hieronder gelden bij de volgende verversing voor elke geïnstalleerde widget.';
+  String get widgetDefaultsThisProfileHint =>
+      'De keuzes hieronder gelden voor elke geïnstalleerde widget die dit profiel toont, bij de volgende vernieuwing.';
 
   @override
   String get widgetDefaultsColorLabel => 'Kleurenschema';

@@ -13,7 +13,6 @@ import 'tank_sync_relink_tile.dart';
 import 'tank_sync_schema_outdated_tile.dart';
 import '../../../../core/error/guarded.dart';
 import '../../../../core/logging/error_logger.dart';
-import '../../../../core/providers/app_state_provider.dart';
 import '../../../../core/sync/sync_config.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
@@ -52,7 +51,6 @@ class TankSyncSection extends ConsumerWidget {
     ThemeData theme,
   ) {
     final l = AppLocalizations.of(context);
-    final consent = ref.watch(gdprConsentProvider);
     return [
       // #3449 — zero-height unless the launch identity guard flagged a
       // stored identity with no session (re-link guidance + start-fresh).
@@ -84,35 +82,22 @@ class TankSyncSection extends ConsumerWidget {
           onTap: () => _confirmSwitchToAnonymous(context, ref),
         ),
       const Divider(indent: 16, endIndent: 16),
-      // #1665/#3448 — trajet sync. Recorded trips upload/pull whenever
-      // Cloud Sync consent AND this toggle are on: an anonymous UUID is a
-      // full identity (its rows are RLS-scoped exactly like an email
-      // account's), so the former email requirement was dropped. The
-      // anonymous hint explains that email is what makes the data
+      // #1665/#3448/#3884 — the trajet-sync consent lives with its four
+      // siblings under Settings → Privacy & data (one home per parameter);
+      // this row is the cross-link. The anonymous hint stays here, next
+      // to the account controls, because email is what makes synced trips
       // reachable from OTHER devices.
-      SwitchListTile(
-        key: const Key('tripsSyncToggle'),
-        secondary: const Icon(Icons.route_outlined),
-        title: Text(l.consentSyncTripsTitle),
+      ListTile(
+        key: const Key('tankSyncPrivacyCrossLink'),
+        leading: const Icon(Icons.privacy_tip_outlined),
+        title: Text(l.settingsPrivacyCrossLinkTitle),
         subtitle: Text(
-          !consent.cloudSync
-              ? (l.consentSyncTripsDisabledHint)
-              : !syncConfig.hasEmail
-              ? (l.consentSyncTripsAnonymousHint)
-              : (l.consentSyncTripsSubtitle),
+          syncConfig.hasEmail
+              ? l.settingsPrivacyCrossLinkSubtitle
+              : l.consentSyncTripsAnonymousHint,
         ),
-        value: consent.syncTrips,
-        onChanged: consent.cloudSync
-            ? (v) => ref
-                  .read(gdprConsentProvider.notifier)
-                  .save(
-                    location: consent.location,
-                    errorReporting: consent.errorReporting,
-                    cloudSync: consent.cloudSync,
-                    vinOnlineDecode: consent.vinOnlineDecode,
-                    syncTrips: v,
-                  )
-            : null,
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () => context.push(RoutePaths.settingsPrivacy),
       ),
       const Divider(indent: 16, endIndent: 16),
       ListTile(

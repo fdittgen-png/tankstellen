@@ -18,33 +18,50 @@ import 'trip_detail_charts.dart';
 /// header is silently skipped rather than rendering an empty card. Extracted
 /// from `trip_detail_body.dart` (#2804) to keep that file under the 400-line
 /// norm.
+///
+/// #3882 — when the stored trip carries its column set ([columnsPresent],
+/// the v2 meta row's `cols`), each gate is an O(1) set lookup on the sample
+/// codec keys instead of ten O(n) scans; legacy / fixture trips without it
+/// keep the scan.
 class TripDetailChartsSection extends StatelessWidget {
-  const TripDetailChartsSection({super.key, required this.samples});
+  const TripDetailChartsSection({
+    super.key,
+    required this.samples,
+    this.columnsPresent,
+  });
 
   final List<TripDetailSample> samples;
+  final Set<String>? columnsPresent;
+
+  bool _has(Set<String> keys, bool Function(TripDetailSample) probe) {
+    final cols = columnsPresent;
+    if (cols != null) return keys.any(cols.contains);
+    return samples.any(probe);
+  }
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
 
-    final hasRpmSamples = samples.any((s) => s.rpm != null);
-    final hasFuelRateSamples = samples.any(
+    final hasRpmSamples = _has(const {'r'}, (s) => s.rpm != null);
+    final hasFuelRateSamples = _has(
+      const {'f', 'fe'},
       (s) => s.fuelRateLPerHour != null || s.estimatedFuelRateLPerHour != null,
     );
-    final hasEngineLoadSamples = samples.any(
-      (s) => s.engineLoadPercent != null,
-    );
-    final hasThrottleSamples = samples.any(
+    final hasEngineLoadSamples =
+        _has(const {'el'}, (s) => s.engineLoadPercent != null);
+    final hasThrottleSamples = _has(
+      const {'pp', 'th'},
       (s) => s.pedalPercent != null || s.throttlePercent != null,
     );
-    final hasCoolantSamples = samples.any((s) => s.coolantTempC != null);
-    final hasAltitudeSamples = samples.any((s) => s.altitudeM != null);
-    final hasLambdaSamples = samples.any((s) => s.lambda != null);
+    final hasCoolantSamples = _has(const {'ct'}, (s) => s.coolantTempC != null);
+    final hasAltitudeSamples = _has(const {'al'}, (s) => s.altitudeM != null);
+    final hasLambdaSamples = _has(const {'lm'}, (s) => s.lambda != null);
     // #3692 — turbo/thermal signals via the lossless origin.
-    final hasBoostSamples = samples.any((s) => s.boostKpa != null);
-    final hasIatSamples = samples.any((s) => s.iatC != null);
+    final hasBoostSamples = _has(const {'bk'}, (s) => s.boostKpa != null);
+    final hasIatSamples = _has(const {'ia'}, (s) => s.iatC != null);
     final hasTimingSamples =
-        samples.any((s) => s.timingAdvanceDeg != null);
+        _has(const {'ta'}, (s) => s.timingAdvanceDeg != null);
 
     return Card(
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 4),

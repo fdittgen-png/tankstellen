@@ -55,6 +55,7 @@ export 'data/protocol/oem_pid_table.dart';
 export 'data/paused_trip_repository.dart';
 export 'domain/trip_distance_source.dart';
 export 'domain/trip_live_reading.dart';
+export 'domain/rolling_consumption_window.dart'; // #3883
 // #3855 — the vehicle power state (engine / ignition on-off) is a NEW
 // cross-feature contract: the trips surfaces key their copy and actions on
 // it (the same sanctioned-growth shape as the #3437 / #3743 seams).

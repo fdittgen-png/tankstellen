@@ -294,13 +294,6 @@ class AppLocalizationsFi extends AppLocalizations {
   String get clearCacheButton => 'Tyhjennä välimuisti';
 
   @override
-  String get deleteAllTitle => 'Poista kaikki tiedot?';
-
-  @override
-  String get deleteAllBody =>
-      'Tämä poistaa pysyvästi kaikki profiilit, suosikit, API-avaimen, asetukset ja välimuistin. Sovellus palautetaan.';
-
-  @override
   String get deleteAllButton => 'Poista kaikki';
 
   @override
@@ -847,20 +840,6 @@ class AppLocalizationsFi extends AppLocalizations {
   @override
   String get avoidHighwaysDesc =>
       'Reitinlaskenta välttää maksullisia teitä ja moottoriteitä';
-
-  @override
-  String get showFuelStations => 'Näytä huoltoasemat';
-
-  @override
-  String get showFuelStationsDesc =>
-      'Sisällytä bensiini-, diesel-, LPG-, CNG-asemat';
-
-  @override
-  String get showEvStations => 'Näytä latausasemat';
-
-  @override
-  String get showEvStationsDesc =>
-      'Sisällytä sähköauton latausasemat hakutuloksiin';
 
   @override
   String get noStationsAlongThisRoute => 'Ei asemia tämän reitin varrella.';
@@ -1849,9 +1828,6 @@ class AppLocalizationsFi extends AppLocalizations {
   String get tripBannerPaused => 'Matka keskeytetty — napauta jatkaaksesi';
 
   @override
-  String get navConsumption => 'Kulutus';
-
-  @override
   String get vehicleBaselineSectionTitle => 'Perusarvojen kalibrointi';
 
   @override
@@ -2233,18 +2209,6 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get sectionLocation => 'Sijainti';
-
-  @override
-  String get sectionSetupDataSources => 'Asetukset ja tietolähteet';
-
-  @override
-  String get sectionFeaturesUsage => 'Ominaisuudet ja käyttö';
-
-  @override
-  String get sectionAccountSync => 'Tili ja synkronointi';
-
-  @override
-  String get sectionAppearanceWidgets => 'Ulkoasu ja widgetit';
 
   @override
   String get sectionPrivacyData => 'Yksityisyys ja tiedot';
@@ -5942,6 +5906,41 @@ class AppLocalizationsFi extends AppLocalizations {
       'Hidasta ennen mutkaa, ei mutkassa — kova kaarros hidastaa vauhtia, jonka sitten täytyy rakentaa uudelleen.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Viimeiset $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Kulutuksen yksikkö';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Miten polttoaineenkulutus näytetään kaikkialla sovelluksessa';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automaattinen ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle =>
+      'Reaaliaikaisen kulutuksen ikkuna';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Keskiarvoistaa reaaliaikaisen arvon viime sekunneilta – pidempi on tasaisempi, lyhyempi reagoi nopeammin';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'arv. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Sijainnin käyttö';
 
   @override
@@ -7080,6 +7079,258 @@ class AppLocalizationsFi extends AppLocalizations {
   String get refuelUnitPerSession => '/lataus';
 
   @override
+  String get settingsSearchHint => 'Hae asetuksista';
+
+  @override
+  String settingsSearchNoResults(String query) {
+    return 'Mikään asetus ei vastaa hakua ”$query”';
+  }
+
+  @override
+  String get settingsTopicProfilesTitle => 'Profiilit ja alue';
+
+  @override
+  String get settingsTopicProfilesSubtitle =>
+      'Maa, kieli, polttoaine, hakusäde, reittisuunnittelu';
+
+  @override
+  String get settingsTopicProfilesKeywords =>
+      'profiili, maa, kieli, polttoaine, säde, postinumero, reitti, koti, arvio, aloitusnäyttö, profile, country, language, fuel, radius, route, home, rating';
+
+  @override
+  String get settingsTopicVehiclesTitle => 'Ajoneuvot ja OBD2';
+
+  @override
+  String get settingsTopicVehiclesSubtitle =>
+      'Autosi, tankin koko, OBD2-sovittimen pariliitos';
+
+  @override
+  String get settingsTopicVehiclesKeywords =>
+      'ajoneuvo, auto, obd, obd2, sovitin, bluetooth, tankki, moottori, vin, kalibrointi, vehicle, car, adapter, tank, engine, calibration';
+
+  @override
+  String get settingsTopicDrivingTitle => 'Ajaminen ja kulutus';
+
+  @override
+  String get settingsTopicDrivingSubtitle =>
+      'Valmennus, palkinnot, huoltoasematutka, vianetsintä';
+
+  @override
+  String get settingsTopicDrivingKeywords =>
+      'valmennus, eko, haptinen, ääni, pelillistäminen, tutka, rullaus, matka, kulutus, polttoaineklubi, kanta-asiakas, obd2-loki, kiinnitä, coach, eco, haptic, voice, gamification, radar, glide, trip, consumption, loyalty, pin';
+
+  @override
+  String get settingsTopicPricesTitle => 'Hinnat ja hälytykset';
+
+  @override
+  String get settingsTopicPricesSubtitle =>
+      'Hintahälytykset, äänikuulutukset, hintahistoria, yhteisön ilmoitukset';
+
+  @override
+  String get settingsTopicPricesKeywords =>
+      'hälytys, ilmoitus, hinta, historia, ennuste, paras aika, yhteisö, raportti, qr, maksu, ääni, kuulutus, alert, notification, price, history, prediction, community, report, payment, voice, announcement';
+
+  @override
+  String get settingsTopicUnitsTitle => 'Yksiköt ja näyttö';
+
+  @override
+  String get settingsTopicUnitsSubtitle =>
+      'Teema, etäisyysyksikkö, aloitusnäytön widget';
+
+  @override
+  String get settingsTopicUnitsKeywords =>
+      'teema, tumma, vaalea, eko, yksikkö, km, mailit, widget, väri, näyttö, ulkoasu, theme, dark, light, eco, unit, miles, colour, display, appearance';
+
+  @override
+  String get settingsTopicFeaturesTitle => 'Ominaisuudet ja käyttötila';
+
+  @override
+  String get settingsTopicFeaturesSubtitle =>
+      'Käyttötilan esiasetukset ja jokainen ominaisuuskytkin';
+
+  @override
+  String get settingsTopicFeaturesKeywords =>
+      'ominaisuus, tila, perus, keskitaso, täysi, mukautettu, kytkin, asematyypit, huoltoasemat, latausasemat, lataus, feature, mode, basic, medium, full, custom, switch, toggle, charging';
+
+  @override
+  String get settingsTopicDataSourcesTitle => 'Tietolähteet ja sijainti';
+
+  @override
+  String get settingsTopicDataSourcesSubtitle =>
+      'API-avaimet, GPS-sijainti, automaattinen profiilin vaihto';
+
+  @override
+  String get settingsTopicDataSourcesKeywords =>
+      'api, avain, gps, sijainti, paikka, tietolähde, tankerkoenig, opencharge, key, location, position, data source';
+
+  @override
+  String get settingsTopicSyncTitle => 'Synkronointi ja tili';
+
+  @override
+  String get settingsTopicSyncKeywords =>
+      'tanksync, pilvi, tili, sähköposti, yhdistä laite, synkronointi, jaa tietokanta, anonyymi, cloud, account, email, link device, sync, share database, anonymous';
+
+  @override
+  String get settingsTopicPrivacySubtitle =>
+      'Suostumukset, tietosuojapaneeli, tallennustila ja välimuisti';
+
+  @override
+  String get settingsTopicPrivacyKeywords =>
+      'tietosuoja, suostumus, gdpr, poista, tyhjennä, tallennustila, välimuisti, tiedot, virheraportointi, vin, privacy, consent, delete, erase, storage, cache, data, error reporting';
+
+  @override
+  String get settingsTopicBackupTitle => 'Varmuuskopiointi ja palautus';
+
+  @override
+  String get settingsTopicBackupSubtitle =>
+      'Vie tai palauta täydellinen varmuuskopio tiedoistasi';
+
+  @override
+  String get settingsTopicBackupKeywords =>
+      'varmuuskopio, vienti, palautus, tuonti, zip, xml, siirto, backup, export, restore, import, transfer';
+
+  @override
+  String get settingsTopicAdvancedSubtitle =>
+      'GitHub-tunnus, kehittäjätyökalut';
+
+  @override
+  String get settingsTopicAdvancedKeywords =>
+      'kehittäjä, vianetsintä, tunnus, pat, github, diagnostiikka, virheloki, jäljitys, developer, debug, token, diagnostics, error log, trace';
+
+  @override
+  String get settingsTopicAboutSubtitle => 'Versio, lisenssit, linkit';
+
+  @override
+  String get settingsTopicAboutKeywords =>
+      'tietoja, versio, lisenssi, lahjoita, github, maininta, about, version, license, donate, attribution';
+
+  @override
+  String get settingsConsumptionOffHint =>
+      'Ota kulutuksen seuranta käyttöön kohdassa Ominaisuudet ja käyttötila määrittääksesi ajoneuvot, valmennuksen ja palkinnot.';
+
+  @override
+  String get settingsOpenFeaturesLink => 'Avaa Ominaisuudet ja käyttötila';
+
+  @override
+  String get settingsRadarTileSubtitle =>
+      'Säde, hintatila, kysely ja näytön kiinnitys aktiiviselle profiilille';
+
+  @override
+  String get settingsRadarNoProfileHint =>
+      'Luo ensin profiili – tutkan asetukset tallennetaan profiilikohtaisesti.';
+
+  @override
+  String get settingsRadarPinHeader => 'Näytön kiinnitys';
+
+  @override
+  String get settingsAlertsTileSubtitle =>
+      'Asema- ja sädehälytykset, jotka ilmoittavat hinnanlaskuista';
+
+  @override
+  String get settingsPriceFeaturesHeader => 'Hintaominaisuudet';
+
+  @override
+  String get settingsVoiceAnnouncementsOffHint =>
+      'Äänikuulutukset ovat pois päältä. Ota Äänipalaute ja Äänikuulutukset käyttöön kohdassa Ominaisuudet ja käyttötila kuullaksesi lähellä olevasta halvasta polttoaineesta ajaessasi.';
+
+  @override
+  String get settingsDistanceUnitTitle => 'Etäisyysyksikkö';
+
+  @override
+  String get settingsDistanceUnitSubtitle => 'Aktiivisen profiilin maan mukaan';
+
+  @override
+  String get settingsObd2AdapterTitle => 'OBD2-sovitin';
+
+  @override
+  String get settingsObd2AdapterSubtitle =>
+      'Sovittimet liitetään ajoneuvokohtaisesti – avaa ajoneuvo liittääksesi tai vaihtaaksesi sen sovittimen';
+
+  @override
+  String get settingsStorageDeleteHint =>
+      'Kaikkien paikallisten tietojen poisto tehdään tietosuojapaneelista.';
+
+  @override
+  String get settingsPrivacyCrossLinkTitle => 'Suostumukset';
+
+  @override
+  String get settingsPrivacyCrossLinkSubtitle =>
+      'Cloud Syncin ja matkojen synkronoinnin suostumukset ovat kohdassa Tietosuoja ja tiedot';
+
+  @override
+  String get settingsBackupExportSubtitle =>
+      'Ajoneuvot, tankkaukset, matkat ja latauslokit ZIP-tiedostona';
+
+  @override
+  String get settingsBackupRestoreSubtitle =>
+      'Yhdistä tai korvaa tietosi aiemmasta varmuuskopio-ZIPistä';
+
+  @override
+  String get settingsStationTypesLink =>
+      'Asematyypit asetetaan kohdassa Ominaisuudet ja käyttötila';
+
+  @override
+  String get routeSearchCriterionLabel => 'Aseman valinta reittiosuutta kohti';
+
+  @override
+  String get routeSearchCriterionCheapest => 'Halvin';
+
+  @override
+  String get routeSearchCriterionNearest => 'Lähinnä reittiä';
+
+  @override
+  String get routeSearchTopNLabel => 'Ehdokkaita näytepistettä kohti';
+
+  @override
+  String routeSearchTopNCaption(int count) {
+    return 'Jokaisessa reitin pisteessä huomioidaan enintään $count asemaa.';
+  }
+
+  @override
+  String get hybridFuelChoiceLabel => 'Polttoaine hintahakuun (hybridi)';
+
+  @override
+  String get hybridFuelChoiceVehicleDefault => 'Ajoneuvon oletus';
+
+  @override
+  String get scopeThisProfile => 'Tämä profiili';
+
+  @override
+  String get scopeAllProfiles => 'Kaikki profiilit';
+
+  @override
+  String get scopeThisVehicle => 'Tämä ajoneuvo';
+
+  @override
+  String get featureLabel_manualConsumption => 'Manuaalinen kulutuksen kirjaus';
+
+  @override
+  String get featureDescription_manualConsumption =>
+      'Kirjaa tankkaukset ja lataukset käsin (OBD2-sovitinta ei tarvita).';
+
+  @override
+  String get featureLabel_loyaltyCards => 'Kanta-asiakaskortit';
+
+  @override
+  String get featureDescription_loyaltyCards =>
+      'Polttoaineklubi-/kanta-asiakaskortit litrakohtaisilla alennuksilla hintavertailuissa.';
+
+  @override
+  String get featureLabel_startupTrace => 'Käynnistyksen alustusjäljitys';
+
+  @override
+  String get featureDescription_startupTrace =>
+      'Tallentaa sovelluksen käynnistyksen ajastetut vaiheet, näyttää ne vesiputouksena ja vie ne – kehittäjädiagnostiikka.';
+
+  @override
+  String get locationGpsAutoHint =>
+      'GPS-sijainti haetaan automaattisesti haun yhteydessä. Voit päivittää sen myös käsin tässä.';
+
+  @override
+  String get locationClearGpsBody =>
+      'Tyhjennetäänkö tallennettu GPS-sijainti? Voit päivittää sen uudelleen milloin tahansa.';
+
+  @override
   String get shareReceiptUnsupportedFormat =>
       'Tätä tiedostomuotoa ei voi vielä tuoda — jaa sen sijaan kuva kuitista.';
 
@@ -8074,8 +8325,8 @@ class AppLocalizationsFi extends AppLocalizations {
       'Androidilla paina widgetiä pitkään ja valitse Määritä uudelleen muuttaaksesi profiilia, väriä ja sisältöä.';
 
   @override
-  String get widgetDefaultsApplyToAllHint =>
-      'Alla olevat valinnat koskevat kaikkia asennettuja widgettejä seuraavalla päivityksellä.';
+  String get widgetDefaultsThisProfileHint =>
+      'Alla olevat valinnat koskevat jokaista asennettua widgetiä, joka näyttää tämän profiilin, seuraavan päivityksen yhteydessä.';
 
   @override
   String get widgetDefaultsColorLabel => 'Värimaailma';

@@ -295,13 +295,6 @@ class AppLocalizationsRo extends AppLocalizations {
   String get clearCacheButton => 'Golește cache';
 
   @override
-  String get deleteAllTitle => 'Ștergi toate datele?';
-
-  @override
-  String get deleteAllBody =>
-      'Aceasta șterge permanent toate profilurile, favoritele, cheia API, setările și cache-ul. Aplicația va fi resetată.';
-
-  @override
   String get deleteAllButton => 'Șterge tot';
 
   @override
@@ -847,20 +840,6 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get avoidHighwaysDesc =>
       'Calculul rutei evită drumurile cu taxă și autostrăzile';
-
-  @override
-  String get showFuelStations => 'Arată benzinăriile';
-
-  @override
-  String get showFuelStationsDesc =>
-      'Include stații de benzină, motorină, GPL, GNC';
-
-  @override
-  String get showEvStations => 'Arată stații de încărcare';
-
-  @override
-  String get showEvStationsDesc =>
-      'Include stații de încărcare electrică în rezultate';
 
   @override
   String get noStationsAlongThisRoute =>
@@ -1856,9 +1835,6 @@ class AppLocalizationsRo extends AppLocalizations {
   String get tripBannerPaused => 'Călătorie în pauză — apăsați pentru a relua';
 
   @override
-  String get navConsumption => 'Consum';
-
-  @override
   String get vehicleBaselineSectionTitle => 'Calibrare referință';
 
   @override
@@ -2243,18 +2219,6 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get sectionLocation => 'Locație';
-
-  @override
-  String get sectionSetupDataSources => 'Configurare și surse de date';
-
-  @override
-  String get sectionFeaturesUsage => 'Funcții și utilizare';
-
-  @override
-  String get sectionAccountSync => 'Cont și sincronizare';
-
-  @override
-  String get sectionAppearanceWidgets => 'Aspect și widgeturi';
 
   @override
   String get sectionPrivacyData => 'Confidențialitate și date';
@@ -5984,6 +5948,41 @@ class AppLocalizationsRo extends AppLocalizations {
       'Reduceți viteza înainte de curbă, nu în ea — virajele strânse frânează viteza pe care trebuie apoi să o recâștigați.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Ultimele $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Unitatea de consum';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Cum este afișat consumul de combustibil în toată aplicația';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automat ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle =>
+      'Fereastra consumului în timp real';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Mediază valoarea în timp real pe ultimele secunde — mai lungă este mai stabilă, mai scurtă reacționează mai repede';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'est. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Acces la locație';
 
   @override
@@ -7132,6 +7131,261 @@ class AppLocalizationsRo extends AppLocalizations {
   String get refuelUnitPerSession => '/sesiune';
 
   @override
+  String get settingsSearchHint => 'Caută în setări';
+
+  @override
+  String settingsSearchNoResults(String query) {
+    return 'Nicio setare nu corespunde cu „$query”';
+  }
+
+  @override
+  String get settingsTopicProfilesTitle => 'Profiluri și regiune';
+
+  @override
+  String get settingsTopicProfilesSubtitle =>
+      'Țară, limbă, combustibil, rază de căutare, planificarea rutei';
+
+  @override
+  String get settingsTopicProfilesKeywords =>
+      'profil, țară, limbă, combustibil, rază, cod poștal, rută, acasă, evaluare, ecran de pornire, profile, country, language, fuel, radius, route, home, rating';
+
+  @override
+  String get settingsTopicVehiclesTitle => 'Vehicule și OBD2';
+
+  @override
+  String get settingsTopicVehiclesSubtitle =>
+      'Mașinile tale, capacitatea rezervorului, asocierea adaptorului OBD2';
+
+  @override
+  String get settingsTopicVehiclesKeywords =>
+      'vehicul, mașină, obd, obd2, adaptor, bluetooth, rezervor, motor, vin, calibrare, vehicle, car, adapter, tank, engine, calibration';
+
+  @override
+  String get settingsTopicDrivingTitle => 'Condus și consum';
+
+  @override
+  String get settingsTopicDrivingSubtitle =>
+      'Coaching, recompense, radar de benzinării, depanare';
+
+  @override
+  String get settingsTopicDrivingKeywords =>
+      'coach, eco, haptic, voce, gamificare, radar, rulare liberă, călătorie, consum, club de combustibil, fidelitate, jurnal obd2, fixare, voice, gamification, glide, trip, consumption, loyalty, pin';
+
+  @override
+  String get settingsTopicPricesTitle => 'Prețuri și alerte';
+
+  @override
+  String get settingsTopicPricesSubtitle =>
+      'Alerte de preț, anunțuri vocale, istoricul prețurilor, raportări ale comunității';
+
+  @override
+  String get settingsTopicPricesKeywords =>
+      'alertă, notificare, preț, istoric, predicție, cel mai bun moment, comunitate, raport, qr, plată, voce, anunț, alert, notification, price, history, prediction, community, report, payment, voice, announcement';
+
+  @override
+  String get settingsTopicUnitsTitle => 'Unități și afișare';
+
+  @override
+  String get settingsTopicUnitsSubtitle =>
+      'Temă, unitate de distanță, widget pe ecranul de pornire';
+
+  @override
+  String get settingsTopicUnitsKeywords =>
+      'temă, întunecat, luminos, eco, unitate, km, mile, widget, culoare, afișare, aspect, theme, dark, light, unit, miles, colour, display, appearance';
+
+  @override
+  String get settingsTopicFeaturesTitle => 'Funcții și mod de utilizare';
+
+  @override
+  String get settingsTopicFeaturesSubtitle =>
+      'Presetări ale modului de utilizare și fiecare comutator de funcție';
+
+  @override
+  String get settingsTopicFeaturesKeywords =>
+      'funcție, mod, de bază, mediu, complet, personalizat, comutator, tipuri de stații, benzinării, stații de încărcare, încărcare, feature, mode, basic, medium, full, custom, switch, toggle, charging';
+
+  @override
+  String get settingsTopicDataSourcesTitle => 'Surse de date și locație';
+
+  @override
+  String get settingsTopicDataSourcesSubtitle =>
+      'Chei API, poziție GPS, schimbare automată a profilului';
+
+  @override
+  String get settingsTopicDataSourcesKeywords =>
+      'api, cheie, gps, locație, poziție, sursă de date, tankerkoenig, opencharge, key, location, data source';
+
+  @override
+  String get settingsTopicSyncTitle => 'Sincronizare și cont';
+
+  @override
+  String get settingsTopicSyncKeywords =>
+      'tanksync, cloud, cont, e-mail, conectare dispozitiv, sincronizare, partajare bază de date, anonim, account, email, link device, sync, share database, anonymous';
+
+  @override
+  String get settingsTopicPrivacySubtitle =>
+      'Consimțăminte, panou de confidențialitate, stocare și cache';
+
+  @override
+  String get settingsTopicPrivacyKeywords =>
+      'confidențialitate, consimțământ, gdpr, ștergere, stocare, cache, date, raportare erori, vin, privacy, consent, delete, erase, storage, data, error reporting';
+
+  @override
+  String get settingsTopicBackupTitle => 'Backup și restaurare';
+
+  @override
+  String get settingsTopicBackupSubtitle =>
+      'Exportă sau restaurează un backup complet al datelor tale';
+
+  @override
+  String get settingsTopicBackupKeywords =>
+      'backup, export, restaurare, import, zip, xml, transfer, restore';
+
+  @override
+  String get settingsTopicAdvancedSubtitle =>
+      'Token GitHub, instrumente pentru dezvoltatori';
+
+  @override
+  String get settingsTopicAdvancedKeywords =>
+      'dezvoltator, depanare, token, pat, github, diagnosticare, jurnal de erori, urmărire, developer, debug, diagnostics, error log, trace';
+
+  @override
+  String get settingsTopicAboutSubtitle => 'Versiune, licențe, linkuri';
+
+  @override
+  String get settingsTopicAboutKeywords =>
+      'despre, versiune, licență, donează, github, atribuire, about, version, license, donate, attribution';
+
+  @override
+  String get settingsConsumptionOffHint =>
+      'Activează urmărirea consumului în Funcții și mod de utilizare pentru a configura vehiculele, coachingul și recompensele.';
+
+  @override
+  String get settingsOpenFeaturesLink => 'Deschide Funcții și mod de utilizare';
+
+  @override
+  String get settingsRadarTileSubtitle =>
+      'Rază, mod de preț, interogare și fixarea ecranului pentru profilul activ';
+
+  @override
+  String get settingsRadarNoProfileHint =>
+      'Creează mai întâi un profil — setările radarului sunt salvate per profil.';
+
+  @override
+  String get settingsRadarPinHeader => 'Fixarea ecranului';
+
+  @override
+  String get settingsAlertsTileSubtitle =>
+      'Alerte pentru stații și rază care te anunță la scăderi de preț';
+
+  @override
+  String get settingsPriceFeaturesHeader => 'Funcții de preț';
+
+  @override
+  String get settingsVoiceAnnouncementsOffHint =>
+      'Anunțurile vocale sunt dezactivate. Activează Feedback vocal și Anunțuri vocale în Funcții și mod de utilizare pentru a auzi combustibilul ieftin din apropiere în timp ce conduci.';
+
+  @override
+  String get settingsDistanceUnitTitle => 'Unitate de distanță';
+
+  @override
+  String get settingsDistanceUnitSubtitle => 'Din țara profilului activ';
+
+  @override
+  String get settingsObd2AdapterTitle => 'Adaptor OBD2';
+
+  @override
+  String get settingsObd2AdapterSubtitle =>
+      'Adaptoarele se asociază per vehicul — deschide un vehicul pentru a asocia sau schimba adaptorul';
+
+  @override
+  String get settingsStorageDeleteHint =>
+      'Ștergerea tuturor datelor locale se face din panoul de confidențialitate.';
+
+  @override
+  String get settingsPrivacyCrossLinkTitle => 'Consimțăminte';
+
+  @override
+  String get settingsPrivacyCrossLinkSubtitle =>
+      'Consimțămintele pentru Cloud Sync și sincronizarea călătoriilor se află la Confidențialitate și date';
+
+  @override
+  String get settingsBackupExportSubtitle =>
+      'Vehicule, alimentări, călătorii și jurnale de încărcare ca fișier ZIP';
+
+  @override
+  String get settingsBackupRestoreSubtitle =>
+      'Combină sau înlocuiește datele dintr-un backup ZIP anterior';
+
+  @override
+  String get settingsStationTypesLink =>
+      'Tipurile de stații se setează în Funcții și mod de utilizare';
+
+  @override
+  String get routeSearchCriterionLabel =>
+      'Alegerea stației per segment de rută';
+
+  @override
+  String get routeSearchCriterionCheapest => 'Cea mai ieftină';
+
+  @override
+  String get routeSearchCriterionNearest => 'Cea mai apropiată de rută';
+
+  @override
+  String get routeSearchTopNLabel => 'Candidate per punct de eșantionare';
+
+  @override
+  String routeSearchTopNCaption(int count) {
+    return 'Până la $count stații sunt luate în considerare în fiecare punct de-a lungul rutei.';
+  }
+
+  @override
+  String get hybridFuelChoiceLabel =>
+      'Combustibil pentru căutarea prețurilor (hibrid)';
+
+  @override
+  String get hybridFuelChoiceVehicleDefault => 'Implicit al vehiculului';
+
+  @override
+  String get scopeThisProfile => 'Acest profil';
+
+  @override
+  String get scopeAllProfiles => 'Toate profilurile';
+
+  @override
+  String get scopeThisVehicle => 'Acest vehicul';
+
+  @override
+  String get featureLabel_manualConsumption =>
+      'Înregistrare manuală a consumului';
+
+  @override
+  String get featureDescription_manualConsumption =>
+      'Înregistrează manual alimentările și sesiunile de încărcare (nu este nevoie de adaptor OBD2).';
+
+  @override
+  String get featureLabel_loyaltyCards => 'Carduri de fidelitate';
+
+  @override
+  String get featureDescription_loyaltyCards =>
+      'Carduri de club de combustibil / fidelitate cu reduceri pe litru în comparațiile de prețuri.';
+
+  @override
+  String get featureLabel_startupTrace => 'Urmărirea inițializării la pornire';
+
+  @override
+  String get featureDescription_startupTrace =>
+      'Înregistrează fazele cronometrate ale pornirii aplicației, le afișează în cascadă și le exportă — un diagnostic pentru dezvoltatori.';
+
+  @override
+  String get locationGpsAutoHint =>
+      'Poziția GPS este obținută automat la căutare. O poți actualiza și manual aici.';
+
+  @override
+  String get locationClearGpsBody =>
+      'Ștergi poziția GPS salvată? O poți actualiza din nou oricând.';
+
+  @override
   String get shareReceiptUnsupportedFormat =>
       'Acest tip de fișier nu poate fi importat încă — partajați o fotografie a bonului.';
 
@@ -8133,8 +8387,8 @@ class AppLocalizationsRo extends AppLocalizations {
       'Pe Android, apăsați lung pe widget și alegeți Reconfigurați pentru a modifica profilul, culoarea și conținutul.';
 
   @override
-  String get widgetDefaultsApplyToAllHint =>
-      'Opțiunile de mai jos se aplică fiecărui widget instalat la următoarea reîmprospătare.';
+  String get widgetDefaultsThisProfileHint =>
+      'Alegerile de mai jos se aplică fiecărui widget instalat care afișează acest profil, la următoarea reîmprospătare.';
 
   @override
   String get widgetDefaultsColorLabel => 'Schemă de culori';

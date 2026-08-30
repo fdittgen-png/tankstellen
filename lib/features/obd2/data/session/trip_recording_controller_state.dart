@@ -203,6 +203,17 @@ mixin _TripRecordingSessionState {
   // (a controller is built per trip), so no explicit reset is needed.
   final InstantConsumptionEma _instantEma = InstantConsumptionEma();
 
+  /// #3883 — rolling "last N s" consumption for the recording screen's
+  /// headline: ∫fuelRate·dt ÷ ∫speed·dt over [liveConsumptionWindowSeconds].
+  /// The buffer keeps 30 s, so the window can change mid-trip.
+  final RollingConsumptionWindow _rollingWindow = RollingConsumptionWindow();
+
+  /// #3883 — the user's live window length (Settings › Driving), read
+  /// on every emit so a change applies mid-trip. The pipeline injects
+  /// the settings read; the default stands in tests.
+  int Function() readLiveConsumptionWindowSeconds =
+      () => kDefaultLiveConsumptionWindowSeconds;
+
   /// #3845 — rolling driving-behaviour band for the live surfaces. Runs
   /// the canonical end-of-trip calculator over a sliding window, so the
   /// live colour and the trip's final grade share one implementation.

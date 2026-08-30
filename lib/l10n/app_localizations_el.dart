@@ -294,13 +294,6 @@ class AppLocalizationsEl extends AppLocalizations {
   String get clearCacheButton => 'Εκκαθάριση';
 
   @override
-  String get deleteAllTitle => 'Διαγραφή όλων των δεδομένων;';
-
-  @override
-  String get deleteAllBody =>
-      'Αυτό θα διαγράψει μόνιμα όλα τα προφίλ, αγαπημένα, κλειδί API, ρυθμίσεις και προσωρινή μνήμη. Η εφαρμογή θα επαναφερθεί.';
-
-  @override
   String get deleteAllButton => 'Διαγραφή όλων';
 
   @override
@@ -850,20 +843,6 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get avoidHighwaysDesc =>
       'Ο υπολογισμός διαδρομής αποφεύγει δρόμους με διόδια και αυτοκινητοδρόμους';
-
-  @override
-  String get showFuelStations => 'Εμφάνιση βενζινάδικων';
-
-  @override
-  String get showFuelStationsDesc =>
-      'Συμπερίληψη σταθμών βενζίνης, ντίζελ, LPG, CNG';
-
-  @override
-  String get showEvStations => 'Εμφάνιση σταθμών φόρτισης';
-
-  @override
-  String get showEvStationsDesc =>
-      'Συμπερίληψη ηλεκτρικών σταθμών φόρτισης στα αποτελέσματα';
 
   @override
   String get noStationsAlongThisRoute =>
@@ -1860,9 +1839,6 @@ class AppLocalizationsEl extends AppLocalizations {
   String get tripBannerPaused => 'Διαδρομή σε παύση — πατήστε για συνέχεια';
 
   @override
-  String get navConsumption => 'Κατανάλωση';
-
-  @override
   String get vehicleBaselineSectionTitle => 'Βαθμονόμηση βάσης';
 
   @override
@@ -2247,18 +2223,6 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get sectionLocation => 'Τοποθεσία';
-
-  @override
-  String get sectionSetupDataSources => 'Ρύθμιση & πηγές δεδομένων';
-
-  @override
-  String get sectionFeaturesUsage => 'Λειτουργίες & χρήση';
-
-  @override
-  String get sectionAccountSync => 'Λογαριασμός & συγχρονισμός';
-
-  @override
-  String get sectionAppearanceWidgets => 'Εμφάνιση & γραφικά στοιχεία';
 
   @override
   String get sectionPrivacyData => 'Απόρρητο & δεδομένα';
@@ -5991,6 +5955,40 @@ class AppLocalizationsEl extends AppLocalizations {
       'Επιβραδύνετε πριν από τη στροφή, όχι μέσα σε αυτή — το δυνατό κόψιμο στροφής χάνει ταχύτητα που πρέπει να κερδίσετε ξανά.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Τελευταία $seconds δ';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Μονάδα κατανάλωσης';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Πώς εμφανίζεται η κατανάλωση καυσίμου σε όλη την εφαρμογή';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Αυτόματα ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Παράθυρο ζωντανής κατανάλωσης';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Μέσος όρος της ζωντανής τιμής στα τελευταία δευτερόλεπτα — μεγαλύτερο είναι σταθερότερο, μικρότερο αντιδρά πιο γρήγορα';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds δ';
+  }
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'εκτ. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Πρόσβαση στην τοποθεσία';
 
   @override
@@ -7138,6 +7136,259 @@ class AppLocalizationsEl extends AppLocalizations {
   String get refuelUnitPerSession => '/συνεδρία';
 
   @override
+  String get settingsSearchHint => 'Αναζήτηση ρυθμίσεων';
+
+  @override
+  String settingsSearchNoResults(String query) {
+    return 'Καμία ρύθμιση δεν ταιριάζει με «$query»';
+  }
+
+  @override
+  String get settingsTopicProfilesTitle => 'Προφίλ & περιοχή';
+
+  @override
+  String get settingsTopicProfilesSubtitle =>
+      'Χώρα, γλώσσα, καύσιμο, ακτίνα αναζήτησης, σχεδιασμός διαδρομής';
+
+  @override
+  String get settingsTopicProfilesKeywords =>
+      'προφίλ, χώρα, γλώσσα, καύσιμο, ακτίνα, ταχυδρομικός κώδικας, διαδρομή, σπίτι, αξιολόγηση, αρχική οθόνη, profile, country, language, fuel, radius, route, home, rating';
+
+  @override
+  String get settingsTopicVehiclesTitle => 'Οχήματα & OBD2';
+
+  @override
+  String get settingsTopicVehiclesSubtitle =>
+      'Τα αυτοκίνητά σας, χωρητικότητα ρεζερβουάρ, σύζευξη προσαρμογέα OBD2';
+
+  @override
+  String get settingsTopicVehiclesKeywords =>
+      'όχημα, αυτοκίνητο, obd, obd2, προσαρμογέας, bluetooth, ρεζερβουάρ, κινητήρας, vin, βαθμονόμηση, vehicle, car, adapter, tank, engine, calibration';
+
+  @override
+  String get settingsTopicDrivingTitle => 'Οδήγηση & κατανάλωση';
+
+  @override
+  String get settingsTopicDrivingSubtitle =>
+      'Καθοδήγηση, ανταμοιβές, ραντάρ πρατηρίων, αντιμετώπιση προβλημάτων';
+
+  @override
+  String get settingsTopicDrivingKeywords =>
+      'καθοδήγηση, οικολογικό, απτικό, φωνή, παιχνιδοποίηση, ραντάρ, ελεύθερη κύλιση, διαδρομή, κατανάλωση, λέσχη καυσίμων, πιστότητα, αρχείο obd2, καρφίτσωμα, coach, eco, haptic, voice, gamification, radar, glide, trip, consumption, loyalty, pin';
+
+  @override
+  String get settingsTopicPricesTitle => 'Τιμές & ειδοποιήσεις';
+
+  @override
+  String get settingsTopicPricesSubtitle =>
+      'Ειδοποιήσεις τιμών, φωνητικές ανακοινώσεις, ιστορικό τιμών, αναφορές κοινότητας';
+
+  @override
+  String get settingsTopicPricesKeywords =>
+      'ειδοποίηση, τιμή, ιστορικό, πρόβλεψη, καλύτερη στιγμή, κοινότητα, αναφορά, qr, πληρωμή, φωνή, ανακοίνωση, alert, notification, price, history, prediction, community, report, payment, voice, announcement';
+
+  @override
+  String get settingsTopicUnitsTitle => 'Μονάδες & εμφάνιση';
+
+  @override
+  String get settingsTopicUnitsSubtitle =>
+      'Θέμα, μονάδα απόστασης, γραφικό στοιχείο αρχικής οθόνης';
+
+  @override
+  String get settingsTopicUnitsKeywords =>
+      'θέμα, σκούρο, ανοιχτό, οικολογικό, μονάδα, χλμ, μίλια, γραφικό στοιχείο, χρώμα, εμφάνιση, theme, dark, light, eco, unit, km, miles, widget, colour, display, appearance';
+
+  @override
+  String get settingsTopicFeaturesTitle => 'Λειτουργίες & τρόπος χρήσης';
+
+  @override
+  String get settingsTopicFeaturesSubtitle =>
+      'Προεπιλογές τρόπου χρήσης και κάθε διακόπτης λειτουργίας';
+
+  @override
+  String get settingsTopicFeaturesKeywords =>
+      'λειτουργία, τρόπος, βασικό, μεσαίο, πλήρες, προσαρμοσμένο, διακόπτης, τύποι σταθμών, πρατήρια, φορτιστές, φόρτιση, feature, mode, basic, medium, full, custom, switch, toggle, charging';
+
+  @override
+  String get settingsTopicDataSourcesTitle => 'Πηγές δεδομένων & τοποθεσία';
+
+  @override
+  String get settingsTopicDataSourcesSubtitle =>
+      'Κλειδιά API, θέση GPS, αυτόματη εναλλαγή προφίλ';
+
+  @override
+  String get settingsTopicDataSourcesKeywords =>
+      'api, κλειδί, gps, τοποθεσία, θέση, πηγή δεδομένων, tankerkoenig, opencharge, key, location, data source';
+
+  @override
+  String get settingsTopicSyncTitle => 'Συγχρονισμός & λογαριασμός';
+
+  @override
+  String get settingsTopicSyncKeywords =>
+      'tanksync, cloud, λογαριασμός, email, σύνδεση συσκευής, συγχρονισμός, κοινή χρήση βάσης, ανώνυμος, account, link device, sync, share database, anonymous';
+
+  @override
+  String get settingsTopicPrivacySubtitle =>
+      'Συγκαταθέσεις, πίνακας απορρήτου, αποθήκευση & cache';
+
+  @override
+  String get settingsTopicPrivacyKeywords =>
+      'απόρρητο, συγκατάθεση, gdpr, διαγραφή, αποθήκευση, cache, δεδομένα, αναφορά σφαλμάτων, vin, privacy, consent, delete, erase, storage, data, error reporting';
+
+  @override
+  String get settingsTopicBackupTitle => 'Αντίγραφο ασφαλείας & επαναφορά';
+
+  @override
+  String get settingsTopicBackupSubtitle =>
+      'Εξαγωγή ή επαναφορά πλήρους αντιγράφου ασφαλείας των δεδομένων σας';
+
+  @override
+  String get settingsTopicBackupKeywords =>
+      'αντίγραφο ασφαλείας, εξαγωγή, επαναφορά, εισαγωγή, zip, xml, μεταφορά, backup, export, restore, import, transfer';
+
+  @override
+  String get settingsTopicAdvancedSubtitle =>
+      'Διακριτικό GitHub, εργαλεία προγραμματιστή';
+
+  @override
+  String get settingsTopicAdvancedKeywords =>
+      'προγραμματιστής, αποσφαλμάτωση, διακριτικό, pat, github, διαγνωστικά, αρχείο σφαλμάτων, ίχνος, developer, debug, token, diagnostics, error log, trace';
+
+  @override
+  String get settingsTopicAboutSubtitle => 'Έκδοση, άδειες, σύνδεσμοι';
+
+  @override
+  String get settingsTopicAboutKeywords =>
+      'σχετικά, έκδοση, άδεια, δωρεά, github, αναφορά, about, version, license, donate, attribution';
+
+  @override
+  String get settingsConsumptionOffHint =>
+      'Ενεργοποιήστε την παρακολούθηση κατανάλωσης στις Λειτουργίες & τρόπος χρήσης για να ρυθμίσετε οχήματα, καθοδήγηση και ανταμοιβές.';
+
+  @override
+  String get settingsOpenFeaturesLink => 'Άνοιγμα Λειτουργίες & τρόπος χρήσης';
+
+  @override
+  String get settingsRadarTileSubtitle =>
+      'Ακτίνα, λειτουργία τιμών, ανίχνευση και καρφίτσωμα οθόνης για το ενεργό προφίλ';
+
+  @override
+  String get settingsRadarNoProfileHint =>
+      'Δημιουργήστε πρώτα ένα προφίλ — οι ρυθμίσεις ραντάρ αποθηκεύονται ανά προφίλ.';
+
+  @override
+  String get settingsRadarPinHeader => 'Καρφίτσωμα οθόνης';
+
+  @override
+  String get settingsAlertsTileSubtitle =>
+      'Ειδοποιήσεις σταθμού και ακτίνας που σας ενημερώνουν για πτώσεις τιμών';
+
+  @override
+  String get settingsPriceFeaturesHeader => 'Λειτουργίες τιμών';
+
+  @override
+  String get settingsVoiceAnnouncementsOffHint =>
+      'Οι φωνητικές ανακοινώσεις είναι απενεργοποιημένες. Ενεργοποιήστε τη Φωνητική ανατροφοδότηση και τις Φωνητικές ανακοινώσεις στις Λειτουργίες & τρόπος χρήσης για να ακούτε για φθηνό καύσιμο κοντά σας ενώ οδηγείτε.';
+
+  @override
+  String get settingsDistanceUnitTitle => 'Μονάδα απόστασης';
+
+  @override
+  String get settingsDistanceUnitSubtitle => 'Από τη χώρα του ενεργού προφίλ';
+
+  @override
+  String get settingsObd2AdapterTitle => 'Προσαρμογέας OBD2';
+
+  @override
+  String get settingsObd2AdapterSubtitle =>
+      'Οι προσαρμογείς συζευγνύονται ανά όχημα — ανοίξτε ένα όχημα για να συζεύξετε ή να αλλάξετε τον προσαρμογέα του';
+
+  @override
+  String get settingsStorageDeleteHint =>
+      'Η διαγραφή όλων των τοπικών δεδομένων γίνεται από τον πίνακα απορρήτου.';
+
+  @override
+  String get settingsPrivacyCrossLinkTitle => 'Συγκαταθέσεις';
+
+  @override
+  String get settingsPrivacyCrossLinkSubtitle =>
+      'Οι συγκαταθέσεις για Cloud Sync και συγχρονισμό διαδρομών βρίσκονται στο Απόρρητο & δεδομένα';
+
+  @override
+  String get settingsBackupExportSubtitle =>
+      'Οχήματα, ανεφοδιασμοί, διαδρομές και αρχεία φόρτισης ως αρχείο ZIP';
+
+  @override
+  String get settingsBackupRestoreSubtitle =>
+      'Συγχωνεύστε ή αντικαταστήστε τα δεδομένα σας από προηγούμενο ZIP αντιγράφου ασφαλείας';
+
+  @override
+  String get settingsStationTypesLink =>
+      'Οι τύποι σταθμών ορίζονται στις Λειτουργίες & τρόπος χρήσης';
+
+  @override
+  String get routeSearchCriterionLabel => 'Επιλογή σταθμού ανά τμήμα διαδρομής';
+
+  @override
+  String get routeSearchCriterionCheapest => 'Φθηνότερος';
+
+  @override
+  String get routeSearchCriterionNearest => 'Πλησιέστερος στη διαδρομή';
+
+  @override
+  String get routeSearchTopNLabel => 'Υποψήφιοι ανά σημείο δειγματοληψίας';
+
+  @override
+  String routeSearchTopNCaption(int count) {
+    return 'Έως $count σταθμοί εξετάζονται σε κάθε σημείο κατά μήκος της διαδρομής.';
+  }
+
+  @override
+  String get hybridFuelChoiceLabel => 'Καύσιμο για αναζήτηση τιμών (υβριδικό)';
+
+  @override
+  String get hybridFuelChoiceVehicleDefault => 'Προεπιλογή οχήματος';
+
+  @override
+  String get scopeThisProfile => 'Αυτό το προφίλ';
+
+  @override
+  String get scopeAllProfiles => 'Όλα τα προφίλ';
+
+  @override
+  String get scopeThisVehicle => 'Αυτό το όχημα';
+
+  @override
+  String get featureLabel_manualConsumption =>
+      'Χειροκίνητη καταγραφή κατανάλωσης';
+
+  @override
+  String get featureDescription_manualConsumption =>
+      'Καταγράψτε ανεφοδιασμούς και συνεδρίες φόρτισης χειροκίνητα (δεν απαιτείται προσαρμογέας OBD2).';
+
+  @override
+  String get featureLabel_loyaltyCards => 'Κάρτες πιστότητας';
+
+  @override
+  String get featureDescription_loyaltyCards =>
+      'Κάρτες λέσχης καυσίμων / πιστότητας με εκπτώσεις ανά λίτρο στις συγκρίσεις τιμών.';
+
+  @override
+  String get featureLabel_startupTrace => 'Ίχνος αρχικοποίησης εκκίνησης';
+
+  @override
+  String get featureDescription_startupTrace =>
+      'Καταγράφει τις χρονομετρημένες φάσεις εκκίνησης της εφαρμογής, τις εμφανίζει ως καταρράκτη και τις εξάγει — διαγνωστικό για προγραμματιστές.';
+
+  @override
+  String get locationGpsAutoHint =>
+      'Η θέση GPS λαμβάνεται αυτόματα κατά την αναζήτηση. Μπορείτε επίσης να την ενημερώσετε χειροκίνητα εδώ.';
+
+  @override
+  String get locationClearGpsBody =>
+      'Να διαγραφεί η αποθηκευμένη θέση GPS; Μπορείτε να την ενημερώσετε ξανά ανά πάσα στιγμή.';
+
+  @override
   String get shareReceiptUnsupportedFormat =>
       'Αυτός ο τύπος αρχείου δεν μπορεί να εισαχθεί ακόμη — κοινοποιήστε μια φωτογραφία της απόδειξης.';
 
@@ -8144,8 +8395,8 @@ class AppLocalizationsEl extends AppLocalizations {
       'Στο Android, πατήστε παρατεταμένα το widget και επιλέξτε Επαναρύθμιση για αλλαγή προφίλ, χρώματος και περιεχομένου.';
 
   @override
-  String get widgetDefaultsApplyToAllHint =>
-      'Οι επιλογές παρακάτω εφαρμόζονται σε κάθε εγκατεστημένο widget στην επόμενη ανανέωση.';
+  String get widgetDefaultsThisProfileHint =>
+      'Οι παρακάτω επιλογές ισχύουν για κάθε εγκατεστημένο γραφικό στοιχείο που εμφανίζει αυτό το προφίλ, στην επόμενη ανανέωση.';
 
   @override
   String get widgetDefaultsColorLabel => 'Χρωματικό σχήμα';

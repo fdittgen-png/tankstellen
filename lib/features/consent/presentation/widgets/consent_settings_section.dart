@@ -139,11 +139,36 @@ class _ConsentSettingsSectionState
                 syncTrips: consent.syncTrips,
               ),
         ),
-        // #1665 — the trajet-sync toggle moved to Settings → TankSync
-        // (`tank_sync_section.dart`); it now also gates on a
-        // non-anonymous account, which only makes sense alongside the
-        // account controls. The `consentSyncTrips` storage key +
-        // `GdprConsent.syncTrips` field still back it.
+        // #1665/#3448/#3884 — the trajet-sync consent is back HERE, next to
+        // the Cloud Sync master it depends on (one home per parameter;
+        // #3884). An anonymous UUID is a full identity (#3448), so there
+        // is no email requirement — the TankSync section keeps a
+        // cross-link to this screen instead of a second switch. Disabled
+        // (with a hint) while Cloud Sync is off; the provider also
+        // force-clears it when Cloud Sync is revoked (`effectiveSyncTrips`).
+        SwitchListTile(
+          key: const Key('tripsSyncToggle'),
+          secondary: const Icon(Icons.route_outlined, size: 20),
+          title: Text(l10n.consentSyncTripsTitle),
+          subtitle: Text(
+            consent.cloudSync
+                ? l10n.consentSyncTripsSubtitle
+                : l10n.consentSyncTripsDisabledHint,
+            style: theme.textTheme.bodySmall,
+            maxLines: collapsedMaxLines(),
+            overflow: collapsedOverflow(),
+          ),
+          value: consent.syncTrips,
+          onChanged: consent.cloudSync
+              ? (v) => ref.read(gdprConsentProvider.notifier).save(
+                    location: consent.location,
+                    errorReporting: consent.errorReporting,
+                    cloudSync: consent.cloudSync,
+                    vinOnlineDecode: consent.vinOnlineDecode,
+                    syncTrips: v,
+                  )
+              : null,
+        ),
         // #1529 — section-level expand toggle for the 3 collapsed
         // subtitles (Cloud Sync, Community Wait Times, VIN online
         // decode). The first two consents

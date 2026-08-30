@@ -56,14 +56,14 @@ class ChartsTab extends ConsumerWidget {
     // trip-length card so the two histograms describe the same data
     // slice — and so the reference line on the speed card matches the
     // overall avg already computed above.
-    // #3741 — the list is summaries-only; full-decode only the filtered
-    // trips that actually STORE samples (sampleCount stays truthful on
-    // the summary decode) via the per-id detail family.
+    // #3741 — the list is summaries-only; read only the filtered trips
+    // that actually STORE samples (sampleCount stays truthful on the
+    // summary decode). #3882 — and only their speed + fuel-rate COLUMNS:
+    // the histogram never looks at the other 32 fields.
     final filteredTrips = _filterTrips(trips, activeVehicle?.id);
     final speedBins = aggregateSpeedConsumption([
       for (final t in filteredTrips)
-        if (t.sampleCount > 0)
-          ...?ref.watch(tripHistoryDetailProvider(t.id))?.samples,
+        if (t.sampleCount > 0) ...ref.watch(tripSpeedFuelSamplesProvider(t.id)),
     ]);
 
     return ListView(

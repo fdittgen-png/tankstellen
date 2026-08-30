@@ -11,7 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/theme/theme_mode_provider.dart';
-import 'package:tankstellen/features/profile/presentation/screens/profile_screen.dart';
+import 'package:tankstellen/features/profile/presentation/screens/settings/units_display_screen.dart';
 import 'package:tankstellen/core/widgets/settings_menu_tile.dart';
 
 import '../../../../helpers/mock_providers.dart';
@@ -35,7 +35,7 @@ class _FixedThemeMode extends ThemeModeSetting {
 }
 
 void main() {
-  group('ProfileScreen Theme card (#897)', () {
+  group('UnitsDisplayScreen Theme card (#897, hosted per #3884)', () {
     late MockHiveStorage mockStorage;
 
     List<Object> buildOverrides(AppThemeChoice themeMode) {
@@ -79,7 +79,7 @@ void main() {
         'instead of a bespoke bottom-sheet tile', (tester) async {
       await pumpApp(
         tester,
-        const ProfileScreen(),
+        const UnitsDisplayScreen(),
         overrides: buildOverrides(AppThemeChoice.system),
       );
 
@@ -114,7 +114,7 @@ void main() {
         (tester) async {
       await pumpApp(
         tester,
-        const ProfileScreen(),
+        const UnitsDisplayScreen(),
         overrides: buildOverrides(AppThemeChoice.light),
       );
 
@@ -134,7 +134,7 @@ void main() {
         (tester) async {
       await pumpApp(
         tester,
-        const ProfileScreen(),
+        const UnitsDisplayScreen(),
         overrides: buildOverrides(AppThemeChoice.dark),
       );
 
@@ -155,7 +155,7 @@ void main() {
         '— it was replaced by a SettingsMenuTile in #897', (tester) async {
       await pumpApp(
         tester,
-        const ProfileScreen(),
+        const UnitsDisplayScreen(),
         overrides: buildOverrides(AppThemeChoice.system),
       );
 

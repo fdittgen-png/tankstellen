@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/domain/consumption_unit.dart';
 import '../../../../core/utils/time_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -43,7 +44,11 @@ class TripRecordingLandscapeBody extends StatelessWidget {
     super.key,
     required this.reading,
     required this.brokenMapOverride,
+    this.unit = ConsumptionUnit.lPer100Km, // #3883
   });
+
+  /// #3883 — the display unit of the average tile.
+  final ConsumptionUnit unit;
 
   /// The current live reading, or null before the first fix lands. Owned
   /// by the host screen so this widget stays free of provider reads for
@@ -143,6 +148,7 @@ class TripRecordingLandscapeBody extends StatelessWidget {
                               value: TripAvgConsumptionCard.resolveDisplay(
                                 r,
                                 brokenMapOverride: brokenMapOverride,
+                                unit: unit,
                               ).value,
                             ),
                           ),

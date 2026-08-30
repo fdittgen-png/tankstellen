@@ -86,8 +86,6 @@
   "clearCacheTitle": "Изчистване на кеша?",
   "clearCacheBody": "Кешираните резултати от търсене и цени ще бъдат изтрити. Профилите, любимите и настройките се запазват.",
   "clearCacheButton": "Изчисти кеша",
-  "deleteAllTitle": "Изтриване на всички данни?",
-  "deleteAllBody": "Това ще изтрие завинаги всички профили, любими, API ключ, настройки и кеш. Приложението ще се нулира.",
   "deleteAllButton": "Изтрий всичко",
   "entries": "записа",
   "cacheEmpty": "Кешът е празен",
@@ -258,10 +256,6 @@
   "showCheapestEveryNKm": "Показвай най-евтината станция на всеки {km} км по маршрута",
   "avoidHighways": "Избягвай магистрали",
   "avoidHighwaysDesc": "Изчисляването на маршрута избягва платени пътища и магистрали",
-  "showFuelStations": "Показвай бензиностанции",
-  "showFuelStationsDesc": "Включи бензинови, дизелови, LPG, CNG станции",
-  "showEvStations": "Показвай зарядни станции",
-  "showEvStationsDesc": "Включи електрически зарядни станции в резултатите",
   "noStationsAlongThisRoute": "Не са намерени станции по този маршрут.",
   "fuelCostCalculator": "Калкулатор за разход на гориво",
   "distanceKm": "Разстояние (км)",
@@ -567,7 +561,6 @@
   "tripResume": "Продължи",
   "tripBannerRecording": "Записване на пътуване",
   "tripBannerPaused": "Пътуването е на пауза — докоснете за продължаване",
-  "navConsumption": "Разход",
   "vehicleBaselineSectionTitle": "Базова калибровка",
   "vehicleBaselineEmpty": "Все още няма примери — започнете OBD2 пътуване, за да научите горивния профил на превозното средство.",
   "vehicleBaselineProgress": "Научено от примери в различни ситуации на шофиране.",
@@ -1428,7 +1421,6 @@
   "widgetHelpAdd": "Добавете я от избирача на джаджи на launcher-а — задръжте върху празна зона на началния екран, изберете Джаджи и намерете SparKilo.",
   "widgetHelpTap": "Докоснете станция в джаджата, за да я отворите в приложението. Докоснете иконата за обновяване за актуализиране на цените.",
   "widgetHelpConfigure": "На Android, задръжте върху джаджата и изберете Преконфигурирай за промяна на профила, цвета и съдържанието.",
-  "widgetDefaultsApplyToAllHint": "Изборите по-долу се прилагат за всеки инсталиран уиджет при следващото обновяване.",
   "widgetDefaultsColorLabel": "Цветова схема",
   "widgetDefaultsVariantLabel": "Вариант на съдържанието",
   "widgetColorSchemeSystem": "Системна",
@@ -2447,22 +2439,6 @@
   },
   "tripRecordingDiscardedNoMovement": "Записът е отхвърлен — не е засечено движение",
   "@tripRecordingDiscardedNoMovement": {
-    "description": "MT — needs native review"
-  },
-  "sectionSetupDataSources": "Настройка и източници на данни",
-  "@sectionSetupDataSources": {
-    "description": "MT — needs native review"
-  },
-  "sectionFeaturesUsage": "Функции и използване",
-  "@sectionFeaturesUsage": {
-    "description": "MT — needs native review"
-  },
-  "sectionAccountSync": "Акаунт и синхронизация",
-  "@sectionAccountSync": {
-    "description": "MT — needs native review"
-  },
-  "sectionAppearanceWidgets": "Изглед и джаджи",
-  "@sectionAppearanceWidgets": {
     "description": "MT — needs native review"
   },
   "sectionPrivacyData": "Поверителност и данни",
@@ -4832,5 +4808,126 @@
         "type": "String"
       }
     }
-  }
+  },
+  "liveConsumptionWindowLabel": "Последните {seconds} с",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Единица за разход",
+  "consumptionUnitSettingSubtitle": "Как се показва разходът на гориво навсякъде в приложението",
+  "consumptionUnitAuto": "Автоматично ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Прозорец на разхода на живо",
+  "consumptionWindowSettingSubtitle": "Усреднява стойността на живо за последните секунди — по-дълъг е по-спокоен, по-кратък реагира по-бързо",
+  "consumptionWindowOption": "{seconds} с",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "tripRecordingPipEstConsumptionCaptionUnit": "прибл. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsSearchHint": "Търсене в настройките",
+  "settingsSearchNoResults": "Няма настройки, отговарящи на „{query}“",
+  "@settingsSearchNoResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTopicProfilesTitle": "Профили и регион",
+  "settingsTopicProfilesSubtitle": "Държава, език, гориво, радиус на търсене, планиране на маршрут",
+  "settingsTopicProfilesKeywords": "профил, държава, език, гориво, радиус, пощенски код, маршрут, дом, оценка, начален екран, profile, country, language, fuel, radius, route, home, rating",
+  "settingsTopicVehiclesTitle": "Превозни средства и OBD2",
+  "settingsTopicVehiclesSubtitle": "Вашите автомобили, обем на резервоара, сдвояване на OBD2 адаптер",
+  "settingsTopicVehiclesKeywords": "превозно средство, автомобил, кола, obd, obd2, адаптер, bluetooth, резервоар, двигател, vin, калибриране, vehicle, car, adapter, tank, engine, calibration",
+  "settingsTopicDrivingTitle": "Шофиране и разход",
+  "settingsTopicDrivingSubtitle": "Коучинг, награди, радар за бензиностанции, отстраняване на проблеми",
+  "settingsTopicDrivingKeywords": "коуч, еко, хаптичен, глас, геймификация, радар, плъзгане, пътуване, разход, горивен клуб, лоялност, obd2 дневник, закачване, coach, eco, haptic, voice, gamification, radar, glide, trip, consumption, loyalty, pin",
+  "settingsTopicPricesTitle": "Цени и известия",
+  "settingsTopicPricesSubtitle": "Ценови известия, гласови съобщения, история на цените, сигнали от общността",
+  "settingsTopicPricesKeywords": "известие, уведомление, цена, история, прогноза, най-добро време, общност, сигнал, qr, плащане, глас, съобщение, alert, notification, price, history, prediction, community, report, payment, voice, announcement",
+  "settingsTopicUnitsTitle": "Единици и изглед",
+  "settingsTopicUnitsSubtitle": "Тема, единица за разстояние, уиджет на началния екран",
+  "settingsTopicUnitsKeywords": "тема, тъмна, светла, еко, единица, км, мили, уиджет, цвят, изглед, външен вид, theme, dark, light, eco, unit, km, miles, widget, colour, display, appearance",
+  "settingsTopicFeaturesTitle": "Функции и режим на използване",
+  "settingsTopicFeaturesSubtitle": "Предварителни настройки на режима на използване и всеки превключвател на функция",
+  "settingsTopicFeaturesKeywords": "функция, режим, основен, среден, пълен, персонализиран, превключвател, типове станции, бензиностанции, зарядни, зареждане, feature, mode, basic, medium, full, custom, switch, toggle, charging",
+  "settingsTopicDataSourcesTitle": "Източници на данни и местоположение",
+  "settingsTopicDataSourcesSubtitle": "API ключове, GPS позиция, автоматично превключване на профил",
+  "settingsTopicDataSourcesKeywords": "api, ключ, gps, местоположение, позиция, източник на данни, tankerkoenig, opencharge, key, location, data source",
+  "settingsTopicSyncTitle": "Синхронизация и акаунт",
+  "settingsTopicSyncKeywords": "tanksync, облак, акаунт, имейл, свързване на устройство, синхронизация, споделяне на база данни, анонимен, cloud, account, email, link device, sync, share database, anonymous",
+  "settingsTopicPrivacySubtitle": "Съгласия, табло за поверителност, хранилище и кеш",
+  "settingsTopicPrivacyKeywords": "поверителност, съгласие, gdpr, изтриване, изчистване, хранилище, кеш, данни, докладване на грешки, vin, privacy, consent, delete, erase, storage, cache, data, error reporting",
+  "settingsTopicBackupTitle": "Резервно копие и възстановяване",
+  "settingsTopicBackupSubtitle": "Експортирайте или възстановете пълно резервно копие на данните си",
+  "settingsTopicBackupKeywords": "резервно копие, експорт, възстановяване, импорт, zip, xml, прехвърляне, backup, export, restore, import, transfer",
+  "settingsTopicAdvancedSubtitle": "GitHub токен, инструменти за разработчици",
+  "settingsTopicAdvancedKeywords": "разработчик, дебъг, токен, pat, github, диагностика, дневник на грешките, трасиране, developer, debug, token, diagnostics, error log, trace",
+  "settingsTopicAboutSubtitle": "Версия, лицензи, връзки",
+  "settingsTopicAboutKeywords": "относно, версия, лиценз, дарение, github, признание, about, version, license, donate, attribution",
+  "settingsConsumptionOffHint": "Включете проследяването на разхода във Функции и режим на използване, за да настроите превозни средства, коучинг и награди.",
+  "settingsOpenFeaturesLink": "Отвори Функции и режим на използване",
+  "settingsRadarTileSubtitle": "Радиус, ценови режим, запитване и закачване на екрана за активния профил",
+  "settingsRadarNoProfileHint": "Първо създайте профил — настройките на радара се съхраняват за всеки профил.",
+  "settingsRadarPinHeader": "Закачване на екрана",
+  "settingsAlertsTileSubtitle": "Известия за станции и радиус, които ви уведомяват при спад на цените",
+  "settingsPriceFeaturesHeader": "Ценови функции",
+  "settingsVoiceAnnouncementsOffHint": "Гласовите съобщения са изключени. Включете Гласова обратна връзка и Гласови съобщения във Функции и режим на използване, за да чувате за евтино гориво наблизо, докато шофирате.",
+  "settingsDistanceUnitTitle": "Единица за разстояние",
+  "settingsDistanceUnitSubtitle": "От държавата на активния профил",
+  "settingsObd2AdapterTitle": "OBD2 адаптер",
+  "settingsObd2AdapterSubtitle": "Адаптерите се сдвояват за всяко превозно средство — отворете превозно средство, за да сдвоите или смените адаптера му",
+  "settingsStorageDeleteHint": "Изтриването на всички локални данни става от таблото за поверителност.",
+  "settingsPrivacyCrossLinkTitle": "Съгласия",
+  "settingsPrivacyCrossLinkSubtitle": "Съгласията за Cloud Sync и синхронизация на пътуванията са в Поверителност и данни",
+  "settingsBackupExportSubtitle": "Превозни средства, зареждания, пътувания и дневници на зареждане като ZIP файл",
+  "settingsBackupRestoreSubtitle": "Обединете или заменете данните си от предишно резервно копие ZIP",
+  "settingsStationTypesLink": "Типовете станции се задават във Функции и режим на използване",
+  "routeSearchCriterionLabel": "Избор на станция за всеки участък от маршрута",
+  "routeSearchCriterionCheapest": "Най-евтина",
+  "routeSearchCriterionNearest": "Най-близо до маршрута",
+  "routeSearchTopNLabel": "Кандидати на точка за извадка",
+  "routeSearchTopNCaption": "Във всяка точка по маршрута се разглеждат до {count} станции.",
+  "@routeSearchTopNCaption": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hybridFuelChoiceLabel": "Гориво за търсене на цени (хибрид)",
+  "hybridFuelChoiceVehicleDefault": "По подразбиране за превозното средство",
+  "scopeThisProfile": "Този профил",
+  "scopeAllProfiles": "Всички профили",
+  "scopeThisVehicle": "Това превозно средство",
+  "featureLabel_manualConsumption": "Ръчно записване на разхода",
+  "featureDescription_manualConsumption": "Записвайте зареждания с гориво и сесии на зареждане на ток ръчно (не е нужен OBD2 адаптер).",
+  "featureLabel_loyaltyCards": "Карти за лоялност",
+  "featureDescription_loyaltyCards": "Карти на горивни клубове / за лоялност с отстъпка на литър в сравненията на цени.",
+  "featureLabel_startupTrace": "Трасиране на инициализацията при стартиране",
+  "featureDescription_startupTrace": "Записва хронометрираните фази на стартирането на приложението, показва ги като водопад и ги експортира — диагностика за разработчици.",
+  "locationGpsAutoHint": "GPS позицията се получава автоматично при търсене. Можете да я обновите и ръчно тук.",
+  "locationClearGpsBody": "Да се изчисти ли запазената GPS позиция? Можете да я обновите отново по всяко време.",
+  "widgetDefaultsThisProfileHint": "Изборите по-долу важат за всеки инсталиран уиджет, показващ този профил, при следващото опресняване."
 }

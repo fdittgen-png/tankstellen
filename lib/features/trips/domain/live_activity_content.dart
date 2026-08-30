@@ -8,6 +8,7 @@ import '../../../core/utils/price_formatter.dart';
 import '../../../core/utils/radar_closeness.dart';
 import '../../../core/utils/station_extensions.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../core/domain/consumption_unit.dart';
 import '../../../core/domain/fuel_type.dart';
 import '../../../core/domain/station.dart';
 import '../providers/trip_recording_provider.dart';
@@ -182,6 +183,7 @@ LiveActivityContent? buildLiveActivityContent({
   required double? radiusMeters,
   required AppLocalizations l,
   required DateTime now,
+  ConsumptionUnit unit = ConsumptionUnit.lPer100Km, // #3883
 }) {
   if (!state.isActive) return null;
 
@@ -205,25 +207,27 @@ LiveActivityContent? buildLiveActivityContent({
 
   // Resolve the consumption hero (shared by both modes — the approach
   // layouts keep it so the island's expanded view can show it secondary).
-  final raw = (live != null && !paused) ? formatInstantConsumption(live) : null;
+  // #3883 — rolling-window figure in the user's unit via the shared
+  // resolver (the PiP renders the identical parts).
+  final figure =
+      (live != null && !paused) ? resolveLiveConsumption(live, unit: unit) : null;
   final gpsEstimate = (live != null && !paused)
       ? live.gpsEstimatedLPer100Km
       : null;
   final String bigFigure;
   final String bigCaption;
   var isEstimate = false;
-  if (raw != null) {
-    final idx = raw.indexOf(' ');
-    bigFigure = idx < 0 ? raw : raw.substring(0, idx);
-    bigCaption = raw.contains('L/100') ? 'L/100 km' : 'L/h';
+  if (figure != null) {
+    bigFigure = figure.figure;
+    bigCaption = figure.unitMask;
   } else if (gpsEstimate != null) {
-    bigFigure = '~${gpsEstimate.toStringAsFixed(1)}';
-    bigCaption = l.tripRecordingPipEstConsumptionCaption;
+    bigFigure = formatEstimatedConsumptionFigure(gpsEstimate, unit);
+    bigCaption = l.tripRecordingPipEstConsumptionCaptionUnit(unit.mask);
     isEstimate = true;
   } else {
     // Warm-up / paused — keep the hero consumption-framed (#2601).
     bigFigure = '~';
-    bigCaption = l.tripRecordingPipEstConsumptionCaption;
+    bigCaption = l.tripRecordingPipEstConsumptionCaptionUnit(unit.mask);
     isEstimate = true;
   }
 

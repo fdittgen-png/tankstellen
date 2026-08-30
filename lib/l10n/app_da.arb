@@ -86,8 +86,6 @@
   "clearCacheTitle": "Ryd cache?",
   "clearCacheBody": "Cachelagrede søgeresultater og priser slettes. Profiler, favoritter og indstillinger bevares.",
   "clearCacheButton": "Ryd cache",
-  "deleteAllTitle": "Slet alle data?",
-  "deleteAllBody": "Dette sletter permanent alle profiler, favoritter, API-nøgle, indstillinger og cache. Appen nulstilles.",
   "deleteAllButton": "Slet alt",
   "entries": "poster",
   "cacheEmpty": "Cachen er tom",
@@ -258,10 +256,6 @@
   "showCheapestEveryNKm": "Vis billigste station for hver {km} km langs ruten",
   "avoidHighways": "Undgå motorveje",
   "avoidHighwaysDesc": "Ruteberegning undgår betalingsveje og motorveje",
-  "showFuelStations": "Vis tankstationer",
-  "showFuelStationsDesc": "Inkluder benzin-, diesel-, LPG-, CNG-stationer",
-  "showEvStations": "Vis ladestationer",
-  "showEvStationsDesc": "Inkluder elektriske ladestationer i søgeresultater",
   "noStationsAlongThisRoute": "Ingen stationer fundet langs denne rute.",
   "fuelCostCalculator": "Brændstofomkostningsberegner",
   "distanceKm": "Afstand (km)",
@@ -567,7 +561,6 @@
   "tripResume": "Genoptag",
   "tripBannerRecording": "Optager tur",
   "tripBannerPaused": "Tur på pause — tryk for at genoptage",
-  "navConsumption": "Forbrug",
   "vehicleBaselineSectionTitle": "Basisliniekalibrering",
   "vehicleBaselineEmpty": "Ingen prøver endnu — start en OBD2-tur for at begynde at lære dette køretøjs brændstofprofil.",
   "vehicleBaselineProgress": "Lært fra prøver på tværs af køresituationer.",
@@ -1428,7 +1421,6 @@
   "widgetHelpAdd": "Tilføj den fra din launchers widget-vælger — langt tryk på et tomt område af startskærmen, vælg Widgets, og find SparKilo.",
   "widgetHelpTap": "Tryk på en station i widgetten for at åbne den i appen. Tryk på opdateringsikonet for at opdatere priser.",
   "widgetHelpConfigure": "På Android: langt tryk på widgetten og vælg Genkonfigurér for at ændre profil, farve og indhold.",
-  "widgetDefaultsApplyToAllHint": "Valgene nedenfor gælder for alle installerede widgets ved næste opdatering.",
   "widgetDefaultsColorLabel": "Farvetema",
   "widgetDefaultsVariantLabel": "Indholdsvariant",
   "widgetColorSchemeSystem": "Følg systemet",
@@ -2447,22 +2439,6 @@
   },
   "tripRecordingDiscardedNoMovement": "Optagelse kasseret — ingen bevægelse registreret",
   "@tripRecordingDiscardedNoMovement": {
-    "description": "MT — needs native review"
-  },
-  "sectionSetupDataSources": "Opsætning og datakilder",
-  "@sectionSetupDataSources": {
-    "description": "MT — needs native review"
-  },
-  "sectionFeaturesUsage": "Funktioner og brug",
-  "@sectionFeaturesUsage": {
-    "description": "MT — needs native review"
-  },
-  "sectionAccountSync": "Konto og synkronisering",
-  "@sectionAccountSync": {
-    "description": "MT — needs native review"
-  },
-  "sectionAppearanceWidgets": "Udseende og widgets",
-  "@sectionAppearanceWidgets": {
     "description": "MT — needs native review"
   },
   "sectionPrivacyData": "Privatliv og data",
@@ -4832,5 +4808,126 @@
         "type": "String"
       }
     }
-  }
+  },
+  "liveConsumptionWindowLabel": "Seneste {seconds} s",
+  "@liveConsumptionWindowLabel": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionUnitSettingTitle": "Forbrugsenhed",
+  "consumptionUnitSettingSubtitle": "Sådan vises brændstofforbruget overalt i appen",
+  "consumptionUnitAuto": "Automatisk ({unit})",
+  "@consumptionUnitAuto": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "consumptionWindowSettingTitle": "Vindue for live-forbrug",
+  "consumptionWindowSettingSubtitle": "Gennemsnit af live-værdien over de seneste sekunder – længere er roligere, kortere reagerer hurtigere",
+  "consumptionWindowOption": "{seconds} s",
+  "@consumptionWindowOption": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "tripRecordingPipEstConsumptionCaptionUnit": "ansl. {unit}",
+  "@tripRecordingPipEstConsumptionCaptionUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsSearchHint": "Søg i indstillinger",
+  "settingsSearchNoResults": "Ingen indstillinger matcher \"{query}\"",
+  "@settingsSearchNoResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTopicProfilesTitle": "Profiler & region",
+  "settingsTopicProfilesSubtitle": "Land, sprog, brændstof, søgeradius, ruteplanlægning",
+  "settingsTopicProfilesKeywords": "profil, land, sprog, brændstof, radius, postnummer, rute, hjem, vurdering, startskærm, profile, country, language, fuel, route, home, rating",
+  "settingsTopicVehiclesTitle": "Køretøjer & OBD2",
+  "settingsTopicVehiclesSubtitle": "Dine biler, tankstørrelse, parring af OBD2-adapter",
+  "settingsTopicVehiclesKeywords": "køretøj, bil, obd, obd2, adapter, bluetooth, tank, motor, vin, kalibrering, vehicle, car, engine, calibration",
+  "settingsTopicDrivingTitle": "Kørsel & forbrug",
+  "settingsTopicDrivingSubtitle": "Coaching, belønninger, tankstationsradar, fejlfinding",
+  "settingsTopicDrivingKeywords": "coach, eco, haptisk, stemme, gamification, radar, glid, tur, forbrug, brændstofklub, loyalitet, obd2-log, fastgør, haptic, voice, glide, trip, consumption, loyalty, pin",
+  "settingsTopicPricesTitle": "Priser & advarsler",
+  "settingsTopicPricesSubtitle": "Prisadvarsler, stemmemeddelelser, prishistorik, fællesskabsrapporter",
+  "settingsTopicPricesKeywords": "advarsel, notifikation, pris, historik, forudsigelse, bedste tidspunkt, fællesskab, rapport, qr, betaling, stemme, meddelelse, alert, price, history, prediction, community, report, payment, voice",
+  "settingsTopicUnitsTitle": "Enheder & visning",
+  "settingsTopicUnitsSubtitle": "Tema, afstandsenhed, widget på startskærmen",
+  "settingsTopicUnitsKeywords": "tema, mørk, lys, eco, enhed, km, miles, widget, farve, visning, udseende, theme, dark, light, unit, colour, display",
+  "settingsTopicFeaturesTitle": "Funktioner & brugstilstand",
+  "settingsTopicFeaturesSubtitle": "Forudindstillinger for brugstilstand og alle funktionskontakter",
+  "settingsTopicFeaturesKeywords": "funktion, tilstand, basis, medium, fuld, tilpasset, kontakt, stationstyper, tankstationer, ladestandere, opladning, feature, mode, basic, full, custom, switch, toggle, charging",
+  "settingsTopicDataSourcesTitle": "Datakilder & placering",
+  "settingsTopicDataSourcesSubtitle": "API-nøgler, GPS-position, automatisk profilskift",
+  "settingsTopicDataSourcesKeywords": "api, nøgle, gps, placering, position, datakilde, tankerkoenig, opencharge, key, location, data source",
+  "settingsTopicSyncTitle": "Synkronisering & konto",
+  "settingsTopicSyncKeywords": "tanksync, cloud, konto, e-mail, tilknyt enhed, synkronisering, del database, anonym, account, email, link device, sync, share database, anonymous",
+  "settingsTopicPrivacySubtitle": "Samtykker, privatlivsoversigt, lager & cache",
+  "settingsTopicPrivacyKeywords": "privatliv, samtykke, gdpr, slet, ryd, lager, cache, data, fejlrapportering, vin, privacy, consent, delete, erase, storage, error reporting",
+  "settingsTopicBackupTitle": "Sikkerhedskopi & gendannelse",
+  "settingsTopicBackupSubtitle": "Eksportér eller gendan en fuld sikkerhedskopi af dine data",
+  "settingsTopicBackupKeywords": "sikkerhedskopi, eksport, gendan, import, zip, xml, overførsel, backup, export, restore, transfer",
+  "settingsTopicAdvancedSubtitle": "GitHub-token, udviklerværktøjer",
+  "settingsTopicAdvancedKeywords": "udvikler, fejlsøgning, token, pat, github, diagnostik, fejllog, trace, developer, debug, diagnostics, error log",
+  "settingsTopicAboutSubtitle": "Version, licenser, links",
+  "settingsTopicAboutKeywords": "om, version, licens, donér, github, kreditering, about, license, donate, attribution",
+  "settingsConsumptionOffHint": "Slå forbrugsregistrering til under Funktioner & brugstilstand for at konfigurere køretøjer, coaching og belønninger.",
+  "settingsOpenFeaturesLink": "Åbn Funktioner & brugstilstand",
+  "settingsRadarTileSubtitle": "Radius, pristilstand, forespørgsel og skærmfastgørelse for den aktive profil",
+  "settingsRadarNoProfileHint": "Opret først en profil — radarindstillingerne gemmes pr. profil.",
+  "settingsRadarPinHeader": "Skærmfastgørelse",
+  "settingsAlertsTileSubtitle": "Stations- og radiusadvarsler, der giver besked om prisfald",
+  "settingsPriceFeaturesHeader": "Prisfunktioner",
+  "settingsVoiceAnnouncementsOffHint": "Stemmemeddelelser er slået fra. Slå Stemmefeedback og Stemmemeddelelser til under Funktioner & brugstilstand for at høre billigt brændstof i nærheden, mens du kører.",
+  "settingsDistanceUnitTitle": "Afstandsenhed",
+  "settingsDistanceUnitSubtitle": "Fra den aktive profils land",
+  "settingsObd2AdapterTitle": "OBD2-adapter",
+  "settingsObd2AdapterSubtitle": "Adaptere parres pr. køretøj — åbn et køretøj for at parre eller skifte dets adapter",
+  "settingsStorageDeleteHint": "Sletning af alle lokale data sker fra privatlivsoversigten.",
+  "settingsPrivacyCrossLinkTitle": "Samtykker",
+  "settingsPrivacyCrossLinkSubtitle": "Samtykker til Cloud Sync og tursynkronisering findes under Privatliv & data",
+  "settingsBackupExportSubtitle": "Køretøjer, tankninger, ture og opladningslogs som ZIP-fil",
+  "settingsBackupRestoreSubtitle": "Flet eller erstat dine data fra en tidligere sikkerhedskopi-ZIP",
+  "settingsStationTypesLink": "Stationstyper vælges under Funktioner & brugstilstand",
+  "routeSearchCriterionLabel": "Stationsvalg pr. rutesegment",
+  "routeSearchCriterionCheapest": "Billigste",
+  "routeSearchCriterionNearest": "Nærmest ruten",
+  "routeSearchTopNLabel": "Kandidater pr. målepunkt",
+  "routeSearchTopNCaption": "Op til {count} stationer tages i betragtning ved hvert punkt langs ruten.",
+  "@routeSearchTopNCaption": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hybridFuelChoiceLabel": "Brændstof til prissøgning (hybrid)",
+  "hybridFuelChoiceVehicleDefault": "Køretøjets standard",
+  "scopeThisProfile": "Denne profil",
+  "scopeAllProfiles": "Alle profiler",
+  "scopeThisVehicle": "Dette køretøj",
+  "featureLabel_manualConsumption": "Manuel forbrugsregistrering",
+  "featureDescription_manualConsumption": "Registrér tankninger og opladninger manuelt (ingen OBD2-adapter nødvendig).",
+  "featureLabel_loyaltyCards": "Loyalitetskort",
+  "featureDescription_loyaltyCards": "Brændstofklub-/loyalitetskort med rabat pr. liter i prissammenligninger.",
+  "featureLabel_startupTrace": "Opstartsinitialiseringsspor",
+  "featureDescription_startupTrace": "Registrerer de tidsmålte faser i appens opstart, viser dem som et vandfald og eksporterer dem — en udviklerdiagnostik.",
+  "locationGpsAutoHint": "GPS-positionen hentes automatisk, når du søger. Du kan også opdatere den manuelt her.",
+  "locationClearGpsBody": "Ryd den gemte GPS-position? Du kan opdatere den igen når som helst.",
+  "widgetDefaultsThisProfileHint": "Valgene nedenfor gælder for alle installerede widgets, der viser denne profil, ved næste opdatering."
 }

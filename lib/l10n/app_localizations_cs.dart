@@ -294,13 +294,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get clearCacheButton => 'Vymazat mezipaměť';
 
   @override
-  String get deleteAllTitle => 'Smazat všechna data?';
-
-  @override
-  String get deleteAllBody =>
-      'Tím trvale smažete všechny profily, oblíbené, klíč API, nastavení a mezipaměť. Aplikace bude resetována.';
-
-  @override
   String get deleteAllButton => 'Smazat vše';
 
   @override
@@ -847,20 +840,6 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get avoidHighwaysDesc =>
       'Výpočet trasy se vyhýbá placeným silnicím a dálnicím';
-
-  @override
-  String get showFuelStations => 'Zobrazit čerpací stanice';
-
-  @override
-  String get showFuelStationsDesc =>
-      'Zahrnout benzínové, naftové, LPG, CNG stanice';
-
-  @override
-  String get showEvStations => 'Zobrazit nabíjecí stanice';
-
-  @override
-  String get showEvStationsDesc =>
-      'Zahrnout elektrické nabíjecí stanice ve výsledcích';
 
   @override
   String get noStationsAlongThisRoute =>
@@ -1852,9 +1831,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get tripBannerPaused => 'Cesta pozastavena — klepnutím pokračujte';
 
   @override
-  String get navConsumption => 'Spotřeba';
-
-  @override
   String get vehicleBaselineSectionTitle => 'Základní kalibrace';
 
   @override
@@ -2238,18 +2214,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get sectionLocation => 'Poloha';
-
-  @override
-  String get sectionSetupDataSources => 'Nastavení a zdroje dat';
-
-  @override
-  String get sectionFeaturesUsage => 'Funkce a použití';
-
-  @override
-  String get sectionAccountSync => 'Účet a synchronizace';
-
-  @override
-  String get sectionAppearanceWidgets => 'Vzhled a widgety';
 
   @override
   String get sectionPrivacyData => 'Soukromí a data';
@@ -5954,6 +5918,40 @@ class AppLocalizationsCs extends AppLocalizations {
       'Zpomalujte před zatáčkou, ne v ní — ostré projíždění zatáčkami ztrácí rychlost, kterou pak musíte znovu dobývat.';
 
   @override
+  String liveConsumptionWindowLabel(int seconds) {
+    return 'Posledních $seconds s';
+  }
+
+  @override
+  String get consumptionUnitSettingTitle => 'Jednotka spotřeby';
+
+  @override
+  String get consumptionUnitSettingSubtitle =>
+      'Jak se spotřeba paliva zobrazuje v celé aplikaci';
+
+  @override
+  String consumptionUnitAuto(String unit) {
+    return 'Automaticky ($unit)';
+  }
+
+  @override
+  String get consumptionWindowSettingTitle => 'Okno živé spotřeby';
+
+  @override
+  String get consumptionWindowSettingSubtitle =>
+      'Průměruje živou hodnotu za posledních několik sekund – delší je klidnější, kratší reaguje rychleji';
+
+  @override
+  String consumptionWindowOption(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
+    return 'odh. $unit';
+  }
+
+  @override
   String get locationConsentTitle => 'Přístup k poloze';
 
   @override
@@ -7091,6 +7089,258 @@ class AppLocalizationsCs extends AppLocalizations {
   String get refuelUnitPerSession => '/relaci';
 
   @override
+  String get settingsSearchHint => 'Hledat v nastavení';
+
+  @override
+  String settingsSearchNoResults(String query) {
+    return 'Žádné nastavení neodpovídá „$query“';
+  }
+
+  @override
+  String get settingsTopicProfilesTitle => 'Profily a region';
+
+  @override
+  String get settingsTopicProfilesSubtitle =>
+      'Země, jazyk, palivo, okruh hledání, plánování trasy';
+
+  @override
+  String get settingsTopicProfilesKeywords =>
+      'profil, země, jazyk, palivo, okruh, psč, trasa, domov, hodnocení, úvodní obrazovka, profile, country, language, fuel, radius, route, home, rating';
+
+  @override
+  String get settingsTopicVehiclesTitle => 'Vozidla a OBD2';
+
+  @override
+  String get settingsTopicVehiclesSubtitle =>
+      'Vaše auta, objem nádrže, párování adaptéru OBD2';
+
+  @override
+  String get settingsTopicVehiclesKeywords =>
+      'vozidlo, auto, obd, obd2, adaptér, bluetooth, nádrž, motor, vin, kalibrace, vehicle, car, adapter, tank, engine, calibration';
+
+  @override
+  String get settingsTopicDrivingTitle => 'Jízda a spotřeba';
+
+  @override
+  String get settingsTopicDrivingSubtitle =>
+      'Koučování, odměny, radar čerpacích stanic, řešení potíží';
+
+  @override
+  String get settingsTopicDrivingKeywords =>
+      'kouč, eko, haptický, hlas, gamifikace, radar, dojezd, jízda, spotřeba, palivový klub, věrnost, log obd2, připnout, coach, eco, haptic, voice, gamification, glide, trip, consumption, loyalty, pin';
+
+  @override
+  String get settingsTopicPricesTitle => 'Ceny a upozornění';
+
+  @override
+  String get settingsTopicPricesSubtitle =>
+      'Cenová upozornění, hlasová oznámení, historie cen, hlášení komunity';
+
+  @override
+  String get settingsTopicPricesKeywords =>
+      'upozornění, oznámení, cena, historie, předpověď, nejlepší čas, komunita, hlášení, qr, platba, hlas, alert, notification, price, history, prediction, community, report, payment, voice, announcement';
+
+  @override
+  String get settingsTopicUnitsTitle => 'Jednotky a zobrazení';
+
+  @override
+  String get settingsTopicUnitsSubtitle =>
+      'Motiv, jednotka vzdálenosti, widget na domovské obrazovce';
+
+  @override
+  String get settingsTopicUnitsKeywords =>
+      'motiv, tmavý, světlý, eko, jednotka, km, míle, widget, barva, zobrazení, vzhled, theme, dark, light, eco, unit, miles, colour, display, appearance';
+
+  @override
+  String get settingsTopicFeaturesTitle => 'Funkce a režim použití';
+
+  @override
+  String get settingsTopicFeaturesSubtitle =>
+      'Předvolby režimu použití a všechny přepínače funkcí';
+
+  @override
+  String get settingsTopicFeaturesKeywords =>
+      'funkce, režim, základní, střední, plný, vlastní, přepínač, typy stanic, čerpací stanice, nabíječky, nabíjení, feature, mode, basic, medium, full, custom, switch, toggle, charging';
+
+  @override
+  String get settingsTopicDataSourcesTitle => 'Zdroje dat a poloha';
+
+  @override
+  String get settingsTopicDataSourcesSubtitle =>
+      'Klíče API, poloha GPS, automatické přepínání profilu';
+
+  @override
+  String get settingsTopicDataSourcesKeywords =>
+      'api, klíč, gps, poloha, pozice, zdroj dat, tankerkoenig, opencharge, key, location, data source';
+
+  @override
+  String get settingsTopicSyncTitle => 'Synchronizace a účet';
+
+  @override
+  String get settingsTopicSyncKeywords =>
+      'tanksync, cloud, účet, e-mail, propojit zařízení, synchronizace, sdílet databázi, anonymní, account, email, link device, sync, share database, anonymous';
+
+  @override
+  String get settingsTopicPrivacySubtitle =>
+      'Souhlasy, panel soukromí, úložiště a mezipaměť';
+
+  @override
+  String get settingsTopicPrivacyKeywords =>
+      'soukromí, souhlas, gdpr, smazat, vymazat, úložiště, mezipaměť, data, hlášení chyb, vin, privacy, consent, delete, erase, storage, cache, error reporting';
+
+  @override
+  String get settingsTopicBackupTitle => 'Záloha a obnovení';
+
+  @override
+  String get settingsTopicBackupSubtitle =>
+      'Exportujte nebo obnovte úplnou zálohu svých dat';
+
+  @override
+  String get settingsTopicBackupKeywords =>
+      'záloha, export, obnovit, import, zip, xml, přenos, backup, restore, transfer';
+
+  @override
+  String get settingsTopicAdvancedSubtitle =>
+      'Token GitHub, vývojářské nástroje';
+
+  @override
+  String get settingsTopicAdvancedKeywords =>
+      'vývojář, ladění, token, pat, github, diagnostika, protokol chyb, trasování, developer, debug, diagnostics, error log, trace';
+
+  @override
+  String get settingsTopicAboutSubtitle => 'Verze, licence, odkazy';
+
+  @override
+  String get settingsTopicAboutKeywords =>
+      'o aplikaci, verze, licence, přispět, github, autorství, about, version, license, donate, attribution';
+
+  @override
+  String get settingsConsumptionOffHint =>
+      'Zapněte sledování spotřeby v části Funkce a režim použití, abyste mohli nastavit vozidla, koučování a odměny.';
+
+  @override
+  String get settingsOpenFeaturesLink => 'Otevřít Funkce a režim použití';
+
+  @override
+  String get settingsRadarTileSubtitle =>
+      'Okruh, cenový režim, dotazování a připnutí obrazovky pro aktivní profil';
+
+  @override
+  String get settingsRadarNoProfileHint =>
+      'Nejprve vytvořte profil – nastavení radaru se ukládá pro každý profil zvlášť.';
+
+  @override
+  String get settingsRadarPinHeader => 'Připnutí obrazovky';
+
+  @override
+  String get settingsAlertsTileSubtitle =>
+      'Upozornění na stanice a okruh, která vás informují o poklesu cen';
+
+  @override
+  String get settingsPriceFeaturesHeader => 'Cenové funkce';
+
+  @override
+  String get settingsVoiceAnnouncementsOffHint =>
+      'Hlasová oznámení jsou vypnutá. Zapněte Hlasovou zpětnou vazbu a Hlasová oznámení v části Funkce a režim použití, abyste během jízdy slyšeli o levném palivu v okolí.';
+
+  @override
+  String get settingsDistanceUnitTitle => 'Jednotka vzdálenosti';
+
+  @override
+  String get settingsDistanceUnitSubtitle => 'Podle země aktivního profilu';
+
+  @override
+  String get settingsObd2AdapterTitle => 'Adaptér OBD2';
+
+  @override
+  String get settingsObd2AdapterSubtitle =>
+      'Adaptéry se párují pro každé vozidlo – otevřete vozidlo, chcete-li spárovat nebo změnit jeho adaptér';
+
+  @override
+  String get settingsStorageDeleteHint =>
+      'Smazání všech místních dat se provádí z panelu soukromí.';
+
+  @override
+  String get settingsPrivacyCrossLinkTitle => 'Souhlasy';
+
+  @override
+  String get settingsPrivacyCrossLinkSubtitle =>
+      'Souhlasy pro Cloud Sync a synchronizaci jízd najdete v části Soukromí a data';
+
+  @override
+  String get settingsBackupExportSubtitle =>
+      'Vozidla, tankování, jízdy a záznamy nabíjení jako soubor ZIP';
+
+  @override
+  String get settingsBackupRestoreSubtitle =>
+      'Sloučit nebo nahradit data z dřívější zálohy ZIP';
+
+  @override
+  String get settingsStationTypesLink =>
+      'Typy stanic se nastavují v části Funkce a režim použití';
+
+  @override
+  String get routeSearchCriterionLabel => 'Výběr stanice pro úsek trasy';
+
+  @override
+  String get routeSearchCriterionCheapest => 'Nejlevnější';
+
+  @override
+  String get routeSearchCriterionNearest => 'Nejblíže trase';
+
+  @override
+  String get routeSearchTopNLabel => 'Kandidátů na bod vzorkování';
+
+  @override
+  String routeSearchTopNCaption(int count) {
+    return 'V každém bodě podél trasy se zvažuje až $count stanic.';
+  }
+
+  @override
+  String get hybridFuelChoiceLabel => 'Palivo pro hledání cen (hybrid)';
+
+  @override
+  String get hybridFuelChoiceVehicleDefault => 'Výchozí pro vozidlo';
+
+  @override
+  String get scopeThisProfile => 'Tento profil';
+
+  @override
+  String get scopeAllProfiles => 'Všechny profily';
+
+  @override
+  String get scopeThisVehicle => 'Toto vozidlo';
+
+  @override
+  String get featureLabel_manualConsumption => 'Ruční záznam spotřeby';
+
+  @override
+  String get featureDescription_manualConsumption =>
+      'Zaznamenávejte tankování a nabíjení ručně (adaptér OBD2 není potřeba).';
+
+  @override
+  String get featureLabel_loyaltyCards => 'Věrnostní karty';
+
+  @override
+  String get featureDescription_loyaltyCards =>
+      'Karty palivových klubů / věrnostní karty se slevou na litr v porovnání cen.';
+
+  @override
+  String get featureLabel_startupTrace => 'Trasování inicializace při spuštění';
+
+  @override
+  String get featureDescription_startupTrace =>
+      'Zaznamenává časované fáze spuštění aplikace, zobrazuje je jako vodopád a exportuje – diagnostika pro vývojáře.';
+
+  @override
+  String get locationGpsAutoHint =>
+      'Poloha GPS se získává automaticky při hledání. Zde ji můžete také aktualizovat ručně.';
+
+  @override
+  String get locationClearGpsBody =>
+      'Vymazat uloženou polohu GPS? Kdykoli ji můžete znovu aktualizovat.';
+
+  @override
   String get shareReceiptUnsupportedFormat =>
       'Tento typ souboru zatím nelze importovat — sdílejte místo toho fotografii účtenky.';
 
@@ -8086,8 +8336,8 @@ class AppLocalizationsCs extends AppLocalizations {
       'Na Androidu podržte widget a vyberte Překonfigurovat pro změnu profilu, barvy a obsahu.';
 
   @override
-  String get widgetDefaultsApplyToAllHint =>
-      'Volby níže se použijí na všechny instalované widgety při příští aktualizaci.';
+  String get widgetDefaultsThisProfileHint =>
+      'Níže uvedené volby platí pro všechny nainstalované widgety zobrazující tento profil, při příští aktualizaci.';
 
   @override
   String get widgetDefaultsColorLabel => 'Barevné schéma';
