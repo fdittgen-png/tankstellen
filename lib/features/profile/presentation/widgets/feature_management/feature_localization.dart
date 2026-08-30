@@ -3,25 +3,22 @@
 
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../feature_management/domain/feature.dart';
-import '../../../../feature_management/domain/feature_manifest.dart';
 
 // ---------------------------------------------------------------------------
 // Localised-string lookup helpers for the Feature management section.
 //
 // `AppLocalizations` exposes one getter per key, so a per-feature switch
 // is the simplest mapping that stays static-analysis-friendly (compile-
-// time exhaustiveness over `Feature`). When the localisation lookup is
-// null (test fixtures that omit `AppLocalizations`) the fallback reads the
-// English string straight off `FeatureManifest.defaultManifest` — the
-// single source of truth — instead of re-typing the same literal here
-// (#2189). The two features whose manifest text intentionally differs from
-// the toggle text keep a local literal, flagged inline below.
+// time exhaustiveness over `Feature`). Every feature now has an ARB key
+// (#3884 closed the last three English-only manifest fallbacks —
+// manualConsumption, loyaltyCards, startupTrace). The two features whose
+// manifest text intentionally differs from the toggle text are flagged
+// inline below.
 //
 // Extracted from feature_management_section.dart for #2681 (file-length).
 // ---------------------------------------------------------------------------
 
 String featureLabel(AppLocalizations l, Feature f) {
-  final m = FeatureManifest.defaultManifest.entryFor(f);
   switch (f) {
     case Feature.obd2TripRecording:
       return l.featureLabel_obd2TripRecording;
@@ -56,13 +53,9 @@ String featureLabel(AppLocalizations l, Feature f) {
     case Feature.showConsumptionTab:
       return l.featureLabel_showConsumptionTab;
     case Feature.manualConsumption:
-      // #1517: ARB strings to follow in a localisation pass; English-only
-      // fallback from the manifest SSoT (#2189) so the toggle is readable.
-      return m.displayName;
+      return l.featureLabel_manualConsumption;
     case Feature.loyaltyCards:
-      // #1517: ARB strings to follow in a localisation pass; English-only
-      // fallback from the manifest SSoT (#2189) so the toggle is readable.
-      return m.displayName;
+      return l.featureLabel_loyaltyCards;
     case Feature.tflitePricePrediction:
       return l.featureLabel_tflitePricePrediction;
     case Feature.fuelCalculator:
@@ -94,13 +87,11 @@ String featureLabel(AppLocalizations l, Feature f) {
     case Feature.voiceFeedback:
       return l.featureLabel_voiceFeedback;
     case Feature.startupTrace:
-      // #3383 dev tool — English-only manifest SSoT fallback (#2189).
-      return m.displayName;
+      return l.featureLabel_startupTrace;
   }
 }
 
 String featureDescription(AppLocalizations l, Feature f) {
-  final m = FeatureManifest.defaultManifest.entryFor(f);
   switch (f) {
     case Feature.obd2TripRecording:
       return l.featureDescription_obd2TripRecording;
@@ -135,13 +126,9 @@ String featureDescription(AppLocalizations l, Feature f) {
     case Feature.showConsumptionTab:
       return l.featureDescription_showConsumptionTab;
     case Feature.manualConsumption:
-      // #1517: ARB strings to follow in a localisation pass; English-only
-      // fallback from the manifest SSoT (#2189).
-      return m.description;
+      return l.featureDescription_manualConsumption;
     case Feature.loyaltyCards:
-      // #1517: ARB strings to follow in a localisation pass; English-only
-      // fallback from the manifest SSoT (#2189).
-      return m.description;
+      return l.featureDescription_loyaltyCards;
     case Feature.tflitePricePrediction:
       return l.featureDescription_tflitePricePrediction;
     case Feature.fuelCalculator:
@@ -179,8 +166,7 @@ String featureDescription(AppLocalizations l, Feature f) {
     case Feature.voiceFeedback:
       return l.featureDescription_voiceFeedback;
     case Feature.startupTrace:
-      // #3383 dev tool — English-only manifest SSoT fallback (#2189).
-      return m.description;
+      return l.featureDescription_startupTrace;
   }
 }
 

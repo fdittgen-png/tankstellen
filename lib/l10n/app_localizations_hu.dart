@@ -295,13 +295,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get clearCacheButton => 'Gyorsítótár törlése';
 
   @override
-  String get deleteAllTitle => 'Összes adat törlése?';
-
-  @override
-  String get deleteAllBody =>
-      'Ez véglegesen törli az összes profilt, kedvencet, API-kulcsot, beállítást és gyorsítótárat. Az alkalmazás visszaáll.';
-
-  @override
   String get deleteAllButton => 'Mindent töröl';
 
   @override
@@ -851,19 +844,6 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get avoidHighwaysDesc =>
       'Az útvonaltervezés elkerüli a fizetős utakat és autópályákat';
-
-  @override
-  String get showFuelStations => 'Benzinkutak mutatása';
-
-  @override
-  String get showFuelStationsDesc => 'Benzin, dízel, LPG, CNG kutak bevonása';
-
-  @override
-  String get showEvStations => 'Töltőállomások mutatása';
-
-  @override
-  String get showEvStationsDesc =>
-      'Elektromos töltőállomások bevonása a keresési eredményekbe';
 
   @override
   String get noStationsAlongThisRoute =>
@@ -1857,9 +1837,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get tripBannerPaused => 'Út szüneteltetve — érintsen a folytatáshoz';
 
   @override
-  String get navConsumption => 'Fogyasztás';
-
-  @override
   String get vehicleBaselineSectionTitle => 'Alapvonal-kalibráció';
 
   @override
@@ -2244,18 +2221,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get sectionLocation => 'Helyszín';
-
-  @override
-  String get sectionSetupDataSources => 'Beállítás és adatforrások';
-
-  @override
-  String get sectionFeaturesUsage => 'Funkciók és használat';
-
-  @override
-  String get sectionAccountSync => 'Fiók és szinkronizálás';
-
-  @override
-  String get sectionAppearanceWidgets => 'Megjelenés és widgetek';
 
   @override
   String get sectionPrivacyData => 'Adatvédelem és adatok';
@@ -6004,9 +5969,6 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get consumptionDisplaySectionTitle => 'Fogyasztás megjelenítése';
-
-  @override
   String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
     return 'becs. $unit';
   }
@@ -7157,6 +7119,260 @@ class AppLocalizationsHu extends AppLocalizations {
   String get refuelUnitPerSession => '/munkamenet';
 
   @override
+  String get settingsSearchHint => 'Keresés a beállításokban';
+
+  @override
+  String settingsSearchNoResults(String query) {
+    return 'Nincs a következőre illeszkedő beállítás: „$query”';
+  }
+
+  @override
+  String get settingsTopicProfilesTitle => 'Profilok és régió';
+
+  @override
+  String get settingsTopicProfilesSubtitle =>
+      'Ország, nyelv, üzemanyag, keresési sugár, útvonaltervezés';
+
+  @override
+  String get settingsTopicProfilesKeywords =>
+      'profil, ország, nyelv, üzemanyag, sugár, irányítószám, útvonal, otthon, értékelés, kezdőképernyő, profile, country, language, fuel, radius, route, home, rating';
+
+  @override
+  String get settingsTopicVehiclesTitle => 'Járművek és OBD2';
+
+  @override
+  String get settingsTopicVehiclesSubtitle =>
+      'Autóid, tankméret, OBD2-adapter párosítása';
+
+  @override
+  String get settingsTopicVehiclesKeywords =>
+      'jármű, autó, obd, obd2, adapter, bluetooth, tank, motor, vin, kalibrálás, vehicle, car, engine, calibration';
+
+  @override
+  String get settingsTopicDrivingTitle => 'Vezetés és fogyasztás';
+
+  @override
+  String get settingsTopicDrivingSubtitle =>
+      'Coaching, jutalmak, benzinkút-radar, hibaelhárítás';
+
+  @override
+  String get settingsTopicDrivingKeywords =>
+      'coach, öko, haptikus, hang, gamifikáció, radar, gurulás, út, fogyasztás, üzemanyagklub, hűség, obd2 napló, rögzítés, eco, haptic, voice, gamification, glide, trip, consumption, loyalty, pin';
+
+  @override
+  String get settingsTopicPricesTitle => 'Árak és riasztások';
+
+  @override
+  String get settingsTopicPricesSubtitle =>
+      'Árriasztások, hangbemondás, árelőzmények, közösségi jelentések';
+
+  @override
+  String get settingsTopicPricesKeywords =>
+      'riasztás, értesítés, ár, előzmények, előrejelzés, legjobb időpont, közösség, jelentés, qr, fizetés, hang, bemondás, alert, notification, price, history, prediction, community, report, payment, voice, announcement';
+
+  @override
+  String get settingsTopicUnitsTitle => 'Mértékegységek és megjelenés';
+
+  @override
+  String get settingsTopicUnitsSubtitle =>
+      'Téma, távolság mértékegysége, kezdőképernyő-widget';
+
+  @override
+  String get settingsTopicUnitsKeywords =>
+      'téma, sötét, világos, öko, mértékegység, km, mérföld, widget, szín, megjelenés, kinézet, theme, dark, light, eco, unit, miles, colour, display, appearance';
+
+  @override
+  String get settingsTopicFeaturesTitle => 'Funkciók és használati mód';
+
+  @override
+  String get settingsTopicFeaturesSubtitle =>
+      'Használati mód sablonok és minden funkciókapcsoló';
+
+  @override
+  String get settingsTopicFeaturesKeywords =>
+      'funkció, mód, alap, közepes, teljes, egyéni, kapcsoló, állomástípusok, benzinkutak, töltők, töltés, feature, mode, basic, medium, full, custom, switch, toggle, charging';
+
+  @override
+  String get settingsTopicDataSourcesTitle => 'Adatforrások és helyzet';
+
+  @override
+  String get settingsTopicDataSourcesSubtitle =>
+      'API-kulcsok, GPS-pozíció, automatikus profilváltás';
+
+  @override
+  String get settingsTopicDataSourcesKeywords =>
+      'api, kulcs, gps, helyzet, pozíció, adatforrás, tankerkoenig, opencharge, key, location, data source';
+
+  @override
+  String get settingsTopicSyncTitle => 'Szinkronizálás és fiók';
+
+  @override
+  String get settingsTopicSyncKeywords =>
+      'tanksync, felhő, fiók, e-mail, eszköz összekapcsolása, szinkronizálás, adatbázis megosztása, névtelen, cloud, account, email, link device, sync, share database, anonymous';
+
+  @override
+  String get settingsTopicPrivacySubtitle =>
+      'Hozzájárulások, adatvédelmi irányítópult, tárhely és gyorsítótár';
+
+  @override
+  String get settingsTopicPrivacyKeywords =>
+      'adatvédelem, hozzájárulás, gdpr, törlés, tárhely, gyorsítótár, adatok, hibajelentés, vin, privacy, consent, delete, erase, storage, cache, data, error reporting';
+
+  @override
+  String get settingsTopicBackupTitle => 'Biztonsági mentés és visszaállítás';
+
+  @override
+  String get settingsTopicBackupSubtitle =>
+      'Adataid teljes biztonsági mentésének exportálása vagy visszaállítása';
+
+  @override
+  String get settingsTopicBackupKeywords =>
+      'biztonsági mentés, exportálás, visszaállítás, importálás, zip, xml, átvitel, backup, export, restore, import, transfer';
+
+  @override
+  String get settingsTopicAdvancedSubtitle =>
+      'GitHub-token, fejlesztői eszközök';
+
+  @override
+  String get settingsTopicAdvancedKeywords =>
+      'fejlesztő, hibakeresés, token, pat, github, diagnosztika, hibanapló, nyomkövetés, developer, debug, diagnostics, error log, trace';
+
+  @override
+  String get settingsTopicAboutSubtitle => 'Verzió, licencek, hivatkozások';
+
+  @override
+  String get settingsTopicAboutKeywords =>
+      'névjegy, verzió, licenc, adományozás, github, forrásmegjelölés, about, version, license, donate, attribution';
+
+  @override
+  String get settingsConsumptionOffHint =>
+      'Kapcsold be a fogyasztáskövetést a Funkciók és használati mód alatt a járművek, a coaching és a jutalmak beállításához.';
+
+  @override
+  String get settingsOpenFeaturesLink =>
+      'Funkciók és használati mód megnyitása';
+
+  @override
+  String get settingsRadarTileSubtitle =>
+      'Sugár, ármód, lekérdezés és képernyőrögzítés az aktív profilhoz';
+
+  @override
+  String get settingsRadarNoProfileHint =>
+      'Először hozz létre egy profilt – a radar beállításai profilonként tárolódnak.';
+
+  @override
+  String get settingsRadarPinHeader => 'Képernyőrögzítés';
+
+  @override
+  String get settingsAlertsTileSubtitle =>
+      'Állomás- és sugárriasztások, amelyek árcsökkenésről értesítenek';
+
+  @override
+  String get settingsPriceFeaturesHeader => 'Árfunkciók';
+
+  @override
+  String get settingsVoiceAnnouncementsOffHint =>
+      'A hangbemondás ki van kapcsolva. Kapcsold be a Hangvisszajelzést és a Hangbemondást a Funkciók és használati mód alatt, hogy vezetés közben halld a közeli olcsó üzemanyagot.';
+
+  @override
+  String get settingsDistanceUnitTitle => 'Távolság mértékegysége';
+
+  @override
+  String get settingsDistanceUnitSubtitle => 'Az aktív profil országa alapján';
+
+  @override
+  String get settingsObd2AdapterTitle => 'OBD2-adapter';
+
+  @override
+  String get settingsObd2AdapterSubtitle =>
+      'Az adapterek járművenként párosíthatók – nyiss meg egy járművet az adapter párosításához vagy cseréjéhez';
+
+  @override
+  String get settingsStorageDeleteHint =>
+      'Az összes helyi adat törlése az adatvédelmi irányítópultról történik.';
+
+  @override
+  String get settingsPrivacyCrossLinkTitle => 'Hozzájárulások';
+
+  @override
+  String get settingsPrivacyCrossLinkSubtitle =>
+      'A Cloud Sync és az útszinkronizálás hozzájárulásai az Adatvédelem és adatok alatt találhatók';
+
+  @override
+  String get settingsBackupExportSubtitle =>
+      'Járművek, tankolások, utak és töltési naplók ZIP-fájlként';
+
+  @override
+  String get settingsBackupRestoreSubtitle =>
+      'Adatok egyesítése vagy cseréje egy korábbi biztonsági mentés ZIP-fájljából';
+
+  @override
+  String get settingsStationTypesLink =>
+      'Az állomástípusok a Funkciók és használati mód alatt állíthatók be';
+
+  @override
+  String get routeSearchCriterionLabel =>
+      'Állomásválasztás útvonalszakaszonként';
+
+  @override
+  String get routeSearchCriterionCheapest => 'Legolcsóbb';
+
+  @override
+  String get routeSearchCriterionNearest => 'Az útvonalhoz legközelebbi';
+
+  @override
+  String get routeSearchTopNLabel => 'Jelöltek mintavételi pontonként';
+
+  @override
+  String routeSearchTopNCaption(int count) {
+    return 'Az útvonal minden pontján legfeljebb $count állomást veszünk figyelembe.';
+  }
+
+  @override
+  String get hybridFuelChoiceLabel => 'Üzemanyag az árkereséshez (hibrid)';
+
+  @override
+  String get hybridFuelChoiceVehicleDefault => 'A jármű alapértelmezése';
+
+  @override
+  String get scopeThisProfile => 'Ez a profil';
+
+  @override
+  String get scopeAllProfiles => 'Minden profil';
+
+  @override
+  String get scopeThisVehicle => 'Ez a jármű';
+
+  @override
+  String get featureLabel_manualConsumption => 'Kézi fogyasztásnaplózás';
+
+  @override
+  String get featureDescription_manualConsumption =>
+      'Tankolások és töltések kézi rögzítése (nem kell OBD2-adapter).';
+
+  @override
+  String get featureLabel_loyaltyCards => 'Hűségkártyák';
+
+  @override
+  String get featureDescription_loyaltyCards =>
+      'Üzemanyagklub-/hűségkártyák literenkénti kedvezménnyel az ár-összehasonlításban.';
+
+  @override
+  String get featureLabel_startupTrace => 'Indítási inicializálási nyomkövetés';
+
+  @override
+  String get featureDescription_startupTrace =>
+      'Rögzíti az alkalmazás indításának időmért fázisait, vízesésként mutatja és exportálja – fejlesztői diagnosztika.';
+
+  @override
+  String get locationGpsAutoHint =>
+      'A GPS-pozíciót kereséskor automatikusan lekérjük. Itt kézzel is frissítheted.';
+
+  @override
+  String get locationClearGpsBody =>
+      'Törlöd a tárolt GPS-pozíciót? Bármikor újra frissítheted.';
+
+  @override
   String get shareReceiptUnsupportedFormat =>
       'Ez a fájltípus még nem importálható — osszon meg helyette egy fényképet a bizonylatról.';
 
@@ -8154,8 +8370,8 @@ class AppLocalizationsHu extends AppLocalizations {
       'Android-on nyomjon hosszan a widgetre, és válassza az Újrakonfigurálás lehetőséget a profil, szín és tartalom megváltoztatásához.';
 
   @override
-  String get widgetDefaultsApplyToAllHint =>
-      'Az alábbi beállítások a következő frissítéskor minden telepített widgetre érvényesek.';
+  String get widgetDefaultsThisProfileHint =>
+      'Az alábbi választások minden telepített, ezt a profilt mutató widgetre érvényesek a következő frissítéskor.';
 
   @override
   String get widgetDefaultsColorLabel => 'Színséma';

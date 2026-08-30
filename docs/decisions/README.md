@@ -52,3 +52,4 @@ reused. If a decision is reversed, the original ADR is marked
 | 0016 | Vehicle power state — engine-off start/stop as a car state, not a link failure (Epic #3855) | Accepted |
 | 0017 | Bounded-memory trip recording — live ring, WAL as source of truth, incremental aggregates, downsampled rendering (#3878) | Accepted |
 | 0018 | Trip detail v2 — meta row + columnar 5-minute chunks, decoded off the UI isolate (#3882) | Accepted |
+| 0019 | Settings information architecture — two-level topic tree, one home per parameter, scope labels (#3884) | Accepted |

@@ -54,6 +54,22 @@ abstract final class RoutePaths {
   static const developerToolsObd2Health = '/developer-tools/obd2-health';
   static const developerToolsOcrTester = '/developer-tools/ocr-tester';
 
+  // Settings topic screens (#3884, Epic #3881) — the two-level tree:
+  // the Settings root lists topic tiles; each tile pushes one of these.
+  static const settingsProfiles = '/settings/profiles';
+  static const settingsVehicles = '/settings/vehicles';
+  static const settingsDriving = '/settings/driving';
+  static const settingsRadar = '/settings/driving/radar';
+  static const settingsPrices = '/settings/prices';
+  static const settingsUnits = '/settings/units';
+  static const settingsFeatures = '/settings/features';
+  static const settingsDataSources = '/settings/data-sources';
+  static const settingsSync = '/settings/sync';
+  static const settingsPrivacy = '/settings/privacy';
+  static const settingsBackup = '/settings/backup';
+  static const settingsAdvanced = '/settings/advanced';
+  static const settingsAbout = '/settings/about';
+
   // Consumption / trips.
   static const consumption = '/consumption';
   static const carbon = '/carbon';

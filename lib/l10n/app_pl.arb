@@ -86,8 +86,6 @@
   "clearCacheTitle": "Wyczyścić pamięć podręczną?",
   "clearCacheBody": "Zapisane wyniki wyszukiwania i ceny zostaną usunięte. Profile, ulubione i ustawienia zostaną zachowane.",
   "clearCacheButton": "Wyczyść pamięć podręczną",
-  "deleteAllTitle": "Usunąć wszystkie dane?",
-  "deleteAllBody": "To trwale usunie wszystkie profile, ulubione, klucz API, ustawienia i pamięć podręczną. Aplikacja zostanie zresetowana.",
   "deleteAllButton": "Usuń wszystko",
   "entries": "wpisów",
   "cacheEmpty": "Pamięć podręczna jest pusta",
@@ -258,10 +256,6 @@
   "showCheapestEveryNKm": "Pokaż najtańszą stację co {km} km wzdłuż trasy",
   "avoidHighways": "Unikaj autostrad",
   "avoidHighwaysDesc": "Obliczanie trasy omija drogi płatne i autostrady",
-  "showFuelStations": "Pokaż stacje paliw",
-  "showFuelStationsDesc": "Uwzględnij stacje benzynowe, diesel, LPG, CNG",
-  "showEvStations": "Pokaż stacje ładowania",
-  "showEvStationsDesc": "Uwzględnij stacje ładowania w wynikach wyszukiwania",
   "noStationsAlongThisRoute": "Nie znaleziono stacji wzdłuż tej trasy.",
   "fuelCostCalculator": "Kalkulator kosztów paliwa",
   "distanceKm": "Odległość (km)",
@@ -567,7 +561,6 @@
   "tripResume": "Wznów",
   "tripBannerRecording": "Nagrywanie trasy",
   "tripBannerPaused": "Trasa wstrzymana — dotknij, aby wznowić",
-  "navConsumption": "Zużycie",
   "vehicleBaselineSectionTitle": "Kalibracja bazowa",
   "vehicleBaselineEmpty": "Brak próbek — rozpocznij trasę OBD2, aby zacząć poznawać profil paliwowy tego pojazdu.",
   "vehicleBaselineProgress": "Nauczono z próbek z różnych sytuacji jazdy.",
@@ -1428,7 +1421,6 @@
   "widgetHelpAdd": "Dodaj go z selektora widgetów programu uruchamiającego — naciśnij i przytrzymaj pusty obszar ekranu głównego, wybierz Widgety i znajdź SparKilo.",
   "widgetHelpTap": "Dotknij stacji w widgecie, aby otworzyć ją w aplikacji. Dotknij ikony odświeżania, aby zaktualizować ceny.",
   "widgetHelpConfigure": "Na Androidzie naciśnij i przytrzymaj widget i wybierz Skonfiguruj ponownie, aby zmienić profil, kolor i zawartość.",
-  "widgetDefaultsApplyToAllHint": "Poniższe wybory zostaną zastosowane do każdego zainstalowanego widżetu przy następnym odświeżeniu.",
   "widgetDefaultsColorLabel": "Schemat kolorów",
   "widgetDefaultsVariantLabel": "Wariant zawartości",
   "widgetColorSchemeSystem": "Według systemu",
@@ -2447,22 +2439,6 @@
   },
   "tripRecordingDiscardedNoMovement": "Nagrywanie odrzucone — nie wykryto ruchu",
   "@tripRecordingDiscardedNoMovement": {
-    "description": "MT — needs native review"
-  },
-  "sectionSetupDataSources": "Konfiguracja i źródła danych",
-  "@sectionSetupDataSources": {
-    "description": "MT — needs native review"
-  },
-  "sectionFeaturesUsage": "Funkcje i użytkowanie",
-  "@sectionFeaturesUsage": {
-    "description": "MT — needs native review"
-  },
-  "sectionAccountSync": "Konto i synchronizacja",
-  "@sectionAccountSync": {
-    "description": "MT — needs native review"
-  },
-  "sectionAppearanceWidgets": "Wygląd i widżety",
-  "@sectionAppearanceWidgets": {
     "description": "MT — needs native review"
   },
   "sectionPrivacyData": "Prywatność i dane",
@@ -4861,7 +4837,6 @@
       }
     }
   },
-  "consumptionDisplaySectionTitle": "Wyświetlanie zużycia",
   "tripRecordingPipEstConsumptionCaptionUnit": "szac. {unit}",
   "@tripRecordingPipEstConsumptionCaptionUnit": {
     "placeholders": {
@@ -4869,5 +4844,90 @@
         "type": "String"
       }
     }
-  }
+  },
+  "settingsSearchHint": "Szukaj w ustawieniach",
+  "settingsSearchNoResults": "Brak ustawień pasujących do „{query}”",
+  "@settingsSearchNoResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTopicProfilesTitle": "Profile i region",
+  "settingsTopicProfilesSubtitle": "Kraj, język, paliwo, promień wyszukiwania, planowanie trasy",
+  "settingsTopicProfilesKeywords": "profil, kraj, język, paliwo, promień, kod pocztowy, trasa, dom, ocena, ekran startowy, profile, country, language, fuel, radius, route, home, rating",
+  "settingsTopicVehiclesTitle": "Pojazdy i OBD2",
+  "settingsTopicVehiclesSubtitle": "Twoje samochody, pojemność baku, parowanie adaptera OBD2",
+  "settingsTopicVehiclesKeywords": "pojazd, samochód, auto, obd, obd2, adapter, bluetooth, bak, silnik, vin, kalibracja, vehicle, car, tank, engine, calibration",
+  "settingsTopicDrivingTitle": "Jazda i zużycie paliwa",
+  "settingsTopicDrivingSubtitle": "Coaching, nagrody, radar stacji, rozwiązywanie problemów",
+  "settingsTopicDrivingKeywords": "coach, eko, haptyczny, głos, grywalizacja, radar, wybieg, podróż, zużycie, klub paliwowy, lojalność, log obd2, przypnij, eco, haptic, voice, gamification, glide, trip, consumption, loyalty, pin",
+  "settingsTopicPricesTitle": "Ceny i alerty",
+  "settingsTopicPricesSubtitle": "Alerty cenowe, komunikaty głosowe, historia cen, zgłoszenia społeczności",
+  "settingsTopicPricesKeywords": "alert, powiadomienie, cena, historia, prognoza, najlepszy moment, społeczność, zgłoszenie, qr, płatność, głos, komunikat, notification, price, history, prediction, community, report, payment, voice, announcement",
+  "settingsTopicUnitsTitle": "Jednostki i wygląd",
+  "settingsTopicUnitsSubtitle": "Motyw, jednostka odległości, widżet ekranu głównego",
+  "settingsTopicUnitsKeywords": "motyw, ciemny, jasny, eko, jednostka, km, mile, widżet, kolor, wygląd, theme, dark, light, eco, unit, miles, widget, colour, display, appearance",
+  "settingsTopicFeaturesTitle": "Funkcje i tryb użycia",
+  "settingsTopicFeaturesSubtitle": "Zestawy trybu użycia i każdy przełącznik funkcji",
+  "settingsTopicFeaturesKeywords": "funkcja, tryb, podstawowy, średni, pełny, własny, przełącznik, typy stacji, stacje paliw, ładowarki, ładowanie, feature, mode, basic, medium, full, custom, switch, toggle, charging",
+  "settingsTopicDataSourcesTitle": "Źródła danych i lokalizacja",
+  "settingsTopicDataSourcesSubtitle": "Klucze API, pozycja GPS, automatyczne przełączanie profilu",
+  "settingsTopicDataSourcesKeywords": "api, klucz, gps, lokalizacja, pozycja, źródło danych, tankerkoenig, opencharge, key, location, data source",
+  "settingsTopicSyncTitle": "Synchronizacja i konto",
+  "settingsTopicSyncKeywords": "tanksync, chmura, konto, e-mail, połącz urządzenie, synchronizacja, udostępnij bazę, anonimowy, cloud, account, email, link device, sync, share database, anonymous",
+  "settingsTopicPrivacySubtitle": "Zgody, panel prywatności, pamięć i cache",
+  "settingsTopicPrivacyKeywords": "prywatność, zgoda, rodo, usuń, wymaż, pamięć, cache, dane, raportowanie błędów, vin, privacy, consent, gdpr, delete, erase, storage, data, error reporting",
+  "settingsTopicBackupTitle": "Kopia zapasowa i przywracanie",
+  "settingsTopicBackupSubtitle": "Eksportuj lub przywróć pełną kopię zapasową swoich danych",
+  "settingsTopicBackupKeywords": "kopia zapasowa, eksport, przywróć, import, zip, xml, przeniesienie, backup, export, restore, transfer",
+  "settingsTopicAdvancedSubtitle": "Token GitHub, narzędzia deweloperskie",
+  "settingsTopicAdvancedKeywords": "deweloper, debugowanie, token, pat, github, diagnostyka, dziennik błędów, ślad, developer, debug, diagnostics, error log, trace",
+  "settingsTopicAboutSubtitle": "Wersja, licencje, linki",
+  "settingsTopicAboutKeywords": "o aplikacji, wersja, licencja, wesprzyj, github, autorstwo, about, version, license, donate, attribution",
+  "settingsConsumptionOffHint": "Włącz śledzenie zużycia paliwa w sekcji Funkcje i tryb użycia, aby skonfigurować pojazdy, coaching i nagrody.",
+  "settingsOpenFeaturesLink": "Otwórz Funkcje i tryb użycia",
+  "settingsRadarTileSubtitle": "Promień, tryb cen, odpytywanie i przypinanie ekranu dla aktywnego profilu",
+  "settingsRadarNoProfileHint": "Najpierw utwórz profil — ustawienia radaru są zapisywane dla każdego profilu.",
+  "settingsRadarPinHeader": "Przypinanie ekranu",
+  "settingsAlertsTileSubtitle": "Alerty dla stacji i promienia powiadamiające o spadkach cen",
+  "settingsPriceFeaturesHeader": "Funkcje cenowe",
+  "settingsVoiceAnnouncementsOffHint": "Komunikaty głosowe są wyłączone. Włącz Informacje głosowe i Komunikaty głosowe w sekcji Funkcje i tryb użycia, aby słyszeć o tanim paliwie w pobliżu podczas jazdy.",
+  "settingsDistanceUnitTitle": "Jednostka odległości",
+  "settingsDistanceUnitSubtitle": "Z kraju aktywnego profilu",
+  "settingsObd2AdapterTitle": "Adapter OBD2",
+  "settingsObd2AdapterSubtitle": "Adaptery są parowane dla każdego pojazdu — otwórz pojazd, aby sparować lub zmienić jego adapter",
+  "settingsStorageDeleteHint": "Usunięcie wszystkich danych lokalnych odbywa się z panelu prywatności.",
+  "settingsPrivacyCrossLinkTitle": "Zgody",
+  "settingsPrivacyCrossLinkSubtitle": "Zgody na Cloud Sync i synchronizację podróży znajdziesz w sekcji Prywatność i dane",
+  "settingsBackupExportSubtitle": "Pojazdy, tankowania, podróże i dzienniki ładowania jako plik ZIP",
+  "settingsBackupRestoreSubtitle": "Scal lub zastąp swoje dane z wcześniejszej kopii zapasowej ZIP",
+  "settingsStationTypesLink": "Typy stacji ustawia się w sekcji Funkcje i tryb użycia",
+  "routeSearchCriterionLabel": "Wybór stacji na odcinek trasy",
+  "routeSearchCriterionCheapest": "Najtańsza",
+  "routeSearchCriterionNearest": "Najbliżej trasy",
+  "routeSearchTopNLabel": "Kandydatów na punkt próbkowania",
+  "routeSearchTopNCaption": "W każdym punkcie wzdłuż trasy uwzględnianych jest do {count} stacji.",
+  "@routeSearchTopNCaption": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hybridFuelChoiceLabel": "Paliwo do wyszukiwania cen (hybryda)",
+  "hybridFuelChoiceVehicleDefault": "Domyślne pojazdu",
+  "scopeThisProfile": "Ten profil",
+  "scopeAllProfiles": "Wszystkie profile",
+  "scopeThisVehicle": "Ten pojazd",
+  "featureLabel_manualConsumption": "Ręczne rejestrowanie zużycia",
+  "featureDescription_manualConsumption": "Rejestruj tankowania i sesje ładowania ręcznie (adapter OBD2 nie jest wymagany).",
+  "featureLabel_loyaltyCards": "Karty lojalnościowe",
+  "featureDescription_loyaltyCards": "Karty klubów paliwowych / lojalnościowe z rabatem za litr w porównaniach cen.",
+  "featureLabel_startupTrace": "Ślad inicjalizacji przy uruchomieniu",
+  "featureDescription_startupTrace": "Rejestruje mierzone czasowo fazy uruchamiania aplikacji, pokazuje je jako wykres kaskadowy i eksportuje — diagnostyka dla deweloperów.",
+  "locationGpsAutoHint": "Pozycja GPS jest pobierana automatycznie podczas wyszukiwania. Możesz też zaktualizować ją tutaj ręcznie.",
+  "locationClearGpsBody": "Wyczyścić zapisaną pozycję GPS? Możesz ją zaktualizować ponownie w dowolnym momencie.",
+  "widgetDefaultsThisProfileHint": "Poniższe wybory dotyczą każdego zainstalowanego widżetu pokazującego ten profil, przy następnym odświeżeniu."
 }

@@ -4,16 +4,19 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tankstellen/app/routes/profile_routes.dart';
+import 'package:tankstellen/core/navigation/app_routes.dart';
 
 void main() {
   group('profileRoutes', () {
-    test('returns exactly 11 routes', () {
+    test('returns exactly 24 routes', () {
       // Guards against accidental insert/delete — the Profile shell
       // branch pushes onto these sub-screens. #2248 added the three
       // Developer-tools routes (/developer-tools[/error-log|/flags]);
       // #2471 added the gated /developer-tools/obd2-health screen;
-      // #2518 added the gated /developer-tools/ocr-tester screen.
-      expect(profileRoutes.length, 11);
+      // #2518 added the gated /developer-tools/ocr-tester screen;
+      // #3884 added the twelve Settings topic screens + the radar
+      // sub-screen (/settings/...).
+      expect(profileRoutes.length, 24);
     });
 
     test('route 0 path is "/vehicles"', () {
@@ -72,6 +75,30 @@ void main() {
     test('route 10 path is "/developer-tools/ocr-tester" (#2518)', () {
       final route = profileRoutes[10] as GoRoute;
       expect(route.path, '/developer-tools/ocr-tester');
+    });
+
+    test('routes 11–23 are the #3884 Settings topic screens, in root-tile '
+        'order, with the radar sub-screen after Driving & consumption', () {
+      const expected = <String>[
+        RoutePaths.settingsProfiles,
+        RoutePaths.settingsVehicles,
+        RoutePaths.settingsDriving,
+        RoutePaths.settingsRadar,
+        RoutePaths.settingsPrices,
+        RoutePaths.settingsUnits,
+        RoutePaths.settingsFeatures,
+        RoutePaths.settingsDataSources,
+        RoutePaths.settingsSync,
+        RoutePaths.settingsPrivacy,
+        RoutePaths.settingsBackup,
+        RoutePaths.settingsAdvanced,
+        RoutePaths.settingsAbout,
+      ];
+      for (var i = 0; i < expected.length; i++) {
+        final route = profileRoutes[11 + i] as GoRoute;
+        expect(route.path, expected[i], reason: 'route ${11 + i}');
+        expect(route.path, startsWith('/settings/'));
+      }
     });
 
     test('every entry is a GoRoute', () {

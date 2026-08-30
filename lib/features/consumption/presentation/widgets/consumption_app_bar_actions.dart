@@ -7,15 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/error/guarded.dart';
 import '../../../../core/navigation/app_routes.dart';
-import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
 import '../../../feature_management/domain/feature.dart';
-import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../../fill_ups/api.dart';
-import '../../../charging/api.dart';
 import '../../../trips/api.dart';
 import '../screens/consumption_screen.dart';
 import '../../../obd2/api.dart';
@@ -56,53 +52,22 @@ class ConsumptionAppBarActions extends ConsumerWidget {
 
   const ConsumptionAppBarActions({super.key, this.tripIds});
 
-  /// Run the full XML-in-ZIP backup export pipeline (#1317), preserving
-  /// the [ConsumptionScreen.debugExporterOverride] test seam so the
-  /// export widget tests keep driving a recording exporter.
+  /// Run the full XML-in-ZIP backup export pipeline (#1317) through the
+  /// shared [BackupExportFlow] (#3884 — one implementation for this menu
+  /// and Settings → Backup & restore), preserving the
+  /// [ConsumptionScreen.debugExporterOverride] test seam so the export
+  /// widget tests keep driving a recording exporter.
   Future<void> _runBackupExport(BuildContext context, WidgetRef ref) async {
-    final l = AppLocalizations.of(context);
-    await runGuarded(
+    await BackupExportFlow.run(
       context,
+      ref,
+      // The export test seam still lives on ConsumptionScreen so the
+      // existing `ConsumptionScreen.debugExporterOverride = …` widget
+      // tests keep driving a recording exporter through this extracted
+      // action widget (#2756).
+      // ignore: invalid_use_of_visible_for_testing_member
+      exporter: ConsumptionScreen.debugExporterOverride,
       where: 'ConsumptionAppBarActions._runBackupExport failed',
-      errorText: l.exportBackupFailed,
-      action: () async {
-        final vehicles = ref.read(vehicleProfileListProvider);
-        final fillUps = ref.read(fillUpListProvider);
-        final tripsRepo = ref.read(tripHistoryRepositoryProvider);
-        final trips = tripsRepo?.loadAll() ?? const [];
-        final chargingLogs =
-            ref.read(chargingLogsProvider).asData?.value ?? const [];
-
-        // The export test seam still lives on ConsumptionScreen so the
-        // existing `ConsumptionScreen.debugExporterOverride = …` widget
-        // tests keep driving a recording exporter through this extracted
-        // action widget (#2756).
-        final exporter =
-            // ignore: invalid_use_of_visible_for_testing_member
-            ConsumptionScreen.debugExporterOverride ?? FullBackupExporter();
-        // #2815 — show an indeterminate progress modal while the XML builds,
-        // zips, and writes (1-3 s, previously a silent freeze).
-        final result = await runWithBackupProgress(
-          context,
-          label: l.backupExportProgress,
-          icon: Icons.archive_outlined,
-          work: () => exporter.export(
-            vehicles: vehicles,
-            fillUps: fillUps,
-            trips: trips,
-            chargingLogs: chargingLogs,
-          ),
-        );
-
-        if (!context.mounted) return;
-        // #2014 / #2815 — when the exporter wrote a copy to the public Downloads
-        // folder, name the file so the user can find it (e.g. in the restore
-        // picker, which now also opens on Downloads).
-        final message = (result.savedPath != null)
-            ? (l.exportBackupSavedAs(result.fileName))
-            : (l.exportBackupReady);
-        SnackBarHelper.showSuccess(context, message);
-      },
     );
   }
 

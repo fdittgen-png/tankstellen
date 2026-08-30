@@ -294,13 +294,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clearCacheButton => 'Clear cache';
 
   @override
-  String get deleteAllTitle => 'Delete all data?';
-
-  @override
-  String get deleteAllBody =>
-      'This permanently deletes all profiles, favorites, API key, settings, and cache. The app will reset.';
-
-  @override
   String get deleteAllButton => 'Delete all';
 
   @override
@@ -843,19 +836,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get avoidHighwaysDesc =>
       'Route calculation avoids toll roads and highways';
-
-  @override
-  String get showFuelStations => 'Show fuel stations';
-
-  @override
-  String get showFuelStationsDesc => 'Include gas, diesel, LPG, CNG stations';
-
-  @override
-  String get showEvStations => 'Show EV charging stations';
-
-  @override
-  String get showEvStationsDesc =>
-      'Include electric charging stations in search results';
 
   @override
   String get noStationsAlongThisRoute => 'No stations found along this route.';
@@ -1842,9 +1822,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tripBannerPaused => 'Trip paused — tap to resume';
 
   @override
-  String get navConsumption => 'Consumption';
-
-  @override
   String get vehicleBaselineSectionTitle => 'Baseline calibration';
 
   @override
@@ -2227,18 +2204,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sectionLocation => 'Location';
-
-  @override
-  String get sectionSetupDataSources => 'Setup & data sources';
-
-  @override
-  String get sectionFeaturesUsage => 'Features & usage';
-
-  @override
-  String get sectionAccountSync => 'Account & sync';
-
-  @override
-  String get sectionAppearanceWidgets => 'Appearance & widgets';
 
   @override
   String get sectionPrivacyData => 'Privacy & data';
@@ -5939,9 +5904,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get consumptionDisplaySectionTitle => 'Consumption display';
-
-  @override
   String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
     return 'est. $unit';
   }
@@ -7080,6 +7042,258 @@ class AppLocalizationsEn extends AppLocalizations {
   String get refuelUnitPerSession => '/session';
 
   @override
+  String get settingsSearchHint => 'Search settings';
+
+  @override
+  String settingsSearchNoResults(String query) {
+    return 'No settings match \"$query\"';
+  }
+
+  @override
+  String get settingsTopicProfilesTitle => 'Profiles & region';
+
+  @override
+  String get settingsTopicProfilesSubtitle =>
+      'Country, language, fuel type, search radius, route planning';
+
+  @override
+  String get settingsTopicProfilesKeywords =>
+      'profile, country, language, fuel, radius, postal code, route, home, rating, start screen';
+
+  @override
+  String get settingsTopicVehiclesTitle => 'Vehicles & OBD2';
+
+  @override
+  String get settingsTopicVehiclesSubtitle =>
+      'Your cars, tank size, OBD2 adapter pairing';
+
+  @override
+  String get settingsTopicVehiclesKeywords =>
+      'vehicle, car, obd, obd2, adapter, bluetooth, tank, engine, vin, calibration';
+
+  @override
+  String get settingsTopicDrivingTitle => 'Driving & consumption';
+
+  @override
+  String get settingsTopicDrivingSubtitle =>
+      'Coaching, rewards, fuel-station radar, troubleshooting';
+
+  @override
+  String get settingsTopicDrivingKeywords =>
+      'coach, eco, haptic, voice, gamification, radar, glide, trip, consumption, fuel club, loyalty, obd2 log, pin';
+
+  @override
+  String get settingsTopicPricesTitle => 'Prices & alerts';
+
+  @override
+  String get settingsTopicPricesSubtitle =>
+      'Price alerts, voice announcements, price history, community reports';
+
+  @override
+  String get settingsTopicPricesKeywords =>
+      'alert, notification, price, history, prediction, best time, community, report, qr, payment, voice, announcement';
+
+  @override
+  String get settingsTopicUnitsTitle => 'Units & display';
+
+  @override
+  String get settingsTopicUnitsSubtitle =>
+      'Theme, distance unit, home-screen widget';
+
+  @override
+  String get settingsTopicUnitsKeywords =>
+      'theme, dark, light, eco, unit, km, miles, widget, colour, color, display, appearance';
+
+  @override
+  String get settingsTopicFeaturesTitle => 'Features & use mode';
+
+  @override
+  String get settingsTopicFeaturesSubtitle =>
+      'Use-mode presets and every feature switch';
+
+  @override
+  String get settingsTopicFeaturesKeywords =>
+      'feature, mode, basic, medium, full, custom, switch, toggle, station types, fuel stations, ev stations, charging';
+
+  @override
+  String get settingsTopicDataSourcesTitle => 'Data sources & location';
+
+  @override
+  String get settingsTopicDataSourcesSubtitle =>
+      'API keys, GPS position, automatic profile switching';
+
+  @override
+  String get settingsTopicDataSourcesKeywords =>
+      'api, key, gps, location, position, data source, tankerkoenig, opencharge';
+
+  @override
+  String get settingsTopicSyncTitle => 'Sync & account';
+
+  @override
+  String get settingsTopicSyncKeywords =>
+      'tanksync, cloud, account, email, link device, sync, share database, anonymous';
+
+  @override
+  String get settingsTopicPrivacySubtitle =>
+      'Consents, privacy dashboard, storage & cache';
+
+  @override
+  String get settingsTopicPrivacyKeywords =>
+      'privacy, consent, gdpr, delete, erase, storage, cache, data, error reporting, vin';
+
+  @override
+  String get settingsTopicBackupTitle => 'Backup & restore';
+
+  @override
+  String get settingsTopicBackupSubtitle =>
+      'Export or restore a full backup of your data';
+
+  @override
+  String get settingsTopicBackupKeywords =>
+      'backup, export, restore, import, zip, xml, transfer';
+
+  @override
+  String get settingsTopicAdvancedSubtitle => 'GitHub token, developer tools';
+
+  @override
+  String get settingsTopicAdvancedKeywords =>
+      'developer, debug, token, pat, github, diagnostics, error log, trace';
+
+  @override
+  String get settingsTopicAboutSubtitle => 'Version, licences, links';
+
+  @override
+  String get settingsTopicAboutKeywords =>
+      'about, version, licence, license, donate, github, attribution';
+
+  @override
+  String get settingsConsumptionOffHint =>
+      'Turn on consumption tracking in Features & use mode to configure vehicles, coaching and rewards.';
+
+  @override
+  String get settingsOpenFeaturesLink => 'Open Features & use mode';
+
+  @override
+  String get settingsRadarTileSubtitle =>
+      'Radius, price mode, polling and screen pinning for the active profile';
+
+  @override
+  String get settingsRadarNoProfileHint =>
+      'Create a profile first — the radar settings are stored per profile.';
+
+  @override
+  String get settingsRadarPinHeader => 'Screen pinning';
+
+  @override
+  String get settingsAlertsTileSubtitle =>
+      'Station and radius alerts that notify you of price drops';
+
+  @override
+  String get settingsPriceFeaturesHeader => 'Price features';
+
+  @override
+  String get settingsVoiceAnnouncementsOffHint =>
+      'Voice announcements are off. Turn on Voice feedback and Voice announcements in Features & use mode to hear nearby cheap fuel while driving.';
+
+  @override
+  String get settingsDistanceUnitTitle => 'Distance unit';
+
+  @override
+  String get settingsDistanceUnitSubtitle =>
+      'From the active profile\'s country';
+
+  @override
+  String get settingsObd2AdapterTitle => 'OBD2 adapter';
+
+  @override
+  String get settingsObd2AdapterSubtitle =>
+      'Adapters are paired per vehicle — open a vehicle to pair or change its adapter';
+
+  @override
+  String get settingsStorageDeleteHint =>
+      'Deleting all local data is done from the Privacy Dashboard.';
+
+  @override
+  String get settingsPrivacyCrossLinkTitle => 'Consents';
+
+  @override
+  String get settingsPrivacyCrossLinkSubtitle =>
+      'Cloud Sync and trip-sync consents live under Privacy & data';
+
+  @override
+  String get settingsBackupExportSubtitle =>
+      'Vehicles, fill-ups, trips and charging logs as a ZIP file';
+
+  @override
+  String get settingsBackupRestoreSubtitle =>
+      'Merge or replace your data from a previous backup ZIP';
+
+  @override
+  String get settingsStationTypesLink =>
+      'Station types are set in Features & use mode';
+
+  @override
+  String get routeSearchCriterionLabel => 'Station choice per route segment';
+
+  @override
+  String get routeSearchCriterionCheapest => 'Cheapest';
+
+  @override
+  String get routeSearchCriterionNearest => 'Nearest to route';
+
+  @override
+  String get routeSearchTopNLabel => 'Candidates per sample point';
+
+  @override
+  String routeSearchTopNCaption(int count) {
+    return 'Up to $count stations are considered at each point along the route.';
+  }
+
+  @override
+  String get hybridFuelChoiceLabel => 'Fuel for price search (hybrid)';
+
+  @override
+  String get hybridFuelChoiceVehicleDefault => 'Vehicle default';
+
+  @override
+  String get scopeThisProfile => 'This profile';
+
+  @override
+  String get scopeAllProfiles => 'All profiles';
+
+  @override
+  String get scopeThisVehicle => 'This vehicle';
+
+  @override
+  String get featureLabel_manualConsumption => 'Manual consumption logging';
+
+  @override
+  String get featureDescription_manualConsumption =>
+      'Track fuel fill-ups and EV charging sessions by hand (no OBD2 adapter required).';
+
+  @override
+  String get featureLabel_loyaltyCards => 'Loyalty cards';
+
+  @override
+  String get featureDescription_loyaltyCards =>
+      'Fuel-club / loyalty program cards with per-litre discounts in price comparisons.';
+
+  @override
+  String get featureLabel_startupTrace => 'Startup initialization trace';
+
+  @override
+  String get featureDescription_startupTrace =>
+      'Record the timed phases of app startup, view them as a waterfall and export them — a developer diagnostic.';
+
+  @override
+  String get locationGpsAutoHint =>
+      'GPS position is acquired automatically when you search. You can also update it manually here.';
+
+  @override
+  String get locationClearGpsBody =>
+      'Clear the stored GPS position? You can update it again at any time.';
+
+  @override
   String get shareReceiptUnsupportedFormat =>
       'That file type can\'t be imported yet — share a photo of the receipt instead.';
 
@@ -8070,8 +8284,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'On Android, long-press the widget and choose Reconfigure to change the profile, colour, and content.';
 
   @override
-  String get widgetDefaultsApplyToAllHint =>
-      'Choices below apply to every installed widget on the next refresh.';
+  String get widgetDefaultsThisProfileHint =>
+      'Choices below apply to every installed widget showing this profile, on the next refresh.';
 
   @override
   String get widgetDefaultsColorLabel => 'Colour scheme';
@@ -8393,13 +8607,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get clearCacheButton => '⟦Çłéář çáçĥé ·····⟧';
-
-  @override
-  String get deleteAllTitle => '⟦Đéłéŧé áłł đáŧá? ······⟧';
-
-  @override
-  String get deleteAllBody =>
-      '⟦Ŧĥîš ƥéřɱáñéñŧłý đéłéŧéš áłł ƥřóƒîłéš, ƒáṽóřîŧéš, ÁƤÎ ķéý, šéŧŧîñǧš, áñđ çáçĥé. Ŧĥé áƥƥ ŵîłł řéšéŧ. ····································⟧';
 
   @override
   String get deleteAllButton => '⟦Đéłéŧé áłł ····⟧';
@@ -8958,20 +9165,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get avoidHighwaysDesc =>
       '⟦Řóúŧé çáłçúłáŧîóñ áṽóîđš ŧółł řóáđš áñđ ĥîǧĥŵáýš ···················⟧';
-
-  @override
-  String get showFuelStations => '⟦Šĥóŵ ƒúéł šŧáŧîóñš ·······⟧';
-
-  @override
-  String get showFuelStationsDesc =>
-      '⟦Îñçłúđé ǧáš, đîéšéł, ŁƤǦ, ÇÑǦ šŧáŧîóñš ··············⟧';
-
-  @override
-  String get showEvStations => '⟦Šĥóŵ ÉṼ çĥářǧîñǧ šŧáŧîóñš ··········⟧';
-
-  @override
-  String get showEvStationsDesc =>
-      '⟦Îñçłúđé éłéçŧřîç çĥářǧîñǧ šŧáŧîóñš îñ šéářçĥ řéšúłŧš ·····················⟧';
 
   @override
   String get noStationsAlongThisRoute =>
@@ -9979,9 +10172,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get tripBannerPaused => '⟦Ŧřîƥ ƥáúšéđ — ŧáƥ ŧó řéšúɱé ·········⟧';
 
   @override
-  String get navConsumption => '⟦Çóñšúɱƥŧîóñ ·····⟧';
-
-  @override
   String get vehicleBaselineSectionTitle => '⟦Ɓášéłîñé çáłîƀřáŧîóñ ·········⟧';
 
   @override
@@ -10371,18 +10561,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get sectionLocation => '⟦Łóçáŧîóñ ····⟧';
-
-  @override
-  String get sectionSetupDataSources => '⟦Šéŧúƥ & đáŧá šóúřçéš ·······⟧';
-
-  @override
-  String get sectionFeaturesUsage => '⟦Ƒéáŧúřéš & úšáǧé ······⟧';
-
-  @override
-  String get sectionAccountSync => '⟦Áççóúñŧ & šýñç ·····⟧';
-
-  @override
-  String get sectionAppearanceWidgets => '⟦Áƥƥéářáñçé & ŵîđǧéŧš ········⟧';
 
   @override
   String get sectionPrivacyData => '⟦Ƥřîṽáçý & đáŧá ·····⟧';
@@ -14197,9 +14375,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   }
 
   @override
-  String get consumptionDisplaySectionTitle => '⟦Çóñšúɱƥŧîóñ đîšƥłáý ········⟧';
-
-  @override
   String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
     return '⟦éšŧ. $unit ·⟧';
   }
@@ -15361,6 +15536,266 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get refuelUnitPerSession => '⟦/šéššîóñ ···⟧';
 
   @override
+  String get settingsSearchHint => '⟦Šéářçĥ šéŧŧîñǧš ······⟧';
+
+  @override
+  String settingsSearchNoResults(String query) {
+    return '⟦Ñó šéŧŧîñǧš ɱáŧçĥ \"$query\" ·······⟧';
+  }
+
+  @override
+  String get settingsTopicProfilesTitle => '⟦Ƥřóƒîłéš & řéǧîóñ ······⟧';
+
+  @override
+  String get settingsTopicProfilesSubtitle =>
+      '⟦Çóúñŧřý, łáñǧúáǧé, ƒúéł ŧýƥé, šéářçĥ řáđîúš, řóúŧé ƥłáññîñǧ ······················⟧';
+
+  @override
+  String get settingsTopicProfilesKeywords =>
+      '⟦ƥřóƒîłé, çóúñŧřý, łáñǧúáǧé, ƒúéł, řáđîúš, ƥóšŧáł çóđé, řóúŧé, ĥóɱé, řáŧîñǧ, šŧářŧ šçřééñ ·······························⟧';
+
+  @override
+  String get settingsTopicVehiclesTitle => '⟦Ṽéĥîçłéš & ÓƁĐ2 ·····⟧';
+
+  @override
+  String get settingsTopicVehiclesSubtitle =>
+      '⟦Ýóúř çářš, ŧáñķ šîžé, ÓƁĐ2 áđáƥŧéř ƥáîřîñǧ ···············⟧';
+
+  @override
+  String get settingsTopicVehiclesKeywords =>
+      '⟦ṽéĥîçłé, çář, óƀđ, óƀđ2, áđáƥŧéř, ƀłúéŧóóŧĥ, ŧáñķ, éñǧîñé, ṽîñ, çáłîƀřáŧîóñ ·························⟧';
+
+  @override
+  String get settingsTopicDrivingTitle => '⟦Đřîṽîñǧ & çóñšúɱƥŧîóñ ········⟧';
+
+  @override
+  String get settingsTopicDrivingSubtitle =>
+      '⟦Çóáçĥîñǧ, řéŵářđš, ƒúéł-šŧáŧîóñ řáđář, ŧřóúƀłéšĥóóŧîñǧ ·····················⟧';
+
+  @override
+  String get settingsTopicDrivingKeywords =>
+      '⟦çóáçĥ, éçó, ĥáƥŧîç, ṽóîçé, ǧáɱîƒîçáŧîóñ, řáđář, ǧłîđé, ŧřîƥ, çóñšúɱƥŧîóñ, ƒúéł çłúƀ, łóýáłŧý, óƀđ2 łóǧ, ƥîñ ····································⟧';
+
+  @override
+  String get settingsTopicPricesTitle => '⟦Ƥřîçéš & áłéřŧš ·····⟧';
+
+  @override
+  String get settingsTopicPricesSubtitle =>
+      '⟦Ƥřîçé áłéřŧš, ṽóîçé áññóúñçéɱéñŧš, ƥřîçé ĥîšŧóřý, çóɱɱúñîŧý řéƥóřŧš ··························⟧';
+
+  @override
+  String get settingsTopicPricesKeywords =>
+      '⟦áłéřŧ, ñóŧîƒîçáŧîóñ, ƥřîçé, ĥîšŧóřý, ƥřéđîçŧîóñ, ƀéšŧ ŧîɱé, çóɱɱúñîŧý, řéƥóřŧ, ɋř, ƥáýɱéñŧ, ṽóîçé, áññóúñçéɱéñŧ ········································⟧';
+
+  @override
+  String get settingsTopicUnitsTitle => '⟦Úñîŧš & đîšƥłáý ·····⟧';
+
+  @override
+  String get settingsTopicUnitsSubtitle =>
+      '⟦Ŧĥéɱé, đîšŧáñçé úñîŧ, ĥóɱé-šçřééñ ŵîđǧéŧ ···············⟧';
+
+  @override
+  String get settingsTopicUnitsKeywords =>
+      '⟦ŧĥéɱé, đářķ, łîǧĥŧ, éçó, úñîŧ, ķɱ, ɱîłéš, ŵîđǧéŧ, çółóúř, çółóř, đîšƥłáý, áƥƥéářáñçé ····························⟧';
+
+  @override
+  String get settingsTopicFeaturesTitle => '⟦Ƒéáŧúřéš & úšé ɱóđé ·······⟧';
+
+  @override
+  String get settingsTopicFeaturesSubtitle =>
+      '⟦Úšé-ɱóđé ƥřéšéŧš áñđ éṽéřý ƒéáŧúřé šŵîŧçĥ ················⟧';
+
+  @override
+  String get settingsTopicFeaturesKeywords =>
+      '⟦ƒéáŧúřé, ɱóđé, ƀášîç, ɱéđîúɱ, ƒúłł, çúšŧóɱ, šŵîŧçĥ, ŧóǧǧłé, šŧáŧîóñ ŧýƥéš, ƒúéł šŧáŧîóñš, éṽ šŧáŧîóñš, çĥářǧîñǧ ·······································⟧';
+
+  @override
+  String get settingsTopicDataSourcesTitle =>
+      '⟦Đáŧá šóúřçéš & łóçáŧîóñ ·········⟧';
+
+  @override
+  String get settingsTopicDataSourcesSubtitle =>
+      '⟦ÁƤÎ ķéýš, ǦƤŠ ƥóšîŧîóñ, áúŧóɱáŧîç ƥřóƒîłé šŵîŧçĥîñǧ ···················⟧';
+
+  @override
+  String get settingsTopicDataSourcesKeywords =>
+      '⟦áƥî, ķéý, ǧƥš, łóçáŧîóñ, ƥóšîŧîóñ, đáŧá šóúřçé, ŧáñķéřķóéñîǧ, óƥéñçĥářǧé ··························⟧';
+
+  @override
+  String get settingsTopicSyncTitle => '⟦Šýñç & áççóúñŧ ·····⟧';
+
+  @override
+  String get settingsTopicSyncKeywords =>
+      '⟦ŧáñķšýñç, çłóúđ, áççóúñŧ, éɱáîł, łîñķ đéṽîçé, šýñç, šĥářé đáŧáƀášé, áñóñýɱóúš ···························⟧';
+
+  @override
+  String get settingsTopicPrivacySubtitle =>
+      '⟦Çóñšéñŧš, ƥřîṽáçý đášĥƀóářđ, šŧóřáǧé & çáçĥé ················⟧';
+
+  @override
+  String get settingsTopicPrivacyKeywords =>
+      '⟦ƥřîṽáçý, çóñšéñŧ, ǧđƥř, đéłéŧé, éřášé, šŧóřáǧé, çáçĥé, đáŧá, éřřóř řéƥóřŧîñǧ, ṽîñ ····························⟧';
+
+  @override
+  String get settingsTopicBackupTitle => '⟦Ɓáçķúƥ & řéšŧóřé ······⟧';
+
+  @override
+  String get settingsTopicBackupSubtitle =>
+      '⟦Éẋƥóřŧ óř řéšŧóřé á ƒúłł ƀáçķúƥ óƒ ýóúř đáŧá ················⟧';
+
+  @override
+  String get settingsTopicBackupKeywords =>
+      '⟦ƀáçķúƥ, éẋƥóřŧ, řéšŧóřé, îɱƥóřŧ, žîƥ, ẋɱł, ŧřáñšƒéř ··················⟧';
+
+  @override
+  String get settingsTopicAdvancedSubtitle =>
+      '⟦ǦîŧĤúƀ ŧóķéñ, đéṽéłóƥéř ŧóółš ···········⟧';
+
+  @override
+  String get settingsTopicAdvancedKeywords =>
+      '⟦đéṽéłóƥéř, đéƀúǧ, ŧóķéñ, ƥáŧ, ǧîŧĥúƀ, đîáǧñóšŧîçš, éřřóř łóǧ, ŧřáçé ·······················⟧';
+
+  @override
+  String get settingsTopicAboutSubtitle =>
+      '⟦Ṽéřšîóñ, łîçéñçéš, łîñķš ·········⟧';
+
+  @override
+  String get settingsTopicAboutKeywords =>
+      '⟦áƀóúŧ, ṽéřšîóñ, łîçéñçé, łîçéñšé, đóñáŧé, ǧîŧĥúƀ, áŧŧřîƀúŧîóñ ······················⟧';
+
+  @override
+  String get settingsConsumptionOffHint =>
+      '⟦Ŧúřñ óñ çóñšúɱƥŧîóñ ŧřáçķîñǧ îñ Ƒéáŧúřéš & úšé ɱóđé ŧó çóñƒîǧúřé ṽéĥîçłéš, çóáçĥîñǧ áñđ řéŵářđš. ····································⟧';
+
+  @override
+  String get settingsOpenFeaturesLink => '⟦Óƥéñ Ƒéáŧúřéš & úšé ɱóđé ·········⟧';
+
+  @override
+  String get settingsRadarTileSubtitle =>
+      '⟦Řáđîúš, ƥřîçé ɱóđé, ƥółłîñǧ áñđ šçřééñ ƥîññîñǧ ƒóř ŧĥé áçŧîṽé ƥřóƒîłé ··························⟧';
+
+  @override
+  String get settingsRadarNoProfileHint =>
+      '⟦Çřéáŧé á ƥřóƒîłé ƒîřšŧ — ŧĥé řáđář šéŧŧîñǧš ářé šŧóřéđ ƥéř ƥřóƒîłé. ························⟧';
+
+  @override
+  String get settingsRadarPinHeader => '⟦Šçřééñ ƥîññîñǧ ······⟧';
+
+  @override
+  String get settingsAlertsTileSubtitle =>
+      '⟦Šŧáŧîóñ áñđ řáđîúš áłéřŧš ŧĥáŧ ñóŧîƒý ýóú óƒ ƥřîçé đřóƥš ·····················⟧';
+
+  @override
+  String get settingsPriceFeaturesHeader => '⟦Ƥřîçé ƒéáŧúřéš ······⟧';
+
+  @override
+  String get settingsVoiceAnnouncementsOffHint =>
+      '⟦Ṽóîçé áññóúñçéɱéñŧš ářé óƒƒ. Ŧúřñ óñ Ṽóîçé ƒééđƀáçķ áñđ Ṽóîçé áññóúñçéɱéñŧš îñ Ƒéáŧúřéš & úšé ɱóđé ŧó ĥéář ñéářƀý çĥéáƥ ƒúéł ŵĥîłé đřîṽîñǧ. ···················································⟧';
+
+  @override
+  String get settingsDistanceUnitTitle => '⟦Đîšŧáñçé úñîŧ ·····⟧';
+
+  @override
+  String get settingsDistanceUnitSubtitle =>
+      '⟦Ƒřóɱ ŧĥé áçŧîṽé ƥřóƒîłé\'š çóúñŧřý ·············⟧';
+
+  @override
+  String get settingsObd2AdapterTitle => '⟦ÓƁĐ2 áđáƥŧéř ·····⟧';
+
+  @override
+  String get settingsObd2AdapterSubtitle =>
+      '⟦Áđáƥŧéřš ářé ƥáîřéđ ƥéř ṽéĥîçłé — óƥéñ á ṽéĥîçłé ŧó ƥáîř óř çĥáñǧé îŧš áđáƥŧéř ····························⟧';
+
+  @override
+  String get settingsStorageDeleteHint =>
+      '⟦Đéłéŧîñǧ áłł łóçáł đáŧá îš đóñé ƒřóɱ ŧĥé Ƥřîṽáçý Đášĥƀóářđ. ······················⟧';
+
+  @override
+  String get settingsPrivacyCrossLinkTitle => '⟦Çóñšéñŧš ····⟧';
+
+  @override
+  String get settingsPrivacyCrossLinkSubtitle =>
+      '⟦Çłóúđ Šýñç áñđ ŧřîƥ-šýñç çóñšéñŧš łîṽé úñđéř Ƥřîṽáçý & đáŧá ······················⟧';
+
+  @override
+  String get settingsBackupExportSubtitle =>
+      '⟦Ṽéĥîçłéš, ƒîłł-úƥš, ŧřîƥš áñđ çĥářǧîñǧ łóǧš áš á ŽÎƤ ƒîłé ····················⟧';
+
+  @override
+  String get settingsBackupRestoreSubtitle =>
+      '⟦Ṁéřǧé óř řéƥłáçé ýóúř đáŧá ƒřóɱ á ƥřéṽîóúš ƀáçķúƥ ŽÎƤ ····················⟧';
+
+  @override
+  String get settingsStationTypesLink =>
+      '⟦Šŧáŧîóñ ŧýƥéš ářé šéŧ îñ Ƒéáŧúřéš & úšé ɱóđé ················⟧';
+
+  @override
+  String get routeSearchCriterionLabel =>
+      '⟦Šŧáŧîóñ çĥóîçé ƥéř řóúŧé šéǧɱéñŧ ·············⟧';
+
+  @override
+  String get routeSearchCriterionCheapest => '⟦Çĥéáƥéšŧ ····⟧';
+
+  @override
+  String get routeSearchCriterionNearest => '⟦Ñéářéšŧ ŧó řóúŧé ······⟧';
+
+  @override
+  String get routeSearchTopNLabel =>
+      '⟦Çáñđîđáŧéš ƥéř šáɱƥłé ƥóîñŧ ···········⟧';
+
+  @override
+  String routeSearchTopNCaption(int count) {
+    return '⟦Úƥ ŧó $count šŧáŧîóñš ářé çóñšîđéřéđ áŧ éáçĥ ƥóîñŧ áłóñǧ ŧĥé řóúŧé. ······················⟧';
+  }
+
+  @override
+  String get hybridFuelChoiceLabel =>
+      '⟦Ƒúéł ƒóř ƥřîçé šéářçĥ (ĥýƀřîđ) ···········⟧';
+
+  @override
+  String get hybridFuelChoiceVehicleDefault => '⟦Ṽéĥîçłé đéƒáúłŧ ······⟧';
+
+  @override
+  String get scopeThisProfile => '⟦Ŧĥîš ƥřóƒîłé ·····⟧';
+
+  @override
+  String get scopeAllProfiles => '⟦Áłł ƥřóƒîłéš ·····⟧';
+
+  @override
+  String get scopeThisVehicle => '⟦Ŧĥîš ṽéĥîçłé ·····⟧';
+
+  @override
+  String get featureLabel_manualConsumption =>
+      '⟦Ṁáñúáł çóñšúɱƥŧîóñ łóǧǧîñǧ ···········⟧';
+
+  @override
+  String get featureDescription_manualConsumption =>
+      '⟦Ŧřáçķ ƒúéł ƒîłł-úƥš áñđ ÉṼ çĥářǧîñǧ šéššîóñš ƀý ĥáñđ (ñó ÓƁĐ2 áđáƥŧéř řéɋúîřéđ). ····························⟧';
+
+  @override
+  String get featureLabel_loyaltyCards => '⟦Łóýáłŧý çářđš ·····⟧';
+
+  @override
+  String get featureDescription_loyaltyCards =>
+      '⟦Ƒúéł-çłúƀ / łóýáłŧý ƥřóǧřáɱ çářđš ŵîŧĥ ƥéř-łîŧřé đîšçóúñŧš îñ ƥřîçé çóɱƥářîšóñš. ······························⟧';
+
+  @override
+  String get featureLabel_startupTrace =>
+      '⟦Šŧářŧúƥ îñîŧîáłîžáŧîóñ ŧřáçé ············⟧';
+
+  @override
+  String get featureDescription_startupTrace =>
+      '⟦Řéçóřđ ŧĥé ŧîɱéđ ƥĥášéš óƒ áƥƥ šŧářŧúƥ, ṽîéŵ ŧĥéɱ áš á ŵáŧéřƒáłł áñđ éẋƥóřŧ ŧĥéɱ — á đéṽéłóƥéř đîáǧñóšŧîç. ······································⟧';
+
+  @override
+  String get locationGpsAutoHint =>
+      '⟦ǦƤŠ ƥóšîŧîóñ îš áçɋúîřéđ áúŧóɱáŧîçáłłý ŵĥéñ ýóú šéářçĥ. Ýóú çáñ áłšó úƥđáŧé îŧ ɱáñúáłłý ĥéřé. ···································⟧';
+
+  @override
+  String get locationClearGpsBody =>
+      '⟦Çłéář ŧĥé šŧóřéđ ǦƤŠ ƥóšîŧîóñ? Ýóú çáñ úƥđáŧé îŧ áǧáîñ áŧ áñý ŧîɱé. ························⟧';
+
+  @override
   String get shareReceiptUnsupportedFormat =>
       '⟦Ŧĥáŧ ƒîłé ŧýƥé çáñ\'ŧ ƀé îɱƥóřŧéđ ýéŧ — šĥářé á ƥĥóŧó óƒ ŧĥé řéçéîƥŧ îñšŧéáđ. ···························⟧';
 
@@ -16377,8 +16812,8 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Óñ Áñđřóîđ, łóñǧ-ƥřéšš ŧĥé ŵîđǧéŧ áñđ çĥóóšé Řéçóñƒîǧúřé ŧó çĥáñǧé ŧĥé ƥřóƒîłé, çółóúř, áñđ çóñŧéñŧ. ····································⟧';
 
   @override
-  String get widgetDefaultsApplyToAllHint =>
-      '⟦Çĥóîçéš ƀéłóŵ áƥƥłý ŧó éṽéřý îñšŧáłłéđ ŵîđǧéŧ óñ ŧĥé ñéẋŧ řéƒřéšĥ. ·························⟧';
+  String get widgetDefaultsThisProfileHint =>
+      '⟦Çĥóîçéš ƀéłóŵ áƥƥłý ŧó éṽéřý îñšŧáłłéđ ŵîđǧéŧ šĥóŵîñǧ ŧĥîš ƥřóƒîłé, óñ ŧĥé ñéẋŧ řéƒřéšĥ. ·································⟧';
 
   @override
   String get widgetDefaultsColorLabel => '⟦Çółóúř šçĥéɱé ·····⟧';

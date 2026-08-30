@@ -211,6 +211,7 @@ void main() {
     test('basic / medium / full bundles match the pinned canonical sets', () {
       // Regression guard: the IA reorg is presentation-only — the preset
       // bundles must not have drifted. Pin the exact sets here.
+      // #3884 — the presets keep the default-on price tools on.
       expect(appProfileBundles[AppProfile.basic], <Feature>{
         Feature.showFuel,
         Feature.showElectric,
@@ -220,6 +221,9 @@ void main() {
         Feature.evCharging,
         Feature.tankSync,
         Feature.baselineSync,
+        Feature.fuelCalculator,
+        Feature.paymentQrScan,
+        Feature.communityPriceReports,
       });
       expect(appProfileBundles[AppProfile.medium], <Feature>{
         Feature.showFuel,
@@ -230,6 +234,11 @@ void main() {
         Feature.evCharging,
         Feature.tankSync,
         Feature.baselineSync,
+        Feature.fuelCalculator,
+        Feature.paymentQrScan,
+        Feature.communityPriceReports,
+        Feature.carbonDashboard,
+        Feature.addFillUpOcrReceipt,
         Feature.manualConsumption,
         Feature.showConsumptionTab,
         Feature.obd2TripRecording,
@@ -246,6 +255,11 @@ void main() {
         Feature.evCharging,
         Feature.tankSync,
         Feature.baselineSync,
+        Feature.fuelCalculator,
+        Feature.paymentQrScan,
+        Feature.communityPriceReports,
+        Feature.carbonDashboard,
+        Feature.addFillUpOcrReceipt,
         Feature.manualConsumption,
         Feature.loyaltyCards,
         Feature.obd2TripRecording,

@@ -26,6 +26,7 @@ export 'domain/services/monthly_insights_aggregator.dart';
 export 'presentation/screens/add_fill_up_screen.dart';
 export 'presentation/screens/consumption_statistics_screen.dart';
 export 'presentation/screens/pick_station_for_fill_up_screen.dart';
+export 'presentation/widgets/backup_export_flow.dart';
 export 'presentation/widgets/backup_progress_dialog.dart';
 export 'presentation/widgets/backup_restore_flow.dart';
 export 'presentation/widgets/fill_up_date_row.dart';

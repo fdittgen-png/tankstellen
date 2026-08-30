@@ -294,13 +294,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get clearCacheButton => 'Tühjenda vahemälu';
 
   @override
-  String get deleteAllTitle => 'Kustuta kõik andmed?';
-
-  @override
-  String get deleteAllBody =>
-      'See kustutab jäädavalt kõik profiilid, lemmikud, API võtme, seaded ja vahemälu. Rakendus lähtestatakse.';
-
-  @override
   String get deleteAllButton => 'Kustuta kõik';
 
   @override
@@ -843,20 +836,6 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get avoidHighwaysDesc =>
       'Marsruudi arvutus väldib tasulisi teid ja kiirteid';
-
-  @override
-  String get showFuelStations => 'Näita tanklasid';
-
-  @override
-  String get showFuelStationsDesc =>
-      'Kaasa bensiini-, diisli-, LPG-, CNG-jaamad';
-
-  @override
-  String get showEvStations => 'Näita laadimisjaamu';
-
-  @override
-  String get showEvStationsDesc =>
-      'Kaasa elektrilaadimise jaamad otsingutulemustes';
 
   @override
   String get noStationsAlongThisRoute =>
@@ -1845,9 +1824,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get tripBannerPaused => 'Reis peatatud — puuduta jätkamiseks';
 
   @override
-  String get navConsumption => 'Kulu';
-
-  @override
   String get vehicleBaselineSectionTitle => 'Baasjooné kalibreerimine';
 
   @override
@@ -2230,18 +2206,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get sectionLocation => 'Asukoht';
-
-  @override
-  String get sectionSetupDataSources => 'Seadistus ja andmeallikad';
-
-  @override
-  String get sectionFeaturesUsage => 'Funktsioonid ja kasutus';
-
-  @override
-  String get sectionAccountSync => 'Konto ja sünkroniseerimine';
-
-  @override
-  String get sectionAppearanceWidgets => 'Välimus ja vidinad';
 
   @override
   String get sectionPrivacyData => 'Privaatsus ja andmed';
@@ -5967,9 +5931,6 @@ class AppLocalizationsEt extends AppLocalizations {
   }
 
   @override
-  String get consumptionDisplaySectionTitle => 'Kulu kuvamine';
-
-  @override
   String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
     return 'hinn. $unit';
   }
@@ -7110,6 +7071,257 @@ class AppLocalizationsEt extends AppLocalizations {
   String get refuelUnitPerSession => '/sessioon';
 
   @override
+  String get settingsSearchHint => 'Otsi seadetest';
+
+  @override
+  String settingsSearchNoResults(String query) {
+    return 'Ükski seade ei vasta päringule „$query”';
+  }
+
+  @override
+  String get settingsTopicProfilesTitle => 'Profiilid ja piirkond';
+
+  @override
+  String get settingsTopicProfilesSubtitle =>
+      'Riik, keel, kütus, otsinguraadius, marsruudi planeerimine';
+
+  @override
+  String get settingsTopicProfilesKeywords =>
+      'profiil, riik, keel, kütus, raadius, postiindeks, marsruut, kodu, hinnang, avakuva, profile, country, language, fuel, radius, route, home, rating';
+
+  @override
+  String get settingsTopicVehiclesTitle => 'Sõidukid ja OBD2';
+
+  @override
+  String get settingsTopicVehiclesSubtitle =>
+      'Sinu autod, paagi maht, OBD2-adapteri sidumine';
+
+  @override
+  String get settingsTopicVehiclesKeywords =>
+      'sõiduk, auto, obd, obd2, adapter, bluetooth, paak, mootor, vin, kalibreerimine, vehicle, car, tank, engine, calibration';
+
+  @override
+  String get settingsTopicDrivingTitle => 'Sõitmine ja kulu';
+
+  @override
+  String get settingsTopicDrivingSubtitle =>
+      'Juhendamine, auhinnad, tanklaradar, tõrkeotsing';
+
+  @override
+  String get settingsTopicDrivingKeywords =>
+      'juhendaja, öko, haptiline, hääl, mängustamine, radar, vabakäik, sõit, kulu, kütuseklubi, püsiklient, obd2 logi, kinnita, coach, eco, haptic, voice, gamification, glide, trip, consumption, loyalty, pin';
+
+  @override
+  String get settingsTopicPricesTitle => 'Hinnad ja hoiatused';
+
+  @override
+  String get settingsTopicPricesSubtitle =>
+      'Hinnahoiatused, häälteated, hinnaajalugu, kogukonna teated';
+
+  @override
+  String get settingsTopicPricesKeywords =>
+      'hoiatus, teavitus, hind, ajalugu, prognoos, parim aeg, kogukond, teade, qr, makse, hääl, alert, notification, price, history, prediction, community, report, payment, voice, announcement';
+
+  @override
+  String get settingsTopicUnitsTitle => 'Ühikud ja kuva';
+
+  @override
+  String get settingsTopicUnitsSubtitle => 'Teema, kauguse ühik, avakuva vidin';
+
+  @override
+  String get settingsTopicUnitsKeywords =>
+      'teema, tume, hele, öko, ühik, km, miilid, vidin, värv, kuva, välimus, theme, dark, light, eco, unit, miles, widget, colour, display, appearance';
+
+  @override
+  String get settingsTopicFeaturesTitle => 'Funktsioonid ja kasutusrežiim';
+
+  @override
+  String get settingsTopicFeaturesSubtitle =>
+      'Kasutusrežiimi eelseaded ja iga funktsioonilüliti';
+
+  @override
+  String get settingsTopicFeaturesKeywords =>
+      'funktsioon, režiim, põhi, keskmine, täis, kohandatud, lüliti, jaamatüübid, tanklad, laadijad, laadimine, feature, mode, basic, medium, full, custom, switch, toggle, charging';
+
+  @override
+  String get settingsTopicDataSourcesTitle => 'Andmeallikad ja asukoht';
+
+  @override
+  String get settingsTopicDataSourcesSubtitle =>
+      'API-võtmed, GPS-asukoht, automaatne profiilivahetus';
+
+  @override
+  String get settingsTopicDataSourcesKeywords =>
+      'api, võti, gps, asukoht, positsioon, andmeallikas, tankerkoenig, opencharge, key, location, data source';
+
+  @override
+  String get settingsTopicSyncTitle => 'Sünkroonimine ja konto';
+
+  @override
+  String get settingsTopicSyncKeywords =>
+      'tanksync, pilv, konto, e-post, seo seade, sünkroonimine, jaga andmebaasi, anonüümne, cloud, account, email, link device, sync, share database, anonymous';
+
+  @override
+  String get settingsTopicPrivacySubtitle =>
+      'Nõusolekud, privaatsuse juhtpaneel, salvestusruum ja vahemälu';
+
+  @override
+  String get settingsTopicPrivacyKeywords =>
+      'privaatsus, nõusolek, gdpr, kustuta, tühjenda, salvestusruum, vahemälu, andmed, veateavitus, vin, privacy, consent, delete, erase, storage, cache, data, error reporting';
+
+  @override
+  String get settingsTopicBackupTitle => 'Varundamine ja taastamine';
+
+  @override
+  String get settingsTopicBackupSubtitle =>
+      'Ekspordi või taasta oma andmete täielik varukoopia';
+
+  @override
+  String get settingsTopicBackupKeywords =>
+      'varukoopia, eksport, taasta, import, zip, xml, ülekanne, backup, export, restore, transfer';
+
+  @override
+  String get settingsTopicAdvancedSubtitle =>
+      'GitHubi luba, arendaja tööriistad';
+
+  @override
+  String get settingsTopicAdvancedKeywords =>
+      'arendaja, silumine, luba, pat, github, diagnostika, vealogi, jälg, developer, debug, token, diagnostics, error log, trace';
+
+  @override
+  String get settingsTopicAboutSubtitle => 'Versioon, litsentsid, lingid';
+
+  @override
+  String get settingsTopicAboutKeywords =>
+      'teave, versioon, litsents, anneta, github, viide, about, version, license, donate, attribution';
+
+  @override
+  String get settingsConsumptionOffHint =>
+      'Lülita kulu jälgimine sisse jaotises Funktsioonid ja kasutusrežiim, et seadistada sõidukeid, juhendamist ja auhindu.';
+
+  @override
+  String get settingsOpenFeaturesLink => 'Ava Funktsioonid ja kasutusrežiim';
+
+  @override
+  String get settingsRadarTileSubtitle =>
+      'Raadius, hinnarežiim, päringud ja ekraani kinnitamine aktiivse profiili jaoks';
+
+  @override
+  String get settingsRadarNoProfileHint =>
+      'Loo kõigepealt profiil – radari seaded salvestatakse profiili kohta.';
+
+  @override
+  String get settingsRadarPinHeader => 'Ekraani kinnitamine';
+
+  @override
+  String get settingsAlertsTileSubtitle =>
+      'Tankla- ja raadiusehoiatused, mis teavitavad hinnalangusest';
+
+  @override
+  String get settingsPriceFeaturesHeader => 'Hinnafunktsioonid';
+
+  @override
+  String get settingsVoiceAnnouncementsOffHint =>
+      'Häälteated on välja lülitatud. Lülita Hääletagasiside ja Häälteated sisse jaotises Funktsioonid ja kasutusrežiim, et kuulda sõidu ajal lähedal olevast odavast kütusest.';
+
+  @override
+  String get settingsDistanceUnitTitle => 'Kauguse ühik';
+
+  @override
+  String get settingsDistanceUnitSubtitle => 'Aktiivse profiili riigi järgi';
+
+  @override
+  String get settingsObd2AdapterTitle => 'OBD2-adapter';
+
+  @override
+  String get settingsObd2AdapterSubtitle =>
+      'Adapterid seotakse sõiduki kohta – ava sõiduk, et selle adapter siduda või vahetada';
+
+  @override
+  String get settingsStorageDeleteHint =>
+      'Kõigi kohalike andmete kustutamine toimub privaatsuse juhtpaneelilt.';
+
+  @override
+  String get settingsPrivacyCrossLinkTitle => 'Nõusolekud';
+
+  @override
+  String get settingsPrivacyCrossLinkSubtitle =>
+      'Cloud Synci ja sõitude sünkroonimise nõusolekud asuvad jaotises Privaatsus ja andmed';
+
+  @override
+  String get settingsBackupExportSubtitle =>
+      'Sõidukid, tankimised, sõidud ja laadimislogid ZIP-failina';
+
+  @override
+  String get settingsBackupRestoreSubtitle =>
+      'Ühenda või asenda oma andmed varasemast varukoopia-ZIPist';
+
+  @override
+  String get settingsStationTypesLink =>
+      'Jaamatüübid määratakse jaotises Funktsioonid ja kasutusrežiim';
+
+  @override
+  String get routeSearchCriterionLabel => 'Tankla valik marsruudilõigu kohta';
+
+  @override
+  String get routeSearchCriterionCheapest => 'Odavaim';
+
+  @override
+  String get routeSearchCriterionNearest => 'Marsruudile lähim';
+
+  @override
+  String get routeSearchTopNLabel => 'Kandidaate valimipunkti kohta';
+
+  @override
+  String routeSearchTopNCaption(int count) {
+    return 'Igas marsruudi punktis kaalutakse kuni $count tanklat.';
+  }
+
+  @override
+  String get hybridFuelChoiceLabel => 'Kütus hinnaotsinguks (hübriid)';
+
+  @override
+  String get hybridFuelChoiceVehicleDefault => 'Sõiduki vaikimisi';
+
+  @override
+  String get scopeThisProfile => 'See profiil';
+
+  @override
+  String get scopeAllProfiles => 'Kõik profiilid';
+
+  @override
+  String get scopeThisVehicle => 'See sõiduk';
+
+  @override
+  String get featureLabel_manualConsumption => 'Käsitsi kulu kirjendamine';
+
+  @override
+  String get featureDescription_manualConsumption =>
+      'Kirjenda tankimisi ja laadimisi käsitsi (OBD2-adapterit pole vaja).';
+
+  @override
+  String get featureLabel_loyaltyCards => 'Püsikliendikaardid';
+
+  @override
+  String get featureDescription_loyaltyCards =>
+      'Kütuseklubi-/püsikliendikaardid liitripõhiste soodustustega hinnavõrdlustes.';
+
+  @override
+  String get featureLabel_startupTrace => 'Käivituse lähtestamise jälg';
+
+  @override
+  String get featureDescription_startupTrace =>
+      'Salvestab rakenduse käivituse ajastatud faasid, näitab neid koskvaatena ja ekspordib – arendaja diagnostika.';
+
+  @override
+  String get locationGpsAutoHint =>
+      'GPS-asukoht hangitakse otsingul automaatselt. Saad seda siin ka käsitsi uuendada.';
+
+  @override
+  String get locationClearGpsBody =>
+      'Kas kustutada salvestatud GPS-asukoht? Saad seda igal ajal uuesti uuendada.';
+
+  @override
   String get shareReceiptUnsupportedFormat =>
       'Seda failitüüpi pole veel võimalik importida — jagage hoopis kviitungi fotot.';
 
@@ -8099,8 +8311,8 @@ class AppLocalizationsEt extends AppLocalizations {
       'Androidis hoia vidinat pikalt all ja vali Konfigureeri uuesti, et muuta profiili, värvi ja sisu.';
 
   @override
-  String get widgetDefaultsApplyToAllHint =>
-      'Valikud allpool kehtivad kõikidele paigaldatud vidinatele järgmisel värskendamisel.';
+  String get widgetDefaultsThisProfileHint =>
+      'Allolevad valikud kehtivad igale paigaldatud vidinale, mis näitab seda profiili, järgmisel värskendusel.';
 
   @override
   String get widgetDefaultsColorLabel => 'Värviskeem';

@@ -294,13 +294,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get clearCacheButton => 'Rensa cache';
 
   @override
-  String get deleteAllTitle => 'Ta bort all data?';
-
-  @override
-  String get deleteAllBody =>
-      'Detta raderar permanent alla profiler, favoriter, API-nyckel, inställningar och cache. Appen återställs.';
-
-  @override
   String get deleteAllButton => 'Ta bort allt';
 
   @override
@@ -846,20 +839,6 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get avoidHighwaysDesc =>
       'Ruttberäkning undviker avgiftsvägar och motorvägar';
-
-  @override
-  String get showFuelStations => 'Visa bensinstationer';
-
-  @override
-  String get showFuelStationsDesc =>
-      'Inkludera bensin-, diesel-, LPG-, CNG-stationer';
-
-  @override
-  String get showEvStations => 'Visa laddstationer';
-
-  @override
-  String get showEvStationsDesc =>
-      'Inkludera elektriska laddstationer i sökresultat';
 
   @override
   String get noStationsAlongThisRoute =>
@@ -1850,9 +1829,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get tripBannerPaused => 'Resa pausad – tryck för att återuppta';
 
   @override
-  String get navConsumption => 'Förbrukning';
-
-  @override
   String get vehicleBaselineSectionTitle => 'Grundkalibrering';
 
   @override
@@ -2235,18 +2211,6 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get sectionLocation => 'Plats';
-
-  @override
-  String get sectionSetupDataSources => 'Installation och datakällor';
-
-  @override
-  String get sectionFeaturesUsage => 'Funktioner och användning';
-
-  @override
-  String get sectionAccountSync => 'Konto och synkronisering';
-
-  @override
-  String get sectionAppearanceWidgets => 'Utseende och widgetar';
 
   @override
   String get sectionPrivacyData => 'Integritet och data';
@@ -5965,9 +5929,6 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
-  String get consumptionDisplaySectionTitle => 'Visning av förbrukning';
-
-  @override
   String tripRecordingPipEstConsumptionCaptionUnit(String unit) {
     return 'uppsk. $unit';
   }
@@ -7110,6 +7071,258 @@ class AppLocalizationsSv extends AppLocalizations {
   String get refuelUnitPerSession => '/session';
 
   @override
+  String get settingsSearchHint => 'Sök inställningar';
+
+  @override
+  String settingsSearchNoResults(String query) {
+    return 'Inga inställningar matchar \"$query\"';
+  }
+
+  @override
+  String get settingsTopicProfilesTitle => 'Profiler & region';
+
+  @override
+  String get settingsTopicProfilesSubtitle =>
+      'Land, språk, bränsle, sökradie, ruttplanering';
+
+  @override
+  String get settingsTopicProfilesKeywords =>
+      'profil, land, språk, bränsle, radie, postnummer, rutt, hem, betyg, startskärm, profile, country, language, fuel, radius, route, home, rating';
+
+  @override
+  String get settingsTopicVehiclesTitle => 'Fordon & OBD2';
+
+  @override
+  String get settingsTopicVehiclesSubtitle =>
+      'Dina bilar, tankstorlek, parkoppling av OBD2-adapter';
+
+  @override
+  String get settingsTopicVehiclesKeywords =>
+      'fordon, bil, obd, obd2, adapter, bluetooth, tank, motor, vin, kalibrering, vehicle, car, engine, calibration';
+
+  @override
+  String get settingsTopicDrivingTitle => 'Körning & förbrukning';
+
+  @override
+  String get settingsTopicDrivingSubtitle =>
+      'Coaching, belöningar, bensinstationsradar, felsökning';
+
+  @override
+  String get settingsTopicDrivingKeywords =>
+      'coach, eco, haptisk, röst, gamification, radar, glid, resa, förbrukning, bränsleklubb, lojalitet, obd2-logg, fäst, haptic, voice, glide, trip, consumption, loyalty, pin';
+
+  @override
+  String get settingsTopicPricesTitle => 'Priser & aviseringar';
+
+  @override
+  String get settingsTopicPricesSubtitle =>
+      'Prisaviseringar, röstmeddelanden, prishistorik, communityrapporter';
+
+  @override
+  String get settingsTopicPricesKeywords =>
+      'avisering, notis, pris, historik, prognos, bästa tidpunkt, community, rapport, qr, betalning, röst, meddelande, alert, notification, price, history, prediction, report, payment, voice, announcement';
+
+  @override
+  String get settingsTopicUnitsTitle => 'Enheter & visning';
+
+  @override
+  String get settingsTopicUnitsSubtitle =>
+      'Tema, avståndsenhet, widget på startskärmen';
+
+  @override
+  String get settingsTopicUnitsKeywords =>
+      'tema, mörkt, ljust, eco, enhet, km, miles, widget, färg, visning, utseende, theme, dark, light, unit, colour, display';
+
+  @override
+  String get settingsTopicFeaturesTitle => 'Funktioner & användningsläge';
+
+  @override
+  String get settingsTopicFeaturesSubtitle =>
+      'Förinställningar för användningsläge och varje funktionsväxel';
+
+  @override
+  String get settingsTopicFeaturesKeywords =>
+      'funktion, läge, bas, medel, full, anpassad, växel, stationstyper, bensinstationer, laddstationer, laddning, feature, mode, basic, medium, custom, switch, toggle, charging';
+
+  @override
+  String get settingsTopicDataSourcesTitle => 'Datakällor & plats';
+
+  @override
+  String get settingsTopicDataSourcesSubtitle =>
+      'API-nycklar, GPS-position, automatiskt profilbyte';
+
+  @override
+  String get settingsTopicDataSourcesKeywords =>
+      'api, nyckel, gps, plats, position, datakälla, tankerkoenig, opencharge, key, location, data source';
+
+  @override
+  String get settingsTopicSyncTitle => 'Synkronisering & konto';
+
+  @override
+  String get settingsTopicSyncKeywords =>
+      'tanksync, moln, konto, e-post, länka enhet, synkronisering, dela databas, anonym, cloud, account, email, link device, sync, share database, anonymous';
+
+  @override
+  String get settingsTopicPrivacySubtitle =>
+      'Samtycken, integritetspanel, lagring & cache';
+
+  @override
+  String get settingsTopicPrivacyKeywords =>
+      'integritet, samtycke, gdpr, radera, rensa, lagring, cache, data, felrapportering, vin, privacy, consent, delete, erase, storage, error reporting';
+
+  @override
+  String get settingsTopicBackupTitle => 'Säkerhetskopiering & återställning';
+
+  @override
+  String get settingsTopicBackupSubtitle =>
+      'Exportera eller återställ en fullständig säkerhetskopia av dina data';
+
+  @override
+  String get settingsTopicBackupKeywords =>
+      'säkerhetskopia, export, återställ, import, zip, xml, överföring, backup, restore, transfer';
+
+  @override
+  String get settingsTopicAdvancedSubtitle => 'GitHub-token, utvecklarverktyg';
+
+  @override
+  String get settingsTopicAdvancedKeywords =>
+      'utvecklare, felsökning, token, pat, github, diagnostik, fellogg, spårning, developer, debug, diagnostics, error log, trace';
+
+  @override
+  String get settingsTopicAboutSubtitle => 'Version, licenser, länkar';
+
+  @override
+  String get settingsTopicAboutKeywords =>
+      'om, version, licens, donera, github, erkännande, about, license, donate, attribution';
+
+  @override
+  String get settingsConsumptionOffHint =>
+      'Slå på förbrukningsregistrering under Funktioner & användningsläge för att konfigurera fordon, coaching och belöningar.';
+
+  @override
+  String get settingsOpenFeaturesLink => 'Öppna Funktioner & användningsläge';
+
+  @override
+  String get settingsRadarTileSubtitle =>
+      'Radie, prisläge, avfrågning och skärmfästning för den aktiva profilen';
+
+  @override
+  String get settingsRadarNoProfileHint =>
+      'Skapa en profil först — radarinställningarna sparas per profil.';
+
+  @override
+  String get settingsRadarPinHeader => 'Skärmfästning';
+
+  @override
+  String get settingsAlertsTileSubtitle =>
+      'Stations- och radieaviseringar som meddelar dig om prissänkningar';
+
+  @override
+  String get settingsPriceFeaturesHeader => 'Prisfunktioner';
+
+  @override
+  String get settingsVoiceAnnouncementsOffHint =>
+      'Röstmeddelanden är av. Slå på Röståterkoppling och Röstmeddelanden under Funktioner & användningsläge för att höra billigt bränsle i närheten när du kör.';
+
+  @override
+  String get settingsDistanceUnitTitle => 'Avståndsenhet';
+
+  @override
+  String get settingsDistanceUnitSubtitle => 'Från den aktiva profilens land';
+
+  @override
+  String get settingsObd2AdapterTitle => 'OBD2-adapter';
+
+  @override
+  String get settingsObd2AdapterSubtitle =>
+      'Adaptrar parkopplas per fordon — öppna ett fordon för att parkoppla eller byta dess adapter';
+
+  @override
+  String get settingsStorageDeleteHint =>
+      'Radering av alla lokala data görs från integritetspanelen.';
+
+  @override
+  String get settingsPrivacyCrossLinkTitle => 'Samtycken';
+
+  @override
+  String get settingsPrivacyCrossLinkSubtitle =>
+      'Samtycken för Cloud Sync och resesynkronisering finns under Integritet & data';
+
+  @override
+  String get settingsBackupExportSubtitle =>
+      'Fordon, tankningar, resor och laddningsloggar som ZIP-fil';
+
+  @override
+  String get settingsBackupRestoreSubtitle =>
+      'Slå ihop eller ersätt dina data från en tidigare säkerhetskopia (ZIP)';
+
+  @override
+  String get settingsStationTypesLink =>
+      'Stationstyper ställs in under Funktioner & användningsläge';
+
+  @override
+  String get routeSearchCriterionLabel => 'Stationsval per ruttsegment';
+
+  @override
+  String get routeSearchCriterionCheapest => 'Billigast';
+
+  @override
+  String get routeSearchCriterionNearest => 'Närmast rutten';
+
+  @override
+  String get routeSearchTopNLabel => 'Kandidater per mätpunkt';
+
+  @override
+  String routeSearchTopNCaption(int count) {
+    return 'Upp till $count stationer övervägs vid varje punkt längs rutten.';
+  }
+
+  @override
+  String get hybridFuelChoiceLabel => 'Bränsle för prissökning (hybrid)';
+
+  @override
+  String get hybridFuelChoiceVehicleDefault => 'Fordonets standard';
+
+  @override
+  String get scopeThisProfile => 'Den här profilen';
+
+  @override
+  String get scopeAllProfiles => 'Alla profiler';
+
+  @override
+  String get scopeThisVehicle => 'Det här fordonet';
+
+  @override
+  String get featureLabel_manualConsumption =>
+      'Manuell förbrukningsregistrering';
+
+  @override
+  String get featureDescription_manualConsumption =>
+      'Registrera tankningar och laddningar för hand (ingen OBD2-adapter krävs).';
+
+  @override
+  String get featureLabel_loyaltyCards => 'Lojalitetskort';
+
+  @override
+  String get featureDescription_loyaltyCards =>
+      'Bränsleklubb-/lojalitetskort med rabatt per liter i prisjämförelser.';
+
+  @override
+  String get featureLabel_startupTrace => 'Spårning av startinitiering';
+
+  @override
+  String get featureDescription_startupTrace =>
+      'Registrerar de tidsatta faserna i appens start, visar dem som ett vattenfall och exporterar dem — en utvecklardiagnostik.';
+
+  @override
+  String get locationGpsAutoHint =>
+      'GPS-positionen hämtas automatiskt när du söker. Du kan också uppdatera den manuellt här.';
+
+  @override
+  String get locationClearGpsBody =>
+      'Rensa den sparade GPS-positionen? Du kan uppdatera den igen när som helst.';
+
+  @override
   String get shareReceiptUnsupportedFormat =>
       'Den filtypen kan inte importeras ännu — dela ett foto av kvittot istället.';
 
@@ -8100,8 +8313,8 @@ class AppLocalizationsSv extends AppLocalizations {
       'På Android, håll länge på widgeten och välj Konfigurera om för att ändra profil, färg och innehåll.';
 
   @override
-  String get widgetDefaultsApplyToAllHint =>
-      'Valen nedan tillämpas på varje installerad widget vid nästa uppdatering.';
+  String get widgetDefaultsThisProfileHint =>
+      'Valen nedan gäller för alla installerade widgetar som visar den här profilen, vid nästa uppdatering.';
 
   @override
   String get widgetDefaultsColorLabel => 'Färgschema';

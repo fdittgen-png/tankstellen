@@ -106,8 +106,7 @@ class LocationSectionWidget extends ConsumerWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          'GPS position is acquired automatically when you search. '
-          'You can also update it manually here.',
+          l.locationGpsAutoHint,
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -175,10 +174,7 @@ class LocationSectionWidget extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l.delete),
-        content: const Text(
-          'Clear the stored GPS position? '
-          'You can update it again at any time.',
-        ),
+        content: Text(l.locationClearGpsBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),

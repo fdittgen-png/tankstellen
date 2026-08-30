@@ -97,6 +97,36 @@ void main() {
       expect(full, isNot(contains(Feature.tflitePricePrediction)));
     });
 
+    // #3884 — the bundles are exhaustive, so a default-on feature missing
+    // from a bundle was silently turned OFF by applying any preset.
+    test('#3884: every preset keeps the prerequisite-free default-on price '
+        'tools on (fuelCalculator, paymentQrScan, communityPriceReports)',
+        () {
+      for (final p in [AppProfile.basic, AppProfile.medium, AppProfile.full]) {
+        final bundle = appProfileBundles[p]!;
+        expect(bundle, contains(Feature.fuelCalculator),
+            reason: '${p.name} must not switch the calculator off');
+        expect(bundle, contains(Feature.paymentQrScan),
+            reason: '${p.name} must not switch scan-to-pay off');
+        expect(bundle, contains(Feature.communityPriceReports),
+            reason: '${p.name} must not switch community reports off');
+      }
+    });
+
+    test('#3884: Medium and Full keep carbonDashboard + addFillUpOcrReceipt '
+        'on; Basic (no fill-ups) does not include them', () {
+      for (final p in [AppProfile.medium, AppProfile.full]) {
+        final bundle = appProfileBundles[p]!;
+        expect(bundle, contains(Feature.carbonDashboard),
+            reason: '${p.name} must not switch the carbon dashboard off');
+        expect(bundle, contains(Feature.addFillUpOcrReceipt),
+            reason: '${p.name} must not switch receipt OCR off');
+      }
+      final basic = appProfileBundles[AppProfile.basic]!;
+      expect(basic, isNot(contains(Feature.carbonDashboard)));
+      expect(basic, isNot(contains(Feature.addFillUpOcrReceipt)));
+    });
+
     test('custom has an empty bundle (it is a sentinel, not a preset)', () {
       expect(appProfileBundles[AppProfile.custom], isEmpty);
     });

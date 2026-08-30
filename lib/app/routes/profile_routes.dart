@@ -12,15 +12,30 @@ import '../../features/profile/presentation/screens/developer_tools/feature_flag
 import '../../features/profile/presentation/screens/developer_tools/obd2_health_screen.dart';
 import '../../features/profile/presentation/screens/developer_tools/pump_ocr_tester_screen.dart';
 import '../../features/profile/presentation/screens/privacy_dashboard_screen.dart';
+import '../../features/profile/presentation/screens/settings/about_screen.dart';
+import '../../features/profile/presentation/screens/settings/advanced_developer_screen.dart';
+import '../../features/profile/presentation/screens/settings/backup_restore_screen.dart';
+import '../../features/profile/presentation/screens/settings/data_sources_location_screen.dart';
+import '../../features/profile/presentation/screens/settings/driving_consumption_screen.dart';
+import '../../features/profile/presentation/screens/settings/features_use_mode_screen.dart';
+import '../../features/profile/presentation/screens/settings/prices_alerts_screen.dart';
+import '../../features/profile/presentation/screens/settings/privacy_data_screen.dart';
+import '../../features/profile/presentation/screens/settings/profiles_region_screen.dart';
+import '../../features/profile/presentation/screens/settings/radar_settings_screen.dart';
+import '../../features/profile/presentation/screens/settings/sync_account_screen.dart';
+import '../../features/profile/presentation/screens/settings/units_display_screen.dart';
+import '../../features/profile/presentation/screens/settings/vehicles_obd2_screen.dart';
 import '../../features/profile/presentation/screens/theme_settings_screen.dart';
 import '../../features/vehicle/presentation/screens/edit_vehicle_screen.dart';
 import '../../features/vehicle/presentation/screens/vehicle_list_screen.dart';
 
 /// Profile/settings sub-screens that push on top of the Profile shell branch:
 /// vehicle list and editor, saved itineraries, privacy dashboard, theme
-/// settings (#897), loyalty/fuel-club discount cards (#1120), and the
-/// Developer / Debug tools (#2248). The Developer-tools screens self-guard
-/// on `Feature.debugMode` so a stale deep-link cannot expose them.
+/// settings (#897), loyalty/fuel-club discount cards (#1120), the
+/// Developer / Debug tools (#2248) and, since #3884, the twelve Settings
+/// topic screens plus the radar sub-screen of the two-level Settings tree.
+/// The Developer-tools screens self-guard on `Feature.debugMode` so a
+/// stale deep-link cannot expose them.
 List<RouteBase> get profileRoutes => [
       GoRoute(
         path: RoutePaths.vehicles,
@@ -84,5 +99,58 @@ List<RouteBase> get profileRoutes => [
       GoRoute(
         path: RoutePaths.developerToolsOcrTester,
         builder: (context, state) => const PumpOcrTesterScreen(),
+      ),
+      // #3884 (Epic #3881) — Settings topic screens, in root-tile order.
+      GoRoute(
+        path: RoutePaths.settingsProfiles,
+        builder: (context, state) => const ProfilesRegionScreen(),
+      ),
+      GoRoute(
+        path: RoutePaths.settingsVehicles,
+        builder: (context, state) => const VehiclesObd2Screen(),
+      ),
+      GoRoute(
+        path: RoutePaths.settingsDriving,
+        builder: (context, state) => const DrivingConsumptionScreen(),
+      ),
+      GoRoute(
+        path: RoutePaths.settingsRadar,
+        builder: (context, state) => const RadarSettingsScreen(),
+      ),
+      GoRoute(
+        path: RoutePaths.settingsPrices,
+        builder: (context, state) => const PricesAlertsScreen(),
+      ),
+      GoRoute(
+        path: RoutePaths.settingsUnits,
+        builder: (context, state) => const UnitsDisplayScreen(),
+      ),
+      GoRoute(
+        path: RoutePaths.settingsFeatures,
+        builder: (context, state) => const FeaturesUseModeScreen(),
+      ),
+      GoRoute(
+        path: RoutePaths.settingsDataSources,
+        builder: (context, state) => const DataSourcesLocationScreen(),
+      ),
+      GoRoute(
+        path: RoutePaths.settingsSync,
+        builder: (context, state) => const SyncAccountScreen(),
+      ),
+      GoRoute(
+        path: RoutePaths.settingsPrivacy,
+        builder: (context, state) => const PrivacyDataScreen(),
+      ),
+      GoRoute(
+        path: RoutePaths.settingsBackup,
+        builder: (context, state) => const BackupRestoreScreen(),
+      ),
+      GoRoute(
+        path: RoutePaths.settingsAdvanced,
+        builder: (context, state) => const AdvancedDeveloperScreen(),
+      ),
+      GoRoute(
+        path: RoutePaths.settingsAbout,
+        builder: (context, state) => const AboutScreen(),
       ),
     ];

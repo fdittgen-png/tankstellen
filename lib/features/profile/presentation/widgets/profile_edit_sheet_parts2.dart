@@ -76,17 +76,13 @@ class _CountrySection extends ConsumerWidget {
   }
 }
 
-/// In-trip approach-overlay settings (#2067 / Epic #2065).
+/// In-trip approach-overlay (Fuel Station Radar) settings (#2067 /
+/// Epic #2065), bound to the sheet's edit state.
 ///
-/// Three controls:
-/// - **Radius** (km) — slider 0.5–5.0 in 0.5 km steps; the geo-fence
-///   distance within which the recording overlay grows and flips to
-///   a huge price figure.
-/// - **Price mode** — `nearest` (default, stable) vs
-///   `cheapestInRadius` (re-evaluates as stations enter/leave).
-/// - **Min poll** (s) — floor on the speed-adaptive poll cadence
-///   (1–10 s). The detector polls more aggressively at higher speed
-///   but never tighter than this.
+/// #3884 — the controls themselves live in the public [RadarSettingsCard]
+/// so Settings → Driving & consumption → Fuel Station Radar can host the
+/// same card for the ACTIVE profile; this thin adapter keeps the edit
+/// sheet's `ProfileEditState` / `ProfileEditController` wiring.
 class _ApproachOverlaySection extends StatelessWidget {
   final ProfileEditState state;
   final ProfileEditController ctrl;
@@ -95,81 +91,13 @@ class _ApproachOverlaySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text('${l10n.approachRadiusLabel}:'),
-            Expanded(
-              child: Slider(
-                value: state.approachRadiusKm,
-                min: 0.5,
-                max: 5.0,
-                divisions: 9,
-                label: UnitFormatter.formatDistance(state.approachRadiusKm),
-                onChanged: ctrl.setApproachRadiusKm,
-              ),
-            ),
-            Text(UnitFormatter.formatDistance(state.approachRadiusKm)),
-          ],
-        ),
-        Text(
-          l10n.approachRadiusCaption(
-              UnitFormatter.formatDecimal(state.approachRadiusKm)),
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-        const SizedBox(height: Spacing.md),
-        Text(l10n.approachPriceModeLabel, style: theme.textTheme.bodyMedium),
-        const SizedBox(height: Spacing.sm),
-        Wrap(
-          spacing: 6,
-          children: [
-            ChoiceChip(
-              label: Text(l10n.approachPriceModeNearest),
-              selected: state.approachPriceMode == ApproachPriceMode.nearest,
-              onSelected: (_) =>
-                  ctrl.setApproachPriceMode(ApproachPriceMode.nearest),
-              visualDensity: VisualDensity.compact,
-            ),
-            ChoiceChip(
-              label: Text(l10n.approachPriceModeCheapestInRadius),
-              selected:
-                  state.approachPriceMode == ApproachPriceMode.cheapestInRadius,
-              onSelected: (_) =>
-                  ctrl.setApproachPriceMode(ApproachPriceMode.cheapestInRadius),
-              visualDensity: VisualDensity.compact,
-            ),
-          ],
-        ),
-        const SizedBox(height: Spacing.md),
-        Row(
-          children: [
-            Text('${l10n.approachMinPollLabel}:'),
-            Expanded(
-              child: Slider(
-                value: state.approachMinPollSeconds.toDouble(),
-                min: 1,
-                max: 10,
-                divisions: 9,
-                label: '${state.approachMinPollSeconds} s',
-                onChanged: (v) => ctrl.setApproachMinPollSeconds(v.round()),
-              ),
-            ),
-            Text('${state.approachMinPollSeconds} s'),
-          ],
-        ),
-        Text(
-          l10n.approachMinPollCaption(state.approachMinPollSeconds),
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-      ],
+    return RadarSettingsCard(
+      radiusKm: state.approachRadiusKm,
+      priceMode: state.approachPriceMode,
+      minPollSeconds: state.approachMinPollSeconds,
+      onRadiusChanged: ctrl.setApproachRadiusKm,
+      onPriceModeChanged: ctrl.setApproachPriceMode,
+      onMinPollSecondsChanged: ctrl.setApproachMinPollSeconds,
     );
   }
 }

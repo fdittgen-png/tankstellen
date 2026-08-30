@@ -257,6 +257,57 @@ void main() {
     });
   });
 
+  // #3884 — one home per parameter + the three formerly UI-less profile
+  // parameters get their controls.
+  group('ProfileEditSheet settings-IA (#3884)', () {
+    String librarySource() {
+      const files = [
+        'lib/features/profile/presentation/widgets/profile_edit_sheet.dart',
+        'lib/features/profile/presentation/widgets/profile_edit_sheet_parts.dart',
+        'lib/features/profile/presentation/widgets/profile_edit_sheet_parts2.dart',
+        'lib/features/profile/presentation/widgets/profile_edit_sheet_route_section.dart',
+      ];
+      return files.map((f) => File(f).readAsStringSync()).join('\n');
+    }
+
+    test('the show-fuel / show-EV switches are gone — replaced by a link to '
+        'Features & use mode', () {
+      final source = librarySource();
+      expect(source, isNot(contains('showFuelEnabledProvider')));
+      expect(source, isNot(contains('showElectricEnabledProvider')));
+      expect(source, contains("Key('profileStationTypesLink')"));
+      expect(source, contains('settingsStationTypesLink'));
+      expect(source, contains('RoutePaths.settingsFeatures'));
+    });
+
+    test('Route planning card exposes routeSearchCriterion (segmented) and '
+        'routeSearchTopNPerSamplePoint (slider 3–20)', () {
+      final source = librarySource();
+      expect(source, contains("Key('routeSearchCriterionSegmented')"));
+      expect(source, contains('SegmentedButton<RouteSearchCriterion>'));
+      expect(source, contains("Key('routeSearchTopNSlider')"));
+      expect(source, matches(RegExp(r'min:\s*3,\s*max:\s*20')));
+      expect(source, contains('ctrl.setRouteSearchTopNPerSamplePoint'));
+      expect(source, contains('ctrl.setRouteSearchCriterion'));
+    });
+
+    test('Vehicle card exposes hybridFuelChoice only for a hybrid default '
+        'vehicle and the Save path persists it', () {
+      final source = librarySource();
+      expect(source, contains("Key('hybridFuelChoiceDropdown')"));
+      expect(source, contains('VehicleType.hybrid'));
+      expect(source, contains('ctrl.setHybridFuelChoice'));
+      expect(source, contains('hybridFuelChoice: state.hybridFuelChoice'));
+    });
+
+    test('the radar card is the shared RadarSettingsCard (also hosted on '
+        'Settings → Driving & consumption → Fuel Station Radar)', () {
+      final source = librarySource();
+      expect(source, contains('RadarSettingsCard('));
+      expect(source, contains("import 'radar_settings_card.dart';"));
+    });
+  });
+
   group('ProfileEditSheet #2551 SectionCard redesign', () {
     String mainSource() => File(
       'lib/features/profile/presentation/widgets/profile_edit_sheet.dart',

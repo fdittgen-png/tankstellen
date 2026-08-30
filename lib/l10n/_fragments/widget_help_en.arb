@@ -19,9 +19,9 @@
   "@widgetHelpConfigure": {
     "description": "Help line explaining how to reconfigure the Android home-screen widget (#1806). Shown only on fresh installs without an active profile; otherwise the in-app defaults editor (#2106) renders instead."
   },
-  "widgetDefaultsApplyToAllHint": "Choices below apply to every installed widget on the next refresh.",
-  "@widgetDefaultsApplyToAllHint": {
-    "description": "#2106 — italicised hint above the in-Settings widget-defaults editor explaining the live-override semantics."
+  "widgetDefaultsThisProfileHint": "Choices below apply to every installed widget showing this profile, on the next refresh.",
+  "@widgetDefaultsThisProfileHint": {
+    "description": "#2106 / #3884 — italicised hint above the in-Settings widget-defaults editor. The colour + variant persist on the ACTIVE UserProfile, so the hint names the profile scope instead of the former 'applies to all widgets' wording."
   },
   "widgetDefaultsColorLabel": "Colour scheme",
   "@widgetDefaultsColorLabel": {

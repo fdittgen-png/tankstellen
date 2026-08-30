@@ -37,6 +37,10 @@ class ProfileEditState {
   final int routeSearchTopNPerSamplePoint;
   final RouteSearchCriterion routeSearchCriterion;
 
+  /// #706 / #3884 — which of a hybrid default vehicle's fuels drives the
+  /// price search. Null = the vehicle's own combustion fuel.
+  final FuelType? hybridFuelChoice;
+
   const ProfileEditState({
     required this.fuelType,
     required this.radius,
@@ -54,6 +58,7 @@ class ProfileEditState {
     required this.approachMinPollSeconds,
     required this.routeSearchTopNPerSamplePoint,
     required this.routeSearchCriterion,
+    this.hybridFuelChoice,
   });
 
   factory ProfileEditState.fromProfile(UserProfile p) => ProfileEditState(
@@ -73,6 +78,7 @@ class ProfileEditState {
         approachMinPollSeconds: p.approachMinPollSeconds,
         routeSearchTopNPerSamplePoint: p.routeSearchTopNPerSamplePoint,
         routeSearchCriterion: p.routeSearchCriterion,
+        hybridFuelChoice: p.hybridFuelChoice,
       );
 
   ProfileEditState copyWith({
@@ -95,6 +101,8 @@ class ProfileEditState {
     int? approachMinPollSeconds,
     int? routeSearchTopNPerSamplePoint,
     RouteSearchCriterion? routeSearchCriterion,
+    FuelType? hybridFuelChoice,
+    bool clearHybridFuelChoice = false,
   }) {
     return ProfileEditState(
       fuelType: fuelType ?? this.fuelType,
@@ -118,6 +126,9 @@ class ProfileEditState {
       routeSearchTopNPerSamplePoint: routeSearchTopNPerSamplePoint ??
           this.routeSearchTopNPerSamplePoint,
       routeSearchCriterion: routeSearchCriterion ?? this.routeSearchCriterion,
+      hybridFuelChoice: clearHybridFuelChoice
+          ? null
+          : (hybridFuelChoice ?? this.hybridFuelChoice),
     );
   }
 }
@@ -161,4 +172,8 @@ class ProfileEditController extends _$ProfileEditController {
       state = state.copyWith(routeSearchTopNPerSamplePoint: v);
   void setRouteSearchCriterion(RouteSearchCriterion v) =>
       state = state.copyWith(routeSearchCriterion: v);
+  void setHybridFuelChoice(FuelType? v) => state = state.copyWith(
+        hybridFuelChoice: v,
+        clearHybridFuelChoice: v == null,
+      );
 }

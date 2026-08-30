@@ -86,8 +86,6 @@
   "clearCacheTitle": "Rensa cache?",
   "clearCacheBody": "Cachade sökresultat och priser raderas. Profiler, favoriter och inställningar bevaras.",
   "clearCacheButton": "Rensa cache",
-  "deleteAllTitle": "Ta bort all data?",
-  "deleteAllBody": "Detta raderar permanent alla profiler, favoriter, API-nyckel, inställningar och cache. Appen återställs.",
   "deleteAllButton": "Ta bort allt",
   "entries": "poster",
   "cacheEmpty": "Cachen är tom",
@@ -258,10 +256,6 @@
   "showCheapestEveryNKm": "Visa billigaste station var {km}:e km längs rutten",
   "avoidHighways": "Undvik motorvägar",
   "avoidHighwaysDesc": "Ruttberäkning undviker avgiftsvägar och motorvägar",
-  "showFuelStations": "Visa bensinstationer",
-  "showFuelStationsDesc": "Inkludera bensin-, diesel-, LPG-, CNG-stationer",
-  "showEvStations": "Visa laddstationer",
-  "showEvStationsDesc": "Inkludera elektriska laddstationer i sökresultat",
   "noStationsAlongThisRoute": "Inga stationer hittades längs denna rutt.",
   "fuelCostCalculator": "Bränslekostnadskalkylator",
   "distanceKm": "Avstånd (km)",
@@ -567,7 +561,6 @@
   "tripResume": "Återuppta",
   "tripBannerRecording": "Spelar in resa",
   "tripBannerPaused": "Resa pausad – tryck för att återuppta",
-  "navConsumption": "Förbrukning",
   "vehicleBaselineSectionTitle": "Grundkalibrering",
   "vehicleBaselineEmpty": "Inga prover ännu – starta en OBD2-resa för att börja lära känna fordonets bränsleprofil.",
   "vehicleBaselineProgress": "Lärt från prover över olika körsituationer.",
@@ -1428,7 +1421,6 @@
   "widgetHelpAdd": "Lägg till den från din launchers widgetväljare – håll länge på ett tomt område på hemskärmen, välj Widgets och hitta SparKilo.",
   "widgetHelpTap": "Tryck på en station i widgeten för att öppna den i appen. Tryck på uppdateringsikonen för att uppdatera priser.",
   "widgetHelpConfigure": "På Android, håll länge på widgeten och välj Konfigurera om för att ändra profil, färg och innehåll.",
-  "widgetDefaultsApplyToAllHint": "Valen nedan tillämpas på varje installerad widget vid nästa uppdatering.",
   "widgetDefaultsColorLabel": "Färgschema",
   "widgetDefaultsVariantLabel": "Innehållsvariant",
   "widgetColorSchemeSystem": "Följ systemet",
@@ -2447,22 +2439,6 @@
   },
   "tripRecordingDiscardedNoMovement": "Inspelning avbruten — ingen rörelse registrerades",
   "@tripRecordingDiscardedNoMovement": {
-    "description": "MT — needs native review"
-  },
-  "sectionSetupDataSources": "Installation och datakällor",
-  "@sectionSetupDataSources": {
-    "description": "MT — needs native review"
-  },
-  "sectionFeaturesUsage": "Funktioner och användning",
-  "@sectionFeaturesUsage": {
-    "description": "MT — needs native review"
-  },
-  "sectionAccountSync": "Konto och synkronisering",
-  "@sectionAccountSync": {
-    "description": "MT — needs native review"
-  },
-  "sectionAppearanceWidgets": "Utseende och widgetar",
-  "@sectionAppearanceWidgets": {
     "description": "MT — needs native review"
   },
   "sectionPrivacyData": "Integritet och data",
@@ -4861,7 +4837,6 @@
       }
     }
   },
-  "consumptionDisplaySectionTitle": "Visning av förbrukning",
   "tripRecordingPipEstConsumptionCaptionUnit": "uppsk. {unit}",
   "@tripRecordingPipEstConsumptionCaptionUnit": {
     "placeholders": {
@@ -4869,5 +4844,90 @@
         "type": "String"
       }
     }
-  }
+  },
+  "settingsSearchHint": "Sök inställningar",
+  "settingsSearchNoResults": "Inga inställningar matchar \"{query}\"",
+  "@settingsSearchNoResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTopicProfilesTitle": "Profiler & region",
+  "settingsTopicProfilesSubtitle": "Land, språk, bränsle, sökradie, ruttplanering",
+  "settingsTopicProfilesKeywords": "profil, land, språk, bränsle, radie, postnummer, rutt, hem, betyg, startskärm, profile, country, language, fuel, radius, route, home, rating",
+  "settingsTopicVehiclesTitle": "Fordon & OBD2",
+  "settingsTopicVehiclesSubtitle": "Dina bilar, tankstorlek, parkoppling av OBD2-adapter",
+  "settingsTopicVehiclesKeywords": "fordon, bil, obd, obd2, adapter, bluetooth, tank, motor, vin, kalibrering, vehicle, car, engine, calibration",
+  "settingsTopicDrivingTitle": "Körning & förbrukning",
+  "settingsTopicDrivingSubtitle": "Coaching, belöningar, bensinstationsradar, felsökning",
+  "settingsTopicDrivingKeywords": "coach, eco, haptisk, röst, gamification, radar, glid, resa, förbrukning, bränsleklubb, lojalitet, obd2-logg, fäst, haptic, voice, glide, trip, consumption, loyalty, pin",
+  "settingsTopicPricesTitle": "Priser & aviseringar",
+  "settingsTopicPricesSubtitle": "Prisaviseringar, röstmeddelanden, prishistorik, communityrapporter",
+  "settingsTopicPricesKeywords": "avisering, notis, pris, historik, prognos, bästa tidpunkt, community, rapport, qr, betalning, röst, meddelande, alert, notification, price, history, prediction, report, payment, voice, announcement",
+  "settingsTopicUnitsTitle": "Enheter & visning",
+  "settingsTopicUnitsSubtitle": "Tema, avståndsenhet, widget på startskärmen",
+  "settingsTopicUnitsKeywords": "tema, mörkt, ljust, eco, enhet, km, miles, widget, färg, visning, utseende, theme, dark, light, unit, colour, display",
+  "settingsTopicFeaturesTitle": "Funktioner & användningsläge",
+  "settingsTopicFeaturesSubtitle": "Förinställningar för användningsläge och varje funktionsväxel",
+  "settingsTopicFeaturesKeywords": "funktion, läge, bas, medel, full, anpassad, växel, stationstyper, bensinstationer, laddstationer, laddning, feature, mode, basic, medium, custom, switch, toggle, charging",
+  "settingsTopicDataSourcesTitle": "Datakällor & plats",
+  "settingsTopicDataSourcesSubtitle": "API-nycklar, GPS-position, automatiskt profilbyte",
+  "settingsTopicDataSourcesKeywords": "api, nyckel, gps, plats, position, datakälla, tankerkoenig, opencharge, key, location, data source",
+  "settingsTopicSyncTitle": "Synkronisering & konto",
+  "settingsTopicSyncKeywords": "tanksync, moln, konto, e-post, länka enhet, synkronisering, dela databas, anonym, cloud, account, email, link device, sync, share database, anonymous",
+  "settingsTopicPrivacySubtitle": "Samtycken, integritetspanel, lagring & cache",
+  "settingsTopicPrivacyKeywords": "integritet, samtycke, gdpr, radera, rensa, lagring, cache, data, felrapportering, vin, privacy, consent, delete, erase, storage, error reporting",
+  "settingsTopicBackupTitle": "Säkerhetskopiering & återställning",
+  "settingsTopicBackupSubtitle": "Exportera eller återställ en fullständig säkerhetskopia av dina data",
+  "settingsTopicBackupKeywords": "säkerhetskopia, export, återställ, import, zip, xml, överföring, backup, restore, transfer",
+  "settingsTopicAdvancedSubtitle": "GitHub-token, utvecklarverktyg",
+  "settingsTopicAdvancedKeywords": "utvecklare, felsökning, token, pat, github, diagnostik, fellogg, spårning, developer, debug, diagnostics, error log, trace",
+  "settingsTopicAboutSubtitle": "Version, licenser, länkar",
+  "settingsTopicAboutKeywords": "om, version, licens, donera, github, erkännande, about, license, donate, attribution",
+  "settingsConsumptionOffHint": "Slå på förbrukningsregistrering under Funktioner & användningsläge för att konfigurera fordon, coaching och belöningar.",
+  "settingsOpenFeaturesLink": "Öppna Funktioner & användningsläge",
+  "settingsRadarTileSubtitle": "Radie, prisläge, avfrågning och skärmfästning för den aktiva profilen",
+  "settingsRadarNoProfileHint": "Skapa en profil först — radarinställningarna sparas per profil.",
+  "settingsRadarPinHeader": "Skärmfästning",
+  "settingsAlertsTileSubtitle": "Stations- och radieaviseringar som meddelar dig om prissänkningar",
+  "settingsPriceFeaturesHeader": "Prisfunktioner",
+  "settingsVoiceAnnouncementsOffHint": "Röstmeddelanden är av. Slå på Röståterkoppling och Röstmeddelanden under Funktioner & användningsläge för att höra billigt bränsle i närheten när du kör.",
+  "settingsDistanceUnitTitle": "Avståndsenhet",
+  "settingsDistanceUnitSubtitle": "Från den aktiva profilens land",
+  "settingsObd2AdapterTitle": "OBD2-adapter",
+  "settingsObd2AdapterSubtitle": "Adaptrar parkopplas per fordon — öppna ett fordon för att parkoppla eller byta dess adapter",
+  "settingsStorageDeleteHint": "Radering av alla lokala data görs från integritetspanelen.",
+  "settingsPrivacyCrossLinkTitle": "Samtycken",
+  "settingsPrivacyCrossLinkSubtitle": "Samtycken för Cloud Sync och resesynkronisering finns under Integritet & data",
+  "settingsBackupExportSubtitle": "Fordon, tankningar, resor och laddningsloggar som ZIP-fil",
+  "settingsBackupRestoreSubtitle": "Slå ihop eller ersätt dina data från en tidigare säkerhetskopia (ZIP)",
+  "settingsStationTypesLink": "Stationstyper ställs in under Funktioner & användningsläge",
+  "routeSearchCriterionLabel": "Stationsval per ruttsegment",
+  "routeSearchCriterionCheapest": "Billigast",
+  "routeSearchCriterionNearest": "Närmast rutten",
+  "routeSearchTopNLabel": "Kandidater per mätpunkt",
+  "routeSearchTopNCaption": "Upp till {count} stationer övervägs vid varje punkt längs rutten.",
+  "@routeSearchTopNCaption": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hybridFuelChoiceLabel": "Bränsle för prissökning (hybrid)",
+  "hybridFuelChoiceVehicleDefault": "Fordonets standard",
+  "scopeThisProfile": "Den här profilen",
+  "scopeAllProfiles": "Alla profiler",
+  "scopeThisVehicle": "Det här fordonet",
+  "featureLabel_manualConsumption": "Manuell förbrukningsregistrering",
+  "featureDescription_manualConsumption": "Registrera tankningar och laddningar för hand (ingen OBD2-adapter krävs).",
+  "featureLabel_loyaltyCards": "Lojalitetskort",
+  "featureDescription_loyaltyCards": "Bränsleklubb-/lojalitetskort med rabatt per liter i prisjämförelser.",
+  "featureLabel_startupTrace": "Spårning av startinitiering",
+  "featureDescription_startupTrace": "Registrerar de tidsatta faserna i appens start, visar dem som ett vattenfall och exporterar dem — en utvecklardiagnostik.",
+  "locationGpsAutoHint": "GPS-positionen hämtas automatiskt när du söker. Du kan också uppdatera den manuellt här.",
+  "locationClearGpsBody": "Rensa den sparade GPS-positionen? Du kan uppdatera den igen när som helst.",
+  "widgetDefaultsThisProfileHint": "Valen nedan gäller för alla installerade widgetar som visar den här profilen, vid nästa uppdatering."
 }

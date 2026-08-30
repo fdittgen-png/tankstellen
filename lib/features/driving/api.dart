@@ -17,6 +17,7 @@ library;
 export 'haptic_eco_coach.dart';
 export 'presentation/screens/driving_mode_screen.dart';
 export 'presentation/widgets/driving_settings_section.dart';
+export 'presentation/widgets/voice_announcements_settings_tile.dart';
 export 'providers/driving_coach_voice_listener_provider.dart';
 export 'providers/haptic_eco_coach_provider.dart';
 export 'providers/live_harsh_event_bus_provider.dart';

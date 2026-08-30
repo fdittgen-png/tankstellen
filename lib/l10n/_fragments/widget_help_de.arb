@@ -4,7 +4,7 @@
   "widgetHelpAdd": "Füge es über die Widget-Auswahl deines Launchers hinzu — halte einen leeren Bereich des Startbildschirms gedrückt, wähle „Widgets“ und suche SparKilo.",
   "widgetHelpTap": "Tippe im Widget auf eine Station, um sie in der App zu öffnen. Tippe auf das Aktualisieren-Symbol, um die Preise zu aktualisieren.",
   "widgetHelpConfigure": "Halte das Widget unter Android gedrückt und wähle „Neu konfigurieren“, um Profil, Farbe und Inhalt zu ändern.",
-  "widgetDefaultsApplyToAllHint": "Die untenstehenden Einstellungen gelten ab der nächsten Aktualisierung für alle installierten Widgets.",
+  "widgetDefaultsThisProfileHint": "Die untenstehenden Einstellungen gelten ab der nächsten Aktualisierung für alle installierten Widgets, die dieses Profil anzeigen.",
   "widgetDefaultsColorLabel": "Farbschema",
   "widgetDefaultsVariantLabel": "Inhaltsvariante",
   "widgetColorSchemeSystem": "System folgen",

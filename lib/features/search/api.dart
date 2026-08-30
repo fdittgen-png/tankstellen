@@ -25,6 +25,10 @@ export 'presentation/widgets/sort_selector.dart';
 export 'presentation/widgets/station_card.dart';
 export 'providers/ev_charging_service_provider.dart';
 export 'providers/ev_search_provider.dart';
+// #3884 — the radar auto-pin preference gets a proper Settings home
+// (Driving & consumption → Fuel Station Radar) next to its help-sheet
+// toggle, so the profile feature reads it through the barrel.
+export 'providers/radar_pin_provider.dart';
 export 'providers/radar_search_provider.dart';
 export 'providers/search_filters_provider.dart';
 export 'providers/search_mode_provider.dart';

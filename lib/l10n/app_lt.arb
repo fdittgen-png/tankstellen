@@ -86,8 +86,6 @@
   "clearCacheTitle": "Išvalyti podėlį?",
   "clearCacheBody": "Podėlyje esantys paieškos rezultatai ir kainos bus ištrinti. Profiliai, mėgstami ir nustatymai išsaugomi.",
   "clearCacheButton": "Išvalyti podėlį",
-  "deleteAllTitle": "Ištrinti visus duomenis?",
-  "deleteAllBody": "Tai visam laikui ištrina visus profilius, mėgstamus, API raktą, nustatymus ir podėlį. Programa bus atstatyta.",
   "deleteAllButton": "Ištrinti viską",
   "entries": "įrašų",
   "cacheEmpty": "Podėlis tuščias",
@@ -258,10 +256,6 @@
   "showCheapestEveryNKm": "Rodyti pigiausią stotį kas {km} km palei maršrutą",
   "avoidHighways": "Vengti greitkelių",
   "avoidHighwaysDesc": "Maršruto skaičiavimas vengia mokamų kelių ir greitkelių",
-  "showFuelStations": "Rodyti degalines",
-  "showFuelStationsDesc": "Įtraukti benzino, dyzelino, LPG, CNG stotis",
-  "showEvStations": "Rodyti įkrovimo stotis",
-  "showEvStationsDesc": "Įtraukti elektrinius įkrovimo stotis į rezultatus",
   "noStationsAlongThisRoute": "Stočių palei šį maršrutą nerasta.",
   "fuelCostCalculator": "Degalų kaštų skaičiuoklė",
   "distanceKm": "Atstumas (km)",
@@ -567,7 +561,6 @@
   "tripResume": "Tęsti",
   "tripBannerRecording": "Įrašoma kelionė",
   "tripBannerPaused": "Kelionė pristabdyta — palieskite, kad tęstumėte",
-  "navConsumption": "Suvartojimas",
   "vehicleBaselineSectionTitle": "Bazinė kalibracija",
   "vehicleBaselineEmpty": "Dar nėra pavyzdžių — pradėkite OBD2 kelionę, kad galėtumėte mokytis šios transporto priemonės kuro profilį.",
   "vehicleBaselineProgress": "Išmokta iš pavyzdžių įvairiose vairavimo situacijose.",
@@ -1428,7 +1421,6 @@
   "widgetHelpAdd": "Pridėkite jį iš savo paleistuvo valdiklių parinkiklio — ilgai paspauskite tuščią pradinio ekrano sritį, pasirinkite Valdikliai ir raskite SparKilo.",
   "widgetHelpTap": "Palieskite stotelę valdiklyje, kad atidarytumėte ją programoje. Palieskite atnaujinimo piktogramą, kad atnaujintumėte kainas.",
   "widgetHelpConfigure": "Android aplinkoje ilgai spauskite valdiklį ir pasirinkite Konfigūruoti iš naujo, kad pakeistumėte profilį, spalvą ir turinį.",
-  "widgetDefaultsApplyToAllHint": "Toliau pateikti pasirinkimai taikomi kiekvienam įdiegtam valdikliui kito atnaujinimo metu.",
   "widgetDefaultsColorLabel": "Spalvų schema",
   "widgetDefaultsVariantLabel": "Turinio variantas",
   "widgetColorSchemeSystem": "Pagal sistemą",
@@ -2447,22 +2439,6 @@
   },
   "tripRecordingDiscardedNoMovement": "Įrašas atmestas — judėjimas neaptiktas",
   "@tripRecordingDiscardedNoMovement": {
-    "description": "MT — needs native review"
-  },
-  "sectionSetupDataSources": "Sąranka ir duomenų šaltiniai",
-  "@sectionSetupDataSources": {
-    "description": "MT — needs native review"
-  },
-  "sectionFeaturesUsage": "Funkcijos ir naudojimas",
-  "@sectionFeaturesUsage": {
-    "description": "MT — needs native review"
-  },
-  "sectionAccountSync": "Paskyra ir sinchronizavimas",
-  "@sectionAccountSync": {
-    "description": "MT — needs native review"
-  },
-  "sectionAppearanceWidgets": "Išvaizda ir valdikliai",
-  "@sectionAppearanceWidgets": {
     "description": "MT — needs native review"
   },
   "sectionPrivacyData": "Privatumas ir duomenys",
@@ -4861,7 +4837,6 @@
       }
     }
   },
-  "consumptionDisplaySectionTitle": "Sąnaudų rodymas",
   "tripRecordingPipEstConsumptionCaptionUnit": "apyt. {unit}",
   "@tripRecordingPipEstConsumptionCaptionUnit": {
     "placeholders": {
@@ -4869,5 +4844,90 @@
         "type": "String"
       }
     }
-  }
+  },
+  "settingsSearchHint": "Ieškoti nustatymuose",
+  "settingsSearchNoResults": "Nė vienas nustatymas neatitinka „{query}“",
+  "@settingsSearchNoResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTopicProfilesTitle": "Profiliai ir regionas",
+  "settingsTopicProfilesSubtitle": "Šalis, kalba, degalai, paieškos spindulys, maršruto planavimas",
+  "settingsTopicProfilesKeywords": "profilis, šalis, kalba, degalai, spindulys, pašto kodas, maršrutas, namai, įvertinimas, pradžios ekranas, profile, country, language, fuel, radius, route, home, rating",
+  "settingsTopicVehiclesTitle": "Transporto priemonės ir OBD2",
+  "settingsTopicVehiclesSubtitle": "Jūsų automobiliai, bako talpa, OBD2 adapterio susiejimas",
+  "settingsTopicVehiclesKeywords": "transporto priemonė, automobilis, obd, obd2, adapteris, bluetooth, bakas, variklis, vin, kalibravimas, vehicle, car, adapter, tank, engine, calibration",
+  "settingsTopicDrivingTitle": "Vairavimas ir sąnaudos",
+  "settingsTopicDrivingSubtitle": "Treniravimas, apdovanojimai, degalinių radaras, trikčių šalinimas",
+  "settingsTopicDrivingKeywords": "treneris, eko, haptinis, balsas, žaidybinimas, radaras, riedėjimas, kelionė, sąnaudos, degalų klubas, lojalumas, obd2 žurnalas, prisegti, coach, eco, haptic, voice, gamification, radar, glide, trip, consumption, loyalty, pin",
+  "settingsTopicPricesTitle": "Kainos ir įspėjimai",
+  "settingsTopicPricesSubtitle": "Kainų įspėjimai, balso pranešimai, kainų istorija, bendruomenės pranešimai",
+  "settingsTopicPricesKeywords": "įspėjimas, pranešimas, kaina, istorija, prognozė, geriausias laikas, bendruomenė, ataskaita, qr, mokėjimas, balsas, alert, notification, price, history, prediction, community, report, payment, voice, announcement",
+  "settingsTopicUnitsTitle": "Vienetai ir rodymas",
+  "settingsTopicUnitsSubtitle": "Tema, atstumo vienetas, pradžios ekrano valdiklis",
+  "settingsTopicUnitsKeywords": "tema, tamsi, šviesi, eko, vienetas, km, mylios, valdiklis, spalva, rodymas, išvaizda, theme, dark, light, eco, unit, miles, widget, colour, display, appearance",
+  "settingsTopicFeaturesTitle": "Funkcijos ir naudojimo režimas",
+  "settingsTopicFeaturesSubtitle": "Naudojimo režimo šablonai ir kiekvienas funkcijų jungiklis",
+  "settingsTopicFeaturesKeywords": "funkcija, režimas, pagrindinis, vidutinis, pilnas, pasirinktinis, jungiklis, stočių tipai, degalinės, įkroviklių stotys, įkrovimas, feature, mode, basic, medium, full, custom, switch, toggle, charging",
+  "settingsTopicDataSourcesTitle": "Duomenų šaltiniai ir vieta",
+  "settingsTopicDataSourcesSubtitle": "API raktai, GPS padėtis, automatinis profilio keitimas",
+  "settingsTopicDataSourcesKeywords": "api, raktas, gps, vieta, padėtis, duomenų šaltinis, tankerkoenig, opencharge, key, location, data source",
+  "settingsTopicSyncTitle": "Sinchronizavimas ir paskyra",
+  "settingsTopicSyncKeywords": "tanksync, debesis, paskyra, el. paštas, susieti įrenginį, sinchronizavimas, bendrinti duomenų bazę, anonimiškas, cloud, account, email, link device, sync, share database, anonymous",
+  "settingsTopicPrivacySubtitle": "Sutikimai, privatumo skydelis, saugykla ir podėlis",
+  "settingsTopicPrivacyKeywords": "privatumas, sutikimas, bdar, ištrinti, išvalyti, saugykla, podėlis, duomenys, klaidų pranešimai, vin, privacy, consent, gdpr, delete, erase, storage, cache, data, error reporting",
+  "settingsTopicBackupTitle": "Atsarginė kopija ir atkūrimas",
+  "settingsTopicBackupSubtitle": "Eksportuokite arba atkurkite visą savo duomenų atsarginę kopiją",
+  "settingsTopicBackupKeywords": "atsarginė kopija, eksportas, atkurti, importas, zip, xml, perkėlimas, backup, export, restore, import, transfer",
+  "settingsTopicAdvancedSubtitle": "GitHub žetonas, kūrėjo įrankiai",
+  "settingsTopicAdvancedKeywords": "kūrėjas, derinimas, žetonas, pat, github, diagnostika, klaidų žurnalas, sekimas, developer, debug, token, diagnostics, error log, trace",
+  "settingsTopicAboutSubtitle": "Versija, licencijos, nuorodos",
+  "settingsTopicAboutKeywords": "apie, versija, licencija, paaukoti, github, priskyrimas, about, version, license, donate, attribution",
+  "settingsConsumptionOffHint": "Įjunkite sąnaudų stebėjimą skiltyje Funkcijos ir naudojimo režimas, kad sukonfigūruotumėte transporto priemones, treniravimą ir apdovanojimus.",
+  "settingsOpenFeaturesLink": "Atidaryti Funkcijos ir naudojimo režimas",
+  "settingsRadarTileSubtitle": "Spindulys, kainų režimas, apklausa ir ekrano prisegimas aktyviam profiliui",
+  "settingsRadarNoProfileHint": "Pirmiausia sukurkite profilį — radaro nustatymai saugomi kiekvienam profiliui atskirai.",
+  "settingsRadarPinHeader": "Ekrano prisegimas",
+  "settingsAlertsTileSubtitle": "Stočių ir spindulio įspėjimai, pranešantys apie kainų kritimą",
+  "settingsPriceFeaturesHeader": "Kainų funkcijos",
+  "settingsVoiceAnnouncementsOffHint": "Balso pranešimai išjungti. Įjunkite Balso atsiliepimą ir Balso pranešimus skiltyje Funkcijos ir naudojimo režimas, kad vairuodami girdėtumėte apie pigius degalus netoliese.",
+  "settingsDistanceUnitTitle": "Atstumo vienetas",
+  "settingsDistanceUnitSubtitle": "Pagal aktyvaus profilio šalį",
+  "settingsObd2AdapterTitle": "OBD2 adapteris",
+  "settingsObd2AdapterSubtitle": "Adapteriai susiejami kiekvienai transporto priemonei — atidarykite transporto priemonę, kad susietumėte arba pakeistumėte jos adapterį",
+  "settingsStorageDeleteHint": "Visi vietiniai duomenys ištrinami iš privatumo skydelio.",
+  "settingsPrivacyCrossLinkTitle": "Sutikimai",
+  "settingsPrivacyCrossLinkSubtitle": "Cloud Sync ir kelionių sinchronizavimo sutikimai yra skiltyje Privatumas ir duomenys",
+  "settingsBackupExportSubtitle": "Transporto priemonės, degalų pylimai, kelionės ir įkrovimo žurnalai kaip ZIP failas",
+  "settingsBackupRestoreSubtitle": "Sujunkite arba pakeiskite savo duomenis iš ankstesnės atsarginės kopijos ZIP",
+  "settingsStationTypesLink": "Stočių tipai nustatomi skiltyje Funkcijos ir naudojimo režimas",
+  "routeSearchCriterionLabel": "Stoties pasirinkimas kiekvienai maršruto atkarpai",
+  "routeSearchCriterionCheapest": "Pigiausia",
+  "routeSearchCriterionNearest": "Arčiausiai maršruto",
+  "routeSearchTopNLabel": "Kandidatų viename imties taške",
+  "routeSearchTopNCaption": "Kiekviename maršruto taške atsižvelgiama į iki {count} stočių.",
+  "@routeSearchTopNCaption": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hybridFuelChoiceLabel": "Degalai kainų paieškai (hibridas)",
+  "hybridFuelChoiceVehicleDefault": "Transporto priemonės numatytasis",
+  "scopeThisProfile": "Šis profilis",
+  "scopeAllProfiles": "Visi profiliai",
+  "scopeThisVehicle": "Ši transporto priemonė",
+  "featureLabel_manualConsumption": "Rankinis sąnaudų registravimas",
+  "featureDescription_manualConsumption": "Registruokite degalų pylimus ir įkrovimo sesijas rankiniu būdu (OBD2 adapteris nereikalingas).",
+  "featureLabel_loyaltyCards": "Lojalumo kortelės",
+  "featureDescription_loyaltyCards": "Degalų klubų / lojalumo kortelės su nuolaida už litrą kainų palyginimuose.",
+  "featureLabel_startupTrace": "Paleidimo inicijavimo sekimas",
+  "featureDescription_startupTrace": "Įrašo laiku matuojamas programos paleidimo fazes, rodo jas kaip krioklį ir eksportuoja — kūrėjo diagnostika.",
+  "locationGpsAutoHint": "GPS padėtis gaunama automatiškai ieškant. Čia ją galite atnaujinti ir rankiniu būdu.",
+  "locationClearGpsBody": "Išvalyti išsaugotą GPS padėtį? Ją galite bet kada atnaujinti iš naujo.",
+  "widgetDefaultsThisProfileHint": "Toliau pateikti pasirinkimai galioja kiekvienam įdiegtam valdikliui, rodančiam šį profilį, kito atnaujinimo metu."
 }

@@ -86,8 +86,6 @@
   "clearCacheTitle": "Limpar cache?",
   "clearCacheBody": "Os resultados de pesquisa e preços em cache serão eliminados. Perfis, favoritos e definições são preservados.",
   "clearCacheButton": "Limpar cache",
-  "deleteAllTitle": "Eliminar todos os dados?",
-  "deleteAllBody": "Isto elimina permanentemente todos os perfis, favoritos, chave API, definições e cache. A app será reiniciada.",
   "deleteAllButton": "Eliminar tudo",
   "entries": "entradas",
   "cacheEmpty": "A cache está vazia",
@@ -258,10 +256,6 @@
   "showCheapestEveryNKm": "Mostrar posto mais barato a cada {km} km ao longo da rota",
   "avoidHighways": "Evitar autoestradas",
   "avoidHighwaysDesc": "O cálculo da rota evita portagens e autoestradas",
-  "showFuelStations": "Mostrar postos de combustível",
-  "showFuelStationsDesc": "Incluir postos de gasolina, gasóleo, GPL, GNC",
-  "showEvStations": "Mostrar postos de carregamento",
-  "showEvStationsDesc": "Incluir postos de carregamento elétrico nos resultados",
   "noStationsAlongThisRoute": "Nenhum posto encontrado ao longo desta rota.",
   "fuelCostCalculator": "Calculadora de custo de combustível",
   "distanceKm": "Distância (km)",
@@ -567,7 +561,6 @@
   "tripResume": "Retomar",
   "tripBannerRecording": "A gravar viagem",
   "tripBannerPaused": "Viagem pausada — toque para retomar",
-  "navConsumption": "Consumo",
   "vehicleBaselineSectionTitle": "Calibração de referência",
   "vehicleBaselineEmpty": "Sem amostras ainda — inicie uma viagem OBD2 para começar a aprender o perfil de combustível deste veículo.",
   "vehicleBaselineProgress": "Aprendido a partir de amostras em várias situações de condução.",
@@ -1428,7 +1421,6 @@
   "widgetHelpAdd": "Adicione-o no seletor de widgets do seu launcher — pressione longamente uma área vazia do ecrã inicial, escolha Widgets e encontre SparKilo.",
   "widgetHelpTap": "Toque num posto no widget para abri-lo na aplicação. Toque no ícone de atualização para atualizar os preços.",
   "widgetHelpConfigure": "No Android, pressione longamente o widget e escolha Reconfigurar para alterar o perfil, cor e conteúdo.",
-  "widgetDefaultsApplyToAllHint": "As escolhas abaixo aplicam-se a cada widget instalado na próxima atualização.",
   "widgetDefaultsColorLabel": "Esquema de cores",
   "widgetDefaultsVariantLabel": "Variante de conteúdo",
   "widgetColorSchemeSystem": "Seguir sistema",
@@ -2447,22 +2439,6 @@
   },
   "tripRecordingDiscardedNoMovement": "Gravação descartada — nenhum movimento detetado",
   "@tripRecordingDiscardedNoMovement": {
-    "description": "MT — needs native review"
-  },
-  "sectionSetupDataSources": "Configuração e fontes de dados",
-  "@sectionSetupDataSources": {
-    "description": "MT — needs native review"
-  },
-  "sectionFeaturesUsage": "Funcionalidades e utilização",
-  "@sectionFeaturesUsage": {
-    "description": "MT — needs native review"
-  },
-  "sectionAccountSync": "Conta e sincronização",
-  "@sectionAccountSync": {
-    "description": "MT — needs native review"
-  },
-  "sectionAppearanceWidgets": "Aparência e widgets",
-  "@sectionAppearanceWidgets": {
     "description": "MT — needs native review"
   },
   "sectionPrivacyData": "Privacidade e dados",
@@ -4861,7 +4837,6 @@
       }
     }
   },
-  "consumptionDisplaySectionTitle": "Apresentação do consumo",
   "tripRecordingPipEstConsumptionCaptionUnit": "est. {unit}",
   "@tripRecordingPipEstConsumptionCaptionUnit": {
     "placeholders": {
@@ -4869,5 +4844,90 @@
         "type": "String"
       }
     }
-  }
+  },
+  "settingsSearchHint": "Pesquisar definições",
+  "settingsSearchNoResults": "Nenhuma definição corresponde a \"{query}\"",
+  "@settingsSearchNoResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTopicProfilesTitle": "Perfis e região",
+  "settingsTopicProfilesSubtitle": "País, idioma, combustível, raio de pesquisa, planeamento de rotas",
+  "settingsTopicProfilesKeywords": "perfil, país, idioma, combustível, raio, código postal, rota, casa, avaliação, ecrã inicial, profile, country, language, fuel, radius, route, home, rating",
+  "settingsTopicVehiclesTitle": "Veículos e OBD2",
+  "settingsTopicVehiclesSubtitle": "Os seus carros, capacidade do depósito, emparelhamento do adaptador OBD2",
+  "settingsTopicVehiclesKeywords": "veículo, carro, obd, obd2, adaptador, bluetooth, depósito, motor, vin, calibração, vehicle, car, adapter, tank, engine",
+  "settingsTopicDrivingTitle": "Condução e consumo",
+  "settingsTopicDrivingSubtitle": "Coaching, recompensas, radar de postos, resolução de problemas",
+  "settingsTopicDrivingKeywords": "coach, eco, háptico, voz, gamificação, radar, deslize, viagem, consumo, clube de combustível, fidelidade, registo obd2, fixar, haptic, voice, trip, consumption, loyalty, pin",
+  "settingsTopicPricesTitle": "Preços e alertas",
+  "settingsTopicPricesSubtitle": "Alertas de preço, anúncios por voz, histórico de preços, relatos da comunidade",
+  "settingsTopicPricesKeywords": "alerta, notificação, preço, histórico, previsão, melhor altura, comunidade, relato, qr, pagamento, voz, anúncio, alert, price, history, prediction, report, payment, voice",
+  "settingsTopicUnitsTitle": "Unidades e apresentação",
+  "settingsTopicUnitsSubtitle": "Tema, unidade de distância, widget do ecrã inicial",
+  "settingsTopicUnitsKeywords": "tema, escuro, claro, eco, unidade, km, milhas, widget, cor, apresentação, aspeto, theme, dark, light, unit, miles, display",
+  "settingsTopicFeaturesTitle": "Funcionalidades e modo de utilização",
+  "settingsTopicFeaturesSubtitle": "Predefinições do modo de utilização e todos os interruptores de funcionalidades",
+  "settingsTopicFeaturesKeywords": "funcionalidade, modo, básico, médio, completo, personalizado, interruptor, tipos de posto, postos, carregadores, carregamento, feature, basic, medium, full, custom, switch, toggle, charging",
+  "settingsTopicDataSourcesTitle": "Fontes de dados e localização",
+  "settingsTopicDataSourcesSubtitle": "Chaves API, posição GPS, mudança automática de perfil",
+  "settingsTopicDataSourcesKeywords": "api, chave, gps, localização, posição, fonte de dados, tankerkoenig, opencharge, key, location",
+  "settingsTopicSyncTitle": "Sincronização e conta",
+  "settingsTopicSyncKeywords": "tanksync, nuvem, conta, e-mail, associar dispositivo, sincronização, partilhar base de dados, anónimo, cloud, account, email, link device, sync, share database, anonymous",
+  "settingsTopicPrivacySubtitle": "Consentimentos, painel de privacidade, armazenamento e cache",
+  "settingsTopicPrivacyKeywords": "privacidade, consentimento, rgpd, apagar, eliminar, armazenamento, cache, dados, relatório de erros, vin, privacy, consent, gdpr, delete, erase, storage, data, error reporting",
+  "settingsTopicBackupTitle": "Cópia de segurança e restauro",
+  "settingsTopicBackupSubtitle": "Exportar ou restaurar uma cópia de segurança completa dos seus dados",
+  "settingsTopicBackupKeywords": "cópia de segurança, exportar, restaurar, importar, zip, xml, transferir, backup, export, restore, import, transfer",
+  "settingsTopicAdvancedSubtitle": "Token do GitHub, ferramentas de programador",
+  "settingsTopicAdvancedKeywords": "programador, depuração, token, pat, github, diagnóstico, registo de erros, rastreio, developer, debug, diagnostics, error log, trace",
+  "settingsTopicAboutSubtitle": "Versão, licenças, ligações",
+  "settingsTopicAboutKeywords": "acerca, versão, licença, doar, github, atribuição, about, version, license, donate",
+  "settingsConsumptionOffHint": "Ative o registo de consumo em Funcionalidades e modo de utilização para configurar veículos, coaching e recompensas.",
+  "settingsOpenFeaturesLink": "Abrir Funcionalidades e modo de utilização",
+  "settingsRadarTileSubtitle": "Raio, modo de preço, consulta e fixação de ecrã para o perfil ativo",
+  "settingsRadarNoProfileHint": "Crie primeiro um perfil — as definições do radar são guardadas por perfil.",
+  "settingsRadarPinHeader": "Fixação de ecrã",
+  "settingsAlertsTileSubtitle": "Alertas de posto e de raio que o avisam de descidas de preço",
+  "settingsPriceFeaturesHeader": "Funcionalidades de preços",
+  "settingsVoiceAnnouncementsOffHint": "Os anúncios por voz estão desativados. Ative Feedback por voz e Anúncios por voz em Funcionalidades e modo de utilização para ouvir combustível barato por perto enquanto conduz.",
+  "settingsDistanceUnitTitle": "Unidade de distância",
+  "settingsDistanceUnitSubtitle": "Do país do perfil ativo",
+  "settingsObd2AdapterTitle": "Adaptador OBD2",
+  "settingsObd2AdapterSubtitle": "Os adaptadores são emparelhados por veículo — abra um veículo para emparelhar ou mudar o seu adaptador",
+  "settingsStorageDeleteHint": "A eliminação de todos os dados locais faz-se a partir do painel de privacidade.",
+  "settingsPrivacyCrossLinkTitle": "Consentimentos",
+  "settingsPrivacyCrossLinkSubtitle": "Os consentimentos de Cloud Sync e de sincronização de viagens estão em Privacidade e dados",
+  "settingsBackupExportSubtitle": "Veículos, abastecimentos, viagens e registos de carregamento num ficheiro ZIP",
+  "settingsBackupRestoreSubtitle": "Combine ou substitua os seus dados a partir de um ZIP de cópia de segurança anterior",
+  "settingsStationTypesLink": "Os tipos de posto definem-se em Funcionalidades e modo de utilização",
+  "routeSearchCriterionLabel": "Escolha do posto por troço de rota",
+  "routeSearchCriterionCheapest": "Mais barato",
+  "routeSearchCriterionNearest": "Mais próximo da rota",
+  "routeSearchTopNLabel": "Candidatos por ponto de amostragem",
+  "routeSearchTopNCaption": "São considerados até {count} postos em cada ponto ao longo da rota.",
+  "@routeSearchTopNCaption": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hybridFuelChoiceLabel": "Combustível para a pesquisa de preços (híbrido)",
+  "hybridFuelChoiceVehicleDefault": "Predefinição do veículo",
+  "scopeThisProfile": "Este perfil",
+  "scopeAllProfiles": "Todos os perfis",
+  "scopeThisVehicle": "Este veículo",
+  "featureLabel_manualConsumption": "Registo manual do consumo",
+  "featureDescription_manualConsumption": "Registe abastecimentos e sessões de carregamento à mão (não é preciso adaptador OBD2).",
+  "featureLabel_loyaltyCards": "Cartões de fidelidade",
+  "featureDescription_loyaltyCards": "Cartões de clube de combustível / fidelidade com descontos por litro nas comparações de preços.",
+  "featureLabel_startupTrace": "Rastreio de inicialização no arranque",
+  "featureDescription_startupTrace": "Regista as fases cronometradas do arranque da app, mostra-as em cascata e exporta-as — um diagnóstico para programadores.",
+  "locationGpsAutoHint": "A posição GPS é obtida automaticamente ao pesquisar. Também pode atualizá-la manualmente aqui.",
+  "locationClearGpsBody": "Apagar a posição GPS guardada? Pode atualizá-la novamente a qualquer momento.",
+  "widgetDefaultsThisProfileHint": "As escolhas abaixo aplicam-se a todos os widgets instalados que mostrem este perfil, na próxima atualização."
 }

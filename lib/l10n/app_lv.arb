@@ -86,8 +86,6 @@
   "clearCacheTitle": "Iztīrīt kešatmiņu?",
   "clearCacheBody": "Kešatmiņā saglabātie meklēšanas rezultāti un cenas tiks dzēsti. Profili, izlase un iestatījumi tiks saglabāti.",
   "clearCacheButton": "Iztīrīt kešatmiņu",
-  "deleteAllTitle": "Dzēst visus datus?",
-  "deleteAllBody": "Tas neatgriezeniski dzēš visus profilus, izlasi, API atslēgu, iestatījumus un kešatmiņu. Lietotne tiks atiestatīta.",
   "deleteAllButton": "Dzēst visu",
   "entries": "ieraksti",
   "cacheEmpty": "Kešatmiņa ir tukša",
@@ -258,10 +256,6 @@
   "showCheapestEveryNKm": "Rādīt lētāko staciju ik {km} km gar maršrutu",
   "avoidHighways": "Izvairīties no automaģistrālēm",
   "avoidHighwaysDesc": "Maršruta aprēķins izvairās no maksas ceļiem un automaģistrālēm",
-  "showFuelStations": "Rādīt degvielas uzpildes stacijas",
-  "showFuelStationsDesc": "Iekļaut benzīna, dīzeļa, LPG, CNG stacijas",
-  "showEvStations": "Rādīt uzlādes stacijas",
-  "showEvStationsDesc": "Iekļaut elektriskās uzlādes stacijas meklēšanas rezultātos",
   "noStationsAlongThisRoute": "Stacijas gar šo maršrutu nav atrastas.",
   "fuelCostCalculator": "Degvielas izmaksu kalkulators",
   "distanceKm": "Attālums (km)",
@@ -567,7 +561,6 @@
   "tripResume": "Turpināt",
   "tripBannerRecording": "Ieraksta braucienu",
   "tripBannerPaused": "Brauciens pauzēts — pieskarieties, lai turpinātu",
-  "navConsumption": "Patēriņš",
   "vehicleBaselineSectionTitle": "Bāzlīnijas kalibrēšana",
   "vehicleBaselineEmpty": "Vēl nav paraugu — sāciet OBD2 braucienu, lai sāktu apgūt šī transportlīdzekļa degvielas profilu.",
   "vehicleBaselineProgress": "Apgūts no paraugiem dažādās braukšanas situācijās.",
@@ -1428,7 +1421,6 @@
   "widgetHelpAdd": "Pievienojiet to no palaišanas programmas logrīku izvēlnes — ilgi spiediet tukšu sākuma ekrāna apgabalu, izvēlieties Logrīki un atrodiet SparKilo.",
   "widgetHelpTap": "Pieskarieties logrīkā stacijai, lai to atvērtu lietotnē. Pieskarieties atjaunināšanas ikonai, lai atjauninātu cenas.",
   "widgetHelpConfigure": "Android lietotnē ilgi spiediet logrīku un izvēlieties Pārkonfigurēt, lai mainītu profilu, krāsu un saturu.",
-  "widgetDefaultsApplyToAllHint": "Turpmākās izvēles tiek piemērotas katram instalētajam logrīkam nākamajā atjaunināšanā.",
   "widgetDefaultsColorLabel": "Krāsu shēma",
   "widgetDefaultsVariantLabel": "Satura variants",
   "widgetColorSchemeSystem": "Sekot sistēmai",
@@ -2447,22 +2439,6 @@
   },
   "tripRecordingDiscardedNoMovement": "Ieraksts atmests — kustība nav konstatēta",
   "@tripRecordingDiscardedNoMovement": {
-    "description": "MT — needs native review"
-  },
-  "sectionSetupDataSources": "Iestatīšana un datu avoti",
-  "@sectionSetupDataSources": {
-    "description": "MT — needs native review"
-  },
-  "sectionFeaturesUsage": "Funkcijas un lietošana",
-  "@sectionFeaturesUsage": {
-    "description": "MT — needs native review"
-  },
-  "sectionAccountSync": "Konts un sinhronizācija",
-  "@sectionAccountSync": {
-    "description": "MT — needs native review"
-  },
-  "sectionAppearanceWidgets": "Izskats un logrīki",
-  "@sectionAppearanceWidgets": {
     "description": "MT — needs native review"
   },
   "sectionPrivacyData": "Privātums un dati",
@@ -4861,7 +4837,6 @@
       }
     }
   },
-  "consumptionDisplaySectionTitle": "Patēriņa attēlojums",
   "tripRecordingPipEstConsumptionCaptionUnit": "apt. {unit}",
   "@tripRecordingPipEstConsumptionCaptionUnit": {
     "placeholders": {
@@ -4869,5 +4844,90 @@
         "type": "String"
       }
     }
-  }
+  },
+  "settingsSearchHint": "Meklēt iestatījumos",
+  "settingsSearchNoResults": "Neviens iestatījums neatbilst vaicājumam “{query}”",
+  "@settingsSearchNoResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTopicProfilesTitle": "Profili un reģions",
+  "settingsTopicProfilesSubtitle": "Valsts, valoda, degviela, meklēšanas rādiuss, maršruta plānošana",
+  "settingsTopicProfilesKeywords": "profils, valsts, valoda, degviela, rādiuss, pasta indekss, maršruts, mājas, vērtējums, sākuma ekrāns, profile, country, language, fuel, radius, route, home, rating",
+  "settingsTopicVehiclesTitle": "Transportlīdzekļi un OBD2",
+  "settingsTopicVehiclesSubtitle": "Tavas automašīnas, tvertnes tilpums, OBD2 adaptera savienošana pārī",
+  "settingsTopicVehiclesKeywords": "transportlīdzeklis, auto, obd, obd2, adapteris, bluetooth, tvertne, dzinējs, vin, kalibrēšana, vehicle, car, adapter, tank, engine, calibration",
+  "settingsTopicDrivingTitle": "Braukšana un patēriņš",
+  "settingsTopicDrivingSubtitle": "Trenēšana, balvas, degvielas uzpildes staciju radars, problēmu novēršana",
+  "settingsTopicDrivingKeywords": "treneris, eko, haptisks, balss, spēlifikācija, radars, ripošana, brauciens, patēriņš, degvielas klubs, lojalitāte, obd2 žurnāls, piespraust, coach, eco, haptic, voice, gamification, radar, glide, trip, consumption, loyalty, pin",
+  "settingsTopicPricesTitle": "Cenas un brīdinājumi",
+  "settingsTopicPricesSubtitle": "Cenu brīdinājumi, balss paziņojumi, cenu vēsture, kopienas ziņojumi",
+  "settingsTopicPricesKeywords": "brīdinājums, paziņojums, cena, vēsture, prognoze, labākais laiks, kopiena, ziņojums, qr, maksājums, balss, alert, notification, price, history, prediction, community, report, payment, voice, announcement",
+  "settingsTopicUnitsTitle": "Mērvienības un attēlojums",
+  "settingsTopicUnitsSubtitle": "Motīvs, attāluma mērvienība, sākuma ekrāna logrīks",
+  "settingsTopicUnitsKeywords": "motīvs, tumšs, gaišs, eko, mērvienība, km, jūdzes, logrīks, krāsa, attēlojums, izskats, theme, dark, light, eco, unit, miles, widget, colour, display, appearance",
+  "settingsTopicFeaturesTitle": "Funkcijas un lietošanas režīms",
+  "settingsTopicFeaturesSubtitle": "Lietošanas režīma sagataves un katrs funkciju slēdzis",
+  "settingsTopicFeaturesKeywords": "funkcija, režīms, pamata, vidējs, pilns, pielāgots, slēdzis, staciju veidi, degvielas stacijas, uzlādes stacijas, uzlāde, feature, mode, basic, medium, full, custom, switch, toggle, charging",
+  "settingsTopicDataSourcesTitle": "Datu avoti un atrašanās vieta",
+  "settingsTopicDataSourcesSubtitle": "API atslēgas, GPS pozīcija, automātiska profila maiņa",
+  "settingsTopicDataSourcesKeywords": "api, atslēga, gps, atrašanās vieta, pozīcija, datu avots, tankerkoenig, opencharge, key, location, data source",
+  "settingsTopicSyncTitle": "Sinhronizācija un konts",
+  "settingsTopicSyncKeywords": "tanksync, mākonis, konts, e-pasts, saistīt ierīci, sinhronizācija, koplietot datubāzi, anonīms, cloud, account, email, link device, sync, share database, anonymous",
+  "settingsTopicPrivacySubtitle": "Piekrišanas, privātuma panelis, krātuve un kešatmiņa",
+  "settingsTopicPrivacyKeywords": "privātums, piekrišana, vdar, dzēst, notīrīt, krātuve, kešatmiņa, dati, kļūdu ziņošana, vin, privacy, consent, gdpr, delete, erase, storage, cache, data, error reporting",
+  "settingsTopicBackupTitle": "Dublēšana un atjaunošana",
+  "settingsTopicBackupSubtitle": "Eksportē vai atjauno pilnu savu datu dublējumu",
+  "settingsTopicBackupKeywords": "dublējums, eksports, atjaunot, imports, zip, xml, pārsūtīšana, backup, export, restore, import, transfer",
+  "settingsTopicAdvancedSubtitle": "GitHub pilnvara, izstrādātāja rīki",
+  "settingsTopicAdvancedKeywords": "izstrādātājs, atkļūdošana, pilnvara, pat, github, diagnostika, kļūdu žurnāls, izsekošana, developer, debug, token, diagnostics, error log, trace",
+  "settingsTopicAboutSubtitle": "Versija, licences, saites",
+  "settingsTopicAboutKeywords": "par, versija, licence, ziedot, github, atsauce, about, version, license, donate, attribution",
+  "settingsConsumptionOffHint": "Ieslēdz patēriņa izsekošanu sadaļā Funkcijas un lietošanas režīms, lai konfigurētu transportlīdzekļus, trenēšanu un balvas.",
+  "settingsOpenFeaturesLink": "Atvērt Funkcijas un lietošanas režīms",
+  "settingsRadarTileSubtitle": "Rādiuss, cenu režīms, aptaujāšana un ekrāna piespraušana aktīvajam profilam",
+  "settingsRadarNoProfileHint": "Vispirms izveido profilu — radara iestatījumi tiek glabāti katram profilam.",
+  "settingsRadarPinHeader": "Ekrāna piespraušana",
+  "settingsAlertsTileSubtitle": "Staciju un rādiusa brīdinājumi, kas paziņo par cenu kritumu",
+  "settingsPriceFeaturesHeader": "Cenu funkcijas",
+  "settingsVoiceAnnouncementsOffHint": "Balss paziņojumi ir izslēgti. Ieslēdz Balss atgriezenisko saiti un Balss paziņojumus sadaļā Funkcijas un lietošanas režīms, lai braucot dzirdētu par lētu degvielu tuvumā.",
+  "settingsDistanceUnitTitle": "Attāluma mērvienība",
+  "settingsDistanceUnitSubtitle": "No aktīvā profila valsts",
+  "settingsObd2AdapterTitle": "OBD2 adapteris",
+  "settingsObd2AdapterSubtitle": "Adapteri tiek savienoti pārī katram transportlīdzeklim — atver transportlīdzekli, lai savienotu vai mainītu tā adapteri",
+  "settingsStorageDeleteHint": "Visu vietējo datu dzēšana notiek no privātuma paneļa.",
+  "settingsPrivacyCrossLinkTitle": "Piekrišanas",
+  "settingsPrivacyCrossLinkSubtitle": "Cloud Sync un braucienu sinhronizācijas piekrišanas atrodas sadaļā Privātums un dati",
+  "settingsBackupExportSubtitle": "Transportlīdzekļi, uzpildes, braucieni un uzlādes žurnāli kā ZIP fails",
+  "settingsBackupRestoreSubtitle": "Apvieno vai aizstāj savus datus no iepriekšēja dublējuma ZIP",
+  "settingsStationTypesLink": "Staciju veidus iestata sadaļā Funkcijas un lietošanas režīms",
+  "routeSearchCriterionLabel": "Stacijas izvēle katram maršruta posmam",
+  "routeSearchCriterionCheapest": "Lētākā",
+  "routeSearchCriterionNearest": "Tuvākā maršrutam",
+  "routeSearchTopNLabel": "Kandidāti katrā paraugpunktā",
+  "routeSearchTopNCaption": "Katrā maršruta punktā tiek ņemtas vērā līdz {count} stacijām.",
+  "@routeSearchTopNCaption": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hybridFuelChoiceLabel": "Degviela cenu meklēšanai (hibrīds)",
+  "hybridFuelChoiceVehicleDefault": "Transportlīdzekļa noklusējums",
+  "scopeThisProfile": "Šis profils",
+  "scopeAllProfiles": "Visi profili",
+  "scopeThisVehicle": "Šis transportlīdzeklis",
+  "featureLabel_manualConsumption": "Manuāla patēriņa reģistrēšana",
+  "featureDescription_manualConsumption": "Reģistrē uzpildes un uzlādes sesijas manuāli (OBD2 adapteris nav nepieciešams).",
+  "featureLabel_loyaltyCards": "Lojalitātes kartes",
+  "featureDescription_loyaltyCards": "Degvielas klubu / lojalitātes kartes ar atlaidi par litru cenu salīdzinājumos.",
+  "featureLabel_startupTrace": "Palaišanas inicializācijas izsekošana",
+  "featureDescription_startupTrace": "Reģistrē lietotnes palaišanas laikā mērītās fāzes, rāda tās kā ūdenskritumu un eksportē — izstrādātāja diagnostika.",
+  "locationGpsAutoHint": "GPS pozīcija tiek iegūta automātiski meklējot. Šeit to vari atjaunināt arī manuāli.",
+  "locationClearGpsBody": "Vai notīrīt saglabāto GPS pozīciju? To vari jebkurā laikā atjaunināt vēlreiz.",
+  "widgetDefaultsThisProfileHint": "Tālāk norādītās izvēles attiecas uz katru instalēto logrīku, kas rāda šo profilu, nākamajā atsvaidzināšanā."
 }

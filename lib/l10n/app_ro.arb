@@ -86,8 +86,6 @@
   "clearCacheTitle": "Golești cache-ul?",
   "clearCacheBody": "Rezultatele căutărilor și prețurile din cache vor fi șterse. Profilurile, favoritele și setările sunt păstrate.",
   "clearCacheButton": "Golește cache",
-  "deleteAllTitle": "Ștergi toate datele?",
-  "deleteAllBody": "Aceasta șterge permanent toate profilurile, favoritele, cheia API, setările și cache-ul. Aplicația va fi resetată.",
   "deleteAllButton": "Șterge tot",
   "entries": "intrări",
   "cacheEmpty": "Cache-ul este gol",
@@ -258,10 +256,6 @@
   "showCheapestEveryNKm": "Arată cea mai ieftină stație la fiecare {km} km de-a lungul rutei",
   "avoidHighways": "Evită autostrăzile",
   "avoidHighwaysDesc": "Calculul rutei evită drumurile cu taxă și autostrăzile",
-  "showFuelStations": "Arată benzinăriile",
-  "showFuelStationsDesc": "Include stații de benzină, motorină, GPL, GNC",
-  "showEvStations": "Arată stații de încărcare",
-  "showEvStationsDesc": "Include stații de încărcare electrică în rezultate",
   "noStationsAlongThisRoute": "Nu s-au găsit stații de-a lungul acestei rute.",
   "fuelCostCalculator": "Calculator cost carburant",
   "distanceKm": "Distanță (km)",
@@ -567,7 +561,6 @@
   "tripResume": "Reluați",
   "tripBannerRecording": "Se înregistrează călătoria",
   "tripBannerPaused": "Călătorie în pauză — apăsați pentru a relua",
-  "navConsumption": "Consum",
   "vehicleBaselineSectionTitle": "Calibrare referință",
   "vehicleBaselineEmpty": "Niciun eșantion încă — porniți o călătorie OBD2 pentru a învăța profilul de combustibil al acestui vehicul.",
   "vehicleBaselineProgress": "Învățat din eșantioane în diverse situații de condus.",
@@ -1428,7 +1421,6 @@
   "widgetHelpAdd": "Adăugați-l din selectorul de widget-uri al launcher-ului — apăsați lung pe o zonă liberă a ecranului principal, alegeți Widget-uri și găsiți SparKilo.",
   "widgetHelpTap": "Apăsați o stație din widget pentru a o deschide în aplicație. Apăsați pictograma de actualizare pentru a actualiza prețurile.",
   "widgetHelpConfigure": "Pe Android, apăsați lung pe widget și alegeți Reconfigurați pentru a modifica profilul, culoarea și conținutul.",
-  "widgetDefaultsApplyToAllHint": "Opțiunile de mai jos se aplică fiecărui widget instalat la următoarea reîmprospătare.",
   "widgetDefaultsColorLabel": "Schemă de culori",
   "widgetDefaultsVariantLabel": "Variantă de conținut",
   "widgetColorSchemeSystem": "Conform sistemului",
@@ -2447,22 +2439,6 @@
   },
   "tripRecordingDiscardedNoMovement": "Înregistrare anulată — nicio mișcare detectată",
   "@tripRecordingDiscardedNoMovement": {
-    "description": "MT — needs native review"
-  },
-  "sectionSetupDataSources": "Configurare și surse de date",
-  "@sectionSetupDataSources": {
-    "description": "MT — needs native review"
-  },
-  "sectionFeaturesUsage": "Funcții și utilizare",
-  "@sectionFeaturesUsage": {
-    "description": "MT — needs native review"
-  },
-  "sectionAccountSync": "Cont și sincronizare",
-  "@sectionAccountSync": {
-    "description": "MT — needs native review"
-  },
-  "sectionAppearanceWidgets": "Aspect și widgeturi",
-  "@sectionAppearanceWidgets": {
     "description": "MT — needs native review"
   },
   "sectionPrivacyData": "Confidențialitate și date",
@@ -4861,7 +4837,6 @@
       }
     }
   },
-  "consumptionDisplaySectionTitle": "Afișarea consumului",
   "tripRecordingPipEstConsumptionCaptionUnit": "est. {unit}",
   "@tripRecordingPipEstConsumptionCaptionUnit": {
     "placeholders": {
@@ -4869,5 +4844,90 @@
         "type": "String"
       }
     }
-  }
+  },
+  "settingsSearchHint": "Caută în setări",
+  "settingsSearchNoResults": "Nicio setare nu corespunde cu „{query}”",
+  "@settingsSearchNoResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTopicProfilesTitle": "Profiluri și regiune",
+  "settingsTopicProfilesSubtitle": "Țară, limbă, combustibil, rază de căutare, planificarea rutei",
+  "settingsTopicProfilesKeywords": "profil, țară, limbă, combustibil, rază, cod poștal, rută, acasă, evaluare, ecran de pornire, profile, country, language, fuel, radius, route, home, rating",
+  "settingsTopicVehiclesTitle": "Vehicule și OBD2",
+  "settingsTopicVehiclesSubtitle": "Mașinile tale, capacitatea rezervorului, asocierea adaptorului OBD2",
+  "settingsTopicVehiclesKeywords": "vehicul, mașină, obd, obd2, adaptor, bluetooth, rezervor, motor, vin, calibrare, vehicle, car, adapter, tank, engine, calibration",
+  "settingsTopicDrivingTitle": "Condus și consum",
+  "settingsTopicDrivingSubtitle": "Coaching, recompense, radar de benzinării, depanare",
+  "settingsTopicDrivingKeywords": "coach, eco, haptic, voce, gamificare, radar, rulare liberă, călătorie, consum, club de combustibil, fidelitate, jurnal obd2, fixare, voice, gamification, glide, trip, consumption, loyalty, pin",
+  "settingsTopicPricesTitle": "Prețuri și alerte",
+  "settingsTopicPricesSubtitle": "Alerte de preț, anunțuri vocale, istoricul prețurilor, raportări ale comunității",
+  "settingsTopicPricesKeywords": "alertă, notificare, preț, istoric, predicție, cel mai bun moment, comunitate, raport, qr, plată, voce, anunț, alert, notification, price, history, prediction, community, report, payment, voice, announcement",
+  "settingsTopicUnitsTitle": "Unități și afișare",
+  "settingsTopicUnitsSubtitle": "Temă, unitate de distanță, widget pe ecranul de pornire",
+  "settingsTopicUnitsKeywords": "temă, întunecat, luminos, eco, unitate, km, mile, widget, culoare, afișare, aspect, theme, dark, light, unit, miles, colour, display, appearance",
+  "settingsTopicFeaturesTitle": "Funcții și mod de utilizare",
+  "settingsTopicFeaturesSubtitle": "Presetări ale modului de utilizare și fiecare comutator de funcție",
+  "settingsTopicFeaturesKeywords": "funcție, mod, de bază, mediu, complet, personalizat, comutator, tipuri de stații, benzinării, stații de încărcare, încărcare, feature, mode, basic, medium, full, custom, switch, toggle, charging",
+  "settingsTopicDataSourcesTitle": "Surse de date și locație",
+  "settingsTopicDataSourcesSubtitle": "Chei API, poziție GPS, schimbare automată a profilului",
+  "settingsTopicDataSourcesKeywords": "api, cheie, gps, locație, poziție, sursă de date, tankerkoenig, opencharge, key, location, data source",
+  "settingsTopicSyncTitle": "Sincronizare și cont",
+  "settingsTopicSyncKeywords": "tanksync, cloud, cont, e-mail, conectare dispozitiv, sincronizare, partajare bază de date, anonim, account, email, link device, sync, share database, anonymous",
+  "settingsTopicPrivacySubtitle": "Consimțăminte, panou de confidențialitate, stocare și cache",
+  "settingsTopicPrivacyKeywords": "confidențialitate, consimțământ, gdpr, ștergere, stocare, cache, date, raportare erori, vin, privacy, consent, delete, erase, storage, data, error reporting",
+  "settingsTopicBackupTitle": "Backup și restaurare",
+  "settingsTopicBackupSubtitle": "Exportă sau restaurează un backup complet al datelor tale",
+  "settingsTopicBackupKeywords": "backup, export, restaurare, import, zip, xml, transfer, restore",
+  "settingsTopicAdvancedSubtitle": "Token GitHub, instrumente pentru dezvoltatori",
+  "settingsTopicAdvancedKeywords": "dezvoltator, depanare, token, pat, github, diagnosticare, jurnal de erori, urmărire, developer, debug, diagnostics, error log, trace",
+  "settingsTopicAboutSubtitle": "Versiune, licențe, linkuri",
+  "settingsTopicAboutKeywords": "despre, versiune, licență, donează, github, atribuire, about, version, license, donate, attribution",
+  "settingsConsumptionOffHint": "Activează urmărirea consumului în Funcții și mod de utilizare pentru a configura vehiculele, coachingul și recompensele.",
+  "settingsOpenFeaturesLink": "Deschide Funcții și mod de utilizare",
+  "settingsRadarTileSubtitle": "Rază, mod de preț, interogare și fixarea ecranului pentru profilul activ",
+  "settingsRadarNoProfileHint": "Creează mai întâi un profil — setările radarului sunt salvate per profil.",
+  "settingsRadarPinHeader": "Fixarea ecranului",
+  "settingsAlertsTileSubtitle": "Alerte pentru stații și rază care te anunță la scăderi de preț",
+  "settingsPriceFeaturesHeader": "Funcții de preț",
+  "settingsVoiceAnnouncementsOffHint": "Anunțurile vocale sunt dezactivate. Activează Feedback vocal și Anunțuri vocale în Funcții și mod de utilizare pentru a auzi combustibilul ieftin din apropiere în timp ce conduci.",
+  "settingsDistanceUnitTitle": "Unitate de distanță",
+  "settingsDistanceUnitSubtitle": "Din țara profilului activ",
+  "settingsObd2AdapterTitle": "Adaptor OBD2",
+  "settingsObd2AdapterSubtitle": "Adaptoarele se asociază per vehicul — deschide un vehicul pentru a asocia sau schimba adaptorul",
+  "settingsStorageDeleteHint": "Ștergerea tuturor datelor locale se face din panoul de confidențialitate.",
+  "settingsPrivacyCrossLinkTitle": "Consimțăminte",
+  "settingsPrivacyCrossLinkSubtitle": "Consimțămintele pentru Cloud Sync și sincronizarea călătoriilor se află la Confidențialitate și date",
+  "settingsBackupExportSubtitle": "Vehicule, alimentări, călătorii și jurnale de încărcare ca fișier ZIP",
+  "settingsBackupRestoreSubtitle": "Combină sau înlocuiește datele dintr-un backup ZIP anterior",
+  "settingsStationTypesLink": "Tipurile de stații se setează în Funcții și mod de utilizare",
+  "routeSearchCriterionLabel": "Alegerea stației per segment de rută",
+  "routeSearchCriterionCheapest": "Cea mai ieftină",
+  "routeSearchCriterionNearest": "Cea mai apropiată de rută",
+  "routeSearchTopNLabel": "Candidate per punct de eșantionare",
+  "routeSearchTopNCaption": "Până la {count} stații sunt luate în considerare în fiecare punct de-a lungul rutei.",
+  "@routeSearchTopNCaption": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hybridFuelChoiceLabel": "Combustibil pentru căutarea prețurilor (hibrid)",
+  "hybridFuelChoiceVehicleDefault": "Implicit al vehiculului",
+  "scopeThisProfile": "Acest profil",
+  "scopeAllProfiles": "Toate profilurile",
+  "scopeThisVehicle": "Acest vehicul",
+  "featureLabel_manualConsumption": "Înregistrare manuală a consumului",
+  "featureDescription_manualConsumption": "Înregistrează manual alimentările și sesiunile de încărcare (nu este nevoie de adaptor OBD2).",
+  "featureLabel_loyaltyCards": "Carduri de fidelitate",
+  "featureDescription_loyaltyCards": "Carduri de club de combustibil / fidelitate cu reduceri pe litru în comparațiile de prețuri.",
+  "featureLabel_startupTrace": "Urmărirea inițializării la pornire",
+  "featureDescription_startupTrace": "Înregistrează fazele cronometrate ale pornirii aplicației, le afișează în cascadă și le exportă — un diagnostic pentru dezvoltatori.",
+  "locationGpsAutoHint": "Poziția GPS este obținută automat la căutare. O poți actualiza și manual aici.",
+  "locationClearGpsBody": "Ștergi poziția GPS salvată? O poți actualiza din nou oricând.",
+  "widgetDefaultsThisProfileHint": "Alegerile de mai jos se aplică fiecărui widget instalat care afișează acest profil, la următoarea reîmprospătare."
 }

@@ -79,8 +79,11 @@ class _WidgetDefaultsEditor extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 4),
+        // #3884 — the colour + variant persist on the ACTIVE profile, so
+        // the hint says "this profile" (the former "applies to all
+        // widgets" wording hid the profile scope).
         Text(
-          l.widgetDefaultsApplyToAllHint,
+          l.widgetDefaultsThisProfileHint,
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
             fontStyle: FontStyle.italic,

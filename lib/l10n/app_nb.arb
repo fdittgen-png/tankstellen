@@ -86,8 +86,6 @@
   "clearCacheTitle": "Tøm hurtigbuffer?",
   "clearCacheBody": "Hurtigbufrede søkeresultater og priser slettes. Profiler, favoritter og innstillinger beholdes.",
   "clearCacheButton": "Tøm hurtigbuffer",
-  "deleteAllTitle": "Slette alle data?",
-  "deleteAllBody": "Dette sletter permanent alle profiler, favoritter, API-nøkkel, innstillinger og hurtigbuffer. Appen tilbakestilles.",
   "deleteAllButton": "Slett alt",
   "entries": "oppføringer",
   "cacheEmpty": "Hurtigbufferen er tom",
@@ -258,10 +256,6 @@
   "showCheapestEveryNKm": "Vis billigste stasjon for hver {km} km langs ruten",
   "avoidHighways": "Unngå motorveier",
   "avoidHighwaysDesc": "Ruteberegning unngår bompenger og motorveier",
-  "showFuelStations": "Vis bensinstasjoner",
-  "showFuelStationsDesc": "Inkluder bensin-, diesel-, LPG-, CNG-stasjoner",
-  "showEvStations": "Vis ladestasjoner",
-  "showEvStationsDesc": "Inkluder elektriske ladestasjoner i søkeresultater",
   "noStationsAlongThisRoute": "Ingen stasjoner funnet langs denne ruten.",
   "fuelCostCalculator": "Drivstoffkostnadsberegner",
   "distanceKm": "Avstand (km)",
@@ -567,7 +561,6 @@
   "tripResume": "Fortsett",
   "tripBannerRecording": "Tar opp tur",
   "tripBannerPaused": "Tur på pause – trykk for å fortsette",
-  "navConsumption": "Forbruk",
   "vehicleBaselineSectionTitle": "Grunnleggende kalibrering",
   "vehicleBaselineEmpty": "Ingen prøver ennå – start en OBD2-tur for å begynne å lære dette kjøretøyets drivstoffprofil.",
   "vehicleBaselineProgress": "Lært fra prøver på tvers av kjøresituasjoner.",
@@ -1428,7 +1421,6 @@
   "widgetHelpAdd": "Legg den til fra launcherens widget-velger – trykk og hold et tomt område på startskjermen, velg Widgets, og finn SparKilo.",
   "widgetHelpTap": "Trykk på en stasjon i widgeten for å åpne den i appen. Trykk på oppdateringsikonet for å oppdatere priser.",
   "widgetHelpConfigure": "På Android, trykk og hold widgeten og velg Konfigurer for å endre profil, farge og innhold.",
-  "widgetDefaultsApplyToAllHint": "Valgene under gjelder for alle installerte widgeter ved neste oppdatering.",
   "widgetDefaultsColorLabel": "Fargevalg",
   "widgetDefaultsVariantLabel": "Innholdsvariant",
   "widgetColorSchemeSystem": "Følg systemet",
@@ -2447,22 +2439,6 @@
   },
   "tripRecordingDiscardedNoMovement": "Registrering forkastet — ingen bevegelse oppdaget",
   "@tripRecordingDiscardedNoMovement": {
-    "description": "MT — needs native review"
-  },
-  "sectionSetupDataSources": "Oppsett og datakilder",
-  "@sectionSetupDataSources": {
-    "description": "MT — needs native review"
-  },
-  "sectionFeaturesUsage": "Funksjoner og bruk",
-  "@sectionFeaturesUsage": {
-    "description": "MT — needs native review"
-  },
-  "sectionAccountSync": "Konto og synkronisering",
-  "@sectionAccountSync": {
-    "description": "MT — needs native review"
-  },
-  "sectionAppearanceWidgets": "Utseende og widgeter",
-  "@sectionAppearanceWidgets": {
     "description": "MT — needs native review"
   },
   "sectionPrivacyData": "Personvern og data",
@@ -4861,7 +4837,6 @@
       }
     }
   },
-  "consumptionDisplaySectionTitle": "Visning av forbruk",
   "tripRecordingPipEstConsumptionCaptionUnit": "ansl. {unit}",
   "@tripRecordingPipEstConsumptionCaptionUnit": {
     "placeholders": {
@@ -4869,5 +4844,90 @@
         "type": "String"
       }
     }
-  }
+  },
+  "settingsSearchHint": "Søk i innstillinger",
+  "settingsSearchNoResults": "Ingen innstillinger samsvarer med \"{query}\"",
+  "@settingsSearchNoResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTopicProfilesTitle": "Profiler og region",
+  "settingsTopicProfilesSubtitle": "Land, språk, drivstoff, søkeradius, ruteplanlegging",
+  "settingsTopicProfilesKeywords": "profil, land, språk, drivstoff, radius, postnummer, rute, hjem, vurdering, startskjerm, profile, country, language, fuel, route, home, rating",
+  "settingsTopicVehiclesTitle": "Kjøretøy og OBD2",
+  "settingsTopicVehiclesSubtitle": "Bilene dine, tankstørrelse, paring av OBD2-adapter",
+  "settingsTopicVehiclesKeywords": "kjøretøy, bil, obd, obd2, adapter, bluetooth, tank, motor, vin, kalibrering, vehicle, car, engine, calibration",
+  "settingsTopicDrivingTitle": "Kjøring og forbruk",
+  "settingsTopicDrivingSubtitle": "Coaching, belønninger, bensinstasjonsradar, feilsøking",
+  "settingsTopicDrivingKeywords": "coach, eco, haptisk, stemme, gamification, radar, gli, tur, forbruk, drivstoffklubb, lojalitet, obd2-logg, fest, haptic, voice, glide, trip, consumption, loyalty, pin",
+  "settingsTopicPricesTitle": "Priser og varsler",
+  "settingsTopicPricesSubtitle": "Prisvarsler, talemeldinger, prishistorikk, fellesskapsrapporter",
+  "settingsTopicPricesKeywords": "varsel, notifikasjon, pris, historikk, prognose, beste tidspunkt, fellesskap, rapport, qr, betaling, stemme, melding, alert, price, history, prediction, community, report, payment, voice, announcement",
+  "settingsTopicUnitsTitle": "Enheter og visning",
+  "settingsTopicUnitsSubtitle": "Tema, avstandsenhet, widget på startskjermen",
+  "settingsTopicUnitsKeywords": "tema, mørk, lys, eco, enhet, km, miles, widget, farge, visning, utseende, theme, dark, light, unit, colour, display",
+  "settingsTopicFeaturesTitle": "Funksjoner og bruksmodus",
+  "settingsTopicFeaturesSubtitle": "Forhåndsinnstillinger for bruksmodus og alle funksjonsbrytere",
+  "settingsTopicFeaturesKeywords": "funksjon, modus, basis, medium, full, tilpasset, bryter, stasjonstyper, bensinstasjoner, ladestasjoner, lading, feature, mode, basic, custom, switch, toggle, charging",
+  "settingsTopicDataSourcesTitle": "Datakilder og posisjon",
+  "settingsTopicDataSourcesSubtitle": "API-nøkler, GPS-posisjon, automatisk profilbytte",
+  "settingsTopicDataSourcesKeywords": "api, nøkkel, gps, posisjon, plassering, datakilde, tankerkoenig, opencharge, key, location, data source",
+  "settingsTopicSyncTitle": "Synkronisering og konto",
+  "settingsTopicSyncKeywords": "tanksync, sky, konto, e-post, koble enhet, synkronisering, del database, anonym, cloud, account, email, link device, sync, share database, anonymous",
+  "settingsTopicPrivacySubtitle": "Samtykker, personvernoversikt, lagring og hurtigbuffer",
+  "settingsTopicPrivacyKeywords": "personvern, samtykke, gdpr, slett, tøm, lagring, hurtigbuffer, data, feilrapportering, vin, privacy, consent, delete, erase, storage, cache, error reporting",
+  "settingsTopicBackupTitle": "Sikkerhetskopi og gjenoppretting",
+  "settingsTopicBackupSubtitle": "Eksporter eller gjenopprett en full sikkerhetskopi av dataene dine",
+  "settingsTopicBackupKeywords": "sikkerhetskopi, eksport, gjenopprett, import, zip, xml, overføring, backup, export, restore, transfer",
+  "settingsTopicAdvancedSubtitle": "GitHub-token, utviklerverktøy",
+  "settingsTopicAdvancedKeywords": "utvikler, feilsøking, token, pat, github, diagnostikk, feillogg, sporing, developer, debug, diagnostics, error log, trace",
+  "settingsTopicAboutSubtitle": "Versjon, lisenser, lenker",
+  "settingsTopicAboutKeywords": "om, versjon, lisens, doner, github, kreditering, about, license, donate, attribution",
+  "settingsConsumptionOffHint": "Slå på forbruksregistrering under Funksjoner og bruksmodus for å konfigurere kjøretøy, coaching og belønninger.",
+  "settingsOpenFeaturesLink": "Åpne Funksjoner og bruksmodus",
+  "settingsRadarTileSubtitle": "Radius, prismodus, spørring og skjermfesting for den aktive profilen",
+  "settingsRadarNoProfileHint": "Opprett en profil først — radarinnstillingene lagres per profil.",
+  "settingsRadarPinHeader": "Skjermfesting",
+  "settingsAlertsTileSubtitle": "Stasjons- og radiusvarsler som varsler deg om prisfall",
+  "settingsPriceFeaturesHeader": "Prisfunksjoner",
+  "settingsVoiceAnnouncementsOffHint": "Talemeldinger er av. Slå på Taletilbakemelding og Talemeldinger under Funksjoner og bruksmodus for å høre billig drivstoff i nærheten mens du kjører.",
+  "settingsDistanceUnitTitle": "Avstandsenhet",
+  "settingsDistanceUnitSubtitle": "Fra landet til den aktive profilen",
+  "settingsObd2AdapterTitle": "OBD2-adapter",
+  "settingsObd2AdapterSubtitle": "Adaptere pares per kjøretøy — åpne et kjøretøy for å pare eller bytte adapteren",
+  "settingsStorageDeleteHint": "Sletting av alle lokale data gjøres fra personvernoversikten.",
+  "settingsPrivacyCrossLinkTitle": "Samtykker",
+  "settingsPrivacyCrossLinkSubtitle": "Samtykker for Cloud Sync og tursynkronisering finnes under Personvern og data",
+  "settingsBackupExportSubtitle": "Kjøretøy, fyllinger, turer og ladelogger som ZIP-fil",
+  "settingsBackupRestoreSubtitle": "Slå sammen eller erstatt dataene dine fra en tidligere sikkerhetskopi-ZIP",
+  "settingsStationTypesLink": "Stasjonstyper velges under Funksjoner og bruksmodus",
+  "routeSearchCriterionLabel": "Stasjonsvalg per rutesegment",
+  "routeSearchCriterionCheapest": "Billigst",
+  "routeSearchCriterionNearest": "Nærmest ruten",
+  "routeSearchTopNLabel": "Kandidater per målepunkt",
+  "routeSearchTopNCaption": "Opptil {count} stasjoner vurderes ved hvert punkt langs ruten.",
+  "@routeSearchTopNCaption": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hybridFuelChoiceLabel": "Drivstoff for prissøk (hybrid)",
+  "hybridFuelChoiceVehicleDefault": "Kjøretøyets standard",
+  "scopeThisProfile": "Denne profilen",
+  "scopeAllProfiles": "Alle profiler",
+  "scopeThisVehicle": "Dette kjøretøyet",
+  "featureLabel_manualConsumption": "Manuell forbruksregistrering",
+  "featureDescription_manualConsumption": "Registrer fyllinger og ladeøkter for hånd (ingen OBD2-adapter nødvendig).",
+  "featureLabel_loyaltyCards": "Lojalitetskort",
+  "featureDescription_loyaltyCards": "Drivstoffklubb-/lojalitetskort med rabatt per liter i prissammenligninger.",
+  "featureLabel_startupTrace": "Oppstartsinitialiseringsspor",
+  "featureDescription_startupTrace": "Registrerer de tidsmålte fasene i appens oppstart, viser dem som en foss og eksporterer dem — en utviklerdiagnostikk.",
+  "locationGpsAutoHint": "GPS-posisjonen hentes automatisk når du søker. Du kan også oppdatere den manuelt her.",
+  "locationClearGpsBody": "Tøm den lagrede GPS-posisjonen? Du kan oppdatere den igjen når som helst.",
+  "widgetDefaultsThisProfileHint": "Valgene nedenfor gjelder for alle installerte widgeter som viser denne profilen, ved neste oppdatering."
 }

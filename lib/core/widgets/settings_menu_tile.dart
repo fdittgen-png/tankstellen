@@ -23,17 +23,23 @@ class SettingsMenuTile extends StatelessWidget {
   final String subtitle;
   final VoidCallback onTap;
 
+  /// Optional badge rendered before the chevron — a `ScopeBadge`
+  /// naming the setting's scope on tiles that are not global (#3884).
+  final Widget? badge;
+
   const SettingsMenuTile({
     super.key,
     required this.icon,
     required this.title,
     required this.subtitle,
     required this.onTap,
+    this.badge,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final badgeWidget = badge;
     return Card(
       margin: EdgeInsets.zero,
       child: ListTile(
@@ -48,7 +54,16 @@ class SettingsMenuTile extends StatelessWidget {
           subtitle,
           style: theme.textTheme.bodySmall,
         ),
-        trailing: const Icon(Icons.chevron_right),
+        trailing: badgeWidget == null
+            ? const Icon(Icons.chevron_right)
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  badgeWidget,
+                  const SizedBox(width: 4),
+                  const Icon(Icons.chevron_right),
+                ],
+              ),
         onTap: onTap,
       ),
     );

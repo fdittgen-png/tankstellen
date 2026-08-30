@@ -675,18 +675,6 @@ abstract class AppLocalizations {
   /// **'Clear cache'**
   String get clearCacheButton;
 
-  /// No description provided for @deleteAllTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete all data?'**
-  String get deleteAllTitle;
-
-  /// No description provided for @deleteAllBody.
-  ///
-  /// In en, this message translates to:
-  /// **'This permanently deletes all profiles, favorites, API key, settings, and cache. The app will reset.'**
-  String get deleteAllBody;
-
   /// No description provided for @deleteAllButton.
   ///
   /// In en, this message translates to:
@@ -1682,30 +1670,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Route calculation avoids toll roads and highways'**
   String get avoidHighwaysDesc;
-
-  /// No description provided for @showFuelStations.
-  ///
-  /// In en, this message translates to:
-  /// **'Show fuel stations'**
-  String get showFuelStations;
-
-  /// No description provided for @showFuelStationsDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Include gas, diesel, LPG, CNG stations'**
-  String get showFuelStationsDesc;
-
-  /// No description provided for @showEvStations.
-  ///
-  /// In en, this message translates to:
-  /// **'Show EV charging stations'**
-  String get showEvStations;
-
-  /// No description provided for @showEvStationsDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Include electric charging stations in search results'**
-  String get showEvStationsDesc;
 
   /// No description provided for @noStationsAlongThisRoute.
   ///
@@ -3483,12 +3447,6 @@ abstract class AppLocalizations {
   /// **'Trip paused — tap to resume'**
   String get tripBannerPaused;
 
-  /// No description provided for @navConsumption.
-  ///
-  /// In en, this message translates to:
-  /// **'Consumption'**
-  String get navConsumption;
-
   /// No description provided for @vehicleBaselineSectionTitle.
   ///
   /// In en, this message translates to:
@@ -4197,37 +4155,13 @@ abstract class AppLocalizations {
   /// **'Location'**
   String get sectionLocation;
 
-  /// Settings group header (#2521) over the API Key + Location entries — the first-run configuration the app needs to find prices.
-  ///
-  /// In en, this message translates to:
-  /// **'Setup & data sources'**
-  String get sectionSetupDataSources;
-
-  /// Settings group header (#2521) over Feature management + Consumption — the toggles that decide which surfaces appear and how they're used.
-  ///
-  /// In en, this message translates to:
-  /// **'Features & usage'**
-  String get sectionFeaturesUsage;
-
-  /// Settings group header (#2521) over the TankSync cloud-sync entry.
-  ///
-  /// In en, this message translates to:
-  /// **'Account & sync'**
-  String get sectionAccountSync;
-
-  /// Settings group header (#2521) over the Theme chooser + Home-screen widget help entries.
-  ///
-  /// In en, this message translates to:
-  /// **'Appearance & widgets'**
-  String get sectionAppearanceWidgets;
-
-  /// Settings group header (#2521) over Privacy consent + Privacy Dashboard + Storage & cache — one data-control concern.
+  /// Settings topic title (#2521 group header, #3884 root tile) over Privacy consent + Privacy Dashboard + Storage & cache — one data-control concern.
   ///
   /// In en, this message translates to:
   /// **'Privacy & data'**
   String get sectionPrivacyData;
 
-  /// Settings group header (#2521) over the bad-scan PAT entry + Developer tools — power-user controls hidden by default.
+  /// Settings topic title (#2521 group header, #3884 root tile) over the bad-scan PAT entry + Developer tools — power-user controls hidden by default.
   ///
   /// In en, this message translates to:
   /// **'Advanced & developer'**
@@ -10291,12 +10225,6 @@ abstract class AppLocalizations {
   /// **'{seconds} s'**
   String consumptionWindowOption(int seconds);
 
-  /// #3883 — Settings section header grouping the consumption-unit and live-window settings.
-  ///
-  /// In en, this message translates to:
-  /// **'Consumption display'**
-  String get consumptionDisplaySectionTitle;
-
   /// #3883 — unit caption under the big GPS-estimated consumption figure on the PiP tile / Live Activity, in the user's display unit ('est. mpg (UK)'). Generalises tripRecordingPipEstConsumptionCaption.
   ///
   /// In en, this message translates to:
@@ -12208,6 +12136,426 @@ abstract class AppLocalizations {
   /// **'/session'**
   String get refuelUnitPerSession;
 
+  /// Hint text of the search field at the top of the Settings root (#3884). Typing filters the topic tiles by title, subtitle and keywords.
+  ///
+  /// In en, this message translates to:
+  /// **'Search settings'**
+  String get settingsSearchHint;
+
+  /// Empty state under the Settings search field when no topic tile matches the typed query (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'No settings match \"{query}\"'**
+  String settingsSearchNoResults(String query);
+
+  /// Settings root tile title (#3884): the user profiles list — country, language, fuel type, search radius, route planning.
+  ///
+  /// In en, this message translates to:
+  /// **'Profiles & region'**
+  String get settingsTopicProfilesTitle;
+
+  /// One-line subtitle of the Profiles & region tile naming what is inside (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Country, language, fuel type, search radius, route planning'**
+  String get settingsTopicProfilesSubtitle;
+
+  /// Comma-separated search keywords for the Profiles & region tile (#3884). Not shown; matched against the Settings search field.
+  ///
+  /// In en, this message translates to:
+  /// **'profile, country, language, fuel, radius, postal code, route, home, rating, start screen'**
+  String get settingsTopicProfilesKeywords;
+
+  /// Settings root tile title (#3884): the vehicle list and OBD2 adapter pairing.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicles & OBD2'**
+  String get settingsTopicVehiclesTitle;
+
+  /// One-line subtitle of the Vehicles & OBD2 tile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Your cars, tank size, OBD2 adapter pairing'**
+  String get settingsTopicVehiclesSubtitle;
+
+  /// Comma-separated search keywords for the Vehicles & OBD2 tile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'vehicle, car, obd, obd2, adapter, bluetooth, tank, engine, vin, calibration'**
+  String get settingsTopicVehiclesKeywords;
+
+  /// Settings root tile title (#3884): coaching while driving, rewards, the fuel-station radar and trip troubleshooting.
+  ///
+  /// In en, this message translates to:
+  /// **'Driving & consumption'**
+  String get settingsTopicDrivingTitle;
+
+  /// One-line subtitle of the Driving & consumption tile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Coaching, rewards, fuel-station radar, troubleshooting'**
+  String get settingsTopicDrivingSubtitle;
+
+  /// Comma-separated search keywords for the Driving & consumption tile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'coach, eco, haptic, voice, gamification, radar, glide, trip, consumption, fuel club, loyalty, obd2 log, pin'**
+  String get settingsTopicDrivingKeywords;
+
+  /// Settings root tile title (#3884): price alerts, voice announcements and the price-related feature switches.
+  ///
+  /// In en, this message translates to:
+  /// **'Prices & alerts'**
+  String get settingsTopicPricesTitle;
+
+  /// One-line subtitle of the Prices & alerts tile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Price alerts, voice announcements, price history, community reports'**
+  String get settingsTopicPricesSubtitle;
+
+  /// Comma-separated search keywords for the Prices & alerts tile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'alert, notification, price, history, prediction, best time, community, report, qr, payment, voice, announcement'**
+  String get settingsTopicPricesKeywords;
+
+  /// Settings root tile title (#3884): theme, distance unit and the home-screen widget.
+  ///
+  /// In en, this message translates to:
+  /// **'Units & display'**
+  String get settingsTopicUnitsTitle;
+
+  /// One-line subtitle of the Units & display tile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Theme, distance unit, home-screen widget'**
+  String get settingsTopicUnitsSubtitle;
+
+  /// Comma-separated search keywords for the Units & display tile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'theme, dark, light, eco, unit, km, miles, widget, colour, color, display, appearance'**
+  String get settingsTopicUnitsKeywords;
+
+  /// Settings root tile title (#3884): the use-mode presets and every feature switch.
+  ///
+  /// In en, this message translates to:
+  /// **'Features & use mode'**
+  String get settingsTopicFeaturesTitle;
+
+  /// One-line subtitle of the Features & use mode tile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Use-mode presets and every feature switch'**
+  String get settingsTopicFeaturesSubtitle;
+
+  /// Comma-separated search keywords for the Features & use mode tile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'feature, mode, basic, medium, full, custom, switch, toggle, station types, fuel stations, ev stations, charging'**
+  String get settingsTopicFeaturesKeywords;
+
+  /// Settings root tile title (#3884): API keys and the GPS position.
+  ///
+  /// In en, this message translates to:
+  /// **'Data sources & location'**
+  String get settingsTopicDataSourcesTitle;
+
+  /// One-line subtitle of the Data sources & location tile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'API keys, GPS position, automatic profile switching'**
+  String get settingsTopicDataSourcesSubtitle;
+
+  /// Comma-separated search keywords for the Data sources & location tile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'api, key, gps, location, position, data source, tankerkoenig, opencharge'**
+  String get settingsTopicDataSourcesKeywords;
+
+  /// Settings root tile title (#3884): TankSync cloud sync and the account. Only shown when the TankSync feature is on.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync & account'**
+  String get settingsTopicSyncTitle;
+
+  /// Comma-separated search keywords for the Sync & account tile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'tanksync, cloud, account, email, link device, sync, share database, anonymous'**
+  String get settingsTopicSyncKeywords;
+
+  /// One-line subtitle of the Privacy & data tile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Consents, privacy dashboard, storage & cache'**
+  String get settingsTopicPrivacySubtitle;
+
+  /// Comma-separated search keywords for the Privacy & data tile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'privacy, consent, gdpr, delete, erase, storage, cache, data, error reporting, vin'**
+  String get settingsTopicPrivacyKeywords;
+
+  /// Settings root tile title (#3884): export and restore a full backup.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup & restore'**
+  String get settingsTopicBackupTitle;
+
+  /// One-line subtitle of the Backup & restore tile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Export or restore a full backup of your data'**
+  String get settingsTopicBackupSubtitle;
+
+  /// Comma-separated search keywords for the Backup & restore tile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'backup, export, restore, import, zip, xml, transfer'**
+  String get settingsTopicBackupKeywords;
+
+  /// One-line subtitle of the Advanced & developer tile (#3884). Only shown when the PAT or debug feature is on.
+  ///
+  /// In en, this message translates to:
+  /// **'GitHub token, developer tools'**
+  String get settingsTopicAdvancedSubtitle;
+
+  /// Comma-separated search keywords for the Advanced & developer tile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'developer, debug, token, pat, github, diagnostics, error log, trace'**
+  String get settingsTopicAdvancedKeywords;
+
+  /// One-line subtitle of the About tile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Version, licences, links'**
+  String get settingsTopicAboutSubtitle;
+
+  /// Comma-separated search keywords for the About tile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'about, version, licence, license, donate, github, attribution'**
+  String get settingsTopicAboutKeywords;
+
+  /// Hint on the Driving & consumption screen when the consumption surface is not reachable (no data source / tab flag on) (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on consumption tracking in Features & use mode to configure vehicles, coaching and rewards.'**
+  String get settingsConsumptionOffHint;
+
+  /// Link/button label that opens the Features & use mode screen from a hint (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Open Features & use mode'**
+  String get settingsOpenFeaturesLink;
+
+  /// Subtitle of the Fuel Station Radar tile on the Driving & consumption screen (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Radius, price mode, polling and screen pinning for the active profile'**
+  String get settingsRadarTileSubtitle;
+
+  /// Empty state of the radar settings screen when there is no active profile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Create a profile first — the radar settings are stored per profile.'**
+  String get settingsRadarNoProfileHint;
+
+  /// Section header above the radar auto-pin switch on the radar settings screen (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Screen pinning'**
+  String get settingsRadarPinHeader;
+
+  /// Subtitle of the Price alerts tile on the Prices & alerts screen (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Station and radius alerts that notify you of price drops'**
+  String get settingsAlertsTileSubtitle;
+
+  /// Section header above the price-related feature switches on the Prices & alerts screen (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Price features'**
+  String get settingsPriceFeaturesHeader;
+
+  /// Hint on the Prices & alerts screen when the voice-announcements feature is not effectively enabled (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Voice announcements are off. Turn on Voice feedback and Voice announcements in Features & use mode to hear nearby cheap fuel while driving.'**
+  String get settingsVoiceAnnouncementsOffHint;
+
+  /// Read-only row on the Units & display screen showing the distance unit (km / mi) (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Distance unit'**
+  String get settingsDistanceUnitTitle;
+
+  /// Subtitle of the read-only distance-unit row explaining where the unit comes from (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'From the active profile\'s country'**
+  String get settingsDistanceUnitSubtitle;
+
+  /// Tile title on the Vehicles & OBD2 screen leading to the per-vehicle adapter pairing (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 adapter'**
+  String get settingsObd2AdapterTitle;
+
+  /// Subtitle of the OBD2 adapter tile on the Vehicles & OBD2 screen (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Adapters are paired per vehicle — open a vehicle to pair or change its adapter'**
+  String get settingsObd2AdapterSubtitle;
+
+  /// One-line hint at the bottom of Storage & cache replacing the former duplicate Delete-all button (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting all local data is done from the Privacy Dashboard.'**
+  String get settingsStorageDeleteHint;
+
+  /// Cross-link tile inside the TankSync section that opens Privacy & data (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Consents'**
+  String get settingsPrivacyCrossLinkTitle;
+
+  /// Subtitle of the TankSync → Privacy & data cross-link tile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud Sync and trip-sync consents live under Privacy & data'**
+  String get settingsPrivacyCrossLinkSubtitle;
+
+  /// Subtitle of the Export backup action on the Backup & restore screen (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicles, fill-ups, trips and charging logs as a ZIP file'**
+  String get settingsBackupExportSubtitle;
+
+  /// Subtitle of the Restore backup action on the Backup & restore screen (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Merge or replace your data from a previous backup ZIP'**
+  String get settingsBackupRestoreSubtitle;
+
+  /// Tile in the profile edit sheet replacing the former show-fuel / show-EV switches; tapping opens Features & use mode (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Station types are set in Features & use mode'**
+  String get settingsStationTypesLink;
+
+  /// Label of the segmented control in the Route planning card choosing which stations are kept at each sample point (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Station choice per route segment'**
+  String get routeSearchCriterionLabel;
+
+  /// Segment label: keep the cheapest stations around each route sample point (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Cheapest'**
+  String get routeSearchCriterionCheapest;
+
+  /// Segment label: keep the stations nearest to the route at each sample point (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Nearest to route'**
+  String get routeSearchCriterionNearest;
+
+  /// Label of the slider (3–20) bounding how many stations are considered at each point along the route (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Candidates per sample point'**
+  String get routeSearchTopNLabel;
+
+  /// Caption under the candidates-per-sample-point slider (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Up to {count} stations are considered at each point along the route.'**
+  String routeSearchTopNCaption(int count);
+
+  /// Dropdown label in the profile edit sheet's Vehicle card, shown only when the default vehicle is a hybrid: which of its fuels drives price search (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel for price search (hybrid)'**
+  String get hybridFuelChoiceLabel;
+
+  /// Dropdown option meaning 'no explicit hybrid fuel choice — use the vehicle's combustion fuel' (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle default'**
+  String get hybridFuelChoiceVehicleDefault;
+
+  /// Scope badge on a setting that is stored per user profile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'This profile'**
+  String get scopeThisProfile;
+
+  /// Scope badge on a setting that applies app-wide, regardless of the active profile (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'All profiles'**
+  String get scopeAllProfiles;
+
+  /// Scope badge on a setting that is stored per vehicle (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'This vehicle'**
+  String get scopeThisVehicle;
+
+  /// Display name for the manual fill-up / charging-log feature gate (#1517, localised in #3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Manual consumption logging'**
+  String get featureLabel_manualConsumption;
+
+  /// One-line description for the manual consumption logging feature gate (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Track fuel fill-ups and EV charging sessions by hand (no OBD2 adapter required).'**
+  String get featureDescription_manualConsumption;
+
+  /// Display name for the fuel-club / loyalty cards feature gate (#1517, localised in #3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Loyalty cards'**
+  String get featureLabel_loyaltyCards;
+
+  /// One-line description for the loyalty cards feature gate (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel-club / loyalty program cards with per-litre discounts in price comparisons.'**
+  String get featureDescription_loyaltyCards;
+
+  /// Display name for the developer startup-trace feature gate (#3383, localised in #3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Startup initialization trace'**
+  String get featureLabel_startupTrace;
+
+  /// One-line description for the startup-trace feature gate (#3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Record the timed phases of app startup, view them as a waterfall and export them — a developer diagnostic.'**
+  String get featureDescription_startupTrace;
+
+  /// Hint under the 'Tap to update GPS position' row in the Location section (was hard-coded English; #3884).
+  ///
+  /// In en, this message translates to:
+  /// **'GPS position is acquired automatically when you search. You can also update it manually here.'**
+  String get locationGpsAutoHint;
+
+  /// Body of the confirmation dialog when deleting the stored GPS position (was hard-coded English; #3884).
+  ///
+  /// In en, this message translates to:
+  /// **'Clear the stored GPS position? You can update it again at any time.'**
+  String get locationClearGpsBody;
+
   /// Snackbar shown when the user shares an unsupported file (e.g. a PDF) into the app. Image receipts work today; PDF rasterisation arrives in #2737 (#2735).
   ///
   /// In en, this message translates to:
@@ -13894,11 +14242,11 @@ abstract class AppLocalizations {
   /// **'On Android, long-press the widget and choose Reconfigure to change the profile, colour, and content.'**
   String get widgetHelpConfigure;
 
-  /// #2106 — italicised hint above the in-Settings widget-defaults editor explaining the live-override semantics.
+  /// #2106 / #3884 — italicised hint above the in-Settings widget-defaults editor. The colour + variant persist on the ACTIVE UserProfile, so the hint names the profile scope instead of the former 'applies to all widgets' wording.
   ///
   /// In en, this message translates to:
-  /// **'Choices below apply to every installed widget on the next refresh.'**
-  String get widgetDefaultsApplyToAllHint;
+  /// **'Choices below apply to every installed widget showing this profile, on the next refresh.'**
+  String get widgetDefaultsThisProfileHint;
 
   /// #2106 — label above the widget colour-scheme dropdown in Settings.
   ///
