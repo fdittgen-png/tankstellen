@@ -882,7 +882,6 @@
   "obd2PauseBannerTitle": "Połączenie OBD2 utracone — nagrywanie wstrzymane",
   "obd2PauseBannerResume": "Wznów nagrywanie",
   "obd2PauseBannerEnd": "Zakończ nagrywanie",
-  "veCalibratedTitle": "Aktualizacja kalibracji zużycia dla {vehicleName} — dokładność poprawiona o {percent}%",
   "veResetConfirmTitle": "Resetować sprawność objętościową?",
   "veResetConfirmBody": "Spowoduje to odrzucenie nauczonych wartości sprawności objętościowej (η_v) i przywrócenie wartości domyślnej (0,85). Szacunki przepływu paliwa na poziomie trasy powrócą do stałej producenta, dopóki kalibracja nie zbierze nowych próbek z kolejnych tras.",
   "alertsRadiusSectionTitle": "Alerty radiusowe",
@@ -4929,5 +4928,16 @@
   "featureDescription_startupTrace": "Rejestruje mierzone czasowo fazy uruchamiania aplikacji, pokazuje je jako wykres kaskadowy i eksportuje — diagnostyka dla deweloperów.",
   "locationGpsAutoHint": "Pozycja GPS jest pobierana automatycznie podczas wyszukiwania. Możesz też zaktualizować ją tutaj ręcznie.",
   "locationClearGpsBody": "Wyczyścić zapisaną pozycję GPS? Możesz ją zaktualizować ponownie w dowolnym momencie.",
-  "widgetDefaultsThisProfileHint": "Poniższe wybory dotyczą każdego zainstalowanego widżetu pokazującego ten profil, przy następnym odświeżeniu."
+  "widgetDefaultsThisProfileHint": "Poniższe wybory dotyczą każdego zainstalowanego widżetu pokazującego ten profil, przy następnym odświeżeniu.",
+  "pumpGainCalibratedTitle": "{vehicleName}: szacunki zużycia ponownie dopasowane do dystrybutora ({percent} %)",
+  "@pumpGainCalibratedTitle": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  }
 }

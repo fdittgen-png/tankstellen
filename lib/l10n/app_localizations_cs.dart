@@ -3055,11 +3055,6 @@ class AppLocalizationsCs extends AppLocalizations {
       'Záznam pomocí GPS — čekání na adaptér OBD2';
 
   @override
-  String veCalibratedTitle(String vehicleName, String percent) {
-    return 'Kalibrace spotřeby aktualizována pro $vehicleName — přesnost zlepšena o $percent%';
-  }
-
-  @override
   String get veResetConfirmTitle => 'Resetovat volumetrickou účinnost?';
 
   @override
@@ -6920,6 +6915,11 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get tripRecordingPipElapsedCaption => 'uplynulo';
+
+  @override
+  String pumpGainCalibratedTitle(String vehicleName, String percent) {
+    return '$vehicleName: odhady spotřeby znovu ukotveny ke stojanu ($percent %)';
+  }
 
   @override
   String get qrLaunchConfirmTitle => 'Otevřít naskenovaný odkaz?';

@@ -70,7 +70,7 @@ class _BarList extends StatelessWidget {
 ///   * the bar itself, with width proportional to the bin's avg, plus
 ///     the optional vertical reference line;
 ///   * trailing avg L/100 km figure (or "—" / "Need more data").
-class _SpeedBar extends StatelessWidget {
+class _SpeedBar extends ConsumerWidget {
   final SpeedConsumptionBin bin;
   final double maxAvg;
   final double? overallAvgLPer100Km;
@@ -89,7 +89,9 @@ class _SpeedBar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // #3889 — the app-wide consumption unit.
+    final unit = ref.watch(consumptionDisplaySettingProvider).unit;
     final avg = bin.avgLPer100Km;
     final isIdle = bin.band == SpeedBand.idleJam;
 
@@ -110,7 +112,7 @@ class _SpeedBar extends StatelessWidget {
 
     final trailing = avg == null
         ? (isIdle ? '—' : l.speedConsumptionNeedMoreData)
-        : '${UnitFormatter.formatDecimal(avg)} L/100';
+        : UnitFormatter.formatConsumptionLocalized(avg, unit);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,

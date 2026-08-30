@@ -1484,7 +1484,6 @@
   "obd2PauseBannerResume": "Reprendre l'enregistrement",
   "obd2PauseBannerEnd": "Terminer l'enregistrement",
   "obd2GpsDegradedBannerTitle": "Enregistrement via GPS — reconnexion OBD2",
-  "veCalibratedTitle": "Étalonnage de la consommation mis à jour pour {vehicleName} — précision améliorée de {percent} %",
   "alertsRadiusSectionTitle": "Alertes de zone",
   "alertsRadiusAdd": "Ajouter une alerte de zone",
   "alertsRadiusEmptyTitle": "Aucune alerte de zone pour l'instant",
@@ -4901,5 +4900,16 @@
   "featureDescription_startupTrace": "Enregistre les phases chronométrées du démarrage de l'app, les affiche en cascade et les exporte — un diagnostic développeur.",
   "locationGpsAutoHint": "La position GPS est acquise automatiquement lors d'une recherche. Vous pouvez aussi la mettre à jour manuellement ici.",
   "locationClearGpsBody": "Effacer la position GPS enregistrée ? Vous pourrez la mettre à jour à tout moment.",
-  "widgetDefaultsThisProfileHint": "Les choix ci-dessous s'appliquent à tous les widgets installés affichant ce profil, à la prochaine actualisation."
+  "widgetDefaultsThisProfileHint": "Les choix ci-dessous s'appliquent à tous les widgets installés affichant ce profil, à la prochaine actualisation.",
+  "pumpGainCalibratedTitle": "{vehicleName} : estimations de consommation recalées sur la pompe ({percent} %)",
+  "@pumpGainCalibratedTitle": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  }
 }

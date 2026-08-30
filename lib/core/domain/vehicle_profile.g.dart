@@ -56,6 +56,11 @@ _VehicleProfile _$VehicleProfileFromJson(Map<String, dynamic> json) =>
           (json['volumetricEfficiency'] as num?)?.toDouble() ?? 0.85,
       volumetricEfficiencySamples:
           (json['volumetricEfficiencySamples'] as num?)?.toInt() ?? 0,
+      pumpGain: (json['pumpGain'] as num?)?.toDouble() ?? 1.0,
+      pumpGainSamples: (json['pumpGainSamples'] as num?)?.toInt() ?? 0,
+      pumpGainUpdatedAt: json['pumpGainUpdatedAt'] == null
+          ? null
+          : DateTime.parse(json['pumpGainUpdatedAt'] as String),
       manualEngineDisplacementCcOverride:
           (json['manualEngineDisplacementCcOverride'] as num?)?.toDouble(),
       manualVolumetricEfficiencyOverride:
@@ -145,6 +150,9 @@ Map<String, dynamic> _$VehicleProfileToJson(
   'enginePowerKw': instance.enginePowerKw,
   'volumetricEfficiency': instance.volumetricEfficiency,
   'volumetricEfficiencySamples': instance.volumetricEfficiencySamples,
+  'pumpGain': instance.pumpGain,
+  'pumpGainSamples': instance.pumpGainSamples,
+  'pumpGainUpdatedAt': instance.pumpGainUpdatedAt?.toIso8601String(),
   'manualEngineDisplacementCcOverride':
       instance.manualEngineDisplacementCcOverride,
   'manualVolumetricEfficiencyOverride':

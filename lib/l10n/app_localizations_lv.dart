@@ -3062,11 +3062,6 @@ class AppLocalizationsLv extends AppLocalizations {
       'Ieraksta ar GPS — gaida OBD2 adapteri';
 
   @override
-  String veCalibratedTitle(String vehicleName, String percent) {
-    return 'Patēriņa kalibrēšana atjaunināta $vehicleName — precizitāte uzlabojusies par $percent%';
-  }
-
-  @override
   String get veResetConfirmTitle => 'Atiestatīt tilpuma efektivitāti?';
 
   @override
@@ -6953,6 +6948,11 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get tripRecordingPipElapsedCaption => 'pagājis';
+
+  @override
+  String pumpGainCalibratedTitle(String vehicleName, String percent) {
+    return '$vehicleName: patēriņa aplēses no jauna piesaistītas sūknim ($percent %)';
+  }
 
   @override
   String get qrLaunchConfirmTitle => 'Atvērt skenēto saiti?';

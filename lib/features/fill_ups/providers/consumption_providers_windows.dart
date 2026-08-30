@@ -65,23 +65,6 @@ mixin _FillUpListWindows on _$FillUpList {
     }
   }
 
-  /// Pick the fill-up with the largest `date` that is strictly older
-  /// than [current] for the same vehicle. Ignores fill-ups without a
-  /// vehicle id — reconciliation only applies to vehicle-bound fills.
-  /// Skips correction entries — they're synthesised and shouldn't
-  /// anchor the η_v window.
-  FillUp? _previousFillUpFor(FillUp current, List<FillUp> all) {
-    if (current.vehicleId == null) return null;
-    FillUp? best;
-    for (final f in all) {
-      if (f.id == current.id) continue;
-      if (f.vehicleId != current.vehicleId) continue;
-      if (f.isCorrection) continue;
-      if (!f.date.isBefore(current.date)) continue;
-      if (best == null || f.date.isAfter(best.date)) best = f;
-    }
-    return best;
-  }
 
   /// Sum the [TripSummary.distanceKm] across every trip in the same
   /// plein-to-plein window the [Reconciler] uses. Inlined here so the

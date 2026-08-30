@@ -3064,11 +3064,6 @@ class AppLocalizationsHu extends AppLocalizations {
       'Rögzítés GPS-szel — várakozás az OBD2-adapterre';
 
   @override
-  String veCalibratedTitle(String vehicleName, String percent) {
-    return 'Fogyasztás-kalibráció frissítve a(z) $vehicleName számára — pontosság $percent%-kal javult';
-  }
-
-  @override
   String get veResetConfirmTitle =>
       'Visszaállítja a volumetrikus hatékonyságot?';
 
@@ -6949,6 +6944,11 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get tripRecordingPipElapsedCaption => 'eltelt';
+
+  @override
+  String pumpGainCalibratedTitle(String vehicleName, String percent) {
+    return '$vehicleName: fogyasztási becslések a kúthoz igazítva ($percent %)';
+  }
 
   @override
   String get qrLaunchConfirmTitle => 'Megnyitod a beolvasott linket?';

@@ -3065,11 +3065,6 @@ class AppLocalizationsEl extends AppLocalizations {
       'Καταγραφή με GPS — αναμονή για τον προσαρμογέα OBD2';
 
   @override
-  String veCalibratedTitle(String vehicleName, String percent) {
-    return 'Βαθμονόμηση κατανάλωσης ενημερώθηκε για $vehicleName — η ακρίβεια βελτιώθηκε κατά $percent%';
-  }
-
-  @override
   String get veResetConfirmTitle => 'Επαναφορά ογκομετρικής απόδοσης;';
 
   @override
@@ -6966,6 +6961,11 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get tripRecordingPipElapsedCaption => 'παρήλθε';
+
+  @override
+  String pumpGainCalibratedTitle(String vehicleName, String percent) {
+    return '$vehicleName: οι εκτιμήσεις κατανάλωσης επαναπροσαρμόστηκαν στην αντλία ($percent %)';
+  }
 
   @override
   String get qrLaunchConfirmTitle => 'Άνοιγμα του σαρωμένου συνδέσμου;';

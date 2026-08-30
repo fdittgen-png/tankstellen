@@ -882,7 +882,6 @@
   "obd2PauseBannerTitle": "OBD2-anslutning förlorad – inspelning pausad",
   "obd2PauseBannerResume": "Återuppta inspelning",
   "obd2PauseBannerEnd": "Avsluta inspelning",
-  "veCalibratedTitle": "Förbrukningskalibrering uppdaterad för {vehicleName} – noggrannheten förbättrad med {percent}%",
   "veResetConfirmTitle": "Återställ volymetrisk effektivitet?",
   "veResetConfirmBody": "Det här kasserar den inlärda volymetriska effektiviteten (η_v) och återställer standardvärdet (0,85). Bränsleflödesuppskattningar på resenivå faller tillbaka på tillverkarens konstant tills kalibratorn samlar nya prover från kommande resor.",
   "alertsRadiusSectionTitle": "Radiebaserade aviseringar",
@@ -4929,5 +4928,16 @@
   "featureDescription_startupTrace": "Registrerar de tidsatta faserna i appens start, visar dem som ett vattenfall och exporterar dem — en utvecklardiagnostik.",
   "locationGpsAutoHint": "GPS-positionen hämtas automatiskt när du söker. Du kan också uppdatera den manuellt här.",
   "locationClearGpsBody": "Rensa den sparade GPS-positionen? Du kan uppdatera den igen när som helst.",
-  "widgetDefaultsThisProfileHint": "Valen nedan gäller för alla installerade widgetar som visar den här profilen, vid nästa uppdatering."
+  "widgetDefaultsThisProfileHint": "Valen nedan gäller för alla installerade widgetar som visar den här profilen, vid nästa uppdatering.",
+  "pumpGainCalibratedTitle": "{vehicleName}: förbrukningsuppskattningar förankrade mot pumpen ({percent} %)",
+  "@pumpGainCalibratedTitle": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  }
 }

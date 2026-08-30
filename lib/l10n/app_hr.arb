@@ -882,7 +882,6 @@
   "obd2PauseBannerTitle": "OBD2 veza prekinuta — snimanje pauzirano",
   "obd2PauseBannerResume": "Nastavi snimanje",
   "obd2PauseBannerEnd": "Završi snimanje",
-  "veCalibratedTitle": "Kalibracija potrošnje ažurirana za {vehicleName} — točnost poboljšana za {percent}%",
   "veResetConfirmTitle": "Resetirati volumetrijsku učinkovitost?",
   "veResetConfirmBody": "Ovo će odbaciti naučenu volumetrijsku učinkovitost (η_v) i vratiti zadanu vrijednost (0.85). Procjene protoka goriva na razini putovanja vraćat će se na tvornički konstantu dok kalibracija ne prikupi nove uzorke iz nadolazećih putovanja.",
   "alertsRadiusSectionTitle": "Upozorenja polumjera",
@@ -4929,5 +4928,16 @@
   "featureDescription_startupTrace": "Bilježi vremenski mjerene faze pokretanja aplikacije, prikazuje ih kao vodopad i izvozi — dijagnostika za razvojne programere.",
   "locationGpsAutoHint": "GPS položaj dohvaća se automatski pri pretraživanju. Ovdje ga možete ažurirati i ručno.",
   "locationClearGpsBody": "Obrisati spremljeni GPS položaj? Možete ga ponovno ažurirati u bilo kojem trenutku.",
-  "widgetDefaultsThisProfileHint": "Odabiri u nastavku vrijede za svaki instalirani widget koji prikazuje ovaj profil, pri sljedećem osvježavanju."
+  "widgetDefaultsThisProfileHint": "Odabiri u nastavku vrijede za svaki instalirani widget koji prikazuje ovaj profil, pri sljedećem osvježavanju.",
+  "pumpGainCalibratedTitle": "{vehicleName}: procjene potrošnje ponovno usidrene na pumpu ({percent} %)",
+  "@pumpGainCalibratedTitle": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  }
 }

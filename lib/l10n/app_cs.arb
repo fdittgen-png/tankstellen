@@ -882,7 +882,6 @@
   "obd2PauseBannerTitle": "Připojení OBD2 ztraceno — nahrávání pozastaveno",
   "obd2PauseBannerResume": "Obnovit nahrávání",
   "obd2PauseBannerEnd": "Ukončit nahrávání",
-  "veCalibratedTitle": "Kalibrace spotřeby aktualizována pro {vehicleName} — přesnost zlepšena o {percent}%",
   "veResetConfirmTitle": "Resetovat volumetrickou účinnost?",
   "veResetConfirmBody": "Tímto se zruší naučená volumetrická účinnost (η_v) a obnoví se výchozí hodnota (0,85). Odhady průtoku paliva na úrovni cesty se vrátí na konstantu výrobce, dokud kalibrátor nenasbírá nové vzorky z nadcházejících cest.",
   "alertsRadiusSectionTitle": "Polohová upozornění",
@@ -4929,5 +4928,16 @@
   "featureDescription_startupTrace": "Zaznamenává časované fáze spuštění aplikace, zobrazuje je jako vodopád a exportuje – diagnostika pro vývojáře.",
   "locationGpsAutoHint": "Poloha GPS se získává automaticky při hledání. Zde ji můžete také aktualizovat ručně.",
   "locationClearGpsBody": "Vymazat uloženou polohu GPS? Kdykoli ji můžete znovu aktualizovat.",
-  "widgetDefaultsThisProfileHint": "Níže uvedené volby platí pro všechny nainstalované widgety zobrazující tento profil, při příští aktualizaci."
+  "widgetDefaultsThisProfileHint": "Níže uvedené volby platí pro všechny nainstalované widgety zobrazující tento profil, při příští aktualizaci.",
+  "pumpGainCalibratedTitle": "{vehicleName}: odhady spotřeby znovu ukotveny ke stojanu ({percent} %)",
+  "@pumpGainCalibratedTitle": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  }
 }

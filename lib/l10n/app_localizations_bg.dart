@@ -3067,11 +3067,6 @@ class AppLocalizationsBg extends AppLocalizations {
       'Запис с GPS — изчаква OBD2 адаптера';
 
   @override
-  String veCalibratedTitle(String vehicleName, String percent) {
-    return 'Калибровката на разхода е актуализирана за $vehicleName — точността е подобрена с $percent%';
-  }
-
-  @override
   String get veResetConfirmTitle => 'Нулиране на обемната ефективност?';
 
   @override
@@ -6967,6 +6962,11 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get tripRecordingPipElapsedCaption => 'изминало';
+
+  @override
+  String pumpGainCalibratedTitle(String vehicleName, String percent) {
+    return '$vehicleName: оценките за разход са наново привързани към колонката ($percent %)';
+  }
 
   @override
   String get qrLaunchConfirmTitle => 'Отваряне на сканираната връзка?';

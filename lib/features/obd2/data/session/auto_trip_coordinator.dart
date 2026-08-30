@@ -157,6 +157,7 @@ class AutoTripCoordinator {
   /// threshold-cross (handed to the recorder) or disconnect.
   late final AutoTripSessionOpener _watch = AutoTripSessionOpener(
     mac: config.mac,
+    now: _now, // #3891 — one clock for the re-arm cooldown
     linkSupervisor: linkSupervisor,
     speedStreamFactory: speedStreamFactory,
     startTrip: startTrip,
@@ -344,6 +345,21 @@ class AutoTripCoordinator {
         mac: config.mac,
         detail: 'tripActive=$_tripActive sessionHeld=${_watch.hasOpenSession} '
             'watching=${_watch.isWatching}',
+      );
+      return;
+    }
+    // #3891 — a parked car answered "adapter did not answer" moments ago:
+    // every app resume used to redial it (20–60 s of RFCOMM churn each).
+    // Back off; the engine-start wake path and an explicit user tap still
+    // connect immediately.
+    final lastFail = _watch.lastOpenFailureAt;
+    final cooldown = _watch.reArmCooldown;
+    if (lastFail != null && _now().difference(lastFail) < cooldown) {
+      AutoRecordTraceLog.add(
+        AutoRecordEventKind.foregroundArmSkipped,
+        mac: config.mac,
+        detail: 'cooldown after ${_watch.openFailureStreak} failed open(s) — '
+            '${cooldown.inMinutes} min',
       );
       return;
     }

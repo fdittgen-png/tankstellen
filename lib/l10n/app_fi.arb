@@ -882,7 +882,6 @@
   "obd2PauseBannerTitle": "OBD2-yhteys katkesi — tallennus keskeytetty",
   "obd2PauseBannerResume": "Jatka tallennusta",
   "obd2PauseBannerEnd": "Lopeta tallennus",
-  "veCalibratedTitle": "Kulutuskalibrointi päivitetty ajoneuvolle {vehicleName} — tarkkuus parani {percent}%",
   "veResetConfirmTitle": "Nollatako tilavuushyötysuhde?",
   "veResetConfirmBody": "Tämä hylkää opitun tilavuushyötysuhteen (η_v) ja palauttaa oletusarvon (0,85). Matkakohtaiset polttoainevirta-arviot palaavat valmistajan vakioon kunnes kalibraattori kerää uusia näytteitä tulevista matkoista.",
   "alertsRadiusSectionTitle": "Säde-hälytykset",
@@ -4929,5 +4928,16 @@
   "featureDescription_startupTrace": "Tallentaa sovelluksen käynnistyksen ajastetut vaiheet, näyttää ne vesiputouksena ja vie ne – kehittäjädiagnostiikka.",
   "locationGpsAutoHint": "GPS-sijainti haetaan automaattisesti haun yhteydessä. Voit päivittää sen myös käsin tässä.",
   "locationClearGpsBody": "Tyhjennetäänkö tallennettu GPS-sijainti? Voit päivittää sen uudelleen milloin tahansa.",
-  "widgetDefaultsThisProfileHint": "Alla olevat valinnat koskevat jokaista asennettua widgetiä, joka näyttää tämän profiilin, seuraavan päivityksen yhteydessä."
+  "widgetDefaultsThisProfileHint": "Alla olevat valinnat koskevat jokaista asennettua widgetiä, joka näyttää tämän profiilin, seuraavan päivityksen yhteydessä.",
+  "pumpGainCalibratedTitle": "{vehicleName}: kulutusarviot ankkuroitu uudelleen mittariin ({percent} %)",
+  "@pumpGainCalibratedTitle": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -882,7 +882,6 @@
   "obd2PauseBannerTitle": "OBD2 savienojums zaudēts — ierakstīšana apturēta",
   "obd2PauseBannerResume": "Atsākt ierakstīšanu",
   "obd2PauseBannerEnd": "Beigt ierakstīšanu",
-  "veCalibratedTitle": "Patēriņa kalibrēšana atjaunināta {vehicleName} — precizitāte uzlabojusies par {percent}%",
   "veResetConfirmTitle": "Atiestatīt tilpuma efektivitāti?",
   "veResetConfirmBody": "Tiks atceltas apgūtās tilpuma efektivitātes (η_v) vērtības un atjaunota noklusējuma vērtība (0.85). Brauciena degvielas plūsmas aprēķini atgriezīsies pie ražotāja konstantes, līdz kalibrētājs savāks jaunus paraugus no nākamajiem braucieniem.",
   "alertsRadiusSectionTitle": "Rādiusa brīdinājumi",
@@ -4929,5 +4928,16 @@
   "featureDescription_startupTrace": "Reģistrē lietotnes palaišanas laikā mērītās fāzes, rāda tās kā ūdenskritumu un eksportē — izstrādātāja diagnostika.",
   "locationGpsAutoHint": "GPS pozīcija tiek iegūta automātiski meklējot. Šeit to vari atjaunināt arī manuāli.",
   "locationClearGpsBody": "Vai notīrīt saglabāto GPS pozīciju? To vari jebkurā laikā atjaunināt vēlreiz.",
-  "widgetDefaultsThisProfileHint": "Tālāk norādītās izvēles attiecas uz katru instalēto logrīku, kas rāda šo profilu, nākamajā atsvaidzināšanā."
+  "widgetDefaultsThisProfileHint": "Tālāk norādītās izvēles attiecas uz katru instalēto logrīku, kas rāda šo profilu, nākamajā atsvaidzināšanā.",
+  "pumpGainCalibratedTitle": "{vehicleName}: patēriņa aplēses no jauna piesaistītas sūknim ({percent} %)",
+  "@pumpGainCalibratedTitle": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -106,6 +106,12 @@ class TripSummary {
   /// recalculable" and such trips are left untouched by a recompute.
   final double? volumetricEfficiencyUsed;
 
+  /// #3887 — the pump-anchored gain the trip's estimated fuel was
+  /// multiplied by (`VehicleProfile.pumpGain` at recording time). The
+  /// learner divides it back out to recover the raw estimator output.
+  /// Null on trips recorded before #3887 (≡ 1.0).
+  final double? pumpGainApplied;
+
   /// Kind of trajet — whether the recorder collected OBD2 telemetry
   /// alongside GPS, or GPS only (#2025). Trips upgrade in-place from
   /// `gpsOnly` to `gpsPlusObd2` the moment an OBD2 adapter starts
@@ -213,6 +219,7 @@ class TripSummary {
     this.secondsBelowOptimalGear,
     this.fuelRateSuspect = false,
     this.volumetricEfficiencyUsed,
+    this.pumpGainApplied,
     this.kind = TripKind.gpsPlusObd2,
     this.harshEvents = const [],
     this.isVirtual = false,
@@ -264,6 +271,7 @@ class TripSummary {
     double? secondsBelowOptimalGear,
     bool? fuelRateSuspect,
     double? volumetricEfficiencyUsed,
+    double? pumpGainApplied,
     TripKind? kind,
     List<HarshEvent>? harshEvents,
     bool? isVirtual,
@@ -297,6 +305,7 @@ class TripSummary {
         fuelRateSuspect: fuelRateSuspect ?? this.fuelRateSuspect,
         volumetricEfficiencyUsed:
             volumetricEfficiencyUsed ?? this.volumetricEfficiencyUsed,
+        pumpGainApplied: pumpGainApplied ?? this.pumpGainApplied,
         kind: kind ?? this.kind,
         harshEvents: harshEvents ?? this.harshEvents,
         isVirtual: isVirtual ?? this.isVirtual,

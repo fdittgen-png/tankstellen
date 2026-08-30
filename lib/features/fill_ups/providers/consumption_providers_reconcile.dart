@@ -155,7 +155,7 @@ mixin _FillUpListReconcile on _FillUpListWindows {
   Future<void> _recordBrokenMapObservation({
     required FillUp fillUp,
     required _TripVsPumpReconciliation? reconciliation,
-    required VeLearnResult? veResult,
+    required double? proposedEta,
   }) async {
     if (reconciliation == null) return;
     final vehicleId = fillUp.vehicleId;
@@ -189,7 +189,7 @@ mixin _FillUpListReconcile on _FillUpListWindows {
         prior: prior,
         reconciledLPer100km: reconciledLPer100km,
         estimatedLPer100km: estimatedLPer100km,
-        proposedEta: veResult?.proposedEta,
+        proposedEta: proposedEta,
         now: DateTime.now(),
         vehicle: vehicle,
       );

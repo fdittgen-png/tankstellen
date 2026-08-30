@@ -2,8 +2,11 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/domain/consumption_unit.dart';
+import '../../../../core/providers/consumption_display_provider.dart';
 import '../../../../core/utils/time_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -34,7 +37,7 @@ import '../../domain/services/monthly_insights_aggregator.dart';
 ///
 /// The widget is purely presentational. Bucketing / averaging happens
 /// inside the aggregator, which is unit-tested separately.
-class MonthlyInsightsCard extends StatelessWidget {
+class MonthlyInsightsCard extends ConsumerWidget {
   /// Pre-computed aggregate. Build it via
   /// `aggregateMonthlyInsights(trips, now)`.
   final MonthlyInsightsSummary summary;
@@ -42,9 +45,11 @@ class MonthlyInsightsCard extends StatelessWidget {
   const MonthlyInsightsCard({super.key, required this.summary});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    // #3889 — the month figures follow the app-wide consumption unit.
+    final unit = ref.watch(consumptionDisplaySettingProvider).unit;
     final reliable = summary.isComparisonReliable;
 
     final tripsRow = _MetricRow(
@@ -98,9 +103,11 @@ class MonthlyInsightsCard extends StatelessWidget {
             label: l.consumptionMonthlyAvgConsumptionLabel,
             currentValue: _fmtConsumption(
               summary.currentMonthAvgConsumptionLPer100km,
+              unit,
             ),
             previousValue: _fmtConsumption(
               summary.previousMonthAvgConsumptionLPer100km,
+              unit,
             ),
             // Round to one decimal so a +0.04 swing doesn't render as
             // a coloured arrow when the displayed numbers are equal.
@@ -273,9 +280,9 @@ String _fmtDistance(double km) {
   return UnitFormatter.formatDistance(km, fractionDigits: 0);
 }
 
-String _fmtConsumption(double? lPer100Km) {
+String _fmtConsumption(double? lPer100Km, ConsumptionUnit unit) {
   if (lPer100Km == null) return '—';
-  return '${UnitFormatter.formatDecimal(lPer100Km)} L/100';
+  return UnitFormatter.formatConsumptionLocalized(lPer100Km, unit);
 }
 
 String _fmtClimb(double meters) =>

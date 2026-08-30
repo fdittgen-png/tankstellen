@@ -140,6 +140,13 @@ class BackupXmlWriter {
         'VolumetricEfficiencySamples',
         v.volumetricEfficiencySamples.toString(),
       );
+      // #3887 — pump-anchored gain round-trips with the profile.
+      _writeText(builder, 'PumpGain', v.pumpGain.toString());
+      _writeText(builder, 'PumpGainSamples', v.pumpGainSamples.toString());
+      if (v.pumpGainUpdatedAt != null) {
+        _writeText(builder, 'PumpGainUpdatedAt',
+            v.pumpGainUpdatedAt!.toUtc().toIso8601String());
+      }
 
       if (v.curbWeightKg != null) {
         _writeText(builder, 'CurbWeightKg', v.curbWeightKg!.toString());

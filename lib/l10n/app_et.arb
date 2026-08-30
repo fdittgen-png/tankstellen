@@ -882,7 +882,6 @@
   "obd2PauseBannerTitle": "OBD2 ühendus kadunud — salvestamine peatatud",
   "obd2PauseBannerResume": "Jätka salvestamist",
   "obd2PauseBannerEnd": "Lõpeta salvestamine",
-  "veCalibratedTitle": "Kulukalibreerimine uuendatud sõidukile {vehicleName} — täpsus paranes {percent}% võrra",
   "veResetConfirmTitle": "Lähtestada mahuline efektiivsus?",
   "veResetConfirmBody": "See hülgab õpitud mahulise efektiivsuse (η_v) ja taastab vaikeväärtuse (0,85). Reisitaseme kütusevoo hinnangud lähevad tagasi tootja konstandile, kuni kalibreerimistööriist kogub tulevaste reiside uued näidised.",
   "alertsRadiusSectionTitle": "Raadiusteteatised",
@@ -4929,5 +4928,16 @@
   "featureDescription_startupTrace": "Salvestab rakenduse käivituse ajastatud faasid, näitab neid koskvaatena ja ekspordib – arendaja diagnostika.",
   "locationGpsAutoHint": "GPS-asukoht hangitakse otsingul automaatselt. Saad seda siin ka käsitsi uuendada.",
   "locationClearGpsBody": "Kas kustutada salvestatud GPS-asukoht? Saad seda igal ajal uuesti uuendada.",
-  "widgetDefaultsThisProfileHint": "Allolevad valikud kehtivad igale paigaldatud vidinale, mis näitab seda profiili, järgmisel värskendusel."
+  "widgetDefaultsThisProfileHint": "Allolevad valikud kehtivad igale paigaldatud vidinale, mis näitab seda profiili, järgmisel värskendusel.",
+  "pumpGainCalibratedTitle": "{vehicleName}: kuluhinnangud tanklapumbaga uuesti kooskõlla viidud ({percent} %)",
+  "@pumpGainCalibratedTitle": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  }
 }

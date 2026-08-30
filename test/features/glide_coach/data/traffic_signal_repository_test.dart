@@ -235,4 +235,75 @@ void main() {
       expect(TrafficSignalRepository.boxName, 'traffic_signals_cache');
     });
   });
+
+  group('circuit breaker (#3890)', () {
+    late Directory tmpDir;
+    late Box<String> box;
+    setUp(() async {
+      tmpDir = Directory.systemTemp.createTempSync('traffic_signal_breaker_');
+      Hive.init(tmpDir.path);
+      box = await Hive.openBox<String>('traffic_signals_breaker');
+    });
+    tearDown(() async {
+      await box.deleteFromDisk();
+      await Hive.close();
+      tmpDir.deleteSync(recursive: true);
+    });
+
+    test('a failed Overpass call opens the breaker: no redial for 5 min, '
+        'then 10, then 20; a success closes it', () async {
+      var now = DateTime(2026, 8, 30, 17);
+      final client = _FakeOsmClient(
+          errorToThrow: const OsmTrafficSignalException('refused'));
+      final repo = TrafficSignalRepository(
+          client: client, cacheBox: box, now: () => now);
+      Future<List<TrafficSignal>> call() => repo.getSignalsForBoundingBox(
+          south: 43, west: 3, north: 43.1, east: 3.1);
+      await expectLater(call(), throwsA(isA<OsmTrafficSignalException>()));
+      expect(client.callCount, 1);
+      expect(repo.breakerHold, const Duration(minutes: 5));
+      // Inside the hold: served empty, no network.
+      expect(await call(), isEmpty);
+      now = now.add(const Duration(minutes: 4));
+      expect(await call(), isEmpty);
+      expect(client.callCount, 1);
+      // Hold elapsed: one probe, fails again → 10 min.
+      now = now.add(const Duration(minutes: 2));
+      await expectLater(call(), throwsA(isA<OsmTrafficSignalException>()));
+      expect(client.callCount, 2);
+      expect(repo.breakerHold, const Duration(minutes: 10));
+      now = now.add(const Duration(minutes: 11));
+      await expectLater(call(), throwsA(isA<OsmTrafficSignalException>()));
+      expect(repo.breakerHold, const Duration(minutes: 20));
+      // Recovery closes it.
+      now = now.add(const Duration(minutes: 21));
+      client.errorToThrow = null;
+      expect(await call(), isEmpty);
+      expect(repo.breakerUntil, isNull);
+      expect(repo.breakerHold, Duration.zero);
+    });
+
+    test('while open, a stale cache entry is served instead of nothing',
+        () async {
+      var now = DateTime(2026, 8, 30, 17);
+      final client = _FakeOsmClient(
+          response: [const TrafficSignal(id: 's1', lat: 43.05, lng: 3.05)]);
+      final repo = TrafficSignalRepository(
+          client: client,
+          cacheBox: box,
+          ttl: const Duration(minutes: 30),
+          now: () => now);
+      Future<List<TrafficSignal>> call() => repo.getSignalsForBoundingBox(
+          south: 43, west: 3, north: 43.1, east: 3.1);
+      expect(await call(), hasLength(1));
+      // Cache expired, Overpass down → the breaker opens on the failure…
+      now = now.add(const Duration(hours: 1));
+      client.errorToThrow = const OsmTrafficSignalException('timeout');
+      await expectLater(call(), throwsA(isA<OsmTrafficSignalException>()));
+      // …and the next lookups get the stale signals, not an empty road.
+      expect(await call(), hasLength(1));
+      expect(client.callCount, 2);
+    });
+  });
+
 }

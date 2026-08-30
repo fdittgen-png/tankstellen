@@ -17,6 +17,8 @@
       <EngineCylinders>4</EngineCylinders>
       <VolumetricEfficiency>0.85</VolumetricEfficiency>
       <VolumetricEfficiencySamples>3</VolumetricEfficiencySamples>
+      <PumpGain>1.0</PumpGain>
+      <PumpGainSamples>0</PumpGainSamples>
       <CalibrationMode>rule</CalibrationMode>
       <AutoRecord>false</AutoRecord>
       <MovementStartThresholdKmh>5.0</MovementStartThresholdKmh>

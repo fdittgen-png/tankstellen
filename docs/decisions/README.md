@@ -53,3 +53,4 @@ reused. If a decision is reversed, the original ADR is marked
 | 0017 | Bounded-memory trip recording — live ring, WAL as source of truth, incremental aggregates, downsampled rendering (#3878) | Accepted |
 | 0018 | Trip detail v2 — meta row + columnar 5-minute chunks, decoded off the UI isolate (#3882) | Accepted |
 | 0019 | Settings information architecture — two-level topic tree, one home per parameter, scope labels (#3884) | Accepted |
+| 0020 | The pump is the truth — a learned fuel gain anchors OBD2 consumption on full-tank fills (#3887) | Accepted |

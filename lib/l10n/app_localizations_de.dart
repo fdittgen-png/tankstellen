@@ -3059,11 +3059,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Aufzeichnung per GPS — warte auf den OBD2-Adapter';
 
   @override
-  String veCalibratedTitle(String vehicleName, String percent) {
-    return 'Verbrauchsberechnung für $vehicleName kalibriert — Genauigkeit verbessert um $percent%';
-  }
-
-  @override
   String get veResetConfirmTitle => 'Volumetrischen Wirkungsgrad zurücksetzen?';
 
   @override
@@ -6941,6 +6936,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get tripRecordingPipElapsedCaption => 'vergangen';
+
+  @override
+  String pumpGainCalibratedTitle(String vehicleName, String percent) {
+    return '$vehicleName: Verbrauchsschätzungen an der Zapfsäule neu verankert ($percent %)';
+  }
 
   @override
   String get qrLaunchConfirmTitle => 'Gescannten Link öffnen?';

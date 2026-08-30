@@ -61,66 +61,74 @@ final class FillUpRepositoryProvider
 
 String _$fillUpRepositoryHash() => r'cc5e51ddaa9f996875c6e5bace204386b25f55dd';
 
-/// Learner for per-vehicle volumetric efficiency (#815).
+/// Learner for the per-vehicle pump-anchored fuel gain (#3887; replaced
+/// the #815 η_v learner).
 ///
 /// Returns null when the trip-history Hive box isn't open (widget
 /// tests that don't bother initialising Hive) — callers guard by
 /// skipping the reconciliation entirely when the instance is null,
 /// which also lets the fill-up save path stay a single-line change.
 
-@ProviderFor(veLearner)
-final veLearnerProvider = VeLearnerProvider._();
+@ProviderFor(pumpGainLearner)
+final pumpGainLearnerProvider = PumpGainLearnerProvider._();
 
-/// Learner for per-vehicle volumetric efficiency (#815).
+/// Learner for the per-vehicle pump-anchored fuel gain (#3887; replaced
+/// the #815 η_v learner).
 ///
 /// Returns null when the trip-history Hive box isn't open (widget
 /// tests that don't bother initialising Hive) — callers guard by
 /// skipping the reconciliation entirely when the instance is null,
 /// which also lets the fill-up save path stay a single-line change.
 
-final class VeLearnerProvider
-    extends $FunctionalProvider<VeLearner?, VeLearner?, VeLearner?>
-    with $Provider<VeLearner?> {
-  /// Learner for per-vehicle volumetric efficiency (#815).
+final class PumpGainLearnerProvider
+    extends
+        $FunctionalProvider<
+          PumpGainLearner?,
+          PumpGainLearner?,
+          PumpGainLearner?
+        >
+    with $Provider<PumpGainLearner?> {
+  /// Learner for the per-vehicle pump-anchored fuel gain (#3887; replaced
+  /// the #815 η_v learner).
   ///
   /// Returns null when the trip-history Hive box isn't open (widget
   /// tests that don't bother initialising Hive) — callers guard by
   /// skipping the reconciliation entirely when the instance is null,
   /// which also lets the fill-up save path stay a single-line change.
-  VeLearnerProvider._()
+  PumpGainLearnerProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'veLearnerProvider',
+        name: r'pumpGainLearnerProvider',
         isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$veLearnerHash();
+  String debugGetCreateSourceHash() => _$pumpGainLearnerHash();
 
   @$internal
   @override
-  $ProviderElement<VeLearner?> $createElement($ProviderPointer pointer) =>
+  $ProviderElement<PumpGainLearner?> $createElement($ProviderPointer pointer) =>
       $ProviderElement(pointer);
 
   @override
-  VeLearner? create(Ref ref) {
-    return veLearner(ref);
+  PumpGainLearner? create(Ref ref) {
+    return pumpGainLearner(ref);
   }
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(VeLearner? value) {
+  Override overrideWithValue(PumpGainLearner? value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<VeLearner?>(value),
+      providerOverride: $SyncValueProvider<PumpGainLearner?>(value),
     );
   }
 }
 
-String _$veLearnerHash() => r'3ee7af1d1504ef129c160480ac732df0494e036f';
+String _$pumpGainLearnerHash() => r'1e2570a937593cd31ff3cf2dfc1a5d09e886b3a9';
 
 /// Detector for the broken-MAP belief system (#1423 phase 3). Single
 /// stateless instance shared across observations.
@@ -347,7 +355,7 @@ abstract class _$BrokenMapBeliefByVehicle
   }
 }
 
-/// Holds the most recent [VeLearnResult] (#815) so the UI can show a
+/// Holds the most recent [PumpGainResult] (#3887) so the UI can show a
 /// one-shot calibration snackbar after the fill-up save flow closes.
 ///
 /// The fill-up screen reads-and-clears this on its way out; unread
@@ -356,10 +364,10 @@ abstract class _$BrokenMapBeliefByVehicle
 /// result is retained — if two tankfuls calibrate back-to-back (rare,
 /// but possible during data imports) the second one wins.
 
-@ProviderFor(LastVeLearnResult)
-final lastVeLearnResultProvider = LastVeLearnResultProvider._();
+@ProviderFor(LastPumpGainResult)
+final lastPumpGainResultProvider = LastPumpGainResultProvider._();
 
-/// Holds the most recent [VeLearnResult] (#815) so the UI can show a
+/// Holds the most recent [PumpGainResult] (#3887) so the UI can show a
 /// one-shot calibration snackbar after the fill-up save flow closes.
 ///
 /// The fill-up screen reads-and-clears this on its way out; unread
@@ -367,9 +375,9 @@ final lastVeLearnResultProvider = LastVeLearnResultProvider._();
 /// when the user lands on the consumption tab. Only the most recent
 /// result is retained — if two tankfuls calibrate back-to-back (rare,
 /// but possible during data imports) the second one wins.
-final class LastVeLearnResultProvider
-    extends $NotifierProvider<LastVeLearnResult, VeLearnResult?> {
-  /// Holds the most recent [VeLearnResult] (#815) so the UI can show a
+final class LastPumpGainResultProvider
+    extends $NotifierProvider<LastPumpGainResult, PumpGainResult?> {
+  /// Holds the most recent [PumpGainResult] (#3887) so the UI can show a
   /// one-shot calibration snackbar after the fill-up save flow closes.
   ///
   /// The fill-up screen reads-and-clears this on its way out; unread
@@ -377,36 +385,37 @@ final class LastVeLearnResultProvider
   /// when the user lands on the consumption tab. Only the most recent
   /// result is retained — if two tankfuls calibrate back-to-back (rare,
   /// but possible during data imports) the second one wins.
-  LastVeLearnResultProvider._()
+  LastPumpGainResultProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'lastVeLearnResultProvider',
+        name: r'lastPumpGainResultProvider',
         isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$lastVeLearnResultHash();
+  String debugGetCreateSourceHash() => _$lastPumpGainResultHash();
 
   @$internal
   @override
-  LastVeLearnResult create() => LastVeLearnResult();
+  LastPumpGainResult create() => LastPumpGainResult();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(VeLearnResult? value) {
+  Override overrideWithValue(PumpGainResult? value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<VeLearnResult?>(value),
+      providerOverride: $SyncValueProvider<PumpGainResult?>(value),
     );
   }
 }
 
-String _$lastVeLearnResultHash() => r'71c27ad112b34edc9636c7ccd0694d1758ecd4d0';
+String _$lastPumpGainResultHash() =>
+    r'b0d7fceadbb8c277a473bbd972c067d70c4e6d4c';
 
-/// Holds the most recent [VeLearnResult] (#815) so the UI can show a
+/// Holds the most recent [PumpGainResult] (#3887) so the UI can show a
 /// one-shot calibration snackbar after the fill-up save flow closes.
 ///
 /// The fill-up screen reads-and-clears this on its way out; unread
@@ -415,17 +424,17 @@ String _$lastVeLearnResultHash() => r'71c27ad112b34edc9636c7ccd0694d1758ecd4d0';
 /// result is retained — if two tankfuls calibrate back-to-back (rare,
 /// but possible during data imports) the second one wins.
 
-abstract class _$LastVeLearnResult extends $Notifier<VeLearnResult?> {
-  VeLearnResult? build();
+abstract class _$LastPumpGainResult extends $Notifier<PumpGainResult?> {
+  PumpGainResult? build();
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref = this.ref as $Ref<VeLearnResult?, VeLearnResult?>;
+    final ref = this.ref as $Ref<PumpGainResult?, PumpGainResult?>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<VeLearnResult?, VeLearnResult?>,
-              VeLearnResult?,
+              AnyNotifier<PumpGainResult?, PumpGainResult?>,
+              PumpGainResult?,
               Object?,
               Object?
             >;
@@ -469,7 +478,7 @@ final class FillUpListProvider
   }
 }
 
-String _$fillUpListHash() => r'40ce45a13c8b174fd356103ca59650ff25504a23';
+String _$fillUpListHash() => r'559d443b095587ef7f0b848f139b070b5255403e';
 
 /// Mutable list of all fill-ups, newest first.
 

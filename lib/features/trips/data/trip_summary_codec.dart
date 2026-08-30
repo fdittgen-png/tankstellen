@@ -50,6 +50,8 @@ Map<String, dynamic> tripSummaryToJson(TripSummary s) => {
       // / MAF fuel) carry no value, so parsimony saves bytes.
       if (s.volumetricEfficiencyUsed != null)
         'veUsed': s.volumetricEfficiencyUsed,
+      // #3887: the pump-anchored gain the estimated fuel carried.
+      if (s.pumpGainApplied != null) 'pg': s.pumpGainApplied,
       // #2025 — trajet kind. Omitted when gpsPlusObd2 (the historical
       // default) so legacy trips round-trip with zero bytes added.
       if (s.kind != TripKind.gpsPlusObd2) 'kind': s.kind.wireName,
@@ -110,6 +112,7 @@ TripSummary tripSummaryFromJson(Map<String, dynamic> j) => TripSummary(
       // fuel was not 100% speed-density carry no key → null, which
       // correctly reads as "not recalculable".
       volumetricEfficiencyUsed: (j['veUsed'] as num?)?.toDouble(),
+      pumpGainApplied: (j['pg'] as num?)?.toDouble(),
       // #2025: trajet kind. Missing key → gpsPlusObd2 because every
       // recording before this field landed required an OBD2 connection.
       kind: TripKind.fromWireName(j['kind'] as String?),

@@ -882,7 +882,6 @@
   "obd2PauseBannerTitle": "OBD2-kapcsolat megszakadt — rögzítés szüneteltetve",
   "obd2PauseBannerResume": "Rögzítés folytatása",
   "obd2PauseBannerEnd": "Rögzítés befejezése",
-  "veCalibratedTitle": "Fogyasztás-kalibráció frissítve a(z) {vehicleName} számára — pontosság {percent}%-kal javult",
   "veResetConfirmTitle": "Visszaállítja a volumetrikus hatékonyságot?",
   "veResetConfirmBody": "Ez elveti a tanult volumetrikus hatékonyságot (η_v), és visszaállítja az alapértéket (0,85). Az útszintű üzemanyag-áramlás becslések visszaesnek a gyártói konstansra, amíg a kalibrátor új mintákat nem gyűjt a következő utakból.",
   "alertsRadiusSectionTitle": "Sugárkörös riasztások",
@@ -4929,5 +4928,16 @@
   "featureDescription_startupTrace": "Rögzíti az alkalmazás indításának időmért fázisait, vízesésként mutatja és exportálja – fejlesztői diagnosztika.",
   "locationGpsAutoHint": "A GPS-pozíciót kereséskor automatikusan lekérjük. Itt kézzel is frissítheted.",
   "locationClearGpsBody": "Törlöd a tárolt GPS-pozíciót? Bármikor újra frissítheted.",
-  "widgetDefaultsThisProfileHint": "Az alábbi választások minden telepített, ezt a profilt mutató widgetre érvényesek a következő frissítéskor."
+  "widgetDefaultsThisProfileHint": "Az alábbi választások minden telepített, ezt a profilt mutató widgetre érvényesek a következő frissítéskor.",
+  "pumpGainCalibratedTitle": "{vehicleName}: fogyasztási becslések a kúthoz igazítva ({percent} %)",
+  "@pumpGainCalibratedTitle": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  }
 }

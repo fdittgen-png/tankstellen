@@ -116,6 +116,8 @@ mixin _TripRecordingSummary on _TripRecordingTelemetryIngest {
       secondsBelowOptimalGear: _computeGearCoachingMetric(),
       fuelRateSuspect: fuelRateSuspect,
       volumetricEfficiencyUsed: veUsed,
+      // #3887 — the pump-anchored gain the estimated fuel carried.
+      pumpGainApplied: _vehicle?.pumpGain,
     );
   }
 

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/carbon/presentation/widgets/speed_consumption_card.dart';
 import 'package:tankstellen/features/trips/domain/services/speed_consumption_histogram.dart';
@@ -181,8 +182,7 @@ Future<void> _pumpCard(
   required List<SpeedConsumptionBin> bins,
   required double? overallAvgLPer100Km,
 }) async {
-  await tester.pumpWidget(
-    MaterialApp(
+  await tester.pumpWidget(ProviderScope(child: MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: const Locale('en'),
@@ -208,8 +208,7 @@ Future<void> _pumpCard(
           ),
         ),
       ),
-    ),
-  );
+    )));
   // Two pumps so the AppLocalizations delegate finishes loading.
   // pumpAndSettle is avoided per the project's Hive-fire-and-forget
   // guideline — Windows test runs occasionally hang on it.

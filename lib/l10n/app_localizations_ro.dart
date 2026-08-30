@@ -3064,11 +3064,6 @@ class AppLocalizationsRo extends AppLocalizations {
       'Înregistrare cu GPS — se așteaptă adaptorul OBD2';
 
   @override
-  String veCalibratedTitle(String vehicleName, String percent) {
-    return 'Calibrarea consumului actualizată pentru $vehicleName — precizie îmbunătățită cu $percent%';
-  }
-
-  @override
   String get veResetConfirmTitle => 'Resetați eficiența volumetrică?';
 
   @override
@@ -6962,6 +6957,11 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get tripRecordingPipElapsedCaption => 'scurs';
+
+  @override
+  String pumpGainCalibratedTitle(String vehicleName, String percent) {
+    return '$vehicleName: estimările de consum reancorate la pompă ($percent %)';
+  }
 
   @override
   String get qrLaunchConfirmTitle => 'Deschizi linkul scanat?';

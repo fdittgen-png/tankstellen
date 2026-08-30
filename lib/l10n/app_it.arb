@@ -882,7 +882,6 @@
   "obd2PauseBannerTitle": "Connessione OBD2 persa — registrazione in pausa",
   "obd2PauseBannerResume": "Riprendi registrazione",
   "obd2PauseBannerEnd": "Termina registrazione",
-  "veCalibratedTitle": "Calibrazione consumo aggiornata per {vehicleName} — precisione migliorata del {percent}%",
   "veResetConfirmTitle": "Reimpostare l'efficienza volumetrica?",
   "veResetConfirmBody": "Questo eliminerà l'efficienza volumetrica (η_v) appresa e ripristinerà il valore predefinito (0,85). Le stime del flusso carburante a livello di percorso torneranno alla costante del produttore finché il calibratore non raccoglie nuovi campioni dai prossimi percorsi.",
   "alertsRadiusSectionTitle": "Avvisi di raggio",
@@ -4929,5 +4928,16 @@
   "featureDescription_startupTrace": "Registra le fasi cronometrate dell'avvio dell'app, le mostra a cascata e le esporta: una diagnostica per sviluppatori.",
   "locationGpsAutoHint": "La posizione GPS viene acquisita automaticamente durante la ricerca. Puoi anche aggiornarla manualmente qui.",
   "locationClearGpsBody": "Cancellare la posizione GPS salvata? Puoi aggiornarla di nuovo in qualsiasi momento.",
-  "widgetDefaultsThisProfileHint": "Le scelte qui sotto valgono per ogni widget installato che mostra questo profilo, al prossimo aggiornamento."
+  "widgetDefaultsThisProfileHint": "Le scelte qui sotto valgono per ogni widget installato che mostra questo profilo, al prossimo aggiornamento.",
+  "pumpGainCalibratedTitle": "{vehicleName}: stime di consumo riallineate alla pompa ({percent} %)",
+  "@pumpGainCalibratedTitle": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  }
 }

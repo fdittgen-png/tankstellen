@@ -5624,12 +5624,6 @@ abstract class AppLocalizations {
   /// **'Recording with GPS — waiting for the OBD2 adapter'**
   String get obd2GpsDegradedPassiveWaitingBanner;
 
-  /// Snackbar shown after #815 reconciles OBD2 integrated fuel against the pump receipt and learns a new volumetric-efficiency scalar for the vehicle.
-  ///
-  /// In en, this message translates to:
-  /// **'Consumption calibration updated for {vehicleName} — accuracy improved by {percent}%'**
-  String veCalibratedTitle(String vehicleName, String percent);
-
   /// Title of the confirm dialog shown before discarding the learned volumetric efficiency (#815).
   ///
   /// In en, this message translates to:
@@ -11849,6 +11843,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'elapsed'**
   String get tripRecordingPipElapsedCaption;
+
+  /// #3887 — snackbar after a full tank closes a tank window: the OBD2 consumption estimates were rescaled to match the pump; {percent} is the signed change of the estimates, e.g. '-27' (they come down) or '+8'.
+  ///
+  /// In en, this message translates to:
+  /// **'{vehicleName}: consumption estimates re-anchored to the pump ({percent} %)'**
+  String pumpGainCalibratedTitle(String vehicleName, String percent);
 
   /// Title of the confirmation dialog shown before a scanned payment-QR web URL is handed to the browser (#3611). Scanned QR codes are attacker-controlled input, so the app never auto-launches them.
   ///

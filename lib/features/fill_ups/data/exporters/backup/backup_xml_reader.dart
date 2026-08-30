@@ -50,20 +50,15 @@ class BackupXmlReadException implements Exception {
 /// Inverse of [BackupXmlWriter] (#2571).
 ///
 /// Parses a v1 Tankstellen backup document back into the in-memory
-/// domain models the writer emitted. The reader is the exact mirror of
-/// the writer: every element the writer can produce is read back, and
-/// every element the writer omits for a null value is treated as null
-/// here — so a writer → reader round trip reconstructs the same
-/// entities (for the fields the v1 schema carries).
+/// domain models the writer emitted — the exact mirror of the writer:
+/// every element it can produce is read back, every omitted one is null,
+/// so a writer → reader round trip reconstructs the same entities.
 ///
 /// ### Version dispatch
-/// The root `version` attribute is inspected first. `"1.0"` parses via
-/// the v1 path below. A backup produced by a FUTURE schema (`"2.0"`,
-/// `"3.x"`, …) is rejected with a clear [BackupXmlReadException] so an
-/// older app build never silently mis-reads a newer file — the schema
-/// doc's "a future importer dispatches on that value" contract. A
-/// missing or non-numeric version is likewise rejected as "not a
-/// recognised backup".
+/// The root `version` attribute is inspected first: `"1.0"` parses via
+/// the v1 path; a FUTURE major (`"2.0"`, …) or a missing / non-numeric
+/// version is rejected with a clear [BackupXmlReadException] so an older
+/// build never silently mis-reads a newer file.
 class BackupXmlReader {
   const BackupXmlReader();
 
@@ -205,6 +200,9 @@ class BackupXmlReader {
       engineCylinders: _int(v, 'EngineCylinders'),
       volumetricEfficiency: _double(v, 'VolumetricEfficiency') ?? 0.85,
       volumetricEfficiencySamples: _int(v, 'VolumetricEfficiencySamples') ?? 0,
+      pumpGain: _double(v, 'PumpGain') ?? 1.0, // #3887
+      pumpGainSamples: _int(v, 'PumpGainSamples') ?? 0,
+      pumpGainUpdatedAt: DateTime.tryParse(_text(v, 'PumpGainUpdatedAt') ?? ''),
       curbWeightKg: _int(v, 'CurbWeightKg'),
       obd2AdapterMac: _text(v, 'Obd2AdapterMac'),
       obd2AdapterName: _text(v, 'Obd2AdapterName'),

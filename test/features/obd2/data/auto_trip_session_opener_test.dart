@@ -180,4 +180,28 @@ void main() {
     expect(transport.disconnectCalls, 1,
         reason: 'the orphan session is dropped, not leaked');
   });
+
+  group('re-arm cooldown (#3891)', () {
+    test('failed opens count up and the cooldown doubles 3 → 6 → 12 → 15 min; '
+        'a live session resets it', () async {
+      final opener = buildOpener();
+      expect(opener.reArmCooldown, Duration.zero);
+      await opener.openAndWatch((String mac) async => null);
+      expect(opener.openFailureStreak, 1);
+      expect(opener.lastOpenFailureAt, isNotNull);
+      expect(opener.reArmCooldown, const Duration(minutes: 3));
+      await opener.openAndWatch((String mac) async => null);
+      expect(opener.reArmCooldown, const Duration(minutes: 6));
+      await opener.openAndWatch((String mac) async => null);
+      expect(opener.reArmCooldown, const Duration(minutes: 12));
+      await opener.openAndWatch((String mac) async => null);
+      expect(opener.reArmCooldown, const Duration(minutes: 15),
+          reason: 'capped');
+      await opener.openAndWatch((String mac) async => throw StateError('x'));
+      expect(opener.openFailureStreak, 5, reason: 'an exception counts too');
+      opener.noteOpenFailure();
+      expect(opener.openFailureStreak, 6);
+    });
+  });
+
 }
