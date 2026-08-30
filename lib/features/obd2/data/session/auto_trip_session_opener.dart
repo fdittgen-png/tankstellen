@@ -73,6 +73,7 @@ class AutoTripSessionOpener {
     required this.onLinkDrop,
     required this.shouldAbandonOpen,
     required this.clearTripActive,
+    this.now = DateTime.now, // #3660 seam (tear-off, injectable)
   });
 
   /// Whether an open OBD2 session is currently held.
@@ -84,6 +85,21 @@ class AutoTripSessionOpener {
   /// The held session, if any — read-only peek for the coordinator's
   /// liveness checks.
   Obd2Service? get session => _session;
+
+  /// #3891 — failed opens since the last live session; the foreground
+  /// re-arm backs off on these instead of redialling a parked car.
+  int openFailureStreak = 0;
+  DateTime? lastOpenFailureAt;
+  final DateTime Function() now;
+
+  void noteOpenFailure() => (openFailureStreak++, lastOpenFailureAt = now());
+
+  /// Re-arm wait after the last failure: 3 min, doubling to 15 min.
+  Duration get reArmCooldown {
+    if (openFailureStreak <= 0) return Duration.zero;
+    final minutes = (3 << (openFailureStreak - 1)).clamp(3, 15);
+    return Duration(minutes: minutes);
+  }
 
   /// Null out and return the held session without closing it —
   /// ownership transfer (hand-off) or defensive clear.
@@ -167,6 +183,7 @@ class AutoTripSessionOpener {
         mac: mac,
         detail: 'opener returned null',
       );
+      noteOpenFailure(); // #3891
       return;
     }
 
@@ -190,6 +207,7 @@ class AutoTripSessionOpener {
     // closures below.
     final Obd2Service live = service;
     _session = service;
+    openFailureStreak = 0; lastOpenFailureAt = null; // #3891 — live → no cooldown
     // #2282 concern 4 — only the 1 Hz auto-record movement stream is
     // live at this point (the recorder hasn't taken over yet), so drop
     // the BLE link to balanced connection priority. The recorder bumps
