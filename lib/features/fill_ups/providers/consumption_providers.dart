@@ -13,7 +13,7 @@ import '../../../core/logging/error_logger.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../data/fill_ups_sync.dart';
 import '../../vehicle/data/reference_vehicle_catalog_provider.dart';
-import '../../vehicle/data/ve_learner.dart';
+import '../domain/services/pump_gain_learner.dart';
 import '../../vehicle/data/vehicle_profile_catalog_matcher.dart';
 import '../../../core/domain/gps_calibration_matrix.dart';
 import '../../vehicle/domain/entities/reference_vehicle.dart';
@@ -44,20 +44,19 @@ FillUpRepository fillUpRepository(Ref ref) {
   return FillUpRepository(storage);
 }
 
-/// Learner for per-vehicle volumetric efficiency (#815).
+/// Learner for the per-vehicle pump-anchored fuel gain (#3887; replaced
+/// the #815 η_v learner).
 ///
 /// Returns null when the trip-history Hive box isn't open (widget
 /// tests that don't bother initialising Hive) — callers guard by
 /// skipping the reconciliation entirely when the instance is null,
 /// which also lets the fill-up save path stay a single-line change.
 @Riverpod(keepAlive: true)
-VeLearner? veLearner(Ref ref) {
+PumpGainLearner? pumpGainLearner(Ref ref) {
   final history = ref.watch(tripHistoryRepositoryProvider);
   if (history == null) return null;
-  final profileRepo = ref.watch(vehicleProfileRepositoryProvider);
-  return VeLearner.fromRepos(
-    profileRepository: profileRepo,
-    tripHistoryRepository: history,
+  return PumpGainLearner(
+    profileRepository: ref.watch(vehicleProfileRepositoryProvider),
   );
 }
 
@@ -117,7 +116,7 @@ class BrokenMapBeliefByVehicle extends _$BrokenMapBeliefByVehicle
   }
 }
 
-/// Holds the most recent [VeLearnResult] (#815) so the UI can show a
+/// Holds the most recent [PumpGainResult] (#3887) so the UI can show a
 /// one-shot calibration snackbar after the fill-up save flow closes.
 ///
 /// The fill-up screen reads-and-clears this on its way out; unread
@@ -126,13 +125,13 @@ class BrokenMapBeliefByVehicle extends _$BrokenMapBeliefByVehicle
 /// result is retained — if two tankfuls calibrate back-to-back (rare,
 /// but possible during data imports) the second one wins.
 @Riverpod(keepAlive: true)
-class LastVeLearnResult extends _$LastVeLearnResult {
+class LastPumpGainResult extends _$LastPumpGainResult {
   @override
-  VeLearnResult? build() => null;
+  PumpGainResult? build() => null;
 
   /// Stash [result]. Pass `null` from the consumer to clear after
   /// rendering the snackbar.
-  void set(VeLearnResult? result) {
+  void set(PumpGainResult? result) {
     state = result;
   }
 }
@@ -172,7 +171,6 @@ class FillUpList extends _$FillUpList
   /// so the partials see the full trip set.
   Future<void> add(FillUp fillUp) async {
     final repo = ref.read(fillUpRepositoryProvider);
-    final previous = _previousFillUpFor(fillUp, repo.getAll());
     final linkedIds = _linkedTripIdsForWholeWindow(fillUp);
     // #3122 — stamp the local edit time (UTC) so the LWW sync merge can
     // propagate this record to other devices.
@@ -188,7 +186,7 @@ class FillUpList extends _$FillUpList
     await _relinkOpenWindow(linked);
     state = repo.getAll();
     await _evaluateReminders(linked);
-    final veResult = await _reconcileVolumetricEfficiency(linked, previous);
+    final gainResult = await _reconcilePumpGain(linked); // #3887
     // #2081 — GPS matrix reconciliation. Independent of η_v: the η_v
     // path applies to the OBD2 fuel-rate trim; this path applies to
     // the GPS-only L/100 km matrix. Both happily run for hybrid
@@ -207,7 +205,7 @@ class FillUpList extends _$FillUpList
     await _recordBrokenMapObservation(
       fillUp: linked,
       reconciliation: reconciliation,
-      veResult: veResult,
+      proposedEta: gainResult?.proposedEta,
     );
   }
 

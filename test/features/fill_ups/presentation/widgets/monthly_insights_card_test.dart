@@ -70,8 +70,8 @@ void main() {
       expect(find.text('240 km'), findsOneWidget);
       expect(find.text('180 km'), findsOneWidget);
       // Avg consumption — one-decimal L/100.
-      expect(find.text('6,0 L/100'), findsOneWidget);
-      expect(find.text('7,0 L/100'), findsOneWidget);
+      expect(find.text('6,0 L/100 km'), findsOneWidget);
+      expect(find.text('7,0 L/100 km'), findsOneWidget);
     });
 
     testWidgets('renders delta arrows when values differ', (tester) async {

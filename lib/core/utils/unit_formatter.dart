@@ -151,6 +151,15 @@ class UnitFormatter {
     return '${converted.toStringAsFixed(u.fractionDigits)} ${u.mask}';
   }
 
+  /// Locale-aware twin of [formatConsumption] (#3889): the figure uses the
+  /// active locale's decimal separator (`6,4 L/100 km` in de/fr) — for the
+  /// cards that rendered `formatDecimal` + a hard mask before.
+  static String formatConsumptionLocalized(double value, ConsumptionUnit unit) {
+    final converted = unit.fromLPer100Km(value);
+    if (converted == null) return '--';
+    return '${formatDecimal(converted, fractionDigits: unit.fractionDigits)} ${unit.mask}';
+  }
+
   /// Format a bare decimal number in the *active locale* so metric
   /// countries render "2,3" (comma) and English-locale countries
   /// render "2.3" (dot). Using `toStringAsFixed` would hard-code the

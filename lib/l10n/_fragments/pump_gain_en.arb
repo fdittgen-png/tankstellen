@@ -1,0 +1,14 @@
+{
+  "pumpGainCalibratedTitle": "{vehicleName}: consumption estimates re-anchored to the pump ({percent} %)",
+  "@pumpGainCalibratedTitle": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    },
+    "description": "#3887 — snackbar after a full tank closes a tank window: the OBD2 consumption estimates were rescaled to match the pump; {percent} is the signed change of the estimates, e.g. '-27' (they come down) or '+8'."
+  }
+}

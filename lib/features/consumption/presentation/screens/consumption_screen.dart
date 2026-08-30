@@ -120,16 +120,17 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
     // snackbar when the fill-up save path learns a new value for the
     // active vehicle. Listening here keeps the snackbar visible after
     // the fill-up form pops, which is the screen the user sees.
-    ref.listen(lastVeLearnResultProvider, (previous, next) {
+    ref.listen(lastPumpGainResultProvider, (previous, next) {
       if (next == null) return;
       final vehicles = ref.read(vehicleProfileListProvider);
       final vehicle = vehicles.where((v) => v.id == next.vehicleId).firstOrNull;
       final name = vehicle?.name ?? '';
-      final percent = next.accuracyImprovementPct.round().toString();
-      final msg = l.veCalibratedTitle(name, percent);
-      SnackBarHelper.showSuccess(context, msg);
+      // #3887 — signed change of the estimates ("−27 %" = they come down).
+      final pct = next.changePct.round();
+      final percent = pct > 0 ? '+$pct' : '$pct';
+      SnackBarHelper.showSuccess(context, l.pumpGainCalibratedTitle(name, percent));
       // Clear so a rebuild doesn't re-fire the snackbar.
-      ref.read(lastVeLearnResultProvider.notifier).set(null);
+      ref.read(lastPumpGainResultProvider.notifier).set(null);
     });
 
     return switch (widget.section) {

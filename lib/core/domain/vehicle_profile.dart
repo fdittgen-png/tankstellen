@@ -118,6 +118,15 @@ abstract class VehicleProfile with _$VehicleProfile {
     @Default(0.85) double volumetricEfficiency,
     @Default(0) int volumetricEfficiencySamples,
 
+    // #3887 (Epic #3886) — pump-anchored fuel gain: the multiplier every
+    // ESTIMATED fuel-rate branch (speed-density, MAF) carries so the
+    // recordings land on the pump's litres. Learned per full-to-full tank
+    // window by `PumpGainLearner`; 1.0 until the first window closes.
+    // JSONB-stored field-add — sync-transparent.
+    @Default(1.0) double pumpGain,
+    @Default(0) int pumpGainSamples,
+    DateTime? pumpGainUpdatedAt,
+
     // User-editable calibration overrides (#1397). Each is null until
     // the user types a value into the "Advanced calibration" section
     // of the edit-vehicle screen; non-null values take precedence over

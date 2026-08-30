@@ -1266,7 +1266,6 @@
   "obd2PauseBannerEnd": "Aufzeichnung beenden",
   "obd2GpsDegradedBannerTitle": "Aufzeichnung per GPS — OBD2 verbindet erneut",
   "obd2GpsDegradedPassiveWaitingBanner": "Aufzeichnung per GPS — warte auf den OBD2-Adapter",
-  "veCalibratedTitle": "Verbrauchsberechnung für {vehicleName} kalibriert — Genauigkeit verbessert um {percent}%",
   "veResetConfirmTitle": "Volumetrischen Wirkungsgrad zurücksetzen?",
   "veResetConfirmBody": "Dies verwirft den gelernten volumetrischen Wirkungsgrad (η_v) und stellt den Standardwert (0,85) wieder her. Fahrt-bezogene Verbrauchsschätzungen fallen auf die Herstellerkonstante zurück, bis der Kalibrator aus kommenden Fahrten neue Messwerte sammelt.",
   "alertsStationSectionTitle": "Stations-Alarme",
@@ -3289,6 +3288,17 @@
   "tripRecordingPipElapsedCaption": "vergangen",
   "@tripRecordingPipElapsedCaption": {
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
+  },
+  "pumpGainCalibratedTitle": "{vehicleName}: Verbrauchsschätzungen an der Zapfsäule neu verankert ({percent} %)",
+  "@pumpGainCalibratedTitle": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
   },
   "qrLaunchConfirmTitle": "Gescannten Link öffnen?",
   "@qrLaunchConfirmTitle": {

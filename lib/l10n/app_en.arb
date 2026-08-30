@@ -1509,20 +1509,6 @@
   "@obd2GpsDegradedPassiveWaitingBanner": {
     "description": "Calmer variant of obd2GpsDegradedBannerTitle shown (#2767) once the reconnect scanner has exhausted its active-scan attempts and switched to a low-power passive wait for the adapter to power back up. The trip is still recording on GPS and the app still re-arms an active scan periodically, so the wording is reassuring (\"waiting for\") rather than urgent (\"reconnecting\")."
   },
-  "veCalibratedTitle": "Consumption calibration updated for {vehicleName} — accuracy improved by {percent}%",
-  "@veCalibratedTitle": {
-    "description": "Snackbar shown after #815 reconciles OBD2 integrated fuel against the pump receipt and learns a new volumetric-efficiency scalar for the vehicle.",
-    "placeholders": {
-      "vehicleName": {
-        "type": "String",
-        "example": "Peugeot 107"
-      },
-      "percent": {
-        "type": "String",
-        "example": "42"
-      }
-    }
-  },
   "veResetConfirmTitle": "Reset volumetric efficiency?",
   "@veResetConfirmTitle": {
     "description": "Title of the confirm dialog shown before discarding the learned volumetric efficiency (#815)."
@@ -6684,6 +6670,18 @@
   "tripRecordingPipElapsedCaption": "elapsed",
   "@tripRecordingPipElapsedCaption": {
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
+  },
+  "pumpGainCalibratedTitle": "{vehicleName}: consumption estimates re-anchored to the pump ({percent} %)",
+  "@pumpGainCalibratedTitle": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    },
+    "description": "#3887 — snackbar after a full tank closes a tank window: the OBD2 consumption estimates were rescaled to match the pump; {percent} is the signed change of the estimates, e.g. '-27' (they come down) or '+8'."
   },
   "qrLaunchConfirmTitle": "Open scanned link?",
   "@qrLaunchConfirmTitle": {

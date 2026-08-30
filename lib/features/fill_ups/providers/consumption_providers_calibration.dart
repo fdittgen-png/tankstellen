@@ -26,56 +26,39 @@ mixin _FillUpListCalibration on _$FillUpList {
   }
 
   /// Run the η_v learner against the new fill-up. Returns the resulting
-  /// [VeLearnResult] (or `null` when guards rejected) so downstream
+  /// [PumpGainResult] (or `null` when guards rejected) so downstream
   /// hooks (#1423 phase 3 broken-MAP belief) can read
-  /// [VeLearnResult.proposedEta] without re-running the learner.
-  Future<VeLearnResult?> _reconcileVolumetricEfficiency(
-    FillUp fillUp,
-    FillUp? previous,
-  ) async {
+  /// [PumpGainResult.proposedEta] without re-running the learner.
+  /// #3887 — pump-anchored fuel gain: a closing full-to-full window
+  /// re-anchors every estimated fuel-rate branch on the pump's litres.
+  Future<PumpGainResult?> _reconcilePumpGain(FillUp fillUp) async {
     final vehicleId = fillUp.vehicleId;
-    if (vehicleId == null) return null;
-    if (fillUp.liters <= 0) return null;
+    if (vehicleId == null || fillUp.liters <= 0) return null;
     try {
-      final learner = ref.read(veLearnerProvider);
+      final learner = ref.read(pumpGainLearnerProvider);
       if (learner == null) return null;
+      final summariesById = <String, TripSummary>{
+        for (final t in ref.read(tripHistoryListProvider)) t.id: t.summary,
+      };
       final result = await learner.reconcileAfterFillUp(
         vehicleId: vehicleId,
-        pumpedLiters: fillUp.liters,
-        fillUpTimestamp: fillUp.date,
-        previousFillUpTimestamp: previous?.date,
+        closing: fillUp,
+        fillUps: [
+          for (final f in state)
+            if (f.vehicleId == vehicleId || f.vehicleId == null) f,
+        ],
+        tripSummariesById: summariesById,
       );
       if (result != null) {
-        ref
-            .read(lastVeLearnResultProvider.notifier)
-            .set(result);
-        // Refresh the vehicle list so the edit screen reflects the
-        // bumped η_v sample count immediately.
+        ref.read(lastPumpGainResultProvider.notifier).set(result);
         ref.invalidate(vehicleProfileListProvider);
       }
       return result;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'FillUpList: VE reconciliation failed'}));
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'FillUpList: pump-gain reconciliation failed'}));
       return null;
     }
   }
-
-  /// Refine the active vehicle's [GpsCalibrationMatrix] against the
-  /// observed fuel burn at this fill-up (#2081 / Epic #2055).
-  ///
-  /// Looks up GPS-only / hybrid trajets in the fill-up's linked
-  /// window, builds the feature aggregate per trajet, and passes
-  /// them through [GpsMatrixReconciler.reconcile] to update the
-  /// matrix's `baseline` coefficient + the bookkeeping fields
-  /// (count, variance, last-reconciled-at). Skips silently when:
-  ///
-  /// - No vehicle is linked to the fill-up.
-  /// - No GPS-only / hybrid trajets exist in the window.
-  /// - The reconciler returns null (degenerate inputs).
-  ///
-  /// Cold-starts the matrix from the vehicle's defaults when the
-  /// field is null — first GPS-only fill-up reconciliation will
-  /// seed the matrix and step it once toward the observed truth.
   Future<void> _reconcileGpsCalibrationMatrix(FillUp fillUp) async {
     final vehicleId = fillUp.vehicleId;
     if (vehicleId == null) return;

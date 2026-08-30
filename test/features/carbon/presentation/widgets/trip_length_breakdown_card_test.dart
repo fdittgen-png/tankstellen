@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/carbon/presentation/widgets/trip_length_breakdown_card.dart';
 import 'package:tankstellen/features/trips/domain/services/trip_length_aggregator.dart';
@@ -81,8 +82,8 @@ void main() {
       );
 
       // Short avg 10.0 → "10.0 L/100"; long avg 6.0 → "6.0 L/100".
-      expect(find.text('10,0 L/100'), findsOneWidget);
-      expect(find.text('6,0 L/100'), findsOneWidget);
+      expect(find.text('10,0 L/100 km'), findsOneWidget);
+      expect(find.text('6,0 L/100 km'), findsOneWidget);
     });
   });
 
@@ -134,7 +135,7 @@ void main() {
         // medium bucket when below the floor — averaging 3 trips is
         // exactly the "swing-on-one-outlier" case the placeholder
         // exists to suppress.
-        expect(find.text('6,0 L/100'), findsNothing);
+        expect(find.text('6,0 L/100 km'), findsNothing);
       },
     );
   });
@@ -224,8 +225,7 @@ Future<void> _pumpCard(
   required TripLengthBreakdown breakdown,
   required double? overallAvgLPer100Km,
 }) async {
-  await tester.pumpWidget(
-    MaterialApp(
+  await tester.pumpWidget(ProviderScope(child: MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: const Locale('en'),
@@ -243,8 +243,7 @@ Future<void> _pumpCard(
           },
         ),
       ),
-    ),
-  );
+    )));
   // Two pumps so the AppLocalizations delegate finishes loading. We
   // avoid pumpAndSettle on Windows widget tests per the project's
   // Hive-fire-and-forget guideline.

@@ -3032,11 +3032,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Recording with GPS — waiting for the OBD2 adapter';
 
   @override
-  String veCalibratedTitle(String vehicleName, String percent) {
-    return 'Consumption calibration updated for $vehicleName — accuracy improved by $percent%';
-  }
-
-  @override
   String get veResetConfirmTitle => 'Reset volumetric efficiency?';
 
   @override
@@ -6875,6 +6870,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tripRecordingPipElapsedCaption => 'elapsed';
+
+  @override
+  String pumpGainCalibratedTitle(String vehicleName, String percent) {
+    return '$vehicleName: consumption estimates re-anchored to the pump ($percent %)';
+  }
 
   @override
   String get qrLaunchConfirmTitle => 'Open scanned link?';
@@ -11421,11 +11421,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Řéçóřđîñǧ ŵîŧĥ ǦƤŠ — ŵáîŧîñǧ ƒóř ŧĥé ÓƁĐ2 áđáƥŧéř ··················⟧';
 
   @override
-  String veCalibratedTitle(String vehicleName, String percent) {
-    return '⟦Çóñšúɱƥŧîóñ çáłîƀřáŧîóñ úƥđáŧéđ ƒóř $vehicleName — áççúřáçý îɱƥřóṽéđ ƀý $percent% ·······················⟧';
-  }
-
-  @override
   String get veResetConfirmTitle =>
       '⟦Řéšéŧ ṽółúɱéŧřîç éƒƒîçîéñçý? ···········⟧';
 
@@ -15365,6 +15360,11 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get tripRecordingPipElapsedCaption => '⟦éłáƥšéđ ···⟧';
+
+  @override
+  String pumpGainCalibratedTitle(String vehicleName, String percent) {
+    return '⟦$vehicleName: çóñšúɱƥŧîóñ éšŧîɱáŧéš řé-áñçĥóřéđ ŧó ŧĥé ƥúɱƥ ($percent %) ··················⟧';
+  }
 
   @override
   String get qrLaunchConfirmTitle => '⟦Óƥéñ šçáññéđ łîñķ? ·······⟧';

@@ -16,7 +16,7 @@ library;
 
 export 'data/reference_vehicle_catalog_provider.dart';
 export 'data/repositories/vehicle_profile_repository.dart';
-export 'data/ve_learner.dart';
+export 'data/ve_convergence.dart';
 export 'data/vehicle_profile_catalog_matcher.dart';
 export 'data/vehicle_profile_migrator.dart';
 export 'domain/calibration_confidence_tier.dart';

@@ -882,7 +882,6 @@
   "obd2PauseBannerTitle": "OBD2 ryšys prarastas — įrašymas pristabdytas",
   "obd2PauseBannerResume": "Tęsti įrašymą",
   "obd2PauseBannerEnd": "Baigti įrašymą",
-  "veCalibratedTitle": "Suvartojimo kalibracija atnaujinta {vehicleName} — tikslumas pagerintas {percent}%",
   "veResetConfirmTitle": "Atstatyti tūrinį efektyvumą?",
   "veResetConfirmBody": "Tai atmes išmoktą tūrinį efektyvumą (η_v) ir atkurs numatytąją reikšmę (0,85). Kelionės lygio kuro srauto įverčiai grįš prie gamintojo konstantos, kol kalibravimo priemonė surinks naujų pavyzdžių iš būsimų kelionių.",
   "alertsRadiusSectionTitle": "Spindulio įspėjimai",
@@ -4929,5 +4928,16 @@
   "featureDescription_startupTrace": "Įrašo laiku matuojamas programos paleidimo fazes, rodo jas kaip krioklį ir eksportuoja — kūrėjo diagnostika.",
   "locationGpsAutoHint": "GPS padėtis gaunama automatiškai ieškant. Čia ją galite atnaujinti ir rankiniu būdu.",
   "locationClearGpsBody": "Išvalyti išsaugotą GPS padėtį? Ją galite bet kada atnaujinti iš naujo.",
-  "widgetDefaultsThisProfileHint": "Toliau pateikti pasirinkimai galioja kiekvienam įdiegtam valdikliui, rodančiam šį profilį, kito atnaujinimo metu."
+  "widgetDefaultsThisProfileHint": "Toliau pateikti pasirinkimai galioja kiekvienam įdiegtam valdikliui, rodančiam šį profilį, kito atnaujinimo metu.",
+  "pumpGainCalibratedTitle": "{vehicleName}: sąnaudų įverčiai iš naujo susieti su kolonėle ({percent} %)",
+  "@pumpGainCalibratedTitle": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  }
 }

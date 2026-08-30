@@ -3046,11 +3046,6 @@ class AppLocalizationsSl extends AppLocalizations {
       'Snemanje z GPS — čakanje na adapter OBD2';
 
   @override
-  String veCalibratedTitle(String vehicleName, String percent) {
-    return 'Umerjanje porabe posodobljeno za $vehicleName — natančnost izboljšana za $percent%';
-  }
-
-  @override
   String get veResetConfirmTitle => 'Ponastaviti volumetrično učinkovitost?';
 
   @override
@@ -6923,6 +6918,11 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get tripRecordingPipElapsedCaption => 'preteklo';
+
+  @override
+  String pumpGainCalibratedTitle(String vehicleName, String percent) {
+    return '$vehicleName: ocene porabe znova usidrane na točilni aparat ($percent %)';
+  }
 
   @override
   String get qrLaunchConfirmTitle => 'Odpreti skenirano povezavo?';

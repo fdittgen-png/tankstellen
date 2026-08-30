@@ -72,7 +72,14 @@ class FuelTab extends ConsumerWidget {
       ConsumptionStatsCard(
         stats: stats,
         volumetricEfficiency: activeVehicle?.volumetricEfficiency,
-        volumetricEfficiencySamples: activeVehicle?.volumetricEfficiencySamples,
+        // #3887 — the pump-anchored gain is the fill-up anchor now; the
+        // legacy η_v sample count still counts for profiles calibrated
+        // before it.
+        volumetricEfficiencySamples: activeVehicle == null
+            ? null
+            : (activeVehicle.pumpGainSamples > 0
+                ? activeVehicle.pumpGainSamples
+                : activeVehicle.volumetricEfficiencySamples),
         // #2698 — tapping the summary card opens the full
         // consumption-statistics detail page (month-over-month
         // comparison + evolution charts).

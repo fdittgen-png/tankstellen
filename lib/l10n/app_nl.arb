@@ -882,7 +882,6 @@
   "obd2PauseBannerTitle": "OBD2-verbinding verbroken — opname gepauzeerd",
   "obd2PauseBannerResume": "Opname hervatten",
   "obd2PauseBannerEnd": "Opname beëindigen",
-  "veCalibratedTitle": "Verbruikskalibratie bijgewerkt voor {vehicleName} — nauwkeurigheid verbeterd met {percent}%",
   "veResetConfirmTitle": "Volumetrisch rendement resetten?",
   "veResetConfirmBody": "Dit verwijdert het geleerde volumetrisch rendement (η_v) en herstelt de standaardwaarde (0.85). Brandstofstroominschattingen per rit vallen terug op de fabrikantconstante totdat de kalibratie nieuwe steekproeven uit aankomende ritten heeft verzameld.",
   "alertsRadiusSectionTitle": "Straalwaarschuwingen",
@@ -4929,5 +4928,16 @@
   "featureDescription_startupTrace": "Legt de getimede fasen van het opstarten van de app vast, toont ze als waterval en exporteert ze — een ontwikkelaarsdiagnose.",
   "locationGpsAutoHint": "De GPS-positie wordt automatisch bepaald bij het zoeken. Je kunt hem hier ook handmatig bijwerken.",
   "locationClearGpsBody": "Opgeslagen GPS-positie wissen? Je kunt hem op elk moment opnieuw bijwerken.",
-  "widgetDefaultsThisProfileHint": "De keuzes hieronder gelden voor elke geïnstalleerde widget die dit profiel toont, bij de volgende vernieuwing."
+  "widgetDefaultsThisProfileHint": "De keuzes hieronder gelden voor elke geïnstalleerde widget die dit profiel toont, bij de volgende vernieuwing.",
+  "pumpGainCalibratedTitle": "{vehicleName}: verbruiksschattingen opnieuw verankerd aan de pomp ({percent} %)",
+  "@pumpGainCalibratedTitle": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  }
 }

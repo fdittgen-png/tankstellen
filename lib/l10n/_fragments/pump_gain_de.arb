@@ -1,0 +1,13 @@
+{
+  "pumpGainCalibratedTitle": "{vehicleName}: Verbrauchsschätzungen an der Zapfsäule neu verankert ({percent} %)",
+  "@pumpGainCalibratedTitle": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  }
+}

@@ -882,7 +882,6 @@
   "obd2PauseBannerTitle": "Conexiune OBD2 pierdută — înregistrare în pauză",
   "obd2PauseBannerResume": "Reluați înregistrarea",
   "obd2PauseBannerEnd": "Terminați înregistrarea",
-  "veCalibratedTitle": "Calibrarea consumului actualizată pentru {vehicleName} — precizie îmbunătățită cu {percent}%",
   "veResetConfirmTitle": "Resetați eficiența volumetrică?",
   "veResetConfirmBody": "Aceasta va elimina eficiența volumetrică (η_v) învățată și va restaura valoarea implicită (0.85). Estimările de debit combustibil la nivel de călătorie vor reveni la constanta producătorului până când calibratorul colectează noi eșantioane din viitoarele călătorii.",
   "alertsRadiusSectionTitle": "Alerte de rază",
@@ -4929,5 +4928,16 @@
   "featureDescription_startupTrace": "Înregistrează fazele cronometrate ale pornirii aplicației, le afișează în cascadă și le exportă — un diagnostic pentru dezvoltatori.",
   "locationGpsAutoHint": "Poziția GPS este obținută automat la căutare. O poți actualiza și manual aici.",
   "locationClearGpsBody": "Ștergi poziția GPS salvată? O poți actualiza din nou oricând.",
-  "widgetDefaultsThisProfileHint": "Alegerile de mai jos se aplică fiecărui widget instalat care afișează acest profil, la următoarea reîmprospătare."
+  "widgetDefaultsThisProfileHint": "Alegerile de mai jos se aplică fiecărui widget instalat care afișează acest profil, la următoarea reîmprospătare.",
+  "pumpGainCalibratedTitle": "{vehicleName}: estimările de consum reancorate la pompă ({percent} %)",
+  "@pumpGainCalibratedTitle": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  }
 }

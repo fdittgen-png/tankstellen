@@ -882,7 +882,6 @@
   "obd2PauseBannerTitle": "OBD2-forbindelse mistet — optagelse sat på pause",
   "obd2PauseBannerResume": "Genoptag optagelse",
   "obd2PauseBannerEnd": "Afslut optagelse",
-  "veCalibratedTitle": "Forbrugskalibrering opdateret for {vehicleName} — nøjagtighed forbedret med {percent}%",
   "veResetConfirmTitle": "Nulstil volumetrisk effektivitet?",
   "veResetConfirmBody": "Dette vil kassere den lærte volumetriske effektivitet (η_v) og gendanne standardværdien (0.85). Turbaserede brændstofstrømsestimater falder tilbage til fabrikantens konstant, indtil kalibroren indsamler nye prøver fra kommende ture.",
   "alertsRadiusSectionTitle": "Radiusadvarsler",
@@ -4929,5 +4928,16 @@
   "featureDescription_startupTrace": "Registrerer de tidsmålte faser i appens opstart, viser dem som et vandfald og eksporterer dem — en udviklerdiagnostik.",
   "locationGpsAutoHint": "GPS-positionen hentes automatisk, når du søger. Du kan også opdatere den manuelt her.",
   "locationClearGpsBody": "Ryd den gemte GPS-position? Du kan opdatere den igen når som helst.",
-  "widgetDefaultsThisProfileHint": "Valgene nedenfor gælder for alle installerede widgets, der viser denne profil, ved næste opdatering."
+  "widgetDefaultsThisProfileHint": "Valgene nedenfor gælder for alle installerede widgets, der viser denne profil, ved næste opdatering.",
+  "pumpGainCalibratedTitle": "{vehicleName}: forbrugsestimater forankret til standeren igen ({percent} %)",
+  "@pumpGainCalibratedTitle": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  }
 }

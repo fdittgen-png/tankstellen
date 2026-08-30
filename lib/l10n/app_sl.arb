@@ -882,7 +882,6 @@
   "obd2PauseBannerTitle": "Izgubljena OBD2 povezava — snemanje v pavzi",
   "obd2PauseBannerResume": "Nadaljuj snemanje",
   "obd2PauseBannerEnd": "Končaj snemanje",
-  "veCalibratedTitle": "Umerjanje porabe posodobljeno za {vehicleName} — natančnost izboljšana za {percent}%",
   "veResetConfirmTitle": "Ponastaviti volumetrično učinkovitost?",
   "veResetConfirmBody": "To bo zavrglo naučeno volumetrično učinkovitost (η_v) in obnovilo privzeto vrednost (0,85). Ocene pretoka goriva na ravni vožnje bodo padle nazaj na konstanto proizvajalca, dokler kalibrater ne zbere novih vzorcev iz prihodnjih voženj.",
   "alertsRadiusSectionTitle": "Polmerna opozorila",
@@ -4929,5 +4928,16 @@
   "featureDescription_startupTrace": "Beleži časovno izmerjene faze zagona aplikacije, jih prikaže kot slap in izvozi – diagnostika za razvijalce.",
   "locationGpsAutoHint": "Položaj GPS se pridobi samodejno ob iskanju. Tukaj ga lahko posodobite tudi ročno.",
   "locationClearGpsBody": "Počistim shranjeni položaj GPS? Kadar koli ga lahko znova posodobite.",
-  "widgetDefaultsThisProfileHint": "Spodnje izbire veljajo za vse nameščene pripomočke, ki prikazujejo ta profil, ob naslednji osvežitvi."
+  "widgetDefaultsThisProfileHint": "Spodnje izbire veljajo za vse nameščene pripomočke, ki prikazujejo ta profil, ob naslednji osvežitvi.",
+  "pumpGainCalibratedTitle": "{vehicleName}: ocene porabe znova usidrane na točilni aparat ({percent} %)",
+  "@pumpGainCalibratedTitle": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  }
 }

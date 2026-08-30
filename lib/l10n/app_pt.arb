@@ -882,7 +882,6 @@
   "obd2PauseBannerTitle": "Ligação OBD2 perdida — gravação pausada",
   "obd2PauseBannerResume": "Retomar gravação",
   "obd2PauseBannerEnd": "Terminar gravação",
-  "veCalibratedTitle": "Calibração de consumo atualizada para {vehicleName} — precisão melhorada em {percent}%",
   "veResetConfirmTitle": "Repor eficiência volumétrica?",
   "veResetConfirmBody": "Isto irá descartar a eficiência volumétrica aprendida (η_v) e restaurar o valor predefinido (0,85). As estimativas de caudal de combustível por viagem voltarão à constante do fabricante até o calibrador recolher novas amostras de próximas viagens.",
   "alertsRadiusSectionTitle": "Alertas de raio",
@@ -4929,5 +4928,16 @@
   "featureDescription_startupTrace": "Regista as fases cronometradas do arranque da app, mostra-as em cascata e exporta-as — um diagnóstico para programadores.",
   "locationGpsAutoHint": "A posição GPS é obtida automaticamente ao pesquisar. Também pode atualizá-la manualmente aqui.",
   "locationClearGpsBody": "Apagar a posição GPS guardada? Pode atualizá-la novamente a qualquer momento.",
-  "widgetDefaultsThisProfileHint": "As escolhas abaixo aplicam-se a todos os widgets instalados que mostrem este perfil, na próxima atualização."
+  "widgetDefaultsThisProfileHint": "As escolhas abaixo aplicam-se a todos os widgets instalados que mostrem este perfil, na próxima atualização.",
+  "pumpGainCalibratedTitle": "{vehicleName}: estimativas de consumo reancoradas na bomba ({percent} %)",
+  "@pumpGainCalibratedTitle": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  }
 }
