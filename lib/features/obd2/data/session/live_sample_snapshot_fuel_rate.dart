@@ -75,6 +75,14 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
     // (STFT/LTFT trims + commanded φ); only a measured wideband φ is
     // trusted. See the accuracy-limit doc in `fuel_mixture_model.dart`.
     final isDiesel = mixture.kind == ResolvedFuelKind.diesel;
+    // #3888 — on an ethanol fuel the enrichment is already in the AFR the
+    // air mass is divided by; the ECU's +25 % trims on E85 are the SAME
+    // correction, so applying both counts it twice.
+    final skipTrim = isDiesel ||
+        mixture.kind == ResolvedFuelKind.e85 ||
+        (_precision.ethanolPercent ?? 0) >= 30;
+    // #3887 — the pump-anchored gain on every ESTIMATED branch.
+    final pumpGain = _vehicle?.pumpGain ?? 1.0;
     final displacement = _vehicle?.manualEngineDisplacementCcOverride
             ?.round() ??
         _vehicle?.engineDisplacementCc ??
@@ -228,7 +236,7 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
       final raw = maf * 3600.0 / (effectiveAfr * density);
       // #3430 — STFT/LTFT are petrol stoich-feedback trims; skipped on
       // diesel (they don't model a lean-burn mixture).
-      final corrected = isDiesel ? raw : _applyTrim(raw);
+      final corrected = (skipTrim ? raw : _applyTrim(raw)) * pumpGain;
       collector?.record(
         branch: Obd2BranchTag.maf,
         fuelRateLPerHour: corrected,
@@ -299,7 +307,7 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
       return null;
     }
     // #3430 — trim correction skipped on diesel (petrol stoich feedback).
-    final corrected = isDiesel ? raw : _applyTrim(raw);
+    final corrected = (skipTrim ? raw : _applyTrim(raw)) * pumpGain;
     collector?.record(
       branch: Obd2BranchTag.speedDensity,
       fuelRateLPerHour: corrected,

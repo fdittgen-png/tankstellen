@@ -155,6 +155,12 @@ class Obd2FuelRateReader {
     // #3430 — diesel gate: skip STFT/LTFT + commanded-φ corrections; only
     // a measured wideband φ adjusts the AFR (see fuel_mixture_model.dart).
     final isDiesel = afrDensity.kind == mixture_model.ResolvedFuelKind.diesel;
+    // #3888 — no trim stacking on ethanol fuels (see the live chain).
+    final skipTrim = isDiesel ||
+        afrDensity.kind == mixture_model.ResolvedFuelKind.e85 ||
+        (ethanolPercent ?? 0) >= 30;
+    // #3887 — the pump-anchored gain on every ESTIMATED branch.
+    final pumpGain = vehicle?.pumpGain ?? 1.0;
     // #1395 / #2191 — the diagnostic side-channel (breadcrumb trace +
     // the suspicious-low / 5E-vs-MAF sanity bounds) lives in this
     // collaborator so the fallback chain below reads clean: compute
@@ -258,7 +264,7 @@ class Obd2FuelRateReader {
         // #3430 — STFT/LTFT are petrol stoich-feedback trims: skipped on
         // diesel.
         final corrected =
-            isDiesel ? rate : await _applyFuelTrimCorrection(rate);
+            (skipTrim ? rate : await _applyFuelTrimCorrection(rate)) * pumpGain;
         diagnostics.recordMaf(corrected: corrected, maf: maf);
         return corrected;
       }
@@ -324,7 +330,7 @@ class Obd2FuelRateReader {
       return null;
     }
     // #3430 — trim correction skipped on diesel (petrol stoich feedback).
-    final corrected = isDiesel ? rate : await _applyFuelTrimCorrection(rate);
+    final corrected = (skipTrim ? rate : await _applyFuelTrimCorrection(rate)) * pumpGain;
     diagnostics.recordSpeedDensity(
       corrected: corrected,
       mapKpa: mapKpa,
