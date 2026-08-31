@@ -31,7 +31,7 @@ dependencies:
   hive_flutter: ^1.1.0
 
   # Maps & Location
-  flutter_map: ^8.3.1
+  flutter_map: ^8.3.2
   flutter_map_marker_cluster: ^8.2.2
   # Pinned to 0.x — latlong2 0.10.x is a breaking API bump used
   # pervasively by the map + routing layer. Bump under its own
@@ -116,7 +116,7 @@ dependencies:
   permission_handler: ^12.0.3
   flutter_secure_storage: ^11.0.0
   package_info_plus: ^10.2.1
-  sentry_flutter: ^9.27.0
+  sentry_flutter: ^9.28.0
   home_widget: ^0.9.3
   workmanager: ^0.10.9
   shimmer: ^4.0.0
