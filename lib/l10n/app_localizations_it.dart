@@ -6512,7 +6512,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get open24Hours => 'Aperto 24 ore';
 
   @override
-  String get openingHoursAutomate24h => 'Self-service pump 24/7 (card payment)';
+  String get openingHoursAutomate24h =>
+      'Distributore self-service 24 ore su 24 (pagamento con carta)';
 
   @override
   String get dayMon => 'Lunedì';
@@ -7917,75 +7918,77 @@ class AppLocalizationsIt extends AppLocalizations {
       'Il tuo paese è supportato ma non è ancora configurato, quindi i prezzi potrebbero essere di un altro paese. Scegli il tuo paese nelle impostazioni di ricerca per vedere i prezzi locali.';
 
   @override
-  String get stalePriceBadge => 'Old price';
+  String get stalePriceBadge => 'Prezzo datato';
 
   @override
-  String get radiusAlertCenterChipGps => 'My position';
+  String get radiusAlertCenterChipGps => 'La mia posizione';
 
   @override
-  String get radiusAlertCenterChipMap => 'Map point';
+  String get radiusAlertCenterChipMap => 'Punto sulla mappa';
 
   @override
   String radiusAlertCenterChipPostal(String postalCode) {
-    return 'Postal code $postalCode';
+    return 'CAP $postalCode';
   }
 
   @override
-  String get radiusAlertCenterClear => 'Clear location';
+  String get radiusAlertCenterClear => 'Rimuovi posizione';
 
   @override
-  String get radiusAlertBlockerLabel => 'Enter a label';
+  String get radiusAlertBlockerLabel => 'Inserisci un\'etichetta';
 
   @override
-  String get radiusAlertBlockerThreshold => 'Enter a threshold above 0';
+  String get radiusAlertBlockerThreshold =>
+      'Inserisci una soglia maggiore di 0';
 
   @override
-  String get radiusAlertBlockerLocation => 'Choose a location';
+  String get radiusAlertBlockerLocation => 'Scegli una posizione';
 
   @override
-  String get fillInventoryTitle => 'Fill-up summary';
+  String get fillInventoryTitle => 'Bilancio del pieno';
 
   @override
   String fillInventorySubtitleFull(String date, String fuel) {
-    return 'Full tank on $date · $fuel';
+    return 'Pieno del $date · $fuel';
   }
 
   @override
   String fillInventorySubtitlePartial(String date, String fuel) {
-    return 'Partial fill on $date · $fuel';
+    return 'Rifornimento parziale del $date · $fuel';
   }
 
   @override
   String fillInventoryKmSinceLastFull(String km) {
-    return '$km km since the last full tank';
+    return '$km km dall\'ultimo pieno';
   }
 
   @override
   String fillInventoryPumpLiters(String liters) {
-    return '$liters L pumped';
+    return '$liters L erogati';
   }
 
   @override
   String fillInventoryPumpConsumption(String value) {
-    return 'Pump consumption: $value';
+    return 'Consumo alla pompa: $value';
   }
 
   @override
   String fillInventoryRecordedTrips(int coverage, String value) {
-    return 'Recorded trips: $coverage % of the tank · $value raw';
+    return 'Percorsi registrati: $coverage % del pieno · $value grezzo';
   }
 
   @override
-  String get fillInventoryNoRecordedTrips => 'No recorded trip in this tank';
+  String get fillInventoryNoRecordedTrips =>
+      'Nessun percorso registrato in questo pieno';
 
   @override
   String fillInventoryTankNow(String liters, String km) {
-    return 'Tank now: $liters L · ≈ $km km at pump consumption';
+    return 'Serbatoio ora: $liters L · ≈ $km km al consumo della pompa';
   }
 
   @override
   String fillInventoryTankNowNoRange(String liters) {
-    return 'Tank now: $liters L';
+    return 'Serbatoio ora: $liters L';
   }
 
   @override
@@ -7994,151 +7997,155 @@ class AppLocalizationsIt extends AppLocalizations {
     String after,
     String percent,
   ) {
-    return 'Pump calibration: ×$before → ×$after ($percent %)';
+    return 'Calibrazione pompa: ×$before → ×$after ($percent %)';
   }
 
   @override
   String fillInventoryCalibrationSkipped(String reason) {
-    return 'Pump calibration: skipped — $reason';
+    return 'Calibrazione pompa: saltata — $reason';
   }
 
   @override
   String get fillInventorySkipNotFullTank =>
-      'partial fill (the tank window stays open)';
+      'rifornimento parziale (la finestra del pieno resta aperta)';
 
   @override
   String get fillInventorySkipCorrection =>
-      'correction entry, not a pumped fill';
+      'voce di correzione, non un rifornimento erogato';
 
   @override
-  String get fillInventorySkipNoVehicle => 'no vehicle on this fill';
+  String get fillInventorySkipNoVehicle =>
+      'nessun veicolo su questo rifornimento';
 
   @override
   String get fillInventorySkipNoWindow =>
-      'first full tank (no window closed yet)';
+      'primo pieno (nessuna finestra ancora chiusa)';
 
   @override
   String fillInventorySkipCoverageTooLow(int coverage) {
-    return 'recorded trips cover $coverage % of the tank (60 % needed)';
+    return 'i percorsi registrati coprono il $coverage % del pieno (necessario il 60 %)';
   }
 
   @override
   String fillInventorySkipRecordedTooShort(String km) {
-    return 'only $km recorded km (40 km needed)';
+    return 'solo $km km registrati (necessari 40 km)';
   }
 
   @override
   String get fillInventorySkipNoRecordedFuel =>
-      'the recorded trips carry no fuel figure';
+      'i percorsi registrati non contengono dati sul carburante';
 
   @override
   String get fillInventorySkipImplausible =>
-      'pump and recordings disagree too much — check the receipt';
+      'pompa e registrazioni divergono troppo — controlla lo scontrino';
 
   @override
-  String get fillInventoryDismiss => 'Got it';
+  String get fillInventoryDismiss => 'Capito';
 
   @override
   String tankReportResidualAfterCalibration(String percent) {
-    return 'Gap after calibration: $percent %';
+    return 'Scarto dopo la calibrazione: $percent %';
   }
 
   @override
-  String get tripFuelSourceMeasured => 'Measured';
+  String get tripFuelSourceMeasured => 'Misurato';
 
   @override
-  String get tripFuelSourceEstimatedCalibrated => 'Estimated · calibrated';
+  String get tripFuelSourceEstimatedCalibrated => 'Stimato · calibrato';
 
   @override
-  String get tripFuelSourceEstimated => 'Estimated';
+  String get tripFuelSourceEstimated => 'Stimato';
 
   @override
   String get tripFuelSourceGps => 'GPS';
 
   @override
   String get tripFuelSourceMeasuredTooltip =>
-      'Fuel rate reported by the engine (PID 5E / 9D / A2) — never rescaled';
+      'Flusso carburante riportato dal motore (PID 5E / 9D / A2) — mai riscalato';
 
   @override
   String get tripFuelSourceEstimatedTooltip =>
-      'Fuel estimated from air mass — rescaled by the pump calibration';
+      'Carburante stimato dalla massa d\'aria — riscalato con la calibrazione pompa';
 
   @override
   String get tripFuelSourceGpsTooltip =>
-      'GPS-physics estimate — no engine data';
+      'Stima fisica da GPS — nessun dato del motore';
 
   @override
-  String get tripFuelSourceRecalculated => 'recalculated';
+  String get tripFuelSourceRecalculated => 'ricalcolato';
 
   @override
   String tripDetailGainApplied(String percent) {
-    return 'Pump gain applied: $percent %';
+    return 'Fattore pompa applicato: $percent %';
   }
 
   @override
   String tripDetailRecalculatedAfterFill(String date) {
-    return 'Recalculated after the fill-up of $date';
+    return 'Ricalcolato dopo il rifornimento del $date';
   }
 
   @override
   String get fillUpOdometerFromLastFillUp =>
-      'Pre-filled from your last fill-up';
+      'Precompilato dal tuo ultimo rifornimento';
 
   @override
-  String get fillUpStationLabel => 'Station';
+  String get fillUpStationLabel => 'Stazione';
 
   @override
-  String get fillUpStationChange => 'Change';
+  String get fillUpStationChange => 'Cambia';
 
   @override
-  String get pickStationSectionLast => 'Last station';
+  String get pickStationSectionLast => 'Ultima stazione';
 
   @override
-  String get pickStationSectionFavorites => 'Favorites';
+  String get pickStationSectionFavorites => 'Preferiti';
 
   @override
-  String get pickStationSectionNearby => 'Nearby';
+  String get pickStationSectionNearby => 'Nelle vicinanze';
 
   @override
   String get pickStationNearbyEmpty =>
-      'No recent search — search for stations on the Search tab and the nearest ones will appear here.';
+      'Nessuna ricerca recente — cerca le stazioni nella scheda Ricerca e le più vicine compariranno qui.';
 
   @override
   String pickStationLastFillUpAt(String date) {
-    return 'Last fill-up: $date';
+    return 'Ultimo rifornimento: $date';
   }
 
   @override
   String get privacyTopicSubtitle =>
-      'Your choices, data on this device, sync, export or delete';
+      'Le tue scelte, dati su questo dispositivo, sincronizzazione, esportazione o eliminazione';
 
   @override
-  String get privacyDataLocationLocal => 'Your data stays on this device';
+  String get privacyDataLocationLocal =>
+      'I tuoi dati restano su questo dispositivo';
 
   @override
   String get privacyDataLocationSynced =>
-      'Your data is also synced to TankSync';
+      'I tuoi dati sono sincronizzati anche su TankSync';
 
   @override
-  String get privacySyncLineEnabledAnonymous => 'Sync: on · anonymous account';
+  String get privacySyncLineEnabledAnonymous =>
+      'Sincronizzazione: attiva · account anonimo';
 
   @override
-  String get privacySyncLineEnabledEmail => 'Sync: on · email account';
+  String get privacySyncLineEnabledEmail =>
+      'Sincronizzazione: attiva · account email';
 
   @override
-  String get privacySyncLineDisabled => 'Sync: off';
+  String get privacySyncLineDisabled => 'Sincronizzazione: disattivata';
 
   @override
   String privacyStorageLine(String size) {
-    return '$size stored on this device';
+    return '$size archiviati su questo dispositivo';
   }
 
   @override
-  String get privacyTopicChoicesTitle => 'Your choices';
+  String get privacyTopicChoicesTitle => 'Le tue scelte';
 
   @override
   String privacyChoicesStatus(int on, int total) {
-    return '$on of $total enabled';
+    return '$on su $total attive';
   }
 
   @override
@@ -8146,41 +8153,41 @@ class AppLocalizationsIt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count categories',
-      one: '1 category',
+      other: '$count categorie',
+      one: '1 categoria',
     );
     return '$size · $_temp0';
   }
 
   @override
-  String get privacyTopicExportDeleteTitle => 'Export or delete';
+  String get privacyTopicExportDeleteTitle => 'Esporta o elimina';
 
   @override
   String privacyExportDeleteStatus(int count) {
-    return 'ZIP, JSON, CSV · error log ($count)';
+    return 'ZIP, JSON, CSV · registro errori ($count)';
   }
 
   @override
-  String get privacyLearnMore => 'Learn more';
+  String get privacyLearnMore => 'Scopri di più';
 
   @override
   String get tileProxyToggleShort =>
-      'Tiles come via the developer\'s EU proxy, not straight from OpenStreetMap';
+      'Le tessere passano dal proxy UE dello sviluppatore, non direttamente da OpenStreetMap';
 
   @override
   String get remoteLogosToggleShort =>
-      'Fetch brand logos from logo.clearbit.com instead of bundled placeholders';
+      'Scarica i loghi dei marchi da logo.clearbit.com invece dei segnaposto inclusi';
 
   @override
-  String get privacyCacheDetails => 'Cache details';
+  String get privacyCacheDetails => 'Dettagli cache';
 
   @override
   String privacyCacheResponses(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count cached responses',
-      one: '1 cached response',
+      other: '$count risposte in cache',
+      one: '1 risposta in cache',
     );
     return '$_temp0';
   }
@@ -8190,172 +8197,175 @@ class AppLocalizationsIt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count entries',
-      one: '1 entry',
+      other: '$count voci',
+      one: '1 voce',
     );
-    return 'Clear cache ($_temp0)';
+    return 'Svuota cache ($_temp0)';
   }
 
   @override
-  String get privacySyncStatusLabel => 'Status';
+  String get privacySyncStatusLabel => 'Stato';
 
   @override
   String get privacySyncModeCommunity =>
-      'Sparkilo Community — the developer\'s EU server';
+      'Sparkilo Community — il server UE dello sviluppatore';
 
   @override
-  String get privacySyncModeSelfHosted => 'Self-hosted — your own Supabase';
+  String get privacySyncModeSelfHosted => 'Self-hosted — il tuo Supabase';
 
   @override
   String get privacySyncModeSharedGroup =>
-      'Shared group — a database you joined';
+      'Gruppo condiviso — un database a cui ti sei unito';
 
   @override
   String get privacySyncAccountLabel => 'Account';
 
   @override
   String get privacySyncAccountAnonymous =>
-      'Anonymous account, tied to this device';
+      'Account anonimo, legato a questo dispositivo';
 
   @override
   String privacySyncAccountEmail(String email) {
-    return 'Email account: $email';
+    return 'Account email: $email';
   }
 
   @override
-  String get privacyCopyUserId => 'Copy user ID';
+  String get privacyCopyUserId => 'Copia ID utente';
 
   @override
-  String get privacyUserIdCopied => 'User ID copied';
+  String get privacyUserIdCopied => 'ID utente copiato';
 
   @override
-  String get privacySyncDatabaseHost => 'Database host';
+  String get privacySyncDatabaseHost => 'Host del database';
 
   @override
-  String get privacyExportSectionTitle => 'Export';
+  String get privacyExportSectionTitle => 'Esportazione';
 
   @override
-  String get privacyExportMyData => 'Export my data';
+  String get privacyExportMyData => 'Esporta i miei dati';
 
   @override
-  String get privacyExportSheetTitle => 'Choose a format';
+  String get privacyExportSheetTitle => 'Scegli un formato';
 
   @override
-  String get privacyExportZipTitle => 'ZIP archive';
+  String get privacyExportZipTitle => 'Archivio ZIP';
 
   @override
   String get privacyExportZipSubtitle =>
-      'Everything, attachments included — for a complete backup';
+      'Tutto, allegati inclusi — per un backup completo';
 
   @override
   String get privacyExportJsonTitle => 'JSON';
 
   @override
-  String get privacyExportJsonSubtitle => 'Machine-readable — for another app';
+  String get privacyExportJsonSubtitle =>
+      'Leggibile dalle macchine — per un\'altra app';
 
   @override
   String get privacyExportCsvTitle => 'CSV';
 
   @override
-  String get privacyExportCsvSubtitle => 'Spreadsheet — one table per category';
+  String get privacyExportCsvSubtitle =>
+      'Foglio di calcolo — una tabella per categoria';
 
   @override
-  String get privacyErrorLogTitle => 'Error log';
+  String get privacyErrorLogTitle => 'Registro errori';
 
   @override
   String privacyErrorLogCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count entries',
-      one: '1 entry',
-      zero: 'No entries',
+      other: '$count voci',
+      one: '1 voce',
+      zero: 'Nessuna voce',
     );
     return '$_temp0';
   }
 
   @override
-  String get privacyErrorLogSave => 'Save';
+  String get privacyErrorLogSave => 'Salva';
 
   @override
-  String get privacyErrorLogClear => 'Clear';
+  String get privacyErrorLogClear => 'Cancella';
 
   @override
-  String get privacyDangerZoneTitle => 'Danger zone';
+  String get privacyDangerZoneTitle => 'Zona pericolosa';
 
   @override
   String get privacyDangerZoneBody =>
-      'Permanently deletes everything the app stores on this device. With sync on, your data on the TankSync server is erased too.';
+      'Elimina definitivamente tutto ciò che l\'app archivia su questo dispositivo. Con la sincronizzazione attiva, vengono cancellati anche i tuoi dati sul server TankSync.';
 
   @override
-  String get privacyDeleteAllMyData => 'Delete all my data';
+  String get privacyDeleteAllMyData => 'Elimina tutti i miei dati';
 
   @override
-  String get tripRecordingScreenTitle => 'Trip in progress';
+  String get tripRecordingScreenTitle => 'Percorso in corso';
 
   @override
-  String get recordingObd2ChipLive => 'Live';
+  String get recordingObd2ChipLive => 'In diretta';
 
   @override
   String recordingObd2ChipLiveRate(int rate) {
-    return 'Live · $rate PID/s';
+    return 'In diretta · $rate PID/s';
   }
 
   @override
-  String get recordingObd2ChipReconnecting => 'Reconnecting…';
+  String get recordingObd2ChipReconnecting => 'Riconnessione…';
 
   @override
   String recordingObd2ChipReconnectingAttempt(int attempt) {
-    return 'Reconnecting… (try $attempt)';
+    return 'Riconnessione… (tentativo $attempt)';
   }
 
   @override
-  String get recordingObd2ChipGpsOnly => 'GPS only';
+  String get recordingObd2ChipGpsOnly => 'Solo GPS';
 
   @override
-  String get recordingObd2ChipEngineOff => 'Engine off — waiting';
+  String get recordingObd2ChipEngineOff => 'Motore spento — in attesa';
 
   @override
-  String get recordingObd2ChipNoAdapter => 'No adapter';
+  String get recordingObd2ChipNoAdapter => 'Nessun adattatore';
 
   @override
-  String get recordingObd2SheetTitle => 'OBD2 link';
+  String get recordingObd2SheetTitle => 'Collegamento OBD2';
 
   @override
   String get recordingObd2SheetLive =>
-      'The adapter is delivering engine data, so consumption is measured from the car. Nothing to do — keep driving.';
+      'L\'adattatore sta fornendo i dati del motore, quindi il consumo è misurato dall\'auto. Niente da fare — continua a guidare.';
 
   @override
   String get recordingObd2SheetReconnecting =>
-      'The Bluetooth link is being re-established; meanwhile the recording continues on GPS. No action needed — a reset only helps if it stays like this for minutes.';
+      'Il collegamento Bluetooth viene ripristinato; nel frattempo la registrazione continua con il GPS. Nessuna azione necessaria — un riavvio aiuta solo se resta così per minuti.';
 
   @override
   String get recordingObd2SheetGpsOnly =>
-      'The adapter has not answered for a while, so the app waits for it to reappear and records on GPS. Consumption is estimated until it is back.';
+      'L\'adattatore non risponde da un po\', quindi l\'app aspetta che ricompaia e registra con il GPS. Il consumo è stimato finché non torna.';
 
   @override
   String get recordingObd2SheetEngineOff =>
-      'The engine is off, so there is nothing to read. The recording continues on GPS and picks the adapter up again as soon as the engine runs.';
+      'Il motore è spento, quindi non c\'è nulla da leggere. La registrazione continua con il GPS e riprende l\'adattatore non appena il motore gira.';
 
   @override
   String get recordingObd2SheetNoAdapter =>
-      'This trip is recorded without an OBD2 adapter. Speed and distance come from GPS; consumption is a physics estimate calibrated by your fill-ups.';
+      'Questo percorso viene registrato senza adattatore OBD2. Velocità e distanza vengono dal GPS; il consumo è una stima fisica calibrata dai tuoi rifornimenti.';
 
   @override
   String recordingGpsChipPrecise(int meters) {
-    return 'Precise fix (±$meters m)';
+    return 'Posizione precisa (±$meters m)';
   }
 
   @override
   String recordingGpsChipApprox(int meters) {
-    return 'Approximate fix (±$meters m)';
+    return 'Posizione approssimativa (±$meters m)';
   }
 
   @override
-  String get recordingGpsChipNoFix => 'No fix';
+  String get recordingGpsChipNoFix => 'Nessuna posizione';
 
   @override
-  String get recordingGpsChipFixUnknownAccuracy => 'Fix (accuracy unknown)';
+  String get recordingGpsChipFixUnknownAccuracy =>
+      'Posizione (precisione sconosciuta)';
 
   @override
   String recordingGpsChipWithCoverage(String fix, int percent) {
@@ -8363,90 +8373,90 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get recordingGpsSheetTitle => 'GPS signal';
+  String get recordingGpsSheetTitle => 'Segnale GPS';
 
   @override
   String get recordingGpsSheetPrecise =>
-      'The position is accurate to a few metres, so distance and the trace are reliable.';
+      'La posizione è precisa a pochi metri, quindi distanza e traccia sono affidabili.';
 
   @override
   String get recordingGpsSheetApprox =>
-      'The position is only accurate to tens of metres — typical in cities, tunnels or under trees. Distance may drift slightly until the fix improves.';
+      'La posizione è precisa solo a decine di metri — tipico in città, nelle gallerie o sotto gli alberi. La distanza può discostarsi leggermente finché la posizione non migliora.';
 
   @override
   String get recordingGpsSheetNoFix =>
-      'No position has arrived recently. Check that location is allowed and the phone can see the sky; the recording resumes with the next fix.';
+      'Nessuna posizione è arrivata di recente. Verifica che la localizzazione sia consentita e che il telefono veda il cielo; la registrazione riprende con la prossima posizione.';
 
   @override
   String recordingGpsSheetCoverage(int percent) {
-    return 'Coverage so far: $percent % of the seconds had a fix.';
+    return 'Copertura finora: il $percent % dei secondi aveva una posizione.';
   }
 
   @override
-  String get recordingSheetClose => 'Got it';
+  String get recordingSheetClose => 'Capito';
 
   @override
-  String get fuelSourceMeasured => 'Measured (ECU fuel flow)';
+  String get fuelSourceMeasured => 'Misurato (flusso carburante ECU)';
 
   @override
   String fuelSourceEstimatedCalibrated(int percent) {
-    return 'Estimated · pump-calibrated ±$percent %';
+    return 'Stimato · calibrato sulla pompa ±$percent %';
   }
 
   @override
-  String get fuelSourceEstimatedUncalibrated => 'Estimated · not calibrated';
+  String get fuelSourceEstimatedUncalibrated => 'Stimato · non calibrato';
 
   @override
-  String get fuelSourceGpsEstimate => 'GPS estimate';
+  String get fuelSourceGpsEstimate => 'Stima GPS';
 
   @override
-  String get recordingTileScore => 'Driving score';
+  String get recordingTileScore => 'Punteggio di guida';
 
   @override
   String stationStatusWithFreshness(String status, String ago) {
-    return '$status · updated $ago ago';
+    return '$status · aggiornato $ago fa';
   }
 
   @override
   String pricesNotSoldHere(String fuels) {
-    return 'Not sold here: $fuels';
+    return 'Non venduti qui: $fuels';
   }
 
   @override
   String tankReportRecordedTripsCoverage(String pct) {
-    return 'Recorded trips cover $pct % of this tank';
+    return 'I percorsi registrati coprono il $pct % di questo pieno';
   }
 
   @override
   String tankReportRecordedTripsAvg(String value) {
-    return 'Recorded trips: $value';
+    return 'Percorsi registrati: $value';
   }
 
   @override
   String tankReportRecordedTripsOverestimate(String pct) {
-    return 'Your recorded trips overestimate consumption by $pct %';
+    return 'I tuoi percorsi registrati sovrastimano il consumo del $pct %';
   }
 
   @override
   String tankReportRecordedTripsUnderestimate(String pct) {
-    return 'Your recorded trips underestimate consumption by $pct %';
+    return 'I tuoi percorsi registrati sottostimano il consumo del $pct %';
   }
 
   @override
-  String get trajetObd2DegradedSubtitle => 'No engine data — GPS estimate';
+  String get trajetObd2DegradedSubtitle => 'Nessun dato del motore — stima GPS';
 
   @override
-  String get vehicleTopicAdapterNone => 'None';
+  String get vehicleTopicAdapterNone => 'Nessuno';
 
   @override
-  String get vehicleTopicCalibrationTitle => 'Calibration';
+  String get vehicleTopicCalibrationTitle => 'Calibrazione';
 
   @override
-  String get vehicleTopicAdvancedBadge => 'Advanced';
+  String get vehicleTopicAdvancedBadge => 'Avanzato';
 
   @override
   String vehicleTopicCalibrationStatus(int coverage, String mode) {
-    return 'Baseline $coverage % · $mode';
+    return 'Riferimento $coverage % · $mode';
   }
 
   @override
@@ -8454,26 +8464,26 @@ class AppLocalizationsIt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count reminders',
-      one: '1 reminder',
-      zero: 'No reminders',
+      other: '$count promemoria',
+      one: '1 promemoria',
+      zero: 'Nessun promemoria',
     );
     return '$_temp0';
   }
 
   @override
-  String get vehicleTopicAutoRecordOn => 'On';
+  String get vehicleTopicAutoRecordOn => 'Attiva';
 
   @override
-  String get vehicleTopicAutoRecordOff => 'Off';
+  String get vehicleTopicAutoRecordOff => 'Disattivata';
 
   @override
   String get vehicleTopicAutoRecordPairLinkText =>
-      'Pair an adapter under “OBD2 adapter” to enable auto-recording';
+      'Abbina un adattatore in “Adattatore OBD2” per abilitare la registrazione automatica';
 
   @override
   String vehicleBaselineCoverageSamples(int covered, int max) {
-    return '$covered / $max samples';
+    return '$covered / $max campioni';
   }
 
   @override
@@ -8481,43 +8491,43 @@ class AppLocalizationsIt extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count samples',
-      one: '1 sample',
+      other: '$count campioni',
+      one: '1 campione',
     );
     return '$_temp0';
   }
 
   @override
   String get calibrationModeRuleDescription =>
-      'Sorts each driving sample into one situation using fixed speed and load thresholds.';
+      'Assegna ogni campione di guida a una sola situazione usando soglie fisse di velocità e carico.';
 
   @override
   String get calibrationModeFuzzyDescription =>
-      'Splits each sample across neighbouring situations by how well it fits each one — smoother estimates around the boundaries.';
+      'Distribuisce ogni campione tra le situazioni vicine in base a quanto vi si adatta — stime più fluide intorno ai confini.';
 
   @override
-  String get pumpGainChipNotCalibrated => 'Not pump-calibrated yet';
+  String get pumpGainChipNotCalibrated => 'Non ancora calibrato sulla pompa';
 
   @override
   String pumpGainChipCalibrated(int fills, int percent) {
     String _temp0 = intl.Intl.pluralLogic(
       fills,
       locale: localeName,
-      other: 'Pump-calibrated · $fills fill-ups · ±$percent %',
-      one: 'Pump-calibrated · 1 fill-up · ±$percent %',
+      other: 'Calibrato sulla pompa · $fills rifornimenti · ±$percent %',
+      one: 'Calibrato sulla pompa · 1 rifornimento · ±$percent %',
     );
     return '$_temp0';
   }
 
   @override
-  String get pumpGainResetAction => 'Reset pump calibration';
+  String get pumpGainResetAction => 'Reimposta calibrazione pompa';
 
   @override
-  String get pumpGainResetConfirmTitle => 'Reset pump calibration?';
+  String get pumpGainResetConfirmTitle => 'Reimpostare la calibrazione pompa?';
 
   @override
   String get pumpGainResetConfirmBody =>
-      'This discards the fuel gain learned from your fill-ups. OBD2 consumption estimates fall back to the uncorrected figure until the next full-to-full tank window re-learns it.';
+      'Questo elimina il fattore carburante appreso dai tuoi rifornimenti. Le stime di consumo OBD2 tornano al valore non corretto finché la prossima finestra da pieno a pieno non lo apprende di nuovo.';
 
   @override
   String get vehicleMultiFuelCapableLabel =>
