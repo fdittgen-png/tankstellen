@@ -96,7 +96,6 @@
   "configTankSyncDisabled": "Onemogućeno",
   "privacyPolicy": "Pravila o privatnosti",
   "fuels": "Goriva",
-  "services": "Usluge",
   "zone": "Zona",
   "highway": "Autocesta",
   "localStation": "Lokalna postaja",
@@ -2737,15 +2736,6 @@
   "routeSearchingChip": "Pretraživanje rute…",
   "@routeSearchingChip": {
     "description": "MT — needs native review"
-  },
-  "routeSegmentSummaryBadge": "Svakih {km} km",
-  "@routeSegmentSummaryBadge": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "km": {
-        "type": "String"
-      }
-    }
   },
   "profileSwitchedTo": "Prebačeno na {profile}",
   "@profileSwitchedTo": {
@@ -5790,6 +5780,426 @@
   },
   "brandMarkEvGeneric": "Charging point",
   "@brandMarkEvGeneric": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "allPricesLegend": "Filled = cheapest of these results. Second figure = what 100 km costs on that fuel with your vehicle.",
+  "@allPricesLegend": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "allPricesLegendPricesOnly": "Filled = cheapest of these results. Add a vehicle and log fill-ups to see the cost per 100 km.",
+  "@allPricesLegendPricesOnly": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "allPricesNoPriceMask": "—",
+  "@allPricesNoPriceMask": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "allPricesBestMarker": "best",
+  "@allPricesBestMarker": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "allPricesDelta": "+{amount}",
+  "@allPricesDelta": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "0,06"
+      }
+    }
+  },
+  "allPricesCostPer100km": "{cost}/100 km",
+  "@allPricesCostPer100km": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "cost": {
+        "type": "String",
+        "example": "5,02 €"
+      }
+    }
+  },
+  "allPricesVerdictHere": "Cheapest here: {fuel} at {cost}",
+  "@allPricesVerdictHere": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E85"
+      },
+      "cost": {
+        "type": "String",
+        "example": "5,02 €/100 km"
+      }
+    }
+  },
+  "allPricesVerdictWinsResults": "cheapest of the results",
+  "@allPricesVerdictWinsResults": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "allPricesMoreFuels": "+{count}",
+  "@allPricesMoreFuels": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "allPricesMoreFuelsTooltip": "{count, plural, =1{Show 1 more fuel} other{Show {count} more fuels}}",
+  "@allPricesMoreFuelsTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "allPricesFewerFuelsTooltip": "Hide the extra fuels",
+  "@allPricesFewerFuelsTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "allPricesCellPriceSemantics": "{fuel} {price}",
+  "@allPricesCellPriceSemantics": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E10"
+      },
+      "price": {
+        "type": "String",
+        "example": "1,839"
+      }
+    }
+  },
+  "allPricesCellCostSemantics": "{fuel} {price}, {cost} per 100 km at {consumption}",
+  "@allPricesCellCostSemantics": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E85"
+      },
+      "price": {
+        "type": "String",
+        "example": "0,839"
+      },
+      "cost": {
+        "type": "String",
+        "example": "5,02 €"
+      },
+      "consumption": {
+        "type": "String",
+        "example": "6,0 L/100 km"
+      }
+    }
+  },
+  "allPricesCellNoPriceSemantics": "{fuel}, no price",
+  "@allPricesCellNoPriceSemantics": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E85"
+      }
+    }
+  },
+  "allPricesCellUnavailableSemantics": "{fuel}, out of stock",
+  "@allPricesCellUnavailableSemantics": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "Diesel"
+      }
+    }
+  },
+  "allPricesCellUnusableSemantics": "{fuel}, not usable by your vehicle",
+  "@allPricesCellUnusableSemantics": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "Diesel"
+      }
+    }
+  },
+  "criteriaModeNearby": "Nearby",
+  "@criteriaModeNearby": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "criteriaModeRoute": "Route",
+  "@criteriaModeRoute": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "criteriaSubmit": "Search",
+  "@criteriaSubmit": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "criteriaReset": "Reset",
+  "@criteriaReset": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "criteriaResetDone": "Criteria reset to your defaults",
+  "@criteriaResetDone": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "criteriaSubmitDisabledRoute": "Enter a start and a destination",
+  "@criteriaSubmitDisabledRoute": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "criteriaSubmitDisabledSearching": "Search in progress…",
+  "@criteriaSubmitDisabledSearching": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "criteriaShowMore": "Show more ({count})",
+  "@criteriaShowMore": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "criteriaShowLess": "Show less",
+  "@criteriaShowLess": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "criteriaBrands": "Brands",
+  "@criteriaBrands": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "criteriaRouteOptions": "Route options",
+  "@criteriaRouteOptions": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "criteriaRouteOptionsSummary": "Every {segmentKm} km · {detourKm} km detour · {saving}",
+  "@criteriaRouteOptionsSummary": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "segmentKm": {
+        "type": "int"
+      },
+      "detourKm": {
+        "type": "int"
+      },
+      "saving": {
+        "type": "String"
+      }
+    }
+  },
+  "criteriaSwapEndpoints": "Swap start and destination",
+  "@criteriaSwapEndpoints": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "searchSummaryAlongRoute": "Along the route · every {km} km",
+  "@searchSummaryAlongRoute": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "50"
+      }
+    }
+  },
+  "searchSummaryPricesJustNow": "Prices from just now",
+  "@searchSummaryPricesJustNow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "searchSummaryPricesMinutes": "Prices from {minutes} min ago",
+  "@searchSummaryPricesMinutes": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+  "searchSummaryPricesHours": "Prices from {hours} h ago",
+  "@searchSummaryPricesHours": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "hours": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "searchSummaryPricesDays": "Prices from {days} d ago",
+  "@searchSummaryPricesDays": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "searchResultsFilterTooltip": "Filters",
+  "@searchResultsFilterTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "searchResultsFilterActiveSemantic": "Filters, {count} active",
+  "@searchResultsFilterActiveSemantic": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "searchResultsMoreActionsTooltip": "More actions",
+  "@searchResultsMoreActionsTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "searchPriceArrowLegend": "↓ and ↑ compare each price with the other stations in this list.",
+  "@searchPriceArrowLegend": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "searchPriceArrowCheapTooltip": "Among the lowest prices in this list",
+  "@searchPriceArrowCheapTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "searchPriceArrowAverageTooltip": "A mid-range price in this list",
+  "@searchPriceArrowAverageTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "searchPriceArrowExpensiveTooltip": "Among the highest prices in this list",
+  "@searchPriceArrowExpensiveTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "searchRefreshTooltip": "Update position and refresh prices",
+  "@searchRefreshTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "priceHistoryFirstSeen": "First seen on {date} — the history builds up with every visit",
+  "@priceHistoryFirstSeen": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "Aug 21, 2026"
+      }
+    }
+  },
+  "priceHistoryCurrentPriceLine": "Current price: {price}",
+  "@priceHistoryCurrentPriceLine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "2.329 €"
+      }
+    }
+  },
+  "priceHistoryDeltaSince": "{delta} since {date}",
+  "@priceHistoryDeltaSince": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "delta": {
+        "type": "String",
+        "example": "+0.03 €"
+      },
+      "date": {
+        "type": "String",
+        "example": "Aug 21, 2026"
+      }
+    }
+  },
+  "priceHistoryUnchangedSince": "Unchanged since {date}",
+  "@priceHistoryUnchangedSince": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "Aug 21, 2026"
+      }
+    }
+  },
+  "priceStatsMin": "Min",
+  "@priceStatsMin": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "priceStatsMax": "Max",
+  "@priceStatsMax": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "priceStatsAvg": "Avg",
+  "@priceStatsAvg": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "amenitiesAndServices": "Amenities & services",
+  "@amenitiesAndServices": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "amenitiesServicesShowMore": "Show more ({count})",
+  "@amenitiesServicesShowMore": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "4"
+      }
+    }
+  },
+  "amenitiesServicesShowLess": "Show less",
+  "@amenitiesServicesShowLess": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

@@ -77,8 +77,11 @@ void main() {
       expect(find.text('Opening hours'), findsOneWidget);
     });
 
-    testWidgets('services section appears after location info',
-        (tester) async {
+    // #3928 — "Amenities" chips and the collapsed "Services (N)"
+    // ExpansionTile were two renderings of the same API list; they are
+    // ONE deduplicated "Amenities & services" section now.
+    testWidgets('merged Amenities & services section appears after '
+        'location info (#3928)', (tester) async {
       final stationWithServices = baseStation.copyWith(
         services: ['Car Wash', 'Shop', 'ATM'],
         department: 'Berlin',
@@ -94,51 +97,19 @@ void main() {
         ),
       );
 
-      // Both zone and services should be present. After #483 the
-      // services header includes the count in parentheses.
       expect(find.text('Zone'), findsOneWidget);
-      expect(find.text('Services (3)'), findsOneWidget);
+      expect(find.text('Amenities & services'), findsOneWidget);
+      // The old separate headings are gone.
+      expect(find.text('Amenities'), findsNothing);
+      expect(find.textContaining('Services ('), findsNothing);
 
-      // Services section should appear BELOW zone section
       final zonePos = tester.getTopLeft(find.text('Zone'));
-      final servicesPos = tester.getTopLeft(find.text('Services (3)'));
-      expect(servicesPos.dy, greaterThan(zonePos.dy));
+      final mergedPos = tester.getTopLeft(find.text('Amenities & services'));
+      expect(mergedPos.dy, greaterThan(zonePos.dy));
     });
 
-    // #483 — services section must be a collapsed-by-default
-    // ExpansionTile so highway stations with 10+ services don't
-    // blow out the detail screen's vertical layout.
-    testWidgets(
-        'services section is collapsed by default — service chips are '
-        'NOT visible until the user taps the header (#483)',
-        (tester) async {
-      final stationWithServices = baseStation.copyWith(
-        services: ['Toilettes', 'Boutique', 'Lavage', 'Air', 'WC',
-            'DAB', 'Resto', 'WiFi', 'Piste poids lourds', 'Recharge'],
-        department: 'Berlin',
-        region: 'Berlin',
-      );
-      final detail = StationDetail(station: stationWithServices);
-
-      await pumpApp(
-        tester,
-        SingleChildScrollView(
-          child: StationInfoSection(
-              station: stationWithServices, detail: detail),
-        ),
-      );
-
-      // Header with count is visible...
-      expect(find.text('Services (10)'), findsOneWidget);
-      // ...but individual service chips are NOT yet materialised.
-      expect(find.text('Toilettes'), findsNothing);
-      expect(find.text('Resto'), findsNothing);
-      expect(find.byType(Chip), findsNothing);
-    });
-
-    testWidgets(
-        'tapping the services header expands the section and shows '
-        'every service chip (#483)',
+    testWidgets('the merged section is NOT collapsed — up to eight chips '
+        'render immediately (#3928 replaces the #483 ExpansionTile)',
         (tester) async {
       final stationWithServices = baseStation.copyWith(
         services: ['Car Wash', 'Shop', 'ATM'],
@@ -155,30 +126,52 @@ void main() {
         ),
       );
 
-      // Header visible, chips hidden.
-      expect(find.text('Services (3)'), findsOneWidget);
-      expect(find.byType(Chip), findsNothing);
-
-      // Tap the header to expand.
-      await tester.tap(find.text('Services (3)'));
-      await tester.pumpAndSettle();
-
-      // Now all three chips are visible.
       expect(find.byType(Chip), findsNWidgets(3));
       expect(find.text('Car Wash'), findsOneWidget);
       expect(find.text('Shop'), findsOneWidget);
       expect(find.text('ATM'), findsOneWidget);
-
-      // Tap again to collapse.
-      await tester.tap(find.text('Services (3)'));
-      await tester.pumpAndSettle();
-      expect(find.byType(Chip), findsNothing);
+      // No fold button: three chips are below the eight-chip threshold.
+      expect(
+        find.byKey(const ValueKey('station-detail-amenities-services-fold')),
+        findsNothing,
+      );
     });
 
-    testWidgets(
-        'services expansion tile is NOT rendered when the services list '
-        'is empty (#483 keeps the existing empty-behaviour)',
-        (tester) async {
+    testWidgets('a long list folds after eight chips behind '
+        '"Show more (n)" (#3928)', (tester) async {
+      final stationWithServices = baseStation.copyWith(
+        services: const [
+          'Piste poids lourds', 'Automate CB', 'Location de vehicules',
+          'Vente de gaz domestique', 'Bar', 'Vente de fioul', 'Relais colis',
+          'Laverie', 'Douches', 'Aire de jeux',
+        ],
+        department: 'Berlin',
+        region: 'Berlin',
+      );
+      final detail = StationDetail(station: stationWithServices);
+
+      await pumpApp(
+        tester,
+        SingleChildScrollView(
+          child: StationInfoSection(
+              station: stationWithServices, detail: detail),
+        ),
+      );
+
+      expect(find.byType(Chip), findsNWidgets(8));
+      expect(find.text('Show more (2)'), findsOneWidget);
+      expect(find.text('Douches'), findsNothing);
+
+      await tester.tap(find.text('Show more (2)'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(Chip), findsNWidgets(10));
+      expect(find.text('Douches'), findsOneWidget);
+      expect(find.text('Show less'), findsOneWidget);
+    });
+
+    testWidgets('the merged section is NOT rendered when the station has '
+        'neither amenities nor services (#3928)', (tester) async {
       final stationNoServices = baseStation.copyWith(
         services: const [],
         department: 'Berlin',
@@ -194,37 +187,47 @@ void main() {
         ),
       );
 
-      // No services header, no ExpansionTile at all for this section.
-      expect(find.textContaining('Services ('), findsNothing);
-      expect(
-        find.byKey(const ValueKey('station-detail-services-expansion')),
-        findsNothing,
-      );
+      expect(find.text('Amenities & services'), findsNothing);
+      expect(find.byType(Chip), findsNothing);
     });
 
-    testWidgets('amenities section appears after location info',
-        (tester) async {
-      final stationWithAmenities = baseStation.copyWith(
-        amenities: {StationAmenity.shop, StationAmenity.toilet},
+    testWidgets('a raw service string that repeats a typed amenity is '
+        'deduplicated away (#3928)', (tester) async {
+      // `Station de lavage` / `Gonflage` / `Distributeur` are the FR
+      // wordings behind the carWash / airPump / atm chips above them.
+      final station = baseStation.copyWith(
+        amenities: {
+          StationAmenity.carWash,
+          StationAmenity.airPump,
+          StationAmenity.atm,
+        },
+        services: const [
+          'Station de lavage',
+          'Gonflage',
+          'Distributeur',
+          'Piste poids lourds',
+        ],
         department: 'Berlin',
         region: 'Berlin',
       );
-      final detail = StationDetail(station: stationWithAmenities);
+      final detail = StationDetail(station: station);
 
       await pumpApp(
         tester,
         SingleChildScrollView(
-          child: StationInfoSection(
-              station: stationWithAmenities, detail: detail),
+          child: StationInfoSection(station: station, detail: detail),
         ),
       );
 
-      expect(find.text('Amenities'), findsOneWidget);
-
-      // Amenities should appear after zone
-      final zonePos = tester.getTopLeft(find.text('Zone'));
-      final amenitiesPos = tester.getTopLeft(find.text('Amenities'));
-      expect(amenitiesPos.dy, greaterThan(zonePos.dy));
+      // Three typed amenity pills + exactly ONE surviving service chip.
+      expect(find.text('Station de lavage'), findsNothing);
+      expect(find.text('Gonflage'), findsNothing);
+      expect(find.text('Distributeur'), findsNothing);
+      expect(find.byType(Chip), findsNWidgets(1));
+      expect(find.text('Piste poids lourds'), findsOneWidget);
+      expect(find.text('Car Wash'), findsOneWidget);
+      expect(find.text('Air'), findsOneWidget);
+      expect(find.text('ATM'), findsOneWidget);
     });
 
     testWidgets('does not show fuel type chips section', (tester) async {

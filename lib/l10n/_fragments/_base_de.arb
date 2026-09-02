@@ -14,14 +14,6 @@
   "searchNearby": "Tankstellen in der Nähe",
   "fabRunSearch": "Suche starten",
   "routeSearchingChip": "Route wird gesucht…",
-  "routeSegmentSummaryBadge": "Alle {km} km",
-  "@routeSegmentSummaryBadge": {
-    "placeholders": {
-      "km": {
-        "type": "String"
-      }
-    }
-  },
   "searchCriteriaTitle": "Suchkriterien",
   "searchCriteriaRadiusBadge": "Im Umkreis von {km} km",
   "@searchCriteriaRadiusBadge": {
@@ -141,7 +133,6 @@
   "configTankSyncDisabled": "Deaktiviert",
   "privacyPolicy": "Datenschutzerklärung",
   "fuels": "Kraftstoffe",
-  "services": "Services",
   "zone": "Zone",
   "highway": "Autobahn",
   "localStation": "Ortsnahe Tankstelle",

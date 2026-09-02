@@ -1,0 +1,18 @@
+{
+  "allPricesLegend": "Gefüllt = günstigster Preis dieser Treffer. Zweite Zahl = was 100 km mit diesem Kraftstoff in Ihrem Fahrzeug kosten.",
+  "allPricesLegendPricesOnly": "Gefüllt = günstigster Preis dieser Treffer. Fahrzeug anlegen und Tankvorgänge erfassen, um die Kosten pro 100 km zu sehen.",
+  "allPricesNoPriceMask": "—",
+  "allPricesBestMarker": "bester",
+  "allPricesDelta": "+{amount}",
+  "allPricesCostPer100km": "{cost}/100 km",
+  "allPricesVerdictHere": "Hier am günstigsten: {fuel} für {cost}",
+  "allPricesVerdictWinsResults": "günstigster der Treffer",
+  "allPricesMoreFuels": "+{count}",
+  "allPricesMoreFuelsTooltip": "{count, plural, =1{1 weiteren Kraftstoff anzeigen} other{{count} weitere Kraftstoffe anzeigen}}",
+  "allPricesFewerFuelsTooltip": "Weitere Kraftstoffe ausblenden",
+  "allPricesCellPriceSemantics": "{fuel} {price}",
+  "allPricesCellCostSemantics": "{fuel} {price}, {cost} pro 100 km bei {consumption}",
+  "allPricesCellNoPriceSemantics": "{fuel}, kein Preis",
+  "allPricesCellUnavailableSemantics": "{fuel}, nicht verfügbar",
+  "allPricesCellUnusableSemantics": "{fuel}, für Ihr Fahrzeug nicht geeignet"
+}

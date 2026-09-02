@@ -2,36 +2,57 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/opening_hours.dart';
+import 'package:tankstellen/core/domain/search_mode.dart';
+import 'package:tankstellen/core/domain/search_result_item.dart';
 import 'package:tankstellen/core/domain/station.dart';
+import 'package:tankstellen/core/domain/station_amenity.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/widgets/service_status_banner.dart';
+import 'package:tankstellen/core/time/app_clock.dart';
 import 'package:tankstellen/features/fill_ups/domain/services/monthly_insights_aggregator.dart';
 import 'package:tankstellen/features/fill_ups/presentation/widgets/monthly_insights_card.dart';
+import 'package:tankstellen/features/obd2/api.dart';
+import 'package:tankstellen/features/obd2/domain/fuel_mixture_model.dart';
+import 'package:tankstellen/features/price_history/data/repositories/price_history_repository.dart';
+import 'package:tankstellen/features/price_history/domain/entities/price_record.dart';
+import 'package:tankstellen/features/price_history/providers/price_history_provider.dart';
 import 'package:tankstellen/features/profile/domain/entities/user_profile.dart';
 import 'package:tankstellen/features/profile/presentation/screens/settings/privacy/privacy_choices_screen.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
+import 'package:tankstellen/features/search/presentation/widgets/all_prices/all_prices_table_header.dart';
+import 'package:tankstellen/features/search/presentation/widgets/all_prices_station_card.dart';
+import 'package:tankstellen/features/search/presentation/widgets/criteria/criteria_action_bar.dart';
+import 'package:tankstellen/features/search/presentation/widgets/criteria/criteria_option_row.dart';
 import 'package:tankstellen/features/search/presentation/widgets/fuel_type_selector.dart';
+import 'package:tankstellen/features/search/presentation/widgets/results/results_row.dart';
+import 'package:tankstellen/features/search/presentation/widgets/search_mode_toggle.dart';
+import 'package:tankstellen/features/search/presentation/widgets/search_summary_bar.dart';
 import 'package:tankstellen/features/search/presentation/widgets/station_card.dart';
+import 'package:tankstellen/features/search/providers/all_prices_comparison_model.dart';
+import 'package:tankstellen/features/search/providers/all_prices_table_provider.dart';
+import 'package:tankstellen/features/search/providers/search_provider.dart';
 import 'package:tankstellen/features/search/providers/station_rating_provider.dart';
 import 'package:tankstellen/features/setup/presentation/widgets/language_selector.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/opening_hours_view.dart';
+import 'package:tankstellen/features/station_detail/presentation/widgets/price_history_section.dart';
+import 'package:tankstellen/features/station_detail/presentation/widgets/station_amenities_services_section.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/station_brand_header.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/station_prices_section.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/station_status_row.dart';
-import 'package:tankstellen/core/domain/vehicle_profile.dart';
-import 'package:tankstellen/core/time/app_clock.dart';
-import 'package:tankstellen/features/obd2/api.dart';
-import 'package:tankstellen/features/obd2/domain/fuel_mixture_model.dart';
 import 'package:tankstellen/features/trips/presentation/widgets/recording/recording_status_strip.dart';
 import 'package:tankstellen/features/trips/presentation/widgets/trip_avg_consumption_card.dart';
 import 'package:tankstellen/features/trips/providers/recording_gps_fix_provider.dart';
 import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../fixtures/stations.dart';
 import '../helpers/mock_providers.dart';
@@ -66,6 +87,53 @@ const _monthSummary = MonthlyInsightsSummary(
   previousMonthAvgConsumptionLPer100km: 10.6,
   isComparisonReliable: true,
 );
+
+/// #3933 — the widest all-prices row the French flex-fuel case produces:
+/// four columns plus the "+n" expander, every cell carrying a price, a
+/// delta and a cost per 100 km, and a two-part verdict line underneath.
+/// If the grid survives this at 320 dp it survives every real result set.
+const _allPricesColumns = AllPricesColumns(
+  visible: [FuelType.e10, FuelType.e98, FuelType.diesel, FuelType.e85],
+  overflow: [FuelType.lpg],
+);
+
+const _allPricesStation = Station(
+  id: 'fr-expansion',
+  name: 'Flex',
+  brand: 'TOTAL ENERGIES',
+  street: 'Avenue de la Gare',
+  postCode: '34120',
+  place: 'Pezenas',
+  lat: 43.46,
+  lng: 3.42,
+  dist: 12.4,
+  e10: 2.089,
+  e98: 2.189,
+  diesel: 1.929,
+  e85: 0.839,
+  lpg: 0.959,
+  isOpen: true,
+);
+
+List<Object> _allPricesOverrides() => <Object>[
+      fakeHiveStorageOverride().override,
+      activeCountryOverride(Countries.france),
+      allPricesColumnsProvider.overrideWithValue(_allPricesColumns),
+      allPricesBestByFuelProvider.overrideWithValue(
+        const {FuelType.e85: 0.809, FuelType.e10: 2.029},
+      ),
+      allPricesFuelCostModelProvider.overrideWithValue(
+        const FuelCostModel(
+          litersPer100kmByFuel: {FuelType.e85: 6.0, FuelType.e10: 4.6},
+          usableFuels: {
+            FuelType.e5,
+            FuelType.e10,
+            FuelType.e98,
+            FuelType.e85,
+          },
+        ),
+      ),
+    ];
 
 void main() {
   const pseudoLocale = Locale('en', 'XA');
@@ -213,6 +281,31 @@ void main() {
         widgetName: 'MonthlyInsightsCard',
       );
     });
+
+    // #3933 — the all-prices comparison table has FIXED columns, so an
+    // expanded translation cannot be absorbed by re-flowing: it has to
+    // shrink inside its column instead. These two cases are the proof.
+    testWidgets('AllPricesTableHeader — sticky columns + legend (#3933)',
+        (tester) async {
+      await pumpPseudo(
+        tester,
+        const AllPricesTableHeader(),
+        overrides: _allPricesOverrides(),
+        widgetName: 'AllPricesTableHeader',
+      );
+    });
+
+    testWidgets('AllPricesStationCard — four columns + verdict (#3933)',
+        (tester) async {
+      await pumpPseudo(
+        tester,
+        const SingleChildScrollView(
+          child: AllPricesStationCard(station: _allPricesStation),
+        ),
+        overrides: _allPricesOverrides(),
+        widgetName: 'AllPricesStationCard',
+      );
+    });
   });
 
   group('Text-scale overflow (1.3x font setting, #3662)', () {
@@ -306,6 +399,28 @@ void main() {
         tester,
         const MonthlyInsightsCard(summary: _monthSummary),
         widgetName: 'MonthlyInsightsCard',
+      );
+    });
+
+    testWidgets('AllPricesTableHeader — sticky columns + legend (#3933)',
+        (tester) async {
+      await pumpScaled(
+        tester,
+        const AllPricesTableHeader(),
+        overrides: _allPricesOverrides(),
+        widgetName: 'AllPricesTableHeader',
+      );
+    });
+
+    testWidgets('AllPricesStationCard — four columns + verdict (#3933)',
+        (tester) async {
+      await pumpScaled(
+        tester,
+        const SingleChildScrollView(
+          child: AllPricesStationCard(station: _allPricesStation),
+        ),
+        overrides: _allPricesOverrides(),
+        widgetName: 'AllPricesStationCard',
       );
     });
   });
@@ -515,7 +630,308 @@ void main() {
       );
     });
   });
+
+  // #3928 (Epic #3925) — the two station-detail strings this issue adds
+  // are the longest prose on the page: the single-observation sentence
+  // and the merged section heading. Both must survive an expanded
+  // translation at 320 dp and a 1.3x font setting.
+  group('Station detail — price history + merged services (#3928)', () {
+    const singlePointStation = Station(
+      id: 'station-3928',
+      name: 'Star Tankstelle',
+      brand: 'STAR',
+      street: 'Hauptstr.',
+      houseNumber: '12',
+      postCode: '10115',
+      place: 'Berlin',
+      lat: 52.5200,
+      lng: 13.4050,
+      dist: 1.5,
+      diesel: 2.329,
+      isOpen: true,
+    );
+
+    List<Object> historyOverrides() {
+      final storage = fakeHiveStorageOverride();
+      return <Object>[
+        storage.override,
+        priceHistoryRepositoryProvider
+            .overrideWithValue(PriceHistoryRepository(storage.fake)),
+        priceHistoryProvider('station-3928').overrideWithValue([
+          PriceRecord(
+            stationId: 'station-3928',
+            recordedAt: DateTime(2026, 8, 21, 9, 30),
+            diesel: 2.329,
+          ),
+        ]),
+        priceStatsProvider('station-3928', FuelType.diesel)
+            .overrideWithValue(const PriceStats(
+          min: 2.329,
+          max: 2.329,
+          avg: 2.329,
+          current: 2.329,
+        )),
+      ];
+    }
+
+    /// A station whose amenity chips and raw services together overflow
+    /// the eight-chip fold — the widest the merged section ever gets.
+    final crowdedStation = singlePointStation.copyWith(
+      amenities: const {
+        StationAmenity.shop,
+        StationAmenity.carWash,
+        StationAmenity.airPump,
+        StationAmenity.atm,
+      },
+      services: const [
+        'Piste poids lourds',
+        'Automate CB',
+        'Location de vehicules',
+        'Vente de gaz domestique',
+        'Relais colis',
+        'Douches',
+      ],
+      department: 'Berlin',
+      region: 'Berlin',
+    );
+
+    testWidgets('PriceHistorySection single-observation line — en_XA',
+        (tester) async {
+      await pumpPseudo(
+        tester,
+        const SingleChildScrollView(
+          child: PriceHistorySection(
+            stationId: 'station-3928',
+            station: singlePointStation,
+          ),
+        ),
+        overrides: historyOverrides(),
+        widgetName: 'PriceHistorySection (single observation)',
+      );
+    });
+
+    testWidgets('PriceHistorySection single-observation line — 1.3x',
+        (tester) async {
+      await pumpScaled(
+        tester,
+        const SingleChildScrollView(
+          child: PriceHistorySection(
+            stationId: 'station-3928',
+            station: singlePointStation,
+          ),
+        ),
+        overrides: historyOverrides(),
+        widgetName: 'PriceHistorySection (single observation)',
+      );
+    });
+
+    testWidgets('Amenities & services merged section — en_XA', (tester) async {
+      await pumpPseudo(
+        tester,
+        SingleChildScrollView(
+          child: StationAmenitiesServicesSection(station: crowdedStation),
+        ),
+        widgetName: 'StationAmenitiesServicesSection',
+      );
+    });
+
+    testWidgets('Amenities & services merged section — 1.3x', (tester) async {
+      await pumpScaled(
+        tester,
+        SingleChildScrollView(
+          child: StationAmenitiesServicesSection(station: crowdedStation),
+        ),
+        widgetName: 'StationAmenitiesServicesSection',
+      );
+    });
+  });
+
+  // #3927 (Epic #3925) — the criteria sheet's fixed-size chrome: the mode
+  // toggle that used to wrap over two lines, the sticky action bar with
+  // its disabled-reason line, and one route-option row.
+  group('Search criteria sheet chrome (#3927)', () {
+    Widget modeToggle() =>
+        SearchModeToggle(mode: SearchMode.nearby, onChanged: (_) {});
+
+    Widget actionBar() => Builder(
+      builder: (context) => CriteriaActionBar(
+        onSubmit: () {},
+        onReset: () {},
+        disabledReason: AppLocalizations.of(
+          context,
+        ).criteriaSubmitDisabledRoute,
+      ),
+    );
+
+    Widget optionRow() => Builder(
+      builder: (context) {
+        final l10n = AppLocalizations.of(context);
+        return CriteriaOptionRow(
+          label: l10n.routeSegment,
+          value: '200 km',
+          caption: l10n.showCheapestEveryNKm(200),
+          child: CriteriaOptionSlider(
+            value: 200,
+            min: 50,
+            max: 1000,
+            divisions: 19,
+            label: '200 km',
+            onChanged: (_) {},
+          ),
+        );
+      },
+    );
+
+    testWidgets('SearchModeToggle — pseudo-locale', (tester) async {
+      await pumpPseudo(tester, modeToggle(), widgetName: 'SearchModeToggle');
+      // The words survive; only the icons may be dropped (#3927).
+      for (final text in tester.widgetList<Text>(find.byType(Text))) {
+        expect(text.maxLines, 1);
+      }
+    });
+
+    testWidgets('SearchModeToggle — 1.3x', (tester) async {
+      await pumpScaled(tester, modeToggle(), widgetName: 'SearchModeToggle');
+    });
+
+    testWidgets('CriteriaActionBar — pseudo-locale', (tester) async {
+      await pumpPseudo(tester, actionBar(), widgetName: 'CriteriaActionBar');
+    });
+
+    testWidgets('CriteriaActionBar — 1.3x', (tester) async {
+      await pumpScaled(tester, actionBar(), widgetName: 'CriteriaActionBar');
+    });
+
+    testWidgets('CriteriaOptionRow — pseudo-locale', (tester) async {
+      await pumpPseudo(tester, optionRow(), widgetName: 'CriteriaOptionRow');
+    });
+
+    testWidgets('CriteriaOptionRow — 1.3x', (tester) async {
+      await pumpScaled(tester, optionRow(), widgetName: 'CriteriaOptionRow');
+    });
+  });
+
+  // #3926 — the two-row results chrome. Both rows pack several segments /
+  // controls onto one band, which is exactly the shape that breaks under an
+  // expanded translation: row A wraps its pills, row B ellipsises the count
+  // and the radar chip and wraps its sort chips.
+  group('#3926 results chrome — two rows', () {
+    final chromeNow = DateTime(2026, 3, 11, 14, 30);
+
+    List<Object> chromeOverrides() {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+      when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
+      when(() => test.mockStorage.getRatings())
+          .thenReturn(const <String, int>{});
+      when(() => test.mockStorage.getSetting(any())).thenReturn(null);
+      return <Object>[
+        ...test.overrides,
+        userPositionOverride(lat: 48.85, lng: 2.35, source: 'GPS'),
+        appClockProvider.overrideWithValue(FixedClock(chromeNow)),
+        searchStateProvider.overrideWith(
+          () => _ChromeSearchState(chromeNow.subtract(const Duration(hours: 2))),
+        ),
+      ];
+    }
+
+    testWidgets('SearchSummaryBar (row A) — pseudo-locale', (tester) async {
+      await pumpPseudo(
+        tester,
+        const SearchSummaryBar(),
+        overrides: chromeOverrides(),
+        widgetName: 'SearchSummaryBar (row A)',
+      );
+    });
+
+    testWidgets('SearchSummaryBar (row A) — 1.3x', (tester) async {
+      await pumpScaled(
+        tester,
+        const SearchSummaryBar(),
+        overrides: chromeOverrides(),
+        widgetName: 'SearchSummaryBar (row A)',
+      );
+    });
+
+    testWidgets('SearchResultsRow (row B) — pseudo-locale', (tester) async {
+      await pumpPseudo(
+        tester,
+        const SearchResultsRow(items: _chromeItems),
+        overrides: chromeOverrides(),
+        widgetName: 'SearchResultsRow (row B)',
+      );
+    });
+
+    testWidgets('SearchResultsRow (row B) — 1.3x', (tester) async {
+      await pumpScaled(
+        tester,
+        const SearchResultsRow(items: _chromeItems),
+        overrides: chromeOverrides(),
+        widgetName: 'SearchResultsRow (row B)',
+      );
+    });
+
+    testWidgets('SearchResultsRow (row B) with the radar scope entry '
+        '— pseudo-locale', (tester) async {
+      await pumpPseudo(
+        tester,
+        SearchResultsRow(items: _chromeItems, onRadarToggle: () {}),
+        overrides: chromeOverrides(),
+        widgetName: 'SearchResultsRow (row B, radar scope)',
+      );
+    });
+  });
 }
+
+/// #3926 — a two-station result set downloaded at a pinned instant, so the
+/// row-A freshness segment renders its longest ("Prices from 2 h ago") form.
+class _ChromeSearchState extends SearchState {
+  _ChromeSearchState(this._fetchedAt);
+
+  final DateTime _fetchedAt;
+
+  @override
+  AsyncValue<ServiceResult<List<SearchResultItem>>> build() => AsyncValue.data(
+        ServiceResult(
+          data: _chromeItems,
+          source: ServiceSource.prixCarburantsApi,
+          fetchedAt: _fetchedAt,
+        ),
+      );
+}
+
+const _chromeItems = <SearchResultItem>[
+  FuelStationResult(_chromeStationA),
+  FuelStationResult(_chromeStationB),
+];
+
+const _chromeStationA = Station(
+  id: 'fr-chrome-a',
+  name: 'A',
+  brand: 'TOTAL',
+  street: 'rue A',
+  postCode: '75001',
+  place: 'Paris',
+  lat: 48.85,
+  lng: 2.35,
+  dist: 1.2,
+  e10: 1.75,
+  isOpen: true,
+);
+
+const _chromeStationB = Station(
+  id: 'fr-chrome-b',
+  name: 'B',
+  brand: 'ESSO',
+  street: 'rue B',
+  postCode: '75002',
+  place: 'Paris',
+  lat: 48.86,
+  lng: 2.36,
+  dist: 2.4,
+  e10: 1.95,
+  isOpen: true,
+);
 
 // #3916 — pinned fakes for the recording status strip + badge cases.
 class _FixedTripRecording extends TripRecording {

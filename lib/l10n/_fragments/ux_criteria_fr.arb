@@ -1,0 +1,35 @@
+{
+  "criteriaModeNearby": "À proximité",
+  "criteriaModeRoute": "Trajet",
+  "criteriaSubmit": "Rechercher",
+  "criteriaReset": "Réinitialiser",
+  "criteriaResetDone": "Critères réinitialisés sur vos valeurs par défaut",
+  "criteriaSubmitDisabledRoute": "Indiquez un départ et une destination",
+  "criteriaSubmitDisabledSearching": "Recherche en cours…",
+  "criteriaShowMore": "Afficher plus ({count})",
+  "@criteriaShowMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "criteriaShowLess": "Afficher moins",
+  "criteriaBrands": "Marques",
+  "criteriaRouteOptions": "Options d'itinéraire",
+  "criteriaRouteOptionsSummary": "Tous les {segmentKm} km · détour {detourKm} km · {saving}",
+  "@criteriaRouteOptionsSummary": {
+    "placeholders": {
+      "segmentKm": {
+        "type": "int"
+      },
+      "detourKm": {
+        "type": "int"
+      },
+      "saving": {
+        "type": "String"
+      }
+    }
+  },
+  "criteriaSwapEndpoints": "Inverser le départ et la destination"
+}

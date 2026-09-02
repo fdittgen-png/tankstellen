@@ -1,0 +1,84 @@
+{
+  "searchSummaryAlongRoute": "Along the route · every {km} km",
+  "@searchSummaryAlongRoute": {
+    "description": "Route-mode segment of the results summary bar (row A), replacing the radius segment. Names the corridor first and the sampling spacing second, so the user reads WHERE the search ran before HOW densely (#3926, epic #3925). Replaces the bare 'Every {km} km' badge.",
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "50"
+      }
+    }
+  },
+  "searchSummaryPricesJustNow": "Prices from just now",
+  "@searchSummaryPricesJustNow": {
+    "description": "Freshness segment of the results summary bar (row A) when the price list was fetched less than a minute ago. Replaces the wordless amber '⚠ 2 h ago' pill, which never said WHAT was two hours old (#3926). The age measures how long ago the app downloaded this price list from the upstream open-data service (a cached list keeps its original download time), not how long ago the operator changed the price."
+  },
+  "searchSummaryPricesMinutes": "Prices from {minutes} min ago",
+  "@searchSummaryPricesMinutes": {
+    "description": "Freshness segment of the results summary bar (row A) for a download age under an hour (#3926).",
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+  "searchSummaryPricesHours": "Prices from {hours} h ago",
+  "@searchSummaryPricesHours": {
+    "description": "Freshness segment of the results summary bar (row A) for a download age under a day (#3926).",
+    "placeholders": {
+      "hours": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "searchSummaryPricesDays": "Prices from {days} d ago",
+  "@searchSummaryPricesDays": {
+    "description": "Freshness segment of the results summary bar (row A) for a download age of a day or more (#3926).",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "searchResultsFilterTooltip": "Filters",
+  "@searchResultsFilterTooltip": {
+    "description": "Tooltip and accessibility label of the filter icon button on the results row (row B), which expands the brand / highway / EV filter chips (#3926)."
+  },
+  "searchResultsFilterActiveSemantic": "Filters, {count} active",
+  "@searchResultsFilterActiveSemantic": {
+    "description": "Accessibility label of the results-row filter icon button when at least one filter is active; the visible affordance is a count badge on the icon (#3926).",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "searchResultsMoreActionsTooltip": "More actions",
+  "@searchResultsMoreActionsTooltip": {
+    "description": "Tooltip of the overflow ('…') button on the results row that holds the labelled map / radar-view / fuel-cost-calculator entries, replacing three unlabelled icon buttons (#3926)."
+  },
+  "searchPriceArrowLegend": "↓ and ↑ compare each price with the other stations in this list.",
+  "@searchPriceArrowLegend": {
+    "description": "One-line legend under the results list explaining the price arrows on the station cards. The arrow is NOT a time trend: it is the station's price tier inside the CURRENT result set (bottom third = ↓, middle third = –, top third = ↑), computed from the minimum and maximum price of the listed stations for the selected fuel (#3926)."
+  },
+  "searchPriceArrowCheapTooltip": "Among the lowest prices in this list",
+  "@searchPriceArrowCheapTooltip": {
+    "description": "Tooltip on the ↓ arrow beside a station-card price — the price sits in the bottom third of the current result set's price range (#3926)."
+  },
+  "searchPriceArrowAverageTooltip": "A mid-range price in this list",
+  "@searchPriceArrowAverageTooltip": {
+    "description": "Tooltip on the – dash beside a station-card price — the price sits in the middle third of the current result set's price range (#3926)."
+  },
+  "searchPriceArrowExpensiveTooltip": "Among the highest prices in this list",
+  "@searchPriceArrowExpensiveTooltip": {
+    "description": "Tooltip on the ↑ arrow beside a station-card price — the price sits in the top third of the current result set's price range (#3926)."
+  },
+  "searchRefreshTooltip": "Update position and refresh prices",
+  "@searchRefreshTooltip": {
+    "description": "Tooltip of the ONE refresh action in the search app bar (#3926). It merges the two refreshes the screen used to carry: the app-bar 'refresh prices' (re-run the last search) and the position bar's GPS re-fix."
+  }
+}

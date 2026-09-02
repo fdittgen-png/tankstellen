@@ -14,14 +14,6 @@
   "searchNearby": "Tankstellen in der Nähe",
   "fabRunSearch": "Suche starten",
   "routeSearchingChip": "Route wird gesucht…",
-  "routeSegmentSummaryBadge": "Alle {km} km",
-  "@routeSegmentSummaryBadge": {
-    "placeholders": {
-      "km": {
-        "type": "String"
-      }
-    }
-  },
   "searchCriteriaTitle": "Suchkriterien",
   "searchCriteriaRadiusBadge": "Im Umkreis von {km} km",
   "@searchCriteriaRadiusBadge": {
@@ -141,7 +133,6 @@
   "configTankSyncDisabled": "Deaktiviert",
   "privacyPolicy": "Datenschutzerklärung",
   "fuels": "Kraftstoffe",
-  "services": "Services",
   "zone": "Zone",
   "highway": "Autobahn",
   "localStation": "Ortsnahe Tankstelle",
@@ -3776,6 +3767,22 @@
   "radiusAlertBlockerLabel": "Geben Sie eine Bezeichnung ein",
   "radiusAlertBlockerThreshold": "Geben Sie einen Schwellenwert über 0 ein",
   "radiusAlertBlockerLocation": "Wählen Sie einen Standort",
+  "allPricesLegend": "Gefüllt = günstigster Preis dieser Treffer. Zweite Zahl = was 100 km mit diesem Kraftstoff in Ihrem Fahrzeug kosten.",
+  "allPricesLegendPricesOnly": "Gefüllt = günstigster Preis dieser Treffer. Fahrzeug anlegen und Tankvorgänge erfassen, um die Kosten pro 100 km zu sehen.",
+  "allPricesNoPriceMask": "—",
+  "allPricesBestMarker": "bester",
+  "allPricesDelta": "+{amount}",
+  "allPricesCostPer100km": "{cost}/100 km",
+  "allPricesVerdictHere": "Hier am günstigsten: {fuel} für {cost}",
+  "allPricesVerdictWinsResults": "günstigster der Treffer",
+  "allPricesMoreFuels": "+{count}",
+  "allPricesMoreFuelsTooltip": "{count, plural, =1{1 weiteren Kraftstoff anzeigen} other{{count} weitere Kraftstoffe anzeigen}}",
+  "allPricesFewerFuelsTooltip": "Weitere Kraftstoffe ausblenden",
+  "allPricesCellPriceSemantics": "{fuel} {price}",
+  "allPricesCellCostSemantics": "{fuel} {price}, {cost} pro 100 km bei {consumption}",
+  "allPricesCellNoPriceSemantics": "{fuel}, kein Preis",
+  "allPricesCellUnavailableSemantics": "{fuel}, nicht verfügbar",
+  "allPricesCellUnusableSemantics": "{fuel}, für Ihr Fahrzeug nicht geeignet",
   "brandMarkFuelGeneric": "Tankstelle",
   "brandMarkEvGeneric": "Ladepunkt",
   "fillInventoryTitle": "Tankbilanz",
@@ -4020,6 +4027,39 @@
     },
     "description": "#3919 — trip detail header: the shown figures were re-expressed with a calibration learned after the trip."
   },
+  "criteriaModeNearby": "In der Nähe",
+  "criteriaModeRoute": "Route",
+  "criteriaSubmit": "Suchen",
+  "criteriaReset": "Zurücksetzen",
+  "criteriaResetDone": "Kriterien auf deine Standardwerte zurückgesetzt",
+  "criteriaSubmitDisabledRoute": "Gib einen Start und ein Ziel an",
+  "criteriaSubmitDisabledSearching": "Suche läuft …",
+  "criteriaShowMore": "Mehr anzeigen ({count})",
+  "@criteriaShowMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "criteriaShowLess": "Weniger anzeigen",
+  "criteriaBrands": "Marken",
+  "criteriaRouteOptions": "Routenoptionen",
+  "criteriaRouteOptionsSummary": "Alle {segmentKm} km · {detourKm} km Umweg · {saving}",
+  "@criteriaRouteOptionsSummary": {
+    "placeholders": {
+      "segmentKm": {
+        "type": "int"
+      },
+      "detourKm": {
+        "type": "int"
+      },
+      "saving": {
+        "type": "String"
+      }
+    }
+  },
+  "criteriaSwapEndpoints": "Start und Ziel tauschen",
   "fillUpOdometerFromLastFillUp": "Aus Ihrer letzten Tankfüllung vorausgefüllt",
   "fillUpStationLabel": "Tankstelle",
   "fillUpStationChange": "Ändern",
@@ -4102,6 +4142,102 @@
   "fuelSourceEstimatedUncalibrated": "Geschätzt · nicht kalibriert",
   "fuelSourceGpsEstimate": "GPS-Schätzung",
   "recordingTileScore": "Fahrstil",
+  "searchSummaryAlongRoute": "Entlang der Route · alle {km} km",
+  "@searchSummaryAlongRoute": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "searchSummaryPricesJustNow": "Preise von gerade eben",
+  "searchSummaryPricesMinutes": "Preise von vor {minutes} Min.",
+  "@searchSummaryPricesMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "searchSummaryPricesHours": "Preise von vor {hours} Std.",
+  "@searchSummaryPricesHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "searchSummaryPricesDays": "Preise von vor {days} Tg.",
+  "@searchSummaryPricesDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "searchResultsFilterTooltip": "Filter",
+  "searchResultsFilterActiveSemantic": "Filter, {count} aktiv",
+  "@searchResultsFilterActiveSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchResultsMoreActionsTooltip": "Weitere Aktionen",
+  "searchPriceArrowLegend": "↓ und ↑ vergleichen jeden Preis mit den anderen Tankstellen in dieser Liste.",
+  "searchPriceArrowCheapTooltip": "Gehört zu den niedrigsten Preisen in dieser Liste",
+  "searchPriceArrowAverageTooltip": "Ein mittlerer Preis in dieser Liste",
+  "searchPriceArrowExpensiveTooltip": "Gehört zu den höchsten Preisen in dieser Liste",
+  "searchRefreshTooltip": "Position aktualisieren und Preise neu laden",
+  "priceHistoryFirstSeen": "Erstmals gesehen am {date} — der Verlauf wächst mit jedem Besuch",
+  "@priceHistoryFirstSeen": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "priceHistoryCurrentPriceLine": "Aktueller Preis: {price}",
+  "@priceHistoryCurrentPriceLine": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "priceHistoryDeltaSince": "{delta} seit dem {date}",
+  "@priceHistoryDeltaSince": {
+    "placeholders": {
+      "delta": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "priceHistoryUnchangedSince": "Unverändert seit dem {date}",
+  "@priceHistoryUnchangedSince": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "priceStatsMin": "Min.",
+  "priceStatsMax": "Max.",
+  "priceStatsAvg": "Ø",
+  "amenitiesAndServices": "Ausstattung & Services",
+  "amenitiesServicesShowMore": "Mehr anzeigen ({count})",
+  "@amenitiesServicesShowMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "amenitiesServicesShowLess": "Weniger anzeigen",
   "stationStatusWithFreshness": "{status} · aktualisiert vor {ago}",
   "pricesNotSoldHere": "Hier nicht angeboten: {fuels}",
   "tankReportRecordedTripsCoverage": "Aufgezeichnete Fahrten decken {pct} % dieser Tankfüllung ab",

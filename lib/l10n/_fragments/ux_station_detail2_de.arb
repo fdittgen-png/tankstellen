@@ -1,0 +1,38 @@
+{
+  "priceHistoryFirstSeen": "Erstmals gesehen am {date} — der Verlauf wächst mit jedem Besuch",
+  "@priceHistoryFirstSeen": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "priceHistoryCurrentPriceLine": "Aktueller Preis: {price}",
+  "@priceHistoryCurrentPriceLine": {
+    "placeholders": {
+      "price": {"type": "String"}
+    }
+  },
+  "priceHistoryDeltaSince": "{delta} seit dem {date}",
+  "@priceHistoryDeltaSince": {
+    "placeholders": {
+      "delta": {"type": "String"},
+      "date": {"type": "String"}
+    }
+  },
+  "priceHistoryUnchangedSince": "Unverändert seit dem {date}",
+  "@priceHistoryUnchangedSince": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "priceStatsMin": "Min.",
+  "priceStatsMax": "Max.",
+  "priceStatsAvg": "Ø",
+  "amenitiesAndServices": "Ausstattung & Services",
+  "amenitiesServicesShowMore": "Mehr anzeigen ({count})",
+  "@amenitiesServicesShowMore": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "amenitiesServicesShowLess": "Weniger anzeigen"
+}

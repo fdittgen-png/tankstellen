@@ -7,8 +7,9 @@ import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/brand_registry.dart';
 import '../../../../core/domain/station.dart';
 import '../../providers/brand_filter_provider.dart';
+import 'criteria/criteria_chip_group.dart';
 
-/// Horizontally scrollable brand filter chips with major brands grouped.
+/// Wrapping brand filter chips with major brands grouped (#3927).
 ///
 /// Shows an "All" chip to reset, then major brands (from [BrandRegistry]),
 /// then "Others" for independent/unrecognized brands. Also includes a
@@ -38,58 +39,60 @@ class BrandFilterChips extends ConsumerWidget {
         return (brandCounts[b] ?? 0).compareTo(brandCounts[a] ?? 0);
       });
 
+    // #3927 — the brand strip used to scroll horizontally and clipped its
+    // labels mid-word ("Intermarch…"). It now wraps like the fuel and
+    // amenity groups: the "All" / highway toggles are pinned, the brands
+    // fold behind one "Show more (n)" chip, and an active brand filter is
+    // always visible whatever its rank.
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            // "All" chip
-            ChoiceChip(
-              avatar: const Icon(Icons.select_all, size: 16),
-              label: Text(l10n.brandFilterAll),
-              selected: isAllSelected,
+      child: CriteriaChipGroup(
+        groupKeyPrefix: 'criteria-brand',
+        selectedFlags: [
+          for (final brand in sortedBrands) selectedBrands.contains(brand),
+        ],
+        pinned: [
+          // "All" chip
+          ChoiceChip(
+            key: const ValueKey('criteria-brand-all'),
+            avatar: const Icon(Icons.select_all, size: 16),
+            label: Text(l10n.brandFilterAll),
+            selected: isAllSelected,
+            onSelected: (_) => ref.read(selectedBrandsProvider.notifier).clear(),
+            visualDensity: VisualDensity.compact,
+          ),
+          // Highway exclusion chip
+          if (hasHighwayStations)
+            FilterChip(
+              avatar: const Icon(Icons.no_crash, size: 16),
+              label: Text(l10n.brandFilterNoHighway),
+              selected: excludeHighway,
               onSelected: (_) =>
-                  ref.read(selectedBrandsProvider.notifier).clear(),
+                  ref.read(excludeHighwayStationsProvider.notifier).toggle(),
               visualDensity: VisualDensity.compact,
             ),
-            // Highway exclusion chip
-            if (hasHighwayStations) ...[
-              const SizedBox(width: 6),
-              FilterChip(
-                avatar: const Icon(Icons.no_crash, size: 16),
-                label: Text(l10n.brandFilterNoHighway),
-                selected: excludeHighway,
-                onSelected: (_) =>
-                    ref.read(excludeHighwayStationsProvider.notifier).toggle(),
-                visualDensity: VisualDensity.compact,
-              ),
-            ],
-            // Highway-only chip
-            if (hasHighwayStations) ...[
-              const SizedBox(width: 6),
-              FilterChip(
-                label: Text(l10n.brandFilterHighway),
-                selected: selectedBrands.contains('Autoroute'),
-                onSelected: (_) => ref
-                    .read(selectedBrandsProvider.notifier)
-                    .toggle('Autoroute'),
-                visualDensity: VisualDensity.compact,
-              ),
-            ],
-            // Brand chips (grouped by canonical name)
-            for (final brand in sortedBrands) ...[
-              const SizedBox(width: 6),
-              FilterChip(
-                label: Text('$brand (${brandCounts[brand]})'),
-                selected: selectedBrands.contains(brand),
-                onSelected: (_) =>
-                    ref.read(selectedBrandsProvider.notifier).toggle(brand),
-                visualDensity: VisualDensity.compact,
-              ),
-            ],
-          ],
-        ),
+          // Highway-only chip
+          if (hasHighwayStations)
+            FilterChip(
+              label: Text(l10n.brandFilterHighway),
+              selected: selectedBrands.contains('Autoroute'),
+              onSelected: (_) =>
+                  ref.read(selectedBrandsProvider.notifier).toggle('Autoroute'),
+              visualDensity: VisualDensity.compact,
+            ),
+        ],
+        // Brand chips (grouped by canonical name)
+        chips: [
+          for (final brand in sortedBrands)
+            FilterChip(
+              key: ValueKey('criteria-brand-$brand'),
+              label: Text('$brand (${brandCounts[brand]})'),
+              selected: selectedBrands.contains(brand),
+              onSelected: (_) =>
+                  ref.read(selectedBrandsProvider.notifier).toggle(brand),
+              visualDensity: VisualDensity.compact,
+            ),
+        ],
       ),
     );
   }

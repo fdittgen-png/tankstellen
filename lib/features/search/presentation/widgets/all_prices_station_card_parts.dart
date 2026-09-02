@@ -3,124 +3,136 @@
 
 part of 'all_prices_station_card.dart';
 
-/// A single fuel badge rendered inside [AllPricesStationCard].
+/// The card's identity row — status dot, brand/street title, tri-state
+/// open badge and the favourite toggle (#3933 keeps it byte-for-byte the
+/// same chrome the chip version had; only the price area became a table).
 ///
-/// Library-private (`part of`) so the public API of the card stays unchanged.
-class _FuelBadge extends StatelessWidget {
-  final String label;
-  final double? price;
-  final FuelType fuelType;
-  final bool isUnavailable;
-  final bool isCheapest;
+/// Library-private (`part of`) so the public API of the card stays
+/// unchanged.
+class _AllPricesCardHeader extends StatelessWidget {
+  final Station station;
+  final String title;
+  final Color statusColor;
+  final bool isFavorite;
+  final VoidCallback? onFavoriteTap;
 
-  /// When true, this badge is the user's preferred fuel type and should be
-  /// rendered larger with a thicker border to stand out.
-  final bool isProfileFuel;
-
-  const _FuelBadge({
-    required this.label,
-    required this.price,
-    required this.fuelType,
-    this.isUnavailable = false,
-    this.isCheapest = false,
-    this.isProfileFuel = false,
+  const _AllPricesCardHeader({
+    required this.station,
+    required this.title,
+    required this.statusColor,
+    required this.isFavorite,
+    required this.onFavoriteTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
-    final color = FuelColors.forType(fuelType);
 
-    final isHighlighted = isProfileFuel && !isUnavailable;
-    final isChampion = isCheapest && !isUnavailable;
-
-    final borderColor = isChampion ? color : color;
-    final bgColor = isChampion
-        ? color
-        : isHighlighted
-        ? FuelColors.forType(fuelType).withValues(alpha: 0.22)
-        : FuelColors.forTypeLight(fuelType);
-
-    final borderWidth = isChampion ? 1.5 : (isHighlighted ? 1.5 : 0.5);
-    final labelFontSize = isHighlighted ? 11.0 : 10.0;
-    final priceFontSize = isHighlighted ? 13.0 : 11.0;
-    final dotSize = isHighlighted ? 8.0 : 6.0;
-    final verticalPadding = isHighlighted ? 5.0 : 4.0;
-    final horizontalPadding = isHighlighted ? 10.0 : 8.0;
-
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: horizontalPadding,
-        vertical: verticalPadding,
-      ),
-      decoration: BoxDecoration(
-        color: isUnavailable
-            ? theme.colorScheme.surfaceContainerHighest
-            : bgColor,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: isUnavailable ? theme.colorScheme.outlineVariant : borderColor,
-          width: borderWidth,
+    return Row(
+      children: [
+        // #3198 tri-state: unknown renders the neutral muted dot, never
+        // the red "closed" one.
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: statusColor,
+          ),
         ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: dotSize,
-            height: dotSize,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: isUnavailable
-                  ? theme.colorScheme.onSurfaceVariant
-                  : isChampion
-                  ? Colors.white
-                  : color,
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            title,
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.bold,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(width: 4),
-          Text(
-            label,
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: statusColor.withValues(alpha: 0.12),
+            borderRadius: AppRadius.md,
+          ),
+          child: Text(
+            switch (station.isOpen) {
+              true => l10n.open,
+              false => l10n.closed,
+              null => l10n.openStateUnknown,
+            },
             style: TextStyle(
-              fontSize: labelFontSize,
-              fontWeight: isHighlighted || isChampion
-                  ? FontWeight.bold
-                  : FontWeight.w600,
-              color: isUnavailable
-                  ? theme.colorScheme.onSurfaceVariant
-                  : isChampion
-                  ? Colors.white
-                  : color,
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: statusColor,
             ),
           ),
-          const SizedBox(width: 4),
-          // #2973 — flash the per-fuel price on change (the SAME
-          // AnimatedPriceText the search card uses), so an all-prices row
-          // that drops is noticeable. The out-of-stock case carries no
-          // numeric price, so it passes null and never flashes. Reduced
-          // motion is honoured inside AnimatedPriceText.
-          AnimatedPriceText(
-            price: isUnavailable ? null : price,
-            child: Text(
-              isUnavailable
-                  ? (l10n.outOfStock)
-                  : PriceFormatter.formatPriceCompact(price),
-              style: TextStyle(
-                fontSize: priceFontSize,
-                fontWeight: FontWeight.bold,
-                color: isUnavailable
-                    ? theme.colorScheme.onSurfaceVariant
-                    : isChampion
-                    ? Colors.white
-                    : isHighlighted
-                    ? color
-                    : theme.colorScheme.onSurface,
-              ),
+        ),
+        const SizedBox(width: 4),
+        SizedBox(
+          width: 32,
+          height: 32,
+          child: IconButton(
+            padding: EdgeInsets.zero,
+            iconSize: 20,
+            icon: Icon(
+              isFavorite ? Icons.star : Icons.star_border,
+              color: isFavorite ? Colors.amber : null,
             ),
+            // #2974 — selection tick on the favourite toggle (the same
+            // everyday tap haptic as the compact card). selectionClick
+            // only; fires only on the discrete star tap, never scroll.
+            onPressed: onFavoriteTap == null
+                ? null
+                : () {
+                    unawaited(HapticFeedback.selectionClick());
+                    onFavoriteTap!();
+                  },
+            tooltip: isFavorite ? (l10n.removeFavorite) : (l10n.addFavorite),
           ),
-        ],
-      ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Address + distance line, indented to sit under the card title.
+class _AllPricesCardAddress extends StatelessWidget {
+  final String address;
+  final double? distanceKm;
+
+  const _AllPricesCardAddress({
+    required this.address,
+    required this.distanceKm,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      children: [
+        const SizedBox(width: 18), // Align with the title.
+        Expanded(
+          child: Text(
+            address,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        Text(
+          PriceFormatter.formatDistance(distanceKm),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: theme.colorScheme.primary,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -14,14 +14,6 @@
   "searchNearby": "Nearby stations",
   "fabRunSearch": "Run search",
   "routeSearchingChip": "Searching the route…",
-  "routeSegmentSummaryBadge": "Every {km} km",
-  "@routeSegmentSummaryBadge": {
-    "placeholders": {
-      "km": {
-        "type": "String"
-      }
-    }
-  },
   "searchCriteriaTitle": "Search criteria",
   "searchCriteriaRadiusBadge": "Within {km} km",
   "@searchCriteriaRadiusBadge": {
@@ -149,7 +141,6 @@
   "configTankSyncDisabled": "Disabled",
   "privacyPolicy": "Privacy Policy",
   "fuels": "Fuels",
-  "services": "Services",
   "zone": "Zone",
   "highway": "Highway",
   "localStation": "Local station",

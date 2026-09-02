@@ -1,0 +1,18 @@
+{
+  "allPricesLegend": "Fond plein = le moins cher de ces résultats. Deuxième chiffre = ce que coûtent 100 km avec ce carburant sur votre véhicule.",
+  "allPricesLegendPricesOnly": "Fond plein = le moins cher de ces résultats. Ajoutez un véhicule et saisissez vos pleins pour voir le coût aux 100 km.",
+  "allPricesNoPriceMask": "—",
+  "allPricesBestMarker": "le moins cher",
+  "allPricesDelta": "+{amount}",
+  "allPricesCostPer100km": "{cost}/100 km",
+  "allPricesVerdictHere": "Le moins cher ici : {fuel} à {cost}",
+  "allPricesVerdictWinsResults": "le moins cher des résultats",
+  "allPricesMoreFuels": "+{count}",
+  "allPricesMoreFuelsTooltip": "{count, plural, =1{Afficher 1 carburant de plus} other{Afficher {count} carburants de plus}}",
+  "allPricesFewerFuelsTooltip": "Masquer les carburants supplémentaires",
+  "allPricesCellPriceSemantics": "{fuel} {price}",
+  "allPricesCellCostSemantics": "{fuel} {price}, {cost} aux 100 km pour {consumption}",
+  "allPricesCellNoPriceSemantics": "{fuel}, pas de prix",
+  "allPricesCellUnavailableSemantics": "{fuel}, en rupture",
+  "allPricesCellUnusableSemantics": "{fuel}, incompatible avec votre véhicule"
+}
