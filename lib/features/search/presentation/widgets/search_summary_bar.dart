@@ -16,15 +16,26 @@ import '../../providers/radar_search_provider.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
 import '../screens/search_criteria_screen.dart';
+import 'results/price_freshness_segment.dart';
+import 'results/summary_chip.dart';
+import 'user_position_bar.dart';
 
-/// Compact, 1-row summary bar shown above the results list.
+/// **Row A** of the two-row results chrome (#3926, epic #3925).
 ///
-/// Displays the current search criteria (fuel type, quantity, radius) and a
-/// "Rechercher" action that opens the full [SearchCriteriaScreen]. Tapping
-/// anywhere on the bar also opens the criteria screen.
+/// One tappable band that replaced three stacked strips: the country data
+/// source link, the fuel/radius chip row and the "Your position: GPS
+/// (1 min)" bar with its second refresh icon. It now carries four
+/// segments — fuel · radius (or "along the route") · position or search
+/// address · price freshness — and opens the full [SearchCriteriaScreen]
+/// on tap, exactly as the old chip row did.
 ///
-/// Designed to be under 56dp tall and to leave the maximum amount of
-/// vertical space for the results list below.
+/// The segments live in a [Wrap]: an expanded translation moves a whole
+/// pill to the next line instead of clipping it, so the band survives
+/// en_XA at 320 dp and a 1.3× text scale.
+///
+/// The open-data attribution that used to sit above this bar now lives in
+/// the footer under the results list, and the position bar's refresh icon
+/// was folded into the single app-bar refresh.
 class SearchSummaryBar extends ConsumerWidget {
   const SearchSummaryBar({super.key});
 
@@ -50,30 +61,30 @@ class SearchSummaryBar extends ConsumerWidget {
     return type.displayName;
   }
 
-  /// The chip that follows the fuel chip. In nearby mode it shows the
-  /// radius ("Within {km} km"); in route mode it shows a "Searching the
-  /// route…" placeholder while results stream in, then the route-segment
-  /// summary ("Every {km} km") once the search completes (#2592).
-  Widget _secondChip(
+  /// The segment that follows the fuel pill. In nearby mode it shows the
+  /// radius ("Within {km} km"); in route mode it names the corridor and its
+  /// sampling spacing ("Along the route · every {km} km", #3926) — or a
+  /// "Searching the route…" placeholder while results stream in (#2592).
+  Widget _scopeSegment(
     BuildContext context,
     WidgetRef ref,
     AppLocalizations l10n,
     SearchMode mode,
   ) {
     // #2676 — while the on-search Fuel Station Radar owns the results, the
-    // radius chip is meaningless (the radar scans its own cached corridor);
-    // replace it with a "radar result" badge so the grey bar signals the
+    // radius segment is meaningless (the radar scans its own cached
+    // corridor); it becomes a "radar result" badge so the bar signals the
     // list is a radar scan, not a regular search.
-    if (ref.watch(radarSearchProvider).active) {
-      return _SummaryChip(
-        icon: const Icon(Icons.radar, size: 16),
+    if (ref.watch(radarSearchProvider.select((s) => s.active))) {
+      return SummaryChip(
+        icon: const Icon(Icons.radar, size: 14),
         label: l10n.fuelStationRadarResultBadge,
       );
     }
     if (mode != SearchMode.route) {
       final kmText = ref.watch(searchRadiusProvider).round().toString();
-      return _SummaryChip(
-        icon: const Icon(Icons.radar, size: 16),
+      return SummaryChip(
+        icon: const Icon(Icons.radar, size: 14),
         label: l10n.searchCriteriaRadiusBadge(kmText),
       );
     }
@@ -84,10 +95,10 @@ class SearchSummaryBar extends ConsumerWidget {
       // #2783 — a live spinner (not the static route icon) so a route search
       // in progress — including the progressive/partial phase where real
       // cards are already showing — clearly reads as still ongoing.
-      return _SummaryChip(
+      return SummaryChip(
         icon: const SizedBox(
-          width: 14,
-          height: 14,
+          width: 12,
+          height: 12,
           child: CircularProgressIndicator(strokeWidth: 2),
         ),
         label: l10n.routeSearchingChip,
@@ -97,10 +108,26 @@ class SearchSummaryBar extends ConsumerWidget {
         .watch(routeSegmentSearchParamProvider)
         .round()
         .toString();
-    return _SummaryChip(
-      icon: const Icon(Icons.route, size: 16),
-      label: l10n.routeSegmentSummaryBadge(segmentText),
+    return SummaryChip(
+      icon: const Icon(Icons.route, size: 14),
+      label: l10n.searchSummaryAlongRoute(segmentText),
     );
+  }
+
+  /// Position or address segment. A ZIP/address search names the place it
+  /// searched around; otherwise the user's own position (source + age) is
+  /// shown by [UserPositionBar], now a compact pill rather than its own
+  /// full-width strip.
+  Widget _whereSegment(WidgetRef ref) {
+    final location = ref.watch(searchLocationProvider);
+    if (location.isNotEmpty) {
+      return SummaryChip(
+        key: const Key('search_summary_address'),
+        icon: const Icon(Icons.place_outlined, size: 14),
+        label: location,
+      );
+    }
+    return const UserPositionBar();
   }
 
   @override
@@ -109,7 +136,7 @@ class SearchSummaryBar extends ConsumerWidget {
     final fuelType = ref.watch(selectedFuelTypeProvider);
     final theme = Theme.of(context);
 
-    // #2592 — route mode replaces the meaningless radius chip with the
+    // #2592 — route mode replaces the meaningless radius segment with the
     // route-planning summary. Gate on Feature.routePlanning exactly as the
     // criteria screen does, so a gated-off install keeps the radius chip.
     final storedMode = ref.watch(activeSearchModeProvider);
@@ -120,7 +147,10 @@ class SearchSummaryBar extends ConsumerWidget {
         ? storedMode
         : SearchMode.nearby;
 
-    final fuelColor = FuelColors.forType(fuelType);
+    // #3926 — the radar re-scans continuously and paints its own result set,
+    // so the regular search's download age would describe a list the user is
+    // not looking at. No freshness segment while it owns the results.
+    final radarActive = ref.watch(radarSearchProvider.select((s) => s.active));
 
     return Semantics(
       label: l10n.searchCriteriaSemanticLabel,
@@ -131,72 +161,26 @@ class SearchSummaryBar extends ConsumerWidget {
           onTap: () => _openCriteria(context),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            child: Row(
+            child: Wrap(
+              spacing: 6,
+              runSpacing: 4,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Fuel type chip
-                        _SummaryChip(
-                          icon: Icon(fuelType.icon, size: 16, color: fuelColor),
-                          label: _fuelLabel(context, fuelType),
-                        ),
-                        const SizedBox(width: 6),
-                        // Second chip: radius (nearby) or route-planning
-                        // summary (route) — see [_secondChip] (#2592).
-                        _secondChip(context, ref, l10n, mode),
-                      ],
-                    ),
+                SummaryChip(
+                  icon: Icon(
+                    fuelType.icon,
+                    size: 14,
+                    color: FuelColors.forType(fuelType),
                   ),
+                  label: _fuelLabel(context, fuelType),
                 ),
-                // #2131 — inline "Search" tonal button removed; the
-                // central FAB owns the open-criteria action now. The
-                // tap-anywhere-on-bar affordance below is kept as a
-                // discoverable shortcut on the status row itself.
+                _scopeSegment(context, ref, l10n, mode),
+                _whereSegment(ref),
+                if (!radarActive) const PriceFreshnessSegment(),
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _SummaryChip extends StatelessWidget {
-  const _SummaryChip({required this.icon, required this.label});
-
-  final Widget icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        // #2117 — chip sits on the summary bar's `surfaceContainerHighest`
-        // surface; surfaceContainerLow is the M3 inversion that reads as
-        // a recessed pill rather than fighting the bar.
-        color: theme.colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.outlineVariant),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          icon,
-          const SizedBox(width: 4),
-          Flexible(
-            child: Text(
-              label,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.labelSmall,
-            ),
-          ),
-        ],
       ),
     );
   }

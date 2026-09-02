@@ -9,51 +9,75 @@ import '../../../../helpers/pump_app.dart';
 
 void main() {
   group('SortSelector', () {
-    testWidgets('renders all six sort options', (tester) async {
+    testWidgets('renders all six sort options without scrolling (#3926)', (
+      tester,
+    ) async {
       await pumpApp(
         tester,
-        SortSelector(
-          selected: SortMode.distance,
-          onChanged: (_) {},
-        ),
+        SortSelector(selected: SortMode.distance, onChanged: (_) {}),
       );
 
-      // First 3 visible without scroll
+      // #3926 — the chips used to live in a horizontal SingleChildScrollView
+      // that cut "24h" in half at 320 dp and hid the three chips past it.
+      // A Wrap moves a whole chip to the next line instead, so every option
+      // is on screen with no drag.
+      expect(find.byType(SingleChildScrollView), findsNothing);
+      expect(find.byType(Wrap), findsOneWidget);
+
       expect(find.text('Distance'), findsOneWidget);
       expect(find.text('Price'), findsOneWidget);
       expect(find.text('A-Z'), findsOneWidget);
-
-      // Scroll to reveal new chips
-      await tester.drag(
-        find.byType(SingleChildScrollView),
-        const Offset(-300, 0),
-      );
-      await tester.pump();
-
       expect(find.text('24h'), findsOneWidget);
       expect(find.text('Rating'), findsOneWidget);
       expect(find.text('Price/km'), findsOneWidget);
     });
 
+    testWidgets('no chip is clipped at a 320 dp width (#3926)', (tester) async {
+      tester.view.physicalSize = const Size(320, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await pumpApp(
+        tester,
+        SortSelector(selected: SortMode.distance, onChanged: (_) {}),
+      );
+
+      expect(tester.takeException(), isNull);
+      for (final label in const [
+        'Distance',
+        'Price',
+        'A-Z',
+        '24h',
+        'Rating',
+        'Price/km',
+      ]) {
+        final rect = tester.getRect(find.text(label));
+        expect(
+          rect.left >= 0 && rect.right <= 320,
+          isTrue,
+          reason: 'the "$label" chip must sit fully inside a 320 dp viewport '
+              '— it is $rect',
+        );
+      }
+    });
+
     testWidgets('default selection is highlighted as selected', (tester) async {
       await pumpApp(
         tester,
-        SortSelector(
-          selected: SortMode.distance,
-          onChanged: (_) {},
-        ),
+        SortSelector(selected: SortMode.distance, onChanged: (_) {}),
       );
 
-      final chips = tester.widgetList<ChoiceChip>(find.byType(ChoiceChip)).toList();
+      final chips = tester
+          .widgetList<ChoiceChip>(find.byType(ChoiceChip))
+          .toList();
       expect(chips, hasLength(6));
 
-      // Distance chip should be selected
       final distanceChip = chips.firstWhere(
         (c) => (c.label as Text).data == 'Distance',
       );
       expect(distanceChip.selected, isTrue);
 
-      // Others should not be selected
       final priceChip = chips.firstWhere(
         (c) => (c.label as Text).data == 'Price',
       );
@@ -68,144 +92,54 @@ void main() {
     testWidgets('price selection is highlighted when selected', (tester) async {
       await pumpApp(
         tester,
-        SortSelector(
-          selected: SortMode.price,
-          onChanged: (_) {},
-        ),
+        SortSelector(selected: SortMode.price, onChanged: (_) {}),
       );
 
-      final chips = tester.widgetList<ChoiceChip>(find.byType(ChoiceChip)).toList();
+      final chips = tester
+          .widgetList<ChoiceChip>(find.byType(ChoiceChip))
+          .toList();
       final priceChip = chips.firstWhere(
         (c) => (c.label as Text).data == 'Price',
       );
       expect(priceChip.selected, isTrue);
     });
 
-    testWidgets('tapping a sort option calls onChanged', (tester) async {
-      SortMode? receivedMode;
-
-      await pumpApp(
+    for (final (label, expected) in const [
+      ('Price', SortMode.price),
+      ('A-Z', SortMode.name),
+      ('24h', SortMode.open24h),
+      ('Rating', SortMode.rating),
+      ('Price/km', SortMode.priceDistance),
+    ]) {
+      testWidgets('tapping $label calls onChanged with $expected', (
         tester,
-        SortSelector(
-          selected: SortMode.distance,
-          onChanged: (mode) => receivedMode = mode,
-        ),
-      );
+      ) async {
+        SortMode? receivedMode;
 
-      await tester.tap(find.text('Price'));
-      await tester.pumpAndSettle();
+        await pumpApp(
+          tester,
+          SortSelector(
+            selected: SortMode.distance,
+            onChanged: (mode) => receivedMode = mode,
+          ),
+        );
 
-      expect(receivedMode, SortMode.price);
-    });
+        await tester.tap(find.text(label));
+        await tester.pumpAndSettle();
 
-    testWidgets('tapping A-Z calls onChanged with name', (tester) async {
-      SortMode? receivedMode;
-
-      await pumpApp(
-        tester,
-        SortSelector(
-          selected: SortMode.distance,
-          onChanged: (mode) => receivedMode = mode,
-        ),
-      );
-
-      await tester.tap(find.text('A-Z'));
-      await tester.pumpAndSettle();
-
-      expect(receivedMode, SortMode.name);
-    });
-
-    testWidgets('tapping 24h calls onChanged with open24h', (tester) async {
-      SortMode? receivedMode;
-
-      await pumpApp(
-        tester,
-        SortSelector(
-          selected: SortMode.distance,
-          onChanged: (mode) => receivedMode = mode,
-        ),
-      );
-
-      // Scroll to reveal new chips
-      await tester.drag(
-        find.byType(SingleChildScrollView),
-        const Offset(-300, 0),
-      );
-      await tester.pump();
-
-      await tester.tap(find.text('24h'));
-      await tester.pumpAndSettle();
-
-      expect(receivedMode, SortMode.open24h);
-    });
-
-    testWidgets('tapping Rating calls onChanged with rating', (tester) async {
-      SortMode? receivedMode;
-
-      await pumpApp(
-        tester,
-        SortSelector(
-          selected: SortMode.distance,
-          onChanged: (mode) => receivedMode = mode,
-        ),
-      );
-
-      await tester.drag(
-        find.byType(SingleChildScrollView),
-        const Offset(-300, 0),
-      );
-      await tester.pump();
-
-      await tester.tap(find.text('Rating'));
-      await tester.pumpAndSettle();
-
-      expect(receivedMode, SortMode.rating);
-    });
-
-    testWidgets('tapping Price/km calls onChanged with priceDistance', (tester) async {
-      SortMode? receivedMode;
-
-      await pumpApp(
-        tester,
-        SortSelector(
-          selected: SortMode.distance,
-          onChanged: (mode) => receivedMode = mode,
-        ),
-      );
-
-      await tester.drag(
-        find.byType(SingleChildScrollView),
-        const Offset(-300, 0),
-      );
-      await tester.pump();
-
-      await tester.tap(find.text('Price/km'));
-      await tester.pumpAndSettle();
-
-      expect(receivedMode, SortMode.priceDistance);
-    });
+        expect(receivedMode, expected);
+      });
+    }
 
     testWidgets('each chip has an icon', (tester) async {
       await pumpApp(
         tester,
-        SortSelector(
-          selected: SortMode.distance,
-          onChanged: (_) {},
-        ),
+        SortSelector(selected: SortMode.distance, onChanged: (_) {}),
       );
 
-      // First 3 icons visible
       expect(find.byIcon(Icons.near_me), findsOneWidget);
       expect(find.byIcon(Icons.euro), findsOneWidget);
       expect(find.byIcon(Icons.sort_by_alpha), findsOneWidget);
-
-      // Scroll to see new icons
-      await tester.drag(
-        find.byType(SingleChildScrollView),
-        const Offset(-300, 0),
-      );
-      await tester.pump();
-
       expect(find.byIcon(Icons.schedule), findsOneWidget);
       expect(find.byIcon(Icons.star), findsOneWidget);
       expect(find.byIcon(Icons.balance), findsOneWidget);
@@ -214,10 +148,7 @@ void main() {
     testWidgets('has correct semantics labels', (tester) async {
       await pumpApp(
         tester,
-        SortSelector(
-          selected: SortMode.price,
-          onChanged: (_) {},
-        ),
+        SortSelector(selected: SortMode.price, onChanged: (_) {}),
       );
 
       expect(
@@ -233,19 +164,17 @@ void main() {
     testWidgets('open24h selected chip is highlighted', (tester) async {
       await pumpApp(
         tester,
-        SortSelector(
-          selected: SortMode.open24h,
-          onChanged: (_) {},
-        ),
+        SortSelector(selected: SortMode.open24h, onChanged: (_) {}),
       );
 
-      final chips = tester.widgetList<ChoiceChip>(find.byType(ChoiceChip)).toList();
+      final chips = tester
+          .widgetList<ChoiceChip>(find.byType(ChoiceChip))
+          .toList();
       final open24hChip = chips.firstWhere(
         (c) => (c.label as Text).data == '24h',
       );
       expect(open24hChip.selected, isTrue);
 
-      // Distance should not be selected
       final distChip = chips.firstWhere(
         (c) => (c.label as Text).data == 'Distance',
       );
@@ -259,14 +188,17 @@ void main() {
     });
 
     test('contains all expected modes', () {
-      expect(SortMode.values, containsAll([
-        SortMode.distance,
-        SortMode.price,
-        SortMode.name,
-        SortMode.open24h,
-        SortMode.rating,
-        SortMode.priceDistance,
-      ]));
+      expect(
+        SortMode.values,
+        containsAll([
+          SortMode.distance,
+          SortMode.price,
+          SortMode.name,
+          SortMode.open24h,
+          SortMode.rating,
+          SortMode.priceDistance,
+        ]),
+      );
     });
   });
 }

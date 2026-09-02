@@ -8,7 +8,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/widgets/responsive_layout.dart';
 import '../../../../core/widgets/settings_app_bar_action.dart';
 import '../../../../core/country/country_provider.dart';
+import '../../../../core/error/guarded.dart';
 import '../../../../core/location/location_consent.dart';
+import '../../../../core/location/user_position_provider.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/utils/frame_callbacks.dart';
 import '../../../../core/widgets/page_scaffold.dart';
@@ -29,7 +31,7 @@ import '../../providers/search_provider.dart';
 import '../../providers/selected_station_provider.dart';
 import '../widgets/radar_pin_help_sheet.dart';
 import '../widgets/radar_screen_pin_mixin.dart';
-import '../widgets/radar_search_fab.dart';
+import '../widgets/results/search_results_footer.dart';
 import '../widgets/search_results_content.dart';
 import '../widgets/search_chrome_banners.dart';
 import '../widgets/search_summary_bar.dart';
@@ -137,6 +139,47 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     );
   }
 
+  /// #3926 — the ONE refresh this screen offers, merging the two it used to
+  /// carry. The AppBar action only re-ran the last search
+  /// (`repeatLastSearch`); the user-position strip carried a SECOND refresh
+  /// icon that asked for location consent, re-fixed the GPS position and —
+  /// when results were already showing — re-ran the search after it. This
+  /// does both in that order: re-fix the position first (so the distances
+  /// and the ranking are computed from where the user is now), then re-run
+  /// the search. A refused consent or a failed fix still refreshes prices.
+  Future<void> _refreshAll() async {
+    final settings = ref.read(settingsStorageProvider);
+    // #3159 — capture the notifiers BEFORE the consent/GPS awaits: a
+    // post-await ref.read throws a StateError if the screen unmounted
+    // while the dialog was up.
+    final positionNotifier = ref.read(userPositionProvider.notifier);
+    final searchNotifier = ref.read(searchStateProvider.notifier);
+
+    var consented = LocationConsentDialog.hasConsent(settings);
+    if (!consented) {
+      if (!mounted) return;
+      consented = await LocationConsentDialog.show(context);
+      if (consented) await LocationConsentDialog.recordConsent(settings);
+    }
+    if (consented) {
+      try {
+        await positionNotifier.updateFromGps();
+      } catch (e, st) {
+        // #1692 — never surface a raw exception toString() to the user;
+        // show a localized message instead. #2146 — route to the
+        // exportable log so the cause is recoverable from a report.
+        logFailure(e, st, where: 'SearchScreen: refresh updateFromGps');
+        if (mounted) {
+          SnackBarHelper.showError(
+            context,
+            AppLocalizations.of(context).searchFailedSnackbar,
+          );
+        }
+      }
+    }
+    unawaited(searchNotifier.repeatLastSearch());
+  }
+
   // ---------------------------------------------------------------------------
   // #2677 — radar pin + reduce-to-PiP (Android-only via PipController.isSupported)
   // ---------------------------------------------------------------------------
@@ -212,12 +255,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       actions: [
         IconButton(
           icon: const Icon(Icons.refresh),
-          onPressed: () {
-            unawaited(
-              ref.read(searchStateProvider.notifier).repeatLastSearch(),
-            );
-          },
-          tooltip: l10n.refreshPrices,
+          onPressed: () => unawaited(_refreshAll()),
+          tooltip: l10n.searchRefreshTooltip,
         ),
         if (radarActive) ...[
           // Pin — wake lock + immersive bars (copied from the trip screen).
@@ -257,12 +296,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
         const SettingsAppBarAction(),
       ],
       bodyPadding: EdgeInsets.zero,
-      // #2682 — the Fuel Station Radar launches from a "Start recording"-style
-      // extended-FAB pill (`RadarSearchFab`) floated bottom-right via the
-      // Scaffold FAB slot, clear of the shell's central search FAB (docked into
-      // the bottom-nav notch) + the bottom nav itself. The pill flips to a stop
-      // treatment while the radar owns the results list.
-      floatingActionButton: const RadarSearchFab(),
+      // #3926 — no screen-level FAB any more. The Fuel Station Radar pill
+      // (#2682) covered the third station card and competed with the
+      // shell's docked search FAB; it is a compact chip on the results row
+      // now, leaving the docked search FAB as the only FAB on the screen.
       // #2530 — the shared master/detail scaffold owns the breakpoint +
       // foldable-hinge + 1:1/2:3 ratios. Compact (< 600dp) renders
       // `_buildSearchContent` full-width, byte-for-byte unchanged. On wide
@@ -333,7 +370,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
           hidden: hideChromeForLandscapeRadar,
           country: country,
           corridorCountryCodes: corridorCodes,
-          onSearchAgain: _performGpsSearch,
         ),
         // Results dominate the remaining vertical space.
         Expanded(
@@ -342,6 +378,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
             child: SearchResultsContent(onGpsRetry: _performGpsSearch),
           ),
         ),
+        // #3926 — the price-arrow legend + the open-data attribution that
+        // used to head the screen, as a pinned footer under the list.
+        if (!hideChromeForLandscapeRadar)
+          SearchResultsFooter(
+            country: country,
+            corridorCountryCodes: corridorCodes,
+          ),
       ],
     );
   }

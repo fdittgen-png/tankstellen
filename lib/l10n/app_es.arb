@@ -2737,15 +2737,6 @@
   "@routeSearchingChip": {
     "description": "MT — needs native review"
   },
-  "routeSegmentSummaryBadge": "Cada {km} km",
-  "@routeSegmentSummaryBadge": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "km": {
-        "type": "String"
-      }
-    }
-  },
   "profileSwitchedTo": "Cambiado a {profile}",
   "@profileSwitchedTo": {
     "description": "MT — needs native review",

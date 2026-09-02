@@ -2737,15 +2737,6 @@
   "@routeSearchingChip": {
     "description": "MT — needs native review"
   },
-  "routeSegmentSummaryBadge": "Každých {km} km",
-  "@routeSegmentSummaryBadge": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "km": {
-        "type": "String"
-      }
-    }
-  },
   "profileSwitchedTo": "Přepnuto na {profile}",
   "@profileSwitchedTo": {
     "description": "MT — needs native review",

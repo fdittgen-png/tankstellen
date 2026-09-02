@@ -26,13 +26,13 @@ import '../../../../fixtures/stations.dart';
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
 
-/// #2682 — the radar launches from a "Start recording"-style extended-FAB pill
-/// ([RadarSearchFab]), styled like the trip `TrajetsRecordFab` (a brand-tinted
-/// rounded [FloatingActionButton.extended] with a leading icon + label) — NOT
-/// the cramped #2675 header IconButton. Tapping it runs the on-search radar and
-/// the SAME results list re-renders the radar stations as ordinary fuel cards,
-/// without touching `searchStateProvider`. When the radar is active the pill
-/// flips to a stop treatment that dismisses it.
+/// #2682 shipped the radar launch affordance as an extended-FAB pill; #3926
+/// demoted it to a compact [RadarSearchChip] on the results row, because the
+/// pill covered the third station card and competed with the shell's docked
+/// search FAB. Tapping it still runs the on-search radar and the SAME results
+/// list re-renders the radar stations as ordinary fuel cards, without touching
+/// `searchStateProvider`; when the radar is active the chip flips to a stop
+/// treatment that dismisses it.
 
 Station _station(String id, double lat, double lng, {double e10 = 1.5}) =>
     Station(
@@ -103,22 +103,24 @@ FuelStationRadar _recordedRadar(List<Station> corridor) => FuelStationRadar(
 void main() {
   Future<void> noopRetry() async {}
 
-  group('RadarSearchFab', () {
+  group('RadarSearchChip', () {
     testWidgets(
-        'renders as a FloatingActionButton.extended (the "Start recording" '
-        'pill style), idle label, with a leading radar icon', (tester) async {
+        '#3926 — renders as a compact ActionChip (no FAB), idle label, with a '
+        'leading radar icon', (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
       await pumpApp(
         tester,
-        const RadarSearchFab(),
+        const RadarSearchChip(),
         overrides: test.overrides.cast(),
       );
 
-      // It is the extended-FAB pill, not a bare IconButton.
-      expect(find.byType(FloatingActionButton), findsOneWidget);
-      expect(find.widgetWithIcon(FloatingActionButton, Icons.radar),
+      // #3926 — a chip, never a FAB: the docked search FAB is the only
+      // floating button on the search screen now.
+      expect(find.byType(FloatingActionButton), findsNothing);
+      expect(find.byType(ActionChip), findsOneWidget);
+      expect(find.widgetWithIcon(ActionChip, Icons.radar),
           findsOneWidget);
       expect(find.text('Start fuel station radar'), findsOneWidget);
     });
@@ -132,16 +134,12 @@ void main() {
       when(() => test.mockStorage.getRatings())
           .thenReturn(const <String, int>{});
 
-      // Pump the content + pill together so the single radar provider drives
-      // both: the pill is the launch affordance, the content is the renderer.
+      // #3926 — the chip lives ON the results row, so pumping the content
+      // alone gives both roles: row B is the launch affordance, the list
+      // below it is the renderer.
       await pumpApp(
         tester,
-        Column(
-          children: [
-            const RadarSearchFab(),
-            Expanded(child: SearchResultsContent(onGpsRetry: noopRetry)),
-          ],
-        ),
+        SearchResultsContent(onGpsRetry: noopRetry),
         overrides: [
           ...test.overrides,
           userPositionProvider.overrideWith(_FixedUserPosition.new),
@@ -180,7 +178,7 @@ void main() {
       // hang; a single frame is enough to assert the first paint.
       await pumpApp(
         tester,
-        const RadarSearchFab(),
+        const RadarSearchChip(),
         overrides: [
           ...test.overrides,
           radarSearchProvider.overrideWith(_InitialisingRadar.new),
@@ -193,13 +191,13 @@ void main() {
       expect(find.text('Searching…'), findsOneWidget);
       expect(
           find.descendant(
-            of: find.byType(FloatingActionButton),
+            of: find.byType(ActionChip),
             matching: find.byType(CircularProgressIndicator),
           ),
           findsOneWidget);
       expect(find.text('Stop radar'), findsNothing);
       expect(find.text('Start fuel station radar'), findsNothing);
-      expect(find.widgetWithIcon(FloatingActionButton, Icons.stop_circle),
+      expect(find.widgetWithIcon(ActionChip, Icons.stop_circle),
           findsNothing);
 
       // It stays tappable so the user can cancel mid-scan — dismiss flips it
@@ -217,7 +215,7 @@ void main() {
 
       await pumpApp(
         tester,
-        const RadarSearchFab(),
+        const RadarSearchChip(),
         overrides: [
           ...test.overrides,
           radarSearchProvider.overrideWith(
@@ -232,22 +230,23 @@ void main() {
       expect(find.text('Stop radar'), findsOneWidget);
       expect(find.text('Stop'), findsNothing);
       expect(find.text('Start fuel station radar'), findsNothing);
-      expect(find.widgetWithIcon(FloatingActionButton, Icons.stop_circle),
+      expect(find.widgetWithIcon(ActionChip, Icons.stop_circle),
           findsOneWidget);
       expect(
-          find.widgetWithIcon(FloatingActionButton, Icons.close), findsNothing);
+          find.widgetWithIcon(ActionChip, Icons.close), findsNothing);
 
       // Tapping it dismisses the radar (flips back to the start treatment).
       await tester.tap(find.byKey(const Key('radarSearchButton')));
       await tester.pumpAndSettle();
       expect(find.text('Start fuel station radar'), findsOneWidget);
-      expect(find.widgetWithIcon(FloatingActionButton, Icons.radar),
+      expect(find.widgetWithIcon(ActionChip, Icons.radar),
           findsOneWidget);
     });
   });
 
-  testWidgets('the old header radar IconButton is gone from SearchResultsList',
-      (tester) async {
+  testWidgets(
+      '#3926 — the launch affordance is a single chip on the results row, and '
+      'the results area floats no FAB of its own', (tester) async {
     final test = standardTestOverrides();
     when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
     when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
@@ -262,10 +261,10 @@ void main() {
       ].cast(),
     );
 
-    // The launch affordance no longer lives inside the results list header —
-    // it is the screen-level FAB pill now.
-    expect(find.byKey(const Key('radarSearchButton')), findsNothing);
-    expect(find.byType(RadarSearchFab), findsNothing);
+    // Exactly one launch affordance, on row B — and it is not a FAB.
+    expect(find.byKey(const Key('radarSearchButton')), findsOneWidget);
+    expect(find.byType(RadarSearchChip), findsOneWidget);
+    expect(find.byType(FloatingActionButton), findsNothing);
   });
 
   testWidgets('an active radar state renders its stations via the same list',

@@ -5,12 +5,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/location/user_position_provider.dart';
 import '../../../../l10n/app_localizations.dart';
+import 'results/summary_chip.dart';
 
-/// Shows the user's known position and allows updating it.
+/// The **position segment** of the results summary bar (row A, #3926).
+///
+/// Was a full-width strip of its own ("Your position: GPS (1 min)") with a
+/// second refresh icon beside the app bar's. The strip is gone: the readout
+/// is now one pill inside row A, and the refresh it carried was merged into
+/// the single app-bar refresh (which re-fixes the position *and* re-runs the
+/// search). The widget keeps its name and its optional [onUpdatePosition]
+/// callback so it can still be driven as a standalone affordance.
 class UserPositionBar extends ConsumerWidget {
-  final VoidCallback onUpdatePosition;
+  /// Optional tap action. Row A leaves this null — the whole band opens the
+  /// criteria sheet — and the app-bar refresh owns the GPS re-fix.
+  final VoidCallback? onUpdatePosition;
 
-  const UserPositionBar({super.key, required this.onUpdatePosition});
+  const UserPositionBar({super.key, this.onUpdatePosition});
 
   String _formatAge(DateTime updatedAt) {
     final diff = DateTime.now().difference(updatedAt);
@@ -26,83 +36,34 @@ class UserPositionBar extends ConsumerWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
 
-    final posLabel = l10n.yourPosition;
-    final unknownLabel = l10n.positionUnknown;
-    final distFromSearchLabel = l10n.distancesFromCenter;
-
+    final Widget chip;
     if (userPos != null) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
-        child: Row(
-          children: [
-            Icon(Icons.my_location, size: 16, color: theme.colorScheme.primary),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Text(
-                '$posLabel: ${userPos.source} (${_formatAge(userPos.updatedAt)})',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            InkWell(
-              onTap: onUpdatePosition,
-              borderRadius: BorderRadius.circular(12),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                child: Icon(
-                  Icons.refresh,
-                  size: 18,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-            ),
-          ],
+      final value = '${userPos.source} · ${_formatAge(userPos.updatedAt)}';
+      chip = SummaryChip(
+        key: const Key('user_position_segment'),
+        icon: Icon(
+          Icons.my_location,
+          size: 14,
+          color: theme.colorScheme.primary,
         ),
+        label: value,
+        semanticsLabel: '${l10n.yourPosition}: $value',
+      );
+    } else {
+      chip = SummaryChip(
+        key: const Key('user_position_segment'),
+        icon: Icon(
+          Icons.location_off,
+          size: 14,
+          color: theme.colorScheme.error,
+        ),
+        label: l10n.positionUnknown,
+        semanticsLabel: '${l10n.positionUnknown} — ${l10n.distancesFromCenter}',
       );
     }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      color: theme.colorScheme.errorContainer.withValues(alpha: 0.3),
-      child: Row(
-        children: [
-          Icon(
-            Icons.location_off,
-            size: 16,
-            color: theme.colorScheme.onErrorContainer,
-          ),
-          const SizedBox(width: 6),
-          Expanded(
-            child: Text(
-              '$unknownLabel \u2014 $distFromSearchLabel',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onErrorContainer,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          TextButton.icon(
-            onPressed: onUpdatePosition,
-            icon: Icon(
-              Icons.my_location,
-              size: 14,
-              color: theme.colorScheme.primary,
-            ),
-            label: Text(
-              'GPS',
-              style: TextStyle(fontSize: 12, color: theme.colorScheme.primary),
-            ),
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-          ),
-        ],
-      ),
-    );
+    final onTap = onUpdatePosition;
+    if (onTap == null) return chip;
+    return InkWell(onTap: onTap, child: chip);
   }
 }

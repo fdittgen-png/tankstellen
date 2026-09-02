@@ -125,14 +125,25 @@ class _StationPriceColumn extends StatelessWidget {
             if (priceTier != null && priceTier != PriceTier.unknown)
               Padding(
                 padding: const EdgeInsets.only(right: 2),
-                child: Icon(
-                  iconForPriceTier(priceTier!),
-                  size: 16,
-                  // #3198 — only a KNOWN-closed station greys the price;
-                  // unknown keeps the fuel colour (price data is valid).
-                  color: station.isOpen == false
-                      ? theme.colorScheme.onSurfaceVariant
-                      : fuelColor,
+                // #3926 — the ↓ / – / ↑ glyph is a PRICE TIER inside the
+                // CURRENT result set (`priceTierOf` splits the listed
+                // stations' min-to-max range for the selected fuel into
+                // thirds), never a movement against an earlier price. It
+                // shipped with no reference at all; it now names what it
+                // compares against, and the list footer carries the same
+                // wording as a one-line legend.
+                child: Tooltip(
+                  message: _priceTierTooltip(l10n, priceTier!),
+                  child: Icon(
+                    iconForPriceTier(priceTier!),
+                    size: 16,
+                    // #3198 — only a KNOWN-closed station greys the price;
+                    // unknown keeps the fuel colour (price data is valid).
+                    color: station.isOpen == false
+                        ? theme.colorScheme.onSurfaceVariant
+                        : fuelColor,
+                    semanticLabel: _priceTierTooltip(l10n, priceTier!),
+                  ),
                 ),
               ),
             AnimatedPriceText(
@@ -206,6 +217,18 @@ class _StationPriceColumn extends StatelessWidget {
     );
   }
 }
+
+/// Wording for the card's price-tier glyph (#3926). The tier is relative
+/// to the OTHER stations currently listed — the bottom, middle or top
+/// third of their price range for the selected fuel — so every string
+/// says "in this list" rather than implying a movement over time.
+String _priceTierTooltip(AppLocalizations l10n, PriceTier tier) =>
+    switch (tier) {
+      PriceTier.cheap => l10n.searchPriceArrowCheapTooltip,
+      PriceTier.average => l10n.searchPriceArrowAverageTooltip,
+      PriceTier.expensive => l10n.searchPriceArrowExpensiveTooltip,
+      PriceTier.unknown => '',
+    };
 
 /// Small badge rendered under the price row when a loyalty / fuel-club
 /// card applies (#1120 pilot). Shows the per-litre discount, the

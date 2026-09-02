@@ -10,10 +10,16 @@ import 'package:tankstellen/features/route_search/domain/entities/route_info.dar
 import 'package:tankstellen/features/route_search/domain/route_search_result.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/search_mode.dart';
+import 'package:tankstellen/core/domain/search_result_item.dart';
 import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/search/presentation/screens/search_criteria_screen.dart';
 import 'package:tankstellen/features/search/presentation/widgets/search_summary_bar.dart';
+import 'package:tankstellen/core/services/service_result.dart';
+import 'package:tankstellen/core/time/app_clock.dart';
+import 'package:tankstellen/features/search/presentation/widgets/results/summary_chip.dart';
+import 'package:tankstellen/features/search/presentation/widgets/user_position_bar.dart';
 import 'package:tankstellen/features/search/providers/radar_search_provider.dart';
+import 'package:tankstellen/features/search/providers/search_provider.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
@@ -27,7 +33,8 @@ const _route = RouteInfo(
 
 void main() {
   group('SearchSummaryBar', () {
-    testWidgets('renders fuel type and radius badge (#2131 — inline button removed)',
+    testWidgets(
+        'renders fuel type and radius badge (#2131 — inline button removed)',
         (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
@@ -120,7 +127,7 @@ void main() {
       // #2783 — a live spinner signals the search is ongoing.
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
       expect(find.text('Within 10 km'), findsNothing);
-      expect(find.text('Every 50 km'), findsNothing);
+      expect(find.text('Along the route · every 50 km'), findsNothing);
     });
 
     testWidgets('route mode + partial result shows searching chip',
@@ -153,7 +160,7 @@ void main() {
 
       expect(find.text('Searching the route…'), findsOneWidget);
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
-      expect(find.text('Every 50 km'), findsNothing);
+      expect(find.text('Along the route · every 50 km'), findsNothing);
     });
 
     testWidgets('route mode + complete result shows route-segment summary',
@@ -178,7 +185,7 @@ void main() {
         ],
       );
 
-      expect(find.text('Every 50 km'), findsOneWidget);
+      expect(find.text('Along the route · every 50 km'), findsOneWidget);
       expect(find.text('Searching the route…'), findsNothing);
       expect(find.text('Within 10 km'), findsNothing);
     });
@@ -224,6 +231,105 @@ void main() {
       expect(find.text('Within 10 km'), findsOneWidget);
       expect(find.text('Fuel Station Radar result'), findsNothing);
     });
+
+    // #3926 — row A absorbed the position strip and the freshness pill.
+    testWidgets('carries the position segment when no address was searched',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const SearchSummaryBar(),
+        overrides: [
+          ...test.overrides,
+          selectedFuelTypeOverride(FuelType.e10),
+          searchRadiusOverride(10),
+          userPositionOverride(lat: 52.52, lng: 13.405, source: 'GPS'),
+        ],
+      );
+
+      expect(find.byType(UserPositionBar), findsOneWidget);
+      expect(find.byKey(const Key('search_summary_address')), findsNothing);
+    });
+
+    testWidgets('a searched address replaces the position segment',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const SearchSummaryBar(),
+        overrides: [
+          ...test.overrides,
+          selectedFuelTypeOverride(FuelType.e10),
+          searchRadiusOverride(10),
+          userPositionNullOverride(),
+          searchLocationOverride('75001 Paris'),
+        ],
+      );
+
+      expect(find.text('75001 Paris'), findsOneWidget);
+      expect(find.byType(UserPositionBar), findsNothing);
+    });
+
+    testWidgets(
+        'the freshness segment says WHAT is old — the price download age — '
+        'and stays neutral inside the staleness threshold (#3926)',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const SearchSummaryBar(),
+        overrides: [
+          ...test.overrides,
+          selectedFuelTypeOverride(FuelType.e10),
+          searchRadiusOverride(10),
+          userPositionNullOverride(),
+          appClockProvider.overrideWithValue(FixedClock(_fixedNow)),
+          searchStateProvider.overrideWith(
+            () => _SeededSearch(_fixedNow.subtract(const Duration(hours: 2))),
+          ),
+        ],
+      );
+
+      // The wordless "⚠ 2 h ago" pill is gone; the segment names the subject.
+      expect(find.text('Prices from 2 h ago'), findsOneWidget);
+      final chip = tester.widget<SummaryChip>(
+        find.byKey(const Key('search_freshness_segment')),
+      );
+      // 2 h is past the 15-minute staleness threshold → amber.
+      expect(chip.emphasized, isTrue);
+    });
+
+    testWidgets('a fresh price list is NOT amber (#3926)', (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const SearchSummaryBar(),
+        overrides: [
+          ...test.overrides,
+          selectedFuelTypeOverride(FuelType.e10),
+          searchRadiusOverride(10),
+          userPositionNullOverride(),
+          appClockProvider.overrideWithValue(FixedClock(_fixedNow)),
+          searchStateProvider.overrideWith(
+            () => _SeededSearch(_fixedNow.subtract(const Duration(minutes: 3))),
+          ),
+        ],
+      );
+
+      expect(find.text('Prices from 3 min ago'), findsOneWidget);
+      final chip = tester.widget<SummaryChip>(
+        find.byKey(const Key('search_freshness_segment')),
+      );
+      expect(chip.emphasized, isFalse);
+    });
   });
 }
 
@@ -234,3 +340,36 @@ class _ActiveRadar extends RadarSearch {
         stations: AsyncData<List<Station>>(<Station>[]),
       );
 }
+
+/// A mid-month Wednesday — the house convention for a pinned test clock.
+final _fixedNow = DateTime(2026, 3, 11, 14, 30);
+
+/// A loaded search whose payload was downloaded at [_fetchedAt] — the value
+/// the freshness segment ages against.
+class _SeededSearch extends SearchState {
+  _SeededSearch(this._fetchedAt);
+
+  final DateTime _fetchedAt;
+
+  @override
+  AsyncValue<ServiceResult<List<SearchResultItem>>> build() => AsyncValue.data(
+        ServiceResult(
+          data: const [FuelStationResult(_station)],
+          source: ServiceSource.prixCarburantsApi,
+          fetchedAt: _fetchedAt,
+        ),
+      );
+}
+
+const _station = Station(
+  id: 'fr-1',
+  name: 'Station',
+  brand: 'TEST',
+  street: 'rue',
+  postCode: '75001',
+  place: 'Paris',
+  lat: 48.85,
+  lng: 2.35,
+  e10: 1.75,
+  isOpen: true,
+);

@@ -9,23 +9,28 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/radar_search_provider.dart';
 
-/// #2682 — the Fuel Station Radar launch affordance on the search-results
-/// screen, styled identically to the Trajets "Start recording" pill
-/// (`TrajetsRecordFab`): a brand-tinted, rounded [FloatingActionButton.extended]
-/// floating bottom-right, with a leading filled icon + a label.
+/// The Fuel Station Radar launch affordance on the search-results screen.
 ///
-/// Replaces the cramped header radar icon-button (#2675) — the launch
-/// affordance only; all radar behaviour (cache-first fetch, results injection,
-/// grey result-badge, PiP controls) is unchanged and still owned by
-/// [RadarSearch] + `SearchResultsContent`.
+/// #2682 shipped it as a brand-tinted extended FAB floating bottom-right.
+/// #3926 demotes it to a compact [ActionChip] on the results row: the
+/// screen carried TWO floating buttons — the shell's docked search FAB and
+/// this pill — and the pill covered the third station card. The shell's
+/// search FAB is now the only FAB on the screen, and the list reserves
+/// `kFabScrollClearance` so the last card clears it.
 ///
-/// Mirrors the trip pill's idle→active flip: idle launches the scan
-/// ([RadarSearch.runRadar]); once the radar owns the results list it flips to
-/// a stop treatment that hands the list back to the regular search
-/// ([RadarSearch.dismiss]) — the same "one button, two states" pattern the
-/// "Start recording" → "Resume recording" pill uses.
-class RadarSearchFab extends ConsumerWidget {
-  const RadarSearchFab({super.key});
+/// All radar behaviour (cache-first fetch, results injection, grey
+/// result-badge, PiP controls) is unchanged and still owned by
+/// [RadarSearch] + `SearchResultsContent`. The handler and the
+/// `radarSearchButton` key are the same as the FAB's, so the idle → active
+/// flip is preserved: idle launches the scan ([RadarSearch.runRadar]);
+/// once the radar owns the results list the chip flips to a stop treatment
+/// that hands the list back to the regular search ([RadarSearch.dismiss]).
+class RadarSearchChip extends ConsumerWidget {
+  const RadarSearchChip({super.key});
+
+  /// Ceiling for the chip so an expanded translation ellipsises its label
+  /// instead of pushing the results row into a horizontal overflow.
+  static const double maxWidth = 150;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -34,11 +39,11 @@ class RadarSearchFab extends ConsumerWidget {
     final active = radar.active;
 
     // #3290 — while a run is initialising (acquiring the first GPS fix, or the
-    // first station list is still loading) the pill shows a spinner + a
-    // "Searching…" label so the user sees the radar is WORKING. Previously the
-    // pill flipped straight from "Start" to "Stop radar" with no progress sign,
-    // so a scan that takes a few seconds (cold GPS lock + first fetch) read as a
-    // button that did nothing. The pill stays tappable throughout so the user
+    // first station list is still loading) the chip shows a spinner + a
+    // "Searching…" label so the user sees the radar is WORKING. Previously it
+    // flipped straight from "Start" to "Stop radar" with no progress sign, so a
+    // scan that takes a few seconds (cold GPS lock + first fetch) read as a
+    // button that did nothing. The chip stays tappable throughout so the user
     // can still cancel mid-scan.
     final initializing = active && (radar.locating || radar.stations.isLoading);
 
@@ -46,32 +51,39 @@ class RadarSearchFab extends ConsumerWidget {
     final Widget icon;
     if (!active) {
       label = l10n.fuelStationRadarStart;
-      icon = const Icon(Icons.radar);
+      icon = const Icon(Icons.radar, size: 16);
     } else if (initializing) {
       label = l10n.radarSearching;
       icon = const SizedBox.square(
-        dimension: 18,
+        dimension: 14,
         child: CircularProgressIndicator(strokeWidth: 2),
       );
     } else {
       label = l10n.stopRadar;
-      icon = const Icon(Icons.stop_circle);
+      icon = const Icon(Icons.stop_circle, size: 16);
     }
 
-    return FloatingActionButton.extended(
-      key: const Key('radarSearchButton'),
-      // While the radar owns the list, the pill stops the scan and hands the
-      // results list back to the regular search; otherwise it launches a scan.
-      onPressed: () {
-        final notifier = ref.read(radarSearchProvider.notifier);
-        if (active) {
-          notifier.dismiss();
-        } else {
-          unawaited(notifier.runRadar());
-        }
-      },
-      icon: icon,
-      label: Text(label),
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: maxWidth),
+      child: ActionChip(
+        key: const Key('radarSearchButton'),
+        avatar: icon,
+        label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+        labelStyle: Theme.of(context).textTheme.labelSmall,
+        visualDensity: VisualDensity.compact,
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        tooltip: label,
+        // While the radar owns the list, the chip stops the scan and hands the
+        // results list back to the regular search; otherwise it launches a scan.
+        onPressed: () {
+          final notifier = ref.read(radarSearchProvider.notifier);
+          if (active) {
+            notifier.dismiss();
+          } else {
+            unawaited(notifier.runRadar());
+          }
+        },
+      ),
     );
   }
 }

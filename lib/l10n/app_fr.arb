@@ -1671,14 +1671,6 @@
   },
   "fabRunSearch": "Lancer la recherche",
   "routeSearchingChip": "Recherche sur l'itinéraire…",
-  "routeSegmentSummaryBadge": "Tous les {km} km",
-  "@routeSegmentSummaryBadge": {
-    "placeholders": {
-      "km": {
-        "type": "String"
-      }
-    }
-  },
   "approachTestSimulateButton": "Tester l'overlay d'approche",
   "@approachTestSimulateButton": {
     "description": "Button on the trip-recording screen that pushes a synthetic ApproachInRadius into the PiP for 30 s so the user can verify the price layout without driving (#2163)."

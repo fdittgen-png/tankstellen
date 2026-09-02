@@ -2737,15 +2737,6 @@
   "@routeSearchingChip": {
     "description": "MT — needs native review"
   },
-  "routeSegmentSummaryBadge": "Iga {km} km",
-  "@routeSegmentSummaryBadge": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "km": {
-        "type": "String"
-      }
-    }
-  },
   "profileSwitchedTo": "Lülitati profiilile {profile}",
   "@profileSwitchedTo": {
     "description": "MT — needs native review",

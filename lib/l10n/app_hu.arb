@@ -2737,15 +2737,6 @@
   "@routeSearchingChip": {
     "description": "MT — needs native review"
   },
-  "routeSegmentSummaryBadge": "Minden {km} km-ben",
-  "@routeSegmentSummaryBadge": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "km": {
-        "type": "String"
-      }
-    }
-  },
   "profileSwitchedTo": "Átváltva: {profile}",
   "@profileSwitchedTo": {
     "description": "MT — needs native review",

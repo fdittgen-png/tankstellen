@@ -90,7 +90,9 @@ void main() {
       expect(find.byType(TextField), findsNothing);
     });
 
-    testWidgets('renders UserPositionBar', (tester) async {
+    testWidgets(
+        '#3926 — the position readout is a SEGMENT of row A, not a strip of '
+        'its own', (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
@@ -104,6 +106,42 @@ void main() {
       );
 
       expect(find.byType(UserPositionBar), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(SearchSummaryBar),
+          matching: find.byType(UserPositionBar),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets(
+        '#3926 — the screen carries EXACTLY ONE refresh, in the app bar '
+        '(the position strip\'s second one is gone)', (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const SearchScreen(),
+        overrides: [
+          ...test.overrides,
+          userPositionOverride(lat: 52.52, lng: 13.405),
+        ],
+      );
+
+      expect(find.byIcon(Icons.refresh), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(AppBar),
+          matching: find.byIcon(Icons.refresh),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.byTooltip('Update position and refresh prices'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('shows empty state message when no search performed',

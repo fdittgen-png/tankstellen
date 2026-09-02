@@ -21,6 +21,7 @@ import '../../providers/radar_search_provider.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
 import 'radar_scope_view.dart';
+import 'radar_search_fab.dart';
 import 'route_results_view.dart';
 import 'search_results_list.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -213,9 +214,15 @@ class SearchResultsContent extends ConsumerWidget {
           // the screen's two "nothing here" moments no longer look like
           // two different apps.
           return SingleChildScrollView(
-            child: EmptyState(
-              icon: Icons.search,
-              title: l10n.startSearch,
+            child: Column(
+              children: [
+                EmptyState(icon: Icons.search, title: l10n.startSearch),
+                // #3926 — the radar launch affordance is a chip on the
+                // results row now; with no results there is no row, so the
+                // empty state carries the chip itself (the extended FAB it
+                // replaced used to be visible in every state).
+                const RadarSearchChip(),
+              ],
             ),
           );
         }
@@ -277,6 +284,11 @@ class _RadarEmptyState extends StatelessWidget {
               icon: const Icon(Icons.refresh),
               label: Text(l10n.retry),
             ),
+            const SizedBox(height: 12),
+            // #3926 — the only way to STOP a scan that found nothing: the
+            // radar chip lives on the results row, which an empty scan
+            // never renders.
+            const RadarSearchChip(),
           ],
         ),
       ),

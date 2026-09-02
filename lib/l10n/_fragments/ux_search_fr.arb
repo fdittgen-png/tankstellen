@@ -1,0 +1,50 @@
+{
+  "searchSummaryAlongRoute": "Le long du trajet · tous les {km} km",
+  "@searchSummaryAlongRoute": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "searchSummaryPricesJustNow": "Prix relevés à l'instant",
+  "searchSummaryPricesMinutes": "Prix d'il y a {minutes} min",
+  "@searchSummaryPricesMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "searchSummaryPricesHours": "Prix d'il y a {hours} h",
+  "@searchSummaryPricesHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "searchSummaryPricesDays": "Prix d'il y a {days} j",
+  "@searchSummaryPricesDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "searchResultsFilterTooltip": "Filtres",
+  "searchResultsFilterActiveSemantic": "Filtres, {count} actifs",
+  "@searchResultsFilterActiveSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchResultsMoreActionsTooltip": "Autres actions",
+  "searchPriceArrowLegend": "↓ et ↑ situent chaque prix par rapport aux autres stations de cette liste.",
+  "searchPriceArrowCheapTooltip": "Parmi les prix les plus bas de cette liste",
+  "searchPriceArrowAverageTooltip": "Un prix intermédiaire dans cette liste",
+  "searchPriceArrowExpensiveTooltip": "Parmi les prix les plus élevés de cette liste",
+  "searchRefreshTooltip": "Actualiser la position et les prix"
+}

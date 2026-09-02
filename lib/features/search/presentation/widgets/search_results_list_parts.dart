@@ -53,106 +53,34 @@ Map<String, Map<FuelType, bool>> _computeCheapestFlagsFor(
 (double, double) _getPriceRangeFor(List<Station> stations, FuelType fuel) =>
     priceRange(stations, fuel, requirePositive: true);
 
-/// Collapsible section that wraps [BrandFilterChips] inside an expandable
-/// toggle. When collapsed, only a "Brands" label with a chevron is shown.
-class _CollapsibleBrandFilters extends ConsumerWidget {
+/// The filter panel behind row B's badged filter button (#3926).
+///
+/// Was a "All brands ⌄" strip of its own — a sixth stacked chrome row
+/// above the first station card, carrying only a label, a dot and a
+/// chevron. The label + dot became the badged `Icons.filter_list` button
+/// on the results row; what is left here is the panel it expands: the
+/// brand / motorway chips and, for a mixed result set, the EV connector +
+/// power chips (#1784 — renders nothing for a fuel-only result set).
+class _ExpandableFilters extends ConsumerWidget {
   final List<Station> stations;
 
-  const _CollapsibleBrandFilters({required this.stations});
+  const _ExpandableFilters({required this.stations});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final expanded = ref.watch(brandFiltersExpandedProvider);
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    final selectedBrands = ref.watch(selectedBrandsProvider);
-    final excludeHighway = ref.watch(excludeHighwayStationsProvider);
-    final hasActiveFilters = selectedBrands.isNotEmpty || excludeHighway;
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        InkWell(
-          onTap: () => ref.read(brandFiltersExpandedProvider.notifier).toggle(),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.filter_list,
-                  size: 16,
-                  color: theme.colorScheme.primary,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  l10n.brandFilterAll,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
-                if (hasActiveFilters) ...[
-                  const SizedBox(width: 4),
-                  Container(
-                    width: 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ],
-                const Spacer(),
-                Icon(
-                  expanded ? Icons.expand_less : Icons.expand_more,
-                  size: 18,
-                  color: theme.colorScheme.primary,
-                ),
-              ],
-            ),
-          ),
-        ),
-        AnimatedCrossFade(
-          firstChild: BrandFilterChips(stations: stations),
-          secondChild: const SizedBox.shrink(),
-          crossFadeState: expanded
-              ? CrossFadeState.showFirst
-              : CrossFadeState.showSecond,
-          duration: const Duration(milliseconds: 200),
-        ),
-      ],
-    );
-  }
-}
-
-/// Toggle button to switch between compact card view and all-prices detail view.
-class _ViewToggleButton extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final allPrices = ref.watch(allPricesViewEnabledProvider);
-    final l10n = AppLocalizations.of(context);
-
-    final label = allPrices
-        ? (l10n.switchToCompactView)
-        : (l10n.switchToAllPricesView);
-
-    return Semantics(
-      label: label,
-      button: true,
-      child: Tooltip(
-        message: label,
-        child: InkWell(
-          onTap: () => ref.read(allPricesViewEnabledProvider.notifier).toggle(),
-          borderRadius: BorderRadius.circular(12),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            child: Icon(
-              allPrices ? Icons.view_list : Icons.view_agenda,
-              size: 18,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ),
-        ),
+    return AnimatedCrossFade(
+      firstChild: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          BrandFilterChips(stations: stations),
+          const MixedResultsFilterChips(),
+        ],
       ),
+      secondChild: const SizedBox(width: double.infinity),
+      crossFadeState:
+          expanded ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+      duration: const Duration(milliseconds: 200),
     );
   }
 }

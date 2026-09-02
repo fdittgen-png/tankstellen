@@ -1,0 +1,50 @@
+{
+  "searchSummaryAlongRoute": "Entlang der Route · alle {km} km",
+  "@searchSummaryAlongRoute": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "searchSummaryPricesJustNow": "Preise von gerade eben",
+  "searchSummaryPricesMinutes": "Preise von vor {minutes} Min.",
+  "@searchSummaryPricesMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "searchSummaryPricesHours": "Preise von vor {hours} Std.",
+  "@searchSummaryPricesHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "searchSummaryPricesDays": "Preise von vor {days} Tg.",
+  "@searchSummaryPricesDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "searchResultsFilterTooltip": "Filter",
+  "searchResultsFilterActiveSemantic": "Filter, {count} aktiv",
+  "@searchResultsFilterActiveSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchResultsMoreActionsTooltip": "Weitere Aktionen",
+  "searchPriceArrowLegend": "↓ und ↑ vergleichen jeden Preis mit den anderen Tankstellen in dieser Liste.",
+  "searchPriceArrowCheapTooltip": "Gehört zu den niedrigsten Preisen in dieser Liste",
+  "searchPriceArrowAverageTooltip": "Ein mittlerer Preis in dieser Liste",
+  "searchPriceArrowExpensiveTooltip": "Gehört zu den höchsten Preisen in dieser Liste",
+  "searchRefreshTooltip": "Position aktualisieren und Preise neu laden"
+}

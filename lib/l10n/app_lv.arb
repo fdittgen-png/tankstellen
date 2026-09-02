@@ -2737,15 +2737,6 @@
   "@routeSearchingChip": {
     "description": "MT — needs native review"
   },
-  "routeSegmentSummaryBadge": "Ik {km} km",
-  "@routeSegmentSummaryBadge": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "km": {
-        "type": "String"
-      }
-    }
-  },
   "profileSwitchedTo": "Pārslēgts uz {profile}",
   "@profileSwitchedTo": {
     "description": "MT — needs native review",

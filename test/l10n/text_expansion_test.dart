@@ -2,11 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/opening_hours.dart';
 import 'package:tankstellen/core/domain/search_mode.dart';
+import 'package:tankstellen/core/domain/search_result_item.dart';
 import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/core/domain/station_amenity.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
@@ -29,10 +32,13 @@ import 'package:tankstellen/features/search/presentation/widgets/all_prices_stat
 import 'package:tankstellen/features/search/presentation/widgets/criteria/criteria_action_bar.dart';
 import 'package:tankstellen/features/search/presentation/widgets/criteria/criteria_option_row.dart';
 import 'package:tankstellen/features/search/presentation/widgets/fuel_type_selector.dart';
+import 'package:tankstellen/features/search/presentation/widgets/results/results_row.dart';
 import 'package:tankstellen/features/search/presentation/widgets/search_mode_toggle.dart';
+import 'package:tankstellen/features/search/presentation/widgets/search_summary_bar.dart';
 import 'package:tankstellen/features/search/presentation/widgets/station_card.dart';
 import 'package:tankstellen/features/search/providers/all_prices_comparison_model.dart';
 import 'package:tankstellen/features/search/providers/all_prices_table_provider.dart';
+import 'package:tankstellen/features/search/providers/search_provider.dart';
 import 'package:tankstellen/features/search/providers/station_rating_provider.dart';
 import 'package:tankstellen/features/setup/presentation/widgets/language_selector.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/opening_hours_view.dart';
@@ -799,9 +805,127 @@ void main() {
 
     testWidgets('CriteriaOptionRow — 1.3x', (tester) async {
       await pumpScaled(tester, optionRow(), widgetName: 'CriteriaOptionRow');
+  // #3926 — the two-row results chrome. Both rows pack several segments /
+  // controls onto one band, which is exactly the shape that breaks under an
+  // expanded translation: row A wraps its pills, row B ellipsises the count
+  // and the radar chip and wraps its sort chips.
+  group('#3926 results chrome — two rows', () {
+    final chromeNow = DateTime(2026, 3, 11, 14, 30);
+
+    List<Object> chromeOverrides() {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+      when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
+      when(() => test.mockStorage.getRatings())
+          .thenReturn(const <String, int>{});
+      when(() => test.mockStorage.getSetting(any())).thenReturn(null);
+      return <Object>[
+        ...test.overrides,
+        userPositionOverride(lat: 48.85, lng: 2.35, source: 'GPS'),
+        appClockProvider.overrideWithValue(FixedClock(chromeNow)),
+        searchStateProvider.overrideWith(
+          () => _ChromeSearchState(chromeNow.subtract(const Duration(hours: 2))),
+        ),
+      ];
+    }
+
+    testWidgets('SearchSummaryBar (row A) — pseudo-locale', (tester) async {
+      await pumpPseudo(
+        tester,
+        const SearchSummaryBar(),
+        overrides: chromeOverrides(),
+        widgetName: 'SearchSummaryBar (row A)',
+      );
+    });
+
+    testWidgets('SearchSummaryBar (row A) — 1.3x', (tester) async {
+      await pumpScaled(
+        tester,
+        const SearchSummaryBar(),
+        overrides: chromeOverrides(),
+        widgetName: 'SearchSummaryBar (row A)',
+      );
+    });
+
+    testWidgets('SearchResultsRow (row B) — pseudo-locale', (tester) async {
+      await pumpPseudo(
+        tester,
+        const SearchResultsRow(items: _chromeItems),
+        overrides: chromeOverrides(),
+        widgetName: 'SearchResultsRow (row B)',
+      );
+    });
+
+    testWidgets('SearchResultsRow (row B) — 1.3x', (tester) async {
+      await pumpScaled(
+        tester,
+        const SearchResultsRow(items: _chromeItems),
+        overrides: chromeOverrides(),
+        widgetName: 'SearchResultsRow (row B)',
+      );
+    });
+
+    testWidgets('SearchResultsRow (row B) with the radar scope entry '
+        '— pseudo-locale', (tester) async {
+      await pumpPseudo(
+        tester,
+        SearchResultsRow(items: _chromeItems, onRadarToggle: () {}),
+        overrides: chromeOverrides(),
+        widgetName: 'SearchResultsRow (row B, radar scope)',
+      );
     });
   });
 }
+
+/// #3926 — a two-station result set downloaded at a pinned instant, so the
+/// row-A freshness segment renders its longest ("Prices from 2 h ago") form.
+class _ChromeSearchState extends SearchState {
+  _ChromeSearchState(this._fetchedAt);
+
+  final DateTime _fetchedAt;
+
+  @override
+  AsyncValue<ServiceResult<List<SearchResultItem>>> build() => AsyncValue.data(
+        ServiceResult(
+          data: _chromeItems,
+          source: ServiceSource.prixCarburantsApi,
+          fetchedAt: _fetchedAt,
+        ),
+      );
+}
+
+const _chromeItems = <SearchResultItem>[
+  FuelStationResult(_chromeStationA),
+  FuelStationResult(_chromeStationB),
+];
+
+const _chromeStationA = Station(
+  id: 'fr-chrome-a',
+  name: 'A',
+  brand: 'TOTAL',
+  street: 'rue A',
+  postCode: '75001',
+  place: 'Paris',
+  lat: 48.85,
+  lng: 2.35,
+  dist: 1.2,
+  e10: 1.75,
+  isOpen: true,
+);
+
+const _chromeStationB = Station(
+  id: 'fr-chrome-b',
+  name: 'B',
+  brand: 'ESSO',
+  street: 'rue B',
+  postCode: '75002',
+  place: 'Paris',
+  lat: 48.86,
+  lng: 2.36,
+  dist: 2.4,
+  e10: 1.95,
+  isOpen: true,
+);
 
 // #3916 — pinned fakes for the recording status strip + badge cases.
 class _FixedTripRecording extends TripRecording {

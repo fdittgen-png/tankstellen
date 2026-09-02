@@ -5,24 +5,20 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../../core/widgets/responsive_layout.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/services/service_result.dart';
-import 'header_icon_button.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/price_tier.dart';
 import '../../../../core/utils/price_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
-import '../../../../core/services/widgets/freshness_badge.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../core/widgets/staggered_fade_in.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../favorites/presentation/widgets/swipe_tutorial_banner.dart';
 import '../../../favorites/providers/favorites_provider.dart';
-import '../../../feature_management/application/feature_flags_provider.dart';
-import '../../../feature_management/domain/feature.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/search_result_item.dart';
 import '../../../../core/domain/station.dart';
@@ -30,7 +26,6 @@ import '../../providers/selected_station_provider.dart';
 import '../../providers/ignored_stations_provider.dart';
 import '../../providers/search_provider.dart';
 import '../../providers/radar_search_provider.dart';
-import '../../providers/brand_filter_provider.dart';
 import '../../providers/search_screen_ui_provider.dart';
 import '../../providers/station_rating_provider.dart';
 import '../../../profile/providers/profile_provider.dart';
@@ -39,7 +34,7 @@ import 'brand_filter_chips.dart';
 import 'cross_border_banner.dart';
 import 'ev_station_card.dart';
 import 'mixed_results_filter_chips.dart';
-import 'sort_selector.dart';
+import 'results/results_row.dart';
 import 'swipeable_station_card.dart';
 
 part 'search_results_list_parts.dart';
@@ -113,100 +108,35 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
   Widget build(BuildContext context) {
     final result = widget.result;
     final onRefresh = widget.onRefresh;
-    final l10n = AppLocalizations.of(context);
     final ignoredIds = ref.watch(ignoredStationsProvider);
-    final sortMode = ref.watch(selectedSortModeProvider);
 
     return Column(
       children: [
         ServiceStatusBanner(result: result),
-        // Compact header: location + count + sort in minimal space
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-          child: Row(
-            children: [
-              Expanded(
-                child: Builder(builder: (ctx) {
-                  final location = ref.watch(searchLocationProvider);
-                  return Text(
-                    location.isNotEmpty
-                        ? '$location · ${result.data.length}'
-                        : l10n.stationsFound(result.data.length),
-                    style: Theme.of(ctx).textTheme.bodySmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                    overflow: TextOverflow.ellipsis,
-                  );
-                }),
-              ),
-              _ViewToggleButton(),
-              const SizedBox(width: 4),
-              HeaderIconButton(
-                icon: Icons.map,
-                semanticsLabel: l10n.showOnMapSemanticLabel,
-                onTap: () => context.go(RoutePaths.map),
-              ),
-              const SizedBox(width: 4),
-              // #3366 — compact radar-scope toggle, sat with the list/map view
-              // icons (replaces the space-hungry "Radar view" text button).
-              // Only present when the caller offers it (radar active + usable
-              // centre).
-              if (widget.onRadarToggle != null) ...[
-                HeaderIconButton(
-                  key: const Key('radar_view_toggle'),
-                  icon: Icons.radar,
-                  semanticsLabel: l10n.radarScopeShowScope,
-                  onTap: widget.onRadarToggle!,
-                ),
-                const SizedBox(width: 4),
-              ],
-              // #2682 — the radar LAUNCH affordance is a bottom-right FAB
-              // (`RadarSearchFab`), not here. #1613 — gated fuel-cost
-              // Calculator entry point (#2543 pre-fills the cheapest price).
-              if (ref
-                  .watch(enabledFeaturesProvider)
-                  .contains(Feature.fuelCalculator)) ...[
-                HeaderIconButton(
-                  icon: Icons.calculate,
-                  semanticsLabel: l10n.fuelCostCalculator,
-                  onTap: () {
-                    final fuel = ref.read(selectedFuelTypeProvider);
-                    final (minP, _) = priceRange(
-                      _fuelStationsFrom(result.data),
-                      fuel,
-                      requirePositive: true,
-                    );
-                    CalculatorRoute(initialPrice: minP > 0 ? minP : null)
-                        .go(context);
-                  },
-                ),
-                const SizedBox(width: 4),
-              ],
-              FreshnessBadge(result: result),
-            ],
-          ),
+        // #3926 — ROW B: count, radar chip, badged filter button, view
+        // toggle, and the labelled overflow that now holds the map /
+        // radar-scope / calculator actions. It replaced the count row with
+        // its three bare glyphs and its wordless amber pill, the clipped
+        // sort scroller and the "All brands" filter header.
+        SearchResultsRow(
+          items: result.data,
+          onRadarToggle: widget.onRadarToggle,
+          showSortAndFilter: !widget.hideSortAndFilter,
         ),
         const CrossBorderBanner(),
         // #494 — same swipe-hint banner as the favorites screen. Shows
         // once until the user taps "Got it", then stays dismissed.
         const SwipeTutorialBanner(),
-        // #3372 — the landscape radar list drops the sort + filter rows for
-        // vertical room (the header keeps the radar/list/map toggles).
-        if (!widget.hideSortAndFilter) ...[
-          SortSelector(
-            selected: sortMode,
-            onChanged: (mode) =>
-                ref.read(selectedSortModeProvider.notifier).set(mode),
-          ),
-          _CollapsibleBrandFilters(
+        // #3372 — the landscape radar list drops the filter panel for
+        // vertical room (row B keeps the count/view/overflow controls).
+        // #3926 — the panel no longer carries its own "All brands ⌄"
+        // header row: the badged filter button on row B expands it.
+        if (!widget.hideSortAndFilter)
+          _ExpandableFilters(
             stations: _fuelStationsFrom(result.data)
                 .where((s) => !ignoredIds.contains(s.id))
                 .toList(),
           ),
-          // #1784 — Fuel/EV/Both kind selector + EV connector & power
-          // filters. Renders nothing for a fuel-only result set.
-          const MixedResultsFilterChips(),
-        ],
         Expanded(
           child: RefreshIndicator(
             onRefresh: () async => onRefresh(),
@@ -230,6 +160,11 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
               final profileFuel = ref.watch(activeProfileProvider)?.preferredFuelType;
 
               return ListView.builder(
+                // #3926 — the extended radar FAB is gone, but the shell's
+                // docked search FAB still floats over the list bottom;
+                // reserve the shared clearance so the last card is not
+                // sitting under it.
+                padding: const EdgeInsets.only(bottom: kFabScrollClearance),
                 itemCount: sorted.length,
                 itemBuilder: (context, index) {
                   final item = sorted[index];
@@ -292,11 +227,9 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
             }),
           ),
         ),
-        // #2373 — the open-data attribution that used to sit in a bottom
-        // footer here is now relocated to the tappable country-service
-        // header at the top of the screen (DemoModeBanner), which credits
-        // AND links the upstream source (CC BY / Licence Ouverte / OGL /
-        // IODL all mandate visible attribution).
+        // #2373/#3926 — the open-data attribution lives in the screen's
+        // footer under this list (`SearchResultsFooter`), together with
+        // the price-arrow legend.
       ],
     );
   }
