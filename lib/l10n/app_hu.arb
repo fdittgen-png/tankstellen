@@ -5312,5 +5312,475 @@
   "@privacyDeleteAllMyData": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "fillInventoryTitle": "Fill-up summary",
+  "@fillInventoryTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillInventorySubtitleFull": "Full tank on {date} · {fuel}",
+  "@fillInventorySubtitleFull": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "1 Sep 2026"
+      },
+      "fuel": {
+        "type": "String",
+        "example": "E85"
+      }
+    }
+  },
+  "fillInventorySubtitlePartial": "Partial fill on {date} · {fuel}",
+  "@fillInventorySubtitlePartial": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "1 Sep 2026"
+      },
+      "fuel": {
+        "type": "String",
+        "example": "E10"
+      }
+    }
+  },
+  "fillInventoryKmSinceLastFull": "{km} km since the last full tank",
+  "@fillInventoryKmSinceLastFull": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "559"
+      }
+    }
+  },
+  "fillInventoryPumpLiters": "{liters} L pumped",
+  "@fillInventoryPumpLiters": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "liters": {
+        "type": "String",
+        "example": "35.7"
+      }
+    }
+  },
+  "fillInventoryPumpConsumption": "Pump consumption: {value}",
+  "@fillInventoryPumpConsumption": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "value": {
+        "type": "String",
+        "example": "6.4 L/100 km"
+      }
+    }
+  },
+  "fillInventoryRecordedTrips": "Recorded trips: {coverage} % of the tank · {value} raw",
+  "@fillInventoryRecordedTrips": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "coverage": {
+        "type": "int",
+        "example": "81"
+      },
+      "value": {
+        "type": "String",
+        "example": "10.5 L/100 km"
+      }
+    }
+  },
+  "fillInventoryNoRecordedTrips": "No recorded trip in this tank",
+  "@fillInventoryNoRecordedTrips": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillInventoryTankNow": "Tank now: {liters} L · ≈ {km} km at pump consumption",
+  "@fillInventoryTankNow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "liters": {
+        "type": "String",
+        "example": "35.0"
+      },
+      "km": {
+        "type": "String",
+        "example": "547"
+      }
+    }
+  },
+  "fillInventoryTankNowNoRange": "Tank now: {liters} L",
+  "@fillInventoryTankNowNoRange": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "liters": {
+        "type": "String",
+        "example": "35.0"
+      }
+    }
+  },
+  "fillInventoryCalibrationApplied": "Pump calibration: ×{before} → ×{after} ({percent} %)",
+  "@fillInventoryCalibrationApplied": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "before": {
+        "type": "String",
+        "example": "0.93"
+      },
+      "after": {
+        "type": "String",
+        "example": "0.72"
+      },
+      "percent": {
+        "type": "String",
+        "example": "-22"
+      }
+    }
+  },
+  "fillInventoryCalibrationSkipped": "Pump calibration: skipped — {reason}",
+  "@fillInventoryCalibrationSkipped": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "reason": {
+        "type": "String",
+        "example": "first full tank (no window closed yet)"
+      }
+    }
+  },
+  "fillInventorySkipNotFullTank": "partial fill (the tank window stays open)",
+  "@fillInventorySkipNotFullTank": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillInventorySkipCorrection": "correction entry, not a pumped fill",
+  "@fillInventorySkipCorrection": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillInventorySkipNoVehicle": "no vehicle on this fill",
+  "@fillInventorySkipNoVehicle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillInventorySkipNoWindow": "first full tank (no window closed yet)",
+  "@fillInventorySkipNoWindow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillInventorySkipCoverageTooLow": "recorded trips cover {coverage} % of the tank (60 % needed)",
+  "@fillInventorySkipCoverageTooLow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "coverage": {
+        "type": "int",
+        "example": "42"
+      }
+    }
+  },
+  "fillInventorySkipRecordedTooShort": "only {km} recorded km (40 km needed)",
+  "@fillInventorySkipRecordedTooShort": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "18"
+      }
+    }
+  },
+  "fillInventorySkipNoRecordedFuel": "the recorded trips carry no fuel figure",
+  "@fillInventorySkipNoRecordedFuel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillInventorySkipImplausible": "pump and recordings disagree too much — check the receipt",
+  "@fillInventorySkipImplausible": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillInventoryDismiss": "Got it",
+  "@fillInventoryDismiss": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tankReportResidualAfterCalibration": "Gap after calibration: {percent} %",
+  "@tankReportResidualAfterCalibration": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "percent": {
+        "type": "String",
+        "example": "-3"
+      }
+    }
+  },
+  "tripFuelSourceMeasured": "Measured",
+  "@tripFuelSourceMeasured": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripFuelSourceEstimatedCalibrated": "Estimated · calibrated",
+  "@tripFuelSourceEstimatedCalibrated": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripFuelSourceEstimated": "Estimated",
+  "@tripFuelSourceEstimated": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripFuelSourceGps": "GPS",
+  "@tripFuelSourceGps": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripFuelSourceMeasuredTooltip": "Fuel rate reported by the engine (PID 5E / 9D / A2) — never rescaled",
+  "@tripFuelSourceMeasuredTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripFuelSourceEstimatedTooltip": "Fuel estimated from air mass — rescaled by the pump calibration",
+  "@tripFuelSourceEstimatedTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripFuelSourceGpsTooltip": "GPS-physics estimate — no engine data",
+  "@tripFuelSourceGpsTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripFuelSourceRecalculated": "recalculated",
+  "@tripFuelSourceRecalculated": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripDetailGainApplied": "Pump gain applied: {percent} %",
+  "@tripDetailGainApplied": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "percent": {
+        "type": "String",
+        "example": "-22"
+      }
+    }
+  },
+  "tripDetailRecalculatedAfterFill": "Recalculated after the fill-up of {date}",
+  "@tripDetailRecalculatedAfterFill": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "1 Sep 2026"
+      }
+    }
+  },
+  "tripRecordingScreenTitle": "Trip in progress",
+  "@tripRecordingScreenTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recordingObd2ChipLive": "Live",
+  "@recordingObd2ChipLive": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recordingObd2ChipLiveRate": "Live · {rate} PID/s",
+  "@recordingObd2ChipLiveRate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "rate": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+  "recordingObd2ChipReconnecting": "Reconnecting…",
+  "@recordingObd2ChipReconnecting": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recordingObd2ChipReconnectingAttempt": "Reconnecting… (try {attempt})",
+  "@recordingObd2ChipReconnectingAttempt": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "attempt": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "recordingObd2ChipGpsOnly": "GPS only",
+  "@recordingObd2ChipGpsOnly": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recordingObd2ChipEngineOff": "Engine off — waiting",
+  "@recordingObd2ChipEngineOff": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recordingObd2ChipNoAdapter": "No adapter",
+  "@recordingObd2ChipNoAdapter": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recordingObd2SheetTitle": "OBD2 link",
+  "@recordingObd2SheetTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recordingObd2SheetLive": "The adapter is delivering engine data, so consumption is measured from the car. Nothing to do — keep driving.",
+  "@recordingObd2SheetLive": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recordingObd2SheetReconnecting": "The Bluetooth link is being re-established; meanwhile the recording continues on GPS. No action needed — a reset only helps if it stays like this for minutes.",
+  "@recordingObd2SheetReconnecting": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recordingObd2SheetGpsOnly": "The adapter has not answered for a while, so the app waits for it to reappear and records on GPS. Consumption is estimated until it is back.",
+  "@recordingObd2SheetGpsOnly": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recordingObd2SheetEngineOff": "The engine is off, so there is nothing to read. The recording continues on GPS and picks the adapter up again as soon as the engine runs.",
+  "@recordingObd2SheetEngineOff": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recordingObd2SheetNoAdapter": "This trip is recorded without an OBD2 adapter. Speed and distance come from GPS; consumption is a physics estimate calibrated by your fill-ups.",
+  "@recordingObd2SheetNoAdapter": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recordingGpsChipPrecise": "Precise fix (±{meters} m)",
+  "@recordingGpsChipPrecise": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "meters": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "recordingGpsChipApprox": "Approximate fix (±{meters} m)",
+  "@recordingGpsChipApprox": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "meters": {
+        "type": "int",
+        "example": "40"
+      }
+    }
+  },
+  "recordingGpsChipNoFix": "No fix",
+  "@recordingGpsChipNoFix": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recordingGpsChipFixUnknownAccuracy": "Fix (accuracy unknown)",
+  "@recordingGpsChipFixUnknownAccuracy": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recordingGpsChipWithCoverage": "{fix} · {percent} %",
+  "@recordingGpsChipWithCoverage": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fix": {
+        "type": "String",
+        "example": "Precise fix (±5 m)"
+      },
+      "percent": {
+        "type": "int",
+        "example": "98"
+      }
+    }
+  },
+  "recordingGpsSheetTitle": "GPS signal",
+  "@recordingGpsSheetTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recordingGpsSheetPrecise": "The position is accurate to a few metres, so distance and the trace are reliable.",
+  "@recordingGpsSheetPrecise": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recordingGpsSheetApprox": "The position is only accurate to tens of metres — typical in cities, tunnels or under trees. Distance may drift slightly until the fix improves.",
+  "@recordingGpsSheetApprox": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recordingGpsSheetNoFix": "No position has arrived recently. Check that location is allowed and the phone can see the sky; the recording resumes with the next fix.",
+  "@recordingGpsSheetNoFix": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recordingGpsSheetCoverage": "Coverage so far: {percent} % of the seconds had a fix.",
+  "@recordingGpsSheetCoverage": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "percent": {
+        "type": "int",
+        "example": "98"
+      }
+    }
+  },
+  "recordingSheetClose": "Got it",
+  "@recordingSheetClose": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelSourceMeasured": "Measured (ECU fuel flow)",
+  "@fuelSourceMeasured": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelSourceEstimatedCalibrated": "Estimated · pump-calibrated ±{percent} %",
+  "@fuelSourceEstimatedCalibrated": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "percent": {
+        "type": "int",
+        "example": "4"
+      }
+    }
+  },
+  "fuelSourceEstimatedUncalibrated": "Estimated · not calibrated",
+  "@fuelSourceEstimatedUncalibrated": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelSourceGpsEstimate": "GPS estimate",
+  "@fuelSourceGpsEstimate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recordingTileScore": "Driving score",
+  "@recordingTileScore": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }
