@@ -10,6 +10,7 @@ import '../domain/entities/trip_termination.dart';
 import '../domain/obd2_engine_coverage.dart';
 import '../domain/obd2_trip_features.dart';
 import '../domain/recording_session_journal.dart';
+import '../domain/trip_fuel_source.dart';
 import '../domain/trip_recorder.dart';
 import '../../obd2/api.dart';
 import 'trip_sample_codec.dart';
@@ -229,7 +230,13 @@ class TripHistoryEntry {
     return {
         'id': id,
         'vehicleId': vehicleId,
-        'summary': tripSummaryToJson(summary),
+        // #3919 — stamp the dominant fuel-source branch once, at save.
+        'summary': tripSummaryToJson(
+          summary.dominantFuelSource == null && samples.isNotEmpty
+              ? summary.copyWith(
+                  dominantFuelSource: dominantFuelSourceOf(samples))
+              : summary,
+        ),
         if (automatic) 'automatic': true,
         if (samples.isNotEmpty)
           'samples': samples.map(sampleToJson).toList(growable: false),

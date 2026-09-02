@@ -60,6 +60,7 @@ void main() {
     coldStartSurcharge: true,
     secondsBelowOptimalGear: 41.0,
     volumetricEfficiencyUsed: 0.87,
+    dominantFuelSource: 'pid5e', // #3919
     kind: TripKind.gpsOnly,
     harshEvents: [
       HarshEvent(

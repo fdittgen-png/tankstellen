@@ -7,6 +7,7 @@ import '../../../../ev/domain/entities/charging_log.dart';
 import '../../../../../core/domain/vehicle_profile.dart';
 import '../../../domain/entities/fill_up.dart';
 import '../../../../trips/api.dart';
+import 'backup_xml_pump_gain.dart';
 
 /// Pure-Dart writer for the v1 Tankstellen backup XML
 /// (see `assets/schemas/tankstellen_backup_v1.xsd`).
@@ -147,6 +148,8 @@ class BackupXmlWriter {
         _writeText(builder, 'PumpGainUpdatedAt',
             v.pumpGainUpdatedAt!.toUtc().toIso8601String());
       }
+      // #3918 — per-fuel gains + tank grade; both omitted when empty.
+      writePumpGainByFuel(builder, v.pumpGainByFuel, v.tankFuelKey);
 
       if (v.curbWeightKg != null) {
         _writeText(builder, 'CurbWeightKg', v.curbWeightKg!.toString());

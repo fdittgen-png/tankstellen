@@ -36,7 +36,10 @@
 /// the user shouldn't act on.
 library;
 
+import '../../../../core/domain/vehicle_profile.dart';
 import '../../../trips/api.dart';
+
+part 'monthly_insights_aggregator_integration.dart';
 
 /// Bands the aggregator considers "noise" for the consumption average.
 /// Below 5 km a single coast or a long warm-up dominates the figure.
@@ -164,8 +167,12 @@ class MonthlyInsightsSummary {
 /// this is well under a frame on the UI thread.
 MonthlyInsightsSummary aggregateMonthlyInsights(
   List<TripHistoryEntry> trips,
-  DateTime now,
-) {
+  DateTime now, {
+  // #3918 — when given, each trip's litres are re-expressed at the
+  // vehicle's CURRENT pump gain ([CalibratedTripFigures]) so the month
+  // agrees with the trip rows and the tank report; null = stored figures.
+  VehicleProfile? vehicle,
+}) {
   if (trips.isEmpty) return MonthlyInsightsSummary.empty;
 
   final currentBucket = _MonthBucket();
@@ -200,6 +207,10 @@ MonthlyInsightsSummary aggregateMonthlyInsights(
     // Distance + consumption: prefer sample-integrated maths. Falls
     // back to summary.distanceKm if samples are empty — important for
     // legacy trips written before #1040 persisted samples.
+    // #3918 — gainNow / pumpGainApplied for an estimated trip, 1.0 else.
+    final scale = vehicle == null
+        ? 1.0
+        : CalibratedTripFigures.of(entry.summary, vehicle).scale;
     final samples = entry.samples;
     if (samples.isNotEmpty) {
       final integ = _integrateSamples(samples);
@@ -219,7 +230,7 @@ MonthlyInsightsSummary aggregateMonthlyInsights(
             fuelIntegratedSeconds: integ.fuelIntegratedSeconds,
           );
       if (reliable) {
-        bucket.fuelLitres += integ.fuelLitres;
+        bucket.fuelLitres += integ.fuelLitres * scale;
         bucket.consumptionDistanceKm += integ.distanceKm;
       } else {
         // #2447 — samples carried no per-tick fuel rate (GPS-only / EV /
@@ -230,7 +241,8 @@ MonthlyInsightsSummary aggregateMonthlyInsights(
         // itself nulled by the recorder for unreliable trips) over the
         // trip's distance, so this surface agrees with the Carbon charts
         // + reconciliation basis.
-        _addSummaryFuelFallback(bucket, entry.summary, integ.distanceKm);
+        _addSummaryFuelFallback(
+            bucket, entry.summary, integ.distanceKm, scale);
       }
     } else {
       // No samples — use the persisted summary. We cannot re-integrate a
@@ -240,7 +252,7 @@ MonthlyInsightsSummary aggregateMonthlyInsights(
       // longer silently drop out of the average.
       final summaryDistance = entry.summary.distanceKm;
       bucket.distanceKm += summaryDistance;
-      _addSummaryFuelFallback(bucket, entry.summary, summaryDistance);
+      _addSummaryFuelFallback(bucket, entry.summary, summaryDistance, scale);
     }
   }
 
@@ -263,101 +275,6 @@ MonthlyInsightsSummary aggregateMonthlyInsights(
     previousMonthClimbMeters: previousBucket.climbMeters,
     isComparisonReliable: reliable,
   );
-}
-
-/// #2447 — fold a trip's canonical litres into the consumption average
-/// from the summary, used when no per-tick fuel-rate series exists
-/// (GPS-only / EV / no-fuel-PID / legacy). Adds the canonical litres
-/// over [distanceKm] only when BOTH are meaningful — a trip with no
-/// litres figure and no GPS estimate ([tripConsumedLitersOrNull] null)
-/// or zero distance stays out of the average, so honest "no data" is
-/// never zero-filled.
-void _addSummaryFuelFallback(
-  _MonthBucket bucket,
-  TripSummary summary,
-  double distanceKm,
-) {
-  if (distanceKm <= 0) return;
-  final litres = tripConsumedLitersOrNull(summary);
-  if (litres == null || litres <= 0) return;
-  bucket.fuelLitres += litres;
-  bucket.consumptionDistanceKm += distanceKm;
-}
-
-/// Result of re-integrating a trip's per-tick samples. Carries the fuel
-/// cadence bookkeeping (#2835) alongside distance + litres so the caller
-/// can apply [isTripConsumptionReliable] — the same gate the live
-/// recorder uses.
-typedef _Integration = ({
-  double distanceKm,
-  double fuelLitres,
-  bool hadFuelRate,
-  int fuelIntervalCount,
-  double fuelIntegratedSeconds,
-});
-
-/// Walk the per-tick samples and return the re-integrated distance +
-/// fuel plus the cadence bookkeeping. Mirrors `TripRecorder.onSample` so
-/// the per-trip figures the user already sees on the trip detail screen
-/// line up with the monthly aggregate (no parallel-implementation drift).
-_Integration _integrateSamples(List<TripSample> samples) {
-  const empty = (
-    distanceKm: 0.0,
-    fuelLitres: 0.0,
-    hadFuelRate: false,
-    fuelIntervalCount: 0,
-    fuelIntegratedSeconds: 0.0,
-  );
-  if (samples.length < 2) return empty;
-  final sorted = [...samples]
-    ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-
-  double distanceKm = 0;
-  double fuelLitres = 0;
-  bool hadFuelRate = false;
-  int fuelIntervalCount = 0;
-  double fuelIntegratedSeconds = 0;
-
-  for (var i = 1; i < sorted.length; i++) {
-    final prev = sorted[i - 1];
-    final cur = sorted[i];
-    final dt = cur.timestamp.difference(prev.timestamp).inMicroseconds /
-        Duration.microsecondsPerSecond;
-    if (dt <= 0) continue;
-
-    final avgSpeedKmh = (prev.speedKmh + cur.speedKmh) / 2.0;
-    distanceKm += avgSpeedKmh * dt / 3600.0;
-
-    if (prev.fuelRateLPerHour != null && cur.fuelRateLPerHour != null) {
-      final avgRate = (prev.fuelRateLPerHour! + cur.fuelRateLPerHour!) / 2.0;
-      fuelLitres += avgRate * dt / 3600.0;
-      hadFuelRate = true;
-      fuelIntervalCount++;
-      fuelIntegratedSeconds += dt;
-    }
-  }
-
-  return (
-    distanceKm: distanceKm,
-    fuelLitres: fuelLitres,
-    hadFuelRate: hadFuelRate,
-    fuelIntervalCount: fuelIntervalCount,
-    fuelIntegratedSeconds: fuelIntegratedSeconds,
-  );
-}
-
-/// Sum of positive altitude deltas (metres climbed) across [samples]
-/// (#2697 P3). Samples without altitude contribute nothing.
-double _climbMeters(List<TripSample> samples) {
-  if (samples.length < 2) return 0;
-  final sorted = [...samples]
-    ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-  double climb = 0;
-  for (var i = 1; i < sorted.length; i++) {
-    final pAlt = sorted[i - 1].altitudeM, cAlt = sorted[i].altitudeM;
-    if (pAlt != null && cAlt != null && cAlt > pAlt) climb += cAlt - pAlt;
-  }
-  return climb;
 }
 
 /// Average L/100 km for a bucket. Null when the bucket's qualifying

@@ -8,6 +8,7 @@ import '../../../../../core/domain/fuel_type.dart';
 import '../../../../../core/domain/vehicle_profile.dart';
 import '../../../domain/entities/fill_up.dart';
 import '../../../../trips/api.dart';
+import 'backup_xml_pump_gain.dart';
 import 'backup_xml_writer.dart';
 
 /// Decoded payload of a restore-side backup parse (#2571) — the same
@@ -203,6 +204,8 @@ class BackupXmlReader {
       pumpGain: _double(v, 'PumpGain') ?? 1.0, // #3887
       pumpGainSamples: _int(v, 'PumpGainSamples') ?? 0,
       pumpGainUpdatedAt: DateTime.tryParse(_text(v, 'PumpGainUpdatedAt') ?? ''),
+      pumpGainByFuel: readPumpGainByFuel(v), // #3918
+      tankFuelKey: readTankFuelKey(v),
       curbWeightKg: _int(v, 'CurbWeightKg'),
       obd2AdapterMac: _text(v, 'Obd2AdapterMac'),
       obd2AdapterName: _text(v, 'Obd2AdapterName'),

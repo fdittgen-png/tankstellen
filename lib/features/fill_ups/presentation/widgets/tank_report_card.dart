@@ -10,7 +10,10 @@ import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/services/tank_report.dart';
 import '../../providers/tank_report_provider.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 import '../../../../core/error/guarded.dart';
+import '../../../trips/api.dart' show TripSummary, tripHistoryListProvider;
+import '../../../vehicle/api.dart' show activeVehicleProfileProvider;
 
 /// Per-tank insight card on the Carburant tab (#3616).
 ///
@@ -49,6 +52,23 @@ class TankReportCard extends ConsumerWidget {
     final unit = ref.watch(consumptionDisplaySettingProvider).unit;
     final evolution = report.evolution;
     final behavior = report.latestBehavior;
+    // #3918 — the recorded figure is re-expressed at the active vehicle's
+    // CURRENT gain (display only), with the residual that remains after
+    // that calibration; the stored `TankBehavior` figure is the fallback
+    // when the trip/vehicle graph is not wired (test scopes).
+    final calibrated = guard(
+      () {
+        final VehicleProfile? vehicle = ref.watch(activeVehicleProfileProvider);
+        final summaries = <String, TripSummary>{
+          for (final t in ref.watch(tripHistoryListProvider)) t.id: t.summary,
+        };
+        return calibratedTankRecording(latest, summaries, vehicle);
+      },
+      where: 'TankReportCard: calibrated recording failed',
+      fallback: null,
+    );
+    final recordedLPer100Km =
+        calibrated?.recordedLPer100Km ?? behavior.recordedLPer100Km;
 
     return Card(
       child: Padding(
@@ -86,14 +106,25 @@ class TankReportCard extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             _CoverageBar(behavior: behavior, l: l),
-            if (behavior.recordedLPer100Km != null) ...[
+            if (recordedLPer100Km != null) ...[
               const SizedBox(height: 4),
               Text(
                 l.tankReportRecordedTripsAvg(
                   UnitFormatter.formatConsumptionLocalized(
-                      behavior.recordedLPer100Km!, unit),
+                      recordedLPer100Km, unit),
                 ),
                 style: theme.textTheme.bodySmall,
+              ),
+            ],
+            if (calibrated != null) ...[
+              const SizedBox(height: 2),
+              Text(
+                l.tankReportResidualAfterCalibration(
+                  _signedPercent(calibrated.residualPct),
+                ),
+                key: const Key('tankReportResidualAfterCalibration'),
+                style: theme.textTheme.bodySmall
+                    ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
               ),
             ],
             if (evolution != null &&
@@ -124,6 +155,12 @@ class TankReportCard extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// `+3` / `-12` — the residual's sign is the information (#3918).
+String _signedPercent(double pct) {
+  final rounded = pct.round();
+  return rounded > 0 ? '+$rounded' : '$rounded';
 }
 
 class _TrendLine extends StatelessWidget {

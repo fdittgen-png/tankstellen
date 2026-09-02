@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../../../vehicle/api.dart' show ReferenceVehicle, EtaVCurvePoint, defaultVolumetricEfficiency, etaVCurveFor;
+import '../../../../core/domain/pump_gain_resolution.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../domain/fuel_mixture_model.dart' as mixture_model;
 import '../fuel_rate_diagnostics.dart';
@@ -159,8 +160,8 @@ class Obd2FuelRateReader {
     final skipTrim = isDiesel ||
         afrDensity.kind == mixture_model.ResolvedFuelKind.e85 ||
         (ethanolPercent ?? 0) >= 30;
-    // #3887 — the pump-anchored gain on every ESTIMATED branch.
-    final pumpGain = vehicle?.pumpGain ?? 1.0;
+    // #3887 — the pump-anchored gain on every ESTIMATED branch (#3918: per fuel).
+    final pumpGain = resolvePumpGain(vehicle, fuelKey: pumpGainFuelKeyFor(vehicle)).gain;
     // #1395 / #2191 — the diagnostic side-channel (breadcrumb trace +
     // the suspicious-low / 5E-vs-MAF sanity bounds) lives in this
     // collaborator so the fallback chain below reads clean: compute
