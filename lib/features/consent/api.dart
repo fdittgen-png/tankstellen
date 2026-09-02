@@ -12,8 +12,12 @@
 /// barrel was introduced — every file of this feature that other
 /// features imported at the time. It should only ever SHRINK as
 /// cross-feature reach-ins are inverted or moved to `lib/core/`.
+/// #3909 (Epic #3907) split the former `ConsentSettingsSection` /
+/// `PrivacyControlsSection` into row widgets the "Your choices" screen
+/// composes into one list.
 library;
 
 export 'presentation/screens/gdpr_consent_screen.dart';
-export 'presentation/widgets/consent_settings_section.dart';
-export 'presentation/widgets/privacy_controls_section.dart';
+export 'presentation/widgets/consent_record_footer.dart';
+export 'presentation/widgets/consent_switch_rows.dart';
+export 'presentation/widgets/privacy_control_rows.dart';
