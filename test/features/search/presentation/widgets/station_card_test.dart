@@ -10,6 +10,7 @@ import 'package:tankstellen/core/theme/dark_mode_colors.dart';
 import 'package:tankstellen/core/theme/fuel_colors.dart';
 import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/core/utils/price_tier.dart';
+import 'package:tankstellen/core/widgets/brand_logo.dart';
 import 'package:tankstellen/core/widgets/station_card_shell.dart';
 import 'package:tankstellen/features/trips/presentation/widgets/proximity_fill_bar.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
@@ -1482,6 +1483,103 @@ void main() {
       expect(find.textContaining('+1,2 km'), findsOneWidget);
     });
 
+    // #3931 — the brand mark as the row's leading widget. Before it, the
+    // only brand signal on a result row was the text; a driver scanning
+    // a list could not pick out the chain they hold a card for.
+    group('brand mark (#3931)', () {
+      testWidgets('a recognised brand renders its mark ahead of the status '
+          'column', (tester) async {
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: testStation, // brand: 'STAR' → canonical Orlen
+            selectedFuelType: FuelType.e10,
+          ),
+        );
+
+        expect(find.byType(BrandLogo), findsOneWidget);
+        final logo = tester.widget<BrandLogo>(find.byType(BrandLogo));
+        expect(logo.brand, 'STAR');
+        expect(logo.size, 34, reason: 'row-sized, not the 48dp detail slot');
+        expect(find.text('OR'), findsOneWidget);
+
+        // Leading: the mark sits left of the status column and the
+        // station text, and the card still names the brand.
+        final markX = tester.getTopLeft(find.byType(BrandLogo)).dx;
+        final brandX = tester.getTopLeft(find.text('STAR')).dx;
+        expect(markX, lessThan(brandX));
+      });
+
+      testWidgets('a brandless station renders no mark — a column of grey '
+          'boxes would be noise, not information', (tester) async {
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: Station(
+              id: 'mx-cre-1',
+              name: 'Servicio Los Pinos',
+              brand: '',
+              street: '',
+              postCode: '',
+              place: 'Monterrey',
+              lat: 25.6,
+              lng: -100.3,
+              dist: 2.0,
+              e10: 22.5,
+              isOpen: true,
+            ),
+            selectedFuelType: FuelType.e10,
+          ),
+        );
+
+        expect(find.byType(BrandLogo), findsNothing);
+      });
+
+      testWidgets('an unrecognised brand renders no mark either', (
+        tester,
+      ) async {
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: Station(
+              id: 'de-1',
+              name: 'Freie Tankstelle Meier',
+              brand: 'Tankstelle Meier',
+              street: 'Dorfstr.',
+              postCode: '12345',
+              place: 'Musterdorf',
+              lat: 50.0,
+              lng: 8.0,
+              dist: 1.0,
+              e10: 1.799,
+              isOpen: true,
+            ),
+            selectedFuelType: FuelType.e10,
+          ),
+        );
+
+        expect(find.byType(BrandLogo), findsNothing);
+      });
+
+      testWidgets('the mark does not announce the brand a second time — the '
+          'row already carries it in its own semantic label', (tester) async {
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: testStation,
+            selectedFuelType: FuelType.e10,
+          ),
+        );
+
+        expect(
+          find.ancestor(
+            of: find.byType(BrandLogo),
+            matching: find.byType(ExcludeSemantics),
+          ),
+          findsOneWidget,
+        );
+      });
+    });
   });
 }
 

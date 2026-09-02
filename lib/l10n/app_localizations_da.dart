@@ -7888,6 +7888,12 @@ class AppLocalizationsDa extends AppLocalizations {
   String get radiusAlertBlockerLocation => 'Vælg en placering';
 
   @override
+  String get brandMarkFuelGeneric => 'Fuel station';
+
+  @override
+  String get brandMarkEvGeneric => 'Charging point';
+
+  @override
   String get fillInventoryTitle => 'Tankningsoversigt';
 
   @override

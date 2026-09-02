@@ -7855,6 +7855,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get radiusAlertBlockerLocation => 'Choose a location';
 
   @override
+  String get brandMarkFuelGeneric => 'Fuel station';
+
+  @override
+  String get brandMarkEvGeneric => 'Charging point';
+
+  @override
   String get fillInventoryTitle => 'Fill-up summary';
 
   @override
@@ -16670,6 +16676,12 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get radiusAlertBlockerLocation => '⟦Çĥóóšé á łóçáŧîóñ ·······⟧';
+
+  @override
+  String get brandMarkFuelGeneric => '⟦Ƒúéł šŧáŧîóñ ·····⟧';
+
+  @override
+  String get brandMarkEvGeneric => '⟦Çĥářǧîñǧ ƥóîñŧ ······⟧';
 
   @override
   String get fillInventoryTitle => '⟦Ƒîłł-úƥ šúɱɱářý ······⟧';

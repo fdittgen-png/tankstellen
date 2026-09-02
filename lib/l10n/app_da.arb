@@ -5280,5 +5280,15 @@
   },
   "fuelSourceEstimatedUncalibrated": "Estimeret · ikke kalibreret",
   "fuelSourceGpsEstimate": "GPS-estimat",
-  "recordingTileScore": "Kørescore"
+  "recordingTileScore": "Kørescore",
+  "brandMarkFuelGeneric": "Fuel station",
+  "@brandMarkFuelGeneric": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "brandMarkEvGeneric": "Charging point",
+  "@brandMarkEvGeneric": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  }
 }

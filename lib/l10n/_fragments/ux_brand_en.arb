@@ -1,0 +1,10 @@
+{
+  "brandMarkFuelGeneric": "Fuel station",
+  "@brandMarkFuelGeneric": {
+    "description": "Accessibility label for the neutral station mark shown in place of a brand logo when the station carries no recognised brand."
+  },
+  "brandMarkEvGeneric": "Charging point",
+  "@brandMarkEvGeneric": {
+    "description": "Accessibility label for the neutral charging mark shown in place of a network logo when the charging point carries no recognised network."
+  }
+}

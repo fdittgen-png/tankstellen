@@ -5283,5 +5283,7 @@
   },
   "fuelSourceEstimatedUncalibrated": "Estimé · non calibré",
   "fuelSourceGpsEstimate": "Estimation GPS",
-  "recordingTileScore": "Score de conduite"
+  "recordingTileScore": "Score de conduite",
+  "brandMarkFuelGeneric": "Station-service",
+  "brandMarkEvGeneric": "Point de recharge"
 }

@@ -144,6 +144,43 @@ class BrandRegistry {
     'Octa+': ['Octa+', 'OCTA+', 'Octaplus'],
     'Power': ['Power', 'POWER', 'Gabriels'],
     'Goedert': ['Goedert', 'GOEDERT'],
+
+    // =========================================================================
+    // European EV charging networks ⚡ (#3931)
+    // =========================================================================
+    // Declared LAST on purpose: [canonicalize] and [canonicalFromText] fall
+    // back to a substring scan in declaration order, so a fuel brand that
+    // shares a word with a network ("Shell Recharge", "TotalEnergies
+    // Charge") keeps resolving to the fuel brand it always did. Networks
+    // whose bare name is a common substring — `Mer` inside `Supermarché`,
+    // `Recharge` inside `borne de recharge` — are deliberately ABSENT: they
+    // would stamp a phantom brand onto unrelated stations (#481 / #2922).
+    // `Mer` still gets an offline mark via `brandAppearances`, which is
+    // keyed by exact operator title and never scans substrings.
+    'Ionity': ['Ionity', 'IONITY'],
+    'Fastned': ['Fastned', 'FASTNED', 'Fastned Charging'],
+    'Allego': ['Allego', 'ALLEGO'],
+    'EnBW': ['EnBW', 'ENBW', 'EnBW mobility+'],
+    'Electra': ['Electra', 'ELECTRA'],
+    'Izivia': ['Izivia', 'IZIVIA', 'Sodetrel'],
+    'Freshmile': ['Freshmile', 'FRESHMILE'],
+    'Driveco': ['Driveco', 'DRIVECO'],
+    'Bump': ['Bump', 'BUMP', 'Bump Charge'],
+    'Engie Vianeo': ['Engie Vianeo', 'Vianeo', 'ENGIE Vianeo'],
+    'Powerdot': ['Powerdot', 'Power Dot', 'POWERDOT'],
+    'Zunder': ['Zunder', 'ZUNDER'],
+    'Atlante': ['Atlante', 'ATLANTE'],
+    'Be Charge': ['Be Charge', 'BeCharge', 'Be Charge Plenitude'],
+    'Enel X Way': ['Enel X Way', 'Enel X', 'EnelXWay'],
+    'Vattenfall InCharge': ['Vattenfall InCharge', 'InCharge', 'Vattenfall'],
+    'Tesla': ['Tesla', 'TESLA', 'Tesla Supercharger', 'Supercharger'],
+    'Shell Recharge': ['Shell Recharge', 'Shell Recharge Solutions',
+        'NewMotion'],
+    'TotalEnergies Charge': ['TotalEnergies Charge', 'TotalEnergies Charging'],
+    'E.ON Drive': ['E.ON Drive', 'EON Drive', 'E.ON'],
+    'Lidl': ['Lidl', 'LIDL'],
+    'Aldi': ['Aldi', 'ALDI', 'Aldi Süd', 'Aldi Nord'],
+    'Kaufland': ['Kaufland', 'KAUFLAND'],
   };
 
   /// The "Others" label for independent/unrecognized brands.

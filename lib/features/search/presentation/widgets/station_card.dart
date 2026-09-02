@@ -13,8 +13,10 @@ import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/price_tier.dart';
 import '../../../../core/utils/station_extensions.dart';
+import '../../../../core/domain/brand_appearance.dart';
 import '../../../../core/widgets/animated_favorite_star.dart';
 import '../../../../core/widgets/animated_price_text.dart';
+import '../../../../core/widgets/brand_logo.dart';
 import '../../../../core/widgets/station_card_shell.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../trips/api.dart';
@@ -115,6 +117,17 @@ class StationCard extends StatelessWidget {
 
   double? get _displayPrice => station.priceFor(selectedFuelType);
 
+  /// The offline brand mark for this row (#3931), or `null` when the
+  /// station has no recognised brand.
+  ///
+  /// Deliberately absent rather than neutral for an unknown brand: a
+  /// column of identical grey pump boxes down a result list is noise,
+  /// and the row already names the station. The mark only appears where
+  /// it carries information — the colour the driver recognises from the
+  /// forecourt sign.
+  BrandAppearance? get _brandMark =>
+      _hasBrand ? BrandAppearance.of(station.brand) : null;
+
   /// Resolve the per-litre loyalty discount that applies to this
   /// station, or `null` if no card matches (#1120 pilot). The lookup
   /// is canonical-brand → discount, so the caller doesn't have to
@@ -187,6 +200,15 @@ class StationCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              if (_brandMark != null) ...[
+                // The row's own semantic label already names the brand;
+                // letting the mark announce it again would read the
+                // brand twice on every card.
+                ExcludeSemantics(
+                  child: BrandLogo(brand: station.brand, size: 34),
+                ),
+                const SizedBox(width: 10),
+              ],
               _StatusColumn(station: station),
               const SizedBox(width: 12),
               Expanded(

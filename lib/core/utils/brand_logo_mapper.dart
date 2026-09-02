@@ -1,11 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-/// Maps fuel station brand names to their logo image URLs.
+/// Maps fuel station and charging network brand names to their logo
+/// image URLs.
 ///
 /// Uses favicon/logo services that don't require API keys.
-/// Falls back to `null` for unknown brands, so the UI can show
-/// a generic fuel pump icon instead.
+/// Falls back to `null` for unknown brands, so the UI can show the
+/// offline colour + monogram mark (`BrandAppearance`, #3930) instead.
+/// Nothing here is reached unless the user switched internet logos ON in
+/// Settings → Privacy (#3870) — the marks are the default.
 class BrandLogoMapper {
   BrandLogoMapper._();
 
@@ -61,6 +64,66 @@ class BrandLogoMapper {
 
     // Belgium / Luxembourg
     'lukoil': 'lukoil.com',
+    'dats 24': 'dats24.be',
+
+    // International — remaining majors (#3931)
+    'texaco': 'texaco.com',
+    'chevron': 'chevron.com',
+    'mobil': 'mobil.com',
+    'valero': 'valero.com',
+    'arco': 'arco.com',
+
+    // Germany / Austria — remaining chains (#3931)
+    'orlen': 'orlen.pl',
+    'bft': 'bft.de',
+    'westfalen': 'westfalen.com',
+    'oil!': 'oil-tankstellen.de',
+    'turmöl': 'turmoel.at',
+    'turmoel': 'turmoel.at',
+
+    // Spain / Portugal (#3931)
+    'ballenoil': 'ballenoil.es',
+    'prio': 'prio.pt',
+
+    // Denmark (#3931)
+    'ok': 'ok.dk',
+    'circle k': 'circlek.com',
+
+    // United Kingdom (#3931)
+    'tesco': 'tesco.com',
+    'sainsbury\'s': 'sainsburys.co.uk',
+    'sainsburys': 'sainsburys.co.uk',
+    'asda': 'asda.com',
+    'morrisons': 'morrisons.com',
+
+    // Australia (#3931)
+    'ampol': 'ampol.com.au',
+    '7-eleven': '7eleven.com.au',
+    'united': 'unitedpetroleum.com.au',
+    'puma energy': 'pumaenergy.com',
+
+    // Americas (#3931)
+    'pemex': 'pemex.com',
+    'ypf': 'ypf.com',
+    'axion energy': 'axionenergy.com',
+
+    // ==========================================================================
+    // European EV charging networks (#3931)
+    // ==========================================================================
+    'ionity': 'ionity.eu',
+    'fastned': 'fastned.nl',
+    'allego': 'allego.eu',
+    'enbw': 'enbw.com',
+    'izivia': 'izivia.com',
+    'freshmile': 'freshmile.com',
+    'driveco': 'driveco.com',
+    'tesla': 'tesla.com',
+    'shell recharge': 'shell.com',
+    'totalenergies charge': 'totalenergies.com',
+    'e.on drive': 'eon.com',
+    'vattenfall incharge': 'vattenfall.com',
+    'lidl': 'lidl.com',
+    'kaufland': 'kaufland.com',
   };
 
   /// The set of brand keys this mapper owns a logo domain for.
