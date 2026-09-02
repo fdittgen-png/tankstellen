@@ -115,13 +115,9 @@ class VehicleEditForm extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     return PageScaffold(
       title: isEdit ? (l.vehicleEditTitle) : (l.vehicleAddTitle),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.check),
-          tooltip: l.save,
-          onPressed: onSave,
-        ),
-      ],
+      // #3899 — ONE save affordance: the pinned bottom bar. The former
+      // AppBar check-mark duplicated it and read as a second, different
+      // action.
       bodyPadding: EdgeInsets.zero,
       body: Form(
         key: formKey,
