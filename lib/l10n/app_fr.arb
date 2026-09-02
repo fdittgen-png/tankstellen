@@ -5276,5 +5276,261 @@
   "fuelSourceGpsEstimate": "Estimation GPS",
   "recordingTileScore": "Score de conduite",
   "brandMarkFuelGeneric": "Station-service",
-  "brandMarkEvGeneric": "Point de recharge"
+  "brandMarkEvGeneric": "Point de recharge",
+  "allPricesLegend": "Fond plein = le moins cher de ces résultats. Deuxième chiffre = ce que coûtent 100 km avec ce carburant sur votre véhicule.",
+  "allPricesLegendPricesOnly": "Fond plein = le moins cher de ces résultats. Ajoutez un véhicule et saisissez vos pleins pour voir le coût aux 100 km.",
+  "allPricesNoPriceMask": "—",
+  "allPricesBestMarker": "le moins cher",
+  "allPricesDelta": "+{amount}",
+  "@allPricesDelta": {
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "0,06"
+      }
+    }
+  },
+  "allPricesCostPer100km": "{cost}/100 km",
+  "@allPricesCostPer100km": {
+    "placeholders": {
+      "cost": {
+        "type": "String",
+        "example": "5,02 €"
+      }
+    }
+  },
+  "allPricesVerdictHere": "Le moins cher ici : {fuel} à {cost}",
+  "@allPricesVerdictHere": {
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E85"
+      },
+      "cost": {
+        "type": "String",
+        "example": "5,02 €/100 km"
+      }
+    }
+  },
+  "allPricesVerdictWinsResults": "le moins cher des résultats",
+  "allPricesMoreFuels": "+{count}",
+  "@allPricesMoreFuels": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "allPricesMoreFuelsTooltip": "{count, plural, =1{Afficher 1 carburant de plus} other{Afficher {count} carburants de plus}}",
+  "@allPricesMoreFuelsTooltip": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "allPricesFewerFuelsTooltip": "Masquer les carburants supplémentaires",
+  "allPricesCellPriceSemantics": "{fuel} {price}",
+  "@allPricesCellPriceSemantics": {
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E10"
+      },
+      "price": {
+        "type": "String",
+        "example": "1,839"
+      }
+    }
+  },
+  "allPricesCellCostSemantics": "{fuel} {price}, {cost} aux 100 km pour {consumption}",
+  "@allPricesCellCostSemantics": {
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E85"
+      },
+      "price": {
+        "type": "String",
+        "example": "0,839"
+      },
+      "cost": {
+        "type": "String",
+        "example": "5,02 €"
+      },
+      "consumption": {
+        "type": "String",
+        "example": "6,0 L/100 km"
+      }
+    }
+  },
+  "allPricesCellNoPriceSemantics": "{fuel}, pas de prix",
+  "@allPricesCellNoPriceSemantics": {
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E85"
+      }
+    }
+  },
+  "allPricesCellUnavailableSemantics": "{fuel}, en rupture",
+  "@allPricesCellUnavailableSemantics": {
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "Diesel"
+      }
+    }
+  },
+  "allPricesCellUnusableSemantics": "{fuel}, incompatible avec votre véhicule",
+  "@allPricesCellUnusableSemantics": {
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "Diesel"
+      }
+    }
+  },
+  "criteriaModeNearby": "À proximité",
+  "criteriaModeRoute": "Trajet",
+  "criteriaSubmit": "Rechercher",
+  "criteriaReset": "Réinitialiser",
+  "criteriaResetDone": "Critères réinitialisés sur vos valeurs par défaut",
+  "criteriaSubmitDisabledRoute": "Indiquez un départ et une destination",
+  "criteriaSubmitDisabledSearching": "Recherche en cours…",
+  "criteriaShowMore": "Afficher plus ({count})",
+  "@criteriaShowMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "criteriaShowLess": "Afficher moins",
+  "criteriaBrands": "Marques",
+  "criteriaRouteOptions": "Options d'itinéraire",
+  "criteriaRouteOptionsSummary": "Tous les {segmentKm} km · détour {detourKm} km · {saving}",
+  "@criteriaRouteOptionsSummary": {
+    "placeholders": {
+      "segmentKm": {
+        "type": "int"
+      },
+      "detourKm": {
+        "type": "int"
+      },
+      "saving": {
+        "type": "String"
+      }
+    }
+  },
+  "criteriaSwapEndpoints": "Inverser le départ et la destination",
+  "searchSummaryAlongRoute": "Le long du trajet · tous les {km} km",
+  "@searchSummaryAlongRoute": {
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "50"
+      }
+    }
+  },
+  "searchSummaryPricesJustNow": "Prix relevés à l'instant",
+  "searchSummaryPricesMinutes": "Prix d'il y a {minutes} min",
+  "@searchSummaryPricesMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+  "searchSummaryPricesHours": "Prix d'il y a {hours} h",
+  "@searchSummaryPricesHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "searchSummaryPricesDays": "Prix d'il y a {days} j",
+  "@searchSummaryPricesDays": {
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "searchResultsFilterTooltip": "Filtres",
+  "searchResultsFilterActiveSemantic": "Filtres, {count} actifs",
+  "@searchResultsFilterActiveSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "searchResultsMoreActionsTooltip": "Autres actions",
+  "searchPriceArrowLegend": "↓ et ↑ situent chaque prix par rapport aux autres stations de cette liste.",
+  "searchPriceArrowCheapTooltip": "Parmi les prix les plus bas de cette liste",
+  "searchPriceArrowAverageTooltip": "Un prix intermédiaire dans cette liste",
+  "searchPriceArrowExpensiveTooltip": "Parmi les prix les plus élevés de cette liste",
+  "searchRefreshTooltip": "Actualiser la position et les prix",
+  "priceHistoryFirstSeen": "Première observation le {date} — l'historique se construit à chaque visite",
+  "@priceHistoryFirstSeen": {
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "Aug 21, 2026"
+      }
+    }
+  },
+  "priceHistoryCurrentPriceLine": "Prix actuel : {price}",
+  "@priceHistoryCurrentPriceLine": {
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "2.329 €"
+      }
+    }
+  },
+  "priceHistoryDeltaSince": "{delta} depuis le {date}",
+  "@priceHistoryDeltaSince": {
+    "placeholders": {
+      "delta": {
+        "type": "String",
+        "example": "+0.03 €"
+      },
+      "date": {
+        "type": "String",
+        "example": "Aug 21, 2026"
+      }
+    }
+  },
+  "priceHistoryUnchangedSince": "Inchangé depuis le {date}",
+  "@priceHistoryUnchangedSince": {
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "Aug 21, 2026"
+      }
+    }
+  },
+  "priceStatsMin": "Min",
+  "priceStatsMax": "Max",
+  "priceStatsAvg": "Moy.",
+  "amenitiesAndServices": "Équipements et services",
+  "amenitiesServicesShowMore": "Afficher plus ({count})",
+  "@amenitiesServicesShowMore": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "4"
+      }
+    }
+  },
+  "amenitiesServicesShowLess": "Afficher moins"
 }

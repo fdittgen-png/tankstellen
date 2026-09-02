@@ -743,6 +743,9 @@ void main() {
         ),
         widgetName: 'StationAmenitiesServicesSection',
       );
+    });
+  });
+
   // #3927 (Epic #3925) — the criteria sheet's fixed-size chrome: the mode
   // toggle that used to wrap over two lines, the sticky action bar with
   // its disabled-reason line, and one route-option row.
@@ -805,6 +808,9 @@ void main() {
 
     testWidgets('CriteriaOptionRow — 1.3x', (tester) async {
       await pumpScaled(tester, optionRow(), widgetName: 'CriteriaOptionRow');
+    });
+  });
+
   // #3926 — the two-row results chrome. Both rows pack several segments /
   // controls onto one band, which is exactly the shape that breaks under an
   // expanded translation: row A wraps its pills, row B ellipsises the count

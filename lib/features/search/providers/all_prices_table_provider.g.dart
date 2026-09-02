@@ -73,7 +73,7 @@ final class AllPricesBestByFuelProvider
 }
 
 String _$allPricesBestByFuelHash() =>
-    r'68dd131ce13158d9e9789a0f49136b77fd996006';
+    r'80ea5f30f0023f1e595d20b11843847aa78a316d';
 
 /// The active vehicle's per-fuel cost model, or [FuelCostModel.empty]
 /// when there is no vehicle / no usable history.

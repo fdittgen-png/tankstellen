@@ -225,12 +225,6 @@ abstract class AppLocalizations {
   /// **'Searching the route…'**
   String get routeSearchingChip;
 
-  /// No description provided for @routeSegmentSummaryBadge.
-  ///
-  /// In en, this message translates to:
-  /// **'Every {km} km'**
-  String routeSegmentSummaryBadge(String km);
-
   /// No description provided for @searchCriteriaTitle.
   ///
   /// In en, this message translates to:
@@ -734,12 +728,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Fuels'**
   String get fuels;
-
-  /// No description provided for @services.
-  ///
-  /// In en, this message translates to:
-  /// **'Services'**
-  String get services;
 
   /// No description provided for @zone.
   ///
@@ -13534,6 +13522,107 @@ abstract class AppLocalizations {
   /// **'Choose a location'**
   String get radiusAlertBlockerLocation;
 
+  /// One-line legend under the sticky column header of the all-prices comparison table (#3933). Explains the two things the cards would otherwise leave unexplained: the filled emphasis and the second number in each cell. Shown when the active vehicle has measured per-fuel consumption.
+  ///
+  /// In en, this message translates to:
+  /// **'Filled = cheapest of these results. Second figure = what 100 km costs on that fuel with your vehicle.'**
+  String get allPricesLegend;
+
+  /// Legend variant of allPricesLegend used when no vehicle is active or no fuel has a measured consumption yet, so the cost-per-100-km line is absent from every cell (#3933).
+  ///
+  /// In en, this message translates to:
+  /// **'Filled = cheapest of these results. Add a vehicle and log fill-ups to see the cost per 100 km.'**
+  String get allPricesLegendPricesOnly;
+
+  /// Placeholder rendered in a fuel column the station does not price at all, keeping the column aligned instead of reflowing the row (#3933). An em dash in most locales.
+  ///
+  /// In en, this message translates to:
+  /// **'—'**
+  String get allPricesNoPriceMask;
+
+  /// Marker under the price of the cell that holds the cheapest price for its fuel across the current search results (#3933). Replaces the numeric delta on that one cell. Very short — it must fit a column roughly 66 dp wide.
+  ///
+  /// In en, this message translates to:
+  /// **'best'**
+  String get allPricesBestMarker;
+
+  /// How much dearer this station's price for a fuel is than the cheapest price for the same fuel in the current results (#3933). Rendered under the price in a table cell; keep it as short as the English form.
+  ///
+  /// In en, this message translates to:
+  /// **'+{amount}'**
+  String allPricesDelta(String amount);
+
+  /// A money amount expressed per 100 km — the cost of driving 100 km on one fuel at one station (#3933). Used inside the per-station verdict line.
+  ///
+  /// In en, this message translates to:
+  /// **'{cost}/100 km'**
+  String allPricesCostPer100km(String cost);
+
+  /// Per-station verdict line of the all-prices comparison table (#3933): which fuel actually costs least per 100 km at THIS station, given the vehicle's measured consumption for each fuel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cheapest here: {fuel} at {cost}'**
+  String allPricesVerdictHere(String fuel, String cost);
+
+  /// Marker appended to the per-station verdict when that station also holds the cheapest price for the winning fuel across the whole result set (#3933).
+  ///
+  /// In en, this message translates to:
+  /// **'cheapest of the results'**
+  String get allPricesVerdictWinsResults;
+
+  /// Label of the per-card expander that reveals the fuels which did not fit the fixed column budget of the all-prices table (#3933). Must stay two or three characters wide.
+  ///
+  /// In en, this message translates to:
+  /// **'+{count}'**
+  String allPricesMoreFuels(int count);
+
+  /// Tooltip of the collapsed per-card expander in the all-prices table (#3933).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Show 1 more fuel} other{Show {count} more fuels}}'**
+  String allPricesMoreFuelsTooltip(int count);
+
+  /// Tooltip of the expanded per-card expander in the all-prices table (#3933) — collapsing it hides the fuels outside the fixed column set.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide the extra fuels'**
+  String get allPricesFewerFuelsTooltip;
+
+  /// Screen-reader label of one all-prices table cell when only the pump price is known (#3933).
+  ///
+  /// In en, this message translates to:
+  /// **'{fuel} {price}'**
+  String allPricesCellPriceSemantics(String fuel, String price);
+
+  /// Screen-reader label of one all-prices table cell when the vehicle's measured consumption turns the pump price into a cost per 100 km (#3933).
+  ///
+  /// In en, this message translates to:
+  /// **'{fuel} {price}, {cost} per 100 km at {consumption}'**
+  String allPricesCellCostSemantics(
+    String fuel,
+    String price,
+    String cost,
+    String consumption,
+  );
+
+  /// Screen-reader label of an empty all-prices table cell — the station does not sell that fuel, and the column stays in place (#3933).
+  ///
+  /// In en, this message translates to:
+  /// **'{fuel}, no price'**
+  String allPricesCellNoPriceSemantics(String fuel);
+
+  /// Screen-reader label of an all-prices table cell for a fuel the station reports as out of stock (#3933).
+  ///
+  /// In en, this message translates to:
+  /// **'{fuel}, out of stock'**
+  String allPricesCellUnavailableSemantics(String fuel);
+
+  /// Screen-reader label of a dimmed all-prices table cell — the active vehicle cannot be filled with that fuel (#3933).
+  ///
+  /// In en, this message translates to:
+  /// **'{fuel}, not usable by your vehicle'**
+  String allPricesCellUnusableSemantics(String fuel);
+
   /// Accessibility label for the neutral station mark shown in place of a brand logo when the station carries no recognised brand.
   ///
   /// In en, this message translates to:
@@ -13741,6 +13830,88 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Recalculated after the fill-up of {date}'**
   String tripDetailRecalculatedAfterFill(String date);
+
+  /// Short label of the 'nearby stations' segment in the search-criteria mode toggle (#3927). Kept to one short word so the segmented button never wraps at 320 dp; the long form stays on the segment tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearby'**
+  String get criteriaModeNearby;
+
+  /// Short label of the 'along the route' segment in the search-criteria mode toggle (#3927). Kept to one short word so the segmented button never wraps at 320 dp; the long form stays on the segment tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Route'**
+  String get criteriaModeRoute;
+
+  /// Primary action of the search-criteria sheet's sticky bottom bar — runs the search with the criteria on screen (#3927).
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get criteriaSubmit;
+
+  /// Secondary text action of the search-criteria sheet's sticky bottom bar — restores the saved defaults, or the factory ones when nothing was saved (#3927).
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get criteriaReset;
+
+  /// Snackbar confirming that the search criteria were restored to the saved (or factory) defaults (#3927).
+  ///
+  /// In en, this message translates to:
+  /// **'Criteria reset to your defaults'**
+  String get criteriaResetDone;
+
+  /// One-line reason shown above the disabled Search button when route mode has no start or no destination yet (#3927).
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a start and a destination'**
+  String get criteriaSubmitDisabledRoute;
+
+  /// One-line reason shown above the disabled Search button while a route search is already running (#3927).
+  ///
+  /// In en, this message translates to:
+  /// **'Search in progress…'**
+  String get criteriaSubmitDisabledSearching;
+
+  /// Chip that expands a collapsed criteria chip group (fuels, amenities, brands); count is how many chips are still hidden (#3927).
+  ///
+  /// In en, this message translates to:
+  /// **'Show more ({count})'**
+  String criteriaShowMore(int count);
+
+  /// Chip that collapses an expanded criteria chip group back to its first rows (#3927).
+  ///
+  /// In en, this message translates to:
+  /// **'Show less'**
+  String get criteriaShowLess;
+
+  /// Section header above the brand filter chips on the search-criteria sheet (#3927).
+  ///
+  /// In en, this message translates to:
+  /// **'Brands'**
+  String get criteriaBrands;
+
+  /// Title of the collapsible section holding the three route-planning options (segment, detour budget, minimum saving) on the search-criteria sheet (#3927).
+  ///
+  /// In en, this message translates to:
+  /// **'Route options'**
+  String get criteriaRouteOptions;
+
+  /// One-line summary shown under the collapsed 'Route options' section: the route-segment spacing, the detour budget and the minimum-saving value ('Off' or an amount per litre) (#3927).
+  ///
+  /// In en, this message translates to:
+  /// **'Every {segmentKm} km · {detourKm} km detour · {saving}'**
+  String criteriaRouteOptionsSummary(
+    int segmentKm,
+    int detourKm,
+    String saving,
+  );
+
+  /// Tooltip of the icon button between the start and destination fields that exchanges the two endpoints of a route search (#3927).
+  ///
+  /// In en, this message translates to:
+  /// **'Swap start and destination'**
+  String get criteriaSwapEndpoints;
 
   /// Helper text under the odometer field of the Add fill-up form when the value was pre-filled from the vehicle's most recent fill-up (#3899).
   ///
@@ -14233,6 +14404,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Driving score'**
   String get recordingTileScore;
+
+  /// Route-mode segment of the results summary bar (row A), replacing the radius segment. Names the corridor first and the sampling spacing second, so the user reads WHERE the search ran before HOW densely (#3926, epic #3925). Replaces the bare 'Every {km} km' badge.
+  ///
+  /// In en, this message translates to:
+  /// **'Along the route · every {km} km'**
+  String searchSummaryAlongRoute(String km);
+
+  /// Freshness segment of the results summary bar (row A) when the price list was fetched less than a minute ago. Replaces the wordless amber '⚠ 2 h ago' pill, which never said WHAT was two hours old (#3926). The age measures how long ago the app downloaded this price list from the upstream open-data service (a cached list keeps its original download time), not how long ago the operator changed the price.
+  ///
+  /// In en, this message translates to:
+  /// **'Prices from just now'**
+  String get searchSummaryPricesJustNow;
+
+  /// Freshness segment of the results summary bar (row A) for a download age under an hour (#3926).
+  ///
+  /// In en, this message translates to:
+  /// **'Prices from {minutes} min ago'**
+  String searchSummaryPricesMinutes(int minutes);
+
+  /// Freshness segment of the results summary bar (row A) for a download age under a day (#3926).
+  ///
+  /// In en, this message translates to:
+  /// **'Prices from {hours} h ago'**
+  String searchSummaryPricesHours(int hours);
+
+  /// Freshness segment of the results summary bar (row A) for a download age of a day or more (#3926).
+  ///
+  /// In en, this message translates to:
+  /// **'Prices from {days} d ago'**
+  String searchSummaryPricesDays(int days);
+
+  /// Tooltip and accessibility label of the filter icon button on the results row (row B), which expands the brand / highway / EV filter chips (#3926).
+  ///
+  /// In en, this message translates to:
+  /// **'Filters'**
+  String get searchResultsFilterTooltip;
+
+  /// Accessibility label of the results-row filter icon button when at least one filter is active; the visible affordance is a count badge on the icon (#3926).
+  ///
+  /// In en, this message translates to:
+  /// **'Filters, {count} active'**
+  String searchResultsFilterActiveSemantic(int count);
+
+  /// Tooltip of the overflow ('…') button on the results row that holds the labelled map / radar-view / fuel-cost-calculator entries, replacing three unlabelled icon buttons (#3926).
+  ///
+  /// In en, this message translates to:
+  /// **'More actions'**
+  String get searchResultsMoreActionsTooltip;
+
+  /// One-line legend under the results list explaining the price arrows on the station cards. The arrow is NOT a time trend: it is the station's price tier inside the CURRENT result set (bottom third = ↓, middle third = –, top third = ↑), computed from the minimum and maximum price of the listed stations for the selected fuel (#3926).
+  ///
+  /// In en, this message translates to:
+  /// **'↓ and ↑ compare each price with the other stations in this list.'**
+  String get searchPriceArrowLegend;
+
+  /// Tooltip on the ↓ arrow beside a station-card price — the price sits in the bottom third of the current result set's price range (#3926).
+  ///
+  /// In en, this message translates to:
+  /// **'Among the lowest prices in this list'**
+  String get searchPriceArrowCheapTooltip;
+
+  /// Tooltip on the – dash beside a station-card price — the price sits in the middle third of the current result set's price range (#3926).
+  ///
+  /// In en, this message translates to:
+  /// **'A mid-range price in this list'**
+  String get searchPriceArrowAverageTooltip;
+
+  /// Tooltip on the ↑ arrow beside a station-card price — the price sits in the top third of the current result set's price range (#3926).
+  ///
+  /// In en, this message translates to:
+  /// **'Among the highest prices in this list'**
+  String get searchPriceArrowExpensiveTooltip;
+
+  /// Tooltip of the ONE refresh action in the search app bar (#3926). It merges the two refreshes the screen used to carry: the app-bar 'refresh prices' (re-run the last search) and the position bar's GPS re-fix.
+  ///
+  /// In en, this message translates to:
+  /// **'Update position and refresh prices'**
+  String get searchRefreshTooltip;
+
+  /// Station detail, price history (#3928): shown INSTEAD of the chart and the stats row when only a single price observation exists, so a lone dot in an empty chart never pretends to be a trend.
+  ///
+  /// In en, this message translates to:
+  /// **'First seen on {date} — the history builds up with every visit'**
+  String priceHistoryFirstSeen(String date);
+
+  /// Station detail, price history (#3928): the single-observation state renders the current price on its own line under the first-seen sentence.
+  ///
+  /// In en, this message translates to:
+  /// **'Current price: {price}'**
+  String priceHistoryCurrentPriceLine(String price);
+
+  /// Station detail, price history (#3928): explicit price delta between the oldest and the newest observation in the displayed window. Replaces the reference-less trend arrow. The delta is a signed, already-formatted price.
+  ///
+  /// In en, this message translates to:
+  /// **'{delta} since {date}'**
+  String priceHistoryDeltaSince(String delta, String date);
+
+  /// Station detail, price history (#3928): shown in place of a delta when the newest price equals the oldest one in the displayed window.
+  ///
+  /// In en, this message translates to:
+  /// **'Unchanged since {date}'**
+  String priceHistoryUnchangedSince(String date);
+
+  /// Station detail, price history (#3928): label of the lowest observed price in the window. Coloured as a good value only when it differs from the maximum.
+  ///
+  /// In en, this message translates to:
+  /// **'Min'**
+  String get priceStatsMin;
+
+  /// Station detail, price history (#3928): label of the highest observed price in the window. Coloured as a bad value only when it differs from the minimum.
+  ///
+  /// In en, this message translates to:
+  /// **'Max'**
+  String get priceStatsMax;
+
+  /// Station detail, price history (#3928): label of the average observed price in the window. Abbreviation of 'average'.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg'**
+  String get priceStatsAvg;
+
+  /// Station detail (#3928): heading of the single merged section that replaces the former separate 'Amenities' chips and 'Services (N)' expander — one deduplicated list.
+  ///
+  /// In en, this message translates to:
+  /// **'Amenities & services'**
+  String get amenitiesAndServices;
+
+  /// Station detail (#3928): reveals the amenities/services chips hidden beyond the first eight.
+  ///
+  /// In en, this message translates to:
+  /// **'Show more ({count})'**
+  String amenitiesServicesShowMore(int count);
+
+  /// Station detail (#3928): collapses the amenities/services chip list back to the first eight.
+  ///
+  /// In en, this message translates to:
+  /// **'Show less'**
+  String get amenitiesServicesShowLess;
 
   /// Station-detail header line: the open / closed / unknown state followed by how long ago the data was fetched. Owns the whole word order per locale — never composed from fragments (#3902).
   ///

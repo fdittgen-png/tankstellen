@@ -36,6 +36,7 @@ import 'ev_station_card.dart';
 import 'mixed_results_filter_chips.dart';
 import 'results/results_row.dart';
 import 'swipeable_station_card.dart';
+import 'all_prices/all_prices_table_header.dart';
 
 part 'search_results_list_parts.dart';
 
@@ -137,6 +138,12 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
                 .where((s) => !ignoredIds.contains(s.id))
                 .toList(),
           ),
+        // #3933 — the all-prices table's column header: names each fuel
+        // column once above the list so the cells below can stay numeric.
+        // Renders nothing outside the all-prices view (and when no column
+        // resolves), so the compact list is untouched.
+        if (ref.watch(allPricesViewEnabledProvider))
+          const AllPricesTableHeader(),
         Expanded(
           child: RefreshIndicator(
             onRefresh: () async => onRefresh(),

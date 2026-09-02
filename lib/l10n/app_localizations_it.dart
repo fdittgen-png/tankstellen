@@ -51,11 +51,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get routeSearchingChip => 'Ricerca lungo il percorso…';
 
   @override
-  String routeSegmentSummaryBadge(String km) {
-    return 'Ogni $km km';
-  }
-
-  @override
   String get searchCriteriaTitle => 'Criteri di ricerca';
 
   @override
@@ -326,9 +321,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get fuels => 'Carburanti';
-
-  @override
-  String get services => 'Servizi';
 
   @override
   String get zone => 'Zona';
@@ -7945,6 +7937,87 @@ class AppLocalizationsIt extends AppLocalizations {
   String get radiusAlertBlockerLocation => 'Scegli una posizione';
 
   @override
+  String get allPricesLegend =>
+      'Filled = cheapest of these results. Second figure = what 100 km costs on that fuel with your vehicle.';
+
+  @override
+  String get allPricesLegendPricesOnly =>
+      'Filled = cheapest of these results. Add a vehicle and log fill-ups to see the cost per 100 km.';
+
+  @override
+  String get allPricesNoPriceMask => '—';
+
+  @override
+  String get allPricesBestMarker => 'best';
+
+  @override
+  String allPricesDelta(String amount) {
+    return '+$amount';
+  }
+
+  @override
+  String allPricesCostPer100km(String cost) {
+    return '$cost/100 km';
+  }
+
+  @override
+  String allPricesVerdictHere(String fuel, String cost) {
+    return 'Cheapest here: $fuel at $cost';
+  }
+
+  @override
+  String get allPricesVerdictWinsResults => 'cheapest of the results';
+
+  @override
+  String allPricesMoreFuels(int count) {
+    return '+$count';
+  }
+
+  @override
+  String allPricesMoreFuelsTooltip(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Show $count more fuels',
+      one: 'Show 1 more fuel',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get allPricesFewerFuelsTooltip => 'Hide the extra fuels';
+
+  @override
+  String allPricesCellPriceSemantics(String fuel, String price) {
+    return '$fuel $price';
+  }
+
+  @override
+  String allPricesCellCostSemantics(
+    String fuel,
+    String price,
+    String cost,
+    String consumption,
+  ) {
+    return '$fuel $price, $cost per 100 km at $consumption';
+  }
+
+  @override
+  String allPricesCellNoPriceSemantics(String fuel) {
+    return '$fuel, no price';
+  }
+
+  @override
+  String allPricesCellUnavailableSemantics(String fuel) {
+    return '$fuel, out of stock';
+  }
+
+  @override
+  String allPricesCellUnusableSemantics(String fuel) {
+    return '$fuel, not usable by your vehicle';
+  }
+
+  @override
   String get brandMarkFuelGeneric => 'Fuel station';
 
   @override
@@ -8089,6 +8162,53 @@ class AppLocalizationsIt extends AppLocalizations {
   String tripDetailRecalculatedAfterFill(String date) {
     return 'Ricalcolato dopo il rifornimento del $date';
   }
+
+  @override
+  String get criteriaModeNearby => 'Nearby';
+
+  @override
+  String get criteriaModeRoute => 'Route';
+
+  @override
+  String get criteriaSubmit => 'Search';
+
+  @override
+  String get criteriaReset => 'Reset';
+
+  @override
+  String get criteriaResetDone => 'Criteria reset to your defaults';
+
+  @override
+  String get criteriaSubmitDisabledRoute => 'Enter a start and a destination';
+
+  @override
+  String get criteriaSubmitDisabledSearching => 'Search in progress…';
+
+  @override
+  String criteriaShowMore(int count) {
+    return 'Show more ($count)';
+  }
+
+  @override
+  String get criteriaShowLess => 'Show less';
+
+  @override
+  String get criteriaBrands => 'Brands';
+
+  @override
+  String get criteriaRouteOptions => 'Route options';
+
+  @override
+  String criteriaRouteOptionsSummary(
+    int segmentKm,
+    int detourKm,
+    String saving,
+  ) {
+    return 'Every $segmentKm km · $detourKm km detour · $saving';
+  }
+
+  @override
+  String get criteriaSwapEndpoints => 'Swap start and destination';
 
   @override
   String get fillUpOdometerFromLastFillUp =>
@@ -8417,6 +8537,98 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get recordingTileScore => 'Punteggio di guida';
+
+  @override
+  String searchSummaryAlongRoute(String km) {
+    return 'Along the route · every $km km';
+  }
+
+  @override
+  String get searchSummaryPricesJustNow => 'Prices from just now';
+
+  @override
+  String searchSummaryPricesMinutes(int minutes) {
+    return 'Prices from $minutes min ago';
+  }
+
+  @override
+  String searchSummaryPricesHours(int hours) {
+    return 'Prices from $hours h ago';
+  }
+
+  @override
+  String searchSummaryPricesDays(int days) {
+    return 'Prices from $days d ago';
+  }
+
+  @override
+  String get searchResultsFilterTooltip => 'Filters';
+
+  @override
+  String searchResultsFilterActiveSemantic(int count) {
+    return 'Filters, $count active';
+  }
+
+  @override
+  String get searchResultsMoreActionsTooltip => 'More actions';
+
+  @override
+  String get searchPriceArrowLegend =>
+      '↓ and ↑ compare each price with the other stations in this list.';
+
+  @override
+  String get searchPriceArrowCheapTooltip =>
+      'Among the lowest prices in this list';
+
+  @override
+  String get searchPriceArrowAverageTooltip => 'A mid-range price in this list';
+
+  @override
+  String get searchPriceArrowExpensiveTooltip =>
+      'Among the highest prices in this list';
+
+  @override
+  String get searchRefreshTooltip => 'Update position and refresh prices';
+
+  @override
+  String priceHistoryFirstSeen(String date) {
+    return 'First seen on $date — the history builds up with every visit';
+  }
+
+  @override
+  String priceHistoryCurrentPriceLine(String price) {
+    return 'Current price: $price';
+  }
+
+  @override
+  String priceHistoryDeltaSince(String delta, String date) {
+    return '$delta since $date';
+  }
+
+  @override
+  String priceHistoryUnchangedSince(String date) {
+    return 'Unchanged since $date';
+  }
+
+  @override
+  String get priceStatsMin => 'Min';
+
+  @override
+  String get priceStatsMax => 'Max';
+
+  @override
+  String get priceStatsAvg => 'Avg';
+
+  @override
+  String get amenitiesAndServices => 'Amenities & services';
+
+  @override
+  String amenitiesServicesShowMore(int count) {
+    return 'Show more ($count)';
+  }
+
+  @override
+  String get amenitiesServicesShowLess => 'Show less';
 
   @override
   String stationStatusWithFreshness(String status, String ago) {

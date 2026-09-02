@@ -8075,6 +8075,150 @@
   "@radiusAlertBlockerLocation": {
     "description": "Helper line under the zone-alert sheet's location buttons explaining why Save is disabled: no alert centre (GPS position or map point) has been chosen yet (#3905)."
   },
+  "allPricesLegend": "Filled = cheapest of these results. Second figure = what 100 km costs on that fuel with your vehicle.",
+  "@allPricesLegend": {
+    "description": "One-line legend under the sticky column header of the all-prices comparison table (#3933). Explains the two things the cards would otherwise leave unexplained: the filled emphasis and the second number in each cell. Shown when the active vehicle has measured per-fuel consumption."
+  },
+  "allPricesLegendPricesOnly": "Filled = cheapest of these results. Add a vehicle and log fill-ups to see the cost per 100 km.",
+  "@allPricesLegendPricesOnly": {
+    "description": "Legend variant of allPricesLegend used when no vehicle is active or no fuel has a measured consumption yet, so the cost-per-100-km line is absent from every cell (#3933)."
+  },
+  "allPricesNoPriceMask": "—",
+  "@allPricesNoPriceMask": {
+    "description": "Placeholder rendered in a fuel column the station does not price at all, keeping the column aligned instead of reflowing the row (#3933). An em dash in most locales."
+  },
+  "allPricesBestMarker": "best",
+  "@allPricesBestMarker": {
+    "description": "Marker under the price of the cell that holds the cheapest price for its fuel across the current search results (#3933). Replaces the numeric delta on that one cell. Very short — it must fit a column roughly 66 dp wide."
+  },
+  "allPricesDelta": "+{amount}",
+  "@allPricesDelta": {
+    "description": "How much dearer this station's price for a fuel is than the cheapest price for the same fuel in the current results (#3933). Rendered under the price in a table cell; keep it as short as the English form.",
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "0,06"
+      }
+    }
+  },
+  "allPricesCostPer100km": "{cost}/100 km",
+  "@allPricesCostPer100km": {
+    "description": "A money amount expressed per 100 km — the cost of driving 100 km on one fuel at one station (#3933). Used inside the per-station verdict line.",
+    "placeholders": {
+      "cost": {
+        "type": "String",
+        "example": "5,02 €"
+      }
+    }
+  },
+  "allPricesVerdictHere": "Cheapest here: {fuel} at {cost}",
+  "@allPricesVerdictHere": {
+    "description": "Per-station verdict line of the all-prices comparison table (#3933): which fuel actually costs least per 100 km at THIS station, given the vehicle's measured consumption for each fuel.",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E85"
+      },
+      "cost": {
+        "type": "String",
+        "example": "5,02 €/100 km"
+      }
+    }
+  },
+  "allPricesVerdictWinsResults": "cheapest of the results",
+  "@allPricesVerdictWinsResults": {
+    "description": "Marker appended to the per-station verdict when that station also holds the cheapest price for the winning fuel across the whole result set (#3933)."
+  },
+  "allPricesMoreFuels": "+{count}",
+  "@allPricesMoreFuels": {
+    "description": "Label of the per-card expander that reveals the fuels which did not fit the fixed column budget of the all-prices table (#3933). Must stay two or three characters wide.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "allPricesMoreFuelsTooltip": "{count, plural, =1{Show 1 more fuel} other{Show {count} more fuels}}",
+  "@allPricesMoreFuelsTooltip": {
+    "description": "Tooltip of the collapsed per-card expander in the all-prices table (#3933).",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "allPricesFewerFuelsTooltip": "Hide the extra fuels",
+  "@allPricesFewerFuelsTooltip": {
+    "description": "Tooltip of the expanded per-card expander in the all-prices table (#3933) — collapsing it hides the fuels outside the fixed column set."
+  },
+  "allPricesCellPriceSemantics": "{fuel} {price}",
+  "@allPricesCellPriceSemantics": {
+    "description": "Screen-reader label of one all-prices table cell when only the pump price is known (#3933).",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E10"
+      },
+      "price": {
+        "type": "String",
+        "example": "1,839"
+      }
+    }
+  },
+  "allPricesCellCostSemantics": "{fuel} {price}, {cost} per 100 km at {consumption}",
+  "@allPricesCellCostSemantics": {
+    "description": "Screen-reader label of one all-prices table cell when the vehicle's measured consumption turns the pump price into a cost per 100 km (#3933).",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E85"
+      },
+      "price": {
+        "type": "String",
+        "example": "0,839"
+      },
+      "cost": {
+        "type": "String",
+        "example": "5,02 €"
+      },
+      "consumption": {
+        "type": "String",
+        "example": "6,0 L/100 km"
+      }
+    }
+  },
+  "allPricesCellNoPriceSemantics": "{fuel}, no price",
+  "@allPricesCellNoPriceSemantics": {
+    "description": "Screen-reader label of an empty all-prices table cell — the station does not sell that fuel, and the column stays in place (#3933).",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E85"
+      }
+    }
+  },
+  "allPricesCellUnavailableSemantics": "{fuel}, out of stock",
+  "@allPricesCellUnavailableSemantics": {
+    "description": "Screen-reader label of an all-prices table cell for a fuel the station reports as out of stock (#3933).",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "Diesel"
+      }
+    }
+  },
+  "allPricesCellUnusableSemantics": "{fuel}, not usable by your vehicle",
+  "@allPricesCellUnusableSemantics": {
+    "description": "Screen-reader label of a dimmed all-prices table cell — the active vehicle cannot be filled with that fuel (#3933).",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "Diesel"
+      }
+    }
+  },
   "brandMarkFuelGeneric": "Fuel station",
   "@brandMarkFuelGeneric": {
     "description": "Accessibility label for the neutral station mark shown in place of a brand logo when the station carries no recognised brand."
@@ -8324,6 +8468,74 @@
       }
     },
     "description": "#3919 — trip detail header: the shown figures were re-expressed with a calibration learned after the trip."
+  },
+  "criteriaModeNearby": "Nearby",
+  "@criteriaModeNearby": {
+    "description": "Short label of the 'nearby stations' segment in the search-criteria mode toggle (#3927). Kept to one short word so the segmented button never wraps at 320 dp; the long form stays on the segment tooltip."
+  },
+  "criteriaModeRoute": "Route",
+  "@criteriaModeRoute": {
+    "description": "Short label of the 'along the route' segment in the search-criteria mode toggle (#3927). Kept to one short word so the segmented button never wraps at 320 dp; the long form stays on the segment tooltip."
+  },
+  "criteriaSubmit": "Search",
+  "@criteriaSubmit": {
+    "description": "Primary action of the search-criteria sheet's sticky bottom bar — runs the search with the criteria on screen (#3927)."
+  },
+  "criteriaReset": "Reset",
+  "@criteriaReset": {
+    "description": "Secondary text action of the search-criteria sheet's sticky bottom bar — restores the saved defaults, or the factory ones when nothing was saved (#3927)."
+  },
+  "criteriaResetDone": "Criteria reset to your defaults",
+  "@criteriaResetDone": {
+    "description": "Snackbar confirming that the search criteria were restored to the saved (or factory) defaults (#3927)."
+  },
+  "criteriaSubmitDisabledRoute": "Enter a start and a destination",
+  "@criteriaSubmitDisabledRoute": {
+    "description": "One-line reason shown above the disabled Search button when route mode has no start or no destination yet (#3927)."
+  },
+  "criteriaSubmitDisabledSearching": "Search in progress…",
+  "@criteriaSubmitDisabledSearching": {
+    "description": "One-line reason shown above the disabled Search button while a route search is already running (#3927)."
+  },
+  "criteriaShowMore": "Show more ({count})",
+  "@criteriaShowMore": {
+    "description": "Chip that expands a collapsed criteria chip group (fuels, amenities, brands); count is how many chips are still hidden (#3927).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "criteriaShowLess": "Show less",
+  "@criteriaShowLess": {
+    "description": "Chip that collapses an expanded criteria chip group back to its first rows (#3927)."
+  },
+  "criteriaBrands": "Brands",
+  "@criteriaBrands": {
+    "description": "Section header above the brand filter chips on the search-criteria sheet (#3927)."
+  },
+  "criteriaRouteOptions": "Route options",
+  "@criteriaRouteOptions": {
+    "description": "Title of the collapsible section holding the three route-planning options (segment, detour budget, minimum saving) on the search-criteria sheet (#3927)."
+  },
+  "criteriaRouteOptionsSummary": "Every {segmentKm} km · {detourKm} km detour · {saving}",
+  "@criteriaRouteOptionsSummary": {
+    "description": "One-line summary shown under the collapsed 'Route options' section: the route-segment spacing, the detour budget and the minimum-saving value ('Off' or an amount per litre) (#3927).",
+    "placeholders": {
+      "segmentKm": {
+        "type": "int"
+      },
+      "detourKm": {
+        "type": "int"
+      },
+      "saving": {
+        "type": "String"
+      }
+    }
+  },
+  "criteriaSwapEndpoints": "Swap start and destination",
+  "@criteriaSwapEndpoints": {
+    "description": "Tooltip of the icon button between the start and destination fields that exchanges the two endpoints of a route search (#3927)."
   },
   "fillUpOdometerFromLastFillUp": "Pre-filled from your last fill-up",
   "@fillUpOdometerFromLastFillUp": {
@@ -8759,6 +8971,162 @@
   "recordingTileScore": "Driving score",
   "@recordingTileScore": {
     "description": "Label of the live driving-score tile in the recording screen's metric grid (#3916)."
+  },
+  "searchSummaryAlongRoute": "Along the route · every {km} km",
+  "@searchSummaryAlongRoute": {
+    "description": "Route-mode segment of the results summary bar (row A), replacing the radius segment. Names the corridor first and the sampling spacing second, so the user reads WHERE the search ran before HOW densely (#3926, epic #3925). Replaces the bare 'Every {km} km' badge.",
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "50"
+      }
+    }
+  },
+  "searchSummaryPricesJustNow": "Prices from just now",
+  "@searchSummaryPricesJustNow": {
+    "description": "Freshness segment of the results summary bar (row A) when the price list was fetched less than a minute ago. Replaces the wordless amber '⚠ 2 h ago' pill, which never said WHAT was two hours old (#3926). The age measures how long ago the app downloaded this price list from the upstream open-data service (a cached list keeps its original download time), not how long ago the operator changed the price."
+  },
+  "searchSummaryPricesMinutes": "Prices from {minutes} min ago",
+  "@searchSummaryPricesMinutes": {
+    "description": "Freshness segment of the results summary bar (row A) for a download age under an hour (#3926).",
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+  "searchSummaryPricesHours": "Prices from {hours} h ago",
+  "@searchSummaryPricesHours": {
+    "description": "Freshness segment of the results summary bar (row A) for a download age under a day (#3926).",
+    "placeholders": {
+      "hours": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "searchSummaryPricesDays": "Prices from {days} d ago",
+  "@searchSummaryPricesDays": {
+    "description": "Freshness segment of the results summary bar (row A) for a download age of a day or more (#3926).",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "searchResultsFilterTooltip": "Filters",
+  "@searchResultsFilterTooltip": {
+    "description": "Tooltip and accessibility label of the filter icon button on the results row (row B), which expands the brand / highway / EV filter chips (#3926)."
+  },
+  "searchResultsFilterActiveSemantic": "Filters, {count} active",
+  "@searchResultsFilterActiveSemantic": {
+    "description": "Accessibility label of the results-row filter icon button when at least one filter is active; the visible affordance is a count badge on the icon (#3926).",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "searchResultsMoreActionsTooltip": "More actions",
+  "@searchResultsMoreActionsTooltip": {
+    "description": "Tooltip of the overflow ('…') button on the results row that holds the labelled map / radar-view / fuel-cost-calculator entries, replacing three unlabelled icon buttons (#3926)."
+  },
+  "searchPriceArrowLegend": "↓ and ↑ compare each price with the other stations in this list.",
+  "@searchPriceArrowLegend": {
+    "description": "One-line legend under the results list explaining the price arrows on the station cards. The arrow is NOT a time trend: it is the station's price tier inside the CURRENT result set (bottom third = ↓, middle third = –, top third = ↑), computed from the minimum and maximum price of the listed stations for the selected fuel (#3926)."
+  },
+  "searchPriceArrowCheapTooltip": "Among the lowest prices in this list",
+  "@searchPriceArrowCheapTooltip": {
+    "description": "Tooltip on the ↓ arrow beside a station-card price — the price sits in the bottom third of the current result set's price range (#3926)."
+  },
+  "searchPriceArrowAverageTooltip": "A mid-range price in this list",
+  "@searchPriceArrowAverageTooltip": {
+    "description": "Tooltip on the – dash beside a station-card price — the price sits in the middle third of the current result set's price range (#3926)."
+  },
+  "searchPriceArrowExpensiveTooltip": "Among the highest prices in this list",
+  "@searchPriceArrowExpensiveTooltip": {
+    "description": "Tooltip on the ↑ arrow beside a station-card price — the price sits in the top third of the current result set's price range (#3926)."
+  },
+  "searchRefreshTooltip": "Update position and refresh prices",
+  "@searchRefreshTooltip": {
+    "description": "Tooltip of the ONE refresh action in the search app bar (#3926). It merges the two refreshes the screen used to carry: the app-bar 'refresh prices' (re-run the last search) and the position bar's GPS re-fix."
+  },
+  "priceHistoryFirstSeen": "First seen on {date} — the history builds up with every visit",
+  "@priceHistoryFirstSeen": {
+    "description": "Station detail, price history (#3928): shown INSTEAD of the chart and the stats row when only a single price observation exists, so a lone dot in an empty chart never pretends to be a trend.",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "Aug 21, 2026"
+      }
+    }
+  },
+  "priceHistoryCurrentPriceLine": "Current price: {price}",
+  "@priceHistoryCurrentPriceLine": {
+    "description": "Station detail, price history (#3928): the single-observation state renders the current price on its own line under the first-seen sentence.",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "2.329 €"
+      }
+    }
+  },
+  "priceHistoryDeltaSince": "{delta} since {date}",
+  "@priceHistoryDeltaSince": {
+    "description": "Station detail, price history (#3928): explicit price delta between the oldest and the newest observation in the displayed window. Replaces the reference-less trend arrow. The delta is a signed, already-formatted price.",
+    "placeholders": {
+      "delta": {
+        "type": "String",
+        "example": "+0.03 €"
+      },
+      "date": {
+        "type": "String",
+        "example": "Aug 21, 2026"
+      }
+    }
+  },
+  "priceHistoryUnchangedSince": "Unchanged since {date}",
+  "@priceHistoryUnchangedSince": {
+    "description": "Station detail, price history (#3928): shown in place of a delta when the newest price equals the oldest one in the displayed window.",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "Aug 21, 2026"
+      }
+    }
+  },
+  "priceStatsMin": "Min",
+  "@priceStatsMin": {
+    "description": "Station detail, price history (#3928): label of the lowest observed price in the window. Coloured as a good value only when it differs from the maximum."
+  },
+  "priceStatsMax": "Max",
+  "@priceStatsMax": {
+    "description": "Station detail, price history (#3928): label of the highest observed price in the window. Coloured as a bad value only when it differs from the minimum."
+  },
+  "priceStatsAvg": "Avg",
+  "@priceStatsAvg": {
+    "description": "Station detail, price history (#3928): label of the average observed price in the window. Abbreviation of 'average'."
+  },
+  "amenitiesAndServices": "Amenities & services",
+  "@amenitiesAndServices": {
+    "description": "Station detail (#3928): heading of the single merged section that replaces the former separate 'Amenities' chips and 'Services (N)' expander — one deduplicated list."
+  },
+  "amenitiesServicesShowMore": "Show more ({count})",
+  "@amenitiesServicesShowMore": {
+    "description": "Station detail (#3928): reveals the amenities/services chips hidden beyond the first eight.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "4"
+      }
+    }
+  },
+  "amenitiesServicesShowLess": "Show less",
+  "@amenitiesServicesShowLess": {
+    "description": "Station detail (#3928): collapses the amenities/services chip list back to the first eight."
   },
   "stationStatusWithFreshness": "{status} · updated {ago} ago",
   "@stationStatusWithFreshness": {
