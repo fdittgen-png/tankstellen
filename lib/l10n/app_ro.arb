@@ -63,16 +63,11 @@
   "freeNoKey": "Gratuit — fără cheie necesară",
   "apiKeyRequired": "Cheie API necesară",
   "dataTransparency": "Transparența datelor",
-  "storageAndCache": "Stocare și cache",
   "clearCache": "Golește cache",
   "stationsFound": "{count} benzinării găsite",
   "storageUsage": "Utilizare stocare pe acest dispozitiv",
   "settingsLabel": "Setări",
-  "profilesStored": "profiluri salvate",
-  "stationsMarked": "benzinării marcate",
-  "cachedResponses": "răspunsuri în cache",
   "total": "Total",
-  "cacheManagement": "Gestionare cache",
   "cacheDescription": "Cache-ul stochează răspunsuri API pentru încărcare mai rapidă și acces offline.",
   "cacheTtlGroupNetwork": "Rețea",
   "cacheTtlGroupData": "Date",
@@ -87,7 +82,6 @@
   "clearCacheBody": "Rezultatele căutărilor și prețurile din cache vor fi șterse. Profilurile, favoritele și setările sunt păstrate.",
   "clearCacheButton": "Golește cache",
   "deleteAllButton": "Șterge tot",
-  "entries": "intrări",
   "cacheEmpty": "Cache-ul este gol",
   "apiKeyNote": "Înregistrare gratuită. Date de la agențiile guvernamentale de transparență a prețurilor.",
   "apiKeyFormatError": "Format invalid — UUID așteptat (8-4-4-4-12)",
@@ -97,32 +91,9 @@
   "reportConsentBody": "Aceasta va deschide o problemă publică pe GitHub cu detaliile erorii de mai jos. Nu sunt incluse coordonate GPS, chei API sau date personale.",
   "reportConsentConfirm": "Deschide GitHub",
   "reportConsentCancel": "Anulare",
-  "configProfileSection": "Profil",
-  "configActiveProfile": "Profil activ",
-  "configPreferredFuel": "Combustibil preferat",
-  "configCountry": "Țara",
-  "configRouteSegment": "Segment de rută",
-  "configApiKeysSection": "Chei API",
-  "configTankerkoenigKey": "Cheie API Tankerkoenig",
-  "configApiKeyConfigured": "Configurată",
-  "configApiKeyCommunity": "Implicită (cheie comunitate)",
   "searchLocationPlaceholder": "Adresă, cod poștal sau oraș",
-  "configEvKey": "Cheie API stații EV",
-  "configEvKeyCustom": "Cheie personalizată",
-  "configEvKeyShared": "Implicită (partajată)",
-  "configCloudSyncSection": "Sincronizare cloud",
   "configTankSyncConnected": "Conectat",
   "configTankSyncDisabled": "Dezactivat",
-  "configAuthMode": "Mod autentificare",
-  "configAuthEmail": "Email (persistent)",
-  "configAuthAnonymous": "Anonim (doar pe dispozitiv)",
-  "configDatabase": "Bază de date",
-  "configPrivacySummary": "Rezumat confidențialitate",
-  "configPrivacySummarySynced": "• Favoritele, alertele și stațiile ignorate sunt sincronizate cu baza dvs. de date privată\n• Poziția GPS și cheile API nu părăsesc niciodată dispozitivul\n• {authNote}",
-  "configPrivacySummaryLocal": "• Toate datele sunt stocate local doar pe acest dispozitiv\n• Nicio dată nu este trimisă la niciun server\n• Cheile API sunt criptate în spațiul de stocare securizat al dispozitivului",
-  "configAuthNoteEmail": "Contul de email permite accesul de pe mai multe dispozitive",
-  "configAuthNoteAnonymous": "Cont anonim — date legate de acest dispozitiv",
-  "configNone": "Niciunul",
   "privacyPolicy": "Politica de confidențialitate",
   "fuels": "Carburanți",
   "services": "Servicii",
@@ -262,42 +233,8 @@
   "fuelNeeded": "Carburant necesar",
   "totalCost": "Cost total",
   "priceHistory": "Istoric prețuri",
-  "ignoredStationsLabel": "Ignorate",
-  "ratingsLabel": "Evaluări",
   "favoritesDataCache": "Date favorite",
   "citySearchCache": "Căutare oraș",
-  "priceHistoryStationsTracked": "{count} stații urmărite",
-  "@priceHistoryStationsTracked": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "alertsConfiguredCount": "{count} configurate",
-  "@alertsConfiguredCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ignoredStationsHidden": "{count} stații ascunse",
-  "@ignoredStationsHidden": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ratingsStationsRated": "{count} stații evaluate",
-  "@ratingsStationsRated": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "noPriceHistory": "Încă nu există istoric de prețuri",
   "noStatistics": "Nu sunt statistici disponibile",
   "showAllFuelTypes": "Arată toate tipurile de carburant",
@@ -420,33 +357,19 @@
   "alertStatsActive": "Active",
   "alertStatsToday": "Astăzi",
   "alertStatsThisWeek": "Săptămâna aceasta",
-  "privacyDashboardTitle": "Tablou de bord confidențialitate",
-  "privacyDashboardSubtitle": "Vizualizați, exportați sau ștergeți datele dvs.",
-  "privacyDashboardBanner": "Datele dvs. vă aparțin. Aici puteți vedea tot ce stochează această aplicație, le puteți exporta sau șterge.",
   "privacyLocalData": "Date pe acest dispozitiv",
   "privacyIgnoredStations": "Stații ignorate",
   "privacyRatings": "Evaluări stații",
   "privacyPriceHistory": "Stații cu istoric prețuri",
   "privacyProfiles": "Profile de căutare",
   "privacyItineraries": "Rute salvate",
-  "privacyCacheEntries": "Intrări în cache",
-  "privacyApiKey": "Cheie API stocată",
-  "privacyEvApiKey": "Cheie API EV stocată",
-  "privacyEstimatedSize": "Spațiu estimat",
-  "privacySyncedData": "Sincronizare cloud (TankSync)",
-  "privacySyncDisabled": "Sincronizarea cloud este dezactivată. Toate datele rămân doar pe acest dispozitiv.",
   "privacySyncMode": "Mod sincronizare",
   "privacySyncUserId": "ID utilizator",
   "privacySyncDescription": "Când sincronizarea este activată, favoritele, alertele, stațiile ignorate și evaluările sunt stocate și pe serverul TankSync.",
-  "privacyViewServerData": "Vizualizați datele de pe server",
-  "privacyExportButton": "Exportați toate datele ca JSON",
   "privacyExportSuccess": "Date exportate în clipboard",
-  "privacyExportCsvButton": "Exportați toate datele ca CSV",
   "privacyExportCsvSuccess": "Date CSV exportate în clipboard",
   "savedToDownloadsFolder": "Salvat în folderul Descărcări",
-  "privacyClearErrorLog": "Șterge jurnalul de erori",
   "privacyErrorLogCleared": "Jurnalul de erori a fost șters",
-  "privacyDeleteButton": "Ștergeți toate datele",
   "privacyDeleteTitle": "Ștergeți toate datele?",
   "privacyDeleteBody": "Aceasta va șterge permanent:\n\n- Toate favoritele și datele stațiilor\n- Toate profilurile de căutare\n- Toate alertele de prețuri\n- Tot istoricul prețurilor\n- Toate datele din cache\n- Cheia dvs. API\n- Toate setările aplicației\n\nAplicația se va reseta la starea inițială. Această acțiune nu poate fi anulată.",
   "privacyDeleteConfirm": "Ștergeți totul",
@@ -1177,9 +1100,6 @@
   "authInfoBenefit2": "• Pregătiți o rută pe telefon, folosiți-o în mașină",
   "authInfoBenefit3": "• Nicio dată nu este partajată cu terți",
   "authInfoBenefit4": "• Puteți șterge contul oricând",
-  "privacyLocalDataEmpty": "Nimic stocat încă. Adăugați un favorit sau setați o alertă de preț pentru a vedea intrările aici.",
-  "privacyHideEmptyRows": "Ascundeți rândurile goale",
-  "privacyShowEmptyRows": "{count, plural, =1{Afișați {count} rând gol} other{Afișați {count} rânduri goale}}",
   "apiKeySetupTitle": "Configurare cheie API (opțional)",
   "apiKeySetupDescription": "Înregistrați-vă pentru o cheie API gratuită sau omiteți pentru a explora aplicația cu date demo.",
   "apiKeyRegistrationButton": "Înregistrare {provider}",
@@ -1192,8 +1112,6 @@
   "consentSyncTripsTitle": "Sincronizați înregistrările de călătorii",
   "consentSyncTripsSubtitle": "Faceți backup la călătoriile OBD2 + GPS în TankSync. Cross-device, opt-in.",
   "consentSyncTripsDisabledHint": "Activați mai întâi Sincronizarea cloud pentru a face backup la călătorii.",
-  "consentHideDetails": "Ascundeți detaliile",
-  "consentShowDetails": "Afișați detaliile",
   "dialogOk": "OK",
   "invalidLinkTitle": "Link invalid",
   "invalidLinkBody": "Link-ul \"{path}\" nu este valid.",
@@ -1636,15 +1554,6 @@
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
   "fabRunSearch": "Execută căutarea",
-  "privacySaveErrorLog": "Salvează jurnalul de erori ({count})",
-  "@privacySaveErrorLog": {
-    "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "approachTestSimulateButton": "Testează suprapunerea de apropiere",
   "@approachTestSimulateButton": {
     "description": "Button on the trip-recording screen that pushes a synthetic ApproachInRadius into the PiP for 30 s so the user can verify the price layout without driving (#2163)."
@@ -4638,12 +4547,10 @@
   "deleteReportTooltip": "Șterge acest raport",
   "reportDeleted": "Raport șters",
   "reportDeleteFailed": "Raportul nu a putut fi șters",
-  "privacyControlsTitle": "Controale de confidențialitate",
   "tileProxyToggleTitle": "Încarcă plăcile hărții prin proxy-ul Sparkilo",
   "tileProxyToggleSubtitle": "Activat: zona vizibilă a hărții și adresa dvs. IP ajung la serverul din UE al dezvoltatorului, care preia plăcile de la OpenStreetMap. Dezactivat: plăcile se încarcă direct de la tile.openstreetmap.org.",
   "remoteLogosToggleTitle": "Încarcă logourile mărcilor de pe internet",
   "remoteLogosToggleSubtitle": "Dezactivat implicit: se afișează substituenți incluși în aplicație. Activat: logourile sunt preluate de la logo.clearbit.com, care vede adresa dvs. IP.",
-  "privacyExportAllButton": "Exportă toate datele mele (ZIP)",
   "privacyExportAllSuccess": "{fileName} salvat în Descărcări — {count} fișiere incluse",
   "@privacyExportAllSuccess": {
     "placeholders": {
@@ -4776,7 +4683,6 @@
   "settingsTopicDataSourcesKeywords": "api, cheie, gps, locație, poziție, sursă de date, tankerkoenig, opencharge, key, location, data source",
   "settingsTopicSyncTitle": "Sincronizare și cont",
   "settingsTopicSyncKeywords": "tanksync, cloud, cont, e-mail, conectare dispozitiv, sincronizare, partajare bază de date, anonim, account, email, link device, sync, share database, anonymous",
-  "settingsTopicPrivacySubtitle": "Consimțăminte, panou de confidențialitate, stocare și cache",
   "settingsTopicPrivacyKeywords": "confidențialitate, consimțământ, gdpr, ștergere, stocare, cache, date, raportare erori, vin, privacy, consent, delete, erase, storage, data, error reporting",
   "settingsTopicBackupTitle": "Backup și restaurare",
   "settingsTopicBackupSubtitle": "Exportă sau restaurează un backup complet al datelor tale",
@@ -4797,7 +4703,6 @@
   "settingsDistanceUnitSubtitle": "Din țara profilului activ",
   "settingsObd2AdapterTitle": "Adaptor OBD2",
   "settingsObd2AdapterSubtitle": "Adaptoarele se asociază per vehicul — deschide un vehicul pentru a asocia sau schimba adaptorul",
-  "settingsStorageDeleteHint": "Ștergerea tuturor datelor locale se face din panoul de confidențialitate.",
   "settingsPrivacyCrossLinkTitle": "Consimțăminte",
   "settingsPrivacyCrossLinkSubtitle": "Consimțămintele pentru Cloud Sync și sincronizarea călătoriilor se află la Confidențialitate și date",
   "settingsBackupExportSubtitle": "Vehicule, alimentări, călătorii și jurnale de încărcare ca fișier ZIP",

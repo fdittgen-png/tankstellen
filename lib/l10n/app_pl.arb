@@ -63,16 +63,11 @@
   "freeNoKey": "Bezpłatnie — klucz nie jest wymagany",
   "apiKeyRequired": "Wymagany klucz API",
   "dataTransparency": "Przejrzystość danych",
-  "storageAndCache": "Pamięć i pamięć podręczna",
   "clearCache": "Wyczyść pamięć podręczną",
   "stationsFound": "Znaleziono {count} stacji",
   "storageUsage": "Wykorzystanie pamięci na tym urządzeniu",
   "settingsLabel": "Ustawienia",
-  "profilesStored": "profili zapisanych",
-  "stationsMarked": "stacji oznaczonych",
-  "cachedResponses": "odpowiedzi w pamięci podręcznej",
   "total": "Razem",
-  "cacheManagement": "Zarządzanie pamięcią podręczną",
   "cacheDescription": "Pamięć podręczna przechowuje odpowiedzi API dla szybszego ładowania i dostępu offline.",
   "cacheTtlGroupNetwork": "Sieć",
   "cacheTtlGroupData": "Dane",
@@ -87,7 +82,6 @@
   "clearCacheBody": "Zapisane wyniki wyszukiwania i ceny zostaną usunięte. Profile, ulubione i ustawienia zostaną zachowane.",
   "clearCacheButton": "Wyczyść pamięć podręczną",
   "deleteAllButton": "Usuń wszystko",
-  "entries": "wpisów",
   "cacheEmpty": "Pamięć podręczna jest pusta",
   "apiKeyNote": "Bezpłatna rejestracja. Dane od rządowych agencji przejrzystości cen.",
   "apiKeyFormatError": "Nieprawidłowy format — oczekiwany UUID (8-4-4-4-12)",
@@ -97,32 +91,9 @@
   "reportConsentBody": "Spowoduje to otwarcie publicznego zgłoszenia na GitHub ze szczegółami błędu poniżej. Nie są dołączane współrzędne GPS, klucze API ani dane osobowe.",
   "reportConsentConfirm": "Otwórz GitHub",
   "reportConsentCancel": "Anuluj",
-  "configProfileSection": "Profil",
-  "configActiveProfile": "Aktywny profil",
-  "configPreferredFuel": "Preferowane paliwo",
-  "configCountry": "Kraj",
-  "configRouteSegment": "Odcinek trasy",
-  "configApiKeysSection": "Klucze API",
-  "configTankerkoenigKey": "Klucz API Tankerkoenig",
-  "configApiKeyConfigured": "Skonfigurowany",
-  "configApiKeyCommunity": "Domyślny (klucz społecznościowy)",
   "searchLocationPlaceholder": "Adres, kod pocztowy lub miasto",
-  "configEvKey": "Klucz API stacji EV",
-  "configEvKeyCustom": "Własny klucz",
-  "configEvKeyShared": "Domyślny (współdzielony)",
-  "configCloudSyncSection": "Synchronizacja w chmurze",
   "configTankSyncConnected": "Połączono",
   "configTankSyncDisabled": "Wyłączono",
-  "configAuthMode": "Tryb uwierzytelnienia",
-  "configAuthEmail": "E-mail (trwały)",
-  "configAuthAnonymous": "Anonimowy (tylko urządzenie)",
-  "configDatabase": "Baza danych",
-  "configPrivacySummary": "Podsumowanie prywatności",
-  "configPrivacySummarySynced": "• Ulubione, alerty i ukryte stacje są synchronizowane z Twoją prywatną bazą danych\n• Pozycja GPS i klucze API nigdy nie opuszczają urządzenia\n• {authNote}",
-  "configPrivacySummaryLocal": "• Wszystkie dane są przechowywane wyłącznie lokalnie na tym urządzeniu\n• Żadne dane nie są wysyłane na serwer\n• Klucze API szyfrowane w bezpiecznym magazynie urządzenia",
-  "configAuthNoteEmail": "Konto e-mail umożliwia dostęp z wielu urządzeń",
-  "configAuthNoteAnonymous": "Konto anonimowe — dane powiązane z tym urządzeniem",
-  "configNone": "Brak",
   "privacyPolicy": "Polityka prywatności",
   "fuels": "Paliwa",
   "services": "Usługi",
@@ -262,42 +233,8 @@
   "fuelNeeded": "Potrzebne paliwo",
   "totalCost": "Koszt całkowity",
   "priceHistory": "Historia cen",
-  "ignoredStationsLabel": "Ignorowane",
-  "ratingsLabel": "Oceny",
   "favoritesDataCache": "Dane ulubionych",
   "citySearchCache": "Wyszukiwanie miasta",
-  "priceHistoryStationsTracked": "{count} śledzonych stacji",
-  "@priceHistoryStationsTracked": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "alertsConfiguredCount": "{count} skonfigurowanych",
-  "@alertsConfiguredCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ignoredStationsHidden": "{count} ukrytych stacji",
-  "@ignoredStationsHidden": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ratingsStationsRated": "{count} ocenionych stacji",
-  "@ratingsStationsRated": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "noPriceHistory": "Brak historii cen",
   "noStatistics": "Brak dostępnych statystyk",
   "showAllFuelTypes": "Pokaż wszystkie typy paliw",
@@ -420,33 +357,19 @@
   "alertStatsActive": "Aktywne",
   "alertStatsToday": "Dzisiaj",
   "alertStatsThisWeek": "W tym tygodniu",
-  "privacyDashboardTitle": "Panel prywatności",
-  "privacyDashboardSubtitle": "Przeglądaj, eksportuj lub usuń swoje dane",
-  "privacyDashboardBanner": "Twoje dane należą do Ciebie. Tutaj możesz zobaczyć wszystko, co ta aplikacja przechowuje, wyeksportować to lub usunąć.",
   "privacyLocalData": "Dane na tym urządzeniu",
   "privacyIgnoredStations": "Ukryte stacje",
   "privacyRatings": "Oceny stacji",
   "privacyPriceHistory": "Stacje historii cen",
   "privacyProfiles": "Profile wyszukiwania",
   "privacyItineraries": "Zapisane trasy",
-  "privacyCacheEntries": "Wpisy w pamięci podręcznej",
-  "privacyApiKey": "Klucz API zapisany",
-  "privacyEvApiKey": "Klucz API EV zapisany",
-  "privacyEstimatedSize": "Szacowany rozmiar",
-  "privacySyncedData": "Synchronizacja w chmurze (TankSync)",
-  "privacySyncDisabled": "Synchronizacja w chmurze jest wyłączona. Wszystkie dane pozostają wyłącznie na tym urządzeniu.",
   "privacySyncMode": "Tryb synchronizacji",
   "privacySyncUserId": "ID użytkownika",
   "privacySyncDescription": "Gdy synchronizacja jest włączona, ulubione, alerty, ukryte stacje i oceny są również przechowywane na serwerze TankSync.",
-  "privacyViewServerData": "Wyświetl dane serwera",
-  "privacyExportButton": "Eksportuj wszystkie dane jako JSON",
   "privacyExportSuccess": "Dane wyeksportowane do schowka",
-  "privacyExportCsvButton": "Eksportuj wszystkie dane jako CSV",
   "privacyExportCsvSuccess": "Dane CSV wyeksportowane do schowka",
   "savedToDownloadsFolder": "Zapisano w folderze Pobrane",
-  "privacyClearErrorLog": "Wyczyść dziennik błędów",
   "privacyErrorLogCleared": "Dziennik błędów wyczyszczony",
-  "privacyDeleteButton": "Usuń wszystkie dane",
   "privacyDeleteTitle": "Usunąć wszystkie dane?",
   "privacyDeleteBody": "Spowoduje to trwałe usunięcie:\n\n- Wszystkich ulubionych i danych stacji\n- Wszystkich profili wyszukiwania\n- Wszystkich alertów cenowych\n- Całej historii cen\n- Wszystkich danych w pamięci podręcznej\n- Twojego klucza API\n- Wszystkich ustawień aplikacji\n\nAplikacja zostanie zresetowana do stanu początkowego. Tej operacji nie można cofnąć.",
   "privacyDeleteConfirm": "Usuń wszystko",
@@ -1177,9 +1100,6 @@
   "authInfoBenefit2": "• Zaplanuj trasę na telefonie, użyj jej w samochodzie",
   "authInfoBenefit3": "• Żadne dane nie są udostępniane stronom trzecim",
   "authInfoBenefit4": "• Możesz usunąć swoje konto w dowolnym momencie",
-  "privacyLocalDataEmpty": "Nic jeszcze nie zapisano. Dodaj ulubioną stację lub ustaw alert cenowy, aby zobaczyć wpisy.",
-  "privacyHideEmptyRows": "Ukryj puste wiersze",
-  "privacyShowEmptyRows": "{count, plural, =1{Pokaż {count} pusty wiersz} other{Pokaż {count} puste wiersze}}",
   "apiKeySetupTitle": "Konfiguracja klucza API (opcjonalne)",
   "apiKeySetupDescription": "Zarejestruj się, aby uzyskać bezpłatny klucz API, lub pomiń, aby eksplorować aplikację z danymi demo.",
   "apiKeyRegistrationButton": "Rejestracja {provider}",
@@ -1192,8 +1112,6 @@
   "consentSyncTripsTitle": "Synchronizuj nagrania tras",
   "consentSyncTripsSubtitle": "Twórz kopię zapasową tras OBD2 + GPS w TankSync. Między urządzeniami, opt-in.",
   "consentSyncTripsDisabledHint": "Włącz Synchronizację w chmurze powyżej, aby tworzyć kopię tras.",
-  "consentHideDetails": "Ukryj szczegóły",
-  "consentShowDetails": "Pokaż szczegóły",
   "dialogOk": "OK",
   "invalidLinkTitle": "Nieprawidłowy link",
   "invalidLinkBody": "Link \"{path}\" jest nieprawidłowy.",
@@ -1636,15 +1554,6 @@
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
   "fabRunSearch": "Uruchom wyszukiwanie",
-  "privacySaveErrorLog": "Zapisz dziennik błędów ({count})",
-  "@privacySaveErrorLog": {
-    "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "approachTestSimulateButton": "Testuj nakładkę zbliżania się",
   "@approachTestSimulateButton": {
     "description": "Button on the trip-recording screen that pushes a synthetic ApproachInRadius into the PiP for 30 s so the user can verify the price layout without driving (#2163)."
@@ -4638,12 +4547,10 @@
   "deleteReportTooltip": "Usuń to zgłoszenie",
   "reportDeleted": "Zgłoszenie usunięte",
   "reportDeleteFailed": "Nie udało się usunąć zgłoszenia",
-  "privacyControlsTitle": "Ustawienia prywatności",
   "tileProxyToggleTitle": "Ładuj kafelki mapy przez proxy Sparkilo",
   "tileProxyToggleSubtitle": "Wł.: widoczny obszar mapy i Twój adres IP trafiają na serwer dewelopera w UE, który pobiera kafelki z OpenStreetMap. Wył.: kafelki są ładowane bezpośrednio z tile.openstreetmap.org.",
   "remoteLogosToggleTitle": "Ładuj logo marek z internetu",
   "remoteLogosToggleSubtitle": "Domyślnie wył.: wyświetlane są wbudowane symbole zastępcze. Wł.: logo są pobierane z logo.clearbit.com, które widzi Twój adres IP.",
-  "privacyExportAllButton": "Eksportuj wszystkie moje dane (ZIP)",
   "privacyExportAllSuccess": "Zapisano {fileName} w folderze Pobrane — {count} plików w środku",
   "@privacyExportAllSuccess": {
     "placeholders": {
@@ -4776,7 +4683,6 @@
   "settingsTopicDataSourcesKeywords": "api, klucz, gps, lokalizacja, pozycja, źródło danych, tankerkoenig, opencharge, key, location, data source",
   "settingsTopicSyncTitle": "Synchronizacja i konto",
   "settingsTopicSyncKeywords": "tanksync, chmura, konto, e-mail, połącz urządzenie, synchronizacja, udostępnij bazę, anonimowy, cloud, account, email, link device, sync, share database, anonymous",
-  "settingsTopicPrivacySubtitle": "Zgody, panel prywatności, pamięć i cache",
   "settingsTopicPrivacyKeywords": "prywatność, zgoda, rodo, usuń, wymaż, pamięć, cache, dane, raportowanie błędów, vin, privacy, consent, gdpr, delete, erase, storage, data, error reporting",
   "settingsTopicBackupTitle": "Kopia zapasowa i przywracanie",
   "settingsTopicBackupSubtitle": "Eksportuj lub przywróć pełną kopię zapasową swoich danych",
@@ -4797,7 +4703,6 @@
   "settingsDistanceUnitSubtitle": "Z kraju aktywnego profilu",
   "settingsObd2AdapterTitle": "Adapter OBD2",
   "settingsObd2AdapterSubtitle": "Adaptery są parowane dla każdego pojazdu — otwórz pojazd, aby sparować lub zmienić jego adapter",
-  "settingsStorageDeleteHint": "Usunięcie wszystkich danych lokalnych odbywa się z panelu prywatności.",
   "settingsPrivacyCrossLinkTitle": "Zgody",
   "settingsPrivacyCrossLinkSubtitle": "Zgody na Cloud Sync i synchronizację podróży znajdziesz w sekcji Prywatność i dane",
   "settingsBackupExportSubtitle": "Pojazdy, tankowania, podróże i dzienniki ładowania jako plik ZIP",

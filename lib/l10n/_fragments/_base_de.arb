@@ -87,7 +87,6 @@
   "freeNoKey": "Kostenlos — kein Schlüssel nötig",
   "apiKeyRequired": "API-Schlüssel erforderlich",
   "dataTransparency": "Datentransparenz",
-  "storageAndCache": "Speicher & Cache",
   "clearCache": "Cache leeren",
   "stationsFound": "{count} Tankstellen gefunden",
   "@stationsFound": {
@@ -99,11 +98,7 @@
   },
   "storageUsage": "Speichernutzung auf diesem Gerät",
   "settingsLabel": "Einstellungen",
-  "profilesStored": "Profile gespeichert",
-  "stationsMarked": "Tankstellen gemerkt",
-  "cachedResponses": "zwischengespeicherte Antworten",
   "total": "Gesamt",
-  "cacheManagement": "Cache-Verwaltung",
   "cacheDescription": "Der Cache speichert API-Antworten für schnellere Ladezeiten und Offline-Zugriff.",
   "cacheTtlGroupNetwork": "Netzwerk",
   "cacheTtlGroupData": "Daten",
@@ -132,7 +127,6 @@
   "clearCacheBody": "Zwischengespeicherte Suchergebnisse und Preise werden gelöscht. Profile, Favoriten und Einstellungen bleiben erhalten.",
   "clearCacheButton": "Cache leeren",
   "deleteAllButton": "Alles löschen",
-  "entries": "Einträge",
   "cacheEmpty": "Cache ist leer",
   "apiKeyNote": "Kostenlose Registrierung. Daten von den Markttransparenzstellen.",
   "apiKeyFormatError": "Ungültiges Format — UUID erwartet (8-4-4-4-12)",
@@ -142,32 +136,9 @@
   "reportConsentBody": "Dies öffnet ein öffentliches GitHub-Issue mit den unten gezeigten Fehlerdetails. Keine GPS-Koordinaten, API-Schlüssel oder persönlichen Daten werden übermittelt.",
   "reportConsentConfirm": "GitHub öffnen",
   "reportConsentCancel": "Abbrechen",
-  "configProfileSection": "Profil",
-  "configActiveProfile": "Aktives Profil",
-  "configPreferredFuel": "Bevorzugter Kraftstoff",
-  "configCountry": "Land",
-  "configRouteSegment": "Streckenabschnitt",
-  "configApiKeysSection": "API-Schlüssel",
-  "configTankerkoenigKey": "Tankerkönig API-Schlüssel",
-  "configApiKeyConfigured": "Konfiguriert",
-  "configApiKeyCommunity": "Standard-Community-Schlüssel",
   "searchLocationPlaceholder": "Adresse, Postleitzahl oder Stadt",
-  "configEvKey": "Ladesäulen API-Schlüssel",
-  "configEvKeyCustom": "Eigener Schlüssel",
-  "configEvKeyShared": "Standard (geteilt)",
-  "configCloudSyncSection": "Cloud-Sync",
   "configTankSyncConnected": "Verbunden",
   "configTankSyncDisabled": "Deaktiviert",
-  "configAuthMode": "Anmeldeverfahren",
-  "configAuthEmail": "E-Mail (dauerhaft)",
-  "configAuthAnonymous": "Anonym (nur dieses Gerät)",
-  "configDatabase": "Datenbank",
-  "configPrivacySummary": "Datenschutz-Zusammenfassung",
-  "configPrivacySummarySynced": "• Favoriten, Preisalarme und ignorierte Tankstellen werden in Ihre private Datenbank synchronisiert\n• GPS-Position und API-Schlüssel verlassen Ihr Gerät nie\n• {authNote}",
-  "configPrivacySummaryLocal": "• Alle Daten werden nur lokal auf diesem Gerät gespeichert\n• Es werden keine Daten an einen Server gesendet\n• API-Schlüssel sind im sicheren Gerätespeicher verschlüsselt",
-  "configAuthNoteEmail": "E-Mail-Konto ermöglicht gerätübergreifenden Zugriff",
-  "configAuthNoteAnonymous": "Anonymes Konto — Daten an dieses Gerät gebunden",
-  "configNone": "Keine",
   "privacyPolicy": "Datenschutzerklärung",
   "fuels": "Kraftstoffe",
   "services": "Services",
@@ -446,42 +417,8 @@
   "calculatorReset": "Zurücksetzen",
   "calculatorResultPlaceholder": "Geben Sie Entfernung, Verbrauch und Preis ein, um die Fahrtkosten zu sehen",
   "priceHistory": "Preisverlauf",
-  "ignoredStationsLabel": "Ignoriert",
-  "ratingsLabel": "Bewertungen",
   "favoritesDataCache": "Favoritendaten",
   "citySearchCache": "Stadtsuche",
-  "priceHistoryStationsTracked": "{count} Tankstellen verfolgt",
-  "@priceHistoryStationsTracked": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "alertsConfiguredCount": "{count} konfiguriert",
-  "@alertsConfiguredCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ignoredStationsHidden": "{count} Tankstellen ausgeblendet",
-  "@ignoredStationsHidden": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ratingsStationsRated": "{count} Tankstellen bewertet",
-  "@ratingsStationsRated": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "noPriceHistory": "Noch kein Preisverlauf",
   "noStatistics": "Keine Statistiken verfügbar",
   "showAllFuelTypes": "Alle Kraftstoffarten anzeigen",
@@ -679,41 +616,18 @@
   "alertStatsActive": "Aktiv",
   "alertStatsToday": "Heute",
   "alertStatsThisWeek": "Diese Woche",
-  "privacyDashboardTitle": "Datenschutz-Dashboard",
-  "privacyDashboardSubtitle": "Daten anzeigen, exportieren oder löschen",
-  "privacyDashboardBanner": "Ihre Daten gehören Ihnen. Hier sehen Sie alles, was diese App speichert, und können es exportieren oder löschen.",
   "privacyLocalData": "Daten auf diesem Gerät",
   "privacyIgnoredStations": "Ausgeblendete Stationen",
   "privacyRatings": "Stationsbewertungen",
   "privacyPriceHistory": "Preisverlauf-Stationen",
   "privacyProfiles": "Suchprofile",
   "privacyItineraries": "Gespeicherte Routen",
-  "privacyCacheEntries": "Cache-Einträge",
-  "privacyApiKey": "API-Schlüssel gespeichert",
-  "privacyEvApiKey": "EV-API-Schlüssel gespeichert",
-  "privacyEstimatedSize": "Geschätzter Speicherverbrauch",
-  "privacySyncedData": "Cloud-Sync (TankSync)",
-  "privacySyncDisabled": "Cloud-Sync ist deaktiviert. Alle Daten bleiben nur auf diesem Gerät.",
   "privacySyncMode": "Sync-Modus",
   "privacySyncUserId": "Benutzer-ID",
   "privacySyncDescription": "Bei aktiviertem Sync werden Favoriten, Bewertungen, Alarme, ausgeblendete Stationen, gespeicherte Routen, Fahrzeuge, Tankprotokolle und Fahrten auch auf dem TankSync-Server gespeichert.",
-  "privacyViewServerData": "Serverdaten anzeigen",
-  "privacyExportButton": "Alle Daten als JSON exportieren",
   "privacyExportSuccess": "Daten in die Zwischenablage exportiert",
-  "privacyExportCsvButton": "Alle Daten als CSV exportieren",
   "privacyExportCsvSuccess": "CSV-Daten in die Zwischenablage exportiert",
   "savedToDownloadsFolder": "Im Downloads-Ordner gespeichert",
-  "privacyDeleteButton": "Alle Daten löschen",
-  "privacySaveErrorLog": "Fehlerprotokoll speichern ({count})",
-  "@privacySaveErrorLog": {
-    "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "privacyClearErrorLog": "Fehlerprotokoll löschen",
   "privacyErrorLogCleared": "Fehlerprotokoll gelöscht",
   "privacyDeleteTitle": "Alle Daten löschen?",
   "privacyDeleteBody": "Dies löscht unwiderruflich:\n\n- Alle Favoriten und Stationsdaten\n- Alle Suchprofile\n- Alle Preisalarme\n- Allen Preisverlauf\n- Alle zwischengespeicherten Daten\n- Ihren API-Schlüssel\n- Alle App-Einstellungen\n\nDie App wird auf den Ausgangszustand zurückgesetzt. Diese Aktion kann nicht rückgängig gemacht werden.",

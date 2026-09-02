@@ -9,12 +9,10 @@
   "deleteReportTooltip": "Diese Meldung löschen",
   "reportDeleted": "Meldung gelöscht",
   "reportDeleteFailed": "Meldung konnte nicht gelöscht werden",
-  "privacyControlsTitle": "Datenschutz-Einstellungen",
   "tileProxyToggleTitle": "Kartenkacheln über den Sparkilo-Proxy laden",
   "tileProxyToggleSubtitle": "An: Kartenausschnitt und IP-Adresse erreichen den EU-Server des Entwicklers, der die Kacheln von OpenStreetMap holt. Aus: Kacheln kommen direkt von tile.openstreetmap.org.",
   "remoteLogosToggleTitle": "Markenlogos aus dem Internet laden",
   "remoteLogosToggleSubtitle": "Standardmäßig aus: es werden mitgelieferte Platzhalter angezeigt. An: Logos werden von logo.clearbit.com geladen, das deine IP-Adresse sieht.",
-  "privacyExportAllButton": "Alle meine Daten exportieren (ZIP)",
   "privacyExportAllSuccess": "{fileName} in Downloads gespeichert — {count} Dateien enthalten",
   "privacyExportAllFailed": "Die Exportdatei konnte nicht gespeichert werden"
 }

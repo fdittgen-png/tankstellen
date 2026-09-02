@@ -63,16 +63,11 @@
   "freeNoKey": "Ilmainen — avainta ei tarvita",
   "apiKeyRequired": "API-avain vaaditaan",
   "dataTransparency": "Tietojen läpinäkyvyys",
-  "storageAndCache": "Tallennus ja välimuisti",
   "clearCache": "Tyhjennä välimuisti",
   "stationsFound": "{count} asemaa löytyi",
   "storageUsage": "Tallennustilan käyttö tällä laitteella",
   "settingsLabel": "Asetukset",
-  "profilesStored": "profiilia tallennettu",
-  "stationsMarked": "asemaa merkitty",
-  "cachedResponses": "välimuistissa olevaa vastausta",
   "total": "Yhteensä",
-  "cacheManagement": "Välimuistin hallinta",
   "cacheDescription": "Välimuisti tallentaa API-vastaukset nopeampaa latausta ja offline-käyttöä varten.",
   "cacheTtlGroupNetwork": "Verkko",
   "cacheTtlGroupData": "Tiedot",
@@ -87,7 +82,6 @@
   "clearCacheBody": "Välimuistissa olevat hakutulokset ja hinnat poistetaan. Profiilit, suosikit ja asetukset säilytetään.",
   "clearCacheButton": "Tyhjennä välimuisti",
   "deleteAllButton": "Poista kaikki",
-  "entries": "merkintää",
   "cacheEmpty": "Välimuisti on tyhjä",
   "apiKeyNote": "Ilmainen rekisteröinti. Tiedot valtion hintatransparenssitoimistoilta.",
   "apiKeyFormatError": "Virheellinen muoto — odotettu UUID (8-4-4-4-12)",
@@ -97,32 +91,9 @@
   "reportConsentBody": "Tämä avaa julkisen GitHub-ilmoituksen alla olevilla virhetiedoilla. Mitään GPS-koordinaatteja, API-avaimia tai henkilötietoja ei sisällytetä.",
   "reportConsentConfirm": "Avaa GitHub",
   "reportConsentCancel": "Peruuta",
-  "configProfileSection": "Profiili",
-  "configActiveProfile": "Aktiivinen profiili",
-  "configPreferredFuel": "Ensisijainen polttoaine",
-  "configCountry": "Maa",
-  "configRouteSegment": "Reittijakso",
-  "configApiKeysSection": "API-avaimet",
-  "configTankerkoenigKey": "Tankerkoenig API-avain",
-  "configApiKeyConfigured": "Määritetty",
-  "configApiKeyCommunity": "Oletus (yhteisöavain)",
   "searchLocationPlaceholder": "Osoite, postinumero tai kaupunki",
-  "configEvKey": "Sähköautojen lataus API-avain",
-  "configEvKeyCustom": "Mukautettu avain",
-  "configEvKeyShared": "Oletus (jaettu)",
-  "configCloudSyncSection": "Pilvisynkronointi",
   "configTankSyncConnected": "Yhdistetty",
   "configTankSyncDisabled": "Poistettu käytöstä",
-  "configAuthMode": "Todennustapa",
-  "configAuthEmail": "Sähköposti (pysyvä)",
-  "configAuthAnonymous": "Anonyymi (vain laite)",
-  "configDatabase": "Tietokanta",
-  "configPrivacySummary": "Tietosuojayhteenveto",
-  "configPrivacySummarySynced": "• Suosikit, hälytykset ja ohitetut asemat synkronoidaan yksityiseen tietokantaasi\n• GPS-sijainti ja API-avaimet eivät koskaan poistu laitteeltasi\n• {authNote}",
-  "configPrivacySummaryLocal": "• Kaikki tiedot tallennetaan vain paikallisesti tälle laitteelle\n• Mitään tietoja ei lähetetä palvelimelle\n• API-avaimet salattu laitteen suojatussa tallennustilassa",
-  "configAuthNoteEmail": "Sähköpostitili mahdollistaa pääsyn useilta laitteilta",
-  "configAuthNoteAnonymous": "Anonyymi tili — tiedot sidottu tähän laitteeseen",
-  "configNone": "Ei mitään",
   "privacyPolicy": "Tietosuojakäytäntö",
   "fuels": "Polttoaineet",
   "services": "Palvelut",
@@ -262,42 +233,8 @@
   "fuelNeeded": "Tarvittava polttoaine",
   "totalCost": "Kokonaiskustannus",
   "priceHistory": "Hintahistoria",
-  "ignoredStationsLabel": "Ohitetut",
-  "ratingsLabel": "Arvioinnit",
   "favoritesDataCache": "Suosikkien tiedot",
   "citySearchCache": "Kaupunkihaku",
-  "priceHistoryStationsTracked": "{count} seurattua asemaa",
-  "@priceHistoryStationsTracked": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "alertsConfiguredCount": "{count} määritetty",
-  "@alertsConfiguredCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ignoredStationsHidden": "{count} piilotettua asemaa",
-  "@ignoredStationsHidden": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ratingsStationsRated": "{count} arvioitua asemaa",
-  "@ratingsStationsRated": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "noPriceHistory": "Ei hintahistoriaa vielä",
   "noStatistics": "Tilastoja ei saatavilla",
   "showAllFuelTypes": "Näytä kaikki polttoainetyypit",
@@ -420,33 +357,19 @@
   "alertStatsActive": "Aktiiviset",
   "alertStatsToday": "Tänään",
   "alertStatsThisWeek": "Tällä viikolla",
-  "privacyDashboardTitle": "Tietosuojanäkymä",
-  "privacyDashboardSubtitle": "Katso, vie tai poista tietosi",
-  "privacyDashboardBanner": "Tietosi kuuluvat sinulle. Täällä voit nähdä kaiken, mitä tämä sovellus tallentaa, viedä sen tai poistaa sen.",
   "privacyLocalData": "Tiedot tällä laitteella",
   "privacyIgnoredStations": "Ohitetut asemat",
   "privacyRatings": "Asemien arvostelut",
   "privacyPriceHistory": "Hintahistoria-asemat",
   "privacyProfiles": "Hakuprofiilit",
   "privacyItineraries": "Tallennetut reitit",
-  "privacyCacheEntries": "Välimuistimerkinnät",
-  "privacyApiKey": "API-avain tallennettu",
-  "privacyEvApiKey": "Sähköauto-API-avain tallennettu",
-  "privacyEstimatedSize": "Arvioitu tallennustila",
-  "privacySyncedData": "Pilvisynkronointi (TankSync)",
-  "privacySyncDisabled": "Pilvisynkronointi on poistettu käytöstä. Kaikki tiedot pysyvät vain tällä laitteella.",
   "privacySyncMode": "Synkronointitapa",
   "privacySyncUserId": "Käyttäjätunnus",
   "privacySyncDescription": "Kun synkronointi on käytössä, suosikit, hälytykset, ohitetut asemat ja arvostelut tallennetaan myös TankSync-palvelimelle.",
-  "privacyViewServerData": "Tarkastele palvelintietoja",
-  "privacyExportButton": "Vie kaikki tiedot JSON-muodossa",
   "privacyExportSuccess": "Tiedot viety leikepöydälle",
-  "privacyExportCsvButton": "Vie kaikki tiedot CSV-muodossa",
   "privacyExportCsvSuccess": "CSV-tiedot viety leikepöydälle",
   "savedToDownloadsFolder": "Tallennettu Lataukset-kansioon",
-  "privacyClearErrorLog": "Tyhjennä virheloki",
   "privacyErrorLogCleared": "Virheloki tyhjennetty",
-  "privacyDeleteButton": "Poista kaikki tiedot",
   "privacyDeleteTitle": "Poistetaanko kaikki tiedot?",
   "privacyDeleteBody": "Tämä poistaa pysyvästi:\n\n- Kaikki suosikit ja asematiedot\n- Kaikki hakuprofiilit\n- Kaikki hintahälytykset\n- Kaikki hintahistoriat\n- Kaikki välimuistin tiedot\n- API-avaimesi\n- Kaikki sovelluksen asetukset\n\nSovellus palautuu alkutilaan. Tätä toimintoa ei voi peruuttaa.",
   "privacyDeleteConfirm": "Poista kaikki",
@@ -1177,9 +1100,6 @@
   "authInfoBenefit2": "• Suunnittele reitti puhelimella, käytä sitä autossasi",
   "authInfoBenefit3": "• Tietoja ei jaeta kolmansille osapuolille",
   "authInfoBenefit4": "• Voit poistaa tilisi milloin tahansa",
-  "privacyLocalDataEmpty": "Ei vielä tallennettua. Lisää suosikki tai aseta hintahälytys nähdäksesi merkinnät täällä.",
-  "privacyHideEmptyRows": "Piilota tyhjät rivit",
-  "privacyShowEmptyRows": "{count, plural, =1{Näytä {count} tyhjä rivi} other{Näytä {count} tyhjää riviä}}",
   "apiKeySetupTitle": "API-avaimen asetukset (valinnainen)",
   "apiKeySetupDescription": "Rekisteröidy ilmaiseksi API-avaimelle tai ohita ja tutustu sovellukseen esimerkkitiedoilla.",
   "apiKeyRegistrationButton": "{provider}-rekisteröinti",
@@ -1192,8 +1112,6 @@
   "consentSyncTripsTitle": "Synkronoi matkatallenteet",
   "consentSyncTripsSubtitle": "Varmuuskopioi OBD2- ja GPS-matkat TankSynciin. Laitteiden välinen, valinnainen.",
   "consentSyncTripsDisabledHint": "Ota pilvisynkronointi käyttöön yllä varmuuskopioidaksesi matkat.",
-  "consentHideDetails": "Piilota tiedot",
-  "consentShowDetails": "Näytä tiedot",
   "dialogOk": "OK",
   "invalidLinkTitle": "Virheellinen linkki",
   "invalidLinkBody": "Linkki \"{path}\" ei ole kelvollinen.",
@@ -1636,15 +1554,6 @@
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
   "fabRunSearch": "Suorita haku",
-  "privacySaveErrorLog": "Tallenna virheloki ({count})",
-  "@privacySaveErrorLog": {
-    "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "approachTestSimulateButton": "Testaa lähestymispeitto",
   "@approachTestSimulateButton": {
     "description": "Button on the trip-recording screen that pushes a synthetic ApproachInRadius into the PiP for 30 s so the user can verify the price layout without driving (#2163)."
@@ -4638,12 +4547,10 @@
   "deleteReportTooltip": "Poista tämä ilmoitus",
   "reportDeleted": "Ilmoitus poistettu",
   "reportDeleteFailed": "Ilmoitusta ei voitu poistaa",
-  "privacyControlsTitle": "Tietosuoja-asetukset",
   "tileProxyToggleTitle": "Lataa karttaruudut Sparkilo-välityspalvelimen kautta",
   "tileProxyToggleSubtitle": "Päällä: näkyvä kartta-alue ja IP-osoitteesi päätyvät kehittäjän EU-palvelimelle, joka hakee ruudut OpenStreetMapista. Pois: ruudut ladataan suoraan osoitteesta tile.openstreetmap.org.",
   "remoteLogosToggleTitle": "Lataa merkkien logot internetistä",
   "remoteLogosToggleSubtitle": "Oletuksena pois: näytetään sovelluksen mukana tulevat paikkamerkit. Päällä: logot haetaan osoitteesta logo.clearbit.com, joka näkee IP-osoitteesi.",
-  "privacyExportAllButton": "Vie kaikki tietoni (ZIP)",
   "privacyExportAllSuccess": "{fileName} tallennettu Lataukset-kansioon — sisältää {count} tiedostoa",
   "@privacyExportAllSuccess": {
     "placeholders": {
@@ -4776,7 +4683,6 @@
   "settingsTopicDataSourcesKeywords": "api, avain, gps, sijainti, paikka, tietolähde, tankerkoenig, opencharge, key, location, position, data source",
   "settingsTopicSyncTitle": "Synkronointi ja tili",
   "settingsTopicSyncKeywords": "tanksync, pilvi, tili, sähköposti, yhdistä laite, synkronointi, jaa tietokanta, anonyymi, cloud, account, email, link device, sync, share database, anonymous",
-  "settingsTopicPrivacySubtitle": "Suostumukset, tietosuojapaneeli, tallennustila ja välimuisti",
   "settingsTopicPrivacyKeywords": "tietosuoja, suostumus, gdpr, poista, tyhjennä, tallennustila, välimuisti, tiedot, virheraportointi, vin, privacy, consent, delete, erase, storage, cache, data, error reporting",
   "settingsTopicBackupTitle": "Varmuuskopiointi ja palautus",
   "settingsTopicBackupSubtitle": "Vie tai palauta täydellinen varmuuskopio tiedoistasi",
@@ -4797,7 +4703,6 @@
   "settingsDistanceUnitSubtitle": "Aktiivisen profiilin maan mukaan",
   "settingsObd2AdapterTitle": "OBD2-sovitin",
   "settingsObd2AdapterSubtitle": "Sovittimet liitetään ajoneuvokohtaisesti – avaa ajoneuvo liittääksesi tai vaihtaaksesi sen sovittimen",
-  "settingsStorageDeleteHint": "Kaikkien paikallisten tietojen poisto tehdään tietosuojapaneelista.",
   "settingsPrivacyCrossLinkTitle": "Suostumukset",
   "settingsPrivacyCrossLinkSubtitle": "Cloud Syncin ja matkojen synkronoinnin suostumukset ovat kohdassa Tietosuoja ja tiedot",
   "settingsBackupExportSubtitle": "Ajoneuvot, tankkaukset, matkat ja latauslokit ZIP-tiedostona",

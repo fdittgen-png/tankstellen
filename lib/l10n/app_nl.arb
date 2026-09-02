@@ -63,16 +63,11 @@
   "freeNoKey": "Gratis — geen sleutel nodig",
   "apiKeyRequired": "API-sleutel vereist",
   "dataTransparency": "Gegevenstransparantie",
-  "storageAndCache": "Opslag en cache",
   "clearCache": "Cache wissen",
   "stationsFound": "{count} tankstations gevonden",
   "storageUsage": "Opslaggebruik op dit apparaat",
   "settingsLabel": "Instellingen",
-  "profilesStored": "profielen opgeslagen",
-  "stationsMarked": "stations gemarkeerd",
-  "cachedResponses": "gecachte antwoorden",
   "total": "Totaal",
-  "cacheManagement": "Cachebeheer",
   "cacheDescription": "De cache slaat API-antwoorden op voor sneller laden en offline toegang.",
   "cacheTtlGroupNetwork": "Netwerk",
   "cacheTtlGroupData": "Gegevens",
@@ -87,7 +82,6 @@
   "clearCacheBody": "Gecachte zoekresultaten en prijzen worden verwijderd. Profielen, favorieten en instellingen blijven bewaard.",
   "clearCacheButton": "Cache wissen",
   "deleteAllButton": "Alles verwijderen",
-  "entries": "items",
   "cacheEmpty": "De cache is leeg",
   "apiKeyNote": "Gratis registratie. Gegevens van overheidsinstanties voor prijstransparantie.",
   "apiKeyFormatError": "Ongeldig formaat — UUID verwacht (8-4-4-4-12)",
@@ -97,32 +91,9 @@
   "reportConsentBody": "Hiermee wordt een openbaar GitHub-issue aangemaakt met de onderstaande foutdetails. Er worden geen GPS-coördinaten, API-sleutels of persoonsgegevens meegestuurd.",
   "reportConsentConfirm": "GitHub openen",
   "reportConsentCancel": "Annuleren",
-  "configProfileSection": "Profiel",
-  "configActiveProfile": "Actief profiel",
-  "configPreferredFuel": "Voorkeursbrandstof",
-  "configCountry": "Land",
-  "configRouteSegment": "Routegedeelte",
-  "configApiKeysSection": "API-sleutels",
-  "configTankerkoenigKey": "Tankerkoenig API-sleutel",
-  "configApiKeyConfigured": "Geconfigureerd",
-  "configApiKeyCommunity": "Standaard (communitysleutel)",
   "searchLocationPlaceholder": "Adres, postcode of stad",
-  "configEvKey": "EV-laad API-sleutel",
-  "configEvKeyCustom": "Eigen sleutel",
-  "configEvKeyShared": "Standaard (gedeeld)",
-  "configCloudSyncSection": "Cloudsynchronisatie",
   "configTankSyncConnected": "Verbonden",
   "configTankSyncDisabled": "Uitgeschakeld",
-  "configAuthMode": "Verificatiemodus",
-  "configAuthEmail": "E-mail (permanent)",
-  "configAuthAnonymous": "Anoniem (alleen apparaat)",
-  "configDatabase": "Database",
-  "configPrivacySummary": "Privacyoverzicht",
-  "configPrivacySummarySynced": "• Favorieten, meldingen en verborgen stations worden gesynchroniseerd naar je privédatabase\n• GPS-positie en API-sleutels verlaten je apparaat nooit\n• {authNote}",
-  "configPrivacySummaryLocal": "• Alle gegevens worden alleen lokaal op dit apparaat opgeslagen\n• Er worden geen gegevens naar een server gestuurd\n• API-sleutels versleuteld in beveiligde apparaatopslag",
-  "configAuthNoteEmail": "E-mailaccount maakt toegang via meerdere apparaten mogelijk",
-  "configAuthNoteAnonymous": "Anoniem account — gegevens gekoppeld aan dit apparaat",
-  "configNone": "Geen",
   "privacyPolicy": "Privacybeleid",
   "fuels": "Brandstoffen",
   "services": "Diensten",
@@ -262,42 +233,8 @@
   "fuelNeeded": "Benodigde brandstof",
   "totalCost": "Totale kosten",
   "priceHistory": "Prijsgeschiedenis",
-  "ignoredStationsLabel": "Genegeerd",
-  "ratingsLabel": "Beoordelingen",
   "favoritesDataCache": "Favorietengegevens",
   "citySearchCache": "Plaatszoeken",
-  "priceHistoryStationsTracked": "{count} gevolgde stations",
-  "@priceHistoryStationsTracked": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "alertsConfiguredCount": "{count} geconfigureerd",
-  "@alertsConfiguredCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ignoredStationsHidden": "{count} verborgen stations",
-  "@ignoredStationsHidden": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ratingsStationsRated": "{count} beoordeelde stations",
-  "@ratingsStationsRated": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "noPriceHistory": "Nog geen prijsgeschiedenis",
   "noStatistics": "Geen statistieken beschikbaar",
   "showAllFuelTypes": "Alle brandstofsoorten tonen",
@@ -420,33 +357,19 @@
   "alertStatsActive": "Actief",
   "alertStatsToday": "Vandaag",
   "alertStatsThisWeek": "Deze week",
-  "privacyDashboardTitle": "Privacydashboard",
-  "privacyDashboardSubtitle": "Bekijk, exporteer of verwijder je gegevens",
-  "privacyDashboardBanner": "Je gegevens zijn van jou. Hier zie je alles wat de app opslaat — je kunt het exporteren of verwijderen.",
   "privacyLocalData": "Gegevens op dit apparaat",
   "privacyIgnoredStations": "Verborgen stations",
   "privacyRatings": "Stationbeoordelingen",
   "privacyPriceHistory": "Prijsgeschiedenisstations",
   "privacyProfiles": "Zoekprofielen",
   "privacyItineraries": "Opgeslagen routes",
-  "privacyCacheEntries": "Cachegegevens",
-  "privacyApiKey": "API-sleutel opgeslagen",
-  "privacyEvApiKey": "EV API-sleutel opgeslagen",
-  "privacyEstimatedSize": "Geschatte opslag",
-  "privacySyncedData": "Cloudsync (TankSync)",
-  "privacySyncDisabled": "Cloudsync is uitgeschakeld. Alle gegevens blijven alleen op dit apparaat.",
   "privacySyncMode": "Synchronisatiemodus",
   "privacySyncUserId": "Gebruikers-ID",
   "privacySyncDescription": "Als synchronisatie is ingeschakeld, worden favorieten, meldingen, verborgen stations en beoordelingen ook op de TankSync-server opgeslagen.",
-  "privacyViewServerData": "Servergegevens bekijken",
-  "privacyExportButton": "Alle gegevens exporteren als JSON",
   "privacyExportSuccess": "Gegevens geëxporteerd naar klembord",
-  "privacyExportCsvButton": "Alle gegevens exporteren als CSV",
   "privacyExportCsvSuccess": "CSV-gegevens geëxporteerd naar klembord",
   "savedToDownloadsFolder": "Opgeslagen in de map Downloads",
-  "privacyClearErrorLog": "Foutenlogboek wissen",
   "privacyErrorLogCleared": "Foutenlogboek gewist",
-  "privacyDeleteButton": "Alle gegevens verwijderen",
   "privacyDeleteTitle": "Alle gegevens verwijderen?",
   "privacyDeleteBody": "Dit verwijdert permanent:\n\n- Alle favorieten en stationgegevens\n- Alle zoekprofielen\n- Alle prijsmeldingen\n- Alle prijsgeschiedenis\n- Alle gecachede gegevens\n- Je API-sleutel\n- Alle app-instellingen\n\nDe app wordt teruggezet naar de beginstatus. Deze actie kan niet ongedaan worden gemaakt.",
   "privacyDeleteConfirm": "Alles verwijderen",
@@ -1177,9 +1100,6 @@
   "authInfoBenefit2": "• Bereid een route voor op je telefoon, gebruik hem in je auto",
   "authInfoBenefit3": "• Er worden geen gegevens gedeeld met derden",
   "authInfoBenefit4": "• Je kunt je account op elk moment verwijderen",
-  "privacyLocalDataEmpty": "Nog niets opgeslagen. Voeg een favoriet toe of stel een prijsmelding in om hier vermeldingen te zien.",
-  "privacyHideEmptyRows": "Lege rijen verbergen",
-  "privacyShowEmptyRows": "{count, plural, =1{Toon {count} lege rij} other{Toon {count} lege rijen}}",
   "apiKeySetupTitle": "API-sleutelinstellingen (optioneel)",
   "apiKeySetupDescription": "Registreer voor een gratis API-sleutel, of sla dit over om de app met demogegevens te verkennen.",
   "apiKeyRegistrationButton": "{provider} registratie",
@@ -1192,8 +1112,6 @@
   "consentSyncTripsTitle": "Ritopnames synchroniseren",
   "consentSyncTripsSubtitle": "OBD2 + GPS-ritten back-uppen naar TankSync. Cross-device, opt-in.",
   "consentSyncTripsDisabledHint": "Schakel hierboven Cloudsync in om ritten te back-uppen.",
-  "consentHideDetails": "Details verbergen",
-  "consentShowDetails": "Details tonen",
   "dialogOk": "OK",
   "invalidLinkTitle": "Ongeldige koppeling",
   "invalidLinkBody": "De koppeling \"{path}\" is niet geldig.",
@@ -1636,15 +1554,6 @@
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
   "fabRunSearch": "Zoekopdracht uitvoeren",
-  "privacySaveErrorLog": "Foutenlogboek opslaan ({count})",
-  "@privacySaveErrorLog": {
-    "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "approachTestSimulateButton": "Testen van naderingsoverlay",
   "@approachTestSimulateButton": {
     "description": "Button on the trip-recording screen that pushes a synthetic ApproachInRadius into the PiP for 30 s so the user can verify the price layout without driving (#2163)."
@@ -4638,12 +4547,10 @@
   "deleteReportTooltip": "Deze melding verwijderen",
   "reportDeleted": "Melding verwijderd",
   "reportDeleteFailed": "Kon de melding niet verwijderen",
-  "privacyControlsTitle": "Privacy-instellingen",
   "tileProxyToggleTitle": "Kaarttegels via de Sparkilo-proxy laden",
   "tileProxyToggleSubtitle": "Aan: het zichtbare kaartgebied en je IP-adres bereiken de EU-server van de ontwikkelaar, die de tegels bij OpenStreetMap ophaalt. Uit: tegels worden rechtstreeks van tile.openstreetmap.org geladen.",
   "remoteLogosToggleTitle": "Merklogo's van internet laden",
   "remoteLogosToggleSubtitle": "Standaard uit: er worden meegeleverde plaatshouders getoond. Aan: logo's worden opgehaald van logo.clearbit.com, dat je IP-adres ziet.",
-  "privacyExportAllButton": "Al mijn gegevens exporteren (ZIP)",
   "privacyExportAllSuccess": "{fileName} opgeslagen in Downloads — {count} bestanden erin",
   "@privacyExportAllSuccess": {
     "placeholders": {
@@ -4776,7 +4683,6 @@
   "settingsTopicDataSourcesKeywords": "api, sleutel, gps, locatie, positie, gegevensbron, tankerkoenig, opencharge, key, location, data source",
   "settingsTopicSyncTitle": "Synchronisatie & account",
   "settingsTopicSyncKeywords": "tanksync, cloud, account, e-mail, apparaat koppelen, synchronisatie, database delen, anoniem, email, link device, sync, share database, anonymous",
-  "settingsTopicPrivacySubtitle": "Toestemmingen, privacydashboard, opslag & cache",
   "settingsTopicPrivacyKeywords": "privacy, toestemming, avg, verwijderen, wissen, opslag, cache, gegevens, foutrapportage, vin, consent, gdpr, delete, erase, storage, data, error reporting",
   "settingsTopicBackupTitle": "Back-up & herstel",
   "settingsTopicBackupSubtitle": "Een volledige back-up van je gegevens exporteren of herstellen",
@@ -4797,7 +4703,6 @@
   "settingsDistanceUnitSubtitle": "Van het land van het actieve profiel",
   "settingsObd2AdapterTitle": "OBD2-adapter",
   "settingsObd2AdapterSubtitle": "Adapters worden per voertuig gekoppeld — open een voertuig om zijn adapter te koppelen of te wijzigen",
-  "settingsStorageDeleteHint": "Alle lokale gegevens verwijder je via het privacydashboard.",
   "settingsPrivacyCrossLinkTitle": "Toestemmingen",
   "settingsPrivacyCrossLinkSubtitle": "De toestemmingen voor Cloud Sync en ritsynchronisatie staan onder Privacy & gegevens",
   "settingsBackupExportSubtitle": "Voertuigen, tankbeurten, ritten en laadlogs als ZIP-bestand",

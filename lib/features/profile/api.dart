@@ -21,7 +21,6 @@ export 'presentation/screens/developer_tools/error_log_viewer_screen.dart';
 export 'presentation/screens/developer_tools/feature_flag_dump_screen.dart';
 export 'presentation/screens/developer_tools/obd2_health_screen.dart';
 export 'presentation/screens/developer_tools/pump_ocr_tester_screen.dart';
-export 'presentation/screens/privacy_dashboard_screen.dart';
 export 'presentation/screens/profile_screen.dart';
 export 'presentation/screens/theme_settings_screen.dart';
 export 'presentation/widgets/gamification_settings_tile.dart';

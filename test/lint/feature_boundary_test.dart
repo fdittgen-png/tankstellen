@@ -371,7 +371,9 @@ const _featurePairBaseline = <String, int>{
   // broke the driving <-> profile and widget <-> profile cycles.
   'profile -> feature_management': 47,
   'profile -> search': 2,
-  'profile -> sync': 2,
+  // #3908 (Epic #3907) — 2 → 1: the dashboard's synced_data_card reach-in
+  // to sync/providers is gone (the overview card imports the barrel).
+  'profile -> sync': 1,
   'profile -> vehicle': 3,
   'route_search -> profile': 11,
   'route_search -> search': 1,

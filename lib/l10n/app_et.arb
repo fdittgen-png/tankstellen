@@ -63,16 +63,11 @@
   "freeNoKey": "Tasuta — võtit pole vaja",
   "apiKeyRequired": "API võti nõutud",
   "dataTransparency": "Andmete läbipaistvus",
-  "storageAndCache": "Salvestusruum ja vahemälu",
   "clearCache": "Tühjenda vahemälu",
   "stationsFound": "Leiti {count} tanklat",
   "storageUsage": "Salvestusruumi kasutus selles seadmes",
   "settingsLabel": "Seaded",
-  "profilesStored": "salvestatud profiili",
-  "stationsMarked": "märgitud tanklat",
-  "cachedResponses": "vahemällu salvestatud vastust",
   "total": "Kokku",
-  "cacheManagement": "Vahemälu haldus",
   "cacheDescription": "Vahemälu salvestab API vastuseid kiiremaks laadimiseks ja võrguühenduseta juurdepääsuks.",
   "cacheTtlGroupNetwork": "Võrk",
   "cacheTtlGroupData": "Andmed",
@@ -87,7 +82,6 @@
   "clearCacheBody": "Vahemällu salvestatud otsingutulemused ja hinnad kustutatakse. Profiilid, lemmikud ja seaded säilitatakse.",
   "clearCacheButton": "Tühjenda vahemälu",
   "deleteAllButton": "Kustuta kõik",
-  "entries": "kirjet",
   "cacheEmpty": "Vahemälu on tühi",
   "apiKeyNote": "Tasuta registreerumine. Andmed riiklike hinnaläbipaistvuse asutuste käest.",
   "apiKeyFormatError": "Vigane vorming — oodatav UUID (8-4-4-4-12)",
@@ -97,32 +91,9 @@
   "reportConsentBody": "See avab avaliku GitHubi vearaporti allpool toodud tõrke üksikasjadega. GPS-koordinaate, API-võtmeid ega isikuandmeid ei kaasata.",
   "reportConsentConfirm": "Ava GitHub",
   "reportConsentCancel": "Tühista",
-  "configProfileSection": "Profiil",
-  "configActiveProfile": "Aktiivne profiil",
-  "configPreferredFuel": "Eelistatud kütus",
-  "configCountry": "Riik",
-  "configRouteSegment": "Marsruudi lõik",
-  "configApiKeysSection": "API-võtmed",
-  "configTankerkoenigKey": "Tankerkoenig API-võti",
-  "configApiKeyConfigured": "Seadistatud",
-  "configApiKeyCommunity": "Vaikimisi (ühenduse võti)",
   "searchLocationPlaceholder": "Aadress, sihtnumber või linn",
-  "configEvKey": "EV laadimise API-võti",
-  "configEvKeyCustom": "Kohandatud võti",
-  "configEvKeyShared": "Vaikimisi (jagatud)",
-  "configCloudSyncSection": "Pilvsünkroonimine",
   "configTankSyncConnected": "Ühendatud",
   "configTankSyncDisabled": "Keelatud",
-  "configAuthMode": "Autentimisrežiim",
-  "configAuthEmail": "E-post (püsiv)",
-  "configAuthAnonymous": "Anonüümne (ainult seade)",
-  "configDatabase": "Andmebaas",
-  "configPrivacySummary": "Privaatsuse kokkuvõte",
-  "configPrivacySummarySynced": "• Lemmikud, teatised ja ignoreeritud jaamad sünkroonitakse sinu privaatse andmebaasiga\n• GPS-asukoht ja API-võtmed ei lahku kunagi sinu seadmest\n• {authNote}",
-  "configPrivacySummaryLocal": "• Kõik andmed talletatakse ainult sellesse seadmesse\n• Serverisse ei saadeta ühtegi andmet\n• API-võtmed on krüpteeritud seadme turvalises salvestusruumis",
-  "configAuthNoteEmail": "E-postkonto võimaldab juurdepääsu mitmest seadmest",
-  "configAuthNoteAnonymous": "Anonüümne konto — andmed on seotud selle seadmega",
-  "configNone": "Puudub",
   "privacyPolicy": "Privaatsuspoliitika",
   "fuels": "Kütused",
   "services": "Teenused",
@@ -262,42 +233,8 @@
   "fuelNeeded": "Vajalik kütus",
   "totalCost": "Kogukulu",
   "priceHistory": "Hinnaajalugu",
-  "ignoredStationsLabel": "Ignoreeritud",
-  "ratingsLabel": "Hinnangud",
   "favoritesDataCache": "Lemmikute andmed",
   "citySearchCache": "Linna otsing",
-  "priceHistoryStationsTracked": "{count} jälitatud tanklat",
-  "@priceHistoryStationsTracked": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "alertsConfiguredCount": "{count} konfigureeritud",
-  "@alertsConfiguredCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ignoredStationsHidden": "{count} peidetud tanklat",
-  "@ignoredStationsHidden": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ratingsStationsRated": "{count} hinnatud tanklat",
-  "@ratingsStationsRated": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "noPriceHistory": "Hinnaajalugu puudub",
   "noStatistics": "Statistika pole saadaval",
   "showAllFuelTypes": "Näita kõiki kütuseliike",
@@ -420,33 +357,19 @@
   "alertStatsActive": "Aktiivsed",
   "alertStatsToday": "Täna",
   "alertStatsThisWeek": "Sel nädalal",
-  "privacyDashboardTitle": "Privaatsuse armatuurlaud",
-  "privacyDashboardSubtitle": "Vaata, ekspordi või kustuta oma andmeid",
-  "privacyDashboardBanner": "Sinu andmed kuuluvad sulle. Siin näed kõike, mida rakendus salvestab, saad seda eksportida või kustutada.",
   "privacyLocalData": "Andmed sellel seadmel",
   "privacyIgnoredStations": "Ignoreeritud jaamad",
   "privacyRatings": "Jaamade hinnangud",
   "privacyPriceHistory": "Hinnaloo jaamad",
   "privacyProfiles": "Otsinguprofiilid",
   "privacyItineraries": "Salvestatud marsruudid",
-  "privacyCacheEntries": "Vahemälu kirjed",
-  "privacyApiKey": "API-võti salvestatud",
-  "privacyEvApiKey": "EV API-võti salvestatud",
-  "privacyEstimatedSize": "Hinnanguline salvestusmaht",
-  "privacySyncedData": "Pilvsünkroonimine (TankSync)",
-  "privacySyncDisabled": "Pilvsünkroonimine on keelatud. Kõik andmed jäävad ainult sellesse seadmesse.",
   "privacySyncMode": "Sünkroonimisrežiim",
   "privacySyncUserId": "Kasutaja ID",
   "privacySyncDescription": "Kui sünkroonimine on lubatud, salvestatakse lemmikud, teatised, ignoreeritud jaamad ja hinnangud ka TankSync serverisse.",
-  "privacyViewServerData": "Vaata serveri andmeid",
-  "privacyExportButton": "Ekspordi kõik andmed JSON-ina",
   "privacyExportSuccess": "Andmed eksporditi lõikelauale",
-  "privacyExportCsvButton": "Ekspordi kõik andmed CSV-na",
   "privacyExportCsvSuccess": "CSV-andmed eksporditi lõikelauale",
   "savedToDownloadsFolder": "Salvestatud Allalaadimiste kausta",
-  "privacyClearErrorLog": "Tühjenda vealogi",
   "privacyErrorLogCleared": "Vealogi tühjendatud",
-  "privacyDeleteButton": "Kustuta kõik andmed",
   "privacyDeleteTitle": "Kustutada kõik andmed?",
   "privacyDeleteBody": "See kustutab jäädavalt:\n\n- Kõik lemmikud ja jaamaandmed\n- Kõik otsinguprofiilid\n- Kõik hinnateatised\n- Kogu hinnaloo\n- Kõik vahemälu andmed\n- Sinu API-võtme\n- Kõik rakenduse seaded\n\nRakendus lähtestatakse algsesse olekusse. Seda toimingut ei saa tagasi võtta.",
   "privacyDeleteConfirm": "Kustuta kõik",
@@ -1177,9 +1100,6 @@
   "authInfoBenefit2": "• Valmista marsruut ette telefonil, kasuta seda autos",
   "authInfoBenefit3": "• Andmeid ei jagata kolmandate osapooltega",
   "authInfoBenefit4": "• Saad konto igal ajal kustutada",
-  "privacyLocalDataEmpty": "Midagi pole veel salvestatud. Lisa lemmik või sea hinnahoiatus, et näha kirjeid siin.",
-  "privacyHideEmptyRows": "Peida tühjad read",
-  "privacyShowEmptyRows": "{count, plural, =1{Kuva {count} tühi rida} other{Kuva {count} tühja rida}}",
   "apiKeySetupTitle": "API-võtme seadistus (vabatahtlik)",
   "apiKeySetupDescription": "Registreeru tasuta API-võtme saamiseks või jäta vahele, et uurida rakendust demoandmetega.",
   "apiKeyRegistrationButton": "{provider} registreerimine",
@@ -1192,8 +1112,6 @@
   "consentSyncTripsTitle": "Sünkrooni reisi salvestisi",
   "consentSyncTripsSubtitle": "Varunda OBD2 + GPS reisid TankSync'i. Seadmeteülene, vabatahtlik.",
   "consentSyncTripsDisabledHint": "Luba ülal Pilvsünkroonimine reiside varundamiseks.",
-  "consentHideDetails": "Peida üksikasjad",
-  "consentShowDetails": "Kuva üksikasjad",
   "dialogOk": "OK",
   "invalidLinkTitle": "Kehtetu link",
   "invalidLinkBody": "Link \"{path}\" ei kehti.",
@@ -1636,15 +1554,6 @@
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
   "fabRunSearch": "Käivita otsing",
-  "privacySaveErrorLog": "Salvesta tõrkelogi ({count})",
-  "@privacySaveErrorLog": {
-    "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "approachTestSimulateButton": "Testi lähenemise ülekatet",
   "@approachTestSimulateButton": {
     "description": "Button on the trip-recording screen that pushes a synthetic ApproachInRadius into the PiP for 30 s so the user can verify the price layout without driving (#2163)."
@@ -4638,12 +4547,10 @@
   "deleteReportTooltip": "Kustuta see teade",
   "reportDeleted": "Teade kustutatud",
   "reportDeleteFailed": "Teadet ei õnnestunud kustutada",
-  "privacyControlsTitle": "Privaatsusseaded",
   "tileProxyToggleTitle": "Laadi kaardipaanid Sparkilo puhverserveri kaudu",
   "tileProxyToggleSubtitle": "Sees: nähtav kaardiala ja sinu IP-aadress jõuavad arendaja EL-i serverisse, mis hangib paanid OpenStreetMapist. Väljas: paanid laaditakse otse aadressilt tile.openstreetmap.org.",
   "remoteLogosToggleTitle": "Laadi brändilogod internetist",
   "remoteLogosToggleSubtitle": "Vaikimisi väljas: kuvatakse rakendusega kaasas olevad kohatäited. Sees: logod hangitakse aadressilt logo.clearbit.com, mis näeb sinu IP-aadressi.",
-  "privacyExportAllButton": "Ekspordi kõik minu andmed (ZIP)",
   "privacyExportAllSuccess": "{fileName} salvestatud allalaadimiste kausta — sisaldab {count} faili",
   "@privacyExportAllSuccess": {
     "placeholders": {
@@ -4776,7 +4683,6 @@
   "settingsTopicDataSourcesKeywords": "api, võti, gps, asukoht, positsioon, andmeallikas, tankerkoenig, opencharge, key, location, data source",
   "settingsTopicSyncTitle": "Sünkroonimine ja konto",
   "settingsTopicSyncKeywords": "tanksync, pilv, konto, e-post, seo seade, sünkroonimine, jaga andmebaasi, anonüümne, cloud, account, email, link device, sync, share database, anonymous",
-  "settingsTopicPrivacySubtitle": "Nõusolekud, privaatsuse juhtpaneel, salvestusruum ja vahemälu",
   "settingsTopicPrivacyKeywords": "privaatsus, nõusolek, gdpr, kustuta, tühjenda, salvestusruum, vahemälu, andmed, veateavitus, vin, privacy, consent, delete, erase, storage, cache, data, error reporting",
   "settingsTopicBackupTitle": "Varundamine ja taastamine",
   "settingsTopicBackupSubtitle": "Ekspordi või taasta oma andmete täielik varukoopia",
@@ -4797,7 +4703,6 @@
   "settingsDistanceUnitSubtitle": "Aktiivse profiili riigi järgi",
   "settingsObd2AdapterTitle": "OBD2-adapter",
   "settingsObd2AdapterSubtitle": "Adapterid seotakse sõiduki kohta – ava sõiduk, et selle adapter siduda või vahetada",
-  "settingsStorageDeleteHint": "Kõigi kohalike andmete kustutamine toimub privaatsuse juhtpaneelilt.",
   "settingsPrivacyCrossLinkTitle": "Nõusolekud",
   "settingsPrivacyCrossLinkSubtitle": "Cloud Synci ja sõitude sünkroonimise nõusolekud asuvad jaotises Privaatsus ja andmed",
   "settingsBackupExportSubtitle": "Sõidukid, tankimised, sõidud ja laadimislogid ZIP-failina",

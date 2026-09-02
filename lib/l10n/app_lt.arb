@@ -63,16 +63,11 @@
   "freeNoKey": "Nemokama — raktas nereikalingas",
   "apiKeyRequired": "Reikalingas API raktas",
   "dataTransparency": "Duomenų skaidrumas",
-  "storageAndCache": "Saugykla ir podėlis",
   "clearCache": "Išvalyti podėlį",
   "stationsFound": "Rasta {count} degalinių",
   "storageUsage": "Saugyklos naudojimas šiame įrenginyje",
   "settingsLabel": "Nustatymai",
-  "profilesStored": "išsaugotų profilių",
-  "stationsMarked": "pažymėtų stočių",
-  "cachedResponses": "podėlyje esančių atsakymų",
   "total": "Iš viso",
-  "cacheManagement": "Podėlio valdymas",
   "cacheDescription": "Podėlis saugo API atsakymus greitesniam įkėlimui ir prieigai neprisijungus.",
   "cacheTtlGroupNetwork": "Tinklas",
   "cacheTtlGroupData": "Duomenys",
@@ -87,7 +82,6 @@
   "clearCacheBody": "Podėlyje esantys paieškos rezultatai ir kainos bus ištrinti. Profiliai, mėgstami ir nustatymai išsaugomi.",
   "clearCacheButton": "Išvalyti podėlį",
   "deleteAllButton": "Ištrinti viską",
-  "entries": "įrašų",
   "cacheEmpty": "Podėlis tuščias",
   "apiKeyNote": "Nemokama registracija. Duomenys iš vyriausybinių kainų skaidrumo agentūrų.",
   "apiKeyFormatError": "Netinkamas formatas — tikėtinas UUID (8-4-4-4-12)",
@@ -97,32 +91,9 @@
   "reportConsentBody": "Bus atidarytas viešas GitHub pranešimas su žemiau pateikta klaidos informacija. GPS koordinatės, API raktai ar asmeniniai duomenys neįtraukiami.",
   "reportConsentConfirm": "Atidaryti GitHub",
   "reportConsentCancel": "Atšaukti",
-  "configProfileSection": "Profilis",
-  "configActiveProfile": "Aktyvus profilis",
-  "configPreferredFuel": "Pageidaujamas kuras",
-  "configCountry": "Šalis",
-  "configRouteSegment": "Maršruto atkarpa",
-  "configApiKeysSection": "API raktai",
-  "configTankerkoenigKey": "Tankerkoenig API raktas",
-  "configApiKeyConfigured": "Sukonfigūruotas",
-  "configApiKeyCommunity": "Numatytasis (bendruomenės raktas)",
   "searchLocationPlaceholder": "Adresas, pašto kodas arba miestas",
-  "configEvKey": "EV įkrovimo API raktas",
-  "configEvKeyCustom": "Pasirinktinis raktas",
-  "configEvKeyShared": "Numatytasis (bendrinamas)",
-  "configCloudSyncSection": "Debesų sinchronizavimas",
   "configTankSyncConnected": "Prisijungta",
   "configTankSyncDisabled": "Išjungta",
-  "configAuthMode": "Autentifikacijos režimas",
-  "configAuthEmail": "El. paštas (nuolatinis)",
-  "configAuthAnonymous": "Anoniminis (tik įrenginyje)",
-  "configDatabase": "Duomenų bazė",
-  "configPrivacySummary": "Privatumo santrauka",
-  "configPrivacySummarySynced": "• Mėgstami, įspėjimai ir nepaisomi stoteliai sinchronizuojami su jūsų privačia duomenų baze\n• GPS vieta ir API raktai niekada nepalieka jūsų įrenginio\n• {authNote}",
-  "configPrivacySummaryLocal": "• Visi duomenys saugomi tik šiame įrenginyje\n• Jokie duomenys neišsiunčiami į serverį\n• API raktai šifruojami įrenginio saugiojoje saugykloje",
-  "configAuthNoteEmail": "El. pašto paskyra suteikia prieigą iš kelių įrenginių",
-  "configAuthNoteAnonymous": "Anoniminė paskyra — duomenys susieti su šiuo įrenginiu",
-  "configNone": "Nėra",
   "privacyPolicy": "Privatumo politika",
   "fuels": "Degalai",
   "services": "Paslaugos",
@@ -262,42 +233,8 @@
   "fuelNeeded": "Reikalingi degalai",
   "totalCost": "Bendra kaina",
   "priceHistory": "Kainų istorija",
-  "ignoredStationsLabel": "Ignoruojama",
-  "ratingsLabel": "Įvertinimai",
   "favoritesDataCache": "Mėgstamiausių duomenys",
   "citySearchCache": "Miesto paieška",
-  "priceHistoryStationsTracked": "{count} stebimų stočių",
-  "@priceHistoryStationsTracked": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "alertsConfiguredCount": "{count} sukonfigūruota",
-  "@alertsConfiguredCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ignoredStationsHidden": "{count} paslėptų stočių",
-  "@ignoredStationsHidden": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ratingsStationsRated": "{count} įvertintų stočių",
-  "@ratingsStationsRated": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "noPriceHistory": "Kainų istorijos dar nėra",
   "noStatistics": "Nėra prieinamų statistikų",
   "showAllFuelTypes": "Rodyti visus degalų tipus",
@@ -420,33 +357,19 @@
   "alertStatsActive": "Aktyvūs",
   "alertStatsToday": "Šiandien",
   "alertStatsThisWeek": "Šią savaitę",
-  "privacyDashboardTitle": "Privatumo prietaisų skydelis",
-  "privacyDashboardSubtitle": "Peržiūrėkite, eksportuokite arba ištrinkite savo duomenis",
-  "privacyDashboardBanner": "Jūsų duomenys priklauso jums. Čia galite pamatyti viską, ką programa saugo, eksportuoti arba ištrinti.",
   "privacyLocalData": "Duomenys šiame įrenginyje",
   "privacyIgnoredStations": "Ignoruojamos stotelės",
   "privacyRatings": "Stotelių įvertinimai",
   "privacyPriceHistory": "Kainų istorijos stotelės",
   "privacyProfiles": "Paieškos profiliai",
   "privacyItineraries": "Išsaugoti maršrutai",
-  "privacyCacheEntries": "Talpyklos įrašai",
-  "privacyApiKey": "Saugomas API raktas",
-  "privacyEvApiKey": "Saugomas EV API raktas",
-  "privacyEstimatedSize": "Apytikslis saugyklos dydis",
-  "privacySyncedData": "Debesų sinchronizavimas (TankSync)",
-  "privacySyncDisabled": "Debesų sinchronizavimas išjungtas. Visi duomenys lieka tik šiame įrenginyje.",
   "privacySyncMode": "Sinchronizavimo režimas",
   "privacySyncUserId": "Naudotojo ID",
   "privacySyncDescription": "Kai sinchronizavimas įjungtas, mėgstami, įspėjimai, ignoruojamos stotelės ir įvertinimai taip pat saugomi TankSync serveryje.",
-  "privacyViewServerData": "Peržiūrėti serverio duomenis",
-  "privacyExportButton": "Eksportuoti visus duomenis kaip JSON",
   "privacyExportSuccess": "Duomenys eksportuoti į iškarpinę",
-  "privacyExportCsvButton": "Eksportuoti visus duomenis kaip CSV",
   "privacyExportCsvSuccess": "CSV duomenys eksportuoti į iškarpinę",
   "savedToDownloadsFolder": "Išsaugota aplanke Atsisiuntimai",
-  "privacyClearErrorLog": "Išvalyti klaidų žurnalą",
   "privacyErrorLogCleared": "Klaidų žurnalas išvalytas",
-  "privacyDeleteButton": "Ištrinti visus duomenis",
   "privacyDeleteTitle": "Ištrinti visus duomenis?",
   "privacyDeleteBody": "Bus visam laikui ištrinta:\n\n- Visi mėgstami ir stotelių duomenys\n- Visi paieškos profiliai\n- Visi kainų įspėjimai\n- Visa kainų istorija\n- Visi talpykloje esantys duomenys\n- Jūsų API raktas\n- Visi programos nustatymai\n\nPrograma bus atstatyta į pradinę būseną. Šio veiksmo negalima atšaukti.",
   "privacyDeleteConfirm": "Ištrinti viską",
@@ -1177,9 +1100,6 @@
   "authInfoBenefit2": "• Paruoškite maršrutą telefone, naudokite automobilyje",
   "authInfoBenefit3": "• Duomenys nebendrinsimi su trečiosiomis šalimis",
   "authInfoBenefit4": "• Galite bet kada ištrinti savo paskyrą",
-  "privacyLocalDataEmpty": "Dar nieko nesaugoma. Pridėkite mėgstamą arba nustatykite kainų įspėjimą, kad matytumėte įrašus čia.",
-  "privacyHideEmptyRows": "Slėpti tuščias eilutes",
-  "privacyShowEmptyRows": "{count, plural, =1{Rodyti {count} tuščią eilutę} other{Rodyti {count} tuščias eilutes}}",
   "apiKeySetupTitle": "API rakto sąranka (neprivaloma)",
   "apiKeySetupDescription": "Užsiregistruokite nemokamai gauti API raktą arba praleiskite ir tyrinėkite programą su demonstraciniais duomenimis.",
   "apiKeyRegistrationButton": "{provider} registracija",
@@ -1192,8 +1112,6 @@
   "consentSyncTripsTitle": "Sinchronizuoti kelionių įrašus",
   "consentSyncTripsSubtitle": "Kurti atsargines OBD2 + GPS kelionių kopijas TankSync. Tarpįrengininis, pasirenkamas.",
   "consentSyncTripsDisabledHint": "Įjunkite debesų sinchronizavimą aukščiau, kad kurti atsargines kelionių kopijas.",
-  "consentHideDetails": "Slėpti detales",
-  "consentShowDetails": "Rodyti detales",
   "dialogOk": "Gerai",
   "invalidLinkTitle": "Neteisingas nuoroda",
   "invalidLinkBody": "Nuoroda \"{path}\" neteisinga.",
@@ -1636,15 +1554,6 @@
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
   "fabRunSearch": "Vykdyti paiešką",
-  "privacySaveErrorLog": "Įrašyti klaidų žurnalą ({count})",
-  "@privacySaveErrorLog": {
-    "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "approachTestSimulateButton": "Testuoti artėjimo perdangą",
   "@approachTestSimulateButton": {
     "description": "Button on the trip-recording screen that pushes a synthetic ApproachInRadius into the PiP for 30 s so the user can verify the price layout without driving (#2163)."
@@ -4638,12 +4547,10 @@
   "deleteReportTooltip": "Ištrinti šį pranešimą",
   "reportDeleted": "Pranešimas ištrintas",
   "reportDeleteFailed": "Nepavyko ištrinti pranešimo",
-  "privacyControlsTitle": "Privatumo valdymas",
   "tileProxyToggleTitle": "Įkelti žemėlapio plyteles per Sparkilo tarpinį serverį",
   "tileProxyToggleSubtitle": "Įjungta: matoma žemėlapio sritis ir jūsų IP adresas pasiekia kūrėjo ES serverį, kuris plyteles gauna iš OpenStreetMap. Išjungta: plytelės įkeliamos tiesiai iš tile.openstreetmap.org.",
   "remoteLogosToggleTitle": "Įkelti prekių ženklų logotipus iš interneto",
   "remoteLogosToggleSubtitle": "Pagal numatytuosius nustatymus išjungta: rodomi programoje įtraukti vietos rezervavimo ženklai. Įjungta: logotipai gaunami iš logo.clearbit.com, kuris mato jūsų IP adresą.",
-  "privacyExportAllButton": "Eksportuoti visus mano duomenis (ZIP)",
   "privacyExportAllSuccess": "{fileName} išsaugota atsisiuntimų aplanke — viduje {count} failų",
   "@privacyExportAllSuccess": {
     "placeholders": {
@@ -4776,7 +4683,6 @@
   "settingsTopicDataSourcesKeywords": "api, raktas, gps, vieta, padėtis, duomenų šaltinis, tankerkoenig, opencharge, key, location, data source",
   "settingsTopicSyncTitle": "Sinchronizavimas ir paskyra",
   "settingsTopicSyncKeywords": "tanksync, debesis, paskyra, el. paštas, susieti įrenginį, sinchronizavimas, bendrinti duomenų bazę, anonimiškas, cloud, account, email, link device, sync, share database, anonymous",
-  "settingsTopicPrivacySubtitle": "Sutikimai, privatumo skydelis, saugykla ir podėlis",
   "settingsTopicPrivacyKeywords": "privatumas, sutikimas, bdar, ištrinti, išvalyti, saugykla, podėlis, duomenys, klaidų pranešimai, vin, privacy, consent, gdpr, delete, erase, storage, cache, data, error reporting",
   "settingsTopicBackupTitle": "Atsarginė kopija ir atkūrimas",
   "settingsTopicBackupSubtitle": "Eksportuokite arba atkurkite visą savo duomenų atsarginę kopiją",
@@ -4797,7 +4703,6 @@
   "settingsDistanceUnitSubtitle": "Pagal aktyvaus profilio šalį",
   "settingsObd2AdapterTitle": "OBD2 adapteris",
   "settingsObd2AdapterSubtitle": "Adapteriai susiejami kiekvienai transporto priemonei — atidarykite transporto priemonę, kad susietumėte arba pakeistumėte jos adapterį",
-  "settingsStorageDeleteHint": "Visi vietiniai duomenys ištrinami iš privatumo skydelio.",
   "settingsPrivacyCrossLinkTitle": "Sutikimai",
   "settingsPrivacyCrossLinkSubtitle": "Cloud Sync ir kelionių sinchronizavimo sutikimai yra skiltyje Privatumas ir duomenys",
   "settingsBackupExportSubtitle": "Transporto priemonės, degalų pylimai, kelionės ir įkrovimo žurnalai kaip ZIP failas",

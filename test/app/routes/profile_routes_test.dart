@@ -34,9 +34,12 @@ void main() {
       expect(route.path, '/itineraries');
     });
 
-    test('route 3 path is "/privacy-dashboard"', () {
+    test('route 3 "/privacy-dashboard" redirects to Settings → Privacy & data '
+        '(#3908 — the dashboard is retired)', () {
       final route = profileRoutes[3] as GoRoute;
       expect(route.path, '/privacy-dashboard');
+      expect(route.builder, isNull);
+      expect(route.redirect, isNotNull);
     });
 
     test('route 4 path is "/theme-settings" (#897)', () {
@@ -111,13 +114,13 @@ void main() {
       }
     });
 
-    test('every GoRoute has a non-null builder', () {
+    test('every GoRoute has a non-null builder (or a redirect)', () {
       for (var i = 0; i < profileRoutes.length; i++) {
         final route = profileRoutes[i] as GoRoute;
         expect(
-          route.builder,
+          route.builder ?? route.redirect,
           isNotNull,
-          reason: 'route $i (${route.path}) should have a non-null builder',
+          reason: 'route $i (${route.path}) should have a builder or redirect',
         );
       }
     });

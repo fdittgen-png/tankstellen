@@ -63,16 +63,11 @@
   "freeNoKey": "Gratis — ingen nyckel behövs",
   "apiKeyRequired": "API-nyckel krävs",
   "dataTransparency": "Datatransparens",
-  "storageAndCache": "Lagring och cache",
   "clearCache": "Rensa cache",
   "stationsFound": "{count} bensinstationer hittades",
   "storageUsage": "Lagringsanvändning på denna enhet",
   "settingsLabel": "Inställningar",
-  "profilesStored": "profiler sparade",
-  "stationsMarked": "stationer markerade",
-  "cachedResponses": "cachade svar",
   "total": "Totalt",
-  "cacheManagement": "Cachehantering",
   "cacheDescription": "Cachen lagrar API-svar för snabbare laddning och offlineåtkomst.",
   "cacheTtlGroupNetwork": "Nätverk",
   "cacheTtlGroupData": "Data",
@@ -87,7 +82,6 @@
   "clearCacheBody": "Cachade sökresultat och priser raderas. Profiler, favoriter och inställningar bevaras.",
   "clearCacheButton": "Rensa cache",
   "deleteAllButton": "Ta bort allt",
-  "entries": "poster",
   "cacheEmpty": "Cachen är tom",
   "apiKeyNote": "Gratis registrering. Data från statliga pristransparensorgan.",
   "apiKeyFormatError": "Ogiltigt format — UUID förväntat (8-4-4-4-12)",
@@ -97,32 +91,9 @@
   "reportConsentBody": "Det här öppnar ett offentligt GitHub-ärende med felinformationen nedan. Inga GPS-koordinater, API-nycklar eller personuppgifter ingår.",
   "reportConsentConfirm": "Öppna GitHub",
   "reportConsentCancel": "Avbryt",
-  "configProfileSection": "Profil",
-  "configActiveProfile": "Aktiv profil",
-  "configPreferredFuel": "Favoritbränsle",
-  "configCountry": "Land",
-  "configRouteSegment": "Ruttsegment",
-  "configApiKeysSection": "API-nycklar",
-  "configTankerkoenigKey": "Tankerkoenig API-nyckel",
-  "configApiKeyConfigured": "Konfigurerad",
-  "configApiKeyCommunity": "Standard (community-nyckel)",
   "searchLocationPlaceholder": "Adress, postnummer eller ort",
-  "configEvKey": "EV-laddnings-API-nyckel",
-  "configEvKeyCustom": "Anpassad nyckel",
-  "configEvKeyShared": "Standard (delad)",
-  "configCloudSyncSection": "Molnsynkronisering",
   "configTankSyncConnected": "Ansluten",
   "configTankSyncDisabled": "Inaktiverad",
-  "configAuthMode": "Autentiseringsläge",
-  "configAuthEmail": "E-post (beständig)",
-  "configAuthAnonymous": "Anonym (endast denna enhet)",
-  "configDatabase": "Databas",
-  "configPrivacySummary": "Integritetsöversikt",
-  "configPrivacySummarySynced": "• Favoriter, aviseringar och ignorerade stationer synkas till din privata databas\n• GPS-position och API-nycklar lämnar aldrig din enhet\n• {authNote}",
-  "configPrivacySummaryLocal": "• All data lagras lokalt på den här enheten\n• Ingen data skickas till någon server\n• API-nycklar krypterade i enhetens säkra lagring",
-  "configAuthNoteEmail": "E-postkonto möjliggör åtkomst från flera enheter",
-  "configAuthNoteAnonymous": "Anonymt konto – data kopplad till den här enheten",
-  "configNone": "Ingen",
   "privacyPolicy": "Integritetspolicy",
   "fuels": "Bränslen",
   "services": "Tjänster",
@@ -262,42 +233,8 @@
   "fuelNeeded": "Bränsle som behövs",
   "totalCost": "Total kostnad",
   "priceHistory": "Prishistorik",
-  "ignoredStationsLabel": "Ignorerade",
-  "ratingsLabel": "Betyg",
   "favoritesDataCache": "Favoritdata",
   "citySearchCache": "Stadsökning",
-  "priceHistoryStationsTracked": "{count} bevakade stationer",
-  "@priceHistoryStationsTracked": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "alertsConfiguredCount": "{count} konfigurerade",
-  "@alertsConfiguredCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ignoredStationsHidden": "{count} dolda stationer",
-  "@ignoredStationsHidden": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ratingsStationsRated": "{count} betygsatta stationer",
-  "@ratingsStationsRated": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "noPriceHistory": "Ingen prishistorik ännu",
   "noStatistics": "Ingen statistik tillgänglig",
   "showAllFuelTypes": "Visa alla bränsletyper",
@@ -420,33 +357,19 @@
   "alertStatsActive": "Aktiva",
   "alertStatsToday": "Idag",
   "alertStatsThisWeek": "Denna vecka",
-  "privacyDashboardTitle": "Integritetspanel",
-  "privacyDashboardSubtitle": "Visa, exportera eller radera din data",
-  "privacyDashboardBanner": "Din data tillhör dig. Här kan du se allt som appen lagrar, exportera det eller radera det.",
   "privacyLocalData": "Data på den här enheten",
   "privacyIgnoredStations": "Ignorerade stationer",
   "privacyRatings": "Stationsbetyg",
   "privacyPriceHistory": "Prishistorik-stationer",
   "privacyProfiles": "Sökprofiler",
   "privacyItineraries": "Sparade rutter",
-  "privacyCacheEntries": "Cacheposter",
-  "privacyApiKey": "API-nyckel lagrad",
-  "privacyEvApiKey": "EV API-nyckel lagrad",
-  "privacyEstimatedSize": "Uppskattad lagring",
-  "privacySyncedData": "Molnsynk (TankSync)",
-  "privacySyncDisabled": "Molnsynkronisering är inaktiverad. All data stannar på den här enheten.",
   "privacySyncMode": "Synkläge",
   "privacySyncUserId": "Användar-ID",
   "privacySyncDescription": "När synkronisering är aktiverad lagras favoriter, aviseringar, ignorerade stationer och betyg även på TankSync-servern.",
-  "privacyViewServerData": "Visa serverdata",
-  "privacyExportButton": "Exportera all data som JSON",
   "privacyExportSuccess": "Data exporterad till urklipp",
-  "privacyExportCsvButton": "Exportera all data som CSV",
   "privacyExportCsvSuccess": "CSV-data exporterad till urklipp",
   "savedToDownloadsFolder": "Sparad i mappen Hämtningar",
-  "privacyClearErrorLog": "Rensa felloggen",
   "privacyErrorLogCleared": "Felloggen rensad",
-  "privacyDeleteButton": "Radera all data",
   "privacyDeleteTitle": "Radera all data?",
   "privacyDeleteBody": "Det här raderar permanent:\n\n- Alla favoriter och stationsdata\n- Alla sökprofiler\n- Alla prisaviseringar\n- All prishistorik\n- All cachad data\n- Din API-nyckel\n- Alla appinställningar\n\nAppen återställs till ursprungligt läge. Den här åtgärden kan inte ångras.",
   "privacyDeleteConfirm": "Radera allt",
@@ -1177,9 +1100,6 @@
   "authInfoBenefit2": "• Förbered en rutt på din telefon, använd den i bilen",
   "authInfoBenefit3": "• Ingen data delas med tredje part",
   "authInfoBenefit4": "• Du kan radera ditt konto när som helst",
-  "privacyLocalDataEmpty": "Inget lagrat ännu. Lägg till en favorit eller ange en prisavisering för att se poster här.",
-  "privacyHideEmptyRows": "Dölj tomma rader",
-  "privacyShowEmptyRows": "{count, plural, =1{Visa {count} tom rad} other{Visa {count} tomma rader}}",
   "apiKeySetupTitle": "API-nyckelinställning (valfritt)",
   "apiKeySetupDescription": "Registrera dig för en gratis API-nyckel, eller hoppa över för att utforska appen med demodata.",
   "apiKeyRegistrationButton": "{provider} Registrering",
@@ -1192,8 +1112,6 @@
   "consentSyncTripsTitle": "Synka reseinspelningar",
   "consentSyncTripsSubtitle": "Säkerhetskopiera OBD2- och GPS-resor till TankSync. Mellan enheter, opt-in.",
   "consentSyncTripsDisabledHint": "Aktivera Molnsynkronisering ovan för att säkerhetskopiera resor.",
-  "consentHideDetails": "Dölj detaljer",
-  "consentShowDetails": "Visa detaljer",
   "dialogOk": "OK",
   "invalidLinkTitle": "Ogiltig länk",
   "invalidLinkBody": "Länken \"{path}\" är inte giltig.",
@@ -1636,15 +1554,6 @@
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
   "fabRunSearch": "Kör sökning",
-  "privacySaveErrorLog": "Spara felloggen ({count})",
-  "@privacySaveErrorLog": {
-    "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "approachTestSimulateButton": "Testa närmandeöverlägg",
   "@approachTestSimulateButton": {
     "description": "Button on the trip-recording screen that pushes a synthetic ApproachInRadius into the PiP for 30 s so the user can verify the price layout without driving (#2163)."
@@ -4638,12 +4547,10 @@
   "deleteReportTooltip": "Radera den här rapporten",
   "reportDeleted": "Rapport raderad",
   "reportDeleteFailed": "Det gick inte att radera rapporten",
-  "privacyControlsTitle": "Integritetsinställningar",
   "tileProxyToggleTitle": "Hämta kartrutor via Sparkilo-proxyn",
   "tileProxyToggleSubtitle": "På: det visade kartutsnittet och din IP-adress når utvecklarens EU-server, som hämtar rutorna från OpenStreetMap. Av: rutorna hämtas direkt från tile.openstreetmap.org.",
   "remoteLogosToggleTitle": "Hämta varumärkeslogotyper från internet",
   "remoteLogosToggleSubtitle": "Av som standard: medföljande platshållare visas. På: logotyper hämtas från logo.clearbit.com, som ser din IP-adress.",
-  "privacyExportAllButton": "Exportera alla mina data (ZIP)",
   "privacyExportAllSuccess": "{fileName} sparad i Hämtningar — {count} filer inuti",
   "@privacyExportAllSuccess": {
     "placeholders": {
@@ -4776,7 +4683,6 @@
   "settingsTopicDataSourcesKeywords": "api, nyckel, gps, plats, position, datakälla, tankerkoenig, opencharge, key, location, data source",
   "settingsTopicSyncTitle": "Synkronisering & konto",
   "settingsTopicSyncKeywords": "tanksync, moln, konto, e-post, länka enhet, synkronisering, dela databas, anonym, cloud, account, email, link device, sync, share database, anonymous",
-  "settingsTopicPrivacySubtitle": "Samtycken, integritetspanel, lagring & cache",
   "settingsTopicPrivacyKeywords": "integritet, samtycke, gdpr, radera, rensa, lagring, cache, data, felrapportering, vin, privacy, consent, delete, erase, storage, error reporting",
   "settingsTopicBackupTitle": "Säkerhetskopiering & återställning",
   "settingsTopicBackupSubtitle": "Exportera eller återställ en fullständig säkerhetskopia av dina data",
@@ -4797,7 +4703,6 @@
   "settingsDistanceUnitSubtitle": "Från den aktiva profilens land",
   "settingsObd2AdapterTitle": "OBD2-adapter",
   "settingsObd2AdapterSubtitle": "Adaptrar parkopplas per fordon — öppna ett fordon för att parkoppla eller byta dess adapter",
-  "settingsStorageDeleteHint": "Radering av alla lokala data görs från integritetspanelen.",
   "settingsPrivacyCrossLinkTitle": "Samtycken",
   "settingsPrivacyCrossLinkSubtitle": "Samtycken för Cloud Sync och resesynkronisering finns under Integritet & data",
   "settingsBackupExportSubtitle": "Fordon, tankningar, resor och laddningsloggar som ZIP-fil",

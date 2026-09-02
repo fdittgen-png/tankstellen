@@ -63,16 +63,11 @@
   "freeNoKey": "Gratis — ingen nøgle nødvendig",
   "apiKeyRequired": "API-nøgle påkrævet",
   "dataTransparency": "Datatransparens",
-  "storageAndCache": "Lagring og cache",
   "clearCache": "Ryd cache",
   "stationsFound": "{count} tankstationer fundet",
   "storageUsage": "Lagringsforbrug på denne enhed",
   "settingsLabel": "Indstillinger",
-  "profilesStored": "profiler gemt",
-  "stationsMarked": "stationer markeret",
-  "cachedResponses": "cachelagrede svar",
   "total": "Total",
-  "cacheManagement": "Cacheadministration",
   "cacheDescription": "Cachen gemmer API-svar for hurtigere indlæsning og offline adgang.",
   "cacheTtlGroupNetwork": "Netværk",
   "cacheTtlGroupData": "Data",
@@ -87,7 +82,6 @@
   "clearCacheBody": "Cachelagrede søgeresultater og priser slettes. Profiler, favoritter og indstillinger bevares.",
   "clearCacheButton": "Ryd cache",
   "deleteAllButton": "Slet alt",
-  "entries": "poster",
   "cacheEmpty": "Cachen er tom",
   "apiKeyNote": "Gratis registrering. Data fra statslige pristransparensorganer.",
   "apiKeyFormatError": "Ugyldigt format — forventet UUID (8-4-4-4-12)",
@@ -97,32 +91,9 @@
   "reportConsentBody": "Dette åbner et offentligt GitHub-issue med fejldetaljerne nedenfor. Ingen GPS-koordinater, API-nøgler eller personoplysninger inkluderes.",
   "reportConsentConfirm": "Åbn GitHub",
   "reportConsentCancel": "Annuller",
-  "configProfileSection": "Profil",
-  "configActiveProfile": "Aktiv profil",
-  "configPreferredFuel": "Foretrukket brændstof",
-  "configCountry": "Land",
-  "configRouteSegment": "Rutesegment",
-  "configApiKeysSection": "API-nøgler",
-  "configTankerkoenigKey": "Tankerkoenig API-nøgle",
-  "configApiKeyConfigured": "Konfigureret",
-  "configApiKeyCommunity": "Standard (fællesskabsnøgle)",
   "searchLocationPlaceholder": "Adresse, postnummer eller by",
-  "configEvKey": "EV-opladnings-API-nøgle",
-  "configEvKeyCustom": "Brugerdefineret nøgle",
-  "configEvKeyShared": "Standard (delt)",
-  "configCloudSyncSection": "Cloud-synkronisering",
   "configTankSyncConnected": "Tilsluttet",
   "configTankSyncDisabled": "Deaktiveret",
-  "configAuthMode": "Godkendelsestilstand",
-  "configAuthEmail": "E-mail (vedvarende)",
-  "configAuthAnonymous": "Anonym (kun enhed)",
-  "configDatabase": "Database",
-  "configPrivacySummary": "Privatlivsoversigt",
-  "configPrivacySummarySynced": "• Favoritter, advarsler og ignorerede stationer synkroniseres til din private database\n• GPS-position og API-nøgler forlader aldrig din enhed\n• {authNote}",
-  "configPrivacySummaryLocal": "• Alle data gemmes lokalt på denne enhed\n• Ingen data sendes til nogen server\n• API-nøgler krypteret i enhedens sikre lager",
-  "configAuthNoteEmail": "E-mailkonto muliggør adgang fra flere enheder",
-  "configAuthNoteAnonymous": "Anonym konto — data knyttet til denne enhed",
-  "configNone": "Ingen",
   "privacyPolicy": "Privatlivspolitik",
   "fuels": "Brændstoffer",
   "services": "Tjenester",
@@ -262,42 +233,8 @@
   "fuelNeeded": "Nødvendigt brændstof",
   "totalCost": "Samlede omkostninger",
   "priceHistory": "Prishistorik",
-  "ignoredStationsLabel": "Ignorerede",
-  "ratingsLabel": "Vurderinger",
   "favoritesDataCache": "Favoritdata",
   "citySearchCache": "Bysøgning",
-  "priceHistoryStationsTracked": "{count} sporede stationer",
-  "@priceHistoryStationsTracked": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "alertsConfiguredCount": "{count} konfigureret",
-  "@alertsConfiguredCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ignoredStationsHidden": "{count} skjulte stationer",
-  "@ignoredStationsHidden": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ratingsStationsRated": "{count} vurderede stationer",
-  "@ratingsStationsRated": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "noPriceHistory": "Ingen prishistorik endnu",
   "noStatistics": "Ingen statistikker tilgængelige",
   "showAllFuelTypes": "Vis alle brændstoftyper",
@@ -420,33 +357,19 @@
   "alertStatsActive": "Aktive",
   "alertStatsToday": "I dag",
   "alertStatsThisWeek": "Denne uge",
-  "privacyDashboardTitle": "Privatlivsdashboard",
-  "privacyDashboardSubtitle": "Se, eksporter eller slet dine data",
-  "privacyDashboardBanner": "Dine data tilhører dig. Her kan du se alt, hvad denne app gemmer, eksportere det eller slette det.",
   "privacyLocalData": "Data på denne enhed",
   "privacyIgnoredStations": "Ignorerede stationer",
   "privacyRatings": "Stationsbedømmelser",
   "privacyPriceHistory": "Prishistorik-stationer",
   "privacyProfiles": "Søgeprofiler",
   "privacyItineraries": "Gemte ruter",
-  "privacyCacheEntries": "Cache-poster",
-  "privacyApiKey": "API-nøgle gemt",
-  "privacyEvApiKey": "EV API-nøgle gemt",
-  "privacyEstimatedSize": "Anslået lager",
-  "privacySyncedData": "Cloud-sync (TankSync)",
-  "privacySyncDisabled": "Cloud-synkronisering er deaktiveret. Alle data forbliver kun på denne enhed.",
   "privacySyncMode": "Synkroniseringstilstand",
   "privacySyncUserId": "Bruger-ID",
   "privacySyncDescription": "Når sync er aktiveret, gemmes favoritter, advarsler, ignorerede stationer og bedømmelser også på TankSync-serveren.",
-  "privacyViewServerData": "Vis serverdata",
-  "privacyExportButton": "Eksporter alle data som JSON",
   "privacyExportSuccess": "Data eksporteret til udklipsholder",
-  "privacyExportCsvButton": "Eksporter alle data som CSV",
   "privacyExportCsvSuccess": "CSV-data eksporteret til udklipsholder",
   "savedToDownloadsFolder": "Gemt i mappen Downloads",
-  "privacyClearErrorLog": "Ryd fejllog",
   "privacyErrorLogCleared": "Fejllog ryddet",
-  "privacyDeleteButton": "Slet alle data",
   "privacyDeleteTitle": "Slet alle data?",
   "privacyDeleteBody": "Dette sletter permanent:\n\n- Alle favoritter og stationsdata\n- Alle søgeprofiler\n- Alle prisadvarsler\n- Al prishistorik\n- Alle cachedata\n- Din API-nøgle\n- Alle appindstillinger\n\nAppen nulstilles til sin begyndelsestilstand. Denne handling kan ikke fortrydes.",
   "privacyDeleteConfirm": "Slet alt",
@@ -1177,9 +1100,6 @@
   "authInfoBenefit2": "• Planlæg en rute på din telefon, brug den i din bil",
   "authInfoBenefit3": "• Ingen data deles med tredjepart",
   "authInfoBenefit4": "• Du kan slette din konto til enhver tid",
-  "privacyLocalDataEmpty": "Intet gemt endnu. Tilføj en favorit eller angiv en prisadvarsel for at se poster her.",
-  "privacyHideEmptyRows": "Skjul tomme rækker",
-  "privacyShowEmptyRows": "{count, plural, =1{Vis {count} tom række} other{Vis {count} tomme rækker}}",
   "apiKeySetupTitle": "API-nøgleopsætning (valgfrit)",
   "apiKeySetupDescription": "Registrér dig for en gratis API-nøgle, eller spring over for at udforske appen med demodata.",
   "apiKeyRegistrationButton": "{provider}-registrering",
@@ -1192,8 +1112,6 @@
   "consentSyncTripsTitle": "Synkroniser turoptagelser",
   "consentSyncTripsSubtitle": "Sikkerhedskopier OBD2 + GPS-ture til TankSync. Tværenhed, opt-in.",
   "consentSyncTripsDisabledHint": "Aktivér Cloud-synkronisering ovenfor for at sikkerhedskopiere ture.",
-  "consentHideDetails": "Skjul detaljer",
-  "consentShowDetails": "Vis detaljer",
   "dialogOk": "OK",
   "invalidLinkTitle": "Ugyldigt link",
   "invalidLinkBody": "Linket \"{path}\" er ikke gyldigt.",
@@ -1636,15 +1554,6 @@
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
   "fabRunSearch": "Kør søgning",
-  "privacySaveErrorLog": "Gem fejllog ({count})",
-  "@privacySaveErrorLog": {
-    "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "approachTestSimulateButton": "Test af tilnærmelsesoverlay",
   "@approachTestSimulateButton": {
     "description": "Button on the trip-recording screen that pushes a synthetic ApproachInRadius into the PiP for 30 s so the user can verify the price layout without driving (#2163)."
@@ -4638,12 +4547,10 @@
   "deleteReportTooltip": "Slet denne rapport",
   "reportDeleted": "Rapport slettet",
   "reportDeleteFailed": "Rapporten kunne ikke slettes",
-  "privacyControlsTitle": "Privatlivsindstillinger",
   "tileProxyToggleTitle": "Hent kortfliser via Sparkilo-proxyen",
   "tileProxyToggleSubtitle": "Til: det viste kortudsnit og din IP-adresse når udviklerens EU-server, som henter fliserne fra OpenStreetMap. Fra: fliserne hentes direkte fra tile.openstreetmap.org.",
   "remoteLogosToggleTitle": "Hent mærkelogoer fra internettet",
   "remoteLogosToggleSubtitle": "Fra som standard: medfølgende pladsholdere vises. Til: logoer hentes fra logo.clearbit.com, som ser din IP-adresse.",
-  "privacyExportAllButton": "Eksportér alle mine data (ZIP)",
   "privacyExportAllSuccess": "{fileName} gemt i Downloads — {count} filer indeni",
   "@privacyExportAllSuccess": {
     "placeholders": {
@@ -4776,7 +4683,6 @@
   "settingsTopicDataSourcesKeywords": "api, nøgle, gps, placering, position, datakilde, tankerkoenig, opencharge, key, location, data source",
   "settingsTopicSyncTitle": "Synkronisering & konto",
   "settingsTopicSyncKeywords": "tanksync, cloud, konto, e-mail, tilknyt enhed, synkronisering, del database, anonym, account, email, link device, sync, share database, anonymous",
-  "settingsTopicPrivacySubtitle": "Samtykker, privatlivsoversigt, lager & cache",
   "settingsTopicPrivacyKeywords": "privatliv, samtykke, gdpr, slet, ryd, lager, cache, data, fejlrapportering, vin, privacy, consent, delete, erase, storage, error reporting",
   "settingsTopicBackupTitle": "Sikkerhedskopi & gendannelse",
   "settingsTopicBackupSubtitle": "Eksportér eller gendan en fuld sikkerhedskopi af dine data",
@@ -4797,7 +4703,6 @@
   "settingsDistanceUnitSubtitle": "Fra den aktive profils land",
   "settingsObd2AdapterTitle": "OBD2-adapter",
   "settingsObd2AdapterSubtitle": "Adaptere parres pr. køretøj — åbn et køretøj for at parre eller skifte dets adapter",
-  "settingsStorageDeleteHint": "Sletning af alle lokale data sker fra privatlivsoversigten.",
   "settingsPrivacyCrossLinkTitle": "Samtykker",
   "settingsPrivacyCrossLinkSubtitle": "Samtykker til Cloud Sync og tursynkronisering findes under Privatliv & data",
   "settingsBackupExportSubtitle": "Køretøjer, tankninger, ture og opladningslogs som ZIP-fil",

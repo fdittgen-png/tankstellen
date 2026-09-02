@@ -47,6 +47,9 @@ List<Object> settingsTestOverrides({Set<Feature>? flags}) {
   when(() => mockStorage.getAlerts()).thenReturn([]);
   when(() => mockStorage.getEvApiKey()).thenReturn(null);
   when(() => mockStorage.hasCustomEvApiKey()).thenReturn(false);
+  // #3910 — the device-data inventory behind the Privacy & data entry.
+  when(() => mockStorage.getItineraries()).thenReturn([]);
+  when(() => mockStorage.getPriceHistoryKeys()).thenReturn([]);
 
   final test = standardTestOverrides();
   return [
