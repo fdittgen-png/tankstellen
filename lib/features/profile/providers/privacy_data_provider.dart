@@ -5,71 +5,147 @@ import 'dart:convert';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/data/storage_repository.dart';
+import '../../../core/moderation/content_moderation_providers.dart';
 import '../../../core/storage/storage_providers.dart';
-import '../../../core/sync/sync_provider.dart';
 
 part 'privacy_data_provider.g.dart';
 
-/// Snapshot of all locally stored user data for the privacy dashboard.
+/// One category of data the app keeps on the device (#3910, Epic #3907).
 ///
-/// Each field represents a distinct data category that the user
-/// can inspect before deciding to export or delete.
-class PrivacyDataSnapshot {
-  final int favoritesCount;
-  final int ignoredCount;
-  final int ratingsCount;
-  final int alertsCount;
-  final int priceHistoryStationCount;
-  final int profileCount;
-  final int cacheEntryCount;
-  final int itineraryCount;
-  final bool hasApiKey;
-  final bool hasEvApiKey;
-  final bool syncEnabled;
-  final String? syncMode;
-  final String? syncUserId;
-  final int estimatedTotalBytes;
-
-  const PrivacyDataSnapshot({
-    required this.favoritesCount,
-    required this.ignoredCount,
-    required this.ratingsCount,
-    required this.alertsCount,
-    required this.priceHistoryStationCount,
-    required this.profileCount,
-    required this.cacheEntryCount,
-    required this.itineraryCount,
-    required this.hasApiKey,
-    required this.hasEvApiKey,
-    required this.syncEnabled,
-    required this.syncMode,
-    required this.syncUserId,
-    required this.estimatedTotalBytes,
-  });
+/// The kind is a stable identity for icons, labels and widget keys; the
+/// count is the number of user-visible items and [bytes] the on-disk
+/// estimate (exact box size where the storage layer measures it, a
+/// per-entry estimate for the tiny sets it does not).
+enum DeviceDataKind {
+  favorites,
+  ratings,
+  profiles,
+  alerts,
+  priceHistory,
+  ignoredStations,
+  blockedUsers,
+  itineraries,
+  cache,
+  settings,
 }
 
-/// Collects a snapshot of all locally stored user data.
-@riverpod
-PrivacyDataSnapshot privacyData(Ref ref) {
-  final storage = ref.watch(storageRepositoryProvider);
-  final syncConfig = ref.watch(syncStateProvider);
-  final stats = storage.storageStats;
+/// Estimated bytes of one entry in the small string-set categories the
+/// storage layer does not measure (ignored stations, ratings, blocked
+/// users, saved routes).
+const int kDeviceDataSmallEntryBytes = 64;
 
-  return PrivacyDataSnapshot(
-    favoritesCount: storage.favoriteCount,
-    ignoredCount: storage.getIgnoredIds().length,
-    ratingsCount: storage.getRatings().length,
-    alertsCount: storage.alertCount,
-    priceHistoryStationCount: storage.getPriceHistoryKeys().length,
-    profileCount: storage.profileCount,
-    cacheEntryCount: storage.cacheEntryCount,
-    itineraryCount: storage.getItineraries().length,
-    hasApiKey: storage.hasApiKey('de'),
-    hasEvApiKey: storage.hasEvApiKey(),
-    syncEnabled: syncConfig.enabled,
-    syncMode: syncConfig.enabled ? syncConfig.modeName : null,
-    syncUserId: syncConfig.userId,
-    estimatedTotalBytes: stats.total,
+class DeviceDataCategory {
+  final DeviceDataKind kind;
+
+  /// Number of items; `null` for categories without a countable unit
+  /// (the settings box).
+  final int? count;
+  final int bytes;
+
+  const DeviceDataCategory({
+    required this.kind,
+    required this.count,
+    required this.bytes,
+  });
+
+  /// True when the category holds nothing the user put there. Settings
+  /// always exist, so that row is never "empty".
+  bool get isEmpty => count != null && count == 0;
+}
+
+/// The ONE device-data inventory (#3910): every category with its count
+/// AND its size, so the "Data on this device" screen and the Privacy &
+/// data summary read the same numbers — the former dashboard card and
+/// the storage section each carried their own copy.
+class DeviceDataInventory {
+  /// Categories in canonical order (favorites … settings).
+  final List<DeviceDataCategory> categories;
+
+  /// Total bytes of every measured storage box.
+  final int totalBytes;
+
+  const DeviceDataInventory({
+    required this.categories,
+    required this.totalBytes,
+  });
+
+  /// Non-empty categories first (canonical order kept), empty ones at
+  /// the end — the list shape the inventory screen renders.
+  List<DeviceDataCategory> get orderedForDisplay => [
+        ...categories.where((c) => !c.isEmpty),
+        ...categories.where((c) => c.isEmpty),
+      ];
+
+  int get nonEmptyCount => categories.where((c) => !c.isEmpty).length;
+
+  DeviceDataCategory byKind(DeviceDataKind kind) =>
+      categories.firstWhere((c) => c.kind == kind);
+}
+
+/// Collects the device-data inventory from the storage layer.
+@riverpod
+DeviceDataInventory deviceDataInventory(Ref ref) {
+  final storage = ref.watch(storageRepositoryProvider);
+  final blocked = ref.watch(blockedContentAuthorsProvider);
+  final stats = storage.storageStats;
+  final ignored = storage.getIgnoredIds().length;
+  final ratings = storage.getRatings().length;
+  final itineraries = storage.getItineraries().length;
+
+  return DeviceDataInventory(
+    totalBytes: stats.total,
+    categories: [
+      DeviceDataCategory(
+        kind: DeviceDataKind.favorites,
+        count: storage.favoriteCount,
+        bytes: stats.favorites,
+      ),
+      DeviceDataCategory(
+        kind: DeviceDataKind.ratings,
+        count: ratings,
+        bytes: ratings * kDeviceDataSmallEntryBytes,
+      ),
+      DeviceDataCategory(
+        kind: DeviceDataKind.profiles,
+        count: storage.profileCount,
+        bytes: stats.profiles,
+      ),
+      DeviceDataCategory(
+        kind: DeviceDataKind.alerts,
+        count: storage.alertCount,
+        bytes: stats.alerts,
+      ),
+      DeviceDataCategory(
+        kind: DeviceDataKind.priceHistory,
+        count: storage.getPriceHistoryKeys().length,
+        bytes: stats.priceHistory,
+      ),
+      DeviceDataCategory(
+        kind: DeviceDataKind.ignoredStations,
+        count: ignored,
+        bytes: ignored * kDeviceDataSmallEntryBytes,
+      ),
+      DeviceDataCategory(
+        kind: DeviceDataKind.blockedUsers,
+        count: blocked.length,
+        bytes: blocked.length * kDeviceDataSmallEntryBytes,
+      ),
+      DeviceDataCategory(
+        kind: DeviceDataKind.itineraries,
+        count: itineraries,
+        bytes: itineraries * kDeviceDataSmallEntryBytes,
+      ),
+      DeviceDataCategory(
+        kind: DeviceDataKind.cache,
+        count: storage.cacheEntryCount,
+        bytes: stats.cache,
+      ),
+      DeviceDataCategory(
+        kind: DeviceDataKind.settings,
+        count: null,
+        bytes: stats.settings,
+      ),
+    ],
   );
 }
 
