@@ -1508,14 +1508,6 @@
   "@obd2GpsDegradedPassiveWaitingBanner": {
     "description": "Calmer variant of obd2GpsDegradedBannerTitle shown (#2767) once the reconnect scanner has exhausted its active-scan attempts and switched to a low-power passive wait for the adapter to power back up. The trip is still recording on GPS and the app still re-arms an active scan periodically, so the wording is reassuring (\"waiting for\") rather than urgent (\"reconnecting\")."
   },
-  "veResetConfirmTitle": "Reset volumetric efficiency?",
-  "@veResetConfirmTitle": {
-    "description": "Title of the confirm dialog shown before discarding the learned volumetric efficiency (#815)."
-  },
-  "veResetConfirmBody": "This will discard the learned volumetric efficiency (η_v) and restore the default value (0.85). Trip-level fuel-flow estimates will fall back to the manufacturer constant until the calibrator collects new samples from upcoming trips.",
-  "@veResetConfirmBody": {
-    "description": "Body of the confirm dialog shown before discarding the learned volumetric efficiency (#815)."
-  },
   "alertsStationSectionTitle": "Station alerts",
   "@alertsStationSectionTitle": {
     "description": "Header of the per-station price-alert section on the alerts screen, symmetric with the radius/zone section (#2819)."
@@ -2303,54 +2295,6 @@
   "calibrationResetToDetected": "Reset to detected value",
   "@calibrationResetToDetected": {
     "description": "Tooltip / a11y label for the per-field reset IconButton that nulls a manual override."
-  },
-  "calibrationLearnerStatusCalibrated": "η_v: {eta} (calibrated, {samples} samples)",
-  "@calibrationLearnerStatusCalibrated": {
-    "description": "Live readout when the learner has accepted at least 3 plein-complet samples.",
-    "placeholders": {
-      "eta": {
-        "type": "String",
-        "example": "0.87"
-      },
-      "samples": {
-        "type": "int",
-        "example": "5"
-      }
-    }
-  },
-  "calibrationLearnerStatusLearning": "η_v: {eta} (learning, {samples} samples)",
-  "@calibrationLearnerStatusLearning": {
-    "description": "Live readout while the learner is bootstrapping (1-2 samples).",
-    "placeholders": {
-      "eta": {
-        "type": "String",
-        "example": "0.85"
-      },
-      "samples": {
-        "type": "int",
-        "example": "1"
-      }
-    }
-  },
-  "calibrationLearnerStatusNoSamples": "η_v: 0.85 (default — no plein-complet yet)",
-  "@calibrationLearnerStatusNoSamples": {
-    "description": "Live readout before the first plein-complet has been logged."
-  },
-  "calibrationLearnerEtaCompact": "η_v: {eta} · {samples} samples",
-  "@calibrationLearnerEtaCompact": {
-    "description": "#2112 — compact engineer-detail pill that rides alongside the confidence-tier badge on the Fuel tab. Replaces the longer 'learning' / 'calibrated' parenthetical labels — the maturity colour is carried by the confidence tier next to it.",
-    "placeholders": {
-      "eta": {
-        "type": "String"
-      },
-      "samples": {
-        "type": "int"
-      }
-    }
-  },
-  "calibrationResetLearner": "Reset learner",
-  "@calibrationResetLearner": {
-    "description": "OutlinedButton label that resets η_v back to 0.85 and clears the sample counter."
   },
   "calibrationBasisAtkinson": "Atkinson cycle",
   "@calibrationBasisAtkinson": {
@@ -8279,10 +8223,6 @@
   "vinDecodeTooltip": "Decode VIN",
   "vinConfirmAction": "Yes, auto-fill",
   "vinModifyAction": "Modify manually",
-  "veResetAction": "Reset volumetric efficiency",
-  "@veResetAction": {
-    "description": "Action on the vehicle edit screen that discards the learned volumetric-efficiency calibration (#815)."
-  },
   "vehicleReadVinFromCarButton": "Read VIN from car",
   "@vehicleReadVinFromCarButton": {
     "description": "Button label on the vehicle edit screen that triggers an OBD2 Mode 09 PID 02 read of the VIN from the paired adapter (#1162)."

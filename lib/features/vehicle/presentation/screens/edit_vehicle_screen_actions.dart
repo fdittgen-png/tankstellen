@@ -74,7 +74,7 @@ mixin _VehicleEditActions on ConsumerState<EditVehicleScreen> {
     if (form == null || !form.validate()) return;
     // #1226 — read the freshest persisted profile and pass it as `existing:`
     // so `buildProfile` can `copyWith` over it, preserving every non-form field
-    // (calibrationMode, autoRecord, runtime-calibrated η_v, driving stats, VIN
+    // (calibrationMode, autoRecord, the learned pump gain, driving stats, VIN
     // metadata, …) verbatim.
     final id = _existingId;
     final existing = id == null
@@ -329,13 +329,13 @@ mixin _VehicleEditActions on ConsumerState<EditVehicleScreen> {
     });
   }
 
-  /// #815 — confirm-dialog → write default η_v (0.85), reset samples.
-  Future<void> _resetVolumetricEfficiency() async {
+  /// #3901 — confirm-dialog → pump gain 1.0, samples 0, learned-at null.
+  Future<void> _resetPumpGain() async {
     final id = _existingId;
     if (id == null) return;
-    final confirmed = await VeResetConfirmDialog.show(context);
+    final confirmed = await PumpGainResetConfirmDialog.show(context);
     if (confirmed != true || !mounted) return;
-    await ref.resetVolumetricEfficiency(id);
+    await ref.resetPumpGain(id);
   }
 
   /// #1397 — persist a single calibration-override field. Reads the freshest

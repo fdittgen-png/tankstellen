@@ -39,7 +39,7 @@ mixin _VehicleEditTopics on _VehicleCatalogResetAction {
           onAfrChanged: (v) => _saveCalibrationOverride(manualAfrOverride: v),
           onFuelDensityChanged: (v) =>
               _saveCalibrationOverride(manualFuelDensityGPerLOverride: v),
-          onResetVolumetricEfficiency: _resetVolumetricEfficiency,
+          onResetPumpGain: _resetPumpGain,
           onResetFromCatalog: _resetFromCatalog,
         ),
       VehicleEditTopic.reminders =>

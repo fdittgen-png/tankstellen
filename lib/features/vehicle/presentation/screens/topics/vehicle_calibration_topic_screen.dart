@@ -31,8 +31,8 @@ class VehicleCalibrationTopicScreen extends ConsumerWidget {
   final ValueChanged<double?> onAfrChanged;
   final ValueChanged<double?> onFuelDensityChanged;
 
-  /// #815 — discard the learned volumetric-efficiency calibration.
-  final VoidCallback onResetVolumetricEfficiency;
+  /// #3901 — discard the learned pump-anchored fuel gain (Epic #3886).
+  final VoidCallback onResetPumpGain;
 
   /// #3651 — re-initialize the catalog-backed spec fields from the
   /// reference vehicle database (confirm dialog owned by the editor).
@@ -45,7 +45,7 @@ class VehicleCalibrationTopicScreen extends ConsumerWidget {
     required this.onVolumetricEfficiencyChanged,
     required this.onAfrChanged,
     required this.onFuelDensityChanged,
-    required this.onResetVolumetricEfficiency,
+    required this.onResetPumpGain,
     required this.onResetFromCatalog,
   });
 
@@ -71,21 +71,20 @@ class VehicleCalibrationTopicScreen extends ConsumerWidget {
           onVolumetricEfficiencyChanged: onVolumetricEfficiencyChanged,
           onAfrChanged: onAfrChanged,
           onFuelDensityChanged: onFuelDensityChanged,
-          onResetLearner: onResetVolumetricEfficiency,
         ),
         // #1622 — broken-MAP + adapter-blocklist diagnostics (collapses
         // when there's nothing to show).
         const SizedBox(height: 16),
         BrokenMapDiagnosticsCard(vehicleId: vehicleId),
-        // η_v calibration reset (#815). Distinct icon + label per #1219 so
-        // users can tell at a glance which side of the calibration
-        // pipeline they're nuking — fuel-pump glyph for the volumetric-
-        // efficiency constant.
+        // Pump-calibration reset (#3901). Distinct icon + label per #1219
+        // so users can tell at a glance which side of the calibration
+        // pipeline they're nuking — fuel-pump glyph for the pump gain.
         const SizedBox(height: 12),
         OutlinedButton.icon(
-          onPressed: onResetVolumetricEfficiency,
+          key: const Key('pumpGainResetButton'),
+          onPressed: onResetPumpGain,
           icon: const Icon(Icons.local_gas_station_outlined),
-          label: Text(l.veResetAction),
+          label: Text(l.pumpGainResetAction),
         ),
         // #3651 — re-initialize the catalog-backed spec fields (tank
         // capacity, rated power, displacement) from the reference
@@ -111,7 +110,6 @@ class _AdvancedCalibrationCard extends ConsumerWidget {
   final ValueChanged<double?> onVolumetricEfficiencyChanged;
   final ValueChanged<double?> onAfrChanged;
   final ValueChanged<double?> onFuelDensityChanged;
-  final VoidCallback onResetLearner;
 
   const _AdvancedCalibrationCard({
     required this.vehicleId,
@@ -119,7 +117,6 @@ class _AdvancedCalibrationCard extends ConsumerWidget {
     required this.onVolumetricEfficiencyChanged,
     required this.onAfrChanged,
     required this.onFuelDensityChanged,
-    required this.onResetLearner,
   });
 
   @override
@@ -167,7 +164,6 @@ class _AdvancedCalibrationCard extends ConsumerWidget {
       onVolumetricEfficiencyChanged: onVolumetricEfficiencyChanged,
       onAfrChanged: onAfrChanged,
       onFuelDensityChanged: onFuelDensityChanged,
-      onResetLearner: onResetLearner,
     );
   }
 }

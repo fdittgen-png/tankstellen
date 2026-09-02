@@ -32,5 +32,16 @@
     }
   },
   "calibrationModeRuleDescription": "Classe chaque relevé de conduite dans une seule situation selon des seuils fixes de vitesse et de charge.",
-  "calibrationModeFuzzyDescription": "Répartit chaque relevé entre les situations voisines selon son degré d’appartenance — des estimations plus lisses aux frontières."
+  "calibrationModeFuzzyDescription": "Répartit chaque relevé entre les situations voisines selon son degré d’appartenance — des estimations plus lisses aux frontières.",
+  "pumpGainChipNotCalibrated": "Pas encore calibré à la pompe",
+  "pumpGainChipCalibrated": "{fills, plural, =1{Calibré à la pompe · 1 plein · ±{percent} %} other{Calibré à la pompe · {fills} pleins · ±{percent} %}}",
+  "@pumpGainChipCalibrated": {
+    "placeholders": {
+      "fills": {"type": "int", "example": "6"},
+      "percent": {"type": "int", "example": "7"}
+    }
+  },
+  "pumpGainResetAction": "Réinitialiser le calibrage à la pompe",
+  "pumpGainResetConfirmTitle": "Réinitialiser le calibrage à la pompe ?",
+  "pumpGainResetConfirmBody": "Le facteur de carburant appris à partir de vos pleins sera effacé. Les estimations de consommation OBD2 reviendront à la valeur non corrigée jusqu’à ce que le prochain intervalle plein-à-plein le réapprenne."
 }

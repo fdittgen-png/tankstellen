@@ -1265,8 +1265,6 @@
   "obd2PauseBannerEnd": "Aufzeichnung beenden",
   "obd2GpsDegradedBannerTitle": "Aufzeichnung per GPS — OBD2 verbindet erneut",
   "obd2GpsDegradedPassiveWaitingBanner": "Aufzeichnung per GPS — warte auf den OBD2-Adapter",
-  "veResetConfirmTitle": "Volumetrischen Wirkungsgrad zurücksetzen?",
-  "veResetConfirmBody": "Dies verwirft den gelernten volumetrischen Wirkungsgrad (η_v) und stellt den Standardwert (0,85) wieder her. Fahrt-bezogene Verbrauchsschätzungen fallen auf die Herstellerkonstante zurück, bis der Kalibrator aus kommenden Fahrten neue Messwerte sammelt.",
   "alertsStationSectionTitle": "Stations-Alarme",
   "alertsStationAdd": "Stations-Alarm hinzufügen",
   "alertsRadiusSectionTitle": "Umkreis-Alarme",
@@ -1574,31 +1572,6 @@
   "calibrationSourceDefault": "(Standard)",
   "calibrationSourceManual": "(manuell)",
   "calibrationResetToDetected": "Auf erkannten Wert zurücksetzen",
-  "calibrationLearnerStatusCalibrated": "η_v: {eta} (kalibriert, {samples} Messungen)",
-  "@calibrationLearnerStatusCalibrated": {
-    "placeholders": {
-      "eta": {
-        "type": "String"
-      },
-      "samples": {
-        "type": "int"
-      }
-    }
-  },
-  "calibrationLearnerStatusLearning": "η_v: {eta} (lernt, {samples} Messungen)",
-  "@calibrationLearnerStatusLearning": {
-    "placeholders": {
-      "eta": {
-        "type": "String"
-      },
-      "samples": {
-        "type": "int"
-      }
-    }
-  },
-  "calibrationLearnerStatusNoSamples": "η_v: 0.85 (Standard – noch keine Volltankung)",
-  "calibrationLearnerEtaCompact": "η_v: {eta} · {samples} Messwerte",
-  "calibrationResetLearner": "Lernalgorithmus zurücksetzen",
   "calibrationBasisAtkinson": "Atkinson-Zyklus",
   "calibrationBasisVnt": "VTG-Diesel + Direkteinspritzung",
   "calibrationBasisTurboDi": "Turbo + Direkteinspritzung",
@@ -3905,7 +3878,6 @@
   "vinDecodeTooltip": "FIN entschlüsseln",
   "vinConfirmAction": "Ja, automatisch ausfüllen",
   "vinModifyAction": "Manuell anpassen",
-  "veResetAction": "Volumetrischen Wirkungsgrad zurücksetzen",
   "vehicleReadVinFromCarButton": "FIN aus dem Auto auslesen",
   "vehicleReadVinFromCarTooltip": "FIN vom gekoppelten OBD2-Adapter auslesen",
   "vehicleReadVinFailedUnsupportedSnackbar": "FIN nicht verfügbar (Modus 09 PID 02 wird vor 2005 nicht unterstützt)",

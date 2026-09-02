@@ -22,7 +22,7 @@ import '../../providers/vin_adapter_pair_auto_populator_provider.dart';
 import '../../providers/vin_decoder_provider.dart';
 import '../widgets/catalog_reset_confirm_dialog.dart';
 import '../widgets/reference_vehicle_picker.dart';
-import '../widgets/ve_reset_confirm_dialog.dart';
+import '../widgets/pump_gain_reset_confirm_dialog.dart';
 import '../widgets/vehicle_edit_form.dart';
 import '../widgets/vehicle_form_controllers.dart';
 import '../widgets/vehicle_save_actions.dart';

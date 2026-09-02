@@ -60,5 +60,29 @@
   "calibrationModeFuzzyDescription": "Splits each sample across neighbouring situations by how well it fits each one — smoother estimates around the boundaries.",
   "@calibrationModeFuzzyDescription": {
     "description": "One-line plain-language description under the Fuzzy calibration mode option on the Edit-vehicle Calibration topic (#3900)."
+  },
+  "pumpGainChipNotCalibrated": "Not pump-calibrated yet",
+  "@pumpGainChipNotCalibrated": {
+    "description": "Neutral calibration pill on the consumption card (Developer mode) while no full-to-full tank window has closed yet, so the pump-anchored fuel gain is still 1.0 (#3901, Epic #3886)."
+  },
+  "pumpGainChipCalibrated": "{fills, plural, =1{Pump-calibrated · 1 fill-up · ±{percent} %} other{Pump-calibrated · {fills} fill-ups · ±{percent} %}}",
+  "@pumpGainChipCalibrated": {
+    "description": "Calibration pill on the consumption card (Developer mode) once the pump-anchored gain has been learned: number of full-to-full fill-ups folded in and the gain's distance from 1.0 in percent (#3901).",
+    "placeholders": {
+      "fills": {"type": "int", "example": "6"},
+      "percent": {"type": "int", "example": "7"}
+    }
+  },
+  "pumpGainResetAction": "Reset pump calibration",
+  "@pumpGainResetAction": {
+    "description": "Button on the Edit-vehicle Calibration topic (and confirm label of its dialog) that discards the learned pump-anchored fuel gain: gain 1.0, samples 0 (#3901)."
+  },
+  "pumpGainResetConfirmTitle": "Reset pump calibration?",
+  "@pumpGainResetConfirmTitle": {
+    "description": "Title of the confirm dialog shown before discarding the learned pump-anchored fuel gain (#3901)."
+  },
+  "pumpGainResetConfirmBody": "This discards the fuel gain learned from your fill-ups. OBD2 consumption estimates fall back to the uncorrected figure until the next full-to-full tank window re-learns it.",
+  "@pumpGainResetConfirmBody": {
+    "description": "Body of the confirm dialog shown before discarding the learned pump-anchored fuel gain (#3901)."
   }
 }

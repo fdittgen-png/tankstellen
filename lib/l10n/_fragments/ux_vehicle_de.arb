@@ -32,5 +32,16 @@
     }
   },
   "calibrationModeRuleDescription": "Ordnet jede Fahrprobe anhand fester Geschwindigkeits- und Lastschwellen genau einer Situation zu.",
-  "calibrationModeFuzzyDescription": "Verteilt jede Probe nach Passung auf benachbarte Situationen – gleichmäßigere Schätzungen an den Übergängen."
+  "calibrationModeFuzzyDescription": "Verteilt jede Probe nach Passung auf benachbarte Situationen – gleichmäßigere Schätzungen an den Übergängen.",
+  "pumpGainChipNotCalibrated": "Noch nicht an der Zapfsäule kalibriert",
+  "pumpGainChipCalibrated": "{fills, plural, =1{Zapfsäulen-kalibriert · 1 Tankfüllung · ±{percent} %} other{Zapfsäulen-kalibriert · {fills} Tankfüllungen · ±{percent} %}}",
+  "@pumpGainChipCalibrated": {
+    "placeholders": {
+      "fills": {"type": "int", "example": "6"},
+      "percent": {"type": "int", "example": "7"}
+    }
+  },
+  "pumpGainResetAction": "Zapfsäulen-Kalibrierung zurücksetzen",
+  "pumpGainResetConfirmTitle": "Zapfsäulen-Kalibrierung zurücksetzen?",
+  "pumpGainResetConfirmBody": "Der aus Ihren Tankfüllungen gelernte Kraftstofffaktor wird verworfen. OBD2-Verbrauchsschätzungen nutzen wieder den unkorrigierten Wert, bis das nächste Voll-zu-Voll-Tankfenster ihn neu lernt."
 }

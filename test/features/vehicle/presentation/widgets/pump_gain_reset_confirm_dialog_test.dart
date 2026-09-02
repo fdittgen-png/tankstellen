@@ -3,19 +3,18 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/vehicle/presentation/widgets/ve_reset_confirm_dialog.dart';
+import 'package:tankstellen/features/vehicle/presentation/widgets/pump_gain_reset_confirm_dialog.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
-/// Widget tests for [VeResetConfirmDialog] (#815).
+/// Widget tests for [PumpGainResetConfirmDialog] (#3901).
 ///
-/// Covers the four return paths of the destructive-action confirmation
-/// dialog: render the title/body, return `false` on Cancel, return
-/// `true` on Reset, and return `null` on barrier dismiss. The widget
-/// is otherwise a thin wrapper around `showDialog` so the tests focus
-/// on the surface the caller sees: the rendered text and the Future
-/// payload.
+/// Covers the return paths of the destructive-action confirmation
+/// dialog: render the title/body, `false` on Cancel, `true` on Reset,
+/// `false` on barrier dismiss (#3682 shared dialog). The widget is a
+/// thin wrapper around the shared dialog so the tests focus on the
+/// surface the caller sees: the rendered text and the Future payload.
 void main() {
-  group('VeResetConfirmDialog', () {
+  group('PumpGainResetConfirmDialog', () {
     testWidgets('show() opens an AlertDialog with the title rendered',
         (tester) async {
       await _pumpHost(tester);
@@ -23,7 +22,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(AlertDialog), findsOneWidget);
-      expect(find.text('Reset volumetric efficiency?'), findsOneWidget);
+      expect(find.text('Reset pump calibration?'), findsOneWidget);
     });
 
     testWidgets('renders the explanatory body copy', (tester) async {
@@ -32,11 +31,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.textContaining('default value (0.85)'),
+        find.textContaining('full-to-full'),
         findsOneWidget,
-        reason:
-            'Body must explain that confirming restores the default '
-            'volumetric efficiency so the user understands what is lost.',
+        reason: 'Body must explain that the next full-to-full tank window '
+            're-learns the gain so the user understands what is lost.',
       );
     });
 
@@ -46,14 +44,6 @@ void main() {
       await tester.tap(find.byKey(const Key('open-dialog')));
       await tester.pumpAndSettle();
 
-      // Both actions are TextButtons inside the AlertDialog.
-      // #3682 — Cancel is a TextButton; the destructive action is the
-      // shared error-styled FilledButton.
-      final cancels = find.descendant(
-        of: find.byType(AlertDialog),
-        matching: find.byType(TextButton),
-      );
-      expect(cancels, findsOneWidget);
       expect(
         find.descendant(
           of: find.byType(AlertDialog),
@@ -64,7 +54,7 @@ void main() {
       expect(
         find.descendant(
           of: find.byType(AlertDialog),
-          matching: find.text('Reset volumetric efficiency'),
+          matching: find.text('Reset pump calibration'),
         ),
         findsOneWidget,
       );
@@ -89,7 +79,7 @@ void main() {
       expect(await result, false);
     });
 
-    testWidgets('tapping Reset volumetric efficiency resolves the future with `true`',
+    testWidgets('tapping Reset pump calibration resolves with `true`',
         (tester) async {
       late Future<bool?> result;
       await _pumpHost(tester, onShow: (future) => result = future);
@@ -99,7 +89,7 @@ void main() {
       await tester.tap(
         find.descendant(
           of: find.byType(AlertDialog),
-          matching: find.text('Reset volumetric efficiency'),
+          matching: find.text('Reset pump calibration'),
         ),
       );
       await tester.pumpAndSettle();
@@ -108,7 +98,7 @@ void main() {
       expect(await result, true);
     });
 
-    testWidgets('barrier dismiss resolves the future with `null`',
+    testWidgets('barrier dismiss resolves the future with `false`',
         (tester) async {
       late Future<bool?> result;
       await _pumpHost(tester, onShow: (future) => result = future);
@@ -117,23 +107,15 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(AlertDialog), findsOneWidget);
 
-      // Tap the modal barrier (top-left corner is well outside the
-      // centered AlertDialog) to dismiss without picking either action.
       await tester.tapAt(const Offset(10, 10));
       await tester.pumpAndSettle();
 
       expect(find.byType(AlertDialog), findsNothing);
-      // #3682 — barrier now maps to FALSE (see shared dialog).
       expect(await result, isFalse);
     });
   });
 }
 
-/// Pumps a small host scaffold with a button that opens the dialog.
-///
-/// The optional [onShow] callback receives the Future returned by
-/// [VeResetConfirmDialog.show] so individual tests can await it and
-/// assert the resolved value.
 Future<void> _pumpHost(
   WidgetTester tester, {
   void Function(Future<bool?> future)? onShow,
@@ -149,7 +131,7 @@ Future<void> _pumpHost(
             child: ElevatedButton(
               key: const Key('open-dialog'),
               onPressed: () {
-                final future = VeResetConfirmDialog.show(context);
+                final future = PumpGainResetConfirmDialog.show(context);
                 onShow?.call(future);
               },
               child: const Text('open'),

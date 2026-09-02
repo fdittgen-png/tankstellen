@@ -33,7 +33,7 @@ void main() {
 
   Future<void> pump(
     WidgetTester tester, {
-    VoidCallback? onResetVolumetricEfficiency,
+    VoidCallback? onResetPumpGain,
     VoidCallback? onResetFromCatalog,
   }) async {
     tester.view.physicalSize = const Size(900, 2400);
@@ -52,7 +52,7 @@ void main() {
             onVolumetricEfficiencyChanged: (_) {},
             onAfrChanged: (_) {},
             onFuelDensityChanged: (_) {},
-            onResetVolumetricEfficiency: onResetVolumetricEfficiency ?? () {},
+            onResetPumpGain: onResetPumpGain ?? () {},
             onResetFromCatalog: onResetFromCatalog ?? () {},
           ),
         ),
@@ -63,14 +63,14 @@ void main() {
 
   group('VehicleCalibrationTopicScreen (#3900)', () {
     testWidgets(
-        'volumetric-efficiency reset uses the local_gas_station_outlined '
+        'pump-calibration reset (#3901) uses the local_gas_station_outlined '
         'icon — distinct from the baseline reset\'s tune_outlined glyph '
         '(#1219)', (tester) async {
       var taps = 0;
-      await pump(tester, onResetVolumetricEfficiency: () => taps++);
+      await pump(tester, onResetPumpGain: () => taps++);
 
       final resetButton = find.ancestor(
-        of: find.text('Reset volumetric efficiency'),
+        of: find.text('Reset pump calibration'),
         matching: find.byType(OutlinedButton),
       );
       expect(resetButton, findsOneWidget);

@@ -14,23 +14,6 @@
   "calibrationSourceDefault": "(Standard)",
   "calibrationSourceManual": "(manuell)",
   "calibrationResetToDetected": "Auf erkannten Wert zurücksetzen",
-  "calibrationLearnerStatusCalibrated": "η_v: {eta} (kalibriert, {samples} Messungen)",
-  "@calibrationLearnerStatusCalibrated": {
-    "placeholders": {
-      "eta": {"type": "String"},
-      "samples": {"type": "int"}
-    }
-  },
-  "calibrationLearnerStatusLearning": "η_v: {eta} (lernt, {samples} Messungen)",
-  "@calibrationLearnerStatusLearning": {
-    "placeholders": {
-      "eta": {"type": "String"},
-      "samples": {"type": "int"}
-    }
-  },
-  "calibrationLearnerStatusNoSamples": "η_v: 0.85 (Standard – noch keine Volltankung)",
-  "calibrationLearnerEtaCompact": "η_v: {eta} · {samples} Messwerte",
-  "calibrationResetLearner": "Lernalgorithmus zurücksetzen",
   "calibrationBasisAtkinson": "Atkinson-Zyklus",
   "calibrationBasisVnt": "VTG-Diesel + Direkteinspritzung",
   "calibrationBasisTurboDi": "Turbo + Direkteinspritzung",

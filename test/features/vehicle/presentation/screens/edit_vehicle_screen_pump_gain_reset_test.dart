@@ -19,21 +19,19 @@ import 'package:tankstellen/features/vehicle/presentation/screens/edit_vehicle_s
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
-/// Widget tests for the η_v calibration reset action added to
-/// [EditVehicleScreen] (#815).
+/// Widget tests for the pump-calibration reset action on
+/// [EditVehicleScreen] (#3901, replacing the #815 η_v reset).
 ///
-/// Covers the confirm-then-reset flow: tapping the button opens a
-/// destructive-action dialog, and only the explicit confirm commits
-/// the change back to the profile repository.
+/// Covers the confirm-then-reset flow on the Calibration topic screen
+/// (#3900): tapping the button opens a destructive-action dialog, and
+/// only the explicit confirm commits the change back to the profile
+/// repository — pump gain 1.0, samples 0, updatedAt null.
 void main() {
   late Directory tempDir;
 
   setUp(() async {
-    tempDir = await Directory.systemTemp.createTemp('ve_reset_widget_');
+    tempDir = await Directory.systemTemp.createTemp('pump_gain_reset_widget_');
     Hive.init(tempDir.path);
-    // The service-reminder section and baseline section both open
-    // Hive boxes during their first build. Open them empty so the
-    // sections render without throwing.
     await Hive.openBox<String>(HiveBoxes.serviceReminders);
     await Hive.openBox<String>(HiveBoxes.obd2Baselines);
   });
@@ -45,92 +43,87 @@ void main() {
     }
   });
 
-  group('EditVehicleScreen — η_v reset (#815)', () {
-    testWidgets('renders the reset action on an existing vehicle',
-        (tester) async {
-      final repo = VehicleProfileRepository(_FakeSettings());
-      await repo.save(const VehicleProfile(
+  VehicleProfile calibrated() => VehicleProfile(
         id: 'v1',
         name: 'Peugeot 107',
-        volumetricEfficiency: 0.72,
-        volumetricEfficiencySamples: 5,
-      ));
+        pumpGain: 0.93,
+        pumpGainSamples: 6,
+        pumpGainUpdatedAt: DateTime.utc(2026, 8, 30),
+      );
+
+  group('EditVehicleScreen — pump-calibration reset (#3901)', () {
+    testWidgets('renders the reset action on the Calibration topic; the '
+        'old volumetric-efficiency reset is gone', (tester) async {
+      final repo = VehicleProfileRepository(_FakeSettings());
+      await repo.save(calibrated());
 
       await _pumpEditScreen(tester, repo: repo, vehicleId: 'v1');
-
-      // #3900 — the reset lives on the Calibration topic screen.
       await _openCalibrationTopic(tester);
       await tester.dragUntilVisible(
-        find.text('Reset volumetric efficiency'),
+        find.text('Reset pump calibration'),
         find.byType(ListView).last,
         const Offset(0, -200),
       );
-      expect(find.text('Reset volumetric efficiency'), findsOneWidget);
+      expect(find.text('Reset pump calibration'), findsOneWidget);
+      expect(find.textContaining('volumetric efficiency'), findsNothing);
+      expect(find.textContaining('Reset learner'), findsNothing);
     });
 
     testWidgets('Cancel leaves the profile untouched', (tester) async {
       final repo = VehicleProfileRepository(_FakeSettings());
-      await repo.save(const VehicleProfile(
-        id: 'v1',
-        name: 'Peugeot 107',
-        volumetricEfficiency: 0.72,
-        volumetricEfficiencySamples: 5,
-      ));
+      await repo.save(calibrated());
 
       await _pumpEditScreen(tester, repo: repo, vehicleId: 'v1');
       await _openCalibrationTopic(tester);
       await tester.dragUntilVisible(
-        find.text('Reset volumetric efficiency'),
+        find.text('Reset pump calibration'),
         find.byType(ListView).last,
         const Offset(0, -200),
       );
-      await tester.tap(find.text('Reset volumetric efficiency'));
+      await tester.tap(find.text('Reset pump calibration'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Reset volumetric efficiency?'), findsOneWidget);
+      expect(find.text('Reset pump calibration?'), findsOneWidget);
       await tester.tap(find.text('Cancel'));
       await tester.pumpAndSettle();
 
       final stored = repo.getById('v1')!;
-      expect(stored.volumetricEfficiency, 0.72);
-      expect(stored.volumetricEfficiencySamples, 5);
+      expect(stored.pumpGain, 0.93);
+      expect(stored.pumpGainSamples, 6);
+      expect(stored.pumpGainUpdatedAt, isNotNull);
     });
 
     testWidgets(
-      'confirming the reset writes η_v=0.85 and samples=0 back to '
-      'the profile',
+      'confirming the reset writes gain 1.0, samples 0, updatedAt null '
+      'back to the profile',
       (tester) async {
         final repo = VehicleProfileRepository(_FakeSettings());
-        await repo.save(const VehicleProfile(
-          id: 'v1',
-          name: 'Peugeot 107',
-          volumetricEfficiency: 0.72,
-          volumetricEfficiencySamples: 5,
-        ));
+        await repo.save(calibrated());
 
         await _pumpEditScreen(tester, repo: repo, vehicleId: 'v1');
         await _openCalibrationTopic(tester);
         await tester.dragUntilVisible(
-          find.text('Reset volumetric efficiency'),
+          find.text('Reset pump calibration'),
           find.byType(ListView).last,
           const Offset(0, -200),
         );
-        await tester.tap(find.text('Reset volumetric efficiency'));
+        await tester.tap(find.text('Reset pump calibration'));
         await tester.pumpAndSettle();
 
         // The dialog's confirm action and the outer page button share
         // the same label — find the one inside the AlertDialog.
         final confirm = find.descendant(
           of: find.byType(AlertDialog),
-          matching: find.text('Reset volumetric efficiency'),
+          matching: find.text('Reset pump calibration'),
         );
         expect(confirm, findsOneWidget);
         await tester.tap(confirm);
         await tester.pumpAndSettle();
 
         final stored = repo.getById('v1')!;
-        expect(stored.volumetricEfficiency, 0.85);
-        expect(stored.volumetricEfficiencySamples, 0);
+        expect(stored.pumpGain, 1.0);
+        expect(stored.pumpGainSamples, 0);
+        expect(stored.pumpGainUpdatedAt, isNull);
       },
     );
   });
@@ -144,8 +137,6 @@ Future<void> _openCalibrationTopic(WidgetTester tester) async {
     find.byType(ListView).first,
     const Offset(0, -200),
   );
-  // Fully into the viewport — a half-scrolled tile's centre can sit
-  // under the pinned Save bar.
   await tester.ensureVisible(tile);
   await tester.pumpAndSettle();
   await tester.tap(tile);
@@ -157,25 +148,17 @@ Future<void> _pumpEditScreen(
   required VehicleProfileRepository repo,
   required String vehicleId,
 }) async {
-  // The edit-vehicle screen has grown tall (#779 baseline + #1529
-  // collapse toggle + service reminders + #815 reset button). The
-  // 800×600 default surface forces dragUntilVisible to scroll the
-  // button on/off-stage as the layout settles, racing pumpAndSettle
-  // and producing offstage taps. A tall surface lets every section
-  // render at once and avoids the race (#1545 root cause).
+  // Tall surface so every section renders at once (#1545 root cause).
   await tester.binding.setSurfaceSize(const Size(1200, 3200));
   addTearDown(() => tester.binding.setSurfaceSize(null));
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
         vehicleProfileRepositoryProvider.overrideWithValue(repo),
-        // The vehicle save-actions widget reads
-        // [fillUpListProvider] (for `latestOdometerKm`) and the
-        // post-save side-effect calls [activeProfileProvider] (for
-        // `syncActiveProfile`). Both production providers reach
-        // Hive boxes the widget-test setUp doesn't initialise.
-        // Stub them so the build + post-save flow succeed without
-        // touching Hive (#1545).
+        // The vehicle save-actions extension reads [fillUpListProvider]
+        // (for `latestOdometerKm`) and the post-save side-effect calls
+        // [activeProfileProvider]. Both reach Hive boxes the widget-test
+        // setUp doesn't initialise — stub them (#1545).
         fillUpListProvider.overrideWith(() => _EmptyFillUpList()),
         activeProfileProvider.overrideWith(() => _NullActiveProfile()),
       ],
@@ -189,19 +172,11 @@ Future<void> _pumpEditScreen(
   await tester.pumpAndSettle();
 }
 
-/// Test stub for [FillUpList] — returns an empty list so the
-/// odometer-lookup helper inside `vehicle_save_actions.dart` resolves
-/// to null without ever touching the production Hive-backed
-/// repository (#1545).
 class _EmptyFillUpList extends FillUpList {
   @override
   List<FillUp> build() => const [];
 }
 
-/// Test stub for [ActiveProfile] — returns null so
-/// `syncActiveProfile` short-circuits without reading the production
-/// `profileRepositoryProvider`, which itself depends on a Hive box
-/// the widget-test setUp doesn't initialise (#1545).
 class _NullActiveProfile extends ActiveProfile {
   @override
   UserProfile? build() => null;

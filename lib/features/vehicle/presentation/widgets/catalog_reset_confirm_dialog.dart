@@ -7,7 +7,7 @@ import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Confirmation dialog for the reset-from-vehicle-database action
-/// (#3651). Mirrors [VeResetConfirmDialog] (#815): the caller decides
+/// (#3651). Mirrors [PumpGainResetConfirmDialog] (#3901): the caller decides
 /// what to do with the returned bool — this widget only asks.
 class CatalogResetConfirmDialog {
   CatalogResetConfirmDialog._();

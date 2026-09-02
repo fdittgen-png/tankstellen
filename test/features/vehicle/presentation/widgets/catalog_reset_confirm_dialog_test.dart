@@ -7,7 +7,7 @@ import 'package:tankstellen/features/vehicle/presentation/widgets/catalog_reset_
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Widget tests for [CatalogResetConfirmDialog] (#3651). Mirrors the
-/// [VeResetConfirmDialog] test surface: rendered copy (including the
+/// [PumpGainResetConfirmDialog] test surface: rendered copy (including the
 /// matched catalog row in the body) and the Future payload per return
 /// path.
 void main() {
