@@ -278,6 +278,12 @@ class _FakeObd2Service implements Obd2Service {
   @override
   int get sessionSuccessfulObdSends => 0;
 
+  /// #3915 — a healthy link answers the adoption round-trip.
+  @override
+  Future<bool> probeLiveness(
+          {Duration timeout = kObd2LivenessProbeTimeout}) async =>
+      _connected;
+
   @override
   Future<Set<int>> discoverSupportedPids() async {
     reprobeCallCount++;

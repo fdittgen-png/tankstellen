@@ -45,6 +45,11 @@ enum RecordingSessionEventKind {
   /// OBD2 re-attached and full recording resumed.
   leftDegraded,
 
+  /// #3915 — the same `Obd2Service` instance was rebound and dropped
+  /// again twice within a minute: the trip refuses it for the rest of
+  /// the session and waits for a different one. Detail = the cycle.
+  adoptionRefused,
+
   /// Both sources gone — the visible pause banner with its grace timer.
   pausedDueToDrop,
 

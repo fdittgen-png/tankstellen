@@ -185,6 +185,9 @@ class _Scanner implements Obd2ReattachSource {
   VoidCallback? onReconnect;
   @override
   set onPassiveWait(VoidCallback? callback) {}
+
+  @override
+  set adoptionGate(Obd2AdoptionGate? gate) {}
   @override
   bool get isPassiveWaiting => false;
   @override

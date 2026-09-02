@@ -323,6 +323,9 @@ class _ObservableScanner implements Obd2ReattachSource {
   VoidCallback? onPassiveWait;
 
   @override
+  Obd2AdoptionGate? adoptionGate;
+
+  @override
   int get currentAttemptNumber => 1;
 
   @override

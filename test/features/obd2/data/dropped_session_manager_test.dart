@@ -825,6 +825,9 @@ class _FakeScanner implements Obd2ReattachSource {
   VoidCallback? onPassiveWait;
 
   @override
+  Obd2AdoptionGate? adoptionGate;
+
+  @override
   Future<void> start() async {
     _scanning = true;
     startCalls++;

@@ -91,10 +91,28 @@ extension Obd2LinkSupervisorActions on Obd2LinkSupervisor {
     // #3756 — read the dying session's traffic BEFORE releasing it: a
     // link that completed real OBD commands is proof the link works,
     // not the zero-traffic corpse-adopt shape the flap counter targets.
-    final trafficked = (_service?.sessionSuccessfulObdSends ?? 0) >=
+    final dead = _service;
+    final trafficked = (dead?.sessionSuccessfulObdSends ?? 0) >=
         ReconnectStandDown.traffickedSendThreshold;
     _service = null;
-    _dropTail(reason, trafficked: trafficked);
+    if (dead == null) {
+      _dropTail(reason, trafficked: trafficked);
+      return;
+    }
+    // #3915 — CLOSE the abandoned instance instead of merely forgetting
+    // it. Nulling the reference left its socket open with the transport
+    // flag still `true`: any consumer holding the same instance (the
+    // trip's poll loop) kept reading "connected" on a link this owner had
+    // already given up — one half of the 2026-09-01 re-adoption livelock.
+    // State leaves `ready` synchronously (no consumer adopts the corpse
+    // meanwhile); the socket closes FIRST (the adapter's single RFCOMM
+    // channel is free before any redial), then the normal drop path runs.
+    if (_mayAutoDial) _setState(Obd2LinkState.reconnecting);
+    unawaited(() async {
+      await _release(dead, 'notifyDrop');
+      if (_disposed) return;
+      _dropTail(reason, trafficked: trafficked);
+    }());
   }
 
   /// #3776 (Epic #3775) — a DELIBERATE death of a supervisor-owned link,
@@ -138,8 +156,31 @@ extension Obd2LinkSupervisorActions on Obd2LinkSupervisor {
       _dropTail('external:$reason-null-service', trafficked: false);
       return;
     }
-    if (svc.isConnected) return;
-    reportServiceDead(svc, reason: reason);
+    if (!svc.isConnected) {
+      reportServiceDead(svc, reason: reason);
+      return;
+    }
+    // #3915 — a connected FLAG is not liveness: the 2026-09-01 field
+    // trip held, in `ready`, an instance whose flag said connected while
+    // every command threw instantly, and this very check waved it
+    // through for 43 minutes. Prove it with one round-trip; a mute
+    // instance is recycled exactly like a dead-flag one.
+    unawaited(_recycleUnlessProbeAnswers(svc, reason));
+  }
+
+  Future<void> _recycleUnlessProbeAnswers(
+      Obd2Service svc, String reason) async {
+    final live = await svc.probeLiveness();
+    if (live || _disposed) return;
+    // Re-check the level: the owner may have moved on while probing.
+    if (!identical(_service, svc) || _state.value != Obd2LinkState.ready) {
+      return;
+    }
+    BreadcrumbCollector.add(
+      'OBD2 link probe failed (#3915)',
+      detail: '$reason — connected flag but no reply, recycling',
+    );
+    reportServiceDead(svc, reason: '$reason-probe');
   }
 
   /// Shared tail of every drop path: stand-down bookkeeping, the #3534
