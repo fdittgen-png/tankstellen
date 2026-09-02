@@ -112,6 +112,13 @@ class TripSummary {
   /// Null on trips recorded before #3887 (≡ 1.0).
   final double? pumpGainApplied;
 
+  /// #3919 — the `FuelRateSourceTag` name that produced the MOST
+  /// fuel-carrying samples (`pid5E` / `maf` / `speedDensity` …), stamped
+  /// at persist time from the per-sample provenance so the summary-only
+  /// history list can badge measured vs estimated fuel. Null on legacy
+  /// trips and trips without a fuel signal.
+  final String? dominantFuelSource;
+
   /// Kind of trajet — whether the recorder collected OBD2 telemetry
   /// alongside GPS, or GPS only (#2025). Trips upgrade in-place from
   /// `gpsOnly` to `gpsPlusObd2` the moment an OBD2 adapter starts
@@ -220,6 +227,7 @@ class TripSummary {
     this.fuelRateSuspect = false,
     this.volumetricEfficiencyUsed,
     this.pumpGainApplied,
+    this.dominantFuelSource,
     this.kind = TripKind.gpsPlusObd2,
     this.harshEvents = const [],
     this.isVirtual = false,
@@ -272,6 +280,7 @@ class TripSummary {
     bool? fuelRateSuspect,
     double? volumetricEfficiencyUsed,
     double? pumpGainApplied,
+    String? dominantFuelSource,
     TripKind? kind,
     List<HarshEvent>? harshEvents,
     bool? isVirtual,
@@ -306,6 +315,7 @@ class TripSummary {
         volumetricEfficiencyUsed:
             volumetricEfficiencyUsed ?? this.volumetricEfficiencyUsed,
         pumpGainApplied: pumpGainApplied ?? this.pumpGainApplied,
+        dominantFuelSource: dominantFuelSource ?? this.dominantFuelSource,
         kind: kind ?? this.kind,
         harshEvents: harshEvents ?? this.harshEvents,
         isVirtual: isVirtual ?? this.isVirtual,

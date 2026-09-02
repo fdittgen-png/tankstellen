@@ -11,6 +11,8 @@ import 'package:tankstellen/features/obd2/domain/trip_live_reading.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/features/trips/presentation/screens/trip_recording_screen.dart';
 import 'package:tankstellen/features/trips/presentation/widgets/minimal_drive_summary.dart';
+import 'package:tankstellen/features/trips/presentation/widgets/recording/recording_metric_grid.dart';
+import 'package:tankstellen/features/trips/presentation/widgets/recording/recording_status_strip.dart';
 import 'package:tankstellen/features/trips/presentation/widgets/trip_radar_card.dart';
 import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
 import 'package:tankstellen/features/trips/providers/wakelock_facade.dart';
@@ -22,9 +24,10 @@ import '../../../../helpers/pump_app.dart';
 import '../../../../helpers/silence_error_logger.dart';
 import '../../../../helpers/recording_profile_override.dart';
 
-/// #2380 — the closest-station radar card leads the active recording
-/// column and the consumption/coaching card (MinimalDriveSummary) is
-/// now the last child, below the metric cards.
+/// #2380 / #3916 — the live recording column is driver-first: the hero
+/// (MinimalDriveSummary: the one live figure + coaching cues) leads, the
+/// OBD2 / GPS status strip sits under it, then the compact metric grid,
+/// and the closest-station radar card closes the column.
 void main() {
   silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -54,8 +57,8 @@ void main() {
   );
 
   testWidgets(
-      'in-radius station price renders at the TOP and the coaching '
-      'card sits BELOW the metric cards', (tester) async {
+      'in-radius station price renders in the radar card BELOW the grid, '
+      'under the hero and the status strip', (tester) async {
     useTallPhone(tester);
     // FR is the default active country; pin it so the expected price
     // string is deterministic regardless of test ordering.
@@ -71,7 +74,7 @@ void main() {
       recordingProfileOverride() as Object,
         // Fake provider override pushing an in-radius approach hit —
         // the radar card renders this station directly (no GPS / search
-        // chain needed) at the top of the column.
+        // chain needed).
         effectiveApproachStateProvider.overrideWithValue(
           const ApproachInRadius(station: station, distanceMeters: 250),
         ),
@@ -88,22 +91,22 @@ void main() {
     expect(find.text('Tankstelle Mitte'), findsOneWidget);
     expect(find.text(expectedPrice), findsOneWidget);
 
-    // The radar card is ABOVE the consumption/coaching card.
+    // #3916 — hero → status strip → grid → radar, top to bottom.
+    final heroTop = tester.getTopLeft(find.byType(MinimalDriveSummary)).dy;
+    final stripTop =
+        tester.getTopLeft(find.byType(RecordingStatusStrip)).dy;
+    final gridTop = tester.getTopLeft(find.byType(RecordingMetricGrid)).dy;
     final radarTop = tester.getTopLeft(find.byType(TripRadarCard)).dy;
-    final coachTop = tester.getTopLeft(find.byType(MinimalDriveSummary)).dy;
-    expect(radarTop, lessThan(coachTop),
-        reason: 'Radar card must lead the column.');
-
-    // The coaching card is BELOW every metric card (distance card is
-    // the first metric — coaching must sit lower than it).
-    final firstMetricTop =
-        tester.getTopLeft(find.byType(Card).first).dy;
-    expect(coachTop, greaterThan(firstMetricTop),
-        reason: 'MinimalDriveSummary must be below the metric cards.');
+    expect(heroTop, lessThan(stripTop),
+        reason: 'The hero must lead the column.');
+    expect(stripTop, lessThan(gridTop),
+        reason: 'The status strip sits directly under the hero.');
+    expect(gridTop, lessThan(radarTop),
+        reason: 'The radar card moves below the trip-figures grid.');
   });
 
   testWidgets(
-      'idle approach + no nearest station → graceful placeholder leads '
+      'idle approach + no nearest station → graceful placeholder closes '
       'the column', (tester) async {
     useTallPhone(tester);
     await pumpApp(
@@ -121,8 +124,9 @@ void main() {
 
     expect(find.text('No station nearby'), findsOneWidget);
     final radarTop = tester.getTopLeft(find.byType(TripRadarCard)).dy;
-    final coachTop = tester.getTopLeft(find.byType(MinimalDriveSummary)).dy;
-    expect(radarTop, lessThan(coachTop));
+    final heroTop = tester.getTopLeft(find.byType(MinimalDriveSummary)).dy;
+    expect(heroTop, lessThan(radarTop),
+        reason: 'The placeholder radar card still closes the column.');
   });
 }
 

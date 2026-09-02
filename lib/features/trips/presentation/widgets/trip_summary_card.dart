@@ -11,10 +11,13 @@ import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../data/trip_history_repository.dart';
+import '../../domain/calibrated_trip_figures.dart';
 import '../../domain/obd2_engine_coverage.dart';
+import '../../domain/trip_fuel_source.dart';
 import '../../domain/trip_recorder.dart';
 import '../../providers/trip_fuel_cost_provider.dart';
 import 'distance_source_badge.dart';
+import 'fuel_source_chip.dart';
 import 'trip_detail_charts.dart';
 
 /// Headline summary card on the trip detail screen (#890).
@@ -70,13 +73,16 @@ class TripSummaryCard extends ConsumerWidget {
     // #3576 — measured wins; a persisted GPS-physics estimate renders
     // `~`-prefixed (the live view's estimate convention); dash only when
     // neither exists.
-    final avgConsumption = s.avgLPer100Km != null
-        ? UnitFormatter.formatConsumption(s.avgLPer100Km!, isEv: isEv)
+    // #3918 — measured litres pass through; estimated litres are
+    // re-expressed at the vehicle's CURRENT pump gain (display only).
+    final figures = CalibratedTripFigures.of(s, vehicle);
+    final avgConsumption = figures.lPer100Km != null
+        ? UnitFormatter.formatConsumption(figures.lPer100Km!, isEv: isEv)
         : s.estimatedAvgLPer100Km != null
             ? '~${UnitFormatter.formatConsumption(s.estimatedAvgLPer100Km!, isEv: isEv)}'
             : unknown;
-    final fuelUsed = s.fuelLitersConsumed != null
-        ? '${UnitFormatter.formatDecimal(s.fuelLitersConsumed!, fractionDigits: 2)} L'
+    final fuelUsed = figures.liters != null
+        ? '${UnitFormatter.formatDecimal(figures.liters!, fractionDigits: 2)} L'
         : s.estimatedFuelLitersConsumed != null
             ? '~${UnitFormatter.formatDecimal(s.estimatedFuelLitersConsumed!, fractionDigits: 2)} L'
             : unknown;
@@ -90,10 +96,43 @@ class TripSummaryCard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              l.trajetDetailSummaryTitle,
-              style: theme.textTheme.titleMedium,
+            // #3919 — header: the fuel-source chip, the gain the shown
+            // figures carry, and the "recalculated after the fill of …"
+            // line when the calibration post-dates the trip.
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    l.trajetDetailSummaryTitle,
+                    style: theme.textTheme.titleMedium,
+                  ),
+                ),
+                if (!isEv) FuelSourceChip(figures: figures),
+              ],
             ),
+            if (!isEv && figures.kind == TripFuelSourceKind.estimated &&
+                figures.calibrated) ...[
+              const SizedBox(height: 4),
+              Text(
+                l.tripDetailGainApplied(_signed(figures.correctionPercent)),
+                key: const Key('tripDetailGainApplied'),
+                style: theme.textTheme.bodySmall
+                    ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              ),
+              if (figures.reExpressed &&
+                  figures.resolution.updatedAt != null)
+                Text(
+                  l.tripDetailRecalculatedAfterFill(
+                    UnitFormatter.formatMediumDate(
+                      figures.resolution.updatedAt!,
+                      locale: Localizations.localeOf(context).toString(),
+                    ),
+                  ),
+                  key: const Key('tripDetailRecalculatedAfterFill'),
+                  style: theme.textTheme.bodySmall
+                      ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                ),
+            ],
             const SizedBox(height: 8),
             _SummaryRow(label: l.trajetDetailFieldDate, value: date),
             _SummaryRow(label: l.trajetDetailFieldVehicle, value: vehicleName),
@@ -236,6 +275,9 @@ class TripSummaryCard extends ConsumerWidget {
     }
     return label;
   }
+
+  /// `+8` / `-22` — the sign is the information.
+  static String _signed(int pct) => pct > 0 ? '+$pct' : '$pct';
 
   static String _fmtDate(DateTime d) {
     final y = d.year.toString();

@@ -111,6 +111,11 @@ mixin _TripRecordingCore on _$TripRecording {
   @visibleForTesting
   bool get debugIsGpsOnlyActive => _pipeline?.isGpsOnly ?? false;
 
+  /// #3916 — production twin of [debugIsGpsOnlyActive] for the recording
+  /// screen's status strip: true while the running trip is the dongle-
+  /// less GPS-only kind (no adapter to report on), false otherwise.
+  bool get isGpsOnlyTripActive => _pipeline?.isGpsOnly ?? false;
+
   /// Snapshot of the vehicle the last [startTrip] call was scoped to.
   /// Exposed so the save-as-fill-up path can figure out which
   /// trajets to auto-link (#888). Null before the first call, or

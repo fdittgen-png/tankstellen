@@ -413,6 +413,12 @@ class _FakeObd2Service implements Obd2Service {
   @override
   Obd2BusProbeResult get busProbe => busProbeValue;
 
+  /// #3915 — a healthy link answers the adoption round-trip.
+  @override
+  Future<bool> probeLiveness(
+          {Duration timeout = kObd2LivenessProbeTimeout}) async =>
+      true;
+
   @override
   Future<Set<int>> discoverSupportedPids() async {
     reprobeCallCount++;

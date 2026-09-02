@@ -3,6 +3,12 @@
 
 part of 'obd2_service.dart';
 
+/// #3915 (Epic #3914) — default bound on one [Obd2Service.probeLiveness]
+/// round-trip. `ATRV` answers from the adapter itself (no bus traffic) in
+/// tens of milliseconds; 1.5 s is generous for a slow clone and still far
+/// below the 8 s post-rebind grace the field livelock burned per cycle.
+const Duration kObd2LivenessProbeTimeout = Duration(milliseconds: 1500);
+
 /// Link-side surface extracted from [Obd2Service] as a `part` mixin so it
 /// keeps private-member access while `obd2_service.dart` stays under the
 /// #1680 file-length cap (sanctioned #3760 decomposition — move-only,
@@ -115,7 +121,50 @@ mixin _Obd2ServiceLink implements Obd2RawCommandPort, Obd2FuelRateReads {
 
   /// `true` when the underlying [Obd2Transport] currently has an open
   /// connection to the vehicle's ELM327 adapter.
+  ///
+  /// #3915 — a FLAG, not liveness: a byte channel whose session was
+  /// cleared by a write-time drop keeps this true while every command
+  /// throws instantly. Anything that ADOPTS a service must prove it with
+  /// [probeLiveness] instead of trusting this getter.
   bool get isConnected => _transport.isConnected;
+
+  Future<bool>? _livenessProbe;
+
+  /// #3915 — prove the link alive with ONE real round-trip: `ATRV`
+  /// through the session ladder, bounded by [timeout]. `true` iff a
+  /// reply arrived; `false` on a dead transport flag, an instant throw
+  /// (the connected-but-mute corpse of the 2026-09-01 field trip) or
+  /// silence past the bound. The probe swallows every fault into
+  /// `false` — it is a verdict, not an I/O surface. Single-flight per
+  /// instance: concurrent callers share the in-flight round-trip so a
+  /// poke storm cannot queue a burst of ATRVs on the half-duplex link.
+  Future<bool> probeLiveness(
+      {Duration timeout = kObd2LivenessProbeTimeout}) {
+    final inFlight = _livenessProbe;
+    if (inFlight != null) return inFlight;
+    final probe = _probeLivenessOnce(timeout)
+        .whenComplete(() => _livenessProbe = null);
+    _livenessProbe = probe;
+    return probe;
+  }
+
+  Future<bool> _probeLivenessOnce(Duration timeout) async {
+    if (!_transport.isConnected) return false;
+    try {
+      await _rawSend(Elm327Commands.readVoltageCommand).timeout(timeout);
+      return true;
+    } catch (e, st) {
+      // An expected link condition (mute socket, adapter asleep) — the
+      // caller's reaction (recycle through the owner) is the visible
+      // outcome; a breadcrumb keeps the field export honest.
+      BreadcrumbCollector.add(
+        'OBD2 liveness probe failed (#3915)',
+        detail: '${e.runtimeType} — connected flag but no reply',
+      );
+      debugPrint('Obd2Service.probeLiveness: $e\n$st');
+      return false;
+    }
+  }
 
   /// Send a raw command to the ELM327 adapter and return the raw
   /// response. Exposed for the [PidScheduler]-based trip recording

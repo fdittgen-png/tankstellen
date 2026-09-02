@@ -87,63 +87,30 @@ mixin _TripRecordingBodySections on _TripRecordingEventHandlers {
       );
     }
 
-    // #2380 — the radar card + five metric cards + coaching card can
-    // exceed a short viewport, so the recording column scrolls rather
-    // than overflowing on small phones / large text scales.
+    // #3916 (Epic #3914) — driver-first column: the hero (the ONE live
+    // consumption figure + speed + coaching cues) leads, the OBD2 / GPS
+    // status strip sits directly under it, then the compact trip-figures
+    // grid (with the consumption card + its fuel-source badge), and the
+    // closest-station radar last. #2380 — the column scrolls rather than
+    // overflowing on small phones / large text scales.
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // #2380 — closest-station radar leads the column; coaching card
-          // moved to the bottom. See [TripRadarCard] for the data sources.
-          const TripRadarCard(),
+          const MinimalDriveSummary(),
           const SizedBox(height: 8),
-          _MetricCard(
-            icon: Icons.route,
-            label: l.tripMetricDistance,
-            value: r == null
-                ? '—'
-                : UnitFormatter.formatDistance(
-                    r.distanceKmSoFar,
-                    fractionDigits: 2,
-                  ),
+          const RecordingStatusStrip(),
+          const SizedBox(height: 8),
+          RecordingMetricGrid(
+            reading: r,
+            brokenMapOverride: brokenMapOverride,
+            unit: ref.watch(consumptionDisplaySettingProvider).unit, // #3883
           ),
-          const SizedBox(height: 8),
-          _MetricCard(
-            icon: Icons.speed,
-            label: l.tripMetricSpeed,
-            value: r?.speedKmh == null
-                ? '—'
-                : '${UnitFormatter.formatDecimal(r!.speedKmh!, fractionDigits: 0)} km/h',
-          ),
-          const SizedBox(height: 8),
-          _MetricCard(
-            icon: Icons.local_gas_station,
-            label: l.tripMetricFuelUsed,
-            // #2391 — measured litres, else the GPS estimator's running
-            // integral with `~` (GPS-only trips no longer show `—` all
-            // drive), else `—`.
-            value: r?.fuelLitersSoFar != null
-                ? '${UnitFormatter.formatDecimal(r!.fuelLitersSoFar!, fractionDigits: 2)} L'
-                : r?.gpsEstimatedFuelLitersSoFar != null
-                ? '~${UnitFormatter.formatDecimal(r!.gpsEstimatedFuelLitersSoFar!, fractionDigits: 2)} L'
-                : '—',
-          ),
-          const SizedBox(height: 8),
-          // #2391 — Avg card: measured (OBD2, no `~`) vs GPS-only estimate
-          // (`~X.X L/100 km` + calibration-maturity badge + info tooltip).
-          TripAvgConsumptionCard(live: r, brokenMapOverride: brokenMapOverride),
           const BrokenMapDisclaimerChip(),
           const SizedBox(height: 8),
-          _MetricCard(
-            icon: Icons.timer,
-            label: l.tripMetricElapsed,
-            value: r == null ? '—' : formatMinutesSeconds(r.elapsed),
-          ),
-          const SizedBox(height: 8),
-          // #2380 — instant L/100 km + coaching symbols; moved from the
-          // top to the bottom so the radar card leads the screen.
-          const MinimalDriveSummary(),
+          // #2380 radar card (price + station + closeness bar), now below
+          // the figures. See [TripRadarCard] for the data sources.
+          const TripRadarCard(),
           // #3432 — live eco-nudge SnackBars (rate-limited in the pure
           // engine; screen-mounted, so structurally foreground-only).
           const EcoNudgeListener(),

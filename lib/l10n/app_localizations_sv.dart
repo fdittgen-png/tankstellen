@@ -1616,16 +1616,10 @@ class AppLocalizationsSv extends AppLocalizations {
   String get obdPickerConnecting => 'Ansluter…';
 
   @override
-  String get tripRecordingTitle => 'Spelar in resa';
-
-  @override
   String get tripSummaryTitle => 'Resesammanfattning';
 
   @override
   String get tripMetricDistance => 'Sträcka';
-
-  @override
-  String get tripMetricSpeed => 'Hastighet';
 
   @override
   String get tripMetricFuelUsed => 'Bränsle använt';
@@ -7888,6 +7882,144 @@ class AppLocalizationsSv extends AppLocalizations {
   String get radiusAlertBlockerLocation => 'Choose a location';
 
   @override
+  String get fillInventoryTitle => 'Fill-up summary';
+
+  @override
+  String fillInventorySubtitleFull(String date, String fuel) {
+    return 'Full tank on $date · $fuel';
+  }
+
+  @override
+  String fillInventorySubtitlePartial(String date, String fuel) {
+    return 'Partial fill on $date · $fuel';
+  }
+
+  @override
+  String fillInventoryKmSinceLastFull(String km) {
+    return '$km km since the last full tank';
+  }
+
+  @override
+  String fillInventoryPumpLiters(String liters) {
+    return '$liters L pumped';
+  }
+
+  @override
+  String fillInventoryPumpConsumption(String value) {
+    return 'Pump consumption: $value';
+  }
+
+  @override
+  String fillInventoryRecordedTrips(int coverage, String value) {
+    return 'Recorded trips: $coverage % of the tank · $value raw';
+  }
+
+  @override
+  String get fillInventoryNoRecordedTrips => 'No recorded trip in this tank';
+
+  @override
+  String fillInventoryTankNow(String liters, String km) {
+    return 'Tank now: $liters L · ≈ $km km at pump consumption';
+  }
+
+  @override
+  String fillInventoryTankNowNoRange(String liters) {
+    return 'Tank now: $liters L';
+  }
+
+  @override
+  String fillInventoryCalibrationApplied(
+    String before,
+    String after,
+    String percent,
+  ) {
+    return 'Pump calibration: ×$before → ×$after ($percent %)';
+  }
+
+  @override
+  String fillInventoryCalibrationSkipped(String reason) {
+    return 'Pump calibration: skipped — $reason';
+  }
+
+  @override
+  String get fillInventorySkipNotFullTank =>
+      'partial fill (the tank window stays open)';
+
+  @override
+  String get fillInventorySkipCorrection =>
+      'correction entry, not a pumped fill';
+
+  @override
+  String get fillInventorySkipNoVehicle => 'no vehicle on this fill';
+
+  @override
+  String get fillInventorySkipNoWindow =>
+      'first full tank (no window closed yet)';
+
+  @override
+  String fillInventorySkipCoverageTooLow(int coverage) {
+    return 'recorded trips cover $coverage % of the tank (60 % needed)';
+  }
+
+  @override
+  String fillInventorySkipRecordedTooShort(String km) {
+    return 'only $km recorded km (40 km needed)';
+  }
+
+  @override
+  String get fillInventorySkipNoRecordedFuel =>
+      'the recorded trips carry no fuel figure';
+
+  @override
+  String get fillInventorySkipImplausible =>
+      'pump and recordings disagree too much — check the receipt';
+
+  @override
+  String get fillInventoryDismiss => 'Got it';
+
+  @override
+  String tankReportResidualAfterCalibration(String percent) {
+    return 'Gap after calibration: $percent %';
+  }
+
+  @override
+  String get tripFuelSourceMeasured => 'Measured';
+
+  @override
+  String get tripFuelSourceEstimatedCalibrated => 'Estimated · calibrated';
+
+  @override
+  String get tripFuelSourceEstimated => 'Estimated';
+
+  @override
+  String get tripFuelSourceGps => 'GPS';
+
+  @override
+  String get tripFuelSourceMeasuredTooltip =>
+      'Fuel rate reported by the engine (PID 5E / 9D / A2) — never rescaled';
+
+  @override
+  String get tripFuelSourceEstimatedTooltip =>
+      'Fuel estimated from air mass — rescaled by the pump calibration';
+
+  @override
+  String get tripFuelSourceGpsTooltip =>
+      'GPS-physics estimate — no engine data';
+
+  @override
+  String get tripFuelSourceRecalculated => 'recalculated';
+
+  @override
+  String tripDetailGainApplied(String percent) {
+    return 'Pump gain applied: $percent %';
+  }
+
+  @override
+  String tripDetailRecalculatedAfterFill(String date) {
+    return 'Recalculated after the fill-up of $date';
+  }
+
+  @override
   String get fillUpOdometerFromLastFillUp =>
       'Pre-filled from your last fill-up';
 
@@ -8096,6 +8228,118 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get privacyDeleteAllMyData => 'Delete all my data';
+
+  @override
+  String get tripRecordingScreenTitle => 'Trip in progress';
+
+  @override
+  String get recordingObd2ChipLive => 'Live';
+
+  @override
+  String recordingObd2ChipLiveRate(int rate) {
+    return 'Live · $rate PID/s';
+  }
+
+  @override
+  String get recordingObd2ChipReconnecting => 'Reconnecting…';
+
+  @override
+  String recordingObd2ChipReconnectingAttempt(int attempt) {
+    return 'Reconnecting… (try $attempt)';
+  }
+
+  @override
+  String get recordingObd2ChipGpsOnly => 'GPS only';
+
+  @override
+  String get recordingObd2ChipEngineOff => 'Engine off — waiting';
+
+  @override
+  String get recordingObd2ChipNoAdapter => 'No adapter';
+
+  @override
+  String get recordingObd2SheetTitle => 'OBD2 link';
+
+  @override
+  String get recordingObd2SheetLive =>
+      'The adapter is delivering engine data, so consumption is measured from the car. Nothing to do — keep driving.';
+
+  @override
+  String get recordingObd2SheetReconnecting =>
+      'The Bluetooth link is being re-established; meanwhile the recording continues on GPS. No action needed — a reset only helps if it stays like this for minutes.';
+
+  @override
+  String get recordingObd2SheetGpsOnly =>
+      'The adapter has not answered for a while, so the app waits for it to reappear and records on GPS. Consumption is estimated until it is back.';
+
+  @override
+  String get recordingObd2SheetEngineOff =>
+      'The engine is off, so there is nothing to read. The recording continues on GPS and picks the adapter up again as soon as the engine runs.';
+
+  @override
+  String get recordingObd2SheetNoAdapter =>
+      'This trip is recorded without an OBD2 adapter. Speed and distance come from GPS; consumption is a physics estimate calibrated by your fill-ups.';
+
+  @override
+  String recordingGpsChipPrecise(int meters) {
+    return 'Precise fix (±$meters m)';
+  }
+
+  @override
+  String recordingGpsChipApprox(int meters) {
+    return 'Approximate fix (±$meters m)';
+  }
+
+  @override
+  String get recordingGpsChipNoFix => 'No fix';
+
+  @override
+  String get recordingGpsChipFixUnknownAccuracy => 'Fix (accuracy unknown)';
+
+  @override
+  String recordingGpsChipWithCoverage(String fix, int percent) {
+    return '$fix · $percent %';
+  }
+
+  @override
+  String get recordingGpsSheetTitle => 'GPS signal';
+
+  @override
+  String get recordingGpsSheetPrecise =>
+      'The position is accurate to a few metres, so distance and the trace are reliable.';
+
+  @override
+  String get recordingGpsSheetApprox =>
+      'The position is only accurate to tens of metres — typical in cities, tunnels or under trees. Distance may drift slightly until the fix improves.';
+
+  @override
+  String get recordingGpsSheetNoFix =>
+      'No position has arrived recently. Check that location is allowed and the phone can see the sky; the recording resumes with the next fix.';
+
+  @override
+  String recordingGpsSheetCoverage(int percent) {
+    return 'Coverage so far: $percent % of the seconds had a fix.';
+  }
+
+  @override
+  String get recordingSheetClose => 'Got it';
+
+  @override
+  String get fuelSourceMeasured => 'Measured (ECU fuel flow)';
+
+  @override
+  String fuelSourceEstimatedCalibrated(int percent) {
+    return 'Estimated · pump-calibrated ±$percent %';
+  }
+
+  @override
+  String get fuelSourceEstimatedUncalibrated => 'Estimated · not calibrated';
+
+  @override
+  String get fuelSourceGpsEstimate => 'GPS estimate';
+
+  @override
+  String get recordingTileScore => 'Driving score';
 
   @override
   String stationStatusWithFreshness(String status, String ago) {

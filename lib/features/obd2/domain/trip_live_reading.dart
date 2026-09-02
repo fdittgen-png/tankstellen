@@ -3,6 +3,8 @@
 
 import 'package:flutter/foundation.dart';
 
+import 'fuel_mixture_model.dart';
+
 /// Live read-out from the currently-recording trip (#726).
 ///
 /// Emitted on every debounced tick so the recording screen can show the
@@ -190,6 +192,21 @@ class TripLiveReading {
   /// The configured window length the figures integrate over.
   final int? windowSeconds;
 
+  // --- #3916 (epic #3914) — live provenance for the recording screen --
+
+  /// Which branch produced this tick's [fuelRateLPerHour] (#3916): a
+  /// measured ECU PID (0x9D / 0xA2 / 0x5E) or an estimate (MAF /
+  /// speed-density). The same vocabulary the persisted `TripSample`
+  /// carries as `fuelSource`; stamped only alongside an actual rate, so
+  /// it is null on GPS-only readings and before the first fuel tick.
+  final FuelRateSourceTag? fuelSource;
+
+  /// The scheduler's achieved OBD2 read rate over its rolling window,
+  /// in PID reads per second (#3916). Null on GPS-only readings and on
+  /// readings built by paths without a scheduler (degraded emitter,
+  /// tests).
+  final double? obd2ReadsPerSecond;
+
   const TripLiveReading({
     this.speedKmh,
     this.rpm,
@@ -226,6 +243,8 @@ class TripLiveReading {
     this.windowLPerHour,
     this.windowIsIdle,
     this.windowSeconds,
+    this.fuelSource,
+    this.obd2ReadsPerSecond,
   });
 
   /// Overlay one or more fields onto a copy of this reading (#2506).
@@ -273,6 +292,8 @@ class TripLiveReading {
     double? windowLPerHour,
     bool? windowIsIdle,
     int? windowSeconds,
+    FuelRateSourceTag? fuelSource,
+    double? obd2ReadsPerSecond,
   }) {
     return TripLiveReading(
       speedKmh: speedKmh ?? this.speedKmh,
@@ -312,6 +333,8 @@ class TripLiveReading {
       windowLPerHour: windowLPerHour ?? this.windowLPerHour,
       windowIsIdle: windowIsIdle ?? this.windowIsIdle,
       windowSeconds: windowSeconds ?? this.windowSeconds,
+      fuelSource: fuelSource ?? this.fuelSource,
+      obd2ReadsPerSecond: obd2ReadsPerSecond ?? this.obd2ReadsPerSecond,
     );
   }
 
@@ -325,5 +348,26 @@ class TripLiveReading {
   double? get liveAvgLPer100Km {
     if (fuelLitersSoFar == null || distanceKmSoFar < 0.01) return null;
     return fuelLitersSoFar! / distanceKmSoFar * 100.0;
+  }
+
+  /// #3916 — true when this tick's fuel rate is a MEASURED ECU figure
+  /// (PID 0x9D / 0xA2 / 0x5E), false when it is derived from air mass
+  /// (MAF / speed-density — the branches the pump gain calibrates,
+  /// #3886), null when no fuel-rate provenance exists (GPS-only reading,
+  /// or the source was never stamped).
+  bool? get fuelRateIsMeasured {
+    switch (fuelSource) {
+      case FuelRateSourceTag.pid9D:
+      case FuelRateSourceTag.pidA2:
+      case FuelRateSourceTag.pid5E:
+        return true;
+      case FuelRateSourceTag.maf66:
+      case FuelRateSourceTag.maf:
+      case FuelRateSourceTag.speedDensity:
+        return false;
+      case FuelRateSourceTag.none:
+      case null:
+        return null;
+    }
   }
 }

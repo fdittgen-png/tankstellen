@@ -1625,16 +1625,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get obdPickerConnecting => 'Verbinden…';
 
   @override
-  String get tripRecordingTitle => 'Fahrt wird aufgezeichnet';
-
-  @override
   String get tripSummaryTitle => 'Fahrtzusammenfassung';
 
   @override
   String get tripMetricDistance => 'Strecke';
-
-  @override
-  String get tripMetricSpeed => 'Geschwindigkeit';
 
   @override
   String get tripMetricFuelUsed => 'Verbraucht';
@@ -7940,6 +7934,145 @@ class AppLocalizationsDe extends AppLocalizations {
   String get radiusAlertBlockerLocation => 'Wählen Sie einen Standort';
 
   @override
+  String get fillInventoryTitle => 'Tankbilanz';
+
+  @override
+  String fillInventorySubtitleFull(String date, String fuel) {
+    return 'Volltanken am $date · $fuel';
+  }
+
+  @override
+  String fillInventorySubtitlePartial(String date, String fuel) {
+    return 'Teilbetankung am $date · $fuel';
+  }
+
+  @override
+  String fillInventoryKmSinceLastFull(String km) {
+    return '$km km seit dem letzten Volltanken';
+  }
+
+  @override
+  String fillInventoryPumpLiters(String liters) {
+    return '$liters L getankt';
+  }
+
+  @override
+  String fillInventoryPumpConsumption(String value) {
+    return 'Verbrauch laut Zapfsäule: $value';
+  }
+
+  @override
+  String fillInventoryRecordedTrips(int coverage, String value) {
+    return 'Aufgezeichnete Fahrten: $coverage % des Tanks · $value roh';
+  }
+
+  @override
+  String get fillInventoryNoRecordedTrips =>
+      'Keine aufgezeichnete Fahrt in dieser Tankfüllung';
+
+  @override
+  String fillInventoryTankNow(String liters, String km) {
+    return 'Tank jetzt: $liters L · ≈ $km km beim Zapfsäulen-Verbrauch';
+  }
+
+  @override
+  String fillInventoryTankNowNoRange(String liters) {
+    return 'Tank jetzt: $liters L';
+  }
+
+  @override
+  String fillInventoryCalibrationApplied(
+    String before,
+    String after,
+    String percent,
+  ) {
+    return 'Zapfsäulen-Kalibrierung: ×$before → ×$after ($percent %)';
+  }
+
+  @override
+  String fillInventoryCalibrationSkipped(String reason) {
+    return 'Zapfsäulen-Kalibrierung: übersprungen — $reason';
+  }
+
+  @override
+  String get fillInventorySkipNotFullTank =>
+      'Teilbetankung (das Tankfenster bleibt offen)';
+
+  @override
+  String get fillInventorySkipCorrection =>
+      'Korrektureintrag, keine echte Betankung';
+
+  @override
+  String get fillInventorySkipNoVehicle => 'kein Fahrzeug bei dieser Betankung';
+
+  @override
+  String get fillInventorySkipNoWindow =>
+      'erstes Volltanken (noch kein Fenster geschlossen)';
+
+  @override
+  String fillInventorySkipCoverageTooLow(int coverage) {
+    return 'aufgezeichnete Fahrten decken $coverage % des Tanks ab (60 % nötig)';
+  }
+
+  @override
+  String fillInventorySkipRecordedTooShort(String km) {
+    return 'nur $km aufgezeichnete km (40 km nötig)';
+  }
+
+  @override
+  String get fillInventorySkipNoRecordedFuel =>
+      'die aufgezeichneten Fahrten tragen keinen Kraftstoffwert';
+
+  @override
+  String get fillInventorySkipImplausible =>
+      'Zapfsäule und Aufzeichnungen weichen zu stark ab — Beleg prüfen';
+
+  @override
+  String get fillInventoryDismiss => 'Verstanden';
+
+  @override
+  String tankReportResidualAfterCalibration(String percent) {
+    return 'Abweichung nach Kalibrierung: $percent %';
+  }
+
+  @override
+  String get tripFuelSourceMeasured => 'Gemessen';
+
+  @override
+  String get tripFuelSourceEstimatedCalibrated => 'Geschätzt · kalibriert';
+
+  @override
+  String get tripFuelSourceEstimated => 'Geschätzt';
+
+  @override
+  String get tripFuelSourceGps => 'GPS';
+
+  @override
+  String get tripFuelSourceMeasuredTooltip =>
+      'Vom Motor gemeldeter Kraftstoffdurchfluss (PID 5E / 9D / A2) — nie umskaliert';
+
+  @override
+  String get tripFuelSourceEstimatedTooltip =>
+      'Kraftstoff aus der Luftmasse geschätzt — mit der Zapfsäulen-Kalibrierung umskaliert';
+
+  @override
+  String get tripFuelSourceGpsTooltip =>
+      'GPS-Physik-Schätzung — keine Motordaten';
+
+  @override
+  String get tripFuelSourceRecalculated => 'neu berechnet';
+
+  @override
+  String tripDetailGainApplied(String percent) {
+    return 'Angewandte Zapfsäulen-Korrektur: $percent %';
+  }
+
+  @override
+  String tripDetailRecalculatedAfterFill(String date) {
+    return 'Neu berechnet nach der Betankung vom $date';
+  }
+
+  @override
   String get fillUpOdometerFromLastFillUp =>
       'Aus Ihrer letzten Tankfüllung vorausgefüllt';
 
@@ -8153,6 +8286,119 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacyDeleteAllMyData => 'Alle meine Daten löschen';
+
+  @override
+  String get tripRecordingScreenTitle => 'Fahrt läuft';
+
+  @override
+  String get recordingObd2ChipLive => 'Live';
+
+  @override
+  String recordingObd2ChipLiveRate(int rate) {
+    return 'Live · $rate PID/s';
+  }
+
+  @override
+  String get recordingObd2ChipReconnecting => 'Verbindet erneut…';
+
+  @override
+  String recordingObd2ChipReconnectingAttempt(int attempt) {
+    return 'Verbindet erneut… (Versuch $attempt)';
+  }
+
+  @override
+  String get recordingObd2ChipGpsOnly => 'Nur GPS';
+
+  @override
+  String get recordingObd2ChipEngineOff => 'Motor aus — warte';
+
+  @override
+  String get recordingObd2ChipNoAdapter => 'Kein Adapter';
+
+  @override
+  String get recordingObd2SheetTitle => 'OBD2-Verbindung';
+
+  @override
+  String get recordingObd2SheetLive =>
+      'Der Adapter liefert Motordaten, der Verbrauch wird also im Fahrzeug gemessen. Nichts zu tun — einfach weiterfahren.';
+
+  @override
+  String get recordingObd2SheetReconnecting =>
+      'Die Bluetooth-Verbindung wird gerade wiederhergestellt; die Aufzeichnung läuft derweil per GPS weiter. Keine Aktion nötig — ein Zurücksetzen hilft nur, wenn es minutenlang so bleibt.';
+
+  @override
+  String get recordingObd2SheetGpsOnly =>
+      'Der Adapter antwortet seit einer Weile nicht, deshalb wartet die App auf ihn und zeichnet per GPS auf. Der Verbrauch wird geschätzt, bis er zurück ist.';
+
+  @override
+  String get recordingObd2SheetEngineOff =>
+      'Der Motor ist aus, es gibt also nichts zu lesen. Die Aufzeichnung läuft per GPS weiter und holt den Adapter zurück, sobald der Motor läuft.';
+
+  @override
+  String get recordingObd2SheetNoAdapter =>
+      'Diese Fahrt wird ohne OBD2-Adapter aufgezeichnet. Geschwindigkeit und Strecke kommen vom GPS; der Verbrauch ist eine physikalische Schätzung, kalibriert über deine Tankfüllungen.';
+
+  @override
+  String recordingGpsChipPrecise(int meters) {
+    return 'Genauer Fix (±$meters m)';
+  }
+
+  @override
+  String recordingGpsChipApprox(int meters) {
+    return 'Ungefährer Fix (±$meters m)';
+  }
+
+  @override
+  String get recordingGpsChipNoFix => 'Kein Fix';
+
+  @override
+  String get recordingGpsChipFixUnknownAccuracy =>
+      'Fix (Genauigkeit unbekannt)';
+
+  @override
+  String recordingGpsChipWithCoverage(String fix, int percent) {
+    return '$fix · $percent %';
+  }
+
+  @override
+  String get recordingGpsSheetTitle => 'GPS-Signal';
+
+  @override
+  String get recordingGpsSheetPrecise =>
+      'Die Position ist auf wenige Meter genau, Strecke und Spur sind also verlässlich.';
+
+  @override
+  String get recordingGpsSheetApprox =>
+      'Die Position ist nur auf einige Dutzend Meter genau — typisch in Städten, Tunneln oder unter Bäumen. Die Strecke kann leicht abweichen, bis der Fix besser wird.';
+
+  @override
+  String get recordingGpsSheetNoFix =>
+      'Seit Kurzem kommt keine Position mehr an. Prüfe, ob der Standort erlaubt ist und das Telefon freien Himmel sieht; die Aufzeichnung läuft mit dem nächsten Fix weiter.';
+
+  @override
+  String recordingGpsSheetCoverage(int percent) {
+    return 'Abdeckung bisher: $percent % der Sekunden hatten einen Fix.';
+  }
+
+  @override
+  String get recordingSheetClose => 'Verstanden';
+
+  @override
+  String get fuelSourceMeasured => 'Gemessen (ECU-Kraftstofffluss)';
+
+  @override
+  String fuelSourceEstimatedCalibrated(int percent) {
+    return 'Geschätzt · pumpenkalibriert ±$percent %';
+  }
+
+  @override
+  String get fuelSourceEstimatedUncalibrated => 'Geschätzt · nicht kalibriert';
+
+  @override
+  String get fuelSourceGpsEstimate => 'GPS-Schätzung';
+
+  @override
+  String get recordingTileScore => 'Fahrstil';
 
   @override
   String stationStatusWithFreshness(String status, String ago) {

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../../../vehicle/domain/entities/reference_vehicle.dart';
+import '../../../../core/domain/pump_gain_resolution.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../protocol/elm327_protocol.dart';
 import '../../domain/fuel_mixture_model.dart';

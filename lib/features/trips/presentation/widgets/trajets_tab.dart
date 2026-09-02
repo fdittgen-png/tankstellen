@@ -93,7 +93,9 @@ class TrajetsTab extends ConsumerWidget {
     // monthly-insights summary. Aggregator is pure + cheap; running
     // it on every rebuild keeps the card in lock-step with the
     // visible trip list.
-    final monthlySummary = aggregateMonthlyInsights(filtered, DateTime.now());
+    // #3918 — litres re-expressed at the active vehicle's current gain.
+    final monthlySummary = aggregateMonthlyInsights(filtered, DateTime.now(),
+        vehicle: activeVehicle);
     // #2494 — bottom padding clears the floating record FAB hosted by
     // PageScaffold. The Scaffold lifts the FAB clear of the system inset,
     // so we must NOT add `viewPadding.bottom` on top (the old hand-rolled

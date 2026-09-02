@@ -201,6 +201,25 @@ class RecordingStartCoordinator {
         notifier.cancelConnecting();
         return;
       }
+      // #3915 (Epic #3914) — a REUSED supervised link is adopted only
+      // after a real round-trip. `isConnected` is a transport flag: the
+      // 2026-09-01 field trip started on an owner-held instance whose
+      // flag said connected while every command threw instantly, and
+      // recorded 43 minutes with zero engine data. A mute link gets ONE
+      // fresh dial through the owner's single flight (the #3571 rung's
+      // shape: `connect` recycles the held corpse before dialing); a
+      // link that answers proceeds untouched.
+      if (sup != null && identical(sup.service, service)) {
+        final live = await service.probeLiveness();
+        if (!live) {
+          BreadcrumbCollector.add(
+            'OBD2 start: reused link failed the liveness probe — '
+            'fresh dial (#3915)',
+          );
+          final fresh = await sup.connect();
+          if (fresh != null) service = fresh;
+        }
+      }
       // #2892 — the ELM chip can connect cleanly (every AT OK) while the
       // vehicle bus is silent (ignition off / ECU asleep): ATDPN→NO DATA
       // caches no protocol and 0100→NO DATA leaves zero supported PIDs, yet

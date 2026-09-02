@@ -1,0 +1,151 @@
+{
+  "fillInventoryTitle": "Bilan du plein",
+  "@fillInventoryTitle": {
+    "description": "#3917 — title of the post-fill inventory sheet / card (French: 'Bilan du plein')."
+  },
+  "fillInventorySubtitleFull": "Plein complet du {date} · {fuel}",
+  "@fillInventorySubtitleFull": {
+    "placeholders": {
+      "date": {"type": "String", "example": "1 sept. 2026"},
+      "fuel": {"type": "String", "example": "E85"}
+    },
+    "description": "#3917 — subtitle under the inventory title for a full tank."
+  },
+  "fillInventorySubtitlePartial": "Plein partiel du {date} · {fuel}",
+  "@fillInventorySubtitlePartial": {
+    "placeholders": {
+      "date": {"type": "String", "example": "1 sept. 2026"},
+      "fuel": {"type": "String", "example": "E10"}
+    },
+    "description": "#3917 — subtitle under the inventory title for a partial fill."
+  },
+  "fillInventoryKmSinceLastFull": "{km} km depuis le dernier plein complet",
+  "@fillInventoryKmSinceLastFull": {
+    "placeholders": {
+      "km": {"type": "String", "example": "559"}
+    },
+    "description": "#3917 — odometer distance of the closed tank window."
+  },
+  "fillInventoryPumpLiters": "{liters} L à la pompe",
+  "@fillInventoryPumpLiters": {
+    "placeholders": {
+      "liters": {"type": "String", "example": "35,7"}
+    },
+    "description": "#3917 — litres pumped over the tank window."
+  },
+  "fillInventoryPumpConsumption": "Consommation à la pompe : {value}",
+  "@fillInventoryPumpConsumption": {
+    "placeholders": {
+      "value": {"type": "String", "example": "6,4 L/100 km"}
+    },
+    "description": "#3917 — the tank's true consumption, already unit-formatted."
+  },
+  "fillInventoryRecordedTrips": "Trajets enregistrés : {coverage} % du plein · {value} brut",
+  "@fillInventoryRecordedTrips": {
+    "placeholders": {
+      "coverage": {"type": "int", "example": "81"},
+      "value": {"type": "String", "example": "10,5 L/100 km"}
+    },
+    "description": "#3917 — recorded-trip coverage of the window and their raw (uncalibrated) consumption, unit-formatted."
+  },
+  "fillInventoryNoRecordedTrips": "Aucun trajet enregistré sur ce plein",
+  "@fillInventoryNoRecordedTrips": {
+    "description": "#3917 — the closed window contains no OBD2 recording."
+  },
+  "fillInventoryTankNow": "Réservoir maintenant : {liters} L · ≈ {km} km à la conso pompe",
+  "@fillInventoryTankNow": {
+    "placeholders": {
+      "liters": {"type": "String", "example": "35,0"},
+      "km": {"type": "String", "example": "547"}
+    },
+    "description": "#3917 — current tank content and the range it buys at the window's pump consumption."
+  },
+  "fillInventoryTankNowNoRange": "Réservoir maintenant : {liters} L",
+  "@fillInventoryTankNowNoRange": {
+    "placeholders": {
+      "liters": {"type": "String", "example": "35,0"}
+    },
+    "description": "#3917 — current tank content when no range can be computed."
+  },
+  "fillInventoryCalibrationApplied": "Calibrage à la pompe : ×{before} → ×{after} ({percent} %)",
+  "@fillInventoryCalibrationApplied": {
+    "placeholders": {
+      "before": {"type": "String", "example": "0,93"},
+      "after": {"type": "String", "example": "0,72"},
+      "percent": {"type": "String", "example": "-22"}
+    },
+    "description": "#3917 — the gain before and after this fill's calibration; {percent} is the signed change of the estimates."
+  },
+  "fillInventoryCalibrationSkipped": "Calibrage à la pompe : ignoré — {reason}",
+  "@fillInventoryCalibrationSkipped": {
+    "placeholders": {
+      "reason": {"type": "String", "example": "premier plein complet (aucune fenêtre fermée)"}
+    },
+    "description": "#3917 — the fill did not calibrate; {reason} is one of the fillInventorySkip* strings."
+  },
+  "fillInventorySkipNotFullTank": "plein partiel (la fenêtre reste ouverte)",
+  "@fillInventorySkipNotFullTank": {"description": "#3917 — skip reason."},
+  "fillInventorySkipCorrection": "entrée de correction, pas un plein réel",
+  "@fillInventorySkipCorrection": {"description": "#3917 — skip reason."},
+  "fillInventorySkipNoVehicle": "aucun véhicule sur ce plein",
+  "@fillInventorySkipNoVehicle": {"description": "#3917 — skip reason."},
+  "fillInventorySkipNoWindow": "premier plein complet (aucune fenêtre fermée)",
+  "@fillInventorySkipNoWindow": {"description": "#3917 — skip reason."},
+  "fillInventorySkipCoverageTooLow": "les trajets enregistrés couvrent {coverage} % du plein (60 % requis)",
+  "@fillInventorySkipCoverageTooLow": {
+    "placeholders": {
+      "coverage": {"type": "int", "example": "42"}
+    },
+    "description": "#3917 — skip reason: recording coverage below the calibration bar."
+  },
+  "fillInventorySkipRecordedTooShort": "seulement {km} km enregistrés (40 km requis)",
+  "@fillInventorySkipRecordedTooShort": {
+    "placeholders": {
+      "km": {"type": "String", "example": "18"}
+    },
+    "description": "#3917 — skip reason: too little recorded distance."
+  },
+  "fillInventorySkipNoRecordedFuel": "les trajets enregistrés n’ont aucune donnée carburant",
+  "@fillInventorySkipNoRecordedFuel": {"description": "#3917 — skip reason."},
+  "fillInventorySkipImplausible": "pompe et enregistrements trop éloignés — vérifiez le ticket",
+  "@fillInventorySkipImplausible": {"description": "#3917 — skip reason: implausible pump/recorded ratio."},
+  "fillInventoryDismiss": "Compris",
+  "@fillInventoryDismiss": {"description": "#3917 — dismiss button of the inventory sheet."},
+  "tankReportResidualAfterCalibration": "Écart après calibrage : {percent} %",
+  "@tankReportResidualAfterCalibration": {
+    "placeholders": {
+      "percent": {"type": "String", "example": "-3"}
+    },
+    "description": "#3918 — tank report: signed residual between the re-expressed recordings and the pump after the current calibration."
+  },
+  "tripFuelSourceMeasured": "Mesuré",
+  "@tripFuelSourceMeasured": {"description": "#3919 — trip fuel-source chip: fuel rate reported by the ECU."},
+  "tripFuelSourceEstimatedCalibrated": "Estimé · calibré",
+  "@tripFuelSourceEstimatedCalibrated": {"description": "#3919 — trip fuel-source chip: estimated branch with a pump gain applied."},
+  "tripFuelSourceEstimated": "Estimé",
+  "@tripFuelSourceEstimated": {"description": "#3919 — trip fuel-source chip: estimated branch, no pump calibration yet."},
+  "tripFuelSourceGps": "GPS",
+  "@tripFuelSourceGps": {"description": "#3919 — trip fuel-source chip: GPS-physics estimate, no engine data."},
+  "tripFuelSourceMeasuredTooltip": "Débit carburant rapporté par le moteur (PID 5E / 9D / A2) — jamais recalé",
+  "@tripFuelSourceMeasuredTooltip": {"description": "#3919 — tooltip of the Measured chip."},
+  "tripFuelSourceEstimatedTooltip": "Carburant estimé d’après la masse d’air — recalé par le calibrage à la pompe",
+  "@tripFuelSourceEstimatedTooltip": {"description": "#3919 — tooltip of the Estimated chips."},
+  "tripFuelSourceGpsTooltip": "Estimation physique GPS — aucune donnée moteur",
+  "@tripFuelSourceGpsTooltip": {"description": "#3919 — tooltip of the GPS chip."},
+  "tripFuelSourceRecalculated": "recalculé",
+  "@tripFuelSourceRecalculated": {"description": "#3919 — suffix in the chip tooltip when the figure was re-expressed with the current pump calibration."},
+  "tripDetailGainApplied": "Gain appliqué : {percent} %",
+  "@tripDetailGainApplied": {
+    "placeholders": {
+      "percent": {"type": "String", "example": "-22"}
+    },
+    "description": "#3919 — trip detail header: the signed pump-gain correction the shown fuel figures carry."
+  },
+  "tripDetailRecalculatedAfterFill": "Recalculé après le plein du {date}",
+  "@tripDetailRecalculatedAfterFill": {
+    "placeholders": {
+      "date": {"type": "String", "example": "1 sept. 2026"}
+    },
+    "description": "#3919 — trip detail header: the shown figures were re-expressed with a calibration learned after the trip."
+  }
+}

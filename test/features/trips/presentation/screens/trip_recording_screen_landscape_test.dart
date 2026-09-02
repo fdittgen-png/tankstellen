@@ -11,6 +11,8 @@ import 'package:tankstellen/features/obd2/domain/trip_live_reading.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/features/trips/presentation/screens/trip_recording_screen.dart';
 import 'package:tankstellen/features/trips/presentation/widgets/minimal_drive_summary.dart';
+import 'package:tankstellen/features/trips/presentation/widgets/recording/recording_metric_grid.dart';
+import 'package:tankstellen/features/trips/presentation/widgets/recording/recording_status_strip.dart';
 import 'package:tankstellen/features/trips/presentation/widgets/trip_radar_card.dart';
 import 'package:tankstellen/features/trips/presentation/widgets/trip_recording_landscape_body.dart';
 import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
@@ -24,12 +26,12 @@ import '../../../../helpers/pump_app.dart';
 import '../../../../helpers/recording_profile_override.dart';
 import '../../../../helpers/silence_error_logger.dart';
 
-/// #2903 — the LANDSCAPE recording layout is a dedicated glanceable,
-/// zero-touch split distinct from portrait: live feedback (instant
-/// consumption + eco-coaching cues + speed) on the LEFT, trip + radar
-/// (Fuel Station Radar on top, then a 2×2 Distance/Avg/Elapsed/Fuel
-/// grid) on the RIGHT. Every key metric is visible at once with NO
-/// scrolling. Portrait stays the scrolling vertical list.
+/// #2903 / #3916 — the LANDSCAPE recording layout is a dedicated
+/// glanceable, zero-touch split distinct from portrait, mirroring the
+/// portrait hierarchy: the hero (the one live figure + speed + coaching
+/// cues) with the OBD2 / GPS status strip and the radar on the LEFT, the
+/// compact trip-figures grid on the RIGHT. Every key metric is visible at
+/// once with NO scrolling. Portrait stays the scrolling vertical list.
 ///
 /// The layout body ([TripRecordingLandscapeBody]) is tested directly in
 /// a phone-landscape-sized box so the assertion isolates the new layout
@@ -81,7 +83,10 @@ void main() {
   }) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: bodyOverrides().cast(),
+        overrides: [
+          tripRecordingProvider.overrideWith(_LiveFakeTripRecording.new),
+          ...bodyOverrides(),
+        ].cast(),
         child: MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
@@ -110,48 +115,59 @@ void main() {
   }
 
   testWidgets(
-      'landscape body shows instant-consumption + speed on the left and '
-      'radar + distance/avg/elapsed/fuel on the right, with NO overflow',
-      (tester) async {
+      'landscape body shows the hero + status strip + radar on the left and '
+      'the metric grid on the right, with NO overflow', (tester) async {
     await pumpLandscapeBody(tester);
 
-    // LEFT zone — live driving feedback.
+    // LEFT zone — live driving feedback: the hero with its figure + speed.
     expect(find.byType(MinimalDriveSummary), findsOneWidget);
     expect(
         find.byKey(const Key('minimal_drive_instant_value')), findsOneWidget);
-    expect(find.byKey(const Key('landscapeSpeedTile')), findsOneWidget);
-    expect(find.text('Speed'), findsOneWidget);
-
-    // RIGHT zone — radar on top.
+    expect(find.byKey(const Key('recording_hero_speed')), findsOneWidget);
+    expect(find.text('88'), findsOneWidget);
+    // The status strip directly under the hero, then the radar.
+    expect(find.byKey(const Key('recordingObd2StatusChip')), findsOneWidget);
+    expect(find.byKey(const Key('recordingGpsStatusChip')), findsOneWidget);
     expect(find.byType(TripRadarCard), findsOneWidget);
     expect(find.text('Fuel Station Radar'), findsOneWidget);
 
-    // 2×2 grid — Distance / Avg / Elapsed / Fuel used all present.
-    expect(find.byKey(const Key('landscapeDistanceTile')), findsOneWidget);
-    expect(find.byKey(const Key('landscapeAvgTile')), findsOneWidget);
-    expect(find.byKey(const Key('landscapeElapsedTile')), findsOneWidget);
-    expect(find.byKey(const Key('landscapeFuelTile')), findsOneWidget);
+    // RIGHT zone — the trip-figures grid.
+    expect(find.byKey(const Key('recordingTileDistance')), findsOneWidget);
+    expect(find.byKey(const Key('recordingTileElapsed')), findsOneWidget);
+    expect(find.byKey(const Key('recordingTileFuel')), findsOneWidget);
+    expect(find.byKey(const Key('recordingTileScore')), findsOneWidget);
+    expect(find.byKey(const Key('tripAvgConsumptionCard')), findsOneWidget);
     expect(find.text('Distance'), findsOneWidget);
     expect(find.text('Avg'), findsOneWidget);
     expect(find.text('Elapsed'), findsOneWidget);
     expect(find.text('Fuel used'), findsOneWidget);
 
-    // The metric values render (not just labels).
+    // Values from the reading render.
     expect(find.text('5,00 km'), findsOneWidget);
-    expect(find.text('88 km/h'), findsOneWidget);
 
-    // No scrolling: the body must NOT introduce a scroll view of its own.
+    // NO scrolling surface in landscape.
     expect(find.byType(SingleChildScrollView), findsNothing);
     expect(find.byType(ListView), findsNothing);
 
-    // Layout contract: the live-feedback zone is LEFT of the radar zone.
+    // Two-zone split: the hero / strip / radar are LEFT of the grid.
+    final gridLeft =
+        tester.getTopLeft(find.byType(RecordingMetricGrid)).dx;
+    final heroLeft = tester.getTopLeft(find.byType(MinimalDriveSummary)).dx;
+    final stripLeft =
+        tester.getTopLeft(find.byType(RecordingStatusStrip)).dx;
     final radarLeft = tester.getTopLeft(find.byType(TripRadarCard)).dx;
-    final speedLeft =
-        tester.getTopLeft(find.byKey(const Key('landscapeSpeedTile'))).dx;
-    expect(speedLeft, lessThan(radarLeft),
-        reason: 'Live-feedback zone must sit left of the trip/radar zone.');
+    expect(heroLeft, lessThan(gridLeft),
+        reason: 'Live feedback (hero) is the LEFT zone.');
+    expect(stripLeft, lessThan(gridLeft));
+    expect(radarLeft, lessThan(gridLeft));
+    // Hero above strip above radar within the left zone.
+    final heroTop = tester.getTopLeft(find.byType(MinimalDriveSummary)).dy;
+    final stripTop = tester.getTopLeft(find.byType(RecordingStatusStrip)).dy;
+    final radarTop = tester.getTopLeft(find.byType(TripRadarCard)).dy;
+    expect(heroTop, lessThan(stripTop));
+    expect(stripTop, lessThan(radarTop));
 
-    // No RenderFlex overflow at a phone-landscape size.
+    // No RenderFlex overflow anywhere in the split.
     expect(tester.takeException(), isNull);
   });
 
@@ -160,8 +176,8 @@ void main() {
     await pumpLandscapeBody(tester, textScaleFactor: 1.3);
 
     expect(find.byType(TripRecordingLandscapeBody), findsOneWidget);
-    expect(find.byKey(const Key('landscapeSpeedTile')), findsOneWidget);
-    expect(find.byKey(const Key('landscapeFuelTile')), findsOneWidget);
+    expect(find.byKey(const Key('recording_hero_speed')), findsOneWidget);
+    expect(find.byKey(const Key('recordingTileFuel')), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

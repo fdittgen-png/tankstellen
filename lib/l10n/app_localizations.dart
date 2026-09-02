@@ -3057,12 +3057,6 @@ abstract class AppLocalizations {
   /// **'Connecting…'**
   String get obdPickerConnecting;
 
-  /// No description provided for @tripRecordingTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Recording trip'**
-  String get tripRecordingTitle;
-
   /// No description provided for @tripSummaryTitle.
   ///
   /// In en, this message translates to:
@@ -3074,12 +3068,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Distance'**
   String get tripMetricDistance;
-
-  /// No description provided for @tripMetricSpeed.
-  ///
-  /// In en, this message translates to:
-  /// **'Speed'**
-  String get tripMetricSpeed;
 
   /// No description provided for @tripMetricFuelUsed.
   ///
@@ -13546,6 +13534,202 @@ abstract class AppLocalizations {
   /// **'Choose a location'**
   String get radiusAlertBlockerLocation;
 
+  /// #3917 — title of the post-fill inventory sheet / card (French: 'Bilan du plein').
+  ///
+  /// In en, this message translates to:
+  /// **'Fill-up summary'**
+  String get fillInventoryTitle;
+
+  /// #3917 — subtitle under the inventory title for a full tank.
+  ///
+  /// In en, this message translates to:
+  /// **'Full tank on {date} · {fuel}'**
+  String fillInventorySubtitleFull(String date, String fuel);
+
+  /// #3917 — subtitle under the inventory title for a partial fill.
+  ///
+  /// In en, this message translates to:
+  /// **'Partial fill on {date} · {fuel}'**
+  String fillInventorySubtitlePartial(String date, String fuel);
+
+  /// #3917 — odometer distance of the closed tank window.
+  ///
+  /// In en, this message translates to:
+  /// **'{km} km since the last full tank'**
+  String fillInventoryKmSinceLastFull(String km);
+
+  /// #3917 — litres pumped over the tank window.
+  ///
+  /// In en, this message translates to:
+  /// **'{liters} L pumped'**
+  String fillInventoryPumpLiters(String liters);
+
+  /// #3917 — the tank's true consumption, already unit-formatted.
+  ///
+  /// In en, this message translates to:
+  /// **'Pump consumption: {value}'**
+  String fillInventoryPumpConsumption(String value);
+
+  /// #3917 — recorded-trip coverage of the window and their raw (uncalibrated) consumption, unit-formatted.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded trips: {coverage} % of the tank · {value} raw'**
+  String fillInventoryRecordedTrips(int coverage, String value);
+
+  /// #3917 — the closed window contains no OBD2 recording.
+  ///
+  /// In en, this message translates to:
+  /// **'No recorded trip in this tank'**
+  String get fillInventoryNoRecordedTrips;
+
+  /// #3917 — current tank content and the range it buys at the window's pump consumption.
+  ///
+  /// In en, this message translates to:
+  /// **'Tank now: {liters} L · ≈ {km} km at pump consumption'**
+  String fillInventoryTankNow(String liters, String km);
+
+  /// #3917 — current tank content when no range can be computed.
+  ///
+  /// In en, this message translates to:
+  /// **'Tank now: {liters} L'**
+  String fillInventoryTankNowNoRange(String liters);
+
+  /// #3917 — the gain before and after this fill's calibration; {percent} is the signed change of the estimates.
+  ///
+  /// In en, this message translates to:
+  /// **'Pump calibration: ×{before} → ×{after} ({percent} %)'**
+  String fillInventoryCalibrationApplied(
+    String before,
+    String after,
+    String percent,
+  );
+
+  /// #3917 — the fill did not calibrate; {reason} is one of the fillInventorySkip* strings.
+  ///
+  /// In en, this message translates to:
+  /// **'Pump calibration: skipped — {reason}'**
+  String fillInventoryCalibrationSkipped(String reason);
+
+  /// #3917 — skip reason.
+  ///
+  /// In en, this message translates to:
+  /// **'partial fill (the tank window stays open)'**
+  String get fillInventorySkipNotFullTank;
+
+  /// #3917 — skip reason.
+  ///
+  /// In en, this message translates to:
+  /// **'correction entry, not a pumped fill'**
+  String get fillInventorySkipCorrection;
+
+  /// #3917 — skip reason.
+  ///
+  /// In en, this message translates to:
+  /// **'no vehicle on this fill'**
+  String get fillInventorySkipNoVehicle;
+
+  /// #3917 — skip reason.
+  ///
+  /// In en, this message translates to:
+  /// **'first full tank (no window closed yet)'**
+  String get fillInventorySkipNoWindow;
+
+  /// #3917 — skip reason: recording coverage below the calibration bar.
+  ///
+  /// In en, this message translates to:
+  /// **'recorded trips cover {coverage} % of the tank (60 % needed)'**
+  String fillInventorySkipCoverageTooLow(int coverage);
+
+  /// #3917 — skip reason: too little recorded distance.
+  ///
+  /// In en, this message translates to:
+  /// **'only {km} recorded km (40 km needed)'**
+  String fillInventorySkipRecordedTooShort(String km);
+
+  /// #3917 — skip reason.
+  ///
+  /// In en, this message translates to:
+  /// **'the recorded trips carry no fuel figure'**
+  String get fillInventorySkipNoRecordedFuel;
+
+  /// #3917 — skip reason: implausible pump/recorded ratio.
+  ///
+  /// In en, this message translates to:
+  /// **'pump and recordings disagree too much — check the receipt'**
+  String get fillInventorySkipImplausible;
+
+  /// #3917 — dismiss button of the inventory sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get fillInventoryDismiss;
+
+  /// #3918 — tank report: signed residual between the re-expressed recordings and the pump after the current calibration.
+  ///
+  /// In en, this message translates to:
+  /// **'Gap after calibration: {percent} %'**
+  String tankReportResidualAfterCalibration(String percent);
+
+  /// #3919 — trip fuel-source chip: fuel rate reported by the ECU.
+  ///
+  /// In en, this message translates to:
+  /// **'Measured'**
+  String get tripFuelSourceMeasured;
+
+  /// #3919 — trip fuel-source chip: estimated branch with a pump gain applied.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated · calibrated'**
+  String get tripFuelSourceEstimatedCalibrated;
+
+  /// #3919 — trip fuel-source chip: estimated branch, no pump calibration yet.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated'**
+  String get tripFuelSourceEstimated;
+
+  /// #3919 — trip fuel-source chip: GPS-physics estimate, no engine data.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS'**
+  String get tripFuelSourceGps;
+
+  /// #3919 — tooltip of the Measured chip.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel rate reported by the engine (PID 5E / 9D / A2) — never rescaled'**
+  String get tripFuelSourceMeasuredTooltip;
+
+  /// #3919 — tooltip of the Estimated chips.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel estimated from air mass — rescaled by the pump calibration'**
+  String get tripFuelSourceEstimatedTooltip;
+
+  /// #3919 — tooltip of the GPS chip.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS-physics estimate — no engine data'**
+  String get tripFuelSourceGpsTooltip;
+
+  /// #3919 — suffix in the chip tooltip when the figure was re-expressed with the current pump calibration.
+  ///
+  /// In en, this message translates to:
+  /// **'recalculated'**
+  String get tripFuelSourceRecalculated;
+
+  /// #3919 — trip detail header: the signed pump-gain correction the shown fuel figures carry.
+  ///
+  /// In en, this message translates to:
+  /// **'Pump gain applied: {percent} %'**
+  String tripDetailGainApplied(String percent);
+
+  /// #3919 — trip detail header: the shown figures were re-expressed with a calibration learned after the trip.
+  ///
+  /// In en, this message translates to:
+  /// **'Recalculated after the fill-up of {date}'**
+  String tripDetailRecalculatedAfterFill(String date);
+
   /// Helper text under the odometer field of the Add fill-up form when the value was pre-filled from the vehicle's most recent fill-up (#3899).
   ///
   /// In en, this message translates to:
@@ -13857,6 +14041,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete all my data'**
   String get privacyDeleteAllMyData;
+
+  /// AppBar title of the live trip-recording screen while a trip is being recorded. Short on purpose so it never truncates next to the pause / stop / overflow actions (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'Trip in progress'**
+  String get tripRecordingScreenTitle;
+
+  /// OBD2 status chip on the recording screen: the adapter is delivering engine data and no read rate is known yet (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'Live'**
+  String get recordingObd2ChipLive;
+
+  /// OBD2 status chip on the recording screen: live engine data with the achieved read rate in PID reads per second (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'Live · {rate} PID/s'**
+  String recordingObd2ChipLiveRate(int rate);
+
+  /// OBD2 status chip on the recording screen: the Bluetooth link dropped and an automatic reconnect is in flight (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnecting…'**
+  String get recordingObd2ChipReconnecting;
+
+  /// OBD2 status chip on the recording screen: automatic reconnect in flight, with the 1-based attempt ordinal (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnecting… (try {attempt})'**
+  String recordingObd2ChipReconnectingAttempt(int attempt);
+
+  /// OBD2 status chip on the recording screen: the adapter is gone, the reconnect loop is passively waiting and the trip keeps recording on GPS (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'GPS only'**
+  String get recordingObd2ChipGpsOnly;
+
+  /// OBD2 status chip on the recording screen: the engine is off, nothing is broken, the recording waits for it on GPS (#3858/#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'Engine off — waiting'**
+  String get recordingObd2ChipEngineOff;
+
+  /// OBD2 status chip on the recording screen for a trip recorded without any OBD2 adapter (GPS-only trip kind) (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'No adapter'**
+  String get recordingObd2ChipNoAdapter;
+
+  /// Title of the plain-language bottom sheet opened from the OBD2 status chip on the recording screen (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 link'**
+  String get recordingObd2SheetTitle;
+
+  /// Body of the OBD2 status sheet while engine data is flowing (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'The adapter is delivering engine data, so consumption is measured from the car. Nothing to do — keep driving.'**
+  String get recordingObd2SheetLive;
+
+  /// Body of the OBD2 status sheet while an automatic reconnect is in flight (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'The Bluetooth link is being re-established; meanwhile the recording continues on GPS. No action needed — a reset only helps if it stays like this for minutes.'**
+  String get recordingObd2SheetReconnecting;
+
+  /// Body of the OBD2 status sheet while the reconnect loop passively waits for the adapter (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'The adapter has not answered for a while, so the app waits for it to reappear and records on GPS. Consumption is estimated until it is back.'**
+  String get recordingObd2SheetGpsOnly;
+
+  /// Body of the OBD2 status sheet while the recording waits for the engine (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'The engine is off, so there is nothing to read. The recording continues on GPS and picks the adapter up again as soon as the engine runs.'**
+  String get recordingObd2SheetEngineOff;
+
+  /// Body of the OBD2 status sheet for a GPS-only trip kind (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'This trip is recorded without an OBD2 adapter. Speed and distance come from GPS; consumption is a physics estimate calibrated by your fill-ups.'**
+  String get recordingObd2SheetNoAdapter;
+
+  /// GPS status chip on the recording screen: horizontal accuracy within the precise band, with the accuracy radius in metres (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'Precise fix (±{meters} m)'**
+  String recordingGpsChipPrecise(int meters);
+
+  /// GPS status chip on the recording screen: horizontal accuracy in the coarse band, with the accuracy radius in metres (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'Approximate fix (±{meters} m)'**
+  String recordingGpsChipApprox(int meters);
+
+  /// GPS status chip on the recording screen: no recent position fix (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'No fix'**
+  String get recordingGpsChipNoFix;
+
+  /// GPS status chip on the recording screen: a recent fix exists but the platform reported no horizontal accuracy for it (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'Fix (accuracy unknown)'**
+  String get recordingGpsChipFixUnknownAccuracy;
+
+  /// GPS status chip label composed of the fix text and the coverage-so-far percentage. Owns the word order per locale (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'{fix} · {percent} %'**
+  String recordingGpsChipWithCoverage(String fix, int percent);
+
+  /// Title of the plain-language bottom sheet opened from the GPS status chip on the recording screen (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'GPS signal'**
+  String get recordingGpsSheetTitle;
+
+  /// Body of the GPS status sheet while the fix is precise (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'The position is accurate to a few metres, so distance and the trace are reliable.'**
+  String get recordingGpsSheetPrecise;
+
+  /// Body of the GPS status sheet while the fix is approximate (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'The position is only accurate to tens of metres — typical in cities, tunnels or under trees. Distance may drift slightly until the fix improves.'**
+  String get recordingGpsSheetApprox;
+
+  /// Body of the GPS status sheet while no recent fix exists (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'No position has arrived recently. Check that location is allowed and the phone can see the sky; the recording resumes with the next fix.'**
+  String get recordingGpsSheetNoFix;
+
+  /// Extra line of the GPS status sheet with the live coverage-so-far percentage (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'Coverage so far: {percent} % of the seconds had a fix.'**
+  String recordingGpsSheetCoverage(int percent);
+
+  /// Dismiss button of the OBD2 / GPS status sheets on the recording screen (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get recordingSheetClose;
+
+  /// Fuel-source badge on the recording screen's consumption card when the live fuel rate comes from a measured ECU PID (0x5E / 0x9D / 0xA2) (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'Measured (ECU fuel flow)'**
+  String get fuelSourceMeasured;
+
+  /// Fuel-source badge when the live fuel rate is estimated (MAF / speed-density) and the vehicle carries a pump-anchored gain; {percent} is the gain's distance from 1 in percent (#3886/#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated · pump-calibrated ±{percent} %'**
+  String fuelSourceEstimatedCalibrated(int percent);
+
+  /// Fuel-source badge when the live fuel rate is estimated and the vehicle has no pump-gain samples yet (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated · not calibrated'**
+  String get fuelSourceEstimatedUncalibrated;
+
+  /// Fuel-source badge when no engine data exists (GPS-only or degraded trip) and consumption is the GPS physics estimate (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'GPS estimate'**
+  String get fuelSourceGpsEstimate;
+
+  /// Label of the live driving-score tile in the recording screen's metric grid (#3916).
+  ///
+  /// In en, this message translates to:
+  /// **'Driving score'**
+  String get recordingTileScore;
 
   /// Station-detail header line: the open / closed / unknown state followed by how long ago the data was fetched. Owns the whole word order per locale — never composed from fragments (#3902).
   ///

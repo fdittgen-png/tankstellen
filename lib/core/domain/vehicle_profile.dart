@@ -4,6 +4,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'gps_calibration_matrix.dart';
+import 'pump_gain_entry.dart';
 import 'speed_consumption_histogram.dart';
 import 'trip_length_breakdown.dart';
 import 'vehicle_enums.dart';
@@ -126,6 +127,14 @@ abstract class VehicleProfile with _$VehicleProfile {
     @Default(1.0) double pumpGain,
     @Default(0) int pumpGainSamples,
     DateTime? pumpGainUpdatedAt,
+    // #3918 — per-fuel gains for a multi-fuel vehicle, keyed by the
+    // fill's `FuelType.apiValue`; the scalar above stays the fallback.
+    // `tankFuelKey` is the tank's dominant grade per the fill history,
+    // stamped on every fill save so the readers pick the right entry.
+    // Both JSONB field-adds — sync-transparent.
+    @Default(<String, PumpGainEntry>{})
+    Map<String, PumpGainEntry> pumpGainByFuel,
+    String? tankFuelKey,
 
     // User-editable calibration overrides (#1397). Each is null until
     // the user types a value into the "Advanced calibration" section

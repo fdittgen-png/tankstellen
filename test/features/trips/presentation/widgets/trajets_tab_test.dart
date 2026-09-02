@@ -220,6 +220,11 @@ class _NoopObd2Service implements Obd2Service {
   @override
   Obd2BusProbeResult get busProbe => Obd2BusProbeResult.answered;
 
+  // #3915 — a reused supervised link is adopted only after a real
+  // round-trip; the healthy pre-warm fake answers it.
+  @override
+  Future<bool> probeLiveness({Duration? timeout}) async => true;
+
   @override
   noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

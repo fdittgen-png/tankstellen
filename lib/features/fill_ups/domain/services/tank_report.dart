@@ -25,6 +25,7 @@
 ///    far recorded estimates still sit from the pump.
 library;
 
+import '../../../../core/domain/vehicle_profile.dart';
 import '../entities/fill_up.dart';
 import '../../../trips/api.dart';
 import 'tank_behavior.dart';
@@ -254,4 +255,32 @@ PumpCalibration? _calibration(
   }
   if (ewma == null) return null;
   return PumpCalibration(factor: ewma, samples: samples);
+}
+
+/// #3918 — the window's recorded consumption RE-EXPRESSED at [vehicle]'s
+/// current pump gain for the closing fill's fuel ([CalibratedTripFigures]
+/// — display only), and the residual against the pump that remains
+/// after that calibration. Null when the recordings carry no fuel.
+({double recordedLPer100Km, double residualPct})? calibratedTankRecording(
+  TankPeriod period,
+  Map<String, TripSummary> tripSummariesById,
+  VehicleProfile? vehicle,
+) {
+  var liters = 0.0, km = 0.0;
+  final fuelKey = period.closing.fuelType.apiValue;
+  for (final id in period.closing.linkedTripIds) {
+    final t = tripSummariesById[id];
+    if (t == null || t.isVirtual || isEngineOffTransport(t)) continue;
+    final l = CalibratedTripFigures.of(t, vehicle, fuelKey: fuelKey).liters ??
+        tripConsumedLitersOrNull(t);
+    if (l == null || l <= 0 || t.distanceKm <= 0) continue;
+    liters += l;
+    km += t.distanceKm;
+  }
+  if (liters <= 0 || km < 5) return null;
+  final recorded = liters / km * 100.0;
+  return (
+    recordedLPer100Km: recorded,
+    residualPct: (recorded / period.lPer100Km - 1.0) * 100.0,
+  );
 }

@@ -23,6 +23,15 @@ import 'package:tankstellen/features/station_detail/presentation/widgets/opening
 import 'package:tankstellen/features/station_detail/presentation/widgets/station_brand_header.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/station_prices_section.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/station_status_row.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
+import 'package:tankstellen/core/time/app_clock.dart';
+import 'package:tankstellen/features/obd2/api.dart';
+import 'package:tankstellen/features/obd2/domain/fuel_mixture_model.dart';
+import 'package:tankstellen/features/trips/presentation/widgets/recording/recording_status_strip.dart';
+import 'package:tankstellen/features/trips/presentation/widgets/trip_avg_consumption_card.dart';
+import 'package:tankstellen/features/trips/providers/recording_gps_fix_provider.dart';
+import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
+import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../fixtures/stations.dart';
 import '../helpers/mock_providers.dart';
@@ -410,6 +419,138 @@ void main() {
       );
     });
   });
+
+  // #3916 — the recording screen's status strip (two chip rows whose
+  // labels must ellipsize, never overflow) and the consumption card with
+  // its longest fuel-source badge ("Estimated · pump-calibrated ±12 %").
+  group('Recording screen status strip + fuel-source badge (#3916)', () {
+    final now = DateTime(2026, 3, 11, 14, 30);
+    // The widest chip labels: a reconnect in flight + an approximate fix
+    // with coverage.
+    List<Object> stripOverrides() => <Object>[
+          tripRecordingProvider.overrideWith(
+            () => _FixedTripRecording(const TripRecordingState(
+              phase: TripRecordingPhase.degradedGpsOnly,
+              dropReason: TripDropReason.transportError,
+              reconnectPassiveWaiting: true,
+              live: TripLiveReading(
+                elapsed: Duration(minutes: 5),
+                distanceKmSoFar: 4.0,
+              ),
+            )),
+          ),
+          obd2ReconnectProvider.overrideWith(
+            () => _PinnedLinkState(Obd2LinkState.idle),
+          ),
+          obd2ConnectionStatusProvider.overrideWith(
+            () => _FixedObd2Status(const Obd2ConnectionSnapshot(
+              state: Obd2ConnectionState.connected,
+              adapterName: 'vLinker FS',
+            )),
+          ),
+          recordingGpsFixProvider.overrideWith(
+            () => _SeededGpsFix(RecordingGpsFix(
+              fixAt: now.subtract(const Duration(seconds: 1)),
+              firstFixAt: now.subtract(const Duration(seconds: 61)),
+              fixCount: 59,
+              accuracyM: 40.0,
+            )),
+          ),
+          appClockProvider.overrideWithValue(FixedClock(now)),
+        ];
+    // The widest badge: an estimated branch with a pump-calibrated gain.
+    const estimatedReading = TripLiveReading(
+      elapsed: Duration(minutes: 5),
+      distanceKmSoFar: 5.0,
+      fuelLitersSoFar: 0.3,
+      fuelRateLPerHour: 4.0,
+      fuelSource: FuelRateSourceTag.speedDensity,
+    );
+    List<Object> badgeOverrides() => <Object>[
+          activeVehicleProfileProvider.overrideWith(
+            () => _FixedActiveVehicle(const VehicleProfile(
+              id: 'veh-a',
+              name: 'Test',
+              pumpGain: 1.12,
+              pumpGainSamples: 3,
+            )),
+          ),
+        ];
+
+    testWidgets('RecordingStatusStrip — pseudo-locale', (tester) async {
+      await pumpPseudo(
+        tester,
+        const RecordingStatusStrip(),
+        overrides: stripOverrides(),
+        widgetName: 'RecordingStatusStrip',
+      );
+    });
+
+    testWidgets('RecordingStatusStrip — 1.3x', (tester) async {
+      await pumpScaled(
+        tester,
+        const RecordingStatusStrip(),
+        overrides: stripOverrides(),
+        widgetName: 'RecordingStatusStrip',
+      );
+    });
+
+    testWidgets('TripAvgConsumptionCard with the calibrated-estimate badge '
+        '— pseudo-locale', (tester) async {
+      await pumpPseudo(
+        tester,
+        const TripAvgConsumptionCard(live: estimatedReading),
+        overrides: badgeOverrides(),
+        widgetName: 'TripAvgConsumptionCard (fuel-source badge)',
+      );
+    });
+
+    testWidgets('TripAvgConsumptionCard with the calibrated-estimate badge '
+        '— 1.3x', (tester) async {
+      await pumpScaled(
+        tester,
+        const TripAvgConsumptionCard(live: estimatedReading),
+        overrides: badgeOverrides(),
+        widgetName: 'TripAvgConsumptionCard (fuel-source badge)',
+      );
+    });
+  });
+}
+
+// #3916 — pinned fakes for the recording status strip + badge cases.
+class _FixedTripRecording extends TripRecording {
+  _FixedTripRecording(this._state);
+  final TripRecordingState _state;
+  @override
+  TripRecordingState build() => _state;
+}
+
+class _PinnedLinkState extends Obd2Reconnect {
+  _PinnedLinkState(this._pinned);
+  final Obd2LinkState _pinned;
+  @override
+  Obd2LinkState build() => _pinned;
+}
+
+class _FixedObd2Status extends Obd2ConnectionStatus {
+  _FixedObd2Status(this._initial);
+  final Obd2ConnectionSnapshot _initial;
+  @override
+  Obd2ConnectionSnapshot build() => _initial;
+}
+
+class _SeededGpsFix extends RecordingGpsFixTracker {
+  _SeededGpsFix(this._fix);
+  final RecordingGpsFix? _fix;
+  @override
+  RecordingGpsFix? build() => _fix;
+}
+
+class _FixedActiveVehicle extends ActiveVehicleProfile {
+  _FixedActiveVehicle(this._v);
+  final VehicleProfile? _v;
+  @override
+  VehicleProfile? build() => _v;
 }
 
 /// testStation without its Super E5 price — drives the #3902 footnote.

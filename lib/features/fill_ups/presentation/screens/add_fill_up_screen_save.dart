@@ -104,6 +104,17 @@ mixin _AddFillUpSaveFlow on _AddFillUpFormState {
     );
     if (!mounted) return;
 
+    // #3917 — a FULL fill establishes an inventory: show the "Bilan du
+    // plein" (consumed / recorded / tank now / calibration outcome or
+    // skip reason) before we pop. Read-only; the save already happened.
+    if (fillUp.isFullTank) {
+      final inventory = ref.read(lastFillInventoryProvider);
+      if (inventory != null && inventory.fillId == fillUp.id) {
+        await showFillInventorySheet(context, inventory);
+        if (!mounted) return;
+      }
+    }
+
     context.pop();
     messenger.showSnackBar(
       SnackBarHelper.successSnackBar(scheme, savedMessage),

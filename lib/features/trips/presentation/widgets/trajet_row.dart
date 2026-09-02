@@ -9,7 +9,9 @@ import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../data/trip_history_repository.dart';
+import '../../domain/calibrated_trip_figures.dart';
 import '../../domain/trajet_data_quality.dart';
+import 'fuel_source_chip.dart';
 import 'trajet_stripe_colors.dart';
 
 /// One row in the Trajets list (#889). Shows date/time + chips for
@@ -61,6 +63,7 @@ class TrajetRow extends StatelessWidget {
     final durationMinutes = durationSec == null ? null : durationSec ~/ 60;
     final isEv = vehicle?.type == VehicleType.ev;
     final avgUnit = isEv ? 'kWh/100 km' : 'L/100 km';
+    final figures = CalibratedTripFigures.of(s, vehicle);
     // Compact density on landscape / tablet widths — drops the
     // per-row vertical margin from 3 → 1 dp and the inner padding
     // from (12, 8) → (10, 4) so a 600+ dp viewport shows ~50 % more
@@ -157,11 +160,14 @@ class TrajetRow extends StatelessWidget {
                               durationMinutes.toString(),
                             ),
                           ),
-                        if (s.avgLPer100Km != null)
+                        // #3918 — the consumption figure is re-expressed
+                        // at the vehicle's CURRENT pump gain (display
+                        // only); #3919 — the fuel-source chip follows it.
+                        if (figures.lPer100Km != null)
                           _Chip(
                             icon: Icons.eco,
                             text: l.trajetsRowAvgConsumption(
-                              UnitFormatter.formatDecimal(s.avgLPer100Km!),
+                              UnitFormatter.formatDecimal(figures.lPer100Km!),
                               avgUnit,
                             ),
                           )
@@ -181,6 +187,7 @@ class TrajetRow extends StatelessWidget {
                             text: l.trajetsRowColdStartChip,
                             tooltip: l.trajetsRowColdStartTooltip,
                           ),
+                        if (!isEv) FuelSourceChip(figures: figures, compact: true),
                       ],
                     ),
                     // #3904 — the red stripe + warning icon say "something

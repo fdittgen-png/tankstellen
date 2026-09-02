@@ -18,6 +18,7 @@ import '../../glide_coach/providers/glide_coach_evaluator_provider.dart';
 import '../../glide_coach/providers/glide_coach_settings_provider.dart';
 import '../../obd2/api.dart';
 import '../../../core/logging/error_logger.dart';
+import 'recording_gps_fix_provider.dart';
 
 /// Owns the #1374 / #1125 / #1458 GPS concern extracted from the
 /// [TripRecording] notifier (#1679): the opt-in Geolocator position
@@ -129,6 +130,15 @@ class TripGpsStreamController {
             // teleport gate never fired. The GPS-only pipeline already
             // trusts `p.timestamp`; this aligns the OBD2 path.
             fixAt: pos.timestamp,
+          );
+          // #3916 — tee the fix instant + accuracy to the live GPS status
+          // chip (the persisted `hAccuracyM` above never reached the UI
+          // live). Additive; guarded inside the helper.
+          teeRecordingGpsFix(
+            _ref,
+            fixAt: pos.timestamp,
+            accuracyM: pos.accuracy.isFinite ? pos.accuracy : null,
+            where: 'TripRecording GPS fix seam',
           );
           // #1458 phase 2 — record one cadence-diagnostic per fix so the
           // user can see, post-trip, whether the OS kept delivering

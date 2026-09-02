@@ -135,7 +135,8 @@ mixin _TripRecordingBuild on _TripRecordingBodySections {
         ? (l.tripRecordingConnectingTitle)
         : state.phase == TripRecordingPhase.paused
         ? (l.tripBannerPaused)
-        : (l.tripRecordingTitle);
+        // #3916 — a short title that fits beside pause / stop / overflow.
+        : (l.tripRecordingScreenTitle);
 
     // After stop: show the summary. Until then: live view.
     // #1395 — wrap the title in a GestureDetector so the hidden
@@ -150,7 +151,16 @@ mixin _TripRecordingBuild on _TripRecordingBodySections {
         behavior: HitTestBehavior.opaque,
         excludeFromSemantics: true,
         onTap: _bumpDebugTapCount,
-        child: Semantics(header: true, child: Text(title)),
+        // #3916 — shrink-to-fit, never an ellipsis: the title must read
+        // whole beside the actions under a text-expansion locale.
+        child: Semantics(
+          header: true,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: AlignmentDirectional.centerStart,
+            child: Text(title, maxLines: 1, softWrap: false),
+          ),
+        ),
       ),
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),

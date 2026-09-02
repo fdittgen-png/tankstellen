@@ -691,10 +691,8 @@
   "obdPickerScanning": "Recherche d'adaptateurs…",
   "obdPickerConnecting": "Connexion…",
   "obd2PickerPinnedFallback": "Impossible de joindre '{adapterName}' — choisissez un autre adaptateur",
-  "tripRecordingTitle": "Enregistrement du trajet",
   "tripSummaryTitle": "Résumé du trajet",
   "tripMetricDistance": "Distance",
-  "tripMetricSpeed": "Vitesse",
   "tripMetricFuelUsed": "Carburant utilisé",
   "tripMetricAvgConsumption": "Moyenne",
   "tripMetricElapsed": "Durée",
@@ -5019,5 +5017,271 @@
   "privacyErrorLogClear": "Effacer",
   "privacyDangerZoneTitle": "Zone dangereuse",
   "privacyDangerZoneBody": "Supprime définitivement tout ce que l'application stocke sur cet appareil. Avec la synchronisation activée, vos données sur le serveur TankSync sont aussi effacées.",
-  "privacyDeleteAllMyData": "Supprimer toutes mes données"
+  "privacyDeleteAllMyData": "Supprimer toutes mes données",
+  "fillInventoryTitle": "Bilan du plein",
+  "fillInventorySubtitleFull": "Plein complet du {date} · {fuel}",
+  "@fillInventorySubtitleFull": {
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "1 Sep 2026"
+      },
+      "fuel": {
+        "type": "String",
+        "example": "E85"
+      }
+    }
+  },
+  "fillInventorySubtitlePartial": "Plein partiel du {date} · {fuel}",
+  "@fillInventorySubtitlePartial": {
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "1 Sep 2026"
+      },
+      "fuel": {
+        "type": "String",
+        "example": "E10"
+      }
+    }
+  },
+  "fillInventoryKmSinceLastFull": "{km} km depuis le dernier plein complet",
+  "@fillInventoryKmSinceLastFull": {
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "559"
+      }
+    }
+  },
+  "fillInventoryPumpLiters": "{liters} L à la pompe",
+  "@fillInventoryPumpLiters": {
+    "placeholders": {
+      "liters": {
+        "type": "String",
+        "example": "35.7"
+      }
+    }
+  },
+  "fillInventoryPumpConsumption": "Consommation à la pompe : {value}",
+  "@fillInventoryPumpConsumption": {
+    "placeholders": {
+      "value": {
+        "type": "String",
+        "example": "6.4 L/100 km"
+      }
+    }
+  },
+  "fillInventoryRecordedTrips": "Trajets enregistrés : {coverage} % du plein · {value} brut",
+  "@fillInventoryRecordedTrips": {
+    "placeholders": {
+      "coverage": {
+        "type": "int",
+        "example": "81"
+      },
+      "value": {
+        "type": "String",
+        "example": "10.5 L/100 km"
+      }
+    }
+  },
+  "fillInventoryNoRecordedTrips": "Aucun trajet enregistré sur ce plein",
+  "fillInventoryTankNow": "Réservoir maintenant : {liters} L · ≈ {km} km à la conso pompe",
+  "@fillInventoryTankNow": {
+    "placeholders": {
+      "liters": {
+        "type": "String",
+        "example": "35.0"
+      },
+      "km": {
+        "type": "String",
+        "example": "547"
+      }
+    }
+  },
+  "fillInventoryTankNowNoRange": "Réservoir maintenant : {liters} L",
+  "@fillInventoryTankNowNoRange": {
+    "placeholders": {
+      "liters": {
+        "type": "String",
+        "example": "35.0"
+      }
+    }
+  },
+  "fillInventoryCalibrationApplied": "Calibrage à la pompe : ×{before} → ×{after} ({percent} %)",
+  "@fillInventoryCalibrationApplied": {
+    "placeholders": {
+      "before": {
+        "type": "String",
+        "example": "0.93"
+      },
+      "after": {
+        "type": "String",
+        "example": "0.72"
+      },
+      "percent": {
+        "type": "String",
+        "example": "-22"
+      }
+    }
+  },
+  "fillInventoryCalibrationSkipped": "Calibrage à la pompe : ignoré — {reason}",
+  "@fillInventoryCalibrationSkipped": {
+    "placeholders": {
+      "reason": {
+        "type": "String",
+        "example": "first full tank (no window closed yet)"
+      }
+    }
+  },
+  "fillInventorySkipNotFullTank": "plein partiel (la fenêtre reste ouverte)",
+  "fillInventorySkipCorrection": "entrée de correction, pas un plein réel",
+  "fillInventorySkipNoVehicle": "aucun véhicule sur ce plein",
+  "fillInventorySkipNoWindow": "premier plein complet (aucune fenêtre fermée)",
+  "fillInventorySkipCoverageTooLow": "les trajets enregistrés couvrent {coverage} % du plein (60 % requis)",
+  "@fillInventorySkipCoverageTooLow": {
+    "placeholders": {
+      "coverage": {
+        "type": "int",
+        "example": "42"
+      }
+    }
+  },
+  "fillInventorySkipRecordedTooShort": "seulement {km} km enregistrés (40 km requis)",
+  "@fillInventorySkipRecordedTooShort": {
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "18"
+      }
+    }
+  },
+  "fillInventorySkipNoRecordedFuel": "les trajets enregistrés n’ont aucune donnée carburant",
+  "fillInventorySkipImplausible": "pompe et enregistrements trop éloignés — vérifiez le ticket",
+  "fillInventoryDismiss": "Compris",
+  "tankReportResidualAfterCalibration": "Écart après calibrage : {percent} %",
+  "@tankReportResidualAfterCalibration": {
+    "placeholders": {
+      "percent": {
+        "type": "String",
+        "example": "-3"
+      }
+    }
+  },
+  "tripFuelSourceMeasured": "Mesuré",
+  "tripFuelSourceEstimatedCalibrated": "Estimé · calibré",
+  "tripFuelSourceEstimated": "Estimé",
+  "tripFuelSourceGps": "GPS",
+  "tripFuelSourceMeasuredTooltip": "Débit carburant rapporté par le moteur (PID 5E / 9D / A2) — jamais recalé",
+  "tripFuelSourceEstimatedTooltip": "Carburant estimé d’après la masse d’air — recalé par le calibrage à la pompe",
+  "tripFuelSourceGpsTooltip": "Estimation physique GPS — aucune donnée moteur",
+  "tripFuelSourceRecalculated": "recalculé",
+  "tripDetailGainApplied": "Gain appliqué : {percent} %",
+  "@tripDetailGainApplied": {
+    "placeholders": {
+      "percent": {
+        "type": "String",
+        "example": "-22"
+      }
+    }
+  },
+  "tripDetailRecalculatedAfterFill": "Recalculé après le plein du {date}",
+  "@tripDetailRecalculatedAfterFill": {
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "1 Sep 2026"
+      }
+    }
+  },
+  "tripRecordingScreenTitle": "Trajet en cours",
+  "recordingObd2ChipLive": "En direct",
+  "recordingObd2ChipLiveRate": "En direct · {rate} PID/s",
+  "@recordingObd2ChipLiveRate": {
+    "placeholders": {
+      "rate": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+  "recordingObd2ChipReconnecting": "Reconnexion…",
+  "recordingObd2ChipReconnectingAttempt": "Reconnexion… (essai {attempt})",
+  "@recordingObd2ChipReconnectingAttempt": {
+    "placeholders": {
+      "attempt": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "recordingObd2ChipGpsOnly": "GPS seul",
+  "recordingObd2ChipEngineOff": "Moteur éteint — en attente",
+  "recordingObd2ChipNoAdapter": "Sans adaptateur",
+  "recordingObd2SheetTitle": "Liaison OBD2",
+  "recordingObd2SheetLive": "L'adaptateur transmet les données moteur : la consommation est mesurée dans la voiture. Rien à faire, continuez à rouler.",
+  "recordingObd2SheetReconnecting": "La liaison Bluetooth est en train de se rétablir ; en attendant, l'enregistrement continue par GPS. Aucune action nécessaire — une réinitialisation n'aide que si la situation dure plusieurs minutes.",
+  "recordingObd2SheetGpsOnly": "L'adaptateur ne répond plus depuis un moment : l'application attend qu'il réapparaisse et enregistre par GPS. La consommation est estimée jusqu'à son retour.",
+  "recordingObd2SheetEngineOff": "Le moteur est éteint, il n'y a donc rien à lire. L'enregistrement continue par GPS et reprend l'adaptateur dès que le moteur tourne.",
+  "recordingObd2SheetNoAdapter": "Ce trajet est enregistré sans adaptateur OBD2. La vitesse et la distance viennent du GPS ; la consommation est une estimation physique calibrée par vos pleins.",
+  "recordingGpsChipPrecise": "Fix précis (±{meters} m)",
+  "@recordingGpsChipPrecise": {
+    "placeholders": {
+      "meters": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "recordingGpsChipApprox": "Fix approximatif (±{meters} m)",
+  "@recordingGpsChipApprox": {
+    "placeholders": {
+      "meters": {
+        "type": "int",
+        "example": "40"
+      }
+    }
+  },
+  "recordingGpsChipNoFix": "Pas de fix",
+  "recordingGpsChipFixUnknownAccuracy": "Fix (précision inconnue)",
+  "recordingGpsChipWithCoverage": "{fix} · {percent} %",
+  "@recordingGpsChipWithCoverage": {
+    "placeholders": {
+      "fix": {
+        "type": "String",
+        "example": "Precise fix (±5 m)"
+      },
+      "percent": {
+        "type": "int",
+        "example": "98"
+      }
+    }
+  },
+  "recordingGpsSheetTitle": "Signal GPS",
+  "recordingGpsSheetPrecise": "La position est précise à quelques mètres : la distance et la trace sont fiables.",
+  "recordingGpsSheetApprox": "La position n'est précise qu'à quelques dizaines de mètres — courant en ville, dans un tunnel ou sous les arbres. La distance peut légèrement dériver jusqu'à ce que le fix s'améliore.",
+  "recordingGpsSheetNoFix": "Aucune position n'est arrivée récemment. Vérifiez que la localisation est autorisée et que le téléphone voit le ciel ; l'enregistrement reprend au prochain fix.",
+  "recordingGpsSheetCoverage": "Couverture jusqu'ici : {percent} % des secondes avaient un fix.",
+  "@recordingGpsSheetCoverage": {
+    "placeholders": {
+      "percent": {
+        "type": "int",
+        "example": "98"
+      }
+    }
+  },
+  "recordingSheetClose": "Compris",
+  "fuelSourceMeasured": "Mesuré (débit ECU)",
+  "fuelSourceEstimatedCalibrated": "Estimé · calibré à la pompe ±{percent} %",
+  "@fuelSourceEstimatedCalibrated": {
+    "placeholders": {
+      "percent": {
+        "type": "int",
+        "example": "4"
+      }
+    }
+  },
+  "fuelSourceEstimatedUncalibrated": "Estimé · non calibré",
+  "fuelSourceGpsEstimate": "Estimation GPS",
+  "recordingTileScore": "Score de conduite"
 }

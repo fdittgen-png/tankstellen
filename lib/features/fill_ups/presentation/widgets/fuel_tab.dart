@@ -24,6 +24,7 @@ import '../../domain/entities/fill_up.dart';
 import '../../providers/consumption_providers.dart';
 import 'consumption_stats_card.dart';
 import 'edit_correction_fill_up_sheet.dart';
+import 'fill_inventory_card.dart';
 import 'fill_up_card.dart';
 import 'tank_level_card.dart';
 
@@ -76,6 +77,9 @@ class FuelTab extends ConsumerWidget {
         message: l.helpBannerConsumption,
       ),
       if (showGamification) const BadgeShelf(),
+      // #3917 — the last fill's "Bilan du plein" stays pinned until the
+      // next fill replaces it (self-hides without one).
+      const FillInventoryCard(),
       const TankLevelCard(),
       ConsumptionStatsCard(
         stats: stats,

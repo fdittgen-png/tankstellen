@@ -9,9 +9,11 @@ import '../../../../core/providers/consumption_display_provider.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/gps_calibration_matrix.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../../obd2/api.dart';
 import 'gps_matrix_maturity_badge.dart';
+import 'recording/fuel_source_badge.dart';
 
 /// Live **Average consumption** card for the trip-recording screen
 /// (#2391 / Epic #2385 — GPS-only live fuel consumption).
@@ -40,12 +42,24 @@ import 'gps_matrix_maturity_badge.dart';
 /// Before the estimator warms up (too few moving samples) every figure
 /// is null, so the card shows a muted `—` placeholder and no badge —
 /// graceful, never a fabricated number.
+///
+/// #3916 — a second row carries the [FuelSourceBadge]: whether the live
+/// figure is *measured* (ECU fuel-flow PID), *estimated* (air-mass branch,
+/// pump-calibrated ±x % or not yet calibrated — #3886) or the *GPS
+/// estimate*. Resolved by [resolveFuelSourceBadge] from the reading's
+/// provenance + the active vehicle's pump gain; absent when unknown.
 class TripAvgConsumptionCard extends ConsumerWidget {
   const TripAvgConsumptionCard({
     super.key,
     required this.live,
     this.brokenMapOverride,
+    this.unit,
   });
+
+  /// #3883 / #3916 — the display unit of the average. Null reads the
+  /// user's consumption-display setting; the recording grid passes the
+  /// unit it already resolved so the card stays free of a second watch.
+  final ConsumptionUnit? unit;
 
   /// The current live reading, or null before the first fix lands.
   final TripLiveReading? live;
@@ -104,7 +118,8 @@ class TripAvgConsumptionCard extends ConsumerWidget {
     // shared resolver so the landscape grid tile stays in sync.
     final display = resolveDisplay(r,
         brokenMapOverride: brokenMapOverride,
-        unit: ref.watch(consumptionDisplaySettingProvider).unit); // #3883
+        unit: unit ??
+            ref.watch(consumptionDisplaySettingProvider).unit); // #3883
     final value = display.value;
     final isEstimate = display.isEstimate;
 
@@ -112,7 +127,16 @@ class TripAvgConsumptionCard extends ConsumerWidget {
     // estimate branch; the active vehicle's calibration matrix drives
     // which tier (cold/warming/converged) shows. A null vehicle/matrix
     // cold-starts so a fresh install still shows an honest "cold" badge.
-    final matrix = isEstimate ? _resolveMatrix(ref) : null;
+    final vehicle = _resolveVehicle(ref);
+    final matrix = isEstimate
+        ? (vehicle?.gpsCalibration ?? GpsCalibrationMatrix.coldStart())
+        : null;
+    // #3916 — fuel-source provenance badge; null while nothing is known.
+    // The broken-MAP override is a receipt-derived figure, not a live
+    // branch, so it carries no badge.
+    final fuelSource = brokenMapOverride != null
+        ? null
+        : resolveFuelSourceBadge(live: r, vehicle: vehicle);
 
     final trailing = <Widget>[
       if (isEstimate)
@@ -149,35 +173,67 @@ class TripAvgConsumptionCard extends ConsumerWidget {
       // `Expanded` that ellipsizes, and the trailing keeps its min width.
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Row(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(Icons.eco, size: 28),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                l.tripMetricAvgConsumption,
-                style: theme.textTheme.bodySmall,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+            // #3916 — the card now also lives in the recording grid's
+            // narrow cells: the trailing (tooltip + badge + value) keeps
+            // its natural width while it fits, shrinks to fit past 70 %
+            // of the row, and always leaves the label its share.
+            LayoutBuilder(
+              builder: (context, constraints) => Row(
+                children: [
+                  const Icon(Icons.eco, size: 28),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      l.tripMetricAvgConsumption,
+                      style: theme.textTheme.bodySmall,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: (constraints.maxWidth - 44) * 0.7,
+                    ),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerRight,
+                      child:
+                          Row(mainAxisSize: MainAxisSize.min, children: trailing),
+                    ),
+                  ),
+                ],
               ),
             ),
-            Row(mainAxisSize: MainAxisSize.min, children: trailing),
+            if (fuelSource != null) ...[
+              const SizedBox(height: 6),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: FuelSourceBadge(
+                  key: const Key('tripAvgFuelSourceBadge'),
+                  state: fuelSource,
+                ),
+              ),
+            ],
           ],
         ),
       ),
     );
   }
 
-  /// The active vehicle's [GpsCalibrationMatrix], cold-starting when the
-  /// vehicle has none yet (or no vehicle / provider graph is wired —
-  /// the read is guarded so a test harness without the vehicle providers
-  /// still renders an honest cold badge rather than throwing).
-  GpsCalibrationMatrix _resolveMatrix(WidgetRef ref) {
+  /// The active vehicle, whose [GpsCalibrationMatrix] drives the
+  /// maturity badge (cold-starting when it has none) and whose pump gain
+  /// drives the fuel-source badge (#3916). Guarded: a test harness
+  /// without the vehicle providers renders an honest cold badge rather
+  /// than throwing.
+  VehicleProfile? _resolveVehicle(WidgetRef ref) {
     try {
-      final vehicle = ref.watch(activeVehicleProfileProvider);
-      return vehicle?.gpsCalibration ?? GpsCalibrationMatrix.coldStart();
+      return ref.watch(activeVehicleProfileProvider);
     } catch (_) {
-      return GpsCalibrationMatrix.coldStart();
+      return null;
     }
   }
 }

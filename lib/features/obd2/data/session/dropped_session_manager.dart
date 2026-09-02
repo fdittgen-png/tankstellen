@@ -6,8 +6,10 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../../../trips/api.dart';
 import 'obd2_reattach_source.dart';
+import 'obd2_service.dart';
 import '../auto_record_trace_log.dart';
 import '../obd2_comm_diagnostics.dart';
 import '../obd2_session_diagnostic.dart';
@@ -16,6 +18,7 @@ import 'dropped_session_repo_resolver.dart';
 import '../paused_trip_repository.dart';
 
 part 'dropped_session_manager_engine_off.dart';
+part 'dropped_session_manager_reattach.dart';
 
 /// Why a recording transitioned into the paused-due-to-drop state
 /// (#1330 phase 3). Distinguishes the two failure modes that share the
@@ -101,6 +104,10 @@ class DroppedSessionManager {
   /// or after a resume / silent recovery cleared it.
   TripDropReason? _dropReason;
 
+  /// #3915 — the re-adoption cycle breaker (see the reattach part).
+  late final ReadoptionCycleBreaker _adoptionGate =
+      ReadoptionCycleBreaker(now: _now);
+
   DroppedSessionManager({
     required this._host,
     required this._now,
@@ -155,6 +162,7 @@ class DroppedSessionManager {
     // #1920 — trace every detected drop for the exportable OBD2 log.
     _trace(AutoRecordEventKind.dropDetected, detail: reason.name);
     _note(RecordingSessionEventKind.linkDrop, reason.name); // #3797
+    _refuseIfReadoptionCycle(reason); // #3915
     // #2905 — record the connected→dropped transition (gated comm-health).
     Obd2CommDiagnostics.instance
         .noteSessionTransition(Obd2SessionState.dropped, detail: reason.name);
@@ -223,35 +231,6 @@ class DroppedSessionManager {
     _enterVisibleDrop(_dropReason ?? TripDropReason.transportError);
   }
 
-  /// Kick off the auto-reconnect scanner (#797 phase 3) if both a
-  /// pinned adapter MAC AND a scanner factory are wired. No-op
-  /// otherwise — the grace timer remains the sole recovery path then.
-  void _startReconnectScanner() {
-    final mac = _pinnedAdapterMac;
-    final factory = _reconnectScannerFactory;
-    if (mac == null || factory == null) return;
-    final scanner = factory(mac, onScannerReconnect);
-    if (scanner == null) return;
-    // #2767 — re-emit on the active→passive switch so the UI can swap to the
-    // calmer "passive-waiting" copy. Wired here (not via the factory
-    // signature) so the `(mac, onReconnect)` factory contract stays untouched.
-    scanner.onPassiveWait = _onScannerPassiveWait;
-    _reconnectScanner = scanner;
-    // Fire-and-forget — start() is an async scheduler boot that
-    // shouldn't block the drop handler. Errors inside the scanner are
-    // already caught internally.
-    unawaited(scanner.start());
-  }
-
-  /// #2767 — the scanner dropped to a passive autoConnect wait. Recording
-  /// continues; we re-emit only so the UI can swap to the calmer copy. A pure
-  /// notification: no state transition, and the scanner still re-arms.
-  void _onScannerPassiveWait() {
-    if (_host.stopped) return;
-    _trace(AutoRecordEventKind.reconnectPassiveWaiting);
-    _host.emitState();
-  }
-
   /// Reaction when the reconnect scanner finds the adapter again. The
   /// scanner self-stops before firing this callback.
   void onScannerReconnect() {
@@ -301,22 +280,6 @@ class DroppedSessionManager {
     _host.resumeScheduler();
     if (!_host.paused && !_host.stopped) _host.startScheduler();
     _host.emitState();
-  }
-
-  /// Tear down the in-flight reconnect scanner. Best-effort; safe to
-  /// call when none is running.
-  Future<void> stopReconnectScanner() async {
-    final scanner = _reconnectScanner;
-    if (scanner == null) return;
-    _reconnectScanner = null;
-    try {
-      await scanner.stop();
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: const {
-            'where': 'DroppedSessionManager stop reconnect scanner'
-          }));
-    }
   }
 
   /// Persist the in-progress trip snapshot to the paused-trips box on

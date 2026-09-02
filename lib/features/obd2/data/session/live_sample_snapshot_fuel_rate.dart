@@ -29,6 +29,14 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
   FuelRateSourceTag? _lastFuelRateSource;
   FuelRateSourceTag? get lastFuelRateSource => _lastFuelRateSource;
 
+  /// #3918 — the pump-gain resolution (per-fuel entry / scalar /
+  /// uncalibrated, and the gain itself) the most recent
+  /// [deriveFuelRateLPerHour] applied to its estimated branches. Null
+  /// until the first derivation; the trip summary stamps its gain as
+  /// `pumpGainApplied` so the learner divides the right value back out.
+  PumpGainResolution? _lastPumpGainResolution;
+  PumpGainResolution? get lastPumpGainResolution => _lastPumpGainResolution;
+
   /// #1858 — the volumetric efficiency applied on the most recent
   /// [deriveFuelRateLPerHour] call. Only meaningful when
   /// [lastFuelRateBranch] is [Obd2BranchTag.speedDensity]; null
@@ -81,8 +89,15 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
     final skipTrim = isDiesel ||
         mixture.kind == ResolvedFuelKind.e85 ||
         (_precision.ethanolPercent ?? 0) >= 30;
-    // #3887 — the pump-anchored gain on every ESTIMATED branch.
-    final pumpGain = _vehicle?.pumpGain ?? 1.0;
+    // #3887 — the pump-anchored gain on every ESTIMATED branch; #3918 —
+    // per-fuel entry (tank grade → ECU 0x51 key → profile fuel) → scalar
+    // → 1.0, and the resolution is kept for the badges.
+    final gainResolution = resolvePumpGain(
+      _vehicle,
+      fuelKey: pumpGainFuelKeyFor(_vehicle, sessionFuelKey: sessionFuelTypeKey),
+    );
+    _lastPumpGainResolution = gainResolution;
+    final pumpGain = gainResolution.gain;
     final displacement = _vehicle?.manualEngineDisplacementCcOverride
             ?.round() ??
         _vehicle?.engineDisplacementCc ??
