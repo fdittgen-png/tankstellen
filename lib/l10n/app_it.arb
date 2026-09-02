@@ -5280,5 +5280,15 @@
   },
   "fuelSourceEstimatedUncalibrated": "Stimato · non calibrato",
   "fuelSourceGpsEstimate": "Stima GPS",
-  "recordingTileScore": "Punteggio di guida"
+  "recordingTileScore": "Punteggio di guida",
+  "brandMarkFuelGeneric": "Fuel station",
+  "@brandMarkFuelGeneric": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "brandMarkEvGeneric": "Charging point",
+  "@brandMarkEvGeneric": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  }
 }

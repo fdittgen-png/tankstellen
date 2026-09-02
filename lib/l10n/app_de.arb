@@ -3776,6 +3776,8 @@
   "radiusAlertBlockerLabel": "Geben Sie eine Bezeichnung ein",
   "radiusAlertBlockerThreshold": "Geben Sie einen Schwellenwert über 0 ein",
   "radiusAlertBlockerLocation": "Wählen Sie einen Standort",
+  "brandMarkFuelGeneric": "Tankstelle",
+  "brandMarkEvGeneric": "Ladepunkt",
   "fillInventoryTitle": "Tankbilanz",
   "@fillInventoryTitle": {
     "description": "#3917 — title of the post-fill inventory sheet / card (French: 'Bilan du plein')."

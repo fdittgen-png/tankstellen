@@ -7951,6 +7951,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get radiusAlertBlockerLocation => 'Elige una ubicación';
 
   @override
+  String get brandMarkFuelGeneric => 'Fuel station';
+
+  @override
+  String get brandMarkEvGeneric => 'Charging point';
+
+  @override
   String get fillInventoryTitle => 'Balance del repostaje';
 
   @override

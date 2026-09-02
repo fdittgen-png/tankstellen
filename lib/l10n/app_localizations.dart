@@ -13534,6 +13534,18 @@ abstract class AppLocalizations {
   /// **'Choose a location'**
   String get radiusAlertBlockerLocation;
 
+  /// Accessibility label for the neutral station mark shown in place of a brand logo when the station carries no recognised brand.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel station'**
+  String get brandMarkFuelGeneric;
+
+  /// Accessibility label for the neutral charging mark shown in place of a network logo when the charging point carries no recognised network.
+  ///
+  /// In en, this message translates to:
+  /// **'Charging point'**
+  String get brandMarkEvGeneric;
+
   /// #3917 — title of the post-fill inventory sheet / card (French: 'Bilan du plein').
   ///
   /// In en, this message translates to:

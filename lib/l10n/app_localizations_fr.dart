@@ -7983,6 +7983,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get radiusAlertBlockerLocation => 'Choisissez un emplacement';
 
   @override
+  String get brandMarkFuelGeneric => 'Station-service';
+
+  @override
+  String get brandMarkEvGeneric => 'Point de recharge';
+
+  @override
   String get fillInventoryTitle => 'Bilan du plein';
 
   @override

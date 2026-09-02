@@ -2217,6 +2217,8 @@
   "radiusAlertBlockerLabel": "⟦Éñŧéř á łáƀéł ·····⟧",
   "radiusAlertBlockerThreshold": "⟦Éñŧéř á ŧĥřéšĥółđ áƀóṽé 0 ·········⟧",
   "radiusAlertBlockerLocation": "⟦Çĥóóšé á łóçáŧîóñ ·······⟧",
+  "brandMarkFuelGeneric": "⟦Ƒúéł šŧáŧîóñ ·····⟧",
+  "brandMarkEvGeneric": "⟦Çĥářǧîñǧ ƥóîñŧ ······⟧",
   "fillInventoryTitle": "⟦Ƒîłł-úƥ šúɱɱářý ······⟧",
   "fillInventorySubtitleFull": "⟦Ƒúłł ŧáñķ óñ {date} · {fuel} ·····⟧",
   "fillInventorySubtitlePartial": "⟦Ƥářŧîáł ƒîłł óñ {date} · {fuel} ······⟧",
