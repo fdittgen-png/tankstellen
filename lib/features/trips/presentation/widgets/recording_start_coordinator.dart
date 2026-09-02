@@ -152,21 +152,40 @@ class RecordingStartCoordinator {
     // below can honour KEEP-LINK even when [maybePrewarm] never ran.
     final sup = _resolveSupervisor(ref);
     try {
-      // #2274 concern 3 — consume the pre-warmed link if one is ready.
-      // Awaiting the in-flight warm here is cheap: if it has already
-      // resolved we get the service immediately; if it's still
-      // connecting we let it finish rather than firing a second connect.
-      Obd2Service? service;
-      final warm = _prewarm;
-      if (warm != null) {
-        service = _prewarmedService ?? await warm;
+      // #3896 — reuse-live-first (#3527 rule 2): the supervisor's CURRENT
+      // live link beats any cached pre-warm. The pre-warm is a snapshot
+      // taken when the tab opened; this coordinator lives as long as the
+      // process (the shell's IndexedStack never disposes the tab), so on
+      // the SECOND trip of a session that snapshot was a closed corpse the
+      // owner had long recycled — the trip started on it and degraded to
+      // GPS-only until the app was restarted.
+      Obd2Service? service = sup?.service;
+      if (service == null) {
+        // #2274 concern 3 — consume the pre-warmed link if one is ready.
+        // Awaiting the in-flight warm here is cheap: if it has already
+        // resolved we get the service immediately; if it's still
+        // connecting we let it finish rather than firing a second connect.
+        final warm = _prewarm;
+        if (warm != null) {
+          final warmed = _prewarmedService ?? await warm;
+          // Trust it only while it is still THE supervised link (a
+          // supervisor-owned warm that resolved after the check above),
+          // or — with no supervisor graph — while it is still connected.
+          if (warmed != null &&
+              (sup != null
+                  ? identical(sup.service, warmed)
+                  : warmed.isConnected)) {
+            service = warmed;
+          }
+        }
       }
-      if (service != null) {
-        // Pre-warm hit — skip the picker entirely; the link is already
-        // up. Mark it consumed so [dispose] doesn't disconnect the
-        // service the live recording now owns.
-        _prewarmConsumed = true;
-      } else {
+      // The pre-warm is ONE-SHOT: consumed or discarded here, never read
+      // by a later start. A discarded warm is either supervisor-owned
+      // (the owner keeps or closes it) or already dead — nothing leaks.
+      _prewarm = null;
+      _prewarmedService = null;
+      _prewarmConsumed = true;
+      if (service == null) {
         // #1188 — pre-warm missed (no pinned adapter, out of range, or a
         // failed direct connect): fall back to the picker, which takes a
         // silent `connectByMac` fast path for a paired adapter.
