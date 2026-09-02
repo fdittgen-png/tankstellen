@@ -24,6 +24,25 @@ void main() {
       );
     });
 
+    test('every appearance key is a canonical brand or a documented '
+        'registry-less charging network', () {
+      // `Mer` is deliberately out of the registry — `mer` is a substring
+      // of `Supermarché` and would poison the partial-match pass.
+      const registryLess = {'Mer'};
+      final canonical = BrandRegistry.allBrands.toSet();
+
+      final orphans = brandAppearances.keys
+          .where((k) => !canonical.contains(k) && !registryLess.contains(k))
+          .toList();
+
+      expect(
+        orphans,
+        isEmpty,
+        reason: 'appearance keys that no longer canonicalise would silently '
+            'stop resolving: $orphans',
+      );
+    });
+
     test('every monogram is 1-3 characters and non-blank', () {
       for (final entry in brandAppearances.entries) {
         final monogram = entry.value.monogram;
@@ -52,6 +71,42 @@ void main() {
       expect(brandAppearances['Shell']!.foreground, const Color(0xFF000000));
       expect(brandAppearances['Aral']!.foreground, const Color(0xFFFFFFFF));
     });
+
+    test('the charging networks carry an EV or dual kind, never fuel-only',
+        () {
+      const evNetworks = [
+        'Ionity',
+        'Fastned',
+        'Allego',
+        'EnBW',
+        'Electra',
+        'Izivia',
+        'Freshmile',
+        'Driveco',
+        'Bump',
+        'Engie Vianeo',
+        'Powerdot',
+        'Zunder',
+        'Atlante',
+        'Be Charge',
+        'Enel X Way',
+        'Vattenfall InCharge',
+        'Tesla',
+        'Shell Recharge',
+        'TotalEnergies Charge',
+        'E.ON Drive',
+        'Mer',
+      ];
+      for (final network in evNetworks) {
+        final appearance = brandAppearances[network];
+        expect(appearance, isNotNull, reason: '$network has no appearance');
+        expect(appearance!.kind, BrandKind.ev, reason: network);
+      }
+      // Supermarkets and majors run both.
+      for (final dual in ['Circle K', 'Lidl', 'Aldi', 'Kaufland', 'Shell']) {
+        expect(brandAppearances[dual]!.kind, BrandKind.both, reason: dual);
+      }
+    });
   });
 
   group('BrandAppearance.of', () {
@@ -70,6 +125,10 @@ void main() {
       expect(BrandAppearance.of('  aral  ')!.monogram, 'AR');
     });
 
+    test('resolves a registry-less network by its exact operator title', () {
+      expect(BrandAppearance.of('Mer')!.kind, BrandKind.ev);
+    });
+
     test('returns null for an unknown brand and for blank input', () {
       expect(BrandAppearance.of('NoSuchNetwork123'), isNull);
       expect(BrandAppearance.of(''), isNull);
@@ -78,6 +137,32 @@ void main() {
 
     test('the independent sentinel stays unbranded', () {
       expect(BrandAppearance.of(BrandRegistry.independentLabel), isNull);
+    });
+  });
+
+  group('EV networks in the registry (#3931)', () {
+    test('the European networks canonicalise from their common spellings', () {
+      expect(BrandRegistry.canonicalize('IONITY'), 'Ionity');
+      expect(BrandRegistry.canonicalize('Fastned'), 'Fastned');
+      expect(BrandRegistry.canonicalize('Power Dot'), 'Powerdot');
+      expect(BrandRegistry.canonicalize('NewMotion'), 'Shell Recharge');
+      expect(BrandRegistry.canonicalize('Supercharger'), 'Tesla');
+      expect(BrandRegistry.canonicalize('EnBW mobility+'), 'EnBW');
+    });
+
+    test('`Mer` and `Recharge` stay OUT of the registry — their names are '
+        'substrings that would stamp a phantom brand (#481 / #2922)', () {
+      expect(BrandRegistry.allBrands, isNot(contains('Mer')));
+      expect(BrandRegistry.allBrands, isNot(contains('Recharge')));
+      // The regression the exclusion prevents.
+      expect(BrandRegistry.canonicalize('Supermarché du Port'), isNot('Mer'));
+    });
+
+    test('adding the networks did not disturb the fuel vocabulary', () {
+      expect(BrandRegistry.canonicalize('Shell'), 'Shell');
+      expect(BrandRegistry.canonicalize('TotalEnergies'), 'TotalEnergies');
+      expect(BrandRegistry.canonicalize('Power'), 'Power');
+      expect(BrandRegistry.canonicalize('Circle K'), 'Circle K');
     });
   });
 }
