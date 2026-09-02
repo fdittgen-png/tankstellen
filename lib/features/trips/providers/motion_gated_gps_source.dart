@@ -10,6 +10,7 @@ import '../../../core/location/geolocator_wrapper.dart';
 import '../../../core/location/recording_location_settings.dart';
 import '../../../core/logging/error_logger.dart';
 import '../domain/services/motion_gate.dart';
+import 'recording_gps_fix_provider.dart';
 
 /// #3319 — owns the recording GPS subscription and motion-gates its cadence:
 /// full-rate ([GpsProfile.fine]) while moving, backed off
@@ -74,6 +75,18 @@ class MotionGatedGpsSource {
     _sub = null;
   }
 
+  /// #3916 — every fix also feeds the recording screen's live GPS status
+  /// (accuracy + cadence) before the pipeline's own handler runs.
+  void _dispatch(Position pos) {
+    teeRecordingGpsFix(
+      _ref,
+      fixAt: pos.timestamp,
+      accuracyM: pos.accuracy.isFinite ? pos.accuracy : null,
+      where: 'MotionGatedGpsSource: GPS fix seam',
+    );
+    _onPosition(pos);
+  }
+
   StreamSubscription<Position> _open({required bool coarse}) {
     return _ref
         .read(geolocatorWrapperProvider)
@@ -83,7 +96,7 @@ class MotionGatedGpsSource {
               recordingLocationSettingsForRef(_ref, coarse: coarse),
         )
         .listen(
-          _onPosition,
+          _dispatch,
           onError: (Object e, StackTrace st) {
             unawaited(errorLogger.log(ErrorLayer.providers, e, st,
                 context: const {'where': 'MotionGatedGpsSource: stream error'}));

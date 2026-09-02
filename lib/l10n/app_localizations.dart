@@ -3057,12 +3057,6 @@ abstract class AppLocalizations {
   /// **'Connecting…'**
   String get obdPickerConnecting;
 
-  /// No description provided for @tripRecordingTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Recording trip'**
-  String get tripRecordingTitle;
-
   /// No description provided for @tripSummaryTitle.
   ///
   /// In en, this message translates to:
@@ -3074,12 +3068,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Distance'**
   String get tripMetricDistance;
-
-  /// No description provided for @tripMetricSpeed.
-  ///
-  /// In en, this message translates to:
-  /// **'Speed'**
-  String get tripMetricSpeed;
 
   /// No description provided for @tripMetricFuelUsed.
   ///

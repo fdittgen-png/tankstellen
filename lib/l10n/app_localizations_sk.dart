@@ -1622,16 +1622,10 @@ class AppLocalizationsSk extends AppLocalizations {
   String get obdPickerConnecting => 'Pripájanie…';
 
   @override
-  String get tripRecordingTitle => 'Záznam jazdy';
-
-  @override
   String get tripSummaryTitle => 'Súhrn jazdy';
 
   @override
   String get tripMetricDistance => 'Vzdialenosť';
-
-  @override
-  String get tripMetricSpeed => 'Rýchlosť';
 
   @override
   String get tripMetricFuelUsed => 'Spotrebované palivo';

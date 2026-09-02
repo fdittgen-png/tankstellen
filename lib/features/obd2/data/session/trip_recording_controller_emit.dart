@@ -310,6 +310,12 @@ mixin _TripRecordingEmit
       instantIsIdle: instant?.isIdle,
       // #3845 — rolling behaviour band (green/yellow/orange/red).
       liveDrivingScore: liveBand?.score,
+      // #3916 — live provenance for the recording screen: which branch
+      // produced this tick's rate (measured PID vs air-mass estimate),
+      // stamped only alongside an actual rate like the TripSample field;
+      // and the scheduler's achieved read rate for the OBD2 status chip.
+      fuelSource: fuelRate == null ? null : snap.lastFuelRateSource,
+      obd2ReadsPerSecond: _scheduler?.governorState.achievedReadsPerSecond,
     );
     // #2506 — when NO fuel-rate PID is measurable (every tick null), fold
     // the GPS-physics estimate + coaching into the live reading so the

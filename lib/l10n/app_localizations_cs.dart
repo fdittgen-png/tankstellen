@@ -1618,16 +1618,10 @@ class AppLocalizationsCs extends AppLocalizations {
   String get obdPickerConnecting => 'Připojování…';
 
   @override
-  String get tripRecordingTitle => 'Nahrávání cesty';
-
-  @override
   String get tripSummaryTitle => 'Přehled cesty';
 
   @override
   String get tripMetricDistance => 'Vzdálenost';
-
-  @override
-  String get tripMetricSpeed => 'Rychlost';
 
   @override
   String get tripMetricFuelUsed => 'Spotřebované palivo';

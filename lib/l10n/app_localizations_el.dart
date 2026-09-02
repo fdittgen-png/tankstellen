@@ -1626,16 +1626,10 @@ class AppLocalizationsEl extends AppLocalizations {
   String get obdPickerConnecting => 'Σύνδεση…';
 
   @override
-  String get tripRecordingTitle => 'Καταγραφή διαδρομής';
-
-  @override
   String get tripSummaryTitle => 'Σύνοψη διαδρομής';
 
   @override
   String get tripMetricDistance => 'Απόσταση';
-
-  @override
-  String get tripMetricSpeed => 'Ταχύτητα';
 
   @override
   String get tripMetricFuelUsed => 'Καύσιμο που χρησιμοποιήθηκε';

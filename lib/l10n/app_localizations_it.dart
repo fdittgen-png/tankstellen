@@ -1621,16 +1621,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get obdPickerConnecting => 'Connessione in corso…';
 
   @override
-  String get tripRecordingTitle => 'Registrazione percorso';
-
-  @override
   String get tripSummaryTitle => 'Riepilogo percorso';
 
   @override
   String get tripMetricDistance => 'Distanza';
-
-  @override
-  String get tripMetricSpeed => 'Velocità';
 
   @override
   String get tripMetricFuelUsed => 'Carburante usato';

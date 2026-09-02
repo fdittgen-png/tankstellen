@@ -1622,16 +1622,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get obdPickerConnecting => 'Verbinden…';
 
   @override
-  String get tripRecordingTitle => 'Rit opnemen';
-
-  @override
   String get tripSummaryTitle => 'Ritoverzicht';
 
   @override
   String get tripMetricDistance => 'Afstand';
-
-  @override
-  String get tripMetricSpeed => 'Snelheid';
 
   @override
   String get tripMetricFuelUsed => 'Gebruikt brandstof';

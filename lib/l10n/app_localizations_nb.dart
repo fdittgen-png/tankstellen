@@ -1615,16 +1615,10 @@ class AppLocalizationsNb extends AppLocalizations {
   String get obdPickerConnecting => 'Kobler til…';
 
   @override
-  String get tripRecordingTitle => 'Tar opp tur';
-
-  @override
   String get tripSummaryTitle => 'Tursammendrag';
 
   @override
   String get tripMetricDistance => 'Avstand';
-
-  @override
-  String get tripMetricSpeed => 'Hastighet';
 
   @override
   String get tripMetricFuelUsed => 'Drivstoff brukt';

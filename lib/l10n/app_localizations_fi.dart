@@ -1616,16 +1616,10 @@ class AppLocalizationsFi extends AppLocalizations {
   String get obdPickerConnecting => 'Yhdistetään…';
 
   @override
-  String get tripRecordingTitle => 'Tallennetaan matkaa';
-
-  @override
   String get tripSummaryTitle => 'Matkan yhteenveto';
 
   @override
   String get tripMetricDistance => 'Etäisyys';
-
-  @override
-  String get tripMetricSpeed => 'Nopeus';
 
   @override
   String get tripMetricFuelUsed => 'Polttoainetta käytetty';

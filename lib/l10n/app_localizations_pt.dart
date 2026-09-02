@@ -1624,16 +1624,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get obdPickerConnecting => 'A ligar…';
 
   @override
-  String get tripRecordingTitle => 'A gravar viagem';
-
-  @override
   String get tripSummaryTitle => 'Resumo da viagem';
 
   @override
   String get tripMetricDistance => 'Distância';
-
-  @override
-  String get tripMetricSpeed => 'Velocidade';
 
   @override
   String get tripMetricFuelUsed => 'Combustível usado';

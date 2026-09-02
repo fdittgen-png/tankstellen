@@ -1628,16 +1628,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get obdPickerConnecting => 'Connexion…';
 
   @override
-  String get tripRecordingTitle => 'Enregistrement du trajet';
-
-  @override
   String get tripSummaryTitle => 'Résumé du trajet';
 
   @override
   String get tripMetricDistance => 'Distance';
-
-  @override
-  String get tripMetricSpeed => 'Vitesse';
 
   @override
   String get tripMetricFuelUsed => 'Carburant utilisé';

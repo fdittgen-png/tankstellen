@@ -1619,16 +1619,10 @@ class AppLocalizationsLt extends AppLocalizations {
   String get obdPickerConnecting => 'Jungiamasi…';
 
   @override
-  String get tripRecordingTitle => 'Kelionės įrašymas';
-
-  @override
   String get tripSummaryTitle => 'Kelionės santrauka';
 
   @override
   String get tripMetricDistance => 'Atstumas';
-
-  @override
-  String get tripMetricSpeed => 'Greitis';
 
   @override
   String get tripMetricFuelUsed => 'Sunaudotas kuras';

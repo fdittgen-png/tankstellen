@@ -67,12 +67,12 @@ void main() {
       expect(find.byType(PageScaffold), findsOneWidget);
     });
 
-    testWidgets('page title reads "Recording trip" while actively recording',
+    testWidgets('page title reads "Trip in progress" while actively recording (#3916)',
         (tester) async {
       await _pumpRecordingScreen(tester);
 
       // Title flows through PageScaffold → AppBar.title.
-      expect(find.text('Recording trip'), findsOneWidget);
+      expect(find.text('Trip in progress'), findsOneWidget);
     });
 
     testWidgets('pause / stop primary + pin (via overflow kebab) survive',

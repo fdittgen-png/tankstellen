@@ -1619,16 +1619,10 @@ class AppLocalizationsPl extends AppLocalizations {
   String get obdPickerConnecting => 'Łączenie…';
 
   @override
-  String get tripRecordingTitle => 'Nagrywanie trasy';
-
-  @override
   String get tripSummaryTitle => 'Podsumowanie trasy';
 
   @override
   String get tripMetricDistance => 'Dystans';
-
-  @override
-  String get tripMetricSpeed => 'Prędkość';
 
   @override
   String get tripMetricFuelUsed => 'Zużyte paliwo';

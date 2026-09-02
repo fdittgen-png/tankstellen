@@ -1616,16 +1616,10 @@ class AppLocalizationsHr extends AppLocalizations {
   String get obdPickerConnecting => 'Spajanje…';
 
   @override
-  String get tripRecordingTitle => 'Snimanje vožnje';
-
-  @override
   String get tripSummaryTitle => 'Sažetak vožnje';
 
   @override
   String get tripMetricDistance => 'Udaljenost';
-
-  @override
-  String get tripMetricSpeed => 'Brzina';
 
   @override
   String get tripMetricFuelUsed => 'Potrošeno gorivo';

@@ -1615,16 +1615,10 @@ class AppLocalizationsSl extends AppLocalizations {
   String get obdPickerConnecting => 'Povezovanje…';
 
   @override
-  String get tripRecordingTitle => 'Snemanje vožnje';
-
-  @override
   String get tripSummaryTitle => 'Povzetek vožnje';
 
   @override
   String get tripMetricDistance => 'Razdalja';
-
-  @override
-  String get tripMetricSpeed => 'Hitrost';
 
   @override
   String get tripMetricFuelUsed => 'Porabljeno gorivo';

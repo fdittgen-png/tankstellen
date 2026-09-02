@@ -1622,16 +1622,10 @@ class AppLocalizationsLv extends AppLocalizations {
   String get obdPickerConnecting => 'Savienojas…';
 
   @override
-  String get tripRecordingTitle => 'Brauciena ierakstīšana';
-
-  @override
   String get tripSummaryTitle => 'Brauciena kopsavilkums';
 
   @override
   String get tripMetricDistance => 'Attālums';
-
-  @override
-  String get tripMetricSpeed => 'Ātrums';
 
   @override
   String get tripMetricFuelUsed => 'Patērētā degviela';

@@ -1616,16 +1616,10 @@ class AppLocalizationsDa extends AppLocalizations {
   String get obdPickerConnecting => 'Opretter forbindelse…';
 
   @override
-  String get tripRecordingTitle => 'Optager tur';
-
-  @override
   String get tripSummaryTitle => 'Turresumé';
 
   @override
   String get tripMetricDistance => 'Afstand';
-
-  @override
-  String get tripMetricSpeed => 'Hastighed';
 
   @override
   String get tripMetricFuelUsed => 'Brændstof brugt';

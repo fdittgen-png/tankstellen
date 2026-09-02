@@ -1616,16 +1616,10 @@ class AppLocalizationsSv extends AppLocalizations {
   String get obdPickerConnecting => 'Ansluter…';
 
   @override
-  String get tripRecordingTitle => 'Spelar in resa';
-
-  @override
   String get tripSummaryTitle => 'Resesammanfattning';
 
   @override
   String get tripMetricDistance => 'Sträcka';
-
-  @override
-  String get tripMetricSpeed => 'Hastighet';
 
   @override
   String get tripMetricFuelUsed => 'Bränsle använt';

@@ -1624,16 +1624,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get obdPickerConnecting => 'Csatlakozás…';
 
   @override
-  String get tripRecordingTitle => 'Út rögzítése';
-
-  @override
   String get tripSummaryTitle => 'Út összefoglalója';
 
   @override
   String get tripMetricDistance => 'Távolság';
-
-  @override
-  String get tripMetricSpeed => 'Sebesség';
 
   @override
   String get tripMetricFuelUsed => 'Felhasznált üzemanyag';

@@ -1611,16 +1611,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get obdPickerConnecting => 'Connecting…';
 
   @override
-  String get tripRecordingTitle => 'Recording trip';
-
-  @override
   String get tripSummaryTitle => 'Trip summary';
 
   @override
   String get tripMetricDistance => 'Distance';
-
-  @override
-  String get tripMetricSpeed => 'Speed';
 
   @override
   String get tripMetricFuelUsed => 'Fuel used';
@@ -10007,16 +10001,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get obdPickerConnecting => '⟦Çóññéçŧîñǧ… ·····⟧';
 
   @override
-  String get tripRecordingTitle => '⟦Řéçóřđîñǧ ŧřîƥ ······⟧';
-
-  @override
   String get tripSummaryTitle => '⟦Ŧřîƥ šúɱɱářý ·····⟧';
 
   @override
   String get tripMetricDistance => '⟦Đîšŧáñçé ····⟧';
-
-  @override
-  String get tripMetricSpeed => '⟦Šƥééđ ··⟧';
 
   @override
   String get tripMetricFuelUsed => '⟦Ƒúéł úšéđ ····⟧';

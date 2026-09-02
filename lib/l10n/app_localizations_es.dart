@@ -1621,16 +1621,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get obdPickerConnecting => 'Conectando…';
 
   @override
-  String get tripRecordingTitle => 'Grabando viaje';
-
-  @override
   String get tripSummaryTitle => 'Resumen del viaje';
 
   @override
   String get tripMetricDistance => 'Distancia';
-
-  @override
-  String get tripMetricSpeed => 'Velocidad';
 
   @override
   String get tripMetricFuelUsed => 'Combustible usado';

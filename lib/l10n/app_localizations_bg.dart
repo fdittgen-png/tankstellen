@@ -1624,16 +1624,10 @@ class AppLocalizationsBg extends AppLocalizations {
   String get obdPickerConnecting => 'Свързване...';
 
   @override
-  String get tripRecordingTitle => 'Запис на пътуване';
-
-  @override
   String get tripSummaryTitle => 'Резюме на пътуването';
 
   @override
   String get tripMetricDistance => 'Разстояние';
-
-  @override
-  String get tripMetricSpeed => 'Скорост';
 
   @override
   String get tripMetricFuelUsed => 'Изразходвано гориво';

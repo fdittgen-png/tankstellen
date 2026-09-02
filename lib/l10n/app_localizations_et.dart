@@ -1611,16 +1611,10 @@ class AppLocalizationsEt extends AppLocalizations {
   String get obdPickerConnecting => 'Ühendan…';
 
   @override
-  String get tripRecordingTitle => 'Reisi salvestamine';
-
-  @override
   String get tripSummaryTitle => 'Reisi kokkuvõte';
 
   @override
   String get tripMetricDistance => 'Vahemaa';
-
-  @override
-  String get tripMetricSpeed => 'Kiirus';
 
   @override
   String get tripMetricFuelUsed => 'Kasutatud kütus';

@@ -1622,16 +1622,10 @@ class AppLocalizationsRo extends AppLocalizations {
   String get obdPickerConnecting => 'Se conectează…';
 
   @override
-  String get tripRecordingTitle => 'Se înregistrează călătoria';
-
-  @override
   String get tripSummaryTitle => 'Rezumat călătorie';
 
   @override
   String get tripMetricDistance => 'Distanță';
-
-  @override
-  String get tripMetricSpeed => 'Viteză';
 
   @override
   String get tripMetricFuelUsed => 'Combustibil utilizat';
