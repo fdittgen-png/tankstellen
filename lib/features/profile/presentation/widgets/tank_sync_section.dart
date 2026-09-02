@@ -15,7 +15,6 @@ import '../../../../core/error/guarded.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/sync/sync_config.dart';
 import '../../../../core/sync/sync_provider.dart';
-import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 
@@ -58,15 +57,9 @@ class TankSyncSection extends ConsumerWidget {
       // #3560 — zero-height unless the self-host schema is outdated (drift
       // hit this session, or the recorded schema version is behind).
       const TankSyncSchemaOutdatedTile(),
-      ListTile(
-        leading: Icon(Icons.cloud_done, color: DarkModeColors.success(context)),
-        title: Text(syncConfig.modeName),
-        subtitle: Text(
-          syncConfig.hasEmail
-              ? syncConfig.userEmail!
-              : 'Anonymous \u00b7 ${syncConfig.userId?.substring(0, 8) ?? ""}...',
-        ),
-      ),
+      // #3911 (Epic #3907) \u2014 the status / mode / account / user-id rows
+      // moved to `SyncAccountOverviewCard` above this section (full,
+      // copyable id; localised mode explanation), so they are shown once.
       if (!syncConfig.hasEmail)
         ListTile(
           leading: const Icon(Icons.email_outlined),

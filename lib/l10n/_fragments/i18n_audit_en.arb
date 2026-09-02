@@ -30,14 +30,6 @@
   "authInfoBenefit2": "• Prepare a route on your phone, use it in your car",
   "authInfoBenefit3": "• No data is shared with third parties",
   "authInfoBenefit4": "• You can delete your account at any time",
-  "privacyLocalDataEmpty": "Nothing stored yet. Add a favorite or set a price alert to see entries here.",
-  "privacyHideEmptyRows": "Hide empty rows",
-  "privacyShowEmptyRows": "{count, plural, =1{Show {count} empty row} other{Show {count} empty rows}}",
-  "@privacyShowEmptyRows": {
-    "placeholders": {
-      "count": {"type": "int", "example": "3"}
-    }
-  },
   "apiKeySetupTitle": "API key setup (optional)",
   "apiKeySetupDescription": "Register for a free API key, or skip to explore the app with demo data.",
   "apiKeyRegistrationButton": "{provider} Registration",
@@ -61,8 +53,6 @@
   "consentSyncTripsSubtitle": "Back up OBD2 + GPS trips to TankSync. Cross-device, opt-in.",
   "consentSyncTripsDisabledHint": "Enable Cloud Sync above to back up trips.",
   "consentSyncTripsAnonymousHint": "Trips back up under this device's anonymous account. Sign in with an email to reach them from other devices.",
-  "consentHideDetails": "Hide details",
-  "consentShowDetails": "Show details",
   "dialogOk": "OK",
   "invalidLinkTitle": "Invalid link",
   "invalidLinkBody": "The link \"{path}\" is not valid.",

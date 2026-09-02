@@ -51,7 +51,7 @@ void main() {
     '// ignore: silent_catch': 32,
     '// ignore: catch_no_st': 14,
     '// ignore: log_raw_debugprint': 0,
-    '// i18n-ignore:': 123,
+    '// i18n-ignore:': 122,
   };
 
   bool isScanned(String path) {

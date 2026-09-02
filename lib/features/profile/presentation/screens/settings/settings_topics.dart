@@ -136,7 +136,8 @@ List<SettingsTopic> buildSettingsTopics(
       id: SettingsTopicId.privacy,
       icon: Icons.privacy_tip_outlined,
       title: l.sectionPrivacyData,
-      subtitle: l.settingsTopicPrivacySubtitle,
+      // #3908 (Epic #3907) — names the four privacy topics.
+      subtitle: l.privacyTopicSubtitle,
       keywords: l.settingsTopicPrivacyKeywords,
       route: RoutePaths.settingsPrivacy,
     ),

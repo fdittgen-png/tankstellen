@@ -8,11 +8,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
-import 'package:tankstellen/features/consent/presentation/widgets/consent_settings_section.dart';
+import 'package:tankstellen/features/consent/presentation/widgets/consent_switch_rows.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../../../../fakes/fake_hive_storage.dart';
 
+/// The five consent rows (#3909) — the write paths of the former
+/// `ConsentSettingsSection`, unchanged.
 void main() {
   late FakeHiveStorage fakeStorage;
 
@@ -28,7 +30,8 @@ void main() {
     bool syncTrips = false,
   }) {
     unawaited(fakeStorage.putSetting(StorageKeys.consentLocation, location));
-    unawaited(fakeStorage.putSetting(StorageKeys.consentErrorReporting, errorReporting));
+    unawaited(fakeStorage.putSetting(
+        StorageKeys.consentErrorReporting, errorReporting));
     unawaited(fakeStorage.putSetting(StorageKeys.consentCloudSync, cloudSync));
     unawaited(fakeStorage.putSetting(
         StorageKeys.consentVinOnlineDecode, vinOnlineDecode));
@@ -42,17 +45,15 @@ void main() {
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: Locale('en'),
-        home: Scaffold(body: ConsentSettingsSection()),
+        home: Scaffold(body: SingleChildScrollView(child: ConsentSwitchRows())),
       ),
     );
   }
 
-  group('ConsentSettingsSection', () {
+  group('ConsentSwitchRows', () {
     testWidgets('shows five toggle switches', (tester) async {
-      // #1665 moved the Sync-trip-recordings toggle to TankSync; #3884
-      // brought it back here next to the Cloud Sync master it depends on
-      // (one home per parameter). #2063 removed the community wait-time
-      // toggle. Five consent toggles live here.
+      // #2063 removed the community wait-time toggle; #3884 brought the
+      // trip-sync toggle back next to its Cloud Sync master. Five rows.
       await tester.pumpWidget(buildWidget());
       await tester.pumpAndSettle();
 
@@ -104,8 +105,9 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      final tiles =
-          tester.widgetList<SwitchListTile>(find.byType(SwitchListTile)).toList();
+      final tiles = tester
+          .widgetList<SwitchListTile>(find.byType(SwitchListTile))
+          .toList();
       expect(tiles[0].value, isTrue); // location
       expect(tiles[1].value, isFalse); // error reporting
       expect(tiles[2].value, isTrue); // cloud sync
@@ -116,7 +118,6 @@ void main() {
       await tester.pumpWidget(buildWidget());
       await tester.pumpAndSettle();
 
-      // Tap location toggle
       await tester.tap(find.byType(Switch).first);
       await tester.pumpAndSettle();
 
@@ -138,14 +139,19 @@ void main() {
       expect(fakeStorage.getSetting(StorageKeys.consentCloudSync), false);
     });
 
-    testWidgets('shows settings hint text', (tester) async {
+    testWidgets('#3909 — no subtitle carries a maxLines cap (nothing can '
+        'ellipsise); the former Show-details toggle is gone', (tester) async {
       await tester.pumpWidget(buildWidget());
       await tester.pumpAndSettle();
 
+      for (final tile
+          in tester.widgetList<SwitchListTile>(find.byType(SwitchListTile))) {
+        final subtitle = tile.subtitle! as Text;
+        expect(subtitle.maxLines, isNull);
+        expect(subtitle.overflow, isNull);
+      }
       expect(
-        find.textContaining('change your privacy choices'),
-        findsOneWidget,
-      );
+          find.byKey(const Key('consentSubtitleExpandToggle')), findsNothing);
     });
   });
 }

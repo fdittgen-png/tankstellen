@@ -11,7 +11,6 @@ import '../../features/profile/presentation/screens/developer_tools/error_log_vi
 import '../../features/profile/presentation/screens/developer_tools/feature_flag_dump_screen.dart';
 import '../../features/profile/presentation/screens/developer_tools/obd2_health_screen.dart';
 import '../../features/profile/presentation/screens/developer_tools/pump_ocr_tester_screen.dart';
-import '../../features/profile/presentation/screens/privacy_dashboard_screen.dart';
 import '../../features/profile/presentation/screens/settings/about_screen.dart';
 import '../../features/profile/presentation/screens/settings/advanced_developer_screen.dart';
 import '../../features/profile/presentation/screens/settings/backup_restore_screen.dart';
@@ -53,9 +52,13 @@ List<RouteBase> get profileRoutes => [
         path: RoutePaths.itineraries,
         builder: (context, state) => const ItinerariesScreen(),
       ),
+      // #3908 (Epic #3907) — the Privacy Dashboard is retired: its data
+      // inventory, sync facts, export and delete actions live under the
+      // four Privacy & data topics. The path stays as a redirect so old
+      // deep links and widgets land on the one privacy entry.
       GoRoute(
         path: RoutePaths.privacyDashboard,
-        builder: (context, state) => const PrivacyDashboardScreen(),
+        redirect: (context, state) => RoutePaths.settingsPrivacy,
       ),
       // #897 — dedicated Theme settings screen, pushed from the
       // Theme card on the profile/settings screen. Extracted from

@@ -7,13 +7,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
+import 'package:tankstellen/core/telemetry/storage/trace_storage.dart';
 import 'package:tankstellen/features/calculator/presentation/screens/calculator_screen.dart';
 import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/consumption_screen.dart';
 import 'package:tankstellen/features/fill_ups/providers/consumption_providers.dart';
 import 'package:tankstellen/features/favorites/presentation/screens/favorites_screen.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
-import 'package:tankstellen/features/profile/presentation/screens/privacy_dashboard_screen.dart';
+import 'package:tankstellen/features/profile/presentation/screens/settings/privacy_data_screen.dart';
 import 'package:tankstellen/features/profile/presentation/screens/profile_screen.dart';
 import 'package:tankstellen/core/domain/search_result_item.dart';
 import 'package:tankstellen/core/domain/station.dart';
@@ -23,6 +24,7 @@ import 'package:tankstellen/features/setup/presentation/screens/setup_screen.dar
 import 'package:tankstellen/features/sync/presentation/screens/sync_setup_screen.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
+import '../features/profile/presentation/screens/settings/privacy/privacy_test_support.dart';
 import '../helpers/mock_providers.dart';
 
 /// A fixed ActiveLanguage notifier for testing.
@@ -345,15 +347,12 @@ void main() {
     });
 
     // -----------------------------------------------------------------------
-    // PrivacyDashboardScreen
+    // PrivacyDataScreen (#3908 — the privacy entry that replaced the
+    // dashboard: summary card + four topic tiles)
     // -----------------------------------------------------------------------
-    group('PrivacyDashboardScreen', () {
+    group('PrivacyDataScreen', () {
       List<Object> overrides() {
         final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
-        when(() => test.mockStorage.hasCustomApiKey(any())).thenReturn(false);
-        when(() => test.mockStorage.hasEvApiKey()).thenReturn(false);
-        when(() => test.mockStorage.hasCustomEvApiKey()).thenReturn(false);
         when(() => test.mockStorage.favoriteCount).thenReturn(0);
         when(() => test.mockStorage.alertCount).thenReturn(0);
         when(() => test.mockStorage.profileCount).thenReturn(0);
@@ -362,6 +361,7 @@ void main() {
         when(() => test.mockStorage.getRatings()).thenReturn(const {});
         when(() => test.mockStorage.getPriceHistoryKeys()).thenReturn(const []);
         when(() => test.mockStorage.getItineraries()).thenReturn(const []);
+        when(() => test.mockStorage.getSetting(any())).thenReturn(null);
         when(() => test.mockStorage.storageStats).thenReturn((
           settings: 0,
           profiles: 0,
@@ -371,15 +371,15 @@ void main() {
           alerts: 0,
           total: 0,
         ));
-        // storageRepositoryProvider is already overridden via
-        // standardTestOverrides, so the PrivacyDashboard will pick up the
-        // configured mock above.
-        return test.overrides;
+        return [
+          ...test.overrides,
+          traceStorageProvider.overrideWithValue(StubTraceStorage()),
+        ];
       }
 
       testWidgets('meets Android tap target guideline', (tester) async {
         final handle = tester.ensureSemantics();
-        await _pumpScreen(tester, const PrivacyDashboardScreen(),
+        await _pumpScreen(tester, const PrivacyDataScreen(),
             overrides: overrides());
 
         await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
@@ -388,7 +388,7 @@ void main() {
 
       testWidgets('meets labeled tap target guideline', (tester) async {
         final handle = tester.ensureSemantics();
-        await _pumpScreen(tester, const PrivacyDashboardScreen(),
+        await _pumpScreen(tester, const PrivacyDataScreen(),
             overrides: overrides());
 
         await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));

@@ -62,10 +62,6 @@
   "@reportDeleteFailed": {
     "description": "Snackbar when a single-report delete failed."
   },
-  "privacyControlsTitle": "Privacy controls",
-  "@privacyControlsTitle": {
-    "description": "Settings → Privacy & data: header of the non-consent privacy switches (tile proxy, internet logos)."
-  },
   "tileProxyToggleTitle": "Route map tiles through the Sparkilo proxy",
   "@tileProxyToggleTitle": {
     "description": "Switch title. Sparkilo is the app name."
@@ -81,10 +77,6 @@
   "remoteLogosToggleSubtitle": "Off by default: bundled placeholders are shown. On: logos are fetched from logo.clearbit.com, which sees your IP address.",
   "@remoteLogosToggleSubtitle": {
     "description": "Switch explanation for internet brand logos."
-  },
-  "privacyExportAllButton": "Export all my data (ZIP)",
-  "@privacyExportAllButton": {
-    "description": "Privacy Dashboard button: one ZIP with every local category and every server table (GDPR Art. 20)."
   },
   "privacyExportAllSuccess": "Saved {fileName} to Downloads — {count} files inside",
   "@privacyExportAllSuccess": {

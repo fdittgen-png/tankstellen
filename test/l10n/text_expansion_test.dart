@@ -13,6 +13,7 @@ import 'package:tankstellen/core/services/widgets/service_status_banner.dart';
 import 'package:tankstellen/features/fill_ups/domain/services/monthly_insights_aggregator.dart';
 import 'package:tankstellen/features/fill_ups/presentation/widgets/monthly_insights_card.dart';
 import 'package:tankstellen/features/profile/domain/entities/user_profile.dart';
+import 'package:tankstellen/features/profile/presentation/screens/settings/privacy/privacy_choices_screen.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
 import 'package:tankstellen/features/search/presentation/widgets/fuel_type_selector.dart';
 import 'package:tankstellen/features/search/presentation/widgets/station_card.dart';
@@ -25,6 +26,7 @@ import 'package:tankstellen/features/station_detail/presentation/widgets/station
 
 import '../fixtures/stations.dart';
 import '../helpers/mock_providers.dart';
+import '../helpers/never_truncates.dart';
 import '../helpers/pump_app.dart';
 
 /// Pseudo-localization pass for text-expansion overflow (#1699).
@@ -168,6 +170,19 @@ void main() {
       );
     });
 
+    // #3909 (Epic #3907) — the "Your choices" list: every consent /
+    // privacy-control subtitle wraps, none ellipsises.
+    testWidgets('PrivacyChoicesScreen — no row truncates', (tester) async {
+      await pumpPseudo(
+        tester,
+        const PrivacyChoicesScreen(),
+        overrides: [fakeHiveStorageOverride().override],
+        widgetName: 'PrivacyChoicesScreen',
+      );
+      expectNoTextTruncates(tester,
+          within: find.byKey(const Key('privacyChoicesList')));
+    });
+
     testWidgets('FuelTypeSelector — Germany fuel set', (tester) async {
       await pumpPseudo(
         tester,
@@ -250,6 +265,17 @@ void main() {
         ),
         widgetName: 'LanguageSelector',
       );
+    });
+
+    testWidgets('PrivacyChoicesScreen — no row truncates', (tester) async {
+      await pumpScaled(
+        tester,
+        const PrivacyChoicesScreen(),
+        overrides: [fakeHiveStorageOverride().override],
+        widgetName: 'PrivacyChoicesScreen',
+      );
+      expectNoTextTruncates(tester,
+          within: find.byKey(const Key('privacyChoicesList')));
     });
 
     testWidgets('FuelTypeSelector — Germany fuel set', (tester) async {

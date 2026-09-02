@@ -63,16 +63,11 @@
   "freeNoKey": "Ingyenes — kulcs nem szükséges",
   "apiKeyRequired": "API-kulcs szükséges",
   "dataTransparency": "Adatátláthatóság",
-  "storageAndCache": "Tárhely és gyorsítótár",
   "clearCache": "Gyorsítótár törlése",
   "stationsFound": "{count} kút találva",
   "storageUsage": "Tárhelyhasználat ezen az eszközön",
   "settingsLabel": "Beállítások",
-  "profilesStored": "profil mentve",
-  "stationsMarked": "kút jelölve",
-  "cachedResponses": "gyorsítótárazott válasz",
   "total": "Összesen",
-  "cacheManagement": "Gyorsítótár kezelése",
   "cacheDescription": "A gyorsítótár API-válaszokat tárol a gyorsabb betöltés és offline hozzáférés érdekében.",
   "cacheTtlGroupNetwork": "Hálózat",
   "cacheTtlGroupData": "Adatok",
@@ -87,7 +82,6 @@
   "clearCacheBody": "A tárolt keresési eredmények és árak törlődnek. A profilok, kedvencek és beállítások megmaradnak.",
   "clearCacheButton": "Gyorsítótár törlése",
   "deleteAllButton": "Mindent töröl",
-  "entries": "bejegyzés",
   "cacheEmpty": "A gyorsítótár üres",
   "apiKeyNote": "Ingyenes regisztráció. Adatok a kormányzati ártranszparencia-ügynökségektől.",
   "apiKeyFormatError": "Érvénytelen formátum — UUID elvárva (8-4-4-4-12)",
@@ -97,32 +91,9 @@
   "reportConsentBody": "Ez egy nyilvános GitHub-hibajegyet nyit meg az alábbi hibarészletekkel. Nem kerül bele GPS-koordináta, API-kulcs vagy személyes adat.",
   "reportConsentConfirm": "GitHub megnyitása",
   "reportConsentCancel": "Mégse",
-  "configProfileSection": "Profil",
-  "configActiveProfile": "Aktív profil",
-  "configPreferredFuel": "Előnyben részesített üzemanyag",
-  "configCountry": "Ország",
-  "configRouteSegment": "Útvonal-szakasz",
-  "configApiKeysSection": "API-kulcsok",
-  "configTankerkoenigKey": "Tankerkoenig API-kulcs",
-  "configApiKeyConfigured": "Beállítva",
-  "configApiKeyCommunity": "Alapértelmezett (közösségi kulcs)",
   "searchLocationPlaceholder": "Cím, irányítószám vagy város",
-  "configEvKey": "EV töltési API-kulcs",
-  "configEvKeyCustom": "Egyéni kulcs",
-  "configEvKeyShared": "Alapértelmezett (megosztott)",
-  "configCloudSyncSection": "Felhőszinkronizálás",
   "configTankSyncConnected": "Csatlakoztatva",
   "configTankSyncDisabled": "Letiltva",
-  "configAuthMode": "Hitelesítési mód",
-  "configAuthEmail": "E-mail (tartós)",
-  "configAuthAnonymous": "Névtelen (csak eszköz)",
-  "configDatabase": "Adatbázis",
-  "configPrivacySummary": "Adatvédelmi összefoglaló",
-  "configPrivacySummarySynced": "• A kedvencek, riasztások és figyelmen kívül hagyott állomások szinkronizálódnak a privát adatbázisba\n• A GPS-pozíció és az API-kulcsok soha nem hagyják el az eszközt\n• {authNote}",
-  "configPrivacySummaryLocal": "• Az összes adat csak ezen az eszközön tárolódik\n• Nem kerül adat semmilyen szerverre\n• Az API-kulcsok titkosítva vannak az eszköz biztonságos tárolójában",
-  "configAuthNoteEmail": "Az e-mail fiók lehetővé teszi a több eszközről való hozzáférést",
-  "configAuthNoteAnonymous": "Névtelen fiók — az adatok ehhez az eszközhöz kötöttek",
-  "configNone": "Nincs",
   "privacyPolicy": "Adatvédelmi irányelvek",
   "fuels": "Üzemanyagok",
   "services": "Szolgáltatások",
@@ -262,42 +233,8 @@
   "fuelNeeded": "Szükséges üzemanyag",
   "totalCost": "Összköltség",
   "priceHistory": "Ártörténet",
-  "ignoredStationsLabel": "Mellőzött",
-  "ratingsLabel": "Értékelések",
   "favoritesDataCache": "Kedvencek adatai",
   "citySearchCache": "Városkeresés",
-  "priceHistoryStationsTracked": "{count} követett kút",
-  "@priceHistoryStationsTracked": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "alertsConfiguredCount": "{count} beállítva",
-  "@alertsConfiguredCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ignoredStationsHidden": "{count} rejtett kút",
-  "@ignoredStationsHidden": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ratingsStationsRated": "{count} értékelt kút",
-  "@ratingsStationsRated": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "noPriceHistory": "Még nincs ártörténet",
   "noStatistics": "Nincsenek elérhető statisztikák",
   "showAllFuelTypes": "Összes üzemanyagtípus mutatása",
@@ -420,33 +357,19 @@
   "alertStatsActive": "Aktív",
   "alertStatsToday": "Ma",
   "alertStatsThisWeek": "Ezen a héten",
-  "privacyDashboardTitle": "Adatvédelmi irányítópult",
-  "privacyDashboardSubtitle": "Adatok megtekintése, exportálása vagy törlése",
-  "privacyDashboardBanner": "Az adatai az Öné. Itt megtekintheti az alkalmazás által tárolt összes adatot, exportálhatja vagy törölheti azokat.",
   "privacyLocalData": "Adatok ezen az eszközön",
   "privacyIgnoredStations": "Figyelmen kívül hagyott állomások",
   "privacyRatings": "Állomásértékelések",
   "privacyPriceHistory": "Ártörténeti állomások",
   "privacyProfiles": "Keresési profilok",
   "privacyItineraries": "Mentett útvonalak",
-  "privacyCacheEntries": "Gyorsítótár-bejegyzések",
-  "privacyApiKey": "Tárolt API-kulcs",
-  "privacyEvApiKey": "Tárolt EV API-kulcs",
-  "privacyEstimatedSize": "Becsült tárterület",
-  "privacySyncedData": "Felhőszinkronizálás (TankSync)",
-  "privacySyncDisabled": "A felhőszinkronizálás le van tiltva. Az összes adat csak ezen az eszközön marad.",
   "privacySyncMode": "Szinkronizálási mód",
   "privacySyncUserId": "Felhasználói azonosító",
   "privacySyncDescription": "Ha a szinkronizálás engedélyezve van, a kedvencek, riasztások, figyelmen kívül hagyott állomások és értékelések szintén a TankSync szerveren tárolódnak.",
-  "privacyViewServerData": "Szerveradatok megtekintése",
-  "privacyExportButton": "Összes adat exportálása JSON-ként",
   "privacyExportSuccess": "Adatok exportálva a vágólapra",
-  "privacyExportCsvButton": "Összes adat exportálása CSV-ként",
   "privacyExportCsvSuccess": "CSV-adatok exportálva a vágólapra",
   "savedToDownloadsFolder": "Mentve a Letöltések mappába",
-  "privacyClearErrorLog": "Hibanapló törlése",
   "privacyErrorLogCleared": "Hibanapló törölve",
-  "privacyDeleteButton": "Összes adat törlése",
   "privacyDeleteTitle": "Törli az összes adatot?",
   "privacyDeleteBody": "Ez véglegesen törli:\n\n- Az összes kedvencet és állomásadatot\n- Az összes keresési profilt\n- Az összes áriasztást\n- Az összes ártörténetet\n- Az összes gyorsítótárazott adatot\n- Az Ön API-kulcsát\n- Az összes alkalmazásbeállítást\n\nAz alkalmazás visszaáll a kezdeti állapotára. Ez a művelet nem vonható vissza.",
   "privacyDeleteConfirm": "Mindent töröl",
@@ -1177,9 +1100,6 @@
   "authInfoBenefit2": "• Tervezzen útvonalat a telefonján, és használja az autójában",
   "authInfoBenefit3": "• Semmilyen adat nem kerül megosztásra harmadik felekkel",
   "authInfoBenefit4": "• Fiókját bármikor törölheti",
-  "privacyLocalDataEmpty": "Még semmi sem tárolódott. Adjon hozzá kedvencet vagy állítson be áriasztást a bejegyzések megtekintéséhez.",
-  "privacyHideEmptyRows": "Üres sorok elrejtése",
-  "privacyShowEmptyRows": "{count, plural, =1{{count} üres sor megjelenítése} other{{count} üres sor megjelenítése}}",
   "apiKeySetupTitle": "API-kulcs beállítása (opcionális)",
   "apiKeySetupDescription": "Regisztráljon egy ingyenes API-kulcsért, vagy ugorja át, hogy demó adatokkal fedezze fel az alkalmazást.",
   "apiKeyRegistrationButton": "{provider} regisztráció",
@@ -1192,8 +1112,6 @@
   "consentSyncTripsTitle": "Útfelvételek szinkronizálása",
   "consentSyncTripsSubtitle": "OBD2 + GPS utak mentése TankSync-re. Eszközök között, opcionális.",
   "consentSyncTripsDisabledHint": "Az utak mentéséhez engedélyezze a Felhőszinkronizálást fentebb.",
-  "consentHideDetails": "Részletek elrejtése",
-  "consentShowDetails": "Részletek megjelenítése",
   "dialogOk": "OK",
   "invalidLinkTitle": "Érvénytelen hivatkozás",
   "invalidLinkBody": "A(z) \"{path}\" hivatkozás érvénytelen.",
@@ -1636,15 +1554,6 @@
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
   "fabRunSearch": "Keresés futtatása",
-  "privacySaveErrorLog": "Hibanapló mentése ({count})",
-  "@privacySaveErrorLog": {
-    "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "approachTestSimulateButton": "Megközelítési rátét tesztelése",
   "@approachTestSimulateButton": {
     "description": "Button on the trip-recording screen that pushes a synthetic ApproachInRadius into the PiP for 30 s so the user can verify the price layout without driving (#2163)."
@@ -4638,12 +4547,10 @@
   "deleteReportTooltip": "Jelentés törlése",
   "reportDeleted": "Jelentés törölve",
   "reportDeleteFailed": "A jelentést nem sikerült törölni",
-  "privacyControlsTitle": "Adatvédelmi beállítások",
   "tileProxyToggleTitle": "Térképcsempék betöltése a Sparkilo proxyn keresztül",
   "tileProxyToggleSubtitle": "Be: a látható térképrészlet és az Ön IP-címe a fejlesztő EU-s szerverére kerül, amely a csempéket az OpenStreetMaptől kéri le. Ki: a csempék közvetlenül a tile.openstreetmap.org címről töltődnek be.",
   "remoteLogosToggleTitle": "Márkalogók betöltése az internetről",
   "remoteLogosToggleSubtitle": "Alapértelmezés szerint ki: a beépített helyettesítő képek jelennek meg. Be: a logók a logo.clearbit.com címről töltődnek le, amely látja az Ön IP-címét.",
-  "privacyExportAllButton": "Összes adatom exportálása (ZIP)",
   "privacyExportAllSuccess": "{fileName} mentve a Letöltésekbe — {count} fájlt tartalmaz",
   "@privacyExportAllSuccess": {
     "placeholders": {
@@ -4776,7 +4683,6 @@
   "settingsTopicDataSourcesKeywords": "api, kulcs, gps, helyzet, pozíció, adatforrás, tankerkoenig, opencharge, key, location, data source",
   "settingsTopicSyncTitle": "Szinkronizálás és fiók",
   "settingsTopicSyncKeywords": "tanksync, felhő, fiók, e-mail, eszköz összekapcsolása, szinkronizálás, adatbázis megosztása, névtelen, cloud, account, email, link device, sync, share database, anonymous",
-  "settingsTopicPrivacySubtitle": "Hozzájárulások, adatvédelmi irányítópult, tárhely és gyorsítótár",
   "settingsTopicPrivacyKeywords": "adatvédelem, hozzájárulás, gdpr, törlés, tárhely, gyorsítótár, adatok, hibajelentés, vin, privacy, consent, delete, erase, storage, cache, data, error reporting",
   "settingsTopicBackupTitle": "Biztonsági mentés és visszaállítás",
   "settingsTopicBackupSubtitle": "Adataid teljes biztonsági mentésének exportálása vagy visszaállítása",
@@ -4797,7 +4703,6 @@
   "settingsDistanceUnitSubtitle": "Az aktív profil országa alapján",
   "settingsObd2AdapterTitle": "OBD2-adapter",
   "settingsObd2AdapterSubtitle": "Az adapterek járművenként párosíthatók – nyiss meg egy járművet az adapter párosításához vagy cseréjéhez",
-  "settingsStorageDeleteHint": "Az összes helyi adat törlése az adatvédelmi irányítópultról történik.",
   "settingsPrivacyCrossLinkTitle": "Hozzájárulások",
   "settingsPrivacyCrossLinkSubtitle": "A Cloud Sync és az útszinkronizálás hozzájárulásai az Adatvédelem és adatok alatt találhatók",
   "settingsBackupExportSubtitle": "Járművek, tankolások, utak és töltési naplók ZIP-fájlként",
@@ -5131,6 +5036,282 @@
   },
   "pumpGainResetConfirmBody": "This discards the fuel gain learned from your fill-ups. OBD2 consumption estimates fall back to the uncorrected figure until the next full-to-full tank window re-learns it.",
   "@pumpGainResetConfirmBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyTopicSubtitle": "Your choices, data on this device, sync, export or delete",
+  "@privacyTopicSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyDataLocationLocal": "Your data stays on this device",
+  "@privacyDataLocationLocal": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyDataLocationSynced": "Your data is also synced to TankSync",
+  "@privacyDataLocationSynced": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncLineEnabledAnonymous": "Sync: on · anonymous account",
+  "@privacySyncLineEnabledAnonymous": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncLineEnabledEmail": "Sync: on · email account",
+  "@privacySyncLineEnabledEmail": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncLineDisabled": "Sync: off",
+  "@privacySyncLineDisabled": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyStorageLine": "{size} stored on this device",
+  "@privacyStorageLine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "size": {
+        "type": "String",
+        "example": "2.1 MB"
+      }
+    }
+  },
+  "privacyTopicChoicesTitle": "Your choices",
+  "@privacyTopicChoicesTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyChoicesStatus": "{on} of {total} enabled",
+  "@privacyChoicesStatus": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "on": {
+        "type": "int",
+        "example": "5"
+      },
+      "total": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "privacyDeviceDataStatus": "{size} · {count, plural, =1{1 category} other{{count} categories}}",
+  "@privacyDeviceDataStatus": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "size": {
+        "type": "String",
+        "example": "2.1 MB"
+      },
+      "count": {
+        "type": "int",
+        "example": "6"
+      }
+    }
+  },
+  "privacyTopicExportDeleteTitle": "Export or delete",
+  "@privacyTopicExportDeleteTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportDeleteStatus": "ZIP, JSON, CSV · error log ({count})",
+  "@privacyExportDeleteStatus": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "29"
+      }
+    }
+  },
+  "privacyLearnMore": "Learn more",
+  "@privacyLearnMore": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tileProxyToggleShort": "Tiles come via the developer's EU proxy, not straight from OpenStreetMap",
+  "@tileProxyToggleShort": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "remoteLogosToggleShort": "Fetch brand logos from logo.clearbit.com instead of bundled placeholders",
+  "@remoteLogosToggleShort": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyCacheDetails": "Cache details",
+  "@privacyCacheDetails": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyCacheResponses": "{count, plural, =1{1 cached response} other{{count} cached responses}}",
+  "@privacyCacheResponses": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "211"
+      }
+    }
+  },
+  "privacyClearCacheEntries": "Clear cache ({count, plural, =1{1 entry} other{{count} entries}})",
+  "@privacyClearCacheEntries": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "211"
+      }
+    }
+  },
+  "privacySyncStatusLabel": "Status",
+  "@privacySyncStatusLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncModeCommunity": "Sparkilo Community — the developer's EU server",
+  "@privacySyncModeCommunity": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncModeSelfHosted": "Self-hosted — your own Supabase",
+  "@privacySyncModeSelfHosted": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncModeSharedGroup": "Shared group — a database you joined",
+  "@privacySyncModeSharedGroup": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncAccountLabel": "Account",
+  "@privacySyncAccountLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncAccountAnonymous": "Anonymous account, tied to this device",
+  "@privacySyncAccountAnonymous": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncAccountEmail": "Email account: {email}",
+  "@privacySyncAccountEmail": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "x@y.example"
+      }
+    }
+  },
+  "privacyCopyUserId": "Copy user ID",
+  "@privacyCopyUserId": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyUserIdCopied": "User ID copied",
+  "@privacyUserIdCopied": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncDatabaseHost": "Database host",
+  "@privacySyncDatabaseHost": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportSectionTitle": "Export",
+  "@privacyExportSectionTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportMyData": "Export my data",
+  "@privacyExportMyData": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportSheetTitle": "Choose a format",
+  "@privacyExportSheetTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportZipTitle": "ZIP archive",
+  "@privacyExportZipTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportZipSubtitle": "Everything, attachments included — for a complete backup",
+  "@privacyExportZipSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportJsonTitle": "JSON",
+  "@privacyExportJsonTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportJsonSubtitle": "Machine-readable — for another app",
+  "@privacyExportJsonSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportCsvTitle": "CSV",
+  "@privacyExportCsvTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportCsvSubtitle": "Spreadsheet — one table per category",
+  "@privacyExportCsvSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyErrorLogTitle": "Error log",
+  "@privacyErrorLogTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyErrorLogCount": "{count, plural, =0{No entries} =1{1 entry} other{{count} entries}}",
+  "@privacyErrorLogCount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "29"
+      }
+    }
+  },
+  "privacyErrorLogSave": "Save",
+  "@privacyErrorLogSave": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyErrorLogClear": "Clear",
+  "@privacyErrorLogClear": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyDangerZoneTitle": "Danger zone",
+  "@privacyDangerZoneTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyDangerZoneBody": "Permanently deletes everything the app stores on this device. With sync on, your data on the TankSync server is erased too.",
+  "@privacyDangerZoneBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyDeleteAllMyData": "Delete all my data",
+  "@privacyDeleteAllMyData": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

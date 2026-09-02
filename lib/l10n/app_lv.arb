@@ -63,16 +63,11 @@
   "freeNoKey": "Bezmaksas — atslēga nav nepieciešama",
   "apiKeyRequired": "Nepieciešama API atslēga",
   "dataTransparency": "Datu caurredzamība",
-  "storageAndCache": "Krātuve un kešatmiņa",
   "clearCache": "Iztīrīt kešatmiņu",
   "stationsFound": "Atrastas {count} stacijas",
   "storageUsage": "Krātuves izmantošana šajā ierīcē",
   "settingsLabel": "Iestatījumi",
-  "profilesStored": "saglabāti profili",
-  "stationsMarked": "atzīmētas stacijas",
-  "cachedResponses": "kešatmiņā saglabātas atbildes",
   "total": "Kopā",
-  "cacheManagement": "Kešatmiņas pārvaldība",
   "cacheDescription": "Kešatmiņa saglabā API atbildes ātrākai ielādei un bezsaistes piekļuvei.",
   "cacheTtlGroupNetwork": "Tīkls",
   "cacheTtlGroupData": "Dati",
@@ -87,7 +82,6 @@
   "clearCacheBody": "Kešatmiņā saglabātie meklēšanas rezultāti un cenas tiks dzēsti. Profili, izlase un iestatījumi tiks saglabāti.",
   "clearCacheButton": "Iztīrīt kešatmiņu",
   "deleteAllButton": "Dzēst visu",
-  "entries": "ieraksti",
   "cacheEmpty": "Kešatmiņa ir tukša",
   "apiKeyNote": "Bezmaksas reģistrācija. Dati no valdības cenu caurredzamības aģentūrām.",
   "apiKeyFormatError": "Nederīgs formāts — gaidīts UUID (8-4-4-4-12)",
@@ -97,32 +91,9 @@
   "reportConsentBody": "Tiks atvērts publisks GitHub ziņojums ar kļūdas informāciju. GPS koordinātas, API atslēgas vai personas dati netiek iekļauti.",
   "reportConsentConfirm": "Atvērt GitHub",
   "reportConsentCancel": "Atcelt",
-  "configProfileSection": "Profils",
-  "configActiveProfile": "Aktīvais profils",
-  "configPreferredFuel": "Vēlamais degvielas veids",
-  "configCountry": "Valsts",
-  "configRouteSegment": "Maršruta posms",
-  "configApiKeysSection": "API atslēgas",
-  "configTankerkoenigKey": "Tankerkoenig API atslēga",
-  "configApiKeyConfigured": "Konfigurēta",
-  "configApiKeyCommunity": "Noklusējums (kopienas atslēga)",
   "searchLocationPlaceholder": "Adrese, pasta indekss vai pilsēta",
-  "configEvKey": "EV uzlādes API atslēga",
-  "configEvKeyCustom": "Pielāgota atslēga",
-  "configEvKeyShared": "Noklusējums (kopīga)",
-  "configCloudSyncSection": "Mākoņa sinhronizācija",
   "configTankSyncConnected": "Savienots",
   "configTankSyncDisabled": "Atspējots",
-  "configAuthMode": "Autentifikācijas veids",
-  "configAuthEmail": "E-pasts (pastāvīgs)",
-  "configAuthAnonymous": "Anonīms (tikai šī ierīce)",
-  "configDatabase": "Datu bāze",
-  "configPrivacySummary": "Privātuma kopsavilkums",
-  "configPrivacySummarySynced": "• Izlases, brīdinājumi un ignorētās stacijas tiek sinhronizētas ar jūsu privāto datu bāzi\n• GPS atrašanās vieta un API atslēgas nekad neatstāj jūsu ierīci\n• {authNote}",
-  "configPrivacySummaryLocal": "• Visi dati tiek glabāti tikai lokāli šajā ierīcē\n• Nav datu, kas tiek sūtīti uz serveri\n• API atslēgas šifrētas ierīces drošajā atmiņā",
-  "configAuthNoteEmail": "E-pasta konts nodrošina piekļuvi no vairākām ierīcēm",
-  "configAuthNoteAnonymous": "Anonīms konts — dati saistīti ar šo ierīci",
-  "configNone": "Nav",
   "privacyPolicy": "Privātuma politika",
   "fuels": "Degvielas",
   "services": "Pakalpojumi",
@@ -262,42 +233,8 @@
   "fuelNeeded": "Nepieciešamā degviela",
   "totalCost": "Kopējās izmaksas",
   "priceHistory": "Cenu vēsture",
-  "ignoredStationsLabel": "Ignorētas",
-  "ratingsLabel": "Vērtējumi",
   "favoritesDataCache": "Iecienīto dati",
   "citySearchCache": "Pilsētas meklēšana",
-  "priceHistoryStationsTracked": "{count} izsekotas stacijas",
-  "@priceHistoryStationsTracked": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "alertsConfiguredCount": "{count} konfigurētas",
-  "@alertsConfiguredCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ignoredStationsHidden": "{count} paslēptas stacijas",
-  "@ignoredStationsHidden": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ratingsStationsRated": "{count} novērtētas stacijas",
-  "@ratingsStationsRated": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "noPriceHistory": "Vēl nav cenu vēstures",
   "noStatistics": "Nav pieejamu statistiku",
   "showAllFuelTypes": "Rādīt visus degvielas veidus",
@@ -420,33 +357,19 @@
   "alertStatsActive": "Aktīvas",
   "alertStatsToday": "Šodien",
   "alertStatsThisWeek": "Šo nedēļu",
-  "privacyDashboardTitle": "Privātuma panelis",
-  "privacyDashboardSubtitle": "Skatīt, eksportēt vai dzēst savus datus",
-  "privacyDashboardBanner": "Jūsu dati pieder jums. Šeit varat redzēt visu, ko šī lietotne glabā, eksportēt vai dzēst.",
   "privacyLocalData": "Dati šajā ierīcē",
   "privacyIgnoredStations": "Ignorētās stacijas",
   "privacyRatings": "Staciju vērtējumi",
   "privacyPriceHistory": "Cenu vēstures stacijas",
   "privacyProfiles": "Meklēšanas profili",
   "privacyItineraries": "Saglabātie maršruti",
-  "privacyCacheEntries": "Kešatmiņas ieraksti",
-  "privacyApiKey": "API atslēga glabāta",
-  "privacyEvApiKey": "EV API atslēga glabāta",
-  "privacyEstimatedSize": "Aptuvens krātuve",
-  "privacySyncedData": "Mākoņa sinhronizācija (TankSync)",
-  "privacySyncDisabled": "Mākoņa sinhronizācija ir atspējota. Visi dati paliek tikai šajā ierīcē.",
   "privacySyncMode": "Sinhronizācijas režīms",
   "privacySyncUserId": "Lietotāja ID",
   "privacySyncDescription": "Kad sinhronizācija ir iespējota, izlases, brīdinājumi, ignorētās stacijas un vērtējumi tiek glabāti arī TankSync serverī.",
-  "privacyViewServerData": "Skatīt servera datus",
-  "privacyExportButton": "Eksportēt visus datus kā JSON",
   "privacyExportSuccess": "Dati eksportēti starpliktuvē",
-  "privacyExportCsvButton": "Eksportēt visus datus kā CSV",
   "privacyExportCsvSuccess": "CSV dati eksportēti starpliktuvē",
   "savedToDownloadsFolder": "Saglabāts mapē Lejupielādes",
-  "privacyClearErrorLog": "Notīrīt kļūdu žurnālu",
   "privacyErrorLogCleared": "Kļūdu žurnāls notīrīts",
-  "privacyDeleteButton": "Dzēst visus datus",
   "privacyDeleteTitle": "Dzēst visus datus?",
   "privacyDeleteBody": "Tiks neatgriezeniski dzēsts:\n\n- Visas izlases un staciju dati\n- Visi meklēšanas profili\n- Visi cenu brīdinājumi\n- Visa cenu vēsture\n- Visi kešatmiņas dati\n- Jūsu API atslēga\n- Visi lietotnes iestatījumi\n\nLietotne atiestatīsies uz sākotnējo stāvokli. Šo darbību nevar atcelt.",
   "privacyDeleteConfirm": "Dzēst visu",
@@ -1177,9 +1100,6 @@
   "authInfoBenefit2": "• Sagatavojiet maršrutu savā tālrunī, izmantojiet to savā automašīnā",
   "authInfoBenefit3": "• Dati netiek kopīgoti ar trešajām pusēm",
   "authInfoBenefit4": "• Jūs varat dzēst savu kontu jebkurā laikā",
-  "privacyLocalDataEmpty": "Vēl nekas nav saglabāts. Pievienojiet izlasi vai iestatiet cenu brīdinājumu, lai redzētu ierakstus šeit.",
-  "privacyHideEmptyRows": "Slēpt tukšās rindas",
-  "privacyShowEmptyRows": "{count, plural, =1{Rādīt {count} tukšu rindu} other{Rādīt {count} tukšas rindas}}",
   "apiKeySetupTitle": "API atslēgas iestatīšana (neobligāti)",
   "apiKeySetupDescription": "Reģistrējieties bezmaksas API atslēgai vai izlaidiet un izpētiet lietotni ar demonstrācijas datiem.",
   "apiKeyRegistrationButton": "{provider} reģistrācija",
@@ -1192,8 +1112,6 @@
   "consentSyncTripsTitle": "Sinhronizēt braucienu ierakstus",
   "consentSyncTripsSubtitle": "Dublēt OBD2 + GPS braucienus ar TankSync. Starpierīču, pēc izvēles.",
   "consentSyncTripsDisabledHint": "Iespējojiet Mākoņa sinhronizāciju augstāk, lai dublētu braucienus.",
-  "consentHideDetails": "Slēpt detaļas",
-  "consentShowDetails": "Rādīt detaļas",
   "dialogOk": "Labi",
   "invalidLinkTitle": "Nederīga saite",
   "invalidLinkBody": "Saite \"{path}\" nav derīga.",
@@ -1636,15 +1554,6 @@
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
   "fabRunSearch": "Veikt meklēšanu",
-  "privacySaveErrorLog": "Saglabāt kļūdu žurnālu ({count})",
-  "@privacySaveErrorLog": {
-    "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "approachTestSimulateButton": "Testēt tuvošanās pārklājumu",
   "@approachTestSimulateButton": {
     "description": "Button on the trip-recording screen that pushes a synthetic ApproachInRadius into the PiP for 30 s so the user can verify the price layout without driving (#2163)."
@@ -4638,12 +4547,10 @@
   "deleteReportTooltip": "Dzēst šo ziņojumu",
   "reportDeleted": "Ziņojums dzēsts",
   "reportDeleteFailed": "Neizdevās dzēst ziņojumu",
-  "privacyControlsTitle": "Privātuma iestatījumi",
   "tileProxyToggleTitle": "Ielādēt kartes flīzes caur Sparkilo starpniekserveri",
   "tileProxyToggleSubtitle": "Ieslēgts: redzamais kartes apgabals un jūsu IP adrese nonāk izstrādātāja ES serverī, kas flīzes iegūst no OpenStreetMap. Izslēgts: flīzes tiek ielādētas tieši no tile.openstreetmap.org.",
   "remoteLogosToggleTitle": "Ielādēt zīmolu logotipus no interneta",
   "remoteLogosToggleSubtitle": "Pēc noklusējuma izslēgts: tiek rādīti lietotnē iekļautie aizstājēji. Ieslēgts: logotipi tiek iegūti no logo.clearbit.com, kas redz jūsu IP adresi.",
-  "privacyExportAllButton": "Eksportēt visus manus datus (ZIP)",
   "privacyExportAllSuccess": "{fileName} saglabāts lejupielādēs — iekšā {count} faili",
   "@privacyExportAllSuccess": {
     "placeholders": {
@@ -4776,7 +4683,6 @@
   "settingsTopicDataSourcesKeywords": "api, atslēga, gps, atrašanās vieta, pozīcija, datu avots, tankerkoenig, opencharge, key, location, data source",
   "settingsTopicSyncTitle": "Sinhronizācija un konts",
   "settingsTopicSyncKeywords": "tanksync, mākonis, konts, e-pasts, saistīt ierīci, sinhronizācija, koplietot datubāzi, anonīms, cloud, account, email, link device, sync, share database, anonymous",
-  "settingsTopicPrivacySubtitle": "Piekrišanas, privātuma panelis, krātuve un kešatmiņa",
   "settingsTopicPrivacyKeywords": "privātums, piekrišana, vdar, dzēst, notīrīt, krātuve, kešatmiņa, dati, kļūdu ziņošana, vin, privacy, consent, gdpr, delete, erase, storage, cache, data, error reporting",
   "settingsTopicBackupTitle": "Dublēšana un atjaunošana",
   "settingsTopicBackupSubtitle": "Eksportē vai atjauno pilnu savu datu dublējumu",
@@ -4797,7 +4703,6 @@
   "settingsDistanceUnitSubtitle": "No aktīvā profila valsts",
   "settingsObd2AdapterTitle": "OBD2 adapteris",
   "settingsObd2AdapterSubtitle": "Adapteri tiek savienoti pārī katram transportlīdzeklim — atver transportlīdzekli, lai savienotu vai mainītu tā adapteri",
-  "settingsStorageDeleteHint": "Visu vietējo datu dzēšana notiek no privātuma paneļa.",
   "settingsPrivacyCrossLinkTitle": "Piekrišanas",
   "settingsPrivacyCrossLinkSubtitle": "Cloud Sync un braucienu sinhronizācijas piekrišanas atrodas sadaļā Privātums un dati",
   "settingsBackupExportSubtitle": "Transportlīdzekļi, uzpildes, braucieni un uzlādes žurnāli kā ZIP fails",
@@ -5131,6 +5036,282 @@
   },
   "pumpGainResetConfirmBody": "This discards the fuel gain learned from your fill-ups. OBD2 consumption estimates fall back to the uncorrected figure until the next full-to-full tank window re-learns it.",
   "@pumpGainResetConfirmBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyTopicSubtitle": "Your choices, data on this device, sync, export or delete",
+  "@privacyTopicSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyDataLocationLocal": "Your data stays on this device",
+  "@privacyDataLocationLocal": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyDataLocationSynced": "Your data is also synced to TankSync",
+  "@privacyDataLocationSynced": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncLineEnabledAnonymous": "Sync: on · anonymous account",
+  "@privacySyncLineEnabledAnonymous": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncLineEnabledEmail": "Sync: on · email account",
+  "@privacySyncLineEnabledEmail": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncLineDisabled": "Sync: off",
+  "@privacySyncLineDisabled": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyStorageLine": "{size} stored on this device",
+  "@privacyStorageLine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "size": {
+        "type": "String",
+        "example": "2.1 MB"
+      }
+    }
+  },
+  "privacyTopicChoicesTitle": "Your choices",
+  "@privacyTopicChoicesTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyChoicesStatus": "{on} of {total} enabled",
+  "@privacyChoicesStatus": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "on": {
+        "type": "int",
+        "example": "5"
+      },
+      "total": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "privacyDeviceDataStatus": "{size} · {count, plural, =1{1 category} other{{count} categories}}",
+  "@privacyDeviceDataStatus": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "size": {
+        "type": "String",
+        "example": "2.1 MB"
+      },
+      "count": {
+        "type": "int",
+        "example": "6"
+      }
+    }
+  },
+  "privacyTopicExportDeleteTitle": "Export or delete",
+  "@privacyTopicExportDeleteTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportDeleteStatus": "ZIP, JSON, CSV · error log ({count})",
+  "@privacyExportDeleteStatus": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "29"
+      }
+    }
+  },
+  "privacyLearnMore": "Learn more",
+  "@privacyLearnMore": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tileProxyToggleShort": "Tiles come via the developer's EU proxy, not straight from OpenStreetMap",
+  "@tileProxyToggleShort": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "remoteLogosToggleShort": "Fetch brand logos from logo.clearbit.com instead of bundled placeholders",
+  "@remoteLogosToggleShort": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyCacheDetails": "Cache details",
+  "@privacyCacheDetails": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyCacheResponses": "{count, plural, =1{1 cached response} other{{count} cached responses}}",
+  "@privacyCacheResponses": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "211"
+      }
+    }
+  },
+  "privacyClearCacheEntries": "Clear cache ({count, plural, =1{1 entry} other{{count} entries}})",
+  "@privacyClearCacheEntries": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "211"
+      }
+    }
+  },
+  "privacySyncStatusLabel": "Status",
+  "@privacySyncStatusLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncModeCommunity": "Sparkilo Community — the developer's EU server",
+  "@privacySyncModeCommunity": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncModeSelfHosted": "Self-hosted — your own Supabase",
+  "@privacySyncModeSelfHosted": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncModeSharedGroup": "Shared group — a database you joined",
+  "@privacySyncModeSharedGroup": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncAccountLabel": "Account",
+  "@privacySyncAccountLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncAccountAnonymous": "Anonymous account, tied to this device",
+  "@privacySyncAccountAnonymous": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncAccountEmail": "Email account: {email}",
+  "@privacySyncAccountEmail": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "x@y.example"
+      }
+    }
+  },
+  "privacyCopyUserId": "Copy user ID",
+  "@privacyCopyUserId": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyUserIdCopied": "User ID copied",
+  "@privacyUserIdCopied": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncDatabaseHost": "Database host",
+  "@privacySyncDatabaseHost": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportSectionTitle": "Export",
+  "@privacyExportSectionTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportMyData": "Export my data",
+  "@privacyExportMyData": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportSheetTitle": "Choose a format",
+  "@privacyExportSheetTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportZipTitle": "ZIP archive",
+  "@privacyExportZipTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportZipSubtitle": "Everything, attachments included — for a complete backup",
+  "@privacyExportZipSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportJsonTitle": "JSON",
+  "@privacyExportJsonTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportJsonSubtitle": "Machine-readable — for another app",
+  "@privacyExportJsonSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportCsvTitle": "CSV",
+  "@privacyExportCsvTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportCsvSubtitle": "Spreadsheet — one table per category",
+  "@privacyExportCsvSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyErrorLogTitle": "Error log",
+  "@privacyErrorLogTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyErrorLogCount": "{count, plural, =0{No entries} =1{1 entry} other{{count} entries}}",
+  "@privacyErrorLogCount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "29"
+      }
+    }
+  },
+  "privacyErrorLogSave": "Save",
+  "@privacyErrorLogSave": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyErrorLogClear": "Clear",
+  "@privacyErrorLogClear": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyDangerZoneTitle": "Danger zone",
+  "@privacyDangerZoneTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyDangerZoneBody": "Permanently deletes everything the app stores on this device. With sync on, your data on the TankSync server is erased too.",
+  "@privacyDangerZoneBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyDeleteAllMyData": "Delete all my data",
+  "@privacyDeleteAllMyData": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

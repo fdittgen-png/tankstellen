@@ -104,10 +104,6 @@
   "@settingsTopicSyncKeywords": {
     "description": "Comma-separated search keywords for the Sync & account tile (#3884)."
   },
-  "settingsTopicPrivacySubtitle": "Consents, privacy dashboard, storage & cache",
-  "@settingsTopicPrivacySubtitle": {
-    "description": "One-line subtitle of the Privacy & data tile (#3884)."
-  },
   "settingsTopicPrivacyKeywords": "privacy, consent, gdpr, delete, erase, storage, cache, data, error reporting, vin",
   "@settingsTopicPrivacyKeywords": {
     "description": "Comma-separated search keywords for the Privacy & data tile (#3884)."
@@ -187,10 +183,6 @@
   "settingsObd2AdapterSubtitle": "Adapters are paired per vehicle — open a vehicle to pair or change its adapter",
   "@settingsObd2AdapterSubtitle": {
     "description": "Subtitle of the OBD2 adapter tile on the Vehicles & OBD2 screen (#3884)."
-  },
-  "settingsStorageDeleteHint": "Deleting all local data is done from the Privacy Dashboard.",
-  "@settingsStorageDeleteHint": {
-    "description": "One-line hint at the bottom of Storage & cache replacing the former duplicate Delete-all button (#3884)."
   },
   "settingsPrivacyCrossLinkTitle": "Consents",
   "@settingsPrivacyCrossLinkTitle": {

@@ -3,8 +3,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consent/presentation/widgets/consent_settings_section.dart';
-import 'package:tankstellen/features/consent/presentation/widgets/privacy_controls_section.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/profile/presentation/screens/settings/about_screen.dart';
 import 'package:tankstellen/features/profile/presentation/screens/settings/backup_restore_screen.dart';
@@ -16,12 +14,15 @@ import 'package:tankstellen/features/profile/presentation/widgets/about_section.
 import 'package:tankstellen/features/profile/presentation/widgets/api_key_section.dart';
 import 'package:tankstellen/features/profile/presentation/widgets/feature_management_section.dart';
 import 'package:tankstellen/features/profile/presentation/widgets/location_section_widget.dart';
-import 'package:tankstellen/features/profile/presentation/widgets/storage_section.dart';
+import 'package:tankstellen/features/profile/presentation/widgets/privacy/privacy_summary_card.dart';
+import 'package:tankstellen/features/profile/presentation/widgets/privacy/sync_account_overview_card.dart';
 import 'package:tankstellen/features/profile/presentation/widgets/tank_sync_section.dart';
 import 'package:tankstellen/features/profile/presentation/widgets/use_mode_section.dart';
+import 'package:tankstellen/core/telemetry/storage/trace_storage.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../../../../../helpers/pump_app.dart';
+import 'privacy/privacy_test_support.dart';
 import 'settings_test_harness.dart';
 
 /// One minimal widget test per Settings topic screen (#3884), part 2:
@@ -32,7 +33,10 @@ void main() {
       {Set<Feature>? flags}) async {
     await tester.binding.setSurfaceSize(const Size(600, 3200));
     addTearDown(() => tester.binding.setSurfaceSize(null));
-    await pumpApp(tester, screen, overrides: settingsTestOverrides(flags: flags));
+    await pumpApp(tester, screen, overrides: [
+      ...settingsTestOverrides(flags: flags),
+      traceStorageProvider.overrideWithValue(StubTraceStorage()),
+    ]);
   }
 
   AppLocalizations l10n(WidgetTester tester, Type screen) =>
@@ -66,33 +70,37 @@ void main() {
     expect(find.byType(ExpansionTile), findsNothing);
   });
 
-  testWidgets('Sync & account hosts the TankSync section under the brand '
-      'header + localised subtitle', (tester) async {
+  testWidgets('Sync & account hosts the overview card above the TankSync '
+      'section under the brand header + localised subtitle (#3911)',
+      (tester) async {
     await pumpTall(tester, const SyncAccountScreen(),
         flags: const {Feature.tankSync});
     final l = l10n(tester, SyncAccountScreen);
     expect(find.text('TankSync'), findsOneWidget);
     expect(find.text(l.tankSyncSectionSubtitle), findsOneWidget);
+    expect(find.byType(SyncAccountOverviewCard), findsOneWidget);
     expect(find.byType(TankSyncSection), findsOneWidget);
+    expect(
+      tester.getTopLeft(find.byType(SyncAccountOverviewCard)).dy,
+      lessThan(tester.getTopLeft(find.byType(TankSyncSection)).dy),
+    );
     expect(find.byType(ExpansionTile), findsNothing);
   });
 
-  testWidgets('Privacy & data hosts the five consents (trip sync back next '
-      'to Cloud Sync), privacy controls, the dashboard tile and Storage '
-      'without a Delete-all button', (tester) async {
+  testWidgets('Privacy & data is the summary card + the four topic tiles '
+      '(#3908) — no inline consents, dashboard tile or storage section',
+      (tester) async {
     await pumpTall(tester, const PrivacyDataScreen());
     final l = l10n(tester, PrivacyDataScreen);
-    expect(find.byType(ConsentSettingsSection), findsOneWidget);
-    expect(find.byKey(const Key('tripsSyncToggle')), findsOneWidget);
-    expect(find.byType(PrivacyControlsSection), findsOneWidget);
-    expect(find.byKey(const Key('settingsPrivacyDashboardTile')),
-        findsOneWidget);
-    expect(find.byType(StorageSection), findsOneWidget);
-    expect(find.text(l.deleteAllButton), findsNothing,
-        reason: 'the Privacy Dashboard owns deletion (#3884)');
-    expect(find.text(l.settingsStorageDeleteHint), findsOneWidget);
-    expect(find.byKey(const Key('storagePrivacyDashboardLink')),
-        findsOneWidget);
+    expect(find.byType(PrivacySummaryCard), findsOneWidget);
+    expect(find.byKey(const Key('privacyTopic_choices')), findsOneWidget);
+    expect(find.byKey(const Key('privacyTopic_deviceData')), findsOneWidget);
+    expect(find.byKey(const Key('privacyTopic_sync')), findsOneWidget);
+    expect(find.byKey(const Key('privacyTopic_exportDelete')), findsOneWidget);
+    expect(find.byType(SwitchListTile), findsNothing,
+        reason: 'the consents live under "Your choices"');
+    expect(find.byKey(const Key('settingsPrivacyDashboardTile')), findsNothing);
+    expect(find.text(l.deleteAllButton), findsNothing);
     expect(find.byType(ExpansionTile), findsNothing);
   });
 

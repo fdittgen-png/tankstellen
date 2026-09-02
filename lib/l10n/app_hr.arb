@@ -63,16 +63,11 @@
   "freeNoKey": "Besplatno — ključ nije potreban",
   "apiKeyRequired": "Potreban API ključ",
   "dataTransparency": "Transparentnost podataka",
-  "storageAndCache": "Pohrana i predmemorija",
   "clearCache": "Očisti predmemoriju",
   "stationsFound": "Pronađeno {count} postaja",
   "storageUsage": "Korištenje pohrane na ovom uređaju",
   "settingsLabel": "Postavke",
-  "profilesStored": "spremljenih profila",
-  "stationsMarked": "označenih postaja",
-  "cachedResponses": "predmemoriranih odgovora",
   "total": "Ukupno",
-  "cacheManagement": "Upravljanje predmemorijom",
   "cacheDescription": "Predmemorija pohranjuje API odgovore za brže učitavanje i offline pristup.",
   "cacheTtlGroupNetwork": "Mreža",
   "cacheTtlGroupData": "Podaci",
@@ -87,7 +82,6 @@
   "clearCacheBody": "Predmemorirani rezultati pretrage i cijene bit će obrisani. Profili, favoriti i postavke su sačuvani.",
   "clearCacheButton": "Očisti predmemoriju",
   "deleteAllButton": "Obriši sve",
-  "entries": "unosa",
   "cacheEmpty": "Predmemorija je prazna",
   "apiKeyNote": "Besplatna registracija. Podaci od vladinih agencija za transparentnost cijena.",
   "apiKeyFormatError": "Nevažeći format — očekivan UUID (8-4-4-4-12)",
@@ -97,32 +91,9 @@
   "reportConsentBody": "Ovo će otvoriti javnu GitHub prijavu s pojedinostima greške navedenim ispod. Koordinate GPS-a, API ključevi ni osobni podaci neće biti uključeni.",
   "reportConsentConfirm": "Otvori GitHub",
   "reportConsentCancel": "Odustani",
-  "configProfileSection": "Profil",
-  "configActiveProfile": "Aktivni profil",
-  "configPreferredFuel": "Željeno gorivo",
-  "configCountry": "Država",
-  "configRouteSegment": "Segment rute",
-  "configApiKeysSection": "API ključevi",
-  "configTankerkoenigKey": "Tankerkoenig API ključ",
-  "configApiKeyConfigured": "Konfigurirano",
-  "configApiKeyCommunity": "Zadano (zajednički ključ)",
   "searchLocationPlaceholder": "Adresa, poštanski broj ili grad",
-  "configEvKey": "EV punionice API ključ",
-  "configEvKeyCustom": "Vlastiti ključ",
-  "configEvKeyShared": "Zadano (dijeljeni)",
-  "configCloudSyncSection": "Sinkronizacija u oblaku",
   "configTankSyncConnected": "Spojeno",
   "configTankSyncDisabled": "Onemogućeno",
-  "configAuthMode": "Način autentifikacije",
-  "configAuthEmail": "E-pošta (trajna)",
-  "configAuthAnonymous": "Anonimno (samo uređaj)",
-  "configDatabase": "Baza podataka",
-  "configPrivacySummary": "Sažetak privatnosti",
-  "configPrivacySummarySynced": "• Favoriti, upozorenja i ignorirane postaje sinkronizirani su s vašom privatnom bazom podataka\n• GPS lokacija i API ključevi nikad ne napuštaju vaš uređaj\n• {authNote}",
-  "configPrivacySummaryLocal": "• Svi podaci pohranjeni su lokalno samo na ovom uređaju\n• Nikakvi podaci ne šalju se na server\n• API ključevi šifrirani u sigurnoj pohrani uređaja",
-  "configAuthNoteEmail": "E-mail račun omogućuje pristup s više uređaja",
-  "configAuthNoteAnonymous": "Anonimni račun — podaci vezani uz ovaj uređaj",
-  "configNone": "Nema",
   "privacyPolicy": "Pravila o privatnosti",
   "fuels": "Goriva",
   "services": "Usluge",
@@ -262,42 +233,8 @@
   "fuelNeeded": "Potrebno gorivo",
   "totalCost": "Ukupni trošak",
   "priceHistory": "Povijest cijena",
-  "ignoredStationsLabel": "Ignorirano",
-  "ratingsLabel": "Ocjene",
   "favoritesDataCache": "Podaci favorita",
   "citySearchCache": "Pretraga gradova",
-  "priceHistoryStationsTracked": "{count} praćenih stanica",
-  "@priceHistoryStationsTracked": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "alertsConfiguredCount": "{count} konfigurirano",
-  "@alertsConfiguredCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ignoredStationsHidden": "{count} skrivenih stanica",
-  "@ignoredStationsHidden": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ratingsStationsRated": "{count} ocijenjenih stanica",
-  "@ratingsStationsRated": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "noPriceHistory": "Još nema povijesti cijena",
   "noStatistics": "Nema dostupnih statistika",
   "showAllFuelTypes": "Prikaži sve vrste goriva",
@@ -420,33 +357,19 @@
   "alertStatsActive": "Aktivne",
   "alertStatsToday": "Danas",
   "alertStatsThisWeek": "Ovaj tjedan",
-  "privacyDashboardTitle": "Nadzorna ploča privatnosti",
-  "privacyDashboardSubtitle": "Pregledajte, izvezite ili izbrišite svoje podatke",
-  "privacyDashboardBanner": "Vaši podaci su vaši. Ovdje možete vidjeti sve što aplikacija pohranjuje, izvesti ih ili ih obrisati.",
   "privacyLocalData": "Podaci na ovom uređaju",
   "privacyIgnoredStations": "Ignorirane postaje",
   "privacyRatings": "Ocjene postaja",
   "privacyPriceHistory": "Postaje s poviješću cijena",
   "privacyProfiles": "Profili pretraživanja",
   "privacyItineraries": "Spremljene rute",
-  "privacyCacheEntries": "Unosi u predmemoriji",
-  "privacyApiKey": "Pohranjen API ključ",
-  "privacyEvApiKey": "Pohranjen EV API ključ",
-  "privacyEstimatedSize": "Procijenjeni prostor",
-  "privacySyncedData": "Sinkronizacija u oblaku (TankSync)",
-  "privacySyncDisabled": "Sinkronizacija u oblaku onemogućena. Svi podaci ostaju samo na ovom uređaju.",
   "privacySyncMode": "Način sinkronizacije",
   "privacySyncUserId": "ID korisnika",
   "privacySyncDescription": "Kada je sinkronizacija omogućena, favoriti, upozorenja, ignorirane postaje i ocjene pohranjuju se i na TankSync serveru.",
-  "privacyViewServerData": "Pregledaj podatke na serveru",
-  "privacyExportButton": "Izvezi sve podatke kao JSON",
   "privacyExportSuccess": "Podaci izvezeni u međuspremnik",
-  "privacyExportCsvButton": "Izvezi sve podatke kao CSV",
   "privacyExportCsvSuccess": "CSV podaci izvezeni u međuspremnik",
   "savedToDownloadsFolder": "Spremljeno u mapu Preuzimanja",
-  "privacyClearErrorLog": "Očisti zapisnik pogrešaka",
   "privacyErrorLogCleared": "Zapisnik pogrešaka očišćen",
-  "privacyDeleteButton": "Obriši sve podatke",
   "privacyDeleteTitle": "Obrisati sve podatke?",
   "privacyDeleteBody": "Ovo će trajno obrisati:\n\n- Sve favorite i podatke o postajama\n- Sve profile pretraživanja\n- Sva upozorenja o cijenama\n- Cjelokupnu povijest cijena\n- Sve predmemorirane podatke\n- Vaš API ključ\n- Sve postavke aplikacije\n\nAplikacija će se resetirati na početno stanje. Ova se radnja ne može poništiti.",
   "privacyDeleteConfirm": "Obriši sve",
@@ -1177,9 +1100,6 @@
   "authInfoBenefit2": "• Pripremite rutu na telefonu, koristite je u autu",
   "authInfoBenefit3": "• Nijedan podatak se ne dijeli s trećim stranama",
   "authInfoBenefit4": "• Račun možete obrisati u bilo kojem trenutku",
-  "privacyLocalDataEmpty": "Još ništa nije pohranjeno. Dodajte omiljenu postaju ili postavite upozorenje na cijenu za prikaz unosa ovdje.",
-  "privacyHideEmptyRows": "Sakrij prazne retke",
-  "privacyShowEmptyRows": "{count, plural, =1{Prikaži {count} prazan redak} other{Prikaži {count} praznih redaka}}",
   "apiKeySetupTitle": "Postavljanje API ključa (neobavezno)",
   "apiKeySetupDescription": "Registrirajte se za besplatni API ključ ili preskočite za istraživanje aplikacije s demo podacima.",
   "apiKeyRegistrationButton": "{provider} registracija",
@@ -1192,8 +1112,6 @@
   "consentSyncTripsTitle": "Sinkroniziraj snimanja vožnji",
   "consentSyncTripsSubtitle": "Sigurnosno kopirajte OBD2 + GPS vožnje na TankSync. Između uređaja, po izboru.",
   "consentSyncTripsDisabledHint": "Omogućite Sinkronizaciju u oblaku gore za sigurnosno kopiranje vožnji.",
-  "consentHideDetails": "Sakrij pojedinosti",
-  "consentShowDetails": "Prikaži pojedinosti",
   "dialogOk": "U redu",
   "invalidLinkTitle": "Nevažeća veza",
   "invalidLinkBody": "Veza \"{path}\" nije valjana.",
@@ -1636,15 +1554,6 @@
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
   "fabRunSearch": "Pokreni pretraživanje",
-  "privacySaveErrorLog": "Spremi zapisnik pogrešaka ({count})",
-  "@privacySaveErrorLog": {
-    "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder. Supersedes privacyCopyErrorLog (#2145).",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "approachTestSimulateButton": "Testiraj sloj približavanja",
   "@approachTestSimulateButton": {
     "description": "Button on the trip-recording screen that pushes a synthetic ApproachInRadius into the PiP for 30 s so the user can verify the price layout without driving (#2163)."
@@ -4638,12 +4547,10 @@
   "deleteReportTooltip": "Izbriši ovu prijavu",
   "reportDeleted": "Prijava izbrisana",
   "reportDeleteFailed": "Prijavu nije bilo moguće izbrisati",
-  "privacyControlsTitle": "Postavke privatnosti",
   "tileProxyToggleTitle": "Učitavaj pločice karte putem Sparkilo proxyja",
   "tileProxyToggleSubtitle": "Uključeno: prikazani dio karte i vaša IP adresa stižu na EU poslužitelj razvojnog programera, koji dohvaća pločice s OpenStreetMapa. Isključeno: pločice se učitavaju izravno s tile.openstreetmap.org.",
   "remoteLogosToggleTitle": "Učitavaj logotipe marki s interneta",
   "remoteLogosToggleSubtitle": "Zadano isključeno: prikazuju se ugrađene zamjenske slike. Uključeno: logotipi se dohvaćaju s logo.clearbit.com, koji vidi vašu IP adresu.",
-  "privacyExportAllButton": "Izvezi sve moje podatke (ZIP)",
   "privacyExportAllSuccess": "{fileName} spremljeno u Downloads — {count} datoteka unutra",
   "@privacyExportAllSuccess": {
     "placeholders": {
@@ -4776,7 +4683,6 @@
   "settingsTopicDataSourcesKeywords": "api, ključ, gps, lokacija, položaj, izvor podataka, tankerkoenig, opencharge, key, location, data source",
   "settingsTopicSyncTitle": "Sinkronizacija i račun",
   "settingsTopicSyncKeywords": "tanksync, oblak, račun, e-pošta, poveži uređaj, sinkronizacija, dijeli bazu, anoniman, cloud, account, email, link device, sync, share database, anonymous",
-  "settingsTopicPrivacySubtitle": "Privole, nadzorna ploča privatnosti, pohrana i predmemorija",
   "settingsTopicPrivacyKeywords": "privatnost, privola, gdpr, izbriši, obriši, pohrana, predmemorija, podaci, izvještavanje o pogreškama, vin, privacy, consent, delete, erase, storage, cache, data, error reporting",
   "settingsTopicBackupTitle": "Sigurnosna kopija i vraćanje",
   "settingsTopicBackupSubtitle": "Izvezite ili vratite potpunu sigurnosnu kopiju svojih podataka",
@@ -4797,7 +4703,6 @@
   "settingsDistanceUnitSubtitle": "Iz države aktivnog profila",
   "settingsObd2AdapterTitle": "OBD2 adapter",
   "settingsObd2AdapterSubtitle": "Adapteri se uparuju po vozilu — otvorite vozilo da biste uparili ili promijenili njegov adapter",
-  "settingsStorageDeleteHint": "Brisanje svih lokalnih podataka obavlja se s nadzorne ploče privatnosti.",
   "settingsPrivacyCrossLinkTitle": "Privole",
   "settingsPrivacyCrossLinkSubtitle": "Privole za Cloud Sync i sinkronizaciju putovanja nalaze se pod Privatnost i podaci",
   "settingsBackupExportSubtitle": "Vozila, točenja, putovanja i zapisnici punjenja kao ZIP datoteka",
@@ -5131,6 +5036,282 @@
   },
   "pumpGainResetConfirmBody": "This discards the fuel gain learned from your fill-ups. OBD2 consumption estimates fall back to the uncorrected figure until the next full-to-full tank window re-learns it.",
   "@pumpGainResetConfirmBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyTopicSubtitle": "Your choices, data on this device, sync, export or delete",
+  "@privacyTopicSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyDataLocationLocal": "Your data stays on this device",
+  "@privacyDataLocationLocal": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyDataLocationSynced": "Your data is also synced to TankSync",
+  "@privacyDataLocationSynced": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncLineEnabledAnonymous": "Sync: on · anonymous account",
+  "@privacySyncLineEnabledAnonymous": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncLineEnabledEmail": "Sync: on · email account",
+  "@privacySyncLineEnabledEmail": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncLineDisabled": "Sync: off",
+  "@privacySyncLineDisabled": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyStorageLine": "{size} stored on this device",
+  "@privacyStorageLine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "size": {
+        "type": "String",
+        "example": "2.1 MB"
+      }
+    }
+  },
+  "privacyTopicChoicesTitle": "Your choices",
+  "@privacyTopicChoicesTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyChoicesStatus": "{on} of {total} enabled",
+  "@privacyChoicesStatus": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "on": {
+        "type": "int",
+        "example": "5"
+      },
+      "total": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "privacyDeviceDataStatus": "{size} · {count, plural, =1{1 category} other{{count} categories}}",
+  "@privacyDeviceDataStatus": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "size": {
+        "type": "String",
+        "example": "2.1 MB"
+      },
+      "count": {
+        "type": "int",
+        "example": "6"
+      }
+    }
+  },
+  "privacyTopicExportDeleteTitle": "Export or delete",
+  "@privacyTopicExportDeleteTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportDeleteStatus": "ZIP, JSON, CSV · error log ({count})",
+  "@privacyExportDeleteStatus": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "29"
+      }
+    }
+  },
+  "privacyLearnMore": "Learn more",
+  "@privacyLearnMore": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tileProxyToggleShort": "Tiles come via the developer's EU proxy, not straight from OpenStreetMap",
+  "@tileProxyToggleShort": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "remoteLogosToggleShort": "Fetch brand logos from logo.clearbit.com instead of bundled placeholders",
+  "@remoteLogosToggleShort": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyCacheDetails": "Cache details",
+  "@privacyCacheDetails": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyCacheResponses": "{count, plural, =1{1 cached response} other{{count} cached responses}}",
+  "@privacyCacheResponses": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "211"
+      }
+    }
+  },
+  "privacyClearCacheEntries": "Clear cache ({count, plural, =1{1 entry} other{{count} entries}})",
+  "@privacyClearCacheEntries": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "211"
+      }
+    }
+  },
+  "privacySyncStatusLabel": "Status",
+  "@privacySyncStatusLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncModeCommunity": "Sparkilo Community — the developer's EU server",
+  "@privacySyncModeCommunity": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncModeSelfHosted": "Self-hosted — your own Supabase",
+  "@privacySyncModeSelfHosted": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncModeSharedGroup": "Shared group — a database you joined",
+  "@privacySyncModeSharedGroup": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncAccountLabel": "Account",
+  "@privacySyncAccountLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncAccountAnonymous": "Anonymous account, tied to this device",
+  "@privacySyncAccountAnonymous": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncAccountEmail": "Email account: {email}",
+  "@privacySyncAccountEmail": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "x@y.example"
+      }
+    }
+  },
+  "privacyCopyUserId": "Copy user ID",
+  "@privacyCopyUserId": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyUserIdCopied": "User ID copied",
+  "@privacyUserIdCopied": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacySyncDatabaseHost": "Database host",
+  "@privacySyncDatabaseHost": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportSectionTitle": "Export",
+  "@privacyExportSectionTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportMyData": "Export my data",
+  "@privacyExportMyData": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportSheetTitle": "Choose a format",
+  "@privacyExportSheetTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportZipTitle": "ZIP archive",
+  "@privacyExportZipTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportZipSubtitle": "Everything, attachments included — for a complete backup",
+  "@privacyExportZipSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportJsonTitle": "JSON",
+  "@privacyExportJsonTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportJsonSubtitle": "Machine-readable — for another app",
+  "@privacyExportJsonSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportCsvTitle": "CSV",
+  "@privacyExportCsvTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyExportCsvSubtitle": "Spreadsheet — one table per category",
+  "@privacyExportCsvSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyErrorLogTitle": "Error log",
+  "@privacyErrorLogTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyErrorLogCount": "{count, plural, =0{No entries} =1{1 entry} other{{count} entries}}",
+  "@privacyErrorLogCount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "29"
+      }
+    }
+  },
+  "privacyErrorLogSave": "Save",
+  "@privacyErrorLogSave": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyErrorLogClear": "Clear",
+  "@privacyErrorLogClear": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyDangerZoneTitle": "Danger zone",
+  "@privacyDangerZoneTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyDangerZoneBody": "Permanently deletes everything the app stores on this device. With sync on, your data on the TankSync server is erased too.",
+  "@privacyDangerZoneBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "privacyDeleteAllMyData": "Delete all my data",
+  "@privacyDeleteAllMyData": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

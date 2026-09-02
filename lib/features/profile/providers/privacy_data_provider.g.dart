@@ -10,57 +10,58 @@ part of 'privacy_data_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Collects a snapshot of all locally stored user data.
+/// Collects the device-data inventory from the storage layer.
 
-@ProviderFor(privacyData)
-final privacyDataProvider = PrivacyDataProvider._();
+@ProviderFor(deviceDataInventory)
+final deviceDataInventoryProvider = DeviceDataInventoryProvider._();
 
-/// Collects a snapshot of all locally stored user data.
+/// Collects the device-data inventory from the storage layer.
 
-final class PrivacyDataProvider
+final class DeviceDataInventoryProvider
     extends
         $FunctionalProvider<
-          PrivacyDataSnapshot,
-          PrivacyDataSnapshot,
-          PrivacyDataSnapshot
+          DeviceDataInventory,
+          DeviceDataInventory,
+          DeviceDataInventory
         >
-    with $Provider<PrivacyDataSnapshot> {
-  /// Collects a snapshot of all locally stored user data.
-  PrivacyDataProvider._()
+    with $Provider<DeviceDataInventory> {
+  /// Collects the device-data inventory from the storage layer.
+  DeviceDataInventoryProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'privacyDataProvider',
+        name: r'deviceDataInventoryProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$privacyDataHash();
+  String debugGetCreateSourceHash() => _$deviceDataInventoryHash();
 
   @$internal
   @override
-  $ProviderElement<PrivacyDataSnapshot> $createElement(
+  $ProviderElement<DeviceDataInventory> $createElement(
     $ProviderPointer pointer,
   ) => $ProviderElement(pointer);
 
   @override
-  PrivacyDataSnapshot create(Ref ref) {
-    return privacyData(ref);
+  DeviceDataInventory create(Ref ref) {
+    return deviceDataInventory(ref);
   }
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(PrivacyDataSnapshot value) {
+  Override overrideWithValue(DeviceDataInventory value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<PrivacyDataSnapshot>(value),
+      providerOverride: $SyncValueProvider<DeviceDataInventory>(value),
     );
   }
 }
 
-String _$privacyDataHash() => r'54b71f30e1717427b5675c69f671f7cd6e717f77';
+String _$deviceDataInventoryHash() =>
+    r'8a2ae491c1f97f30f188c425ce66f7e39c2b6d37';
 
 /// Exports all user data as a JSON string for GDPR data portability.
 ///

@@ -95,7 +95,6 @@
   "freeNoKey": "Free — no key needed",
   "apiKeyRequired": "API key required",
   "dataTransparency": "Data transparency",
-  "storageAndCache": "Storage & cache",
   "clearCache": "Clear cache",
   "stationsFound": "{count} stations found",
   "@stationsFound": {
@@ -107,11 +106,7 @@
   },
   "storageUsage": "Storage usage on this device",
   "settingsLabel": "Settings",
-  "profilesStored": "profiles stored",
-  "stationsMarked": "stations marked",
-  "cachedResponses": "cached responses",
   "total": "Total",
-  "cacheManagement": "Cache management",
   "cacheDescription": "The cache stores API responses for faster loading and offline access.",
   "cacheTtlGroupNetwork": "Network",
   "cacheTtlGroupData": "Data",
@@ -140,7 +135,6 @@
   "clearCacheBody": "Cached search results and prices will be deleted. Profiles, favorites and settings are preserved.",
   "clearCacheButton": "Clear cache",
   "deleteAllButton": "Delete all",
-  "entries": "entries",
   "cacheEmpty": "Cache is empty",
   "apiKeyNote": "Free registration. Data from government price transparency agencies.",
   "apiKeyFormatError": "Invalid format — expected UUID (8-4-4-4-12)",
@@ -150,37 +144,9 @@
   "reportConsentBody": "This will open a public GitHub issue with the error details below. No GPS coordinates, API keys, or personal data are included.",
   "reportConsentConfirm": "Open GitHub",
   "reportConsentCancel": "Cancel",
-  "configProfileSection": "Profile",
-  "configActiveProfile": "Active profile",
-  "configPreferredFuel": "Preferred fuel",
-  "configCountry": "Country",
-  "configRouteSegment": "Route segment",
-  "configApiKeysSection": "API keys",
-  "configTankerkoenigKey": "Tankerkoenig API key",
-  "configApiKeyConfigured": "Configured",
-  "configApiKeyCommunity": "Default (community key)",
   "searchLocationPlaceholder": "Address, postal code or city",
-  "configEvKey": "EV charging API key",
-  "configEvKeyCustom": "Custom key",
-  "configEvKeyShared": "Default (shared)",
-  "configCloudSyncSection": "Cloud Sync",
   "configTankSyncConnected": "Connected",
   "configTankSyncDisabled": "Disabled",
-  "configAuthMode": "Auth mode",
-  "configAuthEmail": "Email (persistent)",
-  "configAuthAnonymous": "Anonymous (device-only)",
-  "configDatabase": "Database",
-  "configPrivacySummary": "Privacy summary",
-  "configPrivacySummarySynced": "• Favorites, alerts, and ignored stations are synced to your private database\n• GPS position and API keys never leave your device\n• {authNote}",
-  "@configPrivacySummarySynced": {
-    "placeholders": {
-      "authNote": {}
-    }
-  },
-  "configPrivacySummaryLocal": "• All data is stored locally on this device only\n• No data is sent to any server\n• API keys encrypted in device secure storage",
-  "configAuthNoteEmail": "Email account enables cross-device access",
-  "configAuthNoteAnonymous": "Anonymous account — data tied to this device",
-  "configNone": "None",
   "privacyPolicy": "Privacy Policy",
   "fuels": "Fuels",
   "services": "Services",
@@ -486,42 +452,8 @@
   "calculatorReset": "Reset",
   "calculatorResultPlaceholder": "Fill in distance, consumption and price to see your trip cost",
   "priceHistory": "Price History",
-  "ignoredStationsLabel": "Ignored",
-  "ratingsLabel": "Ratings",
   "favoritesDataCache": "Favorites data",
   "citySearchCache": "City search",
-  "priceHistoryStationsTracked": "{count} stations tracked",
-  "@priceHistoryStationsTracked": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "alertsConfiguredCount": "{count} configured",
-  "@alertsConfiguredCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ignoredStationsHidden": "{count} stations hidden",
-  "@ignoredStationsHidden": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ratingsStationsRated": "{count} stations rated",
-  "@ratingsStationsRated": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "noPriceHistory": "No price history yet",
   "noStatistics": "No statistics available",
   "showAllFuelTypes": "Show all fuel types",
@@ -719,44 +651,21 @@
   "alertStatsActive": "Active",
   "alertStatsToday": "Today",
   "alertStatsThisWeek": "This week",
-  "privacyDashboardTitle": "Privacy Dashboard",
-  "privacyDashboardSubtitle": "View, export, or delete your data",
-  "privacyDashboardBanner": "Your data belongs to you. Here you can see everything this app stores, export it, or delete it.",
   "privacyLocalData": "Data on this device",
   "privacyIgnoredStations": "Ignored stations",
   "privacyRatings": "Station ratings",
   "privacyPriceHistory": "Price history stations",
   "privacyProfiles": "Search profiles",
   "privacyItineraries": "Saved routes",
-  "privacyCacheEntries": "Cache entries",
-  "privacyApiKey": "API key stored",
-  "privacyEvApiKey": "EV API key stored",
-  "privacyEstimatedSize": "Estimated storage",
-  "privacySyncedData": "Cloud sync (TankSync)",
-  "privacySyncDisabled": "Cloud sync is disabled. All data stays on this device only.",
   "privacySyncMode": "Sync mode",
   "privacySyncUserId": "User ID",
   "privacySyncDescription": "When sync is enabled, favorites, ratings, alerts, ignored stations, saved routes, vehicles, fuel logs and trips are also stored on the TankSync server.",
-  "privacyViewServerData": "View server data",
-  "privacyExportButton": "Export all data as JSON",
   "privacyExportSuccess": "Data exported to clipboard",
-  "privacyExportCsvButton": "Export all data as CSV",
   "privacyExportCsvSuccess": "CSV data exported to clipboard",
   "savedToDownloadsFolder": "Saved to your Downloads folder",
   "@savedToDownloadsFolder": {
     "description": "Snackbar confirming an export was written to the device's public Downloads folder (#2014). Replaces the earlier savedToFile string, which leaked a filesystem path that is meaningless to users (and on Android Q+ becomes a content:// URI)."
   },
-  "privacyDeleteButton": "Delete all data",
-  "privacySaveErrorLog": "Save error log ({count})",
-  "@privacySaveErrorLog": {
-    "description": "Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder (and shares / copies as a secondary path). Supersedes privacyCopyErrorLog (#2145). count = number of traces buffered.",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "privacyClearErrorLog": "Clear error log",
   "privacyErrorLogCleared": "Error log cleared",
   "privacyDeleteTitle": "Delete all data?",
   "privacyDeleteBody": "This will permanently delete:\n\n- All favorites and station data\n- All search profiles\n- All price alerts\n- All price history\n- All cached data\n- Your API key\n- All app settings\n\nThe app will reset to its initial state. This action cannot be undone.",
