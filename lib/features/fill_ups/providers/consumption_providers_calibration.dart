@@ -25,13 +25,16 @@ mixin _FillUpListCalibration on _$FillUpList {
     }
   }
 
-  /// Run the η_v learner against the new fill-up. Returns the resulting
-  /// [PumpGainResult] (or `null` when guards rejected) so downstream
-  /// hooks (#1423 phase 3 broken-MAP belief) can read
+  /// Run the pump-gain learner against the new fill-up. Returns the
+  /// [PumpGainOutcome] (null when the learner is unwired or failed) so
+  /// downstream hooks (#1423 phase 3 broken-MAP belief) can read
   /// [PumpGainResult.proposedEta] without re-running the learner.
   /// #3887 — pump-anchored fuel gain: a closing full-to-full window
   /// re-anchors every estimated fuel-rate branch on the pump's litres.
-  Future<PumpGainResult?> _reconcilePumpGain(FillUp fillUp) async {
+  /// #3917 — every fill publishes its inventory (calibrated or the skip
+  /// reason) through [lastFillInventoryProvider]; #3918 — the tank's
+  /// dominant fuel key is stamped on the profile for the readers.
+  Future<PumpGainOutcome?> _reconcilePumpGain(FillUp fillUp) async {
     final vehicleId = fillUp.vehicleId;
     if (vehicleId == null || fillUp.liters <= 0) return null;
     try {
@@ -40,24 +43,52 @@ mixin _FillUpListCalibration on _$FillUpList {
       final summariesById = <String, TripSummary>{
         for (final t in ref.read(tripHistoryListProvider)) t.id: t.summary,
       };
-      final result = await learner.reconcileAfterFillUp(
+      final vehicleFills = [
+        for (final f in state)
+          if (f.vehicleId == vehicleId || f.vehicleId == null) f,
+      ];
+      final outcome = await learner.evaluate(
         vehicleId: vehicleId,
         closing: fillUp,
-        fillUps: [
-          for (final f in state)
-            if (f.vehicleId == vehicleId || f.vehicleId == null) f,
-        ],
+        fillUps: vehicleFills,
         tripSummariesById: summariesById,
       );
+      await _stampTankFuelKey(vehicleId, vehicleFills);
+      final result = outcome.result;
       if (result != null) {
         ref.read(lastPumpGainResultProvider.notifier).set(result);
-        ref.invalidate(vehicleProfileListProvider);
       }
-      return result;
+      ref.invalidate(vehicleProfileListProvider);
+      if (!fillUp.isCorrection) {
+        await ref
+            .read(lastFillInventoryProvider.notifier)
+            .set(FillInventory.fromOutcome(fillUp, outcome));
+      }
+      return outcome;
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'FillUpList: pump-gain reconciliation failed'}));
       return null;
     }
+  }
+
+  /// #3918 — write the tank's dominant grade (the mix estimate on a
+  /// multi-fuel vehicle, else the last physical fill's fuel) so the
+  /// fuel-rate readers resolve `pumpGainByFuel` by what the tank holds.
+  Future<void> _stampTankFuelKey(String vehicleId, List<FillUp> fills) async {
+    final repo = ref.read(vehicleProfileRepositoryProvider);
+    final vehicle = repo.getById(vehicleId);
+    if (vehicle == null) return;
+    final physical = fills.where((f) => !f.isCorrection).toList()
+      ..sort((a, b) => b.date.compareTo(a.date));
+    if (physical.isEmpty) return;
+    String key = physical.first.fuelType.apiValue;
+    if (vehicle.multiFuelCapable) {
+      final mix = estimateTankMix(vehicle: vehicle, fillUps: fills);
+      final dominant = mix?.shares.firstOrNull;
+      if (dominant != null) key = dominant.fuel.apiValue;
+    }
+    if (vehicle.tankFuelKey == key) return;
+    await repo.save(vehicle.copyWith(tankFuelKey: key));
   }
   Future<void> _reconcileGpsCalibrationMatrix(FillUp fillUp) async {
     final vehicleId = fillUp.vehicleId;

@@ -8,6 +8,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/pump_gain_entry.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/trips/domain/trip_summary.dart';
@@ -122,6 +123,148 @@ void main() {
     expect(PumpGainLearner.blendWeight(0), 1.0);
     expect(PumpGainLearner.blendWeight(1), 0.5);
     expect(PumpGainLearner.blendWeight(7), 0.4);
+  });
+
+  // #3917 — every skip carries its reason (and the window figures when a
+  // window closed) so the "Bilan du plein" can explain itself.
+  group('evaluate — skip reasons', () {
+    final trips = {'a': _trip(100, 10.5)};
+    final fills = [_fill('f1', 0, 100000, 40), _fill('f2', 10, 100559, 35.7, trips: ['a'])];
+
+    Future<PumpGainOutcome> eval(FillUp closing,
+            {List<FillUp>? fillUps, Map<String, TripSummary>? summaries}) =>
+        learner.evaluate(
+            vehicleId: 'car',
+            closing: closing,
+            fillUps: fillUps ?? fills,
+            tripSummariesById: summaries ?? trips);
+
+    test('partial fill', () async {
+      final o = await eval(_fill('f2', 10, 100559, 35.7, full: false));
+      expect(o.skipReason, PumpGainSkipReason.notFullTank);
+      expect(o.result, isNull);
+      expect(o.fuelKey, 'e85');
+    });
+
+    test('correction', () async {
+      final o = await eval(fills.last.copyWith(isCorrection: true));
+      expect(o.skipReason, PumpGainSkipReason.correction);
+    });
+
+    test('unknown vehicle', () async {
+      final o = await learner.evaluate(
+          vehicleId: 'ghost', closing: fills.last, fillUps: fills, tripSummariesById: trips);
+      expect(o.skipReason, PumpGainSkipReason.noVehicle);
+    });
+
+    test('first full tank — no window closes', () async {
+      final only = _fill('f1', 0, 100000, 40);
+      final o = await eval(only, fillUps: [only]);
+      expect(o.skipReason, PumpGainSkipReason.noWindow);
+      expect(o.period, isNull);
+    });
+
+    test('coverage too low keeps the window figures', () async {
+      final o = await eval(fills.last);
+      expect(o.skipReason, PumpGainSkipReason.coverageTooLow);
+      expect(o.period, isNotNull);
+      expect(o.coverageShare, closeTo(0.18, 0.01));
+      expect(o.recordedKm, 100);
+      expect(o.rawRecordedLPer100Km, closeTo(10.5, 0.01));
+    });
+
+    test('recorded distance too short', () async {
+      final o = await eval(fills.last, summaries: {'a': _trip(30, 3.15)});
+      expect(o.skipReason, PumpGainSkipReason.recordedTooShort);
+    });
+
+    test('no recorded fuel', () async {
+      final o = await eval(fills.last, summaries: {
+        'a': TripSummary(
+            distanceKm: 500,
+            maxRpm: 3000,
+            highRpmSeconds: 0,
+            idleSeconds: 0,
+            harshBrakes: 0,
+            harshAccelerations: 0,
+            startedAt: _t0),
+      });
+      // No litres → the trip never counts as recorded km either.
+      expect(o.skipReason, PumpGainSkipReason.recordedTooShort);
+    });
+
+    test('implausible target', () async {
+      final o = await eval(fills.last, summaries: {'a': _trip(500, 0.5)});
+      expect(o.skipReason, PumpGainSkipReason.implausibleTarget);
+      expect(o.period, isNotNull);
+    });
+
+    test('calibrated → result, no reason', () async {
+      final closing = _fill('f2', 10, 100559, 35.7, trips: ['a', 'b']);
+      final o = await eval(closing,
+          summaries: {'a': _trip(300, 31.5), 'b': _trip(153, 16.07)},
+          fillUps: [_fill('f1', 0, 100000, 40), closing]);
+      expect(o.skipReason, isNull);
+      expect(o.calibrated, isTrue);
+      expect(o.result!.fuelKey, isNull, reason: 'single-fuel: scalar only');
+      expect(repo.getById('car')!.pumpGainByFuel, isEmpty);
+    });
+  });
+
+  // #3918 — a multi-fuel vehicle learns per grade AND keeps blending the
+  // scalar as the fallback.
+  group('multi-fuel keying', () {
+    final trips = {'a': _trip(300, 31.5), 'b': _trip(153, 16.07)};
+    final fills = [
+      _fill('f1', 0, 100000, 40),
+      _fill('f2', 10, 100559, 35.7, trips: ['a', 'b'])
+    ];
+
+    test('first E85 window: per-fuel entry at face value + scalar', () async {
+      await repo.save(const VehicleProfile(
+          id: 'car', name: 'Flex', multiFuelCapable: true));
+      final o = await learner.evaluate(
+          vehicleId: 'car', closing: fills.last, fillUps: fills, tripSummariesById: trips);
+      final r = o.result!;
+      expect(r.fuelKey, 'e85');
+      expect(r.previousGain, 1.0);
+      expect(r.newGain, closeTo(0.608, 0.005));
+      expect(r.sampleCount, 1);
+      final p = repo.getById('car')!;
+      expect(p.pumpGainByFuel['e85']!.gain, closeTo(0.608, 0.005));
+      expect(p.pumpGainByFuel['e85']!.samples, 1);
+      expect(p.pumpGainByFuel['e85']!.updatedAt, _t0);
+      expect(p.pumpGain, closeTo(0.608, 0.005), reason: 'scalar blends too');
+      expect(p.pumpGainSamples, 1);
+    });
+
+    test('an E10 window blends its own entry, not the E85 one', () async {
+      await repo.save(const VehicleProfile(
+          id: 'car',
+          name: 'Flex',
+          multiFuelCapable: true,
+          pumpGain: 0.6,
+          pumpGainSamples: 1,
+          pumpGainByFuel: {'e85': PumpGainEntry(gain: 0.6, samples: 1)}));
+      final e10Fills = [
+        fills.first,
+        fills.last.copyWith(fuelType: FuelType.e10),
+      ];
+      final o = await learner.evaluate(
+          vehicleId: 'car',
+          closing: e10Fills.last,
+          fillUps: e10Fills,
+          tripSummariesById: trips);
+      final r = o.result!;
+      expect(r.fuelKey, 'e10');
+      expect(r.previousGain, 1.0, reason: 'fresh grade starts at 1.0');
+      expect(r.newGain, closeTo(0.608, 0.005), reason: 'first sample: face value');
+      final p = repo.getById('car')!;
+      expect(p.pumpGainByFuel['e85']!.gain, 0.6, reason: 'untouched');
+      expect(p.pumpGainByFuel['e10']!.samples, 1);
+      // Scalar: 0.5 × 0.608 + 0.5 × 0.6 ≈ 0.604.
+      expect(p.pumpGain, closeTo(0.604, 0.005));
+    });
   });
 }
 

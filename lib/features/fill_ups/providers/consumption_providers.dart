@@ -24,11 +24,14 @@ import '../data/repositories/fill_up_repository.dart';
 import '../../trips/api.dart';
 import '../domain/entities/consumption_stats.dart';
 import '../domain/entities/eco_score.dart';
+import '../domain/entities/fill_inventory.dart';
 import '../domain/entities/fill_up.dart';
 import '../domain/entities/pending_reconciliation.dart';
 import '../domain/services/eco_score_calculator.dart';
 import '../domain/services/fill_up_trip_linker.dart';
 import '../domain/services/reconciler.dart';
+import '../domain/services/tank_mix_estimator.dart';
+import 'fill_inventory_provider.dart';
 import 'pending_reconciliation_provider.dart';
 
 part 'consumption_providers.g.dart';
@@ -186,7 +189,7 @@ class FillUpList extends _$FillUpList
     await _relinkOpenWindow(linked);
     state = repo.getAll();
     await _evaluateReminders(linked);
-    final gainResult = await _reconcilePumpGain(linked); // #3887
+    final gainOutcome = await _reconcilePumpGain(linked); // #3887 / #3917
     // #2081 — GPS matrix reconciliation. Independent of η_v: the η_v
     // path applies to the OBD2 fuel-rate trim; this path applies to
     // the GPS-only L/100 km matrix. Both happily run for hybrid
@@ -205,7 +208,7 @@ class FillUpList extends _$FillUpList
     await _recordBrokenMapObservation(
       fillUp: linked,
       reconciliation: reconciliation,
-      proposedEta: gainResult?.proposedEta,
+      proposedEta: gainOutcome?.result?.proposedEta,
     );
   }
 
