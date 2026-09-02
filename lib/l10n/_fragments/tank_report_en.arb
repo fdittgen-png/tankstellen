@@ -3,14 +3,6 @@
   "@tankReportTitle": {
     "description": "#3616 card title — per-plein consumption report on the Carburant tab"
   },
-  "tankReportHeadline": "{value} L/100 km",
-  "@tankReportHeadline": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportSincePrevious": "Since the previous full tank: {km} km · {liters} L · {cost}",
   "@tankReportSincePrevious": {
     "placeholders": {
@@ -43,22 +35,6 @@
   },
   "tankReportTrendFlat": "Level with the previous tank",
   "tankReportNoPrevious": "Evolution appears after your next full tank.",
-  "tankReportCoverage": "Recordings cover {pct} % of this tank",
-  "@tankReportCoverage": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportRecordedAvg": "Recorded slice: {value} L/100 km",
-  "@tankReportRecordedAvg": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportExplainHeader": "What the recordings suggest",
   "tankReportFactorHighRpm": "High-RPM share {cur} % (was {prev} %)",
   "@tankReportFactorHighRpm": {
@@ -104,21 +80,5 @@
       }
     }
   },
-  "tankReportCaveat": "Recordings are spontaneous and cover only part of this tank — these hints are indicative, not the full story.",
-  "tankReportCalibrationUnder": "Recorded estimates run {pct} % under pump truth",
-  "@tankReportCalibrationUnder": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportCalibrationOver": "Recorded estimates run {pct} % over pump truth",
-  "@tankReportCalibrationOver": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  }
+  "tankReportCaveat": "Recordings are spontaneous and cover only part of this tank — these hints are indicative, not the full story."
 }

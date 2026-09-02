@@ -36,14 +36,13 @@ void main() {
       expect(find.text('Add vehicle'), findsOneWidget);
     });
 
-    testWidgets('app-bar Save action is still wired as an IconButton',
-        (tester) async {
+    testWidgets(
+        'ONE save affordance — the app bar carries no check-mark action '
+        '(#3899); the pinned bottom bar is the only Save', (tester) async {
       await _pumpEditScreen(tester);
 
-      // The app-bar action is the only IconButton with Icons.check in
-      // the tree (drivetrain/extras rows render distinct icons).
-      final saveAction = find.widgetWithIcon(IconButton, Icons.check);
-      expect(saveAction, findsOneWidget);
+      expect(find.widgetWithIcon(IconButton, Icons.check), findsNothing);
+      expect(find.widgetWithText(FilledButton, 'Save'), findsOneWidget);
     });
 
     testWidgets('pinned bottom Save survives the PageScaffold migration',

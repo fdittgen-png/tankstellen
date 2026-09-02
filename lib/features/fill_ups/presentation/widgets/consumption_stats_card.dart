@@ -11,6 +11,7 @@ import '../../../feature_management/api.dart';
 import '../../domain/entities/consumption_stats.dart';
 import '../../providers/pending_reconciliation_provider.dart';
 import 'confidence_tier_badge.dart';
+import 'pump_gain_chip.dart';
 import 'resolve_gap_banner.dart';
 import '../../../../core/utils/unit_formatter.dart';
 
@@ -162,11 +163,9 @@ class ConsumptionStatsCard extends ConsumerWidget {
                   samples: volumetricEfficiencySamples!,
                   hasGpsPlusObd2Trip: hasGpsPlusObd2Trip,
                 ),
-                if (showRawCalibration)
-                  _CalibrationChip(
-                    volumetricEfficiency: volumetricEfficiency ?? 0.85,
-                    samples: volumetricEfficiencySamples!,
-                  ),
+                // #3901 — the pump-anchored gain (Epic #3886) replaced
+                // the η_v learner; the chip reads the active vehicle.
+                if (showRawCalibration) const PumpGainChip(),
               ],
             ),
           ],
@@ -214,11 +213,21 @@ class ConsumptionStatsCard extends ConsumerWidget {
               ),
             ],
           ),
+          // #3903 — the fill-up count is a fifth tile in the same grid
+          // style (icon + label + value), not a bare text line.
           if (stats.fillUpCount > 0) ...[
             const SizedBox(height: 8),
-            Text(
-              '${l.statFillUpCount}: ${stats.fillUpCount}',
-              style: theme.textTheme.bodySmall,
+            Row(
+              children: [
+                Expanded(
+                  child: _StatTile(
+                    icon: Icons.format_list_numbered,
+                    label: l.statFillUpCount,
+                    value: '${stats.fillUpCount}',
+                  ),
+                ),
+                const Expanded(child: SizedBox.shrink()),
+              ],
             ),
           ],
           // #2446 — corrections are surfaced transparently on their
@@ -259,6 +268,6 @@ class ConsumptionStatsCard extends ConsumerWidget {
 }
 
 // The four private decoration widgets (_OpenWindowBanner,
-// _CorrectionShareHint, _CalibrationChip, _StatTile) live in the
+// _CorrectionShareHint, _StatTile) live in the
 // `part`'d consumption_stats_card_parts.dart so this file stays under
 // the 400-line cap (#2698 / file_length_test).

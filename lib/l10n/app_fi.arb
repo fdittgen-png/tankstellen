@@ -169,7 +169,6 @@
   "settingsStorageDetail": "API-avain, aktiivinen profiili",
   "allFuels": "Kaikki",
   "priceAlerts": "Hintahälytykset",
-  "noPriceAlerts": "Ei hintahälytyksiä",
   "noPriceAlertsHint": "Luo hälytys aseman tietosivulta.",
   "alertDeleted": "Hälytys \"{name}\" poistettu",
   "createAlert": "Luo hintahälytys",
@@ -492,7 +491,6 @@
   "liters": "Litrat",
   "odometerKm": "Matkamittari (km)",
   "notesOptional": "Muistiinpanot (valinnainen)",
-  "stationPreFilled": "Asema esitäytetty",
   "statAvgConsumption": "Keskim. L/100km",
   "statAvgCostPerKm": "Keskim. kustannus/km",
   "statTotalLiters": "Yhteensä litraa",
@@ -882,8 +880,6 @@
   "obd2PauseBannerTitle": "OBD2-yhteys katkesi — tallennus keskeytetty",
   "obd2PauseBannerResume": "Jatka tallennusta",
   "obd2PauseBannerEnd": "Lopeta tallennus",
-  "veResetConfirmTitle": "Nollatako tilavuushyötysuhde?",
-  "veResetConfirmBody": "Tämä hylkää opitun tilavuushyötysuhteen (η_v) ja palauttaa oletusarvon (0,85). Matkakohtaiset polttoainevirta-arviot palaavat valmistajan vakioon kunnes kalibraattori kerää uusia näytteitä tulevista matkoista.",
   "alertsRadiusSectionTitle": "Säde-hälytykset",
   "alertsRadiusAdd": "Lisää säde-hälytys",
   "alertsRadiusEmptyTitle": "Ei vielä säde-hälytyksiä",
@@ -899,8 +895,6 @@
   "obd2ConnectedTooltip": "OBD2 yhdistetty: {adapterName}",
   "obd2PairChipTooltip": "Paritetaan OBD2-sovitin",
   "fillUpSavedSnackbar": "Tankkaus tallennettu",
-  "radiusAlertsEntryTitle": "Säde-hälytykset ja tilastot",
-  "radiusAlertsEntrySubtitle": "Saat ilmoituksen kun hinnat laskevat lähellä sinua",
   "notFoundTitle": "Sivua ei löydy",
   "notFoundBody": "\"{location}\" ei löydy.",
   "notFoundHomeButton": "Etusivu",
@@ -943,7 +937,6 @@
   "autoRecordBackgroundLocationOpenSettings": "Avaa asetukset",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Sijaintilupa vaaditaan",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Taustasijainnin pyytäminen epäonnistui",
-  "autoRecordPairAdapterLinkText": "Paritetaan sovitin alla olevassa osiossa automaattisen tallennuksen ottamiseksi käyttöön",
   "exportBackupReady": "Varmuuskopio valmis — valitse kohde",
   "exportBackupFailed": "Varmuuskopion vienti epäonnistui — yritä uudelleen",
   "brokenMapChipDisclaimer": "MAP-lukema epäilyttävä",
@@ -973,10 +966,6 @@
   "calibrationSourceDefault": "(oletus)",
   "calibrationSourceManual": "(manuaalinen)",
   "calibrationResetToDetected": "Nollaa havaittuun arvoon",
-  "calibrationLearnerStatusCalibrated": "η_v: {eta} (kalibroitu, {samples} näytettä)",
-  "calibrationLearnerStatusLearning": "η_v: {eta} (oppii, {samples} näytettä)",
-  "calibrationLearnerStatusNoSamples": "η_v: 0,85 (oletus — ei plein-complet-tankkausta vielä)",
-  "calibrationLearnerEtaCompact": "η_v: {eta} · {samples} näytettä",
   "consumptionAccuracyLabel": "Tarkkuus: {level} · {band}",
   "consumptionAccuracyHigh": "Korkea",
   "consumptionAccuracyMedium": "Keskitaso",
@@ -984,7 +973,6 @@
   "consumptionAccuracyTooltipHigh": "Täysi kalibrointi: tankkaukset sekä OBD2:lla tallennetut matkat. L/100 km -luku vastaa todellisuutta muutaman prosentin tarkkuudella.",
   "consumptionAccuracyTooltipMedium": "Tankkaukset ovat ankkuroineet kulutusmallin, mutta yhtäkään OBD2-matkaa ei ole vielä syötetty. Tallenna yksi OBD2 yhdistettynä saavuttaaksesi korkean tarkkuuden.",
   "consumptionAccuracyTooltipLow": "Vain GPS — yksikään tankkaus ei ole vielä ankkuroinut kulutusmallia. Lisää pari täyttä tankkausta parantaaksesi tarkkuutta.",
-  "calibrationResetLearner": "Nollaa oppija",
   "calibrationBasisAtkinson": "Atkinson-sykli",
   "calibrationBasisVnt": "VNT-diesel + DI",
   "calibrationBasisTurboDi": "Turboahdettu + DI",
@@ -1266,7 +1254,6 @@
   "radiusAlertMapPickerConfirm": "Vahvista",
   "radiusAlertMapPickerCancel": "Peruuta",
   "radiusAlertMapPickerHint": "Vedä karttaa asettaaksesi hälytyksen keskipiste",
-  "radiusAlertCenterFromMap": "Karttasijainti",
   "refuelUnitPerKwh": "/kWh",
   "refuelUnitPerSession": "/lataus",
   "speedConsumptionCardTitle": "Kulutus nopeuden mukaan",
@@ -1387,7 +1374,6 @@
   "vinDecodeTooltip": "Pura VIN-koodi",
   "vinConfirmAction": "Kyllä, esitäytä",
   "vinModifyAction": "Muokkaa manuaalisesti",
-  "veResetAction": "Nollaa tilavuushyötysuhde",
   "vehicleReadVinFromCarButton": "Lue VIN autosta",
   "vehicleReadVinFromCarTooltip": "Lue VIN paritetulta OBD2-sovittimelta",
   "vehicleReadVinFailedUnsupportedSnackbar": "VIN ei saatavilla (Mode 09 PID 02 ei tuettu ennen 2005 ajoneuvoja)",
@@ -3250,54 +3236,12 @@
   "@consumptionMonthlyClimbLabel": {
     "description": "MT — needs native review"
   },
-  "openNow": "Auki",
-  "@openNow": {
-    "description": "MT — needs native review"
-  },
-  "openNowClosed": "Suljettu",
-  "@openNowClosed": {
-    "description": "MT — needs native review"
-  },
   "openHoursUnknown": "Aukioloajat tuntematon",
   "@openHoursUnknown": {
     "description": "MT — needs native review"
   },
-  "closesAt": "Sulkeutuu {time}",
-  "@closesAt": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "time": {
-        "type": "String"
-      }
-    }
-  },
-  "opensAt": "Avautuu {day} {time}",
-  "@opensAt": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "day": {
-        "type": "String"
-      },
-      "time": {
-        "type": "String"
-      }
-    }
-  },
-  "opensToday": "Avautuu {time}",
-  "@opensToday": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "time": {
-        "type": "String"
-      }
-    }
-  },
   "open24Hours": "Auki 24 tuntia",
   "@open24Hours": {
-    "description": "MT — needs native review"
-  },
-  "badge24h": "24h",
-  "@badge24h": {
     "description": "MT — needs native review"
   },
   "dayMon": "Maanantai",
@@ -3447,10 +3391,6 @@
   },
   "featureDescription_addFillUpShareIntentReceipt": "Jaa kuittivalokuva toisesta sovelluksesta esitäyttääksesi tankkauksen — päivämäärä, litrat, yhteissumma ja asema luetaan laitteella.",
   "@featureDescription_addFillUpShareIntentReceipt": {
-    "description": "MT — needs native review"
-  },
-  "openingHoursAutomate24h": "Automatisoi 24/7",
-  "@openingHoursAutomate24h": {
     "description": "MT — needs native review"
   },
   "stopRadar": "Pysäytä tutka",
@@ -4203,14 +4143,6 @@
   "featureLabel_voiceFeedback": "Puhuttu palaute (puhesynteesi)",
   "featureDescription_voiceFeedback": "Pääkytkin kaikelle puhutulle — ajovalmentajalle ja asemakuulutuksille. Pois päältä sovellus ei koskaan avaa puhesynteesimoottoria.",
   "tankReportTitle": "Tankkiraportti",
-  "tankReportHeadline": "{value} L/100 km",
-  "@tankReportHeadline": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportSincePrevious": "Edellisestä täydestä tankillisesta: {km} km · {liters} L · {cost}",
   "@tankReportSincePrevious": {
     "placeholders": {
@@ -4243,22 +4175,6 @@
   },
   "tankReportTrendFlat": "Samalla tasolla kuin edellinen tankillinen",
   "tankReportNoPrevious": "Kehitys näkyy seuraavan täyden tankillisen jälkeen.",
-  "tankReportCoverage": "Tallenteet kattavat {pct} % tästä tankillisesta",
-  "@tankReportCoverage": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportRecordedAvg": "Tallennettu osuus: {value} L/100 km",
-  "@tankReportRecordedAvg": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportExplainHeader": "Mitä tallenteet vihjaavat",
   "tankReportFactorHighRpm": "Korkeiden kierrosten osuus {cur} % (aiemmin {prev} %)",
   "@tankReportFactorHighRpm": {
@@ -4305,22 +4221,6 @@
     }
   },
   "tankReportCaveat": "Tallenteet ovat satunnaisia ja kattavat vain osan tästä tankillisesta — nämä vihjeet ovat suuntaa antavia, eivät koko totuus.",
-  "tankReportCalibrationUnder": "Tallennetut arviot ovat {pct} % mittarilukemaa pienemmät",
-  "@tankReportCalibrationUnder": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportCalibrationOver": "Tallennetut arviot ovat {pct} % mittarilukemaa suuremmat",
-  "@tankReportCalibrationOver": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
   "qrLaunchConfirmTitle": "Avataanko skannattu linkki?",
   "qrLaunchConfirmBody": "Tämä QR-koodi osoittaa kohteeseen {host}. Avaa vain linkkejä, joihin luotat.",
   "@qrLaunchConfirmBody": {
@@ -4939,5 +4839,299 @@
         "type": "String"
       }
     }
+  },
+  "openingHoursAutomate24h": "Self-service pump 24/7 (card payment)",
+  "@openingHoursAutomate24h": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "stalePriceBadge": "Old price",
+  "@stalePriceBadge": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "radiusAlertCenterChipGps": "My position",
+  "@radiusAlertCenterChipGps": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "radiusAlertCenterChipMap": "Map point",
+  "@radiusAlertCenterChipMap": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "radiusAlertCenterChipPostal": "Postal code {postalCode}",
+  "@radiusAlertCenterChipPostal": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "postalCode": {
+        "type": "String",
+        "example": "34550"
+      }
+    }
+  },
+  "radiusAlertCenterClear": "Clear location",
+  "@radiusAlertCenterClear": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "radiusAlertBlockerLabel": "Enter a label",
+  "@radiusAlertBlockerLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "radiusAlertBlockerThreshold": "Enter a threshold above 0",
+  "@radiusAlertBlockerThreshold": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "radiusAlertBlockerLocation": "Choose a location",
+  "@radiusAlertBlockerLocation": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpOdometerFromLastFillUp": "Pre-filled from your last fill-up",
+  "@fillUpOdometerFromLastFillUp": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpStationLabel": "Station",
+  "@fillUpStationLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpStationChange": "Change",
+  "@fillUpStationChange": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pickStationSectionLast": "Last station",
+  "@pickStationSectionLast": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pickStationSectionFavorites": "Favorites",
+  "@pickStationSectionFavorites": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pickStationSectionNearby": "Nearby",
+  "@pickStationSectionNearby": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pickStationNearbyEmpty": "No recent search — search for stations on the Search tab and the nearest ones will appear here.",
+  "@pickStationNearbyEmpty": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pickStationLastFillUpAt": "Last fill-up: {date}",
+  "@pickStationLastFillUpAt": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "stationStatusWithFreshness": "{status} · updated {ago} ago",
+  "@stationStatusWithFreshness": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "status": {
+        "type": "String",
+        "example": "Open"
+      },
+      "ago": {
+        "type": "String",
+        "example": "< 1 min"
+      }
+    }
+  },
+  "pricesNotSoldHere": "Not sold here: {fuels}",
+  "@pricesNotSoldHere": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuels": {
+        "type": "String",
+        "example": "Super E5, Super E10"
+      }
+    }
+  },
+  "tankReportRecordedTripsCoverage": "Recorded trips cover {pct} % of this tank",
+  "@tankReportRecordedTripsCoverage": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportRecordedTripsAvg": "Recorded trips: {value}",
+  "@tankReportRecordedTripsAvg": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportRecordedTripsOverestimate": "Your recorded trips overestimate consumption by {pct} %",
+  "@tankReportRecordedTripsOverestimate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportRecordedTripsUnderestimate": "Your recorded trips underestimate consumption by {pct} %",
+  "@tankReportRecordedTripsUnderestimate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "trajetObd2DegradedSubtitle": "No engine data — GPS estimate",
+  "@trajetObd2DegradedSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleTopicAdapterNone": "None",
+  "@vehicleTopicAdapterNone": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleTopicCalibrationTitle": "Calibration",
+  "@vehicleTopicCalibrationTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleTopicAdvancedBadge": "Advanced",
+  "@vehicleTopicAdvancedBadge": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleTopicCalibrationStatus": "Baseline {coverage} % · {mode}",
+  "@vehicleTopicCalibrationStatus": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "coverage": {
+        "type": "int",
+        "example": "78"
+      },
+      "mode": {
+        "type": "String",
+        "example": "Rule-based"
+      }
+    }
+  },
+  "vehicleTopicRemindersCount": "{count, plural, =0{No reminders} =1{1 reminder} other{{count} reminders}}",
+  "@vehicleTopicRemindersCount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "vehicleTopicAutoRecordOn": "On",
+  "@vehicleTopicAutoRecordOn": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleTopicAutoRecordOff": "Off",
+  "@vehicleTopicAutoRecordOff": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleTopicAutoRecordPairLinkText": "Pair an adapter under “OBD2 adapter” to enable auto-recording",
+  "@vehicleTopicAutoRecordPairLinkText": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleBaselineCoverageSamples": "{covered} / {max} samples",
+  "@vehicleBaselineCoverageSamples": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "covered": {
+        "type": "int",
+        "example": "210"
+      },
+      "max": {
+        "type": "int",
+        "example": "270"
+      }
+    }
+  },
+  "vehicleBaselineRawSamples": "{count, plural, =1{1 sample} other{{count} samples}}",
+  "@vehicleBaselineRawSamples": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "954"
+      }
+    }
+  },
+  "calibrationModeRuleDescription": "Sorts each driving sample into one situation using fixed speed and load thresholds.",
+  "@calibrationModeRuleDescription": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "calibrationModeFuzzyDescription": "Splits each sample across neighbouring situations by how well it fits each one — smoother estimates around the boundaries.",
+  "@calibrationModeFuzzyDescription": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pumpGainChipNotCalibrated": "Not pump-calibrated yet",
+  "@pumpGainChipNotCalibrated": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pumpGainChipCalibrated": "{fills, plural, =1{Pump-calibrated · 1 fill-up · ±{percent} %} other{Pump-calibrated · {fills} fill-ups · ±{percent} %}}",
+  "@pumpGainChipCalibrated": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fills": {
+        "type": "int",
+        "example": "6"
+      },
+      "percent": {
+        "type": "int",
+        "example": "7"
+      }
+    }
+  },
+  "pumpGainResetAction": "Reset pump calibration",
+  "@pumpGainResetAction": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pumpGainResetConfirmTitle": "Reset pump calibration?",
+  "@pumpGainResetConfirmTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pumpGainResetConfirmBody": "This discards the fuel gain learned from your fill-ups. OBD2 consumption estimates fall back to the uncorrected figure until the next full-to-full tank window re-learns it.",
+  "@pumpGainResetConfirmBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

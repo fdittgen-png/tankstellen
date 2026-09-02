@@ -8,7 +8,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/domain/consumption_unit.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/providers/consumption_display_provider.dart';
 import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/fill_ups/domain/services/tank_report.dart';
 import 'package:tankstellen/features/fill_ups/presentation/widgets/tank_report_card.dart';
@@ -95,13 +97,61 @@ void main() {
     expect(find.text('2,0 L/100 km more than the previous tank'),
         findsOneWidget);
     expect(find.byIcon(Icons.trending_up), findsOneWidget);
-    expect(find.text('Recordings cover 40 % of this tank'), findsOneWidget);
+    // #3904 — plain-language recorded-trips lines.
+    expect(find.text('Recorded trips cover 40 % of this tank'), findsOneWidget);
+    expect(find.text('Recorded trips: 8,0 L/100 km'), findsOneWidget);
     expect(find.text('High-RPM share 30 % (was 10 %)'), findsOneWidget);
     expect(
         find.textContaining('spontaneous and cover only part'), findsOneWidget,
         reason: '40%/36% coverage must carry the honesty caveat');
-    expect(find.text('Recorded estimates run 25 % under pump truth'),
+    // factor 1.25 = the pump burned 25 % MORE than the recordings claimed.
+    expect(find.text('Your recorded trips underestimate consumption by 25 %'),
         findsOneWidget);
+  });
+
+  testWidgets('recordings above pump truth read as "overestimate" (#3904)',
+      (tester) async {
+    final report = TankReport(
+      latest: _period(liters: 60),
+      latestBehavior: _behavior,
+      evolution: null,
+      // pump ÷ recorded = 0.8 → the recordings claimed 20 % MORE.
+      calibration: const PumpCalibration(factor: 0.8, samples: 2),
+    );
+    await tester.pumpWidget(_host(report));
+    expect(find.text('Your recorded trips overestimate consumption by 20 %'),
+        findsOneWidget);
+    expect(find.textContaining('underestimate'), findsNothing);
+  });
+
+  testWidgets('headline + recorded-trips figures follow the consumption '
+      'unit setting (#3889/#3904)', (tester) async {
+    final report = TankReport(
+      latest: _period(liters: 60), // 12.0 L/100 km ≈ 24 mpg (UK)
+      latestBehavior: _behavior, // 8.0 L/100 km ≈ 35 mpg (UK)
+      evolution: null,
+      calibration: null,
+    );
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          tankReportProvider.overrideWith((_) => report),
+          consumptionDisplaySettingProvider.overrideWith(
+            () => _FixedDisplay(ConsumptionUnit.mpgUk),
+          ),
+        ],
+        child: const MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(body: TankReportCard()),
+        ),
+      ),
+    );
+    expect(find.text('24 mpg (UK)'), findsOneWidget);
+    expect(find.text('Recorded trips: 35 mpg (UK)'), findsOneWidget);
+    expect(find.textContaining('L/100 km'), findsNothing,
+        reason: 'the headline and the recorded-trips line render in the '
+            'chosen unit, never a literal L/100 km');
   });
 
   testWidgets('first closed window: no-previous line, no hints',
@@ -117,4 +167,13 @@ void main() {
         findsOneWidget);
     expect(find.text('What the recordings suggest'), findsNothing);
   });
+}
+
+/// A consumption-unit setting pinned to [unit], no SharedPreferences.
+class _FixedDisplay extends ConsumptionDisplaySetting {
+  _FixedDisplay(this.unit);
+  final ConsumptionUnit unit;
+
+  @override
+  ConsumptionDisplay build() => ConsumptionDisplay(unitOverride: unit);
 }

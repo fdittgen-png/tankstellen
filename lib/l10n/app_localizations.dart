@@ -1191,12 +1191,6 @@ abstract class AppLocalizations {
   /// **'Price Alerts'**
   String get priceAlerts;
 
-  /// No description provided for @noPriceAlerts.
-  ///
-  /// In en, this message translates to:
-  /// **'No price alerts'**
-  String get noPriceAlerts;
-
   /// No description provided for @noPriceAlertsHint.
   ///
   /// In en, this message translates to:
@@ -3032,12 +3026,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Notes (optional)'**
   String get notesOptional;
-
-  /// No description provided for @stationPreFilled.
-  ///
-  /// In en, this message translates to:
-  /// **'Station pre-filled'**
-  String get stationPreFilled;
 
   /// No description provided for @statAvgConsumption.
   ///
@@ -5624,18 +5612,6 @@ abstract class AppLocalizations {
   /// **'Recording with GPS — waiting for the OBD2 adapter'**
   String get obd2GpsDegradedPassiveWaitingBanner;
 
-  /// Title of the confirm dialog shown before discarding the learned volumetric efficiency (#815).
-  ///
-  /// In en, this message translates to:
-  /// **'Reset volumetric efficiency?'**
-  String get veResetConfirmTitle;
-
-  /// Body of the confirm dialog shown before discarding the learned volumetric efficiency (#815).
-  ///
-  /// In en, this message translates to:
-  /// **'This will discard the learned volumetric efficiency (η_v) and restore the default value (0.85). Trip-level fuel-flow estimates will fall back to the manufacturer constant until the calibrator collects new samples from upcoming trips.'**
-  String get veResetConfirmBody;
-
   /// Header of the per-station price-alert section on the alerts screen, symmetric with the radius/zone section (#2819).
   ///
   /// In en, this message translates to:
@@ -5743,18 +5719,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Fill-up saved'**
   String get fillUpSavedSnackbar;
-
-  /// Title of the navigation entry on the favorites Alerts tab that opens the radius-alerts + statistics screen (#1701).
-  ///
-  /// In en, this message translates to:
-  /// **'Radius alerts & statistics'**
-  String get radiusAlertsEntryTitle;
-
-  /// Subtitle of the radius-alerts navigation entry on the favorites Alerts tab — explains what radius alerts do (#1701).
-  ///
-  /// In en, this message translates to:
-  /// **'Get notified when prices drop near you'**
-  String get radiusAlertsEntrySubtitle;
 
   /// AppBar title of the go_router 404 / error screen shown when a route cannot be matched (#1690).
   ///
@@ -6299,12 +6263,6 @@ abstract class AppLocalizations {
   /// **'Tap to open Sparkilo — trip recording can start.'**
   String get aclWakeNotificationBody;
 
-  /// Passive informational link rendered on the auto-record card when no adapter is paired (#1400). Replaces the duplicate orange-tinted 'Pair an adapter' CTA that lived in the auto-record card before #1400; tapping the link scrolls to the canonical 'OBD2 adapter' card below and pulses its border.
-  ///
-  /// In en, this message translates to:
-  /// **'Pair an adapter in the section below to enable auto-recording'**
-  String get autoRecordPairAdapterLinkText;
-
   /// SnackBar shown after a successful backup export when the share sheet is about to appear (#1317).
   ///
   /// In en, this message translates to:
@@ -6560,36 +6518,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reset to detected value'**
   String get calibrationResetToDetected;
-
-  /// Live readout when the learner has accepted at least 3 plein-complet samples.
-  ///
-  /// In en, this message translates to:
-  /// **'η_v: {eta} (calibrated, {samples} samples)'**
-  String calibrationLearnerStatusCalibrated(String eta, int samples);
-
-  /// Live readout while the learner is bootstrapping (1-2 samples).
-  ///
-  /// In en, this message translates to:
-  /// **'η_v: {eta} (learning, {samples} samples)'**
-  String calibrationLearnerStatusLearning(String eta, int samples);
-
-  /// Live readout before the first plein-complet has been logged.
-  ///
-  /// In en, this message translates to:
-  /// **'η_v: 0.85 (default — no plein-complet yet)'**
-  String get calibrationLearnerStatusNoSamples;
-
-  /// #2112 — compact engineer-detail pill that rides alongside the confidence-tier badge on the Fuel tab. Replaces the longer 'learning' / 'calibrated' parenthetical labels — the maturity colour is carried by the confidence tier next to it.
-  ///
-  /// In en, this message translates to:
-  /// **'η_v: {eta} · {samples} samples'**
-  String calibrationLearnerEtaCompact(String eta, int samples);
-
-  /// OutlinedButton label that resets η_v back to 0.85 and clears the sample counter.
-  ///
-  /// In en, this message translates to:
-  /// **'Reset learner'**
-  String get calibrationResetLearner;
 
   /// Engine-tech basis label for η_v (#1422 phase 2). Shown inside the catalog origin tag when the reference vehicle is an Atkinson-cycle hybrid (Toyota Hybrid, Mazda Skyactiv-X).
   ///
@@ -11526,41 +11454,11 @@ abstract class AppLocalizations {
   /// **'You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.'**
   String get onboardingObd2LaterNote;
 
-  /// Opening-hours status line — station is currently open (#2709).
-  ///
-  /// In en, this message translates to:
-  /// **'Open'**
-  String get openNow;
-
-  /// Opening-hours status line — station is currently closed (#2709).
-  ///
-  /// In en, this message translates to:
-  /// **'Closed'**
-  String get openNowClosed;
-
   /// Opening-hours status line — the schedule could not be resolved (#2709).
   ///
   /// In en, this message translates to:
   /// **'Hours unknown'**
   String get openHoursUnknown;
-
-  /// Opening-hours status detail — when an open station next closes (#2709).
-  ///
-  /// In en, this message translates to:
-  /// **'Closes {time}'**
-  String closesAt(String time);
-
-  /// Opening-hours status detail — when a closed station next opens on a future day (#2709).
-  ///
-  /// In en, this message translates to:
-  /// **'Opens {day} {time}'**
-  String opensAt(String day, String time);
-
-  /// Opening-hours status detail — when a closed station next opens later the same day (#2709).
-  ///
-  /// In en, this message translates to:
-  /// **'Opens {time}'**
-  String opensToday(String time);
 
   /// Opening-hours row shown when the station is open every day around the clock (#2709).
   ///
@@ -11568,16 +11466,10 @@ abstract class AppLocalizations {
   /// **'Open 24 hours'**
   String get open24Hours;
 
-  /// Compact badge shown next to the status for an around-the-clock station (#2709).
+  /// Informational opening-hours row (not an action) shown alongside the staffed schedule when the forecourt has an unattended card-payment pump open round-the-clock — the French noun 'automate', NOT the verb 'to automate' (FR Automate : 24/24, #2742, #3902).
   ///
   /// In en, this message translates to:
-  /// **'24h'**
-  String get badge24h;
-
-  /// Opening-hours indicator shown alongside the staffed schedule when an unattended pump is open round-the-clock (FR Automate : 24/24, #2742).
-  ///
-  /// In en, this message translates to:
-  /// **'24/7 automate'**
+  /// **'Self-service pump 24/7 (card payment)'**
   String get openingHoursAutomate24h;
 
   /// Full weekday name — Monday (opening-hours table, #2709).
@@ -11969,12 +11861,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Drag the map to position the alert center'**
   String get radiusAlertMapPickerHint;
-
-  /// Label shown in the create sheet after a location has been picked on the map, distinguishing it from a GPS or postal-code center (#578 phase 3).
-  ///
-  /// In en, this message translates to:
-  /// **'Map location'**
-  String get radiusAlertCenterFromMap;
 
   /// Title of the guided reconciliation workflow dialog raised after a full-tank fill-up when recorded trips don't account for all the pumped fuel (#2442).
   ///
@@ -12898,12 +12784,6 @@ abstract class AppLocalizations {
   /// **'Tank report'**
   String get tankReportTitle;
 
-  /// No description provided for @tankReportHeadline.
-  ///
-  /// In en, this message translates to:
-  /// **'{value} L/100 km'**
-  String tankReportHeadline(String value);
-
   /// No description provided for @tankReportSincePrevious.
   ///
   /// In en, this message translates to:
@@ -12933,18 +12813,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Evolution appears after your next full tank.'**
   String get tankReportNoPrevious;
-
-  /// No description provided for @tankReportCoverage.
-  ///
-  /// In en, this message translates to:
-  /// **'Recordings cover {pct} % of this tank'**
-  String tankReportCoverage(String pct);
-
-  /// No description provided for @tankReportRecordedAvg.
-  ///
-  /// In en, this message translates to:
-  /// **'Recorded slice: {value} L/100 km'**
-  String tankReportRecordedAvg(String value);
 
   /// No description provided for @tankReportExplainHeader.
   ///
@@ -12981,18 +12849,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Recordings are spontaneous and cover only part of this tank — these hints are indicative, not the full story.'**
   String get tankReportCaveat;
-
-  /// No description provided for @tankReportCalibrationUnder.
-  ///
-  /// In en, this message translates to:
-  /// **'Recorded estimates run {pct} % under pump truth'**
-  String tankReportCalibrationUnder(String pct);
-
-  /// No description provided for @tankReportCalibrationOver.
-  ///
-  /// In en, this message translates to:
-  /// **'Recorded estimates run {pct} % over pump truth'**
-  String tankReportCalibrationOver(String pct);
 
   /// Title of the Theme card on the Settings screen (#897). The card matches the Privacy + Storage card pattern and navigates to a dedicated theme picker screen.
   ///
@@ -13996,6 +13852,246 @@ abstract class AppLocalizations {
   /// **'Your country is supported, but it isn\'t set up yet — so prices may be from another country. Choose your country in the search settings to see local prices.'**
   String get configureCountryBody;
 
+  /// Small badge on a favorites station card whose price timestamp is older than the stale-price threshold (7 days) — warns that the shown price is probably outdated (#3905).
+  ///
+  /// In en, this message translates to:
+  /// **'Old price'**
+  String get stalePriceBadge;
+
+  /// Chip on the zone-alert sheet naming the chosen alert centre when it was bound to the device's current GPS position (#3905).
+  ///
+  /// In en, this message translates to:
+  /// **'My position'**
+  String get radiusAlertCenterChipGps;
+
+  /// Chip on the zone-alert sheet naming the chosen alert centre when the user picked a point on the map (#3905).
+  ///
+  /// In en, this message translates to:
+  /// **'Map point'**
+  String get radiusAlertCenterChipMap;
+
+  /// Chip on the zone-alert sheet naming the chosen alert centre when only a postal code was typed (#3905).
+  ///
+  /// In en, this message translates to:
+  /// **'Postal code {postalCode}'**
+  String radiusAlertCenterChipPostal(String postalCode);
+
+  /// Tooltip of the clear (x) action on the zone-alert centre chip — removes the chosen location so another one can be picked (#3905).
+  ///
+  /// In en, this message translates to:
+  /// **'Clear location'**
+  String get radiusAlertCenterClear;
+
+  /// Helper line under the zone-alert sheet's location buttons explaining why Save is disabled: the label field is empty (#3905).
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a label'**
+  String get radiusAlertBlockerLabel;
+
+  /// Helper line under the zone-alert sheet's location buttons explaining why Save is disabled: the price threshold is empty, unparseable or not positive (#3905).
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a threshold above 0'**
+  String get radiusAlertBlockerThreshold;
+
+  /// Helper line under the zone-alert sheet's location buttons explaining why Save is disabled: no alert centre (GPS position or map point) has been chosen yet (#3905).
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a location'**
+  String get radiusAlertBlockerLocation;
+
+  /// Helper text under the odometer field of the Add fill-up form when the value was pre-filled from the vehicle's most recent fill-up (#3899).
+  ///
+  /// In en, this message translates to:
+  /// **'Pre-filled from your last fill-up'**
+  String get fillUpOdometerFromLastFillUp;
+
+  /// Label of the read-only station row in the 'Where you were' section of the Add fill-up form (#3899).
+  ///
+  /// In en, this message translates to:
+  /// **'Station'**
+  String get fillUpStationLabel;
+
+  /// Text action next to the chosen station on the Add fill-up form; re-opens the station picker (#3899).
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get fillUpStationChange;
+
+  /// Section header on the station picker for the station of the most recent fill-up (#3906).
+  ///
+  /// In en, this message translates to:
+  /// **'Last station'**
+  String get pickStationSectionLast;
+
+  /// Section header on the station picker listing the user's favorite stations (#3906).
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get pickStationSectionFavorites;
+
+  /// Section header on the station picker listing the nearest stations from the last search (#3906).
+  ///
+  /// In en, this message translates to:
+  /// **'Nearby'**
+  String get pickStationSectionNearby;
+
+  /// One-line hint under the Nearby header of the station picker when no search result is cached (#3906).
+  ///
+  /// In en, this message translates to:
+  /// **'No recent search — search for stations on the Search tab and the nearest ones will appear here.'**
+  String get pickStationNearbyEmpty;
+
+  /// Subtitle of the 'Last station' row on the station picker; {date} is a localized date.
+  ///
+  /// In en, this message translates to:
+  /// **'Last fill-up: {date}'**
+  String pickStationLastFillUpAt(String date);
+
+  /// Station-detail header line: the open / closed / unknown state followed by how long ago the data was fetched. Owns the whole word order per locale — never composed from fragments (#3902).
+  ///
+  /// In en, this message translates to:
+  /// **'{status} · updated {ago} ago'**
+  String stationStatusWithFreshness(String status, String ago);
+
+  /// Muted footnote under the station-detail price list naming the base fuels this station has no price for (they are hidden from the list). {fuels} is a comma-joined list of fuel codes (#3902).
+  ///
+  /// In en, this message translates to:
+  /// **'Not sold here: {fuels}'**
+  String pricesNotSoldHere(String fuels);
+
+  /// #3904 tank report — plain-language share of the tank's distance covered by recorded trips (replaces tankReportCoverage). pct is the already-formatted whole-number percentage.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded trips cover {pct} % of this tank'**
+  String tankReportRecordedTripsCoverage(String pct);
+
+  /// #3904 tank report — average consumption of the recorded trips inside this tank (replaces tankReportRecordedAvg). value carries the figure AND its unit, formatted in the user's consumption unit (e.g. '10,5 L/100 km', '27 mpg (UK)').
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded trips: {value}'**
+  String tankReportRecordedTripsAvg(String value);
+
+  /// #3904 tank report — the recorded estimates run ABOVE the pump-measured consumption (replaces tankReportCalibrationOver). pct is the already-formatted whole-number gap.
+  ///
+  /// In en, this message translates to:
+  /// **'Your recorded trips overestimate consumption by {pct} %'**
+  String tankReportRecordedTripsOverestimate(String pct);
+
+  /// #3904 tank report — the recorded estimates run BELOW the pump-measured consumption (replaces tankReportCalibrationUnder). pct is the already-formatted whole-number gap.
+  ///
+  /// In en, this message translates to:
+  /// **'Your recorded trips underestimate consumption by {pct} %'**
+  String tankReportRecordedTripsUnderestimate(String pct);
+
+  /// #3904 Trajets list — one-line subtitle under the metrics of a red-stripe (OBD2 degraded) trip row, explaining in plain words why the figures are estimates. Pairs with the warning icon whose tooltip is trajetObd2Degraded.
+  ///
+  /// In en, this message translates to:
+  /// **'No engine data — GPS estimate'**
+  String get trajetObd2DegradedSubtitle;
+
+  /// Status line of the 'OBD2 adapter' topic tile on the Edit-vehicle screen when no adapter is paired (#3900).
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get vehicleTopicAdapterNone;
+
+  /// Title of the Calibration topic tile + sub-screen on the Edit-vehicle screen (baseline coverage, calibration mode, advanced overrides, resets) (#3900).
+  ///
+  /// In en, this message translates to:
+  /// **'Calibration'**
+  String get vehicleTopicCalibrationTitle;
+
+  /// Small outlined badge on the Calibration topic tile marking it as an advanced topic (#3900).
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced'**
+  String get vehicleTopicAdvancedBadge;
+
+  /// Status line of the Calibration topic tile: baseline coverage percent and the active calibration mode name (#3900).
+  ///
+  /// In en, this message translates to:
+  /// **'Baseline {coverage} % · {mode}'**
+  String vehicleTopicCalibrationStatus(int coverage, String mode);
+
+  /// Status line of the Service reminders topic tile — number of reminders on this vehicle (#3900).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No reminders} =1{1 reminder} other{{count} reminders}}'**
+  String vehicleTopicRemindersCount(int count);
+
+  /// Status line of the Auto-record topic tile when hands-free auto-record is enabled for this vehicle (#3900).
+  ///
+  /// In en, this message translates to:
+  /// **'On'**
+  String get vehicleTopicAutoRecordOn;
+
+  /// Status line of the Auto-record topic tile when auto-record is disabled for this vehicle (#3900).
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get vehicleTopicAutoRecordOff;
+
+  /// Passive link on the auto-record card (#1400) pointing the user at the OBD2 adapter topic screen, the one place an adapter is paired (#3900).
+  ///
+  /// In en, this message translates to:
+  /// **'Pair an adapter under “OBD2 adapter” to enable auto-recording'**
+  String get vehicleTopicAutoRecordPairLinkText;
+
+  /// Tally under the aggregate baseline coverage bar: capped covered samples out of the maximum (9 situations × 30) (#3900).
+  ///
+  /// In en, this message translates to:
+  /// **'{covered} / {max} samples'**
+  String vehicleBaselineCoverageSamples(int covered, int max);
+
+  /// Secondary text under a per-situation baseline row showing the raw (uncapped) sample count once it exceeds the target (#3900).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 sample} other{{count} samples}}'**
+  String vehicleBaselineRawSamples(int count);
+
+  /// One-line plain-language description under the Rule-based calibration mode option on the Edit-vehicle Calibration topic (#3900).
+  ///
+  /// In en, this message translates to:
+  /// **'Sorts each driving sample into one situation using fixed speed and load thresholds.'**
+  String get calibrationModeRuleDescription;
+
+  /// One-line plain-language description under the Fuzzy calibration mode option on the Edit-vehicle Calibration topic (#3900).
+  ///
+  /// In en, this message translates to:
+  /// **'Splits each sample across neighbouring situations by how well it fits each one — smoother estimates around the boundaries.'**
+  String get calibrationModeFuzzyDescription;
+
+  /// Neutral calibration pill on the consumption card (Developer mode) while no full-to-full tank window has closed yet, so the pump-anchored fuel gain is still 1.0 (#3901, Epic #3886).
+  ///
+  /// In en, this message translates to:
+  /// **'Not pump-calibrated yet'**
+  String get pumpGainChipNotCalibrated;
+
+  /// Calibration pill on the consumption card (Developer mode) once the pump-anchored gain has been learned: number of full-to-full fill-ups folded in and the gain's distance from 1.0 in percent (#3901).
+  ///
+  /// In en, this message translates to:
+  /// **'{fills, plural, =1{Pump-calibrated · 1 fill-up · ±{percent} %} other{Pump-calibrated · {fills} fill-ups · ±{percent} %}}'**
+  String pumpGainChipCalibrated(int fills, int percent);
+
+  /// Button on the Edit-vehicle Calibration topic (and confirm label of its dialog) that discards the learned pump-anchored fuel gain: gain 1.0, samples 0 (#3901).
+  ///
+  /// In en, this message translates to:
+  /// **'Reset pump calibration'**
+  String get pumpGainResetAction;
+
+  /// Title of the confirm dialog shown before discarding the learned pump-anchored fuel gain (#3901).
+  ///
+  /// In en, this message translates to:
+  /// **'Reset pump calibration?'**
+  String get pumpGainResetConfirmTitle;
+
+  /// Body of the confirm dialog shown before discarding the learned pump-anchored fuel gain (#3901).
+  ///
+  /// In en, this message translates to:
+  /// **'This discards the fuel gain learned from your fill-ups. OBD2 consumption estimates fall back to the uncorrected figure until the next full-to-full tank window re-learns it.'**
+  String get pumpGainResetConfirmBody;
+
   /// Switch label on the vehicle edit screen (combustion section) shown only for E10/E85 flex-fuel vehicles. Declares this car may be filled with more than one fuel type, enabling the per-fuel cost-per-km comparison (#2885).
   ///
   /// In en, this message translates to:
@@ -14031,12 +14127,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Modify manually'**
   String get vinModifyAction;
-
-  /// Action on the vehicle edit screen that discards the learned volumetric-efficiency calibration (#815).
-  ///
-  /// In en, this message translates to:
-  /// **'Reset volumetric efficiency'**
-  String get veResetAction;
 
   /// Button label on the vehicle edit screen that triggers an OBD2 Mode 09 PID 02 read of the VIN from the paired adapter (#1162).
   ///

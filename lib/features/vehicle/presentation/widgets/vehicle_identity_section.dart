@@ -73,21 +73,23 @@ class VehicleIdentitySection extends StatelessWidget {
       icon: Icons.badge_outlined,
       accent: accent,
       children: [
+        // #3899 — one icon per row: the glyph lives INSIDE the field as
+        // its prefix; the decorative leading tile column is gone (the
+        // section header keeps its single leading icon).
         FormFieldTile(
-          icon: Icons.directions_car_outlined,
-          color: accent,
           content: TextFormField(
             controller: nameController,
             decoration: InputDecoration(
               labelText: l.vehicleNameLabel,
               hintText: l.vehicleNameHint,
+              prefixIcon: const Icon(Icons.directions_car_outlined),
               border: const OutlineInputBorder(),
             ),
             validator: (v) =>
                 (v == null || v.trim().isEmpty) ? (l.fieldRequired) : null,
           ),
         ),
-        // VIN row — the FormFieldTile keeps the existing input layout,
+        // VIN row — the QR glyph is the field's prefix icon (#3899),
         // and a trailing info icon button (#895) opens the in-place
         // explanation sheet. Tooltip + Semantics satisfy
         // androidTapTargetGuideline and TalkBack announcement
@@ -96,13 +98,12 @@ class VehicleIdentitySection extends StatelessWidget {
           children: [
             Expanded(
               child: FormFieldTile(
-                icon: Icons.qr_code_2_outlined,
-                color: accent,
                 content: TextFormField(
                   controller: vinController,
                   focusNode: vinFocus,
                   decoration: InputDecoration(
                     labelText: l.vinLabel,
+                    prefixIcon: const Icon(Icons.qr_code_2_outlined),
                     border: const OutlineInputBorder(),
                     suffixIcon: decodingVin
                         ? const Padding(

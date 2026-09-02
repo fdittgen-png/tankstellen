@@ -45,9 +45,10 @@ void main() {
 
       await _pumpEditScreen(tester, repo: repo, vehicleId: 'v1');
 
+      await _openCalibrationTopic(tester);
       await tester.dragUntilVisible(
         find.byKey(const Key('calibrationModeSegmentedButton')),
-        find.byType(ListView),
+        find.byType(ListView).last,
         const Offset(0, -200),
       );
 
@@ -81,9 +82,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      await _openCalibrationTopic(tester);
       await tester.dragUntilVisible(
         find.byKey(const Key('calibrationModeSegmentedButton')),
-        find.byType(ListView),
+        find.byType(ListView).last,
         const Offset(0, -200),
       );
       // Ensure the Fuzzy segment is fully inside the viewport so the
@@ -122,9 +124,10 @@ void main() {
 
       await _pumpEditScreen(tester, repo: repo, vehicleId: 'v1');
 
+      await _openCalibrationTopic(tester);
       await tester.dragUntilVisible(
         find.byKey(const Key('calibrationModeSegmentedButton')),
-        find.byType(ListView),
+        find.byType(ListView).last,
         const Offset(0, -200),
       );
 
@@ -146,9 +149,10 @@ void main() {
 
       await _pumpEditScreen(tester, repo: repo, vehicleId: 'v1');
 
+      await _openCalibrationTopic(tester);
       await tester.dragUntilVisible(
         find.byKey(const Key('calibrationModeSegmentedButton')),
-        find.byType(ListView),
+        find.byType(ListView).last,
         const Offset(0, -200),
       );
       await tester.ensureVisible(find.text('Fuzzy'));
@@ -159,8 +163,10 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 50));
 
-      // Selector wrote fuzzy. Now tap the screen-level Save (the
-      // pinned bottom bar) and expect Hive still holds fuzzy after.
+      // Selector wrote fuzzy. Now leave the topic and tap the screen-
+      // level Save (the pinned bottom bar) and expect Hive still holds
+      // fuzzy after.
+      await _closeTopic(tester);
       await tester.tap(find.widgetWithText(FilledButton, 'Save'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 50));
@@ -177,9 +183,10 @@ void main() {
 
       await _pumpEditScreen(tester, repo: repo, vehicleId: 'v1');
 
+      await _openCalibrationTopic(tester);
       await tester.dragUntilVisible(
         find.byKey(const Key('calibrationModeSegmentedButton')),
-        find.byType(ListView),
+        find.byType(ListView).last,
         const Offset(0, -200),
       );
       await tester.ensureVisible(find.text('Fuzzy'));
@@ -191,7 +198,9 @@ void main() {
       await tester.pump(const Duration(milliseconds: 50));
 
       // Edit the name field (any other field's edit must not flip
-      // calibrationMode back to rule on Save).
+      // calibrationMode back to rule on Save). The name lives on the
+      // top level — leave the topic first.
+      await _closeTopic(tester);
       await tester.dragUntilVisible(
         find.widgetWithText(TextFormField, 'Car'),
         find.byType(ListView),
@@ -225,9 +234,10 @@ void main() {
 
       await _pumpEditScreen(tester, repo: repo, vehicleId: 'v1');
 
+      await _openCalibrationTopic(tester);
       await tester.dragUntilVisible(
         find.byKey(const Key('calibrationModeSegmentedButton')),
-        find.byType(ListView),
+        find.byType(ListView).last,
         const Offset(0, -200),
       );
       await tester.ensureVisible(find.text('Fuzzy'));
@@ -238,6 +248,7 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 50));
 
+      await _closeTopic(tester);
       await tester.tap(find.widgetWithText(FilledButton, 'Save'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 50));
@@ -258,6 +269,29 @@ void main() {
       freshControllers.load(reloaded);
     });
   });
+}
+
+/// #3900 — the calibration mode lives on the Calibration topic screen:
+/// scroll the editor's top level to its tile, open it, settle.
+Future<void> _openCalibrationTopic(WidgetTester tester) async {
+  final tile = find.byKey(const Key('vehicleTopic_calibration'));
+  await tester.dragUntilVisible(
+    tile,
+    find.byType(ListView).first,
+    const Offset(0, -200),
+  );
+  // Fully into the viewport — a half-scrolled tile's centre can sit
+  // under the pinned Save bar.
+  await tester.ensureVisible(tile);
+  await tester.pumpAndSettle();
+  await tester.tap(tile);
+  await tester.pumpAndSettle();
+}
+
+/// Pop the topic screen back to the editor's top level.
+Future<void> _closeTopic(WidgetTester tester) async {
+  await tester.pageBack();
+  await tester.pumpAndSettle();
 }
 
 Future<void> _pumpEditScreen(

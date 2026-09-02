@@ -287,7 +287,6 @@
   "settingsStorageDetail": "API key, active profile",
   "allFuels": "All",
   "priceAlerts": "Price Alerts",
-  "noPriceAlerts": "No price alerts",
   "noPriceAlertsHint": "Create an alert from a station's detail page.",
   "alertDeleted": "Alert \"{name}\" deleted",
   "@alertDeleted": {
@@ -847,7 +846,6 @@
   "liters": "Liters",
   "odometerKm": "Odometer (km)",
   "notesOptional": "Notes (optional)",
-  "stationPreFilled": "Station pre-filled",
   "statAvgConsumption": "Avg L/100km",
   "statAvgCostPerKm": "Avg cost/km",
   "statTotalLiters": "Total liters",
@@ -1509,14 +1507,6 @@
   "@obd2GpsDegradedPassiveWaitingBanner": {
     "description": "Calmer variant of obd2GpsDegradedBannerTitle shown (#2767) once the reconnect scanner has exhausted its active-scan attempts and switched to a low-power passive wait for the adapter to power back up. The trip is still recording on GPS and the app still re-arms an active scan periodically, so the wording is reassuring (\"waiting for\") rather than urgent (\"reconnecting\")."
   },
-  "veResetConfirmTitle": "Reset volumetric efficiency?",
-  "@veResetConfirmTitle": {
-    "description": "Title of the confirm dialog shown before discarding the learned volumetric efficiency (#815)."
-  },
-  "veResetConfirmBody": "This will discard the learned volumetric efficiency (η_v) and restore the default value (0.85). Trip-level fuel-flow estimates will fall back to the manufacturer constant until the calibrator collects new samples from upcoming trips.",
-  "@veResetConfirmBody": {
-    "description": "Body of the confirm dialog shown before discarding the learned volumetric efficiency (#815)."
-  },
   "alertsStationSectionTitle": "Station alerts",
   "@alertsStationSectionTitle": {
     "description": "Header of the per-station price-alert section on the alerts screen, symmetric with the radius/zone section (#2819)."
@@ -1599,14 +1589,6 @@
   "fillUpSavedSnackbar": "Fill-up saved",
   "@fillUpSavedSnackbar": {
     "description": "Success snackbar confirming a fill-up was saved, shown after the Add fill-up screen pops back to the consumption list (#1692)."
-  },
-  "radiusAlertsEntryTitle": "Radius alerts & statistics",
-  "@radiusAlertsEntryTitle": {
-    "description": "Title of the navigation entry on the favorites Alerts tab that opens the radius-alerts + statistics screen (#1701)."
-  },
-  "radiusAlertsEntrySubtitle": "Get notified when prices drop near you",
-  "@radiusAlertsEntrySubtitle": {
-    "description": "Subtitle of the radius-alerts navigation entry on the favorites Alerts tab — explains what radius alerts do (#1701)."
   },
   "notFoundTitle": "Page not found",
   "@notFoundTitle": {
@@ -2064,10 +2046,6 @@
   "@aclWakeNotificationBody": {
     "description": "#3756 native wake notification body."
   },
-  "autoRecordPairAdapterLinkText": "Pair an adapter in the section below to enable auto-recording",
-  "@autoRecordPairAdapterLinkText": {
-    "description": "Passive informational link rendered on the auto-record card when no adapter is paired (#1400). Replaces the duplicate orange-tinted 'Pair an adapter' CTA that lived in the auto-record card before #1400; tapping the link scrolls to the canonical 'OBD2 adapter' card below and pulses its border."
-  },
   "exportBackupReady": "Backup ready — pick a destination",
   "@exportBackupReady": {
     "description": "SnackBar shown after a successful backup export when the share sheet is about to appear (#1317)."
@@ -2316,54 +2294,6 @@
   "calibrationResetToDetected": "Reset to detected value",
   "@calibrationResetToDetected": {
     "description": "Tooltip / a11y label for the per-field reset IconButton that nulls a manual override."
-  },
-  "calibrationLearnerStatusCalibrated": "η_v: {eta} (calibrated, {samples} samples)",
-  "@calibrationLearnerStatusCalibrated": {
-    "description": "Live readout when the learner has accepted at least 3 plein-complet samples.",
-    "placeholders": {
-      "eta": {
-        "type": "String",
-        "example": "0.87"
-      },
-      "samples": {
-        "type": "int",
-        "example": "5"
-      }
-    }
-  },
-  "calibrationLearnerStatusLearning": "η_v: {eta} (learning, {samples} samples)",
-  "@calibrationLearnerStatusLearning": {
-    "description": "Live readout while the learner is bootstrapping (1-2 samples).",
-    "placeholders": {
-      "eta": {
-        "type": "String",
-        "example": "0.85"
-      },
-      "samples": {
-        "type": "int",
-        "example": "1"
-      }
-    }
-  },
-  "calibrationLearnerStatusNoSamples": "η_v: 0.85 (default — no plein-complet yet)",
-  "@calibrationLearnerStatusNoSamples": {
-    "description": "Live readout before the first plein-complet has been logged."
-  },
-  "calibrationLearnerEtaCompact": "η_v: {eta} · {samples} samples",
-  "@calibrationLearnerEtaCompact": {
-    "description": "#2112 — compact engineer-detail pill that rides alongside the confidence-tier badge on the Fuel tab. Replaces the longer 'learning' / 'calibrated' parenthetical labels — the maturity colour is carried by the confidence tier next to it.",
-    "placeholders": {
-      "eta": {
-        "type": "String"
-      },
-      "samples": {
-        "type": "int"
-      }
-    }
-  },
-  "calibrationResetLearner": "Reset learner",
-  "@calibrationResetLearner": {
-    "description": "OutlinedButton label that resets η_v back to 0.85 and clears the sample counter."
   },
   "calibrationBasisAtkinson": "Atkinson cycle",
   "@calibrationBasisAtkinson": {
@@ -6428,59 +6358,17 @@
   "@onboardingObd2LaterNote": {
     "description": "Informational note on the iOS variant of the OBD2 onboarding step (App Review 5.1.1(iv), #3535): no in-wizard connect flow on iOS, the adapter is paired later from the vehicle screen."
   },
-  "openNow": "Open",
-  "@openNow": {
-    "description": "Opening-hours status line — station is currently open (#2709)."
-  },
-  "openNowClosed": "Closed",
-  "@openNowClosed": {
-    "description": "Opening-hours status line — station is currently closed (#2709)."
-  },
   "openHoursUnknown": "Hours unknown",
   "@openHoursUnknown": {
     "description": "Opening-hours status line — the schedule could not be resolved (#2709)."
-  },
-  "closesAt": "Closes {time}",
-  "@closesAt": {
-    "description": "Opening-hours status detail — when an open station next closes (#2709).",
-    "placeholders": {
-      "time": {
-        "type": "String"
-      }
-    }
-  },
-  "opensAt": "Opens {day} {time}",
-  "@opensAt": {
-    "description": "Opening-hours status detail — when a closed station next opens on a future day (#2709).",
-    "placeholders": {
-      "day": {
-        "type": "String"
-      },
-      "time": {
-        "type": "String"
-      }
-    }
-  },
-  "opensToday": "Opens {time}",
-  "@opensToday": {
-    "description": "Opening-hours status detail — when a closed station next opens later the same day (#2709).",
-    "placeholders": {
-      "time": {
-        "type": "String"
-      }
-    }
   },
   "open24Hours": "Open 24 hours",
   "@open24Hours": {
     "description": "Opening-hours row shown when the station is open every day around the clock (#2709)."
   },
-  "badge24h": "24h",
-  "@badge24h": {
-    "description": "Compact badge shown next to the status for an around-the-clock station (#2709)."
-  },
-  "openingHoursAutomate24h": "24/7 automate",
+  "openingHoursAutomate24h": "Self-service pump 24/7 (card payment)",
   "@openingHoursAutomate24h": {
-    "description": "Opening-hours indicator shown alongside the staffed schedule when an unattended pump is open round-the-clock (FR Automate : 24/24, #2742)."
+    "description": "Informational opening-hours row (not an action) shown alongside the staffed schedule when the forecourt has an unattended card-payment pump open round-the-clock — the French noun 'automate', NOT the verb 'to automate' (FR Automate : 24/24, #2742, #3902)."
   },
   "dayMon": "Monday",
   "@dayMon": {
@@ -6768,10 +6656,6 @@
   "radiusAlertMapPickerHint": "Drag the map to position the alert center",
   "@radiusAlertMapPickerHint": {
     "description": "Overlay hint on the map-picker explaining the center-crosshair interaction (#578 phase 3)."
-  },
-  "radiusAlertCenterFromMap": "Map location",
-  "@radiusAlertCenterFromMap": {
-    "description": "Label shown in the create sheet after a location has been picked on the map, distinguishing it from a GPS or postal-code center (#578 phase 3)."
   },
   "reconcileWorkflowTitle": "Reconcile your fuel",
   "@reconcileWorkflowTitle": {
@@ -7476,14 +7360,6 @@
   "@tankReportTitle": {
     "description": "#3616 card title — per-plein consumption report on the Carburant tab"
   },
-  "tankReportHeadline": "{value} L/100 km",
-  "@tankReportHeadline": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportSincePrevious": "Since the previous full tank: {km} km · {liters} L · {cost}",
   "@tankReportSincePrevious": {
     "placeholders": {
@@ -7516,22 +7392,6 @@
   },
   "tankReportTrendFlat": "Level with the previous tank",
   "tankReportNoPrevious": "Evolution appears after your next full tank.",
-  "tankReportCoverage": "Recordings cover {pct} % of this tank",
-  "@tankReportCoverage": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportRecordedAvg": "Recorded slice: {value} L/100 km",
-  "@tankReportRecordedAvg": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportExplainHeader": "What the recordings suggest",
   "tankReportFactorHighRpm": "High-RPM share {cur} % (was {prev} %)",
   "@tankReportFactorHighRpm": {
@@ -7578,22 +7438,6 @@
     }
   },
   "tankReportCaveat": "Recordings are spontaneous and cover only part of this tank — these hints are indicative, not the full story.",
-  "tankReportCalibrationUnder": "Recorded estimates run {pct} % under pump truth",
-  "@tankReportCalibrationUnder": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportCalibrationOver": "Recorded estimates run {pct} % over pump truth",
-  "@tankReportCalibrationOver": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
   "themeCardTitle": "Theme",
   "@themeCardTitle": {
     "description": "Title of the Theme card on the Settings screen (#897). The card matches the Privacy + Storage card pattern and navigates to a dedicated theme picker screen."
@@ -8324,6 +8168,255 @@
   "@configureCountryBody": {
     "description": "Body of the configure-country banner (#3361). Tells the user their country is supported but unconfigured, and to set it in the search settings."
   },
+  "stalePriceBadge": "Old price",
+  "@stalePriceBadge": {
+    "description": "Small badge on a favorites station card whose price timestamp is older than the stale-price threshold (7 days) — warns that the shown price is probably outdated (#3905)."
+  },
+  "radiusAlertCenterChipGps": "My position",
+  "@radiusAlertCenterChipGps": {
+    "description": "Chip on the zone-alert sheet naming the chosen alert centre when it was bound to the device's current GPS position (#3905)."
+  },
+  "radiusAlertCenterChipMap": "Map point",
+  "@radiusAlertCenterChipMap": {
+    "description": "Chip on the zone-alert sheet naming the chosen alert centre when the user picked a point on the map (#3905)."
+  },
+  "radiusAlertCenterChipPostal": "Postal code {postalCode}",
+  "@radiusAlertCenterChipPostal": {
+    "description": "Chip on the zone-alert sheet naming the chosen alert centre when only a postal code was typed (#3905).",
+    "placeholders": {
+      "postalCode": {
+        "type": "String",
+        "example": "34550"
+      }
+    }
+  },
+  "radiusAlertCenterClear": "Clear location",
+  "@radiusAlertCenterClear": {
+    "description": "Tooltip of the clear (x) action on the zone-alert centre chip — removes the chosen location so another one can be picked (#3905)."
+  },
+  "radiusAlertBlockerLabel": "Enter a label",
+  "@radiusAlertBlockerLabel": {
+    "description": "Helper line under the zone-alert sheet's location buttons explaining why Save is disabled: the label field is empty (#3905)."
+  },
+  "radiusAlertBlockerThreshold": "Enter a threshold above 0",
+  "@radiusAlertBlockerThreshold": {
+    "description": "Helper line under the zone-alert sheet's location buttons explaining why Save is disabled: the price threshold is empty, unparseable or not positive (#3905)."
+  },
+  "radiusAlertBlockerLocation": "Choose a location",
+  "@radiusAlertBlockerLocation": {
+    "description": "Helper line under the zone-alert sheet's location buttons explaining why Save is disabled: no alert centre (GPS position or map point) has been chosen yet (#3905)."
+  },
+  "fillUpOdometerFromLastFillUp": "Pre-filled from your last fill-up",
+  "@fillUpOdometerFromLastFillUp": {
+    "description": "Helper text under the odometer field of the Add fill-up form when the value was pre-filled from the vehicle's most recent fill-up (#3899)."
+  },
+  "fillUpStationLabel": "Station",
+  "@fillUpStationLabel": {
+    "description": "Label of the read-only station row in the 'Where you were' section of the Add fill-up form (#3899)."
+  },
+  "fillUpStationChange": "Change",
+  "@fillUpStationChange": {
+    "description": "Text action next to the chosen station on the Add fill-up form; re-opens the station picker (#3899)."
+  },
+  "pickStationSectionLast": "Last station",
+  "@pickStationSectionLast": {
+    "description": "Section header on the station picker for the station of the most recent fill-up (#3906)."
+  },
+  "pickStationSectionFavorites": "Favorites",
+  "@pickStationSectionFavorites": {
+    "description": "Section header on the station picker listing the user's favorite stations (#3906)."
+  },
+  "pickStationSectionNearby": "Nearby",
+  "@pickStationSectionNearby": {
+    "description": "Section header on the station picker listing the nearest stations from the last search (#3906)."
+  },
+  "pickStationNearbyEmpty": "No recent search — search for stations on the Search tab and the nearest ones will appear here.",
+  "@pickStationNearbyEmpty": {
+    "description": "One-line hint under the Nearby header of the station picker when no search result is cached (#3906)."
+  },
+  "pickStationLastFillUpAt": "Last fill-up: {date}",
+  "@pickStationLastFillUpAt": {
+    "description": "Subtitle of the 'Last station' row on the station picker; {date} is a localized date.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "stationStatusWithFreshness": "{status} · updated {ago} ago",
+  "@stationStatusWithFreshness": {
+    "description": "Station-detail header line: the open / closed / unknown state followed by how long ago the data was fetched. Owns the whole word order per locale — never composed from fragments (#3902).",
+    "placeholders": {
+      "status": {
+        "type": "String",
+        "example": "Open"
+      },
+      "ago": {
+        "type": "String",
+        "example": "< 1 min"
+      }
+    }
+  },
+  "pricesNotSoldHere": "Not sold here: {fuels}",
+  "@pricesNotSoldHere": {
+    "description": "Muted footnote under the station-detail price list naming the base fuels this station has no price for (they are hidden from the list). {fuels} is a comma-joined list of fuel codes (#3902).",
+    "placeholders": {
+      "fuels": {
+        "type": "String",
+        "example": "Super E5, Super E10"
+      }
+    }
+  },
+  "tankReportRecordedTripsCoverage": "Recorded trips cover {pct} % of this tank",
+  "@tankReportRecordedTripsCoverage": {
+    "description": "#3904 tank report — plain-language share of the tank's distance covered by recorded trips (replaces tankReportCoverage). pct is the already-formatted whole-number percentage.",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportRecordedTripsAvg": "Recorded trips: {value}",
+  "@tankReportRecordedTripsAvg": {
+    "description": "#3904 tank report — average consumption of the recorded trips inside this tank (replaces tankReportRecordedAvg). value carries the figure AND its unit, formatted in the user's consumption unit (e.g. '10,5 L/100 km', '27 mpg (UK)').",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportRecordedTripsOverestimate": "Your recorded trips overestimate consumption by {pct} %",
+  "@tankReportRecordedTripsOverestimate": {
+    "description": "#3904 tank report — the recorded estimates run ABOVE the pump-measured consumption (replaces tankReportCalibrationOver). pct is the already-formatted whole-number gap.",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportRecordedTripsUnderestimate": "Your recorded trips underestimate consumption by {pct} %",
+  "@tankReportRecordedTripsUnderestimate": {
+    "description": "#3904 tank report — the recorded estimates run BELOW the pump-measured consumption (replaces tankReportCalibrationUnder). pct is the already-formatted whole-number gap.",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "trajetObd2DegradedSubtitle": "No engine data — GPS estimate",
+  "@trajetObd2DegradedSubtitle": {
+    "description": "#3904 Trajets list — one-line subtitle under the metrics of a red-stripe (OBD2 degraded) trip row, explaining in plain words why the figures are estimates. Pairs with the warning icon whose tooltip is trajetObd2Degraded."
+  },
+  "vehicleTopicAdapterNone": "None",
+  "@vehicleTopicAdapterNone": {
+    "description": "Status line of the 'OBD2 adapter' topic tile on the Edit-vehicle screen when no adapter is paired (#3900)."
+  },
+  "vehicleTopicCalibrationTitle": "Calibration",
+  "@vehicleTopicCalibrationTitle": {
+    "description": "Title of the Calibration topic tile + sub-screen on the Edit-vehicle screen (baseline coverage, calibration mode, advanced overrides, resets) (#3900)."
+  },
+  "vehicleTopicAdvancedBadge": "Advanced",
+  "@vehicleTopicAdvancedBadge": {
+    "description": "Small outlined badge on the Calibration topic tile marking it as an advanced topic (#3900)."
+  },
+  "vehicleTopicCalibrationStatus": "Baseline {coverage} % · {mode}",
+  "@vehicleTopicCalibrationStatus": {
+    "description": "Status line of the Calibration topic tile: baseline coverage percent and the active calibration mode name (#3900).",
+    "placeholders": {
+      "coverage": {
+        "type": "int",
+        "example": "78"
+      },
+      "mode": {
+        "type": "String",
+        "example": "Rule-based"
+      }
+    }
+  },
+  "vehicleTopicRemindersCount": "{count, plural, =0{No reminders} =1{1 reminder} other{{count} reminders}}",
+  "@vehicleTopicRemindersCount": {
+    "description": "Status line of the Service reminders topic tile — number of reminders on this vehicle (#3900).",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "vehicleTopicAutoRecordOn": "On",
+  "@vehicleTopicAutoRecordOn": {
+    "description": "Status line of the Auto-record topic tile when hands-free auto-record is enabled for this vehicle (#3900)."
+  },
+  "vehicleTopicAutoRecordOff": "Off",
+  "@vehicleTopicAutoRecordOff": {
+    "description": "Status line of the Auto-record topic tile when auto-record is disabled for this vehicle (#3900)."
+  },
+  "vehicleTopicAutoRecordPairLinkText": "Pair an adapter under “OBD2 adapter” to enable auto-recording",
+  "@vehicleTopicAutoRecordPairLinkText": {
+    "description": "Passive link on the auto-record card (#1400) pointing the user at the OBD2 adapter topic screen, the one place an adapter is paired (#3900)."
+  },
+  "vehicleBaselineCoverageSamples": "{covered} / {max} samples",
+  "@vehicleBaselineCoverageSamples": {
+    "description": "Tally under the aggregate baseline coverage bar: capped covered samples out of the maximum (9 situations × 30) (#3900).",
+    "placeholders": {
+      "covered": {
+        "type": "int",
+        "example": "210"
+      },
+      "max": {
+        "type": "int",
+        "example": "270"
+      }
+    }
+  },
+  "vehicleBaselineRawSamples": "{count, plural, =1{1 sample} other{{count} samples}}",
+  "@vehicleBaselineRawSamples": {
+    "description": "Secondary text under a per-situation baseline row showing the raw (uncapped) sample count once it exceeds the target (#3900).",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "954"
+      }
+    }
+  },
+  "calibrationModeRuleDescription": "Sorts each driving sample into one situation using fixed speed and load thresholds.",
+  "@calibrationModeRuleDescription": {
+    "description": "One-line plain-language description under the Rule-based calibration mode option on the Edit-vehicle Calibration topic (#3900)."
+  },
+  "calibrationModeFuzzyDescription": "Splits each sample across neighbouring situations by how well it fits each one — smoother estimates around the boundaries.",
+  "@calibrationModeFuzzyDescription": {
+    "description": "One-line plain-language description under the Fuzzy calibration mode option on the Edit-vehicle Calibration topic (#3900)."
+  },
+  "pumpGainChipNotCalibrated": "Not pump-calibrated yet",
+  "@pumpGainChipNotCalibrated": {
+    "description": "Neutral calibration pill on the consumption card (Developer mode) while no full-to-full tank window has closed yet, so the pump-anchored fuel gain is still 1.0 (#3901, Epic #3886)."
+  },
+  "pumpGainChipCalibrated": "{fills, plural, =1{Pump-calibrated · 1 fill-up · ±{percent} %} other{Pump-calibrated · {fills} fill-ups · ±{percent} %}}",
+  "@pumpGainChipCalibrated": {
+    "description": "Calibration pill on the consumption card (Developer mode) once the pump-anchored gain has been learned: number of full-to-full fill-ups folded in and the gain's distance from 1.0 in percent (#3901).",
+    "placeholders": {
+      "fills": {
+        "type": "int",
+        "example": "6"
+      },
+      "percent": {
+        "type": "int",
+        "example": "7"
+      }
+    }
+  },
+  "pumpGainResetAction": "Reset pump calibration",
+  "@pumpGainResetAction": {
+    "description": "Button on the Edit-vehicle Calibration topic (and confirm label of its dialog) that discards the learned pump-anchored fuel gain: gain 1.0, samples 0 (#3901)."
+  },
+  "pumpGainResetConfirmTitle": "Reset pump calibration?",
+  "@pumpGainResetConfirmTitle": {
+    "description": "Title of the confirm dialog shown before discarding the learned pump-anchored fuel gain (#3901)."
+  },
+  "pumpGainResetConfirmBody": "This discards the fuel gain learned from your fill-ups. OBD2 consumption estimates fall back to the uncorrected figure until the next full-to-full tank window re-learns it.",
+  "@pumpGainResetConfirmBody": {
+    "description": "Body of the confirm dialog shown before discarding the learned pump-anchored fuel gain (#3901)."
+  },
   "vehicleMultiFuelCapableLabel": "I may fill up with different fuel types",
   "@vehicleMultiFuelCapableLabel": {
     "description": "Switch label on the vehicle edit screen (combustion section) shown only for E10/E85 flex-fuel vehicles. Declares this car may be filled with more than one fuel type, enabling the per-fuel cost-per-km comparison (#2885)."
@@ -8336,10 +8429,6 @@
   "vinDecodeTooltip": "Decode VIN",
   "vinConfirmAction": "Yes, auto-fill",
   "vinModifyAction": "Modify manually",
-  "veResetAction": "Reset volumetric efficiency",
-  "@veResetAction": {
-    "description": "Action on the vehicle edit screen that discards the learned volumetric-efficiency calibration (#815)."
-  },
   "vehicleReadVinFromCarButton": "Read VIN from car",
   "@vehicleReadVinFromCarButton": {
     "description": "Button label on the vehicle edit screen that triggers an OBD2 Mode 09 PID 02 read of the VIN from the paired adapter (#1162)."

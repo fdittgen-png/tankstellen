@@ -75,8 +75,16 @@ class VehicleAdapterSection extends ConsumerWidget {
               // #3676 — hard reset: ATZ chip reset on the dongle (best
               // effort), full link recycle, fresh dial. Sits beside
               // Forget so every link-lifecycle action lives in one card.
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+              // #3899 — an OverflowBar, not a Row: the two labels share
+              // one row only when both fit, otherwise they stack into
+              // two full-width rows (each label then wraps inside its
+              // button). Nothing is ever clipped ("Oublier l'adap").
+              OverflowBar(
+                key: const Key('vehicleAdapterActions'),
+                alignment: MainAxisAlignment.end,
+                spacing: 8,
+                overflowAlignment: OverflowBarAlignment.end,
+                overflowSpacing: 4,
                 children: [
                   const _ResetConnectionButton(),
                   TextButton.icon(

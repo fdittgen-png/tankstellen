@@ -386,17 +386,18 @@ void main() {
   });
 
   // -------------------------------------------------------------------------
-  // VehicleSaveActions.resetVolumetricEfficiency
+  // VehicleSaveActions.resetPumpGain (#3901)
   // -------------------------------------------------------------------------
 
-  group('VehicleSaveActions.resetVolumetricEfficiency', () {
+  group('VehicleSaveActions.resetPumpGain', () {
     testWidgets(
-      'vehicle present → save called with VE = 0.85 and samples = 0',
+      'vehicle present → save called with gain 1.0, samples 0, updatedAt '
+      'null',
       (tester) async {
-        final seeded = _vehicle(
-          id: 'v1',
-          volumetricEfficiency: 0.71,
-          volumetricEfficiencySamples: 7,
+        final seeded = _vehicle(id: 'v1').copyWith(
+          pumpGain: 0.93,
+          pumpGainSamples: 7,
+          pumpGainUpdatedAt: DateTime.utc(2026, 8, 30),
         );
         final fakeList = _FakeVehicleList([seeded]);
 
@@ -407,13 +408,14 @@ void main() {
           ],
         );
 
-        await ref.resetVolumetricEfficiency('v1');
+        await ref.resetPumpGain('v1');
 
         expect(fakeList.savedProfiles, hasLength(1));
         final saved = fakeList.savedProfiles.single;
         expect(saved.id, 'v1');
-        expect(saved.volumetricEfficiency, 0.85);
-        expect(saved.volumetricEfficiencySamples, 0);
+        expect(saved.pumpGain, 1.0);
+        expect(saved.pumpGainSamples, 0);
+        expect(saved.pumpGainUpdatedAt, isNull);
       },
     );
 
@@ -427,7 +429,7 @@ void main() {
         ],
       );
 
-      await ref.resetVolumetricEfficiency('not-there');
+      await ref.resetPumpGain('not-there');
 
       expect(fakeList.savedProfiles, isEmpty);
     });

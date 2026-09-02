@@ -9,22 +9,23 @@ import '../../../../core/theme/spacing.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/opening_hours.dart';
 import 'opening_hours_format.dart';
-import 'opening_hours_status_line.dart';
 
 /// Google-/Apple-Maps-grade opening-hours display (Epic #2707 C2, #2709).
 ///
 /// Renders a [WeeklyOpeningHours] as:
-///   * a **status hero** ("Open · Closes 19:30" / "Closing soon · …" /
-///     "Closed · Opens 14:00" / "Closed · Opens Mon 06:30") derived from
-///     `computeOpenNow`; hidden when the status is unknown
-///     ([OpeningHoursStatusLine]);
-///   * a single **"Open 24 hours"** row + a compact `24h` badge when every
-///     day is around-the-clock — never seven identical rows;
+///   * a single **"Open 24 hours"** row when every day is around-the-clock —
+///     never seven identical rows;
 ///   * a **collapsed week** that groups consecutive identical days into
 ///     "Mon – Fri 06:30–19:30" spans, expandable to the full per-day table;
 ///   * **today emphasis** (bold + a leading accent on today's row);
 ///   * a trailing **public-holidays** row when the schedule carries one;
+///   * a muted, informational **"Self-service pump 24/7"** row when the
+///     forecourt has an unattended automate (FR `Automate : 24/24`, #2742);
 ///   * a muted **"Opening hours not available"** line for the no-data case.
+///
+/// #3902 — the former "Open · Closes 19:30" status hero (+ `24h` badge) is
+/// gone: the screen states the open / closed state ONCE, in the header's
+/// `StationStatusRow`; this card is the schedule only.
 ///
 /// Resolution is the caller's responsibility — pass
 /// `detail.openingHours ?? legacyOpeningHoursBridge(detail)` so un-adapted
@@ -63,21 +64,20 @@ class _OpeningHoursViewState extends State<OpeningHoursView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        OpeningHoursStatusLine(hours: hours, now: now, badge24h: all24h),
-        // The 24/7-automate indicator is orthogonal to the staffed schedule:
-        // an unattended pump open round-the-clock while the boutique keeps its
-        // own per-day hours (FR `Automate : 24/24`, #2742). Shown in addition
-        // to — never instead of — the staffed table below.
-        if (hours.automate24h) ...[
-          const SizedBox(height: Spacing.sm),
-          _Automate24Line(l10n: l10n),
-        ],
-        const SizedBox(height: Spacing.md),
         if (all24h)
           _Open24Row(key: const ValueKey('opening-hours-24h-row'), l10n: l10n)
         else
           ..._buildWeek(hours, now, l10n),
         _buildHolidayRow(hours, l10n),
+        // The 24/7-automate indicator is orthogonal to the staffed schedule:
+        // an unattended pump open round-the-clock while the boutique keeps its
+        // own per-day hours (FR `Automate : 24/24`, #2742). Shown in addition
+        // to — never instead of — the staffed table above, as a muted
+        // informational footnote (#3902: it used to be green like a link).
+        if (hours.automate24h) ...[
+          const SizedBox(height: Spacing.sm),
+          _Automate24Line(l10n: l10n),
+        ],
       ],
     );
   }
@@ -268,15 +268,23 @@ class _Open24Row extends StatelessWidget {
             color: DarkModeColors.success(context),
           ),
           const SizedBox(width: Spacing.lg),
-          Text(l10n.open24Hours, style: theme.textTheme.bodyMedium),
+          Expanded(
+            child: Text(l10n.open24Hours, style: theme.textTheme.bodyMedium),
+          ),
         ],
       ),
     );
   }
 }
 
-/// The "24/7 automate" indicator: an unattended pump open round-the-clock
-/// alongside the staffed boutique schedule (FR `Automate : 24/24`, #2742).
+/// The self-service automate indicator: an unattended, card-payment pump
+/// open round-the-clock alongside the staffed boutique schedule (FR
+/// `Automate : 24/24`, #2742).
+///
+/// #3902 — purely informational: rendered in the neutral
+/// `onSurfaceVariant` colour with no tap target. It used to be bold green
+/// with a pump icon, which read as an action (and the French copy said
+/// "Automatiser" — the verb — instead of the noun "Automate").
 class _Automate24Line extends StatelessWidget {
   final AppLocalizations l10n;
 
@@ -285,22 +293,19 @@ class _Automate24Line extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final muted = theme.colorScheme.onSurfaceVariant;
     return Padding(
       key: const ValueKey('opening-hours-automate-24h'),
       padding: const EdgeInsets.symmetric(vertical: Spacing.xs),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.local_gas_station,
-            size: 18,
-            color: DarkModeColors.success(context),
-          ),
+          Icon(Icons.local_gas_station, size: 18, color: muted),
           const SizedBox(width: Spacing.lg),
-          Text(
-            l10n.openingHoursAutomate24h,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: DarkModeColors.success(context),
-              fontWeight: FontWeight.w600,
+          Expanded(
+            child: Text(
+              l10n.openingHoursAutomate24h,
+              style: theme.textTheme.bodyMedium?.copyWith(color: muted),
             ),
           ),
         ],

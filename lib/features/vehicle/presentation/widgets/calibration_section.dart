@@ -4,7 +4,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../data/ve_convergence.dart';
 import '../../domain/entities/reference_vehicle.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 
@@ -50,11 +49,12 @@ CalibrationValueSource resolveCalibrationSource({
 /// edit-vehicle screen (#1397).
 ///
 /// Surfaces the four manual override fields
-/// (`manual<X>Override` on [VehicleProfile]) plus a live readout of
-/// the auto-learned η_v and a "Reset learner" button. Each field
-/// labels its origin so users know whether the value they're seeing
-/// came from VIN decoding, the catalog, the auto-learner or their
-/// own keyboard.
+/// (`manual<X>Override` on [VehicleProfile]). Each field labels its
+/// origin so users know whether the value they're seeing came from VIN
+/// decoding, the catalog, a default constant or their own keyboard.
+/// #3901 — the η_v learner readout + "Reset learner" are gone with the
+/// learner (Epic #3886): consumption is pump-anchored now, η_v is a
+/// catalog / manual constant only.
 class CalibrationSection extends StatefulWidget {
   /// The current vehicle profile. Drives both the prefilled values
   /// and every "(detected / catalog / default / manual)" badge.
@@ -72,11 +72,6 @@ class CalibrationSection extends StatefulWidget {
   /// Persist the new manual fuel-density override (or `null` to clear).
   final void Function(double?) onFuelDensityChanged;
 
-  /// Tapping "Reset learner" calls this with the active vehicle's id —
-  /// the screen is responsible for resetting `volumetricEfficiency` +
-  /// `volumetricEfficiencySamples`.
-  final VoidCallback onResetLearner;
-
   /// Optional resolved [ReferenceVehicle] for [profile] (#1422 phase 2).
   ///
   /// When non-null AND the volumetricEfficiency field is currently
@@ -91,11 +86,10 @@ class CalibrationSection extends StatefulWidget {
   final ReferenceVehicle? referenceVehicle;
 
   /// Whether the vehicle reports its fuel rate directly via PID 5E (or a
-  /// MAF-derived rate), making the volumetric-efficiency calibration
+  /// MAF-derived rate), making the volumetric-efficiency constant
   /// irrelevant (#2837). η_v only scales the speed-density branch, never
-  /// the direct branch, so when this is true the η_v field, its learner
-  /// readout and the "Reset learner" button are de-emphasised behind an
-  /// explanatory note rather than presented as actionable calibration.
+  /// the direct branch, so when this is true the η_v field is replaced
+  /// by an explanatory note rather than presented as a knob to tune.
   /// Defaults false — speed-density cars keep the full calibration UI.
   final bool directFuelRateSupported;
 
@@ -106,7 +100,6 @@ class CalibrationSection extends StatefulWidget {
     required this.onVolumetricEfficiencyChanged,
     required this.onAfrChanged,
     required this.onFuelDensityChanged,
-    required this.onResetLearner,
     this.referenceVehicle,
     this.directFuelRateSupported = false,
   });
@@ -219,10 +212,9 @@ class _CalibrationSectionState extends State<CalibrationSection> {
       case _CalibrationField.volumetricEfficiency:
         return resolveCalibrationSource(
           manualSet: p.manualVolumetricEfficiencyOverride != null,
-          // The auto-learner writes back into volumetricEfficiency
-          // itself; treat sample count > 0 as a "detected"-class signal
-          // so the UI labels the value as something other than default.
-          detectedSet: p.volumetricEfficiencySamples > 0,
+          // #3901 — no learner writes η_v any more; it is catalog / manual
+          // / default only.
+          detectedSet: false,
           catalogResolved: p.referenceVehicleId != null,
         );
       case _CalibrationField.afr:
@@ -369,23 +361,6 @@ class _CalibrationSectionState extends State<CalibrationSection> {
     }
   }
 
-  String _learnerStatus(AppLocalizations l) {
-    final samples = widget.profile.volumetricEfficiencySamples;
-    if (samples == 0) {
-      return l.calibrationLearnerStatusNoSamples;
-    }
-    // #1626 — show the ± convergence band so the user sees how settled
-    // the learned η_v is. Folded into the `eta` placeholder so the
-    // existing parameterised ARB strings need no signature change.
-    final etaValue = _formatDouble(widget.profile.volumetricEfficiency);
-    final band = _formatDouble(veConvergenceHalfWidth(samples));
-    final eta = '$etaValue ± $band';
-    if (samples < 3) {
-      return l.calibrationLearnerStatusLearning(eta, samples);
-    }
-    return l.calibrationLearnerStatusCalibrated(eta, samples);
-  }
-
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
@@ -428,28 +403,6 @@ class _CalibrationSectionState extends State<CalibrationSection> {
             labelText: l.calibrationFuelDensityLabel,
             l: l,
           ),
-          // #2837 — the live η_v readout + Reset learner only matter for
-          // the speed-density model; skip them entirely on direct-fuel-
-          // rate cars so the "0 samples" nudge can't mislead.
-          if (!widget.directFuelRateSupported) ...[
-            const SizedBox(height: 16),
-            // Live η_v readout — text + reset button.
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    _learnerStatus(l),
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                OutlinedButton(
-                  onPressed: widget.onResetLearner,
-                  child: Text(l.calibrationResetLearner),
-                ),
-              ],
-            ),
-          ],
         ],
       ),
     );
@@ -482,10 +435,9 @@ class _CalibrationSectionState extends State<CalibrationSection> {
   }
 }
 
-/// #2837 — replaces the η_v field + learner readout when the car reports
-/// fuel rate directly (PID 5E / MAF). A muted info row explaining that
-/// volumetric-efficiency calibration is not used for this vehicle, so the
-/// "0 samples" nudge can't read as a calibration the user must complete.
+/// #2837 — replaces the η_v field when the car reports fuel rate directly
+/// (PID 5E / MAF). A muted info row explaining that the volumetric-
+/// efficiency constant is not used for this vehicle.
 class _DirectFuelRateNote extends StatelessWidget {
   const _DirectFuelRateNote({required this.l});
 

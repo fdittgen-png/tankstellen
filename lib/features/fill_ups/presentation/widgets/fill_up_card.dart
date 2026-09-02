@@ -62,13 +62,17 @@ class FillUpCard extends StatelessWidget {
       return _CorrectionRow(volume: volume, onTap: onTap);
     }
 
-    final dateStr =
-        '${fillUp.date.year}-${_pad(fillUp.date.month)}-${_pad(fillUp.date.day)}';
+    // #3903 — locale medium date ("21 août 2026", not "2026-08-21") and
+    // a grouped whole-km odometer ("122 700 km", not "122700.0 km").
+    final dateStr = UnitFormatter.formatMediumDate(
+      fillUp.date,
+      locale: Localizations.localeOf(context).toString(),
+    );
     // Until the FillUp model carries an origin-country code (tracked in
     // #626 follow-up), fall back to the active country's units. Old
     // records logged before this change will re-format on the fly when
     // the user changes country — acceptable as a transitional step.
-    final distance = UnitFormatter.formatDistance(fillUp.odometerKm);
+    final distance = UnitFormatter.formatOdometer(fillUp.odometerKm);
     // #2491 — a fill-up cost is a TOTAL: route it through formatTotal
     // (locale-aware 2 dp + currency symbol) instead of a hand-rolled
     // toStringAsFixed(2) that hardcodes the dot separator.
@@ -173,8 +177,6 @@ class FillUpCard extends StatelessWidget {
       ),
     );
   }
-
-  String _pad(int n) => n.toString().padLeft(2, '0');
 }
 
 /// #1902 — the slim row a correction [FillUp] collapses to. It carries

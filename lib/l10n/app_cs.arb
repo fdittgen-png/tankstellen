@@ -169,7 +169,6 @@
   "settingsStorageDetail": "Klíč API, aktivní profil",
   "allFuels": "Vše",
   "priceAlerts": "Cenové výstrahy",
-  "noPriceAlerts": "Žádné cenové výstrahy",
   "noPriceAlertsHint": "Vytvořte výstrahu na stránce s podrobnostmi stanice.",
   "alertDeleted": "Výstraha \"{name}\" smazána",
   "createAlert": "Vytvořit cenovou výstrahu",
@@ -492,7 +491,6 @@
   "liters": "Litry",
   "odometerKm": "Tachometr (km)",
   "notesOptional": "Poznámky (volitelné)",
-  "stationPreFilled": "Stanice předvyplněna",
   "statAvgConsumption": "Průměr L/100km",
   "statAvgCostPerKm": "Průměrné náklady/km",
   "statTotalLiters": "Celkem litrů",
@@ -882,8 +880,6 @@
   "obd2PauseBannerTitle": "Připojení OBD2 ztraceno — nahrávání pozastaveno",
   "obd2PauseBannerResume": "Obnovit nahrávání",
   "obd2PauseBannerEnd": "Ukončit nahrávání",
-  "veResetConfirmTitle": "Resetovat volumetrickou účinnost?",
-  "veResetConfirmBody": "Tímto se zruší naučená volumetrická účinnost (η_v) a obnoví se výchozí hodnota (0,85). Odhady průtoku paliva na úrovni cesty se vrátí na konstantu výrobce, dokud kalibrátor nenasbírá nové vzorky z nadcházejících cest.",
   "alertsRadiusSectionTitle": "Polohová upozornění",
   "alertsRadiusAdd": "Přidat polohové upozornění",
   "alertsRadiusEmptyTitle": "Zatím žádná polohová upozornění",
@@ -899,8 +895,6 @@
   "obd2ConnectedTooltip": "OBD2 připojeno: {adapterName}",
   "obd2PairChipTooltip": "Spárovat adaptér OBD2",
   "fillUpSavedSnackbar": "Tankování uloženo",
-  "radiusAlertsEntryTitle": "Polohová upozornění a statistiky",
-  "radiusAlertsEntrySubtitle": "Dostávejte oznámení, když ceny klesnou ve vašem okolí",
   "notFoundTitle": "Stránka nenalezena",
   "notFoundBody": "\"{location}\" nenalezeno.",
   "notFoundHomeButton": "Domů",
@@ -943,7 +937,6 @@
   "autoRecordBackgroundLocationOpenSettings": "Otevřít nastavení",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Vyžadováno oprávnění k poloze",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Nepodařilo se požádat o polohu na pozadí",
-  "autoRecordPairAdapterLinkText": "Spárujte adaptér v sekci níže pro povolení automatického nahrávání",
   "exportBackupReady": "Záloha připravena — vyberte cíl",
   "exportBackupFailed": "Export zálohy selhal — zkuste to znovu",
   "brokenMapChipDisclaimer": "Odečty MAP jsou podezřelé",
@@ -973,10 +966,6 @@
   "calibrationSourceDefault": "(výchozí)",
   "calibrationSourceManual": "(ruční)",
   "calibrationResetToDetected": "Resetovat na zjištěnou hodnotu",
-  "calibrationLearnerStatusCalibrated": "η_v: {eta} (kalibrováno, {samples} vzorků)",
-  "calibrationLearnerStatusLearning": "η_v: {eta} (učení, {samples} vzorků)",
-  "calibrationLearnerStatusNoSamples": "η_v: 0,85 (výchozí — zatím žádné plné tankování)",
-  "calibrationLearnerEtaCompact": "η_v: {eta} · {samples} vzorků",
   "consumptionAccuracyLabel": "Přesnost: {level} · {band}",
   "consumptionAccuracyHigh": "Vysoká",
   "consumptionAccuracyMedium": "Střední",
@@ -984,7 +973,6 @@
   "consumptionAccuracyTooltipHigh": "Plná kalibrace: tankování plus jízdy zaznamenané přes OBD2. Hodnota L/100 km odpovídá realitě s odchylkou několika procent.",
   "consumptionAccuracyTooltipMedium": "Tankování ukotvila model spotřeby, ale zatím nebyla zpracována žádná jízda z OBD2. Zaznamenejte jednu s připojeným OBD2 pro dosažení vysoké přesnosti.",
   "consumptionAccuracyTooltipLow": "Pouze GPS — model spotřeby zatím neukotvilo žádné tankování. Přidejte několik plných tankování pro zlepšení přesnosti.",
-  "calibrationResetLearner": "Resetovat učení",
   "calibrationBasisAtkinson": "Atkinsonův cyklus",
   "calibrationBasisVnt": "VNT diesel + DI",
   "calibrationBasisTurboDi": "Turbodmychadlo + DI",
@@ -1266,7 +1254,6 @@
   "radiusAlertMapPickerConfirm": "Potvrdit",
   "radiusAlertMapPickerCancel": "Zrušit",
   "radiusAlertMapPickerHint": "Přetáhněte mapu pro umístění středu upozornění",
-  "radiusAlertCenterFromMap": "Poloha na mapě",
   "refuelUnitPerKwh": "/kWh",
   "refuelUnitPerSession": "/relaci",
   "speedConsumptionCardTitle": "Spotřeba podle rychlosti",
@@ -1387,7 +1374,6 @@
   "vinDecodeTooltip": "Dekódovat VIN",
   "vinConfirmAction": "Ano, automaticky vyplnit",
   "vinModifyAction": "Upravit ručně",
-  "veResetAction": "Resetovat volumetrickou účinnost",
   "vehicleReadVinFromCarButton": "Přečíst VIN z auta",
   "vehicleReadVinFromCarTooltip": "Přečíst VIN ze spárovaného adaptéru OBD2",
   "vehicleReadVinFailedUnsupportedSnackbar": "VIN není dostupný (Mode 09 PID 02 nepodporován na vozidlech před rokem 2005)",
@@ -3250,54 +3236,12 @@
   "@consumptionMonthlyClimbLabel": {
     "description": "MT — needs native review"
   },
-  "openNow": "Otevřeno",
-  "@openNow": {
-    "description": "MT — needs native review"
-  },
-  "openNowClosed": "Zavřeno",
-  "@openNowClosed": {
-    "description": "MT — needs native review"
-  },
   "openHoursUnknown": "Otevírací doba neznámá",
   "@openHoursUnknown": {
     "description": "MT — needs native review"
   },
-  "closesAt": "Zavírá v {time}",
-  "@closesAt": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "time": {
-        "type": "String"
-      }
-    }
-  },
-  "opensAt": "Otevírá {day} {time}",
-  "@opensAt": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "day": {
-        "type": "String"
-      },
-      "time": {
-        "type": "String"
-      }
-    }
-  },
-  "opensToday": "Otevírá v {time}",
-  "@opensToday": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "time": {
-        "type": "String"
-      }
-    }
-  },
   "open24Hours": "Otevřeno 24 hodin",
   "@open24Hours": {
-    "description": "MT — needs native review"
-  },
-  "badge24h": "24h",
-  "@badge24h": {
     "description": "MT — needs native review"
   },
   "dayMon": "Pondělí",
@@ -3447,10 +3391,6 @@
   },
   "featureDescription_addFillUpShareIntentReceipt": "Sdílejte fotografii účtenky z jiné aplikace pro předvyplnění tankování — datum, litry, celková částka a stanice se čtou na zařízení.",
   "@featureDescription_addFillUpShareIntentReceipt": {
-    "description": "MT — needs native review"
-  },
-  "openingHoursAutomate24h": "Automatizovat 24/7",
-  "@openingHoursAutomate24h": {
     "description": "MT — needs native review"
   },
   "stopRadar": "Zastavit radar",
@@ -4203,14 +4143,6 @@
   "featureLabel_voiceFeedback": "Hlasová zpětná vazba (syntéza řeči)",
   "featureDescription_voiceFeedback": "Hlavní vypínač všech hlasových výstupů — hlasového kouče jízdy a hlášení stanic. Když je vypnutý, aplikace nikdy nespustí syntézu řeči.",
   "tankReportTitle": "Zpráva o nádrži",
-  "tankReportHeadline": "{value} L/100 km",
-  "@tankReportHeadline": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportSincePrevious": "Od předchozí plné nádrže: {km} km · {liters} L · {cost}",
   "@tankReportSincePrevious": {
     "placeholders": {
@@ -4243,22 +4175,6 @@
   },
   "tankReportTrendFlat": "Na úrovni předchozí nádrže",
   "tankReportNoPrevious": "Vývoj se zobrazí po vaší příští plné nádrži.",
-  "tankReportCoverage": "Záznamy pokrývají {pct} % této nádrže",
-  "@tankReportCoverage": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportRecordedAvg": "Zaznamenaná část: {value} L/100 km",
-  "@tankReportRecordedAvg": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportExplainHeader": "Co záznamy naznačují",
   "tankReportFactorHighRpm": "Podíl vysokých otáček {cur} % (dříve {prev} %)",
   "@tankReportFactorHighRpm": {
@@ -4305,22 +4221,6 @@
     }
   },
   "tankReportCaveat": "Záznamy jsou nahodilé a pokrývají jen část této nádrže — tyto náznaky jsou orientační, ne celý obraz.",
-  "tankReportCalibrationUnder": "Zaznamenané odhady jsou o {pct} % nižší než skutečnost u stojanu",
-  "@tankReportCalibrationUnder": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportCalibrationOver": "Zaznamenané odhady jsou o {pct} % vyšší než skutečnost u stojanu",
-  "@tankReportCalibrationOver": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
   "qrLaunchConfirmTitle": "Otevřít naskenovaný odkaz?",
   "qrLaunchConfirmBody": "Tento QR kód vede na {host}. Otevírejte jen odkazy, kterým důvěřujete.",
   "@qrLaunchConfirmBody": {
@@ -4939,5 +4839,299 @@
         "type": "String"
       }
     }
+  },
+  "openingHoursAutomate24h": "Self-service pump 24/7 (card payment)",
+  "@openingHoursAutomate24h": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "stalePriceBadge": "Old price",
+  "@stalePriceBadge": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "radiusAlertCenterChipGps": "My position",
+  "@radiusAlertCenterChipGps": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "radiusAlertCenterChipMap": "Map point",
+  "@radiusAlertCenterChipMap": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "radiusAlertCenterChipPostal": "Postal code {postalCode}",
+  "@radiusAlertCenterChipPostal": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "postalCode": {
+        "type": "String",
+        "example": "34550"
+      }
+    }
+  },
+  "radiusAlertCenterClear": "Clear location",
+  "@radiusAlertCenterClear": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "radiusAlertBlockerLabel": "Enter a label",
+  "@radiusAlertBlockerLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "radiusAlertBlockerThreshold": "Enter a threshold above 0",
+  "@radiusAlertBlockerThreshold": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "radiusAlertBlockerLocation": "Choose a location",
+  "@radiusAlertBlockerLocation": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpOdometerFromLastFillUp": "Pre-filled from your last fill-up",
+  "@fillUpOdometerFromLastFillUp": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpStationLabel": "Station",
+  "@fillUpStationLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpStationChange": "Change",
+  "@fillUpStationChange": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pickStationSectionLast": "Last station",
+  "@pickStationSectionLast": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pickStationSectionFavorites": "Favorites",
+  "@pickStationSectionFavorites": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pickStationSectionNearby": "Nearby",
+  "@pickStationSectionNearby": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pickStationNearbyEmpty": "No recent search — search for stations on the Search tab and the nearest ones will appear here.",
+  "@pickStationNearbyEmpty": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pickStationLastFillUpAt": "Last fill-up: {date}",
+  "@pickStationLastFillUpAt": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "stationStatusWithFreshness": "{status} · updated {ago} ago",
+  "@stationStatusWithFreshness": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "status": {
+        "type": "String",
+        "example": "Open"
+      },
+      "ago": {
+        "type": "String",
+        "example": "< 1 min"
+      }
+    }
+  },
+  "pricesNotSoldHere": "Not sold here: {fuels}",
+  "@pricesNotSoldHere": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuels": {
+        "type": "String",
+        "example": "Super E5, Super E10"
+      }
+    }
+  },
+  "tankReportRecordedTripsCoverage": "Recorded trips cover {pct} % of this tank",
+  "@tankReportRecordedTripsCoverage": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportRecordedTripsAvg": "Recorded trips: {value}",
+  "@tankReportRecordedTripsAvg": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportRecordedTripsOverestimate": "Your recorded trips overestimate consumption by {pct} %",
+  "@tankReportRecordedTripsOverestimate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportRecordedTripsUnderestimate": "Your recorded trips underestimate consumption by {pct} %",
+  "@tankReportRecordedTripsUnderestimate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "trajetObd2DegradedSubtitle": "No engine data — GPS estimate",
+  "@trajetObd2DegradedSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleTopicAdapterNone": "None",
+  "@vehicleTopicAdapterNone": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleTopicCalibrationTitle": "Calibration",
+  "@vehicleTopicCalibrationTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleTopicAdvancedBadge": "Advanced",
+  "@vehicleTopicAdvancedBadge": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleTopicCalibrationStatus": "Baseline {coverage} % · {mode}",
+  "@vehicleTopicCalibrationStatus": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "coverage": {
+        "type": "int",
+        "example": "78"
+      },
+      "mode": {
+        "type": "String",
+        "example": "Rule-based"
+      }
+    }
+  },
+  "vehicleTopicRemindersCount": "{count, plural, =0{No reminders} =1{1 reminder} other{{count} reminders}}",
+  "@vehicleTopicRemindersCount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "vehicleTopicAutoRecordOn": "On",
+  "@vehicleTopicAutoRecordOn": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleTopicAutoRecordOff": "Off",
+  "@vehicleTopicAutoRecordOff": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleTopicAutoRecordPairLinkText": "Pair an adapter under “OBD2 adapter” to enable auto-recording",
+  "@vehicleTopicAutoRecordPairLinkText": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleBaselineCoverageSamples": "{covered} / {max} samples",
+  "@vehicleBaselineCoverageSamples": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "covered": {
+        "type": "int",
+        "example": "210"
+      },
+      "max": {
+        "type": "int",
+        "example": "270"
+      }
+    }
+  },
+  "vehicleBaselineRawSamples": "{count, plural, =1{1 sample} other{{count} samples}}",
+  "@vehicleBaselineRawSamples": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "954"
+      }
+    }
+  },
+  "calibrationModeRuleDescription": "Sorts each driving sample into one situation using fixed speed and load thresholds.",
+  "@calibrationModeRuleDescription": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "calibrationModeFuzzyDescription": "Splits each sample across neighbouring situations by how well it fits each one — smoother estimates around the boundaries.",
+  "@calibrationModeFuzzyDescription": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pumpGainChipNotCalibrated": "Not pump-calibrated yet",
+  "@pumpGainChipNotCalibrated": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pumpGainChipCalibrated": "{fills, plural, =1{Pump-calibrated · 1 fill-up · ±{percent} %} other{Pump-calibrated · {fills} fill-ups · ±{percent} %}}",
+  "@pumpGainChipCalibrated": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fills": {
+        "type": "int",
+        "example": "6"
+      },
+      "percent": {
+        "type": "int",
+        "example": "7"
+      }
+    }
+  },
+  "pumpGainResetAction": "Reset pump calibration",
+  "@pumpGainResetAction": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pumpGainResetConfirmTitle": "Reset pump calibration?",
+  "@pumpGainResetConfirmTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pumpGainResetConfirmBody": "This discards the fuel gain learned from your fill-ups. OBD2 consumption estimates fall back to the uncorrected figure until the next full-to-full tank window re-learns it.",
+  "@pumpGainResetConfirmBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

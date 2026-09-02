@@ -74,11 +74,13 @@ void main() {
       ));
 
       await _pumpPushedEditScreen(tester, repo: repo);
+      // #3900 — the adapter card lives on the OBD2 adapter topic screen.
+      await _openAdapterTopic(tester);
 
       // Paired state is shown — the MAC + Forget button are present.
       await tester.dragUntilVisible(
         find.byKey(const Key('vehicleAdapterForget')),
-        find.byType(ListView),
+        find.byType(ListView).last,
         const Offset(0, -200),
       );
       expect(find.byKey(const Key('vehicleAdapterForget')), findsOneWidget);
@@ -90,16 +92,17 @@ void main() {
       // "still mounted" assertion is a real RED-before guard.
       await tester.pumpAndSettle();
 
-      // The form is STILL on screen — the route was NOT popped.
+      // The form is STILL in the navigator (under the topic screen) —
+      // the route was NOT popped.
       expect(
-        find.byType(EditVehicleScreen),
+        find.byType(EditVehicleScreen, skipOffstage: false),
         findsOneWidget,
         reason: 'forgetting the adapter must NOT close the Edit-vehicle form',
       );
       // The adapter section flipped to the unpaired state in place.
       await tester.dragUntilVisible(
         find.byKey(const Key('vehicleAdapterPair')),
-        find.byType(ListView),
+        find.byType(ListView).last,
         const Offset(0, -200),
       );
       expect(find.byKey(const Key('vehicleAdapterPair')), findsOneWidget);
@@ -155,10 +158,12 @@ void main() {
       await tester.enterText(nameField, 'Polo GTI');
       await tester.pump();
 
-      // Open the pair sheet from the (unpaired) adapter card.
+      // Open the pair sheet from the (unpaired) adapter card — on the
+      // OBD2 adapter topic screen (#3900).
+      await _openAdapterTopic(tester);
       await tester.dragUntilVisible(
         find.byKey(const Key('vehicleAdapterPair')),
-        find.byType(ListView),
+        find.byType(ListView).last,
         const Offset(0, -200),
       );
       await tester.tap(find.byKey(const Key('vehicleAdapterPair')));
@@ -173,10 +178,10 @@ void main() {
       await tester.tap(find.byKey(const Key('obdPickerItem_id-vLinker FS')));
       await tester.pumpAndSettle();
 
-      // The Edit-vehicle form is STILL on screen — pairing did not pop
-      // it.
+      // The Edit-vehicle form is STILL in the navigator — pairing did
+      // not pop it.
       expect(
-        find.byType(EditVehicleScreen),
+        find.byType(EditVehicleScreen, skipOffstage: false),
         findsOneWidget,
         reason: 'pairing an adapter must NOT close the Edit-vehicle form',
       );
@@ -185,7 +190,7 @@ void main() {
       // The adapter section now shows the paired adapter in place.
       await tester.dragUntilVisible(
         find.byKey(const Key('vehicleAdapterForget')),
-        find.byType(ListView),
+        find.byType(ListView).last,
         const Offset(0, -200),
       );
       expect(find.byKey(const Key('vehicleAdapterForget')), findsOneWidget);
@@ -200,6 +205,23 @@ void main() {
       expect(after.tankCapacityL, 45);
     },
   );
+}
+
+/// #3900 — the adapter card lives on the OBD2 adapter topic screen:
+/// scroll the editor's top level to its tile, open it, settle.
+Future<void> _openAdapterTopic(WidgetTester tester) async {
+  final tile = find.byKey(const Key('vehicleTopic_adapter'));
+  await tester.dragUntilVisible(
+    tile,
+    find.byType(ListView).first,
+    const Offset(0, -200),
+  );
+  // Fully into the viewport — a half-scrolled tile's centre can sit
+  // under the pinned Save bar.
+  await tester.ensureVisible(tile);
+  await tester.pumpAndSettle();
+  await tester.tap(tile);
+  await tester.pumpAndSettle();
 }
 
 Future<void> _pumpPushedEditScreen(

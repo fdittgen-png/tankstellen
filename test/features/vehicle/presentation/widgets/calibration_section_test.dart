@@ -16,7 +16,6 @@ class _CapturedCalls {
   double? lastVe;
   double? lastAfr;
   double? lastDensity;
-  bool resetLearnerFired = false;
   bool displacementFired = false;
   bool veFired = false;
   bool afrFired = false;
@@ -54,7 +53,6 @@ Widget _harness(
             calls.lastDensity = v;
             calls.densityFired = true;
           },
-          onResetLearner: () => calls.resetLearnerFired = true,
         ),
       ),
     ),
@@ -169,62 +167,6 @@ void main() {
           reason: 'reset must clear the manual override');
     });
 
-    testWidgets(
-        'live readout — samples == 0 → "no plein-complet yet"',
-        (tester) async {
-      const profile = VehicleProfile(
-        id: 'v',
-        name: 'Duster',
-        // volumetricEfficiencySamples defaults to 0
-      );
-      await tester.pumpWidget(_harness(profile, _CapturedCalls()));
-      await tester.pump();
-      await tester.tap(find.text('Advanced calibration'));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
-
-      expect(find.textContaining('no plein-complet'), findsOneWidget);
-    });
-
-    testWidgets(
-        'live readout — samples > 0 → "calibrated, N samples"',
-        (tester) async {
-      const profile = VehicleProfile(
-        id: 'v',
-        name: 'Duster',
-        volumetricEfficiency: 0.87,
-        volumetricEfficiencySamples: 4,
-      );
-      await tester.pumpWidget(_harness(profile, _CapturedCalls()));
-      await tester.pump();
-      await tester.tap(find.text('Advanced calibration'));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
-
-      expect(find.textContaining('0.87'), findsWidgets);
-      expect(find.textContaining('4'), findsWidgets);
-      expect(find.textContaining('calibrated'), findsOneWidget);
-    });
-
-    testWidgets('Reset learner button fires the onResetLearner callback',
-        (tester) async {
-      const profile = VehicleProfile(
-        id: 'v',
-        name: 'Duster',
-        volumetricEfficiency: 0.87,
-        volumetricEfficiencySamples: 4,
-      );
-      final calls = _CapturedCalls();
-      await tester.pumpWidget(_harness(profile, calls));
-      await tester.pump();
-      await tester.tap(find.text('Advanced calibration'));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
-
-      await tester.tap(find.text('Reset learner'));
-      await tester.pump();
-      expect(calls.resetLearnerFired, isTrue);
-    });
   });
 
   group('CalibrationSection η_v origin tag enrichment (#1422 phase 2)', () {
@@ -381,8 +323,8 @@ void main() {
     const profile = VehicleProfile(id: 'v', name: 'Skoda Diesel');
 
     testWidgets(
-        'PID-5E car hides the η_v field + learner readout + Reset learner '
-        'behind the explanatory note', (tester) async {
+        'PID-5E car hides the η_v field behind the explanatory note',
+        (tester) async {
       await tester.pumpWidget(
         _harness(profile, _CapturedCalls(), directFuelRateSupported: true),
       );
@@ -390,10 +332,9 @@ void main() {
       await tester.tap(find.text('Advanced calibration'));
       await tester.pump(const Duration(milliseconds: 300));
 
-      // The η_v editable field, the "samples" learner nudge and the
-      // Reset learner button are all gone.
+      // The η_v editable field is gone (#3901 — the learner readout and
+      // Reset learner no longer exist on any car).
       expect(find.text('Volumetric efficiency (η_v)'), findsNothing);
-      expect(find.text('Reset learner'), findsNothing);
       expect(find.textContaining('samples'), findsNothing);
       // ...replaced by the direct-fuel-rate note (mentions PID 5E).
       expect(find.textContaining('PID 5E'), findsOneWidget);
@@ -414,7 +355,6 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
 
       expect(find.text('Volumetric efficiency (η_v)'), findsOneWidget);
-      expect(find.text('Reset learner'), findsOneWidget);
       expect(find.textContaining('PID 5E'), findsNothing);
     });
   });

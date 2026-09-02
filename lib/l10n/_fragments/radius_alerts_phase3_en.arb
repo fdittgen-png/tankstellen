@@ -18,9 +18,5 @@
   "radiusAlertMapPickerHint": "Drag the map to position the alert center",
   "@radiusAlertMapPickerHint": {
     "description": "Overlay hint on the map-picker explaining the center-crosshair interaction (#578 phase 3)."
-  },
-  "radiusAlertCenterFromMap": "Map location",
-  "@radiusAlertCenterFromMap": {
-    "description": "Label shown in the create sheet after a location has been picked on the map, distinguishing it from a GPS or postal-code center (#578 phase 3)."
   }
 }

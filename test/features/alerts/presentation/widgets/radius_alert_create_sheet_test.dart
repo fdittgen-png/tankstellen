@@ -263,9 +263,9 @@ void main() {
           reason: 'picked LatLng should unlock Save',
         );
 
-        // The "Map location" caption is what tells the user which
+        // The "Map point" chip (#3905) is what tells the user which
         // source is currently bound to the alert.
-        expect(find.text('Map location'), findsOneWidget);
+        expect(find.text('Map point'), findsOneWidget);
 
         // Scroll Save into view (the sheet grew with #1012 phase 1).
         final saveBtn = find.widgetWithText(FilledButton, 'Save');
@@ -319,7 +319,7 @@ void main() {
         find.widgetWithText(FilledButton, 'Save'),
       );
       expect(save.onPressed, isNull);
-      expect(find.text('Map location'), findsNothing);
+      expect(find.text('Map point'), findsNothing);
     });
 
     testWidgets('frequency dropdown writes selected value into the saved alert '

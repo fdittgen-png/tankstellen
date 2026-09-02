@@ -7,12 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/navigation/app_routes.dart';
+import '../../../../core/time/app_clock.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/widgets/favorite_dismissible.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/station.dart';
 import '../../../search/presentation/widgets/station_card.dart';
+import '../../domain/stale_price_policy.dart';
 import '../../providers/favorites_provider.dart';
 
 /// Wraps a [StationCard] in the shared [FavoriteDismissible] swipe
@@ -47,6 +49,13 @@ class FavoriteStationDismissible extends ConsumerWidget {
         station: station,
         selectedFuelType: FuelType.all,
         isFavorite: true,
+        // #3905 — a favorite is re-read for weeks; flag a price whose
+        // upstream stamp is older than kStalePriceThreshold so a July
+        // "Updated 16/07" no longer reads as current in September.
+        isStalePrice: isStalePrice(
+          station.updatedAt,
+          now: ref.watch(appClockProvider).now(),
+        ),
         profileFuelType: ref.watch(activeProfileProvider)?.preferredFuelType,
         onTap: () => StationDetailRoute(station.id).push<void>(context),
         onFavoriteTap: () {

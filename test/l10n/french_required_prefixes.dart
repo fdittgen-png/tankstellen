@@ -36,7 +36,6 @@ const List<String> kFrenchRequiredPrefixes = <String>[
   // vehicle-edit) was shipping mixed-locale on French.
   'vehicle',
   'calibrationMode',
-  'veReset',
   'serviceReminder',
   'addServiceReminder', // exact key — startsWith of itself
   'vin',

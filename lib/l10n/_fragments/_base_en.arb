@@ -287,7 +287,6 @@
   "settingsStorageDetail": "API key, active profile",
   "allFuels": "All",
   "priceAlerts": "Price Alerts",
-  "noPriceAlerts": "No price alerts",
   "noPriceAlertsHint": "Create an alert from a station's detail page.",
   "alertDeleted": "Alert \"{name}\" deleted",
   "@alertDeleted": {
@@ -847,7 +846,6 @@
   "liters": "Liters",
   "odometerKm": "Odometer (km)",
   "notesOptional": "Notes (optional)",
-  "stationPreFilled": "Station pre-filled",
   "statAvgConsumption": "Avg L/100km",
   "statAvgCostPerKm": "Avg cost/km",
   "statTotalLiters": "Total liters",
@@ -1509,14 +1507,6 @@
   "@obd2GpsDegradedPassiveWaitingBanner": {
     "description": "Calmer variant of obd2GpsDegradedBannerTitle shown (#2767) once the reconnect scanner has exhausted its active-scan attempts and switched to a low-power passive wait for the adapter to power back up. The trip is still recording on GPS and the app still re-arms an active scan periodically, so the wording is reassuring (\"waiting for\") rather than urgent (\"reconnecting\")."
   },
-  "veResetConfirmTitle": "Reset volumetric efficiency?",
-  "@veResetConfirmTitle": {
-    "description": "Title of the confirm dialog shown before discarding the learned volumetric efficiency (#815)."
-  },
-  "veResetConfirmBody": "This will discard the learned volumetric efficiency (η_v) and restore the default value (0.85). Trip-level fuel-flow estimates will fall back to the manufacturer constant until the calibrator collects new samples from upcoming trips.",
-  "@veResetConfirmBody": {
-    "description": "Body of the confirm dialog shown before discarding the learned volumetric efficiency (#815)."
-  },
   "alertsStationSectionTitle": "Station alerts",
   "@alertsStationSectionTitle": {
     "description": "Header of the per-station price-alert section on the alerts screen, symmetric with the radius/zone section (#2819)."
@@ -1599,14 +1589,6 @@
   "fillUpSavedSnackbar": "Fill-up saved",
   "@fillUpSavedSnackbar": {
     "description": "Success snackbar confirming a fill-up was saved, shown after the Add fill-up screen pops back to the consumption list (#1692)."
-  },
-  "radiusAlertsEntryTitle": "Radius alerts & statistics",
-  "@radiusAlertsEntryTitle": {
-    "description": "Title of the navigation entry on the favorites Alerts tab that opens the radius-alerts + statistics screen (#1701)."
-  },
-  "radiusAlertsEntrySubtitle": "Get notified when prices drop near you",
-  "@radiusAlertsEntrySubtitle": {
-    "description": "Subtitle of the radius-alerts navigation entry on the favorites Alerts tab — explains what radius alerts do (#1701)."
   },
   "notFoundTitle": "Page not found",
   "@notFoundTitle": {

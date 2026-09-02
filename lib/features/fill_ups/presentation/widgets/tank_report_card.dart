@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/providers/consumption_display_provider.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -20,6 +21,11 @@ import '../../../../core/error/guarded.dart';
 /// story), and the residual gap between recorded estimates and pump
 /// truth. Hidden entirely until a first window closes — no skeleton, the
 /// stats card above already owns the "not enough data" narrative.
+///
+/// #3904 — the recorded-trips lines speak plainly ("Your recorded trips
+/// overestimate consumption by 39 %", not "estimates run 39 % over pump
+/// truth"), and every consumption figure this card owns renders in the
+/// app-wide consumption unit (#3889) rather than a literal `L/100 km`.
 class TankReportCard extends ConsumerWidget {
   const TankReportCard({super.key});
 
@@ -38,6 +44,9 @@ class TankReportCard extends ConsumerWidget {
     if (report == null || latest == null) return const SizedBox.shrink();
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    // #3889 — the headline + recorded-trips figures follow the app-wide
+    // consumption unit; the formatter carries the unit mask itself.
+    final unit = ref.watch(consumptionDisplaySettingProvider).unit;
     final evolution = report.evolution;
     final behavior = report.latestBehavior;
 
@@ -57,7 +66,8 @@ class TankReportCard extends ConsumerWidget {
                       style: theme.textTheme.titleMedium),
                 ),
                 Text(
-                  l.tankReportHeadline(UnitFormatter.formatDecimal(latest.lPer100Km)),
+                  UnitFormatter.formatConsumptionLocalized(
+                      latest.lPer100Km, unit),
                   style: theme.textTheme.titleMedium
                       ?.copyWith(fontWeight: FontWeight.bold),
                 ),
@@ -79,8 +89,10 @@ class TankReportCard extends ConsumerWidget {
             if (behavior.recordedLPer100Km != null) ...[
               const SizedBox(height: 4),
               Text(
-                l.tankReportRecordedAvg(
-                    UnitFormatter.formatDecimal(behavior.recordedLPer100Km!)),
+                l.tankReportRecordedTripsAvg(
+                  UnitFormatter.formatConsumptionLocalized(
+                      behavior.recordedLPer100Km!, unit),
+                ),
                 style: theme.textTheme.bodySmall,
               ),
             ],
@@ -186,7 +198,7 @@ class _CoverageBar extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Text(l.tankReportCoverage('$pct'),
+        Text(l.tankReportRecordedTripsCoverage('$pct'),
             style: theme.textTheme.bodySmall),
       ],
     );
@@ -252,11 +264,12 @@ class _CalibrationLine extends StatelessWidget {
     // A residual under 3% means the η_v learner (#815) has the estimator
     // effectively on pump truth — nothing worth a line.
     if (gap.abs() < 3) return const SizedBox.shrink();
+    // gapPct > 0 = the pump burned MORE than the recordings claimed, i.e.
+    // the recorded trips UNDER-estimate consumption (#3904 plain wording).
+    final pct = UnitFormatter.formatDecimal(gap.abs(), fractionDigits: 0);
     final text = gap > 0
-        ? l.tankReportCalibrationUnder(
-            UnitFormatter.formatDecimal(gap.abs(), fractionDigits: 0))
-        : l.tankReportCalibrationOver(
-            UnitFormatter.formatDecimal(gap.abs(), fractionDigits: 0));
+        ? l.tankReportRecordedTripsUnderestimate(pct)
+        : l.tankReportRecordedTripsOverestimate(pct);
     return Row(
       children: [
         Icon(Icons.tune, size: 16, color: theme.colorScheme.outline),

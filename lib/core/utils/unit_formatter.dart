@@ -176,6 +176,27 @@ class UnitFormatter {
     return NumberFormat(pattern, _activeLocale).format(value);
   }
 
+  /// Odometer reading as a grouped whole number with the country's
+  /// distance unit (#3903): `122 700 km` (fr), `122,700 km` (en),
+  /// `76,246 mi` (GB). Dashboards show whole units; the grouping
+  /// separator follows the active locale like [formatDecimal] does.
+  static String formatOdometer(double? km, {String? countryCode}) {
+    if (km == null) return '--';
+    final cfg = _resolve(countryCode);
+    final imperial = cfg.distanceUnit == 'mi';
+    final value = imperial ? km * _milesPerKm : km;
+    final figure = NumberFormat('#,##0', _activeLocale).format(value);
+    return imperial ? '$figure mi' : '$figure km';
+  }
+
+  /// Medium date (`Aug 21, 2026` / `21 août 2026` / `21.08.2026`) in the
+  /// given UI [locale] — the one surface-level date format for list rows
+  /// and captions (#3903). Pass `Localizations.localeOf(context)
+  /// .toString()`; the caller owns the widget context, this class does
+  /// not.
+  static String formatMediumDate(DateTime date, {required String locale}) =>
+      DateFormat.yMMMd(locale).format(date);
+
   static String _oneDecimal(double v) => formatDecimal(v);
 
   static String _threeDecimals(double v) =>

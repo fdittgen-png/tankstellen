@@ -575,9 +575,6 @@ class AppLocalizationsFi extends AppLocalizations {
   String get priceAlerts => 'Hintahälytykset';
 
   @override
-  String get noPriceAlerts => 'Ei hintahälytyksiä';
-
-  @override
   String get noPriceAlertsHint => 'Luo hälytys aseman tietosivulta.';
 
   @override
@@ -1600,9 +1597,6 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get notesOptional => 'Muistiinpanot (valinnainen)';
-
-  @override
-  String get stationPreFilled => 'Asema esitäytetty';
 
   @override
   String get statAvgConsumption => 'Keskim. L/100km';
@@ -3045,13 +3039,6 @@ class AppLocalizationsFi extends AppLocalizations {
       'Tallennetaan GPS:llä — odotetaan OBD2-sovitinta';
 
   @override
-  String get veResetConfirmTitle => 'Nollatako tilavuushyötysuhde?';
-
-  @override
-  String get veResetConfirmBody =>
-      'Tämä hylkää opitun tilavuushyötysuhteen (η_v) ja palauttaa oletusarvon (0,85). Matkakohtaiset polttoainevirta-arviot palaavat valmistajan vakioon kunnes kalibraattori kerää uusia näytteitä tulevista matkoista.';
-
-  @override
   String get alertsStationSectionTitle => 'Asemahälytykset';
 
   @override
@@ -3108,13 +3095,6 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get fillUpSavedSnackbar => 'Tankkaus tallennettu';
-
-  @override
-  String get radiusAlertsEntryTitle => 'Säde-hälytykset ja tilastot';
-
-  @override
-  String get radiusAlertsEntrySubtitle =>
-      'Saat ilmoituksen kun hinnat laskevat lähellä sinua';
 
   @override
   String get notFoundTitle => 'Sivua ei löydy';
@@ -3459,10 +3439,6 @@ class AppLocalizationsFi extends AppLocalizations {
       'Avaa Sparkilo napauttamalla — matkan tallennus voi alkaa.';
 
   @override
-  String get autoRecordPairAdapterLinkText =>
-      'Paritetaan sovitin alla olevassa osiossa automaattisen tallennuksen ottamiseksi käyttöön';
-
-  @override
   String get exportBackupReady => 'Varmuuskopio valmis — valitse kohde';
 
   @override
@@ -3621,28 +3597,6 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get calibrationResetToDetected => 'Nollaa havaittuun arvoon';
-
-  @override
-  String calibrationLearnerStatusCalibrated(String eta, int samples) {
-    return 'η_v: $eta (kalibroitu, $samples näytettä)';
-  }
-
-  @override
-  String calibrationLearnerStatusLearning(String eta, int samples) {
-    return 'η_v: $eta (oppii, $samples näytettä)';
-  }
-
-  @override
-  String get calibrationLearnerStatusNoSamples =>
-      'η_v: 0,85 (oletus — ei plein-complet-tankkausta vielä)';
-
-  @override
-  String calibrationLearnerEtaCompact(String eta, int samples) {
-    return 'η_v: $eta · $samples näytettä';
-  }
-
-  @override
-  String get calibrationResetLearner => 'Nollaa oppija';
 
   @override
   String get calibrationBasisAtkinson => 'Atkinson-sykli';
@@ -6716,37 +6670,13 @@ class AppLocalizationsFi extends AppLocalizations {
       'Voit parittaa Bluetooth-OBD2-sovittimen milloin tahansa myöhemmin ajoneuvonäkymästä tallentaaksesi matkoja ja lukeaksesi moottoritietoja.';
 
   @override
-  String get openNow => 'Auki';
-
-  @override
-  String get openNowClosed => 'Suljettu';
-
-  @override
   String get openHoursUnknown => 'Aukioloajat tuntematon';
-
-  @override
-  String closesAt(String time) {
-    return 'Sulkeutuu $time';
-  }
-
-  @override
-  String opensAt(String day, String time) {
-    return 'Avautuu $day $time';
-  }
-
-  @override
-  String opensToday(String time) {
-    return 'Avautuu $time';
-  }
 
   @override
   String get open24Hours => 'Auki 24 tuntia';
 
   @override
-  String get badge24h => '24h';
-
-  @override
-  String get openingHoursAutomate24h => 'Automatisoi 24/7';
+  String get openingHoursAutomate24h => 'Self-service pump 24/7 (card payment)';
 
   @override
   String get dayMon => 'Maanantai';
@@ -6975,9 +6905,6 @@ class AppLocalizationsFi extends AppLocalizations {
   @override
   String get radiusAlertMapPickerHint =>
       'Vedä karttaa asettaaksesi hälytyksen keskipiste';
-
-  @override
-  String get radiusAlertCenterFromMap => 'Karttasijainti';
 
   @override
   String get reconcileWorkflowTitle => 'Täsmäytä polttoaineesi';
@@ -7540,11 +7467,6 @@ class AppLocalizationsFi extends AppLocalizations {
   String get tankReportTitle => 'Tankkiraportti';
 
   @override
-  String tankReportHeadline(String value) {
-    return '$value L/100 km';
-  }
-
-  @override
   String tankReportSincePrevious(String km, String liters, String cost) {
     return 'Edellisestä täydestä tankillisesta: $km km · $liters L · $cost';
   }
@@ -7566,16 +7488,6 @@ class AppLocalizationsFi extends AppLocalizations {
   @override
   String get tankReportNoPrevious =>
       'Kehitys näkyy seuraavan täyden tankillisen jälkeen.';
-
-  @override
-  String tankReportCoverage(String pct) {
-    return 'Tallenteet kattavat $pct % tästä tankillisesta';
-  }
-
-  @override
-  String tankReportRecordedAvg(String value) {
-    return 'Tallennettu osuus: $value L/100 km';
-  }
 
   @override
   String get tankReportExplainHeader => 'Mitä tallenteet vihjaavat';
@@ -7603,16 +7515,6 @@ class AppLocalizationsFi extends AppLocalizations {
   @override
   String get tankReportCaveat =>
       'Tallenteet ovat satunnaisia ja kattavat vain osan tästä tankillisesta — nämä vihjeet ovat suuntaa antavia, eivät koko totuus.';
-
-  @override
-  String tankReportCalibrationUnder(String pct) {
-    return 'Tallennetut arviot ovat $pct % mittarilukemaa pienemmät';
-  }
-
-  @override
-  String tankReportCalibrationOver(String pct) {
-    return 'Tallennetut arviot ovat $pct % mittarilukemaa suuremmat';
-  }
 
   @override
   String get themeCardTitle => 'Teema';
@@ -8178,6 +8080,177 @@ class AppLocalizationsFi extends AppLocalizations {
       'Maasi on tuettu, mutta sitä ei ole vielä määritetty — joten hinnat voivat olla toisesta maasta. Valitse maasi hakuasetuksista nähdäksesi paikalliset hinnat.';
 
   @override
+  String get stalePriceBadge => 'Old price';
+
+  @override
+  String get radiusAlertCenterChipGps => 'My position';
+
+  @override
+  String get radiusAlertCenterChipMap => 'Map point';
+
+  @override
+  String radiusAlertCenterChipPostal(String postalCode) {
+    return 'Postal code $postalCode';
+  }
+
+  @override
+  String get radiusAlertCenterClear => 'Clear location';
+
+  @override
+  String get radiusAlertBlockerLabel => 'Enter a label';
+
+  @override
+  String get radiusAlertBlockerThreshold => 'Enter a threshold above 0';
+
+  @override
+  String get radiusAlertBlockerLocation => 'Choose a location';
+
+  @override
+  String get fillUpOdometerFromLastFillUp =>
+      'Pre-filled from your last fill-up';
+
+  @override
+  String get fillUpStationLabel => 'Station';
+
+  @override
+  String get fillUpStationChange => 'Change';
+
+  @override
+  String get pickStationSectionLast => 'Last station';
+
+  @override
+  String get pickStationSectionFavorites => 'Favorites';
+
+  @override
+  String get pickStationSectionNearby => 'Nearby';
+
+  @override
+  String get pickStationNearbyEmpty =>
+      'No recent search — search for stations on the Search tab and the nearest ones will appear here.';
+
+  @override
+  String pickStationLastFillUpAt(String date) {
+    return 'Last fill-up: $date';
+  }
+
+  @override
+  String stationStatusWithFreshness(String status, String ago) {
+    return '$status · updated $ago ago';
+  }
+
+  @override
+  String pricesNotSoldHere(String fuels) {
+    return 'Not sold here: $fuels';
+  }
+
+  @override
+  String tankReportRecordedTripsCoverage(String pct) {
+    return 'Recorded trips cover $pct % of this tank';
+  }
+
+  @override
+  String tankReportRecordedTripsAvg(String value) {
+    return 'Recorded trips: $value';
+  }
+
+  @override
+  String tankReportRecordedTripsOverestimate(String pct) {
+    return 'Your recorded trips overestimate consumption by $pct %';
+  }
+
+  @override
+  String tankReportRecordedTripsUnderestimate(String pct) {
+    return 'Your recorded trips underestimate consumption by $pct %';
+  }
+
+  @override
+  String get trajetObd2DegradedSubtitle => 'No engine data — GPS estimate';
+
+  @override
+  String get vehicleTopicAdapterNone => 'None';
+
+  @override
+  String get vehicleTopicCalibrationTitle => 'Calibration';
+
+  @override
+  String get vehicleTopicAdvancedBadge => 'Advanced';
+
+  @override
+  String vehicleTopicCalibrationStatus(int coverage, String mode) {
+    return 'Baseline $coverage % · $mode';
+  }
+
+  @override
+  String vehicleTopicRemindersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count reminders',
+      one: '1 reminder',
+      zero: 'No reminders',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get vehicleTopicAutoRecordOn => 'On';
+
+  @override
+  String get vehicleTopicAutoRecordOff => 'Off';
+
+  @override
+  String get vehicleTopicAutoRecordPairLinkText =>
+      'Pair an adapter under “OBD2 adapter” to enable auto-recording';
+
+  @override
+  String vehicleBaselineCoverageSamples(int covered, int max) {
+    return '$covered / $max samples';
+  }
+
+  @override
+  String vehicleBaselineRawSamples(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count samples',
+      one: '1 sample',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get calibrationModeRuleDescription =>
+      'Sorts each driving sample into one situation using fixed speed and load thresholds.';
+
+  @override
+  String get calibrationModeFuzzyDescription =>
+      'Splits each sample across neighbouring situations by how well it fits each one — smoother estimates around the boundaries.';
+
+  @override
+  String get pumpGainChipNotCalibrated => 'Not pump-calibrated yet';
+
+  @override
+  String pumpGainChipCalibrated(int fills, int percent) {
+    String _temp0 = intl.Intl.pluralLogic(
+      fills,
+      locale: localeName,
+      other: 'Pump-calibrated · $fills fill-ups · ±$percent %',
+      one: 'Pump-calibrated · 1 fill-up · ±$percent %',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get pumpGainResetAction => 'Reset pump calibration';
+
+  @override
+  String get pumpGainResetConfirmTitle => 'Reset pump calibration?';
+
+  @override
+  String get pumpGainResetConfirmBody =>
+      'This discards the fuel gain learned from your fill-ups. OBD2 consumption estimates fall back to the uncorrected figure until the next full-to-full tank window re-learns it.';
+
+  @override
   String get vehicleMultiFuelCapableLabel =>
       'Saatan tankata eri polttoainelaatuja';
 
@@ -8196,9 +8269,6 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get vinModifyAction => 'Muokkaa manuaalisesti';
-
-  @override
-  String get veResetAction => 'Nollaa tilavuushyötysuhde';
 
   @override
   String get vehicleReadVinFromCarButton => 'Lue VIN autosta';

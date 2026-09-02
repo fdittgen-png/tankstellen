@@ -1,19 +1,14 @@
 {
   "tankReportTitle": "Tank-Bericht",
-  "tankReportHeadline": "{value} L/100 km",
   "tankReportSincePrevious": "Seit dem letzten Volltanken: {km} km · {liters} L · {cost}",
   "tankReportTrendUp": "{delta} L/100 km mehr als beim vorigen Tank",
   "tankReportTrendDown": "{delta} L/100 km weniger als beim vorigen Tank",
   "tankReportTrendFlat": "Gleichauf mit dem vorigen Tank",
   "tankReportNoPrevious": "Die Entwicklung erscheint nach deinem nächsten Volltanken.",
-  "tankReportCoverage": "Aufzeichnungen decken {pct} % dieses Tanks ab",
-  "tankReportRecordedAvg": "Aufgezeichneter Anteil: {value} L/100 km",
   "tankReportExplainHeader": "Was die Aufzeichnungen nahelegen",
   "tankReportFactorHighRpm": "Hochdrehzahl-Anteil {cur} % (vorher {prev} %)",
   "tankReportFactorHarsh": "Harte Manöver {cur}/100 km (vorher {prev})",
   "tankReportFactorColdStarts": "Kaltstarts {cur} (vorher {prev})",
   "tankReportFactorIdle": "Leerlauf-Anteil {cur} % (vorher {prev} %)",
-  "tankReportCaveat": "Aufzeichnungen sind spontan und decken nur einen Teil dieses Tanks ab — diese Hinweise sind Anhaltspunkte, nicht die ganze Wahrheit.",
-  "tankReportCalibrationUnder": "Aufgezeichnete Schätzungen liegen {pct} % unter der Zapfsäulen-Wahrheit",
-  "tankReportCalibrationOver": "Aufgezeichnete Schätzungen liegen {pct} % über der Zapfsäulen-Wahrheit"
+  "tankReportCaveat": "Aufzeichnungen sind spontan und decken nur einen Teil dieses Tanks ab — diese Hinweise sind Anhaltspunkte, nicht die ganze Wahrheit."
 }

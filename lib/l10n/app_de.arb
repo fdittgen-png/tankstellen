@@ -268,7 +268,6 @@
   "settingsStorageDetail": "API-Schlüssel, aktives Profil",
   "allFuels": "Alle",
   "priceAlerts": "Preisalarme",
-  "noPriceAlerts": "Keine Preisalarme",
   "noPriceAlertsHint": "Erstellen Sie einen Alarm auf der Detailseite einer Tankstelle.",
   "alertDeleted": "Alarm \"{name}\" gelöscht",
   "@alertDeleted": {
@@ -761,7 +760,6 @@
   "liters": "Liter",
   "odometerKm": "Kilometerstand (km)",
   "notesOptional": "Notizen (optional)",
-  "stationPreFilled": "Tankstelle vorausgefüllt",
   "statAvgConsumption": "Ø L/100km",
   "statAvgCostPerKm": "Ø Kosten/km",
   "statTotalLiters": "Gesamt Liter",
@@ -1266,8 +1264,6 @@
   "obd2PauseBannerEnd": "Aufzeichnung beenden",
   "obd2GpsDegradedBannerTitle": "Aufzeichnung per GPS — OBD2 verbindet erneut",
   "obd2GpsDegradedPassiveWaitingBanner": "Aufzeichnung per GPS — warte auf den OBD2-Adapter",
-  "veResetConfirmTitle": "Volumetrischen Wirkungsgrad zurücksetzen?",
-  "veResetConfirmBody": "Dies verwirft den gelernten volumetrischen Wirkungsgrad (η_v) und stellt den Standardwert (0,85) wieder her. Fahrt-bezogene Verbrauchsschätzungen fallen auf die Herstellerkonstante zurück, bis der Kalibrator aus kommenden Fahrten neue Messwerte sammelt.",
   "alertsStationSectionTitle": "Stations-Alarme",
   "alertsStationAdd": "Stations-Alarm hinzufügen",
   "alertsRadiusSectionTitle": "Umkreis-Alarme",
@@ -1286,8 +1282,6 @@
   "obd2ConnectedTooltip": "OBD2 verbunden: {adapterName}",
   "obd2PairChipTooltip": "OBD2-Adapter koppeln",
   "fillUpSavedSnackbar": "Tankvorgang gespeichert",
-  "radiusAlertsEntryTitle": "Umkreis-Alarme & Statistik",
-  "radiusAlertsEntrySubtitle": "Werde benachrichtigt, wenn die Preise in deiner Nähe fallen",
   "notFoundTitle": "Seite nicht gefunden",
   "notFoundBody": "„{location}“ nicht gefunden.",
   "notFoundHomeButton": "Startseite",
@@ -1529,7 +1523,6 @@
   "@aclWakeNotificationBody": {
     "description": "#3756 native wake notification body."
   },
-  "autoRecordPairAdapterLinkText": "Adapter im Abschnitt unten koppeln, um automatisches Aufzeichnen zu aktivieren",
   "exportBackupReady": "Sicherung bereit – Ziel auswählen",
   "exportBackupFailed": "Sicherungsexport fehlgeschlagen – bitte erneut versuchen",
   "backupExportProgress": "Sicherung wird exportiert…",
@@ -1578,31 +1571,6 @@
   "calibrationSourceDefault": "(Standard)",
   "calibrationSourceManual": "(manuell)",
   "calibrationResetToDetected": "Auf erkannten Wert zurücksetzen",
-  "calibrationLearnerStatusCalibrated": "η_v: {eta} (kalibriert, {samples} Messungen)",
-  "@calibrationLearnerStatusCalibrated": {
-    "placeholders": {
-      "eta": {
-        "type": "String"
-      },
-      "samples": {
-        "type": "int"
-      }
-    }
-  },
-  "calibrationLearnerStatusLearning": "η_v: {eta} (lernt, {samples} Messungen)",
-  "@calibrationLearnerStatusLearning": {
-    "placeholders": {
-      "eta": {
-        "type": "String"
-      },
-      "samples": {
-        "type": "int"
-      }
-    }
-  },
-  "calibrationLearnerStatusNoSamples": "η_v: 0.85 (Standard – noch keine Volltankung)",
-  "calibrationLearnerEtaCompact": "η_v: {eta} · {samples} Messwerte",
-  "calibrationResetLearner": "Lernalgorithmus zurücksetzen",
   "calibrationBasisAtkinson": "Atkinson-Zyklus",
   "calibrationBasisVnt": "VTG-Diesel + Direkteinspritzung",
   "calibrationBasisTurboDi": "Turbo + Direkteinspritzung",
@@ -3227,15 +3195,9 @@
   "@onboardingObd2LaterNote": {
     "description": "Informational note on the iOS variant of the OBD2 onboarding step (App Review 5.1.1(iv), #3535): no in-wizard connect flow on iOS, the adapter is paired later from the vehicle screen."
   },
-  "openNow": "Geöffnet",
-  "openNowClosed": "Geschlossen",
   "openHoursUnknown": "Öffnungszeiten unbekannt",
-  "closesAt": "Schließt um {time}",
-  "opensAt": "Öffnet {day} {time}",
-  "opensToday": "Öffnet um {time}",
   "open24Hours": "24 Stunden geöffnet",
-  "badge24h": "24h",
-  "openingHoursAutomate24h": "Automat 24/7",
+  "openingHoursAutomate24h": "Tankautomat 24/7 (Kartenzahlung)",
   "dayMon": "Montag",
   "dayTue": "Dienstag",
   "dayWed": "Mittwoch",
@@ -3356,7 +3318,6 @@
   "radiusAlertMapPickerConfirm": "Bestätigen",
   "radiusAlertMapPickerCancel": "Abbrechen",
   "radiusAlertMapPickerHint": "Karte verschieben, um das Alarm-Zentrum zu platzieren",
-  "radiusAlertCenterFromMap": "Kartenposition",
   "reconcileWorkflowTitle": "Kraftstoff abgleichen",
   "reconcileWorkflowExplainHeadline": "Wir haben eine Differenz von {gap} L gefunden",
   "reconcileWorkflowExplainBody": "Du hast {pumped} L getankt, aber deine erfassten Fahrten erklären nur {consumed} L. Damit bleiben {gap} L ungeklärt.",
@@ -3618,22 +3579,17 @@
     }
   },
   "tankReportTitle": "Tank-Bericht",
-  "tankReportHeadline": "{value} L/100 km",
   "tankReportSincePrevious": "Seit dem letzten Volltanken: {km} km · {liters} L · {cost}",
   "tankReportTrendUp": "{delta} L/100 km mehr als beim vorigen Tank",
   "tankReportTrendDown": "{delta} L/100 km weniger als beim vorigen Tank",
   "tankReportTrendFlat": "Gleichauf mit dem vorigen Tank",
   "tankReportNoPrevious": "Die Entwicklung erscheint nach deinem nächsten Volltanken.",
-  "tankReportCoverage": "Aufzeichnungen decken {pct} % dieses Tanks ab",
-  "tankReportRecordedAvg": "Aufgezeichneter Anteil: {value} L/100 km",
   "tankReportExplainHeader": "Was die Aufzeichnungen nahelegen",
   "tankReportFactorHighRpm": "Hochdrehzahl-Anteil {cur} % (vorher {prev} %)",
   "tankReportFactorHarsh": "Harte Manöver {cur}/100 km (vorher {prev})",
   "tankReportFactorColdStarts": "Kaltstarts {cur} (vorher {prev})",
   "tankReportFactorIdle": "Leerlauf-Anteil {cur} % (vorher {prev} %)",
   "tankReportCaveat": "Aufzeichnungen sind spontan und decken nur einen Teil dieses Tanks ab — diese Hinweise sind Anhaltspunkte, nicht die ganze Wahrheit.",
-  "tankReportCalibrationUnder": "Aufgezeichnete Schätzungen liegen {pct} % unter der Zapfsäulen-Wahrheit",
-  "tankReportCalibrationOver": "Aufgezeichnete Schätzungen liegen {pct} % über der Zapfsäulen-Wahrheit",
   "themeCardTitle": "Design",
   "themeCardSubtitleSystem": "System",
   "themeCardSubtitleLight": "Hell",
@@ -3909,13 +3865,104 @@
   "unsupportedRegionDismiss": "Verstanden",
   "configureCountryTitle": "Land festlegen",
   "configureCountryBody": "Dein Land wird unterstützt, ist aber noch nicht eingerichtet – daher stammen die Preise möglicherweise aus einem anderen Land. Wähle dein Land in den Sucheinstellungen, um lokale Preise zu sehen.",
+  "stalePriceBadge": "Alter Preis",
+  "radiusAlertCenterChipGps": "Mein Standort",
+  "radiusAlertCenterChipMap": "Punkt auf der Karte",
+  "radiusAlertCenterChipPostal": "Postleitzahl {postalCode}",
+  "radiusAlertCenterClear": "Standort entfernen",
+  "radiusAlertBlockerLabel": "Geben Sie eine Bezeichnung ein",
+  "radiusAlertBlockerThreshold": "Geben Sie einen Schwellenwert über 0 ein",
+  "radiusAlertBlockerLocation": "Wählen Sie einen Standort",
+  "fillUpOdometerFromLastFillUp": "Aus Ihrer letzten Tankfüllung vorausgefüllt",
+  "fillUpStationLabel": "Tankstelle",
+  "fillUpStationChange": "Ändern",
+  "pickStationSectionLast": "Letzte Tankstelle",
+  "pickStationSectionFavorites": "Favoriten",
+  "pickStationSectionNearby": "In der Nähe",
+  "pickStationNearbyEmpty": "Keine aktuelle Suche — suchen Sie im Tab „Suche“ nach Tankstellen, dann erscheinen die nächstgelegenen hier.",
+  "pickStationLastFillUpAt": "Letzte Tankfüllung: {date}",
+  "stationStatusWithFreshness": "{status} · aktualisiert vor {ago}",
+  "pricesNotSoldHere": "Hier nicht angeboten: {fuels}",
+  "tankReportRecordedTripsCoverage": "Aufgezeichnete Fahrten decken {pct} % dieser Tankfüllung ab",
+  "tankReportRecordedTripsAvg": "Aufgezeichnete Fahrten: {value}",
+  "tankReportRecordedTripsOverestimate": "Deine aufgezeichneten Fahrten überschätzen den Verbrauch um {pct} %",
+  "tankReportRecordedTripsUnderestimate": "Deine aufgezeichneten Fahrten unterschätzen den Verbrauch um {pct} %",
+  "trajetObd2DegradedSubtitle": "Keine Motordaten — GPS-Schätzung",
+  "vehicleTopicAdapterNone": "Keiner",
+  "vehicleTopicCalibrationTitle": "Kalibrierung",
+  "vehicleTopicAdvancedBadge": "Erweitert",
+  "vehicleTopicCalibrationStatus": "Basislinie {coverage} % · {mode}",
+  "@vehicleTopicCalibrationStatus": {
+    "placeholders": {
+      "coverage": {
+        "type": "int",
+        "example": "78"
+      },
+      "mode": {
+        "type": "String",
+        "example": "Regelbasiert"
+      }
+    }
+  },
+  "vehicleTopicRemindersCount": "{count, plural, =0{Keine Erinnerungen} =1{1 Erinnerung} other{{count} Erinnerungen}}",
+  "@vehicleTopicRemindersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "vehicleTopicAutoRecordOn": "Ein",
+  "vehicleTopicAutoRecordOff": "Aus",
+  "vehicleTopicAutoRecordPairLinkText": "Koppeln Sie unter „OBD2-Adapter“ einen Adapter, um die automatische Aufzeichnung zu aktivieren",
+  "vehicleBaselineCoverageSamples": "{covered} / {max} Stichproben",
+  "@vehicleBaselineCoverageSamples": {
+    "placeholders": {
+      "covered": {
+        "type": "int",
+        "example": "210"
+      },
+      "max": {
+        "type": "int",
+        "example": "270"
+      }
+    }
+  },
+  "vehicleBaselineRawSamples": "{count, plural, =1{1 Stichprobe} other{{count} Stichproben}}",
+  "@vehicleBaselineRawSamples": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "954"
+      }
+    }
+  },
+  "calibrationModeRuleDescription": "Ordnet jede Fahrprobe anhand fester Geschwindigkeits- und Lastschwellen genau einer Situation zu.",
+  "calibrationModeFuzzyDescription": "Verteilt jede Probe nach Passung auf benachbarte Situationen – gleichmäßigere Schätzungen an den Übergängen.",
+  "pumpGainChipNotCalibrated": "Noch nicht an der Zapfsäule kalibriert",
+  "pumpGainChipCalibrated": "{fills, plural, =1{Zapfsäulen-kalibriert · 1 Tankfüllung · ±{percent} %} other{Zapfsäulen-kalibriert · {fills} Tankfüllungen · ±{percent} %}}",
+  "@pumpGainChipCalibrated": {
+    "placeholders": {
+      "fills": {
+        "type": "int",
+        "example": "6"
+      },
+      "percent": {
+        "type": "int",
+        "example": "7"
+      }
+    }
+  },
+  "pumpGainResetAction": "Zapfsäulen-Kalibrierung zurücksetzen",
+  "pumpGainResetConfirmTitle": "Zapfsäulen-Kalibrierung zurücksetzen?",
+  "pumpGainResetConfirmBody": "Der aus Ihren Tankfüllungen gelernte Kraftstofffaktor wird verworfen. OBD2-Verbrauchsschätzungen nutzen wieder den unkorrigierten Wert, bis das nächste Voll-zu-Voll-Tankfenster ihn neu lernt.",
   "vehicleMultiFuelCapableLabel": "Ich tanke eventuell verschiedene Kraftstoffarten",
   "vehicleMultiFuelCapableHelper": "Ermittelt, welcher Kraftstoff pro Kilometer am günstigsten ist",
   "vinLabel": "FIN (optional)",
   "vinDecodeTooltip": "FIN entschlüsseln",
   "vinConfirmAction": "Ja, automatisch ausfüllen",
   "vinModifyAction": "Manuell anpassen",
-  "veResetAction": "Volumetrischen Wirkungsgrad zurücksetzen",
   "vehicleReadVinFromCarButton": "FIN aus dem Auto auslesen",
   "vehicleReadVinFromCarTooltip": "FIN vom gekoppelten OBD2-Adapter auslesen",
   "vehicleReadVinFailedUnsupportedSnackbar": "FIN nicht verfügbar (Modus 09 PID 02 wird vor 2005 nicht unterstützt)",

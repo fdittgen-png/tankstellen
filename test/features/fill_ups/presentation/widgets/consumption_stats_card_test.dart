@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/features/fill_ups/domain/entities/consumption_stats.dart';
 import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
@@ -11,6 +12,7 @@ import 'package:tankstellen/features/fill_ups/presentation/widgets/consumption_s
 import 'package:tankstellen/features/fill_ups/providers/pending_reconciliation_provider.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
+import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 
 import '../../../../helpers/pump_app.dart';
@@ -26,6 +28,25 @@ class _DebugModeOn extends FeatureFlags {
 /// Overrides list that enables Developer mode for the calibration-chip
 /// tests below.
 final _debugOn = [featureFlagsProvider.overrideWith(() => _DebugModeOn())];
+
+/// #3901 — the pump-gain chip reads the ACTIVE vehicle's pump gain.
+class _FixedActiveVehicle extends ActiveVehicleProfile {
+  _FixedActiveVehicle(this._profile);
+  final VehicleProfile? _profile;
+
+  @override
+  VehicleProfile? build() => _profile;
+}
+
+Object _activeVehicle({required double pumpGain, required int samples}) =>
+    activeVehicleProfileProvider.overrideWith(
+      () => _FixedActiveVehicle(VehicleProfile(
+        id: 'v1',
+        name: 'Polo',
+        pumpGain: pumpGain,
+        pumpGainSamples: samples,
+      )),
+    );
 
 /// #2445 — seeds a live [PendingReconciliation] so the 'Resolve gap'
 /// affordance renders. Mirrors a deferred gap a user chose to decide
@@ -208,8 +229,12 @@ void main() {
         ConsumptionStatsCard(stats: _stats(fillUpCount: 5)),
       );
 
-      // The widget renders "Fill-ups: 5" (localized prefix + number).
-      expect(find.text('Fill-ups: 5'), findsOneWidget);
+      // #3903 — a fifth grid tile (icon + label + value), not a bare
+      // "Fill-ups: 5" text line.
+      expect(find.text('Fill-ups: 5'), findsNothing);
+      expect(find.text('Fill-ups'), findsOneWidget);
+      expect(find.text('5'), findsOneWidget);
+      expect(find.byIcon(Icons.format_list_numbered), findsOneWidget);
     });
 
     testWidgets('hides the count line when fillUpCount is zero', (
@@ -223,7 +248,8 @@ void main() {
       // The literal "Fill-ups: 0" string must not appear when the row
       // is hidden behind the `fillUpCount > 0` guard.
       expect(find.text('Fill-ups: 0'), findsNothing);
-      expect(find.textContaining('Fill-ups:'), findsNothing);
+      expect(find.textContaining('Fill-ups'), findsNothing);
+      expect(find.byIcon(Icons.format_list_numbered), findsNothing);
     });
   });
 
@@ -273,7 +299,8 @@ void main() {
         find.text('198.40 £'),
         findsOneWidget,
       ); // total spent (formatTotal)
-      expect(find.text('Fill-ups: 3'), findsOneWidget);
+      expect(find.text('Fill-ups'), findsOneWidget); // #3903 grid tile
+      expect(find.text('3'), findsOneWidget);
       expect(find.text('—'), findsNothing); // no nullable fallbacks fired
     });
   });
@@ -411,7 +438,8 @@ void main() {
           expect(find.textContaining('auto-corrections'), findsNothing);
           // Existing chrome still renders.
           expect(find.text('Consumption stats'), findsOneWidget);
-          expect(find.text('Fill-ups: 5'), findsOneWidget);
+          expect(find.text('Fill-ups'), findsOneWidget); // #3903 grid tile
+          expect(find.text('5'), findsOneWidget);
         },
       );
     },
@@ -420,12 +448,12 @@ void main() {
   // ─── #2433 — precision rating back in the Verbrauchsstatistik card ───
   //
   // #2383 moved the accuracy indicator (ConfidenceTierBadge) and the raw
-  // η_v chip (_CalibrationChip) to the Carburant app-bar. #2433 reverses
+  // η_v chip (now the #3901 PumpGainChip) to the Carburant app-bar. #2433 reverses
   // that placement: both ride a subtitle row inside the stats card again,
   // next to the figures they qualify. The raw η_v chip stays gated on
   // Developer mode (#2262), so the chip tests below pump with `_debugOn`.
 
-  group('ConsumptionStatsCard — calibration chip (#1397 / #2262)', () {
+  group('ConsumptionStatsCard — pump-gain chip (#3901 / #2262)', () {
     testWidgets('no chip when volumetricEfficiencySamples == null', (
       tester,
     ) async {
@@ -434,11 +462,12 @@ void main() {
         ConsumptionStatsCard(stats: _stats()),
         overrides: _debugOn,
       );
-      expect(find.byType(Chip), findsNothing);
+      expect(find.byKey(const Key('pumpGainChip')), findsNothing);
     });
 
     testWidgets(
-      'samples == 0 → "no plein-complet yet" pill (#2112, debug on)',
+      'no pump samples on the active vehicle → neutral "not pump-'
+      'calibrated yet" pill (debug on)',
       (tester) async {
         await pumpApp(
           tester,
@@ -447,39 +476,15 @@ void main() {
             volumetricEfficiency: 0.85,
             volumetricEfficiencySamples: 0,
           ),
-          overrides: _debugOn,
+          overrides: [..._debugOn, _activeVehicle(pumpGain: 1.0, samples: 0)],
         );
-        // #2112 — the calibration pill is no longer a Material `Chip`;
-        // it's a tonal Container so the η_v pill harmonises with the
-        // confidence-tier badge next to it. The label still contains
-        // the no-plein-complet substring.
-        expect(find.textContaining('no plein-complet'), findsOneWidget);
-      },
-    );
-
-    // #2112 — the "learning" vs "calibrated" parenthetical was
-    // dropped because the maturity colour is carried by the
-    // confidence-tier badge now riding next to it. The η_v pill
-    // shows the bare mean + sample count in both cases.
-    testWidgets(
-      '0 < samples < 3 → compact η_v pill with sample count (debug on)',
-      (tester) async {
-        await pumpApp(
-          tester,
-          ConsumptionStatsCard(
-            stats: _stats(),
-            volumetricEfficiency: 0.87,
-            volumetricEfficiencySamples: 2,
-          ),
-          overrides: _debugOn,
-        );
-        expect(find.textContaining('0.87'), findsOneWidget);
-        expect(find.textContaining('2 samples'), findsOneWidget);
+        expect(find.text('Not pump-calibrated yet'), findsOneWidget);
+        expect(find.textContaining('η_v'), findsNothing);
       },
     );
 
     testWidgets(
-      'samples >= 3 → compact η_v pill (no calibrated wording, debug on)',
+      'pump samples > 0 → "Pump-calibrated · N fill-ups · ±x %" (debug on)',
       (tester) async {
         await pumpApp(
           tester,
@@ -488,19 +493,17 @@ void main() {
             volumetricEfficiency: 0.91,
             volumetricEfficiencySamples: 5,
           ),
-          overrides: _debugOn,
+          overrides: [..._debugOn, _activeVehicle(pumpGain: 0.93, samples: 5)],
         );
-        expect(find.textContaining('0.91'), findsOneWidget);
-        expect(find.textContaining('5 samples'), findsOneWidget);
-        // #2112 — old shape removed; if the parenthetical comes back
-        // this fails and forces a deliberate decision.
-        expect(find.textContaining('calibrated'), findsNothing);
-        expect(find.textContaining('learning'), findsNothing);
+        expect(find.text('Pump-calibrated · 5 fill-ups · ±7 %'), findsOneWidget);
+        // The η_v learner shape is gone for good.
+        expect(find.textContaining('η_v'), findsNothing);
+        expect(find.textContaining('samples'), findsNothing);
       },
     );
 
     testWidgets(
-      '#2112 — accuracy badge + η_v pill ride a single Wrap (debug on)',
+      '#2112 — accuracy badge + pump-gain pill ride a single Wrap (debug on)',
       (tester) async {
         await pumpApp(
           tester,
@@ -509,13 +512,11 @@ void main() {
             volumetricEfficiency: 0.87,
             volumetricEfficiencySamples: 2,
           ),
-          overrides: _debugOn,
+          overrides: [..._debugOn, _activeVehicle(pumpGain: 0.97, samples: 2)],
         );
         final wraps = find.byType(Wrap).evaluate();
-        // ConsumptionStatsCard has no other Wrap today; this asserts
-        // the calibration pills group sits in exactly one Wrap so
-        // their layout stays harmonised.
         expect(wraps.length, greaterThanOrEqualTo(1));
+        expect(find.byKey(const Key('pumpGainChip')), findsOneWidget);
       },
     );
   });
@@ -639,9 +640,10 @@ void main() {
     });
   });
 
-  group('ConsumptionStatsCard — raw η_v chip Developer-mode gate (#2262)', () {
+  group('ConsumptionStatsCard — pump-gain chip Developer-mode gate (#2262)',
+      () {
     testWidgets(
-      'η_v chip is HIDDEN for normal users (debugMode off — default)',
+      'pump-gain chip is HIDDEN for normal users (debugMode off — default)',
       (tester) async {
         // No override → manifest default → debugMode off.
         await pumpApp(
@@ -651,16 +653,18 @@ void main() {
             volumetricEfficiency: 0.87,
             volumetricEfficiencySamples: 2,
           ),
+          overrides: [_activeVehicle(pumpGain: 0.97, samples: 2)],
         );
-        // The raw η_v glyph + sample count must not surface.
-        expect(find.textContaining('η_v'), findsNothing);
-        expect(find.textContaining('2 samples'), findsNothing);
+        // The raw calibration pill must not surface.
+        expect(find.byKey(const Key('pumpGainChip')), findsNothing);
+        expect(find.textContaining('Pump-calibrated'), findsNothing);
         // …but the plain accuracy indicator (always-on) still renders.
         expect(find.textContaining('Accuracy:'), findsOneWidget);
       },
     );
 
-    testWidgets('η_v chip is SHOWN when Developer mode is ON', (tester) async {
+    testWidgets('pump-gain chip is SHOWN when Developer mode is ON',
+        (tester) async {
       await pumpApp(
         tester,
         ConsumptionStatsCard(
@@ -668,10 +672,9 @@ void main() {
           volumetricEfficiency: 0.87,
           volumetricEfficiencySamples: 2,
         ),
-        overrides: _debugOn,
+        overrides: [..._debugOn, _activeVehicle(pumpGain: 0.97, samples: 2)],
       );
-      expect(find.textContaining('η_v'), findsOneWidget);
-      expect(find.textContaining('2 samples'), findsOneWidget);
+      expect(find.text('Pump-calibrated · 2 fill-ups · ±3 %'), findsOneWidget);
       // Accuracy indicator still rides alongside it.
       expect(find.textContaining('Accuracy:'), findsOneWidget);
     });
@@ -687,7 +690,7 @@ void main() {
             volumetricEfficiencySamples: 0,
           ),
         );
-        expect(find.textContaining('no plein-complet'), findsNothing);
+        expect(find.text('Not pump-calibrated yet'), findsNothing);
         expect(find.textContaining('η_v'), findsNothing);
       },
     );

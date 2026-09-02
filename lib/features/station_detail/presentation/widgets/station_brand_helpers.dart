@@ -40,3 +40,29 @@ String stationDisplayHeading(Station s) {
   if (name.isNotEmpty) return name;
   return s.street;
 }
+
+/// The line rendered under [stationDisplayHeading] in the brand header, or
+/// `null` when there is nothing left to say.
+///
+/// #1996 — the dedicated body Address section is gone (it duplicated the
+/// street the header already showed), so the header subtitle carries the
+/// full address: `"<street>, <postcode> <place>"` when the heading is the
+/// brand / name, or just `"<postcode> <place>"` when the heading already IS
+/// the street (last-resort fallback). Whichever pieces the upstream left
+/// empty are dropped, never rendered as an orphan comma.
+///
+/// Shared by `StationBrandHeader` (renders it) and
+/// `stationHeaderExpandedHeight` (measures it — #3902), so the sliver band
+/// is sized from exactly the text the header paints.
+String? stationHeaderSubtitle(Station s) {
+  // i18n-ignore: language-neutral postal format mask.
+  final city = '${s.postCode} ${s.place}'.trim();
+  if (stationDisplayHeading(s) != s.street) {
+    final line = [
+      if (s.street.isNotEmpty) s.street,
+      if (city.isNotEmpty) city,
+    ].join(', ');
+    return line.isEmpty ? null : line;
+  }
+  return city.isEmpty ? null : city;
+}

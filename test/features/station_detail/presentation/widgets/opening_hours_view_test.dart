@@ -40,8 +40,11 @@ void main() {
         ],
       );
 
-  group('OpeningHoursView — status line', () {
-    testWidgets('open → "Open · Closes 19:30"', (tester) async {
+  group('OpeningHoursView — no open-state hero (#3902)', () {
+    testWidgets(
+        'the card renders the schedule only — no "Open · Closes 19:30" line: '
+        'the header status row is the ONE place the open state is said',
+        (tester) async {
       await pumpApp(
         tester,
         SingleChildScrollView(
@@ -50,89 +53,11 @@ void main() {
       );
 
       expect(find.byKey(const ValueKey('opening-hours-status-line')),
-          findsOneWidget);
-      // RichText splits the headline + detail across spans; assert on the
-      // composed text via the rich-text matcher.
-      expect(
-        find.textContaining('Open', findRichText: true),
-        findsWidgets,
-      );
-      expect(
-        find.textContaining('Closes 19:30', findRichText: true),
-        findsOneWidget,
-      );
-    });
-
-    testWidgets('closing soon → amber, still "Closes …"', (tester) async {
-      // 19:00 on a Wednesday → closes 19:30, i.e. 30 min away (< 60).
-      final soon = DateTime(2026, 6, 3, 19, 0);
-      await pumpApp(
-        tester,
-        SingleChildScrollView(
-          child: OpeningHoursView(hours: businessWeek(), now: soon),
-        ),
-      );
-      expect(
-        find.textContaining('Closes 19:30', findRichText: true),
-        findsOneWidget,
-      );
-    });
-
-    testWidgets('closed today, opens later same day → "Opens 06:30"',
-        (tester) async {
-      // 05:00 Wednesday → before today's 06:30 open.
-      final early = DateTime(2026, 6, 3, 5, 0);
-      await pumpApp(
-        tester,
-        SingleChildScrollView(
-          child: OpeningHoursView(hours: businessWeek(), now: early),
-        ),
-      );
-      expect(
-        find.textContaining('Closed', findRichText: true),
-        findsWidgets,
-      );
-      expect(
-        find.textContaining('Opens 06:30', findRichText: true),
-        findsOneWidget,
-      );
-    });
-
-    testWidgets('closed, opens another day → "Opens Mon 06:30"',
-        (tester) async {
-      // Sunday 12:00 — Sunday is closed, next opening is Monday 06:30.
-      final sunday = DateTime(2026, 6, 7, 12, 0); // 2026-06-07 is a Sunday.
-      await pumpApp(
-        tester,
-        SingleChildScrollView(
-          child: OpeningHoursView(hours: businessWeek(), now: sunday),
-        ),
-      );
-      expect(
-        find.textContaining('Opens Mon 06:30', findRichText: true),
-        findsOneWidget,
-      );
-    });
-
-    testWidgets('unknown schedule → status line hidden', (tester) async {
-      // Every regular day unknown, but a holiday row keeps the view off the
-      // no-data path → the status line must hide while the table renders.
-      final unknown = WeeklyOpeningHours(
-        availability: OpeningHoursAvailability.partial,
-        days: [
-          for (final d in kRegularWeekdays)
-            DayHours(day: d, state: DayState.unknown),
-          DayHours.closedDay(OpeningDay.publicHoliday),
-        ],
-      );
-      await pumpApp(
-        tester,
-        SingleChildScrollView(
-          child: OpeningHoursView(hours: unknown, now: wednesday),
-        ),
-      );
-      expect(find.byKey(const ValueKey('opening-hours-status-line')),
           findsNothing);
+      expect(find.textContaining('Closes', findRichText: true), findsNothing);
+      expect(find.textContaining('Open ·', findRichText: true), findsNothing);
+      // The schedule itself is intact.
+      expect(find.text('06:30–19:30'), findsOneWidget);
     });
   });
 
@@ -151,10 +76,11 @@ void main() {
 
       expect(find.byKey(const ValueKey('opening-hours-24h-row')),
           findsOneWidget);
-      expect(find.byKey(const ValueKey('opening-hours-24h-badge')),
-          findsOneWidget);
       expect(find.text('Open 24 hours'), findsOneWidget);
-      expect(find.text('24h'), findsOneWidget);
+      // #3902 — the `24h` badge went with the status hero; the row says it.
+      expect(find.byKey(const ValueKey('opening-hours-24h-badge')),
+          findsNothing);
+      expect(find.text('24h'), findsNothing);
       // No collapsed-week expand affordance for a 24/7 station.
       expect(find.byKey(const ValueKey('opening-hours-expand-toggle')),
           findsNothing);
@@ -270,7 +196,7 @@ void main() {
 
   group('OpeningHoursView — 24/7 automate (#2742)', () {
     testWidgets(
-        'automate + staffed → "24/7 automate" line AND the staffed schedule '
+        'automate + staffed → self-service line AND the staffed schedule '
         'AND Sunday "Closed", never a lone "Open 24 hours" row', (tester) async {
       // The Esso 34120008 shape: pump 24/7, boutique Mon–Sat staffed, Sun
       // closed. automate24h is the orthogonal indicator.
@@ -282,10 +208,11 @@ void main() {
         ),
       );
 
-      // The new 24/7-automate line is present …
+      // The 24/7-automate line is present …
       expect(find.byKey(const ValueKey('opening-hours-automate-24h')),
           findsOneWidget);
-      expect(find.text('24/7 automate'), findsOneWidget);
+      expect(find.text('Self-service pump 24/7 (card payment)'),
+          findsOneWidget);
       // … alongside the staffed schedule (not collapsed to a single row) …
       expect(find.byKey(const ValueKey('opening-hours-24h-row')), findsNothing);
       expect(find.text('06:30–19:30'), findsOneWidget);
@@ -305,17 +232,15 @@ void main() {
           ),
         ),
       );
-      // Pump-only: the single 24h row + 24h badge are kept …
+      // Pump-only: the single 24h row is kept …
       expect(find.byKey(const ValueKey('opening-hours-24h-row')),
-          findsOneWidget);
-      expect(find.byKey(const ValueKey('opening-hours-24h-badge')),
           findsOneWidget);
       // … plus the explicit automate line.
       expect(find.byKey(const ValueKey('opening-hours-automate-24h')),
           findsOneWidget);
     });
 
-    testWidgets('no automate → no "24/7 automate" line', (tester) async {
+    testWidgets('no automate → no self-service line', (tester) async {
       await pumpApp(
         tester,
         SingleChildScrollView(
@@ -324,6 +249,70 @@ void main() {
       );
       expect(find.byKey(const ValueKey('opening-hours-automate-24h')),
           findsNothing);
+    });
+
+    testWidgets(
+        '#3902 the automate line is informational: muted colour, no tap '
+        'target, localised as the NOUN (fr "Automate", not "Automatiser")',
+        (tester) async {
+      final esso = businessWeek().copyWith(automate24h: true);
+      await pumpApp(
+        tester,
+        SingleChildScrollView(
+          child: OpeningHoursView(hours: esso, now: wednesday),
+        ),
+      );
+
+      final line = find.byKey(const ValueKey('opening-hours-automate-24h'));
+      // Not tappable — no button / ink / gesture wrapper anywhere inside.
+      expect(
+        find.descendant(of: line, matching: find.byType(InkWell)),
+        findsNothing,
+      );
+      expect(
+        find.descendant(of: line, matching: find.byType(GestureDetector)),
+        findsNothing,
+      );
+      expect(
+        find.descendant(of: line, matching: find.byType(ButtonStyleButton)),
+        findsNothing,
+      );
+      // Neutral onSurfaceVariant colour, regular weight (it used to be bold
+      // green — it read as a link).
+      final context = tester.element(line);
+      final muted = Theme.of(context).colorScheme.onSurfaceVariant;
+      final text = tester.widget<Text>(
+        find.descendant(of: line, matching: find.byType(Text)),
+      );
+      expect(text.style?.color, muted);
+      expect(text.style?.fontWeight, isNot(FontWeight.w600));
+      final icon = tester.widget<Icon>(
+        find.descendant(of: line, matching: find.byType(Icon)),
+      );
+      expect(icon.icon, Icons.local_gas_station);
+      expect(icon.color, muted);
+
+      // French: the noun.
+      await pumpApp(
+        tester,
+        SingleChildScrollView(
+          child: OpeningHoursView(hours: esso, now: wednesday),
+        ),
+        locale: const Locale('fr'),
+      );
+      expect(find.text('Automate 24h/24 7j/7 (paiement par carte)'),
+          findsOneWidget);
+      expect(find.textContaining('Automatiser'), findsNothing);
+
+      // German.
+      await pumpApp(
+        tester,
+        SingleChildScrollView(
+          child: OpeningHoursView(hours: esso, now: wednesday),
+        ),
+        locale: const Locale('de'),
+      );
+      expect(find.text('Tankautomat 24/7 (Kartenzahlung)'), findsOneWidget);
     });
   });
 

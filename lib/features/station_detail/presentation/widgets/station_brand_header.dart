@@ -1,16 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
-import '../../../../core/utils/geo_utils.dart';
-import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/widgets/brand_logo.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/station.dart';
 import 'station_brand_helpers.dart';
+import 'station_header_metrics.dart';
 
 /// Brand logo + station name block at the top of the station detail body.
 ///
@@ -19,6 +16,16 @@ import 'station_brand_helpers.dart';
 /// brand was a bug or the station genuinely had no chain affiliation.
 /// Now we also show an explicit "Station indépendante" subtitle when the
 /// parser flagged the station with the independent sentinel.
+///
+/// #3902 — the round "directions" button that used to sit at the end of
+/// this row (#3344) is gone: the screen already carries the extended
+/// "Navigate" FAB (#3337), and two affordances for the same action read as
+/// two different actions. The FAB is the ONE navigate action on both the
+/// compact and the wide layout.
+///
+/// The text styles and gaps below are the ones `stationHeaderExpandedHeight`
+/// measures — keep [kBrandLogoSize] / [kBrandLogoGap] / the style lookups in
+/// sync with that helper, or the collapsing header band mis-sizes.
 class StationBrandHeader extends StatelessWidget {
   final Station station;
 
@@ -29,91 +36,43 @@ class StationBrandHeader extends StatelessWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
 
-    // #1996 — the dedicated body Address section is gone (it just
-    // duplicated the street the AppBar already showed). Fold the
-    // postal code + place into the brand-header subtitle so the city
-    // info still reaches the user. Composed as "<street>, <postcode>
-    // <place>" — falls back gracefully to whichever pieces the upstream
-    // populated. // i18n-ignore: language-neutral postal format mask.
-    final addressLine = [
-      if (station.street.isNotEmpty) station.street,
-      if (station.postCode.isNotEmpty || station.place.isNotEmpty)
-        '${station.postCode} ${station.place}'.trim(),
-    ].join(', ');
-
     // #2161 — when the brand is empty/sentinel, fall back to the
     // station name before the street. Matches the home-widget builder
     // so a station that displays as "Intermarché" in the widget reads
-    // as "Intermarché" in the detail header too. `headingIsBrandOrName`
-    // tracks whether the heading is the brand/name (and therefore the
-    // address should appear as a subtitle) or the street fallback (in
-    // which case only the postCode + place should appear below).
+    // as "Intermarché" in the detail header too. The subtitle carries the
+    // address (or just postcode + place when the heading IS the street).
     final heading = stationDisplayHeading(station);
-    final headingIsBrandOrName = heading != station.street;
+    final subtitle = stationHeaderSubtitle(station);
 
     return Semantics(
-      label: headingIsBrandOrName && heading != addressLine
-          ? '$heading, $addressLine'
-          : heading,
+      label: subtitle != null ? '$heading, $subtitle' : heading,
       header: true,
       excludeSemantics: true,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          BrandLogo(brand: station.brand, size: 48),
-          const SizedBox(width: 12),
+          BrandLogo(brand: station.brand, size: kBrandLogoSize),
+          const SizedBox(width: kBrandLogoGap),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  heading,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                if (headingIsBrandOrName)
-                  Text(addressLine, style: theme.textTheme.bodyLarge)
-                else if (addressLine != station.street &&
-                    addressLine.isNotEmpty)
-                  // Heading IS the street — still surface postal code +
-                  // place on a second line so the user gets the city.
-                  Text(
-                    '${station.postCode} ${station.place}'.trim(),
-                    style: theme.textTheme.bodyLarge,
-                  ),
+                Text(heading, style: headerHeadingStyle(theme)),
+                if (subtitle != null)
+                  Text(subtitle, style: headerSubtitleStyle(theme)),
                 if (isIndependentSentinel(station))
                   Padding(
-                    padding: const EdgeInsets.only(top: 2),
+                    padding: const EdgeInsets.only(
+                      top: kIndependentLineGap,
+                    ),
                     child: Text(
                       l10n.independentStation,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                        fontStyle: FontStyle.italic,
-                      ),
+                      style: headerIndependentStyle(theme),
                     ),
                   ),
               ],
             ),
           ),
-          // #3344 — a navigate button glued to the address: the spot the user
-          // is reading the location is the most natural place to reach for
-          // "take me there". Same behaviour as the directions FAB (#3337) —
-          // opens the device's default maps app at the station. Only shown when
-          // the coordinates are usable (an unusable pin can't be navigated to).
-          if (isUsableCoord(station.lat, station.lng))
-            IconButton.filledTonal(
-              key: const Key('station_address_navigate'),
-              tooltip: l10n.navigate,
-              icon: const Icon(Icons.directions),
-              onPressed: () => unawaited(
-                NavigationUtils.openInMaps(
-                  station.lat,
-                  station.lng,
-                  label: hasRealBrand(station) ? station.brand : station.street,
-                ),
-              ),
-            ),
         ],
       ),
     );

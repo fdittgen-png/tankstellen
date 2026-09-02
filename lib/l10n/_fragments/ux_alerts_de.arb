@@ -1,0 +1,10 @@
+{
+  "stalePriceBadge": "Alter Preis",
+  "radiusAlertCenterChipGps": "Mein Standort",
+  "radiusAlertCenterChipMap": "Punkt auf der Karte",
+  "radiusAlertCenterChipPostal": "Postleitzahl {postalCode}",
+  "radiusAlertCenterClear": "Standort entfernen",
+  "radiusAlertBlockerLabel": "Geben Sie eine Bezeichnung ein",
+  "radiusAlertBlockerThreshold": "Geben Sie einen Schwellenwert über 0 ein",
+  "radiusAlertBlockerLocation": "Wählen Sie einen Standort"
+}

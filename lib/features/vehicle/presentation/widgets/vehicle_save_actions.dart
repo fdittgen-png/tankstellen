@@ -13,8 +13,8 @@ import '../../providers/vehicle_providers.dart';
 import '../../../../core/logging/error_logger.dart';
 
 /// Cross-cutting actions the edit-vehicle screen runs against
-/// Riverpod providers: default-profile sync, volumetric-efficiency
-/// reset, latest-odometer lookup. Gathering them here keeps the
+/// Riverpod providers: default-profile sync, pump-calibration reset,
+/// latest-odometer lookup. Gathering them here keeps the
 /// screen focused on form composition.
 extension VehicleSaveActions on WidgetRef {
   /// #710 — auto-set [profile] as the active profile's default and
@@ -42,20 +42,22 @@ extension VehicleSaveActions on WidgetRef {
     }
   }
 
-  /// #815 — reset the learned η_v for [vehicleId] back to the
-  /// default (0.85) and clear the sample counter.
-  Future<void> resetVolumetricEfficiency(String vehicleId) async {
+  /// #3901 (Epic #3886) — reset the learned pump-anchored fuel gain for
+  /// [vehicleId]: gain back to 1.0, sample counter 0, learned-at cleared.
+  /// The next closing full-to-full tank window re-anchors from scratch.
+  Future<void> resetPumpGain(String vehicleId) async {
     try {
       final list = read(vehicleProfileListProvider);
       final existing = list.where((v) => v.id == vehicleId).firstOrNull;
       if (existing == null) return;
       final cleared = existing.copyWith(
-        volumetricEfficiency: 0.85,
-        volumetricEfficiencySamples: 0,
+        pumpGain: 1.0,
+        pumpGainSamples: 0,
+        pumpGainUpdatedAt: null,
       );
       await read(vehicleProfileListProvider.notifier).save(cleared);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'EditVehicleScreen: VE reset failed'}));
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'EditVehicleScreen: pump-gain reset failed'}));
     }
   }
 

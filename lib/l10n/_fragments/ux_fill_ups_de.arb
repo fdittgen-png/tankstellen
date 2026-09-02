@@ -1,0 +1,10 @@
+{
+  "fillUpOdometerFromLastFillUp": "Aus Ihrer letzten Tankfüllung vorausgefüllt",
+  "fillUpStationLabel": "Tankstelle",
+  "fillUpStationChange": "Ändern",
+  "pickStationSectionLast": "Letzte Tankstelle",
+  "pickStationSectionFavorites": "Favoriten",
+  "pickStationSectionNearby": "In der Nähe",
+  "pickStationNearbyEmpty": "Keine aktuelle Suche — suchen Sie im Tab „Suche“ nach Tankstellen, dann erscheinen die nächstgelegenen hier.",
+  "pickStationLastFillUpAt": "Letzte Tankfüllung: {date}"
+}

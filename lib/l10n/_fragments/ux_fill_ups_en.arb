@@ -1,0 +1,18 @@
+{
+  "fillUpOdometerFromLastFillUp": "Pre-filled from your last fill-up",
+  "@fillUpOdometerFromLastFillUp": {"description": "Helper text under the odometer field of the Add fill-up form when the value was pre-filled from the vehicle's most recent fill-up (#3899)."},
+  "fillUpStationLabel": "Station",
+  "@fillUpStationLabel": {"description": "Label of the read-only station row in the 'Where you were' section of the Add fill-up form (#3899)."},
+  "fillUpStationChange": "Change",
+  "@fillUpStationChange": {"description": "Text action next to the chosen station on the Add fill-up form; re-opens the station picker (#3899)."},
+  "pickStationSectionLast": "Last station",
+  "@pickStationSectionLast": {"description": "Section header on the station picker for the station of the most recent fill-up (#3906)."},
+  "pickStationSectionFavorites": "Favorites",
+  "@pickStationSectionFavorites": {"description": "Section header on the station picker listing the user's favorite stations (#3906)."},
+  "pickStationSectionNearby": "Nearby",
+  "@pickStationSectionNearby": {"description": "Section header on the station picker listing the nearest stations from the last search (#3906)."},
+  "pickStationNearbyEmpty": "No recent search — search for stations on the Search tab and the nearest ones will appear here.",
+  "@pickStationNearbyEmpty": {"description": "One-line hint under the Nearby header of the station picker when no search result is cached (#3906)."},
+  "pickStationLastFillUpAt": "Last fill-up: {date}",
+  "@pickStationLastFillUpAt": {"description": "Subtitle of the 'Last station' row on the station picker; {date} is a localized date.", "placeholders": {"date": {"type": "String"}}}
+}

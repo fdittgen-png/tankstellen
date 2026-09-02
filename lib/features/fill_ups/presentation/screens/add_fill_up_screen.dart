@@ -40,6 +40,7 @@ import '../widgets/fill_up_scan_handlers.dart';
 import '../widgets/fill_up_share_scan_handlers.dart';
 import '../widgets/fill_up_variance_prompt.dart';
 import '../widgets/fill_up_warning_dialog.dart';
+import '../widgets/known_station_lookup.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/utils/unit_formatter.dart';
 
@@ -208,15 +209,9 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen>
         tooltip: l.tooltipBack,
         onPressed: () => Navigator.maybePop(context),
       ),
-      // #3073 — app-bar save stays above the iOS keyboard, which covers the
-      // bottom save bar and has no system dismiss. Bottom bar kept otherwise.
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.check),
-          tooltip: l.save,
-          onPressed: _save,
-        ),
-      ],
+      // #3899 — ONE save affordance: the pinned bottom bar. The #3073
+      // app-bar check-mark is gone; the keyboard's drag-to-dismiss below
+      // still uncovers the bar on iOS.
       bodyPadding: EdgeInsets.zero,
       body: Form(
         key: _formKey,
@@ -238,6 +233,8 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen>
               onScanReceipt: _scanReceipt,
               onPasteReceipt: _pasteReceiptText,
               stationName: widget.stationName,
+              stationAddress: _stationAddress(),
+              onChangeStation: _changeStation,
               dateLabel: dateStr,
               onPickDate: _pickDate,
               vehicleId: _vehicleId,

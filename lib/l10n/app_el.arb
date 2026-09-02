@@ -169,7 +169,6 @@
   "settingsStorageDetail": "Κλειδί API, ενεργό προφίλ",
   "allFuels": "Όλα",
   "priceAlerts": "Ειδοποιήσεις τιμών",
-  "noPriceAlerts": "Χωρίς ειδοποιήσεις τιμών",
   "noPriceAlertsHint": "Δημιουργήστε ειδοποίηση από τη σελίδα λεπτομερειών ενός σταθμού.",
   "alertDeleted": "Ειδοποίηση \"{name}\" διαγράφηκε",
   "createAlert": "Δημιουργία ειδοποίησης τιμής",
@@ -492,7 +491,6 @@
   "liters": "Λίτρα",
   "odometerKm": "Χιλιόμετρα (km)",
   "notesOptional": "Σημειώσεις (προαιρετικό)",
-  "stationPreFilled": "Σταθμός προεπιλεγμένος",
   "statAvgConsumption": "Μέση L/100km",
   "statAvgCostPerKm": "Μέσο κόστος/km",
   "statTotalLiters": "Συνολικά λίτρα",
@@ -882,8 +880,6 @@
   "obd2PauseBannerTitle": "Η σύνδεση OBD2 χάθηκε — η καταγραφή έχει παυτεί",
   "obd2PauseBannerResume": "Συνέχεια καταγραφής",
   "obd2PauseBannerEnd": "Τέλος καταγραφής",
-  "veResetConfirmTitle": "Επαναφορά ογκομετρικής απόδοσης;",
-  "veResetConfirmBody": "Αυτό θα απορρίψει την εκμαθημένη ογκομετρική απόδοση (η_v) και θα επαναφέρει την προεπιλεγμένη τιμή (0.85). Οι εκτιμήσεις ροής καυσίμου θα επιστρέψουν στη σταθερά κατασκευαστή μέχρι ο βαθμονομητής να συλλέξει νέα δείγματα.",
   "alertsRadiusSectionTitle": "Ειδοποιήσεις ακτίνας",
   "alertsRadiusAdd": "Προσθήκη ειδοποίησης ακτίνας",
   "alertsRadiusEmptyTitle": "Δεν υπάρχουν ειδοποιήσεις ακτίνας ακόμα",
@@ -899,8 +895,6 @@
   "obd2ConnectedTooltip": "OBD2 συνδεδεμένο: {adapterName}",
   "obd2PairChipTooltip": "Σύζευξη προσαρμογέα OBD2",
   "fillUpSavedSnackbar": "Ο ανεφοδιασμός αποθηκεύτηκε",
-  "radiusAlertsEntryTitle": "Ειδοποιήσεις ακτίνας & στατιστικά",
-  "radiusAlertsEntrySubtitle": "Ειδοποίηση όταν πέφτουν οι τιμές κοντά σας",
   "notFoundTitle": "Η σελίδα δεν βρέθηκε",
   "notFoundBody": "Το \"{location}\" δεν βρέθηκε.",
   "notFoundHomeButton": "Αρχική",
@@ -943,7 +937,6 @@
   "autoRecordBackgroundLocationOpenSettings": "Άνοιγμα ρυθμίσεων",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Απαιτείται άδεια τοποθεσίας",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Αδύνατη αίτηση τοποθεσίας παρασκηνίου",
-  "autoRecordPairAdapterLinkText": "Συζεύξτε έναν προσαρμογέα στην παρακάτω ενότητα για ενεργοποίηση αυτόματης καταγραφής",
   "exportBackupReady": "Αντίγραφο ασφαλείας έτοιμο — επιλέξτε προορισμό",
   "exportBackupFailed": "Αποτυχία εξαγωγής αντιγράφου — παρακαλώ δοκιμάστε ξανά",
   "brokenMapChipDisclaimer": "Ύποπτες ενδείξεις MAP",
@@ -973,10 +966,6 @@
   "calibrationSourceDefault": "(προεπιλογή)",
   "calibrationSourceManual": "(χειροκίνητο)",
   "calibrationResetToDetected": "Επαναφορά σε ανιχνευμένη τιμή",
-  "calibrationLearnerStatusCalibrated": "η_v: {eta} (βαθμονομημένο, {samples} δείγματα)",
-  "calibrationLearnerStatusLearning": "η_v: {eta} (εκμάθηση, {samples} δείγματα)",
-  "calibrationLearnerStatusNoSamples": "η_v: 0.85 (προεπιλογή — δεν υπάρχει πλήρης ανεφοδιασμός ακόμα)",
-  "calibrationLearnerEtaCompact": "η_v: {eta} · {samples} δείγματα",
   "consumptionAccuracyLabel": "Ακρίβεια: {level} · {band}",
   "consumptionAccuracyHigh": "Υψηλή",
   "consumptionAccuracyMedium": "Μέτρια",
@@ -984,7 +973,6 @@
   "consumptionAccuracyTooltipHigh": "Πλήρης βαθμονόμηση: ανεφοδιασμοί συν διαδρομές καταγεγραμμένες με OBD2. Η τιμή L/100 km ακολουθεί την πραγματικότητα με απόκλιση λίγων ποσοστιαίων μονάδων.",
   "consumptionAccuracyTooltipMedium": "Οι ανεφοδιασμοί έχουν αγκυρώσει το μοντέλο κατανάλωσης, αλλά δεν έχει τροφοδοτηθεί ακόμη διαδρομή OBD2. Καταγράψτε μία με συνδεδεμένο OBD2 για να φτάσετε σε υψηλή ακρίβεια.",
   "consumptionAccuracyTooltipLow": "Μόνο GPS — κανένας ανεφοδιασμός δεν έχει αγκυρώσει ακόμη το μοντέλο κατανάλωσης. Προσθέστε μερικούς πλήρεις ανεφοδιασμούς για να βελτιώσετε την ακρίβεια.",
-  "calibrationResetLearner": "Επαναφορά εκπαιδευτή",
   "calibrationBasisAtkinson": "Κύκλος Atkinson",
   "calibrationBasisVnt": "VNT diesel + DI",
   "calibrationBasisTurboDi": "Υπερτροφοδοτούμενο + DI",
@@ -1266,7 +1254,6 @@
   "radiusAlertMapPickerConfirm": "Επιβεβαίωση",
   "radiusAlertMapPickerCancel": "Ακύρωση",
   "radiusAlertMapPickerHint": "Σύρετε τον χάρτη για τοποθέτηση κέντρου ειδοποίησης",
-  "radiusAlertCenterFromMap": "Τοποθεσία χάρτη",
   "refuelUnitPerKwh": "/kWh",
   "refuelUnitPerSession": "/συνεδρία",
   "speedConsumptionCardTitle": "Κατανάλωση ανά ταχύτητα",
@@ -1387,7 +1374,6 @@
   "vinDecodeTooltip": "Αποκωδικοποίηση VIN",
   "vinConfirmAction": "Ναι, αυτόματη συμπλήρωση",
   "vinModifyAction": "Χειροκίνητη τροποποίηση",
-  "veResetAction": "Επαναφορά ογκομετρικής απόδοσης",
   "vehicleReadVinFromCarButton": "Ανάγνωση VIN από αυτοκίνητο",
   "vehicleReadVinFromCarTooltip": "Ανάγνωση VIN από συζευγμένο προσαρμογέα OBD2",
   "vehicleReadVinFailedUnsupportedSnackbar": "VIN μη διαθέσιμο (Mode 09 PID 02 δεν υποστηρίζεται σε οχήματα πριν το 2005)",
@@ -3250,54 +3236,12 @@
   "@consumptionMonthlyClimbLabel": {
     "description": "MT — needs native review"
   },
-  "openNow": "Ανοιχτό",
-  "@openNow": {
-    "description": "MT — needs native review"
-  },
-  "openNowClosed": "Κλειστό",
-  "@openNowClosed": {
-    "description": "MT — needs native review"
-  },
   "openHoursUnknown": "Άγνωστες ώρες",
   "@openHoursUnknown": {
     "description": "MT — needs native review"
   },
-  "closesAt": "Κλείνει {time}",
-  "@closesAt": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "time": {
-        "type": "String"
-      }
-    }
-  },
-  "opensAt": "Ανοίγει {day} {time}",
-  "@opensAt": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "day": {
-        "type": "String"
-      },
-      "time": {
-        "type": "String"
-      }
-    }
-  },
-  "opensToday": "Ανοίγει {time}",
-  "@opensToday": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "time": {
-        "type": "String"
-      }
-    }
-  },
   "open24Hours": "Ανοιχτό 24 ώρες",
   "@open24Hours": {
-    "description": "MT — needs native review"
-  },
-  "badge24h": "24ω",
-  "@badge24h": {
     "description": "MT — needs native review"
   },
   "dayMon": "Δευτέρα",
@@ -3447,10 +3391,6 @@
   },
   "featureDescription_addFillUpShareIntentReceipt": "Κοινοποιήστε φωτογραφία απόδειξης από άλλη εφαρμογή για προσυμπλήρωση ανεφοδίασης — ημερομηνία, λίτρα, σύνολο και πρατήριο διαβάζονται στη συσκευή.",
   "@featureDescription_addFillUpShareIntentReceipt": {
-    "description": "MT — needs native review"
-  },
-  "openingHoursAutomate24h": "Αυτόματο 24/7",
-  "@openingHoursAutomate24h": {
     "description": "MT — needs native review"
   },
   "stopRadar": "Διακοπή ραντάρ",
@@ -4203,14 +4143,6 @@
   "featureLabel_voiceFeedback": "Φωνητική ανατροφοδότηση (σύνθεση ομιλίας)",
   "featureDescription_voiceFeedback": "Κεντρικός διακόπτης για κάθε εκφωνούμενη λειτουργία — τον φωνητικό προπονητή οδήγησης και τις ανακοινώσεις πρατηρίων. Απενεργοποιημένος, η εφαρμογή δεν ανοίγει ποτέ μηχανή σύνθεσης ομιλίας.",
   "tankReportTitle": "Αναφορά ρεζερβουάρ",
-  "tankReportHeadline": "{value} L/100 km",
-  "@tankReportHeadline": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportSincePrevious": "Από το προηγούμενο γεμάτο ρεζερβουάρ: {km} km · {liters} L · {cost}",
   "@tankReportSincePrevious": {
     "placeholders": {
@@ -4243,22 +4175,6 @@
   },
   "tankReportTrendFlat": "Στο ίδιο επίπεδο με το προηγούμενο ρεζερβουάρ",
   "tankReportNoPrevious": "Η εξέλιξη εμφανίζεται μετά το επόμενο γεμάτο ρεζερβουάρ.",
-  "tankReportCoverage": "Οι καταγραφές καλύπτουν το {pct} % αυτού του ρεζερβουάρ",
-  "@tankReportCoverage": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportRecordedAvg": "Καταγεγραμμένο τμήμα: {value} L/100 χλμ",
-  "@tankReportRecordedAvg": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportExplainHeader": "Τι υποδεικνύουν οι καταγραφές",
   "tankReportFactorHighRpm": "Ποσοστό υψηλών στροφών {cur} % (ήταν {prev} %)",
   "@tankReportFactorHighRpm": {
@@ -4305,22 +4221,6 @@
     }
   },
   "tankReportCaveat": "Οι καταγραφές είναι τυχαίες και καλύπτουν μόνο μέρος αυτού του ρεζερβουάρ — αυτές οι ενδείξεις είναι ενδεικτικές, όχι η πλήρης εικόνα.",
-  "tankReportCalibrationUnder": "Οι καταγεγραμμένες εκτιμήσεις είναι {pct} % κάτω από την ένδειξη της αντλίας",
-  "@tankReportCalibrationUnder": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportCalibrationOver": "Οι καταγεγραμμένες εκτιμήσεις είναι {pct} % πάνω από την ένδειξη της αντλίας",
-  "@tankReportCalibrationOver": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
   "qrLaunchConfirmTitle": "Άνοιγμα του σαρωμένου συνδέσμου;",
   "qrLaunchConfirmBody": "Αυτός ο κωδικός QR οδηγεί στο {host}. Ανοίγετε μόνο συνδέσμους που εμπιστεύεστε.",
   "@qrLaunchConfirmBody": {
@@ -4939,5 +4839,299 @@
         "type": "String"
       }
     }
+  },
+  "openingHoursAutomate24h": "Self-service pump 24/7 (card payment)",
+  "@openingHoursAutomate24h": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "stalePriceBadge": "Old price",
+  "@stalePriceBadge": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "radiusAlertCenterChipGps": "My position",
+  "@radiusAlertCenterChipGps": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "radiusAlertCenterChipMap": "Map point",
+  "@radiusAlertCenterChipMap": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "radiusAlertCenterChipPostal": "Postal code {postalCode}",
+  "@radiusAlertCenterChipPostal": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "postalCode": {
+        "type": "String",
+        "example": "34550"
+      }
+    }
+  },
+  "radiusAlertCenterClear": "Clear location",
+  "@radiusAlertCenterClear": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "radiusAlertBlockerLabel": "Enter a label",
+  "@radiusAlertBlockerLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "radiusAlertBlockerThreshold": "Enter a threshold above 0",
+  "@radiusAlertBlockerThreshold": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "radiusAlertBlockerLocation": "Choose a location",
+  "@radiusAlertBlockerLocation": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpOdometerFromLastFillUp": "Pre-filled from your last fill-up",
+  "@fillUpOdometerFromLastFillUp": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpStationLabel": "Station",
+  "@fillUpStationLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpStationChange": "Change",
+  "@fillUpStationChange": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pickStationSectionLast": "Last station",
+  "@pickStationSectionLast": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pickStationSectionFavorites": "Favorites",
+  "@pickStationSectionFavorites": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pickStationSectionNearby": "Nearby",
+  "@pickStationSectionNearby": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pickStationNearbyEmpty": "No recent search — search for stations on the Search tab and the nearest ones will appear here.",
+  "@pickStationNearbyEmpty": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pickStationLastFillUpAt": "Last fill-up: {date}",
+  "@pickStationLastFillUpAt": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "stationStatusWithFreshness": "{status} · updated {ago} ago",
+  "@stationStatusWithFreshness": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "status": {
+        "type": "String",
+        "example": "Open"
+      },
+      "ago": {
+        "type": "String",
+        "example": "< 1 min"
+      }
+    }
+  },
+  "pricesNotSoldHere": "Not sold here: {fuels}",
+  "@pricesNotSoldHere": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuels": {
+        "type": "String",
+        "example": "Super E5, Super E10"
+      }
+    }
+  },
+  "tankReportRecordedTripsCoverage": "Recorded trips cover {pct} % of this tank",
+  "@tankReportRecordedTripsCoverage": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportRecordedTripsAvg": "Recorded trips: {value}",
+  "@tankReportRecordedTripsAvg": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportRecordedTripsOverestimate": "Your recorded trips overestimate consumption by {pct} %",
+  "@tankReportRecordedTripsOverestimate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportRecordedTripsUnderestimate": "Your recorded trips underestimate consumption by {pct} %",
+  "@tankReportRecordedTripsUnderestimate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "trajetObd2DegradedSubtitle": "No engine data — GPS estimate",
+  "@trajetObd2DegradedSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleTopicAdapterNone": "None",
+  "@vehicleTopicAdapterNone": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleTopicCalibrationTitle": "Calibration",
+  "@vehicleTopicCalibrationTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleTopicAdvancedBadge": "Advanced",
+  "@vehicleTopicAdvancedBadge": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleTopicCalibrationStatus": "Baseline {coverage} % · {mode}",
+  "@vehicleTopicCalibrationStatus": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "coverage": {
+        "type": "int",
+        "example": "78"
+      },
+      "mode": {
+        "type": "String",
+        "example": "Rule-based"
+      }
+    }
+  },
+  "vehicleTopicRemindersCount": "{count, plural, =0{No reminders} =1{1 reminder} other{{count} reminders}}",
+  "@vehicleTopicRemindersCount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "vehicleTopicAutoRecordOn": "On",
+  "@vehicleTopicAutoRecordOn": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleTopicAutoRecordOff": "Off",
+  "@vehicleTopicAutoRecordOff": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleTopicAutoRecordPairLinkText": "Pair an adapter under “OBD2 adapter” to enable auto-recording",
+  "@vehicleTopicAutoRecordPairLinkText": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleBaselineCoverageSamples": "{covered} / {max} samples",
+  "@vehicleBaselineCoverageSamples": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "covered": {
+        "type": "int",
+        "example": "210"
+      },
+      "max": {
+        "type": "int",
+        "example": "270"
+      }
+    }
+  },
+  "vehicleBaselineRawSamples": "{count, plural, =1{1 sample} other{{count} samples}}",
+  "@vehicleBaselineRawSamples": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "954"
+      }
+    }
+  },
+  "calibrationModeRuleDescription": "Sorts each driving sample into one situation using fixed speed and load thresholds.",
+  "@calibrationModeRuleDescription": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "calibrationModeFuzzyDescription": "Splits each sample across neighbouring situations by how well it fits each one — smoother estimates around the boundaries.",
+  "@calibrationModeFuzzyDescription": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pumpGainChipNotCalibrated": "Not pump-calibrated yet",
+  "@pumpGainChipNotCalibrated": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pumpGainChipCalibrated": "{fills, plural, =1{Pump-calibrated · 1 fill-up · ±{percent} %} other{Pump-calibrated · {fills} fill-ups · ±{percent} %}}",
+  "@pumpGainChipCalibrated": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fills": {
+        "type": "int",
+        "example": "6"
+      },
+      "percent": {
+        "type": "int",
+        "example": "7"
+      }
+    }
+  },
+  "pumpGainResetAction": "Reset pump calibration",
+  "@pumpGainResetAction": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pumpGainResetConfirmTitle": "Reset pump calibration?",
+  "@pumpGainResetConfirmTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "pumpGainResetConfirmBody": "This discards the fuel gain learned from your fill-ups. OBD2 consumption estimates fall back to the uncorrected figure until the next full-to-full tank window re-learns it.",
+  "@pumpGainResetConfirmBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

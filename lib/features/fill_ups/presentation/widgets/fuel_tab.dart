@@ -59,7 +59,15 @@ class FuelTab extends ConsumerWidget {
     // #2494 — clears the floating add-fill-up FAB hosted by PageScaffold.
     // The Scaffold lifts the FAB clear of the system inset, so we must NOT
     // add `viewPadding.bottom` on top of the shared clearance constant.
-    const bottomInset = kFabScrollClearance;
+    // #3903 — an explicit `padding:` makes the ListView DROP the
+    // MediaQuery safe-area padding it would otherwise add itself, while
+    // the Scaffold still lifts the FAB by that inset — so the extended
+    // FAB overlapped the last rows wherever `padding.bottom` is non-zero
+    // (nav-rail layouts, gesture bars). Re-add exactly the consumed
+    // `MediaQuery.padding` (not `viewPadding`) so the clearance stays
+    // FAB height + margins above the FAB's real position.
+    final bottomInset =
+        kFabScrollClearance + MediaQuery.paddingOf(context).bottom;
 
     final headerChildren = <Widget>[
       HelpBanner(
@@ -128,14 +136,14 @@ class FuelTab extends ConsumerWidget {
     if (isWideScreen(context)) {
       return ResponsiveMasterDetail(
         master: SingleChildScrollView(
-          padding: const EdgeInsets.only(top: 8, bottom: bottomInset),
+          padding: EdgeInsets.only(top: 8, bottom: bottomInset),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: headerChildren,
           ),
         ),
         detail: ListView.builder(
-          padding: const EdgeInsets.only(top: 8, bottom: bottomInset),
+          padding: EdgeInsets.only(top: 8, bottom: bottomInset),
           itemCount: fillUps.length,
           itemBuilder: (context, index) => buildFillUpRow(index),
         ),
@@ -147,7 +155,7 @@ class FuelTab extends ConsumerWidget {
       onRefresh: () async => ref.invalidate(fillUpListProvider),
       child: ListView.builder(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.only(top: 8, bottom: bottomInset),
+        padding: EdgeInsets.only(top: 8, bottom: bottomInset),
         itemCount: fillUps.length + 1,
         itemBuilder: (context, index) {
           if (index == 0) {

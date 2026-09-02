@@ -12,8 +12,8 @@ part of 'edit_vehicle_screen.dart';
 mixin _VehicleCatalogResetAction on _VehicleEditActions {
   /// #3651 — re-initialize the catalog-backed spec fields (tank
   /// capacity, rated power, displacement) from the reference vehicle
-  /// database, after an explicit confirm. The η_v calibration keeps its
-  /// own dedicated reset (#815) — this action is about the static
+  /// database, after an explicit confirm. The pump calibration keeps its
+  /// own dedicated reset (#3901) — this action is about the static
   /// manufacturer spec, not the learned state.
   Future<void> _resetFromCatalog() async {
     final id = _existingId;

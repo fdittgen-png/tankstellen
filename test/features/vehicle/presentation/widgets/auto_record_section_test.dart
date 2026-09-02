@@ -599,10 +599,11 @@ void main() {
           find.byKey(const Key('autoRecordPairAdapterLink')),
           findsOneWidget,
         );
-        // Canonical copy from the en ARB fragment.
+        // Canonical copy from the en ARB fragment (#3900 — the adapter
+        // is paired on its own topic screen, not "below").
         expect(
           find.text(
-            'Pair an adapter in the section below to enable '
+            'Pair an adapter under “OBD2 adapter” to enable '
             'auto-recording',
           ),
           findsOneWidget,

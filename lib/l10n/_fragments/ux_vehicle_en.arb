@@ -1,0 +1,88 @@
+{
+  "vehicleTopicAdapterNone": "None",
+  "@vehicleTopicAdapterNone": {
+    "description": "Status line of the 'OBD2 adapter' topic tile on the Edit-vehicle screen when no adapter is paired (#3900)."
+  },
+  "vehicleTopicCalibrationTitle": "Calibration",
+  "@vehicleTopicCalibrationTitle": {
+    "description": "Title of the Calibration topic tile + sub-screen on the Edit-vehicle screen (baseline coverage, calibration mode, advanced overrides, resets) (#3900)."
+  },
+  "vehicleTopicAdvancedBadge": "Advanced",
+  "@vehicleTopicAdvancedBadge": {
+    "description": "Small outlined badge on the Calibration topic tile marking it as an advanced topic (#3900)."
+  },
+  "vehicleTopicCalibrationStatus": "Baseline {coverage} % · {mode}",
+  "@vehicleTopicCalibrationStatus": {
+    "description": "Status line of the Calibration topic tile: baseline coverage percent and the active calibration mode name (#3900).",
+    "placeholders": {
+      "coverage": {"type": "int", "example": "78"},
+      "mode": {"type": "String", "example": "Rule-based"}
+    }
+  },
+  "vehicleTopicRemindersCount": "{count, plural, =0{No reminders} =1{1 reminder} other{{count} reminders}}",
+  "@vehicleTopicRemindersCount": {
+    "description": "Status line of the Service reminders topic tile — number of reminders on this vehicle (#3900).",
+    "placeholders": {
+      "count": {"type": "int", "example": "2"}
+    }
+  },
+  "vehicleTopicAutoRecordOn": "On",
+  "@vehicleTopicAutoRecordOn": {
+    "description": "Status line of the Auto-record topic tile when hands-free auto-record is enabled for this vehicle (#3900)."
+  },
+  "vehicleTopicAutoRecordOff": "Off",
+  "@vehicleTopicAutoRecordOff": {
+    "description": "Status line of the Auto-record topic tile when auto-record is disabled for this vehicle (#3900)."
+  },
+  "vehicleTopicAutoRecordPairLinkText": "Pair an adapter under “OBD2 adapter” to enable auto-recording",
+  "@vehicleTopicAutoRecordPairLinkText": {
+    "description": "Passive link on the auto-record card (#1400) pointing the user at the OBD2 adapter topic screen, the one place an adapter is paired (#3900)."
+  },
+  "vehicleBaselineCoverageSamples": "{covered} / {max} samples",
+  "@vehicleBaselineCoverageSamples": {
+    "description": "Tally under the aggregate baseline coverage bar: capped covered samples out of the maximum (9 situations × 30) (#3900).",
+    "placeholders": {
+      "covered": {"type": "int", "example": "210"},
+      "max": {"type": "int", "example": "270"}
+    }
+  },
+  "vehicleBaselineRawSamples": "{count, plural, =1{1 sample} other{{count} samples}}",
+  "@vehicleBaselineRawSamples": {
+    "description": "Secondary text under a per-situation baseline row showing the raw (uncapped) sample count once it exceeds the target (#3900).",
+    "placeholders": {
+      "count": {"type": "int", "example": "954"}
+    }
+  },
+  "calibrationModeRuleDescription": "Sorts each driving sample into one situation using fixed speed and load thresholds.",
+  "@calibrationModeRuleDescription": {
+    "description": "One-line plain-language description under the Rule-based calibration mode option on the Edit-vehicle Calibration topic (#3900)."
+  },
+  "calibrationModeFuzzyDescription": "Splits each sample across neighbouring situations by how well it fits each one — smoother estimates around the boundaries.",
+  "@calibrationModeFuzzyDescription": {
+    "description": "One-line plain-language description under the Fuzzy calibration mode option on the Edit-vehicle Calibration topic (#3900)."
+  },
+  "pumpGainChipNotCalibrated": "Not pump-calibrated yet",
+  "@pumpGainChipNotCalibrated": {
+    "description": "Neutral calibration pill on the consumption card (Developer mode) while no full-to-full tank window has closed yet, so the pump-anchored fuel gain is still 1.0 (#3901, Epic #3886)."
+  },
+  "pumpGainChipCalibrated": "{fills, plural, =1{Pump-calibrated · 1 fill-up · ±{percent} %} other{Pump-calibrated · {fills} fill-ups · ±{percent} %}}",
+  "@pumpGainChipCalibrated": {
+    "description": "Calibration pill on the consumption card (Developer mode) once the pump-anchored gain has been learned: number of full-to-full fill-ups folded in and the gain's distance from 1.0 in percent (#3901).",
+    "placeholders": {
+      "fills": {"type": "int", "example": "6"},
+      "percent": {"type": "int", "example": "7"}
+    }
+  },
+  "pumpGainResetAction": "Reset pump calibration",
+  "@pumpGainResetAction": {
+    "description": "Button on the Edit-vehicle Calibration topic (and confirm label of its dialog) that discards the learned pump-anchored fuel gain: gain 1.0, samples 0 (#3901)."
+  },
+  "pumpGainResetConfirmTitle": "Reset pump calibration?",
+  "@pumpGainResetConfirmTitle": {
+    "description": "Title of the confirm dialog shown before discarding the learned pump-anchored fuel gain (#3901)."
+  },
+  "pumpGainResetConfirmBody": "This discards the fuel gain learned from your fill-ups. OBD2 consumption estimates fall back to the uncorrected figure until the next full-to-full tank window re-learns it.",
+  "@pumpGainResetConfirmBody": {
+    "description": "Body of the confirm dialog shown before discarding the learned pump-anchored fuel gain (#3901)."
+  }
+}
