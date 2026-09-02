@@ -4743,30 +4743,12 @@
       }
     }
   },
-  "openingHoursAutomate24h": "Self-service pump 24/7 (card payment)",
-  "@openingHoursAutomate24h": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "stalePriceBadge": "Old price",
-  "@stalePriceBadge": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "radiusAlertCenterChipGps": "My position",
-  "@radiusAlertCenterChipGps": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "radiusAlertCenterChipMap": "Map point",
-  "@radiusAlertCenterChipMap": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "radiusAlertCenterChipPostal": "Postal code {postalCode}",
+  "openingHoursAutomate24h": "Selvbetjeningsstander døgnet rundt (kortbetaling)",
+  "stalePriceBadge": "Gammel pris",
+  "radiusAlertCenterChipGps": "Min position",
+  "radiusAlertCenterChipMap": "Punkt på kortet",
+  "radiusAlertCenterChipPostal": "Postnummer {postalCode}",
   "@radiusAlertCenterChipPostal": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "postalCode": {
         "type": "String",
@@ -4774,75 +4756,27 @@
       }
     }
   },
-  "radiusAlertCenterClear": "Clear location",
-  "@radiusAlertCenterClear": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "radiusAlertBlockerLabel": "Enter a label",
-  "@radiusAlertBlockerLabel": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "radiusAlertBlockerThreshold": "Enter a threshold above 0",
-  "@radiusAlertBlockerThreshold": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "radiusAlertBlockerLocation": "Choose a location",
-  "@radiusAlertBlockerLocation": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "fillUpOdometerFromLastFillUp": "Pre-filled from your last fill-up",
-  "@fillUpOdometerFromLastFillUp": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
+  "radiusAlertCenterClear": "Ryd placering",
+  "radiusAlertBlockerLabel": "Angiv en mærkat",
+  "radiusAlertBlockerThreshold": "Angiv en grænse over 0",
+  "radiusAlertBlockerLocation": "Vælg en placering",
+  "fillUpOdometerFromLastFillUp": "Forudfyldt fra din seneste tankning",
   "fillUpStationLabel": "Station",
-  "@fillUpStationLabel": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "fillUpStationChange": "Change",
-  "@fillUpStationChange": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "pickStationSectionLast": "Last station",
-  "@pickStationSectionLast": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "pickStationSectionFavorites": "Favorites",
-  "@pickStationSectionFavorites": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "pickStationSectionNearby": "Nearby",
-  "@pickStationSectionNearby": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "pickStationNearbyEmpty": "No recent search — search for stations on the Search tab and the nearest ones will appear here.",
-  "@pickStationNearbyEmpty": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "pickStationLastFillUpAt": "Last fill-up: {date}",
+  "fillUpStationChange": "Skift",
+  "pickStationSectionLast": "Seneste station",
+  "pickStationSectionFavorites": "Favoritter",
+  "pickStationSectionNearby": "I nærheden",
+  "pickStationNearbyEmpty": "Ingen nylig søgning — søg efter stationer under fanen Søg, så vises de nærmeste her.",
+  "pickStationLastFillUpAt": "Seneste tankning: {date}",
   "@pickStationLastFillUpAt": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "date": {
         "type": "String"
       }
     }
   },
-  "stationStatusWithFreshness": "{status} · updated {ago} ago",
+  "stationStatusWithFreshness": "{status} · opdateret for {ago} siden",
   "@stationStatusWithFreshness": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "status": {
         "type": "String",
@@ -4854,10 +4788,8 @@
       }
     }
   },
-  "pricesNotSoldHere": "Not sold here: {fuels}",
+  "pricesNotSoldHere": "Sælges ikke her: {fuels}",
   "@pricesNotSoldHere": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "fuels": {
         "type": "String",
@@ -4865,70 +4797,44 @@
       }
     }
   },
-  "tankReportRecordedTripsCoverage": "Recorded trips cover {pct} % of this tank",
+  "tankReportRecordedTripsCoverage": "Optagne ture dækker {pct} % af denne tank",
   "@tankReportRecordedTripsCoverage": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "pct": {
         "type": "String"
       }
     }
   },
-  "tankReportRecordedTripsAvg": "Recorded trips: {value}",
+  "tankReportRecordedTripsAvg": "Optagne ture: {value}",
   "@tankReportRecordedTripsAvg": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "value": {
         "type": "String"
       }
     }
   },
-  "tankReportRecordedTripsOverestimate": "Your recorded trips overestimate consumption by {pct} %",
+  "tankReportRecordedTripsOverestimate": "Dine optagne ture overvurderer forbruget med {pct} %",
   "@tankReportRecordedTripsOverestimate": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "pct": {
         "type": "String"
       }
     }
   },
-  "tankReportRecordedTripsUnderestimate": "Your recorded trips underestimate consumption by {pct} %",
+  "tankReportRecordedTripsUnderestimate": "Dine optagne ture undervurderer forbruget med {pct} %",
   "@tankReportRecordedTripsUnderestimate": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "pct": {
         "type": "String"
       }
     }
   },
-  "trajetObd2DegradedSubtitle": "No engine data — GPS estimate",
-  "@trajetObd2DegradedSubtitle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "vehicleTopicAdapterNone": "None",
-  "@vehicleTopicAdapterNone": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "vehicleTopicCalibrationTitle": "Calibration",
-  "@vehicleTopicCalibrationTitle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "vehicleTopicAdvancedBadge": "Advanced",
-  "@vehicleTopicAdvancedBadge": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "vehicleTopicCalibrationStatus": "Baseline {coverage} % · {mode}",
+  "trajetObd2DegradedSubtitle": "Ingen motordata — GPS-estimat",
+  "vehicleTopicAdapterNone": "Ingen",
+  "vehicleTopicCalibrationTitle": "Kalibrering",
+  "vehicleTopicAdvancedBadge": "Avanceret",
+  "vehicleTopicCalibrationStatus": "Basislinje {coverage} % · {mode}",
   "@vehicleTopicCalibrationStatus": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "coverage": {
         "type": "int",
@@ -4940,10 +4846,8 @@
       }
     }
   },
-  "vehicleTopicRemindersCount": "{count, plural, =0{No reminders} =1{1 reminder} other{{count} reminders}}",
+  "vehicleTopicRemindersCount": "{count, plural, =0{Ingen påmindelser} =1{1 påmindelse} other{{count} påmindelser}}",
   "@vehicleTopicRemindersCount": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "count": {
         "type": "int",
@@ -4951,25 +4855,11 @@
       }
     }
   },
-  "vehicleTopicAutoRecordOn": "On",
-  "@vehicleTopicAutoRecordOn": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "vehicleTopicAutoRecordOff": "Off",
-  "@vehicleTopicAutoRecordOff": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "vehicleTopicAutoRecordPairLinkText": "Pair an adapter under “OBD2 adapter” to enable auto-recording",
-  "@vehicleTopicAutoRecordPairLinkText": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "vehicleBaselineCoverageSamples": "{covered} / {max} samples",
+  "vehicleTopicAutoRecordOn": "Til",
+  "vehicleTopicAutoRecordOff": "Fra",
+  "vehicleTopicAutoRecordPairLinkText": "Par en adapter under “OBD2-adapter” for at aktivere automatisk optagelse",
+  "vehicleBaselineCoverageSamples": "{covered} / {max} prøver",
   "@vehicleBaselineCoverageSamples": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "covered": {
         "type": "int",
@@ -4981,10 +4871,8 @@
       }
     }
   },
-  "vehicleBaselineRawSamples": "{count, plural, =1{1 sample} other{{count} samples}}",
+  "vehicleBaselineRawSamples": "{count, plural, =1{1 prøve} other{{count} prøver}}",
   "@vehicleBaselineRawSamples": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "count": {
         "type": "int",
@@ -4992,25 +4880,11 @@
       }
     }
   },
-  "calibrationModeRuleDescription": "Sorts each driving sample into one situation using fixed speed and load thresholds.",
-  "@calibrationModeRuleDescription": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "calibrationModeFuzzyDescription": "Splits each sample across neighbouring situations by how well it fits each one — smoother estimates around the boundaries.",
-  "@calibrationModeFuzzyDescription": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "pumpGainChipNotCalibrated": "Not pump-calibrated yet",
-  "@pumpGainChipNotCalibrated": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "pumpGainChipCalibrated": "{fills, plural, =1{Pump-calibrated · 1 fill-up · ±{percent} %} other{Pump-calibrated · {fills} fill-ups · ±{percent} %}}",
+  "calibrationModeRuleDescription": "Placerer hver køreprøve i én situation ud fra faste grænser for hastighed og belastning.",
+  "calibrationModeFuzzyDescription": "Fordeler hver prøve på nabosituationer efter, hvor godt den passer til hver af dem — glattere estimater omkring grænserne.",
+  "pumpGainChipNotCalibrated": "Endnu ikke kalibreret efter standeren",
+  "pumpGainChipCalibrated": "{fills, plural, =1{Standerkalibreret · 1 tankning · ±{percent} %} other{Standerkalibreret · {fills} tankninger · ±{percent} %}}",
   "@pumpGainChipCalibrated": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "fills": {
         "type": "int",
@@ -5022,55 +4896,17 @@
       }
     }
   },
-  "pumpGainResetAction": "Reset pump calibration",
-  "@pumpGainResetAction": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "pumpGainResetConfirmTitle": "Reset pump calibration?",
-  "@pumpGainResetConfirmTitle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "pumpGainResetConfirmBody": "This discards the fuel gain learned from your fill-ups. OBD2 consumption estimates fall back to the uncorrected figure until the next full-to-full tank window re-learns it.",
-  "@pumpGainResetConfirmBody": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacyTopicSubtitle": "Your choices, data on this device, sync, export or delete",
-  "@privacyTopicSubtitle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacyDataLocationLocal": "Your data stays on this device",
-  "@privacyDataLocationLocal": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacyDataLocationSynced": "Your data is also synced to TankSync",
-  "@privacyDataLocationSynced": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacySyncLineEnabledAnonymous": "Sync: on · anonymous account",
-  "@privacySyncLineEnabledAnonymous": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacySyncLineEnabledEmail": "Sync: on · email account",
-  "@privacySyncLineEnabledEmail": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacySyncLineDisabled": "Sync: off",
-  "@privacySyncLineDisabled": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacyStorageLine": "{size} stored on this device",
+  "pumpGainResetAction": "Nulstil standerkalibrering",
+  "pumpGainResetConfirmTitle": "Nulstil standerkalibrering?",
+  "pumpGainResetConfirmBody": "Dette sletter den brændstoffaktor, der er lært fra dine tankninger. OBD2-forbrugsestimater falder tilbage til det ukorrigerede tal, indtil det næste fuld-til-fuld-tankvindue lærer den igen.",
+  "privacyTopicSubtitle": "Dine valg, data på denne enhed, synkronisering, eksport eller sletning",
+  "privacyDataLocationLocal": "Dine data bliver på denne enhed",
+  "privacyDataLocationSynced": "Dine data synkroniseres også til TankSync",
+  "privacySyncLineEnabledAnonymous": "Sync: til · anonym konto",
+  "privacySyncLineEnabledEmail": "Sync: til · e-mailkonto",
+  "privacySyncLineDisabled": "Sync: fra",
+  "privacyStorageLine": "{size} gemt på denne enhed",
   "@privacyStorageLine": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "size": {
         "type": "String",
@@ -5078,15 +4914,9 @@
       }
     }
   },
-  "privacyTopicChoicesTitle": "Your choices",
-  "@privacyTopicChoicesTitle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacyChoicesStatus": "{on} of {total} enabled",
+  "privacyTopicChoicesTitle": "Dine valg",
+  "privacyChoicesStatus": "{on} af {total} slået til",
   "@privacyChoicesStatus": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "on": {
         "type": "int",
@@ -5098,10 +4928,8 @@
       }
     }
   },
-  "privacyDeviceDataStatus": "{size} · {count, plural, =1{1 category} other{{count} categories}}",
+  "privacyDeviceDataStatus": "{size} · {count, plural, =1{1 kategori} other{{count} kategorier}}",
   "@privacyDeviceDataStatus": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "size": {
         "type": "String",
@@ -5113,15 +4941,9 @@
       }
     }
   },
-  "privacyTopicExportDeleteTitle": "Export or delete",
-  "@privacyTopicExportDeleteTitle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacyExportDeleteStatus": "ZIP, JSON, CSV · error log ({count})",
+  "privacyTopicExportDeleteTitle": "Eksportér eller slet",
+  "privacyExportDeleteStatus": "ZIP, JSON, CSV · fejllog ({count})",
   "@privacyExportDeleteStatus": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "count": {
         "type": "int",
@@ -5129,30 +4951,12 @@
       }
     }
   },
-  "privacyLearnMore": "Learn more",
-  "@privacyLearnMore": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "tileProxyToggleShort": "Tiles come via the developer's EU proxy, not straight from OpenStreetMap",
-  "@tileProxyToggleShort": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "remoteLogosToggleShort": "Fetch brand logos from logo.clearbit.com instead of bundled placeholders",
-  "@remoteLogosToggleShort": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacyCacheDetails": "Cache details",
-  "@privacyCacheDetails": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacyCacheResponses": "{count, plural, =1{1 cached response} other{{count} cached responses}}",
+  "privacyLearnMore": "Læs mere",
+  "tileProxyToggleShort": "Kortfliser hentes via udviklerens EU-proxy, ikke direkte fra OpenStreetMap",
+  "remoteLogosToggleShort": "Hent mærkelogoer fra logo.clearbit.com i stedet for de medfølgende pladsholdere",
+  "privacyCacheDetails": "Cachedetaljer",
+  "privacyCacheResponses": "{count, plural, =1{1 cachelagret svar} other{{count} cachelagrede svar}}",
   "@privacyCacheResponses": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "count": {
         "type": "int",
@@ -5160,10 +4964,8 @@
       }
     }
   },
-  "privacyClearCacheEntries": "Clear cache ({count, plural, =1{1 entry} other{{count} entries}})",
+  "privacyClearCacheEntries": "Ryd cache ({count, plural, =1{1 post} other{{count} poster}})",
   "@privacyClearCacheEntries": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "count": {
         "type": "int",
@@ -5172,39 +4974,13 @@
     }
   },
   "privacySyncStatusLabel": "Status",
-  "@privacySyncStatusLabel": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacySyncModeCommunity": "Sparkilo Community — the developer's EU server",
-  "@privacySyncModeCommunity": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacySyncModeSelfHosted": "Self-hosted — your own Supabase",
-  "@privacySyncModeSelfHosted": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacySyncModeSharedGroup": "Shared group — a database you joined",
-  "@privacySyncModeSharedGroup": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacySyncAccountLabel": "Account",
-  "@privacySyncAccountLabel": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacySyncAccountAnonymous": "Anonymous account, tied to this device",
-  "@privacySyncAccountAnonymous": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacySyncAccountEmail": "Email account: {email}",
+  "privacySyncModeCommunity": "Sparkilo Community — udviklerens EU-server",
+  "privacySyncModeSelfHosted": "Selvhostet — din egen Supabase",
+  "privacySyncModeSharedGroup": "Delt gruppe — en database, du har tilsluttet dig",
+  "privacySyncAccountLabel": "Konto",
+  "privacySyncAccountAnonymous": "Anonym konto, knyttet til denne enhed",
+  "privacySyncAccountEmail": "E-mailkonto: {email}",
   "@privacySyncAccountEmail": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "email": {
         "type": "String",
@@ -5212,75 +4988,21 @@
       }
     }
   },
-  "privacyCopyUserId": "Copy user ID",
-  "@privacyCopyUserId": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacyUserIdCopied": "User ID copied",
-  "@privacyUserIdCopied": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacySyncDatabaseHost": "Database host",
-  "@privacySyncDatabaseHost": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacyExportSectionTitle": "Export",
-  "@privacyExportSectionTitle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacyExportMyData": "Export my data",
-  "@privacyExportMyData": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacyExportSheetTitle": "Choose a format",
-  "@privacyExportSheetTitle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacyExportZipTitle": "ZIP archive",
-  "@privacyExportZipTitle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacyExportZipSubtitle": "Everything, attachments included — for a complete backup",
-  "@privacyExportZipSubtitle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
+  "privacyCopyUserId": "Kopiér bruger-ID",
+  "privacyUserIdCopied": "Bruger-ID kopieret",
+  "privacySyncDatabaseHost": "Databasevært",
+  "privacyExportSectionTitle": "Eksport",
+  "privacyExportMyData": "Eksportér mine data",
+  "privacyExportSheetTitle": "Vælg et format",
+  "privacyExportZipTitle": "ZIP-arkiv",
+  "privacyExportZipSubtitle": "Alt, inklusive vedhæftninger — til en komplet sikkerhedskopi",
   "privacyExportJsonTitle": "JSON",
-  "@privacyExportJsonTitle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacyExportJsonSubtitle": "Machine-readable — for another app",
-  "@privacyExportJsonSubtitle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
+  "privacyExportJsonSubtitle": "Maskinlæsbart — til en anden app",
   "privacyExportCsvTitle": "CSV",
-  "@privacyExportCsvTitle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacyExportCsvSubtitle": "Spreadsheet — one table per category",
-  "@privacyExportCsvSubtitle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacyErrorLogTitle": "Error log",
-  "@privacyErrorLogTitle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacyErrorLogCount": "{count, plural, =0{No entries} =1{1 entry} other{{count} entries}}",
+  "privacyExportCsvSubtitle": "Regneark — én tabel pr. kategori",
+  "privacyErrorLogTitle": "Fejllog",
+  "privacyErrorLogCount": "{count, plural, =0{Ingen poster} =1{1 post} other{{count} poster}}",
   "@privacyErrorLogCount": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "count": {
         "type": "int",
@@ -5288,40 +5010,14 @@
       }
     }
   },
-  "privacyErrorLogSave": "Save",
-  "@privacyErrorLogSave": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacyErrorLogClear": "Clear",
-  "@privacyErrorLogClear": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacyDangerZoneTitle": "Danger zone",
-  "@privacyDangerZoneTitle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacyDangerZoneBody": "Permanently deletes everything the app stores on this device. With sync on, your data on the TankSync server is erased too.",
-  "@privacyDangerZoneBody": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "privacyDeleteAllMyData": "Delete all my data",
-  "@privacyDeleteAllMyData": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "fillInventoryTitle": "Fill-up summary",
-  "@fillInventoryTitle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "fillInventorySubtitleFull": "Full tank on {date} · {fuel}",
+  "privacyErrorLogSave": "Gem",
+  "privacyErrorLogClear": "Ryd",
+  "privacyDangerZoneTitle": "Farezone",
+  "privacyDangerZoneBody": "Sletter permanent alt, hvad appen gemmer på denne enhed. Er sync slået til, slettes dine data på TankSync-serveren også.",
+  "privacyDeleteAllMyData": "Slet alle mine data",
+  "fillInventoryTitle": "Tankningsoversigt",
+  "fillInventorySubtitleFull": "Fuld tank den {date} · {fuel}",
   "@fillInventorySubtitleFull": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "date": {
         "type": "String",
@@ -5333,10 +5029,8 @@
       }
     }
   },
-  "fillInventorySubtitlePartial": "Partial fill on {date} · {fuel}",
+  "fillInventorySubtitlePartial": "Delvis tankning den {date} · {fuel}",
   "@fillInventorySubtitlePartial": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "date": {
         "type": "String",
@@ -5348,10 +5042,8 @@
       }
     }
   },
-  "fillInventoryKmSinceLastFull": "{km} km since the last full tank",
+  "fillInventoryKmSinceLastFull": "{km} km siden seneste fulde tank",
   "@fillInventoryKmSinceLastFull": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "km": {
         "type": "String",
@@ -5359,10 +5051,8 @@
       }
     }
   },
-  "fillInventoryPumpLiters": "{liters} L pumped",
+  "fillInventoryPumpLiters": "{liters} L tanket",
   "@fillInventoryPumpLiters": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "liters": {
         "type": "String",
@@ -5370,10 +5060,8 @@
       }
     }
   },
-  "fillInventoryPumpConsumption": "Pump consumption: {value}",
+  "fillInventoryPumpConsumption": "Forbrug ifølge standeren: {value}",
   "@fillInventoryPumpConsumption": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "value": {
         "type": "String",
@@ -5381,10 +5069,8 @@
       }
     }
   },
-  "fillInventoryRecordedTrips": "Recorded trips: {coverage} % of the tank · {value} raw",
+  "fillInventoryRecordedTrips": "Optagne ture: {coverage} % af tanken · {value} rå",
   "@fillInventoryRecordedTrips": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "coverage": {
         "type": "int",
@@ -5396,15 +5082,9 @@
       }
     }
   },
-  "fillInventoryNoRecordedTrips": "No recorded trip in this tank",
-  "@fillInventoryNoRecordedTrips": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "fillInventoryTankNow": "Tank now: {liters} L · ≈ {km} km at pump consumption",
+  "fillInventoryNoRecordedTrips": "Ingen optaget tur i denne tank",
+  "fillInventoryTankNow": "Tank nu: {liters} L · ≈ {km} km ved standerforbrug",
   "@fillInventoryTankNow": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "liters": {
         "type": "String",
@@ -5416,10 +5096,8 @@
       }
     }
   },
-  "fillInventoryTankNowNoRange": "Tank now: {liters} L",
+  "fillInventoryTankNowNoRange": "Tank nu: {liters} L",
   "@fillInventoryTankNowNoRange": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "liters": {
         "type": "String",
@@ -5427,10 +5105,8 @@
       }
     }
   },
-  "fillInventoryCalibrationApplied": "Pump calibration: ×{before} → ×{after} ({percent} %)",
+  "fillInventoryCalibrationApplied": "Standerkalibrering: ×{before} → ×{after} ({percent} %)",
   "@fillInventoryCalibrationApplied": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "before": {
         "type": "String",
@@ -5446,10 +5122,8 @@
       }
     }
   },
-  "fillInventoryCalibrationSkipped": "Pump calibration: skipped — {reason}",
+  "fillInventoryCalibrationSkipped": "Standerkalibrering: sprunget over — {reason}",
   "@fillInventoryCalibrationSkipped": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "reason": {
         "type": "String",
@@ -5457,30 +5131,12 @@
       }
     }
   },
-  "fillInventorySkipNotFullTank": "partial fill (the tank window stays open)",
-  "@fillInventorySkipNotFullTank": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "fillInventorySkipCorrection": "correction entry, not a pumped fill",
-  "@fillInventorySkipCorrection": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "fillInventorySkipNoVehicle": "no vehicle on this fill",
-  "@fillInventorySkipNoVehicle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "fillInventorySkipNoWindow": "first full tank (no window closed yet)",
-  "@fillInventorySkipNoWindow": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "fillInventorySkipCoverageTooLow": "recorded trips cover {coverage} % of the tank (60 % needed)",
+  "fillInventorySkipNotFullTank": "delvis tankning (tankvinduet forbliver åbent)",
+  "fillInventorySkipCorrection": "korrektionspost, ikke en tankning ved standeren",
+  "fillInventorySkipNoVehicle": "intet køretøj på denne tankning",
+  "fillInventorySkipNoWindow": "første fulde tank (intet vindue lukket endnu)",
+  "fillInventorySkipCoverageTooLow": "optagne ture dækker {coverage} % af tanken (60 % kræves)",
   "@fillInventorySkipCoverageTooLow": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "coverage": {
         "type": "int",
@@ -5488,10 +5144,8 @@
       }
     }
   },
-  "fillInventorySkipRecordedTooShort": "only {km} recorded km (40 km needed)",
+  "fillInventorySkipRecordedTooShort": "kun {km} optagne km (40 km kræves)",
   "@fillInventorySkipRecordedTooShort": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "km": {
         "type": "String",
@@ -5499,25 +5153,11 @@
       }
     }
   },
-  "fillInventorySkipNoRecordedFuel": "the recorded trips carry no fuel figure",
-  "@fillInventorySkipNoRecordedFuel": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "fillInventorySkipImplausible": "pump and recordings disagree too much — check the receipt",
-  "@fillInventorySkipImplausible": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "fillInventoryDismiss": "Got it",
-  "@fillInventoryDismiss": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "tankReportResidualAfterCalibration": "Gap after calibration: {percent} %",
+  "fillInventorySkipNoRecordedFuel": "de optagne ture har intet brændstoftal",
+  "fillInventorySkipImplausible": "stander og optagelser afviger for meget — tjek kvitteringen",
+  "fillInventoryDismiss": "Forstået",
+  "tankReportResidualAfterCalibration": "Afvigelse efter kalibrering: {percent} %",
   "@tankReportResidualAfterCalibration": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "percent": {
         "type": "String",
@@ -5525,50 +5165,16 @@
       }
     }
   },
-  "tripFuelSourceMeasured": "Measured",
-  "@tripFuelSourceMeasured": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "tripFuelSourceEstimatedCalibrated": "Estimated · calibrated",
-  "@tripFuelSourceEstimatedCalibrated": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "tripFuelSourceEstimated": "Estimated",
-  "@tripFuelSourceEstimated": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
+  "tripFuelSourceMeasured": "Målt",
+  "tripFuelSourceEstimatedCalibrated": "Estimeret · kalibreret",
+  "tripFuelSourceEstimated": "Estimeret",
   "tripFuelSourceGps": "GPS",
-  "@tripFuelSourceGps": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "tripFuelSourceMeasuredTooltip": "Fuel rate reported by the engine (PID 5E / 9D / A2) — never rescaled",
-  "@tripFuelSourceMeasuredTooltip": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "tripFuelSourceEstimatedTooltip": "Fuel estimated from air mass — rescaled by the pump calibration",
-  "@tripFuelSourceEstimatedTooltip": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "tripFuelSourceGpsTooltip": "GPS-physics estimate — no engine data",
-  "@tripFuelSourceGpsTooltip": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "tripFuelSourceRecalculated": "recalculated",
-  "@tripFuelSourceRecalculated": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "tripDetailGainApplied": "Pump gain applied: {percent} %",
+  "tripFuelSourceMeasuredTooltip": "Brændstofrate rapporteret af motoren (PID 5E / 9D / A2) — skaleres aldrig",
+  "tripFuelSourceEstimatedTooltip": "Brændstof estimeret ud fra luftmasse — skaleret efter standerkalibreringen",
+  "tripFuelSourceGpsTooltip": "GPS-fysikestimat — ingen motordata",
+  "tripFuelSourceRecalculated": "genberegnet",
+  "tripDetailGainApplied": "Standerfaktor anvendt: {percent} %",
   "@tripDetailGainApplied": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "percent": {
         "type": "String",
@@ -5576,10 +5182,8 @@
       }
     }
   },
-  "tripDetailRecalculatedAfterFill": "Recalculated after the fill-up of {date}",
+  "tripDetailRecalculatedAfterFill": "Genberegnet efter tankningen den {date}",
   "@tripDetailRecalculatedAfterFill": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "date": {
         "type": "String",
@@ -5587,20 +5191,10 @@
       }
     }
   },
-  "tripRecordingScreenTitle": "Trip in progress",
-  "@tripRecordingScreenTitle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
+  "tripRecordingScreenTitle": "Tur i gang",
   "recordingObd2ChipLive": "Live",
-  "@recordingObd2ChipLive": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
   "recordingObd2ChipLiveRate": "Live · {rate} PID/s",
   "@recordingObd2ChipLiveRate": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "rate": {
         "type": "int",
@@ -5608,15 +5202,9 @@
       }
     }
   },
-  "recordingObd2ChipReconnecting": "Reconnecting…",
-  "@recordingObd2ChipReconnecting": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "recordingObd2ChipReconnectingAttempt": "Reconnecting… (try {attempt})",
+  "recordingObd2ChipReconnecting": "Genforbinder…",
+  "recordingObd2ChipReconnectingAttempt": "Genforbinder… (forsøg {attempt})",
   "@recordingObd2ChipReconnectingAttempt": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "attempt": {
         "type": "int",
@@ -5624,55 +5212,17 @@
       }
     }
   },
-  "recordingObd2ChipGpsOnly": "GPS only",
-  "@recordingObd2ChipGpsOnly": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "recordingObd2ChipEngineOff": "Engine off — waiting",
-  "@recordingObd2ChipEngineOff": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "recordingObd2ChipNoAdapter": "No adapter",
-  "@recordingObd2ChipNoAdapter": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "recordingObd2SheetTitle": "OBD2 link",
-  "@recordingObd2SheetTitle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "recordingObd2SheetLive": "The adapter is delivering engine data, so consumption is measured from the car. Nothing to do — keep driving.",
-  "@recordingObd2SheetLive": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "recordingObd2SheetReconnecting": "The Bluetooth link is being re-established; meanwhile the recording continues on GPS. No action needed — a reset only helps if it stays like this for minutes.",
-  "@recordingObd2SheetReconnecting": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "recordingObd2SheetGpsOnly": "The adapter has not answered for a while, so the app waits for it to reappear and records on GPS. Consumption is estimated until it is back.",
-  "@recordingObd2SheetGpsOnly": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "recordingObd2SheetEngineOff": "The engine is off, so there is nothing to read. The recording continues on GPS and picks the adapter up again as soon as the engine runs.",
-  "@recordingObd2SheetEngineOff": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "recordingObd2SheetNoAdapter": "This trip is recorded without an OBD2 adapter. Speed and distance come from GPS; consumption is a physics estimate calibrated by your fill-ups.",
-  "@recordingObd2SheetNoAdapter": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "recordingGpsChipPrecise": "Precise fix (±{meters} m)",
+  "recordingObd2ChipGpsOnly": "Kun GPS",
+  "recordingObd2ChipEngineOff": "Motor slukket — venter",
+  "recordingObd2ChipNoAdapter": "Ingen adapter",
+  "recordingObd2SheetTitle": "OBD2-forbindelse",
+  "recordingObd2SheetLive": "Adapteren leverer motordata, så forbruget måles fra bilen. Intet at gøre — kør bare videre.",
+  "recordingObd2SheetReconnecting": "Bluetooth-forbindelsen genoprettes; imens fortsætter optagelsen på GPS. Ingen handling nødvendig — en nulstilling hjælper kun, hvis det bliver ved i flere minutter.",
+  "recordingObd2SheetGpsOnly": "Adapteren har ikke svaret i et stykke tid, så appen venter på, at den dukker op igen, og optager på GPS. Forbruget estimeres, indtil den er tilbage.",
+  "recordingObd2SheetEngineOff": "Motoren er slukket, så der er intet at læse. Optagelsen fortsætter på GPS og tager adapteren op igen, så snart motoren kører.",
+  "recordingObd2SheetNoAdapter": "Denne tur optages uden OBD2-adapter. Hastighed og afstand kommer fra GPS; forbruget er et fysikestimat kalibreret efter dine tankninger.",
+  "recordingGpsChipPrecise": "Præcis position (±{meters} m)",
   "@recordingGpsChipPrecise": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "meters": {
         "type": "int",
@@ -5680,10 +5230,8 @@
       }
     }
   },
-  "recordingGpsChipApprox": "Approximate fix (±{meters} m)",
+  "recordingGpsChipApprox": "Omtrentlig position (±{meters} m)",
   "@recordingGpsChipApprox": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "meters": {
         "type": "int",
@@ -5691,20 +5239,10 @@
       }
     }
   },
-  "recordingGpsChipNoFix": "No fix",
-  "@recordingGpsChipNoFix": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "recordingGpsChipFixUnknownAccuracy": "Fix (accuracy unknown)",
-  "@recordingGpsChipFixUnknownAccuracy": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
+  "recordingGpsChipNoFix": "Intet signal",
+  "recordingGpsChipFixUnknownAccuracy": "Position (ukendt nøjagtighed)",
   "recordingGpsChipWithCoverage": "{fix} · {percent} %",
   "@recordingGpsChipWithCoverage": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "fix": {
         "type": "String",
@@ -5716,30 +5254,12 @@
       }
     }
   },
-  "recordingGpsSheetTitle": "GPS signal",
-  "@recordingGpsSheetTitle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "recordingGpsSheetPrecise": "The position is accurate to a few metres, so distance and the trace are reliable.",
-  "@recordingGpsSheetPrecise": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "recordingGpsSheetApprox": "The position is only accurate to tens of metres — typical in cities, tunnels or under trees. Distance may drift slightly until the fix improves.",
-  "@recordingGpsSheetApprox": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "recordingGpsSheetNoFix": "No position has arrived recently. Check that location is allowed and the phone can see the sky; the recording resumes with the next fix.",
-  "@recordingGpsSheetNoFix": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "recordingGpsSheetCoverage": "Coverage so far: {percent} % of the seconds had a fix.",
+  "recordingGpsSheetTitle": "GPS-signal",
+  "recordingGpsSheetPrecise": "Positionen er nøjagtig inden for få meter, så afstand og spor er pålidelige.",
+  "recordingGpsSheetApprox": "Positionen er kun nøjagtig inden for nogle titals meter — typisk i byer, tunneler eller under træer. Afstanden kan afvige lidt, indtil signalet bliver bedre.",
+  "recordingGpsSheetNoFix": "Der er ikke modtaget nogen position for nylig. Tjek, at lokation er tilladt, og at telefonen kan se himlen; optagelsen fortsætter med den næste position.",
+  "recordingGpsSheetCoverage": "Dækning indtil videre: {percent} % af sekunderne havde en position.",
   "@recordingGpsSheetCoverage": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "percent": {
         "type": "int",
@@ -5747,20 +5267,10 @@
       }
     }
   },
-  "recordingSheetClose": "Got it",
-  "@recordingSheetClose": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "fuelSourceMeasured": "Measured (ECU fuel flow)",
-  "@fuelSourceMeasured": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "fuelSourceEstimatedCalibrated": "Estimated · pump-calibrated ±{percent} %",
+  "recordingSheetClose": "Forstået",
+  "fuelSourceMeasured": "Målt (ECU-brændstofflow)",
+  "fuelSourceEstimatedCalibrated": "Estimeret · standerkalibreret ±{percent} %",
   "@fuelSourceEstimatedCalibrated": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "percent": {
         "type": "int",
@@ -5768,19 +5278,7 @@
       }
     }
   },
-  "fuelSourceEstimatedUncalibrated": "Estimated · not calibrated",
-  "@fuelSourceEstimatedUncalibrated": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "fuelSourceGpsEstimate": "GPS estimate",
-  "@fuelSourceGpsEstimate": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "recordingTileScore": "Driving score",
-  "@recordingTileScore": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  }
+  "fuelSourceEstimatedUncalibrated": "Estimeret · ikke kalibreret",
+  "fuelSourceGpsEstimate": "GPS-estimat",
+  "recordingTileScore": "Kørescore"
 }
