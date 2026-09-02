@@ -4203,14 +4203,6 @@
   "featureLabel_voiceFeedback": "Kõneline tagasiside (kõnesüntees)",
   "featureDescription_voiceFeedback": "Pealüliti kogu kõneväljundile — sõidu hääljuhendajale ja tanklateadetele. Väljalülitatuna ei ava rakendus kunagi kõnesünteesi mootorit.",
   "tankReportTitle": "Paagi aruanne",
-  "tankReportHeadline": "{value} L/100 km",
-  "@tankReportHeadline": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportSincePrevious": "Alates eelmisest täis paagist: {km} km · {liters} L · {cost}",
   "@tankReportSincePrevious": {
     "placeholders": {
@@ -4243,22 +4235,6 @@
   },
   "tankReportTrendFlat": "Eelmise paagiga samal tasemel",
   "tankReportNoPrevious": "Muutus ilmub pärast teie järgmist täis paaki.",
-  "tankReportCoverage": "Salvestused katavad {pct} % sellest paagist",
-  "@tankReportCoverage": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportRecordedAvg": "Salvestatud osa: {value} L/100 km",
-  "@tankReportRecordedAvg": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportExplainHeader": "Mida salvestused näitavad",
   "tankReportFactorHighRpm": "Kõrgete pöörete osakaal {cur} % (oli {prev} %)",
   "@tankReportFactorHighRpm": {
@@ -4305,22 +4281,6 @@
     }
   },
   "tankReportCaveat": "Salvestused on juhuslikud ja katavad ainult osa sellest paagist — need vihjed on suunavad, mitte kogu lugu.",
-  "tankReportCalibrationUnder": "Salvestatud hinnangud on {pct} % alla tankuri näidu",
-  "@tankReportCalibrationUnder": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportCalibrationOver": "Salvestatud hinnangud on {pct} % üle tankuri näidu",
-  "@tankReportCalibrationOver": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
   "qrLaunchConfirmTitle": "Kas avada skannitud link?",
   "qrLaunchConfirmBody": "See QR-kood viitab aadressile {host}. Avage ainult usaldusväärseid linke.",
   "@qrLaunchConfirmBody": {

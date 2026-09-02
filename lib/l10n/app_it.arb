@@ -4203,14 +4203,6 @@
   "featureLabel_voiceFeedback": "Feedback vocale (sintesi vocale)",
   "featureDescription_voiceFeedback": "Interruttore generale di ogni uscita vocale: il coach di guida parlato e gli annunci delle stazioni. Se disattivato, l'app non apre mai un motore di sintesi vocale.",
   "tankReportTitle": "Rapporto del pieno",
-  "tankReportHeadline": "{value} L/100 km",
-  "@tankReportHeadline": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportSincePrevious": "Dal pieno precedente: {km} km · {liters} L · {cost}",
   "@tankReportSincePrevious": {
     "placeholders": {
@@ -4243,22 +4235,6 @@
   },
   "tankReportTrendFlat": "In linea con il pieno precedente",
   "tankReportNoPrevious": "L'andamento comparirà dopo il tuo prossimo pieno.",
-  "tankReportCoverage": "Le registrazioni coprono il {pct} % di questo pieno",
-  "@tankReportCoverage": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportRecordedAvg": "Parte registrata: {value} L/100 km",
-  "@tankReportRecordedAvg": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportExplainHeader": "Cosa suggeriscono le registrazioni",
   "tankReportFactorHighRpm": "Quota ad alti giri {cur} % (prima {prev} %)",
   "@tankReportFactorHighRpm": {
@@ -4305,22 +4281,6 @@
     }
   },
   "tankReportCaveat": "Le registrazioni sono spontanee e coprono solo parte di questo pieno: questi indizi sono indicativi, non tutta la storia.",
-  "tankReportCalibrationUnder": "Le stime registrate sono del {pct} % inferiori al dato reale della pompa",
-  "@tankReportCalibrationUnder": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportCalibrationOver": "Le stime registrate sono del {pct} % superiori al dato reale della pompa",
-  "@tankReportCalibrationOver": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
   "qrLaunchConfirmTitle": "Aprire il link scansionato?",
   "qrLaunchConfirmBody": "Questo codice QR punta a {host}. Apri solo link di cui ti fidi.",
   "@qrLaunchConfirmBody": {

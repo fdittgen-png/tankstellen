@@ -4203,14 +4203,6 @@
   "featureLabel_voiceFeedback": "Feedback falado (síntese de voz)",
   "featureDescription_voiceFeedback": "Interruptor geral de toda a saída de voz — o treinador de condução falado e os anúncios de postos. Desligado, a app nunca abre um motor de síntese de voz.",
   "tankReportTitle": "Relatório do depósito",
-  "tankReportHeadline": "{value} L/100 km",
-  "@tankReportHeadline": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportSincePrevious": "Desde o depósito cheio anterior: {km} km · {liters} L · {cost}",
   "@tankReportSincePrevious": {
     "placeholders": {
@@ -4243,22 +4235,6 @@
   },
   "tankReportTrendFlat": "Ao nível do depósito anterior",
   "tankReportNoPrevious": "A evolução aparece após o seu próximo depósito cheio.",
-  "tankReportCoverage": "As gravações cobrem {pct} % deste depósito",
-  "@tankReportCoverage": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportRecordedAvg": "Parte gravada: {value} L/100 km",
-  "@tankReportRecordedAvg": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportExplainHeader": "O que as gravações sugerem",
   "tankReportFactorHighRpm": "Quota a rotações altas {cur} % (antes {prev} %)",
   "@tankReportFactorHighRpm": {
@@ -4305,22 +4281,6 @@
     }
   },
   "tankReportCaveat": "As gravações são espontâneas e cobrem apenas parte deste depósito — estas pistas são indicativas, não a história completa.",
-  "tankReportCalibrationUnder": "As estimativas gravadas ficam {pct} % abaixo do valor real da bomba",
-  "@tankReportCalibrationUnder": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportCalibrationOver": "As estimativas gravadas ficam {pct} % acima do valor real da bomba",
-  "@tankReportCalibrationOver": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
   "qrLaunchConfirmTitle": "Abrir a ligação digitalizada?",
   "qrLaunchConfirmBody": "Este código QR aponta para {host}. Abra apenas ligações em que confie.",
   "@qrLaunchConfirmBody": {

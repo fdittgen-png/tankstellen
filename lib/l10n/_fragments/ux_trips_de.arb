@@ -1,0 +1,7 @@
+{
+  "tankReportRecordedTripsCoverage": "Aufgezeichnete Fahrten decken {pct} % dieser Tankfüllung ab",
+  "tankReportRecordedTripsAvg": "Aufgezeichnete Fahrten: {value}",
+  "tankReportRecordedTripsOverestimate": "Deine aufgezeichneten Fahrten überschätzen den Verbrauch um {pct} %",
+  "tankReportRecordedTripsUnderestimate": "Deine aufgezeichneten Fahrten unterschätzen den Verbrauch um {pct} %",
+  "trajetObd2DegradedSubtitle": "Keine Motordaten — GPS-Schätzung"
+}

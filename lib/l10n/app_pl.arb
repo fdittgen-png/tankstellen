@@ -4203,14 +4203,6 @@
   "featureLabel_voiceFeedback": "Komunikaty głosowe (synteza mowy)",
   "featureDescription_voiceFeedback": "Główny przełącznik wszystkich komunikatów głosowych — trenera jazdy i zapowiedzi stacji. Po wyłączeniu aplikacja nigdy nie uruchamia silnika syntezy mowy.",
   "tankReportTitle": "Raport z baku",
-  "tankReportHeadline": "{value} L/100 km",
-  "@tankReportHeadline": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportSincePrevious": "Od poprzedniego pełnego baku: {km} km · {liters} L · {cost}",
   "@tankReportSincePrevious": {
     "placeholders": {
@@ -4243,22 +4235,6 @@
   },
   "tankReportTrendFlat": "Na poziomie poprzedniego baku",
   "tankReportNoPrevious": "Zmiana pojawi się po następnym pełnym baku.",
-  "tankReportCoverage": "Nagrania obejmują {pct} % tego baku",
-  "@tankReportCoverage": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportRecordedAvg": "Zarejestrowana część: {value} L/100 km",
-  "@tankReportRecordedAvg": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportExplainHeader": "Co sugerują nagrania",
   "tankReportFactorHighRpm": "Udział wysokich obrotów {cur} % (było {prev} %)",
   "@tankReportFactorHighRpm": {
@@ -4305,22 +4281,6 @@
     }
   },
   "tankReportCaveat": "Nagrania są spontaniczne i obejmują tylko część tego baku — te wskazówki są orientacyjne, nie pełnym obrazem.",
-  "tankReportCalibrationUnder": "Zarejestrowane szacunki są o {pct} % niższe niż wskazanie dystrybutora",
-  "@tankReportCalibrationUnder": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportCalibrationOver": "Zarejestrowane szacunki są o {pct} % wyższe niż wskazanie dystrybutora",
-  "@tankReportCalibrationOver": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
   "qrLaunchConfirmTitle": "Otworzyć zeskanowany link?",
   "qrLaunchConfirmBody": "Ten kod QR prowadzi do {host}. Otwieraj tylko zaufane linki.",
   "@qrLaunchConfirmBody": {

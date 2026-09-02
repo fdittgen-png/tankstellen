@@ -4203,14 +4203,6 @@
   "featureLabel_voiceFeedback": "Opplest tilbakemelding (talesyntese)",
   "featureDescription_voiceFeedback": "Hovedbryter for alt som leses opp — kjørecoachen og stasjonsmeldingene. Avslått åpner appen aldri en talesyntesemotor.",
   "tankReportTitle": "Tankrapport",
-  "tankReportHeadline": "{value} L/100 km",
-  "@tankReportHeadline": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportSincePrevious": "Siden forrige fulle tank: {km} km · {liters} L · {cost}",
   "@tankReportSincePrevious": {
     "placeholders": {
@@ -4243,22 +4235,6 @@
   },
   "tankReportTrendFlat": "På nivå med forrige tank",
   "tankReportNoPrevious": "Utviklingen vises etter neste fulle tank.",
-  "tankReportCoverage": "Opptakene dekker {pct} % av denne tanken",
-  "@tankReportCoverage": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportRecordedAvg": "Registrert del: {value} L/100 km",
-  "@tankReportRecordedAvg": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportExplainHeader": "Hva opptakene antyder",
   "tankReportFactorHighRpm": "Andel høyt turtall {cur} % (var {prev} %)",
   "@tankReportFactorHighRpm": {
@@ -4305,22 +4281,6 @@
     }
   },
   "tankReportCaveat": "Opptakene er spontane og dekker bare en del av denne tanken — disse hintene er veiledende, ikke hele historien.",
-  "tankReportCalibrationUnder": "Registrerte anslag ligger {pct} % under pumpens tall",
-  "@tankReportCalibrationUnder": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportCalibrationOver": "Registrerte anslag ligger {pct} % over pumpens tall",
-  "@tankReportCalibrationOver": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
   "qrLaunchConfirmTitle": "Åpne den skannede lenken?",
   "qrLaunchConfirmBody": "Denne QR-koden peker til {host}. Åpne bare lenker du stoler på.",
   "@qrLaunchConfirmBody": {

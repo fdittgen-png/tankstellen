@@ -4203,14 +4203,6 @@
   "featureLabel_voiceFeedback": "Гласова обратна връзка (синтез на реч)",
   "featureDescription_voiceFeedback": "Главен превключвател за всичко изговорено — гласовия треньор за шофиране и съобщенията за бензиностанции. Когато е изключен, приложението никога не отваря синтезатор на реч.",
   "tankReportTitle": "Отчет за резервоара",
-  "tankReportHeadline": "{value} L/100 km",
-  "@tankReportHeadline": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportSincePrevious": "От предишния пълен резервоар: {km} км · {liters} л · {cost}",
   "@tankReportSincePrevious": {
     "placeholders": {
@@ -4243,22 +4235,6 @@
   },
   "tankReportTrendFlat": "На нивото на предишния резервоар",
   "tankReportNoPrevious": "Промяната ще се покаже след следващия ви пълен резервоар.",
-  "tankReportCoverage": "Записите покриват {pct} % от този резервоар",
-  "@tankReportCoverage": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportRecordedAvg": "Записана част: {value} л/100 км",
-  "@tankReportRecordedAvg": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportExplainHeader": "Какво подсказват записите",
   "tankReportFactorHighRpm": "Дял на високите обороти {cur} % (беше {prev} %)",
   "@tankReportFactorHighRpm": {
@@ -4305,22 +4281,6 @@
     }
   },
   "tankReportCaveat": "Записите са спонтанни и покриват само част от този резервоар — тези насоки са ориентировъчни, не цялата картина.",
-  "tankReportCalibrationUnder": "Записаните оценки са с {pct} % под отчетеното на колонката",
-  "@tankReportCalibrationUnder": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportCalibrationOver": "Записаните оценки са с {pct} % над отчетеното на колонката",
-  "@tankReportCalibrationOver": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
   "qrLaunchConfirmTitle": "Отваряне на сканираната връзка?",
   "qrLaunchConfirmBody": "Този QR код сочи към {host}. Отваряйте само връзки, на които имате доверие.",
   "@qrLaunchConfirmBody": {

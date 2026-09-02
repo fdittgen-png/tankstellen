@@ -4203,14 +4203,6 @@
   "featureLabel_voiceFeedback": "Φωνητική ανατροφοδότηση (σύνθεση ομιλίας)",
   "featureDescription_voiceFeedback": "Κεντρικός διακόπτης για κάθε εκφωνούμενη λειτουργία — τον φωνητικό προπονητή οδήγησης και τις ανακοινώσεις πρατηρίων. Απενεργοποιημένος, η εφαρμογή δεν ανοίγει ποτέ μηχανή σύνθεσης ομιλίας.",
   "tankReportTitle": "Αναφορά ρεζερβουάρ",
-  "tankReportHeadline": "{value} L/100 km",
-  "@tankReportHeadline": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportSincePrevious": "Από το προηγούμενο γεμάτο ρεζερβουάρ: {km} km · {liters} L · {cost}",
   "@tankReportSincePrevious": {
     "placeholders": {
@@ -4243,22 +4235,6 @@
   },
   "tankReportTrendFlat": "Στο ίδιο επίπεδο με το προηγούμενο ρεζερβουάρ",
   "tankReportNoPrevious": "Η εξέλιξη εμφανίζεται μετά το επόμενο γεμάτο ρεζερβουάρ.",
-  "tankReportCoverage": "Οι καταγραφές καλύπτουν το {pct} % αυτού του ρεζερβουάρ",
-  "@tankReportCoverage": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportRecordedAvg": "Καταγεγραμμένο τμήμα: {value} L/100 χλμ",
-  "@tankReportRecordedAvg": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportExplainHeader": "Τι υποδεικνύουν οι καταγραφές",
   "tankReportFactorHighRpm": "Ποσοστό υψηλών στροφών {cur} % (ήταν {prev} %)",
   "@tankReportFactorHighRpm": {
@@ -4305,22 +4281,6 @@
     }
   },
   "tankReportCaveat": "Οι καταγραφές είναι τυχαίες και καλύπτουν μόνο μέρος αυτού του ρεζερβουάρ — αυτές οι ενδείξεις είναι ενδεικτικές, όχι η πλήρης εικόνα.",
-  "tankReportCalibrationUnder": "Οι καταγεγραμμένες εκτιμήσεις είναι {pct} % κάτω από την ένδειξη της αντλίας",
-  "@tankReportCalibrationUnder": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportCalibrationOver": "Οι καταγεγραμμένες εκτιμήσεις είναι {pct} % πάνω από την ένδειξη της αντλίας",
-  "@tankReportCalibrationOver": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
   "qrLaunchConfirmTitle": "Άνοιγμα του σαρωμένου συνδέσμου;",
   "qrLaunchConfirmBody": "Αυτός ο κωδικός QR οδηγεί στο {host}. Ανοίγετε μόνο συνδέσμους που εμπιστεύεστε.",
   "@qrLaunchConfirmBody": {

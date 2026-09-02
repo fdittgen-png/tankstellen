@@ -4,13 +4,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/domain/consumption_unit.dart';
 import '../../../../core/providers/consumption_display_provider.dart';
 import '../../../../core/utils/time_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/services/monthly_insights_aggregator.dart';
+import 'monthly_insights_table.dart';
 
 /// "This month vs last month" card on the Trajets tab landing screen
 /// (#1041 phase 4 — Aggregates surface).
@@ -35,6 +35,10 @@ import '../../domain/services/monthly_insights_aggregator.dart';
 /// numbers stay visible — even with a single trip the user can see
 /// what they did this month.
 ///
+/// Layout (#3904): the rows form ONE [Table] whose value columns take
+/// their intrinsic width, so "10,1 L/100 km" never wraps its unit onto a
+/// second line — the label column gives way first. See [MonthlyMetricsTable].
+///
 /// The widget is purely presentational. Bucketing / averaging happens
 /// inside the aggregator, which is unit-tested separately.
 class MonthlyInsightsCard extends ConsumerWidget {
@@ -52,31 +56,31 @@ class MonthlyInsightsCard extends ConsumerWidget {
     final unit = ref.watch(consumptionDisplaySettingProvider).unit;
     final reliable = summary.isComparisonReliable;
 
-    final tripsRow = _MetricRow(
+    final tripsRow = MonthlyMetric(
       label: l.consumptionMonthlyTripsLabel,
       currentValue: _fmtCount(summary.currentMonthTripCount),
       previousValue: _fmtCount(summary.previousMonthTripCount),
       delta: summary.tripCountDelta,
-      sentiment: _Sentiment.neutral,
+      sentiment: MonthlyMetricSentiment.neutral,
       showPrevious: reliable,
     );
 
-    final driveTimeRow = _MetricRow(
+    final driveTimeRow = MonthlyMetric(
       label: l.consumptionMonthlyDriveTimeLabel,
       currentValue: _fmtDuration(summary.currentMonthDriveTime),
       previousValue: _fmtDuration(summary.previousMonthDriveTime),
       delta: summary.driveTimeDelta.inMinutes,
-      sentiment: _Sentiment.neutral,
+      sentiment: MonthlyMetricSentiment.neutral,
       showPrevious: reliable,
     );
 
-    final distanceRow = _MetricRow(
+    final distanceRow = MonthlyMetric(
       label: l.consumptionMonthlyDistanceLabel,
       currentValue: _fmtDistance(summary.currentMonthDistanceKm),
       previousValue: _fmtDistance(summary.previousMonthDistanceKm),
       // Convert to a comparable scalar for the arrow: 1-decimal km.
       delta: ((summary.distanceKmDelta) * 10).round(),
-      sentiment: _Sentiment.neutral,
+      sentiment: MonthlyMetricSentiment.neutral,
       showPrevious: reliable,
     );
 
@@ -84,12 +88,12 @@ class MonthlyInsightsCard extends ConsumerWidget {
     // altitude-bearing trips. Neutral sentiment: terrain, not behaviour.
     final showClimbRow = summary.currentMonthClimbMeters > 0;
     final climbRow = showClimbRow
-        ? _MetricRow(
+        ? MonthlyMetric(
             label: l.consumptionMonthlyClimbLabel,
             currentValue: _fmtClimb(summary.currentMonthClimbMeters),
             previousValue: _fmtClimb(summary.previousMonthClimbMeters),
             delta: summary.climbMetersDelta.round(),
-            sentiment: _Sentiment.neutral,
+            sentiment: MonthlyMetricSentiment.neutral,
             showPrevious: reliable,
           )
         : null;
@@ -99,7 +103,7 @@ class MonthlyInsightsCard extends ConsumerWidget {
     final showConsumptionRow =
         summary.currentMonthAvgConsumptionLPer100km != null;
     final consumptionRow = showConsumptionRow
-        ? _MetricRow(
+        ? MonthlyMetric(
             label: l.consumptionMonthlyAvgConsumptionLabel,
             currentValue: _fmtConsumption(
               summary.currentMonthAvgConsumptionLPer100km,
@@ -112,7 +116,7 @@ class MonthlyInsightsCard extends ConsumerWidget {
             // Round to one decimal so a +0.04 swing doesn't render as
             // a coloured arrow when the displayed numbers are equal.
             delta: ((summary.consumptionDeltaLPer100km ?? 0) * 10).round(),
-            sentiment: _Sentiment.lowerIsBetter,
+            sentiment: MonthlyMetricSentiment.lowerIsBetter,
             showPrevious:
                 reliable &&
                 summary.previousMonthAvgConsumptionLPer100km != null,
@@ -142,122 +146,22 @@ class MonthlyInsightsCard extends ConsumerWidget {
                 ),
               ),
             ],
-            const SizedBox(height: 8),
-            tripsRow,
-            const SizedBox(height: 6),
-            driveTimeRow,
-            const SizedBox(height: 6),
-            distanceRow,
-            if (climbRow != null) ...[const SizedBox(height: 6), climbRow],
-            if (consumptionRow != null) ...[
-              const SizedBox(height: 6),
-              consumptionRow,
-            ],
+            const SizedBox(height: 5),
+            // #3904 — one table, so the value columns share their widths
+            // across rows and a figure never wraps its unit.
+            MonthlyMetricsTable(
+              metrics: [
+                tripsRow,
+                driveTimeRow,
+                distanceRow,
+                ?climbRow,
+                ?consumptionRow,
+              ],
+              showPreviousColumn: reliable,
+            ),
           ],
         ),
       ),
-    );
-  }
-}
-
-/// Sentiment band for the trailing delta arrow. `neutral` means the
-/// arrow is rendered grey regardless of direction (more activity is
-/// not inherently good/bad). `lowerIsBetter` is for fuel — down green,
-/// up red.
-enum _Sentiment { neutral, lowerIsBetter }
-
-/// One labelled row inside [MonthlyInsightsCard]. Renders the label on
-/// the left, the current value bold, the previous value in muted text
-/// (when [showPrevious] is true), and a trailing delta arrow.
-class _MetricRow extends StatelessWidget {
-  final String label;
-  final String currentValue;
-  final String previousValue;
-  final num delta;
-  final _Sentiment sentiment;
-  final bool showPrevious;
-
-  const _MetricRow({
-    required this.label,
-    required this.currentValue,
-    required this.previousValue,
-    required this.delta,
-    required this.sentiment,
-    required this.showPrevious,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Row(
-      children: [
-        Expanded(
-          flex: 3,
-          child: Text(
-            label,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ),
-        Expanded(
-          flex: 2,
-          child: Text(
-            currentValue,
-            textAlign: TextAlign.end,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontFeatures: const [FontFeature.tabularFigures()],
-            ),
-          ),
-        ),
-        if (showPrevious) ...[
-          const SizedBox(width: 8),
-          Expanded(
-            flex: 2,
-            child: Text(
-              previousValue,
-              textAlign: TextAlign.end,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-                fontFeatures: const [FontFeature.tabularFigures()],
-              ),
-            ),
-          ),
-          const SizedBox(width: 4),
-          SizedBox(
-            width: 20,
-            child: _DeltaArrow(delta: delta, sentiment: sentiment),
-          ),
-        ],
-      ],
-    );
-  }
-}
-
-/// The trailing arrow on a metric row. Hidden when the displayed
-/// values are equal (delta == 0). Colour follows [sentiment]:
-///   * `neutral`   → grey, both directions
-///   * `lowerIsBetter` → up = error, down = primary
-class _DeltaArrow extends StatelessWidget {
-  final num delta;
-  final _Sentiment sentiment;
-
-  const _DeltaArrow({required this.delta, required this.sentiment});
-
-  @override
-  Widget build(BuildContext context) {
-    if (delta == 0) return const SizedBox.shrink();
-    final theme = Theme.of(context);
-    final up = delta > 0;
-    final color = switch (sentiment) {
-      _Sentiment.neutral => theme.colorScheme.onSurfaceVariant,
-      _Sentiment.lowerIsBetter =>
-        up ? theme.colorScheme.error : DarkModeColors.success(context),
-    };
-    return Icon(
-      up ? Icons.arrow_upward : Icons.arrow_downward,
-      size: 16,
-      color: color,
     );
   }
 }

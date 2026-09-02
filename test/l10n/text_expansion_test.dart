@@ -8,6 +8,8 @@ import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/widgets/service_status_banner.dart';
 import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/features/fill_ups/domain/services/monthly_insights_aggregator.dart';
+import 'package:tankstellen/features/fill_ups/presentation/widgets/monthly_insights_card.dart';
 import 'package:tankstellen/features/search/presentation/widgets/fuel_type_selector.dart';
 import 'package:tankstellen/features/search/presentation/widgets/station_card.dart';
 import 'package:tankstellen/features/setup/presentation/widgets/language_selector.dart';
@@ -30,6 +32,21 @@ import '../helpers/pump_app.dart';
 /// support matrix) and asserts no `RenderFlex` overflow. A layout that
 /// survives `en_XA` at 320 dp survives every real translation; a
 /// failure here is real chrome that truncates for non-English users.
+/// #3904 — a reliable two-month comparison with the widest figures the
+/// month card renders (four-digit km, hours + minutes, a two-decimal
+/// consumption with its unit) so every value column is at its widest.
+const _monthSummary = MonthlyInsightsSummary(
+  currentMonthTripCount: 3,
+  previousMonthTripCount: 97,
+  currentMonthDriveTime: Duration(hours: 1, minutes: 19),
+  previousMonthDriveTime: Duration(hours: 22, minutes: 25),
+  currentMonthDistanceKm: 48.0,
+  previousMonthDistanceKm: 1039.0,
+  currentMonthAvgConsumptionLPer100km: 10.1,
+  previousMonthAvgConsumptionLPer100km: 10.6,
+  isComparisonReliable: true,
+);
+
 void main() {
   const pseudoLocale = Locale('en', 'XA');
 
@@ -154,6 +171,15 @@ void main() {
         widgetName: 'FuelTypeSelector',
       );
     });
+
+    testWidgets('MonthlyInsightsCard — reliable comparison (#3904)',
+        (tester) async {
+      await pumpPseudo(
+        tester,
+        const MonthlyInsightsCard(summary: _monthSummary),
+        widgetName: 'MonthlyInsightsCard',
+      );
+    });
   });
 
   group('Text-scale overflow (1.3x font setting, #3662)', () {
@@ -227,6 +253,15 @@ void main() {
           selectedFuelTypeOverride(FuelType.all),
         ],
         widgetName: 'FuelTypeSelector',
+      );
+    });
+
+    testWidgets('MonthlyInsightsCard — reliable comparison (#3904)',
+        (tester) async {
+      await pumpScaled(
+        tester,
+        const MonthlyInsightsCard(summary: _monthSummary),
+        widgetName: 'MonthlyInsightsCard',
       );
     });
   });

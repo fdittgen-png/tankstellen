@@ -1,0 +1,42 @@
+{
+  "tankReportRecordedTripsCoverage": "Recorded trips cover {pct} % of this tank",
+  "@tankReportRecordedTripsCoverage": {
+    "description": "#3904 tank report — plain-language share of the tank's distance covered by recorded trips (replaces tankReportCoverage). pct is the already-formatted whole-number percentage.",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportRecordedTripsAvg": "Recorded trips: {value}",
+  "@tankReportRecordedTripsAvg": {
+    "description": "#3904 tank report — average consumption of the recorded trips inside this tank (replaces tankReportRecordedAvg). value carries the figure AND its unit, formatted in the user's consumption unit (e.g. '10,5 L/100 km', '27 mpg (UK)').",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportRecordedTripsOverestimate": "Your recorded trips overestimate consumption by {pct} %",
+  "@tankReportRecordedTripsOverestimate": {
+    "description": "#3904 tank report — the recorded estimates run ABOVE the pump-measured consumption (replaces tankReportCalibrationOver). pct is the already-formatted whole-number gap.",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportRecordedTripsUnderestimate": "Your recorded trips underestimate consumption by {pct} %",
+  "@tankReportRecordedTripsUnderestimate": {
+    "description": "#3904 tank report — the recorded estimates run BELOW the pump-measured consumption (replaces tankReportCalibrationUnder). pct is the already-formatted whole-number gap.",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "trajetObd2DegradedSubtitle": "No engine data — GPS estimate",
+  "@trajetObd2DegradedSubtitle": {
+    "description": "#3904 Trajets list — one-line subtitle under the metrics of a red-stripe (OBD2 degraded) trip row, explaining in plain words why the figures are estimates. Pairs with the warning icon whose tooltip is trajetObd2Degraded."
+  }
+}

@@ -4203,14 +4203,6 @@
   "featureLabel_voiceFeedback": "Hangos visszajelzés (beszédszintézis)",
   "featureDescription_voiceFeedback": "Főkapcsoló minden hangos visszajelzéshez — a vezetési hangedzőhöz és a kútbemondásokhoz. Kikapcsolva az app soha nem nyit meg beszédszintetizátort.",
   "tankReportTitle": "Tankjelentés",
-  "tankReportHeadline": "{value} L/100 km",
-  "@tankReportHeadline": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportSincePrevious": "Az előző teli tank óta: {km} km · {liters} L · {cost}",
   "@tankReportSincePrevious": {
     "placeholders": {
@@ -4243,22 +4235,6 @@
   },
   "tankReportTrendFlat": "Az előző tankkal azonos szinten",
   "tankReportNoPrevious": "A változás a következő teli tank után jelenik meg.",
-  "tankReportCoverage": "A rögzítések ennek a tanknak {pct}%-át fedik le",
-  "@tankReportCoverage": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportRecordedAvg": "Rögzített rész: {value} L/100 km",
-  "@tankReportRecordedAvg": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportExplainHeader": "Amire a rögzítések utalnak",
   "tankReportFactorHighRpm": "Magas fordulat aránya: {cur}% (korábban {prev}%)",
   "@tankReportFactorHighRpm": {
@@ -4305,22 +4281,6 @@
     }
   },
   "tankReportCaveat": "A rögzítések esetlegesek, és csak ennek a tanknak egy részét fedik le — ezek az utalások tájékoztató jellegűek, nem a teljes kép.",
-  "tankReportCalibrationUnder": "A rögzített becslések {pct}%-kal a kútoszlop értéke alatt járnak",
-  "@tankReportCalibrationUnder": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportCalibrationOver": "A rögzített becslések {pct}%-kal a kútoszlop értéke felett járnak",
-  "@tankReportCalibrationOver": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
   "qrLaunchConfirmTitle": "Megnyitod a beolvasott linket?",
   "qrLaunchConfirmBody": "Ez a QR-kód ide mutat: {host}. Csak megbízható linkeket nyiss meg.",
   "@qrLaunchConfirmBody": {

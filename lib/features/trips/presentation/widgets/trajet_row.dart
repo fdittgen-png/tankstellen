@@ -183,6 +183,20 @@ class TrajetRow extends StatelessWidget {
                           ),
                       ],
                     ),
+                    // #3904 — the red stripe + warning icon say "something
+                    // went wrong" but not WHAT; a tooltip needs a long-press
+                    // a user never tries. One plain line under the metrics
+                    // says it outright, in the stripe colour.
+                    if (degraded) ...[
+                      SizedBox(height: compact ? 2 : 4),
+                      Text(
+                        l.trajetObd2DegradedSubtitle,
+                        key: const ValueKey('trajet_obd2_degraded_subtitle'),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: stripeColor,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

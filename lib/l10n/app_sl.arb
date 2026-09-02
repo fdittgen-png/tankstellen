@@ -4203,14 +4203,6 @@
   "featureLabel_voiceFeedback": "Govorne povratne informacije (sinteza govora)",
   "featureDescription_voiceFeedback": "Glavno stikalo za vse govorjeno — glasovnega trenerja vožnje in napovedi postaj. Ko je izklopljeno, aplikacija nikoli ne odpre sinteze govora.",
   "tankReportTitle": "Poročilo o rezervoarju",
-  "tankReportHeadline": "{value} L/100 km",
-  "@tankReportHeadline": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportSincePrevious": "Od prejšnjega polnega rezervoarja: {km} km · {liters} L · {cost}",
   "@tankReportSincePrevious": {
     "placeholders": {
@@ -4243,22 +4235,6 @@
   },
   "tankReportTrendFlat": "Na ravni prejšnjega rezervoarja",
   "tankReportNoPrevious": "Razvoj se prikaže po vašem naslednjem polnem rezervoarju.",
-  "tankReportCoverage": "Posnetki pokrivajo {pct} % tega rezervoarja",
-  "@tankReportCoverage": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportRecordedAvg": "Posneti del: {value} L/100 km",
-  "@tankReportRecordedAvg": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportExplainHeader": "Kaj nakazujejo posnetki",
   "tankReportFactorHighRpm": "Delež visokih vrtljajev {cur} % (prej {prev} %)",
   "@tankReportFactorHighRpm": {
@@ -4305,22 +4281,6 @@
     }
   },
   "tankReportCaveat": "Posnetki so naključni in pokrivajo le del tega rezervoarja — ti namigi so okvirni, ne celotna slika.",
-  "tankReportCalibrationUnder": "Posnete ocene so {pct} % pod dejansko vrednostjo na črpalki",
-  "@tankReportCalibrationUnder": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportCalibrationOver": "Posnete ocene so {pct} % nad dejansko vrednostjo na črpalki",
-  "@tankReportCalibrationOver": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
   "qrLaunchConfirmTitle": "Odpreti skenirano povezavo?",
   "qrLaunchConfirmBody": "Ta koda QR vodi na {host}. Odpirajte samo povezave, ki jim zaupate.",
   "@qrLaunchConfirmBody": {

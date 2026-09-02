@@ -1,0 +1,7 @@
+{
+  "tankReportRecordedTripsCoverage": "Les trajets enregistrés couvrent {pct} % de ce plein",
+  "tankReportRecordedTripsAvg": "Trajets enregistrés : {value}",
+  "tankReportRecordedTripsOverestimate": "Vos trajets enregistrés surestiment la consommation de {pct} %",
+  "tankReportRecordedTripsUnderestimate": "Vos trajets enregistrés sous-estiment la consommation de {pct} %",
+  "trajetObd2DegradedSubtitle": "Sans données moteur — estimation GPS"
+}

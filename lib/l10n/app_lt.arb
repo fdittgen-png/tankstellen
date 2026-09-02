@@ -4203,14 +4203,6 @@
   "featureLabel_voiceFeedback": "Balso atsakas (kalbos sintezė)",
   "featureDescription_voiceFeedback": "Pagrindinis visų balso pranešimų jungiklis — vairavimo balso trenerio ir degalinių pranešimų. Išjungus programa niekada nepaleidžia kalbos sintezės.",
   "tankReportTitle": "Bako ataskaita",
-  "tankReportHeadline": "{value} L/100 km",
-  "@tankReportHeadline": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportSincePrevious": "Nuo ankstesnio pilno bako: {km} km · {liters} L · {cost}",
   "@tankReportSincePrevious": {
     "placeholders": {
@@ -4243,22 +4235,6 @@
   },
   "tankReportTrendFlat": "Tiek pat, kiek ankstesnis bakas",
   "tankReportNoPrevious": "Pokytis bus rodomas po kito pilno bako.",
-  "tankReportCoverage": "Įrašai apima {pct} % šio bako",
-  "@tankReportCoverage": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportRecordedAvg": "Įrašyta dalis: {value} L/100 km",
-  "@tankReportRecordedAvg": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportExplainHeader": "Ką rodo įrašai",
   "tankReportFactorHighRpm": "Aukštų apsukų dalis {cur} % (buvo {prev} %)",
   "@tankReportFactorHighRpm": {
@@ -4305,22 +4281,6 @@
     }
   },
   "tankReportCaveat": "Įrašai atsitiktiniai ir apima tik dalį šio bako — šios užuominos orientacinės, ne visa istorija.",
-  "tankReportCalibrationUnder": "Įrašyti įverčiai {pct} % mažesni už kolonėlės rodmenį",
-  "@tankReportCalibrationUnder": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportCalibrationOver": "Įrašyti įverčiai {pct} % viršija kolonėlės rodmenį",
-  "@tankReportCalibrationOver": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
   "qrLaunchConfirmTitle": "Atidaryti nuskaitytą nuorodą?",
   "qrLaunchConfirmBody": "Šis QR kodas nukreipia į {host}. Atidarykite tik nuorodas, kuriomis pasitikite.",
   "@qrLaunchConfirmBody": {

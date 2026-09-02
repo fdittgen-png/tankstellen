@@ -4203,14 +4203,6 @@
   "featureLabel_voiceFeedback": "Talad återkoppling (talsyntes)",
   "featureDescription_voiceFeedback": "Huvudbrytare för allt talat — körcoachen och stationsmeddelandena. Avstängd öppnar appen aldrig någon talsyntesmotor.",
   "tankReportTitle": "Tankrapport",
-  "tankReportHeadline": "{value} L/100 km",
-  "@tankReportHeadline": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportSincePrevious": "Sedan förra fulla tanken: {km} km · {liters} L · {cost}",
   "@tankReportSincePrevious": {
     "placeholders": {
@@ -4243,22 +4235,6 @@
   },
   "tankReportTrendFlat": "I nivå med förra tanken",
   "tankReportNoPrevious": "Utvecklingen visas efter din nästa fulla tank.",
-  "tankReportCoverage": "Registreringarna täcker {pct} % av den här tanken",
-  "@tankReportCoverage": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportRecordedAvg": "Registrerad del: {value} L/100 km",
-  "@tankReportRecordedAvg": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportExplainHeader": "Vad registreringarna antyder",
   "tankReportFactorHighRpm": "Andel högt varvtal {cur} % (var {prev} %)",
   "@tankReportFactorHighRpm": {
@@ -4305,22 +4281,6 @@
     }
   },
   "tankReportCaveat": "Registreringarna är spontana och täcker bara en del av den här tanken — ledtrådarna är vägledande, inte hela bilden.",
-  "tankReportCalibrationUnder": "Registrerade uppskattningar ligger {pct} % under pumpens värde",
-  "@tankReportCalibrationUnder": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportCalibrationOver": "Registrerade uppskattningar ligger {pct} % över pumpens värde",
-  "@tankReportCalibrationOver": {
-    "placeholders": {
-      "pct": {
-        "type": "String"
-      }
-    }
-  },
   "qrLaunchConfirmTitle": "Öppna den skannade länken?",
   "qrLaunchConfirmBody": "Den här QR-koden pekar på {host}. Öppna bara länkar du litar på.",
   "@qrLaunchConfirmBody": {
