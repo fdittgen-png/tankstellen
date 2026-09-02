@@ -6,25 +6,46 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../domain/brand_appearance.dart';
 import '../providers/privacy_controls_provider.dart';
 import '../theme/app_radius.dart';
 import '../utils/brand_logo_mapper.dart';
 
-/// Displays a brand logo for a fuel station, with automatic fallback
-/// to a generic fuel pump icon when no logo is available or loading fails.
+/// Displays the mark for a fuel station brand or a charging network.
 ///
-/// Uses [BrandLogoMapper] to resolve brand names to logo URLs. Logos are
-/// disk-cached and decoded at the display size (#1761): a logo is
-/// fetched and decoded once, then reused from disk across scroll-away
-/// and app restarts instead of re-downloading.
+/// Three renderings, in order of preference:
+///
+/// 1. **The real logo** — only when the user switched internet logos ON
+///    in Settings → Privacy (#3870) *and* [BrandLogoMapper] resolves a
+///    domain. Disk-cached and decoded at the display size (#1761).
+/// 2. **The offline brand mark** (#3930) — the brand's own colour with a
+///    1–3 character monogram, from [BrandAppearance]. This is what the
+///    overwhelming majority of users see, because the privacy switch is
+///    OFF by default. It is also the network logo's placeholder and its
+///    error widget, so a slow or dead CDN degrades to the brand's colour
+///    rather than to a grey hole.
+/// 3. **The neutral tile** — a surface-coloured box with a pump or a
+///    charging glyph, for a brand nothing recognises. [kind] picks the
+///    glyph.
 class BrandLogo extends ConsumerWidget {
-  /// The brand name (e.g. "Shell", "TotalEnergies", "ARAL").
+  /// The brand name (e.g. "Shell", "TotalEnergies", "Ionity"). Raw
+  /// upstream spellings are fine — the mark canonicalises them.
   final String brand;
 
-  /// The size of the logo (width and height). Defaults to 48.
+  /// The size of the mark (width and height). Defaults to 48.
   final double size;
 
-  const BrandLogo({super.key, required this.brand, this.size = 48});
+  /// What the caller is showing: a forecourt or a charging point. Only
+  /// decides the neutral fallback glyph — a brand with its own mark
+  /// renders the same either way.
+  final BrandKind kind;
+
+  const BrandLogo({
+    super.key,
+    required this.brand,
+    this.size = 48,
+    this.kind = BrandKind.fuel,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -37,12 +58,20 @@ class BrandLogo extends ConsumerWidget {
 
     // #1687 — a screen reader previously announced nothing for the
     // logo on every station card. `image: true` marks it as a
-    // graphic; the label names the brand it depicts.
+    // graphic; the label names the brand it depicts. A brandless
+    // station announces what the neutral tile actually depicts
+    // instead of an empty "  logo" (#3930).
+    final label = brand.trim().isEmpty
+        ? (kind == BrandKind.ev
+              ? l10n.brandMarkEvGeneric
+              : l10n.brandMarkFuelGeneric)
+        : l10n.brandLogoLabel(brand);
+
     return Semantics(
-      label: l10n.brandLogoLabel(brand),
+      label: label,
       image: true,
       child: url == null
-          ? _fallbackIcon(theme)
+          ? _mark(theme)
           : _networkLogo(context, url, theme),
     );
   }
@@ -61,27 +90,56 @@ class BrandLogo extends ConsumerWidget {
         fit: BoxFit.contain,
         memCacheWidth: cachePx,
         memCacheHeight: cachePx,
-        placeholder: (context, _) => _placeholder(theme),
-        errorWidget: (context, _, _) => _fallbackIcon(theme),
+        placeholder: (context, _) => _mark(theme),
+        errorWidget: (context, _, _) => _mark(theme),
       ),
     );
   }
 
-  /// Calm static placeholder shown while the logo loads — a soft
-  /// surface-coloured box. A spinner is overkill for a 48dp slot and
-  /// would animate indefinitely.
-  Widget _placeholder(ThemeData theme) {
+  /// The offline mark: the brand's colour + monogram when the brand is
+  /// known, the neutral tile otherwise.
+  Widget _mark(ThemeData theme) {
+    final appearance = BrandAppearance.of(brand);
+    return appearance == null
+        ? _neutralTile(theme)
+        : _monogramTile(appearance);
+  }
+
+  /// Colour + monogram (#3930). The foreground is computed from the
+  /// background's luminance, so every brand clears the 4.5:1 floor
+  /// without a hand-maintained text colour beside each entry.
+  Widget _monogramTile(BrandAppearance appearance) {
     return Container(
       width: size,
       height: size,
+      alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest,
+        color: appearance.background,
         borderRadius: AppRadius.md,
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: size * 0.1),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            appearance.monogram,
+            maxLines: 1,
+            style: TextStyle(
+              color: appearance.foreground,
+              fontSize: size * 0.44,
+              fontWeight: FontWeight.w800,
+              height: 1.1,
+              letterSpacing: -0.5,
+            ),
+          ),
+        ),
       ),
     );
   }
 
-  Widget _fallbackIcon(ThemeData theme) {
+  /// Nothing recognises this brand — a calm surface box with the glyph
+  /// for what the caller is showing.
+  Widget _neutralTile(ThemeData theme) {
     return Container(
       width: size,
       height: size,
@@ -90,7 +148,7 @@ class BrandLogo extends ConsumerWidget {
         borderRadius: AppRadius.md,
       ),
       child: Icon(
-        Icons.local_gas_station,
+        kind == BrandKind.ev ? Icons.ev_station : Icons.local_gas_station,
         size: size * 0.6,
         color: theme.colorScheme.onSurfaceVariant,
       ),
