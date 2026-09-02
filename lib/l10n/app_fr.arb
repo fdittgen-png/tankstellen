@@ -1419,7 +1419,6 @@
   "consumptionStatsTitle": "Statistiques de consommation",
   "noFillUpsTitle": "Aucun plein pour l'instant",
   "noFillUpsSubtitle": "Enregistrez votre premier plein pour suivre votre consommation.",
-  "stationPreFilled": "Station pré-remplie",
   "statAvgConsumption": "Conso moy. L/100 km",
   "statAvgCostPerKm": "Coût moy./km",
   "statTotalLiters": "Litres au total",
@@ -3339,54 +3338,12 @@
   "@consumptionMonthlyClimbLabel": {
     "description": "Row label on the monthly-insights card for total metres climbed across the month (#2697 P3) — now trustworthy that altitude is guarded + persisted. Rendered only when at least one trip carried altitude samples."
   },
-  "openNow": "Ouvert",
-  "@openNow": {
-    "description": "MT — needs native review"
-  },
-  "openNowClosed": "Fermé",
-  "@openNowClosed": {
-    "description": "MT — needs native review"
-  },
   "openHoursUnknown": "Horaires inconnus",
   "@openHoursUnknown": {
     "description": "MT — needs native review"
   },
-  "closesAt": "Ferme à {time}",
-  "@closesAt": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "time": {
-        "type": "String"
-      }
-    }
-  },
-  "opensAt": "Ouvre {day} à {time}",
-  "@opensAt": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "day": {
-        "type": "String"
-      },
-      "time": {
-        "type": "String"
-      }
-    }
-  },
-  "opensToday": "Ouvre à {time}",
-  "@opensToday": {
-    "description": "MT — needs native review",
-    "placeholders": {
-      "time": {
-        "type": "String"
-      }
-    }
-  },
   "open24Hours": "Ouvert 24h/24",
   "@open24Hours": {
-    "description": "MT — needs native review"
-  },
-  "badge24h": "24h",
-  "@badge24h": {
     "description": "MT — needs native review"
   },
   "dayMon": "Lundi",
@@ -3538,7 +3495,7 @@
   "@featureDescription_addFillUpShareIntentReceipt": {
     "description": "MT — needs native review"
   },
-  "openingHoursAutomate24h": "Automatiser 24h/24 7j/7",
+  "openingHoursAutomate24h": "Automate 24h/24 7j/7 (paiement par carte)",
   "@openingHoursAutomate24h": {
     "description": "MT — needs native review"
   },
@@ -4893,5 +4850,160 @@
         "type": "String"
       }
     }
-  }
+  },
+  "stalePriceBadge": "Prix ancien",
+  "radiusAlertCenterChipGps": "Ma position",
+  "radiusAlertCenterChipMap": "Point sur la carte",
+  "radiusAlertCenterChipPostal": "Code postal {postalCode}",
+  "@radiusAlertCenterChipPostal": {
+    "placeholders": {
+      "postalCode": {
+        "type": "String",
+        "example": "34550"
+      }
+    }
+  },
+  "radiusAlertCenterClear": "Effacer l'emplacement",
+  "radiusAlertBlockerLabel": "Saisissez un libellé",
+  "radiusAlertBlockerThreshold": "Saisissez un seuil supérieur à 0",
+  "radiusAlertBlockerLocation": "Choisissez un emplacement",
+  "fillUpOdometerFromLastFillUp": "Pré-rempli depuis votre dernier plein",
+  "fillUpStationLabel": "Station",
+  "fillUpStationChange": "Changer",
+  "pickStationSectionLast": "Dernière station",
+  "pickStationSectionFavorites": "Favoris",
+  "pickStationSectionNearby": "À proximité",
+  "pickStationNearbyEmpty": "Aucune recherche récente — cherchez des stations dans l'onglet Recherche et les plus proches apparaîtront ici.",
+  "pickStationLastFillUpAt": "Dernier plein : {date}",
+  "@pickStationLastFillUpAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "stationStatusWithFreshness": "{status} · mis à jour il y a {ago}",
+  "@stationStatusWithFreshness": {
+    "placeholders": {
+      "status": {
+        "type": "String",
+        "example": "Open"
+      },
+      "ago": {
+        "type": "String",
+        "example": "< 1 min"
+      }
+    }
+  },
+  "pricesNotSoldHere": "Non vendu ici : {fuels}",
+  "@pricesNotSoldHere": {
+    "placeholders": {
+      "fuels": {
+        "type": "String",
+        "example": "Super E5, Super E10"
+      }
+    }
+  },
+  "tankReportRecordedTripsCoverage": "Les trajets enregistrés couvrent {pct} % de ce plein",
+  "@tankReportRecordedTripsCoverage": {
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportRecordedTripsAvg": "Trajets enregistrés : {value}",
+  "@tankReportRecordedTripsAvg": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportRecordedTripsOverestimate": "Vos trajets enregistrés surestiment la consommation de {pct} %",
+  "@tankReportRecordedTripsOverestimate": {
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportRecordedTripsUnderestimate": "Vos trajets enregistrés sous-estiment la consommation de {pct} %",
+  "@tankReportRecordedTripsUnderestimate": {
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "trajetObd2DegradedSubtitle": "Sans données moteur — estimation GPS",
+  "vehicleTopicAdapterNone": "Aucun",
+  "vehicleTopicCalibrationTitle": "Calibrage",
+  "vehicleTopicAdvancedBadge": "Avancé",
+  "vehicleTopicCalibrationStatus": "Baseline {coverage} % · {mode}",
+  "@vehicleTopicCalibrationStatus": {
+    "placeholders": {
+      "coverage": {
+        "type": "int",
+        "example": "78"
+      },
+      "mode": {
+        "type": "String",
+        "example": "Rule-based"
+      }
+    }
+  },
+  "vehicleTopicRemindersCount": "{count, plural, =0{Aucun rappel} =1{1 rappel} other{{count} rappels}}",
+  "@vehicleTopicRemindersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "vehicleTopicAutoRecordOn": "Activé",
+  "vehicleTopicAutoRecordOff": "Désactivé",
+  "vehicleTopicAutoRecordPairLinkText": "Associez un adaptateur dans « Adaptateur OBD2 » pour activer l’enregistrement automatique",
+  "vehicleBaselineCoverageSamples": "{covered} / {max} échantillons",
+  "@vehicleBaselineCoverageSamples": {
+    "placeholders": {
+      "covered": {
+        "type": "int",
+        "example": "210"
+      },
+      "max": {
+        "type": "int",
+        "example": "270"
+      }
+    }
+  },
+  "vehicleBaselineRawSamples": "{count, plural, =1{1 échantillon} other{{count} échantillons}}",
+  "@vehicleBaselineRawSamples": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "954"
+      }
+    }
+  },
+  "calibrationModeRuleDescription": "Classe chaque relevé de conduite dans une seule situation selon des seuils fixes de vitesse et de charge.",
+  "calibrationModeFuzzyDescription": "Répartit chaque relevé entre les situations voisines selon son degré d’appartenance — des estimations plus lisses aux frontières.",
+  "pumpGainChipNotCalibrated": "Pas encore calibré à la pompe",
+  "pumpGainChipCalibrated": "{fills, plural, =1{Calibré à la pompe · 1 plein · ±{percent} %} other{Calibré à la pompe · {fills} pleins · ±{percent} %}}",
+  "@pumpGainChipCalibrated": {
+    "placeholders": {
+      "fills": {
+        "type": "int",
+        "example": "6"
+      },
+      "percent": {
+        "type": "int",
+        "example": "7"
+      }
+    }
+  },
+  "pumpGainResetAction": "Réinitialiser le calibrage à la pompe",
+  "pumpGainResetConfirmTitle": "Réinitialiser le calibrage à la pompe ?",
+  "pumpGainResetConfirmBody": "Le facteur de carburant appris à partir de vos pleins sera effacé. Les estimations de consommation OBD2 reviendront à la valeur non corrigée jusqu’à ce que le prochain intervalle plein-à-plein le réapprenne."
 }

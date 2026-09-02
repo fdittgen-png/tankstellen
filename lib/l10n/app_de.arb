@@ -760,7 +760,6 @@
   "liters": "Liter",
   "odometerKm": "Kilometerstand (km)",
   "notesOptional": "Notizen (optional)",
-  "stationPreFilled": "Tankstelle vorausgefüllt",
   "statAvgConsumption": "Ø L/100km",
   "statAvgCostPerKm": "Ø Kosten/km",
   "statTotalLiters": "Gesamt Liter",
@@ -3196,15 +3195,9 @@
   "@onboardingObd2LaterNote": {
     "description": "Informational note on the iOS variant of the OBD2 onboarding step (App Review 5.1.1(iv), #3535): no in-wizard connect flow on iOS, the adapter is paired later from the vehicle screen."
   },
-  "openNow": "Geöffnet",
-  "openNowClosed": "Geschlossen",
   "openHoursUnknown": "Öffnungszeiten unbekannt",
-  "closesAt": "Schließt um {time}",
-  "opensAt": "Öffnet {day} {time}",
-  "opensToday": "Öffnet um {time}",
   "open24Hours": "24 Stunden geöffnet",
-  "badge24h": "24h",
-  "openingHoursAutomate24h": "Automat 24/7",
+  "openingHoursAutomate24h": "Tankautomat 24/7 (Kartenzahlung)",
   "dayMon": "Montag",
   "dayTue": "Dienstag",
   "dayWed": "Mittwoch",
@@ -3872,6 +3865,98 @@
   "unsupportedRegionDismiss": "Verstanden",
   "configureCountryTitle": "Land festlegen",
   "configureCountryBody": "Dein Land wird unterstützt, ist aber noch nicht eingerichtet – daher stammen die Preise möglicherweise aus einem anderen Land. Wähle dein Land in den Sucheinstellungen, um lokale Preise zu sehen.",
+  "stalePriceBadge": "Alter Preis",
+  "radiusAlertCenterChipGps": "Mein Standort",
+  "radiusAlertCenterChipMap": "Punkt auf der Karte",
+  "radiusAlertCenterChipPostal": "Postleitzahl {postalCode}",
+  "radiusAlertCenterClear": "Standort entfernen",
+  "radiusAlertBlockerLabel": "Geben Sie eine Bezeichnung ein",
+  "radiusAlertBlockerThreshold": "Geben Sie einen Schwellenwert über 0 ein",
+  "radiusAlertBlockerLocation": "Wählen Sie einen Standort",
+  "fillUpOdometerFromLastFillUp": "Aus Ihrer letzten Tankfüllung vorausgefüllt",
+  "fillUpStationLabel": "Tankstelle",
+  "fillUpStationChange": "Ändern",
+  "pickStationSectionLast": "Letzte Tankstelle",
+  "pickStationSectionFavorites": "Favoriten",
+  "pickStationSectionNearby": "In der Nähe",
+  "pickStationNearbyEmpty": "Keine aktuelle Suche — suchen Sie im Tab „Suche“ nach Tankstellen, dann erscheinen die nächstgelegenen hier.",
+  "pickStationLastFillUpAt": "Letzte Tankfüllung: {date}",
+  "stationStatusWithFreshness": "{status} · aktualisiert vor {ago}",
+  "pricesNotSoldHere": "Hier nicht angeboten: {fuels}",
+  "tankReportRecordedTripsCoverage": "Aufgezeichnete Fahrten decken {pct} % dieser Tankfüllung ab",
+  "tankReportRecordedTripsAvg": "Aufgezeichnete Fahrten: {value}",
+  "tankReportRecordedTripsOverestimate": "Deine aufgezeichneten Fahrten überschätzen den Verbrauch um {pct} %",
+  "tankReportRecordedTripsUnderestimate": "Deine aufgezeichneten Fahrten unterschätzen den Verbrauch um {pct} %",
+  "trajetObd2DegradedSubtitle": "Keine Motordaten — GPS-Schätzung",
+  "vehicleTopicAdapterNone": "Keiner",
+  "vehicleTopicCalibrationTitle": "Kalibrierung",
+  "vehicleTopicAdvancedBadge": "Erweitert",
+  "vehicleTopicCalibrationStatus": "Basislinie {coverage} % · {mode}",
+  "@vehicleTopicCalibrationStatus": {
+    "placeholders": {
+      "coverage": {
+        "type": "int",
+        "example": "78"
+      },
+      "mode": {
+        "type": "String",
+        "example": "Regelbasiert"
+      }
+    }
+  },
+  "vehicleTopicRemindersCount": "{count, plural, =0{Keine Erinnerungen} =1{1 Erinnerung} other{{count} Erinnerungen}}",
+  "@vehicleTopicRemindersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "vehicleTopicAutoRecordOn": "Ein",
+  "vehicleTopicAutoRecordOff": "Aus",
+  "vehicleTopicAutoRecordPairLinkText": "Koppeln Sie unter „OBD2-Adapter“ einen Adapter, um die automatische Aufzeichnung zu aktivieren",
+  "vehicleBaselineCoverageSamples": "{covered} / {max} Stichproben",
+  "@vehicleBaselineCoverageSamples": {
+    "placeholders": {
+      "covered": {
+        "type": "int",
+        "example": "210"
+      },
+      "max": {
+        "type": "int",
+        "example": "270"
+      }
+    }
+  },
+  "vehicleBaselineRawSamples": "{count, plural, =1{1 Stichprobe} other{{count} Stichproben}}",
+  "@vehicleBaselineRawSamples": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "954"
+      }
+    }
+  },
+  "calibrationModeRuleDescription": "Ordnet jede Fahrprobe anhand fester Geschwindigkeits- und Lastschwellen genau einer Situation zu.",
+  "calibrationModeFuzzyDescription": "Verteilt jede Probe nach Passung auf benachbarte Situationen – gleichmäßigere Schätzungen an den Übergängen.",
+  "pumpGainChipNotCalibrated": "Noch nicht an der Zapfsäule kalibriert",
+  "pumpGainChipCalibrated": "{fills, plural, =1{Zapfsäulen-kalibriert · 1 Tankfüllung · ±{percent} %} other{Zapfsäulen-kalibriert · {fills} Tankfüllungen · ±{percent} %}}",
+  "@pumpGainChipCalibrated": {
+    "placeholders": {
+      "fills": {
+        "type": "int",
+        "example": "6"
+      },
+      "percent": {
+        "type": "int",
+        "example": "7"
+      }
+    }
+  },
+  "pumpGainResetAction": "Zapfsäulen-Kalibrierung zurücksetzen",
+  "pumpGainResetConfirmTitle": "Zapfsäulen-Kalibrierung zurücksetzen?",
+  "pumpGainResetConfirmBody": "Der aus Ihren Tankfüllungen gelernte Kraftstofffaktor wird verworfen. OBD2-Verbrauchsschätzungen nutzen wieder den unkorrigierten Wert, bis das nächste Voll-zu-Voll-Tankfenster ihn neu lernt.",
   "vehicleMultiFuelCapableLabel": "Ich tanke eventuell verschiedene Kraftstoffarten",
   "vehicleMultiFuelCapableHelper": "Ermittelt, welcher Kraftstoff pro Kilometer am günstigsten ist",
   "vinLabel": "FIN (optional)",
