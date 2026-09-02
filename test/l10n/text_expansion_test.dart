@@ -15,6 +15,10 @@ import 'package:tankstellen/features/fill_ups/presentation/widgets/monthly_insig
 import 'package:tankstellen/features/profile/domain/entities/user_profile.dart';
 import 'package:tankstellen/features/profile/presentation/screens/settings/privacy/privacy_choices_screen.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
+import 'package:tankstellen/features/search/presentation/widgets/all_prices/all_prices_table_header.dart';
+import 'package:tankstellen/features/search/presentation/widgets/all_prices_station_card.dart';
+import 'package:tankstellen/features/search/providers/all_prices_comparison_model.dart';
+import 'package:tankstellen/features/search/providers/all_prices_table_provider.dart';
 import 'package:tankstellen/features/search/presentation/widgets/fuel_type_selector.dart';
 import 'package:tankstellen/features/search/presentation/widgets/station_card.dart';
 import 'package:tankstellen/features/search/providers/station_rating_provider.dart';
@@ -72,6 +76,53 @@ const _monthSummary = MonthlyInsightsSummary(
   previousMonthAvgConsumptionLPer100km: 10.6,
   isComparisonReliable: true,
 );
+
+/// #3933 — the widest all-prices row the French flex-fuel case produces:
+/// four columns plus the "+n" expander, every cell carrying a price, a
+/// delta and a cost per 100 km, and a two-part verdict line underneath.
+/// If the grid survives this at 320 dp it survives every real result set.
+const _allPricesColumns = AllPricesColumns(
+  visible: [FuelType.e10, FuelType.e98, FuelType.diesel, FuelType.e85],
+  overflow: [FuelType.lpg],
+);
+
+const _allPricesStation = Station(
+  id: 'fr-expansion',
+  name: 'Flex',
+  brand: 'TOTAL ENERGIES',
+  street: 'Avenue de la Gare',
+  postCode: '34120',
+  place: 'Pezenas',
+  lat: 43.46,
+  lng: 3.42,
+  dist: 12.4,
+  e10: 2.089,
+  e98: 2.189,
+  diesel: 1.929,
+  e85: 0.839,
+  lpg: 0.959,
+  isOpen: true,
+);
+
+List<Object> _allPricesOverrides() => <Object>[
+      fakeHiveStorageOverride().override,
+      activeCountryOverride(Countries.france),
+      allPricesColumnsProvider.overrideWithValue(_allPricesColumns),
+      allPricesBestByFuelProvider.overrideWithValue(
+        const {FuelType.e85: 0.809, FuelType.e10: 2.029},
+      ),
+      allPricesFuelCostModelProvider.overrideWithValue(
+        const FuelCostModel(
+          litersPer100kmByFuel: {FuelType.e85: 6.0, FuelType.e10: 4.6},
+          usableFuels: {
+            FuelType.e5,
+            FuelType.e10,
+            FuelType.e98,
+            FuelType.e85,
+          },
+        ),
+      ),
+    ];
 
 void main() {
   const pseudoLocale = Locale('en', 'XA');
@@ -219,6 +270,31 @@ void main() {
         widgetName: 'MonthlyInsightsCard',
       );
     });
+
+    // #3933 — the all-prices comparison table has FIXED columns, so an
+    // expanded translation cannot be absorbed by re-flowing: it has to
+    // shrink inside its column instead. These two cases are the proof.
+    testWidgets('AllPricesTableHeader — sticky columns + legend (#3933)',
+        (tester) async {
+      await pumpPseudo(
+        tester,
+        const AllPricesTableHeader(),
+        overrides: _allPricesOverrides(),
+        widgetName: 'AllPricesTableHeader',
+      );
+    });
+
+    testWidgets('AllPricesStationCard — four columns + verdict (#3933)',
+        (tester) async {
+      await pumpPseudo(
+        tester,
+        const SingleChildScrollView(
+          child: AllPricesStationCard(station: _allPricesStation),
+        ),
+        overrides: _allPricesOverrides(),
+        widgetName: 'AllPricesStationCard',
+      );
+    });
   });
 
   group('Text-scale overflow (1.3x font setting, #3662)', () {
@@ -312,6 +388,28 @@ void main() {
         tester,
         const MonthlyInsightsCard(summary: _monthSummary),
         widgetName: 'MonthlyInsightsCard',
+      );
+    });
+
+    testWidgets('AllPricesTableHeader — sticky columns + legend (#3933)',
+        (tester) async {
+      await pumpScaled(
+        tester,
+        const AllPricesTableHeader(),
+        overrides: _allPricesOverrides(),
+        widgetName: 'AllPricesTableHeader',
+      );
+    });
+
+    testWidgets('AllPricesStationCard — four columns + verdict (#3933)',
+        (tester) async {
+      await pumpScaled(
+        tester,
+        const SingleChildScrollView(
+          child: AllPricesStationCard(station: _allPricesStation),
+        ),
+        overrides: _allPricesOverrides(),
+        widgetName: 'AllPricesStationCard',
       );
     });
   });

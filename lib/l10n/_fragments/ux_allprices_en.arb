@@ -1,0 +1,146 @@
+{
+  "allPricesLegend": "Filled = cheapest of these results. Second figure = what 100 km costs on that fuel with your vehicle.",
+  "@allPricesLegend": {
+    "description": "One-line legend under the sticky column header of the all-prices comparison table (#3933). Explains the two things the cards would otherwise leave unexplained: the filled emphasis and the second number in each cell. Shown when the active vehicle has measured per-fuel consumption."
+  },
+  "allPricesLegendPricesOnly": "Filled = cheapest of these results. Add a vehicle and log fill-ups to see the cost per 100 km.",
+  "@allPricesLegendPricesOnly": {
+    "description": "Legend variant of allPricesLegend used when no vehicle is active or no fuel has a measured consumption yet, so the cost-per-100-km line is absent from every cell (#3933)."
+  },
+  "allPricesNoPriceMask": "—",
+  "@allPricesNoPriceMask": {
+    "description": "Placeholder rendered in a fuel column the station does not price at all, keeping the column aligned instead of reflowing the row (#3933). An em dash in most locales."
+  },
+  "allPricesBestMarker": "best",
+  "@allPricesBestMarker": {
+    "description": "Marker under the price of the cell that holds the cheapest price for its fuel across the current search results (#3933). Replaces the numeric delta on that one cell. Very short — it must fit a column roughly 66 dp wide."
+  },
+  "allPricesDelta": "+{amount}",
+  "@allPricesDelta": {
+    "description": "How much dearer this station's price for a fuel is than the cheapest price for the same fuel in the current results (#3933). Rendered under the price in a table cell; keep it as short as the English form.",
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "0,06"
+      }
+    }
+  },
+  "allPricesCostPer100km": "{cost}/100 km",
+  "@allPricesCostPer100km": {
+    "description": "A money amount expressed per 100 km — the cost of driving 100 km on one fuel at one station (#3933). Used inside the per-station verdict line.",
+    "placeholders": {
+      "cost": {
+        "type": "String",
+        "example": "5,02 €"
+      }
+    }
+  },
+  "allPricesVerdictHere": "Cheapest here: {fuel} at {cost}",
+  "@allPricesVerdictHere": {
+    "description": "Per-station verdict line of the all-prices comparison table (#3933): which fuel actually costs least per 100 km at THIS station, given the vehicle's measured consumption for each fuel.",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E85"
+      },
+      "cost": {
+        "type": "String",
+        "example": "5,02 €/100 km"
+      }
+    }
+  },
+  "allPricesVerdictWinsResults": "cheapest of the results",
+  "@allPricesVerdictWinsResults": {
+    "description": "Marker appended to the per-station verdict when that station also holds the cheapest price for the winning fuel across the whole result set (#3933)."
+  },
+  "allPricesMoreFuels": "+{count}",
+  "@allPricesMoreFuels": {
+    "description": "Label of the per-card expander that reveals the fuels which did not fit the fixed column budget of the all-prices table (#3933). Must stay two or three characters wide.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "allPricesMoreFuelsTooltip": "{count, plural, =1{Show 1 more fuel} other{Show {count} more fuels}}",
+  "@allPricesMoreFuelsTooltip": {
+    "description": "Tooltip of the collapsed per-card expander in the all-prices table (#3933).",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "allPricesFewerFuelsTooltip": "Hide the extra fuels",
+  "@allPricesFewerFuelsTooltip": {
+    "description": "Tooltip of the expanded per-card expander in the all-prices table (#3933) — collapsing it hides the fuels outside the fixed column set."
+  },
+  "allPricesCellPriceSemantics": "{fuel} {price}",
+  "@allPricesCellPriceSemantics": {
+    "description": "Screen-reader label of one all-prices table cell when only the pump price is known (#3933).",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E10"
+      },
+      "price": {
+        "type": "String",
+        "example": "1,839"
+      }
+    }
+  },
+  "allPricesCellCostSemantics": "{fuel} {price}, {cost} per 100 km at {consumption}",
+  "@allPricesCellCostSemantics": {
+    "description": "Screen-reader label of one all-prices table cell when the vehicle's measured consumption turns the pump price into a cost per 100 km (#3933).",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E85"
+      },
+      "price": {
+        "type": "String",
+        "example": "0,839"
+      },
+      "cost": {
+        "type": "String",
+        "example": "5,02 €"
+      },
+      "consumption": {
+        "type": "String",
+        "example": "6,0 L/100 km"
+      }
+    }
+  },
+  "allPricesCellNoPriceSemantics": "{fuel}, no price",
+  "@allPricesCellNoPriceSemantics": {
+    "description": "Screen-reader label of an empty all-prices table cell — the station does not sell that fuel, and the column stays in place (#3933).",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E85"
+      }
+    }
+  },
+  "allPricesCellUnavailableSemantics": "{fuel}, out of stock",
+  "@allPricesCellUnavailableSemantics": {
+    "description": "Screen-reader label of an all-prices table cell for a fuel the station reports as out of stock (#3933).",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "Diesel"
+      }
+    }
+  },
+  "allPricesCellUnusableSemantics": "{fuel}, not usable by your vehicle",
+  "@allPricesCellUnusableSemantics": {
+    "description": "Screen-reader label of a dimmed all-prices table cell — the active vehicle cannot be filled with that fuel (#3933).",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "Diesel"
+      }
+    }
+  }
+}
