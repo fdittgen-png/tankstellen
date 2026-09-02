@@ -4,13 +4,17 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../l10n/app_localizations.dart';
+import '../../widgets/privacy/sync_account_overview_card.dart';
 import '../../widgets/tank_sync_section.dart';
 import 'settings_topic_scaffold.dart';
 
-/// Settings → Sync & account (#3884): the TankSync section expanded —
-/// connection status, account (anonymous ↔ email), data management and
-/// the danger zone. The root tile is gated on `Feature.tankSync`
-/// (#1447 phase 3); stored TankSync config survives the gate.
+/// Settings → Sync & account (#3884, #3911 Epic #3907): the ONE TankSync
+/// screen — the plain-language overview (status, mode and what it
+/// means, account kind, copyable user id, database host, the
+/// learned-vehicle-profiles switch) above the TankSync section with its
+/// account actions, data management and danger zone. The root tile is
+/// gated on `Feature.tankSync` (#1447 phase 3); stored TankSync config
+/// survives the gate.
 class SyncAccountScreen extends StatelessWidget {
   const SyncAccountScreen({super.key});
 
@@ -27,6 +31,8 @@ class SyncAccountScreen extends StatelessWidget {
           // section isn't an unexplained label.
           subtitle: l.tankSyncSectionSubtitle,
         ),
+        const SyncAccountOverviewCard(),
+        const SizedBox(height: 8),
         const TankSyncSection(),
       ],
     );
