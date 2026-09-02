@@ -217,9 +217,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get dataTransparency => 'Transparentnost dat';
 
   @override
-  String get storageAndCache => 'Úložiště a mezipaměť';
-
-  @override
   String get clearCache => 'Vymazat mezipaměť';
 
   @override
@@ -234,19 +231,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get settingsLabel => 'Nastavení';
 
   @override
-  String get profilesStored => 'uložených profilů';
-
-  @override
-  String get stationsMarked => 'označených stanic';
-
-  @override
-  String get cachedResponses => 'odpovědí v mezipaměti';
-
-  @override
   String get total => 'Celkem';
-
-  @override
-  String get cacheManagement => 'Správa mezipaměti';
 
   @override
   String get cacheDescription =>
@@ -297,9 +282,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get deleteAllButton => 'Smazat vše';
 
   @override
-  String get entries => 'záznamů';
-
-  @override
   String get cacheEmpty => 'Mezipaměť je prázdná';
 
   @override
@@ -330,87 +312,13 @@ class AppLocalizationsCs extends AppLocalizations {
   String get reportConsentCancel => 'Zrušit';
 
   @override
-  String get configProfileSection => 'Profil';
-
-  @override
-  String get configActiveProfile => 'Aktivní profil';
-
-  @override
-  String get configPreferredFuel => 'Preferované palivo';
-
-  @override
-  String get configCountry => 'Země';
-
-  @override
-  String get configRouteSegment => 'Segment trasy';
-
-  @override
-  String get configApiKeysSection => 'Klíče API';
-
-  @override
-  String get configTankerkoenigKey => 'Klíč API Tankerkoenig';
-
-  @override
-  String get configApiKeyConfigured => 'Nakonfigurováno';
-
-  @override
-  String get configApiKeyCommunity => 'Výchozí (komunitní klíč)';
-
-  @override
   String get searchLocationPlaceholder => 'Adresa, PSČ nebo město';
-
-  @override
-  String get configEvKey => 'Klíč API pro nabíjení EV';
-
-  @override
-  String get configEvKeyCustom => 'Vlastní klíč';
-
-  @override
-  String get configEvKeyShared => 'Výchozí (sdílený)';
-
-  @override
-  String get configCloudSyncSection => 'Cloudová synchronizace';
 
   @override
   String get configTankSyncConnected => 'Připojeno';
 
   @override
   String get configTankSyncDisabled => 'Zakázáno';
-
-  @override
-  String get configAuthMode => 'Režim ověřování';
-
-  @override
-  String get configAuthEmail => 'E-mail (trvalý)';
-
-  @override
-  String get configAuthAnonymous => 'Anonymní (pouze zařízení)';
-
-  @override
-  String get configDatabase => 'Databáze';
-
-  @override
-  String get configPrivacySummary => 'Přehled ochrany soukromí';
-
-  @override
-  String configPrivacySummarySynced(Object authNote) {
-    return '• Oblíbené, upozornění a ignorované stanice jsou synchronizovány do vaší soukromé databáze\n• Poloha GPS a klíče API nikdy neopustí vaše zařízení\n• $authNote';
-  }
-
-  @override
-  String get configPrivacySummaryLocal =>
-      '• Všechna data jsou uložena pouze lokálně na tomto zařízení\n• Žádná data nejsou odesílána na žádný server\n• Klíče API jsou šifrovány v zabezpečeném úložišti zařízení';
-
-  @override
-  String get configAuthNoteEmail =>
-      'E-mailový účet umožňuje přístup z více zařízení';
-
-  @override
-  String get configAuthNoteAnonymous =>
-      'Anonymní účet — data vázána na toto zařízení';
-
-  @override
-  String get configNone => 'Žádný';
 
   @override
   String get privacyPolicy => 'Zásady ochrany soukromí';
@@ -913,36 +821,10 @@ class AppLocalizationsCs extends AppLocalizations {
   String get priceHistory => 'Historie cen';
 
   @override
-  String get ignoredStationsLabel => 'Ignorováno';
-
-  @override
-  String get ratingsLabel => 'Hodnocení';
-
-  @override
   String get favoritesDataCache => 'Data oblíbených';
 
   @override
   String get citySearchCache => 'Hledání města';
-
-  @override
-  String priceHistoryStationsTracked(int count) {
-    return '$count sledovaných stanic';
-  }
-
-  @override
-  String alertsConfiguredCount(int count) {
-    return '$count nakonfigurováno';
-  }
-
-  @override
-  String ignoredStationsHidden(int count) {
-    return '$count skrytých stanic';
-  }
-
-  @override
-  String ratingsStationsRated(int count) {
-    return '$count hodnocených stanic';
-  }
 
   @override
   String get noPriceHistory => 'Zatím žádná historie cen';
@@ -1365,17 +1247,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get alertStatsThisWeek => 'Tento tyden';
 
   @override
-  String get privacyDashboardTitle => 'Přehled ochrany soukromí';
-
-  @override
-  String get privacyDashboardSubtitle =>
-      'Zobrazit, exportovat nebo smazat vaše data';
-
-  @override
-  String get privacyDashboardBanner =>
-      'Vaše data patří vám. Zde vidíte vše, co tato aplikace ukládá, můžete to exportovat nebo smazat.';
-
-  @override
   String get privacyLocalData => 'Data na tomto zařízení';
 
   @override
@@ -1394,25 +1265,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get privacyItineraries => 'Uložené trasy';
 
   @override
-  String get privacyCacheEntries => 'Záznamy mezipaměti';
-
-  @override
-  String get privacyApiKey => 'Uložený klíč API';
-
-  @override
-  String get privacyEvApiKey => 'Uložený klíč API pro EV';
-
-  @override
-  String get privacyEstimatedSize => 'Odhadovaný úložný prostor';
-
-  @override
-  String get privacySyncedData => 'Cloudová synchronizace (TankSync)';
-
-  @override
-  String get privacySyncDisabled =>
-      'Cloudová synchronizace je zakázána. Všechna data zůstávají pouze na tomto zařízení.';
-
-  @override
   String get privacySyncMode => 'Režim synchronizace';
 
   @override
@@ -1423,33 +1275,13 @@ class AppLocalizationsCs extends AppLocalizations {
       'Když je synchronizace povolena, oblíbené, upozornění, ignorované stanice a hodnocení jsou také uloženy na serveru TankSync.';
 
   @override
-  String get privacyViewServerData => 'Zobrazit data na serveru';
-
-  @override
-  String get privacyExportButton => 'Exportovat všechna data jako JSON';
-
-  @override
   String get privacyExportSuccess => 'Data exportována do schránky';
-
-  @override
-  String get privacyExportCsvButton => 'Exportovat všechna data jako CSV';
 
   @override
   String get privacyExportCsvSuccess => 'Data CSV exportována do schránky';
 
   @override
   String get savedToDownloadsFolder => 'Uloženo do složky Stažené';
-
-  @override
-  String get privacyDeleteButton => 'Smazat všechna data';
-
-  @override
-  String privacySaveErrorLog(int count) {
-    return 'Uložit záznam chyb ($count)';
-  }
-
-  @override
-  String get privacyClearErrorLog => 'Vymazat protokol chyb';
 
   @override
   String get privacyErrorLogCleared => 'Protokol chyb byl vymazán';
@@ -5296,9 +5128,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get reportDeleteFailed => 'Hlášení se nepodařilo smazat';
 
   @override
-  String get privacyControlsTitle => 'Nastavení soukromí';
-
-  @override
   String get tileProxyToggleTitle =>
       'Načítat mapové dlaždice přes proxy Sparkilo';
 
@@ -5312,9 +5141,6 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get remoteLogosToggleSubtitle =>
       'Ve výchozím stavu vypnuto: zobrazují se vestavěné zástupné obrázky. Zapnuto: loga se stahují z logo.clearbit.com, které vidí vaši IP adresu.';
-
-  @override
-  String get privacyExportAllButton => 'Exportovat všechna moje data (ZIP)';
 
   @override
   String privacyExportAllSuccess(String fileName, int count) {
@@ -5748,24 +5574,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get authInfoBenefit4 => '• Účet lze kdykoli smazat';
 
   @override
-  String get privacyLocalDataEmpty =>
-      'Zatím nic uloženo. Přidejte oblíbenou nebo nastavte cenové upozornění pro zobrazení záznamů.';
-
-  @override
-  String get privacyHideEmptyRows => 'Skrýt prázdné řádky';
-
-  @override
-  String privacyShowEmptyRows(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'Zobrazit $count prázdných řádků',
-      one: 'Zobrazit $count prázdný řádek',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get apiKeySetupTitle => 'Nastavení klíče API (volitelné)';
 
   @override
@@ -5812,12 +5620,6 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get consentSyncTripsAnonymousHint =>
       'Jízdy se zálohují pod anonymním účtem tohoto zařízení. Přihlaste se e-mailem, abyste se k nim dostali z jiných zařízení.';
-
-  @override
-  String get consentHideDetails => 'Skrýt podrobnosti';
-
-  @override
-  String get consentShowDetails => 'Zobrazit podrobnosti';
 
   @override
   String get dialogOk => 'OK';
@@ -7108,10 +6910,6 @@ class AppLocalizationsCs extends AppLocalizations {
       'tanksync, cloud, účet, e-mail, propojit zařízení, synchronizace, sdílet databázi, anonymní, account, email, link device, sync, share database, anonymous';
 
   @override
-  String get settingsTopicPrivacySubtitle =>
-      'Souhlasy, panel soukromí, úložiště a mezipaměť';
-
-  @override
   String get settingsTopicPrivacyKeywords =>
       'soukromí, souhlas, gdpr, smazat, vymazat, úložiště, mezipaměť, data, hlášení chyb, vin, privacy, consent, delete, erase, storage, cache, error reporting';
 
@@ -7182,10 +6980,6 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get settingsObd2AdapterSubtitle =>
       'Adaptéry se párují pro každé vozidlo – otevřete vozidlo, chcete-li spárovat nebo změnit jeho adaptér';
-
-  @override
-  String get settingsStorageDeleteHint =>
-      'Smazání všech místních dat se provádí z panelu soukromí.';
 
   @override
   String get settingsPrivacyCrossLinkTitle => 'Souhlasy';
@@ -8144,6 +7938,188 @@ class AppLocalizationsCs extends AppLocalizations {
   String pickStationLastFillUpAt(String date) {
     return 'Last fill-up: $date';
   }
+
+  @override
+  String get privacyTopicSubtitle =>
+      'Your choices, data on this device, sync, export or delete';
+
+  @override
+  String get privacyDataLocationLocal => 'Your data stays on this device';
+
+  @override
+  String get privacyDataLocationSynced =>
+      'Your data is also synced to TankSync';
+
+  @override
+  String get privacySyncLineEnabledAnonymous => 'Sync: on · anonymous account';
+
+  @override
+  String get privacySyncLineEnabledEmail => 'Sync: on · email account';
+
+  @override
+  String get privacySyncLineDisabled => 'Sync: off';
+
+  @override
+  String privacyStorageLine(String size) {
+    return '$size stored on this device';
+  }
+
+  @override
+  String get privacyTopicChoicesTitle => 'Your choices';
+
+  @override
+  String privacyChoicesStatus(int on, int total) {
+    return '$on of $total enabled';
+  }
+
+  @override
+  String privacyDeviceDataStatus(String size, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count categories',
+      one: '1 category',
+    );
+    return '$size · $_temp0';
+  }
+
+  @override
+  String get privacyTopicExportDeleteTitle => 'Export or delete';
+
+  @override
+  String privacyExportDeleteStatus(int count) {
+    return 'ZIP, JSON, CSV · error log ($count)';
+  }
+
+  @override
+  String get privacyLearnMore => 'Learn more';
+
+  @override
+  String get tileProxyToggleShort =>
+      'Tiles come via the developer\'s EU proxy, not straight from OpenStreetMap';
+
+  @override
+  String get remoteLogosToggleShort =>
+      'Fetch brand logos from logo.clearbit.com instead of bundled placeholders';
+
+  @override
+  String get privacyCacheDetails => 'Cache details';
+
+  @override
+  String privacyCacheResponses(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cached responses',
+      one: '1 cached response',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String privacyClearCacheEntries(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count entries',
+      one: '1 entry',
+    );
+    return 'Clear cache ($_temp0)';
+  }
+
+  @override
+  String get privacySyncStatusLabel => 'Status';
+
+  @override
+  String get privacySyncModeCommunity =>
+      'Sparkilo Community — the developer\'s EU server';
+
+  @override
+  String get privacySyncModeSelfHosted => 'Self-hosted — your own Supabase';
+
+  @override
+  String get privacySyncModeSharedGroup =>
+      'Shared group — a database you joined';
+
+  @override
+  String get privacySyncAccountLabel => 'Account';
+
+  @override
+  String get privacySyncAccountAnonymous =>
+      'Anonymous account, tied to this device';
+
+  @override
+  String privacySyncAccountEmail(String email) {
+    return 'Email account: $email';
+  }
+
+  @override
+  String get privacyCopyUserId => 'Copy user ID';
+
+  @override
+  String get privacyUserIdCopied => 'User ID copied';
+
+  @override
+  String get privacySyncDatabaseHost => 'Database host';
+
+  @override
+  String get privacyExportSectionTitle => 'Export';
+
+  @override
+  String get privacyExportMyData => 'Export my data';
+
+  @override
+  String get privacyExportSheetTitle => 'Choose a format';
+
+  @override
+  String get privacyExportZipTitle => 'ZIP archive';
+
+  @override
+  String get privacyExportZipSubtitle =>
+      'Everything, attachments included — for a complete backup';
+
+  @override
+  String get privacyExportJsonTitle => 'JSON';
+
+  @override
+  String get privacyExportJsonSubtitle => 'Machine-readable — for another app';
+
+  @override
+  String get privacyExportCsvTitle => 'CSV';
+
+  @override
+  String get privacyExportCsvSubtitle => 'Spreadsheet — one table per category';
+
+  @override
+  String get privacyErrorLogTitle => 'Error log';
+
+  @override
+  String privacyErrorLogCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count entries',
+      one: '1 entry',
+      zero: 'No entries',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get privacyErrorLogSave => 'Save';
+
+  @override
+  String get privacyErrorLogClear => 'Clear';
+
+  @override
+  String get privacyDangerZoneTitle => 'Danger zone';
+
+  @override
+  String get privacyDangerZoneBody =>
+      'Permanently deletes everything the app stores on this device. With sync on, your data on the TankSync server is erased too.';
+
+  @override
+  String get privacyDeleteAllMyData => 'Delete all my data';
 
   @override
   String stationStatusWithFreshness(String status, String ago) {

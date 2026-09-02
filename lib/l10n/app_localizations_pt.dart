@@ -218,9 +218,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dataTransparency => 'Transparência de dados';
 
   @override
-  String get storageAndCache => 'Armazenamento e cache';
-
-  @override
   String get clearCache => 'Limpar cache';
 
   @override
@@ -235,19 +232,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settingsLabel => 'Definições';
 
   @override
-  String get profilesStored => 'perfis guardados';
-
-  @override
-  String get stationsMarked => 'postos marcados';
-
-  @override
-  String get cachedResponses => 'respostas em cache';
-
-  @override
   String get total => 'Total';
-
-  @override
-  String get cacheManagement => 'Gestão de cache';
 
   @override
   String get cacheDescription =>
@@ -298,9 +283,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get deleteAllButton => 'Eliminar tudo';
 
   @override
-  String get entries => 'entradas';
-
-  @override
   String get cacheEmpty => 'A cache está vazia';
 
   @override
@@ -331,87 +313,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get reportConsentCancel => 'Cancelar';
 
   @override
-  String get configProfileSection => 'Perfil';
-
-  @override
-  String get configActiveProfile => 'Perfil ativo';
-
-  @override
-  String get configPreferredFuel => 'Combustível preferido';
-
-  @override
-  String get configCountry => 'País';
-
-  @override
-  String get configRouteSegment => 'Segmento de rota';
-
-  @override
-  String get configApiKeysSection => 'Chaves de API';
-
-  @override
-  String get configTankerkoenigKey => 'Chave de API Tankerkoenig';
-
-  @override
-  String get configApiKeyConfigured => 'Configurada';
-
-  @override
-  String get configApiKeyCommunity => 'Predefinição (chave comunitária)';
-
-  @override
   String get searchLocationPlaceholder => 'Morada, código postal ou cidade';
-
-  @override
-  String get configEvKey => 'Chave de API de carregamento elétrico';
-
-  @override
-  String get configEvKeyCustom => 'Chave personalizada';
-
-  @override
-  String get configEvKeyShared => 'Predefinição (partilhada)';
-
-  @override
-  String get configCloudSyncSection => 'Sincronização na nuvem';
 
   @override
   String get configTankSyncConnected => 'Ligado';
 
   @override
   String get configTankSyncDisabled => 'Desativado';
-
-  @override
-  String get configAuthMode => 'Modo de autenticação';
-
-  @override
-  String get configAuthEmail => 'E-mail (persistente)';
-
-  @override
-  String get configAuthAnonymous => 'Anónimo (apenas neste dispositivo)';
-
-  @override
-  String get configDatabase => 'Base de dados';
-
-  @override
-  String get configPrivacySummary => 'Resumo de privacidade';
-
-  @override
-  String configPrivacySummarySynced(Object authNote) {
-    return '• Favoritos, alertas e postos ignorados são sincronizados na sua base de dados privada\n• A posição GPS e as chaves de API nunca saem do seu dispositivo\n• $authNote';
-  }
-
-  @override
-  String get configPrivacySummaryLocal =>
-      '• Todos os dados são guardados localmente apenas neste dispositivo\n• Nenhum dado é enviado para qualquer servidor\n• Chaves de API encriptadas no armazenamento seguro do dispositivo';
-
-  @override
-  String get configAuthNoteEmail =>
-      'A conta de e-mail permite acesso entre dispositivos';
-
-  @override
-  String get configAuthNoteAnonymous =>
-      'Conta anónima — dados associados a este dispositivo';
-
-  @override
-  String get configNone => 'Nenhum';
 
   @override
   String get privacyPolicy => 'Política de Privacidade';
@@ -914,36 +822,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get priceHistory => 'Histórico de preços';
 
   @override
-  String get ignoredStationsLabel => 'Ignoradas';
-
-  @override
-  String get ratingsLabel => 'Avaliações';
-
-  @override
   String get favoritesDataCache => 'Dados de favoritos';
 
   @override
   String get citySearchCache => 'Pesquisa de cidade';
-
-  @override
-  String priceHistoryStationsTracked(int count) {
-    return '$count estações monitoradas';
-  }
-
-  @override
-  String alertsConfiguredCount(int count) {
-    return '$count configuradas';
-  }
-
-  @override
-  String ignoredStationsHidden(int count) {
-    return '$count estações ocultas';
-  }
-
-  @override
-  String ratingsStationsRated(int count) {
-    return '$count estações avaliadas';
-  }
 
   @override
   String get noPriceHistory => 'Sem histórico de preços ainda';
@@ -1367,17 +1249,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get alertStatsThisWeek => 'Esta semana';
 
   @override
-  String get privacyDashboardTitle => 'Painel de privacidade';
-
-  @override
-  String get privacyDashboardSubtitle =>
-      'Veja, exporte ou elimine os seus dados';
-
-  @override
-  String get privacyDashboardBanner =>
-      'Os seus dados pertencem-lhe. Aqui pode ver tudo o que esta aplicação armazena, exportá-lo ou eliminá-lo.';
-
-  @override
   String get privacyLocalData => 'Dados neste dispositivo';
 
   @override
@@ -1396,25 +1267,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get privacyItineraries => 'Rotas guardadas';
 
   @override
-  String get privacyCacheEntries => 'Entradas em cache';
-
-  @override
-  String get privacyApiKey => 'Chave de API guardada';
-
-  @override
-  String get privacyEvApiKey => 'Chave de API EV guardada';
-
-  @override
-  String get privacyEstimatedSize => 'Armazenamento estimado';
-
-  @override
-  String get privacySyncedData => 'Sincronização na nuvem (TankSync)';
-
-  @override
-  String get privacySyncDisabled =>
-      'A sincronização na nuvem está desativada. Todos os dados ficam apenas neste dispositivo.';
-
-  @override
   String get privacySyncMode => 'Modo de sincronização';
 
   @override
@@ -1425,17 +1277,8 @@ class AppLocalizationsPt extends AppLocalizations {
       'Quando a sincronização está ativada, favoritos, alertas, postos ignorados e avaliações também são guardados no servidor TankSync.';
 
   @override
-  String get privacyViewServerData => 'Ver dados no servidor';
-
-  @override
-  String get privacyExportButton => 'Exportar todos os dados como JSON';
-
-  @override
   String get privacyExportSuccess =>
       'Dados exportados para a área de transferência';
-
-  @override
-  String get privacyExportCsvButton => 'Exportar todos os dados como CSV';
 
   @override
   String get privacyExportCsvSuccess =>
@@ -1443,17 +1286,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get savedToDownloadsFolder => 'Guardado na pasta Transferências';
-
-  @override
-  String get privacyDeleteButton => 'Eliminar todos os dados';
-
-  @override
-  String privacySaveErrorLog(int count) {
-    return 'Guardar registo de erros ($count)';
-  }
-
-  @override
-  String get privacyClearErrorLog => 'Limpar registo de erros';
 
   @override
   String get privacyErrorLogCleared => 'Registo de erros limpo';
@@ -5323,9 +5155,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get reportDeleteFailed => 'Não foi possível eliminar o relatório';
 
   @override
-  String get privacyControlsTitle => 'Controlos de privacidade';
-
-  @override
   String get tileProxyToggleTitle =>
       'Carregar os mosaicos do mapa através do proxy Sparkilo';
 
@@ -5340,9 +5169,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get remoteLogosToggleSubtitle =>
       'Desligado por predefinição: são mostrados marcadores incluídos na aplicação. Ligado: os logótipos são obtidos de logo.clearbit.com, que vê o seu endereço IP.';
-
-  @override
-  String get privacyExportAllButton => 'Exportar todos os meus dados (ZIP)';
 
   @override
   String privacyExportAllSuccess(String fileName, int count) {
@@ -5780,24 +5606,6 @@ class AppLocalizationsPt extends AppLocalizations {
       '• Pode eliminar a sua conta a qualquer momento';
 
   @override
-  String get privacyLocalDataEmpty =>
-      'Nada guardado ainda. Adicione um favorito ou defina um alerta de preço para ver entradas aqui.';
-
-  @override
-  String get privacyHideEmptyRows => 'Ocultar linhas vazias';
-
-  @override
-  String privacyShowEmptyRows(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'Mostrar $count linhas vazias',
-      one: 'Mostrar $count linha vazia',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get apiKeySetupTitle => 'Configuração da chave de API (opcional)';
 
   @override
@@ -5844,12 +5652,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get consentSyncTripsAnonymousHint =>
       'As viagens são guardadas na conta anónima deste dispositivo. Inicie sessão com um e-mail para as alcançar a partir de outros dispositivos.';
-
-  @override
-  String get consentHideDetails => 'Ocultar detalhes';
-
-  @override
-  String get consentShowDetails => 'Mostrar detalhes';
 
   @override
   String get dialogOk => 'OK';
@@ -7150,10 +6952,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'tanksync, nuvem, conta, e-mail, associar dispositivo, sincronização, partilhar base de dados, anónimo, cloud, account, email, link device, sync, share database, anonymous';
 
   @override
-  String get settingsTopicPrivacySubtitle =>
-      'Consentimentos, painel de privacidade, armazenamento e cache';
-
-  @override
   String get settingsTopicPrivacyKeywords =>
       'privacidade, consentimento, rgpd, apagar, eliminar, armazenamento, cache, dados, relatório de erros, vin, privacy, consent, gdpr, delete, erase, storage, data, error reporting';
 
@@ -7225,10 +7023,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get settingsObd2AdapterSubtitle =>
       'Os adaptadores são emparelhados por veículo — abra um veículo para emparelhar ou mudar o seu adaptador';
-
-  @override
-  String get settingsStorageDeleteHint =>
-      'A eliminação de todos os dados locais faz-se a partir do painel de privacidade.';
 
   @override
   String get settingsPrivacyCrossLinkTitle => 'Consentimentos';
@@ -8193,6 +7987,188 @@ class AppLocalizationsPt extends AppLocalizations {
   String pickStationLastFillUpAt(String date) {
     return 'Last fill-up: $date';
   }
+
+  @override
+  String get privacyTopicSubtitle =>
+      'Your choices, data on this device, sync, export or delete';
+
+  @override
+  String get privacyDataLocationLocal => 'Your data stays on this device';
+
+  @override
+  String get privacyDataLocationSynced =>
+      'Your data is also synced to TankSync';
+
+  @override
+  String get privacySyncLineEnabledAnonymous => 'Sync: on · anonymous account';
+
+  @override
+  String get privacySyncLineEnabledEmail => 'Sync: on · email account';
+
+  @override
+  String get privacySyncLineDisabled => 'Sync: off';
+
+  @override
+  String privacyStorageLine(String size) {
+    return '$size stored on this device';
+  }
+
+  @override
+  String get privacyTopicChoicesTitle => 'Your choices';
+
+  @override
+  String privacyChoicesStatus(int on, int total) {
+    return '$on of $total enabled';
+  }
+
+  @override
+  String privacyDeviceDataStatus(String size, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count categories',
+      one: '1 category',
+    );
+    return '$size · $_temp0';
+  }
+
+  @override
+  String get privacyTopicExportDeleteTitle => 'Export or delete';
+
+  @override
+  String privacyExportDeleteStatus(int count) {
+    return 'ZIP, JSON, CSV · error log ($count)';
+  }
+
+  @override
+  String get privacyLearnMore => 'Learn more';
+
+  @override
+  String get tileProxyToggleShort =>
+      'Tiles come via the developer\'s EU proxy, not straight from OpenStreetMap';
+
+  @override
+  String get remoteLogosToggleShort =>
+      'Fetch brand logos from logo.clearbit.com instead of bundled placeholders';
+
+  @override
+  String get privacyCacheDetails => 'Cache details';
+
+  @override
+  String privacyCacheResponses(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cached responses',
+      one: '1 cached response',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String privacyClearCacheEntries(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count entries',
+      one: '1 entry',
+    );
+    return 'Clear cache ($_temp0)';
+  }
+
+  @override
+  String get privacySyncStatusLabel => 'Status';
+
+  @override
+  String get privacySyncModeCommunity =>
+      'Sparkilo Community — the developer\'s EU server';
+
+  @override
+  String get privacySyncModeSelfHosted => 'Self-hosted — your own Supabase';
+
+  @override
+  String get privacySyncModeSharedGroup =>
+      'Shared group — a database you joined';
+
+  @override
+  String get privacySyncAccountLabel => 'Account';
+
+  @override
+  String get privacySyncAccountAnonymous =>
+      'Anonymous account, tied to this device';
+
+  @override
+  String privacySyncAccountEmail(String email) {
+    return 'Email account: $email';
+  }
+
+  @override
+  String get privacyCopyUserId => 'Copy user ID';
+
+  @override
+  String get privacyUserIdCopied => 'User ID copied';
+
+  @override
+  String get privacySyncDatabaseHost => 'Database host';
+
+  @override
+  String get privacyExportSectionTitle => 'Export';
+
+  @override
+  String get privacyExportMyData => 'Export my data';
+
+  @override
+  String get privacyExportSheetTitle => 'Choose a format';
+
+  @override
+  String get privacyExportZipTitle => 'ZIP archive';
+
+  @override
+  String get privacyExportZipSubtitle =>
+      'Everything, attachments included — for a complete backup';
+
+  @override
+  String get privacyExportJsonTitle => 'JSON';
+
+  @override
+  String get privacyExportJsonSubtitle => 'Machine-readable — for another app';
+
+  @override
+  String get privacyExportCsvTitle => 'CSV';
+
+  @override
+  String get privacyExportCsvSubtitle => 'Spreadsheet — one table per category';
+
+  @override
+  String get privacyErrorLogTitle => 'Error log';
+
+  @override
+  String privacyErrorLogCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count entries',
+      one: '1 entry',
+      zero: 'No entries',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get privacyErrorLogSave => 'Save';
+
+  @override
+  String get privacyErrorLogClear => 'Clear';
+
+  @override
+  String get privacyDangerZoneTitle => 'Danger zone';
+
+  @override
+  String get privacyDangerZoneBody =>
+      'Permanently deletes everything the app stores on this device. With sync on, your data on the TankSync server is erased too.';
+
+  @override
+  String get privacyDeleteAllMyData => 'Delete all my data';
 
   @override
   String stationStatusWithFreshness(String status, String ago) {

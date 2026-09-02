@@ -217,9 +217,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get dataTransparency => 'Datatransparens';
 
   @override
-  String get storageAndCache => 'Lagring och cache';
-
-  @override
   String get clearCache => 'Rensa cache';
 
   @override
@@ -234,19 +231,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get settingsLabel => 'Inställningar';
 
   @override
-  String get profilesStored => 'profiler sparade';
-
-  @override
-  String get stationsMarked => 'stationer markerade';
-
-  @override
-  String get cachedResponses => 'cachade svar';
-
-  @override
   String get total => 'Totalt';
-
-  @override
-  String get cacheManagement => 'Cachehantering';
 
   @override
   String get cacheDescription =>
@@ -297,9 +282,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get deleteAllButton => 'Ta bort allt';
 
   @override
-  String get entries => 'poster';
-
-  @override
   String get cacheEmpty => 'Cachen är tom';
 
   @override
@@ -330,87 +312,13 @@ class AppLocalizationsSv extends AppLocalizations {
   String get reportConsentCancel => 'Avbryt';
 
   @override
-  String get configProfileSection => 'Profil';
-
-  @override
-  String get configActiveProfile => 'Aktiv profil';
-
-  @override
-  String get configPreferredFuel => 'Favoritbränsle';
-
-  @override
-  String get configCountry => 'Land';
-
-  @override
-  String get configRouteSegment => 'Ruttsegment';
-
-  @override
-  String get configApiKeysSection => 'API-nycklar';
-
-  @override
-  String get configTankerkoenigKey => 'Tankerkoenig API-nyckel';
-
-  @override
-  String get configApiKeyConfigured => 'Konfigurerad';
-
-  @override
-  String get configApiKeyCommunity => 'Standard (community-nyckel)';
-
-  @override
   String get searchLocationPlaceholder => 'Adress, postnummer eller ort';
-
-  @override
-  String get configEvKey => 'EV-laddnings-API-nyckel';
-
-  @override
-  String get configEvKeyCustom => 'Anpassad nyckel';
-
-  @override
-  String get configEvKeyShared => 'Standard (delad)';
-
-  @override
-  String get configCloudSyncSection => 'Molnsynkronisering';
 
   @override
   String get configTankSyncConnected => 'Ansluten';
 
   @override
   String get configTankSyncDisabled => 'Inaktiverad';
-
-  @override
-  String get configAuthMode => 'Autentiseringsläge';
-
-  @override
-  String get configAuthEmail => 'E-post (beständig)';
-
-  @override
-  String get configAuthAnonymous => 'Anonym (endast denna enhet)';
-
-  @override
-  String get configDatabase => 'Databas';
-
-  @override
-  String get configPrivacySummary => 'Integritetsöversikt';
-
-  @override
-  String configPrivacySummarySynced(Object authNote) {
-    return '• Favoriter, aviseringar och ignorerade stationer synkas till din privata databas\n• GPS-position och API-nycklar lämnar aldrig din enhet\n• $authNote';
-  }
-
-  @override
-  String get configPrivacySummaryLocal =>
-      '• All data lagras lokalt på den här enheten\n• Ingen data skickas till någon server\n• API-nycklar krypterade i enhetens säkra lagring';
-
-  @override
-  String get configAuthNoteEmail =>
-      'E-postkonto möjliggör åtkomst från flera enheter';
-
-  @override
-  String get configAuthNoteAnonymous =>
-      'Anonymt konto – data kopplad till den här enheten';
-
-  @override
-  String get configNone => 'Ingen';
 
   @override
   String get privacyPolicy => 'Integritetspolicy';
@@ -912,36 +820,10 @@ class AppLocalizationsSv extends AppLocalizations {
   String get priceHistory => 'Prishistorik';
 
   @override
-  String get ignoredStationsLabel => 'Ignorerade';
-
-  @override
-  String get ratingsLabel => 'Betyg';
-
-  @override
   String get favoritesDataCache => 'Favoritdata';
 
   @override
   String get citySearchCache => 'Stadsökning';
-
-  @override
-  String priceHistoryStationsTracked(int count) {
-    return '$count bevakade stationer';
-  }
-
-  @override
-  String alertsConfiguredCount(int count) {
-    return '$count konfigurerade';
-  }
-
-  @override
-  String ignoredStationsHidden(int count) {
-    return '$count dolda stationer';
-  }
-
-  @override
-  String ratingsStationsRated(int count) {
-    return '$count betygsatta stationer';
-  }
 
   @override
   String get noPriceHistory => 'Ingen prishistorik ännu';
@@ -1361,17 +1243,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get alertStatsThisWeek => 'Denna vecka';
 
   @override
-  String get privacyDashboardTitle => 'Integritetspanel';
-
-  @override
-  String get privacyDashboardSubtitle =>
-      'Visa, exportera eller radera din data';
-
-  @override
-  String get privacyDashboardBanner =>
-      'Din data tillhör dig. Här kan du se allt som appen lagrar, exportera det eller radera det.';
-
-  @override
   String get privacyLocalData => 'Data på den här enheten';
 
   @override
@@ -1390,25 +1261,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get privacyItineraries => 'Sparade rutter';
 
   @override
-  String get privacyCacheEntries => 'Cacheposter';
-
-  @override
-  String get privacyApiKey => 'API-nyckel lagrad';
-
-  @override
-  String get privacyEvApiKey => 'EV API-nyckel lagrad';
-
-  @override
-  String get privacyEstimatedSize => 'Uppskattad lagring';
-
-  @override
-  String get privacySyncedData => 'Molnsynk (TankSync)';
-
-  @override
-  String get privacySyncDisabled =>
-      'Molnsynkronisering är inaktiverad. All data stannar på den här enheten.';
-
-  @override
   String get privacySyncMode => 'Synkläge';
 
   @override
@@ -1419,33 +1271,13 @@ class AppLocalizationsSv extends AppLocalizations {
       'När synkronisering är aktiverad lagras favoriter, aviseringar, ignorerade stationer och betyg även på TankSync-servern.';
 
   @override
-  String get privacyViewServerData => 'Visa serverdata';
-
-  @override
-  String get privacyExportButton => 'Exportera all data som JSON';
-
-  @override
   String get privacyExportSuccess => 'Data exporterad till urklipp';
-
-  @override
-  String get privacyExportCsvButton => 'Exportera all data som CSV';
 
   @override
   String get privacyExportCsvSuccess => 'CSV-data exporterad till urklipp';
 
   @override
   String get savedToDownloadsFolder => 'Sparad i mappen Hämtningar';
-
-  @override
-  String get privacyDeleteButton => 'Radera all data';
-
-  @override
-  String privacySaveErrorLog(int count) {
-    return 'Spara felloggen ($count)';
-  }
-
-  @override
-  String get privacyClearErrorLog => 'Rensa felloggen';
 
   @override
   String get privacyErrorLogCleared => 'Felloggen rensad';
@@ -5278,9 +5110,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get reportDeleteFailed => 'Det gick inte att radera rapporten';
 
   @override
-  String get privacyControlsTitle => 'Integritetsinställningar';
-
-  @override
   String get tileProxyToggleTitle => 'Hämta kartrutor via Sparkilo-proxyn';
 
   @override
@@ -5294,9 +5123,6 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get remoteLogosToggleSubtitle =>
       'Av som standard: medföljande platshållare visas. På: logotyper hämtas från logo.clearbit.com, som ser din IP-adress.';
-
-  @override
-  String get privacyExportAllButton => 'Exportera alla mina data (ZIP)';
 
   @override
   String privacyExportAllSuccess(String fileName, int count) {
@@ -5729,24 +5555,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get authInfoBenefit4 => '• Du kan radera ditt konto när som helst';
 
   @override
-  String get privacyLocalDataEmpty =>
-      'Inget lagrat ännu. Lägg till en favorit eller ange en prisavisering för att se poster här.';
-
-  @override
-  String get privacyHideEmptyRows => 'Dölj tomma rader';
-
-  @override
-  String privacyShowEmptyRows(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'Visa $count tomma rader',
-      one: 'Visa $count tom rad',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get apiKeySetupTitle => 'API-nyckelinställning (valfritt)';
 
   @override
@@ -5793,12 +5601,6 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get consentSyncTripsAnonymousHint =>
       'Resor säkerhetskopieras under enhetens anonyma konto. Logga in med en e-postadress för att nå dem från andra enheter.';
-
-  @override
-  String get consentHideDetails => 'Dölj detaljer';
-
-  @override
-  String get consentShowDetails => 'Visa detaljer';
 
   @override
   String get dialogOk => 'OK';
@@ -7089,10 +6891,6 @@ class AppLocalizationsSv extends AppLocalizations {
       'tanksync, moln, konto, e-post, länka enhet, synkronisering, dela databas, anonym, cloud, account, email, link device, sync, share database, anonymous';
 
   @override
-  String get settingsTopicPrivacySubtitle =>
-      'Samtycken, integritetspanel, lagring & cache';
-
-  @override
   String get settingsTopicPrivacyKeywords =>
       'integritet, samtycke, gdpr, radera, rensa, lagring, cache, data, felrapportering, vin, privacy, consent, delete, erase, storage, error reporting';
 
@@ -7162,10 +6960,6 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get settingsObd2AdapterSubtitle =>
       'Adaptrar parkopplas per fordon — öppna ett fordon för att parkoppla eller byta dess adapter';
-
-  @override
-  String get settingsStorageDeleteHint =>
-      'Radering av alla lokala data görs från integritetspanelen.';
 
   @override
   String get settingsPrivacyCrossLinkTitle => 'Samtycken';
@@ -8120,6 +7914,188 @@ class AppLocalizationsSv extends AppLocalizations {
   String pickStationLastFillUpAt(String date) {
     return 'Last fill-up: $date';
   }
+
+  @override
+  String get privacyTopicSubtitle =>
+      'Your choices, data on this device, sync, export or delete';
+
+  @override
+  String get privacyDataLocationLocal => 'Your data stays on this device';
+
+  @override
+  String get privacyDataLocationSynced =>
+      'Your data is also synced to TankSync';
+
+  @override
+  String get privacySyncLineEnabledAnonymous => 'Sync: on · anonymous account';
+
+  @override
+  String get privacySyncLineEnabledEmail => 'Sync: on · email account';
+
+  @override
+  String get privacySyncLineDisabled => 'Sync: off';
+
+  @override
+  String privacyStorageLine(String size) {
+    return '$size stored on this device';
+  }
+
+  @override
+  String get privacyTopicChoicesTitle => 'Your choices';
+
+  @override
+  String privacyChoicesStatus(int on, int total) {
+    return '$on of $total enabled';
+  }
+
+  @override
+  String privacyDeviceDataStatus(String size, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count categories',
+      one: '1 category',
+    );
+    return '$size · $_temp0';
+  }
+
+  @override
+  String get privacyTopicExportDeleteTitle => 'Export or delete';
+
+  @override
+  String privacyExportDeleteStatus(int count) {
+    return 'ZIP, JSON, CSV · error log ($count)';
+  }
+
+  @override
+  String get privacyLearnMore => 'Learn more';
+
+  @override
+  String get tileProxyToggleShort =>
+      'Tiles come via the developer\'s EU proxy, not straight from OpenStreetMap';
+
+  @override
+  String get remoteLogosToggleShort =>
+      'Fetch brand logos from logo.clearbit.com instead of bundled placeholders';
+
+  @override
+  String get privacyCacheDetails => 'Cache details';
+
+  @override
+  String privacyCacheResponses(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cached responses',
+      one: '1 cached response',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String privacyClearCacheEntries(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count entries',
+      one: '1 entry',
+    );
+    return 'Clear cache ($_temp0)';
+  }
+
+  @override
+  String get privacySyncStatusLabel => 'Status';
+
+  @override
+  String get privacySyncModeCommunity =>
+      'Sparkilo Community — the developer\'s EU server';
+
+  @override
+  String get privacySyncModeSelfHosted => 'Self-hosted — your own Supabase';
+
+  @override
+  String get privacySyncModeSharedGroup =>
+      'Shared group — a database you joined';
+
+  @override
+  String get privacySyncAccountLabel => 'Account';
+
+  @override
+  String get privacySyncAccountAnonymous =>
+      'Anonymous account, tied to this device';
+
+  @override
+  String privacySyncAccountEmail(String email) {
+    return 'Email account: $email';
+  }
+
+  @override
+  String get privacyCopyUserId => 'Copy user ID';
+
+  @override
+  String get privacyUserIdCopied => 'User ID copied';
+
+  @override
+  String get privacySyncDatabaseHost => 'Database host';
+
+  @override
+  String get privacyExportSectionTitle => 'Export';
+
+  @override
+  String get privacyExportMyData => 'Export my data';
+
+  @override
+  String get privacyExportSheetTitle => 'Choose a format';
+
+  @override
+  String get privacyExportZipTitle => 'ZIP archive';
+
+  @override
+  String get privacyExportZipSubtitle =>
+      'Everything, attachments included — for a complete backup';
+
+  @override
+  String get privacyExportJsonTitle => 'JSON';
+
+  @override
+  String get privacyExportJsonSubtitle => 'Machine-readable — for another app';
+
+  @override
+  String get privacyExportCsvTitle => 'CSV';
+
+  @override
+  String get privacyExportCsvSubtitle => 'Spreadsheet — one table per category';
+
+  @override
+  String get privacyErrorLogTitle => 'Error log';
+
+  @override
+  String privacyErrorLogCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count entries',
+      one: '1 entry',
+      zero: 'No entries',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get privacyErrorLogSave => 'Save';
+
+  @override
+  String get privacyErrorLogClear => 'Clear';
+
+  @override
+  String get privacyDangerZoneTitle => 'Danger zone';
+
+  @override
+  String get privacyDangerZoneBody =>
+      'Permanently deletes everything the app stores on this device. With sync on, your data on the TankSync server is erased too.';
+
+  @override
+  String get privacyDeleteAllMyData => 'Delete all my data';
 
   @override
   String stationStatusWithFreshness(String status, String ago) {

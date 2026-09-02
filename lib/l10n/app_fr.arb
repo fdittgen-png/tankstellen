@@ -4903,5 +4903,121 @@
   },
   "pumpGainResetAction": "Réinitialiser le calibrage à la pompe",
   "pumpGainResetConfirmTitle": "Réinitialiser le calibrage à la pompe ?",
-  "pumpGainResetConfirmBody": "Le facteur de carburant appris à partir de vos pleins sera effacé. Les estimations de consommation OBD2 reviendront à la valeur non corrigée jusqu’à ce que le prochain intervalle plein-à-plein le réapprenne."
+  "pumpGainResetConfirmBody": "Le facteur de carburant appris à partir de vos pleins sera effacé. Les estimations de consommation OBD2 reviendront à la valeur non corrigée jusqu’à ce que le prochain intervalle plein-à-plein le réapprenne.",
+  "privacyTopicSubtitle": "Vos choix, vos données sur cet appareil, synchronisation, export ou suppression",
+  "privacyDataLocationLocal": "Vos données restent sur cet appareil",
+  "privacyDataLocationSynced": "Vos données sont aussi synchronisées sur TankSync",
+  "privacySyncLineEnabledAnonymous": "Synchronisation : activée · compte anonyme",
+  "privacySyncLineEnabledEmail": "Synchronisation : activée · compte e-mail",
+  "privacySyncLineDisabled": "Synchronisation : désactivée",
+  "privacyStorageLine": "{size} stockés sur cet appareil",
+  "@privacyStorageLine": {
+    "placeholders": {
+      "size": {
+        "type": "String",
+        "example": "2.1 MB"
+      }
+    }
+  },
+  "privacyTopicChoicesTitle": "Vos choix",
+  "privacyChoicesStatus": "{on} sur {total} activés",
+  "@privacyChoicesStatus": {
+    "placeholders": {
+      "on": {
+        "type": "int",
+        "example": "5"
+      },
+      "total": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "privacyDeviceDataStatus": "{size} · {count, plural, =1{1 catégorie} other{{count} catégories}}",
+  "@privacyDeviceDataStatus": {
+    "placeholders": {
+      "size": {
+        "type": "String",
+        "example": "2.1 MB"
+      },
+      "count": {
+        "type": "int",
+        "example": "6"
+      }
+    }
+  },
+  "privacyTopicExportDeleteTitle": "Exporter ou supprimer",
+  "privacyExportDeleteStatus": "ZIP, JSON, CSV · journal d'erreurs ({count})",
+  "@privacyExportDeleteStatus": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "29"
+      }
+    }
+  },
+  "privacyLearnMore": "En savoir plus",
+  "tileProxyToggleShort": "Les tuiles passent par le proxy UE du développeur, pas directement par OpenStreetMap",
+  "remoteLogosToggleShort": "Charger les logos des marques depuis logo.clearbit.com au lieu des visuels intégrés",
+  "privacyCacheDetails": "Détails du cache",
+  "privacyCacheResponses": "{count, plural, =1{1 réponse en cache} other{{count} réponses en cache}}",
+  "@privacyCacheResponses": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "211"
+      }
+    }
+  },
+  "privacyClearCacheEntries": "Vider le cache ({count, plural, =1{1 entrée} other{{count} entrées}})",
+  "@privacyClearCacheEntries": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "211"
+      }
+    }
+  },
+  "privacySyncStatusLabel": "État",
+  "privacySyncModeCommunity": "Sparkilo Community — serveur UE du développeur",
+  "privacySyncModeSelfHosted": "Auto-hébergé — votre propre Supabase",
+  "privacySyncModeSharedGroup": "Groupe partagé — une base de données que vous avez rejointe",
+  "privacySyncAccountLabel": "Compte",
+  "privacySyncAccountAnonymous": "Compte anonyme, lié à cet appareil",
+  "privacySyncAccountEmail": "Compte e-mail : {email}",
+  "@privacySyncAccountEmail": {
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "x@y.example"
+      }
+    }
+  },
+  "privacyCopyUserId": "Copier l'identifiant utilisateur",
+  "privacyUserIdCopied": "Identifiant copié",
+  "privacySyncDatabaseHost": "Hôte de la base de données",
+  "privacyExportSectionTitle": "Exporter",
+  "privacyExportMyData": "Exporter mes données",
+  "privacyExportSheetTitle": "Choisir un format",
+  "privacyExportZipTitle": "Archive ZIP",
+  "privacyExportZipSubtitle": "Tout, y compris les pièces jointes — pour une sauvegarde complète",
+  "privacyExportJsonTitle": "JSON",
+  "privacyExportJsonSubtitle": "Lisible par machine — pour un autre logiciel",
+  "privacyExportCsvTitle": "CSV",
+  "privacyExportCsvSubtitle": "Tableur — une table par catégorie",
+  "privacyErrorLogTitle": "Journal d'erreurs",
+  "privacyErrorLogCount": "{count, plural, =0{Aucune entrée} =1{1 entrée} other{{count} entrées}}",
+  "@privacyErrorLogCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "29"
+      }
+    }
+  },
+  "privacyErrorLogSave": "Enregistrer",
+  "privacyErrorLogClear": "Effacer",
+  "privacyDangerZoneTitle": "Zone dangereuse",
+  "privacyDangerZoneBody": "Supprime définitivement tout ce que l'application stocke sur cet appareil. Avec la synchronisation activée, vos données sur le serveur TankSync sont aussi effacées.",
+  "privacyDeleteAllMyData": "Supprimer toutes mes données"
 }

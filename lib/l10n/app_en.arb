@@ -8123,6 +8123,238 @@
       }
     }
   },
+  "privacyTopicSubtitle": "Your choices, data on this device, sync, export or delete",
+  "@privacyTopicSubtitle": {
+    "description": "Settings root: one-line subtitle of the Privacy & data tile naming its four topics (#3908, Epic #3907)."
+  },
+  "privacyDataLocationLocal": "Your data stays on this device",
+  "@privacyDataLocationLocal": {
+    "description": "Privacy & data summary card, first line when cloud sync is off (#3908)."
+  },
+  "privacyDataLocationSynced": "Your data is also synced to TankSync",
+  "@privacyDataLocationSynced": {
+    "description": "Privacy & data summary card, first line when cloud sync is on — TankSync is the brand name of the sync service (#3908)."
+  },
+  "privacySyncLineEnabledAnonymous": "Sync: on · anonymous account",
+  "@privacySyncLineEnabledAnonymous": {
+    "description": "Sync status line (summary card + Sync & account tile) when sync is on with an anonymous, device-bound account (#3908)."
+  },
+  "privacySyncLineEnabledEmail": "Sync: on · email account",
+  "@privacySyncLineEnabledEmail": {
+    "description": "Sync status line (summary card + Sync & account tile) when sync is on with an email account (#3908)."
+  },
+  "privacySyncLineDisabled": "Sync: off",
+  "@privacySyncLineDisabled": {
+    "description": "Sync status line (summary card + Sync & account tile) when cloud sync is off (#3908)."
+  },
+  "privacyStorageLine": "{size} stored on this device",
+  "@privacyStorageLine": {
+    "description": "Privacy & data summary card, third line: total bytes the app keeps locally, already formatted (e.g. '2.1 MB') (#3908).",
+    "placeholders": {
+      "size": {
+        "type": "String",
+        "example": "2.1 MB"
+      }
+    }
+  },
+  "privacyTopicChoicesTitle": "Your choices",
+  "@privacyTopicChoicesTitle": {
+    "description": "Title of the first privacy topic tile and screen: the five consents and the two privacy controls (#3909)."
+  },
+  "privacyChoicesStatus": "{on} of {total} enabled",
+  "@privacyChoicesStatus": {
+    "description": "Status line of the 'Your choices' tile: how many of the consents are switched on (#3908).",
+    "placeholders": {
+      "on": {
+        "type": "int",
+        "example": "5"
+      },
+      "total": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "privacyDeviceDataStatus": "{size} · {count, plural, =1{1 category} other{{count} categories}}",
+  "@privacyDeviceDataStatus": {
+    "description": "Status line of the 'Data on this device' tile: total formatted size and the number of non-empty data categories (#3908).",
+    "placeholders": {
+      "size": {
+        "type": "String",
+        "example": "2.1 MB"
+      },
+      "count": {
+        "type": "int",
+        "example": "6"
+      }
+    }
+  },
+  "privacyTopicExportDeleteTitle": "Export or delete",
+  "@privacyTopicExportDeleteTitle": {
+    "description": "Title of the fourth privacy topic tile and screen: data export, the error log and the delete-everything action (#3912)."
+  },
+  "privacyExportDeleteStatus": "ZIP, JSON, CSV · error log ({count})",
+  "@privacyExportDeleteStatus": {
+    "description": "Status line of the 'Export or delete' tile: the three export formats and the number of buffered error-log entries (#3908).",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "29"
+      }
+    }
+  },
+  "privacyLearnMore": "Learn more",
+  "@privacyLearnMore": {
+    "description": "Tooltip of the info icon on a privacy-control row; opens a dialog with the full explanation (#3909)."
+  },
+  "tileProxyToggleShort": "Tiles come via the developer's EU proxy, not straight from OpenStreetMap",
+  "@tileProxyToggleShort": {
+    "description": "Two-line subtitle of the map-tile proxy switch on the 'Your choices' screen; the full text stays behind the info icon (#3909)."
+  },
+  "remoteLogosToggleShort": "Fetch brand logos from logo.clearbit.com instead of bundled placeholders",
+  "@remoteLogosToggleShort": {
+    "description": "Two-line subtitle of the internet brand-logos switch on the 'Your choices' screen; the full text stays behind the info icon (#3909)."
+  },
+  "privacyCacheDetails": "Cache details",
+  "@privacyCacheDetails": {
+    "description": "Collapsed expansion tile on the 'Data on this device' screen holding the cache lifetime table and the clear-cache button (#3910)."
+  },
+  "privacyCacheResponses": "{count, plural, =1{1 cached response} other{{count} cached responses}}",
+  "@privacyCacheResponses": {
+    "description": "Detail line of the Cache row on the 'Data on this device' screen (#3910).",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "211"
+      }
+    }
+  },
+  "privacyClearCacheEntries": "Clear cache ({count, plural, =1{1 entry} other{{count} entries}})",
+  "@privacyClearCacheEntries": {
+    "description": "Label of the clear-cache button inside 'Cache details', carrying the number of cached entries (#3910).",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "211"
+      }
+    }
+  },
+  "privacySyncStatusLabel": "Status",
+  "@privacySyncStatusLabel": {
+    "description": "Label of the connection-status row on the Sync & account screen (#3911)."
+  },
+  "privacySyncModeCommunity": "Sparkilo Community — the developer's EU server",
+  "@privacySyncModeCommunity": {
+    "description": "Sync-mode row value: the shared community database hosted by the developer in the EU. 'Sparkilo Community' is a product name (#3911)."
+  },
+  "privacySyncModeSelfHosted": "Self-hosted — your own Supabase",
+  "@privacySyncModeSelfHosted": {
+    "description": "Sync-mode row value: the user's own self-hosted Supabase project. 'Supabase' is a brand name (#3911)."
+  },
+  "privacySyncModeSharedGroup": "Shared group — a database you joined",
+  "@privacySyncModeSharedGroup": {
+    "description": "Sync-mode row value: a third-party database the user joined via QR code or manual entry (#3911)."
+  },
+  "privacySyncAccountLabel": "Account",
+  "@privacySyncAccountLabel": {
+    "description": "Label of the account row on the Sync & account screen (#3911)."
+  },
+  "privacySyncAccountAnonymous": "Anonymous account, tied to this device",
+  "@privacySyncAccountAnonymous": {
+    "description": "Account row value when the sync identity is an anonymous UUID bound to this device (#3911)."
+  },
+  "privacySyncAccountEmail": "Email account: {email}",
+  "@privacySyncAccountEmail": {
+    "description": "Account row value when the sync identity is an email sign-in (#3911).",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "x@y.example"
+      }
+    }
+  },
+  "privacyCopyUserId": "Copy user ID",
+  "@privacyCopyUserId": {
+    "description": "Tooltip of the copy icon next to the sync user id (#3911)."
+  },
+  "privacyUserIdCopied": "User ID copied",
+  "@privacyUserIdCopied": {
+    "description": "Snackbar after the sync user id was copied to the clipboard (#3911)."
+  },
+  "privacySyncDatabaseHost": "Database host",
+  "@privacySyncDatabaseHost": {
+    "description": "Label of the row showing the Supabase host name (no scheme) on the Sync & account screen (#3911)."
+  },
+  "privacyExportSectionTitle": "Export",
+  "@privacyExportSectionTitle": {
+    "description": "Group header of the export section on the 'Export or delete' screen (#3912)."
+  },
+  "privacyExportMyData": "Export my data",
+  "@privacyExportMyData": {
+    "description": "The one export button on the 'Export or delete' screen; opens the format chooser sheet (#3912)."
+  },
+  "privacyExportSheetTitle": "Choose a format",
+  "@privacyExportSheetTitle": {
+    "description": "Title of the bottom sheet offering the three export formats (#3912)."
+  },
+  "privacyExportZipTitle": "ZIP archive",
+  "@privacyExportZipTitle": {
+    "description": "Export-format option: one ZIP with everything (#3912)."
+  },
+  "privacyExportZipSubtitle": "Everything, attachments included — for a complete backup",
+  "@privacyExportZipSubtitle": {
+    "description": "Explanation under the ZIP export option (#3912)."
+  },
+  "privacyExportJsonTitle": "JSON",
+  "@privacyExportJsonTitle": {
+    "description": "Export-format option: a single JSON document. 'JSON' is a format name (#3912)."
+  },
+  "privacyExportJsonSubtitle": "Machine-readable — for another app",
+  "@privacyExportJsonSubtitle": {
+    "description": "Explanation under the JSON export option (#3912)."
+  },
+  "privacyExportCsvTitle": "CSV",
+  "@privacyExportCsvTitle": {
+    "description": "Export-format option: spreadsheet tables. 'CSV' is a format name (#3912)."
+  },
+  "privacyExportCsvSubtitle": "Spreadsheet — one table per category",
+  "@privacyExportCsvSubtitle": {
+    "description": "Explanation under the CSV export option (#3912)."
+  },
+  "privacyErrorLogTitle": "Error log",
+  "@privacyErrorLogTitle": {
+    "description": "Group header and row title of the locally buffered error log on the 'Export or delete' screen (#3912)."
+  },
+  "privacyErrorLogCount": "{count, plural, =0{No entries} =1{1 entry} other{{count} entries}}",
+  "@privacyErrorLogCount": {
+    "description": "Subtitle of the error-log row: number of buffered trace entries (#3912).",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "29"
+      }
+    }
+  },
+  "privacyErrorLogSave": "Save",
+  "@privacyErrorLogSave": {
+    "description": "Action on the error-log row: save the log to Downloads (clipboard / share fallbacks by size) (#3912)."
+  },
+  "privacyErrorLogClear": "Clear",
+  "@privacyErrorLogClear": {
+    "description": "Action on the error-log row: empty the buffered error log (#3912)."
+  },
+  "privacyDangerZoneTitle": "Danger zone",
+  "@privacyDangerZoneTitle": {
+    "description": "Group header of the delete-everything section on the 'Export or delete' screen (#3912)."
+  },
+  "privacyDangerZoneBody": "Permanently deletes everything the app stores on this device. With sync on, your data on the TankSync server is erased too.",
+  "@privacyDangerZoneBody": {
+    "description": "Explanation above the delete-everything button. TankSync is the brand name of the sync service (#3912)."
+  },
+  "privacyDeleteAllMyData": "Delete all my data",
+  "@privacyDeleteAllMyData": {
+    "description": "The red delete-everything button on the 'Export or delete' screen; opens the confirmation dialog (#3912)."
+  },
   "stationStatusWithFreshness": "{status} · updated {ago} ago",
   "@stationStatusWithFreshness": {
     "description": "Station-detail header line: the open / closed / unknown state followed by how long ago the data was fetched. Owns the whole word order per locale — never composed from fragments (#3902).",

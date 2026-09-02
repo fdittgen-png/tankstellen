@@ -537,12 +537,6 @@ abstract class AppLocalizations {
   /// **'Data transparency'**
   String get dataTransparency;
 
-  /// No description provided for @storageAndCache.
-  ///
-  /// In en, this message translates to:
-  /// **'Storage & cache'**
-  String get storageAndCache;
-
   /// No description provided for @clearCache.
   ///
   /// In en, this message translates to:
@@ -567,35 +561,11 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settingsLabel;
 
-  /// No description provided for @profilesStored.
-  ///
-  /// In en, this message translates to:
-  /// **'profiles stored'**
-  String get profilesStored;
-
-  /// No description provided for @stationsMarked.
-  ///
-  /// In en, this message translates to:
-  /// **'stations marked'**
-  String get stationsMarked;
-
-  /// No description provided for @cachedResponses.
-  ///
-  /// In en, this message translates to:
-  /// **'cached responses'**
-  String get cachedResponses;
-
   /// No description provided for @total.
   ///
   /// In en, this message translates to:
   /// **'Total'**
   String get total;
-
-  /// No description provided for @cacheManagement.
-  ///
-  /// In en, this message translates to:
-  /// **'Cache management'**
-  String get cacheManagement;
 
   /// No description provided for @cacheDescription.
   ///
@@ -681,12 +651,6 @@ abstract class AppLocalizations {
   /// **'Delete all'**
   String get deleteAllButton;
 
-  /// No description provided for @entries.
-  ///
-  /// In en, this message translates to:
-  /// **'entries'**
-  String get entries;
-
   /// No description provided for @cacheEmpty.
   ///
   /// In en, this message translates to:
@@ -741,89 +705,11 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get reportConsentCancel;
 
-  /// No description provided for @configProfileSection.
-  ///
-  /// In en, this message translates to:
-  /// **'Profile'**
-  String get configProfileSection;
-
-  /// No description provided for @configActiveProfile.
-  ///
-  /// In en, this message translates to:
-  /// **'Active profile'**
-  String get configActiveProfile;
-
-  /// No description provided for @configPreferredFuel.
-  ///
-  /// In en, this message translates to:
-  /// **'Preferred fuel'**
-  String get configPreferredFuel;
-
-  /// No description provided for @configCountry.
-  ///
-  /// In en, this message translates to:
-  /// **'Country'**
-  String get configCountry;
-
-  /// No description provided for @configRouteSegment.
-  ///
-  /// In en, this message translates to:
-  /// **'Route segment'**
-  String get configRouteSegment;
-
-  /// No description provided for @configApiKeysSection.
-  ///
-  /// In en, this message translates to:
-  /// **'API keys'**
-  String get configApiKeysSection;
-
-  /// No description provided for @configTankerkoenigKey.
-  ///
-  /// In en, this message translates to:
-  /// **'Tankerkoenig API key'**
-  String get configTankerkoenigKey;
-
-  /// No description provided for @configApiKeyConfigured.
-  ///
-  /// In en, this message translates to:
-  /// **'Configured'**
-  String get configApiKeyConfigured;
-
-  /// No description provided for @configApiKeyCommunity.
-  ///
-  /// In en, this message translates to:
-  /// **'Default (community key)'**
-  String get configApiKeyCommunity;
-
   /// No description provided for @searchLocationPlaceholder.
   ///
   /// In en, this message translates to:
   /// **'Address, postal code or city'**
   String get searchLocationPlaceholder;
-
-  /// No description provided for @configEvKey.
-  ///
-  /// In en, this message translates to:
-  /// **'EV charging API key'**
-  String get configEvKey;
-
-  /// No description provided for @configEvKeyCustom.
-  ///
-  /// In en, this message translates to:
-  /// **'Custom key'**
-  String get configEvKeyCustom;
-
-  /// No description provided for @configEvKeyShared.
-  ///
-  /// In en, this message translates to:
-  /// **'Default (shared)'**
-  String get configEvKeyShared;
-
-  /// No description provided for @configCloudSyncSection.
-  ///
-  /// In en, this message translates to:
-  /// **'Cloud Sync'**
-  String get configCloudSyncSection;
 
   /// No description provided for @configTankSyncConnected.
   ///
@@ -836,66 +722,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Disabled'**
   String get configTankSyncDisabled;
-
-  /// No description provided for @configAuthMode.
-  ///
-  /// In en, this message translates to:
-  /// **'Auth mode'**
-  String get configAuthMode;
-
-  /// No description provided for @configAuthEmail.
-  ///
-  /// In en, this message translates to:
-  /// **'Email (persistent)'**
-  String get configAuthEmail;
-
-  /// No description provided for @configAuthAnonymous.
-  ///
-  /// In en, this message translates to:
-  /// **'Anonymous (device-only)'**
-  String get configAuthAnonymous;
-
-  /// No description provided for @configDatabase.
-  ///
-  /// In en, this message translates to:
-  /// **'Database'**
-  String get configDatabase;
-
-  /// No description provided for @configPrivacySummary.
-  ///
-  /// In en, this message translates to:
-  /// **'Privacy summary'**
-  String get configPrivacySummary;
-
-  /// No description provided for @configPrivacySummarySynced.
-  ///
-  /// In en, this message translates to:
-  /// **'• Favorites, alerts, and ignored stations are synced to your private database\n• GPS position and API keys never leave your device\n• {authNote}'**
-  String configPrivacySummarySynced(Object authNote);
-
-  /// No description provided for @configPrivacySummaryLocal.
-  ///
-  /// In en, this message translates to:
-  /// **'• All data is stored locally on this device only\n• No data is sent to any server\n• API keys encrypted in device secure storage'**
-  String get configPrivacySummaryLocal;
-
-  /// No description provided for @configAuthNoteEmail.
-  ///
-  /// In en, this message translates to:
-  /// **'Email account enables cross-device access'**
-  String get configAuthNoteEmail;
-
-  /// No description provided for @configAuthNoteAnonymous.
-  ///
-  /// In en, this message translates to:
-  /// **'Anonymous account — data tied to this device'**
-  String get configAuthNoteAnonymous;
-
-  /// No description provided for @configNone.
-  ///
-  /// In en, this message translates to:
-  /// **'None'**
-  String get configNone;
 
   /// No description provided for @privacyPolicy.
   ///
@@ -1797,18 +1623,6 @@ abstract class AppLocalizations {
   /// **'Price History'**
   String get priceHistory;
 
-  /// No description provided for @ignoredStationsLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Ignored'**
-  String get ignoredStationsLabel;
-
-  /// No description provided for @ratingsLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Ratings'**
-  String get ratingsLabel;
-
   /// No description provided for @favoritesDataCache.
   ///
   /// In en, this message translates to:
@@ -1820,30 +1634,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'City search'**
   String get citySearchCache;
-
-  /// No description provided for @priceHistoryStationsTracked.
-  ///
-  /// In en, this message translates to:
-  /// **'{count} stations tracked'**
-  String priceHistoryStationsTracked(int count);
-
-  /// No description provided for @alertsConfiguredCount.
-  ///
-  /// In en, this message translates to:
-  /// **'{count} configured'**
-  String alertsConfiguredCount(int count);
-
-  /// No description provided for @ignoredStationsHidden.
-  ///
-  /// In en, this message translates to:
-  /// **'{count} stations hidden'**
-  String ignoredStationsHidden(int count);
-
-  /// No description provided for @ratingsStationsRated.
-  ///
-  /// In en, this message translates to:
-  /// **'{count} stations rated'**
-  String ratingsStationsRated(int count);
 
   /// No description provided for @noPriceHistory.
   ///
@@ -2589,24 +2379,6 @@ abstract class AppLocalizations {
   /// **'This week'**
   String get alertStatsThisWeek;
 
-  /// No description provided for @privacyDashboardTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Privacy Dashboard'**
-  String get privacyDashboardTitle;
-
-  /// No description provided for @privacyDashboardSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'View, export, or delete your data'**
-  String get privacyDashboardSubtitle;
-
-  /// No description provided for @privacyDashboardBanner.
-  ///
-  /// In en, this message translates to:
-  /// **'Your data belongs to you. Here you can see everything this app stores, export it, or delete it.'**
-  String get privacyDashboardBanner;
-
   /// No description provided for @privacyLocalData.
   ///
   /// In en, this message translates to:
@@ -2643,42 +2415,6 @@ abstract class AppLocalizations {
   /// **'Saved routes'**
   String get privacyItineraries;
 
-  /// No description provided for @privacyCacheEntries.
-  ///
-  /// In en, this message translates to:
-  /// **'Cache entries'**
-  String get privacyCacheEntries;
-
-  /// No description provided for @privacyApiKey.
-  ///
-  /// In en, this message translates to:
-  /// **'API key stored'**
-  String get privacyApiKey;
-
-  /// No description provided for @privacyEvApiKey.
-  ///
-  /// In en, this message translates to:
-  /// **'EV API key stored'**
-  String get privacyEvApiKey;
-
-  /// No description provided for @privacyEstimatedSize.
-  ///
-  /// In en, this message translates to:
-  /// **'Estimated storage'**
-  String get privacyEstimatedSize;
-
-  /// No description provided for @privacySyncedData.
-  ///
-  /// In en, this message translates to:
-  /// **'Cloud sync (TankSync)'**
-  String get privacySyncedData;
-
-  /// No description provided for @privacySyncDisabled.
-  ///
-  /// In en, this message translates to:
-  /// **'Cloud sync is disabled. All data stays on this device only.'**
-  String get privacySyncDisabled;
-
   /// No description provided for @privacySyncMode.
   ///
   /// In en, this message translates to:
@@ -2697,29 +2433,11 @@ abstract class AppLocalizations {
   /// **'When sync is enabled, favorites, ratings, alerts, ignored stations, saved routes, vehicles, fuel logs and trips are also stored on the TankSync server.'**
   String get privacySyncDescription;
 
-  /// No description provided for @privacyViewServerData.
-  ///
-  /// In en, this message translates to:
-  /// **'View server data'**
-  String get privacyViewServerData;
-
-  /// No description provided for @privacyExportButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Export all data as JSON'**
-  String get privacyExportButton;
-
   /// No description provided for @privacyExportSuccess.
   ///
   /// In en, this message translates to:
   /// **'Data exported to clipboard'**
   String get privacyExportSuccess;
-
-  /// No description provided for @privacyExportCsvButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Export all data as CSV'**
-  String get privacyExportCsvButton;
 
   /// No description provided for @privacyExportCsvSuccess.
   ///
@@ -2732,24 +2450,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Saved to your Downloads folder'**
   String get savedToDownloadsFolder;
-
-  /// No description provided for @privacyDeleteButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete all data'**
-  String get privacyDeleteButton;
-
-  /// Button on the Privacy Dashboard that writes the buffered error traces to the device's Downloads folder (and shares / copies as a secondary path). Supersedes privacyCopyErrorLog (#2145). count = number of traces buffered.
-  ///
-  /// In en, this message translates to:
-  /// **'Save error log ({count})'**
-  String privacySaveErrorLog(int count);
-
-  /// No description provided for @privacyClearErrorLog.
-  ///
-  /// In en, this message translates to:
-  /// **'Clear error log'**
-  String get privacyClearErrorLog;
 
   /// No description provided for @privacyErrorLogCleared.
   ///
@@ -9248,12 +8948,6 @@ abstract class AppLocalizations {
   /// **'Could not delete the report'**
   String get reportDeleteFailed;
 
-  /// Settings → Privacy & data: header of the non-consent privacy switches (tile proxy, internet logos).
-  ///
-  /// In en, this message translates to:
-  /// **'Privacy controls'**
-  String get privacyControlsTitle;
-
   /// Switch title. Sparkilo is the app name.
   ///
   /// In en, this message translates to:
@@ -9277,12 +8971,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Off by default: bundled placeholders are shown. On: logos are fetched from logo.clearbit.com, which sees your IP address.'**
   String get remoteLogosToggleSubtitle;
-
-  /// Privacy Dashboard button: one ZIP with every local category and every server table (GDPR Art. 20).
-  ///
-  /// In en, this message translates to:
-  /// **'Export all my data (ZIP)'**
-  String get privacyExportAllButton;
 
   /// Snackbar after the full export ZIP was written.
   ///
@@ -9919,24 +9607,6 @@ abstract class AppLocalizations {
   /// **'• You can delete your account at any time'**
   String get authInfoBenefit4;
 
-  /// No description provided for @privacyLocalDataEmpty.
-  ///
-  /// In en, this message translates to:
-  /// **'Nothing stored yet. Add a favorite or set a price alert to see entries here.'**
-  String get privacyLocalDataEmpty;
-
-  /// No description provided for @privacyHideEmptyRows.
-  ///
-  /// In en, this message translates to:
-  /// **'Hide empty rows'**
-  String get privacyHideEmptyRows;
-
-  /// No description provided for @privacyShowEmptyRows.
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{Show {count} empty row} other{Show {count} empty rows}}'**
-  String privacyShowEmptyRows(int count);
-
   /// No description provided for @apiKeySetupTitle.
   ///
   /// In en, this message translates to:
@@ -10014,18 +9684,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Trips back up under this device\'s anonymous account. Sign in with an email to reach them from other devices.'**
   String get consentSyncTripsAnonymousHint;
-
-  /// No description provided for @consentHideDetails.
-  ///
-  /// In en, this message translates to:
-  /// **'Hide details'**
-  String get consentHideDetails;
-
-  /// No description provided for @consentShowDetails.
-  ///
-  /// In en, this message translates to:
-  /// **'Show details'**
-  String get consentShowDetails;
 
   /// No description provided for @dialogOk.
   ///
@@ -12172,12 +11830,6 @@ abstract class AppLocalizations {
   /// **'tanksync, cloud, account, email, link device, sync, share database, anonymous'**
   String get settingsTopicSyncKeywords;
 
-  /// One-line subtitle of the Privacy & data tile (#3884).
-  ///
-  /// In en, this message translates to:
-  /// **'Consents, privacy dashboard, storage & cache'**
-  String get settingsTopicPrivacySubtitle;
-
   /// Comma-separated search keywords for the Privacy & data tile (#3884).
   ///
   /// In en, this message translates to:
@@ -12297,12 +11949,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Adapters are paired per vehicle — open a vehicle to pair or change its adapter'**
   String get settingsObd2AdapterSubtitle;
-
-  /// One-line hint at the bottom of Storage & cache replacing the former duplicate Delete-all button (#3884).
-  ///
-  /// In en, this message translates to:
-  /// **'Deleting all local data is done from the Privacy Dashboard.'**
-  String get settingsStorageDeleteHint;
 
   /// Cross-link tile inside the TankSync section that opens Privacy & data (#3884).
   ///
@@ -13947,6 +13593,270 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last fill-up: {date}'**
   String pickStationLastFillUpAt(String date);
+
+  /// Settings root: one-line subtitle of the Privacy & data tile naming its four topics (#3908, Epic #3907).
+  ///
+  /// In en, this message translates to:
+  /// **'Your choices, data on this device, sync, export or delete'**
+  String get privacyTopicSubtitle;
+
+  /// Privacy & data summary card, first line when cloud sync is off (#3908).
+  ///
+  /// In en, this message translates to:
+  /// **'Your data stays on this device'**
+  String get privacyDataLocationLocal;
+
+  /// Privacy & data summary card, first line when cloud sync is on — TankSync is the brand name of the sync service (#3908).
+  ///
+  /// In en, this message translates to:
+  /// **'Your data is also synced to TankSync'**
+  String get privacyDataLocationSynced;
+
+  /// Sync status line (summary card + Sync & account tile) when sync is on with an anonymous, device-bound account (#3908).
+  ///
+  /// In en, this message translates to:
+  /// **'Sync: on · anonymous account'**
+  String get privacySyncLineEnabledAnonymous;
+
+  /// Sync status line (summary card + Sync & account tile) when sync is on with an email account (#3908).
+  ///
+  /// In en, this message translates to:
+  /// **'Sync: on · email account'**
+  String get privacySyncLineEnabledEmail;
+
+  /// Sync status line (summary card + Sync & account tile) when cloud sync is off (#3908).
+  ///
+  /// In en, this message translates to:
+  /// **'Sync: off'**
+  String get privacySyncLineDisabled;
+
+  /// Privacy & data summary card, third line: total bytes the app keeps locally, already formatted (e.g. '2.1 MB') (#3908).
+  ///
+  /// In en, this message translates to:
+  /// **'{size} stored on this device'**
+  String privacyStorageLine(String size);
+
+  /// Title of the first privacy topic tile and screen: the five consents and the two privacy controls (#3909).
+  ///
+  /// In en, this message translates to:
+  /// **'Your choices'**
+  String get privacyTopicChoicesTitle;
+
+  /// Status line of the 'Your choices' tile: how many of the consents are switched on (#3908).
+  ///
+  /// In en, this message translates to:
+  /// **'{on} of {total} enabled'**
+  String privacyChoicesStatus(int on, int total);
+
+  /// Status line of the 'Data on this device' tile: total formatted size and the number of non-empty data categories (#3908).
+  ///
+  /// In en, this message translates to:
+  /// **'{size} · {count, plural, =1{1 category} other{{count} categories}}'**
+  String privacyDeviceDataStatus(String size, int count);
+
+  /// Title of the fourth privacy topic tile and screen: data export, the error log and the delete-everything action (#3912).
+  ///
+  /// In en, this message translates to:
+  /// **'Export or delete'**
+  String get privacyTopicExportDeleteTitle;
+
+  /// Status line of the 'Export or delete' tile: the three export formats and the number of buffered error-log entries (#3908).
+  ///
+  /// In en, this message translates to:
+  /// **'ZIP, JSON, CSV · error log ({count})'**
+  String privacyExportDeleteStatus(int count);
+
+  /// Tooltip of the info icon on a privacy-control row; opens a dialog with the full explanation (#3909).
+  ///
+  /// In en, this message translates to:
+  /// **'Learn more'**
+  String get privacyLearnMore;
+
+  /// Two-line subtitle of the map-tile proxy switch on the 'Your choices' screen; the full text stays behind the info icon (#3909).
+  ///
+  /// In en, this message translates to:
+  /// **'Tiles come via the developer\'s EU proxy, not straight from OpenStreetMap'**
+  String get tileProxyToggleShort;
+
+  /// Two-line subtitle of the internet brand-logos switch on the 'Your choices' screen; the full text stays behind the info icon (#3909).
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch brand logos from logo.clearbit.com instead of bundled placeholders'**
+  String get remoteLogosToggleShort;
+
+  /// Collapsed expansion tile on the 'Data on this device' screen holding the cache lifetime table and the clear-cache button (#3910).
+  ///
+  /// In en, this message translates to:
+  /// **'Cache details'**
+  String get privacyCacheDetails;
+
+  /// Detail line of the Cache row on the 'Data on this device' screen (#3910).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 cached response} other{{count} cached responses}}'**
+  String privacyCacheResponses(int count);
+
+  /// Label of the clear-cache button inside 'Cache details', carrying the number of cached entries (#3910).
+  ///
+  /// In en, this message translates to:
+  /// **'Clear cache ({count, plural, =1{1 entry} other{{count} entries}})'**
+  String privacyClearCacheEntries(int count);
+
+  /// Label of the connection-status row on the Sync & account screen (#3911).
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get privacySyncStatusLabel;
+
+  /// Sync-mode row value: the shared community database hosted by the developer in the EU. 'Sparkilo Community' is a product name (#3911).
+  ///
+  /// In en, this message translates to:
+  /// **'Sparkilo Community — the developer\'s EU server'**
+  String get privacySyncModeCommunity;
+
+  /// Sync-mode row value: the user's own self-hosted Supabase project. 'Supabase' is a brand name (#3911).
+  ///
+  /// In en, this message translates to:
+  /// **'Self-hosted — your own Supabase'**
+  String get privacySyncModeSelfHosted;
+
+  /// Sync-mode row value: a third-party database the user joined via QR code or manual entry (#3911).
+  ///
+  /// In en, this message translates to:
+  /// **'Shared group — a database you joined'**
+  String get privacySyncModeSharedGroup;
+
+  /// Label of the account row on the Sync & account screen (#3911).
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get privacySyncAccountLabel;
+
+  /// Account row value when the sync identity is an anonymous UUID bound to this device (#3911).
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous account, tied to this device'**
+  String get privacySyncAccountAnonymous;
+
+  /// Account row value when the sync identity is an email sign-in (#3911).
+  ///
+  /// In en, this message translates to:
+  /// **'Email account: {email}'**
+  String privacySyncAccountEmail(String email);
+
+  /// Tooltip of the copy icon next to the sync user id (#3911).
+  ///
+  /// In en, this message translates to:
+  /// **'Copy user ID'**
+  String get privacyCopyUserId;
+
+  /// Snackbar after the sync user id was copied to the clipboard (#3911).
+  ///
+  /// In en, this message translates to:
+  /// **'User ID copied'**
+  String get privacyUserIdCopied;
+
+  /// Label of the row showing the Supabase host name (no scheme) on the Sync & account screen (#3911).
+  ///
+  /// In en, this message translates to:
+  /// **'Database host'**
+  String get privacySyncDatabaseHost;
+
+  /// Group header of the export section on the 'Export or delete' screen (#3912).
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get privacyExportSectionTitle;
+
+  /// The one export button on the 'Export or delete' screen; opens the format chooser sheet (#3912).
+  ///
+  /// In en, this message translates to:
+  /// **'Export my data'**
+  String get privacyExportMyData;
+
+  /// Title of the bottom sheet offering the three export formats (#3912).
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a format'**
+  String get privacyExportSheetTitle;
+
+  /// Export-format option: one ZIP with everything (#3912).
+  ///
+  /// In en, this message translates to:
+  /// **'ZIP archive'**
+  String get privacyExportZipTitle;
+
+  /// Explanation under the ZIP export option (#3912).
+  ///
+  /// In en, this message translates to:
+  /// **'Everything, attachments included — for a complete backup'**
+  String get privacyExportZipSubtitle;
+
+  /// Export-format option: a single JSON document. 'JSON' is a format name (#3912).
+  ///
+  /// In en, this message translates to:
+  /// **'JSON'**
+  String get privacyExportJsonTitle;
+
+  /// Explanation under the JSON export option (#3912).
+  ///
+  /// In en, this message translates to:
+  /// **'Machine-readable — for another app'**
+  String get privacyExportJsonSubtitle;
+
+  /// Export-format option: spreadsheet tables. 'CSV' is a format name (#3912).
+  ///
+  /// In en, this message translates to:
+  /// **'CSV'**
+  String get privacyExportCsvTitle;
+
+  /// Explanation under the CSV export option (#3912).
+  ///
+  /// In en, this message translates to:
+  /// **'Spreadsheet — one table per category'**
+  String get privacyExportCsvSubtitle;
+
+  /// Group header and row title of the locally buffered error log on the 'Export or delete' screen (#3912).
+  ///
+  /// In en, this message translates to:
+  /// **'Error log'**
+  String get privacyErrorLogTitle;
+
+  /// Subtitle of the error-log row: number of buffered trace entries (#3912).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No entries} =1{1 entry} other{{count} entries}}'**
+  String privacyErrorLogCount(int count);
+
+  /// Action on the error-log row: save the log to Downloads (clipboard / share fallbacks by size) (#3912).
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get privacyErrorLogSave;
+
+  /// Action on the error-log row: empty the buffered error log (#3912).
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get privacyErrorLogClear;
+
+  /// Group header of the delete-everything section on the 'Export or delete' screen (#3912).
+  ///
+  /// In en, this message translates to:
+  /// **'Danger zone'**
+  String get privacyDangerZoneTitle;
+
+  /// Explanation above the delete-everything button. TankSync is the brand name of the sync service (#3912).
+  ///
+  /// In en, this message translates to:
+  /// **'Permanently deletes everything the app stores on this device. With sync on, your data on the TankSync server is erased too.'**
+  String get privacyDangerZoneBody;
+
+  /// The red delete-everything button on the 'Export or delete' screen; opens the confirmation dialog (#3912).
+  ///
+  /// In en, this message translates to:
+  /// **'Delete all my data'**
+  String get privacyDeleteAllMyData;
 
   /// Station-detail header line: the open / closed / unknown state followed by how long ago the data was fetched. Owns the whole word order per locale — never composed from fragments (#3902).
   ///
