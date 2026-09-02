@@ -60,10 +60,15 @@ class _StationDetails extends StatelessWidget {
   /// list, so the card is unchanged there.
   final double? closenessRadiusMeters;
 
+  /// #3905 — amber "Updated …" line + "Old price" badge (see
+  /// [StationCard.isStalePrice]).
+  final bool isStalePrice;
+
   const _StationDetails({
     required this.station,
     required this.hasBrand,
     this.closenessRadiusMeters,
+    this.isStalePrice = false,
   });
 
   @override
@@ -164,29 +169,9 @@ class _StationDetails extends StatelessWidget {
               const SizedBox(width: 8),
               Flexible(
                 flex: 3,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.update,
-                      size: 12,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: Spacing.xs),
-                    Flexible(
-                      child: Text(
-                        // #2622 — wrap the upstream pre-formatted timestamp as
-                        // "Updated {time}" so it reads as freshness, not a bare
-                        // code. (No relative "2h ago": updatedAt is a lossy,
-                        // per-country pre-formatted String.)
-                        l10n.stationUpdatedLabel(station.updatedAt!),
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
+                child: _UpdatedRow(
+                  updatedAt: station.updatedAt!,
+                  isStalePrice: isStalePrice,
                 ),
               ),
             ],
@@ -252,6 +237,73 @@ class _StationDetails extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 2),
             child: AmenityChips(amenities: station.amenities),
+          ),
+      ],
+    );
+  }
+}
+
+/// The "Updated {time}" freshness row (#2622). #3905 — when
+/// [isStalePrice] is set the icon + text switch to the tertiary (amber)
+/// colour and a small "Old price" badge follows, so a weeks-old price no
+/// longer reads like a fresh one. A [Wrap] hosts the two: the badge sits
+/// beside the timestamp when the column has room and drops under it
+/// otherwise (expanded translations, raised text scale, 320 dp) — a
+/// Wrap never overflows horizontally, and the badge text itself
+/// ellipsises inside the column width as a last resort.
+class _UpdatedRow extends StatelessWidget {
+  final String updatedAt;
+  final bool isStalePrice;
+
+  const _UpdatedRow({required this.updatedAt, required this.isStalePrice});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+    final color = isStalePrice
+        ? theme.colorScheme.tertiary
+        : theme.colorScheme.onSurfaceVariant;
+    return Wrap(
+      spacing: Spacing.xs,
+      runSpacing: 2,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.update, size: 12, color: color),
+            const SizedBox(width: Spacing.xs),
+            Flexible(
+              child: Text(
+                // #2622 — wrap the upstream pre-formatted timestamp as
+                // "Updated {time}" so it reads as freshness, not a bare
+                // code. (No relative "2h ago": updatedAt is a lossy,
+                // per-country pre-formatted String.)
+                l10n.stationUpdatedLabel(updatedAt),
+                style: theme.textTheme.bodySmall?.copyWith(color: color),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        if (isStalePrice)
+          Container(
+            key: const Key('station_card_stale_price_badge'),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.tertiaryContainer,
+              borderRadius: AppRadius.sm,
+            ),
+            child: Text(
+              l10n.stalePriceBadge,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onTertiaryContainer,
+                fontWeight: FontWeight.bold,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
       ],
     );

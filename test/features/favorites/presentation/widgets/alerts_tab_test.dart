@@ -14,7 +14,12 @@ import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/widgets/empty_state.dart';
 import 'package:tankstellen/core/widgets/help_banner.dart';
 import 'package:tankstellen/features/alerts/data/models/price_alert.dart';
+import 'package:tankstellen/features/alerts/domain/entities/radius_alert.dart';
+import 'package:tankstellen/features/alerts/presentation/widgets/alert_statistics_card.dart';
+import 'package:tankstellen/features/alerts/presentation/widgets/alerts_body.dart';
+import 'package:tankstellen/features/alerts/presentation/widgets/alerts_last_checked_footer.dart';
 import 'package:tankstellen/features/alerts/providers/alert_provider.dart';
+import 'package:tankstellen/features/alerts/providers/radius_alerts_provider.dart';
 import 'package:tankstellen/features/favorites/presentation/widgets/alerts_tab.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
@@ -22,6 +27,7 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
 import '../../../../helpers/confirm_delete.dart';
+import '../../../../mocks/mocks.dart';
 
 PriceAlert _alert({
   String id = 'alert-1',
@@ -42,35 +48,57 @@ PriceAlert _alert({
   );
 }
 
+/// Overrides for one tab render: storage stubs the alerts page needs, the
+/// seeded station alerts and an empty zone-alert list.
+List<Object> _overrides(
+  ({List<Object> overrides, MockStorageRepository mockStorage}) test,
+  _RecordingAlerts alerts,
+) {
+  when(() => test.mockStorage.getSetting(any())).thenReturn(null);
+  when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+  when(() => test.mockStorage.getAlerts()).thenReturn([]);
+  return [
+    ...test.overrides,
+    alertProvider.overrideWith(() => alerts),
+    radiusAlertsProvider.overrideWith(_NoRadiusAlerts.new),
+  ];
+}
+
 void main() {
-  group('AlertsTab', () {
-    testWidgets('shows EmptyState with "No price alerts" when list is empty',
+  group('AlertsTab (#3905 — alerts page inlined)', () {
+    testWidgets(
+        'empty: renders the stats strip, both sections and the footer '
+        'directly — no intermediate card, no duplicate empty state',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.getSetting(any())).thenReturn(null);
 
       await pumpApp(
         tester,
         const AlertsTab(),
-        overrides: [
-          ...test.overrides,
-          alertProvider.overrideWith(() => _RecordingAlerts(const [])),
-        ],
+        overrides: _overrides(test, _RecordingAlerts(const [])),
       );
 
+      // The page body itself, not a link to it.
+      expect(find.byType(AlertsBody), findsOneWidget);
+      expect(find.byType(AlertStatisticsCard), findsOneWidget);
+      expect(find.text('Station alerts (0)'), findsOneWidget);
+      expect(find.text('Radius alerts (0)'), findsOneWidget);
+      expect(find.byType(AlertsLastCheckedFooter), findsOneWidget);
+      // The old "Radius alerts & statistics" entry card and the tab's own
+      // full-screen empty state are gone; the hint appears ONCE, inline.
+      expect(find.byKey(const Key('radiusAlertsEntry')), findsNothing);
+      expect(find.text('Radius alerts & statistics'), findsNothing);
+      expect(find.text('No price alerts'), findsNothing);
+      expect(find.textContaining("station's detail page"), findsOneWidget);
+      // The only EmptyState left is the zone section's compact one.
       expect(find.byType(EmptyState), findsOneWidget);
-      expect(find.text('No price alerts'), findsOneWidget);
-      expect(find.byIcon(Icons.notifications_off_outlined), findsOneWidget);
-      // Empty branch must NOT render the help banner or any list tiles.
+      expect(find.text('No radius alerts yet'), findsOneWidget);
       expect(find.byType(HelpBanner), findsNothing);
-      expect(find.byType(ListTile), findsNothing);
     });
 
-    testWidgets('renders HelpBanner + one ListTile per alert when non-empty',
+    testWidgets('renders HelpBanner + one row per alert when non-empty',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.getSetting(any())).thenReturn(null);
-
       final alerts = [
         _alert(id: 'a1', stationName: 'Shell Berlin'),
         _alert(id: 'a2', stationName: 'Aral Munich'),
@@ -80,78 +108,25 @@ void main() {
       await pumpApp(
         tester,
         const AlertsTab(),
-        overrides: [
-          ...test.overrides,
-          alertProvider.overrideWith(() => _RecordingAlerts(alerts)),
-        ],
+        overrides: _overrides(test, _RecordingAlerts(alerts)),
       );
 
-      expect(find.byType(EmptyState), findsNothing);
       expect(find.byType(HelpBanner), findsOneWidget);
-      expect(find.byType(ListTile), findsNWidgets(3));
+      expect(find.text('Station alerts (3)'), findsOneWidget);
       expect(find.text('Shell Berlin'), findsOneWidget);
       expect(find.text('Aral Munich'), findsOneWidget);
       expect(find.text('TotalEnergies Hamburg'), findsOneWidget);
     });
 
-    testWidgets('active alert renders notifications_active icon', (tester) async {
-      final test = standardTestOverrides();
-      when(() => test.mockStorage.getSetting(any())).thenReturn(null);
-
-      await pumpApp(
-        tester,
-        const AlertsTab(),
-        overrides: [
-          ...test.overrides,
-          alertProvider.overrideWith(
-            () => _RecordingAlerts([_alert(isActive: true)]),
-          ),
-        ],
-      );
-
-      expect(find.byIcon(Icons.notifications_active), findsOneWidget);
-      expect(find.byIcon(Icons.notifications_off), findsNothing);
-      // Switch reflects active state.
-      final switchWidget = tester.widget<Switch>(find.byType(Switch));
-      expect(switchWidget.value, isTrue);
-    });
-
-    testWidgets('inactive alert renders notifications_off icon and grey switch',
-        (tester) async {
-      final test = standardTestOverrides();
-      when(() => test.mockStorage.getSetting(any())).thenReturn(null);
-
-      await pumpApp(
-        tester,
-        const AlertsTab(),
-        overrides: [
-          ...test.overrides,
-          alertProvider.overrideWith(
-            () => _RecordingAlerts([_alert(isActive: false)]),
-          ),
-        ],
-      );
-
-      expect(find.byIcon(Icons.notifications_off), findsOneWidget);
-      expect(find.byIcon(Icons.notifications_active), findsNothing);
-      final switchWidget = tester.widget<Switch>(find.byType(Switch));
-      expect(switchWidget.value, isFalse);
-    });
-
     testWidgets('tapping the Switch invokes notifier.toggleAlert(id)',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.getSetting(any())).thenReturn(null);
-
       final notifier = _RecordingAlerts([_alert(id: 'alert-42')]);
 
       await pumpApp(
         tester,
         const AlertsTab(),
-        overrides: [
-          ...test.overrides,
-          alertProvider.overrideWith(() => notifier),
-        ],
+        overrides: _overrides(test, notifier),
       );
 
       await tester.tap(find.byType(Switch));
@@ -165,8 +140,6 @@ void main() {
         'swipe-to-dismiss invokes notifier.removeAlert(id) and shows SnackBar',
         (tester) async {
       final test = standardTestOverrides();
-      when(() => test.mockStorage.getSetting(any())).thenReturn(null);
-
       final notifier = _RecordingAlerts(
         [_alert(id: 'alert-99', stationName: 'Shell Berlin')],
       );
@@ -174,27 +147,18 @@ void main() {
       await pumpApp(
         tester,
         const AlertsTab(),
-        overrides: [
-          ...test.overrides,
-          alertProvider.overrideWith(() => notifier),
-        ],
+        overrides: _overrides(test, notifier),
       );
 
-      // Swipe right-to-left to trigger DismissDirection.endToStart.
-      await tester.drag(
-        find.byType(Dismissible),
-        const Offset(-600, 0),
-      );
+      await tester.drag(find.text('Shell Berlin'), const Offset(-600, 0));
       await confirmPendingDelete(tester); // #3682
 
       expect(notifier.removeCalls, ['alert-99']);
-      // SnackBar text uses l10n alertDeleted with the station name.
       expect(find.text('Alert "Shell Berlin" deleted'), findsOneWidget);
     });
 
     testWidgets('tapping an alert row pushes /station/:id', (tester) async {
-      final mockStorageOverride = mockStorageRepositoryOverride();
-      when(() => mockStorageOverride.mock.getSetting(any())).thenReturn(null);
+      final test = standardTestOverrides();
 
       String? landedOn;
       final router = GoRouter(
@@ -218,14 +182,10 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: <Object>[
-            mockStorageOverride.override,
-            alertProvider.overrideWith(
-              () => _RecordingAlerts(
-                [_alert(id: 'a1', stationId: 'shell-42')],
-              ),
-            ),
-          ].cast(),
+          overrides: _overrides(
+            test,
+            _RecordingAlerts([_alert(id: 'a1', stationId: 'shell-42')]),
+          ).cast(),
           child: MaterialApp.router(
             routerConfig: router,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -236,7 +196,6 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Tap the ListTile (not the Switch) by tapping the title text.
       await tester.tap(find.text('Shell Berlin'));
       await tester.pumpAndSettle();
 
@@ -244,56 +203,23 @@ void main() {
       expect(find.text('station shell-42'), findsOneWidget);
     });
 
-    // #1701 — the radius-alerts + statistics screen at `/alerts` had no
-    // navigation entry point anywhere. This entry is it.
-    testWidgets(
-        'the radius-alerts entry is reachable (empty state) and routes '
-        'to /alerts', (tester) async {
-      final mockStorageOverride = mockStorageRepositoryOverride();
-      when(() => mockStorageOverride.mock.getSetting(any())).thenReturn(null);
+    // #1699 — the inlined page must survive the en_XA expansion at the
+    // narrowest supported width.
+    testWidgets('does not overflow under en_XA at 320 dp', (tester) async {
+      tester.view.physicalSize = const Size(320, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final test = standardTestOverrides();
 
-      String? landedOn;
-      final router = GoRouter(
-        initialLocation: '/',
-        routes: [
-          GoRoute(
-            path: '/',
-            builder: (_, _) => const Scaffold(body: AlertsTab()),
-          ),
-          GoRoute(
-            path: '/alerts',
-            builder: (_, _) {
-              landedOn = '/alerts';
-              return const Scaffold(body: Text('alerts screen'));
-            },
-          ),
-        ],
+      await pumpApp(
+        tester,
+        const AlertsTab(),
+        overrides: _overrides(test, _RecordingAlerts([_alert()])),
+        locale: const Locale('en', 'XA'),
       );
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: <Object>[
-            mockStorageOverride.override,
-            // Zero price alerts → empty state; the entry must still show.
-            alertProvider.overrideWith(() => _RecordingAlerts(const [])),
-          ].cast(),
-          child: MaterialApp.router(
-            routerConfig: router,
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            locale: const Locale('en'),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.byKey(const Key('radiusAlertsEntry')), findsOneWidget);
-
-      await tester.tap(find.byKey(const Key('radiusAlertsEntry')));
-      await tester.pumpAndSettle();
-
-      expect(landedOn, '/alerts');
-      expect(find.text('alerts screen'), findsOneWidget);
+      expect(tester.takeException(), isNull);
     });
   });
 }
@@ -320,4 +246,9 @@ class _RecordingAlerts extends AlertNotifier {
   Future<void> toggleAlert(String id) async {
     toggleCalls.add(id);
   }
+}
+
+class _NoRadiusAlerts extends RadiusAlerts {
+  @override
+  Future<List<RadiusAlert>> build() async => const [];
 }

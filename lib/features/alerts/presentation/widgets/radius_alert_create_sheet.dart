@@ -19,7 +19,9 @@ import '../../../../core/domain/fuel_type.dart';
 import '../../domain/entities/radius_alert.dart';
 import '../../domain/radius_alert_validators.dart';
 import '../../providers/radius_alerts_provider.dart';
+import '../../providers/zone_alert_price_sample_provider.dart';
 import 'radius_alert_form_fields.dart';
+import 'radius_alert_form_support.dart';
 import 'radius_alert_map_picker.dart';
 
 /// Signature of the map-picker opener. Production code pushes
@@ -37,10 +39,16 @@ typedef RadiusAlertMapPickerOpener =
 /// [RadiusAlertMapPicker] and binds the returned [LatLng] as the alert
 /// center so the background evaluator has real coordinates.
 ///
-/// The form sections live in `radius_alert_form_fields.dart` and the
-/// pure validators / parsers live in
-/// `domain/radius_alert_validators.dart`; this file owns the state,
-/// lifecycle, and side-effects (GPS read, map picker, save).
+/// #3905 — intuitiveness pass: the threshold seeds from the local price
+/// (minus 5 %) in the locale's decimal format, the chosen centre shows
+/// as a clearable chip, and a disabled Save says which requirement is
+/// still unmet.
+///
+/// The form sections live in `radius_alert_form_fields.dart`, the
+/// #3905 helpers in `radius_alert_form_support.dart`, and the pure
+/// validators / parsers in `domain/radius_alert_validators.dart`; this
+/// file owns the state, lifecycle, and side-effects (GPS read, map
+/// picker, save).
 class RadiusAlertCreateSheet extends ConsumerStatefulWidget {
   /// Injection hook so widget tests can swap the id generator for a
   /// deterministic string. Production callers leave this unset.
@@ -87,16 +95,26 @@ class RadiusAlertCreateSheet extends ConsumerStatefulWidget {
 class _RadiusAlertCreateSheetState
     extends ConsumerState<RadiusAlertCreateSheet> {
   final _labelController = TextEditingController();
-  final _thresholdController = TextEditingController(text: '1.500');
+  final _thresholdController = TextEditingController();
   final _postalCodeController = TextEditingController();
 
   FuelType _fuelType = FuelType.diesel;
   double _radiusKm = 10;
   int _frequencyPerDay = 1;
 
+  /// #3905 — once the user has typed in the threshold field the
+  /// price-based seed stops following the fuel dropdown.
+  bool _thresholdEdited = false;
+
   double? _centerLat;
   double? _centerLng;
-  String? _centerSource;
+  RadiusAlertCenterKind? _centerKind;
+
+  @override
+  void initState() {
+    super.initState();
+    _applySuggestedThreshold();
+  }
 
   @override
   void dispose() {
@@ -104,6 +122,29 @@ class _RadiusAlertCreateSheetState
     _thresholdController.dispose();
     _postalCodeController.dispose();
     super.dispose();
+  }
+
+  /// #3905 — seed the threshold with "local price − 5 %" for the current
+  /// fuel (last search results, else favorites cache), or the constant
+  /// fallback when no price is known. Programmatic `text` writes do not
+  /// fire the field's `onChanged`, so `_thresholdEdited` stays false.
+  void _applySuggestedThreshold() {
+    final sample = ref.read(zoneAlertPriceSampleProvider);
+    final seed =
+        suggestedThreshold(sample, _fuelType) ?? kRadiusAlertFallbackThreshold;
+    _thresholdController.text = formatThreshold(seed);
+  }
+
+  void _onFuelTypeChanged(FuelType fuel) {
+    setState(() {
+      _fuelType = fuel;
+      if (!_thresholdEdited) _applySuggestedThreshold();
+    });
+  }
+
+  void _onThresholdChanged() {
+    _thresholdEdited = true;
+    _rebuild();
   }
 
   void _useMyLocation() {
@@ -118,7 +159,7 @@ class _RadiusAlertCreateSheetState
     setState(() {
       _centerLat = pos.lat;
       _centerLng = pos.lng;
-      _centerSource = pos.source;
+      _centerKind = RadiusAlertCenterKind.gps;
     });
   }
 
@@ -133,13 +174,44 @@ class _RadiusAlertCreateSheetState
         );
     final picked = await opener(context);
     if (!mounted || picked == null) return;
-    final l10n = AppLocalizations.of(context);
     setState(() {
       _centerLat = picked.latitude;
       _centerLng = picked.longitude;
-      _centerSource = l10n.radiusAlertCenterFromMap;
+      _centerKind = RadiusAlertCenterKind.map;
     });
   }
+
+  /// The chip's clear (×): drops the bound coordinates, or — for the
+  /// postal-only chip — empties the postal-code field.
+  void _clearCenter() {
+    setState(() {
+      if (_centerKind == RadiusAlertCenterKind.postal) {
+        _postalCodeController.clear();
+      } else {
+        _centerLat = null;
+        _centerLng = null;
+        _centerKind = null;
+      }
+    });
+  }
+
+  /// What the location chip shows: bound coordinates win; a typed postal
+  /// code alone is surfaced too so the user sees it was taken into
+  /// account (it does NOT enable Save on its own — #2211, no geocoder).
+  RadiusAlertCenterKind? get _chipKind {
+    if (_centerLat != null && _centerLng != null) return _centerKind;
+    if (_postalCodeController.text.trim().isNotEmpty) {
+      return RadiusAlertCenterKind.postal;
+    }
+    return null;
+  }
+
+  RadiusAlertSaveBlocker? get _saveBlocker => firstSaveBlocker(
+    label: _labelController.text,
+    thresholdRaw: _thresholdController.text,
+    centerLat: _centerLat,
+    centerLng: _centerLng,
+  );
 
   bool get _canSave => RadiusAlertValidators.canSave(
     label: _labelController.text,
@@ -226,6 +298,7 @@ class _RadiusAlertCreateSheetState
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    final chipKind = _chipKind;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -243,13 +316,13 @@ class _RadiusAlertCreateSheetState
           RadiusAlertFuelTypeField(
             value: _fuelType,
             evaluableFuels: _evaluableFuels,
-            onChanged: (v) => setState(() => _fuelType = v),
+            onChanged: _onFuelTypeChanged,
           ),
           const SizedBox(height: 16),
           RadiusAlertThresholdField(
             controller: _thresholdController,
             currencySymbol: _currencySymbol,
-            onChanged: _rebuild,
+            onChanged: _onThresholdChanged,
           ),
           const SizedBox(height: 16),
           RadiusAlertRadiusSlider(
@@ -266,10 +339,15 @@ class _RadiusAlertCreateSheetState
             onUseMyLocation: _useMyLocation,
             onPickOnMap: _pickOnMap,
           ),
-          if (_centerSource != null) ...[
+          if (chipKind != null) ...[
             const SizedBox(height: 8),
-            Text(_centerSource!, style: theme.textTheme.bodySmall),
+            RadiusAlertCenterChip(
+              kind: chipKind,
+              postalCode: _postalCodeController.text.trim(),
+              onClear: _clearCenter,
+            ),
           ],
+          RadiusAlertSaveBlockerHint(blocker: _saveBlocker),
           const SizedBox(height: 16),
           RadiusAlertPostalCodeField(
             controller: _postalCodeController,

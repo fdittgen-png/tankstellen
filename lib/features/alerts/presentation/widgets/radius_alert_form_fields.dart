@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/fuel_type.dart';
@@ -117,6 +118,12 @@ class RadiusAlertThresholdField extends StatelessWidget {
     return TextField(
       controller: controller,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      // #3905 — same digit / `.` / `,` filter as the fill-up numeric
+      // fields: the seed value is rendered with the locale's decimal
+      // separator ("1,499" in FR) and the parser accepts either.
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+      ],
       decoration: InputDecoration(
         labelText: l10n.alertThresholdWithCurrency(currencySymbol),
         border: const OutlineInputBorder(),

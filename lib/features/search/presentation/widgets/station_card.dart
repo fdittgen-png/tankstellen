@@ -79,6 +79,16 @@ class StationCard extends StatelessWidget {
   /// PiP overlay, so all three radar surfaces share one fill metaphor.
   final double? closenessRadiusMeters;
 
+  /// #3905 — when true the "Updated …" line is rendered in the tertiary
+  /// (amber) colour with a small "Old price" badge, telling the user the
+  /// shown price is older than the caller's staleness threshold. The
+  /// Favorites list is the only caller today (its cards are re-read for
+  /// weeks and a July timestamp looked current in September); the search
+  /// list leaves it `false`, so its cards are unchanged. The card itself
+  /// carries no clock or timestamp parsing — the decision is the
+  /// caller's (`stale_price_policy.dart` in favorites).
+  final bool isStalePrice;
+
   const StationCard({
     super.key,
     required this.station,
@@ -92,6 +102,7 @@ class StationCard extends StatelessWidget {
     this.profileFuelType,
     this.activeDiscountsByBrand,
     this.closenessRadiusMeters,
+    this.isStalePrice = false,
   });
 
   /// True if the station has a real brand name (not empty, not generic "Station")
@@ -183,6 +194,7 @@ class StationCard extends StatelessWidget {
                   station: station,
                   hasBrand: _hasBrand,
                   closenessRadiusMeters: closenessRadiusMeters,
+                  isStalePrice: isStalePrice,
                 ),
               ),
               const SizedBox(width: 8),

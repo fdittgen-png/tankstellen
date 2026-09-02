@@ -1,0 +1,40 @@
+{
+  "stalePriceBadge": "Old price",
+  "@stalePriceBadge": {
+    "description": "Small badge on a favorites station card whose price timestamp is older than the stale-price threshold (7 days) — warns that the shown price is probably outdated (#3905)."
+  },
+  "radiusAlertCenterChipGps": "My position",
+  "@radiusAlertCenterChipGps": {
+    "description": "Chip on the zone-alert sheet naming the chosen alert centre when it was bound to the device's current GPS position (#3905)."
+  },
+  "radiusAlertCenterChipMap": "Map point",
+  "@radiusAlertCenterChipMap": {
+    "description": "Chip on the zone-alert sheet naming the chosen alert centre when the user picked a point on the map (#3905)."
+  },
+  "radiusAlertCenterChipPostal": "Postal code {postalCode}",
+  "@radiusAlertCenterChipPostal": {
+    "description": "Chip on the zone-alert sheet naming the chosen alert centre when only a postal code was typed (#3905).",
+    "placeholders": {
+      "postalCode": {
+        "type": "String",
+        "example": "34550"
+      }
+    }
+  },
+  "radiusAlertCenterClear": "Clear location",
+  "@radiusAlertCenterClear": {
+    "description": "Tooltip of the clear (x) action on the zone-alert centre chip — removes the chosen location so another one can be picked (#3905)."
+  },
+  "radiusAlertBlockerLabel": "Enter a label",
+  "@radiusAlertBlockerLabel": {
+    "description": "Helper line under the zone-alert sheet's location buttons explaining why Save is disabled: the label field is empty (#3905)."
+  },
+  "radiusAlertBlockerThreshold": "Enter a threshold above 0",
+  "@radiusAlertBlockerThreshold": {
+    "description": "Helper line under the zone-alert sheet's location buttons explaining why Save is disabled: the price threshold is empty, unparseable or not positive (#3905)."
+  },
+  "radiusAlertBlockerLocation": "Choose a location",
+  "@radiusAlertBlockerLocation": {
+    "description": "Helper line under the zone-alert sheet's location buttons explaining why Save is disabled: no alert centre (GPS position or map point) has been chosen yet (#3905)."
+  }
+}

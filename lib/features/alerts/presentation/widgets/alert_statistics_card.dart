@@ -67,25 +67,34 @@ class _StatColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: iconColor, size: 24),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
+    // #3905 — the strip now sits at the top of the Favorites "Price
+    // alerts" tab. Each column takes an equal third and its label wraps
+    // (2 lines, then ellipsis) so an expanded translation at 320 dp
+    // never overflows the row.
+    return Expanded(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: iconColor, size: 24),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
+          const SizedBox(height: 2),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

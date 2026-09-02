@@ -1,0 +1,10 @@
+{
+  "stalePriceBadge": "Prix ancien",
+  "radiusAlertCenterChipGps": "Ma position",
+  "radiusAlertCenterChipMap": "Point sur la carte",
+  "radiusAlertCenterChipPostal": "Code postal {postalCode}",
+  "radiusAlertCenterClear": "Effacer l'emplacement",
+  "radiusAlertBlockerLabel": "Saisissez un libellé",
+  "radiusAlertBlockerThreshold": "Saisissez un seuil supérieur à 0",
+  "radiusAlertBlockerLocation": "Choisissez un emplacement"
+}

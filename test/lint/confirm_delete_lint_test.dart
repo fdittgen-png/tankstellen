@@ -30,9 +30,6 @@ void main() {
         'the ONE shared two-direction (navigate|delete) favorites wrapper '
             '(the fuel/EV twins consolidated onto it); its delete branch '
             'calls confirmDestructiveAction explicitly',
-    'lib/features/favorites/presentation/widgets/alerts_tab.dart':
-        'labeled background variant; confirmDismiss calls '
-            'confirmDestructiveAction explicitly',
     'lib/features/loyalty/presentation/widgets/loyalty_card_tile.dart':
         'delegates to the screen-side confirmation (which uses the shared '
             'dialog) so a cancelled swipe restores the row visually',
@@ -89,7 +86,6 @@ void main() {
       'in their delete branch', () {
     for (final f in [
       'lib/core/widgets/favorite_dismissible.dart',
-      'lib/features/favorites/presentation/widgets/alerts_tab.dart',
       'lib/features/search/presentation/widgets/route_results_view.dart',
       'lib/features/search/presentation/widgets/swipeable_station_card.dart',
     ]) {
