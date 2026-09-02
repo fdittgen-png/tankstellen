@@ -1,0 +1,5 @@
+{
+  "stationStatusWithFreshness": "{status} · mis à jour il y a {ago}",
+  "pricesNotSoldHere": "Non vendu ici : {fuels}",
+  "openingHoursAutomate24h": "Automate 24h/24 7j/7 (paiement par carte)"
+}

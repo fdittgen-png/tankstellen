@@ -3449,10 +3449,6 @@
   "@featureDescription_addFillUpShareIntentReceipt": {
     "description": "MT — needs native review"
   },
-  "openingHoursAutomate24h": "24/7 automatiseren",
-  "@openingHoursAutomate24h": {
-    "description": "MT — needs native review"
-  },
   "stopRadar": "Radar stoppen",
   "@stopRadar": {
     "description": "MT — needs native review"

@@ -16,6 +16,7 @@ import '../../providers/station_detail_provider.dart';
 import '../widgets/price_history_foldable.dart';
 import '../widgets/station_brand_header.dart';
 import '../widgets/station_detail_app_bar_actions.dart';
+import '../widgets/station_header_metrics.dart';
 import '../widgets/station_info_section.dart';
 import '../widgets/station_prices_section.dart';
 import '../widgets/station_rating_section.dart';
@@ -25,9 +26,9 @@ import 'station_detail_wide_layout.dart';
 /// Detail screen for a single fuel station.
 ///
 /// #1539 — the data state uses a `CustomScrollView` + `SliverAppBar`
-/// (pinned, `expandedHeight: 196`) so the rich status-row + brand-header
-/// block collapses out of view on scroll, leaving a 1-row compact bar
-/// (back arrow + actions). Loading and error states keep a plain fixed
+/// (pinned, `expandedHeight` measured from its content — #3902) so the rich
+/// status-row + brand-header block collapses out of view on scroll, leaving
+/// a 1-row compact bar (back arrow + actions). Loading and error states keep a plain fixed
 /// `AppBar` since there is no scroll content to sticky-collapse against.
 ///
 /// #2161 — the AppBar no longer renders the station name or the
@@ -88,10 +89,10 @@ class _StationDetailPlain extends StatelessWidget {
 /// Loaded state — adaptive on screen size (#2531, Epic #2525).
 ///
 /// On **compact** (< 600dp / portrait phone) this is the original
-/// `CustomScrollView` + `SliverAppBar(pinned: true, expandedHeight: 196)`:
-/// status row and brand header live inside the `flexibleSpace.background`,
-/// so they fade out as the bar collapses to its compact form on scroll past
-/// the prices card. This path is byte-for-byte unchanged.
+/// `CustomScrollView` + `SliverAppBar(pinned: true)` whose `expandedHeight`
+/// is measured from the header content (#3902): status row and brand header
+/// live inside the `flexibleSpace.background`, so they fade out as the bar
+/// collapses to its compact form on scroll past the prices card.
 ///
 /// On **medium / expanded** (≥ 600dp / landscape / tablet) it delegates to
 /// [StationDetailWideLayout] — a normal (non-expanding) `PageScaffold`
@@ -127,15 +128,18 @@ class _StationDetailLoaded extends StatelessWidget {
 
     return Scaffold(
       // #3337 — surface "directions" as a prominent labelled FAB; it was a
-      // small AppBar icon users struggled to find.
+      // small AppBar icon users struggled to find. #3902 — it is the ONE
+      // navigate affordance on the screen (the header's round button went).
       floatingActionButton: StationDirectionsFab(station: station),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             pinned: true,
-            // #1989 — trimmed from 220: the status row + brand header
-            // do not fill that much, leaving dead space below the name.
-            expandedHeight: 196,
+            // #1989 trimmed a fixed 220 to 196; #3902 replaces the round
+            // number with a measurement of the status row + brand header
+            // text, so the band ends `kHeaderBottomInset` under the address
+            // instead of leaving a strip of empty brand-green.
+            expandedHeight: stationHeaderExpandedHeight(context, station),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () => context.pop(),
@@ -156,10 +160,10 @@ class _StationDetailLoaded extends StatelessWidget {
                   // expansion state, so the background has to inset by that
                   // much to avoid overlap when fully expanded.
                   padding: const EdgeInsets.fromLTRB(
-                    16,
-                    kToolbarHeight + 8,
-                    16,
-                    8,
+                    kHeaderHorizontalPadding,
+                    kToolbarHeight + kHeaderTopGap,
+                    kHeaderHorizontalPadding,
+                    kHeaderBottomInset,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,7 +174,7 @@ class _StationDetailLoaded extends StatelessWidget {
                         serviceResult: serviceResult,
                         stationId: stationId,
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: kHeaderStatusGap),
                       StationBrandHeader(station: station),
                     ],
                   ),
@@ -180,7 +184,17 @@ class _StationDetailLoaded extends StatelessWidget {
           ),
           SliverToBoxAdapter(child: ServiceStatusBanner(result: serviceResult)),
           SliverPadding(
-            padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + bottomPadding + 24),
+            // #3902 — the list reserves the shared FAB clearance so the
+            // extended "Navigate" FAB never covers the last card. This is a
+            // pushed route with no shell bottom bar consuming the system
+            // inset, so — unlike the tab bodies — the safe-area gap sits
+            // under the content and is added on top of the clearance.
+            padding: EdgeInsets.fromLTRB(
+              16,
+              16,
+              16,
+              kFabScrollClearance + bottomPadding,
+            ),
             sliver: SliverList(
               delegate: SliverChildListDelegate.fixed([
                 StationPricesSection(station: station),

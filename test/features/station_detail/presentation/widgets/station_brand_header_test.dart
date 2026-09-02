@@ -107,37 +107,37 @@ void main() {
     });
 
     testWidgets(
-        '#3344 a navigate button sits next to the address for a usable station',
+        '#3902 the header carries NO directions affordance — the extended '
+        '"Navigate" FAB is the one navigate action on the screen',
         (tester) async {
       await pumpApp(tester, const StationBrandHeader(station: testStation));
 
-      final button = find.byKey(const Key('station_address_navigate'));
-      expect(button, findsOneWidget);
-      expect(
-        find.descendant(of: button, matching: find.byIcon(Icons.directions)),
-        findsOneWidget,
-      );
+      expect(find.byKey(const Key('station_address_navigate')), findsNothing,
+          reason: 'the #3344 round button duplicated the #3337 FAB');
+      expect(find.byIcon(Icons.directions), findsNothing);
+      expect(find.byType(IconButton), findsNothing);
     });
 
     testWidgets(
-        '#3344 the navigate button is hidden when coordinates are unusable',
-        (tester) async {
-      const noCoords = Station(
+        '#3902 an empty subtitle renders no second Text (no blank line under '
+        'the heading)', (tester) async {
+      const bare = Station(
         id: 'bare',
-        name: '',
+        name: 'Only Name',
         brand: '',
-        street: 'Only Street',
-        postCode: '00000',
-        place: 'Nowhere',
-        lat: 0,
-        lng: 0,
+        street: '',
+        postCode: '',
+        place: '',
+        lat: 1,
+        lng: 1,
         isOpen: true,
       );
 
-      await pumpApp(tester, const StationBrandHeader(station: noCoords));
+      await pumpApp(tester, const StationBrandHeader(station: bare));
 
-      expect(find.byKey(const Key('station_address_navigate')), findsNothing,
-          reason: 'an unusable (0,0) pin cannot be navigated to');
+      expect(find.text('Only Name'), findsOneWidget);
+      expect(find.byType(Text), findsOneWidget,
+          reason: 'nothing to say under the heading → no empty Text');
     });
   });
 }

@@ -103,7 +103,17 @@ class StationDetailWideLayout extends StatelessWidget {
           Expanded(
             flex: 3,
             child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + bottomPadding + 24),
+              // #3902 — the right pane hosts the cards the bottom-right
+              // "Navigate" FAB floats over, so it reserves the shared FAB
+              // clearance (plus the system inset: no shell bar consumes it
+              // on this pushed route). The left pane needs none — the FAB
+              // never overlaps it.
+              padding: EdgeInsets.fromLTRB(
+                16,
+                16,
+                16,
+                kFabScrollClearance + bottomPadding,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,

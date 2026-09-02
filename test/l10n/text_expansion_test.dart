@@ -4,15 +4,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/country/country_config.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/opening_hours.dart';
+import 'package:tankstellen/core/domain/station.dart';
+import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/widgets/service_status_banner.dart';
-import 'package:tankstellen/core/language/language_provider.dart';
-import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/features/fill_ups/domain/services/monthly_insights_aggregator.dart';
 import 'package:tankstellen/features/fill_ups/presentation/widgets/monthly_insights_card.dart';
+import 'package:tankstellen/features/profile/domain/entities/user_profile.dart';
+import 'package:tankstellen/features/profile/providers/profile_provider.dart';
 import 'package:tankstellen/features/search/presentation/widgets/fuel_type_selector.dart';
 import 'package:tankstellen/features/search/presentation/widgets/station_card.dart';
+import 'package:tankstellen/features/search/providers/station_rating_provider.dart';
 import 'package:tankstellen/features/setup/presentation/widgets/language_selector.dart';
+import 'package:tankstellen/features/station_detail/presentation/widgets/opening_hours_view.dart';
+import 'package:tankstellen/features/station_detail/presentation/widgets/station_brand_header.dart';
+import 'package:tankstellen/features/station_detail/presentation/widgets/station_prices_section.dart';
+import 'package:tankstellen/features/station_detail/presentation/widgets/station_status_row.dart';
 
 import '../fixtures/stations.dart';
 import '../helpers/mock_providers.dart';
@@ -265,4 +274,143 @@ void main() {
       );
     });
   });
+
+  // #3902 — the station-detail rows this pass reworded / restyled: the
+  // parameterised status phrase, the "Not sold here" footnote, the
+  // self-service automate line and the brand header (its round directions
+  // button is gone, so the heading column now spans the full width).
+  group('Station detail rows (#3902)', () {
+    // Pinned instant — the status row only formats the age, never reads the
+    // wall clock itself.
+    final result = ServiceResult<Object>(
+      data: const Object(),
+      source: ServiceSource.cache,
+      fetchedAt: DateTime(2026, 3, 11, 14, 15),
+    );
+    final statusOverrides = <Object>[
+      stationRatingsProvider.overrideWith(
+        () => _SeededStationRatings({testStation.id: 4}),
+      ),
+    ];
+    final pricesOverrides = <Object>[
+      activeProfileProvider.overrideWith(() => _NullActiveProfile()),
+    ];
+    final automate = WeeklyOpeningHours.allWeek24h(automate24h: true);
+    final wednesday = DateTime(2026, 6, 3, 10, 0);
+
+    Widget statusRow() => StationStatusRow(
+          station: testStation,
+          serviceResult: result,
+          stationId: testStation.id,
+        );
+
+    testWidgets('StationStatusRow — pseudo-locale', (tester) async {
+      await pumpPseudo(
+        tester,
+        statusRow(),
+        overrides: statusOverrides,
+        widgetName: 'StationStatusRow',
+      );
+    });
+
+    testWidgets('StationStatusRow — 1.3x', (tester) async {
+      await pumpScaled(
+        tester,
+        statusRow(),
+        overrides: statusOverrides,
+        widgetName: 'StationStatusRow',
+      );
+    });
+
+    testWidgets('StationPricesSection with a "Not sold here" footnote — '
+        'pseudo-locale', (tester) async {
+      await pumpPseudo(
+        tester,
+        const SingleChildScrollView(
+          child: StationPricesSection(station: kUnpricedE5Station),
+        ),
+        overrides: pricesOverrides,
+        widgetName: 'StationPricesSection',
+      );
+    });
+
+    testWidgets('StationPricesSection with a "Not sold here" footnote — 1.3x',
+        (tester) async {
+      await pumpScaled(
+        tester,
+        const SingleChildScrollView(
+          child: StationPricesSection(station: kUnpricedE5Station),
+        ),
+        overrides: pricesOverrides,
+        widgetName: 'StationPricesSection',
+      );
+    });
+
+    testWidgets('OpeningHoursView with the automate line — pseudo-locale',
+        (tester) async {
+      await pumpPseudo(
+        tester,
+        SingleChildScrollView(
+          child: OpeningHoursView(hours: automate, now: wednesday),
+        ),
+        widgetName: 'OpeningHoursView (automate)',
+      );
+    });
+
+    testWidgets('OpeningHoursView with the automate line — 1.3x',
+        (tester) async {
+      await pumpScaled(
+        tester,
+        SingleChildScrollView(
+          child: OpeningHoursView(hours: automate, now: wednesday),
+        ),
+        widgetName: 'OpeningHoursView (automate)',
+      );
+    });
+
+    testWidgets('StationBrandHeader — pseudo-locale', (tester) async {
+      await pumpPseudo(
+        tester,
+        const StationBrandHeader(station: testStation),
+        widgetName: 'StationBrandHeader',
+      );
+    });
+
+    testWidgets('StationBrandHeader — 1.3x', (tester) async {
+      await pumpScaled(
+        tester,
+        const StationBrandHeader(station: testStation),
+        widgetName: 'StationBrandHeader',
+      );
+    });
+  });
+}
+
+/// testStation without its Super E5 price — drives the #3902 footnote.
+const kUnpricedE5Station = Station(
+  id: '51d4b477-a095-1aa0-e100-80009459e03a',
+  name: 'Star Tankstelle',
+  brand: 'STAR',
+  street: 'Hauptstr.',
+  houseNumber: '12',
+  postCode: '10115',
+  place: 'Berlin',
+  lat: 52.5200,
+  lng: 13.4050,
+  dist: 1.5,
+  e10: 1.799,
+  diesel: 1.659,
+  isOpen: true,
+);
+
+class _SeededStationRatings extends StationRatings {
+  _SeededStationRatings(this._initial);
+  final Map<String, int> _initial;
+  @override
+  Map<String, int> build() => _initial;
+}
+
+class _NullActiveProfile extends ActiveProfile {
+  @override
+  UserProfile? build() => null;
 }

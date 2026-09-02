@@ -19,7 +19,7 @@ ServiceResult<dynamic> _result({DateTime? fetchedAt}) {
   );
 }
 
-Station _station({bool isOpen = true}) {
+Station _station({bool? isOpen = true}) {
   return Station(
     id: 'st-1',
     name: 'Test',
@@ -54,6 +54,7 @@ void main() {
       required Station station,
       required ServiceResult<dynamic> serviceResult,
       int? rating,
+      Locale locale = const Locale('en'),
     }) {
       final ratings = <String, int>{};
       if (rating != null) ratings[station.id] = rating;
@@ -67,6 +68,7 @@ void main() {
           child: MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
+            locale: locale,
             home: Scaffold(
               body: StationStatusRow(
                 station: station,
@@ -87,7 +89,7 @@ void main() {
         station: _station(isOpen: true),
         serviceResult: _result(),
       );
-      expect(find.textContaining('Open —'), findsOneWidget);
+      expect(find.text('Open · updated < 1 min ago'), findsOneWidget);
     });
 
     testWidgets('renders the closed status text when station is closed', (
@@ -98,7 +100,66 @@ void main() {
         station: _station(isOpen: false),
         serviceResult: _result(),
       );
-      expect(find.textContaining('Closed —'), findsOneWidget);
+      expect(find.text('Closed · updated < 1 min ago'), findsOneWidget);
+    });
+
+    testWidgets('#3198 unknown open state renders the neutral wording', (
+      tester,
+    ) async {
+      await pumpRow(
+        tester,
+        station: _station(isOpen: null),
+        serviceResult: _result(),
+      );
+      expect(find.text('Unknown · updated < 1 min ago'), findsOneWidget);
+    });
+
+    // #3902 — the phrase used to be glued together from word fragments
+    // ("$status — $freshness $ago"), which put the French "il y a" AFTER
+    // the duration: "Ouvert — < 1 min il y a". One parameterised key per
+    // locale now owns the word order.
+    testWidgets('#3902 French puts "il y a" before the duration', (
+      tester,
+    ) async {
+      await pumpRow(
+        tester,
+        station: _station(isOpen: true),
+        serviceResult: _result(),
+        locale: const Locale('fr'),
+      );
+      expect(find.text('Ouvert · mis à jour il y a < 1 min'), findsOneWidget);
+      expect(find.textContaining('min il y a'), findsNothing,
+          reason: 'the old fragment order must not come back');
+    });
+
+    testWidgets('#3902 German phrase reads "aktualisiert vor …"', (
+      tester,
+    ) async {
+      await pumpRow(
+        tester,
+        station: _station(isOpen: true),
+        serviceResult: _result(),
+        locale: const Locale('de'),
+      );
+      expect(
+        find.text('Geöffnet · aktualisiert vor < 1 min'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('#3902 the status text stays on one line (ellipsis)', (
+      tester,
+    ) async {
+      await pumpRow(
+        tester,
+        station: _station(isOpen: true),
+        serviceResult: _result(),
+      );
+      final text = tester.widget<Text>(
+        find.text('Open · updated < 1 min ago'),
+      );
+      expect(text.maxLines, 1);
+      expect(text.overflow, TextOverflow.ellipsis);
     });
 
     testWidgets('shows 5 star icons when a rating is present', (tester) async {

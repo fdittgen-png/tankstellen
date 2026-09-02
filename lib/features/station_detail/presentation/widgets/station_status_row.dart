@@ -9,6 +9,7 @@ import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/station.dart';
 import '../../../search/providers/station_rating_provider.dart';
+import 'station_header_metrics.dart';
 
 /// Top row of the station detail screen — open/closed dot + freshness
 /// text on the left, compact 5-star rating on the right.
@@ -18,6 +19,9 @@ import '../../../search/providers/station_rating_provider.dart';
 /// `station_detail_screen.dart` so the screen's `_buildContent` helper
 /// drops the 49-line inline `Row(...)` block and so the row can be
 /// covered by widget tests in isolation.
+///
+/// This row is the ONE place the screen states the open / closed state
+/// (#3902): the opening-hours card below renders the schedule only.
 class StationStatusRow extends ConsumerWidget {
   final Station station;
   final ServiceResult<dynamic> serviceResult;
@@ -58,8 +62,8 @@ class StationStatusRow extends ConsumerWidget {
               children: [
                 ExcludeSemantics(
                   child: Container(
-                    width: 12,
-                    height: 12,
+                    width: kStatusDotSize,
+                    height: kStatusDotSize,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: color,
@@ -67,21 +71,19 @@ class StationStatusRow extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(width: 6),
-                // Flexible + ellipsis so the status text yields instead of
-                // overflowing the row when the available width is narrow —
-                // e.g. the flex:2 left pane of the #2531 two-column wide
-                // layout, where the row competes with the trailing stars.
-                // Harmless in the full-width compact sliver header (the text
-                // never reaches the cap there).
+                // Flexible + single-line ellipsis so the status text yields
+                // instead of overflowing the row when the available width is
+                // narrow — e.g. the flex:2 left pane of the #2531 two-column
+                // wide layout, where the row competes with the trailing
+                // stars. One line also keeps the row at the height
+                // `stationHeaderExpandedHeight` budgets for it (#3902).
                 Flexible(
                   child: ExcludeSemantics(
                     child: Text(
-                      _buildStatusText(station, serviceResult, l10n),
+                      buildStationStatusText(station, serviceResult, l10n),
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: color,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: headerStatusStyle(theme)?.copyWith(color: color),
                     ),
                   ),
                 ),
@@ -96,7 +98,7 @@ class StationStatusRow extends ConsumerWidget {
               5,
               (i) => Icon(
                 i < rating ? Icons.star : Icons.star_border,
-                size: 16,
+                size: kRatingStarSize,
                 color: i < rating ? Colors.amber : Colors.grey.shade400,
               ),
             ),
@@ -104,21 +106,23 @@ class StationStatusRow extends ConsumerWidget {
       ],
     );
   }
+}
 
-  /// Combines open/closed with freshness, e.g. "Open — < 1 min ago".
-  /// Visible-for-testing.
-  static String _buildStatusText(
-    Station station,
-    ServiceResult<dynamic> result,
-    AppLocalizations l10n,
-  ) {
-    final status = switch (station.isOpen) {
-      true => l10n.open,
-      false => l10n.closed,
-      null => l10n.openStateUnknown,
-    };
-    final agoSuffix = l10n.freshnessAgo;
-    final freshness = result.freshnessLabel;
-    return '$status — $freshness $agoSuffix';
-  }
+/// The open-state + freshness phrase, e.g. "Open · updated < 1 min ago".
+///
+/// #3902 — used to be composed from word fragments
+/// (`'$status — $freshness $agoSuffix'`), which produced "Ouvert — < 1 min
+/// il y a" in French: the `ago` word is a prefix there, not a suffix. One
+/// parameterised ARB key per locale owns the word order instead.
+String buildStationStatusText(
+  Station station,
+  ServiceResult<dynamic> result,
+  AppLocalizations l10n,
+) {
+  final status = switch (station.isOpen) {
+    true => l10n.open,
+    false => l10n.closed,
+    null => l10n.openStateUnknown,
+  };
+  return l10n.stationStatusWithFreshness(status, result.freshnessLabel);
 }

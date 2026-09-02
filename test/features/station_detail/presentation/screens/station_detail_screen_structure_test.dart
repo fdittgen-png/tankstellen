@@ -11,11 +11,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
+import 'package:tankstellen/core/widgets/page_scaffold.dart';
 import 'package:tankstellen/features/price_history/data/repositories/price_history_repository.dart';
 import 'package:tankstellen/features/price_history/providers/price_history_provider.dart';
 import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/station_detail/presentation/screens/station_detail_screen.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/station_brand_header.dart';
+import 'package:tankstellen/features/station_detail/presentation/widgets/station_header_metrics.dart';
+import 'package:tankstellen/features/station_detail/presentation/widgets/station_status_row.dart';
 import 'package:tankstellen/features/station_detail/providers/station_detail_provider.dart';
 
 import '../../../../fixtures/stations.dart';
@@ -92,6 +95,87 @@ void main() {
       // Inline open + freshness status (the FreshnessBadge was folded in).
       expect(find.textContaining('Open'), findsAtLeast(1));
       expect(find.textContaining('ago'), findsAtLeast(1));
+    });
+
+    testWidgets(
+        '#3902 exactly ONE navigate affordance (the extended FAB) — the '
+        'header round button is gone', (tester) async {
+      await pumpApp(
+        tester,
+        const StationDetailScreen(stationId: stationId),
+        overrides: overrides,
+      );
+
+      expect(find.byKey(const Key('station_directions_fab')), findsOneWidget);
+      expect(find.byKey(const Key('station_address_navigate')), findsNothing);
+      expect(find.byIcon(Icons.directions), findsOneWidget,
+          reason: 'one directions icon on the whole screen');
+      expect(find.text('Navigate'), findsOneWidget);
+    });
+
+    testWidgets(
+        '#3902 the open state is said ONCE — the header status row; no '
+        'second open/closed line in the hours card', (tester) async {
+      await pumpApp(
+        tester,
+        const StationDetailScreen(stationId: stationId),
+        overrides: overrides,
+      );
+
+      expect(find.byType(StationStatusRow), findsOneWidget);
+      expect(find.byKey(const ValueKey('opening-hours-status-line')),
+          findsNothing);
+      // The status phrase is the parameterised key, not glued fragments.
+      expect(find.textContaining('Open · updated'), findsOneWidget);
+      expect(find.textContaining('Open —'), findsNothing);
+    });
+
+    testWidgets(
+        '#3902 the compact scroll body reserves the FAB clearance under the '
+        'last card', (tester) async {
+      // The default 800x600 test surface is the WIDE layout; the sliver
+      // list only exists on compact.
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await pumpApp(
+        tester,
+        const StationDetailScreen(stationId: stationId),
+        overrides: overrides,
+      );
+
+      final padding = tester.widget<SliverPadding>(find.byType(SliverPadding));
+      final bottom = padding.padding.resolve(TextDirection.ltr).bottom;
+      expect(bottom, greaterThanOrEqualTo(kFabScrollClearance));
+    });
+
+    testWidgets(
+        '#3902 the expanded header band is measured from its content and '
+        'does not overflow at a 1.3x text scale on a 320 dp phone',
+        (tester) async {
+      tester.view.physicalSize = const Size(320, 800);
+      tester.view.devicePixelRatio = 1.0;
+      tester.platformDispatcher.textScaleFactorTestValue = 1.3;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+      await pumpApp(
+        tester,
+        const StationDetailScreen(stationId: stationId),
+        overrides: overrides,
+      );
+
+      expect(tester.takeException(), isNull,
+          reason: 'the header Column must fit the measured expandedHeight');
+      final appBar = tester.widget<SliverAppBar>(find.byType(SliverAppBar));
+      final expanded = appBar.expandedHeight!;
+      // Tighter than the old fixed 196 at 1.0x would have been at 1.3x,
+      // yet still tall enough for toolbar + status row + brand header.
+      expect(expanded, greaterThan(kToolbarHeight + kBrandLogoSize));
+      expect(expanded, lessThan(260));
     });
 
     testWidgets('#2161 — no station-name Hero in the AppBar', (tester) async {

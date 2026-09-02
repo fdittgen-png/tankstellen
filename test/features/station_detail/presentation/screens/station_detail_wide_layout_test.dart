@@ -97,9 +97,16 @@ void main() {
         // The VerticalDivider between the two panes.
         expect(find.byType(VerticalDivider), findsOneWidget);
 
-        // A NORMAL AppBar (PageScaffold), NOT the 196dp expanding sliver.
+        // A NORMAL AppBar (PageScaffold), NOT the expanding sliver.
         expect(find.byType(AppBar), findsOneWidget);
         expect(find.byType(SliverAppBar), findsNothing);
+
+        // #3902 — exactly one navigate affordance on the wide layout too.
+        expect(find.byKey(const Key('station_directions_fab')),
+            findsOneWidget);
+        expect(find.byKey(const Key('station_address_navigate')),
+            findsNothing);
+        expect(find.byIcon(Icons.directions), findsOneWidget);
       },
     );
 
@@ -120,6 +127,11 @@ void main() {
         // The body content still renders (brand header + prices section).
         expect(find.byType(StationBrandHeader), findsOneWidget);
         expect(find.byType(StationPricesSection), findsOneWidget);
+
+        // #3902 — exactly one navigate affordance on compact.
+        expect(find.byKey(const Key('station_directions_fab')),
+            findsOneWidget);
+        expect(find.byIcon(Icons.directions), findsOneWidget);
       },
     );
   });

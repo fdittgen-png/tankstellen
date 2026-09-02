@@ -1,57 +1,15 @@
 {
-  "openNow": "Open",
-  "@openNow": {
-    "description": "Opening-hours status line — station is currently open (#2709)."
-  },
-  "openNowClosed": "Closed",
-  "@openNowClosed": {
-    "description": "Opening-hours status line — station is currently closed (#2709)."
-  },
   "openHoursUnknown": "Hours unknown",
   "@openHoursUnknown": {
     "description": "Opening-hours status line — the schedule could not be resolved (#2709)."
-  },
-  "closesAt": "Closes {time}",
-  "@closesAt": {
-    "description": "Opening-hours status detail — when an open station next closes (#2709).",
-    "placeholders": {
-      "time": {
-        "type": "String"
-      }
-    }
-  },
-  "opensAt": "Opens {day} {time}",
-  "@opensAt": {
-    "description": "Opening-hours status detail — when a closed station next opens on a future day (#2709).",
-    "placeholders": {
-      "day": {
-        "type": "String"
-      },
-      "time": {
-        "type": "String"
-      }
-    }
-  },
-  "opensToday": "Opens {time}",
-  "@opensToday": {
-    "description": "Opening-hours status detail — when a closed station next opens later the same day (#2709).",
-    "placeholders": {
-      "time": {
-        "type": "String"
-      }
-    }
   },
   "open24Hours": "Open 24 hours",
   "@open24Hours": {
     "description": "Opening-hours row shown when the station is open every day around the clock (#2709)."
   },
-  "badge24h": "24h",
-  "@badge24h": {
-    "description": "Compact badge shown next to the status for an around-the-clock station (#2709)."
-  },
-  "openingHoursAutomate24h": "24/7 automate",
+  "openingHoursAutomate24h": "Self-service pump 24/7 (card payment)",
   "@openingHoursAutomate24h": {
-    "description": "Opening-hours indicator shown alongside the staffed schedule when an unattended pump is open round-the-clock (FR Automate : 24/24, #2742)."
+    "description": "Informational opening-hours row (not an action) shown alongside the staffed schedule when the forecourt has an unattended card-payment pump open round-the-clock — the French noun 'automate', NOT the verb 'to automate' (FR Automate : 24/24, #2742, #3902)."
   },
   "dayMon": "Monday",
   "@dayMon": {

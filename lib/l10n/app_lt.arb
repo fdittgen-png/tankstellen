@@ -3449,10 +3449,6 @@
   "@featureDescription_addFillUpShareIntentReceipt": {
     "description": "MT — needs native review"
   },
-  "openingHoursAutomate24h": "24/7 automatizuoti",
-  "@openingHoursAutomate24h": {
-    "description": "MT — needs native review"
-  },
   "stopRadar": "Sustabdyti radarą",
   "@stopRadar": {
     "description": "MT — needs native review"

@@ -20,14 +20,22 @@ import 'price_tile.dart';
 /// "Prices" header + per-fuel [PriceTile] rows + "Log fill-up" CTA.
 ///
 /// Extracted from [StationDetailScreen] so the screen stays under the
-/// 300-LOC cap (#563). Public behaviour is unchanged — same fuel
-/// ordering, same optional-tile gating, same localisation lookups.
+/// 300-LOC cap (#563). Same fuel ordering, same localisation lookups.
 ///
 /// #923 phase 3f — the raw `Text(…, titleMedium)` + plain Column
 /// wrapper is replaced by the canonical [SectionCard] so the Prices
 /// block shares the design-system surface tint, radius, padding, and
 /// header role (`SectionHeader`) with every other section on the
 /// station-detail screen.
+///
+/// #3902 — a fuel the station does not sell used to render as a grey
+/// `"Super E5  --"` row, which reads like a missing price rather than a
+/// missing pump. Unpriced fuels are hidden from the list; the base fuels
+/// among them (the ones every station is EXPECTED to carry) are named once
+/// in a muted "Not sold here: …" footnote so the absence is explicit. The
+/// optional fuels (98 / E85 / LPG / CNG) were never listed when absent and
+/// still are not — listing them as "not sold" on every forecourt would be
+/// noise.
 class StationPricesSection extends StatelessWidget {
   final Station station;
 
@@ -43,44 +51,101 @@ class StationPricesSection extends StatelessWidget {
     final cc = Countries.countryCodeForStationId(station.id);
     final isMx = cc == 'MX';
 
+    final rows = <_FuelRow>[
+      _FuelRow(
+        label: isMx
+            ? fuelDisplayLabel(FuelType.e5, countryCode: cc)
+            : 'Super E5', // i18n-ignore: language-neutral fuel code
+        price: station.e5,
+        fuelType: FuelType.e5,
+        expected: true,
+      ),
+      _FuelRow(
+        label: 'Super E10',
+        price: station.e10,
+        fuelType: FuelType.e10,
+        expected: true,
+      ),
+      _FuelRow(
+        label: 'Diesel',
+        price: station.diesel,
+        fuelType: FuelType.diesel,
+        expected: true,
+      ),
+      _FuelRow(
+        label: isMx
+            ? fuelDisplayLabel(FuelType.e98, countryCode: cc)
+            : 'Super 98', // i18n-ignore: language-neutral fuel code
+        price: station.e98,
+        fuelType: FuelType.e98,
+      ),
+      _FuelRow(label: 'E85', price: station.e85, fuelType: FuelType.e85),
+      _FuelRow(label: 'LPG', price: station.lpg, fuelType: FuelType.lpg),
+      _FuelRow(label: 'CNG', price: station.cng, fuelType: FuelType.cng),
+    ];
+    final notSold = [
+      for (final r in rows)
+        if (r.expected && r.price == null) r.label,
+    ];
+
     return SectionCard(
       title: l10n.prices,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          PriceTile(
-            label: isMx
-                ? fuelDisplayLabel(FuelType.e5, countryCode: cc)
-                : 'Super E5', // i18n-ignore: language-neutral fuel code
-            price: station.e5,
-            fuelType: FuelType.e5,
-          ),
-          PriceTile(
-            label: 'Super E10',
-            price: station.e10,
-            fuelType: FuelType.e10,
-          ),
-          PriceTile(
-            label: 'Diesel',
-            price: station.diesel,
-            fuelType: FuelType.diesel,
-          ),
-          if (station.e98 != null)
-            PriceTile(
-              label: isMx
-                  ? fuelDisplayLabel(FuelType.e98, countryCode: cc)
-                  : 'Super 98', // i18n-ignore: language-neutral fuel code
-              price: station.e98,
-              fuelType: FuelType.e98,
-            ),
-          if (station.e85 != null)
-            PriceTile(label: 'E85', price: station.e85, fuelType: FuelType.e85),
-          if (station.lpg != null)
-            PriceTile(label: 'LPG', price: station.lpg, fuelType: FuelType.lpg),
-          if (station.cng != null)
-            PriceTile(label: 'CNG', price: station.cng, fuelType: FuelType.cng),
+          for (final r in rows)
+            if (r.price != null)
+              PriceTile(label: r.label, price: r.price, fuelType: r.fuelType),
+          if (notSold.isNotEmpty)
+            _NotSoldHereLine(fuels: notSold.join(', ')),
           const SizedBox(height: 12),
           LogFillUpButton(station: station),
+        ],
+      ),
+    );
+  }
+}
+
+/// One candidate price row; [expected] marks the base fuels whose absence is
+/// worth naming in the "Not sold here" footnote.
+class _FuelRow {
+  final String label;
+  final double? price;
+  final FuelType fuelType;
+  final bool expected;
+
+  const _FuelRow({
+    required this.label,
+    required this.price,
+    required this.fuelType,
+    this.expected = false,
+  });
+}
+
+/// The muted single-line "Not sold here: Super E5" footnote (#3902).
+class _NotSoldHereLine extends StatelessWidget {
+  final String fuels;
+
+  const _NotSoldHereLine({required this.fuels});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final muted = theme.colorScheme.onSurfaceVariant;
+    return Padding(
+      key: const ValueKey('prices-not-sold-here'),
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.remove_circle_outline, size: 16, color: muted),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              AppLocalizations.of(context).pricesNotSoldHere(fuels),
+              style: theme.textTheme.bodySmall?.copyWith(color: muted),
+            ),
+          ),
         ],
       ),
     );
