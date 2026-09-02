@@ -1,0 +1,10 @@
+{
+  "fillUpOdometerFromLastFillUp": "Pré-rempli depuis votre dernier plein",
+  "fillUpStationLabel": "Station",
+  "fillUpStationChange": "Changer",
+  "pickStationSectionLast": "Dernière station",
+  "pickStationSectionFavorites": "Favoris",
+  "pickStationSectionNearby": "À proximité",
+  "pickStationNearbyEmpty": "Aucune recherche récente — cherchez des stations dans l'onglet Recherche et les plus proches apparaîtront ici.",
+  "pickStationLastFillUpAt": "Dernier plein : {date}"
+}

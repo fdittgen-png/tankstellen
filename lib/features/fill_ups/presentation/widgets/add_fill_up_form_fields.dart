@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_radius.dart';
 import '../../../../core/widgets/form_section_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/fuel_type.dart';
@@ -12,17 +13,23 @@ import 'fill_up_import_buttons_pair.dart';
 import 'fill_up_notes_field.dart';
 import 'fill_up_numeric_field.dart';
 import 'fill_up_price_per_liter_readout.dart';
-import 'fill_up_station_pre_fill_banner.dart';
+import 'fill_up_station_row.dart';
 import 'fill_up_vehicle_dropdown.dart';
 import 'fill_up_vehicle_fuel_picker.dart';
 
 /// All the input rows on the Add-Fill-up form, composed in the
-/// canonical order: optional station-prefill banner, "What you filled"
-/// card (date, vehicle, fuel, liters, total + price/liter readout),
-/// "Where you were" card (odometer, notes, optional report-bad-scan
+/// canonical order: "What you filled" card (date, vehicle, fuel,
+/// liters, total + price/liter readout, full-tank toggle), "Where you
+/// were" card (station, odometer, notes, optional report-bad-scan
 /// button). Pulled out of `add_fill_up_screen.dart` (#563 extraction)
 /// so the screen file drops well below 300 LOC and the form layout
 /// can be exercised as a single widget in tests.
+///
+/// #3899 — every row carries its icon ONCE (the field's own prefix
+/// icon); the decorative leading tile column is gone. Only the two
+/// section headers keep a leading icon tile. The chosen station moved
+/// from a banner above the cards into the "Where you were" section as
+/// a read-only row with a "Change" action.
 ///
 /// All controllers, the form's `_formKey`, and the busy/scan state are
 /// owned by the screen — this widget is a pure stateless layout that
@@ -38,11 +45,17 @@ class AddFillUpFormFields extends StatelessWidget {
   /// no camera / no cloud). Threaded to [FillUpImportButtonsPair].
   final VoidCallback onPasteReceipt;
 
-  /// Optional station pre-fill banner — non-null station name renders
-  /// the banner above the cards, otherwise the slot is omitted.
+  /// Station chosen on the picker screen — null renders the
+  /// "Pick a station" row instead (#3899).
   final String? stationName;
 
-  /// Formatted `YYYY-MM-DD` date string shown on the date row.
+  /// One-line address of [stationName] when the app knows the station.
+  final String? stationAddress;
+
+  /// Re-opens the station picker (#3899).
+  final VoidCallback onChangeStation;
+
+  /// Localized date string shown on the date row.
   final String dateLabel;
   final VoidCallback onPickDate;
 
@@ -64,7 +77,9 @@ class AddFillUpFormFields extends StatelessWidget {
   final TextEditingController costCtrl;
   final TextEditingController odoCtrl;
 
-  /// #3877 — "From your car · …" under the odometer field; null = none.
+  /// #3877 / #3899 — provenance helper text under the odometer field
+  /// ("From your car · …", "Pre-filled from your last fill-up");
+  /// null = none.
   final String? odometerNote;
   final TextEditingController notesCtrl;
 
@@ -79,6 +94,8 @@ class AddFillUpFormFields extends StatelessWidget {
     required this.onScanReceipt,
     required this.onPasteReceipt,
     required this.stationName,
+    this.stationAddress,
+    required this.onChangeStation,
     required this.dateLabel,
     required this.onPickDate,
     required this.vehicleId,
@@ -114,18 +131,6 @@ class AddFillUpFormFields extends StatelessWidget {
           onPasteReceipt: onPasteReceipt,
         ),
         const SizedBox(height: 16),
-        // Station pre-fill callout — rendered above the cards so it's
-        // unmissable when the user opened the form from a station
-        // detail screen (#751 phase 2 keeps the original #581
-        // affordance; it simply graduated from a ListTile card to the
-        // restyled header band).
-        if (stationName != null) ...[
-          FillUpStationPreFillBanner(
-            stationName: stationName!,
-            label: l.stationPreFilled,
-          ),
-          const SizedBox(height: 16),
-        ],
         // Card 1: "What you filled" — date, vehicle, fuel, liters, cost.
         FormSectionCard(
           title: l.fillUpSectionWhatTitle,
@@ -133,13 +138,13 @@ class AddFillUpFormFields extends StatelessWidget {
           icon: Icons.local_gas_station_outlined,
           children: [
             FormFieldTile(
-              icon: Icons.calendar_today_outlined,
               content: InkWell(
                 onTap: onPickDate,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: AppRadius.md,
                 child: InputDecorator(
                   decoration: InputDecoration(
                     labelText: l.fillUpDate,
+                    prefixIcon: const Icon(Icons.calendar_today_outlined),
                     border: const OutlineInputBorder(),
                   ),
                   child: Text(dateLabel),
@@ -147,7 +152,6 @@ class AddFillUpFormFields extends StatelessWidget {
               ),
             ),
             FormFieldTile(
-              icon: Icons.directions_car_outlined,
               content: FillUpVehicleDropdown(
                 vehicleId: vehicleId,
                 vehicles: vehicles,
@@ -156,7 +160,6 @@ class AddFillUpFormFields extends StatelessWidget {
             ),
             if (vehicleId != null)
               FormFieldTile(
-                icon: Icons.water_drop_outlined,
                 content: FillUpVehicleFuelPicker(
                   vehicles: vehicles,
                   vehicleId: vehicleId!,
@@ -166,7 +169,6 @@ class AddFillUpFormFields extends StatelessWidget {
                 ),
               ),
             FormFieldTile(
-              icon: Icons.opacity_outlined,
               content: FillUpNumericField(
                 controller: litersCtrl,
                 label: l.liters,
@@ -175,7 +177,6 @@ class AddFillUpFormFields extends StatelessWidget {
               ),
             ),
             FormFieldTile(
-              icon: Icons.euro,
               content: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -199,10 +200,10 @@ class AddFillUpFormFields extends StatelessWidget {
             // on `previous_level + liters_added` (#1360 lands the
             // partial-fill path the original v1 left as a TODO).
             FormFieldTile(
-              icon: Icons.local_gas_station_outlined,
               content: SwitchListTile(
                 key: const Key('add_fill_up_is_full_tank_toggle'),
                 contentPadding: EdgeInsets.zero,
+                secondary: const Icon(Icons.local_gas_station_outlined),
                 title: Text(l.addFillUpIsFullTankLabel),
                 subtitle: Text(l.addFillUpIsFullTankSubtitle),
                 value: isFullTank,
@@ -212,37 +213,29 @@ class AddFillUpFormFields extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        // Card 2: "Where you were" — odometer, notes.
+        // Card 2: "Where you were" — station, odometer, notes.
         FormSectionCard(
           title: l.fillUpSectionWhereTitle,
           subtitle: l.fillUpSectionWhereSubtitle,
           icon: Icons.place_outlined,
           children: [
             FormFieldTile(
-              icon: Icons.speed_outlined,
+              content: FillUpStationRow(
+                stationName: stationName,
+                address: stationAddress,
+                onChange: onChangeStation,
+              ),
+            ),
+            FormFieldTile(
               content: FillUpNumericField(
                 controller: odoCtrl,
                 label: l.odometerKm,
                 icon: Icons.speed,
+                helperText: odometerNote,
                 validator: (v) => AddFillUpValidators.positiveNumber(v, l),
               ),
             ),
-            if (odometerNote != null)
-              Padding(
-                key: const Key('fillUpOdometerPrefillNote'),
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                child: Row(children: [
-                  Icon(Icons.directions_car_outlined,
-                      size: 16, color: Theme.of(context).colorScheme.primary),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(odometerNote!,
-                        style: Theme.of(context).textTheme.bodySmall),
-                  ),
-                ]),
-              ),
             FormFieldTile(
-              icon: Icons.edit_note_outlined,
               content: FillUpNotesField(controller: notesCtrl),
             ),
             if (onReportBadScan != null) ...[

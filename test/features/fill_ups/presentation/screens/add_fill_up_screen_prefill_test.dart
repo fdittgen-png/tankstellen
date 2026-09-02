@@ -57,7 +57,10 @@ void main() {
       );
 
       expect(find.text('Total Castelnau'), findsOneWidget);
-      expect(find.text('Station pre-filled'), findsOneWidget);
+      // #3899 — the station is a row in "Where you were" with a Change
+      // action; the old banner above the cards is gone.
+      expect(find.text('Change'), findsOneWidget);
+      expect(find.text('Station pre-filled'), findsNothing);
     });
 
     testWidgets(

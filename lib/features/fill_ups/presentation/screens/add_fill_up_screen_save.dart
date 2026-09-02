@@ -156,6 +156,32 @@ mixin _AddFillUpSaveFlow on _AddFillUpFormState {
     );
   }
 
+  /// #3899 — address line of the pre-filled station when the app knows
+  /// it (favorites / last search result); null otherwise or without a
+  /// station.
+  String? _stationAddress() {
+    final id = widget.stationId;
+    if (id == null) return null;
+    final station = findKnownStation(ref, id);
+    if (station == null) return null;
+    final line = stationAddressLine(station);
+    return line.isEmpty ? null : line;
+  }
+
+  /// #3899 — "Change" on the station row re-opens the picker. The picker
+  /// replaces itself with a fresh form carrying the new station (its
+  /// existing `pushReplacement` contract), so this form is REPLACED
+  /// rather than stacked — unsaved entries go through the #1693 discard
+  /// guard first.
+  Future<void> _changeStation() async {
+    if (_isDirty) {
+      final discard = await showDiscardChangesDialog(context);
+      if (!discard) return;
+    }
+    if (!mounted) return;
+    context.pushReplacement(RoutePaths.pickStationForFillUp);
+  }
+
   /// #1693 — true once the user has entered any fill-up data (typed or
   /// receipt-scanned). The form's controllers all start empty, so any
   /// non-empty field means there is unsaved data the discard guard

@@ -25,12 +25,17 @@ class FillUpNumericField extends StatelessWidget {
   final IconData icon;
   final FormFieldValidator<String>? validator;
 
+  /// #3899 — provenance note under the field ("Pre-filled from your
+  /// last fill-up"); null renders no helper line.
+  final String? helperText;
+
   const FillUpNumericField({
     super.key,
     required this.controller,
     required this.label,
     required this.icon,
     this.validator,
+    this.helperText,
   });
 
   @override
@@ -44,6 +49,8 @@ class FillUpNumericField extends StatelessWidget {
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(icon),
+        helperText: helperText,
+        helperMaxLines: 2,
       ),
       validator: validator,
     );

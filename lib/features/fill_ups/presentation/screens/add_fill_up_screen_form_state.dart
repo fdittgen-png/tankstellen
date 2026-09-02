@@ -78,8 +78,13 @@ mixin _AddFillUpFormState on ConsumerState<AddFillUpScreen> {
   /// a bounded live read over the kept-alive link when the ignition is
   /// on and the form's vehicle is the adapter's vehicle, else the
   /// per-vehicle snapshot the last recording left (a reading, or reading +
-  /// distance driven since). Never overwrites a user-typed value; never
-  /// prefills a km below the vehicle's previous fill-up.
+  /// distance driven since). Never overwrites a user-typed value.
+  ///
+  /// #3899 — the latest KNOWN odometer is the max of the car's reading
+  /// and the vehicle's last fill-up: with no (fresh) car reading the last
+  /// plein's km is prefilled, and a car reading below it is superseded by
+  /// it (the old rule "never below the previous fill-up" now falls back
+  /// instead of leaving the field empty).
   Future<void> _prefillOdometerFromCar(String? vehicleId) async {
     if (vehicleId == null || _odoCtrl.text.isNotEmpty) return;
     final now = _clockNow();
@@ -95,10 +100,14 @@ mixin _AddFillUpFormState on ConsumerState<AddFillUpScreen> {
             km: snap.km, at: snap.at, source: snap.source, live: false);
       }
     }
-    if (candidate == null || !mounted) return;
+    if (!mounted) return;
     final previous = previousFillUpOdometerKm(
         vehicleId: vehicleId, date: _date, allFillUps: _safeFillUps());
-    if (previous != null && candidate.km < previous) return;
+    if (previous != null && (candidate == null || candidate.km < previous)) {
+      candidate =
+          _OdometerPrefill(km: previous, at: now, source: null, live: false);
+    }
+    if (candidate == null) return;
     if (_odoCtrl.text.isNotEmpty || _vehicleId != vehicleId) return;
     setState(() {
       _odometerPrefill = candidate;
@@ -147,6 +156,8 @@ mixin _AddFillUpFormState on ConsumerState<AddFillUpScreen> {
   String? _odometerPrefillNote(AppLocalizations l, BuildContext context) {
     final p = _odometerPrefill;
     if (p == null) return null;
+    // #3899 — the last plein carries no timestamp worth showing.
+    if (p.source == null) return l.fillUpOdometerFromLastFillUp;
     final locale = Localizations.localeOf(context).toString();
     final when = DateFormat.yMMMd(locale).add_Hm().format(p.at);
     if (p.source == VehicleOdometerSource.obd2Estimate) {
@@ -238,6 +249,7 @@ mixin _AddFillUpFormState on ConsumerState<AddFillUpScreen> {
 }
 
 /// #3877 — what was prefilled into the odometer field and where from.
+/// #3899 — a null [source] means the vehicle's last fill-up, not the car.
 class _OdometerPrefill {
   const _OdometerPrefill({
     required this.km,
@@ -247,7 +259,7 @@ class _OdometerPrefill {
   });
   final double km;
   final DateTime at;
-  final VehicleOdometerSource source;
+  final VehicleOdometerSource? source;
   final bool live;
 
   /// Odometers are whole kilometres on every dashboard.

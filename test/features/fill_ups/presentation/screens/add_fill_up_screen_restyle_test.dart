@@ -153,26 +153,40 @@ void main() {
     });
 
     testWidgets(
-        '#3073 — exposes a check action in the app bar (reachable above the '
-        'iOS keyboard) alongside the pinned bottom Save', (tester) async {
+        '#3899 — ONE save affordance: the pinned bottom Save, no app-bar '
+        'check action', (tester) async {
       await _pumpWithTallView(
         tester,
         const AddFillUpScreen(),
         overrides: _withVehicle,
       );
 
-      // The app-bar ✓ action stays visible above the keyboard, so the form
-      // is submittable on iOS where the keyboard covers the bottom save bar.
       final checkAction = find.byWidgetPredicate(
         (w) =>
             w is IconButton &&
             w.icon is Icon &&
-            (w.icon as Icon).icon == Icons.check &&
-            w.tooltip == 'Save',
+            (w.icon as Icon).icon == Icons.check,
       );
-      expect(checkAction, findsOneWidget);
-      // The pinned bottom Save bar stays for the keyboard-closed case.
+      expect(checkAction, findsNothing);
       expect(find.widgetWithText(FilledButton, 'Save'), findsOneWidget);
+    });
+
+    testWidgets('#3899 — every field row carries its icon ONCE (no leading '
+        'tile column); only the two section headers keep a tile',
+        (tester) async {
+      await _pumpWithTallView(
+        tester,
+        const AddFillUpScreen(),
+        overrides: _withVehicle,
+      );
+
+      final tiles = tester.widgetList<FormFieldTile>(find.byType(FormFieldTile));
+      expect(tiles, isNotEmpty);
+      expect(tiles.every((t) => t.icon == null), isTrue,
+          reason: 'A FormFieldTile with an icon duplicates the prefixIcon.');
+      // The date row's calendar is its prefix icon now — exactly one.
+      expect(find.byIcon(Icons.calendar_today_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.speed), findsOneWidget);
     });
 
     testWidgets('every ARB label referenced in the form still renders',
@@ -212,7 +226,8 @@ void main() {
     });
 
     testWidgets(
-        'station pre-fill banner renders when a stationName is passed',
+        '#3899 — the chosen station shows ONCE, as a row in "Where you '
+        'were" with a Change action (no banner above the cards)',
         (tester) async {
       await _pumpWithTallView(
         tester,
@@ -224,7 +239,28 @@ void main() {
       );
 
       expect(find.text('Totale Castelnau'), findsOneWidget);
-      expect(find.text('Station pre-filled'), findsOneWidget);
+      expect(find.text('Change'), findsOneWidget);
+      expect(find.text('Station pre-filled'), findsNothing);
+      final row = find.byKey(const Key('fill_up_station_row'));
+      expect(row, findsOneWidget);
+      expect(
+        find.ancestor(of: row, matching: find.byType(FormSectionCard)),
+        findsOneWidget,
+        reason: 'The station row lives inside a section card.',
+      );
+    });
+
+    testWidgets('#3899 — without a station the row reads "Pick a station"',
+        (tester) async {
+      await _pumpWithTallView(
+        tester,
+        const AddFillUpScreen(),
+        overrides: _withVehicle,
+      );
+
+      expect(find.byKey(const Key('fill_up_station_row')), findsOneWidget);
+      expect(find.text('Pick a station'), findsOneWidget);
+      expect(find.text('Change'), findsNothing);
     });
   });
 
