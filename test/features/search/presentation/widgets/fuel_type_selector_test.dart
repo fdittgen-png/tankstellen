@@ -97,6 +97,38 @@ void main() {
       expect(label.data, 'Diesel');
     });
 
+    testWidgets('#3927 — the selected fuel is ordered first so it is '
+        'always visible', (tester) async {
+      final storage = mockHiveStorageOverride();
+      when(() => storage.mock.getActiveProfileId()).thenReturn(null);
+      when(() => storage.mock.getSetting(any())).thenReturn(null);
+
+      await pumpApp(
+        tester,
+        const FuelTypeSelector(),
+        overrides: [
+          storage.override,
+          activeCountryOverride(Countries.france),
+          // E85 sits near the END of the French fuel list — the report
+          // that started #3925 was "I cannot see that E85 is selected".
+          selectedFuelTypeOverride(FuelType.e85),
+        ],
+      );
+
+      final chips = tester.widgetList<ChoiceChip>(find.byType(ChoiceChip));
+      expect((chips.first.label as Text).data, 'E85 / Bioéthanol');
+      expect(chips.first.selected, isTrue);
+      // Its chip is laid out on screen, not clipped past an edge.
+      final chipFinder = find.byKey(
+        const ValueKey('criteria-fuel-e85'),
+      );
+      expect(chipFinder, findsOneWidget);
+      expect(
+        tester.getTopLeft(chipFinder).dx,
+        lessThan(tester.view.physicalSize.width / tester.view.devicePixelRatio),
+      );
+    });
+
     testWidgets('tapping a fuel type chip triggers selection', (tester) async {
       final storage = mockHiveStorageOverride();
       when(() => storage.mock.getActiveProfileId()).thenReturn(null);
@@ -158,15 +190,54 @@ void main() {
         ],
       );
 
-      // A scroll over the horizontal chip strip must NOT buzz.
-      await tester.drag(find.byType(SingleChildScrollView), const Offset(-80, 0));
+      // #3927 — the strip wraps instead of scrolling; a drag across it
+      // must still never buzz.
+      await tester.drag(find.byType(Wrap).first, const Offset(-80, 0));
       await tester.pumpAndSettle();
-      expect(haptics, isEmpty, reason: 'scroll must never fire a haptic');
+      expect(haptics, isEmpty, reason: 'a drag must never fire a haptic');
 
       // A discrete chip tap fires exactly one selectionClick.
       await tester.tap(find.text('Super E10'));
       await tester.pumpAndSettle();
       expect(haptics, ['HapticFeedbackType.selectionClick']);
+    });
+
+    // #3927 (Epic #3925) — the promise the wrap layout replaced the
+    // horizontal scroller for: whichever fuel is selected is ON SCREEN
+    // without any scrolling. The old strip could park the selection off
+    // the right edge (E85 selected, France), so the user could not see
+    // their own choice. Replaces the three golden images this widget
+    // used to carry: they pinned pixels of the scroller that no longer
+    // exists, and locally regenerated goldens fail Linux CI anyway.
+    testWidgets('the selected fuel is visible without scrolling (#3927)',
+        (tester) async {
+      final storage = mockHiveStorageOverride();
+      when(() => storage.mock.getActiveProfileId()).thenReturn(null);
+      when(() => storage.mock.getSetting(any())).thenReturn(null);
+
+      await pumpApp(
+        tester,
+        const FuelTypeSelector(),
+        overrides: [
+          storage.override,
+          activeCountryOverride(Countries.france),
+          selectedFuelTypeOverride(FuelType.e85),
+        ],
+      );
+
+      final chips = tester.widgetList<ChoiceChip>(find.byType(ChoiceChip));
+      final selected = chips.where((c) => c.selected).toList();
+      expect(selected, hasLength(1), reason: 'exactly one fuel is selected');
+
+      // The selected chip's rect must lie inside the viewport: no part of
+      // it may sit beyond the right edge the way the scroller allowed.
+      final selectedFinder = find.byWidgetPredicate(
+        (w) => w is ChoiceChip && w.selected,
+      );
+      final rect = tester.getRect(selectedFinder);
+      final view = tester.view.physicalSize / tester.view.devicePixelRatio;
+      expect(rect.left, greaterThanOrEqualTo(0));
+      expect(rect.right, lessThanOrEqualTo(view.width));
     });
 
     testWidgets('has correct semantics labels', (tester) async {

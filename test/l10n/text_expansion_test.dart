@@ -6,42 +6,47 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/opening_hours.dart';
+import 'package:tankstellen/core/domain/search_mode.dart';
 import 'package:tankstellen/core/domain/station.dart';
+import 'package:tankstellen/core/domain/station_amenity.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/widgets/service_status_banner.dart';
+import 'package:tankstellen/core/time/app_clock.dart';
 import 'package:tankstellen/features/fill_ups/domain/services/monthly_insights_aggregator.dart';
 import 'package:tankstellen/features/fill_ups/presentation/widgets/monthly_insights_card.dart';
+import 'package:tankstellen/features/obd2/api.dart';
+import 'package:tankstellen/features/obd2/domain/fuel_mixture_model.dart';
+import 'package:tankstellen/features/price_history/data/repositories/price_history_repository.dart';
+import 'package:tankstellen/features/price_history/domain/entities/price_record.dart';
+import 'package:tankstellen/features/price_history/providers/price_history_provider.dart';
 import 'package:tankstellen/features/profile/domain/entities/user_profile.dart';
 import 'package:tankstellen/features/profile/presentation/screens/settings/privacy/privacy_choices_screen.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
 import 'package:tankstellen/features/search/presentation/widgets/all_prices/all_prices_table_header.dart';
 import 'package:tankstellen/features/search/presentation/widgets/all_prices_station_card.dart';
+import 'package:tankstellen/features/search/presentation/widgets/criteria/criteria_action_bar.dart';
+import 'package:tankstellen/features/search/presentation/widgets/criteria/criteria_option_row.dart';
+import 'package:tankstellen/features/search/presentation/widgets/fuel_type_selector.dart';
+import 'package:tankstellen/features/search/presentation/widgets/search_mode_toggle.dart';
+import 'package:tankstellen/features/search/presentation/widgets/station_card.dart';
 import 'package:tankstellen/features/search/providers/all_prices_comparison_model.dart';
 import 'package:tankstellen/features/search/providers/all_prices_table_provider.dart';
-import 'package:tankstellen/features/search/presentation/widgets/fuel_type_selector.dart';
-import 'package:tankstellen/features/search/presentation/widgets/station_card.dart';
 import 'package:tankstellen/features/search/providers/station_rating_provider.dart';
 import 'package:tankstellen/features/setup/presentation/widgets/language_selector.dart';
-import 'package:tankstellen/core/domain/station_amenity.dart';
-import 'package:tankstellen/features/price_history/data/repositories/price_history_repository.dart';
-import 'package:tankstellen/features/price_history/domain/entities/price_record.dart';
-import 'package:tankstellen/features/price_history/providers/price_history_provider.dart';
+import 'package:tankstellen/features/station_detail/presentation/widgets/opening_hours_view.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/price_history_section.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/station_amenities_services_section.dart';
-import 'package:tankstellen/features/station_detail/presentation/widgets/opening_hours_view.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/station_brand_header.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/station_prices_section.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/station_status_row.dart';
-import 'package:tankstellen/core/domain/vehicle_profile.dart';
-import 'package:tankstellen/core/time/app_clock.dart';
-import 'package:tankstellen/features/obd2/api.dart';
-import 'package:tankstellen/features/obd2/domain/fuel_mixture_model.dart';
 import 'package:tankstellen/features/trips/presentation/widgets/recording/recording_status_strip.dart';
 import 'package:tankstellen/features/trips/presentation/widgets/trip_avg_consumption_card.dart';
 import 'package:tankstellen/features/trips/providers/recording_gps_fix_provider.dart';
 import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../fixtures/stations.dart';
 import '../helpers/mock_providers.dart';
@@ -732,6 +737,68 @@ void main() {
         ),
         widgetName: 'StationAmenitiesServicesSection',
       );
+  // #3927 (Epic #3925) — the criteria sheet's fixed-size chrome: the mode
+  // toggle that used to wrap over two lines, the sticky action bar with
+  // its disabled-reason line, and one route-option row.
+  group('Search criteria sheet chrome (#3927)', () {
+    Widget modeToggle() =>
+        SearchModeToggle(mode: SearchMode.nearby, onChanged: (_) {});
+
+    Widget actionBar() => Builder(
+      builder: (context) => CriteriaActionBar(
+        onSubmit: () {},
+        onReset: () {},
+        disabledReason: AppLocalizations.of(
+          context,
+        ).criteriaSubmitDisabledRoute,
+      ),
+    );
+
+    Widget optionRow() => Builder(
+      builder: (context) {
+        final l10n = AppLocalizations.of(context);
+        return CriteriaOptionRow(
+          label: l10n.routeSegment,
+          value: '200 km',
+          caption: l10n.showCheapestEveryNKm(200),
+          child: CriteriaOptionSlider(
+            value: 200,
+            min: 50,
+            max: 1000,
+            divisions: 19,
+            label: '200 km',
+            onChanged: (_) {},
+          ),
+        );
+      },
+    );
+
+    testWidgets('SearchModeToggle — pseudo-locale', (tester) async {
+      await pumpPseudo(tester, modeToggle(), widgetName: 'SearchModeToggle');
+      // The words survive; only the icons may be dropped (#3927).
+      for (final text in tester.widgetList<Text>(find.byType(Text))) {
+        expect(text.maxLines, 1);
+      }
+    });
+
+    testWidgets('SearchModeToggle — 1.3x', (tester) async {
+      await pumpScaled(tester, modeToggle(), widgetName: 'SearchModeToggle');
+    });
+
+    testWidgets('CriteriaActionBar — pseudo-locale', (tester) async {
+      await pumpPseudo(tester, actionBar(), widgetName: 'CriteriaActionBar');
+    });
+
+    testWidgets('CriteriaActionBar — 1.3x', (tester) async {
+      await pumpScaled(tester, actionBar(), widgetName: 'CriteriaActionBar');
+    });
+
+    testWidgets('CriteriaOptionRow — pseudo-locale', (tester) async {
+      await pumpPseudo(tester, optionRow(), widgetName: 'CriteriaOptionRow');
+    });
+
+    testWidgets('CriteriaOptionRow — 1.3x', (tester) async {
+      await pumpScaled(tester, optionRow(), widgetName: 'CriteriaOptionRow');
     });
   });
 }

@@ -1,0 +1,35 @@
+{
+  "criteriaModeNearby": "In der Nähe",
+  "criteriaModeRoute": "Route",
+  "criteriaSubmit": "Suchen",
+  "criteriaReset": "Zurücksetzen",
+  "criteriaResetDone": "Kriterien auf deine Standardwerte zurückgesetzt",
+  "criteriaSubmitDisabledRoute": "Gib einen Start und ein Ziel an",
+  "criteriaSubmitDisabledSearching": "Suche läuft …",
+  "criteriaShowMore": "Mehr anzeigen ({count})",
+  "@criteriaShowMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "criteriaShowLess": "Weniger anzeigen",
+  "criteriaBrands": "Marken",
+  "criteriaRouteOptions": "Routenoptionen",
+  "criteriaRouteOptionsSummary": "Alle {segmentKm} km · {detourKm} km Umweg · {saving}",
+  "@criteriaRouteOptionsSummary": {
+    "placeholders": {
+      "segmentKm": {
+        "type": "int"
+      },
+      "detourKm": {
+        "type": "int"
+      },
+      "saving": {
+        "type": "String"
+      }
+    }
+  },
+  "criteriaSwapEndpoints": "Start und Ziel tauschen"
+}

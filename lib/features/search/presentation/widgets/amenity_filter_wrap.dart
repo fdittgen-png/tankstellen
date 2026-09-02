@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/station_amenity.dart';
+import 'criteria/criteria_chip_group.dart';
 
 /// FilterChips, one per [StationAmenity], used by the Search criteria
 /// screen to let the user filter results by station equipment (shop,
@@ -13,15 +14,20 @@ import '../../../../core/domain/station_amenity.dart';
 /// Stateless: the parent owns the selection set and forwards toggles
 /// via [onToggle].
 ///
-/// #1529 — switched from a multi-row [Wrap] to a single horizontally-
-/// scrolling [Row]. The 8 chips at default chip width wrap to 3 rows
-/// on Samsung S20 portrait, eating ~180 dp. A horizontal scroll
-/// shows only ~3 chips at once but the user can pan to reveal the
-/// rest, and the screen reclaims two full rows of vertical space for
-/// the search-criteria controls below.
+/// #1529 turned the original [Wrap] into a horizontally-scrolling row to
+/// reclaim two rows of vertical space. #3927 reverts that trade: the
+/// scroller clipped labels mid-word ("W…") with no affordance that more
+/// chips existed, and it could hide an ACTIVE filter off-screen. The
+/// group now wraps — about two rows at 360 dp — and folds the remainder
+/// behind one "Show more (n)" chip, which costs a single row while
+/// keeping every selected chip visible.
 class AmenityFilterWrap extends StatelessWidget {
   final Set<StationAmenity> selected;
   final ValueChanged<StationAmenity> onToggle;
+
+  /// How many chips stay visible while the group is collapsed. Selected
+  /// chips are shown regardless of their position.
+  static const int collapsedCount = 6;
 
   const AmenityFilterWrap({
     super.key,
@@ -32,16 +38,17 @@ class AmenityFilterWrap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      // Negative left padding cancels the default ListTile-like inset
-      // when this widget sits inside a SectionContent, so the leftmost
-      // chip aligns with the section title above it.
+    const amenities = StationAmenity.values;
+    return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (final amenity in StationAmenity.values) ...[
+      child: CriteriaChipGroup(
+        groupKeyPrefix: 'criteria-amenity',
+        collapsedCount: collapsedCount,
+        selectedFlags: [
+          for (final amenity in amenities) selected.contains(amenity),
+        ],
+        chips: [
+          for (final amenity in amenities)
             FilterChip(
               key: ValueKey('criteria-amenity-${amenity.name}'),
               avatar: Icon(amenityIcon(amenity), size: 18),
@@ -49,8 +56,6 @@ class AmenityFilterWrap extends StatelessWidget {
               selected: selected.contains(amenity),
               onSelected: (_) => onToggle(amenity),
             ),
-            if (amenity != StationAmenity.values.last) const SizedBox(width: 8),
-          ],
         ],
       ),
     );

@@ -1,0 +1,70 @@
+{
+  "criteriaModeNearby": "Nearby",
+  "@criteriaModeNearby": {
+    "description": "Short label of the 'nearby stations' segment in the search-criteria mode toggle (#3927). Kept to one short word so the segmented button never wraps at 320 dp; the long form stays on the segment tooltip."
+  },
+  "criteriaModeRoute": "Route",
+  "@criteriaModeRoute": {
+    "description": "Short label of the 'along the route' segment in the search-criteria mode toggle (#3927). Kept to one short word so the segmented button never wraps at 320 dp; the long form stays on the segment tooltip."
+  },
+  "criteriaSubmit": "Search",
+  "@criteriaSubmit": {
+    "description": "Primary action of the search-criteria sheet's sticky bottom bar — runs the search with the criteria on screen (#3927)."
+  },
+  "criteriaReset": "Reset",
+  "@criteriaReset": {
+    "description": "Secondary text action of the search-criteria sheet's sticky bottom bar — restores the saved defaults, or the factory ones when nothing was saved (#3927)."
+  },
+  "criteriaResetDone": "Criteria reset to your defaults",
+  "@criteriaResetDone": {
+    "description": "Snackbar confirming that the search criteria were restored to the saved (or factory) defaults (#3927)."
+  },
+  "criteriaSubmitDisabledRoute": "Enter a start and a destination",
+  "@criteriaSubmitDisabledRoute": {
+    "description": "One-line reason shown above the disabled Search button when route mode has no start or no destination yet (#3927)."
+  },
+  "criteriaSubmitDisabledSearching": "Search in progress…",
+  "@criteriaSubmitDisabledSearching": {
+    "description": "One-line reason shown above the disabled Search button while a route search is already running (#3927)."
+  },
+  "criteriaShowMore": "Show more ({count})",
+  "@criteriaShowMore": {
+    "description": "Chip that expands a collapsed criteria chip group (fuels, amenities, brands); count is how many chips are still hidden (#3927).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "criteriaShowLess": "Show less",
+  "@criteriaShowLess": {
+    "description": "Chip that collapses an expanded criteria chip group back to its first rows (#3927)."
+  },
+  "criteriaBrands": "Brands",
+  "@criteriaBrands": {
+    "description": "Section header above the brand filter chips on the search-criteria sheet (#3927)."
+  },
+  "criteriaRouteOptions": "Route options",
+  "@criteriaRouteOptions": {
+    "description": "Title of the collapsible section holding the three route-planning options (segment, detour budget, minimum saving) on the search-criteria sheet (#3927)."
+  },
+  "criteriaRouteOptionsSummary": "Every {segmentKm} km · {detourKm} km detour · {saving}",
+  "@criteriaRouteOptionsSummary": {
+    "description": "One-line summary shown under the collapsed 'Route options' section: the route-segment spacing, the detour budget and the minimum-saving value ('Off' or an amount per litre) (#3927).",
+    "placeholders": {
+      "segmentKm": {
+        "type": "int"
+      },
+      "detourKm": {
+        "type": "int"
+      },
+      "saving": {
+        "type": "String"
+      }
+    }
+  },
+  "criteriaSwapEndpoints": "Swap start and destination",
+  "@criteriaSwapEndpoints": {
+    "description": "Tooltip of the icon button between the start and destination fields that exchanges the two endpoints of a route search (#3927)."
+  }
+}

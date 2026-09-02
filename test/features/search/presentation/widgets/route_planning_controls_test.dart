@@ -20,6 +20,16 @@ class _FixedProfile extends ActiveProfile {
   UserProfile? build() => _profile;
 }
 
+/// Detour override that starts away from the profile default, so the
+/// "Route options" section must open pre-expanded (#3927).
+class _FixedDetour extends RouteDetourSearchParam {
+  _FixedDetour(this._km);
+  final double _km;
+
+  @override
+  double build() => _km;
+}
+
 void main() {
   group('RoutePlanningControls (#2592)', () {
     testWidgets('renders three sliders defaulted from the profile', (
@@ -49,12 +59,88 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byType(Slider), findsNWidgets(3));
-      // Segment + detour value labels render the profile defaults.
+      // #3927 — the options are collapsed while every value still equals
+      // the profile default; the one-line summary carries all three.
+      expect(find.byType(Slider), findsNothing);
+      expect(
+        find.text('Every 200 km · 8 km detour · 0,05 €/L'),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.text('Route options'));
+      await tester.pumpAndSettle();
+
+      // Two sliders now — the minimum saving became preset chips.
+      expect(find.byType(Slider), findsNWidgets(2));
       expect(find.text('200 km'), findsOneWidget);
       expect(find.text('8 km'), findsOneWidget);
-      // Min-saving default 0.05 €/L → the formatted amount label.
       expect(find.text('0,05 €/L'), findsWidgets);
+      // The 0.05 preset chip is the selected one.
+      final chip = tester.widget<ChoiceChip>(
+        find.byKey(const ValueKey('criteria-min-saving-5')),
+      );
+      expect(chip.selected, isTrue);
+    });
+
+    testWidgets('#3927 — a minimum-saving chip writes the same provider '
+        'value the slider wrote', (tester) async {
+      late ProviderContainer container;
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            activeProfileProvider.overrideWith(
+              () => _FixedProfile(
+                const UserProfile(id: 'p', name: 'P', routeSegmentKm: 50),
+              ),
+            ),
+          ],
+          child: Consumer(
+            builder: (context, ref, _) {
+              container = ProviderScope.containerOf(context);
+              return const MaterialApp(
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
+                home: Scaffold(body: RoutePlanningControls()),
+              );
+            },
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Route options'));
+      await tester.pumpAndSettle();
+
+      expect(container.read(minRouteSavingSearchParamProvider), 0.0);
+      await tester.tap(find.byKey(const ValueKey('criteria-min-saving-10')));
+      await tester.pumpAndSettle();
+      expect(container.read(minRouteSavingSearchParamProvider), 0.10);
+    });
+
+    testWidgets('#3927 — the section opens pre-expanded when a value '
+        'differs from its default', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            activeProfileProvider.overrideWith(
+              () => _FixedProfile(
+                const UserProfile(id: 'p', name: 'P', routeSegmentKm: 50),
+              ),
+            ),
+            routeDetourSearchParamProvider.overrideWith(
+              () => _FixedDetour(12),
+            ),
+          ],
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: RoutePlanningControls()),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(Slider), findsNWidgets(2));
     });
 
     testWidgets('dragging the segment slider updates the provider', (
@@ -82,6 +168,9 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Route options'));
       await tester.pumpAndSettle();
 
       expect(container.read(routeSegmentSearchParamProvider), 50.0);

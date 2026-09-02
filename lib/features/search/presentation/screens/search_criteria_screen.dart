@@ -28,8 +28,11 @@ import '../../providers/brand_filter_provider.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
 import '../../providers/search_screen_ui_provider.dart';
+import '../widgets/criteria/criteria_action_bar.dart';
 import '../widgets/location_input.dart' show LocationInputWidgetState;
 import '../widgets/search_criteria_form.dart';
+
+part 'search_criteria_screen_actions.dart';
 
 /// Full-screen modal for editing search criteria (mode, location, fuel, radius,
 /// filters, equipment). Pops on submission and delegates to the relevant
@@ -61,18 +64,10 @@ class SearchCriteriaScreen extends ConsumerStatefulWidget {
       _SearchCriteriaScreenState();
 }
 
-class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
-  // #2131 / #2137 — GlobalKeys drive the inline inputs' submit from the FAB.
-  final GlobalKey<RouteInputWidgetState> _routeInputKey =
-      GlobalKey<RouteInputWidgetState>();
-  final GlobalKey<LocationInputWidgetState> _locationInputKey =
-      GlobalKey<LocationInputWidgetState>();
-
+class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen>
+    with _SearchCriteriaActions {
   SearchFabAction? _registeredFabAction;
   SearchFabActionController? _fabNotifier;
-
-  // #2136 — re-entry guard: double-tap pop races crash with "No element".
-  bool _searchFired = false;
 
   @override
   void initState() {
@@ -104,6 +99,39 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     super.dispose();
   }
 
+  /// The mode the sheet is actually in: route planning can be gated off
+  /// (#1447 phase 4), in which case the stored mode is preserved but the
+  /// sheet behaves as Nearby.
+  SearchMode _effectiveMode({required bool watch}) {
+    final mode = watch
+        ? ref.watch(activeSearchModeProvider)
+        : ref.read(activeSearchModeProvider);
+    final manifest = watch
+        ? ref.watch(featureManifestProvider)
+        : ref.read(featureManifestProvider);
+    final enabledFlags = watch
+        ? ref.watch(enabledFeaturesProvider)
+        : ref.read(enabledFeaturesProvider);
+    final routePlanningOn = isEffectivelyEnabled(
+      Feature.routePlanning,
+      manifest,
+      enabledFlags,
+    );
+    return routePlanningOn ? mode : SearchMode.nearby;
+  }
+
+  /// Why the search cannot run, or null when it can. #3927 — the sheet's
+  /// action bar shows this line above the disabled button; the shell FAB
+  /// mirrors the same condition as its `enabled` flag, so the two can
+  /// never disagree.
+  String? _submitDisabledReason(AppLocalizations l10n, SearchMode mode) {
+    if (mode != SearchMode.route) return null;
+    final routeState = ref.watch(routeInputControllerProvider);
+    if (routeState.isSearching) return l10n.criteriaSubmitDisabledSearching;
+    if (!routeState.canSearch) return l10n.criteriaSubmitDisabledRoute;
+    return null;
+  }
+
   void _updateFabAction() {
     if (!mounted) return;
     // #2810 — only the CURRENTLY-displayed criteria screen may own the FAB
@@ -114,15 +142,7 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     // faded/dead on Map/Favoris.
     if (!(ModalRoute.of(context)?.isCurrent ?? false)) return;
     final l10n = AppLocalizations.of(context);
-    final mode = ref.read(activeSearchModeProvider);
-    final manifest = ref.read(featureManifestProvider);
-    final enabledFlags = ref.read(enabledFeaturesProvider);
-    final routePlanningOn = isEffectivelyEnabled(
-      Feature.routePlanning,
-      manifest,
-      enabledFlags,
-    );
-    final effectiveMode = routePlanningOn ? mode : SearchMode.nearby;
+    final effectiveMode = _effectiveMode(watch: false);
 
     final bool enabled;
     final VoidCallback onTap;
@@ -156,168 +176,26 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
 
   void _onFabRouteTap() {
     if (_bailIfStale()) return;
-    unawaited(_routeInputKey.currentState?.resolveAndSearch());
+    onRouteSubmit();
   }
 
   void _onFabNearbyTap() {
     if (_bailIfStale()) return;
-    final loc = _locationInputKey.currentState;
-    if (loc != null) {
-      loc.submit();
+    onNearbySubmit();
+  }
+
+  /// The action bar's primary tap — the same dispatch the shell FAB runs.
+  void _onSubmit() {
+    if (_effectiveMode(watch: false) == SearchMode.route) {
+      onRouteSubmit();
     } else {
-      unawaited(_performGpsSearch());
+      onNearbySubmit();
     }
-  }
-
-  Future<void> _performGpsSearch() async {
-    if (_searchFired) return;
-    final fuelType = ref.read(selectedFuelTypeProvider);
-    final radius = ref.read(searchRadiusProvider);
-    final settings = ref.read(settingsStorageProvider);
-    if (!LocationConsentDialog.hasConsent(settings)) {
-      if (!mounted) return;
-      final consented = await LocationConsentDialog.show(context);
-      if (!consented) {
-        if (mounted) {
-          SnackBarHelper.show(
-            context,
-            AppLocalizations.of(context).locationDenied,
-          );
-        }
-        return;
-      }
-      await LocationConsentDialog.recordConsent(settings);
-    }
-    if (_searchFired || !mounted) return;
-    _searchFired = true;
-    // SearchState dispatches to EV or fuel service based on fuelType.
-    unawaited(
-      ref
-          .read(searchStateProvider.notifier)
-          .searchByGps(fuelType: fuelType, radiusKm: radius),
-    );
-    Navigator.of(context).pop();
-  }
-
-  void _performZipSearch(String zip) {
-    if (_searchFired || !mounted) return;
-    _searchFired = true;
-    final fuelType = ref.read(selectedFuelTypeProvider);
-    final radius = ref.read(searchRadiusProvider);
-    unawaited(
-      ref
-          .read(searchStateProvider.notifier)
-          .searchByZipCode(zipCode: zip, fuelType: fuelType, radiusKm: radius),
-    );
-    Navigator.of(context).pop();
-  }
-
-  void _performCitySearch(ResolvedLocation city) {
-    if (_searchFired || !mounted) return;
-    _searchFired = true;
-    final fuelType = ref.read(selectedFuelTypeProvider);
-    final radius = ref.read(searchRadiusProvider);
-    unawaited(
-      ref
-          .read(searchStateProvider.notifier)
-          .searchByCoordinates(
-            lat: city.lat,
-            lng: city.lng,
-            postalCode: city.postcode,
-            locationName: city.name,
-            fuelType: fuelType,
-            radiusKm: radius,
-          ),
-    );
-    Navigator.of(context).pop();
-  }
-
-  void _performRouteSearch(List<RouteWaypoint> waypoints) {
-    if (_searchFired || !mounted) return;
-    _searchFired = true;
-    final fuelType = ref.read(selectedFuelTypeProvider);
-    // #2592 — the route-planning params come from the criteria screen's
-    // per-search overrides (defaulted from the profile). #1602 — the
-    // corridor radius is the detour budget.
-    final detourBudgetKm = ref.read(routeDetourSearchParamProvider);
-    final segmentKm = ref.read(routeSegmentSearchParamProvider);
-    final minSaving = ref.read(minRouteSavingSearchParamProvider);
-    ref.read(activeSearchModeProvider.notifier).set(SearchMode.route);
-    unawaited(
-      ref
-          .read(routeSearchStateProvider.notifier)
-          .searchAlongRoute(
-            waypoints: waypoints,
-            fuelType: fuelType,
-            searchRadiusKm: detourBudgetKm,
-            segmentKm: segmentKm,
-            minSavingPerLiter: minSaving,
-          ),
-    );
-    Navigator.of(context).pop();
-  }
-
-  Future<void> _saveAsDefaults() async {
-    final l10n = AppLocalizations.of(context);
-    final fuelType = ref.read(selectedFuelTypeProvider);
-    final radius = ref.read(searchRadiusProvider);
-    final amenities = ref.read(selectedAmenitiesProvider);
-    final openOnly = ref.read(openOnlyFilterProvider);
-    final brands = ref.read(selectedBrandsProvider);
-    final excludeHighway = ref.read(excludeHighwayStationsProvider);
-
-    // #3159 — read everything BEFORE the storage awaits below: a
-    // post-await ref.read throws a StateError if the screen unmounted
-    // while the settings were persisting. The captured notifier still
-    // finishes the profile write on the unmounted path.
-    final storage = ref.read(storageRepositoryProvider);
-    final profile = ref.read(activeProfileProvider);
-    final profileNotifier = ref.read(activeProfileProvider.notifier);
-    final inRoute = ref.read(activeSearchModeProvider) == SearchMode.route;
-    final routeSegmentKm = ref.read(routeSegmentSearchParamProvider);
-    final routeDetourBudgetKm = ref.read(routeDetourSearchParamProvider);
-    final minRouteSavingPerLiter = ref.read(minRouteSavingSearchParamProvider);
-
-    // #1792 — the criteria with no UserProfile field of their own
-    // (open-only, amenity set, brand filter) persist device-locally so
-    // the *whole* default set round-trips, not just the profile
-    // subset. This runs regardless of whether a profile is active.
-    await storage.putSetting(StorageKeys.defaultOpenOnly, openOnly);
-    await storage.putSetting(StorageKeys.defaultExcludeHighway, excludeHighway);
-    await storage.putSetting(
-      StorageKeys.defaultAmenities,
-      amenities.map((a) => a.name).toList(),
-    );
-    await storage.putSetting(StorageKeys.defaultBrands, brands.toList());
-
-    // Fuel type + radius are profile fields — mirror them into the
-    // active profile so existing profile consumers keep seeing them.
-    // #2592 — in route mode also persist the route-planning params so the
-    // per-search overrides become the new profile defaults.
-    if (profile != null) {
-      await profileNotifier.updateProfile(
-        profile.copyWith(
-          preferredFuelType: fuelType,
-          defaultSearchRadius: radius,
-          routeSegmentKm: inRoute ? routeSegmentKm : profile.routeSegmentKm,
-          routeDetourBudgetKm: inRoute
-              ? routeDetourBudgetKm
-              : profile.routeDetourBudgetKm,
-          minRouteSavingPerLiter: inRoute
-              ? minRouteSavingPerLiter
-              : profile.minRouteSavingPerLiter,
-        ),
-      );
-    }
-
-    if (!mounted) return;
-    SnackBarHelper.show(context, l10n.criteriaSavedToProfile);
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final storedMode = ref.watch(activeSearchModeProvider);
 
     // #2131 — re-register the FAB when mode or canSearch flip.
     ref.listen<SearchMode>(
@@ -330,39 +208,78 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
 
     // #1447 phase 4 — when routePlanning is gated off, hide the toggle
     // and treat the stored mode as Nearby (the stored value is preserved).
-    final manifest = ref.watch(featureManifestProvider);
-    final enabledFlags = ref.watch(enabledFeaturesProvider);
+    final mode = _effectiveMode(watch: true);
     final routePlanningOn = isEffectivelyEnabled(
       Feature.routePlanning,
-      manifest,
-      enabledFlags,
+      ref.watch(featureManifestProvider),
+      ref.watch(enabledFeaturesProvider),
     );
-    final mode = routePlanningOn ? storedMode : SearchMode.nearby;
 
     return PageScaffold(
       title: l10n.searchCriteriaTitle,
       leading: IconButton(
         icon: const Icon(Icons.close),
-        tooltip: AppLocalizations.of(context).tooltipClose,
+        tooltip: l10n.tooltipClose,
         onPressed: () => Navigator.of(context).pop(),
       ),
+      // #3927 — "Save as my defaults" was a full-width outlined button at
+      // the bottom of the form, reading as the sheet's primary action. It
+      // is a rare, deliberate action: the app-bar overflow is its place.
+      actions: [
+        PopupMenuButton<_CriteriaOverflowAction>(
+          key: const ValueKey('criteria-overflow-menu'),
+          icon: const Icon(Icons.more_vert),
+          tooltip: l10n.moreActionsTooltip,
+          onSelected: (_) => unawaited(saveAsDefaults()),
+          itemBuilder: (_) => [
+            PopupMenuItem<_CriteriaOverflowAction>(
+              key: const ValueKey('criteria-save-defaults-button'),
+              value: _CriteriaOverflowAction.saveDefaults,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.bookmark_add, size: 20),
+                  const SizedBox(width: 12),
+                  Flexible(
+                    child: Text(
+                      l10n.saveAsDefaults,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
       bodyPadding: EdgeInsets.zero,
+      // #3927 — the sheet owns its primary action again: a labelled,
+      // full-width Search button that says why it is disabled, plus the
+      // Reset that the form never had.
+      bottomNavigationBar: CriteriaActionBar(
+        onSubmit: _onSubmit,
+        onReset: resetCriteria,
+        disabledReason: _submitDisabledReason(l10n, mode),
+      ),
       // #2592 — the form body lives in SearchCriteriaForm so this screen
       // stays under the file-length cap; the State retains the search /
       // save actions and the FAB wiring and passes them down.
       body: SafeArea(
         child: SearchCriteriaForm(
-          routeInputKey: _routeInputKey,
-          locationInputKey: _locationInputKey,
+          routeInputKey: routeInputKey,
+          locationInputKey: locationInputKey,
           routePlanningOn: routePlanningOn,
           mode: mode,
-          onGpsSearch: _performGpsSearch,
-          onZipSearch: _performZipSearch,
-          onCitySearch: _performCitySearch,
-          onRouteSearch: _performRouteSearch,
-          onSaveDefaults: _saveAsDefaults,
+          onGpsSearch: performGpsSearch,
+          onZipSearch: performZipSearch,
+          onCitySearch: performCitySearch,
+          onRouteSearch: performRouteSearch,
         ),
       ),
     );
   }
 }
+
+/// The criteria sheet's app-bar overflow entries (#3927). One today —
+/// the enum keeps `PopupMenuButton`'s dispatch typed for the next one.
+enum _CriteriaOverflowAction { saveDefaults }

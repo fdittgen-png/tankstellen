@@ -16,6 +16,7 @@ import '../../providers/search_provider.dart';
 import '../../providers/search_screen_ui_provider.dart';
 import 'amenity_filter_wrap.dart';
 import 'brand_filter_chips.dart';
+import 'criteria/criteria_section_header.dart';
 import 'fuel_type_selector.dart';
 import 'location_input.dart' show LocationInput, LocationInputWidgetState;
 import 'route_planning_controls.dart';
@@ -27,6 +28,11 @@ import 'search_radius_slider.dart';
 /// (#2592). All search/save actions are owned by the parent State and
 /// passed in as callbacks; the form watches its own filter providers and
 /// surfaces the radius (nearby) vs the route-planning controls (route).
+///
+/// #3927 — the form no longer carries any button of its own: "Search" and
+/// "Reset" live in the screen's sticky bottom [CriteriaActionBar], and
+/// "Save as my defaults" moved to the app-bar overflow. What is left here
+/// is exactly the criteria.
 class SearchCriteriaForm extends ConsumerWidget {
   const SearchCriteriaForm({
     super.key,
@@ -38,7 +44,6 @@ class SearchCriteriaForm extends ConsumerWidget {
     required this.onZipSearch,
     required this.onCitySearch,
     required this.onRouteSearch,
-    required this.onSaveDefaults,
   });
 
   final GlobalKey<RouteInputWidgetState> routeInputKey;
@@ -49,12 +54,10 @@ class SearchCriteriaForm extends ConsumerWidget {
   final void Function(String zip) onZipSearch;
   final void Function(ResolvedLocation city) onCitySearch;
   final void Function(List<RouteWaypoint> waypoints) onRouteSearch;
-  final VoidCallback onSaveDefaults;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     final radius = ref.watch(searchRadiusProvider);
     final openOnly = ref.watch(openOnlyFilterProvider);
     final amenities = ref.watch(selectedAmenitiesProvider);
@@ -93,7 +96,7 @@ class SearchCriteriaForm extends ConsumerWidget {
             RouteInput(key: routeInputKey, onSearch: onRouteSearch),
           ],
           const SizedBox(height: 8),
-          _SectionHeader(l10n.fuelType),
+          CriteriaSectionHeader(l10n.fuelType),
           const SizedBox(height: 4),
           const FuelTypeSelector(),
           const SizedBox(height: 8),
@@ -119,7 +122,7 @@ class SearchCriteriaForm extends ConsumerWidget {
             secondary: const Icon(Icons.schedule),
           ),
           const SizedBox(height: 4),
-          _SectionHeader(l10n.amenities),
+          CriteriaSectionHeader(l10n.amenities),
           const SizedBox(height: 4),
           AmenityFilterWrap(
             selected: amenities,
@@ -131,49 +134,17 @@ class SearchCriteriaForm extends ConsumerWidget {
             builder: (context, ref, _) {
               final stations = ref.watch(fuelStationsProvider);
               if (stations.isEmpty) return const SizedBox.shrink();
-              return BrandFilterChips(stations: stations);
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  CriteriaSectionHeader(l10n.criteriaBrands),
+                  const SizedBox(height: 4),
+                  BrandFilterChips(stations: stations),
+                ],
+              );
             },
           ),
-          const SizedBox(height: 8),
-          // #3548 — quiet secondary action: hairline outline + secondary
-          // foreground so it stops competing with the central search FAB
-          // (the form's only primary action).
-          OutlinedButton.icon(
-            key: const ValueKey('criteria-save-defaults-button'),
-            onPressed: onSaveDefaults,
-            icon: const Icon(Icons.bookmark_add, size: 18),
-            label: Text(l10n.saveAsDefaults),
-            style: OutlinedButton.styleFrom(
-              minimumSize: const Size.fromHeight(44),
-              foregroundColor: theme.colorScheme.secondary,
-              side: BorderSide(color: theme.colorScheme.outlineVariant),
-            ),
-          ),
-          // #2131 — the inline Search CTA moved to the central FAB.
         ],
-      ),
-    );
-  }
-}
-
-/// #3548 — the criteria form's section eyebrow: letter-spaced,
-/// medium-weight `onSurfaceVariant` label instead of a plain
-/// `titleSmall`, so section starts scan as structure rather than
-/// body text. Style only — the string itself is the localized label.
-class _SectionHeader extends StatelessWidget {
-  final String text;
-
-  const _SectionHeader(this.text);
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Text(
-      text,
-      style: theme.textTheme.labelLarge?.copyWith(
-        fontWeight: FontWeight.w700,
-        letterSpacing: 0.8,
-        color: theme.colorScheme.onSurfaceVariant,
       ),
     );
   }

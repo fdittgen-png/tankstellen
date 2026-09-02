@@ -16,6 +16,7 @@ import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/services/country_service_registry.dart'
     show fuelTypesForCountry;
 import '../../providers/search_provider.dart';
+import 'criteria/criteria_chip_group.dart';
 
 class FuelTypeSelector extends ConsumerWidget {
   const FuelTypeSelector({super.key});
@@ -63,42 +64,58 @@ class FuelTypeSelector extends ConsumerWidget {
       );
     }
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: types.map((type) {
-          // Localize "All" for display — other types use their canonical names
-          final label = type == FuelType.all
-              ? (AppLocalizations.of(context).allFuels)
-              : type.displayName;
-          return Padding(
-            padding: const EdgeInsets.only(right: 6),
-            child: Semantics(
-              label: AppLocalizations.of(
-                context,
-              ).fuelTypeSemantic(label, '${selected == type}'),
-              child: ChoiceChip(
-                avatar: selected == type
-                    ? null
-                    : CircleAvatar(
-                        backgroundColor: FuelColors.forType(type),
-                        radius: 6,
-                      ),
-                label: Text(label),
-                selected: selected == type,
-                onSelected: (_) {
-                  // #2974 — a selection tick on the per-fuel chip re-search,
-                  // matching the everyday tap-surface haptics. selectionClick
-                  // only (never heavyImpact); never fires on scroll because
-                  // ChoiceChip.onSelected is a discrete tap, not a drag.
-                  unawaited(HapticFeedback.selectionClick());
-                  ref.read(selectedFuelTypeProvider.notifier).select(type);
-                },
-                visualDensity: VisualDensity.compact,
+    // #3927 — the selection must ALWAYS be visible. The old horizontal
+    // scroller could park the selected chip (E85 on the French set) past
+    // the right edge, so the sheet showed no answer to "which fuel am I
+    // searching for?". Ordering the selected type first, wrapping the rest
+    // onto as many rows as they need, and folding anything past the eighth
+    // behind "Show more" keeps the answer on the first row at every width.
+    final ordered = <FuelType>[
+      ...types.where((t) => t == selected),
+      ...types.where((t) => t != selected),
+    ];
+
+    return CriteriaChipGroup(
+      groupKeyPrefix: 'criteria-fuel',
+      collapsedCount: 8,
+      selectedFlags: [for (final type in ordered) type == selected],
+      chips: [for (final type in ordered) _chip(context, ref, type, selected)],
+    );
+  }
+
+  Widget _chip(
+    BuildContext context,
+    WidgetRef ref,
+    FuelType type,
+    FuelType selected,
+  ) {
+    // Localize "All" for display — other types use their canonical names
+    final label = type == FuelType.all
+        ? (AppLocalizations.of(context).allFuels)
+        : type.displayName;
+    return Semantics(
+      label: AppLocalizations.of(
+        context,
+      ).fuelTypeSemantic(label, '${selected == type}'),
+      child: ChoiceChip(
+        key: ValueKey('criteria-fuel-${type.name}'),
+        avatar: selected == type
+            ? null
+            : CircleAvatar(
+                backgroundColor: FuelColors.forType(type),
+                radius: 6,
               ),
-            ),
-          );
-        }).toList(),
+        label: Text(label),
+        selected: selected == type,
+        onSelected: (_) {
+          // #2974 — a selection tick on the per-fuel chip re-search,
+          // matching the everyday tap-surface haptics. selectionClick
+          // only (never heavyImpact); never fires on a drag because
+          // ChoiceChip.onSelected is a discrete tap.
+          unawaited(HapticFeedback.selectionClick());
+          ref.read(selectedFuelTypeProvider.notifier).select(type);
+        },
+        visualDensity: VisualDensity.compact,
       ),
     );
   }

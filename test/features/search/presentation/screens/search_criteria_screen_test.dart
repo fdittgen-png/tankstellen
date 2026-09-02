@@ -15,6 +15,7 @@ import 'package:tankstellen/core/domain/station_amenity.dart';
 import 'package:tankstellen/features/search/presentation/screens/search_criteria_screen.dart';
 import 'package:tankstellen/features/search/presentation/widgets/fuel_type_selector.dart';
 import 'package:tankstellen/features/search/presentation/widgets/location_input.dart';
+import 'package:tankstellen/features/search/providers/search_filters_provider.dart';
 import 'package:tankstellen/features/search/providers/search_screen_ui_provider.dart';
 
 import '../../../../helpers/mock_providers.dart';
@@ -74,9 +75,24 @@ void main() {
           find.byKey(const ValueKey('criteria-open-only-toggle')),
           findsOneWidget,
         );
+        // #3927 — the sheet owns a labelled primary action again, plus a
+        // reset; "Save as my defaults" moved into the app-bar overflow.
         expect(
-          find.byKey(const ValueKey('criteria-save-defaults-button')),
+          find.byKey(const ValueKey('criteria-submit-button')),
           findsOneWidget,
+        );
+        expect(
+          find.byKey(const ValueKey('criteria-reset-button')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const ValueKey('criteria-overflow-menu')),
+          findsOneWidget,
+        );
+        // Nearby mode can always search — no reason line.
+        expect(
+          find.byKey(const ValueKey('criteria-disabled-reason')),
+          findsNothing,
         );
       },
     );
@@ -100,8 +116,8 @@ void main() {
 
       expect(find.byType(LocationInput), findsOneWidget);
 
-      // Tap the "Along route" segment.
-      await tester.tap(find.text('Search along route').first);
+      // Tap the "Route" segment.
+      await tester.tap(find.text('Route').first);
       await tester.pump();
 
       // LocationInput should be gone; nearby mode widget replaced.
@@ -230,13 +246,12 @@ void main() {
       await tester.tap(airChip);
       await tester.pump();
 
-      final saveBtn = find.byKey(
-        const ValueKey('criteria-save-defaults-button'),
+      await tester.tap(find.byKey(const ValueKey('criteria-overflow-menu')));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const ValueKey('criteria-save-defaults-button')),
       );
-      await tester.ensureVisible(saveBtn);
-      await tester.pump();
-      await tester.tap(saveBtn);
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       // Fuel type + radius are profile fields — mirrored into the profile.
       expect(fake.updates, hasLength(1));
@@ -279,13 +294,12 @@ void main() {
           ],
         );
 
-        final saveBtn = find.byKey(
-          const ValueKey('criteria-save-defaults-button'),
+        await tester.tap(find.byKey(const ValueKey('criteria-overflow-menu')));
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(const ValueKey('criteria-save-defaults-button')),
         );
-        await tester.ensureVisible(saveBtn);
-        await tester.pump();
-        await tester.tap(saveBtn);
-        await tester.pump();
+        await tester.pumpAndSettle();
 
         expect(fake.updates, hasLength(1));
         // Route mode persists the route-segment override onto the profile.
@@ -463,6 +477,118 @@ void main() {
         // asserting empty locks in the no-overflow invariant.
         expect(tester.takeException(), isNull);
       });
+    });
+  });
+
+  // #3927 (Epic #3925) — the sheet's own action bar: a labelled primary
+  // Search that explains its disabled state, a Reset that restores the
+  // saved defaults, and the radius presets beside the slider.
+  group('SearchCriteriaScreen — action bar + presets (#3927)', () {
+    testWidgets('route mode without endpoints disables Search and says why', (
+      tester,
+    ) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const SearchCriteriaScreen(),
+        overrides: [
+          ...test.overrides,
+          selectedFuelTypeOverride(FuelType.e10),
+          searchRadiusOverride(8),
+          userPositionNullOverride(),
+          activeSearchModeOverride(SearchMode.route),
+        ],
+      );
+
+      final reason = find.byKey(const ValueKey('criteria-disabled-reason'));
+      expect(reason, findsOneWidget);
+      expect(
+        tester.widget<Text>(reason).data,
+        'Enter a start and a destination',
+      );
+      final submit = tester.widget<FilledButton>(
+        find.byKey(const ValueKey('criteria-submit-button')),
+      );
+      expect(submit.onPressed, isNull);
+    });
+
+    testWidgets(
+      'a radius preset chip sets the radius; Reset restores the saved default',
+      (tester) async {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+
+        late ProviderContainer container;
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              ...test.overrides,
+              selectedFuelTypeOverride(FuelType.e10),
+              searchRadiusOverride(8),
+              userPositionNullOverride(),
+            ].cast(),
+            child: Consumer(
+              builder: (context, ref, _) {
+                container = ProviderScope.containerOf(context);
+                return const MaterialApp(
+                  localizationsDelegates:
+                      AppLocalizations.localizationsDelegates,
+                  supportedLocales: AppLocalizations.supportedLocales,
+                  home: SearchCriteriaScreen(),
+                );
+              },
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(container.read(searchRadiusProvider), 8.0);
+
+        final preset = find.byKey(const ValueKey('criteria-radius-preset-25'));
+        await tester.ensureVisible(preset);
+        await tester.pump();
+        await tester.tap(preset);
+        await tester.pumpAndSettle();
+        expect(container.read(searchRadiusProvider), 25.0);
+
+        await tester.tap(find.byKey(const ValueKey('criteria-reset-button')));
+        await tester.pumpAndSettle();
+
+        // Back to the saved default the provider builds from.
+        expect(container.read(searchRadiusProvider), 8.0);
+        expect(find.text('Criteria reset to your defaults'), findsOneWidget);
+      },
+    );
+
+    testWidgets('no 50 km preset while the radius provider clamps at 25', (
+      tester,
+    ) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const SearchCriteriaScreen(),
+        overrides: [
+          ...test.overrides,
+          selectedFuelTypeOverride(FuelType.e10),
+          searchRadiusOverride(8),
+          userPositionNullOverride(),
+        ],
+      );
+
+      expect(
+        find.byKey(const ValueKey('criteria-radius-preset-5')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('criteria-radius-preset-50')),
+        findsNothing,
+        reason: 'SearchRadius.set clamps to 25 km — a 50 km chip would '
+            'silently land on 25 and lie about what it did.',
+      );
     });
   });
 }

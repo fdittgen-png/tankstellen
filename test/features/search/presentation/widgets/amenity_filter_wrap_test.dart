@@ -25,11 +25,34 @@ void main() {
       );
     }
 
-    testWidgets('renders one FilterChip per amenity value', (tester) async {
+    testWidgets('#3927 — collapsed shows the first rows plus a Show more '
+        'chip, expanded shows every amenity', (tester) async {
       await pumpWrap(tester, selected: const {}, onToggle: (_) {});
+      final hidden =
+          StationAmenity.values.length - AmenityFilterWrap.collapsedCount;
+      expect(
+        find.byType(FilterChip),
+        findsNWidgets(AmenityFilterWrap.collapsedCount),
+      );
+      expect(find.text('Show more ($hidden)'), findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey('criteria-amenity-show-more')));
+      await tester.pumpAndSettle();
+
       expect(
         find.byType(FilterChip),
         findsNWidgets(StationAmenity.values.length),
+      );
+      expect(find.text('Show less'), findsOneWidget);
+    });
+
+    testWidgets('#3927 — a selected amenity past the collapse cut stays '
+        'visible without expanding', (tester) async {
+      final last = StationAmenity.values.last;
+      await pumpWrap(tester, selected: {last}, onToggle: (_) {});
+      expect(
+        find.byKey(ValueKey('criteria-amenity-${last.name}')),
+        findsOneWidget,
       );
     });
 
@@ -56,6 +79,8 @@ void main() {
 
     testWidgets('every chip carries a stable ValueKey', (tester) async {
       await pumpWrap(tester, selected: const {}, onToggle: (_) {});
+      await tester.tap(find.byKey(const ValueKey('criteria-amenity-show-more')));
+      await tester.pumpAndSettle();
       for (final amenity in StationAmenity.values) {
         expect(
           find.byKey(ValueKey('criteria-amenity-${amenity.name}')),

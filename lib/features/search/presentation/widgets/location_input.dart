@@ -127,8 +127,14 @@ class LocationInputWidgetState extends ConsumerState<LocationInput> {
     }
   }
 
+  /// #3927 — the GPS branch used to repeat `Icons.my_location`, so the
+  /// field showed the same locate glyph twice: once as a passive prefix
+  /// and once as the actionable suffix button. The prefix now reports
+  /// what the field CONTAINS (nothing typed yet → a plain search glyph,
+  /// digits → a postcode pin, text → a city), and the single locate icon
+  /// on the field is the one you can tap.
   IconData _prefixIcon(LocationInputType type) => switch (type) {
-    LocationInputType.gps => Icons.my_location,
+    LocationInputType.gps => Icons.search,
     LocationInputType.zip => Icons.pin_drop,
     LocationInputType.city => Icons.location_city,
   };

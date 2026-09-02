@@ -132,6 +132,23 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
     ref.read(routeInputControllerProvider.notifier).removeStop(index);
   }
 
+  /// #3927 — exchange start and destination, text and resolved
+  /// coordinates together. "Same trip, other way round" was previously a
+  /// full re-type of both fields. Text is written before the coordinates
+  /// so the fields' own `onTextChanged` (a `TextField.onChanged`, which
+  /// a programmatic controller write never fires) cannot null out the
+  /// coordinates we just swapped in.
+  void _swapEndpoints() {
+    final state = ref.read(routeInputControllerProvider);
+    final notifier = ref.read(routeInputControllerProvider.notifier);
+    final startText = _startController.text;
+    final startCoords = state.startCoords;
+    _startController.text = _endController.text;
+    _endController.text = startText;
+    notifier.setStartCoords(state.endCoords);
+    notifier.setEndCoords(startCoords);
+  }
+
   void _onStartCitySelected(ResolvedLocation city) {
     _startController.text = city.name;
     ref
@@ -294,7 +311,18 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
               .read(routeInputControllerProvider.notifier)
               .setStartCoords(null),
         ),
-        const SizedBox(height: 6),
+        // #3927 — swap start ⇄ destination, right-aligned between the two
+        // endpoint fields so it reads as acting on both.
+        Align(
+          alignment: Alignment.centerRight,
+          child: IconButton(
+            key: const ValueKey('route-swap-endpoints'),
+            icon: const Icon(Icons.swap_vert, size: 20),
+            tooltip: l10n.criteriaSwapEndpoints,
+            visualDensity: VisualDensity.compact,
+            onPressed: _swapEndpoints,
+          ),
+        ),
 
         // Optional stops with autocomplete
         for (var i = 0; i < _stopControllers.length; i++)
