@@ -2,36 +2,32 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/widgets/page_scaffold.dart';
-import '../../../trips/api.dart';
-import '../../data/reference_vehicle_catalog_provider.dart';
-import '../../data/vehicle_profile_catalog_matcher.dart';
-import '../../domain/entities/reference_vehicle.dart';
-import '../../providers/vehicle_providers.dart';
-import 'auto_record_section.dart';
-import 'calibration_section.dart';
-import 'obd2_capability_section.dart';
+import '../screens/topics/vehicle_edit_topic.dart';
 import 'vehicle_drivetrain_section.dart';
-import 'vehicle_extras_section.dart';
 import 'vehicle_form_controllers.dart';
 import 'vehicle_header.dart';
 import 'vehicle_identity_section.dart';
-import 'vehicle_save_actions.dart';
 import 'vehicle_save_bar.dart';
+import 'vehicle_topic_tiles.dart';
 
 /// #3234 — the `EditVehicleScreen` form body (the `PageScaffold` + the scrolling
 /// stack of section cards) extracted out of `_EditVehicleScreenState.build` as
-/// a stateless [ConsumerWidget]. It owns no state: the screen passes the live
-/// form values + pre-built callbacks (the `setState` closures are created in
-/// the State), so this is a pure view. The screen keeps only the load/dispose
+/// a stateless widget. It owns no state: the screen passes the live form
+/// values + pre-built callbacks (the `setState` closures are created in the
+/// State), so this is a pure view. The screen keeps only the load/dispose
 /// lifecycle, the `ref.listen` prepop-refill, the discard `PopScope`, and the
 /// imperative actions (in the `_VehicleEditActions` part mixin).
-class VehicleEditForm extends ConsumerWidget {
+///
+/// #3900 — a topic tree, not one long page: identity & engine stay inline;
+/// everything a saved vehicle grows (OBD2 adapter, calibration, service
+/// reminders, auto-record) is a tappable [VehicleTopicTiles] row opening its
+/// own sub-screen. The pinned Save stays here on the top level.
+class VehicleEditForm extends StatelessWidget {
   const VehicleEditForm({
     super.key,
     required this.formKey,
@@ -55,20 +51,9 @@ class VehicleEditForm extends ConsumerWidget {
     required this.numberValidator,
     required this.existingId,
     required this.adapterName,
-    required this.onAdapterPaired,
-    required this.onAdapterForget,
-    required this.onResetVolumetricEfficiency,
-    required this.onResetFromCatalog,
-    required this.obd2CardKey,
-    required this.obd2HighlightAnimation,
-    required this.onScrollToObd2Card,
+    required this.onOpenTopic,
     required this.onOpenCatalogPicker,
     required this.onSave,
-    required this.onDisplacementChanged,
-    required this.onVolumetricEfficiencyChanged,
-    required this.onAfrChanged,
-    required this.onFuelDensityChanged,
-    required this.onResetLearner,
   });
 
   final GlobalKey<FormState> formKey;
@@ -92,26 +77,14 @@ class VehicleEditForm extends ConsumerWidget {
   final String? Function(String?) numberValidator;
   final String? existingId;
   final String? adapterName;
-  final void Function(String? name, String? mac) onAdapterPaired;
-  final VoidCallback onAdapterForget;
-  final VoidCallback onResetVolumetricEfficiency;
 
-  /// #3651 — re-initialize the catalog-backed spec fields from the
-  /// reference vehicle database (confirm dialog owned by the screen).
-  final VoidCallback onResetFromCatalog;
-  final GlobalKey obd2CardKey;
-  final Animation<double>? obd2HighlightAnimation;
-  final Future<void> Function() onScrollToObd2Card;
+  /// #3900 — opens the topic sub-screen for a saved vehicle.
+  final ValueChanged<VehicleEditTopic> onOpenTopic;
   final VoidCallback onOpenCatalogPicker;
   final VoidCallback onSave;
-  final ValueChanged<double?> onDisplacementChanged;
-  final ValueChanged<double?> onVolumetricEfficiencyChanged;
-  final ValueChanged<double?> onAfrChanged;
-  final ValueChanged<double?> onFuelDensityChanged;
-  final VoidCallback onResetLearner;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     return PageScaffold(
       title: isEdit ? (l.vehicleEditTitle) : (l.vehicleAddTitle),
@@ -190,86 +163,17 @@ class VehicleEditForm extends ConsumerWidget {
               onFuelTypeChanged: onFuelTypeChanged,
               numberValidator: numberValidator,
             ),
-            // Extras for saved vehicles — adapter, baselines, VE reset, service
-            // reminders. All need a stable id. Spread a List<Widget> (not a
-            // Column) so scrollUntilVisible still works on the rows below the
-            // fold (see feedback_ci_column_in_listview.md).
+            // #3900 — topics for a saved vehicle: adapter, calibration,
+            // reminders, auto-record. Each opens its own sub-screen; all
+            // need a stable id, so the Add flow shows none.
             if (existingId != null) ...[
-              ...VehicleExtrasSection.build(
-                context: context,
+              const SizedBox(height: 16),
+              VehicleTopicTiles(
                 vehicleId: existingId!,
-                adapterMac: adapterMac,
                 adapterName: adapterName,
-                onAdapterPaired: onAdapterPaired,
-                onAdapterForget: onAdapterForget,
-                onResetVolumetricEfficiency: onResetVolumetricEfficiency,
-                onResetFromCatalog: onResetFromCatalog,
-                currentOdometerKm: ref.latestOdometerKm(existingId!),
-                obd2CardKey: obd2CardKey,
-                obd2HighlightAnimation: obd2HighlightAnimation,
+                adapterMac: adapterMac,
+                onOpenTopic: onOpenTopic,
               ),
-              // Hands-free auto-record settings (#1004 phase 6 / #1400).
-              const SizedBox(height: 16),
-              AutoRecordSection(
-                vehicleId: existingId!,
-                onScrollToObd2Card: onScrollToObd2Card,
-              ),
-              // #1401 phase 6 — adapter capability tier card (collapses to
-              // SizedBox.shrink when no adapter is connected).
-              const SizedBox(height: 16),
-              const Obd2CapabilitySection(),
-              // #1622 — broken-MAP + adapter-blocklist diagnostics (collapses
-              // when there's nothing to show).
-              const SizedBox(height: 16),
-              BrokenMapDiagnosticsCard(vehicleId: existingId),
-              const SizedBox(height: 16),
-              // #1397 — collapsed-by-default override tile for the four physics
-              // constants the OBD2 estimator uses. Each row labels its source.
-              Builder(builder: (context) {
-                final profile = ref
-                    .watch(vehicleProfileListProvider)
-                    .where((v) => v.id == existingId)
-                    .firstOrNull;
-                if (profile == null) return const SizedBox.shrink();
-                // #1422 phase 2 — resolve the matching ReferenceVehicle (by slug,
-                // else via the matcher) for the η_v origin tag. Catalog provider
-                // is keep-alive, so this watch is cheap.
-                final catalog =
-                    ref.watch(referenceVehicleCatalogProvider).value ??
-                        const <ReferenceVehicle>[];
-                ReferenceVehicle? referenceVehicle;
-                if (profile.referenceVehicleId != null) {
-                  for (final entry in catalog) {
-                    if (VehicleProfileCatalogMatcher.slugFor(entry) ==
-                        profile.referenceVehicleId) {
-                      referenceVehicle = entry;
-                      break;
-                    }
-                  }
-                }
-                referenceVehicle ??= VehicleProfileCatalogMatcher.bestMatch(
-                  profile: profile,
-                  catalog: catalog,
-                );
-                // #2837 — when this vehicle reports fuel rate directly (PID 5E /
-                // MAF), the η_v calibration is irrelevant; de-emphasise it.
-                final directFuelRate = vehicleReportsDirectFuelRate(
-                  // #3613 — the detector reads vehicleId + summary only.
-                  ref.watch(tripHistoryRepositoryProvider)?.loadSummaries() ??
-                      const [],
-                  vehicleId: profile.id,
-                );
-                return CalibrationSection(
-                  profile: profile,
-                  referenceVehicle: referenceVehicle,
-                  directFuelRateSupported: directFuelRate,
-                  onDisplacementChanged: onDisplacementChanged,
-                  onVolumetricEfficiencyChanged: onVolumetricEfficiencyChanged,
-                  onAfrChanged: onAfrChanged,
-                  onFuelDensityChanged: onFuelDensityChanged,
-                  onResetLearner: onResetLearner,
-                );
-              }),
             ],
           ],
         ),

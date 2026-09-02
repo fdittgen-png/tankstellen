@@ -940,7 +940,6 @@
   "autoRecordBackgroundLocationOpenSettings": "Atvērt iestatījumus",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Nepieciešama atrašanās vietas atļauja",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Nevarēja pieprasīt fona atrašanās vietu",
-  "autoRecordPairAdapterLinkText": "Savienojiet adapteru zemāk esošajā sadaļā, lai iespējotu automātisko ierakstīšanu",
   "exportBackupReady": "Rezerves kopija gatava — izvēlieties galamērķi",
   "exportBackupFailed": "Rezerves kopijas eksports neizdevās — lūdzu, mēģiniet vēlreiz",
   "brokenMapChipDisclaimer": "MAP rādījumi ir aizdomīgi",

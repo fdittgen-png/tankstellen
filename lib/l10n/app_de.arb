@@ -1526,7 +1526,6 @@
   "@aclWakeNotificationBody": {
     "description": "#3756 native wake notification body."
   },
-  "autoRecordPairAdapterLinkText": "Adapter im Abschnitt unten koppeln, um automatisches Aufzeichnen zu aktivieren",
   "exportBackupReady": "Sicherung bereit – Ziel auswählen",
   "exportBackupFailed": "Sicherungsexport fehlgeschlagen – bitte erneut versuchen",
   "backupExportProgress": "Sicherung wird exportiert…",

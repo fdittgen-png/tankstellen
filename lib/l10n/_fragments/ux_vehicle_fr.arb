@@ -1,0 +1,36 @@
+{
+  "vehicleTopicAdapterNone": "Aucun",
+  "vehicleTopicCalibrationTitle": "Calibrage",
+  "vehicleTopicAdvancedBadge": "Avancé",
+  "vehicleTopicCalibrationStatus": "Baseline {coverage} % · {mode}",
+  "@vehicleTopicCalibrationStatus": {
+    "placeholders": {
+      "coverage": {"type": "int", "example": "78"},
+      "mode": {"type": "String", "example": "Basé sur les règles"}
+    }
+  },
+  "vehicleTopicRemindersCount": "{count, plural, =0{Aucun rappel} =1{1 rappel} other{{count} rappels}}",
+  "@vehicleTopicRemindersCount": {
+    "placeholders": {
+      "count": {"type": "int", "example": "2"}
+    }
+  },
+  "vehicleTopicAutoRecordOn": "Activé",
+  "vehicleTopicAutoRecordOff": "Désactivé",
+  "vehicleTopicAutoRecordPairLinkText": "Associez un adaptateur dans « Adaptateur OBD2 » pour activer l’enregistrement automatique",
+  "vehicleBaselineCoverageSamples": "{covered} / {max} échantillons",
+  "@vehicleBaselineCoverageSamples": {
+    "placeholders": {
+      "covered": {"type": "int", "example": "210"},
+      "max": {"type": "int", "example": "270"}
+    }
+  },
+  "vehicleBaselineRawSamples": "{count, plural, =1{1 échantillon} other{{count} échantillons}}",
+  "@vehicleBaselineRawSamples": {
+    "placeholders": {
+      "count": {"type": "int", "example": "954"}
+    }
+  },
+  "calibrationModeRuleDescription": "Classe chaque relevé de conduite dans une seule situation selon des seuils fixes de vitesse et de charge.",
+  "calibrationModeFuzzyDescription": "Répartit chaque relevé entre les situations voisines selon son degré d’appartenance — des estimations plus lisses aux frontières."
+}

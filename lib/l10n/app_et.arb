@@ -940,7 +940,6 @@
   "autoRecordBackgroundLocationOpenSettings": "Ava seaded",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Asukohaluba vajalik",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Taustaasukoha taotlemine ebaõnnestus",
-  "autoRecordPairAdapterLinkText": "Ühenda adapter allolevas jaotises automaatsalvestamise lubamiseks",
   "exportBackupReady": "Varukoopia valmis — vali sihtkoht",
   "exportBackupFailed": "Varukoopia eksportimine ebaõnnestus — palun proovi uuesti",
   "brokenMapChipDisclaimer": "MAP-näidud kahtlased",

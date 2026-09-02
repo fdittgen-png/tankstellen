@@ -940,7 +940,6 @@
   "autoRecordBackgroundLocationOpenSettings": "Öppna inställningar",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Platsbehörighet krävs",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Kunde inte begära bakgrundsplats",
-  "autoRecordPairAdapterLinkText": "Para ihop en adapter i avsnittet nedan för att aktivera autoinspelning",
   "exportBackupReady": "Säkerhetskopia klar – välj ett mål",
   "exportBackupFailed": "Export av säkerhetskopia misslyckades – försök igen",
   "brokenMapChipDisclaimer": "MAP-avläsningar misstänkta",

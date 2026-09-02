@@ -940,7 +940,6 @@
   "autoRecordBackgroundLocationOpenSettings": "Άνοιγμα ρυθμίσεων",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Απαιτείται άδεια τοποθεσίας",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Αδύνατη αίτηση τοποθεσίας παρασκηνίου",
-  "autoRecordPairAdapterLinkText": "Συζεύξτε έναν προσαρμογέα στην παρακάτω ενότητα για ενεργοποίηση αυτόματης καταγραφής",
   "exportBackupReady": "Αντίγραφο ασφαλείας έτοιμο — επιλέξτε προορισμό",
   "exportBackupFailed": "Αποτυχία εξαγωγής αντιγράφου — παρακαλώ δοκιμάστε ξανά",
   "brokenMapChipDisclaimer": "Ύποπτες ενδείξεις MAP",

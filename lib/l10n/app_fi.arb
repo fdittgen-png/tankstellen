@@ -940,7 +940,6 @@
   "autoRecordBackgroundLocationOpenSettings": "Avaa asetukset",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Sijaintilupa vaaditaan",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Taustasijainnin pyytäminen epäonnistui",
-  "autoRecordPairAdapterLinkText": "Paritetaan sovitin alla olevassa osiossa automaattisen tallennuksen ottamiseksi käyttöön",
   "exportBackupReady": "Varmuuskopio valmis — valitse kohde",
   "exportBackupFailed": "Varmuuskopion vienti epäonnistui — yritä uudelleen",
   "brokenMapChipDisclaimer": "MAP-lukema epäilyttävä",

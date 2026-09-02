@@ -1,0 +1,36 @@
+{
+  "vehicleTopicAdapterNone": "Keiner",
+  "vehicleTopicCalibrationTitle": "Kalibrierung",
+  "vehicleTopicAdvancedBadge": "Erweitert",
+  "vehicleTopicCalibrationStatus": "Basislinie {coverage} % · {mode}",
+  "@vehicleTopicCalibrationStatus": {
+    "placeholders": {
+      "coverage": {"type": "int", "example": "78"},
+      "mode": {"type": "String", "example": "Regelbasiert"}
+    }
+  },
+  "vehicleTopicRemindersCount": "{count, plural, =0{Keine Erinnerungen} =1{1 Erinnerung} other{{count} Erinnerungen}}",
+  "@vehicleTopicRemindersCount": {
+    "placeholders": {
+      "count": {"type": "int", "example": "2"}
+    }
+  },
+  "vehicleTopicAutoRecordOn": "Ein",
+  "vehicleTopicAutoRecordOff": "Aus",
+  "vehicleTopicAutoRecordPairLinkText": "Koppeln Sie unter „OBD2-Adapter“ einen Adapter, um die automatische Aufzeichnung zu aktivieren",
+  "vehicleBaselineCoverageSamples": "{covered} / {max} Stichproben",
+  "@vehicleBaselineCoverageSamples": {
+    "placeholders": {
+      "covered": {"type": "int", "example": "210"},
+      "max": {"type": "int", "example": "270"}
+    }
+  },
+  "vehicleBaselineRawSamples": "{count, plural, =1{1 Stichprobe} other{{count} Stichproben}}",
+  "@vehicleBaselineRawSamples": {
+    "placeholders": {
+      "count": {"type": "int", "example": "954"}
+    }
+  },
+  "calibrationModeRuleDescription": "Ordnet jede Fahrprobe anhand fester Geschwindigkeits- und Lastschwellen genau einer Situation zu.",
+  "calibrationModeFuzzyDescription": "Verteilt jede Probe nach Passung auf benachbarte Situationen – gleichmäßigere Schätzungen an den Übergängen."
+}

@@ -940,7 +940,6 @@
   "autoRecordBackgroundLocationOpenSettings": "Otwórz ustawienia",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Wymagane uprawnienie do lokalizacji",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Nie można było poprosić o lokalizację w tle",
-  "autoRecordPairAdapterLinkText": "Sparuj adapter w sekcji poniżej, aby włączyć automatyczne nagrywanie",
   "exportBackupReady": "Kopia zapasowa gotowa — wybierz lokalizację",
   "exportBackupFailed": "Eksport kopii zapasowej nie powiódł się — spróbuj ponownie",
   "brokenMapChipDisclaimer": "Podejrzane odczyty MAP",

@@ -940,7 +940,6 @@
   "autoRecordBackgroundLocationOpenSettings": "Beállítások megnyitása",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Helyadat-engedély szükséges",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Nem sikerült háttéres helyadatot kérni",
-  "autoRecordPairAdapterLinkText": "Párosítson adaptert az alábbi szakaszban az automatikus rögzítés engedélyezéséhez",
   "exportBackupReady": "Biztonsági mentés kész — válasszon célmappát",
   "exportBackupFailed": "A biztonsági mentés exportálása sikertelen — kérjük, próbálja újra",
   "brokenMapChipDisclaimer": "MAP-leolvasások gyanúsak",

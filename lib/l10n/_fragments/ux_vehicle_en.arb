@@ -1,0 +1,64 @@
+{
+  "vehicleTopicAdapterNone": "None",
+  "@vehicleTopicAdapterNone": {
+    "description": "Status line of the 'OBD2 adapter' topic tile on the Edit-vehicle screen when no adapter is paired (#3900)."
+  },
+  "vehicleTopicCalibrationTitle": "Calibration",
+  "@vehicleTopicCalibrationTitle": {
+    "description": "Title of the Calibration topic tile + sub-screen on the Edit-vehicle screen (baseline coverage, calibration mode, advanced overrides, resets) (#3900)."
+  },
+  "vehicleTopicAdvancedBadge": "Advanced",
+  "@vehicleTopicAdvancedBadge": {
+    "description": "Small outlined badge on the Calibration topic tile marking it as an advanced topic (#3900)."
+  },
+  "vehicleTopicCalibrationStatus": "Baseline {coverage} % · {mode}",
+  "@vehicleTopicCalibrationStatus": {
+    "description": "Status line of the Calibration topic tile: baseline coverage percent and the active calibration mode name (#3900).",
+    "placeholders": {
+      "coverage": {"type": "int", "example": "78"},
+      "mode": {"type": "String", "example": "Rule-based"}
+    }
+  },
+  "vehicleTopicRemindersCount": "{count, plural, =0{No reminders} =1{1 reminder} other{{count} reminders}}",
+  "@vehicleTopicRemindersCount": {
+    "description": "Status line of the Service reminders topic tile — number of reminders on this vehicle (#3900).",
+    "placeholders": {
+      "count": {"type": "int", "example": "2"}
+    }
+  },
+  "vehicleTopicAutoRecordOn": "On",
+  "@vehicleTopicAutoRecordOn": {
+    "description": "Status line of the Auto-record topic tile when hands-free auto-record is enabled for this vehicle (#3900)."
+  },
+  "vehicleTopicAutoRecordOff": "Off",
+  "@vehicleTopicAutoRecordOff": {
+    "description": "Status line of the Auto-record topic tile when auto-record is disabled for this vehicle (#3900)."
+  },
+  "vehicleTopicAutoRecordPairLinkText": "Pair an adapter under “OBD2 adapter” to enable auto-recording",
+  "@vehicleTopicAutoRecordPairLinkText": {
+    "description": "Passive link on the auto-record card (#1400) pointing the user at the OBD2 adapter topic screen, the one place an adapter is paired (#3900)."
+  },
+  "vehicleBaselineCoverageSamples": "{covered} / {max} samples",
+  "@vehicleBaselineCoverageSamples": {
+    "description": "Tally under the aggregate baseline coverage bar: capped covered samples out of the maximum (9 situations × 30) (#3900).",
+    "placeholders": {
+      "covered": {"type": "int", "example": "210"},
+      "max": {"type": "int", "example": "270"}
+    }
+  },
+  "vehicleBaselineRawSamples": "{count, plural, =1{1 sample} other{{count} samples}}",
+  "@vehicleBaselineRawSamples": {
+    "description": "Secondary text under a per-situation baseline row showing the raw (uncapped) sample count once it exceeds the target (#3900).",
+    "placeholders": {
+      "count": {"type": "int", "example": "954"}
+    }
+  },
+  "calibrationModeRuleDescription": "Sorts each driving sample into one situation using fixed speed and load thresholds.",
+  "@calibrationModeRuleDescription": {
+    "description": "One-line plain-language description under the Rule-based calibration mode option on the Edit-vehicle Calibration topic (#3900)."
+  },
+  "calibrationModeFuzzyDescription": "Splits each sample across neighbouring situations by how well it fits each one — smoother estimates around the boundaries.",
+  "@calibrationModeFuzzyDescription": {
+    "description": "One-line plain-language description under the Fuzzy calibration mode option on the Edit-vehicle Calibration topic (#3900)."
+  }
+}

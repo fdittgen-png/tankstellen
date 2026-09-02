@@ -29,9 +29,15 @@ import '../widgets/vehicle_save_actions.dart';
 import '../widgets/vin_confirm_dialog.dart';
 import '../widgets/vin_info_sheet.dart';
 import '../../../../core/logging/error_logger.dart';
+import 'topics/vehicle_adapter_topic_screen.dart';
+import 'topics/vehicle_auto_record_topic_screen.dart';
+import 'topics/vehicle_calibration_topic_screen.dart';
+import 'topics/vehicle_edit_topic.dart';
+import 'topics/vehicle_service_reminders_topic_screen.dart';
 
 part 'edit_vehicle_screen_actions.dart';
 part 'edit_vehicle_screen_catalog_reset.dart';
+part 'edit_vehicle_screen_topics.dart';
 
 /// Sentinel for the four "leave alone" arguments on
 /// [_VehicleEditActions._saveCalibrationOverride] — `null` is a
@@ -52,48 +58,28 @@ class EditVehicleScreen extends ConsumerStatefulWidget {
 }
 
 class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
-    with
-        SingleTickerProviderStateMixin,
-        _VehicleEditActions,
-        _VehicleCatalogResetAction {
+    with _VehicleEditActions, _VehicleCatalogResetAction, _VehicleEditTopics {
   @override
   final _formKey = GlobalKey<FormState>();
   @override
   final _ctrl = VehicleFormControllers();
 
-  // #1400 — anchors the OBD2 adapter card in the scrollable so the
-  // passive "Pair an adapter in the section below" link on the
-  // auto-record card can `Scrollable.ensureVisible` to it.
-  final GlobalKey _obd2CardKey = GlobalKey();
-
-  // #1400 — scroll controller for the host `ListView`. Owned here
-  // (instead of relying on the implicit primary controller) so the
-  // auto-record link's tap handler can fall back to an `animateTo(0)`
-  // when the OBD2 card has been virtualised out of the tree by
-  // ListView's lazy build, then run `Scrollable.ensureVisible` once
-  // the card remounts.
+  // Scroll controller for the host `ListView` — owned here so the form
+  // stays a pure view of the State.
   final ScrollController _scrollController = ScrollController();
-
-  // #1400 — drives a brief amber border pulse on the OBD2 card after
-  // the user taps the auto-record link. forward → reverse runs
-  // 1 s end-to-end (500 ms each way).
-  late final AnimationController _obd2HighlightController;
 
   // #3234 — the mutable form state (_type / _connectors / _adapterMac / the
   // VIN-decode + engine scalars / the busy flags / the picked catalog row) and
   // the imperative actions that read+write it now live in the `_VehicleEditActions`
   // part mixin; `build` + the load path below reference them as inherited
-  // members, unchanged.
+  // members, unchanged. #3900 — the topic sub-screens (adapter, calibration,
+  // reminders, auto-record) are opened by the `_VehicleEditTopics` part mixin.
 
   @override
   void initState() {
     super.initState();
     // Rebuild on every name keystroke so the header title tracks input.
     _ctrl.nameController.addListener(_refresh);
-    _obd2HighlightController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
     if (widget.vehicleId != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _loadExisting());
     } else {
@@ -146,64 +132,8 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
   void dispose() {
     _ctrl.nameController.removeListener(_refresh);
     _ctrl.dispose();
-    _obd2HighlightController.dispose();
     _scrollController.dispose();
     super.dispose();
-  }
-
-  /// Scrolls the host `ListView` so the OBD2 adapter card is visible
-  /// near the top of the viewport and pulses an amber border around
-  /// it for ~1 s (#1400). Wired to the passive "Pair an adapter in
-  /// the section below" link on the auto-record card so users have a
-  /// single canonical place to pair an adapter — this method just
-  /// surfaces it.
-  ///
-  /// Two-stage scroll: ListView lazily builds children, so when the
-  /// user has scrolled the auto-record link into view the OBD2 card
-  /// (which lives ABOVE) may have already been virtualised out of
-  /// the tree. In that case `_obd2CardKey.currentContext` is null
-  /// and `Scrollable.ensureVisible` cannot fire. We `animateTo(0)`
-  /// first to pull the OBD2 card back into the tree, then run
-  /// `ensureVisible` so the card lands near the top of the viewport
-  /// regardless of small layout shifts above (header / identity /
-  /// drivetrain cards).
-  ///
-  /// Safe no-op if the OBD2 card isn't in the tree even after the
-  /// pull-back (e.g. brand-new vehicle that hasn't been saved yet —
-  /// the extras section is gated on `_existingId != null`).
-  Future<void> _scrollToAndHighlightObd2Card() async {
-    // Stage 1 — pull the OBD2 card back into the tree. Cheap no-op
-    // when the controller has no clients (e.g. isolated widget
-    // pumps that don't mount a Scrollable) or when offset is
-    // already near zero.
-    if (_scrollController.hasClients && _scrollController.offset > 0) {
-      await _scrollController.animateTo(
-        0,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-      if (!mounted) return;
-    }
-    // Stage 2 — once the card is in the tree, ensure it lands at
-    // alignment 0.1 (near the top, with a small breathing-room
-    // strip above so the user can see we scrolled). The
-    // `currentContext` lookup happens AFTER the previous await so
-    // we always pick up the freshly-mounted element.
-    final ctx = _obd2CardKey.currentContext;
-    if (ctx == null || !ctx.mounted) return;
-    await Scrollable.ensureVisible(
-      ctx,
-      duration: const Duration(milliseconds: 400),
-      alignment: 0.1,
-    );
-    if (!mounted) return;
-    // Run the highlight controller once forward → reverse so the
-    // border fades in over 500 ms then back out over 500 ms (1 s
-    // total). Awaiting forward then reverse keeps the controller
-    // sequence deterministic for tests.
-    await _obd2HighlightController.forward(from: 0.0);
-    if (!mounted) return;
-    await _obd2HighlightController.reverse();
   }
 
   /// Brand-accent colour from the vehicle name. Falls back to the
@@ -283,23 +213,9 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
         numberValidator: _validateOptionalNumber,
         existingId: _existingId,
         adapterName: _adapterName,
-        onAdapterPaired: _onAdapterChanged,
-        onAdapterForget: () => _onAdapterChanged(null, null),
-        onResetVolumetricEfficiency: _resetVolumetricEfficiency,
-        onResetFromCatalog: _resetFromCatalog,
-        obd2CardKey: _obd2CardKey,
-        obd2HighlightAnimation: _obd2HighlightController,
-        onScrollToObd2Card: _scrollToAndHighlightObd2Card,
+        onOpenTopic: _openTopic,
         onOpenCatalogPicker: _openCatalogPicker,
         onSave: _save,
-        onDisplacementChanged: (v) =>
-            _saveCalibrationOverride(manualEngineDisplacementCcOverride: v),
-        onVolumetricEfficiencyChanged: (v) =>
-            _saveCalibrationOverride(manualVolumetricEfficiencyOverride: v),
-        onAfrChanged: (v) => _saveCalibrationOverride(manualAfrOverride: v),
-        onFuelDensityChanged: (v) =>
-            _saveCalibrationOverride(manualFuelDensityGPerLOverride: v),
-        onResetLearner: _resetVolumetricEfficiency,
       ),
     );
   }

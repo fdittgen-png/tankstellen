@@ -940,7 +940,6 @@
   "autoRecordBackgroundLocationOpenSettings": "Abrir definições",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Permissão de localização necessária",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Não foi possível solicitar localização em segundo plano",
-  "autoRecordPairAdapterLinkText": "Emparelhe um adaptador na secção abaixo para ativar a gravação automática",
   "exportBackupReady": "Cópia de segurança pronta — escolha um destino",
   "exportBackupFailed": "Falha na exportação da cópia de segurança — tente novamente",
   "brokenMapChipDisclaimer": "Leituras MAP suspeitas",

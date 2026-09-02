@@ -940,7 +940,6 @@
   "autoRecordBackgroundLocationOpenSettings": "Отвори настройки",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Необходимо е разрешение за местоположение",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Не може да се поиска фоново местоположение",
-  "autoRecordPairAdapterLinkText": "Сдвоете адаптер в секцията по-долу, за да активирате автоматичния запис",
   "exportBackupReady": "Резервното копие е готово — изберете дестинация",
   "exportBackupFailed": "Неуспешен експорт на резервно копие — моля, опитайте отново",
   "brokenMapChipDisclaimer": "Подозрителни MAP показания",

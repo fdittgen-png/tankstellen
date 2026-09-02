@@ -557,7 +557,7 @@ class _PairAdapterLink extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  l.autoRecordPairAdapterLinkText,
+                  l.vehicleTopicAutoRecordPairLinkText,
                   style: theme.textTheme.bodySmall,
                 ),
               ),

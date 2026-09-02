@@ -110,9 +110,52 @@ class VehicleCalibrationModeSelector extends ConsumerWidget {
                     .requestReplay(vehicleId);
               },
             ),
+            // #3900 — one plain-language line per mode, so "Rule-based"
+            // vs "Fuzzy" is a choice the user can make without opening
+            // the tooltip. Rule = winner-take-all single bucket via fixed
+            // thresholds; fuzzy = one weighted vote per neighbouring
+            // bucket (trip_baseline_recorder → fuzzy_classifier).
+            const SizedBox(height: 12),
+            _ModeDescription(
+              icon: Icons.rule,
+              body: l.calibrationModeRuleDescription,
+            ),
+            const SizedBox(height: 6),
+            _ModeDescription(
+              icon: Icons.blur_circular,
+              body: l.calibrationModeFuzzyDescription,
+            ),
           ],
         ),
       ),
+    );
+  }
+}
+
+/// One "what this mode does" line under the segmented control (#3900),
+/// led by the same glyph as its segment so the pairing reads at a glance.
+class _ModeDescription extends StatelessWidget {
+  final IconData icon;
+  final String body;
+
+  const _ModeDescription({required this.icon, required this.body});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final muted = theme.colorScheme.onSurfaceVariant;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 16, color: muted),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            body,
+            style: theme.textTheme.bodySmall?.copyWith(color: muted),
+          ),
+        ),
+      ],
     );
   }
 }

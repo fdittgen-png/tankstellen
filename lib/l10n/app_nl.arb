@@ -940,7 +940,6 @@
   "autoRecordBackgroundLocationOpenSettings": "Instellingen openen",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Locatietoestemming vereist",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Achtergrondlocatie kon niet worden aangevraagd",
-  "autoRecordPairAdapterLinkText": "Koppel een adapter in de onderstaande sectie om automatisch opnemen in te schakelen",
   "exportBackupReady": "Back-up klaar — kies een bestemming",
   "exportBackupFailed": "Back-up exporteren mislukt — probeer het opnieuw",
   "brokenMapChipDisclaimer": "MAP-meetwaarden verdacht",

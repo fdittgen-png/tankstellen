@@ -940,7 +940,6 @@
   "autoRecordBackgroundLocationOpenSettings": "Odpri nastavitve",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Potrebno je dovoljenje za lokacijo",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Zahtevanje lokacije v ozadju ni uspelo",
-  "autoRecordPairAdapterLinkText": "Sparajte adapter v spodnjem razdelku za omogočanje samodejnega snemanja",
   "exportBackupReady": "Varnostna kopija pripravljena — izberite cilj",
   "exportBackupFailed": "Izvoz varnostne kopije ni uspel — poskusite znova",
   "brokenMapChipDisclaimer": "Odčitki MAP so sumljivi",

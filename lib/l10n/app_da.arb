@@ -940,7 +940,6 @@
   "autoRecordBackgroundLocationOpenSettings": "Åbn indstillinger",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Lokationstilladelse kræves",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Kunne ikke anmode om baggrundslokation",
-  "autoRecordPairAdapterLinkText": "Par en adapter i afsnittet nedenfor for at aktivere automatisk optagelse",
   "exportBackupReady": "Sikkerhedskopi klar — vælg en destination",
   "exportBackupFailed": "Eksport af sikkerhedskopi mislykkedes — prøv igen",
   "brokenMapChipDisclaimer": "MAP-aflæsninger mistænkelige",

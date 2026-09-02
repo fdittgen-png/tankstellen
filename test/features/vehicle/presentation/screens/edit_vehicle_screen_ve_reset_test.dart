@@ -58,11 +58,11 @@ void main() {
 
       await _pumpEditScreen(tester, repo: repo, vehicleId: 'v1');
 
-      // Scroll until the reset action is visible — it lives below
-      // the service-reminder and baseline sections.
+      // #3900 — the reset lives on the Calibration topic screen.
+      await _openCalibrationTopic(tester);
       await tester.dragUntilVisible(
         find.text('Reset volumetric efficiency'),
-        find.byType(ListView),
+        find.byType(ListView).last,
         const Offset(0, -200),
       );
       expect(find.text('Reset volumetric efficiency'), findsOneWidget);
@@ -78,9 +78,10 @@ void main() {
       ));
 
       await _pumpEditScreen(tester, repo: repo, vehicleId: 'v1');
+      await _openCalibrationTopic(tester);
       await tester.dragUntilVisible(
         find.text('Reset volumetric efficiency'),
-        find.byType(ListView),
+        find.byType(ListView).last,
         const Offset(0, -200),
       );
       await tester.tap(find.text('Reset volumetric efficiency'));
@@ -108,9 +109,10 @@ void main() {
         ));
 
         await _pumpEditScreen(tester, repo: repo, vehicleId: 'v1');
+        await _openCalibrationTopic(tester);
         await tester.dragUntilVisible(
           find.text('Reset volumetric efficiency'),
-          find.byType(ListView),
+          find.byType(ListView).last,
           const Offset(0, -200),
         );
         await tester.tap(find.text('Reset volumetric efficiency'));
@@ -132,6 +134,22 @@ void main() {
       },
     );
   });
+}
+
+/// #3900 — the calibration resets live on the Calibration topic screen.
+Future<void> _openCalibrationTopic(WidgetTester tester) async {
+  final tile = find.byKey(const Key('vehicleTopic_calibration'));
+  await tester.dragUntilVisible(
+    tile,
+    find.byType(ListView).first,
+    const Offset(0, -200),
+  );
+  // Fully into the viewport — a half-scrolled tile's centre can sit
+  // under the pinned Save bar.
+  await tester.ensureVisible(tile);
+  await tester.pumpAndSettle();
+  await tester.tap(tile);
+  await tester.pumpAndSettle();
 }
 
 Future<void> _pumpEditScreen(

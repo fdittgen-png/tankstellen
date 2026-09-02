@@ -940,7 +940,6 @@
   "autoRecordBackgroundLocationOpenSettings": "Otevřít nastavení",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Vyžadováno oprávnění k poloze",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Nepodařilo se požádat o polohu na pozadí",
-  "autoRecordPairAdapterLinkText": "Spárujte adaptér v sekci níže pro povolení automatického nahrávání",
   "exportBackupReady": "Záloha připravena — vyberte cíl",
   "exportBackupFailed": "Export zálohy selhal — zkuste to znovu",
   "brokenMapChipDisclaimer": "Odečty MAP jsou podezřelé",

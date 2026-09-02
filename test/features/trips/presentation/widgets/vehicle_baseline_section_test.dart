@@ -136,6 +136,11 @@ void main() {
       );
 
       expect(find.text('30/30'), findsOneWidget);
+      // #3900 — a full bucket carries a check; no secondary raw line
+      // when the raw count does not exceed the target.
+      expect(find.byIcon(Icons.check), findsOneWidget);
+      expect(find.text('30 samples'), findsNothing,
+          reason: 'no raw line when the count does not exceed the target');
 
       final bars = tester
           .widgetList<LinearProgressIndicator>(
@@ -159,9 +164,13 @@ void main() {
         ],
       );
 
-      // Raw count surfaces honestly — clamping is for the bar, not
-      // the readout.
-      expect(find.text('45/30'), findsOneWidget);
+      // #3900 — the readout is CAPPED (min(count, target)/target) with a
+      // check once full; the honest raw count is the secondary line.
+      // Never "45/30".
+      expect(find.text('45/30'), findsNothing);
+      expect(find.text('30/30'), findsOneWidget);
+      expect(find.text('45 samples'), findsOneWidget);
+      expect(find.byIcon(Icons.check), findsOneWidget);
 
       final bars = tester
           .widgetList<LinearProgressIndicator>(
@@ -476,6 +485,26 @@ void main() {
       );
       expect(warning.data, contains('Stop & go'));
       expect(warning.data, contains('Climbing / loaded'));
+      // #3900 — informational tone, not an error: info glyph on the
+      // neutral surface tint, no error container / warning glyph.
+      final note = find.byKey(const Key('vehicleBaselineMissingWarning'));
+      expect(
+        find.descendant(of: note, matching: find.byIcon(Icons.info_outline)),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: note,
+          matching: find.byIcon(Icons.warning_amber_rounded),
+        ),
+        findsNothing,
+      );
+      final box = tester.widget<Container>(note);
+      final scheme = Theme.of(tester.element(note)).colorScheme;
+      expect(
+        (box.decoration! as BoxDecoration).color,
+        scheme.surfaceContainerHighest,
+      );
     });
 
     testWidgets(

@@ -1,13 +1,71 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/error/guarded.dart';
+import '../../../../core/theme/app_radius.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/situation_classifier.dart';
 import '../../providers/vehicle_baseline_summary_provider.dart';
+
+part 'vehicle_baseline_section_parts.dart';
+
+/// The persisted driving situations the baseline learns — transients
+/// never accumulate. The three #2515 buckets (cold-start / sustained-
+/// load / partial-decel) are persistent, so they join the breakdown +
+/// the coverage bar.
+const List<DrivingSituation> kBaselineSituations = [
+  DrivingSituation.idle,
+  DrivingSituation.stopAndGo,
+  DrivingSituation.urbanCruise,
+  DrivingSituation.highwayCruise,
+  DrivingSituation.deceleration,
+  DrivingSituation.climbingOrLoaded,
+  DrivingSituation.coldStartWarmup,
+  DrivingSituation.sustainedLoadOrTowing,
+  DrivingSituation.partialThrottleDecel,
+];
+
+/// Sample count at which a situation is considered fully learned —
+/// mirrors `BaselineStore.fullConfidenceSamples`.
+const int kBaselineFullConfidenceSamples = 30;
+
+/// #2514 — baseline *coverage* in [0, 1]: Σ min(count, target) / (9 ×
+/// target). Caps each bucket at its target, so a single over-filled
+/// situation (urban 224k) can never mask two empty ones — the figure
+/// can NEVER read 100% while any persisted bucket is still 0/target.
+double baselineCoverageFraction(
+  Map<DrivingSituation, int> counts, {
+  int target = kBaselineFullConfidenceSamples,
+}) {
+  final maxTotal = kBaselineSituations.length * target;
+  if (maxTotal == 0) return 0;
+  final covered = kBaselineSituations.fold<int>(
+    0,
+    (acc, s) => acc + (counts[s] ?? 0).clamp(0, target),
+  );
+  return covered / maxTotal;
+}
+
+/// #3900 — the Edit-vehicle topic tile reads the coverage as a whole
+/// percent without importing the summary provider (which stays
+/// trips-internal). Guarded: an unwired provider reads as 0 %.
+extension VehicleBaselineCoverage on WidgetRef {
+  int baselineCoveragePercent(String vehicleId) => guard(
+        () => (baselineCoverageFraction(
+                  watch(vehicleBaselineSummaryProvider(vehicleId)),
+                ) *
+                100)
+            .round(),
+        where: 'VehicleBaselineCoverage: summary lookup failed',
+        fallback: 0,
+      );
+}
 
 /// "Baseline calibration" section on the vehicle edit screen (#779).
 ///
@@ -26,9 +84,14 @@ import '../../providers/vehicle_baseline_summary_provider.dart';
 /// #2514 — the aggregate bar tracks *coverage* (Σ min(count, target))
 /// rather than raw sample volume, so an over-filled bucket (urban
 /// 224k) can no longer drive it to 100% while Stop & go / Climbing
-/// sit at 0/30. When any persisted situation has zero samples a
-/// warning chip names the missing buckets and the per-situation
+/// sit at 0/30. When any persisted situation has zero samples an
+/// informational chip names the missing buckets and the per-situation
 /// breakdown auto-expands.
+///
+/// #3900 — a per-situation row reads `min(count, target)/target` with
+/// a check once full, and the raw count as secondary text ("954
+/// samples") — never "954/30". The not-yet-detected box is
+/// informational, not an error.
 class VehicleBaselineSection extends ConsumerStatefulWidget {
   final String vehicleId;
 
@@ -47,7 +110,7 @@ class VehicleBaselineSection extends ConsumerStatefulWidget {
   const VehicleBaselineSection({
     super.key,
     required this.vehicleId,
-    this.fullConfidenceSamples = 30,
+    this.fullConfidenceSamples = kBaselineFullConfidenceSamples,
     this.expandDetailsByDefault = false,
   });
 
@@ -70,21 +133,7 @@ class _VehicleBaselineSectionState
     final counts = ref.watch(vehicleBaselineSummaryProvider(widget.vehicleId));
     final theme = Theme.of(context);
 
-    // Persisted situations only — transients never accumulate. The
-    // three #2515 buckets (cold-start / sustained-load / partial-decel)
-    // are persistent, so they join the breakdown + the coverage bar.
-    const situations = [
-      DrivingSituation.idle,
-      DrivingSituation.stopAndGo,
-      DrivingSituation.urbanCruise,
-      DrivingSituation.highwayCruise,
-      DrivingSituation.deceleration,
-      DrivingSituation.climbingOrLoaded,
-      DrivingSituation.coldStartWarmup,
-      DrivingSituation.sustainedLoadOrTowing,
-      DrivingSituation.partialThrottleDecel,
-    ];
-
+    const situations = kBaselineSituations;
     final target = widget.fullConfidenceSamples;
     final totalSamples = situations.fold<int>(
       0,
@@ -93,21 +142,17 @@ class _VehicleBaselineSectionState
     final maxTotal = situations.length * target;
 
     // #2514 — drive the aggregate bar off *coverage*, not raw volume.
-    // Σ min(count, target) caps each bucket at its target, so a single
-    // over-filled situation (urban 224k) can no longer mask two empty
-    // ones: the bar can NEVER read 100% while any persisted bucket is
-    // still 0/target.
     final coveredSamples = situations.fold<int>(
       0,
       (acc, s) => acc + (counts[s] ?? 0).clamp(0, target),
     );
-    final coverageValue = maxTotal == 0 ? 0.0 : coveredSamples / maxTotal;
+    final coverageValue = baselineCoverageFraction(counts, target: target);
 
     // Persisted situations that have not accumulated a single sample yet
     // (e.g. Stop & go and Climbing on the Fuzzy path, #2512). When any
-    // exist — and the baseline isn't simply empty — we surface a warning
-    // chip and force the per-situation breakdown open so the user sees
-    // exactly which buckets are stuck at 0/target.
+    // exist — and the baseline isn't simply empty — we surface an
+    // informational chip and force the per-situation breakdown open so
+    // the user sees exactly which buckets are stuck at 0/target.
     final missingSituations = totalSamples == 0
         ? const <DrivingSituation>[]
         : [
@@ -150,14 +195,10 @@ class _VehicleBaselineSectionState
             const SizedBox(height: 12),
             // #1529 — aggregate progress bar shown always; per-
             // situation breakdown only when the user taps Show
-            // details. Saves 5 of the 6 rows (~300 dp) on the
-            // common path.
-            //
-            // #2514 — the bar tracks COVERAGE (Σ min(count, target)),
-            // not raw volume, so it can never sit at 100% while a
-            // bucket is empty.
+            // details. #2514 — the bar tracks COVERAGE, so it can never
+            // sit at 100% while a bucket is empty.
             ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: AppRadius.md,
               child: LinearProgressIndicator(
                 key: const Key('vehicleBaselineAggregateBar'),
                 value: coverageValue,
@@ -166,7 +207,7 @@ class _VehicleBaselineSectionState
             ),
             const SizedBox(height: 4),
             Text(
-              '$coveredSamples / $maxTotal samples',
+              l.vehicleBaselineCoverageSamples(coveredSamples, maxTotal),
               style: theme.textTheme.labelSmall,
               textAlign: TextAlign.right,
             ),
@@ -175,7 +216,7 @@ class _VehicleBaselineSectionState
             // situation has never been detected yet.
             if (hasMissing) ...[
               const SizedBox(height: 8),
-              _MissingSituationsWarning(
+              _MissingSituationsNote(
                 situations: missingSituations
                     .map((s) => _label(s, l))
                     .toList(growable: false),
@@ -225,8 +266,8 @@ class _VehicleBaselineSectionState
                     ? null
                     : () => _confirmReset(context, ref, l),
                 // tune_outlined picks up the "tuning learned per-situation
-                // behaviour" connotation — distinct from the η_v reset's
-                // local_gas_station_outlined icon (#1219).
+                // behaviour" connotation — distinct from the pump-gain
+                // reset's local_gas_station_outlined icon (#1219).
                 icon: const Icon(Icons.tune_outlined),
                 label: Text(l.vehicleBaselineReset),
               ),
@@ -282,94 +323,5 @@ class _VehicleBaselineSectionState
       case DrivingSituation.fuelCutCoast:
         return s.name;
     }
-  }
-}
-
-class _BaselineRow extends StatelessWidget {
-  final String label;
-  final int count;
-  final int fullConfidenceSamples;
-
-  const _BaselineRow({
-    required this.label,
-    required this.count,
-    required this.fullConfidenceSamples,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final progress = (count / fullConfidenceSamples).clamp(0.0, 1.0);
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 3,
-            child: Text(label, style: theme.textTheme.bodyMedium),
-          ),
-          Expanded(
-            flex: 5,
-            child: LinearProgressIndicator(value: progress, minHeight: 6),
-          ),
-          const SizedBox(width: 8),
-          SizedBox(
-            width: 48,
-            child: Text(
-              '$count/$fullConfidenceSamples',
-              style: theme.textTheme.bodySmall,
-              textAlign: TextAlign.end,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// #2514 — amber warning chip listing the driving situations that have
-/// never been detected (0 samples). It exists because the coverage bar
-/// alone tells the user calibration is incomplete but not *which*
-/// buckets are stuck; naming them (e.g. "Stop & go", "Climbing /
-/// loaded") points at the root cause tracked by Epic #2512.
-class _MissingSituationsWarning extends StatelessWidget {
-  final List<String> situations;
-
-  const _MissingSituationsWarning({required this.situations});
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    // Comma-join is locale-neutral punctuation, not prose.
-    final joined = situations.join(', '); // i18n-ignore: list separator
-    return Container(
-      key: const Key('vehicleBaselineMissingWarning'),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: scheme.errorContainer,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            Icons.warning_amber_rounded,
-            size: 18,
-            color: scheme.onErrorContainer,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              l.vehicleBaselineMissingWarning(joined),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: scheme.onErrorContainer,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

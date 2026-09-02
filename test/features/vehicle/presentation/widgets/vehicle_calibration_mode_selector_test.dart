@@ -185,5 +185,28 @@ void main() {
       expect(info.semanticLabel, contains('Rule-based'));
       expect(info.semanticLabel, contains('Fuzzy'));
     });
+
+    testWidgets(
+        '#3900 — one plain-language description line under each mode: '
+        'rule = fixed thresholds, fuzzy = split across neighbours',
+        (tester) async {
+      final list = _FakeVehicleProfileList(const [
+        VehicleProfile(id: 'v1', name: 'Golf'),
+      ]);
+      await _pumpSelector(tester, vehicleId: 'v1', list: list);
+
+      expect(
+        find.textContaining('fixed speed and load thresholds'),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining('across neighbouring situations'),
+        findsOneWidget,
+      );
+      // The description lines are led by the segment glyphs (the
+      // selected segment itself swaps its glyph for a check-mark).
+      expect(find.byIcon(Icons.rule), findsWidgets);
+      expect(find.byIcon(Icons.blur_circular), findsNWidgets(2));
+    });
   });
 }

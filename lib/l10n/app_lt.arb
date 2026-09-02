@@ -940,7 +940,6 @@
   "autoRecordBackgroundLocationOpenSettings": "Atidaryti nustatymus",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Reikalingas vietos leidimas",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Nepavyko prašyti foninės vietos",
-  "autoRecordPairAdapterLinkText": "Suporuokite adapterį žemiau esančiame skyriuje, kad įjungtumėte automatinį įrašymą",
   "exportBackupReady": "Atsarginė kopija paruošta — pasirinkite paskirties vietą",
   "exportBackupFailed": "Atsarginės kopijos eksportas nepavyko — bandykite dar kartą",
   "brokenMapChipDisclaimer": "MAP rodymai įtartini",

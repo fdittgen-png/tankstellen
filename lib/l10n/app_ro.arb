@@ -940,7 +940,6 @@
   "autoRecordBackgroundLocationOpenSettings": "Deschideți setările",
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Permisiunea de locație este necesară",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Nu s-a putut solicita locația în fundal",
-  "autoRecordPairAdapterLinkText": "Asociați un adaptor în secțiunea de mai jos pentru a activa înregistrarea automată",
   "exportBackupReady": "Backup gata — alegeți destinația",
   "exportBackupFailed": "Exportul backup-ului a eșuat — vă rugăm să încercați din nou",
   "brokenMapChipDisclaimer": "Citiri MAP suspecte",
