@@ -1,0 +1,76 @@
+{
+  "priceHistoryFirstSeen": "First seen on {date} — the history builds up with every visit",
+  "@priceHistoryFirstSeen": {
+    "description": "Station detail, price history (#3928): shown INSTEAD of the chart and the stats row when only a single price observation exists, so a lone dot in an empty chart never pretends to be a trend.",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "Aug 21, 2026"
+      }
+    }
+  },
+  "priceHistoryCurrentPriceLine": "Current price: {price}",
+  "@priceHistoryCurrentPriceLine": {
+    "description": "Station detail, price history (#3928): the single-observation state renders the current price on its own line under the first-seen sentence.",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "2.329 €"
+      }
+    }
+  },
+  "priceHistoryDeltaSince": "{delta} since {date}",
+  "@priceHistoryDeltaSince": {
+    "description": "Station detail, price history (#3928): explicit price delta between the oldest and the newest observation in the displayed window. Replaces the reference-less trend arrow. The delta is a signed, already-formatted price.",
+    "placeholders": {
+      "delta": {
+        "type": "String",
+        "example": "+0.03 €"
+      },
+      "date": {
+        "type": "String",
+        "example": "Aug 21, 2026"
+      }
+    }
+  },
+  "priceHistoryUnchangedSince": "Unchanged since {date}",
+  "@priceHistoryUnchangedSince": {
+    "description": "Station detail, price history (#3928): shown in place of a delta when the newest price equals the oldest one in the displayed window.",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "Aug 21, 2026"
+      }
+    }
+  },
+  "priceStatsMin": "Min",
+  "@priceStatsMin": {
+    "description": "Station detail, price history (#3928): label of the lowest observed price in the window. Coloured as a good value only when it differs from the maximum."
+  },
+  "priceStatsMax": "Max",
+  "@priceStatsMax": {
+    "description": "Station detail, price history (#3928): label of the highest observed price in the window. Coloured as a bad value only when it differs from the minimum."
+  },
+  "priceStatsAvg": "Avg",
+  "@priceStatsAvg": {
+    "description": "Station detail, price history (#3928): label of the average observed price in the window. Abbreviation of 'average'."
+  },
+  "amenitiesAndServices": "Amenities & services",
+  "@amenitiesAndServices": {
+    "description": "Station detail (#3928): heading of the single merged section that replaces the former separate 'Amenities' chips and 'Services (N)' expander — one deduplicated list."
+  },
+  "amenitiesServicesShowMore": "Show more ({count})",
+  "@amenitiesServicesShowMore": {
+    "description": "Station detail (#3928): reveals the amenities/services chips hidden beyond the first eight.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "4"
+      }
+    }
+  },
+  "amenitiesServicesShowLess": "Show less",
+  "@amenitiesServicesShowLess": {
+    "description": "Station detail (#3928): collapses the amenities/services chip list back to the first eight."
+  }
+}

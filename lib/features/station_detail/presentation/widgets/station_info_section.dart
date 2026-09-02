@@ -8,26 +8,27 @@ import '../../../../core/country/country_time.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/station.dart';
-import '../../../search/presentation/widgets/amenity_chips.dart';
 import '../../../search/presentation/widgets/pay_with_app_button.dart';
 import '../../../search/presentation/widgets/payment_method_chips.dart';
 import '../../domain/legacy_opening_hours_bridge.dart';
 import '../../../../core/domain/opening_hours.dart';
 import 'opening_hours_view.dart';
+import 'station_amenities_services_section.dart';
 
-/// Address, opening hours, fuels, services, and location info for a station.
+/// Opening hours, zone, amenities/services and payment info for a station.
 ///
-/// #923 phase 3f — the five plain-text `titleMedium` sub-headings
-/// (Address / Opening hours / Zone / Amenities / Payment methods)
+/// #923 phase 3f — the plain-text `titleMedium` sub-headings
+/// (Opening hours / Zone / Amenities & services / Payment methods)
 /// are rendered through the canonical [SectionHeader] so the headings
 /// share the design-system role, weight, and color with every other
 /// section on the screen. The body stays in a single Column — the
 /// screen already owns outer card-vs-card spacing via its parent
 /// [SizedBox]s and the section layout was not wrapped in a Card before
-/// this migration, so no visual regressions are introduced here. The
-/// bottom `ExpansionTile` for "Services (N)" keeps its own
-/// `titleMedium` label because that slot is an ExpansionTile title,
-/// not a stand-alone section heading.
+/// this migration, so no visual regressions are introduced here.
+///
+/// #3928 — the former "Amenities" chips and the collapsed
+/// "Services (N)" `ExpansionTile` were two renderings of one API list;
+/// they now live in the single [StationAmenitiesServicesSection].
 class StationInfoSection extends StatelessWidget {
   final Station station;
   final StationDetail detail;
@@ -40,7 +41,6 @@ class StationInfoSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
 
     // #1996 — the dedicated "Address" block was pure duplication: the
@@ -108,13 +108,11 @@ class StationInfoSection extends StatelessWidget {
           const SizedBox(height: 12),
         ],
 
-        // Amenities (icon chips) — at the bottom
-        if (station.amenities.isNotEmpty) ...[
-          SectionHeader(title: l10n.amenities, padding: EdgeInsets.zero),
-          const SizedBox(height: 8),
-          AmenityChips(amenities: station.amenities, maxVisible: 8),
-          const SizedBox(height: 12),
-        ],
+        // #3928 — ONE deduplicated "Amenities & services" section. The
+        // typed amenity chips and the raw API service strings used to be
+        // two blocks saying the same thing twice (`Lavage · Air · DAB`
+        // above, `Station de lavage`/`Gonflage`/`Distributeur` below).
+        StationAmenitiesServicesSection(station: station),
 
         // Payment methods (inferred from brand — no API data available)
         if (station.brand.trim().isNotEmpty) ...[
@@ -125,51 +123,6 @@ class StationInfoSection extends StatelessWidget {
           PayWithAppButton(brand: station.brand),
           const SizedBox(height: 12),
         ],
-
-        // Services (raw text from API) — at the bottom, collapsed by
-        // default (#483). Highway stations routinely return 10+ services
-        // and previously pushed the price-history section far below the
-        // fold. The ExpansionTile lets users see which services exist at
-        // a glance (via the count in the title) without blowing out the
-        // visual balance of the screen.
-        if (station.services.isNotEmpty)
-          Theme(
-            // Strip the default ExpansionTile dividers so it blends
-            // with the surrounding Column layout.
-            data: theme.copyWith(dividerColor: Colors.transparent),
-            child: ExpansionTile(
-              key: const ValueKey('station-detail-services-expansion'),
-              tilePadding: EdgeInsets.zero,
-              childrenPadding: const EdgeInsets.only(bottom: 8),
-              initiallyExpanded: false,
-              title: Semantics(
-                header: true,
-                child: Text(
-                  '${l10n.services} '
-                  '(${station.services.length})',
-                  style: theme.textTheme.titleMedium,
-                ),
-              ),
-              children: [
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 4,
-                  children: station.services
-                      .map(
-                        (s) => Chip(
-                          avatar: const Icon(
-                            Icons.check_circle_outline,
-                            size: 16,
-                          ),
-                          label: Text(s, style: const TextStyle(fontSize: 11)),
-                          visualDensity: VisualDensity.compact,
-                        ),
-                      )
-                      .toList(),
-                ),
-              ],
-            ),
-          ),
       ],
     );
   }

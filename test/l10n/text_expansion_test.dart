@@ -19,6 +19,12 @@ import 'package:tankstellen/features/search/presentation/widgets/fuel_type_selec
 import 'package:tankstellen/features/search/presentation/widgets/station_card.dart';
 import 'package:tankstellen/features/search/providers/station_rating_provider.dart';
 import 'package:tankstellen/features/setup/presentation/widgets/language_selector.dart';
+import 'package:tankstellen/core/domain/station_amenity.dart';
+import 'package:tankstellen/features/price_history/data/repositories/price_history_repository.dart';
+import 'package:tankstellen/features/price_history/domain/entities/price_record.dart';
+import 'package:tankstellen/features/price_history/providers/price_history_provider.dart';
+import 'package:tankstellen/features/station_detail/presentation/widgets/price_history_section.dart';
+import 'package:tankstellen/features/station_detail/presentation/widgets/station_amenities_services_section.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/opening_hours_view.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/station_brand_header.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/station_prices_section.dart';
@@ -512,6 +518,121 @@ void main() {
         const TripAvgConsumptionCard(live: estimatedReading),
         overrides: badgeOverrides(),
         widgetName: 'TripAvgConsumptionCard (fuel-source badge)',
+      );
+    });
+  });
+
+  // #3928 (Epic #3925) — the two station-detail strings this issue adds
+  // are the longest prose on the page: the single-observation sentence
+  // and the merged section heading. Both must survive an expanded
+  // translation at 320 dp and a 1.3x font setting.
+  group('Station detail — price history + merged services (#3928)', () {
+    const singlePointStation = Station(
+      id: 'station-3928',
+      name: 'Star Tankstelle',
+      brand: 'STAR',
+      street: 'Hauptstr.',
+      houseNumber: '12',
+      postCode: '10115',
+      place: 'Berlin',
+      lat: 52.5200,
+      lng: 13.4050,
+      dist: 1.5,
+      diesel: 2.329,
+      isOpen: true,
+    );
+
+    List<Object> historyOverrides() {
+      final storage = fakeHiveStorageOverride();
+      return <Object>[
+        storage.override,
+        priceHistoryRepositoryProvider
+            .overrideWithValue(PriceHistoryRepository(storage.fake)),
+        priceHistoryProvider('station-3928').overrideWithValue([
+          PriceRecord(
+            stationId: 'station-3928',
+            recordedAt: DateTime(2026, 8, 21, 9, 30),
+            diesel: 2.329,
+          ),
+        ]),
+        priceStatsProvider('station-3928', FuelType.diesel)
+            .overrideWithValue(const PriceStats(
+          min: 2.329,
+          max: 2.329,
+          avg: 2.329,
+          current: 2.329,
+        )),
+      ];
+    }
+
+    /// A station whose amenity chips and raw services together overflow
+    /// the eight-chip fold — the widest the merged section ever gets.
+    final crowdedStation = singlePointStation.copyWith(
+      amenities: const {
+        StationAmenity.shop,
+        StationAmenity.carWash,
+        StationAmenity.airPump,
+        StationAmenity.atm,
+      },
+      services: const [
+        'Piste poids lourds',
+        'Automate CB',
+        'Location de vehicules',
+        'Vente de gaz domestique',
+        'Relais colis',
+        'Douches',
+      ],
+      department: 'Berlin',
+      region: 'Berlin',
+    );
+
+    testWidgets('PriceHistorySection single-observation line — en_XA',
+        (tester) async {
+      await pumpPseudo(
+        tester,
+        const SingleChildScrollView(
+          child: PriceHistorySection(
+            stationId: 'station-3928',
+            station: singlePointStation,
+          ),
+        ),
+        overrides: historyOverrides(),
+        widgetName: 'PriceHistorySection (single observation)',
+      );
+    });
+
+    testWidgets('PriceHistorySection single-observation line — 1.3x',
+        (tester) async {
+      await pumpScaled(
+        tester,
+        const SingleChildScrollView(
+          child: PriceHistorySection(
+            stationId: 'station-3928',
+            station: singlePointStation,
+          ),
+        ),
+        overrides: historyOverrides(),
+        widgetName: 'PriceHistorySection (single observation)',
+      );
+    });
+
+    testWidgets('Amenities & services merged section — en_XA', (tester) async {
+      await pumpPseudo(
+        tester,
+        SingleChildScrollView(
+          child: StationAmenitiesServicesSection(station: crowdedStation),
+        ),
+        widgetName: 'StationAmenitiesServicesSection',
+      );
+    });
+
+    testWidgets('Amenities & services merged section — 1.3x', (tester) async {
+      await pumpScaled(
+        tester,
+        SingleChildScrollView(
+          child: StationAmenitiesServicesSection(station: crowdedStation),
+        ),
+        widgetName: 'StationAmenitiesServicesSection',
       );
     });
   });
