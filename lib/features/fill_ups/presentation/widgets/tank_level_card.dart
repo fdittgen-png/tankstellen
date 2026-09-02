@@ -4,7 +4,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/utils/time_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
@@ -102,6 +101,7 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    final locale = Localizations.localeOf(context).toString();
     final capacityL = estimate.capacityL;
     // Progress fraction is null when capacity is unknown — the bar is
     // hidden in that case so we don't fake a percentage.
@@ -150,6 +150,9 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
                   fontFeatures: const [FontFeature.tabularFigures()],
                 ),
               ),
+              // #3903 — ONE primary range sentence (body weight, full
+              // contrast) and a smaller muted secondary line for the
+              // long-run figure; both numbers stay.
               if (rangeKm != null) ...[
                 const SizedBox(height: 4),
                 Text(
@@ -160,7 +163,7 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
                       : l.tankLevelRangeFormat(rangeKm.round().toString()),
                   key: const Key('tank_level_range_primary'),
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
@@ -183,10 +186,33 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
                   value: fraction,
                   color: barColor,
                 ),
+                // #3903 — end labels anchor the bar: empty on the left,
+                // the tank capacity on the right.
+                const SizedBox(height: 4),
+                Row(
+                  key: const Key('tank_level_bar_labels'),
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      l.tankLevelLitersFormat('0'),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    Text(
+                      l.tankLevelLitersFormat(
+                        UnitFormatter.formatDecimal(capacityL, fractionDigits: 0),
+                      ),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
               ],
               const SizedBox(height: 12),
               Text(
-                _captionFor(l, estimate),
+                _captionFor(l, estimate, locale),
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -237,22 +263,32 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
   /// fill-up anchor, or an OBD2 sensor reading newer than that fill.
   /// Trip counts/methods are gone from this card by directive — the
   /// recordings-vs-pump comparison lives on the Trajets tab (#3648).
-  String _captionFor(AppLocalizations l, TankLevelEstimate estimate) {
+  String _captionFor(
+    AppLocalizations l,
+    TankLevelEstimate estimate,
+    String locale,
+  ) {
     switch (estimate.source) {
       case TankLevelSource.fillUp:
-        return l.tankLevelSourceFillUp(_formatDate(estimate.lastFillUpDate));
+        return l.tankLevelSourceFillUp(
+          _formatDate(estimate.lastFillUpDate, locale),
+        );
       case TankLevelSource.obd2Sensor:
-        return l.tankLevelSourceObd2(_formatDate(estimate.sensorReadAt));
+        return l.tankLevelSourceObd2(
+          _formatDate(estimate.sensorReadAt, locale),
+        );
     }
   }
 
-  String _formatDate(DateTime? date) {
+  /// #3903 — the UI locale's medium date, not a raw `YYYY-MM-DD`.
+  String _formatDate(DateTime? date, String locale) {
     if (date == null) return '';
-    return '${date.year}-${twoDigits(date.month)}-${twoDigits(date.day)}';
+    return UnitFormatter.formatMediumDate(date, locale: locale);
   }
 
   Future<void> _openDetailSheet(BuildContext context, WidgetRef ref) async {
     final l = AppLocalizations.of(context);
+    final locale = Localizations.localeOf(context).toString();
     final allTrips = ref.read(tripHistoryListProvider);
     final lastFillUpDate = estimate.lastFillUpDate;
     final relevant = allTrips.where((t) {
@@ -282,7 +318,7 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
                 if (relevant.isEmpty)
                   Text(
                     l.tankLevelLastFillUpFormat(
-                      _formatDate(lastFillUpDate),
+                      _formatDate(lastFillUpDate, locale),
                       '0',
                     ),
                     style: theme.textTheme.bodyMedium,
@@ -295,7 +331,7 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
                       itemBuilder: (context, index) {
                         final trip = relevant[index];
                         final startedAt = trip.summary.startedAt;
-                        final dateText = _formatDate(startedAt);
+                        final dateText = _formatDate(startedAt, locale);
                         final distance = UnitFormatter.formatDistance(
                           trip.summary.distanceKm,
                         );

@@ -306,7 +306,8 @@ void main() {
       );
 
       expect(
-        find.textContaining('Anchored at the last fill-up: 2026-04-27'),
+        // #3903 — localized medium date, not a raw YYYY-MM-DD.
+        find.textContaining('Anchored at the last fill-up: Apr 27, 2026'),
         findsOneWidget,
       );
     });
@@ -329,7 +330,7 @@ void main() {
       );
 
       expect(
-        find.textContaining('OBD2 tank sensor · 2026-04-29'),
+        find.textContaining('OBD2 tank sensor · Apr 29, 2026'),
         findsOneWidget,
       );
     });

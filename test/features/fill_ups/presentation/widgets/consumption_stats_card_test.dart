@@ -208,8 +208,12 @@ void main() {
         ConsumptionStatsCard(stats: _stats(fillUpCount: 5)),
       );
 
-      // The widget renders "Fill-ups: 5" (localized prefix + number).
-      expect(find.text('Fill-ups: 5'), findsOneWidget);
+      // #3903 — a fifth grid tile (icon + label + value), not a bare
+      // "Fill-ups: 5" text line.
+      expect(find.text('Fill-ups: 5'), findsNothing);
+      expect(find.text('Fill-ups'), findsOneWidget);
+      expect(find.text('5'), findsOneWidget);
+      expect(find.byIcon(Icons.format_list_numbered), findsOneWidget);
     });
 
     testWidgets('hides the count line when fillUpCount is zero', (
@@ -223,7 +227,8 @@ void main() {
       // The literal "Fill-ups: 0" string must not appear when the row
       // is hidden behind the `fillUpCount > 0` guard.
       expect(find.text('Fill-ups: 0'), findsNothing);
-      expect(find.textContaining('Fill-ups:'), findsNothing);
+      expect(find.textContaining('Fill-ups'), findsNothing);
+      expect(find.byIcon(Icons.format_list_numbered), findsNothing);
     });
   });
 
@@ -273,7 +278,8 @@ void main() {
         find.text('198.40 £'),
         findsOneWidget,
       ); // total spent (formatTotal)
-      expect(find.text('Fill-ups: 3'), findsOneWidget);
+      expect(find.text('Fill-ups'), findsOneWidget); // #3903 grid tile
+      expect(find.text('3'), findsOneWidget);
       expect(find.text('—'), findsNothing); // no nullable fallbacks fired
     });
   });
@@ -411,7 +417,8 @@ void main() {
           expect(find.textContaining('auto-corrections'), findsNothing);
           // Existing chrome still renders.
           expect(find.text('Consumption stats'), findsOneWidget);
-          expect(find.text('Fill-ups: 5'), findsOneWidget);
+          expect(find.text('Fill-ups'), findsOneWidget); // #3903 grid tile
+          expect(find.text('5'), findsOneWidget);
         },
       );
     },
