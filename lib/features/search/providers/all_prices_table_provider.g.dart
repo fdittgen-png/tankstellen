@@ -77,18 +77,87 @@ String _$allPricesBestByFuelHash() =>
 
 /// The active vehicle's per-fuel cost model, or [FuelCostModel.empty]
 /// when there is no vehicle / no usable history.
+///
+/// The consumption numbers are NOT re-derived here (#3934): they come from
+/// `fuelTypeEfficiencyComparisonProvider` — the fill-ups feature's own
+/// per-fuel aggregator (ADR 0015 v3), the same one the consumption screen
+/// renders — reached through the `fill_ups/api.dart` barrel. One model, so
+/// the table and that screen can never state two different L/100 km for the
+/// same tank history.
+///
+/// Only PURE buckets become a per-fuel figure. A MIX bucket (`E85/E10`) is
+/// a blend the driver burned, not a grade they can buy at the pump, and
+/// crediting its litres to the dominant grade is exactly the ADR 0014
+/// collapse ADR 0015 rejected — so a mix contributes to no column, and a
+/// fuel only ever driven blended simply has no cost-per-100 km cell.
+///
+/// The aggregator also owns the vehicle scoping: it keeps the ACTIVE
+/// vehicle's own fills only, where the deleted local copy also swept in
+/// fills carrying no `vehicleId`. Single-vehicle users see no difference
+/// (their fills are the vehicle's); multi-vehicle users no longer risk a
+/// stray unassigned fill of another car moving this car's number.
+///
+/// The pump-anchored gain (`VehicleProfile.pumpGain*`, Epic #3886) is
+/// deliberately NOT applied: it trims ESTIMATED OBD2 fuel rates onto the
+/// pump's litres, and these litres already come from the pump.
 
 @ProviderFor(allPricesFuelCostModel)
 final allPricesFuelCostModelProvider = AllPricesFuelCostModelProvider._();
 
 /// The active vehicle's per-fuel cost model, or [FuelCostModel.empty]
 /// when there is no vehicle / no usable history.
+///
+/// The consumption numbers are NOT re-derived here (#3934): they come from
+/// `fuelTypeEfficiencyComparisonProvider` — the fill-ups feature's own
+/// per-fuel aggregator (ADR 0015 v3), the same one the consumption screen
+/// renders — reached through the `fill_ups/api.dart` barrel. One model, so
+/// the table and that screen can never state two different L/100 km for the
+/// same tank history.
+///
+/// Only PURE buckets become a per-fuel figure. A MIX bucket (`E85/E10`) is
+/// a blend the driver burned, not a grade they can buy at the pump, and
+/// crediting its litres to the dominant grade is exactly the ADR 0014
+/// collapse ADR 0015 rejected — so a mix contributes to no column, and a
+/// fuel only ever driven blended simply has no cost-per-100 km cell.
+///
+/// The aggregator also owns the vehicle scoping: it keeps the ACTIVE
+/// vehicle's own fills only, where the deleted local copy also swept in
+/// fills carrying no `vehicleId`. Single-vehicle users see no difference
+/// (their fills are the vehicle's); multi-vehicle users no longer risk a
+/// stray unassigned fill of another car moving this car's number.
+///
+/// The pump-anchored gain (`VehicleProfile.pumpGain*`, Epic #3886) is
+/// deliberately NOT applied: it trims ESTIMATED OBD2 fuel rates onto the
+/// pump's litres, and these litres already come from the pump.
 
 final class AllPricesFuelCostModelProvider
     extends $FunctionalProvider<FuelCostModel, FuelCostModel, FuelCostModel>
     with $Provider<FuelCostModel> {
   /// The active vehicle's per-fuel cost model, or [FuelCostModel.empty]
   /// when there is no vehicle / no usable history.
+  ///
+  /// The consumption numbers are NOT re-derived here (#3934): they come from
+  /// `fuelTypeEfficiencyComparisonProvider` — the fill-ups feature's own
+  /// per-fuel aggregator (ADR 0015 v3), the same one the consumption screen
+  /// renders — reached through the `fill_ups/api.dart` barrel. One model, so
+  /// the table and that screen can never state two different L/100 km for the
+  /// same tank history.
+  ///
+  /// Only PURE buckets become a per-fuel figure. A MIX bucket (`E85/E10`) is
+  /// a blend the driver burned, not a grade they can buy at the pump, and
+  /// crediting its litres to the dominant grade is exactly the ADR 0014
+  /// collapse ADR 0015 rejected — so a mix contributes to no column, and a
+  /// fuel only ever driven blended simply has no cost-per-100 km cell.
+  ///
+  /// The aggregator also owns the vehicle scoping: it keeps the ACTIVE
+  /// vehicle's own fills only, where the deleted local copy also swept in
+  /// fills carrying no `vehicleId`. Single-vehicle users see no difference
+  /// (their fills are the vehicle's); multi-vehicle users no longer risk a
+  /// stray unassigned fill of another car moving this car's number.
+  ///
+  /// The pump-anchored gain (`VehicleProfile.pumpGain*`, Epic #3886) is
+  /// deliberately NOT applied: it trims ESTIMATED OBD2 fuel rates onto the
+  /// pump's litres, and these litres already come from the pump.
   AllPricesFuelCostModelProvider._()
     : super(
         from: null,
@@ -123,7 +192,7 @@ final class AllPricesFuelCostModelProvider
 }
 
 String _$allPricesFuelCostModelHash() =>
-    r'462b2aba299e8df33702e49b966075e49b0f5927';
+    r'4c1bb83e51c4ca87e7f14e2e464938249000e0a8';
 
 /// The stable column set every all-prices card renders.
 ///
