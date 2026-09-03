@@ -13522,18 +13522,6 @@ abstract class AppLocalizations {
   /// **'Choose a location'**
   String get radiusAlertBlockerLocation;
 
-  /// One-line legend under the sticky column header of the all-prices comparison table (#3933). Explains the two things the cards would otherwise leave unexplained: the filled emphasis and the second number in each cell. Shown when the active vehicle has measured per-fuel consumption.
-  ///
-  /// In en, this message translates to:
-  /// **'Filled = cheapest of these results. Second figure = what 100 km costs on that fuel with your vehicle.'**
-  String get allPricesLegend;
-
-  /// Legend variant of allPricesLegend used when no vehicle is active or no fuel has a measured consumption yet, so the cost-per-100-km line is absent from every cell (#3933).
-  ///
-  /// In en, this message translates to:
-  /// **'Filled = cheapest of these results. Add a vehicle and log fill-ups to see the cost per 100 km.'**
-  String get allPricesLegendPricesOnly;
-
   /// Placeholder rendered in a fuel column the station does not price at all, keeping the column aligned instead of reflowing the row (#3933). An em dash in most locales.
   ///
   /// In en, this message translates to:
@@ -13960,6 +13948,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last fill-up: {date}'**
   String pickStationLastFillUpAt(String date);
+
+  /// Tooltip and screen-reader label of the left chevron in the paged help bubble (#3938). Icon-only control, so this string is the only thing a screen reader can announce.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous tip'**
+  String get helpBubblePreviousTip;
+
+  /// Tooltip and screen-reader label of the right chevron in the paged help bubble (#3938). Icon-only control, so this string is the only thing a screen reader can announce.
+  ///
+  /// In en, this message translates to:
+  /// **'Next tip'**
+  String get helpBubbleNextTip;
+
+  /// Compact position indicator between the two chevrons of the paged help bubble — 'which tip of how many' (#3938). Kept as a separator mask so a locale that does not use a slash can change it.
+  ///
+  /// In en, this message translates to:
+  /// **'{index}/{total}'**
+  String helpBubbleTipPosition(int index, int total);
+
+  /// Screen-reader label for the help bubble's position indicator (#3938). The visible '2/5' is a compact mask; assistive tech announces this full sentence instead.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip {index} of {total}'**
+  String helpBubbleTipPositionSemantic(int index, int total);
+
+  /// Tip 1 of the search-results help bubble (#3939): the summary bar is the whole search's control, but nothing on a band of grey pills says 'tap me'.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the grey bar above the results to change your fuel, your radius and every other search criterion.'**
+  String get helpSearchTipSummaryBar;
+
+  /// Tip 2 of the search-results help bubble (#3939). Replaces the first half of the permanent two-line legend that used to sit under the all-prices column header.
+  ///
+  /// In en, this message translates to:
+  /// **'In the comparison table, a filled cell marks the cheapest price for that fuel among the stations you are looking at.'**
+  String get helpSearchTipFillEmphasis;
+
+  /// Tip 3 of the search-results help bubble (#3939). Replaces the second half of the permanent all-prices legend.
+  ///
+  /// In en, this message translates to:
+  /// **'The smaller second figure in a cell is what 100 km on that fuel costs in your vehicle.'**
+  String get helpSearchTipSecondFigure;
+
+  /// Tip 4 of the search-results help bubble (#3939): the most misread mark on the screen. priceTierOf() classifies a price WITHIN the current result set, so the down/up glyph is a ranking, never a rise or fall since yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'The arrow beside a price ranks it inside this list — cheapest, middle or dearest third of these results. It is not a price trend over time.'**
+  String get helpSearchTipPriceArrows;
+
+  /// Tip 5 of the search-results help bubble (#3939), the deepest one: the all-prices comparison view exists for comparing fuels rather than stations.
+  ///
+  /// In en, this message translates to:
+  /// **'The view button switches between the compact cards and the table that compares every fuel at once.'**
+  String get helpSearchTipViewToggle;
+
+  /// Long-press tooltip and screen-reader label of the fuel pill in the results summary bar (#3939). The pill itself now shows only the fuel code ('E85'), because the pump icon beside it already says the word 'fuel'.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel: {fuel}'**
+  String searchSummaryFuelTooltip(String fuel);
+
+  /// Value-only label of the radius pill in the results summary bar (#3939). The radius glyph beside it already says 'within a radius of', so the pill shows the number alone; the full sentence lives in its tooltip (searchCriteriaRadiusBadge).
+  ///
+  /// In en, this message translates to:
+  /// **'{km} km'**
+  String searchSummaryRadiusValue(String km);
+
+  /// Value-only label of the price-freshness pill in the results summary bar for an age under one minute (#3939). The clock glyph carries the meaning; the full sentence ('Prices from just now') is the tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'now'**
+  String get searchSummaryAgeJustNow;
+
+  /// Value-only label of the price-freshness pill for a download age under an hour (#3939). The full sentence lives in the tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String searchSummaryAgeMinutes(int minutes);
+
+  /// Value-only label of the price-freshness pill for a download age under a day (#3939). The full sentence lives in the tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} h'**
+  String searchSummaryAgeHours(int hours);
+
+  /// Value-only label of the price-freshness pill for a download age of a day or more (#3939). The full sentence lives in the tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} d'**
+  String searchSummaryAgeDays(int days);
 
   /// Settings root: one-line subtitle of the Privacy & data tile naming its four topics (#3908, Epic #3907).
   ///

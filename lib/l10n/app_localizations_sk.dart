@@ -7915,14 +7915,6 @@ class AppLocalizationsSk extends AppLocalizations {
   String get radiusAlertBlockerLocation => 'Choose a location';
 
   @override
-  String get allPricesLegend =>
-      'Filled = cheapest of these results. Second figure = what 100 km costs on that fuel with your vehicle.';
-
-  @override
-  String get allPricesLegendPricesOnly =>
-      'Filled = cheapest of these results. Add a vehicle and log fill-ups to see the cost per 100 km.';
-
-  @override
   String get allPricesNoPriceMask => '—';
 
   @override
@@ -8212,6 +8204,70 @@ class AppLocalizationsSk extends AppLocalizations {
   @override
   String pickStationLastFillUpAt(String date) {
     return 'Last fill-up: $date';
+  }
+
+  @override
+  String get helpBubblePreviousTip => 'Previous tip';
+
+  @override
+  String get helpBubbleNextTip => 'Next tip';
+
+  @override
+  String helpBubbleTipPosition(int index, int total) {
+    return '$index/$total';
+  }
+
+  @override
+  String helpBubbleTipPositionSemantic(int index, int total) {
+    return 'Tip $index of $total';
+  }
+
+  @override
+  String get helpSearchTipSummaryBar =>
+      'Tap the grey bar above the results to change your fuel, your radius and every other search criterion.';
+
+  @override
+  String get helpSearchTipFillEmphasis =>
+      'In the comparison table, a filled cell marks the cheapest price for that fuel among the stations you are looking at.';
+
+  @override
+  String get helpSearchTipSecondFigure =>
+      'The smaller second figure in a cell is what 100 km on that fuel costs in your vehicle.';
+
+  @override
+  String get helpSearchTipPriceArrows =>
+      'The arrow beside a price ranks it inside this list — cheapest, middle or dearest third of these results. It is not a price trend over time.';
+
+  @override
+  String get helpSearchTipViewToggle =>
+      'The view button switches between the compact cards and the table that compares every fuel at once.';
+
+  @override
+  String searchSummaryFuelTooltip(String fuel) {
+    return 'Fuel: $fuel';
+  }
+
+  @override
+  String searchSummaryRadiusValue(String km) {
+    return '$km km';
+  }
+
+  @override
+  String get searchSummaryAgeJustNow => 'now';
+
+  @override
+  String searchSummaryAgeMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String searchSummaryAgeHours(int hours) {
+    return '$hours h';
+  }
+
+  @override
+  String searchSummaryAgeDays(int days) {
+    return '$days d';
   }
 
   @override

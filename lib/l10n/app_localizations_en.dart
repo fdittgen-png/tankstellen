@@ -7847,14 +7847,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get radiusAlertBlockerLocation => 'Choose a location';
 
   @override
-  String get allPricesLegend =>
-      'Filled = cheapest of these results. Second figure = what 100 km costs on that fuel with your vehicle.';
-
-  @override
-  String get allPricesLegendPricesOnly =>
-      'Filled = cheapest of these results. Add a vehicle and log fill-ups to see the cost per 100 km.';
-
-  @override
   String get allPricesNoPriceMask => '—';
 
   @override
@@ -8144,6 +8136,70 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String pickStationLastFillUpAt(String date) {
     return 'Last fill-up: $date';
+  }
+
+  @override
+  String get helpBubblePreviousTip => 'Previous tip';
+
+  @override
+  String get helpBubbleNextTip => 'Next tip';
+
+  @override
+  String helpBubbleTipPosition(int index, int total) {
+    return '$index/$total';
+  }
+
+  @override
+  String helpBubbleTipPositionSemantic(int index, int total) {
+    return 'Tip $index of $total';
+  }
+
+  @override
+  String get helpSearchTipSummaryBar =>
+      'Tap the grey bar above the results to change your fuel, your radius and every other search criterion.';
+
+  @override
+  String get helpSearchTipFillEmphasis =>
+      'In the comparison table, a filled cell marks the cheapest price for that fuel among the stations you are looking at.';
+
+  @override
+  String get helpSearchTipSecondFigure =>
+      'The smaller second figure in a cell is what 100 km on that fuel costs in your vehicle.';
+
+  @override
+  String get helpSearchTipPriceArrows =>
+      'The arrow beside a price ranks it inside this list — cheapest, middle or dearest third of these results. It is not a price trend over time.';
+
+  @override
+  String get helpSearchTipViewToggle =>
+      'The view button switches between the compact cards and the table that compares every fuel at once.';
+
+  @override
+  String searchSummaryFuelTooltip(String fuel) {
+    return 'Fuel: $fuel';
+  }
+
+  @override
+  String searchSummaryRadiusValue(String km) {
+    return '$km km';
+  }
+
+  @override
+  String get searchSummaryAgeJustNow => 'now';
+
+  @override
+  String searchSummaryAgeMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String searchSummaryAgeHours(int hours) {
+    return '$hours h';
+  }
+
+  @override
+  String searchSummaryAgeDays(int days) {
+    return '$days d';
   }
 
   @override
@@ -16882,14 +16938,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get radiusAlertBlockerLocation => '⟦Çĥóóšé á łóçáŧîóñ ·······⟧';
 
   @override
-  String get allPricesLegend =>
-      '⟦Ƒîłłéđ = çĥéáƥéšŧ óƒ ŧĥéšé řéšúłŧš. Šéçóñđ ƒîǧúřé = ŵĥáŧ 100 ķɱ çóšŧš óñ ŧĥáŧ ƒúéł ŵîŧĥ ýóúř ṽéĥîçłé. ··································⟧';
-
-  @override
-  String get allPricesLegendPricesOnly =>
-      '⟦Ƒîłłéđ = çĥéáƥéšŧ óƒ ŧĥéšé řéšúłŧš. Áđđ á ṽéĥîçłé áñđ łóǧ ƒîłł-úƥš ŧó šéé ŧĥé çóšŧ ƥéř 100 ķɱ. ·······························⟧';
-
-  @override
   String get allPricesNoPriceMask => '⟦—⟧';
 
   @override
@@ -17185,6 +17233,70 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String pickStationLastFillUpAt(String date) {
     return '⟦Łášŧ ƒîłł-úƥ: $date ·····⟧';
+  }
+
+  @override
+  String get helpBubblePreviousTip => '⟦Ƥřéṽîóúš ŧîƥ ·····⟧';
+
+  @override
+  String get helpBubbleNextTip => '⟦Ñéẋŧ ŧîƥ ···⟧';
+
+  @override
+  String helpBubbleTipPosition(int index, int total) {
+    return '⟦$index/$total⟧';
+  }
+
+  @override
+  String helpBubbleTipPositionSemantic(int index, int total) {
+    return '⟦Ŧîƥ $index óƒ $total ··⟧';
+  }
+
+  @override
+  String get helpSearchTipSummaryBar =>
+      '⟦Ŧáƥ ŧĥé ǧřéý ƀář áƀóṽé ŧĥé řéšúłŧš ŧó çĥáñǧé ýóúř ƒúéł, ýóúř řáđîúš áñđ éṽéřý óŧĥéř šéářçĥ çřîŧéřîóñ. ·····································⟧';
+
+  @override
+  String get helpSearchTipFillEmphasis =>
+      '⟦Îñ ŧĥé çóɱƥářîšóñ ŧáƀłé, á ƒîłłéđ çéłł ɱářķš ŧĥé çĥéáƥéšŧ ƥřîçé ƒóř ŧĥáŧ ƒúéł áɱóñǧ ŧĥé šŧáŧîóñš ýóú ářé łóóķîñǧ áŧ. ··········································⟧';
+
+  @override
+  String get helpSearchTipSecondFigure =>
+      '⟦Ŧĥé šɱáłłéř šéçóñđ ƒîǧúřé îñ á çéłł îš ŵĥáŧ 100 ķɱ óñ ŧĥáŧ ƒúéł çóšŧš îñ ýóúř ṽéĥîçłé. ·····························⟧';
+
+  @override
+  String get helpSearchTipPriceArrows =>
+      '⟦Ŧĥé ářřóŵ ƀéšîđé á ƥřîçé řáñķš îŧ îñšîđé ŧĥîš łîšŧ — çĥéáƥéšŧ, ɱîđđłé óř đéářéšŧ ŧĥîřđ óƒ ŧĥéšé řéšúłŧš. Îŧ îš ñóŧ á ƥřîçé ŧřéñđ óṽéř ŧîɱé. ·················································⟧';
+
+  @override
+  String get helpSearchTipViewToggle =>
+      '⟦Ŧĥé ṽîéŵ ƀúŧŧóñ šŵîŧçĥéš ƀéŧŵééñ ŧĥé çóɱƥáçŧ çářđš áñđ ŧĥé ŧáƀłé ŧĥáŧ çóɱƥářéš éṽéřý ƒúéł áŧ óñçé. ····································⟧';
+
+  @override
+  String searchSummaryFuelTooltip(String fuel) {
+    return '⟦Ƒúéł: $fuel ··⟧';
+  }
+
+  @override
+  String searchSummaryRadiusValue(String km) {
+    return '⟦$km ķɱ ·⟧';
+  }
+
+  @override
+  String get searchSummaryAgeJustNow => '⟦ñóŵ ·⟧';
+
+  @override
+  String searchSummaryAgeMinutes(int minutes) {
+    return '⟦$minutes ɱîñ ·⟧';
+  }
+
+  @override
+  String searchSummaryAgeHours(int hours) {
+    return '⟦$hours ĥ⟧';
+  }
+
+  @override
+  String searchSummaryAgeDays(int days) {
+    return '⟦$days đ⟧';
   }
 
   @override

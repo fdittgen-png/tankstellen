@@ -5531,20 +5531,10 @@
     }
   },
   "amenitiesServicesShowLess": "Afficher moins",
-  "helpBubblePreviousTip": "Previous tip",
-  "@helpBubblePreviousTip": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "helpBubbleNextTip": "Next tip",
-  "@helpBubbleNextTip": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
+  "helpBubblePreviousTip": "Astuce précédente",
+  "helpBubbleNextTip": "Astuce suivante",
   "helpBubbleTipPosition": "{index}/{total}",
   "@helpBubbleTipPosition": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "index": {
         "type": "int",
@@ -5556,10 +5546,8 @@
       }
     }
   },
-  "helpBubbleTipPositionSemantic": "Tip {index} of {total}",
+  "helpBubbleTipPositionSemantic": "Astuce {index} sur {total}",
   "@helpBubbleTipPositionSemantic": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "index": {
         "type": "int",
@@ -5571,35 +5559,13 @@
       }
     }
   },
-  "helpSearchTipSummaryBar": "Tap the grey bar above the results to change your fuel, your radius and every other search criterion.",
-  "@helpSearchTipSummaryBar": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "helpSearchTipFillEmphasis": "In the comparison table, a filled cell marks the cheapest price for that fuel among the stations you are looking at.",
-  "@helpSearchTipFillEmphasis": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "helpSearchTipSecondFigure": "The smaller second figure in a cell is what 100 km on that fuel costs in your vehicle.",
-  "@helpSearchTipSecondFigure": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "helpSearchTipPriceArrows": "The arrow beside a price ranks it inside this list — cheapest, middle or dearest third of these results. It is not a price trend over time.",
-  "@helpSearchTipPriceArrows": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "helpSearchTipViewToggle": "The view button switches between the compact cards and the table that compares every fuel at once.",
-  "@helpSearchTipViewToggle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "searchSummaryFuelTooltip": "Fuel: {fuel}",
+  "helpSearchTipSummaryBar": "Touchez la barre grise au-dessus des résultats pour changer de carburant, de rayon et tous les autres critères de recherche.",
+  "helpSearchTipFillEmphasis": "Dans le tableau comparatif, une case pleine signale le prix le plus bas pour ce carburant parmi les stations affichées.",
+  "helpSearchTipSecondFigure": "Le second chiffre, plus petit, indique ce que coûtent 100 km avec ce carburant sur votre véhicule.",
+  "helpSearchTipPriceArrows": "La flèche à côté d'un prix le situe dans cette liste — tiers le moins cher, intermédiaire ou le plus cher de ces résultats. Ce n'est pas une évolution dans le temps.",
+  "helpSearchTipViewToggle": "Le bouton d'affichage bascule entre les fiches compactes et le tableau qui compare tous les carburants d'un coup d'œil.",
+  "searchSummaryFuelTooltip": "Carburant : {fuel}",
   "@searchSummaryFuelTooltip": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "fuel": {
         "type": "String",
@@ -5609,8 +5575,6 @@
   },
   "searchSummaryRadiusValue": "{km} km",
   "@searchSummaryRadiusValue": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "km": {
         "type": "String",
@@ -5618,15 +5582,9 @@
       }
     }
   },
-  "searchSummaryAgeJustNow": "now",
-  "@searchSummaryAgeJustNow": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
+  "searchSummaryAgeJustNow": "à l'instant",
   "searchSummaryAgeMinutes": "{minutes} min",
   "@searchSummaryAgeMinutes": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "minutes": {
         "type": "int",
@@ -5636,8 +5594,6 @@
   },
   "searchSummaryAgeHours": "{hours} h",
   "@searchSummaryAgeHours": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "hours": {
         "type": "int",
@@ -5645,10 +5601,8 @@
       }
     }
   },
-  "searchSummaryAgeDays": "{days} d",
+  "searchSummaryAgeDays": "{days} j",
   "@searchSummaryAgeDays": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "days": {
         "type": "int",

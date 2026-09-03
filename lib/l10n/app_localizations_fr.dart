@@ -7975,14 +7975,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get radiusAlertBlockerLocation => 'Choisissez un emplacement';
 
   @override
-  String get allPricesLegend =>
-      'Fond plein = le moins cher de ces résultats. Deuxième chiffre = ce que coûtent 100 km avec ce carburant sur votre véhicule.';
-
-  @override
-  String get allPricesLegendPricesOnly =>
-      'Fond plein = le moins cher de ces résultats. Ajoutez un véhicule et saisissez vos pleins pour voir le coût aux 100 km.';
-
-  @override
   String get allPricesNoPriceMask => '—';
 
   @override
@@ -8276,6 +8268,70 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String pickStationLastFillUpAt(String date) {
     return 'Dernier plein : $date';
+  }
+
+  @override
+  String get helpBubblePreviousTip => 'Astuce précédente';
+
+  @override
+  String get helpBubbleNextTip => 'Astuce suivante';
+
+  @override
+  String helpBubbleTipPosition(int index, int total) {
+    return '$index/$total';
+  }
+
+  @override
+  String helpBubbleTipPositionSemantic(int index, int total) {
+    return 'Astuce $index sur $total';
+  }
+
+  @override
+  String get helpSearchTipSummaryBar =>
+      'Touchez la barre grise au-dessus des résultats pour changer de carburant, de rayon et tous les autres critères de recherche.';
+
+  @override
+  String get helpSearchTipFillEmphasis =>
+      'Dans le tableau comparatif, une case pleine signale le prix le plus bas pour ce carburant parmi les stations affichées.';
+
+  @override
+  String get helpSearchTipSecondFigure =>
+      'Le second chiffre, plus petit, indique ce que coûtent 100 km avec ce carburant sur votre véhicule.';
+
+  @override
+  String get helpSearchTipPriceArrows =>
+      'La flèche à côté d\'un prix le situe dans cette liste — tiers le moins cher, intermédiaire ou le plus cher de ces résultats. Ce n\'est pas une évolution dans le temps.';
+
+  @override
+  String get helpSearchTipViewToggle =>
+      'Le bouton d\'affichage bascule entre les fiches compactes et le tableau qui compare tous les carburants d\'un coup d\'œil.';
+
+  @override
+  String searchSummaryFuelTooltip(String fuel) {
+    return 'Carburant : $fuel';
+  }
+
+  @override
+  String searchSummaryRadiusValue(String km) {
+    return '$km km';
+  }
+
+  @override
+  String get searchSummaryAgeJustNow => 'à l\'instant';
+
+  @override
+  String searchSummaryAgeMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String searchSummaryAgeHours(int hours) {
+    return '$hours h';
+  }
+
+  @override
+  String searchSummaryAgeDays(int days) {
+    return '$days j';
   }
 
   @override
