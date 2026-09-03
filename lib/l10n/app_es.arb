@@ -5822,5 +5822,31 @@
   "@logoCreditsOpenFilePage": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "sortMenuByName": "Sort by name (A–Z)",
+  "@sortMenuByName": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "sortMenuOpen24h": "24-hour stations first",
+  "@sortMenuOpen24h": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "sortMenuPriceDistance": "Sort by price per kilometre",
+  "@sortMenuPriceDistance": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "sortMenuActiveSemantic": "{option}, current sort",
+  "@sortMenuActiveSemantic": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "option": {
+        "type": "String",
+        "example": "Sort by name (A–Z)"
+      }
+    }
   }
 }

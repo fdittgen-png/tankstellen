@@ -216,11 +216,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get clearCache => 'Cache leeren';
 
   @override
-  String stationsFound(int count) {
-    return '$count Tankstellen gefunden';
-  }
-
-  @override
   String get storageUsage => 'Speichernutzung auf diesem Gerät';
 
   @override
@@ -357,13 +352,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get sortDistance => 'Entfernung';
 
   @override
-  String get sortOpen24h => '24h';
-
-  @override
   String get sortRating => 'Bewertung';
-
-  @override
-  String get sortPriceDistance => 'Preis/km';
 
   @override
   String get cheap => 'günstig';
@@ -7937,19 +7926,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String allPricesCostPer100km(String cost) {
-    return '$cost/100 km';
-  }
-
-  @override
-  String allPricesVerdictHere(String fuel, String cost) {
-    return 'Hier am günstigsten: $fuel für $cost';
-  }
-
-  @override
-  String get allPricesVerdictWinsResults => 'günstigster der Treffer';
-
-  @override
   String allPricesMoreFuels(int count) {
     return '+$count';
   }
@@ -8671,6 +8647,20 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get searchRefreshTooltip =>
       'Position aktualisieren und Preise neu laden';
+
+  @override
+  String get sortMenuByName => 'Nach Name sortieren (A–Z)';
+
+  @override
+  String get sortMenuOpen24h => 'Rund um die Uhr geöffnete Tankstellen zuerst';
+
+  @override
+  String get sortMenuPriceDistance => 'Nach Preis pro Kilometer sortieren';
+
+  @override
+  String sortMenuActiveSemantic(String option) {
+    return '$option, aktuelle Sortierung';
+  }
 
   @override
   String priceHistoryFirstSeen(String date) {

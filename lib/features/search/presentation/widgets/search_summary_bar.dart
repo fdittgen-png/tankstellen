@@ -15,6 +15,7 @@ import '../../../route_search/providers/route_search_provider.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/search_mode.dart';
 import '../../providers/radar_search_provider.dart';
+import '../../../../core/location/user_position_provider.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
 import '../screens/search_criteria_screen.dart';
@@ -187,6 +188,27 @@ class SearchSummaryBar extends ConsumerWidget {
                   tooltip: _fuelTooltip(l10n, fuelType),
                 ),
                 _scopeSegment(context, ref, l10n, mode),
+                // #3943 — the "where" pill was removed as chrome: with a
+                // known position it only restated the criteria. The
+                // UNKNOWN case is not chrome, though — it warns that
+                // every distance below is measured from the search
+                // centre rather than from the user, so a silent removal
+                // would leave wrong-looking distances unexplained. Shown
+                // only when there is no position.
+                if (ref.watch(userPositionProvider) == null)
+                  SummaryChip(
+                    key: const Key('search_summary_position_unknown'),
+                    icon: Icon(
+                      Icons.location_off,
+                      size: 14,
+                      color: theme.colorScheme.error,
+                    ),
+                    label: l10n.positionUnknown,
+                    tooltip:
+                        '${l10n.positionUnknown} — ${l10n.distancesFromCenter}',
+                    semanticsLabel:
+                        '${l10n.positionUnknown} — ${l10n.distancesFromCenter}',
+                  ),
                 if (!radarActive) const PriceFreshnessSegment(),
               ],
             ),

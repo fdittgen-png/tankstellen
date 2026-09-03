@@ -5600,5 +5600,17 @@
       }
     }
   },
-  "logoCreditsOpenFilePage": "Ouvrir la page du fichier sur Wikimedia Commons"
+  "logoCreditsOpenFilePage": "Ouvrir la page du fichier sur Wikimedia Commons",
+  "sortMenuByName": "Trier par nom (A–Z)",
+  "sortMenuOpen24h": "Stations ouvertes 24 h/24 en premier",
+  "sortMenuPriceDistance": "Trier par prix au kilomètre",
+  "sortMenuActiveSemantic": "{option}, tri actif",
+  "@sortMenuActiveSemantic": {
+    "placeholders": {
+      "option": {
+        "type": "String",
+        "example": "Sort by name (A–Z)"
+      }
+    }
+  }
 }
