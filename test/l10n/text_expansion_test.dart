@@ -27,6 +27,8 @@ import 'package:tankstellen/features/price_history/providers/price_history_provi
 import 'package:tankstellen/features/profile/domain/entities/user_profile.dart';
 import 'package:tankstellen/features/profile/presentation/screens/settings/privacy/privacy_choices_screen.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
+import 'package:tankstellen/core/storage/storage_keys.dart';
+import 'package:tankstellen/core/widgets/help_banner.dart';
 import 'package:tankstellen/features/search/presentation/widgets/all_prices/all_prices_table_header.dart';
 import 'package:tankstellen/features/search/presentation/widgets/all_prices_station_card.dart';
 import 'package:tankstellen/features/search/presentation/widgets/criteria/criteria_action_bar.dart';
@@ -133,6 +135,14 @@ List<Object> _allPricesOverrides() => <Object>[
           },
         ),
       ),
+    ];
+
+/// #3938 — the paged help bubble reads a shown flag and an int position
+/// from the settings box; a stateful fake keeps both absent so the bubble
+/// renders open on tip 1.
+List<Object> _helpBubbleOverrides() => <Object>[
+      fakeHiveStorageOverride().override,
+      fakeStorageRepositoryOverride().override,
     ];
 
 void main() {
@@ -295,6 +305,33 @@ void main() {
       );
     });
 
+    // #3938 — the paged help bubble is the surface the epic moved the
+    // explanations INTO, so it is the one that must survive expansion:
+    // five sentences, a dismiss button and a three-part nav group inside
+    // one card at 320 dp.
+    testWidgets('HelpBanner — the paged search-surface bubble (#3938)',
+        (tester) async {
+      await pumpPseudo(
+        tester,
+        const HelpBanner(
+          storageKey: StorageKeys.helpBannerSearchResults,
+          icon: Icons.lightbulb_outline,
+          surface: HelpSurface.searchResults,
+        ),
+        overrides: _helpBubbleOverrides(),
+        widgetName: 'HelpBanner (paged)',
+      );
+      // Guard against a vacuous pass: a hidden bubble cannot overflow.
+      expect(
+        find.byKey(
+          const ValueKey(
+            'help-bubble-pager-${StorageKeys.helpBannerSearchResults}',
+          ),
+        ),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('AllPricesStationCard — four columns + verdict (#3933)',
         (tester) async {
       await pumpPseudo(
@@ -409,6 +446,29 @@ void main() {
         const AllPricesTableHeader(),
         overrides: _allPricesOverrides(),
         widgetName: 'AllPricesTableHeader',
+      );
+    });
+
+    testWidgets('HelpBanner — the paged search-surface bubble (#3938)',
+        (tester) async {
+      await pumpScaled(
+        tester,
+        const HelpBanner(
+          storageKey: StorageKeys.helpBannerSearchResults,
+          icon: Icons.lightbulb_outline,
+          surface: HelpSurface.searchResults,
+        ),
+        overrides: _helpBubbleOverrides(),
+        widgetName: 'HelpBanner (paged)',
+      );
+      // Guard against a vacuous pass: a hidden bubble cannot overflow.
+      expect(
+        find.byKey(
+          const ValueKey(
+            'help-bubble-pager-${StorageKeys.helpBannerSearchResults}',
+          ),
+        ),
+        findsOneWidget,
       );
     });
 

@@ -105,8 +105,9 @@ void main() {
 
   group('RadarSearchChip', () {
     testWidgets(
-        '#3926 — renders as a compact ActionChip (no FAB), idle label, with a '
-        'leading radar icon', (tester) async {
+        '#3939 — renders as an ICON-ONLY ActionChip (no FAB): the extended '
+        'pill was what pushed the result count into an ellipsis',
+        (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
@@ -122,7 +123,29 @@ void main() {
       expect(find.byType(ActionChip), findsOneWidget);
       expect(find.widgetWithIcon(ActionChip, Icons.radar),
           findsOneWidget);
-      expect(find.text('Start fuel station radar'), findsOneWidget);
+      // #3939 — the word is gone from the chip …
+      expect(find.text('Start fuel station radar'), findsNothing);
+      // … and lives on as its tooltip.
+      expect(find.byTooltip('Start fuel station radar'), findsOneWidget);
+    });
+
+    testWidgets('#3939 — the icon-only chip names itself to a screen reader',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const RadarSearchChip(),
+        overrides: test.overrides.cast(),
+      );
+
+      expect(
+        find.bySemanticsLabel('Start fuel station radar'),
+        findsOneWidget,
+      );
+      handle.dispose();
     });
 
     testWidgets('tapping the pill runs the radar and the list re-renders the '
@@ -186,17 +209,18 @@ void main() {
         settle: false,
       );
 
-      // A working spinner + "Searching…" — NOT the silent flip to "Stop radar"
-      // or "Start" that gave no sign the scan was running.
-      expect(find.text('Searching…'), findsOneWidget);
+      // A working spinner — NOT the silent flip to the stop glyph that gave
+      // no sign the scan was running. #3939 moved the wording to the
+      // tooltip, but the spinner itself is the visible progress sign.
       expect(
           find.descendant(
             of: find.byType(ActionChip),
             matching: find.byType(CircularProgressIndicator),
           ),
           findsOneWidget);
-      expect(find.text('Stop radar'), findsNothing);
-      expect(find.text('Start fuel station radar'), findsNothing);
+      expect(find.byTooltip('Searching…'), findsOneWidget);
+      expect(find.byTooltip('Stop radar'), findsNothing);
+      expect(find.byTooltip('Start fuel station radar'), findsNothing);
       expect(find.widgetWithIcon(ActionChip, Icons.stop_circle),
           findsNothing);
 
@@ -204,7 +228,7 @@ void main() {
       // back to the idle start treatment (no spinner left to animate).
       await tester.tap(find.byKey(const Key('radarSearchButton')));
       await tester.pump();
-      expect(find.text('Start fuel station radar'), findsOneWidget);
+      expect(find.byTooltip('Start fuel station radar'), findsOneWidget);
     });
 
     testWidgets(
@@ -224,12 +248,10 @@ void main() {
         ].cast(),
       );
 
-      // Active → a clear "Stop radar" label + a meaningful stop_circle icon
-      // (#2744 — not the ambiguous "Étape"/close treatment), not the start
-      // label.
-      expect(find.text('Stop radar'), findsOneWidget);
-      expect(find.text('Stop'), findsNothing);
-      expect(find.text('Start fuel station radar'), findsNothing);
+      // Active → a meaningful stop_circle glyph (#2744 — not the ambiguous
+      // "Étape"/close treatment) named "Stop radar" by its tooltip.
+      expect(find.byTooltip('Stop radar'), findsOneWidget);
+      expect(find.byTooltip('Start fuel station radar'), findsNothing);
       expect(find.widgetWithIcon(ActionChip, Icons.stop_circle),
           findsOneWidget);
       expect(
@@ -238,7 +260,7 @@ void main() {
       // Tapping it dismisses the radar (flips back to the start treatment).
       await tester.tap(find.byKey(const Key('radarSearchButton')));
       await tester.pumpAndSettle();
-      expect(find.text('Start fuel station radar'), findsOneWidget);
+      expect(find.byTooltip('Start fuel station radar'), findsOneWidget);
       expect(find.widgetWithIcon(ActionChip, Icons.radar),
           findsOneWidget);
     });

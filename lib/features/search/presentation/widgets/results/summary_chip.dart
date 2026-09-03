@@ -16,11 +16,17 @@ import '../../../../../core/theme/app_radius.dart';
 /// The pill never grows past [maxWidth]; its label ellipsises instead, so
 /// an expanded translation (de/en_XA) can never push the band into a
 /// horizontal overflow at 320 dp.
+///
+/// #3939 (Epic #3937) — the pills now carry the **value only** (`E85`,
+/// `10 km`, `1 min`): the glyph beside each one already says the noun the
+/// old label repeated. Nothing is lost, because the full sentence moves
+/// into [tooltip], which is also what a screen reader announces.
 class SummaryChip extends StatelessWidget {
   const SummaryChip({
     super.key,
     required this.icon,
     required this.label,
+    this.tooltip,
     this.semanticsLabel,
     this.emphasized = false,
     this.maxWidth = 168,
@@ -29,11 +35,18 @@ class SummaryChip extends StatelessWidget {
   /// Leading glyph — an [Icon] or a small progress indicator.
   final Widget icon;
 
-  /// Visible pill text.
+  /// Visible pill text — the VALUE alone since #3939.
   final String label;
 
-  /// Screen-reader label when the visible text alone is not self-explanatory
-  /// (e.g. the position segment, which reads "GPS · 1 min" visually).
+  /// The full sentence the visible value is the short form of ("Within
+  /// 10 km"). Shown on long-press and, unless [semanticsLabel] overrides
+  /// it, announced by assistive tech — so dropping the word from the pill
+  /// costs neither discoverability nor accessibility.
+  final String? tooltip;
+
+  /// Screen-reader label when neither the visible text nor [tooltip] is
+  /// the right thing to announce (e.g. the position segment, which reads
+  /// "GPS · 1 min" visually). Defaults to [tooltip].
   final String? semanticsLabel;
 
   /// Amber "needs attention" treatment — used by the freshness segment once
@@ -84,8 +97,16 @@ class SummaryChip extends StatelessWidget {
         ),
       ),
     );
-    final semantics = semanticsLabel;
-    if (semantics == null) return pill;
-    return Semantics(label: semantics, excludeSemantics: true, child: pill);
+    final message = tooltip;
+    final Widget decorated = message == null
+        ? pill
+        : Tooltip(message: message, child: pill);
+    final semantics = semanticsLabel ?? tooltip;
+    if (semantics == null) return decorated;
+    return Semantics(
+      label: semantics,
+      excludeSemantics: true,
+      child: decorated,
+    );
   }
 }

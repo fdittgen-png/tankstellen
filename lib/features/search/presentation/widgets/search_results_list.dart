@@ -13,6 +13,8 @@ import '../../../../core/utils/price_tier.dart';
 import '../../../../core/utils/price_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
+import '../../../../core/storage/storage_keys.dart';
+import '../../../../core/widgets/help_banner.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../core/widgets/staggered_fade_in.dart';
@@ -128,6 +130,18 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
         // #494 — same swipe-hint banner as the favorites screen. Shows
         // once until the user taps "Got it", then stays dismissed.
         const SwipeTutorialBanner(),
+        // #3939 (Epic #3937) — everything the chrome used to explain in
+        // permanent height (the all-prices legend, what the price arrows
+        // rank, where the criteria live) lives here instead: a paged,
+        // dismissible bubble the user reads once. The landscape radar
+        // pane, which trades every non-essential row for vertical room,
+        // does not carry it.
+        if (!widget.hideSortAndFilter)
+          const HelpBanner(
+            storageKey: StorageKeys.helpBannerSearchResults,
+            icon: Icons.lightbulb_outline,
+            surface: HelpSurface.searchResults,
+          ),
         // #3372 — the landscape radar list drops the filter panel for
         // vertical room (row B keeps the count/view/overflow controls).
         // #3926 — the panel no longer carries its own "All brands ⌄"

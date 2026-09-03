@@ -3767,8 +3767,6 @@
   "radiusAlertBlockerLabel": "Geben Sie eine Bezeichnung ein",
   "radiusAlertBlockerThreshold": "Geben Sie einen Schwellenwert über 0 ein",
   "radiusAlertBlockerLocation": "Wählen Sie einen Standort",
-  "allPricesLegend": "Gefüllt = günstigster Preis dieser Treffer. Zweite Zahl = was 100 km mit diesem Kraftstoff in Ihrem Fahrzeug kosten.",
-  "allPricesLegendPricesOnly": "Gefüllt = günstigster Preis dieser Treffer. Fahrzeug anlegen und Tankvorgänge erfassen, um die Kosten pro 100 km zu sehen.",
   "allPricesNoPriceMask": "—",
   "allPricesBestMarker": "bester",
   "allPricesDelta": "+{amount}",
@@ -4097,6 +4095,47 @@
   "helpSearchTipSecondFigure": "Die kleinere zweite Zahl in einem Feld zeigt, was 100 km mit diesem Kraftstoff in Ihrem Fahrzeug kosten.",
   "helpSearchTipPriceArrows": "Der Pfeil neben einem Preis ordnet ihn innerhalb dieser Liste ein — günstigstes, mittleres oder teuerstes Drittel dieser Treffer. Er zeigt keinen zeitlichen Preisverlauf.",
   "helpSearchTipViewToggle": "Die Ansichtstaste wechselt zwischen den kompakten Karten und der Tabelle, die alle Kraftstoffe auf einmal vergleicht.",
+  "searchSummaryFuelTooltip": "Kraftstoff: {fuel}",
+  "@searchSummaryFuelTooltip": {
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      }
+    }
+  },
+  "searchSummaryRadiusValue": "{km} km",
+  "@searchSummaryRadiusValue": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "searchSummaryAgeJustNow": "jetzt",
+  "searchSummaryAgeMinutes": "{minutes} Min.",
+  "@searchSummaryAgeMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "searchSummaryAgeHours": "{hours} Std.",
+  "@searchSummaryAgeHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "searchSummaryAgeDays": "{days} T.",
+  "@searchSummaryAgeDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
   "privacyTopicSubtitle": "Ihre Entscheidungen, Daten auf diesem Gerät, Synchronisierung, Export oder Löschen",
   "privacyDataLocationLocal": "Ihre Daten bleiben auf diesem Gerät",
   "privacyDataLocationSynced": "Ihre Daten werden zusätzlich mit TankSync synchronisiert",

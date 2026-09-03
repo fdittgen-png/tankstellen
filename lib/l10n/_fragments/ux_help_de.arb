@@ -4,28 +4,51 @@
   "helpBubbleTipPosition": "{index}/{total}",
   "@helpBubbleTipPosition": {
     "placeholders": {
-      "index": {
-        "type": "int"
-      },
-      "total": {
-        "type": "int"
-      }
+      "index": {"type": "int"},
+      "total": {"type": "int"}
     }
   },
   "helpBubbleTipPositionSemantic": "Tipp {index} von {total}",
   "@helpBubbleTipPositionSemantic": {
     "placeholders": {
-      "index": {
-        "type": "int"
-      },
-      "total": {
-        "type": "int"
-      }
+      "index": {"type": "int"},
+      "total": {"type": "int"}
     }
   },
   "helpSearchTipSummaryBar": "Tippen Sie auf die graue Leiste über den Treffern, um Kraftstoff, Umkreis und alle weiteren Suchkriterien zu ändern.",
   "helpSearchTipFillEmphasis": "In der Vergleichstabelle markiert ein gefülltes Feld den günstigsten Preis für diesen Kraftstoff unter den angezeigten Stationen.",
   "helpSearchTipSecondFigure": "Die kleinere zweite Zahl in einem Feld zeigt, was 100 km mit diesem Kraftstoff in Ihrem Fahrzeug kosten.",
   "helpSearchTipPriceArrows": "Der Pfeil neben einem Preis ordnet ihn innerhalb dieser Liste ein — günstigstes, mittleres oder teuerstes Drittel dieser Treffer. Er zeigt keinen zeitlichen Preisverlauf.",
-  "helpSearchTipViewToggle": "Die Ansichtstaste wechselt zwischen den kompakten Karten und der Tabelle, die alle Kraftstoffe auf einmal vergleicht."
+  "helpSearchTipViewToggle": "Die Ansichtstaste wechselt zwischen den kompakten Karten und der Tabelle, die alle Kraftstoffe auf einmal vergleicht.",
+  "searchSummaryFuelTooltip": "Kraftstoff: {fuel}",
+  "@searchSummaryFuelTooltip": {
+    "placeholders": {
+      "fuel": {"type": "String"}
+    }
+  },
+  "searchSummaryRadiusValue": "{km} km",
+  "@searchSummaryRadiusValue": {
+    "placeholders": {
+      "km": {"type": "String"}
+    }
+  },
+  "searchSummaryAgeJustNow": "jetzt",
+  "searchSummaryAgeMinutes": "{minutes} Min.",
+  "@searchSummaryAgeMinutes": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "searchSummaryAgeHours": "{hours} Std.",
+  "@searchSummaryAgeHours": {
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
+  "searchSummaryAgeDays": "{days} T.",
+  "@searchSummaryAgeDays": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  }
 }

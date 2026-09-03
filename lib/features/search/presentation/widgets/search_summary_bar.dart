@@ -3,7 +3,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/country/country_provider.dart';
 import '../../../../core/theme/fuel_colors.dart';
+import '../../../../core/utils/station_extensions.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
 import '../../../feature_management/domain/feature.dart';
@@ -33,6 +35,13 @@ import 'user_position_bar.dart';
 /// pill to the next line instead of clipping it, so the band survives
 /// en_XA at 320 dp and a 1.3× text scale.
 ///
+/// #3939 (Epic #3937) — every segment renders its **value only**: `E85`,
+/// not "E85 / Bioéthanol"; `10 km`, not "Within 10 km"; `1 min`, not
+/// "Prices from 1 min ago". The leaf, the radius glyph and the clock
+/// already say the nouns those labels repeated, and the full sentence
+/// survives as the pill's tooltip and its screen-reader label — so a
+/// long-press and a screen reader lose nothing at all.
+///
 /// The open-data attribution that used to sit above this bar now lives in
 /// the footer under the results list, and the position bar's refresh icon
 /// was folded into the single app-bar refresh.
@@ -54,12 +63,20 @@ class SearchSummaryBar extends ConsumerWidget {
     );
   }
 
-  String _fuelLabel(BuildContext context, FuelType type) {
-    if (type == FuelType.all) {
-      return AppLocalizations.of(context).allFuels;
-    }
-    return type.displayName;
+  /// The fuel pill's VISIBLE text: the pump code alone (`E85`, `Diesel`,
+  /// and the PEMEX grade names in Mexico). The wildcard keeps its word —
+  /// "All" has no code.
+  String _fuelValue(AppLocalizations l10n, FuelType type, String countryCode) {
+    if (type == FuelType.all) return l10n.allFuels;
+    return fuelDisplayLabel(type, countryCode: countryCode);
   }
+
+  /// What the pill says on long-press and to a screen reader: the full
+  /// name the visible code stands for.
+  String _fuelTooltip(AppLocalizations l10n, FuelType type) =>
+      l10n.searchSummaryFuelTooltip(
+        type == FuelType.all ? l10n.allFuels : type.displayName,
+      );
 
   /// The segment that follows the fuel pill. In nearby mode it shows the
   /// radius ("Within {km} km"); in route mode it names the corridor and its
@@ -83,9 +100,13 @@ class SearchSummaryBar extends ConsumerWidget {
     }
     if (mode != SearchMode.route) {
       final kmText = ref.watch(searchRadiusProvider).round().toString();
+      // #3939 — the radius glyph already says "within a radius of"; the
+      // pill keeps the number and hands the sentence to the tooltip.
       return SummaryChip(
+        key: const Key('search_summary_radius'),
         icon: const Icon(Icons.radar, size: 14),
-        label: l10n.searchCriteriaRadiusBadge(kmText),
+        label: l10n.searchSummaryRadiusValue(kmText),
+        tooltip: l10n.searchCriteriaRadiusBadge(kmText),
       );
     }
     final routeState = ref.watch(routeSearchStateProvider);
@@ -134,6 +155,7 @@ class SearchSummaryBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final fuelType = ref.watch(selectedFuelTypeProvider);
+    final countryCode = ref.watch(activeCountryProvider).code;
     final theme = Theme.of(context);
 
     // #2592 — route mode replaces the meaningless radius segment with the
@@ -167,12 +189,14 @@ class SearchSummaryBar extends ConsumerWidget {
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 SummaryChip(
+                  key: const Key('search_summary_fuel'),
                   icon: Icon(
                     fuelType.icon,
                     size: 14,
                     color: FuelColors.forType(fuelType),
                   ),
-                  label: _fuelLabel(context, fuelType),
+                  label: _fuelValue(l10n, fuelType, countryCode),
+                  tooltip: _fuelTooltip(l10n, fuelType),
                 ),
                 _scopeSegment(context, ref, l10n, mode),
                 _whereSegment(ref),

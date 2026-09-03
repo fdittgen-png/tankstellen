@@ -1,6 +1,4 @@
 {
-  "allPricesLegend": "Fond plein = le moins cher de ces résultats. Deuxième chiffre = ce que coûtent 100 km avec ce carburant sur votre véhicule.",
-  "allPricesLegendPricesOnly": "Fond plein = le moins cher de ces résultats. Ajoutez un véhicule et saisissez vos pleins pour voir le coût aux 100 km.",
   "allPricesNoPriceMask": "—",
   "allPricesBestMarker": "le moins cher",
   "allPricesDelta": "+{amount}",

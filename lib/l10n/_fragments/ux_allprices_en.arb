@@ -1,12 +1,4 @@
 {
-  "allPricesLegend": "Filled = cheapest of these results. Second figure = what 100 km costs on that fuel with your vehicle.",
-  "@allPricesLegend": {
-    "description": "One-line legend under the sticky column header of the all-prices comparison table (#3933). Explains the two things the cards would otherwise leave unexplained: the filled emphasis and the second number in each cell. Shown when the active vehicle has measured per-fuel consumption."
-  },
-  "allPricesLegendPricesOnly": "Filled = cheapest of these results. Add a vehicle and log fill-ups to see the cost per 100 km.",
-  "@allPricesLegendPricesOnly": {
-    "description": "Legend variant of allPricesLegend used when no vehicle is active or no fuel has a measured consumption yet, so the cost-per-100-km line is absent from every cell (#3933)."
-  },
   "allPricesNoPriceMask": "—",
   "@allPricesNoPriceMask": {
     "description": "Placeholder rendered in a fuel column the station does not price at all, keeping the column aligned instead of reflowing the row (#3933). An em dash in most locales."

@@ -8075,14 +8075,6 @@
   "@radiusAlertBlockerLocation": {
     "description": "Helper line under the zone-alert sheet's location buttons explaining why Save is disabled: no alert centre (GPS position or map point) has been chosen yet (#3905)."
   },
-  "allPricesLegend": "Filled = cheapest of these results. Second figure = what 100 km costs on that fuel with your vehicle.",
-  "@allPricesLegend": {
-    "description": "One-line legend under the sticky column header of the all-prices comparison table (#3933). Explains the two things the cards would otherwise leave unexplained: the filled emphasis and the second number in each cell. Shown when the active vehicle has measured per-fuel consumption."
-  },
-  "allPricesLegendPricesOnly": "Filled = cheapest of these results. Add a vehicle and log fill-ups to see the cost per 100 km.",
-  "@allPricesLegendPricesOnly": {
-    "description": "Legend variant of allPricesLegend used when no vehicle is active or no fuel has a measured consumption yet, so the cost-per-100-km line is absent from every cell (#3933)."
-  },
   "allPricesNoPriceMask": "—",
   "@allPricesNoPriceMask": {
     "description": "Placeholder rendered in a fuel column the station does not price at all, keeping the column aligned instead of reflowing the row (#3933). An em dash in most locales."
@@ -8629,6 +8621,60 @@
   "helpSearchTipViewToggle": "The view button switches between the compact cards and the table that compares every fuel at once.",
   "@helpSearchTipViewToggle": {
     "description": "Tip 5 of the search-results help bubble (#3939), the deepest one: the all-prices comparison view exists for comparing fuels rather than stations."
+  },
+  "searchSummaryFuelTooltip": "Fuel: {fuel}",
+  "@searchSummaryFuelTooltip": {
+    "description": "Long-press tooltip and screen-reader label of the fuel pill in the results summary bar (#3939). The pill itself now shows only the fuel code ('E85'), because the pump icon beside it already says the word 'fuel'.",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E85 / Bioethanol"
+      }
+    }
+  },
+  "searchSummaryRadiusValue": "{km} km",
+  "@searchSummaryRadiusValue": {
+    "description": "Value-only label of the radius pill in the results summary bar (#3939). The radius glyph beside it already says 'within a radius of', so the pill shows the number alone; the full sentence lives in its tooltip (searchCriteriaRadiusBadge).",
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "10"
+      }
+    }
+  },
+  "searchSummaryAgeJustNow": "now",
+  "@searchSummaryAgeJustNow": {
+    "description": "Value-only label of the price-freshness pill in the results summary bar for an age under one minute (#3939). The clock glyph carries the meaning; the full sentence ('Prices from just now') is the tooltip."
+  },
+  "searchSummaryAgeMinutes": "{minutes} min",
+  "@searchSummaryAgeMinutes": {
+    "description": "Value-only label of the price-freshness pill for a download age under an hour (#3939). The full sentence lives in the tooltip.",
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+  "searchSummaryAgeHours": "{hours} h",
+  "@searchSummaryAgeHours": {
+    "description": "Value-only label of the price-freshness pill for a download age under a day (#3939). The full sentence lives in the tooltip.",
+    "placeholders": {
+      "hours": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "searchSummaryAgeDays": "{days} d",
+  "@searchSummaryAgeDays": {
+    "description": "Value-only label of the price-freshness pill for a download age of a day or more (#3939). The full sentence lives in the tooltip.",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "3"
+      }
+    }
   },
   "privacyTopicSubtitle": "Your choices, data on this device, sync, export or delete",
   "@privacyTopicSubtitle": {

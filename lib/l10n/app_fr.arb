@@ -5596,14 +5596,64 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "allPricesLegend": "Filled = cheapest of these results. Second figure = what 100 km costs on that fuel with your vehicle.",
-  "@allPricesLegend": {
+  "searchSummaryFuelTooltip": "Fuel: {fuel}",
+  "@searchSummaryFuelTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E85 / Bioethanol"
+      }
+    }
+  },
+  "searchSummaryRadiusValue": "{km} km",
+  "@searchSummaryRadiusValue": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "10"
+      }
+    }
+  },
+  "searchSummaryAgeJustNow": "now",
+  "@searchSummaryAgeJustNow": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "allPricesLegendPricesOnly": "Filled = cheapest of these results. Add a vehicle and log fill-ups to see the cost per 100 km.",
-  "@allPricesLegendPricesOnly": {
+  "searchSummaryAgeMinutes": "{minutes} min",
+  "@searchSummaryAgeMinutes": {
     "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
+    "description": "MT — needs native review",
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+  "searchSummaryAgeHours": "{hours} h",
+  "@searchSummaryAgeHours": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "hours": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "searchSummaryAgeDays": "{days} d",
+  "@searchSummaryAgeDays": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "3"
+      }
+    }
   }
 }

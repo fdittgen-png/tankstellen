@@ -1,6 +1,4 @@
 {
-  "allPricesLegend": "Gefüllt = günstigster Preis dieser Treffer. Zweite Zahl = was 100 km mit diesem Kraftstoff in Ihrem Fahrzeug kosten.",
-  "allPricesLegendPricesOnly": "Gefüllt = günstigster Preis dieser Treffer. Fahrzeug anlegen und Tankvorgänge erfassen, um die Kosten pro 100 km zu sehen.",
   "allPricesNoPriceMask": "—",
   "allPricesBestMarker": "bester",
   "allPricesDelta": "+{amount}",

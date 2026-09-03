@@ -48,15 +48,24 @@ class PriceFreshnessSegment extends ConsumerWidget {
     final age = ref.watch(appClockProvider).now().difference(result.fetchedAt);
     final stale = result.isStale || age > staleAfter;
 
+    // #3939 — the clock glyph already says "age", so the pill carries the
+    // bare figure ("1 min") and the sentence that names WHAT is that old
+    // moves into the tooltip / screen-reader label. Both come from the
+    // same branch, so they can never disagree.
     final String label;
+    final String tooltip;
     if (age.inMinutes < 1) {
-      label = l10n.searchSummaryPricesJustNow;
+      label = l10n.searchSummaryAgeJustNow;
+      tooltip = l10n.searchSummaryPricesJustNow;
     } else if (age.inHours < 1) {
-      label = l10n.searchSummaryPricesMinutes(age.inMinutes);
+      label = l10n.searchSummaryAgeMinutes(age.inMinutes);
+      tooltip = l10n.searchSummaryPricesMinutes(age.inMinutes);
     } else if (age.inDays < 1) {
-      label = l10n.searchSummaryPricesHours(age.inHours);
+      label = l10n.searchSummaryAgeHours(age.inHours);
+      tooltip = l10n.searchSummaryPricesHours(age.inHours);
     } else {
-      label = l10n.searchSummaryPricesDays(age.inDays);
+      label = l10n.searchSummaryAgeDays(age.inDays);
+      tooltip = l10n.searchSummaryPricesDays(age.inDays);
     }
 
     return SummaryChip(
@@ -69,6 +78,7 @@ class PriceFreshnessSegment extends ConsumerWidget {
             : Theme.of(context).colorScheme.onSurfaceVariant,
       ),
       label: label,
+      tooltip: tooltip,
       emphasized: stale,
     );
   }
