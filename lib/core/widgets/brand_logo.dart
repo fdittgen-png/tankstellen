@@ -7,30 +7,49 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../domain/brand_appearance.dart';
+import '../domain/brand_logo_manifest.dart';
 import '../providers/privacy_controls_provider.dart';
 import '../theme/app_radius.dart';
 import '../utils/brand_logo_mapper.dart';
 
 /// Displays the mark for a fuel station brand or a charging network.
 ///
-/// Three renderings, in order of preference:
+/// Four renderings, in order of preference:
 ///
-/// 1. **The real logo** — only when the user switched internet logos ON
-///    in Settings → Privacy (#3870) *and* [BrandLogoMapper] resolves a
-///    domain. Disk-cached and decoded at the display size (#1761).
-/// 2. **The offline brand mark** (#3930) — the brand's own colour with a
-///    1–3 character monogram, from [BrandAppearance]. This is what the
-///    overwhelming majority of users see, because the privacy switch is
-///    OFF by default. It is also the network logo's placeholder and its
-///    error widget, so a slow or dead CDN degrades to the brand's colour
-///    rather than to a grey hole.
-/// 3. **The neutral tile** — a surface-coloured box with a pump or a
+/// 1. **The bundled logo** (#3940) — the brand's real mark, shipped
+///    inside the app from [BrandLogoManifest]. Free-licensed files only
+///    (public domain / CC-BY / CC-BY-SA / CC0, audited file-by-file on
+///    Wikimedia Commons), so it needs no network call and is completely
+///    independent of the internet-logos privacy switch. About sixty of
+///    the registry's brands have one; the rest genuinely have no
+///    free-licensed logo and fall through.
+/// 2. **The real logo over the network** — only when the user switched
+///    internet logos ON in Settings → Privacy (#3870) *and*
+///    [BrandLogoMapper] resolves a domain. Disk-cached and decoded at the
+///    display size (#1761). Unchanged by #3940, but now reached only for
+///    brands with no bundled file.
+/// 3. **The offline brand mark** (#3930) — the brand's own colour with a
+///    1–3 character monogram, from [BrandAppearance]. It is also the
+///    network logo's placeholder and its error widget, so a slow or dead
+///    CDN degrades to the brand's colour rather than to a grey hole.
+/// 4. **The neutral tile** — a surface-coloured box with a pump or a
 ///    charging glyph, for a brand nothing recognises. [kind] picks the
 ///    glyph.
 class BrandLogo extends ConsumerWidget {
   /// The brand name (e.g. "Shell", "TotalEnergies", "Ionity"). Raw
   /// upstream spellings are fine — the mark canonicalises them.
   final String brand;
+
+  /// How much WIDER than [size] a bundled logo may grow, as a multiple
+  /// of it. Commons hosts wordmarks, not emblems, and several are very
+  /// wide (Fastned ≈ 7.6:1, TotalEnergies ≈ 6.6:1): letterboxed into a
+  /// square they collapse to an unreadable strip — worse for
+  /// recognition than the monogram they replaced. A caller whose layout
+  /// can absorb the extra width (the list card's Row) passes > 1 so a
+  /// wordmark keeps its height and spends width instead. Callers that
+  /// reserve a fixed square in their own measurements (the station
+  /// detail header, which feeds `station_header_metrics`) keep 1.
+  final double maxWidthFactor;
 
   /// The size of the mark (width and height). Defaults to 48.
   final double size;
@@ -44,15 +63,22 @@ class BrandLogo extends ConsumerWidget {
     super.key,
     required this.brand,
     this.size = 48,
+    this.maxWidthFactor = 1,
     this.kind = BrandKind.fuel,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // #3940 — a bundled, free-licensed logo wins over everything else: it
+    // is the brand's real mark, it costs no request, and it renders with
+    // the privacy switch OFF (which is its default).
+    final bundled = BrandLogoManifest.of(brand);
     // #3870 (Epic #3865) — internet logos (logo.clearbit.com) only when the
     // user switched them on in Settings → Privacy; the monogram otherwise.
     final remote = ref.watch(remoteBrandLogosProvider);
-    final url = remote ? BrandLogoMapper.logoUrl(brand) : null;
+    final url = bundled == null && remote
+        ? BrandLogoMapper.logoUrl(brand)
+        : null;
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
 
@@ -70,9 +96,50 @@ class BrandLogo extends ConsumerWidget {
     return Semantics(
       label: label,
       image: true,
-      child: url == null
-          ? _mark(theme)
-          : _networkLogo(context, url, theme),
+      child: switch ((bundled, url)) {
+        (final BrandLogoAsset logo, _) => _bundledLogo(logo, theme),
+        (_, final String remoteUrl) => _networkLogo(context, remoteUrl, theme),
+        _ => _mark(theme),
+      },
+    );
+  }
+
+  /// The bundled free-licensed logo (#3940), letterboxed on a white
+  /// ground.
+  ///
+  /// White, not the surface colour: Commons hosts wordmarks drawn for
+  /// print, several of them black (the bft and Morrisons marks), so a
+  /// theme-coloured ground would swallow them in dark mode. The assets
+  /// are already rendered at the display budget by
+  /// `tool/fetch_brand_logos.dart`, so there is no decode-at-size dance
+  /// to do here. A missing or corrupt asset degrades to the monogram
+  /// rather than to Flutter's broken-image glyph.
+  Widget _bundledLogo(BrandLogoAsset logo, ThemeData theme) {
+    // Height is fixed; width follows the image's own ratio between one
+    // and [maxWidthFactor] squares. With the default factor of 1 this is
+    // exactly the old square. The image is unconstrained in width inside
+    // those bounds, so `BoxFit.contain` fills the height rather than
+    // shrinking to fit a square it never fitted.
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        minWidth: size,
+        maxWidth: size * maxWidthFactor,
+        minHeight: size,
+        maxHeight: size,
+      ),
+      child: Container(
+        padding: EdgeInsets.all(size * 0.08),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFFFFF),
+          borderRadius: AppRadius.md,
+        ),
+        child: Image.asset(
+          logo.assetPath,
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.medium,
+          errorBuilder: (context, _, _) => _mark(theme),
+        ),
+      ),
     );
   }
 

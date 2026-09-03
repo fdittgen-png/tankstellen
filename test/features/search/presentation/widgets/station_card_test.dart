@@ -1501,7 +1501,11 @@ void main() {
         final logo = tester.widget<BrandLogo>(find.byType(BrandLogo));
         expect(logo.brand, 'STAR');
         expect(logo.size, 34, reason: 'row-sized, not the 48dp detail slot');
-        expect(find.text('OR'), findsOneWidget);
+        // #3940 — Orlen has a bundled free-licensed logo, and the
+        // bundled tier outranks the monogram, so the mark is an image
+        // rather than the 'OR' letters this asserted before.
+        expect(find.text('OR'), findsNothing);
+        expect(find.byType(Image), findsWidgets);
 
         // Leading: the mark sits left of the status column and the
         // station text, and the card still names the brand.

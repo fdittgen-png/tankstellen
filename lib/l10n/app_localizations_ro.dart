@@ -8304,6 +8304,41 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
+  String get logoCreditsTitle => 'Logo credits';
+
+  @override
+  String logoCreditsAboutSubtitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count brand logos from Wikimedia Commons',
+      one: '1 brand logo from Wikimedia Commons',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get logoCreditsIntro =>
+      'These station and charging-network logos are bundled with the app. Every file was taken from Wikimedia Commons and is public domain or published under a Creative Commons licence — nothing is downloaded while you browse.';
+
+  @override
+  String get logoCreditsMonogramNote =>
+      'Brands whose logo is not available under a free licence keep the lettered mark in the app\'s own colours.';
+
+  @override
+  String get logoCreditsTrademarkNotice =>
+      'All trademarks are the property of their respective owners and are shown only to identify the station or the charging network.';
+
+  @override
+  String logoCreditsEntryDetails(String licence, String author) {
+    return '$licence · $author';
+  }
+
+  @override
+  String get logoCreditsOpenFilePage =>
+      'Open the file page on Wikimedia Commons';
+
+  @override
   String get privacyTopicSubtitle =>
       'Your choices, data on this device, sync, export or delete';
 

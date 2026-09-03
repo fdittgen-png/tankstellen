@@ -205,7 +205,16 @@ class StationCard extends StatelessWidget {
                 // letting the mark announce it again would read the
                 // brand twice on every card.
                 ExcludeSemantics(
-                  child: BrandLogo(brand: station.brand, size: 34),
+                  child: // #3940 — the slot stays SQUARE here. A wide Commons wordmark
+                  // (Fastned 7.6:1) would read better in a wider box, but this
+                  // row has no width to give: at 320 dp under a 1.3x text
+                  // scale a 2x slot overflows the card by 2.4 px, and a
+                  // LayoutBuilder cannot measure the room because a Row lays
+                  // its non-flex children out unbounded. The brand name sits
+                  // beside the mark anyway, so recognition does not rest on
+                  // the logo alone. `BrandLogo.maxWidthFactor` stays available
+                  // for a surface that does have the room.
+                  BrandLogo(brand: station.brand, size: 34),
                 ),
                 const SizedBox(width: 10),
               ],
