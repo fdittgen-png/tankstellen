@@ -1,0 +1,43 @@
+{
+  "logoCreditsTitle": "Logo credits",
+  "@logoCreditsTitle": {
+    "description": "Title of the Settings → About → logo credits screen, and the label of the row in About that opens it (#3940). Lists every station-brand logo bundled with the app, with its licence, author and source."
+  },
+  "logoCreditsAboutSubtitle": "{count, plural, =1{1 brand logo from Wikimedia Commons} other{{count} brand logos from Wikimedia Commons}}",
+  "@logoCreditsAboutSubtitle": {
+    "description": "Subtitle of the About row that opens the logo credits screen (#3940). {count} is the number of bundled logo files.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "logoCreditsIntro": "These station and charging-network logos are bundled with the app. Every file was taken from Wikimedia Commons and is public domain or published under a Creative Commons licence — nothing is downloaded while you browse.",
+  "@logoCreditsIntro": {
+    "description": "Explanatory paragraph at the top of the logo credits screen (#3940). Makes clear the logos ship inside the app and need no network call."
+  },
+  "logoCreditsMonogramNote": "Brands whose logo is not available under a free licence keep the lettered mark in the app's own colours.",
+  "@logoCreditsMonogramNote": {
+    "description": "Second paragraph of the logo credits screen (#3940), explaining why many brands still show the coloured monogram tile instead of a real logo."
+  },
+  "logoCreditsTrademarkNotice": "All trademarks are the property of their respective owners and are shown only to identify the station or the charging network.",
+  "@logoCreditsTrademarkNotice": {
+    "description": "Trademark notice at the bottom of the logo credits screen (#3940). Copyright and trademark are separate questions: a public-domain file settles copyright, this line covers nominative trademark use."
+  },
+  "logoCreditsEntryDetails": "{licence} · {author}",
+  "@logoCreditsEntryDetails": {
+    "description": "Subtitle of one logo row on the credits screen (#3940): the Commons licence template and the file's author. Both values are data reproduced verbatim from Wikimedia Commons and are never translated.",
+    "placeholders": {
+      "licence": {
+        "type": "String"
+      },
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "logoCreditsOpenFilePage": "Open the file page on Wikimedia Commons",
+  "@logoCreditsOpenFilePage": {
+    "description": "Tooltip of the icon-only button on each logo credits row that opens the file's Wikimedia Commons page in a browser (#3940)."
+  }
+}

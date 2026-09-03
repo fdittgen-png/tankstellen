@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/domain/brand_appearance.dart';
+import 'package:tankstellen/core/domain/brand_logo_manifest.dart';
 import 'package:tankstellen/core/providers/privacy_controls_provider.dart';
 import 'package:tankstellen/core/widgets/brand_logo.dart';
 
@@ -38,24 +39,79 @@ void main() {
       expect(find.byIcon(Icons.local_gas_station), findsNothing);
     });
 
-    testWidgets('#3870 — internet logos are OFF by default: a known brand '
-        'renders the bundled mark and touches no network', (tester) async {
-      await pumpApp(tester, const BrandLogo(brand: 'Shell'));
+    testWidgets('#3870 — internet logos are OFF by default: a brand with no '
+        'bundled logo renders the monogram and touches no network',
+        (tester) async {
+      // Carrefour's chevron mark is above the threshold of originality, so
+      // Commons cannot host it and #3940 bundles nothing for it — which
+      // makes it the brand that still exercises the monogram tier.
+      await pumpApp(tester, const BrandLogo(brand: 'Carrefour'));
 
       expect(find.byType(CachedNetworkImage), findsNothing,
           reason: 'logo.clearbit.com must not see the user\'s IP unless '
               'the Settings → Privacy switch is on');
       // #3930 — and it is no longer the grey pump box every brand shared:
-      // Shell's own yellow with its monogram.
+      // Carrefour's own blue with its monogram.
       expect(find.byIcon(Icons.local_gas_station), findsNothing);
-      expect(find.text('SH'), findsOneWidget);
+      expect(find.text('CF'), findsOneWidget);
+    });
+
+    testWidgets('#3940 — a brand with a bundled logo renders it, with the '
+        'privacy switch OFF and no network image', (tester) async {
+      final logo = BrandLogoManifest.of('Shell')!;
+
+      await pumpApp(tester, const BrandLogo(brand: 'Shell'));
+
+      expect(find.byType(CachedNetworkImage), findsNothing);
+      // The monogram is gone — this is the brand's real mark now.
+      expect(find.text('SH'), findsNothing);
+      final image = tester.widget<Image>(
+        find.descendant(
+          of: find.byType(BrandLogo),
+          matching: find.byType(Image),
+        ),
+      );
+      expect((image.image as AssetImage).assetName, logo.assetPath);
+      expect(image.fit, BoxFit.contain);
+    });
+
+    testWidgets('#3940 — a raw upstream spelling resolves to the same '
+        'bundled file', (tester) async {
+      await pumpApp(tester, const BrandLogo(brand: 'INTERMARCHE'));
+
+      final image = tester.widget<Image>(
+        find.descendant(
+          of: find.byType(BrandLogo),
+          matching: find.byType(Image),
+        ),
+      );
+      expect(
+        (image.image as AssetImage).assetName,
+        BrandLogoManifest.of('Intermarché')!.assetPath,
+      );
+      expect(find.text('IM'), findsNothing);
+    });
+
+    testWidgets('#3940 — the bundled logo beats the opt-in remote logo',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const BrandLogo(brand: 'Shell'),
+        overrides: [
+          remoteBrandLogosProvider.overrideWith(() => _RemoteLogosOn()),
+        ],
+      );
+
+      expect(find.byType(CachedNetworkImage), findsNothing,
+          reason: 'a bundled, free-licensed file is the brand\'s real mark '
+              'and costs no request — it must win over Clearbit');
     });
 
     testWidgets('#3930 — the mark paints the brand colour with a computed '
         'contrasting monogram', (tester) async {
-      await pumpApp(tester, const BrandLogo(brand: 'Aral'));
+      await pumpApp(tester, const BrandLogo(brand: 'Carrefour'));
 
-      final appearance = BrandAppearance.of('Aral')!;
+      final appearance = BrandAppearance.of('Carrefour')!;
       final container = tester.widget<Container>(
         find
             .descendant(
@@ -69,19 +125,20 @@ void main() {
         appearance.background,
       );
 
-      final text = tester.widget<Text>(find.text('AR'));
+      final text = tester.widget<Text>(find.text('CF'));
       expect(text.style?.color, appearance.foreground);
       expect(appearance.contrastRatio, greaterThanOrEqualTo(4.5));
     });
 
     testWidgets('#3931 — an EV network resolved through the registry gets '
         'its own mark', (tester) async {
+      // Electra has no Wikidata logo, so it stays on the #3930 monogram.
       await pumpApp(
         tester,
-        const BrandLogo(brand: 'IONITY', kind: BrandKind.ev),
+        const BrandLogo(brand: 'ELECTRA', kind: BrandKind.ev),
       );
 
-      expect(find.text('IO'), findsOneWidget);
+      expect(find.text('EL'), findsOneWidget);
       expect(find.byIcon(Icons.ev_station), findsNothing);
     });
 
@@ -89,7 +146,7 @@ void main() {
         'the user switched internet logos on', (tester) async {
       await pumpApp(
         tester,
-        const BrandLogo(brand: 'Shell'),
+        const BrandLogo(brand: 'Carrefour'),
         overrides: [
           remoteBrandLogosProvider.overrideWith(() => _RemoteLogosOn()),
         ],
@@ -113,7 +170,7 @@ void main() {
     testWidgets('uses ClipRRect for known brand', (tester) async {
       await pumpApp(
         tester,
-        const BrandLogo(brand: 'ARAL'),
+        const BrandLogo(brand: 'CARREFOUR'),
         overrides: [
           remoteBrandLogosProvider.overrideWith(() => _RemoteLogosOn()),
         ],

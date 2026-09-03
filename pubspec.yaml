@@ -221,6 +221,15 @@ flutter:
     # rootBundle. `tanksync_config.json` is the only runtime-loaded file
     # at the assets/ root, so it is listed explicitly.
     - assets/tanksync_config.json
+    # #3940 — free-licensed brand logos (public domain / CC-BY / CC-BY-SA)
+    # fetched from Wikimedia Commons by `tool/fetch_brand_logos.dart`. The
+    # directory is listed as a whole because its contents are GENERATED:
+    # the tool rewrites both the PNGs and
+    # `lib/core/domain/brand_logo_manifest_data.dart` on every run, and a
+    # per-file list here would drift on the next brand that gains a free
+    # logo. `test/core/domain/brand_logo_manifest_test.dart` pins the
+    # directory and the manifest to each other.
+    - assets/brand_logos/
     - assets/models/
     - assets/ocr_config/index.json
     - assets/receipt_overrides/index.json
