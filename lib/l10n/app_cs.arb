@@ -6317,5 +6317,53 @@
         "example": "3"
       }
     }
+  },
+  "logoCreditsTitle": "Logo credits",
+  "@logoCreditsTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "logoCreditsAboutSubtitle": "{count, plural, =1{1 brand logo from Wikimedia Commons} other{{count} brand logos from Wikimedia Commons}}",
+  "@logoCreditsAboutSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "logoCreditsIntro": "These station and charging-network logos are bundled with the app. Every file was taken from Wikimedia Commons and is public domain or published under a Creative Commons licence — nothing is downloaded while you browse.",
+  "@logoCreditsIntro": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "logoCreditsMonogramNote": "Brands whose logo is not available under a free licence keep the lettered mark in the app's own colours.",
+  "@logoCreditsMonogramNote": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "logoCreditsTrademarkNotice": "All trademarks are the property of their respective owners and are shown only to identify the station or the charging network.",
+  "@logoCreditsTrademarkNotice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "logoCreditsEntryDetails": "{licence} · {author}",
+  "@logoCreditsEntryDetails": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "licence": {
+        "type": "String"
+      },
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "logoCreditsOpenFilePage": "Open the file page on Wikimedia Commons",
+  "@logoCreditsOpenFilePage": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

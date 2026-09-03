@@ -14039,6 +14039,48 @@ abstract class AppLocalizations {
   /// **'{days} d'**
   String searchSummaryAgeDays(int days);
 
+  /// Title of the Settings → About → logo credits screen, and the label of the row in About that opens it (#3940). Lists every station-brand logo bundled with the app, with its licence, author and source.
+  ///
+  /// In en, this message translates to:
+  /// **'Logo credits'**
+  String get logoCreditsTitle;
+
+  /// Subtitle of the About row that opens the logo credits screen (#3940). {count} is the number of bundled logo files.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 brand logo from Wikimedia Commons} other{{count} brand logos from Wikimedia Commons}}'**
+  String logoCreditsAboutSubtitle(int count);
+
+  /// Explanatory paragraph at the top of the logo credits screen (#3940). Makes clear the logos ship inside the app and need no network call.
+  ///
+  /// In en, this message translates to:
+  /// **'These station and charging-network logos are bundled with the app. Every file was taken from Wikimedia Commons and is public domain or published under a Creative Commons licence — nothing is downloaded while you browse.'**
+  String get logoCreditsIntro;
+
+  /// Second paragraph of the logo credits screen (#3940), explaining why many brands still show the coloured monogram tile instead of a real logo.
+  ///
+  /// In en, this message translates to:
+  /// **'Brands whose logo is not available under a free licence keep the lettered mark in the app\'s own colours.'**
+  String get logoCreditsMonogramNote;
+
+  /// Trademark notice at the bottom of the logo credits screen (#3940). Copyright and trademark are separate questions: a public-domain file settles copyright, this line covers nominative trademark use.
+  ///
+  /// In en, this message translates to:
+  /// **'All trademarks are the property of their respective owners and are shown only to identify the station or the charging network.'**
+  String get logoCreditsTrademarkNotice;
+
+  /// Subtitle of one logo row on the credits screen (#3940): the Commons licence template and the file's author. Both values are data reproduced verbatim from Wikimedia Commons and are never translated.
+  ///
+  /// In en, this message translates to:
+  /// **'{licence} · {author}'**
+  String logoCreditsEntryDetails(String licence, String author);
+
+  /// Tooltip of the icon-only button on each logo credits row that opens the file's Wikimedia Commons page in a browser (#3940).
+  ///
+  /// In en, this message translates to:
+  /// **'Open the file page on Wikimedia Commons'**
+  String get logoCreditsOpenFilePage;
+
   /// Settings root: one-line subtitle of the Privacy & data tile naming its four topics (#3908, Epic #3907).
   ///
   /// In en, this message translates to:

@@ -24,6 +24,15 @@ const _notContacted = <String, String>{
   'play.google.com': 'store deep link',
   'www.paypal.me': 'donation deep link (tap)',
   'revolut.me': 'donation deep link (tap)',
+  // #3940 — the bundled brand logos are shipped as assets; the app never
+  // fetches them. These two hosts appear only as ATTRIBUTION text in
+  // `brand_logo_manifest_data.dart`, which the credits screen can open on
+  // an explicit tap (the same shape as the documentation links above):
+  // commons.wikimedia.org is each file's source page, and powerdot.eu is
+  // the author string Commons records for the one CC-BY-SA file whose
+  // author is a URL. No user data reaches either.
+  'commons.wikimedia.org': 'bundled-logo source attribution (tap)',
+  'powerdot.eu': 'CC-BY-SA author attribution for a bundled logo (tap)',
   'en.wikipedia.org': 'documentation link (tap)',
   'www.garmin.com': 'documentation link (tap)',
   'supabase.com': 'documentation link in the self-host wizard (tap)',

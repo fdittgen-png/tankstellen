@@ -4136,6 +4136,30 @@
       }
     }
   },
+  "logoCreditsTitle": "Logo-Nachweise",
+  "logoCreditsAboutSubtitle": "{count, plural, =1{1 Markenlogo von Wikimedia Commons} other{{count} Markenlogos von Wikimedia Commons}}",
+  "@logoCreditsAboutSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "logoCreditsIntro": "Diese Logos von Tankstellen- und Ladenetzmarken sind in der App enthalten. Jede Datei stammt von Wikimedia Commons und ist gemeinfrei oder unter einer Creative-Commons-Lizenz veröffentlicht — beim Blättern wird nichts nachgeladen.",
+  "logoCreditsMonogramNote": "Marken, deren Logo nicht unter einer freien Lizenz verfügbar ist, behalten das Buchstabenzeichen in den Farben der App.",
+  "logoCreditsTrademarkNotice": "Alle Marken sind Eigentum ihrer jeweiligen Inhaber und werden ausschließlich zur Kennzeichnung der Tankstelle oder des Ladenetzes gezeigt.",
+  "logoCreditsEntryDetails": "{licence} · {author}",
+  "@logoCreditsEntryDetails": {
+    "placeholders": {
+      "licence": {
+        "type": "String"
+      },
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "logoCreditsOpenFilePage": "Dateiseite auf Wikimedia Commons öffnen",
   "privacyTopicSubtitle": "Ihre Entscheidungen, Daten auf diesem Gerät, Synchronisierung, Export oder Löschen",
   "privacyDataLocationLocal": "Ihre Daten bleiben auf diesem Gerät",
   "privacyDataLocationSynced": "Ihre Daten werden zusätzlich mit TankSync synchronisiert",

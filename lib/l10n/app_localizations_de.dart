@@ -8284,6 +8284,41 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get logoCreditsTitle => 'Logo-Nachweise';
+
+  @override
+  String logoCreditsAboutSubtitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Markenlogos von Wikimedia Commons',
+      one: '1 Markenlogo von Wikimedia Commons',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get logoCreditsIntro =>
+      'Diese Logos von Tankstellen- und Ladenetzmarken sind in der App enthalten. Jede Datei stammt von Wikimedia Commons und ist gemeinfrei oder unter einer Creative-Commons-Lizenz veröffentlicht — beim Blättern wird nichts nachgeladen.';
+
+  @override
+  String get logoCreditsMonogramNote =>
+      'Marken, deren Logo nicht unter einer freien Lizenz verfügbar ist, behalten das Buchstabenzeichen in den Farben der App.';
+
+  @override
+  String get logoCreditsTrademarkNotice =>
+      'Alle Marken sind Eigentum ihrer jeweiligen Inhaber und werden ausschließlich zur Kennzeichnung der Tankstelle oder des Ladenetzes gezeigt.';
+
+  @override
+  String logoCreditsEntryDetails(String licence, String author) {
+    return '$licence · $author';
+  }
+
+  @override
+  String get logoCreditsOpenFilePage =>
+      'Dateiseite auf Wikimedia Commons öffnen';
+
+  @override
   String get privacyTopicSubtitle =>
       'Ihre Entscheidungen, Daten auf diesem Gerät, Synchronisierung, Export oder Löschen';
 
