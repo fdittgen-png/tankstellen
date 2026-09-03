@@ -64,7 +64,6 @@
   "apiKeyRequired": "Chiave API necessaria",
   "dataTransparency": "Trasparenza dei dati",
   "clearCache": "Svuota cache",
-  "stationsFound": "{count} stazioni trovate",
   "storageUsage": "Utilizzo dello spazio su questo dispositivo",
   "settingsLabel": "Impostazioni",
   "total": "Totale",
@@ -107,9 +106,7 @@
   "demoModeBanner": "Modalità demo. Configura la chiave API nelle impostazioni.",
   "demoModeBannerAction": "Ottieni prezzi in tempo reale",
   "sortDistance": "Distanza",
-  "sortOpen24h": "24h",
   "sortRating": "Valutazione",
-  "sortPriceDistance": "Prezzo/km",
   "cheap": "economico",
   "expensive": "costoso",
   "reportPrice": "Segnala prezzo",
@@ -1335,13 +1332,6 @@
     "placeholders": {
       "distance": {
         "type": "String"
-      }
-    }
-  },
-  "@stationsFound": {
-    "placeholders": {
-      "count": {
-        "type": "int"
       }
     }
   },
@@ -5301,37 +5291,6 @@
         "example": "0,06"
       }
     }
-  },
-  "allPricesCostPer100km": "{cost}/100 km",
-  "@allPricesCostPer100km": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "cost": {
-        "type": "String",
-        "example": "5,02 €"
-      }
-    }
-  },
-  "allPricesVerdictHere": "Cheapest here: {fuel} at {cost}",
-  "@allPricesVerdictHere": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "fuel": {
-        "type": "String",
-        "example": "E85"
-      },
-      "cost": {
-        "type": "String",
-        "example": "5,02 €/100 km"
-      }
-    }
-  },
-  "allPricesVerdictWinsResults": "cheapest of the results",
-  "@allPricesVerdictWinsResults": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
   },
   "allPricesMoreFuels": "+{count}",
   "@allPricesMoreFuels": {

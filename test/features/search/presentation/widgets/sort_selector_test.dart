@@ -7,14 +7,14 @@ import 'package:tankstellen/features/search/presentation/widgets/sort_selector.d
 
 import '../../../../helpers/pump_app.dart';
 
-/// #3939 — an icon-only sort chip has an [Icon] where the others have a
-/// [Text], so it is addressed by its glyph.
+/// #3939 / #3943 — every sort chip is icon-only now, so a chip is addressed
+/// by its glyph.
 ChoiceChip _chipWithIcon(List<ChoiceChip> chips, IconData icon) =>
     chips.firstWhere((c) => c.label is Icon && (c.label as Icon).icon == icon);
 
 void main() {
   group('SortSelector', () {
-    testWidgets('renders all six sort options without scrolling (#3926)', (
+    testWidgets('renders exactly the three glyph chips (#3943)', (
       tester,
     ) async {
       await pumpApp(
@@ -22,30 +22,48 @@ void main() {
         SortSelector(selected: SortMode.distance, onChanged: (_) {}),
       );
 
-      // #3926 — the chips used to live in a horizontal SingleChildScrollView
-      // that cut "24h" in half at 320 dp and hid the three chips past it.
-      // A Wrap moves a whole chip to the next line instead, so every option
-      // is on screen with no drag.
-      expect(find.byType(SingleChildScrollView), findsNothing);
-      expect(find.byType(Wrap), findsOneWidget);
-
-      // #3939 — distance, price and rating render ICON-ONLY: the arrow,
-      // the euro sign and the star already say the word. The three whose
-      // glyph says nothing keep their text.
-      expect(find.text('Distance'), findsNothing);
-      expect(find.text('Price'), findsNothing);
-      expect(find.text('Rating'), findsNothing);
+      // #3943 — the selector joined the results icon row, so only the modes
+      // whose glyph is unambiguous stay on screen: the navigation arrow is
+      // distance, the euro sign is price, the star is rating.
+      expect(find.byType(ChoiceChip), findsNWidgets(3));
       expect(find.byIcon(Icons.near_me), findsOneWidget);
       expect(find.byIcon(Icons.euro), findsOneWidget);
       expect(find.byIcon(Icons.star), findsOneWidget);
 
-      expect(find.text('A-Z'), findsOneWidget);
-      expect(find.text('24h'), findsOneWidget);
-      expect(find.text('Price/km'), findsOneWidget);
+      // The three modes no glyph can say moved into the overflow menu —
+      // they are not chips any more, and they are not words here either.
+      for (final gone in const ['A-Z', '24h', 'Price/km']) {
+        expect(find.text(gone), findsNothing);
+      }
+      expect(find.byIcon(Icons.sort_by_alpha), findsNothing);
+      expect(find.byIcon(Icons.schedule), findsNothing);
+      expect(find.byIcon(Icons.balance), findsNothing);
+
+      // No chip spells a word its glyph already says, either.
+      for (final word in const ['Distance', 'Price', 'Rating']) {
+        expect(find.text(word), findsNothing);
+      }
     });
 
-    testWidgets('#3939 — every icon-only sort chip carries its label as a '
-        'tooltip AND in its semantics', (tester) async {
+    testWidgets('#3943 — the group scrolls inside its own slot rather than '
+        'growing the row', (tester) async {
+      await pumpApp(
+        tester,
+        SortSelector(selected: SortMode.distance, onChanged: (_) {}),
+      );
+
+      // A `LayoutBuilder` cannot measure the room left in a Row (non-flex
+      // children are laid out unbounded), so the guarantee is structural:
+      // the group is a horizontal scroller, and the row hands it a bounded
+      // Expanded slot. It can never push the row past its own width.
+      final scroller = tester.widget<SingleChildScrollView>(
+        find.byType(SingleChildScrollView),
+      );
+      expect(scroller.scrollDirection, Axis.horizontal);
+    });
+
+    testWidgets('#3939 — every chip carries its label as a tooltip AND in '
+        'its semantics', (tester) async {
       final handle = tester.ensureSemantics();
       await pumpApp(
         tester,
@@ -71,8 +89,8 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('#3939 — a selected icon-only chip KEEPS its glyph (a bare '
-        'checkmark would say nothing)', (tester) async {
+    testWidgets('#3939 — a selected chip KEEPS its glyph (a bare checkmark '
+        'would say nothing)', (tester) async {
       await pumpApp(
         tester,
         SortSelector(selected: SortMode.price, onChanged: (_) {}),
@@ -95,12 +113,12 @@ void main() {
       );
 
       expect(tester.takeException(), isNull);
-      for (final label in const ['A-Z', '24h', 'Price/km']) {
-        final rect = tester.getRect(find.text(label));
+      for (final icon in const [Icons.near_me, Icons.euro, Icons.star]) {
+        final rect = tester.getRect(find.byIcon(icon));
         expect(
           rect.left >= 0 && rect.right <= 320,
           isTrue,
-          reason: 'the "$label" chip must sit fully inside a 320 dp viewport '
+          reason: 'the $icon chip must sit fully inside a 320 dp viewport '
               '— it is $rect',
         );
       }
@@ -115,15 +133,11 @@ void main() {
       final chips = tester
           .widgetList<ChoiceChip>(find.byType(ChoiceChip))
           .toList();
-      expect(chips, hasLength(6));
+      expect(chips, hasLength(3));
 
       expect(_chipWithIcon(chips, Icons.near_me).selected, isTrue);
       expect(_chipWithIcon(chips, Icons.euro).selected, isFalse);
-
-      final nameChip = chips.firstWhere(
-        (c) => c.label is Text && (c.label as Text).data == 'A-Z',
-      );
-      expect(nameChip.selected, isFalse);
+      expect(_chipWithIcon(chips, Icons.star).selected, isFalse);
     });
 
     testWidgets('price selection is highlighted when selected', (tester) async {
@@ -138,33 +152,9 @@ void main() {
       expect(_chipWithIcon(chips, Icons.euro).selected, isTrue);
     });
 
-    for (final (label, expected) in const [
-      ('A-Z', SortMode.name),
-      ('24h', SortMode.open24h),
-      ('Price/km', SortMode.priceDistance),
-    ]) {
-      testWidgets('tapping $label calls onChanged with $expected', (
-        tester,
-      ) async {
-        SortMode? receivedMode;
-
-        await pumpApp(
-          tester,
-          SortSelector(
-            selected: SortMode.distance,
-            onChanged: (mode) => receivedMode = mode,
-          ),
-        );
-
-        await tester.tap(find.text(label));
-        await tester.pumpAndSettle();
-
-        expect(receivedMode, expected);
-      });
-    }
-
-    // #3939 — the icon-only chips are tapped by their glyph.
+    // #3939 — the chips are tapped by their glyph.
     for (final (icon, expected) in const [
+      (Icons.near_me, SortMode.distance),
       (Icons.euro, SortMode.price),
       (Icons.star, SortMode.rating),
     ]) {
@@ -176,7 +166,7 @@ void main() {
         await pumpApp(
           tester,
           SortSelector(
-            selected: SortMode.distance,
+            selected: SortMode.open24h,
             onChanged: (mode) => receivedMode = mode,
           ),
         );
@@ -187,20 +177,6 @@ void main() {
         expect(receivedMode, expected);
       });
     }
-
-    testWidgets('each chip has an icon', (tester) async {
-      await pumpApp(
-        tester,
-        SortSelector(selected: SortMode.distance, onChanged: (_) {}),
-      );
-
-      expect(find.byIcon(Icons.near_me), findsOneWidget);
-      expect(find.byIcon(Icons.euro), findsOneWidget);
-      expect(find.byIcon(Icons.sort_by_alpha), findsOneWidget);
-      expect(find.byIcon(Icons.schedule), findsOneWidget);
-      expect(find.byIcon(Icons.star), findsOneWidget);
-      expect(find.byIcon(Icons.balance), findsOneWidget);
-    });
 
     testWidgets('has correct semantics labels', (tester) async {
       await pumpApp(
@@ -218,7 +194,8 @@ void main() {
       );
     });
 
-    testWidgets('open24h selected chip is highlighted', (tester) async {
+    testWidgets('a mode that lives in the overflow menu leaves every chip '
+        'unselected (#3943)', (tester) async {
       await pumpApp(
         tester,
         SortSelector(selected: SortMode.open24h, onChanged: (_) {}),
@@ -227,17 +204,12 @@ void main() {
       final chips = tester
           .widgetList<ChoiceChip>(find.byType(ChoiceChip))
           .toList();
-      final open24hChip = chips.firstWhere(
-        (c) => c.label is Text && (c.label as Text).data == '24h',
-      );
-      expect(open24hChip.selected, isTrue);
-
-      expect(_chipWithIcon(chips, Icons.near_me).selected, isFalse);
+      expect(chips.every((c) => !c.selected), isTrue);
     });
   });
 
   group('SortMode enum', () {
-    test('has six values', () {
+    test('has six values — #3943 moved three of them, deleted none', () {
       expect(SortMode.values.length, 6);
     });
 
@@ -253,6 +225,14 @@ void main() {
           SortMode.priceDistance,
         ]),
       );
+    });
+
+    test('the three visible chips are the glyph modes (#3943)', () {
+      expect(SortSelector.visibleModes, const [
+        SortMode.distance,
+        SortMode.price,
+        SortMode.rating,
+      ]);
     });
   });
 }

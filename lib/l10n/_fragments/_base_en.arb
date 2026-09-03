@@ -88,14 +88,6 @@
   "apiKeyRequired": "API key required",
   "dataTransparency": "Data transparency",
   "clearCache": "Clear cache",
-  "stationsFound": "{count} stations found",
-  "@stationsFound": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "storageUsage": "Storage usage on this device",
   "settingsLabel": "Settings",
   "total": "Total",
@@ -158,9 +150,7 @@
     "description": "Action button on the demo-mode banner — opens Settings where live prices can be set up. Jargon-free wording (#1696)."
   },
   "sortDistance": "Distance",
-  "sortOpen24h": "24h",
   "sortRating": "Rating",
-  "sortPriceDistance": "Price/km",
   "cheap": "cheap",
   "expensive": "expensive",
   "reportPrice": "Report price",

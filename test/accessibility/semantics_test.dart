@@ -93,9 +93,16 @@ void main() {
         findsOneWidget,
       );
 
-      // A-Z chip is not selected
+      // #3943 — A-Z is no longer a chip: it is a labelled entry in the
+      // results overflow menu, so it has no chip semantics here.
       expect(
         find.bySemanticsLabel(RegExp(r'Sort by A-Z$')),
+        findsNothing,
+      );
+
+      // Rating chip is not selected
+      expect(
+        find.bySemanticsLabel(RegExp(r'Sort by Rating$')),
         findsOneWidget,
       );
     });

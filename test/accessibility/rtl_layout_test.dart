@@ -246,12 +246,13 @@ void main() {
           ),
         );
 
-        // #3939 — distance and price are icon-only now (the arrow and the
-        // euro sign already say the word); the chips that keep their text
-        // keep it in RTL too.
+        // #3939 / #3943 — every remaining chip is icon-only (the arrow, the
+        // euro sign and the star already say the word), and the three
+        // wordy modes moved into the overflow menu.
         expect(find.byIcon(Icons.near_me), findsOneWidget);
         expect(find.byIcon(Icons.euro), findsOneWidget);
-        expect(find.text('A-Z'), findsOneWidget);
+        expect(find.byIcon(Icons.star), findsOneWidget);
+        expect(find.text('A-Z'), findsNothing);
       });
 
       testWidgets('chips are in reversed visual order for RTL', (tester) async {
@@ -264,10 +265,10 @@ void main() {
         );
 
         final distanceX = tester.getCenter(find.byIcon(Icons.near_me)).dx;
-        final azX = tester.getCenter(find.text('A-Z')).dx;
+        final ratingX = tester.getCenter(find.byIcon(Icons.star)).dx;
 
-        // In RTL, Distance (first in code) should be to the right of A-Z
-        expect(distanceX, greaterThan(azX),
+        // In RTL, Distance (first in code) should be to the right of Rating
+        expect(distanceX, greaterThan(ratingX),
             reason: 'In RTL, first Row child should appear on the right');
       });
 

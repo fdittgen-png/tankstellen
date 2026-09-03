@@ -64,7 +64,6 @@
   "apiKeyRequired": "API-nøgle påkrævet",
   "dataTransparency": "Datatransparens",
   "clearCache": "Ryd cache",
-  "stationsFound": "{count} tankstationer fundet",
   "storageUsage": "Lagringsforbrug på denne enhed",
   "settingsLabel": "Indstillinger",
   "total": "Total",
@@ -107,9 +106,7 @@
   "demoModeBanner": "Demo-tilstand. Konfigurer API-nøgle i indstillinger.",
   "demoModeBannerAction": "Hent live-priser",
   "sortDistance": "Afstand",
-  "sortOpen24h": "24t",
   "sortRating": "Bedømmelse",
-  "sortPriceDistance": "Pris/km",
   "cheap": "billig",
   "expensive": "dyr",
   "reportPrice": "Rapportér pris",
@@ -1335,13 +1332,6 @@
     "placeholders": {
       "distance": {
         "type": "String"
-      }
-    }
-  },
-  "@stationsFound": {
-    "placeholders": {
-      "count": {
-        "type": "int"
       }
     }
   },
@@ -5301,37 +5291,6 @@
         "example": "0,06"
       }
     }
-  },
-  "allPricesCostPer100km": "{cost}/100 km",
-  "@allPricesCostPer100km": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "cost": {
-        "type": "String",
-        "example": "5,02 €"
-      }
-    }
-  },
-  "allPricesVerdictHere": "Cheapest here: {fuel} at {cost}",
-  "@allPricesVerdictHere": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "fuel": {
-        "type": "String",
-        "example": "E85"
-      },
-      "cost": {
-        "type": "String",
-        "example": "5,02 €/100 km"
-      }
-    }
-  },
-  "allPricesVerdictWinsResults": "cheapest of the results",
-  "@allPricesVerdictWinsResults": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
   },
   "allPricesMoreFuels": "+{count}",
   "@allPricesMoreFuels": {

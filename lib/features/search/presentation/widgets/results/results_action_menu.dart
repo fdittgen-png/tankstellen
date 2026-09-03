@@ -13,8 +13,10 @@ import '../../../../../l10n/app_localizations.dart';
 import '../../../../feature_management/application/feature_flags_provider.dart';
 import '../../../../feature_management/domain/feature.dart';
 import '../../../providers/search_provider.dart';
+import '../../../providers/search_screen_ui_provider.dart';
+import '../sort_selector.dart';
 
-/// The three secondary results actions, one labelled entry each (#3926).
+/// The secondary results actions, one labelled entry each (#3926, #3943).
 enum ResultsAction {
   /// Open the map tab centred on the result set.
   showOnMap,
@@ -25,6 +27,15 @@ enum ResultsAction {
 
   /// Open the fuel-cost calculator, pre-filled with the cheapest price.
   fuelCalculator,
+
+  /// #3943 — sort the results by station name, A to Z.
+  sortByName,
+
+  /// #3943 — sort the round-the-clock stations to the top.
+  sortOpen24h,
+
+  /// #3943 — sort by price per kilometre travelled to the pump.
+  sortByPriceDistance,
 }
 
 /// The "⋯" overflow button on the results row (row B, #3926).
@@ -34,6 +45,14 @@ enum ResultsAction {
 /// text at all. Each action keeps its handler, its accessibility label and
 /// its widget key; it simply gains a visible label and a single labelled
 /// entry point.
+///
+/// #3943 — it also holds the three sort modes whose chip left the visible
+/// row: `A-Z`, `24h` and `Price/km` have no glyph that says them, so they
+/// were the expensive chips to keep on screen and the cheap ones to move
+/// here. They are demoted, NOT deleted: same [SortMode], same provider,
+/// same behaviour, and the active one is ticked. The three modes whose
+/// glyph is self-evident (distance, price, rating) stay as chips on the
+/// row itself.
 class ResultsActionMenu extends ConsumerWidget {
   const ResultsActionMenu({
     super.key,
@@ -62,8 +81,19 @@ class ResultsActionMenu extends ConsumerWidget {
         ];
         final (minP, _) = priceRange(stations, fuel, requirePositive: true);
         CalculatorRoute(initialPrice: minP > 0 ? minP : null).go(context);
+      case ResultsAction.sortByName:
+        _sort(ref, SortMode.name);
+      case ResultsAction.sortOpen24h:
+        _sort(ref, SortMode.open24h);
+      case ResultsAction.sortByPriceDistance:
+        _sort(ref, SortMode.priceDistance);
     }
   }
+
+  /// The sort entries drive exactly the provider the chips drive — the
+  /// sorting itself is untouched by #3943, only where the control lives.
+  void _sort(WidgetRef ref, SortMode mode) =>
+      ref.read(selectedSortModeProvider.notifier).set(mode);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -72,6 +102,7 @@ class ResultsActionMenu extends ConsumerWidget {
     final hasCalculator = ref.watch(
       enabledFeaturesProvider.select((f) => f.contains(Feature.fuelCalculator)),
     );
+    final sortMode = ref.watch(selectedSortModeProvider);
 
     return PopupMenuButton<ResultsAction>(
       key: const Key('results_action_menu'),
@@ -105,6 +136,35 @@ class ResultsActionMenu extends ConsumerWidget {
             icon: Icons.calculate,
             label: l10n.fuelCostCalculator,
           ),
+        const PopupMenuDivider(),
+        // #3943 — the three sort modes no glyph can say. Ticked when
+        // active, so the menu also answers "how is this list sorted?".
+        _entry(
+          key: const Key('results_sort_name'),
+          value: ResultsAction.sortByName,
+          icon: Icons.sort_by_alpha,
+          label: l10n.sortMenuByName,
+          selected: sortMode == SortMode.name,
+          selectedSemantics: l10n.sortMenuActiveSemantic(l10n.sortMenuByName),
+        ),
+        _entry(
+          key: const Key('results_sort_open24h'),
+          value: ResultsAction.sortOpen24h,
+          icon: Icons.schedule,
+          label: l10n.sortMenuOpen24h,
+          selected: sortMode == SortMode.open24h,
+          selectedSemantics: l10n.sortMenuActiveSemantic(l10n.sortMenuOpen24h),
+        ),
+        _entry(
+          key: const Key('results_sort_price_distance'),
+          value: ResultsAction.sortByPriceDistance,
+          icon: Icons.balance,
+          label: l10n.sortMenuPriceDistance,
+          selected: sortMode == SortMode.priceDistance,
+          selectedSemantics: l10n.sortMenuActiveSemantic(
+            l10n.sortMenuPriceDistance,
+          ),
+        ),
       ],
     );
   }
@@ -114,12 +174,14 @@ class ResultsActionMenu extends ConsumerWidget {
     required ResultsAction value,
     required IconData icon,
     required String label,
+    bool selected = false,
+    String? selectedSemantics,
   }) {
     return PopupMenuItem<ResultsAction>(
       key: key,
       value: value,
       child: Semantics(
-        label: label,
+        label: selected ? (selectedSemantics ?? label) : label,
         button: true,
         excludeSemantics: true,
         child: Row(
@@ -130,6 +192,10 @@ class ResultsActionMenu extends ConsumerWidget {
             Flexible(
               child: Text(label, maxLines: 2, overflow: TextOverflow.ellipsis),
             ),
+            if (selected) ...[
+              const SizedBox(width: 8),
+              const Icon(Icons.check, size: 16),
+            ],
           ],
         ),
       ),

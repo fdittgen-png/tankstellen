@@ -64,7 +64,6 @@
   "apiKeyRequired": "API-kulcs szükséges",
   "dataTransparency": "Adatátláthatóság",
   "clearCache": "Gyorsítótár törlése",
-  "stationsFound": "{count} kút találva",
   "storageUsage": "Tárhelyhasználat ezen az eszközön",
   "settingsLabel": "Beállítások",
   "total": "Összesen",
@@ -107,9 +106,7 @@
   "demoModeBanner": "Demó mód. Állítsa be az API-kulcsot a beállításokban.",
   "demoModeBannerAction": "Élő árak megtekintése",
   "sortDistance": "Távolság",
-  "sortOpen24h": "24h",
   "sortRating": "Értékelés",
-  "sortPriceDistance": "Ár/km",
   "cheap": "olcsó",
   "expensive": "drága",
   "reportPrice": "Ár bejelentése",
@@ -1335,13 +1332,6 @@
     "placeholders": {
       "distance": {
         "type": "String"
-      }
-    }
-  },
-  "@stationsFound": {
-    "placeholders": {
-      "count": {
-        "type": "int"
       }
     }
   },
@@ -5803,37 +5793,6 @@
         "example": "0,06"
       }
     }
-  },
-  "allPricesCostPer100km": "{cost}/100 km",
-  "@allPricesCostPer100km": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "cost": {
-        "type": "String",
-        "example": "5,02 €"
-      }
-    }
-  },
-  "allPricesVerdictHere": "Cheapest here: {fuel} at {cost}",
-  "@allPricesVerdictHere": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "fuel": {
-        "type": "String",
-        "example": "E85"
-      },
-      "cost": {
-        "type": "String",
-        "example": "5,02 €/100 km"
-      }
-    }
-  },
-  "allPricesVerdictWinsResults": "cheapest of the results",
-  "@allPricesVerdictWinsResults": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
   },
   "allPricesMoreFuels": "+{count}",
   "@allPricesMoreFuels": {

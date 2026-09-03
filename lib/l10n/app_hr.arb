@@ -64,7 +64,6 @@
   "apiKeyRequired": "Potreban API ključ",
   "dataTransparency": "Transparentnost podataka",
   "clearCache": "Očisti predmemoriju",
-  "stationsFound": "Pronađeno {count} postaja",
   "storageUsage": "Korištenje pohrane na ovom uređaju",
   "settingsLabel": "Postavke",
   "total": "Ukupno",
@@ -107,9 +106,7 @@
   "demoModeBanner": "Demo način. Konfigurirajte API ključ u postavkama.",
   "demoModeBannerAction": "Dohvati stvarne cijene",
   "sortDistance": "Udaljenost",
-  "sortOpen24h": "24h",
   "sortRating": "Ocjena",
-  "sortPriceDistance": "Cijena/km",
   "cheap": "jeftino",
   "expensive": "skupo",
   "reportPrice": "Prijavi cijenu",
@@ -1335,13 +1332,6 @@
     "placeholders": {
       "distance": {
         "type": "String"
-      }
-    }
-  },
-  "@stationsFound": {
-    "placeholders": {
-      "count": {
-        "type": "int"
       }
     }
   },
@@ -5803,37 +5793,6 @@
         "example": "0,06"
       }
     }
-  },
-  "allPricesCostPer100km": "{cost}/100 km",
-  "@allPricesCostPer100km": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "cost": {
-        "type": "String",
-        "example": "5,02 €"
-      }
-    }
-  },
-  "allPricesVerdictHere": "Cheapest here: {fuel} at {cost}",
-  "@allPricesVerdictHere": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "fuel": {
-        "type": "String",
-        "example": "E85"
-      },
-      "cost": {
-        "type": "String",
-        "example": "5,02 €/100 km"
-      }
-    }
-  },
-  "allPricesVerdictWinsResults": "cheapest of the results",
-  "@allPricesVerdictWinsResults": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
   },
   "allPricesMoreFuels": "+{count}",
   "@allPricesMoreFuels": {

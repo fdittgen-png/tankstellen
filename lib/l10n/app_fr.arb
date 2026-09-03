@@ -108,14 +108,6 @@
   "apiKeyRequired": "Clé API requise",
   "dataTransparency": "Transparence des données",
   "clearCache": "Vider le cache",
-  "stationsFound": "{count} stations trouvées",
-  "@stationsFound": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "storageUsage": "Utilisation du stockage sur cet appareil",
   "settingsLabel": "Paramètres",
   "total": "Total",
@@ -1238,9 +1230,7 @@
   "onboardingPickUseMode": "Choisissez un mode d'utilisation pour continuer.",
   "searchCriteriaTitle": "Critères de recherche",
   "searchCriteriaRadiusBadge": "Dans un rayon de {km} km",
-  "sortOpen24h": "24h",
   "sortRating": "Note",
-  "sortPriceDistance": "Prix/km",
   "forgetAllSyncedTripsButton": "Oublier tous les trajets synchronisés",
   "forgetAllSyncedTripsConfirmTitle": "Oublier tous les trajets synchronisés ?",
   "forgetAllSyncedTripsConfirmBody": "Chaque résumé de trajet et bloc de détails sera supprimé du serveur. L'historique de trajets local sur cet appareil ne sera pas affecté.\n\nCette action est irréversible.",
@@ -5288,29 +5278,6 @@
       }
     }
   },
-  "allPricesCostPer100km": "{cost}/100 km",
-  "@allPricesCostPer100km": {
-    "placeholders": {
-      "cost": {
-        "type": "String",
-        "example": "5,02 €"
-      }
-    }
-  },
-  "allPricesVerdictHere": "Le moins cher ici : {fuel} à {cost}",
-  "@allPricesVerdictHere": {
-    "placeholders": {
-      "fuel": {
-        "type": "String",
-        "example": "E85"
-      },
-      "cost": {
-        "type": "String",
-        "example": "5,02 €/100 km"
-      }
-    }
-  },
-  "allPricesVerdictWinsResults": "le moins cher des résultats",
   "allPricesMoreFuels": "+{count}",
   "@allPricesMoreFuels": {
     "placeholders": {

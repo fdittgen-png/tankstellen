@@ -4,9 +4,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/domain/consumption_unit.dart';
-import '../../../../../core/theme/dark_mode_colors.dart';
-import '../../../../../core/theme/fuel_colors.dart';
-import '../../../../../core/utils/price_formatter.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../providers/all_prices_comparison_model.dart';
 import 'fuel_comparison_cell.dart';
@@ -20,11 +17,12 @@ import 'fuel_comparison_cell.dart';
 /// card renders exactly those columns, blank where the station has no
 /// price.
 ///
-/// Below the row: the per-station verdict — which fuel actually costs
-/// least per 100 km HERE — plus the "cheapest of the results" marker when
-/// that fuel's price also wins the whole result set. Both vanish when the
-/// user has no vehicle or no consumption history, leaving a clean price
-/// table with deltas.
+/// #3943 — the table is now the whole card. The verdict line that used to
+/// sit under it ("🏆 Cheapest here: E85 at 3,91 €/100 km", plus a
+/// "cheapest of the results" marker) restated what the cells directly
+/// above it already showed: every cell carries its own cost per 100 km,
+/// and the cheapest one is filled in its fuel colour. One sentence of
+/// chrome per card, on every card, saying nothing new.
 class FuelComparisonTable extends StatefulWidget {
   final StationFuelComparison comparison;
   final ConsumptionUnit consumptionUnit;
@@ -44,7 +42,6 @@ class _FuelComparisonTableState extends State<FuelComparisonTable> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final comparison = widget.comparison;
     final overflow = comparison.overflowCells;
 
@@ -100,10 +97,6 @@ class _FuelComparisonTableState extends State<FuelComparisonTable> {
             ),
           ),
         ],
-        if (comparison.hasVerdict) ...[
-          const SizedBox(height: 5),
-          _VerdictLine(comparison: comparison, l10n: l10n),
-        ],
       ],
     );
   }
@@ -151,60 +144,6 @@ class _ExpanderButton extends StatelessWidget {
                 ),
               ),
       ),
-    );
-  }
-}
-
-/// « E85 — 5,02 €/100 km here », plus the outright-winner marker.
-class _VerdictLine extends StatelessWidget {
-  final StationFuelComparison comparison;
-  final AppLocalizations l10n;
-
-  const _VerdictLine({required this.comparison, required this.l10n});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final fuel = comparison.verdictFuel!;
-    final color = FuelColors.forType(fuel);
-    final cell = <FuelCellData>[
-      ...comparison.cells,
-      ...comparison.overflowCells,
-    ].firstWhere((c) => c.fuel == fuel);
-
-    return Row(
-      children: [
-        Icon(Icons.emoji_events_outlined, size: 13, color: color),
-        const SizedBox(width: 4),
-        Expanded(
-          child: Text(
-            l10n.allPricesVerdictHere(
-              cell.label,
-              l10n.allPricesCostPer100km(
-                PriceFormatter.formatTotal(comparison.verdictCostPer100km),
-              ),
-            ),
-            maxLines: 2,
-            style: theme.textTheme.bodySmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface,
-            ),
-          ),
-        ),
-        if (comparison.winsResults) ...[
-          const SizedBox(width: 4),
-          Flexible(
-            child: Text(
-              l10n.allPricesVerdictWinsResults,
-              maxLines: 2,
-              style: theme.textTheme.labelSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: DarkModeColors.success(context),
-              ),
-            ),
-          ),
-        ],
-      ],
     );
   }
 }

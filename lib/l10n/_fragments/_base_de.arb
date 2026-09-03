@@ -80,14 +80,6 @@
   "apiKeyRequired": "API-Schlüssel erforderlich",
   "dataTransparency": "Datentransparenz",
   "clearCache": "Cache leeren",
-  "stationsFound": "{count} Tankstellen gefunden",
-  "@stationsFound": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "storageUsage": "Speichernutzung auf diesem Gerät",
   "settingsLabel": "Einstellungen",
   "total": "Gesamt",
@@ -144,9 +136,7 @@
   "demoModeBanner": "Demo-Modus – Beispielpreise werden angezeigt.",
   "demoModeBannerAction": "Live-Preise aktivieren",
   "sortDistance": "Entfernung",
-  "sortOpen24h": "24h",
   "sortRating": "Bewertung",
-  "sortPriceDistance": "Preis/km",
   "cheap": "günstig",
   "expensive": "teuer",
   "reportPrice": "Preis melden",

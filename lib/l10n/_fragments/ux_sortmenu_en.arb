@@ -1,0 +1,24 @@
+{
+  "sortMenuByName": "Sort by name (A–Z)",
+  "@sortMenuByName": {
+    "description": "Entry in the search-results overflow menu (#3943) that sorts the station list alphabetically by name. It replaces the old 'A-Z' sort chip; no glyph says 'alphabetical', so the menu entry spells the sort out."
+  },
+  "sortMenuOpen24h": "24-hour stations first",
+  "@sortMenuOpen24h": {
+    "description": "Entry in the search-results overflow menu (#3943) that sorts the stations open around the clock to the top of the list. It replaces the old '24h' sort chip."
+  },
+  "sortMenuPriceDistance": "Sort by price per kilometre",
+  "@sortMenuPriceDistance": {
+    "description": "Entry in the search-results overflow menu (#3943) that sorts by the combined cost of the fuel and of the drive to the station. It replaces the old 'Price/km' sort chip."
+  },
+  "sortMenuActiveSemantic": "{option}, current sort",
+  "@sortMenuActiveSemantic": {
+    "description": "Screen-reader label of the sort entry the results list is currently sorted by, in the search-results overflow menu (#3943). Visually that entry carries a tick.",
+    "placeholders": {
+      "option": {
+        "type": "String",
+        "example": "Sort by name (A–Z)"
+      }
+    }
+  }
+}
