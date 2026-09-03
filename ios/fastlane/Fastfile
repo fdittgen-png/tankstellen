@@ -1021,11 +1021,17 @@ platform :ios do
     end
 
     UI.important("=== How to read this ===")
-    UI.message("An external tester can install a build only when its")
-    UI.message("externalState is READY_FOR_BETA_TESTING (or betaReview is")
-    UI.message("APPROVED) AND the extern group is listed under groups.")
-    UI.message("WAITING_FOR_BETA_REVIEW / IN_BETA_REVIEW / REJECTED all look")
-    UI.message("like a successful upload in the CI log but ship nothing.")
+    UI.message("An external tester can install a build only when ALL of:")
+    UI.message("  processing=VALID, expired=false,")
+    UI.message("  externalState=BETA_APPROVED,")
+    UI.message("  the extern group is listed under groups, and")
+    UI.message("  the tester is in that group with an accepted invite.")
+    UI.message("READY_FOR_BETA_SUBMISSION (never submitted at all),")
+    UI.message("WAITING_FOR_BETA_REVIEW, IN_BETA_REVIEW and BETA_REJECTED all")
+    UI.message("look like a successful upload in the CI log but ship nothing.")
+    UI.message("betaReview=- means NO review submission exists — that is the")
+    UI.message("silent-stranding case, not a pending one.")
+    UI.message("Full glossary: docs/guides/ios-testflight-testers.md")
   end
 
   desc "#3814 — FAIL if the newest external build is not actually shippable."
