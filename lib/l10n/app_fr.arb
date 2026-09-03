@@ -5277,8 +5277,6 @@
   "recordingTileScore": "Score de conduite",
   "brandMarkFuelGeneric": "Station-service",
   "brandMarkEvGeneric": "Point de recharge",
-  "allPricesLegend": "Fond plein = le moins cher de ces résultats. Deuxième chiffre = ce que coûtent 100 km avec ce carburant sur votre véhicule.",
-  "allPricesLegendPricesOnly": "Fond plein = le moins cher de ces résultats. Ajoutez un véhicule et saisissez vos pleins pour voir le coût aux 100 km.",
   "allPricesNoPriceMask": "—",
   "allPricesBestMarker": "le moins cher",
   "allPricesDelta": "+{amount}",
@@ -5532,5 +5530,84 @@
       }
     }
   },
-  "amenitiesServicesShowLess": "Afficher moins"
+  "amenitiesServicesShowLess": "Afficher moins",
+  "helpBubblePreviousTip": "Astuce précédente",
+  "helpBubbleNextTip": "Astuce suivante",
+  "helpBubbleTipPosition": "{index}/{total}",
+  "@helpBubbleTipPosition": {
+    "placeholders": {
+      "index": {
+        "type": "int",
+        "example": "2"
+      },
+      "total": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "helpBubbleTipPositionSemantic": "Astuce {index} sur {total}",
+  "@helpBubbleTipPositionSemantic": {
+    "placeholders": {
+      "index": {
+        "type": "int",
+        "example": "2"
+      },
+      "total": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "helpSearchTipSummaryBar": "Touchez la barre grise au-dessus des résultats pour changer de carburant, de rayon et tous les autres critères de recherche.",
+  "helpSearchTipFillEmphasis": "Dans le tableau comparatif, une case pleine signale le prix le plus bas pour ce carburant parmi les stations affichées.",
+  "helpSearchTipSecondFigure": "Le second chiffre, plus petit, indique ce que coûtent 100 km avec ce carburant sur votre véhicule.",
+  "helpSearchTipPriceArrows": "La flèche à côté d'un prix le situe dans cette liste — tiers le moins cher, intermédiaire ou le plus cher de ces résultats. Ce n'est pas une évolution dans le temps.",
+  "helpSearchTipViewToggle": "Le bouton d'affichage bascule entre les fiches compactes et le tableau qui compare tous les carburants d'un coup d'œil.",
+  "searchSummaryFuelTooltip": "Carburant : {fuel}",
+  "@searchSummaryFuelTooltip": {
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E85 / Bioethanol"
+      }
+    }
+  },
+  "searchSummaryRadiusValue": "{km} km",
+  "@searchSummaryRadiusValue": {
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "10"
+      }
+    }
+  },
+  "searchSummaryAgeJustNow": "à l'instant",
+  "searchSummaryAgeMinutes": "{minutes} min",
+  "@searchSummaryAgeMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+  "searchSummaryAgeHours": "{hours} h",
+  "@searchSummaryAgeHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "searchSummaryAgeDays": "{days} j",
+  "@searchSummaryAgeDays": {
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  }
 }

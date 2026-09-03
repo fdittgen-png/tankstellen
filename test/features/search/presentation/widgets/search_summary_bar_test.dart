@@ -49,8 +49,44 @@ void main() {
         ],
       );
 
-      expect(find.text('Super E10'), findsOneWidget);
-      expect(find.text('Within 10 km'), findsOneWidget);
+      // #3939 — value only: the pump glyph says "fuel", the radius glyph
+      // says "within a radius of".
+      expect(find.text('E10'), findsOneWidget);
+      expect(find.text('Super E10'), findsNothing);
+      expect(find.text('10 km'), findsOneWidget);
+      expect(find.text('Within 10 km'), findsNothing);
+    });
+
+    testWidgets('#3939 — the value-only pills carry the full sentence as a '
+        'tooltip AND as their screen-reader label', (tester) async {
+      final handle = tester.ensureSemantics();
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const SearchSummaryBar(),
+        overrides: [
+          ...test.overrides,
+          selectedFuelTypeOverride(FuelType.e85),
+          searchRadiusOverride(10),
+          userPositionNullOverride(),
+        ],
+      );
+
+      expect(find.text('E85'), findsOneWidget);
+      expect(find.byTooltip('Fuel: E85 / Bioéthanol'), findsOneWidget);
+      expect(find.byTooltip('Within 10 km'), findsOneWidget);
+
+      // The whole band is one tappable semantics node, so the pills'
+      // sentences are announced as part of it — the words the pills
+      // stopped showing are still read out.
+      expect(
+        find.bySemanticsLabel(RegExp(r'Fuel: E85 / Bioéthanol')),
+        findsOneWidget,
+      );
+      expect(find.bySemanticsLabel(RegExp(r'Within 10 km')), findsOneWidget);
+      handle.dispose();
     });
 
     testWidgets('tapping the bar opens SearchCriteriaScreen', (tester) async {
@@ -97,7 +133,7 @@ void main() {
         ],
       );
 
-      expect(find.text('Within 10 km'), findsOneWidget);
+      expect(find.text('10 km'), findsOneWidget);
     });
 
     testWidgets('route mode + loading shows searching chip, no radius',
@@ -126,7 +162,7 @@ void main() {
       expect(find.text('Searching the route…'), findsOneWidget);
       // #2783 — a live spinner signals the search is ongoing.
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
-      expect(find.text('Within 10 km'), findsNothing);
+      expect(find.text('10 km'), findsNothing);
       expect(find.text('Along the route · every 50 km'), findsNothing);
     });
 
@@ -187,7 +223,7 @@ void main() {
 
       expect(find.text('Along the route · every 50 km'), findsOneWidget);
       expect(find.text('Searching the route…'), findsNothing);
-      expect(find.text('Within 10 km'), findsNothing);
+      expect(find.text('10 km'), findsNothing);
     });
 
     // #2676 — while the on-search Fuel Station Radar owns the results, the
@@ -210,7 +246,7 @@ void main() {
       );
 
       expect(find.text('Fuel Station Radar result'), findsOneWidget);
-      expect(find.text('Within 10 km'), findsNothing);
+      expect(find.text('10 km'), findsNothing);
     });
 
     testWidgets('radar inactive keeps the radius chip (badge absent)',
@@ -228,7 +264,7 @@ void main() {
         ],
       );
 
-      expect(find.text('Within 10 km'), findsOneWidget);
+      expect(find.text('10 km'), findsOneWidget);
       expect(find.text('Fuel Station Radar result'), findsNothing);
     });
 
@@ -296,8 +332,12 @@ void main() {
         ],
       );
 
-      // The wordless "⚠ 2 h ago" pill is gone; the segment names the subject.
-      expect(find.text('Prices from 2 h ago'), findsOneWidget);
+      // #3939 — the pill shows the bare age; the sentence that names WHAT
+      // is two hours old moved to its tooltip and semantics label, so
+      // nothing the #3926 wording won is lost.
+      expect(find.text('2 h'), findsOneWidget);
+      expect(find.text('Prices from 2 h ago'), findsNothing);
+      expect(find.byTooltip('Prices from 2 h ago'), findsOneWidget);
       final chip = tester.widget<SummaryChip>(
         find.byKey(const Key('search_freshness_segment')),
       );
@@ -324,7 +364,8 @@ void main() {
         ],
       );
 
-      expect(find.text('Prices from 3 min ago'), findsOneWidget);
+      expect(find.text('3 min'), findsOneWidget);
+      expect(find.byTooltip('Prices from 3 min ago'), findsOneWidget);
       final chip = tester.widget<SummaryChip>(
         find.byKey(const Key('search_freshness_segment')),
       );

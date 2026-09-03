@@ -85,6 +85,48 @@ class StorageKeys {
   static const String helpBannerAlerts = 'help_banner_alerts_shown';
   static const String helpBannerConsumption = 'help_banner_consumption_shown';
   static const String helpBannerVehicles = 'help_banner_vehicles_shown';
+
+  /// #3938 (Epic #3937) — the search-results surface's help bubble. Carries
+  /// the explanations the results chrome used to spend permanent height on
+  /// (the all-prices legend, what the price arrows rank, where the criteria
+  /// live). Dismissal persists exactly like the four flags above.
+  static const String helpBannerSearchResults =
+      'help_banner_search_results_shown';
+
+  /// #3938 — the paged help bubble remembers WHICH tip it last showed on a
+  /// surface, so the next visit opens on the tip AFTER it and every visit
+  /// teaches something new. One `int` slot per surface, alongside (never
+  /// instead of) that surface's dismissal flag; read/written only through
+  /// `HelpBanner` (#3592 one-accessor rule). A stored index from a shorter
+  /// or longer tip list is tolerated — the bubble takes it modulo the
+  /// current tip count.
+  static const String helpBannerCriteriaPosition =
+      'help_banner_criteria_position';
+  static const String helpBannerAlertsPosition = 'help_banner_alerts_position';
+  static const String helpBannerConsumptionPosition =
+      'help_banner_consumption_position';
+  static const String helpBannerVehiclesPosition =
+      'help_banner_vehicles_position';
+  static const String helpBannerSearchResultsPosition =
+      'help_banner_search_results_position';
+
+  /// The position slot that pairs with a help bubble's dismissal flag.
+  ///
+  /// Every shipped surface has an explicit constant above; an unknown key
+  /// (a widget test's throwaway `'test_banner'`) derives its slot by
+  /// suffix rather than crashing, so a new surface always has somewhere to
+  /// remember its place even before it gets a named constant.
+  static String helpBannerPositionKey(String shownKey) =>
+      _helpBannerPositions[shownKey] ?? '${shownKey}_position';
+
+  static const Map<String, String> _helpBannerPositions = <String, String>{
+    helpBannerCriteria: helpBannerCriteriaPosition,
+    helpBannerAlerts: helpBannerAlertsPosition,
+    helpBannerConsumption: helpBannerConsumptionPosition,
+    helpBannerVehicles: helpBannerVehiclesPosition,
+    helpBannerSearchResults: helpBannerSearchResultsPosition,
+  };
+
   static const String supabaseAnonKey = 'supabase_anon_key';
 
   /// #780 — opt-in switch for per-vehicle baseline sync. Defaults to

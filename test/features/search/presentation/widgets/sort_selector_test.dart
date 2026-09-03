@@ -7,6 +7,11 @@ import 'package:tankstellen/features/search/presentation/widgets/sort_selector.d
 
 import '../../../../helpers/pump_app.dart';
 
+/// #3939 — an icon-only sort chip has an [Icon] where the others have a
+/// [Text], so it is addressed by its glyph.
+ChoiceChip _chipWithIcon(List<ChoiceChip> chips, IconData icon) =>
+    chips.firstWhere((c) => c.label is Icon && (c.label as Icon).icon == icon);
+
 void main() {
   group('SortSelector', () {
     testWidgets('renders all six sort options without scrolling (#3926)', (
@@ -24,12 +29,58 @@ void main() {
       expect(find.byType(SingleChildScrollView), findsNothing);
       expect(find.byType(Wrap), findsOneWidget);
 
-      expect(find.text('Distance'), findsOneWidget);
-      expect(find.text('Price'), findsOneWidget);
+      // #3939 — distance, price and rating render ICON-ONLY: the arrow,
+      // the euro sign and the star already say the word. The three whose
+      // glyph says nothing keep their text.
+      expect(find.text('Distance'), findsNothing);
+      expect(find.text('Price'), findsNothing);
+      expect(find.text('Rating'), findsNothing);
+      expect(find.byIcon(Icons.near_me), findsOneWidget);
+      expect(find.byIcon(Icons.euro), findsOneWidget);
+      expect(find.byIcon(Icons.star), findsOneWidget);
+
       expect(find.text('A-Z'), findsOneWidget);
       expect(find.text('24h'), findsOneWidget);
-      expect(find.text('Rating'), findsOneWidget);
       expect(find.text('Price/km'), findsOneWidget);
+    });
+
+    testWidgets('#3939 — every icon-only sort chip carries its label as a '
+        'tooltip AND in its semantics', (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpApp(
+        tester,
+        SortSelector(selected: SortMode.distance, onChanged: (_) {}),
+      );
+
+      for (final label in const ['Distance', 'Price', 'Rating']) {
+        expect(
+          find.byTooltip(label),
+          findsOneWidget,
+          reason: 'the icon-only "$label" chip must name itself on '
+              'long-press',
+        );
+        expect(
+          find.bySemanticsLabel(
+            RegExp('^Sort by ${RegExp.escape(label)}(,.*)?\$'),
+          ),
+          findsOneWidget,
+          reason: 'the icon-only "$label" chip must name itself to a '
+              'screen reader',
+        );
+      }
+      handle.dispose();
+    });
+
+    testWidgets('#3939 — a selected icon-only chip KEEPS its glyph (a bare '
+        'checkmark would say nothing)', (tester) async {
+      await pumpApp(
+        tester,
+        SortSelector(selected: SortMode.price, onChanged: (_) {}),
+      );
+
+      expect(find.byIcon(Icons.euro), findsOneWidget);
+      expect(find.byIcon(Icons.near_me), findsOneWidget);
+      expect(find.byIcon(Icons.star), findsOneWidget);
     });
 
     testWidgets('no chip is clipped at a 320 dp width (#3926)', (tester) async {
@@ -44,14 +95,7 @@ void main() {
       );
 
       expect(tester.takeException(), isNull);
-      for (final label in const [
-        'Distance',
-        'Price',
-        'A-Z',
-        '24h',
-        'Rating',
-        'Price/km',
-      ]) {
+      for (final label in const ['A-Z', '24h', 'Price/km']) {
         final rect = tester.getRect(find.text(label));
         expect(
           rect.left >= 0 && rect.right <= 320,
@@ -73,18 +117,11 @@ void main() {
           .toList();
       expect(chips, hasLength(6));
 
-      final distanceChip = chips.firstWhere(
-        (c) => (c.label as Text).data == 'Distance',
-      );
-      expect(distanceChip.selected, isTrue);
-
-      final priceChip = chips.firstWhere(
-        (c) => (c.label as Text).data == 'Price',
-      );
-      expect(priceChip.selected, isFalse);
+      expect(_chipWithIcon(chips, Icons.near_me).selected, isTrue);
+      expect(_chipWithIcon(chips, Icons.euro).selected, isFalse);
 
       final nameChip = chips.firstWhere(
-        (c) => (c.label as Text).data == 'A-Z',
+        (c) => c.label is Text && (c.label as Text).data == 'A-Z',
       );
       expect(nameChip.selected, isFalse);
     });
@@ -98,17 +135,12 @@ void main() {
       final chips = tester
           .widgetList<ChoiceChip>(find.byType(ChoiceChip))
           .toList();
-      final priceChip = chips.firstWhere(
-        (c) => (c.label as Text).data == 'Price',
-      );
-      expect(priceChip.selected, isTrue);
+      expect(_chipWithIcon(chips, Icons.euro).selected, isTrue);
     });
 
     for (final (label, expected) in const [
-      ('Price', SortMode.price),
       ('A-Z', SortMode.name),
       ('24h', SortMode.open24h),
-      ('Rating', SortMode.rating),
       ('Price/km', SortMode.priceDistance),
     ]) {
       testWidgets('tapping $label calls onChanged with $expected', (
@@ -125,6 +157,31 @@ void main() {
         );
 
         await tester.tap(find.text(label));
+        await tester.pumpAndSettle();
+
+        expect(receivedMode, expected);
+      });
+    }
+
+    // #3939 — the icon-only chips are tapped by their glyph.
+    for (final (icon, expected) in const [
+      (Icons.euro, SortMode.price),
+      (Icons.star, SortMode.rating),
+    ]) {
+      testWidgets('tapping the $expected glyph calls onChanged', (
+        tester,
+      ) async {
+        SortMode? receivedMode;
+
+        await pumpApp(
+          tester,
+          SortSelector(
+            selected: SortMode.distance,
+            onChanged: (mode) => receivedMode = mode,
+          ),
+        );
+
+        await tester.tap(find.byIcon(icon));
         await tester.pumpAndSettle();
 
         expect(receivedMode, expected);
@@ -171,14 +228,11 @@ void main() {
           .widgetList<ChoiceChip>(find.byType(ChoiceChip))
           .toList();
       final open24hChip = chips.firstWhere(
-        (c) => (c.label as Text).data == '24h',
+        (c) => c.label is Text && (c.label as Text).data == '24h',
       );
       expect(open24hChip.selected, isTrue);
 
-      final distChip = chips.firstWhere(
-        (c) => (c.label as Text).data == 'Distance',
-      );
-      expect(distChip.selected, isFalse);
+      expect(_chipWithIcon(chips, Icons.near_me).selected, isFalse);
     });
   });
 

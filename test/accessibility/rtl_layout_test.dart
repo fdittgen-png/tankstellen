@@ -246,8 +246,11 @@ void main() {
           ),
         );
 
-        expect(find.text('Distance'), findsOneWidget);
-        expect(find.text('Price'), findsOneWidget);
+        // #3939 — distance and price are icon-only now (the arrow and the
+        // euro sign already say the word); the chips that keep their text
+        // keep it in RTL too.
+        expect(find.byIcon(Icons.near_me), findsOneWidget);
+        expect(find.byIcon(Icons.euro), findsOneWidget);
         expect(find.text('A-Z'), findsOneWidget);
       });
 
@@ -260,7 +263,7 @@ void main() {
           ),
         );
 
-        final distanceX = tester.getCenter(find.text('Distance')).dx;
+        final distanceX = tester.getCenter(find.byIcon(Icons.near_me)).dx;
         final azX = tester.getCenter(find.text('A-Z')).dx;
 
         // In RTL, Distance (first in code) should be to the right of A-Z

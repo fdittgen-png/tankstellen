@@ -1,0 +1,112 @@
+{
+  "helpBubblePreviousTip": "Previous tip",
+  "@helpBubblePreviousTip": {
+    "description": "Tooltip and screen-reader label of the left chevron in the paged help bubble (#3938). Icon-only control, so this string is the only thing a screen reader can announce."
+  },
+  "helpBubbleNextTip": "Next tip",
+  "@helpBubbleNextTip": {
+    "description": "Tooltip and screen-reader label of the right chevron in the paged help bubble (#3938). Icon-only control, so this string is the only thing a screen reader can announce."
+  },
+  "helpBubbleTipPosition": "{index}/{total}",
+  "@helpBubbleTipPosition": {
+    "description": "Compact position indicator between the two chevrons of the paged help bubble — 'which tip of how many' (#3938). Kept as a separator mask so a locale that does not use a slash can change it.",
+    "placeholders": {
+      "index": {
+        "type": "int",
+        "example": "2"
+      },
+      "total": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "helpBubbleTipPositionSemantic": "Tip {index} of {total}",
+  "@helpBubbleTipPositionSemantic": {
+    "description": "Screen-reader label for the help bubble's position indicator (#3938). The visible '2/5' is a compact mask; assistive tech announces this full sentence instead.",
+    "placeholders": {
+      "index": {
+        "type": "int",
+        "example": "2"
+      },
+      "total": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "helpSearchTipSummaryBar": "Tap the grey bar above the results to change your fuel, your radius and every other search criterion.",
+  "@helpSearchTipSummaryBar": {
+    "description": "Tip 1 of the search-results help bubble (#3939): the summary bar is the whole search's control, but nothing on a band of grey pills says 'tap me'."
+  },
+  "helpSearchTipFillEmphasis": "In the comparison table, a filled cell marks the cheapest price for that fuel among the stations you are looking at.",
+  "@helpSearchTipFillEmphasis": {
+    "description": "Tip 2 of the search-results help bubble (#3939). Replaces the first half of the permanent two-line legend that used to sit under the all-prices column header."
+  },
+  "helpSearchTipSecondFigure": "The smaller second figure in a cell is what 100 km on that fuel costs in your vehicle.",
+  "@helpSearchTipSecondFigure": {
+    "description": "Tip 3 of the search-results help bubble (#3939). Replaces the second half of the permanent all-prices legend."
+  },
+  "helpSearchTipPriceArrows": "The arrow beside a price ranks it inside this list — cheapest, middle or dearest third of these results. It is not a price trend over time.",
+  "@helpSearchTipPriceArrows": {
+    "description": "Tip 4 of the search-results help bubble (#3939): the most misread mark on the screen. priceTierOf() classifies a price WITHIN the current result set, so the down/up glyph is a ranking, never a rise or fall since yesterday."
+  },
+  "helpSearchTipViewToggle": "The view button switches between the compact cards and the table that compares every fuel at once.",
+  "@helpSearchTipViewToggle": {
+    "description": "Tip 5 of the search-results help bubble (#3939), the deepest one: the all-prices comparison view exists for comparing fuels rather than stations."
+  },
+  "searchSummaryFuelTooltip": "Fuel: {fuel}",
+  "@searchSummaryFuelTooltip": {
+    "description": "Long-press tooltip and screen-reader label of the fuel pill in the results summary bar (#3939). The pill itself now shows only the fuel code ('E85'), because the pump icon beside it already says the word 'fuel'.",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E85 / Bioethanol"
+      }
+    }
+  },
+  "searchSummaryRadiusValue": "{km} km",
+  "@searchSummaryRadiusValue": {
+    "description": "Value-only label of the radius pill in the results summary bar (#3939). The radius glyph beside it already says 'within a radius of', so the pill shows the number alone; the full sentence lives in its tooltip (searchCriteriaRadiusBadge).",
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "10"
+      }
+    }
+  },
+  "searchSummaryAgeJustNow": "now",
+  "@searchSummaryAgeJustNow": {
+    "description": "Value-only label of the price-freshness pill in the results summary bar for an age under one minute (#3939). The clock glyph carries the meaning; the full sentence ('Prices from just now') is the tooltip."
+  },
+  "searchSummaryAgeMinutes": "{minutes} min",
+  "@searchSummaryAgeMinutes": {
+    "description": "Value-only label of the price-freshness pill for a download age under an hour (#3939). The full sentence lives in the tooltip.",
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+  "searchSummaryAgeHours": "{hours} h",
+  "@searchSummaryAgeHours": {
+    "description": "Value-only label of the price-freshness pill for a download age under a day (#3939). The full sentence lives in the tooltip.",
+    "placeholders": {
+      "hours": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "searchSummaryAgeDays": "{days} d",
+  "@searchSummaryAgeDays": {
+    "description": "Value-only label of the price-freshness pill for a download age of a day or more (#3939). The full sentence lives in the tooltip.",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  }
+}

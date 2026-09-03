@@ -51,7 +51,7 @@ class RadarSearchChip extends ConsumerWidget {
     final Widget icon;
     if (!active) {
       label = l10n.fuelStationRadarStart;
-      icon = const Icon(Icons.radar, size: 16);
+      icon = const Icon(Icons.radar, size: 18);
     } else if (initializing) {
       label = l10n.radarSearching;
       icon = const SizedBox.square(
@@ -60,16 +60,17 @@ class RadarSearchChip extends ConsumerWidget {
       );
     } else {
       label = l10n.stopRadar;
-      icon = const Icon(Icons.stop_circle, size: 16);
+      icon = const Icon(Icons.stop_circle, size: 18);
     }
 
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: maxWidth),
+    return Semantics(
+      label: label,
+      button: true,
+      excludeSemantics: true,
       child: ActionChip(
         key: const Key('radarSearchButton'),
-        avatar: icon,
-        label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
-        labelStyle: Theme.of(context).textTheme.labelSmall,
+        label: icon,
+        labelPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
         visualDensity: VisualDensity.compact,
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         tooltip: label,

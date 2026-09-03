@@ -12,8 +12,11 @@ import '../../../../../helpers/mock_providers.dart';
 import '../../../../../helpers/pump_app.dart';
 
 /// #3933 — the sticky column header that names the fuels ONCE above the
-/// all-prices list, plus the one-line legend that explains the emphasis
-/// and the second number in each cell.
+/// all-prices list. #3939 (Epic #3937) deleted the two-line legend that
+/// used to sit under it: what the fill emphasis means and what the second
+/// figure in a cell is are now tips in the search surface's dismissible
+/// help bubble, not permanent chrome on the one screen whose job is
+/// showing stations. The fuel codes are data, so they stay.
 void main() {
   const columns = AllPricesColumns(
     visible: [FuelType.e10, FuelType.e98, FuelType.diesel, FuelType.e85],
@@ -45,34 +48,37 @@ void main() {
     expect(find.text('GPL'), findsNothing);
   });
 
-  testWidgets('the legend explains the emphasis and the second number', (
-    tester,
-  ) async {
-    await pumpApp(
-      tester,
-      const AllPricesTableHeader(),
-      overrides: overrides(
-        cost: const FuelCostModel(
-          litersPer100kmByFuel: {FuelType.e85: 6.0},
-          usableFuels: {FuelType.e85, FuelType.e10},
-        ),
+  testWidgets('#3939 — the permanent legend is GONE from the layout, with '
+      'or without a measured consumption', (tester) async {
+    for (final cost in const [
+      FuelCostModel.empty,
+      FuelCostModel(
+        litersPer100kmByFuel: {FuelType.e85: 6.0},
+        usableFuels: {FuelType.e85, FuelType.e10},
       ),
-    );
+    ]) {
+      await pumpApp(
+        tester,
+        const AllPricesTableHeader(),
+        overrides: overrides(cost: cost),
+      );
 
-    expect(find.textContaining('cheapest of these results'), findsOneWidget);
-    expect(find.textContaining('100 km'), findsOneWidget);
+      expect(find.textContaining('cheapest of these results'), findsNothing);
+      expect(find.textContaining('100 km'), findsNothing);
+      expect(find.textContaining('log fill-ups'), findsNothing);
+    }
   });
 
-  testWidgets('without consumption the legend invites logging fill-ups', (
-    tester,
-  ) async {
+  testWidgets('#3939 — the header is one row of fuel codes and nothing '
+      'else', (tester) async {
     await pumpApp(
       tester,
       const AllPricesTableHeader(),
       overrides: overrides(),
     );
 
-    expect(find.textContaining('log fill-ups'), findsOneWidget);
+    // Four column codes, no prose line beneath them.
+    expect(find.byType(Text), findsNWidgets(4));
   });
 
   testWidgets('renders nothing when no column set resolved', (tester) async {

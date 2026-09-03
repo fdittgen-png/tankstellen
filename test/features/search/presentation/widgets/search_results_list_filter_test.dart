@@ -12,6 +12,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/services/service_result.dart';
+import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/core/domain/search_result_item.dart';
 import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/core/domain/station_amenity.dart';
@@ -81,6 +82,13 @@ Future<void> _pumpList(
   when(() => test.mockStorage.getApiKey(any())).thenReturn(null);
   when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
   when(() => test.mockStorage.getRatings()).thenReturn(<String, int>{});
+  // #3939 — this file measures FILTERING, not chrome: the search surface's
+  // help bubble is seeded as already dismissed so it does not push the
+  // fourth card past the bottom of the test viewport.
+  when(() => test.mockStorage.getSetting(any())).thenReturn(null);
+  when(
+    () => test.mockStorage.getSetting(StorageKeys.helpBannerSearchResults),
+  ).thenReturn(true);
 
   await pumpApp(
     tester,

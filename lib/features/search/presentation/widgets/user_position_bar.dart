@@ -47,6 +47,9 @@ class UserPositionBar extends ConsumerWidget {
           color: theme.colorScheme.primary,
         ),
         label: value,
+        // #3939 — the pill was already value-only ("GPS · 1 min"); what it
+        // gains here is the long-press sentence that names the value.
+        tooltip: '${l10n.yourPosition}: $value',
         semanticsLabel: '${l10n.yourPosition}: $value',
       );
     } else {
@@ -58,6 +61,7 @@ class UserPositionBar extends ConsumerWidget {
           color: theme.colorScheme.error,
         ),
         label: l10n.positionUnknown,
+        tooltip: '${l10n.positionUnknown} — ${l10n.distancesFromCenter}',
         semanticsLabel: '${l10n.positionUnknown} — ${l10n.distancesFromCenter}',
       );
     }

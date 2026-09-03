@@ -13,6 +13,8 @@ import '../../../../core/utils/price_tier.dart';
 import '../../../../core/utils/price_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
+import '../../../../core/storage/storage_keys.dart';
+import '../../../../core/widgets/help_banner.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../core/widgets/staggered_fade_in.dart';
@@ -128,6 +130,12 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
         // #494 — same swipe-hint banner as the favorites screen. Shows
         // once until the user taps "Got it", then stays dismissed.
         const SwipeTutorialBanner(),
+        // #3939 (Epic #3937) — everything the chrome used to explain in
+        // permanent height (the all-prices legend, what the price arrows
+        // rank, where the criteria live) lives here instead: a paged,
+        // dismissible bubble the user reads once. The landscape radar
+        // pane, which trades every non-essential row for vertical room,
+        // does not carry it.
         // #3372 — the landscape radar list drops the filter panel for
         // vertical room (row B keeps the count/view/overflow controls).
         // #3926 — the panel no longer carries its own "All brands ⌄"
@@ -166,14 +174,28 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
               final priceRange = _getPriceRangeFor(fuelOnly, fuelType);
               final profileFuel = ref.watch(activeProfileProvider)?.preferredFuelType;
 
+              // #3937 — the help bubble is the list's FIRST ITEM, not a
+              // band above it: on the screen whose whole point is showing
+              // stations, an explanation must scroll away with the first
+              // flick instead of holding height until it is dismissed.
+              // The landscape radar pane carries no bubble at all.
+              final showHelp = !widget.hideSortAndFilter;
               return ListView.builder(
                 // #3926 — the extended radar FAB is gone, but the shell's
                 // docked search FAB still floats over the list bottom;
                 // reserve the shared clearance so the last card is not
                 // sitting under it.
                 padding: const EdgeInsets.only(bottom: kFabScrollClearance),
-                itemCount: sorted.length,
-                itemBuilder: (context, index) {
+                itemCount: sorted.length + (showHelp ? 1 : 0),
+                itemBuilder: (context, rawIndex) {
+                  if (showHelp && rawIndex == 0) {
+                    return const HelpBanner(
+                      storageKey: StorageKeys.helpBannerSearchResults,
+                      icon: Icons.lightbulb_outline,
+                      surface: HelpSurface.searchResults,
+                    );
+                  }
+                  final index = rawIndex - (showHelp ? 1 : 0);
                   final item = sorted[index];
                   // #595 — cap stagger so a 50-result search finishes
                   // fading in well under a second. Index key keeps the
