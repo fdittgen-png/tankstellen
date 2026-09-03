@@ -4068,6 +4068,35 @@
   "pickStationSectionNearby": "In der Nähe",
   "pickStationNearbyEmpty": "Keine aktuelle Suche — suchen Sie im Tab „Suche“ nach Tankstellen, dann erscheinen die nächstgelegenen hier.",
   "pickStationLastFillUpAt": "Letzte Tankfüllung: {date}",
+  "helpBubblePreviousTip": "Vorheriger Tipp",
+  "helpBubbleNextTip": "Nächster Tipp",
+  "helpBubbleTipPosition": "{index}/{total}",
+  "@helpBubbleTipPosition": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "helpBubbleTipPositionSemantic": "Tipp {index} von {total}",
+  "@helpBubbleTipPositionSemantic": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "helpSearchTipSummaryBar": "Tippen Sie auf die graue Leiste über den Treffern, um Kraftstoff, Umkreis und alle weiteren Suchkriterien zu ändern.",
+  "helpSearchTipFillEmphasis": "In der Vergleichstabelle markiert ein gefülltes Feld den günstigsten Preis für diesen Kraftstoff unter den angezeigten Stationen.",
+  "helpSearchTipSecondFigure": "Die kleinere zweite Zahl in einem Feld zeigt, was 100 km mit diesem Kraftstoff in Ihrem Fahrzeug kosten.",
+  "helpSearchTipPriceArrows": "Der Pfeil neben einem Preis ordnet ihn innerhalb dieser Liste ein — günstigstes, mittleres oder teuerstes Drittel dieser Treffer. Er zeigt keinen zeitlichen Preisverlauf.",
+  "helpSearchTipViewToggle": "Die Ansichtstaste wechselt zwischen den kompakten Karten und der Tabelle, die alle Kraftstoffe auf einmal vergleicht.",
   "privacyTopicSubtitle": "Ihre Entscheidungen, Daten auf diesem Gerät, Synchronisierung, Export oder Löschen",
   "privacyDataLocationLocal": "Ihre Daten bleiben auf diesem Gerät",
   "privacyDataLocationSynced": "Ihre Daten werden zusätzlich mit TankSync synchronisiert",

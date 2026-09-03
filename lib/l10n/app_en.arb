@@ -8574,6 +8574,62 @@
       }
     }
   },
+  "helpBubblePreviousTip": "Previous tip",
+  "@helpBubblePreviousTip": {
+    "description": "Tooltip and screen-reader label of the left chevron in the paged help bubble (#3938). Icon-only control, so this string is the only thing a screen reader can announce."
+  },
+  "helpBubbleNextTip": "Next tip",
+  "@helpBubbleNextTip": {
+    "description": "Tooltip and screen-reader label of the right chevron in the paged help bubble (#3938). Icon-only control, so this string is the only thing a screen reader can announce."
+  },
+  "helpBubbleTipPosition": "{index}/{total}",
+  "@helpBubbleTipPosition": {
+    "description": "Compact position indicator between the two chevrons of the paged help bubble — 'which tip of how many' (#3938). Kept as a separator mask so a locale that does not use a slash can change it.",
+    "placeholders": {
+      "index": {
+        "type": "int",
+        "example": "2"
+      },
+      "total": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "helpBubbleTipPositionSemantic": "Tip {index} of {total}",
+  "@helpBubbleTipPositionSemantic": {
+    "description": "Screen-reader label for the help bubble's position indicator (#3938). The visible '2/5' is a compact mask; assistive tech announces this full sentence instead.",
+    "placeholders": {
+      "index": {
+        "type": "int",
+        "example": "2"
+      },
+      "total": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "helpSearchTipSummaryBar": "Tap the grey bar above the results to change your fuel, your radius and every other search criterion.",
+  "@helpSearchTipSummaryBar": {
+    "description": "Tip 1 of the search-results help bubble (#3939): the summary bar is the whole search's control, but nothing on a band of grey pills says 'tap me'."
+  },
+  "helpSearchTipFillEmphasis": "In the comparison table, a filled cell marks the cheapest price for that fuel among the stations you are looking at.",
+  "@helpSearchTipFillEmphasis": {
+    "description": "Tip 2 of the search-results help bubble (#3939). Replaces the first half of the permanent two-line legend that used to sit under the all-prices column header."
+  },
+  "helpSearchTipSecondFigure": "The smaller second figure in a cell is what 100 km on that fuel costs in your vehicle.",
+  "@helpSearchTipSecondFigure": {
+    "description": "Tip 3 of the search-results help bubble (#3939). Replaces the second half of the permanent all-prices legend."
+  },
+  "helpSearchTipPriceArrows": "The arrow beside a price ranks it inside this list — cheapest, middle or dearest third of these results. It is not a price trend over time.",
+  "@helpSearchTipPriceArrows": {
+    "description": "Tip 4 of the search-results help bubble (#3939): the most misread mark on the screen. priceTierOf() classifies a price WITHIN the current result set, so the down/up glyph is a ranking, never a rise or fall since yesterday."
+  },
+  "helpSearchTipViewToggle": "The view button switches between the compact cards and the table that compares every fuel at once.",
+  "@helpSearchTipViewToggle": {
+    "description": "Tip 5 of the search-results help bubble (#3939), the deepest one: the all-prices comparison view exists for comparing fuels rather than stations."
+  },
   "privacyTopicSubtitle": "Your choices, data on this device, sync, export or delete",
   "@privacyTopicSubtitle": {
     "description": "Settings root: one-line subtitle of the Privacy & data tile naming its four topics (#3908, Epic #3907)."

@@ -5277,8 +5277,6 @@
   "recordingTileScore": "Score de conduite",
   "brandMarkFuelGeneric": "Station-service",
   "brandMarkEvGeneric": "Point de recharge",
-  "allPricesLegend": "Fond plein = le moins cher de ces résultats. Deuxième chiffre = ce que coûtent 100 km avec ce carburant sur votre véhicule.",
-  "allPricesLegendPricesOnly": "Fond plein = le moins cher de ces résultats. Ajoutez un véhicule et saisissez vos pleins pour voir le coût aux 100 km.",
   "allPricesNoPriceMask": "—",
   "allPricesBestMarker": "le moins cher",
   "allPricesDelta": "+{amount}",
@@ -5532,5 +5530,80 @@
       }
     }
   },
-  "amenitiesServicesShowLess": "Afficher moins"
+  "amenitiesServicesShowLess": "Afficher moins",
+  "helpBubblePreviousTip": "Previous tip",
+  "@helpBubblePreviousTip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "helpBubbleNextTip": "Next tip",
+  "@helpBubbleNextTip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "helpBubbleTipPosition": "{index}/{total}",
+  "@helpBubbleTipPosition": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "index": {
+        "type": "int",
+        "example": "2"
+      },
+      "total": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "helpBubbleTipPositionSemantic": "Tip {index} of {total}",
+  "@helpBubbleTipPositionSemantic": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "index": {
+        "type": "int",
+        "example": "2"
+      },
+      "total": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "helpSearchTipSummaryBar": "Tap the grey bar above the results to change your fuel, your radius and every other search criterion.",
+  "@helpSearchTipSummaryBar": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "helpSearchTipFillEmphasis": "In the comparison table, a filled cell marks the cheapest price for that fuel among the stations you are looking at.",
+  "@helpSearchTipFillEmphasis": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "helpSearchTipSecondFigure": "The smaller second figure in a cell is what 100 km on that fuel costs in your vehicle.",
+  "@helpSearchTipSecondFigure": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "helpSearchTipPriceArrows": "The arrow beside a price ranks it inside this list — cheapest, middle or dearest third of these results. It is not a price trend over time.",
+  "@helpSearchTipPriceArrows": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "helpSearchTipViewToggle": "The view button switches between the compact cards and the table that compares every fuel at once.",
+  "@helpSearchTipViewToggle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "allPricesLegend": "Filled = cheapest of these results. Second figure = what 100 km costs on that fuel with your vehicle.",
+  "@allPricesLegend": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "allPricesLegendPricesOnly": "Filled = cheapest of these results. Add a vehicle and log fill-ups to see the cost per 100 km.",
+  "@allPricesLegendPricesOnly": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  }
 }

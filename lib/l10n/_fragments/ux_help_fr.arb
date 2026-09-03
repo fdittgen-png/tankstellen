@@ -1,0 +1,31 @@
+{
+  "helpBubblePreviousTip": "Astuce précédente",
+  "helpBubbleNextTip": "Astuce suivante",
+  "helpBubbleTipPosition": "{index}/{total}",
+  "@helpBubbleTipPosition": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "helpBubbleTipPositionSemantic": "Astuce {index} sur {total}",
+  "@helpBubbleTipPositionSemantic": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "helpSearchTipSummaryBar": "Touchez la barre grise au-dessus des résultats pour changer de carburant, de rayon et tous les autres critères de recherche.",
+  "helpSearchTipFillEmphasis": "Dans le tableau comparatif, une case pleine signale le prix le plus bas pour ce carburant parmi les stations affichées.",
+  "helpSearchTipSecondFigure": "Le second chiffre, plus petit, indique ce que coûtent 100 km avec ce carburant sur votre véhicule.",
+  "helpSearchTipPriceArrows": "La flèche à côté d'un prix le situe dans cette liste — tiers le moins cher, intermédiaire ou le plus cher de ces résultats. Ce n'est pas une évolution dans le temps.",
+  "helpSearchTipViewToggle": "Le bouton d'affichage bascule entre les fiches compactes et le tableau qui compare tous les carburants d'un coup d'œil."
+}
