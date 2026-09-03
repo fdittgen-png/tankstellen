@@ -105,7 +105,10 @@ void main() {
         expect(logo.kind, BrandKind.ev);
         expect(logo.brand, 'Ionity', reason: 'the raw OCM operator title '
             'must be canonicalised so every spelling shares one mark');
-        expect(find.text('IO'), findsOneWidget);
+        // #3940 — Ionity ships a bundled logo, which outranks the
+        // monogram; the mark is an image now, not the 'IO' letters.
+        expect(find.text('IO'), findsNothing);
+        expect(find.byType(Image), findsWidgets);
         expect(find.byIcon(Icons.ev_station), findsNothing);
         // The operator text line is unchanged.
         expect(find.text('IONITY'), findsOneWidget);

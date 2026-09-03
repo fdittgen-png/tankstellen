@@ -40,6 +40,17 @@ class BrandLogo extends ConsumerWidget {
   /// upstream spellings are fine — the mark canonicalises them.
   final String brand;
 
+  /// How much WIDER than [size] a bundled logo may grow, as a multiple
+  /// of it. Commons hosts wordmarks, not emblems, and several are very
+  /// wide (Fastned ≈ 7.6:1, TotalEnergies ≈ 6.6:1): letterboxed into a
+  /// square they collapse to an unreadable strip — worse for
+  /// recognition than the monogram they replaced. A caller whose layout
+  /// can absorb the extra width (the list card's Row) passes > 1 so a
+  /// wordmark keeps its height and spends width instead. Callers that
+  /// reserve a fixed square in their own measurements (the station
+  /// detail header, which feeds `station_header_metrics`) keep 1.
+  final double maxWidthFactor;
+
   /// The size of the mark (width and height). Defaults to 48.
   final double size;
 
@@ -52,6 +63,7 @@ class BrandLogo extends ConsumerWidget {
     super.key,
     required this.brand,
     this.size = 48,
+    this.maxWidthFactor = 1,
     this.kind = BrandKind.fuel,
   });
 
@@ -103,19 +115,30 @@ class BrandLogo extends ConsumerWidget {
   /// to do here. A missing or corrupt asset degrades to the monogram
   /// rather than to Flutter's broken-image glyph.
   Widget _bundledLogo(BrandLogoAsset logo, ThemeData theme) {
-    return Container(
-      width: size,
-      height: size,
-      padding: EdgeInsets.all(size * 0.08),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFFFFF),
-        borderRadius: AppRadius.md,
+    // Height is fixed; width follows the image's own ratio between one
+    // and [maxWidthFactor] squares. With the default factor of 1 this is
+    // exactly the old square. The image is unconstrained in width inside
+    // those bounds, so `BoxFit.contain` fills the height rather than
+    // shrinking to fit a square it never fitted.
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        minWidth: size,
+        maxWidth: size * maxWidthFactor,
+        minHeight: size,
+        maxHeight: size,
       ),
-      child: Image.asset(
-        logo.assetPath,
-        fit: BoxFit.contain,
-        filterQuality: FilterQuality.medium,
-        errorBuilder: (context, _, _) => _mark(theme),
+      child: Container(
+        padding: EdgeInsets.all(size * 0.08),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFFFFF),
+          borderRadius: AppRadius.md,
+        ),
+        child: Image.asset(
+          logo.assetPath,
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.medium,
+          errorBuilder: (context, _, _) => _mark(theme),
+        ),
       ),
     );
   }
