@@ -33,8 +33,9 @@ part 'all_prices_station_card_parts.dart';
 /// columns in a list-wide stable order (empty cell where the station lacks
 /// a grade — never a reflow), each cell carrying the pump price, its delta
 /// against the cheapest of the current results, and the cost of 100 km on
-/// that fuel for the active vehicle. A verdict line names the winning fuel
-/// here and flags the station when it wins the results outright.
+/// that fuel for the active vehicle — the cheapest cell is filled in its
+/// fuel colour, which is how the winner is named (#3943 dropped the
+/// verdict sentence that repeated it under every card).
 ///
 /// ## No new constructor parameters (the #3933 data seam)
 /// `search_results_list.dart` belongs to the sibling #3926 work, so every
@@ -45,9 +46,9 @@ part 'all_prices_station_card_parts.dart';
 /// outside a live search (route results, tests).
 ///
 /// ## Degradation
-/// With no vehicle or no consumption history the per-100 km number and the
-/// verdict disappear on their own (they are null in the model) and the
-/// card degrades to an aligned price table with deltas.
+/// With no vehicle or no consumption history the per-100 km number
+/// disappears on its own (it is null in the model) and the card degrades
+/// to an aligned price table with deltas.
 class AllPricesStationCard extends ConsumerWidget {
   final Station station;
   final VoidCallback? onTap;

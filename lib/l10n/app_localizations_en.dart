@@ -215,11 +215,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clearCache => 'Clear cache';
 
   @override
-  String stationsFound(int count) {
-    return '$count stations found';
-  }
-
-  @override
   String get storageUsage => 'Storage usage on this device';
 
   @override
@@ -355,13 +350,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sortDistance => 'Distance';
 
   @override
-  String get sortOpen24h => '24h';
-
-  @override
   String get sortRating => 'Rating';
-
-  @override
-  String get sortPriceDistance => 'Price/km';
 
   @override
   String get cheap => 'cheap';
@@ -7858,19 +7847,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String allPricesCostPer100km(String cost) {
-    return '$cost/100 km';
-  }
-
-  @override
-  String allPricesVerdictHere(String fuel, String cost) {
-    return 'Cheapest here: $fuel at $cost';
-  }
-
-  @override
-  String get allPricesVerdictWinsResults => 'cheapest of the results';
-
-  @override
   String allPricesMoreFuels(int count) {
     return '+$count';
   }
@@ -8584,6 +8560,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchRefreshTooltip => 'Update position and refresh prices';
 
   @override
+  String get sortMenuByName => 'Sort by name (A–Z)';
+
+  @override
+  String get sortMenuOpen24h => '24-hour stations first';
+
+  @override
+  String get sortMenuPriceDistance => 'Sort by price per kilometre';
+
+  @override
+  String sortMenuActiveSemantic(String option) {
+    return '$option, current sort';
+  }
+
+  @override
   String priceHistoryFirstSeen(String date) {
     return 'First seen on $date — the history builds up with every visit';
   }
@@ -9131,11 +9121,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get clearCache => '⟦Çłéář çáçĥé ·····⟧';
 
   @override
-  String stationsFound(int count) {
-    return '⟦$count šŧáŧîóñš ƒóúñđ ······⟧';
-  }
-
-  @override
   String get storageUsage => '⟦Šŧóřáǧé úšáǧé óñ ŧĥîš đéṽîçé ···········⟧';
 
   @override
@@ -9275,13 +9260,7 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get sortDistance => '⟦Đîšŧáñçé ····⟧';
 
   @override
-  String get sortOpen24h => '⟦24ĥ⟧';
-
-  @override
   String get sortRating => '⟦Řáŧîñǧ ···⟧';
-
-  @override
-  String get sortPriceDistance => '⟦Ƥřîçé/ķɱ ···⟧';
 
   @override
   String get cheap => '⟦çĥéáƥ ··⟧';
@@ -16984,20 +16963,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   }
 
   @override
-  String allPricesCostPer100km(String cost) {
-    return '⟦$cost/100 ķɱ ·⟧';
-  }
-
-  @override
-  String allPricesVerdictHere(String fuel, String cost) {
-    return '⟦Çĥéáƥéšŧ ĥéřé: $fuel áŧ $cost ······⟧';
-  }
-
-  @override
-  String get allPricesVerdictWinsResults =>
-      '⟦çĥéáƥéšŧ óƒ ŧĥé řéšúłŧš ·········⟧';
-
-  @override
   String allPricesMoreFuels(int count) {
     return '⟦+$count⟧';
   }
@@ -17724,6 +17689,21 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get searchRefreshTooltip =>
       '⟦Úƥđáŧé ƥóšîŧîóñ áñđ řéƒřéšĥ ƥřîçéš ··············⟧';
+
+  @override
+  String get sortMenuByName => '⟦Šóřŧ ƀý ñáɱé (Á–Ž) ·····⟧';
+
+  @override
+  String get sortMenuOpen24h => '⟦24-ĥóúř šŧáŧîóñš ƒîřšŧ ········⟧';
+
+  @override
+  String get sortMenuPriceDistance =>
+      '⟦Šóřŧ ƀý ƥřîçé ƥéř ķîłóɱéŧřé ··········⟧';
+
+  @override
+  String sortMenuActiveSemantic(String option) {
+    return '⟦$option, çúřřéñŧ šóřŧ ·····⟧';
+  }
 
   @override
   String priceHistoryFirstSeen(String date) {

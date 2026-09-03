@@ -268,8 +268,9 @@ void main() {
       expect(find.text('Fuel Station Radar result'), findsNothing);
     });
 
-    // #3926 — row A absorbed the position strip and the freshness pill.
-    testWidgets('carries the position segment when no address was searched',
+    // #3926 — row A absorbed the position strip and the freshness pill;
+    // #3943 dropped the position segment again, keeping the freshness one.
+    testWidgets('carries no position segment, whatever the fix (#3943)',
         (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
@@ -285,11 +286,11 @@ void main() {
         ],
       );
 
-      expect(find.byType(UserPositionBar), findsOneWidget);
+      expect(find.byType(UserPositionBar), findsNothing);
       expect(find.byKey(const Key('search_summary_address')), findsNothing);
     });
 
-    testWidgets('a searched address replaces the position segment',
+    testWidgets('a searched address is not echoed on the band either (#3943)',
         (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
@@ -306,7 +307,7 @@ void main() {
         ],
       );
 
-      expect(find.text('75001 Paris'), findsOneWidget);
+      expect(find.text('75001 Paris'), findsNothing);
       expect(find.byType(UserPositionBar), findsNothing);
     });
 

@@ -64,7 +64,6 @@
   "apiKeyRequired": "Απαιτείται κλειδί API",
   "dataTransparency": "Διαφάνεια δεδομένων",
   "clearCache": "Εκκαθάριση προσωρινής μνήμης",
-  "stationsFound": "Βρέθηκαν {count} βενζινάδικα",
   "storageUsage": "Χρήση αποθηκευτικού χώρου σε αυτή τη συσκευή",
   "settingsLabel": "Ρυθμίσεις",
   "total": "Σύνολο",
@@ -107,9 +106,7 @@
   "demoModeBanner": "Λειτουργία επίδειξης. Ρυθμίστε το κλειδί API στις ρυθμίσεις.",
   "demoModeBannerAction": "Λήψη ζωντανών τιμών",
   "sortDistance": "Απόσταση",
-  "sortOpen24h": "24ω",
   "sortRating": "Αξιολόγηση",
-  "sortPriceDistance": "Τιμή/km",
   "cheap": "φθηνό",
   "expensive": "ακριβό",
   "reportPrice": "Αναφορά τιμής",
@@ -1335,13 +1332,6 @@
     "placeholders": {
       "distance": {
         "type": "String"
-      }
-    }
-  },
-  "@stationsFound": {
-    "placeholders": {
-      "count": {
-        "type": "int"
       }
     }
   },
@@ -5804,37 +5794,6 @@
       }
     }
   },
-  "allPricesCostPer100km": "{cost}/100 km",
-  "@allPricesCostPer100km": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "cost": {
-        "type": "String",
-        "example": "5,02 €"
-      }
-    }
-  },
-  "allPricesVerdictHere": "Cheapest here: {fuel} at {cost}",
-  "@allPricesVerdictHere": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "fuel": {
-        "type": "String",
-        "example": "E85"
-      },
-      "cost": {
-        "type": "String",
-        "example": "5,02 €/100 km"
-      }
-    }
-  },
-  "allPricesVerdictWinsResults": "cheapest of the results",
-  "@allPricesVerdictWinsResults": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
   "allPricesMoreFuels": "+{count}",
   "@allPricesMoreFuels": {
     "x-mt": "needs-native-review",
@@ -6365,5 +6324,31 @@
   "@logoCreditsOpenFilePage": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "sortMenuByName": "Sort by name (A–Z)",
+  "@sortMenuByName": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "sortMenuOpen24h": "24-hour stations first",
+  "@sortMenuOpen24h": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "sortMenuPriceDistance": "Sort by price per kilometre",
+  "@sortMenuPriceDistance": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "sortMenuActiveSemantic": "{option}, current sort",
+  "@sortMenuActiveSemantic": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "option": {
+        "type": "String",
+        "example": "Sort by name (A–Z)"
+      }
+    }
   }
 }

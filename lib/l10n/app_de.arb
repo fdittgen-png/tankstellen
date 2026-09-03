@@ -80,14 +80,6 @@
   "apiKeyRequired": "API-Schlüssel erforderlich",
   "dataTransparency": "Datentransparenz",
   "clearCache": "Cache leeren",
-  "stationsFound": "{count} Tankstellen gefunden",
-  "@stationsFound": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "storageUsage": "Speichernutzung auf diesem Gerät",
   "settingsLabel": "Einstellungen",
   "total": "Gesamt",
@@ -144,9 +136,7 @@
   "demoModeBanner": "Demo-Modus – Beispielpreise werden angezeigt.",
   "demoModeBannerAction": "Live-Preise aktivieren",
   "sortDistance": "Entfernung",
-  "sortOpen24h": "24h",
   "sortRating": "Bewertung",
-  "sortPriceDistance": "Preis/km",
   "cheap": "günstig",
   "expensive": "teuer",
   "reportPrice": "Preis melden",
@@ -3770,9 +3760,6 @@
   "allPricesNoPriceMask": "—",
   "allPricesBestMarker": "bester",
   "allPricesDelta": "+{amount}",
-  "allPricesCostPer100km": "{cost}/100 km",
-  "allPricesVerdictHere": "Hier am günstigsten: {fuel} für {cost}",
-  "allPricesVerdictWinsResults": "günstigster der Treffer",
   "allPricesMoreFuels": "+{count}",
   "allPricesMoreFuelsTooltip": "{count, plural, =1{1 weiteren Kraftstoff anzeigen} other{{count} weitere Kraftstoffe anzeigen}}",
   "allPricesFewerFuelsTooltip": "Weitere Kraftstoffe ausblenden",
@@ -4282,6 +4269,10 @@
   "searchPriceArrowAverageTooltip": "Ein mittlerer Preis in dieser Liste",
   "searchPriceArrowExpensiveTooltip": "Gehört zu den höchsten Preisen in dieser Liste",
   "searchRefreshTooltip": "Position aktualisieren und Preise neu laden",
+  "sortMenuByName": "Nach Name sortieren (A–Z)",
+  "sortMenuOpen24h": "Rund um die Uhr geöffnete Tankstellen zuerst",
+  "sortMenuPriceDistance": "Nach Preis pro Kilometer sortieren",
+  "sortMenuActiveSemantic": "{option}, aktuelle Sortierung",
   "priceHistoryFirstSeen": "Erstmals gesehen am {date} — der Verlauf wächst mit jedem Besuch",
   "@priceHistoryFirstSeen": {
     "placeholders": {

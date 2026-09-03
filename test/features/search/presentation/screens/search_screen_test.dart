@@ -91,8 +91,8 @@ void main() {
     });
 
     testWidgets(
-        '#3926 — the position readout is a SEGMENT of row A, not a strip of '
-        'its own', (tester) async {
+        '#3943 — the position readout left row A altogether (the criteria '
+        'sheet the band opens already names the place)', (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
 
@@ -105,13 +105,13 @@ void main() {
         ],
       );
 
-      expect(find.byType(UserPositionBar), findsOneWidget);
+      expect(find.byType(UserPositionBar), findsNothing);
       expect(
         find.descendant(
           of: find.byType(SearchSummaryBar),
           matching: find.byType(UserPositionBar),
         ),
-        findsOneWidget,
+        findsNothing,
       );
     });
 

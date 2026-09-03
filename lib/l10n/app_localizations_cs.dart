@@ -215,11 +215,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get clearCache => 'Vymazat mezipaměť';
 
   @override
-  String stationsFound(int count) {
-    return 'Nalezeno $count stanic';
-  }
-
-  @override
   String get storageUsage => 'Využití úložiště na tomto zařízení';
 
   @override
@@ -356,13 +351,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get sortDistance => 'Vzdálenost';
 
   @override
-  String get sortOpen24h => '24h';
-
-  @override
   String get sortRating => 'Hodnocení';
-
-  @override
-  String get sortPriceDistance => 'Cena/km';
 
   @override
   String get cheap => 'levné';
@@ -7909,19 +7898,6 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
-  String allPricesCostPer100km(String cost) {
-    return '$cost/100 km';
-  }
-
-  @override
-  String allPricesVerdictHere(String fuel, String cost) {
-    return 'Cheapest here: $fuel at $cost';
-  }
-
-  @override
-  String get allPricesVerdictWinsResults => 'cheapest of the results';
-
-  @override
   String allPricesMoreFuels(int count) {
     return '+$count';
   }
@@ -8633,6 +8609,20 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get searchRefreshTooltip => 'Update position and refresh prices';
+
+  @override
+  String get sortMenuByName => 'Sort by name (A–Z)';
+
+  @override
+  String get sortMenuOpen24h => '24-hour stations first';
+
+  @override
+  String get sortMenuPriceDistance => 'Sort by price per kilometre';
+
+  @override
+  String sortMenuActiveSemantic(String option) {
+    return '$option, current sort';
+  }
 
   @override
   String priceHistoryFirstSeen(String date) {

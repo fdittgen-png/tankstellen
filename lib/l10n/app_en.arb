@@ -88,14 +88,6 @@
   "apiKeyRequired": "API key required",
   "dataTransparency": "Data transparency",
   "clearCache": "Clear cache",
-  "stationsFound": "{count} stations found",
-  "@stationsFound": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "storageUsage": "Storage usage on this device",
   "settingsLabel": "Settings",
   "total": "Total",
@@ -158,9 +150,7 @@
     "description": "Action button on the demo-mode banner — opens Settings where live prices can be set up. Jargon-free wording (#1696)."
   },
   "sortDistance": "Distance",
-  "sortOpen24h": "24h",
   "sortRating": "Rating",
-  "sortPriceDistance": "Price/km",
   "cheap": "cheap",
   "expensive": "expensive",
   "reportPrice": "Report price",
@@ -8093,34 +8083,6 @@
       }
     }
   },
-  "allPricesCostPer100km": "{cost}/100 km",
-  "@allPricesCostPer100km": {
-    "description": "A money amount expressed per 100 km — the cost of driving 100 km on one fuel at one station (#3933). Used inside the per-station verdict line.",
-    "placeholders": {
-      "cost": {
-        "type": "String",
-        "example": "5,02 €"
-      }
-    }
-  },
-  "allPricesVerdictHere": "Cheapest here: {fuel} at {cost}",
-  "@allPricesVerdictHere": {
-    "description": "Per-station verdict line of the all-prices comparison table (#3933): which fuel actually costs least per 100 km at THIS station, given the vehicle's measured consumption for each fuel.",
-    "placeholders": {
-      "fuel": {
-        "type": "String",
-        "example": "E85"
-      },
-      "cost": {
-        "type": "String",
-        "example": "5,02 €/100 km"
-      }
-    }
-  },
-  "allPricesVerdictWinsResults": "cheapest of the results",
-  "@allPricesVerdictWinsResults": {
-    "description": "Marker appended to the per-station verdict when that station also holds the cheapest price for the winning fuel across the whole result set (#3933)."
-  },
   "allPricesMoreFuels": "+{count}",
   "@allPricesMoreFuels": {
     "description": "Label of the per-card expander that reveals the fuels which did not fit the fixed column budget of the all-prices table (#3933). Must stay two or three characters wide.",
@@ -9196,6 +9158,28 @@
   "searchRefreshTooltip": "Update position and refresh prices",
   "@searchRefreshTooltip": {
     "description": "Tooltip of the ONE refresh action in the search app bar (#3926). It merges the two refreshes the screen used to carry: the app-bar 'refresh prices' (re-run the last search) and the position bar's GPS re-fix."
+  },
+  "sortMenuByName": "Sort by name (A–Z)",
+  "@sortMenuByName": {
+    "description": "Entry in the search-results overflow menu (#3943) that sorts the station list alphabetically by name. It replaces the old 'A-Z' sort chip; no glyph says 'alphabetical', so the menu entry spells the sort out."
+  },
+  "sortMenuOpen24h": "24-hour stations first",
+  "@sortMenuOpen24h": {
+    "description": "Entry in the search-results overflow menu (#3943) that sorts the stations open around the clock to the top of the list. It replaces the old '24h' sort chip."
+  },
+  "sortMenuPriceDistance": "Sort by price per kilometre",
+  "@sortMenuPriceDistance": {
+    "description": "Entry in the search-results overflow menu (#3943) that sorts by the combined cost of the fuel and of the drive to the station. It replaces the old 'Price/km' sort chip."
+  },
+  "sortMenuActiveSemantic": "{option}, current sort",
+  "@sortMenuActiveSemantic": {
+    "description": "Screen-reader label of the sort entry the results list is currently sorted by, in the search-results overflow menu (#3943). Visually that entry carries a tick.",
+    "placeholders": {
+      "option": {
+        "type": "String",
+        "example": "Sort by name (A–Z)"
+      }
+    }
   },
   "priceHistoryFirstSeen": "First seen on {date} — the history builds up with every visit",
   "@priceHistoryFirstSeen": {

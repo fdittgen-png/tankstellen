@@ -38,6 +38,7 @@ export 'presentation/widgets/maintenance_suggestion_card.dart';
 export 'presentation/widgets/monthly_insights_card.dart';
 export 'presentation/widgets/tank_report_card.dart';
 export 'providers/consumption_providers.dart';
+export 'providers/fuel_type_efficiency_provider.dart';
 export 'providers/obd2_fuel_level_tracker.dart';
 export 'providers/psa_fuel_level_provider.dart';
 export 'providers/tank_mix_provider.dart';

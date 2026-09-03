@@ -15,21 +15,21 @@ import '../../../route_search/providers/route_search_provider.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/search_mode.dart';
 import '../../providers/radar_search_provider.dart';
+import '../../../../core/location/user_position_provider.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
 import '../screens/search_criteria_screen.dart';
 import 'results/price_freshness_segment.dart';
 import 'results/summary_chip.dart';
-import 'user_position_bar.dart';
 
 /// **Row A** of the two-row results chrome (#3926, epic #3925).
 ///
 /// One tappable band that replaced three stacked strips: the country data
 /// source link, the fuel/radius chip row and the "Your position: GPS
-/// (1 min)" bar with its second refresh icon. It now carries four
-/// segments — fuel · radius (or "along the route") · position or search
-/// address · price freshness — and opens the full [SearchCriteriaScreen]
-/// on tap, exactly as the old chip row did.
+/// (1 min)" bar with its second refresh icon. It now carries three
+/// segments — fuel · radius (or "along the route") · price freshness —
+/// and opens the full [SearchCriteriaScreen] on tap, exactly as the old
+/// chip row did.
 ///
 /// The segments live in a [Wrap]: an expanded translation moves a whole
 /// pill to the next line instead of clipping it, so the band survives
@@ -41,6 +41,11 @@ import 'user_position_bar.dart';
 /// already say the nouns those labels repeated, and the full sentence
 /// survives as the pill's tooltip and its screen-reader label — so a
 /// long-press and a screen reader lose nothing at all.
+///
+/// #3943 — the position / search-address segment is gone. It was the band's
+/// widest and least actionable pill ("34120 Castelnau-de-Guers…"), and it
+/// said what the criteria sheet this very band opens already says: the
+/// place the search ran around. Nothing else moved.
 ///
 /// The open-data attribution that used to sit above this bar now lives in
 /// the footer under the results list, and the position bar's refresh icon
@@ -135,22 +140,6 @@ class SearchSummaryBar extends ConsumerWidget {
     );
   }
 
-  /// Position or address segment. A ZIP/address search names the place it
-  /// searched around; otherwise the user's own position (source + age) is
-  /// shown by [UserPositionBar], now a compact pill rather than its own
-  /// full-width strip.
-  Widget _whereSegment(WidgetRef ref) {
-    final location = ref.watch(searchLocationProvider);
-    if (location.isNotEmpty) {
-      return SummaryChip(
-        key: const Key('search_summary_address'),
-        icon: const Icon(Icons.place_outlined, size: 14),
-        label: location,
-      );
-    }
-    return const UserPositionBar();
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
@@ -199,7 +188,27 @@ class SearchSummaryBar extends ConsumerWidget {
                   tooltip: _fuelTooltip(l10n, fuelType),
                 ),
                 _scopeSegment(context, ref, l10n, mode),
-                _whereSegment(ref),
+                // #3943 — the "where" pill was removed as chrome: with a
+                // known position it only restated the criteria. The
+                // UNKNOWN case is not chrome, though — it warns that
+                // every distance below is measured from the search
+                // centre rather than from the user, so a silent removal
+                // would leave wrong-looking distances unexplained. Shown
+                // only when there is no position.
+                if (ref.watch(userPositionProvider) == null)
+                  SummaryChip(
+                    key: const Key('search_summary_position_unknown'),
+                    icon: Icon(
+                      Icons.location_off,
+                      size: 14,
+                      color: theme.colorScheme.error,
+                    ),
+                    label: l10n.positionUnknown,
+                    tooltip:
+                        '${l10n.positionUnknown} — ${l10n.distancesFromCenter}',
+                    semanticsLabel:
+                        '${l10n.positionUnknown} — ${l10n.distancesFromCenter}',
+                  ),
                 if (!radarActive) const PriceFreshnessSegment(),
               ],
             ),

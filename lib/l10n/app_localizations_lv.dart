@@ -215,11 +215,6 @@ class AppLocalizationsLv extends AppLocalizations {
   String get clearCache => 'Iztīrīt kešatmiņu';
 
   @override
-  String stationsFound(int count) {
-    return 'Atrastas $count stacijas';
-  }
-
-  @override
   String get storageUsage => 'Krātuves izmantošana šajā ierīcē';
 
   @override
@@ -357,13 +352,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get sortDistance => 'Attālums';
 
   @override
-  String get sortOpen24h => '24h';
-
-  @override
   String get sortRating => 'Vērtējums';
-
-  @override
-  String get sortPriceDistance => 'Cena/km';
 
   @override
   String get cheap => 'lēti';
@@ -7946,19 +7935,6 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
-  String allPricesCostPer100km(String cost) {
-    return '$cost/100 km';
-  }
-
-  @override
-  String allPricesVerdictHere(String fuel, String cost) {
-    return 'Cheapest here: $fuel at $cost';
-  }
-
-  @override
-  String get allPricesVerdictWinsResults => 'cheapest of the results';
-
-  @override
   String allPricesMoreFuels(int count) {
     return '+$count';
   }
@@ -8670,6 +8646,20 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get searchRefreshTooltip => 'Update position and refresh prices';
+
+  @override
+  String get sortMenuByName => 'Sort by name (A–Z)';
+
+  @override
+  String get sortMenuOpen24h => '24-hour stations first';
+
+  @override
+  String get sortMenuPriceDistance => 'Sort by price per kilometre';
+
+  @override
+  String sortMenuActiveSemantic(String option) {
+    return '$option, current sort';
+  }
 
   @override
   String priceHistoryFirstSeen(String date) {

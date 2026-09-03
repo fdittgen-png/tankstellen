@@ -537,12 +537,6 @@ abstract class AppLocalizations {
   /// **'Clear cache'**
   String get clearCache;
 
-  /// No description provided for @stationsFound.
-  ///
-  /// In en, this message translates to:
-  /// **'{count} stations found'**
-  String stationsFound(int count);
-
   /// No description provided for @storageUsage.
   ///
   /// In en, this message translates to:
@@ -795,23 +789,11 @@ abstract class AppLocalizations {
   /// **'Distance'**
   String get sortDistance;
 
-  /// No description provided for @sortOpen24h.
-  ///
-  /// In en, this message translates to:
-  /// **'24h'**
-  String get sortOpen24h;
-
   /// No description provided for @sortRating.
   ///
   /// In en, this message translates to:
   /// **'Rating'**
   String get sortRating;
-
-  /// No description provided for @sortPriceDistance.
-  ///
-  /// In en, this message translates to:
-  /// **'Price/km'**
-  String get sortPriceDistance;
 
   /// No description provided for @cheap.
   ///
@@ -13540,24 +13522,6 @@ abstract class AppLocalizations {
   /// **'+{amount}'**
   String allPricesDelta(String amount);
 
-  /// A money amount expressed per 100 km — the cost of driving 100 km on one fuel at one station (#3933). Used inside the per-station verdict line.
-  ///
-  /// In en, this message translates to:
-  /// **'{cost}/100 km'**
-  String allPricesCostPer100km(String cost);
-
-  /// Per-station verdict line of the all-prices comparison table (#3933): which fuel actually costs least per 100 km at THIS station, given the vehicle's measured consumption for each fuel.
-  ///
-  /// In en, this message translates to:
-  /// **'Cheapest here: {fuel} at {cost}'**
-  String allPricesVerdictHere(String fuel, String cost);
-
-  /// Marker appended to the per-station verdict when that station also holds the cheapest price for the winning fuel across the whole result set (#3933).
-  ///
-  /// In en, this message translates to:
-  /// **'cheapest of the results'**
-  String get allPricesVerdictWinsResults;
-
   /// Label of the per-card expander that reveals the fuels which did not fit the fixed column budget of the all-prices table (#3933). Must stay two or three characters wide.
   ///
   /// In en, this message translates to:
@@ -14602,6 +14566,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Update position and refresh prices'**
   String get searchRefreshTooltip;
+
+  /// Entry in the search-results overflow menu (#3943) that sorts the station list alphabetically by name. It replaces the old 'A-Z' sort chip; no glyph says 'alphabetical', so the menu entry spells the sort out.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by name (A–Z)'**
+  String get sortMenuByName;
+
+  /// Entry in the search-results overflow menu (#3943) that sorts the stations open around the clock to the top of the list. It replaces the old '24h' sort chip.
+  ///
+  /// In en, this message translates to:
+  /// **'24-hour stations first'**
+  String get sortMenuOpen24h;
+
+  /// Entry in the search-results overflow menu (#3943) that sorts by the combined cost of the fuel and of the drive to the station. It replaces the old 'Price/km' sort chip.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by price per kilometre'**
+  String get sortMenuPriceDistance;
+
+  /// Screen-reader label of the sort entry the results list is currently sorted by, in the search-results overflow menu (#3943). Visually that entry carries a tick.
+  ///
+  /// In en, this message translates to:
+  /// **'{option}, current sort'**
+  String sortMenuActiveSemantic(String option);
 
   /// Station detail, price history (#3928): shown INSTEAD of the chart and the stats row when only a single price observation exists, so a lone dot in an empty chart never pretends to be a trend.
   ///

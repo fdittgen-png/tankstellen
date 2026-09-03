@@ -86,8 +86,8 @@ void main() {
   }
 
   group('Row B — the results row', () {
-    testWidgets('carries the count, the radar chip, the sort chips and one '
-        'overflow button — no bare glyph rows', (tester) async {
+    testWidgets('carries the sort chips, the radar chip and one overflow '
+        'button — no bare glyph rows, no count (#3943)', (tester) async {
       final overrides = seeded();
 
       await pumpApp(
@@ -100,7 +100,8 @@ void main() {
       );
 
       expect(find.byType(SearchResultsRow), findsOneWidget);
-      expect(find.text('2 stations found'), findsOneWidget);
+      // #3943 — the count is gone; the sort chips took the width it held.
+      expect(find.text('2 stations found'), findsNothing);
       expect(find.byType(SortSelector), findsOneWidget);
       expect(find.byType(RadarSearchChip), findsOneWidget);
       expect(find.byType(ResultsActionMenu), findsOneWidget);
@@ -132,6 +133,10 @@ void main() {
         find.bySemanticsLabel('Show stations on map'),
         findsOneWidget,
       );
+      // #3943 — the three demoted sort modes are labelled entries here.
+      expect(find.text('Sort by name (A–Z)'), findsOneWidget);
+      expect(find.text('24-hour stations first'), findsOneWidget);
+      expect(find.text('Sort by price per kilometre'), findsOneWidget);
     });
 
     testWidgets('the filter button badges the number of active filters and '
@@ -214,13 +219,14 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(find.byType(SearchSummaryBar), findsOneWidget);
       expect(find.byType(SearchResultsRow), findsOneWidget);
-      // The position strip is a segment INSIDE row A now, not a strip.
+      // #3943 — the position / search-address segment left row A entirely:
+      // the criteria sheet the band opens already names the place.
       expect(
         find.descendant(
           of: find.byType(SearchSummaryBar),
           matching: find.byType(UserPositionBar),
         ),
-        findsOneWidget,
+        findsNothing,
       );
       // Row B sits above the first station card.
       final rowB = tester.getRect(find.byType(SearchResultsRow));

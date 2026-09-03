@@ -14,20 +14,28 @@ import '../radar_search_fab.dart';
 import '../sort_selector.dart';
 import 'results_action_menu.dart';
 
-/// **Row B** of the two-row results chrome (#3926, epic #3925).
+/// **Row B** of the results chrome — now a single band (#3943, #3926).
 ///
-/// Collapses four stacked strips — the count row with its three unlabelled
-/// icon buttons and amber pill, the clipped sort-chip scroller and the
-/// "All brands ⌄" filter header — into one band:
+/// #3926 collapsed four stacked strips (the count row with its three
+/// unlabelled icon buttons and amber pill, the clipped sort scroller and
+/// the "All brands ⌄" filter header) into a count line plus a sort line.
+/// #3943 collapses those two into one:
 ///
-///  * the result count;
-///  * the Fuel Station Radar as a compact chip (it was an extended FAB
-///    floating over the third card, fighting the shell's docked search FAB);
-///  * the filter button, badged with the number of active filters;
-///  * the compact/all-prices view toggle;
-///  * the "⋯" menu holding the map / radar-scope / calculator actions;
-///  * the sort chips, which now **wrap** instead of scrolling, so no chip is
-///    ever cut mid-glyph at the right edge.
+///  * the sort chips — distance, price, rating — moved up here, icon-only;
+///  * the result count is gone (the list already says how many there are,
+///    and the count was the segment that kept truncating), which is
+///    exactly the width the chips needed;
+///  * the Fuel Station Radar chip, the badged filter button, the
+///    compact/all-prices view toggle and the "⋮" overflow are unchanged;
+///  * `A-Z`, `24h` and `Price/km` are still real sort modes — they are
+///    labelled entries in the overflow menu now, not deleted.
+///
+/// ## Overflow safety at 320 dp / 1.3x
+/// Every trailing control is a fixed-width glyph. The sort group is the
+/// only elastic part, so it goes in an [Expanded]: it gets exactly the
+/// room the controls leave, and scrolls inside it if a future locale or
+/// accessibility setting ever makes three chips wider than that. The row
+/// itself therefore cannot be pushed past its own width.
 class SearchResultsRow extends ConsumerWidget {
   const SearchResultsRow({
     super.key,
@@ -36,15 +44,14 @@ class SearchResultsRow extends ConsumerWidget {
     this.showSortAndFilter = true,
   });
 
-  /// The unfiltered result set — drives the count and the calculator
-  /// pre-fill.
+  /// The unfiltered result set — drives the calculator pre-fill.
   final List<SearchResultItem> items;
 
   /// #3366 — non-null while the radar scope view can be shown.
   final VoidCallback? onRadarToggle;
 
   /// #3372 — the landscape radar list drops sort + filters for vertical
-  /// room; the count, radar chip, view toggle and overflow stay.
+  /// room; the radar chip, view toggle and overflow stay.
   final bool showSortAndFilter;
 
   /// Number of filters currently narrowing the list — brands, the
@@ -60,7 +67,6 @@ class SearchResultsRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     final allPrices = ref.watch(allPricesViewEnabledProvider);
     final viewToggleLabel = allPrices
         ? l10n.switchToCompactView
@@ -69,51 +75,41 @@ class SearchResultsRow extends ConsumerWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  l10n.stationsFound(items.length),
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(width: 8),
-              const RadarSearchChip(),
-              if (showSortAndFilter)
-                HeaderIconButton(
-                  key: const Key('results_filter_button'),
-                  icon: Icons.filter_list,
-                  semanticsLabel: activeFilters > 0
-                      ? l10n.searchResultsFilterActiveSemantic(activeFilters)
-                      : l10n.searchResultsFilterTooltip,
-                  tooltip: l10n.searchResultsFilterTooltip,
-                  badgeCount: activeFilters,
-                  onTap: () =>
-                      ref.read(brandFiltersExpandedProvider.notifier).toggle(),
-                ),
-              HeaderIconButton(
-                key: const Key('results_view_toggle'),
-                icon: allPrices ? Icons.view_list : Icons.view_agenda,
-                semanticsLabel: viewToggleLabel,
-                onTap: () =>
-                    ref.read(allPricesViewEnabledProvider.notifier).toggle(),
-              ),
-              ResultsActionMenu(items: items, onRadarToggle: onRadarToggle),
-            ],
+          // The one flexible slot on the row. Empty in the landscape radar
+          // pane, where it simply pushes the controls to the trailing edge.
+          Expanded(
+            child: showSortAndFilter
+                ? SortSelector(
+                    selected: ref.watch(selectedSortModeProvider),
+                    onChanged: (mode) =>
+                        ref.read(selectedSortModeProvider.notifier).set(mode),
+                  )
+                : const SizedBox.shrink(),
           ),
+          const SizedBox(width: 4),
+          const RadarSearchChip(),
           if (showSortAndFilter)
-            SortSelector(
-              selected: ref.watch(selectedSortModeProvider),
-              onChanged: (mode) =>
-                  ref.read(selectedSortModeProvider.notifier).set(mode),
+            HeaderIconButton(
+              key: const Key('results_filter_button'),
+              icon: Icons.filter_list,
+              semanticsLabel: activeFilters > 0
+                  ? l10n.searchResultsFilterActiveSemantic(activeFilters)
+                  : l10n.searchResultsFilterTooltip,
+              tooltip: l10n.searchResultsFilterTooltip,
+              badgeCount: activeFilters,
+              onTap: () =>
+                  ref.read(brandFiltersExpandedProvider.notifier).toggle(),
             ),
+          HeaderIconButton(
+            key: const Key('results_view_toggle'),
+            icon: allPrices ? Icons.view_list : Icons.view_agenda,
+            semanticsLabel: viewToggleLabel,
+            onTap: () =>
+                ref.read(allPricesViewEnabledProvider.notifier).toggle(),
+          ),
+          ResultsActionMenu(items: items, onRadarToggle: onRadarToggle),
         ],
       ),
     );

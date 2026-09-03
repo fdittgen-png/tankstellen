@@ -22,8 +22,9 @@ import '../../../../helpers/pump_app.dart';
 /// #3933 (Epic #3925) — the all-prices card is a fuel comparison table.
 ///
 /// Structural assertions only (no golden PNGs): the column set, the cell
-/// contents, the delta, the per-100 km number and the verdict, plus the
-/// documented degradation to a plain price table.
+/// contents, the delta and the per-100 km number, plus the documented
+/// degradation to a plain price table. #3943 deleted the verdict line the
+/// table used to carry underneath it.
 void main() {
   /// Columns of the flex-fuel French case the issue is written around.
   const franceColumns = AllPricesColumns(
@@ -382,7 +383,7 @@ void main() {
     );
   });
 
-  group('cost per 100 km + verdict (#3933)', () {
+  group('cost per 100 km (#3933; #3943 dropped the verdict line)', () {
     const flexCost = FuelCostModel(
       litersPer100kmByFuel: {FuelType.e85: 6.0, FuelType.e10: 4.6},
       usableFuels: {
@@ -393,23 +394,26 @@ void main() {
       },
     );
 
-    testWidgets('the verdict names the fuel that is cheapest per 100 km here', (
-      tester,
-    ) async {
+    testWidgets('each cell carries its own cost per 100 km — the winner needs '
+        'no sentence under the table (#3943)', (tester) async {
       await pumpApp(
         tester,
         const AllPricesStationCard(station: flexStation),
         overrides: tableOverrides(cost: flexCost),
       );
 
-      // 0,839 x 6,0 = 5,03 €/100 km beats 2,089 x 4,6 = 9,61 €/100 km.
-      expect(find.textContaining('E85'), findsWidgets);
-      expect(find.textContaining('5,03 €/100 km'), findsOneWidget);
+      // 0,839 x 6,0 = 5,03 €/100 km beats 2,089 x 4,6 = 9,61 €/100 km, and
+      // the figure lives in the E85 cell itself.
+      expect(find.text('5,03 €'), findsOneWidget);
+      expect(find.text('9,61 €'), findsOneWidget);
+
+      // #3943 — no verdict line repeats it under the card.
+      expect(find.textContaining('Cheapest here'), findsNothing);
+      expect(find.byIcon(Icons.emoji_events_outlined), findsNothing);
     });
 
-    testWidgets('the outright-winner marker appears when the price also wins', (
-      tester,
-    ) async {
+    testWidgets('#3943 — the outright winner is the emphasised cell, not a '
+        'marker line', (tester) async {
       await pumpApp(
         tester,
         const AllPricesStationCard(station: flexStation),
@@ -419,7 +423,16 @@ void main() {
         ),
       );
 
-      expect(find.text('cheapest of the results'), findsOneWidget);
+      expect(find.text('cheapest of the results'), findsNothing);
+
+      // The cell itself still says it: E85 holds the cheapest price of the
+      // results, so it renders as the champion cell.
+      final cells = tester
+          .widgetList<FuelComparisonCell>(find.byType(FuelComparisonCell))
+          .toList();
+      final e85 = cells.firstWhere((c) => c.data.fuel == FuelType.e85);
+      expect(e85.data.isBestInResults, isTrue);
+      expect(e85.data.isUsable, isTrue);
     });
 
     testWidgets('a fuel the vehicle cannot take is dimmed and priced only', (
@@ -440,8 +453,8 @@ void main() {
     });
 
     testWidgets(
-      'no vehicle / no history — the per-100 km row and the verdict vanish, '
-      'the price table survives',
+      'no vehicle / no history — the per-100 km row vanishes, the price '
+      'table survives',
       (tester) async {
         await pumpApp(
           tester,
@@ -454,7 +467,6 @@ void main() {
             .toList();
         expect(cells.every((c) => c.data.costPer100km == null), isTrue);
         expect(find.textContaining('/100 km'), findsNothing);
-        expect(find.text('cheapest of the results'), findsNothing);
         // …but prices + deltas are still there.
         expect(find.text('2,089'), findsOneWidget);
         expect(find.text('+0,060'), findsOneWidget);

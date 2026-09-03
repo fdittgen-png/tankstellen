@@ -60,68 +60,6 @@ class FuelCostModel {
   bool get hasConsumption => litersPer100kmByFuel.isNotEmpty;
 }
 
-/// Per-fuel litres/100 km from a vehicle's own fill-ups.
-///
-/// Walks the same CLOSED plein-to-plein intervals as
-/// `ConsumptionStats.fromFillUps`, but keeps only intervals that ran on a
-/// SINGLE fuel — the opening plein and every contributing fill agree on
-/// `fuelType`. A mixed interval is skipped rather than attributed to its
-/// dominant grade, because at this call site a wrong per-fuel number
-/// would invert the whole "which fuel is cheapest" verdict.
-///
-/// This is deliberately the conservative sibling of the fill-ups feature's
-/// `FuelTypeEfficiencyAggregator` (ADR 0015): that one models the carried
-/// tank content and is the authority on the consumption screen, but it is
-/// not part of the `fill_ups` public barrel, and reaching past the barrel
-/// is a boundary violation. Pure single-fuel windows are the subset both
-/// models agree on.
-///
-/// The pump-anchored gain (`VehicleProfile.pumpGain*`, Epic #3886) is
-/// deliberately NOT applied: it trims ESTIMATED OBD2 fuel rates onto the
-/// pump's litres, and these litres already come from the pump. Applying it
-/// here would double-count the same correction.
-Map<FuelType, double> perFuelConsumptionFromFills(List<FillUp> fills) {
-  if (fills.length < 2) return const <FuelType, double>{};
-  final sorted = [...fills]..sort((a, b) => a.date.compareTo(b.date));
-
-  final liters = <FuelType, double>{};
-  final distance = <FuelType, double>{};
-
-  var openingIndex = 0;
-  final pending = <FillUp>[];
-  for (var i = 1; i < sorted.length; i++) {
-    final fill = sorted[i];
-    pending.add(fill);
-    if (!fill.isFullTank) continue;
-
-    final opening = sorted[openingIndex];
-    final km = (fill.odometerKm - opening.odometerKm)
-        .clamp(0, double.infinity)
-        .toDouble();
-    final litres = pending.fold<double>(0, (sum, f) => sum + f.liters);
-    final grades = <FuelType>{
-      opening.fuelType,
-      ...pending.where((f) => !f.isCorrection).map((f) => f.fuelType),
-    };
-    if (km > 0 && litres > 0 && grades.length == 1) {
-      final fuel = grades.single;
-      liters[fuel] = (liters[fuel] ?? 0) + litres;
-      distance[fuel] = (distance[fuel] ?? 0) + km;
-    }
-
-    openingIndex = i;
-    pending.clear();
-  }
-
-  final result = <FuelType, double>{};
-  for (final entry in distance.entries) {
-    final km = entry.value;
-    final l = liters[entry.key] ?? 0;
-    if (km > 0 && l > 0) result[entry.key] = l / km * 100;
-  }
-  return result;
-}
-
 /// Cheapest price per fuel across the results the list is showing.
 ///
 /// Reads the SAME pipeline the list renders (`searchState` → the memoised
@@ -147,6 +85,29 @@ Map<FuelType, double> allPricesBestByFuel(Ref ref) {
 
 /// The active vehicle's per-fuel cost model, or [FuelCostModel.empty]
 /// when there is no vehicle / no usable history.
+///
+/// The consumption numbers are NOT re-derived here (#3934): they come from
+/// `fuelTypeEfficiencyComparisonProvider` — the fill-ups feature's own
+/// per-fuel aggregator (ADR 0015 v3), the same one the consumption screen
+/// renders — reached through the `fill_ups/api.dart` barrel. One model, so
+/// the table and that screen can never state two different L/100 km for the
+/// same tank history.
+///
+/// Only PURE buckets become a per-fuel figure. A MIX bucket (`E85/E10`) is
+/// a blend the driver burned, not a grade they can buy at the pump, and
+/// crediting its litres to the dominant grade is exactly the ADR 0014
+/// collapse ADR 0015 rejected — so a mix contributes to no column, and a
+/// fuel only ever driven blended simply has no cost-per-100 km cell.
+///
+/// The aggregator also owns the vehicle scoping: it keeps the ACTIVE
+/// vehicle's own fills only, where the deleted local copy also swept in
+/// fills carrying no `vehicleId`. Single-vehicle users see no difference
+/// (their fills are the vehicle's); multi-vehicle users no longer risk a
+/// stray unassigned fill of another car moving this car's number.
+///
+/// The pump-anchored gain (`VehicleProfile.pumpGain*`, Epic #3886) is
+/// deliberately NOT applied: it trims ESTIMATED OBD2 fuel rates onto the
+/// pump's litres, and these litres already come from the pump.
 @riverpod
 FuelCostModel allPricesFuelCostModel(Ref ref) {
   try {
@@ -162,13 +123,16 @@ FuelCostModel allPricesFuelCostModel(Ref ref) {
             ? compatibleFuelsFor(primary).toSet()
             : <FuelType>{primary});
 
-    final fills = ref
-        .watch(fillUpListProvider)
-        .where((f) => f.vehicleId == null || f.vehicleId == vehicle.id)
-        .toList(growable: false);
+    final byFuel = <FuelType, double>{};
+    for (final stats in ref.watch(fuelTypeEfficiencyComparisonProvider)) {
+      if (stats.isMix) continue;
+      final l100 = stats.avgL100km;
+      if (l100 == null || l100 <= 0) continue;
+      byFuel[stats.dominant] = l100;
+    }
 
     return FuelCostModel(
-      litersPer100kmByFuel: perFuelConsumptionFromFills(fills),
+      litersPer100kmByFuel: byFuel,
       usableFuels: usable,
     );
   } catch (e, st) {

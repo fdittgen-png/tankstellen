@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
@@ -15,6 +14,7 @@ import 'package:tankstellen/features/search/presentation/widgets/radar_search_fa
 import 'package:tankstellen/features/search/presentation/widgets/results/results_row.dart';
 import 'package:tankstellen/features/search/presentation/widgets/search_results_list.dart';
 import 'package:tankstellen/features/search/presentation/widgets/search_summary_bar.dart';
+import 'package:tankstellen/features/search/presentation/widgets/sort_selector.dart';
 import 'package:tankstellen/features/search/providers/all_prices_comparison_model.dart';
 import 'package:tankstellen/features/search/providers/all_prices_table_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
@@ -31,8 +31,9 @@ import '../../../../helpers/pump_app.dart';
 ///
 ///  1. every chip the epic named renders its VALUE only, and hands its
 ///     sentence to a tooltip and a semantics label — so nothing is lost;
-///  2. the result count stops truncating at 320 dp, which is the concrete
-///     symptom the extended radar chip caused;
+///  2. the results row spends its 320 dp on controls rather than on words
+///     — the symptom the extended radar chip caused (#3943 has since
+///     deleted the count that used to prove it);
 ///  3. the permanent all-prices legend is gone from the layout, and the
 ///     explanation it carried is reachable on the search surface's help
 ///     bubble instead.
@@ -119,9 +120,9 @@ void main() {
     });
   });
 
-  group('#3939 — the result count stops truncating', () {
-    testWidgets('at 320 dp the count renders in full beside an icon-only '
-        'radar action', (tester) async {
+  group('#3939 — the results row spends its width on controls, not words', () {
+    testWidgets('at 320 dp the radar action is a glyph, and #3943 has since '
+        'taken the count away entirely', (tester) async {
       narrow(tester);
       await pumpApp(
         tester,
@@ -131,27 +132,15 @@ void main() {
         overrides: seeded(),
       );
 
-      final count = find.text('2 stations found');
-      expect(count, findsOneWidget);
+      // #3939 shrank the extended radar pill to a glyph so the count had
+      // room to render in full. #3943 then deleted the count outright — the
+      // list already says how many results there are — and gave the width
+      // to the sort chips.
+      expect(find.text('2 stations found'), findsNothing);
+      expect(find.byType(SortSelector), findsOneWidget);
 
-      // The symptom the epic named was "2 stations tro…": the extended
-      // radar pill left the count 22 dp of the 320 dp row. Icon-only, the
-      // trailing controls take 160 dp instead of 266, and the count keeps
-      // 128 — every dp of the row that is not a control.
-      //
-      // The width, not `didExceedMaxLines`, is the honest measure here:
-      // Flutter's test font draws every glyph a full em wide, so a
-      // sixteen-character count "needs" 192 dp under test and would report
-      // an ellipsis at any plausible width.
-      final paragraph = tester.renderObject<RenderParagraph>(count);
-      expect(
-        paragraph.size.width,
-        greaterThanOrEqualTo(120),
-        reason: 'the count must own the row width the controls do not '
-            '(it had 22 dp before #3939)',
-      );
-
-      // The radar action is what freed the room: a glyph, not a phrase.
+      // The radar action is still what freed the room: a glyph, not a
+      // phrase.
       expect(find.byType(RadarSearchChip), findsOneWidget);
       expect(find.text('Start fuel station radar'), findsNothing);
       expect(find.byTooltip('Start fuel station radar'), findsOneWidget);

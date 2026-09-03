@@ -64,7 +64,6 @@
   "apiKeyRequired": "API-nyckel krävs",
   "dataTransparency": "Datatransparens",
   "clearCache": "Rensa cache",
-  "stationsFound": "{count} bensinstationer hittades",
   "storageUsage": "Lagringsanvändning på denna enhet",
   "settingsLabel": "Inställningar",
   "total": "Totalt",
@@ -107,9 +106,7 @@
   "demoModeBanner": "Demoläge. Konfigurera API-nyckel i inställningar.",
   "demoModeBannerAction": "Hämta riktiga priser",
   "sortDistance": "Avstånd",
-  "sortOpen24h": "24h",
   "sortRating": "Betyg",
-  "sortPriceDistance": "Pris/km",
   "cheap": "billig",
   "expensive": "dyr",
   "reportPrice": "Rapportera pris",
@@ -1335,13 +1332,6 @@
     "placeholders": {
       "distance": {
         "type": "String"
-      }
-    }
-  },
-  "@stationsFound": {
-    "placeholders": {
-      "count": {
-        "type": "int"
       }
     }
   },
@@ -5804,37 +5794,6 @@
       }
     }
   },
-  "allPricesCostPer100km": "{cost}/100 km",
-  "@allPricesCostPer100km": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "cost": {
-        "type": "String",
-        "example": "5,02 €"
-      }
-    }
-  },
-  "allPricesVerdictHere": "Cheapest here: {fuel} at {cost}",
-  "@allPricesVerdictHere": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "fuel": {
-        "type": "String",
-        "example": "E85"
-      },
-      "cost": {
-        "type": "String",
-        "example": "5,02 €/100 km"
-      }
-    }
-  },
-  "allPricesVerdictWinsResults": "cheapest of the results",
-  "@allPricesVerdictWinsResults": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
   "allPricesMoreFuels": "+{count}",
   "@allPricesMoreFuels": {
     "x-mt": "needs-native-review",
@@ -6365,5 +6324,31 @@
   "@logoCreditsOpenFilePage": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "sortMenuByName": "Sort by name (A–Z)",
+  "@sortMenuByName": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "sortMenuOpen24h": "24-hour stations first",
+  "@sortMenuOpen24h": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "sortMenuPriceDistance": "Sort by price per kilometre",
+  "@sortMenuPriceDistance": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "sortMenuActiveSemantic": "{option}, current sort",
+  "@sortMenuActiveSemantic": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "option": {
+        "type": "String",
+        "example": "Sort by name (A–Z)"
+      }
+    }
   }
 }
