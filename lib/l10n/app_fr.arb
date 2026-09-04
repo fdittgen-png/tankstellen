@@ -4789,14 +4789,6 @@
       }
     }
   },
-  "tankReportRecordedTripsAvg": "Trajets enregistrés : {value}",
-  "@tankReportRecordedTripsAvg": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportRecordedTripsOverestimate": "Vos trajets enregistrés surestiment la consommation de {pct} %",
   "@tankReportRecordedTripsOverestimate": {
     "placeholders": {
@@ -5140,15 +5132,6 @@
   "fillInventorySkipNoRecordedFuel": "les trajets enregistrés n’ont aucune donnée carburant",
   "fillInventorySkipImplausible": "pompe et enregistrements trop éloignés — vérifiez le ticket",
   "fillInventoryDismiss": "Compris",
-  "tankReportResidualAfterCalibration": "Écart après calibrage : {percent} %",
-  "@tankReportResidualAfterCalibration": {
-    "placeholders": {
-      "percent": {
-        "type": "String",
-        "example": "-3"
-      }
-    }
-  },
   "tripFuelSourceMeasured": "Mesuré",
   "tripFuelSourceEstimatedCalibrated": "Estimé · calibré",
   "tripFuelSourceEstimated": "Estimé",
@@ -5528,7 +5511,7 @@
   },
   "helpSearchTipSummaryBar": "Touchez la barre grise au-dessus des résultats pour changer de carburant, de rayon et tous les autres critères de recherche.",
   "helpSearchTipFillEmphasis": "Dans le tableau comparatif, une case pleine signale le prix le plus bas pour ce carburant parmi les stations affichées.",
-  "helpSearchTipSecondFigure": "Le second chiffre, plus petit, indique ce que coûtent 100 km avec ce carburant sur votre véhicule.",
+  "helpSearchTipSecondFigure": "Le second chiffre, plus petit, indique ce que coûtent 100 km avec ce carburant sur votre véhicule. Un chiffre marqué ≈ n'est pas mesuré : il est modélisé d'après la consommation mesurée de votre véhicule et le contenu énergétique du carburant.",
   "helpSearchTipPriceArrows": "La flèche à côté d'un prix le situe dans cette liste — tiers le moins cher, intermédiaire ou le plus cher de ces résultats. Ce n'est pas une évolution dans le temps.",
   "helpSearchTipViewToggle": "Le bouton d'affichage bascule entre les fiches compactes et le tableau qui compare tous les carburants d'un coup d'œil.",
   "searchSummaryFuelTooltip": "Carburant : {fuel}",
@@ -5610,6 +5593,93 @@
       "option": {
         "type": "String",
         "example": "Sort by name (A–Z)"
+      }
+    }
+  },
+  "alertsEmptyTitle": "Aucune alerte de prix pour l'instant",
+  "alertsEmptySubtitle": "Soyez averti quand une station, ou n'importe quelle station d'une zone, passe sous votre prix cible.",
+  "favoritesLoadErrorTitle": "Favoris",
+  "allPricesEstimatedCost": "≈ {cost}",
+  "@allPricesEstimatedCost": {
+    "placeholders": {
+      "cost": {
+        "type": "String",
+        "example": "9,61 €"
+      }
+    }
+  },
+  "allPricesCellEstimatedSemantics": "{fuel} {price}, environ {cost} aux 100 km, estimé à {consumption} d'après la consommation mesurée de votre véhicule et le contenu énergétique du carburant",
+  "@allPricesCellEstimatedSemantics": {
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E10"
+      },
+      "price": {
+        "type": "String",
+        "example": "1,839"
+      },
+      "cost": {
+        "type": "String",
+        "example": "9,61 €"
+      },
+      "consumption": {
+        "type": "String",
+        "example": "5,2 L/100 km"
+      }
+    }
+  },
+  "tankReportRecordedSummary": "Les trajets enregistrés couvrent {pct} % de ce plein et consomment en moyenne {value} · écart de {residual} % après calibrage",
+  "@tankReportRecordedSummary": {
+    "placeholders": {
+      "pct": {
+        "type": "String",
+        "example": "40"
+      },
+      "value": {
+        "type": "String",
+        "example": "8,0 L/100 km"
+      },
+      "residual": {
+        "type": "String",
+        "example": "-3"
+      }
+    }
+  },
+  "tankReportRecordedSummaryNoResidual": "Les trajets enregistrés couvrent {pct} % de ce plein et consomment en moyenne {value}",
+  "@tankReportRecordedSummaryNoResidual": {
+    "placeholders": {
+      "pct": {
+        "type": "String",
+        "example": "40"
+      },
+      "value": {
+        "type": "String",
+        "example": "8,0 L/100 km"
+      }
+    }
+  },
+  "stationCardPriceUnit": "{currency}/L",
+  "@stationCardPriceUnit": {
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "stationCardStatus24h": "{status} · 24 h/24",
+  "@stationCardStatus24h": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "mapStationCountTooltip": "{count} stations dans le résultat actuel",
+  "@mapStationCountTooltip": {
+    "placeholders": {
+      "count": {
+        "type": "int"
       }
     }
   }

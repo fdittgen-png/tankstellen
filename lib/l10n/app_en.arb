@@ -1721,6 +1721,50 @@
       }
     }
   },
+  "alertsEmptyTitle": "No price alerts yet",
+  "@alertsEmptyTitle": {
+    "description": "Title of the single empty state on the Price alerts tab when the user has neither a station alert nor a zone alert (#3951). The stats strip and the two section headers are collapsed behind it."
+  },
+  "alertsEmptySubtitle": "Get notified when a station, or any station in a zone, drops below your target price.",
+  "@alertsEmptySubtitle": {
+    "description": "One-sentence explanation under the Price alerts empty-state title (#3951): what an alert does, covering both the per-station and the zone kind."
+  },
+  "favoritesLoadErrorTitle": "Favorites",
+  "@favoritesLoadErrorTitle": {
+    "description": "Context label shown by the error widget when the Favorites list fails to load (#3951 — replaced a hard-coded English literal). Names the surface that failed."
+  },
+  "allPricesEstimatedCost": "≈ {cost}",
+  "@allPricesEstimatedCost": {
+    "description": "The cost-per-100 km figure of an all-prices table cell when it is MODELLED rather than measured (#3945): the vehicle has no pure tank of this fuel, so the number is its measured consumption on another fuel converted by energy content. The ≈ prefix is the only visible marker; keep it and keep the string as short as the English form — it must fit a column roughly 66 dp wide.",
+    "placeholders": {
+      "cost": {
+        "type": "String",
+        "example": "9,61 €"
+      }
+    }
+  },
+  "allPricesCellEstimatedSemantics": "{fuel} {price}, about {cost} per 100 km, estimated at {consumption} from your vehicle's measured consumption and the fuel's energy content",
+  "@allPricesCellEstimatedSemantics": {
+    "description": "Screen-reader label of an all-prices table cell whose cost per 100 km is an estimate, not a measurement (#3945). Says so explicitly, because the visual ≈ prefix is not spoken.",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E10"
+      },
+      "price": {
+        "type": "String",
+        "example": "1,839"
+      },
+      "cost": {
+        "type": "String",
+        "example": "9,61 €"
+      },
+      "consumption": {
+        "type": "String",
+        "example": "5,2 L/100 km"
+      }
+    }
+  },
   "approachOverlaySection": "Fuel Station Radar",
   "@approachOverlaySection": {
     "description": "Section title in the profile edit sheet for the in-trip Fuel Station Radar settings (#2067 / Epic #2065 / #2661)."
@@ -4348,6 +4392,38 @@
   "@fuelNameElectric": {
     "description": "Localized display name for electric charging (#2887)."
   },
+  "tankReportRecordedSummary": "Recorded trips cover {pct} % of this tank and average {value} · {residual} % gap after calibration",
+  "@tankReportRecordedSummary": {
+    "description": "#3950 tank report — ONE sentence carrying the three recorded-trips facts that used to be three stacked lines: the share of the tank's distance covered by recorded trips (pct, whole-number percentage), the recorded trips' average consumption (value, figure AND unit in the user's consumption unit, e.g. '8,0 L/100 km') and the signed residual between the calibrated recordings and the pump (residual, e.g. '+3' or '-12').",
+    "placeholders": {
+      "pct": {
+        "type": "String",
+        "example": "40"
+      },
+      "value": {
+        "type": "String",
+        "example": "8,0 L/100 km"
+      },
+      "residual": {
+        "type": "String",
+        "example": "-3"
+      }
+    }
+  },
+  "tankReportRecordedSummaryNoResidual": "Recorded trips cover {pct} % of this tank and average {value}",
+  "@tankReportRecordedSummaryNoResidual": {
+    "description": "#3950 tank report — the same one-sentence recorded-trips summary when no calibration residual is available yet (no pump calibration on the vehicle): coverage share (pct) + recorded average (value with unit).",
+    "placeholders": {
+      "pct": {
+        "type": "String",
+        "example": "40"
+      },
+      "value": {
+        "type": "String",
+        "example": "8,0 L/100 km"
+      }
+    }
+  },
   "calibrationModeLabel": "Calibration mode",
   "@calibrationModeLabel": {
     "description": "Label above the rule/fuzzy segmented button on the vehicle edit screen (#894)."
@@ -6649,6 +6725,33 @@
   "@refuelUnitPerSession": {
     "description": "Trailing unit suffix when an EV network bills a flat per-session price instead of per-kWh in the unified RefuelOptionCard (#1116 phase 3b)."
   },
+  "stationCardPriceUnit": "{currency}/L",
+  "@stationCardPriceUnit": {
+    "description": "Unit rendered in the small unit role beside the results card's display-role price (#3949, Epic #3947), e.g. '1,79⁹' followed by '€/L'. {currency} is the station's currency symbol (€, £, $ …) resolved from its origin country; only the per-litre part is translatable (German uses a lowercase 'l').",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "stationCardStatus24h": "{status} · 24 h",
+  "@stationCardStatus24h": {
+    "description": "Tooltip and screen-reader label of the results card's status dot when the station is open around the clock (#3949). {status} is the already-localized open state ('Open', 'Closed' or 'Unknown'); the old separate '24h' badge folded into this tooltip so the card keeps one metadata line.",
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "mapStationCountTooltip": "{count} stations in the current result set",
+  "@mapStationCountTooltip": {
+    "description": "Tooltip / screen-reader sentence behind the station-count summary chip that the map header shows above the map (#3949). The visible chip text is the short nStations form; this is the full sentence a long-press reveals.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "settingsSearchHint": "Search settings",
   "@settingsSearchHint": {
     "description": "Hint text of the search field at the top of the Settings root (#3884). Typing filters the topic tiles by title, subtitle and keywords."
@@ -8361,16 +8464,6 @@
   "@fillInventoryDismiss": {
     "description": "#3917 — dismiss button of the inventory sheet."
   },
-  "tankReportResidualAfterCalibration": "Gap after calibration: {percent} %",
-  "@tankReportResidualAfterCalibration": {
-    "placeholders": {
-      "percent": {
-        "type": "String",
-        "example": "-3"
-      }
-    },
-    "description": "#3918 — tank report: signed residual between the re-expressed recordings and the pump after the current calibration."
-  },
   "tripFuelSourceMeasured": "Measured",
   "@tripFuelSourceMeasured": {
     "description": "#3919 — trip fuel-source chip: fuel rate reported by the ECU."
@@ -8572,7 +8665,7 @@
   "@helpSearchTipFillEmphasis": {
     "description": "Tip 2 of the search-results help bubble (#3939). Replaces the first half of the permanent two-line legend that used to sit under the all-prices column header."
   },
-  "helpSearchTipSecondFigure": "The smaller second figure in a cell is what 100 km on that fuel costs in your vehicle.",
+  "helpSearchTipSecondFigure": "The smaller second figure in a cell is what 100 km on that fuel costs in your vehicle. A figure marked ≈ is not measured: it is modelled from your vehicle's measured consumption and the fuel's energy content.",
   "@helpSearchTipSecondFigure": {
     "description": "Tip 3 of the search-results help bubble (#3939). Replaces the second half of the permanent all-prices legend."
   },
@@ -9284,15 +9377,6 @@
     "description": "#3904 tank report — plain-language share of the tank's distance covered by recorded trips (replaces tankReportCoverage). pct is the already-formatted whole-number percentage.",
     "placeholders": {
       "pct": {
-        "type": "String"
-      }
-    }
-  },
-  "tankReportRecordedTripsAvg": "Recorded trips: {value}",
-  "@tankReportRecordedTripsAvg": {
-    "description": "#3904 tank report — average consumption of the recorded trips inside this tank (replaces tankReportRecordedAvg). value carries the figure AND its unit, formatted in the user's consumption unit (e.g. '10,5 L/100 km', '27 mpg (UK)').",
-    "placeholders": {
-      "value": {
         "type": "String"
       }
     }

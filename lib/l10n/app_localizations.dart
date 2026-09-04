@@ -5645,6 +5645,41 @@ abstract class AppLocalizations {
   /// **'Threshold ({currency}/L)'**
   String alertThresholdWithCurrency(String currency);
 
+  /// Title of the single empty state on the Price alerts tab when the user has neither a station alert nor a zone alert (#3951). The stats strip and the two section headers are collapsed behind it.
+  ///
+  /// In en, this message translates to:
+  /// **'No price alerts yet'**
+  String get alertsEmptyTitle;
+
+  /// One-sentence explanation under the Price alerts empty-state title (#3951): what an alert does, covering both the per-station and the zone kind.
+  ///
+  /// In en, this message translates to:
+  /// **'Get notified when a station, or any station in a zone, drops below your target price.'**
+  String get alertsEmptySubtitle;
+
+  /// Context label shown by the error widget when the Favorites list fails to load (#3951 — replaced a hard-coded English literal). Names the surface that failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get favoritesLoadErrorTitle;
+
+  /// The cost-per-100 km figure of an all-prices table cell when it is MODELLED rather than measured (#3945): the vehicle has no pure tank of this fuel, so the number is its measured consumption on another fuel converted by energy content. The ≈ prefix is the only visible marker; keep it and keep the string as short as the English form — it must fit a column roughly 66 dp wide.
+  ///
+  /// In en, this message translates to:
+  /// **'≈ {cost}'**
+  String allPricesEstimatedCost(String cost);
+
+  /// Screen-reader label of an all-prices table cell whose cost per 100 km is an estimate, not a measurement (#3945). Says so explicitly, because the visual ≈ prefix is not spoken.
+  ///
+  /// In en, this message translates to:
+  /// **'{fuel} {price}, about {cost} per 100 km, estimated at {consumption} from your vehicle\'s measured consumption and the fuel\'s energy content'**
+  String allPricesCellEstimatedSemantics(
+    String fuel,
+    String price,
+    String cost,
+    String consumption,
+  );
+
   /// Section title in the profile edit sheet for the in-trip Fuel Station Radar settings (#2067 / Epic #2065 / #2661).
   ///
   /// In en, this message translates to:
@@ -8810,6 +8845,18 @@ abstract class AppLocalizations {
   /// **'Electric'**
   String get fuelNameElectric;
 
+  /// #3950 tank report — ONE sentence carrying the three recorded-trips facts that used to be three stacked lines: the share of the tank's distance covered by recorded trips (pct, whole-number percentage), the recorded trips' average consumption (value, figure AND unit in the user's consumption unit, e.g. '8,0 L/100 km') and the signed residual between the calibrated recordings and the pump (residual, e.g. '+3' or '-12').
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded trips cover {pct} % of this tank and average {value} · {residual} % gap after calibration'**
+  String tankReportRecordedSummary(String pct, String value, String residual);
+
+  /// #3950 tank report — the same one-sentence recorded-trips summary when no calibration residual is available yet (no pump calibration on the vehicle): coverage share (pct) + recorded average (value with unit).
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded trips cover {pct} % of this tank and average {value}'**
+  String tankReportRecordedSummaryNoResidual(String pct, String value);
+
   /// Label above the rule/fuzzy segmented button on the vehicle edit screen (#894).
   ///
   /// In en, this message translates to:
@@ -11638,6 +11685,24 @@ abstract class AppLocalizations {
   /// **'/session'**
   String get refuelUnitPerSession;
 
+  /// Unit rendered in the small unit role beside the results card's display-role price (#3949, Epic #3947), e.g. '1,79⁹' followed by '€/L'. {currency} is the station's currency symbol (€, £, $ …) resolved from its origin country; only the per-litre part is translatable (German uses a lowercase 'l').
+  ///
+  /// In en, this message translates to:
+  /// **'{currency}/L'**
+  String stationCardPriceUnit(String currency);
+
+  /// Tooltip and screen-reader label of the results card's status dot when the station is open around the clock (#3949). {status} is the already-localized open state ('Open', 'Closed' or 'Unknown'); the old separate '24h' badge folded into this tooltip so the card keeps one metadata line.
+  ///
+  /// In en, this message translates to:
+  /// **'{status} · 24 h'**
+  String stationCardStatus24h(String status);
+
+  /// Tooltip / screen-reader sentence behind the station-count summary chip that the map header shows above the map (#3949). The visible chip text is the short nStations form; this is the full sentence a long-press reveals.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} stations in the current result set'**
+  String mapStationCountTooltip(int count);
+
   /// Hint text of the search field at the top of the Settings root (#3884). Typing filters the topic tiles by title, subtitle and keywords.
   ///
   /// In en, this message translates to:
@@ -13717,12 +13782,6 @@ abstract class AppLocalizations {
   /// **'Got it'**
   String get fillInventoryDismiss;
 
-  /// #3918 — tank report: signed residual between the re-expressed recordings and the pump after the current calibration.
-  ///
-  /// In en, this message translates to:
-  /// **'Gap after calibration: {percent} %'**
-  String tankReportResidualAfterCalibration(String percent);
-
   /// #3919 — trip fuel-source chip: fuel rate reported by the ECU.
   ///
   /// In en, this message translates to:
@@ -13952,7 +14011,7 @@ abstract class AppLocalizations {
   /// Tip 3 of the search-results help bubble (#3939). Replaces the second half of the permanent all-prices legend.
   ///
   /// In en, this message translates to:
-  /// **'The smaller second figure in a cell is what 100 km on that fuel costs in your vehicle.'**
+  /// **'The smaller second figure in a cell is what 100 km on that fuel costs in your vehicle. A figure marked ≈ is not measured: it is modelled from your vehicle\'s measured consumption and the fuel\'s energy content.'**
   String get helpSearchTipSecondFigure;
 
   /// Tip 4 of the search-results help bubble (#3939): the most misread mark on the screen. priceTierOf() classifies a price WITHIN the current result set, so the down/up glyph is a ranking, never a rise or fall since yesterday.
@@ -14668,12 +14727,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Recorded trips cover {pct} % of this tank'**
   String tankReportRecordedTripsCoverage(String pct);
-
-  /// #3904 tank report — average consumption of the recorded trips inside this tank (replaces tankReportRecordedAvg). value carries the figure AND its unit, formatted in the user's consumption unit (e.g. '10,5 L/100 km', '27 mpg (UK)').
-  ///
-  /// In en, this message translates to:
-  /// **'Recorded trips: {value}'**
-  String tankReportRecordedTripsAvg(String value);
 
   /// #3904 tank report — the recorded estimates run ABOVE the pump-measured consumption (replaces tankReportCalibrationOver). pct is the already-formatted whole-number gap.
   ///

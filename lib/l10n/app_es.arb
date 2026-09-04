@@ -4785,14 +4785,6 @@
       }
     }
   },
-  "tankReportRecordedTripsAvg": "Viajes grabados: {value}",
-  "@tankReportRecordedTripsAvg": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "tankReportRecordedTripsOverestimate": "Tus viajes grabados sobreestiman el consumo un {pct} %",
   "@tankReportRecordedTripsOverestimate": {
     "placeholders": {
@@ -5136,15 +5128,6 @@
   "fillInventorySkipNoRecordedFuel": "los viajes grabados no tienen cifra de combustible",
   "fillInventorySkipImplausible": "el surtidor y las grabaciones difieren demasiado: comprueba el tique",
   "fillInventoryDismiss": "Entendido",
-  "tankReportResidualAfterCalibration": "Diferencia tras la calibración: {percent} %",
-  "@tankReportResidualAfterCalibration": {
-    "placeholders": {
-      "percent": {
-        "type": "String",
-        "example": "-3"
-      }
-    }
-  },
   "tripFuelSourceMeasured": "Medido",
   "tripFuelSourceEstimatedCalibrated": "Estimado · calibrado",
   "tripFuelSourceEstimated": "Estimado",
@@ -5846,6 +5829,119 @@
       "option": {
         "type": "String",
         "example": "Sort by name (A–Z)"
+      }
+    }
+  },
+  "alertsEmptyTitle": "No price alerts yet",
+  "@alertsEmptyTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "alertsEmptySubtitle": "Get notified when a station, or any station in a zone, drops below your target price.",
+  "@alertsEmptySubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "favoritesLoadErrorTitle": "Favorites",
+  "@favoritesLoadErrorTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "allPricesEstimatedCost": "≈ {cost}",
+  "@allPricesEstimatedCost": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "cost": {
+        "type": "String",
+        "example": "9,61 €"
+      }
+    }
+  },
+  "allPricesCellEstimatedSemantics": "{fuel} {price}, about {cost} per 100 km, estimated at {consumption} from your vehicle's measured consumption and the fuel's energy content",
+  "@allPricesCellEstimatedSemantics": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E10"
+      },
+      "price": {
+        "type": "String",
+        "example": "1,839"
+      },
+      "cost": {
+        "type": "String",
+        "example": "9,61 €"
+      },
+      "consumption": {
+        "type": "String",
+        "example": "5,2 L/100 km"
+      }
+    }
+  },
+  "tankReportRecordedSummary": "Recorded trips cover {pct} % of this tank and average {value} · {residual} % gap after calibration",
+  "@tankReportRecordedSummary": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pct": {
+        "type": "String",
+        "example": "40"
+      },
+      "value": {
+        "type": "String",
+        "example": "8,0 L/100 km"
+      },
+      "residual": {
+        "type": "String",
+        "example": "-3"
+      }
+    }
+  },
+  "tankReportRecordedSummaryNoResidual": "Recorded trips cover {pct} % of this tank and average {value}",
+  "@tankReportRecordedSummaryNoResidual": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pct": {
+        "type": "String",
+        "example": "40"
+      },
+      "value": {
+        "type": "String",
+        "example": "8,0 L/100 km"
+      }
+    }
+  },
+  "stationCardPriceUnit": "{currency}/L",
+  "@stationCardPriceUnit": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "stationCardStatus24h": "{status} · 24 h",
+  "@stationCardStatus24h": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "mapStationCountTooltip": "{count} stations in the current result set",
+  "@mapStationCountTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
       }
     }
   }

@@ -1266,6 +1266,39 @@
       }
     }
   },
+  "alertsEmptyTitle": "Noch keine Preisalarme",
+  "alertsEmptySubtitle": "Lass dich benachrichtigen, wenn eine Tankstelle oder eine Tankstelle in einer Zone unter deinen Zielpreis fällt.",
+  "favoritesLoadErrorTitle": "Favoriten",
+  "allPricesEstimatedCost": "≈ {cost}",
+  "@allPricesEstimatedCost": {
+    "placeholders": {
+      "cost": {
+        "type": "String",
+        "example": "9,61 €"
+      }
+    }
+  },
+  "allPricesCellEstimatedSemantics": "{fuel} {price}, etwa {cost} pro 100 km, geschätzt mit {consumption} aus dem gemessenen Verbrauch Ihres Fahrzeugs und dem Energiegehalt des Kraftstoffs",
+  "@allPricesCellEstimatedSemantics": {
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E10"
+      },
+      "price": {
+        "type": "String",
+        "example": "1,839"
+      },
+      "cost": {
+        "type": "String",
+        "example": "9,61 €"
+      },
+      "consumption": {
+        "type": "String",
+        "example": "5,2 L/100 km"
+      }
+    }
+  },
   "approachOverlaySection": "Tankstellen-Radar",
   "@approachOverlaySection": {
     "description": "Section title in the profile edit sheet for the in-trip Fuel Station Radar settings (#2067 / Epic #2065 / #2661)."
@@ -2261,6 +2294,8 @@
   "fuelNameCng": "Erdgas (CNG)",
   "fuelNameHydrogen": "Wasserstoff",
   "fuelNameElectric": "Elektrisch",
+  "tankReportRecordedSummary": "Aufgezeichnete Fahrten decken {pct} % dieser Tankfüllung ab und liegen im Schnitt bei {value} · {residual} % Abweichung nach Kalibrierung",
+  "tankReportRecordedSummaryNoResidual": "Aufgezeichnete Fahrten decken {pct} % dieser Tankfüllung ab und liegen im Schnitt bei {value}",
   "calibrationModeLabel": "Kalibrierungsmodus",
   "calibrationModeRule": "Regelbasiert",
   "calibrationModeFuzzy": "Fuzzy",
@@ -3230,6 +3265,33 @@
   "reconcileResolveGapSemanticLabel": "Ungeklärte Kraftstoff- und Fahrten-Differenz klären",
   "refuelUnitPerKwh": "/kWh",
   "refuelUnitPerSession": "/Sitzung",
+  "stationCardPriceUnit": "{currency}/l",
+  "@stationCardPriceUnit": {
+    "description": "Unit rendered in the small unit role beside the results card's display-role price (#3949, Epic #3947), e.g. '1,79⁹' followed by '€/L'. {currency} is the station's currency symbol (€, £, $ …) resolved from its origin country; only the per-litre part is translatable (German uses a lowercase 'l').",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "stationCardStatus24h": "{status} · 24 h",
+  "@stationCardStatus24h": {
+    "description": "Tooltip and screen-reader label of the results card's status dot when the station is open around the clock (#3949). {status} is the already-localized open state ('Open', 'Closed' or 'Unknown'); the old separate '24h' badge folded into this tooltip so the card keeps one metadata line.",
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "mapStationCountTooltip": "{count} Tankstellen im aktuellen Ergebnis",
+  "@mapStationCountTooltip": {
+    "description": "Tooltip / screen-reader sentence behind the station-count summary chip that the map header shows above the map (#3949). The visible chip text is the short nStations form; this is the full sentence a long-press reveals.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "settingsSearchHint": "Einstellungen durchsuchen",
   "settingsSearchNoResults": "Keine Einstellungen passen zu „{query}“",
   "@settingsSearchNoResults": {
@@ -3950,16 +4012,6 @@
   "@fillInventoryDismiss": {
     "description": "#3917 — dismiss button of the inventory sheet."
   },
-  "tankReportResidualAfterCalibration": "Abweichung nach Kalibrierung: {percent} %",
-  "@tankReportResidualAfterCalibration": {
-    "placeholders": {
-      "percent": {
-        "type": "String",
-        "example": "-3"
-      }
-    },
-    "description": "#3918 — tank report: signed residual between the re-expressed recordings and the pump after the current calibration."
-  },
   "tripFuelSourceMeasured": "Gemessen",
   "@tripFuelSourceMeasured": {
     "description": "#3919 — trip fuel-source chip: fuel rate reported by the ECU."
@@ -4079,7 +4131,7 @@
   },
   "helpSearchTipSummaryBar": "Tippen Sie auf die graue Leiste über den Treffern, um Kraftstoff, Umkreis und alle weiteren Suchkriterien zu ändern.",
   "helpSearchTipFillEmphasis": "In der Vergleichstabelle markiert ein gefülltes Feld den günstigsten Preis für diesen Kraftstoff unter den angezeigten Stationen.",
-  "helpSearchTipSecondFigure": "Die kleinere zweite Zahl in einem Feld zeigt, was 100 km mit diesem Kraftstoff in Ihrem Fahrzeug kosten.",
+  "helpSearchTipSecondFigure": "Die kleinere zweite Zahl in einem Feld zeigt, was 100 km mit diesem Kraftstoff in Ihrem Fahrzeug kosten. Eine mit ≈ markierte Zahl ist nicht gemessen, sondern aus dem gemessenen Verbrauch Ihres Fahrzeugs und dem Energiegehalt des Kraftstoffs modelliert.",
   "helpSearchTipPriceArrows": "Der Pfeil neben einem Preis ordnet ihn innerhalb dieser Liste ein — günstigstes, mittleres oder teuerstes Drittel dieser Treffer. Er zeigt keinen zeitlichen Preisverlauf.",
   "helpSearchTipViewToggle": "Die Ansichtstaste wechselt zwischen den kompakten Karten und der Tabelle, die alle Kraftstoffe auf einmal vergleicht.",
   "searchSummaryFuelTooltip": "Kraftstoff: {fuel}",
@@ -4324,7 +4376,6 @@
   "stationStatusWithFreshness": "{status} · aktualisiert vor {ago}",
   "pricesNotSoldHere": "Hier nicht angeboten: {fuels}",
   "tankReportRecordedTripsCoverage": "Aufgezeichnete Fahrten decken {pct} % dieser Tankfüllung ab",
-  "tankReportRecordedTripsAvg": "Aufgezeichnete Fahrten: {value}",
   "tankReportRecordedTripsOverestimate": "Deine aufgezeichneten Fahrten überschätzen den Verbrauch um {pct} %",
   "tankReportRecordedTripsUnderestimate": "Deine aufgezeichneten Fahrten unterschätzen den Verbrauch um {pct} %",
   "trajetObd2DegradedSubtitle": "Keine Motordaten — GPS-Schätzung",

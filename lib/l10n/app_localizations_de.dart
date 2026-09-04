@@ -3094,6 +3094,31 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get alertsEmptyTitle => 'Noch keine Preisalarme';
+
+  @override
+  String get alertsEmptySubtitle =>
+      'Lass dich benachrichtigen, wenn eine Tankstelle oder eine Tankstelle in einer Zone unter deinen Zielpreis fällt.';
+
+  @override
+  String get favoritesLoadErrorTitle => 'Favoriten';
+
+  @override
+  String allPricesEstimatedCost(String cost) {
+    return '≈ $cost';
+  }
+
+  @override
+  String allPricesCellEstimatedSemantics(
+    String fuel,
+    String price,
+    String cost,
+    String consumption,
+  ) {
+    return '$fuel $price, etwa $cost pro 100 km, geschätzt mit $consumption aus dem gemessenen Verbrauch Ihres Fahrzeugs und dem Energiegehalt des Kraftstoffs';
+  }
+
+  @override
   String get approachOverlaySection => 'Tankstellen-Radar';
 
   @override
@@ -5062,6 +5087,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get fuelNameElectric => 'Elektrisch';
 
   @override
+  String tankReportRecordedSummary(String pct, String value, String residual) {
+    return 'Aufgezeichnete Fahrten decken $pct % dieser Tankfüllung ab und liegen im Schnitt bei $value · $residual % Abweichung nach Kalibrierung';
+  }
+
+  @override
+  String tankReportRecordedSummaryNoResidual(String pct, String value) {
+    return 'Aufgezeichnete Fahrten decken $pct % dieser Tankfüllung ab und liegen im Schnitt bei $value';
+  }
+
+  @override
   String get calibrationModeLabel => 'Kalibrierungsmodus';
 
   @override
@@ -6814,6 +6849,21 @@ class AppLocalizationsDe extends AppLocalizations {
   String get refuelUnitPerSession => '/Sitzung';
 
   @override
+  String stationCardPriceUnit(String currency) {
+    return '$currency/l';
+  }
+
+  @override
+  String stationCardStatus24h(String status) {
+    return '$status · 24 h';
+  }
+
+  @override
+  String mapStationCountTooltip(int count) {
+    return '$count Tankstellen im aktuellen Ergebnis';
+  }
+
+  @override
   String get settingsSearchHint => 'Einstellungen durchsuchen';
 
   @override
@@ -8078,11 +8128,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get fillInventoryDismiss => 'Verstanden';
 
   @override
-  String tankReportResidualAfterCalibration(String percent) {
-    return 'Abweichung nach Kalibrierung: $percent %';
-  }
-
-  @override
   String get tripFuelSourceMeasured => 'Gemessen';
 
   @override
@@ -8221,7 +8266,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get helpSearchTipSecondFigure =>
-      'Die kleinere zweite Zahl in einem Feld zeigt, was 100 km mit diesem Kraftstoff in Ihrem Fahrzeug kosten.';
+      'Die kleinere zweite Zahl in einem Feld zeigt, was 100 km mit diesem Kraftstoff in Ihrem Fahrzeug kosten. Eine mit ≈ markierte Zahl ist nicht gemessen, sondern aus dem gemessenen Verbrauch Ihres Fahrzeugs und dem Energiegehalt des Kraftstoffs modelliert.';
 
   @override
   String get helpSearchTipPriceArrows =>
@@ -8715,11 +8760,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String tankReportRecordedTripsCoverage(String pct) {
     return 'Aufgezeichnete Fahrten decken $pct % dieser Tankfüllung ab';
-  }
-
-  @override
-  String tankReportRecordedTripsAvg(String value) {
-    return 'Aufgezeichnete Fahrten: $value';
   }
 
   @override
