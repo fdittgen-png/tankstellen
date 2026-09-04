@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_radius.dart';
+import '../theme/spacing.dart';
 
 /// The shared frame for every station card (#2493).
 ///
@@ -16,10 +17,17 @@ import '../theme/app_radius.dart';
 /// so the four cards share a single silhouette and only supply their
 /// distinct body + stripe colour.
 ///
+/// #3948 (Epic #3947) — the shell carries **primary-card** semantics: a
+/// station in the results IS the thing the screen is about, so its frame
+/// is the same `surfaceContainerLow` + 1 dp `outlineVariant` + no
+/// elevation as `PrimaryCard`. The public API is unchanged; only the frame
+/// grammar moved from "elevated filled card" to "outlined primary card".
+///
 /// Frame grammar:
-/// * margin `symmetric(horizontal: 8, vertical: 6)`
+/// * margin [Spacing.surfaceMargin] (12 horizontal / 8 vertical)
 /// * `Clip.antiAlias`
-/// * elevation `1` on dark, `2` on light (dark surfaces need less lift)
+/// * fill `surfaceContainerLow`, 1 dp `outlineVariant` edge, elevation 0
+///   (elevation is reserved for things that float)
 /// * shape rounded to [AppRadius.lg] (12) — the canonical card radius
 /// * an [InkWell] tap target sharing the same radius
 /// * an optional left [BorderSide] accent stripe in [stripeColor]
@@ -50,12 +58,17 @@ class StationCardShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final scheme = Theme.of(context).colorScheme;
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      margin: Spacing.surfaceMargin,
       clipBehavior: Clip.antiAlias,
-      elevation: isDark ? 1 : 2,
-      shape: RoundedRectangleBorder(borderRadius: AppRadius.lg),
+      elevation: 0,
+      color: scheme.surfaceContainerLow,
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: AppRadius.lg,
+        side: BorderSide(color: scheme.outlineVariant),
+      ),
       child: InkWell(
         onTap: onTap,
         borderRadius: AppRadius.lg,

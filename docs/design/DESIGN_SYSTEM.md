@@ -244,6 +244,66 @@ widgets in `lib/core/widgets/` and the theme files in
 
 ---
 
+## Visual grammar — type roles, surface levels, chip roles (#3948, Epic #3947)
+
+Seven beta screenshots (2026-09-04) showed screens that were functional
+but not *designed*: no typographic hierarchy, filled cards on a filled
+page of the same tone, one pill shape for both "selected filter" and
+"summary of the search", data cards with no focal number. The grammar
+below is the single vocabulary every core screen is laid out against.
+It adds to the tokens above; it does not replace `SectionCard`,
+`SectionHeader` or the palette.
+
+### Type roles — `AppText` (`lib/core/theme/app_text.dart`)
+
+| Role | Slot | Rule |
+| --- | --- | --- |
+| `AppText.display` | `displaySmall` w600, tabular figures | The ONE number a card is about — the price, the tank litres, the month's L/100 km. At most one per card, top-left. Never text. |
+| `AppText.title` | `titleMedium` w600 | The name of the thing: a station, a card heading, a sheet section. One per card. |
+| `AppText.body` | `bodyMedium` | Sentences, addresses, list text. The default. Never bolded to look important — promote to `title`. |
+| `AppText.label` | `labelSmall`, `onSurfaceVariant` | Units, captions, chip text, freshness, column headers. Read second. |
+| `AppText.unit` | `labelLarge` w500, `onSurfaceVariant`, tabular | Only beside a `display` number, baseline-aligned (`35,0` + `L`). |
+
+The roles are strictly ordered by size (display > title > body ≥ label);
+`test/core/theme/app_text_test.dart` pins the order. A screen names the
+*role* of a string, never its size.
+
+### Surface levels — `PrimaryCard` / `PanelCard` (`lib/core/widgets/`)
+
+| Level | Widget | Fill | Edge | Elevation |
+| --- | --- | --- | --- | --- |
+| page | `Scaffold` | `surface` | — | — |
+| primary | `PrimaryCard` | `surfaceContainerLow` | 1 dp `outlineVariant` | 0 |
+| secondary | `PanelCard` | `surfaceContainerHighest` | none | 0 |
+
+The primary card is the one thing the screen is about (tank level, tank
+report, a station); panels hold the supporting figures (stat tiles,
+month comparison). **Elevation is reserved for things that float** (FAB,
+sheets, snackbars). `StationCardShell` carries primary-card semantics.
+Geometry for both levels: margin `Spacing.surfaceMargin` (12 / 8), inner
+padding `Spacing.cardPadding` (16), radius `AppRadius.lg`; a bare `Card`
+inherits the margin from `cardTheme`.
+
+### Chip roles
+
+| Role | Widget | Unselected | Selected |
+| --- | --- | --- | --- |
+| choice (fuel, radius, sort, amenities) | Material `ChoiceChip` / `FilterChip` via `chipTheme` | `surface` fill, `outlineVariant` hairline | `primaryContainer` fill, `primary` stroke — the **colour** is the selected state |
+| summary (the criteria bar) | `SummaryChip` | tonal `secondaryContainer`, no border, `labelSmall`, `Spacing.chipPadding` | n/a — read, not pressed |
+| mode toggle | `SelectablePill` | transparent, faint outline | `primaryContainer` + `primary` outline |
+
+Selection changes animate with `AppMotion.selectionDuration(context)`
+(200 ms, zero under reduced motion).
+
+### Focal-number rule
+
+Every data card leads with its `display`-role number at top-left, unit
+as `AppText.unit` beside it, everything else subordinate. Empty states
+collapse the chrome above them: zero items means no stats strip and no
+`(0)` headers — one empty state, one primary action.
+
+---
+
 ## Semantic colors
 
 Beyond the palette, several colour layers carry app-specific meaning.

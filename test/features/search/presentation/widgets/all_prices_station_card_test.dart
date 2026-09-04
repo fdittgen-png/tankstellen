@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/theme/spacing.dart';
 import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/core/theme/fuel_colors.dart';
 import 'package:tankstellen/core/widgets/animated_price_text.dart';
@@ -552,9 +553,8 @@ void main() {
   });
 
   group('card polish (#592)', () {
-    testWidgets('card keeps its 6dp margin, elevation 2 and 12dp corners', (
-      tester,
-    ) async {
+    testWidgets('card keeps the grammar margin, no elevation and 12dp '
+        'corners (#3948)', (tester) async {
       await pumpApp(
         tester,
         const AllPricesStationCard(station: testStation),
@@ -562,9 +562,8 @@ void main() {
       );
 
       final card = tester.widget<Card>(find.byType(Card).first);
-      expect(card.margin, const EdgeInsets.symmetric(horizontal: 8,
-        vertical: 6));
-      expect(card.elevation, 2.0);
+      expect(card.margin, Spacing.surfaceMargin);
+      expect(card.elevation, 0);
       expect(
         (card.shape as RoundedRectangleBorder).borderRadius,
         BorderRadius.circular(12),

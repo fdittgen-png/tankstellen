@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/app/theme.dart';
 import 'package:tankstellen/core/theme/contrast_utils.dart';
+import 'package:tankstellen/core/theme/spacing.dart';
 
 void main() {
   group('AppTheme.light', () {
@@ -158,6 +159,35 @@ void main() {
         final shape = snack.shape as RoundedRectangleBorder;
         final radius = shape.borderRadius.resolve(TextDirection.ltr).topLeft;
         expect(radius.x, 12.0);
+      });
+    }
+  });
+
+  group('visual grammar wired into ThemeData (#3948, Epic #3947)', () {
+    for (final (name, theme) in [
+      ('light', AppTheme.light()),
+      ('dark', AppTheme.dark()),
+      ('eco', AppTheme.eco()),
+    ]) {
+      test('$name: choice chips turn primaryContainer when selected and are '
+          'outlined otherwise', () {
+        final cs = theme.colorScheme;
+        final chip = theme.chipTheme;
+        expect(chip.selectedColor, cs.primaryContainer);
+        expect(chip.checkmarkColor, cs.onPrimaryContainer);
+        expect(chip.backgroundColor, cs.surface);
+        expect(chip.padding, Spacing.chipPadding);
+        final side = chip.side! as WidgetStateBorderSide;
+        expect(
+          side.resolve(<WidgetState>{WidgetState.selected})?.color,
+          cs.primary,
+        );
+        expect(side.resolve(<WidgetState>{})?.color, cs.outlineVariant);
+        expect(chip.elevation, 0);
+      });
+
+      test('$name: a bare Card inherits the grammar surface margin', () {
+        expect(theme.cardTheme.margin, Spacing.surfaceMargin);
       });
     }
   });

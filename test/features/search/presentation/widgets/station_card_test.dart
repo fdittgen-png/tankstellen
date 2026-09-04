@@ -14,6 +14,7 @@ import 'package:tankstellen/core/widgets/brand_logo.dart';
 import 'package:tankstellen/core/widgets/station_card_shell.dart';
 import 'package:tankstellen/features/trips/presentation/widgets/proximity_fill_bar.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/theme/spacing.dart';
 import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/core/domain/station_amenity.dart';
 import 'package:tankstellen/features/search/presentation/widgets/amenity_chips.dart';
@@ -1117,7 +1118,7 @@ void main() {
     });
 
     group('card polish (#592)', () {
-      testWidgets('card has 6dp vertical margin (breathing room)', (
+      testWidgets('card carries the grammar surface margin (#3948)', (
         tester,
       ) async {
         await pumpApp(
@@ -1129,14 +1130,12 @@ void main() {
         );
 
         final card = tester.widget<Card>(find.byType(Card).first);
-        expect(
-          card.margin,
-          const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          reason: 'Vertical margin must be 6dp per #592 spec.',
-        );
+        expect(card.margin, Spacing.surfaceMargin);
       });
 
-      testWidgets('card uses elevation 2 in light mode', (tester) async {
+      testWidgets('card is a primary card: outlined, no elevation (#3948)', (
+        tester,
+      ) async {
         await pumpApp(
           tester,
           const StationCard(
@@ -1146,10 +1145,12 @@ void main() {
         );
 
         final card = tester.widget<Card>(find.byType(Card).first);
-        expect(card.elevation, 2.0);
+        expect(card.elevation, 0);
+        final shape = card.shape as RoundedRectangleBorder;
+        expect(shape.side.width, 1);
       });
 
-      testWidgets('card uses elevation 1 in dark mode', (tester) async {
+      testWidgets('card stays flat in dark mode too (#3948)', (tester) async {
         await tester.pumpWidget(
           // #3634 — the card's road-distance Consumer needs a scope.
           ProviderScope(
@@ -1169,7 +1170,7 @@ void main() {
         await tester.pumpAndSettle();
 
         final card = tester.widget<Card>(find.byType(Card).first);
-        expect(card.elevation, 1.0);
+        expect(card.elevation, 0);
       });
 
       testWidgets('card has 12dp rounded corners', (tester) async {
