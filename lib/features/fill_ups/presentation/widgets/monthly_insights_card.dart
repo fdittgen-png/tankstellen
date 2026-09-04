@@ -6,14 +6,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/domain/consumption_unit.dart';
 import '../../../../core/providers/consumption_display_provider.dart';
+import '../../../../core/theme/app_text.dart';
+import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/time_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
+import '../../../../core/widgets/panel_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/services/monthly_insights_aggregator.dart';
 import 'monthly_insights_table.dart';
 
-/// "This month vs last month" card on the Trajets tab landing screen
-/// (#1041 phase 4 — Aggregates surface).
+/// "This month vs last month" panel on the Trajets tab landing screen
+/// (#1041 phase 4 — Aggregates surface); a [PanelCard] since #3950 so the
+/// tank report above it reads as the tab's primary card.
 ///
 /// Renders three or four rows of `(label, current value, previous
 /// value, delta arrow)`:
@@ -51,7 +55,6 @@ class MonthlyInsightsCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     // #3889 — the month figures follow the app-wide consumption unit.
     final unit = ref.watch(consumptionDisplaySettingProvider).unit;
     final reliable = summary.isComparisonReliable;
@@ -123,44 +126,38 @@ class MonthlyInsightsCard extends ConsumerWidget {
           )
         : null;
 
-    return Card(
+    return PanelCard(
       key: const ValueKey('monthly_insights_card'),
-      // #1893 — tighter margin/padding for Trajets-tab space efficiency.
-      margin: const EdgeInsets.fromLTRB(12, 6, 12, 6),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l.consumptionMonthlyInsightsTitle,
+            style: AppText.title(context),
+          ),
+          if (!reliable) ...[
+            const SizedBox(height: Spacing.sm),
             Text(
-              l.consumptionMonthlyInsightsTitle,
-              style: theme.textTheme.titleMedium,
-            ),
-            if (!reliable) ...[
-              const SizedBox(height: 4),
-              Text(
-                l.consumptionMonthlyComparisonNotReliable,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                  fontStyle: FontStyle.italic,
-                ),
+              l.consumptionMonthlyComparisonNotReliable,
+              style: AppText.label(context).copyWith(
+                fontStyle: FontStyle.italic,
               ),
-            ],
-            const SizedBox(height: 5),
-            // #3904 — one table, so the value columns share their widths
-            // across rows and a figure never wraps its unit.
-            MonthlyMetricsTable(
-              metrics: [
-                tripsRow,
-                driveTimeRow,
-                distanceRow,
-                ?climbRow,
-                ?consumptionRow,
-              ],
-              showPreviousColumn: reliable,
             ),
           ],
-        ),
+          const SizedBox(height: Spacing.sm),
+          // #3904 — one table, so the value columns share their widths
+          // across rows and a figure never wraps its unit.
+          MonthlyMetricsTable(
+            metrics: [
+              tripsRow,
+              driveTimeRow,
+              distanceRow,
+              ?climbRow,
+              ?consumptionRow,
+            ],
+            showPreviousColumn: reliable,
+          ),
+        ],
       ),
     );
   }

@@ -3,17 +3,20 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/theme/app_text.dart';
+import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
+import '../../../../core/widgets/panel_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/services/fill_up_monthly_stats_aggregator.dart';
+import 'monthly_insights_table.dart';
 
-/// "This month vs last month" card for the consumption-statistics page
-/// (#2698). Mirrors the Trajets `MonthlyInsightsCard` machinery
-/// (`_MetricRow` / `_DeltaArrow` / `_Sentiment`) but compares fill-up
-/// metrics: total litres, total spent, average price/L, average
-/// L/100km, average cost/km, and fill-ups.
+/// "This month vs last month" panel for the consumption-statistics page
+/// (#2698). Since #3950 it renders the SAME [MonthlyMetricsTable] as the
+/// Trajets `MonthlyInsightsCard` (one table implementation, one
+/// hierarchy) but compares fill-up metrics: total litres, total spent,
+/// average price/L, average L/100km, average cost/km, and fill-ups.
 ///
 /// Δ = current − previous; the percentage is `(Δ / previous) × 100`,
 /// suppressed when the previous figure is zero. Sentiment bands:
@@ -38,107 +41,106 @@ class MonthlyFuelComparisonCard extends StatelessWidget {
     final current = months.isNotEmpty ? months.last.stats : null;
     final previous = hasComparison ? months[months.length - 2].stats : null;
 
-    final rows = <Widget>[
-      _row(
-        context,
+    final metrics = <MonthlyMetric>[
+      _metric(
+        l,
         label: l.statTotalLiters,
         current: current?.totalLiters,
         previous: previous?.totalLiters,
         format: _fmtLiters,
-        sentiment: _Sentiment.neutral,
+        sentiment: MonthlyMetricSentiment.neutral,
         showPrevious: hasComparison,
       ),
-      _row(
-        context,
+      _metric(
+        l,
         label: l.statTotalSpent,
         current: current?.totalSpent,
         previous: previous?.totalSpent,
         format: PriceFormatter.formatTotal,
-        sentiment: _Sentiment.neutral,
+        sentiment: MonthlyMetricSentiment.neutral,
         showPrevious: hasComparison,
       ),
-      _row(
-        context,
+      _metric(
+        l,
         label: l.consumptionStatsPricePerLiter,
         current: current?.avgPricePerLiter,
         previous: previous?.avgPricePerLiter,
         format: PriceFormatter.formatPriceCompact,
-        sentiment: _Sentiment.lowerIsBetter,
+        sentiment: MonthlyMetricSentiment.lowerIsBetter,
         showPrevious: hasComparison,
       ),
-      _row(
-        context,
+      _metric(
+        l,
         label: l.statAvgConsumption,
         current: current?.avgConsumptionL100km,
         previous: previous?.avgConsumptionL100km,
         format: _fmtConsumption,
-        sentiment: _Sentiment.lowerIsBetter,
+        sentiment: MonthlyMetricSentiment.lowerIsBetter,
         showPrevious: hasComparison,
       ),
-      _row(
-        context,
+      _metric(
+        l,
         label: l.statAvgCostPerKm,
         current: current?.avgCostPerKm,
         previous: previous?.avgCostPerKm,
         format: PriceFormatter.formatPerKm,
-        sentiment: _Sentiment.lowerIsBetter,
+        sentiment: MonthlyMetricSentiment.lowerIsBetter,
         showPrevious: hasComparison,
       ),
-      _row(
-        context,
+      _metric(
+        l,
         label: l.statFillUpCount,
         current: current?.fillUpCount.toDouble(),
         previous: previous?.fillUpCount.toDouble(),
         format: _fmtCount,
-        sentiment: _Sentiment.neutral,
+        sentiment: MonthlyMetricSentiment.neutral,
         showPrevious: hasComparison,
       ),
     ];
 
-    return Card(
+    return PanelCard(
       key: const ValueKey('monthly_fuel_comparison_card'),
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l.consumptionStatsComparisonTitle,
+            style: AppText.title(context),
+          ),
+          if (!hasComparison) ...[
+            const SizedBox(height: Spacing.sm),
             Text(
-              l.consumptionStatsComparisonTitle,
-              style: theme.textTheme.titleMedium,
-            ),
-            if (!hasComparison) ...[
-              const SizedBox(height: 4),
-              Text(
-                l.consumptionStatsNeedTwoMonths,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                  fontStyle: FontStyle.italic,
-                ),
+              l.consumptionStatsNeedTwoMonths,
+              style: AppText.label(context).copyWith(
+                fontStyle: FontStyle.italic,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
-            ],
-            const SizedBox(height: 8),
-            for (final row in rows) ...[row, const SizedBox(height: 6)],
+            ),
           ],
-        ),
+          const SizedBox(height: Spacing.md),
+          MonthlyMetricsTable(
+            metrics: metrics,
+            showPreviousColumn: hasComparison,
+          ),
+        ],
       ),
     );
   }
 
-  /// Build a [_MetricRow]. When [current] is null the row is skipped via
-  /// an em-dash; when [previous] is null (or [showPrevious] false) the
-  /// previous column + arrows are hidden. The percentage is suppressed
-  /// when the previous value is zero (division by zero) or absent.
-  Widget _row(
-    BuildContext context, {
+  /// Build one [MonthlyMetric]. When [current] is null the value is an
+  /// em-dash; when [previous] is null (or [showPrevious] false) the
+  /// previous column + arrow are hidden for this row. The percentage is
+  /// suppressed when the previous value is zero (division by zero) or
+  /// absent.
+  MonthlyMetric _metric(
+    AppLocalizations l, {
     required String label,
     required double? current,
     required double? previous,
     required String Function(double?) format,
-    required _Sentiment sentiment,
+    required MonthlyMetricSentiment sentiment,
     required bool showPrevious,
   }) {
-    final l = AppLocalizations.of(context);
     final delta = (current != null && previous != null)
         ? current - previous
         : 0.0;
@@ -150,7 +152,7 @@ class MonthlyFuelComparisonCard extends StatelessWidget {
       final value = '$sign${UnitFormatter.formatDecimal(pct, fractionDigits: 0)}';
       percentText = l.consumptionStatsDeltaPercent(value);
     }
-    return _MetricRow(
+    return MonthlyMetric(
       label: label,
       currentValue: current != null ? format(current) : '—',
       previousValue: previous != null ? format(previous) : '—',
@@ -172,120 +174,3 @@ String _fmtConsumption(double? v) =>
     v == null ? '—' : UnitFormatter.formatDecimal(v);
 
 String _fmtCount(double? v) => v == null ? '—' : v.round().toString();
-
-/// Sentiment band for the trailing delta arrow. `neutral` renders grey
-/// regardless of direction; `lowerIsBetter` is for fuel — down green, up
-/// red. Mirrors `MonthlyInsightsCard._Sentiment`.
-enum _Sentiment { neutral, lowerIsBetter }
-
-/// One labelled row: label, bold current value, muted previous value +
-/// percentage (when [showPrevious]), and a trailing delta arrow. Mirrors
-/// `MonthlyInsightsCard._MetricRow`.
-class _MetricRow extends StatelessWidget {
-  final String label;
-  final String currentValue;
-  final String previousValue;
-  final String? percentText;
-  final double delta;
-  final _Sentiment sentiment;
-  final bool showPrevious;
-
-  const _MetricRow({
-    required this.label,
-    required this.currentValue,
-    required this.previousValue,
-    required this.percentText,
-    required this.delta,
-    required this.sentiment,
-    required this.showPrevious,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Row(
-      children: [
-        Expanded(
-          flex: 3,
-          child: Text(
-            label,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ),
-        Expanded(
-          flex: 2,
-          child: Text(
-            currentValue,
-            textAlign: TextAlign.end,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontFeatures: const [FontFeature.tabularFigures()],
-            ),
-          ),
-        ),
-        if (showPrevious) ...[
-          const SizedBox(width: 8),
-          Expanded(
-            flex: 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  previousValue,
-                  textAlign: TextAlign.end,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
-                ),
-                if (percentText != null)
-                  Text(
-                    percentText!,
-                    textAlign: TextAlign.end,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 4),
-          SizedBox(
-            width: 20,
-            child: _DeltaArrow(delta: delta, sentiment: sentiment),
-          ),
-        ],
-      ],
-    );
-  }
-}
-
-/// Trailing arrow. Hidden when the rounded delta is ~0. Colour follows
-/// [sentiment]: neutral → grey; lowerIsBetter → up = error, down =
-/// success. Mirrors `MonthlyInsightsCard._DeltaArrow`.
-class _DeltaArrow extends StatelessWidget {
-  final double delta;
-  final _Sentiment sentiment;
-
-  const _DeltaArrow({required this.delta, required this.sentiment});
-
-  @override
-  Widget build(BuildContext context) {
-    // Treat sub-0.005 swings as flat so a rounded-equal display doesn't
-    // sprout a coloured arrow.
-    if (delta.abs() < 0.005) return const SizedBox.shrink();
-    final theme = Theme.of(context);
-    final up = delta > 0;
-    final color = switch (sentiment) {
-      _Sentiment.neutral => theme.colorScheme.onSurfaceVariant,
-      _Sentiment.lowerIsBetter =>
-        up ? theme.colorScheme.error : DarkModeColors.success(context),
-    };
-    return Icon(
-      up ? Icons.arrow_upward : Icons.arrow_downward,
-      size: 16,
-      color: color,
-    );
-  }
-}

@@ -231,8 +231,8 @@ class _MetricLine extends StatelessWidget {
 
 /// Sentiment delta arrow for €/km (lowerIsBetter). Hidden when the delta is
 /// ~0 (the winner, or a tie). Up = costlier than the best (error colour);
-/// there is no "down" since the best is the baseline. Mirrors
-/// `MonthlyFuelComparisonCard._DeltaArrow`.
+/// there is no "down" since the best is the baseline. Mirrors the delta
+/// arrow of `MonthlyMetricsTable` (`monthly_insights_table.dart`).
 class _DeltaArrow extends StatelessWidget {
   final double delta;
 

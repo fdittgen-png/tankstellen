@@ -4,11 +4,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+import '../../../../core/theme/app_text.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 
-/// The metric table of `MonthlyInsightsCard` (#3904) — split out of the
-/// card so each file stays well under the 400-line guard. Only the card
-/// builds it; the types are public for that one caller.
+/// The ONE month-over-month metric table (#3904, #3950) — shared by the
+/// Trajets `MonthlyInsightsCard` and the consumption-statistics page's
+/// `MonthlyFuelComparisonCard`, so both render the same hierarchy: the
+/// headline value in the title role, the previous value (and its optional
+/// percentage) in the label role, a tinted delta arrow trailing.
 
 /// Sentiment band for the trailing delta arrow. `neutral` means the
 /// arrow is rendered grey regardless of direction (more activity is
@@ -16,14 +19,18 @@ import '../../../../core/theme/dark_mode_colors.dart';
 /// up red.
 enum MonthlyMetricSentiment { neutral, lowerIsBetter }
 
-/// One labelled metric of the card: the label, the current value, the
-/// previous value (shown when [showPrevious] is true) and the delta that
-/// drives the trailing arrow. Pure data — [MonthlyMetricsTable] renders the
-/// whole list so the value columns line up across rows.
+/// One labelled metric of the table: the label, the current value, the
+/// previous value (shown when [showPrevious] is true), an optional
+/// percentage change rendered under the previous value, and the delta
+/// that drives the trailing arrow. Pure data — [MonthlyMetricsTable]
+/// renders the whole list so the value columns line up across rows.
 class MonthlyMetric {
   final String label;
   final String currentValue;
   final String previousValue;
+
+  /// Already-localized "+12%" under the previous value (#2698), or null.
+  final String? percentText;
   final num delta;
   final MonthlyMetricSentiment sentiment;
   final bool showPrevious;
@@ -32,6 +39,7 @@ class MonthlyMetric {
     required this.label,
     required this.currentValue,
     required this.previousValue,
+    this.percentText,
     required this.delta,
     required this.sentiment,
     required this.showPrevious,
@@ -44,7 +52,11 @@ const double _arrowColumnWidth = 20;
 /// Gap between the label / value / arrow columns.
 const double _columnGap = 8;
 
-/// The metric rows of [MonthlyInsightsCard] as ONE table (#3904).
+/// Swings below this are pump-meter / rounding noise: no arrow. A
+/// displayed-equal pair must never sprout a coloured arrow.
+const double _flatDelta = 0.005;
+
+/// The metric rows of a month card as ONE table (#3904).
 ///
 /// The old layout gave every row a `Row` of fixed-flex `Expanded`
 /// cells (label 3 : current 2 : previous 2), so a value such as
@@ -52,8 +64,8 @@ const double _columnGap = 8;
 /// onto a second line as soon as the card got narrow. Here the two value
 /// columns are [IntrinsicColumnWidth] — they take exactly the space their
 /// widest figure needs — and the label column is the [FlexColumnWidth]
-/// remainder, so the LABEL shrinks first (it wraps onto a second line,
-/// then ellipsises). A value never wraps: it is `softWrap: false`, and in
+/// remainder, so the LABEL gives way (#3950: it never wraps either — one
+/// line, ellipsised). A value never wraps: it is `softWrap: false`, and in
 /// the last resort (a 320 dp phone at a 1.3× font setting) it scales
 /// down inside its cell rather than breaking — see [_ValueCell].
 ///
@@ -74,15 +86,16 @@ class MonthlyMetricsTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final labelStyle = theme.textTheme.bodyMedium?.copyWith(
+    // #3950 — the roles: label (body, muted) < headline (title) and
+    // previous (label). Tabular figures keep the two value columns aligned.
+    final labelStyle = AppText.body(context).copyWith(
       color: theme.colorScheme.onSurfaceVariant,
     );
-    final currentStyle = theme.textTheme.titleMedium?.copyWith(
-      fontFeatures: const [FontFeature.tabularFigures()],
+    final currentStyle = AppText.title(context).copyWith(
+      fontFeatures: const [AppText.tabularFigures],
     );
-    final previousStyle = theme.textTheme.bodyMedium?.copyWith(
-      color: theme.colorScheme.onSurfaceVariant,
-      fontFeatures: const [FontFeature.tabularFigures()],
+    final previousStyle = AppText.label(context).copyWith(
+      fontFeatures: const [AppText.tabularFigures],
     );
 
     return Table(
@@ -101,7 +114,7 @@ class MonthlyMetricsTable extends StatelessWidget {
               _cell(
                 Text(
                   m.label,
-                  maxLines: 2,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: labelStyle,
                 ),
@@ -113,7 +126,11 @@ class MonthlyMetricsTable extends StatelessWidget {
               if (showPreviousColumn)
                 _cell(
                   m.showPrevious
-                      ? _ValueCell(text: m.previousValue, style: previousStyle)
+                      ? _PreviousCell(
+                          value: m.previousValue,
+                          percentText: m.percentText,
+                          style: previousStyle,
+                        )
                       : const SizedBox.shrink(),
                   leading: _columnGap,
                 ),
@@ -136,6 +153,35 @@ class MonthlyMetricsTable extends StatelessWidget {
         padding: EdgeInsets.only(left: leading, top: 3, bottom: 3),
         child: child,
       );
+}
+
+/// The previous-month figure, with the optional percentage change
+/// stacked under it (#2698) — both in the label role, right-aligned.
+class _PreviousCell extends StatelessWidget {
+  final String value;
+  final String? percentText;
+  final TextStyle style;
+
+  const _PreviousCell({
+    required this.value,
+    required this.percentText,
+    required this.style,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final valueCell = _ValueCell(text: value, style: style);
+    final percent = percentText;
+    if (percent == null) return valueCell;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        valueCell,
+        _ValueCell(text: percent, style: style),
+      ],
+    );
+  }
 }
 
 /// A single-line, right-aligned figure that never wraps.
@@ -189,9 +235,10 @@ class _RenderShrinkableCell extends RenderProxyBox {
 }
 
 /// The trailing arrow on a metric row. Hidden when the displayed
-/// values are equal (delta == 0). Colour follows [sentiment]:
+/// values are equal (|delta| below [_flatDelta]). Colour follows
+/// [sentiment]:
 ///   * `neutral`   → grey, both directions
-///   * `lowerIsBetter` → up = error, down = primary
+///   * `lowerIsBetter` → up = error, down = success
 class _DeltaArrow extends StatelessWidget {
   final num delta;
   final MonthlyMetricSentiment sentiment;
@@ -200,7 +247,7 @@ class _DeltaArrow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (delta == 0) return const SizedBox.shrink();
+    if (delta.abs() < _flatDelta) return const SizedBox.shrink();
     final theme = Theme.of(context);
     final up = delta > 0;
     final color = switch (sentiment) {

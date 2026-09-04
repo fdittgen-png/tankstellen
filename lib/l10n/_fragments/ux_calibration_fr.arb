@@ -111,13 +111,6 @@
   "@fillInventorySkipImplausible": {"description": "#3917 — skip reason: implausible pump/recorded ratio."},
   "fillInventoryDismiss": "Compris",
   "@fillInventoryDismiss": {"description": "#3917 — dismiss button of the inventory sheet."},
-  "tankReportResidualAfterCalibration": "Écart après calibrage : {percent} %",
-  "@tankReportResidualAfterCalibration": {
-    "placeholders": {
-      "percent": {"type": "String", "example": "-3"}
-    },
-    "description": "#3918 — tank report: signed residual between the re-expressed recordings and the pump after the current calibration."
-  },
   "tripFuelSourceMeasured": "Mesuré",
   "@tripFuelSourceMeasured": {"description": "#3919 — trip fuel-source chip: fuel rate reported by the ECU."},
   "tripFuelSourceEstimatedCalibrated": "Estimé · calibré",

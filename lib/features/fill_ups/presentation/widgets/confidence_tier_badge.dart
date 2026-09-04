@@ -3,6 +3,9 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_text.dart';
+import '../../../../core/theme/spacing.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/domain/calibration_confidence_tier.dart';
 
@@ -20,6 +23,10 @@ import '../../../vehicle/domain/calibration_confidence_tier.dart';
 /// the trust reads at a glance. The expected-error ± band is kept; the
 /// tooltip is reworded to match (how to improve: add fill-ups → record
 /// an OBD2 trip).
+///
+/// #3950 — sized as ONE small label chip (label role, tight padding,
+/// `AppRadius.sm`) so it sits under the stats-panel title without
+/// forming a second pill row.
 ///
 /// Extracted from `consumption_stats_card.dart` so that file stays
 /// under the 400-line guard (#1680).
@@ -46,21 +53,28 @@ class ConfidenceTierBadge extends StatelessWidget {
     return Tooltip(
       message: spec.tooltip,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        padding: const EdgeInsets.symmetric(
+          horizontal: Spacing.sm + Spacing.xs,
+          vertical: Spacing.xs,
+        ),
         decoration: BoxDecoration(
           color: spec.bg,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadius.sm,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             _LevelMeter(filled: spec.filledDots, color: spec.fg),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: spec.fg,
-                fontWeight: FontWeight.w600,
+            const SizedBox(width: Spacing.sm),
+            // Flexible so an expanded translation at a large font setting
+            // wraps inside the chip instead of overflowing its row.
+            Flexible(
+              child: Text(
+                label,
+                style: AppText.label(context).copyWith(
+                  color: spec.fg,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],

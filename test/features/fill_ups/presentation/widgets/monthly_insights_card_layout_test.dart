@@ -12,6 +12,7 @@ import 'package:tankstellen/features/fill_ups/domain/services/monthly_insights_a
 import 'package:tankstellen/features/fill_ups/presentation/widgets/monthly_insights_card.dart';
 
 import '../../../../helpers/pump_app.dart';
+import '../../../../helpers/text_hierarchy.dart';
 
 const _summary = MonthlyInsightsSummary(
   currentMonthTripCount: 3,
@@ -75,8 +76,8 @@ void main() {
     for (final v in _values) {
       expectSingleLine(tester, v);
     }
-    // The label is the column that gives way: it may wrap (two lines)
-    // and then ellipsise — never the figures.
+    // The label is the column that gives way: #3950 — it NEVER wraps
+    // (one line, ellipsised) — never the figures.
     final labels = tester
         .widgetList<Text>(find.descendant(
           of: find.byType(Table),
@@ -85,9 +86,32 @@ void main() {
         .where((t) => !_values.contains(t.data));
     expect(labels, isNotEmpty);
     for (final label in labels) {
-      expect(label.maxLines, 2);
+      expect(label.maxLines, 1);
       expect(label.overflow, TextOverflow.ellipsis);
     }
+  });
+
+  testWidgets('#3950 — headline values are the largest text in the table; '
+      'previous values and labels are subordinate', (tester) async {
+    await pumpApp(tester, const MonthlyInsightsCard(summary: _summary));
+
+    final currents = ['3', '1h 19', '48 km', '10,1 L/100 km'];
+    expectFocalNumberLargest(
+      tester,
+      within: find.byType(Table),
+      focal: find.text(currents.first),
+      peers: find.byWidgetPredicate(
+        (w) => w is Text && currents.contains(w.data),
+      ),
+    );
+    // Previous values render in the label role: smaller than the labels
+    // (body) too, so the eye reads current → label → previous.
+    final sizes = textFontSizesUnder(tester, find.byType(Table));
+    double sizeOf(String text) => sizes.entries
+        .singleWhere((e) => (e.key.widget as Text).data == text)
+        .value;
+    expect(sizeOf('10,6 L/100 km'), lessThan(sizeOf('10,1 L/100 km')));
+    expect(sizeOf('10,6 L/100 km'), lessThan(sizeOf('Avg consumption')));
   });
 
   testWidgets('values share one column width and keep tabular figures',

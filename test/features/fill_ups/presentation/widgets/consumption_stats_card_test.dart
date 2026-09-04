@@ -16,6 +16,7 @@ import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 
 import '../../../../helpers/pump_app.dart';
+import '../../../../helpers/text_hierarchy.dart';
 
 /// #2262 — the raw η_v chip is gated on `Feature.debugMode`. This stub
 /// flips Developer mode ON so the chip renders; without it the manifest
@@ -694,5 +695,109 @@ void main() {
         expect(find.textContaining('η_v'), findsNothing);
       },
     );
+  });
+
+  // ─── #3950 (Epic #3947) — the visual grammar ────────────────────────
+  //
+  // The panel's stat figures are its focal numbers: a display-derived
+  // style that tops the card title, the tile labels and every caption.
+  // The accuracy badge is ONE small label chip, not a second pill row.
+
+  group('ConsumptionStatsCard — visual grammar (#3950)', () {
+    testWidgets('the stat figure is strictly the largest text on the card '
+        '(tied only with its sibling tiles)', (tester) async {
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(
+          stats: _stats(
+            fillUpCount: 3,
+            totalLiters: 120.0,
+            totalSpent: 198.40,
+            avgConsumptionL100km: 6.4,
+            avgCostPerKm: 0.105,
+            correctionLitersTotal: 2,
+            openWindowFillCount: 1,
+            openWindowLiters: 15,
+          ),
+          volumetricEfficiency: 0.87,
+          volumetricEfficiencySamples: 2,
+          onTap: () {},
+        ),
+        overrides: [_activeVehicle(pumpGain: 0.97, samples: 2)],
+      );
+
+      const figures = ['6.40', '0.105', '120.0', '198.40 £', '3'];
+      expectFocalNumberLargest(
+        tester,
+        within: find.byType(ConsumptionStatsCard),
+        focal: find.text('6.40'),
+        peers: find.byWidgetPredicate(
+          (w) => w is Text && figures.contains(w.data),
+        ),
+      );
+    });
+
+    testWidgets('the accuracy badge is a single label-sized chip under the '
+        'title — no second pill row for normal users', (tester) async {
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(
+          stats: _stats(avgConsumptionL100km: 6.4),
+          volumetricEfficiency: 0.87,
+          volumetricEfficiencySamples: 2,
+        ),
+      );
+
+      final badge = find.textContaining('Accuracy:');
+      expect(badge, findsOneWidget);
+      final sizes = textFontSizesUnder(tester, find.byType(ConsumptionStatsCard));
+      final badgeSize = sizes.entries
+          .singleWhere((e) => e.key == badge.evaluate().single)
+          .value;
+      final titleSize = sizes.entries
+          .singleWhere((e) => (e.key.widget as Text).data == 'Consumption stats')
+          .value;
+      expect(badgeSize, lessThan(titleSize));
+      // The developer-only pump-gain chip is not there to form a row.
+      expect(find.byKey(const Key('pumpGainChip')), findsNothing);
+    });
+
+    testWidgets('en_XA at 320 dp + 1.3x text scale: no overflow',
+        (tester) async {
+      tester.view.physicalSize = const Size(320, 800);
+      tester.view.devicePixelRatio = 1.0;
+      tester.platformDispatcher.textScaleFactorTestValue = 1.3;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+      // The card's real host (the Carburant tab) scrolls; a fixed 800 dp
+      // body would only measure the test font's square glyphs.
+      await pumpApp(
+        tester,
+        SingleChildScrollView(
+          child: ConsumptionStatsCard(
+            stats: _stats(
+              fillUpCount: 12,
+              totalLiters: 1234.5,
+              totalSpent: 2198.40,
+              avgConsumptionL100km: 6.4,
+              avgCostPerKm: 0.105,
+              correctionLitersTotal: 2,
+              openWindowFillCount: 1,
+              openWindowLiters: 15,
+            ),
+            volumetricEfficiency: 0.87,
+            volumetricEfficiencySamples: 2,
+            onTap: () {},
+          ),
+        ),
+        locale: const Locale('en', 'XA'),
+        overrides: [_activeVehicle(pumpGain: 0.97, samples: 2)],
+      );
+
+      expect(tester.takeException(), isNull,
+          reason: 'the stats panel overflows at 320 dp under en_XA / 1.3x');
+    });
   });
 }

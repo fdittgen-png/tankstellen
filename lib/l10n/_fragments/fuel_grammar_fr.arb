@@ -1,0 +1,4 @@
+{
+  "tankReportRecordedSummary": "Les trajets enregistrés couvrent {pct} % de ce plein et consomment en moyenne {value} · écart de {residual} % après calibrage",
+  "tankReportRecordedSummaryNoResidual": "Les trajets enregistrés couvrent {pct} % de ce plein et consomment en moyenne {value}"
+}
