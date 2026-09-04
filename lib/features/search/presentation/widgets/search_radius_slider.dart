@@ -3,7 +3,10 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_text.dart';
+import '../../../../core/theme/spacing.dart';
 import '../../../../l10n/app_localizations.dart';
+import 'criteria/criteria_chip_group.dart';
 
 /// Title row + slider for the search radius (km). Pulled out of
 /// `search_criteria_screen.dart` so the screen's `build` method stays
@@ -43,11 +46,28 @@ class SearchRadiusSlider extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        // #3949 — the section name is the grammar's title role, like the
+        // fuel / amenity / brand headers above and below it; the current
+        // value beside it is the same role in the primary colour.
         Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
           children: [
-            Text('${l10n.searchRadius}:', style: theme.textTheme.titleSmall),
-            const Spacer(),
-            Text('$rounded km', style: theme.textTheme.titleSmall),
+            Expanded(
+              child: Text(
+                l10n.searchRadius,
+                style: AppText.title(context),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: Spacing.md),
+            Text(
+              l10n.searchSummaryRadiusValue('$rounded'),
+              style: AppText.title(context).copyWith(
+                color: theme.colorScheme.primary,
+              ),
+            ),
           ],
         ),
         // #1962 — shrink the slider's reaction overlay so the control
@@ -67,14 +87,18 @@ class SearchRadiusSlider extends StatelessWidget {
           ),
         ),
         Wrap(
-          spacing: 8,
-          runSpacing: 4,
+          spacing: Spacing.md,
+          runSpacing: Spacing.sm,
           children: [
             for (final km in presets)
               ChoiceChip(
                 key: ValueKey('criteria-radius-preset-$km'),
-                label: Text('$km km'),
+                label: Text(l10n.searchSummaryRadiusValue('$km')),
                 selected: rounded == km,
+                // #3949 — the tightened criteria-chip geometry shared with
+                // the fuel group, so both read as one chip role.
+                padding: kCriteriaChipPadding,
+                labelPadding: kCriteriaChipLabelPadding,
                 visualDensity: VisualDensity.compact,
                 onSelected: (_) => onChanged(km.toDouble()),
               ),

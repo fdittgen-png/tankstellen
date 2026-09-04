@@ -50,8 +50,20 @@ import 'results/summary_chip.dart';
 /// The open-data attribution that used to sit above this bar now lives in
 /// the footer under the results list, and the position bar's refresh icon
 /// was folded into the single app-bar refresh.
+///
+/// #3949 (Epic #3947) — the map screen renders this same band above its
+/// map body in place of its old bottom info bar ("25 stations · 25 km ·
+/// < 1 min"): the radius and freshness pills already say two of those
+/// three things, and [stationCount] adds the third as one more summary
+/// chip. The search results screen leaves it null and is unchanged.
 class SearchSummaryBar extends ConsumerWidget {
-  const SearchSummaryBar({super.key});
+  const SearchSummaryBar({super.key, this.stationCount});
+
+  /// When non-null, a summary chip with the number of stations in the
+  /// current result set follows the scope segment. The map passes its
+  /// marker count; the results list — which shows the rows themselves —
+  /// leaves it null.
+  final int? stationCount;
 
   Future<void> _openCriteria(BuildContext context) async {
     final nav = Navigator.of(context);
@@ -188,6 +200,15 @@ class SearchSummaryBar extends ConsumerWidget {
                   tooltip: _fuelTooltip(l10n, fuelType),
                 ),
                 _scopeSegment(context, ref, l10n, mode),
+                // #3949 — the map's station count, one summary chip like
+                // the others; the full sentence rides in the tooltip.
+                if (stationCount != null)
+                  SummaryChip(
+                    key: const Key('search_summary_station_count'),
+                    icon: const Icon(Icons.local_gas_station, size: 14),
+                    label: l10n.nStations(stationCount!),
+                    tooltip: l10n.mapStationCountTooltip(stationCount!),
+                  ),
                 // #3943 — the "where" pill was removed as chrome: with a
                 // known position it only restated the criteria. The
                 // UNKNOWN case is not chrome, though — it warns that

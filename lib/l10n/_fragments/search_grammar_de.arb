@@ -1,0 +1,29 @@
+{
+  "stationCardPriceUnit": "{currency}/l",
+  "@stationCardPriceUnit": {
+    "description": "Unit rendered in the small unit role beside the results card's display-role price (#3949, Epic #3947), e.g. '1,79⁹' followed by '€/L'. {currency} is the station's currency symbol (€, £, $ …) resolved from its origin country; only the per-litre part is translatable (German uses a lowercase 'l').",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "stationCardStatus24h": "{status} · 24 h",
+  "@stationCardStatus24h": {
+    "description": "Tooltip and screen-reader label of the results card's status dot when the station is open around the clock (#3949). {status} is the already-localized open state ('Open', 'Closed' or 'Unknown'); the old separate '24h' badge folded into this tooltip so the card keeps one metadata line.",
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "mapStationCountTooltip": "{count} Tankstellen im aktuellen Ergebnis",
+  "@mapStationCountTooltip": {
+    "description": "Tooltip / screen-reader sentence behind the station-count summary chip that the map header shows above the map (#3949). The visible chip text is the short nStations form; this is the full sentence a long-press reveals.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+}

@@ -184,6 +184,14 @@ void main() {
     for (final scale in [1.5, 2.0, 3.0]) {
       testWidgets('renders multiple station cards at ${scale}x',
           (tester) async {
+        // #3949 — the card leads with a display-role price, so at 3.0x
+        // the default 600 dp test viewport shows two of the three cards;
+        // a taller viewport keeps this a "no overflow" check, not a
+        // lazy-list visibility one.
+        tester.view.physicalSize = const Size(800, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
         await pumpScaledApp(
           tester,
           ListView(

@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../../core/location/user_position_provider.dart';
+import '../../../../core/theme/app_radius.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/services/service_result.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
@@ -23,13 +24,18 @@ import '../../../../core/widgets/shimmer_placeholder.dart';
 
 /// Displays a map of nearby stations from the current search results.
 ///
-/// Layout: station markers fill the body, the bottom info bar pins to
-/// the bottom, and any [ServiceStatusBanner] (cache / fallback /
-/// offline) floats as a Positioned overlay at the top so it never
-/// pushes the map down. Pre-#1428 the banner was the first child of a
-/// Column and produced a visible grey strip between the AppBar and
-/// the map whenever a fallback fired — a permanent ~32 dp tax on
+/// Layout: station markers fill the body, and any [ServiceStatusBanner]
+/// (cache / fallback / offline) floats as a Positioned overlay at the top
+/// so it never pushes the map down. Pre-#1428 the banner was the first
+/// child of a Column and produced a visible grey strip between the AppBar
+/// and the map whenever a fallback fired — a permanent ~32 dp tax on
 /// every "stations were fetched via the secondary API" session.
+///
+/// #3949 (Epic #3947) — the bottom info bar ("25 stations · 25 km ·
+/// < 1 min") is gone. It duplicated the results chrome in a second
+/// visual language under the map; the same three facts now sit in the
+/// `SearchSummaryBar` the `MapScreen` renders ABOVE the map — the radius
+/// and freshness pills it already had, plus a station-count pill.
 class NearbyMapView extends ConsumerStatefulWidget {
   final AsyncValue<dynamic> searchState;
   final dynamic selectedFuel;
@@ -133,39 +139,32 @@ class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
 
         return Stack(
           children: [
-            Column(
-              children: [
-                Expanded(
-                  child: StationMapLayers(
-                    mapController: mapController,
-                    stations: stations,
-                    center: center,
-                    zoom: zoom,
-                    searchRadiusKm: searchRadiusKm,
-                    selectedFuel: selectedFuel as FuelType,
-                    sortMode: sortMode,
-                    // #2998 — adopt the maintainer-loved radar grammar
-                    // (#2939): proximity-cluster EVERY result set with the
-                    // cheapest-price badge, identical to the landscape
-                    // split-screen radar map (InlineMap), instead of the
-                    // legacy emphasis(top-4 pills)+compact-dots scheme. No
-                    // `onStationTap` is passed, so a marker tap keeps its
-                    // default GoRouter push to /station/{id} (the full-screen
-                    // map has no co-visible list to select into); the radius
-                    // circle (`showSearchRadius`, default true) stays drawn.
-                    clusterAlways: true,
-                    showRecenterButton: true,
-                    onRecenter: () => mapController.fitCamera(
-                      CameraFit.bounds(
-                        bounds: bounds,
-                        padding: const EdgeInsets.all(32),
-                      ),
-                    ),
-                    extraLayers: extraLayers,
-                  ),
+            StationMapLayers(
+              mapController: mapController,
+              stations: stations,
+              center: center,
+              zoom: zoom,
+              searchRadiusKm: searchRadiusKm,
+              selectedFuel: selectedFuel as FuelType,
+              sortMode: sortMode,
+              // #2998 — adopt the maintainer-loved radar grammar
+              // (#2939): proximity-cluster EVERY result set with the
+              // cheapest-price badge, identical to the landscape
+              // split-screen radar map (InlineMap), instead of the
+              // legacy emphasis(top-4 pills)+compact-dots scheme. No
+              // `onStationTap` is passed, so a marker tap keeps its
+              // default GoRouter push to /station/{id} (the full-screen
+              // map has no co-visible list to select into); the radius
+              // circle (`showSearchRadius`, default true) stays drawn.
+              clusterAlways: true,
+              showRecenterButton: true,
+              onRecenter: () => mapController.fitCamera(
+                CameraFit.bounds(
+                  bounds: bounds,
+                  padding: const EdgeInsets.all(32),
                 ),
-                _buildInfoBar(context, l10n, stations, result),
-              ],
+              ),
+              extraLayers: extraLayers,
             ),
             // Stale / fallback banner as a floating overlay so it
             // never steals vertical space from the map. Self-hides
@@ -188,53 +187,6 @@ class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
       ),
     );
   }
-
-  Widget _buildInfoBar(
-    BuildContext context,
-    AppLocalizations l10n,
-    List<dynamic> stations,
-    dynamic result,
-  ) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: theme.colorScheme.surfaceContainerHighest,
-      child: Row(
-        children: [
-          Icon(
-            Icons.local_gas_station,
-            size: 16,
-            color: theme.colorScheme.primary,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            l10n.nStations(stations.length),
-            style: theme.textTheme.bodySmall?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Icon(
-            Icons.circle,
-            size: 8,
-            color: theme.colorScheme.primary.withValues(alpha: 0.3),
-          ),
-          const SizedBox(width: 4),
-          Text(
-            '${widget.searchRadiusKm.round()} km ${l10n.searchRadius}',
-            style: theme.textTheme.bodySmall,
-          ),
-          const Spacer(),
-          Text(
-            result.freshnessLabel as String,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 /// Floating wrapper for [ServiceStatusBanner] used by the map view.
@@ -246,8 +198,8 @@ class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
 /// chip overlaying the map rather than a full-bleed strip cutting the
 /// screen in half. [SafeArea] keeps the chip clear of the AppBar's
 /// shadow without inflating its size when the AppBar already provides
-/// its own SafeArea padding (the bottom side is disabled — the bottom
-/// info bar already pins to the safe area).
+/// its own SafeArea padding (the bottom side is disabled — the banner
+/// hugs the top edge only).
 class _OverlayBanner extends StatelessWidget {
   final dynamic result;
 
@@ -259,7 +211,7 @@ class _OverlayBanner extends StatelessWidget {
       bottom: false,
       child: Material(
         elevation: 4,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: AppRadius.md,
         clipBehavior: Clip.antiAlias,
         child: ServiceStatusBanner(result: result as ServiceResult<dynamic>),
       ),

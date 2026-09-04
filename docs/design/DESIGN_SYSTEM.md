@@ -302,6 +302,14 @@ as `AppText.unit` beside it, everything else subordinate. Empty states
 collapse the chrome above them: zero items means no stats strip and no
 `(0)` headers — one empty state, one primary action.
 
+### Applied: search results card, criteria sheet, map (#3949)
+
+| Surface | Grammar applied |
+| --- | --- |
+| `StationCard` | Headline row = brand mark + `display` price + `unit` (`€/L`, baseline-aligned) + tier arrow, Cheapest badge and ★ trailing. Then `title` (name), `body` (address), ONE `label` line `distance · Updated · ●`. The status dot's tooltip/semantics carry open/closed/unknown **and** the 24 h flag — no separate badges. Single-price card ≤ 150 dp at 320 dp (`station_card_grammar_test.dart`). The price never truncates: it scales down whole (`FittedBox`) before it ellipsises. |
+| Criteria sheet | Section headers are `AppText.title`; fuel + radius chips use the tightened `kCriteriaChipPadding` / `kCriteriaChipLabelPadding` / `kCriteriaChipAvatarBox` so each group fits ≤ 2 rows in the 288 dp form width at 320 dp; `CriteriaActionBar` is one row — text-action Reset beside the full-width Search. |
+| Map | **One price encoding = colour.** `PriceLegend` is a single line `cheap ━ramp━ expensive` — the `PriceBandColors.ramp` bar's ends *are* the swatches; no tier arrows, no dots. The ↓ – ↑ arrow stays on markers and cards (a11y). The bottom info bar is gone; `MapScreen` renders the `SearchSummaryBar` above the map with a station-count summary chip. |
+
 ---
 
 ## Semantic colors

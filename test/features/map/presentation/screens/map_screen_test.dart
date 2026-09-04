@@ -5,10 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:tankstellen/core/domain/search_result_item.dart';
 import 'package:tankstellen/core/navigation/current_shell_branch_provider.dart';
+import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/widgets/page_scaffold.dart';
 import 'package:tankstellen/features/map/presentation/screens/map_screen.dart';
 import 'package:tankstellen/features/map/presentation/widgets/nearby_map_view.dart';
+import 'package:tankstellen/features/search/presentation/widgets/search_summary_bar.dart';
+import 'package:tankstellen/features/search/providers/search_provider.dart';
+
+import '../../../../fixtures/stations.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
@@ -161,4 +167,69 @@ void main() {
       },
     );
   });
+
+  // #3949 (Epic #3947) — the map's bottom info bar ("25 stations · 25 km ·
+  // < 1 min") is gone; the results chrome's SearchSummaryBar sits above the
+  // map instead and carries the station count as one more summary chip.
+  group('MapScreen — summary bar header (#3949)', () {
+    testWidgets('renders the SearchSummaryBar above the map once Carte is '
+        'visible, and not while offstage', (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const MapScreen(),
+        overrides: [...test.overrides, userPositionNullOverride()],
+      );
+      expect(find.byType(SearchSummaryBar), findsNothing);
+
+      await _goBranch(tester, _mapBranchIndex);
+      expect(find.byType(SearchSummaryBar), findsOneWidget);
+      final barBottom = tester.getBottomLeft(find.byType(SearchSummaryBar)).dy;
+      final mapTop = tester.getTopLeft(find.byType(NearbyMapView)).dy;
+      expect(barBottom, lessThanOrEqualTo(mapTop));
+    });
+
+    testWidgets('the station count is a summary chip in the header; the old '
+        'bottom bar is gone', (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const MapScreen(),
+        overrides: [
+          ...test.overrides,
+          userPositionNullOverride(),
+          searchStateProvider.overrideWith(_ThreeStationsSearchState.new),
+        ],
+      );
+      await _goBranch(tester, _mapBranchIndex);
+
+      final chip = find.byKey(const Key('search_summary_station_count'));
+      expect(chip, findsOneWidget);
+      expect(find.text('3 stations'), findsOneWidget);
+      // The count lives in the header band, above the map body.
+      expect(
+        tester.getBottomLeft(chip).dy,
+        lessThanOrEqualTo(tester.getTopLeft(find.byType(NearbyMapView)).dy),
+      );
+      // No second rendering of the count anywhere below the map.
+      expect(find.textContaining('stations'), findsOneWidget);
+    });
+  });
+}
+
+/// A landed nearby search with three fuel stations, so the header can
+/// count them.
+class _ThreeStationsSearchState extends SearchState {
+  @override
+  AsyncValue<ServiceResult<List<SearchResultItem>>> build() => AsyncValue.data(
+        ServiceResult(
+          data: [for (final s in testStationList) FuelStationResult(s)],
+          source: ServiceSource.tankerkoenigApi,
+          fetchedAt: DateTime(2026, 9, 4, 12),
+        ),
+      );
 }

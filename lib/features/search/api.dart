@@ -21,6 +21,7 @@ export 'presentation/screens/search_screen.dart';
 export 'presentation/widgets/amenity_chips.dart';
 export 'presentation/widgets/pay_with_app_button.dart';
 export 'presentation/widgets/payment_method_chips.dart';
+export 'presentation/widgets/search_summary_bar.dart';
 export 'presentation/widgets/sort_selector.dart';
 export 'presentation/widgets/station_card.dart';
 export 'providers/ev_charging_service_provider.dart';

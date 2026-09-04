@@ -3,254 +3,196 @@
 
 part of 'station_card.dart';
 
-/// Status dot (green/red/neutral) with optional 24h badge below it.
-class _StatusColumn extends StatelessWidget {
+/// The card's single **label**-role metadata line (#3949):
+/// `distance · Updated {time} · ●`.
+///
+/// The status dot is the open / closed / unknown state (#3198 tri-state:
+/// unknown is the neutral muted dot, never red); its tooltip and
+/// semantics carry the localized state and — when the station is open
+/// around the clock — the 24 h flag that used to be a separate badge. Both
+/// text segments are `Flexible` with ellipsis so a raised text scale or an
+/// expanded translation truncates the timestamp first and the distance
+/// second, never overflowing the row.
+class _MetaLine extends StatelessWidget {
   final Station station;
 
-  const _StatusColumn({required this.station});
+  /// The localized open state the card already computed for its own
+  /// semantic label — reused for the dot so the two never disagree.
+  final String semanticStatus;
 
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            // #3198 — tri-state: an unknown open state renders the neutral
-            // muted dot, never the red "closed" one.
-            color: switch (station.isOpen) {
-              true => DarkModeColors.success(context),
-              false => DarkModeColors.error(context),
-              null => DarkModeColors.mutedText(context),
-            },
-          ),
-        ),
-        if (station.is24h)
-          Padding(
-            padding: const EdgeInsets.only(top: 2),
-            child: Text(
-              '24h',
-              style: TextStyle(
-                fontSize: 9,
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.primary,
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-/// Left-side text block: brand/name title, address line, distance / updated
-/// indicator, and amenity chips.
-class _StationDetails extends StatelessWidget {
-  final Station station;
-  final bool hasBrand;
-
-  /// #2899/#2995 — when non-null, the Fuel Station Radar "closeness" bar is
-  /// rendered under the distance row, scaled to this radius in metres. The radar
-  /// list passes the user's APPROACH RADIUS (`profile.approachRadiusKm * 1000`),
-  /// the SAME base the recording radar card + PiP use, so all three surfaces are
-  /// consistent on the user's approach-radius base. Null on the regular search
-  /// list, so the card is unchanged there.
-  final double? closenessRadiusMeters;
-
-  /// #3905 — amber "Updated …" line + "Old price" badge (see
+  /// #3905 — amber "Updated …" segment + "Old price" badge (see
   /// [StationCard.isStalePrice]).
   final bool isStalePrice;
 
-  const _StationDetails({
+  const _MetaLine({
     required this.station,
-    required this.hasBrand,
-    this.closenessRadiusMeters,
-    this.isStalePrice = false,
+    required this.semanticStatus,
+    required this.isStalePrice,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
-    // #2926 — title fallback brand → name → localized "Unbranded station".
-    // The raw street is NEVER the title: it is the address subtitle below, so
-    // promoting it to the title read as a broken duplicate (e.g. "26 AVENUE DE
-    // VERDUN" shown as the station "name", repeated on the next line). An
-    // unbranded forecourt that carries a real name (e.g. a Mexican CRE company
-    // name) still shows that name; one with no brand AND no name gets the
-    // localized label, and the street drops to the address line instead.
-    final useName = !hasBrand && station.name.isNotEmpty;
-    final titleText = hasBrand
-        ? station.brand
-        : useName
-        ? station.name
-        : (l10n.stationUnbrandedTitle);
-    // The street is shown on the address line whenever it is NOT the title —
-    // i.e. for a branded station (it was already), and now also for the
-    // unbranded label case (the street is no longer hoisted to the title).
-    final showStreetInAddress = hasBrand || !useName;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
+    final style = AppText.label(context);
+    final statusTooltip = station.is24h
+        ? l10n.stationCardStatus24h(semanticStatus)
+        : semanticStatus;
+    return Row(
       children: [
-        // #2161 — was a Hero flight to the detail-screen title; the
-        // detail screen no longer shows the station name in its AppBar
-        // and no longer animates the title, so the source Hero is
-        // dropped too. Plain Text only.
-        Text(
-          titleText,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
+        Flexible(
+          flex: 2,
+          child: _DistanceSegment(station: station, style: style),
         ),
-        const SizedBox(height: Spacing.xs),
-        Text(
-          _addressLine(station, showStreetInAddress),
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
+        if (station.updatedAt != null) ...[
+          _Separator(style: style),
+          Flexible(
+            flex: 3,
+            child: _UpdatedRow(
+              updatedAt: station.updatedAt!,
+              isStalePrice: isStalePrice,
+            ),
           ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        const SizedBox(height: Spacing.xs),
-        Row(
-          children: [
-            // #2622 — distance gets priority in this cramped row; the
-            // timestamp (Flexible, higher flex) is what wraps/ellipsises
-            // first. #3662 — the distance is Flexible too (low flex +
-            // ellipsis) so a user-raised text scale degrades to a
-            // truncated timestamp, never a RenderFlex overflow.
-            // #3634 — when the OSRM table has answered for this station,
-            // the REAL road distance replaces the crow-flies figure (the
-            // route icon marks the difference); otherwise the haversine
-            // value stands as always.
-            Flexible(
-              child: Consumer(
-                builder: (context, ref, _) {
-                  final roadKm = ref.watch(
-                    roadDistancesProvider.select((m) => m[station.id]),
-                  );
-                  if (roadKm == null) {
-                    return Text(
-                      PriceFormatter.formatDistance(station.dist),
-                      style: theme.textTheme.bodySmall,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    );
-                  }
-                  return Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.route,
-                        size: 12,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      const SizedBox(width: 2),
-                      Flexible(
-                        child: Text(
-                          PriceFormatter.formatDistance(roadKm),
-                          style: theme.textTheme.bodySmall,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  );
+        ],
+        const SizedBox(width: Spacing.md),
+        Tooltip(
+          key: const Key('station_card_status_dot'),
+          message: statusTooltip,
+          child: Semantics(
+            label: statusTooltip,
+            child: Container(
+              width: 12,
+              height: 12,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: switch (station.isOpen) {
+                  true => DarkModeColors.success(context),
+                  false => DarkModeColors.error(context),
+                  null => DarkModeColors.mutedText(context),
                 },
               ),
             ),
-            if (station.updatedAt != null) ...[
-              const SizedBox(width: 8),
-              Flexible(
-                flex: 3,
-                child: _UpdatedRow(
-                  updatedAt: station.updatedAt!,
-                  isStalePrice: isStalePrice,
-                ),
-              ),
-            ],
-          ],
-        ),
-        // #3633 — highway mode v2: "via exit {ref} · +{km} km" under the
-        // distance row when the radar's exit layer annotated this
-        // station (same side-channel pattern as roadDistancesProvider).
-        // Absent off-highway / for on-road service areas / when the
-        // exits asset hasn't loaded — the row simply doesn't render.
-        Consumer(
-          builder: (context, ref, _) {
-            final info = ref.watch(
-              highwayExitInfoMapProvider.select((m) => m[station.id]),
-            );
-            if (info == null) return const SizedBox.shrink();
-            return Padding(
-              padding: const EdgeInsets.only(top: 2),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.fork_right,
-                    size: 12,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: 2),
-                  Flexible(
-                    child: Text(
-                      l10n.highwayViaExit(
-                        info.exitLabel,
-                        UnitFormatter.formatDecimal(info.detourKm),
-                      ),
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-        // #2899/#2984 — Fuel Station Radar closeness bar: the SAME green→accent
-        // [ProximityFillBar] the trip radar card + PiP overlay use, so all
-        // three radar surfaces fill identically as the driver nears a station.
-        // `station.dist` is the great-circle distance in km → metres for the
-        // bar; it scales to an ABSOLUTE fixed radius (`closenessRadiusMeters` =
-        // min(searchRadius, cap), see [StationCard]), so closer = fuller and a
-        // given station's fill is stable across result-set changes. Live: the
-        // radar re-stamps `dist` on each scan, so the bar re-fills as the user
-        // moves — the SCALE stays put, only the distance changes.
-        if (closenessRadiusMeters != null) ...[
-          const SizedBox(height: Spacing.xs),
-          ProximityFillBar(
-            distanceMeters: station.dist * 1000.0,
-            radiusMeters: closenessRadiusMeters,
           ),
-        ],
-        if (station.amenities.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(top: 2),
-            child: AmenityChips(amenities: station.amenities),
-          ),
+        ),
       ],
     );
   }
 }
 
-/// The "Updated {time}" freshness row (#2622). #3905 — when
+/// The middle-dot between two metadata segments.
+class _Separator extends StatelessWidget {
+  final TextStyle style;
+
+  const _Separator({required this.style});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.sm),
+      // A language-neutral punctuation glyph, not a translatable string.
+      child: Text('·', style: style),
+    );
+  }
+}
+
+/// The distance segment. #3634 — when the OSRM table has answered for
+/// this station, the REAL road distance replaces the crow-flies figure
+/// (the route icon marks the difference); otherwise the haversine value
+/// stands as always.
+class _DistanceSegment extends StatelessWidget {
+  final Station station;
+  final TextStyle style;
+
+  const _DistanceSegment({required this.station, required this.style});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer(
+      builder: (context, ref, _) {
+        final roadKm = ref.watch(
+          roadDistancesProvider.select((m) => m[station.id]),
+        );
+        if (roadKm == null) {
+          return Text(
+            PriceFormatter.formatDistance(station.dist),
+            style: style,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          );
+        }
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.route, size: 12, color: style.color),
+            const SizedBox(width: Spacing.xs),
+            Flexible(
+              child: Text(
+                PriceFormatter.formatDistance(roadKm),
+                style: style,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// #3633 — highway mode v2: "via exit {ref} · +{km} km" under the meta
+/// line when the radar's exit layer annotated this station (same
+/// side-channel pattern as roadDistancesProvider). Absent off-highway /
+/// for on-road service areas / when the exits asset hasn't loaded — the
+/// line simply doesn't render.
+class _HighwayExitLine extends StatelessWidget {
+  final Station station;
+
+  const _HighwayExitLine({required this.station});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final style = AppText.label(context);
+    return Consumer(
+      builder: (context, ref, _) {
+        final info = ref.watch(
+          highwayExitInfoMapProvider.select((m) => m[station.id]),
+        );
+        if (info == null) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.only(top: Spacing.xs),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.fork_right, size: 12, color: style.color),
+              const SizedBox(width: Spacing.xs),
+              Flexible(
+                child: Text(
+                  l10n.highwayViaExit(
+                    info.exitLabel,
+                    UnitFormatter.formatDecimal(info.detourKm),
+                  ),
+                  style: style,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// The "Updated {time}" freshness segment (#2622). #3905 — when
 /// [isStalePrice] is set the icon + text switch to the tertiary (amber)
 /// colour and a small "Old price" badge follows, so a weeks-old price no
 /// longer reads like a fresh one. A [Wrap] hosts the two: the badge sits
-/// beside the timestamp when the column has room and drops under it
+/// beside the timestamp when the line has room and drops under it
 /// otherwise (expanded translations, raised text scale, 320 dp) — a
 /// Wrap never overflows horizontally, and the badge text itself
-/// ellipsises inside the column width as a last resort.
+/// ellipsises inside the segment width as a last resort.
 class _UpdatedRow extends StatelessWidget {
   final String updatedAt;
   final bool isStalePrice;
@@ -261,9 +203,10 @@ class _UpdatedRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
-    final color = isStalePrice
-        ? theme.colorScheme.tertiary
-        : theme.colorScheme.onSurfaceVariant;
+    final base = AppText.label(context);
+    final style = isStalePrice
+        ? base.copyWith(color: theme.colorScheme.tertiary)
+        : base;
     return Wrap(
       spacing: Spacing.xs,
       runSpacing: 2,
@@ -272,7 +215,7 @@ class _UpdatedRow extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.update, size: 12, color: color),
+            Icon(Icons.update, size: 12, color: style.color),
             const SizedBox(width: Spacing.xs),
             Flexible(
               child: Text(
@@ -281,7 +224,8 @@ class _UpdatedRow extends StatelessWidget {
                 // code. (No relative "2h ago": updatedAt is a lossy,
                 // per-country pre-formatted String.)
                 l10n.stationUpdatedLabel(updatedAt),
-                style: theme.textTheme.bodySmall?.copyWith(color: color),
+                style: style,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -290,14 +234,17 @@ class _UpdatedRow extends StatelessWidget {
         if (isStalePrice)
           Container(
             key: const Key('station_card_stale_price_badge'),
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+            padding: const EdgeInsets.symmetric(
+              horizontal: Spacing.sm,
+              vertical: 1,
+            ),
             decoration: BoxDecoration(
               color: theme.colorScheme.tertiaryContainer,
               borderRadius: AppRadius.sm,
             ),
             child: Text(
               l10n.stalePriceBadge,
-              style: theme.textTheme.labelSmall?.copyWith(
+              style: base.copyWith(
                 color: theme.colorScheme.onTertiaryContainer,
                 fontWeight: FontWeight.bold,
               ),
@@ -310,7 +257,7 @@ class _UpdatedRow extends StatelessWidget {
   }
 }
 
-/// Build the address subtitle line, collapsing empty parts so the line never
+/// Build the address line, collapsing empty parts so the line never
 /// shows an orphan comma (#2704). [includeStreet] adds the street as the first
 /// segment (for branded stations and the unbranded-label case, where the
 /// street is no longer the title — #2926); the city block is always

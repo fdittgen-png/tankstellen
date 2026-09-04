@@ -3,7 +3,31 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../../core/theme/spacing.dart';
 import '../../../../../l10n/app_localizations.dart';
+
+/// Chip padding for the criteria sheet's **choice** chips (#3949, Epic
+/// #3947): tighter than the theme's default so the fuel and radius groups
+/// each fit in at most two rows at 320 dp. The chip role — outlined,
+/// `primaryContainer` when selected — is unchanged; only the geometry is.
+const EdgeInsets kCriteriaChipPadding = EdgeInsets.symmetric(
+  horizontal: Spacing.sm,
+  vertical: Spacing.xs,
+);
+
+/// Label padding paired with [kCriteriaChipPadding] — half the Material
+/// default, so a chip is its text plus one small gutter each side.
+const EdgeInsets kCriteriaChipLabelPadding = EdgeInsets.symmetric(
+  horizontal: Spacing.sm,
+);
+
+/// The avatar slot for a criteria chip's 12 dp fuel dot (or its selected
+/// checkmark): Material reserves 24 dp, which was a third of the chrome on
+/// every fuel chip.
+const BoxConstraints kCriteriaChipAvatarBox = BoxConstraints.tightFor(
+  width: 16,
+  height: 16,
+);
 
 /// A wrapping group of criteria chips with a "Show more (n)" affordance
 /// (#3927, Epic #3925).

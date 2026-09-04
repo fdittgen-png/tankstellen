@@ -17,8 +17,10 @@ import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/widgets/service_status_banner.dart';
 import 'package:tankstellen/core/time/app_clock.dart';
+import 'package:tankstellen/core/utils/price_tier.dart';
 import 'package:tankstellen/features/fill_ups/domain/services/monthly_insights_aggregator.dart';
 import 'package:tankstellen/features/fill_ups/presentation/widgets/monthly_insights_card.dart';
+import 'package:tankstellen/features/map/presentation/widgets/price_legend.dart';
 import 'package:tankstellen/features/obd2/api.dart';
 import 'package:tankstellen/features/obd2/domain/fuel_mixture_model.dart';
 import 'package:tankstellen/features/price_history/data/repositories/price_history_repository.dart';
@@ -36,6 +38,7 @@ import 'package:tankstellen/features/search/presentation/widgets/criteria/criter
 import 'package:tankstellen/features/search/presentation/widgets/fuel_type_selector.dart';
 import 'package:tankstellen/features/search/presentation/widgets/results/results_row.dart';
 import 'package:tankstellen/features/search/presentation/widgets/search_mode_toggle.dart';
+import 'package:tankstellen/features/search/presentation/widgets/search_radius_slider.dart';
 import 'package:tankstellen/features/search/presentation/widgets/search_summary_bar.dart';
 import 'package:tankstellen/features/search/presentation/widgets/station_card.dart';
 import 'package:tankstellen/features/search/providers/all_prices_comparison_model.dart';
@@ -115,6 +118,26 @@ const _allPricesStation = Station(
   e85: 0.839,
   lpg: 0.959,
   isOpen: true,
+);
+
+/// #3949 — a round-the-clock station with a timestamp, so the card's one
+/// label line carries every segment (distance · Updated · status dot) and
+/// the headline row carries the tier arrow, the Cheapest badge and the star.
+const _station24h = Station(
+  id: 'de-24h',
+  name: 'Nachttankstelle',
+  brand: 'ARAL',
+  street: 'Leipziger Str.',
+  postCode: '10117',
+  place: 'Berlin',
+  lat: 52.51,
+  lng: 13.39,
+  dist: 0.5,
+  e10: 1.809,
+  diesel: 1.669,
+  isOpen: true,
+  is24h: true,
+  updatedAt: '10:30',
 );
 
 List<Object> _allPricesOverrides() => <Object>[
@@ -868,6 +891,71 @@ void main() {
 
     testWidgets('CriteriaOptionRow — 1.3x', (tester) async {
       await pumpScaled(tester, optionRow(), widgetName: 'CriteriaOptionRow');
+    });
+
+    // #3949 — the radius block: title-role header + value on one row, the
+    // preset chips in the tightened criteria geometry.
+    Widget radiusSlider() =>
+        SearchRadiusSlider(radiusKm: 10, onChanged: (_) {});
+
+    testWidgets('SearchRadiusSlider — pseudo-locale', (tester) async {
+      await pumpPseudo(
+        tester,
+        radiusSlider(),
+        widgetName: 'SearchRadiusSlider',
+      );
+    });
+
+    testWidgets('SearchRadiusSlider — 1.3x', (tester) async {
+      await pumpScaled(
+        tester,
+        radiusSlider(),
+        widgetName: 'SearchRadiusSlider',
+      );
+    });
+  });
+
+  // #3949 — the map's one-line price legend and the station-count chip the
+  // map header adds to the summary bar.
+  group('Map chrome (#3949)', () {
+    testWidgets('PriceLegend — pseudo-locale', (tester) async {
+      await pumpPseudo(tester, const PriceLegend(), widgetName: 'PriceLegend');
+    });
+
+    testWidgets('PriceLegend — 1.3x', (tester) async {
+      await pumpScaled(tester, const PriceLegend(), widgetName: 'PriceLegend');
+    });
+
+    testWidgets('StationCard with the 24 h status tooltip — pseudo-locale', (
+      tester,
+    ) async {
+      await pumpPseudo(
+        tester,
+        const StationCard(
+          station: _station24h,
+          selectedFuelType: FuelType.e10,
+          isCheapest: true,
+          isFavorite: true,
+          priceTier: PriceTier.cheap,
+        ),
+        widgetName: 'StationCard (cheapest, 24 h)',
+      );
+    });
+
+    testWidgets('StationCard with the 24 h status tooltip — 1.3x', (
+      tester,
+    ) async {
+      await pumpScaled(
+        tester,
+        const StationCard(
+          station: _station24h,
+          selectedFuelType: FuelType.e10,
+          isCheapest: true,
+          isFavorite: true,
+          priceTier: PriceTier.cheap,
+        ),
+        widgetName: 'StationCard (cheapest, 24 h)',
+      );
     });
   });
 

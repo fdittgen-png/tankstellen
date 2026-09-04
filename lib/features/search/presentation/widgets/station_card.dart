@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../../core/country/country_config.dart';
 import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_text.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/theme/spacing.dart';
@@ -30,10 +31,34 @@ import '../../providers/road_distance_provider.dart';
 import '../../../../core/services/radar/motorway_exits_provider.dart';
 import '../../../../core/utils/unit_formatter.dart';
 
+part 'station_card_badges.dart';
 part 'station_card_price_column.dart';
 part 'station_card_price_row.dart';
 part 'station_card_status.dart';
 
+/// One station in the results list, laid out against the visual grammar
+/// (#3949, Epic #3947).
+///
+/// The card leads with its **display**-role number — the selected fuel's
+/// price, top-left, with the brand mark beside it and the `€/L` unit on
+/// its baseline — because the price is the one thing a result row is
+/// about. Everything else is subordinate and reads in order:
+///
+///   1. price (+ tier arrow for colour-blind users) · Cheapest · ★
+///   2. station name in the **title** role (+ the user's rating)
+///   3. address in the **body** role
+///   4. one **label** line: distance · freshness · status dot
+///
+/// The old layout had no focal number: a bold-ish 22 sp price sat in a
+/// right-hand column beside a bold title, two `24h` / open badges competed
+/// with it, and the whole card was a `Row` of three columns whose heights
+/// never agreed. The 24 h flag and the open / closed / unknown state now
+/// live in the status dot's tooltip and semantics (nothing is lost, there
+/// is just no separate badge), so a single-price card stays under 150 dp
+/// at 320 dp — `station_card_grammar_test.dart` pins that.
+///
+/// Every public parameter is unchanged; callers (search list, favourites,
+/// radar list) are untouched.
 class StationCard extends StatelessWidget {
   final Station station;
   final FuelType selectedFuelType;
@@ -48,7 +73,8 @@ class StationCard extends StatelessWidget {
   final PriceTier? priceTier;
 
   /// Optional user rating (1-5) for this station.
-  /// When provided, small star icons are shown above the price area.
+  /// When provided, small star icons are shown at the end of the title
+  /// line.
   final int? rating;
 
   /// The user's preferred fuel type from their profile.
@@ -60,7 +86,7 @@ class StationCard extends StatelessWidget {
   /// Active loyalty/fuel-club discounts keyed by canonical brand
   /// string (#1120 pilot). When this station's brand canonicalizes to
   /// a key in the map and the per-litre discount is positive, the
-  /// price column renders an effective price (raw − discount) plus a
+  /// headline renders an effective price (raw − discount) plus a
   /// `−€0.05` badge. Stations whose brand isn't in the map render
   /// unchanged. Callers typically pass
   /// `ref.watch(activeDiscountByBrandProvider)` after collapsing to
@@ -81,7 +107,7 @@ class StationCard extends StatelessWidget {
   /// PiP overlay, so all three radar surfaces share one fill metaphor.
   final double? closenessRadiusMeters;
 
-  /// #3905 — when true the "Updated …" line is rendered in the tertiary
+  /// #3905 — when true the "Updated …" segment is rendered in the tertiary
   /// (amber) colour with a small "Old price" badge, telling the user the
   /// shown price is older than the caller's staleness threshold. The
   /// Favorites list is the only caller today (its cards are re-read for
@@ -160,6 +186,19 @@ class StationCard extends StatelessWidget {
     lng: station.lng,
   )?.currencySymbol;
 
+  /// #2926 — title fallback brand → name → localized "Unbranded station".
+  /// The raw street is NEVER the title: it is the address line below, so
+  /// promoting it to the title read as a broken duplicate (e.g. "26 AVENUE DE
+  /// VERDUN" shown as the station "name", repeated on the next line). An
+  /// unbranded forecourt that carries a real name (e.g. a Mexican CRE company
+  /// name) still shows that name; one with no brand AND no name gets the
+  /// localized label, and the street drops to the address line instead.
+  String _titleText(AppLocalizations l10n) {
+    if (_hasBrand) return station.brand;
+    if (station.name.isNotEmpty) return station.name;
+    return l10n.stationUnbrandedTitle;
+  }
+
   @override
   Widget build(BuildContext context) {
     final price = _displayPrice;
@@ -176,17 +215,26 @@ class StationCard extends StatelessWidget {
       false => l10n.closed,
       null => l10n.openStateUnknown,
     };
-    final semanticLabel =
-        '${_hasBrand ? station.brand : station.name}, ${station.street}, '
-        '$formattedPrice, $semanticStatus';
+    final semanticLabel = <String>[
+      _hasBrand ? station.brand : station.name,
+      station.street,
+      formattedPrice,
+      semanticStatus,
+      // #3949 — the 24 h flag left the visible chrome for the status dot's
+      // tooltip; the row's own label keeps announcing it.
+      if (station.is24h) l10n.open24h,
+    ].join(', ');
 
-    final fuelColor = FuelColors.forType(selectedFuelType);
     // #2493 — the stripe (unlike the price-text tint) uses the visible
     // all-fuels colour so a `FuelType.all` card no longer shows the near-
     // invisible neutral grey. Cheapest still wins with the success stripe.
     final stripeColor = isCheapest
         ? DarkModeColors.success(context)
         : FuelColors.stripeColor(context, selectedFuelType);
+    final titleText = _titleText(l10n);
+    // The street is shown on the address line whenever it is NOT the title
+    // — for a branded station, and for the unbranded-label case.
+    final showStreetInAddress = _hasBrand || station.name.isEmpty;
 
     return Semantics(
       label: semanticLabel,
@@ -196,57 +244,105 @@ class StationCard extends StatelessWidget {
         stripeColor: stripeColor,
         stripeWidth: isCheapest ? 6 : 4,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+          padding: const EdgeInsets.fromLTRB(
+            Spacing.lg,
+            Spacing.md,
+            Spacing.md,
+            Spacing.md,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              if (_brandMark != null) ...[
-                // The row's own semantic label already names the brand;
-                // letting the mark announce it again would read the
-                // brand twice on every card.
-                ExcludeSemantics(
-                  child: // #3940 — the slot stays SQUARE here. A wide Commons wordmark
-                  // (Fastned 7.6:1) would read better in a wider box, but this
-                  // row has no width to give: at 320 dp under a 1.3x text
-                  // scale a 2x slot overflows the card by 2.4 px, and a
-                  // LayoutBuilder cannot measure the room because a Row lays
-                  // its non-flex children out unbounded. The brand name sits
-                  // beside the mark anyway, so recognition does not rest on
-                  // the logo alone. `BrandLogo.maxWidthFactor` stays available
-                  // for a surface that does have the room.
-                  BrandLogo(brand: station.brand, size: 34),
-                ),
-                const SizedBox(width: 10),
-              ],
-              _StatusColumn(station: station),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _StationDetails(
-                  station: station,
-                  hasBrand: _hasBrand,
-                  closenessRadiusMeters: closenessRadiusMeters,
-                  isStalePrice: isStalePrice,
-                ),
-              ),
-              const SizedBox(width: 8),
-              _StationPriceColumn(
+              _HeadlineRow(
                 station: station,
-                selectedFuelType: selectedFuelType,
+                brandMark: _brandMark,
                 price: price,
                 currencyOverride: currencyOverride,
-                fuelColor: fuelColor,
                 isFavorite: isFavorite,
                 isCheapest: isCheapest,
                 priceTier: priceTier,
-                rating: rating,
-                profileFuelType: profileFuelType,
                 loyaltyDiscount: _loyaltyDiscount,
                 onFavoriteTap: onFavoriteTap,
               ),
+              const SizedBox(height: Spacing.xs),
+              _TitleLine(text: titleText, rating: rating),
+              Text(
+                _addressLine(station, showStreetInAddress),
+                style: AppText.body(context),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: Spacing.xs),
+              _MetaLine(
+                station: station,
+                semanticStatus: semanticStatus,
+                isStalePrice: isStalePrice,
+              ),
+              _HighwayExitLine(station: station),
+              // #2899/#2984 — Fuel Station Radar closeness bar: the SAME
+              // green→accent [ProximityFillBar] the trip radar card + PiP
+              // overlay use. `station.dist` (km) → metres for the bar; it
+              // scales to an ABSOLUTE fixed radius (`closenessRadiusMeters`
+              // = min(searchRadius, cap)), so closer = fuller and a given
+              // station's fill is stable across result-set changes.
+              if (closenessRadiusMeters != null) ...[
+                const SizedBox(height: Spacing.xs),
+                ProximityFillBar(
+                  distanceMeters: station.dist * 1000.0,
+                  radiusMeters: closenessRadiusMeters,
+                ),
+              ],
+              if (station.amenities.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: Spacing.xs),
+                  child: AmenityChips(amenities: station.amenities),
+                ),
+              if (selectedFuelType == FuelType.all && !isCheapest)
+                Padding(
+                  padding: const EdgeInsets.only(top: Spacing.sm),
+                  child: _AllFuelsRows(
+                    station: station,
+                    profileFuelType: profileFuelType,
+                  ),
+                ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Title line: the station name in the title role, with the user's rating
+/// stars (when any) at the trailing end so they cost no extra line.
+class _TitleLine extends StatelessWidget {
+  final String text;
+  final int? rating;
+
+  const _TitleLine({required this.text, required this.rating});
+
+  @override
+  Widget build(BuildContext context) {
+    final rating = this.rating;
+    final showRating = rating != null && rating >= 1 && rating <= 5;
+    return Row(
+      children: [
+        Expanded(
+          // #2161 — was a Hero flight to the detail-screen title; the
+          // detail screen no longer animates it, so plain Text only.
+          child: Text(
+            text,
+            style: AppText.title(context),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        if (showRating) ...[
+          const SizedBox(width: Spacing.md),
+          _RatingStars(rating: rating),
+        ],
+      ],
     );
   }
 }
