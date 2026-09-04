@@ -3,7 +3,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/app/theme.dart';
 import 'package:tankstellen/core/theme/app_radius.dart';
+import 'package:tankstellen/core/theme/spacing.dart';
 import 'package:tankstellen/core/widgets/station_card_shell.dart';
 
 import '../../helpers/pump_app.dart';
@@ -16,36 +18,37 @@ void main() {
       await pumpApp(tester, const StationCardShell(child: Text('body')));
 
       final card = tester.widget<Card>(find.byType(Card));
-      expect(
-        card.margin,
-        const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-      );
+      // #3948 — the grammar's surface margin (12 / 8).
+      expect(card.margin, Spacing.surfaceMargin);
       expect(card.clipBehavior, Clip.antiAlias);
       final shape = card.shape as RoundedRectangleBorder;
       expect(shape.borderRadius, AppRadius.lg);
       expect(find.text('body'), findsOneWidget);
     });
 
-    testWidgets('elevation is 2 in light mode', (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: StationCardShell(child: Text('x'))),
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(tester.widget<Card>(find.byType(Card)).elevation, 2);
-    });
-
-    testWidgets('elevation is 1 in dark mode', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.dark(),
-          home: const Scaffold(body: StationCardShell(child: Text('x'))),
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(tester.widget<Card>(find.byType(Card)).elevation, 1);
-    });
+    for (final (name, theme) in [
+      ('light', AppTheme.light()),
+      ('dark', AppTheme.dark()),
+      ('eco', AppTheme.eco()),
+    ]) {
+      testWidgets(
+          'carries primary-card semantics under $name: surfaceContainerLow, '
+          '1 dp outlineVariant edge, no elevation (#3948)', (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: theme,
+            home: const Scaffold(body: StationCardShell(child: Text('x'))),
+          ),
+        );
+        await tester.pumpAndSettle();
+        final card = tester.widget<Card>(find.byType(Card));
+        expect(card.elevation, 0);
+        expect(card.color, theme.colorScheme.surfaceContainerLow);
+        final shape = card.shape as RoundedRectangleBorder;
+        expect(shape.side.color, theme.colorScheme.outlineVariant);
+        expect(shape.side.width, 1);
+      });
+    }
 
     testWidgets('draws a left stripe in the requested colour and width', (
       tester,

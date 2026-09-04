@@ -26,8 +26,9 @@ import '../../../../helpers/pump_app.dart';
 import '../../../../helpers/silence_error_logger.dart';
 
 /// #3903 — Carburant tab formats: localized medium dates, grouped
-/// whole-km odometers, tank-bar end labels, the fill-up count as a grid
-/// tile, and FAB clearance that follows the consumed safe-area inset.
+/// whole-km odometers, the tank bar (no end labels since #3950), the
+/// fill-up count as a grid tile, and FAB clearance that follows the
+/// consumed safe-area inset.
 class _StubVehicleList extends VehicleProfileList {
   @override
   List<VehicleProfile> build() => const [
@@ -107,7 +108,7 @@ void main() {
     });
   });
 
-  group('TankLevelCard — bar end labels + localized anchor (#3903)', () {
+  group('TankLevelCard — bar + localized anchor (#3903 / #3950)', () {
     final estimate = TankLevelEstimate(
       levelL: 21,
       capacityL: 35,
@@ -123,14 +124,15 @@ void main() {
           tankLevelProvider('stub-vehicle').overrideWith((ref) => estimate),
         ];
 
-    testWidgets('renders "0 L" … "35 L" under the bar', (tester) async {
+    testWidgets('#3950 — no end labels under the bar: the display number '
+        'and the bar already say how full', (tester) async {
       await pumpApp(tester, const TankLevelCard(), overrides: overrides());
-      final labels = find.byKey(const Key('tank_level_bar_labels'));
-      expect(labels, findsOneWidget);
-      expect(find.descendant(of: labels, matching: find.text('0 L')),
-          findsOneWidget);
-      expect(find.descendant(of: labels, matching: find.text('35 L')),
-          findsOneWidget);
+      expect(find.byKey(const Key('tank_level_bar_labels')), findsNothing);
+      expect(find.text('0 L'), findsNothing);
+      expect(find.text('35 L'), findsNothing);
+      // The litres render as the display number with a separate unit.
+      expect(find.text('21,0'), findsOneWidget);
+      expect(find.byKey(const Key('tank_level_progress')), findsOneWidget);
     });
 
     testWidgets('keeps both range figures: a primary sentence and a smaller '

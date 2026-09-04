@@ -5,6 +5,10 @@
 // the previous tank, coverage, the behavior hints WITH the partial-
 // coverage caveat, and the calibration residual; and it renders nothing
 // before a first window closes.
+//
+// #3950 — the headline is the card's ONE display-role number with its
+// unit on the same baseline (strictly the largest text on the card), and
+// coverage + recorded average + residual are ONE sentence.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,6 +20,8 @@ import 'package:tankstellen/features/fill_ups/domain/services/tank_report.dart';
 import 'package:tankstellen/features/fill_ups/presentation/widgets/tank_report_card.dart';
 import 'package:tankstellen/features/fill_ups/providers/tank_report_provider.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
+
+import '../../../../helpers/text_hierarchy.dart';
 
 FillUp _fill(int day, double odo) => FillUp(
       id: 'f$day',
@@ -93,13 +99,19 @@ void main() {
     await tester.pumpWidget(_host(report));
 
     expect(find.text('Tank report'), findsOneWidget);
-    expect(find.text('12,0 L/100 km'), findsOneWidget);
+    // #3950 — display number + baseline unit, two Texts.
+    expect(find.text('12,0'), findsOneWidget);
+    expect(find.text('L/100 km'), findsOneWidget);
     expect(find.text('2,0 L/100 km more than the previous tank'),
         findsOneWidget);
     expect(find.byIcon(Icons.trending_up), findsOneWidget);
-    // #3904 — plain-language recorded-trips lines.
-    expect(find.text('Recorded trips cover 40 % of this tank'), findsOneWidget);
-    expect(find.text('Recorded trips: 8,0 L/100 km'), findsOneWidget);
+    // #3904 / #3950 — coverage + recorded average as ONE plain sentence
+    // (no vehicle graph wired here → no calibration residual).
+    final summary = tester.widget<Text>(
+        find.byKey(const Key('tankReportRecordedSummary')));
+    expect(summary.data, startsWith('Recorded trips cover 40 % of this tank'));
+    expect(summary.data, contains('8,0 L/100 km'));
+    expect(find.textContaining('Recorded trips:'), findsNothing);
     expect(find.text('High-RPM share 30 % (was 10 %)'), findsOneWidget);
     expect(
         find.textContaining('spontaneous and cover only part'), findsOneWidget,
@@ -147,11 +159,91 @@ void main() {
         ),
       ),
     );
-    expect(find.text('24 mpg (UK)'), findsOneWidget);
-    expect(find.text('Recorded trips: 35 mpg (UK)'), findsOneWidget);
+    expect(find.text('24'), findsOneWidget);
+    expect(find.text('mpg (UK)'), findsOneWidget);
+    expect(find.textContaining('average 35 mpg (UK)'), findsOneWidget);
     expect(find.textContaining('L/100 km'), findsNothing,
         reason: 'the headline and the recorded-trips line render in the '
             'chosen unit, never a literal L/100 km');
+  });
+
+  testWidgets('#3950 — the headline is strictly the largest text on the '
+      'card and shares one baseline with its unit', (tester) async {
+    final report = TankReport(
+      latest: _period(liters: 60),
+      latestBehavior: _behavior,
+      evolution: TankEvolution(
+        current: _period(liters: 60),
+        currentBehavior: _behavior,
+        previous: _period(liters: 50),
+        previousBehavior: _behavior,
+        explanations: const [
+          TankExplanation(
+              factor: TankFactor.idle, current: 0.1, previous: 0.05, salience: 2),
+        ],
+      ),
+      calibration: const PumpCalibration(factor: 1.25, samples: 2),
+    );
+    await tester.pumpWidget(_host(report));
+
+    expectFocalNumberLargest(
+      tester,
+      within: find.byType(TankReportCard),
+      focal: find.byKey(const Key('tankReportHeadline')),
+    );
+    final row = tester.widget<Row>(find.ancestor(
+      of: find.byKey(const Key('tankReportHeadlineUnit')),
+      matching: find.byType(Row),
+    ).first);
+    expect(row.crossAxisAlignment, CrossAxisAlignment.baseline);
+    expect(row.textBaseline, TextBaseline.alphabetic);
+    // ONE delta line, ONE recorded-trips sentence.
+    expect(find.byIcon(Icons.trending_up), findsOneWidget);
+    expect(find.byKey(const Key('tankReportRecordedSummary')), findsOneWidget);
+    expect(find.textContaining('after calibration:'), findsNothing);
+  });
+
+  testWidgets('#3950 — en_XA at 320 dp + 1.3x text scale: no overflow',
+      (tester) async {
+    tester.view.physicalSize = const Size(320, 800);
+    tester.view.devicePixelRatio = 1.0;
+    tester.platformDispatcher.textScaleFactorTestValue = 1.3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    final report = TankReport(
+      latest: _period(liters: 60),
+      latestBehavior: _behavior,
+      evolution: TankEvolution(
+        current: _period(liters: 60),
+        currentBehavior: _behavior,
+        previous: _period(liters: 50),
+        previousBehavior: _behavior,
+        explanations: const [
+          TankExplanation(
+              factor: TankFactor.highRpm, current: 0.3, previous: 0.1, salience: 4),
+        ],
+      ),
+      calibration: const PumpCalibration(factor: 1.25, samples: 2),
+    );
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [tankReportProvider.overrideWith((_) => report)],
+        child: const MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: Locale('en', 'XA'),
+          // The card's real host (the Trajets tab) scrolls; a fixed 800 dp
+          // body would only measure the test font's square glyphs.
+          home: Scaffold(
+            body: SingleChildScrollView(child: TankReportCard()),
+          ),
+        ),
+      ),
+    );
+    expect(tester.takeException(), isNull,
+        reason: 'the tank report overflows at 320 dp under en_XA / 1.3x');
   });
 
   testWidgets('first closed window: no-previous line, no hints',

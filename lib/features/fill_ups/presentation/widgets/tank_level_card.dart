@@ -4,7 +4,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/theme/app_text.dart';
+import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/unit_formatter.dart';
+import '../../../../core/widgets/primary_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../../../core/error/guarded.dart';
@@ -13,21 +16,26 @@ import '../../providers/tank_level_provider.dart';
 import '../../providers/tank_mix_provider.dart';
 import '../../../trips/api.dart';
 
-/// Tank-level card on the Fuel tab (#1195).
+/// Tank-level card on the Fuel tab (#1195) — the Carburant tab's
+/// **primary card** since #3950 (Epic #3947).
 ///
-/// Reads [tankLevelProvider] for the active vehicle and renders:
-/// * a big "{litres} L" number
-/// * an "≈ {km} km of range" sub-text (when range is computable)
+/// Reads [tankLevelProvider] for the active vehicle and renders, in the
+/// visual grammar's roles (`AppText`):
+/// * the litres as the card's ONE display-role number, top-left, with
+///   the `L` unit on the same alphabetic baseline
+/// * the range as ONE body line (the last-tank projection when a closed
+///   interval exists, the long-run figure otherwise)
 /// * a `LinearProgressIndicator` that flips to the theme's `error`
-///   colour at < 15 % capacity
-/// * a caption with the last-fill-up date, the number of trips folded
-///   in, and the estimation method
+///   colour at < 15 % capacity — no end labels: the bar and the display
+///   number already say "how full"
+/// * label-role captions: the long-run range context, the level's
+///   source (fill-up anchor date or OBD2 sensor read) and the tank mix
 ///
 /// Empty states:
 /// * No active vehicle — renders nothing (the parent FuelTab handles
 ///   the no-vehicle empty state).
 /// * Active vehicle has no fill-ups — renders the
-///   `tankLevelEmptyNoFillUp` empty-state message inside a Card so the
+///   `tankLevelEmptyNoFillUp` empty-state message inside the card so the
 ///   user gets the affordance to "Log a fill-up".
 ///
 /// Tap → opens a bottom sheet listing the trips folded into the
@@ -66,23 +74,19 @@ class _EmptyTankLevelCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Card(
-      margin: const EdgeInsets.fromLTRB(12, 6, 12, 6),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l.tankLevelTitle, style: theme.textTheme.titleMedium),
-            const SizedBox(height: 8),
-            Text(
-              l.tankLevelEmptyNoFillUp,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+    return PrimaryCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l.tankLevelTitle, style: AppText.title(context)),
+          const SizedBox(height: Spacing.md),
+          Text(
+            l.tankLevelEmptyNoFillUp,
+            style: AppText.body(context).copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -125,116 +129,99 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
     final showLongRunContext = lastIntervalRangeKm != null &&
         longRunRangeKm != null &&
         longRunRangeKm.round() != lastIntervalRangeKm.round();
+    final labelStyle = AppText.label(context);
 
-    return Card(
-      margin: const EdgeInsets.fromLTRB(12, 6, 12, 6),
-      child: InkWell(
-        onTap: () => _openDetailSheet(context, ref),
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(l.tankLevelTitle, style: theme.textTheme.titleMedium),
-              const SizedBox(height: 8),
-              Text(
-                l.tankLevelLitersFormat(litresText),
-                key: const Key('tank_level_big_number'),
-                // #1914 — was `displayMedium` (~45 sp), which dominated
-                // the card; `titleLarge` (~22 sp) roughly halves it
-                // while the w600 weight keeps it the card's focal point.
-                style: theme.textTheme.titleLarge?.copyWith(
-                  color: lowFuel ? theme.colorScheme.error : null,
-                  fontWeight: FontWeight.w600,
-                  fontFeatures: const [FontFeature.tabularFigures()],
-                ),
-              ),
-              // #3903 — ONE primary range sentence (body weight, full
-              // contrast) and a smaller muted secondary line for the
-              // long-run figure; both numbers stay.
-              if (rangeKm != null) ...[
-                const SizedBox(height: 4),
-                Text(
-                  lastIntervalRangeKm != null
-                      ? l.tankLevelRangeLastIntervalFormat(
-                          lastIntervalRangeKm.round().toString(),
-                        )
-                      : l.tankLevelRangeFormat(rangeKm.round().toString()),
-                  key: const Key('tank_level_range_primary'),
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-              if (showLongRunContext) ...[
-                const SizedBox(height: 2),
-                Text(
-                  l.tankLevelRangeLongRunFormat(
-                    longRunRangeKm.round().toString(),
-                  ),
-                  key: const Key('tank_level_range_long_run'),
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-              if (fraction != null) ...[
-                const SizedBox(height: 12),
-                LinearProgressIndicator(
-                  key: const Key('tank_level_progress'),
-                  value: fraction,
-                  color: barColor,
-                ),
-                // #3903 — end labels anchor the bar: empty on the left,
-                // the tank capacity on the right.
-                const SizedBox(height: 4),
-                Row(
-                  key: const Key('tank_level_bar_labels'),
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      l.tankLevelLitersFormat('0'),
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
+    return PrimaryCard(
+      onTap: () => _openDetailSheet(context, ref),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // #3950 — the card title is a muted caption; the display
+          // number right under it is what the eye lands on first.
+          Text(l.tankLevelTitle, style: labelStyle),
+          const SizedBox(height: Spacing.sm),
+          // The number and its unit never wrap or overflow: as a last
+          // resort (a 320 dp phone at a large font setting) the pair
+          // scales down together, keeping the one baseline.
+          Align(
+            alignment: Alignment.centerLeft,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text(
+                    litresText,
+                    key: const Key('tank_level_big_number'),
+                    style: AppText.display(context).copyWith(
+                      color: lowFuel ? theme.colorScheme.error : null,
                     ),
-                    Text(
-                      l.tankLevelLitersFormat(
-                        UnitFormatter.formatDecimal(capacityL, fractionDigits: 0),
-                      ),
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-              const SizedBox(height: 12),
-              Text(
-                _captionFor(l, estimate, locale),
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-              // #3652 — the current tank's fuel mix for multi-fuel
-              // vehicles (E10 topped onto E85 → a blend of both; the
-              // consumption depends on it). The provider returns null
-              // for single-fuel vehicles; a pure tank stays silent via
-              // isBlend. Shell-safe (#2163) like the report card.
-              if (_mixLine(ref, l) case final mixText?) ...[
-                const SizedBox(height: 4),
-                Text(
-                  mixText,
-                  key: const Key('tank_mix_line'),
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
                   ),
-                ),
-              ],
-            ],
+                  const SizedBox(width: Spacing.sm),
+                  // The SI litre symbol is language-neutral; it is not a
+                  // translatable string.
+                  Text(
+                    'L',
+                    key: const Key('tank_level_unit'),
+                    style: AppText.unit(context),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
+          // #3903 / #3950 — ONE range sentence in the body role; the
+          // long-run figure is a label-role caption beneath it.
+          if (rangeKm != null) ...[
+            const SizedBox(height: Spacing.sm),
+            Text(
+              lastIntervalRangeKm != null
+                  ? l.tankLevelRangeLastIntervalFormat(
+                      lastIntervalRangeKm.round().toString(),
+                    )
+                  : l.tankLevelRangeFormat(rangeKm.round().toString()),
+              key: const Key('tank_level_range_primary'),
+              style: AppText.body(context),
+            ),
+          ],
+          if (showLongRunContext) ...[
+            const SizedBox(height: Spacing.xs),
+            Text(
+              l.tankLevelRangeLongRunFormat(
+                longRunRangeKm.round().toString(),
+              ),
+              key: const Key('tank_level_range_long_run'),
+              style: labelStyle,
+            ),
+          ],
+          if (fraction != null) ...[
+            const SizedBox(height: Spacing.lg),
+            // #3950 — no "0 L … 50 L" end labels: the bar is the
+            // fraction and the display number is the litres.
+            LinearProgressIndicator(
+              key: const Key('tank_level_progress'),
+              value: fraction,
+              color: barColor,
+            ),
+          ],
+          const SizedBox(height: Spacing.lg),
+          Text(_captionFor(l, estimate, locale), style: labelStyle),
+          // #3652 — the current tank's fuel mix for multi-fuel
+          // vehicles (E10 topped onto E85 → a blend of both; the
+          // consumption depends on it). The provider returns null
+          // for single-fuel vehicles; a pure tank stays silent via
+          // isBlend. Shell-safe (#2163) like the report card.
+          if (_mixLine(ref, l) case final mixText?) ...[
+            const SizedBox(height: Spacing.sm),
+            Text(
+              mixText,
+              key: const Key('tank_mix_line'),
+              style: labelStyle,
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -302,7 +289,6 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
       context: context,
       showDragHandle: true,
       builder: (sheetContext) {
-        final theme = Theme.of(sheetContext);
         return SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -312,16 +298,16 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
               children: [
                 Text(
                   l.tankLevelDetailSheetTitle,
-                  style: theme.textTheme.titleMedium,
+                  style: AppText.title(sheetContext),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: Spacing.lg),
                 if (relevant.isEmpty)
                   Text(
                     l.tankLevelLastFillUpFormat(
                       _formatDate(lastFillUpDate, locale),
                       '0',
                     ),
-                    style: theme.textTheme.bodyMedium,
+                    style: AppText.body(sheetContext),
                   )
                 else
                   Flexible(
@@ -336,9 +322,11 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
                           trip.summary.distanceKm,
                         );
                         final litres = trip.summary.fuelLitersConsumed;
+                        // #3950 — the litres go through the same ARB mask
+                        // the big number used to ("{litres} L").
                         final litresText = litres == null
                             ? ''
-                            : ' · ${UnitFormatter.formatDecimal(litres)} L';
+                            : ' · ${l.tankLevelLitersFormat(UnitFormatter.formatDecimal(litres))}';
                         return ListTile(
                           dense: true,
                           contentPadding: EdgeInsets.zero,
@@ -355,5 +343,6 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
         );
       },
     );
+    if (!context.mounted) return;
   }
 }

@@ -10,10 +10,12 @@ import 'package:tankstellen/core/theme/dark_mode_colors.dart';
 import 'package:tankstellen/core/theme/fuel_colors.dart';
 import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/core/utils/price_tier.dart';
+import 'package:tankstellen/core/widgets/animated_price_text.dart';
 import 'package:tankstellen/core/widgets/brand_logo.dart';
 import 'package:tankstellen/core/widgets/station_card_shell.dart';
 import 'package:tankstellen/features/trips/presentation/widgets/proximity_fill_bar.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/theme/spacing.dart';
 import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/core/domain/station_amenity.dart';
 import 'package:tankstellen/features/search/presentation/widgets/amenity_chips.dart';
@@ -339,8 +341,8 @@ void main() {
     });
 
     testWidgets(
-      '#2622 — favourite star is hoisted OUT of the price row but keeps '
-      'its 32x32 tap target',
+      '#2622 / #3949 — favourite star keeps its 32x32 tap target and sits '
+      'on the headline row, trailing the display price',
       (tester) async {
         await pumpApp(
           tester,
@@ -370,14 +372,20 @@ void main() {
         );
         expect(sizedBox, findsOneWidget);
 
-        // The star now sits ABOVE the price headline (own line), not on the
-        // same baseline as the price RichText.
-        final starTop = tester.getTopLeft(find.byIcon(Icons.star)).dy;
-        final priceTop = tester.getTopLeft(find.byType(RichText).last).dy;
+        // #3949 — the star shares the headline row with the display price
+        // (trailing edge), so the price owns the leading edge and the star
+        // never pushes the number down.
+        final starCenter = tester.getCenter(find.byIcon(Icons.star));
+        final price = find.byType(AnimatedPriceText);
         expect(
-          starTop,
-          lessThan(priceTop),
-          reason: 'favourite star is hoisted above the price row (#2622)',
+          starCenter.dy,
+          closeTo(tester.getCenter(price).dy, 12),
+          reason: 'favourite star is on the headline row (#3949)',
+        );
+        expect(
+          starCenter.dx,
+          greaterThan(tester.getTopRight(price).dx),
+          reason: 'the star trails the price',
         );
       },
     );
@@ -401,7 +409,8 @@ void main() {
     });
 
     testWidgets(
-      '#2622 — Cheapest badge precedes the price in the widget tree',
+      '#2622 / #3949 — Cheapest badge sits on the headline row beside the '
+      'price, above the title',
       (tester) async {
         await pumpApp(
           tester,
@@ -412,17 +421,22 @@ void main() {
           ),
         );
 
-        // The "Cheapest" badge must sit visually ABOVE the price headline so
-        // it anchors the stop before the eye reaches the number (#2622).
+        // The "Cheapest" badge anchors the bestStops-default list: it is
+        // read together with the number it qualifies (#3949 puts both on
+        // the headline row) and before anything else on the card.
         final cheapest = find.text('Cheapest');
         expect(cheapest, findsOneWidget);
 
-        final cheapestTop = tester.getTopLeft(cheapest).dy;
-        final priceTop = tester.getTopLeft(find.byType(RichText).last).dy;
+        final price = find.byType(AnimatedPriceText);
         expect(
-          cheapestTop,
-          lessThan(priceTop),
-          reason: 'Cheapest badge must be promoted above the price (#2622)',
+          tester.getCenter(cheapest).dy,
+          closeTo(tester.getCenter(price).dy, 12),
+          reason: 'Cheapest badge shares the headline row with the price',
+        );
+        expect(
+          tester.getBottomLeft(cheapest).dy,
+          lessThanOrEqualTo(tester.getTopLeft(find.text('STAR')).dy + 1),
+          reason: 'Cheapest badge is read before the title (#2622)',
         );
       },
     );
@@ -1117,7 +1131,7 @@ void main() {
     });
 
     group('card polish (#592)', () {
-      testWidgets('card has 6dp vertical margin (breathing room)', (
+      testWidgets('card carries the grammar surface margin (#3948)', (
         tester,
       ) async {
         await pumpApp(
@@ -1129,14 +1143,12 @@ void main() {
         );
 
         final card = tester.widget<Card>(find.byType(Card).first);
-        expect(
-          card.margin,
-          const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          reason: 'Vertical margin must be 6dp per #592 spec.',
-        );
+        expect(card.margin, Spacing.surfaceMargin);
       });
 
-      testWidgets('card uses elevation 2 in light mode', (tester) async {
+      testWidgets('card is a primary card: outlined, no elevation (#3948)', (
+        tester,
+      ) async {
         await pumpApp(
           tester,
           const StationCard(
@@ -1146,10 +1158,12 @@ void main() {
         );
 
         final card = tester.widget<Card>(find.byType(Card).first);
-        expect(card.elevation, 2.0);
+        expect(card.elevation, 0);
+        final shape = card.shape as RoundedRectangleBorder;
+        expect(shape.side.width, 1);
       });
 
-      testWidgets('card uses elevation 1 in dark mode', (tester) async {
+      testWidgets('card stays flat in dark mode too (#3948)', (tester) async {
         await tester.pumpWidget(
           // #3634 — the card's road-distance Consumer needs a scope.
           ProviderScope(
@@ -1169,7 +1183,7 @@ void main() {
         await tester.pumpAndSettle();
 
         final card = tester.widget<Card>(find.byType(Card).first);
-        expect(card.elevation, 1.0);
+        expect(card.elevation, 0);
       });
 
       testWidgets('card has 12dp rounded corners', (tester) async {
@@ -1507,11 +1521,17 @@ void main() {
         expect(find.text('OR'), findsNothing);
         expect(find.byType(Image), findsWidgets);
 
-        // Leading: the mark sits left of the status column and the
-        // station text, and the card still names the brand.
+        // Leading: #3949 — the mark opens the headline row, left of the
+        // display price and above the title line; the card still names
+        // the brand.
         final markX = tester.getTopLeft(find.byType(BrandLogo)).dx;
-        final brandX = tester.getTopLeft(find.text('STAR')).dx;
-        expect(markX, lessThan(brandX));
+        final priceX = tester
+            .getTopLeft(find.byType(AnimatedPriceText))
+            .dx;
+        expect(markX, lessThan(priceX));
+        final markTop = tester.getTopLeft(find.byType(BrandLogo)).dy;
+        final brandTop = tester.getTopLeft(find.text('STAR')).dy;
+        expect(markTop, lessThan(brandTop));
       });
 
       testWidgets('a brandless station renders no mark — a column of grey '

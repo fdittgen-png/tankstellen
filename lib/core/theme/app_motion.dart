@@ -34,4 +34,17 @@ class AppMotion {
   /// the animation's end-state without kicking a controller.
   static bool enabled(BuildContext context) =>
       !MediaQuery.disableAnimationsOf(context);
+
+  /// Duration of a **selection** state change — a chip turning
+  /// `primaryContainer`, a pill filling, a card gaining its accent (#3948).
+  /// Matches Material's theme-change beat (200 ms) and the existing
+  /// `SelectablePill` transition, so every selectable surface settles in
+  /// the same rhythm.
+  static const Duration selection = Duration(milliseconds: 200);
+
+  /// [selection], or [Duration.zero] when the OS asked for reduced motion —
+  /// hand this straight to an `AnimatedContainer` / `AnimatedSwitcher` so
+  /// the end-state is still reached, just without the tween.
+  static Duration selectionDuration(BuildContext context) =>
+      enabled(context) ? selection : Duration.zero;
 }

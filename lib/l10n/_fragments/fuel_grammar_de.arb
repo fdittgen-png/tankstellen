@@ -1,0 +1,4 @@
+{
+  "tankReportRecordedSummary": "Aufgezeichnete Fahrten decken {pct} % dieser Tankfüllung ab und liegen im Schnitt bei {value} · {residual} % Abweichung nach Kalibrierung",
+  "tankReportRecordedSummaryNoResidual": "Aufgezeichnete Fahrten decken {pct} % dieser Tankfüllung ab und liegen im Schnitt bei {value}"
+}

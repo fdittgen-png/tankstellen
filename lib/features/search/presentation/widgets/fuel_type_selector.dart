@@ -115,6 +115,13 @@ class FuelTypeSelector extends ConsumerWidget {
           unawaited(HapticFeedback.selectionClick());
           ref.read(selectedFuelTypeProvider.notifier).select(type);
         },
+        // #3949 — the tightened criteria-chip geometry: the German set
+        // (E5 · E10 · Diesel · Electric · All) fits two rows inside the
+        // sheet's 288 dp content width at 320 dp. The 12 dp fuel dot used
+        // to sit in Material's 24 dp avatar slot; the slot now hugs it.
+        padding: kCriteriaChipPadding,
+        labelPadding: kCriteriaChipLabelPadding,
+        avatarBoxConstraints: kCriteriaChipAvatarBox,
         visualDensity: VisualDensity.compact,
       ),
     );

@@ -3074,6 +3074,31 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String get alertsEmptyTitle => 'No price alerts yet';
+
+  @override
+  String get alertsEmptySubtitle =>
+      'Get notified when a station, or any station in a zone, drops below your target price.';
+
+  @override
+  String get favoritesLoadErrorTitle => 'Favorites';
+
+  @override
+  String allPricesEstimatedCost(String cost) {
+    return '≈ $cost';
+  }
+
+  @override
+  String allPricesCellEstimatedSemantics(
+    String fuel,
+    String price,
+    String cost,
+    String consumption,
+  ) {
+    return '$fuel $price, about $cost per 100 km, estimated at $consumption from your vehicle\'s measured consumption and the fuel\'s energy content';
+  }
+
+  @override
   String get approachOverlaySection => 'Inflygningsöverlägg';
 
   @override
@@ -5026,6 +5051,16 @@ class AppLocalizationsSv extends AppLocalizations {
   String get fuelNameElectric => 'El';
 
   @override
+  String tankReportRecordedSummary(String pct, String value, String residual) {
+    return 'Recorded trips cover $pct % of this tank and average $value · $residual % gap after calibration';
+  }
+
+  @override
+  String tankReportRecordedSummaryNoResidual(String pct, String value) {
+    return 'Recorded trips cover $pct % of this tank and average $value';
+  }
+
+  @override
   String get calibrationModeLabel => 'Kalibreringsläge';
 
   @override
@@ -6774,6 +6809,21 @@ class AppLocalizationsSv extends AppLocalizations {
   String get refuelUnitPerSession => '/session';
 
   @override
+  String stationCardPriceUnit(String currency) {
+    return '$currency/L';
+  }
+
+  @override
+  String stationCardStatus24h(String status) {
+    return '$status · 24 h';
+  }
+
+  @override
+  String mapStationCountTooltip(int count) {
+    return '$count stations in the current result set';
+  }
+
+  @override
   String get settingsSearchHint => 'Sök inställningar';
 
   @override
@@ -8025,11 +8075,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get fillInventoryDismiss => 'Got it';
 
   @override
-  String tankReportResidualAfterCalibration(String percent) {
-    return 'Gap after calibration: $percent %';
-  }
-
-  @override
   String get tripFuelSourceMeasured => 'Measured';
 
   @override
@@ -8653,11 +8698,6 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String tankReportRecordedTripsCoverage(String pct) {
     return 'Recorded trips cover $pct % of this tank';
-  }
-
-  @override
-  String tankReportRecordedTripsAvg(String value) {
-    return 'Recorded trips: $value';
   }
 
   @override

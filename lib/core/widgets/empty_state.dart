@@ -15,6 +15,16 @@ class EmptyState extends StatelessWidget {
   final VoidCallback? onAction;
   final double iconSize;
 
+  /// Glyph on the primary action. Defaults to a search glass because the
+  /// first empty states (map, favourites) all led to a search; a surface
+  /// whose action is something else (add an alert, log a fill-up) passes
+  /// its own so the button says what it does (#3951).
+  final IconData actionIcon;
+
+  /// Optional key on the primary action button, so a screen test can tap
+  /// the action without depending on its label.
+  final Key? actionKey;
+
   /// When true, anchor icon+title+subtitle in the top third of the
   /// viewport and pin the CTA near the bottom. Used by the consumption
   /// and favorites empty states (#1539) where the centred default left
@@ -31,6 +41,8 @@ class EmptyState extends StatelessWidget {
     this.onAction,
     this.iconSize = 64,
     this.topBiased = false,
+    this.actionIcon = Icons.search,
+    this.actionKey,
   });
 
   @override
@@ -66,8 +78,9 @@ class EmptyState extends StatelessWidget {
     final hasAction = actionLabel != null && onAction != null;
     final cta = hasAction
         ? FilledButton.icon(
+            key: actionKey,
             onPressed: onAction,
-            icon: const Icon(Icons.search),
+            icon: Icon(actionIcon),
             label: Text(actionLabel!),
           )
         : null;

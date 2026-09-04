@@ -3,13 +3,16 @@
 
 import 'package:flutter/material.dart';
 
-/// The criteria sheet's section eyebrow (#3548, promoted to its own file
+import '../../../../../core/theme/app_text.dart';
+
+/// The criteria sheet's section heading (#3548, promoted to its own file
 /// by #3927 so the brand group can label itself the same way as the fuel
 /// and amenity groups).
 ///
-/// Letter-spaced, medium-weight `onSurfaceVariant` label instead of a plain
-/// `titleSmall`, so section starts scan as structure rather than body text.
-/// Style only — the string itself is the localized label.
+/// #3949 (Epic #3947) — the heading is the grammar's **title** role
+/// ([AppText.title]): the name of the section, one per group, read
+/// before its chips. The old letter-spaced eyebrow was a fifth ad-hoc
+/// size; a sheet section names its role now, never its size.
 class CriteriaSectionHeader extends StatelessWidget {
   const CriteriaSectionHeader(this.text, {super.key});
 
@@ -17,14 +20,6 @@ class CriteriaSectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Text(
-      text,
-      style: theme.textTheme.labelLarge?.copyWith(
-        fontWeight: FontWeight.w700,
-        letterSpacing: 0.8,
-        color: theme.colorScheme.onSurfaceVariant,
-      ),
-    );
+    return Text(text, style: AppText.title(context));
   }
 }

@@ -4,6 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/station.dart';
+import 'package:tankstellen/features/fill_ups/domain/entities/fuel_consumption_figure.dart';
 import 'package:tankstellen/features/search/providers/all_prices_comparison_model.dart';
 
 /// #3933 — the maths behind the all-prices comparison table.
@@ -198,16 +199,46 @@ void main() {
         station: flexStation,
         columns: columns,
         bestByFuel: const {},
-        litersPer100kmByFuel: const {FuelType.e85: 6.0, FuelType.e10: 4.6},
+        consumptionByFuel: const {
+          FuelType.e85: FuelConsumptionFigure.measured(6.0),
+          FuelType.e10: FuelConsumptionFigure.measured(4.6),
+        },
         usableFuels: const {FuelType.e10, FuelType.e85, FuelType.e98},
       );
 
       final e85 = row.cells.firstWhere((c) => c.fuel == FuelType.e85);
       expect(e85.costPer100km, closeTo(0.839 * 6.0, 1e-9));
       expect(e85.litersPer100km, 6.0);
+      expect(e85.isCostEstimated, isFalse);
 
       final e10 = row.cells.firstWhere((c) => c.fuel == FuelType.e10);
       expect(e10.costPer100km, closeTo(2.089 * 4.6, 1e-9));
+    });
+
+    test('an ESTIMATED figure prices the cell and flags it (#3945)', () {
+      final row = buildStationComparison(
+        station: flexStation,
+        columns: columns,
+        bestByFuel: const {},
+        consumptionByFuel: const {
+          FuelType.e85: FuelConsumptionFigure.measured(6.5),
+          FuelType.e10: FuelConsumptionFigure.estimated(5.2),
+        },
+        usableFuels: const {FuelType.e10, FuelType.e85},
+      );
+
+      final e10 = row.cells.firstWhere((c) => c.fuel == FuelType.e10);
+      expect(e10.costPer100km, closeTo(2.089 * 5.2, 1e-9));
+      expect(e10.litersPer100km, 5.2);
+      expect(e10.isCostEstimated, isTrue);
+
+      final e85 = row.cells.firstWhere((c) => c.fuel == FuelType.e85);
+      expect(e85.isCostEstimated, isFalse);
+
+      // A fuel with no figure at all is neither priced nor flagged.
+      final e98 = row.cells.firstWhere((c) => c.fuel == FuelType.e98);
+      expect(e98.costPer100km, isNull);
+      expect(e98.isCostEstimated, isFalse);
     });
 
     test('the verdict names the fuel that is cheapest per 100 km here', () {
@@ -215,7 +246,10 @@ void main() {
         station: flexStation,
         columns: columns,
         bestByFuel: const {FuelType.e85: 0.839},
-        litersPer100kmByFuel: const {FuelType.e85: 6.0, FuelType.e10: 4.6},
+        consumptionByFuel: const {
+          FuelType.e85: FuelConsumptionFigure.measured(6.0),
+          FuelType.e10: FuelConsumptionFigure.measured(4.6),
+        },
         usableFuels: const {FuelType.e10, FuelType.e85},
       );
 
@@ -246,7 +280,10 @@ void main() {
         station: lpgStation,
         columns: columns,
         bestByFuel: const {},
-        litersPer100kmByFuel: const {FuelType.e10: 4.6, FuelType.lpg: 7.0},
+        consumptionByFuel: const {
+          FuelType.e10: FuelConsumptionFigure.measured(4.6),
+          FuelType.lpg: FuelConsumptionFigure.measured(7.0),
+        },
         usableFuels: const {FuelType.e10, FuelType.lpg},
       );
 
@@ -275,7 +312,10 @@ void main() {
         station: flexStation,
         columns: columns,
         bestByFuel: const {},
-        litersPer100kmByFuel: const {FuelType.diesel: 4.0, FuelType.e85: 6.0},
+        consumptionByFuel: const {
+          FuelType.diesel: FuelConsumptionFigure.measured(4.0),
+          FuelType.e85: FuelConsumptionFigure.measured(6.0),
+        },
         usableFuels: const {FuelType.e10, FuelType.e5, FuelType.e98,
           FuelType.e85},
       );

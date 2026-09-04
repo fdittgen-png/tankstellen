@@ -85,17 +85,23 @@ String _$allPricesBestByFuelHash() =>
 /// the table and that screen can never state two different L/100 km for the
 /// same tank history.
 ///
-/// Only PURE buckets become a per-fuel figure. A MIX bucket (`E85/E10`) is
-/// a blend the driver burned, not a grade they can buy at the pump, and
-/// crediting its litres to the dominant grade is exactly the ADR 0014
-/// collapse ADR 0015 rejected — so a mix contributes to no column, and a
-/// fuel only ever driven blended simply has no cost-per-100 km cell.
+/// Only PURE buckets become a MEASURED per-fuel figure. A MIX bucket
+/// (`E85/E10`) is a blend the driver burned, not a grade they can buy at
+/// the pump, and crediting its litres to the dominant grade is exactly the
+/// ADR 0014 collapse ADR 0015 rejected — so a mix contributes to no column.
 ///
-/// The aggregator also owns the vehicle scoping: it keeps the ACTIVE
-/// vehicle's own fills only, where the deleted local copy also swept in
-/// fills carrying no `vehicleId`. Single-vehicle users see no difference
-/// (their fills are the vehicle's); multi-vehicle users no longer risk a
-/// stray unassigned fill of another car moving this car's number.
+/// #3945 — a usable fuel WITHOUT a pure window no longer loses its cell: the
+/// fill-ups feature's `FuelConsumptionEstimator` models it from the
+/// vehicle's baseline consumption (its most-confident pure window of another
+/// grade, else its all-fuel `ConsumptionStats` average anchored on the
+/// declared primary fuel) converted by energy content, and the figure is
+/// flagged `estimated` so the cell renders it as ≈. No baseline at all ⇒
+/// still no cell.
+///
+/// Vehicle scoping is the fill-ups feature's `activeVehicleFillUpsProvider`
+/// (#3945): the ACTIVE vehicle's own fills, plus the unassigned ones for a
+/// single-vehicle user; with two or more vehicles a stray unassigned fill of
+/// another car can never move this car's number.
 ///
 /// The pump-anchored gain (`VehicleProfile.pumpGain*`, Epic #3886) is
 /// deliberately NOT applied: it trims ESTIMATED OBD2 fuel rates onto the
@@ -114,17 +120,23 @@ final allPricesFuelCostModelProvider = AllPricesFuelCostModelProvider._();
 /// the table and that screen can never state two different L/100 km for the
 /// same tank history.
 ///
-/// Only PURE buckets become a per-fuel figure. A MIX bucket (`E85/E10`) is
-/// a blend the driver burned, not a grade they can buy at the pump, and
-/// crediting its litres to the dominant grade is exactly the ADR 0014
-/// collapse ADR 0015 rejected — so a mix contributes to no column, and a
-/// fuel only ever driven blended simply has no cost-per-100 km cell.
+/// Only PURE buckets become a MEASURED per-fuel figure. A MIX bucket
+/// (`E85/E10`) is a blend the driver burned, not a grade they can buy at
+/// the pump, and crediting its litres to the dominant grade is exactly the
+/// ADR 0014 collapse ADR 0015 rejected — so a mix contributes to no column.
 ///
-/// The aggregator also owns the vehicle scoping: it keeps the ACTIVE
-/// vehicle's own fills only, where the deleted local copy also swept in
-/// fills carrying no `vehicleId`. Single-vehicle users see no difference
-/// (their fills are the vehicle's); multi-vehicle users no longer risk a
-/// stray unassigned fill of another car moving this car's number.
+/// #3945 — a usable fuel WITHOUT a pure window no longer loses its cell: the
+/// fill-ups feature's `FuelConsumptionEstimator` models it from the
+/// vehicle's baseline consumption (its most-confident pure window of another
+/// grade, else its all-fuel `ConsumptionStats` average anchored on the
+/// declared primary fuel) converted by energy content, and the figure is
+/// flagged `estimated` so the cell renders it as ≈. No baseline at all ⇒
+/// still no cell.
+///
+/// Vehicle scoping is the fill-ups feature's `activeVehicleFillUpsProvider`
+/// (#3945): the ACTIVE vehicle's own fills, plus the unassigned ones for a
+/// single-vehicle user; with two or more vehicles a stray unassigned fill of
+/// another car can never move this car's number.
 ///
 /// The pump-anchored gain (`VehicleProfile.pumpGain*`, Epic #3886) is
 /// deliberately NOT applied: it trims ESTIMATED OBD2 fuel rates onto the
@@ -143,17 +155,23 @@ final class AllPricesFuelCostModelProvider
   /// the table and that screen can never state two different L/100 km for the
   /// same tank history.
   ///
-  /// Only PURE buckets become a per-fuel figure. A MIX bucket (`E85/E10`) is
-  /// a blend the driver burned, not a grade they can buy at the pump, and
-  /// crediting its litres to the dominant grade is exactly the ADR 0014
-  /// collapse ADR 0015 rejected — so a mix contributes to no column, and a
-  /// fuel only ever driven blended simply has no cost-per-100 km cell.
+  /// Only PURE buckets become a MEASURED per-fuel figure. A MIX bucket
+  /// (`E85/E10`) is a blend the driver burned, not a grade they can buy at
+  /// the pump, and crediting its litres to the dominant grade is exactly the
+  /// ADR 0014 collapse ADR 0015 rejected — so a mix contributes to no column.
   ///
-  /// The aggregator also owns the vehicle scoping: it keeps the ACTIVE
-  /// vehicle's own fills only, where the deleted local copy also swept in
-  /// fills carrying no `vehicleId`. Single-vehicle users see no difference
-  /// (their fills are the vehicle's); multi-vehicle users no longer risk a
-  /// stray unassigned fill of another car moving this car's number.
+  /// #3945 — a usable fuel WITHOUT a pure window no longer loses its cell: the
+  /// fill-ups feature's `FuelConsumptionEstimator` models it from the
+  /// vehicle's baseline consumption (its most-confident pure window of another
+  /// grade, else its all-fuel `ConsumptionStats` average anchored on the
+  /// declared primary fuel) converted by energy content, and the figure is
+  /// flagged `estimated` so the cell renders it as ≈. No baseline at all ⇒
+  /// still no cell.
+  ///
+  /// Vehicle scoping is the fill-ups feature's `activeVehicleFillUpsProvider`
+  /// (#3945): the ACTIVE vehicle's own fills, plus the unassigned ones for a
+  /// single-vehicle user; with two or more vehicles a stray unassigned fill of
+  /// another car can never move this car's number.
   ///
   /// The pump-anchored gain (`VehicleProfile.pumpGain*`, Epic #3886) is
   /// deliberately NOT applied: it trims ESTIMATED OBD2 fuel rates onto the
@@ -192,7 +210,7 @@ final class AllPricesFuelCostModelProvider
 }
 
 String _$allPricesFuelCostModelHash() =>
-    r'4c1bb83e51c4ca87e7f14e2e464938249000e0a8';
+    r'f149a60d7f37ceb3efd355dcbd08c6d3ed53c440';
 
 /// The stable column set every all-prices card renders.
 ///

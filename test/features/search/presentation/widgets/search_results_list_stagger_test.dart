@@ -55,6 +55,14 @@ const _s3 = Station(
 void main() {
   group('SearchResultsList stagger (#595)', () {
     testWidgets('each card is wrapped in a StaggeredFadeIn', (tester) async {
+      // #3949 — the grammar card is ~145 dp tall (display-role price), so
+      // three cards plus the results chrome no longer fit the default
+      // 600×800 test viewport and the lazy list never builds the third.
+      // This test counts wrappers, not scroll extent: tall viewport.
+      tester.view.physicalSize = const Size(600, 1600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getApiKey(any())).thenReturn(null);

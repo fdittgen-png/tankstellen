@@ -40,24 +40,32 @@ part 'all_prices_table_provider.g.dart';
 
 /// What the active vehicle costs to drive, per fuel.
 ///
-/// [litersPer100kmByFuel] is measured, never guessed: it comes from the
-/// user's own full-to-full tank windows. [usableFuels] empty means "no
-/// active vehicle" — the table then dims nothing and shows no per-100 km
-/// row, exactly the documented degradation path.
+/// Each figure in [consumptionByFuel] carries its provenance (#3945): a
+/// `measured` figure comes from the user's own PURE full-to-full tank
+/// windows of that grade; an `estimated` one is the vehicle's measured
+/// consumption on another fuel converted by the two fuels' energy content,
+/// and the cell renders it visibly as a model. [usableFuels] empty means
+/// "no active vehicle" — the table then dims nothing and shows no
+/// per-100 km row, exactly the documented degradation path.
 class FuelCostModel {
-  final Map<FuelType, double> litersPer100kmByFuel;
+  final Map<FuelType, FuelConsumptionFigure> consumptionByFuel;
   final Set<FuelType> usableFuels;
 
   const FuelCostModel({
-    this.litersPer100kmByFuel = const <FuelType, double>{},
+    this.consumptionByFuel = const <FuelType, FuelConsumptionFigure>{},
     this.usableFuels = const <FuelType>{},
   });
 
   static const empty = FuelCostModel();
 
-  /// True when at least one fuel has a measured consumption — i.e. the
-  /// second number in each cell and the verdict line can be rendered.
-  bool get hasConsumption => litersPer100kmByFuel.isNotEmpty;
+  /// True when at least one fuel has a consumption figure — i.e. the
+  /// second number in a cell can be rendered.
+  bool get hasConsumption => consumptionByFuel.isNotEmpty;
+
+  /// The plain litres/100 km per fuel, measured and modelled alike.
+  Map<FuelType, double> get litersPer100kmByFuel => {
+    for (final e in consumptionByFuel.entries) e.key: e.value.litersPer100km,
+  };
 }
 
 /// Cheapest price per fuel across the results the list is showing.
@@ -93,17 +101,23 @@ Map<FuelType, double> allPricesBestByFuel(Ref ref) {
 /// the table and that screen can never state two different L/100 km for the
 /// same tank history.
 ///
-/// Only PURE buckets become a per-fuel figure. A MIX bucket (`E85/E10`) is
-/// a blend the driver burned, not a grade they can buy at the pump, and
-/// crediting its litres to the dominant grade is exactly the ADR 0014
-/// collapse ADR 0015 rejected — so a mix contributes to no column, and a
-/// fuel only ever driven blended simply has no cost-per-100 km cell.
+/// Only PURE buckets become a MEASURED per-fuel figure. A MIX bucket
+/// (`E85/E10`) is a blend the driver burned, not a grade they can buy at
+/// the pump, and crediting its litres to the dominant grade is exactly the
+/// ADR 0014 collapse ADR 0015 rejected — so a mix contributes to no column.
 ///
-/// The aggregator also owns the vehicle scoping: it keeps the ACTIVE
-/// vehicle's own fills only, where the deleted local copy also swept in
-/// fills carrying no `vehicleId`. Single-vehicle users see no difference
-/// (their fills are the vehicle's); multi-vehicle users no longer risk a
-/// stray unassigned fill of another car moving this car's number.
+/// #3945 — a usable fuel WITHOUT a pure window no longer loses its cell: the
+/// fill-ups feature's `FuelConsumptionEstimator` models it from the
+/// vehicle's baseline consumption (its most-confident pure window of another
+/// grade, else its all-fuel `ConsumptionStats` average anchored on the
+/// declared primary fuel) converted by energy content, and the figure is
+/// flagged `estimated` so the cell renders it as ≈. No baseline at all ⇒
+/// still no cell.
+///
+/// Vehicle scoping is the fill-ups feature's `activeVehicleFillUpsProvider`
+/// (#3945): the ACTIVE vehicle's own fills, plus the unassigned ones for a
+/// single-vehicle user; with two or more vehicles a stray unassigned fill of
+/// another car can never move this car's number.
 ///
 /// The pump-anchored gain (`VehicleProfile.pumpGain*`, Epic #3886) is
 /// deliberately NOT applied: it trims ESTIMATED OBD2 fuel rates onto the
@@ -123,16 +137,24 @@ FuelCostModel allPricesFuelCostModel(Ref ref) {
             ? compatibleFuelsFor(primary).toSet()
             : <FuelType>{primary});
 
-    final byFuel = <FuelType, double>{};
-    for (final stats in ref.watch(fuelTypeEfficiencyComparisonProvider)) {
-      if (stats.isMix) continue;
-      final l100 = stats.avgL100km;
-      if (l100 == null || l100 <= 0) continue;
-      byFuel[stats.dominant] = l100;
+    // The all-fuel average over the vehicle's closed windows is the last
+    // anchor when every window is a blend; it needs a fuel to carry an
+    // energy content, and the declared primary is the only honest choice.
+    ConsumptionBaseline? fallback;
+    if (primary != FuelType.all) {
+      final scoped = ref.watch(activeVehicleFillUpsProvider);
+      final avg = ConsumptionStats.fromFillUps(scoped).avgConsumptionL100km;
+      if (avg != null && avg > 0) {
+        fallback = ConsumptionBaseline(litersPer100km: avg, fuel: primary);
+      }
     }
 
     return FuelCostModel(
-      litersPer100kmByFuel: byFuel,
+      consumptionByFuel: FuelConsumptionEstimator.byFuel(
+        stats: ref.watch(fuelTypeEfficiencyComparisonProvider),
+        candidateFuels: usable,
+        fallbackBaseline: fallback,
+      ),
       usableFuels: usable,
     );
   } catch (e, st) {

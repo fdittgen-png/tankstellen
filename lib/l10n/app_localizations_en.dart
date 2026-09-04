@@ -3066,6 +3066,31 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get alertsEmptyTitle => 'No price alerts yet';
+
+  @override
+  String get alertsEmptySubtitle =>
+      'Get notified when a station, or any station in a zone, drops below your target price.';
+
+  @override
+  String get favoritesLoadErrorTitle => 'Favorites';
+
+  @override
+  String allPricesEstimatedCost(String cost) {
+    return '≈ $cost';
+  }
+
+  @override
+  String allPricesCellEstimatedSemantics(
+    String fuel,
+    String price,
+    String cost,
+    String consumption,
+  ) {
+    return '$fuel $price, about $cost per 100 km, estimated at $consumption from your vehicle\'s measured consumption and the fuel\'s energy content';
+  }
+
+  @override
   String get approachOverlaySection => 'Fuel Station Radar';
 
   @override
@@ -5007,6 +5032,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fuelNameElectric => 'Electric';
 
   @override
+  String tankReportRecordedSummary(String pct, String value, String residual) {
+    return 'Recorded trips cover $pct % of this tank and average $value · $residual % gap after calibration';
+  }
+
+  @override
+  String tankReportRecordedSummaryNoResidual(String pct, String value) {
+    return 'Recorded trips cover $pct % of this tank and average $value';
+  }
+
+  @override
   String get calibrationModeLabel => 'Calibration mode';
 
   @override
@@ -6748,6 +6783,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get refuelUnitPerSession => '/session';
 
   @override
+  String stationCardPriceUnit(String currency) {
+    return '$currency/L';
+  }
+
+  @override
+  String stationCardStatus24h(String status) {
+    return '$status · 24 h';
+  }
+
+  @override
+  String mapStationCountTooltip(int count) {
+    return '$count stations in the current result set';
+  }
+
+  @override
   String get settingsSearchHint => 'Search settings';
 
   @override
@@ -7998,11 +8048,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fillInventoryDismiss => 'Got it';
 
   @override
-  String tankReportResidualAfterCalibration(String percent) {
-    return 'Gap after calibration: $percent %';
-  }
-
-  @override
   String get tripFuelSourceMeasured => 'Measured';
 
   @override
@@ -8140,7 +8185,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get helpSearchTipSecondFigure =>
-      'The smaller second figure in a cell is what 100 km on that fuel costs in your vehicle.';
+      'The smaller second figure in a cell is what 100 km on that fuel costs in your vehicle. A figure marked ≈ is not measured: it is modelled from your vehicle\'s measured consumption and the fuel\'s energy content.';
 
   @override
   String get helpSearchTipPriceArrows =>
@@ -8626,11 +8671,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String tankReportRecordedTripsCoverage(String pct) {
     return 'Recorded trips cover $pct % of this tank';
-  }
-
-  @override
-  String tankReportRecordedTripsAvg(String value) {
-    return 'Recorded trips: $value';
   }
 
   @override
@@ -12047,6 +12087,31 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   }
 
   @override
+  String get alertsEmptyTitle => '⟦Ñó ƥřîçé áłéřŧš ýéŧ ·······⟧';
+
+  @override
+  String get alertsEmptySubtitle =>
+      '⟦Ǧéŧ ñóŧîƒîéđ ŵĥéñ á šŧáŧîóñ, óř áñý šŧáŧîóñ îñ á žóñé, đřóƥš ƀéłóŵ ýóúř ŧářǧéŧ ƥřîçé. ······························⟧';
+
+  @override
+  String get favoritesLoadErrorTitle => '⟦Ƒáṽóřîŧéš ····⟧';
+
+  @override
+  String allPricesEstimatedCost(String cost) {
+    return '⟦≈ $cost⟧';
+  }
+
+  @override
+  String allPricesCellEstimatedSemantics(
+    String fuel,
+    String price,
+    String cost,
+    String consumption,
+  ) {
+    return '⟦$fuel $price, áƀóúŧ $cost ƥéř 100 ķɱ, éšŧîɱáŧéđ áŧ $consumption ƒřóɱ ýóúř ṽéĥîçłé\'š ɱéášúřéđ çóñšúɱƥŧîóñ áñđ ŧĥé ƒúéł\'š éñéřǧý çóñŧéñŧ ····································⟧';
+  }
+
+  @override
   String get approachOverlaySection => '⟦Ƒúéł Šŧáŧîóñ Řáđář ·······⟧';
 
   @override
@@ -14051,6 +14116,16 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get fuelNameElectric => '⟦Éłéçŧřîç ····⟧';
 
   @override
+  String tankReportRecordedSummary(String pct, String value, String residual) {
+    return '⟦Řéçóřđéđ ŧřîƥš çóṽéř $pct % óƒ ŧĥîš ŧáñķ áñđ áṽéřáǧé $value · $residual % ǧáƥ áƒŧéř çáłîƀřáŧîóñ ··························⟧';
+  }
+
+  @override
+  String tankReportRecordedSummaryNoResidual(String pct, String value) {
+    return '⟦Řéçóřđéđ ŧřîƥš çóṽéř $pct % óƒ ŧĥîš ŧáñķ áñđ áṽéřáǧé $value ·················⟧';
+  }
+
+  @override
   String get calibrationModeLabel => '⟦Çáłîƀřáŧîóñ ɱóđé ·······⟧';
 
   @override
@@ -15830,6 +15905,21 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get refuelUnitPerSession => '⟦/šéššîóñ ···⟧';
 
   @override
+  String stationCardPriceUnit(String currency) {
+    return '⟦$currency/Ł⟧';
+  }
+
+  @override
+  String stationCardStatus24h(String status) {
+    return '⟦$status · 24 ĥ⟧';
+  }
+
+  @override
+  String mapStationCountTooltip(int count) {
+    return '⟦$count šŧáŧîóñš îñ ŧĥé çúřřéñŧ řéšúłŧ šéŧ ·············⟧';
+  }
+
+  @override
   String get settingsSearchHint => '⟦Šéářçĥ šéŧŧîñǧš ······⟧';
 
   @override
@@ -17116,11 +17206,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get fillInventoryDismiss => '⟦Ǧóŧ îŧ ··⟧';
 
   @override
-  String tankReportResidualAfterCalibration(String percent) {
-    return '⟦Ǧáƥ áƒŧéř çáłîƀřáŧîóñ: $percent % ·········⟧';
-  }
-
-  @override
   String get tripFuelSourceMeasured => '⟦Ṁéášúřéđ ····⟧';
 
   @override
@@ -17261,7 +17346,7 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get helpSearchTipSecondFigure =>
-      '⟦Ŧĥé šɱáłłéř šéçóñđ ƒîǧúřé îñ á çéłł îš ŵĥáŧ 100 ķɱ óñ ŧĥáŧ ƒúéł çóšŧš îñ ýóúř ṽéĥîçłé. ·····························⟧';
+      '⟦Ŧĥé šɱáłłéř šéçóñđ ƒîǧúřé îñ á çéłł îš ŵĥáŧ 100 ķɱ óñ ŧĥáŧ ƒúéł çóšŧš îñ ýóúř ṽéĥîçłé. Á ƒîǧúřé ɱářķéđ ≈ îš ñóŧ ɱéášúřéđ: îŧ îš ɱóđéłłéđ ƒřóɱ ýóúř ṽéĥîçłé\'š ɱéášúřéđ çóñšúɱƥŧîóñ áñđ ŧĥé ƒúéł\'š éñéřǧý çóñŧéñŧ. ·········································································⟧';
 
   @override
   String get helpSearchTipPriceArrows =>
@@ -17758,11 +17843,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String tankReportRecordedTripsCoverage(String pct) {
     return '⟦Řéçóřđéđ ŧřîƥš çóṽéř $pct % óƒ ŧĥîš ŧáñķ ·············⟧';
-  }
-
-  @override
-  String tankReportRecordedTripsAvg(String value) {
-    return '⟦Řéçóřđéđ ŧřîƥš: $value ······⟧';
   }
 
   @override

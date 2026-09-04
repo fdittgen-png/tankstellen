@@ -1,0 +1,34 @@
+{
+  "allPricesEstimatedCost": "≈ {cost}",
+  "@allPricesEstimatedCost": {
+    "description": "The cost-per-100 km figure of an all-prices table cell when it is MODELLED rather than measured (#3945): the vehicle has no pure tank of this fuel, so the number is its measured consumption on another fuel converted by energy content. The ≈ prefix is the only visible marker; keep it and keep the string as short as the English form — it must fit a column roughly 66 dp wide.",
+    "placeholders": {
+      "cost": {
+        "type": "String",
+        "example": "9,61 €"
+      }
+    }
+  },
+  "allPricesCellEstimatedSemantics": "{fuel} {price}, about {cost} per 100 km, estimated at {consumption} from your vehicle's measured consumption and the fuel's energy content",
+  "@allPricesCellEstimatedSemantics": {
+    "description": "Screen-reader label of an all-prices table cell whose cost per 100 km is an estimate, not a measurement (#3945). Says so explicitly, because the visual ≈ prefix is not spoken.",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E10"
+      },
+      "price": {
+        "type": "String",
+        "example": "1,839"
+      },
+      "cost": {
+        "type": "String",
+        "example": "9,61 €"
+      },
+      "consumption": {
+        "type": "String",
+        "example": "5,2 L/100 km"
+      }
+    }
+  }
+}

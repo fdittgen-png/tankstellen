@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../theme/app_motion.dart';
 import '../theme/app_radius.dart';
 
 /// A compact, toggleable icon+label pill used for binary/segmented mode
@@ -46,7 +47,8 @@ class SelectablePill extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        // #3948 — the shared selection beat, zero under reduced motion.
+        duration: AppMotion.selectionDuration(context),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: selected

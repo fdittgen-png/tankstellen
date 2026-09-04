@@ -3,6 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/features/alerts/data/models/price_alert.dart';
 import 'package:tankstellen/features/alerts/domain/entities/radius_alert.dart';
 import 'package:tankstellen/features/alerts/presentation/screens/alerts_screen.dart';
@@ -13,11 +14,15 @@ import 'package:tankstellen/features/alerts/providers/radius_alerts_provider.dar
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
 
+/// The zone section's own empty state (#578 phase 2) — shown when there is
+/// at least one STATION alert and no zone alert. (With zero alerts of
+/// either kind the whole page collapses to one empty state, #3951 — see
+/// `alerts_body_empty_state_test.dart`.)
 void main() {
   group('AlertsScreen radius empty state (#578 phase 2)', () {
     testWidgets(
-        'shows empty state CTA when no radius alerts are configured',
-        (tester) async {
+        'shows the zone section CTA when station alerts exist but no radius '
+        'alerts are configured', (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
       when(() => test.mockStorage.getAlerts()).thenReturn([]);
@@ -27,12 +32,14 @@ void main() {
         const AlertsScreen(),
         overrides: [
           ...test.overrides,
-          alertProvider.overrideWith(() => _EmptyAlerts()),
+          alertProvider.overrideWith(() => _OneAlert()),
           radiusAlertsProvider.overrideWith(() => _EmptyRadiusAlerts()),
         ],
       );
 
-      expect(find.text('Radius alerts (0)'), findsOneWidget);
+      // #3951 — the header drops its " (0)" suffix at zero.
+      expect(find.text('Radius alerts'), findsOneWidget);
+      expect(find.text('Radius alerts (0)'), findsNothing);
       expect(find.text('No radius alerts yet'), findsOneWidget);
       expect(find.text('Create a radius alert'), findsOneWidget);
     });
@@ -48,7 +55,7 @@ void main() {
         const AlertsScreen(),
         overrides: [
           ...test.overrides,
-          alertProvider.overrideWith(() => _EmptyAlerts()),
+          alertProvider.overrideWith(() => _OneAlert()),
           radiusAlertsProvider.overrideWith(() => _EmptyRadiusAlerts()),
           userPositionNullOverride(),
         ],
@@ -67,9 +74,19 @@ void main() {
   });
 }
 
-class _EmptyAlerts extends AlertNotifier {
+class _OneAlert extends AlertNotifier {
   @override
-  List<PriceAlert> build() => const [];
+  List<PriceAlert> build() => [
+        PriceAlert(
+          id: 'alert-1',
+          stationId: 'station-1',
+          stationName: 'Shell Berlin',
+          fuelType: FuelType.e10,
+          targetPrice: 1.50,
+          isActive: true,
+          createdAt: DateTime(2026, 1, 1),
+        ),
+      ];
 }
 
 class _EmptyRadiusAlerts extends RadiusAlerts {

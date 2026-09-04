@@ -67,8 +67,8 @@ List<Object> _overrides(
 void main() {
   group('AlertsTab (#3905 — alerts page inlined)', () {
     testWidgets(
-        'empty: renders the stats strip, both sections and the footer '
-        'directly — no intermediate card, no duplicate empty state',
+        'empty: renders ONE empty state and the footer directly — no '
+        'intermediate card, no stats strip, no "(0)" headers (#3951)',
         (tester) async {
       final test = standardTestOverrides();
 
@@ -80,19 +80,18 @@ void main() {
 
       // The page body itself, not a link to it.
       expect(find.byType(AlertsBody), findsOneWidget);
-      expect(find.byType(AlertStatisticsCard), findsOneWidget);
-      expect(find.text('Station alerts (0)'), findsOneWidget);
-      expect(find.text('Radius alerts (0)'), findsOneWidget);
+      // #3951 — zero alerts of either kind collapse the chrome: no 0·0·0
+      // strip, no "(0)" headers, one EmptyState, one primary action.
+      expect(find.byType(AlertStatisticsCard), findsNothing);
+      expect(find.text('Station alerts (0)'), findsNothing);
+      expect(find.text('Radius alerts (0)'), findsNothing);
+      expect(find.byType(EmptyState), findsOneWidget);
+      expect(find.byType(FilledButton), findsOneWidget);
+      expect(find.text('No price alerts yet'), findsOneWidget);
       expect(find.byType(AlertsLastCheckedFooter), findsOneWidget);
-      // The old "Radius alerts & statistics" entry card and the tab's own
-      // full-screen empty state are gone; the hint appears ONCE, inline.
+      // The old "Radius alerts & statistics" entry card is gone.
       expect(find.byKey(const Key('radiusAlertsEntry')), findsNothing);
       expect(find.text('Radius alerts & statistics'), findsNothing);
-      expect(find.text('No price alerts'), findsNothing);
-      expect(find.textContaining("station's detail page"), findsOneWidget);
-      // The only EmptyState left is the zone section's compact one.
-      expect(find.byType(EmptyState), findsOneWidget);
-      expect(find.text('No radius alerts yet'), findsOneWidget);
       expect(find.byType(HelpBanner), findsNothing);
     });
 

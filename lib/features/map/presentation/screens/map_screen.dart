@@ -15,7 +15,9 @@ import '../../../ev/presentation/widgets/ev_filter_chips.dart';
 import '../../../ev/presentation/widgets/ev_map_overlay.dart';
 import '../../../ev/providers/ev_providers.dart';
 import '../../../route_search/providers/route_search_provider.dart';
+import '../../../search/api.dart' show SearchSummaryBar;
 import '../../../search/providers/search_provider.dart';
+import '../../../../core/domain/search_result_item.dart';
 import '../widgets/nearby_map_view.dart';
 import '../widgets/route_map_view.dart';
 import '../../../../core/error/guarded.dart';
@@ -50,6 +52,16 @@ import '../../../../core/error/guarded.dart';
 /// any newly-available prices. This is a data refresh only — the structural
 /// gate above already keeps the tile layer healthy across a resume, so no
 /// map rebuild is needed.
+///
+/// ## Header (#3949, Epic #3947)
+///
+/// The same [SearchSummaryBar] the results list wears — fuel · radius (or
+/// route) · station count · price freshness, tap to open the criteria
+/// sheet — sits above the map body. It replaces the map's old bottom info
+/// bar, which said the same three things in a second visual language and
+/// stole a strip from the map. The station count is the number of fuel
+/// markers the nearby map paints; in route mode (and before any search)
+/// the pill is simply absent.
 class MapScreen extends ConsumerStatefulWidget {
   const MapScreen({super.key, this.clockOverride});
 
@@ -153,6 +165,7 @@ class _MapScreenState extends ConsumerState<MapScreen>
     final showEv = ref.watch(evShowOnMapProvider);
 
     final Widget body;
+    int? stationCount;
     if (!isVisibleBranch) {
       // Offstage: render nothing heavy. When the branch becomes visible
       // this build re-runs and the map lays out against real constraints.
@@ -163,6 +176,14 @@ class _MapScreenState extends ConsumerState<MapScreen>
       final searchRadius = ref.watch(searchRadiusProvider);
       final routeState = ref.watch(routeSearchStateProvider);
       final hasRouteResults = routeState.hasValue && routeState.value != null;
+      // #3949 — the header's station-count pill: the fuel markers the
+      // nearby map paints (EV pins come from their own overlay). Only a
+      // landed result has a count; loading / error / route mode show none.
+      if (!hasRouteResults && searchState.hasValue) {
+        final items = searchState.requireValue.data;
+        final fuelCount = items.whereType<FuelStationResult>().length;
+        if (items.isNotEmpty) stationCount = fuelCount;
+      }
       body = hasRouteResults
           ? RouteMapView(
               routeResult: routeState.value!,
@@ -202,6 +223,9 @@ class _MapScreenState extends ConsumerState<MapScreen>
         key: _shareBoundaryKey,
         child: Column(
           children: [
+            // #3949 — the results chrome's row A as the map header (see
+            // the class doc). Built only onstage, like the map itself.
+            if (isVisibleBranch) SearchSummaryBar(stationCount: stationCount),
             if (isVisibleBranch && showEv) const EvFilterChips(),
             Expanded(child: body),
           ],

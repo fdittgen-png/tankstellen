@@ -7,10 +7,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/core/services/widgets/service_status_banner.dart';
+import 'package:tankstellen/core/widgets/empty_state.dart';
 import 'package:tankstellen/features/alerts/data/models/price_alert.dart';
+import 'package:tankstellen/features/alerts/domain/entities/radius_alert.dart';
 import 'package:tankstellen/features/alerts/presentation/screens/alerts_screen.dart';
 import 'package:tankstellen/features/alerts/presentation/widgets/create_alert_dialog.dart';
 import 'package:tankstellen/features/alerts/providers/alert_provider.dart';
+import 'package:tankstellen/features/alerts/providers/radius_alerts_provider.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 
 import '../../../../helpers/mock_providers.dart';
@@ -30,6 +33,7 @@ void main() {
         overrides: [
           ...test.overrides,
           alertProvider.overrideWith(() => _EmptyAlerts()),
+          radiusAlertsProvider.overrideWith(() => _EmptyRadiusAlerts()),
         ],
       );
 
@@ -48,14 +52,17 @@ void main() {
         overrides: [
           ...test.overrides,
           alertProvider.overrideWith(() => _EmptyAlerts()),
+          radiusAlertsProvider.overrideWith(() => _EmptyRadiusAlerts()),
         ],
       );
 
-      // #2819 — the empty station section now shows a LABELLED header +
-      // a compact inline hint, not a full-screen "No price alerts" state.
-      expect(find.byIcon(Icons.notifications_off_outlined), findsOneWidget);
-      expect(find.textContaining('Station alerts'), findsOneWidget);
-      expect(find.textContaining("station's detail page"), findsOneWidget);
+      // #3951 — zero alerts of either kind: ONE empty state with ONE
+      // primary action; the stats strip and "(0)" headers are collapsed.
+      expect(find.byType(EmptyState), findsOneWidget);
+      expect(find.byType(FilledButton), findsOneWidget);
+      expect(find.text('No price alerts yet'), findsOneWidget);
+      expect(find.textContaining('Station alerts'), findsNothing);
+      expect(find.textContaining('(0)'), findsNothing);
     });
 
     testWidgets('shows alert list when alerts exist', (tester) async {
@@ -171,11 +178,14 @@ void main() {
         overrides: [
           ...test.overrides,
           alertProvider.overrideWith(() => _EmptyAlerts()),
+          radiusAlertsProvider.overrideWith(() => _EmptyRadiusAlerts()),
         ],
       );
 
       // The Station section "+" is the first add button (Zone "+" is second).
-      await tester.tap(find.byIcon(Icons.add).first);
+      // #3951 — with zero alerts the page is ONE empty state whose primary
+      // action is the station-alert picker.
+      await tester.tap(find.byKey(const Key('alerts_empty_add_station')));
       await tester.pumpAndSettle();
 
       // The picker is shown with the favorite station — NOT the dead-end
@@ -202,10 +212,13 @@ void main() {
         overrides: [
           ...test.overrides,
           alertProvider.overrideWith(() => _EmptyAlerts()),
+          radiusAlertsProvider.overrideWith(() => _EmptyRadiusAlerts()),
         ],
       );
 
-      await tester.tap(find.byIcon(Icons.add).first);
+      // #3951 — with zero alerts the page is ONE empty state whose primary
+      // action is the station-alert picker.
+      await tester.tap(find.byKey(const Key('alerts_empty_add_station')));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('alert_pick_station_tile_fav-1')));
       await tester.pumpAndSettle();
@@ -226,10 +239,13 @@ void main() {
         overrides: [
           ...test.overrides,
           alertProvider.overrideWith(() => _EmptyAlerts()),
+          radiusAlertsProvider.overrideWith(() => _EmptyRadiusAlerts()),
         ],
       );
 
-      await tester.tap(find.byIcon(Icons.add).first);
+      // #3951 — with zero alerts the page is ONE empty state whose primary
+      // action is the station-alert picker.
+      await tester.tap(find.byKey(const Key('alerts_empty_add_station')));
       await tester.pumpAndSettle();
 
       // Picker is shown with the empty hint + a real Search CTA — the user
@@ -275,6 +291,7 @@ void main() {
         overrides: [
           ...test.overrides,
           alertProvider.overrideWith(() => _FixedAlerts(const [])),
+          radiusAlertsProvider.overrideWith(() => _EmptyRadiusAlerts()),
         ],
       );
 
@@ -300,4 +317,9 @@ class _FixedAlerts extends AlertNotifier {
 
   @override
   List<PriceAlert> build() => _alerts;
+}
+
+class _EmptyRadiusAlerts extends RadiusAlerts {
+  @override
+  Future<List<RadiusAlert>> build() async => const [];
 }

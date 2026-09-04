@@ -4,6 +4,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_text.dart';
+import '../../../../core/theme/spacing.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// iOS-only honest "best effort" disclosure on the alerts screen (#3169).
@@ -29,7 +31,7 @@ class AlertsBestEffortNote extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+      padding: const EdgeInsets.fromLTRB(Spacing.xl, Spacing.sm, Spacing.xl, 0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -38,14 +40,13 @@ class AlertsBestEffortNote extends StatelessWidget {
             size: 16,
             color: theme.colorScheme.onSurfaceVariant,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: Spacing.md),
           Expanded(
             child: Text(
               l10n.alertsIosBestEffortNote,
               key: const ValueKey('alerts-best-effort-note'),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+              // #3951 — a disclosure caption is a label-role string.
+              style: AppText.label(context),
             ),
           ),
         ],

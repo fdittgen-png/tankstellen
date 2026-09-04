@@ -4,8 +4,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_text.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/price_formatter.dart';
+import '../../../../core/widgets/panel_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../feature_management/api.dart';
 import '../../domain/entities/consumption_stats.dart';
@@ -17,7 +21,10 @@ import '../../../../core/utils/unit_formatter.dart';
 
 part 'consumption_stats_card_parts.dart';
 
-/// Card summarising aggregated consumption statistics.
+/// Panel summarising aggregated consumption statistics — the Carburant
+/// tab's **secondary** surface since #3950 (Epic #3947): a [PanelCard] of
+/// stat tiles whose focal numbers are the largest text on the card, each
+/// tile's icon + label riding above its figure in the label role.
 ///
 /// Since #1362 the card grows two optional decorations on top of the stat
 /// tiles: a grey **open-window banner** when partial fills sit after the
@@ -31,10 +38,9 @@ part 'consumption_stats_card_parts.dart';
 /// workflow; it REPLACES the accusatory correction-share hint while a gap
 /// is pending (the actionable affordance supersedes the passive nudge).
 ///
-/// #2433 — the consumption-confidence indicator (ConfidenceTierBadge) and
-/// the debug-only raw η_v chip ride a subtitle row under the card title
-/// (moved out to the app-bar in #2383, brought back here in #2433) so the
-/// precision rating sits next to the figures it qualifies.
+/// #2433 / #3950 — the consumption-confidence indicator
+/// ([ConfidenceTierBadge]) is ONE small label-sized chip under the card
+/// title; the debug-only pump-gain chip joins it in Developer mode.
 class ConsumptionStatsCard extends ConsumerWidget {
   final ConsumptionStats stats;
 
@@ -59,8 +65,8 @@ class ConsumptionStatsCard extends ConsumerWidget {
   /// #2698 — when non-null the card body becomes an [InkWell]
   /// (mirroring [ResolveGapBanner]) and a trailing chevron joins the
   /// title row, opening the consumption-statistics detail page. When
-  /// null the card renders byte-identical to its pre-#2698 shape so the
-  /// existing summary-card tests keep passing.
+  /// null the card renders without the link so the existing
+  /// summary-card tests keep passing.
   final VoidCallback? onTap;
 
   const ConsumptionStatsCard({
@@ -98,28 +104,24 @@ class ConsumptionStatsCard extends ConsumerWidget {
     final showCorrectionHint =
         !showResolveGapBanner && stats.correctionShare > 0.05;
 
-    final titleText = Text(
-      l.consumptionStatsTitle,
-      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-    );
     // #2698 — when tappable, the title gains a trailing chevron so the
-    // affordance reads as a link into the detail page; otherwise it is
-    // the bare Text the summary-card tests assert against.
-    final Widget titleRow = onTap == null
-        ? titleText
-        : Row(
-            children: [
-              Expanded(child: titleText),
-              Icon(
-                Icons.chevron_right,
-                size: 20,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ],
-          );
+    // affordance reads as a link into the detail page.
+    final titleRow = Row(
+      children: [
+        Expanded(
+          child: Text(l.consumptionStatsTitle, style: AppText.title(context)),
+        ),
+        if (onTap != null)
+          Icon(
+            Icons.chevron_right,
+            size: 20,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+      ],
+    );
 
     final body = Padding(
-      padding: const EdgeInsets.all(12),
+      padding: Spacing.cardPadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -129,11 +131,11 @@ class ConsumptionStatsCard extends ConsumerWidget {
                 stats.openWindowFillCount,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: Spacing.md),
           ],
           if (showResolveGapBanner) ...[
             ResolveGapBanner(pending: pendingGap),
-            const SizedBox(height: 8),
+            const SizedBox(height: Spacing.md),
           ],
           if (showCorrectionHint) ...[
             _CorrectionShareHint(
@@ -141,35 +143,28 @@ class ConsumptionStatsCard extends ConsumerWidget {
                 (stats.correctionShare * 100).round(),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: Spacing.md),
           ],
           titleRow,
-          // #2433 — the precision rating rides a subtitle row directly
-          // under the card title: the confidence tier (A/B/C — #2027)
-          // and η_v (#1397 / #815) sit side-by-side on a phone in a
-          // single Wrap so they read as one calibration-state group and
-          // stack only when the row genuinely overflows. The confidence
-          // tier leads (user-facing accuracy band); η_v trails
-          // (engineer-detail anchor) and is shown ONLY in Developer mode
-          // (#2262) — for normal users the accuracy indicator alone
-          // conveys trust.
+          // #2433 / #3950 — the precision rating is ONE small label chip
+          // under the title (the confidence tier, #2027); the raw
+          // pump-gain chip (#3901, Epic #3886) joins it ONLY in Developer
+          // mode (#2262), wrapping onto a second line if it must.
           if (volumetricEfficiencySamples != null) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: Spacing.sm),
             Wrap(
-              spacing: 8,
-              runSpacing: 8,
+              spacing: Spacing.md,
+              runSpacing: Spacing.sm,
               children: [
                 ConfidenceTierBadge(
                   samples: volumetricEfficiencySamples!,
                   hasGpsPlusObd2Trip: hasGpsPlusObd2Trip,
                 ),
-                // #3901 — the pump-anchored gain (Epic #3886) replaced
-                // the η_v learner; the chip reads the active vehicle.
                 if (showRawCalibration) const PumpGainChip(),
               ],
             ),
           ],
-          const SizedBox(height: 8),
+          const SizedBox(height: Spacing.lg),
           Row(
             children: [
               Expanded(
@@ -181,6 +176,7 @@ class ConsumptionStatsCard extends ConsumerWidget {
                       : '—',
                 ),
               ),
+              const SizedBox(width: Spacing.md),
               Expanded(
                 child: _StatTile(
                   icon: Icons.euro,
@@ -193,7 +189,7 @@ class ConsumptionStatsCard extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: Spacing.lg),
           Row(
             children: [
               Expanded(
@@ -203,6 +199,7 @@ class ConsumptionStatsCard extends ConsumerWidget {
                   value: UnitFormatter.formatDecimal(stats.totalLiters),
                 ),
               ),
+              const SizedBox(width: Spacing.md),
               Expanded(
                 child: _StatTile(
                   icon: Icons.payments_outlined,
@@ -216,7 +213,7 @@ class ConsumptionStatsCard extends ConsumerWidget {
           // #3903 — the fill-up count is a fifth tile in the same grid
           // style (icon + label + value), not a bare text line.
           if (stats.fillUpCount > 0) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: Spacing.lg),
             Row(
               children: [
                 Expanded(
@@ -226,6 +223,7 @@ class ConsumptionStatsCard extends ConsumerWidget {
                     value: '${stats.fillUpCount}',
                   ),
                 ),
+                const SizedBox(width: Spacing.md),
                 const Expanded(child: SizedBox.shrink()),
               ],
             ),
@@ -236,38 +234,37 @@ class ConsumptionStatsCard extends ConsumerWidget {
           // window so the line stays out of the way otherwise.
           // #2491 — neutral onSurfaceVariant, not warning (#2487).
           if (stats.correctionLitersTotal > 0) ...[
-            const SizedBox(height: 4),
+            const SizedBox(height: Spacing.sm),
             Text(
               l.statCorrectionLiters(
                 UnitFormatter.formatDecimal(stats.correctionLitersTotal),
               ),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+              style: AppText.label(context),
             ),
           ],
         ],
       ),
     );
 
-    return Card(
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      // #2698 — when null the card stays a plain Padding-in-Card so its
-      // render is byte-identical to the pre-#2698 summary card; when
-      // set the body becomes a tappable InkWell that opens the
-      // consumption-statistics detail page (mirrors [ResolveGapBanner]).
+    // #3950 — a PanelCard (secondary surface: tonal fill, no outline, no
+    // shadow) so the tank card above it reads as the figure and this as
+    // the ground. The panel owns no padding here: the body carries it so
+    // the #2698 link InkWell ripples edge to edge inside the corners.
+    return PanelCard(
+      padding: EdgeInsets.zero,
       child: onTap == null
           ? body
           : InkWell(
               key: const Key('consumption-stats-card-link'),
               onTap: onTap,
+              borderRadius: AppRadius.lg,
               child: body,
             ),
     );
   }
 }
 
-// The four private decoration widgets (_OpenWindowBanner,
+// The three private decoration widgets (_OpenWindowBanner,
 // _CorrectionShareHint, _StatTile) live in the
 // `part`'d consumption_stats_card_parts.dart so this file stays under
 // the 400-line cap (#2698 / file_length_test).

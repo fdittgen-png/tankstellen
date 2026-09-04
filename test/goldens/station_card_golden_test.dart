@@ -64,9 +64,16 @@ void main() {
 
       final cheapest = find.text('Cheapest');
       expect(cheapest, findsOneWidget);
-      final cheapestTop = tester.getTopLeft(cheapest).dy;
-      final priceTop = tester.getTopLeft(find.byType(RichText).last).dy;
-      expect(cheapestTop, lessThan(priceTop));
+      // #3949 — the badge shares the headline row with the display price
+      // (trailing it), so it is read together with the number it
+      // qualifies and BEFORE the title, address and meta line below.
+      final cheapestBottom = tester.getBottomLeft(cheapest).dy;
+      // The address line is the unambiguous "below the headline" anchor
+      // (the brand text also appears inside the brand-mark monogram).
+      final addressTop = tester.getTopLeft(
+        find.textContaining('Berliner Str.'),
+      ).dy;
+      expect(cheapestBottom, lessThanOrEqualTo(addressTop + 1));
     });
 
     testWidgets('closed station shows the expensive tier arrow', (tester) async {
@@ -157,7 +164,8 @@ void main() {
       expect(find.text('Diesel: '), findsOneWidget);
     });
 
-    testWidgets('24h station shows the 24h badge', (tester) async {
+    testWidgets('24h station carries the 24 h flag in the status dot tooltip '
+        '(#3949 — no separate badge)', (tester) async {
       const station24h = Station(
         id: '24h-station',
         name: '24h Tankstelle',
@@ -182,7 +190,13 @@ void main() {
         ),
       );
 
-      expect(find.text('24h'), findsOneWidget);
+      // #3949 — the 24 h flag folded into the status dot: nothing is lost,
+      // it just no longer costs a badge below the dot.
+      expect(find.text('24h'), findsNothing);
+      final dot = tester.widget<Tooltip>(
+        find.byKey(const Key('station_card_status_dot')),
+      );
+      expect(dot.message, contains('24 h'));
     });
 
     testWidgets(

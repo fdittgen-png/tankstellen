@@ -8,6 +8,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/data/storage_repository.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/storage/storage_providers.dart';
+import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_text.dart';
+import '../../../../core/theme/spacing.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// A dismissable banner that teaches first-time users about swipe gestures
@@ -58,11 +61,12 @@ class _SwipeTutorialBannerState extends ConsumerState<SwipeTutorialBanner> {
     return Semantics(
       label: l10n.swipeTutorialMessage,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        padding: const EdgeInsets.all(12),
+        // #3951 — grammar geometry: surface margin, card radius, body role.
+        margin: Spacing.surfaceMargin,
+        padding: const EdgeInsets.all(Spacing.lg),
         decoration: BoxDecoration(
           color: theme.colorScheme.primaryContainer,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadius.lg,
         ),
         child: Row(
           children: [
@@ -71,16 +75,16 @@ class _SwipeTutorialBannerState extends ConsumerState<SwipeTutorialBanner> {
               color: theme.colorScheme.onPrimaryContainer,
               size: 28,
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: Spacing.lg),
             Expanded(
               child: Text(
                 l10n.swipeTutorialMessage,
-                style: theme.textTheme.bodyMedium?.copyWith(
+                style: AppText.body(context).copyWith(
                   color: theme.colorScheme.onPrimaryContainer,
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: Spacing.md),
             TextButton(
               onPressed: _dismiss,
               child: Text(l10n.swipeTutorialDismiss),

@@ -1,0 +1,32 @@
+{
+  "allPricesEstimatedCost": "≈ {cost}",
+  "@allPricesEstimatedCost": {
+    "placeholders": {
+      "cost": {
+        "type": "String",
+        "example": "9,61 €"
+      }
+    }
+  },
+  "allPricesCellEstimatedSemantics": "{fuel} {price}, etwa {cost} pro 100 km, geschätzt mit {consumption} aus dem gemessenen Verbrauch Ihres Fahrzeugs und dem Energiegehalt des Kraftstoffs",
+  "@allPricesCellEstimatedSemantics": {
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E10"
+      },
+      "price": {
+        "type": "String",
+        "example": "1,839"
+      },
+      "cost": {
+        "type": "String",
+        "example": "9,61 €"
+      },
+      "consumption": {
+        "type": "String",
+        "example": "5,2 L/100 km"
+      }
+    }
+  }
+}

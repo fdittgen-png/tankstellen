@@ -13,18 +13,22 @@ import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../helpers/pump_app.dart';
+import '../../../../helpers/text_hierarchy.dart';
 
 /// Widget-level coverage for [TankLevelCard] (#1195).
 ///
 /// The card itself is presentational — it reads
-/// [tankLevelProvider] and reflects the [TankLevelEstimate] with a big
-/// number, a range sub-text, a `LinearProgressIndicator`, and a method
-/// caption. These tests pin:
+/// [tankLevelProvider] and reflects the [TankLevelEstimate] with a
+/// display-role number + baseline unit (#3950), a range sub-text, a
+/// `LinearProgressIndicator`, and a method caption. These tests pin:
 ///   * empty state when no fill-ups
 ///   * populated rendering of level + range
 ///   * low-fuel colour switch at < 15 % capacity
 ///   * detail bottom-sheet open on tap
 ///   * method-label localisation across the three enum values
+///   * the visual grammar: the litres are the largest text on the card,
+///     the `L` unit sits beside them, and the card survives 320 dp under
+///     the en_XA pseudo-locale at a 1.3× font setting
 class _StubVehicleList extends VehicleProfileList {
   @override
   List<VehicleProfile> build() => const [
@@ -77,7 +81,12 @@ void main() {
       );
 
       expect(find.text('Tank level'), findsOneWidget);
-      expect(find.text('32,4 L'), findsOneWidget);
+      // #3950 — the litres are the display number; the unit is its own
+      // label-role Text on the same baseline, not part of the string.
+      expect(find.text('32,4'), findsOneWidget);
+      expect(find.byKey(const Key('tank_level_big_number')), findsOneWidget);
+      expect(find.byKey(const Key('tank_level_unit')), findsOneWidget);
+      expect(find.text('32,4 L'), findsNothing);
     });
 
     testWidgets('renders the range sub-text when rangeKm is non-null',
@@ -417,6 +426,111 @@ void main() {
       );
       expect(find.byKey(const Key('tank_mix_line')), findsNothing);
       expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('TankLevelCard — visual grammar (#3950, Epic #3947)', () {
+    TankLevelEstimate estimate() => TankLevelEstimate(
+          levelL: 32.4,
+          capacityL: 50,
+          lastFillUpDate: DateTime(2026, 4, 27),
+          source: TankLevelSource.fillUp,
+          sensorReadAt: null,
+          rangeKm: 405,
+          rangeKmLastInterval: 324,
+        );
+
+    testWidgets('the litres are the ONE display number — strictly the '
+        'largest text on the card', (tester) async {
+      await pumpApp(
+        tester,
+        const TankLevelCard(),
+        overrides: <Object>[
+          ..._tankLevelOverride(estimate()),
+          tankMixProvider('stub-vehicle').overrideWith(
+            (ref) => TankMixEstimate(
+              shares: const [
+                TankMixShare(fuel: FuelType.e10, share: 0.57),
+                TankMixShare(fuel: FuelType.e85, share: 0.43),
+              ],
+              asOf: DateTime(2026, 4, 27),
+            ),
+          ),
+        ],
+      );
+
+      expectFocalNumberLargest(
+        tester,
+        within: find.byType(TankLevelCard),
+        focal: find.byKey(const Key('tank_level_big_number')),
+      );
+    });
+
+    testWidgets('display number and unit share one alphabetic baseline',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const TankLevelCard(),
+        overrides: _tankLevelOverride(estimate()),
+      );
+
+      final row = tester.widget<Row>(find.ancestor(
+        of: find.byKey(const Key('tank_level_unit')),
+        matching: find.byType(Row),
+      ).first);
+      expect(row.crossAxisAlignment, CrossAxisAlignment.baseline);
+      expect(row.textBaseline, TextBaseline.alphabetic);
+      // The unit is muted and clearly smaller than the number.
+      final sizes = textFontSizesUnder(tester, find.byType(TankLevelCard));
+      final number = sizes.entries
+          .singleWhere((e) => e.key.widget.key == const Key('tank_level_big_number'))
+          .value;
+      final unit = sizes.entries
+          .singleWhere((e) => e.key.widget.key == const Key('tank_level_unit'))
+          .value;
+      expect(unit, lessThan(number));
+    });
+
+    testWidgets('the range is ONE body line; the long-run figure is a '
+        'label-role caption and the bar carries no end labels',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const TankLevelCard(),
+        overrides: _tankLevelOverride(estimate()),
+      );
+
+      final primary = tester.widget<Text>(
+          find.byKey(const Key('tank_level_range_primary')));
+      final longRun = tester.widget<Text>(
+          find.byKey(const Key('tank_level_range_long_run')));
+      expect(primary.style!.fontSize!, greaterThan(longRun.style!.fontSize!));
+      expect(find.byKey(const Key('tank_level_bar_labels')), findsNothing);
+      expect(find.text('0 L'), findsNothing);
+      expect(find.text('50 L'), findsNothing);
+    });
+
+    testWidgets('en_XA at 320 dp + 1.3x text scale: no overflow',
+        (tester) async {
+      tester.view.physicalSize = const Size(320, 800);
+      tester.view.devicePixelRatio = 1.0;
+      tester.platformDispatcher.textScaleFactorTestValue = 1.3;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+      // The card's real host (the Carburant tab) scrolls; a fixed 800 dp
+      // body would only measure the test font's square glyphs.
+      await pumpApp(
+        tester,
+        const SingleChildScrollView(child: TankLevelCard()),
+        overrides: _tankLevelOverride(estimate()),
+        locale: const Locale('en', 'XA'),
+      );
+
+      expect(tester.takeException(), isNull,
+          reason: 'the tank card overflows at 320 dp under en_XA / 1.3x');
+      expect(find.byKey(const Key('tank_level_big_number')), findsOneWidget);
     });
   });
 }

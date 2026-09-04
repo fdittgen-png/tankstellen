@@ -56,6 +56,14 @@ const _independent = Station(
 Finder _cardById(String id) => find.byKey(ValueKey('station-$id'));
 
 Future<void> _pumpList(WidgetTester tester) async {
+  // #3949 — the grammar card is ~145 dp tall (display-role price), so the
+  // list plus its chrome no longer fits the default 600×800 test viewport
+  // and the lazy list never builds the last row. This file measures
+  // REACTIVITY, not scrolling: give it a tall viewport.
+  tester.view.physicalSize = const Size(600, 1600);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
   final test = standardTestOverrides();
   when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
   when(() => test.mockStorage.getApiKey(any())).thenReturn(null);

@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_radius.dart';
+import '../../../../../core/theme/spacing.dart';
 
 /// One recessed pill inside the results **summary bar** (row A, #3926).
 ///
@@ -21,6 +22,11 @@ import '../../../../../core/theme/app_radius.dart';
 /// `10 km`, `1 min`): the glyph beside each one already says the noun the
 /// old label repeated. Nothing is lost, because the full sentence moves
 /// into [tooltip], which is also what a screen reader announces.
+/// #3948 (Epic #3947) — the pill is the grammar's **summary** chip role:
+/// tonal (`secondaryContainer`), borderless, `labelSmall`, 8 dp padding.
+/// It is *read*, not pressed, and must look unlike a choice chip (outlined,
+/// `primaryContainer` when selected) so a summary of the search can never
+/// be mistaken for a filter that is still selectable.
 class SummaryChip extends StatelessWidget {
   const SummaryChip({
     super.key,
@@ -61,24 +67,18 @@ class SummaryChip extends StatelessWidget {
     final theme = Theme.of(context);
     final foreground = emphasized
         ? theme.colorScheme.onTertiaryContainer
-        : theme.colorScheme.onSurfaceVariant;
+        : theme.colorScheme.onSecondaryContainer;
     final pill = ConstrainedBox(
       constraints: BoxConstraints(maxWidth: maxWidth),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: Spacing.chipPadding,
         decoration: BoxDecoration(
-          // #2117 — the segment sits on the bar's `surfaceContainerHighest`
-          // surface; `surfaceContainerLow` is the M3 inversion that reads as
-          // a recessed pill rather than fighting the bar.
+          // #3948 — a tonal, borderless read-only pill. The emphasized
+          // (stale-prices) state keeps its amber tertiary tone.
           color: emphasized
               ? theme.colorScheme.tertiaryContainer
-              : theme.colorScheme.surfaceContainerLow,
+              : theme.colorScheme.secondaryContainer,
           borderRadius: AppRadius.xl,
-          border: Border.all(
-            color: emphasized
-                ? theme.colorScheme.tertiary
-                : theme.colorScheme.outlineVariant,
-          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,

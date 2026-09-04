@@ -3,40 +3,41 @@
 
 part of 'station_card.dart';
 
-/// Right-side block: user rating stars, selected-fuel price with tier icon
-/// and favorite toggle, optional "Cheapest" badge, and (in all-fuels mode)
-/// the alternative-fuel mini price rows.
-class _StationPriceColumn extends StatelessWidget {
+/// The card's headline row (#3949): brand mark, the display-role price
+/// with its baseline-aligned unit and the colour-blind tier arrow, then —
+/// pushed to the trailing edge — the Cheapest badge and the favourite
+/// star.
+///
+/// The price is never truncated — it is the ONE number the card exists to
+/// show. It owns the row's remaining width and, when a raised text scale
+/// on a 320 dp screen leaves less room than its natural width, it scales
+/// down whole (a `FittedBox`) rather than ellipsising to `1,7…`. The
+/// Cheapest badge is width-capped and ellipsises first under an expanded
+/// translation; the 32×32 star keeps its tap target.
+class _HeadlineRow extends StatelessWidget {
   final Station station;
-  final FuelType selectedFuelType;
+  final BrandAppearance? brandMark;
   final double? price;
   final String? currencyOverride;
-  final Color fuelColor;
   final bool isFavorite;
   final bool isCheapest;
   final PriceTier? priceTier;
-  final int? rating;
-  final FuelType? profileFuelType;
 
   /// Per-litre loyalty discount that applies to this station's brand
-  /// (#1120 pilot). When non-null and positive, the column renders
-  /// the effective price (raw − discount) as the headline number,
-  /// strikes through the raw price below it, and adds a small
-  /// `−€0.05` badge so the user can tell why the number changed.
+  /// (#1120 pilot). When non-null and positive, the headline renders the
+  /// effective price (raw − discount) and a `−€0.05` badge with the raw
+  /// price struck through follows beneath it.
   final double? loyaltyDiscount;
   final VoidCallback? onFavoriteTap;
 
-  const _StationPriceColumn({
+  const _HeadlineRow({
     required this.station,
-    required this.selectedFuelType,
+    required this.brandMark,
     required this.price,
     required this.currencyOverride,
-    required this.fuelColor,
     required this.isFavorite,
     required this.isCheapest,
     required this.priceTier,
-    required this.rating,
-    required this.profileFuelType,
     required this.loyaltyDiscount,
     required this.onFavoriteTap,
   });
@@ -54,13 +55,8 @@ class _StationPriceColumn extends StatelessWidget {
     return effective < 0.001 ? 0.001 : effective;
   }
 
-  /// ISO country code inferred from the station id, used to pick the
-  /// right fuel-grade labels (#2717 — `mx-` → PEMEX Magna/Premium).
-  String? get _countryCode => Countries.countryCodeForStationId(station.id);
-
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
     final effective = _effectivePrice;
     final hasDiscount =
@@ -68,117 +64,70 @@ class _StationPriceColumn extends StatelessWidget {
         loyaltyDiscount! > 0 &&
         price != null &&
         effective != null;
+
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        // #2622 — the favourite star is hoisted OUT of the price row to the
-        // card's top-right so the price headline owns its own line. The
-        // 32×32 tap target + tooltip are preserved for a11y.
-        SizedBox(
-          width: 32,
-          height: 32,
-          child: IconButton(
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-            icon: AnimatedFavoriteStar(isFavorite: isFavorite, size: 22),
-            // #2974 — a selection tick on the favourite toggle, matching the
-            // everyday tap-surface haptics. selectionClick only (never
-            // heavyImpact); fires only on the discrete star tap, never scroll.
-            onPressed: onFavoriteTap == null
-                ? null
-                : () {
-                    unawaited(HapticFeedback.selectionClick());
-                    onFavoriteTap!();
-                  },
-            tooltip: isFavorite ? (l10n.favoriteRemove) : (l10n.favoriteAdd),
-          ),
-        ),
-        if (rating != null && rating! >= 1 && rating! <= 5)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 2),
-            child: _RatingStars(rating: rating!),
-          ),
-        // #2622 — promote the Cheapest badge ABOVE the price so it anchors
-        // the bestStops-default list before the eye reaches the number.
-        if (isCheapest)
-          Container(
-            margin: const EdgeInsets.only(bottom: 2),
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-            decoration: BoxDecoration(
-              color: DarkModeColors.successSurface(context),
-              borderRadius: AppRadius.sm,
-            ),
-            child: Text(
-              l10n.cheapest,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                color: DarkModeColors.success(context),
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
         Row(
-          mainAxisSize: MainAxisSize.min,
           children: [
-            if (priceTier != null && priceTier != PriceTier.unknown)
-              Padding(
-                padding: const EdgeInsets.only(right: 2),
-                // #3926 — the ↓ / – / ↑ glyph is a PRICE TIER inside the
-                // CURRENT result set (`priceTierOf` splits the listed
-                // stations' min-to-max range for the selected fuel into
-                // thirds), never a movement against an earlier price. It
-                // shipped with no reference at all; it now names what it
-                // compares against, and the list footer carries the same
-                // wording as a one-line legend.
-                child: Tooltip(
-                  message: _priceTierTooltip(l10n, priceTier!),
-                  child: Icon(
-                    iconForPriceTier(priceTier!),
-                    size: 16,
-                    // #3198 — only a KNOWN-closed station greys the price;
-                    // unknown keeps the fuel colour (price data is valid).
-                    color: station.isOpen == false
-                        ? theme.colorScheme.onSurfaceVariant
-                        : fuelColor,
-                    semanticLabel: _priceTierTooltip(l10n, priceTier!),
+            if (brandMark != null) ...[
+              // The row's own semantic label already names the brand;
+              // letting the mark announce it again would read the brand
+              // twice on every card. #3940 — the slot stays SQUARE: a Row
+              // lays its non-flex children out unbounded, so there is no
+              // measured room for a wide wordmark here.
+              ExcludeSemantics(
+                child: BrandLogo(brand: station.brand, size: 34),
+              ),
+              const SizedBox(width: Spacing.md),
+            ],
+            Expanded(
+              child: Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: AlignmentDirectional.centerStart,
+                  child: _PriceHeadline(
+                    station: station,
+                    price: effective,
+                    rawPrice: price,
+                    hasDiscount: hasDiscount,
+                    currencyOverride: currencyOverride,
+                    priceTier: priceTier,
                   ),
                 ),
               ),
-            AnimatedPriceText(
-              price: effective,
-              child: Tooltip(
-                // #1120 — when a loyalty discount applies, the
-                // tooltip surfaces the un-discounted raw price so
-                // power users can verify what the operator quoted.
-                message: hasDiscount
-                    ? (l10n.loyaltyRawPriceTooltip(
-                        PriceFormatter.formatPrice(
-                          price,
-                          currencyOverride: currencyOverride,
-                        ),
-                      ))
-                    : '',
-                child: RichText(
-                  overflow: TextOverflow.ellipsis,
-                  text: PriceFormatter.priceTextSpan(
-                    effective,
-                    currencyOverride: currencyOverride,
-                    baseStyle: theme.textTheme.titleLarge!.copyWith(
-                      fontWeight: FontWeight.bold,
-                      // #3548 — tabular figures: every card's price digits
-                      // occupy identical advance widths, so the price
-                      // column reads as an aligned scannable column
-                      // instead of ragged proportional digits.
-                      fontFeatures: const [FontFeature.tabularFigures()],
-                      // #3198 — grey only when known-closed (see above).
-                      color: station.isOpen == false
-                          ? theme.colorScheme.onSurfaceVariant
-                          : fuelColor,
-                    ),
-                  ),
-                ),
+            ),
+            const SizedBox(width: Spacing.md),
+            if (isCheapest) ...[
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 88),
+                child: const _CheapestBadge(),
+              ),
+              const SizedBox(width: Spacing.sm),
+            ],
+            // #2622 — the favourite star keeps its 32×32 tap target +
+            // tooltip; #3949 moves it onto the headline row's trailing
+            // edge so the price owns the row's leading edge.
+            SizedBox(
+              width: 32,
+              height: 32,
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: AnimatedFavoriteStar(isFavorite: isFavorite, size: 22),
+                // #2974 — a selection tick on the favourite toggle,
+                // matching the everyday tap-surface haptics. selectionClick
+                // only (never heavyImpact); fires only on the discrete star
+                // tap, never scroll.
+                onPressed: onFavoriteTap == null
+                    ? null
+                    : () {
+                        unawaited(HapticFeedback.selectionClick());
+                        onFavoriteTap!();
+                      },
+                tooltip: isFavorite ? l10n.favoriteRemove : l10n.favoriteAdd,
               ),
             ),
           ],
@@ -190,32 +139,139 @@ class _StationPriceColumn extends StatelessWidget {
             rawPrice: price!,
             currencyOverride: currencyOverride,
           ),
-        if (selectedFuelType == FuelType.all && !isCheapest) ...[
-          const SizedBox(height: 2),
-          // #2717 — Mexican (mx-) stations show PEMEX grade names
-          // (Magna/Premium); every other country is unchanged.
-          _PriceRow(
-            label: fuelDisplayLabel(FuelType.e5, countryCode: _countryCode),
-            price: station.e5,
-            fuelType: FuelType.e5,
-            isProfileFuel: profileFuelType is FuelTypeE5,
+      ],
+    );
+  }
+}
+
+/// The display-role price: `[↓] 1,79⁹ €/L`, number and unit on one
+/// baseline ([AppText.display] + [AppText.unit]).
+///
+/// The number is the theme's `onSurface` — the fuel colour lives on the
+/// card's stripe, the price band on the tier arrow — and greys to
+/// `onSurfaceVariant` only for a KNOWN-closed station (#3198: unknown keeps
+/// the full colour, the price data is valid).
+class _PriceHeadline extends StatelessWidget {
+  final Station station;
+  final double? price;
+  final double? rawPrice;
+  final bool hasDiscount;
+  final String? currencyOverride;
+  final PriceTier? priceTier;
+
+  const _PriceHeadline({
+    required this.station,
+    required this.price,
+    required this.rawPrice,
+    required this.hasDiscount,
+    required this.currencyOverride,
+    required this.priceTier,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+    final closed = station.isOpen == false;
+    final numberStyle = closed
+        ? AppText.display(context).copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          )
+        : AppText.display(context);
+    final tier = priceTier;
+    final showTier = tier != null && tier != PriceTier.unknown;
+    final currency = currencyOverride ?? PriceFormatter.currency;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
+      children: [
+        if (showTier)
+          // #3926 — the ↓ / – / ↑ glyph is a PRICE TIER inside the CURRENT
+          // result set (`priceTierOf` splits the listed stations' min-to-
+          // max range for the selected fuel into thirds), never a movement
+          // against an earlier price. It is the colour-blind reading of
+          // the map's colour ramp, so it stays on the card (#3949).
+          Padding(
+            padding: const EdgeInsets.only(right: Spacing.xs),
+            child: Tooltip(
+              message: _priceTierTooltip(l10n, tier),
+              child: Icon(
+                iconForPriceTier(tier),
+                size: 18,
+                color: numberStyle.color,
+                semanticLabel: _priceTierTooltip(l10n, tier),
+              ),
+            ),
           ),
-          _PriceRow(
-            label: fuelDisplayLabel(FuelType.e10, countryCode: _countryCode),
-            price: station.e10,
-            fuelType: FuelType.e10,
-            isProfileFuel: profileFuelType is FuelTypeE10,
+        AnimatedPriceText(
+          price: price,
+          child: Tooltip(
+            // #1120 — when a loyalty discount applies, the tooltip surfaces
+            // the un-discounted raw price so power users can verify what
+            // the operator quoted.
+            message: hasDiscount
+                ? l10n.loyaltyRawPriceTooltip(
+                    PriceFormatter.formatPrice(
+                      rawPrice,
+                      currencyOverride: currencyOverride,
+                    ),
+                  )
+                : '',
+            child: RichText(
+              maxLines: 1,
+              text: _displayPriceSpan(price, numberStyle),
+            ),
           ),
-          _PriceRow(
-            label: fuelDisplayLabel(FuelType.diesel, countryCode: _countryCode),
-            price: station.diesel,
-            fuelType: FuelType.diesel,
-            isProfileFuel: profileFuelType is FuelTypeDiesel,
+        ),
+        if (price != null && price! > 0) ...[
+          const SizedBox(width: Spacing.sm),
+          Text(
+            l10n.stationCardPriceUnit(currency),
+            style: AppText.unit(context),
           ),
         ],
       ],
     );
   }
+}
+
+/// The display number with the 9/10ths digit in superscript — the
+/// standard forecourt price form (`1,79⁹`) — and NO currency: the unit is
+/// rendered separately in [AppText.unit] so the number can be the display
+/// role and the unit the label role, on one baseline.
+///
+/// Mirrors [PriceFormatter.priceTextSpan] minus its trailing ` €`, which
+/// would put the currency symbol at 36 sp.
+TextSpan _displayPriceSpan(double? price, TextStyle style) {
+  if (price == null || price <= 0) {
+    // The same language-neutral "no price" mask PriceFormatter renders.
+    return TextSpan(text: '--', style: style);
+  }
+  final full = PriceFormatter.formatPriceCompact(price);
+  final base = full.substring(0, full.length - 1);
+  final tenths = full.substring(full.length - 1);
+  final size = style.fontSize ?? 14;
+  return TextSpan(
+    style: style,
+    children: [
+      TextSpan(text: base),
+      WidgetSpan(
+        alignment: PlaceholderAlignment.top,
+        child: Transform.translate(
+          offset: Offset(0, -size * 0.2),
+          child: Text(
+            tenths,
+            style: style.copyWith(
+              fontSize: size * 0.65,
+              fontFeatures: const [FontFeature.superscripts()],
+            ),
+          ),
+        ),
+      ),
+    ],
+  );
 }
 
 /// Wording for the card's price-tier glyph (#3926). The tier is relative
@@ -230,92 +286,33 @@ String _priceTierTooltip(AppLocalizations l10n, PriceTier tier) =>
       PriceTier.unknown => '',
     };
 
-/// Small badge rendered under the price row when a loyalty / fuel-club
-/// card applies (#1120 pilot). Shows the per-litre discount, the
-/// canonical brand name, and a struck-through raw price so the user
-/// can read both the headline number and the operator's quoted price
-/// at once.
-class _LoyaltyDiscountBadge extends StatelessWidget {
-  final Station station;
-  final double discount;
-  final double rawPrice;
-  final String? currencyOverride;
-
-  const _LoyaltyDiscountBadge({
-    required this.station,
-    required this.discount,
-    required this.rawPrice,
-    required this.currencyOverride,
-  });
+/// The "Cheapest" badge (#2622) — success-tinted, label role, on the
+/// headline row's trailing edge so it anchors the bestStops-default list
+/// beside the number it qualifies.
+class _CheapestBadge extends StatelessWidget {
+  const _CheapestBadge();
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l = AppLocalizations.of(context);
-    final canonical = BrandRegistry.canonicalize(station.brand) ?? '';
-    final prefix = l.loyaltyBadgePrefix;
-    final discountStr = PriceFormatter.formatPrice(
-      discount,
-      currencyOverride: currencyOverride,
-    );
-    final rawStr = PriceFormatter.formatPrice(
-      rawPrice,
-      currencyOverride: currencyOverride,
-    );
+    final l10n = AppLocalizations.of(context);
     return Container(
-      margin: const EdgeInsets.only(top: 2),
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+      padding: const EdgeInsets.symmetric(
+        horizontal: Spacing.md - Spacing.xs,
+        vertical: 1,
+      ),
       decoration: BoxDecoration(
-        color: theme.colorScheme.primaryContainer,
+        color: DarkModeColors.successSurface(context),
         borderRadius: AppRadius.sm,
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            '$prefix$discountStr ${canonical.isEmpty ? '' : canonical}'.trim(),
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: theme.colorScheme.onPrimaryContainer,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            rawStr,
-            style: TextStyle(
-              fontSize: 10,
-              color: theme.colorScheme.onPrimaryContainer.withValues(
-                alpha: 0.7,
-              ),
-              decoration: TextDecoration.lineThrough,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+      child: Text(
+        l10n.cheapest,
+        style: AppText.label(context).copyWith(
+          fontWeight: FontWeight.bold,
+          color: DarkModeColors.success(context),
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
-    );
-  }
-}
-
-/// Displays 1-5 small star icons for the user's station rating.
-class _RatingStars extends StatelessWidget {
-  final int rating;
-
-  const _RatingStars({required this.rating});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(5, (i) {
-        return Icon(
-          i < rating ? Icons.star : Icons.star_border,
-          size: 12,
-          color: i < rating ? Colors.amber : Colors.grey.shade400,
-        );
-      }),
     );
   }
 }

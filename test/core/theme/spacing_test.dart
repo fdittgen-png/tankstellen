@@ -57,12 +57,22 @@ void main() {
       );
     });
 
-    test('chipPadding has horizontal=lg, vertical=sm', () {
+    test('chipPadding has horizontal=md, vertical=sm (#3948 tightened)', () {
       expect(
         Spacing.chipPadding,
         const EdgeInsets.symmetric(
-          horizontal: Spacing.lg,
+          horizontal: Spacing.md,
           vertical: Spacing.sm,
+        ),
+      );
+    });
+
+    test('surfaceMargin has horizontal=lg, vertical=md (#3948)', () {
+      expect(
+        Spacing.surfaceMargin,
+        const EdgeInsets.symmetric(
+          horizontal: Spacing.lg,
+          vertical: Spacing.md,
         ),
       );
     });

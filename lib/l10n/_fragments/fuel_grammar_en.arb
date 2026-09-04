@@ -1,0 +1,34 @@
+{
+  "tankReportRecordedSummary": "Recorded trips cover {pct} % of this tank and average {value} · {residual} % gap after calibration",
+  "@tankReportRecordedSummary": {
+    "description": "#3950 tank report — ONE sentence carrying the three recorded-trips facts that used to be three stacked lines: the share of the tank's distance covered by recorded trips (pct, whole-number percentage), the recorded trips' average consumption (value, figure AND unit in the user's consumption unit, e.g. '8,0 L/100 km') and the signed residual between the calibrated recordings and the pump (residual, e.g. '+3' or '-12').",
+    "placeholders": {
+      "pct": {
+        "type": "String",
+        "example": "40"
+      },
+      "value": {
+        "type": "String",
+        "example": "8,0 L/100 km"
+      },
+      "residual": {
+        "type": "String",
+        "example": "-3"
+      }
+    }
+  },
+  "tankReportRecordedSummaryNoResidual": "Recorded trips cover {pct} % of this tank and average {value}",
+  "@tankReportRecordedSummaryNoResidual": {
+    "description": "#3950 tank report — the same one-sentence recorded-trips summary when no calibration residual is available yet (no pump calibration on the vehicle): coverage share (pct) + recorded average (value with unit).",
+    "placeholders": {
+      "pct": {
+        "type": "String",
+        "example": "40"
+      },
+      "value": {
+        "type": "String",
+        "example": "8,0 L/100 km"
+      }
+    }
+  }
+}

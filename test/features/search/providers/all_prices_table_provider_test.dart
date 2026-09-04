@@ -40,6 +40,16 @@ class _StubActiveVehicle extends ActiveVehicleProfile {
   VehicleProfile? build() => _value;
 }
 
+/// Stub [VehicleProfileList] returning a fixed list (no repo) — the #3945
+/// single-vs-multi-vehicle scoping rule reads its length.
+class _StubVehicleList extends VehicleProfileList {
+  _StubVehicleList(this._value);
+  final List<VehicleProfile> _value;
+
+  @override
+  List<VehicleProfile> build() => _value;
+}
+
 void main() {
   FillUp fill({
     required String id,
@@ -76,12 +86,18 @@ void main() {
   ProviderContainer container({
     required List<FillUp> fillUps,
     VehicleProfile? activeVehicle,
+    List<VehicleProfile>? vehicles,
   }) {
     final c = ProviderContainer(
       overrides: [
         fillUpListProvider.overrideWith(() => _FakeFillUpList(fillUps)),
         activeVehicleProfileProvider
             .overrideWith(() => _StubActiveVehicle(activeVehicle)),
+        vehicleProfileListProvider.overrideWith(
+          () => _StubVehicleList(
+            vehicles ?? [?activeVehicle],
+          ),
+        ),
       ],
     );
     addTearDown(c.dispose);
@@ -213,9 +229,11 @@ void main() {
       // is a pure E85 burn (50 L carried E85, no fill strictly inside) and
       // E85 becomes (30 + 35) L / 1000 km = 6,5. The last window then opens
       // on a tank still carrying E85 under its 35 L of E10, so it is an
-      // E10/E85 MIX and E10 gets no column at all. Neither answer is
-      // reachable from the deleted helper; the point is that the table now
-      // moves with the consumption screen.
+      // E10/E85 MIX and E10 has no pure window. #3945 — instead of losing
+      // its cell, E10 gets a LABELLED ESTIMATE: the measured 6,5 on E85
+      // converted by energy content (25,6 / 31,9) ≈ 5,22, never the mix
+      // window's 4,6. Neither answer is reachable from the deleted helper;
+      // the point is that the table now moves with the consumption screen.
       final c = container(
         activeVehicle: vehicle(
           preferredFuelType: 'e85',
@@ -234,19 +252,26 @@ void main() {
         ],
       );
 
-      final byFuel = c.read(allPricesFuelCostModelProvider)
-          .litersPer100kmByFuel;
-      expect(byFuel[FuelType.e85], closeTo(6.5, 1e-9));
-      expect(byFuel.containsKey(FuelType.e10), isFalse);
+      final byFuel = c.read(allPricesFuelCostModelProvider).consumptionByFuel;
+      expect(byFuel[FuelType.e85], const FuelConsumptionFigure.measured(6.5));
+      final e10 = byFuel[FuelType.e10]!;
+      expect(e10.isEstimated, isTrue);
+      expect(e10.litersPer100km, closeTo(6.5 * 25.6 / 31.9, 1e-9));
+      expect(e10.litersPer100km, isNot(closeTo(4.6, 1e-3)),
+          reason: 'the mix window must never be credited to E10 (ADR 0014)');
     });
 
     test(
-      'a blended tank stays a mix bucket and becomes no per-grade number',
+      'a blended tank stays a mix bucket — every grade is then an ESTIMATE '
+      'from the all-fuel average, none a measurement (#3945)',
       () {
         // #3934, ADR 0015 v3: with a known tank capacity, the 50 L of E10
         // carried into the window plus the 20 L of E85 splashed in make a
         // ~71/29 blend — a MIX bucket. A blend is not a grade you can buy,
-        // so it credits no column rather than inflating E85's.
+        // so it credits no MEASURED column rather than inflating E85's.
+        // #3945: with no pure window anywhere, the vehicle's all-fuel
+        // average (40 L / 500 km = 8,0) anchored on the declared E85 is the
+        // last baseline, and every usable grade gets a labelled estimate.
         final c = container(
           activeVehicle: vehicle(
             preferredFuelType: 'e85',
@@ -263,16 +288,18 @@ void main() {
           ],
         );
 
-        final byFuel = c.read(allPricesFuelCostModelProvider)
-            .litersPer100kmByFuel;
-        expect(byFuel.containsKey(FuelType.e85), isFalse);
-        expect(byFuel.containsKey(FuelType.e10), isFalse);
+        final byFuel = c.read(allPricesFuelCostModelProvider).consumptionByFuel;
+        expect(byFuel.values.every((f) => f.isEstimated), isTrue);
+        expect(byFuel[FuelType.e85], const FuelConsumptionFigure.estimated(8.0));
+        expect(byFuel[FuelType.e10]!.litersPer100km,
+            closeTo(8.0 * 25.6 / 31.9, 1e-9));
       },
     );
 
     test('a correction entry does not create a bucket of its own', () {
       // 2 + 28 = 30 L over 500 km; the E85 correction inherits the E10
-      // bucket and never enters the composition tally.
+      // bucket and never enters the composition tally. #3945 — E85 is now
+      // ESTIMATED from the measured E10, never measured from the correction.
       final c = container(
         activeVehicle:
             vehicle(preferredFuelType: 'e10', multiFuelCapable: true),
@@ -286,10 +313,57 @@ void main() {
         ],
       );
 
-      final byFuel = c.read(allPricesFuelCostModelProvider)
-          .litersPer100kmByFuel;
-      expect(byFuel[FuelType.e10], closeTo(6.0, 1e-9));
-      expect(byFuel.containsKey(FuelType.e85), isFalse);
+      final byFuel = c.read(allPricesFuelCostModelProvider).consumptionByFuel;
+      expect(byFuel[FuelType.e10], const FuelConsumptionFigure.measured(6.0));
+      expect(byFuel[FuelType.e85]?.isEstimated, isTrue);
+    });
+
+    test('no baseline at all — a mix-only history without a declared fuel '
+        'has nothing to anchor on and gets no figure', () {
+      final c = container(
+        activeVehicle: vehicle(tankCapacityL: 50),
+        fillUps: [
+          fill(id: '1', day: 1, liters: 40, odometerKm: 1000,
+              fuelType: FuelType.e10),
+          fill(id: '2', day: 5, liters: 20, odometerKm: 1300,
+              fuelType: FuelType.e85, isFullTank: false),
+          fill(id: '3', day: 9, liters: 20, odometerKm: 1500,
+              fuelType: FuelType.e85),
+        ],
+      );
+
+      expect(c.read(allPricesFuelCostModelProvider).hasConsumption, isFalse);
+    });
+  });
+
+  group('allPricesFuelCostModelProvider — unassigned fills (#3945)', () {
+    List<FillUp> history() => [
+      fill(id: '1', day: 1, liters: 40, odometerKm: 1000,
+          fuelType: FuelType.e10),
+      fill(id: '2', day: 10, liters: 30, odometerKm: 1500,
+          fuelType: FuelType.e10),
+    ].map((f) => f.copyWith(vehicleId: null)).toList();
+
+    test('a single-vehicle user sees their pre-profile history', () {
+      final v = vehicle(preferredFuelType: 'e10');
+      final c = container(activeVehicle: v, vehicles: [v], fillUps: history());
+
+      expect(
+        c.read(allPricesFuelCostModelProvider).consumptionByFuel[FuelType.e10],
+        const FuelConsumptionFigure.measured(6.0),
+      );
+    });
+
+    test('with two vehicles an unassigned fill is ambiguous and excluded', () {
+      final v = vehicle(preferredFuelType: 'e10');
+      const other = VehicleProfile(id: 'v2', name: 'Other');
+      final c = container(
+        activeVehicle: v,
+        vehicles: [v, other],
+        fillUps: history(),
+      );
+
+      expect(c.read(allPricesFuelCostModelProvider).hasConsumption, isFalse);
     });
   });
 

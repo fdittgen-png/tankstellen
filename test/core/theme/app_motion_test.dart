@@ -41,4 +41,40 @@ void main() {
       expect(result, isFalse);
     });
   });
+
+  group('AppMotion.selection (#3948)', () {
+    test('is the 200 ms Material theme-change beat', () {
+      expect(AppMotion.selection, const Duration(milliseconds: 200));
+    });
+
+    testWidgets('selectionDuration is the beat normally and zero under reduced '
+        'motion', (tester) async {
+      late Duration normal;
+      late Duration reduced;
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: false),
+          child: Builder(
+            builder: (context) {
+              normal = AppMotion.selectionDuration(context);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: Builder(
+            builder: (context) {
+              reduced = AppMotion.selectionDuration(context);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(normal, AppMotion.selection);
+      expect(reduced, Duration.zero);
+    });
+  });
 }

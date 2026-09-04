@@ -5,6 +5,7 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 
 import '../core/theme/app_radius.dart';
+import '../core/theme/spacing.dart';
 
 /// Calm forest-green palette (#1757) — the app's professional default
 /// look, drawn from the green-shield app icon (`#2E7D32`).
@@ -36,27 +37,39 @@ class AppTheme {
   /// full-screen routes. [SnackBarBehavior.floating] is overlaid on the
   /// generated `snackBarTheme` (preserving Flex's colour/shape).
   ///
-  /// **One chip family** (#3548): the search surfaces are chip-dense
-  /// (mode toggle, fuel types, amenities, brands, sort row) and the stock
-  /// M3 mix of outlined-and-washed-out pills read flat and inconsistent.
-  /// One deliberate treatment across every chip: unselected = quiet
-  /// surface fill behind a hairline `outlineVariant` stroke; selected =
-  /// tonal `secondaryContainer` fill with NO stroke (the fill IS the
-  /// signal) and a medium-weight label. Radius stays the canonical
-  /// AppRadius.xl pill from `chipRadius` (#2494).
+  /// **Two chip roles** (#3548, regrammared #3948 / Epic #3947): the
+  /// search surfaces are chip-dense (mode toggle, fuel types, amenities,
+  /// brands, sort row), and until #3948 the selected filter and the
+  /// read-only criteria summary used the same pill, so a *selected filter*
+  /// and a *summary of the search* looked identical. The theme now styles
+  /// the **choice** role: outlined (`outlineVariant` hairline on a quiet
+  /// `surface` fill) and, when selected, filled `primaryContainer` behind a
+  /// `primary` stroke — the colour is the selected state, not the tick
+  /// glyph alone. Padding is [Spacing.chipPadding] (8 / 4) so a 320 dp row
+  /// holds one more chip. The **summary** role (tonal, borderless,
+  /// `labelSmall`) is `SummaryChip` and never goes through `chipTheme`.
+  /// Radius stays the canonical AppRadius.xl pill from `chipRadius` (#2494).
+  ///
+  /// **Card rhythm** (#3948): a bare `Card` inherits the grammar's outer
+  /// margin [Spacing.surfaceMargin] (12 / 8) instead of Material's 4 dp
+  /// all round, so a screen that has not yet migrated to `PrimaryCard` /
+  /// `PanelCard` still keeps the page gutter and the card-to-card beat.
+  /// Elevation stays per-theme (#2488) because `SectionCard` reads it.
   static ThemeData _polish(ThemeData theme) {
     final cs = theme.colorScheme;
     return theme.copyWith(
       snackBarTheme: theme.snackBarTheme.copyWith(
         behavior: SnackBarBehavior.floating,
       ),
+      cardTheme: theme.cardTheme.copyWith(margin: Spacing.surfaceMargin),
       chipTheme: theme.chipTheme.copyWith(
         backgroundColor: cs.surface,
-        selectedColor: cs.secondaryContainer,
-        checkmarkColor: cs.onSecondaryContainer,
+        selectedColor: cs.primaryContainer,
+        checkmarkColor: cs.onPrimaryContainer,
+        padding: Spacing.chipPadding,
         side: WidgetStateBorderSide.resolveWith(
           (states) => states.contains(WidgetState.selected)
-              ? const BorderSide(color: Colors.transparent, width: 0)
+              ? BorderSide(color: cs.primary)
               : BorderSide(color: cs.outlineVariant),
         ),
         labelStyle: (theme.chipTheme.labelStyle ?? theme.textTheme.labelLarge)
