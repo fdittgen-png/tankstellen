@@ -192,31 +192,40 @@ class _HelpBannerState extends ConsumerState<HelpBanner> {
         borderRadius: AppRadius.lg,
       ),
       child: Row(
-        crossAxisAlignment: paged
-            ? CrossAxisAlignment.start
-            : CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(widget.icon, color: onContainer, size: 28),
           const SizedBox(width: 12),
           Expanded(
-            child: HelpTipPager(
-              tips: tips,
-              page: _page,
-              onPageChanged: _goTo,
-              keyPrefix: widget.storageKey,
-              // Paged: the dismiss button joins the nav line, which hands
-              // the tip back the ~70 dp the button used to take beside it
-              // — at 320 dp that is the difference between a five-line
-              // tip and a twelve-line one. A one-tip surface keeps the
-              // trailing button, and with it its exact old footprint.
-              navLeading: paged ? dismiss : null,
-              foreground: onContainer,
-              textStyle: theme.textTheme.bodyMedium?.copyWith(
-                color: onContainer,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                HelpTipPager(
+                  tips: tips,
+                  page: _page,
+                  onPageChanged: _goTo,
+                  keyPrefix: widget.storageKey,
+                  // Paged: the dismiss button joins the nav line under the
+                  // tip. One-tip surfaces used to keep the button TRAILING
+                  // the text, which at 320 dp left the tip a ~150 dp column
+                  // and grew the banner to 580 px under en_XA (#3951 audit).
+                  // The button now sits under the tip in both cases, so the
+                  // text always has the full width beside the icon.
+                  navLeading: paged ? dismiss : null,
+                  foreground: onContainer,
+                  textStyle: theme.textTheme.bodyMedium?.copyWith(
+                    color: onContainer,
+                  ),
+                ),
+                if (!paged)
+                  Align(
+                    alignment: AlignmentDirectional.centerEnd,
+                    child: dismiss,
+                  ),
+              ],
             ),
           ),
-          if (!paged) ...[const SizedBox(width: 8), dismiss],
         ],
       ),
     );

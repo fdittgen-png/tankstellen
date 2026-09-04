@@ -3,8 +3,10 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_text.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/theme/fuel_colors.dart';
+import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/station_card_shell.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -34,7 +36,6 @@ class EvFavoriteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
     final operatorName = station.operator ?? '';
     final connectors = station.connectors;
@@ -83,30 +84,28 @@ class EvFavoriteCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    // #3951 — the station name is the card's title role;
+                    // operator + distance are label-role metadata.
                     Text(
                       station.name,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: AppText.title(context),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     if (operatorName.isNotEmpty) ...[
-                      const SizedBox(height: 2),
+                      const SizedBox(height: Spacing.xs),
                       Text(
                         operatorName,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
+                        style: AppText.label(context),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
                     if (station.dist > 0) ...[
-                      const SizedBox(height: 2),
+                      const SizedBox(height: Spacing.xs),
                       Text(
                         PriceFormatter.formatDistance(station.dist),
-                        style: theme.textTheme.bodySmall,
+                        style: AppText.label(context),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
@@ -226,12 +225,12 @@ class _EvDetailColumn extends StatelessWidget {
                 const SizedBox(width: 3),
                 Text(
                   '$available/$total $availableLabel',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontSize: 11,
-                    color: available > 0
-                        ? DarkModeColors.success(context)
-                        : null,
-                  ),
+                  // #3951 — label role (11 sp); the semantic success
+                  // colour is the one sanctioned override.
+                  style: available > 0
+                      ? AppText.label(context)
+                          .copyWith(color: DarkModeColors.success(context))
+                      : AppText.label(context),
                 ),
               ],
             ),
@@ -241,10 +240,7 @@ class _EvDetailColumn extends StatelessWidget {
             padding: const EdgeInsets.only(top: 2),
             child: Text(
               connectorTypes.join(' · '),
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontSize: 11,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+              style: AppText.label(context),
             ),
           ),
       ],

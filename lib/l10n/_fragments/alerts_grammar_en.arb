@@ -1,0 +1,14 @@
+{
+  "alertsEmptyTitle": "No price alerts yet",
+  "@alertsEmptyTitle": {
+    "description": "Title of the single empty state on the Price alerts tab when the user has neither a station alert nor a zone alert (#3951). The stats strip and the two section headers are collapsed behind it."
+  },
+  "alertsEmptySubtitle": "Get notified when a station, or any station in a zone, drops below your target price.",
+  "@alertsEmptySubtitle": {
+    "description": "One-sentence explanation under the Price alerts empty-state title (#3951): what an alert does, covering both the per-station and the zone kind."
+  },
+  "favoritesLoadErrorTitle": "Favorites",
+  "@favoritesLoadErrorTitle": {
+    "description": "Context label shown by the error widget when the Favorites list fails to load (#3951 — replaced a hard-coded English literal). Names the surface that failed."
+  }
+}

@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
+import 'package:tankstellen/core/widgets/help/help_tip_pager.dart';
 import 'package:tankstellen/core/widgets/help/help_tips.dart';
 import 'package:tankstellen/core/widgets/help_banner.dart';
 
@@ -407,6 +408,45 @@ void main() {
 
     test('an empty catalog is index 0, never a crash', () {
       expect(initialTipIndex(3, 0), 0);
+    });
+  });
+
+  group('HelpBanner one-tip layout (#3951 audit)', () {
+    testWidgets(
+        'a long one-tip message at 320 dp keeps the dismiss button under '
+        'the text, so the banner stays short', (tester) async {
+      tester.view.physicalSize = const Size(320, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await pumpApp(
+        tester,
+        const HelpBanner(
+          storageKey: StorageKeys.helpBannerAlerts,
+          icon: Icons.info_outline,
+          message: 'Swipe a row to the left to delete an alert, tap the '
+              'bell to pause it, and pull down to re-check every price '
+              'right now instead of waiting for the next scan.',
+        ),
+        overrides: [fakeHiveStorageOverride().override],
+      );
+
+      final banner = tester.getRect(find.byType(HelpBanner));
+      final text = tester.getRect(find.byType(HelpTipPager));
+      final dismiss = tester.getRect(find.widgetWithText(TextButton, 'Got it'));
+      // The button sits BELOW the tip, not beside it.
+      expect(dismiss.top, greaterThanOrEqualTo(text.bottom - 1));
+      // The tip column has the width beside the icon, not a starved third.
+      expect(text.width, greaterThan(200));
+      // The banner is exactly text + button + its own 12 dp padding and
+      // 8 dp margin — nothing else stretches it. (An absolute bound would
+      // depend on the test font's square glyphs wrapping the message onto
+      // twice the lines a real font needs.)
+      expect(
+        banner.height,
+        lessThanOrEqualTo(text.height + dismiss.height + 24 + 16 + 1),
+      );
     });
   });
 }

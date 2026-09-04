@@ -46,7 +46,11 @@ class AlertListTile extends ConsumerWidget {
         dense: true,
         leading: Icon(
           Icons.notifications_active,
-          color: alert.isActive ? theme.colorScheme.primary : Colors.grey,
+          // #3951 — a paused alert is muted, not "grey": the theme's
+          // outline tone keeps dark-mode contrast.
+          color: alert.isActive
+              ? theme.colorScheme.primary
+              : theme.colorScheme.outline,
         ),
         title: Text(
           alert.stationName,
@@ -108,7 +112,9 @@ class RadiusAlertListTile extends ConsumerWidget {
         dense: true,
         leading: Icon(
           Icons.location_searching,
-          color: alert.enabled ? theme.colorScheme.primary : Colors.grey,
+          color: alert.enabled
+              ? theme.colorScheme.primary
+              : theme.colorScheme.outline,
         ),
         title: Text(alert.label, maxLines: 1, overflow: TextOverflow.ellipsis),
         subtitle: Text(

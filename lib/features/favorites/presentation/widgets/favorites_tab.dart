@@ -93,7 +93,7 @@ class FavoritesTab extends ConsumerWidget {
       error: (error, stackTrace) => ServiceChainErrorWidget(
         error: error,
         stackTrace: stackTrace,
-        searchContext: 'Favorites load',
+        searchContext: l10n.favoritesLoadErrorTitle,
         onRetry: () =>
             ref.read(favoriteStationsProvider.notifier).loadAndRefresh(),
       ),

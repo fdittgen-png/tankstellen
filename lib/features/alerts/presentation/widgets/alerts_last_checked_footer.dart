@@ -4,6 +4,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/theme/app_text.dart';
+import '../../../../core/theme/spacing.dart';
 import '../../background/background_scan_dedup_store.dart';
 import '../../../../l10n/app_localizations.dart';
 
@@ -20,7 +22,6 @@ class AlertsLastCheckedFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     return FutureBuilder<DateTime?>(
       future: BackgroundScanDedupStore().lastScanAt(),
       builder: (context, snapshot) {
@@ -37,14 +38,18 @@ class AlertsLastCheckedFooter extends StatelessWidget {
           label = l10n.alertsLastChecked(when);
         }
         return Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+          padding: const EdgeInsets.fromLTRB(
+            Spacing.xl,
+            Spacing.lg,
+            Spacing.xl,
+            0,
+          ),
           child: Text(
             label,
             key: const ValueKey('alerts-last-checked'),
             textAlign: TextAlign.center,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+            // #3951 — freshness is a label-role string.
+            style: AppText.label(context),
           ),
         );
       },

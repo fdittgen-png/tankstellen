@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/widgets/panel_card.dart';
 import 'package:tankstellen/features/alerts/presentation/widgets/alert_statistics_card.dart';
 import 'package:tankstellen/features/alerts/providers/alert_statistics_provider.dart';
 
@@ -74,7 +75,8 @@ void main() {
       expect(find.text('0'), findsNWidgets(3));
     });
 
-    testWidgets('renders inside a Card', (tester) async {
+    // #3951 — the strip is a secondary-level PanelCard (supporting figures).
+    testWidgets('renders inside a PanelCard', (tester) async {
       final test = standardTestOverrides();
 
       await pumpApp(
@@ -88,7 +90,7 @@ void main() {
         ],
       );
 
-      expect(find.byType(Card), findsOneWidget);
+      expect(find.byType(PanelCard), findsOneWidget);
     });
 
     testWidgets('shows correct icons', (tester) async {

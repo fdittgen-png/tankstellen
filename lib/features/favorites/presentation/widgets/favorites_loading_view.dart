@@ -5,6 +5,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_text.dart';
+import '../../../../core/theme/spacing.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
 
@@ -52,7 +55,13 @@ class _FavoritesLoadingViewState extends State<FavoritesLoadingView>
       children: [
         // Reassuring header with pulsing icon
         Padding(
-          padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
+          // #3951 — spacing off the Spacing scale, text off the AppText roles.
+          padding: const EdgeInsets.fromLTRB(
+            Spacing.xxl,
+            Spacing.xxxl,
+            Spacing.xxl,
+            Spacing.xl,
+          ),
           child: Row(
             children: [
               FadeTransition(
@@ -63,24 +72,20 @@ class _FavoritesLoadingViewState extends State<FavoritesLoadingView>
                   color: theme.colorScheme.primary,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: Spacing.lg),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     AnimatedDefaultTextStyle(
                       duration: const Duration(milliseconds: 300),
-                      style: theme.textTheme.titleSmall!.copyWith(
-                        color: theme.colorScheme.onSurface,
-                      ),
+                      style: AppText.title(context),
                       child: Text(l.updatingFavorites),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: Spacing.xs),
                     Text(
                       l.fetchingLatestPrices,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
+                      style: AppText.label(context),
                     ),
                   ],
                 ),
@@ -90,13 +95,13 @@ class _FavoritesLoadingViewState extends State<FavoritesLoadingView>
         ),
         // Animated progress bar
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: Spacing.xxl),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(2),
+            borderRadius: AppRadius.sm,
             child: const LinearProgressIndicator(minHeight: 3),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: Spacing.xl),
         // Shimmer skeleton cards
         const Expanded(
           child: SingleChildScrollView(
