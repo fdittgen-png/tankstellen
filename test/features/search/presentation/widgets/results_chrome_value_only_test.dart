@@ -15,6 +15,7 @@ import 'package:tankstellen/features/search/presentation/widgets/results/results
 import 'package:tankstellen/features/search/presentation/widgets/search_results_list.dart';
 import 'package:tankstellen/features/search/presentation/widgets/search_summary_bar.dart';
 import 'package:tankstellen/features/search/presentation/widgets/sort_selector.dart';
+import 'package:tankstellen/features/fill_ups/domain/entities/fuel_consumption_figure.dart';
 import 'package:tankstellen/features/search/providers/all_prices_comparison_model.dart';
 import 'package:tankstellen/features/search/providers/all_prices_table_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
@@ -165,7 +166,9 @@ void main() {
           ),
           allPricesFuelCostModelProvider.overrideWithValue(
             const FuelCostModel(
-              litersPer100kmByFuel: {FuelType.e10: 6.0},
+              consumptionByFuel: {
+                FuelType.e10: FuelConsumptionFigure.measured(6.0),
+              },
               usableFuels: {FuelType.e10},
             ),
           ),

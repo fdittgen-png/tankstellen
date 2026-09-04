@@ -152,7 +152,7 @@ class AllPricesStationCard extends ConsumerWidget {
       station: station,
       columns: columns,
       bestByFuel: best,
-      litersPer100kmByFuel: costModel.litersPer100kmByFuel,
+      consumptionByFuel: costModel.consumptionByFuel,
       usableFuels: usable,
       // #2717 — Mexican (mx-) stations render PEMEX grade names.
       countryCode: Countries.countryCodeForStationId(station.id),

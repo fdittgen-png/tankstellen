@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_radius.dart';
+import '../../../../../core/theme/app_text.dart';
 import '../../../../../core/theme/dark_mode_colors.dart';
 import '../../../../../core/theme/fuel_colors.dart';
 import '../../../../../core/utils/price_formatter.dart';
@@ -21,10 +22,16 @@ import '../../../providers/all_prices_comparison_model.dart';
 /// current results, and the cost of 100 km on that fuel for the active
 /// vehicle.
 ///
-/// Emphasis grammar (explained once by the legend, never left a mystery):
+/// Emphasis grammar (explained once by the help bubble, never left a
+/// mystery):
 /// * filled in the fuel colour — cheapest for this fuel in these results;
 /// * dimmed — the active vehicle cannot be filled with this fuel;
-/// * `+0,06` — how much dearer than the cheapest of these results.
+/// * `+0,06` — how much dearer than the cheapest of these results;
+/// * `≈ 9,61 €` in the muted italic label style — the cost per 100 km is
+///   MODELLED (#3945): the vehicle has no pure tank of this fuel, so the
+///   figure is its measured consumption on another fuel converted by
+///   energy content. A measured figure is bold and fuel-coloured; the two
+///   must never look alike.
 class FuelComparisonCell extends StatelessWidget {
   final FuelCellData data;
 
@@ -116,20 +123,43 @@ class FuelComparisonCell extends StatelessWidget {
             ),
             if (data.costPer100km != null) ...[
               const SizedBox(height: 1),
-              _line(
-                PriceFormatter.formatTotal(data.costPer100km),
-                TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  color: isChampion ? Colors.white : fuelColor,
-                ),
-              ),
+              _line(_costText(l10n), _costStyle(context, isChampion, fuelColor)),
             ],
           ],
         ),
       ),
     );
   }
+
+  /// The cost-per-100 km line: the plain money figure when measured, the
+  /// ≈-prefixed form (ARB) when modelled.
+  String _costText(AppLocalizations l10n) {
+    final cost = PriceFormatter.formatTotal(data.costPer100km);
+    return data.isCostEstimated ? l10n.allPricesEstimatedCost(cost) : cost;
+  }
+
+  /// Measured: bold, in the fuel colour (white on a champion cell). Modelled
+  /// (#3945): the muted `AppText.label` role in italics, so a model never
+  /// carries the visual weight of a measurement; the champion cell keeps
+  /// white for contrast on its filled background.
+  TextStyle _costStyle(BuildContext context, bool isChampion, Color fuelColor) {
+    if (data.isCostEstimated) {
+      final label = AppText.label(context).copyWith(
+        fontSize: _costFontSize,
+        fontStyle: FontStyle.italic,
+      );
+      return isChampion ? label.copyWith(color: Colors.white) : label;
+    }
+    return TextStyle(
+      fontSize: _costFontSize,
+      fontWeight: FontWeight.w700,
+      color: isChampion ? Colors.white : fuelColor,
+    );
+  }
+
+  /// One size for both provenances so the row height never depends on
+  /// whether a figure was measured or modelled.
+  static const double _costFontSize = 11;
 
   /// A single value line that shrinks rather than overflowing — the whole
   /// table has to survive en_XA at 320 dp and a 1.3x text scale, where a
@@ -167,6 +197,14 @@ class FuelComparisonCell extends StatelessWidget {
     final price = PriceFormatter.formatPriceCompact(data.price);
     if (cost == null || l100 == null) {
       return l10n.allPricesCellPriceSemantics(data.label, price);
+    }
+    if (data.isCostEstimated) {
+      return l10n.allPricesCellEstimatedSemantics(
+        data.label,
+        price,
+        PriceFormatter.formatTotal(cost),
+        UnitFormatter.formatConsumptionLocalized(l100, consumptionUnit),
+      );
     }
     return l10n.allPricesCellCostSemantics(
       data.label,

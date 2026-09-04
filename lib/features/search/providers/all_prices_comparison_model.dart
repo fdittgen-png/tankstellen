@@ -22,6 +22,7 @@ library;
 import '../../../core/domain/fuel_type.dart';
 import '../../../core/domain/station.dart';
 import '../../../core/utils/station_extensions.dart';
+import '../../fill_ups/api.dart' show FuelConsumptionFigure;
 
 /// Canonical column ORDER — the one place the left-to-right order of the
 /// table is decided. Stable across countries and cards: a fuel that is
@@ -157,15 +158,22 @@ class FuelCellData {
   /// no price or no reference. Zero on the best cell.
   final double? deltaToBest;
 
-  /// Price x the vehicle's measured litres/100 km for this fuel, i.e.
-  /// what 100 km on this fuel costs at this pump. Null whenever the
-  /// vehicle cannot take the fuel, has no measured consumption for it,
-  /// or the station has no price.
+  /// Price x the vehicle's litres/100 km for this fuel, i.e. what 100 km
+  /// on this fuel costs at this pump. Null whenever the vehicle cannot
+  /// take the fuel, has no consumption figure for it (measured or
+  /// modelled), or the station has no price.
   final double? costPer100km;
 
-  /// The measured litres/100 km behind [costPer100km] (for the semantics
-  /// label). Null under the same conditions.
+  /// The litres/100 km behind [costPer100km] (for the semantics label).
+  /// Null under the same conditions.
   final double? litersPer100km;
+
+  /// True when [costPer100km] rests on a MODELLED consumption (#3945): the
+  /// vehicle has no pure tank of this fuel, so the figure is its measured
+  /// consumption on another fuel converted by energy content. The cell
+  /// must render it visibly as an estimate (≈, italic, own semantics) —
+  /// never in the bold measured style.
+  final bool isCostEstimated;
 
   /// False when the active vehicle cannot be filled with this fuel — the
   /// cell renders dimmed. Always true when there is no active vehicle.
@@ -180,6 +188,7 @@ class FuelCellData {
     this.deltaToBest,
     this.costPer100km,
     this.litersPer100km,
+    this.isCostEstimated = false,
     this.isUsable = true,
   });
 
@@ -222,14 +231,16 @@ class StationFuelComparison {
 /// Build one station's row.
 ///
 /// [bestByFuel] is the cheapest price per fuel across the visible result
-/// set; [litersPer100kmByFuel] the vehicle's measured consumption per fuel
-/// (empty = degrade to a price-only table); [usableFuels] what the vehicle
-/// can take (empty = no vehicle, nothing dimmed).
+/// set; [consumptionByFuel] the vehicle's consumption per fuel, each figure
+/// carrying whether it was measured or modelled (#3945; empty = degrade to
+/// a price-only table); [usableFuels] what the vehicle can take (empty = no
+/// vehicle, nothing dimmed).
 StationFuelComparison buildStationComparison({
   required Station station,
   required AllPricesColumns columns,
   required Map<FuelType, double> bestByFuel,
-  Map<FuelType, double> litersPer100kmByFuel = const <FuelType, double>{},
+  Map<FuelType, FuelConsumptionFigure> consumptionByFuel =
+      const <FuelType, FuelConsumptionFigure>{},
   Set<FuelType> usableFuels = const <FuelType>{},
   String? countryCode,
 }) {
@@ -238,8 +249,10 @@ StationFuelComparison buildStationComparison({
     final unavailable = station.unavailableFuels.contains(fuel.apiValue);
     final usable = usableFuels.isEmpty || usableFuels.contains(fuel);
     final best = bestByFuel[fuel];
-    final l100 = usable ? litersPer100kmByFuel[fuel] : null;
+    final figure = usable ? consumptionByFuel[fuel] : null;
+    final l100 = figure?.litersPer100km;
     final hasPrice = price != null && price > 0 && !unavailable;
+    final hasCost = hasPrice && l100 != null && l100 > 0;
     return FuelCellData(
       fuel: fuel,
       label: fuelDisplayLabel(fuel, countryCode: countryCode),
@@ -247,9 +260,9 @@ StationFuelComparison buildStationComparison({
       isUnavailable: unavailable,
       isBestInResults: hasPrice && best != null && price <= best,
       deltaToBest: hasPrice && best != null ? price - best : null,
-      costPer100km:
-          hasPrice && l100 != null && l100 > 0 ? price * l100 : null,
-      litersPer100km: hasPrice && l100 != null && l100 > 0 ? l100 : null,
+      costPer100km: hasCost ? price * l100 : null,
+      litersPer100km: hasCost ? l100 : null,
+      isCostEstimated: hasCost && figure!.isEstimated,
       isUsable: usable,
     );
   }

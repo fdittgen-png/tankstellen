@@ -36,6 +36,16 @@ class _StubActiveVehicle extends ActiveVehicleProfile {
   VehicleProfile? build() => _value;
 }
 
+/// Stub [VehicleProfileList] returning a fixed list (no repo) — the #3945
+/// single-vs-multi-vehicle rule reads its length.
+class _StubVehicleList extends VehicleProfileList {
+  _StubVehicleList(this._value);
+  final List<VehicleProfile> _value;
+
+  @override
+  List<VehicleProfile> build() => _value;
+}
+
 FillUp _f({
   required String id,
   required double liters,
@@ -66,11 +76,17 @@ const _v1 = VehicleProfile(
 ProviderContainer _container({
   required List<FillUp> fillUps,
   VehicleProfile? activeVehicle,
+  List<VehicleProfile>? vehicles,
 }) {
   final c = ProviderContainer(overrides: [
     fillUpListProvider.overrideWith(() => _FakeFillUpList(fillUps)),
     activeVehicleProfileProvider
         .overrideWith(() => _StubActiveVehicle(activeVehicle)),
+    vehicleProfileListProvider.overrideWith(
+      () => _StubVehicleList(
+        vehicles ?? [?activeVehicle],
+      ),
+    ),
   ]);
   addTearDown(c.dispose);
   return c;
@@ -85,6 +101,47 @@ FuelTypeEfficiencyStats _statsFor(
     );
 
 void main() {
+  group('activeVehicleFillUpsProvider — unassigned fills (#3945)', () {
+    final fills = [
+      _f(id: 'own', liters: 40, cost: 70, odo: 1000, day: 1, vehicleId: 'v1'),
+      _f(id: 'none', liters: 30, cost: 50, odo: 1500, day: 5),
+      _f(id: 'other', liters: 30, cost: 50, odo: 200, day: 6,
+          vehicleId: 'v2'),
+    ];
+    const v2 = VehicleProfile(id: 'v2', name: 'Other');
+
+    test('one vehicle profile: fills with no vehicleId count as its own', () {
+      final c = _container(fillUps: fills, activeVehicle: _v1, vehicles: [_v1]);
+      expect(
+        c.read(activeVehicleFillUpsProvider).map((f) => f.id),
+        ['own', 'none'],
+      );
+    });
+
+    test('two or more profiles: unassigned fills stay excluded', () {
+      final c = _container(
+        fillUps: fills,
+        activeVehicle: _v1,
+        vehicles: [_v1, v2],
+      );
+      expect(c.read(activeVehicleFillUpsProvider).map((f) => f.id), ['own']);
+    });
+
+    test('no active vehicle: every fill', () {
+      final c = _container(fillUps: fills, activeVehicle: null, vehicles: []);
+      expect(c.read(activeVehicleFillUpsProvider), fills);
+    });
+
+    test('the per-fuel comparison reads the same scope', () {
+      // Single-vehicle user: the unassigned closing plein completes the
+      // window, so the comparison has one E10 interval instead of none.
+      final c = _container(fillUps: fills, activeVehicle: _v1, vehicles: [_v1]);
+      final result = c.read(fuelTypeEfficiencyComparisonProvider);
+      expect(result.single.attributedIntervalCount, 1);
+      expect(result.single.avgL100km, closeTo(6.0, 1e-9));
+    });
+  });
+
   group('fuelTypeEfficiencyComparisonProvider', () {
     test('empty fill-up list yields an empty comparison', () {
       final c = _container(fillUps: const [], activeVehicle: _v1);

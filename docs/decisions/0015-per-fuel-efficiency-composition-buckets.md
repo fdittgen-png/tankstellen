@@ -233,3 +233,84 @@ earlier intervals at unrecorded blend ratios).
 - The aggregator is no longer a pure function of the fill list alone — it
   takes an optional `tankCapacityL` and replays the mix chain per interval
   (O(n²) worst case; fill histories are small, measured in hundreds).
+
+## Amendment (2026-09-04, #3945) — a labelled ENERGY-CONTENT estimate when a grade has no pure window
+
+### Problem
+
+The all-prices comparison table (#3933) turns each grade's pump price into
+a cost per 100 km using the vehicle's per-grade `avgL100km` — and, per this
+ADR, only a **PURE** bucket may supply that figure. For the canonical
+flex-fuel driver that is often *no* bucket: with a known tank capacity the
+v3 composition classifies every E10 tank topped onto residual E85 as an
+`E10/E85` MIX, so E10 — a grade the driver buys every other week — has **no
+cost cell at all** (the #3933 fixture: E85 shows 6,5, E10 shows nothing).
+The one question the table exists to answer, *"which grade is cheaper for
+me at this pump?"*, goes unanswered exactly for the user it was built for.
+
+### Decision — Option 2, a labelled estimate
+
+A usable grade **without a pure window** receives an **estimated**
+consumption figure, rendered visibly as an estimate (≈ prefix, the muted
+italic label role, its own screen-reader label, one added sentence in the
+help bubble), computed as
+
+```
+L100_X = L100_base × (energy_base / energy_X)
+```
+
+where the **baseline** is the best *measured* figure the vehicle has, in
+this order:
+
+1. the most-confident PURE bucket of **another** grade (most attributed
+   intervals, then most litres, then lowest `apiValue`);
+2. else the vehicle's all-fuel `ConsumptionStats.avgConsumptionL100km` over
+   its closed windows, anchored on its **declared primary fuel** for the
+   energy content (the only honest anchor when every window is a blend);
+3. no baseline ⇒ no figure — the cell stays empty, exactly as before.
+
+`energy` is the volumetric lower heating value (MJ/L) in
+`FuelEnergyContent` (`lib/features/fill_ups/domain/`), the same table the
+GPS live-fuel estimator has used since #2431 (petrol 31.9, diesel 35.8,
+E85 25.6, LPG 26.0; CNG has none and is never estimated). A pinning test
+ties the two tables together.
+
+Every figure now travels with its **provenance**
+(`FuelConsumptionFigure.measured` / `.estimated`), so a surface can never
+pass a model off as a measurement. The consumption screen is unchanged: it
+still renders only measured buckets.
+
+### Why this is NOT the ADR 0014 collapse
+
+ADR 0014 credited the **measured litres of a blended window** to one grade
+— a real number attached to the wrong fuel, indistinguishable from a pure
+measurement. The estimate here does the opposite on both counts:
+
+- it never touches a MIX bucket's litres (mix buckets are ignored by the
+  estimator on purpose — the #3933 fixture's E10 gets 6,5 × 25,6 / 31,9
+  ≈ 5,2, **not** the mix window's 4,6);
+- it is derived from a **pure** measurement plus stated physics, and it is
+  **labelled** at every layer (domain provenance, ≈ glyph, italic style,
+  semantics, help text), so the reader knows it is a model.
+
+### Vehicle scoping (the smaller question)
+
+Fills carrying no `vehicleId` (pre-profile history, blank picker) are
+attributed to the active vehicle **when the user has exactly one vehicle
+profile** — they can only be that car's, and excluding them (#3934) had
+emptied single-vehicle users' comparison. With **two or more** profiles an
+unassigned fill is ambiguous and stays excluded. The rule is
+`scopeFillUpsToVehicle`, read through the fill-ups feature's
+`activeVehicleFillUpsProvider` by both the per-fuel comparison and the
+all-prices cost model, so the two can never disagree on whose fill a fill
+is.
+
+### Consequences
+
+- A flex-fuel driver sees a cost figure for every grade they can buy, and
+  can tell at a glance which ones are measured and which are modelled.
+- The estimate inherits the baseline's confidence; a one-window baseline
+  produces a one-window estimate. The verdict gate
+  (`kMinAttributedIntervalsForVerdict`) is untouched — estimates never
+  crown anything on the consumption screen.
+- Retuning a heating value changes every estimate; the values are pinned.

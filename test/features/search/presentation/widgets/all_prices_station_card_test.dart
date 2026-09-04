@@ -10,6 +10,7 @@ import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/core/theme/fuel_colors.dart';
 import 'package:tankstellen/core/widgets/animated_price_text.dart';
 import 'package:tankstellen/core/widgets/station_card_shell.dart';
+import 'package:tankstellen/features/fill_ups/domain/entities/fuel_consumption_figure.dart';
 import 'package:tankstellen/features/search/presentation/widgets/all_prices/fuel_comparison_cell.dart';
 import 'package:tankstellen/features/search/presentation/widgets/all_prices/fuel_comparison_table.dart';
 import 'package:tankstellen/features/search/presentation/widgets/all_prices_station_card.dart';
@@ -386,7 +387,10 @@ void main() {
 
   group('cost per 100 km (#3933; #3943 dropped the verdict line)', () {
     const flexCost = FuelCostModel(
-      litersPer100kmByFuel: {FuelType.e85: 6.0, FuelType.e10: 4.6},
+      consumptionByFuel: {
+        FuelType.e85: FuelConsumptionFigure.measured(6.0),
+        FuelType.e10: FuelConsumptionFigure.measured(4.6),
+      },
       usableFuels: {
         FuelType.e10,
         FuelType.e5,

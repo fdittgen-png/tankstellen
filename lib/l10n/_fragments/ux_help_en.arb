@@ -43,7 +43,7 @@
   "@helpSearchTipFillEmphasis": {
     "description": "Tip 2 of the search-results help bubble (#3939). Replaces the first half of the permanent two-line legend that used to sit under the all-prices column header."
   },
-  "helpSearchTipSecondFigure": "The smaller second figure in a cell is what 100 km on that fuel costs in your vehicle.",
+  "helpSearchTipSecondFigure": "The smaller second figure in a cell is what 100 km on that fuel costs in your vehicle. A figure marked ≈ is not measured: it is modelled from your vehicle's measured consumption and the fuel's energy content.",
   "@helpSearchTipSecondFigure": {
     "description": "Tip 3 of the search-results help bubble (#3939). Replaces the second half of the permanent all-prices legend."
   },

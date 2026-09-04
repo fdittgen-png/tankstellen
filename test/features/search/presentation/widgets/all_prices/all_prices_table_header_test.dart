@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/features/fill_ups/domain/entities/fuel_consumption_figure.dart';
 import 'package:tankstellen/features/search/presentation/widgets/all_prices/all_prices_table_header.dart';
 import 'package:tankstellen/features/search/providers/all_prices_comparison_model.dart';
 import 'package:tankstellen/features/search/providers/all_prices_table_provider.dart';
@@ -53,7 +54,7 @@ void main() {
     for (final cost in const [
       FuelCostModel.empty,
       FuelCostModel(
-        litersPer100kmByFuel: {FuelType.e85: 6.0},
+        consumptionByFuel: {FuelType.e85: FuelConsumptionFigure.measured(6.0)},
         usableFuels: {FuelType.e85, FuelType.e10},
       ),
     ]) {

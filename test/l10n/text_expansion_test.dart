@@ -18,6 +18,7 @@ import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/widgets/service_status_banner.dart';
 import 'package:tankstellen/core/time/app_clock.dart';
 import 'package:tankstellen/core/utils/price_tier.dart';
+import 'package:tankstellen/features/fill_ups/domain/entities/fuel_consumption_figure.dart';
 import 'package:tankstellen/features/fill_ups/domain/services/monthly_insights_aggregator.dart';
 import 'package:tankstellen/features/fill_ups/presentation/widgets/monthly_insights_card.dart';
 import 'package:tankstellen/features/map/presentation/widgets/price_legend.dart';
@@ -148,8 +149,13 @@ List<Object> _allPricesOverrides() => <Object>[
         const {FuelType.e85: 0.809, FuelType.e10: 2.029},
       ),
       allPricesFuelCostModelProvider.overrideWithValue(
+        // #3945 — one MEASURED and one ESTIMATED figure, so the ≈-prefixed
+        // cost line is part of the 320 dp stress too.
         const FuelCostModel(
-          litersPer100kmByFuel: {FuelType.e85: 6.0, FuelType.e10: 4.6},
+          consumptionByFuel: {
+            FuelType.e85: FuelConsumptionFigure.measured(6.0),
+            FuelType.e10: FuelConsumptionFigure.estimated(4.6),
+          },
           usableFuels: {
             FuelType.e5,
             FuelType.e10,
