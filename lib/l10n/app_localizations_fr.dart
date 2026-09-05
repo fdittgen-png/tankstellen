@@ -8221,9 +8221,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get criteriaModeRoute => 'Trajet';
 
   @override
-  String get criteriaSubmit => 'Rechercher';
-
-  @override
   String get criteriaReset => 'Réinitialiser';
 
   @override

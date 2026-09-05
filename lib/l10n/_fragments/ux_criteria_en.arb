@@ -7,10 +7,6 @@
   "@criteriaModeRoute": {
     "description": "Short label of the 'along the route' segment in the search-criteria mode toggle (#3927). Kept to one short word so the segmented button never wraps at 320 dp; the long form stays on the segment tooltip."
   },
-  "criteriaSubmit": "Search",
-  "@criteriaSubmit": {
-    "description": "Primary action of the search-criteria sheet's sticky bottom bar — runs the search with the criteria on screen (#3927)."
-  },
   "criteriaReset": "Reset",
   "@criteriaReset": {
     "description": "Secondary text action of the search-criteria sheet's sticky bottom bar — restores the saved defaults, or the factory ones when nothing was saved (#3927)."

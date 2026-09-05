@@ -5343,7 +5343,6 @@
   },
   "criteriaModeNearby": "À proximité",
   "criteriaModeRoute": "Trajet",
-  "criteriaSubmit": "Rechercher",
   "criteriaReset": "Réinitialiser",
   "criteriaResetDone": "Critères réinitialisés sur vos valeurs par défaut",
   "criteriaSubmitDisabledRoute": "Indiquez un départ et une destination",

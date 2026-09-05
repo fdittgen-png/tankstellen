@@ -28,7 +28,6 @@ import '../../providers/brand_filter_provider.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
 import '../../providers/search_screen_ui_provider.dart';
-import '../widgets/criteria/criteria_action_bar.dart';
 import '../widgets/location_input.dart' show LocationInputWidgetState;
 import '../widgets/search_criteria_form.dart';
 
@@ -184,15 +183,6 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen>
     onNearbySubmit();
   }
 
-  /// The action bar's primary tap — the same dispatch the shell FAB runs.
-  void _onSubmit() {
-    if (_effectiveMode(watch: false) == SearchMode.route) {
-      onRouteSubmit();
-    } else {
-      onNearbySubmit();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -253,14 +243,10 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen>
         ),
       ],
       bodyPadding: EdgeInsets.zero,
-      // #3927 — the sheet owns its primary action again: a labelled,
-      // full-width Search button that says why it is disabled, plus the
-      // Reset that the form never had.
-      bottomNavigationBar: CriteriaActionBar(
-        onSubmit: _onSubmit,
-        onReset: resetCriteria,
-        disabledReason: _submitDisabledReason(l10n, mode),
-      ),
+      // #3961 — no sticky action bar: the shell's green Search button is
+      // this sheet's submit (see `_updateFabAction`), and a second one
+      // directly above it was the same action twice. Reset and the
+      // "why is search unavailable" line end the form instead.
       // #2592 — the form body lives in SearchCriteriaForm so this screen
       // stays under the file-length cap; the State retains the search /
       // save actions and the FAB wiring and passes them down.
@@ -274,6 +260,8 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen>
           onZipSearch: performZipSearch,
           onCitySearch: performCitySearch,
           onRouteSearch: performRouteSearch,
+          onReset: resetCriteria,
+          disabledReason: _submitDisabledReason(l10n, mode),
         ),
       ),
     );

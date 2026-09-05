@@ -13854,12 +13854,6 @@ abstract class AppLocalizations {
   /// **'Route'**
   String get criteriaModeRoute;
 
-  /// Primary action of the search-criteria sheet's sticky bottom bar — runs the search with the criteria on screen (#3927).
-  ///
-  /// In en, this message translates to:
-  /// **'Search'**
-  String get criteriaSubmit;
-
   /// Secondary text action of the search-criteria sheet's sticky bottom bar — restores the saved defaults, or the factory ones when nothing was saved (#3927).
   ///
   /// In en, this message translates to:

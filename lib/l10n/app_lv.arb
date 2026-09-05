@@ -5881,11 +5881,6 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "criteriaSubmit": "Search",
-  "@criteriaSubmit": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
   "criteriaReset": "Reset",
   "@criteriaReset": {
     "x-mt": "needs-native-review",

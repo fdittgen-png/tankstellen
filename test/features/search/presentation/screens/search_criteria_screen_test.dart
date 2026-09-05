@@ -75,11 +75,20 @@ void main() {
           find.byKey(const ValueKey('criteria-open-only-toggle')),
           findsOneWidget,
         );
-        // #3927 — the sheet owns a labelled primary action again, plus a
-        // reset; "Save as my defaults" moved into the app-bar overflow.
+        // #3961 — the sheet has NO submit button of its own: the shell's
+        // green Search button fires it (the screen registers a
+        // SearchFabAction). Reset ends the form; "Save as my defaults"
+        // lives in the app-bar overflow.
         expect(
           find.byKey(const ValueKey('criteria-submit-button')),
-          findsOneWidget,
+          findsNothing,
+        );
+        // The sheet's own Scaffold (PageScaffold's) carries no bottom bar.
+        expect(
+          tester
+              .widgetList<Scaffold>(find.byType(Scaffold))
+              .every((s) => s.bottomNavigationBar == null),
+          isTrue,
         );
         expect(
           find.byKey(const ValueKey('criteria-reset-button')),
@@ -508,10 +517,48 @@ void main() {
         tester.widget<Text>(reason).data,
         'Enter a start and a destination',
       );
-      final submit = tester.widget<FilledButton>(
-        find.byKey(const ValueKey('criteria-submit-button')),
+      // #3961 — the greyed-out shell FAB is what the reason explains; the
+      // sheet carries no button of its own to disable.
+      expect(find.byKey(const ValueKey('criteria-submit-button')), findsNothing);
+      // The reason ends the form, under the last criteria section.
+      expect(
+        tester.getTopLeft(reason).dy,
+        greaterThan(tester.getTopLeft(find.byType(FuelTypeSelector)).dy),
       );
-      expect(submit.onPressed, isNull);
+    });
+
+    testWidgets('the shell Search button is the sheet submit: the screen '
+        'registers an enabled SearchFabAction in nearby mode (#3961)', (
+      tester,
+    ) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+      final container = ProviderContainer(
+        overrides: <Object>[
+          ...test.overrides,
+          selectedFuelTypeOverride(FuelType.e10),
+          searchRadiusOverride(8),
+          userPositionNullOverride(),
+        ].cast(),
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: SearchCriteriaScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final action = container.read(searchFabActionControllerProvider);
+      expect(action, isNotNull);
+      expect(action!.enabled, isTrue);
+      expect(action.icon, Icons.search);
     });
 
     testWidgets(

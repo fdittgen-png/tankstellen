@@ -34,7 +34,6 @@ import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/core/widgets/help_banner.dart';
 import 'package:tankstellen/features/search/presentation/widgets/all_prices/all_prices_table_header.dart';
 import 'package:tankstellen/features/search/presentation/widgets/all_prices_station_card.dart';
-import 'package:tankstellen/features/search/presentation/widgets/criteria/criteria_action_bar.dart';
 import 'package:tankstellen/features/search/presentation/widgets/criteria/criteria_option_row.dart';
 import 'package:tankstellen/features/search/presentation/widgets/fuel_type_selector.dart';
 import 'package:tankstellen/features/search/presentation/widgets/results/results_row.dart';
@@ -836,21 +835,12 @@ void main() {
   });
 
   // #3927 (Epic #3925) — the criteria sheet's fixed-size chrome: the mode
-  // toggle that used to wrap over two lines, the sticky action bar with
-  // its disabled-reason line, and one route-option row.
+  // toggle that used to wrap over two lines and one route-option row.
+  // #3961 — the sticky action bar is gone (the shell's Search button is the
+  // sheet's submit); its disabled-reason line now scrolls with the form.
   group('Search criteria sheet chrome (#3927)', () {
     Widget modeToggle() =>
         SearchModeToggle(mode: SearchMode.nearby, onChanged: (_) {});
-
-    Widget actionBar() => Builder(
-      builder: (context) => CriteriaActionBar(
-        onSubmit: () {},
-        onReset: () {},
-        disabledReason: AppLocalizations.of(
-          context,
-        ).criteriaSubmitDisabledRoute,
-      ),
-    );
 
     Widget optionRow() => Builder(
       builder: (context) {
@@ -881,14 +871,6 @@ void main() {
 
     testWidgets('SearchModeToggle — 1.3x', (tester) async {
       await pumpScaled(tester, modeToggle(), widgetName: 'SearchModeToggle');
-    });
-
-    testWidgets('CriteriaActionBar — pseudo-locale', (tester) async {
-      await pumpPseudo(tester, actionBar(), widgetName: 'CriteriaActionBar');
-    });
-
-    testWidgets('CriteriaActionBar — 1.3x', (tester) async {
-      await pumpScaled(tester, actionBar(), widgetName: 'CriteriaActionBar');
     });
 
     testWidgets('CriteriaOptionRow — pseudo-locale', (tester) async {
