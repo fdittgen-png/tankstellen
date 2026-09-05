@@ -289,11 +289,21 @@ inherits the margin from `cardTheme`.
 | Role | Widget | Unselected | Selected |
 | --- | --- | --- | --- |
 | choice (fuel, radius, sort, amenities) | Material `ChoiceChip` / `FilterChip` via `chipTheme` | `surface` fill, `outlineVariant` hairline | `primaryContainer` fill, `primary` stroke — the **colour** is the selected state |
-| summary (the criteria bar) | `SummaryChip` | tonal `secondaryContainer`, no border, `labelSmall`, `Spacing.chipPadding` | n/a — read, not pressed |
+| summary (the criteria bar) | `SummaryChip` | tonal `secondaryContainer`, no border, `labelSmall`, `Spacing.pillPadding` (8/2), capped at 132 dp | n/a — read, not pressed |
 | mode toggle | `SelectablePill` | transparent, faint outline | `primaryContainer` + `primary` outline |
 
 Selection changes animate with `AppMotion.selectionDuration(context)`
 (200 ms, zero under reduced motion).
+
+**The summary band is ONE line** (#3957). It is chrome above the results, so
+every dp it holds is list height: 2 dp of band padding, dense pills, 12 dp
+glyphs. A segment whose glyph already says the whole thing renders
+**glyph-only** (`SummaryChip(labelVisible: false)`) with the sentence in its
+tooltip and spoken label — the radar badge is the case that pushed the band
+onto a second line. Never hide the label of a pill carrying a VALUE (a
+price, a radius, a fuel code): the glyph cannot say those. Names that
+truncate (a provider with a parenthetical) are shortened at the source
+instead of spending the cap on a suffix nobody reads.
 
 ### Focal-number rule
 

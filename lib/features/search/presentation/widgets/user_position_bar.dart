@@ -43,7 +43,7 @@ class UserPositionBar extends ConsumerWidget {
         key: const Key('user_position_segment'),
         icon: Icon(
           Icons.my_location,
-          size: 14,
+          size: 12,
           color: theme.colorScheme.primary,
         ),
         label: value,
@@ -57,7 +57,7 @@ class UserPositionBar extends ConsumerWidget {
         key: const Key('user_position_segment'),
         icon: Icon(
           Icons.location_off,
-          size: 14,
+          size: 12,
           color: theme.colorScheme.error,
         ),
         label: l10n.positionUnknown,

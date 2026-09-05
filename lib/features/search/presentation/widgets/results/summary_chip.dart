@@ -18,6 +18,11 @@ import '../../../../../core/theme/spacing.dart';
 /// an expanded translation (de/en_XA) can never push the band into a
 /// horizontal overflow at 320 dp.
 ///
+/// #3957 — the band is a ONE-LINE band: the pills are dense
+/// ([Spacing.pillPadding], 8/2), capped at 132, and a segment whose glyph
+/// already says everything renders glyph-only ([labelVisible] false). Every
+/// dp of band height is list height.
+///
 /// #3939 (Epic #3937) — the pills now carry the **value only** (`E85`,
 /// `10 km`, `1 min`): the glyph beside each one already says the noun the
 /// old label repeated. Nothing is lost, because the full sentence moves
@@ -35,7 +40,8 @@ class SummaryChip extends StatelessWidget {
     this.tooltip,
     this.semanticsLabel,
     this.emphasized = false,
-    this.maxWidth = 168,
+    this.labelVisible = true,
+    this.maxWidth = 132,
     this.onTap,
     this.trailing,
   });
@@ -56,6 +62,14 @@ class SummaryChip extends StatelessWidget {
   /// the right thing to announce (e.g. the position segment, which reads
   /// "GPS · 1 min" visually). Defaults to [tooltip].
   final String? semanticsLabel;
+
+  /// #3957 — when false the pill renders its glyph ALONE. The value still
+  /// reaches the user through [tooltip] and the screen-reader label, so a
+  /// segment whose glyph already says the whole thing (the radar badge)
+  /// costs one icon of width instead of a whole band line. Never set this
+  /// on a pill carrying a VALUE the glyph cannot express (a price, a
+  /// radius, a fuel code).
+  final bool labelVisible;
 
   /// Amber "needs attention" treatment — used by the freshness segment once
   /// the price list is past the staleness threshold.
@@ -83,7 +97,7 @@ class SummaryChip extends StatelessWidget {
     final pill = ConstrainedBox(
       constraints: BoxConstraints(maxWidth: maxWidth),
       child: Container(
-        padding: Spacing.chipPadding,
+        padding: Spacing.pillPadding,
         decoration: BoxDecoration(
           // #3948 — a tonal, borderless read-only pill. The emphasized
           // (stale-prices) state keeps its amber tertiary tone.
@@ -96,15 +110,18 @@ class SummaryChip extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             icon,
-            const SizedBox(width: 4),
-            Flexible(
-              child: Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.labelSmall?.copyWith(color: foreground),
+            if (labelVisible) ...[
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelSmall
+                      ?.copyWith(color: foreground),
+                ),
               ),
-            ),
+            ],
             if (trailing != null) ...[const SizedBox(width: 3), trailing!],
           ],
         ),
@@ -122,7 +139,10 @@ class SummaryChip extends StatelessWidget {
     final Widget decorated = message == null
         ? tappable
         : Tooltip(message: message, child: tappable);
-    final semantics = semanticsLabel ?? tooltip;
+    // A glyph-only pill has no visible text, so its [label] is the last
+    // resort for assistive tech — it must never announce nothing.
+    final semantics =
+        semanticsLabel ?? tooltip ?? (labelVisible ? null : label);
     if (semantics == null) return decorated;
     return Semantics(
       label: semantics,

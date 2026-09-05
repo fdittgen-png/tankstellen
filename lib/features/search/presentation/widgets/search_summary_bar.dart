@@ -55,7 +55,13 @@ part 'search_summary_bar_source.dart';
 /// said what the criteria sheet this very band opens already says: the
 /// place the search ran around. Nothing else moved.
 ///
-/// #3955 — the open-data credit ("🇫🇷 Prix-Carburants (gouv.fr) ↗") is the
+/// #3957 — it is a ONE-LINE band. Every segment is dense, the radar badge
+/// is glyph-only and the source pill drops its parenthetical, so the normal
+/// configuration fits on a single row at phone widths; the [Wrap] stays the
+/// escape valve for an extreme locale or text scale rather than the layout
+/// the user actually sees.
+///
+/// #3955 — the open-data credit ("🇫🇷 Prix-Carburants ↗") is the
 /// band's LEADING segment ([_DataSourceSegment], a part of this file): the
 /// licences require a *visible* credit and the band is on every results
 /// screen, so the pinned footer that used to hold it — and the list height
@@ -123,9 +129,15 @@ class SearchSummaryBar extends ConsumerWidget {
     // corridor); it becomes a "radar result" badge so the bar signals the
     // list is a radar scan, not a regular search.
     if (ref.watch(radarSearchProvider.select((s) => s.active))) {
+      // #3957 — glyph-only: the radar icon says "radar result", and the
+      // sentence it used to spell out is exactly what pushed the band onto
+      // a second line. It survives as the tooltip + the spoken label.
       return SummaryChip(
-        icon: const Icon(Icons.radar, size: 14),
+        key: const Key('search_summary_radar'),
+        icon: const Icon(Icons.radar, size: 12),
         label: l10n.fuelStationRadarResultBadge,
+        labelVisible: false,
+        tooltip: l10n.fuelStationRadarResultBadge,
       );
     }
     if (mode != SearchMode.route) {
@@ -134,7 +146,7 @@ class SearchSummaryBar extends ConsumerWidget {
       // pill keeps the number and hands the sentence to the tooltip.
       return SummaryChip(
         key: const Key('search_summary_radius'),
-        icon: const Icon(Icons.radar, size: 14),
+        icon: const Icon(Icons.radar, size: 12),
         label: l10n.searchSummaryRadiusValue(kmText),
         tooltip: l10n.searchCriteriaRadiusBadge(kmText),
       );
@@ -148,8 +160,8 @@ class SearchSummaryBar extends ConsumerWidget {
       // cards are already showing — clearly reads as still ongoing.
       return SummaryChip(
         icon: const SizedBox(
-          width: 12,
-          height: 12,
+          width: 11,
+          height: 11,
           child: CircularProgressIndicator(strokeWidth: 2),
         ),
         label: l10n.routeSearchingChip,
@@ -160,7 +172,7 @@ class SearchSummaryBar extends ConsumerWidget {
         .round()
         .toString();
     return SummaryChip(
-      icon: const Icon(Icons.route, size: 14),
+      icon: const Icon(Icons.route, size: 12),
       label: l10n.searchSummaryAlongRoute(segmentText),
     );
   }
@@ -198,10 +210,12 @@ class SearchSummaryBar extends ConsumerWidget {
         child: InkWell(
           onTap: () => _openCriteria(context),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            // #3957 — the band is chrome above the results: 2 dp of its own
+            // padding, dense pills inside. It used to spend 6.
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
             child: Wrap(
               spacing: 6,
-              runSpacing: 4,
+              runSpacing: 2,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 // #3955 — the open-data credit leads the band.
@@ -210,7 +224,7 @@ class SearchSummaryBar extends ConsumerWidget {
                   key: const Key('search_summary_fuel'),
                   icon: Icon(
                     fuelType.icon,
-                    size: 14,
+                    size: 12,
                     color: FuelColors.forType(fuelType),
                   ),
                   label: _fuelValue(l10n, fuelType, countryCode),
@@ -222,7 +236,7 @@ class SearchSummaryBar extends ConsumerWidget {
                 if (stationCount != null)
                   SummaryChip(
                     key: const Key('search_summary_station_count'),
-                    icon: const Icon(Icons.local_gas_station, size: 14),
+                    icon: const Icon(Icons.local_gas_station, size: 12),
                     label: l10n.nStations(stationCount!),
                     tooltip: l10n.mapStationCountTooltip(stationCount!),
                   ),
@@ -238,7 +252,7 @@ class SearchSummaryBar extends ConsumerWidget {
                     key: const Key('search_summary_position_unknown'),
                     icon: Icon(
                       Icons.location_off,
-                      size: 14,
+                      size: 12,
                       color: theme.colorScheme.error,
                     ),
                     label: l10n.positionUnknown,

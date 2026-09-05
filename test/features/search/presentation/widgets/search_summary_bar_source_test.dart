@@ -128,7 +128,8 @@ void main() {
       final chips = tester.widgetList<SummaryChip>(find.byType(SummaryChip));
       expect(chips.first.key, const Key('search_summary_source'));
       expect(find.text(Countries.france.flag), findsOneWidget);
-      expect(find.text(Countries.france.apiProvider!), findsOneWidget);
+      // #3957 — the pill shows the provider WITHOUT its parenthetical.
+      expect(find.text('Prix-Carburants'), findsOneWidget);
       // The source pill sits left of the fuel pill on the same band.
       final source = tester.getTopLeft(find.byKey(const Key('search_summary_source')));
       final fuel = tester.getTopLeft(find.byKey(const Key('search_summary_fuel')));
@@ -155,7 +156,7 @@ void main() {
       final policy = CountryServiceRegistry.policyFor('FR')!;
       final tooltip = tester.widget<Tooltip>(
         find.ancestor(
-          of: find.text(Countries.france.apiProvider!),
+          of: find.text('Prix-Carburants'),
           matching: find.byType(Tooltip),
         ),
       );
@@ -184,8 +185,11 @@ void main() {
         ],
       );
 
-      final fr = CountryServiceRegistry.policyFor('FR')!.attribution;
-      final es = CountryServiceRegistry.policyFor('ES')!.attribution;
+      // #3957 — each credit is shown without its parenthetical.
+      String short(String n) =>
+          n.indexOf(' (') > 0 ? n.substring(0, n.indexOf(' (')) : n;
+      final fr = short(CountryServiceRegistry.policyFor('FR')!.attribution);
+      final es = short(CountryServiceRegistry.policyFor('ES')!.attribution);
       final pill = tester.widget<Text>(
         find.descendant(
           of: find.byKey(const Key('search_summary_source')),

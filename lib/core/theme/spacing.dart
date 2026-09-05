@@ -36,6 +36,12 @@ abstract class Spacing {
   /// every Material chip.
   static const chipPadding = EdgeInsets.symmetric(horizontal: md, vertical: sm);
 
+  /// Padding inside a **summary pill** (`SummaryChip`) — horizontal [md]
+  /// (8) / vertical [xs] (2). #3957 tightened the vertical side from [sm]:
+  /// the pills sit in a one-line band above the results, where every
+  /// vertical dp is list height. Choice chips keep [chipPadding].
+  static const pillPadding = EdgeInsets.symmetric(horizontal: md, vertical: xs);
+
   /// Outer margin of every surface-level card (`PrimaryCard`, `PanelCard`,
   /// `StationCardShell`, the theme's `cardTheme`): [lg] (12) horizontal /
   /// [md] (8) vertical. The 12 dp gutter separates content from the page

@@ -72,7 +72,7 @@ class PriceFreshnessSegment extends ConsumerWidget {
       key: const Key('search_freshness_segment'),
       icon: Icon(
         stale ? Icons.warning_amber_rounded : Icons.schedule,
-        size: 14,
+        size: 12,
         color: stale
             ? Theme.of(context).colorScheme.onTertiaryContainer
             : Theme.of(context).colorScheme.onSurfaceVariant,
