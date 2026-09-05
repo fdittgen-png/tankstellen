@@ -491,8 +491,10 @@ const _coreImportBaseline = <String, int>{
 const _shellImportBaseline = <String, int>{
   'receipts_ocr': 1,
   // #3743 (step 5/5) — the trip-recording banner's router.dart import
-  // followed it into features/trips (was 'consumption', now 0).
-  'trips': 1,
+  // followed it into features/trips (was 'consumption'). #3959 removed
+  // the banner's tappable strip, and with it that import: trips reaches
+  // ZERO. Keep it there — the recording form and the Trajets FAB own the
+  // navigation now.
   'widget': 1,
 };
 
