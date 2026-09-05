@@ -6,13 +6,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../app/router.dart';
 import '../../../../core/domain/consumption_unit.dart';
-import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/providers/consumption_display_provider.dart';
 import '../../../../core/services/approach_detector.dart';
-import '../../../../core/utils/unit_formatter.dart';
-import '../../../../l10n/app_localizations.dart';
 import '../../../approach/providers/effective_approach_state_provider.dart';
 import '../../../approach/providers/nearest_station_radar_provider.dart';
 import '../../../profile/providers/effective_fuel_type_provider.dart';
@@ -22,8 +18,6 @@ import '../../../../core/domain/station.dart';
 import '../../../search/providers/radar_search_provider.dart';
 import '../../../search/providers/search_filters_provider.dart';
 import '../../../obd2/api.dart';
-import '../../../driving_score/api.dart';
-import '../../domain/situation_classifier.dart';
 import '../../providers/live_activity_provider.dart';
 import '../../providers/vehicle_odometer_tracker.dart';
 import 'parked_prompt_pill.dart';
@@ -31,18 +25,24 @@ import '../../../fill_ups/api.dart';
 import '../../providers/pip_mode_provider.dart';
 import '../../providers/trip_recording_provider.dart';
 import 'gps_degraded_banner.dart';
-import 'trip_recording_banner_content.dart';
 import 'trip_recording_banner_palette.dart';
 import 'trip_recording_pip_price_layout.dart';
 import 'trip_recording_pip_view.dart';
 
-/// Persistent indicator of an active OBD2 trip (#726 + #768).
+/// The app-wide recording wrapper (#726 + #768, emptied of chrome by
+/// #3959).
 ///
-/// Zero-height when idle, so wrapping every screen in it is safe.
-/// When a trip is active, the banner colour, icon, and label reflect
-/// the current driving situation + consumption band, and the right
-/// side shows the percentage delta vs the situation's baseline.
-/// Tapping routes back to /trip-recording.
+/// It is mounted through `MaterialApp.builder`, so it sits above every
+/// screen. It claims **no layout height**: it arms the always-on recording
+/// side-effects (iOS Live Activity sync, the OBD2 fuel-level and odometer
+/// trackers), owns the Picture-in-Picture branch — the reduced tile IS this
+/// widget — floats the transient pause / GPS-degraded / parked pills over
+/// the content, and shows the ambient OBD2 status dot on a 24 dp strip when
+/// NO trip is running.
+///
+/// #3959 — the band-coloured efficiency strip it used to draw during a
+/// recording is gone: that signal is the recording form's own
+/// [LiveBandHeader] and the PiP tile's background colour.
 class TripRecordingBanner extends ConsumerWidget {
   final Widget child;
 
@@ -221,82 +221,43 @@ class TripRecordingBanner extends ConsumerWidget {
       );
     }
 
-    final bandColor = bandPalette(context, state.band, state.phase);
-    final l = AppLocalizations.of(context);
-    return Column(
+    // #3959 — a RECORDING claims no chrome above the app. The ambient
+    // efficiency signal the strip used to carry is now the recording
+    // form's own band header ([LiveBandHeader]) and, when the app is
+    // reduced, the PiP tile's background — both `bandPalette`, so the
+    // colour vocabulary is unchanged; what is gone is ~40 dp taken from
+    // every screen for the length of the drive. Getting back into the
+    // running trip is the Trajets FAB ("Resume recording") and the
+    // foreground-service notification, both of which already do it.
+    //
+    // The floating pills stay: they are transient warnings ABOUT the
+    // recording, they claim no layout height, and only the pill itself
+    // takes hits.
+    return Stack(
       children: [
-        Semantics(
-          container: true,
-          button: true,
-          // liveRegion makes TalkBack re-read the label when the
-          // band or situation changes — that's the whole point of
-          // the ambient consumption signal (#767).
-          liveRegion: true,
-          label: _semanticsLabel(state, l),
-          child: ExcludeSemantics(
-            child: Material(
-              color: bandColor.background,
-              elevation: 2,
-              child: SafeArea(
-                bottom: false,
-                child: InkWell(
-                  key: const Key('tripRecordingBanner'),
-                  // #1987 — TripRecordingBanner is wrapped via
-                  // MaterialApp.builder, so its context sits ABOVE the
-                  // Router/Navigator subtree and `GoRouter.of(context)`
-                  // fails. Navigate through the router instance from
-                  // `routerProvider` instead — always resolvable, no
-                  // context lookup — so the banner reliably reopens the
-                  // active recording (the old context-lookup fell back
-                  // to a snackbar naming the long-removed "Conso" tab).
-                  onTap: () =>
-                      ref.read(routerProvider).push(RoutePaths.tripRecording),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    child: TripRecordingBannerContent(
-                      state: state,
-                      palette: bandColor,
-                      unit: ref.watch(consumptionDisplaySettingProvider).unit,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
+        child,
         // #3545 — the drop/degraded status floats OVER the content instead
         // of being inserted as a row: every appear/disappear used to reflow
         // the whole screen below (forms visibly jumped on each reconnect
         // cycle). Both pills render zero-size when idle and are mutually
-        // exclusive (#797 pausedDueToDrop vs #2565 degradedGpsOnly), and
-        // only the pill itself claims hits — taps beside it fall through.
-        Expanded(
-          child: Stack(
-            children: [
-              child,
-              const Positioned(
-                top: 8,
-                left: 12,
-                right: 12,
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: Obd2PauseBanner(),
-                ),
-              ),
-              const Positioned(
-                top: 8,
-                left: 12,
-                right: 12,
-                child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  GpsDegradedBanner(),
-                  ParkedPromptPill(), // #3862 — stacks under the engine pill
-                ]),
-              ),
-            ],
+        // exclusive (#797 pausedDueToDrop vs #2565 degradedGpsOnly).
+        const Positioned(
+          top: 8,
+          left: 12,
+          right: 12,
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: Obd2PauseBanner(),
           ),
+        ),
+        const Positioned(
+          top: 8,
+          left: 12,
+          right: 12,
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            GpsDegradedBanner(),
+            ParkedPromptPill(), // #3862 — stacks under the engine pill
+          ]),
         ),
       ],
     );
@@ -367,36 +328,4 @@ class TripRecordingBanner extends ConsumerWidget {
     );
   }
 
-  String _semanticsLabel(TripRecordingState state, AppLocalizations l) {
-    if (state.phase == TripRecordingPhase.paused) {
-      return l.tripBannerPaused;
-    }
-    final prefix = l.tripBannerRecording;
-    final situation = _situationLabel(state.situation, l);
-    final parts = <String>[prefix, situation];
-    final delta = state.liveDeltaFraction;
-    if (delta != null) {
-      final pct = (delta * 100).round();
-      parts.add('${pct >= 0 ? '+' : ''}$pct%');
-    }
-    final distance = state.live?.distanceKmSoFar;
-    if (distance != null) {
-      parts.add(UnitFormatter.formatDistance(distance));
-    }
-    // #2393 — when the strip is showing the GPS estimate (no measured
-    // OBD2 value, estimate present) append the approximate-value
-    // disclaimer so screen-reader users hear it. The banner content
-    // sits under ExcludeSemantics, so the visible Tooltip can't surface
-    // here — this label is the a11y channel for it.
-    final live = state.live;
-    if (live != null &&
-        formatInstantConsumption(live) == null &&
-        live.gpsEstimatedLPer100Km != null) {
-      parts.add(l.tripRecordingEstimatedInfo);
-    }
-    return parts.join(', ');
-  }
-
-  String _situationLabel(DrivingSituation s, AppLocalizations l) =>
-      situationDisplayLabel(s, l);
 }

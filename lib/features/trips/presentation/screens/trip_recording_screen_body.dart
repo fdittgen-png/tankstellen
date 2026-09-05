@@ -97,6 +97,9 @@ mixin _TripRecordingBodySections on _TripRecordingEventHandlers {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // #3959 — the band-coloured efficiency header the app-wide strip
+          // used to be: on the form, not above every screen.
+          const LiveBandHeader(),
           const MinimalDriveSummary(),
           const SizedBox(height: 8),
           const RecordingStatusStrip(),

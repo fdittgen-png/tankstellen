@@ -8,6 +8,7 @@ import '../../../obd2/api.dart';
 import 'broken_map_widgets.dart';
 import '../../../driving_score/api.dart';
 import 'minimal_drive_summary.dart';
+import 'recording/live_band_header.dart';
 import 'recording/recording_metric_grid.dart';
 import 'recording/recording_status_strip.dart';
 import 'trip_radar_card.dart';
@@ -78,7 +79,14 @@ class TripRecordingLandscapeBody extends StatelessWidget {
                     alignment: Alignment.bottomCenter,
                     child: SizedBox(
                       width: constraints.maxWidth,
-                      child: const MinimalDriveSummary(),
+                      child: const Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // #3959 — same band header as portrait.
+                          LiveBandHeader(),
+                          MinimalDriveSummary(),
+                        ],
+                      ),
                     ),
                   ),
                 ),

@@ -33,6 +33,7 @@ import '../../providers/wakelock_facade.dart';
 import '../widgets/broken_map_widgets.dart';
 import '../../../driving_score/api.dart';
 import '../widgets/minimal_drive_summary.dart';
+import '../widgets/recording/live_band_header.dart';
 import '../widgets/recording/recording_metric_grid.dart';
 import '../widgets/recording/recording_status_strip.dart';
 import '../widgets/recording_app_bar_actions.dart';
