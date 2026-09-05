@@ -465,12 +465,10 @@
   "obdPickerTitle": "Välj en OBD2-adapter",
   "obdPickerScanning": "Söker efter adaptrar…",
   "obdPickerConnecting": "Ansluter…",
-  "tripSummaryTitle": "Resesammanfattning",
   "tripMetricDistance": "Sträcka",
   "tripMetricFuelUsed": "Bränsle använt",
   "tripMetricAvgConsumption": "Snitt",
   "tripMetricElapsed": "Förfluten tid",
-  "tripMetricOdometer": "Vägmätare",
   "tripStop": "Stoppa inspelning",
   "tripPause": "Pausa",
   "tripResume": "Återuppta",
@@ -519,7 +517,6 @@
   "situationClimbing": "Backkörning / lastad",
   "situationHardAccel": "Hård acceleration",
   "situationFuelCut": "Bränslebrytare – frifart",
-  "tripSaveRecording": "Spara resa",
   "vehicleFuelNotSet": "Ej inställt",
   "wizardVehicleDefaultBadge": "Standard",
   "wizardProfileChoiceHint": "Välj hur du vill använda appen. Du kan ändra detta senare i Inställningar.",
@@ -4023,7 +4020,6 @@
   "obd2StatusEngineOffBody": "Adaptern gick att nå men fordonsbussen förblev tyst, så automatisk återanslutning är pausad. Den återupptas när du kör eller öppnar appen igen — eller återanslut nu.",
   "obd2StatusReconnectNow": "Återanslut nu",
   "tripSummaryAutoSaved": "Resan sparades automatiskt",
-  "tripSummaryDone": "Klar",
   "tripSummaryDelete": "Ta bort den här resan",
   "lessonTransportTitle": "Motordata saknas för större delen av resan",
   "lessonTransportAdvice": "Motorn rapporterade ingen aktivitet under nästan hela sträckan. Antingen bröts OBD2-strömmen mitt i resan eller så flyttades bilen utan att köras — förbrukningssiffran är opålitlig och utesluts ur din statistik.",
@@ -6432,5 +6428,10 @@
         "type": "int"
       }
     }
+  },
+  "obd2ResetConnectionAuto": "Reconnecting the adapter automatically…",
+  "@obd2ResetConnectionAuto": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

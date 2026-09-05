@@ -9,7 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../l10n/app_localizations.dart';
 // #3781 — the one guarded reset run (barrel import: boundary-exempt).
-import '../../../obd2/api.dart' show runObd2ConnectionReset;
+import '../../../obd2/api.dart' show Obd2AutoReset, runObd2ConnectionReset;
 // `trip_recording_provider.dart` re-exports `TripRecordingPhase`.
 import '../../providers/trip_recording_provider.dart';
 
@@ -196,9 +196,13 @@ class _GpsDegradedBannerState extends ConsumerState<GpsDegradedBanner> {
       borderRadius: AppRadius.xl,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Row(
+        child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
             Icon(
               // A steady "fix held" glyph for the busy reconnect, a quieter
               // "still listening" glyph once we've dropped to the passive
@@ -249,6 +253,17 @@ class _GpsDegradedBannerState extends ConsumerState<GpsDegradedBanner> {
                     : Text(l.obd2ResetConnection),
               ),
             ],
+              ],
+            ),
+            // #3963 — the reset runs ITSELF five seconds after this pill
+            // appears: the driver must not reach for the phone. The
+            // button above stays for a stopped car that wants it now.
+            // Nothing is armed while the engine is off — there is
+            // nothing to reset then.
+            Obd2AutoReset(
+              armed: !awaitingEngine && !_resetBusy,
+              foreground: theme.colorScheme.onSecondaryContainer,
+            ),
           ],
         ),
       ),

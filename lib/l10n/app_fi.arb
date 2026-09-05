@@ -465,12 +465,10 @@
   "obdPickerTitle": "Valitse OBD2-sovitin",
   "obdPickerScanning": "Etsitään sovittimia…",
   "obdPickerConnecting": "Yhdistetään…",
-  "tripSummaryTitle": "Matkan yhteenveto",
   "tripMetricDistance": "Etäisyys",
   "tripMetricFuelUsed": "Polttoainetta käytetty",
   "tripMetricAvgConsumption": "Keskim.",
   "tripMetricElapsed": "Kulunut aika",
-  "tripMetricOdometer": "Matkamittari",
   "tripStop": "Lopeta tallennus",
   "tripPause": "Keskeytä",
   "tripResume": "Jatka",
@@ -519,7 +517,6 @@
   "situationClimbing": "Nousu / kuorma",
   "situationHardAccel": "Voimakas kiihdytys",
   "situationFuelCut": "Polttoaineen katkaisu — liuku",
-  "tripSaveRecording": "Tallenna matka",
   "vehicleFuelNotSet": "Ei asetettu",
   "wizardVehicleDefaultBadge": "Oletus",
   "wizardProfileChoiceHint": "Valitse, miten haluat käyttää sovellusta. Voit muuttaa tätä myöhemmin Asetuksissa.",
@@ -4023,7 +4020,6 @@
   "obd2StatusEngineOffBody": "Sovitin oli tavoitettavissa, mutta ajoneuvon väylä pysyi hiljaa, joten automaattinen uudelleenyhdistäminen on tauolla. Se jatkuu, kun ajat tai avaat sovelluksen uudelleen — tai yhdistä uudelleen nyt.",
   "obd2StatusReconnectNow": "Yhdistä uudelleen nyt",
   "tripSummaryAutoSaved": "Matka tallennettu automaattisesti",
-  "tripSummaryDone": "Valmis",
   "tripSummaryDelete": "Poista tämä matka",
   "lessonTransportTitle": "Moottoritiedot puuttuvat suurimmalta osalta tätä matkaa",
   "lessonTransportAdvice": "Moottori ei ilmoittanut toimintaa lähes koko matkalla. Joko OBD2-virta katkesi kesken matkan tai autoa siirrettiin ajamatta — kulutuslukema on epäluotettava ja jätetty pois tilastoistasi.",
@@ -6432,5 +6428,10 @@
         "type": "int"
       }
     }
+  },
+  "obd2ResetConnectionAuto": "Reconnecting the adapter automatically…",
+  "@obd2ResetConnectionAuto": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

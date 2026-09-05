@@ -465,12 +465,10 @@
   "obdPickerTitle": "Vali OBD2 adapter",
   "obdPickerScanning": "Otsin adaptereid…",
   "obdPickerConnecting": "Ühendan…",
-  "tripSummaryTitle": "Reisi kokkuvõte",
   "tripMetricDistance": "Vahemaa",
   "tripMetricFuelUsed": "Kasutatud kütus",
   "tripMetricAvgConsumption": "Kesk.",
   "tripMetricElapsed": "Kulunud aeg",
-  "tripMetricOdometer": "Läbisõidumõõdik",
   "tripStop": "Peata salvestamine",
   "tripPause": "Peata",
   "tripResume": "Jätka",
@@ -519,7 +517,6 @@
   "situationClimbing": "Tõus / koormatud",
   "situationHardAccel": "Järsk kiirendus",
   "situationFuelCut": "Kütuse katkestus — libisemine",
-  "tripSaveRecording": "Salvesta reis",
   "vehicleFuelNotSet": "Määramata",
   "wizardVehicleDefaultBadge": "Vaikimisi",
   "wizardProfileChoiceHint": "Vali, kuidas soovid rakendust kasutada. Seda saab hiljem Seadetes muuta.",
@@ -4023,7 +4020,6 @@
   "obd2StatusEngineOffBody": "Adapter oli kättesaadav, kuid sõiduki siin jäi vaikseks, seega on automaatne taasühendamine peatatud. See jätkub, kui sõidate või avate rakenduse uuesti — või ühendage kohe uuesti.",
   "obd2StatusReconnectNow": "Ühenda kohe uuesti",
   "tripSummaryAutoSaved": "Sõit salvestati automaatselt",
-  "tripSummaryDone": "Valmis",
   "tripSummaryDelete": "Kustuta see sõit",
   "lessonTransportTitle": "Mootoriandmed puuduvad suuremal osal sellest sõidust",
   "lessonTransportAdvice": "Mootor ei teatanud peaaegu kogu vahemaa jooksul tegevusest. Kas OBD2 andmevoog katkes sõidu keskel või liigutati autot sõitmata — kulunäit on ebausaldusväärne ja teie statistikast välja jäetud.",
@@ -6432,5 +6428,10 @@
         "type": "int"
       }
     }
+  },
+  "obd2ResetConnectionAuto": "Reconnecting the adapter automatically…",
+  "@obd2ResetConnectionAuto": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

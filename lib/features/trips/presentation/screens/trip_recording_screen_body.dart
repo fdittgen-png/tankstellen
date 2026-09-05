@@ -8,11 +8,6 @@ part of 'trip_recording_screen.dart';
 /// #1680 file-length decomposition. Move-only: behaviour preserved,
 /// every member verbatim from trip_recording_screen.dart.
 mixin _TripRecordingBodySections on _TripRecordingEventHandlers {
-  // Owned by the State (abstract — the State's concrete method
-  // satisfies this implicitly): the summary view's confirm-and-pop
-  // action stays in trip_recording_screen.dart.
-  void _onSave();
-
   Widget _buildRecording(
     BuildContext context,
     AppLocalizations l,
@@ -21,7 +16,8 @@ mixin _TripRecordingBodySections on _TripRecordingEventHandlers {
     // #2548 — staged save-progress: while `stop()` runs, the screen stays
     // mounted in the transient `saving` phase showing the inline
     // TripSaveProgress card (the "wrapping up" bookend to the start
-    // "warming up") until `_stopped` flips it to the summary.
+    // "warming up"); #3963 — when it resolves the screen pops straight
+    // back to the Trajets list with the trip already in it.
     if (state.isSaving) {
       return Center(
         child: TripSaveProgress(
@@ -150,85 +146,5 @@ mixin _TripRecordingBodySections on _TripRecordingEventHandlers {
       );
       return null;
     }
-  }
-
-  Widget _buildSummary(
-    BuildContext context,
-    AppLocalizations l,
-    StoppedTripResult r,
-  ) {
-    final s = r.summary;
-    final liters = s.fuelLitersConsumed;
-    // #3576 — no measured fuel: fall back to the persisted GPS-physics
-    // estimate the live view showed all drive, `~`-prefixed (estimate
-    // convention shared with the recording screen), instead of a dash.
-    final estLiters = s.estimatedFuelLitersConsumed;
-    final estAvg = s.estimatedAvgLPer100Km;
-    final endKm = r.endOdometerKm;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _MetricCard(
-          icon: Icons.route,
-          label: l.tripMetricDistance,
-          value: UnitFormatter.formatDistance(s.distanceKm, fractionDigits: 2),
-        ),
-        const SizedBox(height: 8),
-        _MetricCard(
-          icon: Icons.local_gas_station,
-          label: l.tripMetricFuelUsed,
-          value: liters != null
-              ? '${UnitFormatter.formatDecimal(liters, fractionDigits: 2)} L'
-              : estLiters != null
-                  ? '~${UnitFormatter.formatDecimal(estLiters, fractionDigits: 2)} L'
-                  : '—',
-        ),
-        const SizedBox(height: 8),
-        _MetricCard(
-          icon: Icons.eco,
-          label: l.tripMetricAvgConsumption,
-          value: s.avgLPer100Km != null
-              ? UnitFormatter.formatConsumption(s.avgLPer100Km!, isEv: false)
-              : estAvg != null
-                  ? '~${UnitFormatter.formatConsumption(estAvg, isEv: false)}'
-                  : '—',
-        ),
-        const SizedBox(height: 8),
-        _MetricCard(
-          icon: Icons.speed,
-          label: l.tripMetricOdometer,
-          value: endKm == null
-              ? '—'
-              : UnitFormatter.formatDistance(endKm, fractionDigits: 0),
-        ),
-        const Spacer(),
-        // #3582 — the trip is ALREADY saved by `stop()` (#1185); this
-        // sheet is a confirmation, not a gate. Say so, offer Done, and
-        // make the secondary action an HONEST delete of the saved entry
-        // (the old "Discard" reset the UI but silently kept the trip).
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: Text(
-            l.tripSummaryAutoSaved,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-          ),
-        ),
-        FilledButton.icon(
-          key: const Key('tripSaveButton'),
-          onPressed: _onSave,
-          icon: const Icon(Icons.check),
-          label: Text(l.tripSummaryDone),
-        ),
-        const SizedBox(height: 8),
-        TextButton(
-          key: const Key('tripDiscardButton'),
-          onPressed: _onDeleteSavedTrip,
-          child: Text(l.tripSummaryDelete),
-        ),
-      ],
-    );
   }
 }

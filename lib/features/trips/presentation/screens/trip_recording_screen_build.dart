@@ -28,7 +28,6 @@ mixin _TripRecordingBuild on _TripRecordingBodySections {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final state = ref.watch(tripRecordingProvider);
-    final stopped = _stopped;
 
     // #2569 — keep the voice-announcement listener mounted while this
     // screen is up. It is keepAlive + self-gating (it subscribes to the
@@ -75,7 +74,7 @@ mixin _TripRecordingBuild on _TripRecordingBodySections {
     // app UI). The persisted [RecordingProfile.autoEnterReducedOnStart]
     // is an additive opt-in hint — it never SUPPRESSES the existing
     // always-armed behaviour, so the default is unchanged.
-    final wantAutoPip = stopped == null && state.isActive;
+    final wantAutoPip = state.isActive;
     if (wantAutoPip != _autoPipRequested) {
       _autoPipRequested = wantAutoPip;
       unawaited(_pip.setAutoEnterEnabled(wantAutoPip));
@@ -123,11 +122,8 @@ mixin _TripRecordingBuild on _TripRecordingBodySections {
       );
     }
 
-    final title = stopped != null
-        ? (l.tripSummaryTitle)
-        // #2548 — the staged save view's title, the stop-side bookend to
-        // the #2274 connecting title.
-        : state.isSaving
+    // #3963 — no summary title: Stop pops the screen.
+    final title = state.isSaving
         ? (l.tripRecordingSavingTitle)
         : state.isConnecting
         // #2274 concern 2 — the connecting view is up while the link
@@ -138,7 +134,6 @@ mixin _TripRecordingBuild on _TripRecordingBodySections {
         // #3916 — a short title that fits beside pause / stop / overflow.
         : (l.tripRecordingScreenTitle);
 
-    // After stop: show the summary. Until then: live view.
     // #1395 — wrap the title in a GestureDetector so the hidden
     // 5-tap gesture can flip [obd2DebugOverlayProvider]. `behavior:
     // opaque` ensures the tap is captured even when the title's
@@ -174,9 +169,7 @@ mixin _TripRecordingBuild on _TripRecordingBodySections {
       // #2764 — the 5 inline IconButtons truncated the title to "Enr…".
       // Pause + Stop stay primary; Pin / Help / PiP fold into a single
       // overflow kebab (see [RecordingAppBarActions]).
-      actions: stopped != null
-          ? null
-          : [
+      actions: [
               RecordingAppBarActions(
                 pinned: _pinned,
                 pipSupported: _pip.isSupported,
@@ -212,11 +205,7 @@ mixin _TripRecordingBuild on _TripRecordingBodySections {
                   // every other band so the layout pays nothing in
                   // the common case.
                   const BrokenMapBanner(),
-                  Expanded(
-                    child: stopped == null
-                        ? _buildRecording(context, l, state)
-                        : _buildSummary(context, l, stopped),
-                  ),
+                  Expanded(child: _buildRecording(context, l, state)),
                 ],
               ),
             ),

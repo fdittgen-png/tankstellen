@@ -465,12 +465,10 @@
   "obdPickerTitle": "Escolher um adaptador OBD2",
   "obdPickerScanning": "A procurar adaptadores…",
   "obdPickerConnecting": "A ligar…",
-  "tripSummaryTitle": "Resumo da viagem",
   "tripMetricDistance": "Distância",
   "tripMetricFuelUsed": "Combustível usado",
   "tripMetricAvgConsumption": "Méd.",
   "tripMetricElapsed": "Tempo decorrido",
-  "tripMetricOdometer": "Odómetro",
   "tripStop": "Parar gravação",
   "tripPause": "Pausar",
   "tripResume": "Retomar",
@@ -519,7 +517,6 @@
   "situationClimbing": "Subida / carregado",
   "situationHardAccel": "Aceleração brusca",
   "situationFuelCut": "Corte de combustível — deslizar",
-  "tripSaveRecording": "Guardar viagem",
   "vehicleFuelNotSet": "Não definido",
   "wizardVehicleDefaultBadge": "Predefinição",
   "wizardProfileChoiceHint": "Escolha como pretende utilizar a aplicação. Pode alterar mais tarde nas Definições.",
@@ -4023,7 +4020,6 @@
   "obd2StatusEngineOffBody": "O adaptador estava acessível, mas o barramento do veículo ficou em silêncio, pelo que a reconexão automática está em pausa. Retoma quando conduzir ou reabrir a app — ou reconecte agora.",
   "obd2StatusReconnectNow": "Reconectar agora",
   "tripSummaryAutoSaved": "Viagem guardada automaticamente",
-  "tripSummaryDone": "Concluído",
   "tripSummaryDelete": "Eliminar esta viagem",
   "lessonTransportTitle": "Dados do motor em falta na maior parte desta viagem",
   "lessonTransportAdvice": "O motor não reportou atividade em quase toda a distância. Ou o fluxo OBD2 falhou a meio da viagem, ou o carro foi deslocado sem ser conduzido — o valor de consumo não é fiável e fica excluído das suas estatísticas.",
@@ -5934,5 +5930,10 @@
         "type": "int"
       }
     }
+  },
+  "obd2ResetConnectionAuto": "Reconnecting the adapter automatically…",
+  "@obd2ResetConnectionAuto": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

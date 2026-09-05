@@ -3027,12 +3027,6 @@ abstract class AppLocalizations {
   /// **'Connecting…'**
   String get obdPickerConnecting;
 
-  /// No description provided for @tripSummaryTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Trip summary'**
-  String get tripSummaryTitle;
-
   /// No description provided for @tripMetricDistance.
   ///
   /// In en, this message translates to:
@@ -3056,12 +3050,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Elapsed'**
   String get tripMetricElapsed;
-
-  /// No description provided for @tripMetricOdometer.
-  ///
-  /// In en, this message translates to:
-  /// **'Odometer'**
-  String get tripMetricOdometer;
 
   /// No description provided for @tripStop.
   ///
@@ -3387,23 +3375,11 @@ abstract class AppLocalizations {
   /// **'Fuel cut — coast'**
   String get situationFuelCut;
 
-  /// Trip-summary CTA: persists a TripHistoryEntry only — no fill-up created. (#1185)
-  ///
-  /// In en, this message translates to:
-  /// **'Save trip'**
-  String get tripSaveRecording;
-
   /// No description provided for @tripSummaryAutoSaved.
   ///
   /// In en, this message translates to:
   /// **'Trip saved automatically'**
   String get tripSummaryAutoSaved;
-
-  /// No description provided for @tripSummaryDone.
-  ///
-  /// In en, this message translates to:
-  /// **'Done'**
-  String get tripSummaryDone;
 
   /// No description provided for @tripSummaryDelete.
   ///
@@ -10834,6 +10810,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Adapter reset — reconnecting in the background'**
   String get obd2ResetConnectionNoLink;
+
+  /// Line on an OBD2 drop banner while the connection reset is about to run by itself (#3963) — the driver never has to tap.
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnecting the adapter automatically…'**
+  String get obd2ResetConnectionAuto;
 
   /// Title of the gated developer OCR tester screen that runs the pump / receipt OCR pipeline on a chosen image and shows the full reasoning trace (#2518, Epic #2516). Only visible in Developer / Debug mode.
   ///

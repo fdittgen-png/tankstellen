@@ -1,5 +1,6 @@
 {
   "obd2ResetConnection": "Réinitialiser la connexion",
   "obd2ResetConnectionDone": "Adaptateur réinitialisé — connexion rétablie",
-  "obd2ResetConnectionNoLink": "Adaptateur réinitialisé — reconnexion en arrière-plan"
+  "obd2ResetConnectionNoLink": "Adaptateur réinitialisé — reconnexion en arrière-plan",
+  "obd2ResetConnectionAuto": "Reconnexion automatique de l'adaptateur…"
 }

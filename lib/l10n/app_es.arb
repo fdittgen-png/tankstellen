@@ -465,12 +465,10 @@
   "obdPickerTitle": "Elige un adaptador OBD2",
   "obdPickerScanning": "Buscando adaptadores…",
   "obdPickerConnecting": "Conectando…",
-  "tripSummaryTitle": "Resumen del viaje",
   "tripMetricDistance": "Distancia",
   "tripMetricFuelUsed": "Combustible usado",
   "tripMetricAvgConsumption": "Media",
   "tripMetricElapsed": "Transcurrido",
-  "tripMetricOdometer": "Cuentakilómetros",
   "tripStop": "Detener grabación",
   "tripPause": "Pausar",
   "tripResume": "Reanudar",
@@ -519,7 +517,6 @@
   "situationClimbing": "Subiendo / con carga",
   "situationHardAccel": "Aceleración fuerte",
   "situationFuelCut": "Corte de combustible: deceleración",
-  "tripSaveRecording": "Guardar viaje",
   "vehicleFuelNotSet": "Sin definir",
   "wizardVehicleDefaultBadge": "Predeterminado",
   "wizardProfileChoiceHint": "Elige cómo quieres usar la app. Puedes cambiarlo más tarde en Ajustes.",
@@ -4023,7 +4020,6 @@
   "obd2StatusEngineOffBody": "El adaptador estaba accesible pero el bus del vehículo permaneció en silencio, así que la reconexión automática está en pausa. Se reanuda cuando conduces o vuelves a abrir la app, o reconecta ahora.",
   "obd2StatusReconnectNow": "Reconectar ahora",
   "tripSummaryAutoSaved": "Viaje guardado automáticamente",
-  "tripSummaryDone": "Hecho",
   "tripSummaryDelete": "Eliminar este viaje",
   "lessonTransportTitle": "Faltan datos del motor en la mayor parte de este viaje",
   "lessonTransportAdvice": "El motor no registró actividad durante casi toda la distancia. O el flujo OBD2 falló a mitad del viaje o el coche se movió sin conducirlo: el dato de consumo no es fiable y se excluye de tus estadísticas.",
@@ -5934,5 +5930,10 @@
         "type": "int"
       }
     }
+  },
+  "obd2ResetConnectionAuto": "Reconnecting the adapter automatically…",
+  "@obd2ResetConnectionAuto": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

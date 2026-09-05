@@ -465,12 +465,10 @@
   "obdPickerTitle": "Seleziona un adattatore OBD2",
   "obdPickerScanning": "Ricerca adattatori…",
   "obdPickerConnecting": "Connessione in corso…",
-  "tripSummaryTitle": "Riepilogo percorso",
   "tripMetricDistance": "Distanza",
   "tripMetricFuelUsed": "Carburante usato",
   "tripMetricAvgConsumption": "Media",
   "tripMetricElapsed": "Trascorso",
-  "tripMetricOdometer": "Odometro",
   "tripStop": "Ferma registrazione",
   "tripPause": "Pausa",
   "tripResume": "Riprendi",
@@ -519,7 +517,6 @@
   "situationClimbing": "Salita / carico",
   "situationHardAccel": "Accelerazione brusca",
   "situationFuelCut": "Taglio carburante — costa",
-  "tripSaveRecording": "Salva percorso",
   "vehicleFuelNotSet": "Non impostato",
   "wizardVehicleDefaultBadge": "Predefinito",
   "wizardProfileChoiceHint": "Scegli come vuoi usare l'app. Puoi cambiarlo in seguito nelle Impostazioni.",
@@ -4023,7 +4020,6 @@
   "obd2StatusEngineOffBody": "L'adattatore era raggiungibile ma il bus del veicolo è rimasto muto, quindi la riconnessione automatica è in pausa. Riprende quando guidi o riapri l'app, oppure riconnetti adesso.",
   "obd2StatusReconnectNow": "Riconnetti adesso",
   "tripSummaryAutoSaved": "Viaggio salvato automaticamente",
-  "tripSummaryDone": "Fatto",
   "tripSummaryDelete": "Elimina questo viaggio",
   "lessonTransportTitle": "Dati motore mancanti per gran parte di questo viaggio",
   "lessonTransportAdvice": "Il motore non ha segnalato attività per quasi tutta la distanza. O il flusso OBD2 si è interrotto a metà viaggio, oppure l'auto è stata spostata senza guidarla: il dato di consumo è inaffidabile ed escluso dalle tue statistiche.",
@@ -5934,5 +5930,10 @@
         "type": "int"
       }
     }
+  },
+  "obd2ResetConnectionAuto": "Reconnecting the adapter automatically…",
+  "@obd2ResetConnectionAuto": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

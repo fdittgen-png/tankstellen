@@ -1596,9 +1596,6 @@ class AppLocalizationsNb extends AppLocalizations {
   String get obdPickerConnecting => 'Kobler til…';
 
   @override
-  String get tripSummaryTitle => 'Tursammendrag';
-
-  @override
   String get tripMetricDistance => 'Avstand';
 
   @override
@@ -1609,9 +1606,6 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get tripMetricElapsed => 'Medgått tid';
-
-  @override
-  String get tripMetricOdometer => 'Kilometerstand';
 
   @override
   String get tripStop => 'Stopp opptak';
@@ -1790,13 +1784,7 @@ class AppLocalizationsNb extends AppLocalizations {
   String get situationFuelCut => 'Drivstoffstopp – frihjul';
 
   @override
-  String get tripSaveRecording => 'Lagre tur';
-
-  @override
   String get tripSummaryAutoSaved => 'Tur lagret automatisk';
-
-  @override
-  String get tripSummaryDone => 'Ferdig';
 
   @override
   String get tripSummaryDelete => 'Slett denne turen';
@@ -6336,6 +6324,10 @@ class AppLocalizationsNb extends AppLocalizations {
   @override
   String get obd2ResetConnectionNoLink =>
       'Adapter tilbakestilt — kobler til på nytt i bakgrunnen';
+
+  @override
+  String get obd2ResetConnectionAuto =>
+      'Reconnecting the adapter automatically…';
 
   @override
   String get ocrTesterTitle => 'OCR-tester';

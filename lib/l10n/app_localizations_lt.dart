@@ -1600,9 +1600,6 @@ class AppLocalizationsLt extends AppLocalizations {
   String get obdPickerConnecting => 'Jungiamasi…';
 
   @override
-  String get tripSummaryTitle => 'Kelionės santrauka';
-
-  @override
   String get tripMetricDistance => 'Atstumas';
 
   @override
@@ -1613,9 +1610,6 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get tripMetricElapsed => 'Praėjo';
-
-  @override
-  String get tripMetricOdometer => 'Odometras';
 
   @override
   String get tripStop => 'Sustabdyti įrašymą';
@@ -1795,13 +1789,7 @@ class AppLocalizationsLt extends AppLocalizations {
   String get situationFuelCut => 'Kuro atjungimas — inercinė eiga';
 
   @override
-  String get tripSaveRecording => 'Išsaugoti kelionę';
-
-  @override
   String get tripSummaryAutoSaved => 'Kelionė išsaugota automatiškai';
-
-  @override
-  String get tripSummaryDone => 'Atlikta';
 
   @override
   String get tripSummaryDelete => 'Ištrinti šią kelionę';
@@ -6370,6 +6358,10 @@ class AppLocalizationsLt extends AppLocalizations {
   @override
   String get obd2ResetConnectionNoLink =>
       'Adapteris atstatytas — iš naujo jungiamasi fone';
+
+  @override
+  String get obd2ResetConnectionAuto =>
+      'Reconnecting the adapter automatically…';
 
   @override
   String get ocrTesterTitle => 'OCR testeris';

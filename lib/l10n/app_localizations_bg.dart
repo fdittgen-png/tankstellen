@@ -1605,9 +1605,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get obdPickerConnecting => 'Свързване...';
 
   @override
-  String get tripSummaryTitle => 'Резюме на пътуването';
-
-  @override
   String get tripMetricDistance => 'Разстояние';
 
   @override
@@ -1618,9 +1615,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get tripMetricElapsed => 'Изминало';
-
-  @override
-  String get tripMetricOdometer => 'Одометър';
 
   @override
   String get tripStop => 'Спри записа';
@@ -1801,13 +1795,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get situationFuelCut => 'Отрязване на гориво — инерция';
 
   @override
-  String get tripSaveRecording => 'Запази пътуване';
-
-  @override
   String get tripSummaryAutoSaved => 'Пътуването е запазено автоматично';
-
-  @override
-  String get tripSummaryDone => 'Готово';
 
   @override
   String get tripSummaryDelete => 'Изтриване на това пътуване';
@@ -6389,6 +6377,10 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get obd2ResetConnectionNoLink =>
       'Адаптерът е нулиран — повторно свързване във фонов режим';
+
+  @override
+  String get obd2ResetConnectionAuto =>
+      'Reconnecting the adapter automatically…';
 
   @override
   String get ocrTesterTitle => 'OCR тестер';

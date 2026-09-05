@@ -1592,9 +1592,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get obdPickerConnecting => 'Ühendan…';
 
   @override
-  String get tripSummaryTitle => 'Reisi kokkuvõte';
-
-  @override
   String get tripMetricDistance => 'Vahemaa';
 
   @override
@@ -1605,9 +1602,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get tripMetricElapsed => 'Kulunud aeg';
-
-  @override
-  String get tripMetricOdometer => 'Läbisõidumõõdik';
 
   @override
   String get tripStop => 'Peata salvestamine';
@@ -1785,13 +1779,7 @@ class AppLocalizationsEt extends AppLocalizations {
   String get situationFuelCut => 'Kütuse katkestus — libisemine';
 
   @override
-  String get tripSaveRecording => 'Salvesta reis';
-
-  @override
   String get tripSummaryAutoSaved => 'Sõit salvestati automaatselt';
-
-  @override
-  String get tripSummaryDone => 'Valmis';
 
   @override
   String get tripSummaryDelete => 'Kustuta see sõit';
@@ -6326,6 +6314,10 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get obd2ResetConnectionNoLink =>
       'Adapter lähtestatud — taasühendamine taustal';
+
+  @override
+  String get obd2ResetConnectionAuto =>
+      'Reconnecting the adapter automatically…';
 
   @override
   String get ocrTesterTitle => 'OCR testija';

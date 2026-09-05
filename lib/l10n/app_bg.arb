@@ -465,12 +465,10 @@
   "obdPickerTitle": "Изберете OBD2 адаптер",
   "obdPickerScanning": "Търсене на адаптери...",
   "obdPickerConnecting": "Свързване...",
-  "tripSummaryTitle": "Резюме на пътуването",
   "tripMetricDistance": "Разстояние",
   "tripMetricFuelUsed": "Изразходвано гориво",
   "tripMetricAvgConsumption": "Средно",
   "tripMetricElapsed": "Изминало",
-  "tripMetricOdometer": "Одометър",
   "tripStop": "Спри записа",
   "tripPause": "Пауза",
   "tripResume": "Продължи",
@@ -519,7 +517,6 @@
   "situationClimbing": "Изкачване / натоварен",
   "situationHardAccel": "Рязко ускорение",
   "situationFuelCut": "Отрязване на гориво — инерция",
-  "tripSaveRecording": "Запази пътуване",
   "vehicleFuelNotSet": "Не е зададено",
   "wizardVehicleDefaultBadge": "По подразбиране",
   "wizardProfileChoiceHint": "Изберете как искате да използвате приложението. Можете да промените това по-късно в Настройки.",
@@ -4023,7 +4020,6 @@
   "obd2StatusEngineOffBody": "Адаптерът беше достъпен, но шината на автомобила остана тиха, затова автоматичното повторно свързване е на пауза. Възобновява се, когато шофирате или отворите отново приложението — или се свържете отново сега.",
   "obd2StatusReconnectNow": "Повторно свързване сега",
   "tripSummaryAutoSaved": "Пътуването е запазено автоматично",
-  "tripSummaryDone": "Готово",
   "tripSummaryDelete": "Изтриване на това пътуване",
   "lessonTransportTitle": "Липсват данни от двигателя за по-голямата част от това пътуване",
   "lessonTransportAdvice": "Двигателят не докладва активност почти по цялото разстояние. Или OBD2 потокът е прекъснал по средата на пътуването, или колата е била преместена без шофиране — стойността на разхода е ненадеждна и е изключена от статистиката ви.",
@@ -6432,5 +6428,10 @@
         "type": "int"
       }
     }
+  },
+  "obd2ResetConnectionAuto": "Reconnecting the adapter automatically…",
+  "@obd2ResetConnectionAuto": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

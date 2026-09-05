@@ -86,3 +86,5 @@ export 'providers/obd2_debug_logging_provider.dart';
 export 'providers/obd2_reconnect_provider.dart';
 export 'providers/obd2_recording_pipeline.dart';
 export 'providers/obd2_self_test_controller.dart';
+// #3963 — the self-running connection reset the drop banners embed.
+export 'presentation/widgets/obd2_auto_reset.dart';

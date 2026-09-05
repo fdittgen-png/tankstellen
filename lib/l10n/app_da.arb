@@ -465,12 +465,10 @@
   "obdPickerTitle": "Vælg en OBD2-adapter",
   "obdPickerScanning": "Søger efter adaptere…",
   "obdPickerConnecting": "Opretter forbindelse…",
-  "tripSummaryTitle": "Turresumé",
   "tripMetricDistance": "Afstand",
   "tripMetricFuelUsed": "Brændstof brugt",
   "tripMetricAvgConsumption": "Gns.",
   "tripMetricElapsed": "Forløbet",
-  "tripMetricOdometer": "Kilometertæller",
   "tripStop": "Stop optagelse",
   "tripPause": "Pause",
   "tripResume": "Genoptag",
@@ -519,7 +517,6 @@
   "situationClimbing": "Stigning / lastet",
   "situationHardAccel": "Hård acceleration",
   "situationFuelCut": "Brændstofafskæring — kystning",
-  "tripSaveRecording": "Gem tur",
   "vehicleFuelNotSet": "Ikke angivet",
   "wizardVehicleDefaultBadge": "Standard",
   "wizardProfileChoiceHint": "Vælg, hvordan du vil bruge appen. Du kan ændre dette senere i Indstillinger.",
@@ -4023,7 +4020,6 @@
   "obd2StatusEngineOffBody": "Adapteren kunne nås, men køretøjets bus forblev tavs, så automatisk genforbindelse er sat på pause. Den genoptages, når du kører eller åbner appen igen — eller genforbind nu.",
   "obd2StatusReconnectNow": "Genforbind nu",
   "tripSummaryAutoSaved": "Tur gemt automatisk",
-  "tripSummaryDone": "Færdig",
   "tripSummaryDelete": "Slet denne tur",
   "lessonTransportTitle": "Motordata mangler for det meste af denne tur",
   "lessonTransportAdvice": "Motoren rapporterede ingen aktivitet på næsten hele strækningen. Enten svigtede OBD2-strømmen midt i turen, eller også blev bilen flyttet uden at blive kørt — forbrugstallet er upålideligt og udelukkes fra din statistik.",
@@ -5934,5 +5930,10 @@
         "type": "int"
       }
     }
+  },
+  "obd2ResetConnectionAuto": "Reconnecting the adapter automatically…",
+  "@obd2ResetConnectionAuto": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

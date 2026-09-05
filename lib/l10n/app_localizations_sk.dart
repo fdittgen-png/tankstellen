@@ -1603,9 +1603,6 @@ class AppLocalizationsSk extends AppLocalizations {
   String get obdPickerConnecting => 'Pripájanie…';
 
   @override
-  String get tripSummaryTitle => 'Súhrn jazdy';
-
-  @override
   String get tripMetricDistance => 'Vzdialenosť';
 
   @override
@@ -1616,9 +1613,6 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get tripMetricElapsed => 'Uplynulý čas';
-
-  @override
-  String get tripMetricOdometer => 'Tachometer';
 
   @override
   String get tripStop => 'Zastaviť záznam';
@@ -1796,13 +1790,7 @@ class AppLocalizationsSk extends AppLocalizations {
   String get situationFuelCut => 'Odpojenie paliva — voľný beh';
 
   @override
-  String get tripSaveRecording => 'Uložiť jazdu';
-
-  @override
   String get tripSummaryAutoSaved => 'Jazda uložená automaticky';
-
-  @override
-  String get tripSummaryDone => 'Hotovo';
 
   @override
   String get tripSummaryDelete => 'Odstrániť túto jazdu';
@@ -6358,6 +6346,10 @@ class AppLocalizationsSk extends AppLocalizations {
   @override
   String get obd2ResetConnectionNoLink =>
       'Adaptér resetovaný — opätovné pripájanie na pozadí';
+
+  @override
+  String get obd2ResetConnectionAuto =>
+      'Reconnecting the adapter automatically…';
 
   @override
   String get ocrTesterTitle => 'Tester OCR';

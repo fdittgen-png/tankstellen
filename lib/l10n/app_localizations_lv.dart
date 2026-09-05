@@ -1603,9 +1603,6 @@ class AppLocalizationsLv extends AppLocalizations {
   String get obdPickerConnecting => 'Savienojas…';
 
   @override
-  String get tripSummaryTitle => 'Brauciena kopsavilkums';
-
-  @override
   String get tripMetricDistance => 'Attālums';
 
   @override
@@ -1616,9 +1613,6 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get tripMetricElapsed => 'Pagājušais laiks';
-
-  @override
-  String get tripMetricOdometer => 'Odometrs';
 
   @override
   String get tripStop => 'Apturēt ierakstīšanu';
@@ -1799,13 +1793,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get situationFuelCut => 'Degvielas pārtraukšana — skriešana';
 
   @override
-  String get tripSaveRecording => 'Saglabāt braucienu';
-
-  @override
   String get tripSummaryAutoSaved => 'Brauciens saglabāts automātiski';
-
-  @override
-  String get tripSummaryDone => 'Gatavs';
 
   @override
   String get tripSummaryDelete => 'Dzēst šo braucienu';
@@ -6375,6 +6363,10 @@ class AppLocalizationsLv extends AppLocalizations {
   @override
   String get obd2ResetConnectionNoLink =>
       'Adapteris atiestatīts — atkārtoti savienojas fonā';
+
+  @override
+  String get obd2ResetConnectionAuto =>
+      'Reconnecting the adapter automatically…';
 
   @override
   String get ocrTesterTitle => 'OCR testētājs';

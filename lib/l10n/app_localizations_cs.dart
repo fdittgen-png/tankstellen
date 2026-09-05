@@ -1599,9 +1599,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get obdPickerConnecting => 'Připojování…';
 
   @override
-  String get tripSummaryTitle => 'Přehled cesty';
-
-  @override
   String get tripMetricDistance => 'Vzdálenost';
 
   @override
@@ -1612,9 +1609,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get tripMetricElapsed => 'Uplynulý čas';
-
-  @override
-  String get tripMetricOdometer => 'Tachometr';
 
   @override
   String get tripStop => 'Zastavit nahrávání';
@@ -1793,13 +1787,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get situationFuelCut => 'Odříznutí paliva — výběh';
 
   @override
-  String get tripSaveRecording => 'Uložit cestu';
-
-  @override
   String get tripSummaryAutoSaved => 'Jízda uložena automaticky';
-
-  @override
-  String get tripSummaryDone => 'Hotovo';
 
   @override
   String get tripSummaryDelete => 'Smazat tuto jízdu';
@@ -6343,6 +6331,10 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get obd2ResetConnectionNoLink =>
       'Adaptér resetován — opětovné připojování na pozadí';
+
+  @override
+  String get obd2ResetConnectionAuto =>
+      'Reconnecting the adapter automatically…';
 
   @override
   String get ocrTesterTitle => 'Tester OCR';

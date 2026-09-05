@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/trips/domain/cold_start_baselines.dart';
 import 'package:tankstellen/features/trips/domain/situation_classifier.dart';
+import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/features/fill_ups/presentation/screens/add_fill_up_screen.dart';
 import 'package:tankstellen/features/trips/presentation/screens/trip_recording_screen.dart';
@@ -15,24 +16,26 @@ import '../../../../helpers/silence_error_logger.dart';
 import '../../../../helpers/pump_app.dart';
 import '../../../../helpers/recording_profile_override.dart';
 
-/// Regression coverage for #1185 — the Trip-summary CTA must save a
-/// trip as a consumption record, NOT pretend to be a fill-up.
+/// Regression coverage for #1185 and #3963 — stopping a recording saves
+/// the trip as a consumption record and puts the user back in the list.
 ///
-/// The trip itself is persisted by [TripRecording.stop()] (already
-/// covered upstream in the provider tests). What this file pins down
-/// is the post-stop summary screen behaviour:
+/// The trip is persisted by [TripRecording.stop()] (covered upstream in
+/// the provider tests). What this file pins is what STOP does on screen:
 ///
-///  1. Button label reads "Save trip" via [AppLocalizations.tripSaveRecording]
-///     — the legacy "Save as fill-up" copy is gone.
-///  2. Tapping the button pops the screen with a [TripSaveResult] whose
-///     `entryId` matches the id [TripRecording._saveToHistory] would
-///     have used (ISO start timestamp).
-///  3. Tapping the button does NOT push [AddFillUpScreen] — a trip and
-///     a fill-up are different domain entities.
+///  1. #3963 — it pops. There is no summary form to dismiss: a driver
+///     should never have to confirm a save.
+///  2. It pops a [TripSaveResult] whose `entryId` mirrors the id
+///     [TripRecording._saveToHistory] used (ISO start timestamp), and it
+///     resets the provider so the next recording starts clean.
+///  3. It does NOT push [AddFillUpScreen] — a trip and a fill-up are
+///     different domain entities (#1185).
+///  4. #3582/#3963 — the confirmation snackbar's Delete removes the
+///     PERSISTED entry, which is the honest delete the summary owned.
+///  5. #2509 — a stop that saved nothing says so instead.
 ///
-/// We don't drive the live recording loop here — instead we hand the
-/// fake `stop()` a deterministic [StoppedTripResult] so the save path
-/// runs without a real OBD2 stack.
+/// We don't drive the live recording loop here — the fake `stop()`
+/// returns a deterministic [StoppedTripResult] so the path runs without
+/// a real OBD2 stack.
 
 class _FakeWakelockFacade implements WakelockFacade {
   @override
@@ -40,6 +43,23 @@ class _FakeWakelockFacade implements WakelockFacade {
 
   @override
   Future<void> disable() async {}
+}
+
+/// Records the ids the snackbar's Delete asks the repository to remove.
+class _RecordingTripHistoryRepository implements TripHistoryRepository {
+  final List<String> deleted = <String>[];
+
+  @override
+  Future<void> delete(String id) async => deleted.add(id);
+
+  @override
+  void Function(TripHistoryEntry entry)? onSavedHook;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError(
+        '_RecordingTripHistoryRepository.${invocation.memberName} '
+        'was not expected to be called by the stop flow',
+      );
 }
 
 class _StoppingFakeTripRecording extends TripRecording {
@@ -70,7 +90,10 @@ class _StoppingFakeTripRecording extends TripRecording {
 
 /// Builds a deterministic [StoppedTripResult] with a known
 /// `startedAt` so the assertion on [TripSaveResult.entryId] is stable.
-StoppedTripResult _stoppedAt(DateTime startedAt) {
+StoppedTripResult _stoppedAt(
+  DateTime startedAt, {
+  bool discardedNoMovement = false,
+}) {
   return StoppedTripResult(
     summary: TripSummary(
       distanceKm: 2.95,
@@ -86,12 +109,14 @@ StoppedTripResult _stoppedAt(DateTime startedAt) {
     ),
     odometerStartKm: 12000,
     odometerLatestKm: 12003,
+    discardedNoMovement: discardedNoMovement,
   );
 }
 
 Future<void> _pumpAndStop(
   WidgetTester tester, {
   required _StoppingFakeTripRecording notifier,
+  _RecordingTripHistoryRepository? repo,
   Object? popResult,
 }) async {
   // Wrap the screen in a Navigator so we can capture the pop value the
@@ -115,7 +140,8 @@ Future<void> _pumpAndStop(
     overrides: [
       tripRecordingProvider.overrideWith(() => notifier),
       wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
-            recordingProfileOverride() as Object,
+      recordingProfileOverride() as Object,
+      if (repo != null) tripHistoryRepositoryProvider.overrideWithValue(repo),
     ],
   );
 
@@ -123,7 +149,7 @@ Future<void> _pumpAndStop(
   await tester.pumpAndSettle();
 
   // Tap stop → the fake's `stop()` resolves with the canned result and
-  // the screen flips into the summary view.
+  // the screen pops straight back (#3963).
   await tester.tap(find.byKey(const Key('tripStopButton')));
   await tester.pumpAndSettle();
 }
@@ -133,35 +159,25 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('TripRecordingScreen save (#1185)', () {
-    testWidgets('summary CTA reads "Done" (#3582 — trip already saved) '
-        '— not "Save as fill-up"',
+    testWidgets('#3963 — stop pops: there is no summary form to dismiss',
         (tester) async {
       final notifier = _StoppingFakeTripRecording(
         _stoppedAt(DateTime.utc(2026, 4, 27, 8)),
       );
       await _pumpAndStop(tester, notifier: notifier);
 
-      // New, semantic label.
-      expect(find.text('Done'), findsOneWidget);
-      // #3582 — the sheet says the trip is already saved and offers an
-      // HONEST delete instead of the old keep-anyway "Discard".
-      expect(find.text('Trip saved automatically'), findsOneWidget);
-      expect(find.text('Delete this trip'), findsOneWidget);
-      // Legacy "fill-up" copy must not survive the rename.
-      expect(find.text('Save as fill-up'), findsNothing);
-      // The save button keeps its key so existing tests / accessibility
-      // tooling can still find it.
-      expect(find.byKey(const Key('tripSaveButton')), findsOneWidget);
+      expect(find.byType(TripRecordingScreen), findsNothing);
+      expect(find.byKey(const Key('tripSaveButton')), findsNothing);
+      expect(find.byKey(const Key('tripDiscardButton')), findsNothing);
+      // The save is confirmed where the user now is, not on a screen.
+      expect(find.byKey(const Key('tripSavedSnackBar')), findsOneWidget);
     });
 
-    testWidgets('tapping Done pops with a TripSaveResult carrying '
-        'the persisted entry id', (tester) async {
+    testWidgets('stop pops with a TripSaveResult carrying the persisted '
+        'entry id, and resets the provider', (tester) async {
       final startedAt = DateTime.utc(2026, 4, 27, 8);
       final notifier = _StoppingFakeTripRecording(_stoppedAt(startedAt));
 
-      // Capture the popped value via the GlobalKey-less Navigator
-      // pattern: a Builder pushes the screen, awaits the pop, and
-      // we read the result from a closure-scoped variable.
       TripSaveResult? captured;
       await pumpApp(
         tester,
@@ -169,13 +185,11 @@ void main() {
           builder: (context) => ElevatedButton(
             key: const Key('open_trip_screen'),
             onPressed: () async {
-              final result = await Navigator.of(context)
-                  .push<TripSaveResult?>(
+              captured = await Navigator.of(context).push<TripSaveResult?>(
                 MaterialPageRoute(
                   builder: (_) => const TripRecordingScreen(),
                 ),
               );
-              captured = result;
             },
             child: const Text('Open'),
           ),
@@ -183,95 +197,58 @@ void main() {
         overrides: [
           tripRecordingProvider.overrideWith(() => notifier),
           wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
-            recordingProfileOverride() as Object,
+          recordingProfileOverride() as Object,
         ],
       );
 
       await tester.tap(find.byKey(const Key('open_trip_screen')));
       await tester.pumpAndSettle();
-
       await tester.tap(find.byKey(const Key('tripStopButton')));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byKey(const Key('tripSaveButton')));
-      await tester.pumpAndSettle();
-
       expect(captured, isNotNull);
-      // Id derivation must mirror `TripRecording._saveToHistory` so
-      // the popped result resolves to the persisted entry.
+      // Id derivation mirrors `TripRecording._saveToHistory` so the popped
+      // result resolves to the persisted entry.
       expect(captured!.entryId, startedAt.toIso8601String());
-      // Summary forwarded — the caller can use it for an immediate
-      // refresh / scroll-to without re-reading from Hive.
       expect(captured!.summary.distanceKm, 2.95);
       expect(captured!.summary.fuelLitersConsumed, 0.27);
-      // The provider must be reset so the next recording starts clean.
       expect(notifier.resetCalls, 1);
     });
 
-    testWidgets('tapping Done does NOT push AddFillUpScreen '
-        '(trip-as-consumption-record fix)', (tester) async {
+    testWidgets('stop does NOT push AddFillUpScreen '
+        '(trip-as-consumption-record fix, #1185)', (tester) async {
       final notifier = _StoppingFakeTripRecording(
         _stoppedAt(DateTime.utc(2026, 4, 27, 8)),
       );
       await _pumpAndStop(tester, notifier: notifier);
 
       expect(find.byType(AddFillUpScreen), findsNothing,
-          reason: 'Pre-save sanity: AddFillUpScreen must not be on the stack');
-
-      await tester.tap(find.byKey(const Key('tripSaveButton')));
-      await tester.pumpAndSettle();
-
-      // After save: still no AddFillUpScreen — saving a trip MUST NOT
-      // funnel the user into the fill-up creation flow (#1185).
-      expect(find.byType(AddFillUpScreen), findsNothing,
-          reason: 'Saving a trip must not push AddFillUpScreen — a '
-              'trip is a consumption record, not a refuel event.');
+          reason: 'Saving a trip must not funnel the user into the '
+              'fill-up creation flow — a trip is a consumption record.');
     });
 
-    testWidgets('discard does not pop a TripSaveResult', (tester) async {
+    testWidgets("#3582 — the snackbar's Delete removes the PERSISTED entry, "
+        'not just the UI', (tester) async {
+      final startedAt = DateTime.utc(2026, 4, 27, 8);
+      final repo = _RecordingTripHistoryRepository();
+      final notifier = _StoppingFakeTripRecording(_stoppedAt(startedAt));
+      await _pumpAndStop(tester, notifier: notifier, repo: repo);
+
+      await tester.tap(find.text('Delete this trip'));
+      await tester.pumpAndSettle();
+
+      expect(repo.deleted, [startedAt.toIso8601String()]);
+    });
+
+    testWidgets('#2509 — a stop that saved nothing says so, and offers no '
+        'delete', (tester) async {
       final notifier = _StoppingFakeTripRecording(
-        _stoppedAt(DateTime.utc(2026, 4, 27, 8)),
+        _stoppedAt(DateTime.utc(2026, 4, 27, 8), discardedNoMovement: true),
       );
-      TripSaveResult? captured;
-      Object? sentinel = const Object();
-      await pumpApp(
-        tester,
-        Builder(
-          builder: (context) => ElevatedButton(
-            key: const Key('open_trip_screen'),
-            onPressed: () async {
-              final result = await Navigator.of(context)
-                  .push<TripSaveResult?>(
-                MaterialPageRoute(
-                  builder: (_) => const TripRecordingScreen(),
-                ),
-              );
-              captured = result;
-              sentinel = null;
-            },
-            child: const Text('Open'),
-          ),
-        ),
-        overrides: [
-          tripRecordingProvider.overrideWith(() => notifier),
-          wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
-            recordingProfileOverride() as Object,
-        ],
-      );
+      await _pumpAndStop(tester, notifier: notifier);
 
-      await tester.tap(find.byKey(const Key('open_trip_screen')));
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byKey(const Key('tripStopButton')));
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byKey(const Key('tripDiscardButton')));
-      await tester.pumpAndSettle();
-
-      expect(sentinel, isNull,
-          reason: 'Discard must complete the push so the caller resumes');
-      expect(captured, isNull,
-          reason: 'Discard pops with null — no TripSaveResult');
+      expect(find.byKey(const Key('tripSavedSnackBar')), findsNothing);
+      expect(find.text('Delete this trip'), findsNothing);
     });
   });
 }
