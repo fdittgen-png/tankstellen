@@ -42,7 +42,6 @@
     }
   },
   "searchResultsMoreActionsTooltip": "Autres actions",
-  "searchPriceArrowLegend": "↓ et ↑ situent chaque prix par rapport aux autres stations de cette liste.",
   "searchPriceArrowCheapTooltip": "Parmi les prix les plus bas de cette liste",
   "searchPriceArrowAverageTooltip": "Un prix intermédiaire dans cette liste",
   "searchPriceArrowExpensiveTooltip": "Parmi les prix les plus élevés de cette liste",

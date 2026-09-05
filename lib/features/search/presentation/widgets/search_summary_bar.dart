@@ -1,9 +1,15 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../../../core/country/country_config.dart';
 import '../../../../core/country/country_provider.dart';
+import '../../../../core/error/guarded.dart';
+import '../../../../core/services/country_service_registry.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -21,6 +27,8 @@ import '../../providers/search_provider.dart';
 import '../screens/search_criteria_screen.dart';
 import 'results/price_freshness_segment.dart';
 import 'results/summary_chip.dart';
+
+part 'search_summary_bar_source.dart';
 
 /// **Row A** of the two-row results chrome (#3926, epic #3925).
 ///
@@ -47,9 +55,14 @@ import 'results/summary_chip.dart';
 /// said what the criteria sheet this very band opens already says: the
 /// place the search ran around. Nothing else moved.
 ///
-/// The open-data attribution that used to sit above this bar now lives in
-/// the footer under the results list, and the position bar's refresh icon
-/// was folded into the single app-bar refresh.
+/// #3955 — the open-data credit ("🇫🇷 Prix-Carburants (gouv.fr) ↗") is the
+/// band's LEADING segment ([_DataSourceSegment], a part of this file): the
+/// licences require a *visible* credit and the band is on every results
+/// screen, so the pinned footer that used to hold it — and the list height
+/// it cost — is gone. The band is also forced full-width here, so no
+/// parent that gives it loose constraints can leave it a partial strip.
+/// The position bar's refresh icon was folded into the single app-bar
+/// refresh.
 ///
 /// #3949 (Epic #3947) — the map screen renders this same band above its
 /// map body in place of its old bottom info bar ("25 stations · 25 km ·
@@ -178,7 +191,9 @@ class SearchSummaryBar extends ConsumerWidget {
     return Semantics(
       label: l10n.searchCriteriaSemanticLabel,
       button: true,
-      child: Material(
+      child: SizedBox(
+        width: double.infinity,
+        child: Material(
         color: theme.colorScheme.surfaceContainerHighest,
         child: InkWell(
           onTap: () => _openCriteria(context),
@@ -189,6 +204,8 @@ class SearchSummaryBar extends ConsumerWidget {
               runSpacing: 4,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
+                // #3955 — the open-data credit leads the band.
+                const _DataSourceSegment(),
                 SummaryChip(
                   key: const Key('search_summary_fuel'),
                   icon: Icon(
@@ -234,6 +251,7 @@ class SearchSummaryBar extends ConsumerWidget {
               ],
             ),
           ),
+        ),
         ),
       ),
     );

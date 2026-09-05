@@ -8723,10 +8723,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get searchResultsMoreActionsTooltip => 'Autres actions';
 
   @override
-  String get searchPriceArrowLegend =>
-      '↓ et ↑ situent chaque prix par rapport aux autres stations de cette liste.';
-
-  @override
   String get searchPriceArrowCheapTooltip =>
       'Parmi les prix les plus bas de cette liste';
 

@@ -31,7 +31,6 @@ import '../../providers/search_provider.dart';
 import '../../providers/selected_station_provider.dart';
 import '../widgets/radar_pin_help_sheet.dart';
 import '../widgets/radar_screen_pin_mixin.dart';
-import '../widgets/results/search_results_footer.dart';
 import '../widgets/search_results_content.dart';
 import '../widgets/search_chrome_banners.dart';
 import '../widgets/search_summary_bar.dart';
@@ -378,13 +377,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
             child: SearchResultsContent(onGpsRetry: _performGpsSearch),
           ),
         ),
-        // #3926 — the price-arrow legend + the open-data attribution that
-        // used to head the screen, as a pinned footer under the list.
-        if (!hideChromeForLandscapeRadar)
-          SearchResultsFooter(
-            country: country,
-            corridorCountryCodes: corridorCodes,
-          ),
+        // #3955 — no pinned footer: the open-data credit is row A's first
+        // segment and the price-arrow explanation is a help-bubble tip, so
+        // the list runs down to the bottom bar.
       ],
     );
   }

@@ -9232,10 +9232,6 @@
   "@searchResultsMoreActionsTooltip": {
     "description": "Tooltip of the overflow ('…') button on the results row that holds the labelled map / radar-view / fuel-cost-calculator entries, replacing three unlabelled icon buttons (#3926)."
   },
-  "searchPriceArrowLegend": "↓ and ↑ compare each price with the other stations in this list.",
-  "@searchPriceArrowLegend": {
-    "description": "One-line legend under the results list explaining the price arrows on the station cards. The arrow is NOT a time trend: it is the station's price tier inside the CURRENT result set (bottom third = ↓, middle third = –, top third = ↑), computed from the minimum and maximum price of the listed stations for the selected fuel (#3926)."
-  },
   "searchPriceArrowCheapTooltip": "Among the lowest prices in this list",
   "@searchPriceArrowCheapTooltip": {
     "description": "Tooltip on the ↓ arrow beside a station-card price — the price sits in the bottom third of the current result set's price range (#3926)."

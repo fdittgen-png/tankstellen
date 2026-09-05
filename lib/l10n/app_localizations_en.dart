@@ -8587,10 +8587,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchResultsMoreActionsTooltip => 'More actions';
 
   @override
-  String get searchPriceArrowLegend =>
-      '↓ and ↑ compare each price with the other stations in this list.';
-
-  @override
   String get searchPriceArrowCheapTooltip =>
       'Among the lowest prices in this list';
 
@@ -17754,10 +17750,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get searchResultsMoreActionsTooltip => '⟦Ṁóřé áçŧîóñš ·····⟧';
-
-  @override
-  String get searchPriceArrowLegend =>
-      '⟦↓ áñđ ↑ çóɱƥářé éáçĥ ƥřîçé ŵîŧĥ ŧĥé óŧĥéř šŧáŧîóñš îñ ŧĥîš łîšŧ. ······················⟧';
 
   @override
   String get searchPriceArrowCheapTooltip =>

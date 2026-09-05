@@ -256,9 +256,9 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
             }),
           ),
         ),
-        // #2373/#3926 — the open-data attribution lives in the screen's
-        // footer under this list (`SearchResultsFooter`), together with
-        // the price-arrow legend.
+        // #2373/#3926/#3955 — the open-data credit is the leading segment
+        // of the summary band above this list; the price-arrow explanation
+        // is a help-bubble tip. Nothing is pinned under the list.
       ],
     );
   }

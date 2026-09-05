@@ -14596,12 +14596,6 @@ abstract class AppLocalizations {
   /// **'More actions'**
   String get searchResultsMoreActionsTooltip;
 
-  /// One-line legend under the results list explaining the price arrows on the station cards. The arrow is NOT a time trend: it is the station's price tier inside the CURRENT result set (bottom third = ↓, middle third = –, top third = ↑), computed from the minimum and maximum price of the listed stations for the selected fuel (#3926).
-  ///
-  /// In en, this message translates to:
-  /// **'↓ and ↑ compare each price with the other stations in this list.'**
-  String get searchPriceArrowLegend;
-
   /// Tooltip on the ↓ arrow beside a station-card price — the price sits in the bottom third of the current result set's price range (#3926).
   ///
   /// In en, this message translates to:

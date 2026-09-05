@@ -36,6 +36,8 @@ class SummaryChip extends StatelessWidget {
     this.semanticsLabel,
     this.emphasized = false,
     this.maxWidth = 168,
+    this.onTap,
+    this.trailing,
   });
 
   /// Leading glyph — an [Icon] or a small progress indicator.
@@ -61,6 +63,16 @@ class SummaryChip extends StatelessWidget {
 
   /// Hard ceiling for the pill width (label ellipsises inside it).
   final double maxWidth;
+
+  /// #3955 — a pill that is itself a link (the open-data source credit).
+  /// The band around the pills opens the criteria sheet; an inner tap
+  /// target wins the gesture arena, so this pill can lead somewhere else
+  /// without the band losing its own tap.
+  final VoidCallback? onTap;
+
+  /// Optional trailing glyph after the label — the `open_in_new`
+  /// affordance of a link pill.
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -93,18 +105,28 @@ class SummaryChip extends StatelessWidget {
                 style: theme.textTheme.labelSmall?.copyWith(color: foreground),
               ),
             ),
+            if (trailing != null) ...[const SizedBox(width: 3), trailing!],
           ],
         ),
       ),
     );
+    final tap = onTap;
+    final Widget tappable = tap == null
+        ? pill
+        : GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: tap,
+            child: pill,
+          );
     final message = tooltip;
     final Widget decorated = message == null
-        ? pill
-        : Tooltip(message: message, child: pill);
+        ? tappable
+        : Tooltip(message: message, child: tappable);
     final semantics = semanticsLabel ?? tooltip;
     if (semantics == null) return decorated;
     return Semantics(
       label: semantics,
+      link: tap != null,
       excludeSemantics: true,
       child: decorated,
     );

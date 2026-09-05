@@ -8674,10 +8674,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get searchResultsMoreActionsTooltip => 'Weitere Aktionen';
 
   @override
-  String get searchPriceArrowLegend =>
-      '↓ und ↑ vergleichen jeden Preis mit den anderen Tankstellen in dieser Liste.';
-
-  @override
   String get searchPriceArrowCheapTooltip =>
       'Gehört zu den niedrigsten Preisen in dieser Liste';
 

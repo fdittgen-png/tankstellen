@@ -6022,11 +6022,6 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "searchPriceArrowLegend": "↓ and ↑ compare each price with the other stations in this list.",
-  "@searchPriceArrowLegend": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
   "searchPriceArrowCheapTooltip": "Among the lowest prices in this list",
   "@searchPriceArrowCheapTooltip": {
     "x-mt": "needs-native-review",
