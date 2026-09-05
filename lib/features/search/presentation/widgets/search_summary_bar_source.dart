@@ -47,20 +47,21 @@ class _DataSourceSegment extends ConsumerWidget {
     final policy = CountryServiceRegistry.policyFor(country.code);
     final provider = country.apiProvider; // i18n-ignore: provider name
     final source = policy?.attribution ?? provider ?? country.name;
+    final shown = _shortProvider(provider ?? country.name);
     final credit = l10n.dataSourceLinkSemantic(source, policy?.license ?? '');
     final url = policy?.sourceUrl;
     final linked = url != null && url.isNotEmpty;
     final theme = Theme.of(context);
     return SummaryChip(
       key: const Key('search_summary_source'),
-      icon: Text(country.flag, style: const TextStyle(fontSize: 12)),
-      label: provider ?? country.name,
+      icon: Text(country.flag, style: const TextStyle(fontSize: 11)),
+      label: shown,
       tooltip: credit,
       onTap: linked ? () => unawaited(_open(url)) : null,
       trailing: linked
           ? Icon(
               Icons.open_in_new,
-              size: 11,
+              size: 10,
               color: theme.colorScheme.onSecondaryContainer,
             )
           : null,
@@ -79,17 +80,28 @@ class _DataSourceSegment extends ConsumerWidget {
       final policy = CountryServiceRegistry.policyFor(code);
       if (config == null || policy == null) continue;
       flags.add(config.flag);
-      providers.add(policy.attribution);
+      providers.add(_shortProvider(policy.attribution));
       // i18n-ignore: country name + provider attribution are proper nouns.
       segments.add('${config.name} — ${policy.attribution}');
     }
     if (segments.isEmpty) return const SizedBox.shrink();
     return SummaryChip(
       key: const Key('search_summary_source'),
-      icon: Text(flags.join(' '), style: const TextStyle(fontSize: 12)),
+      icon: Text(flags.join(' '), style: const TextStyle(fontSize: 11)),
       label: providers.join(' · '),
       tooltip: l10n.routeDataSourceMulti(segments.join(' · ')),
     );
+  }
+
+  /// The provider name as the PILL shows it: without a trailing
+  /// parenthetical — `Prix-Carburants (gouv.fr)` reads `Prix-Carburants`
+  /// (#3957). Display only: the full name and the licence stay in the
+  /// tooltip and the spoken label, so the open-data credit is unchanged,
+  /// and the pill stops spending its whole 132 dp on a suffix it then
+  /// truncates ("Prix-Carburants (go…").
+  static String _shortProvider(String name) {
+    final cut = name.indexOf(' (');
+    return cut > 0 ? name.substring(0, cut) : name;
   }
 
   Future<void> _open(String url) async {

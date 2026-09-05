@@ -245,7 +245,10 @@ void main() {
         ],
       );
 
-      expect(find.text('Fuel Station Radar result'), findsOneWidget);
+      // #3957 — the badge is glyph-only now: present as a pill, with the
+      // sentence in its tooltip instead of on a second band line.
+      expect(find.byKey(const Key('search_summary_radar')), findsOneWidget);
+      expect(find.text('Fuel Station Radar result'), findsNothing);
       expect(find.text('10 km'), findsNothing);
     });
 
@@ -265,7 +268,7 @@ void main() {
       );
 
       expect(find.text('10 km'), findsOneWidget);
-      expect(find.text('Fuel Station Radar result'), findsNothing);
+      expect(find.byKey(const Key('search_summary_radar')), findsNothing);
     });
 
     // #3926 — row A absorbed the position strip and the freshness pill;
