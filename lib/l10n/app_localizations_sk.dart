@@ -8655,10 +8655,6 @@ class AppLocalizationsSk extends AppLocalizations {
   String get searchResultsMoreActionsTooltip => 'More actions';
 
   @override
-  String get searchPriceArrowLegend =>
-      '↓ and ↑ compare each price with the other stations in this list.';
-
-  @override
   String get searchPriceArrowCheapTooltip =>
       'Among the lowest prices in this list';
 

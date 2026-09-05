@@ -17,10 +17,15 @@ import 'unsupported_region_notice.dart';
 ///
 /// #3926 reduced it to **one** row: the demo-mode call to action and the
 /// unsupported-region notice are conditional notices, and everything else
-/// collapsed into [SearchSummaryBar] (row A). The country/source
-/// attribution moved to the footer under the list, and the user-position
-/// strip — with the screen's second refresh icon — became a segment of row
-/// A, its refresh folded into the single app-bar refresh.
+/// collapsed into [SearchSummaryBar] (row A). The user-position strip —
+/// with the screen's second refresh icon — became a segment of row A, its
+/// refresh folded into the single app-bar refresh.
+///
+/// #3955 — the country/source credit is row A's leading segment (the footer
+/// under the list is gone), and the column STRETCHES its children: under
+/// [AnimatedSize]'s loose constraints a plain column took the width of its
+/// widest child, which left the band a partial strip ending where the last
+/// chip ended instead of one horizontal line edge to edge.
 class SearchChromeBanners extends ConsumerWidget {
   const SearchChromeBanners({
     super.key,
@@ -36,9 +41,8 @@ class SearchChromeBanners extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // #3926 — only the demo-mode branch of [DemoModeBanner] belongs at the
-    // top: it is a call to action ("turn on live prices"), not a credit.
-    // Its attribution branches render in `SearchResultsFooter`.
+    // #3926 — the demo-mode banner is a call to action ("turn on live
+    // prices"), not a credit; the credit itself is row A's first segment.
     final showsDemoBanner =
         country.requiresApiKey && corridorCountryCodes.length <= 1;
     return AnimatedSize(
@@ -48,6 +52,7 @@ class SearchChromeBanners extends ConsumerWidget {
       child: hidden
           ? const SizedBox(width: double.infinity)
           : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 if (showsDemoBanner) DemoModeBanner(country: country),
                 // #3361 — honest "no coverage for your country" notice
