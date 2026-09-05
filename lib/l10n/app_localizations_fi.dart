@@ -8131,9 +8131,6 @@ class AppLocalizationsFi extends AppLocalizations {
   String get criteriaModeRoute => 'Route';
 
   @override
-  String get criteriaSubmit => 'Search';
-
-  @override
   String get criteriaReset => 'Reset';
 
   @override

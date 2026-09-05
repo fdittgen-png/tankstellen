@@ -8171,9 +8171,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get criteriaModeRoute => 'Route';
 
   @override
-  String get criteriaSubmit => 'Suchen';
-
-  @override
   String get criteriaReset => 'Zurücksetzen';
 
   @override

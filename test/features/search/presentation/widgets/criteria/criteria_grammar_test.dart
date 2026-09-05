@@ -16,7 +16,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/theme/app_text.dart';
-import 'package:tankstellen/features/search/presentation/widgets/criteria/criteria_action_bar.dart';
 import 'package:tankstellen/features/search/presentation/widgets/criteria/criteria_chip_group.dart';
 import 'package:tankstellen/features/search/presentation/widgets/criteria/criteria_section_header.dart';
 import 'package:tankstellen/features/search/presentation/widgets/fuel_type_selector.dart';
@@ -108,73 +107,6 @@ void main() {
       final text = tester.widget<Text>(find.text('Fuel type'));
       expect(text.style?.fontSize, AppText.title(ctx).fontSize);
       expect(text.style?.fontWeight, FontWeight.w600);
-    });
-  });
-
-  group('CriteriaActionBar (#3949)', () {
-    testWidgets('Reset is a text action BESIDE the full-width Search, on one '
-        'row', (tester) async {
-      await pumpAt320(
-        tester,
-        CriteriaActionBar(onSubmit: () {}, onReset: () {}),
-      );
-
-      final reset = find.byKey(const ValueKey('criteria-reset-button'));
-      final submit = find.byKey(const ValueKey('criteria-submit-button'));
-      expect(reset, findsOneWidget);
-      expect(submit, findsOneWidget);
-      expect(tester.widget(reset), isA<TextButton>());
-      expect(tester.widget(submit), isA<FilledButton>());
-
-      // Same row …
-      expect(
-        tester.getCenter(reset).dy,
-        closeTo(tester.getCenter(submit).dy, 1),
-      );
-      // … Reset leading, Search trailing and the wider of the two.
-      expect(tester.getTopLeft(reset).dx, lessThan(tester.getTopLeft(submit).dx));
-      expect(
-        tester.getSize(submit).width,
-        greaterThan(tester.getSize(reset).width),
-      );
-    });
-
-    testWidgets('the disabled reason stays above the row', (tester) async {
-      await pumpAt320(
-        tester,
-        CriteriaActionBar(
-          onSubmit: () {},
-          onReset: () {},
-          disabledReason: 'Enter a start and a destination',
-        ),
-      );
-      final reason = find.byKey(const ValueKey('criteria-disabled-reason'));
-      final submit = find.byKey(const ValueKey('criteria-submit-button'));
-      expect(
-        tester.getBottomLeft(reason).dy,
-        lessThanOrEqualTo(tester.getTopLeft(submit).dy),
-      );
-      expect(
-        tester.widget<FilledButton>(submit).onPressed,
-        isNull,
-      );
-    });
-
-    testWidgets('both actions still fire', (tester) async {
-      var submitted = false;
-      var reset = false;
-      await pumpAt320(
-        tester,
-        CriteriaActionBar(
-          onSubmit: () => submitted = true,
-          onReset: () => reset = true,
-        ),
-      );
-      await tester.tap(find.byKey(const ValueKey('criteria-submit-button')));
-      await tester.tap(find.byKey(const ValueKey('criteria-reset-button')));
-      await tester.pump();
-      expect(submitted, isTrue);
-      expect(reset, isTrue);
     });
   });
 

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/services/location_search_service.dart';
+import '../../../../core/theme/app_text.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/widgets/help_banner.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -29,10 +30,14 @@ import 'search_radius_slider.dart';
 /// passed in as callbacks; the form watches its own filter providers and
 /// surfaces the radius (nearby) vs the route-planning controls (route).
 ///
-/// #3927 — the form no longer carries any button of its own: "Search" and
-/// "Reset" live in the screen's sticky bottom [CriteriaActionBar], and
-/// "Save as my defaults" moved to the app-bar overflow. What is left here
-/// is exactly the criteria.
+/// #3927 — "Save as my defaults" lives in the app-bar overflow, and the
+/// form carries no primary action: the shell's green Search button IS the
+/// sheet's submit (the screen registers a `SearchFabAction` that fires the
+/// same dispatch).
+///
+/// #3961 — the sticky bar that briefly held a second Search button is
+/// gone; its two survivors end the form instead: the reason the search is
+/// unavailable, when it is, and Reset.
 class SearchCriteriaForm extends ConsumerWidget {
   const SearchCriteriaForm({
     super.key,
@@ -44,6 +49,8 @@ class SearchCriteriaForm extends ConsumerWidget {
     required this.onZipSearch,
     required this.onCitySearch,
     required this.onRouteSearch,
+    required this.onReset,
+    this.disabledReason,
   });
 
   final GlobalKey<RouteInputWidgetState> routeInputKey;
@@ -54,6 +61,19 @@ class SearchCriteriaForm extends ConsumerWidget {
   final void Function(String zip) onZipSearch;
   final void Function(ResolvedLocation city) onCitySearch;
   final void Function(List<RouteWaypoint> waypoints) onRouteSearch;
+
+  /// #3961 — restores the saved defaults. The Reset that used to sit in
+  /// the sticky bar is the LAST thing in the criteria now: "start over"
+  /// belongs at the end of the form, not beside the primary action.
+  final VoidCallback onReset;
+
+  /// Why the search cannot run right now (route mode without both
+  /// endpoints, or a search already in flight), or null when it can.
+  /// The shell's green Search button greys out in that state, and a
+  /// greyed button that does not say why is exactly what #3927 fixed —
+  /// so the reason survives the bar's removal, here at the end of the
+  /// form beside [onReset].
+  final String? disabledReason;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -143,6 +163,40 @@ class SearchCriteriaForm extends ConsumerWidget {
                 ],
               );
             },
+          ),
+          const SizedBox(height: 16),
+          if (disabledReason case final reason?) ...[
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.info_outline,
+                  size: 16,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    reason,
+                    key: const ValueKey('criteria-disabled-reason'),
+                    style: AppText.label(context),
+                    // One line for every shipped translation at 360 dp;
+                    // the second is the escape valve for en_XA at 320 dp,
+                    // so the reason degrades to wrapping rather than to a
+                    // truncated half-sentence.
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+          ],
+          OutlinedButton.icon(
+            key: const ValueKey('criteria-reset-button'),
+            onPressed: onReset,
+            icon: const Icon(Icons.restart_alt, size: 18),
+            label: Text(l10n.criteriaReset),
           ),
         ],
       ),

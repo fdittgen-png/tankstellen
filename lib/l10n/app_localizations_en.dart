@@ -8091,9 +8091,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get criteriaModeRoute => 'Route';
 
   @override
-  String get criteriaSubmit => 'Search';
-
-  @override
   String get criteriaReset => 'Reset';
 
   @override
@@ -17244,9 +17241,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get criteriaModeRoute => '⟦Řóúŧé ··⟧';
-
-  @override
-  String get criteriaSubmit => '⟦Šéářçĥ ···⟧';
 
   @override
   String get criteriaReset => '⟦Řéšéŧ ··⟧';
