@@ -465,12 +465,10 @@
   "obdPickerTitle": "OBD2-adapter kiválasztása",
   "obdPickerScanning": "Adapterek keresése…",
   "obdPickerConnecting": "Csatlakozás…",
-  "tripSummaryTitle": "Út összefoglalója",
   "tripMetricDistance": "Távolság",
   "tripMetricFuelUsed": "Felhasznált üzemanyag",
   "tripMetricAvgConsumption": "Átl.",
   "tripMetricElapsed": "Eltelt idő",
-  "tripMetricOdometer": "Kilométer-számláló",
   "tripStop": "Rögzítés leállítása",
   "tripPause": "Szünet",
   "tripResume": "Folytatás",
@@ -519,7 +517,6 @@
   "situationClimbing": "Emelkedő / terhelt",
   "situationHardAccel": "Erős gyorsítás",
   "situationFuelCut": "Üzemanyag-elvágás — gurulás",
-  "tripSaveRecording": "Út mentése",
   "vehicleFuelNotSet": "Nincs beállítva",
   "wizardVehicleDefaultBadge": "Alapértelmezett",
   "wizardProfileChoiceHint": "Válassza ki, hogyan kívánja használni az alkalmazást. Ezt később megváltoztathatja a Beállításokban.",
@@ -4023,7 +4020,6 @@
   "obd2StatusEngineOffBody": "Az adapter elérhető volt, de a járműbusz néma maradt, ezért az automatikus újracsatlakozás szünetel. Folytatódik, ha vezetsz vagy újra megnyitod az appot — vagy csatlakozz újra most.",
   "obd2StatusReconnectNow": "Újracsatlakozás most",
   "tripSummaryAutoSaved": "Út automatikusan mentve",
-  "tripSummaryDone": "Kész",
   "tripSummaryDelete": "Ennek az útnak a törlése",
   "lessonTransportTitle": "Az út nagy részén hiányoznak a motoradatok",
   "lessonTransportAdvice": "A motor szinte a teljes távon nem jelzett aktivitást. Vagy az OBD2-adatfolyam szakadt meg út közben, vagy az autót vezetés nélkül mozgatták — a fogyasztási érték megbízhatatlan, és kimarad a statisztikáidból.",
@@ -6432,5 +6428,10 @@
         "type": "int"
       }
     }
+  },
+  "obd2ResetConnectionAuto": "Reconnecting the adapter automatically…",
+  "@obd2ResetConnectionAuto": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

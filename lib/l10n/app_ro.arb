@@ -465,12 +465,10 @@
   "obdPickerTitle": "Alegeți un adaptor OBD2",
   "obdPickerScanning": "Se caută adaptoare…",
   "obdPickerConnecting": "Se conectează…",
-  "tripSummaryTitle": "Rezumat călătorie",
   "tripMetricDistance": "Distanță",
   "tripMetricFuelUsed": "Combustibil utilizat",
   "tripMetricAvgConsumption": "Medie",
   "tripMetricElapsed": "Timp scurs",
-  "tripMetricOdometer": "Odometru",
   "tripStop": "Opriți înregistrarea",
   "tripPause": "Pauză",
   "tripResume": "Reluați",
@@ -519,7 +517,6 @@
   "situationClimbing": "Urcare / încărcat",
   "situationHardAccel": "Accelerare bruscă",
   "situationFuelCut": "Tăiere combustibil — inerție",
-  "tripSaveRecording": "Salvați călătoria",
   "vehicleFuelNotSet": "Nesetat",
   "wizardVehicleDefaultBadge": "Implicit",
   "wizardProfileChoiceHint": "Alegeți cum doriți să utilizați aplicația. Puteți modifica aceasta mai târziu din Setări.",
@@ -4023,7 +4020,6 @@
   "obd2StatusEngineOffBody": "Adaptorul era accesibil, dar magistrala vehiculului a rămas mută, așa că reconectarea automată este în pauză. Se reia când conduci sau redeschizi aplicația — sau reconectează-te acum.",
   "obd2StatusReconnectNow": "Reconectează acum",
   "tripSummaryAutoSaved": "Călătorie salvată automat",
-  "tripSummaryDone": "Gata",
   "tripSummaryDelete": "Șterge această călătorie",
   "lessonTransportTitle": "Datele motorului lipsesc pentru cea mai mare parte a acestei călătorii",
   "lessonTransportAdvice": "Motorul nu a raportat activitate pe aproape toată distanța. Fie fluxul OBD2 a cedat în timpul călătoriei, fie mașina a fost mutată fără a fi condusă — valoarea consumului este nesigură și exclusă din statisticile tale.",
@@ -6432,5 +6428,10 @@
         "type": "int"
       }
     }
+  },
+  "obd2ResetConnectionAuto": "Reconnecting the adapter automatically…",
+  "@obd2ResetConnectionAuto": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

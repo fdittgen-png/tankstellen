@@ -11,7 +11,6 @@ part of 'trip_recording_screen.dart';
 /// _TripRecordingPinControls` so `_onStop` can release the pin state it
 /// shares with the manual push-pin actions.
 mixin _TripRecordingEventHandlers on _TripRecordingPinControls {
-  StoppedTripResult? _stopped;
   bool _stopping = false;
 
   /// Show the visual eco-coach SnackBar. Lifecycle-gated: this is
@@ -38,44 +37,71 @@ mixin _TripRecordingEventHandlers on _TripRecordingPinControls {
     );
   }
 
+  /// #3963 — Stop SAVES and LEAVES. `stop()` already persisted the trip
+  /// (#1185/#3582), so the summary screen that followed had one job: to be
+  /// dismissed, by a driver. The screen pops instead and the trip is in the
+  /// Trajets list; the delete that summary offered rides the confirmation
+  /// snackbar, so a mis-stop is still one tap from gone.
   Future<void> _onStop() async {
     if (_stopping) return;
     setState(() => _stopping = true);
-    // #1458 phase 2 — hide the unpinned-recording warning if it's still
-    // visible. The warning is about an in-progress recording; once the
-    // user has tapped Stop, the recording is over and the SnackBar
-    // would just be sitting on top of the summary view's discard /
-    // save buttons until its auto-dismiss timer elapsed.
+    // #1458 phase 2 — hide the unpinned-recording warning if it is still
+    // up: it is about an in-progress recording, and this one is over.
     ScaffoldMessenger.maybeOf(context)?.hideCurrentSnackBar();
     final result = await ref.read(tripRecordingProvider.notifier).stop();
     if (!mounted) return;
-    // #891 — when the recording ends, auto-release the wake lock
-    // even if the user forgot to unpin. The form will still be
-    // visible (summary screen) but there's no longer any reason
-    // to keep the device awake at the user's expense.
+    // #891 — auto-release the wake lock even if the user forgot to unpin.
     if (_pinned) {
       await ref.read(wakelockFacadeProvider).disable();
       await EdgeToEdge.restore();
       if (!mounted) return;
     }
-    // #2509 — surface a "no movement detected" notice when the trip was
-    // discarded as genuinely stationary (no distance, no usable signal),
-    // so a Stop tap that saves nothing is never silent data loss. NEVER
-    // shown when the trip was actually saved (`discardedNoMovement` is
-    // false then) — the user lands on the normal summary view instead.
-    if (result.discardedNoMovement) {
-      final l = AppLocalizations.of(context);
-      ScaffoldMessenger.maybeOf(context)
-        ?..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBarHelper.infoSnackBar(l.tripRecordingDiscardedNoMovement),
-        );
-    }
+
+    // Captured BEFORE the pop: the messenger and every string/handle the
+    // snackbar needs must outlive this screen's context (SnackBarHelper
+    // contract — the screen is about to be gone).
+    final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    final notifier = ref.read(tripRecordingProvider.notifier);
+    final repo = ref.read(tripHistoryRepositoryProvider);
+    final entryId = result.summary.startedAt?.toIso8601String();
+
     setState(() {
-      _stopped = result;
       _stopping = false;
       _pinned = false;
     });
+    notifier.reset();
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop(
+        entryId == null
+            ? null
+            : TripSaveResult(entryId: entryId, summary: result.summary),
+      );
+    }
+
+    messenger?.hideCurrentSnackBar();
+    if (result.discardedNoMovement) {
+      // #2509 — a Stop that saves nothing is never silent data loss.
+      messenger?.showSnackBar(
+        SnackBarHelper.infoSnackBar(l.tripRecordingDiscardedNoMovement),
+      );
+      return;
+    }
+    // #3582 — the delete must remove the PERSISTED entry, not just reset
+    // the UI (the old "Discard" silently kept the trip in history).
+    messenger?.showSnackBar(
+      SnackBarHelper.infoSnackBar(
+        l.tripSummaryAutoSaved,
+        key: const Key('tripSavedSnackBar'),
+        duration: SnackBarHelper.undoDuration,
+        action: (entryId == null || repo == null)
+            ? null
+            : SnackBarAction(
+                label: l.tripSummaryDelete,
+                onPressed: () => unawaited(repo.delete(entryId)),
+              ),
+      ),
+    );
   }
 
   void _togglePause() {
@@ -86,22 +112,6 @@ mixin _TripRecordingEventHandlers on _TripRecordingPinControls {
     } else {
       notifier.pause();
     }
-  }
-
-  /// #3582 — the trip was auto-saved at stop, so "delete" must actually
-  /// remove the persisted entry, not just reset the UI (the old
-  /// "Discard" silently kept the trip in history).
-  void _onDeleteSavedTrip() {
-    final r = _stopped;
-    if (r != null) {
-      final entryId = r.summary.startedAt?.toIso8601String();
-      final repo = ref.read(tripHistoryRepositoryProvider);
-      if (entryId != null && repo != null) {
-        unawaited(repo.delete(entryId));
-      }
-    }
-    ref.read(tripRecordingProvider.notifier).reset();
-    Navigator.of(context).pop(null);
   }
 
   /// #1273 — handle the back-press. If the trip is still recording

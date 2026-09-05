@@ -465,12 +465,10 @@
   "obdPickerTitle": "Pasirinkite OBD2 adapterį",
   "obdPickerScanning": "Ieškoma adapterių…",
   "obdPickerConnecting": "Jungiamasi…",
-  "tripSummaryTitle": "Kelionės santrauka",
   "tripMetricDistance": "Atstumas",
   "tripMetricFuelUsed": "Sunaudotas kuras",
   "tripMetricAvgConsumption": "Vid.",
   "tripMetricElapsed": "Praėjo",
-  "tripMetricOdometer": "Odometras",
   "tripStop": "Sustabdyti įrašymą",
   "tripPause": "Pristabdyti",
   "tripResume": "Tęsti",
@@ -519,7 +517,6 @@
   "situationClimbing": "Kalimas / pakrovimas",
   "situationHardAccel": "Staigus greitinimas",
   "situationFuelCut": "Kuro atjungimas — inercinė eiga",
-  "tripSaveRecording": "Išsaugoti kelionę",
   "vehicleFuelNotSet": "Nenustatyta",
   "wizardVehicleDefaultBadge": "Numatytasis",
   "wizardProfileChoiceHint": "Pasirinkite, kaip norite naudoti programą. Tai galite keisti vėliau Nustatymuose.",
@@ -4023,7 +4020,6 @@
   "obd2StatusEngineOffBody": "Adapteris buvo pasiekiamas, bet automobilio magistralė tylėjo, todėl automatinis pakartotinis prisijungimas pristabdytas. Jis atsinaujina, kai važiuojate arba vėl atidarote programą — arba prisijunkite iš naujo dabar.",
   "obd2StatusReconnectNow": "Prisijungti iš naujo dabar",
   "tripSummaryAutoSaved": "Kelionė išsaugota automatiškai",
-  "tripSummaryDone": "Atlikta",
   "tripSummaryDelete": "Ištrinti šią kelionę",
   "lessonTransportTitle": "Didžiąją šios kelionės dalį trūksta variklio duomenų",
   "lessonTransportAdvice": "Variklis beveik visą atstumą nepranešė jokios veiklos. Arba OBD2 duomenų srautas nutrūko kelionės viduryje, arba automobilis buvo perkeltas nevažiuojant — sąnaudų rodmuo nepatikimas ir neįtraukiamas į jūsų statistiką.",
@@ -6432,5 +6428,10 @@
         "type": "int"
       }
     }
+  },
+  "obd2ResetConnectionAuto": "Reconnecting the adapter automatically…",
+  "@obd2ResetConnectionAuto": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

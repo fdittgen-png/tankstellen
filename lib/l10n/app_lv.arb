@@ -465,12 +465,10 @@
   "obdPickerTitle": "Izvēlieties OBD2 adapteru",
   "obdPickerScanning": "Meklē adapterus…",
   "obdPickerConnecting": "Savienojas…",
-  "tripSummaryTitle": "Brauciena kopsavilkums",
   "tripMetricDistance": "Attālums",
   "tripMetricFuelUsed": "Patērētā degviela",
   "tripMetricAvgConsumption": "Vid.",
   "tripMetricElapsed": "Pagājušais laiks",
-  "tripMetricOdometer": "Odometrs",
   "tripStop": "Apturēt ierakstīšanu",
   "tripPause": "Pauze",
   "tripResume": "Turpināt",
@@ -519,7 +517,6 @@
   "situationClimbing": "Kāpšana / noslogots",
   "situationHardAccel": "Straujš paātrinājums",
   "situationFuelCut": "Degvielas pārtraukšana — skriešana",
-  "tripSaveRecording": "Saglabāt braucienu",
   "vehicleFuelNotSet": "Nav iestatīts",
   "wizardVehicleDefaultBadge": "Noklusējums",
   "wizardProfileChoiceHint": "Izvēlieties, kā vēlaties izmantot lietotni. To varat mainīt vēlāk Iestatījumos.",
@@ -4023,7 +4020,6 @@
   "obd2StatusEngineOffBody": "Adapteris bija sasniedzams, bet transportlīdzekļa kopne klusēja, tāpēc automātiskā atkārtotā savienošana ir apturēta. Tā atsākas, kad braucat vai atkal atverat lietotni — vai savienojieties tūlīt.",
   "obd2StatusReconnectNow": "Savienoties tūlīt",
   "tripSummaryAutoSaved": "Brauciens saglabāts automātiski",
-  "tripSummaryDone": "Gatavs",
   "tripSummaryDelete": "Dzēst šo braucienu",
   "lessonTransportTitle": "Lielākajā šī brauciena daļā trūkst dzinēja datu",
   "lessonTransportAdvice": "Dzinējs gandrīz visā attālumā neziņoja par aktivitāti. Vai nu OBD2 datu plūsma pārtrūka brauciena vidū, vai auto tika pārvietots, nebraucot — patēriņa rādījums ir neuzticams un izslēgts no jūsu statistikas.",
@@ -6432,5 +6428,10 @@
         "type": "int"
       }
     }
+  },
+  "obd2ResetConnectionAuto": "Reconnecting the adapter automatically…",
+  "@obd2ResetConnectionAuto": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

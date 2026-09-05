@@ -465,12 +465,10 @@
   "obdPickerTitle": "Kies een OBD2-adapter",
   "obdPickerScanning": "Zoeken naar adapters…",
   "obdPickerConnecting": "Verbinden…",
-  "tripSummaryTitle": "Ritoverzicht",
   "tripMetricDistance": "Afstand",
   "tripMetricFuelUsed": "Gebruikt brandstof",
   "tripMetricAvgConsumption": "Gem.",
   "tripMetricElapsed": "Verstreken",
-  "tripMetricOdometer": "Kilometerstand",
   "tripStop": "Opname stoppen",
   "tripPause": "Pauzeren",
   "tripResume": "Hervatten",
@@ -519,7 +517,6 @@
   "situationClimbing": "Klimmen / zwaar beladen",
   "situationHardAccel": "Hard optrekken",
   "situationFuelCut": "Brandstofonderbreking — uitrollen",
-  "tripSaveRecording": "Rit opslaan",
   "vehicleFuelNotSet": "Niet ingesteld",
   "wizardVehicleDefaultBadge": "Standaard",
   "wizardProfileChoiceHint": "Kies hoe je de app wilt gebruiken. Je kunt dit later aanpassen in Instellingen.",
@@ -4023,7 +4020,6 @@
   "obd2StatusEngineOffBody": "De adapter was bereikbaar maar de voertuigbus bleef stil, dus automatisch herverbinden is gepauzeerd. Het hervat als je gaat rijden of de app opnieuw opent — of verbind nu opnieuw.",
   "obd2StatusReconnectNow": "Nu opnieuw verbinden",
   "tripSummaryAutoSaved": "Rit automatisch opgeslagen",
-  "tripSummaryDone": "Klaar",
   "tripSummaryDelete": "Deze rit verwijderen",
   "lessonTransportTitle": "Motorgegevens ontbreken voor het grootste deel van deze rit",
   "lessonTransportAdvice": "De motor meldde vrijwel de hele afstand geen activiteit. Of de OBD2-stroom viel halverwege de rit uit, of de auto is verplaatst zonder te rijden — het verbruikscijfer is onbetrouwbaar en uitgesloten van je statistieken.",
@@ -6432,5 +6428,10 @@
         "type": "int"
       }
     }
+  },
+  "obd2ResetConnectionAuto": "Reconnecting the adapter automatically…",
+  "@obd2ResetConnectionAuto": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

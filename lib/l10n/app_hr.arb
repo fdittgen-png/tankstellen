@@ -465,12 +465,10 @@
   "obdPickerTitle": "Odaberite OBD2 adapter",
   "obdPickerScanning": "Traženje adaptera…",
   "obdPickerConnecting": "Spajanje…",
-  "tripSummaryTitle": "Sažetak vožnje",
   "tripMetricDistance": "Udaljenost",
   "tripMetricFuelUsed": "Potrošeno gorivo",
   "tripMetricAvgConsumption": "Prosj.",
   "tripMetricElapsed": "Proteklo",
-  "tripMetricOdometer": "Kilometar-sat",
   "tripStop": "Zaustavi snimanje",
   "tripPause": "Pauziraj",
   "tripResume": "Nastavi",
@@ -519,7 +517,6 @@
   "situationClimbing": "Uspinjanje / opterećenje",
   "situationHardAccel": "Naglo ubrzanje",
   "situationFuelCut": "Isključenje goriva — klizanje",
-  "tripSaveRecording": "Spremi vožnju",
   "vehicleFuelNotSet": "Nije postavljeno",
   "wizardVehicleDefaultBadge": "Zadano",
   "wizardProfileChoiceHint": "Odaberite kako želite koristiti aplikaciju. To možete promijeniti kasnije u Postavkama.",
@@ -4023,7 +4020,6 @@
   "obd2StatusEngineOffBody": "Adapter je bio dostupan, ali sabirnica vozila ostala je tiha, pa je automatsko ponovno povezivanje pauzirano. Nastavlja se kad krenete voziti ili ponovno otvorite aplikaciju — ili se povežite odmah.",
   "obd2StatusReconnectNow": "Poveži se odmah",
   "tripSummaryAutoSaved": "Vožnja automatski spremljena",
-  "tripSummaryDone": "Gotovo",
   "tripSummaryDelete": "Izbriši ovu vožnju",
   "lessonTransportTitle": "Podaci motora nedostaju za veći dio ove vožnje",
   "lessonTransportAdvice": "Motor nije javio aktivnost gotovo cijelom udaljenošću. Ili je OBD2 tok otkazao usred vožnje ili je automobil premješten bez vožnje — vrijednost potrošnje je nepouzdana i isključena iz vaše statistike.",
@@ -6432,5 +6428,10 @@
         "type": "int"
       }
     }
+  },
+  "obd2ResetConnectionAuto": "Reconnecting the adapter automatically…",
+  "@obd2ResetConnectionAuto": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

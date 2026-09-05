@@ -1605,9 +1605,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get obdPickerConnecting => 'A ligar…';
 
   @override
-  String get tripSummaryTitle => 'Resumo da viagem';
-
-  @override
   String get tripMetricDistance => 'Distância';
 
   @override
@@ -1618,9 +1615,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get tripMetricElapsed => 'Tempo decorrido';
-
-  @override
-  String get tripMetricOdometer => 'Odómetro';
 
   @override
   String get tripStop => 'Parar gravação';
@@ -1801,13 +1795,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get situationFuelCut => 'Corte de combustível — deslizar';
 
   @override
-  String get tripSaveRecording => 'Guardar viagem';
-
-  @override
   String get tripSummaryAutoSaved => 'Viagem guardada automaticamente';
-
-  @override
-  String get tripSummaryDone => 'Concluído';
 
   @override
   String get tripSummaryDelete => 'Eliminar esta viagem';
@@ -6381,6 +6369,10 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get obd2ResetConnectionNoLink =>
       'Adaptador reposto — a reconectar em segundo plano';
+
+  @override
+  String get obd2ResetConnectionAuto =>
+      'Reconnecting the adapter automatically…';
 
   @override
   String get ocrTesterTitle => 'Testador OCR';

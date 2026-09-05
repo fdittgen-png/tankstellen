@@ -1592,9 +1592,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get obdPickerConnecting => 'Connecting…';
 
   @override
-  String get tripSummaryTitle => 'Trip summary';
-
-  @override
   String get tripMetricDistance => 'Distance';
 
   @override
@@ -1605,9 +1602,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tripMetricElapsed => 'Elapsed';
-
-  @override
-  String get tripMetricOdometer => 'Odometer';
 
   @override
   String get tripStop => 'Stop recording';
@@ -1785,13 +1779,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get situationFuelCut => 'Fuel cut — coast';
 
   @override
-  String get tripSaveRecording => 'Save trip';
-
-  @override
   String get tripSummaryAutoSaved => 'Trip saved automatically';
-
-  @override
-  String get tripSummaryDone => 'Done';
 
   @override
   String get tripSummaryDelete => 'Delete this trip';
@@ -6303,6 +6291,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Adapter reset — reconnecting in the background';
 
   @override
+  String get obd2ResetConnectionAuto =>
+      'Reconnecting the adapter automatically…';
+
+  @override
   String get ocrTesterTitle => 'OCR tester';
 
   @override
@@ -10564,9 +10556,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get obdPickerConnecting => '⟦Çóññéçŧîñǧ… ·····⟧';
 
   @override
-  String get tripSummaryTitle => '⟦Ŧřîƥ šúɱɱářý ·····⟧';
-
-  @override
   String get tripMetricDistance => '⟦Đîšŧáñçé ····⟧';
 
   @override
@@ -10577,9 +10566,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get tripMetricElapsed => '⟦Éłáƥšéđ ···⟧';
-
-  @override
-  String get tripMetricOdometer => '⟦Óđóɱéŧéř ····⟧';
 
   @override
   String get tripStop => '⟦Šŧóƥ řéçóřđîñǧ ······⟧';
@@ -10762,13 +10748,7 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get situationFuelCut => '⟦Ƒúéł çúŧ — çóášŧ ·····⟧';
 
   @override
-  String get tripSaveRecording => '⟦Šáṽé ŧřîƥ ····⟧';
-
-  @override
   String get tripSummaryAutoSaved => '⟦Ŧřîƥ šáṽéđ áúŧóɱáŧîçáłłý ··········⟧';
-
-  @override
-  String get tripSummaryDone => '⟦Đóñé ··⟧';
 
   @override
   String get tripSummaryDelete => '⟦Đéłéŧé ŧĥîš ŧřîƥ ······⟧';
@@ -15407,6 +15387,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get obd2ResetConnectionNoLink =>
       '⟦Áđáƥŧéř řéšéŧ — řéçóññéçŧîñǧ îñ ŧĥé ƀáçķǧřóúñđ ··················⟧';
+
+  @override
+  String get obd2ResetConnectionAuto =>
+      '⟦Řéçóññéçŧîñǧ ŧĥé áđáƥŧéř áúŧóɱáŧîçáłłý… ················⟧';
 
   @override
   String get ocrTesterTitle => '⟦ÓÇŘ ŧéšŧéř ····⟧';

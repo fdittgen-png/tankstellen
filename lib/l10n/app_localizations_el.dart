@@ -1607,9 +1607,6 @@ class AppLocalizationsEl extends AppLocalizations {
   String get obdPickerConnecting => 'Σύνδεση…';
 
   @override
-  String get tripSummaryTitle => 'Σύνοψη διαδρομής';
-
-  @override
   String get tripMetricDistance => 'Απόσταση';
 
   @override
@@ -1620,9 +1617,6 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get tripMetricElapsed => 'Χρόνος';
-
-  @override
-  String get tripMetricOdometer => 'Χιλιόμετρα';
 
   @override
   String get tripStop => 'Διακοπή καταγραφής';
@@ -1802,13 +1796,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get situationFuelCut => 'Διακοπή καυσίμου — αδράνεια';
 
   @override
-  String get tripSaveRecording => 'Αποθήκευση ταξιδιού';
-
-  @override
   String get tripSummaryAutoSaved => 'Η διαδρομή αποθηκεύτηκε αυτόματα';
-
-  @override
-  String get tripSummaryDone => 'Τέλος';
 
   @override
   String get tripSummaryDelete => 'Διαγραφή αυτής της διαδρομής';
@@ -6387,6 +6375,10 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get obd2ResetConnectionNoLink =>
       'Ο προσαρμογέας επαναφέρθηκε — επανασύνδεση στο παρασκήνιο';
+
+  @override
+  String get obd2ResetConnectionAuto =>
+      'Reconnecting the adapter automatically…';
 
   @override
   String get ocrTesterTitle => 'Δοκιμαστής OCR';

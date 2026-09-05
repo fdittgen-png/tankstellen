@@ -1605,9 +1605,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get obdPickerConnecting => 'Csatlakozás…';
 
   @override
-  String get tripSummaryTitle => 'Út összefoglalója';
-
-  @override
   String get tripMetricDistance => 'Távolság';
 
   @override
@@ -1618,9 +1615,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get tripMetricElapsed => 'Eltelt idő';
-
-  @override
-  String get tripMetricOdometer => 'Kilométer-számláló';
 
   @override
   String get tripStop => 'Rögzítés leállítása';
@@ -1799,13 +1793,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get situationFuelCut => 'Üzemanyag-elvágás — gurulás';
 
   @override
-  String get tripSaveRecording => 'Út mentése';
-
-  @override
   String get tripSummaryAutoSaved => 'Út automatikusan mentve';
-
-  @override
-  String get tripSummaryDone => 'Kész';
 
   @override
   String get tripSummaryDelete => 'Ennek az útnak a törlése';
@@ -6370,6 +6358,10 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get obd2ResetConnectionNoLink =>
       'Adapter visszaállítva — újracsatlakozás a háttérben';
+
+  @override
+  String get obd2ResetConnectionAuto =>
+      'Reconnecting the adapter automatically…';
 
   @override
   String get ocrTesterTitle => 'OCR tesztelő';

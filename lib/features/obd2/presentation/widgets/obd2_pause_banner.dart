@@ -10,6 +10,7 @@ import '../../../trips/api.dart';
 import '../../domain/vehicle_power_state.dart';
 import '../../providers/vehicle_power_provider.dart';
 import '../obd2_connection_reset_action.dart';
+import 'obd2_auto_reset.dart';
 
 /// Banner shown when the OBD2 Bluetooth link drops mid-recording
 /// (#797 phase 2).
@@ -151,6 +152,16 @@ class Obd2PauseBanner extends ConsumerWidget {
                     child: Text(l.obd2PauseBannerEnd),
                   ),
                 ],
+              ),
+              // #3963 — the reset runs itself 5 s after the drop surfaces;
+              // Resume and End above stay exactly where they are, so the
+              // driver can always end the trip into the list.
+              Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: Obd2AutoReset(
+                  armed: !carAsleep,
+                  foreground: theme.colorScheme.onErrorContainer,
+                ),
               ),
             ],
           ),

@@ -1603,9 +1603,6 @@ class AppLocalizationsRo extends AppLocalizations {
   String get obdPickerConnecting => 'Se conectează…';
 
   @override
-  String get tripSummaryTitle => 'Rezumat călătorie';
-
-  @override
   String get tripMetricDistance => 'Distanță';
 
   @override
@@ -1616,9 +1613,6 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get tripMetricElapsed => 'Timp scurs';
-
-  @override
-  String get tripMetricOdometer => 'Odometru';
 
   @override
   String get tripStop => 'Opriți înregistrarea';
@@ -1798,13 +1792,7 @@ class AppLocalizationsRo extends AppLocalizations {
   String get situationFuelCut => 'Tăiere combustibil — inerție';
 
   @override
-  String get tripSaveRecording => 'Salvați călătoria';
-
-  @override
   String get tripSummaryAutoSaved => 'Călătorie salvată automat';
-
-  @override
-  String get tripSummaryDone => 'Gata';
 
   @override
   String get tripSummaryDelete => 'Șterge această călătorie';
@@ -6383,6 +6371,10 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get obd2ResetConnectionNoLink =>
       'Adaptor resetat — reconectare în fundal';
+
+  @override
+  String get obd2ResetConnectionAuto =>
+      'Reconnecting the adapter automatically…';
 
   @override
   String get ocrTesterTitle => 'Tester OCR';

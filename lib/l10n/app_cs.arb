@@ -465,12 +465,10 @@
   "obdPickerTitle": "Vybrat adaptér OBD2",
   "obdPickerScanning": "Hledání adaptérů…",
   "obdPickerConnecting": "Připojování…",
-  "tripSummaryTitle": "Přehled cesty",
   "tripMetricDistance": "Vzdálenost",
   "tripMetricFuelUsed": "Spotřebované palivo",
   "tripMetricAvgConsumption": "Průměr",
   "tripMetricElapsed": "Uplynulý čas",
-  "tripMetricOdometer": "Tachometr",
   "tripStop": "Zastavit nahrávání",
   "tripPause": "Pozastavit",
   "tripResume": "Pokračovat",
@@ -519,7 +517,6 @@
   "situationClimbing": "Stoupání / zatížení",
   "situationHardAccel": "Prudké zrychlení",
   "situationFuelCut": "Odříznutí paliva — výběh",
-  "tripSaveRecording": "Uložit cestu",
   "vehicleFuelNotSet": "Nenastaveno",
   "wizardVehicleDefaultBadge": "Výchozí",
   "wizardProfileChoiceHint": "Zvolte, jak chcete aplikaci používat. Toto lze změnit v Nastavení.",
@@ -4023,7 +4020,6 @@
   "obd2StatusEngineOffBody": "Adaptér byl dostupný, ale sběrnice vozidla mlčela, takže automatické opětovné připojování je pozastaveno. Obnoví se, až pojedete nebo znovu otevřete aplikaci — nebo se připojte znovu hned.",
   "obd2StatusReconnectNow": "Připojit znovu hned",
   "tripSummaryAutoSaved": "Jízda uložena automaticky",
-  "tripSummaryDone": "Hotovo",
   "tripSummaryDelete": "Smazat tuto jízdu",
   "lessonTransportTitle": "Po většinu této jízdy chybí data z motoru",
   "lessonTransportAdvice": "Motor nehlásil téměř po celou vzdálenost žádnou aktivitu. Buď datový tok OBD2 v půli jízdy selhal, nebo bylo auto přemístěno bez jízdy — údaj o spotřebě je nespolehlivý a ze statistik je vyloučen.",
@@ -6432,5 +6428,10 @@
         "type": "int"
       }
     }
+  },
+  "obd2ResetConnectionAuto": "Reconnecting the adapter automatically…",
+  "@obd2ResetConnectionAuto": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

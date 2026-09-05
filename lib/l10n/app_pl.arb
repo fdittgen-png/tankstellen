@@ -465,12 +465,10 @@
   "obdPickerTitle": "Wybierz adapter OBD2",
   "obdPickerScanning": "Skanowanie w poszukiwaniu adapterów…",
   "obdPickerConnecting": "Łączenie…",
-  "tripSummaryTitle": "Podsumowanie trasy",
   "tripMetricDistance": "Dystans",
   "tripMetricFuelUsed": "Zużyte paliwo",
   "tripMetricAvgConsumption": "Śr.",
   "tripMetricElapsed": "Czas",
-  "tripMetricOdometer": "Licznik",
   "tripStop": "Zatrzymaj nagrywanie",
   "tripPause": "Pauza",
   "tripResume": "Wznów",
@@ -519,7 +517,6 @@
   "situationClimbing": "Podjazd / obciążenie",
   "situationHardAccel": "Gwałtowne przyspieszenie",
   "situationFuelCut": "Odcięcie paliwa — wybieg",
-  "tripSaveRecording": "Zapisz trasę",
   "vehicleFuelNotSet": "Nie ustawiono",
   "wizardVehicleDefaultBadge": "Domyślny",
   "wizardProfileChoiceHint": "Wybierz, jak chcesz korzystać z aplikacji. Możesz to zmienić później w Ustawieniach.",
@@ -4023,7 +4020,6 @@
   "obd2StatusEngineOffBody": "Adapter był osiągalny, ale magistrala pojazdu milczała, więc automatyczne ponowne łączenie zostało wstrzymane. Wznowi się, gdy ruszysz lub ponownie otworzysz aplikację — albo połącz ponownie teraz.",
   "obd2StatusReconnectNow": "Połącz ponownie teraz",
   "tripSummaryAutoSaved": "Podróż zapisana automatycznie",
-  "tripSummaryDone": "Gotowe",
   "tripSummaryDelete": "Usuń tę podróż",
   "lessonTransportTitle": "Brak danych z silnika przez większość tej podróży",
   "lessonTransportAdvice": "Silnik nie zgłaszał aktywności przez niemal cały dystans. Albo strumień OBD2 urwał się w trakcie podróży, albo samochód przemieszczono bez jazdy — wartość spalania jest niewiarygodna i wykluczona ze statystyk.",
@@ -6432,5 +6428,10 @@
         "type": "int"
       }
     }
+  },
+  "obd2ResetConnectionAuto": "Reconnecting the adapter automatically…",
+  "@obd2ResetConnectionAuto": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

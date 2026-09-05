@@ -1597,9 +1597,6 @@ class AppLocalizationsDa extends AppLocalizations {
   String get obdPickerConnecting => 'Opretter forbindelse…';
 
   @override
-  String get tripSummaryTitle => 'Turresumé';
-
-  @override
   String get tripMetricDistance => 'Afstand';
 
   @override
@@ -1610,9 +1607,6 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get tripMetricElapsed => 'Forløbet';
-
-  @override
-  String get tripMetricOdometer => 'Kilometertæller';
 
   @override
   String get tripStop => 'Stop optagelse';
@@ -1790,13 +1784,7 @@ class AppLocalizationsDa extends AppLocalizations {
   String get situationFuelCut => 'Brændstofafskæring — kystning';
 
   @override
-  String get tripSaveRecording => 'Gem tur';
-
-  @override
   String get tripSummaryAutoSaved => 'Tur gemt automatisk';
-
-  @override
-  String get tripSummaryDone => 'Færdig';
 
   @override
   String get tripSummaryDelete => 'Slet denne tur';
@@ -6329,6 +6317,10 @@ class AppLocalizationsDa extends AppLocalizations {
   @override
   String get obd2ResetConnectionNoLink =>
       'Adapter nulstillet — genforbinder i baggrunden';
+
+  @override
+  String get obd2ResetConnectionAuto =>
+      'Reconnecting the adapter automatically…';
 
   @override
   String get ocrTesterTitle => 'OCR-tester';

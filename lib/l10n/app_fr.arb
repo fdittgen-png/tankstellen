@@ -682,12 +682,10 @@
   "obdPickerScanning": "Recherche d'adaptateurs…",
   "obdPickerConnecting": "Connexion…",
   "obd2PickerPinnedFallback": "Impossible de joindre '{adapterName}' — choisissez un autre adaptateur",
-  "tripSummaryTitle": "Résumé du trajet",
   "tripMetricDistance": "Distance",
   "tripMetricFuelUsed": "Carburant utilisé",
   "tripMetricAvgConsumption": "Moyenne",
   "tripMetricElapsed": "Durée",
-  "tripMetricOdometer": "Compteur",
   "tripStop": "Arrêter l'enregistrement",
   "tripPause": "Pause",
   "tripResume": "Reprendre",
@@ -747,9 +745,7 @@
   "situationClimbing": "Côte / chargé",
   "situationHardAccel": "Accél. forte",
   "situationFuelCut": "Coupure — roue libre",
-  "tripSaveRecording": "Enregistrer le trajet",
   "tripSummaryAutoSaved": "Trajet enregistré automatiquement",
-  "tripSummaryDone": "Terminé",
   "tripSummaryDelete": "Supprimer ce trajet",
   "vehicleFuelNotSet": "Non défini",
   "wizardVehicleDefaultBadge": "Par défaut",
@@ -5680,5 +5676,6 @@
         "type": "int"
       }
     }
-  }
+  },
+  "obd2ResetConnectionAuto": "Reconnexion automatique de l'adaptateur…"
 }

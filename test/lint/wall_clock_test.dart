@@ -105,7 +105,7 @@ void main() {
     'lib/features/fill_ups/presentation/screens/add_fill_up_screen_form_state.dart': 1,
     'lib/features/fill_ups/presentation/screens/add_fill_up_screen_save.dart': 2,
     'lib/features/trips/presentation/screens/trip_detail_screen.dart': 1,
-    'lib/features/trips/presentation/screens/trip_recording_screen.dart': 3,
+    'lib/features/trips/presentation/screens/trip_recording_screen.dart': 2,
     'lib/features/driving_score/presentation/widgets/driving_analysis_trace_card.dart': 1,
     'lib/features/driving_score/presentation/widgets/eco_nudge_listener.dart': 1,
     'lib/features/fill_ups/presentation/widgets/edit_correction_fill_up_sheet.dart': 1,

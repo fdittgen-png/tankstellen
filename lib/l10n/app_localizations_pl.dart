@@ -1600,9 +1600,6 @@ class AppLocalizationsPl extends AppLocalizations {
   String get obdPickerConnecting => 'Łączenie…';
 
   @override
-  String get tripSummaryTitle => 'Podsumowanie trasy';
-
-  @override
   String get tripMetricDistance => 'Dystans';
 
   @override
@@ -1613,9 +1610,6 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get tripMetricElapsed => 'Czas';
-
-  @override
-  String get tripMetricOdometer => 'Licznik';
 
   @override
   String get tripStop => 'Zatrzymaj nagrywanie';
@@ -1793,13 +1787,7 @@ class AppLocalizationsPl extends AppLocalizations {
   String get situationFuelCut => 'Odcięcie paliwa — wybieg';
 
   @override
-  String get tripSaveRecording => 'Zapisz trasę';
-
-  @override
   String get tripSummaryAutoSaved => 'Podróż zapisana automatycznie';
-
-  @override
-  String get tripSummaryDone => 'Gotowe';
 
   @override
   String get tripSummaryDelete => 'Usuń tę podróż';
@@ -6360,6 +6348,10 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get obd2ResetConnectionNoLink =>
       'Adapter zresetowany — ponowne łączenie w tle';
+
+  @override
+  String get obd2ResetConnectionAuto =>
+      'Reconnecting the adapter automatically…';
 
   @override
   String get ocrTesterTitle => 'Tester OCR';

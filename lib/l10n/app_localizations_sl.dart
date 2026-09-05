@@ -1596,9 +1596,6 @@ class AppLocalizationsSl extends AppLocalizations {
   String get obdPickerConnecting => 'Povezovanje…';
 
   @override
-  String get tripSummaryTitle => 'Povzetek vožnje';
-
-  @override
   String get tripMetricDistance => 'Razdalja';
 
   @override
@@ -1609,9 +1606,6 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get tripMetricElapsed => 'Preteklo';
-
-  @override
-  String get tripMetricOdometer => 'Števec km';
 
   @override
   String get tripStop => 'Ustavi snemanje';
@@ -1789,13 +1783,7 @@ class AppLocalizationsSl extends AppLocalizations {
   String get situationFuelCut => 'Izklop goriva — drsenje';
 
   @override
-  String get tripSaveRecording => 'Shrani vožnjo';
-
-  @override
   String get tripSummaryAutoSaved => 'Vožnja samodejno shranjena';
-
-  @override
-  String get tripSummaryDone => 'Končano';
 
   @override
   String get tripSummaryDelete => 'Izbriši to vožnjo';
@@ -6346,6 +6334,10 @@ class AppLocalizationsSl extends AppLocalizations {
   @override
   String get obd2ResetConnectionNoLink =>
       'Adapter ponastavljen — ponovno povezovanje v ozadju';
+
+  @override
+  String get obd2ResetConnectionAuto =>
+      'Reconnecting the adapter automatically…';
 
   @override
   String get ocrTesterTitle => 'Tester OCR';

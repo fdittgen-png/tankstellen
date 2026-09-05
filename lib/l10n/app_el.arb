@@ -465,12 +465,10 @@
   "obdPickerTitle": "Επιλογή προσαρμογέα OBD2",
   "obdPickerScanning": "Σάρωση για προσαρμογείς…",
   "obdPickerConnecting": "Σύνδεση…",
-  "tripSummaryTitle": "Σύνοψη διαδρομής",
   "tripMetricDistance": "Απόσταση",
   "tripMetricFuelUsed": "Καύσιμο που χρησιμοποιήθηκε",
   "tripMetricAvgConsumption": "Μέση",
   "tripMetricElapsed": "Χρόνος",
-  "tripMetricOdometer": "Χιλιόμετρα",
   "tripStop": "Διακοπή καταγραφής",
   "tripPause": "Παύση",
   "tripResume": "Συνέχεια",
@@ -519,7 +517,6 @@
   "situationClimbing": "Ανηφόρα / φορτωμένο",
   "situationHardAccel": "Δυνατή επιτάχυνση",
   "situationFuelCut": "Διακοπή καυσίμου — αδράνεια",
-  "tripSaveRecording": "Αποθήκευση ταξιδιού",
   "vehicleFuelNotSet": "Μη ορισμένο",
   "wizardVehicleDefaultBadge": "Προεπιλογή",
   "wizardProfileChoiceHint": "Επιλέξτε πώς θέλετε να χρησιμοποιήσετε την εφαρμογή. Μπορείτε να το αλλάξετε αργότερα στις Ρυθμίσεις.",
@@ -4023,7 +4020,6 @@
   "obd2StatusEngineOffBody": "Ο προσαρμογέας ήταν προσβάσιμος αλλά ο δίαυλος του οχήματος έμεινε σιωπηλός, οπότε η αυτόματη επανασύνδεση είναι σε παύση. Συνεχίζει όταν οδηγήσετε ή ξανανοίξετε την εφαρμογή — ή επανασυνδεθείτε τώρα.",
   "obd2StatusReconnectNow": "Επανασύνδεση τώρα",
   "tripSummaryAutoSaved": "Η διαδρομή αποθηκεύτηκε αυτόματα",
-  "tripSummaryDone": "Τέλος",
   "tripSummaryDelete": "Διαγραφή αυτής της διαδρομής",
   "lessonTransportTitle": "Λείπουν δεδομένα κινητήρα για το μεγαλύτερο μέρος αυτής της διαδρομής",
   "lessonTransportAdvice": "Ο κινητήρας δεν ανέφερε δραστηριότητα σχεδόν σε όλη την απόσταση. Είτε η ροή OBD2 διακόπηκε στη μέση της διαδρομής είτε το αυτοκίνητο μετακινήθηκε χωρίς οδήγηση — η τιμή κατανάλωσης είναι αναξιόπιστη και εξαιρείται από τα στατιστικά σας.",
@@ -6432,5 +6428,10 @@
         "type": "int"
       }
     }
+  },
+  "obd2ResetConnectionAuto": "Reconnecting the adapter automatically…",
+  "@obd2ResetConnectionAuto": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

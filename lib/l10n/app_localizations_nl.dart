@@ -1603,9 +1603,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get obdPickerConnecting => 'Verbinden…';
 
   @override
-  String get tripSummaryTitle => 'Ritoverzicht';
-
-  @override
   String get tripMetricDistance => 'Afstand';
 
   @override
@@ -1616,9 +1613,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get tripMetricElapsed => 'Verstreken';
-
-  @override
-  String get tripMetricOdometer => 'Kilometerstand';
 
   @override
   String get tripStop => 'Opname stoppen';
@@ -1797,13 +1791,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get situationFuelCut => 'Brandstofonderbreking — uitrollen';
 
   @override
-  String get tripSaveRecording => 'Rit opslaan';
-
-  @override
   String get tripSummaryAutoSaved => 'Rit automatisch opgeslagen';
-
-  @override
-  String get tripSummaryDone => 'Klaar';
 
   @override
   String get tripSummaryDelete => 'Deze rit verwijderen';
@@ -6350,6 +6338,10 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get obd2ResetConnectionNoLink =>
       'Adapter gereset — verbindt opnieuw op de achtergrond';
+
+  @override
+  String get obd2ResetConnectionAuto =>
+      'Reconnecting the adapter automatically…';
 
   @override
   String get ocrTesterTitle => 'OCR-tester';

@@ -1597,9 +1597,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get obdPickerConnecting => 'Ansluter…';
 
   @override
-  String get tripSummaryTitle => 'Resesammanfattning';
-
-  @override
   String get tripMetricDistance => 'Sträcka';
 
   @override
@@ -1610,9 +1607,6 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get tripMetricElapsed => 'Förfluten tid';
-
-  @override
-  String get tripMetricOdometer => 'Vägmätare';
 
   @override
   String get tripStop => 'Stoppa inspelning';
@@ -1790,13 +1784,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get situationFuelCut => 'Bränslebrytare – frifart';
 
   @override
-  String get tripSaveRecording => 'Spara resa';
-
-  @override
   String get tripSummaryAutoSaved => 'Resan sparades automatiskt';
-
-  @override
-  String get tripSummaryDone => 'Klar';
 
   @override
   String get tripSummaryDelete => 'Ta bort den här resan';
@@ -6324,6 +6312,10 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get obd2ResetConnectionNoLink =>
       'Adaptern återställd — återansluter i bakgrunden';
+
+  @override
+  String get obd2ResetConnectionAuto =>
+      'Reconnecting the adapter automatically…';
 
   @override
   String get ocrTesterTitle => 'OCR-testare';

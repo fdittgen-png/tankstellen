@@ -204,27 +204,6 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen>
     }
   }
 
-  @override
-  void _onSave() {
-    // #1185 — the trip is ALREADY persisted to the rolling
-    // [TripHistoryRepository] by `TripRecording.stop()` before this
-    // summary screen renders, so this handler is a confirm-and-pop
-    // affordance, not a write site. We DELIBERATELY do not push
-    // `AddFillUpScreen` from here: a trip is a consumption record,
-    // a fill-up is a refuel event at a pump — the two must not be
-    // conflated (see issue #1185 for the wrong-semantics report).
-    final r = _stopped!;
-    // Match the id derivation in `TripRecording._saveToHistory` so
-    // the popped id resolves to the entry that was just written.
-    final entryId =
-        r.summary.startedAt?.toIso8601String() ??
-        DateTime.now().toIso8601String();
-    ref.read(tripRecordingProvider.notifier).reset();
-    Navigator.of(
-      context,
-    ).pop(TripSaveResult(entryId: entryId, summary: r.summary));
-  }
-
   /// #1273 — show a bottom sheet explaining what the pin button does.
   /// Always visible (NOT gated by any toggle); first-launch users
   /// need this regardless of opt-ins.
@@ -288,51 +267,6 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen>
             ),
           );
         },
-      ),
-    );
-  }
-}
-
-class _MetricCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-  const _MetricCard({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Card(
-      margin: EdgeInsets.zero,
-      // #2764 — explicit Row over a ListTile title/trailing split: the
-      // label gets the flexible space and ellipsizes, the value keeps
-      // its intrinsic width (mirrors TripAvgConsumptionCard's fix).
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Row(
-          children: [
-            Icon(icon, size: 28),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                label,
-                style: theme.textTheme.bodySmall,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            Text(
-              value,
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontFeatures: const [FontFeature.tabularFigures()],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

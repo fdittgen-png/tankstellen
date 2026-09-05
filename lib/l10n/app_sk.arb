@@ -465,12 +465,10 @@
   "obdPickerTitle": "Vybrať OBD2 adaptér",
   "obdPickerScanning": "Vyhľadávanie adaptérov…",
   "obdPickerConnecting": "Pripájanie…",
-  "tripSummaryTitle": "Súhrn jazdy",
   "tripMetricDistance": "Vzdialenosť",
   "tripMetricFuelUsed": "Spotrebované palivo",
   "tripMetricAvgConsumption": "Priem.",
   "tripMetricElapsed": "Uplynulý čas",
-  "tripMetricOdometer": "Tachometer",
   "tripStop": "Zastaviť záznam",
   "tripPause": "Pozastaviť",
   "tripResume": "Pokračovať",
@@ -519,7 +517,6 @@
   "situationClimbing": "Stúpanie / zaťaženie",
   "situationHardAccel": "Prudké zrýchlenie",
   "situationFuelCut": "Odpojenie paliva — voľný beh",
-  "tripSaveRecording": "Uložiť jazdu",
   "vehicleFuelNotSet": "Nenastavené",
   "wizardVehicleDefaultBadge": "Predvolené",
   "wizardProfileChoiceHint": "Vyberte, ako chcete používať aplikáciu. Toto môžete neskôr zmeniť v Nastaveniach.",
@@ -4023,7 +4020,6 @@
   "obd2StatusEngineOffBody": "Adaptér bol dostupný, ale zbernica vozidla mlčala, takže automatické opätovné pripájanie je pozastavené. Obnoví sa, keď pôjdete alebo znova otvoríte aplikáciu — alebo sa pripojte znova hneď.",
   "obd2StatusReconnectNow": "Pripojiť znova hneď",
   "tripSummaryAutoSaved": "Jazda uložená automaticky",
-  "tripSummaryDone": "Hotovo",
   "tripSummaryDelete": "Odstrániť túto jazdu",
   "lessonTransportTitle": "Počas väčšiny tejto jazdy chýbajú údaje z motora",
   "lessonTransportAdvice": "Motor nehlásil takmer po celú vzdialenosť žiadnu aktivitu. Buď dátový tok OBD2 v polovici jazdy zlyhal, alebo bolo auto premiestnené bez jazdy — údaj o spotrebe je nespoľahlivý a zo štatistík je vylúčený.",
@@ -6432,5 +6428,10 @@
         "type": "int"
       }
     }
+  },
+  "obd2ResetConnectionAuto": "Reconnecting the adapter automatically…",
+  "@obd2ResetConnectionAuto": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }
