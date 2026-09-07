@@ -28,6 +28,20 @@ IssueTracker: https://github.com/fdittgen-png/tankstellen/issues
 Name: Sparkilo
 AutoName: Sparkilo
 
+# #3968 — kept because of the COMMIT THIS RECIPE PINS, not because of the
+# app's current code. The libre define every build entry below passes
+# empties the tile proxy and makes CommunityConfig ignore the bundled
+# defaults, but the code that READS it landed in 0bd1815c (2026-08-26), after
+# v6.0.5 / 506fcf50. Dart ignores a define nothing reads, so at this pin the
+# map still fetches every tile from the developer's Supabase host and
+# assets/tanksync_config.json still carries its defaults.
+# This entry comes off in the SAME change that moves `commit:` to a tagged
+# release containing 0bd1815c (and its versionName / versionCode /
+# CurrentVersion* fields with it). test/features/fdroid/
+# libre_build_endpoints_test.dart fails if the two ever disagree again.
+AntiFeatures:
+  - NonFreeNet
+
 RepoType: git
 Repo: https://github.com/fdittgen-png/tankstellen.git
 
