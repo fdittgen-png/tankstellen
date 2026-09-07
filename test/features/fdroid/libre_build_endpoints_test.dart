@@ -43,8 +43,13 @@ void main() {
     // developer's endpoints again). Pin every F-Droid build path.
     test('the fdroiddata recipe passes FDROID_LIBRE on every build entry',
         () {
-      final yaml =
-          File('metadata/de.tankstellen.fuelprices.yml').readAsStringSync();
+      // #3968 — count the BUILD lines only: a comment that names the define
+      // (the AntiFeature block does) must not be mistaken for a build entry
+      // passing it.
+      final yaml = File('metadata/de.tankstellen.fuelprices.yml')
+          .readAsLinesSync()
+          .where((l) => !l.trimLeft().startsWith('#'))
+          .join('\n');
       final entries = RegExp(r'^  - versionName:', multiLine: true)
           .allMatches(yaml)
           .length;
@@ -63,12 +68,67 @@ void main() {
               'script — it must be libre by the same rule');
     });
 
-    test('the recipe declares no AntiFeature, since its cause is gone', () {
+    // #3968 — the assertion that MATTERS, and the one whose absence let a
+    // premature AntiFeature drop reach fdroiddata review. Passing the
+    // define proves nothing on its own: Dart ignores a `--dart-define` no
+    // code reads, so a recipe that pins a commit predating the reader
+    // builds a binary that still talks to the developer's endpoints, with
+    // a green pipeline and no warning anywhere.
+    //
+    // The invariant is therefore about the PINNED COMMIT, not the tree
+    // this test runs in: no NonFreeNet ⇒ every pinned commit must contain
+    // the reader; NonFreeNet ⇒ at least one pinned commit must lack it, so
+    // the AntiFeature cannot go stale after a pin bump either.
+    test('the AntiFeature state matches what the PINNED commits actually '
+        'build (#3968)', () {
       final yaml =
           File('metadata/de.tankstellen.fuelprices.yml').readAsStringSync();
-      expect(yaml, isNot(contains('AntiFeatures:')),
-          reason: 'NonFreeNet was declared only for the developer-hosted '
-              'defaults #3788 removes; leaving it would misreport the app');
+      final pinned = RegExp(r'^\s+commit:\s*([0-9a-f]{40})\s*$',
+              multiLine: true)
+          .allMatches(yaml)
+          .map((m) => m.group(1)!)
+          .toSet();
+      expect(pinned, isNotEmpty,
+          reason: 'every build entry pins a full commit sha');
+
+      final declaresNonFreeNet =
+          RegExp(r'^AntiFeatures:(?:\s*\n\s+-.*)*NonFreeNet',
+                  multiLine: true)
+              .hasMatch(yaml);
+
+      final withoutReader = <String>[];
+      for (final sha in pinned) {
+        expect(_gitHas(sha), isTrue,
+            reason: 'commit $sha is not in this clone — the check needs the '
+                'object (CI checks out at fetch-depth: 0)');
+        if (!_readsLibreDefine(sha)) withoutReader.add(sha);
+      }
+
+      if (declaresNonFreeNet) {
+        expect(withoutReader, isNotEmpty,
+            reason: 'every pinned commit now reads FDROID_LIBRE, so the '
+                'NonFreeNet AntiFeature is stale — drop it in the same '
+                'change that bumped the pin');
+      } else {
+        expect(withoutReader, isEmpty,
+            reason: 'the recipe drops NonFreeNet while pinning '
+                "${withoutReader.join(', ')}, which contains no reader for "
+                'FDROID_LIBRE. Dart ignores an unread define, so that build '
+                'still uses the developer-hosted tile proxy and the bundled '
+                'TankSync defaults. Bump the pin or restore the AntiFeature');
+      }
     });
   });
 }
+
+/// Whether [sha] resolves to a commit in this clone.
+bool _gitHas(String sha) =>
+    Process.runSync('git', ['cat-file', '-e', '$sha^{commit}']).exitCode == 0;
+
+/// Whether the tree at [sha] contains code that READS the libre define.
+/// `git grep` on a rev inspects that commit's tree, not the working copy —
+/// which is the whole point: the working copy always has it.
+bool _readsLibreDefine(String sha) =>
+    Process.runSync('git', ['grep', '-l', 'FDROID_LIBRE', sha, '--', 'lib/'])
+        .exitCode ==
+    0;
