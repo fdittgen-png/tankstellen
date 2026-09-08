@@ -3560,6 +3560,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get chargingChartsEmpty => 'Dar nepakanka duomenų';
 
   @override
+  String get chargingLogDeletedUndoSnackbar => 'Charging session deleted';
+
+  @override
   String get confirmDeleteTitle => 'Ištrinti?';
 
   @override

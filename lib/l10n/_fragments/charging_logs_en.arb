@@ -76,5 +76,7 @@
   "chargingChartsEmpty": "Not enough data yet",
   "@chargingChartsEmpty": {
     "description": "Empty-state caption shown inside the charging charts when no data is available for the last 6 months (#582 phase 3)."
-  }
+  },
+  "chargingLogDeletedUndoSnackbar": "Charging session deleted",
+  "@chargingLogDeletedUndoSnackbar": {"description": "Snackbar after swipe-deleting a charging log; carries the 10-second Undo action (#3989, mirrors fillUpDeletedUndoSnackbar)."}
 }

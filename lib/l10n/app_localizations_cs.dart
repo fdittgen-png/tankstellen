@@ -3545,6 +3545,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get chargingChartsEmpty => 'Zatím nedostatek dat';
 
   @override
+  String get chargingLogDeletedUndoSnackbar => 'Charging session deleted';
+
+  @override
   String get confirmDeleteTitle => 'Smazat?';
 
   @override

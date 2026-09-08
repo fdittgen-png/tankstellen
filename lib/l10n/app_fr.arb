@@ -5697,5 +5697,10 @@
         "type": "String"
       }
     }
+  },
+  "chargingLogDeletedUndoSnackbar": "Charging session deleted",
+  "@chargingLogDeletedUndoSnackbar": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

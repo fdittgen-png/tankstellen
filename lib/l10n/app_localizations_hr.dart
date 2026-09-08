@@ -3545,6 +3545,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get chargingChartsEmpty => 'Još nema dovoljno podataka';
 
   @override
+  String get chargingLogDeletedUndoSnackbar => 'Charging session deleted';
+
+  @override
   String get confirmDeleteTitle => 'Izbrisati?';
 
   @override

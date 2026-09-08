@@ -10,6 +10,7 @@ import 'package:intl/intl.dart' hide TextDirection;
 
 import '../../../../core/widgets/charts/monthly_bar_chart_base.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/utils/price_formatter.dart';
 
 /// Monthly-total charging-cost bar chart (#582 phase 3).
 ///
@@ -90,8 +91,10 @@ class _CostTrendPainter extends MonthlyBarChartPainter {
   }) : super(
           values: entries.map((e) => e.value).toList(growable: false),
           months: entries.map((e) => e.key).toList(growable: false),
-          maxLabel:
-              '€${entries.map((e) => e.value).reduce(math.max).toStringAsFixed(0)}',
+          // #3989 — the app's price formatter, not a hard-coded euro sign.
+          maxLabel: PriceFormatter.formatTotal(
+            entries.map((e) => e.value).reduce(math.max),
+          ),
           barWidthFactor: 0.55,
           bottomInset: 22,
         );

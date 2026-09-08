@@ -10,6 +10,7 @@ import '../../domain/charging_log_readout.dart';
 import '../../domain/charging_log_validators.dart';
 import 'charging_log_derived_readout_panel.dart';
 import '../../../fill_ups/api.dart';
+import '../../../../core/theme/spacing.dart';
 
 /// All the input rows on the Add-Charging-Log form, composed in the
 /// canonical order: date, vehicle, kWh, cost (+derived readout),
@@ -60,16 +61,16 @@ class ChargingLogFormFields extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(Spacing.xl),
       children: [
         FillUpDateRow(dateLabel: dateLabel, onTap: onPickDate),
-        const SizedBox(height: 8),
+        const SizedBox(height: Spacing.md),
         FillUpVehicleDropdown(
           vehicleId: vehicleId,
           vehicles: vehicles,
           onChanged: onVehicleChanged,
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: Spacing.lg),
         FillUpNumericField(
           key: const Key('charging_kwh_field'),
           controller: kwhCtrl,
@@ -77,7 +78,7 @@ class ChargingLogFormFields extends StatelessWidget {
           icon: Icons.bolt_outlined,
           validator: (v) => ChargingLogValidators.positiveNumber(v, l),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: Spacing.lg),
         FillUpNumericField(
           key: const Key('charging_cost_field'),
           controller: costCtrl,
@@ -86,7 +87,7 @@ class ChargingLogFormFields extends StatelessWidget {
           validator: (v) => ChargingLogValidators.positiveNumber(v, l),
         ),
         ChargingLogDerivedReadoutPanel(readout: derived),
-        const SizedBox(height: 12),
+        const SizedBox(height: Spacing.lg),
         FillUpNumericField(
           key: const Key('charging_time_field'),
           controller: timeMinCtrl,
@@ -94,7 +95,7 @@ class ChargingLogFormFields extends StatelessWidget {
           icon: Icons.timer_outlined,
           validator: (v) => ChargingLogValidators.nonNegativeInt(v, l),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: Spacing.lg),
         FillUpNumericField(
           key: const Key('charging_odo_field'),
           controller: odoCtrl,
@@ -102,7 +103,7 @@ class ChargingLogFormFields extends StatelessWidget {
           icon: Icons.speed,
           validator: (v) => ChargingLogValidators.positiveNumber(v, l),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: Spacing.lg),
         TextFormField(
           key: const Key('charging_station_field'),
           controller: stationCtrl,
@@ -113,7 +114,7 @@ class ChargingLogFormFields extends StatelessWidget {
             prefixIcon: const Icon(Icons.place_outlined),
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: Spacing.xxl),
         FilledButton.icon(
           key: const Key('charging_save_button'),
           onPressed: saving ? null : onSave,

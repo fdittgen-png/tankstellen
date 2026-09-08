@@ -32,11 +32,16 @@ void drawChartText(
   bool anchorCenter = false,
   required Color color,
   double fontSize = 10,
+
+  /// #3989 — a theme role (already text-scaled by the caller) instead of a
+  /// pixel size, so chart labels follow the text-size setting like every
+  /// other label. [fontSize] stays for painters not yet migrated.
+  TextStyle? style,
 }) {
   final tp = TextPainter(
     text: TextSpan(
       text: text,
-      style: TextStyle(color: color, fontSize: fontSize),
+      style: (style ?? TextStyle(fontSize: fontSize)).copyWith(color: color),
     ),
     textDirection: TextDirection.ltr,
   )..layout();

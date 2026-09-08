@@ -3562,6 +3562,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get chargingChartsEmpty => 'Vēl nav pietiekami datu';
 
   @override
+  String get chargingLogDeletedUndoSnackbar => 'Charging session deleted';
+
+  @override
   String get confirmDeleteTitle => 'Dzēst?';
 
   @override
