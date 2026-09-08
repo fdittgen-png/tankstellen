@@ -130,7 +130,7 @@ Station? parsePrixCarburantsStation(
       place: ville,
       lat: lat,
       lng: lng,
-      dist: _roundedDistance(searchLat, searchLng, lat, lng),
+      dist: roundedDistanceKm(searchLat, searchLng, lat, lng),
       e5: _toDouble(r['sp95_prix']),
       e10: _toDouble(r['e10_prix']),
       e98: _toDouble(r['sp98_prix']),
@@ -392,10 +392,3 @@ double? _toDouble(dynamic v) {
   return double.tryParse(v.toString());
 }
 
-/// Haversine distance, rounded to 1 decimal place. Mirrors the
-/// `StationServiceHelpers.roundedDistance` mixin method so the
-/// parser stays free of mixin coupling.
-double _roundedDistance(double lat1, double lng1, double lat2, double lng2) {
-  final d = distanceKm(lat1, lng1, lat2, lng2);
-  return double.parse(d.toStringAsFixed(1));
-}

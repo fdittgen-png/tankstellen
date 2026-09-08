@@ -23,6 +23,7 @@ import '../../../core/domain/station.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/utils/geo_utils.dart';
 import 'romania_observatory_keys.dart';
+import '../../../core/utils/number_parsing.dart';
 
 /// Drain one single-product envelope into [byId], merging on the
 /// station id (`Products[].stationid` joins `Stations[].id`).
@@ -121,8 +122,8 @@ class MonitorulStationAccumulator {
       }
       final location = addr['location'];
       if (location is Map) {
-        lat ??= _parseDouble(location['Lat']);
-        lng ??= _parseDouble(location['Lon']);
+        lat ??= parseLooseDouble(location['Lat']);
+        lng ??= parseLooseDouble(location['Lon']);
       }
     }
 
@@ -151,7 +152,7 @@ class MonitorulStationAccumulator {
       place: place ?? '',
       lat: resolvedLat,
       lng: resolvedLng,
-      dist: _roundedDistance(fromLat, fromLng, resolvedLat, resolvedLng),
+      dist: roundedDistanceKm(fromLat, fromLng, resolvedLat, resolvedLng),
       e5: prices[FuelType.e5],
       e98: prices[FuelType.e98],
       diesel: prices[FuelType.diesel],
@@ -164,19 +165,5 @@ class MonitorulStationAccumulator {
     );
   }
 
-  static double? _parseDouble(dynamic raw) {
-    if (raw == null) return null;
-    if (raw is num) return raw.toDouble();
-    if (raw is String) return double.tryParse(raw.trim());
-    return null;
-  }
 }
 
-/// Haversine distance in km, rounded to one decimal — mirrors
-/// `StationServiceHelpers.roundedDistance` so the accumulator stays
-/// free of the mixin's HTTP/result-wrapping baggage (same pattern as
-/// the KR parser).
-double _roundedDistance(double lat1, double lng1, double lat2, double lng2) {
-  final d = distanceKm(lat1, lng1, lat2, lng2);
-  return double.parse(d.toStringAsFixed(1));
-}

@@ -24,6 +24,7 @@ import '../../../core/domain/station.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/utils/geo_utils.dart';
 import 'katec_converter.dart';
+import '../../../core/utils/number_parsing.dart';
 
 /// OPINET `prodcd` parsing utilities.
 ///
@@ -86,8 +87,8 @@ class OpinetStationAccumulator {
     address ??= raw['NEW_ADR']?.toString().trim();
 
     if (lat == null || lng == null) {
-      final rawY = _parseDouble(raw['GIS_Y_COOR']);
-      final rawX = _parseDouble(raw['GIS_X_COOR']);
+      final rawY = parseLooseDouble(raw['GIS_Y_COOR']);
+      final rawX = parseLooseDouble(raw['GIS_X_COOR']);
       if (rawY != null && rawX != null) {
         if (rawX.abs() > 1000 || rawY.abs() > 1000) {
           // KATEC easting/northing — convert back to WGS84.
@@ -103,7 +104,7 @@ class OpinetStationAccumulator {
     }
 
     final distRaw = raw['DISTANCE'];
-    final distMeters = _parseDouble(distRaw);
+    final distMeters = parseLooseDouble(distRaw);
     if (distMeters != null && distMeters > 0) {
       final km = double.parse((distMeters / 1000.0).toStringAsFixed(1));
       apiDistanceKm ??= km;
@@ -121,7 +122,7 @@ class OpinetStationAccumulator {
 
     final brand = _brandFromCode(brandCode);
     final distKm = apiDistanceKm ??
-        _roundedDistance(fromLat, fromLng, resolvedLat, resolvedLng);
+        roundedDistanceKm(fromLat, fromLng, resolvedLat, resolvedLng);
 
     return Station(
       id: 'kr-$uniId',
@@ -221,17 +222,6 @@ double? _parseWonPerLitre(dynamic raw) {
   return null;
 }
 
-double? _parseDouble(dynamic raw) {
-  if (raw == null) return null;
-  if (raw is num) return raw.toDouble();
-  if (raw is String) {
-    final t = raw.trim();
-    if (t.isEmpty) return null;
-    return double.tryParse(t);
-  }
-  return null;
-}
-
 Map<dynamic, dynamic>? _coerceMap(dynamic data) {
   if (data is Map) return data;
   return null;
@@ -263,10 +253,3 @@ String _brandFromCode(String? code) {
   }
 }
 
-/// Haversine distance in km, rounded to one decimal — mirrors
-/// `StationServiceHelpers.roundedDistance` so the parser stays free of
-/// the mixin's HTTP/result-wrapping baggage.
-double _roundedDistance(double lat1, double lng1, double lat2, double lng2) {
-  final d = distanceKm(lat1, lng1, lat2, lng2);
-  return double.parse(d.toStringAsFixed(1));
-}

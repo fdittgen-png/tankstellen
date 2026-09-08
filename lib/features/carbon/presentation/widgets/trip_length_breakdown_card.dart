@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/providers/consumption_display_provider.dart';
-import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../trips/api.dart';
 import '../../../../core/utils/unit_formatter.dart';
+import '../../../../core/widgets/metric_delta_arrow.dart';
 
 /// Trip-length consumption breakdown card on the Carbon dashboard
 /// Charts tab (#1191).
@@ -221,11 +221,7 @@ class _BucketTile extends ConsumerWidget {
             ),
             if (showArrow) ...[
               const SizedBox(width: 4),
-              _DeltaArrow(
-                bucketAvg: avg,
-                overallAvg: overallAvgLPer100Km!,
-                theme: theme,
-              ),
+              MetricDeltaArrow(delta: avg - overallAvgLPer100Km!),
             ],
           ],
         ),
@@ -243,30 +239,3 @@ class _BucketTile extends ConsumerWidget {
   }
 }
 
-/// Up/down arrow on a bucket tile. Rendered only when the bucket has
-/// >=5 trips AND the overall average is known AND they differ.
-///
-/// Sign convention is "lower L/100 km is better":
-///   * bucket avg > overall → red arrow_upward (worse)
-///   * bucket avg < overall → green arrow_downward (better)
-class _DeltaArrow extends StatelessWidget {
-  final double bucketAvg;
-  final double overallAvg;
-  final ThemeData theme;
-
-  const _DeltaArrow({
-    required this.bucketAvg,
-    required this.overallAvg,
-    required this.theme,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final worse = bucketAvg > overallAvg;
-    return Icon(
-      worse ? Icons.arrow_upward : Icons.arrow_downward,
-      size: 16,
-      color: worse ? theme.colorScheme.error : DarkModeColors.success(context),
-    );
-  }
-}

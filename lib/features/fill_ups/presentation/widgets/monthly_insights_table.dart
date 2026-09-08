@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 import '../../../../core/theme/app_text.dart';
-import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/widgets/metric_delta_arrow.dart';
 
 /// The ONE month-over-month metric table (#3904, #3950) — shared by the
 /// Trajets `MonthlyInsightsCard` and the consumption-statistics page's
@@ -137,7 +137,12 @@ class MonthlyMetricsTable extends StatelessWidget {
               if (showPreviousColumn)
                 _cell(
                   m.showPrevious
-                      ? _DeltaArrow(delta: m.delta, sentiment: m.sentiment)
+                      ? MetricDeltaArrow(
+                          delta: m.delta,
+                          neutral:
+                              m.sentiment == MonthlyMetricSentiment.neutral,
+                          flatBelow: _flatDelta,
+                        )
                       : const SizedBox.shrink(),
                   leading: _columnGap / 2,
                 ),
@@ -234,31 +239,3 @@ class _RenderShrinkableCell extends RenderProxyBox {
   double computeMinIntrinsicWidth(double height) => 0;
 }
 
-/// The trailing arrow on a metric row. Hidden when the displayed
-/// values are equal (|delta| below [_flatDelta]). Colour follows
-/// [sentiment]:
-///   * `neutral`   → grey, both directions
-///   * `lowerIsBetter` → up = error, down = success
-class _DeltaArrow extends StatelessWidget {
-  final num delta;
-  final MonthlyMetricSentiment sentiment;
-
-  const _DeltaArrow({required this.delta, required this.sentiment});
-
-  @override
-  Widget build(BuildContext context) {
-    if (delta.abs() < _flatDelta) return const SizedBox.shrink();
-    final theme = Theme.of(context);
-    final up = delta > 0;
-    final color = switch (sentiment) {
-      MonthlyMetricSentiment.neutral => theme.colorScheme.onSurfaceVariant,
-      MonthlyMetricSentiment.lowerIsBetter =>
-        up ? theme.colorScheme.error : DarkModeColors.success(context),
-    };
-    return Icon(
-      up ? Icons.arrow_upward : Icons.arrow_downward,
-      size: 16,
-      color: color,
-    );
-  }
-}

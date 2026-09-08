@@ -148,10 +148,8 @@ mixin StationServiceHelpers {
   // ---------------------------------------------------------------------------
 
   /// Calculate Haversine distance and round to 1 decimal place.
-  double roundedDistance(double lat1, double lng1, double lat2, double lng2) {
-    final d = distanceKm(lat1, lng1, lat2, lng2);
-    return double.parse(d.toStringAsFixed(1));
-  }
+  double roundedDistance(double lat1, double lng1, double lat2, double lng2) =>
+      roundedDistanceKm(lat1, lng1, lat2, lng2); // #3983 — one definition
 
   // ---------------------------------------------------------------------------
   // Filtering

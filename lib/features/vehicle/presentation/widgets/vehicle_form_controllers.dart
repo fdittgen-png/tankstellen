@@ -8,6 +8,7 @@ import '../../../../core/domain/fuel_type.dart';
 import '../../data/vehicle_profile_catalog_matcher.dart';
 import '../../domain/entities/reference_vehicle.dart';
 import '../../../../core/domain/vehicle_profile.dart';
+import '../../../../core/utils/number_parsing.dart';
 
 /// Bundles the text controllers, focus node, and scalar form state
 /// used by [EditVehicleScreen]. Keeps the screen class focused on
@@ -177,10 +178,10 @@ class VehicleFormControllers {
   }) {
     final batteryKwh = type == VehicleType.combustion
         ? null
-        : _parseDouble(batteryController.text);
+        : parseUserDouble(batteryController.text);
     final maxChargingKw = type == VehicleType.combustion
         ? null
-        : _parseDouble(maxChargingKwController.text);
+        : parseUserDouble(maxChargingKwController.text);
     final supportedConnectors =
         type == VehicleType.combustion ? <ConnectorType>{} : {...connectors};
     // #3651 — like `enginePowerKw` below, the catalog row is the
@@ -189,7 +190,7 @@ class VehicleFormControllers {
     // on the new-vehicle path.
     final tankCapacityL = type == VehicleType.ev
         ? null
-        : (_parseDouble(tankController.text) ??
+        : (parseUserDouble(tankController.text) ??
             referenceVehicle?.tankCapacityL);
     // Epic #3015 — rated power in kW. EV power is out of scope, so EVs
     // never persist it. The controller already carries either the
@@ -334,11 +335,6 @@ class VehicleFormControllers {
     vinFocusNode.dispose();
   }
 
-  static double? _parseDouble(String text) {
-    final trimmed = text.trim().replaceAll(',', '.');
-    if (trimmed.isEmpty) return null;
-    return double.tryParse(trimmed);
-  }
 
   static int _parseIntOr(String text, int fallback) =>
       int.tryParse(text.trim()) ?? fallback;

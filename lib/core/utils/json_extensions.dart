@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'number_parsing.dart';
 /// Safe typed accessors for `Map<String, dynamic>` JSON payloads.
 ///
 /// Replaces fragile `data['key'] as Type?` casts that throw at runtime if the
@@ -15,6 +16,7 @@
 /// final ids  = json.getList<String>('ids');       // List<String>
 /// final addr = json.getMap('address');             // Map<String, dynamic>?
 /// ```
+
 extension SafeJsonAccessors on Map<String, dynamic> {
   /// Returns the value at [key] as a [String], or `null` if missing or wrong type.
   String? getString(String key) {
@@ -30,9 +32,7 @@ extension SafeJsonAccessors on Map<String, dynamic> {
     final v = this[key];
     if (v is double) return v;
     if (v is int) return v.toDouble();
-    if (v is num) return v.toDouble();
-    if (v is String) return double.tryParse(v);
-    return null;
+    return parseLooseDouble(v); // #3983 — the one payload-number rule
   }
 
   /// Returns the value at [key] as an [int], or `null` if missing or not numeric.
