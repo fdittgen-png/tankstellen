@@ -5935,5 +5935,25 @@
   "@obd2ResetConnectionAuto": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "helpTitle": "Help",
+  "@helpTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "helpOpenGuide": "Open the guide",
+  "@helpOpenGuide": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "helpUnavailable": "The guide could not be loaded ({asset}).",
+  "@helpUnavailable": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "asset": {
+        "type": "String"
+      }
+    }
   }
 }

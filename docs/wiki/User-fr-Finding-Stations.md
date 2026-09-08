@@ -33,6 +33,65 @@ Son libellé indique ce qu'il va faire, et en mode itinéraire il reste désacti
 | **Marques** | Restreindre à certaines enseignes | Comptées sur l'ensemble courant de résultats, la liste change donc avec le rayon |
 | **Enregistrer comme valeurs par défaut** | Écrit ces critères dans le profil | Toute recherche future part d'ici |
 
+<!-- anchor: search.criteria.button -->
+### Le bouton de recherche
+
+Le bouton en relief au milieu de la barre du bas est le seul déclencheur
+de recherche. Depuis n'importe quel onglet il ouvre cette feuille ;
+depuis les résultats ou la carte il la rouvre avec ce que vous avez
+utilisé en dernier ; dans la feuille, il lance la recherche.
+
+<!-- anchor: search.criteria.mode -->
+### À proximité ou le long d'un trajet
+
+Deux questions différentes. **À proximité** cherche autour de votre
+position ou d'une adresse. **Le long du trajet** demande une destination
+et mesure la distance le long du corridor et non à vol d'oiseau : une
+station à 2 km dans une rue latérale passe donc derrière une station sur
+votre route.
+
+<!-- anchor: search.criteria.fuel-type -->
+### Type de carburant
+
+Pour quel carburant sont les prix. Les puces s'adaptent à ce que publie
+réellement le fournisseur de votre pays — un carburant absent de la liste
+manque dans les données, pas dans l'application.
+
+<!-- anchor: search.criteria.radius -->
+### Rayon
+
+Jusqu'où chercher. Un grand rayon dans un pays dense renvoie beaucoup de
+stations et une recherche plus lente, et les stations en plus sont
+généralement plus loin que ce que vaut l'économie.
+
+<!-- anchor: search.criteria.open-only -->
+### Ouvertes maintenant seulement
+
+Masque les stations fermées. Cela dépend du fournisseur qui publie ou non
+les horaires, et certains ne le font pas — quand ils manquent, la station
+est conservée plutôt que devinée.
+
+<!-- anchor: search.criteria.amenities -->
+### Services
+
+Boutique, lavage, air, WC. Ces filtres portent sur des données
+**déclarées** : une station qui ne publie rien sur ses services disparaît
+d'une liste filtrée même si elle les a tous.
+
+<!-- anchor: search.criteria.highway -->
+### Stations d'autoroute
+
+Les stations d'autoroute sont en général le carburant le plus cher du
+pays : les exclure est le filtre qui change le plus souvent ce que vous
+payez. Gardez-les quand vous ne pouvez pas quitter l'autoroute.
+
+<!-- anchor: search.criteria.defaults -->
+### Enregistrer comme mes valeurs par défaut
+
+Écrit ces critères dans votre profil : chaque recherche suivante part
+d'ici plutôt que des valeurs de l'application. C'est le réglage qui fait
+de la feuille une confirmation en une touche plutôt qu'un formulaire.
+
 ### Comment ça marche réellement
 
 Une recherche à proximité envoie **vos coordonnées (ou un code de région) et un rayon** au fournisseur officiel de votre pays — jamais votre identité. Les pays qui publient un fichier quotidien (Espagne, Italie) sont filtrés sur l'appareil : ces recherches n'ont besoin d'aucun appel réseau une fois le fichier en cache.

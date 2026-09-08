@@ -1580,6 +1580,17 @@
   "@onboardingExploreDemoData": {
     "description": "Onboarding API-key step — CTA to skip key entry and use demo data (#1691)."
   },
+  "helpTitle": "Help",
+  "helpOpenGuide": "Open the guide",
+  "helpUnavailable": "The guide could not be loaded ({asset}).",
+  "@helpUnavailable": {
+    "description": "Shown when the bundled guide asset cannot be read (#4007)",
+    "placeholders": {
+      "asset": {
+        "type": "String"
+      }
+    }
+  },
   "achievementSmoothDriver": "Smooth streak",
   "@achievementSmoothDriver": {
     "description": "Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5)."

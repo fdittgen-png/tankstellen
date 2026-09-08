@@ -33,6 +33,63 @@ Etiketten fortæller hvad den vil gøre, og i rutetilstand er den slået fra, in
 | **Mærker** | Begræns til bestemte kæder | Tælles på det aktuelle resultatsæt, så listen skifter med radius |
 | **Gem som standardværdier** | Skriver disse kriterier ind i profilen | Enhver fremtidig søgning starter her |
 
+<!-- anchor: search.criteria.button -->
+### Søgeknappen
+
+Den hævede knap midt i den nederste bjælke er den eneste søgeudløser. Fra
+enhver fane åbner den dette ark; fra resultaterne eller kortet åbner den
+det igen med det, du sidst brugte; inde i arket kører den søgningen.
+
+<!-- anchor: search.criteria.mode -->
+### I nærheden eller langs en rute
+
+To forskellige spørgsmål. **I nærheden** søger omkring din position eller
+en adresse. **Langs ruten** kræver en destination og måler afstanden
+langs korridoren i stedet for i fugleflugt: en tank 2 km væk ad en
+sidevej rangerer altså efter en, der ligger på din vej.
+
+<!-- anchor: search.criteria.fuel-type -->
+### Brændstoftype
+
+Hvilket brændstof priserne gælder. Chipsene retter sig efter, hvad dit
+lands udbyder faktisk offentliggør — et brændstof, der mangler på listen,
+mangler i data, ikke i appen.
+
+<!-- anchor: search.criteria.radius -->
+### Radius
+
+Hvor langt der skal søges. En stor radius i et tætbefolket land giver
+rigtig mange tankstationer og en langsommere søgning, og de ekstra ligger
+som regel længere væk, end besparelsen er værd.
+
+<!-- anchor: search.criteria.open-only -->
+### Kun åbne nu
+
+Skjuler lukkede tankstationer. Det afhænger af, om udbyderen
+offentliggør åbningstider, og nogle gør ikke — mangler de, beholdes
+stationen i stedet for at blive gættet.
+
+<!-- anchor: search.criteria.amenities -->
+### Faciliteter
+
+Butik, vask, luft, WC. Disse filtre virker på **indberettede** data: en
+station, der intet offentliggør om sine faciliteter, forsvinder fra en
+filtreret liste, selv om den har dem alle.
+
+<!-- anchor: search.criteria.highway -->
+### Motorvejstankstationer
+
+Motorvejstankstationer er som regel landets dyreste brændstof: at udelade
+dem er det ene filter, der oftest ændrer, hvad du betaler. Behold dem, når
+du ikke kan forlade motorvejen.
+
+<!-- anchor: search.criteria.defaults -->
+### Gem som mine standarder
+
+Skriver disse kriterier ind i din profil, så hver senere søgning starter
+her i stedet for ved appens egne standarder. Det er indstillingen, der
+gør arket til en bekræftelse med ét tryk i stedet for en formular.
+
 ### Sådan virker det i praksis
 
 En søgning i nærheden sender **dine koordinater (eller en regionskode) og en radius** til dit lands officielle leverandør — aldrig din identitet. Lande med en daglig samlefil (Spanien, Italien) filtreres på enheden; de søgninger kræver slet ingen netværkskald, når filen er cachet.

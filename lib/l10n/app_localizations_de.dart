@@ -2999,6 +2999,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get onboardingExploreDemoData => 'Mit Demodaten erkunden';
 
   @override
+  String get helpTitle => 'Hilfe';
+
+  @override
+  String get helpOpenGuide => 'Anleitung öffnen';
+
+  @override
+  String helpUnavailable(String asset) {
+    return 'Die Anleitung konnte nicht geladen werden ($asset).';
+  }
+
+  @override
   String get achievementSmoothDriver => 'Ruhige Serie';
 
   @override

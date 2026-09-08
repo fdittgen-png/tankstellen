@@ -8,15 +8,16 @@ import 'package:tankstellen/core/navigation/app_routes.dart';
 
 void main() {
   group('profileRoutes', () {
-    test('returns exactly 24 routes', () {
+    test('returns exactly 25 routes', () {
       // Guards against accidental insert/delete — the Profile shell
       // branch pushes onto these sub-screens. #2248 added the three
       // Developer-tools routes (/developer-tools[/error-log|/flags]);
       // #2471 added the gated /developer-tools/obd2-health screen;
       // #2518 added the gated /developer-tools/ocr-tester screen;
       // #3884 added the twelve Settings topic screens + the radar
-      // sub-screen (/settings/...).
-      expect(profileRoutes.length, 24);
+      // sub-screen (/settings/...); #4007 added /help, appended LAST so
+      // that no existing index in the tests below moves.
+      expect(profileRoutes.length, 25);
     });
 
     test('route 0 path is "/vehicles"', () {

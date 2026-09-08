@@ -33,6 +33,63 @@ The button label changes to say what it will do, and in route mode it stays disa
 | **Brands** | Restrict to specific chains | Counted from the current result set, so the list changes with the radius |
 | **Save as defaults** | Writes these criteria into the profile | Every future search starts here |
 
+<!-- anchor: search.criteria.button -->
+### The search button
+
+The raised button in the middle of the bottom bar is the only search
+trigger. From any tab it opens this sheet; from the results or the map it
+re-opens it with what you last used; inside the sheet it runs the search.
+
+<!-- anchor: search.criteria.mode -->
+### Nearby or along a route
+
+Two different questions. **Nearby** searches around your position or an
+address. **Along route** needs a destination and measures distance along
+the corridor rather than as the crow flies, so a station 2 km away down a
+side road ranks behind one on your way.
+
+<!-- anchor: search.criteria.fuel-type -->
+### Fuel type
+
+Which grade the prices are for. The chips adapt to what your country's
+provider actually publishes — a grade missing from the list is missing
+from the data, not from the app.
+
+<!-- anchor: search.criteria.radius -->
+### Radius
+
+How far to look. A wide radius in a dense country returns a lot of
+stations and a slower search, and the extra stations are usually further
+than the saving is worth.
+
+<!-- anchor: search.criteria.open-only -->
+### Open now only
+
+Hides stations that are closed. It depends on the provider publishing
+opening hours, and some do not — where they are missing the station is
+kept rather than guessed at.
+
+<!-- anchor: search.criteria.amenities -->
+### Amenities
+
+Shop, car wash, air, WC. These filter on **reported** data: a station
+that publishes nothing about its amenities disappears from a filtered
+list even if it has all of them.
+
+<!-- anchor: search.criteria.highway -->
+### Motorway stations
+
+Motorway stations are usually the most expensive fuel in the country, so
+excluding them is the single filter that most often changes what you
+pay. Keep them when you cannot leave the motorway.
+
+<!-- anchor: search.criteria.defaults -->
+### Save as my defaults
+
+Writes these criteria into your profile, so every later search starts
+here instead of from the app's own defaults. It is the setting that makes
+the sheet a one-tap confirmation rather than a form.
+
 ### How it actually works
 
 A nearby search sends **your coordinates (or a region code) and a radius** to your country's official price provider — never your identity. Countries that publish a daily bulk file (Spain, Italy) are filtered on the device instead, so those searches need no per-search network call at all once the file is cached.

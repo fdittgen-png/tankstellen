@@ -1,0 +1,10 @@
+{
+  "search.criteria.button": "El botón de búsqueda",
+  "search.criteria.mode": "Cerca o a lo largo de una ruta",
+  "search.criteria.fuel-type": "Tipo de combustible",
+  "search.criteria.radius": "Radio",
+  "search.criteria.open-only": "Solo abiertas ahora",
+  "search.criteria.amenities": "Servicios",
+  "search.criteria.highway": "Estaciones de autopista",
+  "search.criteria.defaults": "Guardar como mis valores por defecto"
+}

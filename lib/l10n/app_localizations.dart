@@ -5510,6 +5510,24 @@ abstract class AppLocalizations {
   /// **'Explore with demo data'**
   String get onboardingExploreDemoData;
 
+  /// No description provided for @helpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Help'**
+  String get helpTitle;
+
+  /// No description provided for @helpOpenGuide.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the guide'**
+  String get helpOpenGuide;
+
+  /// Shown when the bundled guide asset cannot be read (#4007)
+  ///
+  /// In en, this message translates to:
+  /// **'The guide could not be loaded ({asset}).'**
+  String helpUnavailable(String asset);
+
   /// Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5).
   ///
   /// In en, this message translates to:

@@ -33,6 +33,65 @@ Die Beschriftung sagt, was passieren wird, und im Routenmodus bleibt der Button 
 | **Marken** | Auf bestimmte Ketten beschränken | Wird aus der aktuellen Ergebnismenge gezählt, ändert sich also mit dem Radius |
 | **Als Standard speichern** | Schreibt diese Kriterien ins Profil | Jede künftige Suche startet hier |
 
+<!-- anchor: search.criteria.button -->
+### Der Suchknopf
+
+Der erhöhte Knopf in der Mitte der unteren Leiste ist der einzige
+Suchauslöser. Aus jedem Tab öffnet er dieses Blatt; aus den Ergebnissen
+oder der Karte öffnet er es mit dem zuletzt Benutzten; im Blatt selbst
+startet er die Suche.
+
+<!-- anchor: search.criteria.mode -->
+### In der Nähe oder entlang einer Route
+
+Zwei verschiedene Fragen. **In der Nähe** sucht um deine Position oder
+eine Adresse. **Entlang der Route** braucht ein Ziel und misst die
+Entfernung entlang des Korridors statt Luftlinie — eine Tankstelle 2 km
+entfernt in einer Seitenstraße rangiert also hinter einer, die auf dem
+Weg liegt.
+
+<!-- anchor: search.criteria.fuel-type -->
+### Kraftstoffsorte
+
+Für welche Sorte die Preise gelten. Die Chips richten sich danach, was
+der Anbieter deines Landes tatsächlich veröffentlicht — eine fehlende
+Sorte fehlt in den Daten, nicht in der App.
+
+<!-- anchor: search.criteria.radius -->
+### Umkreis
+
+Wie weit gesucht wird. Ein großer Umkreis in einem dichten Land liefert
+sehr viele Tankstellen und eine langsamere Suche, und die zusätzlichen
+liegen meist weiter weg, als die Ersparnis wert ist.
+
+<!-- anchor: search.criteria.open-only -->
+### Nur jetzt geöffnet
+
+Blendet geschlossene Tankstellen aus. Das hängt davon ab, ob der Anbieter
+Öffnungszeiten veröffentlicht, und manche tun es nicht — fehlen sie, wird
+die Tankstelle behalten statt geraten.
+
+<!-- anchor: search.criteria.amenities -->
+### Ausstattung
+
+Shop, Waschanlage, Luft, WC. Diese filtern über **gemeldete** Daten: eine
+Tankstelle, die nichts über ihre Ausstattung veröffentlicht, verschwindet
+aus einer gefilterten Liste, auch wenn sie alles hat.
+
+<!-- anchor: search.criteria.highway -->
+### Autobahntankstellen
+
+Autobahntankstellen sind meist der teuerste Kraftstoff im Land — sie
+auszuschließen ist der eine Filter, der am häufigsten ändert, was du
+zahlst. Behalte sie, wenn du die Autobahn nicht verlassen kannst.
+
+<!-- anchor: search.criteria.defaults -->
+### Als meine Vorgaben speichern
+
+Schreibt diese Kriterien in dein Profil, sodass jede spätere Suche hier
+beginnt statt bei den Vorgaben der App. Diese Einstellung macht aus dem
+Blatt eine Bestätigung mit einem Tipp statt eines Formulars.
+
 ### Wie es tatsächlich funktioniert
 
 Eine Umkreissuche sendet **deine Koordinaten (oder einen Regionscode) und einen Radius** an den offiziellen Preisanbieter deines Landes — nie deine Identität. Länder mit täglicher Sammeldatei (Spanien, Italien) werden auf dem Gerät gefiltert; solche Suchen brauchen nach dem Zwischenspeichern gar keinen Netzaufruf mehr.

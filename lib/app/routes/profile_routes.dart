@@ -24,6 +24,7 @@ import '../../features/profile/presentation/screens/settings/radar_settings_scre
 import '../../features/profile/presentation/screens/settings/sync_account_screen.dart';
 import '../../features/profile/presentation/screens/settings/units_display_screen.dart';
 import '../../features/profile/presentation/screens/settings/vehicles_obd2_screen.dart';
+import '../../features/help/api.dart';
 import '../../features/profile/presentation/screens/theme_settings_screen.dart';
 import '../../features/vehicle/presentation/screens/edit_vehicle_screen.dart';
 import '../../features/vehicle/presentation/screens/vehicle_list_screen.dart';
@@ -155,5 +156,13 @@ List<RouteBase> get profileRoutes => [
       GoRoute(
         path: RoutePaths.settingsAbout,
         builder: (context, state) => const AboutScreen(),
+      ),
+      // #4007 — the bundled user guide. `?anchor=` names one object and
+      // the screen opens at that heading in the reader's language;
+      // without it the guide opens at the top.
+      GoRoute(
+        path: RoutePaths.help,
+        builder: (context, state) =>
+            HelpScreen(anchor: state.uri.queryParameters['anchor']),
       ),
     ];

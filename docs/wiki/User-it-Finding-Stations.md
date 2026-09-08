@@ -33,6 +33,65 @@ L'etichetta dice cosa farà, e in modalità itinerario resta disattivato finché
 | **Marche** | Limita a certe catene | Contate sull'insieme corrente di risultati, quindi l'elenco cambia col raggio |
 | **Salva come valori predefiniti** | Scrive questi criteri nel profilo | Ogni ricerca futura parte da qui |
 
+<!-- anchor: search.criteria.button -->
+### Il pulsante di ricerca
+
+Il pulsante in rilievo al centro della barra inferiore è l'unico
+attivatore della ricerca. Da qualsiasi scheda apre questo foglio; dai
+risultati o dalla mappa lo riapre con ciò che hai usato per ultimo; nel
+foglio stesso avvia la ricerca.
+
+<!-- anchor: search.criteria.mode -->
+### Nelle vicinanze o lungo un percorso
+
+Due domande diverse. **Nelle vicinanze** cerca attorno alla tua posizione
+o a un indirizzo. **Lungo il percorso** richiede una destinazione e
+misura la distanza lungo il corridoio anziché in linea d'aria: un
+distributore a 2 km in una via laterale finisce dietro a uno che è sulla
+tua strada.
+
+<!-- anchor: search.criteria.fuel-type -->
+### Tipo di carburante
+
+Per quale carburante sono i prezzi. I chip si adattano a ciò che il
+fornitore del tuo paese pubblica davvero — un carburante assente
+dall'elenco manca nei dati, non nell'app.
+
+<!-- anchor: search.criteria.radius -->
+### Raggio
+
+Fin dove cercare. Un raggio ampio in un paese denso restituisce moltissimi
+distributori e una ricerca più lenta, e quelli in più sono di solito più
+lontani di quanto valga il risparmio.
+
+<!-- anchor: search.criteria.open-only -->
+### Solo aperti adesso
+
+Nasconde i distributori chiusi. Dipende dal fornitore che pubblica o meno
+gli orari, e alcuni non lo fanno — quando mancano, il distributore viene
+mantenuto anziché indovinato.
+
+<!-- anchor: search.criteria.amenities -->
+### Servizi
+
+Negozio, autolavaggio, aria, WC. Questi filtri agiscono su dati
+**dichiarati**: un distributore che non pubblica nulla sui propri servizi
+sparisce da un elenco filtrato anche se li ha tutti.
+
+<!-- anchor: search.criteria.highway -->
+### Distributori autostradali
+
+I distributori autostradali sono di norma il carburante più caro del
+paese: escluderli è il filtro che più spesso cambia quanto paghi.
+Tienili quando non puoi lasciare l'autostrada.
+
+<!-- anchor: search.criteria.defaults -->
+### Salvare come miei valori predefiniti
+
+Scrive questi criteri nel tuo profilo, così ogni ricerca successiva parte
+da qui e non dai valori dell'app. È l'impostazione che rende il foglio
+una conferma in un tocco anziché un modulo.
+
 ### Come funziona davvero
 
 Una ricerca nelle vicinanze invia **le tue coordinate (o un codice di regione) e un raggio** al fornitore ufficiale del tuo paese — mai la tua identità. I paesi che pubblicano un file giornaliero (Spagna, Italia) sono filtrati sul dispositivo: quelle ricerche non richiedono alcuna chiamata di rete una volta messo in cache il file.

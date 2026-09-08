@@ -1,0 +1,10 @@
+{
+  "search.criteria.button": "Le bouton de recherche",
+  "search.criteria.mode": "À proximité ou le long d'un trajet",
+  "search.criteria.fuel-type": "Type de carburant",
+  "search.criteria.radius": "Rayon",
+  "search.criteria.open-only": "Ouvertes maintenant seulement",
+  "search.criteria.amenities": "Services",
+  "search.criteria.highway": "Stations d'autoroute",
+  "search.criteria.defaults": "Enregistrer comme mes valeurs par défaut"
+}

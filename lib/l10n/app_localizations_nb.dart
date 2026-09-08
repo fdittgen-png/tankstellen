@@ -2981,6 +2981,17 @@ class AppLocalizationsNb extends AppLocalizations {
   String get onboardingExploreDemoData => 'Utforsk med demodata';
 
   @override
+  String get helpTitle => 'Help';
+
+  @override
+  String get helpOpenGuide => 'Open the guide';
+
+  @override
+  String helpUnavailable(String asset) {
+    return 'The guide could not be loaded ($asset).';
+  }
+
+  @override
   String get achievementSmoothDriver => 'Jevn kjørerekke';
 
   @override

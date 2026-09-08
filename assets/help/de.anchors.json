@@ -1,0 +1,10 @@
+{
+  "search.criteria.button": "Der Suchknopf",
+  "search.criteria.mode": "In der Nähe oder entlang einer Route",
+  "search.criteria.fuel-type": "Kraftstoffsorte",
+  "search.criteria.radius": "Umkreis",
+  "search.criteria.open-only": "Nur jetzt geöffnet",
+  "search.criteria.amenities": "Ausstattung",
+  "search.criteria.highway": "Autobahntankstellen",
+  "search.criteria.defaults": "Als meine Vorgaben speichern"
+}
