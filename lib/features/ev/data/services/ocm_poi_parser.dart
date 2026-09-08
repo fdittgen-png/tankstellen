@@ -50,7 +50,7 @@ class OcmPoiParser {
       final lng = (addr['Longitude'] as num?)?.toDouble();
       if (lat == null || lng == null) return null;
 
-      final dist = _roundedDistance(searchLat, searchLng, lat, lng);
+      final dist = roundedDistanceKm(searchLat, searchLng, lat, lng);
 
       final stationId = 'ocm-${item['ID']}';
 
@@ -116,14 +116,6 @@ class OcmPoiParser {
       return null;
     }
   }
-
-  static double _roundedDistance(
-    double lat1,
-    double lng1,
-    double lat2,
-    double lng2,
-  ) =>
-      double.parse(distanceKm(lat1, lng1, lat2, lng2).toStringAsFixed(1));
 
   /// Map OpenChargeMap ConnectionTypeID to human-readable name.
   static String _mapConnectionType(int? typeId) => switch (typeId) {

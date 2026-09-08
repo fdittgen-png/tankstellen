@@ -23,6 +23,7 @@ import '../../../core/domain/opening_hours.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/utils/geo_utils.dart';
 import 'chile_opening_hours_adapter.dart';
+import '../../../core/utils/number_parsing.dart';
 
 /// CNE product keys → our canonical [FuelType].
 ///
@@ -118,8 +119,8 @@ Station? _parseOneStation(
   // CNE `ubicacion` holds `latitud` / `longitud`. Some mirrored feeds
   // use flat `latitud` / `longitud` on the station — accept both.
   final ubi = raw['ubicacion'];
-  final lat = _parseDouble(ubi is Map ? ubi['latitud'] : raw['latitud']);
-  final lng = _parseDouble(ubi is Map ? ubi['longitud'] : raw['longitud']);
+  final lat = parseLooseDouble(ubi is Map ? ubi['latitud'] : raw['latitud']);
+  final lng = parseLooseDouble(ubi is Map ? ubi['longitud'] : raw['longitud']);
   if (lat == null || lng == null) return null;
   if (lat == 0 && lng == 0) return null;
 
@@ -133,7 +134,7 @@ Station? _parseOneStation(
 
   final prices = _parsePrices(raw);
 
-  final distKm = _roundedDistance(fromLat, fromLng, lat, lng);
+  final distKm = roundedDistanceKm(fromLat, fromLng, lat, lng);
 
   // Stable 'cl-' prefix so the favorites currency lookup finds CL.
   final id = idRaw.startsWith('cl-') ? idRaw : 'cl-$idRaw';
@@ -220,17 +221,6 @@ double? _parsePesoPerLitre(dynamic raw) {
   return null;
 }
 
-double? _parseDouble(dynamic raw) {
-  if (raw == null) return null;
-  if (raw is num) return raw.toDouble();
-  if (raw is String) {
-    final t = raw.trim();
-    if (t.isEmpty) return null;
-    return double.tryParse(t);
-  }
-  return null;
-}
-
 Map<dynamic, dynamic>? _coerceMap(dynamic data) {
   if (data is Map) return data;
   return null;
@@ -271,10 +261,3 @@ bool _isOpen(Map<dynamic, dynamic> raw) {
   return true;
 }
 
-/// Haversine distance in km, rounded to one decimal — mirrors
-/// `StationServiceHelpers.roundedDistance` so the parser stays free of
-/// the mixin's HTTP/result-wrapping baggage.
-double _roundedDistance(double lat1, double lng1, double lat2, double lng2) {
-  final d = distanceKm(lat1, lng1, lat2, lng2);
-  return double.parse(d.toStringAsFixed(1));
-}

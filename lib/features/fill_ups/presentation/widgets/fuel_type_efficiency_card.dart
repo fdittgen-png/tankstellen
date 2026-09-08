@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/services/co2_calculator.dart';
-import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -15,6 +14,7 @@ import '../../domain/services/fuel_type_efficiency_aggregator.dart';
 import '../../providers/fuel_type_efficiency_provider.dart';
 import 'localized_fuel_name.dart';
 import '../../../../core/utils/unit_formatter.dart';
+import '../../../../core/widgets/metric_delta_arrow.dart';
 
 part 'fuel_type_efficiency_rows.dart';
 part 'fuel_type_efficiency_analysis.dart';

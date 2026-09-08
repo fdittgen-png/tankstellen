@@ -68,6 +68,12 @@ double distanceKm(double lat1, double lng1, double lat2, double lng2) {
 /// GPS-track and approach callers need a real distance even at the
 /// equator/prime meridian. Uses [earthRadiusMeters]; numerically
 /// identical to the per-feature copies it replaces (#2169).
+/// [distanceKm] rounded to one decimal — the figure a station list shows
+/// (#3983). This was copied verbatim into five parsers and the service
+/// mixin; it lives here once so "rounded to 0.1 km" has one definition.
+double roundedDistanceKm(double lat1, double lng1, double lat2, double lng2) =>
+    double.parse(distanceKm(lat1, lng1, lat2, lng2).toStringAsFixed(1));
+
 double distanceMeters(double lat1, double lng1, double lat2, double lng2) {
   final dLat = (lat2 - lat1) * pi / 180;
   final dLng = (lng2 - lng1) * pi / 180;

@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+
 part of 'fuel_type_efficiency_card.dart';
 
 /// One composition bucket's row: dominant-fuel icon + the language-neutral
@@ -100,7 +101,11 @@ class _BucketRow extends StatelessWidget {
                     value: costPerKm != null
                         ? PriceFormatter.formatPerKm(costPerKm)
                         : '—',
-                    trailing: _DeltaArrow(delta: delta),
+                    trailing: MetricDeltaArrow(
+                      delta: delta,
+                      flatBelow: 0.0005,
+                      size: 14,
+                    ),
                     emphasised: true,
                   ),
                   _MetricLine(
@@ -225,28 +230,6 @@ class _MetricLine extends StatelessWidget {
           SizedBox(width: 18, child: trailing),
         ],
       ],
-    );
-  }
-}
-
-/// Sentiment delta arrow for €/km (lowerIsBetter). Hidden when the delta is
-/// ~0 (the winner, or a tie). Up = costlier than the best (error colour);
-/// there is no "down" since the best is the baseline. Mirrors the delta
-/// arrow of `MonthlyMetricsTable` (`monthly_insights_table.dart`).
-class _DeltaArrow extends StatelessWidget {
-  final double delta;
-
-  const _DeltaArrow({required this.delta});
-
-  @override
-  Widget build(BuildContext context) {
-    if (delta.abs() < 0.0005) return const SizedBox.shrink();
-    final theme = Theme.of(context);
-    final up = delta > 0;
-    return Icon(
-      up ? Icons.arrow_upward : Icons.arrow_downward,
-      size: 14,
-      color: up ? theme.colorScheme.error : DarkModeColors.success(context),
     );
   }
 }
