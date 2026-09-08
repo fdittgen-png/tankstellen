@@ -33,6 +33,64 @@ O rótulo diz o que vai fazer, e no modo itinerário fica desativado até haver 
 | **Marcas** | Limitar a certas cadeias | Contadas sobre o conjunto atual de resultados, por isso a lista muda com o raio |
 | **Guardar como valores predefinidos** | Escreve estes critérios no perfil | Toda a pesquisa futura parte daqui |
 
+<!-- anchor: search.criteria.button -->
+### O botão de pesquisa
+
+O botão em relevo no meio da barra inferior é o único disparador de
+pesquisa. A partir de qualquer separador abre esta folha; a partir dos
+resultados ou do mapa reabre-a com o que usou por último; dentro da
+folha, lança a pesquisa.
+
+<!-- anchor: search.criteria.mode -->
+### Por perto ou ao longo de uma rota
+
+Duas perguntas diferentes. **Por perto** procura à volta da sua posição
+ou de uma morada. **Ao longo da rota** precisa de um destino e mede a
+distância ao longo do corredor e não em linha reta: um posto a 2 km numa
+rua lateral fica atrás de um que está no seu caminho.
+
+<!-- anchor: search.criteria.fuel-type -->
+### Tipo de combustível
+
+Para que combustível são os preços. Os chips adaptam-se ao que o
+fornecedor do seu país publica de facto — um combustível ausente da lista
+falta nos dados, não na aplicação.
+
+<!-- anchor: search.criteria.radius -->
+### Raio
+
+Até onde procurar. Um raio amplo num país denso devolve muitíssimos
+postos e uma pesquisa mais lenta, e os postos a mais estão normalmente
+mais longe do que vale a poupança.
+
+<!-- anchor: search.criteria.open-only -->
+### Apenas abertos agora
+
+Esconde os postos fechados. Depende de o fornecedor publicar horários, e
+alguns não publicam — quando faltam, o posto é mantido em vez de
+adivinhado.
+
+<!-- anchor: search.criteria.amenities -->
+### Serviços
+
+Loja, lavagem, ar, WC. Estes filtros agem sobre dados **declarados**: um
+posto que não publica nada sobre os seus serviços desaparece de uma lista
+filtrada mesmo que os tenha todos.
+
+<!-- anchor: search.criteria.highway -->
+### Postos de autoestrada
+
+Os postos de autoestrada são normalmente o combustível mais caro do país:
+excluí-los é o filtro que mais vezes muda o que paga. Mantenha-os quando
+não puder sair da autoestrada.
+
+<!-- anchor: search.criteria.defaults -->
+### Guardar como os meus valores predefinidos
+
+Escreve estes critérios no seu perfil, para que cada pesquisa seguinte
+comece aqui e não nos valores da aplicação. É a definição que torna a
+folha uma confirmação num toque em vez de um formulário.
+
 ### Como funciona de verdade
 
 Uma pesquisa por perto envia **as suas coordenadas (ou um código de região) e um raio** ao fornecedor oficial do seu país — nunca a sua identidade. Os países que publicam um ficheiro diário (Espanha, Itália) são filtrados no dispositivo: essas pesquisas não precisam de qualquer chamada de rede depois de o ficheiro estar em cache.

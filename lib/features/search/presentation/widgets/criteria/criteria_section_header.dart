@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../../core/help/help_dot.dart';
 import '../../../../../core/theme/app_text.dart';
 
 /// The criteria sheet's section heading (#3548, promoted to its own file
@@ -13,13 +14,24 @@ import '../../../../../core/theme/app_text.dart';
 /// ([AppText.title]): the name of the section, one per group, read
 /// before its chips. The old letter-spaced eyebrow was a fifth ad-hoc
 /// size; a sheet section names its role now, never its size.
+/// #4007 — a section that carries an [anchor] grows a `?` at the end of
+/// its heading, which opens the guide at exactly that control. Without
+/// one the header is unchanged, so a section is documented when its
+/// paragraph is written and not before.
 class CriteriaSectionHeader extends StatelessWidget {
-  const CriteriaSectionHeader(this.text, {super.key});
+  const CriteriaSectionHeader(this.text, {this.anchor, super.key});
 
   final String text;
+  final String? anchor;
 
   @override
   Widget build(BuildContext context) {
-    return Text(text, style: AppText.title(context));
+    final title = Text(text, style: AppText.title(context));
+    if (anchor case final anchor?) {
+      return Row(
+        children: [Flexible(child: title), HelpDot(anchor)],
+      );
+    }
+    return title;
   }
 }

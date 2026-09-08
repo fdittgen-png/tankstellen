@@ -1,0 +1,10 @@
+{
+  "search.criteria.button": "O botão de pesquisa",
+  "search.criteria.mode": "Por perto ou ao longo de uma rota",
+  "search.criteria.fuel-type": "Tipo de combustível",
+  "search.criteria.radius": "Raio",
+  "search.criteria.open-only": "Apenas abertos agora",
+  "search.criteria.amenities": "Serviços",
+  "search.criteria.highway": "Postos de autoestrada",
+  "search.criteria.defaults": "Guardar como os meus valores predefinidos"
+}

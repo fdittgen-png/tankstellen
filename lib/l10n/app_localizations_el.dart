@@ -3005,6 +3005,17 @@ class AppLocalizationsEl extends AppLocalizations {
   String get onboardingExploreDemoData => 'Εξερεύνηση με δοκιμαστικά δεδομένα';
 
   @override
+  String get helpTitle => 'Help';
+
+  @override
+  String get helpOpenGuide => 'Open the guide';
+
+  @override
+  String helpUnavailable(String asset) {
+    return 'The guide could not be loaded ($asset).';
+  }
+
+  @override
   String get achievementSmoothDriver => 'Σερί ομαλής οδήγησης';
 
   @override

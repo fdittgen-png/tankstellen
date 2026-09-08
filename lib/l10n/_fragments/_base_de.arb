@@ -1196,5 +1196,8 @@
   "obd2ErrorProtocolInitFailed": "Der OBD2-Adapter hat eine unbekannte Antwort gesendet. Er ist möglicherweise nicht kompatibel — probiere einen anderen Adapter.",
   "obd2ErrorDisconnected": "Der OBD2-Adapter wurde getrennt. Stelle die Verbindung wieder her und versuche es erneut.",
   "obd2ErrorPairingRequired": "Der Adapter benötigt eine Bluetooth-Koppelung. Ziehe den Adapter ab, stecke ihn wieder ein und versuche es innerhalb von 5 Minuten erneut.",
-  "onboardingExploreDemoData": "Mit Demodaten erkunden"
+  "onboardingExploreDemoData": "Mit Demodaten erkunden",
+  "helpTitle": "Hilfe",
+  "helpOpenGuide": "Anleitung öffnen",
+  "helpUnavailable": "Die Anleitung konnte nicht geladen werden ({asset})."
 }

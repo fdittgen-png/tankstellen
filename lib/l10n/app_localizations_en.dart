@@ -2971,6 +2971,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingExploreDemoData => 'Explore with demo data';
 
   @override
+  String get helpTitle => 'Help';
+
+  @override
+  String get helpOpenGuide => 'Open the guide';
+
+  @override
+  String helpUnavailable(String asset) {
+    return 'The guide could not be loaded ($asset).';
+  }
+
+  @override
   String get achievementSmoothDriver => 'Smooth streak';
 
   @override
@@ -11975,6 +11986,17 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get onboardingExploreDemoData => '⟦Éẋƥłóřé ŵîŧĥ đéɱó đáŧá ·········⟧';
+
+  @override
+  String get helpTitle => '⟦Ĥéłƥ ··⟧';
+
+  @override
+  String get helpOpenGuide => '⟦Óƥéñ ŧĥé ǧúîđé ·····⟧';
+
+  @override
+  String helpUnavailable(String asset) {
+    return '⟦Ŧĥé ǧúîđé çóúłđ ñóŧ ƀé łóáđéđ ($asset). ···········⟧';
+  }
 
   @override
   String get achievementSmoothDriver => '⟦Šɱóóŧĥ šŧřéáķ ·····⟧';

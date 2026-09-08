@@ -2996,6 +2996,17 @@ class AppLocalizationsSk extends AppLocalizations {
   String get onboardingExploreDemoData => 'Preskúmať s ukážkovými údajmi';
 
   @override
+  String get helpTitle => 'Help';
+
+  @override
+  String get helpOpenGuide => 'Open the guide';
+
+  @override
+  String helpUnavailable(String asset) {
+    return 'The guide could not be loaded ($asset).';
+  }
+
+  @override
   String get achievementSmoothDriver => 'Séria plynulej jazdy';
 
   @override

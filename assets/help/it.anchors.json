@@ -1,0 +1,10 @@
+{
+  "search.criteria.button": "Il pulsante di ricerca",
+  "search.criteria.mode": "Nelle vicinanze o lungo un percorso",
+  "search.criteria.fuel-type": "Tipo di carburante",
+  "search.criteria.radius": "Raggio",
+  "search.criteria.open-only": "Solo aperti adesso",
+  "search.criteria.amenities": "Servizi",
+  "search.criteria.highway": "Distributori autostradali",
+  "search.criteria.defaults": "Salvare come miei valori predefiniti"
+}

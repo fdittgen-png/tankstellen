@@ -147,6 +147,7 @@ dependencies:
   # gmsExcludeGroups + scripts/audit_no_gms.sh). The service therefore
   # swallows every error so the libre build simply no-ops.
   in_app_review: ^2.0.12
+  markdown_widget: ^2.3.2+8
 
 dev_dependencies:
   flutter_test:
@@ -221,6 +222,10 @@ flutter:
     # rootBundle. `tanksync_config.json` is the only runtime-loaded file
     # at the assets/ root, so it is listed explicitly.
     - assets/tanksync_config.json
+    # #4007 — the user guide, compiled from docs/wiki by
+    # `dart run tool/build_help.dart`: one document plus its anchor map
+    # per wiki language. GENERATED — edit the wiki pages, not these.
+    - assets/help/
     # #3940 — free-licensed brand logos (public domain / CC-BY / CC-BY-SA)
     # fetched from Wikimedia Commons by `tool/fetch_brand_logos.dart`. The
     # directory is listed as a whole because its contents are GENERATED:

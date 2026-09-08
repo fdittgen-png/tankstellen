@@ -17,6 +17,8 @@ import '../../providers/search_provider.dart';
 import '../../providers/search_screen_ui_provider.dart';
 import 'amenity_filter_wrap.dart';
 import 'brand_filter_chips.dart';
+import '../../../../core/help/help_anchors.dart';
+import '../../../../core/help/help_dot.dart';
 import 'criteria/criteria_section_header.dart';
 import 'fuel_type_selector.dart';
 import 'location_input.dart' show LocationInput, LocationInputWidgetState;
@@ -116,17 +118,25 @@ class SearchCriteriaForm extends ConsumerWidget {
             RouteInput(key: routeInputKey, onSearch: onRouteSearch),
           ],
           const SizedBox(height: 8),
-          CriteriaSectionHeader(l10n.fuelType),
+          CriteriaSectionHeader(l10n.fuelType,
+              anchor: HelpAnchor.searchFuelType),
           const SizedBox(height: 4),
           const FuelTypeSelector(),
           const SizedBox(height: 8),
           // #2592 — the radius is meaningless along a route; route mode
           // surfaces the route-planning params instead.
           if (mode == SearchMode.nearby)
-            SearchRadiusSlider(
-              radiusKm: radius,
-              onChanged: (value) =>
-                  ref.read(searchRadiusProvider.notifier).set(value),
+            Row(
+              children: [
+                Expanded(
+                  child: SearchRadiusSlider(
+                    radiusKm: radius,
+                    onChanged: (value) =>
+                        ref.read(searchRadiusProvider.notifier).set(value),
+                  ),
+                ),
+                const HelpDot(HelpAnchor.searchRadius),
+              ],
             )
           else if (mode == SearchMode.route)
             const RoutePlanningControls(),
@@ -138,11 +148,15 @@ class SearchCriteriaForm extends ConsumerWidget {
             onChanged: (value) {
               ref.read(openOnlyFilterProvider.notifier).set(value);
             },
-            title: Text(l10n.openOnlyFilter),
+            title: HelpDotTitle(
+              l10n.openOnlyFilter,
+              HelpAnchor.searchOpenOnly,
+            ),
             secondary: const Icon(Icons.schedule),
           ),
           const SizedBox(height: 4),
-          CriteriaSectionHeader(l10n.amenities),
+          CriteriaSectionHeader(l10n.amenities,
+              anchor: HelpAnchor.searchAmenities),
           const SizedBox(height: 4),
           AmenityFilterWrap(
             selected: amenities,

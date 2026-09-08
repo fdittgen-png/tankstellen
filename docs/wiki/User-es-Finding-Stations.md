@@ -33,6 +33,64 @@ Su etiqueta dice lo que hará, y en modo ruta permanece desactivado hasta que ha
 | **Marcas** | Limitar a ciertas cadenas | Se cuentan sobre el conjunto actual de resultados, así que la lista cambia con el radio |
 | **Guardar como valores predeterminados** | Escribe estos criterios en el perfil | Toda búsqueda futura parte de aquí |
 
+<!-- anchor: search.criteria.button -->
+### El botón de búsqueda
+
+El botón elevado en el centro de la barra inferior es el único
+disparador de búsqueda. Desde cualquier pestaña abre esta hoja; desde
+los resultados o el mapa la reabre con lo último que usó; dentro de la
+hoja, lanza la búsqueda.
+
+<!-- anchor: search.criteria.mode -->
+### Cerca o a lo largo de una ruta
+
+Dos preguntas distintas. **Cerca** busca alrededor de su posición o de
+una dirección. **A lo largo de la ruta** necesita un destino y mide la
+distancia a lo largo del corredor, no en línea recta: una estación a 2 km
+por una calle lateral queda detrás de una que está de camino.
+
+<!-- anchor: search.criteria.fuel-type -->
+### Tipo de combustible
+
+Para qué combustible son los precios. Los chips se adaptan a lo que
+publica realmente el proveedor de su país — un combustible ausente de la
+lista falta en los datos, no en la app.
+
+<!-- anchor: search.criteria.radius -->
+### Radio
+
+Hasta dónde buscar. Un radio amplio en un país denso devuelve muchísimas
+estaciones y una búsqueda más lenta, y las estaciones de más suelen estar
+más lejos de lo que vale el ahorro.
+
+<!-- anchor: search.criteria.open-only -->
+### Solo abiertas ahora
+
+Oculta las estaciones cerradas. Depende de que el proveedor publique
+horarios, y algunos no lo hacen — cuando faltan, la estación se conserva
+en vez de adivinarse.
+
+<!-- anchor: search.criteria.amenities -->
+### Servicios
+
+Tienda, lavado, aire, WC. Estos filtros actúan sobre datos
+**declarados**: una estación que no publica nada sobre sus servicios
+desaparece de una lista filtrada aunque los tenga todos.
+
+<!-- anchor: search.criteria.highway -->
+### Estaciones de autopista
+
+Las estaciones de autopista suelen ser el combustible más caro del país:
+excluirlas es el filtro que más a menudo cambia lo que paga.
+Consérvelas cuando no pueda salir de la autopista.
+
+<!-- anchor: search.criteria.defaults -->
+### Guardar como mis valores por defecto
+
+Escribe estos criterios en su perfil, de modo que cada búsqueda posterior
+empiece aquí y no en los valores de la app. Es el ajuste que convierte la
+hoja en una confirmación de un toque en vez de un formulario.
+
 ### Cómo funciona de verdad
 
 Una búsqueda cercana envía **tus coordenadas (o un código de región) y un radio** al proveedor oficial de tu país — nunca tu identidad. Los países que publican un fichero diario (España, Italia) se filtran en el dispositivo: esas búsquedas no necesitan ninguna llamada de red una vez cacheado el fichero.

@@ -47,6 +47,10 @@ abstract final class RoutePaths {
   static const itineraries = '/itineraries';
   static const privacyDashboard = '/privacy-dashboard';
   static const themeSettings = '/theme-settings';
+
+  /// #4007 — the bundled user guide. `?anchor=` opens it at one
+  /// object; without it the guide opens at the top.
+  static const help = '/help';
   static const loyaltySettings = '/loyalty-settings';
   static const developerTools = '/developer-tools';
   static const developerToolsErrorLog = '/developer-tools/error-log';

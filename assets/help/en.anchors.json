@@ -1,0 +1,10 @@
+{
+  "search.criteria.button": "The search button",
+  "search.criteria.mode": "Nearby or along a route",
+  "search.criteria.fuel-type": "Fuel type",
+  "search.criteria.radius": "Radius",
+  "search.criteria.open-only": "Open now only",
+  "search.criteria.amenities": "Amenities",
+  "search.criteria.highway": "Motorway stations",
+  "search.criteria.defaults": "Save as my defaults"
+}

@@ -3003,6 +3003,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String get onboardingExploreDemoData => 'Explorar com dados de demonstração';
 
   @override
+  String get helpTitle => 'Help';
+
+  @override
+  String get helpOpenGuide => 'Open the guide';
+
+  @override
+  String helpUnavailable(String asset) {
+    return 'The guide could not be loaded ($asset).';
+  }
+
+  @override
   String get achievementSmoothDriver => 'Sequência suave';
 
   @override
