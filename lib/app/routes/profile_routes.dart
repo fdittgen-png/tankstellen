@@ -69,14 +69,6 @@ List<RouteBase> get profileRoutes => [
         path: RoutePaths.themeSettings,
         builder: (context, state) => const ThemeSettingsScreen(),
       ),
-      // #4007 — the bundled user guide. `?anchor=` names one object and
-      // the screen opens at that heading in the reader's language;
-      // without it the guide opens at the top.
-      GoRoute(
-        path: RoutePaths.help,
-        builder: (context, state) =>
-            HelpScreen(anchor: state.uri.queryParameters['anchor']),
-      ),
       // #1120 — fuel-club / loyalty discount settings. Pilot ships
       // with one brand (Total Energies); the screen lists, adds,
       // toggles, and deletes user-entered cards.
@@ -164,5 +156,13 @@ List<RouteBase> get profileRoutes => [
       GoRoute(
         path: RoutePaths.settingsAbout,
         builder: (context, state) => const AboutScreen(),
+      ),
+      // #4007 — the bundled user guide. `?anchor=` names one object and
+      // the screen opens at that heading in the reader's language;
+      // without it the guide opens at the top.
+      GoRoute(
+        path: RoutePaths.help,
+        builder: (context, state) =>
+            HelpScreen(anchor: state.uri.queryParameters['anchor']),
       ),
     ];
