@@ -889,8 +889,8 @@ that, sharing one walker (`test/lint/design_system_scan.dart`):
 |---|---|---|---|
 | `no_raw_card_in_widgets_test.dart` | raw `Card(` → `PrimaryCard` / `PanelCard` | widgets | 78 |
 | `no_inline_title_theme_in_widgets_test.dart` | `textTheme.title*` / `headlineSmall` → `AppText` role or `SectionHeader` | widgets | 106 |
-| `no_hard_font_size_test.dart` | `fontSize:` → a type role (scales with the text-size setting) | screens + widgets | 87 |
-| `no_named_colors_test.dart` | `Colors.<named>` → `colorScheme` / semantic roles / price-band ramp | screens + widgets | 93 |
+| `no_hard_font_size_test.dart` | `fontSize:` → a type role (scales with the text-size setting) | screens + widgets | 83 (#3994) |
+| `no_named_colors_test.dart` | `Colors.<named>` → `colorScheme` / semantic roles / price-band ramp | screens + widgets | 89 (#3994) |
 
 Unlike the allow-listed screen scans, these pin a **decrease-only numeric
 baseline** (the `no_hardcoded_ui_strings` rule): going above fails the

@@ -86,10 +86,14 @@ class _DrivingModeScreenState extends ConsumerState<DrivingModeScreen> {
     final stations = ref.watch(fuelStationsProvider);
 
     return Scaffold(
-      body: GestureDetector(
+      // #3994 — a Listener, not a GestureDetector: this only resets the
+      // inactivity timer, it is not a control. A GestureDetector here
+      // registered a screen-sized tappable node with no label, which the
+      // labeled-tap-target guideline (and a screen reader) reads as one
+      // giant unnamed button over the whole map.
+      body: Listener(
         behavior: HitTestBehavior.translucent,
-        onTap: _onUserInteraction,
-        onPanDown: (_) => _onUserInteraction(),
+        onPointerDown: (_) => _onUserInteraction(),
         child: Stack(
           children: [
             DrivingMapView(
