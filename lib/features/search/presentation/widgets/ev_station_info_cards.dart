@@ -10,6 +10,8 @@ import '../../../../core/domain/ev/charging_station.dart';
 import '../../../../core/domain/ev/ev_access_cost.dart';
 import '../../../../core/domain/ev/ev_price.dart';
 import 'ev_connector_tile.dart';
+import '../../../../core/widgets/panel_card.dart';
+import '../../../../core/theme/app_text.dart';
 
 /// Address card for an EV charging station.
 class EVAddressCard extends StatelessWidget {
@@ -22,44 +24,42 @@ class EVAddressCard extends StatelessWidget {
     final theme = Theme.of(context);
     final postCode = station.postCode ?? '';
     final place = station.place ?? '';
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.place, size: 20),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    station.address ?? '',
-                    style: theme.textTheme.bodyLarge,
-                  ),
-                ),
-              ],
-            ),
-            if (postCode.isNotEmpty || place.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(left: 28),
+    return PanelCard(
+      margin: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.place, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
                 child: Text(
-                  '$postCode $place'.trim(),
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
+                  station.address ?? '',
+                  style: theme.textTheme.bodyLarge,
                 ),
               ),
-            const SizedBox(height: 8),
+            ],
+          ),
+          if (postCode.isNotEmpty || place.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(left: 28),
               child: Text(
-                PriceFormatter.formatDistance(station.dist),
-                style: theme.textTheme.bodySmall,
+                '$postCode $place'.trim(),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
-          ],
-        ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.only(left: 28),
+            child: Text(
+              PriceFormatter.formatDistance(station.dist),
+              style: theme.textTheme.bodySmall,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -80,35 +80,31 @@ class EVConnectorsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.electrical_services, color: evColor, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  l10n.evConnectors(station.totalPoints),
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            ...station.connectors.map((c) => EVConnectorTile(connector: c)),
-            if (station.connectors.isEmpty)
+    return PanelCard(
+      margin: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.electrical_services, color: evColor, size: 20),
+              const SizedBox(width: 8),
               Text(
-                l10n.evNoConnectors,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
+                l10n.evConnectors(station.totalPoints),
+                style: AppText.title(context),
               ),
-          ],
-        ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ...station.connectors.map((c) => EVConnectorTile(connector: c)),
+          if (station.connectors.isEmpty)
+            Text(
+              l10n.evNoConnectors,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -150,45 +146,44 @@ class EVPricingCard extends StatelessWidget {
     // price) and always carries the operator-declared disclaimer so it
     // can never masquerade as a verified comparison price.
     if (cost.isKnown || hasUsageCost) {
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.payments, color: evColor, size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    l10n.evUsageCost,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              if (cost.isKnown) ...[
-                const SizedBox(height: 12),
-                _EvPriceBadge(kind: cost.kind),
+      return PanelCard(
+        margin: EdgeInsets.zero,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.payments, color: evColor, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  l10n.evUsageCost,
+                  style: AppText.title(context),
+                ),
               ],
-              if (hasUsageCost) ...[
-                // #2616 — when the raw text parses to a structured per-kWh /
-                // per-session amount, surface it as a prominent labelled line
-                // (prefixed with the "Indicative price" qualifier) ABOVE the
-                // neutral raw text. Free / unparseable strings leave
-                // [priceLabel] null and skip straight to the raw rendering.
-                if (priceLabel != null) ...[
-                  const SizedBox(height: 12),
-                  Text(
-                    '${l10n.evPriceIndicative}: '
-                    '$priceLabel',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: evColor,
-                    ),
-                  ),
-                ],
+            ),
+            if (cost.isKnown) ...[
+              const SizedBox(height: 12),
+              _EvPriceBadge(kind: cost.kind),
+            ],
+            if (hasUsageCost) ...[
+              // #2616 — when the raw text parses to a structured per-kWh /
+              // per-session amount, surface it as a prominent labelled line
+              // (prefixed with the "Indicative price" qualifier) ABOVE the
+              // neutral raw text. Free / unparseable strings leave
+              // [priceLabel] null and skip straight to the raw rendering.
+              if (priceLabel != null) ...[
+                const SizedBox(height: 12),
+                // #3992 — the page's one display-role number, under its
+                // label, per the focal-number rule.
+                Text(l10n.evPriceIndicative, style: AppText.label(context)),
+                Text(
+                  priceLabel,
+                  style: AppText.display(context).copyWith(color: evColor),
+                ),
+              ],
+              // #3992 — not a second copy of the focal number: the raw
+              // string shows only when it says more than the parsed amount.
+              if (priceLabel == null || usageCost.trim() != priceLabel) ...[
                 const SizedBox(height: 12),
                 Text(
                   usageCost,
@@ -196,33 +191,23 @@ class EVPricingCard extends StatelessWidget {
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
+              ],
+              const SizedBox(height: 4),
+              Text(
+                l10n.evPriceDeclaredByOperator,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+              // #2616 — best-effort attribution for OCM-sourced pricing. The
+              // IRVE line (below) and this caption are mutually exclusive:
+              // IRVE stations carry the IRVE attribution, every other usage-
+              // cost station gets this best-effort line.
+              if (!station.isFranceIrveEnriched) ...[
                 const SizedBox(height: 4),
                 Text(
-                  l10n.evPriceDeclaredByOperator,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-                // #2616 — best-effort attribution for OCM-sourced pricing. The
-                // IRVE line (below) and this caption are mutually exclusive:
-                // IRVE stations carry the IRVE attribution, every other usage-
-                // cost station gets this best-effort line.
-                if (!station.isFranceIrveEnriched) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    l10n.evPriceBestEffortOcm,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ],
-              ],
-              if (station.isFranceIrveEnriched) ...[
-                const SizedBox(height: 8),
-                Text(
-                  l10n.evPriceFranceAttribution,
+                  l10n.evPriceBestEffortOcm,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                     fontStyle: FontStyle.italic,
@@ -230,12 +215,24 @@ class EVPricingCard extends StatelessWidget {
                 ),
               ],
             ],
-          ),
+            if (station.isFranceIrveEnriched) ...[
+              const SizedBox(height: 8),
+              Text(
+                l10n.evPriceFranceAttribution,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+          ],
         ),
       );
     }
 
-    return Card(
+    return PanelCard(
+      margin: EdgeInsets.zero,
+      padding: EdgeInsets.zero,
       child: ListTile(
         leading: Icon(Icons.payments, color: theme.colorScheme.outline),
         title: Text(l10n.evUsageCost),
@@ -326,43 +323,41 @@ class EVLastUpdatedCard extends StatelessWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.update, size: 20),
-                const SizedBox(width: 8),
-                Text(l10n.evLastUpdated),
-                const Spacer(),
-                Text(
-                  station.updatedAt ?? (l10n.evUnknown),
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+    return PanelCard(
+      margin: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.update, size: 20),
+              const SizedBox(width: 8),
+              Text(l10n.evLastUpdated),
+              const Spacer(),
+              Text(
+                station.updatedAt ?? (l10n.evUnknown),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
                 ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              l10n.evDataAttribution,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-                fontStyle: FontStyle.italic,
               ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            l10n.evDataAttribution,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              fontStyle: FontStyle.italic,
             ),
-            const SizedBox(height: 4),
-            Text(
-              l10n.evStatusDisclaimer,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            l10n.evStatusDisclaimer,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

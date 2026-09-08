@@ -271,8 +271,11 @@ void main() {
       // A prominent labelled line carries the "Indicative price" qualifier +
       // the parsed amount + the /kWh unit (the raw "0.49 EUR/kWh" text also
       // renders below it, hence the precise structured-line match here).
+      // #3992 — the qualifier is its own label line and the amount is the
+      // card's display-role number, so they are two Texts now.
+      expect(find.text('Indicative price'), findsOneWidget);
       expect(
-        find.text('Indicative price: 0.49 EUR/kWh'),
+        find.text('0.49 EUR/kWh'),
         findsOneWidget,
       );
       // Both the structured line and the raw text contain the amount + unit.

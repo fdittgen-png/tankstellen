@@ -50,7 +50,6 @@ void main() {
       // - price_history_screen.dart  : per-fuel-type chart card.
       // - profile_screen.dart        : profile header card.
       // - theme_settings_screen.dart : theme-preview card.
-      // - search/ev_station_detail_screen.dart : rating tile card.
       // - sync/auth_screen.dart      : account-mode card.
       const allowlist = <String>{
         'lib/features/consent/presentation/screens/gdpr_consent_screen.dart',
@@ -60,7 +59,6 @@ void main() {
         'lib/features/price_history/presentation/screens/price_history_screen.dart',
         'lib/features/profile/presentation/screens/profile_screen.dart',
         'lib/features/profile/presentation/screens/theme_settings_screen.dart',
-        'lib/features/search/presentation/screens/ev_station_detail_screen.dart',
         'lib/features/sync/presentation/screens/auth_screen.dart',
       };
 
