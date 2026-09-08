@@ -126,4 +126,11 @@ class DarkModeColors {
       Theme.of(context).brightness == Brightness.dark
           ? Colors.black.withValues(alpha: 0.4)
           : Colors.black.withValues(alpha: 0.15);
+
+  /// Foreground for text and icons drawn over `ColorScheme.scrim`
+  /// (#3994). A scrim is dark in BOTH brightness modes — Material gives it
+  /// no `onScrim` role — so its foreground is light in both; this is the
+  /// one place that fact lives, instead of a `Colors.white` literal in a
+  /// feature widget.
+  static Color scrimForeground(BuildContext context) => Colors.white;
 }

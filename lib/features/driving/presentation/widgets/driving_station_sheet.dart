@@ -92,7 +92,15 @@ class DrivingStationSheet extends StatelessWidget {
             child: FilledButton.icon(
               onPressed: () => _launchNavigation(context),
               icon: const Icon(Icons.navigation, size: 28),
-              label: Text(l10n.navigate, style: const TextStyle(fontSize: 20)),
+              // #3994 — a type role, not a literal, so the in-car primary
+              // action grows with the text-size setting. headlineMedium is
+              // the big-glanceable role (headlineSmall is a heading role).
+              label: Text(
+                l10n.navigate,
+                style: theme.textTheme.headlineMedium!.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ),
         ],

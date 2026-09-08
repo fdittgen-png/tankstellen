@@ -58,8 +58,9 @@ class DrivingTopBar extends StatelessWidget {
               ),
               child: Text(
                 selectedFuel.displayName,
-                style: TextStyle(
-                  fontSize: 14,
+                // #3994 — labelLarge is the 14 sp role; unlike a literal it
+                // follows the text-size setting.
+                style: theme.textTheme.labelLarge!.copyWith(
                   fontWeight: FontWeight.w600,
                   color: theme.colorScheme.onPrimaryContainer,
                 ),

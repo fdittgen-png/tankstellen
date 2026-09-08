@@ -11,6 +11,9 @@ import 'package:tankstellen/core/telemetry/storage/trace_storage.dart';
 import 'package:tankstellen/features/calculator/presentation/screens/calculator_screen.dart';
 import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/consumption_screen.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/features/driving/presentation/screens/driving_mode_screen.dart';
+import 'package:tankstellen/features/driving/presentation/widgets/driving_station_sheet.dart';
 import 'package:tankstellen/features/fill_ups/providers/consumption_providers.dart';
 import 'package:tankstellen/features/favorites/presentation/screens/favorites_screen.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
@@ -25,6 +28,7 @@ import 'package:tankstellen/features/sync/presentation/screens/sync_setup_screen
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../features/profile/presentation/screens/settings/privacy/privacy_test_support.dart';
+import '../fixtures/stations.dart';
 import '../helpers/mock_providers.dart';
 
 /// A fixed ActiveLanguage notifier for testing.
@@ -390,6 +394,83 @@ void main() {
         final handle = tester.ensureSemantics();
         await _pumpScreen(tester, const PrivacyDataScreen(),
             overrides: overrides());
+
+        await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+        handle.dispose();
+      });
+    });
+
+    // -----------------------------------------------------------------------
+    // DrivingModeScreen + DrivingStationSheet (#3994, Epic #3953)
+    //
+    // The one surface built entirely around tap targets and glanceability
+    // had never been registered here, so neither guideline had ever run
+    // against it. Strict (`meetsGuideline`), not report-only: its buttons
+    // are 72 dp by design, so any violation is a real defect.
+    // -----------------------------------------------------------------------
+    group('DrivingModeScreen', () {
+      List<Object> overrides() {
+        final test = standardTestOverrides();
+        return [
+          ...test.overrides,
+          searchStateProvider.overrideWith(() => _EmptySearchState()),
+        ];
+      }
+
+      testWidgets('meets Android tap target guideline', (tester) async {
+        final handle = tester.ensureSemantics();
+        await _pumpScreen(tester, const DrivingModeScreen(),
+            overrides: overrides());
+
+        await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+        handle.dispose();
+      });
+
+      testWidgets('every tappable of OURS has a semantic label — only the '
+          'flutter_map canvas may not', (tester) async {
+        final handle = tester.ensureSemantics();
+        await _pumpScreen(tester, const DrivingModeScreen(),
+            overrides: overrides());
+
+        // flutter_map's gesture layer registers one screen-sized node with
+        // tap + longPress + scroll actions and no label. That is upstream
+        // and is why no map screen is under the strict form of this
+        // guideline. Pin it as the ONLY permitted violation: a second
+        // unlabeled tappable (the screen used to wrap everything in a
+        // GestureDetector for the inactivity timer) fails here.
+        final result = await labeledTapTargetGuideline.evaluate(tester);
+        final reason = result.reason ?? '';
+        final violations = 'SemanticsNode#'.allMatches(reason).length;
+        expect(violations, lessThanOrEqualTo(1),
+            reason: 'an unlabeled tappable that is not the map canvas: '
+                '$reason');
+        if (!result.passed) {
+          expect(reason, contains('scrollDown'),
+              reason: 'the one permitted violation is the scrollable map '
+                  'canvas, not a button of ours: $reason');
+        }
+        handle.dispose();
+      });
+    });
+
+    group('DrivingStationSheet', () {
+      const sheet = Scaffold(
+        body: DrivingStationSheet(station: testStation, fuelType: FuelType.e10),
+      );
+
+      testWidgets('meets Android tap target guideline', (tester) async {
+        final handle = tester.ensureSemantics();
+        await _pumpScreen(tester, sheet,
+            overrides: standardTestOverrides().overrides);
+
+        await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+        handle.dispose();
+      });
+
+      testWidgets('meets labeled tap target guideline', (tester) async {
+        final handle = tester.ensureSemantics();
+        await _pumpScreen(tester, sheet,
+            overrides: standardTestOverrides().overrides);
 
         await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
         handle.dispose();

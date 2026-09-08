@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Bottom bar with 3 oversized buttons for driving mode.
@@ -40,7 +42,9 @@ class DrivingBottomBar extends StatelessWidget {
         ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
+            // #3994 — the bar floats over the map: use the map-overlay
+            // shadow role, tuned per brightness, instead of a literal.
+            color: DarkModeColors.mapOverlayShadow(context),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),
@@ -113,8 +117,9 @@ class _DrivingButton extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   label,
-                  style: TextStyle(
-                    fontSize: 12,
+                  // #3994 — labelMedium is the 12 sp role and scales with
+                  // the text-size setting; the colour is the action's own.
+                  style: theme.textTheme.labelMedium!.copyWith(
                     fontWeight: FontWeight.w600,
                     color: color,
                   ),
