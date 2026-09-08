@@ -1,9 +1,9 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../domain/obd2_connection_errors.dart';
 
@@ -36,6 +36,5 @@ void recordObd2ConnectFailure(
     );
     return;
   }
-  unawaited(errorLogger.log(ErrorLayer.ui, error, stack,
-      context: {'where': where}));
+  log.error(error, stack, layer: ErrorLayer.ui, context: {'where': where});
 }

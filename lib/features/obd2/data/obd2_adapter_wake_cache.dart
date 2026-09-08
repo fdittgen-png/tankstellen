@@ -5,6 +5,7 @@ import 'dart:async';
 
 import '../../../core/data/storage_repository.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import 'protocol/elm327_adapter.dart';
 import 'session/obd2_service.dart';
 
@@ -120,9 +121,9 @@ class Obd2AdapterWakeCache {
   }
 
   void _logFailure(String op, Object e, StackTrace st) {
-    unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {
+    log.error(e, st, layer: ErrorLayer.storage, context: {
       'where': 'Obd2AdapterWakeCache $op failed',
-    }));
+    });
   }
 
   /// Every MAC the cache has observed, keyed by its normalised MAC with

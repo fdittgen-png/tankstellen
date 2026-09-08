@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import '../../trips/api.dart';
 import 'paused_trip_repository.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 
 /// Launch-time recovery for paused-but-never-finalised trips
 /// (#1004 phase 4-WAL).
@@ -91,7 +92,7 @@ class PausedTripRecoveryService {
     try {
       entries = _pausedRepo.loadAll();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'PausedTripRecoveryService loadAll failed'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'PausedTripRecoveryService loadAll failed'});
       return 0;
     }
     if (entries.isEmpty) return 0;

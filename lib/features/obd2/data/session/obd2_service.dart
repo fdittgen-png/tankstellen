@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
@@ -36,6 +35,7 @@ import '../supported_pids_cache.dart';
 import '../protocol/supported_pids_probe.dart' show kObd2ProtocolSearchTimeout;
 import 'supported_pids_resolver.dart';
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/logging/app_log.dart';
 import '../../../../core/telemetry/health_counters.dart';
 
 // #3035 — re-export the tri-state `0100` probe outcome so the connection

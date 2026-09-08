@@ -25,6 +25,7 @@ import 'obd2_scan_error_state.dart';
 import '../obd2_connection_error_l10n.dart';
 import '../obd2_connect_telemetry.dart';
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/logging/app_log.dart';
 
 part 'obd2_adapter_picker_body.dart';
 part 'obd2_adapter_picker_flow.dart';

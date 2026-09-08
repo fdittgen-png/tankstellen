@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/logging/app_log.dart';
 import '../auto_record_trace_log.dart';
 import 'auto_trip_contracts.dart';
 import 'obd2_link_supervisor.dart';
@@ -197,7 +198,7 @@ class AutoTripSessionOpener {
         try {
           await service.disconnect();
         } catch (e, st) {
-          unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'AutoTripCoordinator: drop-orphan disconnect failed'}));
+          log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'AutoTripCoordinator: drop-orphan disconnect failed'});
         }
       }
       return;
@@ -265,9 +266,9 @@ class AutoTripSessionOpener {
     try {
       await service.tuneLinkForBackground();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.background, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.background, context: const {
         'where': 'AutoTripCoordinator: tuneLinkForBackground failed',
-      }));
+      });
     }
   }
 
@@ -278,9 +279,9 @@ class AutoTripSessionOpener {
     try {
       await service.tuneLinkForRecording();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.background, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.background, context: const {
         'where': 'AutoTripCoordinator: tuneLinkForRecording failed',
-      }));
+      });
     }
   }
 
@@ -394,7 +395,7 @@ class AutoTripSessionOpener {
     try {
       await held.disconnect();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'AutoTripCoordinator: session close failed'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'AutoTripCoordinator: session close failed'});
     }
   }
 }

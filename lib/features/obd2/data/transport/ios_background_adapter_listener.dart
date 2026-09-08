@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/logging/app_log.dart';
 import '../../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import 'background_adapter_listener.dart';
 import 'ios_state_restoration_service.dart';
@@ -148,10 +149,10 @@ class IosBackgroundAdapterListener implements BackgroundAdapterListener {
       onError: (Object e, StackTrace st) {
         // A stream error must not kill the watch silently — log it; the
         // subscription itself stays alive (cancelOnError defaults false).
-        unawaited(errorLogger.log(ErrorLayer.background, e, st, context: {
+        log.error(e, st, layer: ErrorLayer.background, context: {
           'where': 'IosBackgroundAdapterListener connectionState error',
           'deviceId': mac,
-        }));
+        });
       },
     );
   }
@@ -190,10 +191,10 @@ class IosBackgroundAdapterListener implements BackgroundAdapterListener {
       BreadcrumbCollector.add('obd2-restoration: restoration-repend',
           detail: 'mac=$mac');
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.background, e, st, context: {
+      log.error(e, st, layer: ErrorLayer.background, context: {
         'where': 'IosBackgroundAdapterListener._repend',
         'deviceId': mac,
-      }));
+      });
     }
   }
 

@@ -9,6 +9,7 @@ import '../obd2_connect_trace.dart';
 import '../obd2_connect_trace_log.dart';
 import 'obd2_service.dart';
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/logging/app_log.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 
 /// Adapter-identity capture + iOS UUID-rotation rematch (#3168).
@@ -239,9 +240,9 @@ Future<Obd2Service?> connectUuidRematched({
     try {
       await markFreshIdKnownGood(fresh.deviceId);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.storage, context: const {
         'where': 'connectUuidRematched: known-good transfer failed (#3247)',
-      }));
+      });
     }
   }
   final service = await connect(candidate);
@@ -262,9 +263,9 @@ Future<Obd2Service?> connectUuidRematched({
         status: Obd2ConnectStepStatus.fail,
         detail: e.toString(),
       );
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.storage, context: const {
         'where': 'connectUuidRematched: identity re-persist failed (#3168)',
-      }));
+      });
     }
   }
   return service;
@@ -297,8 +298,8 @@ Future<void> repersistRotatedAdapterIdentity({
       ));
     }
   } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+    log.error(e, st, layer: ErrorLayer.storage, context: const {
       'where': 'repersistRotatedAdapterIdentity failed (#3168)',
-    }));
+    });
   }
 }

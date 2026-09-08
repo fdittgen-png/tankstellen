@@ -18,6 +18,7 @@ import '../obd2_connect_trace.dart';
 import '../obd2_connect_trace_log.dart';
 import '../../domain/obd2_connection_errors.dart';
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/logging/app_log.dart';
 import '../../../../core/telemetry/collectors/breadcrumb_collector.dart';
 
 export 'classic_link_drop_signature.dart' show isBenignClassicLinkDrop;
@@ -275,8 +276,7 @@ class ClassicElmChannel implements ElmByteChannel {
             detail: e.toString(),
           );
         } else {
-          unawaited(errorLogger.log(ErrorLayer.other, e, st,
-              context: const {'where': 'ClassicElmChannel notify error'}));
+          log.error(e, st, layer: ErrorLayer.other, context: const {'where': 'ClassicElmChannel notify error'});
         }
       },
       onDone: () {
@@ -384,7 +384,7 @@ class ClassicElmChannel implements ElmByteChannel {
     } catch (e, st) {
       // #2466 — recoverable OBD2/BT teardown, not local storage (#2379).
       // Was `storage`; now `other` to match [FlutterBluePlusElmChannel].
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'ClassicElmChannel: disconnect error (ignored)'}));
+      log.error(e, st, layer: ErrorLayer.other, context: const {'where': 'ClassicElmChannel: disconnect error (ignored)'});
     }
     await _incoming.close();
   }

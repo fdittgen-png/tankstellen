@@ -112,10 +112,9 @@ extension DroppedSessionReattach on DroppedSessionManager {
     try {
       await scanner.stop();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: const {
+      log.error(e, st, layer: ErrorLayer.storage, context: const {
             'where': 'DroppedSessionManager stop reconnect scanner'
-          }));
+          });
     }
   }
 

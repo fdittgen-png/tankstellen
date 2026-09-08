@@ -5,6 +5,7 @@ import 'dart:async';
 
 import '../../../core/data/storage_repository.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 
 /// Local, NON-synced set of adapter deviceIds that have completed at
 /// least one SUCCESSFUL connect on THIS phone (#3181).
@@ -79,8 +80,8 @@ class KnownObd2AdaptersStore {
   }
 
   void _log(String op, Object e, StackTrace st) {
-    unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {
+    log.error(e, st, layer: ErrorLayer.storage, context: {
       'where': 'KnownObd2AdaptersStore $op failed',
-    }));
+    });
   }
 }

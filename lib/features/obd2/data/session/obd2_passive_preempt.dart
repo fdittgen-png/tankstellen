@@ -29,8 +29,8 @@ Future<void> _teardownDirectChannel(
     await channel.close();
   } catch (e, st) {
     // #2379 — OBD2/BLE, not local storage.
-    unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
+    log.error(e, st, layer: ErrorLayer.other, context: const {
       'where': 'Obd2ConnectionService: own-direct-channel teardown',
-    }));
+    });
   }
 }

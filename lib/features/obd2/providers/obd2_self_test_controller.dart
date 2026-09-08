@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../data/obd2_connect_trace.dart';
 import '../data/session/obd2_connection_service.dart';
 import '../data/session/obd2_link_supervisor.dart';
@@ -95,9 +96,9 @@ class Obd2SelfTestController extends _$Obd2SelfTestController {
     try {
       linkSupervisor = ref.read(obd2ReconnectProvider.notifier).supervisor;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.providers, context: const {
         'where': 'Obd2SelfTestController: supervisor resolve failed',
-      }));
+      });
     }
     final report = await runObd2SelfTest(
       connection,

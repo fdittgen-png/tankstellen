@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import 'dart:async';
-
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../../core/providers/consumption_display_provider.dart';
 import '../../../core/sync/trips_sync_enabled_provider.dart';
 import '../../driving/providers/live_harsh_event_bus_provider.dart';
@@ -315,9 +315,9 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     try {
       await ctl.refreshOdometer();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.providers, context: const {
         'where': 'Obd2RecordingPipeline.stop: refreshOdometer failed'
-      }));
+      });
     }
     // #1040/#1458 — snapshot both buffers BEFORE stop() tears the controller
     // down. #3878 — the whole trip comes back from the WAL (one isolate hop).
@@ -374,9 +374,9 @@ class Obd2RecordingPipeline implements RecordingPipeline {
         _host.setSaveStage(TripSaveStage.syncingToCloud);
       }
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.providers, context: const {
         'where': 'Obd2RecordingPipeline.stop: sync-gate read'
-      }));
+      });
     }
     // #769 / #780 — flush learned baselines + sync before release.
     await _baselines.flushAndSync();

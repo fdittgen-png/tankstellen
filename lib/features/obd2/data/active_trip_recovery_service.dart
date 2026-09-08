@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import '../../trips/api.dart';
 import 'active_trip_repository.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../../core/telemetry/process_death_context.dart';
 
 /// Outcome of [ActiveTripRecoveryService.recover].
@@ -108,7 +109,7 @@ class ActiveTripRecoveryService {
       // contract to the old fat snapshot, better durability).
       snapshot = await _activeRepo.loadSnapshotWithSamples();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'ActiveTripRecoveryService loadSnapshot failed'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'ActiveTripRecoveryService loadSnapshot failed'});
       return ActiveTripRecoveryOutcome.failed;
     }
     if (snapshot == null) {
@@ -125,25 +126,20 @@ class ActiveTripRecoveryService {
       try {
         await _activeRepo.clearSnapshot();
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+        log.error(e, st, layer: ErrorLayer.storage, context: const {
           'where': 'ActiveTripRecoveryService clear finalised failed'
-        }));
+        });
         return ActiveTripRecoveryOutcome.failed;
       }
       // #3796 — no silent discard: a dropped recovery must be visible in
       // the export, or a lost trip looks like it never existed.
-      unawaited(errorLogger.log(
-        ErrorLayer.storage,
-        StateError('active-trip snapshot discarded (already finalised)'),
-        StackTrace.current,
-        context: {
+      log.error(StateError('active-trip snapshot discarded (already finalised)'), StackTrace.current, layer: ErrorLayer.storage, context: {
           'where': 'ActiveTripRecoveryService: already-finalised snapshot',
           'id': snapshot.id,
           'phase': snapshot.phase,
           'samples': snapshot.samples.length,
           'lastFlushedAt': snapshot.lastFlushedAt.toIso8601String(),
-        },
-      ));
+        });
       return ActiveTripRecoveryOutcome.discarded;
     }
 
@@ -158,7 +154,7 @@ class ActiveTripRecoveryService {
       try {
         await _activeRepo.clearSnapshot();
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'ActiveTripRecoveryService clear stale failed'}));
+        log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'ActiveTripRecoveryService clear stale failed'});
         return ActiveTripRecoveryOutcome.failed;
       }
       // Stale auto-record snapshots still bump the unseen badge —
@@ -169,17 +165,13 @@ class ActiveTripRecoveryService {
         try {
           await cb();
         } catch (e, st) {
-          unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'ActiveTripRecoveryService stale badge bump failed'}));
+          log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'ActiveTripRecoveryService stale badge bump failed'});
         }
       }
       // #3796 — same: a trip abandoned past the recovery horizon is real
       // data loss and must appear in the export, with the process-death
       // attribution when the WAL row outlived its writing process.
-      unawaited(errorLogger.log(
-        ErrorLayer.storage,
-        StateError('active-trip snapshot discarded (stale)'),
-        StackTrace.current,
-        context: {
+      log.error(StateError('active-trip snapshot discarded (stale)'), StackTrace.current, layer: ErrorLayer.storage, context: {
           'where': 'ActiveTripRecoveryService: stale snapshot',
           'id': snapshot.id,
           'phase': snapshot.phase,
@@ -190,8 +182,7 @@ class ActiveTripRecoveryService {
               ProcessDeathContext.diedWhileRecording(snapshot.processInstanceId),
           if (ProcessDeathContext.lastExitReason != null)
             'previousExitReason': ProcessDeathContext.lastExitReason,
-        },
-      ));
+        });
       return ActiveTripRecoveryOutcome.discarded;
     }
 

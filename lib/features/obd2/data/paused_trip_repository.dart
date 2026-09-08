@@ -12,6 +12,7 @@ import 'package:hive/hive.dart';
 // feature's public api.dart barrel (the feature-boundary contract).
 import '../../trips/api.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 
 /// Snapshot of an in-progress OBD2 recording that was paused because
 /// the Bluetooth transport dropped (#797 phase 1).
@@ -122,7 +123,7 @@ class PausedTripRepository {
     try {
       await _box.put(entry.id, jsonEncode(entry.toJson()));
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'PausedTripRepository.save'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'PausedTripRepository.save'});
     }
   }
 
@@ -136,7 +137,7 @@ class PausedTripRepository {
       final json = (jsonDecode(raw) as Map).cast<String, dynamic>();
       return PausedTripEntry.fromJson(json);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'PausedTripRepository.load'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'PausedTripRepository.load'});
       return null;
     }
   }
@@ -160,7 +161,7 @@ class PausedTripRepository {
     try {
       await _box.delete(id);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'PausedTripRepository.delete'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'PausedTripRepository.delete'});
     }
   }
 }

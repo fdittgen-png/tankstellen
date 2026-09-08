@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../data/session/obd2_service.dart';
 import '../data/obd2_session_context_block.dart';
 import 'obd2_reconnect_provider.dart';
@@ -28,8 +29,7 @@ Future<void> teardownServiceRespectingSupervisor(
     await svc.disconnect();
   } catch (e, st) {
     // #2472 — context adds the obd2Session block only when dev-armed.
-    unawaited(errorLogger.log(ErrorLayer.providers, e, st,
-        context: obd2DisconnectTraceContext()));
+    log.error(e, st, layer: ErrorLayer.providers, context: obd2DisconnectTraceContext());
   }
 }
 

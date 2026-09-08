@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/logging/app_log.dart';
 import '../../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../../../trips/api.dart';
 import 'obd2_reattach_source.dart';

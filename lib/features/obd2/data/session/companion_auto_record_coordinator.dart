@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/location/recording_location_settings.dart';
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/logging/app_log.dart';
 import '../transport/companion_device_association.dart';
 
 /// #3320 (Epic #3314) — decides whether to establish a Companion-Device-Manager
@@ -55,9 +56,9 @@ class CompanionAutoRecordCoordinator {
       if (!_attemptedMacs.add(mac)) return false;
       return await _association.associate(mac);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.other, context: const {
         'where': 'CompanionAutoRecordCoordinator.ensureAssociated'
-      }));
+      });
       return false;
     }
   }

@@ -5,6 +5,7 @@ import 'dart:async';
 
 import '../../../core/data/storage_repository.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 
 /// The auto-pinned last-good adapter (#3019 / Epic #3013 phase 3).
 ///
@@ -154,8 +155,8 @@ class LastGoodAdapterStore {
   }
 
   void _log(String op, Object e, StackTrace st) {
-    unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {
+    log.error(e, st, layer: ErrorLayer.storage, context: {
       'where': 'LastGoodAdapterStore $op failed',
-    }));
+    });
   }
 }

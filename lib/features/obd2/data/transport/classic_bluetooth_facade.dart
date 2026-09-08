@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/logging/app_log.dart';
 import '../protocol/adapter_registry.dart';
 import 'classic_elm_channel.dart';
 import 'classic_method_channel.dart';
@@ -76,10 +77,10 @@ class PluginClassicBluetoothFacade implements ClassicBluetoothFacade {
       // adapters at all, on Android, because the Classic side blipped. Degrade
       // gracefully to "no Classic candidates" (log it; never yield a stream
       // error that aborts the BLE results) so BLE discovery always survives.
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.storage, context: const {
         'where': 'PluginClassicBluetoothFacade: bondedDevices failed — '
             'degraded to no Classic candidates (BLE scan unaffected)',
-      }));
+      });
     }
   }
 
@@ -98,10 +99,10 @@ class PluginClassicBluetoothFacade implements ClassicBluetoothFacade {
       // #3423 — degrade to UNKNOWN (null), mirroring the scan() degradation
       // above: a failed bonded-list read must never block the connect, and
       // must never be misread as a lost bond.
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.storage, context: const {
         'where': 'PluginClassicBluetoothFacade: isBonded failed — '
             'degraded to unknown (connect proceeds)',
-      }));
+      });
       return null;
     }
   }

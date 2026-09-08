@@ -363,16 +363,16 @@ Future<void> _stopScanBeforeConnect(Obd2ConnectionService svc) async {
     await svc.bluetooth.stopScan();
   } catch (e, st) {
     // #2379 — OBD2/BLE radio, not local storage. Best-effort; never fatal.
-    unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
+    log.error(e, st, layer: ErrorLayer.other, context: const {
       'where': 'Obd2ConnectionService: stopScan (BLE) before connect',
-    }));
+    });
   }
   try {
     await svc.classicBluetooth?.stopScan();
   } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
+    log.error(e, st, layer: ErrorLayer.other, context: const {
       'where': 'Obd2ConnectionService: stopScan (classic) before connect',
-    }));
+    });
   }
   if (wasScanning && svc.scanSettleDelay > Duration.zero) {
     await Future<void>.delayed(svc.scanSettleDelay);

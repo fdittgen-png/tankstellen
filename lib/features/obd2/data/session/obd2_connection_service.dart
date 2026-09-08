@@ -34,6 +34,7 @@ import '../transport/obd2_scan_governor.dart';
 import 'obd2_service.dart';
 import '../supported_pids_cache.dart';
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/logging/app_log.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 
