@@ -3,6 +3,7 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'run_scope.dart';
 
 import '../telemetry/storage/isolate_error_spool.dart';
 import '../telemetry/trace_recorder.dart';
@@ -71,6 +72,14 @@ enum ErrorLayer {
 ///   num, bool, null, List, Map). Non-primitives are coerced via
 ///   `toString()` by the spool; for the foreground path the wrapper
 ///   error preserves them in its `toString()`.
+typedef SpoolEnqueue = Future<void> Function({
+  required String isolateTaskName,
+  required Object error,
+  StackTrace? stack,
+  Map<String, dynamic>? contextMap,
+  DateTime? timestamp,
+});
+
 class ErrorLogger {
   ErrorLogger._();
 
@@ -84,20 +93,43 @@ class ErrorLogger {
   /// `log` calls it instead of resolving `traceRecorderProvider` from
   /// the bound container. Useful for unit tests that don't want to
   /// stand up a full Hive + provider stack.
+  TraceRecorder? _testRecorderOverride;
+
+  /// Test seam: route every trace to [recorder] instead of the real
+  /// pipeline.
+  ///
+  /// Installing one also clears the episode table (#3980): the logger is a
+  /// process-wide singleton, so without this a test inherits the previous
+  /// test's open episode and its first `log()` is silently suppressed —
+  /// which is exactly how the UK per-feed test failed on PR #4004, with an
+  /// empty recorder and nothing to explain it.
   @visibleForTesting
-  TraceRecorder? testRecorderOverride;
+  TraceRecorder? get testRecorderOverride => _testRecorderOverride;
+
+  @visibleForTesting
+  set testRecorderOverride(TraceRecorder? recorder) {
+    _testRecorderOverride = recorder;
+    _episodes.clear();
+  }
+
+  SpoolEnqueue _spoolEnqueueOverride = IsolateErrorSpool.enqueue;
 
   /// Test seam: replace the spool enqueue function. Defaults to
   /// [IsolateErrorSpool.enqueue]. Tests inject a captor to assert what
   /// was written without touching real Hive boxes.
+  ///
+  /// Like [testRecorderOverride], installing one clears the episode table
+  /// (#3980): this is the seam the background-isolate path writes through,
+  /// and a test that captures here would otherwise inherit an earlier
+  /// test's open episode and see nothing at all.
   @visibleForTesting
-  Future<void> Function({
-    required String isolateTaskName,
-    required Object error,
-    StackTrace? stack,
-    Map<String, dynamic>? contextMap,
-    DateTime? timestamp,
-  }) spoolEnqueueOverride = IsolateErrorSpool.enqueue;
+  SpoolEnqueue get spoolEnqueueOverride => _spoolEnqueueOverride;
+
+  @visibleForTesting
+  set spoolEnqueueOverride(SpoolEnqueue fn) {
+    _spoolEnqueueOverride = fn;
+    _episodes.clear();
+  }
 
   /// Bind the root foreground [ProviderContainer]. Called exactly
   /// once from `AppInitializer` after the container is built. After
@@ -113,41 +145,56 @@ class ErrorLogger {
   @visibleForTesting
   void resetForTest() {
     _container = null;
-    testRecorderOverride = null;
-    spoolEnqueueOverride = IsolateErrorSpool.enqueue;
+    _testRecorderOverride = null;
+    _spoolEnqueueOverride = IsolateErrorSpool.enqueue;
+    _episodes.clear(); // #3980 — no test inherits the previous test's episode
   }
 
   /// `true` when running inside the foreground isolate with a bound
   /// container or an explicit test recorder.
   bool get isForegroundBound =>
-      _container != null || testRecorderOverride != null;
+      _container != null || _testRecorderOverride != null;
 
-  /// #3581 — episode gate for the SYNC layer only: an unreachable
-  /// self-host retries every table on every resume, and the identical
-  /// failure spooled 40× in minutes, flooding real traces out of the
-  /// ring. Consecutive sync errors with the same signature within
-  /// [syncEpisodeWindow] are counted, not spooled; the first different
-  /// signature (or window expiry) logs one summary carrying the
-  /// suppressed count. Other layers are untouched.
-  static const Duration syncEpisodeWindow = Duration(minutes: 10);
-  String? _syncEpisodeSignature;
-  DateTime? _syncEpisodeLastAt;
-  int _syncEpisodeSuppressed = 0;
+  /// #3581 / #3980 — episode gate, per layer. It began as a SYNC-only
+  /// gate: an unreachable self-host retries every table on every resume,
+  /// and the identical failure spooled 40× in minutes, flooding real
+  /// traces out of the ring. A country-API outage or an OBD2 reconnect
+  /// storm does exactly the same on its own layer, so #3980 keeps one
+  /// episode per [ErrorLayer]. Consecutive errors on a layer with the
+  /// same signature within [episodeWindow] are counted, not spooled; the
+  /// first different signature (or window expiry) logs one summary
+  /// carrying the suppressed count. Layers never share an episode — a
+  /// storage failure during a sync outage is still its own first trace.
+  static const Duration episodeWindow = Duration(minutes: 10);
+  final Map<ErrorLayer, _Episode> _episodes = {};
 
-  /// Signature = error type + leading message chars — stable across the
-  /// per-table variations of one outage episode.
-  static String _syncSignature(Object error) {
+  /// Signature = error type + leading message chars + the ADR 0021 context
+  /// discriminators, so one outage collapses but INDEPENDENT failures do
+  /// not.
+  ///
+  /// The first cut keyed on the error alone and was too coarse: fourteen
+  /// parallel UK feeds throwing the same `DioException`, or two countries
+  /// hitting the same opening-hours parse failure, are not one episode —
+  /// they are N facts about N subjects, and collapsing them erased exactly
+  /// the per-subject independence those call sites promise. `where` /
+  /// `entity` / `country` / `runId` are what tell them apart.
+  ///
+  /// `episode` is the caller's own escape hatch: a site that already owns
+  /// its episode semantics (`UnresponsiveAdapterDiagnostic`, which logs
+  /// once per outage transition and rate-limits on its own clock) passes an
+  /// incrementing id, so a genuinely new episode is never swallowed here.
+  static String _signature(Object error, Map<String, Object?>? context) {
     final s = error.toString();
-    return '${error.runtimeType}:${s.substring(0, s.length < 80 ? s.length : 80)}';
+    final head = s.substring(0, s.length < 80 ? s.length : 80);
+    final keys = ['where', 'entity', 'country', 'runId', 'episode'];
+    final discriminators =
+        keys.map((k) => context?[k]?.toString() ?? '').join('|');
+    return '${error.runtimeType}:$head|$discriminators';
   }
 
-  /// Test seam — reset the #3581 episode gate.
+  /// Test seam — forget every layer's episode.
   @visibleForTesting
-  void resetSyncEpisodeForTest() {
-    _syncEpisodeSignature = null;
-    _syncEpisodeLastAt = null;
-    _syncEpisodeSuppressed = 0;
-  }
+  void resetEpisodesForTest() => _episodes.clear();
 
   /// Log [error] under [layer]. Routes to [TraceRecorder] in the
   /// foreground and to [IsolateErrorSpool] in background isolates.
@@ -161,32 +208,35 @@ class ErrorLogger {
     Map<String, Object?>? context,
   }) async {
     final stackTrace = stack ?? StackTrace.current;
-    if (layer == ErrorLayer.sync) {
-      final now = DateTime.now();
-      final signature = _syncSignature(error);
-      final last = _syncEpisodeLastAt;
-      final sameEpisode = signature == _syncEpisodeSignature &&
-          last != null &&
-          now.difference(last) < syncEpisodeWindow;
-      if (sameEpisode) {
-        _syncEpisodeLastAt = now;
-        _syncEpisodeSuppressed++;
-        return; // counted, not spooled — the episode's first trace stands.
-      }
-      final suppressed = _syncEpisodeSuppressed;
-      _syncEpisodeSignature = signature;
-      _syncEpisodeLastAt = now;
-      _syncEpisodeSuppressed = 0;
-      if (suppressed > 0) {
-        context = {
-          ...?context,
-          'previousSyncEpisodeSuppressed': suppressed,
-        };
-      }
+    final now = DateTime.now();
+    final signature = _signature(error, context);
+    final episode = _episodes[layer];
+    if (episode != null &&
+        episode.signature == signature &&
+        now.difference(episode.lastAt) < episodeWindow) {
+      episode.lastAt = now;
+      episode.suppressed++;
+      return; // counted, not spooled — the episode's first trace stands.
+    }
+    final suppressed = episode?.suppressed ?? 0;
+    _episodes[layer] = _Episode(signature, now);
+    if (suppressed > 0) {
+      context = {
+        ...?context,
+        'previousEpisodeSuppressed': suppressed,
+        'episodeLayer': layer.name,
+      };
+    }
+    // #3980 — the ADR 0021 runId rides along automatically when the call
+    // happens inside a RunScope; an explicit key in [context] wins.
+    final runId = RunScope.currentId;
+    if (runId != null && !(context?.containsKey('runId') ?? false)) {
+      context = {...?context, 'runId': runId};
     }
     try {
-      if (testRecorderOverride != null) {
-        await testRecorderOverride!.record(
+      final recorder = _testRecorderOverride;
+      if (recorder != null) {
+        await recorder.record(
           ContextualError(layer: layer, error: error, context: context),
           stackTrace,
         );
@@ -208,7 +258,7 @@ class ErrorLogger {
         return;
       }
       // Background isolate path: spool through Hive ring buffer.
-      await spoolEnqueueOverride(
+      await _spoolEnqueueOverride(
         isolateTaskName: layer.name,
         error: error,
         stack: stackTrace,
@@ -277,3 +327,12 @@ class ContextualError implements Exception {
 /// decided per call based on whether [ErrorLogger.bind] has been
 /// invoked in the current isolate.
 final ErrorLogger errorLogger = ErrorLogger._();
+
+/// One layer's current outage episode (#3980): the signature that opened
+/// it, when it was last seen, and how many identical throws it swallowed.
+class _Episode {
+  _Episode(this.signature, this.lastAt);
+  final String signature;
+  DateTime lastAt;
+  int suppressed = 0;
+}

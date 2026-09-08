@@ -10,6 +10,7 @@ import '../../ev/data/services/ev_price_enricher.dart';
 import '../../ev/data/services/fr_irve_price_service.dart';
 import '../../../core/domain/ev/charging_station.dart';
 import 'ev_charging_service_provider.dart';
+import '../../../core/logging/run_scope.dart';
 
 part 'ev_search_provider.g.dart';
 
@@ -36,7 +37,15 @@ class EVSearchState extends _$EVSearchState {
     ));
   }
 
+  /// #3980 — one ADR 0021 runId for everything this call logs.
   Future<void> searchNearby({
+    required double lat,
+    required double lng,
+    required double radiusKm,
+  }) =>
+      RunScope.run('search', () => _searchNearbyImpl(lat: lat, lng: lng, radiusKm: radiusKm));
+
+  Future<void> _searchNearbyImpl({
     required double lat,
     required double lng,
     required double radiusKm,
