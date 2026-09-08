@@ -52,4 +52,4 @@ void main() {
 }
 
 /// Baseline as of 2026-09-08 (#3986). Only ever decreases; target 0.
-const _baseline = 83;
+const _baseline = 81;

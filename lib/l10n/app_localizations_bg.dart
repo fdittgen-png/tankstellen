@@ -3564,6 +3564,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get chargingChartsEmpty => 'Все още няма достатъчно данни';
 
   @override
+  String get chargingLogDeletedUndoSnackbar => 'Charging session deleted';
+
+  @override
   String get confirmDeleteTitle => 'Изтриване?';
 
   @override

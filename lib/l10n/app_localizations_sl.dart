@@ -3539,6 +3539,9 @@ class AppLocalizationsSl extends AppLocalizations {
   String get chargingChartsEmpty => 'Še ni dovolj podatkov';
 
   @override
+  String get chargingLogDeletedUndoSnackbar => 'Charging session deleted';
+
+  @override
   String get confirmDeleteTitle => 'Izbrisati?';
 
   @override

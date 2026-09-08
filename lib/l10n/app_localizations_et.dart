@@ -3535,6 +3535,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get chargingChartsEmpty => 'Andmeid pole veel piisavalt';
 
   @override
+  String get chargingLogDeletedUndoSnackbar => 'Charging session deleted';
+
+  @override
   String get confirmDeleteTitle => 'Kas kustutada?';
 
   @override

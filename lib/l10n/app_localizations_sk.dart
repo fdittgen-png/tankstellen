@@ -3551,6 +3551,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get chargingChartsEmpty => 'Zatiaľ nedostatok dát';
 
   @override
+  String get chargingLogDeletedUndoSnackbar => 'Charging session deleted';
+
+  @override
   String get confirmDeleteTitle => 'Odstrániť?';
 
   @override

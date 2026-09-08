@@ -17,6 +17,7 @@ import '../../domain/charging_log_validators.dart';
 import '../../providers/charging_logs_provider.dart';
 import '../widgets/charging_log_form_fields.dart';
 import '../../../../core/error/guarded.dart';
+import '../../../../core/theme/spacing.dart';
 
 /// Form to add a new [ChargingLog] entry (#582 phase 2).
 ///
@@ -190,7 +191,7 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
     if (vehicles.isEmpty) {
       return PageScaffold(
         title: l.addChargingLogTitle,
-        bodyPadding: const EdgeInsets.all(32),
+        bodyPadding: const EdgeInsets.all(Spacing.xxxl),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -200,13 +201,13 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
                 size: 80,
                 color: Theme.of(context).colorScheme.primary,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: Spacing.xxl),
               Text(
                 l.consumptionNoVehicleTitle,
                 style: Theme.of(context).textTheme.headlineSmall,
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: Spacing.lg),
               Text(
                 l.consumptionNoVehicleBody,
                 style: Theme.of(context).textTheme.bodyMedium,

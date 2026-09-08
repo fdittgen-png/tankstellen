@@ -3551,6 +3551,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get chargingChartsEmpty => 'Nog niet genoeg gegevens';
 
   @override
+  String get chargingLogDeletedUndoSnackbar => 'Charging session deleted';
+
+  @override
   String get confirmDeleteTitle => 'Verwijderen?';
 
   @override

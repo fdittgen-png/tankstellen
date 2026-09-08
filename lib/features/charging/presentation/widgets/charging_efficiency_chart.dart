@@ -11,6 +11,7 @@ import 'package:intl/intl.dart' hide TextDirection;
 import '../../../../core/widgets/charts/monthly_bar_chart_base.dart'
     show drawChartText;
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/utils/unit_formatter.dart';
 
 /// Monthly kWh/100 km line chart (#582 phase 3).
 ///
@@ -63,6 +64,10 @@ class ChargingEfficiencyChart extends StatelessWidget {
     // the active locale's short-month names via intl (matches price_chart.dart's
     // `DateFormat.Md(locale)` pattern). #2971.
     final locale = Localizations.localeOf(context).toString();
+    // #3989 — axis labels in the label role, scaled with the text-size
+    // setting, instead of a hard 10 px.
+    final labelStyle = theme.textTheme.labelSmall!
+        .apply(fontSizeFactor: MediaQuery.textScalerOf(context).scale(1.0));
     return SizedBox(
       height: 160,
       child: CustomPaint(
@@ -70,6 +75,7 @@ class ChargingEfficiencyChart extends StatelessWidget {
           entries: entries,
           color: effective,
           labelColor: theme.colorScheme.onSurface,
+          labelStyle: labelStyle,
           monthFormat: DateFormat.MMM(locale),
         ),
         size: Size.infinite,
@@ -82,6 +88,7 @@ class _EfficiencyPainter extends CustomPainter {
   final List<MapEntry<DateTime, double?>> entries;
   final Color color;
   final Color labelColor;
+  final TextStyle labelStyle;
 
   /// Locale-aware short-month formatter for the X-axis labels (#2971).
   final DateFormat monthFormat;
@@ -90,6 +97,7 @@ class _EfficiencyPainter extends CustomPainter {
     required this.entries,
     required this.color,
     required this.labelColor,
+    required this.labelStyle,
     required this.monthFormat,
   });
 
@@ -130,11 +138,11 @@ class _EfficiencyPainter extends CustomPainter {
     // Max label top-right
     drawChartText(
       canvas,
-      '${maxV.toStringAsFixed(1)} kWh',
+      UnitFormatter.formatConsumption(maxV, isEv: true),
       Offset(size.width - rightInset, 2),
       anchorRight: true,
       color: labelColor.withAlpha(160),
-      fontSize: 10,
+      style: labelStyle,
     );
 
     // Month labels along the bottom axis.
@@ -145,7 +153,7 @@ class _EfficiencyPainter extends CustomPainter {
         Offset(xForIndex(i), topInset + chartHeight + 4),
         anchorCenter: true,
         color: labelColor.withAlpha(160),
-        fontSize: 10,
+        style: labelStyle,
       );
     }
 

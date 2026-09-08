@@ -3563,6 +3563,9 @@ class AppLocalizationsRo extends AppLocalizations {
   String get chargingChartsEmpty => 'Date insuficiente încă';
 
   @override
+  String get chargingLogDeletedUndoSnackbar => 'Charging session deleted';
+
+  @override
   String get confirmDeleteTitle => 'Ștergi?';
 
   @override

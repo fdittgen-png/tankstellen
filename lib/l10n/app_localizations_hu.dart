@@ -3564,6 +3564,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get chargingChartsEmpty => 'Még nincs elég adat';
 
   @override
+  String get chargingLogDeletedUndoSnackbar => 'Charging session deleted';
+
+  @override
   String get confirmDeleteTitle => 'Törlöd?';
 
   @override

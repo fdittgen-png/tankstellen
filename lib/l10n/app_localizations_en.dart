@@ -3523,6 +3523,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chargingChartsEmpty => 'Not enough data yet';
 
   @override
+  String get chargingLogDeletedUndoSnackbar => 'Charging session deleted';
+
+  @override
   String get confirmDeleteTitle => 'Delete?';
 
   @override
@@ -12556,6 +12559,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get chargingChartsEmpty => '⟦Ñóŧ éñóúǧĥ đáŧá ýéŧ ·······⟧';
+
+  @override
+  String get chargingLogDeletedUndoSnackbar =>
+      '⟦Çĥářǧîñǧ šéššîóñ đéłéŧéđ ··········⟧';
 
   @override
   String get confirmDeleteTitle => '⟦Đéłéŧé? ···⟧';

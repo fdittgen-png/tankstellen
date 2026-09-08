@@ -3536,6 +3536,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get chargingChartsEmpty => 'Ikke nok data endnu';
 
   @override
+  String get chargingLogDeletedUndoSnackbar => 'Charging session deleted';
+
+  @override
   String get confirmDeleteTitle => 'Slet?';
 
   @override

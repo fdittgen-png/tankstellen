@@ -6392,6 +6392,12 @@ abstract class AppLocalizations {
   /// **'Not enough data yet'**
   String get chargingChartsEmpty;
 
+  /// Snackbar after swipe-deleting a charging log; carries the 10-second Undo action (#3989, mirrors fillUpDeletedUndoSnackbar).
+  ///
+  /// In en, this message translates to:
+  /// **'Charging session deleted'**
+  String get chargingLogDeletedUndoSnackbar;
+
   /// Title of the shared destructive-action confirmation dialog (#3682) shown before EVERY delete in the app.
   ///
   /// In en, this message translates to:

@@ -3557,6 +3557,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get chargingChartsEmpty => 'Noch nicht genügend Daten';
 
   @override
+  String get chargingLogDeletedUndoSnackbar => 'Ladevorgang gelöscht';
+
+  @override
   String get confirmDeleteTitle => 'Löschen?';
 
   @override

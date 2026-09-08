@@ -7,6 +7,7 @@ import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../ev/api.dart';
 import '../../../../core/utils/unit_formatter.dart';
+import '../../../../core/widgets/panel_card.dart';
 
 /// Compact list-tile card for a single [ChargingLog] row on the
 /// Consumption screen's Charging tab (#582 phase 2).
@@ -43,8 +44,10 @@ class ChargingLogCard extends StatelessWidget {
     return Semantics(
       container: true,
       label: '$title, $subtitle',
-      child: Card(
+      // #3989 — the panel surface; ListTile brings its own insets.
+      child: PanelCard(
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: EdgeInsets.zero,
         child: ListTile(
           leading: Icon(
             Icons.ev_station_outlined,
