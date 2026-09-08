@@ -894,8 +894,8 @@ store-metadata-only PR can still satisfy branch protection and auto-merge (#2568
 
 | Workflow | Trigger | What it does |
 |---|---|---|
-| `deploy.yml` — *Deploy to Play Store* | `v*` tags; dispatch (`deploy-internal` / `promote-rollout`) | Validates the CHANGELOG entry, waits for CI's AAB, uploads to **internal**, then promotes to production at a chosen staged-rollout percentage (1/5/10/25/50/100) from `beta` (default), `alpha` or `internal`. Concurrency group `play-store-deploy`, `cancel-in-progress: false`. |
-| `daily-beta.yml` — *Daily Open-Testing Build* | 16:00 Europe/Paris cron + dispatch | Builds `--flavor play` AAB with a **monotonic run-counter build number** and uploads to the **beta (open testing)** track; tags the commit so every shipped versionCode maps back to a commit (#3177). |
+| `deploy.yml` — *Release · Play Store deploy* | `v*` tags; dispatch (`deploy-internal` / `promote-rollout`) | Validates the CHANGELOG entry, waits for CI's AAB, uploads to **internal**, then promotes to production at a chosen staged-rollout percentage (1/5/10/25/50/100) from `beta` (default), `alpha` or `internal`. Concurrency group `play-store-deploy`, `cancel-in-progress: false`. |
+| `daily-beta.yml` — *Release · Play open-testing (daily)* | 16:00 Europe/Paris cron + dispatch | Builds `--flavor play` AAB with a **monotonic run-counter build number** and uploads to the **beta (open testing)** track; tags the commit so every shipped versionCode maps back to a commit (#3177). |
 | `daily-github-release.yml` | 21:00 cron + dispatch | `pre-check` → `build-android` + `build-ios` (macOS) → `release` (or `skipped-summary`). |
 | `ios-testflight.yml` | 04:30 cron + dispatch | macOS-15 build + TestFlight upload; `distribute` input pushes to the external `extern` group; `sync_certs` repair mode runs write-mode match. |
 | `ios-beta-review.yml` | dispatch | Pushes localised Beta App Review test info ahead of a build (#2611). |
@@ -903,7 +903,7 @@ store-metadata-only PR can still satisfy branch protection and auto-merge (#2568
 | `app-store-listing.yml` | dispatch (macOS) | `fastlane deliver` for App Store text metadata only — no binary. |
 | `play-store-listing.yml` | dispatch + push to listing paths | `fastlane supply` metadata-only upload of the public Play listing. |
 | `play-status.yml` | dispatch | Read-only Play track status. |
-| `fdroid.yml` — *F-Droid no-GMS audit* | every PR + push to master | **Advisory, deliberately not a required check.** Builds the keyless-unsigned fdroid **release** APK and runs the 3-layer GMS/MLKit/Play-Core/Sentry audit. |
+| `fdroid.yml` — *CI · F-Droid no-GMS audit* | every PR + push to master | **Advisory, deliberately not a required check.** Builds the keyless-unsigned fdroid **release** APK and runs the 3-layer GMS/MLKit/Play-Core/Sentry audit. |
 | `fdroid-publish.yml` | `v*` tags + dispatch | Builds + signs the fdroid APK, regenerates the `fdroidserver` index, assembles the combined Pages site and deploys it. Shares the `pages` concurrency group. |
 | `pages.yml` | push to landing/privacy/fdroid-repo paths + dispatch | Deploys the combined Pages site (landing at root, `/privacy-policy/`, `/fdroid`). |
 | `dev-apk.yml` | dispatch | arm64 dev APK for sideload verification. |

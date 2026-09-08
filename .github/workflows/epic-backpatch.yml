@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: MIT
 
-name: Epic checklist back-patch
+name: Tools · Epic checklist back-patch
 
 # #2341 — when a child issue is opened with a `Part of #<N>` /
 # `epic: #<N>` back-reference, rewrite the matching title-only task item

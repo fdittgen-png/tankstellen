@@ -28,7 +28,7 @@
 #
 # Crude, and it catches the whole class.
 
-name: Release boot check
+name: CI · Release boot check
 
 on:
   workflow_dispatch:

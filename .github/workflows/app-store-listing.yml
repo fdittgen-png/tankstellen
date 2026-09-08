@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: MIT
 
-name: App Store listing
+name: Publish · App Store listing
 
 # Pushes the iOS text metadata under ios/fastlane/metadata/<locale>/ to App
 # Store Connect via `fastlane deliver`, WITHOUT rebuilding or uploading a

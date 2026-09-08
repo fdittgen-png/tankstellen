@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: MIT
 
-name: CI
+name: CI · Docs-only stub
 
 # Docs-only "stub" workflow. `ci.yml` carries `paths-ignore` for
 # `**/*.md`, `docs/**`, `LICENSE`, `.gitignore` (and, since #2568, the

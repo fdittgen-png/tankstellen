@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: MIT
 
-name: GR Fuel Prices Publish
+name: Publish · Greek fuel prices
 
 # #3549 — self-published Greek fuel prices: parse the ministry's official
 # daily-prefecture PDF bulletins (fuelprices.gr) with the vendored MIT

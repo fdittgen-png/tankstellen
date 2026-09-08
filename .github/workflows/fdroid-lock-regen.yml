@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: MIT
 
-name: Regenerate fdroid lockfile
+name: Tools · Regenerate F-Droid lockfile
 
 # #3806 — one dispatch instead of a manual local dance.
 #
@@ -15,7 +15,8 @@ name: Regenerate fdroid lockfile
 #     -> Unable to satisfy `pubspec.yaml` using `pubspec.lock`.
 #
 # Nothing about the bump is wrong — a derived file simply was not
-# regenerated. This has now bitten on #3352, #3563, #3773 and #3804.
+# regenerated. This has now bitten on #3352, #3563, #3773, #3804 and
+# again on #3965, #3966 and #3967.
 #
 # ## Why dispatch-only, deliberately
 #
@@ -113,4 +114,20 @@ jobs:
             echo '```'
             git diff HEAD~1 --stat -- pubspec.fdroid.lock
             echo '```'
+            echo ""
+            # #3971 — this push used GITHUB_TOKEN, and events from that token
+            # deliberately start no workflow run, so the branch now sits on a
+            # head SHA with NO checks. Say so here, where the operator is
+            # already looking, rather than leaving a silently unverified PR.
+            echo "**Now re-fire the checks.** This push used"
+            echo "\`GITHUB_TOKEN\`, which by design triggers no workflow"
+            echo "run, so the new head SHA carries no results yet:"
+            echo ""
+            echo '```sh'
+            echo "gh workflow run fdroid.yml --ref $BRANCH   # build-fdroid"
+            echo "gh workflow run ci.yml --ref $BRANCH       # the CI matrix"
+            echo '```'
+            echo ""
+            echo "Or re-fire everything at once with"
+            echo "\`gh pr close <n> && gh pr reopen <n>\`."
           } >> "$GITHUB_STEP_SUMMARY"

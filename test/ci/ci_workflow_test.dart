@@ -786,4 +786,64 @@ void main() {
       }
     });
   });
+
+  // #3972 — the Actions sidebar is sorted alphabetically by workflow name,
+  // so a shared `<Group> · <description>` prefix is what makes 27 entries
+  // legible: it clusters them by when you care about them. Two workflows
+  // were previously BOTH named "CI" and were indistinguishable in a run
+  // list. Workflow names are not status-check contexts (branch protection
+  // lists bare job ids), so this convention is free to enforce.
+  group('workflow naming convention (#3972)', () {
+    const groups = ['CI', 'Nightly', 'Release', 'Publish', 'Status', 'Tools'];
+
+    List<File> workflowFiles() =>
+        Directory('.github/workflows')
+            .listSync()
+            .whereType<File>()
+            .where((f) => f.path.endsWith('.yml'))
+            .toList()
+          ..sort((a, b) => a.path.compareTo(b.path));
+
+    /// The workflow's top-level `name:` — the first column-0 `name:` line.
+    String? topLevelName(File f) {
+      for (final line in f.readAsStringSync().split('\n')) {
+        if (line.startsWith('name:')) return line.substring(5).trim();
+      }
+      return null;
+    }
+
+    test('every workflow is named "<Group> · <description>"', () {
+      final offenders = <String>[];
+      for (final f in workflowFiles()) {
+        final name = topLevelName(f);
+        if (name == null) {
+          offenders.add('${f.path}: no top-level name:');
+          continue;
+        }
+        final parts = name.split(' · ');
+        if (parts.length != 2 ||
+            !groups.contains(parts.first) ||
+            parts.last.trim().isEmpty) {
+          offenders.add('${f.path}: "$name"');
+        }
+      }
+      expect(offenders, isEmpty,
+          reason: 'workflow names must read "<Group> · <what it does>" with '
+              'Group one of $groups — see #3972. Offenders:\n'
+              '${offenders.join('\n')}');
+    });
+
+    test('no two workflows share a name', () {
+      final byName = <String, List<String>>{};
+      for (final f in workflowFiles()) {
+        final name = topLevelName(f);
+        if (name != null) byName.putIfAbsent(name, () => []).add(f.path);
+      }
+      final dupes = byName.entries.where((e) => e.value.length > 1).toList();
+      expect(dupes, isEmpty,
+          reason: 'a duplicate workflow name is unreadable in the Actions '
+              'sidebar (ci.yml and ci-docs-stub.yml were both "CI"): '
+              '${dupes.map((e) => '"${e.key}" -> ${e.value}').join('; ')}');
+    });
+  });
 }

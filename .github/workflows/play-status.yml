@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: MIT
 
-name: Play track status (read-only)
+name: Status · Play track
 
 # Manual-only. Reports what is currently live on each Play Store track so a
 # promotion can be confirmed as actually PUBLISHED (an API edit commit succeeds

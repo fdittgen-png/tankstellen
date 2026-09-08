@@ -20,12 +20,27 @@
 # keyless-UNSIGNED — an fdroid-only release without a keystore is the
 # sanctioned F-Droid shape (#3471; F-Droid signs downstream).
 
-name: F-Droid no-GMS audit
+name: CI · F-Droid no-GMS audit
 
 on:
   pull_request:
   push:
     branches: [master]
+  # #3971 — manual hatch, mirroring ci.yml's (#2128). Two cases need it:
+  #
+  #  * fdroid-lock-regen.yml (#3806) pushes the regenerated
+  #    `pubspec.fdroid.lock` with GITHUB_TOKEN, and events from that token
+  #    deliberately create no workflow run — so the branch is left on a head
+  #    SHA with no `build-fdroid` result, for the one job the regen exists to
+  #    turn green. (`gh pr update-branch` has the same limitation.)
+  #  * a transient Android/Gradle failure that just needs a retry — the reason
+  #    this job is advisory in the first place.
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for the manual run (audit trail)'
+        required: false
+        type: string
 
 # Single self-contained job → exactly one status context ("build-fdroid"),
 # never gated per-step. Keep it OUT of required checks.

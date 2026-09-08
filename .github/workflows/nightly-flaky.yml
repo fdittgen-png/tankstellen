@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: MIT
 
-name: Nightly Flaky + Network Suite
+name: Nightly · Flaky & network suite
 
 # Companion to #1584. The `flaky` + `network` buckets are excluded from
 # PR + master CI because their failures are intermittent and would

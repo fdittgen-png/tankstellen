@@ -11,7 +11,7 @@ into App Store Connect by hand.
 
 ## How to run
 
-GitHub → **Actions** → **iOS TestFlight Testers** → **Run workflow**
+GitHub → **Actions** → **Tools · Add iOS TestFlight tester** → **Run workflow**
 (`workflow_dispatch`). Or from the CLI:
 
 ```bash
@@ -91,7 +91,7 @@ expires nothing.
 
 ## How to run it
 
-GitHub → **Actions** → **iOS TestFlight Status** → **Run workflow**. Or:
+GitHub → **Actions** → **Status · iOS TestFlight** → **Run workflow**. Or:
 
 ```bash
 # The last 15 builds, newest first

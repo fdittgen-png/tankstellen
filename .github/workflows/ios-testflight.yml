@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: MIT
 
-name: iOS TestFlight Build
+name: Release · iOS TestFlight build
 
 # Build a signed iOS IPA on a macOS runner and upload it to TestFlight via the
 # App Store Connect API. Mirror of `daily-beta.yml` but for iOS.

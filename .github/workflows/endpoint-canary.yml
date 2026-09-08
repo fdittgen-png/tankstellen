@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: MIT
 
-name: Endpoint Canary
+name: Nightly · Endpoint canary
 
 # Weekly live-probe of every shipped country service's endpoint (#3199,
 # under epic #3186) — so the next CL-404 / GR-NXDOMAIN / RO-404 /

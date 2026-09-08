@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: MIT
 
-name: App Store status
+name: Status · App Store
 
 # #3851 — READ-ONLY report of the App Store version state.
 #
