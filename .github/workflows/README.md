@@ -24,8 +24,8 @@ sidebar:
 
 ## Rules
 
-- Sentence case after the group — `Regenerate F-Droid lockfile`, not
-  `Regenerate F-Droid Lockfile`.
+- Sentence case after the group — `Regenerate lockfiles`, not
+  `Regenerate Lockfiles`.
 - Verb-first when the workflow *performs* an action
   (`Add iOS TestFlight tester`); noun-first when it names what it produces or
   reports on (`Play track`, `Motorway exits`).

@@ -1,22 +1,31 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: MIT
 
-name: Tools · Regenerate F-Droid lockfile
+name: Tools · Regenerate lockfiles
 
-# #3806 — one dispatch instead of a manual local dance.
+# #3806 (fdroid lock) + #3974 (main lock) — one dispatch instead of a
+# manual local dance, for BOTH lockfiles this repo commits.
 #
-# The F-Droid flavour pins its OWN lockfile: `pubspec.fdroid.lock` is
-# resolved with `pubspec_overrides.fdroid.yaml`, which swaps the
-# GMS / ML-Kit / Play-Core / Sentry plugins for libre stubs. Dependabot
-# only ever updates `pubspec.lock`, so the fdroid lock goes stale and the
-# `build-fdroid` job fails on
+# `pubspec.lock` must be the resolution the Flutter SDK actually produces.
+# Dependabot maintains it with plain `dart pub`, which cannot resolve
+# `sdk: flutter` and therefore ignores the versions Flutter exact-pins
+# (`meta: 1.18.0`, `vector_math: 2.2.0` in packages/flutter/pubspec.yaml;
+# `matcher: 0.12.19` in packages/flutter_test/pubspec.yaml). A plain
+# `flutter pub get` silently re-resolves rather than failing, so that
+# drift stayed invisible until #3974 gave `analyze` an
+# `--enforce-lockfile` gate.
+#
+# `pubspec.fdroid.lock` is a SECOND lockfile: the F-Droid flavour resolves
+# with `pubspec_overrides.fdroid.yaml`, which swaps the GMS / ML-Kit /
+# Play-Core / Sentry plugins for libre stubs. Dependabot never touches it
+# at all, so it goes stale on every pub bump and `build-fdroid` fails on
 #
 #     flutter pub get --enforce-lockfile
 #     -> Unable to satisfy `pubspec.yaml` using `pubspec.lock`.
 #
-# Nothing about the bump is wrong — a derived file simply was not
-# regenerated. This has now bitten on #3352, #3563, #3773, #3804 and
-# again on #3965, #3966 and #3967.
+# In both cases nothing about the bump is wrong — a derived file simply
+# was not regenerated. Between them this has bitten on #3352, #3563,
+# #3773, #3804 and again on #3965, #3966 and #3967.
 #
 # ## Why dispatch-only, deliberately
 #
@@ -36,7 +45,7 @@ on:
         type: string
 
 concurrency:
-  group: fdroid-lock-regen-${{ inputs.branch }}
+  group: lock-regen-${{ inputs.branch }}
   cancel-in-progress: false
 
 jobs:
@@ -44,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
-      # Required to push the regenerated lockfile back onto the branch.
+      # Required to push the regenerated lockfiles back onto the branch.
       contents: write
     steps:
       - uses: actions/checkout@v7
@@ -59,9 +68,18 @@ jobs:
         with:
           channel: stable
           # Same pin as ci.yml — a lockfile resolved by a different SDK
-          # would not be the one the F-Droid buildserver reproduces.
+          # would not be the one CI, or the F-Droid buildserver,
+          # reproduces.
           flutter-version: "3.44.9"
           cache: true
+
+      - name: Regenerate pubspec.lock
+        run: |
+          set -euo pipefail
+          # Plain resolve, no overrides: this is the normal flavour, and
+          # running it through Flutter (not `dart pub`) is the whole point
+          # — only Flutter applies the SDK's exact pins.
+          flutter pub get
 
       - name: Regenerate pubspec.fdroid.lock
         run: |
@@ -76,56 +94,58 @@ jobs:
           cp /tmp/main.lock pubspec.lock
           rm -f pubspec_overrides.yaml
 
-      - name: Verify the regenerated lock satisfies the fdroid flavour
+      - name: Verify both locks with the very step that gates CI
         run: |
           set -euo pipefail
-          # This is EXACTLY the build-fdroid step that was failing, so a
-          # green run here means the PR's job will pass too.
+          # These are EXACTLY the steps that fail in `analyze` (#3974) and
+          # `build-fdroid` (#3806), so green here means green there.
+          flutter pub get --enforce-lockfile
           cp pubspec.lock /tmp/main.lock
           dart run tool/apply_fdroid_overrides.dart
           flutter pub get --enforce-lockfile
           cp /tmp/main.lock pubspec.lock
           rm -f pubspec_overrides.yaml
 
-      - name: Commit + push if the lock changed
+      - name: Commit + push if either lock changed
         env:
           BRANCH: ${{ inputs.branch }}
         run: |
           set -euo pipefail
-          if git diff --quiet -- pubspec.fdroid.lock; then
-            echo "pubspec.fdroid.lock already up to date — nothing to push."
-            echo "### fdroid lock already current on \`$BRANCH\`" \
+          if git diff --quiet -- pubspec.lock pubspec.fdroid.lock; then
+            echo "Both lockfiles already up to date — nothing to push."
+            echo "### Lockfiles already current on \`$BRANCH\`" \
               >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email \
             "41898282+github-actions[bot]@users.noreply.github.com"
-          git add pubspec.fdroid.lock
+          git add pubspec.lock pubspec.fdroid.lock
           # Single-line subject + body via repeated -m: a raw multi-line
           # string here would break out of this YAML block scalar.
           git commit \
-            -m "build(deps): regenerate pubspec.fdroid.lock" \
-            -m "The F-Droid flavour pins its own lockfile and Dependabot only updates pubspec.lock, so build-fdroid's pub get --enforce-lockfile fails until this derived file is regenerated (#3806)."
+            -m "build(deps): regenerate lockfiles" \
+            -m "pubspec.lock must be the SDK's own resolution and pubspec.fdroid.lock is a second lockfile Dependabot never updates, so both are regenerated through Flutter here (#3974, #3806)."
           git push origin "HEAD:$BRANCH"
           {
-            echo "### Regenerated \`pubspec.fdroid.lock\` on \`$BRANCH\`"
+            echo "### Regenerated lockfiles on \`$BRANCH\`"
             echo ""
             echo '```'
-            git diff HEAD~1 --stat -- pubspec.fdroid.lock
+            git diff HEAD~1 --stat -- pubspec.lock pubspec.fdroid.lock
             echo '```'
             echo ""
-            # #3971 — this push used GITHUB_TOKEN, and events from that token
-            # deliberately start no workflow run, so the branch now sits on a
-            # head SHA with NO checks. Say so here, where the operator is
-            # already looking, rather than leaving a silently unverified PR.
+            # #3971 — this push used GITHUB_TOKEN, and events from that
+            # token deliberately start no workflow run, so the branch now
+            # sits on a head SHA with NO checks. Say so here, where the
+            # operator is already looking, rather than leaving a silently
+            # unverified PR.
             echo "**Now re-fire the checks.** This push used"
             echo "\`GITHUB_TOKEN\`, which by design triggers no workflow"
             echo "run, so the new head SHA carries no results yet:"
             echo ""
             echo '```sh'
-            echo "gh workflow run fdroid.yml --ref $BRANCH   # build-fdroid"
             echo "gh workflow run ci.yml --ref $BRANCH       # the CI matrix"
+            echo "gh workflow run fdroid.yml --ref $BRANCH   # build-fdroid"
             echo '```'
             echo ""
             echo "Or re-fire everything at once with"

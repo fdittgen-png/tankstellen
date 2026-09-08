@@ -145,7 +145,29 @@ jobs:
             .dart_tool
           key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pub-
-      - run: flutter pub get
+      # #3974 — `pubspec.lock` must be the resolution the SDK actually
+      # produces. Dependabot maintains it with plain `dart pub`, which
+      # cannot resolve `sdk: flutter` and so ignores the versions Flutter
+      # exact-pins (`meta: 1.18.0`, `vector_math: 2.2.0` in
+      # packages/flutter/pubspec.yaml; `matcher: 0.12.19` in
+      # packages/flutter_test/pubspec.yaml). A plain `flutter pub get`
+      # silently RE-RESOLVES and rewrites the lock instead of failing, so
+      # the drift was invisible: every job quietly ran versions the file
+      # did not name. `--enforce-lockfile` is the same gate `build-fdroid`
+      # has always applied to pubspec.fdroid.lock — the main flavour's
+      # lock simply never had one.
+      #
+      # When this fails on a Dependabot PR the bump is not wrong, the
+      # derived file is stale: dispatch "Tools · Regenerate lockfiles".
+      - name: Install deps, enforcing pubspec.lock
+        run: |
+          if ! flutter pub get --enforce-lockfile; then
+            echo "::error title=pubspec.lock is not the SDK's resolution::\
+          pubspec.lock names versions Flutter's exact pins forbid. Fix it \
+          with one dispatch: Actions -> 'Tools · Regenerate lockfiles' -> \
+          branch=${{ github.head_ref || github.ref_name }} (#3974)."
+            exit 1
+          fi
       # #1730 — no `build_runner build` here. The .g.dart / .freezed.dart
       # outputs are committed and kept honest by the `codegen-drift` job
       # below, so `analyze` trusts the checked-in generated files instead
