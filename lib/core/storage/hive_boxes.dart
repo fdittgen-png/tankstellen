@@ -247,9 +247,11 @@ class HiveBoxes {
         Hive.openBox<int>(boxSchema),
       ]);
       // HiveError is Hive's runtime storage-failure type, not a bug.
-    } on HiveError catch (e, st) { // ignore: avoid_catching_errors, unused_catch_stack
-      throw HiveCorruptionException(
-          'a storage box could not be opened (${e.message})');
+    } on HiveError catch (e, st) { // ignore: avoid_catching_errors
+      // #3979 — keep Hive's own stack (a plain throw dropped the frame
+      // naming the corrupt box).
+      Error.throwWithStackTrace(HiveCorruptionException(
+          'a storage box could not be opened (${e.message})'), st);
     }
 
     // #2670 — the main isolate owns these for the whole app lifetime; a

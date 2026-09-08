@@ -139,11 +139,20 @@ void main() {
 
     await expectLater(
       chain.searchStations(_params()),
-      throwsA(isA<ServiceChainExhaustedException>().having(
-        (e) => e.errors.single.message,
-        'captured fault',
-        contains('decode drift'),
-      )),
+      throwsA(isA<ServiceChainExhaustedException>()
+          .having(
+            (e) => e.errors.single.message,
+            'captured fault',
+            contains('decode drift'),
+          )
+          // #3979 — the Error's TYPE survives. The chain used to rewrite
+          // every non-Exception as `Exception(e.toString())`, so this
+          // reached the trace as an anonymous "Exception: Bad state: …".
+          .having((e) => e.errors.single.errorType, 'errorType', 'StateError')
+          .having((e) => e.errors.single.stackTrace, 'the attempt\'s own stack',
+              isNotNull)
+          .having((e) => e.message, 'diagnostic names the type',
+              contains('StateError'))),
     );
   });
 
@@ -160,6 +169,9 @@ void main() {
     expect(result.data.single.id, 'a');
     expect(result.errors, isNotEmpty,
         reason: 'the absorbed implementor throw must ride along');
+    // #3979 — and it rides along typed, with its own stack.
+    expect(result.errors.single.errorType, 'TypeError');
+    expect(result.errors.single.stackTrace, isNotNull);
   });
 
   test('a thrown ApiException keeps its typed classification on the '
@@ -168,11 +180,11 @@ void main() {
 
     await expectLater(
       chain.searchStations(_params()),
-      throwsA(isA<ServiceChainExhaustedException>().having(
-        (e) => e.errors.single.statusCode,
-        'statusCode',
-        503,
-      )),
+      throwsA(isA<ServiceChainExhaustedException>()
+          .having((e) => e.errors.single.statusCode, 'statusCode', 503)
+          .having((e) => e.errors.single.errorType, 'errorType',
+              'ApiException')
+          .having((e) => e.errors.single.stackTrace, 'stack', isNotNull)),
     );
   });
 }

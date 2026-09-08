@@ -228,8 +228,7 @@ class StationServiceChain with _ChainCoalescing implements StationService {
       // is logged, never thrown into the void.
       unawaited(pending.then<void>((_) {}).catchError((Object e, StackTrace st) {
         recordDataAccessFailure(countryCode);
-        logStationApiFailure(e is Exception ? e : Exception(e.toString()), st,
-            countryCode: countryCode, cacheKey: cacheKey);
+        logStationApiFailure(e, st, countryCode: countryCode, cacheKey: cacheKey);
       }));
       recordDataAccess(_recorder, countryCode, endpoint,
           DataAccessHit.hiveStale, ServiceSource.cache,
@@ -249,11 +248,15 @@ class StationServiceChain with _ChainCoalescing implements StationService {
       recordDataAccessFailure(countryCode); // #3146 — always-on tally
       // #3370/#2296 — breadcrumb an EXPECTED `unsupported` gap (e.g. Luxembourg
       // has no per-station detail); ERROR-log any real failure (with stack).
-      logStationApiFailure(e is Exception ? e : Exception(e.toString()), st,
-          countryCode: countryCode, cacheKey: cacheKey);
+      // #3979 — `e` as thrown: the old `e is Exception ? e : Exception(e
+      // .toString())` erased every Error subtype (a TypeError on drifted
+      // JSON became an anonymous Exception); the logger takes Object.
+      logStationApiFailure(e, st, countryCode: countryCode, cacheKey: cacheKey);
       errors.add(ServiceError(
         source: _errorSource,
         message: e.toString(),
+        errorType: e.runtimeType.toString(),
+        stackTrace: st,
         statusCode: e is ApiException ? e.statusCode : null,
         kind: e is ApiException ? effectiveFailureKind(e) : FailureKind.unknown,
         retryAfter: e is ApiException ? e.retryAfter : null,

@@ -237,6 +237,8 @@ class LuxembourgStationService
         message: 'LUSTAT prix-maxima fetch failed; serving compile-time '
             'fallback decree prices (#3195): $e',
         kind: e is ApiException ? e.kind : FailureKind.network,
+        errorType: e.runtimeType.toString(),
+        stackTrace: st,
         occurredAt: DateTime.now(),
       ));
       prices = <FuelType, double>{

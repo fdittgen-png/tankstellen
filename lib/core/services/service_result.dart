@@ -107,5 +107,16 @@ abstract class ServiceError with _$ServiceError {
     /// Upstream-suggested backoff parsed from a `Retry-After` header when
     /// [kind] is [FailureKind.rateLimited]; null otherwise.
     Duration? retryAfter,
+
+    /// #3979 — the runtime type of what was thrown (`TypeError`,
+    /// `ApiException`, `DioException`, …). Before, the chain rewrote every
+    /// non-`Exception` as `Exception(e.toString())`, so a `TypeError` from
+    /// drifted JSON reached the trace as an anonymous exception.
+    String? errorType,
+
+    /// #3979 — this attempt's OWN stack. A chain exhaustion used to carry
+    /// N stringified messages and exactly one stack (the rethrow site's);
+    /// now each attempt keeps the one that explains it.
+    StackTrace? stackTrace,
   }) = _ServiceError;
 }

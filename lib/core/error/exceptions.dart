@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'failure_kind.dart';
+import '../services/service_result.dart';
 
 export 'failure_kind.dart';
 
@@ -160,14 +160,23 @@ class NonFuelStationIdException extends AppException {
 /// including the cache. Carries accumulated errors from each step
 /// so the UI can report exactly what went wrong.
 class ServiceChainExhaustedException extends AppException {
-  final List<dynamic> errors;
+  /// One entry per attempt, each with its own type and stack (#3979).
+  /// Typed — `List<dynamic>` let every consumer re-check `is ServiceError`
+  /// and let the chains put anything at all in here.
+  final List<ServiceError> errors;
 
   const ServiceChainExhaustedException({required this.errors});
 
   @override
   String get message {
     if (errors.isEmpty) return 'All services unavailable.';
-    final details = errors.map((e) => e.toString()).join('\n');
+    // One line per attempt. Deliberately NOT `e.toString()`: a
+    // ServiceError now carries a stack, and N stacks do not belong in a
+    // one-line diagnostic — the trace persists them per attempt.
+    final details = errors.map((e) {
+      final type = e.errorType == null ? '' : '${e.errorType}: ';
+      return '${e.source.displayName}: $type${e.message}';
+    }).join('\n');
     return 'All services failed:\n$details';
   }
 

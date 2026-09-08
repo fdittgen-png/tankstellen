@@ -11,7 +11,6 @@ import 'package:uuid/uuid.dart';
 import '../error/exceptions.dart';
 import '../logging/error_logger.dart';
 import '../network/dio_offline.dart';
-import '../services/service_result.dart';
 import 'collectors/app_state_collector.dart';
 import 'collectors/breadcrumb_collector.dart';
 import 'pii_scrubber.dart';
@@ -93,24 +92,20 @@ class TraceRecorder {
     // Build chain snapshot from ServiceChainExhaustedException
     var chain = serviceChainState;
     if (chain == null && effectiveError is ServiceChainExhaustedException) {
+      // #3979 — one typed attempt with its OWN stack per entry. The list
+      // is `List<ServiceError>` now, so the 'unknown' fallback is gone.
       chain = ServiceChainSnapshot(
-        attempts: effectiveError.errors.map((e) {
-          if (e is ServiceError) {
-            return ServiceAttempt(
-              serviceName: e.source.displayName,
-              succeeded: false,
-              errorMessage: e.message,
-              statusCode: e.statusCode,
-              attemptedAt: e.occurredAt,
-            );
-          }
-          return ServiceAttempt(
-            serviceName: 'unknown',
-            succeeded: false,
-            errorMessage: e.toString(),
-            attemptedAt: now,
-          );
-        }).toList(),
+        attempts: effectiveError.errors
+            .map((e) => ServiceAttempt(
+                  serviceName: e.source.displayName,
+                  succeeded: false,
+                  errorMessage: e.message,
+                  errorType: e.errorType,
+                  stackTrace: e.stackTrace?.toString(),
+                  statusCode: e.statusCode,
+                  attemptedAt: e.occurredAt,
+                ))
+            .toList(),
       );
     }
 

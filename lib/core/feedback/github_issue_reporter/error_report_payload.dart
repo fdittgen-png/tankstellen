@@ -109,18 +109,17 @@ class ErrorReportPayload {
       statusCode = error.statusCode;
     }
     if (error is ServiceChainExhaustedException) {
+      // #3979 — `errors` is typed now; the `else` branch that stringified
+      // arbitrary objects went with the `List<dynamic>` that allowed them.
       for (final inner in error.errors) {
-        if (inner is ServiceError) {
-          sourceLabel ??= inner.source.displayName;
-          statusCode ??= inner.statusCode;
-          fallbackChain.add(
-            '${inner.source.displayName}: '
-            '${_sanitizeMessage(inner.message)}'
-            '${inner.statusCode != null ? " (status ${inner.statusCode})" : ""}',
-          );
-        } else {
-          fallbackChain.add(_sanitizeMessage(inner.toString()));
-        }
+        sourceLabel ??= inner.source.displayName;
+        statusCode ??= inner.statusCode;
+        final type = inner.errorType == null ? '' : '${inner.errorType}: ';
+        fallbackChain.add(
+          '${inner.source.displayName}: $type'
+          '${_sanitizeMessage(inner.message)}'
+          '${inner.statusCode != null ? " (status ${inner.statusCode})" : ""}',
+        );
       }
       if (fallbackChain.isNotEmpty) {
         message = fallbackChain.first;
@@ -194,13 +193,8 @@ class ErrorReportPayload {
   /// service error for a [ServiceChainExhaustedException], else the
   /// error's own string form.
   static String _primaryMessage(Object error) {
-    if (error is ServiceChainExhaustedException) {
-      for (final inner in error.errors) {
-        if (inner is ServiceError) return _sanitizeMessage(inner.message);
-      }
-      if (error.errors.isNotEmpty) {
-        return _sanitizeMessage(error.errors.first.toString());
-      }
+    if (error is ServiceChainExhaustedException && error.errors.isNotEmpty) {
+      return _sanitizeMessage(error.errors.first.message);
     }
     return _sanitizeMessage(error.toString());
   }

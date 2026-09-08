@@ -258,16 +258,13 @@ class BatchQueryHelper {
       Duration? ra;
       var limited = false;
       for (final err in e.errors) {
-        if (err is ServiceError) {
-          if (err.kind == FailureKind.rateLimited ||
-              err.kind == FailureKind.network ||
-              err.kind == FailureKind.timeout) {
-            limited = true;
-          }
-          if (err.retryAfter != null &&
-              (ra == null || err.retryAfter! > ra)) {
-            ra = err.retryAfter;
-          }
+        if (err.kind == FailureKind.rateLimited ||
+            err.kind == FailureKind.network ||
+            err.kind == FailureKind.timeout) {
+          limited = true;
+        }
+        if (err.retryAfter != null && (ra == null || err.retryAfter! > ra)) {
+          ra = err.retryAfter;
         }
       }
       return (limited: limited, retryAfter: ra);

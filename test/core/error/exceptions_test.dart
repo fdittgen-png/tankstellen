@@ -3,6 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
+import 'package:tankstellen/core/services/service_result.dart';
 
 void main() {
   group('ApiException', () {
@@ -79,15 +80,32 @@ void main() {
       expect(e.errors, isEmpty);
     });
 
-    test('stores errors list', () {
+    // #3979 — `errors` is `List<ServiceError>`: one typed attempt, with its
+    // own stack, per entry. It used to be `List<dynamic>` and held raw
+    // exceptions, which is the erasure the chains have stopped doing.
+    test('stores one typed attempt per entry', () {
+      final st = StackTrace.current;
       final errors = [
-        const ApiException(message: 'timeout'),
-        const CacheException(message: 'miss'),
+        ServiceError(
+          source: ServiceSource.tankerkoenigApi,
+          message: 'timeout',
+          errorType: 'ApiException',
+          stackTrace: st,
+          occurredAt: DateTime.utc(2026, 9, 8),
+        ),
+        ServiceError(
+          source: ServiceSource.cache,
+          message: 'miss',
+          errorType: 'CacheException',
+          stackTrace: st,
+          occurredAt: DateTime.utc(2026, 9, 8),
+        ),
       ];
       final e = ServiceChainExhaustedException(errors: errors);
       expect(e.errors.length, 2);
-      expect(e.errors[0], isA<ApiException>());
-      expect(e.errors[1], isA<CacheException>());
+      expect(e.errors[0].errorType, 'ApiException');
+      expect(e.errors[1].errorType, 'CacheException');
+      expect(e.errors.every((x) => x.stackTrace == st), isTrue);
     });
 
     test('toString with empty errors shows generic message', () {
@@ -95,15 +113,30 @@ void main() {
       expect(e.toString(), 'All services unavailable.');
     });
 
-    test('toString with errors lists each error', () {
-      const e = ServiceChainExhaustedException(errors: [
-        ApiException(message: 'down', statusCode: 500),
-        CacheException(message: 'empty'),
+    test('toString lists each attempt as source, type and message — '
+        'never its stack', () {
+      final e = ServiceChainExhaustedException(errors: [
+        ServiceError(
+          source: ServiceSource.tankerkoenigApi,
+          message: 'down',
+          errorType: 'ApiException',
+          statusCode: 500,
+          stackTrace: StackTrace.current,
+          occurredAt: DateTime.utc(2026, 9, 8),
+        ),
+        ServiceError(
+          source: ServiceSource.cache,
+          message: 'empty',
+          occurredAt: DateTime.utc(2026, 9, 8),
+        ),
       ]);
       final str = e.toString();
       expect(str, startsWith('All services failed:'));
-      expect(str, contains('ApiException: down (status: 500)'));
-      expect(str, contains('CacheException'));
+      expect(str, contains('Tankerkönig API: ApiException: down'));
+      expect(str, contains('empty'));
+      // N stacks do not belong in a one-line diagnostic; the trace
+      // persists them per attempt (#3979).
+      expect(str, isNot(contains('exceptions_test.dart')));
     });
 
     test('implements Exception', () {
@@ -152,7 +185,18 @@ void main() {
     });
 
     test('ServiceChainExhaustedException message with errors', () {
-      const e = ServiceChainExhaustedException(errors: ['err1', 'err2']);
+      final e = ServiceChainExhaustedException(errors: [
+        ServiceError(
+          source: ServiceSource.tankerkoenigApi,
+          message: 'err1',
+          occurredAt: DateTime.utc(2026, 9, 8),
+        ),
+        ServiceError(
+          source: ServiceSource.cache,
+          message: 'err2',
+          occurredAt: DateTime.utc(2026, 9, 8),
+        ),
+      ]);
       expect(e.message, contains('err1'));
       expect(e.message, contains('err2'));
     });

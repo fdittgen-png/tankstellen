@@ -1244,7 +1244,11 @@ as String?,
 /// @nodoc
 mixin _$ServiceAttempt {
 
- String get serviceName; bool get succeeded; String? get errorMessage; int? get statusCode; DateTime get attemptedAt;
+ String get serviceName; bool get succeeded; String? get errorMessage;/// #3979 — runtime type of the throw at this attempt (`TypeError`,
+/// `ApiException`, …), so the export names what failed per attempt.
+ String? get errorType;/// #3979 — this attempt's own stack, as text. Null for traces persisted
+/// before the field existed.
+ String? get stackTrace; int? get statusCode; DateTime get attemptedAt;
 /// Create a copy of ServiceAttempt
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1257,16 +1261,16 @@ $ServiceAttemptCopyWith<ServiceAttempt> get copyWith => _$ServiceAttemptCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ServiceAttempt&&(identical(other.serviceName, serviceName) || other.serviceName == serviceName)&&(identical(other.succeeded, succeeded) || other.succeeded == succeeded)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&(identical(other.attemptedAt, attemptedAt) || other.attemptedAt == attemptedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ServiceAttempt&&(identical(other.serviceName, serviceName) || other.serviceName == serviceName)&&(identical(other.succeeded, succeeded) || other.succeeded == succeeded)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.errorType, errorType) || other.errorType == errorType)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&(identical(other.attemptedAt, attemptedAt) || other.attemptedAt == attemptedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,serviceName,succeeded,errorMessage,statusCode,attemptedAt);
+int get hashCode => Object.hash(runtimeType,serviceName,succeeded,errorMessage,errorType,stackTrace,statusCode,attemptedAt);
 
 @override
 String toString() {
-  return 'ServiceAttempt(serviceName: $serviceName, succeeded: $succeeded, errorMessage: $errorMessage, statusCode: $statusCode, attemptedAt: $attemptedAt)';
+  return 'ServiceAttempt(serviceName: $serviceName, succeeded: $succeeded, errorMessage: $errorMessage, errorType: $errorType, stackTrace: $stackTrace, statusCode: $statusCode, attemptedAt: $attemptedAt)';
 }
 
 
@@ -1277,7 +1281,7 @@ abstract mixin class $ServiceAttemptCopyWith<$Res>  {
   factory $ServiceAttemptCopyWith(ServiceAttempt value, $Res Function(ServiceAttempt) _then) = _$ServiceAttemptCopyWithImpl;
 @useResult
 $Res call({
- String serviceName, bool succeeded, String? errorMessage, int? statusCode, DateTime attemptedAt
+ String serviceName, bool succeeded, String? errorMessage, String? errorType, String? stackTrace, int? statusCode, DateTime attemptedAt
 });
 
 
@@ -1294,11 +1298,13 @@ class _$ServiceAttemptCopyWithImpl<$Res>
 
 /// Create a copy of ServiceAttempt
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? serviceName = null,Object? succeeded = null,Object? errorMessage = freezed,Object? statusCode = freezed,Object? attemptedAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? serviceName = null,Object? succeeded = null,Object? errorMessage = freezed,Object? errorType = freezed,Object? stackTrace = freezed,Object? statusCode = freezed,Object? attemptedAt = null,}) {
   return _then(_self.copyWith(
 serviceName: null == serviceName ? _self.serviceName : serviceName // ignore: cast_nullable_to_non_nullable
 as String,succeeded: null == succeeded ? _self.succeeded : succeeded // ignore: cast_nullable_to_non_nullable
 as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
+as String?,errorType: freezed == errorType ? _self.errorType : errorType // ignore: cast_nullable_to_non_nullable
+as String?,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
 as String?,statusCode: freezed == statusCode ? _self.statusCode : statusCode // ignore: cast_nullable_to_non_nullable
 as int?,attemptedAt: null == attemptedAt ? _self.attemptedAt : attemptedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
@@ -1386,10 +1392,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String serviceName,  bool succeeded,  String? errorMessage,  int? statusCode,  DateTime attemptedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String serviceName,  bool succeeded,  String? errorMessage,  String? errorType,  String? stackTrace,  int? statusCode,  DateTime attemptedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ServiceAttempt() when $default != null:
-return $default(_that.serviceName,_that.succeeded,_that.errorMessage,_that.statusCode,_that.attemptedAt);case _:
+return $default(_that.serviceName,_that.succeeded,_that.errorMessage,_that.errorType,_that.stackTrace,_that.statusCode,_that.attemptedAt);case _:
   return orElse();
 
 }
@@ -1407,10 +1413,10 @@ return $default(_that.serviceName,_that.succeeded,_that.errorMessage,_that.statu
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String serviceName,  bool succeeded,  String? errorMessage,  int? statusCode,  DateTime attemptedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String serviceName,  bool succeeded,  String? errorMessage,  String? errorType,  String? stackTrace,  int? statusCode,  DateTime attemptedAt)  $default,) {final _that = this;
 switch (_that) {
 case _ServiceAttempt():
-return $default(_that.serviceName,_that.succeeded,_that.errorMessage,_that.statusCode,_that.attemptedAt);case _:
+return $default(_that.serviceName,_that.succeeded,_that.errorMessage,_that.errorType,_that.stackTrace,_that.statusCode,_that.attemptedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1427,10 +1433,10 @@ return $default(_that.serviceName,_that.succeeded,_that.errorMessage,_that.statu
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String serviceName,  bool succeeded,  String? errorMessage,  int? statusCode,  DateTime attemptedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String serviceName,  bool succeeded,  String? errorMessage,  String? errorType,  String? stackTrace,  int? statusCode,  DateTime attemptedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _ServiceAttempt() when $default != null:
-return $default(_that.serviceName,_that.succeeded,_that.errorMessage,_that.statusCode,_that.attemptedAt);case _:
+return $default(_that.serviceName,_that.succeeded,_that.errorMessage,_that.errorType,_that.stackTrace,_that.statusCode,_that.attemptedAt);case _:
   return null;
 
 }
@@ -1442,12 +1448,18 @@ return $default(_that.serviceName,_that.succeeded,_that.errorMessage,_that.statu
 @JsonSerializable()
 
 class _ServiceAttempt implements ServiceAttempt {
-  const _ServiceAttempt({required this.serviceName, required this.succeeded, this.errorMessage, this.statusCode, required this.attemptedAt});
+  const _ServiceAttempt({required this.serviceName, required this.succeeded, this.errorMessage, this.errorType, this.stackTrace, this.statusCode, required this.attemptedAt});
   factory _ServiceAttempt.fromJson(Map<String, dynamic> json) => _$ServiceAttemptFromJson(json);
 
 @override final  String serviceName;
 @override final  bool succeeded;
 @override final  String? errorMessage;
+/// #3979 — runtime type of the throw at this attempt (`TypeError`,
+/// `ApiException`, …), so the export names what failed per attempt.
+@override final  String? errorType;
+/// #3979 — this attempt's own stack, as text. Null for traces persisted
+/// before the field existed.
+@override final  String? stackTrace;
 @override final  int? statusCode;
 @override final  DateTime attemptedAt;
 
@@ -1464,16 +1476,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ServiceAttempt&&(identical(other.serviceName, serviceName) || other.serviceName == serviceName)&&(identical(other.succeeded, succeeded) || other.succeeded == succeeded)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&(identical(other.attemptedAt, attemptedAt) || other.attemptedAt == attemptedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ServiceAttempt&&(identical(other.serviceName, serviceName) || other.serviceName == serviceName)&&(identical(other.succeeded, succeeded) || other.succeeded == succeeded)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.errorType, errorType) || other.errorType == errorType)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&(identical(other.attemptedAt, attemptedAt) || other.attemptedAt == attemptedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,serviceName,succeeded,errorMessage,statusCode,attemptedAt);
+int get hashCode => Object.hash(runtimeType,serviceName,succeeded,errorMessage,errorType,stackTrace,statusCode,attemptedAt);
 
 @override
 String toString() {
-  return 'ServiceAttempt(serviceName: $serviceName, succeeded: $succeeded, errorMessage: $errorMessage, statusCode: $statusCode, attemptedAt: $attemptedAt)';
+  return 'ServiceAttempt(serviceName: $serviceName, succeeded: $succeeded, errorMessage: $errorMessage, errorType: $errorType, stackTrace: $stackTrace, statusCode: $statusCode, attemptedAt: $attemptedAt)';
 }
 
 
@@ -1484,7 +1496,7 @@ abstract mixin class _$ServiceAttemptCopyWith<$Res> implements $ServiceAttemptCo
   factory _$ServiceAttemptCopyWith(_ServiceAttempt value, $Res Function(_ServiceAttempt) _then) = __$ServiceAttemptCopyWithImpl;
 @override @useResult
 $Res call({
- String serviceName, bool succeeded, String? errorMessage, int? statusCode, DateTime attemptedAt
+ String serviceName, bool succeeded, String? errorMessage, String? errorType, String? stackTrace, int? statusCode, DateTime attemptedAt
 });
 
 
@@ -1501,11 +1513,13 @@ class __$ServiceAttemptCopyWithImpl<$Res>
 
 /// Create a copy of ServiceAttempt
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? serviceName = null,Object? succeeded = null,Object? errorMessage = freezed,Object? statusCode = freezed,Object? attemptedAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? serviceName = null,Object? succeeded = null,Object? errorMessage = freezed,Object? errorType = freezed,Object? stackTrace = freezed,Object? statusCode = freezed,Object? attemptedAt = null,}) {
   return _then(_ServiceAttempt(
 serviceName: null == serviceName ? _self.serviceName : serviceName // ignore: cast_nullable_to_non_nullable
 as String,succeeded: null == succeeded ? _self.succeeded : succeeded // ignore: cast_nullable_to_non_nullable
 as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
+as String?,errorType: freezed == errorType ? _self.errorType : errorType // ignore: cast_nullable_to_non_nullable
+as String?,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
 as String?,statusCode: freezed == statusCode ? _self.statusCode : statusCode // ignore: cast_nullable_to_non_nullable
 as int?,attemptedAt: null == attemptedAt ? _self.attemptedAt : attemptedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
