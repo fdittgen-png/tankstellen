@@ -1,11 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
 import '../logging/error_logger.dart';
+import '../logging/app_log.dart';
 
 /// #3451 — off-main-isolate decode for pulled sync payloads.
 ///
@@ -59,9 +59,9 @@ class BatchDecode {
       // never cost the pull — decode inline instead: behaviour-identical,
       // only the thread changes. Logged so a systematically broken
       // offload is field-visible.
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.sync, context: const {
         'where': 'BatchDecode compute() failed — decoded inline'
-      }));
+      });
       return entrypoint(rows);
     }
   }

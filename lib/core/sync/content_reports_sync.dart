@@ -1,11 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
 import '../../core/logging/error_logger.dart';
+import '../../core/logging/app_log.dart';
 import 'sync_transport.dart';
 
 /// Files in-app "Report content" rows against community user-generated
@@ -59,8 +59,7 @@ class ContentReportsSync {
       debugPrint('ContentReportsSync.submit: $targetKind/$targetId reported');
       return true;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-          context: const {'where': 'ContentReportsSync.submit FAILED'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'ContentReportsSync.submit FAILED'});
       return false;
     }
   }

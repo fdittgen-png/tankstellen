@@ -1,11 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
 import '../../core/logging/error_logger.dart';
+import '../../core/logging/app_log.dart';
 import '../utils/json_extensions.dart';
 import 'deletions_sync.dart';
 import 'entity_sync.dart';
@@ -62,8 +62,7 @@ class RatingsSync {
       debugPrint(
           'RatingsSync.upsert: $stationId = $rating stars (shared=$shared)');
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-          context: const {'where': 'RatingsSync.upsert FAILED'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'RatingsSync.upsert FAILED'});
     }
   }
 
@@ -99,8 +98,7 @@ class RatingsSync {
       await t.upsert(_table, rows, onConflict: 'user_id,station_id');
       debugPrint('RatingsSync.upsertAll: ${rows.length} ratings in 1 round-trip');
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-          context: const {'where': 'RatingsSync.upsertAll FAILED'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'RatingsSync.upsertAll FAILED'});
     }
   }
 
@@ -143,8 +141,7 @@ class RatingsSync {
       }
       return result;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-          context: const {'where': 'RatingsSync.fetchAll FAILED'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'RatingsSync.fetchAll FAILED'});
       return {};
     }
   }

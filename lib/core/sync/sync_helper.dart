@@ -1,11 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'sync_provider.dart';
 import '../../core/logging/error_logger.dart';
+import '../../core/logging/app_log.dart';
 import '../telemetry/health_counters.dart';
 import '../utils/json_extensions.dart';
 
@@ -59,7 +59,7 @@ class SyncHelper {
       }
     } catch (e, st) {
       healthCounters.increment('sync.${context.toLowerCase()}.failures');
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: {'where': 'SyncHelper[$context]: sync failed'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: {'where': 'SyncHelper[$context]: sync failed'});
     }
   }
 

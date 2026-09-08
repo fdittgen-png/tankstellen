@@ -1,11 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
 import '../logging/error_logger.dart';
+import '../logging/app_log.dart';
 import '../utils/json_extensions.dart';
 import 'deletions_sync.dart';
 import 'sync_transport.dart';
@@ -112,11 +112,11 @@ class SyncedDataDeletion {
         debugPrint('SyncedDataDeletion: wiped "$table"');
       } catch (e, st) {
         allOk = false;
-        unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: {
+        log.error(e, st, layer: ErrorLayer.sync, context: {
           'where': 'SyncedDataDeletion.delete FAILED for table',
           'table': table,
           'category': category.name,
-        }));
+        });
       }
     }
     return allOk;

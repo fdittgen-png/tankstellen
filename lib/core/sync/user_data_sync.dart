@@ -1,13 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
 import 'supabase_client.dart';
 import '../../features/trips/api.dart';
 import '../../core/logging/error_logger.dart';
+import '../../core/logging/app_log.dart';
 
 /// GDPR data-management operations over the user's full server-side
 /// footprint, pulled out of [SyncService] (#727).
@@ -72,9 +72,9 @@ class UserDataSync {
           // A self-host schema older than the table: export what exists.
           unavailable.add(entry.key);
           out[entry.key] = const <dynamic>[];
-          unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: {
-            'where': 'UserDataSync.fetchAll: ${entry.key} unavailable'
-          }));
+          log.error(e, st, layer: ErrorLayer.sync, context: {
+            'where': 'UserDataSync.fetchAll: ${entry.key} unavailable', 'entity': entry.key
+          });
         }
       }
       try {
@@ -90,8 +90,7 @@ class UserDataSync {
       if (unavailable.isNotEmpty) out['unavailable'] = unavailable;
       return out;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-          context: const {'where': 'UserDataSync.fetchAll FAILED'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'UserDataSync.fetchAll FAILED'});
       return {'error': e.toString()};
     }
   }
@@ -143,9 +142,9 @@ class UserDataSync {
     } catch (e, st) {
       // Schema < v9 (self-host that has not re-run the setup SQL): fall
       // back to the per-table path and REPORT what it could not do.
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.sync, context: const {
         'where': 'erase_my_data RPC unavailable (schema < v9?) — per-table'
-      }));
+      });
     }
     final failed = <String>[];
     final deleted = <String, int>{};
@@ -155,17 +154,16 @@ class UserDataSync {
         deleted[entry.key] = -1; // count unknown on this path
       } catch (e, st) {
         failed.add(entry.key);
-        unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: {
-          'where': 'UserDataSync.deleteAll FAILED for ${entry.key}'
-        }));
+        log.error(e, st, layer: ErrorLayer.sync, context: {
+          'where': 'UserDataSync.deleteAll FAILED for ${entry.key}', 'entity': entry.key
+        });
       }
     }
     try {
       await TripsSync.forgetAllForUser();
     } catch (e, st) {
       failed.add('trip_summaries');
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-          context: const {'where': 'UserDataSync.deleteAll trips FAILED'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'UserDataSync.deleteAll trips FAILED'});
     }
     return ServerErasureResult(deleted: deleted, failedTables: failed);
   }
@@ -183,8 +181,7 @@ class UserDataSync {
       await client.from(table).delete().eq(idColumn, id);
       return true;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-          context: {'where': 'UserDataSync.deleteOwnRow $table'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: {'where': 'UserDataSync.deleteOwnRow $table'});
       return false;
     }
   }

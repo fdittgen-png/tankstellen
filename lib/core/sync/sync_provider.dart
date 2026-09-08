@@ -20,6 +20,7 @@ import 'sync_events.dart';
 import 'sync_run_trace.dart';
 import 'user_data_sync.dart';
 import '../../core/logging/error_logger.dart';
+import '../../core/logging/app_log.dart';
 
 // #3449 — the seam typedefs + EmailAuthResult moved to sync_auth_types.dart
 // (this file sits at the 400-line cap); re-exported so existing imports
@@ -102,7 +103,7 @@ class SyncState extends _$SyncState {
       // Initial sync: upload local data to server (non-blocking)
       _performInitialSync(storage);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'TankSync connect failed'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'TankSync connect failed'});
       rethrow;
     }
   }
@@ -247,7 +248,7 @@ class SyncState extends _$SyncState {
       // Sync local data to the new anonymous account
       _performInitialSync(storage);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'switchToAnonymous failed'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'switchToAnonymous failed'});
       rethrow;
     }
   }
@@ -258,7 +259,7 @@ class SyncState extends _$SyncState {
     try {
       await TankSyncClient.signOut();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'TankSync signOut failed'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'TankSync signOut failed'});
     }
 
     await storage.putSetting('sync_enabled', false);
@@ -286,7 +287,7 @@ class SyncState extends _$SyncState {
         await syncAndPersistRatings(storage);
         debugPrint('InitialSync: complete');
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'InitialSync failed (non-fatal)'}));
+        log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'InitialSync failed (non-fatal)'});
       }
     }));
   }

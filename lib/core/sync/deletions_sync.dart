@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
@@ -10,6 +9,7 @@ import 'pending_deletions_journal.dart';
 import 'sync_device_identity.dart';
 import 'sync_transport.dart';
 import '../../core/logging/error_logger.dart';
+import '../../core/logging/app_log.dart';
 import '../telemetry/collectors/breadcrumb_collector.dart';
 
 /// Deletion tombstones (#3078, Epic #3075).
@@ -100,8 +100,7 @@ class DeletionsSync {
         _breadcrumbDeletionsAbsent();
         return false;
       }
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-          context: const {'where': 'DeletionsSync.record FAILED'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'DeletionsSync.record FAILED'});
       return false;
     }
   }
@@ -137,10 +136,10 @@ class DeletionsSync {
       if (!_isMissingForensicColumn(e)) rethrow;
       // Surface the outdated-schema signal (the verifier flags it too),
       // then degrade to a stamp-less write.
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.sync, context: const {
         'where': 'DeletionsSync: pre-v4 schema — tombstone upsert retried '
             'without the #3125 forensic columns'
-      }));
+      });
       final legacyRows = [
         for (final row in rows)
           {...row}
@@ -225,8 +224,7 @@ class DeletionsSync {
         _breadcrumbDeletionsAbsent();
         return PendingDeletionsJournal.pendingIds(tableName);
       }
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-          context: const {'where': 'DeletionsSync.fetchTombstonedIds FAILED'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'DeletionsSync.fetchTombstonedIds FAILED'});
       return PendingDeletionsJournal.pendingIds(tableName);
     }
   }

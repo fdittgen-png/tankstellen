@@ -1,13 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../logging/error_logger.dart';
+import '../logging/app_log.dart';
 
 /// Minimal key-value seam over [FlutterSecureStorage] so tests can fake
 /// (and fault-inject) the platform keychain/keystore without a method
@@ -110,10 +110,10 @@ class SecureSessionLocalStorage extends LocalStorage {
       // session (imported or already newer).
       await prefs.remove(persistSessionKey);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.sync, context: const {
         'where': 'SecureSessionLocalStorage: legacy prefs session migration '
             'failed — will retry next start'
-      }));
+      });
     }
   }
 
@@ -127,10 +127,10 @@ class SecureSessionLocalStorage extends LocalStorage {
     } catch (e, st) {
       // Degrade to "no persisted session" → the auth flow falls back to
       // a fresh sign-in instead of crash-looping on a broken keystore.
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.sync, context: const {
         'where': 'SecureSessionLocalStorage: secure-store read failed — '
             'degrading to fresh sign-in'
-      }));
+      });
       return null;
     }
   }
@@ -142,10 +142,10 @@ class SecureSessionLocalStorage extends LocalStorage {
     } catch (e, st) {
       // Best-effort: the in-memory session keeps working for this run;
       // the next start falls back to a fresh sign-in.
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.sync, context: const {
         'where': 'SecureSessionLocalStorage: secure-store write failed — '
             'session not persisted'
-      }));
+      });
     }
   }
 
@@ -154,9 +154,9 @@ class SecureSessionLocalStorage extends LocalStorage {
     try {
       await _secureStore.delete(persistSessionKey);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.sync, context: const {
         'where': 'SecureSessionLocalStorage: secure-store delete failed'
-      }));
+      });
     }
   }
 }

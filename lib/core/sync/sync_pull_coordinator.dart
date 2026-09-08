@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../logging/error_logger.dart';
+import '../logging/app_log.dart';
 import '../perf/launch_sync_trace.dart';
 
 /// One registered server→local pull covering [tables] (#3447).
@@ -123,8 +124,7 @@ class SyncPullCoordinator {
       await Future.wait(_entries.map((e) => _pullOne(e, trace)));
       _lastCompletedAt = now();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-          context: const {'where': 'SyncPullCoordinator.pullAll'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'SyncPullCoordinator.pullAll'});
     } finally {
       _running = false;
     }
@@ -137,14 +137,13 @@ class SyncPullCoordinator {
       try {
         pulled = await entry.pull().timeout(entry.timeout);
       } on TimeoutException catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: {
+        log.error(e, st, layer: ErrorLayer.sync, context: {
           'where': 'sync pull timed out',
           'tables': name,
           'timeoutSeconds': entry.timeout.inSeconds,
-        }));
+        });
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-            context: {'where': 'sync pull FAILED', 'tables': name}));
+        log.error(e, st, layer: ErrorLayer.sync, context: {'where': 'sync pull FAILED', 'tables': name});
       }
     }, attributes: () => {'table': name, 'pulled': pulled});
   }
