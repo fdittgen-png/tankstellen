@@ -82,6 +82,9 @@ docs/*
 !docs/play-store/
 !docs/decisions/
 !docs/guides/
+# The user and developer wiki: the repository is the source of truth
+# and the GitHub wiki is its mirror (#4005, docs/guides/wiki-mirror.md).
+!docs/wiki/
 !docs/screenshots/
 !docs/design/
 !docs/security/
@@ -132,6 +135,7 @@ docs/guides/*
 !docs/guides/obd2-link-rewrite-validation.md
 !docs/guides/opening-hours.md
 !docs/guides/play-fgs-declaration.md
+!docs/guides/wiki-mirror.md
 
 # Development-only assets (screenshots, mockups)
 assets_dev/
@@ -162,3 +166,4 @@ pubspec_overrides.yaml
 # Epic #3865 — the GDPR data inventory is the source of truth the surfaces tests read
 !docs/privacy/
 !docs/privacy/data_inventory.json
+.media-workbench/
