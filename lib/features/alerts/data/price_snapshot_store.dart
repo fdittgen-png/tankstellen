@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'dart:convert';
 
@@ -11,6 +10,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../../../core/storage/hive_boxes.dart';
 import 'models/price_snapshot.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 
 /// Hive-backed rolling store of [PriceSnapshot] records (#579).
 ///
@@ -46,7 +46,7 @@ class PriceSnapshotStore {
       if (!Hive.isBoxOpen(HiveBoxes.priceSnapshots)) return null;
       return Hive.box<String>(HiveBoxes.priceSnapshots);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'PriceSnapshotStore: box unavailable'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'PriceSnapshotStore: box unavailable'});
       return null;
     }
   }
@@ -87,7 +87,7 @@ class PriceSnapshotStore {
           out.add(PriceSnapshot.fromJson(map));
         }
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {'where': 'PriceSnapshotStore.all: skipping $key'}));
+        log.error(e, st, layer: ErrorLayer.storage, context: {'where': 'PriceSnapshotStore.all: skipping $key', 'entity': key});
       }
     }
     out.sort((a, b) => a.timestamp.compareTo(b.timestamp));
@@ -130,7 +130,7 @@ class PriceSnapshotStore {
           toDelete.add(key);
         }
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {'where': 'PriceSnapshotStore._prune: removing corrupt $key'}));
+        log.error(e, st, layer: ErrorLayer.storage, context: {'where': 'PriceSnapshotStore._prune: removing corrupt $key', 'entity': key});
         toDelete.add(key);
       }
     }

@@ -1,12 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../../core/storage/hive_boxes.dart';
 
 /// Cross-trigger dedup ledger for the on-device background scan (#2415).
@@ -50,10 +50,9 @@ class BackgroundScanDedupStore {
       if (!Hive.isBoxOpen(HiveBoxes.alerts)) return null;
       return Hive.box(HiveBoxes.alerts);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: const {
+      log.error(e, st, layer: ErrorLayer.storage, context: const {
             'where': 'BackgroundScanDedupStore: alerts box unavailable'
-          }));
+          });
       return null;
     }
   }

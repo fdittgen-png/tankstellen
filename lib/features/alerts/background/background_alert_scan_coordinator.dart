@@ -1,13 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
 import '../data/repositories/alert_repository.dart';
 import '../../widget/api.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../../core/storage/hive_storage.dart';
 import '../../../core/cache/cache_manager.dart';
 import '../../../core/background/alert_scan_journal.dart';
@@ -168,10 +168,10 @@ class BackgroundAlertScanCoordinator {
       // IsolateErrorSpool when unbound (background isolate), so the former
       // explicit `IsolateErrorSpool.enqueue` double-logged every scan
       // failure; the bg_scan tag now travels in the context map instead.
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {
+      log.error(e, st, layer: ErrorLayer.other, context: {
         'where': 'BackgroundAlertScanCoordinator: scan failed (${trigger.tag})',
         'isolateTaskName': 'bg_scan_${trigger.tag}',
-      }));
+      });
       // #3147 — the error TYPE only (PII-safe), so the journal shows a
       // failed run distinctly from "no scan ran at all".
       await _journal.append(
@@ -181,9 +181,9 @@ class BackgroundAlertScanCoordinator {
       try {
         await HiveStorage.closeIsolateBoxes();
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
+        log.error(e, st, layer: ErrorLayer.other, context: const {
           'where': 'BackgroundAlertScanCoordinator: failed to close Hive boxes'
-        }));
+        });
       }
       lock?.release();
     }
@@ -374,9 +374,9 @@ class BackgroundAlertScanCoordinator {
         stationService: service,
       );
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.other, context: const {
         'where': 'BackgroundAlertScanCoordinator: nearest widget refresh failed'
-      }));
+      });
     }
   }
 }

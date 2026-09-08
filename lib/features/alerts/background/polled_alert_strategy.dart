@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -11,6 +10,7 @@ import '../../../core/domain/station.dart';
 import '../../../core/cache/cache_manager.dart';
 import '../../../core/data/storage_repository.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../../core/services/country_service_registry.dart';
 import '../../../core/services/diagnostics/data_access_recorder.dart';
 import '../../../core/services/dio_factory.dart';
@@ -207,10 +207,10 @@ class PolledAlertStrategy implements CountryAlertStrategy {
       }
       return out;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {
-        'where': 'PolledAlertStrategy.fetchPrices($countryCode)',
+      log.error(e, st, layer: ErrorLayer.other, context: {
+        'where': 'PolledAlertStrategy.fetchPrices($countryCode)', 'country': countryCode,
         'ids': stationIds.length,
-      }));
+      });
       return const {};
     }
   }
@@ -230,9 +230,9 @@ class PolledAlertStrategy implements CountryAlertStrategy {
       final result = await _service.searchStations(params);
       return result.data;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {
-        'where': 'PolledAlertStrategy.searchArea($countryCode)',
-      }));
+      log.error(e, st, layer: ErrorLayer.other, context: {
+        'where': 'PolledAlertStrategy.searchArea($countryCode)', 'country': countryCode,
+      });
       return const [];
     }
   }

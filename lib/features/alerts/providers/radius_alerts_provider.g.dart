@@ -173,7 +173,7 @@ final class RadiusAlertsProvider
   RadiusAlerts create() => RadiusAlerts();
 }
 
-String _$radiusAlertsHash() => r'67d47bec87f7308c5212362b18a42b918219bf01';
+String _$radiusAlertsHash() => r'1a09313b658e66234754a1c494fa3aeae8301890';
 
 /// Radius-watchlist state (#578 phase 1).
 ///

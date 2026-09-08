@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
@@ -18,6 +17,7 @@ import '../../alerts/domain/velocity_alert_detector.dart';
 import '../../../core/domain/search_params.dart';
 import '../../../core/constants/field_names.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../../core/notifications/local_notification_service.dart';
 import '../../../core/notifications/notification_service.dart';
 import '../../../core/services/country_service_registry.dart';
@@ -200,11 +200,11 @@ class BackgroundScanRunners {
       // to the IsolateErrorSpool when unbound, so the former explicit
       // `IsolateErrorSpool.enqueue` double-logged every failure (halving
       // the effective spool depth); context travels in the map instead.
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {
+      log.error(e, st, layer: ErrorLayer.other, context: {
         'where': 'BackgroundScanRunners: velocity detector failed',
         'isolateTaskName': 'velocity_detector',
         'priceCount': prices.length,
-      }));
+      });
       return 0;
     }
   }
@@ -278,10 +278,10 @@ class BackgroundScanRunners {
       return fired.length;
     } catch (e, st) {
       // #3147 bonus — single log call (see [runVelocity]'s catch).
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.other, context: const {
         'where': 'BackgroundScanRunners: radius alert runner failed',
         'isolateTaskName': 'radius_alerts',
-      }));
+      });
       return 0;
     }
   }

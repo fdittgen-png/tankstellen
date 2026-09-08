@@ -15,6 +15,7 @@ import '../../../core/utils/event_loop_yield.dart';
 import '../data/models/price_alert.dart';
 import '../data/repositories/alert_repository.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 
 part 'alert_provider.g.dart';
 
@@ -135,7 +136,7 @@ class AlertNotifier extends _$AlertNotifier {
         }
       }
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'AlertProvider: sync failed'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'AlertProvider: sync failed'});
     }
     return 0;
   }

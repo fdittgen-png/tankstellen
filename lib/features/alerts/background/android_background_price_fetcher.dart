@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,6 +8,7 @@ import 'package:workmanager/workmanager.dart';
 
 import '../../../core/background/background_price_fetcher.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import 'background_service.dart';
 
 /// Android implementation of [BackgroundPriceFetcher] using WorkManager.
@@ -86,9 +86,9 @@ class AndroidBackgroundPriceFetcher implements BackgroundPriceFetcher {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(handleBuildKey, info.buildNumber);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.background, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.background, context: const {
         'where': 'AndroidBackgroundPriceFetcher: stamp handle build (#3688)',
-      }));
+      });
     }
   }
 

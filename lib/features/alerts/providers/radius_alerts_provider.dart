@@ -10,6 +10,7 @@ import '../data/radius_alert_store.dart';
 import '../domain/entities/radius_alert.dart';
 import '../background/background_service.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../../core/notifications/notification_providers.dart';
 
 part 'radius_alerts_provider.g.dart';
@@ -52,7 +53,7 @@ class RadiusAlerts extends _$RadiusAlerts {
       // surface a false-success state (#2314).
       state = AsyncValue.data(await store.list());
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'RadiusAlerts.add'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'RadiusAlerts.add'});
       state = AsyncValue.error(e, st);
       return;
     }
@@ -84,7 +85,7 @@ class RadiusAlerts extends _$RadiusAlerts {
       // surface a false-success state (#2314).
       state = AsyncValue.data(await store.list());
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'RadiusAlerts.remove'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'RadiusAlerts.remove'});
       state = AsyncValue.error(e, st);
       return;
     }
@@ -113,7 +114,7 @@ class RadiusAlerts extends _$RadiusAlerts {
       // surface a false-success state (#2314).
       state = AsyncValue.data(await store.list());
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'RadiusAlerts.toggle'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'RadiusAlerts.toggle'});
       state = AsyncValue.error(e, st);
       return;
     }

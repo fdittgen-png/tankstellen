@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'dart:convert';
 
@@ -17,6 +16,7 @@ import 'models/price_snapshot.dart';
 import 'price_snapshot_store.dart';
 import 'velocity_alert_cooldown.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 
 /// Glue between the background price refresh cycle and the
 /// velocity detector (#579).
@@ -148,7 +148,7 @@ class VelocityAlertRunner {
         }
       }
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'VelocityAlertRunner.loadConfig: falling back to defaults'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'VelocityAlertRunner.loadConfig: falling back to defaults'});
     }
     return VelocityAlertConfig.defaults();
   }

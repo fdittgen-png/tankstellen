@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'dart:convert';
 
@@ -11,6 +10,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../../../core/storage/hive_boxes.dart';
 import '../domain/entities/radius_alert.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 
 /// Hive-backed store for [RadiusAlert] records (#578 phase 1).
 ///
@@ -42,7 +42,7 @@ class RadiusAlertStore {
       if (!Hive.isBoxOpen(HiveBoxes.alerts)) return null;
       return Hive.box(HiveBoxes.alerts);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'RadiusAlertStore: alerts box unavailable'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'RadiusAlertStore: alerts box unavailable'});
       return null;
     }
   }
@@ -62,7 +62,7 @@ class RadiusAlertStore {
         if (json == null) continue;
         out.add(RadiusAlert.fromJson(json));
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {'where': 'RadiusAlertStore.list: skipping $key'}));
+        log.error(e, st, layer: ErrorLayer.storage, context: {'where': 'RadiusAlertStore.list: skipping $key', 'entity': key});
       }
     }
     // Stable order — oldest-first keeps the UI deterministic across
@@ -108,10 +108,10 @@ class RadiusAlertStore {
       try {
         return DateTime.parse(raw);
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {
+        log.error(e, st, layer: ErrorLayer.storage, context: {
           'where': 'RadiusAlertStore.getLastEvaluatedAt: bad timestamp '
               'for $alertId'
-        }));
+        });
         debugPrint(
             'RadiusAlertStore.getLastEvaluatedAt: bad ISO timestamp '
             'for $alertId: $e');

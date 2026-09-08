@@ -121,5 +121,5 @@ const _exempt = <String>{
 };
 
 /// Baselines as of 2026-09-08 (#3977). Only ever decrease; target 0.
-const _baselineSites = 311;
-const _baselineFiles = 149;
+const _baselineSites = 277;
+const _baselineFiles = 132;

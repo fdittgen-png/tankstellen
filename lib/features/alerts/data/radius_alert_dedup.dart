@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'dart:convert';
 
@@ -10,6 +9,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../../core/storage/hive_boxes.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 
 /// Notification dedup state for [RadiusAlert].
 ///
@@ -70,7 +70,7 @@ class RadiusAlertDedup {
       if (!Hive.isBoxOpen(HiveBoxes.alerts)) return null;
       return Hive.box(HiveBoxes.alerts);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'RadiusAlertDedup: alerts box unavailable'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'RadiusAlertDedup: alerts box unavailable'});
       return null;
     }
   }
@@ -227,7 +227,7 @@ class RadiusAlertDedup {
       }
       if (raw is Map) return _LastFire.fromJson(raw);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {'where': 'RadiusAlertDedup: corrupt dedup row for $context'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: {'where': 'RadiusAlertDedup: corrupt dedup row for $context'});
     }
     return null;
   }

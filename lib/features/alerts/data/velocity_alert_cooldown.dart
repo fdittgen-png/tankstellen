@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -9,6 +8,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../../../core/storage/hive_boxes.dart';
 import '../../../core/domain/fuel_type.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 
 /// Per-fuel cooldown tracker for the velocity alert detector (#579).
 ///
@@ -30,7 +30,7 @@ class VelocityAlertCooldown {
       if (!Hive.isBoxOpen(HiveBoxes.settings)) return null;
       return Hive.box(HiveBoxes.settings);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'VelocityAlertCooldown: settings box unavailable'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'VelocityAlertCooldown: settings box unavailable'});
       return null;
     }
   }
@@ -75,7 +75,7 @@ class VelocityAlertCooldown {
       final parsed = DateTime.tryParse(raw.toString());
       return parsed;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {'where': 'VelocityAlertCooldown: corrupt timestamp for ${fuelType.apiValue}'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: {'where': 'VelocityAlertCooldown: corrupt timestamp for ${fuelType.apiValue}'});
       return null;
     }
   }
