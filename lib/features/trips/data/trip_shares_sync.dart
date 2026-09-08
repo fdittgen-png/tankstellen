@@ -2,12 +2,13 @@
 // SPDX-License-Identifier: MIT
 
 import 'dart:async';
-import 'dart:math';
+import 'dart:math' hide log;
 
 import 'package:flutter/foundation.dart';
 
 import 'trip_history_repository.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../../core/sync/supabase_client.dart';
 import '../../../core/sync/trip_share_transport.dart';
 
@@ -154,9 +155,9 @@ class TripSharesSync {
       return TripShareResult.failed;
     } catch (e, st) {
       if (!isMissingFunctionError(e)) {
-        unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: {
-          'where': 'TripSharesSync.shareWithEmail FAILED for $tripId'
-        }));
+        log.error(e, st, layer: ErrorLayer.sync, context: {
+          'where': 'TripSharesSync.shareWithEmail FAILED for $tripId', 'entity': tripId
+        });
         return TripShareResult.failed;
       }
       return legacyShareWithEmail(wire, tripId, recipientEmail);
@@ -186,8 +187,7 @@ class TripSharesSync {
       debugPrint('TripSharesSync.createShareLink: minted token for $tripId');
       return token;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-          context: {'where': 'TripSharesSync.createShareLink FAILED for $tripId'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: {'where': 'TripSharesSync.createShareLink FAILED for $tripId', 'entity': tripId});
       return null;
     }
   }
@@ -210,8 +210,7 @@ class TripSharesSync {
       );
       return claimed is String && claimed.isNotEmpty;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-          context: const {'where': 'TripSharesSync.claimShareLink FAILED'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'TripSharesSync.claimShareLink FAILED'});
       return false;
     }
   }
@@ -231,8 +230,7 @@ class TripSharesSync {
           .eq('trip_id', tripId);
       return parseShareRows(rows);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-          context: {'where': 'TripSharesSync.listSharesForTrip FAILED for $tripId'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: {'where': 'TripSharesSync.listSharesForTrip FAILED for $tripId', 'entity': tripId});
       return const [];
     }
   }
@@ -252,8 +250,7 @@ class TripSharesSync {
           .eq('owner_id', userId);
       debugPrint('TripSharesSync.revoke: revoked $shareId');
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-          context: {'where': 'TripSharesSync.revoke FAILED for $shareId'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: {'where': 'TripSharesSync.revoke FAILED for $shareId', 'entity': shareId});
     }
   }
 
@@ -293,8 +290,7 @@ class TripSharesSync {
         ownerByTripId: ownerByTripId,
       );
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-          context: const {'where': 'TripSharesSync.fetchSharedWithMe FAILED'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'TripSharesSync.fetchSharedWithMe FAILED'});
       return SharedTripsFetch.empty;
     }
   }
@@ -341,8 +337,7 @@ class TripSharesSync {
       try {
         out.add(TripHistoryEntry.fromJson(data.cast<String, dynamic>()));
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-            context: {'where': 'TripSharesSync.parseSharedSummaries decode failed for ${r['id']}'}));
+        log.error(e, st, layer: ErrorLayer.sync, context: {'where': 'TripSharesSync.parseSharedSummaries decode failed for ${r['id']}'});
       }
     }
     return out;

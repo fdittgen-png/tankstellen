@@ -8,6 +8,7 @@ import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../../core/storage/hive_boxes.dart';
 import '../data/baselines_sync.dart';
 import '../../sync/providers/baseline_sync_enabled_provider.dart';
@@ -54,7 +55,6 @@ Future<void> syncBaselineAfterFlush(Ref ref, String vehicleId) async {
       // merged JSON from disk.
     }
   } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.providers, e, st,
-        context: const {'where': 'TripRecording.stop: baseline sync failed'}));
+    log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording.stop: baseline sync failed'});
   }
 }

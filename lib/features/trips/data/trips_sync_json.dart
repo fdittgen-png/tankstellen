@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'trip_history_repository.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../../core/sync/sync_isolate_decode.dart';
 
 /// Trip-sync JSON payload shapers, split out of `trips_sync.dart` so the
@@ -83,11 +84,7 @@ Future<List<TripHistoryEntry>> mergeTripRowsOffThread(
   for (var i = 0; i < decoded.length; i++) {
     final entry = decoded[i];
     if (entry == null) {
-      unawaited(errorLogger.log(
-          ErrorLayer.sync,
-          StateError('trip summary blob failed to decode'),
-          StackTrace.current,
-          context: {'where': 'mergeTripRowsOffThread decode', 'id': ids[i]}));
+      log.error(StateError('trip summary blob failed to decode'), StackTrace.current, layer: ErrorLayer.sync, context: {'where': 'mergeTripRowsOffThread decode', 'id': ids[i]});
       continue;
     }
     downloaded.add(entry);

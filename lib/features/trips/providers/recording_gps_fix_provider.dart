@@ -1,12 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import 'trip_recording_provider.dart';
 
 /// The most recent GPS fix of the running recording, as the recording
@@ -130,7 +130,6 @@ void teeRecordingGpsFix(
         .read(recordingGpsFixProvider.notifier)
         .onFix(fixAt: fixAt, accuracyM: accuracyM);
   } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.providers, e, st,
-        context: {'where': where}));
+    log.error(e, st, layer: ErrorLayer.providers, context: {'where': where});
   }
 }

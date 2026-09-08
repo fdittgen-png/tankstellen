@@ -1,11 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../vehicle/data/reference_vehicle_catalog_provider.dart';
 import '../../vehicle/data/vehicle_profile_catalog_matcher.dart';
 import '../../vehicle/domain/entities/reference_vehicle.dart';
@@ -30,9 +30,9 @@ ReferenceVehicle? tryMatchReferenceVehicle(Ref ref, VehicleProfile? profile) {
       catalog: catalog,
     );
   } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
+    log.error(e, st, layer: ErrorLayer.providers, context: const {
       'where': 'Obd2RecordingPipeline: reference catalog unavailable'
-    }));
+    });
     return null;
   }
 }

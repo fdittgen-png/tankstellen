@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import 'baseline_sync.dart';
 import '../../../core/sync/deletions_sync.dart';
 import '../../../core/sync/entity_sync.dart';
@@ -95,8 +96,7 @@ class BaselinesSync {
       );
       return merged;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-          context: const {'where': 'BaselinesSync.merge FAILED'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'BaselinesSync.merge FAILED'});
       return localJson;
     }
   }

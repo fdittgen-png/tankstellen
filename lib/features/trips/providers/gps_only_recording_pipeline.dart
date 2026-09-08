@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../../core/providers/consumption_display_provider.dart';
 import '../../driving/providers/live_harsh_event_bus_provider.dart';
 import '../../obd2/api.dart';
@@ -88,9 +89,9 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     try {
       _wal.flushNow(recorder.buildSummary());
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.providers, context: const {
         'where': 'GpsOnlyRecordingPipeline.onAppBackgrounded'
-      }));
+      });
     }
   }
 
@@ -203,9 +204,9 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
       try {
         _ref.read(obd2ReconnectProvider.notifier).supervisor.wake();
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
+        log.error(e, st, layer: ErrorLayer.providers, context: const {
           'where': 'GpsOnlyRecordingPipeline: movement wake failed',
-        }));
+        });
       }
     },
   );

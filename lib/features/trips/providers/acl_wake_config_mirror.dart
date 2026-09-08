@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/language/language_provider.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../../l10n/app_localizations.dart';
 
 /// #3756 — mirror the armed adapter MAC + LOCALIZED wake-notification
@@ -44,8 +45,7 @@ Future<void> mirrorAclWakeConfig(Ref ref, String? mac) async {
     await prefs.setString('acl_wake_title', l10n.aclWakeNotificationTitle);
     await prefs.setString('acl_wake_body', l10n.aclWakeNotificationBody);
   } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.background, e, st,
-        context: const {'where': 'aclWake prefs mirror failed'}));
+    log.error(e, st, layer: ErrorLayer.background, context: const {'where': 'aclWake prefs mirror failed'});
   }
 }
 
@@ -56,7 +56,6 @@ Future<void> clearAclWakeConfig() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('acl_wake_mac');
   } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.background, e, st,
-        context: const {'where': 'aclWake prefs clear failed'}));
+    log.error(e, st, layer: ErrorLayer.background, context: const {'where': 'aclWake prefs clear failed'});
   }
 }

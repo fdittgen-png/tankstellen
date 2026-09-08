@@ -1,8 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -12,6 +10,7 @@ import '../../../core/sync/deletions_sync.dart';
 import '../../../core/sync/supabase_client.dart';
 import 'trips_sync_json.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 
 /// Per-trip-summary sync with Supabase (#1479 phase 2).
 ///
@@ -68,7 +67,7 @@ class TripsSync {
           .upsert(buildSummaryRow(entry, userId), onConflict: 'user_id,id');
       debugPrint('TripsSync.uploadSummary: uploaded ${entry.id}');
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: {'where': 'TripsSync.uploadSummary FAILED for ${entry.id}'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: {'where': 'TripsSync.uploadSummary FAILED for ${entry.id}', 'entity': entry.id});
     }
     // Phase 4 (#1541) — fan out the heavy blob to `trip_details`.
     // [uploadDetails] no-ops when the entry has no samples /
@@ -111,7 +110,7 @@ class TripsSync {
       }, onConflict: 'user_id,id');
       debugPrint('TripsSync.uploadDetails: uploaded ${entry.id}');
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: {'where': 'TripsSync.uploadDetails FAILED for ${entry.id}'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: {'where': 'TripsSync.uploadDetails FAILED for ${entry.id}', 'entity': entry.id});
     }
   }
 
@@ -140,7 +139,7 @@ class TripsSync {
       if (data is! Map) return null;
       return data.cast<String, dynamic>();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: {'where': 'TripsSync.fetchDetails FAILED for $tripId'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: {'where': 'TripsSync.fetchDetails FAILED for $tripId', 'entity': tripId});
       return null;
     }
   }
@@ -161,7 +160,7 @@ class TripsSync {
           .eq('user_id', userId)
           .eq('id', tripId);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: {'where': 'TripsSync.deleteSummary FAILED for $tripId'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: {'where': 'TripsSync.deleteSummary FAILED for $tripId', 'entity': tripId});
     }
   }
 
@@ -241,7 +240,7 @@ class TripsSync {
           'downloaded=${merged.length - liveLocal.length}');
       return merged;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'TripsSync.merge FAILED'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'TripsSync.merge FAILED'});
       return localEntries;
     }
   }
@@ -270,7 +269,7 @@ class TripsSync {
     try {
       await client.from(table).upsert(rows, onConflict: 'user_id,id');
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: {'where': 'TripsSync._batchUpsert $table FAILED'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: {'where': 'TripsSync._batchUpsert $table FAILED'});
     }
   }
 
@@ -339,7 +338,7 @@ class TripsSync {
       await client.from('trip_details').delete().eq('user_id', userId);
       debugPrint('TripsSync.forgetAllForUser: wiped server-side rows');
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'TripsSync.forgetAllForUser FAILED'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'TripsSync.forgetAllForUser FAILED'});
     }
   }
 
@@ -364,7 +363,7 @@ class TripsSync {
           .eq('user_id', userId)
           .lt('updated_at', cutoff.toIso8601String());
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'TripsSync.pruneOldDetails FAILED'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'TripsSync.pruneOldDetails FAILED'});
     }
   }
 
@@ -428,7 +427,7 @@ class TripsSync {
           TripHistoryEntry.fromJson(data.cast<String, dynamic>()),
         );
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: {'where': 'TripsSync.mergeRows decode failed for $id'}));
+        log.error(e, st, layer: ErrorLayer.sync, context: {'where': 'TripsSync.mergeRows decode failed for $id', 'entity': id});
       }
     }
     return [...localEntries, ...downloaded];

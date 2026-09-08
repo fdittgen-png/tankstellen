@@ -156,7 +156,7 @@ mixin _TripRecordingCore on _$TripRecording {
           .read(featureFlagsProvider.notifier)
           .isEnabled(Feature.experimentalOemPids);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording: feature flags unavailable'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording: feature flags unavailable'});
       return false;
     }
   }
@@ -173,7 +173,7 @@ mixin _TripRecordingCore on _$TripRecording {
           .read(featureFlagsProvider.notifier)
           .isEnabled(Feature.debugMode);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording: feature flags unavailable'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording: feature flags unavailable'});
       return false;
     }
   }

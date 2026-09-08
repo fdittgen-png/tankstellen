@@ -10,6 +10,7 @@ import '../../vehicle/providers/vehicle_providers.dart';
 import '../domain/trip_ve_recompute.dart';
 import 'trip_history_provider.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 
 part 'trip_ve_recompute_provider.g.dart';
 
@@ -83,7 +84,7 @@ class TripVeRecomputeListener extends _$TripVeRecomputeListener {
         ref.read(tripHistoryListProvider.notifier).refresh();
       }
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripVeRecomputeListener: recompute failed'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripVeRecomputeListener: recompute failed'});
     }
   }
 }

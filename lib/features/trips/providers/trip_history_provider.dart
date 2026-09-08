@@ -14,6 +14,7 @@ import '../domain/trip_verdict.dart';
 import '../domain/gps_driving_features.dart';
 import 'verdict_calibration_provider.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 
 part 'trip_history_provider.g.dart';
 
@@ -100,9 +101,9 @@ class TripHistoryList extends _$TripHistoryList {
           .record(verdict, features);
       ref.invalidate(gpsKpiBandsProvider);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.storage, context: const {
         'where': 'TripHistoryList.setVerdict calibration record'
-      }));
+      });
     }
   }
 

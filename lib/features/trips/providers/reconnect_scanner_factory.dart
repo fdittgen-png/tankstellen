@@ -1,12 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../obd2/api.dart';
 
 /// Build the in-trip reattach-source factory handed to
@@ -46,9 +46,9 @@ Obd2ReattachSource? Function(
   try {
     supervisor = ref.read(obd2ReconnectProvider.notifier).supervisor;
   } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
+    log.error(e, st, layer: ErrorLayer.providers, context: const {
       'where': 'Obd2RecordingPipeline: link supervisor unavailable'
-    }));
+    });
     return null;
   }
   return (pinnedMac, onReconnect) => SupervisorReattachSource(

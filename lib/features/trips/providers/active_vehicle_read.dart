@@ -1,12 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/domain/vehicle_profile.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 
 /// Read the active vehicle profile, swallowing any provider-wiring errors
@@ -25,8 +25,7 @@ VehicleProfile? tryReadActiveVehicleProfile(Ref ref, {required String where}) {
   try {
     return ref.read(activeVehicleProfileProvider);
   } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.providers, e, st,
-        context: {'where': where}));
+    log.error(e, st, layer: ErrorLayer.providers, context: {'where': where});
     return null;
   }
 }

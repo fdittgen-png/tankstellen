@@ -77,7 +77,7 @@ mixin _TripRecordingSnapshot on _$TripRecording, _TripRecordingCore {
         box: Hive.box<String>(HiveBoxes.obd2ActiveTrip),
       );
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording active repo'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording active repo'});
       return null;
     }
   }
@@ -271,7 +271,7 @@ mixin _TripRecordingSnapshot on _$TripRecording, _TripRecordingCore {
       }
       await repo.saveSnapshot(next);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording flush snapshot failed'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording flush snapshot failed'});
     }
   }
 
@@ -305,7 +305,7 @@ mixin _TripRecordingSnapshot on _$TripRecording, _TripRecordingCore {
     try {
       await repo.clearSnapshot();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording clear snapshot failed'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording clear snapshot failed'});
     }
   }
 

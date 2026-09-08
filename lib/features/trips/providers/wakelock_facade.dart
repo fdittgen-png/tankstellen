@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 
 part 'wakelock_facade.g.dart';
 
@@ -38,7 +39,7 @@ class RealWakelockFacade implements WakelockFacade {
     try {
       await WakelockPlus.enable();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'WakelockFacade.enable failed'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'WakelockFacade.enable failed'});
     }
   }
 
@@ -47,7 +48,7 @@ class RealWakelockFacade implements WakelockFacade {
     try {
       await WakelockPlus.disable();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'WakelockFacade.disable failed'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'WakelockFacade.disable failed'});
     }
   }
 }

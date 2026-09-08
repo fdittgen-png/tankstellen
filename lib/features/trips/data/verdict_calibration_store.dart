@@ -6,6 +6,7 @@ import 'dart:convert';
 
 import '../../../core/data/storage_repository.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../domain/gps_driving_features.dart';
 import '../domain/gps_kpi_verdict.dart';
 import '../domain/trip_verdict.dart';
@@ -103,8 +104,7 @@ class VerdictCalibrationStore {
         jsonEncode([for (final r in capped) r.toJson()]),
       );
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: const {'where': 'VerdictCalibrationStore.record'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'VerdictCalibrationStore.record'});
     }
   }
 
@@ -121,8 +121,7 @@ class VerdictCalibrationStore {
             ?VerdictCalibrationRow.fromJson(e.cast<String, dynamic>()),
       ];
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: const {'where': 'VerdictCalibrationStore.loadRows'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'VerdictCalibrationStore.loadRows'});
       return [];
     }
   }
