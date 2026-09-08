@@ -76,8 +76,6 @@
   "noFavoritesHint": "Tippen Sie auf den Stern bei einer Tankstelle, um sie als Favorit zu speichern.",
   "language": "Sprache",
   "country": "Land",
-  "freeNoKey": "Kostenlos — kein Schlüssel nötig",
-  "apiKeyRequired": "API-Schlüssel erforderlich",
   "dataTransparency": "Datentransparenz",
   "clearCache": "Cache leeren",
   "storageUsage": "Speichernutzung auf diesem Gerät",
@@ -113,7 +111,7 @@
   "deleteAllButton": "Alles löschen",
   "cacheEmpty": "Cache ist leer",
   "apiKeyNote": "Kostenlose Registrierung. Daten von den Markttransparenzstellen.",
-  "apiKeyFormatError": "Ungültiges Format — UUID erwartet (8-4-4-4-12)",
+  "apiKeyFormatError": "Das sieht nicht wie ein API-Schlüssel aus — erwartet werden 36 Zeichen mit Bindestrichen (8-4-4-4-12)",
   "reportThisIssue": "Dieses Problem melden",
   "reportAlreadySent": "Du hast dieses Problem bereits gemeldet.",
   "reportConsentTitle": "Auf GitHub melden?",
@@ -2648,7 +2646,7 @@
   "authInfoBenefit4": "• Konto jederzeit löschbar",
   "apiKeySetupTitle": "API-Schlüssel einrichten (optional)",
   "apiKeySetupDescription": "Registrieren Sie sich für einen kostenlosen API-Schlüssel oder erkunden Sie die App mit Demo-Daten.",
-  "apiKeyRegistrationButton": "{provider} Registrierung",
+  "apiKeyRegistrationButton": "Bei {provider} registrieren",
   "apiKeyTerms": "Mit Eingabe eines API-Schlüssels akzeptieren Sie die Nutzungsbedingungen von {provider}. Datenweitergabe ist untersagt.",
   "calculatorDistanceHint": "z. B. 150",
   "calculatorConsumptionHint": "z. B. 7,0",
@@ -3161,6 +3159,31 @@
   "onboardingObd2LaterNote": "Du kannst einen Bluetooth-OBD2-Adapter jederzeit später über den Fahrzeug-Bildschirm koppeln, um Fahrten aufzuzeichnen und Motordaten auszulesen.",
   "@onboardingObd2LaterNote": {
     "description": "Informational note on the iOS variant of the OBD2 onboarding step (App Review 5.1.1(iv), #3535): no in-wizard connect flow on iOS, the adapter is paired later from the vehicle screen."
+  },
+  "onboardingTitle": "Sparkilo einrichten",
+  "@onboardingTitle": {
+    "description": "Page title of the onboarding wizard (#3987). Sparkilo is the brand name."
+  },
+  "onboardingStepOf": "Schritt {current} von {total}",
+  "@onboardingStepOf": {
+    "description": "Semantics label of the onboarding progress indicator (#3987); replaces the visible 'n / N' counter.",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "@apiKeyRegisterWith": {
+    "description": "Button that opens the API provider's registration page in the onboarding API-key step (#3987).",
+    "placeholders": {
+      "provider": {
+        "type": "String",
+        "example": "Tankerkönig"
+      }
+    }
   },
   "openHoursUnknown": "Öffnungszeiten unbekannt",
   "open24Hours": "24 Stunden geöffnet",

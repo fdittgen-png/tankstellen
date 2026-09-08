@@ -84,8 +84,6 @@
   "noFavoritesHint": "Tap the star on a station to save it as a favorite.",
   "language": "Language",
   "country": "Country",
-  "freeNoKey": "Free — no key needed",
-  "apiKeyRequired": "API key required",
   "dataTransparency": "Data transparency",
   "clearCache": "Clear cache",
   "storageUsage": "Storage usage on this device",
@@ -121,7 +119,7 @@
   "deleteAllButton": "Delete all",
   "cacheEmpty": "Cache is empty",
   "apiKeyNote": "Free registration. Data from government price transparency agencies.",
-  "apiKeyFormatError": "Invalid format — expected UUID (8-4-4-4-12)",
+  "apiKeyFormatError": "That doesn't look like an API key — expected 36 characters with dashes (8-4-4-4-12)",
   "reportThisIssue": "Report this issue",
   "reportAlreadySent": "You already reported this issue.",
   "reportConsentTitle": "Report to GitHub?",
@@ -5106,7 +5104,7 @@
   "authInfoBenefit4": "• You can delete your account at any time",
   "apiKeySetupTitle": "API key setup (optional)",
   "apiKeySetupDescription": "Register for a free API key, or skip to explore the app with demo data.",
-  "apiKeyRegistrationButton": "{provider} Registration",
+  "apiKeyRegistrationButton": "Register with {provider}",
   "@apiKeyRegistrationButton": {
     "placeholders": {
       "provider": {
@@ -6354,6 +6352,31 @@
   "onboardingObd2LaterNote": "You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.",
   "@onboardingObd2LaterNote": {
     "description": "Informational note on the iOS variant of the OBD2 onboarding step (App Review 5.1.1(iv), #3535): no in-wizard connect flow on iOS, the adapter is paired later from the vehicle screen."
+  },
+  "onboardingTitle": "Set up Sparkilo",
+  "@onboardingTitle": {
+    "description": "Page title of the onboarding wizard (#3987). Sparkilo is the brand name."
+  },
+  "onboardingStepOf": "Step {current} of {total}",
+  "@onboardingStepOf": {
+    "description": "Semantics label of the onboarding progress indicator (#3987); replaces the visible 'n / N' counter.",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "@apiKeyRegisterWith": {
+    "description": "Button that opens the API provider's registration page in the onboarding API-key step (#3987).",
+    "placeholders": {
+      "provider": {
+        "type": "String",
+        "example": "Tankerkönig"
+      }
+    }
   },
   "openHoursUnknown": "Hours unknown",
   "@openHoursUnknown": {

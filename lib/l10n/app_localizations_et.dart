@@ -203,12 +203,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get country => 'Riik';
 
   @override
-  String get freeNoKey => 'Tasuta — võtit pole vaja';
-
-  @override
-  String get apiKeyRequired => 'API võti nõutud';
-
-  @override
   String get dataTransparency => 'Andmete läbipaistvus';
 
   @override
@@ -6502,6 +6496,14 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get onboardingObd2LaterNote =>
       'Bluetooth OBD2-adapteri saate siduda igal ajal hiljem sõidukikuvalt, et salvestada sõite ja lugeda mootoriandmeid.';
+
+  @override
+  String get onboardingTitle => 'Set up Sparkilo';
+
+  @override
+  String onboardingStepOf(int current, int total) {
+    return 'Step $current of $total';
+  }
 
   @override
   String get openHoursUnknown => 'Lahtiolekuajad teadmata';

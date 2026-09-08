@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// Dot-style progress indicator for the onboarding wizard.
 ///
@@ -21,7 +22,13 @@ class OnboardingProgressIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Row(
+    // #3987 — the position is announced here, so the wizard needs no
+    // `n / N` text of its own.
+    final l10n = AppLocalizations.of(context);
+    return Semantics(
+      label: l10n.onboardingStepOf(currentStep + 1, stepCount),
+      container: true,
+      child: Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(stepCount, (index) {
         final isActive = index == currentStep;
@@ -45,6 +52,7 @@ class OnboardingProgressIndicator extends StatelessWidget {
           ),
         );
       }),
+    ),
     );
   }
 }

@@ -204,12 +204,6 @@ class AppLocalizationsRo extends AppLocalizations {
   String get country => 'Țară';
 
   @override
-  String get freeNoKey => 'Gratuit — fără cheie necesară';
-
-  @override
-  String get apiKeyRequired => 'Cheie API necesară';
-
-  @override
   String get dataTransparency => 'Transparența datelor';
 
   @override
@@ -6560,6 +6554,14 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get onboardingObd2LaterNote =>
       'Poți asocia oricând mai târziu un adaptor OBD2 Bluetooth din ecranul vehiculului pentru a înregistra călătorii și a citi datele motorului.';
+
+  @override
+  String get onboardingTitle => 'Set up Sparkilo';
+
+  @override
+  String onboardingStepOf(int current, int total) {
+    return 'Step $current of $total';
+  }
 
   @override
   String get openHoursUnknown => 'Program necunoscut';

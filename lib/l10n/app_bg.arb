@@ -60,8 +60,6 @@
   "noFavoritesHint": "Докоснете звездата на бензиностанция, за да я запазите в любими.",
   "language": "Език",
   "country": "Държава",
-  "freeNoKey": "Безплатно — не е необходим ключ",
-  "apiKeyRequired": "Необходим е API ключ",
   "dataTransparency": "Прозрачност на данните",
   "clearCache": "Изчистване на кеша",
   "storageUsage": "Използване на паметта на това устройство",
@@ -6502,6 +6500,24 @@
       "error": {
         "type": "String",
         "example": "No internet connection"
+      }
+    }
+  },
+  "onboardingTitle": "Set up Sparkilo",
+  "@onboardingTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "onboardingStepOf": "Step {current} of {total}",
+  "@onboardingStepOf": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
       }
     }
   }

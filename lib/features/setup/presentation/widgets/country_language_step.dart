@@ -8,9 +8,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/country/country_config.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/language/language_provider.dart';
-import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'illustrations/globe_illustration.dart';
+import 'country_info_card.dart';
 
 /// Second onboarding step: language and country selection.
 class CountryLanguageStep extends ConsumerWidget {
@@ -93,72 +93,9 @@ class CountryLanguageStep extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
 
-          // Country info card
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(country.flag, style: const TextStyle(fontSize: 24)),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              country.name,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              l10n.countryInfoDataSource(
-                                country.apiProvider ??
-                                    (l10n.countryInfoDemoSource),
-                              ),
-                              style: theme.textTheme.bodySmall,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: country.requiresApiKey
-                              ? DarkModeColors.warningSurface(context)
-                              : DarkModeColors.successSurface(context),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          country.requiresApiKey
-                              ? (l10n.apiKeyRequired)
-                              : (l10n.freeNoKey),
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: country.requiresApiKey
-                                ? DarkModeColors.warning(context)
-                                : DarkModeColors.success(context),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Fuel types: ${country.fuelTypes.join(', ')}',
-                    style: theme.textTheme.bodySmall,
-                  ),
-                ],
-              ),
-            ),
-          ),
+          // #3987 — the one CountryInfoCard, not an inline copy of it
+          // (the copy carried a hard-coded 'Fuel types:').
+          CountryInfoCard(country: country),
           const SizedBox(height: 24),
         ],
       ),

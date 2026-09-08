@@ -96,7 +96,7 @@ void main() {
         DarkModeColors.error(tester.element(find.byIcon(Icons.error_outline))),
       );
       expect(
-        find.text('Invalid format — expected UUID (8-4-4-4-12)'),
+        find.text("That doesn't look like an API key — expected 36 characters with dashes (8-4-4-4-12)"),
         findsOneWidget,
       );
     });
@@ -105,7 +105,7 @@ void main() {
       tester,
     ) async {
       await pumpSection(tester, formatValid: null);
-      expect(find.text('Tankerkoenig Registration'), findsOneWidget);
+      expect(find.text('Register with Tankerkoenig'), findsOneWidget);
       expect(find.byIcon(Icons.open_in_new), findsOneWidget);
     });
 
@@ -113,7 +113,7 @@ void main() {
       tester,
     ) async {
       await pumpSection(tester, formatValid: null, country: _germanyNoUrl);
-      expect(find.text('Tankerkoenig Registration'), findsNothing);
+      expect(find.text('Register with Tankerkoenig'), findsNothing);
       expect(find.byIcon(Icons.open_in_new), findsNothing);
     });
 

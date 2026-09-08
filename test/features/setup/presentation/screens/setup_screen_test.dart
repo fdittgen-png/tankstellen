@@ -156,7 +156,7 @@ void main() {
 
       // The l10n error message or English fallback
       expect(
-        find.textContaining('UUID'),
+        find.textContaining('36 characters'),
         findsOneWidget,
       );
     });

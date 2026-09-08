@@ -203,12 +203,6 @@ class AppLocalizationsPl extends AppLocalizations {
   String get country => 'Kraj';
 
   @override
-  String get freeNoKey => 'Bezpłatnie — klucz nie jest wymagany';
-
-  @override
-  String get apiKeyRequired => 'Wymagany klucz API';
-
-  @override
   String get dataTransparency => 'Przejrzystość danych';
 
   @override
@@ -6537,6 +6531,14 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get onboardingObd2LaterNote =>
       'Adapter Bluetooth OBD2 możesz sparować w dowolnym momencie później z ekranu pojazdu, aby nagrywać podróże i odczytywać dane z silnika.';
+
+  @override
+  String get onboardingTitle => 'Set up Sparkilo';
+
+  @override
+  String onboardingStepOf(int current, int total) {
+    return 'Step $current of $total';
+  }
 
   @override
   String get openHoursUnknown => 'Godziny nieznane';

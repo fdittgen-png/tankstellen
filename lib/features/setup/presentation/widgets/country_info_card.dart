@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import '../../../../core/country/country_config.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'country_status_badge.dart';
+import '../../../../core/theme/app_text.dart';
+import '../../../../core/widgets/panel_card.dart';
 
 /// Setup screen card summarising a [CountryConfig]: flag, name, API data
 /// source, the API-key requirement badge, and the supported fuel types.
@@ -35,7 +37,8 @@ class CountryInfoCard extends StatelessWidget {
     );
     return Semantics(
       label: semanticLabel,
-      child: Card(
+      // #3987 — the panel surface and the type roles of the visual grammar.
+      child: PanelCard(
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -46,7 +49,7 @@ class CountryInfoCard extends StatelessWidget {
                   ExcludeSemantics(
                     child: Text(
                       country.flag,
-                      style: const TextStyle(fontSize: 24),
+                      style: theme.textTheme.headlineMedium,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -57,9 +60,7 @@ class CountryInfoCard extends StatelessWidget {
                         children: [
                           Text(
                             country.name,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: AppText.title(context),
                           ),
                           Text(
                             l10n.countryInfoDataSource(dataSource),

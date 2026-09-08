@@ -165,7 +165,7 @@ void main() {
         DarkModeColors.error(tester.element(find.byIcon(Icons.error_outline))),
       );
       expect(
-        find.text('Invalid format — expected UUID (8-4-4-4-12)'),
+        find.text("That doesn't look like an API key — expected 36 characters with dashes (8-4-4-4-12)"),
         findsOneWidget,
       );
       expect(find.byIcon(Icons.check_circle), findsNothing);
@@ -220,7 +220,7 @@ void main() {
 
       // Germany has both apiProvider and apiKeyRegistrationUrl.
       expect(
-        find.text('${Countries.germany.apiProvider} Registration'),
+        find.text('Register with ${Countries.germany.apiProvider}'),
         findsOneWidget,
       );
       expect(find.byIcon(Icons.open_in_new), findsOneWidget);
@@ -239,7 +239,7 @@ void main() {
       );
 
       expect(find.byIcon(Icons.open_in_new), findsNothing);
-      expect(find.text('Tankerkoenig Registration'), findsNothing);
+      expect(find.text('Register with Tankerkoenig'), findsNothing);
     });
 
     testWidgets('omits the attribution line when attribution is null',
@@ -251,7 +251,7 @@ void main() {
       );
 
       // Sanity check — registration button still renders.
-      expect(find.text('Tankerkoenig Registration'), findsOneWidget);
+      expect(find.text('Register with Tankerkoenig'), findsOneWidget);
       // No attribution text below.
       expect(find.text(Countries.germany.attribution!), findsNothing);
     });

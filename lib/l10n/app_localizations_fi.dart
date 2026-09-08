@@ -203,12 +203,6 @@ class AppLocalizationsFi extends AppLocalizations {
   String get country => 'Maa';
 
   @override
-  String get freeNoKey => 'Ilmainen — avainta ei tarvita';
-
-  @override
-  String get apiKeyRequired => 'API-avain vaaditaan';
-
-  @override
   String get dataTransparency => 'Tietojen läpinäkyvyys';
 
   @override
@@ -6510,6 +6504,14 @@ class AppLocalizationsFi extends AppLocalizations {
   @override
   String get onboardingObd2LaterNote =>
       'Voit parittaa Bluetooth-OBD2-sovittimen milloin tahansa myöhemmin ajoneuvonäkymästä tallentaaksesi matkoja ja lukeaksesi moottoritietoja.';
+
+  @override
+  String get onboardingTitle => 'Set up Sparkilo';
+
+  @override
+  String onboardingStepOf(int current, int total) {
+    return 'Step $current of $total';
+  }
 
   @override
   String get openHoursUnknown => 'Aukioloajat tuntematon';

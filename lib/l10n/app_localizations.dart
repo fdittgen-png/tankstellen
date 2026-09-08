@@ -513,18 +513,6 @@ abstract class AppLocalizations {
   /// **'Country'**
   String get country;
 
-  /// No description provided for @freeNoKey.
-  ///
-  /// In en, this message translates to:
-  /// **'Free — no key needed'**
-  String get freeNoKey;
-
-  /// No description provided for @apiKeyRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'API key required'**
-  String get apiKeyRequired;
-
   /// No description provided for @dataTransparency.
   ///
   /// In en, this message translates to:
@@ -654,7 +642,7 @@ abstract class AppLocalizations {
   /// No description provided for @apiKeyFormatError.
   ///
   /// In en, this message translates to:
-  /// **'Invalid format — expected UUID (8-4-4-4-12)'**
+  /// **'That doesn\'t look like an API key — expected 36 characters with dashes (8-4-4-4-12)'**
   String get apiKeyFormatError;
 
   /// No description provided for @reportThisIssue.
@@ -9651,7 +9639,7 @@ abstract class AppLocalizations {
   /// No description provided for @apiKeyRegistrationButton.
   ///
   /// In en, this message translates to:
-  /// **'{provider} Registration'**
+  /// **'Register with {provider}'**
   String apiKeyRegistrationButton(String provider);
 
   /// No description provided for @apiKeyTerms.
@@ -11146,6 +11134,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.'**
   String get onboardingObd2LaterNote;
+
+  /// Page title of the onboarding wizard (#3987). Sparkilo is the brand name.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up Sparkilo'**
+  String get onboardingTitle;
+
+  /// Semantics label of the onboarding progress indicator (#3987); replaces the visible 'n / N' counter.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {current} of {total}'**
+  String onboardingStepOf(int current, int total);
 
   /// Opening-hours status line — the schedule could not be resolved (#2709).
   ///

@@ -60,8 +60,6 @@
   "noFavoritesHint": "Tapnite zvezdico pri postaji, da jo dodate med priljubljene.",
   "language": "Jezik",
   "country": "Država",
-  "freeNoKey": "Brezplačno — ključ ni potreben",
-  "apiKeyRequired": "Potreben API ključ",
   "dataTransparency": "Preglednost podatkov",
   "clearCache": "Počisti predpomnilnik",
   "storageUsage": "Poraba shrambe na tej napravi",
@@ -6502,6 +6500,24 @@
       "error": {
         "type": "String",
         "example": "No internet connection"
+      }
+    }
+  },
+  "onboardingTitle": "Set up Sparkilo",
+  "@onboardingTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "onboardingStepOf": "Step {current} of {total}",
+  "@onboardingStepOf": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
       }
     }
   }

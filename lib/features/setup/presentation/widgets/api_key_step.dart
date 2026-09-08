@@ -117,7 +117,10 @@ class _ApiKeyStepState extends ConsumerState<ApiKeyStep> {
                   }
                 },
                 icon: const Icon(Icons.open_in_new),
-                label: Text('${country.apiProvider} Registration'),
+                label: Text(
+                  AppLocalizations.of(context)
+                      .apiKeyRegistrationButton(country.apiProvider ?? ''),
+                ),
               ),
             ),
           TextField(

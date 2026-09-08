@@ -204,12 +204,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get country => 'Ország';
 
   @override
-  String get freeNoKey => 'Ingyenes — kulcs nem szükséges';
-
-  @override
-  String get apiKeyRequired => 'API-kulcs szükséges';
-
-  @override
   String get dataTransparency => 'Adatátláthatóság';
 
   @override
@@ -6547,6 +6541,14 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get onboardingObd2LaterNote =>
       'Bluetooth OBD2-adaptert bármikor párosíthatsz később a jármű képernyőjéről, hogy utakat rögzíts és motoradatokat olvass.';
+
+  @override
+  String get onboardingTitle => 'Set up Sparkilo';
+
+  @override
+  String onboardingStepOf(int current, int total) {
+    return 'Step $current of $total';
+  }
 
   @override
   String get openHoursUnknown => 'Nyitvatartás ismeretlen';

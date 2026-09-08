@@ -60,8 +60,6 @@
   "noFavoritesHint": "Érintse meg a csillagot egy kútnál a kedvencekhez adáshoz.",
   "language": "Nyelv",
   "country": "Ország",
-  "freeNoKey": "Ingyenes — kulcs nem szükséges",
-  "apiKeyRequired": "API-kulcs szükséges",
   "dataTransparency": "Adatátláthatóság",
   "clearCache": "Gyorsítótár törlése",
   "storageUsage": "Tárhelyhasználat ezen az eszközön",
@@ -6502,6 +6500,24 @@
       "error": {
         "type": "String",
         "example": "No internet connection"
+      }
+    }
+  },
+  "onboardingTitle": "Set up Sparkilo",
+  "@onboardingTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "onboardingStepOf": "Step {current} of {total}",
+  "@onboardingStepOf": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
       }
     }
   }

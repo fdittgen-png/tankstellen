@@ -60,8 +60,6 @@
   "noFavoritesHint": "Dotknij gwiazdki przy stacji, aby zapisać ją jako ulubioną.",
   "language": "Język",
   "country": "Kraj",
-  "freeNoKey": "Bezpłatnie — klucz nie jest wymagany",
-  "apiKeyRequired": "Wymagany klucz API",
   "dataTransparency": "Przejrzystość danych",
   "clearCache": "Wyczyść pamięć podręczną",
   "storageUsage": "Wykorzystanie pamięci na tym urządzeniu",
@@ -6502,6 +6500,24 @@
       "error": {
         "type": "String",
         "example": "No internet connection"
+      }
+    }
+  },
+  "onboardingTitle": "Set up Sparkilo",
+  "@onboardingTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "onboardingStepOf": "Step {current} of {total}",
+  "@onboardingStepOf": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
       }
     }
   }

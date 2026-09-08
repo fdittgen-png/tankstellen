@@ -203,12 +203,6 @@ class AppLocalizationsLt extends AppLocalizations {
   String get country => 'Šalis';
 
   @override
-  String get freeNoKey => 'Nemokama — raktas nereikalingas';
-
-  @override
-  String get apiKeyRequired => 'Reikalingas API raktas';
-
-  @override
   String get dataTransparency => 'Duomenų skaidrumas';
 
   @override
@@ -6548,6 +6542,14 @@ class AppLocalizationsLt extends AppLocalizations {
   @override
   String get onboardingObd2LaterNote =>
       '„Bluetooth“ OBD2 adapterį galite susieti bet kada vėliau automobilio ekrane, kad įrašytumėte keliones ir skaitytumėte variklio duomenis.';
+
+  @override
+  String get onboardingTitle => 'Set up Sparkilo';
+
+  @override
+  String onboardingStepOf(int current, int total) {
+    return 'Step $current of $total';
+  }
 
   @override
   String get openHoursUnknown => 'Darbo laikas nežinomas';
