@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/gps_sample_diagnostic.dart';
 import '../../domain/gps_coverage_report.dart';
 import 'gps_coverage_line.dart';
+import '../../../../core/widgets/panel_card.dart';
 
 /// Read-only inspector card for the GPS sample diagnostics captured
 /// during a trip recording (#1458 phase 2.5).
@@ -64,7 +65,7 @@ class GpsDiagnosticsCard extends StatelessWidget {
     final coverageLine = gpsCoverageSummaryLine(coverage, l);
     final coverageHint = gpsCoverageHint(coverage, l);
 
-    return Card(
+    return PanelCard(
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 8),
       child: ExpansionTile(
         // Locks down a stable selector for widget tests.

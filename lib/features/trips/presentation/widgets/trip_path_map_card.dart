@@ -12,6 +12,7 @@ import '../../../map/data/sparkilo_tile_layer.dart';
 import '../../../driving_score/api.dart';
 import 'trip_detail_charts.dart';
 import 'trip_path_geometry.dart';
+import '../../../../core/widgets/panel_card.dart';
 
 // ---------------------------------------------------------------------------
 // Phase 3 thresholds (#1374) — fixed defaults.
@@ -90,8 +91,7 @@ class TripPathMapCard extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-      child: Card(
-        clipBehavior: Clip.antiAlias,
+      child: PanelCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

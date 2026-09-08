@@ -13,6 +13,7 @@ import '../../domain/calibrated_trip_figures.dart';
 import '../../domain/trajet_data_quality.dart';
 import 'fuel_source_chip.dart';
 import 'trajet_stripe_colors.dart';
+import '../../../../core/widgets/panel_card.dart';
 
 /// One row in the Trajets list (#889). Shows date/time + chips for
 /// distance, duration, and average consumption. Extracted from
@@ -100,10 +101,9 @@ class TrajetRow extends StatelessWidget {
     // user and a screen reader too.
     final degraded = quality == TrajetDataQuality.obd2Degraded;
 
-    return Card(
+    return PanelCard(
       key: ValueKey('trajet-${entry.id}'),
       margin: cardMargin,
-      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         onLongPress: onLongPress,

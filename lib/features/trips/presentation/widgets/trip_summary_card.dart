@@ -19,6 +19,8 @@ import '../../providers/trip_fuel_cost_provider.dart';
 import 'distance_source_badge.dart';
 import 'fuel_source_chip.dart';
 import 'trip_detail_charts.dart';
+import '../../../../core/widgets/panel_card.dart';
+import '../../../../core/theme/app_text.dart';
 
 /// Headline summary card on the trip detail screen (#890).
 ///
@@ -89,110 +91,109 @@ class TripSummaryCard extends ConsumerWidget {
     final avgSpeed = _avgSpeedLabel(samples, unknown);
     final maxSpeed = _maxSpeedLabel(samples, unknown);
 
-    return Card(
+    return PanelCard(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // #3919 — header: the fuel-source chip, the gain the shown
-            // figures carry, and the "recalculated after the fill of …"
-            // line when the calibration post-dates the trip.
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    l.trajetDetailSummaryTitle,
-                    style: theme.textTheme.titleMedium,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // #3919 — header: the fuel-source chip, the gain the shown
+          // figures carry, and the "recalculated after the fill of …"
+          // line when the calibration post-dates the trip.
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  l.trajetDetailSummaryTitle,
+                  style: AppText.title(context),
+                ),
+              ),
+              if (!isEv) FuelSourceChip(figures: figures),
+            ],
+          ),
+          if (!isEv && figures.kind == TripFuelSourceKind.estimated &&
+              figures.calibrated) ...[
+            const SizedBox(height: 4),
+            Text(
+              l.tripDetailGainApplied(_signed(figures.correctionPercent)),
+              key: const Key('tripDetailGainApplied'),
+              style: theme.textTheme.bodySmall
+                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            ),
+            if (figures.reExpressed &&
+                figures.resolution.updatedAt != null)
+              Text(
+                l.tripDetailRecalculatedAfterFill(
+                  UnitFormatter.formatMediumDate(
+                    figures.resolution.updatedAt!,
+                    locale: Localizations.localeOf(context).toString(),
                   ),
                 ),
-                if (!isEv) FuelSourceChip(figures: figures),
-              ],
-            ),
-            if (!isEv && figures.kind == TripFuelSourceKind.estimated &&
-                figures.calibrated) ...[
-              const SizedBox(height: 4),
-              Text(
-                l.tripDetailGainApplied(_signed(figures.correctionPercent)),
-                key: const Key('tripDetailGainApplied'),
+                key: const Key('tripDetailRecalculatedAfterFill'),
                 style: theme.textTheme.bodySmall
                     ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
               ),
-              if (figures.reExpressed &&
-                  figures.resolution.updatedAt != null)
-                Text(
-                  l.tripDetailRecalculatedAfterFill(
-                    UnitFormatter.formatMediumDate(
-                      figures.resolution.updatedAt!,
-                      locale: Localizations.localeOf(context).toString(),
-                    ),
-                  ),
-                  key: const Key('tripDetailRecalculatedAfterFill'),
-                  style: theme.textTheme.bodySmall
-                      ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-                ),
-            ],
-            const SizedBox(height: 8),
-            _SummaryRow(label: l.trajetDetailFieldDate, value: date),
-            _SummaryRow(label: l.trajetDetailFieldVehicle, value: vehicleName),
-            // #1312 — surface the OBD2 adapter identity directly
-            // under Vehicle so device-test bug reports can name the
-            // suspect device (different ELM327 clones expose different
-            // PID subsets). Hidden when no field was captured —
-            // legacy trips, fake-service tests, and any path that
-            // bypassed [Obd2ConnectionService] all carry null
-            // adapter fields and the row collapses cleanly.
-            if (entry.adapterMac != null ||
-                entry.adapterName != null ||
-                entry.adapterFirmware != null)
-              _SummaryRow(
-                label: l.trajetDetailFieldAdapter,
-                value: _formatAdapter(
-                  entry.adapterName,
-                  entry.adapterMac,
-                  entry.adapterFirmware,
-                ),
-              ),
-            // #3499 (epic #3498) — engine-data honesty: a gpsPlusObd2 trip
-            // whose OBD2 link contributed no (or partial) engine PIDs says
-            // so HERE, next to the adapter identity, instead of silently
-            // rendering "~ estimated" fuel figures with no explanation.
-            if (_engineCoverageNote(l) case final note?)
-              _EngineCoverageNote(text: note),
-            // #3253 — distance provenance chip beside the km figure: the
-            // persisted `distanceSource` (odometer / GPS track / virtual
-            // estimate) was rendered nowhere, while the fuel figures carry
-            // the ~ / maturity badge. Now the km declares its trust level.
-            _SummaryRow(
-              label: l.trajetDetailFieldDistance,
-              value: distance,
-              badge: DistanceSourceBadge(source: s.distanceSource),
-            ),
-            _SummaryRow(label: l.trajetDetailFieldDuration, value: duration),
-            _SummaryRow(
-              label: l.trajetDetailFieldAvgConsumption,
-              value: avgConsumption,
-            ),
-            _SummaryRow(label: l.trajetDetailFieldFuelUsed, value: fuelUsed),
-            // #1209 — estimated euro/£/$ cost of the fuel used,
-            // derived from the most recent fill-up before this trip.
-            // Hidden when the provider returns null (no fill-ups, no
-            // valid price, or no fuelLitersConsumed) so the row never
-            // shows a misleading "0,00 €" or "—" placeholder.
-            if (fuelCost != null)
-              _SummaryRow(
-                label: l.trajetDetailFieldFuelCost,
-                // #2491 — a trip cost is a TOTAL, not a per-litre price:
-                // route it through formatTotal (2 dp + currency symbol)
-                // so a 1.05 € trip reads "1,05 €", not "1,047 €".
-                value: PriceFormatter.formatTotal(fuelCost),
-              ),
-            _SummaryRow(label: l.trajetDetailFieldAvgSpeed, value: avgSpeed),
-            _SummaryRow(label: l.trajetDetailFieldMaxSpeed, value: maxSpeed),
           ],
-        ),
+          const SizedBox(height: 8),
+          _SummaryRow(label: l.trajetDetailFieldDate, value: date),
+          _SummaryRow(label: l.trajetDetailFieldVehicle, value: vehicleName),
+          // #1312 — surface the OBD2 adapter identity directly
+          // under Vehicle so device-test bug reports can name the
+          // suspect device (different ELM327 clones expose different
+          // PID subsets). Hidden when no field was captured —
+          // legacy trips, fake-service tests, and any path that
+          // bypassed [Obd2ConnectionService] all carry null
+          // adapter fields and the row collapses cleanly.
+          if (entry.adapterMac != null ||
+              entry.adapterName != null ||
+              entry.adapterFirmware != null)
+            _SummaryRow(
+              label: l.trajetDetailFieldAdapter,
+              value: _formatAdapter(
+                entry.adapterName,
+                entry.adapterMac,
+                entry.adapterFirmware,
+              ),
+            ),
+          // #3499 (epic #3498) — engine-data honesty: a gpsPlusObd2 trip
+          // whose OBD2 link contributed no (or partial) engine PIDs says
+          // so HERE, next to the adapter identity, instead of silently
+          // rendering "~ estimated" fuel figures with no explanation.
+          if (_engineCoverageNote(l) case final note?)
+            _EngineCoverageNote(text: note),
+          // #3253 — distance provenance chip beside the km figure: the
+          // persisted `distanceSource` (odometer / GPS track / virtual
+          // estimate) was rendered nowhere, while the fuel figures carry
+          // the ~ / maturity badge. Now the km declares its trust level.
+          _SummaryRow(
+            label: l.trajetDetailFieldDistance,
+            value: distance,
+            badge: DistanceSourceBadge(source: s.distanceSource),
+          ),
+          _SummaryRow(label: l.trajetDetailFieldDuration, value: duration),
+          _SummaryRow(
+            label: l.trajetDetailFieldAvgConsumption,
+            value: avgConsumption,
+          ),
+          _SummaryRow(label: l.trajetDetailFieldFuelUsed, value: fuelUsed),
+          // #1209 — estimated euro/£/$ cost of the fuel used,
+          // derived from the most recent fill-up before this trip.
+          // Hidden when the provider returns null (no fill-ups, no
+          // valid price, or no fuelLitersConsumed) so the row never
+          // shows a misleading "0,00 €" or "—" placeholder.
+          if (fuelCost != null)
+            _SummaryRow(
+              label: l.trajetDetailFieldFuelCost,
+              // #2491 — a trip cost is a TOTAL, not a per-litre price:
+              // route it through formatTotal (2 dp + currency symbol)
+              // so a 1.05 € trip reads "1,05 €", not "1,047 €".
+              value: PriceFormatter.formatTotal(fuelCost),
+            ),
+          _SummaryRow(label: l.trajetDetailFieldAvgSpeed, value: avgSpeed),
+          _SummaryRow(label: l.trajetDetailFieldMaxSpeed, value: maxSpeed),
+        ],
       ),
+
     );
   }
 

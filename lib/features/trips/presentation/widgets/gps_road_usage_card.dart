@@ -7,6 +7,8 @@ import '../../../../l10n/app_localizations.dart';
 import '../../domain/gps_driving_features.dart';
 import '../../domain/gps_driving_features_shares.dart';
 import '../../../../core/utils/unit_formatter.dart';
+import '../../../../core/widgets/panel_card.dart';
+import '../../../../core/theme/app_text.dart';
 
 /// Coast share at or above which the road-use panel surfaces its
 /// positive coaching line (#2796 C7). ~25 % of moving time spent
@@ -97,41 +99,40 @@ class GpsRoadUsageCard extends StatelessWidget {
     final showCoastPraise =
         features.coastShare >= kGpsRoadUseCoastPraiseThreshold;
 
-    return Card(
+    return PanelCard(
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l.gpsRoadUseCardTitle,
-              key: const Key('gps_road_use_card_title'),
-              style: theme.textTheme.titleMedium,
-            ),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l.gpsRoadUseCardTitle,
+            key: const Key('gps_road_use_card_title'),
+            style: AppText.title(context),
+          ),
+          const SizedBox(height: 12),
+          _SectionHeader(label: l.gpsRoadUseSpeedSection),
+          const SizedBox(height: 8),
+          for (final b in speedBars) b,
+          const SizedBox(height: 16),
+          _SectionHeader(label: l.gpsRoadUsePhaseSection),
+          const SizedBox(height: 8),
+          for (final b in phaseBars) b,
+          if (showCoastPraise) ...[
             const SizedBox(height: 12),
-            _SectionHeader(label: l.gpsRoadUseSpeedSection),
-            const SizedBox(height: 8),
-            for (final b in speedBars) b,
-            const SizedBox(height: 16),
-            _SectionHeader(label: l.gpsRoadUsePhaseSection),
-            const SizedBox(height: 8),
-            for (final b in phaseBars) b,
-            if (showCoastPraise) ...[
-              const SizedBox(height: 12),
-              _CoastPraise(message: l.gpsRoadUseCoastPraise),
-            ],
-            const SizedBox(height: 8),
-            Text(
-              l.gpsRoadUseSource,
-              key: const Key('gps_road_use_source'),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
+            _CoastPraise(message: l.gpsRoadUseCoastPraise),
           ],
-        ),
+          const SizedBox(height: 8),
+          Text(
+            l.gpsRoadUseSource,
+            key: const Key('gps_road_use_source'),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
       ),
+
     );
   }
 }

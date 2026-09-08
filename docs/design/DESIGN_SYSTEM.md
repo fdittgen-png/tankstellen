@@ -887,10 +887,10 @@ that, sharing one walker (`test/lint/design_system_scan.dart`):
 
 | test file | rule | scope | baseline (2026-09-08) |
 |---|---|---|---|
-| `no_raw_card_in_widgets_test.dart` | raw `Card(` → `PrimaryCard` / `PanelCard` | widgets | 75 (#3989) |
-| `no_inline_title_theme_in_widgets_test.dart` | `textTheme.title*` / `headlineSmall` → `AppText` role or `SectionHeader` | widgets | 106 (#3989) |
-| `no_hard_font_size_test.dart` | `fontSize:` → a type role (scales with the text-size setting) | screens + widgets | 81 (#3989) |
-| `no_named_colors_test.dart` | `Colors.<named>` → `colorScheme` / semantic roles / price-band ramp | screens + widgets | 89 (#3989) |
+| `no_raw_card_in_widgets_test.dart` | raw `Card(` → `PrimaryCard` / `PanelCard` | widgets | 58 (#3991) |
+| `no_inline_title_theme_in_widgets_test.dart` | `textTheme.title*` / `headlineSmall` → `AppText` role or `SectionHeader` | widgets | 98 (#3991) |
+| `no_hard_font_size_test.dart` | `fontSize:` → a type role (scales with the text-size setting) | screens + widgets | 81 (#3991) |
+| `no_named_colors_test.dart` | `Colors.<named>` → `colorScheme` / semantic roles / price-band ramp | screens + widgets | 89 (#3991) |
 
 Unlike the allow-listed screen scans, these pin a **decrease-only numeric
 baseline** (the `no_hardcoded_ui_strings` rule): going above fails the

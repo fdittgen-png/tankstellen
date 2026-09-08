@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../obd2/api.dart';
+import '../../../../core/widgets/panel_card.dart';
+import '../../../../core/theme/app_text.dart';
 
 /// "OBD2 adapter" section on the vehicle edit screen (#779).
 ///
@@ -39,78 +41,77 @@ class VehicleAdapterSection extends ConsumerWidget {
     final name = adapterName;
     final paired = mac != null && mac.isNotEmpty;
 
-    return Card(
+    return PanelCard(
       margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.bluetooth),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    l.vehicleAdapterSectionTitle,
-                    style: theme.textTheme.titleMedium,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            if (paired) ...[
-              Text(
-                name == null || name.isEmpty ? (l.vehicleAdapterUnnamed) : name,
-                style: theme.textTheme.bodyLarge,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                mac,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  fontFamily: 'monospace',
-                ),
-              ),
-              const SizedBox(height: 12),
-              // #3676 — hard reset: ATZ chip reset on the dongle (best
-              // effort), full link recycle, fresh dial. Sits beside
-              // Forget so every link-lifecycle action lives in one card.
-              // #3899 — an OverflowBar, not a Row: the two labels share
-              // one row only when both fit, otherwise they stack into
-              // two full-width rows (each label then wraps inside its
-              // button). Nothing is ever clipped ("Oublier l'adap").
-              OverflowBar(
-                key: const Key('vehicleAdapterActions'),
-                alignment: MainAxisAlignment.end,
-                spacing: 8,
-                overflowAlignment: OverflowBarAlignment.end,
-                overflowSpacing: 4,
-                children: [
-                  const _ResetConnectionButton(),
-                  TextButton.icon(
-                    key: const Key('vehicleAdapterForget'),
-                    onPressed: onForget,
-                    icon: const Icon(Icons.link_off),
-                    label: Text(l.vehicleAdapterForget),
-                  ),
-                ],
-              ),
-            ] else ...[
-              Text(l.vehicleAdapterEmpty, style: theme.textTheme.bodySmall),
-              const SizedBox(height: 12),
-              Align(
-                alignment: Alignment.centerRight,
-                child: FilledButton.icon(
-                  key: const Key('vehicleAdapterPair'),
-                  onPressed: () => _onPair(context),
-                  icon: const Icon(Icons.bluetooth_searching),
-                  label: Text(l.vehicleAdapterPair),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.bluetooth),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l.vehicleAdapterSectionTitle,
+                  style: AppText.title(context),
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 12),
+          if (paired) ...[
+            Text(
+              name == null || name.isEmpty ? (l.vehicleAdapterUnnamed) : name,
+              style: theme.textTheme.bodyLarge,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              mac,
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontFamily: 'monospace',
+              ),
+            ),
+            const SizedBox(height: 12),
+            // #3676 — hard reset: ATZ chip reset on the dongle (best
+            // effort), full link recycle, fresh dial. Sits beside
+            // Forget so every link-lifecycle action lives in one card.
+            // #3899 — an OverflowBar, not a Row: the two labels share
+            // one row only when both fit, otherwise they stack into
+            // two full-width rows (each label then wraps inside its
+            // button). Nothing is ever clipped ("Oublier l'adap").
+            OverflowBar(
+              key: const Key('vehicleAdapterActions'),
+              alignment: MainAxisAlignment.end,
+              spacing: 8,
+              overflowAlignment: OverflowBarAlignment.end,
+              overflowSpacing: 4,
+              children: [
+                const _ResetConnectionButton(),
+                TextButton.icon(
+                  key: const Key('vehicleAdapterForget'),
+                  onPressed: onForget,
+                  icon: const Icon(Icons.link_off),
+                  label: Text(l.vehicleAdapterForget),
+                ),
+              ],
+            ),
+          ] else ...[
+            Text(l.vehicleAdapterEmpty, style: theme.textTheme.bodySmall),
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerRight,
+              child: FilledButton.icon(
+                key: const Key('vehicleAdapterPair'),
+                onPressed: () => _onPair(context),
+                icon: const Icon(Icons.bluetooth_searching),
+                label: Text(l.vehicleAdapterPair),
+              ),
+            ),
           ],
-        ),
+        ],
       ),
+
     );
   }
 
