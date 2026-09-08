@@ -106,10 +106,12 @@ class _TestableChain {
         source: result.source,
       );
       return result;
-    } catch (e) {
+    } catch (e, st) {
       errors.add(ServiceError(
         source: ServiceSource.tankerkoenigApi,
         message: e.toString(),
+        errorType: e.runtimeType.toString(), // #3979 — mirrors the real chain
+        stackTrace: st,
         occurredAt: DateTime.now(),
       ));
     }
@@ -205,5 +207,6 @@ void main() {
         throwsA(isA<ServiceChainExhaustedException>()),
       );
     });
+
   });
 }

@@ -102,10 +102,12 @@ class GeocodingChain {
         return result;
       // #3164 — kept: the error is captured into the chain's ServiceError
       // aggregate and surfaces in the result.
-      } catch (e, st) { // ignore: unused_catch_stack
+      } catch (e, st) {
         errors.add(ServiceError(
           source: provider.source,
           message: e.toString(),
+          errorType: e.runtimeType.toString(),
+          stackTrace: st, // #3979 — was `// ignore: unused_catch_stack`
           occurredAt: DateTime.now(),
         ));
       }
@@ -167,10 +169,12 @@ class GeocodingChain {
         );
       // #3164 — kept: the error is captured into the chain's ServiceError
       // aggregate and surfaces in the result.
-      } catch (e, st) { // ignore: unused_catch_stack
+      } catch (e, st) {
         errors.add(ServiceError(
           source: provider.source,
           message: e.toString(),
+          errorType: e.runtimeType.toString(),
+          stackTrace: st, // #3979 — was `// ignore: unused_catch_stack`
           occurredAt: DateTime.now(),
         ));
       }

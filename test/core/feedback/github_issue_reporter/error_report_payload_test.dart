@@ -166,10 +166,20 @@ void main() {
       expect(payload.errorMessage, isNot(contains('All services failed')));
     });
 
-    test('handles ServiceChainExhaustedException with non-ServiceError entries', () {
+    // #3979 — `errors` is `List<ServiceError>` now, so the old "non-
+    // ServiceError entries" case cannot be constructed. What replaced it:
+    // each attempt names its runtime type in the chain line, so a report
+    // says *what* failed at each step, not just that something did.
+    test('a typed attempt names its error type in the fallback chain', () {
       final exception = ServiceChainExhaustedException(
         errors: [
-          Exception('raw timeout'),
+          ServiceError(
+            source: ServiceSource.ukApi,
+            message: 'raw timeout',
+            errorType: 'TimeoutException',
+            stackTrace: StackTrace.current,
+            occurredAt: DateTime.utc(2026, 4, 15, 8, 0),
+          ),
         ],
       );
 
@@ -181,10 +191,9 @@ void main() {
       );
 
       expect(payload.fallbackChain, hasLength(1));
+      expect(payload.fallbackChain.single, contains('TimeoutException: '));
       expect(payload.fallbackChain.single, contains('raw timeout'));
-      // No ServiceError → sourceLabel and statusCode stay null.
-      expect(payload.sourceLabel, isNull);
-      expect(payload.statusCode, isNull);
+      expect(payload.sourceLabel, ServiceSource.ukApi.displayName);
       expect(payload.errorMessage, payload.fallbackChain.single);
     });
 

@@ -128,6 +128,8 @@ _ServiceAttempt _$ServiceAttemptFromJson(Map<String, dynamic> json) =>
       serviceName: json['serviceName'] as String,
       succeeded: json['succeeded'] as bool,
       errorMessage: json['errorMessage'] as String?,
+      errorType: json['errorType'] as String?,
+      stackTrace: json['stackTrace'] as String?,
       statusCode: (json['statusCode'] as num?)?.toInt(),
       attemptedAt: DateTime.parse(json['attemptedAt'] as String),
     );
@@ -137,6 +139,8 @@ Map<String, dynamic> _$ServiceAttemptToJson(_ServiceAttempt instance) =>
       'serviceName': instance.serviceName,
       'succeeded': instance.succeeded,
       'errorMessage': instance.errorMessage,
+      'errorType': instance.errorType,
+      'stackTrace': instance.stackTrace,
       'statusCode': instance.statusCode,
       'attemptedAt': instance.attemptedAt.toIso8601String(),
     };

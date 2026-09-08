@@ -142,9 +142,16 @@ void main() {
           .thenThrow(Exception('fail'));
       when(() => mockCache.get('geo:zip:10115')).thenReturn(null);
 
-      expect(
+      // #3979 — both providers' failures keep their own type and stack;
+      // the chain used to drop the stack (`// ignore: unused_catch_stack`).
+      await expectLater(
         () => chain.zipCodeToCoordinates('10115'),
-        throwsA(isA<ServiceChainExhaustedException>()),
+        throwsA(isA<ServiceChainExhaustedException>()
+            .having((e) => e.errors, 'errors', hasLength(2))
+            .having((e) => e.errors.every((x) => x.errorType != null),
+                'every attempt is typed', isTrue)
+            .having((e) => e.errors.every((x) => x.stackTrace != null),
+                'every attempt carries its own stack', isTrue)),
       );
     });
 

@@ -17,6 +17,7 @@ import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
+import 'package:tankstellen/core/services/service_result.dart';
 
 /// Fake TraceStorage that records calls in memory.
 class _FakeTraceStorage extends TraceStorage {
@@ -180,9 +181,24 @@ void main() {
     });
 
     test('ServiceChainExhaustedException builds chain snapshot', () async {
-      const error = ServiceChainExhaustedException(errors: [
-        'Service A failed',
-        'Service B failed',
+      // #3979 — typed entries, each with its own type and stack (the list
+      // used to be `List<dynamic>` and this test passed bare strings).
+      final error = ServiceChainExhaustedException(errors: [
+        ServiceError(
+          source: ServiceSource.tankerkoenigApi,
+          message: 'Service A failed',
+          errorType: 'ApiException',
+          statusCode: 503,
+          stackTrace: StackTrace.current,
+          occurredAt: DateTime.utc(2026, 9, 8),
+        ),
+        ServiceError(
+          source: ServiceSource.cache,
+          message: 'Service B failed',
+          errorType: 'StateError',
+          stackTrace: StackTrace.current,
+          occurredAt: DateTime.utc(2026, 9, 8),
+        ),
       ]);
 
       await recorder.record(error, StackTrace.current);
@@ -190,7 +206,13 @@ void main() {
       final trace = storage.stored.first;
       expect(trace.category, ErrorCategory.serviceChain);
       expect(trace.serviceChainState, isNotNull);
-      expect(trace.serviceChainState!.attempts, hasLength(2));
+      final attempts = trace.serviceChainState!.attempts;
+      expect(attempts, hasLength(2));
+      // One typed error WITH its own stack per attempt — the whole point.
+      expect(attempts.map((a) => a.errorType), ['ApiException', 'StateError']);
+      expect(attempts.every((a) => (a.stackTrace ?? '').isNotEmpty), isTrue,
+          reason: 'each attempt must persist the stack that explains it');
+      expect(attempts.first.statusCode, 503);
     });
 
     test('timezone offset is formatted correctly', () async {

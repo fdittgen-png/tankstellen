@@ -176,7 +176,7 @@ Future<AsyncValue<ServiceResult<List<SearchResultItem>>>>
             // The empty-result UI behaviour is unchanged.
             unawaited(errorLogger.log(ErrorLayer.services, e, st,
                 context: const {'where': 'finalizeUnifiedResult ev'}));
-            return _emptyEvSearchResult(evError: e);
+            return _emptyEvSearchResult(evError: e, evStack: st);
           },
         ),
   );
@@ -185,7 +185,10 @@ Future<AsyncValue<ServiceResult<List<SearchResultItem>>>>
 /// An empty EV [SearchResultItem] feed, optionally carrying [evError]
 /// so an EV search that failed still surfaces the OpenChargeMap outage
 /// in the freshness / fallback banner (#1866).
-ServiceResult<List<SearchResultItem>> _emptyEvSearchResult({Object? evError}) =>
+ServiceResult<List<SearchResultItem>> _emptyEvSearchResult({
+  Object? evError,
+  StackTrace? evStack,
+}) =>
     ServiceResult<List<SearchResultItem>>(
       data: const [],
       source: ServiceSource.openChargeMapApi,
@@ -196,6 +199,8 @@ ServiceResult<List<SearchResultItem>> _emptyEvSearchResult({Object? evError}) =>
               ServiceError(
                 source: ServiceSource.openChargeMapApi,
                 message: evError.toString(),
+                errorType: evError.runtimeType.toString(),
+                stackTrace: evStack,
                 occurredAt: DateTime.now(),
               ),
             ],

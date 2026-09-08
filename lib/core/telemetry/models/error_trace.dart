@@ -94,6 +94,14 @@ abstract class ServiceAttempt with _$ServiceAttempt {
     required String serviceName,
     required bool succeeded,
     String? errorMessage,
+
+    /// #3979 — runtime type of the throw at this attempt (`TypeError`,
+    /// `ApiException`, …), so the export names what failed per attempt.
+    String? errorType,
+
+    /// #3979 — this attempt's own stack, as text. Null for traces persisted
+    /// before the field existed.
+    String? stackTrace,
     int? statusCode,
     required DateTime attemptedAt,
   }) = _ServiceAttempt;

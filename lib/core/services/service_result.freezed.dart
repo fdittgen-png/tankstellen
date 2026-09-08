@@ -18,7 +18,14 @@ mixin _$ServiceError {
 /// [FailureKind.unknown] for non-HTTP failures (geocoding, GPS, …).
  FailureKind get kind;/// Upstream-suggested backoff parsed from a `Retry-After` header when
 /// [kind] is [FailureKind.rateLimited]; null otherwise.
- Duration? get retryAfter;
+ Duration? get retryAfter;/// #3979 — the runtime type of what was thrown (`TypeError`,
+/// `ApiException`, `DioException`, …). Before, the chain rewrote every
+/// non-`Exception` as `Exception(e.toString())`, so a `TypeError` from
+/// drifted JSON reached the trace as an anonymous exception.
+ String? get errorType;/// #3979 — this attempt's OWN stack. A chain exhaustion used to carry
+/// N stringified messages and exactly one stack (the rethrow site's);
+/// now each attempt keeps the one that explains it.
+ StackTrace? get stackTrace;
 /// Create a copy of ServiceError
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +36,16 @@ $ServiceErrorCopyWith<ServiceError> get copyWith => _$ServiceErrorCopyWithImpl<S
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ServiceError&&(identical(other.source, source) || other.source == source)&&(identical(other.message, message) || other.message == message)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&(identical(other.occurredAt, occurredAt) || other.occurredAt == occurredAt)&&(identical(other.kind, kind) || other.kind == kind)&&(identical(other.retryAfter, retryAfter) || other.retryAfter == retryAfter));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ServiceError&&(identical(other.source, source) || other.source == source)&&(identical(other.message, message) || other.message == message)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&(identical(other.occurredAt, occurredAt) || other.occurredAt == occurredAt)&&(identical(other.kind, kind) || other.kind == kind)&&(identical(other.retryAfter, retryAfter) || other.retryAfter == retryAfter)&&(identical(other.errorType, errorType) || other.errorType == errorType)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,source,message,statusCode,occurredAt,kind,retryAfter);
+int get hashCode => Object.hash(runtimeType,source,message,statusCode,occurredAt,kind,retryAfter,errorType,stackTrace);
 
 @override
 String toString() {
-  return 'ServiceError(source: $source, message: $message, statusCode: $statusCode, occurredAt: $occurredAt, kind: $kind, retryAfter: $retryAfter)';
+  return 'ServiceError(source: $source, message: $message, statusCode: $statusCode, occurredAt: $occurredAt, kind: $kind, retryAfter: $retryAfter, errorType: $errorType, stackTrace: $stackTrace)';
 }
 
 
@@ -49,7 +56,7 @@ abstract mixin class $ServiceErrorCopyWith<$Res>  {
   factory $ServiceErrorCopyWith(ServiceError value, $Res Function(ServiceError) _then) = _$ServiceErrorCopyWithImpl;
 @useResult
 $Res call({
- ServiceSource source, String message, int? statusCode, DateTime occurredAt, FailureKind kind, Duration? retryAfter
+ ServiceSource source, String message, int? statusCode, DateTime occurredAt, FailureKind kind, Duration? retryAfter, String? errorType, StackTrace? stackTrace
 });
 
 
@@ -66,7 +73,7 @@ class _$ServiceErrorCopyWithImpl<$Res>
 
 /// Create a copy of ServiceError
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? source = null,Object? message = null,Object? statusCode = freezed,Object? occurredAt = null,Object? kind = null,Object? retryAfter = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? source = null,Object? message = null,Object? statusCode = freezed,Object? occurredAt = null,Object? kind = null,Object? retryAfter = freezed,Object? errorType = freezed,Object? stackTrace = freezed,}) {
   return _then(_self.copyWith(
 source: null == source ? _self.source : source // ignore: cast_nullable_to_non_nullable
 as ServiceSource,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
@@ -74,7 +81,9 @@ as String,statusCode: freezed == statusCode ? _self.statusCode : statusCode // i
 as int?,occurredAt: null == occurredAt ? _self.occurredAt : occurredAt // ignore: cast_nullable_to_non_nullable
 as DateTime,kind: null == kind ? _self.kind : kind // ignore: cast_nullable_to_non_nullable
 as FailureKind,retryAfter: freezed == retryAfter ? _self.retryAfter : retryAfter // ignore: cast_nullable_to_non_nullable
-as Duration?,
+as Duration?,errorType: freezed == errorType ? _self.errorType : errorType // ignore: cast_nullable_to_non_nullable
+as String?,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
+as StackTrace?,
   ));
 }
 
@@ -159,10 +168,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ServiceSource source,  String message,  int? statusCode,  DateTime occurredAt,  FailureKind kind,  Duration? retryAfter)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ServiceSource source,  String message,  int? statusCode,  DateTime occurredAt,  FailureKind kind,  Duration? retryAfter,  String? errorType,  StackTrace? stackTrace)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ServiceError() when $default != null:
-return $default(_that.source,_that.message,_that.statusCode,_that.occurredAt,_that.kind,_that.retryAfter);case _:
+return $default(_that.source,_that.message,_that.statusCode,_that.occurredAt,_that.kind,_that.retryAfter,_that.errorType,_that.stackTrace);case _:
   return orElse();
 
 }
@@ -180,10 +189,10 @@ return $default(_that.source,_that.message,_that.statusCode,_that.occurredAt,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ServiceSource source,  String message,  int? statusCode,  DateTime occurredAt,  FailureKind kind,  Duration? retryAfter)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ServiceSource source,  String message,  int? statusCode,  DateTime occurredAt,  FailureKind kind,  Duration? retryAfter,  String? errorType,  StackTrace? stackTrace)  $default,) {final _that = this;
 switch (_that) {
 case _ServiceError():
-return $default(_that.source,_that.message,_that.statusCode,_that.occurredAt,_that.kind,_that.retryAfter);case _:
+return $default(_that.source,_that.message,_that.statusCode,_that.occurredAt,_that.kind,_that.retryAfter,_that.errorType,_that.stackTrace);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -200,10 +209,10 @@ return $default(_that.source,_that.message,_that.statusCode,_that.occurredAt,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ServiceSource source,  String message,  int? statusCode,  DateTime occurredAt,  FailureKind kind,  Duration? retryAfter)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ServiceSource source,  String message,  int? statusCode,  DateTime occurredAt,  FailureKind kind,  Duration? retryAfter,  String? errorType,  StackTrace? stackTrace)?  $default,) {final _that = this;
 switch (_that) {
 case _ServiceError() when $default != null:
-return $default(_that.source,_that.message,_that.statusCode,_that.occurredAt,_that.kind,_that.retryAfter);case _:
+return $default(_that.source,_that.message,_that.statusCode,_that.occurredAt,_that.kind,_that.retryAfter,_that.errorType,_that.stackTrace);case _:
   return null;
 
 }
@@ -215,7 +224,7 @@ return $default(_that.source,_that.message,_that.statusCode,_that.occurredAt,_th
 
 
 class _ServiceError implements ServiceError {
-  const _ServiceError({required this.source, required this.message, this.statusCode, required this.occurredAt, this.kind = FailureKind.unknown, this.retryAfter});
+  const _ServiceError({required this.source, required this.message, this.statusCode, required this.occurredAt, this.kind = FailureKind.unknown, this.retryAfter, this.errorType, this.stackTrace});
   
 
 @override final  ServiceSource source;
@@ -228,6 +237,15 @@ class _ServiceError implements ServiceError {
 /// Upstream-suggested backoff parsed from a `Retry-After` header when
 /// [kind] is [FailureKind.rateLimited]; null otherwise.
 @override final  Duration? retryAfter;
+/// #3979 — the runtime type of what was thrown (`TypeError`,
+/// `ApiException`, `DioException`, …). Before, the chain rewrote every
+/// non-`Exception` as `Exception(e.toString())`, so a `TypeError` from
+/// drifted JSON reached the trace as an anonymous exception.
+@override final  String? errorType;
+/// #3979 — this attempt's OWN stack. A chain exhaustion used to carry
+/// N stringified messages and exactly one stack (the rethrow site's);
+/// now each attempt keeps the one that explains it.
+@override final  StackTrace? stackTrace;
 
 /// Create a copy of ServiceError
 /// with the given fields replaced by the non-null parameter values.
@@ -239,16 +257,16 @@ _$ServiceErrorCopyWith<_ServiceError> get copyWith => __$ServiceErrorCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ServiceError&&(identical(other.source, source) || other.source == source)&&(identical(other.message, message) || other.message == message)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&(identical(other.occurredAt, occurredAt) || other.occurredAt == occurredAt)&&(identical(other.kind, kind) || other.kind == kind)&&(identical(other.retryAfter, retryAfter) || other.retryAfter == retryAfter));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ServiceError&&(identical(other.source, source) || other.source == source)&&(identical(other.message, message) || other.message == message)&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&(identical(other.occurredAt, occurredAt) || other.occurredAt == occurredAt)&&(identical(other.kind, kind) || other.kind == kind)&&(identical(other.retryAfter, retryAfter) || other.retryAfter == retryAfter)&&(identical(other.errorType, errorType) || other.errorType == errorType)&&(identical(other.stackTrace, stackTrace) || other.stackTrace == stackTrace));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,source,message,statusCode,occurredAt,kind,retryAfter);
+int get hashCode => Object.hash(runtimeType,source,message,statusCode,occurredAt,kind,retryAfter,errorType,stackTrace);
 
 @override
 String toString() {
-  return 'ServiceError(source: $source, message: $message, statusCode: $statusCode, occurredAt: $occurredAt, kind: $kind, retryAfter: $retryAfter)';
+  return 'ServiceError(source: $source, message: $message, statusCode: $statusCode, occurredAt: $occurredAt, kind: $kind, retryAfter: $retryAfter, errorType: $errorType, stackTrace: $stackTrace)';
 }
 
 
@@ -259,7 +277,7 @@ abstract mixin class _$ServiceErrorCopyWith<$Res> implements $ServiceErrorCopyWi
   factory _$ServiceErrorCopyWith(_ServiceError value, $Res Function(_ServiceError) _then) = __$ServiceErrorCopyWithImpl;
 @override @useResult
 $Res call({
- ServiceSource source, String message, int? statusCode, DateTime occurredAt, FailureKind kind, Duration? retryAfter
+ ServiceSource source, String message, int? statusCode, DateTime occurredAt, FailureKind kind, Duration? retryAfter, String? errorType, StackTrace? stackTrace
 });
 
 
@@ -276,7 +294,7 @@ class __$ServiceErrorCopyWithImpl<$Res>
 
 /// Create a copy of ServiceError
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? source = null,Object? message = null,Object? statusCode = freezed,Object? occurredAt = null,Object? kind = null,Object? retryAfter = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? source = null,Object? message = null,Object? statusCode = freezed,Object? occurredAt = null,Object? kind = null,Object? retryAfter = freezed,Object? errorType = freezed,Object? stackTrace = freezed,}) {
   return _then(_ServiceError(
 source: null == source ? _self.source : source // ignore: cast_nullable_to_non_nullable
 as ServiceSource,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
@@ -284,7 +302,9 @@ as String,statusCode: freezed == statusCode ? _self.statusCode : statusCode // i
 as int?,occurredAt: null == occurredAt ? _self.occurredAt : occurredAt // ignore: cast_nullable_to_non_nullable
 as DateTime,kind: null == kind ? _self.kind : kind // ignore: cast_nullable_to_non_nullable
 as FailureKind,retryAfter: freezed == retryAfter ? _self.retryAfter : retryAfter // ignore: cast_nullable_to_non_nullable
-as Duration?,
+as Duration?,errorType: freezed == errorType ? _self.errorType : errorType // ignore: cast_nullable_to_non_nullable
+as String?,stackTrace: freezed == stackTrace ? _self.stackTrace : stackTrace // ignore: cast_nullable_to_non_nullable
+as StackTrace?,
   ));
 }
 

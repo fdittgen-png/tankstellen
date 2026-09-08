@@ -246,6 +246,8 @@ class GreeceStationService
         errors.add(ServiceError(
           source: ServiceSource.greeceApi,
           message: 'parse ${pref.apiName}: $e',
+          errorType: e.runtimeType.toString(),
+          stackTrace: st,
           occurredAt: DateTime.now(),
         ));
       }
