@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'trip_chart_section.dart';
 import 'trip_detail_charts.dart';
+import '../../../../core/widgets/panel_card.dart';
 
 /// The per-trip telemetry charts, folded into one collapsed-by-default
 /// [ExpansionTile] (#1895) so the summary and insight cards above stay the
@@ -63,9 +64,8 @@ class TripDetailChartsSection extends StatelessWidget {
     final hasTimingSamples =
         _has(const {'ta'}, (s) => s.timingAdvanceDeg != null);
 
-    return Card(
+    return PanelCard(
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-      clipBehavior: Clip.antiAlias,
       child: ExpansionTile(
         title: Text(l.trajetDetailChartsSection),
         initiallyExpanded: false,

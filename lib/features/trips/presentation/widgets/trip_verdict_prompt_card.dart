@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/trip_verdict.dart';
 import '../../providers/trip_history_provider.dart';
+import '../../../../core/widgets/panel_card.dart';
 
 /// The 3-tap post-trip verdict prompt (#3501, epic #3498).
 ///
@@ -59,71 +60,70 @@ class _TripVerdictPromptCardState extends ConsumerState<TripVerdictPromptCard> {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final answered = _answered;
-    return Card(
+    return PanelCard(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-        child: answered != null && answered != TripVerdict.skipped
-            ? Row(
-                key: const Key('tripVerdictThanks'),
-                children: [
-                  Icon(Icons.check_circle_outline,
-                      size: 20, color: theme.colorScheme.primary),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(l.tripVerdictThanks,
-                        style: theme.textTheme.bodyMedium),
-                  ),
-                ],
-              )
-            : answered == TripVerdict.skipped
-                ? const SizedBox.shrink()
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(l.tripVerdictPromptTitle,
-                                style: theme.textTheme.titleSmall),
-                          ),
-                          IconButton(
-                            key: const Key('tripVerdictDismiss'),
-                            tooltip: l.tripVerdictDismiss,
-                            icon: const Icon(Icons.close, size: 18),
-                            onPressed: () => _submit(TripVerdict.skipped),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Wrap(
-                        spacing: 8,
-                        children: [
-                          ActionChip(
-                            key: const Key('tripVerdictSmooth'),
-                            avatar: const Icon(Icons.spa_outlined, size: 18),
-                            label: Text(l.tripVerdictSmooth),
-                            onPressed: () => _submit(TripVerdict.smooth),
-                          ),
-                          ActionChip(
-                            key: const Key('tripVerdictModerate'),
-                            avatar: const Icon(Icons.commute_outlined,
-                                size: 18),
-                            label: Text(l.tripVerdictModerate),
-                            onPressed: () => _submit(TripVerdict.moderate),
-                          ),
-                          ActionChip(
-                            key: const Key('tripVerdictAggressive'),
-                            avatar:
-                                const Icon(Icons.bolt_outlined, size: 18),
-                            label: Text(l.tripVerdictAggressive),
-                            onPressed: () => _submit(TripVerdict.aggressive),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-      ),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+      child: answered != null && answered != TripVerdict.skipped
+          ? Row(
+              key: const Key('tripVerdictThanks'),
+              children: [
+                Icon(Icons.check_circle_outline,
+                    size: 20, color: theme.colorScheme.primary),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(l.tripVerdictThanks,
+                      style: theme.textTheme.bodyMedium),
+                ),
+              ],
+            )
+          : answered == TripVerdict.skipped
+              ? const SizedBox.shrink()
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(l.tripVerdictPromptTitle,
+                              style: theme.textTheme.titleSmall),
+                        ),
+                        IconButton(
+                          key: const Key('tripVerdictDismiss'),
+                          tooltip: l.tripVerdictDismiss,
+                          icon: const Icon(Icons.close, size: 18),
+                          onPressed: () => _submit(TripVerdict.skipped),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Wrap(
+                      spacing: 8,
+                      children: [
+                        ActionChip(
+                          key: const Key('tripVerdictSmooth'),
+                          avatar: const Icon(Icons.spa_outlined, size: 18),
+                          label: Text(l.tripVerdictSmooth),
+                          onPressed: () => _submit(TripVerdict.smooth),
+                        ),
+                        ActionChip(
+                          key: const Key('tripVerdictModerate'),
+                          avatar: const Icon(Icons.commute_outlined,
+                              size: 18),
+                          label: Text(l.tripVerdictModerate),
+                          onPressed: () => _submit(TripVerdict.moderate),
+                        ),
+                        ActionChip(
+                          key: const Key('tripVerdictAggressive'),
+                          avatar:
+                              const Icon(Icons.bolt_outlined, size: 18),
+                          label: Text(l.tripVerdictAggressive),
+                          onPressed: () => _submit(TripVerdict.aggressive),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+
     );
   }
 }

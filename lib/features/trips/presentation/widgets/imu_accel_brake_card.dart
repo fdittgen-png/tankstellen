@@ -7,6 +7,8 @@ import '../../../../l10n/app_localizations.dart';
 import '../../domain/trip_recorder.dart';
 import '../../domain/trip_summary.dart';
 import '../../../../core/utils/unit_formatter.dart';
+import '../../../../core/widgets/panel_card.dart';
+import '../../../../core/theme/app_text.dart';
 
 /// Trip-detail card surfacing the dongle-less hard-acceleration /
 /// hard-braking / sharp-cornering episode counts the phone's IMU detected on a
@@ -43,48 +45,47 @@ class ImuAccelBrakeCard extends StatelessWidget {
     String fmt(int count, double perKm) =>
         '$count (${UnitFormatter.formatDecimal(perKm)}/km)';
 
-    return Card(
+    return PanelCard(
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l.accelBrakeCardTitle,
-              key: const Key('accel_brake_card_title'),
-              style: theme.textTheme.titleMedium,
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l.accelBrakeCardTitle,
+            key: const Key('accel_brake_card_title'),
+            style: AppText.title(context),
+          ),
+          const SizedBox(height: 8),
+          _row(
+            theme,
+            key: const Key('accel_brake_hard_accel'),
+            label: l.accelBrakeHardAccel,
+            value: fmt(summary.imuHardAccelCount, summary.imuHardAccelPerKm),
+          ),
+          _row(
+            theme,
+            key: const Key('accel_brake_hard_brake'),
+            label: l.accelBrakeHardBrake,
+            value: fmt(summary.imuHardBrakeCount, summary.imuHardBrakePerKm),
+          ),
+          _row(
+            theme,
+            key: const Key('accel_brake_sharp_corner'),
+            label: l.accelBrakeSharpCorner,
+            value: fmt(summary.sharpCornerCount, summary.sharpCornersPerKm),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            l.accelBrakeSource,
+            key: const Key('accel_brake_source'),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
             ),
-            const SizedBox(height: 8),
-            _row(
-              theme,
-              key: const Key('accel_brake_hard_accel'),
-              label: l.accelBrakeHardAccel,
-              value: fmt(summary.imuHardAccelCount, summary.imuHardAccelPerKm),
-            ),
-            _row(
-              theme,
-              key: const Key('accel_brake_hard_brake'),
-              label: l.accelBrakeHardBrake,
-              value: fmt(summary.imuHardBrakeCount, summary.imuHardBrakePerKm),
-            ),
-            _row(
-              theme,
-              key: const Key('accel_brake_sharp_corner'),
-              label: l.accelBrakeSharpCorner,
-              value: fmt(summary.sharpCornerCount, summary.sharpCornersPerKm),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              l.accelBrakeSource,
-              key: const Key('accel_brake_source'),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
+
     );
   }
 

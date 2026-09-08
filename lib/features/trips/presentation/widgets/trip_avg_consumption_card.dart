@@ -14,6 +14,8 @@ import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../../obd2/api.dart';
 import 'gps_matrix_maturity_badge.dart';
 import 'recording/fuel_source_badge.dart';
+import '../../../../core/widgets/panel_card.dart';
+import '../../../../core/theme/app_text.dart';
 
 /// Live **Average consumption** card for the trip-recording screen
 /// (#2391 / Epic #2385 — GPS-only live fuel consumption).
@@ -157,13 +159,13 @@ class TripAvgConsumptionCard extends ConsumerWidget {
       Text(
         value,
         key: const Key('tripAvgConsumptionValue'),
-        style: theme.textTheme.titleLarge?.copyWith(
-          fontFeatures: const [FontFeature.tabularFigures()],
-        ),
+        // #3991 — the card's one focal number (the display role already
+        // carries tabular figures).
+        style: AppText.display(context),
       ),
     ];
 
-    return Card(
+    return PanelCard(
       key: const Key('tripAvgConsumptionCard'),
       margin: EdgeInsets.zero,
       // #2764 — an explicit Row (not a ListTile title/trailing split):
@@ -171,56 +173,55 @@ class TripAvgConsumptionCard extends ConsumerWidget {
       // its full intrinsic width, squeezing the label to ~1 char so it
       // wrapped one letter per line. The label now lives in an
       // `Expanded` that ellipsizes, and the trailing keeps its min width.
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // #3916 — the card now also lives in the recording grid's
-            // narrow cells: the trailing (tooltip + badge + value) keeps
-            // its natural width while it fits, shrinks to fit past 70 %
-            // of the row, and always leaves the label its share.
-            LayoutBuilder(
-              builder: (context, constraints) => Row(
-                children: [
-                  const Icon(Icons.eco, size: 28),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Text(
-                      l.tripMetricAvgConsumption,
-                      style: theme.textTheme.bodySmall,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // #3916 — the card now also lives in the recording grid's
+          // narrow cells: the trailing (tooltip + badge + value) keeps
+          // its natural width while it fits, shrinks to fit past 70 %
+          // of the row, and always leaves the label its share.
+          LayoutBuilder(
+            builder: (context, constraints) => Row(
+              children: [
+                const Icon(Icons.eco, size: 28),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    l.tripMetricAvgConsumption,
+                    style: theme.textTheme.bodySmall,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: (constraints.maxWidth - 44) * 0.7,
-                    ),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerRight,
-                      child:
-                          Row(mainAxisSize: MainAxisSize.min, children: trailing),
-                    ),
+                ),
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: (constraints.maxWidth - 44) * 0.7,
                   ),
-                ],
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerRight,
+                    child:
+                        Row(mainAxisSize: MainAxisSize.min, children: trailing),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (fuelSource != null) ...[
+            const SizedBox(height: 6),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: FuelSourceBadge(
+                key: const Key('tripAvgFuelSourceBadge'),
+                state: fuelSource,
               ),
             ),
-            if (fuelSource != null) ...[
-              const SizedBox(height: 6),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: FuelSourceBadge(
-                  key: const Key('tripAvgFuelSourceBadge'),
-                  state: fuelSource,
-                ),
-              ),
-            ],
           ],
-        ),
+        ],
       ),
+
     );
   }
 

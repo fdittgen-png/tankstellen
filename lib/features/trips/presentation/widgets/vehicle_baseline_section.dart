@@ -12,6 +12,8 @@ import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/situation_classifier.dart';
 import '../../providers/vehicle_baseline_summary_provider.dart';
+import '../../../../core/widgets/panel_card.dart';
+import '../../../../core/theme/app_text.dart';
 
 part 'vehicle_baseline_section_parts.dart';
 
@@ -166,115 +168,114 @@ class _VehicleBaselineSectionState
     final showDetails =
         _showDetailsOverride ?? (widget.expandDetailsByDefault || hasMissing);
 
-    return Card(
+    return PanelCard(
       margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.tune),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    l.vehicleBaselineSectionTitle,
-                    style: theme.textTheme.titleMedium,
-                  ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.tune),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l.vehicleBaselineSectionTitle,
+                  style: AppText.title(context),
                 ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Text(
-              totalSamples == 0
-                  ? (l.vehicleBaselineEmpty)
-                  : (l.vehicleBaselineProgress),
-              style: theme.textTheme.bodySmall,
-            ),
-            const SizedBox(height: 12),
-            // #1529 — aggregate progress bar shown always; per-
-            // situation breakdown only when the user taps Show
-            // details. #2514 — the bar tracks COVERAGE, so it can never
-            // sit at 100% while a bucket is empty.
-            ClipRRect(
-              borderRadius: AppRadius.md,
-              child: LinearProgressIndicator(
-                key: const Key('vehicleBaselineAggregateBar'),
-                value: coverageValue,
-                minHeight: 8,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              l.vehicleBaselineCoverageSamples(coveredSamples, maxTotal),
-              style: theme.textTheme.labelSmall,
-              textAlign: TextAlign.right,
-            ),
-            // #2514 — surface the empty buckets the over-filled
-            // aggregate used to hide, so the user knows a driving
-            // situation has never been detected yet.
-            if (hasMissing) ...[
-              const SizedBox(height: 8),
-              _MissingSituationsNote(
-                situations: missingSituations
-                    .map((s) => _label(s, l))
-                    .toList(growable: false),
               ),
             ],
-            const SizedBox(height: 8),
-            Align(
-              alignment: AlignmentDirectional.centerStart,
-              child: TextButton.icon(
-                key: const Key('vehicleBaselineDetailsToggle'),
-                onPressed: () =>
-                    setState(() => _showDetailsOverride = !showDetails),
-                icon: Icon(
-                  showDetails ? Icons.expand_less : Icons.expand_more,
-                  size: 18,
-                ),
-                label: Text(
-                  showDetails
-                      ? (l.vehicleBaselineHideDetails)
-                      : (l.vehicleBaselineShowDetails),
-                ),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-              ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            totalSamples == 0
+                ? (l.vehicleBaselineEmpty)
+                : (l.vehicleBaselineProgress),
+            style: theme.textTheme.bodySmall,
+          ),
+          const SizedBox(height: 12),
+          // #1529 — aggregate progress bar shown always; per-
+          // situation breakdown only when the user taps Show
+          // details. #2514 — the bar tracks COVERAGE, so it can never
+          // sit at 100% while a bucket is empty.
+          ClipRRect(
+            borderRadius: AppRadius.md,
+            child: LinearProgressIndicator(
+              key: const Key('vehicleBaselineAggregateBar'),
+              value: coverageValue,
+              minHeight: 8,
             ),
-            if (showDetails) ...[
-              const SizedBox(height: 4),
-              for (final s in situations)
-                _BaselineRow(
-                  label: _label(s, l),
-                  count: counts[s] ?? 0,
-                  fullConfidenceSamples: widget.fullConfidenceSamples,
-                ),
-            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            l.vehicleBaselineCoverageSamples(coveredSamples, maxTotal),
+            style: theme.textTheme.labelSmall,
+            textAlign: TextAlign.right,
+          ),
+          // #2514 — surface the empty buckets the over-filled
+          // aggregate used to hide, so the user knows a driving
+          // situation has never been detected yet.
+          if (hasMissing) ...[
             const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton.icon(
-                key: const Key('resetBaselinesButton'),
-                onPressed: totalSamples == 0
-                    ? null
-                    : () => _confirmReset(context, ref, l),
-                // tune_outlined picks up the "tuning learned per-situation
-                // behaviour" connotation — distinct from the pump-gain
-                // reset's local_gas_station_outlined icon (#1219).
-                icon: const Icon(Icons.tune_outlined),
-                label: Text(l.vehicleBaselineReset),
-              ),
+            _MissingSituationsNote(
+              situations: missingSituations
+                  .map((s) => _label(s, l))
+                  .toList(growable: false),
             ),
           ],
-        ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: TextButton.icon(
+              key: const Key('vehicleBaselineDetailsToggle'),
+              onPressed: () =>
+                  setState(() => _showDetailsOverride = !showDetails),
+              icon: Icon(
+                showDetails ? Icons.expand_less : Icons.expand_more,
+                size: 18,
+              ),
+              label: Text(
+                showDetails
+                    ? (l.vehicleBaselineHideDetails)
+                    : (l.vehicleBaselineShowDetails),
+              ),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 4,
+                ),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+            ),
+          ),
+          if (showDetails) ...[
+            const SizedBox(height: 4),
+            for (final s in situations)
+              _BaselineRow(
+                label: _label(s, l),
+                count: counts[s] ?? 0,
+                fullConfidenceSamples: widget.fullConfidenceSamples,
+              ),
+          ],
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              key: const Key('resetBaselinesButton'),
+              onPressed: totalSamples == 0
+                  ? null
+                  : () => _confirmReset(context, ref, l),
+              // tune_outlined picks up the "tuning learned per-situation
+              // behaviour" connotation — distinct from the pump-gain
+              // reset's local_gas_station_outlined icon (#1219).
+              icon: const Icon(Icons.tune_outlined),
+              label: Text(l.vehicleBaselineReset),
+            ),
+          ),
+        ],
       ),
+
     );
   }
 

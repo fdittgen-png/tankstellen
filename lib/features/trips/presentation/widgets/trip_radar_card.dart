@@ -18,6 +18,7 @@ import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/station.dart';
 import 'proximity_fill_bar.dart';
 import 'radar_swipe_wrapper.dart';
+import '../../../../core/widgets/panel_card.dart';
 
 /// "Closest station" radar card pinned to the TOP of the active
 /// trip-recording column (#2380).
@@ -236,7 +237,7 @@ class RadarCard extends StatelessWidget {
     // fan-out).
     final navigateLabel = l.navigate;
 
-    return Card(
+    return PanelCard(
       margin: EdgeInsets.zero,
       child: Tooltip(
         message: navigateLabel,
@@ -352,7 +353,7 @@ class RadarPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Card(
+    return PanelCard(
       margin: EdgeInsets.zero,
       child: ListTile(
         leading: const Icon(Icons.radar, size: 28),

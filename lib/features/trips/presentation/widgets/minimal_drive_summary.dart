@@ -12,6 +12,7 @@ import '../../providers/trip_recording_provider.dart';
 import 'broken_map_widgets.dart';
 import 'recording/coaching_symbol.dart';
 import 'recording/live_behaviour_band.dart';
+import '../../../../core/widgets/panel_card.dart';
 
 /// The recording screen's HERO (#3916, Epic #3914; born as the compact
 /// live-drive summary card, #2026): the ONE live consumption figure on
@@ -149,116 +150,115 @@ class MinimalDriveSummary extends ConsumerWidget {
       color: scheme.onSurfaceVariant,
     );
 
-    return Card(
+    return PanelCard(
       key: const Key('minimal_drive_summary_card'),
       margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              headlineLabel,
-              key: const Key('minimal_drive_headline_label'),
-              style: mutedLabel,
-            ),
-            // #3916 — the big figure with the speed beside it. The figure
-            // shrinks to fit so a wide unit (mpg) or a large text scale
-            // never pushes the speed off the card.
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Flexible(
-                  flex: 3,
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      headline,
-                      key: const Key('minimal_drive_instant_value'),
-                      style: theme.textTheme.displaySmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: scheme.primary,
-                        fontFeatures: const [FontFeature.tabularFigures()],
-                      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            headlineLabel,
+            key: const Key('minimal_drive_headline_label'),
+            style: mutedLabel,
+          ),
+          // #3916 — the big figure with the speed beside it. The figure
+          // shrinks to fit so a wide unit (mpg) or a large text scale
+          // never pushes the speed off the card.
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Flexible(
+                flex: 3,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    headline,
+                    key: const Key('minimal_drive_instant_value'),
+                    style: theme.textTheme.displaySmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: scheme.primary,
+                      fontFeatures: const [FontFeature.tabularFigures()],
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
-                Flexible(
-                  flex: 2,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          speedText,
-                          key: const Key('recording_hero_speed'),
-                          style: theme.textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: scheme.onSurface,
-                            fontFeatures: const [
-                              FontFeature.tabularFigures(),
-                            ],
-                          ),
+              ),
+              const SizedBox(width: 16),
+              Flexible(
+                flex: 2,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        speedText,
+                        key: const Key('recording_hero_speed'),
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: scheme.onSurface,
+                          fontFeatures: const [
+                            FontFeature.tabularFigures(),
+                          ],
                         ),
                       ),
-                      Text(
-                        'km/h',
-                        style: mutedLabel,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            // #3431 — the trip running average on its own honest row,
-            // so "instant" and "average" are never conflated again.
-            if (avgText != null)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Flexible(
-                    child: Text(
-                      l.minimalDriveTripAverage,
+                    ),
+                    Text(
+                      'km/h',
                       style: mutedLabel,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    avgText,
-                    key: const Key('minimal_drive_trip_avg_value'),
-                    style: mutedLabel?.copyWith(fontWeight: FontWeight.w600),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            // #3845 — always-on driving-behaviour band. Present on every
-            // trajet including GPS-only ones (it is scored from the
-            // speed series, not from a fuel-rate PID), and absent only
-            // while the tracker is still filling its first window.
-            if (reading?.liveDrivingScore != null) ...[
-              const SizedBox(height: 8),
-              LiveBehaviourBand(score: reading!.liveDrivingScore!),
             ],
-            const SizedBox(height: 6),
-            // #2903 — each symbol gets an equal Expanded share so the
-            // triplet fits a narrow pane (the landscape split's left
-            // zone) and a large text scale without overflowing.
+          ),
+          // #3431 — the trip running average on its own honest row,
+          // so "instant" and "average" are never conflated again.
+          if (avgText != null)
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                for (final tile in tiles) Expanded(child: Center(child: tile)),
+                Flexible(
+                  child: Text(
+                    l.minimalDriveTripAverage,
+                    style: mutedLabel,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  avgText,
+                  key: const Key('minimal_drive_trip_avg_value'),
+                  style: mutedLabel?.copyWith(fontWeight: FontWeight.w600),
+                ),
               ],
             ),
+          // #3845 — always-on driving-behaviour band. Present on every
+          // trajet including GPS-only ones (it is scored from the
+          // speed series, not from a fuel-rate PID), and absent only
+          // while the tracker is still filling its first window.
+          if (reading?.liveDrivingScore != null) ...[
+            const SizedBox(height: 8),
+            LiveBehaviourBand(score: reading!.liveDrivingScore!),
           ],
-        ),
+          const SizedBox(height: 6),
+          // #2903 — each symbol gets an equal Expanded share so the
+          // triplet fits a narrow pane (the landscape split's left
+          // zone) and a large text scale without overflowing.
+          Row(
+            children: [
+              for (final tile in tiles) Expanded(child: Center(child: tile)),
+            ],
+          ),
+        ],
       ),
+
     );
   }
 }

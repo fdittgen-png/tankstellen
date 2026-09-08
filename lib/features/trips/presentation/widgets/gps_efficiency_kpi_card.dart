@@ -10,6 +10,8 @@ import '../../domain/gps_kpi_verdict.dart';
 import '../../domain/trip_recorder.dart';
 import '../../providers/verdict_calibration_provider.dart';
 import '../../../../core/utils/unit_formatter.dart';
+import '../../../../core/widgets/panel_card.dart';
+import '../../../../core/theme/app_text.dart';
 
 /// GPS-only efficiency KPI card on the Trip detail screen (#2695 C9 /
 /// #2697 P3). Surfaces the speed-only energy KPIs — RPA, PKE, VAPOS,
@@ -166,23 +168,22 @@ class GpsEfficiencyKpiCard extends ConsumerWidget {
       );
     }
 
-    return Card(
+    return PanelCard(
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l.gpsKpiCardTitle,
-              key: const Key('gps_kpi_card_title'),
-              style: theme.textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            ...rows,
-          ],
-        ),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l.gpsKpiCardTitle,
+            key: const Key('gps_kpi_card_title'),
+            style: AppText.title(context),
+          ),
+          const SizedBox(height: 8),
+          ...rows,
+        ],
       ),
+
     );
   }
 

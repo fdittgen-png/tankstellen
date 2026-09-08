@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/services/throttle_rpm_histogram_calculator.dart';
 import '../../../../core/utils/unit_formatter.dart';
+import '../../../../core/widgets/panel_card.dart';
+import '../../../../core/theme/app_text.dart';
 
 /// Throttle / RPM time-share histogram card on the Trip detail screen
 /// (#1041 phase 3a — "Card C").
@@ -51,52 +53,51 @@ class ThrottleRpmHistogramCard extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
-    return Card(
+    return PanelCard(
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l.throttleRpmHistogramTitle,
-              style: theme.textTheme.titleMedium,
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l.throttleRpmHistogramTitle,
+            style: AppText.title(context),
+          ),
+          const SizedBox(height: 12),
+          if (!histogram.hasData)
+            _EmptyState(message: l.throttleRpmHistogramEmpty)
+          else ...[
+            _SectionHeader(label: l.throttleRpmHistogramThrottleSection),
+            const SizedBox(height: 8),
+            _BarGroup(
+              shares: histogram.throttleQuartiles,
+              labels: <String>[
+                l.throttleRpmHistogramThrottleCoast,
+                l.throttleRpmHistogramThrottleLight,
+                l.throttleRpmHistogramThrottleFirm,
+                l.throttleRpmHistogramThrottleWide,
+              ],
+              emptyCaption: l.throttleRpmHistogramEmpty,
+              color: theme.colorScheme.primary,
             ),
-            const SizedBox(height: 12),
-            if (!histogram.hasData)
-              _EmptyState(message: l.throttleRpmHistogramEmpty)
-            else ...[
-              _SectionHeader(label: l.throttleRpmHistogramThrottleSection),
-              const SizedBox(height: 8),
-              _BarGroup(
-                shares: histogram.throttleQuartiles,
-                labels: <String>[
-                  l.throttleRpmHistogramThrottleCoast,
-                  l.throttleRpmHistogramThrottleLight,
-                  l.throttleRpmHistogramThrottleFirm,
-                  l.throttleRpmHistogramThrottleWide,
-                ],
-                emptyCaption: l.throttleRpmHistogramEmpty,
-                color: theme.colorScheme.primary,
-              ),
-              const SizedBox(height: 16),
-              _SectionHeader(label: l.throttleRpmHistogramRpmSection),
-              const SizedBox(height: 8),
-              _BarGroup(
-                shares: histogram.rpmBands,
-                labels: <String>[
-                  l.throttleRpmHistogramRpmIdle,
-                  l.throttleRpmHistogramRpmCruise,
-                  l.throttleRpmHistogramRpmSpirited,
-                  l.throttleRpmHistogramRpmHard,
-                ],
-                emptyCaption: l.throttleRpmHistogramEmpty,
-                color: theme.colorScheme.tertiary,
-              ),
-            ],
+            const SizedBox(height: 16),
+            _SectionHeader(label: l.throttleRpmHistogramRpmSection),
+            const SizedBox(height: 8),
+            _BarGroup(
+              shares: histogram.rpmBands,
+              labels: <String>[
+                l.throttleRpmHistogramRpmIdle,
+                l.throttleRpmHistogramRpmCruise,
+                l.throttleRpmHistogramRpmSpirited,
+                l.throttleRpmHistogramRpmHard,
+              ],
+              emptyCaption: l.throttleRpmHistogramEmpty,
+              color: theme.colorScheme.tertiary,
+            ),
           ],
-        ),
+        ],
       ),
+
     );
   }
 }
