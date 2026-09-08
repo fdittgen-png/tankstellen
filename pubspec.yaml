@@ -59,7 +59,7 @@ dependencies:
   # #3473). Present in every flavor; the QR screen selects it only when
   # AppFlavor.isLibre (Play/iOS keep mobile_scanner). On libre, mobile_scanner
   # is swapped for a no-op stub so its com.google.mlkit refs leave the dex.
-  flutter_zxing: ^2.3.0
+  flutter_zxing: ^3.0.1
   image_picker: ^1.2.3
   # Constraint tracks the vendored third_party/ fork (see
   # dependency_overrides below), which is 0.15.1 — bump both together.
