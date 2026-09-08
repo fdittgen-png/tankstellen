@@ -20,7 +20,7 @@
 # keyless-UNSIGNED — an fdroid-only release without a keystore is the
 # sanctioned F-Droid shape (#3471; F-Droid signs downstream).
 
-name: F-Droid no-GMS audit
+name: CI · F-Droid no-GMS audit
 
 on:
   pull_request:

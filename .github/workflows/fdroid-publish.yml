@@ -11,7 +11,7 @@
 # Shares the `pages` concurrency group with pages.yml so the two never deploy
 # the single Pages site concurrently (a second deploy would clobber the first).
 
-name: Publish F-Droid repo
+name: Publish · F-Droid repo
 
 on:
   push:

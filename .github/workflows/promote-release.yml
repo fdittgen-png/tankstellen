@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: MIT
 
-name: Promote Release
+name: Release · Promote track
 
 # #3713 — one-click track promotion at ALWAYS 100%. The Console's promote
 # flow pre-fills the staged-rollout percentage from the last staged

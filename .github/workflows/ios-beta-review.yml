@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: MIT
 
-name: iOS Beta App Review Info
+name: Tools · iOS beta review info
 
 # Push the localized Beta App Review test info (App-Review contact block plus
 # the per-locale feedback email + beta-app description) to App Store Connect

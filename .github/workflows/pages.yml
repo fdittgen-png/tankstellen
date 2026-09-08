@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: MIT
 
-name: Deploy site (landing page + privacy policy + F-Droid repo) to GitHub Pages
+name: Publish · GitHub Pages (site + F-Droid repo)
 
 # Single Pages site (#2576, #3066): the marketing landing page (docs/landing/
 # index.html) is the site root, the privacy policy is served at /privacy-policy/,

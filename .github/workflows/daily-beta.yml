@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: MIT
 
-name: Daily Open-Testing Build
+name: Release · Play open-testing (daily)
 
 # Builds master at 18:00 Europe/Paris (CEST) and uploads to the open-testing track.
 # Cron is UTC: 16:00 UTC = 18:00 CEST (summer) / 17:00 CET (winter).

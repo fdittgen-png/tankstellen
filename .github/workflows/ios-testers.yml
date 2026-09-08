@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: MIT
 
-name: iOS TestFlight Testers
+name: Tools · Add iOS TestFlight tester
 
 # Add an iOS tester to the app's TestFlight beta group(s) via the App Store
 # Connect API. Handles BOTH paths: external groups (plain email → invite) and
