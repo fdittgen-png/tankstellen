@@ -3017,6 +3017,29 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
+  String get linkDeviceInvalidCode => 'Please enter a valid device code';
+
+  @override
+  String linkDeviceFailed(String error) {
+    return 'Link failed: $error';
+  }
+
+  @override
+  String linkDeviceLinked(
+    int favorites,
+    int alerts,
+    int vehicles,
+    int fillUps,
+  ) {
+    return 'Linked! Imported $favorites favourites, $alerts alerts, $vehicles vehicles, $fillUps fill-ups.';
+  }
+
+  @override
+  String syncConnectionFailed(String error) {
+    return 'Connection failed: $error';
+  }
+
+  @override
   String get achievementSmoothDriver => 'Серия от плавно шофиране';
 
   @override

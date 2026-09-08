@@ -93,20 +93,33 @@ void main() {
       expect(button.onPressed, isNull);
     });
 
-    testWidgets('Renders a green result message on success', (tester) async {
+    // #3988 — the provider names an outcome; the card supplies the words,
+    // so these assert the rendered LOCALIZED sentence rather than a string
+    // the provider used to carry.
+    testWidgets('Renders the localized success message with its counts',
+        (tester) async {
       await pumpCard(
         tester,
-        state: const LinkDeviceState(result: 'Linked successfully'),
+        state: const LinkDeviceState(
+          outcome: LinkDeviceOutcome.linked,
+          counts: (favorites: 2, alerts: 1, vehicles: 3, fillUps: 4),
+        ),
       );
-      expect(find.text('Linked successfully'), findsOneWidget);
+
+      expect(find.textContaining('2'), findsWidgets);
+      expect(find.textContaining('fill-ups'), findsOneWidget);
     });
 
-    testWidgets('Renders a red result message on error', (tester) async {
+    testWidgets('Renders the localized failure message', (tester) async {
       await pumpCard(
         tester,
-        state: const LinkDeviceState(result: 'Link failed'),
+        state: const LinkDeviceState(
+          outcome: LinkDeviceOutcome.failed,
+          errorDetail: 'boom',
+        ),
       );
-      expect(find.text('Link failed'), findsOneWidget);
+
+      expect(find.textContaining('boom'), findsOneWidget);
     });
   });
 }

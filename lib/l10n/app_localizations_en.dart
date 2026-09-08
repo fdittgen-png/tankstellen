@@ -2982,6 +2982,29 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get linkDeviceInvalidCode => 'Please enter a valid device code';
+
+  @override
+  String linkDeviceFailed(String error) {
+    return 'Link failed: $error';
+  }
+
+  @override
+  String linkDeviceLinked(
+    int favorites,
+    int alerts,
+    int vehicles,
+    int fillUps,
+  ) {
+    return 'Linked! Imported $favorites favourites, $alerts alerts, $vehicles vehicles, $fillUps fill-ups.';
+  }
+
+  @override
+  String syncConnectionFailed(String error) {
+    return 'Connection failed: $error';
+  }
+
+  @override
   String get achievementSmoothDriver => 'Smooth streak';
 
   @override
@@ -11999,6 +12022,30 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String helpUnavailable(String asset) {
     return '⟦Ŧĥé ǧúîđé çóúłđ ñóŧ ƀé łóáđéđ ($asset). ···········⟧';
+  }
+
+  @override
+  String get linkDeviceInvalidCode =>
+      '⟦Ƥłéášé éñŧéř á ṽáłîđ đéṽîçé çóđé ············⟧';
+
+  @override
+  String linkDeviceFailed(String error) {
+    return '⟦Łîñķ ƒáîłéđ: $error ·····⟧';
+  }
+
+  @override
+  String linkDeviceLinked(
+    int favorites,
+    int alerts,
+    int vehicles,
+    int fillUps,
+  ) {
+    return '⟦Łîñķéđ! Îɱƥóřŧéđ $favorites ƒáṽóúřîŧéš, $alerts áłéřŧš, $vehicles ṽéĥîçłéš, $fillUps ƒîłł-úƥš. ····················⟧';
+  }
+
+  @override
+  String syncConnectionFailed(String error) {
+    return '⟦Çóññéçŧîóñ ƒáîłéđ: $error ·······⟧';
   }
 
   @override

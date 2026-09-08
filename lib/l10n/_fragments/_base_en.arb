@@ -1590,5 +1590,13 @@
         "type": "String"
       }
     }
-  }
+  },
+  "linkDeviceInvalidCode": "Please enter a valid device code",
+  "@linkDeviceInvalidCode": {"description": "Shown when the pasted device code is too short to be a device id (#3988)."},
+  "linkDeviceFailed": "Link failed: {error}",
+  "@linkDeviceFailed": {"description": "Shown when a device link throws; {error} is the localized reason, never the raw exception (#3988).", "placeholders": {"error": {"type": "String", "example": "No internet connection"}}},
+  "linkDeviceLinked": "Linked! Imported {favorites} favourites, {alerts} alerts, {vehicles} vehicles, {fillUps} fill-ups.",
+  "@linkDeviceLinked": {"description": "Shown after a successful device link, with what was imported (#3988).", "placeholders": {"favorites": {"type": "int"}, "alerts": {"type": "int"}, "vehicles": {"type": "int"}, "fillUps": {"type": "int"}}},
+  "syncConnectionFailed": "Connection failed: {error}",
+  "@syncConnectionFailed": {"description": "Sync wizard: the connection test or adopt step failed; {error} is the localized reason (#3988).", "placeholders": {"error": {"type": "String", "example": "No internet connection"}}}
 }
