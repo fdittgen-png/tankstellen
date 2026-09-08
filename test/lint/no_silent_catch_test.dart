@@ -60,6 +60,42 @@ void main() {
     // Regression cases for the evasion holes closed in #3163. These pin
     // the matcher itself so a future "simplification" cannot quietly
     // reopen a hole.
+    // #3981 — `.catchError((_) …)` is the same swallow in Future form:
+    // the failure never reaches a catch block, so the scan above cannot
+    // see it. Decrease-only baseline at the true count (4 on 2026-09-08).
+    group('.catchError((_) …) evasion (#3981)', () {
+      test('matcher fidelity (#2348)', () {
+        const fixture = '''
+          future.catchError((_) {});                 // 1
+          future.catchError((_) => null);            // 2
+          future.catchError((_, __) => fallback);    // 3 — two-arg form
+          future.catchError((e, st) => log.error(e, st)); // named: not a hit
+        ''';
+        expect(findSwallowedCatchErrors(fixture), hasLength(3));
+      });
+
+      test('filesystem scan does not grow', () {
+        final offenders = <String>[];
+        for (final entity in Directory('lib').listSync(recursive: true)) {
+          if (entity is! File || !entity.path.endsWith('.dart')) continue;
+          if (entity.path.endsWith('.g.dart') ||
+              entity.path.endsWith('.freezed.dart')) {
+            continue;
+          }
+          final path = entity.path.replaceAll('\\', '/');
+          final src = entity.readAsStringSync();
+          for (final hit in findSwallowedCatchErrors(src)) {
+            offenders.add('$path:${hit.line}  ${hit.snippet}');
+          }
+        }
+        expect(offenders.length, lessThanOrEqualTo(_catchErrorBaseline),
+            reason: '.catchError((_) …) sites: ${offenders.length} '
+                '(baseline $_catchErrorBaseline, decrease-only). Name the '
+                'error and log it — log.error(e, st, …) — or handle it '
+                'explicitly (ADR 0021, #3981).\n${offenders.join('\n')}');
+      });
+    });
+
     group('matcher regression (#3163)', () {
       test('literally empty body is silent (original #565 behavior)', () {
         expect(findSilentCatches('try {} catch (_) {}'), hasLength(1));
@@ -269,3 +305,23 @@ String _blankComments(String src) {
   }
   return out.toString();
 }
+
+/// #3981 — `.catchError((_) …)` / `.catchError((_, __) …)`: an error
+/// callback that discards the error by name is a silent catch in Future
+/// form. A callback that binds the error (`(e, st) => …`) is not matched —
+/// what it does with `e` is the other ratchets' business.
+List<SilentCatch> findSwallowedCatchErrors(String src) {
+  final blanked = _blankComments(src);
+  final re = RegExp(r'\.catchError\(\s*\(\s*_\s*(?:,\s*_+\s*)?\)');
+  final lines = src.split('\n');
+  return [
+    for (final m in re.allMatches(blanked))
+      SilentCatch(
+        blanked.substring(0, m.start).split('\n').length,
+        lines[blanked.substring(0, m.start).split('\n').length - 1].trim(),
+      ),
+  ];
+}
+
+/// Baseline as of 2026-09-08 (#3981). Only ever decreases; target 0.
+const _catchErrorBaseline = 4;

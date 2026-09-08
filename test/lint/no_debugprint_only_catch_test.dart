@@ -34,59 +34,103 @@ import 'package:flutter_test/flutter_test.dart';
 ///   (file-ownership boundary); it is allowlisted below until that
 ///   branch lands and the entry can be removed. The allowlist may only
 ///   ever SHRINK.
+/// - The telemetry pipeline itself (`lib/core/logging/`,
+///   `lib/core/telemetry/`): it cannot log through itself, and its
+///   `debugPrint` fallbacks ARE the never-throws contract (#3981).
+///
+/// ## Scope (#3981, Epic #3952)
+///
+/// This scan used to walk three directories (`lib/app`,
+/// `lib/core/background`, `lib/features/alerts/background`) and assert
+/// zero. Outside them sat **61** more debugPrint-only catch bodies —
+/// 19 in obd2, 15 in feature_management, 10 in trips, 4 in core/storage —
+/// each an empty catch in the shipped build. It now walks all of `lib/`
+/// with a decrease-only numeric baseline (CLAUDE.md), a parse-fidelity
+/// self-check so a matcher drift cannot read as "clean" (#2348), and the
+/// ADR 0021 fix: `log.error(e, st, layer: …, context: {…})`.
 void main() {
-  test(
-      'no debugPrint-only catch handlers in lib/app + lib/core/background + '
-      'lib/features/alerts/background '
-      '(#3143)', () {
+  // `catch (e, st) {` and bare `on TimeoutException {` openers.
+  final catchOpener = RegExp(
+    r'(?:\bon\s+[\w<>.]+\s*(?:catch\s*\([^)]*\))?|\bcatch\s*\([^)]*\))\s*\{',
+  );
+
+  test('matcher fidelity: a debugPrint-only body is found, a logged one is '
+      'not (#2348)', () {
+    const fixture = '''
+      // 1 — swallowed: nothing but a debugPrint
+      try { a(); } catch (e, st) {
+        debugPrint('x: \$e');
+      }
+      // 2 — swallowed, with a comment line the scanner must ignore
+      try { b(); } on TimeoutException {
+        // just a note
+        debugPrint('timeout');
+      }
+      // logged, with a debugPrint alongside: NOT a hit
+      try { c(); } catch (e, st) {
+        log.error(e, st, layer: ErrorLayer.ui);
+        debugPrint('also printed');
+      }
+      // empty: the OTHER ratchet's business
+      try { d(); } catch (_) {}
+    ''';
+    var hits = 0;
+    for (final m in catchOpener.allMatches(fixture)) {
+      final body = _blockBody(fixture, m.end - 1);
+      if (body != null && _isDebugPrintOnly(body)) hits++;
+    }
+    expect(hits, 2,
+        reason: 'the scanner found $hits of 2 known sites — it would report '
+            'a false green on real code');
+  });
+
+  test('debugPrint-only catch handlers in lib/ do not grow (#3143, #3981)',
+      () {
     // Allowlisted bodies, matched by substring of the debugPrint message.
     // ⚠️ May only shrink — see the docstring.
     const allowlistedBodyMarkers = <String>[
       '_runEntitySyncMerge', // owned by the in-flight #3077 branch
     ];
-
     final offenders = <String>[];
-    // `catch (e, st) {` and bare `on TimeoutException {` openers.
-    final catchOpener = RegExp(
-      r'(?:\bon\s+[\w<>.]+\s*(?:catch\s*\([^)]*\))?|\bcatch\s*\([^)]*\))\s*\{',
-    );
-
-    for (final dir in [
-      'lib/app',
-      'lib/core/background',
-      'lib/features/alerts/background',
-    ]) {
-      for (final entity in Directory(dir).listSync(recursive: true)) {
-        if (entity is! File || !entity.path.endsWith('.dart')) continue;
-        if (entity.path.endsWith('.g.dart') ||
-            entity.path.endsWith('.freezed.dart')) {
-          continue;
-        }
-        final src = entity.readAsStringSync();
-        for (final m in catchOpener.allMatches(src)) {
-          final body = _blockBody(src, m.end - 1);
-          if (body == null) continue;
-          if (!_isDebugPrintOnly(body)) continue;
-          if (allowlistedBodyMarkers.any(body.contains)) continue;
-          final line = src.substring(0, m.start).split('\n').length;
-          final path = entity.path.replaceAll('\\', '/');
-          offenders.add('$path:$line');
-        }
+    for (final entity in Directory('lib').listSync(recursive: true)) {
+      if (entity is! File || !entity.path.endsWith('.dart')) continue;
+      if (entity.path.endsWith('.g.dart') ||
+          entity.path.endsWith('.freezed.dart')) {
+        continue;
+      }
+      final path = entity.path.replaceAll('\\', '/');
+      if (_pipeline.any(path.startsWith)) continue;
+      final src = entity.readAsStringSync();
+      for (final m in catchOpener.allMatches(src)) {
+        final body = _blockBody(src, m.end - 1);
+        if (body == null) continue;
+        if (!_isDebugPrintOnly(body)) continue;
+        if (allowlistedBodyMarkers.any(body.contains)) continue;
+        final line = src.substring(0, m.start).split('\n').length;
+        offenders.add('$path:$line');
       }
     }
-
     expect(
-      offenders,
-      isEmpty,
-      reason: 'debugPrint-only catch handlers are invisible in release '
-          'builds (debugPrint is no-opped in _bootstrap). Route the '
-          'failure through `errorLogger.log(ErrorLayer.<layer>, e, st, '
-          'context: {...})` (a debugPrint alongside is fine), or — for an '
-          'expected benign race — a BreadcrumbCollector breadcrumb.\n'
-          'Offending sites:\n${offenders.join('\n')}',
+      offenders.length,
+      lessThanOrEqualTo(_baseline),
+      reason: 'debugPrint-only catch handlers: ${offenders.length} '
+          '(baseline $_baseline, decrease-only). They are invisible in '
+          'release builds (debugPrint is no-opped in _bootstrap). Route the '
+          'failure through `log.error(e, st, layer: ErrorLayer.<layer>, '
+          'context: {...})` (ADR 0021; a debugPrint alongside is fine), or '
+          '— for an expected benign race — a BreadcrumbCollector '
+          'breadcrumb.\nOffending sites:\n${offenders.join('\n')}',
     );
   });
 }
+
+/// The telemetry pipeline cannot log through itself; its `debugPrint`
+/// fallbacks are the never-throws contract, not swallowed failures.
+const _pipeline = <String>['lib/core/logging/', 'lib/core/telemetry/'];
+
+/// Baseline as of 2026-09-08 (#3981), all of lib/ minus [_pipeline].
+/// Only ever decreases; target 0.
+const _baseline = 61;
 
 /// Returns the text between the brace at [openBraceIdx] and its matching
 /// close brace, or null when unbalanced.
