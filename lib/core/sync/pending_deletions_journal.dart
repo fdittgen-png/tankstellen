@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -9,6 +8,7 @@ import 'package:hive/hive.dart';
 
 import '../storage/hive_boxes.dart';
 import '../../core/logging/error_logger.dart';
+import '../../core/logging/app_log.dart';
 
 /// Durable journal of tombstones that have not (yet) been confirmed
 /// server-side (#3123).
@@ -78,9 +78,9 @@ class PendingDeletionsJournal {
             '${entry.key}': {for (final id in entry.value as List) '$id'},
       };
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.sync, context: const {
         'where': 'PendingDeletionsJournal.snapshot load failed'
-      }));
+      });
       return {};
     }
   }
@@ -121,9 +121,9 @@ class PendingDeletionsJournal {
         for (final entry in journal.entries) entry.key: [...entry.value],
       }));
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.sync, context: const {
         'where': 'PendingDeletionsJournal persist failed'
-      }));
+      });
     }
   }
 }

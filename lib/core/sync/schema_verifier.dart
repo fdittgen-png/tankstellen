@@ -1,13 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'schema_sql.dart';
 import 'schema_table_specs.dart';
 import 'supabase_client.dart';
 import '../../core/logging/error_logger.dart';
+import '../../core/logging/app_log.dart';
 
 /// Verifies that the required TankSync database schema exists.
 ///
@@ -68,10 +68,10 @@ class SchemaVerifier {
             .catchError((Object e, StackTrace st) {
           // #3150 — name the table: "table check failed" without it left
           // the self-hoster's missing table unidentifiable.
-          unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: {
+          log.error(e, st, layer: ErrorLayer.sync, context: {
             'where': 'SchemaVerifier: table check failed',
             'table': table,
-          }));
+          });
           return MapEntry(table, false);
         }),
       ),
@@ -110,8 +110,7 @@ class SchemaVerifier {
       final value = row?['value'];
       return value == null ? 0 : (int.tryParse('$value') ?? 0);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-          context: const {'where': 'SchemaVerifier: schema-version probe failed'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'SchemaVerifier: schema-version probe failed'});
       return 0;
     }
   }

@@ -27,12 +27,11 @@ extension SyncStateAccount on SyncState {
       try {
         await TankSyncClient.client?.rpc<void>('delete_user');
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-            context: const {'where': 'delete_user RPC failed (schema < v6?)'}));
+        log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'delete_user RPC failed (schema < v6?)'});
       }
       await TankSyncClient.signOut();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'Delete account failed'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'Delete account failed'});
     }
     await disconnect();
     return result;

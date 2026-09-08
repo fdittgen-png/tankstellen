@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../logging/error_logger.dart';
+import '../logging/app_log.dart';
 import 'tanksync_init.dart';
 
 /// #3450 — background retries for a failed / timed-out TankSync launch
@@ -121,10 +122,10 @@ class TankSyncInitRetry {
           _scheduleNext();
       }
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: {
+      log.error(e, st, layer: ErrorLayer.sync, context: {
         'where': 'TankSyncInitRetry attempt failed',
         'attempt': _attemptsMade,
-      }));
+      });
       _firing = false;
       _scheduleNext();
     } finally {

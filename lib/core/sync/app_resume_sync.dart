@@ -1,11 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
 import '../logging/error_logger.dart';
+import '../logging/app_log.dart';
 import 'sync_pull_coordinator.dart';
 import 'tanksync_init_retry.dart';
 
@@ -81,8 +81,7 @@ class AppResumeSync {
       if (last != null && now().difference(last) < minInterval) return;
       await _coordinator.pullAll(now: now);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-          context: const {'where': 'AppResumeSync.onAppResumed'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'AppResumeSync.onAppResumed'});
     }
   }
 }

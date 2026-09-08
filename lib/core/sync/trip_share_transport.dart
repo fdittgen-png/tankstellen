@@ -1,12 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../logging/error_logger.dart';
+import '../logging/app_log.dart';
 import 'supabase_client.dart';
 
 /// Outcome of a `TripSharesSync.shareWithEmail` call so the UI can show
@@ -120,9 +120,9 @@ Future<TripShareResult> legacyShareWithEmail(
     debugPrint('TripSharesSync.shareWithEmail: shared $tripId (legacy)');
     return TripShareResult.shared;
   } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: {
-      'where': 'TripSharesSync.shareWithEmail legacy FAILED for $tripId'
-    }));
+    log.error(e, st, layer: ErrorLayer.sync, context: {
+      'where': 'TripSharesSync.shareWithEmail legacy FAILED for $tripId', 'entity': tripId
+    });
     return TripShareResult.failed;
   }
 }

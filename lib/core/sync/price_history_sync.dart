@@ -1,11 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import '../country/country_config.dart';
 import 'supabase_client.dart';
 import '../../core/logging/error_logger.dart';
+import '../../core/logging/app_log.dart';
 
 /// Server-side price history queries, pulled out of [SyncService] (#727) and
 /// clarified into a cache↔Supabase contract by #2249.
@@ -75,8 +75,7 @@ class PriceHistorySync {
           .order('recorded_at', ascending: true);
       return List<Map<String, dynamic>>.from(rows);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-          context: const {'where': 'PriceHistorySync.fetch FAILED'}));
+      log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'PriceHistorySync.fetch FAILED'});
       return [];
     }
   }
