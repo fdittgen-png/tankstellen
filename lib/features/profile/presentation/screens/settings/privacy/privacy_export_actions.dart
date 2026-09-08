@@ -37,6 +37,7 @@ import '../../../../../vehicle/api.dart'
 import '../../../../../widget/api.dart' show clearHomeWidgetData;
 import '../../../../data/full_data_export.dart';
 import '../../../../providers/privacy_data_provider.dart';
+import '../../../../../../core/logging/run_scope.dart';
 import '../../../widgets/error_log_export_row.dart'
     show errorLogExportSnackbar, exportErrorLogSizeGated;
 
@@ -162,7 +163,11 @@ mixin PrivacyExportActions<T extends ConsumerStatefulWidget>
     );
   }
 
-  Future<void> exportErrorLog() async {
+  /// #3980 — one ADR 0021 runId for everything this call logs.
+  Future<void> exportErrorLog() =>
+      RunScope.run('export', () => _exportErrorLogImpl());
+
+  Future<void> _exportErrorLogImpl() async {
     final traces = ref.read(traceStorageProvider);
     final json = traces.exportAsJson();
     final byteSize = utf8.encode(json).length;

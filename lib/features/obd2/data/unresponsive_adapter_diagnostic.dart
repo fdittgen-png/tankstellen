@@ -34,6 +34,9 @@ class UnresponsiveAdapterDiagnostic {
   final DateTime Function() _clock;
 
   bool _inEpisode = false;
+
+  /// Incrementing episode id (#3980) — see the [log.error] call below.
+  int _episodeSeq = 0;
   DateTime? _lastLoggedAt;
 
   /// Reset the episode latch + rate-limit window so a fresh outage can log a
@@ -43,6 +46,7 @@ class UnresponsiveAdapterDiagnostic {
   void reset() {
     _inEpisode = false;
     _lastLoggedAt = null;
+    _episodeSeq = 0;
   }
 
   /// Feed the per-tick failure outcome. [backedOffCount] is how many PIDs
@@ -81,7 +85,15 @@ class UnresponsiveAdapterDiagnostic {
       return;
     }
     _lastLoggedAt = now;
-    log.error(error, stack, layer: ErrorLayer.other, context: {'where': msg, 'backedOffPids': backedOffCount});
+    // #3980 — this class already logs exactly once per episode transition
+    // and rate-limits on its own (injectable) clock, so it declares its
+    // episode id: the logger's gate must not swallow a genuinely new
+    // outage that happens to read like the previous one.
+    log.error(error, stack, layer: ErrorLayer.other, context: {
+      'where': msg,
+      'backedOffPids': backedOffCount,
+      'episode': ++_episodeSeq,
+    });
   }
 
   /// True for an error that means "the link dropped" rather than "the

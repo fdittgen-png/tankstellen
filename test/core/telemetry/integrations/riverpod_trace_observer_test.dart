@@ -95,6 +95,12 @@ void main() {
       expect(() => container.read(_exploding), throwsA(isA<Object>()));
       // Invalidate so the build runs again on the next read.
       container.invalidate(_exploding);
+      // #3980 — the episode gate now covers the providers layer too, so
+      // two IDENTICAL failures inside the window collapse into one trace
+      // downstream of the observer. This test is about the observer
+      // forwarding each failure, not about the gate, so open a new
+      // episode between the reads.
+      errorLogger.resetEpisodesForTest();
       expect(() => container.read(_exploding), throwsA(isA<Object>()));
 
       await Future<void>.delayed(Duration.zero);

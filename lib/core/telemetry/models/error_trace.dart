@@ -127,6 +127,17 @@ abstract class Breadcrumb with _$Breadcrumb {
     required DateTime timestamp,
     required String action,
     String? detail,
+
+    /// #3980 — the subsystem the crumb belongs to (`obd2`, `sync`,
+    /// `search`, `bt`, …), so the ring can be filtered rather than merely
+    /// truncated. Derived from the action's leading token unless given.
+    String? area,
+
+    /// #3980 — `info` / `warn` / `error`; `info` for a plain milestone.
+    String? level,
+
+    /// #3980 — the ADR 0021 runId of the run this crumb happened inside.
+    String? runId,
   }) = _Breadcrumb;
 
   factory Breadcrumb.fromJson(Map<String, dynamic> json) =>

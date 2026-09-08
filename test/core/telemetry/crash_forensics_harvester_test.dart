@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
+import 'package:tankstellen/core/logging/run_scope.dart';
 import 'package:tankstellen/core/telemetry/collectors/breadcrumb_collector.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/collectors/breadcrumb_persistence.dart';
@@ -220,13 +221,13 @@ void main() {
     });
   });
 
-  group('sync episode gate (#3581)', () {
+  group('episode gate — every layer (#3581, #3980)', () {
     late _CapturingRecorder recorder;
 
     setUp(() {
       recorder = _CapturingRecorder();
       errorLogger.testRecorderOverride = recorder;
-      errorLogger.resetSyncEpisodeForTest();
+      errorLogger.resetEpisodesForTest();
     });
 
     tearDown(errorLogger.resetForTest);
@@ -244,15 +245,37 @@ void main() {
           ErrorLayer.sync, Exception('different failure'), StackTrace.current);
       expect(recorder.errors, hasLength(2));
       expect(recorder.errors.last.toString(),
-          contains('previousSyncEpisodeSuppressed: 39'),
+          contains('previousEpisodeSuppressed: 39'),
           reason: 'the episode summary must carry the suppressed count');
+      expect(recorder.errors.last.toString(), contains('episodeLayer: sync'));
     });
 
-    test('non-sync layers are never gated', () async {
+    // #3980 — the gate used to be sync-only; an OBD2 reconnect storm or a
+    // country-API outage filled the 50-slot ring with identical entries.
+    test('a services storm collapses too — the gate is no longer sync-only',
+        () async {
+      final outage = Exception('SocketException: Failed host lookup');
+      for (var i = 0; i < 25; i++) {
+        await errorLogger.log(ErrorLayer.services, outage, StackTrace.current);
+      }
+      expect(recorder.errors, hasLength(1));
+    });
+
+    test('layers never share an episode', () async {
       final same = Exception('same error');
-      await errorLogger.log(ErrorLayer.ui, same, StackTrace.current);
-      await errorLogger.log(ErrorLayer.ui, same, StackTrace.current);
-      expect(recorder.errors, hasLength(2));
+      await errorLogger.log(ErrorLayer.sync, same, StackTrace.current);
+      await errorLogger.log(ErrorLayer.storage, same, StackTrace.current);
+      expect(recorder.errors, hasLength(2),
+          reason: 'a storage failure during a sync outage is its own first '
+              'trace');
+    });
+
+    test('a trace inside a RunScope carries the runId (#3980)', () async {
+      await RunScope.run('search', () async {
+        await errorLogger.log(
+            ErrorLayer.services, Exception('boom'), StackTrace.current);
+      });
+      expect(recorder.errors.single.toString(), contains('runId: search-'));
     });
   });
 }

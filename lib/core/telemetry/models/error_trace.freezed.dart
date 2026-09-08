@@ -1799,7 +1799,12 @@ as String?,
 /// @nodoc
 mixin _$Breadcrumb {
 
- DateTime get timestamp; String get action; String? get detail;
+ DateTime get timestamp; String get action; String? get detail;/// #3980 — the subsystem the crumb belongs to (`obd2`, `sync`,
+/// `search`, `bt`, …), so the ring can be filtered rather than merely
+/// truncated. Derived from the action's leading token unless given.
+ String? get area;/// #3980 — `info` / `warn` / `error`; `info` for a plain milestone.
+ String? get level;/// #3980 — the ADR 0021 runId of the run this crumb happened inside.
+ String? get runId;
 /// Create a copy of Breadcrumb
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1812,16 +1817,16 @@ $BreadcrumbCopyWith<Breadcrumb> get copyWith => _$BreadcrumbCopyWithImpl<Breadcr
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Breadcrumb&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&(identical(other.action, action) || other.action == action)&&(identical(other.detail, detail) || other.detail == detail));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Breadcrumb&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&(identical(other.action, action) || other.action == action)&&(identical(other.detail, detail) || other.detail == detail)&&(identical(other.area, area) || other.area == area)&&(identical(other.level, level) || other.level == level)&&(identical(other.runId, runId) || other.runId == runId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,timestamp,action,detail);
+int get hashCode => Object.hash(runtimeType,timestamp,action,detail,area,level,runId);
 
 @override
 String toString() {
-  return 'Breadcrumb(timestamp: $timestamp, action: $action, detail: $detail)';
+  return 'Breadcrumb(timestamp: $timestamp, action: $action, detail: $detail, area: $area, level: $level, runId: $runId)';
 }
 
 
@@ -1832,7 +1837,7 @@ abstract mixin class $BreadcrumbCopyWith<$Res>  {
   factory $BreadcrumbCopyWith(Breadcrumb value, $Res Function(Breadcrumb) _then) = _$BreadcrumbCopyWithImpl;
 @useResult
 $Res call({
- DateTime timestamp, String action, String? detail
+ DateTime timestamp, String action, String? detail, String? area, String? level, String? runId
 });
 
 
@@ -1849,11 +1854,14 @@ class _$BreadcrumbCopyWithImpl<$Res>
 
 /// Create a copy of Breadcrumb
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? timestamp = null,Object? action = null,Object? detail = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? timestamp = null,Object? action = null,Object? detail = freezed,Object? area = freezed,Object? level = freezed,Object? runId = freezed,}) {
   return _then(_self.copyWith(
 timestamp: null == timestamp ? _self.timestamp : timestamp // ignore: cast_nullable_to_non_nullable
 as DateTime,action: null == action ? _self.action : action // ignore: cast_nullable_to_non_nullable
 as String,detail: freezed == detail ? _self.detail : detail // ignore: cast_nullable_to_non_nullable
+as String?,area: freezed == area ? _self.area : area // ignore: cast_nullable_to_non_nullable
+as String?,level: freezed == level ? _self.level : level // ignore: cast_nullable_to_non_nullable
+as String?,runId: freezed == runId ? _self.runId : runId // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -1939,10 +1947,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( DateTime timestamp,  String action,  String? detail)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( DateTime timestamp,  String action,  String? detail,  String? area,  String? level,  String? runId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Breadcrumb() when $default != null:
-return $default(_that.timestamp,_that.action,_that.detail);case _:
+return $default(_that.timestamp,_that.action,_that.detail,_that.area,_that.level,_that.runId);case _:
   return orElse();
 
 }
@@ -1960,10 +1968,10 @@ return $default(_that.timestamp,_that.action,_that.detail);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( DateTime timestamp,  String action,  String? detail)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( DateTime timestamp,  String action,  String? detail,  String? area,  String? level,  String? runId)  $default,) {final _that = this;
 switch (_that) {
 case _Breadcrumb():
-return $default(_that.timestamp,_that.action,_that.detail);case _:
+return $default(_that.timestamp,_that.action,_that.detail,_that.area,_that.level,_that.runId);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1980,10 +1988,10 @@ return $default(_that.timestamp,_that.action,_that.detail);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( DateTime timestamp,  String action,  String? detail)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( DateTime timestamp,  String action,  String? detail,  String? area,  String? level,  String? runId)?  $default,) {final _that = this;
 switch (_that) {
 case _Breadcrumb() when $default != null:
-return $default(_that.timestamp,_that.action,_that.detail);case _:
+return $default(_that.timestamp,_that.action,_that.detail,_that.area,_that.level,_that.runId);case _:
   return null;
 
 }
@@ -1995,12 +2003,20 @@ return $default(_that.timestamp,_that.action,_that.detail);case _:
 @JsonSerializable()
 
 class _Breadcrumb implements Breadcrumb {
-  const _Breadcrumb({required this.timestamp, required this.action, this.detail});
+  const _Breadcrumb({required this.timestamp, required this.action, this.detail, this.area, this.level, this.runId});
   factory _Breadcrumb.fromJson(Map<String, dynamic> json) => _$BreadcrumbFromJson(json);
 
 @override final  DateTime timestamp;
 @override final  String action;
 @override final  String? detail;
+/// #3980 — the subsystem the crumb belongs to (`obd2`, `sync`,
+/// `search`, `bt`, …), so the ring can be filtered rather than merely
+/// truncated. Derived from the action's leading token unless given.
+@override final  String? area;
+/// #3980 — `info` / `warn` / `error`; `info` for a plain milestone.
+@override final  String? level;
+/// #3980 — the ADR 0021 runId of the run this crumb happened inside.
+@override final  String? runId;
 
 /// Create a copy of Breadcrumb
 /// with the given fields replaced by the non-null parameter values.
@@ -2015,16 +2031,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Breadcrumb&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&(identical(other.action, action) || other.action == action)&&(identical(other.detail, detail) || other.detail == detail));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Breadcrumb&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp)&&(identical(other.action, action) || other.action == action)&&(identical(other.detail, detail) || other.detail == detail)&&(identical(other.area, area) || other.area == area)&&(identical(other.level, level) || other.level == level)&&(identical(other.runId, runId) || other.runId == runId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,timestamp,action,detail);
+int get hashCode => Object.hash(runtimeType,timestamp,action,detail,area,level,runId);
 
 @override
 String toString() {
-  return 'Breadcrumb(timestamp: $timestamp, action: $action, detail: $detail)';
+  return 'Breadcrumb(timestamp: $timestamp, action: $action, detail: $detail, area: $area, level: $level, runId: $runId)';
 }
 
 
@@ -2035,7 +2051,7 @@ abstract mixin class _$BreadcrumbCopyWith<$Res> implements $BreadcrumbCopyWith<$
   factory _$BreadcrumbCopyWith(_Breadcrumb value, $Res Function(_Breadcrumb) _then) = __$BreadcrumbCopyWithImpl;
 @override @useResult
 $Res call({
- DateTime timestamp, String action, String? detail
+ DateTime timestamp, String action, String? detail, String? area, String? level, String? runId
 });
 
 
@@ -2052,11 +2068,14 @@ class __$BreadcrumbCopyWithImpl<$Res>
 
 /// Create a copy of Breadcrumb
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? timestamp = null,Object? action = null,Object? detail = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? timestamp = null,Object? action = null,Object? detail = freezed,Object? area = freezed,Object? level = freezed,Object? runId = freezed,}) {
   return _then(_Breadcrumb(
 timestamp: null == timestamp ? _self.timestamp : timestamp // ignore: cast_nullable_to_non_nullable
 as DateTime,action: null == action ? _self.action : action // ignore: cast_nullable_to_non_nullable
 as String,detail: freezed == detail ? _self.detail : detail // ignore: cast_nullable_to_non_nullable
+as String?,area: freezed == area ? _self.area : area // ignore: cast_nullable_to_non_nullable
+as String?,level: freezed == level ? _self.level : level // ignore: cast_nullable_to_non_nullable
+as String?,runId: freezed == runId ? _self.runId : runId // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

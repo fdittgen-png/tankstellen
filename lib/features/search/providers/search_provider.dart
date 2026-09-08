@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 import 'dart:async';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -24,6 +23,7 @@ import '../../../core/domain/station.dart';
 import 'search_filters_provider.dart';
 import 'search_provider_orchestration.dart';
 import 'search_result_helpers.dart';
+import '../../../core/logging/run_scope.dart';
 
 // #727 — re-export so `import 'search_provider.dart'` keeps resolving
 // `SearchLocation`, `SelectedFuelType`, `SearchRadius`, `fuelStations`.
@@ -160,7 +160,7 @@ class SearchState extends _$SearchState {
     state = const AsyncValue.loading();
     final cancelToken = _newCancelToken();
     try {
-      await search(cancelToken);
+      await RunScope.run('search', () => search(cancelToken)); // #3980 runId
     } catch (e, st) {
       if (!ref.mounted) return;
       final classified = classifySearchError(e, st);

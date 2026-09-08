@@ -18,6 +18,7 @@ import 'ocr/ocr_text_engine.dart';
 import 'receipt_parser.dart';
 import 'receipt_scan_outcomes.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/run_scope.dart';
 
 // Re-export the image-orientation helpers (#1711/#3766) so existing
 // callers / tests that import them from this file keep resolving after
@@ -92,7 +93,15 @@ class ReceiptScanService {
   /// [PumpOcrConfig]) drives currency-aware extraction so GBP/£/p, kr,
   /// $ receipts read correctly. With no [country] the parser defaults
   /// to EUR, unchanged from before.
+  /// #3980 — one ADR 0021 runId for everything this call logs.
   Future<ReceiptScanOutcome?> scanReceipt({
+    String? country,
+    String? brand,
+    OcrTraceRecorder? trace,
+  }) =>
+      RunScope.run('ocr', () => _scanReceiptImpl(country: country, brand: brand, trace: trace));
+
+  Future<ReceiptScanOutcome?> _scanReceiptImpl({
     String? country,
     String? brand,
     OcrTraceRecorder? trace,

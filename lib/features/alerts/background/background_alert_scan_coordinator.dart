@@ -23,6 +23,7 @@ import 'daily_collection.dart';
 import '../../../core/background/hive_isolate_lock.dart';
 import 'notification_templates.dart';
 import '../../../core/background/provider_request_budget.dart';
+import '../../../core/logging/run_scope.dart';
 
 // The trigger taxonomy lives in its own file since #3169 (file-length cap);
 // re-exported here so every existing importer keeps working.
@@ -111,7 +112,15 @@ class BackgroundAlertScanCoordinator {
   /// always closed.
   ///
   /// [now] is injectable for tests; defaults to the wall clock.
+  /// #3980 — one ADR 0021 runId for everything this call logs.
   Future<bool> scan({
+    required BackgroundScanTrigger trigger,
+    DateTime? now,
+    Duration cooldown = scanCooldown,
+  }) =>
+      RunScope.run('background-scan', () => _scanImpl(trigger: trigger, now: now, cooldown: cooldown));
+
+  Future<bool> _scanImpl({
     required BackgroundScanTrigger trigger,
     DateTime? now,
     Duration cooldown = scanCooldown,

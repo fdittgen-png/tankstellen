@@ -161,6 +161,9 @@ _Breadcrumb _$BreadcrumbFromJson(Map<String, dynamic> json) => _Breadcrumb(
   timestamp: DateTime.parse(json['timestamp'] as String),
   action: json['action'] as String,
   detail: json['detail'] as String?,
+  area: json['area'] as String?,
+  level: json['level'] as String?,
+  runId: json['runId'] as String?,
 );
 
 Map<String, dynamic> _$BreadcrumbToJson(_Breadcrumb instance) =>
@@ -168,4 +171,7 @@ Map<String, dynamic> _$BreadcrumbToJson(_Breadcrumb instance) =>
       'timestamp': instance.timestamp.toIso8601String(),
       'action': instance.action,
       'detail': instance.detail,
+      'area': instance.area,
+      'level': instance.level,
+      'runId': instance.runId,
     };

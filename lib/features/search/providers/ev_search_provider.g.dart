@@ -123,7 +123,7 @@ final class EVSearchStateProvider
   }
 }
 
-String _$eVSearchStateHash() => r'60721240a9b2ef153fb6cca6ece739b86c9a613c';
+String _$eVSearchStateHash() => r'3a176b9db369c96f13c9cc2eb6d400b80e70b8a9';
 
 /// Manages EV charging station search, parallel to [SearchState] for fuel.
 ///
