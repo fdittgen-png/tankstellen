@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart'
@@ -9,6 +8,7 @@ import 'package:flutter/services.dart'
 import 'package:hive/hive.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../../../core/services/diagnostics/data_access_recorder.dart';
 import '../../../core/services/diagnostics/data_access_trace_export.dart';
@@ -56,9 +56,9 @@ class BackgroundScanTracer {
     try {
       if (_debugModeEnabled()) recorder = DataAccessRecorder();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.background, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.background, context: const {
         'where': 'BackgroundScanTracer.forScan: dev-mode read',
-      }));
+      });
     }
     return BackgroundScanTracer._(recorder);
   }
@@ -101,9 +101,9 @@ class BackgroundScanTracer {
       debugPrint('BackgroundScanTracer.exportIfEnabled: public_files channel '
           'unavailable — skipping Downloads export.');
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.background, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.background, context: const {
         'where': 'BackgroundScanTracer.exportIfEnabled',
-      }));
+      });
     }
   }
 

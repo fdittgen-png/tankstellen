@@ -1,12 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:workmanager/workmanager.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../data/radius_alert_store.dart';
 import '../../../core/storage/hive_storage.dart';
 import 'background_alert_scan_coordinator.dart';
@@ -165,8 +165,7 @@ class BackgroundService {
       await createSlcWakeMonitor().setEnabled(active);
     } catch (e, st) {
       // Never let a scheduling hiccup crash an alert mutation or startup.
-      unawaited(errorLogger.log(ErrorLayer.background, e, st,
-          context: const {'where': 'BackgroundService.reconcile'}));
+      log.error(e, st, layer: ErrorLayer.background, context: const {'where': 'BackgroundService.reconcile'});
     }
   }
 
@@ -209,8 +208,7 @@ class BackgroundService {
       await (fetcher ?? createBackgroundPriceFetcher())
           .scheduleOpportunisticScan();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.background, e, st,
-          context: const {'where': 'BackgroundService.onOpportunisticWake'}));
+      log.error(e, st, layer: ErrorLayer.background, context: const {'where': 'BackgroundService.onOpportunisticWake'});
     }
   }
 
@@ -231,9 +229,9 @@ class BackgroundService {
     } catch (e, st) {
       // Non-fatal: the isolate falls back to live resolution from the
       // persisted language code if the blob is missing.
-      unawaited(errorLogger.log(ErrorLayer.background, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.background, context: const {
         'where': 'BackgroundService._persistNotificationTemplates'
-      }));
+      });
     }
   }
 }
@@ -306,8 +304,7 @@ Future<void> scheduleIosProcessingTask(Workmanager workmanager) async {
     debugPrint('BackgroundService: BGProcessingTask armed '
         '("${IosBackgroundTaskIds.processing}", OS-budgeted, best-effort)');
   } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.background, e, st,
-        context: const {'where': 'scheduleIosProcessingTask'}));
+    log.error(e, st, layer: ErrorLayer.background, context: const {'where': 'scheduleIosProcessingTask'});
   }
 }
 

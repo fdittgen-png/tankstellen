@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
@@ -10,6 +9,7 @@ import '../../../core/domain/station.dart';
 import '../../../core/cache/cache_manager.dart';
 import '../../../core/data/storage_repository.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../../core/services/country_service_registry.dart';
 import '../../../core/services/diagnostics/data_access_recorder.dart';
 import '../../../core/services/fuel_service_policy.dart';
@@ -138,10 +138,10 @@ class BulkDatasetAlertStrategy implements CountryAlertStrategy {
       final result = await _bulkService().searchStations(params);
       return result.data;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {
-        'where': 'BulkDatasetAlertStrategy.searchArea($countryCode)',
+      log.error(e, st, layer: ErrorLayer.other, context: {
+        'where': 'BulkDatasetAlertStrategy.searchArea($countryCode)', 'country': countryCode,
         'ttlSoftMin': _policy.datasetTtlSoft.inMinutes,
-      }));
+      });
       return const [];
     }
   }
@@ -182,10 +182,10 @@ class BulkDatasetAlertStrategy implements CountryAlertStrategy {
       }
       return out;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {
-        'where': 'BulkDatasetAlertStrategy.fetchPrices($countryCode)',
+      log.error(e, st, layer: ErrorLayer.other, context: {
+        'where': 'BulkDatasetAlertStrategy.fetchPrices($countryCode)', 'country': countryCode,
         'ids': stationIds.length,
-      }));
+      });
       return const {};
     }
   }

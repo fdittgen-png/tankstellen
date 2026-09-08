@@ -1,11 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter/services.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import 'slc_wake_monitor.dart';
 
 /// iOS implementation of [SlcWakeMonitor] (#3169): a thin client of the
@@ -41,9 +41,9 @@ class IosSlcWakeMonitor implements SlcWakeMonitor {
     } catch (e, st) {
       // Best-effort mitigation: losing the SLC lane must never break the
       // alert mutation / startup path that reconciled it.
-      unawaited(errorLogger.log(ErrorLayer.background, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.background, context: const {
         'where': 'IosSlcWakeMonitor.setEnabled',
-      }));
+      });
     }
   }
 }
