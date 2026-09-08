@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/logging/app_log.dart';
 import 'obd2_service.dart';
 
 /// #3420 — fire-and-forget-safe teardown for the one leak the 2026-07-02
@@ -23,9 +24,9 @@ extension Obd2DisconnectQuietly on Obd2Service {
     try {
       await disconnect();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.other, context: const {
         'where': 'Obd2Service.disconnectQuietly: teardown error (swallowed)',
-      }));
+      });
     }
   }
 }

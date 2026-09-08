@@ -1,11 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../domain/obd2_connection_errors.dart';
 
 /// Owns the "OBD2 adapter broadly unresponsive" diagnostic decision for
@@ -81,8 +81,7 @@ class UnresponsiveAdapterDiagnostic {
       return;
     }
     _lastLoggedAt = now;
-    unawaited(errorLogger.log(ErrorLayer.other, error, stack,
-        context: {'where': msg, 'backedOffPids': backedOffCount}));
+    log.error(error, stack, layer: ErrorLayer.other, context: {'where': msg, 'backedOffPids': backedOffCount});
   }
 
   /// True for an error that means "the link dropped" rather than "the

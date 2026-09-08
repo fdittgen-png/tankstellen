@@ -140,9 +140,9 @@ mixin _Obd2AdapterPickerFlow on ConsumerState<Obd2AdapterPickerSheet> {
         Navigator.of(context).pop(service);
       }
     } on Obd2ConnectionError catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.ui, context: const {
         'where': '_Obd2AdapterPicker._connect: adapter connect failed'
-      }));
+      });
       if (!mounted) return;
       setState(() {
         _error = e;
@@ -197,9 +197,9 @@ mixin _Obd2AdapterPickerFlow on ConsumerState<Obd2AdapterPickerSheet> {
       // pinned-MAC fast-connect; a HiveError here silently drops the
       // adapter MAC and breaks auto-connect on every later session, so
       // it must leave a release-visible breadcrumb (not just debugPrint).
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.ui, context: const {
         'where': '_persistPickedAdapterToActiveVehicle',
-      }));
+      });
     }
   }
 }

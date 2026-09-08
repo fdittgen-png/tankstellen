@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:hive/hive.dart';
 
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/logging/app_log.dart';
 import '../../../../core/storage/hive_boxes.dart';
 import '../../../trips/api.dart';
 import '../active_trip_repository.dart';
@@ -40,8 +41,7 @@ class DroppedSessionRepoResolver {
       return PausedTripRepository(
           box: Hive.box<String>(HiveBoxes.obd2PausedTrips));
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: const {'where': 'DroppedSessionManager paused repo'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'DroppedSessionManager paused repo'});
       return null;
     }
   }
@@ -55,8 +55,7 @@ class DroppedSessionRepoResolver {
         box: Hive.box<String>(TripHistoryRepository.boxName),
       );
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: const {'where': 'DroppedSessionManager history repo'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'DroppedSessionManager history repo'});
       return null;
     }
   }
@@ -74,8 +73,7 @@ class DroppedSessionRepoResolver {
         box: Hive.box<String>(ActiveTripRepository.boxName),
       );
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: const {'where': 'DroppedSessionManager active repo'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'DroppedSessionManager active repo'});
       return null;
     }
   }
@@ -136,8 +134,7 @@ class DroppedSessionRepoResolver {
           ),
         ));
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-            context: const {'where': 'DroppedSessionManager grace finalise'}));
+        log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'DroppedSessionManager grace finalise'});
       }
     }
     deletePausedRow(id);

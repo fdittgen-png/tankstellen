@@ -118,9 +118,9 @@ mixin _Obd2ServiceInit on _Obd2ServiceLink {
     try {
       return cache.get(key);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.other, context: const {
         'where': 'OBD2 negotiated-protocol cache read failed',
-      }));
+      });
       return null;
     }
   }
@@ -163,9 +163,9 @@ mixin _Obd2ServiceInit on _Obd2ServiceLink {
         await cache.put(key, digit);
       }
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.other, context: const {
         'where': 'OBD2 negotiated-protocol resolve/cache failed',
-      }));
+      });
     }
   }
 

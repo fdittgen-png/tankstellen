@@ -1,9 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+
 import 'dart:async';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../domain/obd2_connection_errors.dart';
 
@@ -55,8 +57,7 @@ void recordObd2ReadFailure(
     );
     return;
   }
-  unawaited(errorLogger.log(ErrorLayer.other, error, stack,
-      context: {'where': where}));
+  log.error(error, stack, layer: ErrorLayer.other, context: {'where': where});
 }
 
 /// #2892 — true when [error] is an EXPECTED, user-surfaced *connect* failure
@@ -109,5 +110,5 @@ void recordObd2ConnectTransient(
     );
     return;
   }
-  unawaited(errorLogger.log(layer, error, stack, context: {'where': where}));
+  log.error(error, stack, layer: layer, context: {'where': where});
 }

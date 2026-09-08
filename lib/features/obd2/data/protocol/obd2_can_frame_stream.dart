@@ -5,6 +5,7 @@ import 'dart:async';
 
 import '../transport/obd2_transport.dart';
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/logging/app_log.dart';
 
 /// PSA instrument-cluster broadcast frame ID (#1418). Mirrors
 /// `PsaFuelLevelCanDecoder.frameId` — kept as a private constant
@@ -139,8 +140,7 @@ Stream<({int id, List<int> payload})> psaCanFrameStream(
       // Best-effort: the user has already cancelled, no point
       // crashing on a STMP write that might fail because the
       // channel is mid-disconnect.
-      unawaited(errorLogger.log(ErrorLayer.other, e, st,
-          context: const {'where': 'OBD2 canFrameStream STMP failed'}));
+      log.error(e, st, layer: ErrorLayer.other, context: const {'where': 'OBD2 canFrameStream STMP failed'});
     }
   }
 

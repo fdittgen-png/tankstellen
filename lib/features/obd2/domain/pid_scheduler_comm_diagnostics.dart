@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+
 import 'dart:async';
 
 import '../data/obd2_comm_diagnostics.dart';

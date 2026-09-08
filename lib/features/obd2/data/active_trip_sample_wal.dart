@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../trips/api.dart'
     show TripSample, sampleFromJson, sampleToJson;
 
@@ -64,8 +65,7 @@ class ActiveTripSampleWal {
           await getApplicationSupportDirectory();
       return File('${dir.path}/$fileName');
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: const {'where': 'ActiveTripSampleWal.resolveFile'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'ActiveTripSampleWal.resolveFile'});
       return null;
     }
   }
@@ -83,8 +83,7 @@ class ActiveTripSampleWal {
       _appended = 0;
     } catch (e, st) {
       _sink = null;
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: const {'where': 'ActiveTripSampleWal.openFresh'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'ActiveTripSampleWal.openFresh'});
     }
   }
 
@@ -99,8 +98,7 @@ class ActiveTripSampleWal {
       _sink = file.openWrite(mode: FileMode.writeOnlyAppend);
     } catch (e, st) {
       _sink = null;
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: const {'where': 'ActiveTripSampleWal.openAppend'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'ActiveTripSampleWal.openAppend'});
     }
   }
 
@@ -118,8 +116,7 @@ class ActiveTripSampleWal {
       sink.writeln(jsonEncode(sampleToJson(sample)));
       _appended++;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: const {'where': 'ActiveTripSampleWal.append'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'ActiveTripSampleWal.append'});
     }
   }
 
@@ -140,8 +137,7 @@ class ActiveTripSampleWal {
       if (file == null || !file.existsSync()) return const [];
       return await compute(parseActiveTripWalFile, file.path);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: const {'where': 'ActiveTripSampleWal.readAll'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'ActiveTripSampleWal.readAll'});
       return const [];
     }
   }
@@ -156,8 +152,7 @@ class ActiveTripSampleWal {
       await sink.flush();
       await sink.close();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: const {'where': 'ActiveTripSampleWal.close'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'ActiveTripSampleWal.close'});
     }
   }
 
@@ -170,8 +165,7 @@ class ActiveTripSampleWal {
       _file = null;
       if (file != null && file.existsSync()) await file.delete();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: const {'where': 'ActiveTripSampleWal.clear'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'ActiveTripSampleWal.clear'});
     }
   }
 }

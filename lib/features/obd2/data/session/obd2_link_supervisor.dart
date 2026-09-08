@@ -7,6 +7,7 @@ import 'dart:math' show Random;
 import 'package:flutter/foundation.dart';
 
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/logging/app_log.dart';
 import '../../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../transport/obd2_link_drop_signal.dart';
 import '../../domain/obd2_link_state.dart';
@@ -313,8 +314,7 @@ class Obd2LinkSupervisor {
     try {
       await dead.disconnect();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st,
-          context: {'where': 'Obd2LinkSupervisor.$where'}));
+      log.error(e, st, layer: ErrorLayer.other, context: {'where': 'Obd2LinkSupervisor.$where'});
     }
   }
 

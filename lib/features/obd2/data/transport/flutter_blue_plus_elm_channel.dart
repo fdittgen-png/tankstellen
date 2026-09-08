@@ -22,6 +22,7 @@ import 'obd2_link_drop_signal.dart';
 import 'obd2_pairing_mode.dart';
 import 'obd2_platform_budgets.dart';
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/logging/app_log.dart';
 
 part 'flutter_blue_plus_elm_channel_connect.dart';
 part 'flutter_blue_plus_elm_channel_gatt.dart';

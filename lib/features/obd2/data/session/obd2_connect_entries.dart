@@ -273,8 +273,8 @@ Future<void> _teardownLastDirectChannelImpl(Obd2ConnectionService svc) async {
     await prior.close();
   } catch (e, st) {
     // #2379 — OBD2/BLE, not local storage.
-    unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
+    log.error(e, st, layer: ErrorLayer.other, context: const {
       'where': 'Obd2ConnectionService: prior-direct-channel teardown',
-    }));
+    });
   }
 }

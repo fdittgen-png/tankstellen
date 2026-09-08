@@ -223,7 +223,7 @@ mixin _Obd2ServiceConnect on _Obd2ServiceInit {
         _capabilityReconciled =
             _capability == Obd2AdapterCapability.standardOnly;
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'OBD2 ATI firmware read failed'}));
+        log.error(e, st, layer: ErrorLayer.other, context: const {'where': 'OBD2 ATI firmware read failed'});
       }
 
       // #2261 concern 3 — read ATDPN to learn the negotiated protocol
@@ -316,9 +316,9 @@ mixin _Obd2ServiceConnect on _Obd2ServiceInit {
       final probe = await probeMultiFrameCapability(_transport.sendCommand);
       _capability = reconcileCapabilityWithProbe(_claimedCapability, probe);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.other, context: const {
         'where': 'OBD2 deferred capability probe failed',
-      }));
+      });
     }
   }
 

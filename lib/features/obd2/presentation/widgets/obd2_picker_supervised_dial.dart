@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/logging/app_log.dart';
 import '../../data/session/obd2_link_supervisor.dart';
 import '../../data/session/obd2_service.dart';
 import '../../providers/obd2_reconnect_provider.dart';
@@ -26,9 +27,9 @@ Future<Obd2Service?> obd2PickerSupervisedDial(
   try {
     sup = container.read(obd2ReconnectProvider.notifier).supervisor;
   } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+    log.error(e, st, layer: ErrorLayer.ui, context: const {
       'where': 'obd2AdapterPicker: supervisor resolve failed',
-    }));
+    });
   }
   return sup != null ? await sup.connectWith(dial) : await dial();
 }

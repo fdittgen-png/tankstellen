@@ -10,6 +10,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'obd2_connect_trace.dart';
 import 'obd2_connect_trace_log.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../../core/telemetry/storage/trace_storage.dart';
 import 'auto_record_trace_log.dart';
 
@@ -70,10 +71,10 @@ class Obd2ConnectTracePersistence {
       TraceStorage.extraExportSections['autoRecordEvents'] =
           AutoRecordTraceLog.exportSection;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.storage, context: const {
         'where': 'Obd2ConnectTracePersistence.init failed — connect traces '
             'stay in-memory only this session',
-      }));
+      });
     }
   }
 

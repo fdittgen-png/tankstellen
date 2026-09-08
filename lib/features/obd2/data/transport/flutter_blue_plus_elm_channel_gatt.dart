@@ -107,8 +107,7 @@ Future<void> _discoverAndBindImpl(FlutterBluePlusElmChannel c) async {
       if (!c._incoming.isClosed) c._incoming.addError(e, st);
       // OBD2/BLE GATT/ATT error → `other` ("not yet classified", #2379).
       // Kept logged: a real link drop worth seeing in release triage.
-      unawaited(errorLogger.log(ErrorLayer.other, e, st,
-          context: const {'where': 'FlutterBluePlusElmChannel notify error'}));
+      log.error(e, st, layer: ErrorLayer.other, context: const {'where': 'FlutterBluePlusElmChannel notify error'});
     },
   );
 }
@@ -292,7 +291,7 @@ Future<void> _closeChannel(FlutterBluePlusElmChannel c) async {
     await c._device.disconnect();
   } catch (e, st) {
     // OBD2/BLE layer, not local storage (#2379).
-    unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'FlutterBluePlusElmChannel: disconnect failed'}));
+    log.error(e, st, layer: ErrorLayer.other, context: const {'where': 'FlutterBluePlusElmChannel: disconnect failed'});
   }
   // #2295 — close the broadcast controller (symmetry with
   // ClassicElmChannel.close()) so it doesn't leak across a reconnect.

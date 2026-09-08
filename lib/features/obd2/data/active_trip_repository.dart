@@ -14,6 +14,7 @@ import '../../trips/api.dart';
 import 'active_trip_sample_wal.dart';
 import 'paused_trip_repository.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 
 /// Snapshot of an in-progress OBD2 recording that is healthy — i.e.
 /// the BT transport is alive and samples are still arriving — but
@@ -241,7 +242,7 @@ class ActiveTripRepository {
               : jsonEncode(json);
       await _box.put(_singletonKey, encoded);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'ActiveTripRepository.saveSnapshot'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'ActiveTripRepository.saveSnapshot'});
     }
   }
 
@@ -256,7 +257,7 @@ class ActiveTripRepository {
       final json = (jsonDecode(raw) as Map).cast<String, dynamic>();
       return ActiveTripSnapshot.fromJson(json);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'ActiveTripRepository.loadSnapshot'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'ActiveTripRepository.loadSnapshot'});
       return null;
     }
   }
@@ -284,7 +285,7 @@ class ActiveTripRepository {
       await _box.delete(_singletonKey);
       await sampleWal?.clear();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'ActiveTripRepository.clearSnapshot'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'ActiveTripRepository.clearSnapshot'});
     }
   }
 

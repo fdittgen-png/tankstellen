@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart' show AppLifecycleState, WidgetsBinding;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../../vehicle/api.dart' show activeVehicleProfileProvider;
@@ -343,9 +344,9 @@ class Obd2Reconnect extends _$Obd2Reconnect {
   bool get carAsleep => Obd2VehiclePower.instance.asleep;
 
   void _logSeam(String where, Object e, StackTrace st) {
-    unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: {
+    log.error(e, st, layer: ErrorLayer.providers, context: {
       'where': 'Obd2Reconnect $where seam failed',
-    }));
+    });
   }
 }
 

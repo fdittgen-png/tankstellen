@@ -1,9 +1,9 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import 'last_good_adapter_store.dart';
 
 /// #3423 — the ONE adapter-pin resolution rule (Epic #3415 task 6).
@@ -73,9 +73,9 @@ ResolvedAdapterPin? resolveAdapterPin({
   } catch (e, st) {
     // Best-effort fallback only: a failed recall (provider unresolvable,
     // storage fault) means no auto-pin — never a thrown trip start.
-    unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+    log.error(e, st, layer: ErrorLayer.storage, context: const {
       'where': 'resolveAdapterPin: last-good recall failed — no fallback pin',
-    }));
+    });
   }
   final fallbackMac = lastGood?.mac.trim();
   if (fallbackMac == null || fallbackMac.isEmpty) return null;

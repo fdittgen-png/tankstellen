@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../data/obd2_comm_diagnostics.dart';
 import 'pid_bandwidth_governor.dart';
 import 'pid_no_protocol_episode.dart';
@@ -356,9 +357,9 @@ class PidScheduler {
         } catch (e, st) {
           // Callback errors are a real HANDLER bug in OUR code (not the BLE
           // link) — keep them logged for triage, as layer `other` (#2379).
-          unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {
+          log.error(e, st, layer: ErrorLayer.other, context: {
             'where': 'PidScheduler: onResult for $command threw',
-          }));
+          });
         }
       }
     } catch (e, st) {
