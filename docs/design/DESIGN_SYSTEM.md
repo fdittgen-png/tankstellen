@@ -878,6 +878,27 @@ Each scan fails loud with file:line of the offending call + the
 `docs/design/DESIGN_SYSTEM.md` URL so a dev fixing the failure lands
 in the right section.
 
+### Widened scope — `presentation/widgets/` ratchets (#3986, Epic #3953)
+
+Scans 2 and 3 above walk `presentation/screens/` only, so a screen passed
+while its cards did not: `presentation/widgets/` held 78 raw `Card(` and
+106 inline title-theme reads that nothing looked at. Four ratchets close
+that, sharing one walker (`test/lint/design_system_scan.dart`):
+
+| test file | rule | scope | baseline (2026-09-08) |
+|---|---|---|---|
+| `no_raw_card_in_widgets_test.dart` | raw `Card(` → `PrimaryCard` / `PanelCard` | widgets | 78 |
+| `no_inline_title_theme_in_widgets_test.dart` | `textTheme.title*` / `headlineSmall` → `AppText` role or `SectionHeader` | widgets | 106 |
+| `no_hard_font_size_test.dart` | `fontSize:` → a type role (scales with the text-size setting) | screens + widgets | 87 |
+| `no_named_colors_test.dart` | `Colors.<named>` → `colorScheme` / semantic roles / price-band ramp | screens + widgets | 93 |
+
+Unlike the allow-listed screen scans, these pin a **decrease-only numeric
+baseline** (the `no_hardcoded_ui_strings` rule): going above fails the
+build, and the PR that migrates sites lowers the constant. The target is 0.
+Every ratchet also runs its regex over an inline fixture with a known count
+(`expectMatcherFidelity`), so a matcher that silently stops matching fails
+loudly instead of reading as "clean" (#2348).
+
 ---
 
 ## Out of scope
