@@ -62,18 +62,18 @@ mixin _TripRecordingPersist
     try {
       historyRepo = ref.read(tripHistoryRepositoryProvider);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording recovered finalise: history repo read failed'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording recovered finalise: history repo read failed'});
     }
     try {
       historyList = ref.read(tripHistoryListProvider.notifier);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording recovered finalise: history list read failed'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording recovered finalise: history list read failed'});
     }
     if (snapshot.automatic) {
       try {
         badgeFuture = ref.read(autoRecordBadgeServiceProvider.future);
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording recovered finalise: badge service read failed'}));
+        log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording recovered finalise: badge service read failed'});
       }
     }
 
@@ -119,7 +119,7 @@ mixin _TripRecordingPersist
                   detail: 'finalised from a recovered snapshot'),
         ));
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording recovered finalise: save failed'}));
+        log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording recovered finalise: save failed'});
       }
     }
 
@@ -132,7 +132,7 @@ mixin _TripRecordingPersist
     try {
       historyList?.refresh();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording recovered finalise: list refresh failed'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording recovered finalise: list refresh failed'});
     }
 
     // Mirror the auto-record badge bookkeeping the regular
@@ -143,7 +143,7 @@ mixin _TripRecordingPersist
         final badge = await badgeFuture;
         await badge.increment();
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording recovered finalise: badge bump failed'}));
+        log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording recovered finalise: badge bump failed'});
       }
     }
 
@@ -194,11 +194,7 @@ mixin _TripRecordingPersist
       // movement detected" notice (the returned outcome) is unchanged.
       final droppedCapturedSignal = samples.isNotEmpty || gpsFixCount > 0;
       if (droppedCapturedSignal) {
-        unawaited(errorLogger.log(
-          ErrorLayer.providers,
-          StateError('trip discarded — no movement detected'),
-          StackTrace.current,
-          context: {
+        log.error(StateError('trip discarded — no movement detected'), StackTrace.current, layer: ErrorLayer.providers, context: {
             'where': 'TripRecording._saveToHistory discard',
             'reason': 'no-movement',
             'distanceKm': summary.distanceKm.toStringAsFixed(4),
@@ -206,8 +202,7 @@ mixin _TripRecordingPersist
             'sampleCount': samples.length.toString(),
             'gpsFixCount': gpsFixCount.toString(),
             'hadStartedAt': (summary.startedAt != null).toString(),
-          },
-        ));
+          });
       }
       return TripPersistOutcome.discardedNoMovement;
     }
@@ -277,7 +272,7 @@ mixin _TripRecordingPersist
           final badge = await ref.read(autoRecordBadgeServiceProvider.future);
           await badge.increment();
         } catch (e, st) {
-          unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording auto-record badge increment'}));
+          log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording auto-record badge increment'});
         }
       }
       // #1479 phase 2 / #1665 — opportunistic upload of the freshly
@@ -298,10 +293,10 @@ mixin _TripRecordingPersist
           unawaited(TripsSync.uploadSummary(entry));
         }
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording trip-sync hook'}));
+        log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording trip-sync hook'});
       }
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording._saveToHistory'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording._saveToHistory'});
     }
     // #2509 — the trip reached the history write (or a best-effort
     // sub-step failed and was logged above); either way it was not a
@@ -335,8 +330,7 @@ mixin _TripRecordingPersist
       await repo.save(vehicle.copyWith(gpsCalibration: updated));
       ref.invalidate(vehicleProfileListProvider);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st,
-          context: const {'where': 'TripRecording._calibratePhysicsScale'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording._calibratePhysicsScale'});
     }
   }
 }

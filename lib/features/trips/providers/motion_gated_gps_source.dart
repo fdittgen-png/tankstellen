@@ -9,6 +9,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/location/geolocator_wrapper.dart';
 import '../../../core/location/recording_location_settings.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../domain/services/motion_gate.dart';
 import 'recording_gps_fix_provider.dart';
 
@@ -64,8 +65,7 @@ class MotionGatedGpsSource {
       _sub = _open(coarse: next == GpsProfile.coarse);
       unawaited(old?.cancel());
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st,
-          context: const {'where': 'MotionGatedGpsSource: profile swap'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'MotionGatedGpsSource: profile swap'});
     }
   }
 
@@ -98,8 +98,7 @@ class MotionGatedGpsSource {
         .listen(
           _dispatch,
           onError: (Object e, StackTrace st) {
-            unawaited(errorLogger.log(ErrorLayer.providers, e, st,
-                context: const {'where': 'MotionGatedGpsSource: stream error'}));
+            log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'MotionGatedGpsSource: stream error'});
           },
         );
   }

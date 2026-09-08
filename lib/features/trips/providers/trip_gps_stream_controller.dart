@@ -18,6 +18,7 @@ import '../../glide_coach/providers/glide_coach_evaluator_provider.dart';
 import '../../glide_coach/providers/glide_coach_settings_provider.dart';
 import '../../obd2/api.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import 'recording_gps_fix_provider.dart';
 
 /// Owns the #1374 / #1125 / #1458 GPS concern extracted from the
@@ -169,11 +170,11 @@ class TripGpsStreamController {
           unawaited(_maybeFireGlideCoach(ctl, pos));
         },
         onError: (Object error, StackTrace st) {
-          unawaited(errorLogger.log(ErrorLayer.providers, error, st, context: const {'where': 'TripRecording GPS stream'}));
+          log.error(error, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording GPS stream'});
         },
       );
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording GPS subscribe failed'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording GPS subscribe failed'});
     }
   }
 
@@ -248,7 +249,7 @@ class TripGpsStreamController {
         await HapticFeedback.lightImpact();
       }
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording glide-coach evaluation failed'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording glide-coach evaluation failed'});
     }
   }
 }

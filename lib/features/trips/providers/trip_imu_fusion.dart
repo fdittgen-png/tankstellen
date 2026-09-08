@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../../core/sensors/imu_sample.dart';
 import '../../../core/sensors/imu_sensor_source.dart';
 import '../domain/services/imu_event_detector.dart';
@@ -73,15 +74,15 @@ class TripImuFusion {
       _sub = _source.stream().listen(
         _detector.onSample,
         onError: (Object e, StackTrace st) {
-          unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: {
+          log.error(e, st, layer: ErrorLayer.providers, context: {
             'where': '$_where: IMU stream error',
-          }));
+          });
         },
       );
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: {
+      log.error(e, st, layer: ErrorLayer.providers, context: {
         'where': '$_where: IMU stream open failed',
-      }));
+      });
     }
   }
 
@@ -100,9 +101,9 @@ class TripImuFusion {
     try {
       await _sub?.cancel();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: {
+      log.error(e, st, layer: ErrorLayer.providers, context: {
         'where': '$_where: IMU stream cancel failed',
-      }));
+      });
     }
     _sub = null;
   }

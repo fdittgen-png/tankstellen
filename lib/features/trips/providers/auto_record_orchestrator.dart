@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import 'acl_wake_config_mirror.dart';
 import '../../feature_management/api.dart';
 import '../../../core/domain/vehicle_profile.dart';
@@ -156,18 +157,18 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
     try {
       ref.read(obd2ReconnectProvider.notifier).supervisor.wake();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.providers, context: const {
         'where': 'AutoRecordOrchestrator: resume wake failed',
-      }));
+      });
     }
     for (final entry in _entries.values.toList()) {
       try {
         await entry.coordinator.armForegroundActive();
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: {
+        log.error(e, st, layer: ErrorLayer.providers, context: {
           'where': 'AutoRecordOrchestrator: foreground arm failed',
           'mac': entry.armedMac,
-        }));
+        });
       }
     }
   }

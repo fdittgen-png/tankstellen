@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../obd2/api.dart';
 import 'active_vehicle_read.dart';
 
@@ -39,14 +40,14 @@ void triggerCompanionAssociationForPinnedAdapter(Ref ref) {
     unawaited(coordinator
         .ensureAssociated(mac)
         .catchError((Object e, StackTrace st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.providers, context: const {
         'where': 'triggerCompanionAssociationForPinnedAdapter: ensure'
-      }));
+      });
       return false;
     }));
   } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
+    log.error(e, st, layer: ErrorLayer.providers, context: const {
       'where': 'triggerCompanionAssociationForPinnedAdapter'
-    }));
+    });
   }
 }

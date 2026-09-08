@@ -84,7 +84,7 @@ final class RecordingProfileControllerProvider
 }
 
 String _$recordingProfileControllerHash() =>
-    r'55bcd8fe66a99e4d292a43f9bcf2e82c657d40ca';
+    r'dac05a96f1d7fbff7cd7f8e6f40d8a31fd4a83c7';
 
 /// App-wide owner of the persisted [RecordingProfile] (#2274 concern 1).
 ///

@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/location/recording_location_settings.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../../core/permissions/battery_optimization_permissions.dart';
 import '../../../core/storage/storage_keys.dart';
 import '../../../core/storage/storage_providers.dart';
@@ -52,8 +53,7 @@ class RecordingBatteryExemption {
       await _permissions.requestExemption();
     } catch (e, st) {
       // A failed prompt must never break recording — log and move on.
-      unawaited(errorLogger.log(ErrorLayer.other, e, st,
-          context: const {'where': 'RecordingBatteryExemption.maybePrompt'}));
+      log.error(e, st, layer: ErrorLayer.other, context: const {'where': 'RecordingBatteryExemption.maybePrompt'});
     }
   }
 }

@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 import 'dart:ui' show Locale;
 
 import 'package:flutter/foundation.dart';
@@ -9,6 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/language/language_provider.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../../l10n/app_localizations.dart';
 
 import '../../vehicle/providers/vehicle_providers.dart';
@@ -52,9 +52,9 @@ BackgroundAdapterListenerFactory autoRecordListenerFactory(Ref ref) {
           ..notificationText = l10n.autoRecordNotificationText;
       } catch (e, st) {
         // Best-effort: the native English fallback stands.
-        unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
+        log.error(e, st, layer: ErrorLayer.providers, context: const {
           'where': 'autoRecordListenerFactory: l10n resolve',
-        }));
+        });
       }
       return listener;
     }

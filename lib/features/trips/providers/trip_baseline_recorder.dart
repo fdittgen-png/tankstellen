@@ -18,6 +18,7 @@ import 'trip_baseline_sync.dart';
 import '../domain/cold_start_baselines.dart';
 import '../domain/situation_classifier.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 
 /// Owns the #769 / #780 / #894 baseline-learning concern extracted
 /// from the [TripRecording] notifier (#1679): the per-trip situation
@@ -78,7 +79,7 @@ class TripBaselineRecorder {
         }
       }
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording.start: baseline setup failed'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording.start: baseline setup failed'});
       _store = null;
     }
   }
@@ -111,7 +112,7 @@ class TripBaselineRecorder {
       try {
         await store.flush(vid);
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording.stop: baseline flush failed'}));
+        log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording.stop: baseline flush failed'});
       }
       // #780 — fold in the server copy once the local flush lands.
       // #3670 — fire-and-forget: the merge is a network round-trip to a
@@ -363,7 +364,7 @@ class TripBaselineRecorder {
     try {
       return _ref.read(activeVehicleProfileProvider);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording: active vehicle unavailable'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording: active vehicle unavailable'});
       return null;
     }
   }

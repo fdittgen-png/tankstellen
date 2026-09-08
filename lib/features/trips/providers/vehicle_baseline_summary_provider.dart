@@ -11,6 +11,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/storage/hive_boxes.dart';
 import '../domain/situation_classifier.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 
 part 'vehicle_baseline_summary_provider.g.dart';
 
@@ -40,7 +41,7 @@ Map<DrivingSituation, int> vehicleBaselineSummary(Ref ref, String vehicleId) {
   try {
     decoded = json.decode(raw) as Map<String, dynamic>;
   } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: {'where': 'vehicleBaselineSummary: corrupt payload for $vehicleId'}));
+    log.error(e, st, layer: ErrorLayer.providers, context: {'where': 'vehicleBaselineSummary: corrupt payload for $vehicleId', 'entity': vehicleId});
     return const {};
   }
 

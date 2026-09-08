@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../../../core/storage/storage_keys.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../domain/entities/recording_profile.dart';
@@ -37,8 +38,7 @@ class RecordingProfileController extends _$RecordingProfileController {
           .getSetting(StorageKeys.recordingProfile);
       return _decode(raw);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st,
-          context: const {'where': 'RecordingProfile: read global failed'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'RecordingProfile: read global failed'});
       return RecordingProfile.defaults;
     }
   }
@@ -52,8 +52,7 @@ class RecordingProfileController extends _$RecordingProfileController {
             jsonEncode(profile.toJson()),
           );
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st,
-          context: const {'where': 'RecordingProfile: write global failed'}));
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'RecordingProfile: write global failed'});
     }
   }
 
@@ -84,9 +83,9 @@ class RecordingProfileController extends _$RecordingProfileController {
       if (raw == null) return null;
       return _decode(raw);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.providers, context: const {
         'where': 'RecordingProfile: read vehicle override failed',
-      }));
+      });
       return null;
     }
   }
@@ -107,9 +106,9 @@ class RecordingProfileController extends _$RecordingProfileController {
         await storage.putSetting(key, jsonEncode(profile.toJson()));
       }
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.providers, context: const {
         'where': 'RecordingProfile: write vehicle override failed',
-      }));
+      });
     }
   }
 

@@ -15,6 +15,7 @@ import 'trip_history_entry.dart';
 import 'trip_history_store_v2.dart';
 import 'trip_sample_codec.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 
 // #3613 — TripHistoryEntry moved into its own file so this one stays
 // under the 400-line cap; the re-export keeps every existing
@@ -79,14 +80,12 @@ class TripHistoryRepository {
       );
       if (skip) return;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: const {'where': 'TripHistoryRepository.save ghost-guard'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'TripHistoryRepository.save ghost-guard'});
     }
     try {
       await _writeRows(entry);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: const {'where': 'TripHistoryRepository.save'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'TripHistoryRepository.save'});
       return;
     }
     await _trim();
@@ -96,8 +95,7 @@ class TripHistoryRepository {
       try {
         hook(entry);
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-            context: const {'where': 'TripHistoryRepository.save onSavedHook'}));
+        log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'TripHistoryRepository.save onSavedHook'});
       }
     }
   }
@@ -150,8 +148,7 @@ class TripHistoryRepository {
       _scheduleMigration(key as String);
       return TripHistoryEntry.fromJson(json);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: {'where': 'TripHistoryRepository._decode: skipping $key'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: {'where': 'TripHistoryRepository._decode: skipping $key', 'entity': key});
       return null;
     }
   }
@@ -178,8 +175,7 @@ class TripHistoryRepository {
       await _box.putAll(rows);
       return true;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: {'where': 'TripHistoryRepository.migrateLegacyRow $id'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: {'where': 'TripHistoryRepository.migrateLegacyRow $id', 'entity': id});
       return false;
     }
   }
@@ -241,8 +237,7 @@ class TripHistoryRepository {
       _scheduleMigration(id);
       return await compute(decodeLegacyRowToEntry, raw);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: {'where': 'TripHistoryRepository.loadByIdAsync $id'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: {'where': 'TripHistoryRepository.loadByIdAsync $id', 'entity': id});
       return null;
     }
   }
@@ -264,8 +259,7 @@ class TripHistoryRepository {
           const <Map<String, dynamic>>[];
       return decodeTripChunkColumns(encodeTripChunkFromMaps(samples), keys);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: {'where': 'TripHistoryRepository.loadColumns $id'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: {'where': 'TripHistoryRepository.loadColumns $id', 'entity': id});
       return TripColumns.empty;
     }
   }
@@ -308,8 +302,7 @@ class TripHistoryRepository {
           id, jsonEncode(entry.copyWith(verdict: verdict.wireName).toJson()));
       return true;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: const {'where': 'TripHistoryRepository.saveVerdict'}));
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'TripHistoryRepository.saveVerdict'});
       return false;
     }
   }

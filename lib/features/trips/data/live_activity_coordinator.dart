@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 import '../domain/live_activity_content.dart';
 import 'live_activity_controller.dart';
 
@@ -83,9 +84,9 @@ class LiveActivityCoordinator {
     try {
       await _apply(content);
     } on Object catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.services, e, st, context: const {
+      log.error(e, st, layer: ErrorLayer.services, context: const {
         'where': 'LiveActivityCoordinator.apply',
-      }));
+      });
     } finally {
       _applying = false;
     }
