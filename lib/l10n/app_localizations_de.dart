@@ -3010,6 +3010,30 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get linkDeviceInvalidCode =>
+      'Bitte einen gültigen Gerätecode eingeben';
+
+  @override
+  String linkDeviceFailed(String error) {
+    return 'Verknüpfung fehlgeschlagen: $error';
+  }
+
+  @override
+  String linkDeviceLinked(
+    int favorites,
+    int alerts,
+    int vehicles,
+    int fillUps,
+  ) {
+    return 'Verknüpft! $favorites Favoriten, $alerts Alarme, $vehicles Fahrzeuge und $fillUps Tankfüllungen importiert.';
+  }
+
+  @override
+  String syncConnectionFailed(String error) {
+    return 'Verbindung fehlgeschlagen: $error';
+  }
+
+  @override
   String get achievementSmoothDriver => 'Ruhige Serie';
 
   @override

@@ -26,6 +26,7 @@ import '../widgets/wizard_create_new.dart';
 import '../widgets/wizard_join_existing.dart';
 import '../widgets/wizard_schema_step.dart';
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/error_localizer.dart';
 
 /// Multi-step wizard for setting up TankSync database connection.
 ///
@@ -267,7 +268,7 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
         'where': 'SyncWizardScreen._adopt: adopt connect/sign-in failed'
       }));
       if (mounted) {
-        wizard.adoptFailed('Connection failed: $e');
+        wizard.adoptFailed(_connectionFailed(context, e));
       }
     } finally {
       if (mounted) wizard.setConnecting(false);
@@ -287,7 +288,7 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
       unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
         'where': 'SyncWizardScreen._testConnection: test failed'
       }));
-      if (mounted) wizard.testFailed('Connection failed:\n$e');
+      if (mounted) wizard.testFailed(_connectionFailed(context, e));
     }
   }
 
@@ -332,7 +333,7 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
         'where': 'SyncWizardScreen._connect: connect/sign-in failed'
       }));
       if (mounted) {
-        notifier.connectFailed('Connection failed: $e');
+        notifier.connectFailed(_connectionFailed(context, e));
       }
     } finally {
       if (mounted) notifier.setConnecting(false);
@@ -361,4 +362,11 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
       }
     }
   }
+}
+
+/// The wizard's connection-failure sentence, localized, with the reason run
+/// through [ErrorLocalizer] instead of interpolating the exception (#3988).
+String _connectionFailed(BuildContext context, Object error) {
+  final l10n = AppLocalizations.of(context);
+  return l10n.syncConnectionFailed(ErrorLocalizer.localize(error, l10n));
 }

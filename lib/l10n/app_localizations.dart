@@ -5528,6 +5528,30 @@ abstract class AppLocalizations {
   /// **'The guide could not be loaded ({asset}).'**
   String helpUnavailable(String asset);
 
+  /// Shown when the pasted device code is too short to be a device id (#3988).
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid device code'**
+  String get linkDeviceInvalidCode;
+
+  /// Shown when a device link throws; {error} is the localized reason, never the raw exception (#3988).
+  ///
+  /// In en, this message translates to:
+  /// **'Link failed: {error}'**
+  String linkDeviceFailed(String error);
+
+  /// Shown after a successful device link, with what was imported (#3988).
+  ///
+  /// In en, this message translates to:
+  /// **'Linked! Imported {favorites} favourites, {alerts} alerts, {vehicles} vehicles, {fillUps} fill-ups.'**
+  String linkDeviceLinked(int favorites, int alerts, int vehicles, int fillUps);
+
+  /// Sync wizard: the connection test or adopt step failed; {error} is the localized reason (#3988).
+  ///
+  /// In en, this message translates to:
+  /// **'Connection failed: {error}'**
+  String syncConnectionFailed(String error);
+
   /// Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5).
   ///
   /// In en, this message translates to:

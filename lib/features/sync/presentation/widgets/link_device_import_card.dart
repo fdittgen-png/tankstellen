@@ -87,10 +87,10 @@ class LinkDeviceImportCard extends ConsumerWidget {
             );
           },
         ),
-        if (uiState.result != null) ...[
+        if (uiState.hasResult) ...[
           const SizedBox(height: 12),
           Text(
-            uiState.result!,
+            _outcomeMessage(context, uiState),
             style: theme.textTheme.bodyMedium?.copyWith(
               color: uiState.isError
                   ? DarkModeColors.error(context)
@@ -100,5 +100,23 @@ class LinkDeviceImportCard extends ConsumerWidget {
         ],
       ],
     );
+  }
+}
+
+/// The localized sentence for a [LinkDeviceOutcome] (#3988). The provider
+/// names the outcome; the words live here, where a BuildContext exists.
+String _outcomeMessage(BuildContext context, LinkDeviceState state) {
+  final l10n = AppLocalizations.of(context);
+  switch (state.outcome!) {
+    case LinkDeviceOutcome.invalidCode:
+      return l10n.linkDeviceInvalidCode;
+    case LinkDeviceOutcome.notConnected:
+      return l10n.linkDeviceNotConnected;
+    case LinkDeviceOutcome.failed:
+      return l10n.linkDeviceFailed(state.errorDetail ?? '');
+    case LinkDeviceOutcome.linked:
+      final c = state.counts!;
+      return l10n.linkDeviceLinked(
+          c.favorites, c.alerts, c.vehicles, c.fillUps);
   }
 }

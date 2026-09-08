@@ -20,24 +20,65 @@ part 'link_device_provider.g.dart';
 
 /// UI state for the "Link device" screen. The text controller itself
 /// is owned by the screen; this provider only tracks loading + result.
+/// How a device-link attempt ended (#3988).
+///
+/// Was a hard-coded English sentence in [LinkDeviceState.result], which the
+/// UI then classified by `startsWith('Link failed')` — a user-visible string
+/// doing double duty as state. The provider has no BuildContext, so it names
+/// the outcome and the card localizes it.
+enum LinkDeviceOutcome {
+  /// The pasted code is too short to be a device id.
+  invalidCode,
+
+  /// TankSync is not connected, so there is nothing to link against.
+  notConnected,
+
+  /// Imported — [LinkDeviceState.counts] carries what arrived.
+  linked,
+
+  /// The attempt threw; [LinkDeviceState.errorDetail] carries the localized
+  /// reason.
+  failed,
+}
+
+/// What a successful link imported.
+typedef LinkDeviceCounts = ({
+  int favorites,
+  int alerts,
+  int vehicles,
+  int fillUps,
+});
+
 class LinkDeviceState {
   final bool isLinking;
-  final String? result;
+  final LinkDeviceOutcome? outcome;
+  final LinkDeviceCounts? counts;
+  final String? errorDetail;
 
-  const LinkDeviceState({this.isLinking = false, this.result});
+  const LinkDeviceState({
+    this.isLinking = false,
+    this.outcome,
+    this.counts,
+    this.errorDetail,
+  });
 
   LinkDeviceState copyWith({
     bool? isLinking,
-    String? result,
+    LinkDeviceOutcome? outcome,
+    LinkDeviceCounts? counts,
+    String? errorDetail,
     bool clearResult = false,
   }) {
     return LinkDeviceState(
       isLinking: isLinking ?? this.isLinking,
-      result: clearResult ? null : (result ?? this.result),
+      outcome: clearResult ? null : (outcome ?? this.outcome),
+      counts: clearResult ? null : (counts ?? this.counts),
+      errorDetail: clearResult ? null : (errorDetail ?? this.errorDetail),
     );
   }
 
-  bool get isError => result != null && result!.startsWith('Link failed');
+  bool get hasResult => outcome != null;
+  bool get isError => outcome != null && outcome != LinkDeviceOutcome.linked;
 }
 
 @riverpod
@@ -48,7 +89,7 @@ class LinkDeviceController extends _$LinkDeviceController {
   Future<void> linkDevice(String otherUserId) async {
     final trimmed = otherUserId.trim();
     if (trimmed.isEmpty || trimmed.length < 10) {
-      state = state.copyWith(result: 'Please enter a valid device code');
+      state = state.copyWith(outcome: LinkDeviceOutcome.invalidCode);
       return;
     }
 
@@ -57,7 +98,8 @@ class LinkDeviceController extends _$LinkDeviceController {
     try {
       final client = TankSyncClient.client;
       if (client == null) {
-        state = const LinkDeviceState(result: 'Not connected to TankSync');
+        state = const LinkDeviceState(
+            outcome: LinkDeviceOutcome.notConnected);
         return;
       }
 
@@ -177,15 +219,24 @@ class LinkDeviceController extends _$LinkDeviceController {
       await FillUpsSync.merge(ref.read(fillUpListProvider));
 
       state = LinkDeviceState(
-        result:
-            'Linked! Imported $addedFavorites favorites, $addedAlerts alerts, '
-            '$addedVehicles vehicles, $addedFillUps fill-ups.',
+        outcome: LinkDeviceOutcome.linked,
+        counts: (
+          favorites: addedFavorites,
+          alerts: addedAlerts,
+          vehicles: addedVehicles,
+          fillUps: addedFillUps,
+        ),
       );
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
         'where': 'LinkDeviceController: device link failed'
       }));
-      state = LinkDeviceState(result: 'Link failed: $e');
+      // #3988 — the exception never reaches the user verbatim; the card
+      // renders the localized reason.
+      state = LinkDeviceState(
+        outcome: LinkDeviceOutcome.failed,
+        errorDetail: e.toString(),
+      );
     }
   }
 }

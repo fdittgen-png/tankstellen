@@ -5702,5 +5702,51 @@
   "@chargingLogDeletedUndoSnackbar": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "linkDeviceInvalidCode": "Please enter a valid device code",
+  "@linkDeviceInvalidCode": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "linkDeviceFailed": "Link failed: {error}",
+  "@linkDeviceFailed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "No internet connection"
+      }
+    }
+  },
+  "linkDeviceLinked": "Linked! Imported {favorites} favourites, {alerts} alerts, {vehicles} vehicles, {fillUps} fill-ups.",
+  "@linkDeviceLinked": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "favorites": {
+        "type": "int"
+      },
+      "alerts": {
+        "type": "int"
+      },
+      "vehicles": {
+        "type": "int"
+      },
+      "fillUps": {
+        "type": "int"
+      }
+    }
+  },
+  "syncConnectionFailed": "Connection failed: {error}",
+  "@syncConnectionFailed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "No internet connection"
+      }
+    }
   }
 }

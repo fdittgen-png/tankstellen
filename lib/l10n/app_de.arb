@@ -1200,6 +1200,48 @@
   "helpTitle": "Hilfe",
   "helpOpenGuide": "Anleitung öffnen",
   "helpUnavailable": "Die Anleitung konnte nicht geladen werden ({asset}).",
+  "linkDeviceInvalidCode": "Bitte einen gültigen Gerätecode eingeben",
+  "@linkDeviceInvalidCode": {
+    "description": "Shown when the pasted device code is too short to be a device id (#3988)."
+  },
+  "linkDeviceFailed": "Verknüpfung fehlgeschlagen: {error}",
+  "@linkDeviceFailed": {
+    "description": "Shown when a device link throws; {error} is the localized reason, never the raw exception (#3988).",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "No internet connection"
+      }
+    }
+  },
+  "linkDeviceLinked": "Verknüpft! {favorites} Favoriten, {alerts} Alarme, {vehicles} Fahrzeuge und {fillUps} Tankfüllungen importiert.",
+  "@linkDeviceLinked": {
+    "description": "Shown after a successful device link, with what was imported (#3988).",
+    "placeholders": {
+      "favorites": {
+        "type": "int"
+      },
+      "alerts": {
+        "type": "int"
+      },
+      "vehicles": {
+        "type": "int"
+      },
+      "fillUps": {
+        "type": "int"
+      }
+    }
+  },
+  "syncConnectionFailed": "Verbindung fehlgeschlagen: {error}",
+  "@syncConnectionFailed": {
+    "description": "Sync wizard: the connection test or adopt step failed; {error} is the localized reason (#3988).",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "No internet connection"
+      }
+    }
+  },
   "achievementSmoothDriver": "Ruhige Serie",
   "@achievementSmoothDriver": {
     "description": "Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5)."
