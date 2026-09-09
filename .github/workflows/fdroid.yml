@@ -53,6 +53,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          # #4025 follow-up — the recipe lint below asserts the AntiFeature
+          # against the commits the recipe PINS (#3968), which means resolving
+          # `506fcf50…` locally. The default shallow clone does not have it, so
+          # that check failed here while passing in ci.yml, which already
+          # fetches full history. The invariant is the most valuable one this
+          # workflow can carry, so fetch the history rather than skip it.
+          fetch-depth: 0
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
