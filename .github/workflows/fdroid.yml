@@ -95,6 +95,21 @@ jobs:
             exit 1
           fi
       - run: dart run build_runner build --delete-conflicting-outputs
+
+      # #4025 — the fdroiddata review checklist, before the 10-minute Gradle
+      # build rather than after it. Every rule these tests encode was stated
+      # once by a reviewer on MR !42093 or by a job rejecting it: the
+      # rewritemeta canonical form (#4023), the AntiFeature-vs-pinned-commit
+      # invariant (#3968), the per-ABI versionCode scheme, the full-sha pin,
+      # and the keys F-Droid reads from fastlane instead.
+      #
+      # This job is advisory by design (see the header), so this step is a
+      # FAST-FAIL for visibility, not the gate. The same tests run in ci.yml's
+      # required `test` shards, which is what actually blocks a merge — a
+      # recipe violation must not be mergeable just because someone read a
+      # green tick on an advisory job.
+      - name: Recipe lint — the fdroiddata review rules, as errors
+        run: flutter test test/features/fdroid
       # Build the keyless-unsigned RELEASE fdroid APK with the GMS-free
       # runtime config (#3480 — release, not debug: only R8 strips the dead
       # Play-Core deferred-components refs, #3479, so only the release dex can
