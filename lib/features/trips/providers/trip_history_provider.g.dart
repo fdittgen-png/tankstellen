@@ -10,6 +10,163 @@ part of 'trip_history_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// Trips for [vehicleId], newest first (#3985).
+///
+/// Was computed inside `TrajetsTab.build`, which re-ran the filter and
+/// the sort on every rebuild — a theme change, a keyboard opening — not
+/// on every data change. As a provider it runs once per change to the
+/// trip list and can be tested without pumping a widget.
+///
+/// A null [vehicleId] keeps every trip: the tab must not go silently
+/// empty just because the profile selector has never been used (#889).
+///
+/// The sort is defensive. `TripHistoryRepository.loadAll` already
+/// returns newest-first, but the list may be populated by another path
+/// (tests, a future sync source), so the ordering contract lives here
+/// rather than being assumed.
+
+@ProviderFor(tripsForVehicle)
+final tripsForVehicleProvider = TripsForVehicleFamily._();
+
+/// Trips for [vehicleId], newest first (#3985).
+///
+/// Was computed inside `TrajetsTab.build`, which re-ran the filter and
+/// the sort on every rebuild — a theme change, a keyboard opening — not
+/// on every data change. As a provider it runs once per change to the
+/// trip list and can be tested without pumping a widget.
+///
+/// A null [vehicleId] keeps every trip: the tab must not go silently
+/// empty just because the profile selector has never been used (#889).
+///
+/// The sort is defensive. `TripHistoryRepository.loadAll` already
+/// returns newest-first, but the list may be populated by another path
+/// (tests, a future sync source), so the ordering contract lives here
+/// rather than being assumed.
+
+final class TripsForVehicleProvider
+    extends
+        $FunctionalProvider<
+          List<TripHistoryEntry>,
+          List<TripHistoryEntry>,
+          List<TripHistoryEntry>
+        >
+    with $Provider<List<TripHistoryEntry>> {
+  /// Trips for [vehicleId], newest first (#3985).
+  ///
+  /// Was computed inside `TrajetsTab.build`, which re-ran the filter and
+  /// the sort on every rebuild — a theme change, a keyboard opening — not
+  /// on every data change. As a provider it runs once per change to the
+  /// trip list and can be tested without pumping a widget.
+  ///
+  /// A null [vehicleId] keeps every trip: the tab must not go silently
+  /// empty just because the profile selector has never been used (#889).
+  ///
+  /// The sort is defensive. `TripHistoryRepository.loadAll` already
+  /// returns newest-first, but the list may be populated by another path
+  /// (tests, a future sync source), so the ordering contract lives here
+  /// rather than being assumed.
+  TripsForVehicleProvider._({
+    required TripsForVehicleFamily super.from,
+    required String? super.argument,
+  }) : super(
+         retry: null,
+         name: r'tripsForVehicleProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$tripsForVehicleHash();
+
+  @override
+  String toString() {
+    return r'tripsForVehicleProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<List<TripHistoryEntry>> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  List<TripHistoryEntry> create(Ref ref) {
+    final argument = this.argument as String?;
+    return tripsForVehicle(ref, argument);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<TripHistoryEntry> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<TripHistoryEntry>>(value),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is TripsForVehicleProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$tripsForVehicleHash() => r'63ea5669a615b09be83769735e1147033f94fbf1';
+
+/// Trips for [vehicleId], newest first (#3985).
+///
+/// Was computed inside `TrajetsTab.build`, which re-ran the filter and
+/// the sort on every rebuild — a theme change, a keyboard opening — not
+/// on every data change. As a provider it runs once per change to the
+/// trip list and can be tested without pumping a widget.
+///
+/// A null [vehicleId] keeps every trip: the tab must not go silently
+/// empty just because the profile selector has never been used (#889).
+///
+/// The sort is defensive. `TripHistoryRepository.loadAll` already
+/// returns newest-first, but the list may be populated by another path
+/// (tests, a future sync source), so the ordering contract lives here
+/// rather than being assumed.
+
+final class TripsForVehicleFamily extends $Family
+    with $FunctionalFamilyOverride<List<TripHistoryEntry>, String?> {
+  TripsForVehicleFamily._()
+    : super(
+        retry: null,
+        name: r'tripsForVehicleProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Trips for [vehicleId], newest first (#3985).
+  ///
+  /// Was computed inside `TrajetsTab.build`, which re-ran the filter and
+  /// the sort on every rebuild — a theme change, a keyboard opening — not
+  /// on every data change. As a provider it runs once per change to the
+  /// trip list and can be tested without pumping a widget.
+  ///
+  /// A null [vehicleId] keeps every trip: the tab must not go silently
+  /// empty just because the profile selector has never been used (#889).
+  ///
+  /// The sort is defensive. `TripHistoryRepository.loadAll` already
+  /// returns newest-first, but the list may be populated by another path
+  /// (tests, a future sync source), so the ordering contract lives here
+  /// rather than being assumed.
+
+  TripsForVehicleProvider call(String? vehicleId) =>
+      TripsForVehicleProvider._(argument: vehicleId, from: this);
+
+  @override
+  String toString() => r'tripsForVehicleProvider';
+}
+
 /// App-wide access to the [TripHistoryRepository] (#726).
 ///
 /// Returns null when the underlying Hive box isn't open — widget

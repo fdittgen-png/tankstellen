@@ -18,6 +18,36 @@ import '../../../core/logging/app_log.dart';
 
 part 'trip_history_provider.g.dart';
 
+/// Trips for [vehicleId], newest first (#3985).
+///
+/// Was computed inside `TrajetsTab.build`, which re-ran the filter and
+/// the sort on every rebuild — a theme change, a keyboard opening — not
+/// on every data change. As a provider it runs once per change to the
+/// trip list and can be tested without pumping a widget.
+///
+/// A null [vehicleId] keeps every trip: the tab must not go silently
+/// empty just because the profile selector has never been used (#889).
+///
+/// The sort is defensive. `TripHistoryRepository.loadAll` already
+/// returns newest-first, but the list may be populated by another path
+/// (tests, a future sync source), so the ordering contract lives here
+/// rather than being assumed.
+@riverpod
+List<TripHistoryEntry> tripsForVehicle(Ref ref, String? vehicleId) {
+  final trips = ref.watch(tripHistoryListProvider);
+  final filtered = vehicleId == null
+      ? trips.toList()
+      : trips
+            .where((t) => t.vehicleId == null || t.vehicleId == vehicleId)
+            .toList();
+  return filtered
+    ..sort((a, b) {
+      final ax = a.summary.startedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+      final bx = b.summary.startedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+      return bx.compareTo(ax);
+    });
+}
+
 /// App-wide access to the [TripHistoryRepository] (#726).
 ///
 /// Returns null when the underlying Hive box isn't open — widget

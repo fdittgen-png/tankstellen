@@ -26,18 +26,16 @@ class FeatureFlagDumpScreen extends ConsumerWidget {
     final on = l.developerToolsFlagOn;
     final off = l.developerToolsFlagOff;
 
-    final features = Feature.values.toList()
-      ..sort((a, b) => a.name.compareTo(b.name));
 
     return PageScaffold(
       title: l.developerToolsFeatureFlagDump,
       bodyPadding: EdgeInsets.zero,
       body: ListView.separated(
         padding: const EdgeInsets.symmetric(vertical: 8),
-        itemCount: features.length,
+        itemCount: _featuresByName.length,
         separatorBuilder: (context, index) => const Divider(height: 1),
         itemBuilder: (context, index) {
-          final f = features[index];
+          final f = _featuresByName[index];
           final isOn = enabled.contains(f);
           return ListTile(
             key: Key('flagDump_${f.name}'),
@@ -60,3 +58,10 @@ class FeatureFlagDumpScreen extends ConsumerWidget {
     );
   }
 }
+
+/// Every [Feature] in name order (#3985).
+///
+/// `Feature.values` never changes at runtime, so sorting it inside
+/// `build` re-did the same work on every rebuild of the dump screen.
+final List<Feature> _featuresByName = Feature.values.toList()
+  ..sort((a, b) => a.name.compareTo(b.name));

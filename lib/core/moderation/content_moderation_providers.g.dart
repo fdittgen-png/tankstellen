@@ -186,3 +186,62 @@ final class ContentReportSubmitProvider
 
 String _$contentReportSubmitHash() =>
     r'9aeb9e068a008f21860cab1706635f643e8c1e54';
+
+/// The blocked authors, in a stable display order (#3985).
+///
+/// The moderation store is a `Set`, so the UI has to sort it before it
+/// can list it. Doing that in the section's `build` re-sorted on every
+/// rebuild; here it happens once per change to the set.
+
+@ProviderFor(sortedBlockedAuthors)
+final sortedBlockedAuthorsProvider = SortedBlockedAuthorsProvider._();
+
+/// The blocked authors, in a stable display order (#3985).
+///
+/// The moderation store is a `Set`, so the UI has to sort it before it
+/// can list it. Doing that in the section's `build` re-sorted on every
+/// rebuild; here it happens once per change to the set.
+
+final class SortedBlockedAuthorsProvider
+    extends $FunctionalProvider<List<String>, List<String>, List<String>>
+    with $Provider<List<String>> {
+  /// The blocked authors, in a stable display order (#3985).
+  ///
+  /// The moderation store is a `Set`, so the UI has to sort it before it
+  /// can list it. Doing that in the section's `build` re-sorted on every
+  /// rebuild; here it happens once per change to the set.
+  SortedBlockedAuthorsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'sortedBlockedAuthorsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$sortedBlockedAuthorsHash();
+
+  @$internal
+  @override
+  $ProviderElement<List<String>> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  List<String> create(Ref ref) {
+    return sortedBlockedAuthors(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<String> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<String>>(value),
+    );
+  }
+}
+
+String _$sortedBlockedAuthorsHash() =>
+    r'6e19fdd95bb6602f11c0c0562ccb3dd028979ac7';

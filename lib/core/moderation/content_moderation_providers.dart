@@ -115,3 +115,12 @@ typedef ContentReportSubmit = Future<bool> Function({
 ContentReportSubmit contentReportSubmit(Ref ref) =>
     ({required String targetKind, required String targetId}) =>
         ContentReportsSync.submit(targetKind: targetKind, targetId: targetId);
+
+/// The blocked authors, in a stable display order (#3985).
+///
+/// The moderation store is a `Set`, so the UI has to sort it before it
+/// can list it. Doing that in the section's `build` re-sorted on every
+/// rebuild; here it happens once per change to the set.
+@riverpod
+List<String> sortedBlockedAuthors(Ref ref) =>
+    ref.watch(blockedContentAuthorsProvider).toList()..sort();
