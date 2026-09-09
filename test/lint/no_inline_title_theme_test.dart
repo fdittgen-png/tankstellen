@@ -46,8 +46,6 @@ void main() {
       // - alerts_screen.dart : `titleMedium` "Radius alerts (n)"
       //   header with a trailing IconButton. Migration to
       //   SectionHeader.trailing tracked as #923-followup.
-      // - price_history_screen.dart : `titleMedium` fuel-type display
-      //   inside a card. Value display, not a heading.
       // - add_charging_log_screen.dart : `headlineSmall` centered
       //   empty-state ("Add a vehicle first"). Empty states use a
       //   larger style than SectionHeader.
@@ -65,7 +63,6 @@ void main() {
       //   section header.
       const allowlist = <String>{
         'lib/features/alerts/presentation/screens/alerts_screen.dart',
-        'lib/features/price_history/presentation/screens/price_history_screen.dart',
         'lib/features/charging/presentation/screens/add_charging_log_screen.dart',
         'lib/features/trips/presentation/screens/trip_detail_screen.dart',
         'lib/features/trips/presentation/screens/trip_recording_screen.dart',

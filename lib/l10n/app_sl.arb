@@ -230,7 +230,6 @@
   "favoritesDataCache": "Podatki priljubljenih",
   "citySearchCache": "Iskanje mesta",
   "noPriceHistory": "Še ni zgodovine cen",
-  "noStatistics": "Ni razpoložljivih statistik",
   "showAllFuelTypes": "Prikaži vse vrste goriv",
   "connected": "Povezano",
   "disconnectTankSync": "Prekini TankSync",
@@ -6520,5 +6519,10 @@
         "type": "int"
       }
     }
+  },
+  "showFewerFuelTypes": "Show fewer fuel types",
+  "@showFewerFuelTypes": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

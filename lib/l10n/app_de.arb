@@ -399,7 +399,6 @@
   "favoritesDataCache": "Favoritendaten",
   "citySearchCache": "Stadtsuche",
   "noPriceHistory": "Noch kein Preisverlauf",
-  "noStatistics": "Keine Statistiken verfügbar",
   "showAllFuelTypes": "Alle Kraftstoffarten anzeigen",
   "connected": "Verbunden",
   "disconnectTankSync": "TankSync trennen",
@@ -1239,6 +1238,10 @@
         "example": "No internet connection"
       }
     }
+  },
+  "showFewerFuelTypes": "Weniger Kraftstoffarten anzeigen",
+  "@showFewerFuelTypes": {
+    "description": "Collapses the station-detail price history back to one fuel type; the counterpart of showAllFuelTypes (#3990)."
   },
   "achievementSmoothDriver": "Ruhige Serie",
   "@achievementSmoothDriver": {

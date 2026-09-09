@@ -6,20 +6,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/sync/price_history_sync.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../price_history/domain/entities/price_record.dart';
-import '../../../price_history/presentation/widgets/price_chart.dart';
-import '../../../price_history/providers/price_history_provider.dart';
+import '../../../price_history/api.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/station.dart';
 import '../../../../core/error/guarded.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import 'price_history_stats_row.dart';
+import '../../../../core/theme/app_text.dart';
+import '../../../../core/widgets/panel_card.dart';
+import '../../../price_history/presentation/widgets/fill_up_guidance_card.dart';
 
 /// Price history block of the station-detail screen — records the
 /// current price on init, then renders one of THREE honest states
@@ -54,6 +54,10 @@ class PriceHistorySection extends ConsumerStatefulWidget {
 
 class _PriceHistorySectionState extends ConsumerState<PriceHistorySection> {
   bool _recorded = false;
+
+  /// #3990 — "Show all fuel types" used to push a whole second screen that
+  /// duplicated this one. It expands here instead.
+  bool _showAllFuels = false;
   bool _fetchedFromDb = false;
 
   @override
@@ -167,12 +171,16 @@ class _PriceHistorySectionState extends ConsumerState<PriceHistorySection> {
           _SinglePoint(record: plottable.first, fuelType: defaultFuel)
         else
           ..._chartAndStats(context, history, plottable, defaultFuel),
+        if (_showAllFuels) ..._allFuelPanels(context),
         Align(
           alignment: AlignmentDirectional.centerEnd,
           child: TextButton(
+            key: const Key('price_history_toggle_all_fuels'),
             onPressed: () =>
-                PriceHistoryRoute(widget.stationId).push<void>(context),
-            child: Text(AppLocalizations.of(context).showAllFuelTypes),
+                setState(() => _showAllFuels = !_showAllFuels),
+            child: Text(_showAllFuels
+                ? AppLocalizations.of(context).showFewerFuelTypes
+                : AppLocalizations.of(context).showAllFuelTypes),
           ),
         ),
       ],
@@ -205,6 +213,59 @@ class _PriceHistorySectionState extends ConsumerState<PriceHistorySection> {
       ],
     ];
   }
+
+  /// Every fuel type this station has ever recorded a price for, each on
+  /// its own panel: the chart, the honest stats row and the fill-up
+  /// guidance the deleted screen used to carry (#3990).
+  ///
+  /// The fuels with no data render nothing — [PriceStats] comes back empty
+  /// and the panel is skipped, exactly as the old screen's section did.
+  List<Widget> _allFuelPanels(BuildContext context) {
+    final history = ref.watch(priceHistoryProvider(widget.stationId));
+    final panels = <Widget>[];
+    for (final fuel in _allFuelTypes) {
+      final stats = ref.watch(priceStatsProvider(widget.stationId, fuel));
+      if (stats.current == null && stats.min == null) continue;
+      final plottable = history
+          .where((r) => _priceOf(r, fuel) != null)
+          .toList(growable: false);
+      final oldest = plottable.isEmpty ? null : plottable.last;
+      panels.add(PanelCard(
+        margin: const EdgeInsets.only(bottom: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(fuel.displayName, style: AppText.title(context)),
+            const SizedBox(height: 12),
+            PriceChart(records: history, fuelType: fuel),
+            const SizedBox(height: 8),
+            PriceHistoryStatsRow(
+              stats: stats,
+              windowStartPrice:
+                  oldest == null ? null : _priceOf(oldest, fuel),
+              windowStartAt: oldest?.recordedAt,
+            ),
+            const SizedBox(height: 8),
+            // On-device "best time to fill up?" heuristic (#1543). Renders
+            // nothing when the gate is off or the data is too thin.
+            FillUpGuidanceCard(
+                stationId: widget.stationId, fuelType: fuel),
+          ],
+        ),
+      ));
+    }
+    return panels;
+  }
+
+  static const _allFuelTypes = [
+    FuelType.e5,
+    FuelType.e10,
+    FuelType.diesel,
+    FuelType.e98,
+    FuelType.e85,
+    FuelType.lpg,
+    FuelType.cng,
+  ];
 
   FuelType _pickFuelType(List<PriceRecord> history) {
     if (history.isEmpty) return FuelType.diesel;

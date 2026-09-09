@@ -230,7 +230,6 @@
   "favoritesDataCache": "Data oblíbených",
   "citySearchCache": "Hledání města",
   "noPriceHistory": "Zatím žádná historie cen",
-  "noStatistics": "Žádné statistiky k dispozici",
   "showAllFuelTypes": "Zobrazit všechny typy paliv",
   "connected": "Připojeno",
   "disconnectTankSync": "Odpojit TankSync",
@@ -6520,5 +6519,10 @@
         "type": "int"
       }
     }
+  },
+  "showFewerFuelTypes": "Show fewer fuel types",
+  "@showFewerFuelTypes": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

@@ -230,7 +230,6 @@
   "favoritesDataCache": "Mėgstamiausių duomenys",
   "citySearchCache": "Miesto paieška",
   "noPriceHistory": "Kainų istorijos dar nėra",
-  "noStatistics": "Nėra prieinamų statistikų",
   "showAllFuelTypes": "Rodyti visus degalų tipus",
   "connected": "Prisijungta",
   "disconnectTankSync": "Atjungti TankSync",
@@ -6520,5 +6519,10 @@
         "type": "int"
       }
     }
+  },
+  "showFewerFuelTypes": "Show fewer fuel types",
+  "@showFewerFuelTypes": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

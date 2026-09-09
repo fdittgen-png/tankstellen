@@ -805,9 +805,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get noPriceHistory => 'Все още няма ценова история';
 
   @override
-  String get noStatistics => 'Няма налични статистики';
-
-  @override
   String get showAllFuelTypes => 'Показване на всички видове горива';
 
   @override
@@ -3032,6 +3029,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String syncConnectionFailed(String error) {
     return 'Connection failed: $error';
   }
+
+  @override
+  String get showFewerFuelTypes => 'Show fewer fuel types';
 
   @override
   String get achievementSmoothDriver => 'Серия от плавно шофиране';

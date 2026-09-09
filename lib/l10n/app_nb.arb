@@ -230,7 +230,6 @@
   "favoritesDataCache": "Favorittdata",
   "citySearchCache": "Bysøk",
   "noPriceHistory": "Ingen prishistorikk ennå",
-  "noStatistics": "Ingen statistikk tilgjengelig",
   "showAllFuelTypes": "Vis alle drivstofftyper",
   "connected": "Tilkoblet",
   "disconnectTankSync": "Koble fra TankSync",
@@ -6520,5 +6519,10 @@
         "type": "int"
       }
     }
+  },
+  "showFewerFuelTypes": "Show fewer fuel types",
+  "@showFewerFuelTypes": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

@@ -230,7 +230,6 @@
   "favoritesDataCache": "Dane ulubionych",
   "citySearchCache": "Wyszukiwanie miasta",
   "noPriceHistory": "Brak historii cen",
-  "noStatistics": "Brak dostępnych statystyk",
   "showAllFuelTypes": "Pokaż wszystkie typy paliw",
   "connected": "Połączono",
   "disconnectTankSync": "Odłącz TankSync",
@@ -6520,5 +6519,10 @@
         "type": "int"
       }
     }
+  },
+  "showFewerFuelTypes": "Show fewer fuel types",
+  "@showFewerFuelTypes": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

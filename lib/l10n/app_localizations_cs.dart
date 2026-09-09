@@ -805,9 +805,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get noPriceHistory => 'Zatím žádná historie cen';
 
   @override
-  String get noStatistics => 'Žádné statistiky k dispozici';
-
-  @override
   String get showAllFuelTypes => 'Zobrazit všechny typy paliv';
 
   @override
@@ -3019,6 +3016,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String syncConnectionFailed(String error) {
     return 'Connection failed: $error';
   }
+
+  @override
+  String get showFewerFuelTypes => 'Show fewer fuel types';
 
   @override
   String get achievementSmoothDriver => 'Série plynulé jízdy';

@@ -806,9 +806,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get noPriceHistory => 'Sem histórico de preços ainda';
 
   @override
-  String get noStatistics => 'Sem estatísticas disponíveis';
-
-  @override
   String get showAllFuelTypes => 'Mostrar todos os tipos de combustível';
 
   @override
@@ -3029,6 +3026,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String syncConnectionFailed(String error) {
     return 'Connection failed: $error';
   }
+
+  @override
+  String get showFewerFuelTypes => 'Show fewer fuel types';
 
   @override
   String get achievementSmoothDriver => 'Sequência suave';

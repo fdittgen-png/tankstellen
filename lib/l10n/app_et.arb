@@ -230,7 +230,6 @@
   "favoritesDataCache": "Lemmikute andmed",
   "citySearchCache": "Linna otsing",
   "noPriceHistory": "Hinnaajalugu puudub",
-  "noStatistics": "Statistika pole saadaval",
   "showAllFuelTypes": "Näita kõiki kütuseliike",
   "connected": "Ühendatud",
   "disconnectTankSync": "Katkesta TankSync",
@@ -6520,5 +6519,10 @@
         "type": "int"
       }
     }
+  },
+  "showFewerFuelTypes": "Show fewer fuel types",
+  "@showFewerFuelTypes": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

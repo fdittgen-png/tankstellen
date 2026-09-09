@@ -806,9 +806,6 @@ class AppLocalizationsSk extends AppLocalizations {
   String get noPriceHistory => 'Zatiaľ žiadna história cien';
 
   @override
-  String get noStatistics => 'Žiadne štatistiky k dispozícii';
-
-  @override
   String get showAllFuelTypes => 'Zobraziť všetky typy palív';
 
   @override
@@ -3022,6 +3019,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String syncConnectionFailed(String error) {
     return 'Connection failed: $error';
   }
+
+  @override
+  String get showFewerFuelTypes => 'Show fewer fuel types';
 
   @override
   String get achievementSmoothDriver => 'Séria plynulej jazdy';

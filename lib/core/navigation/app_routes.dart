@@ -87,8 +87,6 @@ abstract final class RoutePaths {
   // Station detail family.
   static const stationPattern = '/station/:id';
   static String station(String id) => '/station/$id';
-  static const stationHistoryPattern = '/station/:id/history';
-  static String stationHistory(String id) => '/station/$id/history';
   static const evStation = '/ev-station';
   static const evStationPattern = '/ev-station/:id';
   static String evStationById(String id) => '/ev-station/$id';
@@ -141,14 +139,6 @@ final class StationDetailRoute extends AppRoute {
   final String stationId;
   @override
   String get location => RoutePaths.station(stationId);
-}
-
-/// Price-history chart for one station (`/station/:id/history`).
-final class PriceHistoryRoute extends AppRoute {
-  const PriceHistoryRoute(this.stationId);
-  final String stationId;
-  @override
-  String get location => RoutePaths.stationHistory(stationId);
 }
 
 /// User price-report flow (`/report/:id`).

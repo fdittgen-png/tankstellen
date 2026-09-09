@@ -17,8 +17,6 @@ library;
 export 'data/repositories/price_history_repository.dart';
 export 'domain/entities/price_prediction.dart';
 export 'domain/entities/price_record.dart';
-export 'presentation/screens/price_history_screen.dart';
 export 'presentation/widgets/price_chart.dart';
-export 'presentation/widgets/price_stats_card.dart';
 export 'providers/price_history_provider.dart';
 export 'providers/price_prediction_provider.dart';

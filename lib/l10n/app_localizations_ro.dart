@@ -805,9 +805,6 @@ class AppLocalizationsRo extends AppLocalizations {
   String get noPriceHistory => 'Încă nu există istoric de prețuri';
 
   @override
-  String get noStatistics => 'Nu sunt statistici disponibile';
-
-  @override
   String get showAllFuelTypes => 'Arată toate tipurile de carburant';
 
   @override
@@ -3030,6 +3027,9 @@ class AppLocalizationsRo extends AppLocalizations {
   String syncConnectionFailed(String error) {
     return 'Connection failed: $error';
   }
+
+  @override
+  String get showFewerFuelTypes => 'Show fewer fuel types';
 
   @override
   String get achievementSmoothDriver => 'Serie de condus lin';
