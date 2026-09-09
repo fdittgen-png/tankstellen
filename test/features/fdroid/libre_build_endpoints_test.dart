@@ -91,10 +91,7 @@ void main() {
       expect(pinned, isNotEmpty,
           reason: 'every build entry pins a full commit sha');
 
-      final declaresNonFreeNet =
-          RegExp(r'^AntiFeatures:(?:\s*\n\s+-.*)*NonFreeNet',
-                  multiLine: true)
-              .hasMatch(yaml);
+      final declaresNonFreeNet = declaresAntiFeature(yaml, 'NonFreeNet');
 
       final withoutReader = <String>[];
       for (final sha in pinned) {
@@ -118,6 +115,37 @@ void main() {
                 'TankSync defaults. Bump the pin or restore the AntiFeature');
       }
     });
+
+    // #4023 — the guard above reads the AntiFeature state, so it has to
+    // see BOTH spellings fdroiddata accepts. The previous regex saw only
+    // the list form and silently reported "none" for the map form the MR
+    // actually ships; pin both directions so that cannot recur.
+    test('the AntiFeature reader sees both spellings — fidelity check', () {
+      const listForm = 'AntiFeatures:\n  - NonFreeNet\n\nRepoType: git\n';
+      const mapForm = 'AntiFeatures:\n'
+          '  NonFreeNet:\n'
+          '    en-US: By default the map loads tiles through a proxy.\n'
+          '\nRepoType: git\n';
+      expect(declaresAntiFeature(listForm, 'NonFreeNet'), isTrue,
+          reason: 'the plain list form');
+      expect(declaresAntiFeature(mapForm, 'NonFreeNet'), isTrue,
+          reason: 'the localized map form — the one the MR ships');
+
+      // Negatives: a different AntiFeature, and the name appearing
+      // outside the block (a comment or another key) must not count.
+      expect(
+          declaresAntiFeature(
+              'AntiFeatures:\n  - Tracking\n\nRepoType: git\n', 'NonFreeNet'),
+          isFalse);
+      expect(declaresAntiFeature('# NonFreeNet was dropped\nRepoType: git\n',
+              'NonFreeNet'),
+          isFalse);
+      expect(
+          declaresAntiFeature(
+              'AntiFeatures:\n  - Tracking\nRepo: NonFreeNet\n', 'NonFreeNet'),
+          isFalse,
+          reason: 'a dedented key ends the block');
+    });
   });
 }
 
@@ -132,3 +160,39 @@ bool _readsLibreDefine(String sha) =>
     Process.runSync('git', ['grep', '-l', 'FDROID_LIBRE', sha, '--', 'lib/'])
         .exitCode ==
     0;
+
+/// Whether [yaml] declares [name] under `AntiFeatures:`.
+///
+/// #4023 — fdroiddata accepts TWO spellings, and this guard used to see
+/// only one:
+///
+/// ```yaml
+/// AntiFeatures:            AntiFeatures:
+///   - NonFreeNet             NonFreeNet:
+///                              en-US: why it applies
+/// ```
+///
+/// The MR ships the localized map form (the reviewer asked for the
+/// explanation), while the old regex — `^AntiFeatures:(?:\s*\n\s+-.*)*`
+/// `NonFreeNet` — matches only the list form. It reported "no
+/// AntiFeature" for a file that declares one, which flips this test into
+/// its opposite branch and fails with a message saying the reverse of
+/// the truth. It stayed green only because the mirror had drifted to the
+/// old form.
+///
+/// Reads the indented body under `AntiFeatures:` and accepts the name as
+/// a list item or as a key.
+bool declaresAntiFeature(String yaml, String name) {
+  final lines = yaml.split('\n');
+  final start = lines.indexWhere((l) => l.trimRight() == 'AntiFeatures:');
+  if (start < 0) return false;
+  for (var i = start + 1; i < lines.length; i++) {
+    final line = lines[i];
+    if (line.trim().isEmpty) continue;
+    // Dedent back to column 0 ends the block.
+    if (!line.startsWith(' ')) break;
+    final body = line.trim();
+    if (body == '- $name' || body == '$name:') return true;
+  }
+  return false;
+}
