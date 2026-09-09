@@ -23,11 +23,14 @@ import 'package:flutter_test/flutter_test.dart';
 ///   * But the version is not the cause. Master's `rewritemeta` run
 ///     locally produces byte-identical output to the packaged 2.4.5
 ///     release, and neither matches CI.
-///   * The difference is in **`ruamel.yaml`'s emitter**. Both fold at
-///     width 80. CI's generation keeps the word that crosses column 80
-///     and emits no trailing whitespace; the local one breaks *before*
-///     that word and leaves a trailing space. No fdroidserver version
-///     changes that.
+///   * The difference is `ruamel.yaml` **0.18.10 vs 0.18.15**. CI's
+///     `debian:trixie-slim` ships 0.18.10; homebrew and pip give 0.18.15.
+///     Both fold at width 80, but 0.18.10 keeps the word that crosses
+///     column 80 and emits no trailing whitespace, while 0.18.15 breaks
+///     *before* it and leaves one. Proven by installing 0.18.10 locally
+///     and re-running master's `rewritemeta`: no diff. No fdroidserver
+///     version changes this — `setup.py` asks for `>= 0.17.22` with no
+///     upper bound, so the host decides.
 ///   * Local `rewritemeta` also re-flows the `prebuild:` / `build:`
 ///     shell command strings, which CI accepts as committed — so
 ///     running it introduces new diffs on top of not converging.

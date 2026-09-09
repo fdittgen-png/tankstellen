@@ -102,26 +102,36 @@ account.
    fdroid lint de.tankstellen.fuelprices
    ```
 
-   > **Do NOT run `fdroid rewritemeta` locally.** It cannot converge on this
-   > machine and it damages the recipe (#4023).
+   > **`fdroid rewritemeta` only works if your `ruamel.yaml` matches CI's.**
+   > Measured (#4023, confirmed upstream): fdroiddata CI runs
+   > `debian:trixie-slim`, whose `python3-ruamel.yaml` is **0.18.10**. With
+   > **0.18.15** — what you get from homebrew, and from any `pip install`
+   > today — the same command produces a different file *and* damages the
+   > recipe.
    >
    > fdroiddata's pipeline runs `fdroid rewritemeta` and fails if the result
    > differs from what you committed. Reproducing it locally does not work:
    >
-   > * CI downloads fdroidserver **master** on every run, so there is no
-   >   release to match — but the version is not the cause. Master's
-   >   `rewritemeta` run locally is byte-identical to the packaged release,
-   >   and neither matches CI.
-   > * The difference is **`ruamel.yaml`'s emitter**. Both fold at width 80;
-   >   CI's generation keeps the word that crosses column 80 and emits no
-   >   trailing whitespace, the local one breaks *before* it and leaves a
-   >   trailing space.
+   > * It is **not** the fdroidserver version. CI downloads fdroidserver
+   >   **master** on every run, and master's `rewritemeta` run locally is
+   >   byte-identical to the packaged 2.4.5 release — neither matches CI.
+   > * It is `ruamel.yaml` **0.18.10 (CI) vs 0.18.15 (local)**. Both fold at
+   >   width 80; 0.18.10 keeps the word that crosses column 80 and emits no
+   >   trailing whitespace, 0.18.15 breaks *before* it and leaves one.
+   >   `fdroidserver/setup.py` asks for `ruamel.yaml >= 0.17.22` with **no
+   >   upper bound**, so the version you get is whatever is newest.
    > * Local `rewritemeta` also re-flows the `prebuild:` / `build:` **shell
    >   commands** — splitting `$(( $$VERCODE$$ / 10 ))` across lines — which
    >   CI accepts as committed. So it adds new diffs on top of not
    >   converging.
    >
-   > Instead:
+   > Either pin ruamel to CI's version:
+   > ```
+   > pip install --target /tmp/r 'ruamel.yaml==0.18.10'
+   > PYTHONPATH=/tmp/r fdroid rewritemeta de.tankstellen.fuelprices
+   > ```
+   > or — no Python setup, and what CI-parity actually rests on here — use
+   > our own implementation of the rule:
    > ```
    > dart run tool/fdroid_canonicalize.dart          # rewrites to CI's form
    > dart run tool/fdroid_canonicalize.dart --check  # or just verify
