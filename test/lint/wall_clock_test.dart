@@ -88,7 +88,7 @@ void main() {
     'lib/features/alerts/background/background_alert_scan_coordinator.dart': 2,
     'lib/features/alerts/data/repositories/alert_repository.dart': 1,
     'lib/features/alerts/data/test_alert_runner.dart': 1,
-    'lib/features/alerts/presentation/widgets/create_alert_dialog.dart': 1,
+    'lib/features/alerts/presentation/widgets/station_alert_create_sheet.dart': 1,
     'lib/features/alerts/presentation/widgets/radius_alert_create_sheet.dart': 1,
     'lib/features/alerts/providers/alert_statistics_provider.dart': 1,
     'lib/features/approach/providers/fuel_station_radar_provider.dart': 1,

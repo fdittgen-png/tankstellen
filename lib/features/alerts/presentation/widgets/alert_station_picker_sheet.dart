@@ -13,22 +13,21 @@ import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/station.dart';
-import '../../domain/entities/price_alert.dart';
 import '../../providers/alert_provider.dart';
-import 'create_alert_dialog.dart';
+import 'station_alert_create_sheet.dart';
 
 /// Bottom sheet that lets the user pick one of their favorite stations to
 /// attach a price alert to (#2857).
 ///
 /// Before this, the Station-alerts "+" on the redesigned alerts screen was a
 /// dead-end: it only re-showed the "create from a station's detail page" hint.
-/// Station alerts are created via [CreateAlertDialog], which needs a station —
+/// Station alerts are created via [StationAlertCreateSheet], which needs a station —
 /// previously only reachable from the station-detail app bar. This picker
 /// reuses the same favorites-backed list as the consumption fill-up picker
 /// ([PickStationForFillUpScreen]) and the existing `pickStation*` strings, but
 /// — unlike that screen, which `pushReplacement`s into the fill-up form —
 /// RETURNS the chosen [Station] via `Navigator.pop`, so the caller can hand it
-/// straight to [CreateAlertDialog].
+/// straight to [StationAlertCreateSheet].
 ///
 /// When the user has no favorites yet, the sheet shows the empty hint plus a
 /// "Search" CTA that closes the sheet and navigates to the Search tab — the
@@ -50,9 +49,9 @@ class AlertStationPickerSheet extends ConsumerWidget {
   }
 
   /// The full Station-alert add flow (#2857): pick a favorite station, run the
-  /// same [CreateAlertDialog] the station-detail app bar uses, and persist the
+  /// same [StationAlertCreateSheet] the station-detail app bar uses, and persist the
   /// result via [AlertNotifier.addAlert]. Mirrors
-  /// `StationDetailAppBarActions._showCreateAlertDialog` so an alert created
+  /// `StationDetailAppBarActions._showStationAlertCreateSheet` so an alert created
   /// from the alerts screen is byte-identical to one created from detail.
   static Future<void> addStationAlert(
     BuildContext context,
@@ -61,13 +60,11 @@ class AlertStationPickerSheet extends ConsumerWidget {
     final station = await show(context);
     if (station == null || !context.mounted) return;
 
-    final alert = await showDialog<PriceAlert>(
-      context: context,
-      builder: (_) => CreateAlertDialog(
-        stationId: station.id,
-        stationName: _stationLabel(station),
-        currentPrice: station.diesel ?? station.e10 ?? station.e5,
-      ),
+    final alert = await StationAlertCreateSheet.show(
+      context,
+      stationId: station.id,
+      stationName: _stationLabel(station),
+      currentPrice: station.diesel ?? station.e10 ?? station.e5,
     );
     if (alert == null || !context.mounted) return;
 

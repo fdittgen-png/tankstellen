@@ -932,6 +932,24 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String loyaltyCardDeleted(String card) {
+    return '$card gelöscht';
+  }
+
+  @override
+  String durationMinutesShort(int minutes) {
+    return '$minutes Min.';
+  }
+
+  @override
+  String durationHoursMinutes(int hours, int minutes) {
+    return '$hours Std. $minutes Min.';
+  }
+
+  @override
+  String get savedRoutesLoading => 'Gespeicherte Routen werden geladen…';
+
+  @override
   String get refreshFailed =>
       'Aktualisierung fehlgeschlagen. Bitte erneut versuchen.';
 

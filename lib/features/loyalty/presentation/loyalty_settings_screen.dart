@@ -1,17 +1,20 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/page_scaffold.dart';
 import '../../../core/widgets/confirm_delete_dialog.dart';
+import '../../../core/widgets/snackbar_helper.dart';
 import '../../../l10n/app_localizations.dart';
 import '../domain/entities/loyalty_card.dart';
 import '../providers/loyalty_provider.dart';
 import 'widgets/loyalty_add_card_sheet.dart';
 import 'widgets/loyalty_card_tile.dart';
-import 'widgets/loyalty_empty_state.dart';
 
 /// Settings sub-screen that lists every registered fuel-club card and
 /// lets the user add, toggle, and delete one (#1120 pilot).
@@ -23,9 +26,11 @@ import 'widgets/loyalty_empty_state.dart';
 /// bottom sheet. When the list is empty an explanatory empty state
 /// stands in for the cards so first-time users know what to do.
 ///
-/// The empty state, list tile, and add-card bottom sheet were
-/// extracted to `widgets/` (#563) to keep this file under the 300-LOC
-/// guideline. Behaviour is unchanged.
+/// The list tile and add-card bottom sheet were extracted to
+/// `widgets/` (#563) to keep this file under the 300-LOC guideline.
+/// #3993 — the bespoke empty state gave way to core's `EmptyState`,
+/// and deleting a card now offers the same 10-second undo every other
+/// list in the app offers.
 class LoyaltySettingsScreen extends ConsumerWidget {
   const LoyaltySettingsScreen({super.key});
 
@@ -39,7 +44,11 @@ class LoyaltySettingsScreen extends ConsumerWidget {
       subtitle: l.loyaltySettingsSubtitle,
       bannerIcon: Icons.card_membership,
       body: cards.isEmpty
-          ? const LoyaltyEmptyState()
+          ? EmptyState(
+              icon: Icons.card_membership,
+              title: l.loyaltyEmptyTitle,
+              subtitle: l.loyaltyEmptyBody,
+            )
           : ListView.separated(
               padding: const EdgeInsets.only(bottom: 96),
               itemCount: cards.length,
@@ -96,6 +105,19 @@ class LoyaltySettingsScreen extends ConsumerWidget {
     );
     if (confirmed) {
       await cards.remove(card.id);
+      // #3993 — confirmation and undo answer different mistakes: the
+      // dialog catches the tap you did not mean, the undo catches the
+      // one you meant on the wrong card. `upsert` restores the captured
+      // card verbatim, id and addedAt included.
+      if (context.mounted) {
+        SnackBarHelper.showWithUndo(
+          context,
+          l.loyaltyCardDeleted(card.label.trim().isEmpty
+              ? card.brand.canonicalBrand
+              : card.label),
+          onUndo: () => unawaited(cards.upsert(card)),
+        );
+      }
     }
   }
 }

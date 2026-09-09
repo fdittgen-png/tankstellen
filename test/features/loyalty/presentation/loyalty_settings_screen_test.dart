@@ -8,6 +8,8 @@ import 'package:tankstellen/features/loyalty/domain/entities/loyalty_card.dart';
 import 'package:tankstellen/features/loyalty/presentation/loyalty_settings_screen.dart';
 import 'package:tankstellen/features/loyalty/providers/loyalty_provider.dart';
 
+import 'package:tankstellen/core/widgets/empty_state.dart';
+
 import '../../../helpers/pump_app.dart';
 
 /// In-memory fake repository so screen tests don't depend on a real
@@ -74,6 +76,8 @@ void main() {
       await pumpScreen(tester);
 
       expect(find.text('No fuel club cards yet'), findsOneWidget);
+      // #3993 — the SHARED empty state, not a fourth hand-built one.
+      expect(find.byType(EmptyState), findsOneWidget);
       // Exactly one "Add card" surface — the bottom-right FAB (#1329).
       expect(find.text('Add card'), findsOneWidget);
       expect(
@@ -154,6 +158,36 @@ void main() {
       expect(find.text('About-to-die'), findsNothing);
       expect(find.text('No fuel club cards yet'), findsOneWidget);
       expect(repo.loadAll(), isEmpty);
+    });
+
+    testWidgets('deleting offers an undo that brings the card back '
+        'unchanged (#3993)', (tester) async {
+      final card = LoyaltyCard(
+        id: 'pre-seeded',
+        brand: LoyaltyBrand.totalEnergies,
+        discountPerLiter: 0.05,
+        label: 'About-to-die',
+        addedAt: DateTime(2026, 4, 1),
+      );
+      await repo.upsert(card);
+      await pumpScreen(tester);
+
+      await tester.tap(find.byIcon(Icons.delete_outline));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
+      await tester.pumpAndSettle();
+
+      // The confirmation catches the tap you did not mean; the undo
+      // catches the one you meant on the wrong card.
+      expect(find.text('Deleted About-to-die'), findsOneWidget);
+      await tester.tap(find.text('Undo'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('About-to-die'), findsOneWidget);
+      final restored = repo.loadAll().single;
+      expect(restored.id, 'pre-seeded');
+      expect(restored.addedAt, DateTime(2026, 4, 1));
+      expect(restored.discountPerLiter, 0.05);
     });
 
     testWidgets(

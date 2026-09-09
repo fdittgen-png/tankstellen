@@ -480,6 +480,14 @@
     }
   },
   "loadingRoute": "Loading route: {name}",
+  "loyaltyCardDeleted": "Deleted {card}",
+  "@loyaltyCardDeleted": {"description": "Undo snackbar after deleting a fuel-club card (#3993). {card} is the user's own label, or the brand name when they left the label blank.", "placeholders": {"card": {"type": "String"}}},
+  "durationMinutesShort": "{minutes} min",
+  "@durationMinutesShort": {"description": "A travel duration under one hour, for list rows and summaries (#3993). 'min' is the locale's minute abbreviation.", "placeholders": {"minutes": {"type": "int"}}},
+  "durationHoursMinutes": "{hours} h {minutes} min",
+  "@durationHoursMinutes": {"description": "A travel duration of one hour or more (#3993). Both abbreviations are the locale's.", "placeholders": {"hours": {"type": "int"}, "minutes": {"type": "int"}}},
+  "savedRoutesLoading": "Loading your saved routes\u2026",
+  "@savedRoutesLoading": {"description": "Shown on the saved-routes screen while the first sync pull is still running, so a user whose routes live only on the server is never told they have none (#3993)."},
   "@loadingRoute": {
     "placeholders": {
       "name": {

@@ -926,6 +926,24 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String loyaltyCardDeleted(String card) {
+    return 'Deleted $card';
+  }
+
+  @override
+  String durationMinutesShort(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String durationHoursMinutes(int hours, int minutes) {
+    return '$hours h $minutes min';
+  }
+
+  @override
+  String get savedRoutesLoading => 'Loading your saved routes…';
+
+  @override
   String get refreshFailed => 'Refresh failed. Please try again.';
 
   @override
@@ -9910,6 +9928,24 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String loadingRoute(String name) {
     return '⟦Łóáđîñǧ řóúŧé: $name ·····⟧';
   }
+
+  @override
+  String loyaltyCardDeleted(String card) {
+    return '⟦Đéłéŧéđ $card ···⟧';
+  }
+
+  @override
+  String durationMinutesShort(int minutes) {
+    return '⟦$minutes ɱîñ ·⟧';
+  }
+
+  @override
+  String durationHoursMinutes(int hours, int minutes) {
+    return '⟦$hours ĥ $minutes ɱîñ ··⟧';
+  }
+
+  @override
+  String get savedRoutesLoading => '⟦Łóáđîñǧ ýóúř šáṽéđ řóúŧéš… ··········⟧';
 
   @override
   String get refreshFailed =>

@@ -13,8 +13,7 @@ import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/animated_favorite_star.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../alerts/domain/entities/price_alert.dart';
-import '../../../alerts/presentation/widgets/create_alert_dialog.dart';
+import '../../../alerts/presentation/widgets/station_alert_create_sheet.dart';
 import '../../../alerts/providers/alert_provider.dart';
 import '../../../favorites/providers/favorites_provider.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
@@ -63,7 +62,7 @@ class StationDetailAppBarActions extends ConsumerWidget {
           IconButton(
             key: const Key('create_price_alert'),
             icon: const Icon(Icons.notifications_outlined),
-            onPressed: () => _showCreateAlertDialog(context, ref),
+            onPressed: () => _showStationAlertCreateSheet(context, ref),
             tooltip: l10n.createAlert,
           ),
         // #1638 — the scan-payment-QR action is gated on the central
@@ -99,7 +98,7 @@ class StationDetailAppBarActions extends ConsumerWidget {
     );
   }
 
-  Future<void> _showCreateAlertDialog(
+  Future<void> _showStationAlertCreateSheet(
     BuildContext context,
     WidgetRef ref,
   ) async {
@@ -110,13 +109,11 @@ class StationDetailAppBarActions extends ConsumerWidget {
         : stationId;
     final currentPrice = s?.diesel ?? s?.e10 ?? s?.e5;
 
-    final alert = await showDialog<PriceAlert>(
-      context: context,
-      builder: (context) => CreateAlertDialog(
-        stationId: stationId,
-        stationName: stationName,
-        currentPrice: currentPrice,
-      ),
+    final alert = await StationAlertCreateSheet.show(
+      context,
+      stationId: stationId,
+      stationName: stationName,
+      currentPrice: currentPrice,
     );
 
     if (alert != null && context.mounted) {

@@ -390,7 +390,7 @@ const _featurePairBaseline = <String, int>{
   'setup -> feature_management': 4,
   'setup -> profile': 4,
   'setup -> vehicle': 7,
-  'station_detail -> alerts': 3,
+  'station_detail -> alerts': 2,
   'station_detail -> favorites': 1,
   'station_detail -> feature_management': 2,
   'station_detail -> payment': 3,

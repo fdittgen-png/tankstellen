@@ -1833,6 +1833,30 @@ abstract class AppLocalizations {
   /// **'Loading route: {name}'**
   String loadingRoute(String name);
 
+  /// Undo snackbar after deleting a fuel-club card (#3993). {card} is the user's own label, or the brand name when they left the label blank.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted {card}'**
+  String loyaltyCardDeleted(String card);
+
+  /// A travel duration under one hour, for list rows and summaries (#3993). 'min' is the locale's minute abbreviation.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String durationMinutesShort(int minutes);
+
+  /// A travel duration of one hour or more (#3993). Both abbreviations are the locale's.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} h {minutes} min'**
+  String durationHoursMinutes(int hours, int minutes);
+
+  /// Shown on the saved-routes screen while the first sync pull is still running, so a user whose routes live only on the server is never told they have none (#3993).
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your saved routes…'**
+  String get savedRoutesLoading;
+
   /// No description provided for @refreshFailed.
   ///
   /// In en, this message translates to:
