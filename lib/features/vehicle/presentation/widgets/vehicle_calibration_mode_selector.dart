@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+
+import '../../../../core/widgets/panel_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/app_localizations.dart';
@@ -51,11 +53,9 @@ class VehicleCalibrationModeSelector extends ConsumerWidget {
 
     final tooltip = l.calibrationModeTooltip;
 
-    return Card(
+    return PanelCard(
       margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
+      child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
@@ -126,7 +126,6 @@ class VehicleCalibrationModeSelector extends ConsumerWidget {
               body: l.calibrationModeFuzzyDescription,
             ),
           ],
-        ),
       ),
     );
   }

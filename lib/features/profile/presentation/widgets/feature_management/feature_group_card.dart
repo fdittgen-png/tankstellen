@@ -8,6 +8,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../core/widgets/snackbar_helper.dart';
 import '../../../../../l10n/app_localizations.dart';
+
+import '../../../../../core/theme/spacing.dart';
+import '../../../../../core/widgets/panel_card.dart';
 import '../../../../feature_management/application/app_profile_provider.dart';
 import '../../../../feature_management/application/feature_flags_provider.dart';
 import '../../../../feature_management/domain/feature.dart';
@@ -38,38 +41,39 @@ class FeatureGroupCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final hasChildren = group.children.isNotEmpty;
-    return Card(
+    return PanelCard(
       key: Key('featureGroup_${group.parent.name}'),
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            FeatureToggle(
-              feature: group.parent,
-              isEnabled: currentlyEnabled.contains(group.parent),
-              manifest: manifest,
-              currentlyEnabled: currentlyEnabled,
+      margin: const EdgeInsets.symmetric(vertical: Spacing.sm),
+      padding: const EdgeInsets.symmetric(
+        horizontal: Spacing.md,
+        vertical: Spacing.sm,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          FeatureToggle(
+            feature: group.parent,
+            isEnabled: currentlyEnabled.contains(group.parent),
+            manifest: manifest,
+            currentlyEnabled: currentlyEnabled,
+          ),
+          if (hasChildren)
+            Divider(
+              height: 1,
+              thickness: 1,
+              color: theme.dividerColor.withValues(alpha: 0.4),
             ),
-            if (hasChildren)
-              Divider(
-                height: 1,
-                thickness: 1,
-                color: theme.dividerColor.withValues(alpha: 0.4),
+          for (final child in group.children)
+            Padding(
+              padding: const EdgeInsets.only(left: Spacing.xxl),
+              child: FeatureToggle(
+                feature: child,
+                isEnabled: currentlyEnabled.contains(child),
+                manifest: manifest,
+                currentlyEnabled: currentlyEnabled,
               ),
-            for (final child in group.children)
-              Padding(
-                padding: const EdgeInsets.only(left: 24),
-                child: FeatureToggle(
-                  feature: child,
-                  isEnabled: currentlyEnabled.contains(child),
-                  manifest: manifest,
-                  currentlyEnabled: currentlyEnabled,
-                ),
-              ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }

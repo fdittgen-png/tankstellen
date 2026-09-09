@@ -3,6 +3,9 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/spacing.dart';
+import '../../../../core/widgets/panel_card.dart';
+
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/reference_vehicle.dart';
 import '../../../../core/domain/vehicle_profile.dart';
@@ -364,7 +367,10 @@ class _CalibrationSectionState extends State<CalibrationSection> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    return Card(
+    return PanelCard(
+      margin: const EdgeInsets.all(Spacing.sm),
+      // ExpansionTile owns its own insets, header included.
+      padding: EdgeInsets.zero,
       child: ExpansionTile(
         title: Text(l.calibrationAdvancedTitle),
         initiallyExpanded: false,

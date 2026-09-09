@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/theme_mode_provider.dart';
 import '../../../../core/widgets/page_scaffold.dart';
+import '../../../../core/theme/spacing.dart';
+import '../../../../core/widgets/panel_card.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Dedicated Theme settings screen (#897; Eco theme added #1712).
@@ -30,7 +32,7 @@ class ThemeSettingsScreen extends ConsumerWidget {
         groupValue: choice,
         onChanged: (picked) => _select(ref, picked),
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: Spacing.screenPadding,
           children: [
             _ThemeChoiceOption(
               choice: AppThemeChoice.system,
@@ -41,7 +43,7 @@ class ThemeSettingsScreen extends ConsumerWidget {
               onTap: () => _select(ref, AppThemeChoice.system),
               keyValue: 'themeSettingsOptionSystem',
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: Spacing.md),
             _ThemeChoiceOption(
               choice: AppThemeChoice.light,
               icon: Icons.light_mode,
@@ -51,7 +53,7 @@ class ThemeSettingsScreen extends ConsumerWidget {
               onTap: () => _select(ref, AppThemeChoice.light),
               keyValue: 'themeSettingsOptionLight',
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: Spacing.md),
             _ThemeChoiceOption(
               choice: AppThemeChoice.dark,
               icon: Icons.dark_mode,
@@ -61,7 +63,7 @@ class ThemeSettingsScreen extends ConsumerWidget {
               onTap: () => _select(ref, AppThemeChoice.dark),
               keyValue: 'themeSettingsOptionDark',
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: Spacing.md),
             _ThemeChoiceOption(
               choice: AppThemeChoice.eco,
               icon: Icons.energy_savings_leaf,
@@ -71,7 +73,9 @@ class ThemeSettingsScreen extends ConsumerWidget {
               onTap: () => _select(ref, AppThemeChoice.eco),
               keyValue: 'themeSettingsOptionEco',
             ),
-            SizedBox(height: MediaQuery.of(context).viewPadding.bottom + 16),
+            SizedBox(
+              height: MediaQuery.of(context).viewPadding.bottom + Spacing.xl,
+            ),
           ],
         ),
       ),
@@ -108,42 +112,40 @@ class _ThemeChoiceOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Card(
+    return PanelCard(
       key: Key(keyValue),
       margin: EdgeInsets.zero,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(8, 8, 16, 12),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Radio<AppThemeChoice>(value: choice),
-              const SizedBox(width: 4),
-              Icon(icon, size: 20),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 10),
-                    Text(
-                      label,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: selected
-                            ? FontWeight.bold
-                            : FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(description, style: theme.textTheme.bodySmall),
-                  ],
+      onTap: onTap,
+      padding: const EdgeInsets.fromLTRB(
+        Spacing.md,
+        Spacing.md,
+        Spacing.xl,
+        Spacing.lg,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Radio<AppThemeChoice>(value: choice),
+          const SizedBox(width: Spacing.sm),
+          Icon(icon, size: 20),
+          const SizedBox(width: Spacing.lg),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: Spacing.md),
+                Text(
+                  label,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: selected ? FontWeight.bold : FontWeight.w500,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: Spacing.sm),
+                Text(description, style: theme.textTheme.bodySmall),
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

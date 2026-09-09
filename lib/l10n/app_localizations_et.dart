@@ -2711,6 +2711,11 @@ class AppLocalizationsEt extends AppLocalizations {
   String get noStorageUsed => 'Salvestusruumi pole kasutatud';
 
   @override
+  String storageSegmentSemantics(String category, String size, int percent) {
+    return '$category: $size, $percent% of the total';
+  }
+
+  @override
   String get aboutReportBug => 'Teata veast / Tee ettepanek';
 
   @override

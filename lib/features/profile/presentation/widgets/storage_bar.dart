@@ -5,6 +5,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/theme/app_text.dart';
+import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/unit_formatter.dart';
 
 /// Minimum flex weight a non-zero [StorageBar] segment is given so a
@@ -54,11 +56,14 @@ class StorageBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Center(
-          child: Text(l10n.noStorageUsed, style: const TextStyle(fontSize: 11)),
+          // #3995 — a type role, not a hard 11 px: this line has to grow
+          // with the reader's text-size setting like everything else.
+          child: Text(l10n.noStorageUsed, style: AppText.label(context)),
         ),
       );
     }
 
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -66,23 +71,38 @@ class StorageBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           child: SizedBox(
             height: 24,
-            child: Row(
-              children: [
-                for (final seg in segments)
-                  // #2490 — any segment with measurable bytes gets at least
-                  // a [_kMinSegmentFlex] sliver of the bar so a small-but-
-                  // real category (e.g. a couple of favourites next to a
-                  // huge cache) never collapses to an invisible hairline.
-                  // Truly empty (0-byte) categories are still dropped.
-                  if (seg.bytes > 0)
-                    Expanded(
-                      flex: math.max(
-                        _kMinSegmentFlex,
-                        (seg.bytes / totalBytes * 1000).round(),
+            // #3995 — `explicitChildNodes` so each band is its own node.
+            // Without it the bar is ONE unlabelled control and its whole
+            // meaning — how the categories compare — is unavailable to a
+            // screen-reader user.
+            child: Semantics(
+              explicitChildNodes: true,
+              child: Row(
+                children: [
+                  for (final seg in segments)
+                    // #2490 — any segment with measurable bytes gets at
+                    // least a [_kMinSegmentFlex] sliver of the bar so a
+                    // small-but-real category (e.g. a couple of favourites
+                    // next to a huge cache) never collapses to an invisible
+                    // hairline. Truly empty (0-byte) categories are still
+                    // dropped.
+                    if (seg.bytes > 0)
+                      Expanded(
+                        flex: math.max(
+                          _kMinSegmentFlex,
+                          (seg.bytes / totalBytes * 1000).round(),
+                        ),
+                        child: Semantics(
+                          label: l10n.storageSegmentSemantics(
+                            seg.label,
+                            formatBytes(seg.bytes),
+                            (seg.bytes / totalBytes * 100).round(),
+                          ),
+                          child: Container(color: seg.color),
+                        ),
                       ),
-                      child: Container(color: seg.color),
-                    ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -90,7 +110,7 @@ class StorageBar extends StatelessWidget {
         // so the colours stop being arbitrary "what's the orange one
         // again?" guesses. #2490 — the legend now lists every segment the
         // bar renders (any non-zero category), so legend and bar agree.
-        const SizedBox(height: 6),
+        const SizedBox(height: Spacing.sm),
         Wrap(
           key: const Key('storage_bar_legend'),
           spacing: 8,
@@ -180,9 +200,10 @@ class StorageDetailRow extends StatelessWidget {
                 ),
                 Text(
                   detail,
-                  style: theme.textTheme.bodySmall?.copyWith(
+                  // #3995 — the role carries the size; a hard 11 px does
+                  // not scale with the text-size setting.
+                  style: AppText.label(context).copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
-                    fontSize: 11,
                   ),
                 ),
               ],

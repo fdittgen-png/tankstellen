@@ -28,6 +28,57 @@ void main() {
       expect(find.text('No storage used'), findsNothing);
     });
 
+    testWidgets('each band announces its own category, size and share '
+        '(#3995)', (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpApp(
+        tester,
+        StorageBar(
+          segments: const [
+            StorageSegment('Settings', 512, Colors.blue),
+            StorageSegment('Cache', 1536, Colors.red),
+          ],
+          totalBytes: 2048,
+          theme: testTheme,
+        ),
+      );
+
+      // Before #3995 the bar was ONE unlabelled control: a screen-reader
+      // user got the legend's category names and no sizes, so the
+      // comparison the bar exists to show was unavailable.
+      expect(
+        find.bySemanticsLabel('Settings: 512 B, 25% of the total'),
+        findsOneWidget,
+      );
+      expect(
+        find.bySemanticsLabel('Cache: 1,5 KB, 75% of the total'),
+        findsOneWidget,
+      );
+      handle.dispose();
+    });
+
+    testWidgets('a zero-byte category is announced by neither bar nor '
+        'legend (#3995)', (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpApp(
+        tester,
+        StorageBar(
+          segments: const [
+            StorageSegment('Settings', 1024, Colors.blue),
+            StorageSegment('Empty', 0, Colors.green),
+          ],
+          totalBytes: 1024,
+          theme: testTheme,
+        ),
+      );
+
+      expect(
+        find.bySemanticsLabel(RegExp('^Empty:')),
+        findsNothing,
+      );
+      handle.dispose();
+    });
+
     testWidgets('shows empty message when totalBytes is 0', (tester) async {
       await pumpApp(
         tester,
