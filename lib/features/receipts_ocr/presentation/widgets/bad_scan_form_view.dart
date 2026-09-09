@@ -62,6 +62,7 @@ class BadScanFormView extends StatelessWidget {
             enteredLiters: enteredLiters,
             enteredTotalCost: enteredTotalCost,
             l: l,
+            locale: Localizations.localeOf(context).toString(),
           ),
         ),
         const SizedBox(height: 16),

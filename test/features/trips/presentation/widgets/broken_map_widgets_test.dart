@@ -238,7 +238,7 @@ void main() {
         ],
       );
       await tester.pumpAndSettle();
-      expect(find.textContaining('MAP sensor diagnostics'), findsNothing);
+      expect(find.textContaining('Live fuel-use accuracy'), findsNothing);
     });
 
     testWidgets('renders blocklisted adapters with a Clear button',
@@ -309,9 +309,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('MAP sensor diagnostics'), findsOneWidget);
+      expect(find.textContaining('Live fuel-use accuracy'), findsOneWidget);
       expect(find.textContaining('80%'), findsOneWidget);
-      expect(find.textContaining('6 observations'), findsOneWidget);
+      expect(find.textContaining('Based on 6 trips'), findsOneWidget);
     });
   });
 }

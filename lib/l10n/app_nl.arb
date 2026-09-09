@@ -6562,5 +6562,25 @@
   "@savedRoutesLoading": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "qrPaymentUnknownBody": "This isn't a payment code SparKilo knows — it may be a loyalty or receipt code, or a payment scheme we haven't added yet. Nothing is wrong with your scan.",
+  "@qrPaymentUnknownBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "qrPaymentUnknownAction": "Report it and we'll try to add the scheme in a future release.",
+  "@qrPaymentUnknownAction": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "qrPaymentRawHeading": "What the code contains",
+  "@qrPaymentRawHeading": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "brokenMapDiagnosticsExplainer": "Live fuel use is worked out from the engine air-pressure reading (the MAP sensor) your car reports over OBD2. Some adapters report it wrong, which makes live fuel use look far too low — when that happens SparKilo shows your fill-up averages instead.",
+  "@brokenMapDiagnosticsExplainer": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

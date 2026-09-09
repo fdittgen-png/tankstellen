@@ -88,9 +88,11 @@ void main() {
       bumps: 1,
       decompositionIssue: null,
     ),
+    // #3996 — +2: the diagnostics card opens on a plain-language line
+    // explaining what the reading means, instead of on the posterior.
     'lib/features/trips/presentation/widgets/broken_map_widgets.dart': (
-      lines: 439,
-      bumps: 0,
+      lines: 441,
+      bumps: 1,
       decompositionIssue: null,
     ),
     // #2624 — shrank 463 → 450: dropped the post-frame `fitCamera` block

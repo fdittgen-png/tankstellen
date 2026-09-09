@@ -4,6 +4,7 @@
 import 'dart:ui' show Locale;
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:tankstellen/core/feedback/github_issue_reporter.dart';
 import 'package:tankstellen/features/receipts_ocr/data/receipt_parser.dart';
 import 'package:tankstellen/features/receipts_ocr/data/receipt_scan_service.dart';
@@ -16,6 +17,8 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 /// — no `BuildContext`, no provider reads — so a plain `flutter_test`
 /// without `pumpWidget` is the right fixture.
 void main() {
+  setUpAll(() => initializeDateFormatting('en'));
+
   final AppLocalizations l10nEn = lookupAppLocalizations(const Locale('en'));
 
   // ── Fixtures ────────────────────────────────────────────────────────
@@ -57,6 +60,7 @@ void main() {
         enteredLiters: 32.4,
         enteredTotalCost: 55.20,
         l: l10nEn,
+        locale: 'en',
       );
 
       expect(rows, hasLength(7));
@@ -66,19 +70,19 @@ void main() {
       expect(rows[0].scanned, 'super_u');
       expect(rows[0].real, 'super_u');
 
-      // Row 1: liters — 2-decimal formatted on both sides.
+      // Rows 1-3: #3996 — the DISPLAYED figures follow the reader's
+      // number format (default country FR → comma), unlike the share
+      // body and parsedFields map below, which stay machine-readable.
       expect(rows[1].label, 'Liters');
-      expect(rows[1].scanned, '32.50');
-      expect(rows[1].real, '32.40');
+      expect(rows[1].scanned, '32,50');
+      expect(rows[1].real, '32,40');
 
-      // Row 2: total — 2-decimal formatted.
       expect(rows[2].label, 'Total');
-      expect(rows[2].scanned, '55.12');
-      expect(rows[2].real, '55.20');
+      expect(rows[2].scanned, '55,12');
+      expect(rows[2].real, '55,20');
 
-      // Row 3: price/L — 3-decimal formatted on scan, dash on user side.
       expect(rows[3].label, 'Price/L');
-      expect(rows[3].scanned, '1.695');
+      expect(rows[3].scanned, '1,695');
       expect(rows[3].real, '—');
 
       // Row 4: station name passes through verbatim.
@@ -91,9 +95,10 @@ void main() {
       expect(rows[5].scanned, 'Super E10');
       expect(rows[5].real, '—');
 
-      // Row 6: date is the YYYY-MM-DD prefix of toIso8601String.
+      // Row 6: #3996 — the reader's date format, not ISO. The ISO
+      // string is still what the report payload carries.
       expect(rows[6].label, 'Date');
-      expect(rows[6].scanned, '2026-04-23');
+      expect(rows[6].scanned, 'Apr 23, 2026');
       expect(rows[6].real, '—');
     });
 
@@ -110,6 +115,7 @@ void main() {
         enteredLiters: null,
         enteredTotalCost: null,
         l: l10nEn,
+        locale: 'en',
       );
 
       // Liters / Total / Price/L scanned-side dashes.
@@ -137,13 +143,14 @@ void main() {
         enteredLiters: 12.345,
         enteredTotalCost: 24,
         l: l10nEn,
+        locale: 'en',
       );
 
-      expect(rows[1].scanned, '12.00');
-      expect(rows[1].real, '12.35'); // toStringAsFixed rounds half-up
-      expect(rows[2].scanned, '24.50');
-      expect(rows[2].real, '24.00');
-      expect(rows[3].scanned, '1.700');
+      expect(rows[1].scanned, '12,00');
+      expect(rows[1].real, '12,35'); // rounds half-up
+      expect(rows[2].scanned, '24,50');
+      expect(rows[2].real, '24,00');
+      expect(rows[3].scanned, '1,700');
     });
   });
 

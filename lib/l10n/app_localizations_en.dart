@@ -1546,6 +1546,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get qrPaymentUnknownTitle => 'Unrecognised code';
 
   @override
+  String get qrPaymentUnknownBody =>
+      'This isn\'t a payment code SparKilo knows — it may be a loyalty or receipt code, or a payment scheme we haven\'t added yet. Nothing is wrong with your scan.';
+
+  @override
+  String get qrPaymentUnknownAction =>
+      'Report it and we\'ll try to add the scheme in a future release.';
+
+  @override
+  String get qrPaymentRawHeading => 'What the code contains';
+
+  @override
   String get qrPaymentCopyRaw => 'Copy raw text';
 
   @override
@@ -3353,15 +3364,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get brokenMapChipDisclaimer => 'MAP readings suspicious';
+  String get brokenMapChipDisclaimer => 'May be reading low';
 
   @override
   String get brokenMapSnackbarUnreliable =>
-      'MAP sensor reads incorrectly — fuel readings may be 50–80% too low. Try a different adapter.';
+      'Live fuel use is reading 50–80% too low — your adapter’s sensor data looks wrong. A different adapter usually fixes it.';
 
   @override
   String get brokenMapBannerHardDisable =>
-      'MAP sensor unreliable. Showing fill-up averages instead of live fuel rate.';
+      'Live fuel use can’t be trusted on this adapter. Showing your fill-up averages instead.';
 
   @override
   String brokenMapOverlayPosterior(String posterior, String margin) {
@@ -3374,35 +3385,38 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get brokenMapDiagnosticsCardTitle => 'MAP sensor diagnostics';
+  String get brokenMapDiagnosticsCardTitle => 'Live fuel-use accuracy';
+
+  @override
+  String get brokenMapDiagnosticsExplainer =>
+      'Live fuel use is worked out from the engine air-pressure reading (the MAP sensor) your car reports over OBD2. Some adapters report it wrong, which makes live fuel use look far too low — when that happens SparKilo shows your fill-up averages instead.';
 
   @override
   String brokenMapDiagnosticsBeliefLine(String posterior, String margin) {
-    return 'Broken-MAP confidence: $posterior% ± $margin%';
+    return '$posterior% likely to read wrong (give or take $margin%)';
   }
 
   @override
   String brokenMapDiagnosticsObservationCount(int count) {
-    return '$count observations recorded';
+    return 'Based on $count trips so far';
   }
 
   @override
-  String get brokenMapDiagnosticsVerifiedBadge => 'Verified clean';
+  String get brokenMapDiagnosticsVerifiedBadge => 'Confirmed accurate';
 
   @override
-  String get brokenMapDiagnosticsBeliefNone =>
-      'This vehicle\'s MAP sensor hasn\'t been observed yet.';
+  String get brokenMapDiagnosticsBeliefNone => 'Not enough trips yet to tell.';
 
   @override
-  String get brokenMapDiagnosticsBlocklistHeading => 'Blocklisted adapters';
+  String get brokenMapDiagnosticsBlocklistHeading =>
+      'Adapters we no longer trust for this';
 
   @override
-  String get brokenMapDiagnosticsBlocklistEmpty =>
-      'No adapters are blocklisted.';
+  String get brokenMapDiagnosticsBlocklistEmpty => 'None so far.';
 
   @override
   String brokenMapDiagnosticsBlocklistEntry(String adapter, String percent) {
-    return '$adapter — flagged $percent% broken';
+    return '$adapter — $percent% likely to read wrong';
   }
 
   @override
@@ -10567,6 +10581,17 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get qrPaymentUnknownTitle => '⟦Úñřéçóǧñîšéđ çóđé ·······⟧';
 
   @override
+  String get qrPaymentUnknownBody =>
+      '⟦Ŧĥîš îšñ\'ŧ á ƥáýɱéñŧ çóđé ŠƥářĶîłó ķñóŵš — îŧ ɱáý ƀé á łóýáłŧý óř řéçéîƥŧ çóđé, óř á ƥáýɱéñŧ šçĥéɱé ŵé ĥáṽéñ\'ŧ áđđéđ ýéŧ. Ñóŧĥîñǧ îš ŵřóñǧ ŵîŧĥ ýóúř šçáñ. ······················································⟧';
+
+  @override
+  String get qrPaymentUnknownAction =>
+      '⟦Řéƥóřŧ îŧ áñđ ŵé\'łł ŧřý ŧó áđđ ŧĥé šçĥéɱé îñ á ƒúŧúřé řéłéášé. ······················⟧';
+
+  @override
+  String get qrPaymentRawHeading => '⟦Ŵĥáŧ ŧĥé çóđé çóñŧáîñš ·········⟧';
+
+  @override
   String get qrPaymentCopyRaw => '⟦Çóƥý řáŵ ŧéẋŧ ·····⟧';
 
   @override
@@ -12429,15 +12454,15 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   }
 
   @override
-  String get brokenMapChipDisclaimer => '⟦ṀÁƤ řéáđîñǧš šúšƥîçîóúš ·········⟧';
+  String get brokenMapChipDisclaimer => '⟦Ṁáý ƀé řéáđîñǧ łóŵ ·······⟧';
 
   @override
   String get brokenMapSnackbarUnreliable =>
-      '⟦ṀÁƤ šéñšóř řéáđš îñçóřřéçŧłý — ƒúéł řéáđîñǧš ɱáý ƀé 50–80% ŧóó łóŵ. Ŧřý á đîƒƒéřéñŧ áđáƥŧéř. ·······························⟧';
+      '⟦Łîṽé ƒúéł úšé îš řéáđîñǧ 50–80% ŧóó łóŵ — ýóúř áđáƥŧéř’š šéñšóř đáŧá łóóķš ŵřóñǧ. Á đîƒƒéřéñŧ áđáƥŧéř úšúáłłý ƒîẋéš îŧ. ········································⟧';
 
   @override
   String get brokenMapBannerHardDisable =>
-      '⟦ṀÁƤ šéñšóř úñřéłîáƀłé. Šĥóŵîñǧ ƒîłł-úƥ áṽéřáǧéš îñšŧéáđ óƒ łîṽé ƒúéł řáŧé. ···························⟧';
+      '⟦Łîṽé ƒúéł úšé çáñ’ŧ ƀé ŧřúšŧéđ óñ ŧĥîš áđáƥŧéř. Šĥóŵîñǧ ýóúř ƒîłł-úƥ áṽéřáǧéš îñšŧéáđ. ·······························⟧';
 
   @override
   String brokenMapOverlayPosterior(String posterior, String margin) {
@@ -12451,36 +12476,40 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get brokenMapDiagnosticsCardTitle =>
-      '⟦ṀÁƤ šéñšóř đîáǧñóšŧîçš ·········⟧';
+      '⟦Łîṽé ƒúéł-úšé áççúřáçý ·········⟧';
+
+  @override
+  String get brokenMapDiagnosticsExplainer =>
+      '⟦Łîṽé ƒúéł úšé îš ŵóřķéđ óúŧ ƒřóɱ ŧĥé éñǧîñé áîř-ƥřéššúřé řéáđîñǧ (ŧĥé ṀÁƤ šéñšóř) ýóúř çář řéƥóřŧš óṽéř ÓƁĐ2. Šóɱé áđáƥŧéřš řéƥóřŧ îŧ ŵřóñǧ, ŵĥîçĥ ɱáķéš łîṽé ƒúéł úšé łóóķ ƒář ŧóó łóŵ — ŵĥéñ ŧĥáŧ ĥáƥƥéñš ŠƥářĶîłó šĥóŵš ýóúř ƒîłł-úƥ áṽéřáǧéš îñšŧéáđ. ·························································································⟧';
 
   @override
   String brokenMapDiagnosticsBeliefLine(String posterior, String margin) {
-    return '⟦Ɓřóķéñ-ṀÁƤ çóñƒîđéñçé: $posterior% ± $margin% ·········⟧';
+    return '⟦$posterior% łîķéłý ŧó řéáđ ŵřóñǧ (ǧîṽé óř ŧáķé $margin%) ············⟧';
   }
 
   @override
   String brokenMapDiagnosticsObservationCount(int count) {
-    return '⟦$count óƀšéřṽáŧîóñš řéçóřđéđ ·········⟧';
+    return '⟦Ɓášéđ óñ $count ŧřîƥš šó ƒář ········⟧';
   }
 
   @override
-  String get brokenMapDiagnosticsVerifiedBadge => '⟦Ṽéřîƒîéđ çłéáñ ······⟧';
+  String get brokenMapDiagnosticsVerifiedBadge =>
+      '⟦Çóñƒîřɱéđ áççúřáŧé ········⟧';
 
   @override
   String get brokenMapDiagnosticsBeliefNone =>
-      '⟦Ŧĥîš ṽéĥîçłé\'š ṀÁƤ šéñšóř ĥášñ\'ŧ ƀééñ óƀšéřṽéđ ýéŧ. ··················⟧';
+      '⟦Ñóŧ éñóúǧĥ ŧřîƥš ýéŧ ŧó ŧéłł. ··········⟧';
 
   @override
   String get brokenMapDiagnosticsBlocklistHeading =>
-      '⟦Ɓłóçķłîšŧéđ áđáƥŧéřš ·········⟧';
+      '⟦Áđáƥŧéřš ŵé ñó łóñǧéř ŧřúšŧ ƒóř ŧĥîš ··············⟧';
 
   @override
-  String get brokenMapDiagnosticsBlocklistEmpty =>
-      '⟦Ñó áđáƥŧéřš ářé ƀłóçķłîšŧéđ. ···········⟧';
+  String get brokenMapDiagnosticsBlocklistEmpty => '⟦Ñóñé šó ƒář. ····⟧';
 
   @override
   String brokenMapDiagnosticsBlocklistEntry(String adapter, String percent) {
-    return '⟦$adapter — ƒłáǧǧéđ $percent% ƀřóķéñ ······⟧';
+    return '⟦$adapter — $percent% łîķéłý ŧó řéáđ ŵřóñǧ ········⟧';
   }
 
   @override

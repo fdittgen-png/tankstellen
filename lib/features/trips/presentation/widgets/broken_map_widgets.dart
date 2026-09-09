@@ -309,6 +309,16 @@ class _BrokenMapDiagnosticsCardState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // #3996 — what the reading MEANS, before any number. The
+              // card used to open on a Bayesian posterior and its
+              // credible interval, on the vehicle SETTINGS screen.
+              Text(
+                l.brokenMapDiagnosticsExplainer,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 12),
               _beliefSection(l, theme, belief, hasBelief),
               const SizedBox(height: 12),
               Text(

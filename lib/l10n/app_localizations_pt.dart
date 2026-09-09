@@ -1558,6 +1558,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String get qrPaymentUnknownTitle => 'Código não reconhecido';
 
   @override
+  String get qrPaymentUnknownBody =>
+      'This isn\'t a payment code SparKilo knows — it may be a loyalty or receipt code, or a payment scheme we haven\'t added yet. Nothing is wrong with your scan.';
+
+  @override
+  String get qrPaymentUnknownAction =>
+      'Report it and we\'ll try to add the scheme in a future release.';
+
+  @override
+  String get qrPaymentRawHeading => 'What the code contains';
+
+  @override
   String get qrPaymentCopyRaw => 'Copiar texto não processado';
 
   @override
@@ -3411,6 +3422,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get brokenMapDiagnosticsCardTitle => 'Diagnóstico do sensor MAP';
+
+  @override
+  String get brokenMapDiagnosticsExplainer =>
+      'Live fuel use is worked out from the engine air-pressure reading (the MAP sensor) your car reports over OBD2. Some adapters report it wrong, which makes live fuel use look far too low — when that happens SparKilo shows your fill-up averages instead.';
 
   @override
   String brokenMapDiagnosticsBeliefLine(String posterior, String margin) {
