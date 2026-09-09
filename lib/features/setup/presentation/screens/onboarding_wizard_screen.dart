@@ -29,6 +29,7 @@ import '../widgets/onboarding_progress_indicator.dart';
 import '../widgets/preferences_step.dart';
 import '../widgets/profile_choice_step.dart';
 import '../widgets/vehicles_step.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 
 /// Multi-step onboarding wizard with progress indicator.
 ///
@@ -129,11 +130,11 @@ class _OnboardingWizardScreenState
     // once the user taps a card. If they hit the wizard's "Next" button
     // without picking, refuse with a hint — otherwise the wizard would
     // enter the next step with a null `activeAppProfileProvider`.
-    if (currentStep == 0 && ref.read(activeAppProfileProvider) == null) {
-      SnackBarHelper.showError(
-        context,
-        AppLocalizations.of(context).onboardingPickUseMode,
-      );
+    // #3987 — no error SnackBar: the Next button is disabled with the
+    // reason shown beside it while no use mode is picked. This guard only
+    // covers a programmatic call; the button cannot fire in that state.
+    if (_nextDisabledReason(currentStep, AppLocalizations.of(context)) !=
+        null) {
       return;
     }
     if (_isLastStep(currentStep)) {
@@ -268,10 +269,17 @@ class _OnboardingWizardScreenState
     _goToStep(_obd2StepIndex + 1);
   }
 
-  /// Picks a profile from step 0 and advances to step 1.
-  void _onProfilePicked() {
-    _goToStep(1);
-  }
+  /// #3987 — picking a use mode no longer advances by itself: Next is the
+  /// one primary action on every step, and it enables itself through the
+  /// watched [activeAppProfileProvider]. The callback stays so the step can
+  /// still tell the wizard a pick happened (haptics, analytics, later).
+  void _onProfilePicked() {}
+
+  /// Why Next is disabled on [step], or null when it may fire (#3987).
+  String? _nextDisabledReason(int step, AppLocalizations l10n) =>
+      step == 0 && ref.read(activeAppProfileProvider) == null
+          ? l10n.onboardingPickUseMode
+          : null;
 
   List<Widget> _buildSteps() {
     final country = ref.watch(activeCountryProvider);
@@ -317,15 +325,19 @@ class _OnboardingWizardScreenState
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     // Watch country to rebuild when it changes (affects step count).
     ref.watch(activeCountryProvider);
     final wizardState = ref.watch(onboardingWizardControllerProvider);
     final currentStep = wizardState.currentStep;
     final isLoading = wizardState.isLoading;
     final steps = _buildSteps();
+    final l10n = AppLocalizations.of(context);
 
-    return Scaffold(
+    // #3987 — a real page title (PageScaffold), and no `n / N` text: the
+    // progress indicator carries the position, visibly and as semantics.
+    return PageScaffold(
+      title: l10n.onboardingTitle,
+      automaticallyImplyLeading: false,
       body: SafeArea(
         child: Column(
           children: [
@@ -334,14 +346,6 @@ class _OnboardingWizardScreenState
             OnboardingProgressIndicator(
               currentStep: currentStep,
               stepCount: _stepCount,
-            ),
-            const SizedBox(height: 8),
-            // Step counter text
-            Text(
-              '${currentStep + 1} / $_stepCount',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
             ),
             const SizedBox(height: 8),
             // Page content
@@ -366,6 +370,7 @@ class _OnboardingWizardScreenState
               onBack: () => _back(currentStep),
               onNext: () => _next(currentStep),
               onSkip: () => _skip(currentStep),
+              nextDisabledReason: _nextDisabledReason(currentStep, l10n),
             ),
           ],
         ),

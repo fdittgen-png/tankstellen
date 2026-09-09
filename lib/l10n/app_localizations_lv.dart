@@ -203,12 +203,6 @@ class AppLocalizationsLv extends AppLocalizations {
   String get country => 'Valsts';
 
   @override
-  String get freeNoKey => 'Bezmaksas — atslēga nav nepieciešama';
-
-  @override
-  String get apiKeyRequired => 'Nepieciešama API atslēga';
-
-  @override
   String get dataTransparency => 'Datu caurredzamība';
 
   @override
@@ -6552,6 +6546,14 @@ class AppLocalizationsLv extends AppLocalizations {
   @override
   String get onboardingObd2LaterNote =>
       'Bluetooth OBD2 adapteri varat sapārot jebkurā laikā vēlāk transportlīdzekļa ekrānā, lai ierakstītu braucienus un nolasītu dzinēja datus.';
+
+  @override
+  String get onboardingTitle => 'Set up Sparkilo';
+
+  @override
+  String onboardingStepOf(int current, int total) {
+    return 'Step $current of $total';
+  }
 
   @override
   String get openHoursUnknown => 'Darba laiks nezināms';

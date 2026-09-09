@@ -97,7 +97,7 @@ void main() {
       // 8 steps for Germany (Profile, Country, Vehicle, OBD2,
       // Preferences, Landing, API Key, Done). Vehicle now BEFORE OBD2
       // (#1518 — flipped from the prior order).
-      expect(find.text('1 / 8'), findsOneWidget);
+      expect(_step(1, 8), findsOneWidget);
     });
 
     testWidgets('does not show Back button on first step', (tester) async {
@@ -113,7 +113,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Now on step 2: country/language
-      expect(find.text('2 / 8'), findsOneWidget);
+      expect(_step(2, 8), findsOneWidget);
       expect(find.text('Back'), findsOneWidget);
       expect(find.text('Language'), findsOneWidget);
       expect(find.text('Country'), findsOneWidget);
@@ -125,12 +125,12 @@ void main() {
       // Go to step 2
       await tester.tap(find.text('Next'));
       await tester.pumpAndSettle();
-      expect(find.text('2 / 8'), findsOneWidget);
+      expect(_step(2, 8), findsOneWidget);
 
       // Go back
       await tester.tap(find.text('Back'));
       await tester.pumpAndSettle();
-      expect(find.text('1 / 8'), findsOneWidget);
+      expect(_step(1, 8), findsOneWidget);
     });
 
     testWidgets('shows Skip button on API key step', (tester) async {
@@ -151,7 +151,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Step 7: API key (skippable)
-      expect(find.text('7 / 8'), findsOneWidget);
+      expect(_step(7, 8), findsOneWidget);
       expect(find.text('Skip'), findsOneWidget);
     });
 
@@ -172,13 +172,13 @@ void main() {
       await tester.tap(find.text('Next')); // Landing
       await tester.pumpAndSettle();
 
-      expect(find.text('7 / 8'), findsOneWidget);
+      expect(_step(7, 8), findsOneWidget);
 
       // Skip API key
       await tester.tap(find.text('Skip'));
       await tester.pumpAndSettle();
 
-      expect(find.text('8 / 8'), findsOneWidget);
+      expect(_step(8, 8), findsOneWidget);
       expect(find.text('All set!'), findsOneWidget);
     });
 
@@ -232,7 +232,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // 7 steps (Profile, Country, Vehicle, OBD2, Preferences, Landing, Done).
-      expect(find.text('1 / 7'), findsOneWidget);
+      expect(_step(1, 7), findsOneWidget);
 
       // Navigate through all steps, skipping Vehicle + OBD2.
       await tester.tap(find.text('Next'));
@@ -249,7 +249,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Should be on completion step
-      expect(find.text('7 / 7'), findsOneWidget);
+      expect(_step(7, 7), findsOneWidget);
       expect(find.text('All set!'), findsOneWidget);
       expect(find.text('Get started'), findsOneWidget);
     });
@@ -282,7 +282,7 @@ void main() {
       await tester.tap(find.text('Skip')); // OBD2
       await tester.pumpAndSettle();
 
-      expect(find.text('5 / 8'), findsOneWidget);
+      expect(_step(5, 8), findsOneWidget);
       expect(find.text('Your preferences'), findsOneWidget);
       expect(find.byType(Slider), findsOneWidget);
     });
@@ -302,7 +302,7 @@ void main() {
       await tester.tap(find.text('Next')); // Preferences
       await tester.pumpAndSettle();
 
-      expect(find.text('6 / 8'), findsOneWidget);
+      expect(_step(6, 8), findsOneWidget);
       expect(find.text('Home screen'), findsOneWidget);
     });
 
@@ -317,7 +317,7 @@ void main() {
       await tester.tap(find.text('Next'));
       await tester.pumpAndSettle();
 
-      expect(find.text('3 / 8'), findsOneWidget);
+      expect(_step(3, 8), findsOneWidget);
       expect(find.text('My vehicles (optional)'), findsOneWidget);
       expect(find.text('Skip'), findsOneWidget);
     });
@@ -333,7 +333,7 @@ void main() {
       await tester.tap(find.text('Skip')); // Vehicle
       await tester.pumpAndSettle();
 
-      expect(find.text('4 / 8'), findsOneWidget);
+      expect(_step(4, 8), findsOneWidget);
       expect(find.text('Connect your OBD2 adapter'), findsOneWidget);
       expect(find.text('Skip'), findsOneWidget);
       expect(find.text('Maybe later'), findsOneWidget);
@@ -379,7 +379,7 @@ void main() {
         try {
           await pumpIosWizard(tester);
           // 8 → 9: the platform-specific step is included.
-          expect(find.text('1 / 9'), findsOneWidget);
+          expect(_step(1, 9), findsOneWidget);
         } finally {
           debugDefaultTargetPlatformOverride = null;
         }
@@ -426,7 +426,7 @@ void main() {
           await tester.tap(find.text('Next')); // standby → OBD2
           await tester.pumpAndSettle();
 
-          expect(find.text('5 / 9'), findsOneWidget);
+          expect(_step(5, 9), findsOneWidget);
           // Apple forbids the "Connect" + "maybe later/skip" pattern in
           // front of a permission request — neither may render on iOS.
           expect(find.text('Connect adapter'), findsNothing);
@@ -436,7 +436,7 @@ void main() {
           // The wizard's neutral Next advances past the step.
           await tester.tap(find.text('Next'));
           await tester.pumpAndSettle();
-          expect(find.text('6 / 9'), findsOneWidget);
+          expect(_step(6, 9), findsOneWidget);
         } finally {
           debugDefaultTargetPlatformOverride = null;
         }
@@ -467,3 +467,12 @@ class _NullObd2Connector implements OnboardingObd2Connector {
   @override
   Future<String?> readVin(_) async => null;
 }
+
+/// #3987 — the wizard shows no `n / N` text any more; its position is the
+/// progress indicator's semantics label. Matched on the Semantics widget
+/// itself, so no SemanticsHandle is needed (flutter_test requires handles
+/// to be disposed before the test body ends, which a shared pump helper
+/// cannot guarantee).
+Finder _step(int n, int total) => find.byWidgetPredicate(
+      (w) => w is Semantics && w.properties.label == 'Step $n of $total',
+    );

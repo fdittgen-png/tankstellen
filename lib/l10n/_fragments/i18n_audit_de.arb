@@ -17,7 +17,7 @@
   "authInfoBenefit4": "• Konto jederzeit löschbar",
   "apiKeySetupTitle": "API-Schlüssel einrichten (optional)",
   "apiKeySetupDescription": "Registrieren Sie sich für einen kostenlosen API-Schlüssel oder erkunden Sie die App mit Demo-Daten.",
-  "apiKeyRegistrationButton": "{provider} Registrierung",
+  "apiKeyRegistrationButton": "Bei {provider} registrieren",
   "apiKeyTerms": "Mit Eingabe eines API-Schlüssels akzeptieren Sie die Nutzungsbedingungen von {provider}. Datenweitergabe ist untersagt.",
   "calculatorDistanceHint": "z. B. 150",
   "calculatorConsumptionHint": "z. B. 7,0",

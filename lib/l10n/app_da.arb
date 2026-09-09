@@ -60,8 +60,6 @@
   "noFavoritesHint": "Tryk på stjernen ved en tankstation for at gemme den som favorit.",
   "language": "Sprog",
   "country": "Land",
-  "freeNoKey": "Gratis — ingen nøgle nødvendig",
-  "apiKeyRequired": "API-nøgle påkrævet",
   "dataTransparency": "Datatransparens",
   "clearCache": "Ryd cache",
   "storageUsage": "Lagringsforbrug på denne enhed",
@@ -6004,6 +6002,24 @@
       "error": {
         "type": "String",
         "example": "No internet connection"
+      }
+    }
+  },
+  "onboardingTitle": "Set up Sparkilo",
+  "@onboardingTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "onboardingStepOf": "Step {current} of {total}",
+  "@onboardingStepOf": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
       }
     }
   }

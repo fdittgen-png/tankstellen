@@ -32,7 +32,7 @@
   "authInfoBenefit4": "• You can delete your account at any time",
   "apiKeySetupTitle": "API key setup (optional)",
   "apiKeySetupDescription": "Register for a free API key, or skip to explore the app with demo data.",
-  "apiKeyRegistrationButton": "{provider} Registration",
+  "apiKeyRegistrationButton": "Register with {provider}",
   "@apiKeyRegistrationButton": {
     "placeholders": {
       "provider": {"type": "String", "example": "ADAC"}

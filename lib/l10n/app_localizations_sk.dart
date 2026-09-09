@@ -203,12 +203,6 @@ class AppLocalizationsSk extends AppLocalizations {
   String get country => 'Krajina';
 
   @override
-  String get freeNoKey => 'Zadarmo — kľúč nie je potrebný';
-
-  @override
-  String get apiKeyRequired => 'Vyžaduje sa kľúč API';
-
-  @override
   String get dataTransparency => 'Transparentnosť údajov';
 
   @override
@@ -6535,6 +6529,14 @@ class AppLocalizationsSk extends AppLocalizations {
   @override
   String get onboardingObd2LaterNote =>
       'Adaptér Bluetooth OBD2 môžete kedykoľvek neskôr spárovať z obrazovky vozidla, aby ste mohli zaznamenávať jazdy a čítať údaje z motora.';
+
+  @override
+  String get onboardingTitle => 'Set up Sparkilo';
+
+  @override
+  String onboardingStepOf(int current, int total) {
+    return 'Step $current of $total';
+  }
 
   @override
   String get openHoursUnknown => 'Otváracie hodiny neznáme';

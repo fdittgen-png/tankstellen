@@ -60,8 +60,6 @@
   "noFavoritesHint": "Ťuknite na hviezdičku pri stanici, aby ste ju uložili do obľúbených.",
   "language": "Jazyk",
   "country": "Krajina",
-  "freeNoKey": "Zadarmo — kľúč nie je potrebný",
-  "apiKeyRequired": "Vyžaduje sa kľúč API",
   "dataTransparency": "Transparentnosť údajov",
   "clearCache": "Vymazať vyrovnávaciu pamäť",
   "storageUsage": "Využitie úložiska na tomto zariadení",
@@ -6502,6 +6500,24 @@
       "error": {
         "type": "String",
         "example": "No internet connection"
+      }
+    }
+  },
+  "onboardingTitle": "Set up Sparkilo",
+  "@onboardingTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "onboardingStepOf": "Step {current} of {total}",
+  "@onboardingStepOf": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
       }
     }
   }

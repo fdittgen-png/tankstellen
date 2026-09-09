@@ -203,12 +203,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get country => 'Country';
 
   @override
-  String get freeNoKey => 'Free — no key needed';
-
-  @override
-  String get apiKeyRequired => 'API key required';
-
-  @override
   String get dataTransparency => 'Data transparency';
 
   @override
@@ -279,7 +273,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'Free registration. Data from government price transparency agencies.';
 
   @override
-  String get apiKeyFormatError => 'Invalid format — expected UUID (8-4-4-4-12)';
+  String get apiKeyFormatError =>
+      'That doesn\'t look like an API key — expected 36 characters with dashes (8-4-4-4-12)';
 
   @override
   String get reportThisIssue => 'Report this issue';
@@ -5576,7 +5571,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String apiKeyRegistrationButton(String provider) {
-    return '$provider Registration';
+    return 'Register with $provider';
   }
 
   @override
@@ -6476,6 +6471,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get onboardingObd2LaterNote =>
       'You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.';
+
+  @override
+  String get onboardingTitle => 'Set up Sparkilo';
+
+  @override
+  String onboardingStepOf(int current, int total) {
+    return 'Step $current of $total';
+  }
 
   @override
   String get openHoursUnknown => 'Hours unknown';
@@ -9171,12 +9174,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get country => '⟦Çóúñŧřý ···⟧';
 
   @override
-  String get freeNoKey => '⟦Ƒřéé — ñó ķéý ñééđéđ ·······⟧';
-
-  @override
-  String get apiKeyRequired => '⟦ÁƤÎ ķéý řéɋúîřéđ ······⟧';
-
-  @override
   String get dataTransparency => '⟦Đáŧá ŧřáñšƥářéñçý ·······⟧';
 
   @override
@@ -9248,7 +9245,7 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get apiKeyFormatError =>
-      '⟦Îñṽáłîđ ƒóřɱáŧ — éẋƥéçŧéđ ÚÚÎĐ (8-4-4-4-12) ···········⟧';
+      '⟦Ŧĥáŧ đóéšñ\'ŧ łóóķ łîķé áñ ÁƤÎ ķéý — éẋƥéçŧéđ 36 çĥářáçŧéřš ŵîŧĥ đášĥéš (8-4-4-4-12) ························⟧';
 
   @override
   String get reportThisIssue => '⟦Řéƥóřŧ ŧĥîš îššúé ·······⟧';
@@ -14695,7 +14692,7 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String apiKeyRegistrationButton(String provider) {
-    return '⟦$provider Řéǧîšŧřáŧîóñ ·····⟧';
+    return '⟦Řéǧîšŧéř ŵîŧĥ $provider ·····⟧';
   }
 
   @override
@@ -15616,6 +15613,14 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get onboardingObd2LaterNote =>
       '⟦Ýóú çáñ ƥáîř á Ɓłúéŧóóŧĥ ÓƁĐ2 áđáƥŧéř áñýŧîɱé łáŧéř ƒřóɱ ŧĥé ṽéĥîçłé šçřééñ ŧó řéçóřđ ŧřîƥš áñđ řéáđ éñǧîñé đáŧá. ·········································⟧';
+
+  @override
+  String get onboardingTitle => '⟦Šéŧ úƥ Šƥářķîłó ······⟧';
+
+  @override
+  String onboardingStepOf(int current, int total) {
+    return '⟦Šŧéƥ $current óƒ $total ···⟧';
+  }
 
   @override
   String get openHoursUnknown => '⟦Ĥóúřš úñķñóŵñ ·····⟧';

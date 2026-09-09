@@ -60,8 +60,6 @@
   "noFavoritesHint": "Tik op de ster bij een tankstation om het als favoriet op te slaan.",
   "language": "Taal",
   "country": "Land",
-  "freeNoKey": "Gratis — geen sleutel nodig",
-  "apiKeyRequired": "API-sleutel vereist",
   "dataTransparency": "Gegevenstransparantie",
   "clearCache": "Cache wissen",
   "storageUsage": "Opslaggebruik op dit apparaat",
@@ -6502,6 +6500,24 @@
       "error": {
         "type": "String",
         "example": "No internet connection"
+      }
+    }
+  },
+  "onboardingTitle": "Set up Sparkilo",
+  "@onboardingTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "onboardingStepOf": "Step {current} of {total}",
+  "@onboardingStepOf": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
       }
     }
   }

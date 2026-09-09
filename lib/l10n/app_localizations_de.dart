@@ -204,12 +204,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get country => 'Land';
 
   @override
-  String get freeNoKey => 'Kostenlos — kein Schlüssel nötig';
-
-  @override
-  String get apiKeyRequired => 'API-Schlüssel erforderlich';
-
-  @override
   String get dataTransparency => 'Datentransparenz';
 
   @override
@@ -281,7 +275,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get apiKeyFormatError =>
-      'Ungültiges Format — UUID erwartet (8-4-4-4-12)';
+      'Das sieht nicht wie ein API-Schlüssel aus — erwartet werden 36 Zeichen mit Bindestrichen (8-4-4-4-12)';
 
   @override
   String get reportThisIssue => 'Dieses Problem melden';
@@ -5634,7 +5628,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String apiKeyRegistrationButton(String provider) {
-    return '$provider Registrierung';
+    return 'Bei $provider registrieren';
   }
 
   @override
@@ -6541,6 +6535,14 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get onboardingObd2LaterNote =>
       'Du kannst einen Bluetooth-OBD2-Adapter jederzeit später über den Fahrzeug-Bildschirm koppeln, um Fahrten aufzuzeichnen und Motordaten auszulesen.';
+
+  @override
+  String get onboardingTitle => 'Sparkilo einrichten';
+
+  @override
+  String onboardingStepOf(int current, int total) {
+    return 'Schritt $current von $total';
+  }
 
   @override
   String get openHoursUnknown => 'Öffnungszeiten unbekannt';

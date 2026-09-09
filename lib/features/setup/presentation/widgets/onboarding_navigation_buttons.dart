@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/theme/app_text.dart';
 
 /// Bottom navigation row of the onboarding wizard — Back / Skip / Next.
 ///
@@ -31,6 +32,11 @@ class OnboardingNavigationButtons extends StatelessWidget {
   final VoidCallback onNext;
   final VoidCallback onSkip;
 
+  /// #3987 — when non-null, *Next* is disabled and this text says why,
+  /// beside the buttons. Disabled-with-a-reason instead of an error
+  /// SnackBar after the tap.
+  final String? nextDisabledReason;
+
   const OnboardingNavigationButtons({
     super.key,
     required this.currentStep,
@@ -40,6 +46,7 @@ class OnboardingNavigationButtons extends StatelessWidget {
     required this.onBack,
     required this.onNext,
     required this.onSkip,
+    this.nextDisabledReason,
   });
 
   @override
@@ -52,7 +59,20 @@ class OnboardingNavigationButtons extends StatelessWidget {
         32,
         16 + MediaQuery.of(context).viewPadding.bottom,
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          if (nextDisabledReason != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(
+                nextDisabledReason!,
+                style: AppText.label(context),
+                textAlign: TextAlign.end,
+              ),
+            ),
+          Row(
         children: [
           // Back button — hidden on the first step but the empty SizedBox
           // keeps the right-side button aligned.
@@ -74,7 +94,8 @@ class OnboardingNavigationButtons extends StatelessWidget {
               ),
             ),
           FilledButton.icon(
-            onPressed: isLoading ? null : onNext,
+            onPressed:
+                isLoading || nextDisabledReason != null ? null : onNext,
             icon: isLoading
                 ? const SizedBox(
                     height: 18,
@@ -86,6 +107,8 @@ class OnboardingNavigationButtons extends StatelessWidget {
               isLastStep ? (l10n.onboardingFinish) : (l10n.onboardingNext),
             ),
           ),
+        ],
+      ),
         ],
       ),
     );

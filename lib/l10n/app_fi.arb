@@ -60,8 +60,6 @@
   "noFavoritesHint": "Napauta aseman tähteä tallentaaksesi sen suosikiksi.",
   "language": "Kieli",
   "country": "Maa",
-  "freeNoKey": "Ilmainen — avainta ei tarvita",
-  "apiKeyRequired": "API-avain vaaditaan",
   "dataTransparency": "Tietojen läpinäkyvyys",
   "clearCache": "Tyhjennä välimuisti",
   "storageUsage": "Tallennustilan käyttö tällä laitteella",
@@ -6502,6 +6500,24 @@
       "error": {
         "type": "String",
         "example": "No internet connection"
+      }
+    }
+  },
+  "onboardingTitle": "Set up Sparkilo",
+  "@onboardingTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "onboardingStepOf": "Step {current} of {total}",
+  "@onboardingStepOf": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
       }
     }
   }

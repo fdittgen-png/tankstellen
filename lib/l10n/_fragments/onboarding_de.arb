@@ -9,5 +9,10 @@
   "onboardingObd2LaterNote": "Du kannst einen Bluetooth-OBD2-Adapter jederzeit später über den Fahrzeug-Bildschirm koppeln, um Fahrten aufzuzeichnen und Motordaten auszulesen.",
   "@onboardingObd2LaterNote": {
     "description": "Informational note on the iOS variant of the OBD2 onboarding step (App Review 5.1.1(iv), #3535): no in-wizard connect flow on iOS, the adapter is paired later from the vehicle screen."
-  }
+  },
+  "onboardingTitle": "Sparkilo einrichten",
+  "@onboardingTitle": {"description": "Page title of the onboarding wizard (#3987). Sparkilo is the brand name."},
+  "onboardingStepOf": "Schritt {current} von {total}",
+  "@onboardingStepOf": {"description": "Semantics label of the onboarding progress indicator (#3987); replaces the visible 'n / N' counter.", "placeholders": {"current": {"type": "int"}, "total": {"type": "int"}}},
+  "@apiKeyRegisterWith": {"description": "Button that opens the API provider's registration page in the onboarding API-key step (#3987).", "placeholders": {"provider": {"type": "String", "example": "Tankerkönig"}}}
 }

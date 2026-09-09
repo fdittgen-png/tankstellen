@@ -60,8 +60,6 @@
   "noFavoritesHint": "Toca la estrella de una gasolinera para guardarla como favorita.",
   "language": "Idioma",
   "country": "País",
-  "freeNoKey": "Gratis — sin clave necesaria",
-  "apiKeyRequired": "Clave API necesaria",
   "dataTransparency": "Transparencia de datos",
   "clearCache": "Limpiar caché",
   "storageUsage": "Uso de almacenamiento en este dispositivo",
@@ -6004,6 +6002,24 @@
       "error": {
         "type": "String",
         "example": "No internet connection"
+      }
+    }
+  },
+  "onboardingTitle": "Set up Sparkilo",
+  "@onboardingTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "onboardingStepOf": "Step {current} of {total}",
+  "@onboardingStepOf": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
       }
     }
   }
