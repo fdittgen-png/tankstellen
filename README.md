@@ -17,7 +17,7 @@
 
 [![CI](https://github.com/fdittgen-png/tankstellen/actions/workflows/ci.yml/badge.svg)](https://github.com/fdittgen-png/tankstellen/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Flutter](https://img.shields.io/badge/Flutter-3.41-blue.svg)](https://flutter.dev)
+[![Flutter](https://img.shields.io/badge/Flutter-3.44-blue.svg)](https://flutter.dev)
 
 <p align="center">
   <a href="https://play.google.com/store/apps/details?id=de.tankstellen.fuelprices">
@@ -65,13 +65,16 @@ Features that don't serve at least one of those three layers don't belong.
 - **17 countries** — Germany, France, Austria, Spain, Italy, Denmark, Portugal, Luxembourg, Slovenia, UK, Argentina, Australia, Mexico, South Korea, Chile, Greece, Romania
 - **23 languages** — from Bulgarian to Swedish, every UI surface fully translated
 - **One central search button** — a docked button seated in a concave notch at the centre of the 5-tab bottom bar (Favorites · Map · **Search** · Fuel · Trips). Tap it to open the **Search criteria** sheet — Nearby vs Search-along-route, fuel-type chips (Super E10 / E5 / 98, Diesel, LPG, CNG, E85, plus EV charging), a radius slider, an *Open only* toggle, amenity filters (Shop, Car Wash, Air, WC…), a highway / no-highway filter, and *Save as my defaults*.
+- **Every price side by side** — a comparison table with one row per station and one column per grade, each cell carrying the price, the gap to the cheapest, and what a tank of it would cost. A price-per-litre list cannot answer *which grade is cheapest for my car here*; this does.
 - **Result sorting & detail** — *N stations found*, sort by Distance / Price / A-Z / 24h-open; each card shows price, an up/down price-trend arrow, a community star rating, amenity badges, distance, last-update time, and a one-tap favourite star.
 - **Route-aware search** — plan a trip and switch between *All stations* and *Best stops*; distances are measured **along the corridor**, the cheapest stop carries a *Cheapest* badge (e.g. *117 km · 78 min · 24 stations*), and a partial-results banner means a slow country never blocks the cheap result
 - **Cross-border route search** — a route that crosses a national border queries every country the corridor passes through, using each country's own data provider and the fuel grade from its matching profile. The result header credits all contributing sources (e.g. *España — Geoportal Gasolineras (MITECO) · France — Prix Carburants*). Results stream in progressively as each country's batch arrives — near stations appear first, and the full corridor populates within a few seconds.
 - **Cross-border suggestions** — when the next country over is meaningfully cheaper, the app says so
 - **Fuel Station Radar** — a one-tap scan centered on your current GPS position. On the search-results screen a floating *Start fuel station radar* pill launches it; the results list switches to *Fuel Station Radar result* mode and shows priced stations sorted by distance. During a trip recording a *Closest station* card is pinned to the top of the screen at all times — it shows the nearest station with its price and a proximity fill-bar, and you can swipe left/right to page through the ranked candidates. When you drive inside the station's configured radius the card locks onto that station and the approach overlay flips to the large-price PiP view.
 - **Price alerts** — per-station thresholds (e.g. *Diesel ≤ 2.040 €*) plus radius alerts (e.g. *Super E10 ≤ 2.100 € · 10 km*), with an Active / Today / This week activity summary. On-device, consent-respecting, evaluated only when you're nearby.
+- **Station page** — the full per-grade price table including the grades the station does *not* sell (an empty column is data, not a gap), opening hours, zone, amenities, payment methods, your private rating, and one honest price history rather than three that disagree.
 - **Price history & predictions** — 30-day charts plus "best time to fill" guidance (a day-of-week + price-threshold heuristic) from your local history
+- **Offline brand marks** — 60 licence-audited logos for every major European fuel brand and EV network are bundled with the app, so a station card carries its brand with no network call and no consent to give away.
 - **Brand filter** — Total / Esso / Shell / Aral, country-aware brand registry
 - **Favorites** — fuel stations (multi-fuel price rows: E5 / E10 / Diesel) and EV chargers (e.g. *120 kW · 3/3 available · CCS Type 2 · Type 2*) in one list, with swipe-to-navigate / swipe-to-remove; landscape splits the panel side-by-side with the alerts pane
 - **Home-screen widget** — current prices in two layouts (standard + predictive), a tap that opens the right station whether the app is cold or warm, plus a refresh button that re-pulls without ever opening the app
@@ -80,6 +83,8 @@ Features that don't serve at least one of those three layers don't belong.
 ### Layer 2 — burning less
 
 - **OBD2 optional, not required** — Medium-profile users record trajets with GPS alone (no adapter); Full-profile users get the full OBD2 telemetry pipeline. Both paths produce real L/100 km figures via a per-vehicle calibration matrix that refines after every fill-up.
+- **The pump is the truth** — a fill-up closes the loop: the app compares what you actually pumped against what the recordings estimated for the same tank, and derives a per-vehicle **pump calibration** from the difference. The tank report states the residual in plain words (*your recorded trips overestimate consumption by 31 %*) instead of hiding it in a coefficient.
+- **Driving-situation baseline** — every OBD2 sample is filed into one of nine situations (idle, stop & go, urban, highway, decelerating, climbing / loaded, cold start, sustained load, coasting), classified **rule-based** (one situation per sample) or **fuzzy** (spread across neighbours by fit — smoother around 60 km/h and on changing gradients). The screen names the situations it has never seen rather than pretending the profile is complete.
 - **GPS-only trajet recorder** — speed-band integration, accel/brake event counting, altitude grade tracking. The matrix maps the resulting feature set to an estimated L/100 km that converges toward your real-world fuel burn after 3–8 fill-ups.
 - **OBD2 trajet recorder** — any ELM327-compatible adapter (BLE classic + dual-mode, see the adapter registry); fuel rate, RPM, throttle %, engine load (when supported), GPS path. Speed-density fallback for cars without PID 5E.
 - **Always-both recording** — OBD2 and GPS run in parallel during every recording. Mid-trip adapter dropouts are tolerated; the trip classifies as `gpsOnly` / `gpsPlusObd2` / `hybrid` at trip end based on coverage ratio.
@@ -97,10 +102,11 @@ Features that don't serve at least one of those three layers don't belong.
 ### Layer 3 — seeing what you actually spend
 
 - **Fill-up log** — manual entry, pump-display OCR, receipt OCR, or OBD-II auto-import on disconnect; every fill shows L/100 km, the % delta vs the previous fill, and the €/L paid, exportable in one tap
-- **Fuel tab at a glance** — live tank level + estimated range (e.g. *≈ 434 km*), and a consumption-stats card with an accuracy indicator (*High · ±3-7 %*), the learned volumetric efficiency η_v, average L/100 km, average cost/km, total litres, total spent, fill-up count, and correction total
+- **Fuel tab at a glance** — live tank level + estimated range (e.g. *≈ 536 km*), a fill-up summary for the current tank (km since the last full tank, litres pumped, pump consumption, how much of it your recordings actually covered), and a consumption-stats card with an accuracy indicator (*High · ±3-7 %*), the **pump calibration** factor learned from your fill-ups, average L/100 km, average cost/km, total litres, total spent and fill-up count
 - **Trip history** — every recorded trip with distance, duration, avg consumption, fuel used, fuel cost, and a this-month-vs-last comparison
 - **Vehicle profiles** — combustion, hybrid, or EV; tank capacity, battery, connectors, multi-vehicle households
 - **Fuel-cost calculator** — distance × consumption × price → litres, total cost, and cost/km, with smart prefill from your active vehicle and profile
+- **Which fuel is cheapest to drive on** — cost per kilometre per fuel composition, from *your* measured consumption rather than a spec sheet, with the **break-even price** that makes it actionable: below 0.78 €/L, E5 wins; above it, E85 does. Runs on at least two full tanks per composition before it will crown a winner.
 - **Carbon dashboard** — total cost and total CO₂, plus consumption broken down by trip length (short < 5 / medium 5-25 / long > 25 km) and by speed band (idle, urban, suburban, rural, eco-cruise, motorway, motorway-fast) with each band's share of your driving
 - **Service reminders** — interval + mileage-driven, configurable per vehicle
 
@@ -111,6 +117,8 @@ Features that don't serve at least one of those three layers don't belong.
 - **Multiple profiles** — preferred fuel, search radius, start screen, and route-planning settings per profile; the redesigned profile editor groups everything into section cards with a docked Save bar.
 - **Grouped Settings** — Profile · Setup & data sources · Features & usage · Account & sync · Appearance · Privacy · About.
 - **Approach-station overlay** — when you drive near a station, a Picture-in-Picture overlay flips to a big live price (Epic #2065); a *Test approach overlay* button in the Privacy Dashboard fires a synthetic in-radius signal so you can verify it from the couch.
+- **Help where the question is** — a `?` beside a control opens the user guide at that exact control, in the app, in all seven guide languages. The guide is generated from the same source the wiki mirrors, so the answer on your phone and the answer on the web are the same sentence.
+- **One visual grammar** — type roles, surface levels, two chip roles and one focal number per card, applied across the core screens so a number that matters looks like one and a control that acts looks like one.
 - **Voice announcements** — spoken price/stop callouts while driving, in-car friendly.
 - **Local-first** — Hive storage, smart caching, offline-capable.
 - **Cross-device sync** — optional TankSync cloud backend (self-hostable via Supabase), free, anonymous-or-email auth, opt-in trajet sync for favourites, alerts, and trips.
@@ -132,57 +140,51 @@ Sparkilo is **local-first**: everything the app knows about you lives on your ph
 
 ## Screenshots
 
-Captured 2026-06 on Android running Sparkilo against the live `Prix-Carburants` (France) open data. The UI is fully localised across 23 languages — these are the French strings; English / German / 20 others render the same screens.
+Captured 2026-09-09 on Android running Sparkilo 6.0.5 against the live `Prix-Carburants` (France) and `Geoportal Gasolineras` (Spain) open data. The UI is fully localised across 23 languages — these are the English strings; the other 22 render the same screens. The full 66-image set, including every scroll position of the long screens, lives in the [wiki guide](https://github.com/fdittgen-png/tankstellen/wiki).
 
-### Find fuel & EV charging
+### Layer 1 — buy fuel for less money
 
-| Search criteria | Search results | Best stops along a route |
+| Search criteria | Search results | Every price, side by side |
 |:--:|:--:|:--:|
-| ![Search criteria sheet — Nearby vs Search-along-route toggle, fuel-type chips, 10 km radius slider, Open only toggle, amenity and highway filters, Save as my defaults](docs/screenshots/01-search-criteria.jpg) | ![Search results — France/Prix-Carburants source link, 10 stations found, Distance/Price/A-Z/24h sort chips, station cards with price arrows, star ratings and amenity badges](docs/screenshots/02-search-results.jpg) | ![Route mode in Best stops — 117 km / 78 min / 24 stations, the cheapest stop (Auchan 0.768 €) flagged Cheapest, distances measured along the corridor](docs/screenshots/03-route-best-stops.jpg) |
-| The central search button opens one sheet: Nearby vs along-route, fuel type, radius, Open-only, amenity and highway filters, then *Save as my defaults*. | Real-time official prices with a tappable data-source link, four sort modes, price-trend arrows, community ratings, amenity badges and a favourite star. | Plan a trip and surface the cheapest stops along it — *All stations* vs *Best stops*, with distances measured along the corridor. |
+| ![Search criteria sheet — Nearby vs Route, address field, fuel-type chips with E85 selected, a 25 km radius slider with 5/10/25 km presets, Open only, and amenity filters](docs/screenshots/01-search-criteria.jpg) | ![Search results — the France / Prix-Carburants source leading the summary band, station cards with the price large, a trend arrow, freshness, amenity badges, distance and a favourite star](docs/screenshots/02-search-results.jpg) | ![Results in price-matrix mode — one row per station and one column per grade (E5, E10, E98, E85), each cell showing the price, the delta to the cheapest, and what a tank would cost](docs/screenshots/03-price-matrix.jpg) |
+| One sheet behind the central search button: nearby or along a route, which grade, how far, open now, and what the forecourt must have. | Official prices with the open-data source credited and tappable. The price is the focal number; everything else is secondary by design. | The comparison table answers the question a price-per-litre list cannot: *which grade is actually cheapest for my car, here?* |
 
-| Map (route corridor) | Favorites — fuel & EV |
-|:--:|:--:|
-| ![Map view — Perpignan-to-Agde route polyline with green-to-red price pins along the corridor and a cheap-to-expensive legend](docs/screenshots/04-map-route-corridor.jpg) | ![Favorites tab — a 120 kW CCS/Type-2 EV charger (3/3 available) alongside fuel stations showing per-fuel E5/E10/Diesel price rows](docs/screenshots/05-favorites-fuel-and-ev.jpg) |
-| Interactive map with green-to-red price pins, the route corridor drawn as a polyline, plus EV-charging toggle, share and fit-to-results. | Saved fuel stations (multi-fuel price rows) and EV chargers (power, availability, connector types) in one list, with a tab to the price-alerts pane. |
-
-### Track & alert
-
-| Price alerts | Trips logbook |
-|:--:|:--:|
-| ![Price Alerts — Active/Today/This week summary, a per-station Diesel ≤ 2.040 € alert and a radius alert Super E10 ≤ 2.100 € · 10 km, each with an on/off toggle](docs/screenshots/06-price-alerts.jpg) | ![Trips tab — this-month-vs-last comparison and a list of recorded trips, each with date, distance, duration and L/100 km, plus a Start recording button](docs/screenshots/07-trips-list.jpg) |
-| Per-station thresholds and radius alerts in one place, with an Active / Today / This week activity summary. On-device and evaluated only when you're nearby. | Auto + manual trip recording with a month-over-month comparison. Every trip carries distance, duration and (when measured) real L/100 km. |
-
-### Consumption & coaching
-
-| Fuel + tank + stats | Carbon dashboard | Trip detail + GPS route |
+| Map | Station detail | Fuel Station Radar |
 |:--:|:--:|:--:|
-| ![Fuel tab — 30.4 L tank level / ≈ 434 km range, consumption stats with Accuracy High ±3-7 %, η_v 0.90, avg 6.57 L/100 km, cost/km, totals, and per-fill-up cards with L/100 km trend](docs/screenshots/08-fuel-stats.jpg) | ![Carbon dashboard — total cost 111 € and total CO2 173 kg, consumption by trip length (short/medium/long) and by speed band (idle, urban, suburban, rural, eco-cruise, motorway)](docs/screenshots/09-carbon-dashboard.jpg) | ![Trip detail — summary (Peugeot, vLinker OBD2 adapter, 46.9 km, 48m30s, 7.5 L/100 km, fuel used and cost, avg/max speed) and a GPS route map colour-coded Efficient/Borderline/Wasteful](docs/screenshots/10-trip-detail-gps-route.jpg) |
-| Live tank level and range, an accuracy indicator and learned η_v, L/100 km + cost/km totals, and per-fill-up trend chips with % delta and €/L. | Total cost and CO₂ at the top, then consumption sliced by trip length and by speed band — see exactly where the litres go. | The per-trip summary plus a GPS route map colour-coded by efficiency band — find your wasteful segments at a glance. |
+| ![Map — price pins coloured green to red across the Hérault, a radius circle around the current position, and a cheap-to-expensive legend](docs/screenshots/04-map-price-pins.jpg) | ![Station detail — the full per-fuel price table with Super E10, Diesel, Super 98 and E85, a "Not sold here" row, Add fill-up, opening hours and the zone](docs/screenshots/07-station-detail.jpg) | ![Radar view — a sweeping radar centred on the current position, price pills placed by bearing and distance out to 25 km, cheapest highlighted](docs/screenshots/05-radar.jpg) |
+| Price-coloured pins relative to what is on screen, so the cheap one is obvious before you read a single number. | Every grade the station reports, including the ones it does not sell — an empty column is data, not a gap. | A one-tap scan around your GPS position: bearing, distance and price at a glance, and it keeps running while you drive. |
 
-| Eco-coaching + engine usage | Trajets on map |
+| Favourites | EV charging |
 |:--:|:--:|
-| ![Trip detail — Top wasteful behaviours (low-gear labouring, hard accelerations wasting 1.5 L, high RPM) and How you used the engine (throttle-position % and engine-RPM-band %)](docs/screenshots/11-trip-eco-coaching.jpg) | ![Trajets on map — every recorded trip drawn as colour-coded polylines over southern France, from Montpellier to Provence-Alpes-Côte d'Azur](docs/screenshots/12-trajets-on-map.jpg) |
-| *Top wasteful behaviours* turns each trip into litres wasted; *How you used the engine* shows the throttle and RPM zones you actually drive in. | All your recorded trips layered onto a single map — see where you spend most of your driving life. |
+| ![Favourites — two saved stations with their full per-grade price rows and the Price Alerts tab beside them](docs/screenshots/06-favorites.jpg) | ![EV results — chargers with power in kW, connector chips for CCS Type 2 and Type 2, live availability and distance](docs/screenshots/10-ev-charging.jpg) |
+| The stations you actually use, with every grade they report and the alerts pane one tab away. | Open Charge Map chargers in the same list shape as fuel: power, connector, live availability. |
 
-### Right-size & privacy
+### Crossing a border
 
-| Feature presets | Privacy dashboard |
+| Cross-border results | Best stops on the map |
 |:--:|:--:|
-| ![Settings — Feature management with Basic / Medium / Full / Custom preset cards, each describing the feature set it enables](docs/screenshots/14-feature-presets.jpg) | ![Privacy Dashboard — your data belongs to you, with Profile, API keys (community + shared defaults), Cloud Sync status and a privacy summary](docs/screenshots/13-privacy-dashboard.jpg) |
-| Right-size the app: Basic (cheapest fuel + EV, favourites, alerts), Medium (+ manual fill-up & EV tracking), Full (+ OBD2 auto-record, driving scores, loyalty), or Custom. | See, export or delete everything stored on-device in one place; API keys go only to the service they belong to, and recorded trips leave the device only with optional TankSync trip sync. |
+| ![Route results for an 892 km Montpellier-to-Madrid corridor — the header credits Geoportal Gasolineras and Prix Carburants together, the cheapest stop flagged at 0.825 €/L in Perpignan, Spanish stations at 1.57 €/L below it](docs/screenshots/08-route-cross-border.jpg) | ![Route map — a French corridor from Paris to Montpellier with the three best stops pinned at 0.799, 0.818 and 0.819 €/L and a cheap-to-expensive legend](docs/screenshots/09-route-map-best-stops.jpg) |
+| A corridor that crosses a border queries every country it passes through, each with its own government source, and credits all of them. Here the French side is 0.825 € and the Spanish side 1.579 € for the same grade — the kind of gap that pays for the detour. | *Best stops* reduces 208 stations to the handful worth stopping at, measured along the corridor rather than as the crow flies. |
 
-### Fuel Station Radar & cross-border search
+### Layer 2 — burn less of it per kilometre
 
-| Radar — idle (search screen) | Radar — active results | Trip recording — radar card |
+| Trips & tank report | Route by efficiency | How you used the engine |
 |:--:|:--:|:--:|
-| ![Search results screen — France/Prix-Carburants source, 10 stations nearby, with a floating "Start fuel station radar" pill bottom-right](docs/screenshots/15-radar-search-fab.jpg) | ![Search results in Fuel Station Radar mode — "Fuel Station Radar result" chip in the header, 28 stations sorted by distance, with "Arrêter le radar" (Stop radar) pill](docs/screenshots/16-radar-active-results.jpg) | ![Trip recording screen — "Closest station" radar card pinned at the top, showing 18 Avenue de Verdun at 1.999 € Super E10 · 2.2 km away with a proximity fill-bar](docs/screenshots/18-trip-radar-card.jpg) |
-| Tap *Start fuel station radar* in the search results to scan around your current GPS position. The pill flips to *Stop radar* once active. | The results list switches to radar mode and shows all priced stations sorted by distance. The header chip confirms the data source. | During any trip recording a *Closest station* card is pinned to the top — nearest station, its price, fuel type, distance, and a fill-bar that fills as you approach. Swipe left/right to page through candidates. |
+| ![Trips tab — this month vs last month, then the tank report: 6.5 L/100 km from the pump, coverage bar, and the verdict that recorded trips overestimate consumption by 31 %](docs/screenshots/11-trips-tank-report.jpg) | ![Trip detail — the GPS route coloured Efficient / Borderline / Wasteful, and a Top wasteful behaviours card costing four stop-and-go restarts at 0.2 L and a 7 % climb at 0.1 L](docs/screenshots/12-trip-efficiency-route.jpg) | ![Trip detail — Where your fuel went, then throttle position broken into Coast 68 % / Light 30 % / Firm 1 % / Wide-open 1 % and engine RPM into Idle / Cruise / Spirited / Hard](docs/screenshots/13-trip-engine-usage.jpg) |
+| The pump is the truth: the tank report compares what you actually pumped against what the recordings estimated, and says by how much they were wrong. | The route is coloured by what each segment cost, and the wasteful behaviours are priced in litres, not adjectives. | The throttle and RPM zones you actually drive in — the readout that makes "drive more gently" a specific instruction. |
 
-| Cross-border route — dual-source header |
+| Baseline calibration |
 |:--:|
-| ![Search results for a 305 km cross-border route — header credits both "España — Geoportal Gasolineras (MITECO)" and "France — Prix Carburants (data.economie.gouv.fr)", 55 stations found, with a "Start fuel station radar" pill](docs/screenshots/17-cross-border-route-results.jpg) |
-| A route crossing the FR/ES border queries both country data providers simultaneously — the header credits both sources and results stream in as each country's batch resolves. |
+| ![Calibration — Baseline calibration at 210 of 270 samples, a warning that Decelerating and Sustained load are still empty, and per-situation bars for idle, stop & go, urban, highway, climbing, cold start and coasting](docs/screenshots/14-calibration-baseline.jpg) |
+| Each OBD2 sample is filed into a driving situation, and the app says which situations it has never seen rather than pretending the profile is complete. Rule-based or fuzzy classification is your choice. |
+
+### Layer 3 — see what you are really spending
+
+| Fuel tab | Cost per kilometre by fuel | Which fuel is cheapest to drive on |
+|:--:|:--:|:--:|
+| ![Fuel tab — fill-up summary for the tank of 5 September: 532 km, 34.7 L pumped, 6.5 L/100 km from the pump, recorded trips covering 88 % of it, and the pump calibration moving from x1.00 to x0.69](docs/screenshots/15-fuel-tab.jpg) | ![Consumption statistics — cost per kilometre by fuel: E85 at 0.050 €/km on 5.7 L/100 km over four full tanks, E5 at 0.127 €/km on 6.4 L/100 km, each with litres burned and CO2 per 100 km](docs/screenshots/16-cost-per-km-by-fuel.jpg) | ![Cost of driving, fuel by fuel — E85 is your cheapest fuel to drive on, E5 costs 77.48 EUR more per 1000 km, and E5 only beats E85 below 0.78 EUR per litre](docs/screenshots/17-cheapest-fuel-verdict.jpg) |
+| One fill-up, fully accounted: what you pumped, what the recordings claimed, and the correction the pump forced on them. | Cost per kilometre per fuel, from *your* measured consumption per composition — not from a spec sheet. | The verdict, with the break-even price that makes it actionable: below 0.78 €/L, E5 wins. Above it, E85 does. |
+
 
 ## How it works: radar, cross-border data, and incremental loading
 
@@ -229,7 +231,7 @@ Route searches sample the corridor at regular intervals, query each country's se
 
 ### Prerequisites
 
-- [Flutter SDK](https://docs.flutter.dev/get-started/install) (stable channel, 3.41+)
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) — **3.44.9**, the version CI pins and `pubspec.lock` requires
 - **For Android builds:** Android SDK with at least one emulator or connected device, plus JDK 17
 - **For iOS builds (macOS only):** Xcode 26+, CocoaPods 1.16+, Ruby 3.0+ with Bundler (see [docs/guides/ios-codesigning.md](docs/guides/ios-codesigning.md) for the fastlane match setup)
 
@@ -332,7 +334,7 @@ The app is designed to be easily extensible. Each of the 17 supported countries 
 
 | Layer | Technology |
 |-------|-----------|
-| Framework | Flutter 3.41 / Dart 3.11 |
+| Framework | Flutter 3.44.9 / Dart 3.12 |
 | State | Riverpod 3.0 with code generation |
 | Storage | Hive (local-first) + optional Supabase |
 | Networking | Dio 5.x with interceptors |
