@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/error/guarded.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../core/error/error_localizer.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../receipts_ocr/api.dart';
 import 'fill_up_scan_handlers.dart';
@@ -139,7 +140,13 @@ Future<void> runSharedReceiptScan(
       where: 'runSharedReceiptScan: shared receipt scan failed',
     );
     if (state.isMounted() && context.mounted) {
-      SnackBarHelper.showError(context, l.scanReceiptFailed(e.toString()));
+      // #3982 — the placeholder gets a LOCALIZED reason; `e.toString()`
+      // put an English (often stack-shaped) string inside a translated
+      // sentence.
+      SnackBarHelper.showError(
+        context,
+        l.scanReceiptFailed(ErrorLocalizer.localize(e, l)),
+      );
     }
   } finally {
     if (state.isMounted()) state.setScanning(false);

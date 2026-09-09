@@ -1893,6 +1893,18 @@ abstract class AppLocalizations {
   /// **'Server error. Please try again later.'**
   String get errorServer;
 
+  /// Subtitle of the About row (#3982). Was a hard-coded English 'Version' interpolated with the build number.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version}'**
+  String aboutVersionLine(String version);
+
+  /// Shown in the reference-vehicle picker when the catalog fails to load (#3982). {reason} is the localized message from ErrorLocalizer — never a raw exception.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load the vehicle catalog: {reason}'**
+  String referenceVehicleLoadFailed(String reason);
+
   /// No description provided for @errorTimeout.
   ///
   /// In en, this message translates to:

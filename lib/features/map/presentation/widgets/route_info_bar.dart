@@ -3,6 +3,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/utils/duration_formatter.dart';
+import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Compact info bar showing route distance, duration, station count, and action buttons.
@@ -35,7 +37,11 @@ class RouteInfoBar extends StatelessWidget {
           Icon(Icons.route, size: 12, color: theme.colorScheme.primary),
           const SizedBox(width: 4),
           Text(
-            '${distanceKm.round()}km \u00b7 ${durationMinutes.round()}min',
+            // #3982 - the distance follows the country's unit and the
+            // duration's abbreviation comes from ARB, as everywhere else
+            // since #3993.
+            '${UnitFormatter.formatDistance(distanceKm, fractionDigits: 0)}'
+            ' \u00b7 ${formatTravelDuration(l10n, durationMinutes)}',
             style: theme.textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.w600,
             ),

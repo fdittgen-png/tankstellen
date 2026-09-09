@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/debouncer.dart';
+import '../../../../core/error/error_localizer.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/reference_vehicle_catalog_provider.dart';
 import '../../domain/entities/reference_vehicle.dart';
@@ -198,7 +199,12 @@ class _ReferenceVehiclePickerState
                   error: (error, _) => Padding(
                     padding: const EdgeInsets.all(16),
                     child: Text(
-                      'Error: $error',
+                      // #3982 — was `'Error: $error'`: hard-coded English
+                      // AND the raw exception, so a French user read a
+                      // Dart stack fragment.
+                      l.referenceVehicleLoadFailed(
+                        ErrorLocalizer.localize(error, l),
+                      ),
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.error,
                       ),

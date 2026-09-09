@@ -963,6 +963,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorServer => 'Server error. Please try again later.';
 
   @override
+  String aboutVersionLine(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String referenceVehicleLoadFailed(String reason) {
+    return 'Couldn\'t load the vehicle catalog: $reason';
+  }
+
+  @override
   String get errorTimeout => 'Connection timed out. Please try again.';
 
   @override
@@ -9987,6 +9997,16 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get errorServer =>
       '⟦Šéřṽéř éřřóř. Ƥłéášé ŧřý áǧáîñ łáŧéř. ··············⟧';
+
+  @override
+  String aboutVersionLine(String version) {
+    return '⟦Ṽéřšîóñ $version ···⟧';
+  }
+
+  @override
+  String referenceVehicleLoadFailed(String reason) {
+    return '⟦Çóúłđñ\'ŧ łóáđ ŧĥé ṽéĥîçłé çáŧáłóǧ: $reason ·············⟧';
+  }
 
   @override
   String get errorTimeout =>

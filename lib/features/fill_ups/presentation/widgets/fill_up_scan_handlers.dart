@@ -11,6 +11,7 @@ import '../../../../core/error/guarded.dart';
 import '../../../../core/permissions/permission_rationale_dialog.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../core/error/error_localizer.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../receipts_ocr/api.dart';
@@ -137,7 +138,13 @@ Future<void> runReceiptScan(
   } catch (e, st) {
     logFailure(e, st, where: 'runReceiptScan: receipt scan failed');
     if (state.isMounted() && context.mounted) {
-      SnackBarHelper.showError(context, l.scanReceiptFailed(e.toString()));
+      // #3982 — the placeholder gets a LOCALIZED reason; `e.toString()`
+      // put an English (often stack-shaped) string inside a translated
+      // sentence.
+      SnackBarHelper.showError(
+        context,
+        l.scanReceiptFailed(ErrorLocalizer.localize(e, l)),
+      );
     }
   } finally {
     if (state.isMounted()) state.setScanning(false);
