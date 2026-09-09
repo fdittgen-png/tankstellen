@@ -10,6 +10,7 @@ import '../../../../../core/widgets/section_header.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../obd2/api.dart';
 import '../../../../vehicle/providers/vehicle_providers.dart';
+import 'bluetooth_transport_descriptor.dart';
 import 'obd2_self_test_adapter_choice.dart';
 
 /// The #2645 active-adapter-self-test panel on the OBD2 communication-health
@@ -161,14 +162,9 @@ class Obd2SelfTestPanel extends ConsumerWidget {
     if (mac == null) return null;
     for (final a in adapters) {
       if (a.mac != mac) continue;
-      switch (a.transport) {
-        case BluetoothTransport.classic:
-          return Obd2ConnectTransport.classic;
-        case BluetoothTransport.ble:
-          return Obd2ConnectTransport.ble;
-        case null:
-          return null;
-      }
+      // #3984 — the transport → trace-transport mapping is the
+      // descriptor's, including the unclassified case.
+      return descriptorFor(a.transport).connectTransport;
     }
     return null;
   }

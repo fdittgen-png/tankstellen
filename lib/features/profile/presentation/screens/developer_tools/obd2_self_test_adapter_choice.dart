@@ -6,6 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../obd2/api.dart';
+import 'bluetooth_transport_descriptor.dart';
 
 part 'obd2_self_test_adapter_choice.g.dart';
 
@@ -123,17 +124,9 @@ class Obd2SelfTestAdapterChoice extends StatelessWidget {
   }
 
   /// Localised transport tag shown next to each paired adapter (#2969).
+  /// #3984 — the three arms live in the shared descriptor now.
   static String _transportLabel(
     AppLocalizations l,
     BluetoothTransport? transport,
-  ) {
-    switch (transport) {
-      case BluetoothTransport.classic:
-        return l.obd2TestAdapterTransportClassic;
-      case BluetoothTransport.ble:
-        return l.obd2TestAdapterTransportBle;
-      case null:
-        return l.obd2TestAdapterTransportUnknown;
-    }
-  }
+  ) => descriptorFor(transport).label(l);
 }
