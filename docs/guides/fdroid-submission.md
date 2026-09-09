@@ -91,14 +91,45 @@ Prerequisites: `fdroidserver` (`brew install fdroidserver`) and a GitLab
 account.
 
 1. **Fork** `https://gitlab.com/fdroid/fdroiddata` and clone your fork.
-2. **Copy the recipe** in: copy this repo's root
-   `metadata/de.tankstellen.fuelprices.yml` to
-   `metadata/de.tankstellen.fuelprices.yml` in your fdroiddata fork.
+2. **Copy the recipe** in: copy this repo's
+   `metadata/de.tankstellen.fuelprices.yml` — everything **below** its
+   comment header — to `metadata/de.tankstellen.fuelprices.yml` in your
+   fdroiddata fork. This repo's file is the source; the GitLab copy is the
+   derivative. Never edit the GitLab copy directly (#4023: it drifted once,
+   and the drift is what kept our own guard green).
 3. **Lint** it:
    ```
    fdroid lint de.tankstellen.fuelprices
-   fdroid rewritemeta de.tankstellen.fuelprices   # normalises formatting
    ```
+
+   > **Do NOT run `fdroid rewritemeta` locally.** It cannot converge on this
+   > machine and it damages the recipe (#4023).
+   >
+   > fdroiddata's pipeline runs `fdroid rewritemeta` and fails if the result
+   > differs from what you committed. Reproducing it locally does not work:
+   >
+   > * CI downloads fdroidserver **master** on every run, so there is no
+   >   release to match — but the version is not the cause. Master's
+   >   `rewritemeta` run locally is byte-identical to the packaged release,
+   >   and neither matches CI.
+   > * The difference is **`ruamel.yaml`'s emitter**. Both fold at width 80;
+   >   CI's generation keeps the word that crosses column 80 and emits no
+   >   trailing whitespace, the local one breaks *before* it and leaves a
+   >   trailing space.
+   > * Local `rewritemeta` also re-flows the `prebuild:` / `build:` **shell
+   >   commands** — splitting `$(( $$VERCODE$$ / 10 ))` across lines — which
+   >   CI accepts as committed. So it adds new diffs on top of not
+   >   converging.
+   >
+   > Instead:
+   > ```
+   > dart run tool/fdroid_canonicalize.dart          # rewrites to CI's form
+   > dart run tool/fdroid_canonicalize.dart --check  # or just verify
+   > ```
+   > `test/features/fdroid/fdroid_metadata_canonical_test.dart` implements
+   > CI's rule directly and runs in the normal suite, so a non-canonical file
+   > fails before the push rather than after a red pipeline. It is
+   > mutation-checked against the exact block that made the MR red.
 4. **Test the build** in fdroidserver's reproducible build environment:
    ```
    fdroid build -v -l de.tankstellen.fuelprices

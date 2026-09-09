@@ -11,12 +11,31 @@
 # tagged source and builds the GMS-free `fdroid` flavor itself (unlike the
 # self-hosted repo under fdroid/, which ships a prebuilt APK).
 #
-# #3481 — this file mirrors the fdroiddata MR !42093 branch `add-sparkilo`
-# byte-for-byte below this comment block (the MR iterations dropped
+# #3481 — everything below this comment block mirrors the fdroiddata MR
+# !42093 branch `add-sparkilo` BYTE-FOR-BYTE (the MR iterations dropped
 # `subdir:`/`gradle:` — the whole-app `flutter build apk --flavor fdroid`
 # needs neither — and Summary/Description, which F-Droid reads from the
 # upstream fastlane/metadata structure instead).
-
+#
+# #4023 — this file is the SOURCE, the MR copy is the derivative. Edit here,
+# run `dart run tool/fdroid_canonicalize.dart`, then copy the body up. Never
+# hand-edit the GitLab copy and never run `fdroid rewritemeta` locally: local
+# ruamel breaks a folded line BEFORE the word that crosses column 80 and
+# leaves a trailing space, while fdroiddata CI keeps that word and leaves
+# none, so the local tool cannot converge and it also re-flows the prebuild
+# shell commands. `fdroid_metadata_canonical_test.dart` implements CI's rule
+# directly, which is why no fdroidserver is needed to stay green.
+AntiFeatures:
+  NonFreeNet:
+    en-US: By default the map loads tiles through a developer-hosted proxy (a fixed
+      Supabase edge-function URL), and the optional community price reports / TankSync
+      features ship a default configuration (assets/tanksync_config.json) pointing
+      to the same developer-hosted Supabase instance. The server software is FOSS
+      and TankSync is designed for self-hosting (the app provides the SQL to run your
+      own instance), but the shipped defaults use the developer's instance. The FDROID_LIBRE
+      define these build entries pass removes both defaults, but the code reading
+      it landed after the commit pinned here, so it has no effect on this build; this
+      entry is removed when the pin moves to a release containing it.
 Categories:
   - Market & Price
 License: MIT
@@ -27,20 +46,6 @@ IssueTracker: https://github.com/fdittgen-png/tankstellen/issues
 
 Name: Sparkilo
 AutoName: Sparkilo
-
-# #3968 — kept because of the COMMIT THIS RECIPE PINS, not because of the
-# app's current code. The libre define every build entry below passes
-# empties the tile proxy and makes CommunityConfig ignore the bundled
-# defaults, but the code that READS it landed in 0bd1815c (2026-08-26), after
-# v6.0.5 / 506fcf50. Dart ignores a define nothing reads, so at this pin the
-# map still fetches every tile from the developer's Supabase host and
-# assets/tanksync_config.json still carries its defaults.
-# This entry comes off in the SAME change that moves `commit:` to a tagged
-# release containing 0bd1815c (and its versionName / versionCode /
-# CurrentVersion* fields with it). test/features/fdroid/
-# libre_build_endpoints_test.dart fails if the two ever disagree again.
-AntiFeatures:
-  - NonFreeNet
 
 RepoType: git
 Repo: https://github.com/fdittgen-png/tankstellen.git
