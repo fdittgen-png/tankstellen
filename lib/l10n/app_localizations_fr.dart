@@ -971,6 +971,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get errorServer => 'Erreur serveur. Réessayez plus tard.';
 
   @override
+  String aboutVersionLine(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String referenceVehicleLoadFailed(String reason) {
+    return 'Couldn\'t load the vehicle catalog: $reason';
+  }
+
+  @override
   String get errorTimeout => 'Délai de connexion dépassé. Réessayez.';
 
   @override

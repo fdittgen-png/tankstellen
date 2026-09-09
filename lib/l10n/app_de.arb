@@ -462,6 +462,8 @@
   "deleteProfileConfirm": "Profil löschen",
   "errorNetwork": "Netzwerkfehler. Überprüfe deine Verbindung.",
   "errorServer": "Serverfehler. Bitte später erneut versuchen.",
+  "aboutVersionLine": "Version {version}",
+  "referenceVehicleLoadFailed": "Fahrzeugkatalog konnte nicht geladen werden: {reason}",
   "errorTimeout": "Zeitüberschreitung. Bitte erneut versuchen.",
   "errorNoConnection": "Keine Internetverbindung.",
   "errorApiKey": "Ungültiger API-Schlüssel. Überprüfe deine Einstellungen.",

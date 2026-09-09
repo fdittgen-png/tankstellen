@@ -21,8 +21,11 @@ void main() {
         ),
       );
 
-      expect(find.textContaining('250km'), findsOneWidget);
-      expect(find.textContaining('166min'), findsOneWidget);
+      // #3982 — the distance now carries the country's unit and a
+      // space, and the duration reads through ARB: "250 km · 2 h 46 min"
+      // in en, "250 Std./Min." wording in de, miles in the UK.
+      expect(find.textContaining('250 km'), findsOneWidget);
+      expect(find.textContaining('2 h 46 min'), findsOneWidget);
     });
 
     testWidgets('displays station count label', (tester) async {

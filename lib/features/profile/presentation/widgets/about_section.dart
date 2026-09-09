@@ -25,7 +25,10 @@ class AboutSection extends ConsumerWidget {
           ListTile(
             leading: const Icon(Icons.info_outline),
             title: const Text(AppConstants.appName),
-            subtitle: Text('Version ${AppConstants.appVersion}'),
+            subtitle: Text(
+              AppLocalizations.of(context)
+                  .aboutVersionLine(AppConstants.appVersion),
+            ),
           ),
           const Divider(height: 1),
           ListTile(

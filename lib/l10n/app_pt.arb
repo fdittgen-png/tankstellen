@@ -6100,5 +6100,26 @@
         "type": "int"
       }
     }
+  },
+  "aboutVersionLine": "Version {version}",
+  "@aboutVersionLine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "version": {
+        "type": "String",
+        "example": "6.1.0"
+      }
+    }
+  },
+  "referenceVehicleLoadFailed": "Couldn't load the vehicle catalog: {reason}",
+  "@referenceVehicleLoadFailed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
   }
 }

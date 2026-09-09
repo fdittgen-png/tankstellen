@@ -970,6 +970,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get errorServer => 'Serverfehler. Bitte später erneut versuchen.';
 
   @override
+  String aboutVersionLine(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String referenceVehicleLoadFailed(String reason) {
+    return 'Fahrzeugkatalog konnte nicht geladen werden: $reason';
+  }
+
+  @override
   String get errorTimeout => 'Zeitüberschreitung. Bitte erneut versuchen.';
 
   @override
