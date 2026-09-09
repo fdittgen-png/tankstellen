@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../../../../core/feedback/github_issue_reporter.dart';
+import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/receipt_scan_service.dart';
 import 'bad_scan_diff_table.dart';
@@ -15,51 +16,70 @@ import 'bad_scan_diff_table.dart';
 /// reading provider state. They only consume the scan outcome the
 /// caller already holds plus the user-entered values.
 
+/// Placeholder for a field the scan (or the user) left empty.
+const String _kMissing = '—';
+
+/// A displayed figure, in the reader's number format (#3996).
+///
+/// This is the DISPLAY path, unlike [buildBadScanShareBody] and
+/// [buildBadScanParsedFields] below: the diff table is a Table the user
+/// reads, so its numbers follow the same locale rules as every other
+/// figure in the app. Comparing "what the scan read" with "what I
+/// typed" only works if both are written the way the reader writes
+/// numbers.
+String _shown(double? value, int fractionDigits) => value == null
+    ? _kMissing
+    : UnitFormatter.formatDecimal(value, fractionDigits: fractionDigits);
+
 /// Builds the field-by-field diff table rendered above the action
 /// buttons: the rich receipt layout (brand, station, fuel, date).
+///
+/// [locale] is the UI locale (`Localizations.localeOf(context)
+/// .toString()`) — this function stays pure, so the caller reads it.
 List<BadScanDiffRow> buildBadScanDiffRows({
   required ReceiptScanOutcome? receiptScan,
   required double? enteredLiters,
   required double? enteredTotalCost,
   required AppLocalizations l,
+  required String locale,
 }) {
   final p = receiptScan!.parse;
+  final date = p.date;
   return [
     BadScanDiffRow(
       l.badScanReportFieldBrandLayout,
       p.brandLayout,
       p.brandLayout,
     ),
-    BadScanDiffRow(
-      l.liters,
-      // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-      p.liters?.toStringAsFixed(2) ?? '—',
-      // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-      enteredLiters?.toStringAsFixed(2) ?? '—',
-    ),
+    BadScanDiffRow(l.liters, _shown(p.liters, 2), _shown(enteredLiters, 2)),
     BadScanDiffRow(
       l.badScanReportFieldTotal,
-      // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-      p.totalCost?.toStringAsFixed(2) ?? '—',
-      // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-      enteredTotalCost?.toStringAsFixed(2) ?? '—',
+      _shown(p.totalCost, 2),
+      _shown(enteredTotalCost, 2),
     ),
     BadScanDiffRow(
       l.badScanReportFieldPricePerLiter,
-      // i18n-ignore-format: developer-facing bad-scan report payload — machine-readable dot decimals
-      p.pricePerLiter?.toStringAsFixed(3) ?? '—',
-      '—',
+      _shown(p.pricePerLiter, 3),
+      _kMissing,
     ),
-    BadScanDiffRow(l.badScanReportFieldStation, p.stationName ?? '—', '—'),
+    BadScanDiffRow(
+      l.badScanReportFieldStation,
+      p.stationName ?? _kMissing,
+      _kMissing,
+    ),
     BadScanDiffRow(
       l.badScanReportFieldFuel,
-      p.fuelType?.displayName ?? '—',
-      '—',
+      p.fuelType?.displayName ?? _kMissing,
+      _kMissing,
     ),
     BadScanDiffRow(
       l.badScanReportFieldDate,
-      p.date?.toIso8601String().split('T').first ?? '—',
-      '—',
+      // The ISO date stays in the PAYLOAD builders; here the reader
+      // gets their own date format.
+      date == null
+          ? _kMissing
+          : UnitFormatter.formatMediumDate(date, locale: locale),
+      _kMissing,
     ),
   ];
 }

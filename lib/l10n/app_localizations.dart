@@ -2931,6 +2931,24 @@ abstract class AppLocalizations {
   /// **'Unrecognised code'**
   String get qrPaymentUnknownTitle;
 
+  /// Explanation under the title of the unknown-QR dialog (#3996). Says what happened, that the user did nothing wrong, and implicitly why reporting helps.
+  ///
+  /// In en, this message translates to:
+  /// **'This isn\'t a payment code SparKilo knows — it may be a loyalty or receipt code, or a payment scheme we haven\'t added yet. Nothing is wrong with your scan.'**
+  String get qrPaymentUnknownBody;
+
+  /// Second line of the unknown-QR dialog (#3996): what the user can DO about it, next to the Report button.
+  ///
+  /// In en, this message translates to:
+  /// **'Report it and we\'ll try to add the scheme in a future release.'**
+  String get qrPaymentUnknownAction;
+
+  /// Label above the raw scanned payload in the unknown-QR dialog (#3996), so the block of text is identified rather than dumped.
+  ///
+  /// In en, this message translates to:
+  /// **'What the code contains'**
+  String get qrPaymentRawHeading;
+
   /// No description provided for @qrPaymentCopyRaw.
   ///
   /// In en, this message translates to:
@@ -6083,19 +6101,19 @@ abstract class AppLocalizations {
   /// Small chip displayed alongside the live fuel-rate metric while the broken-MAP belief sits in the 0.7–0.9 confidence band — the rate continues to be shown but the user is told it may be unreliable (#1423 phase 5).
   ///
   /// In en, this message translates to:
-  /// **'MAP readings suspicious'**
+  /// **'May be reading low'**
   String get brokenMapChipDisclaimer;
 
   /// Snackbar fired once per session per vehicle when the broken-MAP belief crosses 0.7. Tells the user the live fuel-rate numbers are likely undercounting heavily and suggests trying a different OBD2 adapter (#1423 phase 5).
   ///
   /// In en, this message translates to:
-  /// **'MAP sensor reads incorrectly — fuel readings may be 50–80% too low. Try a different adapter.'**
+  /// **'Live fuel use is reading 50–80% too low — your adapter’s sensor data looks wrong. A different adapter usually fixes it.'**
   String get brokenMapSnackbarUnreliable;
 
   /// Persistent MaterialBanner shown at the top of the trip-recording screen when the broken-MAP belief is at or above 0.9 — the live fuel-rate display is hard-disabled and the app falls back to per-fill L/100km from receipts (#1423 phase 5).
   ///
   /// In en, this message translates to:
-  /// **'MAP sensor unreliable. Showing fill-up averages instead of live fuel rate.'**
+  /// **'Live fuel use can’t be trusted on this adapter. Showing your fill-up averages instead.'**
   String get brokenMapBannerHardDisable;
 
   /// Diagnostic-overlay row showing the Bayesian posterior point estimate and the half-width of the 95% credible interval for the broken-MAP belief (#1424 deliverable G).
@@ -6110,52 +6128,58 @@ abstract class AppLocalizations {
   /// **'MAP sensor: {posterior}% ± {margin}% (verified)'**
   String brokenMapOverlayPosteriorVerified(String posterior, String margin);
 
-  /// Title of the broken-MAP diagnostics card on the vehicle settings screen — surfaces the belief + the adapter blocklist (#1622).
+  /// Title of the broken-MAP diagnostics card on the vehicle settings screen — surfaces the belief + the adapter blocklist (#1622). #3996 — named for what the card TELLS the user (whether live fuel use can be trusted) rather than for the sensor the app inspects.
   ///
   /// In en, this message translates to:
-  /// **'MAP sensor diagnostics'**
+  /// **'Live fuel-use accuracy'**
   String get brokenMapDiagnosticsCardTitle;
+
+  /// Explanatory line under the title of the fuel-use accuracy card (#3996). Names what the reading MEANS before any number, and keeps the MAP acronym once so a user can search for their adapter.
+  ///
+  /// In en, this message translates to:
+  /// **'Live fuel use is worked out from the engine air-pressure reading (the MAP sensor) your car reports over OBD2. Some adapters report it wrong, which makes live fuel use look far too low — when that happens SparKilo shows your fill-up averages instead.'**
+  String get brokenMapDiagnosticsExplainer;
 
   /// Line on the broken-MAP diagnostics card showing the active vehicle's Bayesian posterior point estimate and the half-width of the 95% credible interval (#1622).
   ///
   /// In en, this message translates to:
-  /// **'Broken-MAP confidence: {posterior}% ± {margin}%'**
+  /// **'{posterior}% likely to read wrong (give or take {margin}%)'**
   String brokenMapDiagnosticsBeliefLine(String posterior, String margin);
 
   /// Line on the broken-MAP diagnostics card showing how many observations have been folded into the belief (#1622).
   ///
   /// In en, this message translates to:
-  /// **'{count} observations recorded'**
+  /// **'Based on {count} trips so far'**
   String brokenMapDiagnosticsObservationCount(int count);
 
   /// Badge on the broken-MAP diagnostics card shown when the belief has reached the verified-clean terminal state (#1622).
   ///
   /// In en, this message translates to:
-  /// **'Verified clean'**
+  /// **'Confirmed accurate'**
   String get brokenMapDiagnosticsVerifiedBadge;
 
   /// Placeholder on the broken-MAP diagnostics card when the active vehicle has no broken-MAP observations recorded yet (#1622).
   ///
   /// In en, this message translates to:
-  /// **'This vehicle\'s MAP sensor hasn\'t been observed yet.'**
+  /// **'Not enough trips yet to tell.'**
   String get brokenMapDiagnosticsBeliefNone;
 
   /// Sub-heading on the broken-MAP diagnostics card above the list of OBD2 adapters flagged as having a broken MAP sensor (#1622).
   ///
   /// In en, this message translates to:
-  /// **'Blocklisted adapters'**
+  /// **'Adapters we no longer trust for this'**
   String get brokenMapDiagnosticsBlocklistHeading;
 
   /// Empty-state line on the broken-MAP diagnostics card when no OBD2 adapter is on the broken-MAP blocklist (#1622).
   ///
   /// In en, this message translates to:
-  /// **'No adapters are blocklisted.'**
+  /// **'None so far.'**
   String get brokenMapDiagnosticsBlocklistEmpty;
 
   /// A single blocklisted-adapter row on the broken-MAP diagnostics card: the adapter's ELM firmware id and its recorded broken-confidence (#1622).
   ///
   /// In en, this message translates to:
-  /// **'{adapter} — flagged {percent}% broken'**
+  /// **'{adapter} — {percent}% likely to read wrong'**
   String brokenMapDiagnosticsBlocklistEntry(String adapter, String percent);
 
   /// Button on a blocklisted-adapter row that removes the adapter from the broken-MAP blocklist — the manual escape hatch for a healthy adapter that was mis-flagged (#1622).

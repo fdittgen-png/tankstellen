@@ -1559,6 +1559,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get qrPaymentUnknownTitle => 'Code nicht erkannt';
 
   @override
+  String get qrPaymentUnknownBody =>
+      'Das ist kein Zahlungscode, den SparKilo kennt — vielleicht ein Bonus- oder Belegcode oder ein Zahlverfahren, das wir noch nicht unterstützen. Mit deinem Scan ist alles in Ordnung.';
+
+  @override
+  String get qrPaymentUnknownAction =>
+      'Melde ihn, dann versuchen wir, das Verfahren in einer künftigen Version zu ergänzen.';
+
+  @override
+  String get qrPaymentRawHeading => 'Inhalt des Codes';
+
+  @override
   String get qrPaymentCopyRaw => 'Rohtext kopieren';
 
   @override
@@ -3386,15 +3397,15 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get brokenMapChipDisclaimer => 'MAP-Werte verdächtig';
+  String get brokenMapChipDisclaimer => 'Misst evtl. zu niedrig';
 
   @override
   String get brokenMapSnackbarUnreliable =>
-      'Der MAP-Sensor liest falsch — die Verbrauchswerte können 50–80 % zu niedrig sein. Bitte einen anderen Adapter probieren.';
+      'Der Live-Verbrauch liegt 50–80 % zu niedrig — die Sensordaten deines Adapters wirken falsch. Ein anderer Adapter behebt das meist.';
 
   @override
   String get brokenMapBannerHardDisable =>
-      'MAP-Sensor unzuverlässig. Statt Live-Verbrauch wird der Tankdurchschnitt angezeigt.';
+      'Dem Live-Verbrauch ist mit diesem Adapter nicht zu trauen. Stattdessen wird dein Tankdurchschnitt angezeigt.';
 
   @override
   String brokenMapOverlayPosterior(String posterior, String margin) {
@@ -3407,34 +3418,39 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get brokenMapDiagnosticsCardTitle => 'MAP-Sensor-Diagnose';
+  String get brokenMapDiagnosticsCardTitle => 'Genauigkeit des Live-Verbrauchs';
+
+  @override
+  String get brokenMapDiagnosticsExplainer =>
+      'Der Live-Verbrauch wird aus dem Luftdruckwert im Motor (dem MAP-Sensor) berechnet, den dein Auto über OBD2 meldet. Manche Adapter melden ihn falsch, wodurch der Live-Verbrauch viel zu niedrig wirkt — dann zeigt SparKilo stattdessen deine Tank-Durchschnitte.';
 
   @override
   String brokenMapDiagnosticsBeliefLine(String posterior, String margin) {
-    return 'MAP-Defekt-Konfidenz: $posterior % ± $margin %';
+    return 'Misst zu $posterior % wahrscheinlich falsch (± $margin %)';
   }
 
   @override
   String brokenMapDiagnosticsObservationCount(int count) {
-    return '$count Beobachtungen erfasst';
+    return 'Basiert auf bisher $count Fahrten';
   }
 
   @override
-  String get brokenMapDiagnosticsVerifiedBadge => 'Als intakt bestätigt';
+  String get brokenMapDiagnosticsVerifiedBadge => 'Als genau bestätigt';
 
   @override
   String get brokenMapDiagnosticsBeliefNone =>
-      'Der MAP-Sensor dieses Fahrzeugs wurde noch nicht beobachtet.';
+      'Noch zu wenige Fahrten für eine Aussage.';
 
   @override
-  String get brokenMapDiagnosticsBlocklistHeading => 'Gesperrte Adapter';
+  String get brokenMapDiagnosticsBlocklistHeading =>
+      'Adapter, denen wir dafür nicht mehr vertrauen';
 
   @override
-  String get brokenMapDiagnosticsBlocklistEmpty => 'Keine Adapter gesperrt.';
+  String get brokenMapDiagnosticsBlocklistEmpty => 'Bisher keine.';
 
   @override
   String brokenMapDiagnosticsBlocklistEntry(String adapter, String percent) {
-    return '$adapter — als $percent % defekt markiert';
+    return '$adapter — misst zu $percent % wahrscheinlich falsch';
   }
 
   @override

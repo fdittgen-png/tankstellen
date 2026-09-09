@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_text.dart';
+import '../../../../core/theme/spacing.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 
@@ -42,8 +44,28 @@ class UnknownQrDialog extends StatelessWidget {
     return AlertDialog(
       title: Text(l10n.qrPaymentUnknownTitle),
       content: ConstrainedBox(
-        constraints: const BoxConstraints(maxHeight: 240),
-        child: SingleChildScrollView(child: SelectableText(raw)),
+        constraints: const BoxConstraints(maxHeight: 320),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // #3996 — the dialog used to name the failure and stop,
+              // leaving the user holding a wall of raw payload with no
+              // idea whether they had done something wrong.
+              Text(l10n.qrPaymentUnknownBody),
+              const SizedBox(height: Spacing.md),
+              Text(l10n.qrPaymentUnknownAction),
+              const SizedBox(height: Spacing.xl),
+              Text(
+                l10n.qrPaymentRawHeading,
+                style: AppText.label(context),
+              ),
+              const SizedBox(height: Spacing.sm),
+              SelectableText(raw),
+            ],
+          ),
+        ),
       ),
       actions: [
         TextButton.icon(

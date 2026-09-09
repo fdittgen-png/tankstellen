@@ -812,6 +812,18 @@
   "qrPaymentOpenInBank": "Open in bank app",
   "qrPaymentLaunchFailed": "No app available to open this code",
   "qrPaymentUnknownTitle": "Unrecognised code",
+  "qrPaymentUnknownBody": "This isn't a payment code SparKilo knows — it may be a loyalty or receipt code, or a payment scheme we haven't added yet. Nothing is wrong with your scan.",
+  "@qrPaymentUnknownBody": {
+    "description": "Explanation under the title of the unknown-QR dialog (#3996). Says what happened, that the user did nothing wrong, and implicitly why reporting helps."
+  },
+  "qrPaymentUnknownAction": "Report it and we'll try to add the scheme in a future release.",
+  "@qrPaymentUnknownAction": {
+    "description": "Second line of the unknown-QR dialog (#3996): what the user can DO about it, next to the Report button."
+  },
+  "qrPaymentRawHeading": "What the code contains",
+  "@qrPaymentRawHeading": {
+    "description": "Label above the raw scanned payload in the unknown-QR dialog (#3996), so the block of text is identified rather than dumped."
+  },
   "qrPaymentCopyRaw": "Copy raw text",
   "qrPaymentCopiedRaw": "Copied to clipboard",
   "qrPaymentReport": "Report this scan",
@@ -2148,15 +2160,15 @@
       }
     }
   },
-  "brokenMapChipDisclaimer": "MAP readings suspicious",
+  "brokenMapChipDisclaimer": "May be reading low",
   "@brokenMapChipDisclaimer": {
     "description": "Small chip displayed alongside the live fuel-rate metric while the broken-MAP belief sits in the 0.7–0.9 confidence band — the rate continues to be shown but the user is told it may be unreliable (#1423 phase 5)."
   },
-  "brokenMapSnackbarUnreliable": "MAP sensor reads incorrectly — fuel readings may be 50–80% too low. Try a different adapter.",
+  "brokenMapSnackbarUnreliable": "Live fuel use is reading 50–80% too low — your adapter’s sensor data looks wrong. A different adapter usually fixes it.",
   "@brokenMapSnackbarUnreliable": {
     "description": "Snackbar fired once per session per vehicle when the broken-MAP belief crosses 0.7. Tells the user the live fuel-rate numbers are likely undercounting heavily and suggests trying a different OBD2 adapter (#1423 phase 5)."
   },
-  "brokenMapBannerHardDisable": "MAP sensor unreliable. Showing fill-up averages instead of live fuel rate.",
+  "brokenMapBannerHardDisable": "Live fuel use can’t be trusted on this adapter. Showing your fill-up averages instead.",
   "@brokenMapBannerHardDisable": {
     "description": "Persistent MaterialBanner shown at the top of the trip-recording screen when the broken-MAP belief is at or above 0.9 — the live fuel-rate display is hard-disabled and the app falls back to per-fill L/100km from receipts (#1423 phase 5)."
   },
@@ -2188,11 +2200,15 @@
       }
     }
   },
-  "brokenMapDiagnosticsCardTitle": "MAP sensor diagnostics",
-  "@brokenMapDiagnosticsCardTitle": {
-    "description": "Title of the broken-MAP diagnostics card on the vehicle settings screen — surfaces the belief + the adapter blocklist (#1622)."
+  "brokenMapDiagnosticsCardTitle": "Live fuel-use accuracy",
+  "brokenMapDiagnosticsExplainer": "Live fuel use is worked out from the engine air-pressure reading (the MAP sensor) your car reports over OBD2. Some adapters report it wrong, which makes live fuel use look far too low — when that happens SparKilo shows your fill-up averages instead.",
+  "@brokenMapDiagnosticsExplainer": {
+    "description": "Explanatory line under the title of the fuel-use accuracy card (#3996). Names what the reading MEANS before any number, and keeps the MAP acronym once so a user can search for their adapter."
   },
-  "brokenMapDiagnosticsBeliefLine": "Broken-MAP confidence: {posterior}% ± {margin}%",
+  "@brokenMapDiagnosticsCardTitle": {
+    "description": "Title of the broken-MAP diagnostics card on the vehicle settings screen — surfaces the belief + the adapter blocklist (#1622). #3996 — named for what the card TELLS the user (whether live fuel use can be trusted) rather than for the sensor the app inspects."
+  },
+  "brokenMapDiagnosticsBeliefLine": "{posterior}% likely to read wrong (give or take {margin}%)",
   "@brokenMapDiagnosticsBeliefLine": {
     "description": "Line on the broken-MAP diagnostics card showing the active vehicle's Bayesian posterior point estimate and the half-width of the 95% credible interval (#1622).",
     "placeholders": {
@@ -2206,7 +2222,7 @@
       }
     }
   },
-  "brokenMapDiagnosticsObservationCount": "{count} observations recorded",
+  "brokenMapDiagnosticsObservationCount": "Based on {count} trips so far",
   "@brokenMapDiagnosticsObservationCount": {
     "description": "Line on the broken-MAP diagnostics card showing how many observations have been folded into the belief (#1622).",
     "placeholders": {
@@ -2216,23 +2232,23 @@
       }
     }
   },
-  "brokenMapDiagnosticsVerifiedBadge": "Verified clean",
+  "brokenMapDiagnosticsVerifiedBadge": "Confirmed accurate",
   "@brokenMapDiagnosticsVerifiedBadge": {
     "description": "Badge on the broken-MAP diagnostics card shown when the belief has reached the verified-clean terminal state (#1622)."
   },
-  "brokenMapDiagnosticsBeliefNone": "This vehicle's MAP sensor hasn't been observed yet.",
+  "brokenMapDiagnosticsBeliefNone": "Not enough trips yet to tell.",
   "@brokenMapDiagnosticsBeliefNone": {
     "description": "Placeholder on the broken-MAP diagnostics card when the active vehicle has no broken-MAP observations recorded yet (#1622)."
   },
-  "brokenMapDiagnosticsBlocklistHeading": "Blocklisted adapters",
+  "brokenMapDiagnosticsBlocklistHeading": "Adapters we no longer trust for this",
   "@brokenMapDiagnosticsBlocklistHeading": {
     "description": "Sub-heading on the broken-MAP diagnostics card above the list of OBD2 adapters flagged as having a broken MAP sensor (#1622)."
   },
-  "brokenMapDiagnosticsBlocklistEmpty": "No adapters are blocklisted.",
+  "brokenMapDiagnosticsBlocklistEmpty": "None so far.",
   "@brokenMapDiagnosticsBlocklistEmpty": {
     "description": "Empty-state line on the broken-MAP diagnostics card when no OBD2 adapter is on the broken-MAP blocklist (#1622)."
   },
-  "brokenMapDiagnosticsBlocklistEntry": "{adapter} — flagged {percent}% broken",
+  "brokenMapDiagnosticsBlocklistEntry": "{adapter} — {percent}% likely to read wrong",
   "@brokenMapDiagnosticsBlocklistEntry": {
     "description": "A single blocklisted-adapter row on the broken-MAP diagnostics card: the adapter's ELM firmware id and its recorded broken-confidence (#1622).",
     "placeholders": {
