@@ -16,6 +16,7 @@ import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.d
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
 import 'package:tankstellen/features/search/presentation/screens/ev_station_detail_screen.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
+import 'package:tankstellen/core/widgets/animated_favorite_star.dart';
 
 import '../../helpers/silence_error_logger.dart';
 
@@ -23,6 +24,12 @@ import '../../helpers/silence_error_logger.dart';
 /// detail screen must:
 ///   1. Persist the station to EV favorite storage (so Favorites tab shows it)
 ///   2. Flip isFavoriteProvider to true (so the star icon turns amber)
+///
+/// #3992 — the screen now uses the shared [AnimatedFavoriteStar], as the
+/// fuel detail's app bar does. These assertions therefore look for that
+/// WIDGET rather than for a star glyph: the rating card on the same screen
+/// draws five `Icons.star_border` of its own, so `find.byIcon` is ambiguous
+/// here (it was unique only while this screen hand-rolled `star_outline`).
 ///
 /// This test drives the EXACT screen the router uses (the one under
 /// `search/presentation/screens/`, which after #560 uses the unified
@@ -127,7 +134,7 @@ void main() {
       expect(container.read(evFavoriteStationsProvider), isEmpty,
           reason: 'Start state: favorites tab is empty');
 
-      final starFinder = find.byIcon(Icons.star_outline);
+      final starFinder = find.byType(AnimatedFavoriteStar);
       expect(starFinder, findsOneWidget,
           reason: 'The star-outline button must be visible before favoriting');
 
@@ -182,10 +189,14 @@ void main() {
       await tester.pump();
 
       expect(container.read(isFavoriteProvider(testStation.id)), isTrue);
-      expect(find.byIcon(Icons.star), findsOneWidget);
+      expect(
+          tester
+              .widget<AnimatedFavoriteStar>(find.byType(AnimatedFavoriteStar))
+              .isFavorite,
+          isTrue);
 
       await tester.runAsync(() async {
-        await tester.tap(find.byIcon(Icons.star));
+        await tester.tap(find.byType(AnimatedFavoriteStar));
         await Future<void>.delayed(const Duration(milliseconds: 100));
       });
       await tester.pump();
@@ -200,7 +211,11 @@ void main() {
       expect(container.read(isFavoriteProvider(testStation.id)), isFalse);
       expect(container.read(evFavoriteStationsProvider), isEmpty);
 
-      expect(find.byIcon(Icons.star_outline), findsOneWidget);
+      expect(
+          tester
+              .widget<AnimatedFavoriteStar>(find.byType(AnimatedFavoriteStar))
+              .isFavorite,
+          isFalse);
     },
   );
 }

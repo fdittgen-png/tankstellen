@@ -9,6 +9,8 @@ import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/brand_logo.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/ev/charging_station.dart';
+import '../../../../core/widgets/primary_card.dart';
+import '../../../../core/theme/app_text.dart';
 
 /// Header card showing status, name, and operator for an EV station.
 ///
@@ -36,59 +38,56 @@ class EVStationHeaderCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final operatorName = station.operator ?? '';
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 14,
-                  height: 14,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: station.isOperational == true
-                        ? DarkModeColors.success(context)
-                        : DarkModeColors.warning(context),
-                  ),
+    return PrimaryCard(
+      margin: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 14,
+                height: 14,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: station.isOperational == true
+                      ? DarkModeColors.success(context)
+                      : DarkModeColors.warning(context),
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  station.isOperational == true
-                      ? (l10n.evOperational)
-                      : (l10n.evStatusUnknown),
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: station.isOperational == true
-                        ? DarkModeColors.success(context)
-                        : DarkModeColors.warning(context),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const Spacer(),
-                BrandLogo(
-                  brand: BrandRegistry.canonicalize(operatorName) ??
-                      operatorName,
-                  kind: BrandKind.ev,
-                  size: 36,
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              station.name,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
               ),
-            ),
-            if (operatorName.isNotEmpty && operatorName != station.name)
+              const SizedBox(width: 8),
               Text(
-                operatorName,
-                style: theme.textTheme.titleMedium?.copyWith(color: evColor),
+                station.isOperational == true
+                    ? (l10n.evOperational)
+                    : (l10n.evStatusUnknown),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: station.isOperational == true
+                      ? DarkModeColors.success(context)
+                      : DarkModeColors.warning(context),
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-          ],
-        ),
+              const Spacer(),
+              BrandLogo(
+                brand: BrandRegistry.canonicalize(operatorName) ??
+                    operatorName,
+                kind: BrandKind.ev,
+                size: 36,
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            station.name,
+            // #3992 — the title role; display is reserved for numbers.
+            style: AppText.title(context),
+          ),
+          if (operatorName.isNotEmpty && operatorName != station.name)
+            Text(
+              operatorName,
+              style: AppText.label(context).copyWith(color: evColor),
+            ),
+        ],
       ),
     );
   }

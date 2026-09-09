@@ -59,9 +59,6 @@ void main() {
       // - add_fill_up_screen.dart : `headlineSmall` empty state +
       //   `titleMedium` station-name confirmation row. Both
       //   value/empty displays, not section headers.
-      // - search/ev_station_detail_screen.dart : `titleMedium`
-      //   "Your rating" tile label inside a Card. Migration tracked
-      //   separately.
       // - station_detail_screen.dart : deferred — needs PageScaffold
       //   `title: Widget` variant (#923-deferred). Two uses:
       //   `titleLarge` in Hero flight + `titleMedium` "Price History"
@@ -73,7 +70,6 @@ void main() {
         'lib/features/trips/presentation/screens/trip_detail_screen.dart',
         'lib/features/trips/presentation/screens/trip_recording_screen.dart',
         'lib/features/fill_ups/presentation/screens/add_fill_up_screen.dart',
-        'lib/features/search/presentation/screens/ev_station_detail_screen.dart',
         'lib/features/station_detail/presentation/screens/station_detail_screen.dart',
       };
 

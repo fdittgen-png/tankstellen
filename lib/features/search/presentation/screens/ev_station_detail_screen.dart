@@ -9,7 +9,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/widgets/responsive_layout.dart';
 import '../../../../core/error/guarded.dart';
 import '../../../../core/utils/navigation_utils.dart';
-import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/widgets/star_rating.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -24,6 +23,9 @@ import '../../providers/ev_search_provider.dart';
 import '../../providers/station_rating_provider.dart';
 import '../widgets/ev_station_header_card.dart';
 import '../widgets/ev_station_info_cards.dart';
+import '../../../../core/widgets/animated_favorite_star.dart';
+import '../../../../core/widgets/panel_card.dart';
+import '../../../../core/theme/app_text.dart';
 
 /// Detail screen for an EV charging station.
 class EVStationDetailScreen extends ConsumerStatefulWidget {
@@ -166,11 +168,7 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
           builder: (context, ref, _) {
             final isFav = ref.watch(isFavoriteProvider(station.id));
             return IconButton(
-              icon: Icon(
-                isFav ? Icons.star : Icons.star_outline,
-                color: isFav ? Colors.amber : Colors.white70,
-                size: 26,
-              ),
+              icon: AnimatedFavoriteStar(isFavorite: isFav, size: 26),
               tooltip: isFav ? (l10n.removeFavorite) : (l10n.addFavorite),
               onPressed: () async {
                 // Await the toggle so the snackbar fires AFTER persistence
@@ -184,20 +182,13 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
                     .read(favoritesProvider.notifier)
                     .toggle(station.id, rawJson: _station.toJson());
                 if (!context.mounted) return;
-                // Temporary diagnostic: surface live storage counts in the
-                // snackbar so a user on an APK without logcat can verify
-                // the favorite actually persisted.
-                final storage = ref.read(storageRepositoryProvider);
-                final evIds = storage.getEvFavoriteIds();
-                final savedCount = evIds
-                    .where((id) => storage.getEvFavoriteStationData(id) != null)
-                    .length;
                 final base = isFav
                     ? (l10n.removedFromFavorites)
                     : (l10n.addedToFavorites);
+                // #3992 — no diagnostic suffix in a production snackbar.
                 SnackBarHelper.show(
                   context,
-                  '$base (EV: ${evIds.length} ids / $savedCount saved)',
+                  base,
                   duration: const Duration(seconds: 3),
                 );
               },
@@ -319,39 +310,37 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
       const SizedBox(height: 8),
 
       // Rating
-      Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(l10n.yourRating, style: theme.textTheme.titleMedium),
-              const SizedBox(height: 8),
-              Consumer(
-                builder: (context, ref, _) {
-                  final rating = ref.watch(stationRatingProvider(station.id));
-                  return Row(
-                    children: [
-                      StarRating(
-                        rating: rating,
-                        onRatingChanged: (stars) {
-                          unawaited(
-                            ref
-                                .read(stationRatingsProvider.notifier)
-                                .rate(station.id, stars),
-                          );
-                        },
-                      ),
-                      if (rating != null) ...[
-                        const SizedBox(width: 12),
-                        Text('$rating/5', style: theme.textTheme.bodyMedium),
-                      ],
+      PanelCard(
+        margin: EdgeInsets.zero,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.yourRating, style: AppText.title(context)),
+            const SizedBox(height: 8),
+            Consumer(
+              builder: (context, ref, _) {
+                final rating = ref.watch(stationRatingProvider(station.id));
+                return Row(
+                  children: [
+                    StarRating(
+                      rating: rating,
+                      onRatingChanged: (stars) {
+                        unawaited(
+                          ref
+                              .read(stationRatingsProvider.notifier)
+                              .rate(station.id, stars),
+                        );
+                      },
+                    ),
+                    if (rating != null) ...[
+                      const SizedBox(width: 12),
+                      Text('$rating/5', style: theme.textTheme.bodyMedium),
                     ],
-                  );
-                },
-              ),
-            ],
-          ),
+                  ],
+                );
+              },
+            ),
+          ],
         ),
       ),
       const SizedBox(height: 8),
