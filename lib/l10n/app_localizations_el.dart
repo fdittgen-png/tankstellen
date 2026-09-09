@@ -2734,6 +2734,11 @@ class AppLocalizationsEl extends AppLocalizations {
   String get noStorageUsed => 'Δεν χρησιμοποιείται αποθηκευτικός χώρος';
 
   @override
+  String storageSegmentSemantics(String category, String size, int percent) {
+    return '$category: $size, $percent% of the total';
+  }
+
+  @override
   String get aboutReportBug => 'Αναφορά σφάλματος / Πρόταση λειτουργίας';
 
   @override

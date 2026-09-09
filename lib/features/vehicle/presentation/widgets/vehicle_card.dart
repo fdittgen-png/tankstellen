@@ -3,6 +3,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/widgets/panel_card.dart';
+
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../../../core/utils/unit_formatter.dart';
@@ -76,8 +78,11 @@ class VehicleCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final subtitle = _subtitle();
 
-    return Card(
+    return PanelCard(
       margin: EdgeInsets.zero,
+      // The ListTile brings its own padding; the panel must not add a
+      // second one around it.
+      padding: EdgeInsets.zero,
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: isActive

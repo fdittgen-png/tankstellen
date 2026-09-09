@@ -48,7 +48,6 @@ void main() {
       // - trip_detail_screen.dart    : trip-summary card.
       // - trip_recording_screen.dart : recording-controls card.
       // - profile_screen.dart        : profile header card.
-      // - theme_settings_screen.dart : theme-preview card.
       // - sync/auth_screen.dart      : account-mode card.
       const allowlist = <String>{
         'lib/features/consent/presentation/screens/gdpr_consent_screen.dart',
@@ -56,7 +55,6 @@ void main() {
         'lib/features/trips/presentation/screens/trip_detail_screen.dart',
         'lib/features/trips/presentation/screens/trip_recording_screen.dart',
         'lib/features/profile/presentation/screens/profile_screen.dart',
-        'lib/features/profile/presentation/screens/theme_settings_screen.dart',
         'lib/features/sync/presentation/screens/auth_screen.dart',
       };
 

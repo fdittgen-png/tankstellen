@@ -1117,6 +1117,7 @@
   "swipeHide": "Ausblenden",
   "yourRating": "Ihre Bewertung",
   "noStorageUsed": "Kein Speicher verwendet",
+  "storageSegmentSemantics": "{category}: {size}, {percent} % des Gesamtspeichers",
   "aboutReportBug": "Fehler melden / Funktion vorschlagen",
   "aboutSupportProject": "Dieses Projekt unterstützen",
   "aboutSupportDescription": "Diese App ist kostenlos, Open Source und werbefrei. Wenn sie Ihnen gefällt, unterstützen Sie bitte den Entwickler.",

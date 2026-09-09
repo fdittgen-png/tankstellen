@@ -5023,6 +5023,12 @@ abstract class AppLocalizations {
   /// **'No storage used'**
   String get noStorageUsed;
 
+  /// Screen-reader label for ONE band of the storage bar (#3995). Each band is announced separately with its category, its size and its share, because the bar's meaning is the comparison between bands.
+  ///
+  /// In en, this message translates to:
+  /// **'{category}: {size}, {percent}% of the total'**
+  String storageSegmentSemantics(String category, String size, int percent);
+
   /// No description provided for @aboutReportBug.
   ///
   /// In en, this message translates to:

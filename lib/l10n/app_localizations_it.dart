@@ -2727,6 +2727,11 @@ class AppLocalizationsIt extends AppLocalizations {
   String get noStorageUsed => 'Nessuno spazio utilizzato';
 
   @override
+  String storageSegmentSemantics(String category, String size, int percent) {
+    return '$category: $size, $percent% of the total';
+  }
+
+  @override
   String get aboutReportBug => 'Segnala un bug / Suggerisci una funzionalità';
 
   @override

@@ -1296,6 +1296,8 @@
   "swipeHide": "Hide",
   "yourRating": "Your rating",
   "noStorageUsed": "No storage used",
+  "storageSegmentSemantics": "{category}: {size}, {percent}% of the total",
+  "@storageSegmentSemantics": {"description": "Screen-reader label for ONE band of the storage bar (#3995). Each band is announced separately with its category, its size and its share, because the bar's meaning is the comparison between bands.", "placeholders": {"category": {"type": "String"}, "size": {"type": "String"}, "percent": {"type": "int"}}},
   "aboutReportBug": "Report a bug / Suggest a feature",
   "aboutSupportProject": "Support this project",
   "aboutSupportDescription": "This app is free, open source, and has no ads. If you find it useful, consider supporting the developer.",

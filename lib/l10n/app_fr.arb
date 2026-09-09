@@ -5826,5 +5826,21 @@
   "@brokenMapDiagnosticsExplainer": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "storageSegmentSemantics": "{category}: {size}, {percent}% of the total",
+  "@storageSegmentSemantics": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "category": {
+        "type": "String"
+      },
+      "size": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
   }
 }

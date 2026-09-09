@@ -2731,6 +2731,11 @@ class AppLocalizationsLv extends AppLocalizations {
   String get noStorageUsed => 'Krātuve netiek izmantota';
 
   @override
+  String storageSegmentSemantics(String category, String size, int percent) {
+    return '$category: $size, $percent% of the total';
+  }
+
+  @override
   String get aboutReportBug => 'Ziņot par kļūdu / Ieteikt funkciju';
 
   @override

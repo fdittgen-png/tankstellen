@@ -3,6 +3,9 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_text.dart';
+import '../../../../core/theme/spacing.dart';
+
 import '../../../../l10n/app_localizations.dart';
 
 /// Modal bottom sheet that explains what a VIN is, why the app asks
@@ -51,9 +54,7 @@ class VinInfoSheet extends StatelessWidget {
                   Expanded(
                     child: Text(
                       l.vinInfoTooltip,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: AppText.title(context),
                     ),
                   ),
                 ],
@@ -100,20 +101,14 @@ class _Section extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.only(bottom: Spacing.xl),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(body, style: theme.textTheme.bodyMedium),
+          Text(title, style: AppText.title(context)),
+          const SizedBox(height: Spacing.sm),
+          Text(body, style: AppText.body(context)),
         ],
       ),
     );
