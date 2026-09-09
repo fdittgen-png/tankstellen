@@ -7,6 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/data/storage_repository.dart';
+import '../../../core/logging/app_log.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../data/itineraries_sync.dart';
@@ -17,6 +18,26 @@ import '../domain/entities/saved_itinerary.dart';
 import '../../route_search/domain/entities/route_info.dart';
 
 part 'itinerary_provider.g.dart';
+
+/// Whether the first server merge is still running (#3993).
+///
+/// [ItineraryNotifier.build] returns LOCAL rows synchronously, so the
+/// list is usually correct immediately. It is not for the one user who
+/// matters here: a fresh device whose routes exist only on the server.
+/// For them the local list is empty until the merge lands, and the
+/// screen would state — as fact — that they have no saved routes.
+///
+/// This flag is true only while that first merge is in flight AND the
+/// local list came back empty, which is exactly the window where
+/// "you have none" would be a lie.
+@Riverpod(keepAlive: true)
+class ItineraryFirstLoad extends _$ItineraryFirstLoad {
+  @override
+  bool build() => false;
+
+  // ignore: use_setters_to_change_properties
+  void set(bool value) => state = value;
+}
 
 /// Manages saved itineraries with local-first strategy:
 /// - Save locally first, then sync to DB
@@ -38,8 +59,18 @@ class ItineraryNotifier extends _$ItineraryNotifier {
         .forTable(SyncTables.itineraries)
         .listen((_) => _refreshFromStorage());
     ref.onDispose(sub.cancel);
-    // Kick off async merge in background
-    unawaited(Future.microtask(() => _loadAndMerge()));
+    // Kick off async merge in background. #3993 — when there is nothing
+    // local to show, the screen must say "loading", not "you have none",
+    // until this lands. The flag is raised INSIDE the microtask:
+    // Riverpod forbids a provider writing to another one while it is
+    // still building.
+    final localWasEmpty = local.isEmpty;
+    unawaited(Future.microtask(() async {
+      if (localWasEmpty) {
+        ref.read(itineraryFirstLoadProvider.notifier).set(true);
+      }
+      await _loadAndMerge();
+    }));
     return local;
   }
 
@@ -126,6 +157,11 @@ class ItineraryNotifier extends _$ItineraryNotifier {
       unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'ItineraryNotifier._loadAndMerge'}));
     } finally {
       _mergeInFlight = false;
+      // #3993 — the first-load window closes on EVERY exit path,
+      // including the sync-disabled early return and the error branch:
+      // a flag that only clears on success strands the screen on a
+      // spinner forever.
+      ref.read(itineraryFirstLoadProvider.notifier).set(false);
     }
     return added;
   }
@@ -188,6 +224,27 @@ class ItineraryNotifier extends _$ItineraryNotifier {
       await ItinerariesSync.delete(id);
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'ItineraryNotifier.delete'}));
+    }
+  }
+
+  /// Put a deleted itinerary back exactly as it was (#3993).
+  ///
+  /// The undo path, not a second save: [saveRoute] mints a new id and
+  /// fresh timestamps, which would resurrect the route as a stranger —
+  /// a different row on the server, and a different position in the
+  /// newest-first list. This restores the captured entity verbatim.
+  Future<void> restore(SavedItinerary itinerary) async {
+    final storage = ref.read(storageRepositoryProvider);
+    await storage.addItinerary(_toMap(itinerary));
+    state = [...state, itinerary]
+      ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    try {
+      await ItinerariesSync.save(itinerary);
+    } catch (e, st) {
+      // ADR 0021 — new code goes through the one logging façade
+      // rather than reaching for the error logger by hand.
+      log.error(e, st, layer: ErrorLayer.sync,
+          context: const {'where': 'ItineraryNotifier.restore'});
     }
   }
 

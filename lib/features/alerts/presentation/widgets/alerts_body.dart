@@ -138,7 +138,7 @@ class _AlertsEmptyState extends ConsumerWidget {
           title: l10n.alertsEmptyTitle,
           subtitle: l10n.alertsEmptySubtitle,
           // #2857 — the same favorite-station picker the section header's
-          // "+" opens; on selection it shows the same [CreateAlertDialog]
+          // "+" opens; on selection it shows the same [StationAlertCreateSheet]
           // the station-detail app bar uses.
           actionLabel: l10n.alertsStationAdd,
           actionIcon: Icons.add_alert_outlined,

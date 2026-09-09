@@ -8,6 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/navigation/app_routes.dart';
+import '../../../../core/utils/duration_formatter.dart';
+import '../../../../core/utils/unit_formatter.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/swipe_to_delete.dart';
@@ -38,18 +40,39 @@ class _ItinerariesScreenState extends ConsumerState<ItinerariesScreen> {
   @override
   Widget build(BuildContext context) {
     final itineraries = ref.watch(itineraryProvider);
+    final firstLoad = ref.watch(itineraryFirstLoadProvider);
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
+    final locale = Localizations.localeOf(context).toString();
 
     return PageScaffold(
       title: l10n.savedRoutes,
       bodyPadding: EdgeInsets.zero,
       body: itineraries.isEmpty
-          ? EmptyState(
-              icon: Icons.route,
-              title: l10n.noSavedRoutes,
-              subtitle: l10n.noSavedRoutesHint,
-            )
+          // #3993 — "you have none" is a statement of fact, so it waits
+          // until the first server pull has actually answered.
+          ? (firstLoad
+                ? Center(
+                    key: const Key('itineraries_loading'),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const CircularProgressIndicator(),
+                        const SizedBox(height: 16),
+                        Text(
+                          l10n.savedRoutesLoading,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : EmptyState(
+                    icon: Icons.route,
+                    title: l10n.noSavedRoutes,
+                    subtitle: l10n.noSavedRoutesHint,
+                  ))
           : RefreshIndicator(
               onRefresh: () async {
                 await ref.read(itineraryProvider.notifier).loadFromServer();
@@ -64,12 +87,17 @@ class _ItinerariesScreenState extends ConsumerState<ItinerariesScreen> {
                   return SwipeToDelete(
                     dismissKey: ValueKey(it.id),
                     onDismissed: () {
-                      unawaited(
-                        ref.read(itineraryProvider.notifier).delete(it.id),
-                      );
-                      SnackBarHelper.show(
+                      // #3993 — capture-and-restore undo, the idiom the
+                      // fill-up and alert lists already use. The notifier
+                      // is read HERE: this tile leaves the tree the moment
+                      // it is dismissed, so the callback must close over
+                      // the notifier, not over a dead `ref`.
+                      final notifier = ref.read(itineraryProvider.notifier);
+                      unawaited(notifier.delete(it.id));
+                      SnackBarHelper.showWithUndo(
                         context,
-                        AppLocalizations.of(context).itineraryDeleted(it.name),
+                        l10n.itineraryDeleted(it.name),
+                        onUndo: () => unawaited(notifier.restore(it)),
                       );
                     },
                     child: ListTile(
@@ -80,11 +108,20 @@ class _ItinerariesScreenState extends ConsumerState<ItinerariesScreen> {
                         overflow: TextOverflow.ellipsis,
                       ),
                       subtitle: Text(
-                        '${it.distanceKm.round()} km · ${it.durationMinutes.round()} min'
+                        // #3993 — the distance follows the country's unit
+                        // (a UK user reads miles) and the duration's
+                        // abbreviation comes from ARB. The hand-built
+                        // "n km · n min" it replaces was English and
+                        // metric in all 23 locales.
+                        '${UnitFormatter.formatDistance(it.distanceKm, fractionDigits: 0)}'
+                        ' · ${formatTravelDuration(l10n, it.durationMinutes)}'
                         '$highwaysSuffix',
                       ),
                       trailing: Text(
-                        _formatDate(it.updatedAt),
+                        UnitFormatter.formatShortDate(
+                          it.updatedAt,
+                          locale: locale,
+                        ),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
@@ -136,7 +173,4 @@ class _ItinerariesScreenState extends ConsumerState<ItinerariesScreen> {
     );
   }
 
-  String _formatDate(DateTime dt) {
-    return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}';
-  }
 }

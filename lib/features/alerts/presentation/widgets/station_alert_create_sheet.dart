@@ -6,31 +6,68 @@ import 'package:uuid/uuid.dart';
 import '../../background/fuel_price_fields.dart';
 import '../../../../core/country/country_config.dart';
 import '../../../../core/utils/price_formatter.dart';
+import '../../../../core/widgets/sheet_form_actions.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../domain/entities/price_alert.dart';
+import '../../domain/radius_alert_validators.dart';
+import 'radius_alert_form_support.dart';
 
-/// Dialog for creating a new price alert from the station detail screen.
+/// Bottom sheet that creates a price alert for ONE station.
 ///
 /// Takes the station's ID, name, and current price to pre-fill the form.
-/// Returns a [PriceAlert] on submit, or null if cancelled.
-class CreateAlertDialog extends StatefulWidget {
+/// Pops with a [PriceAlert] on submit, or null if cancelled.
+///
+/// #3993 — this was an `AlertDialog` while its sibling, the zone alert,
+/// was a bottom sheet: the same act on the same screen, arriving from
+/// two directions. It is now a sheet with the shared
+/// [SheetFormActions] row, and it seeds and parses its price through
+/// the same locale-aware helpers the zone sheet uses — the old
+/// `toStringAsFixed(3)` prefill showed a dot-decimal number to readers
+/// whose keyboards type commas.
+class StationAlertCreateSheet extends StatefulWidget {
   final String stationId;
   final String stationName;
   final double? currentPrice;
 
-  const CreateAlertDialog({
+  const StationAlertCreateSheet({
     super.key,
     required this.stationId,
     required this.stationName,
     this.currentPrice,
   });
 
+  /// Open the sheet and return the alert the user built, or null.
+  /// Both entry points — the station-detail app bar and the alerts
+  /// screen's station picker — go through here, so the two can never
+  /// drift into different surfaces again.
+  static Future<PriceAlert?> show(
+    BuildContext context, {
+    required String stationId,
+    required String stationName,
+    double? currentPrice,
+  }) {
+    return showModalBottomSheet<PriceAlert>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+        child: StationAlertCreateSheet(
+          stationId: stationId,
+          stationName: stationName,
+          currentPrice: currentPrice,
+        ),
+      ),
+    );
+  }
+
   @override
-  State<CreateAlertDialog> createState() => _CreateAlertDialogState();
+  State<StationAlertCreateSheet> createState() =>
+      _StationAlertCreateSheetState();
 }
 
-class _CreateAlertDialogState extends State<CreateAlertDialog> {
+class _StationAlertCreateSheetState extends State<StationAlertCreateSheet> {
   final _formKey = GlobalKey<FormState>();
   late FuelType _selectedFuelType;
   late TextEditingController _priceController;
@@ -69,9 +106,14 @@ class _CreateAlertDialogState extends State<CreateAlertDialog> {
         : (_alertFuelTypes.isNotEmpty
               ? _alertFuelTypes.first
               : FuelType.diesel);
+    // #3993 — seeded the way the zone sheet seeds: 5 % below the
+    // current price, floored to the thousandth so the target never
+    // lands above it, and formatted in the reader's decimal separator.
+    // The flat 5-cent discount this replaces was the same absolute step
+    // whether the fuel cost 1.20 or 2.20.
     final prefilled = widget.currentPrice != null
-        // i18n-ignore-format: TextEditingController prefill — re-parsed as a dot-decimal number, not display text
-        ? (widget.currentPrice! - 0.05).toStringAsFixed(3)
+        ? formatThreshold(floorToThreeDecimals(
+            widget.currentPrice! * (1 - kRadiusAlertThresholdDiscount)))
         : '';
     _priceController = TextEditingController(text: prefilled);
   }
@@ -86,14 +128,19 @@ class _CreateAlertDialogState extends State<CreateAlertDialog> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
-    return AlertDialog(
-      title: Text(l10n.createAlert),
-      content: Form(
-        key: _formKey,
+    return Form(
+      key: _formKey,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(
+              l10n.createAlert,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 16),
             Text(
               widget.stationName,
               style: Theme.of(
@@ -148,7 +195,8 @@ class _CreateAlertDialogState extends State<CreateAlertDialog> {
               decoration: InputDecoration(
                 labelText: l10n.alertTargetPriceWithCurrency(_currencySymbol),
                 border: const OutlineInputBorder(),
-                hintText: '1.500',
+                // #3993 — the example in the reader's decimal format.
+                hintText: formatThreshold(1.5),
                 suffixText: '$_currencySymbol/L',
               ),
               keyboardType: const TextInputType.numberWithOptions(
@@ -158,7 +206,10 @@ class _CreateAlertDialogState extends State<CreateAlertDialog> {
                 if (value == null || value.isEmpty) {
                   return l10n.enterPrice;
                 }
-                final parsed = double.tryParse(value.replaceAll(',', '.'));
+                // #3993 — the ONE threshold parser both alert forms use,
+                // so "1,499" and "1.499" mean the same price here as
+                // they do in the zone sheet.
+                final parsed = RadiusAlertValidators.parseThreshold(value);
                 if (parsed == null || parsed <= 0) {
                   return l10n.invalidPrice;
                 }
@@ -168,23 +219,27 @@ class _CreateAlertDialogState extends State<CreateAlertDialog> {
                 return null;
               },
             ),
+            const SizedBox(height: 24),
+            SheetFormActions(
+              onCancel: () => Navigator.of(context).pop(),
+              onConfirm: _onSubmit,
+              confirmLabel: l10n.create,
+              confirmKey: const Key('station_alert_create'),
+            ),
+            const SizedBox(height: 8),
           ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n.cancel),
-        ),
-        FilledButton(onPressed: _onSubmit, child: Text(l10n.create)),
-      ],
     );
   }
 
   void _onSubmit() {
     if (!_formKey.currentState!.validate()) return;
 
-    final price = double.parse(_priceController.text.replaceAll(',', '.'));
+    final price = RadiusAlertValidators.parseThreshold(_priceController.text);
+    // The validator has already rejected an unparseable field; this
+    // guard keeps `_onSubmit` total rather than trusting that ordering.
+    if (price == null) return;
 
     final alert = PriceAlert(
       // #3370 — a real UUID so the alert round-trips the Supabase `alerts.id`

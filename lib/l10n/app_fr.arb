@@ -5768,5 +5768,43 @@
   "@showFewerFuelTypes": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "loyaltyCardDeleted": "Deleted {card}",
+  "@loyaltyCardDeleted": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
+  "durationMinutesShort": "{minutes} min",
+  "@durationMinutesShort": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "durationHoursMinutes": "{hours} h {minutes} min",
+  "@durationHoursMinutes": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "savedRoutesLoading": "Loading your saved routes…",
+  "@savedRoutesLoading": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

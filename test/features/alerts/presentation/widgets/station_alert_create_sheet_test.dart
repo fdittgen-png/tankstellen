@@ -4,15 +4,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/alerts/domain/entities/price_alert.dart';
-import 'package:tankstellen/features/alerts/presentation/widgets/create_alert_dialog.dart';
+import 'package:tankstellen/features/alerts/presentation/widgets/station_alert_create_sheet.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 
 import '../../../../helpers/pump_app.dart';
 
-/// Pumps the dialog inside a button-triggered flow so that the surrounding
+/// Pumps the sheet inside a button-triggered flow so that the surrounding
 /// Navigator can deliver the pop value back to us — the same contract the
-/// real station detail screen uses when awaiting the dialog's result.
-Future<PriceAlert?> _openDialog(
+/// real station detail screen uses when awaiting the sheet's result.
+Future<PriceAlert?> _openSheet(
   WidgetTester tester, {
   String stationId = 'station-1',
   String stationName = 'Test Station',
@@ -24,13 +24,11 @@ Future<PriceAlert?> _openDialog(
     Builder(
       builder: (context) => ElevatedButton(
         onPressed: () async {
-          result = await showDialog<PriceAlert>(
-            context: context,
-            builder: (_) => CreateAlertDialog(
-              stationId: stationId,
-              stationName: stationName,
-              currentPrice: currentPrice,
-            ),
+          result = await StationAlertCreateSheet.show(
+            context,
+            stationId: stationId,
+            stationName: stationName,
+            currentPrice: currentPrice,
           );
         },
         child: const Text('open'),
@@ -43,16 +41,16 @@ Future<PriceAlert?> _openDialog(
 }
 
 void main() {
-  group('CreateAlertDialog rendering', () {
+  group('StationAlertCreateSheet rendering', () {
     testWidgets('shows the station name prominently', (tester) async {
-      await _openDialog(tester, stationName: 'Shell Berlin Mitte');
+      await _openSheet(tester, stationName: 'Shell Berlin Mitte');
 
       expect(find.text('Shell Berlin Mitte'), findsOneWidget);
     });
 
     testWidgets('shows current price line when price is provided',
         (tester) async {
-      await _openDialog(tester, currentPrice: 1.659);
+      await _openSheet(tester, currentPrice: 1.659);
 
       // Default country is FR → comma as decimal separator.
       expect(find.textContaining('1,659'), findsOneWidget);
@@ -60,7 +58,7 @@ void main() {
 
     testWidgets('hides current price line when price is null',
         (tester) async {
-      await _openDialog(tester, currentPrice: null);
+      await _openSheet(tester, currentPrice: null);
 
       // The "Current price: ..." label only renders when currentPrice
       // is non-null. We don't assert on € because the target-price
@@ -69,26 +67,29 @@ void main() {
     });
 
     testWidgets('defaults fuel type to diesel', (tester) async {
-      await _openDialog(tester);
+      await _openSheet(tester);
 
       expect(find.text(FuelType.diesel.displayName), findsOneWidget);
     });
 
-    testWidgets('prefills target price at currentPrice - 0.05',
-        (tester) async {
-      await _openDialog(tester, currentPrice: 1.659);
+    testWidgets('prefills the target 5 % under the current price, in the '
+        "reader's decimal format (#3993)", (tester) async {
+      await _openSheet(tester, currentPrice: 1.659);
 
-      // 1.659 - 0.05 = 1.609
+      // 1.659 × 0.95 = 1.57605, floored to the thousandth. Default
+      // country is FR, so the separator is a comma — the old
+      // `toStringAsFixed(3)` prefill wrote '1.609' next to a keyboard
+      // that types commas.
       final field = find.byType(TextFormField);
       expect(field, findsOneWidget);
       final controller =
           (tester.widget(field) as TextFormField).controller;
-      expect(controller?.text, '1.609');
+      expect(controller?.text, '1,576');
     });
 
     testWidgets('leaves target price blank when no currentPrice',
         (tester) async {
-      await _openDialog(tester);
+      await _openSheet(tester);
 
       final field = find.byType(TextFormField);
       final controller =
@@ -97,9 +98,9 @@ void main() {
     });
   });
 
-  group('CreateAlertDialog validation', () {
+  group('StationAlertCreateSheet validation', () {
     testWidgets('rejects an empty target price', (tester) async {
-      await _openDialog(tester);
+      await _openSheet(tester);
 
       await tester.tap(find.text('Create'));
       await tester.pumpAndSettle();
@@ -108,7 +109,7 @@ void main() {
     });
 
     testWidgets('rejects a non-numeric target price', (tester) async {
-      await _openDialog(tester);
+      await _openSheet(tester);
 
       await tester.enterText(find.byType(TextFormField), 'abc');
       await tester.tap(find.text('Create'));
@@ -118,7 +119,7 @@ void main() {
     });
 
     testWidgets('rejects zero or negative target price', (tester) async {
-      await _openDialog(tester);
+      await _openSheet(tester);
 
       await tester.enterText(find.byType(TextFormField), '0');
       await tester.tap(find.text('Create'));
@@ -128,7 +129,7 @@ void main() {
     });
 
     testWidgets('rejects target price above 10 EUR', (tester) async {
-      await _openDialog(tester);
+      await _openSheet(tester);
 
       await tester.enterText(find.byType(TextFormField), '12.5');
       await tester.tap(find.text('Create'));
@@ -138,7 +139,7 @@ void main() {
     });
 
     testWidgets('accepts comma as decimal separator', (tester) async {
-      final result = await _openDialog(tester);
+      final result = await _openSheet(tester);
       // NB: _openDialog returns before dialog closes; we need to drive
       // the form and observe no validation error fires.
 
@@ -152,7 +153,7 @@ void main() {
     });
   });
 
-  group('CreateAlertDialog submit and cancel', () {
+  group('StationAlertCreateSheet submit and cancel', () {
     testWidgets('Create returns a PriceAlert with form values',
         (tester) async {
       PriceAlert? returned;
@@ -161,13 +162,11 @@ void main() {
         Builder(
           builder: (context) => ElevatedButton(
             onPressed: () async {
-              returned = await showDialog<PriceAlert>(
-                context: context,
-                builder: (_) => const CreateAlertDialog(
-                  stationId: 'shell-42',
-                  stationName: 'Shell 42',
-                  currentPrice: 1.700,
-                ),
+              returned = await StationAlertCreateSheet.show(
+                context,
+                stationId: 'shell-42',
+                stationName: 'Shell 42',
+                currentPrice: 1.700,
               );
             },
             child: const Text('open'),
@@ -212,12 +211,10 @@ void main() {
         Builder(
           builder: (context) => ElevatedButton(
             onPressed: () async {
-              returned = await showDialog<PriceAlert>(
-                context: context,
-                builder: (_) => const CreateAlertDialog(
-                  stationId: 's',
-                  stationName: 'n',
-                ),
+              returned = await StationAlertCreateSheet.show(
+                context,
+                stationId: 's',
+                stationName: 'n',
               );
             },
             child: const Text('open'),
@@ -241,12 +238,10 @@ void main() {
         Builder(
           builder: (context) => ElevatedButton(
             onPressed: () async {
-              returned = await showDialog<PriceAlert>(
-                context: context,
-                builder: (_) => const CreateAlertDialog(
-                  stationId: 's',
-                  stationName: 'n',
-                ),
+              returned = await StationAlertCreateSheet.show(
+                context,
+                stationId: 's',
+                stationName: 'n',
               );
             },
             child: const Text('open'),
@@ -272,10 +267,10 @@ void main() {
     });
   });
 
-  group('CreateAlertDialog fuel gating — DE (#2246/#2865)', () {
+  group('StationAlertCreateSheet fuel gating — DE (#2246/#2865)', () {
     testWidgets('a German station offers only e5/e10/diesel',
         (tester) async {
-      await _openDialog(tester, stationId: 'de-abc-uuid');
+      await _openSheet(tester, stationId: 'de-abc-uuid');
 
       await tester.tap(find.byType(DropdownButtonFormField<FuelType>));
       await tester.pumpAndSettle();
@@ -293,23 +288,23 @@ void main() {
     });
   });
 
-  group('CreateAlertDialog country-aware creation (#2865)', () {
+  group('StationAlertCreateSheet country-aware creation (#2865)', () {
     testWidgets('a non-DE (FR) station shows NO Germany-only warning',
         (tester) async {
-      await _openDialog(tester, stationId: 'fr-12345');
+      await _openSheet(tester, stationId: 'fr-12345');
 
       // The DE-only gate is gone — background alerts now fire everywhere.
       expect(find.byKey(const Key('alert_non_de_warning')), findsNothing);
     });
 
     testWidgets('a German station also shows no warning', (tester) async {
-      await _openDialog(tester, stationId: 'de-abc-uuid');
+      await _openSheet(tester, stationId: 'de-abc-uuid');
 
       expect(find.byKey(const Key('alert_non_de_warning')), findsNothing);
     });
 
     testWidgets('an FR station labels the target price in euro', (tester) async {
-      await _openDialog(tester, stationId: 'fr-12345');
+      await _openSheet(tester, stationId: 'fr-12345');
 
       // FR currency is the euro → label reads "Target price (€)".
       expect(find.text('Target price (€)'), findsOneWidget);
@@ -317,14 +312,14 @@ void main() {
 
     testWidgets('a GB station labels the target price in pounds',
         (tester) async {
-      await _openDialog(tester, stationId: 'uk-9001');
+      await _openSheet(tester, stationId: 'uk-9001');
 
       expect(find.text('Target price (£)'), findsOneWidget);
     });
 
     testWidgets('an FR station offers FR-specific fuels (E85, LPG, SP98)',
         (tester) async {
-      await _openDialog(tester, stationId: 'fr-12345');
+      await _openSheet(tester, stationId: 'fr-12345');
 
       await tester.tap(find.byType(DropdownButtonFormField<FuelType>));
       await tester.pumpAndSettle();
@@ -340,7 +335,7 @@ void main() {
 
     testWidgets('an unprefixed legacy id falls back to the default (DE) set',
         (tester) async {
-      await _openDialog(tester, stationId: 'station-1');
+      await _openSheet(tester, stationId: 'station-1');
 
       // No recognised prefix → default country → euro label + e5/e10/diesel.
       expect(find.text('Target price (€)'), findsOneWidget);

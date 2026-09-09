@@ -11,7 +11,7 @@ import 'package:tankstellen/core/widgets/empty_state.dart';
 import 'package:tankstellen/features/alerts/data/models/price_alert.dart';
 import 'package:tankstellen/features/alerts/domain/entities/radius_alert.dart';
 import 'package:tankstellen/features/alerts/presentation/screens/alerts_screen.dart';
-import 'package:tankstellen/features/alerts/presentation/widgets/create_alert_dialog.dart';
+import 'package:tankstellen/features/alerts/presentation/widgets/station_alert_create_sheet.dart';
 import 'package:tankstellen/features/alerts/providers/alert_provider.dart';
 import 'package:tankstellen/features/alerts/providers/radius_alerts_provider.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
@@ -223,7 +223,7 @@ void main() {
       await tester.tap(find.byKey(const Key('alert_pick_station_tile_fav-1')));
       await tester.pumpAndSettle();
 
-      expect(find.byType(CreateAlertDialog), findsOneWidget);
+      expect(find.byType(StationAlertCreateSheet), findsOneWidget);
     });
 
     testWidgets('with no favorites the picker offers a Search fallback, not a '

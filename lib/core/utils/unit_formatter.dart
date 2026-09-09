@@ -197,6 +197,14 @@ class UnitFormatter {
   static String formatMediumDate(DateTime date, {required String locale}) =>
       DateFormat.yMMMd(locale).format(date);
 
+  /// Short date without the year (`Aug 21` / `21 août` / `21.08.`) in
+  /// the given UI [locale] — for list-row trailing captions where the
+  /// year is noise and the full medium date does not fit (#3993).
+  /// Replaces hand-rolled `dd/MM`, which reads as the wrong date to
+  /// every reader whose locale puts the month first.
+  static String formatShortDate(DateTime date, {required String locale}) =>
+      DateFormat.MMMd(locale).format(date);
+
   static String _oneDecimal(double v) => formatDecimal(v);
 
   static String _threeDecimals(double v) =>

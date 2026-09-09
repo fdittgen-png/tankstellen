@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/widgets/sheet_form_actions.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/fuel_type.dart';
 
@@ -296,22 +297,13 @@ class RadiusAlertActionButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Row(
-      children: [
-        Expanded(
-          child: OutlinedButton(
-            onPressed: onCancel,
-            child: Text(l10n.alertsRadiusCancel),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: FilledButton(
-            onPressed: onSave,
-            child: Text(l10n.alertsRadiusSave),
-          ),
-        ),
-      ],
+    // #3993 — the row itself is core's; this widget stays as the zone
+    // sheet's named entry point with its own verbs.
+    return SheetFormActions(
+      onCancel: onCancel,
+      onConfirm: onSave,
+      cancelLabel: l10n.alertsRadiusCancel,
+      confirmLabel: l10n.alertsRadiusSave,
     );
   }
 }

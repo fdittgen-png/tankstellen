@@ -4,6 +4,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/utils/unit_formatter.dart';
+import '../../../../core/widgets/sheet_form_actions.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/loyalty_card.dart';
 import '../../domain/loyalty_card_validators.dart';
@@ -18,6 +20,11 @@ import '../../domain/loyalty_card_validators.dart';
 /// Extracted from `loyalty_settings_screen.dart` (#563). Validation
 /// rules live in `domain/loyalty_card_validators.dart` so the form
 /// and any future bulk-import path stay consistent.
+///
+/// #3993 — the body scrolls and the actions come from core's
+/// [SheetFormActions]. Before, four fields plus the buttons overflowed
+/// a short screen once the keyboard opened, and Save — the whole point
+/// of the sheet — was the part pushed off.
 class LoyaltyAddCardSheet extends StatefulWidget {
   const LoyaltyAddCardSheet({super.key});
 
@@ -46,79 +53,75 @@ class _LoyaltyAddCardSheetState extends State<LoyaltyAddCardSheet> {
       padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + viewInsets),
       child: Form(
         key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              l.loyaltyAddCardSheetTitle,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<LoyaltyBrand>(
-              initialValue: _brand,
-              decoration: InputDecoration(
-                labelText: l.loyaltyBrandLabel,
-                border: const OutlineInputBorder(),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                l.loyaltyAddCardSheetTitle,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
-              items: [
-                for (final brand in LoyaltyBrand.values)
-                  DropdownMenuItem(
-                    value: brand,
-                    child: Text(brand.canonicalBrand),
-                  ),
-              ],
-              onChanged: (v) {
-                if (v != null) setState(() => _brand = v);
-              },
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _labelController,
-              decoration: InputDecoration(
-                labelText: l.loyaltyCardLabelLabel,
-                border: const OutlineInputBorder(),
-              ),
-              textInputAction: TextInputAction.next,
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _discountController,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              inputFormatters: [
-                // Accept either '.' or ',' so a French keyboard works.
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-              ],
-              decoration: InputDecoration(
-                labelText: l.loyaltyDiscountLabel,
-                hintText: '0.05',
-                border: const OutlineInputBorder(),
-              ),
-              validator: (value) {
-                if (!isValidDiscountInput(value)) {
-                  return l.loyaltyDiscountInvalid;
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text(l.cancel),
-                  ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<LoyaltyBrand>(
+                initialValue: _brand,
+                decoration: InputDecoration(
+                  labelText: l.loyaltyBrandLabel,
+                  border: const OutlineInputBorder(),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: FilledButton(onPressed: _onSave, child: Text(l.save)),
+                items: [
+                  for (final brand in LoyaltyBrand.values)
+                    DropdownMenuItem(
+                      value: brand,
+                      child: Text(brand.canonicalBrand),
+                    ),
+                ],
+                onChanged: (v) {
+                  if (v != null) setState(() => _brand = v);
+                },
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _labelController,
+                decoration: InputDecoration(
+                  labelText: l.loyaltyCardLabelLabel,
+                  border: const OutlineInputBorder(),
                 ),
-              ],
-            ),
-          ],
+                textInputAction: TextInputAction.next,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _discountController,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                inputFormatters: [
+                  // Accept either '.' or ',' so a French keyboard works.
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+                ],
+                decoration: InputDecoration(
+                  labelText: l.loyaltyDiscountLabel,
+                  // #3993 — the example follows the reader's decimal
+                  // separator ("0,05" in FR/DE). A dot-decimal hint next
+                  // to a comma keyboard reads as a different number.
+                  hintText: UnitFormatter.formatDecimal(0.05, fractionDigits: 2),
+                  border: const OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (!isValidDiscountInput(value)) {
+                    return l.loyaltyDiscountInvalid;
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              SheetFormActions(
+                onCancel: () => Navigator.of(context).pop(),
+                onConfirm: _onSave,
+                confirmKey: const Key('loyalty_add_card_save'),
+              ),
+            ],
+          ),
         ),
       ),
     );
