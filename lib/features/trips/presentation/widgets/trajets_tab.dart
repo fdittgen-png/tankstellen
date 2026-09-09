@@ -42,29 +42,11 @@ class TrajetsTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final trips = ref.watch(tripHistoryListProvider);
     final vehicles = ref.watch(vehicleProfileListProvider);
     final activeVehicle = ref.watch(activeVehicleProfileProvider);
-    // Filter to the active vehicle when one is set (#889). Keep every
-    // trip when there is no active vehicle so the tab isn't silently
-    // empty just because the profile selector hasn't been used.
-    final filteredUnsorted = vehicleId == null
-        ? trips.toList(growable: false)
-        : trips
-              .where((t) => t.vehicleId == null || t.vehicleId == vehicleId)
-              .toList(growable: false);
-    // Defensive sort: `TripHistoryRepository.loadAll` already returns
-    // newest-first, but we don't want to assume the provider was
-    // populated by the repo path (tests, future sync sources). Sort
-    // by `startedAt` descending here so the UI contract is tab-level.
-    final filtered = List<TripHistoryEntry>.from(filteredUnsorted)
-      ..sort((a, b) {
-        final ax =
-            a.summary.startedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-        final bx =
-            b.summary.startedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-        return bx.compareTo(ax);
-      });
+    // #3985 — the filter + sort moved to `tripsForVehicleProvider`, so
+    // they run when the trip list changes rather than on every rebuild.
+    final filtered = ref.watch(tripsForVehicleProvider(vehicleId));
 
     if (filtered.isEmpty) {
       // No owned trips — still surface any trips shared WITH the user

@@ -26,7 +26,9 @@ class BlockedAuthorsSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final l = AppLocalizations.of(context);
-    final blocked = ref.watch(blockedContentAuthorsProvider).toList()..sort();
+    // #3985 — sorted once per change to the blocked set, in the
+    // provider, instead of on every rebuild of this section.
+    final blocked = ref.watch(sortedBlockedAuthorsProvider);
     final muted = theme.colorScheme.onSurfaceVariant;
 
     return Card(
