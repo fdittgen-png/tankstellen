@@ -804,9 +804,6 @@ class AppLocalizationsFi extends AppLocalizations {
   String get noPriceHistory => 'Ei hintahistoriaa vielä';
 
   @override
-  String get noStatistics => 'Tilastoja ei saatavilla';
-
-  @override
   String get showAllFuelTypes => 'Näytä kaikki polttoainetyypit';
 
   @override
@@ -3010,6 +3007,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String syncConnectionFailed(String error) {
     return 'Connection failed: $error';
   }
+
+  @override
+  String get showFewerFuelTypes => 'Show fewer fuel types';
 
   @override
   String get achievementSmoothDriver => 'Tasainen putki';

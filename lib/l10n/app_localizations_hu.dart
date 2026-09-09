@@ -809,9 +809,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get noPriceHistory => 'Még nincs ártörténet';
 
   @override
-  String get noStatistics => 'Nincsenek elérhető statisztikák';
-
-  @override
   String get showAllFuelTypes => 'Összes üzemanyagtípus mutatása';
 
   @override
@@ -3029,6 +3026,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String syncConnectionFailed(String error) {
     return 'Connection failed: $error';
   }
+
+  @override
+  String get showFewerFuelTypes => 'Show fewer fuel types';
 
   @override
   String get achievementSmoothDriver => 'Sima sorozat';

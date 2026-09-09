@@ -806,9 +806,6 @@ class AppLocalizationsLv extends AppLocalizations {
   String get noPriceHistory => 'Vēl nav cenu vēstures';
 
   @override
-  String get noStatistics => 'Nav pieejamu statistiku';
-
-  @override
   String get showAllFuelTypes => 'Rādīt visus degvielas veidus';
 
   @override
@@ -3028,6 +3025,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String syncConnectionFailed(String error) {
     return 'Connection failed: $error';
   }
+
+  @override
+  String get showFewerFuelTypes => 'Show fewer fuel types';
 
   @override
   String get achievementSmoothDriver => 'Maigā braukšana sērijā';

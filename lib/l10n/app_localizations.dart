@@ -1599,12 +1599,6 @@ abstract class AppLocalizations {
   /// **'No price history yet'**
   String get noPriceHistory;
 
-  /// No description provided for @noStatistics.
-  ///
-  /// In en, this message translates to:
-  /// **'No statistics available'**
-  String get noStatistics;
-
   /// No description provided for @showAllFuelTypes.
   ///
   /// In en, this message translates to:
@@ -5539,6 +5533,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Connection failed: {error}'**
   String syncConnectionFailed(String error);
+
+  /// Collapses the station-detail price history back to one fuel type; the counterpart of showAllFuelTypes (#3990).
+  ///
+  /// In en, this message translates to:
+  /// **'Show fewer fuel types'**
+  String get showFewerFuelTypes;
 
   /// Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5).
   ///

@@ -804,9 +804,6 @@ class AppLocalizationsHr extends AppLocalizations {
   String get noPriceHistory => 'Još nema povijesti cijena';
 
   @override
-  String get noStatistics => 'Nema dostupnih statistika';
-
-  @override
   String get showAllFuelTypes => 'Prikaži sve vrste goriva';
 
   @override
@@ -3014,6 +3011,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String syncConnectionFailed(String error) {
     return 'Connection failed: $error';
   }
+
+  @override
+  String get showFewerFuelTypes => 'Show fewer fuel types';
 
   @override
   String get achievementSmoothDriver => 'Niz mirnih vožnji';

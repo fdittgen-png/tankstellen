@@ -32,47 +32,42 @@ List<RouteBase> _routesUnderTest() {
 
 void main() {
   group('stationRoutes', () {
-    test('returns exactly 5 routes', () {
+    test('returns exactly 4 routes', () {
       // Guards against accidental insert/delete — fuel detail, EV
-      // detail, EV deep-link, price history, and report.
-      expect(_routesUnderTest().length, 5);
+      // detail, EV deep-link and report. #3990 removed the fifth,
+      // `/station/:id/history`: the price history now expands inside the
+      // station-detail section instead of on a screen of its own, so
+      // there is no longer a more-specific route to order before
+      // `/station/:id`.
+      expect(_routesUnderTest().length, 4);
     });
 
-    test('route 0 path is "/station/:id/history" with id path parameter', () {
-      // Order matters: the more-specific `/station/:id/history` route
-      // must come BEFORE `/station/:id` so go_router matches the
-      // history sub-screen first.
+    test('route 0 path is "/station/:id" with id path parameter', () {
       final route = _routesUnderTest()[0] as GoRoute;
-      expect(route.path, '/station/:id/history');
-      expect(route.path, contains(':id'));
-    });
-
-    test('route 1 path is "/station/:id" with id path parameter', () {
-      final route = _routesUnderTest()[1] as GoRoute;
       expect(route.path, '/station/:id');
       expect(route.path, contains(':id'));
     });
 
-    test('route 2 path is "/ev-station" (extra-payload variant)', () {
+    test('route 1 path is "/ev-station" (extra-payload variant)', () {
       // No path parameter — this variant takes the ChargingStation
       // payload via `state.extra` (set by the in-memory search-results
       // tap path).
-      final route = _routesUnderTest()[2] as GoRoute;
+      final route = _routesUnderTest()[1] as GoRoute;
       expect(route.path, '/ev-station');
       expect(route.path, isNot(contains(':')));
     });
 
-    test('route 3 path is "/ev-station/:id" with id path parameter (#713)', () {
+    test('route 2 path is "/ev-station/:id" with id path parameter (#713)', () {
       // #713 — deep-link friendly EV detail. Takes the station id in
       // the path and hydrates the ChargingStation from the cached
       // widget JSON via the storage repository.
-      final route = _routesUnderTest()[3] as GoRoute;
+      final route = _routesUnderTest()[2] as GoRoute;
       expect(route.path, '/ev-station/:id');
       expect(route.path, contains(':id'));
     });
 
-    test('route 4 path is "/report/:id" with id path parameter', () {
-      final route = _routesUnderTest()[4] as GoRoute;
+    test('route 3 path is "/report/:id" with id path parameter', () {
+      final route = _routesUnderTest()[3] as GoRoute;
       expect(route.path, '/report/:id');
       expect(route.path, contains(':id'));
     });
@@ -126,7 +121,7 @@ void main() {
           .whereType<GoRoute>()
           .where((r) => r.path.contains(':'))
           .toList();
-      expect(paramRoutes.length, 4);
+      expect(paramRoutes.length, 3);
       for (final r in paramRoutes) {
         expect(
           r.path,

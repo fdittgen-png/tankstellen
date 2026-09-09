@@ -802,9 +802,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noPriceHistory => 'No price history yet';
 
   @override
-  String get noStatistics => 'No statistics available';
-
-  @override
   String get showAllFuelTypes => 'Show all fuel types';
 
   @override
@@ -2998,6 +2995,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String syncConnectionFailed(String error) {
     return 'Connection failed: $error';
   }
+
+  @override
+  String get showFewerFuelTypes => 'Show fewer fuel types';
 
   @override
   String get achievementSmoothDriver => 'Smooth streak';
@@ -9786,9 +9786,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get noPriceHistory => '⟦Ñó ƥřîçé ĥîšŧóřý ýéŧ ········⟧';
 
   @override
-  String get noStatistics => '⟦Ñó šŧáŧîšŧîçš áṽáîłáƀłé ·········⟧';
-
-  @override
   String get showAllFuelTypes => '⟦Šĥóŵ áłł ƒúéł ŧýƥéš ·······⟧';
 
   @override
@@ -12044,6 +12041,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String syncConnectionFailed(String error) {
     return '⟦Çóññéçŧîóñ ƒáîłéđ: $error ·······⟧';
   }
+
+  @override
+  String get showFewerFuelTypes => '⟦Šĥóŵ ƒéŵéř ƒúéł ŧýƥéš ········⟧';
 
   @override
   String get achievementSmoothDriver => '⟦Šɱóóŧĥ šŧřéáķ ·····⟧';

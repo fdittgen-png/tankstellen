@@ -808,9 +808,6 @@ class AppLocalizationsEl extends AppLocalizations {
   String get noPriceHistory => 'Δεν υπάρχει ακόμη ιστορικό τιμών';
 
   @override
-  String get noStatistics => 'Δεν υπάρχουν διαθέσιμα στατιστικά';
-
-  @override
   String get showAllFuelTypes => 'Εμφάνιση όλων των τύπων καυσίμου';
 
   @override
@@ -3031,6 +3028,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String syncConnectionFailed(String error) {
     return 'Connection failed: $error';
   }
+
+  @override
+  String get showFewerFuelTypes => 'Show fewer fuel types';
 
   @override
   String get achievementSmoothDriver => 'Σερί ομαλής οδήγησης';

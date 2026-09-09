@@ -47,7 +47,6 @@ void main() {
       // - consumption_screen.dart    : two charging-charts cards.
       // - trip_detail_screen.dart    : trip-summary card.
       // - trip_recording_screen.dart : recording-controls card.
-      // - price_history_screen.dart  : per-fuel-type chart card.
       // - profile_screen.dart        : profile header card.
       // - theme_settings_screen.dart : theme-preview card.
       // - sync/auth_screen.dart      : account-mode card.
@@ -56,7 +55,6 @@ void main() {
         'lib/features/consumption/presentation/screens/consumption_screen.dart',
         'lib/features/trips/presentation/screens/trip_detail_screen.dart',
         'lib/features/trips/presentation/screens/trip_recording_screen.dart',
-        'lib/features/price_history/presentation/screens/price_history_screen.dart',
         'lib/features/profile/presentation/screens/profile_screen.dart',
         'lib/features/profile/presentation/screens/theme_settings_screen.dart',
         'lib/features/sync/presentation/screens/auth_screen.dart',

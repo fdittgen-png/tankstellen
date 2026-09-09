@@ -801,9 +801,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get noPriceHistory => 'Hinnaajalugu puudub';
 
   @override
-  String get noStatistics => 'Statistika pole saadaval';
-
-  @override
   String get showAllFuelTypes => 'Näita kõiki kütuseliike';
 
   @override
@@ -3006,6 +3003,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String syncConnectionFailed(String error) {
     return 'Connection failed: $error';
   }
+
+  @override
+  String get showFewerFuelTypes => 'Show fewer fuel types';
 
   @override
   String get achievementSmoothDriver => 'Sujuv seeria';

@@ -394,7 +394,7 @@ const _featurePairBaseline = <String, int>{
   'station_detail -> favorites': 1,
   'station_detail -> feature_management': 2,
   'station_detail -> payment': 3,
-  'station_detail -> price_history': 4,
+  'station_detail -> price_history': 2,
   'station_detail -> profile': 1,
   'station_detail -> route_search': 1,
   'station_detail -> search': 8,

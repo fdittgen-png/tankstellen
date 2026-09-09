@@ -399,7 +399,6 @@
   "favoritesDataCache": "Favoritendaten",
   "citySearchCache": "Stadtsuche",
   "noPriceHistory": "Noch kein Preisverlauf",
-  "noStatistics": "Keine Statistiken verfügbar",
   "showAllFuelTypes": "Alle Kraftstoffarten anzeigen",
   "connected": "Verbunden",
   "disconnectTankSync": "TankSync trennen",
@@ -1205,5 +1204,7 @@
   "linkDeviceLinked": "Verknüpft! {favorites} Favoriten, {alerts} Alarme, {vehicles} Fahrzeuge und {fillUps} Tankfüllungen importiert.",
   "@linkDeviceLinked": {"description": "Shown after a successful device link, with what was imported (#3988).", "placeholders": {"favorites": {"type": "int"}, "alerts": {"type": "int"}, "vehicles": {"type": "int"}, "fillUps": {"type": "int"}}},
   "syncConnectionFailed": "Verbindung fehlgeschlagen: {error}",
-  "@syncConnectionFailed": {"description": "Sync wizard: the connection test or adopt step failed; {error} is the localized reason (#3988).", "placeholders": {"error": {"type": "String", "example": "No internet connection"}}}
+  "@syncConnectionFailed": {"description": "Sync wizard: the connection test or adopt step failed; {error} is the localized reason (#3988).", "placeholders": {"error": {"type": "String", "example": "No internet connection"}}},
+  "showFewerFuelTypes": "Weniger Kraftstoffarten anzeigen",
+  "@showFewerFuelTypes": {"description": "Collapses the station-detail price history back to one fuel type; the counterpart of showAllFuelTypes (#3990)."}
 }

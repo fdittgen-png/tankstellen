@@ -230,7 +230,6 @@
   "favoritesDataCache": "Kedvencek adatai",
   "citySearchCache": "Városkeresés",
   "noPriceHistory": "Még nincs ártörténet",
-  "noStatistics": "Nincsenek elérhető statisztikák",
   "showAllFuelTypes": "Összes üzemanyagtípus mutatása",
   "connected": "Csatlakoztatva",
   "disconnectTankSync": "TankSync leválasztása",
@@ -6520,5 +6519,10 @@
         "type": "int"
       }
     }
+  },
+  "showFewerFuelTypes": "Show fewer fuel types",
+  "@showFewerFuelTypes": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

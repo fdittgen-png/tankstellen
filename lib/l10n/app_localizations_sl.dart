@@ -802,9 +802,6 @@ class AppLocalizationsSl extends AppLocalizations {
   String get noPriceHistory => 'Še ni zgodovine cen';
 
   @override
-  String get noStatistics => 'Ni razpoložljivih statistik';
-
-  @override
   String get showAllFuelTypes => 'Prikaži vse vrste goriv';
 
   @override
@@ -3009,6 +3006,9 @@ class AppLocalizationsSl extends AppLocalizations {
   String syncConnectionFailed(String error) {
     return 'Connection failed: $error';
   }
+
+  @override
+  String get showFewerFuelTypes => 'Show fewer fuel types';
 
   @override
   String get achievementSmoothDriver => 'Mirna serija';

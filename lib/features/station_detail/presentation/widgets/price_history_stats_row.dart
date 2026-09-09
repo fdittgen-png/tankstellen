@@ -12,7 +12,9 @@ import '../../../price_history/domain/entities/price_stats.dart';
 /// Honest min / max / average / delta row for the station-detail price
 /// history (#3928, epic #3925).
 ///
-/// Two lies of the shared `PriceStatsCard` are fixed here:
+/// It replaced a `PriceStatsCard` that told two lies — #3990 then deleted
+/// that card with the duplicate screen that was its last caller, so this is
+/// now the only price-stats surface:
 ///
 ///  1. **Colour.** It painted Min green and Max red unconditionally, so a
 ///     station with a single observed price rendered `Min 2,329 €` in

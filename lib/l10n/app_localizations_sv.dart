@@ -804,9 +804,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get noPriceHistory => 'Ingen prishistorik ännu';
 
   @override
-  String get noStatistics => 'Ingen statistik tillgänglig';
-
-  @override
   String get showAllFuelTypes => 'Visa alla bränsletyper';
 
   @override
@@ -3005,6 +3002,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String syncConnectionFailed(String error) {
     return 'Connection failed: $error';
   }
+
+  @override
+  String get showFewerFuelTypes => 'Show fewer fuel types';
 
   @override
   String get achievementSmoothDriver => 'Mjukserie';

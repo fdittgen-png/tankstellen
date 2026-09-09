@@ -10,7 +10,6 @@ import '../../core/storage/storage_providers.dart';
 import '../../features/ev/data/repositories/ev_station_repository.dart';
 import '../../features/ev/providers/ev_providers.dart';
 import '../../features/feature_management/domain/feature.dart';
-import '../../features/price_history/presentation/screens/price_history_screen.dart';
 import '../../features/report/presentation/screens/report_screen.dart';
 import '../../features/search/presentation/screens/ev_station_detail_screen.dart';
 import '../../features/station_detail/presentation/screens/station_detail_screen.dart';
@@ -25,22 +24,6 @@ import 'invalid_id_screen.dart';
 /// the [ChargingStation] payload from the cached widget JSON, so the
 /// list is parameterised with the router's [Ref].
 List<RouteBase> stationRoutes(Ref ref) => [
-      GoRoute(
-        path: RoutePaths.stationHistoryPattern,
-        builder: (context, state) {
-          final id = state.pathParameters['id'];
-          if (!isValidStationId(id)) {
-            return invalidIdScreen(context, state.matchedLocation);
-          }
-          // Feature.priceHistory finally gates its surface (2026-08-17
-          // review, dead-code finding 6). Default-on.
-          return FeatureGatedScreen(
-            feature: Feature.priceHistory,
-            fallbackPath: RoutePaths.search,
-            child: PriceHistoryScreen(stationId: id!),
-          );
-        },
-      ),
       GoRoute(
         path: RoutePaths.stationPattern,
         // #3615 — shared detail transition (fade + settle).

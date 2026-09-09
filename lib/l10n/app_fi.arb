@@ -230,7 +230,6 @@
   "favoritesDataCache": "Suosikkien tiedot",
   "citySearchCache": "Kaupunkihaku",
   "noPriceHistory": "Ei hintahistoriaa vielä",
-  "noStatistics": "Tilastoja ei saatavilla",
   "showAllFuelTypes": "Näytä kaikki polttoainetyypit",
   "connected": "Yhdistetty",
   "disconnectTankSync": "Katkaise TankSync",
@@ -6520,5 +6519,10 @@
         "type": "int"
       }
     }
+  },
+  "showFewerFuelTypes": "Show fewer fuel types",
+  "@showFewerFuelTypes": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

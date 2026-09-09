@@ -230,7 +230,6 @@
   "favoritesDataCache": "Iecienīto dati",
   "citySearchCache": "Pilsētas meklēšana",
   "noPriceHistory": "Vēl nav cenu vēstures",
-  "noStatistics": "Nav pieejamu statistiku",
   "showAllFuelTypes": "Rādīt visus degvielas veidus",
   "connected": "Savienots",
   "disconnectTankSync": "Atvienot TankSync",
@@ -6520,5 +6519,10 @@
         "type": "int"
       }
     }
+  },
+  "showFewerFuelTypes": "Show fewer fuel types",
+  "@showFewerFuelTypes": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

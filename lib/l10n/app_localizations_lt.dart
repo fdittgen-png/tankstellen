@@ -805,9 +805,6 @@ class AppLocalizationsLt extends AppLocalizations {
   String get noPriceHistory => 'Kainų istorijos dar nėra';
 
   @override
-  String get noStatistics => 'Nėra prieinamų statistikų';
-
-  @override
   String get showAllFuelTypes => 'Rodyti visus degalų tipus';
 
   @override
@@ -3030,6 +3027,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String syncConnectionFailed(String error) {
     return 'Connection failed: $error';
   }
+
+  @override
+  String get showFewerFuelTypes => 'Show fewer fuel types';
 
   @override
   String get achievementSmoothDriver => 'Sklandaus vairavimo serija';
