@@ -21,7 +21,7 @@ part of 'obd2_connection_service.dart';
 /// `connectByMacPassive`, which extension methods (statically dispatched)
 /// silently forbid. `part`-file privacy is library-level, so these reach the
 /// service's private `_openAndInit` / `_teardownLastDirectChannel` /
-/// `_lastDirectChannel`.
+/// the service's [Obd2DirectChannelSlot].
 
 /// Body of [Obd2ConnectionService.connectByMacDirect] (#2242). Addresses the
 /// adapter via `BluetoothDevice.fromId(mac)` with a bounded ~4 s [timeout],
@@ -63,14 +63,14 @@ Future<Obd2Service?> _connectByMacDirect(
   // No scan ⇒ no resolved profile. Use the registry's generic FFF0
   // BLE profile for the adapter init quirks + display name; its UUIDs
   // match the channel [channelForDirect] builds.
-  final generic = _genericBleProfile(svc);
+  final generic = genericBleProfile(svc.registry);
   // #2969 — this is the BLE direct path. Stamp the resolved transport so a
   // wrong-transport attempt (a BLE direct connect against a Classic adapter)
   // shows resolvedTransport:ble in the trace.
   Obd2ConnectTraceLog.active?.setResolvedTransport(Obd2ConnectTransport.ble);
   final channel =
       svc.bluetooth.channelForDirect(mac, connectTimeout: connectTimeout);
-  svc._lastDirectChannel = channel;
+  svc._directChannel.hold(channel);
   try {
     return await svc._openAndInit(
       channel: channel,
@@ -114,7 +114,7 @@ Future<Obd2Service?> _connectByMacDirect(
       return true;
     }(), 'debug-only breadcrumb — the closure always returns true');
     // #3244 — close-by-identity: tear down THIS attempt's channel only. The
-    // no-arg teardown closed whatever `_lastDirectChannel` pointed at, which
+    // no-arg teardown closed whatever the direct-channel slot pointed at,
     // a rival admitted meanwhile may have re-assigned to ITS live channel.
     await _teardownDirectChannel(svc, channel);
     // #3181 — a TYPED pairing failure must NOT be masked by the scan
@@ -185,12 +185,12 @@ Future<Obd2Service?> _connectByMacClassicDirect(
   // No scan ⇒ no resolved profile. Pick the best-fit Classic profile so
   // the init quirks match the bonded adapter — name-matched from the
   // caller's stored [adapterName] when one was threaded through (#3572).
-  final profile = _classicProfileForReconnect(svc, adapterName: adapterName);
+  final profile = classicProfileForReconnect(svc.registry, adapterName: adapterName);
   // #2969 — the RFCOMM path: stamp resolvedTransport:classic.
   Obd2ConnectTraceLog.active
       ?.setResolvedTransport(Obd2ConnectTransport.classic);
   final channel = classic.channelFor(mac);
-  svc._lastDirectChannel = channel;
+  svc._directChannel.hold(channel);
   try {
     return await svc._openAndInit(
       channel: channel,
@@ -314,9 +314,9 @@ Future<Obd2Service?> _connectByMacPassive(
   // #2906 — stop scan + settle before the passive autoConnect GATT open.
   await svc.stopScanBeforeConnect();
   await svc._teardownLastDirectChannel();
-  final generic = _genericBleProfile(svc);
+  final generic = genericBleProfile(svc.registry);
   final channel = svc.bluetooth.channelForDirect(mac, autoConnect: true);
-  svc._lastDirectChannel = channel;
+  svc._directChannel.hold(channel);
   try {
     return await svc._openAndInit(
       channel: channel,
@@ -334,7 +334,7 @@ Future<Obd2Service?> _connectByMacPassive(
         where: 'Obd2ConnectionService.connectByMacPassive failed',
         layer: ErrorLayer.other);
     // #3244 — close-by-identity: after a preempt force-release the ACTIVE
-    // requester owns `_lastDirectChannel`; this zombie failure path must
+    // requester owns the direct-channel slot; this zombie failure path must
     // close only ITS OWN channel, never the active connect mid-handshake.
     await _teardownDirectChannel(svc, channel);
     return null;

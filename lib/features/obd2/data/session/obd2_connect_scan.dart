@@ -146,7 +146,7 @@ Future<Obd2Service?> _connectByMacImpl(
   required Duration timeout,
   String? adapterName,
 }) =>
-    _traced(
+    tracedConnect(
       origin: Obd2ConnectOrigin.firstConnect,
       mac: mac,
       adapterName: adapterName,

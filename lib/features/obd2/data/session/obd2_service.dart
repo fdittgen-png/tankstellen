@@ -62,6 +62,8 @@ export '../../domain/fuel_rate_estimator.dart'
         applyFuelTrimCorrection,
         estimateFuelRateLPerHourFromMap;
 
+import 'obd2_elm_at_grammar.dart';
+
 part 'obd2_service_link.dart';
 part 'obd2_service_init.dart';
 part 'obd2_service_connect.dart';

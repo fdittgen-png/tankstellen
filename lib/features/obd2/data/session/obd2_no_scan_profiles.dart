@@ -1,18 +1,23 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-part of 'obd2_connection_service.dart';
+import '../protocol/adapter_registry.dart';
 
-// #3572 — no-scan profile fallbacks for the direct-connect-by-MAC paths,
-// extracted from `obd2_connect_by_mac.dart` (same library, keeps
-// private-member access) when that part hit the 400-line guard.
+/// #3572 — the no-scan profile fallbacks for the direct-connect-by-MAC
+/// paths, where no scan resolved a profile and the quirks still have to
+/// fit the real hardware.
+///
+/// #4035 (epic #4032) — a library of its own rather than a `part` of
+/// `obd2_connection_service.dart`: both functions read the adapter
+/// registry and nothing else, so they take the registry instead of the
+/// service and never needed its private scope.
 
 /// Generic FFF0 BLE profile used for direct/passive connect quirks +
 /// display name when no scan resolved a profile.
-Obd2AdapterProfile _genericBleProfile(Obd2ConnectionService svc) =>
-    svc.registry.profiles.firstWhere(
+Obd2AdapterProfile genericBleProfile(Obd2AdapterRegistry registry) =>
+    registry.profiles.firstWhere(
       (p) => p.id == 'generic-fff0',
-      orElse: () => svc.registry.profiles.firstWhere(
+      orElse: () => registry.profiles.firstWhere(
         (p) => p.transport == BluetoothTransport.ble,
       ),
     );
@@ -25,21 +30,21 @@ Obd2AdapterProfile _genericBleProfile(Obd2ConnectionService svc) =>
 /// the reconnect-storm report) and fall back to the first Classic profile.
 /// The Classic adapter quirks are a safe superset for ELM327 SPP — the
 /// fallback governs QUIRKS only, never the displayed identity.
-Obd2AdapterProfile _classicProfileForReconnect(
-  Obd2ConnectionService svc, {
+Obd2AdapterProfile classicProfileForReconnect(
+  Obd2AdapterRegistry registry, {
   String? adapterName,
 }) {
   if (adapterName != null && adapterName.isNotEmpty) {
-    for (final p in svc.registry.profiles) {
+    for (final p in registry.profiles) {
       if (p.transport == BluetoothTransport.classic &&
           p.matchesName(adapterName)) {
         return p;
       }
     }
   }
-  return svc.registry.profiles.firstWhere(
+  return registry.profiles.firstWhere(
     (p) => p.id == 'vlinker-fs-classic',
-    orElse: () => svc.registry.profiles.firstWhere(
+    orElse: () => registry.profiles.firstWhere(
       (p) => p.transport == BluetoothTransport.classic,
     ),
   );
