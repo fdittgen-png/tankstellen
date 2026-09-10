@@ -56,13 +56,22 @@ bool _plausiblePeriod(double distanceKm, double lPer100Km) =>
 
 /// One CLOSED plein-to-plein window.
 class TankPeriod {
+  /// #4038 — the window carries its own distance invariant. [lPer100Km]
+  /// divides by [distanceKm] and is itself used as a divisor by the
+  /// residual maths, and a zero divisor on `double` does not throw in
+  /// Dart: it yields `Infinity` (or `NaN` for `0/0`), which would reach
+  /// the UI as a garbage figure that looks like a real one. Today every
+  /// construction site gates on `distance > 0` before calling this; the
+  /// asserts keep that guarantee attached to the type, so a construction
+  /// site added later inherits it instead of having to remember it.
   const TankPeriod({
     required this.opening,
     required this.closing,
     required this.distanceKm,
     required this.liters,
     required this.pumpedCost,
-  });
+  }) : assert(distanceKm > 0, 'a tank window needs a positive distance'),
+       assert(liters >= 0, 'a tank window cannot consume negative litres');
 
   /// The plein (or very first fill) that opened the window.
   final FillUp opening;

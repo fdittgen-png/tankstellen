@@ -45,6 +45,27 @@ import 'package:flutter_test/flutter_test.dart';
 /// Generated files are not scanned: `.g.dart` / `.freezed.dart` and the
 /// `lib/l10n/app_localizations*.dart` outputs of `flutter gen-l10n`
 /// (each thousands of lines, none handwritten).
+///
+/// ### Second axis: the library, not the file (#4033 / epic #4032)
+/// A `part` file satisfies the per-file cap without making the *unit*
+/// smaller — it shares the declaring library's private scope, so the
+/// code moved but the coupling did not. Measured per library (declaring
+/// file + its hand-written parts), 36 libraries exceed the same 400-line
+/// norm while every one of their files passes the per-file gate; the
+/// worst spans 2 594 lines across 11 files.
+///
+/// [_libraryBaseline] therefore pins each of those libraries at its
+/// measured total, and — following `opt_out_ratchet_test.dart` — the
+/// ratchet is **exact in both directions**:
+///
+///   1. a total above its baseline fails (the library grew);
+///   2. a total *below* its baseline ALSO fails, so a win is locked into
+///      the baseline in the same PR instead of being silently re-spent.
+///
+/// A library that graduates below the cap leaves the map entirely, and a
+/// library over the cap with no entry fails like any new offender. The
+/// per-file 400-line gate above is unchanged — this adds an axis, it
+/// does not relax the existing one.
 
 /// One grandfathered file's ratchet state (#1680 / #2351 / #3141):
 /// the snapshot [lines] count, the upward re-grandfathering [bumps]
@@ -317,6 +338,195 @@ void main() {
           '$lineLimit-line cap) and record its number as '
           '`decompositionIssue:` on the snapshot entry — the bump '
           'pattern stops here (#3141):\n${missingIssue.join("\n")}',
+    );
+  });
+
+  // ---------------------------------------------------------------
+  // Second axis (#4033): the library — declaring file + hand-written
+  // parts — measured against an exact, decrease-only baseline.
+  // ---------------------------------------------------------------
+
+  // Library path (the declaring file) → pinned total line count across
+  // that file and its hand-written `part` files. Measured 2026-09-10.
+  //
+  // NEVER raise an entry. Lower it in the same PR that shrinks the
+  // library, and delete it once the library is at or under the cap.
+  const libraryBaseline = <String, int>{
+    'lib/features/obd2/data/session/trip_recording_controller.dart': 2594,
+    'lib/features/obd2/data/session/obd2_service.dart': 1541,
+    'lib/features/obd2/data/session/obd2_connection_service.dart': 1479,
+    'lib/features/trips/providers/trip_recording_provider.dart': 1466,
+    'lib/features/search/presentation/widgets/station_card.dart': 1138,
+    'lib/features/trips/presentation/widgets/trip_detail_charts.dart': 1077,
+    'lib/features/trips/presentation/screens/trip_recording_screen.dart': 1032,
+    'lib/features/fill_ups/providers/consumption_providers.dart': 973,
+    'lib/features/obd2/data/transport/flutter_blue_plus_elm_channel.dart': 948,
+    'lib/features/obd2/data/session/live_sample_snapshot.dart': 943,
+    'lib/features/profile/presentation/widgets/profile_edit_sheet.dart': 891,
+    'lib/features/obd2/data/session/obd2_self_test_driver.dart': 846,
+    'lib/features/fill_ups/presentation/screens/add_fill_up_screen.dart': 824,
+    'lib/features/fill_ups/presentation/widgets/fuel_type_efficiency_card.dart': 810,
+    'lib/app/app_initializer.dart': 768,
+    'lib/features/obd2/data/obd2_comm_diagnostics.dart': 726,
+    'lib/features/vehicle/presentation/screens/edit_vehicle_screen.dart': 714,
+    'lib/features/obd2/data/protocol/adapter_registry.dart': 706,
+    'lib/features/obd2/data/obd2_connect_trace_log.dart': 627,
+    'lib/features/obd2/data/session/obd2_link_supervisor.dart': 604,
+    'lib/features/obd2/presentation/widgets/obd2_adapter_picker.dart': 601,
+    'lib/features/obd2/data/session/dropped_session_manager.dart': 586,
+    'lib/features/driving_score/data/driving_score_calculator.dart': 556,
+    'lib/features/profile/presentation/screens/developer_tools/pump_ocr_tester_screen.dart': 525,
+    'lib/features/trips/domain/services/gear_inference.dart': 523,
+    'lib/features/receipts_ocr/presentation/widgets/ocr_trace_steps_panel.dart': 509,
+    'lib/features/obd2/data/session/auto_trip_coordinator.dart': 496,
+    'lib/core/services/station_service_chain.dart': 492,
+    'lib/features/search/presentation/screens/search_criteria_screen.dart': 473,
+    'lib/features/trips/presentation/widgets/vehicle_baseline_section.dart': 454,
+    'lib/features/trips/data/trip_history_entry.dart': 450,
+    'lib/features/obd2/data/transport/bluetooth_obd2_transport.dart': 448,
+    'lib/features/search/presentation/widgets/search_results_list.dart': 444,
+    'lib/features/fill_ups/domain/services/monthly_insights_aggregator.dart': 415,
+    'lib/features/fill_ups/presentation/widgets/consumption_stats_card.dart': 414,
+    'lib/core/sync/sync_provider.dart': 413,
+  };
+
+  /// `part 'foo.dart';` — single- or double-quoted.
+  final partDirective = RegExp('^\\s*part\\s+[\'"]([^\'"]+)[\'"]\\s*;');
+
+  /// Resolves a `part` URI against its declaring file's directory,
+  /// collapsing `.`/`..` segments so the result is a repo-relative path
+  /// comparable with [libraryBaseline]'s keys.
+  String resolveAgainst(String dirPath, String uri) {
+    final segments = <String>[];
+    for (final segment in '$dirPath/$uri'.split('/')) {
+      if (segment.isEmpty || segment == '.') continue;
+      if (segment == '..') {
+        if (segments.isNotEmpty) segments.removeLast();
+        continue;
+      }
+      segments.add(segment);
+    }
+    return segments.join('/');
+  }
+
+  /// The hand-written `part` files of [file] (generated parts skipped by
+  /// [isScanned], which is the same scope filter the per-file gate uses).
+  List<String> handwrittenParts(File file) {
+    final dirPath = file.parent.path.replaceAll(r'\', '/');
+    final parts = <String>[];
+    for (final line in file.readAsLinesSync()) {
+      final match = partDirective.firstMatch(line);
+      if (match == null) continue;
+      final uri = match.group(1)!;
+      if (!isScanned(uri)) continue;
+      parts.add(resolveAgainst(dirPath, uri));
+    }
+    return parts;
+  }
+
+  test('no library in lib/ (declaring file + its hand-written parts) '
+      'exceeds $lineLimit lines or its pinned baseline (#4033)', () {
+    // Declaring path → its hand-written parts.
+    final libraries = <String, List<String>>{};
+    for (final entity in Directory('lib').listSync(recursive: true)) {
+      if (entity is! File) continue;
+      final path = entity.path.replaceAll(r'\', '/');
+      if (!isScanned(path)) continue;
+      final parts = handwrittenParts(entity);
+      if (parts.isNotEmpty) libraries[path] = parts;
+    }
+    // A `part` file carries no `part` directives of its own, so anything
+    // listed as someone's part is never itself a declaring library.
+    final allParts = libraries.values.expand((p) => p).toSet();
+    libraries.removeWhere((path, _) => allParts.contains(path));
+
+    final totals = <String, int>{};
+    final composition = <String, List<String>>{};
+    for (final MapEntry(key: path, value: parts) in libraries.entries) {
+      var total = effectiveLines(File(path));
+      final present = <String>[];
+      for (final part in parts) {
+        final partFile = File(part);
+        if (!partFile.existsSync()) continue;
+        total += effectiveLines(partFile);
+        present.add(part);
+      }
+      totals[path] = total;
+      composition[path] = present;
+    }
+
+    String describe(String path) =>
+        '$path  (${totals[path]} lines across '
+        '${composition[path]!.length + 1} files: '
+        '${composition[path]!.join(", ")})';
+
+    // 1. A library over the cap with no baseline entry is a new offender.
+    final unbaselined = <String>[
+      for (final MapEntry(key: path, value: total) in totals.entries)
+        if (total > lineLimit && !libraryBaseline.containsKey(path))
+          describe(path),
+    ];
+    expect(
+      unbaselined,
+      isEmpty,
+      reason:
+          'Library/-ies over $lineLimit lines with no baseline entry. A '
+          '`part` file does not make the unit smaller — it shares the '
+          'declaring library\'s private scope. Extract the code into a '
+          'collaborator with its own private state instead of a part, or '
+          'shrink the library below the cap. Offenders:\n'
+          '${unbaselined.join("\n")}',
+    );
+
+    // 2. Growth ratchet: a pinned library must not exceed its baseline.
+    final grown = <String>[];
+    for (final MapEntry(key: path, value: pinned) in libraryBaseline.entries) {
+      final total = totals[path];
+      if (total == null || total <= pinned) continue;
+      grown.add(
+        '${describe(path)}, baseline $pinned, grew by ${total - pinned}',
+      );
+    }
+    expect(
+      grown,
+      isEmpty,
+      reason:
+          'Library/-ies have GROWN beyond their pinned baseline. This '
+          'ratchet only ever goes down: move the new code into a '
+          'collaborator of its own rather than into another part.\n'
+          '${grown.join("\n")}',
+    );
+
+    // 3. Undershoot ratchet: a win must be locked into the baseline in
+    //    the same PR, or it can be silently re-spent later.
+    final stale = <String>[];
+    for (final MapEntry(key: path, value: pinned) in libraryBaseline.entries) {
+      final total = totals[path];
+      if (total == null) {
+        stale.add(
+          '$path  (no longer a multi-file library — remove the entry, '
+          'baseline $pinned)',
+        );
+      } else if (total <= lineLimit) {
+        stale.add(
+          '${describe(path)} — now at or under the $lineLimit-line cap; '
+          'REMOVE the entry (baseline $pinned)',
+        );
+      } else if (total < pinned) {
+        stale.add(
+          '${describe(path)} — lower the baseline to ${totals[path]} '
+          '(was $pinned)',
+        );
+      }
+    }
+    expect(
+      stale,
+      isEmpty,
+      reason:
+          'Stale library baseline(s): these libraries are smaller than '
+          'the map claims. Lower (or delete) the entry in the SAME PR so '
+          'the win is locked in and cannot creep back:\n'
+          '${stale.join("\n")}',
     );
   });
 }
