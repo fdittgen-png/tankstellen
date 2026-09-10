@@ -57,6 +57,7 @@ import 'package:flutter/material.dart';
 
 import '../logging/error_logger.dart';
 import '../widgets/snackbar_helper.dart';
+import '../logging/app_log.dart';
 
 /// Log [error] under [layer], tagged with [where], without awaiting.
 ///
@@ -88,7 +89,8 @@ void logFailure(
   } catch (e, st) {
     // The logger already promises never to throw; this guard exists so
     // that a future change to it cannot derail a catch block.
-    debugPrint('logFailure($where) itself failed: $e\n$st');
+    log.warn('logFailure($where) itself failed',
+        error: e, stack: st, layer: ErrorLayer.other);
   }
 }
 

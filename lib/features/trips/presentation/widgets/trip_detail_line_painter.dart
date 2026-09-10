@@ -1,21 +1,21 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-// Part of `trip_detail_charts.dart` (#2431) — the shared rolling-window
-// line-chart CustomPainter and its point model, split out so the widget
-// file stays under the 400-line guard. Library-private types, shared with
-// the host library's `_TripDetailLineChart`.
-part of 'trip_detail_charts.dart';
+import 'dart:ui' as ui;
 
-class _ChartPoint {
-  final DateTime timestamp;
-  final double value;
+import 'package:flutter/material.dart';
 
-  const _ChartPoint(this.timestamp, this.value);
-}
+import '../../../../core/utils/unit_formatter.dart';
+import 'trip_chart_geometry.dart';
 
-class _LineChartPainter extends CustomPainter {
-  final List<_ChartPoint> points;
+/// The shared rolling-window line-chart painter behind every trip-detail
+/// chart (#2431). It draws the polyline, the min/max labels, the time
+/// axis and — when the gesture supplies one — the scrub crosshair, all
+/// projected through [TripChartGeometry] so the drawn marker always sits
+/// on the value the readout names.
+
+class LineChartPainter extends CustomPainter {
+  final List<ChartPoint> points;
   final Color color;
   final Color labelColor;
   final String unit;
@@ -23,19 +23,19 @@ class _LineChartPainter extends CustomPainter {
   /// #3502 — the un-smoothed series, drawn as a faint background polyline
   /// behind [points] when smoothing is on. Null keeps the classic
   /// single-line plot.
-  final List<_ChartPoint>? rawPoints;
+  final List<ChartPoint>? rawPoints;
 
   /// #3502 — percentile axis cap forwarded into the geometry (see
-  /// [_TripChartGeometry.forSize]); above-cap values draw clamped.
+  /// [TripChartGeometry.forSize]); above-cap values draw clamped.
   final double? yCap;
 
   /// #2977 — index of the scrubbed sample whose crosshair + marker is drawn,
   /// or null when the user has not scrubbed. Projected with the same
-  /// [_TripChartGeometry] the nearest-point hit-test uses, so the marker
+  /// [TripChartGeometry] the nearest-point hit-test uses, so the marker
   /// lands exactly on the read value.
   final int? selectedIndex;
 
-  _LineChartPainter({
+  LineChartPainter({
     required this.points,
     required this.color,
     required this.labelColor,
@@ -49,7 +49,7 @@ class _LineChartPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (points.isEmpty) return;
 
-    final geo = _TripChartGeometry.forSize(size, points, yCap: yCap);
+    final geo = TripChartGeometry.forSize(size, points, yCap: yCap);
 
     // #3502 — the raw series first (behind), faint + thin, values clamped
     // into the capped axis by yFor. Nothing is hidden by the smoothing —
@@ -79,7 +79,7 @@ class _LineChartPainter extends CustomPainter {
     _drawText(
       canvas,
       '${UnitFormatter.formatDecimal(geo.maxV)} $unit',
-      Offset(size.width - _TripChartGeometry.rightInset, 2),
+      Offset(size.width - TripChartGeometry.rightInset, 2),
       anchorRight: true,
       color: labelColor.withAlpha(160),
       fontSize: 10,
@@ -87,8 +87,8 @@ class _LineChartPainter extends CustomPainter {
     _drawText(
       canvas,
       UnitFormatter.formatDecimal(geo.minV),
-      Offset(_TripChartGeometry.leftInset,
-          size.height - _TripChartGeometry.bottomInset + 4),
+      Offset(TripChartGeometry.leftInset,
+          size.height - TripChartGeometry.bottomInset + 4),
       color: labelColor.withAlpha(160),
       fontSize: 10,
     );
@@ -119,8 +119,8 @@ class _LineChartPainter extends CustomPainter {
       final cx = geo.xFor(sel.timestamp);
       final cy = geo.yFor(sel.value);
       canvas.drawLine(
-        Offset(cx, _TripChartGeometry.topInset),
-        Offset(cx, size.height - _TripChartGeometry.bottomInset),
+        Offset(cx, TripChartGeometry.topInset),
+        Offset(cx, size.height - TripChartGeometry.bottomInset),
         Paint()
           ..color = color.withAlpha(120)
           ..strokeWidth = 1,
@@ -163,7 +163,7 @@ class _LineChartPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_LineChartPainter oldDelegate) =>
+  bool shouldRepaint(LineChartPainter oldDelegate) =>
       oldDelegate.points != points ||
       oldDelegate.rawPoints != rawPoints ||
       oldDelegate.yCap != yCap ||

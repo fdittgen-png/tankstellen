@@ -6,7 +6,16 @@
 // the value/time readout callout. Split into a part file so the widget host
 // file stays under the 400-line guard (#1680). Mirrors the price-chart
 // tap-to-nearest pattern (#2384) so the two charts feel identical.
-part of 'trip_detail_charts.dart';
+import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+import '../../../../core/utils/unit_formatter.dart';
+import '../../../../l10n/app_localizations.dart';
+import 'trip_chart_geometry.dart';
+import 'trip_detail_line_painter.dart';
+import 'trip_detail_sample.dart';
 
 /// Shared implementation — every Trip-detail chart is the same
 /// rolling-window line plot over [timestamp], differing only in which
@@ -17,7 +26,7 @@ part of 'trip_detail_charts.dart';
 /// overlays a vertical crosshair + a value/time readout, mirroring the
 /// price-chart tap-to-nearest pattern (#2384). The crosshair geometry +
 /// readout callout live below in this same part file.
-class _TripDetailLineChart extends StatefulWidget {
+class TripDetailLineChart extends StatefulWidget {
   final List<TripDetailSample> samples;
   final Color? color;
   final double? Function(TripDetailSample) valueOf;
@@ -41,7 +50,8 @@ class _TripDetailLineChart extends StatefulWidget {
   /// the bottom of the plot; capped values draw clamped at the top edge.
   final double? capPercentile;
 
-  const _TripDetailLineChart({
+  const TripDetailLineChart({
+    super.key,
     required this.samples,
     required this.color,
     required this.valueOf,
@@ -53,16 +63,16 @@ class _TripDetailLineChart extends StatefulWidget {
   });
 
   @override
-  State<_TripDetailLineChart> createState() => _TripDetailLineChartState();
+  State<TripDetailLineChart> createState() => TripDetailLineChartState();
 }
 
-class _TripDetailLineChartState extends State<_TripDetailLineChart> {
+class TripDetailLineChartState extends State<TripDetailLineChart> {
   /// Index into the plotted (non-null, time-sorted) points of the sample the
   /// scrub crosshair is reading, or null when the user has not scrubbed yet.
   int? _selected;
 
   @override
-  void didUpdateWidget(_TripDetailLineChart oldWidget) {
+  void didUpdateWidget(TripDetailLineChart oldWidget) {
     super.didUpdateWidget(oldWidget);
     // A new series invalidates the selected ordinal.
     if (!identical(oldWidget.samples, widget.samples) ||
@@ -71,9 +81,9 @@ class _TripDetailLineChartState extends State<_TripDetailLineChart> {
     }
   }
 
-  void _scrub(Offset localPos, Size size, List<_ChartPoint> points) {
+  void _scrub(Offset localPos, Size size, List<ChartPoint> points) {
     if (points.length < 2) return;
-    final nearest = _TripChartGeometry.nearestPointIndex(
+    final nearest = TripChartGeometry.nearestPointIndex(
       localPos,
       size,
       points,
@@ -87,9 +97,9 @@ class _TripDetailLineChartState extends State<_TripDetailLineChart> {
   /// centre exactly; even ones lean left by half a slot). Timestamps are
   /// preserved so the x-axis stays truthful; the median (not a mean) keeps
   /// step edges crisp while killing single-sample spikes.
-  static List<_ChartPoint> _rollingMedian(List<_ChartPoint> pts, int window) {
+  static List<ChartPoint> _rollingMedian(List<ChartPoint> pts, int window) {
     final half = window ~/ 2;
-    final out = <_ChartPoint>[];
+    final out = <ChartPoint>[];
     for (var i = 0; i < pts.length; i++) {
       final from = math.max(0, i - half);
       final to = math.min(pts.length, i + half + 1);
@@ -98,7 +108,7 @@ class _TripDetailLineChartState extends State<_TripDetailLineChart> {
       final median = vals.length.isOdd
           ? vals[mid]
           : (vals[mid - 1] + vals[mid]) / 2;
-      out.add(_ChartPoint(pts[i].timestamp, median));
+      out.add(ChartPoint(pts[i].timestamp, median));
     }
     return out;
   }
@@ -111,11 +121,11 @@ class _TripDetailLineChartState extends State<_TripDetailLineChart> {
 
     // Keep only samples whose value is non-null; we still need the
     // original timestamps so the chart's X axis reflects real time.
-    final points = <_ChartPoint>[];
+    final points = <ChartPoint>[];
     for (final s in widget.samples) {
       final v = widget.valueOf(s);
       if (v == null) continue;
-      points.add(_ChartPoint(s.timestamp, v));
+      points.add(ChartPoint(s.timestamp, v));
     }
     final showEmpty =
         widget.samples.isEmpty || (widget.emptyWhenAllNull && points.isEmpty);
@@ -137,7 +147,7 @@ class _TripDetailLineChartState extends State<_TripDetailLineChart> {
     // #3502 — readable series: rolling-median smoothing (raw kept faint
     // behind) + a percentile-capped y-axis. Both off by default.
     var plotted = points;
-    List<_ChartPoint>? rawBehind;
+    List<ChartPoint>? rawBehind;
     if (widget.smoothWindow > 1 && points.length > widget.smoothWindow) {
       rawBehind = points;
       plotted = _rollingMedian(points, widget.smoothWindow);
@@ -172,7 +182,7 @@ class _TripDetailLineChartState extends State<_TripDetailLineChart> {
               children: [
                 Positioned.fill(
                   child: CustomPaint(
-                    painter: _LineChartPainter(
+                    painter: LineChartPainter(
                       points: plotted,
                       rawPoints: rawBehind,
                       yCap: yCap,
@@ -224,113 +234,12 @@ class _TripDetailLineChartState extends State<_TripDetailLineChart> {
   }
 }
 
-/// Pure projection maths for a trip line chart — kept out of the painter so
-/// the painter and the gesture's nearest-point hit-test share ONE definition
-/// of where a sample lands, and the drawn marker always sits on the read
-/// value. Insets/padding match the previous inline `_LineChartPainter` maths.
-class _TripChartGeometry {
-  /// Insets reserved around the plot (must match the painter's drawn area).
-  static const double leftInset = 8.0;
-  static const double rightInset = 8.0;
-  static const double topInset = 18.0;
-  static const double bottomInset = 22.0;
-
-  final double minV;
-  final double maxV;
-  final double _yMin;
-  final double _ySpan;
-  final int _firstTs;
-  final int _tSpan;
-  final double _chartWidth;
-  final double _chartHeight;
-
-  const _TripChartGeometry._({
-    required this.minV,
-    required this.maxV,
-    required this._yMin,
-    required this._ySpan,
-    required this._firstTs,
-    required this._tSpan,
-    required this._chartWidth,
-    required this._chartHeight,
-  });
-
-  factory _TripChartGeometry.forSize(
-    Size size,
-    List<_ChartPoint> points, {
-    double? yCap,
-  }) {
-    final chartWidth = size.width - leftInset - rightInset;
-    final chartHeight = size.height - topInset - bottomInset;
-
-    final values = points.map((p) => p.value).toList(growable: false);
-    final minV = values.reduce(math.min);
-    // #3502 — a percentile cap bounds the axis so one spike can't squash
-    // the readable band; values above it project clamped at the top edge
-    // (yFor clamps).
-    var maxV = values.reduce(math.max);
-    if (yCap != null && yCap > minV && yCap < maxV) maxV = yCap;
-    final range = (maxV - minV).abs();
-    final padding = range > 0 ? range * 0.1 : 1.0;
-    final yMin = minV - padding;
-    final yMax = maxV + padding;
-    final ySpan = (yMax - yMin) == 0 ? 1.0 : (yMax - yMin);
-
-    final firstTs = points.first.timestamp.millisecondsSinceEpoch;
-    final lastTs = points.last.timestamp.millisecondsSinceEpoch;
-    final tSpan = (lastTs - firstTs) == 0 ? 1 : (lastTs - firstTs);
-
-    return _TripChartGeometry._(
-      minV: minV,
-      maxV: maxV,
-      yMin: yMin,
-      ySpan: ySpan,
-      firstTs: firstTs,
-      tSpan: tSpan,
-      chartWidth: chartWidth,
-      chartHeight: chartHeight,
-    );
-  }
-
-  double xFor(DateTime t) {
-    final rel = (t.millisecondsSinceEpoch - _firstTs) / _tSpan;
-    return leftInset + rel * _chartWidth;
-  }
-
-  double yFor(double v) {
-    // #3502 — clamp into the (possibly capped) axis range so above-cap
-    // spikes draw flat at the top edge instead of escaping the plot.
-    final vv = v.clamp(_yMin, _yMin + _ySpan).toDouble();
-    return topInset + _chartHeight - ((vv - _yMin) / _ySpan) * _chartHeight;
-  }
-
-  /// Index into [points] of the point whose plotted x is nearest [localPos].
-  /// Mirrors `PriceChartAxes.nearestPointIndex` (#2384).
-  static int nearestPointIndex(
-    Offset localPos,
-    Size size,
-    List<_ChartPoint> points,
-  ) {
-    final geo = _TripChartGeometry.forSize(size, points);
-    int best = 0;
-    double bestDist = double.infinity;
-    for (int i = 0; i < points.length; i++) {
-      final dx = (geo.xFor(points[i].timestamp) - localPos.dx).abs();
-      if (dx < bestDist) {
-        bestDist = dx;
-        best = i;
-      }
-    }
-    return best;
-  }
-}
-
 /// A small callout showing the scrubbed point's value + unit and time, e.g.
 /// "42.0 km/h · 10:00:05". Rendered as a real widget (not painted) so it is
 /// legible at any scale and testable via `find.textContaining`. Mirrors the
 /// price-chart `_PriceTooltip` (#2384).
 class _TripChartReadout extends StatelessWidget {
-  final _ChartPoint point;
+  final ChartPoint point;
   final String unit;
   final Locale locale;
 

@@ -1,11 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart' show debugPrint;
 
 import 'obd2_comm_diagnostics.dart' show redactObd2Mac;
 import '../domain/obd2_connect_classifier.dart';
 import 'obd2_connect_trace.dart';
+import '../../../core/logging/app_log.dart';
 
 // #3014 — the mutable per-attempt builder lives in a `part` so this file stays
 // under the #1680/#2351 400-line cap (the obd2_connect_by_mac.dart precedent),
@@ -230,8 +230,8 @@ class Obd2ConnectTraceLog {
           detail: probe(),
         );
       } catch (e, st) {
-        debugPrint(
-            'Obd2ConnectTraceLog: adapterStateProbe threw (ignored): $e\n$st');
+        log.warn('Obd2ConnectTraceLog: adapterStateProbe threw (ignored)',
+            error: e, stack: st);
       }
     }
     return handle;
@@ -288,21 +288,21 @@ class Obd2ConnectTraceLog {
       try {
         onTracePersist?.call(finished);
       } catch (e, st) {
-        debugPrint('Obd2ConnectTraceLog: onTracePersist hook threw '
-            '(ignored): $e\n$st');
+        log.warn('Obd2ConnectTraceLog: onTracePersist hook threw (ignored)',
+            error: e, stack: st);
       }
       // Notify the dev health screen (best-effort; a throwing listener must
       // never derail a connect's finally block).
       try {
         onTraceAdded?.call();
       } catch (e, st) {
-        debugPrint('Obd2ConnectTraceLog: onTraceAdded listener threw '
-            '(ignored): $e\n$st');
+        log.warn('Obd2ConnectTraceLog: onTraceAdded listener threw (ignored)',
+            error: e, stack: st);
       }
     } catch (e, st) {
       // Never let trace bookkeeping derail a connect's finally block (#1103).
       if (identical(_active, handle)) _active = null;
-      debugPrint('Obd2ConnectTraceLog.endTrace failed (ignored): $e\n$st');
+      log.warn('Obd2ConnectTraceLog.endTrace failed', error: e, stack: st);
     }
   }
 

@@ -73,15 +73,18 @@ void main() {
       }
       // empty: the OTHER ratchet's business
       try { d(); } catch (_) {}
+      /// documented, not written — a `///` sample of the anti-pattern:
+      /// } catch (_) { debugPrint('...sync failed'); }
     ''';
     var hits = 0;
-    for (final m in catchOpener.allMatches(fixture)) {
+    for (final m in catchOpener.allMatches(_stripDocComments(fixture))) {
       final body = _blockBody(fixture, m.end - 1);
       if (body != null && _isDebugPrintOnly(body)) hits++;
     }
     expect(hits, 2,
         reason: 'the scanner found $hits of 2 known sites — it would report '
-            'a false green on real code');
+            'a false green on real code (or count the documented sample as '
+            'a real one, #4039)');
   });
 
   test('debugPrint-only catch handlers in lib/ do not grow (#3143, #3981)',
@@ -100,7 +103,7 @@ void main() {
       }
       final path = entity.path.replaceAll('\\', '/');
       if (_pipeline.any(path.startsWith)) continue;
-      final src = entity.readAsStringSync();
+      final src = _stripDocComments(entity.readAsStringSync());
       for (final m in catchOpener.allMatches(src)) {
         final body = _blockBody(src, m.end - 1);
         if (body == null) continue;
@@ -130,7 +133,29 @@ const _pipeline = <String>['lib/core/logging/', 'lib/core/telemetry/'];
 
 /// Baseline as of 2026-09-08 (#3981), all of lib/ minus [_pipeline].
 /// Only ever decreases; target 0.
-const _baseline = 61;
+///
+/// #4039 — reached it. All 61 handlers now route the cause through
+/// `log.warn(msg, error: e, stack: st, layer: …)`, so the failure lands
+/// in the trace ring instead of a release build's no-opped `debugPrint`.
+/// The 61st was never a handler at all: it was the `///` code sample in
+/// `SyncHelper`'s docstring showing the very boilerplate that helper
+/// replaces, which [_stripDocComments] now excludes. A number this
+/// ratchet must never leave.
+const _baseline = 0;
+
+/// Strips `///` doc-comment lines, replacing each with an empty line so
+/// every offset the scan reports still maps to the real source line.
+///
+/// #4039 — a `///` block that DOCUMENTS the anti-pattern (SyncHelper's
+/// docstring shows the `catch (_) { debugPrint(...); }` boilerplate the
+/// helper exists to replace) was counted as an occurrence of it. Same
+/// failure class as #2348: the scan measured something other than what
+/// it claimed, and the last point of the ratchet's run to zero was a
+/// code sample in a comment.
+String _stripDocComments(String src) => src
+    .split('\n')
+    .map((l) => l.trimLeft().startsWith('///') ? '' : l)
+    .join('\n');
 
 /// Returns the text between the brace at [openBraceIdx] and its matching
 /// close brace, or null when unbalanced.

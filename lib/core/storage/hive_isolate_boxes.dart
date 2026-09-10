@@ -1,13 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'hive_boxes.dart';
 import 'hive_cipher_loader.dart';
 import 'hive_isolate_ownership.dart';
 import 'impl/hive_directory_resolver.dart';
+import '../logging/app_log.dart';
+import '../logging/error_logger.dart';
 
 /// Background-isolate box lifecycle, split out of [HiveBoxes] (#3689).
 ///
@@ -90,7 +91,8 @@ class HiveIsolateBoxes {
           await Hive.box<dynamic>(name).close();
         }
       } catch (e, st) {
-        debugPrint('HiveIsolateBoxes: failed to close box "$name": $e\n$st');
+        log.warn('HiveIsolateBoxes: failed to close box "$name"',
+            error: e, stack: st, layer: ErrorLayer.storage);
       }
     }
   }

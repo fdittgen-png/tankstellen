@@ -7,6 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../domain/live_activity_content.dart';
+import '../../../core/logging/app_log.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// #3722 — the ANDROID twin of the iOS Live Activity (#3170): an ongoing
 /// chronometer notification on the lock screen / notification shade
@@ -174,7 +176,8 @@ class AndroidLiveActivityNotifier {
     try {
       await _plugin.cancel(id: notificationId);
     } catch (e, st) {
-      debugPrint('AndroidLiveActivityNotifier: cancel failed: $e\n$st');
+      log.warn('AndroidLiveActivityNotifier: cancel failed',
+          error: e, stack: st, layer: ErrorLayer.ui);
     }
   }
 }

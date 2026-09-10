@@ -28,21 +28,24 @@ mixin _TripRecordingLifecycle
   TripRecordingControllerState get currentState {
     // Check stopped first: an auto-finalised drop sets both
     // `_stopped = true` AND `_started = false`, so the order matters.
-    if (_stopped) return TripRecordingControllerState.stopped;
-    if (!_started) return TripRecordingControllerState.idle;
-    if (_pausedDueToDrop) return TripRecordingControllerState.pausedDueToDrop;
-    if (_paused) return TripRecordingControllerState.paused;
+    if (_run.stopped) return TripRecordingControllerState.stopped;
+    if (!_run.started) return TripRecordingControllerState.idle;
+    if (_run.pausedDueToDrop) {
+      return TripRecordingControllerState.pausedDueToDrop;
+    }
+    if (_run.paused) return TripRecordingControllerState.paused;
     // #2565 — degraded GPS-only: checked after the true-pause states but
     // is still an ACTIVE, recording state.
-    if (_degradedGpsOnly) return TripRecordingControllerState.degradedGpsOnly;
+    if (_run.degradedGpsOnly) {
+      return TripRecordingControllerState.degradedGpsOnly;
+    }
     return TripRecordingControllerState.recording;
   }
 
-  bool get isRecording =>
-      (_started && !_paused && !_pausedDueToDrop) || _degradedGpsOnly;
-  bool get isPaused => _paused || _pausedDueToDrop;
-  bool get isPausedDueToDrop => _pausedDueToDrop;
-  bool get isActive => _started;
+  bool get isRecording => _run.isRecording;
+  bool get isPaused => _run.isPaused;
+  bool get isPausedDueToDrop => _run.pausedDueToDrop;
+  bool get isActive => _run.started;
 
   /// Pause the polling loop without tearing down the recorder. The
   /// scheduler is stopped (no wasted Bluetooth chatter while the user
@@ -51,9 +54,7 @@ mixin _TripRecordingLifecycle
   /// [resume] restarts the scheduler. Safe to call when not recording
   /// — no-op.
   void pause() {
-    if (!_started) return;
-    if (_paused || _pausedDueToDrop) return;
-    _paused = true;
+    if (!_run.pauseByUser()) return;
     _scheduler?.stop();
     _emitState();
   }
@@ -61,11 +62,11 @@ mixin _TripRecordingLifecycle
   /// Resume a paused recording. Works from both user-pause and
   /// drop-pause states. Idempotent; no-op if not paused.
   void resume() {
-    if (!_paused && !_pausedDueToDrop) return;
-    if (_pausedDueToDrop) {
+    if (!_run.isPaused) return;
+    if (_run.pausedDueToDrop) {
       // Cancel the grace timer + clear the drop-reaction reason.
       _droppedSession.cancelGrace();
-      _pausedDueToDrop = false;
+      _run.clearDropPause();
       // #1330 phase 3 — clear the silent-failure latch so a
       // post-resume stretch of nulls can fire again. Without this,
       // a user who resumes after a silent-failure drop and then hits
@@ -84,7 +85,7 @@ mixin _TripRecordingLifecycle
       // before the timer resumes ticking.
       _scheduler?.resume();
     }
-    _paused = false;
+    _run.clearUserPause();
     // #3783 — a drop-resume runs on a freshly-redialed link whose
     // session may lack a negotiated protocol (warm cache ⇒ no 0100 at
     // connect); gate the cadence behind the quiet-window establishment.
@@ -120,8 +121,7 @@ mixin _TripRecordingLifecycle
     // unhandled). Anchoring "fresh" at the swap gives the new link the
     // full staleness window, after which the fence fires again and the
     // recovery cycle re-runs — bounded, convergent.
-    _lastFreshEngineParseAt = _now();
-    _staleEngineEscalated = false;
+    _engineFence.onFreshParse(_now());
     _sessionJournal.add(
       RecordingSessionEventKind.serviceRebound,
       detail: identical(old, service) ? 'same instance' : null,
@@ -138,8 +138,9 @@ mixin _TripRecordingLifecycle
       try {
         await old.disconnect();
       } catch (e, st) {
-        debugPrint('TripRecordingController.replaceService: '
-            'old service disconnect failed (already dead) — $e\n$st');
+        log.warn('TripRecordingController.replaceService: old service disconnect '
+            'failed (already dead)',
+            error: e, stack: st, layer: ErrorLayer.other);
       }
     }());
   }
@@ -149,9 +150,8 @@ mixin _TripRecordingLifecycle
   /// [PidScheduler]. Safe to call multiple times — no-op when already
   /// recording.
   Future<void> start() async {
-    if (_started) return;
-    _started = true;
-    _stopped = false;
+    if (_run.started) return;
+    _run.begin();
     _startedAt = _now();
     _sessionId = _startedAt!.toIso8601String();
     // #3797 — anchor the lifecycle timeline at t=0 BEFORE any OBD work,
@@ -184,7 +184,7 @@ mixin _TripRecordingLifecycle
       );
       _scheduler = _schedulerOverride ?? _buildScheduler();
       _liveSampleSnapshot.subscribeAllTiers(_scheduler!);
-      _engineOffSince = _startedAt;
+      _parkedWatch.armEngineOffSince(_startedAt);
       _droppedSession.enterEngineOffWait();
       _emitTimer = Timer.periodic(_pollInterval, (_) => _emit());
       _emitState();
@@ -215,15 +215,12 @@ mixin _TripRecordingLifecycle
   /// began with the engine off.
   @override
   Future<void> _readTripIdentity() async {
-    if (_identityRead) return;
-    _identityRead = true;
-    _odometerStartKm = await boundedStartRead(
-        _service.readOdometerKm(), kObd2TripStartOdometerBudget);
-    _odometerLatestKm = _odometerStartKm;
-    if (_odometerStartKm != null) {
-      _odometerLatestAt = _now(); // #3877
-      _distanceKmAtOdometerLatest = 0;
-    }
+    if (!_identity.claim()) return;
+    _odometer.recordStart(
+      await boundedStartRead(
+          _service.readOdometerKm(), kObd2TripStartOdometerBudget),
+      _now(),
+    );
     _vin = await boundedStartRead(
         readTripVinOnce(_service), kObd2TripStartVinBudget);
     // #3429 — one-shot ECU fuel-type read (PID 0x51), promoted from the
@@ -239,8 +236,7 @@ mixin _TripRecordingLifecycle
   /// #3862 — the driver answered "Keep" on the parked prompt: stay
   /// recording, do not ask again this session.
   void dismissParkedPrompt() {
-    _parkedPromptDismissed = true;
-    _parkedPromptDue = false;
+    _parkedWatch.dismiss();
     _emitState();
   }
 
@@ -284,12 +280,10 @@ mixin _TripRecordingLifecycle
     // and stop the reconnect scanner.
     _droppedSession.cancelAllTimers();
     await _droppedSession.stopReconnectScanner();
-    _started = false;
-    _stopped = true;
-    _pausedDueToDrop = false;
-    // #2565 — clear the degrade flag so a stop while degraded finalises
-    // cleanly (the drop-window GPS samples persist in the mixed trip).
-    _degradedGpsOnly = false;
+    // #2565 — `end()` also clears the degrade flag so a stop while
+    // degraded finalises cleanly (the drop-window GPS samples persist in
+    // the mixed trip).
+    _run.end();
     _dropDetector.reset();
     _emitState();
     if (!_stateController.isClosed) {

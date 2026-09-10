@@ -5,6 +5,8 @@ import 'package:flutter/foundation.dart' show debugPrint, visibleForTesting;
 
 import '../obd2_connect_trace.dart';
 import '../obd2_connect_trace_log.dart';
+import '../../../../core/logging/app_log.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// #3185 / Epic #3178 — process-wide SCAN GOVERNOR for BLE scan starts.
 ///
@@ -100,8 +102,8 @@ class Obd2ScanGovernor {
     } catch (e, st) {
       // Fail OPEN: governor bookkeeping (the injected wait, the trace
       // stamp) must never abort the scan itself.
-      debugPrint('Obd2ScanGovernor: admitScanStart failed open '
-          '(scan proceeds): $e\n$st');
+      log.warn('Obd2ScanGovernor: admitScanStart failed open (scan proceeds)',
+          error: e, stack: st, layer: ErrorLayer.other);
     }
   }
 

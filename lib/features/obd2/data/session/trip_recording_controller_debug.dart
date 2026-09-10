@@ -31,7 +31,7 @@ mixin _TripRecordingDebugSeams
   /// [TripRecorder]. Null until the first emit with non-null speed
   /// or RPM.
   @visibleForTesting
-  DateTime? get debugLastSampleAt => _lastSampleAt;
+  DateTime? get debugLastSampleAt => _engineFence.lastSampleAt;
 
   /// Exposed for tests: trigger the drop-handling path directly, so
   /// tests that can't easily convince a fake transport to throw three
@@ -131,10 +131,8 @@ mixin _TripRecordingDebugSeams
   /// [refreshOdometer] (#800). Useful when the test just needs to
   /// assert that a `'real'` delta wins over the virtual path.
   @visibleForTesting
-  void debugSetOdometerReadings({double? startKm, double? latestKm}) {
-    if (startKm != null) _odometerStartKm = startKm;
-    if (latestKm != null) _odometerLatestKm = latestKm;
-  }
+  void debugSetOdometerReadings({double? startKm, double? latestKm}) =>
+      _odometer.debugSet(startKm: startKm, latestKm: latestKm);
 
   /// Exposed for tests: read-only view of the captured speed samples.
   @visibleForTesting

@@ -1,7 +1,24 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-part of 'station_card.dart';
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '../../../../core/domain/brand_appearance.dart';
+import '../../../../core/domain/station.dart';
+import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_text.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/theme/spacing.dart';
+import '../../../../core/utils/price_formatter.dart';
+import '../../../../core/utils/price_tier.dart';
+import '../../../../core/widgets/animated_favorite_star.dart';
+import '../../../../core/widgets/animated_price_text.dart';
+import '../../../../core/widgets/brand_logo.dart';
+import '../../../../l10n/app_localizations.dart';
+import 'station_card_badges.dart';
 
 /// The card's headline row (#3949): brand mark, the display-role price
 /// with its baseline-aligned unit and the colour-blind tier arrow, then —
@@ -14,7 +31,7 @@ part of 'station_card.dart';
 /// down whole (a `FittedBox`) rather than ellipsising to `1,7…`. The
 /// Cheapest badge is width-capped and ellipsises first under an expanded
 /// translation; the 32×32 star keeps its tap target.
-class _HeadlineRow extends StatelessWidget {
+class StationCardHeadlineRow extends StatelessWidget {
   final Station station;
   final BrandAppearance? brandMark;
   final double? price;
@@ -30,7 +47,8 @@ class _HeadlineRow extends StatelessWidget {
   final double? loyaltyDiscount;
   final VoidCallback? onFavoriteTap;
 
-  const _HeadlineRow({
+  const StationCardHeadlineRow({
+    super.key,
     required this.station,
     required this.brandMark,
     required this.price,
@@ -133,7 +151,7 @@ class _HeadlineRow extends StatelessWidget {
           ],
         ),
         if (hasDiscount)
-          _LoyaltyDiscountBadge(
+          StationCardLoyaltyBadge(
             station: station,
             discount: loyaltyDiscount!,
             rawPrice: price!,

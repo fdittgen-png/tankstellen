@@ -22,6 +22,7 @@ import '../../../../receipts_ocr/api.dart';
 import '../../../../feature_management/application/feature_flags_provider.dart';
 import '../../../../feature_management/domain/feature.dart';
 import 'pump_ocr_tester_export.dart';
+import '../../../../../core/error/guarded.dart';
 
 // The presentational widgets live in a part so this file stays under the
 // 400-line norm; the screen + its view widgets are one unit.

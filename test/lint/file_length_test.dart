@@ -52,7 +52,8 @@ import 'package:flutter_test/flutter_test.dart';
 /// code moved but the coupling did not. Measured per library (declaring
 /// file + its hand-written parts), 36 libraries exceed the same 400-line
 /// norm while every one of their files passes the per-file gate; the
-/// worst spans 2 594 lines across 11 files.
+/// worst spans 2 594 lines across 11 files. (#4037 has since taken three
+/// of the 36 out — two of them entirely.)
 ///
 /// [_libraryBaseline] therefore pins each of those libraries at its
 /// measured total, and — following `opt_out_ratchet_test.dart` — the
@@ -352,13 +353,27 @@ void main() {
   // NEVER raise an entry. Lower it in the same PR that shrinks the
   // library, and delete it once the library is at or under the cap.
   const libraryBaseline = <String, int>{
-    'lib/features/obd2/data/session/trip_recording_controller.dart': 2594,
-    'lib/features/obd2/data/session/obd2_service.dart': 1541,
-    'lib/features/obd2/data/session/obd2_connection_service.dart': 1479,
-    'lib/features/trips/providers/trip_recording_provider.dart': 1466,
-    'lib/features/search/presentation/widgets/station_card.dart': 1138,
-    'lib/features/trips/presentation/widgets/trip_detail_charts.dart': 1077,
-    'lib/features/trips/presentation/screens/trip_recording_screen.dart': 1032,
+    // #4034 — 2 594 → 2 483: seven clusters of shared mutable state left
+    // for owned collaborators (engine-data fence, voltage watch, parked
+    // prompt, identity read, odometer tracker, run state, fuel
+    // accumulator) and the gear-coaching metric became a pure function.
+    // No private field is written from more than one file any more.
+    'lib/features/obd2/data/session/trip_recording_controller.dart': 2483,
+    // #4035 — 1 541 → 1 517: the pure ELM AT grammar (the `ATI` command,
+    // the firmware-string parse, the reset-command test) left the library.
+    'lib/features/obd2/data/session/obd2_service.dart': 1517,
+    // #4035 — 1 479 across 7 files → 1 365 across 6: the direct-channel
+    // pointer became an owned slot carrying the #3244 close-by-identity
+    // rule, and the connect-trace scope + the no-scan profile fallbacks
+    // became libraries of their own.
+    'lib/features/obd2/data/session/obd2_connection_service.dart': 1365,
+    // #4036 — 1 466 → 1 403: the last-trip identity and the pipeline
+    // selection became owned collaborators, and the WAL snapshot's two
+    // pure controller reads a library of their own.
+    'lib/features/trips/providers/trip_recording_provider.dart': 1403,
+    // #4037 — 1 032 across 5 files → 756 across 3: the pin/wake-lock
+    // state became an owned collaborator and the body a plain widget.
+    'lib/features/trips/presentation/screens/trip_recording_screen.dart': 756,
     'lib/features/fill_ups/providers/consumption_providers.dart': 973,
     'lib/features/obd2/data/transport/flutter_blue_plus_elm_channel.dart': 948,
     'lib/features/obd2/data/session/live_sample_snapshot.dart': 943,

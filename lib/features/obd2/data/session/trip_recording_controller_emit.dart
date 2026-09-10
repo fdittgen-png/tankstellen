@@ -43,7 +43,7 @@ mixin _TripRecordingEmit
     // scheduler is stopped then, so the snapshot is stale — feeding it
     // to the recorder would integrate phantom distance/fuel from a
     // frozen speed over real elapsed time.
-    if (_paused || _pausedDueToDrop || _droppedSession.silentlyReconnecting) {
+    if (_run.isPaused || _droppedSession.silentlyReconnecting) {
       return;
     }
     if (_liveController.isClosed) return;
@@ -54,7 +54,7 @@ mixin _TripRecordingEmit
     // #2565 — `degradedGpsOnly` is NOT gated above: OBD2 is gone (the PID
     // snapshot is stale) but GPS is alive, so build a GPS-only sample +
     // run the estimate overlay instead of freezing.
-    if (_degradedGpsOnly) {
+    if (_run.degradedGpsOnly) {
       _emitDegradedGpsOnly();
       return;
     }
@@ -71,23 +71,21 @@ mixin _TripRecordingEmit
     // Escalate ONCE through the same silent-failure drop path (pause with
     // grace → reconnect → #2565 GPS-only degrade), and skip this tick so
     // nothing stale reaches the recorder.
-    final fresh = _lastFreshEngineParseAt;
-    final started = _startedAt;
-    final pastGrace = started == null ||
-        nowTs.difference(started) > _engineDataStartGrace;
+    final fresh = _engineFence.lastFreshParseAt;
     // #3783 — the fence holds while the reconnect grace / protocol work
     // is active: the quiet-window `0100` search legitimately produces no
     // parses for up to ~17 s, and the fence firing mid-search tore down
     // the very link the recovery was bringing up (the 2026-08-25
     // dial-storm spiral).
-    final engineStale = pastGrace &&
-        !_inReconnectGrace &&
-        !_protocolWorkInFlight &&
-        (fresh == null ||
-            nowTs.difference(fresh) > _engineDataStalenessLimit);
+    final engineStale = _engineFence.isStale(
+      now: nowTs,
+      startedAt: _startedAt,
+      startGrace: _engineDataStartGrace,
+      stalenessLimit: _engineDataStalenessLimit,
+      suppressed: _inReconnectGrace || _protocolWorkInFlight,
+    );
     if (engineStale) {
-      if (!_staleEngineEscalated) {
-        _staleEngineEscalated = true;
+      if (_engineFence.claimEscalation()) {
         _sessionJournal.add(RecordingSessionEventKind.staleEngineFence,
             detail: fresh == null ? 'no parse ever' : 'parse went stale');
         debugPrint(
@@ -107,10 +105,9 @@ mixin _TripRecordingEmit
           ? snap.lastFuelRateVe
           : null;
       if (veUsed != null && veUsed > 0) {
-        _veWeightedFuelSum += veUsed * fuelRate;
-        _veDerivedFuelRateSum += fuelRate;
+        _fuel.addVeDerived(veUsed: veUsed, fuelRate: fuelRate);
       } else {
-        _sawNonVeDerivedFuel = true;
+        _fuel.markNonVeDerived();
       }
     }
     final speedKmh = snap.latestSpeedKmh;
@@ -207,12 +204,12 @@ mixin _TripRecordingEmit
         iatC: snap.latestIatCelsius,
         timingAdvanceDeg: snap.latestTimingAdvanceDeg,
         // #3857 — one `bv` stamp per voltage read (~10 s); null between.
-        batteryVoltageV: _takeVoltageStamp(),
+        batteryVoltageV: _voltageWatch.take(),
       );
       // #2653 — thread the live distance provenance so the detector
       // suppresses harsh scoring on the `virtual` dead-reckoning source.
       _recorder.onSample(sample, distanceSource: distanceSource);
-      _lastSampleAt = nowTs;
+      _engineFence.onSample(nowTs);
       // #1925 — ping the opt-in debug recorder so a stretch of silence
       // surfaces as a data-gap event in the exported session log.
       // #1930 — pass the vehicle state so a gap records what the car
@@ -227,8 +224,7 @@ mixin _TripRecordingEmit
     // 4 Hz emit.
     final summary = _recorder.buildSummary();
     if (fuelRate != null) {
-      _fuelRateSeen = true;
-      _fuelLitersSoFar = summary.fuelLitersConsumed ?? _fuelLitersSoFar;
+      _fuel.observeMeasured(summary.fuelLitersConsumed);
     }
     // #2506 — live Speed/Distance GPS fallback. The OBD2 speed PID (0x0D)
     // always wins when present; when it's momentarily absent (the no-fuel-
@@ -300,10 +296,10 @@ mixin _TripRecordingEmit
       ltft: snap.latestLtft,
       pedalPercent: snap.latestPedalPercent,
       distanceKmSoFar: effectiveDistanceKm,
-      fuelLitersSoFar: _fuelRateSeen ? _fuelLitersSoFar : null,
+      fuelLitersSoFar: _fuel.litersSoFarOrNull,
       elapsed: nowTs.difference(_startedAt ?? nowTs),
-      odometerStartKm: _odometerStartKm,
-      odometerNowKm: _odometerLatestKm,
+      odometerStartKm: _odometer.startKm,
+      odometerNowKm: _odometer.latestKm,
       odometerEstimateKm: estimatedOdometerNowKm, // #3877
       instantLPer100Km: instant?.lPer100Km,
       instantLPerHour: instant?.lPerHour,
@@ -355,7 +351,7 @@ mixin _TripRecordingEmit
     required double? altitudeM,
   }) {
     final folder = _gpsEstimateFolder;
-    if (fuelRate == null && !_fuelRateSeen && folder != null) {
+    if (fuelRate == null && !_fuel.fuelRateSeen && folder != null) {
       final overlaid = folder.overlay(
         base: reading,
         now: nowTs,
@@ -365,7 +361,7 @@ mixin _TripRecordingEmit
       );
       _latestGpsCoachingHint = overlaid.coachingHint;
       return overlaid.reading;
-    } else if (_fuelRateSeen) {
+    } else if (_fuel.fuelRateSeen) {
       _latestGpsCoachingHint = null;
     }
     return reading;
@@ -387,8 +383,8 @@ mixin _TripRecordingEmit
       lastGpsFixAt: _gpsEndedAt,
       startedAt: _startedAt,
       resolverDistanceKm: currentDistanceKm,
-      odometerStartKm: _odometerStartKm,
-      odometerLatestKm: _odometerLatestKm,
+      odometerStartKm: _odometer.startKm,
+      odometerLatestKm: _odometer.latestKm,
     );
     if (reading != null) _liveController.add(reading);
   }

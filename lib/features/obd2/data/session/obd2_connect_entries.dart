@@ -13,46 +13,6 @@ part of 'obd2_connection_service.dart';
 /// [Obd2ConnectionService] stay virtually dispatchable for test fakes
 /// while these bodies keep library-level private access.
 
-/// #2969 — open (or join) a connect trace around [body], stamp the terminal
-/// outcome (success when a service comes back; the inner-stamped outcome — or
-/// `scanEmpty` as the default — when null; the classified error on a throw),
-/// and finalise it into [Obd2ConnectTraceLog]. The single wrapper every
-/// public by-MAC connect entry threads through, so a failure at ANY phase
-/// (incl. the pre-session phases) is captured. Re-entrant safe: a nested
-/// connect (a fallback re-entering a public method) joins the same trace.
-Future<Obd2Service?> _traced({
-  required Obd2ConnectOrigin origin,
-  String? mac,
-  String? adapterName,
-  required Obd2ConnectTransport requestedTransport,
-  required Future<Obd2Service?> Function() body,
-}) async {
-  final trace = Obd2ConnectTraceLog.beginTrace(
-    origin: origin,
-    mac: mac,
-    adapterName: adapterName,
-    requestedTransport: requestedTransport,
-  );
-  try {
-    final svc = await body();
-    if (svc != null) {
-      trace.setOutcome(Obd2ConnectOutcome.success);
-    } else if (!trace.hasOutcome) {
-      // A clean null with NO inner-stamped outcome means the scan/transport
-      // path never matched the adapter — the scan-empty / not-in-range case.
-      trace.setOutcome(Obd2ConnectOutcome.scanEmpty);
-    }
-    return svc;
-    // rethrow preserves the stack; the (e) binding only classifies the trace.
-    // ignore: catch_no_st
-  } catch (e) {
-    trace.setOutcomeFromError(e);
-    rethrow;
-  } finally {
-    Obd2ConnectTraceLog.endTrace(trace);
-  }
-}
-
 /// The [connect] body (trace open/outcome wrap around
 /// [_connectResolved]); kept separate so the entry stays a thin shell.
 Future<Obd2Service> _connectTraced(
@@ -111,7 +71,7 @@ Future<Obd2Service> _connectResolved(
   // by-MAC connect before the scan path opens a fresh one. The
   // [connectByMacDirect]/[connectByMacPassive] paths already self-clean,
   // but the SCAN-fallback `connect` did not — so an in-trip reconnect that
-  // tried a direct connect (which retained `_lastDirectChannel`) and then
+  // tried a direct connect (which retained the direct-channel slot) and
   // fell back to the gated scan left that GATT client open, and Android
   // returned GATT_ERROR 133 on the scan-path open against the same device
   // (the repeat-133 reconnect trap). Idempotent + best-effort.
@@ -222,7 +182,7 @@ Future<Obd2Service?> _connectByMacDirectTraced(
   bool fallbackToScan = true,
   String? adapterName,
 }) =>
-    _traced(
+    tracedConnect(
       origin: Obd2ConnectOrigin.firstConnect,
       mac: mac,
       adapterName: adapterName, // #3014 — name the BLE by-MAC attempt
@@ -238,7 +198,7 @@ Future<Obd2Service?> _connectByMacClassicDirectTraced(
   String mac, {
   String? adapterName,
 }) =>
-    _traced(
+    tracedConnect(
       origin: Obd2ConnectOrigin.firstConnect,
       mac: mac,
       adapterName: adapterName, // #3014 — name the Classic by-MAC attempt
@@ -254,7 +214,7 @@ Future<Obd2Service?> _connectByMacPassiveTraced(
   String mac, {
   String? adapterName,
 }) =>
-    _traced(
+    tracedConnect(
       origin: Obd2ConnectOrigin.liveReconnect,
       mac: mac,
       adapterName: adapterName, // #3014 — name the passive attempt
@@ -265,16 +225,5 @@ Future<Obd2Service?> _connectByMacPassiveTraced(
 /// Body of [Obd2ConnectionService._teardownLastDirectChannel] (#2907;
 /// #3760 — moved from the service file): close + null the prior
 /// direct/passive channel.
-Future<void> _teardownLastDirectChannelImpl(Obd2ConnectionService svc) async {
-  final prior = svc._lastDirectChannel;
-  svc._lastDirectChannel = null;
-  if (prior == null) return;
-  try {
-    await prior.close();
-  } catch (e, st) {
-    // #2379 — OBD2/BLE, not local storage.
-    log.error(e, st, layer: ErrorLayer.other, context: const {
-      'where': 'Obd2ConnectionService: prior-direct-channel teardown',
-    });
-  }
-}
+Future<void> _teardownLastDirectChannelImpl(Obd2ConnectionService svc) =>
+    svc._directChannel.releasePrior();

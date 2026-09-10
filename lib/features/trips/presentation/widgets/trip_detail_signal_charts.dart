@@ -1,16 +1,16 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-/// The driving-signal trip-detail charts (#2461): throttle/pedal,
-/// coolant, altitude, and commanded-λ.
-///
-/// Split out of `trip_detail_charts.dart` (a `part of` library) to keep
-/// that widget file under the 400-line guard. Each chart is a thin
-/// wrapper over the shared private `_TripDetailLineChart`, gated by the
-/// parent screen on "any non-null sample" and self-falling-back to the
-/// shared empty-state caption otherwise (symmetric with the RPM /
-/// engine-load variants).
-part of 'trip_detail_charts.dart';
+// The driving-signal trip-detail charts (#2461): throttle/pedal, coolant,
+// altitude, and commanded-λ. #4037 made this a library of its own rather
+// than a `part of trip_detail_charts.dart`: each chart is a thin wrapper
+// over the shared [TripDetailLineChart], gated by the parent screen on
+// "any non-null sample" and self-falling-back to the shared empty-state
+// caption otherwise (symmetric with the RPM / engine-load variants).
+import 'package:flutter/material.dart';
+
+import 'trip_chart_crosshair.dart';
+import 'trip_detail_sample.dart';
 
 /// Throttle / pedal-position-over-time line chart (#2461).
 ///
@@ -32,7 +32,7 @@ class TripDetailThrottleChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _TripDetailLineChart(
+    return TripDetailLineChart(
       samples: samples,
       color: color,
       // Pedal is the truer "how hard is the driver pushing" signal; fall
@@ -60,7 +60,7 @@ class TripDetailCoolantChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _TripDetailLineChart(
+    return TripDetailLineChart(
       samples: samples,
       color: color,
       valueOf: (s) => s.coolantTempC,
@@ -107,7 +107,7 @@ class TripDetailAltitudeChart extends StatelessWidget {
       base = sorted[sorted.length ~/ 2];
     }
     final baseline = base;
-    return _TripDetailLineChart(
+    return TripDetailLineChart(
       samples: samples,
       color: color,
       valueOf: baseline == null
@@ -138,7 +138,7 @@ class TripDetailLambdaChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _TripDetailLineChart(
+    return TripDetailLineChart(
       samples: samples,
       color: color,
       valueOf: (s) => s.lambda,
@@ -160,7 +160,7 @@ class TripDetailBoostChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _TripDetailLineChart(
+    return TripDetailLineChart(
       samples: samples,
       color: color,
       valueOf: (s) => s.boostKpa,
@@ -179,7 +179,7 @@ class TripDetailIatChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _TripDetailLineChart(
+    return TripDetailLineChart(
       samples: samples,
       color: color,
       valueOf: (s) => s.iatC,
@@ -199,7 +199,7 @@ class TripDetailTimingChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _TripDetailLineChart(
+    return TripDetailLineChart(
       samples: samples,
       color: color,
       valueOf: (s) => s.timingAdvanceDeg,

@@ -207,9 +207,8 @@ extension _PumpOcrTesterActions on _PumpOcrTesterScreenState {
       await _runReceipt(path, trace);
       await _attachImage(trace, path);
     } catch (e, st) {
-      // Dev tool — log the failure for diagnosis, then build whatever was
-      // recorded so the partial trace is still inspectable.
-      debugPrint('PumpOcrTester: pipeline run failed — $e\n$st');
+      // Dev tool — keep whatever was recorded inspectable.
+      logFailure(e, st, where: 'PumpOcrTester: pipeline run failed');
     }
     if (!mounted) return;
     final decoded = await _decodeBaked(path);

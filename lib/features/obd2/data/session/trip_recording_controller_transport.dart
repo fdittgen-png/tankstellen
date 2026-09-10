@@ -145,8 +145,7 @@ mixin _TripRecordingTransportGuard on _TripRecordingSessionState {
       );
     } finally {
       _protocolWorkInFlight = false;
-      _lastFreshEngineParseAt = _now();
-      _staleEngineEscalated = false;
+      _engineFence.onFreshParse(_now());
       scheduler?.resume();
     }
   }
@@ -163,7 +162,7 @@ mixin _TripRecordingTransportGuard on _TripRecordingSessionState {
     s.start();
     // #3858 — a recording that began with the engine off deferred its
     // identity reads to this moment; a normal start already did them.
-    if (!_identityRead) {
+    if (!_identity.done) {
       unawaited(_ensureVehicleProtocol(where: where).then((_) =>
           _readTripIdentity()));
       return;
@@ -237,7 +236,7 @@ mixin _TripRecordingTransportGuard on _TripRecordingSessionState {
   /// detector counts, the controller owns the "are we already
   /// pausing?" state.
   void _registerTransportError(Object error) {
-    if (_pausedDueToDrop || _stopped) return;
+    if (_run.pausedDueToDrop || _run.stopped) return;
     // #3625 — inside the post-reconnect grace the fresh session is
     // still bringing the bus up; failures feed the #3575 protocol
     // episode instead of the drop verdict. #3783 — same while protocol
@@ -271,15 +270,15 @@ mixin _TripRecordingTransportGuard on _TripRecordingSessionState {
     if (parsedValue != null) {
       // ANY successful high-priority parse clears the window — we're
       // detecting "ECU is dead", not "this one PID is unsupported".
-      _lastFreshEngineParseAt = _now(); // #3602 — the staleness fence anchor
-      _staleEngineEscalated = false;
+      // #3602 — the staleness fence anchor.
+      _engineFence.onFreshParse(_now());
       _dropDetector.observeHighPriorityParse(parsedValue);
       return;
     }
     // The transport-error drop already paused us — don't let a stretch
     // of nulls double-fire into a second drop. The lifecycle guard
     // stays here; the detector just counts.
-    if (_pausedDueToDrop || _stopped) return;
+    if (_run.pausedDueToDrop || _run.stopped) return;
     // #3625 — bus-init nulls during the post-reconnect grace are the
     // K-line waking up, not a dead ECU. #3783 — same during protocol
     // work: the quiet window legitimately parses nothing.

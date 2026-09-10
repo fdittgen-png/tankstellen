@@ -74,8 +74,9 @@ mixin _Obd2ServiceInit on _Obd2ServiceLink {
       wakeObservation = WakeObservation.answeredImmediately;
       return response;
     } catch (e, st) {
-      debugPrint('OBD2 wake: first command "$command" failed ($e), '
-          'entering bounded wake window\n$st');
+      log.warn('OBD2 wake: first command "$command" failed, entering bounded wake '
+          'window',
+          error: e, stack: st, layer: ErrorLayer.other);
     }
 
     // Nudges — settle, then re-send. A success here is observed proof the

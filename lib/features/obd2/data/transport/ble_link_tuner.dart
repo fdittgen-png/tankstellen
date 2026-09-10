@@ -1,10 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 import '../obd2_comm_diagnostics.dart';
+import '../../../../core/logging/app_log.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Best-effort BLE link tuning for an OBD2 recording session (#2261
 /// concern 4), extracted from [FlutterBluePlusElmChannel] (#2907) so the
@@ -42,7 +43,8 @@ class BleLinkTuner {
     } catch (e, st) {
       // Many clones reject a non-default MTU — harmless, the default 23-byte
       // MTU still works. PHY (2M) is deliberately NOT requested (a clone trap).
-      debugPrint('BleLinkTuner requestMtu skipped: $e\n$st');
+      log.warn('BleLinkTuner requestMtu skipped',
+          error: e, stack: st, layer: ErrorLayer.other);
     }
   }
 
@@ -60,7 +62,8 @@ class BleLinkTuner {
         connectionPriorityRequest: priority,
       );
     } catch (e, st) {
-      debugPrint('BleLinkTuner requestConnectionPriority skipped: $e\n$st');
+      log.warn('BleLinkTuner requestConnectionPriority skipped',
+          error: e, stack: st, layer: ErrorLayer.other);
     }
   }
 }

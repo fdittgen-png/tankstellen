@@ -7,6 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
+import '../../logging/app_log.dart';
+import '../../logging/error_logger.dart';
 
 /// Where Hive's box files live (#3747, item 3).
 ///
@@ -105,18 +107,19 @@ class HiveDirectoryResolver {
         debugPrint('HiveDirectoryResolver: moved ${moved.length} Hive box '
             'file(s) out of the file-sharing surface (#3747).');
         return targetDir.path;
-      } catch (e, st) { // ignore: unused_catch_stack
-        debugPrint('HiveDirectoryResolver: migration failed ($e) — '
-            'rolling back to the legacy dir; will retry next launch.');
+      } catch (e, st) {
+        log.warn('HiveDirectoryResolver: migration failed — rolling back to the '
+            'legacy dir; will retry next launch',
+            error: e, stack: st, layer: ErrorLayer.storage);
         for (final (original, newPath) in moved) {
           try {
             File(newPath).renameSync(original.path);
-          } catch (e2, st2) { // ignore: unused_catch_stack
+          } catch (e2, st2) {
             // Same-volume rename-back failing is a hard disk fault; the
             // target-populated rule above makes the NEXT launch adopt
             // the target dir rather than losing the moved boxes.
-            debugPrint('HiveDirectoryResolver: rollback of '
-                '$newPath failed: $e2');
+            log.warn('HiveDirectoryResolver: rollback of $newPath failed',
+                error: e2, stack: st2, layer: ErrorLayer.storage);
           }
         }
         return legacyDir.path;

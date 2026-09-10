@@ -105,11 +105,9 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
           onResume: () => unawaited(_armForegroundActiveAll()),
         );
       } catch (e, st) {
-        debugPrint(
-          'AutoRecordOrchestrator: AppLifecycleListener unavailable '
-          '(no WidgetsBinding?) — foreground-active resume arming not '
-          'wired: $e\n$st',
-        );
+        log.warn('AutoRecordOrchestrator: AppLifecycleListener unavailable (no '
+            'WidgetsBinding?) — foreground-active resume arming not wired',
+            error: e, stack: st, layer: ErrorLayer.background);
       }
     }
     // Watch the central master gate (#1373 phase 3d). Any flip rebuilds
@@ -277,10 +275,9 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
     try {
       linkSupervisor = ref.read(obd2ReconnectProvider.notifier).supervisor;
     } catch (e, st) {
-      debugPrint(
-        'AutoRecordOrchestrator: link supervisor unavailable — '
-        'coordinator dials without it: $e\n$st',
-      );
+      log.warn('AutoRecordOrchestrator: link supervisor unavailable — coordinator '
+          'dials without it',
+          error: e, stack: st, layer: ErrorLayer.background);
     }
 
     final listener = listenerFactory();
@@ -344,10 +341,9 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
         );
       }
     } catch (e, st) {
-      debugPrint(
-        'AutoRecordOrchestrator: notification permission probe failed '
-        '(mac=${entry.armedMac}): $e\n$st',
-      );
+      log.warn('AutoRecordOrchestrator: notification permission probe failed '
+          '(mac=${entry.armedMac})',
+          error: e, stack: st, layer: ErrorLayer.background);
     }
     try {
       await entry.coordinator.start();
@@ -357,10 +353,9 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
       // errorLogger + AutoRecordTraceLog; the orchestrator's own
       // try/catch is a belt-and-braces guard so a bug in the listener
       // factory doesn't crash the Riverpod build phase.
-      debugPrint(
-        'AutoRecordOrchestrator: coordinator start failed '
-        '(mac=${entry.armedMac}): $e\n$st',
-      );
+      log.warn('AutoRecordOrchestrator: coordinator start failed '
+          '(mac=${entry.armedMac})',
+          error: e, stack: st, layer: ErrorLayer.background);
     }
   }
 
@@ -369,10 +364,9 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
     try {
       await entry.coordinator.stop();
     } catch (e, st) {
-      debugPrint(
-        'AutoRecordOrchestrator: coordinator stop failed '
-        '(mac=${entry.armedMac}): $e\n$st',
-      );
+      log.warn('AutoRecordOrchestrator: coordinator stop failed '
+          '(mac=${entry.armedMac})',
+          error: e, stack: st, layer: ErrorLayer.background);
     }
   }
 

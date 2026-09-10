@@ -9,33 +9,6 @@ part of 'obd2_service.dart';
 /// #3760 decomposition — move-only, behaviour preserved): the adapter
 /// init handshake, the firmware/capability probe and the teardown.
 mixin _Obd2ServiceConnect on _Obd2ServiceInit {
-  /// AT command that asks the ELM327 to identify itself. Returns a
-  /// version string like `ELM327 v1.5` / `ELM327 v2.2` /
-  /// `STN1110 v4.0.4` (#1401 phase 1).
-  static const String _atiCommand = 'ATI\r';
-
-  /// Strip the trailing ELM prompt (`>`) plus any CR/LF noise from a
-  /// raw `ATI` response. Returns null when the response was a
-  /// NO-DATA-style placeholder.
-  static String? _parseFirmwareString(String raw) {
-    var s = raw.replaceAll('\r', ' ').replaceAll('\n', ' ');
-    s = s.replaceAll('>', '').trim();
-    // Collapse runs of whitespace introduced by stripping CR/LF.
-    s = s.replaceAll(RegExp(r'\s+'), ' ');
-    if (s.isEmpty) return null;
-    if (s.toUpperCase().contains('NO DATA')) return null;
-    return s;
-  }
-
-  /// Whether [command] is a reset / wake command that needs a settle
-  /// delay after it (#2261 concern 5) — ATZ (full reset) or ATWS (warm
-  /// start). Every other AT echo / OBD request is serialised by the
-  /// transport's prompt-wait and needs no extra sleep.
-  static bool _isResetCommand(String command) {
-    final c = command.trim().toUpperCase();
-    return c == 'ATZ' || c == 'ATWS';
-  }
-
   /// Connect and initialize the ELM327 adapter.
   ///
   /// The init sequence + timing is sourced from [adapter] (#1330).
@@ -174,7 +147,7 @@ mixin _Obd2ServiceConnect on _Obd2ServiceInit {
         // commands (ATZ/ATWS), where a slow clone re-enumerates and a
         // back-to-back command can race the reset. The adapter still
         // owns the actual settle duration via [postResetDelay].
-        if (_isResetCommand(sequence[i])) {
+        if (isElmResetCommand(sequence[i])) {
           await Future<void>.delayed(adapter.postResetDelay);
         }
       }
@@ -191,22 +164,22 @@ mixin _Obd2ServiceConnect on _Obd2ServiceInit {
         // would skip firmware-tier detection entirely.
         final atiSw = Stopwatch()..start();
         final raw = await _withConnectRetry(
-          _atiCommand,
+          kObd2AtiCommand,
           _transport.sendCommand,
         );
         atiSw.stop();
         Obd2DebugSessionRecorder.recordHandshakeCommand(
-          _atiCommand,
+          kObd2AtiCommand,
           raw,
           atiSw.elapsedMilliseconds,
         );
         // #2465 — tee the ATI probe into the comm-health collector too.
         Obd2CommDiagnostics.instance.recordHandshakeLine(
-          _atiCommand,
+          kObd2AtiCommand,
           raw,
           atiSw.elapsedMilliseconds,
         );
-        final firmware = _parseFirmwareString(raw);
+        final firmware = parseElmFirmwareString(raw);
         if (firmware != null && firmware.isNotEmpty) {
           adapterFirmware = firmware;
         }

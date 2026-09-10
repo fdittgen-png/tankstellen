@@ -1,8 +1,9 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
+import '../../../core/logging/app_log.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// #3867 (Epic #3865) — wipe the home-screen widget's shared container.
 ///
@@ -37,6 +38,7 @@ Future<void> clearHomeWidgetData() async {
     }
     await HomeWidget.updateWidget(name: 'FuelPriceWidgetProvider');
   } catch (e, st) {
-    debugPrint('clearHomeWidgetData: $e\n$st');
+    log.warn('clearHomeWidgetData',
+        error: e, stack: st, layer: ErrorLayer.background);
   }
 }

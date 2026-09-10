@@ -4,13 +4,14 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../data/storage_repository.dart';
 import '../hive_boxes.dart';
 import '../storage_keys.dart';
+import '../../logging/app_log.dart';
+import '../../logging/error_logger.dart';
 
 /// Hive-backed implementation of [SettingsStorage] and [ApiKeyStorage].
 ///
@@ -220,9 +221,8 @@ class SettingsHiveStore implements SettingsStorage, ApiKeyStorage {
       // away, so the stack is useless; we only drop the value.
       // ignore: catch_no_st
     } on FileSystemException catch (e) {
-      debugPrint(
-          'SettingsHiveStore.$label: settings box closed mid-write, '
-          'dropping ($e)');
+      log.warn('SettingsHiveStore.$label: settings box closed mid-write, dropping',
+          error: e, layer: ErrorLayer.storage);
     }
   }
 

@@ -146,7 +146,7 @@ final class GlideCoachSettingsNotifierProvider
 }
 
 String _$glideCoachSettingsNotifierHash() =>
-    r'ed5bac993239b9880db2d8867926b44d5f9e5daa';
+    r'76b6c3a61bab16dea7e85d11a6598ef96eb3ac43';
 
 /// Persisted user toggle for the glide-coach feature (#1125 phase 3b).
 ///

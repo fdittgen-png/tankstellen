@@ -32,7 +32,10 @@ import 'gps_only_recording_pipeline.dart';
 import 'recording_battery_exemption.dart';
 import 'recording_companion_association.dart';
 import 'recording_lifecycle_marks_recorder.dart';
+import 'active_snapshot_from_controller.dart';
+import 'last_trip_identity.dart';
 import 'recording_pipeline.dart';
+import 'recording_pipeline_slot.dart';
 import 'trip_discard_guard.dart';
 import 'trip_baseline_recorder.dart';
 import 'trip_gps_stream_controller.dart';
@@ -150,8 +153,10 @@ class TripRecording extends _$TripRecording
     final activeVehicle = _tryReadActiveVehicle();
     final resolvedVehicleId = vehicleId ?? activeVehicle?.id;
     final resolvedMac = adapterMac ?? activeVehicle?.obd2AdapterMac;
-    _lastTripVehicleId = resolvedVehicleId;
-    _lastTripStartedAt = DateTime.now();
+    _lastTrip.begin(
+      vehicleId: resolvedVehicleId,
+      startedAt: DateTime.now(),
+    );
     if (service != null) {
       // #1004 phase 2b-3 — orchestrator-driven no-picker start path.
       // The caller supplies the connected `Obd2Service` directly so
@@ -210,12 +215,14 @@ class TripRecording extends _$TripRecording
     Obd2Service service, {
     bool automatic = false,
   }) async {
-    _lastTripStartedAt ??= DateTime.now();
-    _lastTripAutomatic = automatic; // #3251 — stamp the WAL seed honestly.
+    _lastTrip.setAutomatic(automatic); // #3251 — stamp the WAL seed.
     // #769 — record the vehicle id the trip is scoped to up-front so the
     // fill-up auto-link window resolves it even if the baseline load
     // races. Cheap Riverpod cache hit.
-    _lastTripVehicleId ??= _tryReadActiveVehicle()?.id;
+    _lastTrip.fillIn(
+      startedAtIfAbsent: DateTime.now(),
+      vehicleIdIfAbsent: () => _tryReadActiveVehicle()?.id,
+    );
     // #2227 — the OBD2 recording loop lives in [Obd2RecordingPipeline].
     // The notifier selects it (mirroring the GPS-only selection in
     // [startGpsOnly]) and delegates the live loop + teardown; the WAL
@@ -233,7 +240,7 @@ class TripRecording extends _$TripRecording
       readOemPidsFlag: _readOemPidsFlag,
       readDiagnosticCaptureFlag: _readDiagnosticCaptureFlag,
     );
-    _pipeline = pipeline;
+    _pipelineSlot.select(pipeline);
     await pipeline.start(service, automatic: automatic);
   }
 
@@ -270,7 +277,7 @@ class TripRecording extends _$TripRecording
         ref: ref,
         host: _RecordingPipelineHostAdapter(this),
       );
-      _pipeline = pipeline;
+      _pipelineSlot.select(pipeline);
       pipeline.start();
       return StartTripOutcome.started;
     } finally {
@@ -290,7 +297,7 @@ class TripRecording extends _$TripRecording
   /// caller starts producing OBD2-flavoured samples.
   @visibleForTesting
   void debugAppendObd2SampleToGpsOnly(TripSample sample) {
-    final pipeline = _pipeline;
+    final pipeline = _pipelineSlot.pipeline;
     if (pipeline is! GpsOnlyRecordingPipeline) return;
     pipeline.appendObd2Sample(sample);
   }

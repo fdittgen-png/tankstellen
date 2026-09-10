@@ -1,20 +1,29 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-part of 'station_card.dart';
+import 'package:flutter/material.dart';
+
+import '../../../../core/domain/station.dart';
+import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_text.dart';
+import '../../../../core/theme/spacing.dart';
+import '../../../../core/utils/price_formatter.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../domain/entities/brand_registry.dart';
 
 /// Small badge rendered under the headline when a loyalty / fuel-club
 /// card applies (#1120 pilot). Shows the per-litre discount, the
 /// canonical brand name, and a struck-through raw price so the user
 /// can read both the headline number and the operator's quoted price
 /// at once.
-class _LoyaltyDiscountBadge extends StatelessWidget {
+class StationCardLoyaltyBadge extends StatelessWidget {
   final Station station;
   final double discount;
   final double rawPrice;
   final String? currencyOverride;
 
-  const _LoyaltyDiscountBadge({
+  const StationCardLoyaltyBadge({
+    super.key,
     required this.station,
     required this.discount,
     required this.rawPrice,
@@ -79,10 +88,10 @@ class _LoyaltyDiscountBadge extends StatelessWidget {
 }
 
 /// Displays 1-5 small star icons for the user's station rating.
-class _RatingStars extends StatelessWidget {
+class StationCardRatingStars extends StatelessWidget {
   final int rating;
 
-  const _RatingStars({required this.rating});
+  const StationCardRatingStars({super.key, required this.rating});
 
   @override
   Widget build(BuildContext context) {

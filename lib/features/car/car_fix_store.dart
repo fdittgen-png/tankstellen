@@ -3,12 +3,12 @@
 
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 
 import '../../core/data/storage_repository.dart';
 import '../../core/domain/fuel_type.dart';
 import '../../core/logging/error_logger.dart';
 import '../../core/storage/storage_keys.dart';
+import '../../core/logging/app_log.dart';
 import '../../core/utils/geo_utils.dart' show isUsableCoord;
 
 /// Android Auto fix + profile storage helpers behind `CarDataService`
@@ -119,8 +119,10 @@ CarProfile activeCarProfile(StorageRepository storage) {
     try {
       fuel = FuelType.fromString(key);
     // #3164 — kept: preference validation; unknown fuel key falls back.
-    } catch (e, st) { // ignore: unused_catch_stack
-      debugPrint('activeCarProfile: unknown preferred fuel "$key": $e');
+    } catch (e, st) {
+ // ignore: unused_catch_stack
+      log.warn('activeCarProfile: unknown preferred fuel "$key"',
+          error: e, stack: st, layer: ErrorLayer.storage);
     }
   }
   return CarProfile(radiusKm: radius, fuelType: fuel);

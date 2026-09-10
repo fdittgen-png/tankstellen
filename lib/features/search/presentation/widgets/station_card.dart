@@ -1,12 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../../../../core/country/country_config.dart';
-import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_text.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/theme/fuel_colors.dart';
@@ -15,9 +11,6 @@ import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/price_tier.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/domain/brand_appearance.dart';
-import '../../../../core/widgets/animated_favorite_star.dart';
-import '../../../../core/widgets/animated_price_text.dart';
-import '../../../../core/widgets/brand_logo.dart';
 import '../../../../core/widgets/station_card_shell.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../trips/api.dart';
@@ -26,15 +19,11 @@ import '../../domain/entities/brand_registry.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/station.dart';
 import 'amenity_chips.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../providers/road_distance_provider.dart';
-import '../../../../core/services/radar/motorway_exits_provider.dart';
-import '../../../../core/utils/unit_formatter.dart';
 
-part 'station_card_badges.dart';
-part 'station_card_price_column.dart';
-part 'station_card_price_row.dart';
-part 'station_card_status.dart';
+import 'station_card_badges.dart';
+import 'station_card_price_column.dart';
+import 'station_card_price_row.dart';
+import 'station_card_status.dart';
 
 /// One station in the results list, laid out against the visual grammar
 /// (#3949, Epic #3947).
@@ -254,7 +243,7 @@ class StationCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              _HeadlineRow(
+              StationCardHeadlineRow(
                 station: station,
                 brandMark: _brandMark,
                 price: price,
@@ -268,18 +257,18 @@ class StationCard extends StatelessWidget {
               const SizedBox(height: Spacing.xs),
               _TitleLine(text: titleText, rating: rating),
               Text(
-                _addressLine(station, showStreetInAddress),
+                stationCardAddressLine(station, showStreetInAddress),
                 style: AppText.body(context),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: Spacing.xs),
-              _MetaLine(
+              StationCardMetaLine(
                 station: station,
                 semanticStatus: semanticStatus,
                 isStalePrice: isStalePrice,
               ),
-              _HighwayExitLine(station: station),
+              StationCardHighwayExitLine(station: station),
               // #2899/#2984 — Fuel Station Radar closeness bar: the SAME
               // green→accent [ProximityFillBar] the trip radar card + PiP
               // overlay use. `station.dist` (km) → metres for the bar; it
@@ -301,7 +290,7 @@ class StationCard extends StatelessWidget {
               if (selectedFuelType == FuelType.all && !isCheapest)
                 Padding(
                   padding: const EdgeInsets.only(top: Spacing.sm),
-                  child: _AllFuelsRows(
+                  child: StationCardAllFuelsRows(
                     station: station,
                     profileFuelType: profileFuelType,
                   ),
@@ -340,7 +329,7 @@ class _TitleLine extends StatelessWidget {
         ),
         if (showRating) ...[
           const SizedBox(width: Spacing.md),
-          _RatingStars(rating: rating),
+          StationCardRatingStars(rating: rating),
         ],
       ],
     );

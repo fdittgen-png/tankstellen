@@ -14,6 +14,9 @@ import '../transport/bluetooth_facade.dart';
 import '../transport/classic_bluetooth_facade.dart';
 import '../protocol/elm327_adapter.dart';
 import '../transport/elm_byte_channel.dart';
+import 'obd2_connect_trace_scope.dart';
+import 'obd2_direct_channel_slot.dart';
+import 'obd2_no_scan_profiles.dart';
 import '../last_good_adapter_store.dart';
 import '../negotiated_protocol_cache.dart';
 import 'obd2_adapter_identity.dart';
@@ -40,7 +43,6 @@ import '../../../vehicle/providers/vehicle_providers.dart';
 
 part 'obd2_connect_by_mac.dart';
 part 'obd2_connect_entries.dart';
-part 'obd2_connect_profile_fallback.dart';
 part 'obd2_connect_scan.dart';
 part 'obd2_connection_service.g.dart';
 part 'obd2_open_and_init.dart';
@@ -69,12 +71,11 @@ class Obd2ConnectionService {
   /// RSSI adapter without opening the picker again.
   List<ResolvedObd2Candidate> _lastRanked = const [];
 
-  /// The channel opened by the most recent [connectByMacDirect] (#2242).
-  /// Retained so the NEXT direct connect can tear it down before
-  /// reopening — Android returns GATT_ERROR 133 if a stale GATT client
-  /// for the same device is still open, which would silently fall the
-  /// caller back to the scan path. Null once torn down / never used.
-  ElmByteChannel? _lastDirectChannel;
+  /// #4035 — the channel opened by the most recent [connectByMacDirect]
+  /// (#2242), owned by a collaborator that also owns the #3244
+  /// close-by-identity rule. Was a bare pointer written from three of
+  /// this library's parts.
+  final Obd2DirectChannelSlot _directChannel = Obd2DirectChannelSlot();
 
   /// Persistent supported-PID bitmap cache (#811), wired into every
   /// session built here (#2253). Null in tests / configs that don't

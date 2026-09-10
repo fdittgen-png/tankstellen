@@ -3,13 +3,14 @@
 
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 
 import '../../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import 'elm327_commands.dart';
 import 'elm327_parsers.dart';
 import 'obd2_response_class.dart';
 import '../transport/obd2_transport.dart';
+import '../../../../core/logging/app_log.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Session states of one ELM327 link (#3528, Epic #3527).
 ///
@@ -302,7 +303,8 @@ class ElmSession {
       await _transport.sendCommand(recoveryCommand);
       _noteAlive();
     } on Object catch (e, st) {
-      debugPrint('ElmSession: recovery "$recoveryCommand" failed: $e\n$st');
+      log.warn('ElmSession: recovery "$recoveryCommand" failed',
+          error: e, stack: st, layer: ErrorLayer.other);
     } finally {
       _recoveryInFlight = false;
       if (_state == ElmSessionState.recovering) {

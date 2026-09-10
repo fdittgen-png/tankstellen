@@ -1,13 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../data/storage_repository.dart';
 import '../storage/storage_keys.dart';
 import '../storage/storage_providers.dart';
 import '../sync/content_reports_sync.dart';
+import '../logging/app_log.dart';
+import '../logging/error_logger.dart';
 
 part 'content_moderation_providers.g.dart';
 
@@ -51,7 +52,8 @@ Future<void> _persistStringSet(
   try {
     await storage.putSetting(key, value.toList());
   } catch (e, st) {
-    debugPrint('content_moderation: persisting $key failed: $e\n$st');
+    log.warn('content_moderation: persisting $key failed',
+        error: e, stack: st, layer: ErrorLayer.providers);
   }
 }
 

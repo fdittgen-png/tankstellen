@@ -56,8 +56,9 @@ class _DroppedSessionHostAdapter implements DroppedSessionHost {
       try {
         await svc.disconnect();
       } catch (e, st) {
-        debugPrint('TripRecordingController: dropped-service disconnect '
-            'failed (already dead) — $e\n$st');
+        log.warn('TripRecordingController: dropped-service disconnect failed '
+            '(already dead)',
+            error: e, stack: st, layer: ErrorLayer.other);
       }
     }());
   }
@@ -92,14 +93,14 @@ class _DroppedSessionHostAdapter implements DroppedSessionHost {
   TripSummary buildFinalSummary() => _c._finaliseSummary();
 
   @override
-  bool get pausedDueToDrop => _c._pausedDueToDrop;
+  bool get pausedDueToDrop => _c._run.pausedDueToDrop;
   @override
-  set pausedDueToDrop(bool value) => _c._pausedDueToDrop = value;
+  set pausedDueToDrop(bool value) => _c._run.setPausedDueToDrop(value);
 
   @override
-  bool get degradedGpsOnly => _c._degradedGpsOnly;
+  bool get degradedGpsOnly => _c._run.degradedGpsOnly;
   @override
-  set degradedGpsOnly(bool value) => _c._degradedGpsOnly = value;
+  set degradedGpsOnly(bool value) => _c._run.setDegradedGpsOnly(value);
 
   @override
   bool get gpsAlive => GpsOnlySampleBuilder.gpsAlive(
@@ -109,17 +110,17 @@ class _DroppedSessionHostAdapter implements DroppedSessionHost {
       );
 
   @override
-  bool get stopped => _c._stopped;
+  bool get stopped => _c._run.stopped;
   @override
-  set stopped(bool value) => _c._stopped = value;
+  set stopped(bool value) => _c._run.setStopped(value);
 
   @override
-  bool get started => _c._started;
+  bool get started => _c._run.started;
   @override
-  set started(bool value) => _c._started = value;
+  set started(bool value) => _c._run.setStarted(value);
 
   @override
-  bool get paused => _c._paused;
+  bool get paused => _c._run.paused;
 
   @override
   String? get sessionId => _c._sessionId;
@@ -131,10 +132,10 @@ class _DroppedSessionHostAdapter implements DroppedSessionHost {
   String? get vin => _c._vin;
 
   @override
-  double? get odometerStartKm => _c._odometerStartKm;
+  double? get odometerStartKm => _c._odometer.startKm;
 
   @override
-  double? get odometerLatestKm => _c._odometerLatestKm;
+  double? get odometerLatestKm => _c._odometer.latestKm;
 
   @override
   bool get automatic => _c._automatic;

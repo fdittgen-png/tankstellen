@@ -3,6 +3,8 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import '../logging/app_log.dart';
+import '../logging/error_logger.dart';
 
 /// Schema-version stamping + on-upgrade migration for the persistent Hive
 /// boxes (#1686 stamp, #2922 cache eviction). Extracted from `hive_boxes.dart`
@@ -98,8 +100,8 @@ class HiveSchemaMigration {
       try {
         await box.delete(key);
       } catch (e, st) {
-        debugPrint(
-            'HiveSchemaMigration: failed to evict stale cache key "$key": $e\n$st');
+        log.warn('HiveSchemaMigration: failed to evict stale cache key "$key"',
+            error: e, stack: st, layer: ErrorLayer.storage);
       }
     }
   }
