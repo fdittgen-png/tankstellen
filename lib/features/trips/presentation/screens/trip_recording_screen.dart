@@ -32,6 +32,8 @@ import '../widgets/recording_app_bar_actions.dart';
 import '../widgets/recording/auto_pin_toggle.dart';
 import '../widgets/trip_recording_body.dart';
 import 'trip_recording_pin_controller.dart';
+import '../../../../core/logging/app_log.dart';
+import '../../../../core/logging/error_logger.dart';
 
 part 'trip_recording_screen_build.dart';
 part 'trip_recording_screen_handlers.dart';

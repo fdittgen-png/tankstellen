@@ -3,7 +3,6 @@
 
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
 import '../../../core/storage/storage_keys.dart';
@@ -13,6 +12,7 @@ import '../domain/feature.dart';
 import '../domain/feature_manifest.dart';
 import 'feature_flags_repository.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 
 /// Settings-box key written once after the legacy `hapticEcoCoachEnabled`
 /// value has been promoted into the central feature-flag set (#1373
@@ -244,9 +244,8 @@ Future<void> _migrateHapticEcoCoach({
   try {
     await settings.put(hapticEcoCoachMigratedKey, true);
   } catch (e, st) {
-    debugPrint(
-      'migrateLegacyToggles: writing $hapticEcoCoachMigratedKey failed: $e\n$st',
-    );
+    log.warn('migrateLegacyToggles: writing $hapticEcoCoachMigratedKey failed',
+        error: e, stack: st, layer: ErrorLayer.storage);
   }
 }
 
@@ -299,9 +298,8 @@ Future<void> _migrateGamification({
   } catch (e, st) {
     // Don't block startup on a migration failure — the user can
     // re-toggle from settings if the central state is missing.
-    debugPrint(
-      'migrateUserProfileToggles: gamification promote failed: $e\n$st',
-    );
+    log.warn('migrateUserProfileToggles: gamification promote failed',
+        error: e, stack: st, layer: ErrorLayer.storage);
   }
 
   // Always set the flag (even when the persistence above failed) so we
@@ -309,9 +307,8 @@ Future<void> _migrateGamification({
   try {
     await settings.put(gamificationMigratedKey, true);
   } catch (e, st) {
-    debugPrint(
-      'migrateUserProfileToggles: writing $gamificationMigratedKey failed: $e\n$st',
-    );
+    log.warn('migrateUserProfileToggles: writing $gamificationMigratedKey failed',
+        error: e, stack: st, layer: ErrorLayer.storage);
   }
 }
 
@@ -348,9 +345,8 @@ Future<void> _migrateSyncBaselines({
     } catch (e, st) {
       // Don't block startup on a migration failure — the user can
       // re-toggle from settings if the central state is missing.
-      debugPrint(
-        'migrateLegacyToggles: syncBaselines promote failed: $e\n$st',
-      );
+      log.warn('migrateLegacyToggles: syncBaselines promote failed',
+          error: e, stack: st, layer: ErrorLayer.storage);
     }
   }
 
@@ -359,9 +355,8 @@ Future<void> _migrateSyncBaselines({
   try {
     await settings.put(syncBaselinesMigratedKey, true);
   } catch (e, st) {
-    debugPrint(
-      'migrateLegacyToggles: writing $syncBaselinesMigratedKey failed: $e\n$st',
-    );
+    log.warn('migrateLegacyToggles: writing $syncBaselinesMigratedKey failed',
+        error: e, stack: st, layer: ErrorLayer.storage);
   }
 }
 
@@ -431,10 +426,9 @@ Future<void> _migrateAutoRecord({
           // A single malformed row must not block the migration. If
           // every row is malformed [anyDecoded] stays false and we
           // treat it like "no vehicles" (manifest default wins).
-          debugPrint(
-            'migrateLegacyToggles: skipping malformed vehicle profile '
-            'during autoRecord migration: $e\n$st',
-          );
+          log.warn('migrateLegacyToggles: skipping malformed vehicle profile during '
+              'autoRecord migration',
+              error: e, stack: st, layer: ErrorLayer.storage);
         }
       }
       if (anyDecoded) {
@@ -442,10 +436,9 @@ Future<void> _migrateAutoRecord({
       }
     }
   } catch (e, st) {
-    debugPrint(
-      'migrateLegacyToggles: reading vehicle profiles for autoRecord '
-      'migration failed: $e\n$st',
-    );
+    log.warn('migrateLegacyToggles: reading vehicle profiles for autoRecord '
+        'migration failed',
+        error: e, stack: st, layer: ErrorLayer.storage);
   }
 
   if (allVehiclesAutoRecordFalse == true) {
@@ -460,9 +453,8 @@ Future<void> _migrateAutoRecord({
     } catch (e, st) {
       // Don't block startup on a migration failure — the user can
       // re-toggle from settings if the central state is missing.
-      debugPrint(
-        'migrateLegacyToggles: autoRecord disable failed: $e\n$st',
-      );
+      log.warn('migrateLegacyToggles: autoRecord disable failed',
+          error: e, stack: st, layer: ErrorLayer.storage);
     }
   }
   // else: allVehiclesAutoRecordFalse == false (at least one vehicle
@@ -475,9 +467,8 @@ Future<void> _migrateAutoRecord({
   try {
     await settings.put(autoRecordMigratedKey, true);
   } catch (e, st) {
-    debugPrint(
-      'migrateLegacyToggles: writing $autoRecordMigratedKey failed: $e\n$st',
-    );
+    log.warn('migrateLegacyToggles: writing $autoRecordMigratedKey failed',
+        error: e, stack: st, layer: ErrorLayer.storage);
   }
 }
 
@@ -525,17 +516,15 @@ Future<void> _migrateShowFuel({
       await featureFlags.saveEnabled(next);
     }
   } catch (e, st) {
-    debugPrint(
-      'migrateUserProfileToggles: showFuel promote failed: $e\n$st',
-    );
+    log.warn('migrateUserProfileToggles: showFuel promote failed',
+        error: e, stack: st, layer: ErrorLayer.storage);
   }
 
   try {
     await settings.put(showFuelMigratedKey, true);
   } catch (e, st) {
-    debugPrint(
-      'migrateUserProfileToggles: writing $showFuelMigratedKey failed: $e\n$st',
-    );
+    log.warn('migrateUserProfileToggles: writing $showFuelMigratedKey failed',
+        error: e, stack: st, layer: ErrorLayer.storage);
   }
 }
 
@@ -568,17 +557,15 @@ Future<void> _migrateShowElectric({
       await featureFlags.saveEnabled(next);
     }
   } catch (e, st) {
-    debugPrint(
-      'migrateUserProfileToggles: showElectric promote failed: $e\n$st',
-    );
+    log.warn('migrateUserProfileToggles: showElectric promote failed',
+        error: e, stack: st, layer: ErrorLayer.storage);
   }
 
   try {
     await settings.put(showElectricMigratedKey, true);
   } catch (e, st) {
-    debugPrint(
-      'migrateUserProfileToggles: writing $showElectricMigratedKey failed: $e\n$st',
-    );
+    log.warn('migrateUserProfileToggles: writing $showElectricMigratedKey failed',
+        error: e, stack: st, layer: ErrorLayer.storage);
   }
 }
 
@@ -635,16 +622,15 @@ Future<void> _migrateShowConsumptionTab({
       await featureFlags.saveEnabled(next);
     }
   } catch (e, st) {
-    debugPrint(
-      'migrateUserProfileToggles: showConsumptionTab promote failed: $e\n$st',
-    );
+    log.warn('migrateUserProfileToggles: showConsumptionTab promote failed',
+        error: e, stack: st, layer: ErrorLayer.storage);
   }
 
   try {
     await settings.put(showConsumptionTabMigratedKey, true);
   } catch (e, st) {
-    debugPrint(
-      'migrateUserProfileToggles: writing $showConsumptionTabMigratedKey failed: $e\n$st',
-    );
+    log.warn('migrateUserProfileToggles: writing $showConsumptionTabMigratedKey '
+        'failed',
+        error: e, stack: st, layer: ErrorLayer.storage);
   }
 }

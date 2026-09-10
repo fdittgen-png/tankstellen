@@ -20,6 +20,7 @@ import '../../../core/domain/station.dart';
 import '../../search/providers/station_rating_provider.dart';
 import '../../widget/data/home_widget_service.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 
 // #727 — the file this replaces had outgrown its single purpose.
 // `FavoriteStations` (fuel-detail fetch + per-country refresh) lives
@@ -99,12 +100,12 @@ class Favorites extends _$Favorites {
           stationService = ref.read(stationServiceProvider);
         // #3164 — kept: expected fallback when the provider isn't
         // initialized yet; degraded path is logged via debugPrint.
-        } catch (e, st) { // ignore: unused_catch_stack
-          debugPrint(
-            'Favorites._refreshWidget: stationService unavailable, '
-            'falling back to legacy nearest update: $e',
-          );
-        }
+        } catch (e, st) {
+ // ignore: unused_catch_stack
+      log.warn('Favorites._refreshWidget: stationService unavailable, falling back '
+          'to legacy nearest update',
+          error: e, stack: st, layer: ErrorLayer.providers);
+    }
         await HomeWidgetService.updateNearestWidget(
           storage,
           storage,

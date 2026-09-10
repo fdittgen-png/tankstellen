@@ -128,9 +128,8 @@ class PausedTripRecoveryService {
         await _pausedRepo.delete(entry.id);
         recovered++;
       } catch (e, st) {
-        debugPrint(
-          'PausedTripRecoveryService recover ${entry.id} failed: $e\n$st',
-        );
+        log.warn('PausedTripRecoveryService recover ${entry.id} failed',
+            error: e, stack: st, layer: ErrorLayer.storage);
       }
     }
     return recovered;

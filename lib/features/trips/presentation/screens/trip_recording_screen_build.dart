@@ -121,10 +121,8 @@ mixin _TripRecordingBuild on _TripRecordingEventHandlers {
         );
       }
     } catch (e, st) {
-      debugPrint(
-        'TripRecordingScreen broken-MAP listener wiring failed: '
-        '$e\n$st',
-      );
+      log.warn('TripRecordingScreen broken-MAP listener wiring failed',
+          error: e, stack: st, layer: ErrorLayer.ui);
     }
 
     // #3963 — no summary title: Stop pops the screen.

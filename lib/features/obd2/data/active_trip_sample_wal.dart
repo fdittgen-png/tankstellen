@@ -130,7 +130,8 @@ class ActiveTripSampleWal {
     } catch (e, st) {
       // Best-effort pre-read flush: a broken sink must not block
       // reading what is already on disk.
-      debugPrint('ActiveTripSampleWal: pre-read flush failed: $e\n$st');
+      log.warn('ActiveTripSampleWal: pre-read flush failed',
+          error: e, stack: st, layer: ErrorLayer.storage);
     }
     try {
       final file = _file ?? await _resolveFile();
@@ -184,7 +185,8 @@ List<TripSample> parseActiveTripWalFile(String path) {
     } catch (e, st) {
       // A torn/corrupt line (hard kill mid-write) is EXPECTED once per
       // crash; skipping it is the design — every other sample survives.
-      debugPrint('ActiveTripSampleWal: skipping corrupt line: $e\n$st');
+      log.warn('ActiveTripSampleWal: skipping corrupt line',
+          error: e, stack: st, layer: ErrorLayer.storage);
     }
   }
   return samples;

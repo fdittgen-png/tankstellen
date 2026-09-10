@@ -8,6 +8,8 @@ import 'package:flutter/services.dart';
 
 import 'background_adapter_listener.dart';
 import '../../../../../core/utils/event_channel_cancel.dart';
+import '../../../../core/logging/app_log.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// Production [BackgroundAdapterListener] backed by the native Android
 /// foreground service shipped in #1004 phase 2b-1.
@@ -138,8 +140,9 @@ class AndroidBackgroundAdapterListener implements BackgroundAdapterListener {
       // Benign degrade — the channel code/message is the only useful signal.
       // ignore: catch_no_st
     } on PlatformException catch (e) {
-      debugPrint('AndroidBackgroundAdapterListener: FGS arm failed '
-          '(${e.code}): ${e.message} — degrading to no-FGS recording');
+      log.warn('AndroidBackgroundAdapterListener: FGS arm failed — degrading to '
+          'no-FGS recording',
+          error: e, layer: ErrorLayer.background);
     }
   }
 

@@ -1,11 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
 
 import '../constants/app_constants.dart';
 import '../data/storage_repository.dart';
 import '../storage/storage_keys.dart';
+import '../logging/app_log.dart';
+import '../logging/error_logger.dart';
 
 /// #3866 (Epic #3865) — makes a consent change take effect the moment it
 /// is saved, and records WHEN it was given against WHICH policy version.
@@ -30,7 +31,8 @@ class ConsentEnforcement {
     try {
       await hook(enabled);
     } catch (e, st) {
-      debugPrint('ConsentEnforcement: error-reporting hook failed: $e\n$st');
+      log.warn('ConsentEnforcement: error-reporting hook failed',
+          error: e, stack: st, layer: ErrorLayer.storage);
     }
   }
 }

@@ -1,10 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
 import '../../../core/domain/station.dart';
 import '../data/models/price_record.dart';
 import '../data/repositories/price_history_repository.dart';
+import '../../../core/logging/app_log.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Call after a successful station search to record price snapshots.
 ///
@@ -32,7 +33,8 @@ Future<void> recordSearchResults(
       await repo.recordPrice(record);
     } catch (e, st) {
       // Skip individual failures; don't abort remaining records.
-      debugPrint('price_recorder: recordPrice failed for ${station.id}: $e\n$st');
+      log.warn('price_recorder: recordPrice failed for ${station.id}',
+          error: e, stack: st, layer: ErrorLayer.providers);
     }
   }
 }

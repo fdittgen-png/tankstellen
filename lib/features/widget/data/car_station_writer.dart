@@ -1,12 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
 
 import '../../../core/domain/fuel_type.dart';
 import '../../../core/domain/station.dart';
 import 'car_station_data.dart';
+import '../../../core/logging/app_log.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Android Auto v1 — persists the latest in-app Search / Radar station lists
 /// into the same SharedPreferences file the home-widget already uses
@@ -50,7 +51,8 @@ class CarStationWriter {
       // tests + background isolates, and a write fault here is never
       // actionable, so it goes to debugPrint only (no exportable-log spam).
       // The v2 rewrite (#2947) replaces this whole mirror with a live bridge.
-      debugPrint('CarStationWriter.$which skipped (write failed): $e\n$st');
+      log.warn('CarStationWriter.$which skipped (write failed)',
+          error: e, stack: st, layer: ErrorLayer.background);
     }
   }
 }

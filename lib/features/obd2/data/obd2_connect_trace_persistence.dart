@@ -4,7 +4,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'obd2_connect_trace.dart';
@@ -86,8 +85,8 @@ class Obd2ConnectTracePersistence {
     } catch (e, st) {
       // debugPrint, not errorLogger: an errorLogger write here could
       // recurse through trace storage on a sick Hive.
-      debugPrint('Obd2ConnectTracePersistence.append failed (ignored): '
-          '$e\n$st');
+      log.warn('Obd2ConnectTracePersistence.append failed (ignored)',
+          error: e, stack: st, layer: ErrorLayer.storage);
     }
   }
 
@@ -104,8 +103,8 @@ class Obd2ConnectTracePersistence {
             jsonDecode(raw) as Map<String, dynamic>);
         if (trace.startedAtMs >= cutoff) out.add(trace);
       } catch (e, st) {
-        debugPrint('Obd2ConnectTracePersistence: skipping corrupt trace '
-            '(ignored): $e\n$st');
+        log.warn('Obd2ConnectTracePersistence: skipping corrupt trace (ignored)',
+            error: e, stack: st, layer: ErrorLayer.storage);
       }
     }
     out.sort((a, b) => a.startedAtMs.compareTo(b.startedAtMs));

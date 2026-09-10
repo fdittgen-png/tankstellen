@@ -7,6 +7,8 @@ import 'package:flutter/services.dart';
 import '../../../core/notifications/notification_tap_dispatcher.dart';
 import '../domain/live_activity_content.dart';
 import 'android_live_activity_notifier.dart';
+import '../../../core/logging/app_log.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Dart binding for the app-internal iOS Live Activity channel
 /// `tankstellen/live_activity` (#3170). The Swift side lives in
@@ -70,7 +72,8 @@ class LiveActivityController {
     } catch (e, st) {
       // No binding (plain unit test) — the media path is unreachable
       // there anyway; the fallback notifier carries the actions.
-      debugPrint('LiveActivityController: action handler not armed: $e\n$st');
+      log.warn('LiveActivityController: action handler not armed',
+          error: e, stack: st, layer: ErrorLayer.ui);
     }
   }
 
@@ -148,7 +151,8 @@ class LiveActivityController {
       } catch (e, st) {
         // Best-effort (platform error / no handler / no binding) — the
         // fallback end below still runs.
-        debugPrint('LiveActivityController: media tile end failed: $e\n$st');
+        log.warn('LiveActivityController: media tile end failed',
+            error: e, stack: st, layer: ErrorLayer.ui);
       }
       await _android!.end();
       return;
@@ -187,7 +191,8 @@ class LiveActivityController {
       // PlatformException, MissingPluginException, or the no-binding
       // assertion in plain unit tests — every failure degrades to the
       // notification fallback below (documented never-throw contract).
-      debugPrint('LiveActivityController: media tile show failed: $e\n$st');
+      log.warn('LiveActivityController: media tile show failed',
+          error: e, stack: st, layer: ErrorLayer.ui);
     }
     return _android!.show(content);
   }

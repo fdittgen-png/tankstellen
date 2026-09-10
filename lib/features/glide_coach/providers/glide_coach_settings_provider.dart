@@ -9,6 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../domain/entities/glide_coach_settings.dart';
 import 'glide_coach_enabled_provider.dart';
+import '../../../core/logging/app_log.dart';
+import '../../../core/logging/error_logger.dart';
 
 part 'glide_coach_settings_provider.g.dart';
 
@@ -70,7 +72,8 @@ class GlideCoachSettingsNotifier extends _$GlideCoachSettingsNotifier {
         state = state.copyWith(enabled: effective);
       }
     } catch (e, st) {
-      debugPrint('GlideCoachSettingsNotifier._load failed: $e\n$st');
+      log.warn('GlideCoachSettingsNotifier._load failed',
+          error: e, stack: st, layer: ErrorLayer.storage);
     }
   }
 
@@ -89,7 +92,8 @@ class GlideCoachSettingsNotifier extends _$GlideCoachSettingsNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(prefsKey, value);
     } catch (e, st) {
-      debugPrint('GlideCoachSettingsNotifier.setEnabled failed: $e\n$st');
+      log.warn('GlideCoachSettingsNotifier.setEnabled failed',
+          error: e, stack: st, layer: ErrorLayer.storage);
     }
   }
 }

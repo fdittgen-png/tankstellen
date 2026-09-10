@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/foundation.dart';
+import '../../../../core/logging/app_log.dart';
+import '../../../../core/logging/error_logger.dart';
 
 /// #3181 — process-wide FIRST-CONNECT pairing mode.
 ///
@@ -79,8 +81,8 @@ class Obd2PairingMode {
     try {
       pairingWaitPending.value = true;
     } catch (e, st) {
-      debugPrint('Obd2PairingMode: pairingWaitPending listener threw '
-          '(ignored): $e\n$st');
+      log.warn('Obd2PairingMode: pairingWaitPending listener threw (ignored)',
+          error: e, stack: st, layer: ErrorLayer.other);
     }
   }
 
@@ -89,8 +91,8 @@ class Obd2PairingMode {
     try {
       pairingWaitPending.value = false;
     } catch (e, st) {
-      debugPrint('Obd2PairingMode: pairingWaitPending listener threw '
-          '(ignored): $e\n$st');
+      log.warn('Obd2PairingMode: pairingWaitPending listener threw (ignored)',
+          error: e, stack: st, layer: ErrorLayer.other);
     }
   }
 

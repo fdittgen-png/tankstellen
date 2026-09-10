@@ -19,6 +19,7 @@ import '../../../core/utils/station_extensions.dart';
 import 'home_widget_json.dart';
 import 'predictive_payload.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/logging/app_log.dart';
 
 /// Storage boundary for the nearest-widget JSON payload.
 ///
@@ -276,11 +277,11 @@ class NearestWidgetDataBuilder {
         fuel = FuelType.fromString(key);
       // #3164 — kept: stored-preference validation; unknown fuel key is
       // expected and falls back.
-      } catch (e, st) { // ignore: unused_catch_stack
-        debugPrint(
-          'NearestWidgetDataBuilder: unknown preferred fuel "$key": $e',
-        );
-      }
+      } catch (e, st) {
+ // ignore: unused_catch_stack
+      log.warn('NearestWidgetDataBuilder: unknown preferred fuel "$key"',
+          error: e, stack: st, layer: ErrorLayer.background);
+    }
     }
     return _ProfileDefaults(radiusKm: radius, fuelType: fuel);
   }

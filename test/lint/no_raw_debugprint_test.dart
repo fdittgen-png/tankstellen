@@ -65,5 +65,11 @@ void main() {
 const _pipeline = <String>['lib/core/logging/', 'lib/core/telemetry/'];
 
 /// Baselines as of 2026-09-08 (#3981). Only ever decrease; target 0.
-const _baselineSites = 313;
-const _baselineFiles = 154;
+///
+/// #4039 — 313 → 253 sites, 154 → 130 files: the 61 catch handlers whose
+/// entire body was a `debugPrint` (a silent swallow in release) became
+/// `log.warn(..., error:, stack:, layer:)` calls. The remainder are
+/// ordinary trace prints outside catch blocks and come down in the
+/// per-feature batches the issue describes.
+const _baselineSites = 253;
+const _baselineFiles = 130;

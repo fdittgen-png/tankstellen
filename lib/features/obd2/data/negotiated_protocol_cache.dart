@@ -1,8 +1,9 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
+import '../../../core/logging/app_log.dart';
+import '../../../core/logging/error_logger.dart';
 
 /// Persistent cache of the ELM327 protocol number negotiated for a
 /// given adapter + vehicle (#2261 concern 3).
@@ -61,7 +62,8 @@ class NegotiatedProtocolCache {
     try {
       await _box.delete(key);
     } catch (e, st) {
-      debugPrint('NegotiatedProtocolCache: invalidate("$key") failed: $e\n$st');
+      log.warn('NegotiatedProtocolCache: invalidate("$key") failed',
+          error: e, stack: st, layer: ErrorLayer.storage);
     }
   }
 
