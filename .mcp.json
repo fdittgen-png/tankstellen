@@ -11,7 +11,10 @@
         "dart_format",
         "--exclude-tool",
         "dart_fix"
-      ]
+      ],
+      "env": {
+        "PATH": "${HOME}/development/flutter/bin:/opt/homebrew/bin:/usr/bin:/bin"
+      }
     },
     "adb": {
       "command": "npx",
