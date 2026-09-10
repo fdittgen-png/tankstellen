@@ -126,42 +126,35 @@ mixin _TripRecordingSessionState {
   Timer? _emitTimer;
   DateTime? _startedAt;
 
-  /// #3602 — wall time of the last successful high-priority engine parse.
-  /// The staleness fence: [_emit] refuses to stamp snapshot engine values
-  /// onto samples when no fresh parse landed within
-  /// [_engineDataStalenessLimit] — a scheduler that never started (link
-  /// never opened: the 76.5 km field trip recorded 49 min of ghost
-  /// engine data from a rehydrated snapshot at 0.0 Hz) produces no parse
-  /// events at all, so the null-parse silent-failure detector is
-  /// structurally blind to it (it counts null PARSES, not absent polls).
-  DateTime? _lastFreshEngineParseAt;
-  bool _staleEngineEscalated = false;
-  DateTime? _lastSampleAt;
+  // #4034 (epic #4032) — four clusters of this state machine's shared
+  // mutable state are OWNED collaborators now, each with its own private
+  // fields, instead of bare flags any of the controller's parts could
+  // write. The forensic history of each cluster moved with it.
 
-  // #3857 (Epic #3855) — the ~10 s `ATRV` voltage watch. The reply feeds
-  // the vehicle power model through the session hook; the value is also
-  // held here for ONE slow-cadence `bv` stamp on the next sample.
-  DateTime? _lastVoltageReadAt;
-  double? _pendingVoltageStamp;
+  /// #3602 — the staleness fence that keeps snapshot engine values off a
+  /// sample no fresh parse is backing. Was `_lastFreshEngineParseAt` /
+  /// `_staleEngineEscalated` / `_lastSampleAt`, written from four parts.
+  final TripEngineDataFence _engineFence = TripEngineDataFence();
 
-  // #3858 — trip identity (odometer / VIN / fuel type) is read once the
-  // bus can answer; a recording that starts with the engine off defers it
-  // to the engine transition.
-  bool _identityRead = false;
+  /// #3857 (Epic #3855) — the ~10 s `ATRV` voltage watch. Was
+  /// `_lastVoltageReadAt` / `_pendingVoltageStamp`.
+  final TripVoltageWatch _voltageWatch = TripVoltageWatch();
 
-  // #3862 — parked-prompt bookkeeping: when the engine-off wait began,
-  // how long the car has been stationary in it, whether the prompt is
-  // due / was dismissed by the driver ("Keep").
-  DateTime? _engineOffSince;
-  DateTime? _stationarySince;
-  bool _parkedPromptDue = false;
-  bool _parkedPromptDismissed = false;
-  bool _parkedFinaliseInFlight = false;
+  /// #3858 — trip identity (odometer / VIN / fuel type) is read once the
+  /// bus can answer; a recording that starts with the engine off defers
+  /// it to the engine transition. Was `_identityRead`.
+  final TripIdentityRead _identity = TripIdentityRead();
+
+  /// #3862 — parked-prompt bookkeeping: when the engine-off wait began,
+  /// how long the car has been stationary in it, whether the prompt is
+  /// due / was dismissed by the driver ("Keep"). Was five flags written
+  /// from three parts.
+  final TripParkedPromptWatch _parkedWatch = TripParkedPromptWatch();
 
   /// #3862 — true when the recording has been parked (engine off, car
   /// stationary) past [TripRecordingController.parkedPromptAfter] and the
   /// driver has not yet answered. Surfaced to the UI as a Stop / Keep pill.
-  bool get parkedPromptDue => _parkedPromptDue;
+  bool get parkedPromptDue => _parkedWatch.promptDue;
 
   // #2509 — timestamps of the FIRST and LATEST valid GPS fixes that
   // arrived while the OBD2 link delivered no speed/RPM (so
@@ -175,14 +168,12 @@ mixin _TripRecordingSessionState {
   // fix.
   DateTime? _gpsStartedAt;
   DateTime? _gpsEndedAt;
-  double? _odometerStartKm;
-  double? _odometerLatestKm;
-
-  /// #3877 — when [_odometerLatestKm] was read, the trip distance at that
-  /// instant (so the end-of-trip km can be estimated as reading + distance
-  /// driven since), the last refresh attempt, and the in-flight guard of
-  /// the periodic refresh.
-  DateTime? _odometerLatestAt;
+  /// #4034 — the trip's odometer bookkeeping (the start reading, the
+  /// latest one, when it landed, the trip distance at that instant, the
+  /// last refresh attempt and the in-flight guard). Six fields that used
+  /// to sit here and be written from four parts; the reading/distance
+  /// pairing (#3877) is only ever set together inside the tracker now.
+  final TripOdometerTracker _odometer = TripOdometerTracker();
 
   /// #3878 — the whole-trip sample list the stop path read back from the
   /// WAL, for the finalise passes that need every sample (gear coaching);
@@ -192,11 +183,6 @@ mixin _TripRecordingSessionState {
   /// #3878 — injected by the pipeline: reads the whole trip (WAL + ring)
   /// for the grace-window finalise; null = legacy in-memory buffer.
   Future<List<TripSample>> Function()? _allSamplesReader;
-  double? _distanceKmAtOdometerLatest;
-  DateTime? _odometerRefreshAt;
-  bool _odometerRefreshInFlight = false;
-  double _fuelLitersSoFar = 0;
-  bool _fuelRateSeen = false;
 
   // #3431 — true instantaneous consumption: EMA-smoothed (τ ≈ 2.5 s)
   // fuel rate ÷ speed, stamped onto every live reading. Fresh per trip
@@ -219,28 +205,18 @@ mixin _TripRecordingSessionState {
   /// live colour and the trip's final grade share one implementation.
   final LiveDrivingBandTracker _liveBandTracker = LiveDrivingBandTracker();
 
-  // #1858 — η_v recompute provenance, accumulated per emit tick.
-  // [_veWeightedFuelSum] is Σ(η_v_i × fuelRate_i) and
-  // [_veDerivedFuelRateSum] is Σ(fuelRate_i), both over speed-density
-  // ticks only; [_sawNonVeDerivedFuel] flips true the moment any fuel
-  // is integrated from PID 5E or the MAF branch (neither uses η_v).
-  // At trip end these collapse into [TripSummary.volumetricEfficiencyUsed].
-  // A fresh controller is built per trip, so declaration-time zero is
-  // the only reset needed (the values carry correctly across
-  // pause/resume — that is all one trip).
-  double _veWeightedFuelSum = 0;
-  double _veDerivedFuelRateSum = 0;
-  bool _sawNonVeDerivedFuel = false;
-  bool _paused = false;
-  bool _pausedDueToDrop = false;
-
-  /// #2565 — OBD2 dropped mid-trip but GPS is alive: keep recording
-  /// GPS-only instead of pausing. Set by the [DroppedSessionManager]
-  /// degrade branch; cleared on reconnect or escalated to
-  /// [_pausedDueToDrop] when GPS also dies.
-  bool _degradedGpsOnly = false;
-  bool _started = false;
-  bool _stopped = false;
+  /// #4034 — the trip's fuel bookkeeping: litres so far, whether any
+  /// real fuel rate was ever seen, and the #1858 η_v recompute
+  /// provenance. Five fields that used to sit here loose, three of them
+  /// only meaningful as a group.
+  final TripFuelAccumulator _fuel = TripFuelAccumulator();
+  /// #4034 — the five flags that say what the recording is doing
+  /// (`started` / `stopped` / `paused` / `pausedDueToDrop` / the #2565
+  /// `degradedGpsOnly`). They were bare booleans written from the
+  /// lifecycle part AND the drop-host adapter; the compound transitions
+  /// are single methods on the collaborator now, so no caller can do
+  /// half of one.
+  final TripRunState _run = TripRunState();
   String? _sessionId; // ISO start-ts, stable across pause→resume cycles
 
   /// Why the controller flipped into
@@ -257,7 +233,7 @@ mixin _TripRecordingSessionState {
   /// odometer-delta / GPS-track / virtual-odometer selection and the two
   /// rolling sample buffers it integrates over — extracted into a focused
   /// pure-Dart collaborator (#2187). The controller keeps the odometer
-  /// readings ([_odometerStartKm] / [_odometerLatestKm]) and passes them
+  /// readings ([TripOdometerTracker.startKm] / `latestKm`) and passes them
   /// into the resolver per read. Built in the constructor body so it can
   /// capture the resolved [_now] clock.
   late final TripDistanceResolver _distance;

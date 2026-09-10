@@ -35,6 +35,16 @@ import '../../domain/trip_live_reading.dart';
 import '../../domain/trip_sample_buffer.dart';
 import '../../domain/vehicle_power_state.dart';
 import '../../domain/virtual_odometer.dart';
+import 'trip_engine_data_fence.dart';
+import 'trip_fuel_accumulator.dart';
+import 'trip_gear_coaching_metric.dart';
+import 'trip_identity_read.dart';
+import 'trip_odometer_tracker.dart';
+import 'trip_parked_prompt_watch.dart';
+import 'trip_run_state.dart';
+import 'trip_voltage_watch.dart';
+import '../../../../core/logging/app_log.dart';
+import '../../../../core/logging/error_logger.dart';
 
 // Re-export the live-reading DTO so existing callers (providers,
 // widget tests) that import this file keep working after the #563
@@ -338,7 +348,7 @@ class TripRecordingController
       sampleBuffer: _sampleBuffer,
       gpsAliveWindow: _gpsAliveWindow,
       onEscalate: _droppedSession.escalateDegradedToPaused,
-      onSampleAt: (at) => _lastSampleAt = at,
+      onSampleAt: _engineFence.onSample,
       overlayEstimate: (reading,
               {required nowTs, required effectiveSpeedKmh, required altitudeM}) =>
           _overlayGpsEstimate(

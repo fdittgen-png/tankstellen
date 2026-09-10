@@ -163,14 +163,14 @@ mixin _TripRecordingTelemetryIngest on _TripRecordingSessionState {
   /// manufacturer). Exposed so the save-as-fill-up flow can pre-fill
   /// the "odometer" field with the END km — which is start + the
   /// recorder's accumulated distance.
-  double? get odometerStartKm => _odometerStartKm;
+  double? get odometerStartKm => _odometer.startKm;
 
   /// Latest odometer reading read during the trip. Returns null
   /// until the first successful odometer poll. The recording UI
   /// doesn't poll the odometer every tick (it's an expensive Mode
   /// 22 query on some cars) — just once at start and once near the
   /// end via [refreshOdometer].
-  double? get odometerLatestKm => _odometerLatestKm;
+  double? get odometerLatestKm => _odometer.latestKm;
 
   /// VIN read once at [start]. Null on older ECUs / adapters that
   /// can't answer Mode 09 PID 02. Exposed so the fill-up screen can
@@ -188,31 +188,25 @@ mixin _TripRecordingTelemetryIngest on _TripRecordingSessionState {
   /// the save-as-fill-up gets a ground-truth end km rather than a
   /// derived value.
   Future<void> refreshOdometer() async {
-    _odometerRefreshAt = _now();
+    _odometer.beginRefresh(_now());
     final km = await _service.readOdometerKm();
     if (km == null) return;
-    _odometerLatestKm = km;
-    // #3877 — remember WHEN and at WHICH trip distance, so a stop that
-    // happens after this reading can add the distance driven since.
-    _odometerLatestAt = _now();
-    _distanceKmAtOdometerLatest = currentDistanceKm;
+    // #3877 — the reading, WHEN it landed and at WHICH trip distance are
+    // recorded together, so a stop after it can add the distance driven
+    // since without the three ever disagreeing.
+    _odometer.recordRefresh(km, _now(), () => currentDistanceKm);
   }
 
   /// #3877 — instant of the latest successful odometer reading.
-  DateTime? get odometerLatestAt => _odometerLatestAt;
+  DateTime? get odometerLatestAt => _odometer.latestAt;
 
   /// #3877 — trip distance at the latest reading (see [refreshOdometer]).
-  double? get distanceKmAtOdometerLatest => _distanceKmAtOdometerLatest;
+  double? get distanceKmAtOdometerLatest => _odometer.distanceKmAtLatest;
 
   /// #3877 — the best current odometer: the latest reading plus the
   /// distance driven since it; null when the car never answered.
-  double? get estimatedOdometerNowKm {
-    final latest = _odometerLatestKm;
-    if (latest == null) return null;
-    final since = currentDistanceKm -
-        (_distanceKmAtOdometerLatest ?? currentDistanceKm);
-    return latest + (since > 0 ? since : 0);
-  }
+  double? get estimatedOdometerNowKm =>
+      _odometer.estimatedNowKm(currentDistanceKm);
 
   /// Distance covered by the current trip so far (#800).
   ///
@@ -228,8 +222,8 @@ mixin _TripRecordingTelemetryIngest on _TripRecordingSessionState {
   ///      [VirtualOdometer], when the car exposes no odometer
   ///      (Peugeot 107 class) and no GPS track was captured.
   double get currentDistanceKm => _distance.distanceKm(
-        odometerStartKm: _odometerStartKm,
-        odometerLatestKm: _odometerLatestKm,
+        odometerStartKm: _odometer.startKm,
+        odometerLatestKm: _odometer.latestKm,
       );
 
   /// `'real'` when [currentDistanceKm] came from the car's odometer,
@@ -239,8 +233,8 @@ mixin _TripRecordingTelemetryIngest on _TripRecordingSessionState {
   /// flow and eco-analytics know whether to treat the km as a ground
   /// truth or as an estimate.
   String get distanceSource => _distance.distanceSource(
-        odometerStartKm: _odometerStartKm,
-        odometerLatestKm: _odometerLatestKm,
+        odometerStartKm: _odometer.startKm,
+        odometerLatestKm: _odometer.latestKm,
       );
 
   /// Number of GPS fixes buffered for the distance resolver this trip

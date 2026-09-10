@@ -3,24 +3,16 @@
 
 part of 'trip_recording_controller.dart';
 
-/// Trip-end summary finalisation for [TripRecordingController],
-/// extracted from the controller file as a `part` mixin so it keeps
-/// private-member access while the controller stays under the #1680
-/// file-length cap (sanctioned #3760 decomposition — move-only,
-/// behaviour preserved): [_finaliseSummary] and the #1263 gear-inference
-/// coaching metric.
+/// Trip-end summary finalisation for [TripRecordingController], a `part`
+/// mixin because it assembles the summary out of the controller's own
+/// accumulated state (sanctioned #3760 decomposition — move-only,
+/// behaviour preserved).
+///
+/// #4034 (epic #4032) — the #1263 gear-inference metric it used to carry
+/// left the library entirely: it reads a vehicle profile and a sample
+/// list and nothing else, so it is the pure
+/// [computeGearCoachingMetric] function now.
 mixin _TripRecordingSummary on _TripRecordingTelemetryIngest {
-  /// RPM ceiling used by the gear-inference coaching metric (#1263
-  /// phase 2). The "seconds below optimal gear" heuristic counts an
-  /// interval when the next gear up would still keep the engine at or
-  /// above this value — i.e. the current selection is unnecessarily
-  /// low. 2200 RPM matches the issue body's reference point: well
-  /// above the 1500-1800 RPM lugging band on most petrol engines but
-  /// still within the cruise sweet-spot the coaching line targets.
-  /// Hardcoded for phase 2; phase 3+ may promote this to a per-
-  /// vehicle field if the spread between engine families warrants it.
-  static const double _optimalRpmCeiling = 2200.0;
-
   /// Build the trip's final [TripSummary] from the recorder's
   /// in-flight accumulator plus the controller-owned distance
   /// provenance (#800). The recorder still owns distance integration
@@ -63,15 +55,6 @@ mixin _TripRecordingSummary on _TripRecordingTelemetryIngest {
         fuelRateSuspect = true;
       }
     }
-    // #1858 — η_v recompute provenance. Non-null ONLY when every litre
-    // of the trip's fuel was speed-density-derived (η_v-scalable) and
-    // some fuel was burned; then it is the fuel-weighted mean of the
-    // per-tick η_v applied. Any PID 5E / MAF fuel — or no fuel — leaves
-    // it null, marking the trip "not recalculable".
-    final double? veUsed =
-        (!_sawNonVeDerivedFuel && _veDerivedFuelRateSum > 0)
-            ? _veWeightedFuelSum / _veDerivedFuelRateSum
-            : null;
     // #2509 — GPS start/end fallback. When the OBD2 link was dead the
     // recorder never saw a sample, so `base.startedAt` / `base.endedAt`
     // are null even though GPS fixes were buffered into the distance
@@ -96,7 +79,7 @@ mixin _TripRecordingSummary on _TripRecordingTelemetryIngest {
     // the estimate fields null.
     final estimateFolder = _gpsEstimateFolder;
     final stampEstimates =
-        base.fuelLitersConsumed == null && !_fuelRateSeen;
+        base.fuelLitersConsumed == null && !_fuel.fuelRateSeen;
     return TripSummary(
       distanceKm: distanceKm,
       maxRpm: base.maxRpm,
@@ -113,56 +96,20 @@ mixin _TripRecordingSummary on _TripRecordingTelemetryIngest {
       startedAt: startedAt,
       endedAt: endedAt,
       distanceSource: source,
-      secondsBelowOptimalGear: _computeGearCoachingMetric(),
+      secondsBelowOptimalGear: computeGearCoachingMetric(
+        vehicle: _vehicle,
+        // #3878 — the ring holds only the live window; the stop path
+        // hands the whole trip in.
+        capturedSamples:
+            _allSamplesForFinalise ?? _sampleBuffer.capturedSamples,
+      ),
       fuelRateSuspect: fuelRateSuspect,
-      volumetricEfficiencyUsed: veUsed,
+      volumetricEfficiencyUsed: _fuel.volumetricEfficiencyUsed,
       // #3887 — the pump-anchored gain the estimated fuel carried.
       // #3918 — the RESOLVED gain (per-fuel / scalar) the live chain
       // actually multiplied by; the scalar only when nothing was derived.
       pumpGainApplied:
           _liveSampleSnapshot.lastPumpGainResolution?.gain ?? _vehicle?.pumpGain,
-    );
-  }
-
-  /// Compute the gear-inference coaching metric (#1263 phase 2).
-  ///
-  /// Returns null when:
-  ///  - no vehicle profile is wired (we don't know the tyre size);
-  ///  - the vehicle type is [VehicleType.ev] (no gears to coach);
-  ///  - the captured-samples buffer is empty (no data to cluster);
-  ///  - [inferGears] returns fewer than two centroids (degenerate);
-  ///  - [computeSecondsBelowOptimalGear] reports the heuristic as
-  ///    not computable.
-  ///
-  /// Returns a non-negative double otherwise — seconds during the
-  /// trip where a higher gear would have kept RPM above
-  /// [_optimalRpmCeiling].
-  double? _computeGearCoachingMetric() {
-    final vehicle = _vehicle;
-    if (vehicle == null) return null;
-    // EV bypass — pure-electric drivetrains have no manual / discrete
-    // gears. Hybrids DO have a step-ratio transmission on the
-    // combustion side, so they fall through to the inference path.
-    if (vehicle.type == VehicleType.ev) return null;
-    // #3878 — the ring holds only the live window; the stop path hands
-    // the whole trip in.
-    final captured = _allSamplesForFinalise ?? _sampleBuffer.capturedSamples;
-    if (captured.isEmpty) return null;
-    final tireC = vehicle.tireCircumferenceMeters;
-    if (tireC <= 0) return null;
-    final result = inferGears(
-      samples: captured,
-      tireCircumferenceMeters: tireC,
-      priorCentroids: vehicle.gearCentroids,
-    );
-    if (result.centroids.length < 2) return null;
-    return computeSecondsBelowOptimalGear(
-      gearAssignments: result.samples
-          .map((s) => (timestamp: s.timestamp, gear: s.gear))
-          .toList(growable: false),
-      optimalRpmCeiling: _optimalRpmCeiling,
-      samples: captured,
-      centroids: result.centroids,
     );
   }
 }
