@@ -27,8 +27,10 @@ mixin _TripRecordingLifecycle
   /// progress — the caller falls through to its already-active branch.
   void enterConnecting({String? vehicleId}) {
     if (state.isActive || _startInProgress || state.isConnecting) return;
-    _lastTripVehicleId = vehicleId ?? _tryReadActiveVehicle()?.id;
-    _lastTripStartedAt = DateTime.now();
+    _lastTrip.begin(
+      vehicleId: vehicleId ?? _tryReadActiveVehicle()?.id,
+      startedAt: DateTime.now(),
+    );
     state = const TripRecordingState(
       phase: TripRecordingPhase.connecting,
       connectStage: TripStartStage.connectingAdapter,
@@ -67,14 +69,14 @@ mixin _TripRecordingLifecycle
     // GPS-only pipeline is a no-op (its position stream keeps running);
     // the OBD2 pipeline pauses the controller. Only flip the phase when a
     // live recording was actually paused.
-    if (_pipeline?.pause() ?? false) {
+    if (_pipelineSlot.pipeline?.pause() ?? false) {
       state = state.copyWith(phase: TripRecordingPhase.paused);
     }
   }
 
   /// #3862 — "Keep": stay recording, do not ask again this session.
   void dismissParkedPrompt() {
-    _pipeline?.dismissParkedPrompt();
+    _pipelineSlot.pipeline?.dismissParkedPrompt();
     state = state.copyWith(parkedPromptDue: false);
   }
 
@@ -121,10 +123,13 @@ mixin _TripRecordingLifecycle
     // GPS-only). Delegate the full teardown — the OBD2 pipeline owns the
     // controller / service / subscriptions and drives the WAL clear
     // through the host; the GPS-only pipeline owns its Geolocator stream.
-    final pipeline = _pipeline;
+    final pipeline = _pipelineSlot.pipeline;
     if (pipeline != null) {
       final result = await pipeline.stop(automatic: automatic);
-      _pipeline = null;
+      // Released only AFTER the teardown: the persist path inside `stop()`
+      // reaches the live controller through the slot to read the captured
+      // sample buffer, and an empty slot saves a trip with no samples.
+      _pipelineSlot.release();
       _recordEndOdometer(result); // #3877
       return result;
     }
@@ -146,7 +151,7 @@ mixin _TripRecordingLifecycle
   /// driven since when the stop came with the engine already off).
   void _recordEndOdometer(StoppedTripResult result) {
     final km = result.endOdometerKm;
-    final vehicleId = _lastTripVehicleId;
+    final vehicleId = _lastTrip.vehicleId;
     if (km == null || vehicleId == null || vehicleId.isEmpty) return;
     unawaited(ref.read(vehicleOdometerSnapshotStoreProvider).write(
           vehicleId,
@@ -199,7 +204,7 @@ mixin _TripRecordingLifecycle
     // #3438 — a GPS-only recording force-flushes its WAL too (previously
     // only the OBD2 snapshot below flushed; a kill lost the debounce
     // window). Concrete-type dispatch mirrors [debugAppendObd2SampleToGpsOnly].
-    final pipeline = _pipeline;
+    final pipeline = _pipelineSlot.pipeline;
     if (pipeline is GpsOnlyRecordingPipeline) pipeline.onAppBackgrounded();
     if (_obd2?.controller == null) return;
     await _flushActiveSnapshot(force: true);

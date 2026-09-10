@@ -28,10 +28,11 @@ class _RecordingPipelineHostAdapter implements Obd2RecordingPipelineHost {
   set state(TripRecordingState value) => _n._setStateFromPipeline(value);
 
   @override
-  set lastTripVehicleId(String? value) => _n._lastTripVehicleId = value;
+  set lastTripVehicleId(String? value) => _n._lastTrip.setVehicleId(value);
 
   @override
-  set lastTripStartedAt(DateTime? value) => _n._lastTripStartedAt = value;
+  set lastTripStartedAt(DateTime? value) =>
+      _n._lastTrip.setStartedAt(value);
 
   @override
   String? readActiveVehicleId() => _n._tryReadActiveVehicle()?.id;

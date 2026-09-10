@@ -19,27 +19,17 @@ mixin _TripRecordingCore on _$TripRecording {
   // so the second call is rejected.
   bool _startInProgress = false;
 
-  // #2190 / #2227 — the selected recording strategy. Both modes now run
-  // a [RecordingPipeline]: `start(service)` installs an
-  // [Obd2RecordingPipeline], the dongle-less #2025 flow installs a
-  // [GpsOnlyRecordingPipeline]. The historical `_pipeline == null`
-  // inline-OBD2 branch is gone — every lifecycle boundary dispatches
-  // through `_pipeline`. A future third source (CarPlay / Android Auto
-  // telemetry) becomes another implementation rather than another
-  // `_xMode` bool (open/closed — the #2190 motivation). Null only
-  // between trips and in the cold-start-recovered state (#1347), where
-  // the WAL snapshot — not a live pipeline — is the source of truth.
-  RecordingPipeline? _pipeline;
+  /// #4036 — the selected recording strategy (#2190 / #2227), in a slot
+  /// the notifier owns. Was a bare field two of this library's files
+  /// wrote; `select` / `release` are the only two transitions now.
+  final RecordingPipelineSlot _pipelineSlot = RecordingPipelineSlot();
 
   /// The active OBD2 pipeline, or null when no trip is running, a
   /// GPS-only trip is running, or we're in the recovered-no-controller
   /// state. The notifier's WAL snapshot helpers, `pause` / `resume`, and
   /// `debugController` reach the live [TripRecordingController] through
   /// it (#2227).
-  Obd2RecordingPipeline? get _obd2 {
-    final p = _pipeline;
-    return p is Obd2RecordingPipeline ? p : null;
-  }
+  Obd2RecordingPipeline? get _obd2 => _pipelineSlot.obd2;
 
   // #1458 phase 2 — most recent app lifecycle state observed by the
   // wiring layer's [WidgetsBindingObserver]. Read by the GPS stream
@@ -109,34 +99,30 @@ mixin _TripRecordingCore on _$TripRecording {
   /// no trip is running. Lets the strategy-selection test assert which
   /// pipeline the notifier picked without depending on the concrete type.
   @visibleForTesting
-  bool get debugIsGpsOnlyActive => _pipeline?.isGpsOnly ?? false;
+  bool get debugIsGpsOnlyActive => _pipelineSlot.isGpsOnly;
 
   /// #3916 — production twin of [debugIsGpsOnlyActive] for the recording
   /// screen's status strip: true while the running trip is the dongle-
   /// less GPS-only kind (no adapter to report on), false otherwise.
-  bool get isGpsOnlyTripActive => _pipeline?.isGpsOnly ?? false;
+  bool get isGpsOnlyTripActive => _pipelineSlot.isGpsOnly;
 
-  /// Snapshot of the vehicle the last [startTrip] call was scoped to.
-  /// Exposed so the save-as-fill-up path can figure out which
-  /// trajets to auto-link (#888). Null before the first call, or
-  /// after a [reset] / fresh [build].
-  String? _lastTripVehicleId;
-  DateTime? _lastTripStartedAt;
-  // #3251 — the live trip's auto-record provenance, so the WAL seed stamps it
-  // (the recovery badge + saved entry then know it was hands-free).
-  bool _lastTripAutomatic = false;
+  /// #4036 — who the last trip belonged to, when it began, and whether
+  /// it was hands-free (#888 / #3251). Three fields that were written
+  /// from four of this library's files with three different assignment
+  /// shapes; each shape is a named method on the collaborator now.
+  final LastTripIdentity _lastTrip = LastTripIdentity();
 
   /// Most recent vehicle id this provider kicked a trip for.
   ///
   /// Readable by the consumption providers so the fill-up auto-link
   /// can filter trajets to the vehicle that was actually driven —
   /// decoupling the trajets flow from the fill-up flow (#888).
-  String? get lastTripVehicleId => _lastTripVehicleId;
+  String? get lastTripVehicleId => _lastTrip.vehicleId;
 
   /// Timestamp captured on the most recent [startTrip] call. Used by
   /// the auto-link window in the fill-up flow as a "latest-known
   /// driving activity" lower bound when no prior fill-up exists.
-  DateTime? get lastTripStartedAt => _lastTripStartedAt;
+  DateTime? get lastTripStartedAt => _lastTrip.startedAt;
 
   /// Read the active vehicle profile, swallowing provider-wiring errors
   /// (widget tests without the vehicle graph) — delegates to the shared

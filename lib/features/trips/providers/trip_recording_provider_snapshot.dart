@@ -89,12 +89,12 @@ mixin _TripRecordingSnapshot on _$TripRecording, _TripRecordingCore {
     final ctl = _obd2?.controller;
     if (ctl == null) return;
     final id = ctl.sessionId ?? DateTime.now().toIso8601String();
-    final startedAt = _lastTripStartedAt ?? DateTime.now();
+    final startedAt = _lastTrip.startedAt ?? DateTime.now();
     _activeSnapshot = ActiveTripSnapshot(
       id: id,
-      vehicleId: _lastTripVehicleId ?? _baselines.vehicleId,
+      vehicleId: _lastTrip.vehicleId ?? _baselines.vehicleId,
       vin: ctl.vin,
-      automatic: _lastTripAutomatic, // #3251 — real auto-record provenance
+      automatic: _lastTrip.automatic, // #3251 — auto-record provenance
       phase: 'recording',
       summary: const TripSummary(
         distanceKm: 0,
@@ -130,7 +130,7 @@ mixin _TripRecordingSnapshot on _$TripRecording, _TripRecordingCore {
   ActiveTripSnapshot? _buildSnapshotFor(TripRecordingController ctl) {
     final base = _activeSnapshot;
     if (base == null) return null;
-    final phaseStr = _phaseStringFor(ctl);
+    final phaseStr = phaseStringForController(ctl);
     // #3878 — the Hive row is meta-only whenever the WAL is writable (the
     // samples are on disk, the in-memory ring only holds the live window);
     // a broken WAL keeps the pre-#3758 fat row so no sample is lost.
@@ -138,7 +138,7 @@ mixin _TripRecordingSnapshot on _$TripRecording, _TripRecordingCore {
     final samples = walWritable ? const <TripSample>[] : ctl.capturedSamples;
     return base.copyWith(
       phase: phaseStr,
-      summary: _summaryFromCtl(ctl),
+      summary: summaryFromController(ctl),
       samples: samples,
       odometerStartKm: ctl.odometerStartKm,
       odometerLatestKm: ctl.odometerLatestKm,
@@ -149,70 +149,6 @@ mixin _TripRecordingSnapshot on _$TripRecording, _TripRecordingCore {
   /// Map the controller's enum to the string the snapshot
   /// serialises. Centralised so the recovery service doesn't have
   /// to translate enum names — both sides agree on the wire format.
-  String _phaseStringFor(TripRecordingController ctl) {
-    switch (ctl.currentState) {
-      case TripRecordingControllerState.idle:
-        return 'idle';
-      case TripRecordingControllerState.recording:
-        return 'recording';
-      case TripRecordingControllerState.paused:
-        return 'paused';
-      case TripRecordingControllerState.pausedDueToDrop:
-        return 'pausedDueToDrop';
-      // #2565 — a GPS-only degraded trip is still actively recording, so
-      // the WAL snapshot persists it as 'recording' (it rehydrates as a
-      // live trip on relaunch, never as a pause that needs resuming).
-      case TripRecordingControllerState.degradedGpsOnly:
-        return 'recording';
-      case TripRecordingControllerState.stopped:
-        return 'stopped';
-    }
-  }
-
-  /// Pull the recorder's running summary; lets the snapshot carry
-  /// the latest distance / fuel / harsh counts without forcing the
-  /// controller to expose more debug surface than [capturedSamples].
-  /// [samples] is the buffer view the caller read for this flush (#3741).
-  TripSummary _summaryFromCtl(TripRecordingController ctl) {
-    // The controller has no public mid-trip summary accessor; rather
-    // than reach into its recorder we use the captured buffer's O(1)
-    // facts — the post-debounce 1 Hz feed, plenty for the staleness /
-    // preview rendering recovery does. A perfect mid-trip summary
-    // (idle/harsh counters) would need the controller to expose its own
-    // recorder snapshot; deferred until recovery acquires a richer preview.
-    final first = ctl.firstCapturedAt;
-    final last = ctl.latestSample?.timestamp;
-    if (first == null || last == null) {
-      return const TripSummary(
-        distanceKm: 0,
-        maxRpm: 0,
-        highRpmSeconds: 0,
-        idleSeconds: 0,
-        harshBrakes: 0,
-        harshAccelerations: 0,
-      );
-    }
-    // #3741 — incremental running max; the old whole-buffer loop was
-    // O(n) per 5 s flush (O(n²) over a drive) on the gauge isolate.
-    final maxRpm = ctl.maxCapturedRpm;
-    // #3251 — use the controller's OWN gap-capped distance + provenance, not a
-    // re-integration of the raw buffer. Re-integrating bridged dropout gaps and
-    // fabricated ~10 km across a 20-min hole (the #1927 bug on the recovery
-    // path); `currentDistanceKm` already applies `maxIntegrationGapSeconds`, and
-    // `distanceSource` keeps the real provenance instead of defaulting 'virtual'.
-    return TripSummary(
-      distanceKm: ctl.currentDistanceKm,
-      maxRpm: maxRpm,
-      highRpmSeconds: 0,
-      idleSeconds: 0,
-      harshBrakes: 0,
-      harshAccelerations: 0,
-      startedAt: first,
-      endedAt: last,
-      distanceSource: ctl.distanceSource,
-    );
-  }
-
   /// Cheap gate called from the live-stream listener. Promotes to
   /// a real flush when either the time threshold or the sample
   /// threshold is crossed.
@@ -326,8 +262,10 @@ mixin _TripRecordingSnapshot on _$TripRecording, _TripRecordingCore {
   bool restoreFromSnapshot(ActiveTripSnapshot snapshot) {
     if (state.isActive) return false;
     _activeSnapshot = snapshot;
-    _lastTripVehicleId = snapshot.vehicleId;
-    _lastTripStartedAt = snapshot.startedAt;
+    _lastTrip.restore(
+      vehicleId: snapshot.vehicleId,
+      startedAt: snapshot.startedAt,
+    );
     state = state.copyWith(
       phase: TripRecordingPhase.pausedDueToDrop,
     );
