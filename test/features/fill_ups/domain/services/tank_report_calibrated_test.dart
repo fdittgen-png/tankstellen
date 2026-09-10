@@ -89,4 +89,35 @@ void main() {
         closeTo(10.5, 0.01));
     expect(calibratedTankRecording(period, const {}, v), isNull);
   });
+
+  // #4038 — the invariant lives on the type, not only in the caller.
+  group('TankPeriod carries its own distance invariant (#4038)', () {
+    TankPeriod build({required double distanceKm, double liters = 35.7}) =>
+        TankPeriod(
+          opening: _fill('f1', 0, 100000),
+          closing: _fill('f2', 10, 100559),
+          distanceKm: distanceKm,
+          liters: liters,
+          pumpedCost: 30,
+        );
+
+    test('zero distance trips the assert instead of yielding Infinity', () {
+      expect(() => build(distanceKm: 0), throwsA(isA<AssertionError>()));
+    });
+
+    test('negative distance trips the assert too', () {
+      expect(() => build(distanceKm: -1), throwsA(isA<AssertionError>()));
+    });
+
+    test('negative litres trip the assert', () {
+      expect(
+        () => build(distanceKm: 559, liters: -0.1),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+
+    test('a positive window still builds and divides normally', () {
+      expect(build(distanceKm: 559).lPer100Km, closeTo(6.39, 0.01));
+    });
+  });
 }
