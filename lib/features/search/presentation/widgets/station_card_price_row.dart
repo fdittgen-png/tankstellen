@@ -1,17 +1,31 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-part of 'station_card.dart';
+import 'package:flutter/material.dart';
+
+import '../../../../core/country/country_config.dart';
+import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/station.dart';
+import '../../../../core/theme/app_text.dart';
+import '../../../../core/theme/fuel_colors.dart';
+import '../../../../core/theme/spacing.dart';
+import '../../../../core/utils/price_formatter.dart';
+import '../../../../core/utils/station_extensions.dart';
+import '../../../../core/widgets/animated_price_text.dart';
 
 /// The all-fuels footer (`FuelType.all`, #3949): the three grade prices
 /// as label-role rows in a [Wrap], so they sit on one line where the
 /// card has room and fold onto a second one at 320 dp instead of forming
 /// a right-hand column that dictated the card's height.
-class _AllFuelsRows extends StatelessWidget {
+class StationCardAllFuelsRows extends StatelessWidget {
   final Station station;
   final FuelType? profileFuelType;
 
-  const _AllFuelsRows({required this.station, required this.profileFuelType});
+  const StationCardAllFuelsRows({
+    super.key,
+    required this.station,
+    required this.profileFuelType,
+  });
 
   /// ISO country code inferred from the station id, used to pick the
   /// right fuel-grade labels (#2717 — `mx-` → PEMEX Magna/Premium).

@@ -7,7 +7,11 @@ part of 'trip_recording_screen.dart';
 /// PiP bridge state it owns, split out as a `part` mixin under the
 /// #1680 file-length decomposition. Move-only: behaviour preserved,
 /// every member verbatim from trip_recording_screen.dart.
-mixin _TripRecordingBuild on _TripRecordingBodySections {
+///
+/// #4037 — the body it used to call as an inherited `_buildRecording`
+/// is now the plain [TripRecordingBody] widget, which takes the state
+/// it renders as a parameter.
+mixin _TripRecordingBuild on _TripRecordingEventHandlers {
   /// #1884 — the shared Picture-in-Picture bridge (`pipControllerProvider`,
   /// #1977). This screen drives the native auto-PiP opt-in — scoped to
   /// a foreground recording, cleared on [dispose] — and the minimise
@@ -53,8 +57,9 @@ mixin _TripRecordingBuild on _TripRecordingBodySections {
     ref.listen<TripRecordingPhase>(
       tripRecordingProvider.select((s) => s.phase),
       (previous, next) {
-        if (!_autoPinEvaluated && next == TripRecordingPhase.recording) {
-          _maybeApplyAutoPin();
+        if (!_pin.autoPinEvaluated &&
+            next == TripRecordingPhase.recording) {
+          _pin.maybeApplyAutoPin();
         }
       },
     );
@@ -171,12 +176,12 @@ mixin _TripRecordingBuild on _TripRecordingBodySections {
       // overflow kebab (see [RecordingAppBarActions]).
       actions: [
               RecordingAppBarActions(
-                pinned: _pinned,
+                pinned: _pin.isPinned,
                 pipSupported: _pip.isSupported,
                 isActive: state.isActive,
                 isPaused: state.phase == TripRecordingPhase.paused,
                 stopping: _stopping,
-                onTogglePin: _togglePin,
+                onTogglePin: _pin.toggle,
                 onShowPinHelp: _showPinHelp,
                 onEnterPip: () => _pip.enterPip(),
                 onTogglePause: _togglePause,
@@ -205,7 +210,7 @@ mixin _TripRecordingBuild on _TripRecordingBodySections {
                   // every other band so the layout pays nothing in
                   // the common case.
                   const BrokenMapBanner(),
-                  Expanded(child: _buildRecording(context, l, state)),
+                  Expanded(child: TripRecordingBody(state: state)),
                 ],
               ),
             ),
@@ -254,7 +259,7 @@ mixin _TripRecordingLifecycle on _TripRecordingBuild {
     // drive. Default OFF preserves the deliberate opt-in-each-drive
     // design of #891. Done here (not via a synthetic _togglePin tap) so
     // the pin state is correct on the first frame.
-    _maybeApplyAutoPin();
+    _pin.maybeApplyAutoPin();
     // Subscribe to the long-lived coach-events broadcast. The
     // lifecycle provider's stream is filter-empty when the toggle is
     // off — no event will be emitted until the user has opted in,
@@ -279,24 +284,9 @@ mixin _TripRecordingLifecycle on _TripRecordingBuild {
 
   @override
   void dispose() {
-    // Auto-release the wake lock + restore system UI if the user
-    // exits the screen without unpinning. Best-effort; the facade
-    // swallows plugin errors on unsupported platforms. Fire-and-
-    // forget — `dispose` must stay synchronous.
-    // #3834 — the wake lock is released only if we took it, but the system
-    // UI is restored UNCONDITIONALLY. #3827 fixed WHAT the restore does and
-    // left it behind this `_pinned` gate, so on any path that reaches
-    // immersive without the flag surviving to dispose the bars stayed
-    // immersive for the rest of the session — the black status bar users
-    // kept reporting. restore() is idempotent and costs one platform call,
-    // so running it needlessly is free; skipping it is not.
-    if (_pinned) {
-      final facade = _cachedFacade;
-      if (facade != null) {
-        unawaited(facade.disable());
-      }
-    }
-    unawaited(EdgeToEdge.restore());
+    // #4037 — the wake-lock release + unconditional system-UI restore
+    // (#3834) belong to the pin controller that took the lock.
+    _pin.releaseOnDispose();
     unawaited(_coachEventsSub?.cancel());
     _coachEventsSub = null;
     // #1458 phase 2 — cancel any pending unpinned-warning fire so the

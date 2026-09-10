@@ -9,10 +9,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/providers/app_state_provider.dart';
-import '../../../../core/providers/consumption_display_provider.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/storage/storage_providers.dart';
-import '../../../../core/utils/unit_formatter.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -29,25 +27,14 @@ import '../../providers/broken_map_warned_vehicles_provider.dart';
 import '../../providers/pip_mode_provider.dart';
 import '../../providers/recording_profile_provider.dart';
 import '../../providers/trip_recording_provider.dart';
-import '../../providers/wakelock_facade.dart';
 import '../widgets/broken_map_widgets.dart';
-import '../../../driving_score/api.dart';
-import '../widgets/minimal_drive_summary.dart';
-import '../widgets/recording/live_band_header.dart';
-import '../widgets/recording/recording_metric_grid.dart';
-import '../widgets/recording/recording_status_strip.dart';
 import '../widgets/recording_app_bar_actions.dart';
-import '../widgets/trip_radar_card.dart';
-import '../widgets/trip_recording_landscape_body.dart';
-import '../widgets/trip_save_progress.dart';
-import '../widgets/trip_start_progress.dart';
-import '../../../../core/error/guarded.dart';
-import '../../../../core/utils/edge_to_edge.dart';
+import '../widgets/recording/auto_pin_toggle.dart';
+import '../widgets/trip_recording_body.dart';
+import 'trip_recording_pin_controller.dart';
 
-part 'trip_recording_screen_body.dart';
 part 'trip_recording_screen_build.dart';
 part 'trip_recording_screen_handlers.dart';
-part 'trip_recording_screen_pin.dart';
 
 /// Result returned when the user confirms saving a recorded trip
 /// from the summary screen (#726, #1185).
@@ -84,19 +71,29 @@ class TripRecordingScreen extends ConsumerStatefulWidget {
       _TripRecordingScreenState();
 }
 
-// #3762 — decomposed under the #1680 file-length cap: the State's
-// members are split move-only across four `part` mixins (pin controls,
-// event handlers, body sections, build + lifecycle), applied in
-// dependency order below. Private state stays shared; zero behaviour
-// change. This file keeps the members pinned here by the lint
-// baselines (wall-clock call sites, `Card(` / `titleLarge` allowlists).
+// #3762 decomposed this State move-only across four `part` mixins, all
+// sharing its private scope. #4037 (epic #4032) takes two of them out of
+// the library entirely: the pin / wake-lock state is an OWNED collaborator
+// ([TripRecordingPinController], its own private fields), and the body is
+// a plain [TripRecordingBody] widget that takes what it renders as
+// parameters. What is left — the event handlers and `build` + lifecycle —
+// still reaches the State's own members, so those stay parts for now.
 class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen>
     with
-        _TripRecordingPinControls,
         _TripRecordingEventHandlers,
-        _TripRecordingBodySections,
         _TripRecordingBuild,
         _TripRecordingLifecycle {
+  /// #4037 — the pin (wake-lock) state, owned rather than mixed in. The
+  /// screen reads [TripRecordingPinController.isPinned] and rebuilds when
+  /// the controller reports a change.
+  @override
+  late final TripRecordingPinController _pin = TripRecordingPinController(
+    ref: ref,
+    onChanged: () {
+      if (mounted) setState(() {});
+    },
+  );
+
   /// #1395 — hidden 5-tap gesture state for the OBD2 diagnostic
   /// overlay toggle. Mirrors the [MapScreen] gesture (PR #1378) bit-
   /// for-bit so the two debug toggles can be reasoned about as a
@@ -128,7 +125,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen>
   /// device — the warning is the upfront mitigation while we
   /// instrument the live behaviour.
   ///
-  /// Suppressed when [_pinned] is true because pinning is the actual
+  /// Suppressed when the screen is pinned because pinning is the actual
   /// fix; nagging the user who already opted in would be noise. The
   /// [_unpinnedWarningShown] guard prevents re-firing within a single
   /// screen mount even if the post-frame callback runs multiple
@@ -140,7 +137,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen>
   void _maybeShowUnpinnedWarning() {
     if (!mounted) return;
     if (_unpinnedWarningShown) return;
-    if (_pinned) return;
+    if (_pin.isPinned) return;
     final notifier = ref.read(tripRecordingProvider.notifier);
     final recordingState = ref.read(tripRecordingProvider);
     if (!recordingState.isActive) return;
@@ -242,16 +239,13 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen>
                   const SizedBox(height: 12),
                   Text(l.tripRecordingPinHelpBody),
                   const SizedBox(height: 8),
-                  _AutoPinToggle(
+                  AutoPinToggle(
                     onChanged: (value) async {
                       await ref
                           .read(recordingProfileControllerProvider.notifier)
                           .setAutoPin(value);
                       // Reflect the opt-in on THIS live screen at once.
-                      if (value && !_pinned) {
-                        if (mounted) setState(() => _pinned = true);
-                        await _enablePin();
-                      }
+                      if (value) await _pin.pin();
                     },
                   ),
                   const SizedBox(height: 16),

@@ -1,7 +1,19 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-part of 'station_card.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../core/domain/station.dart';
+import '../../../../core/services/radar/motorway_exits_provider.dart';
+import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_text.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/theme/spacing.dart';
+import '../../../../core/utils/price_formatter.dart';
+import '../../../../core/utils/unit_formatter.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../providers/road_distance_provider.dart';
 
 /// The card's single **label**-role metadata line (#3949):
 /// `distance · Updated {time} · ●`.
@@ -13,7 +25,7 @@ part of 'station_card.dart';
 /// text segments are `Flexible` with ellipsis so a raised text scale or an
 /// expanded translation truncates the timestamp first and the distance
 /// second, never overflowing the row.
-class _MetaLine extends StatelessWidget {
+class StationCardMetaLine extends StatelessWidget {
   final Station station;
 
   /// The localized open state the card already computed for its own
@@ -24,7 +36,8 @@ class _MetaLine extends StatelessWidget {
   /// [StationCard.isStalePrice]).
   final bool isStalePrice;
 
-  const _MetaLine({
+  const StationCardMetaLine({
+    super.key,
     required this.station,
     required this.semanticStatus,
     required this.isStalePrice,
@@ -144,10 +157,10 @@ class _DistanceSegment extends StatelessWidget {
 /// side-channel pattern as roadDistancesProvider). Absent off-highway /
 /// for on-road service areas / when the exits asset hasn't loaded — the
 /// line simply doesn't render.
-class _HighwayExitLine extends StatelessWidget {
+class StationCardHighwayExitLine extends StatelessWidget {
   final Station station;
 
-  const _HighwayExitLine({required this.station});
+  const StationCardHighwayExitLine({super.key, required this.station});
 
   @override
   Widget build(BuildContext context) {
@@ -262,7 +275,7 @@ class _UpdatedRow extends StatelessWidget {
 /// segment (for branded stations and the unbranded-label case, where the
 /// street is no longer the title — #2926); the city block is always
 /// `postCode place` joined on whitespace.
-String _addressLine(Station station, bool includeStreet) {
+String stationCardAddressLine(Station station, bool includeStreet) {
   final city = '${station.postCode} ${station.place}'.trim();
   if (!includeStreet || station.street.isEmpty) return city;
   if (city.isEmpty) return station.street;

@@ -7,11 +7,18 @@ part of 'trip_recording_screen.dart';
 /// (stop / pause / delete / back-press / coach + broken-MAP SnackBars),
 /// split out as a `part` mixin under the #1680 file-length
 /// decomposition. Move-only: behaviour preserved, every member verbatim
-/// from trip_recording_screen.dart. Constrained `on
-/// _TripRecordingPinControls` so `_onStop` can release the pin state it
-/// shares with the manual push-pin actions.
-mixin _TripRecordingEventHandlers on _TripRecordingPinControls {
+/// from trip_recording_screen.dart.
+///
+/// #4037 — the pin state it used to inherit is now the State's owned
+/// [TripRecordingPinController]; `_onStop` asks that collaborator to
+/// release the lock instead of writing a field it shares with the
+/// push-pin actions.
+mixin _TripRecordingEventHandlers on ConsumerState<TripRecordingScreen> {
   bool _stopping = false;
+
+  /// Owned by the State (abstract — the State's field satisfies it
+  /// implicitly): the pin / wake-lock collaborator.
+  TripRecordingPinController get _pin;
 
   /// Show the visual eco-coach SnackBar. Lifecycle-gated: this is
   /// only called while the recording screen is mounted because the
@@ -51,9 +58,8 @@ mixin _TripRecordingEventHandlers on _TripRecordingPinControls {
     final result = await ref.read(tripRecordingProvider.notifier).stop();
     if (!mounted) return;
     // #891 — auto-release the wake lock even if the user forgot to unpin.
-    if (_pinned) {
-      await ref.read(wakelockFacadeProvider).disable();
-      await EdgeToEdge.restore();
+    if (_pin.isPinned) {
+      await _pin.disable();
       if (!mounted) return;
     }
 
@@ -68,7 +74,7 @@ mixin _TripRecordingEventHandlers on _TripRecordingPinControls {
 
     setState(() {
       _stopping = false;
-      _pinned = false;
+      _pin.clearPinned();
     });
     notifier.reset();
     if (Navigator.of(context).canPop()) {

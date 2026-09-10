@@ -52,7 +52,8 @@ import 'package:flutter_test/flutter_test.dart';
 /// code moved but the coupling did not. Measured per library (declaring
 /// file + its hand-written parts), 36 libraries exceed the same 400-line
 /// norm while every one of their files passes the per-file gate; the
-/// worst spans 2 594 lines across 11 files.
+/// worst spans 2 594 lines across 11 files. (#4037 has since taken three
+/// of the 36 out — two of them entirely.)
 ///
 /// [_libraryBaseline] therefore pins each of those libraries at its
 /// measured total, and — following `opt_out_ratchet_test.dart` — the
@@ -356,9 +357,9 @@ void main() {
     'lib/features/obd2/data/session/obd2_service.dart': 1541,
     'lib/features/obd2/data/session/obd2_connection_service.dart': 1479,
     'lib/features/trips/providers/trip_recording_provider.dart': 1466,
-    'lib/features/search/presentation/widgets/station_card.dart': 1138,
-    'lib/features/trips/presentation/widgets/trip_detail_charts.dart': 1077,
-    'lib/features/trips/presentation/screens/trip_recording_screen.dart': 1032,
+    // #4037 — 1 032 across 5 files → 756 across 3: the pin/wake-lock
+    // state became an owned collaborator and the body a plain widget.
+    'lib/features/trips/presentation/screens/trip_recording_screen.dart': 756,
     'lib/features/fill_ups/providers/consumption_providers.dart': 973,
     'lib/features/obd2/data/transport/flutter_blue_plus_elm_channel.dart': 948,
     'lib/features/obd2/data/session/live_sample_snapshot.dart': 943,

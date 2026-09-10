@@ -1,18 +1,44 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-part of 'trip_recording_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// #3762 — the live-recording and stop-summary body sections of
-/// `_TripRecordingScreenState`, split out as a `part` mixin under the
-/// #1680 file-length decomposition. Move-only: behaviour preserved,
-/// every member verbatim from trip_recording_screen.dart.
-mixin _TripRecordingBodySections on _TripRecordingEventHandlers {
-  Widget _buildRecording(
-    BuildContext context,
-    AppLocalizations l,
-    TripRecordingState state,
-  ) {
+import '../../../../core/error/guarded.dart';
+import '../../../../core/providers/consumption_display_provider.dart';
+import '../../../../core/utils/unit_formatter.dart';
+import '../../../driving_score/api.dart';
+import '../../../fill_ups/api.dart';
+import '../../../vehicle/api.dart';
+import '../../providers/trip_recording_provider.dart';
+import 'broken_map_widgets.dart';
+import 'minimal_drive_summary.dart';
+import 'recording/live_band_header.dart';
+import 'recording/recording_metric_grid.dart';
+import 'recording/recording_status_strip.dart';
+import 'trip_radar_card.dart';
+import 'trip_recording_landscape_body.dart';
+import 'trip_save_progress.dart';
+import 'trip_start_progress.dart';
+
+/// The recording screen's body: the live-drive column, the landscape
+/// two-zone split, and the connecting / saving progress states.
+///
+/// #4037 (epic #4032) — this was a `part` mixin on the screen's State
+/// (`_TripRecordingBodySections`), sharing its private scope for no
+/// reason: it reads the recording state and `ref`, and writes nothing.
+/// As a `ConsumerWidget` it takes what it needs as parameters, and its
+/// own private helper stays private to this file.
+class TripRecordingBody extends ConsumerWidget {
+  const TripRecordingBody({super.key, required this.state});
+
+  /// The recording state the screen already watched — passed in rather
+  /// than re-watched so the body and the screen's title can never
+  /// disagree about the phase.
+  final TripRecordingState state;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     // #2548 — staged save-progress: while `stop()` runs, the screen stays
     // mounted in the transient `saving` phase showing the inline
     // TripSaveProgress card (the "wrapping up" bookend to the start
