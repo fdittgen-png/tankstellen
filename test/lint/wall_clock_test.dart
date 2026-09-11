@@ -80,7 +80,9 @@ void main() {
     'lib/features/itinerary/data/itineraries_sync.dart': 5,
     'lib/core/sync/price_history_sync.dart': 1,
     'lib/core/sync/ratings_sync.dart': 2,
-    'lib/features/trips/data/trips_sync.dart': 4,
+    // #4056 — 4 → 2: the two row-builder reads moved to
+    // trips_sync_rows.dart and go through SyncRowOps.lwwStamp there.
+    'lib/features/trips/data/trips_sync.dart': 2,
     'lib/core/telemetry/collectors/breadcrumb_collector.dart': 1,
     'lib/core/telemetry/storage/isolate_error_spool.dart': 1,
     'lib/core/telemetry/storage/startup_failure_store.dart': 1,

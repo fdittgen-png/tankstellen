@@ -7,8 +7,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'trip_history_repository.dart';
 import '../../../core/sync/deletions_sync.dart';
+import '../../../core/sync/locally_retained_ids.dart';
 import '../../../core/sync/supabase_client.dart';
+import '../../../core/sync/sync_transport.dart';
 import 'trips_sync_json.dart';
+import 'trips_sync_rows.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/logging/app_log.dart';
 
@@ -64,7 +67,7 @@ class TripsSync {
     try {
       await client
           .from('trip_summaries')
-          .upsert(buildSummaryRow(entry, userId), onConflict: 'user_id,id');
+          .upsert(TripsSyncRows.buildSummaryRow(entry, userId), onConflict: 'user_id,id');
       debugPrint('TripsSync.uploadSummary: uploaded ${entry.id}');
     } catch (e, st) {
       log.error(e, st, layer: ErrorLayer.sync, context: {'where': 'TripsSync.uploadSummary FAILED for ${entry.id}', 'entity': entry.id});
@@ -209,6 +212,20 @@ class TripsSync {
           await DeletionsSync.fetchTombstonedIds('trip_summaries');
       final liveLocal =
           localEntries.where((e) => !tombstoned.contains(e.id)).toList();
+      // #4056 — "Data stored locally on this device is kept". #4046 fixed
+      // this promise in EntitySync.merge, and trips never go through
+      // EntitySync: a wipe tombstoned the ids AND retained them, this
+      // merge dropped them from liveLocal, and mergeAndPruneTrips then
+      // deleted every local entry absent from the result — the device's
+      // whole trip history, one launch after the user asked to keep it.
+      // Retained ids stay in the result (never re-uploaded: they are
+      // excluded from liveLocal, hence from localOnly, by design).
+      final keptLocally = TripsSyncRows.retainedAfterWipe(
+        localEntries,
+        tombstoned: tombstoned,
+        retained: LocallyRetainedIds.forTable('trip_summaries',
+            transport: SupabaseSyncTransport.currentOrNull()),
+      );
       final serverIds = <String>{};
       for (final r in serverRows) {
         final id = r['id'];
@@ -237,8 +254,9 @@ class TripsSync {
           tombstoned: tombstoned);
       debugPrint('TripsSync.merge: local=${liveLocal.length} '
           'server=${serverIds.length} '
-          'downloaded=${merged.length - liveLocal.length}');
-      return merged;
+          'downloaded=${merged.length - liveLocal.length} '
+          'keptAfterWipe=${keptLocally.length}');
+      return [...merged, ...keptLocally];
     } catch (e, st) {
       log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'TripsSync.merge FAILED'});
       return localEntries;
@@ -256,8 +274,8 @@ class TripsSync {
     String userId,
     List<TripHistoryEntry> entries,
   ) async {
-    await _batchUpsert(client, 'trip_summaries', buildSummaryRows(entries, userId));
-    await _batchUpsert(client, 'trip_details', buildDetailRows(entries, userId));
+    await _batchUpsert(client, 'trip_summaries', TripsSyncRows.buildSummaryRows(entries, userId));
+    await _batchUpsert(client, 'trip_details', TripsSyncRows.buildDetailRows(entries, userId));
   }
 
   static Future<void> _batchUpsert(
@@ -273,50 +291,6 @@ class TripsSync {
     }
   }
 
-  /// Pure multi-row analogue of [buildSummaryRow]. Null-timestamp
-  /// entries are skipped (mirrors the [uploadSummary] guard) so the
-  /// NOT-NULL `started_at` / `ended_at` columns are never violated. A
-  /// unit-testable seam for the batch contract.
-  @visibleForTesting
-  static List<Map<String, dynamic>> buildSummaryRows(
-    List<TripHistoryEntry> entries,
-    String userId, {
-    DateTime? now,
-  }) {
-    final rows = <Map<String, dynamic>>[];
-    for (final entry in entries) {
-      if (entry.summary.startedAt == null || entry.summary.endedAt == null) {
-        continue;
-      }
-      rows.add(buildSummaryRow(entry, userId, now: now));
-    }
-    return rows;
-  }
-
-  /// Pure multi-row analogue of the single-trip [uploadDetails] payload.
-  /// Entries with no `samples` AND no `gpsd` contribute nothing (matches
-  /// the single-trip no-op guard). A unit-testable seam.
-  @visibleForTesting
-  static List<Map<String, dynamic>> buildDetailRows(
-    List<TripHistoryEntry> entries,
-    String userId, {
-    DateTime? now,
-  }) {
-    final stamp = (now ?? DateTime.now()).toUtc().toIso8601String();
-    final rows = <Map<String, dynamic>>[];
-    for (final entry in entries) {
-      if (entry.samples.isEmpty && entry.gpsSampleDiagnostics.isEmpty) {
-        continue;
-      }
-      rows.add({
-        'id': entry.id,
-        'user_id': userId,
-        'data': tripDetailsJson(entry),
-        'updated_at': stamp,
-      });
-    }
-    return rows;
-  }
 
   /// Wipe every synced trip for the current user from BOTH
   /// `trip_summaries` AND `trip_details` (#1479 phase 5 — 'Forget
@@ -365,71 +339,5 @@ class TripsSync {
     } catch (e, st) {
       log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'TripsSync.pruneOldDetails FAILED'});
     }
-  }
-
-  /// Pure builder for one `public.trip_summaries` row — the exact
-  /// column map [uploadSummary] upserts. Extracted so a unit test can
-  /// pin every column (the wire `upsert` call can't be exercised
-  /// without a live Supabase client). [now] defaults to wall-clock and
-  /// is injectable so the `updated_at` assertion stays deterministic.
-  @visibleForTesting
-  static Map<String, dynamic> buildSummaryRow(
-    TripHistoryEntry entry,
-    String userId, {
-    DateTime? now,
-  }) {
-    return {
-      'id': entry.id,
-      'user_id': userId,
-      'vehicle_id': entry.vehicleId,
-      'started_at': entry.summary.startedAt!.toIso8601String(),
-      'ended_at': entry.summary.endedAt!.toIso8601String(),
-      // The summary blob stays compact: just the entity's JSON form
-      // WITHOUT the per-tick `samples` and GPS-diagnostics arrays so a
-      // 60-min commute is ~1 KB instead of ~250 KB. The full blob
-      // (samples + gpsd) goes to `public.trip_details` in
-      // [uploadDetails] right after.
-      'data': compactSummaryJson(entry),
-      'updated_at': (now ?? DateTime.now()).toUtc().toIso8601String(),
-    };
-  }
-
-  /// Pure merge step: returns `[...localEntries, ...server-only]` given
-  /// the raw `trip_summaries` rows fetched in [merge]. Server rows whose
-  /// id is already local are skipped (local wins), and a row that fails
-  /// to decode is dropped rather than aborting the whole merge.
-  ///
-  /// This is the value the app-launch caller persists back to the local
-  /// Hive box (`AppInitializer._runTripsSyncMerge`). It is the seam the
-  /// "download silently discarded" regression test (#2239) pins — the
-  /// sibling AlertsSync bug was the caller throwing this superset away,
-  /// so a trip recorded on another device never landed locally.
-  @visibleForTesting
-  static List<TripHistoryEntry> mergeRows(
-    List<TripHistoryEntry> localEntries,
-    List<Map<String, dynamic>> serverRows, {
-    Set<String> tombstoned = const {},
-  }) {
-    final localIds = localEntries.map((e) => e.id).toSet();
-    final downloaded = <TripHistoryEntry>[];
-    for (final r in serverRows) {
-      final id = r['id'];
-      // #3078 — also skip a server row the user deleted on another device.
-      if (id is! String ||
-          localIds.contains(id) ||
-          tombstoned.contains(id)) {
-        continue;
-      }
-      final data = r['data'];
-      if (data is! Map) continue;
-      try {
-        downloaded.add(
-          TripHistoryEntry.fromJson(data.cast<String, dynamic>()),
-        );
-      } catch (e, st) {
-        log.error(e, st, layer: ErrorLayer.sync, context: {'where': 'TripsSync.mergeRows decode failed for $id', 'entity': id});
-      }
-    }
-    return [...localEntries, ...downloaded];
   }
 }

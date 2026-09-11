@@ -39,7 +39,7 @@ Map<String, dynamic> tripDetailsJson(TripHistoryEntry entry) {
 
 /// #3451 — top-level PURE `compute()` entrypoint for the trip-summary
 /// `data` blobs (no Hive / plugins / logging, so it can run on a worker
-/// isolate). Mirrors the decode step of `TripsSync.mergeRows`: a corrupt
+/// isolate). Mirrors the decode step of `TripsSyncRows.mergeRows`: a corrupt
 /// blob maps to `null`; the caller logs the failure count on the main
 /// isolate.
 List<TripHistoryEntry?> decodeTripSummaryDataRows(
@@ -54,7 +54,7 @@ TripHistoryEntry? _decodeTripSummaryBlob(Map<String, dynamic> blob) {
   }
 }
 
-/// #3451 — async analogue of `TripsSync.mergeRows` that batch-decodes the
+/// #3451 — async analogue of `TripsSyncRows.mergeRows` that batch-decodes the
 /// server-only `data` blobs through ONE `compute()` call (via
 /// [BatchDecode.run]) instead of per-row `fromJson` on the UI isolate.
 /// Identical union semantics: local wins on id collision, tombstoned ids

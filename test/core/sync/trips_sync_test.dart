@@ -10,6 +10,7 @@ import 'package:tankstellen/features/trips/data/trips_sync.dart';
 import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import '../../helpers/silence_error_logger.dart';
+import 'package:tankstellen/features/trips/data/trips_sync_rows.dart';
 
 /// #1479 phase 2 / #2239 — coverage of [TripsSync].
 ///
@@ -17,8 +18,8 @@ import '../../helpers/silence_error_logger.dart';
 /// live wire `upsert` / `select` calls can't be exercised in a unit test
 /// without a real Supabase client. Rather than mock the brittle
 /// query-builder chain, the column-shape and merge-union logic are
-/// factored into the pure, `@visibleForTesting` [TripsSync.buildSummaryRow]
-/// and [TripsSync.mergeRows] seams — the wire methods just delegate to
+/// factored into the pure, `@visibleForTesting` [TripsSyncRows.buildSummaryRow]
+/// and [TripsSyncRows.mergeRows] seams — the wire methods just delegate to
 /// them. These tests pin those seams plus the unauthenticated do-no-harm
 /// guards.
 void main() {
@@ -133,7 +134,7 @@ void main() {
   // on, and that the heavy samples / gpsd arrays are stripped from the
   // compact summary blob.
   // ───────────────────────────────────────────────────────────────────
-  group('TripsSync.buildSummaryRow — trip_summaries column contract', () {
+  group('TripsSyncRows.buildSummaryRow — trip_summaries column contract', () {
     test('emits every expected column with the compact (samples-stripped) '
         'data blob', () {
       final started = DateTime.utc(2026, 5, 28, 9, 0);
@@ -170,7 +171,7 @@ void main() {
       );
 
       final now = DateTime.utc(2026, 5, 28, 10, 0);
-      final row = TripsSync.buildSummaryRow(entry, 'user-abc', now: now);
+      final row = TripsSyncRows.buildSummaryRow(entry, 'user-abc', now: now);
 
       // Server-side filter columns + composite-key columns.
       expect(row['id'], '2026-05-28T09:00:00.000Z');
@@ -212,7 +213,7 @@ void main() {
           harshAccelerations: 0,
         ),
       );
-      final row = TripsSync.buildSummaryRow(entry, 'u1');
+      final row = TripsSyncRows.buildSummaryRow(entry, 'u1');
       final decoded = TripHistoryEntry.fromJson(
         (row['data'] as Map).cast<String, dynamic>(),
       );
@@ -237,10 +238,57 @@ void main() {
   // `AppInitializer._runTripsSyncMerge` does it, the remote trip surfaces
   // in the local store.
   // ───────────────────────────────────────────────────────────────────
-  group('TripsSync.mergeRows — applies downloaded entries (#2239)', () {
+  // #4056 — "Data stored locally on this device is kept" for TRIPS. #4046
+  // fixed it in EntitySync.merge; trips never go through EntitySync, so a
+  // wipe tombstoned + retained the ids, merge dropped them, and the launch
+  // prune deleted the whole local history one start later.
+  group('TripsSyncRows.retainedAfterWipe — the kept-locally seam (#4056)', () {
+    TripHistoryEntry mk(String id) => TripHistoryEntry(
+          id: id,
+          vehicleId: 'veh-1',
+          summary: TripSummary(
+            startedAt: DateTime(2026, 6, 1, 8),
+            endedAt: DateTime(2026, 6, 1, 8, 20),
+            distanceKm: 9.4,
+            maxRpm: 2900,
+            highRpmSeconds: 3,
+            idleSeconds: 28,
+            harshBrakes: 0,
+            harshAccelerations: 0,
+          ),
+        );
+
+    test('tombstoned AND retained → kept', () {
+      final kept = TripsSyncRows.retainedAfterWipe(
+        [mk('a'), mk('b')],
+        tombstoned: {'a', 'b'},
+        retained: {'a'},
+      );
+      expect(kept.map((e) => e.id), ['a']);
+    });
+
+    test('tombstoned only → dropped (a real delete on another device)', () {
+      expect(
+        TripsSyncRows.retainedAfterWipe([mk('a')],
+            tombstoned: {'a'}, retained: const {}),
+        isEmpty,
+      );
+    });
+
+    test('retained only → nothing to rescue, and never duplicated', () {
+      expect(
+        TripsSyncRows.retainedAfterWipe([mk('a')],
+            tombstoned: const {}, retained: {'a'}),
+        isEmpty,
+        reason: 'an untombstoned entry is already in the live set',
+      );
+    });
+  });
+
+  group('TripsSyncRows.mergeRows — applies downloaded entries (#2239)', () {
     Map<String, dynamic> serverRow(TripHistoryEntry e) => {
           'id': e.id,
-          'data': TripsSync.buildSummaryRow(e, 'remote-user')['data'],
+          'data': TripsSyncRows.buildSummaryRow(e, 'remote-user')['data'],
         };
 
     TripHistoryEntry mkEntry(String id, DateTime started) => TripHistoryEntry(
@@ -263,7 +311,7 @@ void main() {
       final localA = mkEntry('local-a', DateTime.utc(2026, 5, 27, 8));
       final remoteB = mkEntry('remote-b', DateTime.utc(2026, 5, 28, 8));
 
-      final merged = TripsSync.mergeRows(
+      final merged = TripsSyncRows.mergeRows(
         [localA],
         [serverRow(localA), serverRow(remoteB)],
       );
@@ -277,7 +325,7 @@ void main() {
 
     test('local entries win on id collision — no duplicate, local kept', () {
       final shared = mkEntry('shared', DateTime.utc(2026, 5, 26, 8));
-      final merged = TripsSync.mergeRows([shared], [serverRow(shared)]);
+      final merged = TripsSyncRows.mergeRows([shared], [serverRow(shared)]);
       expect(merged, hasLength(1));
       expect(identical(merged.first, shared), isTrue,
           reason: 'local-wins: the kept entry is the local instance');
@@ -285,7 +333,7 @@ void main() {
 
     test('a corrupt server row is skipped, not fatal to the merge', () {
       final remoteB = mkEntry('remote-b', DateTime.utc(2026, 5, 28, 8));
-      final merged = TripsSync.mergeRows(
+      final merged = TripsSyncRows.mergeRows(
         const [],
         [
           {'id': 'corrupt', 'data': 'not-a-map'}, // bad shape → skipped
@@ -321,7 +369,7 @@ void main() {
         final remoteB = mkEntry('remote-b', DateTime.utc(2026, 5, 28, 8));
         final local = repo.loadAll();
         final localIds = local.map((e) => e.id).toSet();
-        final merged = TripsSync.mergeRows(local, [serverRow(remoteB)]);
+        final merged = TripsSyncRows.mergeRows(local, [serverRow(remoteB)]);
 
         // Exactly the persist-back loop from
         // AppInitializer._runTripsSyncMerge.
@@ -346,7 +394,7 @@ void main() {
   // the single-trip contracts: null-timestamp skip + samples/gpsd-empty
   // skip + correct columns.
   // ───────────────────────────────────────────────────────────────────
-  group('TripsSync.buildSummaryRows / buildDetailRows — batch (#2319)', () {
+  group('TripsSyncRows.buildSummaryRows / buildDetailRows — batch (#2319)', () {
     TripHistoryEntry batchEntry(
       String id, {
       DateTime? started,
@@ -372,7 +420,7 @@ void main() {
     test('builds one summary row per entry with non-null timestamps', () {
       final started = DateTime.utc(2026, 5, 28, 8);
       final ended = started.add(const Duration(minutes: 20));
-      final rows = TripsSync.buildSummaryRows(
+      final rows = TripsSyncRows.buildSummaryRows(
         [
           batchEntry('a', started: started, ended: ended),
           batchEntry('b', started: started, ended: ended),
@@ -387,7 +435,7 @@ void main() {
     test('skips entries with null timestamps (NOT-NULL column contract)',
         () {
       final started = DateTime.utc(2026, 5, 28, 8);
-      final rows = TripsSync.buildSummaryRows(
+      final rows = TripsSyncRows.buildSummaryRows(
         [
           batchEntry('valid',
               started: started, ended: started.add(const Duration(minutes: 5))),
@@ -411,7 +459,7 @@ void main() {
       );
       final empty = batchEntry('light', started: started, ended: ended);
 
-      final rows = TripsSync.buildDetailRows([withSamples, empty], 'user-1');
+      final rows = TripsSyncRows.buildDetailRows([withSamples, empty], 'user-1');
       expect(rows.map((r) => r['id']), ['heavy'],
           reason: 'an entry with no samples and no gpsd must contribute no '
               'details row (matches the single-trip no-op guard)');
@@ -422,8 +470,8 @@ void main() {
 
     test('empty input lists produce empty batches (no wasted round-trip)',
         () {
-      expect(TripsSync.buildSummaryRows(const [], 'u'), isEmpty);
-      expect(TripsSync.buildDetailRows(const [], 'u'), isEmpty);
+      expect(TripsSyncRows.buildSummaryRows(const [], 'u'), isEmpty);
+      expect(TripsSyncRows.buildDetailRows(const [], 'u'), isEmpty);
     });
   });
 }
