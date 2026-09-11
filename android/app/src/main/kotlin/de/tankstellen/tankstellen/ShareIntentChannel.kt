@@ -6,6 +6,8 @@ package de.tankstellen.tankstellen
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel
@@ -15,6 +17,9 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.Locale
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeUnit
 
 /**
  * GMS-free inbound OS share receiver (#2735, Epic #2687).
@@ -55,6 +60,26 @@ object ShareIntentChannel {
     /** A SEND seen before Dart subscribed (cold launch); drained by getInitialShare. */
     @Volatile
     private var pendingInitial: Map<String, Any?>? = null
+
+    /**
+     * #4048 — share decoding runs here, never on the platform thread.
+     * Single-threaded so two shares in flight cannot interleave their
+     * cache-file sequence numbers; scheduled so the stall watchdog below
+     * has somewhere to run.
+     */
+    private val worker: ScheduledExecutorService =
+        Executors.newSingleThreadScheduledExecutor { r ->
+            Thread(r, "share-intent-decode").apply { isDaemon = true }
+        }
+
+    /** Watchdog timer for [SHARE_READ_TIMEOUT_MS]; separate so a stalled
+     *  read on [worker] cannot also starve its own watchdog. */
+    private val watchdog: ScheduledExecutorService =
+        Executors.newSingleThreadScheduledExecutor { r ->
+            Thread(r, "share-intent-watchdog").apply { isDaemon = true }
+        }
+
+    private val main = Handler(Looper.getMainLooper())
 
     fun registerWith(flutterEngine: FlutterEngine, context: Context) {
         val appContext = context.applicationContext
@@ -106,19 +131,32 @@ object ShareIntentChannel {
         if (action != Intent.ACTION_SEND && action != Intent.ACTION_SEND_MULTIPLE) {
             return false
         }
-        return try {
-            val payload = decode(intent) ?: return false
-            val sink = eventSink
-            if (sink != null) {
-                sink.success(payload)
-            } else {
-                pendingInitial = payload
+        // #4048 — decode OFF the platform thread. The #3740 byte cap
+        // bounds how MUCH a hostile or merely slow ContentProvider can
+        // send; it does not bound how LONG it takes to send it. A provider
+        // that trickles bytes held the UI thread for as long as it chose to
+        // trickle, and `deliver` below is the only part that has to be back
+        // on the main looper (Flutter channels are platform-thread only).
+        //
+        // Returning true before the work finishes is correct: the return
+        // value answers "is this a share I am consuming?", which is already
+        // known from the action, not "did it decode?".
+        worker.execute {
+            val payload = try {
+                decode(intent)
+            } catch (e: Exception) {
+                Log.w(TAG, "share intent decode failed", e)
+                null
             }
-            true
-        } catch (e: Exception) {
-            Log.w(TAG, "share intent decode failed", e)
-            false
+            if (payload != null) main.post { deliver(payload) }
         }
+        return true
+    }
+
+    /** Platform-thread delivery — Flutter channels permit nothing else. */
+    private fun deliver(payload: Map<String, Any?>) {
+        val sink = eventSink
+        if (sink != null) sink.success(payload) else pendingInitial = payload
     }
 
     /** Decodes a SEND / SEND_MULTIPLE intent into the Dart payload map, or null. */
@@ -228,6 +266,14 @@ object ShareIntentChannel {
     private const val MAX_SHARE_BYTES = 8L * 1024 * 1024
 
     /**
+     * #4048 — wall-clock budget for one shared stream. The byte cap limits
+     * amount, not time-to-next-byte: a provider that hands over one byte a
+     * second stays under 8 MiB essentially forever. Receipts are small and
+     * local; anything still arriving after this is not a receipt.
+     */
+    private const val SHARE_READ_TIMEOUT_MS = 20_000L
+
+    /**
      * Streams [input] into [output], counting bytes as they flow; aborts
      * with an [IOException] the moment the running total exceeds
      * [MAX_SHARE_BYTES] (#3740). Counting the stream — instead of trusting
@@ -237,14 +283,41 @@ object ShareIntentChannel {
     private fun copyBounded(input: InputStream, output: OutputStream) {
         val buf = ByteArray(64 * 1024)
         var total = 0L
-        while (true) {
-            val n = input.read(buf)
-            if (n < 0) return
-            total += n
-            if (total > MAX_SHARE_BYTES) {
-                throw IOException("shared stream exceeds $MAX_SHARE_BYTES bytes — aborting copy")
+        val deadline = System.nanoTime() +
+            TimeUnit.MILLISECONDS.toNanos(SHARE_READ_TIMEOUT_MS)
+        // #4048 — a per-chunk deadline catches a slow trickle, but a single
+        // read() can block forever regardless, and nothing in the loop runs
+        // to notice. Closing the stream from another thread is what makes
+        // that read throw, so the watchdog is the part that actually bounds
+        // the wait; the loop check just fails faster in the common case.
+        val stall = watchdog.schedule(
+            {
+                try {
+                    input.close()
+                } catch (e: IOException) {
+                    Log.w(TAG, "watchdog close failed", e)
+                }
+            },
+            SHARE_READ_TIMEOUT_MS,
+            TimeUnit.MILLISECONDS,
+        )
+        try {
+            while (true) {
+                val n = input.read(buf)
+                if (n < 0) return
+                if (System.nanoTime() > deadline) {
+                    throw IOException(
+                        "shared stream exceeded ${SHARE_READ_TIMEOUT_MS}ms — aborting copy",
+                    )
+                }
+                total += n
+                if (total > MAX_SHARE_BYTES) {
+                    throw IOException("shared stream exceeds $MAX_SHARE_BYTES bytes — aborting copy")
+                }
+                output.write(buf, 0, n)
             }
-            output.write(buf, 0, n)
+        } finally {
+            stall.cancel(false)
         }
     }
 
