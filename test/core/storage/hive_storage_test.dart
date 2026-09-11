@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:tankstellen/core/storage/hive_isolate_boxes.dart';
 import 'package:tankstellen/core/storage/hive_isolate_ownership.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 
@@ -595,10 +596,51 @@ void main() {
     });
 
     test('closeIsolateBoxes does not close profiles box', () async {
-      // profiles box is only opened by main isolate init, not initInIsolate.
+      // #4053 — the comment here used to read "profiles is only opened by
+      // main isolate init, not initInIsolate". That was false: #2205 added
+      // profiles to initInIsolate so the BG widget could read it, and the
+      // close list was never updated — so it leaked on every scan, quietly,
+      // and this test's stale premise is what made the leak look intended.
+      // profiles stays open here for the REAL reason: initForTest marked it
+      // main-isolate-owned, and #2670 skips owned boxes.
+      expect(HiveIsolateBoxes.isolateBoxNames, contains('profiles'),
+          reason: 'initInIsolate opens profiles (#2205), so the close walk '
+              'must know about it');
       await HiveStorage.closeIsolateBoxes();
 
       expect(Hive.isBoxOpen('profiles'), isTrue);
+    });
+
+    // #4053 — the drift guard. The open set and the close set were two
+    // hand-written lists and had drifted in both directions at once:
+    // `profiles` missing from the close list (silent leak) and
+    // `price_snapshots` / `isolate_error_spool` closed at the wrong value
+    // type (`Box<dynamic>` vs the `Box<String>` they are opened at), which
+    // threw on every single background scan — 30 of the 48 traces in the
+    // 2026-09-11 field export. There is now ONE list; this pins that.
+    test('every box a background isolate opens is also closed, at the '
+        'type it was opened (#4053)', () async {
+      HiveIsolateOwnership.resetForTest();
+      final names = HiveIsolateBoxes.isolateBoxNames;
+
+      // The two String-typed boxes are the ones the old close walk threw
+      // on. Open them exactly as initInIsolate does and close through the
+      // production path: a type mismatch would throw back into the warn.
+      await Hive.openBox<String>('price_snapshots');
+      await Hive.openBox<String>('isolate_error_spool');
+      expect(Hive.isBoxOpen('price_snapshots'), isTrue);
+      expect(Hive.isBoxOpen('isolate_error_spool'), isTrue);
+
+      await HiveStorage.closeIsolateBoxes();
+
+      for (final name in names) {
+        expect(Hive.isBoxOpen(name), isFalse,
+            reason: '"$name" is opened by initInIsolate and must be closed '
+                'by closeIsolateBoxes — a leaked handle per scan is what '
+                '#4053 fixed');
+      }
+
+      await HiveStorage.initForTest();
     });
 
     test('a spawned-worker isolate (init never ran) still closes its '

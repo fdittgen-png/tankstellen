@@ -63,17 +63,20 @@ void main() {
           );
         }
 
-        // #3689 — initInIsolate moved to HiveIsolateBoxes; its opens route
-        // through the local `open` helper so every background open pins the
-        // never-compact strategy. The six PII boxes must pass the cipher.
+        // #3689 — initInIsolate moved to HiveIsolateBoxes. #4053 — the
+        // opens are now declared once in the `_boxes` list that BOTH
+        // initInIsolate and closeIsolateBoxes walk (the old pair of
+        // hand-written lists had drifted apart in the field), so the
+        // cipher is asserted where it is declared. The six PII boxes must
+        // carry `ciphered: true`.
         final isolateSource =
             File('lib/core/storage/hive_isolate_boxes.dart').readAsStringSync();
         final isolateMatch = RegExp(
-          r'static Future<void> initInIsolate\(\) async \{(.*?)\n  \}',
+          r'static const List<_IsolateBox<Object\?>> _boxes = \[(.*?)\n  \];',
           dotAll: true,
         ).firstMatch(isolateSource);
         expect(isolateMatch, isNotNull,
-            reason: 'initInIsolate() method must exist in HiveIsolateBoxes');
+            reason: 'the _boxes declaration must exist in HiveIsolateBoxes');
         final isolateBody = isolateMatch!.group(1)!;
 
         for (final boxName in [
@@ -85,17 +88,17 @@ void main() {
           'priceHistory',
         ]) {
           expect(
-            isolateBody
-                .contains('open<dynamic>(HiveBoxes.$boxName, boxCipher: '),
+            isolateBody.contains(
+                '_IsolateBox<dynamic>(HiveBoxes.$boxName, ciphered: true)'),
             isTrue,
-            reason: 'initInIsolate must open the encrypted $boxName box '
-                'with the cipher',
+            reason: 'the background isolate must open the encrypted '
+                '$boxName box with the cipher',
           );
         }
         // The helper is the single Hive.openBox site — it must carry both
         // the cipher pass-through and the #3689 never-compact strategy.
         expect(
-          isolateSource.contains('compactionStrategy: _neverCompact'),
+          isolateSource.contains('compactionStrategy: HiveIsolateBoxes.neverCompact'),
           isTrue,
           reason: 'background opens must never compact (#3689) — a BG '
               'compaction renames box files under the foreground handles',
@@ -168,8 +171,9 @@ void main() {
         final source =
             File('lib/core/storage/hive_isolate_boxes.dart').readAsStringSync();
 
+        // #4053 — membership now lives in the single `_boxes` list.
         final isolateMatch = RegExp(
-          r'static Future<void> initInIsolate\(\) async \{(.*?)\n  \}',
+          r'static const List<_IsolateBox<Object\?>> _boxes = \[(.*?)\n  \];',
           dotAll: true,
         ).firstMatch(source);
         expect(isolateMatch, isNotNull);
