@@ -3,6 +3,8 @@
 
 import 'package:xml/xml.dart';
 
+import 'backup_xml_element_helpers.dart';
+
 import '../../../../ev/domain/entities/charging_log.dart';
 import '../../../../../core/domain/fuel_type.dart';
 import '../../../../../core/domain/vehicle_profile.dart';
@@ -172,8 +174,8 @@ class BackupXmlReader {
         }
       }
       prefs = ChargingPreferences(
-        minSocPercent: _int(prefsBox, 'MinSocPercent') ?? 20,
-        maxSocPercent: _int(prefsBox, 'MaxSocPercent') ?? 80,
+        minSocPercent: readInt(prefsBox, 'MinSocPercent') ?? 20,
+        maxSocPercent: readInt(prefsBox, 'MaxSocPercent') ?? 80,
         preferredNetworks: networks,
       );
     }
@@ -188,41 +190,41 @@ class BackupXmlReader {
     }
 
     return VehicleProfile(
-      id: _reqText(v, 'Id'),
-      name: _reqText(v, 'Name'),
-      type: VehicleType.fromKey(_text(v, 'EngineType')),
-      batteryKwh: _double(v, 'BatteryKwh'),
-      maxChargingKw: _double(v, 'MaxChargingKw'),
+      id: reqText(v, 'Id'),
+      name: reqText(v, 'Name'),
+      type: VehicleType.fromKey(readText(v, 'EngineType')),
+      batteryKwh: readDouble(v, 'BatteryKwh'),
+      maxChargingKw: readDouble(v, 'MaxChargingKw'),
       supportedConnectors: connectors,
       chargingPreferences: prefs,
-      tankCapacityL: _double(v, 'TankCapacityL'),
-      preferredFuelType: _text(v, 'PreferredFuelType'),
-      engineDisplacementCc: _int(v, 'EngineDisplacementCc'),
-      engineCylinders: _int(v, 'EngineCylinders'),
-      volumetricEfficiency: _double(v, 'VolumetricEfficiency') ?? 0.85,
-      volumetricEfficiencySamples: _int(v, 'VolumetricEfficiencySamples') ?? 0,
-      pumpGain: _double(v, 'PumpGain') ?? 1.0, // #3887
-      pumpGainSamples: _int(v, 'PumpGainSamples') ?? 0,
-      pumpGainUpdatedAt: DateTime.tryParse(_text(v, 'PumpGainUpdatedAt') ?? ''),
+      tankCapacityL: readDouble(v, 'TankCapacityL'),
+      preferredFuelType: readText(v, 'PreferredFuelType'),
+      engineDisplacementCc: readInt(v, 'EngineDisplacementCc'),
+      engineCylinders: readInt(v, 'EngineCylinders'),
+      volumetricEfficiency: readDouble(v, 'VolumetricEfficiency') ?? 0.85,
+      volumetricEfficiencySamples: readInt(v, 'VolumetricEfficiencySamples') ?? 0,
+      pumpGain: readDouble(v, 'PumpGain') ?? 1.0, // #3887
+      pumpGainSamples: readInt(v, 'PumpGainSamples') ?? 0,
+      pumpGainUpdatedAt: DateTime.tryParse(readText(v, 'PumpGainUpdatedAt') ?? ''),
       pumpGainByFuel: readPumpGainByFuel(v), // #3918
       tankFuelKey: readTankFuelKey(v),
-      curbWeightKg: _int(v, 'CurbWeightKg'),
-      obd2AdapterMac: _text(v, 'Obd2AdapterMac'),
-      obd2AdapterName: _text(v, 'Obd2AdapterName'),
-      vin: _text(v, 'Vin'),
-      calibrationMode: VehicleCalibrationMode.fromKey(_text(v, 'CalibrationMode')),
-      autoRecord: _bool(v, 'AutoRecord') ?? false,
+      curbWeightKg: readInt(v, 'CurbWeightKg'),
+      obd2AdapterMac: readText(v, 'Obd2AdapterMac'),
+      obd2AdapterName: readText(v, 'Obd2AdapterName'),
+      vin: readText(v, 'Vin'),
+      calibrationMode: VehicleCalibrationMode.fromKey(readText(v, 'CalibrationMode')),
+      autoRecord: readBool(v, 'AutoRecord') ?? false,
       movementStartThresholdKmh:
-          _double(v, 'MovementStartThresholdKmh') ?? 5.0,
-      disconnectSaveDelaySec: _int(v, 'DisconnectSaveDelaySec') ?? 60,
-      backgroundLocationConsent: _bool(v, 'BackgroundLocationConsent') ?? false,
-      make: _text(v, 'Make'),
-      model: _text(v, 'Model'),
-      year: _int(v, 'Year'),
-      referenceVehicleId: _text(v, 'ReferenceVehicleId'),
-      aggregatesUpdatedAt: _date(v, 'AggregatesUpdatedAt'),
-      aggregatesTripCount: _int(v, 'AggregatesTripCount'),
-      tireCircumferenceMeters: _double(v, 'TireCircumferenceMeters') ?? 1.95,
+          readDouble(v, 'MovementStartThresholdKmh') ?? 5.0,
+      disconnectSaveDelaySec: readInt(v, 'DisconnectSaveDelaySec') ?? 60,
+      backgroundLocationConsent: readBool(v, 'BackgroundLocationConsent') ?? false,
+      make: readText(v, 'Make'),
+      model: readText(v, 'Model'),
+      year: readInt(v, 'Year'),
+      referenceVehicleId: readText(v, 'ReferenceVehicleId'),
+      aggregatesUpdatedAt: readDate(v, 'AggregatesUpdatedAt'),
+      aggregatesTripCount: readInt(v, 'AggregatesTripCount'),
+      tireCircumferenceMeters: readDouble(v, 'TireCircumferenceMeters') ?? 1.95,
       gearCentroids: centroids.isEmpty ? null : centroids,
     );
   }
@@ -238,17 +240,17 @@ class BackupXmlReader {
       }
     }
     return FillUp(
-      id: _reqText(f, 'Id'),
-      vehicleId: _text(f, 'VehicleId'),
-      date: _reqDate(f, 'Date'),
-      fuelType: FuelType.fromString(_reqText(f, 'FuelType')),
-      liters: _reqDouble(f, 'Liters'),
-      totalCost: _reqDouble(f, 'TotalCost'),
-      odometerKm: _reqDouble(f, 'OdometerKm'),
-      stationId: _text(f, 'StationId'),
-      stationName: _text(f, 'StationName'),
-      notes: _text(f, 'Notes'),
-      isFullTank: _bool(f, 'IsFullTank') ?? true,
+      id: reqText(f, 'Id'),
+      vehicleId: readText(f, 'VehicleId'),
+      date: reqDate(f, 'Date'),
+      fuelType: FuelType.fromString(reqText(f, 'FuelType')),
+      liters: reqNonNegativeDouble(f, 'Liters'),
+      totalCost: reqDouble(f, 'TotalCost'),
+      odometerKm: reqDouble(f, 'OdometerKm'),
+      stationId: readText(f, 'StationId'),
+      stationName: readText(f, 'StationName'),
+      notes: readText(f, 'Notes'),
+      isFullTank: readBool(f, 'IsFullTank') ?? true,
       linkedTripIds: linked,
     );
   }
@@ -262,29 +264,29 @@ class BackupXmlReader {
     if (harshBox != null) {
       for (final e in harshBox.findElements('HarshEvent')) {
         harshEvents.add(HarshEvent(
-          timestamp: _reqDate(e, 'Timestamp'),
-          type: HarshEventType.fromWireName(_text(e, 'Type')),
-          magnitudeG: _reqDouble(e, 'MagnitudeG'),
-          speedKmh: _reqDouble(e, 'SpeedKmh'),
+          timestamp: reqDate(e, 'Timestamp'),
+          type: HarshEventType.fromWireName(readText(e, 'Type')),
+          magnitudeG: reqDouble(e, 'MagnitudeG'),
+          speedKmh: reqDouble(e, 'SpeedKmh'),
         ));
       }
     }
 
     final summary = TripSummary(
-      distanceKm: _reqDouble(summaryEl, 'DistanceKm'),
-      maxRpm: _reqDouble(summaryEl, 'MaxRpm'),
-      highRpmSeconds: _reqDouble(summaryEl, 'HighRpmSeconds'),
-      idleSeconds: _reqDouble(summaryEl, 'IdleSeconds'),
-      harshBrakes: _reqInt(summaryEl, 'HarshBrakes'),
-      harshAccelerations: _reqInt(summaryEl, 'HarshAccelerations'),
-      avgLPer100Km: _double(summaryEl, 'AvgLPer100Km'),
-      fuelLitersConsumed: _double(summaryEl, 'FuelLitersConsumed'),
-      startedAt: _date(summaryEl, 'StartedAt'),
-      endedAt: _date(summaryEl, 'EndedAt'),
-      distanceSource: _text(summaryEl, 'DistanceSource') ?? 'virtual',
-      coldStartSurcharge: _bool(summaryEl, 'ColdStartSurcharge') ?? false,
-      secondsBelowOptimalGear: _double(summaryEl, 'SecondsBelowOptimalGear'),
-      kind: TripKind.fromWireName(_text(summaryEl, 'Kind')),
+      distanceKm: reqDouble(summaryEl, 'DistanceKm'),
+      maxRpm: reqDouble(summaryEl, 'MaxRpm'),
+      highRpmSeconds: reqDouble(summaryEl, 'HighRpmSeconds'),
+      idleSeconds: reqDouble(summaryEl, 'IdleSeconds'),
+      harshBrakes: reqInt(summaryEl, 'HarshBrakes'),
+      harshAccelerations: reqInt(summaryEl, 'HarshAccelerations'),
+      avgLPer100Km: readDouble(summaryEl, 'AvgLPer100Km'),
+      fuelLitersConsumed: readDouble(summaryEl, 'FuelLitersConsumed'),
+      startedAt: readDate(summaryEl, 'StartedAt'),
+      endedAt: readDate(summaryEl, 'EndedAt'),
+      distanceSource: readText(summaryEl, 'DistanceSource') ?? 'virtual',
+      coldStartSurcharge: readBool(summaryEl, 'ColdStartSurcharge') ?? false,
+      secondsBelowOptimalGear: readDouble(summaryEl, 'SecondsBelowOptimalGear'),
+      kind: TripKind.fromWireName(readText(summaryEl, 'Kind')),
       harshEvents: harshEvents,
     );
 
@@ -293,32 +295,32 @@ class BackupXmlReader {
     if (samplesBox != null) {
       for (final s in samplesBox.findElements('Sample')) {
         samples.add(TripSample(
-          timestamp: _reqDate(s, 'Timestamp'),
-          speedKmh: _reqDouble(s, 'SpeedKmh'),
+          timestamp: reqDate(s, 'Timestamp'),
+          speedKmh: reqDouble(s, 'SpeedKmh'),
           // #2692 C4-G — optional now: legacy backups always wrote Rpm, so
           // they still read back unchanged; a GPS-only sample reads null.
-          rpm: _double(s, 'Rpm'),
-          fuelRateLPerHour: _double(s, 'FuelRateLPerHour'),
-          throttlePercent: _double(s, 'ThrottlePercent'),
-          engineLoadPercent: _double(s, 'EngineLoadPercent'),
-          coolantTempC: _double(s, 'CoolantTempC'),
-          latitude: _double(s, 'Latitude'),
-          longitude: _double(s, 'Longitude'),
-          altitudeM: _double(s, 'AltitudeM'),
-          hAccuracyM: _double(s, 'HAccuracyM'),
-          bearingDeg: _double(s, 'BearingDeg'),
-          accelG: _double(s, 'AccelG'),
+          rpm: readDouble(s, 'Rpm'),
+          fuelRateLPerHour: readDouble(s, 'FuelRateLPerHour'),
+          throttlePercent: readDouble(s, 'ThrottlePercent'),
+          engineLoadPercent: readDouble(s, 'EngineLoadPercent'),
+          coolantTempC: readDouble(s, 'CoolantTempC'),
+          latitude: readDouble(s, 'Latitude'),
+          longitude: readDouble(s, 'Longitude'),
+          altitudeM: readDouble(s, 'AltitudeM'),
+          hAccuracyM: readDouble(s, 'HAccuracyM'),
+          bearingDeg: readDouble(s, 'BearingDeg'),
+          accelG: readDouble(s, 'AccelG'),
         ));
       }
     }
 
     return TripHistoryEntry(
-      id: _reqText(t, 'Id'),
-      vehicleId: _text(t, 'VehicleId'),
-      automatic: _bool(t, 'Automatic') ?? false,
-      adapterMac: _text(t, 'AdapterMac'),
-      adapterName: _text(t, 'AdapterName'),
-      adapterFirmware: _text(t, 'AdapterFirmware'),
+      id: reqText(t, 'Id'),
+      vehicleId: readText(t, 'VehicleId'),
+      automatic: readBool(t, 'Automatic') ?? false,
+      adapterMac: readText(t, 'AdapterMac'),
+      adapterName: readText(t, 'AdapterName'),
+      adapterFirmware: readText(t, 'AdapterFirmware'),
       summary: summary,
       samples: samples,
     );
@@ -327,76 +329,15 @@ class BackupXmlReader {
   // ── ChargingLog ───────────────────────────────────────────────────
 
   ChargingLog _readChargingLog(XmlElement c) => ChargingLog(
-        id: _reqText(c, 'Id'),
-        vehicleId: _reqText(c, 'VehicleId'),
-        date: _reqDate(c, 'Date'),
-        kWh: _reqDouble(c, 'Kwh'),
-        costEur: _reqDouble(c, 'CostEur'),
-        chargeTimeMin: _reqInt(c, 'ChargeTimeMin'),
-        odometerKm: _reqInt(c, 'OdometerKm'),
-        stationName: _text(c, 'StationName'),
-        chargingStationId: _text(c, 'ChargingStationId'),
+        id: reqText(c, 'Id'),
+        vehicleId: reqText(c, 'VehicleId'),
+        date: reqDate(c, 'Date'),
+        kWh: reqDouble(c, 'Kwh'),
+        costEur: reqDouble(c, 'CostEur'),
+        chargeTimeMin: reqInt(c, 'ChargeTimeMin'),
+        odometerKm: reqInt(c, 'OdometerKm'),
+        stationName: readText(c, 'StationName'),
+        chargingStationId: readText(c, 'ChargingStationId'),
       );
 
-  // ── Element helpers ─────────────────────────────────────────────────
-
-  String? _text(XmlElement parent, String name) =>
-      parent.findElements(name).firstOrNull?.innerText;
-
-  String _reqText(XmlElement parent, String name) {
-    final v = _text(parent, name);
-    if (v == null) {
-      throw BackupXmlReadException('missing required <$name>');
-    }
-    return v;
-  }
-
-  double? _double(XmlElement parent, String name) {
-    final v = _text(parent, name);
-    return v == null ? null : double.tryParse(v);
-  }
-
-  double _reqDouble(XmlElement parent, String name) {
-    final v = _double(parent, name);
-    if (v == null) {
-      throw BackupXmlReadException('missing/invalid required <$name>');
-    }
-    return v;
-  }
-
-  int? _int(XmlElement parent, String name) {
-    final v = _text(parent, name);
-    if (v == null) return null;
-    // Numbers are written via `.toString()`, so a double-typed field
-    // that happens to hold a whole number is still safe to read as int.
-    return int.tryParse(v) ?? double.tryParse(v)?.toInt();
-  }
-
-  int _reqInt(XmlElement parent, String name) {
-    final v = _int(parent, name);
-    if (v == null) {
-      throw BackupXmlReadException('missing/invalid required <$name>');
-    }
-    return v;
-  }
-
-  bool? _bool(XmlElement parent, String name) {
-    final v = _text(parent, name);
-    if (v == null) return null;
-    return v.toLowerCase() == 'true';
-  }
-
-  DateTime? _date(XmlElement parent, String name) {
-    final v = _text(parent, name);
-    if (v == null) return null;
-    return DateTime.tryParse(v);
-  }
-
-  DateTime _reqDate(XmlElement parent, String name) {
-    final v = _date(parent, name);
-    if (v == null) {
-      throw BackupXmlReadException('missing/invalid required <$name>');
-    }
-    return v;
-  }
 }
