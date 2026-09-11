@@ -71,7 +71,8 @@ class DeletionsSync {
     // #3123 — journal-first: persist the durable "these ids are dead"
     // intent BEFORE any auth check or network attempt, so an offline or
     // flaky delete is replayed by the next sync's drain instead of lost.
-    await PendingDeletionsJournal.addAll(tableName, ids);
+    await PendingDeletionsJournal.addAll(tableName, ids,
+        transport: transport);
 
     final t = transport ?? SupabaseSyncTransport.currentOrNull();
     if (t == null) return false;
@@ -91,7 +92,8 @@ class DeletionsSync {
     try {
       await _upsertTombstones(t, rows);
       // Confirmed server-side → the journal entry has served its purpose.
-      await PendingDeletionsJournal.removeAll(tableName, ids);
+      await PendingDeletionsJournal.removeAll(tableName, ids,
+          transport: t);
       debugPrint('DeletionsSync.record: ${ids.length} tombstone(s) '
           'for "$tableName"');
       return true;
@@ -185,9 +187,24 @@ class DeletionsSync {
   /// server-side *before* the caller's union merge runs. Never throws —
   /// a failed replay simply stays journaled for the next attempt.
   static Future<void> drainJournal({SyncTransport? transport}) async {
-    final pending = PendingDeletionsJournal.snapshot();
+    // #4047 — ONLY this context's entries. A delete queued under another
+    // account (or another backend) is deliberately left where it is: not
+    // replayed under the current identity, and not discarded either, so
+    // signing back in resumes it.
+    // Deletes queued before any sign-in belong to whoever signs in first
+    // — that is the ordinary offline case, not a foreign account.
+    await PendingDeletionsJournal.adoptUnbound(
+      PendingDeletionsJournal.contextFor(transport),
+    );
+    final pending = PendingDeletionsJournal.snapshot(transport: transport);
     for (final entry in pending.entries) {
       await recordAll(entry.key, entry.value, transport: transport);
+    }
+    final foreign =
+        PendingDeletionsJournal.quarantinedContexts(transport: transport);
+    if (foreign.isNotEmpty) {
+      debugPrint('DeletionsSync.drainJournal: ${foreign.length} queued '
+          'deletion context(s) from another account/backend left untouched');
     }
   }
 
@@ -217,15 +234,15 @@ class DeletionsSync {
       return {
         ...rows.map((r) => r.getString('record_id')).whereType<String>(),
         // Ids whose replay just failed still count as tombstoned locally.
-        ...PendingDeletionsJournal.pendingIds(tableName),
+        ...PendingDeletionsJournal.pendingIds(tableName, transport: t),
       };
     } catch (e, st) {
       if (isDeletionsTableAbsent(e)) {
         _breadcrumbDeletionsAbsent();
-        return PendingDeletionsJournal.pendingIds(tableName);
+        return PendingDeletionsJournal.pendingIds(tableName, transport: t);
       }
       log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'DeletionsSync.fetchTombstonedIds FAILED'});
-      return PendingDeletionsJournal.pendingIds(tableName);
+      return PendingDeletionsJournal.pendingIds(tableName, transport: t);
     }
   }
 }

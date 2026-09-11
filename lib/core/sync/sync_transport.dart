@@ -26,6 +26,12 @@ abstract class SyncTransport {
   /// The authenticated user id every operation is scoped to.
   String get userId;
 
+  /// #4047 — host of the backend this transport talks to. Defaults to
+  /// null so existing fakes need no change; the production transport
+  /// overrides it. Together with [userId] it identifies the context any
+  /// locally-queued sync intent belongs to.
+  String? get backendUrl => null;
+
   /// `SELECT [columns] FROM [table] WHERE user_id = userId [AND filters]`.
   Future<List<JsonRow>> select(
     String table,
@@ -52,6 +58,9 @@ class SupabaseSyncTransport implements SyncTransport {
   final String userId;
 
   SupabaseSyncTransport._(this._client, this.userId);
+
+  @override
+  String? get backendUrl => TankSyncClient.backendHost;
 
   /// The transport for the current session, or `null` when the client is
   /// not initialised / no user is signed in — callers keep the existing

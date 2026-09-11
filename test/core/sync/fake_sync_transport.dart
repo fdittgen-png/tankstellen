@@ -25,6 +25,13 @@ class DeleteCall {
 /// observes the first one's effects (e.g. the #3123 journal drain).
 /// Failure flags simulate a network blip per operation kind.
 class FakeSyncTransport implements SyncTransport {
+  /// #4047 — the context a queued deletion belongs to is
+  /// `<backend host>|<user id>`. Mutable so a test can simulate the SAME
+  /// account on a DIFFERENT self-hosted backend, which is half of what
+  /// the scoping has to separate.
+  @override
+  String? backendUrl;
+
   @override
   String userId;
 

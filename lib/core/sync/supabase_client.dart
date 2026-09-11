@@ -72,6 +72,7 @@ class TankSyncClient {
     // SharedPreferences slot. The key mirrors the SDK default
     // (`sb-<host-first-label>-auth-token`) so SecureSessionLocalStorage
     // can find — and wipe — a legacy plaintext session on first run.
+    _backendHost = uri.host.toLowerCase();
     await Supabase.initialize(
       url: cleanUrl,
       publishableKey: cleanKey,
@@ -83,6 +84,16 @@ class TankSyncClient {
     );
     _initialized = true;
   }
+
+  /// #4047 — host of the backend [init] connected to. Local sync state
+  /// (queued deletions, after-wipe retention) is scoped by backend AND
+  /// account, because a self-hoster can repoint the app at a different
+  /// project sharing the same account id space, and neither half alone
+  /// separates those. Null before [init].
+  static String? _backendHost;
+
+  /// The backend host the client is connected to, or null before [init].
+  static String? get backendHost => _backendHost;
 
   /// The underlying Supabase client, or `null` if [init] has not been called.
   static SupabaseClient? get client =>
