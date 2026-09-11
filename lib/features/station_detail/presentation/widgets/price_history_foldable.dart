@@ -42,6 +42,10 @@ class PriceHistoryFoldable extends ConsumerWidget {
       clipBehavior: Clip.antiAlias,
       child: ExpansionTile(
         title: Text(l10n.priceHistory, style: theme.textTheme.titleMedium),
+        // #4076 — the most useful numbers on the page were behind the tap.
+        // The collapsed header now carries the stats row for the first
+        // fuel with data; the chart stays behind the fold.
+        subtitle: PriceHistoryCollapsedStats(stationId: stationId),
         childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         children: [PriceHistorySection(stationId: stationId, station: station)],
       ),

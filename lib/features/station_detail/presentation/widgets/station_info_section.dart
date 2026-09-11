@@ -88,26 +88,9 @@ class StationInfoSection extends StatelessWidget {
           const SizedBox(height: 12),
         ],
 
-        // Location info
-        if (station.department != null || station.region != null) ...[
-          SectionHeader(title: l10n.zone, padding: EdgeInsets.zero),
-          const SizedBox(height: 8),
-          ListTile(
-            dense: true,
-            leading: const Icon(Icons.map),
-            title: Text(
-              [
-                station.department,
-                station.region,
-              ].whereType<String>().join(', '),
-            ),
-            subtitle: station.stationType == 'A'
-                ? Text(l10n.highway)
-                : Text(l10n.localStation),
-          ),
-          const SizedBox(height: 12),
-        ],
-
+        // #4076 — the former "Zone" section lives in the brand header
+        // now (`Hérault, Occitanie · Local station`), one line under the
+        // address instead of a heading, an icon and a tile.
         // #3928 — ONE deduplicated "Amenities & services" section. The
         // typed amenity chips and the raw API service strings used to be
         // two blocks saying the same thing twice (`Lavage · Air · DAB`

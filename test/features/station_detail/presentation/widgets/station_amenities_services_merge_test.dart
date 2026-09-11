@@ -17,6 +17,18 @@ void main() {
       expect(normaliseAmenityKey('Relais colis'), 'relaiscolis');
     });
 
+    // #4076 — the shapes from the Pézenas screenshot: compounds whose
+    // normalised form contains a synonym but never equals one.
+    test('folds compound phrases onto the typed amenity (#4076)', () {
+      expect(normaliseAmenityKey('Station de gonflage'), 'airpump');
+      expect(normaliseAmenityKey('DAB (Distributeur automatique de billets)'),
+          'atm');
+      expect(normaliseAmenityKey('Station de lavage automatique'), 'carwash');
+      // Short keys stay exact-only: no false match inside another word.
+      expect(normaliseAmenityKey('Aire de repos'), 'airederepos');
+      expect(normaliseAmenityKey('Carburant additivé'), 'carburantadditive');
+    });
+
     test('folds the synonyms the upstream APIs actually emit', () {
       expect(normaliseAmenityKey('Station de lavage'), 'carwash');
       expect(normaliseAmenityKey('Lavage'), 'carwash');

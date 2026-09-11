@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/widgets/section_card.dart';
+import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/star_rating.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/providers/station_rating_provider.dart';
@@ -26,9 +26,13 @@ class StationRatingSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
-    return SectionCard(
-      title: l10n.yourRating,
-      child: Consumer(
+    // #4076 — a header and a row of stars, not a card that is 80 % padding.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(title: l10n.yourRating, padding: EdgeInsets.zero),
+        const SizedBox(height: 4),
+        Consumer(
         builder: (context, ref, _) {
           final rating = ref.watch(stationRatingProvider(stationId));
           return Row(
@@ -50,7 +54,8 @@ class StationRatingSection extends StatelessWidget {
             ],
           );
         },
-      ),
+        ),
+      ],
     );
   }
 }

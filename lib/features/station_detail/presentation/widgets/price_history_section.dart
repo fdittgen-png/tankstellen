@@ -223,7 +223,7 @@ class _PriceHistorySectionState extends ConsumerState<PriceHistorySection> {
   List<Widget> _allFuelPanels(BuildContext context) {
     final history = ref.watch(priceHistoryProvider(widget.stationId));
     final panels = <Widget>[];
-    for (final fuel in _allFuelTypes) {
+    for (final fuel in kPriceHistoryFuelTypes) {
       final stats = ref.watch(priceStatsProvider(widget.stationId, fuel));
       if (stats.current == null && stats.min == null) continue;
       final plottable = history
@@ -257,15 +257,6 @@ class _PriceHistorySectionState extends ConsumerState<PriceHistorySection> {
     return panels;
   }
 
-  static const _allFuelTypes = [
-    FuelType.e5,
-    FuelType.e10,
-    FuelType.diesel,
-    FuelType.e98,
-    FuelType.e85,
-    FuelType.lpg,
-    FuelType.cng,
-  ];
 
   FuelType _pickFuelType(List<PriceRecord> history) {
     if (history.isEmpty) return FuelType.diesel;
@@ -336,3 +327,38 @@ double? _priceOf(PriceRecord record, FuelType fuelType) => switch (fuelType) {
       FuelTypeCng() => record.cng,
       FuelTypeHydrogen() || FuelTypeElectric() || FuelTypeAll() => null,
     };
+
+/// The fuel types the history is broken down by — shared by the section
+/// and the foldable's collapsed header (#4076).
+const kPriceHistoryFuelTypes = [
+    FuelType.e5,
+    FuelType.e10,
+    FuelType.diesel,
+    FuelType.e98,
+    FuelType.e85,
+    FuelType.lpg,
+    FuelType.cng,
+  ];
+
+/// #4076 — the foldable's collapsed header: the stats row for the first
+/// fuel type with a current price, or nothing (the header stays a plain
+/// title when there is no history). Lives here, next to the section that
+/// already owns the price-history provider import, so the foldable adds no
+/// cross-feature edge (feature_boundary ratchet).
+class PriceHistoryCollapsedStats extends ConsumerWidget {
+  final String stationId;
+  const PriceHistoryCollapsedStats({super.key, required this.stationId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    for (final fuel in kPriceHistoryFuelTypes) {
+      final stats = ref.watch(priceStatsProvider(stationId, fuel));
+      if (stats.current == null) continue;
+      return Padding(
+        padding: const EdgeInsets.only(top: 6),
+        child: PriceHistoryStatsRow(stats: stats),
+      );
+    }
+    return const SizedBox.shrink();
+  }
+}
