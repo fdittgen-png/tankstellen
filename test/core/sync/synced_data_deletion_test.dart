@@ -52,7 +52,7 @@ void main() {
     final ok = await SyncedDataDeletion.delete(SyncedDataCategory.trips,
         transport: t);
 
-    expect(ok, isTrue);
+    expect(ok, SyncedDataDeletionOutcome.deleted);
     expect(t.tables['trip_summaries'], isEmpty);
     expect(t.tables['trip_details'], isEmpty);
     expect(t.tables['vehicles'], hasLength(1),
@@ -86,14 +86,14 @@ void main() {
     expect(
         await SyncedDataDeletion.delete(SyncedDataCategory.vehicles,
             transport: t),
-        isTrue);
+        SyncedDataDeletionOutcome.deleted);
     expect(t.tables['vehicles'], isEmpty);
     expect(t.tables['fill_ups'], hasLength(1));
 
     expect(
         await SyncedDataDeletion.delete(SyncedDataCategory.fillUps,
             transport: t),
-        isTrue);
+        SyncedDataDeletionOutcome.deleted);
     expect(t.tables['fill_ups'], isEmpty);
     expect(t.tables['trip_summaries'], hasLength(1),
         reason: 'trips untouched by the other categories');
@@ -109,7 +109,7 @@ void main() {
     final ok = await SyncedDataDeletion.delete(SyncedDataCategory.everything,
         transport: t);
 
-    expect(ok, isTrue);
+    expect(ok, SyncedDataDeletionOutcome.deleted);
     for (final table in SyncedDataDeletion
         .categoryTables[SyncedDataCategory.everything]!) {
       expect(t.tables[table] ?? const [], isEmpty,
@@ -134,13 +134,14 @@ void main() {
     );
   });
 
-  test('unauthenticated → returns false without throwing', () async {
+  test('unauthenticated → returns failed without throwing', () async {
     // No injected transport and no live session → currentOrNull() is null.
     expect(
-        await SyncedDataDeletion.delete(SyncedDataCategory.trips), isFalse);
+        await SyncedDataDeletion.delete(SyncedDataCategory.trips),
+        SyncedDataDeletionOutcome.failed);
   });
 
-  test('a failing table is isolated: returns false, the rest is still '
+  test('a failing table is isolated: returns failed, the rest is still '
       'wiped, nothing throws', () async {
     final t = serverWith(trips: ['trip-a'], vehicles: ['v-1']);
     t.failDeletes = true;
@@ -148,11 +149,26 @@ void main() {
     final ok = await SyncedDataDeletion.delete(SyncedDataCategory.trips,
         transport: t);
 
-    expect(ok, isFalse);
+    expect(ok, SyncedDataDeletionOutcome.failed);
     // Tombstones were still recorded (tombstone-first): even a failed row
     // delete stays dead across devices.
     expect(
         t.upsertedRows('deletions').map((r) => r['record_id']),
         contains('trip-a'));
+  });
+
+  // #4059 — the rows are gone; only the tombstone is still queued. That
+  // is success with a footnote, and it used to be reported as failure.
+  test('rows deleted but the tombstone upload failed → '
+      'deletedTombstonePending, not failed', () async {
+    final t = serverWith(trips: ['trip-a']);
+    t.failUpserts = true; // the deletions upsert is the one that fails
+
+    final outcome = await SyncedDataDeletion.delete(SyncedDataCategory.trips,
+        transport: t);
+
+    expect(outcome, SyncedDataDeletionOutcome.deletedTombstonePending);
+    expect(t.tables['trip_summaries'], isEmpty,
+        reason: 'the deletion the user asked for did happen');
   });
 }

@@ -114,6 +114,13 @@ class DeletionsSync {
   /// actionable exactly once.
   static bool _breadcrumbedAbsentThisSession = false;
 
+  /// #4059 — whether this session has seen `public.deletions` missing on
+  /// the backend (a self-host on a schema before v3). A tombstone cannot
+  /// land there, ever, so the user should be told to re-run the setup SQL
+  /// rather than that the deletion failed.
+  static bool get deletionsTableAbsentThisSession =>
+      _breadcrumbedAbsentThisSession;
+
   static void _breadcrumbDeletionsAbsent() {
     if (_breadcrumbedAbsentThisSession) return;
     _breadcrumbedAbsentThisSession = true;
