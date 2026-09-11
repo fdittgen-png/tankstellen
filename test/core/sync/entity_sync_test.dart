@@ -3,6 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/sync/entity_sync.dart';
+import 'package:tankstellen/core/sync/sync_row_ops.dart';
 import 'package:tankstellen/core/sync/pending_deletions_journal.dart';
 import 'package:tankstellen/core/sync/sync_device_identity.dart';
 
@@ -92,7 +93,7 @@ void main() {
     });
   });
 
-  group('EntitySync.deleteRow', () {
+  group('SyncRowOps.deleteRow', () {
     test('tombstone-first: tombstone lands even when the row delete fails',
         () async {
       final fake = FakeSyncTransport(tables: {
@@ -102,7 +103,7 @@ void main() {
       })
         ..failDeletes = true;
 
-      final ok = await EntitySync.deleteRow(
+      final ok = await SyncRowOps.deleteRow(
         table: 'favorites',
         idColumn: 'station_id',
         recordId: 'st-1',
@@ -124,7 +125,7 @@ void main() {
         ],
       });
 
-      final ok = await EntitySync.deleteRow(
+      final ok = await SyncRowOps.deleteRow(
         table: 'favorites',
         idColumn: 'station_id',
         recordId: 'st-1',
@@ -141,7 +142,7 @@ void main() {
         'records the tombstone on a failed delete', () async {
       final fake = FakeSyncTransport()..failDeletes = true;
 
-      final ok = await EntitySync.deleteRow(
+      final ok = await SyncRowOps.deleteRow(
         table: 'alerts',
         idColumn: 'id',
         recordId: 'a-1',
@@ -156,7 +157,7 @@ void main() {
 
     test('unauthenticated path is a no-op returning false', () async {
       await expectLater(
-        EntitySync.deleteRow(
+        SyncRowOps.deleteRow(
           table: 'favorites',
           idColumn: 'station_id',
           recordId: 'st-1',
@@ -169,7 +170,7 @@ void main() {
 
   group('EntitySync shared codec helpers', () {
     test('forensicStamps carries the #3125 device identity', () {
-      expect(EntitySync.forensicStamps(), {
+      expect(SyncRowOps.forensicStamps(), {
         'device_id': 'device-under-test',
         'app_version': SyncDeviceIdentity.appVersion,
       });
@@ -177,13 +178,13 @@ void main() {
 
     test('lwwStamp carries the local edit stamp in UTC (#3124)', () {
       final edited = DateTime.utc(2026, 6, 1, 12);
-      expect(EntitySync.lwwStamp(edited), edited.toIso8601String());
+      expect(SyncRowOps.lwwStamp(edited), edited.toIso8601String());
       // Legacy unstamped record → upload-time fallback, still UTC.
-      expect(EntitySync.lwwStamp(null), endsWith('Z'));
+      expect(SyncRowOps.lwwStamp(null), endsWith('Z'));
     });
 
     test('jsonbDataDecoder skips a corrupt row instead of throwing', () {
-      final decode = EntitySync.jsonbDataDecoder<String>(
+      final decode = SyncRowOps.jsonbDataDecoder<String>(
         (json) => json['name'] as String,
         where: 'EntitySyncTest decode failed',
       );

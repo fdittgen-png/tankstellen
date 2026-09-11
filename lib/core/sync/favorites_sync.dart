@@ -4,6 +4,7 @@
 import '../data/storage_repository.dart';
 import '../services/non_fuel_station_guard.dart';
 import 'entity_sync.dart';
+import 'sync_row_ops.dart';
 import 'sync_events.dart';
 import 'sync_transport.dart';
 
@@ -95,7 +96,7 @@ class FavoritesSync {
       'kind': r.kind.wire,
       'data': r.data == null
           ? null
-          : {...r.data!, ...EntitySync.forensicStamps()},
+          : {...r.data!, ...SyncRowOps.forensicStamps()},
       'station_name': r.data?['name'] is String ? r.data!['name'] : null,
     },
     decode: _decodeRow,

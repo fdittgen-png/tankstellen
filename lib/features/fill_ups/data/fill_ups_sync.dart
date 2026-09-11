@@ -3,12 +3,13 @@
 
 import '../domain/entities/fill_up.dart';
 import '../../../core/sync/entity_sync.dart';
+import '../../../core/sync/sync_row_ops.dart';
 import '../../../core/sync/sync_isolate_decode.dart';
 import '../../../core/sync/sync_transport.dart';
 
 /// #3451 — top-level PURE `compute()` entrypoint (no Hive / plugins /
 /// logging, so it can run on a worker isolate). Behaviour mirrors
-/// [EntitySync.jsonbDataDecoder]: a missing or corrupt `data` blob maps to
+/// [SyncRowOps.jsonbDataDecoder]: a missing or corrupt `data` blob maps to
 /// `null` and is skipped by the merge (the corrupt count stays observable
 /// through the merge's downloaded-row delta).
 List<FillUp?> decodeFillUpDataRows(List<Map<String, dynamic>> rows) => [
@@ -56,13 +57,13 @@ class FillUpsSync {
       // #3125 — forensic origin stamps ride INSIDE the JSONB blob
       // (sync-transparent: decode ignores unknown keys, every re-upload
       // re-stamps with the writing device).
-      'data': {...f.toJson(), ...EntitySync.forensicStamps()},
+      'data': {...f.toJson(), ...SyncRowOps.forensicStamps()},
       // Carry the local edit stamp so the next LWW compare sees equal
       // stamps (skip) instead of a phantom-newer server row. Legacy
       // unstamped records fall back to upload time.
-      'updated_at': EntitySync.lwwStamp(f.updatedAt),
+      'updated_at': SyncRowOps.lwwStamp(f.updatedAt),
     },
-    decode: EntitySync.jsonbDataDecoder(
+    decode: SyncRowOps.jsonbDataDecoder(
       FillUp.fromJson,
       where: 'FillUpsSync.merge decode failed',
     ),

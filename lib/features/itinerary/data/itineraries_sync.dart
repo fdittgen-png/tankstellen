@@ -10,6 +10,7 @@ import '../domain/entities/saved_itinerary.dart';
 import '../../../core/utils/json_extensions.dart';
 import '../../../core/sync/deletions_sync.dart';
 import '../../../core/sync/entity_sync.dart';
+import '../../../core/sync/sync_row_ops.dart';
 import '../../../core/sync/sync_helper.dart';
 import '../../../core/sync/sync_transport.dart';
 
@@ -23,7 +24,7 @@ import '../../../core/sync/sync_transport.dart';
 /// happens at the caller (the itinerary provider unions the local list
 /// with `fetchAll`'s return before rendering). Since #3127 the I/O
 /// rides the injectable [SyncTransport] seam and the delete shares
-/// [EntitySync.deleteRow].
+/// [SyncRowOps.deleteRow].
 class ItinerariesSync {
   ItinerariesSync._();
 
@@ -124,9 +125,9 @@ class ItinerariesSync {
   /// Delete a single itinerary from the server. Returns `true` on
   /// success, `false` when unauthenticated or the delete fails.
   /// Tombstone-first (journal-backed, #3078/#3123) via the shared
-  /// [EntitySync.deleteRow].
+  /// [SyncRowOps.deleteRow].
   static Future<bool> delete(String itineraryId, {SyncTransport? transport}) =>
-      EntitySync.deleteRow(
+      SyncRowOps.deleteRow(
         table: _table,
         idColumn: 'id',
         recordId: itineraryId,

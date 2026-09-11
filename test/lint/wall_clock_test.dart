@@ -74,7 +74,9 @@ void main() {
     // owning features; keys follow the files, counts unchanged.
     'lib/features/trips/data/baselines_sync.dart': 1,
     'lib/core/sync/deletions_sync.dart': 1,
-    'lib/core/sync/entity_sync.dart': 1,
+    // #4046/#4047 — entity_sync.dart drops to ZERO: its only raw read was
+    // `lwwStamp`'s fallback, which moved into sync_row_ops.dart and now
+    // reads through the AppClock seam. Ratchet-down, entry deleted.
     'lib/features/itinerary/data/itineraries_sync.dart': 5,
     'lib/core/sync/price_history_sync.dart': 1,
     'lib/core/sync/ratings_sync.dart': 2,
