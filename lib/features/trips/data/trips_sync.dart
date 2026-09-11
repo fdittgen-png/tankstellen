@@ -14,6 +14,7 @@ import 'trips_sync_json.dart';
 import 'trips_sync_rows.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/logging/app_log.dart';
+import '../../../core/sync/sync_row_ops.dart';
 
 /// Per-trip-summary sync with Supabase (#1479 phase 2).
 ///
@@ -109,7 +110,7 @@ class TripsSync {
         'id': entry.id,
         'user_id': userId,
         'data': tripDetailsJson(entry),
-        'updated_at': DateTime.now().toUtc().toIso8601String(),
+        'updated_at': SyncRowOps.lwwStamp(null),
       }, onConflict: 'user_id,id');
       debugPrint('TripsSync.uploadDetails: uploaded ${entry.id}');
     } catch (e, st) {

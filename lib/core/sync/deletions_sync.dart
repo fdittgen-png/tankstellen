@@ -11,6 +11,7 @@ import 'sync_transport.dart';
 import '../../core/logging/error_logger.dart';
 import '../../core/logging/app_log.dart';
 import '../telemetry/collectors/breadcrumb_collector.dart';
+import 'sync_row_ops.dart';
 
 /// Deletion tombstones (#3078, Epic #3075).
 ///
@@ -77,7 +78,7 @@ class DeletionsSync {
     final t = transport ?? SupabaseSyncTransport.currentOrNull();
     if (t == null) return false;
 
-    final now = DateTime.now().toUtc().toIso8601String();
+    final now = SyncRowOps.lwwStamp(null);
     final rows = ids
         .map((id) => {
               'user_id': t.userId,

@@ -54,7 +54,7 @@ class RatingsSync {
             'station_id': stationId,
             'rating': rating,
             'is_shared': shared,
-            'updated_at': DateTime.now().toUtc().toIso8601String(),
+            'updated_at': SyncRowOps.lwwStamp(null),
           },
         ],
         onConflict: 'user_id,station_id',
@@ -83,7 +83,7 @@ class RatingsSync {
     final t = transport ?? SupabaseSyncTransport.currentOrNull();
     if (t == null) return;
 
-    final now = DateTime.now().toUtc().toIso8601String();
+    final now = SyncRowOps.lwwStamp(null);
     final rows = ratings.entries
         .map((e) => {
               'user_id': t.userId,

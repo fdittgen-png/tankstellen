@@ -55,7 +55,8 @@ class ItinerariesSync {
             'avoid_highways': itinerary.avoidHighways,
             'fuel_type': itinerary.fuelType,
             'selected_station_ids': itinerary.selectedStationIds,
-            'updated_at': DateTime.now().toUtc().toIso8601String(),
+            // #4065 — carry the model's own edit stamp (LWW + AppClock seam).
+            'updated_at': SyncRowOps.lwwStamp(itinerary.updatedAt),
           },
         ],
         onConflict: 'id',
