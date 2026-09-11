@@ -630,6 +630,28 @@ void main() {
               'in the deferred window must skip it');
     });
 
+    // #4067 — a warn about another box's failed close lands in the error
+    // spool, which lazily re-opens `isolate_error_spool`. The spool must
+    // therefore be the LAST box closed, after every warn has gone out.
+    test('the error spool closes last, and still closes when another box '
+        'refuses to (#4067)', () async {
+      HiveIsolateOwnership.resetForTest();
+      // feature_flags is declared Box<dynamic> in the isolate set; opening
+      // it as Box<String> makes its close throw — the failure path.
+      await Hive.openBox<String>('feature_flags');
+      await Hive.openBox<String>('isolate_error_spool');
+
+      await HiveStorage.closeIsolateBoxes();
+
+      expect(Hive.isBoxOpen('isolate_error_spool'), isFalse,
+          reason: 'the spool is released even when an earlier close failed');
+      expect(Hive.isBoxOpen('feature_flags'), isTrue,
+          reason: 'the mismatched box could not be closed — and that '
+              'failure must not have re-opened the spool');
+      await Hive.box<String>('feature_flags').close();
+      await HiveStorage.initForTest();
+    });
+
     // #4053 — the drift guard. The open set and the close set were two
     // hand-written lists and had drifted in both directions at once:
     // `profiles` missing from the close list (silent leak) and

@@ -86,15 +86,17 @@ class HiveIsolateBoxes {
     // #579 — velocity detector reads/writes snapshots from the BG
     // isolate, mirroring the main-isolate open above.
     _IsolateBox<String>(HiveBoxes.priceSnapshots),
-    // #1105 — isolate error spool: background-isolate errors written
-    // here while Riverpod is unavailable, drained by the foreground
-    // initialiser into TraceRecorder.
-    _IsolateBox<String>(HiveBoxes.isolateErrorSpool),
     // #2866 — feature flags (uncipher'd, mirroring the foreground open) so
     // the background scan can read the developer-mode flag to dev-gate the
     // #2824 data-access trace export. Best-effort; the scan no-ops the
     // trace if this is unavailable.
     _IsolateBox<dynamic>(HiveBoxes.featureFlags),
+    // #1105 — isolate error spool: background-isolate errors written
+    // here while Riverpod is unavailable, drained by the foreground
+    // initialiser into TraceRecorder. #4067 — LAST on purpose: a warn
+    // about any other box's close routes into this spool and would
+    // re-open it, so every warn is emitted before this one closes.
+    _IsolateBox<String>(HiveBoxes.isolateErrorSpool),
   ];
 
   /// The names [initInIsolate] opens — the drift-guard test reads this.
@@ -125,14 +127,38 @@ class HiveIsolateBoxes {
   /// A true spawned `dart:isolate` worker never ran `init`, so its registry
   /// is empty and every [initInIsolate] handle is still closed.
   static Future<void> closeIsolateBoxes() async {
+    // #4067 — collect first, warn second, close the spool third. In a
+    // background isolate `log.warn` lands in IsolateErrorSpool, which
+    // lazily re-opens `isolate_error_spool`; warning while walking used to
+    // re-open the very handle this walk had just released.
+    final failures = <(String, Object, StackTrace)>[];
     for (final box in _boxes) {
+      if (box.name == HiveBoxes.isolateErrorSpool) continue;
       if (HiveIsolateOwnership.isOwned(box.name)) continue;
       try {
         await box.closeIfOpen();
       } catch (e, st) {
-        log.warn('HiveIsolateBoxes: failed to close box "${box.name}"',
-            error: e, stack: st, layer: ErrorLayer.storage);
+        failures.add((box.name, e, st));
       }
+    }
+    for (final (name, e, st) in failures) {
+      log.warn('HiveIsolateBoxes: failed to close box "$name"',
+          error: e, stack: st, layer: ErrorLayer.storage);
+    }
+    // The spool itself, last. If THIS close fails the spool is still
+    // open, so the warn below re-opens nothing — it is the one warn that
+    // cannot cause the #4067 leak.
+    // The spool itself, last. If THIS close fails the spool is still
+    // open, so the warn below re-opens nothing — it is the one warn that
+    // cannot cause the #4067 leak.
+    if (HiveIsolateOwnership.isOwned(HiveBoxes.isolateErrorSpool)) return;
+    try {
+      if (Hive.isBoxOpen(HiveBoxes.isolateErrorSpool)) {
+        await Hive.box<String>(HiveBoxes.isolateErrorSpool).close();
+      }
+    } catch (e, st) {
+      log.warn('HiveIsolateBoxes: failed to close the error spool',
+          error: e, stack: st, layer: ErrorLayer.storage);
     }
   }
 }
