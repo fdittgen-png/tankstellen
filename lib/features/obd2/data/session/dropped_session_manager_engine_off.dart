@@ -69,10 +69,7 @@ extension DroppedSessionEngineOff on DroppedSessionManager {
     await stopReconnectScanner();
     _note(RecordingSessionEventKind.ended, 'engineOffParked');
     await _repos.finaliseToHistory(_host, dropReason: _dropReason?.name);
-    _host.degradedGpsOnly = false;
-    _host.pausedDueToDrop = false;
-    _host.stopped = true;
-    _host.started = false;
+    _host.finalise(); // #4068 — one terminal transition, shared
     _host.emitState();
   }
 

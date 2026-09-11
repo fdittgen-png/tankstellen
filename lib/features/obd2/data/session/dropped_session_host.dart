@@ -101,10 +101,18 @@ abstract class DroppedSessionHost {
   bool get gpsAlive;
 
   bool get stopped;
-  set stopped(bool value);
 
   bool get started;
-  set started(bool value);
+
+  /// #4068 — the ONE terminal transition for an auto-finalised trip.
+  /// Two hand-rolled finalisers (grace-window expiry and engine-off)
+  /// used to write the flags independently and disagreed on
+  /// `degradedGpsOnly`, and neither cleared the user pause. The
+  /// controller's adapter routes this to `TripRunState.end()` — the same
+  /// transition the user's own stop takes — which is why the `stopped` /
+  /// `started` setters no longer exist on this contract: nothing outside
+  /// that transition may write them.
+  void finalise();
 
   /// True while the user has tapped pause — read so a silent reconnect
   /// respects a pause that landed during the window.

@@ -312,9 +312,7 @@ class DroppedSessionManager {
     await stopReconnectScanner();
     _note(RecordingSessionEventKind.ended, 'graceWindowExpiry'); // #3795
     await _repos.finaliseToHistory(_host, dropReason: _dropReason?.name);
-    _host.pausedDueToDrop = false;
-    _host.stopped = true;
-    _host.started = false;
+    _host.finalise(); // #4068 — one terminal transition, shared
     _graceTimer = null;
     _host.emitState();
   }

@@ -201,6 +201,16 @@ class _Scanner implements Obd2ReattachSource {
 }
 
 class _Host implements DroppedSessionHost {
+  // #4068 — the shared terminal transition (the real adapter routes it
+  // to TripRunState.end()).
+  @override
+  void finalise() {
+    stopped = true;
+    started = false;
+    pausedDueToDrop = false;
+    degradedGpsOnly = false;
+  }
+
   int stopSchedulerCalls = 0;
   int pauseSchedulerCalls = 0;
   int resumeSchedulerCalls = 0;

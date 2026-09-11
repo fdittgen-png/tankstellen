@@ -697,6 +697,16 @@ void main() {
 /// real controller's resume() does, so the manager's reconnect path can
 /// be asserted end-to-end.
 class _FakeHost implements DroppedSessionHost {
+  // #4068 — the shared terminal transition (the real adapter routes it
+  // to TripRunState.end()).
+  @override
+  void finalise() {
+    stopped = true;
+    started = false;
+    pausedDueToDrop = false;
+    degradedGpsOnly = false;
+  }
+
   int stopSchedulerCalls = 0;
   int pauseSchedulerCalls = 0;
   int resumeSchedulerCalls = 0;

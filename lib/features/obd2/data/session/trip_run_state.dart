@@ -60,6 +60,10 @@ class TripRunState {
     _stopped = true;
     _pausedDueToDrop = false;
     _degradedGpsOnly = false;
+    // #4068 — a user pause must not outlive the trip: `isPaused` reads
+    // this flag, and a paused trip that grace-finalised reported
+    // "stopped AND paused" to the tile and the notification.
+    _paused = false;
   }
 
   /// The user paused. No-op unless the trip is running and not already
