@@ -68,6 +68,16 @@ class NotificationPayload {
   /// before the schema existed).
   static NotificationPayload? tryDecode(String? raw) {
     if (raw == null || raw.isEmpty) return null;
+    // #4054 — the tap dispatcher is SHARED. The trip tile sends
+    // `trip_action:trip_stop` / `trip_action:trip_pause` through the same
+    // channel, and its own listener handles them correctly. Those
+    // payloads are simply not addressed to this decoder, and running
+    // `jsonDecode` on them logged a fabricated FormatException into the
+    // user's exportable error log on every Stop or Pause tap — noise on
+    // the one surface they send us when something is actually wrong.
+    // A payload that does not even open a JSON object is "not mine", not
+    // "mine and corrupt"; only the latter is worth a trace.
+    if (!_looksLikeJsonObject(raw)) return null;
     try {
       final decoded = jsonDecode(raw);
       if (decoded is! Map) return null;
@@ -87,6 +97,11 @@ class NotificationPayload {
       return null;
     }
   }
+
+  /// True when [raw] opens a JSON object, i.e. it is plausibly one of
+  /// ours. Cheap structural check, deliberately not a parse: it only has
+  /// to separate a foreign payload from a malformed one.
+  static bool _looksLikeJsonObject(String raw) => raw.trimLeft().startsWith('{');
 
   /// Resolve to the router path the deep-link should push.
   ///

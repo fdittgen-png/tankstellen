@@ -1,10 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/domain/ev/charging_station.dart';
+import '../../core/logging/app_log.dart';
+import '../../core/logging/error_logger.dart';
 import '../../core/navigation/app_routes.dart';
 import '../../core/storage/storage_providers.dart';
 import '../../features/ev/data/repositories/ev_station_repository.dart';
@@ -43,14 +46,27 @@ List<RouteBase> stationRoutes(Ref ref) => [
         // Feature.evCharging finally gates the EV surfaces (2026-08-17
         // review, dead-code finding 6). Default-on.
         pageBuilder: (context, state) {
-          final station = state.extra as ChargingStation;
+          // #4052 — was `state.extra as ChargingStation`, an unchecked
+          // cast that red-screened whenever the payload arrived as
+          // anything else. Field log 2026-09-11: `_Map<String, dynamic>
+          // is not a subtype of ChargingStation`, thrown inside
+          // `pageBuilder` where no error boundary catches it. The same
+          // export carries 34 low-memory process kills in three days,
+          // and a restored route stack hands the payload back as JSON —
+          // so this is downstream of ordinary Android behaviour, not of
+          // anything the user did. Recover the station when the payload
+          // still describes one; fall back to the graceful screen the
+          // id-only sibling route below already uses. Never throw.
+          final station = evStationFromExtra(state.extra);
           return detailTransitionPage(
             key: state.pageKey,
-            child: FeatureGatedScreen(
-              feature: Feature.evCharging,
-              fallbackPath: RoutePaths.search,
-              child: EVStationDetailScreen(station: station),
-            ),
+            child: station == null
+                ? invalidIdScreen(context, state.matchedLocation)
+                : FeatureGatedScreen(
+                    feature: Feature.evCharging,
+                    fallbackPath: RoutePaths.search,
+                    child: EVStationDetailScreen(station: station),
+                  ),
           );
         },
       ),
@@ -98,3 +114,41 @@ List<RouteBase> stationRoutes(Ref ref) => [
 // `hydrateEvStationById` moved to `ev_station_repository.dart` (#3455) so
 // the stationDetail provider's ocm-id routing reuses the same cache-lookup
 // path as this deep-link route. Imported above; behaviour unchanged.
+
+/// Recover the [ChargingStation] a `/ev-station` navigation carried in
+/// `extra`, or `null` when the payload no longer describes one (#4052).
+///
+/// The route exists for callers that already hold the object — the map
+/// overlay, search results, favorites — so the live instance is the hot
+/// path. It is not the only path. `extra` is an untyped `Object?` that
+/// survives a route stack being rebuilt, and a payload that has been
+/// through serialisation comes back as a plain `Map`, not as the class.
+/// The field log of 2026-09-11 caught exactly that, as an unhandled cast
+/// inside `pageBuilder` — a red screen in answer to "show me this
+/// charger", on a device the OS had killed 34 times in three days.
+///
+/// Decoding the map back into a station means those users still land on
+/// the charger they asked for. A payload that is neither a station nor a
+/// station-shaped map is genuinely unusable, and the caller shows the
+/// same graceful screen the id-only route uses for an unknown id.
+///
+/// Never throws: a malformed map is a `null`, not an exception.
+@visibleForTesting
+ChargingStation? evStationFromExtra(Object? extra) {
+  if (extra is ChargingStation) return extra;
+  if (extra is Map) {
+    try {
+      return ChargingStation.fromJson(Map<String, dynamic>.from(extra));
+    } catch (e, st) {
+      log.warn(
+          'station_routes: /ev-station payload was a Map but did not decode '
+          'into a ChargingStation — showing the unknown-station screen',
+          tag: 'navigation',
+          error: e,
+          stack: st,
+          layer: ErrorLayer.ui);
+      return null;
+    }
+  }
+  return null;
+}

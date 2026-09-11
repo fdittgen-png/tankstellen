@@ -197,4 +197,68 @@ void main() {
       expect(result, isNull);
     });
   });
+
+  /// #4052 — `/ev-station` carried `state.extra as ChargingStation`, an
+  /// unchecked cast inside `pageBuilder` where no error boundary catches
+  /// it. The field log of 2026-09-11 has it as
+  /// `_Map<String, dynamic> is not a subtype of ChargingStation` — a red
+  /// screen in answer to "show me this charger".
+  ///
+  /// The same export carries 34 low-memory process kills in three days,
+  /// and a rebuilt route stack hands the payload back as JSON rather than
+  /// as the live object. So the map case is not exotic: it is the normal
+  /// consequence of Android reclaiming the app.
+  group('#4052 — /ev-station recovers a payload that is not a live object',
+      () {
+    const station = ChargingStation(
+      id: 'ocm-987654',
+      name: 'IONITY Pézenas',
+      operator: 'IONITY',
+      latitude: 43.4672,
+      longitude: 3.4242,
+      dist: 1.1,
+      address: 'A75 Aire de Pézenas',
+      postCode: '34120',
+      place: 'Pézenas',
+      totalPoints: 6,
+      isOperational: true,
+    );
+
+    test('the live object is passed straight through — the hot path', () {
+      expect(evStationFromExtra(station), same(station));
+    });
+
+    test('a serialised payload is decoded back into the same station', () {
+      // Exactly the shape the crash reported: the object round-tripped
+      // through JSON, arriving as Map<String, dynamic>.
+      final restored = evStationFromExtra(station.toJson());
+      expect(restored, isNotNull);
+      expect(restored!.id, station.id);
+      expect(restored.name, station.name);
+      expect(restored.latitude, station.latitude);
+      expect(restored.longitude, station.longitude);
+    });
+
+    test('a payload that is neither yields null, never an exception', () {
+      for (final extra in <Object?>[
+        null,
+        'ocm-987654',
+        42,
+        <String>['not', 'a', 'station'],
+      ]) {
+        expect(() => evStationFromExtra(extra), returnsNormally,
+            reason: '$extra');
+        expect(evStationFromExtra(extra), isNull, reason: '$extra');
+      }
+    });
+
+    test('a station-shaped map missing its required fields yields null',
+        () {
+      expect(
+        () => evStationFromExtra(<String, dynamic>{'unrelated': true}),
+        returnsNormally,
+      );
+      expect(evStationFromExtra(<String, dynamic>{'unrelated': true}), isNull);
+    });
+  });
 }

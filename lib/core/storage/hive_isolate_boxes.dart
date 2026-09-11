@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'hive_boxes.dart';
@@ -9,6 +10,42 @@ import 'hive_isolate_ownership.dart';
 import 'impl/hive_directory_resolver.dart';
 import '../logging/app_log.dart';
 import '../logging/error_logger.dart';
+
+/// One background-isolate box: its name, whether it is encrypted, and —
+/// carried in [T] — the value type it is opened at (#4053).
+///
+/// The type is the whole point of this class existing. `HiveIsolateBoxes`
+/// used to keep the open set and the close set as two hand-written lists,
+/// and both possible drifts had happened by the time the field log of
+/// 2026-09-11 was exported: `price_snapshots` and `isolate_error_spool`
+/// are opened as `Box<String>` but were closed through
+/// `Hive.box<dynamic>(name)`, which throws "already open and of type
+/// Box[String]" — 30 of that export's 48 traces, one pair per background
+/// scan, neither box ever released — while `profiles` was absent from the
+/// close list altogether and leaked in silence.
+///
+/// [open] and [closeIfOpen] both resolve `T` from the instance, so a
+/// `_IsolateBox<String>` sitting in a `List<_IsolateBox<Object?>>` list still
+/// closes at `Box<String>`. One list, walked in both directions: a box
+/// cannot be opened and then forgotten, nor closed at the wrong type.
+class _IsolateBox<T> {
+  const _IsolateBox(this.name, {this.ciphered = false});
+
+  final String name;
+  final bool ciphered;
+
+  Future<void> open(HiveAesCipher? cipher) async {
+    await Hive.openBox<T>(
+      name,
+      encryptionCipher: ciphered ? cipher : null,
+      compactionStrategy: HiveIsolateBoxes.neverCompact,
+    );
+  }
+
+  Future<void> closeIfOpen() async {
+    if (Hive.isBoxOpen(name)) await Hive.box<T>(name).close();
+  }
+}
 
 /// Background-isolate box lifecycle, split out of [HiveBoxes] (#3689).
 ///
@@ -30,7 +67,40 @@ class HiveIsolateBoxes {
   HiveIsolateBoxes._();
 
   /// #3689 — background isolates must never rename box files. See class doc.
-  static bool _neverCompact(int entries, int deletedEntries) => false;
+  static bool neverCompact(int entries, int deletedEntries) => false;
+
+  /// The ONE box set a background isolate opens — walked by
+  /// [initInIsolate] to open and by [closeIsolateBoxes] to close, so the
+  /// two can never disagree about membership or value type (#4053).
+  ///
+  /// Adding a box here is the only step needed; there is no second list
+  /// to remember.
+  static const List<_IsolateBox<Object?>> _boxes = [
+    _IsolateBox<dynamic>(HiveBoxes.settings, ciphered: true),
+    _IsolateBox<dynamic>(HiveBoxes.favorites, ciphered: true),
+    // #2205 — BG widget reads the profile.
+    _IsolateBox<dynamic>(HiveBoxes.profiles, ciphered: true),
+    _IsolateBox<dynamic>(HiveBoxes.alerts, ciphered: true),
+    _IsolateBox<dynamic>(HiveBoxes.cache, ciphered: true),
+    _IsolateBox<dynamic>(HiveBoxes.priceHistory, ciphered: true),
+    // #579 — velocity detector reads/writes snapshots from the BG
+    // isolate, mirroring the main-isolate open above.
+    _IsolateBox<String>(HiveBoxes.priceSnapshots),
+    // #1105 — isolate error spool: background-isolate errors written
+    // here while Riverpod is unavailable, drained by the foreground
+    // initialiser into TraceRecorder.
+    _IsolateBox<String>(HiveBoxes.isolateErrorSpool),
+    // #2866 — feature flags (uncipher'd, mirroring the foreground open) so
+    // the background scan can read the developer-mode flag to dev-gate the
+    // #2824 data-access trace export. Best-effort; the scan no-ops the
+    // trace if this is unavailable.
+    _IsolateBox<dynamic>(HiveBoxes.featureFlags),
+  ];
+
+  /// The names [initInIsolate] opens — the drift-guard test reads this.
+  @visibleForTesting
+  static List<String> get isolateBoxNames =>
+      [for (final b in _boxes) b.name];
 
   /// Initialize Hive in a background isolate with proper encryption.
   static Future<void> initInIsolate() async {
@@ -39,28 +109,9 @@ class HiveIsolateBoxes {
     // parallel empty box set in Documents.
     await HiveDirectoryResolver.initHive();
     final cipher = await HiveCipherLoader.loadGuarded();
-    Future<Box<T>> open<T>(String name, {HiveAesCipher? boxCipher}) =>
-        Hive.openBox<T>(name,
-            encryptionCipher: boxCipher, compactionStrategy: _neverCompact);
-    await open<dynamic>(HiveBoxes.settings, boxCipher: cipher);
-    await open<dynamic>(HiveBoxes.favorites, boxCipher: cipher);
-    // #2205 — BG widget reads the profile.
-    await open<dynamic>(HiveBoxes.profiles, boxCipher: cipher);
-    await open<dynamic>(HiveBoxes.alerts, boxCipher: cipher);
-    await open<dynamic>(HiveBoxes.cache, boxCipher: cipher);
-    await open<dynamic>(HiveBoxes.priceHistory, boxCipher: cipher);
-    // #579 — velocity detector reads/writes snapshots from the BG
-    // isolate, mirroring the main-isolate open above.
-    await open<String>(HiveBoxes.priceSnapshots);
-    // #1105 — isolate error spool: background-isolate errors written
-    // here while Riverpod is unavailable, drained by the foreground
-    // initialiser into TraceRecorder.
-    await open<String>(HiveBoxes.isolateErrorSpool);
-    // #2866 — feature flags (uncipher'd, mirroring the foreground open) so the
-    // background scan can read the developer-mode flag to dev-gate the #2824
-    // data-access trace export. Best-effort; the scan no-ops the trace if this
-    // is unavailable.
-    await open<dynamic>(HiveBoxes.featureFlags);
+    for (final box in _boxes) {
+      await box.open(cipher);
+    }
   }
 
   /// Close the Hive boxes opened by [initInIsolate] at the end of a
@@ -74,24 +125,12 @@ class HiveIsolateBoxes {
   /// A true spawned `dart:isolate` worker never ran `init`, so its registry
   /// is empty and every [initInIsolate] handle is still closed.
   static Future<void> closeIsolateBoxes() async {
-    final boxNames = [
-      HiveBoxes.settings,
-      HiveBoxes.favorites,
-      HiveBoxes.alerts,
-      HiveBoxes.cache,
-      HiveBoxes.priceHistory,
-      HiveBoxes.priceSnapshots,
-      HiveBoxes.isolateErrorSpool,
-      HiveBoxes.featureFlags,
-    ];
-    for (final name in boxNames) {
-      if (HiveIsolateOwnership.isOwned(name)) continue;
+    for (final box in _boxes) {
+      if (HiveIsolateOwnership.isOwned(box.name)) continue;
       try {
-        if (Hive.isBoxOpen(name)) {
-          await Hive.box<dynamic>(name).close();
-        }
+        await box.closeIfOpen();
       } catch (e, st) {
-        log.warn('HiveIsolateBoxes: failed to close box "$name"',
+        log.warn('HiveIsolateBoxes: failed to close box "${box.name}"',
             error: e, stack: st, layer: ErrorLayer.storage);
       }
     }
