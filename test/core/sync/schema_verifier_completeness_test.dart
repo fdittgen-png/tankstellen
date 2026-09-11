@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/sync/schema_sql.dart';
 import 'package:tankstellen/core/sync/schema_verifier.dart';
+import 'package:tankstellen/core/sync/user_data_sync.dart';
 
 /// #2929 — drift guard for the TankSync (self-hosted Supabase) schema.
 ///
@@ -46,6 +47,7 @@ void main() {
     'trip_shares',
     'content_reports',
     'deletions',
+    'wait_time_pings', // #4062 — map-routed, never a literal .from()
   };
 
   // Tables read only by server-side SQL (functions / triggers / RPCs), never
@@ -131,6 +133,24 @@ void main() {
         expect(block, contains('CREATE TABLE IF NOT EXISTS'),
             reason: 'every table block must be idempotent (IF NOT EXISTS)');
       }
+    });
+
+    // #4062 — HARD RULE 5's `.from('literal')` scan is blind to tables the
+    // client routes through a map or a parameter. UserDataSync reads and
+    // deletes `wait_time_pings` that way, and the wizard SQL shipped
+    // without the table for months. Every map-routed table must be in
+    // the authoritative set too.
+    test('every table UserDataSync routes by map is in the authoritative '
+        'set (#4062)', () {
+      final routed = {
+        ...UserDataSync.readableTables.keys,
+        ...UserDataSync.deletableTables.keys,
+      };
+      final unaccounted =
+          routed.difference(syncedTables).difference(serverOnlyTables);
+      expect(unaccounted, isEmpty,
+          reason: 'UserDataSync reads/deletes these tables but the wizard SQL '
+              'never creates them on a self-host: $unaccounted');
     });
 
     test('scans the sync sources — no .from() table is unaccounted for', () {

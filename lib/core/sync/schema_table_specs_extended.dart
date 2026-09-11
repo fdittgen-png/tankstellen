@@ -291,6 +291,38 @@ DROP POLICY IF EXISTS content_reports_delete_own ON public.content_reports;
 CREATE POLICY content_reports_delete_own ON public.content_reports
   FOR DELETE USING (reporter_user_id = auth.uid());''',
   ),
+  // #4062 — wait-time pings (#2650 crowd-sourced queue times). The client
+  // reads them for the GDPR export and deletes them on erasure through
+  // UserDataSync's table maps — never a literal `.from('wait_time_pings')`,
+  // which is how the wizard SQL shipped without the table for months: a
+  // wizard-provisioned self-host logged an error on every export.
+  (
+    name: 'wait_time_pings',
+    isRequired: false,
+    createSql: '''
+CREATE TABLE IF NOT EXISTS public.wait_time_pings (
+  id UUID NOT NULL DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  session_id UUID NOT NULL,
+  station_id TEXT NOT NULL,
+  country_code TEXT NOT NULL,
+  event_type TEXT NOT NULL CHECK (event_type IN ('arrived', 'left')),
+  recorded_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, id)
+);
+CREATE INDEX IF NOT EXISTS wait_time_pings_user_idx
+  ON public.wait_time_pings(user_id);
+CREATE INDEX IF NOT EXISTS wait_time_pings_station_recorded_idx
+  ON public.wait_time_pings(station_id, recorded_at);
+CREATE INDEX IF NOT EXISTS wait_time_pings_session_idx
+  ON public.wait_time_pings(session_id);
+''',
+    rlsPolicySql: '''
+-- Wait-time pings (#2650): a user reads, writes and deletes only their own.
+DROP POLICY IF EXISTS wait_time_pings_own ON public.wait_time_pings;
+CREATE POLICY wait_time_pings_own ON public.wait_time_pings
+  FOR ALL USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());''',
+  ),
   // #3078 — deletion tombstones. One row per deleted record so a delete on
   // one device doesn't resurrect from another's still-local copy through the
   // union merge. The owning sync class records a tombstone on delete and

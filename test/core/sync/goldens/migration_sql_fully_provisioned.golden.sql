@@ -1,4 +1,4 @@
--- TankSync Schema Setup (schema version 11)
+-- TankSync Schema Setup (schema version 12)
 -- Run this in your Supabase SQL Editor
 -- Dashboard → SQL Editor → New Query → Paste → Run
 
@@ -52,6 +52,7 @@ ALTER TABLE public.trip_summaries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.trip_details ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.trip_shares ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.content_reports ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.wait_time_pings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.deletions ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS users_own ON public.users;
@@ -184,6 +185,11 @@ CREATE POLICY content_reports_select_own ON public.content_reports
 DROP POLICY IF EXISTS content_reports_delete_own ON public.content_reports;
 CREATE POLICY content_reports_delete_own ON public.content_reports
   FOR DELETE USING (reporter_user_id = auth.uid());
+
+-- Wait-time pings (#2650): a user reads, writes and deletes only their own.
+DROP POLICY IF EXISTS wait_time_pings_own ON public.wait_time_pings;
+CREATE POLICY wait_time_pings_own ON public.wait_time_pings
+  FOR ALL USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
 
 -- Deletion tombstones (#3078): a user only ever sees / writes their own.
 DROP POLICY IF EXISTS deletions_own ON public.deletions;
@@ -520,7 +526,7 @@ DROP POLICY IF EXISTS tanksync_meta_read ON public.tanksync_meta;
 CREATE POLICY tanksync_meta_read ON public.tanksync_meta
   FOR SELECT USING (true);
 INSERT INTO public.tanksync_meta (key, value, updated_at)
-  VALUES ('schema_version', '11', now())
+  VALUES ('schema_version', '12', now())
   ON CONFLICT (key)
   DO UPDATE SET value = EXCLUDED.value, updated_at = now();
 
