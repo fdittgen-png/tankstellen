@@ -5,7 +5,7 @@ import 'dart:async';
 
 
 import '../../../../core/data/storage_repository.dart';
-import '../../../../core/storage/hive_boxes.dart';
+import '../../../../core/storage/hive_map_coercion.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/domain/ev/charging_station.dart';
 import '../../../../core/logging/error_logger.dart';
@@ -30,7 +30,7 @@ class EvStationRepository {
 
     final result = <ChargingStation>[];
     for (final item in raw) {
-      final map = HiveBoxes.toStringDynamicMap(item);
+      final map = toStringDynamicMap(item);
       if (map == null) continue;
       try {
         result.add(ChargingStation.fromJson(map));

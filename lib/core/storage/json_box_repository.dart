@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
 import '../logging/error_logger.dart';
-import 'hive_boxes.dart';
+import 'hive_map_coercion.dart';
 
 /// Shared base for keyed-Hive-JSON repositories (#3614).
 ///
@@ -26,7 +26,7 @@ import 'hive_boxes.dart';
 ///   - [entryKeyPrefix] scopes this repository's entries inside a
 ///     shared box (empty = the repository owns every String key).
 ///   - Decoding tolerates both JSON strings and raw `Map` payloads
-///     (legacy writes), normalised via [HiveBoxes.toStringDynamicMap].
+///     (legacy writes), normalised via [toStringDynamicMap].
 ///   - [fromJson] may return `null` to signal "valid JSON but not a
 ///     usable entity" — such entries are skipped silently.
 ///   - Corrupt entries (throwing decode) are logged to [errorLogger]
@@ -116,10 +116,10 @@ class JsonBoxRepository<T> {
     if (raw is String) {
       if (raw.isEmpty) return null;
       final decoded = jsonDecode(raw);
-      if (decoded is Map) return HiveBoxes.toStringDynamicMap(decoded);
+      if (decoded is Map) return toStringDynamicMap(decoded);
       return null;
     }
-    if (raw is Map) return HiveBoxes.toStringDynamicMap(raw);
+    if (raw is Map) return toStringDynamicMap(raw);
     return null;
   }
 }

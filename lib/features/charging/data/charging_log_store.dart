@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../../core/storage/hive_boxes.dart';
+import '../../../core/storage/hive_map_coercion.dart';
 import '../../ev/api.dart';
 import '../../../core/logging/error_logger.dart';
 
@@ -122,11 +123,11 @@ class ChargingLogStore {
     if (raw is String) {
       if (raw.isEmpty) return null;
       final decoded = jsonDecode(raw);
-      if (decoded is Map) return HiveBoxes.toStringDynamicMap(decoded);
+      if (decoded is Map) return toStringDynamicMap(decoded);
       return null;
     }
     if (raw is Map) {
-      return HiveBoxes.toStringDynamicMap(raw);
+      return toStringDynamicMap(raw);
     }
     return null;
   }

@@ -13,7 +13,7 @@ import 'package:tankstellen/core/cache/cache_manager.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service_chain.dart';
-import 'package:tankstellen/core/storage/hive_boxes.dart';
+import 'package:tankstellen/core/storage/hive_map_coercion.dart';
 import 'package:tankstellen/core/telemetry/collectors/breadcrumb_collector.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
@@ -76,7 +76,7 @@ class _FixtureAdapter implements HttpClientAdapter {
 
 /// Hive-faithful cache: stored payloads come back the way a REAL Hive box
 /// read returns them (every nested Map as `Map<dynamic, dynamic>`), then run
-/// through the same [HiveBoxes.toStringDynamicMap] conversion
+/// through the same [toStringDynamicMap] conversion
 /// `CacheHiveStore.getCachedData` applies — so the chain's serialize →
 /// persist → deserialize round-trip is exercised with production-shaped
 /// payloads, not the in-memory originals.
@@ -105,7 +105,7 @@ class _HiveFaithfulCache implements CacheStrategy {
   CacheEntry? get(String key) {
     final raw = _box[key];
     if (raw == null) return null;
-    final payload = HiveBoxes.toStringDynamicMap(raw);
+    final payload = toStringDynamicMap(raw);
     if (payload == null) return null;
     final meta = _meta[key]!;
     return CacheEntry(

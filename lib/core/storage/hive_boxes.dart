@@ -256,15 +256,32 @@ class HiveBoxes {
 
     // #2670 — the main isolate owns these for the whole app lifetime; a
     // foreground background scan's closeIsolateBoxes() must never close them.
-    HiveIsolateOwnership.markOwned(const [
-      settings, profiles, favorites, cache, priceHistory, alerts,
-      isolateErrorSpool, featureFlags, appProfile, boxSchema,
-    ]);
+    HiveIsolateOwnership.markOwned(mainIsolateOwnedBoxes);
 
     // #1686 stamp missing schema versions + #2922 run the cache eviction for
     // any box whose stamp is below currentSchemaVersion.
     await _ensureSchemaVersions();
   }
+
+  /// Every box the main isolate will EVER open — first-frame and deferred
+  /// alike — marked owned the moment [init] returns (#2670, #4057).
+  ///
+  /// Ownership is a statement about the FILE, not about whether the box is
+  /// open yet. The deferred boxes used to be marked only when
+  /// [initDeferred] completed, which left a window after first frame in
+  /// which a foreground-isolate scan's `closeIsolateBoxes()` saw
+  /// `price_snapshots` as unowned. That was harmless only because the
+  /// close threw on a type mismatch; #4053 fixed the close, and the
+  /// window became a real "price alerts silently stop for the session".
+  /// Marking up-front closes it: the scan skips the box whether or not
+  /// [initDeferred] has run, and `closeIfOpen` tolerates the not-yet-open
+  /// case anyway.
+  @visibleForTesting
+  static List<String> get mainIsolateOwnedBoxes => [
+        settings, profiles, favorites, cache, priceHistory, alerts,
+        isolateErrorSpool, featureFlags, appProfile, boxSchema,
+        ..._deferredBoxes,
+      ];
 
   /// Stamps + migrates the persistent boxes against [currentSchemaVersion]
   /// (#1686 stamp + #2922 cache eviction). Delegates to [HiveSchemaMigration];
@@ -370,34 +387,5 @@ class HiveBoxes {
       serviceReminders, obd2PausedTrips, obd2NegotiatedProtocol,
       obd2ActiveTrip, priceSnapshots, boxSchema,
     ]);
-  }
-
-  /// Safely converts any Hive map to a typed map.
-  /// Returns null if input is not a Map.
-  static Map<String, dynamic>? toStringDynamicMap(dynamic value) {
-    if (value == null) return null;
-    if (value is Map<String, dynamic>) return _deepConvert(value);
-    if (value is Map) {
-      return _deepConvert(Map<String, dynamic>.fromEntries(
-        value.entries.map((e) => MapEntry(e.key.toString(), e.value)),
-      ));
-    }
-    return null;
-  }
-
-  /// Recursively convert nested Hive `_Map` to `Map<String, dynamic>`.
-  static Map<String, dynamic> _deepConvert(Map<String, dynamic> map) {
-    return map.map((key, value) {
-      if (value is Map && value is! Map<String, dynamic>) {
-        return MapEntry(key, toStringDynamicMap(value));
-      }
-      if (value is List) {
-        return MapEntry(key, value.map((e) {
-          if (e is Map) return toStringDynamicMap(e);
-          return e;
-        }).toList());
-      }
-      return MapEntry(key, value);
-    });
   }
 }

@@ -5,6 +5,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../data/storage_repository.dart';
 import '../hive_boxes.dart';
+import '../hive_map_coercion.dart';
 import '../storage_keys.dart';
 
 /// Hive-backed implementation of [ProfileStorage].
@@ -26,13 +27,13 @@ class ProfilesHiveStore implements ProfileStorage {
   @override
   Map<String, dynamic>? getProfile(String id) {
     final data = _profiles.get(id);
-    return HiveBoxes.toStringDynamicMap(data);
+    return toStringDynamicMap(data);
   }
 
   @override
   List<Map<String, dynamic>> getAllProfiles() {
     return _profiles.values
-        .map((e) => HiveBoxes.toStringDynamicMap(e))
+        .map((e) => toStringDynamicMap(e))
         .whereType<Map<String, dynamic>>()
         .toList();
   }

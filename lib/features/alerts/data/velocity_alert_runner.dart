@@ -9,6 +9,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../../core/notifications/notification_service.dart';
 import '../../../core/storage/hive_boxes.dart';
+import '../../../core/storage/hive_map_coercion.dart';
 import '../../../core/domain/fuel_type.dart';
 import '../domain/entities/velocity_alert_config.dart';
 import '../domain/velocity_alert_detector.dart';
@@ -141,7 +142,7 @@ class VelocityAlertRunner {
       if (raw is String && raw.isNotEmpty) {
         final decoded = jsonDecode(raw);
         if (decoded is Map) {
-          final map = HiveBoxes.toStringDynamicMap(decoded);
+          final map = toStringDynamicMap(decoded);
           if (map != null) {
             return VelocityAlertConfig.fromJson(map);
           }

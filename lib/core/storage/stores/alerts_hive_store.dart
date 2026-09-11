@@ -5,6 +5,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../data/storage_repository.dart';
 import '../hive_boxes.dart';
+import '../hive_map_coercion.dart';
 
 /// Hive-backed implementation of [AlertStorage].
 ///
@@ -17,7 +18,7 @@ class AlertsHiveStore implements AlertStorage {
     final data = _alerts.get('alerts');
     if (data == null) return [];
     return (data as List)
-        .map((e) => HiveBoxes.toStringDynamicMap(e))
+        .map((e) => toStringDynamicMap(e))
         .whereType<Map<String, dynamic>>()
         .toList();
   }
