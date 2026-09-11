@@ -213,13 +213,20 @@ CREATE INDEX IF NOT EXISTS trip_shares_trip_recipient_idx
 DROP POLICY IF EXISTS trip_shares_owner_select ON public.trip_shares;
 CREATE POLICY trip_shares_owner_select ON public.trip_shares
   FOR SELECT USING (owner_id = auth.uid());
+-- #4049 — a grant may only name a trip the grantor OWNS. `owns_trip`
+-- is SECURITY DEFINER purely to break the RLS cycle (trip_summaries'
+-- read policy queries trip_shares, so a direct lookup would recurse).
 DROP POLICY IF EXISTS trip_shares_owner_insert ON public.trip_shares;
 CREATE POLICY trip_shares_owner_insert ON public.trip_shares
-  FOR INSERT WITH CHECK (owner_id = auth.uid());
+  FOR INSERT WITH CHECK (
+    owner_id = auth.uid() AND public.owns_trip(trip_id, auth.uid()));
+-- Both sides: USING stops an already-foreign grant being touched,
+-- WITH CHECK stops a legitimate one being repointed at another's trip.
 DROP POLICY IF EXISTS trip_shares_owner_update ON public.trip_shares;
 CREATE POLICY trip_shares_owner_update ON public.trip_shares
-  FOR UPDATE USING (owner_id = auth.uid())
-  WITH CHECK (owner_id = auth.uid());
+  FOR UPDATE
+  USING (owner_id = auth.uid() AND public.owns_trip(trip_id, auth.uid()))
+  WITH CHECK (owner_id = auth.uid() AND public.owns_trip(trip_id, auth.uid()));
 DROP POLICY IF EXISTS trip_shares_owner_delete ON public.trip_shares;
 CREATE POLICY trip_shares_owner_delete ON public.trip_shares
   FOR DELETE USING (owner_id = auth.uid());
@@ -228,6 +235,8 @@ CREATE POLICY trip_shares_recipient_select ON public.trip_shares
   FOR SELECT USING (shared_with_id = auth.uid());
 
 -- Additive read access so a recipient can read a shared trip (never write).
+-- #4049 — the grant's owner must be the row's owner. Defence in depth:
+-- an invalid grant written before this change grants nothing.
 DROP POLICY IF EXISTS trip_summaries_shared_read ON public.trip_summaries;
 CREATE POLICY trip_summaries_shared_read ON public.trip_summaries
   FOR SELECT USING (
@@ -235,6 +244,7 @@ CREATE POLICY trip_summaries_shared_read ON public.trip_summaries
       SELECT 1 FROM public.trip_shares s
       WHERE s.trip_id = trip_summaries.id
         AND s.shared_with_id = auth.uid()
+        AND s.owner_id = trip_summaries.user_id
     )
   );
 DROP POLICY IF EXISTS trip_details_shared_read ON public.trip_details;
@@ -244,6 +254,7 @@ CREATE POLICY trip_details_shared_read ON public.trip_details
       SELECT 1 FROM public.trip_shares s
       WHERE s.trip_id = trip_details.id
         AND s.shared_with_id = auth.uid()
+        AND s.owner_id = trip_details.user_id
     )
   );''',
   ),

@@ -10,8 +10,12 @@
 -- never weakens the existing own-row policies on trip_summaries /
 -- trip_details. A recipient sees a shared trip as strictly read-only.
 --
--- NOT YET APPLIED TO PROD — the maintainer applies this via the
--- Supabase MCP after reviewing the security-critical RLS below. Every
+-- APPLIED TO PROD on 2026-05-29 (supabase_migrations.schema_migrations
+-- version 20260529172917). This header previously read "NOT YET APPLIED
+-- TO PROD" and was never corrected; in 2026-09 it misled two separate
+-- auditors into treating the RLS below as hypothetical when it was
+-- live. #4049 fixes the ownership hole they found. Do not state
+-- deployment status in a comment — query schema_migrations. Every
 -- statement is idempotent (CREATE … IF NOT EXISTS / DROP POLICY IF
 -- EXISTS … CREATE POLICY) so a later `supabase db push` reconciles
 -- cleanly against the already-applied schema.
@@ -61,6 +65,11 @@ ALTER TABLE public.trip_shares ENABLE ROW LEVEL SECURITY;
 -- ───────────────────────────────────────────────────────────────────
 -- 2. RLS on trip_shares — SECURITY-CRITICAL
 -- ───────────────────────────────────────────────────────────────────
+-- ⚠ SUPERSEDED by 20260911000001_trip_share_ownership_binding.sql.
+-- The policies below prove WHO created a grant but never that the
+-- grant's trip_id belongs to that creator, which let any authenticated
+-- user read another account's trip. Read that migration before
+-- changing anything here.
 -- The owner has full CRUD over the share rows THEY created. Split into
 -- explicit per-command policies (rather than one FOR ALL) so the
 -- INSERT path can WITH CHECK that a client can't forge a row owned by

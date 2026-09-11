@@ -1,4 +1,4 @@
--- TankSync Schema Setup (schema version 9)
+-- TankSync Schema Setup (schema version 10)
 -- Run this in your Supabase SQL Editor
 -- Dashboard → SQL Editor → New Query → Paste → Run
 
@@ -10,6 +10,29 @@ ALTER TABLE public.favorites
   ADD COLUMN IF NOT EXISTS kind TEXT NOT NULL DEFAULT 'fuel';
 ALTER TABLE public.favorites
   ADD COLUMN IF NOT EXISTS data JSONB;
+
+-- #4049 — ownership oracle for the trip_shares write policies. It is
+-- SECURITY DEFINER purely to break an RLS cycle: trip_summaries' read
+-- policy queries trip_shares, so a trip_shares policy that looked up
+-- trip_summaries directly would recurse. Must exist BEFORE the share
+-- policies that call it.
+CREATE OR REPLACE FUNCTION public.owns_trip(p_trip_id TEXT, p_user UUID)
+RETURNS BOOLEAN
+LANGUAGE sql
+SECURITY DEFINER
+STABLE
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.trip_summaries
+     WHERE id = p_trip_id AND user_id = p_user
+  );
+$$;
+REVOKE ALL ON FUNCTION public.owns_trip(TEXT, UUID) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.owns_trip(TEXT, UUID) TO authenticated;
+-- NOT redundant with the PUBLIC revoke: Supabase grants anon separately,
+-- and without this owns_trip() is an unauthenticated existence oracle.
+REVOKE EXECUTE ON FUNCTION public.owns_trip(TEXT, UUID) FROM anon;
 
 -- ── Row Level Security ──────────────────────────────────────────────
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
@@ -103,13 +126,20 @@ CREATE POLICY trip_details_own ON public.trip_details
 DROP POLICY IF EXISTS trip_shares_owner_select ON public.trip_shares;
 CREATE POLICY trip_shares_owner_select ON public.trip_shares
   FOR SELECT USING (owner_id = auth.uid());
+-- #4049 — a grant may only name a trip the grantor OWNS. `owns_trip`
+-- is SECURITY DEFINER purely to break the RLS cycle (trip_summaries'
+-- read policy queries trip_shares, so a direct lookup would recurse).
 DROP POLICY IF EXISTS trip_shares_owner_insert ON public.trip_shares;
 CREATE POLICY trip_shares_owner_insert ON public.trip_shares
-  FOR INSERT WITH CHECK (owner_id = auth.uid());
+  FOR INSERT WITH CHECK (
+    owner_id = auth.uid() AND public.owns_trip(trip_id, auth.uid()));
+-- Both sides: USING stops an already-foreign grant being touched,
+-- WITH CHECK stops a legitimate one being repointed at another's trip.
 DROP POLICY IF EXISTS trip_shares_owner_update ON public.trip_shares;
 CREATE POLICY trip_shares_owner_update ON public.trip_shares
-  FOR UPDATE USING (owner_id = auth.uid())
-  WITH CHECK (owner_id = auth.uid());
+  FOR UPDATE
+  USING (owner_id = auth.uid() AND public.owns_trip(trip_id, auth.uid()))
+  WITH CHECK (owner_id = auth.uid() AND public.owns_trip(trip_id, auth.uid()));
 DROP POLICY IF EXISTS trip_shares_owner_delete ON public.trip_shares;
 CREATE POLICY trip_shares_owner_delete ON public.trip_shares
   FOR DELETE USING (owner_id = auth.uid());
@@ -118,6 +148,8 @@ CREATE POLICY trip_shares_recipient_select ON public.trip_shares
   FOR SELECT USING (shared_with_id = auth.uid());
 
 -- Additive read access so a recipient can read a shared trip (never write).
+-- #4049 — the grant's owner must be the row's owner. Defence in depth:
+-- an invalid grant written before this change grants nothing.
 DROP POLICY IF EXISTS trip_summaries_shared_read ON public.trip_summaries;
 CREATE POLICY trip_summaries_shared_read ON public.trip_summaries
   FOR SELECT USING (
@@ -125,6 +157,7 @@ CREATE POLICY trip_summaries_shared_read ON public.trip_summaries
       SELECT 1 FROM public.trip_shares s
       WHERE s.trip_id = trip_summaries.id
         AND s.shared_with_id = auth.uid()
+        AND s.owner_id = trip_summaries.user_id
     )
   );
 DROP POLICY IF EXISTS trip_details_shared_read ON public.trip_details;
@@ -134,6 +167,7 @@ CREATE POLICY trip_details_shared_read ON public.trip_details
       SELECT 1 FROM public.trip_shares s
       WHERE s.trip_id = trip_details.id
         AND s.shared_with_id = auth.uid()
+        AND s.owner_id = trip_details.user_id
     )
   );
 
@@ -277,6 +311,7 @@ CREATE TRIGGER trg_limit_delete_itineraries
   FOR EACH ROW EXECUTE FUNCTION public.limit_bulk_delete();
 
 -- ── Trip-sharing RPCs ───────────────────────────────────────────────
+
 CREATE OR REPLACE FUNCTION public.resolve_share_recipient(recipient_email TEXT)
 RETURNS UUID
 LANGUAGE sql
@@ -308,6 +343,14 @@ DECLARE
   recipient UUID;
 BEGIN
   IF auth.uid() IS NULL THEN
+    RETURN FALSE;
+  END IF;
+  -- #4049 — the caller must OWN the trip. SECURITY DEFINER bypasses RLS
+  -- on the insert below, so without this guard the write policies are
+  -- never consulted and any trip id could be shared. Returns the same
+  -- FALSE as an unresolvable recipient, so it is not an existence
+  -- oracle for trip ids.
+  IF NOT public.owns_trip(p_trip_id, auth.uid()) THEN
     RETURN FALSE;
   END IF;
   SELECT id INTO recipient FROM auth.users
@@ -439,7 +482,7 @@ DROP POLICY IF EXISTS tanksync_meta_read ON public.tanksync_meta;
 CREATE POLICY tanksync_meta_read ON public.tanksync_meta
   FOR SELECT USING (true);
 INSERT INTO public.tanksync_meta (key, value, updated_at)
-  VALUES ('schema_version', '9', now())
+  VALUES ('schema_version', '10', now())
   ON CONFLICT (key)
   DO UPDATE SET value = EXCLUDED.value, updated_at = now();
 

@@ -28,11 +28,51 @@ final String rlsSql = [
   '${syncedTableSpecs.map((spec) => spec.rlsPolicySql).join('\n\n')}\n',
 ].join('\n');
 
+/// #4049 — the ownership oracle the `trip_shares` write policies call.
+/// Emitted BEFORE [rlsSql] in `schema_sql.dart`, because `CREATE POLICY`
+/// resolves the functions in its expression at creation time: a wizard
+/// that emitted the policies first would fail the self-hoster's paste
+/// with "function public.owns_trip(text, uuid) does not exist".
+///
+/// SECURITY DEFINER purely to break an RLS cycle — `trip_summaries`'
+/// read policy queries `trip_shares`, so a `trip_shares` policy that
+/// looked up `trip_summaries` directly would recurse.
+const String ownershipFnSql = '''
+-- #4049 — ownership oracle for the trip_shares write policies. It is
+-- SECURITY DEFINER purely to break an RLS cycle: trip_summaries' read
+-- policy queries trip_shares, so a trip_shares policy that looked up
+-- trip_summaries directly would recurse. Must exist BEFORE the share
+-- policies that call it.
+CREATE OR REPLACE FUNCTION public.owns_trip(p_trip_id TEXT, p_user UUID)
+RETURNS BOOLEAN
+LANGUAGE sql
+SECURITY DEFINER
+STABLE
+SET search_path = public
+AS \$\$
+  SELECT EXISTS (
+    SELECT 1 FROM public.trip_summaries
+     WHERE id = p_trip_id AND user_id = p_user
+  );
+\$\$;
+REVOKE ALL ON FUNCTION public.owns_trip(TEXT, UUID) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.owns_trip(TEXT, UUID) TO authenticated;
+-- NOT redundant with the PUBLIC revoke: Supabase grants anon separately,
+-- and without this owns_trip() is an unauthenticated existence oracle.
+REVOKE EXECUTE ON FUNCTION public.owns_trip(TEXT, UUID) FROM anon;
+''';
+
 /// SECURITY DEFINER RPCs the trip-sharing sync code calls
-/// (`resolve_share_recipient`, `claim_trip_share`). Without these the
-/// account-to-account and link-claim share flows fail on a self-host.
+/// (`owns_trip`, `resolve_share_recipient`, `share_trip_with_email`,
+/// `claim_trip_share`). Without these the account-to-account and
+/// link-claim share flows fail on a self-host.
+///
+/// #4049 — `owns_trip` is emitted FIRST because the `trip_shares` write
+/// policies in `schema_table_specs_extended.dart` call it. A self-host
+/// that pasted the policies without it would get a broken share flow.
 const String rpcSql = '''
 -- ── Trip-sharing RPCs ───────────────────────────────────────────────
+
 CREATE OR REPLACE FUNCTION public.resolve_share_recipient(recipient_email TEXT)
 RETURNS UUID
 LANGUAGE sql
@@ -64,6 +104,14 @@ DECLARE
   recipient UUID;
 BEGIN
   IF auth.uid() IS NULL THEN
+    RETURN FALSE;
+  END IF;
+  -- #4049 — the caller must OWN the trip. SECURITY DEFINER bypasses RLS
+  -- on the insert below, so without this guard the write policies are
+  -- never consulted and any trip id could be shared. Returns the same
+  -- FALSE as an unresolvable recipient, so it is not an existence
+  -- oracle for trip ids.
+  IF NOT public.owns_trip(p_trip_id, auth.uid()) THEN
     RETURN FALSE;
   END IF;
   SELECT id INTO recipient FROM auth.users
