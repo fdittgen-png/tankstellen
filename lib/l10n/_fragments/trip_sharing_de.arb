@@ -36,6 +36,7 @@
     "description": "Snackbar confirming a direct account-to-account trip share succeeded (#2240)."
   },
   "tripShareRecipientNotFound": "Kein TankSync-Konto nutzt diese E-Mail.",
+  "tripShareNotSyncedYet": "Diese Fahrt ist noch nicht in deiner Sync-Datenbank angekommen — versuche es gleich noch einmal.",
   "@tripShareRecipientNotFound": {
     "description": "Snackbar shown when the recipient email entered in the trip-sharing sheet does not match any TankSync account (#2240)."
   },

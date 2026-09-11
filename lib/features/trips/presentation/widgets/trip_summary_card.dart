@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/utils/duration_formatter.dart';
 
 import '../../../../core/utils/num_extensions.dart';
 import '../../../../core/utils/price_formatter.dart';
@@ -70,7 +71,7 @@ class TripSummaryCard extends ConsumerWidget {
         s.startedAt != null &&
             s.endedAt != null &&
             s.endedAt!.isAfter(s.startedAt!)
-        ? _fmtDuration(s.endedAt!.difference(s.startedAt!))
+        ? formatElapsedDuration(l, s.endedAt!.difference(s.startedAt!))
         : unknown;
     // #3576 — measured wins; a persisted GPS-physics estimate renders
     // `~`-prefixed (the live view's estimate convention); dash only when
@@ -286,14 +287,6 @@ class TripSummaryCard extends ConsumerWidget {
         '${twoDigits(d.hour)}:${twoDigits(d.minute)}';
   }
 
-  static String _fmtDuration(Duration d) {
-    final h = d.inHours;
-    final m = d.inMinutes % 60;
-    final s = d.inSeconds % 60;
-    if (h == 0 && m == 0) return '${s}s';
-    if (h == 0) return '${m}m ${s}s';
-    return '${h}h ${m}m';
-  }
 }
 
 class _SummaryRow extends StatelessWidget {

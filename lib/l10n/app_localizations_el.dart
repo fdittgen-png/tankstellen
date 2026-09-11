@@ -950,6 +950,34 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
+  String get positionAgeUnderMinute => '< 1 min';
+
+  @override
+  String positionAgeHours(int hours) {
+    return '$hours h';
+  }
+
+  @override
+  String positionAgeDays(int days) {
+    return '$days d';
+  }
+
+  @override
+  String durationHoursMinutesCompact(int hours, String minutes) {
+    return '${hours}h $minutes';
+  }
+
+  @override
+  String durationSecondsShort(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String durationMinutesSeconds(int minutes, int seconds) {
+    return '$minutes min $seconds s';
+  }
+
+  @override
   String get savedRoutesLoading => 'Loading your saved routes…';
 
   @override
@@ -7336,6 +7364,14 @@ class AppLocalizationsEl extends AppLocalizations {
   String get syncDeleteDataDone => 'Τα συγχρονισμένα δεδομένα διαγράφηκαν';
 
   @override
+  String get syncDeleteDataDonePending =>
+      'Deleted. Your other devices will drop it the next time this device syncs.';
+
+  @override
+  String get syncDeleteDataDoneSchemaOutdated =>
+      'Deleted on the server — but your sync database is outdated, so another device could re-upload it. Re-run the setup SQL.';
+
+  @override
   String get syncDeleteDataFailed =>
       'Η διαγραφή των συγχρονισμένων δεδομένων απέτυχε — δοκιμάστε ξανά';
 
@@ -7930,6 +7966,10 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get tripShareRecipientNotFound =>
       'Κανένας λογαριασμός TankSync δεν χρησιμοποιεί αυτό το email.';
+
+  @override
+  String get tripShareNotSyncedYet =>
+      'This trip hasn\'t reached your sync database yet — try again in a moment.';
 
   @override
   String get tripShareError => 'Δεν ήταν δυνατή η κοινοποίηση. Δοκιμάστε ξανά.';

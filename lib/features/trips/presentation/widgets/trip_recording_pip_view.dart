@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import '../../../../core/utils/duration_formatter.dart';
 
 import '../../../../core/services/approach_detector.dart';
 import '../../../../core/domain/consumption_unit.dart';
@@ -187,7 +188,7 @@ class TripRecordingPipView extends StatelessWidget {
       bigCaption = figure.unitMask;
       secondaryRow = [
         if (distance != null) UnitFormatter.formatDistance(distance),
-        if (elapsed != null) _fmtElapsed(elapsed),
+        if (elapsed != null) formatElapsedDuration(l, elapsed),
       ];
     } else if (gpsEstimate != null) {
       // Branch 2 (#2390) — GPS-only live estimate: huge `~X.X`. The
@@ -200,7 +201,7 @@ class TripRecordingPipView extends StatelessWidget {
       isEstimate = true;
       secondaryRow = [
         if (distance != null) UnitFormatter.formatDistance(distance),
-        if (elapsed != null) _fmtElapsed(elapsed),
+        if (elapsed != null) formatElapsedDuration(l, elapsed),
       ];
     } else if (live != null && !paused) {
       // Branch 3 (#2601) — pre-estimate warm-up: no OBD2 rate, GPS
@@ -214,7 +215,7 @@ class TripRecordingPipView extends StatelessWidget {
       secondaryRow = [
         if (distance != null && distance >= 0.1)
           UnitFormatter.formatDistance(distance),
-        if (elapsed != null) _fmtElapsed(elapsed),
+        if (elapsed != null) formatElapsedDuration(l, elapsed),
       ];
     } else {
       // No data at all (shouldn't happen during an active recording,
@@ -354,17 +355,4 @@ class TripRecordingPipView extends StatelessWidget {
     );
   }
 
-  /// Format an elapsed [Duration] so it reads as a duration, not a clock
-  /// time (#2094 — `"14:12"` next to the system clock read as a time of
-  /// day). Shapes: `"42s"` under a minute, `"14m 12s"` under an hour,
-  /// `"1h 14m"` at an hour-plus (seconds drop — they're noise at that
-  /// scale).
-  static String _fmtElapsed(Duration d) {
-    final h = d.inHours;
-    final m = d.inMinutes % 60;
-    final s = d.inSeconds % 60;
-    if (h >= 1) return '${h}h ${m}m';
-    if (d.inMinutes >= 1) return '${m}m ${s}s';
-    return '${s}s';
-  }
 }

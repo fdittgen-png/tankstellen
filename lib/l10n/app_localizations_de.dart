@@ -947,6 +947,34 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get positionAgeUnderMinute => '< 1 Min.';
+
+  @override
+  String positionAgeHours(int hours) {
+    return '$hours Std.';
+  }
+
+  @override
+  String positionAgeDays(int days) {
+    return '$days T.';
+  }
+
+  @override
+  String durationHoursMinutesCompact(int hours, String minutes) {
+    return '$hours Std. $minutes';
+  }
+
+  @override
+  String durationSecondsShort(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String durationMinutesSeconds(int minutes, int seconds) {
+    return '$minutes Min. $seconds s';
+  }
+
+  @override
   String get savedRoutesLoading => 'Gespeicherte Routen werden geladen…';
 
   @override
@@ -7312,6 +7340,14 @@ class AppLocalizationsDe extends AppLocalizations {
   String get syncDeleteDataDone => 'Synchronisierte Daten gelöscht';
 
   @override
+  String get syncDeleteDataDonePending =>
+      'Gelöscht. Deine anderen Geräte übernehmen das beim nächsten Sync dieses Geräts.';
+
+  @override
+  String get syncDeleteDataDoneSchemaOutdated =>
+      'Auf dem Server gelöscht — aber deine Sync-Datenbank ist veraltet, ein anderes Gerät könnte die Daten erneut hochladen. Führe das Setup-SQL erneut aus.';
+
+  @override
   String get syncDeleteDataFailed =>
       'Löschen der synchronisierten Daten fehlgeschlagen — bitte erneut versuchen';
 
@@ -7903,6 +7939,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get tripShareRecipientNotFound =>
       'Kein TankSync-Konto nutzt diese E-Mail.';
+
+  @override
+  String get tripShareNotSyncedYet =>
+      'Diese Fahrt ist noch nicht in deiner Sync-Datenbank angekommen — versuche es gleich noch einmal.';
 
   @override
   String get tripShareError =>

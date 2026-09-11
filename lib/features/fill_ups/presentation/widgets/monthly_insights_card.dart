@@ -3,12 +3,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/utils/duration_formatter.dart';
 
 import '../../../../core/domain/consumption_unit.dart';
 import '../../../../core/providers/consumption_display_provider.dart';
 import '../../../../core/theme/app_text.dart';
 import '../../../../core/theme/spacing.dart';
-import '../../../../core/utils/time_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../core/widgets/panel_card.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -70,8 +70,8 @@ class MonthlyInsightsCard extends ConsumerWidget {
 
     final driveTimeRow = MonthlyMetric(
       label: l.consumptionMonthlyDriveTimeLabel,
-      currentValue: _fmtDuration(summary.currentMonthDriveTime),
-      previousValue: _fmtDuration(summary.previousMonthDriveTime),
+      currentValue: formatDriveTimeCompact(l, summary.currentMonthDriveTime),
+      previousValue: formatDriveTimeCompact(l, summary.previousMonthDriveTime),
       delta: summary.driveTimeDelta.inMinutes,
       sentiment: MonthlyMetricSentiment.neutral,
       showPrevious: reliable,
@@ -168,13 +168,6 @@ class MonthlyInsightsCard extends ConsumerWidget {
 
 String _fmtCount(int n) => n.toString();
 
-String _fmtDuration(Duration d) {
-  if (d.inMinutes < 60) return '${d.inMinutes} min';
-  final hours = d.inMinutes ~/ 60;
-  final mins = d.inMinutes % 60;
-  if (mins == 0) return '${hours}h';
-  return '${hours}h ${twoDigits(mins)}';
-}
 
 String _fmtDistance(double km) {
   if (km < 10) return UnitFormatter.formatDistance(km);

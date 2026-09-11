@@ -133,6 +133,18 @@ void main() {
   final ternaryInInterpolation =
       RegExp('(?<!\\?)\\?\\s*$quoted\\s*:');
 
+  // #4063 — a TIME unit glued to an interpolation inside presentation
+  // code: `'${m}m ${s}s'`, `'${x} min'`, `'${h}h'`. Every primary sink
+  // stops at the first `$`, so a helper that returned these shapes
+  // shipped English abbreviations into 23 locales unseen — three widgets
+  // did, while `durationMinutesShort` (de: "Min.") sat in the ARB. Only
+  // the units this app translates are flagged (`min`, `h`, `s`); SI
+  // symbols such as `km`, `L`, `kWh` are language-neutral and are not.
+  // Group 1 is the unit token. Scoped to `/presentation/` paths.
+  final interpolatedTimeUnit = RegExp(
+    r"'[^'\n]*\$\{[^}]+\}\s?(min|h|s)(?=[\s'·])[^'\n]*'",
+  );
+
   /// True when [literal] (quotes stripped) reads like user-facing prose
   /// rather than an identifier, route name, key or asset id.
   bool looksLikeProse(String literal) {
@@ -213,6 +225,18 @@ void main() {
         final closes = '}'.allMatches(lineStr).length;
         if (opens <= closes) continue; // not inside an open interpolation
         recordIfProse(match);
+      }
+      // #4063 — interpolated time units, presentation code only.
+      if (path.contains('/presentation/')) {
+        for (final match in interpolatedTimeUnit.allMatches(source)) {
+          final lineStart = source.lastIndexOf('\n', match.start) + 1;
+          final lineEnd = source.indexOf('\n', match.start);
+          final line = source.substring(
+              lineStart, lineEnd == -1 ? source.length : lineEnd);
+          if (line.contains('i18n-ignore')) continue;
+          final lineNo = '\n'.allMatches(source.substring(0, match.start)).length + 1;
+          violations.add('$path:$lineNo: ${match.group(0)}  (interpolated time unit "${match.group(1)}" — use duration_formatter.dart)');
+        }
       }
     }
 

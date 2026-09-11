@@ -3,6 +3,7 @@
 
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/gps_coverage_report.dart';
+import '../../../../core/utils/duration_formatter.dart';
 
 /// Localized copy for the #3465 GPS coverage verdict rendered on the
 /// [GpsDiagnosticsCard] — extracted to its own helper so the card stays
@@ -19,7 +20,7 @@ String? gpsCoverageSummaryLine(GpsCoverageReport? c, AppLocalizations l) {
   if (longest == null) return l.gpsCoverageSummaryNoGaps(pct);
   return l.gpsCoverageSummary(
     pct,
-    formatGpsGapDuration(longest.duration),
+    formatGpsGapDuration(l, longest.duration),
     gpsGapAttributionLabel(longest.attribution, l),
   );
 }
@@ -68,11 +69,7 @@ String gpsGapAttributionLabel(GpsGapAttribution a, AppLocalizations l) {
   }
 }
 
-/// Format a gap duration as "3m 42s" / "42s" — the same language-neutral
-/// unit-suffix convention as the card's time-span formatter.
-String formatGpsGapDuration(Duration d) {
-  final minutes = d.inMinutes;
-  final seconds = d.inSeconds - minutes * 60;
-  if (minutes == 0) return '${seconds}s';
-  return '${minutes}m ${seconds}s';
-}
+/// A gap duration for the coverage line — through the ARB-driven
+/// formatter, since unit abbreviations are user-facing text (#4063).
+String formatGpsGapDuration(AppLocalizations l, Duration d) =>
+    formatElapsedDuration(l, d);

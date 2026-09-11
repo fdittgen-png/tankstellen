@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+
+import '../../../../core/utils/duration_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../../core/navigation/app_routes.dart';
@@ -158,7 +160,7 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
                   const SizedBox(width: 8),
                   Text(
                     '${result.route.distanceKm.round()} km · '
-                    '${result.route.durationMinutes.round()} min · '
+                    '${formatTravelDuration(l10n, result.route.durationMinutes)} · '
                     '${l10n.routeStationCount(result.stations.length)}',
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w600,

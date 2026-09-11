@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import '../../../../core/utils/duration_formatter.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/gps_sample_diagnostic.dart';
@@ -57,7 +58,7 @@ class GpsDiagnosticsCard extends StatelessWidget {
     final title = l.gpsDiagnosticsTitle;
     final headerLine = l.gpsDiagnosticsHeader(
       summary.sampleCount.toString(),
-      _formatDuration(summary.timeSpan),
+      formatTravelDuration(l, summary.timeSpan.inMinutes.toDouble()),
       summary.gapCount,
     );
     final cadenceLine = l.gpsDiagnosticsCadence(summary.medianIntervalMs);
@@ -325,16 +326,6 @@ GpsDiagnosticsSummary computeGpsDiagnosticsSummary(
     gapCount: gapCount,
     largestGap: Duration(milliseconds: largestMs),
   );
-}
-
-/// Format a duration into "Hh Mmin" (e.g. "1h 23min", "12min", "0min").
-/// Hours are dropped when zero so short trips don't read "0h 12min".
-String _formatDuration(Duration d) {
-  if (d == Duration.zero) return '0min';
-  final hours = d.inHours;
-  final minutes = d.inMinutes - hours * 60;
-  if (hours == 0) return '${minutes}min';
-  return '${hours}h ${minutes}min';
 }
 
 /// Format the lifecycle-percent map into a "Resumed 92% · Paused 5% · …"

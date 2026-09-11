@@ -1851,6 +1851,42 @@ abstract class AppLocalizations {
   /// **'{hours} h {minutes} min'**
   String durationHoursMinutes(int hours, int minutes);
 
+  /// Age of the last GPS fix when under a minute old, shown in the position bar (#4063).
+  ///
+  /// In en, this message translates to:
+  /// **'< 1 min'**
+  String get positionAgeUnderMinute;
+
+  /// Age of the last GPS fix in whole hours, shown in the position bar (#4063). 'h' is the locale's hour abbreviation.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} h'**
+  String positionAgeHours(int hours);
+
+  /// Age of the last GPS fix in whole days, shown in the position bar (#4063). 'd' is the locale's day abbreviation.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} d'**
+  String positionAgeDays(int days);
+
+  /// A drive time of one hour or more in a NARROW numeric column (monthly insights table, #4063): hour abbreviation glued to the number, minutes zero-padded and unit-less. 'h' is the locale's hour abbreviation.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h {minutes}'**
+  String durationHoursMinutesCompact(int hours, String minutes);
+
+  /// An elapsed time under one minute, for live recording and trip cards (#4063). 's' is the locale's second abbreviation.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds} s'**
+  String durationSecondsShort(int seconds);
+
+  /// An elapsed time under one hour with seconds, for live recording and trip cards (#4063). Both abbreviations are the locale's.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min {seconds} s'**
+  String durationMinutesSeconds(int minutes, int seconds);
+
   /// Shown on the saved-routes screen while the first sync pull is still running, so a user whose routes live only on the server is never told they have none (#3993).
   ///
   /// In en, this message translates to:
@@ -12417,6 +12453,18 @@ abstract class AppLocalizations {
   /// **'Synced data deleted'**
   String get syncDeleteDataDone;
 
+  /// Snackbar shown when the server rows were deleted but the deletion tombstone is still queued locally and lands on the next sync (#4059).
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted. Your other devices will drop it the next time this device syncs.'**
+  String get syncDeleteDataDonePending;
+
+  /// Snackbar shown when the server rows were deleted but the self-hosted schema has no deletions table, so the tombstone can never land (#4059).
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted on the server — but your sync database is outdated, so another device could re-upload it. Re-run the setup SQL.'**
+  String get syncDeleteDataDoneSchemaOutdated;
+
   /// Snackbar shown when the server-side deletion failed or the user is not connected (#3453).
   ///
   /// In en, this message translates to:
@@ -13430,6 +13478,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No TankSync account uses that email.'**
   String get tripShareRecipientNotFound;
+
+  /// Snackbar shown when the trip being shared is not on the server yet (recorded before the trips toggle, or its upload is still in flight) — the recipient email is fine (#4060).
+  ///
+  /// In en, this message translates to:
+  /// **'This trip hasn\'t reached your sync database yet — try again in a moment.'**
+  String get tripShareNotSyncedYet;
 
   /// Snackbar shown when creating a trip share fails for a non-specific reason (network / server) (#2240).
   ///
