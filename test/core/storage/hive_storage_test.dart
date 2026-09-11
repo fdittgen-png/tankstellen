@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/core/storage/hive_isolate_boxes.dart';
 import 'package:tankstellen/core/storage/hive_isolate_ownership.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
@@ -609,6 +610,24 @@ void main() {
       await HiveStorage.closeIsolateBoxes();
 
       expect(Hive.isBoxOpen('profiles'), isTrue);
+    });
+
+    // #4057 — the deferred-open window. Simulate exactly what init() has
+    // done the moment it returns (ownership marked, deferred boxes not
+    // yet opened by the main isolate), then a foreground scan opens and
+    // closes its set. price_snapshots must survive.
+    test('a foreground scan between init() and initDeferred() does not '
+        'close the main isolate\'s price_snapshots (#4057)', () async {
+      HiveIsolateOwnership.resetForTest();
+      HiveIsolateOwnership.markOwned(HiveBoxes.mainIsolateOwnedBoxes);
+      await Hive.openBox<String>('price_snapshots');
+      expect(Hive.isBoxOpen('price_snapshots'), isTrue);
+
+      await HiveStorage.closeIsolateBoxes();
+
+      expect(Hive.isBoxOpen('price_snapshots'), isTrue,
+          reason: 'owned by the main isolate from init() onward; a scan '
+              'in the deferred window must skip it');
     });
 
     // #4053 — the drift guard. The open set and the close set were two

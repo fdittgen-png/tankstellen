@@ -103,13 +103,8 @@ void main() {
     // `loadFull` hydration seam (doc + per-entry re-hydrate of the
     // local-only details-heal upload) so the launch pull can feed it
     // summary-only decoded entries without losing the trip_details heal.
-    // #3743 (epic item 5) — the config moved into its owning feature;
-    // the key follows the file, snapshot unchanged.
-    'lib/features/trips/data/trips_sync.dart': (
-      lines: 433,
-      bumps: 1,
-      decompositionIssue: null,
-    ),
+    // #4056 — trips_sync.dart entry REMOVED: the pure row/reconcile half
+    // moved to trips_sync_rows.dart and the file is under the cap now.
     // #3996 — +2: the diagnostics card opens on a plain-language line
     // explaining what the reading means, instead of on the posterior.
     'lib/features/trips/presentation/widgets/broken_map_widgets.dart': (

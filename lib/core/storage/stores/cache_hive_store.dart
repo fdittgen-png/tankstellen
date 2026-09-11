@@ -10,6 +10,7 @@ import 'package:meta/meta.dart';
 import '../../data/storage_repository.dart';
 import '../../logging/error_logger.dart';
 import '../hive_boxes.dart';
+import '../hive_map_coercion.dart';
 import '../hive_cache_recovery.dart';
 
 /// Hive-backed implementation of [CacheStorage] and [ItineraryStorage].
@@ -82,7 +83,7 @@ class CacheHiveStore implements CacheStorage, ItineraryStorage {
     final cached = box.get(key);
     if (cached == null) return null;
 
-    final map = HiveBoxes.toStringDynamicMap(cached);
+    final map = toStringDynamicMap(cached);
     if (map == null) return null;
 
     if (maxAge != null) {
@@ -93,7 +94,7 @@ class CacheHiveStore implements CacheStorage, ItineraryStorage {
       }
     }
     final data = map['data'];
-    if (data is Map) return HiveBoxes.toStringDynamicMap(data);
+    if (data is Map) return toStringDynamicMap(data);
     return null;
   }
 
@@ -118,7 +119,7 @@ class CacheHiveStore implements CacheStorage, ItineraryStorage {
     final data = box.get('itineraries');
     if (data == null) return [];
     return (data as List)
-        .map((e) => HiveBoxes.toStringDynamicMap(e))
+        .map((e) => toStringDynamicMap(e))
         .whereType<Map<String, dynamic>>()
         .toList();
   }

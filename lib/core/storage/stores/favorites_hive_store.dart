@@ -5,6 +5,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../data/storage_repository.dart';
 import '../hive_boxes.dart';
+import '../hive_map_coercion.dart';
 import '../storage_keys.dart';
 
 /// Hive round-trips deeply nested maps as `Map<dynamic, dynamic>` / `List<dynamic>`
@@ -75,7 +76,7 @@ class FavoritesHiveStore
     // `Map<String, dynamic>.from` left those inner maps dynamic-keyed, so
     // `Station.fromJson`'s nested cast threw and the whole favorite was
     // silently dropped. Mirrors the EV path's existing deep-convert (#690).
-    return HiveBoxes.toStringDynamicMap(raw);
+    return toStringDynamicMap(raw);
   }
 
   @override
@@ -143,7 +144,7 @@ class FavoritesHiveStore
     if (raw is! Map) return null;
     // Deep-convert so nested connectors + addresses keep `Map<String, dynamic>`
     // typing; otherwise ChargingStation.fromJson fails on the inner cast (#690).
-    return HiveBoxes.toStringDynamicMap(raw);
+    return toStringDynamicMap(raw);
   }
 
   @override

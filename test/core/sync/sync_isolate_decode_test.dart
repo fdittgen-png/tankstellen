@@ -100,7 +100,7 @@ void main() {
       expect(decoded.last, isNull);
     });
 
-    test('mergeTripRowsOffThread matches TripsSync.mergeRows semantics: '
+    test('mergeTripRowsOffThread matches TripsSyncRows.mergeRows semantics: '
         'local wins, tombstoned/corrupt skipped', () async {
       BatchDecode.offloadOverride = false; // deterministic inline path
       final local = TripHistoryEntry(

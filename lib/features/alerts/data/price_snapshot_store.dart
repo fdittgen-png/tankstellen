@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../../core/storage/hive_boxes.dart';
+import '../../../core/storage/hive_map_coercion.dart';
 import 'models/price_snapshot.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/logging/app_log.dart';
@@ -82,7 +83,7 @@ class PriceSnapshotStore {
       try {
         final decoded = jsonDecode(raw);
         if (decoded is Map) {
-          final map = HiveBoxes.toStringDynamicMap(decoded);
+          final map = toStringDynamicMap(decoded);
           if (map == null) continue;
           out.add(PriceSnapshot.fromJson(map));
         }

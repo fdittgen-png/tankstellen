@@ -7,6 +7,7 @@ import 'dart:math' hide log;
 import 'package:flutter/foundation.dart';
 
 import 'trip_history_repository.dart';
+import 'trips_sync_rows.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/logging/app_log.dart';
 import '../../../core/sync/supabase_client.dart';
@@ -325,7 +326,7 @@ class TripSharesSync {
 
   /// Pure decode of `trip_summaries` rows shared with me into read-only
   /// [TripHistoryEntry]s. A row that fails to decode is dropped rather
-  /// than aborting the list — same resilience as [TripsSync.mergeRows].
+  /// than aborting the list — same resilience as [TripsSyncRows.mergeRows].
   @visibleForTesting
   static List<TripHistoryEntry> parseSharedSummaries(
     List<Map<String, dynamic>> rows,

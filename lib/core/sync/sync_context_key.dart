@@ -35,9 +35,22 @@ extension type const SyncContextKey(String value) {
 
   /// Host only — the full URL carries a scheme and sometimes a trailing
   /// slash, and neither distinguishes two projects.
+  ///
+  /// #4058 — accepts a BARE host as well as a URL. Production hands us
+  /// `TankSyncClient.backendHost`, which is `uri.host` — no scheme — and
+  /// `Uri.parse('abc.supabase.co').host` is `''` because a scheme-less
+  /// string parses as a path. The first cut only handled URLs, so every
+  /// production key collapsed to `|<userId>` and the backend half of the
+  /// scoping was inert; the tests passed because they fed `https://…`.
   static String _host(String? url) {
     if (url == null || url.isEmpty) return '(default)';
-    return Uri.tryParse(url)?.host.toLowerCase() ?? url.toLowerCase();
+    final parsed = Uri.tryParse(url)?.host;
+    if (parsed != null && parsed.isNotEmpty) return parsed.toLowerCase();
+    // Not a URL: take it as a host. Strip anything a hand-typed value
+    // might carry that `uri.host` never would.
+    final bare = url.toLowerCase().trim();
+    final slash = bare.indexOf('/');
+    return slash == -1 ? bare : bare.substring(0, slash);
   }
 
   /// Safe inside a JSON object key.

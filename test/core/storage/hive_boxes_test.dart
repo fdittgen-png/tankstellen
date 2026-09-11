@@ -6,6 +6,8 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
+import 'package:tankstellen/core/storage/hive_map_coercion.dart';
+import 'package:tankstellen/core/storage/hive_isolate_boxes.dart';
 
 void main() {
   group('HiveBoxes', () {
@@ -199,6 +201,34 @@ void main() {
         }
       });
 
+      // #4057 — ownership is about the FILE, not whether the box is open
+      // yet. Every box a background isolate opens that the main isolate
+      // also owns must be marked owned by init(), not deferred to
+      // initDeferred()'s completion: in that window a foreground scan's
+      // closeIsolateBoxes() would close the main isolate's live handle.
+      // #4053 made that close actually succeed for price_snapshots.
+      test('init() marks every box the scan isolate shares as owned — '
+          'deferred boxes included (#4057)', () {
+        final owned = HiveBoxes.mainIsolateOwnedBoxes.toSet();
+        for (final name in HiveIsolateBoxes.isolateBoxNames) {
+          expect(owned, contains(name),
+              reason: '"$name" is opened by initInIsolate; if init() does '
+                  'not own it a foreground scan in the deferred-open window '
+                  'closes the live handle (#4057)');
+        }
+        expect(owned, contains(HiveBoxes.priceSnapshots),
+            reason: 'the exact box the field log lost');
+
+        // And init() must use THAT list, not a copy that can drift.
+        final source =
+            File('lib/core/storage/hive_boxes.dart').readAsStringSync();
+        expect(
+          source.contains('HiveIsolateOwnership.markOwned(mainIsolateOwnedBoxes)'),
+          isTrue,
+          reason: 'init() must mark ownership from mainIsolateOwnedBoxes',
+        );
+      });
+
       test('_loadCipher uses FlutterSecureStorage', () {
         // #3149 — the cipher load moved to HiveCipherLoader so a
         // keychain/keystore fault surfaces as a typed StorageInitException
@@ -369,34 +399,34 @@ void main() {
 
     group('toStringDynamicMap', () {
       test('returns null for null input', () {
-        expect(HiveBoxes.toStringDynamicMap(null), isNull);
+        expect(toStringDynamicMap(null), isNull);
       });
 
       test('returns typed map for Map<String, dynamic>', () {
         final input = <String, dynamic>{'key': 'value', 'count': 42};
-        final result = HiveBoxes.toStringDynamicMap(input);
+        final result = toStringDynamicMap(input);
         expect(result, {'key': 'value', 'count': 42});
       });
 
       test('converts untyped Map to Map<String, dynamic>', () {
         final input = <dynamic, dynamic>{1: 'one', 'two': 2};
-        final result = HiveBoxes.toStringDynamicMap(input);
+        final result = toStringDynamicMap(input);
         expect(result, isNotNull);
         expect(result!['1'], 'one');
         expect(result['two'], 2);
       });
 
       test('returns null for non-map input', () {
-        expect(HiveBoxes.toStringDynamicMap('string'), isNull);
-        expect(HiveBoxes.toStringDynamicMap(42), isNull);
-        expect(HiveBoxes.toStringDynamicMap([1, 2, 3]), isNull);
+        expect(toStringDynamicMap('string'), isNull);
+        expect(toStringDynamicMap(42), isNull);
+        expect(toStringDynamicMap([1, 2, 3]), isNull);
       });
 
       test('deep-converts nested maps', () {
         final input = <String, dynamic>{
           'outer': <dynamic, dynamic>{'inner': 'value'},
         };
-        final result = HiveBoxes.toStringDynamicMap(input);
+        final result = toStringDynamicMap(input);
         expect(result, isNotNull);
         expect(result!['outer'], isA<Map<String, dynamic>>());
         expect((result['outer'] as Map)['inner'], 'value');
@@ -409,7 +439,7 @@ void main() {
             <dynamic, dynamic>{'id': 2},
           ],
         };
-        final result = HiveBoxes.toStringDynamicMap(input);
+        final result = toStringDynamicMap(input);
         expect(result, isNotNull);
         final items = result!['items'] as List;
         expect(items.length, 2);

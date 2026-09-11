@@ -11,6 +11,7 @@ import '../../../core/logging/app_log.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../data/itineraries_sync.dart';
+import '../../../core/sync/deletions_sync.dart';
 import '../../../core/sync/sync_events.dart';
 import '../../../core/sync/sync_provider.dart';
 import '../../../core/utils/event_loop_yield.dart';
@@ -149,9 +150,21 @@ class ItineraryNotifier extends _$ItineraryNotifier {
 
       // Upload local-only items to server in parallel (sync adds, never deletes).
       final serverIds = serverItineraries.map((i) => i.id).toSet();
-      final localOnly = state.where((i) => !serverIds.contains(i.id)).toList();
+      var localOnly = state.where((i) => !serverIds.contains(i.id)).toList();
       if (localOnly.isNotEmpty) {
-        await Future.wait(localOnly.map(ItinerariesSync.save));
+        // #4056 — a local-only itinerary is not always "never uploaded":
+        // after "Delete synced data → Itineraries" it is a copy the user
+        // chose to KEEP HERE, and its id is tombstoned. Re-uploading it
+        // would undo the deletion on every other device.
+        final tombstoned =
+            await DeletionsSync.fetchTombstonedIds('itineraries');
+        if (tombstoned.isNotEmpty) {
+          localOnly =
+              localOnly.where((i) => !tombstoned.contains(i.id)).toList();
+        }
+        if (localOnly.isNotEmpty) {
+          await Future.wait(localOnly.map(ItinerariesSync.save));
+        }
       }
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'ItineraryNotifier._loadAndMerge'}));

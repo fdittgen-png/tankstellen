@@ -10,6 +10,7 @@ import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 
 import '../../helpers/silence_error_logger.dart';
+import 'package:tankstellen/features/trips/data/trips_sync_rows.dart';
 
 /// #3453 — the trips half of the delete-my-synced-data round-trip:
 /// a trip deleted server-side (tombstoned) on device A must be REMOVED
@@ -77,6 +78,37 @@ void main() {
     expect(repo.loadAll().map((e) => e.id), ['trip-keep'],
         reason: 'the deleted trip must disappear locally on the next '
             'pull instead of lingering forever');
+  });
+
+  // #4056 — compose the REAL reconcile the way TripsSync.merge does it:
+  // tombstone-filter → mergeRows → append retainedAfterWipe. Trip A was
+  // wiped-and-kept (tombstoned + retained), trip B was deleted on another
+  // device (tombstoned only). A must survive the prune, B must not.
+  test('a trip the user wiped server-side but chose to KEEP survives the '
+      'launch prune; a genuinely deleted one does not (#4056)', () async {
+    await repo.save(entry('kept-A', day: 1));
+    await repo.save(entry('deleted-B', day: 2));
+    final tombstoned = {'kept-A', 'deleted-B'};
+    final retained = {'kept-A'};
+
+    Future<List<TripHistoryEntry>> realShapedMerge(
+        List<TripHistoryEntry> local) async {
+      final live = local.where((e) => !tombstoned.contains(e.id)).toList();
+      final merged = TripsSyncRows.mergeRows(live, const [], tombstoned: tombstoned);
+      return [
+        ...merged,
+        ...TripsSyncRows.retainedAfterWipe(local,
+            tombstoned: tombstoned, retained: retained),
+      ];
+    }
+
+    await LaunchSyncPulls.mergeAndPruneTrips(repo, realShapedMerge);
+
+    expect(repo.storedIds, contains('kept-A'),
+        reason: 'the dialog promised "data stored locally on this device '
+            'is kept" — before #4056 this trip was deleted on the next launch');
+    expect(repo.storedIds, isNot(contains('deleted-B')),
+        reason: 'a delete from another device must still propagate (#3078)');
   });
 
   test('server-only entries are still saved (download direction intact)',

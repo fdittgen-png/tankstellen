@@ -36,6 +36,40 @@ void main() {
       );
     });
 
+    // #4058 — production hands us TankSyncClient.backendHost, which is
+    // `uri.host`: a BARE host, no scheme. `Uri.parse('abc.supabase.co').host`
+    // is '' (it parses as a path), so the first cut collapsed every real
+    // key to '|<userId>' and the backend half was inert. These tests feed
+    // the shape production actually sends.
+    test('accepts the bare host TankSyncClient.backendHost really produces',
+        () {
+      expect(SyncContextKey.of(backendUrl: 'abc.supabase.co', userId: 'u').value,
+          'abc.supabase.co|u');
+      expect(SyncContextKey.of(backendUrl: 'ABC.Supabase.co', userId: 'u').value,
+          'abc.supabase.co|u');
+    });
+
+    test('the bare host and its URL form are the SAME context', () {
+      expect(
+        SyncContextKey.of(backendUrl: 'abc.supabase.co', userId: 'u'),
+        SyncContextKey.of(backendUrl: 'https://abc.supabase.co/', userId: 'u'),
+      );
+    });
+
+    test('two bare hosts with the same user are DIFFERENT contexts', () {
+      expect(
+        SyncContextKey.of(backendUrl: 'a.example', userId: 'u'),
+        isNot(SyncContextKey.of(backendUrl: 'b.example', userId: 'u')),
+      );
+    });
+
+    test('a bare host never aliases the null-backend placeholder', () {
+      expect(SyncContextKey.of(backendUrl: 'a.example', userId: 'u').value,
+          isNot(startsWith('|')));
+      expect(SyncContextKey.of(backendUrl: 'a.example', userId: 'u'),
+          isNot(SyncContextKey.of(backendUrl: null, userId: 'u')));
+    });
+
     test('separates the same account on two different backends', () {
       expect(
         SyncContextKey.of(backendUrl: 'https://a.example', userId: 'u'),
