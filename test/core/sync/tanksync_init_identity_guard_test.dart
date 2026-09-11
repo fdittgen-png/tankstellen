@@ -50,7 +50,6 @@ void main() {
         session = mintedAnonId;
         return mintedAnonId;
       },
-      ensurePublicUser: (userId) async => calls.add('ensureUser:$userId'),
     );
   }
 
@@ -79,8 +78,6 @@ void main() {
       expect(outcome, TankSyncInitOutcome.ready);
       expect(calls, contains('signInAnonymously'));
       expect(storage.getSetting('sync_user_id'), 'new-uuid');
-      expect(calls, contains('ensureUser:new-uuid'),
-          reason: 'the public.users FK row must exist for the new id');
     });
 
     test('live session matching the stored id → ready, nothing rewritten',
@@ -130,7 +127,6 @@ void main() {
           },
           sessionUserId: () => null,
           signInAnonymously: () async => fail('must not be reached'),
-          ensurePublicUser: (_) async {},
         ),
         throwsStateError,
       );
@@ -147,7 +143,6 @@ void main() {
         init: ({required String url, required String anonKey}) async {},
         sessionUserId: () => session,
         signInAnonymously: () async => session,
-        ensurePublicUser: (_) async => throw StateError('RLS hiccup'),
       );
 
       expect(outcome, TankSyncInitOutcome.ready);
