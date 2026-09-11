@@ -47,7 +47,7 @@ import 'schema_table_specs.dart';
 /// replaces the `resolve_share_recipient` email→UUID oracle — the
 /// resolve+insert moves server-side, only success/failure crosses the
 /// wire, and authenticated clients lose EXECUTE on the old resolver.
-const int kSupabaseSchemaVersion = 9;
+const int kSupabaseSchemaVersion = 10;
 
 /// The metadata table that records the applied schema version. Readable by
 /// anyone (it carries no user data — only the schema version the verifier
@@ -116,6 +116,10 @@ String buildMigrationSql(Map<String, bool> schema) {
 
   buffer
     ..writeln(upgradeSql)
+    // #4049 — MUST precede rlsSql: the trip_shares write policies call
+    // public.owns_trip(), and CREATE POLICY resolves its expression at
+    // creation time, so the function has to exist first.
+    ..writeln(ownershipFnSql)
     ..writeln(rlsSql)
     // v8 (#3747) — after rlsSql: the block replaces rlsSql's legacy
     // `users_own FOR ALL` policy with the owner-aware split, so it must
