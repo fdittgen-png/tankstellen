@@ -47,7 +47,10 @@ import 'schema_table_specs.dart';
 /// replaces the `resolve_share_recipient` email→UUID oracle — the
 /// resolve+insert moves server-side, only success/failure crosses the
 /// wire, and authenticated clients lose EXECUTE on the old resolver.
-const int kSupabaseSchemaVersion = 10;
+/// v11 (#4060): `share_trip_with_email_v2()` returns a TEXT outcome so the
+/// client can tell "no such recipient" from "this trip is not on the server
+/// yet" — v1 stays for clients in the field.
+const int kSupabaseSchemaVersion = 11;
 
 /// The metadata table that records the applied schema version. Readable by
 /// anyone (it carries no user data — only the schema version the verifier

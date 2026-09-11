@@ -143,11 +143,23 @@ class TripSharesSync {
       debugPrint('TripSharesSync.shareWithEmail: not authenticated');
       return TripShareResult.notAuthenticated;
     }
+    final params = {'p_trip_id': tripId, 'p_email': recipientEmail};
+    // #4060 — v2 returns a TEXT outcome, so "no such recipient" and "this
+    // trip is not on the server yet" stop sharing one error message.
     try {
-      final ok = await wire.rpc('share_trip_with_email', {
-        'p_trip_id': tripId,
-        'p_email': recipientEmail,
-      });
+      return _fromOutcome(await wire.rpc('share_trip_with_email_v2', params));
+    } catch (e, st) {
+      if (!isMissingFunctionError(e)) {
+        log.error(e, st, layer: ErrorLayer.sync, context: {
+          'where': 'TripSharesSync.shareWithEmail(v2) FAILED for $tripId',
+          'entity': tripId,
+        });
+        return TripShareResult.failed;
+      }
+    }
+    // Self-host on a schema before v11: the boolean v1 RPC.
+    try {
+      final ok = await wire.rpc('share_trip_with_email', params);
       if (ok == true) {
         debugPrint('TripSharesSync.shareWithEmail: shared $tripId');
         return TripShareResult.shared;
@@ -164,6 +176,14 @@ class TripSharesSync {
       return legacyShareWithEmail(wire, tripId, recipientEmail);
     }
   }
+
+  static TripShareResult _fromOutcome(Object? outcome) => switch (outcome) {
+        'shared' => TripShareResult.shared,
+        'recipient_not_found' => TripShareResult.recipientNotFound,
+        'not_owned' => TripShareResult.notSyncedYet,
+        'not_authenticated' => TripShareResult.notAuthenticated,
+        _ => TripShareResult.failed,
+      };
 
   /// Mint an unguessable link/token share for [tripId]. Inserts a row
   /// with a `share_token` and a null `shared_with_id` (the recipient

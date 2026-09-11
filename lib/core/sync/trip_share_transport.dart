@@ -19,6 +19,11 @@ enum TripShareResult {
   /// No TankSync account matched the recipient email.
   recipientNotFound,
 
+  /// #4060 — the server does not (yet) hold this trip under the caller:
+  /// it was recorded before the trips toggle, or its summary upload is
+  /// still in flight. The recipient is fine; the trip needs a sync.
+  notSyncedYet,
+
   /// The caller isn't signed into a TankSync account.
   notAuthenticated,
 
