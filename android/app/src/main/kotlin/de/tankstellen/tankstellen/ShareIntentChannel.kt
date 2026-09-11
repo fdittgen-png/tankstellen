@@ -17,6 +17,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.Locale
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
@@ -63,12 +64,17 @@ object ShareIntentChannel {
 
     /**
      * #4048 — share decoding runs here, never on the platform thread.
-     * Single-threaded so two shares in flight cannot interleave their
-     * cache-file sequence numbers; scheduled so the stall watchdog below
-     * has somewhere to run.
+     * #4064 — a cached pool, not a single thread: the watchdog below
+     * bounds a stalled read by closing the stream, but a pipe-backed
+     * read parked in the kernel is not reliably woken by close() from
+     * another thread. On a single worker that one wedged decode queued
+     * every later SEND behind it for the process lifetime, with no log
+     * and no UI symptom. Each decode now gets its own thread, so a stall
+     * costs one share, never the next one. The cache-file sequence is
+     * serialised separately (see [nextSeq]).
      */
-    private val worker: ScheduledExecutorService =
-        Executors.newSingleThreadScheduledExecutor { r ->
+    private val worker: ExecutorService =
+        Executors.newCachedThreadPool { r ->
             Thread(r, "share-intent-decode").apply { isDaemon = true }
         }
 
@@ -100,6 +106,14 @@ object ShareIntentChannel {
             .setStreamHandler(object : EventChannel.StreamHandler {
                 override fun onListen(args: Any?, sink: EventChannel.EventSink?) {
                     eventSink = sink
+                    // #4064 — a SEND that landed between getInitialShare()
+                    // and this subscription sat in pendingInitial forever.
+                    // Whichever of the two runs first now consumes it.
+                    val parked = pendingInitial
+                    if (parked != null && sink != null) {
+                        pendingInitial = null
+                        sink.success(parked)
+                    }
                 }
 
                 override fun onCancel(args: Any?) {
@@ -246,7 +260,7 @@ object ShareIntentChannel {
         }
         val cacheFile = File(
             context.cacheDir,
-            "shared_receipt_${System.currentTimeMillis()}_${items_seq++}.$ext",
+            "shared_receipt_${System.currentTimeMillis()}_${nextSeq()}.$ext",
         )
         return try {
             resolver.openInputStream(uri)?.use { input ->
@@ -292,6 +306,8 @@ object ShareIntentChannel {
         // the wait; the loop check just fails faster in the common case.
         val stall = watchdog.schedule(
             {
+                // #4064 — the stall is the only evidence there is; say so.
+                Log.w(TAG, "share read stalled past ${SHARE_READ_TIMEOUT_MS}ms — closing the stream")
                 try {
                     input.close()
                 } catch (e: IOException) {
@@ -322,8 +338,11 @@ object ShareIntentChannel {
     }
 
     /** Monotonic suffix so two streams shared in the same millisecond differ. */
-    @Volatile
+    private val seqLock = Any()
     private var items_seq = 0
+
+    /** #4064 — the only writer of [items_seq]; decodes run concurrently now. */
+    private fun nextSeq(): Int = synchronized(seqLock) { items_seq++ }
 
     /** ISO 3166-1 alpha-2 region of the device locale, or null. */
     private fun deviceCountry(): String? {
