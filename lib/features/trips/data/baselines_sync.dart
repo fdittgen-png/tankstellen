@@ -12,6 +12,7 @@ import '../../../core/logging/app_log.dart';
 import 'baseline_sync.dart';
 import '../../../core/sync/deletions_sync.dart';
 import '../../../core/sync/entity_sync.dart';
+import '../../../core/sync/sync_row_ops.dart';
 import '../../../core/sync/sync_transport.dart';
 
 /// Per-vehicle OBD2 baseline sync with Supabase (#780), pulled out of
@@ -23,7 +24,7 @@ import '../../../core/sync/sync_transport.dart';
 /// count wins" — that logic lives in
 /// `features/consumption/data/baseline_sync.dart` (`mergeBaselineJson`,
 /// `totalSampleCount`)). Since #3127 the I/O rides the injectable
-/// [SyncTransport] seam and the delete shares [EntitySync.deleteRow].
+/// [SyncTransport] seam and the delete shares [SyncRowOps.deleteRow].
 class BaselinesSync {
   BaselinesSync._();
 
@@ -104,11 +105,11 @@ class BaselinesSync {
   /// Remove a single vehicle's baseline from the server. Called on
   /// explicit "Forget baseline" from the vehicle edit UI. Tombstone-
   /// first (journal-backed, #3078/#3123) via the shared
-  /// [EntitySync.deleteRow]. Silent on failure — there's nothing the
+  /// [SyncRowOps.deleteRow]. Silent on failure — there's nothing the
   /// caller can do about a network blip, and the local copy is already
   /// gone by the time this runs.
   static Future<void> delete(String vehicleId, {SyncTransport? transport}) =>
-      EntitySync.deleteRow(
+      SyncRowOps.deleteRow(
         table: _table,
         idColumn: 'vehicle_id',
         recordId: vehicleId,

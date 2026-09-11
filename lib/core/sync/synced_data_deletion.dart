@@ -8,6 +8,7 @@ import '../logging/error_logger.dart';
 import '../logging/app_log.dart';
 import '../utils/json_extensions.dart';
 import 'deletions_sync.dart';
+import 'locally_retained_ids.dart';
 import 'sync_transport.dart';
 
 /// What the user asked to wipe from their sync database (#3453).
@@ -34,6 +35,14 @@ enum SyncedDataCategory { trips, vehicles, fillUps, everything }
 /// **Server-side ONLY** (per the issue): local data on this device stays
 /// untouched — the confirmation dialog copy says so. The identity remains
 /// usable after any category, including [SyncedDataCategory.everything].
+///
+/// #4046 — that last sentence used to be false. The tombstone written
+/// above is also what `EntitySync.merge` used to drop local rows by, so
+/// the device promised its copy was the device that deleted it on the
+/// next sync. [LocallyRetainedIds] records the ids this wipe intends to
+/// keep; the merge keeps exactly those and still never re-uploads them.
+/// The two meanings of a tombstone — "the user deleted this record" and
+/// "the server copy is gone, the local one stays" — are now distinct.
 ///
 /// Out of scope, documented deferrals:
 ///  * `price_reports` key on `reporter_id` (not `user_id`), outside the
@@ -105,7 +114,27 @@ class SyncedDataDeletion {
               .map((r) => r.getString(idColumn))
               .whereType<String>()
               .toList();
-          await DeletionsSync.recordAll(table, ids, transport: t);
+          // #4046 — the dialog promises "data stored locally on this
+          // device is kept". The tombstone alone does not deliver that:
+          // the next merge would drop these ids from the local set too.
+          // Record the intent BEFORE the tombstone, so a crash between
+          // the two leaves the rows kept rather than silently removed.
+          await LocallyRetainedIds.retain(table, ids, transport: t);
+          // #4046 — recordAll returns FALSE when the tombstone could not
+          // be uploaded (it stays queued locally). Deleting the server
+          // rows anyway is correct — that is what the user asked for —
+          // but reporting unqualified success is not: without the
+          // tombstone, another device can re-upload its copy and the
+          // data comes back. Surface it.
+          if (!await DeletionsSync.recordAll(table, ids, transport: t)) {
+            allOk = false;
+            log.warn(
+              'SyncedDataDeletion: server rows for "$table" deleted but the '
+              'deletion tombstone is only queued locally — another device '
+              'could re-upload until it lands',
+              layer: ErrorLayer.sync,
+            );
+          }
         }
         // User-scoped by the transport contract (mirrors RLS).
         await t.deleteWhere(table, const {});

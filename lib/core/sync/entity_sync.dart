@@ -4,15 +4,15 @@
 
 import 'package:flutter/foundation.dart';
 
-import '../../core/error/guarded.dart';
 import '../../core/logging/error_logger.dart';
 import '../../core/logging/app_log.dart';
 import '../telemetry/collectors/breadcrumb_collector.dart';
 import '../utils/json_extensions.dart';
 import 'deletions_sync.dart';
 import 'schema_drift_notice.dart';
-import 'sync_device_identity.dart';
+import 'locally_retained_ids.dart';
 import 'sync_helper.dart';
+import 'sync_row_ops.dart';
 import 'sync_run_trace.dart';
 import 'sync_transport.dart';
 
@@ -169,6 +169,23 @@ class EntitySync<T> {
         tombstoned,
         key: (r) => r.getString(idColumn),
       ).toList();
+      // #4046 — a tombstone means "do not put this back on the server".
+      // It does NOT always mean "delete the local copy": when the user
+      // wiped the server and was told "data stored locally on this device
+      // is kept", this device recorded the ids it intends to keep. Those
+      // rows stay out of `liveLocal` — so they are never uploaded, never
+      // LWW-compared, never resurrected — and are added back to the
+      // merged result at the end. Tombstones from anywhere else still
+      // remove the local row, which is what a real record deletion on
+      // another device must do (#3078).
+      final retained =
+          LocallyRetainedIds.forTable(table, transport: t);
+      final keptLocally = retained.isEmpty
+          ? const <Object?>[]
+          : local
+              .where((r) =>
+                  tombstoned.contains(idOf(r)) && retained.contains(idOf(r)))
+              .toList();
       final liveLocal =
           local.where((r) => !tombstoned.contains(idOf(r))).toList();
 
@@ -237,6 +254,8 @@ class EntitySync<T> {
       return [
         for (final r in liveLocal) serverNewerById[idOf(r)] ?? r,
         ...downloaded,
+        // #4046 — the rows the server wipe promised to leave alone.
+        ...keptLocally.whereType<T>(),
       ];
     } catch (e, st) {
       // #3560 — an outdated SELF-HOST schema (server rejects a column or
@@ -299,9 +318,10 @@ class EntitySync<T> {
   /// Delete one record from the server and record its durable tombstone
   /// (#3078/#3121/#3123) so no later [merge] resurrects it. Silent on
   /// failure — the caller's local delete already happened. See
-  /// [tombstoneFirstDelete] for the call ordering.
+  /// [tombstoneFirstDelete] for the call ordering and [SyncRowOps.deleteRow]
+  /// for the shared implementation.
   Future<bool> delete(String recordId, {SyncTransport? transport}) =>
-      deleteRow(
+      SyncRowOps.deleteRow(
         table: table,
         idColumn: idColumn,
         recordId: recordId,
@@ -310,75 +330,4 @@ class EntitySync<T> {
         transport: transport,
       );
 
-  /// The shared tombstone-and-delete used by [delete] AND by the entities
-  /// that have a bespoke read path but the same clone-pattern delete
-  /// (ratings, baselines, itineraries). Returns `true` when the server row
-  /// delete succeeded, `false` when unauthenticated or on a transient
-  /// failure (the tombstone intent stays journaled either way, #3123).
-  static Future<bool> deleteRow({
-    required String table,
-    required String idColumn,
-    required String recordId,
-    required String logContext,
-    bool tombstoneFirst = true,
-    SyncTransport? transport,
-  }) async {
-    final t = transport ?? SupabaseSyncTransport.currentOrNull();
-    if (t == null) return false;
-
-    // #3078/#3123 — tombstone-first (journal-backed) by default: the
-    // durable "this id is dead" record must not depend on the row delete
-    // succeeding. `recordAll` has its own internal guard and does not
-    // throw back into this flow.
-    if (tombstoneFirst) {
-      await DeletionsSync.recordAll(table, [recordId], transport: t);
-    }
-    var deleted = false;
-    try {
-      await t.deleteWhere(table, {idColumn: recordId});
-      debugPrint('$logContext: $recordId removed from server');
-      deleted = true;
-    } catch (e, st) {
-      log.error(e, st, layer: ErrorLayer.sync, context: {'where': '$logContext FAILED'});
-    }
-    // #3121 — the alerts ordering: tombstone regardless of the row-delete
-    // outcome, after the delete attempt.
-    if (!tombstoneFirst) {
-      await DeletionsSync.recordAll(table, [recordId], transport: t);
-    }
-    return deleted;
-  }
-
-  /// The #3125 forensic origin stamps every uploaded JSONB `data` blob
-  /// carries (sync-transparent: decode ignores unknown keys, every
-  /// re-upload re-stamps with the writing device).
-  static Map<String, dynamic> forensicStamps() => {
-        'device_id': SyncDeviceIdentity.deviceId,
-        'app_version': SyncDeviceIdentity.appVersion,
-      };
-
-  /// The `updated_at` column value for an upload: carry the local edit
-  /// stamp so the next LWW compare sees equal stamps (skip) instead of a
-  /// phantom-newer server row; legacy unstamped records fall back to
-  /// upload time. Always UTC (#3124).
-  static String lwwStamp(DateTime? updatedAt) =>
-      (updatedAt ?? DateTime.now()).toUtc().toIso8601String();
-
-  /// A per-row resilient decoder for the JSONB-`data`-blob tables
-  /// (`fill_ups` / `vehicles`): a corrupt row logs under [where] and is
-  /// skipped instead of aborting the whole merge.
-  static T? Function(JsonRow) jsonbDataDecoder<T>(
-    T Function(Map<String, dynamic> json) fromJson, {
-    required String where,
-  }) =>
-      (row) {
-        final data = row['data'];
-        if (data is! Map<String, dynamic>) return null;
-        try {
-          return fromJson(data);
-        } catch (e, st) {
-          logFailure(e, st, where: where, layer: ErrorLayer.sync);
-          return null;
-        }
-      };
 }

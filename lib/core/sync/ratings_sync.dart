@@ -8,14 +8,14 @@ import '../../core/logging/error_logger.dart';
 import '../../core/logging/app_log.dart';
 import '../utils/json_extensions.dart';
 import 'deletions_sync.dart';
-import 'entity_sync.dart';
+import 'sync_row_ops.dart';
 import 'sync_transport.dart';
 
 /// Station-rating sync with Supabase, pulled out of [SyncService] (#727).
 ///
 /// Ratings keep a bespoke read/write surface (an explicit-column table
 /// with no union merge), but since #3127 all I/O rides the injectable
-/// [SyncTransport] seam and the delete shares [EntitySync.deleteRow]:
+/// [SyncTransport] seam and the delete shares [SyncRowOps.deleteRow]:
 ///
 /// - [upsert] — add or update a rating (owner-private by default,
 ///   shareable when [shared] is true).
@@ -105,11 +105,11 @@ class RatingsSync {
   /// Delete a rating from the server. Typically called when the
   /// station is unfavorited (ratings live alongside favorites).
   /// Tombstone-first (journal-backed, #3078/#3123) via the shared
-  /// [EntitySync.deleteRow], so another device's re-upload / fetch
+  /// [SyncRowOps.deleteRow], so another device's re-upload / fetch
   /// can't resurrect the deleted rating even when the row delete
   /// fails transiently.
   static Future<void> delete(String stationId, {SyncTransport? transport}) =>
-      EntitySync.deleteRow(
+      SyncRowOps.deleteRow(
         table: _table,
         idColumn: 'station_id',
         recordId: stationId,

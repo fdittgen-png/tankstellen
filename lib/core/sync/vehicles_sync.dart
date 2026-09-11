@@ -3,12 +3,13 @@
 
 import '../domain/vehicle_profile.dart';
 import 'entity_sync.dart';
+import 'sync_row_ops.dart';
 import 'sync_isolate_decode.dart';
 import 'sync_transport.dart';
 
 /// #3451 — top-level PURE `compute()` entrypoint (no Hive / plugins /
 /// logging, so it can run on a worker isolate). Behaviour mirrors
-/// [EntitySync.jsonbDataDecoder]: a missing or corrupt `data` blob maps to
+/// [SyncRowOps.jsonbDataDecoder]: a missing or corrupt `data` blob maps to
 /// `null` and is skipped by the merge.
 List<VehicleProfile?> decodeVehicleDataRows(List<Map<String, dynamic>> rows) =>
     [for (final row in rows) _decodeVehicleRow(row)];
@@ -53,12 +54,12 @@ class VehiclesSync {
       // #3125 — forensic origin stamps ride INSIDE the JSONB blob
       // (sync-transparent: decode ignores unknown keys, every re-upload
       // re-stamps with the writing device).
-      'data': {...v.toJson(), ...EntitySync.forensicStamps()},
+      'data': {...v.toJson(), ...SyncRowOps.forensicStamps()},
       // Carry the local edit stamp so the next LWW compare sees equal
       // stamps (skip). Legacy unstamped profiles fall back to upload time.
-      'updated_at': EntitySync.lwwStamp(v.updatedAt),
+      'updated_at': SyncRowOps.lwwStamp(v.updatedAt),
     },
-    decode: EntitySync.jsonbDataDecoder(
+    decode: SyncRowOps.jsonbDataDecoder(
       VehicleProfile.fromJson,
       where: 'VehiclesSync.merge decode failed',
     ),
