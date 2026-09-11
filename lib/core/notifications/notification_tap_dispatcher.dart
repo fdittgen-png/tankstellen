@@ -34,6 +34,24 @@ class NotificationTapDispatcher {
   /// through without crashing the listener.
   Stream<String?> get stream => _controller.stream;
 
+  /// #4070 — the trip tile's action payloads share this channel with the
+  /// alert deep-link payloads. Every listener used to receive both and
+  /// filter by shape; the launch handler `jsonDecode`d `trip_action:*`
+  /// and logged a fabricated error per Stop tap (#4054), and the shape
+  /// guard added there in turn hid a truncated alert payload. Namespace
+  /// here instead: each listener sees only its own.
+  static const String actionPrefix = 'trip_action:';
+
+  /// Payloads addressed to the notification LAUNCH handler (alert
+  /// deep-links): everything that is not a trip-tile action.
+  Stream<String?> get launchPayloads =>
+      stream.where((p) => p == null || !p.startsWith(actionPrefix));
+
+  /// Payloads addressed to the trip tile (`trip_action:<id>`).
+  Stream<String> get actionPayloads => stream
+      .where((p) => p != null && p.startsWith(actionPrefix))
+      .cast<String>();
+
   /// Pump a payload onto the stream. Called from the static plugin
   /// callback in `LocalNotificationService`. Visible for tests so a
   /// fake tap can be injected without going through the plugin.

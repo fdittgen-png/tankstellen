@@ -26,11 +26,7 @@ part 'trip_tile_action_listener_provider.g.dart';
 @Riverpod(keepAlive: true)
 void tripTileActionListener(Ref ref) {
   final sub =
-      NotificationTapDispatcher.instance.stream.listen((payload) {
-    if (payload == null ||
-        !payload.startsWith(AndroidLiveActivityNotifier.actionPayloadPrefix)) {
-      return;
-    }
+      NotificationTapDispatcher.instance.actionPayloads.listen((payload) {
     final action = payload
         .substring(AndroidLiveActivityNotifier.actionPayloadPrefix.length);
     BreadcrumbCollector.add('trip tile action', detail: action);
