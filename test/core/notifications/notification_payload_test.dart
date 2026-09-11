@@ -4,6 +4,7 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/notifications/notification_payload.dart';
 import '../../helpers/silence_error_logger.dart';
 
@@ -163,6 +164,91 @@ void main() {
       );
       expect(a, isNot(equals(differentStation)));
       expect(a, isNot(equals(differentCountry)));
+    });
+  });
+
+  /// #4054 — the tap dispatcher is SHARED with the trip tile, so most of
+  /// what reaches [NotificationPayload.tryDecode] is not addressed to it.
+  ///
+  /// The field log of 2026-09-11 carried a `FormatException` for every
+  /// Stop and Pause tap during recording: the trip tile's own listener
+  /// handled the action correctly, and this decoder logged an error about
+  /// it anyway. The exportable error log is what the user sends when
+  /// something is actually wrong; two invented entries per trip are a
+  /// real cost to it.
+  ///
+  /// The distinction pinned here: a payload that does not open a JSON
+  /// object is *not mine* and must be silent; one that looks like mine
+  /// and fails to parse is *mine and corrupt* and must stay reported.
+  group('#4054 — a foreign payload is not a fault', () {
+    late List<Object> logged;
+
+    Future<void> settle() => Future<void>.delayed(Duration.zero);
+
+    setUp(() {
+      logged = <Object>[];
+      errorLogger.spoolEnqueueOverride = ({
+        required String isolateTaskName,
+        required Object error,
+        StackTrace? stack,
+        Map<String, dynamic>? contextMap,
+        DateTime? timestamp,
+      }) async {
+        logged.add(error);
+      };
+    });
+
+    // Restore the file-wide silencer rather than resetForTest(), which
+    // would re-arm the real spool for every test after this group.
+    tearDown(() {
+      errorLogger.spoolEnqueueOverride = ({
+        required String isolateTaskName,
+        required Object error,
+        StackTrace? stack,
+        Map<String, dynamic>? contextMap,
+        DateTime? timestamp,
+      }) async {};
+    });
+
+    test('the exact trip-tile payloads from the field log stay silent',
+        () async {
+      for (final raw in const [
+        'trip_action:trip_stop',
+        'trip_action:trip_pause',
+      ]) {
+        expect(NotificationPayload.tryDecode(raw), isNull, reason: raw);
+      }
+      await settle();
+      expect(logged, isEmpty,
+          reason: 'a payload addressed to another listener is routine — it '
+              "does not belong in the user's error log");
+    });
+
+    test('nor does any other payload that opens no JSON object', () async {
+      for (final raw in const ['legacy-v1', '42', '[1,2]', 'null', '   ']) {
+        expect(NotificationPayload.tryDecode(raw), isNull, reason: raw);
+      }
+      await settle();
+      expect(logged, isEmpty);
+    });
+
+    test('a payload that DOES open an object but is corrupt still logs',
+        () async {
+      expect(NotificationPayload.tryDecode('{"k":"radius",'), isNull);
+      await settle();
+      expect(logged, hasLength(1),
+          reason: 'malformed JSON addressed to this decoder is a genuine '
+              'fault and must stay visible');
+      expect(logged.single, isA<FormatException>());
+    });
+
+    test('a valid payload still decodes, leading whitespace and all',
+        () async {
+      final decoded =
+          NotificationPayload.tryDecode('  {"k":"radius","s":"de-1","c":"de"}');
+      expect(decoded?.stationId, 'de-1');
+      await settle();
+      expect(logged, isEmpty);
     });
   });
 }
