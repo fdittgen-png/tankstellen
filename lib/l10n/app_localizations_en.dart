@@ -3065,6 +3065,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapSheetViewDetails => 'View station details';
 
   @override
+  String get startupFailureTitle => 'Sparkilo couldn\'t start';
+
+  @override
+  String get startupFailureMessage =>
+      'Sparkilo could not finish starting up. Your saved data has not been touched.';
+
+  @override
+  String get startupFailureGuidance =>
+      'Close the app and open it again. If it keeps happening, check for an update: this is almost always a fault in the app rather than in your data. Do not clear the app\'s storage — that would delete your favourites and history without fixing anything.';
+
+  @override
   String get shellSwipeCoachMark =>
       'Swipe down — or double-tap the bar — to use the whole screen';
 
@@ -12304,6 +12315,17 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get mapSheetViewDetails => '⟦Ṽîéŵ šŧáŧîóñ đéŧáîłš ········⟧';
+
+  @override
+  String get startupFailureTitle => '⟦Šƥářķîłó çóúłđñ\'ŧ šŧářŧ ·········⟧';
+
+  @override
+  String get startupFailureMessage =>
+      '⟦Šƥářķîłó çóúłđ ñóŧ ƒîñîšĥ šŧářŧîñǧ úƥ. Ýóúř šáṽéđ đáŧá ĥáš ñóŧ ƀééñ ŧóúçĥéđ. ····························⟧';
+
+  @override
+  String get startupFailureGuidance =>
+      '⟦Çłóšé ŧĥé áƥƥ áñđ óƥéñ îŧ áǧáîñ. Îƒ îŧ ķééƥš ĥáƥƥéñîñǧ, çĥéçķ ƒóř áñ úƥđáŧé: ŧĥîš îš áłɱóšŧ áłŵáýš á ƒáúłŧ îñ ŧĥé áƥƥ řáŧĥéř ŧĥáñ îñ ýóúř đáŧá. Đó ñóŧ çłéář ŧĥé áƥƥ\'š šŧóřáǧé — ŧĥáŧ ŵóúłđ đéłéŧé ýóúř ƒáṽóúřîŧéš áñđ ĥîšŧóřý ŵîŧĥóúŧ ƒîẋîñǧ áñýŧĥîñǧ. ························································································⟧';
 
   @override
   String get shellSwipeCoachMark =>

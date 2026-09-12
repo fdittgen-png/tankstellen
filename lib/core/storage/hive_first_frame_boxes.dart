@@ -24,8 +24,15 @@ abstract final class HiveFirstFrameBoxes {
   static Future<void> openAll(HiveAesCipher? cipher) async {
     // #4110 — a local alias so each open stays on one line: the batch
     // has to read as a batch, not as twenty lines of plumbing.
+    //
+    // #4116 — it MUST name HiveOpenTiming explicitly. A bulk rename that
+    // introduced this alias also rewrote its own body to `timed(n, open)`,
+    // so it recursed until the stack blew — on every cold start, inside
+    // the boxes the first frame cannot be painted without. The app never
+    // started, and 16,626 tests passed, because every test of this batch
+    // read the SOURCE TEXT instead of running it.
     Future<Box<T>> timed<T>(String n, Future<Box<T>> Function() open) =>
-        timed(n, open);
+        HiveOpenTiming.timed(n, open);
 
     // Phase 2 — open the first-frame-critical boxes in one parallel
     // batch. #1686 — a box damaged beyond Hive's crash recovery throws

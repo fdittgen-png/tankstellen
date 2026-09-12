@@ -3089,6 +3089,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get mapSheetViewDetails => 'Stationsdetails ansehen';
 
   @override
+  String get startupFailureTitle => 'Sparkilo konnte nicht starten';
+
+  @override
+  String get startupFailureMessage =>
+      'Sparkilo konnte den Start nicht abschließen. Deine gespeicherten Daten sind unverändert.';
+
+  @override
+  String get startupFailureGuidance =>
+      'Schließe die App und öffne sie erneut. Wenn es weiterhin auftritt, suche nach einem Update: das ist fast immer ein Fehler in der App und nicht in deinen Daten. Lösche NICHT den App-Speicher — das würde deine Favoriten und deinen Verlauf löschen, ohne etwas zu beheben.';
+
+  @override
   String get shellSwipeCoachMark =>
       'Nach unten wischen oder doppelt auf die Leiste tippen, um den ganzen Bildschirm zu nutzen';
 

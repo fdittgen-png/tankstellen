@@ -95,8 +95,8 @@ class AppInitializer {
       // #3149 — Hive is down (spool can't write); plain-file the cause.
       await StartupFailureStore.persist(e, st);
       unawaited(errorLogger.log(ErrorLayer.storage, e, st));
-      // #3272 — bare scope (missing_provider_scope); reads no providers.
-      runApp(const ProviderScope(child: StorageRecoveryHost()));
+      // #4116 — only THIS branch may advise clearing storage.
+      runApp(const ProviderScope(child: StorageRecoveryHost(corrupted: true)));
       return;
     } catch (e, st) {
       // #3149 — any OTHER storage-phase fault (secure-storage cipher,

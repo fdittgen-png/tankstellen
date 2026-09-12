@@ -3102,6 +3102,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get mapSheetViewDetails => 'View station details';
 
   @override
+  String get startupFailureTitle => 'Sparkilo n\'a pas pu démarrer';
+
+  @override
+  String get startupFailureMessage =>
+      'Sparkilo n\'a pas pu terminer son démarrage. Vos données enregistrées sont intactes.';
+
+  @override
+  String get startupFailureGuidance =>
+      'Fermez l\'application et rouvrez-la. Si le problème persiste, cherchez une mise à jour : il s\'agit presque toujours d\'un défaut de l\'application et non de vos données. Ne videz PAS le stockage de l\'application — cela supprimerait vos favoris et votre historique sans rien corriger.';
+
+  @override
   String get shellSwipeCoachMark =>
       'Balayez vers le bas — ou double-tapez la barre — pour utiliser tout l\'écran';
 
