@@ -4,6 +4,8 @@
 import 'package:flutter/material.dart';
 
 import '../theme/spacing.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../app/shell/shell_bar_visibility.dart';
 
 /// Bottom padding a scrollable body must reserve so its last row clears a
 /// floating [FloatingActionButton] hosted by [PageScaffold.floatingActionButton]
@@ -34,7 +36,7 @@ double shellScrollClearance(BuildContext context) =>
 /// conventions identified in the #923 audit (plain app bar, banner
 /// strip à la `ThemeSettingsScreen`, ad-hoc hero row). See
 /// `docs/design/DESIGN_SYSTEM.md` §"PageScaffold" for the contract.
-class PageScaffold extends StatelessWidget {
+class PageScaffold extends ConsumerWidget {
   /// App-bar title. Used unless [titleWidget] is provided. Mutually
   /// exclusive with [titleWidget] — exactly one of the two must be
   /// non-null. Renders in the `pageTitle` role wrapped in
@@ -166,21 +168,63 @@ class PageScaffold extends StatelessWidget {
         );
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // #4104 — the top chrome leaves with the bottom bar. "Maximum screen"
+    // has to mean both ends, or the app bar keeps a sixth of the height
+    // for a title the user is not reading. The status bar itself stays
+    // (transparent, over the content — #4101): this hides the APP's
+    // chrome, never the system's, and nothing enters immersive mode.
+    final chromeHidden = ref.watch(shellBarHiddenProvider);
+    final appBar = AppBar(
+      title: titleWidget ?? Semantics(header: true, child: Text(title!)),
+      actions: actions,
+      leading: leading,
+      automaticallyImplyLeading: automaticallyImplyLeading,
+      toolbarHeight: toolbarHeight,
+      titleTextStyle: titleTextStyle,
+      titleSpacing: titleSpacing,
+      bottom: bottom,
+    );
+    // The bar's own height PLUS the status-bar inset it pads itself with.
+    // Both collapse together, which is why the Scaffold below is
+    // `primary: false` — see [_CollapsingAppBar].
+    final fullChromeHeight =
+        appBar.preferredSize.height + MediaQuery.paddingOf(context).top;
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(end: chromeHidden ? 0 : fullChromeHeight),
+      duration: kShellBarHideDuration,
+      curve: Curves.easeOutCubic,
+      builder: (context, height, _) => _build(context, appBar, height),
+    );
+  }
+
+  /// One frame of the collapse. `body`, `actions` and the rest are the
+  /// same widget instances every frame, so Flutter short-circuits their
+  /// subtrees and only the chrome's height actually re-lays-out.
+  Widget _build(BuildContext context, AppBar appBar, double chromeHeight) {
     final effectivePadding = bodyPadding ?? Spacing.screenPadding;
+    final collapsed = chromeHeight < 0.5;
     final scaffold = Scaffold(
-      appBar: AppBar(
-        title: titleWidget ?? Semantics(header: true, child: Text(title!)),
-        actions: actions,
-        leading: leading,
-        automaticallyImplyLeading: automaticallyImplyLeading,
-        toolbarHeight: toolbarHeight,
-        titleTextStyle: titleTextStyle,
-        titleSpacing: titleSpacing,
-        bottom: bottom,
-      ),
-      body: Column(
-        children: [
+      // The wrapper reports the TOTAL height including the status-bar
+      // inset, so the Scaffold must not reserve that inset a second
+      // time — otherwise a fully collapsed bar would leave a
+      // status-bar-tall band behind.
+      primary: false,
+      appBar: collapsed
+          ? null
+          : _CollapsingAppBar(
+              height: chromeHeight,
+              naturalHeight:
+                  appBar.preferredSize.height + MediaQuery.paddingOf(context).top,
+              child: appBar,
+            ),
+      body: SafeArea(
+        // With no app bar the body starts at y=0; keep it off the status
+        // bar. While the bar is collapsing it still covers that strip.
+        top: collapsed,
+        bottom: false,
+        child: Column(
+          children: [
           if (bannerIcon != null)
             _PageBanner(
               icon: bannerIcon!,
@@ -193,7 +237,8 @@ class PageScaffold extends StatelessWidget {
               child: body,
             ),
           ),
-        ],
+          ],
+        ),
       ),
       // #4100 — the shell's bar lives on the OUTER Scaffold, so this
       // one's bottom edge is under it now that the body paints
@@ -212,6 +257,45 @@ class PageScaffold extends StatelessWidget {
     if (bodyBehindBottomBar) return scaffold;
     // Opted out: consume the bar's height so the body stops above it.
     return SafeArea(top: false, child: scaffold);
+  }
+}
+
+/// An [AppBar] whose reported height can be animated to zero (#4104).
+///
+/// `Scaffold.appBar` lays out from `preferredSize`, so an app bar cannot
+/// animate itself — the height has to come from above. This reports the
+/// tween's current value while rendering the bar at its NATURAL height,
+/// bottom-aligned and clipped, so the title and actions slide up under
+/// the top edge instead of squashing.
+///
+/// [height] is the total including the status-bar inset, which is why
+/// the [Scaffold] using this passes `primary: false`: the inset is
+/// inside the number, and letting the Scaffold add it again would leave
+/// a permanent band where the chrome used to be.
+class _CollapsingAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const _CollapsingAppBar({
+    required this.height,
+    required this.naturalHeight,
+    required this.child,
+  });
+
+  final double height;
+  final double naturalHeight;
+  final Widget child;
+
+  @override
+  Size get preferredSize => Size.fromHeight(height);
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRect(
+      child: OverflowBox(
+        alignment: Alignment.bottomCenter,
+        minHeight: naturalHeight,
+        maxHeight: naturalHeight,
+        child: child,
+      ),
+    );
   }
 }
 

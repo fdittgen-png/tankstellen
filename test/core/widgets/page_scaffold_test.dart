@@ -2,13 +2,24 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/app/shell/shell_bar_visibility.dart';
 import 'package:tankstellen/core/widgets/page_scaffold.dart';
 
+import '../../helpers/silence_error_logger.dart';
+
 void main() {
+  // #4104 — PageScaffold watches the chrome-visibility provider, which
+  // logs the settings box a widget test has no business opening.
+  silenceErrorLoggerSpool();
+
   group('PageScaffold', () {
+    // A ProviderScope is required since #4104: the scaffold reads whether
+    // the shell chrome is swiped away.
     Future<void> pump(WidgetTester tester, Widget page) {
-      return tester.pumpWidget(MaterialApp(home: page));
+      return tester
+          .pumpWidget(ProviderScope(child: MaterialApp(home: page)));
     }
 
     testWidgets('renders the title inside the app bar', (tester) async {
@@ -315,6 +326,84 @@ void main() {
         reason: 'PageScaffold title must expose the TalkBack heading role',
       );
       handle.dispose();
+    });
+  });
+
+  group('#4104 — the top chrome leaves with the bottom bar', () {
+    /// The whole point of the feature: "maximum screen" has to mean both
+    /// ends of the screen, status-bar strip included.
+    Future<ProviderContainer> pumpChrome(WidgetTester tester,
+        {required bool hidden}) async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      if (hidden) {
+        await container.read(shellBarHiddenProvider.notifier).set(true);
+      }
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const MaterialApp(
+            home: PageScaffold(
+              title: 'Privacy',
+              body: Text('Body content'),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      return container;
+    }
+
+    testWidgets('shown: the app bar is there', (tester) async {
+      await pumpChrome(tester, hidden: false);
+      expect(find.byType(AppBar), findsOneWidget);
+      expect(find.text('Privacy'), findsOneWidget);
+    });
+
+    testWidgets('hidden: no app bar, and the body claims the strip the '
+        'status bar inset used to hold', (tester) async {
+      const inset = EdgeInsets.only(top: 40);
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      await container.read(shellBarHiddenProvider.notifier).set(true);
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const MaterialApp(
+            home: MediaQuery(
+              data: MediaQueryData(padding: inset),
+              child: PageScaffold(
+                title: 'Privacy',
+                bodyPadding: EdgeInsets.zero,
+                body: Text('Body content'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(AppBar), findsNothing);
+      // Clear of the status bar — the SYSTEM chrome is never hidden —
+      // but nothing more. A Scaffold that still reserved the inset for a
+      // bar that is gone would push this down twice as far.
+      expect(tester.getTopLeft(find.text('Body content')).dy,
+          closeTo(inset.top, 1));
+    });
+
+    testWidgets('it ANIMATES: mid-flight the bar is shorter but still '
+        'mounted', (tester) async {
+      final container = await pumpChrome(tester, hidden: false);
+      final full = tester.getSize(find.byType(AppBar)).height;
+      await container.read(shellBarHiddenProvider.notifier).set(true);
+      await tester.pump();
+      await tester.pump(kShellBarHideDuration ~/ 2);
+      expect(find.byType(AppBar), findsOneWidget,
+          reason: 'the bar must collapse, not blink out');
+      // The AppBar renders at its natural height inside a clip, so what
+      // shrinks is the space the Scaffold gives it.
+      expect(tester.getBottomLeft(find.byType(AppBar)).dy, lessThan(full));
+      await tester.pumpAndSettle();
+      expect(find.byType(AppBar), findsNothing);
     });
   });
 }
