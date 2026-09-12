@@ -340,7 +340,7 @@ final class FilteredSortedSearchResultsProvider
 }
 
 String _$filteredSortedSearchResultsHash() =>
-    r'769ef688454b77cf258638042978c4d964093cfa';
+    r'df1fb8bd421707e657e44c0c6048742c944a90fd';
 
 /// The [raw] search results after the ignored / brand / amenity / open
 /// filters and the active sort — memoised (#1762).

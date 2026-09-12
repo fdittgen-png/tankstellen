@@ -46,7 +46,7 @@ import '../features/price_history/data/repositories/price_history_repository.dar
 import '../features/profile/data/repositories/profile_repository.dart';
 import '../features/widget/data/home_widget_service.dart';
 import '../features/widget/providers/pending_widget_uri_provider.dart';
-import 'profile_language_binding.dart';
+import 'startup/startup_overrides.dart';
 import 'startup/launch_sync_phase.dart';
 import 'startup/provider_warmup_phase.dart';
 import 'startup/telemetry_replay_phase.dart';
@@ -210,7 +210,7 @@ class AppInitializer {
     List<Override> overrides = const [],
   }) =>
       ProviderContainer(
-        overrides: [...profileLanguageOverrides(), ...overrides],
+        overrides: [...startupOverrides(), ...overrides],
       );
 
   /// Resolves the active Sentry DSN at startup. The user-stored
