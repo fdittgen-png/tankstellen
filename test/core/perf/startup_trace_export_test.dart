@@ -141,4 +141,34 @@ void main() {
       expect(((spans.single as Map)['attributes'] as Map)['pulled'], 2);
     });
   });
+
+  group('#4110 — the export names the long pole', () {
+    test('slowestBoxOpen travels when init recorded one', () {
+      final doc = StartupTraceExport.buildDocument(
+        milestones: const [],
+        totalMs: 8891,
+        exportedAt: DateTime.utc(2026, 9, 12),
+        appVersion: '6.0.5',
+        slowestBoxOpen: ('cache', 8600),
+      );
+      expect(doc['slowestBoxOpen'], {'box': 'cache', 'durationMs': 8600});
+      expect(StartupTraceExport.schemaVersion, 3,
+          reason: 'a new export field is a schema bump, or a reader cannot '
+              'tell an old export without the field from a new one whose '
+              'init never ran');
+    });
+
+    test('it is OMITTED, not null-filled, when init has not run', () {
+      final doc = StartupTraceExport.buildDocument(
+        milestones: const [],
+        totalMs: null,
+        exportedAt: DateTime.utc(2026, 9, 12),
+        appVersion: '6.0.5',
+      );
+      expect(doc.containsKey('slowestBoxOpen'), isFalse,
+          reason: 'an absent field is honest; a {"box": null} row invites '
+              'the reader to conclude something');
+    });
+  });
+
 }
