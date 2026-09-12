@@ -111,9 +111,9 @@ class HiveIsolateBoxes {
     // parallel empty box set in Documents.
     await HiveDirectoryResolver.initHive();
     final cipher = await HiveCipherLoader.loadGuarded();
-    for (final box in _boxes) {
-      await box.open(cipher);
-    }
+    // #4072 — the opens are independent; run them together, as
+    // HiveBoxes.init already does for the foreground set.
+    await Future.wait(_boxes.map((box) => box.open(cipher)));
   }
 
   /// Close the Hive boxes opened by [initInIsolate] at the end of a

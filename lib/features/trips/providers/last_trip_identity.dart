@@ -33,10 +33,8 @@ class LastTripIdentity {
   bool get automatic => _automatic;
 
   /// A start that KNOWS both: overwrite whatever a previous trip left.
-  void begin({required String? vehicleId, required DateTime startedAt}) {
-    _vehicleId = vehicleId;
-    _startedAt = startedAt;
-  }
+  void begin({required String? vehicleId, required DateTime startedAt}) =>
+      restore(vehicleId: vehicleId, startedAt: startedAt); // #4073 — one body
 
   /// #769 — the internal start path fills in only what the public entry
   /// did not already record, so a start that came through [begin] keeps

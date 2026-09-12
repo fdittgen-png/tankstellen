@@ -32,6 +32,7 @@ import 'dart:math' as math;
 
 import '../../../trips/api.dart';
 import '../entities/maintenance_suggestion.dart';
+import '../../../../core/utils/stats.dart';
 
 part '_maf_deviation_detector.dart';
 
@@ -195,7 +196,7 @@ double? _medianIdleRpm(List<TripSample> samples) {
     idle.add(rpm);
   }
   if (idle.length < 4) return null;
-  return _median(idle);
+  return median(idle);
 }
 
 /// Shared half-split + emit shape used by both heuristics. [triggerWhen]
@@ -234,9 +235,9 @@ MaintenanceSuggestion? _emitHalfSplitSignal({
   }
 
   final firstMedian =
-      _median(firstHalf.map((e) => e.value).toList(growable: false));
+      median(firstHalf.map((e) => e.value).toList(growable: false));
   final secondMedian =
-      _median(secondHalf.map((e) => e.value).toList(growable: false));
+      median(secondHalf.map((e) => e.value).toList(growable: false));
 
   final observedDelta = triggerWhen(firstMedian, secondMedian);
   if (observedDelta == null) return null;
@@ -254,16 +255,6 @@ MaintenanceSuggestion? _emitHalfSplitSignal({
     sampleTripCount: tripCount,
     computedAt: nowForStamp,
   );
-}
-
-/// Median of a non-empty list of doubles. Mutates a local copy via
-/// `sort` so the caller's list stays untouched.
-double _median(List<double> values) {
-  assert(values.isNotEmpty, 'median requires non-empty input');
-  final sorted = List<double>.from(values)..sort();
-  final n = sorted.length;
-  if (n.isOdd) return sorted[n ~/ 2];
-  return (sorted[n ~/ 2 - 1] + sorted[n ~/ 2]) / 2.0;
 }
 
 class _TimedValue {

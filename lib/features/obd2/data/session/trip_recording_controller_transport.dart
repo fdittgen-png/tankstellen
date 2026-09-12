@@ -96,8 +96,8 @@ mixin _TripRecordingTransportGuard on _TripRecordingSessionState {
   Future<void> _recoverVehicleProtocol() async {
     if (_protocolWorkInFlight) return;
     final now = _now();
-    final last = _lastProtocolRecoveryAt;
-    if (last != null && now.difference(last) < _protocolRecoveryInterval) {
+    if (!intervalElapsed(
+        _lastProtocolRecoveryAt, now, _protocolRecoveryInterval)) {
       return;
     }
     _lastProtocolRecoveryAt = now;
@@ -235,13 +235,14 @@ mixin _TripRecordingTransportGuard on _TripRecordingSessionState {
   /// its verdict (#797 phase 1). The lifecycle guard stays here — the
   /// detector counts, the controller owns the "are we already
   /// pausing?" state.
+  /// #4073 — post-reconnect grace (#3625) or protocol work (#3783) owns the
+  /// link: failures feed the protocol episode, never the drop verdict.
+  bool get _linkQuietWindow => _inReconnectGrace || _protocolWorkInFlight;
+
   void _registerTransportError(Object error) {
     if (_run.pausedDueToDrop || _run.stopped) return;
-    // #3625 — inside the post-reconnect grace the fresh session is
-    // still bringing the bus up; failures feed the #3575 protocol
-    // episode instead of the drop verdict. #3783 — same while protocol
-    // work runs: its quiet window owns the link.
-    if (_inReconnectGrace || _protocolWorkInFlight) return;
+    if (_linkQuietWindow) return; // see the getter
+
     if (_dropDetector.registerTransportError(error)) {
       _droppedSession.handleDrop();
     }

@@ -388,7 +388,8 @@ void main() {
     'lib/features/obd2/data/session/dropped_session_manager.dart': 581,
     'lib/features/driving_score/data/driving_score_calculator.dart': 556,
     'lib/features/profile/presentation/screens/developer_tools/pump_ocr_tester_screen.dart': 525,
-    'lib/features/trips/domain/services/gear_inference.dart': 523,
+    // #4073 — 523 → 502: the private percentile copy moved to core/utils/stats.dart.
+    'lib/features/trips/domain/services/gear_inference.dart': 502,
     'lib/features/receipts_ocr/presentation/widgets/ocr_trace_steps_panel.dart': 509,
     'lib/features/obd2/data/session/auto_trip_coordinator.dart': 496,
     'lib/core/services/station_service_chain.dart': 492,

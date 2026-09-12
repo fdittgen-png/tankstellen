@@ -6,6 +6,7 @@ import '../../../../core/domain/fuel_type.dart';
 import '../../data/models/price_record.dart';
 import '../entities/fill_up_guidance.dart';
 import 'holiday_premium.dart';
+import '../../../../core/utils/num_extensions.dart';
 
 /// Pure, model-free "best time to fill up?" heuristic (#1543).
 ///
@@ -286,8 +287,8 @@ class FillUpGuidancePredictor {
     final third = (n / 3).floor().clamp(1, n);
     final newest = samples.take(third).map((s) => s.price);
     final oldest = samples.skip(n - third).map((s) => s.price);
-    final newMean = _mean(newest.toList());
-    final oldMean = _mean(oldest.toList());
+    final newMean = (newest.toList()).average;
+    final oldMean = (oldest.toList()).average;
     final delta = newMean - oldMean;
     if (delta > trendThresholdEur) return FillUpTrend.rising;
     if (delta < -trendThresholdEur) return FillUpTrend.falling;
@@ -310,7 +311,7 @@ class FillUpGuidancePredictor {
     final averages = <int, double>{};
     for (final entry in buckets.entries) {
       if (entry.value.length < minBucketSamples) continue;
-      averages[entry.key] = _mean(entry.value);
+      averages[entry.key] = (entry.value).average;
     }
     if (averages.length < minBucketsForSignal) return null;
 
@@ -330,9 +331,6 @@ class FillUpGuidancePredictor {
       spread: maxAvg - minAvg,
     );
   }
-
-  double _mean(List<double> xs) =>
-      xs.isEmpty ? 0 : xs.reduce((a, b) => a + b) / xs.length;
 
   /// Maps an hour (0-23) to a [DayPart] ordinal so it can share the
   /// generic bucketing path. Kept in sync with [DayPart] declaration

@@ -113,6 +113,59 @@ class TripDetailLineChartState extends State<TripDetailLineChart> {
     return out;
   }
 
+  // #4072 — memoised derivations keyed on the samples list identity and
+  // the two knobs; a scrub only moves `_selected`.
+  Object? _memoSamples;
+  List<ChartPoint>? _memoPoints;
+  int? _memoWindow;
+  double? _memoCap;
+  ({List<ChartPoint> plotted, List<ChartPoint>? rawBehind, double? yCap})?
+      _memoSeries;
+
+  List<ChartPoint> _derivedPoints() {
+    final cached = _memoPoints;
+    if (identical(widget.samples, _memoSamples) && cached != null) {
+      return cached;
+    }
+    final points = <ChartPoint>[];
+    for (final s in widget.samples) {
+      final v = widget.valueOf(s);
+      if (v == null) continue;
+      points.add(ChartPoint(s.timestamp, v));
+    }
+    points.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    _memoSamples = widget.samples;
+    _memoPoints = points;
+    _memoSeries = null;
+    return points;
+  }
+
+  ({List<ChartPoint> plotted, List<ChartPoint>? rawBehind, double? yCap})
+      _derivedSeries(List<ChartPoint> points) {
+    final cached = _memoSeries;
+    if (cached != null &&
+        _memoWindow == widget.smoothWindow &&
+        _memoCap == widget.capPercentile) {
+      return cached;
+    }
+    var plotted = points;
+    List<ChartPoint>? rawBehind;
+    if (widget.smoothWindow > 1 && points.length > widget.smoothWindow) {
+      rawBehind = points;
+      plotted = _rollingMedian(points, widget.smoothWindow);
+    }
+    double? yCap;
+    final capAt = widget.capPercentile;
+    if (capAt != null && points.length > 10) {
+      final sortedVals = points.map((p) => p.value).toList(growable: false)
+        ..sort();
+      yCap = sortedVals[((sortedVals.length - 1) * capAt).round()];
+    }
+    _memoWindow = widget.smoothWindow;
+    _memoCap = widget.capPercentile;
+    return _memoSeries = (plotted: plotted, rawBehind: rawBehind, yCap: yCap);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -121,12 +174,9 @@ class TripDetailLineChartState extends State<TripDetailLineChart> {
 
     // Keep only samples whose value is non-null; we still need the
     // original timestamps so the chart's X axis reflects real time.
-    final points = <ChartPoint>[];
-    for (final s in widget.samples) {
-      final v = widget.valueOf(s);
-      if (v == null) continue;
-      points.add(ChartPoint(s.timestamp, v));
-    }
+    // #4072 — derived once per samples list, not once per scrub frame:
+    // every crosshair move rebuilt, re-sorted and re-smoothed the series.
+    final points = _derivedPoints();
     final showEmpty =
         widget.samples.isEmpty || (widget.emptyWhenAllNull && points.isEmpty);
     if (showEmpty) {
@@ -142,23 +192,12 @@ class TripDetailLineChartState extends State<TripDetailLineChart> {
         ),
       );
     }
-    points.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-
     // #3502 — readable series: rolling-median smoothing (raw kept faint
     // behind) + a percentile-capped y-axis. Both off by default.
-    var plotted = points;
-    List<ChartPoint>? rawBehind;
-    if (widget.smoothWindow > 1 && points.length > widget.smoothWindow) {
-      rawBehind = points;
-      plotted = _rollingMedian(points, widget.smoothWindow);
-    }
-    double? yCap;
-    final capAt = widget.capPercentile;
-    if (capAt != null && points.length > 10) {
-      final sortedVals = points.map((p) => p.value).toList(growable: false)
-        ..sort();
-      yCap = sortedVals[((sortedVals.length - 1) * capAt).round()];
-    }
+    final derived = _derivedSeries(points);
+    final plotted = derived.plotted;
+    final rawBehind = derived.rawBehind;
+    final yCap = derived.yCap;
 
     final selected = (_selected != null && _selected! < plotted.length)
         ? _selected

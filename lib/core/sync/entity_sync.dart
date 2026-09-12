@@ -180,6 +180,15 @@ class EntitySync<T> {
       // another device must do (#3078).
       final retained =
           LocallyRetainedIds.forTable(table, transport: t);
+      // #4072 — a retained id whose local row is gone (the user deleted
+      // it here since the wipe) has nothing left to protect: release it,
+      // or the retention blob grows for the life of the install.
+      if (retained.isNotEmpty) {
+        final gone = retained.difference(local.map(idOf).toSet());
+        if (gone.isNotEmpty) {
+          await LocallyRetainedIds.release(table, gone, transport: t);
+        }
+      }
       final keptLocally = retained.isEmpty
           ? const <Object?>[]
           : local

@@ -45,6 +45,7 @@ import 'trip_run_state.dart';
 import 'trip_voltage_watch.dart';
 import '../../../../core/logging/app_log.dart';
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/utils/interval_elapsed.dart';
 
 // Re-export the live-reading DTO so existing callers (providers,
 // widget tests) that import this file keep working after the #563

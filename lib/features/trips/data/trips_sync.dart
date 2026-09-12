@@ -221,12 +221,23 @@ class TripsSync {
       // whole trip history, one launch after the user asked to keep it.
       // Retained ids stay in the result (never re-uploaded: they are
       // excluded from liveLocal, hence from localOnly, by design).
+      final retentionTransport = SupabaseSyncTransport.currentOrNull();
+      final retained = LocallyRetainedIds.forTable('trip_summaries',
+          transport: retentionTransport);
       final keptLocally = TripsSyncRows.retainedAfterWipe(
         localEntries,
         tombstoned: tombstoned,
-        retained: LocallyRetainedIds.forTable('trip_summaries',
-            transport: SupabaseSyncTransport.currentOrNull()),
+        retained: retained,
       );
+      // #4072 — release retained ids whose local row is gone (deleted
+      // here since the wipe) so the retention blob cannot grow unbounded.
+      if (retained.isNotEmpty) {
+        final gone = retained.difference(localEntries.map((e) => e.id).toSet());
+        if (gone.isNotEmpty) {
+          await LocallyRetainedIds.release('trip_summaries', gone,
+              transport: retentionTransport);
+        }
+      }
       final serverIds = <String>{};
       for (final r in serverRows) {
         final id = r['id'];
