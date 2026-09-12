@@ -91,19 +91,25 @@ class SummaryChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    // #4094 — an ordinary segment is TEXT on the band, not a filled
+    // surface. Four tonal pills in a row, above a list of filled cards,
+    // above a filled navigation bar, is how the screen became a stack of
+    // surfaces with no hierarchy left to spend. The emphasized
+    // (stale-prices) state keeps its amber fill, which is the point: a
+    // fill now means something, because only one thing has it.
     final foreground = emphasized
         ? theme.colorScheme.onTertiaryContainer
-        : theme.colorScheme.onSecondaryContainer;
+        : theme.colorScheme.onSurfaceVariant;
     final pill = ConstrainedBox(
       constraints: BoxConstraints(maxWidth: maxWidth),
       child: Container(
         padding: Spacing.pillPadding,
         decoration: BoxDecoration(
-          // #3948 — a tonal, borderless read-only pill. The emphasized
-          // (stale-prices) state keeps its amber tertiary tone.
+          // #3948 made these tonal and borderless; #4094 drops the tone
+          // from every segment but the one that is an attention state.
           color: emphasized
               ? theme.colorScheme.tertiaryContainer
-              : theme.colorScheme.secondaryContainer,
+              : Colors.transparent,
           borderRadius: AppRadius.xl,
         ),
         child: Row(

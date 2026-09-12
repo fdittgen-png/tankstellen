@@ -33,8 +33,8 @@ void main() {
       ('eco', AppTheme.eco()),
     ]) {
       testWidgets(
-          'carries primary-card semantics under $name: surfaceContainerLow, '
-          '1 dp outlineVariant edge, no elevation (#3948)', (tester) async {
+          '#4094 — a LIST ROW under $name: no fill, no outline, no '
+          'elevation; one hairline separator underneath', (tester) async {
         await tester.pumpWidget(
           MaterialApp(
             theme: theme,
@@ -43,11 +43,51 @@ void main() {
         );
         await tester.pumpAndSettle();
         final card = tester.widget<Card>(find.byType(Card));
-        expect(card.elevation, 0);
-        expect(card.color, theme.colorScheme.surfaceContainerLow);
+        expect(card.elevation, 0, reason: 'nothing floats but the selection');
+        expect(card.color, Colors.transparent,
+            reason: 'a fill AND an outline AND a gap is three boundaries '
+                'per row; the hairline is one');
         final shape = card.shape as RoundedRectangleBorder;
-        expect(shape.side.color, theme.colorScheme.outlineVariant);
-        expect(shape.side.width, 1);
+        expect(shape.side, BorderSide.none);
+
+        // The one boundary: a line UNDER the row, so two neighbours share
+        // it instead of each drawing their own ring.
+        final decorated = tester.widget<DecoratedBox>(
+          find.descendant(
+            of: find.byType(InkWell),
+            matching: find.byType(DecoratedBox),
+          ),
+        );
+        final border = (decorated.decoration as BoxDecoration).border! as Border;
+        expect(border.bottom.color, theme.colorScheme.outlineVariant);
+        expect(border.left, BorderSide.none);
+      });
+
+      testWidgets('#4094 — the SELECTED row is the only one that floats, '
+          'under $name', (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: theme,
+            home: const Scaffold(
+              body: StationCardShell(selected: true, child: Text('x')),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        final card = tester.widget<Card>(find.byType(Card));
+        // Elevation is the whole signal, so it costs no colour beyond the
+        // surface a floating thing needs to sit on.
+        expect(card.elevation, 2);
+        expect(card.color, theme.colorScheme.surfaceContainerHigh);
+        final decorated = tester.widget<DecoratedBox>(
+          find.descendant(
+            of: find.byType(InkWell),
+            matching: find.byType(DecoratedBox),
+          ),
+        );
+        final border = (decorated.decoration as BoxDecoration).border! as Border;
+        expect(border.bottom, BorderSide.none,
+            reason: 'a floating row is already separated');
       });
     }
 
@@ -76,22 +116,35 @@ void main() {
       expect(border.left.width, 6);
     });
 
-    testWidgets('draws NO stripe when stripeColor is null', (tester) async {
+    testWidgets('draws NO left stripe when stripeColor is null — #4091 '
+        'spends the accent only where it means something', (tester) async {
       await pumpApp(tester, const StationCardShell(child: Text('body')));
-      // The shell itself adds no bordered DecoratedBox when stripeColor is
-      // null (any DecoratedBox present would come from the Card/Material).
-      final bordered = tester
-          .widgetList<DecoratedBox>(
-            find.descendant(
-              of: find.byType(InkWell),
-              matching: find.byType(DecoratedBox),
-            ),
-          )
-          .where((b) {
-            final d = b.decoration;
-            return d is BoxDecoration && d.border is Border;
-          });
-      expect(bordered, isEmpty);
+      final decorated = tester.widget<DecoratedBox>(
+        find.descendant(
+          of: find.byType(InkWell),
+          matching: find.byType(DecoratedBox),
+        ),
+      );
+      final border = (decorated.decoration as BoxDecoration).border! as Border;
+      expect(border.left, BorderSide.none);
+      expect(border.right, BorderSide.none);
+      expect(border.top, BorderSide.none);
+    });
+
+    testWidgets('#4094 — the last row of a list suppresses its separator',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const StationCardShell(separator: false, child: Text('body')),
+      );
+      final decorated = tester.widget<DecoratedBox>(
+        find.descendant(
+          of: find.byType(InkWell),
+          matching: find.byType(DecoratedBox),
+        ),
+      );
+      final border = (decorated.decoration as BoxDecoration).border! as Border;
+      expect(border.bottom, BorderSide.none);
     });
 
     testWidgets('forwards taps through the InkWell', (tester) async {

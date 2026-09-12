@@ -17,20 +17,31 @@ import '../theme/spacing.dart';
 /// so the four cards share a single silhouette and only supply their
 /// distinct body + stripe colour.
 ///
-/// #3948 (Epic #3947) — the shell carries **primary-card** semantics: a
-/// station in the results IS the thing the screen is about, so its frame
-/// is the same `surfaceContainerLow` + 1 dp `outlineVariant` + no
-/// elevation as `PrimaryCard`. The public API is unchanged; only the frame
-/// grammar moved from "elevated filled card" to "outlined primary card".
+/// #3948 (Epic #3947) — the shell carried **primary-card** semantics: a
+/// `surfaceContainerLow` fill with a 1 dp `outlineVariant` edge.
+///
+/// #4094 — it is a LIST ROW now. Every element was individually
+/// reasonable and the problem was cumulative: a rounded, filled, outlined
+/// card inside a rounded control inside a rounded navigation, twenty
+/// times down a screen, each row announcing its own boundary twice (a
+/// fill AND an outline AND a gap). The row now has no fill and no
+/// outline; a hairline `outlineVariant` separator divides it from the
+/// next, which is one boundary instead of three.
+///
+/// **Elevation is reserved for the selected row.** A list where nothing
+/// floats and one thing does says which one the user picked without
+/// spending any colour on it — the #2531 wide layout's selected station
+/// is the case this exists for.
 ///
 /// Frame grammar:
 /// * margin [Spacing.listCardMargin] (12 horizontal / 4 vertical — #4091)
 /// * `Clip.antiAlias`
-/// * fill `surfaceContainerLow`, 1 dp `outlineVariant` edge, elevation 0
-///   (elevation is reserved for things that float)
+/// * transparent, elevation 0, a bottom hairline — or, when [selected],
+///   `surfaceContainerHigh` at elevation 2 and no separator
 /// * shape rounded to [AppRadius.lg] (12) — the canonical card radius
 /// * an [InkWell] tap target sharing the same radius
-/// * an optional left [BorderSide] accent stripe in [stripeColor]
+/// * an optional left [BorderSide] accent stripe in [stripeColor], which
+///   since #4091 is spent only where it means something
 class StationCardShell extends StatelessWidget {
   /// Colour of the left accent stripe. When `null` no stripe is drawn
   /// (e.g. the all-prices card, which carries its colour in the per-fuel
@@ -48,12 +59,23 @@ class StationCardShell extends StatelessWidget {
   /// Tap handler forwarded to the [InkWell].
   final VoidCallback? onTap;
 
+  /// #4094 — the one row allowed to float. Elevation is the whole
+  /// signal, so it costs no colour.
+  final bool selected;
+
+  /// #4094 — draw the hairline that divides this row from the next.
+  /// Suppressed on the last row of a list, and on a [selected] row,
+  /// which is already separated by floating.
+  final bool separator;
+
   const StationCardShell({
     super.key,
     required this.child,
     this.stripeColor,
     this.stripeWidth = 4,
     this.onTap,
+    this.selected = false,
+    this.separator = true,
   });
 
   @override
@@ -62,26 +84,31 @@ class StationCardShell extends StatelessWidget {
     return Card(
       margin: Spacing.listCardMargin,
       clipBehavior: Clip.antiAlias,
-      elevation: 0,
-      color: scheme.surfaceContainerLow,
+      elevation: selected ? 2 : 0,
+      color: selected ? scheme.surfaceContainerHigh : Colors.transparent,
       surfaceTintColor: Colors.transparent,
-      shape: RoundedRectangleBorder(
-        borderRadius: AppRadius.lg,
-        side: BorderSide(color: scheme.outlineVariant),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: AppRadius.lg),
       child: InkWell(
         onTap: onTap,
         borderRadius: AppRadius.lg,
-        child: stripeColor == null
-            ? child
-            : DecoratedBox(
-                decoration: BoxDecoration(
-                  border: Border(
-                    left: BorderSide(color: stripeColor!, width: stripeWidth),
-                  ),
-                ),
-                child: child,
-              ),
+        // One box carries both edges. The left stripe is the semantic
+        // accent (#4091, spent only on the cheapest row); the bottom
+        // hairline is the row separator (#4094) — a line UNDER the row
+        // rather than a ring around it, so two neighbours share one
+        // boundary instead of drawing two.
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border(
+              left: stripeColor == null
+                  ? BorderSide.none
+                  : BorderSide(color: stripeColor!, width: stripeWidth),
+              bottom: (separator && !selected)
+                  ? BorderSide(color: scheme.outlineVariant)
+                  : BorderSide.none,
+            ),
+          ),
+          child: child,
+        ),
       ),
     );
   }
