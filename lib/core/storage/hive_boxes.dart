@@ -225,12 +225,14 @@ class HiveBoxes {
     final cipher = await HiveCipherLoader.loadGuarded();
     StartupTimer.instance.mark('hive_cipher');
 
-    // Phase 1 — migrate any pre-encryption plaintext boxes. The probes
-    // are independent, so they (and any migration) run in parallel.
-    await Future.wait<void>(
-      _encryptedBoxes.map((boxName) =>
-          HiveLegacyMigration.migrateLegacyPlaintextBox(boxName, cipher)),
-    );
+    // Phase 1 — migrate any pre-encryption plaintext boxes, ONCE ever.
+    // #4110 — this ran on every cold start and cost a full open+close of
+    // every encrypted box before Phase 2 opened them again. See
+    // HiveLegacyMigration.runOnce. `boxSchema` is opened here rather than
+    // in Phase 2 because the flag has to be readable before the decision;
+    // Phase 2's open of it is then a no-op on an already-open box.
+    await HiveLegacyMigration.runOnce(
+        _encryptedBoxes, cipher, await Hive.openBox<int>(boxSchema));
     StartupTimer.instance.mark('hive_migrate');
 
     await HiveFirstFrameBoxes.openAll(cipher);

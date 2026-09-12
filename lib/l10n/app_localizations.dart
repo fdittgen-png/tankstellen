@@ -5618,6 +5618,24 @@ abstract class AppLocalizations {
   /// **'View station details'**
   String get mapSheetViewDetails;
 
+  /// Title of the startup-failure screen (#4116) shown when the storage phase fails for a reason that is NOT established corruption — a cipher fault, or a bug in the app itself.
+  ///
+  /// In en, this message translates to:
+  /// **'Sparkilo couldn\'t start'**
+  String get startupFailureTitle;
+
+  /// Body of the startup-failure screen (#4116). It states what is known — startup failed — and explicitly reassures that the data is intact, because the corruption screen this replaces claimed damage that had not been established.
+  ///
+  /// In en, this message translates to:
+  /// **'Sparkilo could not finish starting up. Your saved data has not been touched.'**
+  String get startupFailureMessage;
+
+  /// Guidance on the startup-failure screen (#4116). It actively COUNTERMANDS the clear-storage advice: for a non-corruption fault that destroys the user's favourites and history and fixes nothing.
+  ///
+  /// In en, this message translates to:
+  /// **'Close the app and open it again. If it keeps happening, check for an update: this is almost always a fault in the app rather than in your data. Do not clear the app\'s storage — that would delete your favourites and history without fixing anything.'**
+  String get startupFailureGuidance;
+
   /// One-time coach mark teaching the swipe-away gesture (#4106/#4107). Names BOTH gestures and what they gain; shown once ever, retires itself after 7s, dismissed by performing it, tapping it, or its Dismiss button.
   ///
   /// In en, this message translates to:

@@ -17,7 +17,11 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 void main() {
   group('StorageRecoveryHost', () {
     testWidgets('renders the English recovery copy from ARB', (tester) async {
-      await tester.pumpWidget(const StorageRecoveryHost());
+      // #4116 — `corrupted: true` is now required to get the CORRUPTION
+      // copy. The default branch deliberately says something else and
+      // never advises clearing storage; see
+      // storage_recovery_cause_test.dart.
+      await tester.pumpWidget(const StorageRecoveryHost(corrupted: true));
       await tester.pumpAndSettle();
 
       final l10n = await AppLocalizations.delegate.load(const Locale('en'));

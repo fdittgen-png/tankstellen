@@ -3073,6 +3073,17 @@ class AppLocalizationsNb extends AppLocalizations {
   String get mapSheetViewDetails => 'View station details';
 
   @override
+  String get startupFailureTitle => 'Sparkilo couldn\'t start';
+
+  @override
+  String get startupFailureMessage =>
+      'Sparkilo could not finish starting up. Your saved data has not been touched.';
+
+  @override
+  String get startupFailureGuidance =>
+      'Close the app and open it again. If it keeps happening, check for an update: this is almost always a fault in the app rather than in your data. Do not clear the app\'s storage — that would delete your favourites and history without fixing anything.';
+
+  @override
   String get shellSwipeCoachMark =>
       'Swipe down to hide the bars and use the whole screen';
 

@@ -6,8 +6,24 @@ import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
 import 'animated_splash.dart';
 
-/// Top-level recovery screen shown when [AppInitializer.run] hits a
-/// [HiveCorruptionException] during the storage phase (#2294).
+/// Top-level recovery screen shown when [AppInitializer.run] fails in
+/// the storage phase (#2294).
+///
+/// #4116 — it says TWO different things now, because it was saying the
+/// wrong one. `_initStorage`'s generic catch routes ANY storage-phase
+/// fault here — a cipher failure, a TraceStorage failure, or a plain bug
+/// in our own code — and the screen told every one of them "the storage
+/// file appears to be damaged … clear the app's storage or reinstall.
+/// Your favourites and history cannot be restored." A recursion I
+/// shipped in #4115 produced exactly that screen, so the app was
+/// advising users to destroy their data to work around a bug a patch
+/// fixed in one line.
+///
+/// [corrupted] therefore gates the copy. Only an actual
+/// `HiveCorruptionException` — Hive itself reporting a file it cannot
+/// recover — earns the clear-your-storage advice. Everything else gets a
+/// message that states what is known, says the data is intact, and
+/// explicitly tells the user NOT to clear storage.
 ///
 /// Before this screen existed, a box damaged beyond Hive's own crash
 /// recovery threw an uncaught exception out of `_initStorage`, leaving
@@ -25,7 +41,12 @@ import 'animated_splash.dart';
 /// hard-coded English fallback keeps the screen useful rather than
 /// blank.
 class StorageRecoveryHost extends StatelessWidget {
-  const StorageRecoveryHost({super.key});
+  const StorageRecoveryHost({super.key, this.corrupted = false});
+
+  /// True only when Hive itself reported a file it could not recover.
+  /// Defaults to false — the safe direction, because the false branch
+  /// never advises data loss.
+  final bool corrupted;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +58,7 @@ class StorageRecoveryHost extends StatelessWidget {
       supportedLocales: AppLocalizations.supportedLocales,
       onGenerateRoute: (_) => PageRouteBuilder<void>(
         pageBuilder: (context, animation, secondaryAnimation) =>
-            const _StorageRecoveryBody(),
+            _StorageRecoveryBody(corrupted: corrupted),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
       ),
@@ -46,14 +67,20 @@ class StorageRecoveryHost extends StatelessWidget {
 }
 
 class _StorageRecoveryBody extends StatelessWidget {
-  const _StorageRecoveryBody();
+  const _StorageRecoveryBody({required this.corrupted});
+
+  final bool corrupted;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final title = l10n.storageRecoveryTitle;
-    final message = l10n.storageRecoveryMessage;
-    final guidance = l10n.storageRecoveryGuidance;
+    // #4116 — claim damage only when damage was actually reported.
+    final title =
+        corrupted ? l10n.storageRecoveryTitle : l10n.startupFailureTitle;
+    final message =
+        corrupted ? l10n.storageRecoveryMessage : l10n.startupFailureMessage;
+    final guidance =
+        corrupted ? l10n.storageRecoveryGuidance : l10n.startupFailureGuidance;
 
     return Semantics(
       container: true,
