@@ -397,7 +397,7 @@ void main() {
     'lib/features/trips/presentation/widgets/vehicle_baseline_section.dart': 454,
     'lib/features/trips/data/trip_history_entry.dart': 450,
     'lib/features/obd2/data/transport/bluetooth_obd2_transport.dart': 448,
-    'lib/features/search/presentation/widgets/search_results_list.dart': 444,
+    'lib/features/search/presentation/widgets/search_results_list.dart': 440,
     'lib/features/fill_ups/domain/services/monthly_insights_aggregator.dart': 415,
     'lib/features/fill_ups/presentation/widgets/consumption_stats_card.dart': 414,
     'lib/core/sync/sync_provider.dart': 413,

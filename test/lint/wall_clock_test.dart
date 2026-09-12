@@ -325,7 +325,6 @@ void main() {
     'test/features/search/radar_search_provider_test.dart': 4,
     'test/features/station_detail/presentation/screens/station_detail_screen_test.dart': 9,
     'test/features/station_detail/presentation/widgets/station_detail_inline_test.dart': 4,
-    'test/features/station_detail/presentation/widgets/station_status_row_test.dart': 1,
     'test/features/station_detail/providers/station_detail_provider_detail_only_hours_test.dart': 3,
     'test/features/station_detail/providers/station_detail_provider_regression_test.dart': 3,
     'test/features/station_detail/providers/station_detail_provider_test.dart': 1,

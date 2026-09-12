@@ -77,3 +77,37 @@ const Duration kShellBarHideDuration = Duration(milliseconds: 220);
 /// nav rail, which already gives the content its full height.
 @visibleForTesting
 const double kShellBarTabsHeight = 64;
+
+/// Whether the swipe-away coach mark has been shown (#4106).
+///
+/// Once ever, like the #1690 swipe-between-tabs hint: a gesture needs
+/// introducing exactly one time, and a hint that returns is an
+/// annoyance rather than help.
+@Riverpod(keepAlive: true)
+class ShellSwipeCoachSeen extends _$ShellSwipeCoachSeen {
+  /// The `settings`-box key the flag persists under.
+  static const String storageKey = 'shell_swipe_coach_seen';
+
+  @override
+  bool build() {
+    try {
+      return ref.read(settingsStorageProvider).getSetting(storageKey) == true;
+    } catch (e, st) {
+      // No settings box yet: treat it as SEEN so a user can never be
+      // shown a hint that cannot be remembered as dismissed.
+      logFailure(e, st, where: 'ShellSwipeCoachSeen.build');
+      return true;
+    }
+  }
+
+  /// Mark it shown, for good.
+  Future<void> markSeen() async {
+    if (state) return;
+    state = true;
+    try {
+      await ref.read(settingsStorageProvider).putSetting(storageKey, true);
+    } catch (e, st) {
+      logFailure(e, st, where: 'ShellSwipeCoachSeen.markSeen');
+    }
+  }
+}

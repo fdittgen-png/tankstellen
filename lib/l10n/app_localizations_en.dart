@@ -2960,6 +2960,118 @@ class AppLocalizationsEn extends AppLocalizations {
       'The Consumption tab was hidden by your profile settings.';
 
   @override
+  String stationSourceFlagTooltip(String country, String source) {
+    return 'Prices from $country — $source';
+  }
+
+  @override
+  String get decisionBestValue => 'Best value';
+
+  @override
+  String get decisionCheapest => 'Cheapest';
+
+  @override
+  String get decisionClosest => 'Closest';
+
+  @override
+  String get decisionReasonBestValue => 'Best balance of price and detour';
+
+  @override
+  String decisionReasonSaves(String amount, String volume, String distance) {
+    return 'Saves $amount on $volume · $distance more driving';
+  }
+
+  @override
+  String decisionReasonBreakEven(String volume) {
+    return 'Only worth the detour from $volume up';
+  }
+
+  @override
+  String get decisionValueUnavailable =>
+      'Record a fill-up and the detour can be priced, not just the pump';
+
+  @override
+  String decisionShowAll(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Show all $count stations',
+      one: 'Show the one station',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String decisionAssumption(String consumption, String volume) {
+    return 'Based on $consumption and $volume';
+  }
+
+  @override
+  String get priceFreshnessFresh => 'Fresh price';
+
+  @override
+  String get priceFreshnessRecent => 'Recent price';
+
+  @override
+  String get priceFreshnessAging => 'Aging price';
+
+  @override
+  String get priceFreshnessStale => 'Old price';
+
+  @override
+  String get priceFreshnessUnknown => 'Price age unknown';
+
+  @override
+  String priceFreshnessTooltip(String band, String stamp) {
+    return '$band · $stamp';
+  }
+
+  @override
+  String get priceLabel => 'Price';
+
+  @override
+  String get priceFreshnessLabel => 'Price freshness';
+
+  @override
+  String get availabilityLabel => 'Availability';
+
+  @override
+  String get availabilityNotReported => 'Not reported';
+
+  @override
+  String get refuelQuantityTitle => 'How much do you usually buy?';
+
+  @override
+  String get refuelQuantityExplainer =>
+      'Best value compares what a refuel really costs, so it needs a rough volume. Sparkilo uses the median of your own fill-ups until you say otherwise.';
+
+  @override
+  String get refuelQuantityMeasured => 'Use my fill-up history';
+
+  @override
+  String get refuelQuantityFullTank => 'A full tank';
+
+  @override
+  String get refuelQuantityChange => 'Change';
+
+  @override
+  String refuelQuantityMeasuredValue(String volume) {
+    return '$volume (from your fill-ups)';
+  }
+
+  @override
+  String refuelConsumptionMeasured(String consumption) {
+    return '$consumption (measured)';
+  }
+
+  @override
+  String get refuelConsumptionMissing => 'No consumption yet';
+
+  @override
+  String get shellSwipeCoachMark =>
+      'Swipe down — or double-tap the bar — to use the whole screen';
+
+  @override
   String get shellBarHiddenAnnounce =>
       'Navigation hidden. Swipe up from the bottom, or long-press the button, to bring it back.';
 
@@ -7989,9 +8101,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your country is supported, but it isn\'t set up yet — so prices may be from another country. Choose your country in the search settings to see local prices.';
 
   @override
-  String get stalePriceBadge => 'Old price';
-
-  @override
   String get radiusAlertCenterChipGps => 'My position';
 
   @override
@@ -8779,11 +8888,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get amenitiesServicesShowLess => 'Show less';
-
-  @override
-  String stationStatusWithFreshness(String status, String ago) {
-    return '$status · updated $ago ago';
-  }
 
   @override
   String pricesNotSoldHere(String fuels) {
@@ -12097,6 +12201,119 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get consumptionTabHiddenNotice =>
       '⟦Ŧĥé Çóñšúɱƥŧîóñ ŧáƀ ŵáš ĥîđđéñ ƀý ýóúř ƥřóƒîłé šéŧŧîñǧš. ·····················⟧';
+
+  @override
+  String stationSourceFlagTooltip(String country, String source) {
+    return '⟦Ƥřîçéš ƒřóɱ $country — $source ·····⟧';
+  }
+
+  @override
+  String get decisionBestValue => '⟦Ɓéšŧ ṽáłúé ····⟧';
+
+  @override
+  String get decisionCheapest => '⟦Çĥéáƥéšŧ ····⟧';
+
+  @override
+  String get decisionClosest => '⟦Çłóšéšŧ ···⟧';
+
+  @override
+  String get decisionReasonBestValue =>
+      '⟦Ɓéšŧ ƀáłáñçé óƒ ƥřîçé áñđ đéŧóúř ············⟧';
+
+  @override
+  String decisionReasonSaves(String amount, String volume, String distance) {
+    return '⟦Šáṽéš $amount óñ $volume · $distance ɱóřé đřîṽîñǧ ········⟧';
+  }
+
+  @override
+  String decisionReasonBreakEven(String volume) {
+    return '⟦Óñłý ŵóřŧĥ ŧĥé đéŧóúř ƒřóɱ $volume úƥ ···········⟧';
+  }
+
+  @override
+  String get decisionValueUnavailable =>
+      '⟦Řéçóřđ á ƒîłł-úƥ áñđ ŧĥé đéŧóúř çáñ ƀé ƥřîçéđ, ñóŧ ĵúšŧ ŧĥé ƥúɱƥ ·······················⟧';
+
+  @override
+  String decisionShowAll(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Show all $count stations',
+      one: 'Show the one station',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String decisionAssumption(String consumption, String volume) {
+    return '⟦Ɓášéđ óñ $consumption áñđ $volume ·····⟧';
+  }
+
+  @override
+  String get priceFreshnessFresh => '⟦Ƒřéšĥ ƥřîçé ·····⟧';
+
+  @override
+  String get priceFreshnessRecent => '⟦Řéçéñŧ ƥřîçé ·····⟧';
+
+  @override
+  String get priceFreshnessAging => '⟦Áǧîñǧ ƥřîçé ·····⟧';
+
+  @override
+  String get priceFreshnessStale => '⟦Ółđ ƥřîçé ····⟧';
+
+  @override
+  String get priceFreshnessUnknown => '⟦Ƥřîçé áǧé úñķñóŵñ ·······⟧';
+
+  @override
+  String priceFreshnessTooltip(String band, String stamp) {
+    return '⟦$band · $stamp⟧';
+  }
+
+  @override
+  String get priceLabel => '⟦Ƥřîçé ··⟧';
+
+  @override
+  String get priceFreshnessLabel => '⟦Ƥřîçé ƒřéšĥñéšš ······⟧';
+
+  @override
+  String get availabilityLabel => '⟦Áṽáîłáƀîłîŧý ·····⟧';
+
+  @override
+  String get availabilityNotReported => '⟦Ñóŧ řéƥóřŧéđ ·····⟧';
+
+  @override
+  String get refuelQuantityTitle => '⟦Ĥóŵ ɱúçĥ đó ýóú úšúáłłý ƀúý? ··········⟧';
+
+  @override
+  String get refuelQuantityExplainer =>
+      '⟦Ɓéšŧ ṽáłúé çóɱƥářéš ŵĥáŧ á řéƒúéł řéáłłý çóšŧš, šó îŧ ñééđš á řóúǧĥ ṽółúɱé. Šƥářķîłó úšéš ŧĥé ɱéđîáñ óƒ ýóúř óŵñ ƒîłł-úƥš úñŧîł ýóú šáý óŧĥéřŵîšé. ·····················································⟧';
+
+  @override
+  String get refuelQuantityMeasured => '⟦Úšé ɱý ƒîłł-úƥ ĥîšŧóřý ········⟧';
+
+  @override
+  String get refuelQuantityFullTank => '⟦Á ƒúłł ŧáñķ ····⟧';
+
+  @override
+  String get refuelQuantityChange => '⟦Çĥáñǧé ···⟧';
+
+  @override
+  String refuelQuantityMeasuredValue(String volume) {
+    return '⟦$volume (ƒřóɱ ýóúř ƒîłł-úƥš) ·······⟧';
+  }
+
+  @override
+  String refuelConsumptionMeasured(String consumption) {
+    return '⟦$consumption (ɱéášúřéđ) ····⟧';
+  }
+
+  @override
+  String get refuelConsumptionMissing => '⟦Ñó çóñšúɱƥŧîóñ ýéŧ ·······⟧';
+
+  @override
+  String get shellSwipeCoachMark =>
+      '⟦Šŵîƥé đóŵñ — óř đóúƀłé-ŧáƥ ŧĥé ƀář — ŧó úšé ŧĥé ŵĥółé šçřééñ ····················⟧';
 
   @override
   String get shellBarHiddenAnnounce =>
@@ -17269,9 +17486,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Ýóúř çóúñŧřý îš šúƥƥóřŧéđ, ƀúŧ îŧ îšñ\'ŧ šéŧ úƥ ýéŧ — šó ƥřîçéš ɱáý ƀé ƒřóɱ áñóŧĥéř çóúñŧřý. Çĥóóšé ýóúř çóúñŧřý îñ ŧĥé šéářçĥ šéŧŧîñǧš ŧó šéé łóçáł ƥřîçéš. ·······················································⟧';
 
   @override
-  String get stalePriceBadge => '⟦Ółđ ƥřîçé ····⟧';
-
-  @override
   String get radiusAlertCenterChipGps => '⟦Ṁý ƥóšîŧîóñ ·····⟧';
 
   @override
@@ -18076,11 +18290,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get amenitiesServicesShowLess => '⟦Šĥóŵ łéšš ····⟧';
-
-  @override
-  String stationStatusWithFreshness(String status, String ago) {
-    return '⟦$status · úƥđáŧéđ $ago áǧó ·····⟧';
-  }
 
   @override
   String pricesNotSoldHere(String fuels) {

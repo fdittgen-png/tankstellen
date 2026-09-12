@@ -20,8 +20,12 @@ import '../../../../helpers/pump_app.dart';
 
 /// #3905 — the Favorites card flags a price whose upstream stamp is older
 /// than `kStalePriceThreshold` (7 days), read through the AppClock seam.
+///
+/// #4092 — the separate amber "Old price" pill is gone; the freshness
+/// segment itself says the word, so a stale price is flagged in the one
+/// place the card talks about price age instead of two.
 void main() {
-  const badge = Key('station_card_stale_price_badge');
+  const freshness = Key('station_card_freshness_word');
   // Mid-month Wednesday (per the AppClock guidance) — no boundary lands.
   final now = DateTime(2026, 9, 16, 14, 30);
 
@@ -61,15 +65,18 @@ void main() {
       final stamp = now.subtract(const Duration(days: 6)).toIso8601String();
       await pumpCard(tester, station(stamp));
 
-      expect(find.byKey(badge), findsNothing);
+      // Still flagged as its own band — just not as "old".
+      expect(find.byKey(freshness), findsOneWidget);
       expect(find.text('Old price'), findsNothing);
+      expect(find.text('Aging price'), findsOneWidget);
     });
 
-    testWidgets('8-day-old price: "Old price" badge shown', (tester) async {
+    testWidgets('8-day-old price: the freshness word says "Old price"',
+        (tester) async {
       final stamp = now.subtract(const Duration(days: 8)).toIso8601String();
       await pumpCard(tester, station(stamp));
 
-      expect(find.byKey(badge), findsOneWidget);
+      expect(find.byKey(freshness), findsOneWidget);
       expect(find.text('Old price'), findsOneWidget);
     });
 
@@ -78,7 +85,7 @@ void main() {
       // "Mis à jour 16/07 11:00" seen in September — the reported case.
       await pumpCard(tester, station('16/07 11:00'));
 
-      expect(find.byKey(badge), findsOneWidget);
+      expect(find.text('Old price'), findsOneWidget);
     });
   });
 }

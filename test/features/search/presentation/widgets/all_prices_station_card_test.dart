@@ -566,7 +566,8 @@ void main() {
       );
 
       final card = tester.widget<Card>(find.byType(Card).first);
-      expect(card.margin, Spacing.surfaceMargin);
+      // #4091 — every station card in a list shares the tighter gutter.
+      expect(card.margin, Spacing.listCardMargin);
       expect(card.elevation, 0);
       expect(
         (card.shape as RoundedRectangleBorder).borderRadius,

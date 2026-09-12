@@ -16,6 +16,7 @@ import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/core/domain/station_amenity.dart';
 import 'package:tankstellen/features/search/presentation/widgets/amenity_chips.dart';
+import 'package:tankstellen/features/search/presentation/widgets/results/amenity_summary.dart';
 import 'package:tankstellen/features/search/presentation/widgets/station_card.dart';
 
 import '../helpers/pump_app.dart';
@@ -68,12 +69,12 @@ void main() {
       // (trailing it), so it is read together with the number it
       // qualifies and BEFORE the title, address and meta line below.
       final cheapestBottom = tester.getBottomLeft(cheapest).dy;
-      // The address line is the unambiguous "below the headline" anchor
-      // (the brand text also appears inside the brand-mark monogram).
-      final addressTop = tester.getTopLeft(
-        find.textContaining('Berliner Str.'),
-      ).dy;
-      expect(cheapestBottom, lessThanOrEqualTo(addressTop + 1));
+      // #4091 — the place line is the "below the headline" anchor now:
+      // the street left the card for the detail screen, so the town is
+      // what the row shows. (The brand text also appears inside the
+      // brand-mark monogram, which is why the title is not the anchor.)
+      final placeTop = tester.getTopLeft(find.textContaining('Berlin')).dy;
+      expect(cheapestBottom, lessThanOrEqualTo(placeTop + 1));
     });
 
     testWidgets('closed station shows the expensive tier arrow', (tester) async {
@@ -147,7 +148,11 @@ void main() {
         ),
       );
 
-      expect(find.byType(AmenityChips), findsOneWidget);
+      // #4091 — one compact line of label type, not a wrap of bordered
+      // pills: on a phone the Wrap cost the card two rows, as much height
+      // as its price, name and address combined.
+      expect(find.byType(AmenitySummary), findsOneWidget);
+      expect(find.byType(AmenityChips), findsNothing);
     });
 
     testWidgets('all-fuels view renders the three price rows', (tester) async {
@@ -225,11 +230,16 @@ void main() {
         ),
       );
 
-      // #2926 — the raw street is NEVER hoisted to the title; an unbranded,
-      // unnamed forecourt shows the localized label, and the street drops to
-      // the address line instead.
+      // #2926 — the raw street is NEVER hoisted to the title; an
+      // unbranded, unnamed forecourt shows the localized label.
       expect(find.text('Unbranded station'), findsOneWidget);
-      expect(find.textContaining('Unter den Linden'), findsOneWidget);
+      // #4091 — and the street is no longer anywhere on the card: it
+      // lives on the detail screen, and the row names the town instead.
+      // The street is deliberately not even a fallback for a missing
+      // place name, because for the forecourts whose NAME is their street
+      // that would print the title twice — the #2926 duplicate again.
+      expect(find.textContaining('Unter den Linden'), findsNothing);
+      expect(find.textContaining('Berlin'), findsOneWidget);
     });
   });
 }

@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:tankstellen/core/permissions/camera_permissions.dart';
@@ -53,11 +54,13 @@ void main() {
     ) async {
       final notifier = _TorchStateNotifier(TorchState.off);
       await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          home: Scaffold(
-            body: QrScannerTorchButton(state: notifier, onToggle: () async {}),
+        ProviderScope(
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: QrScannerTorchButton(state: notifier, onToggle: () async {}),
+            ),
           ),
         ),
       );
@@ -79,13 +82,15 @@ Future<void> _pumpButton(
 }) async {
   final notifier = _TorchStateNotifier(torch);
   await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: Scaffold(
-        body: QrScannerTorchButton(
-          state: notifier,
-          onToggle: onToggle ?? () async {},
+    ProviderScope(
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: QrScannerTorchButton(
+            state: notifier,
+            onToggle: onToggle ?? () async {},
+          ),
         ),
       ),
     ),
@@ -127,10 +132,12 @@ void _registerQrScannerFlowTests() {
         currentState: CameraPermissionState.permanentlyDenied,
       );
       await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          home: QrScannerScreen(permissions: perms),
+        ProviderScope(
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: QrScannerScreen(permissions: perms),
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -152,14 +159,16 @@ void _registerQrScannerFlowTests() {
         requestResult: CameraPermissionState.denied,
       );
       await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          home: QrScannerScreen(
-            permissions: perms,
-            // #3872 — rationale pre-acknowledged; this test is about the
-            // re-prompt BEHIND it.
-            settingsStorage: FakeSettingsStorage.rationalesShown(),
+        ProviderScope(
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: QrScannerScreen(
+              permissions: perms,
+              // #3872 — rationale pre-acknowledged; this test is about the
+              // re-prompt BEHIND it.
+              settingsStorage: FakeSettingsStorage.rationalesShown(),
+            ),
           ),
         ),
       );
@@ -183,12 +192,14 @@ void _registerQrScannerFlowTests() {
         requestResult: CameraPermissionState.granted,
       );
       await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          home: QrScannerScreen(
-            permissions: perms,
-            settingsStorage: FakeSettingsStorage.rationalesShown(),
+        ProviderScope(
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: QrScannerScreen(
+              permissions: perms,
+              settingsStorage: FakeSettingsStorage.rationalesShown(),
+            ),
           ),
         ),
       );
@@ -211,10 +222,12 @@ void _registerQrScannerFlowTests() {
       );
       final storage = FakeSettingsStorage();
       await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          home: QrScannerScreen(permissions: perms, settingsStorage: storage),
+        ProviderScope(
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: QrScannerScreen(permissions: perms, settingsStorage: storage),
+          ),
         ),
       );
       // The screen stays in its `probing` phase (indeterminate spinner)

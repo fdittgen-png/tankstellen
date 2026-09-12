@@ -5456,6 +5456,180 @@ abstract class AppLocalizations {
   /// **'The Consumption tab was hidden by your profile settings.'**
   String get consumptionTabHiddenNotice;
 
+  /// Tooltip and screen-reader label on the small country flag each result carries (#4105). Names the country and the open-data service the price came from, so the flag on a card means the same thing as the flag on the summary bar.
+  ///
+  /// In en, this message translates to:
+  /// **'Prices from {country} — {source}'**
+  String stationSourceFlagTooltip(String country, String source);
+
+  /// Ranking label in the results decision header (#4090): the station with the lowest effective price per litre once the detour's fuel is counted.
+  ///
+  /// In en, this message translates to:
+  /// **'Best value'**
+  String get decisionBestValue;
+
+  /// Ranking label in the results decision header (#4090): the lowest pump price, before any detour arithmetic.
+  ///
+  /// In en, this message translates to:
+  /// **'Cheapest'**
+  String get decisionCheapest;
+
+  /// Ranking label in the results decision header (#4090): the least driving.
+  ///
+  /// In en, this message translates to:
+  /// **'Closest'**
+  String get decisionClosest;
+
+  /// The reason line under the Best value row of the decision header (#4090).
+  ///
+  /// In en, this message translates to:
+  /// **'Best balance of price and detour'**
+  String get decisionReasonBestValue;
+
+  /// The reason line under a cheaper-but-further row of the decision header (#4090). Both halves of the trade are stated: what the pump price saves at the assumed quantity, and the extra driving it costs. Never a net figure presented as a verdict.
+  ///
+  /// In en, this message translates to:
+  /// **'Saves {amount} on {volume} · {distance} more driving'**
+  String decisionReasonSaves(String amount, String volume, String distance);
+
+  /// The reason line when a cheaper station's detour eats the saving at the assumed quantity (#4090). The break-even volume from the economics spec, stated as the condition it is.
+  ///
+  /// In en, this message translates to:
+  /// **'Only worth the detour from {volume} up'**
+  String decisionReasonBreakEven(String volume);
+
+  /// Replaces the Best value row when no consumption figure exists (#4090). The header states why the ranking is missing rather than fabricating a recommendation — economics spec section 4.1.
+  ///
+  /// In en, this message translates to:
+  /// **'Record a fill-up and the detour can be priced, not just the pump'**
+  String get decisionValueUnavailable;
+
+  /// Closes the decision header (#4090) and scrolls on to the full list.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Show the one station} other{Show all {count} stations}}'**
+  String decisionShowAll(int count);
+
+  /// The assumptions the decision header's arithmetic rests on, shown as the assumptions they are (#4090). Consumption is the vehicle's measured or estimated figure; volume is the assumed purchase.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on {consumption} and {volume}'**
+  String decisionAssumption(String consumption, String volume);
+
+  /// Freshness band on a result row (#4092): the operator published this price within the last few hours. Freshness is stated in words because a coloured dot meaning 'something good' has to be decoded.
+  ///
+  /// In en, this message translates to:
+  /// **'Fresh price'**
+  String get priceFreshnessFresh;
+
+  /// Freshness band on a result row (#4092): published within the last day.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent price'**
+  String get priceFreshnessRecent;
+
+  /// Freshness band on a result row (#4092): more than a day old but inside the stale threshold. Worth a glance, not a warning.
+  ///
+  /// In en, this message translates to:
+  /// **'Aging price'**
+  String get priceFreshnessAging;
+
+  /// Freshness band on a result row (#4092): older than the stale threshold. Same wording as the favorites badge so the two lists agree.
+  ///
+  /// In en, this message translates to:
+  /// **'Old price'**
+  String get priceFreshnessStale;
+
+  /// Freshness band on a result row (#4092): no timestamp, or one in a shape the reader does not know. Never presented as fresh, and never as stale either.
+  ///
+  /// In en, this message translates to:
+  /// **'Price age unknown'**
+  String get priceFreshnessUnknown;
+
+  /// Tooltip and screen-reader label for the freshness segment (#4092): the band in words, then the raw timestamp the operator published, so the coarse word never hides the exact figure.
+  ///
+  /// In en, this message translates to:
+  /// **'{band} · {stamp}'**
+  String priceFreshnessTooltip(String band, String stamp);
+
+  /// Row label on the station detail sheet (#4092). Price, price freshness and availability are three orthogonal facts and get three labels; they must never collapse into one indicator.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get priceLabel;
+
+  /// Row label on the station detail sheet (#4092) — see priceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Price freshness'**
+  String get priceFreshnessLabel;
+
+  /// Row label on the station detail sheet (#4092) — see priceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Availability'**
+  String get availabilityLabel;
+
+  /// Availability value when the service publishes no opening state (#4092). An unknown state is stated as unknown, never rendered as open or as closed.
+  ///
+  /// In en, this message translates to:
+  /// **'Not reported'**
+  String get availabilityNotReported;
+
+  /// Title of the refill-quantity sheet (#4095). The quantity is an assumption behind the Best value comparison; the app never needs it to work, and never asks for tank capacity.
+  ///
+  /// In en, this message translates to:
+  /// **'How much do you usually buy?'**
+  String get refuelQuantityTitle;
+
+  /// Body of the refill-quantity sheet (#4095): says what the number is for and that the default is measured, not guessed.
+  ///
+  /// In en, this message translates to:
+  /// **'Best value compares what a refuel really costs, so it needs a rough volume. Sparkilo uses the median of your own fill-ups until you say otherwise.'**
+  String get refuelQuantityExplainer;
+
+  /// The option that hands the quantity back to the measured median (#4095) — the default, and the better answer where a history exists.
+  ///
+  /// In en, this message translates to:
+  /// **'Use my fill-up history'**
+  String get refuelQuantityMeasured;
+
+  /// Offered only when the active vehicle has a tank capacity on file (#4095). Capacity is a ceiling on the quantity, never a requirement.
+  ///
+  /// In en, this message translates to:
+  /// **'A full tank'**
+  String get refuelQuantityFullTank;
+
+  /// The affordance on the decision header's assumption line that opens the refill-quantity sheet (#4095).
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get refuelQuantityChange;
+
+  /// The measured-median option with the value it currently resolves to (#4095).
+  ///
+  /// In en, this message translates to:
+  /// **'{volume} (from your fill-ups)'**
+  String refuelQuantityMeasuredValue(String volume);
+
+  /// The vehicle's consumption shown as the assumption it is (#4095), flagged as coming from the user's own fill-ups rather than a model.
+  ///
+  /// In en, this message translates to:
+  /// **'{consumption} (measured)'**
+  String refuelConsumptionMeasured(String consumption);
+
+  /// Shown in the refill-quantity sheet when there is no measured consumption (#4095) — the Best value ranking is withheld until there is one.
+  ///
+  /// In en, this message translates to:
+  /// **'No consumption yet'**
+  String get refuelConsumptionMissing;
+
+  /// One-time coach mark teaching the swipe-away gesture (#4106/#4107). Names BOTH gestures and what they gain; shown once ever, retires itself after 7s, dismissed by performing it, tapping it, or its Dismiss button.
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe down — or double-tap the bar — to use the whole screen'**
+  String get shellSwipeCoachMark;
+
   /// Announced to assistive technologies when the user swipes the bottom navigation bar away (#4097). It names BOTH ways back, because a hidden bar with no affordance is a dead end.
   ///
   /// In en, this message translates to:
@@ -13689,12 +13863,6 @@ abstract class AppLocalizations {
   /// **'Your country is supported, but it isn\'t set up yet — so prices may be from another country. Choose your country in the search settings to see local prices.'**
   String get configureCountryBody;
 
-  /// Small badge on a favorites station card whose price timestamp is older than the stale-price threshold (7 days) — warns that the shown price is probably outdated (#3905).
-  ///
-  /// In en, this message translates to:
-  /// **'Old price'**
-  String get stalePriceBadge;
-
   /// Chip on the zone-alert sheet naming the chosen alert centre when it was bound to the device's current GPS position (#3905).
   ///
   /// In en, this message translates to:
@@ -14865,12 +15033,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show less'**
   String get amenitiesServicesShowLess;
-
-  /// Station-detail header line: the open / closed / unknown state followed by how long ago the data was fetched. Owns the whole word order per locale — never composed from fragments (#3902).
-  ///
-  /// In en, this message translates to:
-  /// **'{status} · updated {ago} ago'**
-  String stationStatusWithFreshness(String status, String ago);
 
   /// Muted footnote under the station-detail price list naming the base fuels this station has no price for (they are hidden from the list). {fuels} is a comma-joined list of fuel codes (#3902).
   ///

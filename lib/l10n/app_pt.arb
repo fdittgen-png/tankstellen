@@ -4717,7 +4717,6 @@
     }
   },
   "openingHoursAutomate24h": "Bomba automática 24 h/24 (pagamento com cartão)",
-  "stalePriceBadge": "Preço antigo",
   "radiusAlertCenterChipGps": "A minha posição",
   "radiusAlertCenterChipMap": "Ponto no mapa",
   "radiusAlertCenterChipPostal": "Código postal {postalCode}",
@@ -4745,19 +4744,6 @@
     "placeholders": {
       "date": {
         "type": "String"
-      }
-    }
-  },
-  "stationStatusWithFreshness": "{status} · atualizado há {ago}",
-  "@stationStatusWithFreshness": {
-    "placeholders": {
-      "status": {
-        "type": "String",
-        "example": "Open"
-      },
-      "ago": {
-        "type": "String",
-        "example": "< 1 min"
       }
     }
   },
@@ -6210,6 +6196,206 @@
   },
   "shellBarToggleHint": "Long-press to hide or show the navigation",
   "@shellBarToggleHint": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "shellSwipeCoachMark": "Swipe down to hide the bars and use the whole screen",
+  "@shellSwipeCoachMark": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "stationSourceFlagTooltip": "Prices from {country} — {source}",
+  "@stationSourceFlagTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "decisionBestValue": "Best value",
+  "@decisionBestValue": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "decisionCheapest": "Cheapest",
+  "@decisionCheapest": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "decisionClosest": "Closest",
+  "@decisionClosest": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "decisionReasonBestValue": "Best balance of price and detour",
+  "@decisionReasonBestValue": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "decisionReasonSaves": "Saves {amount} on {volume} · {distance} more driving",
+  "@decisionReasonSaves": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "volume": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "decisionReasonBreakEven": "Only worth the detour from {volume} up",
+  "@decisionReasonBreakEven": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "volume": {
+        "type": "String"
+      }
+    }
+  },
+  "decisionValueUnavailable": "Record a fill-up and the detour can be priced, not just the pump",
+  "@decisionValueUnavailable": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "decisionShowAll": "{count, plural, =1{Show the one station} other{Show all {count} stations}}",
+  "@decisionShowAll": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "decisionAssumption": "Based on {consumption} and {volume}",
+  "@decisionAssumption": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "consumption": {
+        "type": "String"
+      },
+      "volume": {
+        "type": "String"
+      }
+    }
+  },
+  "priceFreshnessFresh": "Fresh price",
+  "@priceFreshnessFresh": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "priceFreshnessRecent": "Recent price",
+  "@priceFreshnessRecent": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "priceFreshnessAging": "Aging price",
+  "@priceFreshnessAging": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "priceFreshnessStale": "Old price",
+  "@priceFreshnessStale": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "priceFreshnessUnknown": "Price age unknown",
+  "@priceFreshnessUnknown": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "priceFreshnessTooltip": "{band} · {stamp}",
+  "@priceFreshnessTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "band": {
+        "type": "String"
+      },
+      "stamp": {
+        "type": "String"
+      }
+    }
+  },
+  "priceLabel": "Price",
+  "@priceLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "priceFreshnessLabel": "Price freshness",
+  "@priceFreshnessLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "availabilityLabel": "Availability",
+  "@availabilityLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "availabilityNotReported": "Not reported",
+  "@availabilityNotReported": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelQuantityTitle": "How much do you usually buy?",
+  "@refuelQuantityTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelQuantityExplainer": "Best value compares what a refuel really costs, so it needs a rough volume. Sparkilo uses the median of your own fill-ups until you say otherwise.",
+  "@refuelQuantityExplainer": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelQuantityMeasured": "Use my fill-up history",
+  "@refuelQuantityMeasured": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelQuantityFullTank": "A full tank",
+  "@refuelQuantityFullTank": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelQuantityChange": "Change",
+  "@refuelQuantityChange": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelQuantityMeasuredValue": "{volume} (from your fill-ups)",
+  "@refuelQuantityMeasuredValue": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "volume": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelConsumptionMeasured": "{consumption} (measured)",
+  "@refuelConsumptionMeasured": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "consumption": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelConsumptionMissing": "No consumption yet",
+  "@refuelConsumptionMissing": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

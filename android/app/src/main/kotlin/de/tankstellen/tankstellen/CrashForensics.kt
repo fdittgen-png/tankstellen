@@ -45,6 +45,15 @@ object CrashForensics {
     /** Cap for an OS-provided ANR/native trace stream per exit record. */
     private const val MAX_TRACE_BYTES = 64 * 1024
 
+    // #4111 — ApplicationExitInfo.REASON_PACKAGE_STATE_CHANGE (15) and
+    // REASON_PACKAGE_UPDATED (16). Numeric literals rather than the
+    // constants so the comparison is correct whatever SDK this is built
+    // against, and so a device reporting them on an older platform is
+    // still recognised. Both mean "the package manager stopped the app",
+    // not "the app died".
+    private const val REASON_PACKAGE_STATE_CHANGE = 15
+    private const val REASON_PACKAGE_UPDATED = 16
+
     private fun journalFile(context: Context): File =
         File(File(context.filesDir, JOURNAL_DIR).apply { mkdirs() }, PENDING_FILE)
 
@@ -129,10 +138,28 @@ object CrashForensics {
                 if (info.timestamp > newest) newest = info.timestamp
                 // EXIT_SELF / user-initiated stops are normal lifecycle —
                 // only abnormal deaths become error traces.
+                //
+                // #4111 — REASON_PACKAGE_UPDATED (16) and
+                // REASON_PACKAGE_STATE_CHANGE (15) belong on that list and
+                // were missing, so they fell through to the numeric
+                // fallback and shipped as "process died: unknown_16". Six
+                // of nine process-death traces in the 2026-09-12 field
+                // export were a beta tester installing that day's builds
+                // ("stop … due to installPackageLI"). Two thirds of the
+                // harvest meaning "the user took an update" is worse than
+                // no harvest: it trains the reader to skim past the one
+                // entry that matters, and it spends slots a genuine crash
+                // would have used.
+                //
+                // The constants are API 30 / 31, and the numeric literals
+                // are the contract for a device that reports a reason this
+                // build's SDK does not name yet.
                 if (info.reason == ApplicationExitInfo.REASON_EXIT_SELF ||
                     info.reason == ApplicationExitInfo.REASON_USER_REQUESTED ||
                     info.reason == ApplicationExitInfo.REASON_USER_STOPPED ||
-                    info.reason == ApplicationExitInfo.REASON_PERMISSION_CHANGE
+                    info.reason == ApplicationExitInfo.REASON_PERMISSION_CHANGE ||
+                    info.reason == REASON_PACKAGE_STATE_CHANGE ||
+                    info.reason == REASON_PACKAGE_UPDATED
                 ) {
                     continue
                 }
@@ -176,6 +203,11 @@ object CrashForensics {
         ApplicationExitInfo.REASON_LOW_MEMORY -> "low_memory_kill"
         ApplicationExitInfo.REASON_OTHER -> "other"
         ApplicationExitInfo.REASON_SIGNALED -> "signaled"
+        // #4111 — named so that a device reporting one of these on a path
+        // the filter above somehow misses still produces a legible trace
+        // rather than "unknown_16".
+        REASON_PACKAGE_STATE_CHANGE -> "package_state_change"
+        REASON_PACKAGE_UPDATED -> "package_updated"
         else -> "unknown_$reason"
     }
 

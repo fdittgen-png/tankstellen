@@ -2984,6 +2984,118 @@ class AppLocalizationsDe extends AppLocalizations {
       'Der Verbrauch-Tab wurde durch deine Profileinstellungen ausgeblendet.';
 
   @override
+  String stationSourceFlagTooltip(String country, String source) {
+    return 'Preise aus $country — $source';
+  }
+
+  @override
+  String get decisionBestValue => 'Bester Wert';
+
+  @override
+  String get decisionCheapest => 'Günstigster';
+
+  @override
+  String get decisionClosest => 'Nächster';
+
+  @override
+  String get decisionReasonBestValue => 'Bestes Verhältnis von Preis und Umweg';
+
+  @override
+  String decisionReasonSaves(String amount, String volume, String distance) {
+    return 'Spart $amount bei $volume · $distance mehr Fahrt';
+  }
+
+  @override
+  String decisionReasonBreakEven(String volume) {
+    return 'Der Umweg lohnt sich erst ab $volume';
+  }
+
+  @override
+  String get decisionValueUnavailable =>
+      'Tankvorgang erfassen — dann lässt sich der Umweg mitrechnen, nicht nur der Preis';
+
+  @override
+  String decisionShowAll(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Alle $count Stationen anzeigen',
+      one: 'Die eine Station anzeigen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String decisionAssumption(String consumption, String volume) {
+    return 'Basis: $consumption und $volume';
+  }
+
+  @override
+  String get priceFreshnessFresh => 'Frischer Preis';
+
+  @override
+  String get priceFreshnessRecent => 'Aktueller Preis';
+
+  @override
+  String get priceFreshnessAging => 'Älterer Preis';
+
+  @override
+  String get priceFreshnessStale => 'Alter Preis';
+
+  @override
+  String get priceFreshnessUnknown => 'Preisalter unbekannt';
+
+  @override
+  String priceFreshnessTooltip(String band, String stamp) {
+    return '$band · $stamp';
+  }
+
+  @override
+  String get priceLabel => 'Preis';
+
+  @override
+  String get priceFreshnessLabel => 'Preisaktualität';
+
+  @override
+  String get availabilityLabel => 'Verfügbarkeit';
+
+  @override
+  String get availabilityNotReported => 'Nicht gemeldet';
+
+  @override
+  String get refuelQuantityTitle => 'Wie viel tankst du normalerweise?';
+
+  @override
+  String get refuelQuantityExplainer =>
+      '„Bester Wert“ vergleicht, was ein Tankstopp wirklich kostet — dafür braucht es eine ungefähre Menge. Sparkilo nimmt den Median deiner eigenen Tankvorgänge, solange du nichts anderes sagst.';
+
+  @override
+  String get refuelQuantityMeasured => 'Meine Tankhistorie verwenden';
+
+  @override
+  String get refuelQuantityFullTank => 'Eine Tankfüllung';
+
+  @override
+  String get refuelQuantityChange => 'Ändern';
+
+  @override
+  String refuelQuantityMeasuredValue(String volume) {
+    return '$volume (aus deinen Tankvorgängen)';
+  }
+
+  @override
+  String refuelConsumptionMeasured(String consumption) {
+    return '$consumption (gemessen)';
+  }
+
+  @override
+  String get refuelConsumptionMissing => 'Noch kein Verbrauch';
+
+  @override
+  String get shellSwipeCoachMark =>
+      'Nach unten wischen oder doppelt auf die Leiste tippen, um den ganzen Bildschirm zu nutzen';
+
+  @override
   String get shellBarHiddenAnnounce =>
       'Navigation ausgeblendet. Von unten nach oben wischen oder die Taste lange drücken, um sie zurückzuholen.';
 
@@ -8070,9 +8182,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Dein Land wird unterstützt, ist aber noch nicht eingerichtet – daher stammen die Preise möglicherweise aus einem anderen Land. Wähle dein Land in den Sucheinstellungen, um lokale Preise zu sehen.';
 
   @override
-  String get stalePriceBadge => 'Alter Preis';
-
-  @override
   String get radiusAlertCenterChipGps => 'Mein Standort';
 
   @override
@@ -8871,11 +8980,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get amenitiesServicesShowLess => 'Weniger anzeigen';
-
-  @override
-  String stationStatusWithFreshness(String status, String ago) {
-    return '$status · aktualisiert vor $ago';
-  }
 
   @override
   String pricesNotSoldHere(String fuels) {

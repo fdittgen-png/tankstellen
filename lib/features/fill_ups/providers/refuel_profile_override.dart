@@ -1,11 +1,15 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:math' as math;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 
 import '../../../core/domain/refuel_economics.dart';
 import '../../../core/domain/refuel_profile_provider.dart';
+import '../../../core/domain/refuel_quantity_provider.dart';
+import '../../vehicle/api.dart';
 import 'consumption_providers.dart';
 import 'fuel_type_efficiency_provider.dart';
 
@@ -24,14 +28,26 @@ import 'fuel_type_efficiency_provider.dart';
 ///    default is personal from the first few fills and one
 ///    splash-and-dash or jerrycan cannot skew it. No question is asked
 ///    of the user to get a correct answer.
+///  * #4095 — an explicit `refuelQuantityProvider` choice wins over the
+///    median when the user has made one. It is capped at the active
+///    vehicle's tank capacity where a capacity is configured, because
+///    the app cannot price litres the tank cannot hold; a vehicle with
+///    no capacity on file is simply not capped. Capacity is a ceiling
+///    here and nothing more — it never appears in the arithmetic, and is
+///    never required for any of this to work (economics spec §2).
 final realRefuelProfileProvider = Provider<RefuelProfile>((ref) {
   final consumption = ref.watch(consumptionStatsProvider).avgConsumptionL100km;
   final median = RefuelEconomics.medianLitres(
     ref.watch(activeVehicleFillUpsProvider).map((f) => f.liters),
   );
+  final chosen = ref.watch(refuelQuantityProvider);
+  final capacity = ref.watch(activeVehicleProfileProvider)?.tankCapacityL;
+  final litres = chosen ?? median ?? kDefaultRefuelLitres;
   return RefuelProfile(
     consumptionLPer100km: consumption,
-    litresIntended: median ?? kDefaultRefuelLitres,
+    litresIntended: (capacity != null && capacity > 0)
+        ? math.min(litres, capacity)
+        : litres,
   );
 });
 

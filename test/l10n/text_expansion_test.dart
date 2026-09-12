@@ -518,17 +518,14 @@ void main() {
   // self-service automate line and the brand header (its round directions
   // button is gone, so the heading column now spans the full width).
   group('Station detail rows (#3902)', () {
-    // Pinned instant — the status row only formats the age, never reads the
-    // wall clock itself.
-    final result = ServiceResult<Object>(
-      data: const Object(),
-      source: ServiceSource.cache,
-      fetchedAt: DateTime(2026, 3, 11, 14, 15),
-    );
+    // #4092 — the row no longer takes a ServiceResult: its freshness fact
+    // is the operator's publication age, read from the station's own
+    // stamp through the AppClock seam.
     final statusOverrides = <Object>[
       stationRatingsProvider.overrideWith(
         () => _SeededStationRatings({testStation.id: 4}),
       ),
+      appClockProvider.overrideWithValue(FixedClock(DateTime(2026, 3, 27, 12))),
     ];
     final pricesOverrides = <Object>[
       activeProfileProvider.overrideWith(() => _NullActiveProfile()),
@@ -538,7 +535,6 @@ void main() {
 
     Widget statusRow() => StationStatusRow(
           station: testStation,
-          serviceResult: result,
           stationId: testStation.id,
         );
 

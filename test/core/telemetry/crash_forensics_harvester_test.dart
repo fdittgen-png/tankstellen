@@ -98,6 +98,58 @@ void main() {
       expect(recorder.errors[1].toString(), contains('background'));
     });
 
+    test('#4111 — an app UPDATE is not a process death', () async {
+      // Six of nine process-death traces in the 2026-09-12 field export
+      // were a tester installing that day's builds. The native side
+      // filters REASON_PACKAGE_UPDATED now; this pins the Dart-side last
+      // line of defence, for an OEM that attaches a reason code this
+      // build's SDK does not name.
+      mockHarvest({
+        'uncaught': <Object>[],
+        'exits': [
+          {
+            'timestampMs': 1783990100000,
+            'reason': 'unknown_16',
+            'importance': 'background',
+            'description':
+                'stop de.tankstellen.fuelprices due to installPackageLI',
+            'pssKb': 120000,
+            'rssKb': 144024,
+            'trace': '',
+          },
+          {
+            'timestampMs': 1783990200000,
+            'reason': 'package_updated',
+            'importance': 'background',
+            'description': '',
+            'pssKb': 1000,
+            'rssKb': 2000,
+            'trace': '',
+          },
+          // …while a genuine kill in the same batch still reports.
+          {
+            'timestampMs': 1783990300000,
+            'reason': 'low_memory_kill',
+            'importance': 'background',
+            'description': '',
+            'pssKb': 130000,
+            'rssKb': 140912,
+            'trace': '',
+          },
+        ],
+      });
+
+      await CrashForensicsHarvester.harvestAndLog();
+      await Future<void>.delayed(Duration.zero);
+
+      expect(recorder.errors, hasLength(1),
+          reason: 'two update stops must not each cost a trace — two '
+              'thirds of the harvest meaning "the user took an update" '
+              'trains the reader to skim past the one that matters');
+      expect(recorder.errors.single.toString(), contains('low_memory_kill'));
+      expect(recorder.errors.single.toString(), isNot(contains('unknown_16')));
+    });
+
     test('#3700 same-reason exits COALESCE into one trace (count + rss '
         'range + all timestamps); crash_native stays one-per-exit because '
         'each carries its own tombstone', () async {
@@ -277,5 +329,6 @@ void main() {
       });
       expect(recorder.errors.single.toString(), contains('runId: search-'));
     });
+
   });
 }

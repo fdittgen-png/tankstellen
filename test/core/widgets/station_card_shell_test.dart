@@ -19,7 +19,8 @@ void main() {
 
       final card = tester.widget<Card>(find.byType(Card));
       // #3948 — the grammar's surface margin (12 / 8).
-      expect(card.margin, Spacing.surfaceMargin);
+      // #4091 — the list gutter, half a standalone surface's.
+      expect(card.margin, Spacing.listCardMargin);
       expect(card.clipBehavior, Clip.antiAlias);
       final shape = card.shape as RoundedRectangleBorder;
       expect(shape.borderRadius, AppRadius.lg);

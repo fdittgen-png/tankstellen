@@ -93,9 +93,11 @@ void main() {
       expect(find.text('Super E10'), findsOneWidget);
       expect(find.text('Diesel'), findsOneWidget);
 
-      // Inline open + freshness status (the FreshnessBadge was folded in).
+      // #4092 — availability and price freshness, side by side as two
+      // separate facts rather than one folded-in phrase.
       expect(find.textContaining('Open'), findsAtLeast(1));
-      expect(find.textContaining('ago'), findsAtLeast(1));
+      expect(find.byKey(const Key('station_detail_freshness_word')),
+          findsOneWidget);
     });
 
     testWidgets(
@@ -126,8 +128,11 @@ void main() {
       expect(find.byType(StationStatusRow), findsOneWidget);
       expect(find.byKey(const ValueKey('opening-hours-status-line')),
           findsNothing);
-      // The status phrase is the parameterised key, not glued fragments.
-      expect(find.textContaining('Open · updated'), findsOneWidget);
+      // #4092 — the state is said once, and it is said ALONE: no phrase
+      // that folds the price's age into the same claim (and so into the
+      // same colour).
+      expect(find.text('Open'), findsOneWidget);
+      expect(find.textContaining('Open · updated'), findsNothing);
       expect(find.textContaining('Open —'), findsNothing);
     });
 

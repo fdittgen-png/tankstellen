@@ -101,6 +101,10 @@ class SyncPullCoordinator {
     _enabled = () => false;
     _running = false;
     _lastCompletedAt = null;
+    // #4112 — the escalation counter is per-table and long-lived, so a
+    // test that left a strike on the board would change the log LEVEL of
+    // the next test's timeout.
+    _consecutiveTimeouts.clear();
   }
 
   /// Run every registered pull in parallel (#3450). No-ops when the master
@@ -130,19 +134,60 @@ class SyncPullCoordinator {
     }
   }
 
+  /// How many consecutive timed-out passes a table gets before its
+  /// timeouts are reported as errors (#4112).
+  ///
+  /// A pull that times out costs the user nothing on its own: the local
+  /// data is intact, TankSync is eventually consistent by design, and the
+  /// next pass catches up. Logging the first one at error level put it in
+  /// the same bucket as a corrupted box, which is signal dilution — the
+  /// 2026-09-12 field export had five of them from one phone on a mobile
+  /// link. Once a table has failed this many passes in a row it is no
+  /// longer routine: the user's other device genuinely is not
+  /// converging, and that IS an error.
+  ///
+  /// There is deliberately NO in-pass retry. It was the first thing
+  /// tried, and the evidence argues against it: the field timeouts were
+  /// 15 s on a mobile link, repeating across passes minutes apart, so a
+  /// retry seconds later would overwhelmingly have timed out too — while
+  /// doubling the worst case for a hung table from 15 s to 32 s and
+  /// delaying every other table's pass completion with it. The retry the
+  /// situation actually wants already exists: the next pass.
+  static const int timeoutsBeforeError = 3;
+
+  /// Consecutive timed-out passes per table set. Reset by any success.
+  final Map<String, int> _consecutiveTimeouts = {};
+
+  /// Visible so a test can assert the escalation rather than count logs.
+  @visibleForTesting
+  int consecutiveTimeoutsFor(Iterable<String> tables) =>
+      _consecutiveTimeouts[tables.join('+')] ?? 0;
+
   Future<void> _pullOne(SyncPullEntry entry, LaunchSyncTrace? trace) async {
     final name = entry.tables.join('+');
     var pulled = 0;
     await LaunchSyncTrace.spanned(trace, name, () async {
       try {
         pulled = await entry.pull().timeout(entry.timeout);
+        _consecutiveTimeouts.remove(name);
       } on TimeoutException catch (e, st) {
-        log.error(e, st, layer: ErrorLayer.sync, context: {
+        // #4112 — escalate on persistence, not on the first occurrence.
+        final strikes = (_consecutiveTimeouts[name] ?? 0) + 1;
+        _consecutiveTimeouts[name] = strikes;
+        final context = {
           'where': 'sync pull timed out',
           'tables': name,
           'timeoutSeconds': entry.timeout.inSeconds,
-        });
+          'consecutivePasses': strikes,
+        };
+        if (strikes >= timeoutsBeforeError) {
+          log.error(e, st, layer: ErrorLayer.sync, context: context);
+        } else {
+          log.warn('sync pull timed out (pass $strikes)',
+              error: e, stack: st, layer: ErrorLayer.sync, context: context);
+        }
       } catch (e, st) {
+        _consecutiveTimeouts.remove(name);
         log.error(e, st, layer: ErrorLayer.sync, context: {'where': 'sync pull FAILED', 'tables': name});
       }
     }, attributes: () => {'table': name, 'pulled': pulled});

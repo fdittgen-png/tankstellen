@@ -17,7 +17,33 @@ import '../domain/entities/traffic_signal.dart';
 /// Mirrors the `*Exception` pattern used elsewhere in `lib/core/error/`.
 class OsmTrafficSignalException implements Exception {
   final String message;
-  const OsmTrafficSignalException(this.message);
+
+  /// The HTTP status, when the failure came back with one. Null for a
+  /// connect/receive timeout or a parse failure.
+  ///
+  /// #4109 — the repository's breaker needs this: a 429 means "you are
+  /// rate-limited" and retrying under it is what gets a free public
+  /// endpoint to throttle an IP harder, while a 504 is just a bad minute
+  /// at the server. They cannot share one hold.
+  final int? statusCode;
+
+  /// The server's own `Retry-After`, RAW, exactly as it was sent.
+  ///
+  /// Deliberately unparsed here. Reading it means knowing what time it
+  /// is, and the client has no business owning a clock — the repository
+  /// already has an injectable one, and it is the repository that decides
+  /// how long to hold off. [parseRetryAfter] turns this into a duration
+  /// there.
+  final String? retryAfterHeader;
+
+  const OsmTrafficSignalException(
+    this.message, {
+    this.statusCode,
+    this.retryAfterHeader,
+  });
+
+  /// True when the server said, in so many words, "stop asking".
+  bool get isRateLimited => statusCode == 429;
 
   @override
   String toString() => 'OsmTrafficSignalException: $message';
@@ -94,9 +120,14 @@ class OsmTrafficSignalClient {
           '${e.message}\n$st');
       // #3610 — rethrow with the ORIGINAL stack so the trace points at
       // the dio failure, not at this wrapper.
+      // #4109 — carry the status and any Retry-After through, so the
+      // repository's breaker can wait out a 429 instead of retrying into
+      // it.
       Error.throwWithStackTrace(
         OsmTrafficSignalException(
           'Overpass request failed: ${e.message ?? e.type.name}',
+          statusCode: e.response?.statusCode,
+          retryAfterHeader: e.response?.headers.value('retry-after'),
         ),
         st,
       );
@@ -107,6 +138,8 @@ class OsmTrafficSignalClient {
         response.statusCode! >= 300) {
       throw OsmTrafficSignalException(
         'Overpass returned HTTP ${response.statusCode}',
+        statusCode: response.statusCode,
+        retryAfterHeader: response.headers.value('retry-after'),
       );
     }
 

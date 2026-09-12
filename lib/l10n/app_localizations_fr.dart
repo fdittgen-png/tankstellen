@@ -2996,14 +2996,128 @@ class AppLocalizationsFr extends AppLocalizations {
       'L\'onglet Consommation a été masqué par les réglages de votre profil.';
 
   @override
+  String stationSourceFlagTooltip(String country, String source) {
+    return 'Prix issus de $country — $source';
+  }
+
+  @override
+  String get decisionBestValue => 'Meilleur rapport';
+
+  @override
+  String get decisionCheapest => 'Moins cher';
+
+  @override
+  String get decisionClosest => 'Plus proche';
+
+  @override
+  String get decisionReasonBestValue =>
+      'Meilleur équilibre entre prix et détour';
+
+  @override
+  String decisionReasonSaves(String amount, String volume, String distance) {
+    return 'Économise $amount sur $volume · $distance de route en plus';
+  }
+
+  @override
+  String decisionReasonBreakEven(String volume) {
+    return 'Le détour ne vaut le coup qu\'à partir de $volume';
+  }
+
+  @override
+  String get decisionValueUnavailable =>
+      'Enregistrez un plein et le détour pourra être chiffré, pas seulement le prix à la pompe';
+
+  @override
+  String decisionShowAll(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Afficher les $count stations',
+      one: 'Afficher la station',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String decisionAssumption(String consumption, String volume) {
+    return 'Sur la base de $consumption et $volume';
+  }
+
+  @override
+  String get priceFreshnessFresh => 'Prix récent';
+
+  @override
+  String get priceFreshnessRecent => 'Prix du jour';
+
+  @override
+  String get priceFreshnessAging => 'Prix vieillissant';
+
+  @override
+  String get priceFreshnessStale => 'Prix ancien';
+
+  @override
+  String get priceFreshnessUnknown => 'Ancienneté du prix inconnue';
+
+  @override
+  String priceFreshnessTooltip(String band, String stamp) {
+    return '$band · $stamp';
+  }
+
+  @override
+  String get priceLabel => 'Prix';
+
+  @override
+  String get priceFreshnessLabel => 'Actualité du prix';
+
+  @override
+  String get availabilityLabel => 'Disponibilité';
+
+  @override
+  String get availabilityNotReported => 'Non communiquée';
+
+  @override
+  String get refuelQuantityTitle => 'How much do you usually buy?';
+
+  @override
+  String get refuelQuantityExplainer =>
+      'Best value compares what a refuel really costs, so it needs a rough volume. Sparkilo uses the median of your own fill-ups until you say otherwise.';
+
+  @override
+  String get refuelQuantityMeasured => 'Use my fill-up history';
+
+  @override
+  String get refuelQuantityFullTank => 'A full tank';
+
+  @override
+  String get refuelQuantityChange => 'Change';
+
+  @override
+  String refuelQuantityMeasuredValue(String volume) {
+    return '$volume (from your fill-ups)';
+  }
+
+  @override
+  String refuelConsumptionMeasured(String consumption) {
+    return '$consumption (measured)';
+  }
+
+  @override
+  String get refuelConsumptionMissing => 'No consumption yet';
+
+  @override
+  String get shellSwipeCoachMark =>
+      'Balayez vers le bas — ou double-tapez la barre — pour utiliser tout l\'écran';
+
+  @override
   String get shellBarHiddenAnnounce =>
-      'Navigation hidden. Swipe up from the bottom, or long-press the button, to bring it back.';
+      'Navigation masquée. Balayez vers le haut depuis le bas, ou appui long sur le bouton, pour la faire revenir.';
 
   @override
-  String get shellBarShownAnnounce => 'Navigation shown.';
+  String get shellBarShownAnnounce => 'Navigation affichée.';
 
   @override
-  String get shellBarToggleHint => 'Long-press to hide or show the navigation';
+  String get shellBarToggleHint =>
+      'Appui long pour masquer ou afficher la navigation';
 
   @override
   String get swipeBetweenTabsHint =>
@@ -8117,9 +8231,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Votre pays est pris en charge mais n\'est pas encore configuré — les prix affichés peuvent venir d\'un autre pays. Choisissez votre pays dans les réglages de recherche pour voir les prix locaux.';
 
   @override
-  String get stalePriceBadge => 'Prix ancien';
-
-  @override
   String get radiusAlertCenterChipGps => 'Ma position';
 
   @override
@@ -8916,11 +9027,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get amenitiesServicesShowLess => 'Afficher moins';
-
-  @override
-  String stationStatusWithFreshness(String status, String ago) {
-    return '$status · mis à jour il y a $ago';
-  }
 
   @override
   String pricesNotSoldHere(String fuels) {

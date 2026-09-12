@@ -4721,7 +4721,6 @@
       }
     }
   },
-  "stalePriceBadge": "Prix ancien",
   "radiusAlertCenterChipGps": "Ma position",
   "radiusAlertCenterChipMap": "Point sur la carte",
   "radiusAlertCenterChipPostal": "Code postal {postalCode}",
@@ -4749,19 +4748,6 @@
     "placeholders": {
       "date": {
         "type": "String"
-      }
-    }
-  },
-  "stationStatusWithFreshness": "{status} · mis à jour il y a {ago}",
-  "@stationStatusWithFreshness": {
-    "placeholders": {
-      "status": {
-        "type": "String",
-        "example": "Open"
-      },
-      "ago": {
-        "type": "String",
-        "example": "< 1 min"
       }
     }
   },
@@ -5940,18 +5926,136 @@
       }
     }
   },
-  "shellBarHiddenAnnounce": "Navigation hidden. Swipe up from the bottom, or long-press the button, to bring it back.",
-  "@shellBarHiddenAnnounce": {
+  "shellBarHiddenAnnounce": "Navigation masquée. Balayez vers le haut depuis le bas, ou appui long sur le bouton, pour la faire revenir.",
+  "shellBarShownAnnounce": "Navigation affichée.",
+  "shellBarToggleHint": "Appui long pour masquer ou afficher la navigation",
+  "shellSwipeCoachMark": "Balayez vers le bas — ou double-tapez la barre — pour utiliser tout l'écran",
+  "stationSourceFlagTooltip": "Prix issus de {country} — {source}",
+  "@stationSourceFlagTooltip": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "decisionBestValue": "Meilleur rapport",
+  "decisionCheapest": "Moins cher",
+  "decisionClosest": "Plus proche",
+  "decisionReasonBestValue": "Meilleur équilibre entre prix et détour",
+  "decisionReasonSaves": "Économise {amount} sur {volume} · {distance} de route en plus",
+  "@decisionReasonSaves": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "volume": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "decisionReasonBreakEven": "Le détour ne vaut le coup qu'à partir de {volume}",
+  "@decisionReasonBreakEven": {
+    "placeholders": {
+      "volume": {
+        "type": "String"
+      }
+    }
+  },
+  "decisionValueUnavailable": "Enregistrez un plein et le détour pourra être chiffré, pas seulement le prix à la pompe",
+  "decisionShowAll": "{count, plural, =1{Afficher la station} other{Afficher les {count} stations}}",
+  "@decisionShowAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "decisionAssumption": "Sur la base de {consumption} et {volume}",
+  "@decisionAssumption": {
+    "placeholders": {
+      "consumption": {
+        "type": "String"
+      },
+      "volume": {
+        "type": "String"
+      }
+    }
+  },
+  "priceFreshnessFresh": "Prix récent",
+  "priceFreshnessRecent": "Prix du jour",
+  "priceFreshnessAging": "Prix vieillissant",
+  "priceFreshnessStale": "Prix ancien",
+  "priceFreshnessUnknown": "Ancienneté du prix inconnue",
+  "priceFreshnessTooltip": "{band} · {stamp}",
+  "@priceFreshnessTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "band": {
+        "type": "String"
+      },
+      "stamp": {
+        "type": "String"
+      }
+    }
+  },
+  "priceLabel": "Prix",
+  "priceFreshnessLabel": "Actualité du prix",
+  "availabilityLabel": "Disponibilité",
+  "availabilityNotReported": "Non communiquée",
+  "refuelQuantityTitle": "How much do you usually buy?",
+  "@refuelQuantityTitle": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "shellBarShownAnnounce": "Navigation shown.",
-  "@shellBarShownAnnounce": {
+  "refuelQuantityExplainer": "Best value compares what a refuel really costs, so it needs a rough volume. Sparkilo uses the median of your own fill-ups until you say otherwise.",
+  "@refuelQuantityExplainer": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "shellBarToggleHint": "Long-press to hide or show the navigation",
-  "@shellBarToggleHint": {
+  "refuelQuantityMeasured": "Use my fill-up history",
+  "@refuelQuantityMeasured": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelQuantityFullTank": "A full tank",
+  "@refuelQuantityFullTank": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelQuantityChange": "Change",
+  "@refuelQuantityChange": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelQuantityMeasuredValue": "{volume} (from your fill-ups)",
+  "@refuelQuantityMeasuredValue": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "volume": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelConsumptionMeasured": "{consumption} (measured)",
+  "@refuelConsumptionMeasured": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "consumption": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelConsumptionMissing": "No consumption yet",
+  "@refuelConsumptionMissing": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../../../../core/country/country_config.dart';
 import '../../../../core/theme/app_text.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
-import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/price_tier.dart';
@@ -18,7 +17,7 @@ import '../../../station_detail/presentation/widgets/station_brand_helpers.dart'
 import '../../domain/entities/brand_registry.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/station.dart';
-import 'amenity_chips.dart';
+import 'results/amenity_summary.dart';
 
 import 'station_card_badges.dart';
 import 'station_card_price_column.dart';
@@ -214,16 +213,15 @@ class StationCard extends StatelessWidget {
       if (station.is24h) l10n.open24h,
     ].join(', ');
 
-    // #2493 — the stripe (unlike the price-text tint) uses the visible
-    // all-fuels colour so a `FuelType.all` card no longer shows the near-
-    // invisible neutral grey. Cheapest still wins with the success stripe.
-    final stripeColor = isCheapest
-        ? DarkModeColors.success(context)
-        : FuelColors.stripeColor(context, selectedFuelType);
+    // #4091 — the accent is SEMANTIC now. It used to carry the selected
+    // fuel's colour on every row, which meant every card in the list wore
+    // the same stripe and the colour told the user nothing they had not
+    // chosen themselves — twenty rows of decoration reading as twenty
+    // rows of signal. Colour is spent only where it means something: the
+    // cheapest row. Every other card gets the frame's own hairline.
+    final stripeColor =
+        isCheapest ? DarkModeColors.success(context) : null;
     final titleText = _titleText(l10n);
-    // The street is shown on the address line whenever it is NOT the title
-    // — for a branded station, and for the unbranded-label case.
-    final showStreetInAddress = _hasBrand || station.name.isEmpty;
 
     return Semantics(
       label: semanticLabel,
@@ -233,11 +231,14 @@ class StationCard extends StatelessWidget {
         stripeColor: stripeColor,
         stripeWidth: isCheapest ? 6 : 4,
         child: Padding(
+          // #4091 — tighter vertically. The card's job in a list is to be
+          // comparable with the five cards around it, and 8 dp above and
+          // below every row cost a whole row of that comparison.
           padding: const EdgeInsets.fromLTRB(
             Spacing.lg,
+            Spacing.sm,
             Spacing.md,
-            Spacing.md,
-            Spacing.md,
+            Spacing.sm,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -256,12 +257,10 @@ class StationCard extends StatelessWidget {
               ),
               const SizedBox(height: Spacing.xs),
               _TitleLine(text: titleText, rating: rating),
-              Text(
-                stationCardAddressLine(station, showStreetInAddress),
-                style: AppText.body(context),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+              // #4091 — where it is and how far, on one line. The full
+              // postal address moved to the detail screen: nobody picks a
+              // forecourt by its house number.
+              StationCardPlaceLine(station: station),
               const SizedBox(height: Spacing.xs),
               StationCardMetaLine(
                 station: station,
@@ -282,10 +281,14 @@ class StationCard extends StatelessWidget {
                   radiusMeters: closenessRadiusMeters,
                 ),
               ],
+              // #4091 — facilities are a tie-breaker, not a reason to
+              // drive somewhere, so they get a tie-breaker's weight: one
+              // line of label type instead of a wrap of bordered pills
+              // that cost two rows on a phone.
               if (station.amenities.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: Spacing.xs),
-                  child: AmenityChips(amenities: station.amenities),
+                  child: AmenitySummary(amenities: station.amenities),
                 ),
               if (selectedFuelType == FuelType.all && !isCheapest)
                 Padding(

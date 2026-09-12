@@ -1,8 +1,4 @@
 {
-  "stalePriceBadge": "Old price",
-  "@stalePriceBadge": {
-    "description": "Small badge on a favorites station card whose price timestamp is older than the stale-price threshold (7 days) — warns that the shown price is probably outdated (#3905)."
-  },
   "radiusAlertCenterChipGps": "My position",
   "@radiusAlertCenterChipGps": {
     "description": "Chip on the zone-alert sheet naming the chosen alert centre when it was bound to the device's current GPS position (#3905)."
