@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -20,6 +21,10 @@ class _FakeOsmClient implements OsmTrafficSignalClient {
   List<TrafficSignal> Function() responder;
   Object? errorToThrow;
 
+  /// #4109 — when set, the fake parks the probe on it, so a test can
+  /// have a request genuinely IN FLIGHT while it makes another call.
+  Completer<void>? gate;
+
   _FakeOsmClient({List<TrafficSignal>? response, this.errorToThrow})
       : responder = (() => response ?? const <TrafficSignal>[]);
 
@@ -32,6 +37,8 @@ class _FakeOsmClient implements OsmTrafficSignalClient {
     Duration timeout = const Duration(seconds: 15),
   }) async {
     callCount++;
+    final held = gate;
+    if (held != null) await held.future;
     final err = errorToThrow;
     if (err != null) throw err; // ignore: only_throw_errors
     return responder();
@@ -303,6 +310,171 @@ void main() {
       // …and the next lookups get the stale signals, not an empty road.
       expect(await call(), hasLength(1));
       expect(client.callCount, 2);
+    });
+  });
+
+
+  group('#4109 — single flight, and 429 is not just another failure', () {
+    late Directory tmpDir;
+    late Box<String> box;
+    setUp(() async {
+      tmpDir = Directory.systemTemp.createTempSync('traffic_signal_4109_');
+      Hive.init(tmpDir.path);
+      box = await Hive.openBox<String>('traffic_signals_4109');
+    });
+    tearDown(() async {
+      await box.deleteFromDisk();
+      await Hive.close();
+      tmpDir.deleteSync(recursive: true);
+    });
+
+    test('a second caller while a probe is in flight gets the stale answer '
+        'instead of a second socket', () async {
+      // The field log had three Overpass failures inside ten seconds,
+      // two of them in the same second: the breaker was consulted before
+      // the call and tripped after it, so a per-GPS-tick evaluator got
+      // several probes past the gate before the first returned.
+      final client = _FakeOsmClient(response: const [
+        TrafficSignal(id: 'n1', lat: 43.05, lng: 3.05),
+      ]);
+      final repo = TrafficSignalRepository(client: client, cacheBox: box);
+      Future<List<TrafficSignal>> call() => repo.getSignalsForBoundingBox(
+          south: 43, west: 3, north: 43.1, east: 3.1);
+
+      client.gate = Completer<void>();
+      final first = call();
+      await Future<void>.delayed(Duration.zero);
+      expect(repo.probeInFlight, isTrue);
+
+      // Three more callers arrive while the first is still on the wire.
+      final others = await Future.wait([call(), call(), call()]);
+      expect(client.callCount, 1,
+          reason: 'one socket at a time — the whole point');
+      expect(others, everyElement(isEmpty),
+          reason: 'no cache entry yet, so they get the empty answer NOW '
+              'rather than joining a 15-second wait; the caller is a '
+              'per-GPS-tick evaluator that must not stall');
+
+      client.gate!.complete();
+      expect(await first, hasLength(1));
+      expect(repo.probeInFlight, isFalse);
+    });
+
+    test('a burst counts as ONE failure, so the hold does not over-escalate',
+        () async {
+      var now = DateTime(2026, 9, 12, 16, 20);
+      final client = _FakeOsmClient(
+          errorToThrow: const OsmTrafficSignalException('refused'));
+      final repo = TrafficSignalRepository(
+          client: client, cacheBox: box, now: () => now);
+      Future<List<TrafficSignal>> call() => repo.getSignalsForBoundingBox(
+          south: 43, west: 3, north: 43.1, east: 3.1);
+
+      client.gate = Completer<void>();
+      final failing = call();
+      await Future<void>.delayed(Duration.zero);
+      final shed = await Future.wait([call(), call()]);
+      client.gate!.complete();
+      await expectLater(failing, throwsA(isA<OsmTrafficSignalException>()));
+
+      expect(shed, everyElement(isEmpty));
+      expect(client.callCount, 1);
+      expect(repo.breakerHold, const Duration(minutes: 5),
+          reason: 'one bad window is one failure — three concurrent probes '
+              'used to escalate it to 20 minutes');
+      now = now.add(const Duration(minutes: 1));
+    });
+
+    test('a 429 holds for the rate-limited floor, not the generic 5 minutes',
+        () async {
+      final now = DateTime(2026, 9, 12, 16, 20);
+      final client = _FakeOsmClient(
+        errorToThrow: const OsmTrafficSignalException(
+          'Overpass returned HTTP 429',
+          statusCode: 429,
+        ),
+      );
+      final repo = TrafficSignalRepository(
+          client: client, cacheBox: box, now: () => now);
+      await expectLater(
+        repo.getSignalsForBoundingBox(
+            south: 43, west: 3, north: 43.1, east: 3.1),
+        throwsA(isA<OsmTrafficSignalException>()),
+      );
+
+      // Overpass is donated infrastructure; a 429 is it asking to be left
+      // alone, and retrying into a rate limit is how an IP earns a longer
+      // one.
+      expect(repo.breakerUntil,
+          now.add(TrafficSignalRepository.rateLimitedHold));
+    });
+
+    test('the server\'s own Retry-After wins over both', () async {
+      final now = DateTime(2026, 9, 12, 16, 20);
+      final client = _FakeOsmClient(
+        errorToThrow: const OsmTrafficSignalException(
+          'Overpass returned HTTP 429',
+          statusCode: 429,
+          retryAfterHeader: '2700',
+        ),
+      );
+      final repo = TrafficSignalRepository(
+          client: client, cacheBox: box, now: () => now);
+      await expectLater(
+        repo.getSignalsForBoundingBox(
+            south: 43, west: 3, north: 43.1, east: 3.1),
+        throwsA(isA<OsmTrafficSignalException>()),
+      );
+      expect(repo.breakerUntil, now.add(const Duration(minutes: 45)),
+          reason: 'nobody knows better than the server how long it wants '
+              'to be left alone');
+    });
+
+    test('a 504 keeps the generic escalation — a bad minute is not a rate '
+        'limit', () async {
+      final now = DateTime(2026, 9, 12, 16, 20);
+      final client = _FakeOsmClient(
+        errorToThrow: const OsmTrafficSignalException(
+          'Overpass returned HTTP 504',
+          statusCode: 504,
+        ),
+      );
+      final repo = TrafficSignalRepository(
+          client: client, cacheBox: box, now: () => now);
+      await expectLater(
+        repo.getSignalsForBoundingBox(
+            south: 43, west: 3, north: 43.1, east: 3.1),
+        throwsA(isA<OsmTrafficSignalException>()),
+      );
+      expect(repo.breakerUntil, now.add(const Duration(minutes: 5)));
+    });
+  });
+
+  group('#4109 — Retry-After parsing', () {
+    final now = DateTime.utc(2026, 9, 12, 16, 20);
+
+    test('delta seconds', () {
+      expect(parseRetryAfter('120', now: now), const Duration(seconds: 120));
+    });
+
+    test('an HTTP date in the future', () {
+      expect(parseRetryAfter(HttpDate.format(now.add(const Duration(minutes: 3))),
+              now: now),
+          const Duration(minutes: 3));
+    });
+
+    test('a date already in the past is no hold at all', () {
+      expect(
+          parseRetryAfter(
+              HttpDate.format(now.subtract(const Duration(minutes: 3))),
+              now: now),
+          isNull);
+    });
+
+    test('garbage, empty and null never take the caller down', () {
+      for (final raw in [null, '', '   ', 'soon', '-5', '0']) {
+        expect(parseRetryAfter(raw, now: now), isNull, reason: 'raw: $raw');
+      }
     });
   });
 
