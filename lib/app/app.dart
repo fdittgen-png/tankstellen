@@ -22,6 +22,7 @@ import 'router.dart';
 import 'theme.dart';
 import 'widgets/startup_reveal.dart';
 import '../core/utils/edge_to_edge.dart';
+import 'package:flutter/services.dart';
 
 /// Top-level Material app for Tankstellen. This is the *only* widget
 /// constructed directly from `main()` (via [AppInitializer]); everything
@@ -166,7 +167,21 @@ class _TankstellenAppState extends ConsumerState<TankstellenApp>
         // quiescence, hard-capped), so the user never watches the form
         // being constructed. One reveal per process — the language-key
         // tree rebuild does not re-play it.
-        return StartupReveal(
+        // #4101 — DECLARE the transparent status bar instead of
+        // re-asserting it imperatively. #3841, #4082 and #4084 each
+        // re-applied the style at a moment we predicted (resume,
+        // navigation, branch switch) and the band still came back,
+        // because anything that changes it at an unpredicted moment wins
+        // — and `setSystemUIOverlayStyle` dedupes an unchanged style, so
+        // the next re-assert is a no-op. An AnnotatedRegion is the same
+        // mechanism `AppBar` uses: the framework re-applies it every
+        // frame and on every route, so no screen, resume path or
+        // navigation we did not think of can leave it un-set.
+        // `EdgeToEdge` still owns the edge-to-edge MODE, which an
+        // annotated region does not control.
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: EdgeToEdge.overlayStyle,
+          child: StartupReveal(
           child: NotificationLaunchListener(
             child: WidgetClickListener(
               // #2735 — inbound OS share-intent receiver. Sits beside the
@@ -185,6 +200,7 @@ class _TankstellenAppState extends ConsumerState<TankstellenApp>
               ),
             ),
           ),
+        ),
         );
       },
     );
