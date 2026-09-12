@@ -6197,5 +6197,20 @@
         "type": "String"
       }
     }
+  },
+  "shellBarHiddenAnnounce": "Navigation hidden. Swipe up from the bottom, or long-press the button, to bring it back.",
+  "@shellBarHiddenAnnounce": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "shellBarShownAnnounce": "Navigation shown.",
+  "@shellBarShownAnnounce": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "shellBarToggleHint": "Long-press to hide or show the navigation",
+  "@shellBarToggleHint": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

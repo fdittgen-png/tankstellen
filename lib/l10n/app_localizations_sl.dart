@@ -2971,6 +2971,16 @@ class AppLocalizationsSl extends AppLocalizations {
       'Zavihek Poraba je bil skrit z nastavitvami profila.';
 
   @override
+  String get shellBarHiddenAnnounce =>
+      'Navigation hidden. Swipe up from the bottom, or long-press the button, to bring it back.';
+
+  @override
+  String get shellBarShownAnnounce => 'Navigation shown.';
+
+  @override
+  String get shellBarToggleHint => 'Long-press to hide or show the navigation';
+
+  @override
   String get swipeBetweenTabsHint =>
       'Nasvet: podrsajte levo ali desno za preklop med zavihki.';
 

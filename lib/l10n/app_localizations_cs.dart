@@ -2980,6 +2980,16 @@ class AppLocalizationsCs extends AppLocalizations {
       'Záložka Spotřeba je skryta nastavením profilu.';
 
   @override
+  String get shellBarHiddenAnnounce =>
+      'Navigation hidden. Swipe up from the bottom, or long-press the button, to bring it back.';
+
+  @override
+  String get shellBarShownAnnounce => 'Navigation shown.';
+
+  @override
+  String get shellBarToggleHint => 'Long-press to hide or show the navigation';
+
+  @override
   String get swipeBetweenTabsHint =>
       'Tip: přejeďte doleva nebo doprava pro přepínání záložek.';
 

@@ -5456,6 +5456,24 @@ abstract class AppLocalizations {
   /// **'The Consumption tab was hidden by your profile settings.'**
   String get consumptionTabHiddenNotice;
 
+  /// Announced to assistive technologies when the user swipes the bottom navigation bar away (#4097). It names BOTH ways back, because a hidden bar with no affordance is a dead end.
+  ///
+  /// In en, this message translates to:
+  /// **'Navigation hidden. Swipe up from the bottom, or long-press the button, to bring it back.'**
+  String get shellBarHiddenAnnounce;
+
+  /// Announced when the bottom navigation bar comes back (#4097).
+  ///
+  /// In en, this message translates to:
+  /// **'Navigation shown.'**
+  String get shellBarShownAnnounce;
+
+  /// Accessibility hint on the round centre button (#4097). Exposed as an action, so switch access and screen readers can hide or show the bar without performing any gesture.
+  ///
+  /// In en, this message translates to:
+  /// **'Long-press to hide or show the navigation'**
+  String get shellBarToggleHint;
+
   /// One-time first-run SnackBar hint that the bottom-nav tabs respond to a horizontal swipe gesture (#1690).
   ///
   /// In en, this message translates to:

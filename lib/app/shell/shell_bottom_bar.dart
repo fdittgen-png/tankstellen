@@ -6,8 +6,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'notched_bar_border.dart';
 import '../../core/navigation/search_fab_action_provider.dart';
-import 'search_fab_tap.dart';
 import 'shell_nav_item.dart';
+import 'dart:async';
+import 'shell_bar_visibility.dart';
+import 'shell_center_button.dart';
 
 /// Compact-screen bottom navigation bar (#1874).
 ///
@@ -47,6 +49,11 @@ class ShellBottomBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final barHeight = isLandscape ? 48.0 : 64.0;
+    // #4097 — swiped away: the tab surface slides out and the round
+    // button stays put, revealing the strip of content the bar covered.
+    // Landscape keeps its bar; the nav rail owns that case.
+    final hidden = !isLandscape && ref.watch(shellBarHiddenProvider);
+    final boxHeight = hidden ? (isLandscape ? 40.0 : 56.0) : barHeight;
     // #2113 — context-aware override registered by criteria / results
     // screens. Null means "default branch-switch behaviour".
     final fabAction = ref.watch(searchFabActionControllerProvider);
@@ -125,26 +132,68 @@ class ShellBottomBar extends ConsumerWidget {
         // half on nothing. The button's protrusion comes from the notch
         // geometry and the docked FAB location, not from reserved height —
         // bodies now run to the bar and the button floats over them.
+        child: GestureDetector(
+          // #4097 — a DRAG toggles; tap keeps its current meaning, so
+          // nothing the user does today changes. Down hides, up shows,
+          // and the target is the bar's full width, not a 56 dp circle.
+          onVerticalDragEnd: (details) {
+            final v = details.primaryVelocity ?? 0;
+            if (v.abs() < 200) return;
+            unawaited(
+              ref.read(shellBarHiddenProvider.notifier).set(v > 0),
+            );
+          },
+          child: AnimatedSize(
+            duration: kShellBarHideDuration,
+            curve: Curves.easeOutCubic,
+            alignment: Alignment.bottomCenter,
         child: SizedBox(
-          height: barHeight,
+          height: boxHeight,
           child: Stack(
             children: [
               // Coloured bar pinned to the bottom; the docked centre button
               // protrudes `rise` above the notch carved into its top edge
               // (#2552).
+              // The tab surface: slid fully below the fold when hidden and
+              // made inert, so no tab can be tapped or read through it.
               Positioned(
                 left: 0,
                 right: 0,
                 bottom: 0,
-                child: bar,
+                child: AnimatedSlide(
+                  offset: Offset(0, hidden ? 1 : 0),
+                  duration: kShellBarHideDuration,
+                  curve: Curves.easeOutCubic,
+                  child: IgnorePointer(
+                    key: const Key('shell_bar_surface'),
+                    ignoring: hidden,
+                    child: ExcludeSemantics(
+                      key: const Key('shell_bar_surface_semantics'),
+                      excluding: hidden,
+                      child: bar,
+                    ),
+                  ),
+                ),
               ),
               // Raised primary action, horizontally centred.
               if (primaryIndex >= 0)
                 Align(
-                  alignment: Alignment.topCenter,
-                  child: _centerButton(context, primaryIndex, fabAction, ref),
+                  alignment:
+                      hidden ? Alignment.bottomCenter : Alignment.topCenter,
+                  child: ShellCenterButton(
+                    items: items,
+                    slot: primaryIndex,
+                    currentIndex: currentIndex,
+                    iconControllers: iconControllers,
+                    branchForSlot: branchForSlot,
+                    isLandscape: isLandscape,
+                    onTap: onTap,
+                    action: fabAction,
+                  ),
                 ),
             ],
+          ),
+            ),
           ),
         ),
       ),
@@ -214,163 +263,6 @@ class ShellBottomBar extends ConsumerWidget {
       child: isLandscape
           ? Tooltip(message: item.label, child: inkWell)
           : inkWell,
-    );
-  }
-
-  /// The raised, primary-tinted centre button for the core action.
-  ///
-  /// Portrait (#2552): the button docks into a concave notch carved into
-  /// the bar's top edge (a CircularNotchedRectangle scallop, painted by
-  /// the bar's [NotchedBarBorder] shape). The notch IS the seat — the bar
-  /// surface curves up and embraces the button instead of a flat disc
-  /// sitting behind it. Landscape has no head-room, so the button stays
-  /// flat in the bar.
-  Widget _centerButton(
-      BuildContext context, int i, SearchFabAction? action, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final selected = i == currentIndex;
-    final item = items[i];
-    final controller = iconControllers[branchForSlot[i]];
-    final diameter = isLandscape ? 40.0 : 56.0;
-
-    // #2113 — context-aware FAB. Default reads stay safe (no `watch`
-    // here so a results refresh doesn't re-paint the whole bar) —
-    // the read happens lazily inside `onTap`, when it matters.
-    //
-    // Behaviour matrix:
-    //   1. On the Search branch (results screen): tap → open the
-    //      criteria modal so the user can refine the active search.
-    //   2. On any other branch WITH live results: tap → switch to
-    //      the Search branch and show the existing results.
-    //   3. On any other branch with NO results: tap → open the
-    //      criteria modal directly so the user can start a search
-    //      from anywhere (no detour through an empty results screen).
-    //
-    // A registered [SearchFabAction] (e.g. from a future criteria-
-    // screen "fire search" hook) wins over all three branches —
-    // pluggable extension point.
-    final defaultIcon = selected ? item.filledIcon : item.outlinedIcon;
-    final iconData = action?.icon ?? defaultIcon;
-    final tooltipLabel = action?.tooltip ?? item.label;
-    // #2131 — disabled override: dim the icon when the current
-    // registrant says the action isn't ready (e.g. route tab with no
-    // destination). Null action ⇒ default branch behaviour, always
-    // enabled.
-    // #2553 — the dim is contextual *affordance only* now; a disabled
-    // (or stale) action no longer swallows the tap — see [onTapHandler].
-    final actionEnabled = action?.enabled ?? true;
-
-    // #2553 — a registered-but-DISABLED (or stale) action must never
-    // produce a dead `() {}` no-op. Only an enabled action overrides the
-    // tap; anything else (null OR disabled OR stale) FALLS BACK to the
-    // default branch behaviour (#2113 three-branch matrix, implemented in
-    // search_fab_tap.dart). Worst case the FAB opens criteria / jumps to
-    // Search — it can never become a permanent dead hit-target.
-    final onTapHandler = (action != null && actionEnabled)
-        ? action.onTap
-        : () => handleSearchFabDefaultTap(
-              ref: ref,
-              slot: i,
-              currentIndex: currentIndex,
-              onTap: onTap,
-            );
-
-    // #2131 — surface + icon both dim when the registered action is
-    // disabled, mirroring Material's standard disabled-button look.
-    final buttonColor = actionEnabled
-        ? theme.colorScheme.primary
-        : theme.colorScheme.primary.withValues(alpha: 0.38);
-    final iconColor = actionEnabled
-        ? theme.colorScheme.onPrimary
-        : theme.colorScheme.onPrimary.withValues(alpha: 0.6);
-
-    // #3548 — the app's heart must not read as a flat disc. Three layers
-    // of depth, all derived from the theme so light/dark/eco stay
-    // coherent:
-    //   * a hairline surface-coloured ring in the CircleBorder side —
-    //     a crisp seat separating the button from whatever scrolls
-    //     beneath the notch;
-    //   * a top-light gradient over the primary fill (painted by an Ink
-    //     so the ripple stays above it) — the dome that makes the disc
-    //     read as raised;
-    //   * a soft primary-tinted glow under the Material's own key
-    //     shadow — the professional "lifted" halo.
-    // Disabled keeps the flat dimmed fill (no dome on a dead control).
-    final ringColor = theme.colorScheme.surface;
-    final gradient = actionEnabled
-        ? LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color.lerp(buttonColor, Colors.white, 0.22)!,
-              buttonColor,
-              Color.lerp(buttonColor, Colors.black, 0.14)!,
-            ],
-            stops: const [0.0, 0.55, 1.0],
-          )
-        : null;
-
-    final button = DecoratedBox(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        boxShadow: actionEnabled
-            ? [
-                BoxShadow(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.30),
-                  blurRadius: 14,
-                  offset: const Offset(0, 4),
-                ),
-              ]
-            : const [],
-      ),
-      child: Material(
-        color: buttonColor,
-        shape: CircleBorder(
-          side: BorderSide(color: ringColor, width: isLandscape ? 2 : 2.5),
-        ),
-        elevation: 4,
-        shadowColor: Colors.black.withValues(alpha: 0.4),
-        clipBehavior: Clip.antiAlias,
-        child: Ink(
-          decoration: BoxDecoration(shape: BoxShape.circle, gradient: gradient),
-          child: InkWell(
-            customBorder: const CircleBorder(),
-            onTap: onTapHandler,
-            child: SizedBox(
-              width: diameter,
-              height: diameter,
-              child: Center(
-                child: action != null
-                    ? Icon(
-                        iconData,
-                        size: isLandscape ? 22.0 : 28.0,
-                        color: iconColor,
-                      )
-                    : ShellBounceIcon(
-                        controller: controller,
-                        selected: selected,
-                        icon: iconData,
-                        iconSize: isLandscape ? 22.0 : 28.0,
-                        color: iconColor,
-                      ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-
-    return Semantics(
-      label: tooltipLabel,
-      button: true,
-      selected: selected,
-      excludeSemantics: true,
-      // #2552 — the notch in the bar (the [NotchedBarBorder] shape) is
-      // the seat now, for both orientations; no separate cradle disc.
-      child: Tooltip(
-        message: tooltipLabel,
-        child: button,
-      ),
     );
   }
 }

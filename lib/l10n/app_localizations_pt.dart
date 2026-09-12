@@ -2990,6 +2990,16 @@ class AppLocalizationsPt extends AppLocalizations {
       'O separador Consumo está oculto pelas definições do seu perfil.';
 
   @override
+  String get shellBarHiddenAnnounce =>
+      'Navigation hidden. Swipe up from the bottom, or long-press the button, to bring it back.';
+
+  @override
+  String get shellBarShownAnnounce => 'Navigation shown.';
+
+  @override
+  String get shellBarToggleHint => 'Long-press to hide or show the navigation';
+
+  @override
   String get swipeBetweenTabsHint =>
       'Dica: deslize para a esquerda ou direita para mudar de separador.';
 

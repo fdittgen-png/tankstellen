@@ -2987,6 +2987,16 @@ class AppLocalizationsLv extends AppLocalizations {
       'Patēriņa cilne ir paslēpta ar jūsu profila iestatījumiem.';
 
   @override
+  String get shellBarHiddenAnnounce =>
+      'Navigation hidden. Swipe up from the bottom, or long-press the button, to bring it back.';
+
+  @override
+  String get shellBarShownAnnounce => 'Navigation shown.';
+
+  @override
+  String get shellBarToggleHint => 'Long-press to hide or show the navigation';
+
+  @override
   String get swipeBetweenTabsHint =>
       'Padoms: velciet pa kreisi vai pa labi, lai pārslēgtos starp cilnēm.';
 

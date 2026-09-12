@@ -2996,6 +2996,16 @@ class AppLocalizationsFr extends AppLocalizations {
       'L\'onglet Consommation a été masqué par les réglages de votre profil.';
 
   @override
+  String get shellBarHiddenAnnounce =>
+      'Navigation hidden. Swipe up from the bottom, or long-press the button, to bring it back.';
+
+  @override
+  String get shellBarShownAnnounce => 'Navigation shown.';
+
+  @override
+  String get shellBarToggleHint => 'Long-press to hide or show the navigation';
+
+  @override
   String get swipeBetweenTabsHint =>
       'Astuce : balayez vers la gauche ou la droite pour changer d\'onglet.';
 

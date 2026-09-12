@@ -2984,6 +2984,17 @@ class AppLocalizationsDe extends AppLocalizations {
       'Der Verbrauch-Tab wurde durch deine Profileinstellungen ausgeblendet.';
 
   @override
+  String get shellBarHiddenAnnounce =>
+      'Navigation ausgeblendet. Von unten nach oben wischen oder die Taste lange drücken, um sie zurückzuholen.';
+
+  @override
+  String get shellBarShownAnnounce => 'Navigation eingeblendet.';
+
+  @override
+  String get shellBarToggleHint =>
+      'Lange drücken, um die Navigation aus- oder einzublenden';
+
+  @override
   String get swipeBetweenTabsHint =>
       'Tipp: Wische nach links oder rechts, um zwischen den Tabs zu wechseln.';
 

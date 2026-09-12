@@ -2983,6 +2983,16 @@ class AppLocalizationsSk extends AppLocalizations {
       'Karta Spotreba bola skrytá nastaveniami vášho profilu.';
 
   @override
+  String get shellBarHiddenAnnounce =>
+      'Navigation hidden. Swipe up from the bottom, or long-press the button, to bring it back.';
+
+  @override
+  String get shellBarShownAnnounce => 'Navigation shown.';
+
+  @override
+  String get shellBarToggleHint => 'Long-press to hide or show the navigation';
+
+  @override
   String get swipeBetweenTabsHint =>
       'Tip: potiahnutím doľava alebo doprava prepínajte medzi kartami.';
 
