@@ -1,18 +1,20 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/theme/price_band_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/price_gradient.dart';
-import '../../../../core/utils/price_tier.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/widgets/animated_price_text.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/station.dart';
+import 'driving_marker_card.dart';
+import 'station_map_sheet.dart';
 
 /// Compact marker dimensions — small enough to fit dozens on screen
 /// while keeping the price legible.
@@ -33,11 +35,6 @@ const double kDrivingMarkerHeight = 62;
 /// which adopts the shared [PriceBandColors.ramp] colours but keeps glanceable
 /// markers (#3002, Epic #2997).
 enum StationMarkerVariant { pill, driving }
-
-/// Maximum characters for the brand label on the driving card before it is
-/// truncated. Wider than the tooltip cap because the driving card paints the
-/// brand on a 150dp-wide surface.
-const _maxDrivingBrandLength = 16;
 
 /// A small price-less dot used for lower-ranked stations so a bounded
 /// nearby-search result set stays fully visible (#2510) without the full
@@ -134,7 +131,7 @@ class StationMarkerBuilder {
     // price-only pill. It folds the old bespoke `DrivingMarkerBuilder` +
     // `_drivingStops` palette onto the one canonical ramp.
     if (variant == StationMarkerVariant.driving) {
-      return _drivingMarker(
+      return DrivingMarkerCard.build(
         context,
         station,
         price,
@@ -156,7 +153,7 @@ class StationMarkerBuilder {
     // is illegal (the dependency must be registered in `build`).
     final bool showCompact = compact && !selected;
     final Widget badge = showCompact
-        ? _dot(color, pastel)
+        ? Builder(builder: (ctx) => _dot(ctx, color, pastel))
         : selected
             // #2973 — the SELECTED marker (and ONLY the selected marker) wraps
             // its price in AnimatedPriceText so a refresh that drops the
@@ -165,11 +162,18 @@ class StationMarkerBuilder {
             // runs per-frame across the whole marker layer. Reduced motion is
             // honoured inside AnimatedPriceText.
             ? Builder(
-                builder: (ctx) => _priceBubble(color, pastel, priceText,
+                builder: (ctx) => _priceBubble(ctx, color, pastel, priceText,
                     ringColor: Theme.of(ctx).colorScheme.primary,
                     flashPrice: price),
               )
-            : _priceBubble(color, pastel, priceText);
+            // #4093 — a Builder on the un-selected path too: the card's
+            // surface and hairline are theme colours, and the markers are
+            // built in initState/didUpdateWidget where Theme.of is
+            // illegal. Resolving at paint time is the established pattern
+            // here (see the selected case above).
+            : Builder(
+                builder: (ctx) => _priceBubble(ctx, color, pastel, priceText),
+              );
 
     return Marker(
       point: LatLng(station.lat, station.lng),
@@ -184,9 +188,22 @@ class StationMarkerBuilder {
           button: true,
           selected: selected,
           child: GestureDetector(
-            // #2939 — [onTap] lets the radar split map select the row instead
-            // of navigating; null keeps the default push-to-detail.
-            onTap: onTap ?? () => StationDetailRoute(station.id).push<void>(context),
+            // #2939 — [onTap] lets the radar split map select the row
+            // instead of opening anything.
+            // #4093 — the default is no longer a push to the detail
+            // screen. The map's question is "where are the good options";
+            // a marker tap asks "what about that one", and answering it
+            // by REPLACING the map throws away the context that made the
+            // question worth asking. The sheet answers over the map, and
+            // carries its own way on to the detail screen.
+            onTap: onTap ??
+                () => unawaited(StationMapSheet.show(
+                      context,
+                      station: station,
+                      fuelType: fuelResolver != null
+                          ? fuelResolver(station)
+                          : fuel,
+                    )),
             child: Tooltip(
               message: brand,
               waitDuration: const Duration(milliseconds: 300),
@@ -198,180 +215,96 @@ class StationMarkerBuilder {
     );
   }
 
-  /// The big, driver-legible DRIVING-mode card (#3002, Epic #2997): the brand
-  /// on top (truncated), then a price-tier icon + a LARGE price, on a
-  /// [PriceBandColors.ramp]-coloured pill with a white outline + drop shadow so
-  /// it reads against the map tiles at a glance. Folds the old bespoke
-  /// `DrivingMarkerBuilder` (its own `_drivingStops` palette) onto the ONE
-  /// shared ramp every other map already uses.
-  ///
-  /// Keeps the same wrapping contract as the default marker — a
-  /// [RepaintBoundary] (#1772) + a labelled [Semantics] button (#566) — and the
-  /// driving caller's [onTap] (open the `DrivingStationSheet`); it never falls
-  /// back to a GoRouter push (the driving map has no detail route).
-  static Marker _drivingMarker(
+  static Widget _priceBubble(
     BuildContext context,
-    Station station,
-    double? price,
-    double minPrice,
-    double maxPrice,
-    Color color,
-    String semanticLabel,
+    Color accent,
+    bool pastel,
     String priceText, {
-    required bool selected,
-    required VoidCallback? onTap,
+    Color? ringColor,
+    double? flashPrice,
   }) {
-    final brand =
-        truncateBrand(station.displayName, maxLength: _maxDrivingBrandLength);
-    final tier = priceTierOf(price, minPrice, maxPrice);
-
-    return Marker(
-      point: LatLng(station.lat, station.lng),
-      width: kDrivingMarkerWidth,
-      height: kDrivingMarkerHeight,
-      child: RepaintBoundary(
-        child: Semantics(
-          label: semanticLabel,
-          button: true,
-          selected: selected,
-          child: GestureDetector(
-            onTap: onTap,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.95),
-                borderRadius: BorderRadius.circular(12),
-                // A selected driving card rings in brand-primary; otherwise the
-                // high-contrast white outline keeps it legible over tiles.
-                border: Border.all(
-                  color: selected
-                      ? Theme.of(context).colorScheme.primary
-                      : Colors.white,
-                  width: selected ? 3 : 2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.4),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    brand,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                      letterSpacing: 0.3,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (tier != PriceTier.unknown)
-                        Icon(
-                          iconForPriceTier(tier),
-                          size: 14,
-                          color: Colors.black87,
-                        ),
-                      Text(
-                        priceText,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// The full colour-coded price bubble shown for emphasized stations.
-  ///
-  /// #2939 — [ringColor] (the selected-station case) overrides the default
-  /// white hairline with a thicker brand-primary ring so the chosen marker
-  /// stands out from its neighbours.
-  ///
-  /// #2973 — [flashPrice] (selected case only) wraps the price text in an
-  /// [AnimatedPriceText] so the chosen station's marker flashes when its
-  /// price changes. Null on every non-selected bubble → no flash, so the
-  /// animation can never run across the whole marker layer.
-  static Widget _priceBubble(Color color, bool pastel, String priceText,
-      {Color? ringColor, double? flashPrice}) {
+    final scheme = Theme.of(context).colorScheme;
     final Widget priceLabel = FittedBox(
       fit: BoxFit.scaleDown,
       child: Text(
         priceText,
         style: TextStyle(
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w700,
           fontSize: 12,
           height: 1.0,
-          color: pastel ? Colors.black38 : Colors.black87,
+          // De-emphasized markers dim the NUMBER, not the card: a pastel
+          // wash over the whole marker made the price unreadable.
+          color: pastel
+              ? scheme.onSurfaceVariant.withValues(alpha: 0.7)
+              : scheme.onSurface,
         ),
       ),
     );
     return Container(
       alignment: Alignment.center,
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: pastel ? 0.5 : 0.92),
+        color: scheme.surface.withValues(alpha: pastel ? 0.75 : 0.96),
         borderRadius: BorderRadius.circular(6),
         border: ringColor != null
             ? Border.all(color: ringColor, width: 2)
-            : pastel
-                ? null
-                : Border.all(
-                    color: Colors.white.withValues(alpha: 0.8), width: 1),
+            : Border.all(color: scheme.outlineVariant, width: 1),
+        // One soft shadow so the card lifts off the tiles; the old marker
+        // needed a hard black one to survive its own saturated fill.
         boxShadow: pastel
             ? null
             : [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.25),
+                  color: Colors.black.withValues(alpha: 0.12),
                   blurRadius: 3,
                   offset: const Offset(0, 1),
                 ),
               ],
       ),
-      child: flashPrice == null
-          ? priceLabel
-          : AnimatedPriceText(price: flashPrice, child: priceLabel),
+      clipBehavior: Clip.antiAlias,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // The semantic accent: where this price sits on the ramp, as a
+          // modifier on the number rather than a wash over it.
+          Container(
+            key: const Key('station_marker_accent'),
+            width: 3,
+            height: kStationMarkerHeight,
+            color: accent.withValues(alpha: pastel ? 0.45 : 1),
+          ),
+          // Expanded, not bare: a FittedBox in a Row is handed unbounded
+          // width, so it never scales down and the marker overflows its
+          // fixed 50 dp instead.
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+              child: flashPrice == null
+                  ? priceLabel
+                  : AnimatedPriceText(price: flashPrice, child: priceLabel),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  /// A small price-less dot for a de-emphasized (lower-ranked) station —
-  /// keeps it visible + tappable without a label that would overlap its
+  /// A small dot for a de-emphasized (lower-ranked) station — keeps it
+  /// visible and tappable without a label that would overlap its
   /// neighbours (#2510).
-  static Widget _dot(Color color, bool pastel) {
+  ///
+  /// #4093 — the dot IS its accent: with no price to carry there is
+  /// nothing for a neutral card to hold, so the band colour is the fill
+  /// and a hairline surface ring separates it from the tiles.
+  static Widget _dot(BuildContext context, Color color, bool pastel) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
-        color: color.withValues(alpha: pastel ? 0.5 : 0.92),
+        color: color.withValues(alpha: pastel ? 0.45 : 0.9),
         shape: BoxShape.circle,
-        border: pastel
-            ? null
-            : Border.all(color: Colors.white.withValues(alpha: 0.8), width: 1),
-        boxShadow: pastel
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.25),
-                  blurRadius: 2,
-                  offset: const Offset(0, 1),
-                ),
-              ],
+        border: Border.all(
+          color: scheme.surface.withValues(alpha: pastel ? 0.6 : 0.9),
+          width: 1.5,
+        ),
       ),
     );
   }
@@ -379,8 +312,9 @@ class StationMarkerBuilder {
   /// Green (cheapest) -> Amber -> Orange -> Red (most expensive).
   /// #2196 — thin wrapper over the shared [priceGradientColor].
   /// #2492 — the stops now come from the ONE canonical
-  /// [PriceBandColors.ramp], shared with [PriceLegend] so the legend
-  /// describes exactly what the markers paint. The old pure
+  /// [PriceBandColors.ramp]. #4093 — the legend that used to describe it
+  /// is gone: the marker shows the price itself, so the ramp is a
+  /// modifier on a number rather than the only carrier of it. The old pure
   /// `Colors.yellow` (`#FFEB00`) was near-invisible on the white-bordered
   /// bubbles; it is replaced by the ramp's saturated amber.
   static const _priceStops = PriceBandColors.ramp;

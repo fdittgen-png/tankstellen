@@ -149,8 +149,6 @@
   },
   "sortDistance": "Distance",
   "sortRating": "Rating",
-  "cheap": "cheap",
-  "expensive": "expensive",
   "reportPrice": "Report price",
   "whatsWrong": "What's wrong?",
   "correctPrice": "Correct price (e.g. 1.459)",
@@ -481,25 +479,94 @@
   },
   "loadingRoute": "Loading route: {name}",
   "loyaltyCardDeleted": "Deleted {card}",
-  "@loyaltyCardDeleted": {"description": "Undo snackbar after deleting a fuel-club card (#3993). {card} is the user's own label, or the brand name when they left the label blank.", "placeholders": {"card": {"type": "String"}}},
+  "@loyaltyCardDeleted": {
+    "description": "Undo snackbar after deleting a fuel-club card (#3993). {card} is the user's own label, or the brand name when they left the label blank.",
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "durationMinutesShort": "{minutes} min",
-  "@durationMinutesShort": {"description": "A travel duration under one hour, for list rows and summaries (#3993). 'min' is the locale's minute abbreviation.", "placeholders": {"minutes": {"type": "int"}}},
+  "@durationMinutesShort": {
+    "description": "A travel duration under one hour, for list rows and summaries (#3993). 'min' is the locale's minute abbreviation.",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
   "durationHoursMinutes": "{hours} h {minutes} min",
-  "@durationHoursMinutes": {"description": "A travel duration of one hour or more (#3993). Both abbreviations are the locale's.", "placeholders": {"hours": {"type": "int"}, "minutes": {"type": "int"}}},
+  "@durationHoursMinutes": {
+    "description": "A travel duration of one hour or more (#3993). Both abbreviations are the locale's.",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
   "positionAgeUnderMinute": "< 1 min",
-  "@positionAgeUnderMinute": {"description": "Age of the last GPS fix when under a minute old, shown in the position bar (#4063)."},
+  "@positionAgeUnderMinute": {
+    "description": "Age of the last GPS fix when under a minute old, shown in the position bar (#4063)."
+  },
   "positionAgeHours": "{hours} h",
-  "@positionAgeHours": {"description": "Age of the last GPS fix in whole hours, shown in the position bar (#4063). 'h' is the locale's hour abbreviation.", "placeholders": {"hours": {"type": "int"}}},
+  "@positionAgeHours": {
+    "description": "Age of the last GPS fix in whole hours, shown in the position bar (#4063). 'h' is the locale's hour abbreviation.",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
   "positionAgeDays": "{days} d",
-  "@positionAgeDays": {"description": "Age of the last GPS fix in whole days, shown in the position bar (#4063). 'd' is the locale's day abbreviation.", "placeholders": {"days": {"type": "int"}}},
+  "@positionAgeDays": {
+    "description": "Age of the last GPS fix in whole days, shown in the position bar (#4063). 'd' is the locale's day abbreviation.",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
   "durationHoursMinutesCompact": "{hours}h {minutes}",
-  "@durationHoursMinutesCompact": {"description": "A drive time of one hour or more in a NARROW numeric column (monthly insights table, #4063): hour abbreviation glued to the number, minutes zero-padded and unit-less. 'h' is the locale's hour abbreviation.", "placeholders": {"hours": {"type": "int"}, "minutes": {"type": "String"}}},
+  "@durationHoursMinutesCompact": {
+    "description": "A drive time of one hour or more in a NARROW numeric column (monthly insights table, #4063): hour abbreviation glued to the number, minutes zero-padded and unit-less. 'h' is the locale's hour abbreviation.",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
   "durationSecondsShort": "{seconds} s",
-  "@durationSecondsShort": {"description": "An elapsed time under one minute, for live recording and trip cards (#4063). 's' is the locale's second abbreviation.", "placeholders": {"seconds": {"type": "int"}}},
+  "@durationSecondsShort": {
+    "description": "An elapsed time under one minute, for live recording and trip cards (#4063). 's' is the locale's second abbreviation.",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
   "durationMinutesSeconds": "{minutes} min {seconds} s",
-  "@durationMinutesSeconds": {"description": "An elapsed time under one hour with seconds, for live recording and trip cards (#4063). Both abbreviations are the locale's.", "placeholders": {"minutes": {"type": "int"}, "seconds": {"type": "int"}}},
-  "savedRoutesLoading": "Loading your saved routes\u2026",
-  "@savedRoutesLoading": {"description": "Shown on the saved-routes screen while the first sync pull is still running, so a user whose routes live only on the server is never told they have none (#3993)."},
+  "@durationMinutesSeconds": {
+    "description": "An elapsed time under one hour with seconds, for live recording and trip cards (#4063). Both abbreviations are the locale's.",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "savedRoutesLoading": "Loading your saved routes…",
+  "@savedRoutesLoading": {
+    "description": "Shown on the saved-routes screen while the first sync pull is still running, so a user whose routes live only on the server is never told they have none (#3993)."
+  },
   "@loadingRoute": {
     "placeholders": {
       "name": {
@@ -514,9 +581,24 @@
   "errorNetwork": "Network error. Check your connection.",
   "errorServer": "Server error. Please try again later.",
   "aboutVersionLine": "Version {version}",
-  "@aboutVersionLine": {"description": "Subtitle of the About row (#3982). Was a hard-coded English 'Version' interpolated with the build number.", "placeholders": {"version": {"type": "String", "example": "6.1.0"}}},
+  "@aboutVersionLine": {
+    "description": "Subtitle of the About row (#3982). Was a hard-coded English 'Version' interpolated with the build number.",
+    "placeholders": {
+      "version": {
+        "type": "String",
+        "example": "6.1.0"
+      }
+    }
+  },
   "referenceVehicleLoadFailed": "Couldn't load the vehicle catalog: {reason}",
-  "@referenceVehicleLoadFailed": {"description": "Shown in the reference-vehicle picker when the catalog fails to load (#3982). {reason} is the localized message from ErrorLocalizer — never a raw exception.", "placeholders": {"reason": {"type": "String"}}},
+  "@referenceVehicleLoadFailed": {
+    "description": "Shown in the reference-vehicle picker when the catalog fails to load (#3982). {reason} is the localized message from ErrorLocalizer — never a raw exception.",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
   "errorTimeout": "Connection timed out. Please try again.",
   "errorNoConnection": "No internet connection.",
   "errorApiKey": "Invalid API key. Check your settings.",
@@ -803,11 +885,17 @@
   "qrPaymentLaunchFailed": "No app available to open this code",
   "qrPaymentUnknownTitle": "Unrecognised code",
   "qrPaymentUnknownBody": "This isn't a payment code SparKilo knows — it may be a loyalty or receipt code, or a payment scheme we haven't added yet. Nothing is wrong with your scan.",
-  "@qrPaymentUnknownBody": {"description": "Explanation under the title of the unknown-QR dialog (#3996). Says what happened, that the user did nothing wrong, and implicitly why reporting helps."},
+  "@qrPaymentUnknownBody": {
+    "description": "Explanation under the title of the unknown-QR dialog (#3996). Says what happened, that the user did nothing wrong, and implicitly why reporting helps."
+  },
   "qrPaymentUnknownAction": "Report it and we'll try to add the scheme in a future release.",
-  "@qrPaymentUnknownAction": {"description": "Second line of the unknown-QR dialog (#3996): what the user can DO about it, next to the Report button."},
+  "@qrPaymentUnknownAction": {
+    "description": "Second line of the unknown-QR dialog (#3996): what the user can DO about it, next to the Report button."
+  },
   "qrPaymentRawHeading": "What the code contains",
-  "@qrPaymentRawHeading": {"description": "Label above the raw scanned payload in the unknown-QR dialog (#3996), so the block of text is identified rather than dumped."},
+  "@qrPaymentRawHeading": {
+    "description": "Label above the raw scanned payload in the unknown-QR dialog (#3996), so the block of text is identified rather than dumped."
+  },
   "qrPaymentCopyRaw": "Copy raw text",
   "qrPaymentCopiedRaw": "Copied to clipboard",
   "qrPaymentReport": "Report this scan",
@@ -1313,7 +1401,20 @@
   "yourRating": "Your rating",
   "noStorageUsed": "No storage used",
   "storageSegmentSemantics": "{category}: {size}, {percent}% of the total",
-  "@storageSegmentSemantics": {"description": "Screen-reader label for ONE band of the storage bar (#3995). Each band is announced separately with its category, its size and its share, because the bar's meaning is the comparison between bands.", "placeholders": {"category": {"type": "String"}, "size": {"type": "String"}, "percent": {"type": "int"}}},
+  "@storageSegmentSemantics": {
+    "description": "Screen-reader label for ONE band of the storage bar (#3995). Each band is announced separately with its category, its size and its share, because the bar's meaning is the comparison between bands.",
+    "placeholders": {
+      "category": {
+        "type": "String"
+      },
+      "size": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
   "aboutReportBug": "Report a bug / Suggest a feature",
   "aboutSupportProject": "Support this project",
   "aboutSupportDescription": "This app is free, open source, and has no ads. If you find it useful, consider supporting the developer.",
@@ -1522,69 +1623,192 @@
     "description": "SnackBar shown when a profile change removes the Consumption tab at runtime and the bottom-nav selection jumps to Search — explains why the tab vanished (#1690)."
   },
   "stationSourceFlagTooltip": "Prices from {country} — {source}",
-  "@stationSourceFlagTooltip": {"description": "Tooltip and screen-reader label on the small country flag each result carries (#4105). Names the country and the open-data service the price came from, so the flag on a card means the same thing as the flag on the summary bar.", "placeholders": {"country": {"type": "String"}, "source": {"type": "String"}}},
+  "@stationSourceFlagTooltip": {
+    "description": "Tooltip and screen-reader label on the small country flag each result carries (#4105). Names the country and the open-data service the price came from, so the flag on a card means the same thing as the flag on the summary bar.",
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      }
+    }
+  },
   "decisionBestValue": "Best value",
-  "@decisionBestValue": {"description": "Ranking label in the results decision header (#4090): the station with the lowest effective price per litre once the detour's fuel is counted."},
+  "@decisionBestValue": {
+    "description": "Ranking label in the results decision header (#4090): the station with the lowest effective price per litre once the detour's fuel is counted."
+  },
   "decisionCheapest": "Cheapest",
-  "@decisionCheapest": {"description": "Ranking label in the results decision header (#4090): the lowest pump price, before any detour arithmetic."},
+  "@decisionCheapest": {
+    "description": "Ranking label in the results decision header (#4090): the lowest pump price, before any detour arithmetic."
+  },
   "decisionClosest": "Closest",
-  "@decisionClosest": {"description": "Ranking label in the results decision header (#4090): the least driving."},
+  "@decisionClosest": {
+    "description": "Ranking label in the results decision header (#4090): the least driving."
+  },
   "decisionReasonBestValue": "Best balance of price and detour",
-  "@decisionReasonBestValue": {"description": "The reason line under the Best value row of the decision header (#4090)."},
+  "@decisionReasonBestValue": {
+    "description": "The reason line under the Best value row of the decision header (#4090)."
+  },
   "decisionReasonSaves": "Saves {amount} on {volume} · {distance} more driving",
-  "@decisionReasonSaves": {"description": "The reason line under a cheaper-but-further row of the decision header (#4090). Both halves of the trade are stated: what the pump price saves at the assumed quantity, and the extra driving it costs. Never a net figure presented as a verdict.", "placeholders": {"amount": {"type": "String"}, "volume": {"type": "String"}, "distance": {"type": "String"}}},
+  "@decisionReasonSaves": {
+    "description": "The reason line under a cheaper-but-further row of the decision header (#4090). Both halves of the trade are stated: what the pump price saves at the assumed quantity, and the extra driving it costs. Never a net figure presented as a verdict.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "volume": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
   "decisionReasonBreakEven": "Only worth the detour from {volume} up",
-  "@decisionReasonBreakEven": {"description": "The reason line when a cheaper station's detour eats the saving at the assumed quantity (#4090). The break-even volume from the economics spec, stated as the condition it is.", "placeholders": {"volume": {"type": "String"}}},
+  "@decisionReasonBreakEven": {
+    "description": "The reason line when a cheaper station's detour eats the saving at the assumed quantity (#4090). The break-even volume from the economics spec, stated as the condition it is.",
+    "placeholders": {
+      "volume": {
+        "type": "String"
+      }
+    }
+  },
   "decisionValueUnavailable": "Record a fill-up and the detour can be priced, not just the pump",
-  "@decisionValueUnavailable": {"description": "Replaces the Best value row when no consumption figure exists (#4090). The header states why the ranking is missing rather than fabricating a recommendation — economics spec section 4.1."},
+  "@decisionValueUnavailable": {
+    "description": "Replaces the Best value row when no consumption figure exists (#4090). The header states why the ranking is missing rather than fabricating a recommendation — economics spec section 4.1."
+  },
   "decisionShowAll": "{count, plural, =1{Show the one station} other{Show all {count} stations}}",
-  "@decisionShowAll": {"description": "Closes the decision header (#4090) and scrolls on to the full list.", "placeholders": {"count": {"type": "int"}}},
+  "@decisionShowAll": {
+    "description": "Closes the decision header (#4090) and scrolls on to the full list.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "decisionAssumption": "Based on {consumption} and {volume}",
-  "@decisionAssumption": {"description": "The assumptions the decision header's arithmetic rests on, shown as the assumptions they are (#4090). Consumption is the vehicle's measured or estimated figure; volume is the assumed purchase.", "placeholders": {"consumption": {"type": "String"}, "volume": {"type": "String"}}},
+  "@decisionAssumption": {
+    "description": "The assumptions the decision header's arithmetic rests on, shown as the assumptions they are (#4090). Consumption is the vehicle's measured or estimated figure; volume is the assumed purchase.",
+    "placeholders": {
+      "consumption": {
+        "type": "String"
+      },
+      "volume": {
+        "type": "String"
+      }
+    }
+  },
   "priceFreshnessFresh": "Fresh price",
-  "@priceFreshnessFresh": {"description": "Freshness band on a result row (#4092): the operator published this price within the last few hours. Freshness is stated in words because a coloured dot meaning 'something good' has to be decoded."},
+  "@priceFreshnessFresh": {
+    "description": "Freshness band on a result row (#4092): the operator published this price within the last few hours. Freshness is stated in words because a coloured dot meaning 'something good' has to be decoded."
+  },
   "priceFreshnessRecent": "Recent price",
-  "@priceFreshnessRecent": {"description": "Freshness band on a result row (#4092): published within the last day."},
+  "@priceFreshnessRecent": {
+    "description": "Freshness band on a result row (#4092): published within the last day."
+  },
   "priceFreshnessAging": "Aging price",
-  "@priceFreshnessAging": {"description": "Freshness band on a result row (#4092): more than a day old but inside the stale threshold. Worth a glance, not a warning."},
+  "@priceFreshnessAging": {
+    "description": "Freshness band on a result row (#4092): more than a day old but inside the stale threshold. Worth a glance, not a warning."
+  },
   "priceFreshnessStale": "Old price",
-  "@priceFreshnessStale": {"description": "Freshness band on a result row (#4092): older than the stale threshold. Same wording as the favorites badge so the two lists agree."},
+  "@priceFreshnessStale": {
+    "description": "Freshness band on a result row (#4092): older than the stale threshold. Same wording as the favorites badge so the two lists agree."
+  },
   "priceFreshnessUnknown": "Price age unknown",
-  "@priceFreshnessUnknown": {"description": "Freshness band on a result row (#4092): no timestamp, or one in a shape the reader does not know. Never presented as fresh, and never as stale either."},
+  "@priceFreshnessUnknown": {
+    "description": "Freshness band on a result row (#4092): no timestamp, or one in a shape the reader does not know. Never presented as fresh, and never as stale either."
+  },
   "priceFreshnessTooltip": "{band} · {stamp}",
-  "@priceFreshnessTooltip": {"description": "Tooltip and screen-reader label for the freshness segment (#4092): the band in words, then the raw timestamp the operator published, so the coarse word never hides the exact figure.", "placeholders": {"band": {"type": "String"}, "stamp": {"type": "String"}}},
+  "@priceFreshnessTooltip": {
+    "description": "Tooltip and screen-reader label for the freshness segment (#4092): the band in words, then the raw timestamp the operator published, so the coarse word never hides the exact figure.",
+    "placeholders": {
+      "band": {
+        "type": "String"
+      },
+      "stamp": {
+        "type": "String"
+      }
+    }
+  },
   "priceLabel": "Price",
-  "@priceLabel": {"description": "Row label on the station detail sheet (#4092). Price, price freshness and availability are three orthogonal facts and get three labels; they must never collapse into one indicator."},
+  "@priceLabel": {
+    "description": "Row label on the station detail sheet (#4092). Price, price freshness and availability are three orthogonal facts and get three labels; they must never collapse into one indicator."
+  },
   "priceFreshnessLabel": "Price freshness",
-  "@priceFreshnessLabel": {"description": "Row label on the station detail sheet (#4092) — see priceLabel."},
+  "@priceFreshnessLabel": {
+    "description": "Row label on the station detail sheet (#4092) — see priceLabel."
+  },
   "availabilityLabel": "Availability",
-  "@availabilityLabel": {"description": "Row label on the station detail sheet (#4092) — see priceLabel."},
+  "@availabilityLabel": {
+    "description": "Row label on the station detail sheet (#4092) — see priceLabel."
+  },
   "availabilityNotReported": "Not reported",
-  "@availabilityNotReported": {"description": "Availability value when the service publishes no opening state (#4092). An unknown state is stated as unknown, never rendered as open or as closed."},
+  "@availabilityNotReported": {
+    "description": "Availability value when the service publishes no opening state (#4092). An unknown state is stated as unknown, never rendered as open or as closed."
+  },
   "refuelQuantityTitle": "How much do you usually buy?",
-  "@refuelQuantityTitle": {"description": "Title of the refill-quantity sheet (#4095). The quantity is an assumption behind the Best value comparison; the app never needs it to work, and never asks for tank capacity."},
+  "@refuelQuantityTitle": {
+    "description": "Title of the refill-quantity sheet (#4095). The quantity is an assumption behind the Best value comparison; the app never needs it to work, and never asks for tank capacity."
+  },
   "refuelQuantityExplainer": "Best value compares what a refuel really costs, so it needs a rough volume. Sparkilo uses the median of your own fill-ups until you say otherwise.",
-  "@refuelQuantityExplainer": {"description": "Body of the refill-quantity sheet (#4095): says what the number is for and that the default is measured, not guessed."},
+  "@refuelQuantityExplainer": {
+    "description": "Body of the refill-quantity sheet (#4095): says what the number is for and that the default is measured, not guessed."
+  },
   "refuelQuantityMeasured": "Use my fill-up history",
-  "@refuelQuantityMeasured": {"description": "The option that hands the quantity back to the measured median (#4095) — the default, and the better answer where a history exists."},
+  "@refuelQuantityMeasured": {
+    "description": "The option that hands the quantity back to the measured median (#4095) — the default, and the better answer where a history exists."
+  },
   "refuelQuantityFullTank": "A full tank",
-  "@refuelQuantityFullTank": {"description": "Offered only when the active vehicle has a tank capacity on file (#4095). Capacity is a ceiling on the quantity, never a requirement."},
+  "@refuelQuantityFullTank": {
+    "description": "Offered only when the active vehicle has a tank capacity on file (#4095). Capacity is a ceiling on the quantity, never a requirement."
+  },
   "refuelQuantityChange": "Change",
-  "@refuelQuantityChange": {"description": "The affordance on the decision header's assumption line that opens the refill-quantity sheet (#4095)."},
+  "@refuelQuantityChange": {
+    "description": "The affordance on the decision header's assumption line that opens the refill-quantity sheet (#4095)."
+  },
   "refuelQuantityMeasuredValue": "{volume} (from your fill-ups)",
-  "@refuelQuantityMeasuredValue": {"description": "The measured-median option with the value it currently resolves to (#4095).", "placeholders": {"volume": {"type": "String"}}},
+  "@refuelQuantityMeasuredValue": {
+    "description": "The measured-median option with the value it currently resolves to (#4095).",
+    "placeholders": {
+      "volume": {
+        "type": "String"
+      }
+    }
+  },
   "refuelConsumptionMeasured": "{consumption} (measured)",
-  "@refuelConsumptionMeasured": {"description": "The vehicle's consumption shown as the assumption it is (#4095), flagged as coming from the user's own fill-ups rather than a model.", "placeholders": {"consumption": {"type": "String"}}},
+  "@refuelConsumptionMeasured": {
+    "description": "The vehicle's consumption shown as the assumption it is (#4095), flagged as coming from the user's own fill-ups rather than a model.",
+    "placeholders": {
+      "consumption": {
+        "type": "String"
+      }
+    }
+  },
   "refuelConsumptionMissing": "No consumption yet",
-  "@refuelConsumptionMissing": {"description": "Shown in the refill-quantity sheet when there is no measured consumption (#4095) — the Best value ranking is withheld until there is one."},
+  "@refuelConsumptionMissing": {
+    "description": "Shown in the refill-quantity sheet when there is no measured consumption (#4095) — the Best value ranking is withheld until there is one."
+  },
+  "mapSheetViewDetails": "View station details",
+  "@mapSheetViewDetails": {
+    "description": "The way on from the map's station sheet to the full detail screen (#4093). The sheet answers the decision; the detail screen answers everything else."
+  },
   "shellSwipeCoachMark": "Swipe down — or double-tap the bar — to use the whole screen",
-  "@shellSwipeCoachMark": {"description": "One-time coach mark teaching the swipe-away gesture (#4106/#4107). Names BOTH gestures and what they gain; shown once ever, retires itself after 7s, dismissed by performing it, tapping it, or its Dismiss button."},
+  "@shellSwipeCoachMark": {
+    "description": "One-time coach mark teaching the swipe-away gesture (#4106/#4107). Names BOTH gestures and what they gain; shown once ever, retires itself after 7s, dismissed by performing it, tapping it, or its Dismiss button."
+  },
   "shellBarHiddenAnnounce": "Navigation hidden. Swipe up from the bottom, or long-press the button, to bring it back.",
-  "@shellBarHiddenAnnounce": {"description": "Announced to assistive technologies when the user swipes the bottom navigation bar away (#4097). It names BOTH ways back, because a hidden bar with no affordance is a dead end."},
+  "@shellBarHiddenAnnounce": {
+    "description": "Announced to assistive technologies when the user swipes the bottom navigation bar away (#4097). It names BOTH ways back, because a hidden bar with no affordance is a dead end."
+  },
   "shellBarShownAnnounce": "Navigation shown.",
-  "@shellBarShownAnnounce": {"description": "Announced when the bottom navigation bar comes back (#4097)."},
+  "@shellBarShownAnnounce": {
+    "description": "Announced when the bottom navigation bar comes back (#4097)."
+  },
   "shellBarToggleHint": "Long-press to hide or show the navigation",
-  "@shellBarToggleHint": {"description": "Accessibility hint on the round centre button (#4097). Exposed as an action, so switch access and screen readers can hide or show the bar without performing any gesture."},
+  "@shellBarToggleHint": {
+    "description": "Accessibility hint on the round centre button (#4097). Exposed as an action, so switch access and screen readers can hide or show the bar without performing any gesture."
+  },
   "swipeBetweenTabsHint": "Tip: swipe left or right to switch between tabs.",
   "@swipeBetweenTabsHint": {
     "description": "One-time first-run SnackBar hint that the bottom-nav tabs respond to a horizontal swipe gesture (#1690)."
@@ -1685,13 +1909,49 @@
     }
   },
   "linkDeviceInvalidCode": "Please enter a valid device code",
-  "@linkDeviceInvalidCode": {"description": "Shown when the pasted device code is too short to be a device id (#3988)."},
+  "@linkDeviceInvalidCode": {
+    "description": "Shown when the pasted device code is too short to be a device id (#3988)."
+  },
   "linkDeviceFailed": "Link failed: {error}",
-  "@linkDeviceFailed": {"description": "Shown when a device link throws; {error} is the localized reason, never the raw exception (#3988).", "placeholders": {"error": {"type": "String", "example": "No internet connection"}}},
+  "@linkDeviceFailed": {
+    "description": "Shown when a device link throws; {error} is the localized reason, never the raw exception (#3988).",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "No internet connection"
+      }
+    }
+  },
   "linkDeviceLinked": "Linked! Imported {favorites} favourites, {alerts} alerts, {vehicles} vehicles, {fillUps} fill-ups.",
-  "@linkDeviceLinked": {"description": "Shown after a successful device link, with what was imported (#3988).", "placeholders": {"favorites": {"type": "int"}, "alerts": {"type": "int"}, "vehicles": {"type": "int"}, "fillUps": {"type": "int"}}},
+  "@linkDeviceLinked": {
+    "description": "Shown after a successful device link, with what was imported (#3988).",
+    "placeholders": {
+      "favorites": {
+        "type": "int"
+      },
+      "alerts": {
+        "type": "int"
+      },
+      "vehicles": {
+        "type": "int"
+      },
+      "fillUps": {
+        "type": "int"
+      }
+    }
+  },
   "syncConnectionFailed": "Connection failed: {error}",
-  "@syncConnectionFailed": {"description": "Sync wizard: the connection test or adopt step failed; {error} is the localized reason (#3988).", "placeholders": {"error": {"type": "String", "example": "No internet connection"}}},
+  "@syncConnectionFailed": {
+    "description": "Sync wizard: the connection test or adopt step failed; {error} is the localized reason (#3988).",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "No internet connection"
+      }
+    }
+  },
   "showFewerFuelTypes": "Show fewer fuel types",
-  "@showFewerFuelTypes": {"description": "Collapses the station-detail price history back to one fuel type; the counterpart of showAllFuelTypes (#3990)."}
+  "@showFewerFuelTypes": {
+    "description": "Collapses the station-detail price history back to one fuel type; the counterpart of showAllFuelTypes (#3990)."
+  }
 }

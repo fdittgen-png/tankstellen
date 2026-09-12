@@ -105,8 +105,6 @@
   "demoModeBannerAction": "Získat živé ceny",
   "sortDistance": "Vzdálenost",
   "sortRating": "Hodnocení",
-  "cheap": "levné",
-  "expensive": "drahé",
   "reportPrice": "Nahlásit cenu",
   "whatsWrong": "Co je špatně?",
   "correctPrice": "Správná cena (např. 1,459)",
@@ -6888,6 +6886,11 @@
   },
   "refuelConsumptionMissing": "No consumption yet",
   "@refuelConsumptionMissing": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "mapSheetViewDetails": "View station details",
+  "@mapSheetViewDetails": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

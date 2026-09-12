@@ -105,8 +105,6 @@
   "demoModeBannerAction": "Dohvati stvarne cijene",
   "sortDistance": "Udaljenost",
   "sortRating": "Ocjena",
-  "cheap": "jeftino",
-  "expensive": "skupo",
   "reportPrice": "Prijavi cijenu",
   "whatsWrong": "Što nije u redu?",
   "correctPrice": "Ispravna cijena (npr. 1,459)",
@@ -6888,6 +6886,11 @@
   },
   "refuelConsumptionMissing": "No consumption yet",
   "@refuelConsumptionMissing": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "mapSheetViewDetails": "View station details",
+  "@mapSheetViewDetails": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

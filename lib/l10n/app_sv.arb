@@ -105,8 +105,6 @@
   "demoModeBannerAction": "Hämta riktiga priser",
   "sortDistance": "Avstånd",
   "sortRating": "Betyg",
-  "cheap": "billig",
-  "expensive": "dyr",
   "reportPrice": "Rapportera pris",
   "whatsWrong": "Vad är fel?",
   "correctPrice": "Korrekt pris (t.ex. 15,79)",
@@ -6888,6 +6886,11 @@
   },
   "refuelConsumptionMissing": "No consumption yet",
   "@refuelConsumptionMissing": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "mapSheetViewDetails": "View station details",
+  "@mapSheetViewDetails": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

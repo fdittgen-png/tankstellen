@@ -105,8 +105,6 @@
   "demoModeBannerAction": "Gauti tiesiogines kainas",
   "sortDistance": "Atstumas",
   "sortRating": "Įvertinimas",
-  "cheap": "pigu",
-  "expensive": "brangu",
   "reportPrice": "Pranešti apie kainą",
   "whatsWrong": "Kas negerai?",
   "correctPrice": "Teisinga kaina (pvz. 1,459)",
@@ -6888,6 +6886,11 @@
   },
   "refuelConsumptionMissing": "No consumption yet",
   "@refuelConsumptionMissing": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "mapSheetViewDetails": "View station details",
+  "@mapSheetViewDetails": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

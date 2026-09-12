@@ -19,7 +19,7 @@ import 'package:tankstellen/core/theme/spacing.dart';
 import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/core/domain/station_amenity.dart';
 import 'package:tankstellen/features/search/presentation/widgets/amenity_chips.dart';
-import 'package:tankstellen/features/search/presentation/widgets/results/amenity_summary.dart';
+import 'package:tankstellen/core/widgets/amenity_summary.dart';
 import 'package:tankstellen/features/search/presentation/widgets/station_card.dart';
 
 import '../../../../helpers/pump_app.dart';
@@ -1175,9 +1175,8 @@ void main() {
         expect(card.margin, Spacing.listCardMargin);
       });
 
-      testWidgets('card is a primary card: outlined, no elevation (#3948)', (
-        tester,
-      ) async {
+      testWidgets('#4094 — the card is a list ROW: flat, unoutlined, one '
+          'hairline underneath', (tester) async {
         await pumpApp(
           tester,
           const StationCard(
@@ -1189,7 +1188,9 @@ void main() {
         final card = tester.widget<Card>(find.byType(Card).first);
         expect(card.elevation, 0);
         final shape = card.shape as RoundedRectangleBorder;
-        expect(shape.side.width, 1);
+        expect(shape.side, BorderSide.none,
+            reason: 'the ring around every row is gone; rows share one '
+                'hairline instead (StationCardShell owns it)');
       });
 
       testWidgets('card stays flat in dark mode too (#3948)', (tester) async {

@@ -348,12 +348,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get sortRating => 'Hodnocení';
 
   @override
-  String get cheap => 'levné';
-
-  @override
-  String get expensive => 'drahé';
-
-  @override
   String get reportPrice => 'Nahlásit cenu';
 
   @override
@@ -3086,6 +3080,9 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get refuelConsumptionMissing => 'No consumption yet';
+
+  @override
+  String get mapSheetViewDetails => 'View station details';
 
   @override
   String get shellSwipeCoachMark =>

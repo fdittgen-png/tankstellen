@@ -348,12 +348,6 @@ class AppLocalizationsRo extends AppLocalizations {
   String get sortRating => 'Evaluare';
 
   @override
-  String get cheap => 'ieftin';
-
-  @override
-  String get expensive => 'scump';
-
-  @override
   String get reportPrice => 'Raportează preț';
 
   @override
@@ -3095,6 +3089,9 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get refuelConsumptionMissing => 'No consumption yet';
+
+  @override
+  String get mapSheetViewDetails => 'View station details';
 
   @override
   String get shellSwipeCoachMark =>

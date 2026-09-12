@@ -10,7 +10,6 @@ import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/station.dart';
 import '../../../search/presentation/widgets/sort_selector.dart';
 import 'map_zoom_controls.dart';
-import 'price_legend.dart';
 import 'station_cluster_layers.dart';
 import 'station_map_body.dart';
 import 'station_marker.dart';
@@ -140,11 +139,6 @@ class StationMapLayers extends StatefulWidget {
   /// their controls, unchanged.
   final bool showZoomControls;
 
-  /// #3002 (Epic #2997) — when false, the bottom-left [PriceLegend] is hidden.
-  /// The DRIVING map suppresses it so the legend never sits under the oversized
-  /// driving bottom bar. Defaults to true → unchanged for every other map.
-  final bool showLegend;
-
   const StationMapLayers({
     super.key,
     required this.mapController,
@@ -169,7 +163,6 @@ class StationMapLayers extends StatefulWidget {
     this.interactionOptions,
     this.onMapTap,
     this.showZoomControls = true,
-    this.showLegend = true,
   });
 
   @override
@@ -340,16 +333,13 @@ class _StationMapLayersState extends State<StationMapLayers> {
             showRecenterButton: widget.showRecenterButton,
             onRecenter: widget.onRecenter,
           ),
-        // Price legend — #3002: hidden on the driving map so it never sits
-        // under the oversized driving bottom bar.
-        if (widget.showLegend)
-          Positioned(
-            left: 16,
-            // #4084 — the map runs behind the bar; the bar's height is the
-            // bottom padding, so the legend sits 16 above the bar as before.
-            bottom: 16 + MediaQuery.paddingOf(context).bottom,
-            child: const PriceLegend(),
-          ),
+        // #4093 — the permanent price legend is gone. It existed to
+        // decode a colour that carried the whole message: the markers
+        // were filled green-through-red and the price was painted on top
+        // of that fill. The marker now shows the PRICE as its content,
+        // with the band as a 3 dp accent — a number needs no key, and a
+        // legend that explains a modifier is chrome holding permanent
+        // height on the one screen whose whole point is the map.
       ],
     );
   }

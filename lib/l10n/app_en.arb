@@ -149,8 +149,6 @@
   },
   "sortDistance": "Distance",
   "sortRating": "Rating",
-  "cheap": "cheap",
-  "expensive": "expensive",
   "reportPrice": "Report price",
   "whatsWrong": "What's wrong?",
   "correctPrice": "Correct price (e.g. 1.459)",
@@ -1790,6 +1788,10 @@
   "refuelConsumptionMissing": "No consumption yet",
   "@refuelConsumptionMissing": {
     "description": "Shown in the refill-quantity sheet when there is no measured consumption (#4095) — the Best value ranking is withheld until there is one."
+  },
+  "mapSheetViewDetails": "View station details",
+  "@mapSheetViewDetails": {
+    "description": "The way on from the map's station sheet to the full detail screen (#4093). The sheet answers the decision; the detail screen answers everything else."
   },
   "shellSwipeCoachMark": "Swipe down — or double-tap the bar — to use the whole screen",
   "@shellSwipeCoachMark": {

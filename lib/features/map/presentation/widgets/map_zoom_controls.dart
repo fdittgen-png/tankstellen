@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
-import 'price_legend.dart' show ZoomButton;
+import 'zoom_button.dart' show ZoomButton;
 import 'station_map_geometry.dart';
 
 /// #3233 — the top-right zoom / recenter control column extracted out of

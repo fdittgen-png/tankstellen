@@ -105,8 +105,6 @@
   "demoModeBannerAction": "Λήψη ζωντανών τιμών",
   "sortDistance": "Απόσταση",
   "sortRating": "Αξιολόγηση",
-  "cheap": "φθηνό",
-  "expensive": "ακριβό",
   "reportPrice": "Αναφορά τιμής",
   "whatsWrong": "Τι δεν πάει καλά;",
   "correctPrice": "Σωστή τιμή (π.χ. 1,459)",
@@ -6888,6 +6886,11 @@
   },
   "refuelConsumptionMissing": "No consumption yet",
   "@refuelConsumptionMissing": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "mapSheetViewDetails": "View station details",
+  "@mapSheetViewDetails": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

@@ -348,12 +348,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get sortRating => 'Note';
 
   @override
-  String get cheap => 'bon marché';
-
-  @override
-  String get expensive => 'cher';
-
-  @override
   String get reportPrice => 'Signaler un prix';
 
   @override
@@ -3103,6 +3097,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get refuelConsumptionMissing => 'No consumption yet';
+
+  @override
+  String get mapSheetViewDetails => 'View station details';
 
   @override
   String get shellSwipeCoachMark =>

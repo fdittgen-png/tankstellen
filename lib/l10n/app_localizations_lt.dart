@@ -349,12 +349,6 @@ class AppLocalizationsLt extends AppLocalizations {
   String get sortRating => 'Įvertinimas';
 
   @override
-  String get cheap => 'pigu';
-
-  @override
-  String get expensive => 'brangu';
-
-  @override
   String get reportPrice => 'Pranešti apie kainą';
 
   @override
@@ -3094,6 +3088,9 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get refuelConsumptionMissing => 'No consumption yet';
+
+  @override
+  String get mapSheetViewDetails => 'View station details';
 
   @override
   String get shellSwipeCoachMark =>

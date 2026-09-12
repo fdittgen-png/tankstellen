@@ -348,12 +348,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sortRating => 'Rating';
 
   @override
-  String get cheap => 'cheap';
-
-  @override
-  String get expensive => 'expensive';
-
-  @override
   String get reportPrice => 'Report price';
 
   @override
@@ -3066,6 +3060,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get refuelConsumptionMissing => 'No consumption yet';
+
+  @override
+  String get mapSheetViewDetails => 'View station details';
 
   @override
   String get shellSwipeCoachMark =>
@@ -9523,12 +9520,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get sortRating => '⟦Řáŧîñǧ ···⟧';
 
   @override
-  String get cheap => '⟦çĥéáƥ ··⟧';
-
-  @override
-  String get expensive => '⟦éẋƥéñšîṽé ····⟧';
-
-  @override
   String get reportPrice => '⟦Řéƥóřŧ ƥřîçé ·····⟧';
 
   @override
@@ -12310,6 +12301,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get refuelConsumptionMissing => '⟦Ñó çóñšúɱƥŧîóñ ýéŧ ·······⟧';
+
+  @override
+  String get mapSheetViewDetails => '⟦Ṽîéŵ šŧáŧîóñ đéŧáîłš ········⟧';
 
   @override
   String get shellSwipeCoachMark =>

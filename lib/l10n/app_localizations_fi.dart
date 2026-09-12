@@ -348,12 +348,6 @@ class AppLocalizationsFi extends AppLocalizations {
   String get sortRating => 'Arvosana';
 
   @override
-  String get cheap => 'halpa';
-
-  @override
-  String get expensive => 'kallis';
-
-  @override
   String get reportPrice => 'Ilmoita hinta';
 
   @override
@@ -3077,6 +3071,9 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get refuelConsumptionMissing => 'No consumption yet';
+
+  @override
+  String get mapSheetViewDetails => 'View station details';
 
   @override
   String get shellSwipeCoachMark =>

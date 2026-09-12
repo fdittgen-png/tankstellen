@@ -105,8 +105,6 @@
   "demoModeBannerAction": "Obțineți prețuri live",
   "sortDistance": "Distanță",
   "sortRating": "Evaluare",
-  "cheap": "ieftin",
-  "expensive": "scump",
   "reportPrice": "Raportează preț",
   "whatsWrong": "Ce nu este corect?",
   "correctPrice": "Preț corect (ex. 1,459)",
@@ -6888,6 +6886,11 @@
   },
   "refuelConsumptionMissing": "No consumption yet",
   "@refuelConsumptionMissing": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "mapSheetViewDetails": "View station details",
+  "@mapSheetViewDetails": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

@@ -17,7 +17,7 @@ import '../../../station_detail/presentation/widgets/station_brand_helpers.dart'
 import '../../domain/entities/brand_registry.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/station.dart';
-import 'results/amenity_summary.dart';
+import '../../../../core/widgets/amenity_summary.dart';
 
 import 'station_card_badges.dart';
 import 'station_card_price_column.dart';
@@ -105,6 +105,17 @@ class StationCard extends StatelessWidget {
   /// caller's (`stale_price_policy.dart` in favorites).
   final bool isStalePrice;
 
+  /// #4094 — draw the hairline that divides this row from the next.
+  ///
+  /// Defaults to true, which is right everywhere today: a list's final
+  /// hairline sits above the scroll clearance and reads as the end of
+  /// the list rather than as a dangling line. A caller that wants it
+  /// suppressed can, and `StationCardShell`'s tests pin both states —
+  /// but the search list does NOT pass it, because threading "am I last"
+  /// through `_buildFuelCard` and `SwipeableStationCard` costs three
+  /// files of plumbing for one pixel row.
+  final bool showSeparator;
+
   const StationCard({
     super.key,
     required this.station,
@@ -119,6 +130,7 @@ class StationCard extends StatelessWidget {
     this.activeDiscountsByBrand,
     this.closenessRadiusMeters,
     this.isStalePrice = false,
+    this.showSeparator = true,
   });
 
   /// True if the station has a real brand name (not empty, not generic "Station")
@@ -230,6 +242,7 @@ class StationCard extends StatelessWidget {
         onTap: onTap,
         stripeColor: stripeColor,
         stripeWidth: isCheapest ? 6 : 4,
+        separator: showSeparator,
         child: Padding(
           // #4091 — tighter vertically. The card's job in a list is to be
           // comparable with the five cards around it, and 8 dp above and
