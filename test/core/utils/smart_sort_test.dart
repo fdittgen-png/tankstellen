@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/domain/refuel_economics.dart';
 import 'package:tankstellen/core/utils/price_utils.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/station.dart';
@@ -182,7 +183,13 @@ void main() {
     });
   });
 
-  group('compareByPriceDistance', () {
+  // #4088 — this group used to pin the DEFECT. `compareByPriceDistance`
+  // ranked by `price ÷ distance`, so "cheaper-far has a better ratio than
+  // expensive-near" was asserted as correct even when the detour cost more
+  // than the saving, and a station at 0 km needed a clamp to avoid dividing
+  // by zero. Effective price per litre is a real cost; the contract below
+  // is `docs/specs/refuel-economics.md`.
+  group('compareByEffectivePrice (#4088)', () {
     const stationCheapNear = Station(
       id: 'cheap-near',
       name: 'Cheap Near',
@@ -240,84 +247,71 @@ void main() {
 
     const fuelType = FuelType.e10;
 
-    test('cheaper-far has better ratio than expensive-near', () {
-      // cheap-far: 1.40 / 10.0 = 0.14
-      // expensive-near: 1.80 / 0.5 = 3.60
+    const profile =
+        RefuelProfile(consumptionLPer100km: 7, litresIntended: 40);
+
+    test('at equal price the NEARER station wins — the old defect', () {
+      const near =
+          Station(id: 'n', name: 'n', brand: 'b', street: 's',
+              postCode: '1', place: 'p', lat: 0, lng: 0, dist: 2,
+              e10: 1.0, isOpen: true);
+      const far =
+          Station(id: 'f', name: 'f', brand: 'b', street: 's',
+              postCode: '1', place: 'p', lat: 0, lng: 0, dist: 10,
+              e10: 1.0, isOpen: true);
+      expect(compareByEffectivePrice(near, far, fuelType, profile),
+          lessThan(0),
+          reason: 'price ÷ distance ranked the farther station first');
+    });
+
+    test('a cheaper station still wins when the saving beats the detour', () {
       expect(
-        compareByPriceDistance(stationCheapFar, stationExpensiveNear, fuelType),
+        compareByEffectivePrice(
+            stationCheapFar, stationExpensiveNear, fuelType, profile),
         lessThan(0),
       );
     });
 
-    test('nearby cheap station has lower ratio', () {
-      // cheap-near: 1.50 / 1.0 = 1.50
-      // expensive-near: 1.80 / 0.5 = 3.60
+    test('cheap AND near beats expensive and near', () {
       expect(
-        compareByPriceDistance(stationCheapNear, stationExpensiveNear, fuelType),
+        compareByEffectivePrice(
+            stationCheapNear, stationExpensiveNear, fuelType, profile),
         lessThan(0),
       );
     });
 
-    test('stations without price sort last', () {
+    test('a station at distance 0 needs no clamp — it is simply best', () {
+      const atZero =
+          Station(id: 'z', name: 'z', brand: 'b', street: 's',
+              postCode: '1', place: 'p', lat: 0, lng: 0, dist: 0,
+              e10: 1.0, isOpen: true);
       expect(
-        compareByPriceDistance(stationNoPrice, stationCheapNear, fuelType),
+          compareByEffectivePrice(atZero, stationCheapFar, fuelType, profile),
+          lessThan(0),
+          reason: 'no detour at all: the pump price IS the effective price');
+    });
+
+    test('stations without a price sort last, and tie with each other', () {
+      expect(
+        compareByEffectivePrice(
+            stationNoPrice, stationCheapNear, fuelType, profile),
         greaterThan(0),
       );
-    });
-
-    test('two stations without price compare as equal', () {
-      const noPrice2 = Station(
-        id: 'no-price-2',
-        name: 'No Price 2',
-        brand: 'TOTAL',
-        street: 'Str. E',
-        postCode: '10115',
-        place: 'Berlin',
-        lat: 52.56,
-        lng: 13.44,
-        dist: 2.0,
-        isOpen: true,
-      );
       expect(
-        compareByPriceDistance(stationNoPrice, noPrice2, fuelType),
-        equals(0),
+        compareByEffectivePrice(
+            stationNoPrice, stationNoPrice, fuelType, profile),
+        0,
       );
     });
 
-    test('station at distance 0 uses clamped minimum of 0.1', () {
-      const atZero = Station(
-        id: 'at-zero',
-        name: 'At Zero',
-        brand: 'JET',
-        street: 'Here',
-        postCode: '10115',
-        place: 'Berlin',
-        lat: 52.52,
-        lng: 13.40,
-        dist: 0.0,
-        e10: 1.50,
-        isOpen: true,
-      );
-      // Should not throw / produce infinity; ratio = 1.50 / 0.1 = 15.0
+    test('with no consumption it degrades to pure price, inventing nothing',
+        () {
       expect(
-        compareByPriceDistance(atZero, stationCheapFar, fuelType),
-        greaterThan(0), // 15.0 > 0.14
+        compareByEffectivePrice(stationCheapFar, stationExpensiveNear,
+            fuelType, const RefuelProfile()),
+        lessThan(0),
+        reason: 'cheaper per litre, and no detour cost was fabricated',
       );
-    });
-
-    test('sorting a list orders by best price/distance ratio', () {
-      final stations = [
-        stationExpensiveNear,
-        stationNoPrice,
-        stationCheapFar,
-        stationCheapNear,
-      ];
-      stations.sort((a, b) => compareByPriceDistance(a, b, fuelType));
-
-      expect(stations[0].id, 'cheap-far'); // 0.14
-      expect(stations[1].id, 'cheap-near'); // 1.50
-      expect(stations[2].id, 'expensive-near'); // 3.60
-      expect(stations[3].id, 'no-price'); // sentinel
     });
   });
 }

@@ -5,6 +5,7 @@ import '../constants/app_constants.dart';
 import '../domain/fuel_type.dart';
 import '../domain/station.dart';
 import 'station_extensions.dart';
+import '../domain/refuel_economics.dart';
 
 /// Returns the price of the given [fuelType] for [station], or null if unavailable.
 ///
@@ -156,15 +157,43 @@ int compareByRating(Station a, Station b, Map<String, int> ratings) {
   return a.dist.compareTo(b.dist);
 }
 
-/// Compares two stations by price/distance ratio (lower is better).
-/// Ratio = price / max(dist, 0.1) to avoid division by zero.
-/// Stations without a price sort last.
-int compareByPriceDistance(
-    Station a, Station b, FuelType fuelType) {
+/// Rank two stations by EFFECTIVE price per litre — the pump price plus
+/// what the drive there costs, spread over the litres bought (#4088).
+///
+/// Replaces a `price ÷ distance` ratio that had no economic meaning and
+/// was monotonically IMPROVED by distance: at €1.00/L a station 10 km away
+/// scored 0.10 against 0.50 for one 2 km away, so the sort put the FARTHER
+/// one first and the menu entry recommended pointless detours. The model
+/// and its worked example live in `docs/specs/refuel-economics.md`.
+///
+/// [profile] carries the vehicle's consumption and the litres the refuel
+/// buys. With no consumption there is no honest detour cost, so this
+/// degrades to pure price instead of inventing one; the caller surfaces
+/// that as the reason Best Value is unavailable.
+int compareByEffectivePrice(
+  Station a,
+  Station b,
+  FuelType fuelType,
+  RefuelProfile profile,
+) {
   final pa = priceForFuelType(a, fuelType);
   final pb = priceForFuelType(b, fuelType);
+  if (!profile.canRankByValue) {
+    return (pa ?? AppConstants.noPriceSentinel)
+        .compareTo(pb ?? AppConstants.noPriceSentinel);
+  }
+  double key(Station s, double? price) {
+    final candidate = RefuelCandidate(
+      stationId: s.id,
+      oneWayKm: s.dist,
+      pricePerLitre: price,
+    );
+    return RefuelQuote(
+          candidate: candidate,
+          cost: RefuelEconomics.cost(candidate, profile),
+        ).effectivePricePerLitre ??
+        AppConstants.noPriceSentinel;
+  }
 
-  final ratioA = pa != null ? pa / a.dist.clamp(0.1, double.infinity) : AppConstants.noPriceSentinel;
-  final ratioB = pb != null ? pb / b.dist.clamp(0.1, double.infinity) : AppConstants.noPriceSentinel;
-  return ratioA.compareTo(ratioB);
+  return key(a, pa).compareTo(key(b, pb));
 }

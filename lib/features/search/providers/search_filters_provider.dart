@@ -17,6 +17,7 @@ import 'mixed_results_filter_provider.dart';
 import 'search_provider.dart';
 import 'search_screen_ui_provider.dart';
 import 'station_rating_provider.dart';
+import '../../../core/domain/refuel_economics.dart';
 
 part 'search_filters_provider.g.dart';
 
@@ -149,8 +150,12 @@ List<SearchResultItem> sortSearchResults(
   List<SearchResultItem> items,
   SortMode sortMode,
   FuelType fuelType,
-  Map<String, int> ratings,
-) {
+  Map<String, int> ratings, {
+  /// #4088 — the vehicle side of Best Value. The default carries no
+  /// consumption, which degrades that mode to pure price rather than
+  /// inventing a detour cost.
+  RefuelProfile profile = const RefuelProfile(),
+}) {
   final sorted = List<SearchResultItem>.from(items);
 
   // An all-EV list has no fuel-specific sort key — always by distance.
@@ -190,12 +195,12 @@ List<SearchResultItem> sortSearchResults(
         if (sa != null && sb != null) return compareByRating(sa, sb, ratings);
         return a.dist.compareTo(b.dist);
       });
-    case SortMode.priceDistance:
+    case SortMode.bestValue:
       sorted.sort((a, b) {
         final sa = a is FuelStationResult ? a.station : null;
         final sb = b is FuelStationResult ? b.station : null;
         if (sa != null && sb != null) {
-          return compareByPriceDistance(sa, sb, fuelType);
+          return compareByEffectivePrice(sa, sb, fuelType, profile);
         }
         return a.dist.compareTo(b.dist);
       });
