@@ -38,7 +38,24 @@ class CrashForensicsHarvester {
 
   /// Exit reasons that indicate the OS reclaimed a healthy background
   /// process — routine on Android, breadcrumb-weight, never an ERROR.
-  static const Set<String> _routineReasons = {'freezer', 'other'};
+  ///
+  /// #4111 — the package-lifecycle reasons are filtered natively before
+  /// they ever reach here, but they are listed too: an OEM that reports
+  /// an update stop under a reason code this build's SDK does not name
+  /// would otherwise land as an error trace, which is the exact failure
+  /// being fixed.
+  static const Set<String> _routineReasons = {
+    'freezer',
+    'other',
+    'package_state_change',
+    'package_updated',
+  };
+
+  /// The description Android writes when the package installer stops the
+  /// app to replace it. #4111 — the last line of defence: whatever reason
+  /// code an OEM attaches, an exit that says this is an update, not a
+  /// death.
+  static const String _packageInstallStop = 'installPackageLI';
 
   static Future<void> harvestAndLog() async {
     final String? raw;
@@ -110,6 +127,8 @@ class CrashForensicsHarvester {
       if (entry is! Map) continue;
       final reason = entry['reason']?.toString() ?? 'unknown';
       if (_routineReasons.contains(reason)) continue;
+      final description = entry['description']?.toString() ?? '';
+      if (description.contains(_packageInstallStop)) continue;
       final stamp = _stamp(entry['timestampMs']);
       final trace = entry['trace']?.toString() ?? '';
       if (reason == 'crash_native') {
