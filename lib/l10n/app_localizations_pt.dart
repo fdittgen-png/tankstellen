@@ -3037,6 +3037,38 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get priceFreshnessFresh => 'Fresh price';
+
+  @override
+  String get priceFreshnessRecent => 'Recent price';
+
+  @override
+  String get priceFreshnessAging => 'Aging price';
+
+  @override
+  String get priceFreshnessStale => 'Old price';
+
+  @override
+  String get priceFreshnessUnknown => 'Price age unknown';
+
+  @override
+  String priceFreshnessTooltip(String band, String stamp) {
+    return '$band · $stamp';
+  }
+
+  @override
+  String get priceLabel => 'Price';
+
+  @override
+  String get priceFreshnessLabel => 'Price freshness';
+
+  @override
+  String get availabilityLabel => 'Availability';
+
+  @override
+  String get availabilityNotReported => 'Not reported';
+
+  @override
   String get shellSwipeCoachMark =>
       'Swipe down to hide the bars and use the whole screen';
 
@@ -8141,9 +8173,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'O seu país é suportado, mas ainda não está configurado — por isso os preços podem ser de outro país. Escolha o seu país nas definições de pesquisa para ver os preços locais.';
 
   @override
-  String get stalePriceBadge => 'Preço antigo';
-
-  @override
   String get radiusAlertCenterChipGps => 'A minha posição';
 
   @override
@@ -8939,11 +8968,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get amenitiesServicesShowLess => 'Show less';
-
-  @override
-  String stationStatusWithFreshness(String status, String ago) {
-    return '$status · atualizado há $ago';
-  }
 
   @override
   String pricesNotSoldHere(String fuels) {

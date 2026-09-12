@@ -4,15 +4,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/services/service_result.dart';
+import '../../../../core/domain/price_freshness.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/time/app_clock.dart';
+import '../../../../core/widgets/price_freshness_words.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/station.dart';
 import '../../../search/providers/station_rating_provider.dart';
 import 'station_header_metrics.dart';
 
-/// Top row of the station detail screen — open/closed dot + freshness
-/// text on the left, compact 5-star rating on the right.
+/// Top row of the station detail screen — availability and price
+/// freshness as TWO facts on the left, compact 5-star rating on the
+/// right.
 ///
 /// Stateless apart from watching `stationRatingProvider` (which the parent
 /// previously did inline via `Consumer`). Pulled out of
@@ -22,9 +25,28 @@ import 'station_header_metrics.dart';
 ///
 /// This row is the ONE place the screen states the open / closed state
 /// (#3902): the opening-hours card below renders the schedule only.
+///
+/// #4092 — it used to state availability and price freshness as a single
+/// sentence in a single colour: `stationStatusWithFreshness` produced
+/// "Open · updated 3 h ago" painted green, so the green was simultaneously
+/// claiming the forecourt is open AND that the price is current. They are
+/// orthogonal facts — an open station can publish a week-old price, and a
+/// closed one can have published five minutes ago — and a reader had no
+/// way to tell which half the colour belonged to. They are now two
+/// segments, each with its own glyph, its own colour and its own
+/// screen-reader label, on the one line the #3902 height budget allows.
+///
+/// The freshness fact also changed CLOCK. It used to read
+/// `ServiceResult.freshnessLabel` — how long ago the app DOWNLOADED the
+/// price list — and render it as "Open · updated < 1 min ago" directly
+/// beside a price. A reader takes that to mean the price is a minute
+/// old; it meant our copy of the list is. The header now states the
+/// operator's own publication age, which is the number a driver is
+/// actually asking about, and the exact stamp rides in the tooltip. How
+/// fresh our COPY is remains a real but separate fact, and the results
+/// band (`PriceFreshnessSegment`) is where it is already stated.
 class StationStatusRow extends ConsumerWidget {
   final Station station;
-  final ServiceResult<dynamic> serviceResult;
 
   /// ID used to look up the rating from `stationRatingProvider`. Usually
   /// the `stationId` field on the screen.
@@ -33,7 +55,6 @@ class StationStatusRow extends ConsumerWidget {
   const StationStatusRow({
     super.key,
     required this.station,
-    required this.serviceResult,
     required this.stationId,
   });
 
@@ -52,43 +73,105 @@ class StationStatusRow extends ConsumerWidget {
     };
 
     final statusSemantic = l10n.stationOpenStateSemantic('${station.isOpen}');
+    final band = priceFreshness(
+      station.updatedAt,
+      now: ref.watch(appClockProvider).now(),
+    );
+    final bandWord = priceFreshnessWord(band, l10n);
+    final bandColor = band == PriceFreshness.stale
+        ? theme.colorScheme.tertiary
+        : DarkModeColors.mutedText(context);
 
     return Row(
       children: [
         Expanded(
-          child: Semantics(
-            label: statusSemantic,
-            child: Row(
-              children: [
-                ExcludeSemantics(
-                  child: Container(
-                    width: kStatusDotSize,
-                    height: kStatusDotSize,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: color,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 6),
-                // Flexible + single-line ellipsis so the status text yields
-                // instead of overflowing the row when the available width is
-                // narrow — e.g. the flex:2 left pane of the #2531 two-column
-                // wide layout, where the row competes with the trailing
-                // stars. One line also keeps the row at the height
-                // `stationHeaderExpandedHeight` budgets for it (#3902).
-                Flexible(
+          // Flexible children with single-line ellipsis so the facts yield
+          // instead of overflowing when the width is narrow — e.g. the
+          // flex:2 left pane of the #2531 two-column wide layout, where the
+          // row competes with the trailing stars. One line also keeps the
+          // row at the height `stationHeaderExpandedHeight` budgets for it
+          // (#3902).
+          child: Row(
+            children: [
+              // FACT 1 — availability. The coloured dot belongs to this
+              // fact and to nothing else.
+              Flexible(
+                child: Semantics(
+                  label: '${l10n.availabilityLabel}: $statusSemantic',
                   child: ExcludeSemantics(
-                    child: Text(
-                      buildStationStatusText(station, serviceResult, l10n),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: headerStatusStyle(theme)?.copyWith(color: color),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: kStatusDotSize,
+                          height: kStatusDotSize,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: color,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            _availabilityWord(station, l10n),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style:
+                                headerStatusStyle(theme)?.copyWith(color: color),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+              // A language-neutral separator between two facts.
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: Text(
+                  '·',
+                  style: headerStatusStyle(theme)
+                      ?.copyWith(color: DarkModeColors.mutedText(context)),
+                ),
+              ),
+              // FACT 2 — how old the PRICE is. Never the availability
+              // colour, and never a congratulatory green of its own: only
+              // a stale price is an attention state.
+              Flexible(
+                child: Tooltip(
+                  message: l10n.priceFreshnessTooltip(
+                    bandWord,
+                    l10n.stationUpdatedLabel(station.updatedAt ?? ''),
+                  ),
+                  child: Semantics(
+                    label: '${l10n.priceFreshnessLabel}: $bandWord',
+                    child: ExcludeSemantics(
+                      child: Row(
+                        children: [
+                          Icon(
+                            band == PriceFreshness.stale
+                                ? Icons.history_toggle_off
+                                : Icons.schedule,
+                            size: kStatusDotSize + 4,
+                            color: bandColor,
+                          ),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              bandWord,
+                              key: const Key('station_detail_freshness_word'),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: headerStatusStyle(theme)
+                                  ?.copyWith(color: bandColor),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         if (rating != null)
@@ -108,21 +191,14 @@ class StationStatusRow extends ConsumerWidget {
   }
 }
 
-/// The open-state + freshness phrase, e.g. "Open · updated < 1 min ago".
+/// The availability word on its own.
 ///
-/// #3902 — used to be composed from word fragments
-/// (`'$status — $freshness $agoSuffix'`), which produced "Ouvert — < 1 min
-/// il y a" in French: the `ago` word is a prefix there, not a suffix. One
-/// parameterised ARB key per locale owns the word order instead.
-String buildStationStatusText(
-  Station station,
-  ServiceResult<dynamic> result,
-  AppLocalizations l10n,
-) {
-  final status = switch (station.isOpen) {
-    true => l10n.open,
+/// #3198 — tri-state: an unknown open state is stated as unreported,
+/// never as open and never as closed.
+String _availabilityWord(Station station, AppLocalizations l10n) {
+  return switch (station.isOpen) {
+    true => station.is24h ? l10n.stationCardStatus24h(l10n.open) : l10n.open,
     false => l10n.closed,
-    null => l10n.openStateUnknown,
+    null => l10n.availabilityNotReported,
   };
-  return l10n.stationStatusWithFreshness(status, result.freshnessLabel);
 }

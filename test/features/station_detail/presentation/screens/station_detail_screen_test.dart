@@ -97,7 +97,7 @@ void main() {
       expect(find.text('Diesel'), findsOneWidget);
     });
 
-    testWidgets('shows open status with freshness inline',
+    testWidgets('#4092 shows availability and price freshness as two facts',
         (tester) async {
       final result = ServiceResult(
         data: const StationDetail(station: testStation), // isOpen: true
@@ -120,10 +120,12 @@ void main() {
         ],
       );
 
-      // Status text should contain "Open" combined with freshness
-      // e.g. "Open — < 1 min ago"
+      // Availability, and price age in words — never one sentence that
+      // makes a single colour answer for both.
       expect(find.textContaining('Open'), findsAtLeast(1));
-      expect(find.textContaining('ago'), findsAtLeast(1));
+      expect(find.byKey(const Key('station_detail_freshness_word')),
+          findsOneWidget);
+      expect(find.textContaining('Open · updated'), findsNothing);
     });
 
     testWidgets('does not render separate FreshnessBadge widget',

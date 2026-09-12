@@ -5516,6 +5516,66 @@ abstract class AppLocalizations {
   /// **'Based on {consumption} and {volume}'**
   String decisionAssumption(String consumption, String volume);
 
+  /// Freshness band on a result row (#4092): the operator published this price within the last few hours. Freshness is stated in words because a coloured dot meaning 'something good' has to be decoded.
+  ///
+  /// In en, this message translates to:
+  /// **'Fresh price'**
+  String get priceFreshnessFresh;
+
+  /// Freshness band on a result row (#4092): published within the last day.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent price'**
+  String get priceFreshnessRecent;
+
+  /// Freshness band on a result row (#4092): more than a day old but inside the stale threshold. Worth a glance, not a warning.
+  ///
+  /// In en, this message translates to:
+  /// **'Aging price'**
+  String get priceFreshnessAging;
+
+  /// Freshness band on a result row (#4092): older than the stale threshold. Same wording as the favorites badge so the two lists agree.
+  ///
+  /// In en, this message translates to:
+  /// **'Old price'**
+  String get priceFreshnessStale;
+
+  /// Freshness band on a result row (#4092): no timestamp, or one in a shape the reader does not know. Never presented as fresh, and never as stale either.
+  ///
+  /// In en, this message translates to:
+  /// **'Price age unknown'**
+  String get priceFreshnessUnknown;
+
+  /// Tooltip and screen-reader label for the freshness segment (#4092): the band in words, then the raw timestamp the operator published, so the coarse word never hides the exact figure.
+  ///
+  /// In en, this message translates to:
+  /// **'{band} · {stamp}'**
+  String priceFreshnessTooltip(String band, String stamp);
+
+  /// Row label on the station detail sheet (#4092). Price, price freshness and availability are three orthogonal facts and get three labels; they must never collapse into one indicator.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get priceLabel;
+
+  /// Row label on the station detail sheet (#4092) — see priceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Price freshness'**
+  String get priceFreshnessLabel;
+
+  /// Row label on the station detail sheet (#4092) — see priceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Availability'**
+  String get availabilityLabel;
+
+  /// Availability value when the service publishes no opening state (#4092). An unknown state is stated as unknown, never rendered as open or as closed.
+  ///
+  /// In en, this message translates to:
+  /// **'Not reported'**
+  String get availabilityNotReported;
+
   /// One-time coach mark teaching the swipe-away gesture (#4106/#4107). Names BOTH gestures and what they gain; shown once ever, retires itself after 7s, dismissed by performing it, tapping it, or its Dismiss button.
   ///
   /// In en, this message translates to:
@@ -13755,12 +13815,6 @@ abstract class AppLocalizations {
   /// **'Your country is supported, but it isn\'t set up yet — so prices may be from another country. Choose your country in the search settings to see local prices.'**
   String get configureCountryBody;
 
-  /// Small badge on a favorites station card whose price timestamp is older than the stale-price threshold (7 days) — warns that the shown price is probably outdated (#3905).
-  ///
-  /// In en, this message translates to:
-  /// **'Old price'**
-  String get stalePriceBadge;
-
   /// Chip on the zone-alert sheet naming the chosen alert centre when it was bound to the device's current GPS position (#3905).
   ///
   /// In en, this message translates to:
@@ -14931,12 +14985,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show less'**
   String get amenitiesServicesShowLess;
-
-  /// Station-detail header line: the open / closed / unknown state followed by how long ago the data was fetched. Owns the whole word order per locale — never composed from fragments (#3902).
-  ///
-  /// In en, this message translates to:
-  /// **'{status} · updated {ago} ago'**
-  String stationStatusWithFreshness(String status, String ago);
 
   /// Muted footnote under the station-detail price list naming the base fuels this station has no price for (they are hidden from the list). {fuels} is a comma-joined list of fuel codes (#3902).
   ///

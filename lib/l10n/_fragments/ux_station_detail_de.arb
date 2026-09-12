@@ -1,4 +1,3 @@
 {
-  "stationStatusWithFreshness": "{status} · aktualisiert vor {ago}",
   "pricesNotSoldHere": "Hier nicht angeboten: {fuels}"
 }

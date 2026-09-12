@@ -172,7 +172,6 @@ class _StationDetailLoaded extends StatelessWidget {
                     children: [
                       StationStatusRow(
                         station: station,
-                        serviceResult: serviceResult,
                         stationId: stationId,
                       ),
                       const SizedBox(height: kHeaderStatusGap),

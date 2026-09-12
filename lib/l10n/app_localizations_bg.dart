@@ -3039,6 +3039,38 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
+  String get priceFreshnessFresh => 'Fresh price';
+
+  @override
+  String get priceFreshnessRecent => 'Recent price';
+
+  @override
+  String get priceFreshnessAging => 'Aging price';
+
+  @override
+  String get priceFreshnessStale => 'Old price';
+
+  @override
+  String get priceFreshnessUnknown => 'Price age unknown';
+
+  @override
+  String priceFreshnessTooltip(String band, String stamp) {
+    return '$band · $stamp';
+  }
+
+  @override
+  String get priceLabel => 'Price';
+
+  @override
+  String get priceFreshnessLabel => 'Price freshness';
+
+  @override
+  String get availabilityLabel => 'Availability';
+
+  @override
+  String get availabilityNotReported => 'Not reported';
+
+  @override
   String get shellSwipeCoachMark =>
       'Swipe down to hide the bars and use the whole screen';
 
@@ -8145,9 +8177,6 @@ class AppLocalizationsBg extends AppLocalizations {
       'Вашата държава се поддържа, но още не е зададена — затова цените може да са от друга държава. Изберете държавата си в настройките за търсене, за да видите местните цени.';
 
   @override
-  String get stalePriceBadge => 'Old price';
-
-  @override
   String get radiusAlertCenterChipGps => 'My position';
 
   @override
@@ -8935,11 +8964,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get amenitiesServicesShowLess => 'Show less';
-
-  @override
-  String stationStatusWithFreshness(String status, String ago) {
-    return '$status · updated $ago ago';
-  }
 
   @override
   String pricesNotSoldHere(String fuels) {

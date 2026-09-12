@@ -4717,7 +4717,6 @@
     }
   },
   "openingHoursAutomate24h": "Selvbetjeningsstander døgnet rundt (kortbetaling)",
-  "stalePriceBadge": "Gammel pris",
   "radiusAlertCenterChipGps": "Min position",
   "radiusAlertCenterChipMap": "Punkt på kortet",
   "radiusAlertCenterChipPostal": "Postnummer {postalCode}",
@@ -4745,19 +4744,6 @@
     "placeholders": {
       "date": {
         "type": "String"
-      }
-    }
-  },
-  "stationStatusWithFreshness": "{status} · opdateret for {ago} siden",
-  "@stationStatusWithFreshness": {
-    "placeholders": {
-      "status": {
-        "type": "String",
-        "example": "Open"
-      },
-      "ago": {
-        "type": "String",
-        "example": "< 1 min"
       }
     }
   },
@@ -6304,5 +6290,63 @@
         "type": "String"
       }
     }
+  },
+  "priceFreshnessFresh": "Fresh price",
+  "@priceFreshnessFresh": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "priceFreshnessRecent": "Recent price",
+  "@priceFreshnessRecent": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "priceFreshnessAging": "Aging price",
+  "@priceFreshnessAging": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "priceFreshnessStale": "Old price",
+  "@priceFreshnessStale": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "priceFreshnessUnknown": "Price age unknown",
+  "@priceFreshnessUnknown": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "priceFreshnessTooltip": "{band} · {stamp}",
+  "@priceFreshnessTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "band": {
+        "type": "String"
+      },
+      "stamp": {
+        "type": "String"
+      }
+    }
+  },
+  "priceLabel": "Price",
+  "@priceLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "priceFreshnessLabel": "Price freshness",
+  "@priceFreshnessLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "availabilityLabel": "Availability",
+  "@availabilityLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "availabilityNotReported": "Not reported",
+  "@availabilityNotReported": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

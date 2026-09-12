@@ -3031,6 +3031,38 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get priceFreshnessFresh => 'Frischer Preis';
+
+  @override
+  String get priceFreshnessRecent => 'Aktueller Preis';
+
+  @override
+  String get priceFreshnessAging => 'Älterer Preis';
+
+  @override
+  String get priceFreshnessStale => 'Alter Preis';
+
+  @override
+  String get priceFreshnessUnknown => 'Preisalter unbekannt';
+
+  @override
+  String priceFreshnessTooltip(String band, String stamp) {
+    return '$band · $stamp';
+  }
+
+  @override
+  String get priceLabel => 'Preis';
+
+  @override
+  String get priceFreshnessLabel => 'Preisaktualität';
+
+  @override
+  String get availabilityLabel => 'Verfügbarkeit';
+
+  @override
+  String get availabilityNotReported => 'Nicht gemeldet';
+
+  @override
   String get shellSwipeCoachMark =>
       'Nach unten wischen oder doppelt auf die Leiste tippen, um den ganzen Bildschirm zu nutzen';
 
@@ -8121,9 +8153,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Dein Land wird unterstützt, ist aber noch nicht eingerichtet – daher stammen die Preise möglicherweise aus einem anderen Land. Wähle dein Land in den Sucheinstellungen, um lokale Preise zu sehen.';
 
   @override
-  String get stalePriceBadge => 'Alter Preis';
-
-  @override
   String get radiusAlertCenterChipGps => 'Mein Standort';
 
   @override
@@ -8922,11 +8951,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get amenitiesServicesShowLess => 'Weniger anzeigen';
-
-  @override
-  String stationStatusWithFreshness(String status, String ago) {
-    return '$status · aktualisiert vor $ago';
-  }
 
   @override
   String pricesNotSoldHere(String fuels) {

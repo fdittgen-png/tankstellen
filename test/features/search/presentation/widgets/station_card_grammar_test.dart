@@ -199,7 +199,9 @@ void main() {
       );
 
       final distance = find.textContaining('2,5 km');
-      final updated = find.textContaining('Updated 10:30');
+      // #4092 — the label line says the freshness BAND in words; the raw
+      // "Updated 10:30" stamp moved into its tooltip.
+      final updated = find.byKey(const Key('station_card_freshness_word'));
       final dot = find.byKey(const Key('station_card_status_dot'));
       expect(distance, findsOneWidget);
       expect(updated, findsOneWidget);

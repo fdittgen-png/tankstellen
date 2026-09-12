@@ -4721,7 +4721,6 @@
       }
     }
   },
-  "stalePriceBadge": "Prix ancien",
   "radiusAlertCenterChipGps": "Ma position",
   "radiusAlertCenterChipMap": "Point sur la carte",
   "radiusAlertCenterChipPostal": "Code postal {postalCode}",
@@ -4749,19 +4748,6 @@
     "placeholders": {
       "date": {
         "type": "String"
-      }
-    }
-  },
-  "stationStatusWithFreshness": "{status} · mis à jour il y a {ago}",
-  "@stationStatusWithFreshness": {
-    "placeholders": {
-      "status": {
-        "type": "String",
-        "example": "Open"
-      },
-      "ago": {
-        "type": "String",
-        "example": "< 1 min"
       }
     }
   },
@@ -5940,30 +5926,12 @@
       }
     }
   },
-  "shellBarHiddenAnnounce": "Navigation hidden. Swipe up from the bottom, or long-press the button, to bring it back.",
-  "@shellBarHiddenAnnounce": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "shellBarShownAnnounce": "Navigation shown.",
-  "@shellBarShownAnnounce": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "shellBarToggleHint": "Long-press to hide or show the navigation",
-  "@shellBarToggleHint": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "shellSwipeCoachMark": "Swipe down to hide the bars and use the whole screen",
-  "@shellSwipeCoachMark": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "stationSourceFlagTooltip": "Prices from {country} — {source}",
+  "shellBarHiddenAnnounce": "Navigation masquée. Balayez vers le haut depuis le bas, ou appui long sur le bouton, pour la faire revenir.",
+  "shellBarShownAnnounce": "Navigation affichée.",
+  "shellBarToggleHint": "Appui long pour masquer ou afficher la navigation",
+  "shellSwipeCoachMark": "Balayez vers le bas — ou double-tapez la barre — pour utiliser tout l'écran",
+  "stationSourceFlagTooltip": "Prix issus de {country} — {source}",
   "@stationSourceFlagTooltip": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "country": {
         "type": "String"
@@ -5973,30 +5941,12 @@
       }
     }
   },
-  "decisionBestValue": "Best value",
-  "@decisionBestValue": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "decisionCheapest": "Cheapest",
-  "@decisionCheapest": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "decisionClosest": "Closest",
-  "@decisionClosest": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "decisionReasonBestValue": "Best balance of price and detour",
-  "@decisionReasonBestValue": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "decisionReasonSaves": "Saves {amount} on {volume} · {distance} more driving",
+  "decisionBestValue": "Meilleur rapport",
+  "decisionCheapest": "Moins cher",
+  "decisionClosest": "Plus proche",
+  "decisionReasonBestValue": "Meilleur équilibre entre prix et détour",
+  "decisionReasonSaves": "Économise {amount} sur {volume} · {distance} de route en plus",
   "@decisionReasonSaves": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "amount": {
         "type": "String"
@@ -6009,35 +5959,25 @@
       }
     }
   },
-  "decisionReasonBreakEven": "Only worth the detour from {volume} up",
+  "decisionReasonBreakEven": "Le détour ne vaut le coup qu'à partir de {volume}",
   "@decisionReasonBreakEven": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "volume": {
         "type": "String"
       }
     }
   },
-  "decisionValueUnavailable": "Record a fill-up and the detour can be priced, not just the pump",
-  "@decisionValueUnavailable": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "decisionShowAll": "{count, plural, =1{Show the one station} other{Show all {count} stations}}",
+  "decisionValueUnavailable": "Enregistrez un plein et le détour pourra être chiffré, pas seulement le prix à la pompe",
+  "decisionShowAll": "{count, plural, =1{Afficher la station} other{Afficher les {count} stations}}",
   "@decisionShowAll": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "decisionAssumption": "Based on {consumption} and {volume}",
+  "decisionAssumption": "Sur la base de {consumption} et {volume}",
   "@decisionAssumption": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "consumption": {
         "type": "String"
@@ -6046,5 +5986,27 @@
         "type": "String"
       }
     }
-  }
+  },
+  "priceFreshnessFresh": "Prix récent",
+  "priceFreshnessRecent": "Prix du jour",
+  "priceFreshnessAging": "Prix vieillissant",
+  "priceFreshnessStale": "Prix ancien",
+  "priceFreshnessUnknown": "Ancienneté du prix inconnue",
+  "priceFreshnessTooltip": "{band} · {stamp}",
+  "@priceFreshnessTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "band": {
+        "type": "String"
+      },
+      "stamp": {
+        "type": "String"
+      }
+    }
+  },
+  "priceLabel": "Prix",
+  "priceFreshnessLabel": "Actualité du prix",
+  "availabilityLabel": "Disponibilité",
+  "availabilityNotReported": "Non communiquée"
 }

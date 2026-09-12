@@ -7,13 +7,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/domain/station.dart';
 import '../../../../core/services/country_service_registry.dart';
 import '../../../../core/services/radar/motorway_exits_provider.dart';
-import '../../../../core/theme/app_radius.dart';
+import '../../../../core/domain/price_freshness.dart';
 import '../../../../core/theme/app_text.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
+import '../../../../core/widgets/price_freshness_words.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/time/app_clock.dart';
 import '../../providers/road_distance_provider.dart';
 import '../../../../core/country/country_config.dart';
 
@@ -205,66 +207,65 @@ class StationCardHighwayExitLine extends StatelessWidget {
 /// otherwise (expanded translations, raised text scale, 320 dp) — a
 /// Wrap never overflows horizontally, and the badge text itself
 /// ellipsises inside the segment width as a last resort.
-class _UpdatedRow extends StatelessWidget {
+class _UpdatedRow extends ConsumerWidget {
   final String updatedAt;
   final bool isStalePrice;
 
   const _UpdatedRow({required this.updatedAt, required this.isStalePrice});
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final base = AppText.label(context);
-    final style = isStalePrice
-        ? base.copyWith(color: theme.colorScheme.tertiary)
-        : base;
-    return Wrap(
-      spacing: Spacing.xs,
-      runSpacing: 2,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.update, size: 12, color: style.color),
-            const SizedBox(width: Spacing.xs),
-            Flexible(
-              child: Text(
-                // #2622 — wrap the upstream pre-formatted timestamp as
-                // "Updated {time}" so it reads as freshness, not a bare
-                // code. (No relative "2h ago": updatedAt is a lossy,
-                // per-country pre-formatted String.)
-                l10n.stationUpdatedLabel(updatedAt),
-                style: style,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+    // #4092 — freshness in WORDS. The stamp itself is a lossy,
+    // per-country pre-formatted string ("14:22" with no date in some
+    // countries), so "Updated 14:22" asked the reader to work out
+    // whether that was this afternoon or last Tuesday. The band answers
+    // that question; the exact stamp stays in the tooltip, so the coarse
+    // word never hides the precise figure.
+    final band = priceFreshness(
+      updatedAt,
+      now: ref.watch(appClockProvider).now(),
+    );
+    final word = priceFreshnessWord(band, l10n);
+    final style = AppText.label(context)
+        .copyWith(color: priceFreshnessColor(band, context));
+    // #3905 — the caller's own staleness verdict still wins where it is
+    // given: the favorites list computes it against its own stored row.
+    final stale = isStalePrice || band == PriceFreshness.stale;
+    final tooltip = l10n.priceFreshnessTooltip(
+      word,
+      l10n.stationUpdatedLabel(updatedAt),
+    );
+
+    return Tooltip(
+      message: tooltip,
+      child: Semantics(
+        label: tooltip,
+        child: ExcludeSemantics(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                stale ? Icons.history_toggle_off : Icons.schedule,
+                size: 12,
+                color: style.color,
               ),
-            ),
-          ],
-        ),
-        if (isStalePrice)
-          Container(
-            key: const Key('station_card_stale_price_badge'),
-            padding: const EdgeInsets.symmetric(
-              horizontal: Spacing.sm,
-              vertical: 1,
-            ),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.tertiaryContainer,
-              borderRadius: AppRadius.sm,
-            ),
-            child: Text(
-              l10n.stalePriceBadge,
-              style: base.copyWith(
-                color: theme.colorScheme.onTertiaryContainer,
-                fontWeight: FontWeight.bold,
+              const SizedBox(width: Spacing.xs),
+              Flexible(
+                child: Text(
+                  word,
+                  key: const Key('station_card_freshness_word'),
+                  style: stale
+                      ? style.copyWith(fontWeight: FontWeight.w600)
+                      : style,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+            ],
           ),
-      ],
+        ),
+      ),
     );
   }
 }

@@ -2997,64 +2997,98 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String stationSourceFlagTooltip(String country, String source) {
-    return 'Prices from $country — $source';
+    return 'Prix issus de $country — $source';
   }
 
   @override
-  String get decisionBestValue => 'Best value';
+  String get decisionBestValue => 'Meilleur rapport';
 
   @override
-  String get decisionCheapest => 'Cheapest';
+  String get decisionCheapest => 'Moins cher';
 
   @override
-  String get decisionClosest => 'Closest';
+  String get decisionClosest => 'Plus proche';
 
   @override
-  String get decisionReasonBestValue => 'Best balance of price and detour';
+  String get decisionReasonBestValue =>
+      'Meilleur équilibre entre prix et détour';
 
   @override
   String decisionReasonSaves(String amount, String volume, String distance) {
-    return 'Saves $amount on $volume · $distance more driving';
+    return 'Économise $amount sur $volume · $distance de route en plus';
   }
 
   @override
   String decisionReasonBreakEven(String volume) {
-    return 'Only worth the detour from $volume up';
+    return 'Le détour ne vaut le coup qu\'à partir de $volume';
   }
 
   @override
   String get decisionValueUnavailable =>
-      'Record a fill-up and the detour can be priced, not just the pump';
+      'Enregistrez un plein et le détour pourra être chiffré, pas seulement le prix à la pompe';
 
   @override
   String decisionShowAll(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Show all $count stations',
-      one: 'Show the one station',
+      other: 'Afficher les $count stations',
+      one: 'Afficher la station',
     );
     return '$_temp0';
   }
 
   @override
   String decisionAssumption(String consumption, String volume) {
-    return 'Based on $consumption and $volume';
+    return 'Sur la base de $consumption et $volume';
   }
 
   @override
+  String get priceFreshnessFresh => 'Prix récent';
+
+  @override
+  String get priceFreshnessRecent => 'Prix du jour';
+
+  @override
+  String get priceFreshnessAging => 'Prix vieillissant';
+
+  @override
+  String get priceFreshnessStale => 'Prix ancien';
+
+  @override
+  String get priceFreshnessUnknown => 'Ancienneté du prix inconnue';
+
+  @override
+  String priceFreshnessTooltip(String band, String stamp) {
+    return '$band · $stamp';
+  }
+
+  @override
+  String get priceLabel => 'Prix';
+
+  @override
+  String get priceFreshnessLabel => 'Actualité du prix';
+
+  @override
+  String get availabilityLabel => 'Disponibilité';
+
+  @override
+  String get availabilityNotReported => 'Non communiquée';
+
+  @override
   String get shellSwipeCoachMark =>
-      'Swipe down to hide the bars and use the whole screen';
+      'Balayez vers le bas — ou double-tapez la barre — pour utiliser tout l\'écran';
 
   @override
   String get shellBarHiddenAnnounce =>
-      'Navigation hidden. Swipe up from the bottom, or long-press the button, to bring it back.';
+      'Navigation masquée. Balayez vers le haut depuis le bas, ou appui long sur le bouton, pour la faire revenir.';
 
   @override
-  String get shellBarShownAnnounce => 'Navigation shown.';
+  String get shellBarShownAnnounce => 'Navigation affichée.';
 
   @override
-  String get shellBarToggleHint => 'Long-press to hide or show the navigation';
+  String get shellBarToggleHint =>
+      'Appui long pour masquer ou afficher la navigation';
 
   @override
   String get swipeBetweenTabsHint =>
@@ -8168,9 +8202,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Votre pays est pris en charge mais n\'est pas encore configuré — les prix affichés peuvent venir d\'un autre pays. Choisissez votre pays dans les réglages de recherche pour voir les prix locaux.';
 
   @override
-  String get stalePriceBadge => 'Prix ancien';
-
-  @override
   String get radiusAlertCenterChipGps => 'Ma position';
 
   @override
@@ -8967,11 +8998,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get amenitiesServicesShowLess => 'Afficher moins';
-
-  @override
-  String stationStatusWithFreshness(String status, String ago) {
-    return '$status · mis à jour il y a $ago';
-  }
 
   @override
   String pricesNotSoldHere(String fuels) {
