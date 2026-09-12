@@ -211,7 +211,7 @@ void main() {
           isEv: false,
         ),
       );
-      expect(find.text('25m 0s'), findsOneWidget);
+      expect(find.text('25 min 0 s'), findsOneWidget);
     });
 
     testWidgets('formats multi-hour duration as "Xh Ym"', (tester) async {
@@ -227,7 +227,7 @@ void main() {
           isEv: false,
         ),
       );
-      expect(find.text('2h 15m'), findsOneWidget);
+      expect(find.text('2 h 15 min'), findsOneWidget);
     });
   });
 

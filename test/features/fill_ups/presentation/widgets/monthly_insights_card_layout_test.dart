@@ -73,7 +73,20 @@ void main() {
         reason: 'the card overflows at 320 dp under the pseudo-locale');
     expect(find.byKey(const ValueKey('monthly_insights_table')),
         findsOneWidget);
-    for (final v in _values) {
+    // #4063 — the durations are localized now, so under en_XA the
+    // figures are pseudo-expanded (`⟦1ĥ 19⟧`) and the English literals
+    // in [_values] do not exist. A figure is any Text a FittedBox owns;
+    // measure every one of them rather than a fixed list.
+    final figures = tester
+        .widgetList<Text>(find.descendant(
+          of: find.byType(FittedBox),
+          matching: find.byType(Text),
+        ))
+        .map((t) => t.data!)
+        .toSet();
+    expect(figures.length, _values.length,
+        reason: 'one figure cell per value in the fixture');
+    for (final v in figures) {
       expectSingleLine(tester, v);
     }
     // The label is the column that gives way: #3950 — it NEVER wraps
@@ -83,7 +96,7 @@ void main() {
           of: find.byType(Table),
           matching: find.byType(Text),
         ))
-        .where((t) => !_values.contains(t.data));
+        .where((t) => !figures.contains(t.data));
     expect(labels, isNotEmpty);
     for (final label in labels) {
       expect(label.maxLines, 1);

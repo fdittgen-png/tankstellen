@@ -943,6 +943,34 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
+  String get positionAgeUnderMinute => '< 1 min';
+
+  @override
+  String positionAgeHours(int hours) {
+    return '$hours h';
+  }
+
+  @override
+  String positionAgeDays(int days) {
+    return '$days d';
+  }
+
+  @override
+  String durationHoursMinutesCompact(int hours, String minutes) {
+    return '${hours}h $minutes';
+  }
+
+  @override
+  String durationSecondsShort(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String durationMinutesSeconds(int minutes, int seconds) {
+    return '$minutes min $seconds s';
+  }
+
+  @override
   String get savedRoutesLoading => 'Loading your saved routes…';
 
   @override
@@ -7279,6 +7307,14 @@ class AppLocalizationsNb extends AppLocalizations {
   String get syncDeleteDataDone => 'Synkroniserte data slettet';
 
   @override
+  String get syncDeleteDataDonePending =>
+      'Deleted. Your other devices will drop it the next time this device syncs.';
+
+  @override
+  String get syncDeleteDataDoneSchemaOutdated =>
+      'Deleted on the server — but your sync database is outdated, so another device could re-upload it. Re-run the setup SQL.';
+
+  @override
   String get syncDeleteDataFailed =>
       'Sletting av synkroniserte data mislyktes — prøv igjen';
 
@@ -7860,6 +7896,10 @@ class AppLocalizationsNb extends AppLocalizations {
   @override
   String get tripShareRecipientNotFound =>
       'Ingen TankSync-konto bruker den e-posten.';
+
+  @override
+  String get tripShareNotSyncedYet =>
+      'This trip hasn\'t reached your sync database yet — try again in a moment.';
 
   @override
   String get tripShareError => 'Kunne ikke dele denne turen. Prøv igjen.';

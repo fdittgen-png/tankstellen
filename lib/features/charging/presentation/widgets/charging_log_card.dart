@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import '../../../../core/utils/duration_formatter.dart';
 
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -39,7 +40,8 @@ class ChargingLogCard extends StatelessWidget {
     // " € " glyph that was wrong in every non-euro country.
     final costStr = PriceFormatter.formatTotal(log.costEur);
     final subtitle =
-        '$dateStr  •  $kwhStr kWh  •  $costStr  •  ${log.chargeTimeMin} min';
+        '$dateStr  •  $kwhStr kWh  •  $costStr  •  '
+        '${formatTravelDuration(l, log.chargeTimeMin.toDouble())}';
 
     return Semantics(
       container: true,

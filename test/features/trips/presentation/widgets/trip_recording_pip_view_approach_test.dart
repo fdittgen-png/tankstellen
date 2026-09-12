@@ -393,7 +393,7 @@ void main() {
         // demoted to the secondary row. Default helper uses 8m 32s elapsed.
         expect(find.text('~'), findsOneWidget);
         expect(find.text('est. L/100 km'), findsOneWidget);
-        expect(find.text('8m 32s'), findsOneWidget); // secondary row
+        expect(find.text('8 min 32 s'), findsOneWidget); // secondary row
         // Elapsed is NOT the hero caption anymore.
         expect(find.text('elapsed'), findsNothing);
         expect(find.text('km'), findsNothing);
@@ -419,7 +419,7 @@ void main() {
           ),
         ),
       );
-      expect(find.text('1h 14m'), findsOneWidget);
+      expect(find.text('1 h 14 min'), findsOneWidget);
       // Under-1-minute shape uses seconds only.
       await tester.pumpWidget(
         _wrap(
@@ -434,7 +434,7 @@ void main() {
           ),
         ),
       );
-      expect(find.text('42s'), findsOneWidget);
+      expect(find.text('42 s'), findsOneWidget);
     });
 
     testWidgets(
@@ -473,7 +473,7 @@ void main() {
         await pumpAt(distance: 0, fuelRate: null);
         expect(find.text('~'), findsOneWidget);
         expect(find.text('est. L/100 km'), findsOneWidget);
-        expect(find.text('42s'), findsOneWidget); // secondary row
+        expect(find.text('42 s'), findsOneWidget); // secondary row
         expect(
           find.text('elapsed'),
           findsNothing,
@@ -548,7 +548,7 @@ void main() {
         expect(find.text('L/100 km'), findsNothing);
         // The elapsed time is NOT the hero figure (it moves to the
         // secondary row instead of leading the tile).
-        expect(find.text('7m 7s'), findsOneWidget); // secondary row
+        expect(find.text('7 min 7 s'), findsOneWidget); // secondary row
         // Distance also stays in the secondary row.
         expect(find.text('1,2 km'), findsOneWidget);
       },
@@ -617,7 +617,7 @@ void main() {
         // demoted to the secondary row instead of leading the tile.
         expect(find.text('~'), findsOneWidget);
         expect(find.text('est. L/100 km'), findsOneWidget);
-        expect(find.text('7m 7s'), findsOneWidget); // secondary row
+        expect(find.text('7 min 7 s'), findsOneWidget); // secondary row
         expect(find.text('elapsed'), findsNothing);
         expect(find.text('L/100 km'), findsNothing);
       },
@@ -826,10 +826,10 @@ void main() {
         expect(tester.takeException(), isNull);
         expect(find.text('~'), findsOneWidget);
         expect(find.text('est. L/100 km'), findsOneWidget);
-        expect(find.text('37s'), findsOneWidget);
+        expect(find.text('37 s'), findsOneWidget);
         // The secondary row's bottom must stay within the tile — not clipped.
         expect(
-          tester.getRect(find.text('37s')).bottom,
+          tester.getRect(find.text('37 s')).bottom,
           lessThanOrEqualTo(tileHeight),
         );
       },
@@ -854,9 +854,9 @@ void main() {
       );
       expect(tester.takeException(), isNull);
       expect(find.text('~6.4'), findsOneWidget);
-      expect(find.text('7m 7s'), findsOneWidget);
+      expect(find.text('7 min 7 s'), findsOneWidget);
       expect(
-        tester.getRect(find.text('7m 7s')).bottom,
+        tester.getRect(find.text('7 min 7 s')).bottom,
         lessThanOrEqualTo(tileHeight),
       );
     });
@@ -877,7 +877,7 @@ void main() {
       expect(find.text('L/100 km'), findsOneWidget);
       // Default helper elapsed is 8m 32s — its bottom must stay on-tile.
       expect(
-        tester.getRect(find.text('8m 32s')).bottom,
+        tester.getRect(find.text('8 min 32 s')).bottom,
         lessThanOrEqualTo(tileHeight),
       );
     });

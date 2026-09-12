@@ -22,12 +22,14 @@ class UserPositionBar extends ConsumerWidget {
 
   const UserPositionBar({super.key, this.onUpdatePosition});
 
-  String _formatAge(DateTime updatedAt) {
+  /// #4063 — the age label is user-facing text; its unit abbreviations
+  /// come from ARB like every other string.
+  String _formatAge(AppLocalizations l, DateTime updatedAt) {
     final diff = DateTime.now().difference(updatedAt);
-    if (diff.inMinutes < 1) return '< 1 min';
-    if (diff.inMinutes < 60) return '${diff.inMinutes} min';
-    if (diff.inHours < 24) return '${diff.inHours} h';
-    return '${diff.inDays} d';
+    if (diff.inMinutes < 1) return l.positionAgeUnderMinute;
+    if (diff.inMinutes < 60) return l.durationMinutesShort(diff.inMinutes);
+    if (diff.inHours < 24) return l.positionAgeHours(diff.inHours);
+    return l.positionAgeDays(diff.inDays);
   }
 
   @override
@@ -38,7 +40,7 @@ class UserPositionBar extends ConsumerWidget {
 
     final Widget chip;
     if (userPos != null) {
-      final value = '${userPos.source} · ${_formatAge(userPos.updatedAt)}';
+      final value = '${userPos.source} · ${_formatAge(l10n, userPos.updatedAt)}';
       chip = SummaryChip(
         key: const Key('user_position_segment'),
         icon: Icon(

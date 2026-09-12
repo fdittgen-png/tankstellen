@@ -49,6 +49,8 @@
   "@syncDeleteDataDone": {
     "description": "Snackbar shown when the server-side deletion completed (#3453)."
   },
+  "syncDeleteDataDonePending": "Gelöscht. Deine anderen Geräte übernehmen das beim nächsten Sync dieses Geräts.",
+  "syncDeleteDataDoneSchemaOutdated": "Auf dem Server gelöscht — aber deine Sync-Datenbank ist veraltet, ein anderes Gerät könnte die Daten erneut hochladen. Führe das Setup-SQL erneut aus.",
   "syncDeleteDataFailed": "Löschen der synchronisierten Daten fehlgeschlagen — bitte erneut versuchen",
   "@syncDeleteDataFailed": {
     "description": "Snackbar shown when the server-side deletion failed or the user is not connected (#3453)."

@@ -216,7 +216,7 @@ void main() {
       // actually wire up to the summary and samples.
       expect(find.text('Peugeot 308'), findsOneWidget);
       expect(find.text('52,5 km'), findsOneWidget);
-      expect(find.text('1h 0m'), findsOneWidget);
+      expect(find.text('1 h 0 min'), findsOneWidget);
       expect(find.text('6.4 L/100 km'), findsOneWidget);
       expect(find.text('3,36 L'), findsOneWidget);
       // Avg speed of 0..99 => 49.5 km/h; max speed => 99.0 km/h.

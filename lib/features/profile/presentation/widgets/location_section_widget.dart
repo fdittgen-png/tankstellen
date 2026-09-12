@@ -53,11 +53,12 @@ class LocationSectionWidget extends ConsumerWidget {
 
     if (userPos != null) {
       final diff = DateTime.now().difference(userPos.updatedAt);
+      // #4063 — unit abbreviations come from ARB, like every other string.
       final age = diff.inMinutes < 60
-          ? '${diff.inMinutes} min'
+          ? l.durationMinutesShort(diff.inMinutes)
           : diff.inHours < 24
-          ? '${diff.inHours} h'
-          : '${diff.inDays} d';
+              ? l.positionAgeHours(diff.inHours)
+              : l.positionAgeDays(diff.inDays);
 
       return Row(
         children: [

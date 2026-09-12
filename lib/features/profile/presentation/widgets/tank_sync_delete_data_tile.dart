@@ -92,18 +92,19 @@ class TankSyncDeleteDataTile extends ConsumerWidget {
     );
     if (confirmed != true || !context.mounted) return;
 
-    final ok = await SyncedDataDeletion.delete(category);
+    final outcome = await SyncedDataDeletion.delete(category);
     if (!context.mounted) return;
-    if (ok) {
-      SnackBarHelper.show(
-        context,
-        AppLocalizations.of(context).syncDeleteDataDone,
-      );
-    } else {
-      SnackBarHelper.showError(
-        context,
-        AppLocalizations.of(context).syncDeleteDataFailed,
-      );
+    // #4059 — "deleted, tombstone pending" is success with a footnote,
+    // not a failure. Only a real failure gets the error voice.
+    switch (outcome) {
+      case SyncedDataDeletionOutcome.deleted:
+        SnackBarHelper.show(context, l.syncDeleteDataDone);
+      case SyncedDataDeletionOutcome.deletedTombstonePending:
+        SnackBarHelper.show(context, l.syncDeleteDataDonePending);
+      case SyncedDataDeletionOutcome.deletedSchemaOutdated:
+        SnackBarHelper.show(context, l.syncDeleteDataDoneSchemaOutdated);
+      case SyncedDataDeletionOutcome.failed:
+        SnackBarHelper.showError(context, l.syncDeleteDataFailed);
     }
   }
 }

@@ -6619,5 +6619,81 @@
         "type": "String"
       }
     }
+  },
+  "durationSecondsShort": "{seconds} s",
+  "@durationSecondsShort": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "durationMinutesSeconds": "{minutes} min {seconds} s",
+  "@durationMinutesSeconds": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "syncDeleteDataDonePending": "Deleted. Your other devices will drop it the next time this device syncs.",
+  "@syncDeleteDataDonePending": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncDeleteDataDoneSchemaOutdated": "Deleted on the server — but your sync database is outdated, so another device could re-upload it. Re-run the setup SQL.",
+  "@syncDeleteDataDoneSchemaOutdated": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripShareNotSyncedYet": "This trip hasn't reached your sync database yet — try again in a moment.",
+  "@tripShareNotSyncedYet": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "positionAgeUnderMinute": "< 1 min",
+  "@positionAgeUnderMinute": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "positionAgeHours": "{hours} h",
+  "@positionAgeHours": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "positionAgeDays": "{days} d",
+  "@positionAgeDays": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "durationHoursMinutesCompact": "{hours}h {minutes}",
+  "@durationHoursMinutesCompact": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
   }
 }

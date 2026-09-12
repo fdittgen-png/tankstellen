@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../core/data/storage_repository.dart';
+import '../core/navigation/app_route_extra_codec.dart';
 import '../core/navigation/app_routes.dart';
 import '../core/navigation/root_navigator_key.dart';
 import '../l10n/app_localizations.dart';
@@ -97,6 +98,8 @@ GoRouter router(Ref ref) {
     // navigator (e.g. `CountrySwitchListener` in the MaterialApp
     // builder) can reach a navigator-bearing context for `showDialog`.
     navigatorKey: rootNavigatorKey,
+    // #4061 — typed `extra` payloads survive state restoration.
+    extraCodec: const AppRouteExtraCodec(),
     initialLocation: RoutePaths.consent,
     observers: [NavigationTraceObserver()],
     errorBuilder: (context, state) {

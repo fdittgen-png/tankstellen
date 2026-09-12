@@ -448,6 +448,12 @@
   "loyaltyCardDeleted": "{card} gelöscht",
   "durationMinutesShort": "{minutes} Min.",
   "durationHoursMinutes": "{hours} Std. {minutes} Min.",
+  "positionAgeUnderMinute": "< 1 Min.",
+  "positionAgeHours": "{hours} Std.",
+  "positionAgeDays": "{days} T.",
+  "durationHoursMinutesCompact": "{hours} Std. {minutes}",
+  "durationSecondsShort": "{seconds} s",
+  "durationMinutesSeconds": "{minutes} Min. {seconds} s",
   "savedRoutesLoading": "Gespeicherte Routen werden geladen…",
   "@loadingRoute": {
     "placeholders": {
@@ -3555,6 +3561,8 @@
   "@syncDeleteDataDone": {
     "description": "Snackbar shown when the server-side deletion completed (#3453)."
   },
+  "syncDeleteDataDonePending": "Gelöscht. Deine anderen Geräte übernehmen das beim nächsten Sync dieses Geräts.",
+  "syncDeleteDataDoneSchemaOutdated": "Auf dem Server gelöscht — aber deine Sync-Datenbank ist veraltet, ein anderes Gerät könnte die Daten erneut hochladen. Führe das Setup-SQL erneut aus.",
   "syncDeleteDataFailed": "Löschen der synchronisierten Daten fehlgeschlagen — bitte erneut versuchen",
   "@syncDeleteDataFailed": {
     "description": "Snackbar shown when the server-side deletion failed or the user is not connected (#3453)."
@@ -3833,6 +3841,7 @@
     "description": "Snackbar confirming a direct account-to-account trip share succeeded (#2240)."
   },
   "tripShareRecipientNotFound": "Kein TankSync-Konto nutzt diese E-Mail.",
+  "tripShareNotSyncedYet": "Diese Fahrt ist noch nicht in deiner Sync-Datenbank angekommen — versuche es gleich noch einmal.",
   "@tripShareRecipientNotFound": {
     "description": "Snackbar shown when the recipient email entered in the trip-sharing sheet does not match any TankSync account (#2240)."
   },

@@ -941,6 +941,34 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get positionAgeUnderMinute => '< 1 min';
+
+  @override
+  String positionAgeHours(int hours) {
+    return '$hours h';
+  }
+
+  @override
+  String positionAgeDays(int days) {
+    return '$days d';
+  }
+
+  @override
+  String durationHoursMinutesCompact(int hours, String minutes) {
+    return '${hours}h $minutes';
+  }
+
+  @override
+  String durationSecondsShort(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String durationMinutesSeconds(int minutes, int seconds) {
+    return '$minutes min $seconds s';
+  }
+
+  @override
   String get savedRoutesLoading => 'Loading your saved routes…';
 
   @override
@@ -7242,6 +7270,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncDeleteDataDone => 'Synced data deleted';
 
   @override
+  String get syncDeleteDataDonePending =>
+      'Deleted. Your other devices will drop it the next time this device syncs.';
+
+  @override
+  String get syncDeleteDataDoneSchemaOutdated =>
+      'Deleted on the server — but your sync database is outdated, so another device could re-upload it. Re-run the setup SQL.';
+
+  @override
   String get syncDeleteDataFailed =>
       'Deleting synced data failed — please try again';
 
@@ -7825,6 +7861,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get tripShareRecipientNotFound =>
       'No TankSync account uses that email.';
+
+  @override
+  String get tripShareNotSyncedYet =>
+      'This trip hasn\'t reached your sync database yet — try again in a moment.';
 
   @override
   String get tripShareError => 'Couldn\'t share this trip. Try again.';
@@ -9971,6 +10011,34 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String durationHoursMinutes(int hours, int minutes) {
     return '⟦$hours ĥ $minutes ɱîñ ··⟧';
+  }
+
+  @override
+  String get positionAgeUnderMinute => '⟦< 1 ɱîñ ·⟧';
+
+  @override
+  String positionAgeHours(int hours) {
+    return '⟦$hours ĥ⟧';
+  }
+
+  @override
+  String positionAgeDays(int days) {
+    return '⟦$days đ⟧';
+  }
+
+  @override
+  String durationHoursMinutesCompact(int hours, String minutes) {
+    return '⟦$hoursĥ $minutes⟧';
+  }
+
+  @override
+  String durationSecondsShort(int seconds) {
+    return '⟦$seconds š⟧';
+  }
+
+  @override
+  String durationMinutesSeconds(int minutes, int seconds) {
+    return '⟦$minutes ɱîñ $seconds š ··⟧';
   }
 
   @override
@@ -16447,6 +16515,14 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get syncDeleteDataDone => '⟦Šýñçéđ đáŧá đéłéŧéđ ········⟧';
 
   @override
+  String get syncDeleteDataDonePending =>
+      '⟦Đéłéŧéđ. Ýóúř óŧĥéř đéṽîçéš ŵîłł đřóƥ îŧ ŧĥé ñéẋŧ ŧîɱé ŧĥîš đéṽîçé šýñçš. ···························⟧';
+
+  @override
+  String get syncDeleteDataDoneSchemaOutdated =>
+      '⟦Đéłéŧéđ óñ ŧĥé šéřṽéř — ƀúŧ ýóúř šýñç đáŧáƀášé îš óúŧđáŧéđ, šó áñóŧĥéř đéṽîçé çóúłđ řé-úƥłóáđ îŧ. Řé-řúñ ŧĥé šéŧúƥ ŠɊŁ. ··········································⟧';
+
+  @override
   String get syncDeleteDataFailed =>
       '⟦Đéłéŧîñǧ šýñçéđ đáŧá ƒáîłéđ — ƥłéášé ŧřý áǧáîñ ·················⟧';
 
@@ -17050,6 +17126,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get tripShareRecipientNotFound =>
       '⟦Ñó ŦáñķŠýñç áççóúñŧ úšéš ŧĥáŧ éɱáîł. ··············⟧';
+
+  @override
+  String get tripShareNotSyncedYet =>
+      '⟦Ŧĥîš ŧřîƥ ĥášñ\'ŧ řéáçĥéđ ýóúř šýñç đáŧáƀášé ýéŧ — ŧřý áǧáîñ îñ á ɱóɱéñŧ. ·························⟧';
 
   @override
   String get tripShareError =>

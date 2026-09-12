@@ -82,18 +82,71 @@ void main() {
     });
   });
 
+  // #4060 — v1 answered FALSE for "no such recipient" AND for "the caller
+  // does not own this trip / it is not on the server yet", and the sheet
+  // blamed the recipient's email for both. v2 names the outcome.
+  group('TripSharesSync.shareWithEmail — v11 outcome RPC (#4060)', () {
+    Future<TripShareResult> outcome(Object? v2) =>
+        TripSharesSync.shareWithEmail('trip-1', 'a@example.com',
+            transport: FakeTripShareTransport(
+                rpcResults: {'share_trip_with_email_v2': v2}));
+
+    test('shared', () async => expect(await outcome('shared'), TripShareResult.shared));
+
+    test('recipient_not_found → recipientNotFound',
+        () async => expect(await outcome('recipient_not_found'),
+            TripShareResult.recipientNotFound));
+
+    test('not_owned → notSyncedYet — the trip, not the email, is the '
+        'reason, and the message must say so', () async {
+      expect(await outcome('not_owned'), TripShareResult.notSyncedYet);
+    });
+
+    test('not_authenticated → notAuthenticated',
+        () async => expect(await outcome('not_authenticated'),
+            TripShareResult.notAuthenticated));
+
+    test('an outcome this client does not know → failed, never a guess',
+        () async => expect(await outcome('something_new'), TripShareResult.failed));
+
+    test('v2 present: v1 is never called', () async {
+      final wire = FakeTripShareTransport(
+          rpcResults: {'share_trip_with_email_v2': 'shared'});
+      await TripSharesSync.shareWithEmail('trip-1', 'a@example.com',
+          transport: wire);
+      expect(wire.rpcCalls.map((c) => c.fn), ['share_trip_with_email_v2']);
+    });
+
+    test('a non-missing error on v2 → failed, no fallback', () async {
+      final wire = FakeTripShareTransport(rpcErrors: {
+        'share_trip_with_email_v2': const PostgrestException(
+            message: 'permission denied', code: '42501'),
+      });
+      expect(
+          await TripSharesSync.shareWithEmail('trip-1', 'a@example.com',
+              transport: wire),
+          TripShareResult.failed);
+      expect(wire.rpcCalls.map((c) => c.fn), ['share_trip_with_email_v2']);
+    });
+  });
+
   group('TripSharesSync.shareWithEmail — v8 RPC + pre-v8 fallback (#3747)',
       () {
     test('calls share_trip_with_email and maps true → shared (no UUID '
         'ever reaches the client)', () async {
+      // #4060 — v2 is tried first; a schema before v11 lacks it.
       final wire = FakeTripShareTransport(
+          rpcErrors: {'share_trip_with_email_v2': const PostgrestException(
+              message: 'Could not find the function', code: 'PGRST202'),
+          },
           rpcResults: {'share_trip_with_email': true});
       final result = await TripSharesSync.shareWithEmail(
           'trip-1', 'a@example.com',
           transport: wire);
       expect(result, TripShareResult.shared);
-      expect(wire.rpcCalls.single.fn, 'share_trip_with_email');
-      expect(wire.rpcCalls.single.params,
+      expect(wire.rpcCalls.map((c) => c.fn),
+          ['share_trip_with_email_v2', 'share_trip_with_email']);
+      expect(wire.rpcCalls.last.params,
           {'p_trip_id': 'trip-1', 'p_email': 'a@example.com'});
       expect(wire.upsertCalls, isEmpty,
           reason: 'the insert happens server-side on the v8 path');
@@ -102,6 +155,9 @@ void main() {
     test('maps false → recipientNotFound (the ONE surviving oracle bit)',
         () async {
       final wire = FakeTripShareTransport(
+          rpcErrors: {'share_trip_with_email_v2': const PostgrestException(
+              message: 'Could not find the function', code: 'PGRST202'),
+          },
           rpcResults: {'share_trip_with_email': false});
       expect(
           await TripSharesSync.shareWithEmail('trip-1', 'x@y.z',
@@ -113,6 +169,8 @@ void main() {
         'back to the legacy resolve+insert path', () async {
       final wire = FakeTripShareTransport(
         rpcErrors: {
+          'share_trip_with_email_v2': const PostgrestException(
+              message: 'Could not find the function', code: 'PGRST202'),
           'share_trip_with_email': const PostgrestException(
               message: 'Could not find the function', code: 'PGRST202'),
         },
@@ -122,8 +180,11 @@ void main() {
           'trip-1', 'a@example.com',
           transport: wire);
       expect(result, TripShareResult.shared);
-      expect(wire.rpcCalls.map((c) => c.fn),
-          ['share_trip_with_email', 'resolve_share_recipient']);
+      expect(wire.rpcCalls.map((c) => c.fn), [
+        'share_trip_with_email_v2',
+        'share_trip_with_email',
+        'resolve_share_recipient',
+      ]);
       final upsert = wire.upsertCalls.single;
       expect(upsert.row['owner_id'], wire.userId,
           reason: 'legacy path mirrors the RLS WITH CHECK — the grant is '
@@ -135,6 +196,8 @@ void main() {
     test('any OTHER PostgrestException (e.g. 42501 permission denied) '
         'fails soft WITHOUT falling back — never thrown', () async {
       final wire = FakeTripShareTransport(rpcErrors: {
+        'share_trip_with_email_v2': const PostgrestException(
+            message: 'Could not find the function', code: 'PGRST202'),
         'share_trip_with_email': const PostgrestException(
             message: 'permission denied', code: '42501'),
       });
@@ -145,8 +208,10 @@ void main() {
           await TripSharesSync.shareWithEmail('trip-1', 'x@y.z',
               transport: wire),
           TripShareResult.failed);
-      expect(wire.rpcCalls.every((c) => c.fn == 'share_trip_with_email'),
-          isTrue,
+      // Called twice above, so the list repeats — what matters is that
+      // no call ever reached the legacy oracle.
+      expect(wire.rpcCalls.map((c) => c.fn),
+          everyElement(isIn(['share_trip_with_email_v2', 'share_trip_with_email'])),
           reason: 'the legacy oracle must never be probed on a real error');
       expect(wire.upsertCalls, isEmpty);
     });

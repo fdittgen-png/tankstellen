@@ -448,6 +448,12 @@
   "loyaltyCardDeleted": "{card} gelöscht",
   "durationMinutesShort": "{minutes} Min.",
   "durationHoursMinutes": "{hours} Std. {minutes} Min.",
+  "positionAgeUnderMinute": "< 1 Min.",
+  "positionAgeHours": "{hours} Std.",
+  "positionAgeDays": "{days} T.",
+  "durationHoursMinutesCompact": "{hours} Std. {minutes}",
+  "durationSecondsShort": "{seconds} s",
+  "durationMinutesSeconds": "{minutes} Min. {seconds} s",
   "savedRoutesLoading": "Gespeicherte Routen werden geladen\u2026",
   "@loadingRoute": {
     "placeholders": {

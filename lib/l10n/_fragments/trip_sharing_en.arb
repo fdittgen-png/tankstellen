@@ -39,6 +39,10 @@
   "@tripShareRecipientNotFound": {
     "description": "Snackbar shown when the recipient email entered in the trip-sharing sheet does not match any TankSync account (#2240)."
   },
+  "tripShareNotSyncedYet": "This trip hasn't reached your sync database yet — try again in a moment.",
+  "@tripShareNotSyncedYet": {
+    "description": "Snackbar shown when the trip being shared is not on the server yet (recorded before the trips toggle, or its upload is still in flight) — the recipient email is fine (#4060)."
+  },
   "tripShareError": "Couldn't share this trip. Try again.",
   "@tripShareError": {
     "description": "Snackbar shown when creating a trip share fails for a non-specific reason (network / server) (#2240)."

@@ -103,6 +103,9 @@ class _TripShareSheetState extends State<TripShareSheet> {
         await _reloadShares();
       case TripShareResult.recipientNotFound:
         SnackBarHelper.showError(context, l.tripShareRecipientNotFound);
+      case TripShareResult.notSyncedYet:
+        // #4060 — transient, and not the recipient's fault: say so.
+        SnackBarHelper.show(context, l.tripShareNotSyncedYet);
       case TripShareResult.notAuthenticated:
       case TripShareResult.failed:
         SnackBarHelper.showError(context, l.tripShareError);

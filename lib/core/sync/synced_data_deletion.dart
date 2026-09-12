@@ -95,14 +95,14 @@ class SyncedDataDeletion {
   /// or any table failed (each table is isolated: one failure is logged
   /// and the remaining tables still get wiped — the user confirmed the
   /// destructive action). Failures do not propagate to the caller.
-  static Future<bool> delete(
+  static Future<SyncedDataDeletionOutcome> delete(
     SyncedDataCategory category, {
     SyncTransport? transport,
   }) async {
     final t = transport ?? SupabaseSyncTransport.currentOrNull();
-    if (t == null) return false;
+    if (t == null) return SyncedDataDeletionOutcome.failed;
 
-    var allOk = true;
+    var outcome = SyncedDataDeletionOutcome.deleted;
     for (final table in categoryTables[category]!) {
       try {
         final idColumn = idColumnByTable[table];
@@ -127,7 +127,13 @@ class SyncedDataDeletion {
           // tombstone, another device can re-upload its copy and the
           // data comes back. Surface it.
           if (!await DeletionsSync.recordAll(table, ids, transport: t)) {
-            allOk = false;
+            // #4059 — the rows ARE deleted; only the tombstone is not
+            // durable yet. That is a different message from "failed".
+            outcome = outcome.worst(
+              DeletionsSync.deletionsTableAbsentThisSession
+                  ? SyncedDataDeletionOutcome.deletedSchemaOutdated
+                  : SyncedDataDeletionOutcome.deletedTombstonePending,
+            );
             log.warn(
               'SyncedDataDeletion: server rows for "$table" deleted but the '
               'deletion tombstone is only queued locally — another device '
@@ -140,7 +146,7 @@ class SyncedDataDeletion {
         await t.deleteWhere(table, const {});
         debugPrint('SyncedDataDeletion: wiped "$table"');
       } catch (e, st) {
-        allOk = false;
+        outcome = SyncedDataDeletionOutcome.failed;
         log.error(e, st, layer: ErrorLayer.sync, context: {
           'where': 'SyncedDataDeletion.delete FAILED for table',
           'table': table,
@@ -148,6 +154,33 @@ class SyncedDataDeletion {
         });
       }
     }
-    return allOk;
+    return outcome;
   }
+}
+
+/// What [SyncedDataDeletion.delete] achieved (#4059). Ordered from best
+/// to worst so [worst] can fold per-table results into one verdict.
+///
+/// "Rows deleted, tombstone not yet durable" used to collapse into
+/// `false`, and the tile told the user their deletion had FAILED when it
+/// had succeeded — on a pre-v3 self-host that message could never be
+/// escaped, because a retry found nothing left to delete and reported
+/// the same failure again.
+enum SyncedDataDeletionOutcome {
+  /// Rows deleted and the tombstone confirmed server-side.
+  deleted,
+
+  /// Rows deleted; the tombstone is queued locally (#3123) and lands on
+  /// the next sync. Other devices drop their copies after that.
+  deletedTombstonePending,
+
+  /// Rows deleted; the backend has no `deletions` table, so the tombstone
+  /// can never land. Another device could re-upload — re-run the setup SQL.
+  deletedSchemaOutdated,
+
+  /// At least one table's rows could not be deleted.
+  failed;
+
+  SyncedDataDeletionOutcome worst(SyncedDataDeletionOutcome other) =>
+      index >= other.index ? this : other;
 }

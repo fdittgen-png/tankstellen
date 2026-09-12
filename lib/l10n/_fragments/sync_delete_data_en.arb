@@ -49,6 +49,14 @@
   "@syncDeleteDataDone": {
     "description": "Snackbar shown when the server-side deletion completed (#3453)."
   },
+  "syncDeleteDataDonePending": "Deleted. Your other devices will drop it the next time this device syncs.",
+  "@syncDeleteDataDonePending": {
+    "description": "Snackbar shown when the server rows were deleted but the deletion tombstone is still queued locally and lands on the next sync (#4059)."
+  },
+  "syncDeleteDataDoneSchemaOutdated": "Deleted on the server — but your sync database is outdated, so another device could re-upload it. Re-run the setup SQL.",
+  "@syncDeleteDataDoneSchemaOutdated": {
+    "description": "Snackbar shown when the server rows were deleted but the self-hosted schema has no deletions table, so the tombstone can never land (#4059)."
+  },
   "syncDeleteDataFailed": "Deleting synced data failed — please try again",
   "@syncDeleteDataFailed": {
     "description": "Snackbar shown when the server-side deletion failed or the user is not connected (#3453)."

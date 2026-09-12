@@ -171,7 +171,7 @@ void main() {
       await pumpApp(tester, GpsDiagnosticsCard(diagnostics: diagnostics));
 
       expect(find.textContaining('13 samples'), findsOneWidget);
-      expect(find.textContaining('12min'), findsOneWidget);
+      expect(find.textContaining('12 min'), findsOneWidget);
       expect(find.textContaining('no gaps'), findsOneWidget);
     });
 
@@ -299,7 +299,7 @@ void main() {
       // enum name.
       expect(
         find.text(
-            'Track covers 75% — longest gap 1m 15s (app in background)'),
+            'Track covers 75% — longest gap 1 min 15 s (app in background)'),
         findsOneWidget,
       );
       expect(find.textContaining('backgroundThrottle'), findsNothing);
@@ -335,7 +335,7 @@ void main() {
       // The collapsed subtitle leads with the coverage verdict instead of
       // a zeroed sample triple.
       expect(
-        find.text('Track covers 91% — longest gap 42s (signal loss)'),
+        find.text('Track covers 91% — longest gap 42 s (signal loss)'),
         findsOneWidget,
       );
 
