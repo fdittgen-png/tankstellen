@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/domain/station.dart';
+import '../../../../core/services/country_service_registry.dart';
 import '../../../../core/services/radar/motorway_exits_provider.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_text.dart';
@@ -14,6 +15,7 @@ import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/road_distance_provider.dart';
+import '../../../../core/country/country_config.dart';
 
 /// The card's single **label**-role metadata line (#3949):
 /// `distance · Updated {time} · ●`.
@@ -56,6 +58,10 @@ class StationCardMetaLine extends StatelessWidget {
           flex: 2,
           child: _DistanceSegment(station: station, style: style),
         ),
+        // #4105 — which database this price came from. A cross-border
+        // search mixes sources, and the criteria bar already names them
+        // with flags; a row said nothing about its own.
+        _SourceFlag(station: station, style: style),
         if (station.updatedAt != null) ...[
           _Separator(style: style),
           Flexible(
@@ -280,4 +286,65 @@ String stationCardAddressLine(Station station, bool includeStreet) {
   if (!includeStreet || station.street.isEmpty) return city;
   if (city.isEmpty) return station.street;
   return '${station.street}, $city';
+}
+
+/// The flag of the country whose open-data service published this price
+/// (#4105).
+///
+/// The same glyph the summary band's `_DataSourceSegment` shows for the
+/// search as a whole, at the same 11 pt, now per result — so on a
+/// cross-border route the user can see at a glance WHICH database each
+/// row came from, not just that several were queried. The tooltip and
+/// the spoken label name the country and the service, exactly as the
+/// band's credit chip does.
+///
+/// Resolved by [Countries.countryForStation] — the id prefix first,
+/// which is canonical, then the coordinates. Renders nothing when the
+/// station cannot be attributed, rather than guessing a flag.
+///
+/// The emoji itself is decorative: a screen reader hears the sentence,
+/// never a lone flag glyph it would have to interpret.
+class _SourceFlag extends StatelessWidget {
+  const _SourceFlag({required this.station, required this.style});
+
+  final Station station;
+  final TextStyle style;
+
+  @override
+  Widget build(BuildContext context) {
+    final country = Countries.countryForStation(
+      id: station.id,
+      lat: station.lat,
+      lng: station.lng,
+    );
+    if (country == null || country.flag.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    // The service that published it, named the way the band names it.
+    final attribution =
+        CountryServiceRegistry.policyFor(country.code)?.attribution ??
+            country.apiProvider;
+    final label = attribution == null || attribution.isEmpty
+        ? country.name
+        : AppLocalizations.of(context)
+            .stationSourceFlagTooltip(country.name, attribution);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _Separator(style: style),
+        Tooltip(
+          message: label,
+          child: Semantics(
+            label: label,
+            child: ExcludeSemantics(
+              // Fixed 11 pt, matching the band's credit chip: the flag is
+              // an identifier, so it must not grow and shrink with the
+              // metadata text around it.
+              child: Text(country.flag, style: const TextStyle(fontSize: 11)),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
