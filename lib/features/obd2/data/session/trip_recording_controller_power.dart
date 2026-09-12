@@ -35,9 +35,8 @@ mixin _TripRecordingPowerWatch
         !_protocolWorkInFlight &&
         !_run.degradedGpsOnly &&
         power.engineRunning &&
-        (lastRefresh == null ||
-            now.difference(lastRefresh) >=
-                TripRecordingController.odometerRefreshInterval) &&
+        intervalElapsed(
+            lastRefresh, now, TripRecordingController.odometerRefreshInterval) &&
         _odometer.claimPeriodicRefresh()) {
       unawaited(
           refreshOdometer().whenComplete(_odometer.endPeriodicRefresh));

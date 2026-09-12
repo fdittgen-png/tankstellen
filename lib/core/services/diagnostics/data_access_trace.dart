@@ -4,6 +4,7 @@
 import 'dart:convert';
 
 import 'data_access_event.dart';
+import '../../utils/stats.dart';
 
 /// A self-contained, JSON-serialisable snapshot of every recorded data-layer
 /// access plus the per-provider compliance aggregates (#2824).
@@ -104,7 +105,7 @@ class DataAccessTrace {
         networkIntervalsSec: intervals,
         minNetworkIntervalSec: minInterval,
         medianNetworkIntervalSec:
-            intervals.isEmpty ? null : _median(intervals),
+            intervals.isEmpty ? null : median(intervals),
         configuredMinIntervalSec: configured,
         compliant: compliant,
       ));
@@ -124,13 +125,6 @@ class DataAccessTrace {
 
   static double _min(List<double> xs) =>
       xs.reduce((a, b) => a < b ? a : b);
-
-  static double _median(List<double> xs) {
-    final sorted = [...xs]..sort();
-    final n = sorted.length;
-    if (n.isOdd) return sorted[n ~/ 2];
-    return (sorted[n ~/ 2 - 1] + sorted[n ~/ 2]) / 2;
-  }
 }
 
 /// One per-`country|source` compliance row of a [DataAccessTrace] (#2824).

@@ -31,28 +31,6 @@ const int _maxIterations = 10;
 /// transmission we've measured.
 const double _convergenceEpsilon = 0.005;
 
-/// Internal: linear-interpolation percentile on a pre-sorted list.
-/// `q` in `[0, 1]`. Returns the only element for length-1 inputs and
-/// the boundary element for `q <= 0` / `q >= 1`. Used to seed
-/// centroids and to bracket outliers.
-double _percentile(List<double> sortedAscending, double q) {
-  if (sortedAscending.isEmpty) {
-    return 0.0;
-  }
-  if (sortedAscending.length == 1) {
-    return sortedAscending[0];
-  }
-  if (q <= 0) return sortedAscending.first;
-  if (q >= 1) return sortedAscending.last;
-  final pos = q * (sortedAscending.length - 1);
-  final lo = pos.floor();
-  final hi = pos.ceil();
-  if (lo == hi) return sortedAscending[lo];
-  final frac = pos - lo;
-  return sortedAscending[lo] +
-      (sortedAscending[hi] - sortedAscending[lo]) * frac;
-}
-
 /// Internal: index of the centroid nearest to [value] in 1-D
 /// (Euclidean distance reduces to absolute difference). Ties go to
 /// the lower index — k-means is stable across iterations because

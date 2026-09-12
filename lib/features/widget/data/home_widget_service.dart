@@ -23,6 +23,7 @@ import 'nearest_widget_data_builder.dart';
 import 'predictive_payload.dart';
 import '../../../core/error/guarded.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/utils/number_parsing.dart';
 
 /// Manages data for the Android home screen widgets.
 ///
@@ -310,8 +311,8 @@ class HomeWidgetService {
       final data = storage.getFavoriteStationData(id);
       if (data == null) continue;
 
-      final stationLat = _toDouble(data['lat']);
-      final stationLng = _toDouble(data['lng']);
+      final stationLat = parseLooseDouble(data['lat']);
+      final stationLng = parseLooseDouble(data['lng']);
       if (stationLat == null || stationLng == null) continue;
 
       final distanceKm = haversineDistanceKm(lat, lng, stationLat, stationLng);
@@ -360,8 +361,8 @@ class HomeWidgetService {
         ? brand
         : (name != null && name.isNotEmpty ? name : 'Station');
 
-    final stationLat = _toDouble(data['lat']);
-    final stationLng = _toDouble(data['lng']);
+    final stationLat = parseLooseDouble(data['lat']);
+    final stationLng = parseLooseDouble(data['lng']);
     double? distanceKm;
     if (userLat != null &&
         userLng != null &&
@@ -430,7 +431,7 @@ class HomeWidgetService {
       _ => null,
     };
     if (key == null) return null;
-    return _toDouble(data[key]);
+    return parseLooseDouble(data[key]);
   }
 
   /// Public test-only entry point for [_compactStationData].
@@ -470,14 +471,6 @@ class HomeWidgetService {
     double lon2,
   ) =>
       geo.distanceKm(lat1, lon1, lat2, lon2);
-
-  static double? _toDouble(dynamic value) {
-    if (value is double) return value;
-    if (value is int) return value.toDouble();
-    if (value is String) return double.tryParse(value);
-    return null;
-  }
-
   /// Initialize home_widget group ID. Call once from main.
   static Future<void> init() async {
     await HomeWidget.setAppGroupId(platformWidgetGroupId);

@@ -16,6 +16,7 @@ import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/services/brand_enrich_budget.dart';
 import 'prix_carburants_queries.dart';
+import '../../../core/utils/number_parsing.dart';
 
 /// Real French fuel price data from Prix-Carburants (gouv.fr).
 /// Free, no API key, no registration. Updated every 10 minutes.
@@ -294,14 +295,14 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
         final originalId = originalForUpstream[recordId];
         if (originalId == null) continue; // unrequested / unmatched record
         prices[originalId] = StationPrices(
-          e5: _toDouble(r['sp95_prix']),
-          e10: _toDouble(r['e10_prix']),
+          e5: parseLooseDouble(r['sp95_prix']),
+          e10: parseLooseDouble(r['e10_prix']),
           // #2249 — France's feed also carries SP98, E85 and GPLc; surface
           // them so a favorites/alerts refresh keeps the full fuel set.
-          e98: _toDouble(r['sp98_prix']),
-          diesel: _toDouble(r['gazole_prix']),
-          e85: _toDouble(r['e85_prix']),
-          lpg: _toDouble(r['gplc_prix']),
+          e98: parseLooseDouble(r['sp98_prix']),
+          diesel: parseLooseDouble(r['gazole_prix']),
+          e85: parseLooseDouble(r['e85_prix']),
+          lpg: parseLooseDouble(r['gplc_prix']),
           status: 'open',
         );
       }
@@ -315,14 +316,4 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
     );
   }
 
-  /// Local copy of the `_toDouble` coercion. Used only by [getPrices]
-  /// where we map raw record fields directly into [StationPrices]
-  /// without going through the full [parser.parsePrixCarburantsStation]
-  /// path. Kept here to avoid widening the parser module's surface for
-  /// a one-line helper.
-  double? _toDouble(dynamic v) {
-    if (v == null) return null;
-    if (v is num) return v.toDouble();
-    return double.tryParse(v.toString());
-  }
 }

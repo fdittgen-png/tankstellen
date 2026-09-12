@@ -21,6 +21,7 @@ import '../opening_hours/open_state_from_hours.dart';
 import 'spain_opening_hours_adapter.dart';
 import 'spain_provinces.dart';
 import '../../../core/services/country_service_dependencies.dart';
+import '../../../core/utils/number_parsing.dart';
 
 /// Spanish fuel prices from Geoportal Gasolineras (MITECO).
 /// Free, no API key, no registration.
@@ -312,12 +313,10 @@ class MitecoStationService
     return null;
   }
 
-  /// Parse a number string that uses comma as decimal separator.
-  /// "1,817" → 1.817, "" → null, null → null
-  double? _parseCommaDouble(String? value) {
-    if (value == null || value.trim().isEmpty) return null;
-    return double.tryParse(value.replaceAll(',', '.'));
-  }
+  /// #4073 — the comma-decimal rule lives in `parseUserDouble`; this is
+  /// only the nullable adapter the MITECO row reads go through.
+  double? _parseCommaDouble(String? value) =>
+      value == null ? null : parseUserDouble(value);
 
   @override
   Future<ServiceResult<StationDetail>> getStationDetail(

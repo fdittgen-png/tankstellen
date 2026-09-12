@@ -153,7 +153,6 @@ mixin _TripRecordingLifecycle
     if (_run.started) return;
     _run.begin();
     _startedAt = _now();
-    _sessionId = _startedAt!.toIso8601String();
     // #3797 — anchor the lifecycle timeline at t=0 BEFORE any OBD work,
     // so a session that dies during protocol establishment or the
     // identity reads still exports a timeline that shows how far it got.

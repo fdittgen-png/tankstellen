@@ -217,7 +217,8 @@ mixin _TripRecordingSessionState {
   /// are single methods on the collaborator now, so no caller can do
   /// half of one.
   final TripRunState _run = TripRunState();
-  String? _sessionId; // ISO start-ts, stable across pause→resume cycles
+  // #4073 — derived from `_startedAt` (never cleared), not a second field.
+  String? get _sessionId => _startedAt?.toIso8601String();
 
   /// Why the controller flipped into
   /// [TripRecordingControllerState.pausedDueToDrop] (#1330 phase 3).

@@ -10,6 +10,7 @@ import '../../../core/logging/app_log.dart';
 import '../domain/gps_driving_features.dart';
 import '../domain/gps_kpi_verdict.dart';
 import '../domain/trip_verdict.dart';
+import '../../../core/utils/stats.dart';
 
 /// One (verdict, energy-KPI) observation appended when the driver answers
 /// the #3501 post-trip prompt.
@@ -144,7 +145,7 @@ class VerdictCalibrationStore {
 
     double goodMax(double def, double Function(VerdictCalibrationRow) of) {
       if (smooth.length < kMinSmoothRows) return def;
-      final p75 = _percentile([for (final r in smooth) of(r)], 0.75);
+      final p75 = percentileNearestRank([for (final r in smooth) of(r)], 0.75);
       return p75 > def ? p75 : def; // widen only
     }
 
@@ -152,7 +153,7 @@ class VerdictCalibrationStore {
         double def, double good, double Function(VerdictCalibrationRow) of) {
       var out = def;
       if (aggressive.length >= kMinAggressiveRows) {
-        final p25 = _percentile([for (final r in aggressive) of(r)], 0.25);
+        final p25 = percentileNearestRank([for (final r in aggressive) of(r)], 0.25);
         if (p25 < out) out = p25; // tighten only
       }
       final floor = good * 1.2; // monotonic bands
@@ -169,12 +170,12 @@ class VerdictCalibrationStore {
     // conservative one-direction rules, mirrored.
     var coastGood = d.coastGoodMin;
     if (smooth.length >= kMinSmoothRows) {
-      final p25 = _percentile([for (final r in smooth) r.coast], 0.25);
+      final p25 = percentileNearestRank([for (final r in smooth) r.coast], 0.25);
       if (p25 < coastGood) coastGood = p25;
     }
     var coastModerate = d.coastModerateMin;
     if (aggressive.length >= kMinAggressiveRows) {
-      final p75 = _percentile([for (final r in aggressive) r.coast], 0.75);
+      final p75 = percentileNearestRank([for (final r in aggressive) r.coast], 0.75);
       if (p75 > coastModerate) coastModerate = p75;
     }
     final coastCap = coastGood / 1.2;
@@ -191,11 +192,5 @@ class VerdictCalibrationStore {
       coastGoodMin: coastGood,
       coastModerateMin: coastModerate,
     );
-  }
-
-  static double _percentile(List<double> values, double p) {
-    final sorted = [...values]..sort();
-    final idx = ((sorted.length - 1) * p).round();
-    return sorted[idx];
   }
 }

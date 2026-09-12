@@ -63,5 +63,5 @@ double? _medianCruiseFuelRate(List<TripSample> samples) {
     rates.add(fuel);
   }
   if (rates.length < 4) return null;
-  return _median(rates);
+  return median(rates);
 }

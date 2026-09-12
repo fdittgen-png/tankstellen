@@ -82,7 +82,7 @@ mixin _TripRecordingEmit
       startedAt: _startedAt,
       startGrace: _engineDataStartGrace,
       stalenessLimit: _engineDataStalenessLimit,
-      suppressed: _inReconnectGrace || _protocolWorkInFlight,
+      suppressed: _linkQuietWindow,
     );
     if (engineStale) {
       if (_engineFence.claimEscalation()) {
@@ -121,9 +121,8 @@ mixin _TripRecordingEmit
     // raw keys stay null (carried-forward = simply not re-written) so the
     // payload doesn't balloon at the 4 Hz emit rate.
     final captureRaw = _diagnosticCapture &&
-        (_lastDiagnosticCaptureAt == null ||
-            nowTs.difference(_lastDiagnosticCaptureAt!) >=
-                _diagnosticCaptureInterval);
+        intervalElapsed(
+            _lastDiagnosticCaptureAt, nowTs, _diagnosticCaptureInterval);
     if (captureRaw) _lastDiagnosticCaptureAt = nowTs;
     // The recorder integrates fuel rate and Δt itself, so we only
     // hand it one TripSample per emit — not per PID callback. At a

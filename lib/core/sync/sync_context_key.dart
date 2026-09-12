@@ -74,9 +74,40 @@ class ScopedIdSets {
   final String? Function() load;
   final Future<void> Function(String json) persist;
 
+  // #4072 — one blob decode per distinct raw string, not one per call: a
+  // sync run reads the sets ~50 times and the blob rarely changes between
+  // reads. Callers mutate the returned map, so hand out a deep copy.
+  String? _cachedRaw;
+  Map<String, Map<String, Set<String>>>? _cached;
+
+  Map<String, Map<String, Set<String>>> _copy(
+          Map<String, Map<String, Set<String>>> m) =>
+      {
+        for (final e in m.entries)
+          e.key: {for (final t in e.value.entries) t.key: {...t.value}},
+      };
+
   Map<String, Map<String, Set<String>>> _decode() {
+    final String? raw;
     try {
-      final raw = load();
+      raw = load();
+    } catch (e, st) {
+      // The load seam itself failed (box closed, storage fault): the
+      // pre-#3123 fail-open behaviour, logged.
+      log.warn('ScopedIdSets: load failed — treating as empty',
+          tag: 'sync', error: e, stack: st, layer: ErrorLayer.sync);
+      return {};
+    }
+    final cached = _cached;
+    if (raw != null && raw == _cachedRaw && cached != null) return _copy(cached);
+    final decoded = _decodeUncached(raw);
+    _cachedRaw = raw;
+    _cached = _copy(decoded);
+    return decoded;
+  }
+
+  Map<String, Map<String, Set<String>>> _decodeUncached(String? raw) {
+    try {
       if (raw == null || raw.isEmpty) return {};
       final outer = jsonDecode(raw);
       if (outer is! Map) return {};

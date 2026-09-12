@@ -95,6 +95,7 @@ library;
 
 import 'package:flutter/foundation.dart';
 import '../trip_recorder.dart';
+import '../../../../core/utils/stats.dart';
 
 part 'gear_inference_models.dart';
 part '_gear_clustering.dart';
@@ -185,8 +186,8 @@ GearInferenceResult inferGears({
   // build the percentile bracket on the surviving ratios so a small
   // fixture (test 5) doesn't immediately throw away most of its data.
   final sortedRatios = List<double>.from(validRatios)..sort();
-  final p1 = _percentile(sortedRatios, 0.01);
-  final p99 = _percentile(sortedRatios, 0.99);
+  final p1 = percentileInterpolated(sortedRatios, 0.01);
+  final p99 = percentileInterpolated(sortedRatios, 0.99);
   final lowerBound = p1 / 2.0;
   final upperBound = p99 * 2.0;
 
@@ -222,7 +223,7 @@ GearInferenceResult inferGears({
       // this hits 0.1, 0.3, 0.5, 0.7, 0.9 — i.e. the 10th / 30th /
       // 50th / 70th / 90th percentiles, as documented.
       final q = (2.0 * k + 1.0) / (2.0 * targetGearCount);
-      centroids.add(_percentile(keptSorted, q));
+      centroids.add(percentileInterpolated(keptSorted, q));
     }
   }
 

@@ -41,6 +41,7 @@ import '../../../core/utils/geo_utils.dart';
 import '../../../core/logging/error_logger.dart';
 import '../opening_hours/open_state_from_hours.dart';
 import 'france_opening_hours_adapter.dart';
+import '../../../core/utils/number_parsing.dart';
 
 /// Extract the `results` list from a Prix-Carburants API envelope.
 ///
@@ -131,12 +132,12 @@ Station? parsePrixCarburantsStation(
       lat: lat,
       lng: lng,
       dist: roundedDistanceKm(searchLat, searchLng, lat, lng),
-      e5: _toDouble(r['sp95_prix']),
-      e10: _toDouble(r['e10_prix']),
-      e98: _toDouble(r['sp98_prix']),
-      diesel: _toDouble(r['gazole_prix']),
-      e85: _toDouble(r['e85_prix']),
-      lpg: _toDouble(r['gplc_prix']),
+      e5: parseLooseDouble(r['sp95_prix']),
+      e10: parseLooseDouble(r['e10_prix']),
+      e98: parseLooseDouble(r['sp98_prix']),
+      diesel: parseLooseDouble(r['gazole_prix']),
+      e85: parseLooseDouble(r['e85_prix']),
+      lpg: parseLooseDouble(r['gplc_prix']),
       // #3198 — schedule-derived (automate dispenses 24/7 → open; else the
       // parsed weekly schedule decides; null when no usable hours).
       isOpen: automate24h
@@ -382,13 +383,5 @@ String detectPrixCarburantsBrand(
   // an unbranded independent station from a brand-detection bug.
   // The sentinel is also observable via `BrandRegistry.independentLabel`.
   return 'Independent';
-}
-
-/// Coerce arbitrary scalar (`num`, `String`, `null`) to a `double?`.
-/// Used by [parsePrixCarburantsStation] for every `*_prix` column.
-double? _toDouble(dynamic v) {
-  if (v == null) return null;
-  if (v is num) return v.toDouble();
-  return double.tryParse(v.toString());
 }
 

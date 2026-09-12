@@ -68,6 +68,9 @@ class RadarScopeView extends ConsumerStatefulWidget {
 
 class _RadarScopeViewState extends ConsumerState<RadarScopeView>
     with SingleTickerProviderStateMixin {
+  /// #4072 — label painters reused across sweep frames; lives with the
+  /// state (the prices change with the data, not with the frames).
+  final Map<String, TextPainter> _labelCache = {};
   late final AnimationController _sweep = AnimationController(
     vsync: this,
     duration: const Duration(seconds: 8), // #3372 — slower, calmer sweep
@@ -102,7 +105,10 @@ class _RadarScopeViewState extends ConsumerState<RadarScopeView>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final blips = _blips();
+    final blips = _blips()
+      // #4072 — farthest-first so nearer chips paint on top; sorted ONCE
+      // per build here, not on every frame of the 8 s sweep.
+      ..sort((a, b) => b.distanceKm.compareTo(a.distanceKm));
     // #3364 — compass-first (tracks the phone pointing), GPS course as the
     // fallback (driving), North-up the last resort.
     final heading =
@@ -139,6 +145,7 @@ class _RadarScopeViewState extends ConsumerState<RadarScopeView>
                   cheapestColor: _cheapest,
                   sweep: _sweepColor,
                   rangeLabel: rangeLabel,
+                  labelCache: _labelCache,
                   labelStyle: theme.textTheme.labelSmall?.copyWith(
                         color: _grid,
                         fontWeight: FontWeight.w600,
@@ -174,6 +181,12 @@ class _RadarScopeViewState extends ConsumerState<RadarScopeView>
 }
 
 class _RadarScopePainter extends CustomPainter {
+  /// #4072 — laid-out label painters, keyed by text + colour, owned by the
+  /// widget state so they survive across the sweep's frames. A price chip
+  /// used to lay out a fresh TextPainter on every tick of an 8 s
+  /// repeating controller; the text only changes when the prices do.
+  final Map<String, TextPainter> labelCache;
+
   _RadarScopePainter({
     required this.blips,
     required this.sweepT,
@@ -185,6 +198,7 @@ class _RadarScopePainter extends CustomPainter {
     required this.cheapestColor,
     required this.sweep,
     required this.rangeLabel,
+    required this.labelCache,
     required this.labelStyle,
   });
 
@@ -251,11 +265,9 @@ class _RadarScopePainter extends CustomPainter {
         ..strokeWidth = 2,
     );
 
-    // Station price chips, drawn farthest-first so nearer (more relevant)
-    // chips paint on top.
-    final ordered = [...blips]
-      ..sort((a, b) => b.distanceKm.compareTo(a.distanceKm));
-    for (final b in ordered) {
+    // Station price chips — already farthest-first (sorted once per
+    // build, #4072) so nearer, more relevant chips paint on top.
+    for (final b in blips) {
       _paintChip(canvas, center, radius, b);
     }
 
@@ -264,10 +276,7 @@ class _RadarScopePainter extends CustomPainter {
     _paintHeadingMarkers(canvas, center, radius);
 
     // Range label at the top of the outer ring.
-    final tp = TextPainter(
-      text: TextSpan(text: rangeLabel, style: labelStyle),
-      textDirection: TextDirection.ltr,
-    )..layout();
+    final tp = _label('range|$rangeLabel', rangeLabel, labelStyle);
     tp.paint(canvas, Offset(center.dx + 6, center.dy - radius - tp.height));
   }
 
@@ -280,18 +289,17 @@ class _RadarScopePainter extends CustomPainter {
         ? '?'
         : PriceFormatter.formatPriceCompact(b.price);
 
-    final tp = TextPainter(
-      text: TextSpan(
-        text: label,
-        style: TextStyle(
-          color: isCheapest ? const Color(0xFF06210F) : _ink(a),
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          fontFeatures: const [FontFeature.tabularFigures()],
-        ),
+    final chipColor = isCheapest ? const Color(0xFF06210F) : _ink(a);
+    final tp = _label(
+      'chip|$label|${chipColor.toARGB32()}',
+      label,
+      TextStyle(
+        color: chipColor,
+        fontSize: 11,
+        fontWeight: FontWeight.w700,
+        fontFeatures: const [FontFeature.tabularFigures()],
       ),
-      textDirection: TextDirection.ltr,
-    )..layout();
+    );
 
     const padX = 5.0, padY = 2.0;
     final w = tp.width + padX * 2;
@@ -315,22 +323,27 @@ class _RadarScopePainter extends CustomPainter {
 
     // A small "+N" when this chip stands in for an overlapping cluster.
     if (b.aggregatedCount > 1) {
-      final badge = TextPainter(
-        text: TextSpan(
-          text: '+${b.aggregatedCount - 1}',
-          style: TextStyle(
-            color: _ink(a),
-            fontSize: 8,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        textDirection: TextDirection.ltr,
-      )..layout();
+      final badgeText = '+${b.aggregatedCount - 1}';
+      final badge = _label(
+        'badge|$badgeText|${_ink(a).toARGB32()}',
+        badgeText,
+        TextStyle(color: _ink(a), fontSize: 8, fontWeight: FontWeight.w700),
+      );
       badge.paint(canvas, Offset(rect.right - 2, rect.top - badge.height + 2));
     }
   }
 
   Color _ink(double a) => cheapestColor.withValues(alpha: a);
+
+  /// A laid-out painter for [text], reused across frames (#4072).
+  TextPainter _label(String key, String text, TextStyle? style) =>
+      labelCache.putIfAbsent(
+        key,
+        () => TextPainter(
+          text: TextSpan(text: text, style: style),
+          textDirection: TextDirection.ltr,
+        )..layout(),
+      );
 
   void _paintHeadingMarkers(Canvas canvas, Offset center, double radius) {
     // Fixed up-caret at the centre — "ahead" is always the top.

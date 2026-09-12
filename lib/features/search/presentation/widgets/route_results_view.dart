@@ -88,8 +88,10 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
             .where((s) => !ignoredIds.contains(s.id))
             .toList();
 
-        // Sort stations by position along the route (drive order)
-        _sortByRoutePosition(visibleStations, result.route.geometry);
+        // Sort stations by position along the route (drive order).
+        // #4072 — O(n · P) haversine per station; memoised on the result
+        // and the ignore set so a rebuild does not re-walk the polyline.
+        _sortByRoutePositionMemo(visibleStations, result, ignoredIds);
 
         final allFuelStations = visibleStations
             .whereType<FuelStationResult>()
@@ -295,6 +297,32 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
         isCheapest: item.id == result.cheapestId,
       ),
     );
+  }
+
+  Object? _sortMemoResult;
+  Object? _sortMemoIgnored;
+  List<String>? _sortMemoOrder;
+
+  /// [_sortByRoutePosition], reusing the last order while [result] and
+  /// [ignoredIds] are the same objects that sort saw (#4072).
+  void _sortByRoutePositionMemo(
+    List<SearchResultItem> items,
+    dynamic result,
+    Object ignoredIds,
+  ) {
+    final order = _sortMemoOrder;
+    if (identical(result, _sortMemoResult) &&
+        identical(ignoredIds, _sortMemoIgnored) &&
+        order != null) {
+      final rank = {for (var i = 0; i < order.length; i++) order[i]: i};
+      items.sort((a, b) =>
+          (rank[a.id] ?? order.length).compareTo(rank[b.id] ?? order.length));
+      return;
+    }
+    _sortByRoutePosition(items, result.route.geometry as List<LatLng>);
+    _sortMemoResult = result;
+    _sortMemoIgnored = ignoredIds;
+    _sortMemoOrder = [for (final i in items) i.id];
   }
 
   /// Sort stations by their position along the route polyline.
