@@ -82,7 +82,7 @@ class TrajetsTab extends ConsumerWidget {
     // PageScaffold. The Scaffold lifts the FAB clear of the system inset,
     // so we must NOT add `viewPadding.bottom` on top (the old hand-rolled
     // Stack double-counted it).
-    const bottomInset = kFabScrollClearance;
+    final bottomInset = shellScrollClearance(context); // #4096
 
     Widget rowFor(BuildContext context, TripHistoryEntry entry) {
       final vehicle = entry.vehicleId == null
@@ -110,7 +110,7 @@ class TrajetsTab extends ConsumerWidget {
 
     final trajetsList = ListView.builder(
       key: const Key('trajets_list'),
-      padding: const EdgeInsets.only(top: 4, bottom: bottomInset),
+      padding: EdgeInsets.only(top: 4, bottom: bottomInset),
       itemCount: filtered.length,
       itemBuilder: (context, index) => rowFor(context, filtered[index]),
     );
@@ -126,7 +126,7 @@ class TrajetsTab extends ConsumerWidget {
     if (isWideScreen(context)) {
       return ResponsiveMasterDetail(
         master: SingleChildScrollView(
-          padding: const EdgeInsets.only(top: 4, bottom: bottomInset),
+          padding: EdgeInsets.only(top: 4, bottom: bottomInset),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -149,7 +149,7 @@ class TrajetsTab extends ConsumerWidget {
     // scrolls both panes).
     return ListView.builder(
       key: const Key('trajets_list'),
-      padding: const EdgeInsets.only(top: 4, bottom: bottomInset),
+      padding: EdgeInsets.only(top: 4, bottom: bottomInset),
       itemCount: filtered.length + 1,
       itemBuilder: (context, index) {
         if (index == 0) {

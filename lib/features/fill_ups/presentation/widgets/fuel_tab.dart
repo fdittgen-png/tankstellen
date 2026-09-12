@@ -67,8 +67,7 @@ class FuelTab extends ConsumerWidget {
     // (nav-rail layouts, gesture bars). Re-add exactly the consumed
     // `MediaQuery.padding` (not `viewPadding`) so the clearance stays
     // FAB height + margins above the FAB's real position.
-    final bottomInset =
-        kFabScrollClearance + MediaQuery.paddingOf(context).bottom;
+    final bottomInset = shellScrollClearance(context); // #4096
 
     final headerChildren = <Widget>[
       HelpBanner(

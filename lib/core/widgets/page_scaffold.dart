@@ -18,6 +18,15 @@ import '../theme/spacing.dart';
 /// `EdgeInsets.only(bottom: kFabScrollClearance)`.
 const double kFabScrollClearance = 96;
 
+/// The bottom inset a scrollable inside a [PageScaffold] reserves (#4096).
+///
+/// Bodies run behind the shell's bottom bar now, so the bar's height
+/// arrives as `MediaQuery.padding.bottom`. A list adds it to the FAB
+/// clearance above: the content scrolls UNDER the bar as it should, and
+/// the last row still clears both the bar and any floating button.
+double shellScrollClearance(BuildContext context) =>
+    kFabScrollClearance + MediaQuery.paddingOf(context).bottom;
+
 /// Canonical outer chrome for every top-level screen — `Scaffold` +
 /// `AppBar` + optional primary-tinted banner below the app bar + body.
 ///
@@ -67,12 +76,16 @@ class PageScaffold extends StatelessWidget {
   /// content (map screen).
   final EdgeInsets? bodyPadding;
 
-  /// #4084 — the shell runs branch bodies behind its bottom bar
-  /// (`extendBody`) so the docked button's notch shows the branch through
-  /// it. By default this scaffold insets itself by the bar's height so
-  /// lists, floating buttons and sheets keep today's geometry; a screen
-  /// whose body IS the thing that should show through — the map — sets
-  /// this and positions its own overlays by `MediaQuery.padding.bottom`.
+  /// #4096 — every branch body runs behind the shell's bottom bar, so
+  /// the docked button's notch shows CONTENT through it and the button
+  /// reads as floating rather than sitting on a shelf. #4084 gave the Map
+  /// this and it is the look the whole app should have.
+  ///
+  /// The bar's height arrives inside the body as
+  /// `MediaQuery.padding.bottom`; a scrollable adds it to the clearance
+  /// it already reserves so its last row still clears the bar, and the
+  /// content scrolls UNDER the bar instead of stopping above it. Set
+  /// this false only for a body that cannot tolerate painting there.
   final bool bodyBehindBottomBar;
 
   /// Optional FAB. Passed through to [Scaffold.floatingActionButton].
@@ -131,7 +144,7 @@ class PageScaffold extends StatelessWidget {
     this.bannerIcon,
     this.actions,
     this.bodyPadding,
-    this.bodyBehindBottomBar = false,
+    this.bodyBehindBottomBar = true,
     this.floatingActionButton,
     this.floatingActionButtonLocation,
     this.leading,
@@ -187,8 +200,7 @@ class PageScaffold extends StatelessWidget {
       bottomNavigationBar: bottomNavigationBar,
     );
     if (bodyBehindBottomBar) return scaffold;
-    // The shell's bar height arrives as MediaQuery.padding.bottom; consume
-    // it here once so nothing inside double-insets.
+    // Opted out: consume the bar's height so the body stops above it.
     return SafeArea(top: false, child: scaffold);
   }
 }
