@@ -195,7 +195,17 @@ class PageScaffold extends StatelessWidget {
           ),
         ],
       ),
-      floatingActionButton: floatingActionButton,
+      // #4100 — the shell's bar lives on the OUTER Scaffold, so this
+      // one's bottom edge is under it now that the body paints
+      // full-bleed (#4096). The body SHOULD run behind the bar; a
+      // floating button never should.
+      floatingActionButton: floatingActionButton == null
+          ? null
+          : Padding(
+              padding:
+                  EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
+              child: floatingActionButton,
+            ),
       floatingActionButtonLocation: floatingActionButtonLocation,
       bottomNavigationBar: bottomNavigationBar,
     );
