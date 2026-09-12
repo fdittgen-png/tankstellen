@@ -236,8 +236,8 @@ class AppInitializer {
   // Phase 2 — storage.
 
   static Future<void> _initStorage() async {
+    // #4110 — HiveBoxes.init marks its own sub-phases from inside.
     await HiveStorage.init();
-    StartupTimer.instance.mark('hive_init');
 
     // #795 phase 1 — API-key load (secure-storage read + legacy Hive
     // settings migration) and trace-storage box-open are independent;

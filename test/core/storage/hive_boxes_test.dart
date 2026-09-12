@@ -36,18 +36,20 @@ void main() {
 
     group('encryption coverage', () {
       test('hive_boxes.dart opens all domain boxes with encryptionCipher', () {
-        // Read the source file and verify that every Hive.openBox call
-        // in init() and initInIsolate() uses encryptionCipher, except
-        // initForTest (which runs without FlutterSecureStorage).
-        final source =
-            File('lib/core/storage/hive_boxes.dart').readAsStringSync();
+        // #4110 — the first-frame open batch moved to its own library
+        // when hive_boxes.dart reached the 400-line cap. These
+        // assertions are about the OPENS, so they follow them there.
+        final opensSource =
+            File('lib/core/storage/hive_first_frame_boxes.dart')
+                .readAsStringSync();
 
-        // Extract init() method body
+        // Extract the first-frame open batch.
         final initMatch = RegExp(
-          r'static Future<void> init\(\) async \{(.*?)\n  \}',
+          r'static Future<void> openAll\(HiveAesCipher\? cipher\) async \{'
+          r'(.*?)\n  \}',
           dotAll: true,
-        ).firstMatch(source);
-        expect(initMatch, isNotNull, reason: 'init() method must exist');
+        ).firstMatch(opensSource);
+        expect(initMatch, isNotNull, reason: 'openAll() must exist');
         final initBody = initMatch!.group(1)!;
 
         // All Hive.openBox calls in init() must use encryptionCipher
@@ -138,16 +140,19 @@ void main() {
         }
       });
 
-      test('init() opens all six domain boxes', () {
-        final source =
-            File('lib/core/storage/hive_boxes.dart').readAsStringSync();
+      test('the first-frame batch opens all six domain boxes', () {
+        // #4110 — the first-frame open batch moved to its own library
+        // when hive_boxes.dart reached the 400-line cap. These
+        // assertions are about the OPENS, so they follow them there.
+        final opensSource =
+            File('lib/core/storage/hive_first_frame_boxes.dart')
+                .readAsStringSync();
 
-        // Extract init() method — match from "static Future<void> init()"
-        // to the next "static" or end of class
         final initMatch = RegExp(
-          r'static Future<void> init\(\) async \{(.*?)\n  \}',
+          r'static Future<void> openAll\(HiveAesCipher\? cipher\) async \{'
+          r'(.*?)\n  \}',
           dotAll: true,
-        ).firstMatch(source);
+        ).firstMatch(opensSource);
         expect(initMatch, isNotNull);
         final initBody = initMatch!.group(1)!;
 
@@ -278,16 +283,26 @@ void main() {
       test('init() opens boxes via concurrent Future.wait batches', () {
         final source =
             File('lib/core/storage/hive_boxes.dart').readAsStringSync();
+        // #4110 — the first-frame open batch moved to its own library
+        // when hive_boxes.dart reached the 400-line cap. These
+        // assertions are about the OPENS, so they follow them there.
+        final opensSource =
+            File('lib/core/storage/hive_first_frame_boxes.dart')
+                .readAsStringSync();
 
         final initMatch = RegExp(
           r'static Future<void> init\(\) async \{(.*?)\n  \}',
           dotAll: true,
         ).firstMatch(source);
         expect(initMatch, isNotNull);
-        final initBody = initMatch!.group(1)!;
+        // #4110 — one Future.wait is in init() (the migration probes) and
+        // one is in openAll() (the box batch). Counting across both is
+        // what the assertion always meant: nothing on the cold-start
+        // critical path waits on anything it need not.
+        final initBody = initMatch!.group(1)! + opensSource;
 
         // The ~18 boxes have no inter-box ordering dependency and all
-        // sit on the cold-start critical path. init() must open them
+        // sit on the cold-start critical path. They must open
         // concurrently: one Future.wait for the encrypted-box migration
         // probe, one for the actual box-open batch.
         final waitCount = 'Future.wait'.allMatches(initBody).length;
@@ -303,10 +318,16 @@ void main() {
     });
 
     group('deferred-box opening (#1794)', () {
-      test('init() opens only first-frame-critical boxes; the deep-feature '
-          'boxes move to initDeferred()', () {
+      test('only first-frame-critical boxes open before the first frame; '
+          'the deep-feature boxes move to initDeferred()', () {
         final source =
             File('lib/core/storage/hive_boxes.dart').readAsStringSync();
+        // #4110 — the first-frame open batch moved to its own library
+        // when hive_boxes.dart reached the 400-line cap. These
+        // assertions are about the OPENS, so they follow them there.
+        final opensSource =
+            File('lib/core/storage/hive_first_frame_boxes.dart')
+                .readAsStringSync();
 
         expect(
           source.contains('static Future<void> initDeferred()'),
@@ -320,10 +341,13 @@ void main() {
           dotAll: true,
         ).firstMatch(source);
         expect(initMatch, isNotNull);
-        final initBody = initMatch!.group(1)!;
 
-        // The deep-feature boxes must NOT open in init() — they are
-        // deferred past the first frame.
+        // #4110 — the first-frame SET is `HiveFirstFrameBoxes.openAll`
+        // now, so that is where membership is asserted. The point is
+        // unchanged: what opens before the first frame, and what waits.
+        final firstFrame = initMatch!.group(1)! + opensSource;
+
+        // The deep-feature boxes must NOT be on the first-frame path.
         for (final box in [
           'obd2TripHistory',
           'obd2ActiveTrip',
@@ -333,14 +357,14 @@ void main() {
           'trafficSignalsCache',
         ]) {
           expect(
-            initBody.contains(box),
+            firstFrame.contains(box),
             isFalse,
             reason: '$box is a deep-feature box — it must open in '
                 'initDeferred(), not on the first-frame critical path',
           );
         }
 
-        // First-frame-critical boxes stay in init().
+        // First-frame-critical boxes stay on it.
         for (final box in [
           'settings',
           'featureFlags',
@@ -348,9 +372,10 @@ void main() {
           'isolateErrorSpool',
         ]) {
           expect(
-            initBody.contains(box),
+            firstFrame.contains(box),
             isTrue,
-            reason: '$box is first-frame-critical and must stay in init()',
+            reason: '$box is first-frame-critical and must open before the '
+                'first frame',
           );
         }
       });

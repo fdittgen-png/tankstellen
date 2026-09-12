@@ -195,18 +195,27 @@ void main() {
               'the real end of phase-2 storage init');
     });
 
-    test('hive_init marker is fired INSIDE _initStorage (not run body)', () {
-      // `hive_init` fires right after HiveStorage.init() completes, so
-      // the parallelized Future.wait slot that follows hive_init is
-      // measurable in the StartupTimer summary.
+    test('#4110 — storage marks its SUB-phases from inside HiveBoxes, not '
+        'one hive_init around the whole of it', () {
+      // `hive_init` used to fire here, right after HiveStorage.init()
+      // returned. A field export then showed that single phase owning
+      // 8,855 ms of an 8,891 ms cold start while saying nothing about
+      // which of its four kinds of work was responsible, so the marks
+      // moved to where the work is.
       final initStorageBody =
           _extractMethodBody(initSource, 'static Future<void> _initStorage');
       expect(initStorageBody, isNotNull);
-      expect(initStorageBody,
-          contains("StartupTimer.instance.mark('hive_init')"),
-          reason: 'hive_init must be marked inside _initStorage, right '
-              'after Hive.initFlutter + encrypted-box opens complete — '
-              'moving it back out of the method loses the timing point.');
+      expect(initStorageBody, isNot(contains("mark('hive_init')")),
+          reason: 'a label around four kinds of work cannot name the slow '
+              'one; re-adding it would hide the sub-phases');
+
+      final hiveSource =
+          File('lib/core/storage/hive_boxes.dart').readAsStringSync();
+      for (final phase in ['hive_dir', 'hive_cipher', 'hive_migrate',
+        'hive_open', 'hive_schema']) {
+        expect(hiveSource, contains("StartupTimer.instance.mark('$phase')"),
+            reason: 'missing storage sub-phase: $phase');
+      }
     });
   });
 }

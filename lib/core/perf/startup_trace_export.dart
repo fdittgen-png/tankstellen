@@ -7,6 +7,7 @@ import 'dart:convert';
 import '../constants/app_constants.dart';
 import '../logging/error_logger.dart';
 import '../sharing/public_file_exporter.dart';
+import '../storage/hive_open_timing.dart';
 import '../telemetry/storage/trace_storage.dart';
 import 'startup_timer.dart';
 
@@ -27,7 +28,13 @@ class StartupTraceExport {
   /// v2 (#3445): adds the `spans` section — the post-first-frame
   /// launch-sync spans (`tanksync_init`, `trips_merge`, per-table entity
   /// merges, `sync_phase_done`) recorded after `StartupTimer.finish()`.
-  static const int schemaVersion = 2;
+  ///
+  /// v3 (#4110): adds `slowestBoxOpen`. The `hive_init` phase owned
+  /// 8,855 ms of an 8,891 ms cold start in the 2026-09-12 field export,
+  /// and `HiveBoxes.init` now marks its four sub-phases — but the box
+  /// opens are PARALLEL, so their durations overlap and the phase alone
+  /// cannot say which one is the long pole. This names it.
+  static const int schemaVersion = 3;
 
   /// The export-section key registered into the error-log export.
   static const String exportSectionKey = 'startupTrace';
@@ -70,6 +77,7 @@ class StartupTraceExport {
     required DateTime exportedAt,
     required String appVersion,
     List<StartupSpan> spans = const [],
+    (String, int)? slowestBoxOpen,
   }) {
     return {
       'schema': schemaVersion,
@@ -79,6 +87,15 @@ class StartupTraceExport {
       'totalMs': totalMs,
       'phases': phases(milestones),
       'spans': spanMaps(spans),
+      // #4110 — omitted rather than null-filled when init has not run
+      // (a test, or an export before storage came up): an absent field
+      // is honest, a `{"name": null}` row invites a reader to conclude
+      // something.
+      if (slowestBoxOpen != null)
+        'slowestBoxOpen': {
+          'box': slowestBoxOpen.$1,
+          'durationMs': slowestBoxOpen.$2,
+        },
     };
   }
 
@@ -91,6 +108,7 @@ class StartupTraceExport {
       exportedAt: exportedAt ?? DateTime.now(),
       appVersion: AppConstants.appVersion,
       spans: timer.spans,
+      slowestBoxOpen: HiveOpenTiming.slowest,
     );
     return const JsonEncoder.withIndent('  ').convert(doc);
   }
@@ -123,6 +141,11 @@ class StartupTraceExport {
           'totalMs': StartupTimer.instance.totalMs,
           'phases': phases(StartupTimer.instance.milestones),
           'spans': spanMaps(StartupTimer.instance.spans),
+          if (HiveOpenTiming.slowest case final slowest?)
+            'slowestBoxOpen': {
+              'box': slowest.$1,
+              'durationMs': slowest.$2,
+            },
         };
   }
 }
