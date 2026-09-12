@@ -13,8 +13,6 @@ import '../../../../core/utils/price_tier.dart';
 import '../../../../core/utils/price_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
-import '../../../../core/storage/storage_keys.dart';
-import '../../../../core/widgets/help_banner.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../core/widgets/staggered_fade_in.dart';
@@ -36,6 +34,7 @@ import 'brand_filter_chips.dart';
 import 'cross_border_banner.dart';
 import 'ev_station_card.dart';
 import 'mixed_results_filter_chips.dart';
+import 'results/results_leading_items.dart';
 import 'results/results_row.dart';
 import 'swipeable_station_card.dart';
 import 'all_prices/all_prices_table_header.dart';
@@ -174,28 +173,25 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
               final priceRange = _getPriceRangeFor(fuelOnly, fuelType);
               final profileFuel = ref.watch(activeProfileProvider)?.preferredFuelType;
 
-              // #3937 — the help bubble is the list's FIRST ITEM, not a
-              // band above it: on the screen whose whole point is showing
-              // stations, an explanation must scroll away with the first
-              // flick instead of holding height until it is dismissed.
-              // The landscape radar pane carries no bubble at all.
-              final showHelp = !widget.hideSortAndFilter;
+              // #3937 / #4090 — the help bubble and the decision header
+              // are list ITEMS, not bands above the list; see
+              // [ResultsLeadingItems] for why, and for the index
+              // arithmetic they share.
+              final leading = ResultsLeadingItems(
+                showDecision: !widget.hideSortAndFilter,
+                showHelp: !widget.hideSortAndFilter,
+              );
               return ListView.builder(
                 // #3926 — the extended radar FAB is gone, but the shell's
                 // docked search FAB still floats over the list bottom;
                 // reserve the shared clearance so the last card is not
                 // sitting under it.
                 padding: EdgeInsets.only(bottom: shellScrollClearance(context)),
-                itemCount: sorted.length + (showHelp ? 1 : 0),
+                itemCount: sorted.length + leading.count,
                 itemBuilder: (context, rawIndex) {
-                  if (showHelp && rawIndex == 0) {
-                    return const HelpBanner(
-                      storageKey: StorageKeys.helpBannerSearchResults,
-                      icon: Icons.lightbulb_outline,
-                      surface: HelpSurface.searchResults,
-                    );
-                  }
-                  final index = rawIndex - (showHelp ? 1 : 0);
+                  final lead = leading.itemAt(rawIndex, sorted);
+                  if (lead != null) return lead;
+                  final index = rawIndex - leading.count;
                   final item = sorted[index];
                   // #595 — cap stagger so a 50-result search finishes
                   // fading in well under a second. Index key keeps the
