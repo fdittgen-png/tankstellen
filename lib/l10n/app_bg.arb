@@ -105,8 +105,6 @@
   "demoModeBannerAction": "Вземи актуални цени",
   "sortDistance": "Разстояние",
   "sortRating": "Оценка",
-  "cheap": "евтино",
-  "expensive": "скъпо",
   "reportPrice": "Докладване на цена",
   "whatsWrong": "Какво не е наред?",
   "correctPrice": "Правилна цена (напр. 1,459)",
@@ -6888,6 +6886,11 @@
   },
   "refuelConsumptionMissing": "No consumption yet",
   "@refuelConsumptionMissing": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "mapSheetViewDetails": "View station details",
+  "@mapSheetViewDetails": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

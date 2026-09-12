@@ -349,12 +349,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get sortRating => 'Bewertung';
 
   @override
-  String get cheap => 'günstig';
-
-  @override
-  String get expensive => 'teuer';
-
-  @override
   String get reportPrice => 'Preis melden';
 
   @override
@@ -3090,6 +3084,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get refuelConsumptionMissing => 'Noch kein Verbrauch';
+
+  @override
+  String get mapSheetViewDetails => 'Stationsdetails ansehen';
 
   @override
   String get shellSwipeCoachMark =>

@@ -3,11 +3,10 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../../../core/domain/station_amenity.dart'
-    hide amenityLabel;
-import '../../../../../core/theme/app_text.dart';
-import '../../../../../l10n/app_localizations.dart';
-import '../amenity_chips.dart';
+import '../domain/station_amenity.dart' hide amenityLabel;
+import '../theme/app_text.dart';
+import '../../l10n/app_localizations.dart';
+import 'amenity_labels.dart';
 
 /// Amenities as one line of text: `Shop · Wash · +2` (#4091).
 ///
@@ -22,6 +21,9 @@ import '../amenity_chips.dart';
 /// get a tie-breaker's weight: the label type, no borders, no icons, two
 /// names and a count. The full set — with icons and names — is still on
 /// the detail screen, where the user has asked for detail.
+///
+/// It lives in core because the map's station sheet shows it too
+/// (#4093), and a feature may not reach into another feature's widgets.
 ///
 /// The names come from [localizedAmenityLabel], the same switch the
 /// chips use, so the two cannot drift apart. The overflow count keeps

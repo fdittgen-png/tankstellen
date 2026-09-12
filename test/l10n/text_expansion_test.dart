@@ -21,7 +21,6 @@ import 'package:tankstellen/core/utils/price_tier.dart';
 import 'package:tankstellen/features/fill_ups/domain/entities/fuel_consumption_figure.dart';
 import 'package:tankstellen/features/fill_ups/domain/services/monthly_insights_aggregator.dart';
 import 'package:tankstellen/features/fill_ups/presentation/widgets/monthly_insights_card.dart';
-import 'package:tankstellen/features/map/presentation/widgets/price_legend.dart';
 import 'package:tankstellen/features/obd2/api.dart';
 import 'package:tankstellen/features/obd2/domain/fuel_mixture_model.dart';
 import 'package:tankstellen/features/price_history/data/repositories/price_history_repository.dart';
@@ -902,13 +901,6 @@ void main() {
   // #3949 — the map's one-line price legend and the station-count chip the
   // map header adds to the summary bar.
   group('Map chrome (#3949)', () {
-    testWidgets('PriceLegend — pseudo-locale', (tester) async {
-      await pumpPseudo(tester, const PriceLegend(), widgetName: 'PriceLegend');
-    });
-
-    testWidgets('PriceLegend — 1.3x', (tester) async {
-      await pumpScaled(tester, const PriceLegend(), widgetName: 'PriceLegend');
-    });
 
     testWidgets('StationCard with the 24 h status tooltip — pseudo-locale', (
       tester,

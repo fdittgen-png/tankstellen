@@ -105,8 +105,6 @@
   "demoModeBannerAction": "Ottieni prezzi in tempo reale",
   "sortDistance": "Distanza",
   "sortRating": "Valutazione",
-  "cheap": "economico",
-  "expensive": "costoso",
   "reportPrice": "Segnala prezzo",
   "whatsWrong": "Cosa non va?",
   "correctPrice": "Prezzo corretto (es. 1,459)",
@@ -6396,6 +6394,11 @@
   },
   "refuelConsumptionMissing": "No consumption yet",
   "@refuelConsumptionMissing": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "mapSheetViewDetails": "View station details",
+  "@mapSheetViewDetails": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

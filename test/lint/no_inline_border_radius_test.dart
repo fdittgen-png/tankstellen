@@ -127,7 +127,7 @@ const _baseline = <String, int>{
     'lib/features/fill_ups/presentation/widgets/resolve_gap_banner.dart': 2,
     'lib/features/map/presentation/widgets/cluster_badge.dart': 1,
     'lib/features/map/presentation/widgets/route_station_chip.dart': 1,
-    'lib/features/map/presentation/widgets/station_marker.dart': 2,
+    'lib/features/map/presentation/widgets/station_marker.dart': 1,
     'lib/features/obd2/presentation/widgets/obd2_breadcrumb_overlay.dart': 1,
     'lib/features/price_history/presentation/widgets/price_chart.dart': 1,
     'lib/features/profile/presentation/screens/developer_tools/pump_ocr_tester_widgets.dart': 1,

@@ -193,7 +193,9 @@ void main() {
       expect(tooltip.message, contains('STAR'));
     });
 
-    testWidgets('uses pastel colors when pastel is true', (tester) async {
+    testWidgets('#4093 — pastel dims the ACCENT and the number, not the '
+        'card: a wash over the whole marker made the price unreadable',
+        (tester) async {
       final marker = StationMarkerBuilder.build(
         tester.element(find.byType(Container).first),
         testStation,
@@ -214,9 +216,23 @@ void main() {
         ),
       );
 
-      final container = tester.widget<Container>(find.byType(Container).last);
-      final decoration = container.decoration! as BoxDecoration;
-      expect(decoration.color!.a, closeTo(0.5, 0.01));
+      // The card stays a light neutral surface — legible at any rank …
+      final card = tester.widget<Container>(
+        find.ancestor(
+          of: find.byKey(const Key('station_marker_accent')),
+          matching: find.byType(Container),
+        ).first,
+      );
+      final scheme = Theme.of(tester.element(find.byType(Row).first))
+          .colorScheme;
+      final cardColor = (card.decoration! as BoxDecoration).color!;
+      expect(cardColor.a, closeTo(0.75, 0.01));
+      expect(cardColor.withValues(alpha: 1), scheme.surface);
+
+      // … and the semantic accent is what fades.
+      final accent =
+          tester.widget<Container>(find.byKey(const Key('station_marker_accent')));
+      expect(accent.color!.a, closeTo(0.45, 0.01));
     });
 
     testWidgets(

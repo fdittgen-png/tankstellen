@@ -156,7 +156,6 @@ class DrivingMapView extends StatelessWidget {
       // Driving owns its own oversized bottom bar, so suppress the overlay
       // chrome the other maps carry.
       showZoomControls: false,
-      showLegend: false,
       // A marker tap resets the lock timer and opens the DrivingStationSheet —
       // never a navigation push.
       onStationTap: (id) {

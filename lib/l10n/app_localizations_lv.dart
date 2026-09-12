@@ -349,12 +349,6 @@ class AppLocalizationsLv extends AppLocalizations {
   String get sortRating => 'Vērtējums';
 
   @override
-  String get cheap => 'lēti';
-
-  @override
-  String get expensive => 'dārgi';
-
-  @override
   String get reportPrice => 'Ziņot par cenu';
 
   @override
@@ -3093,6 +3087,9 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get refuelConsumptionMissing => 'No consumption yet';
+
+  @override
+  String get mapSheetViewDetails => 'View station details';
 
   @override
   String get shellSwipeCoachMark =>

@@ -105,8 +105,6 @@
   "demoModeBannerAction": "Élő árak megtekintése",
   "sortDistance": "Távolság",
   "sortRating": "Értékelés",
-  "cheap": "olcsó",
-  "expensive": "drága",
   "reportPrice": "Ár bejelentése",
   "whatsWrong": "Mi a probléma?",
   "correctPrice": "Helyes ár (pl. 1,459)",
@@ -6888,6 +6886,11 @@
   },
   "refuelConsumptionMissing": "No consumption yet",
   "@refuelConsumptionMissing": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "mapSheetViewDetails": "View station details",
+  "@mapSheetViewDetails": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

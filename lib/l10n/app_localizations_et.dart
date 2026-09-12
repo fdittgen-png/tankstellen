@@ -347,12 +347,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get sortRating => 'Hinnang';
 
   @override
-  String get cheap => 'odav';
-
-  @override
-  String get expensive => 'kallis';
-
-  @override
   String get reportPrice => 'Teata hinnast';
 
   @override
@@ -3073,6 +3067,9 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get refuelConsumptionMissing => 'No consumption yet';
+
+  @override
+  String get mapSheetViewDetails => 'View station details';
 
   @override
   String get shellSwipeCoachMark =>

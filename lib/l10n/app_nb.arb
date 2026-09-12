@@ -105,8 +105,6 @@
   "demoModeBannerAction": "Få live-priser",
   "sortDistance": "Avstand",
   "sortRating": "Vurdering",
-  "cheap": "billig",
-  "expensive": "dyr",
   "reportPrice": "Rapporter pris",
   "whatsWrong": "Hva er galt?",
   "correctPrice": "Korrekt pris (f.eks. 15,79)",
@@ -6888,6 +6886,11 @@
   },
   "refuelConsumptionMissing": "No consumption yet",
   "@refuelConsumptionMissing": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "mapSheetViewDetails": "View station details",
+  "@mapSheetViewDetails": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

@@ -135,8 +135,6 @@
   "demoModeBannerAction": "Live-Preise aktivieren",
   "sortDistance": "Entfernung",
   "sortRating": "Bewertung",
-  "cheap": "günstig",
-  "expensive": "teuer",
   "reportPrice": "Preis melden",
   "whatsWrong": "Was stimmt nicht?",
   "correctPrice": "Korrekter Preis (z.B. 1,459)",
@@ -454,7 +452,7 @@
   "durationHoursMinutesCompact": "{hours} Std. {minutes}",
   "durationSecondsShort": "{seconds} s",
   "durationMinutesSeconds": "{minutes} Min. {seconds} s",
-  "savedRoutesLoading": "Gespeicherte Routen werden geladen\u2026",
+  "savedRoutesLoading": "Gespeicherte Routen werden geladen…",
   "@loadingRoute": {
     "placeholders": {
       "name": {
@@ -1216,6 +1214,7 @@
   "refuelQuantityMeasuredValue": "{volume} (aus deinen Tankvorgängen)",
   "refuelConsumptionMeasured": "{consumption} (gemessen)",
   "refuelConsumptionMissing": "Noch kein Verbrauch",
+  "mapSheetViewDetails": "Stationsdetails ansehen",
   "shellSwipeCoachMark": "Nach unten wischen oder doppelt auf die Leiste tippen, um den ganzen Bildschirm zu nutzen",
   "shellBarHiddenAnnounce": "Navigation ausgeblendet. Von unten nach oben wischen oder die Taste lange drücken, um sie zurückzuholen.",
   "shellBarShownAnnounce": "Navigation eingeblendet.",
@@ -1246,13 +1245,49 @@
   "helpOpenGuide": "Anleitung öffnen",
   "helpUnavailable": "Die Anleitung konnte nicht geladen werden ({asset}).",
   "linkDeviceInvalidCode": "Bitte einen gültigen Gerätecode eingeben",
-  "@linkDeviceInvalidCode": {"description": "Shown when the pasted device code is too short to be a device id (#3988)."},
+  "@linkDeviceInvalidCode": {
+    "description": "Shown when the pasted device code is too short to be a device id (#3988)."
+  },
   "linkDeviceFailed": "Verknüpfung fehlgeschlagen: {error}",
-  "@linkDeviceFailed": {"description": "Shown when a device link throws; {error} is the localized reason, never the raw exception (#3988).", "placeholders": {"error": {"type": "String", "example": "No internet connection"}}},
+  "@linkDeviceFailed": {
+    "description": "Shown when a device link throws; {error} is the localized reason, never the raw exception (#3988).",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "No internet connection"
+      }
+    }
+  },
   "linkDeviceLinked": "Verknüpft! {favorites} Favoriten, {alerts} Alarme, {vehicles} Fahrzeuge und {fillUps} Tankfüllungen importiert.",
-  "@linkDeviceLinked": {"description": "Shown after a successful device link, with what was imported (#3988).", "placeholders": {"favorites": {"type": "int"}, "alerts": {"type": "int"}, "vehicles": {"type": "int"}, "fillUps": {"type": "int"}}},
+  "@linkDeviceLinked": {
+    "description": "Shown after a successful device link, with what was imported (#3988).",
+    "placeholders": {
+      "favorites": {
+        "type": "int"
+      },
+      "alerts": {
+        "type": "int"
+      },
+      "vehicles": {
+        "type": "int"
+      },
+      "fillUps": {
+        "type": "int"
+      }
+    }
+  },
   "syncConnectionFailed": "Verbindung fehlgeschlagen: {error}",
-  "@syncConnectionFailed": {"description": "Sync wizard: the connection test or adopt step failed; {error} is the localized reason (#3988).", "placeholders": {"error": {"type": "String", "example": "No internet connection"}}},
+  "@syncConnectionFailed": {
+    "description": "Sync wizard: the connection test or adopt step failed; {error} is the localized reason (#3988).",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "No internet connection"
+      }
+    }
+  },
   "showFewerFuelTypes": "Weniger Kraftstoffarten anzeigen",
-  "@showFewerFuelTypes": {"description": "Collapses the station-detail price history back to one fuel type; the counterpart of showAllFuelTypes (#3990)."}
+  "@showFewerFuelTypes": {
+    "description": "Collapses the station-detail price history back to one fuel type; the counterpart of showAllFuelTypes (#3990)."
+  }
 }

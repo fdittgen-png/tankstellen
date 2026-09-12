@@ -16,7 +16,7 @@ import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/core/domain/station_amenity.dart';
 import 'package:tankstellen/features/search/presentation/widgets/amenity_chips.dart';
-import 'package:tankstellen/features/search/presentation/widgets/results/amenity_summary.dart';
+import 'package:tankstellen/core/widgets/amenity_summary.dart';
 import 'package:tankstellen/features/search/presentation/widgets/station_card.dart';
 
 import '../helpers/pump_app.dart';

@@ -105,8 +105,6 @@
   "demoModeBannerAction": "Hangi reaalajas hinnad",
   "sortDistance": "Kaugus",
   "sortRating": "Hinnang",
-  "cheap": "odav",
-  "expensive": "kallis",
   "reportPrice": "Teata hinnast",
   "whatsWrong": "Mis on valesti?",
   "correctPrice": "Õige hind (nt. 1,459)",
@@ -6888,6 +6886,11 @@
   },
   "refuelConsumptionMissing": "No consumption yet",
   "@refuelConsumptionMissing": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "mapSheetViewDetails": "View station details",
+  "@mapSheetViewDetails": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

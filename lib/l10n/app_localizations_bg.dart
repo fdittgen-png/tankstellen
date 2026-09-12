@@ -348,12 +348,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get sortRating => 'Оценка';
 
   @override
-  String get cheap => 'евтино';
-
-  @override
-  String get expensive => 'скъпо';
-
-  @override
   String get reportPrice => 'Докладване на цена';
 
   @override
@@ -3098,6 +3092,9 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get refuelConsumptionMissing => 'No consumption yet';
+
+  @override
+  String get mapSheetViewDetails => 'View station details';
 
   @override
   String get shellSwipeCoachMark =>

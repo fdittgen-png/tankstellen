@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 /// The ONE canonical cheap→expensive price-band colour ramp (#2492).
 ///
 /// Before this, the map markers ([StationMarkerBuilder]) used
-/// `[green, yellow, orange, red]` while the [PriceLegend] used a 3-stop
+/// `[green, yellow, orange, red]` while the (since removed, #4093) price
+/// legend used a 3-stop
 /// success/warning/error gradient with no yellow — two divergent
 /// price-colour systems. Both now consume [PriceBandColors.ramp] so the
 /// legend always describes exactly what the markers paint.

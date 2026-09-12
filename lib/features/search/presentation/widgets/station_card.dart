@@ -17,7 +17,7 @@ import '../../../station_detail/presentation/widgets/station_brand_helpers.dart'
 import '../../domain/entities/brand_registry.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/station.dart';
-import 'results/amenity_summary.dart';
+import '../../../../core/widgets/amenity_summary.dart';
 
 import 'station_card_badges.dart';
 import 'station_card_price_column.dart';

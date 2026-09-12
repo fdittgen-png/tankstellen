@@ -783,18 +783,6 @@ abstract class AppLocalizations {
   /// **'Rating'**
   String get sortRating;
 
-  /// No description provided for @cheap.
-  ///
-  /// In en, this message translates to:
-  /// **'cheap'**
-  String get cheap;
-
-  /// No description provided for @expensive.
-  ///
-  /// In en, this message translates to:
-  /// **'expensive'**
-  String get expensive;
-
   /// No description provided for @reportPrice.
   ///
   /// In en, this message translates to:
@@ -5623,6 +5611,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No consumption yet'**
   String get refuelConsumptionMissing;
+
+  /// The way on from the map's station sheet to the full detail screen (#4093). The sheet answers the decision; the detail screen answers everything else.
+  ///
+  /// In en, this message translates to:
+  /// **'View station details'**
+  String get mapSheetViewDetails;
 
   /// One-time coach mark teaching the swipe-away gesture (#4106/#4107). Names BOTH gestures and what they gain; shown once ever, retires itself after 7s, dismissed by performing it, tapping it, or its Dismiss button.
   ///

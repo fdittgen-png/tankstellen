@@ -350,12 +350,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get sortRating => 'Értékelés';
 
   @override
-  String get cheap => 'olcsó';
-
-  @override
-  String get expensive => 'drága';
-
-  @override
   String get reportPrice => 'Ár bejelentése';
 
   @override
@@ -3095,6 +3089,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get refuelConsumptionMissing => 'No consumption yet';
+
+  @override
+  String get mapSheetViewDetails => 'View station details';
 
   @override
   String get shellSwipeCoachMark =>

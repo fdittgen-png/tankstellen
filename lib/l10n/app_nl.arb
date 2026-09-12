@@ -105,8 +105,6 @@
   "demoModeBannerAction": "Actuele prijzen ophalen",
   "sortDistance": "Afstand",
   "sortRating": "Beoordeling",
-  "cheap": "goedkoop",
-  "expensive": "duur",
   "reportPrice": "Prijs melden",
   "whatsWrong": "Wat klopt er niet?",
   "correctPrice": "Correcte prijs (bijv. 1,459)",
@@ -6888,6 +6886,11 @@
   },
   "refuelConsumptionMissing": "No consumption yet",
   "@refuelConsumptionMissing": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "mapSheetViewDetails": "View station details",
+  "@mapSheetViewDetails": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }
