@@ -149,6 +149,9 @@ class ShellBottomBar extends ConsumerWidget {
             alignment: Alignment.bottomCenter,
         child: SizedBox(
           height: boxHeight,
+            unawaited(
+              ref.read(shellSwipeCoachSeenProvider.notifier).markSeen(),
+            );
           child: Stack(
             children: [
               // Coloured bar pinned to the bottom; the docked centre button
@@ -195,6 +198,16 @@ class ShellBottomBar extends ConsumerWidget {
           ),
             ),
           ),
+              // #4106 — introduce the gesture once, over the bar it acts
+              // on. Never while the bar is already hidden: the user has
+              // plainly found it.
+              if (!hidden && !ref.watch(shellSwipeCoachSeenProvider))
+                ShellSwipeCoachMark(
+                  barHeight: barHeight,
+                  onDismiss: () => unawaited(
+                    ref.read(shellSwipeCoachSeenProvider.notifier).markSeen(),
+                  ),
+                ),
         ),
       ),
     );

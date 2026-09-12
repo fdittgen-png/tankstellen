@@ -6212,5 +6212,97 @@
   "@shellBarToggleHint": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "shellSwipeCoachMark": "Swipe down to hide the bars and use the whole screen",
+  "@shellSwipeCoachMark": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "stationSourceFlagTooltip": "Prices from {country} — {source}",
+  "@stationSourceFlagTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "decisionBestValue": "Best value",
+  "@decisionBestValue": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "decisionCheapest": "Cheapest",
+  "@decisionCheapest": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "decisionClosest": "Closest",
+  "@decisionClosest": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "decisionReasonBestValue": "Best balance of price and detour",
+  "@decisionReasonBestValue": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "decisionReasonSaves": "Saves {amount} on {volume} · {distance} more driving",
+  "@decisionReasonSaves": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "volume": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "decisionReasonBreakEven": "Only worth the detour from {volume} up",
+  "@decisionReasonBreakEven": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "volume": {
+        "type": "String"
+      }
+    }
+  },
+  "decisionValueUnavailable": "Record a fill-up and the detour can be priced, not just the pump",
+  "@decisionValueUnavailable": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "decisionShowAll": "{count, plural, =1{Show the one station} other{Show all {count} stations}}",
+  "@decisionShowAll": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "decisionAssumption": "Based on {consumption} and {volume}",
+  "@decisionAssumption": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "consumption": {
+        "type": "String"
+      },
+      "volume": {
+        "type": "String"
+      }
+    }
   }
 }

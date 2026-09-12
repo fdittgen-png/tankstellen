@@ -2960,6 +2960,57 @@ class AppLocalizationsEn extends AppLocalizations {
       'The Consumption tab was hidden by your profile settings.';
 
   @override
+  String stationSourceFlagTooltip(String country, String source) {
+    return 'Prices from $country — $source';
+  }
+
+  @override
+  String get decisionBestValue => 'Best value';
+
+  @override
+  String get decisionCheapest => 'Cheapest';
+
+  @override
+  String get decisionClosest => 'Closest';
+
+  @override
+  String get decisionReasonBestValue => 'Best balance of price and detour';
+
+  @override
+  String decisionReasonSaves(String amount, String volume, String distance) {
+    return 'Saves $amount on $volume · $distance more driving';
+  }
+
+  @override
+  String decisionReasonBreakEven(String volume) {
+    return 'Only worth the detour from $volume up';
+  }
+
+  @override
+  String get decisionValueUnavailable =>
+      'Record a fill-up and the detour can be priced, not just the pump';
+
+  @override
+  String decisionShowAll(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Show all $count stations',
+      one: 'Show the one station',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String decisionAssumption(String consumption, String volume) {
+    return 'Based on $consumption and $volume';
+  }
+
+  @override
+  String get shellSwipeCoachMark =>
+      'Swipe down — or double-tap the bar — to use the whole screen';
+
+  @override
   String get shellBarHiddenAnnounce =>
       'Navigation hidden. Swipe up from the bottom, or long-press the button, to bring it back.';
 
@@ -12097,6 +12148,58 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get consumptionTabHiddenNotice =>
       '⟦Ŧĥé Çóñšúɱƥŧîóñ ŧáƀ ŵáš ĥîđđéñ ƀý ýóúř ƥřóƒîłé šéŧŧîñǧš. ·····················⟧';
+
+  @override
+  String stationSourceFlagTooltip(String country, String source) {
+    return '⟦Ƥřîçéš ƒřóɱ $country — $source ·····⟧';
+  }
+
+  @override
+  String get decisionBestValue => '⟦Ɓéšŧ ṽáłúé ····⟧';
+
+  @override
+  String get decisionCheapest => '⟦Çĥéáƥéšŧ ····⟧';
+
+  @override
+  String get decisionClosest => '⟦Çłóšéšŧ ···⟧';
+
+  @override
+  String get decisionReasonBestValue =>
+      '⟦Ɓéšŧ ƀáłáñçé óƒ ƥřîçé áñđ đéŧóúř ············⟧';
+
+  @override
+  String decisionReasonSaves(String amount, String volume, String distance) {
+    return '⟦Šáṽéš $amount óñ $volume · $distance ɱóřé đřîṽîñǧ ········⟧';
+  }
+
+  @override
+  String decisionReasonBreakEven(String volume) {
+    return '⟦Óñłý ŵóřŧĥ ŧĥé đéŧóúř ƒřóɱ $volume úƥ ···········⟧';
+  }
+
+  @override
+  String get decisionValueUnavailable =>
+      '⟦Řéçóřđ á ƒîłł-úƥ áñđ ŧĥé đéŧóúř çáñ ƀé ƥřîçéđ, ñóŧ ĵúšŧ ŧĥé ƥúɱƥ ·······················⟧';
+
+  @override
+  String decisionShowAll(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Show all $count stations',
+      one: 'Show the one station',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String decisionAssumption(String consumption, String volume) {
+    return '⟦Ɓášéđ óñ $consumption áñđ $volume ·····⟧';
+  }
+
+  @override
+  String get shellSwipeCoachMark =>
+      '⟦Šŵîƥé đóŵñ — óř đóúƀłé-ŧáƥ ŧĥé ƀář — ŧó úšé ŧĥé ŵĥółé šçřééñ ····················⟧';
 
   @override
   String get shellBarHiddenAnnounce =>

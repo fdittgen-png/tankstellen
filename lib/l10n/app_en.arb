@@ -1624,6 +1624,87 @@
   "@consumptionTabHiddenNotice": {
     "description": "SnackBar shown when a profile change removes the Consumption tab at runtime and the bottom-nav selection jumps to Search — explains why the tab vanished (#1690)."
   },
+  "stationSourceFlagTooltip": "Prices from {country} — {source}",
+  "@stationSourceFlagTooltip": {
+    "description": "Tooltip and screen-reader label on the small country flag each result carries (#4105). Names the country and the open-data service the price came from, so the flag on a card means the same thing as the flag on the summary bar.",
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "decisionBestValue": "Best value",
+  "@decisionBestValue": {
+    "description": "Ranking label in the results decision header (#4090): the station with the lowest effective price per litre once the detour's fuel is counted."
+  },
+  "decisionCheapest": "Cheapest",
+  "@decisionCheapest": {
+    "description": "Ranking label in the results decision header (#4090): the lowest pump price, before any detour arithmetic."
+  },
+  "decisionClosest": "Closest",
+  "@decisionClosest": {
+    "description": "Ranking label in the results decision header (#4090): the least driving."
+  },
+  "decisionReasonBestValue": "Best balance of price and detour",
+  "@decisionReasonBestValue": {
+    "description": "The reason line under the Best value row of the decision header (#4090)."
+  },
+  "decisionReasonSaves": "Saves {amount} on {volume} · {distance} more driving",
+  "@decisionReasonSaves": {
+    "description": "The reason line under a cheaper-but-further row of the decision header (#4090). Both halves of the trade are stated: what the pump price saves at the assumed quantity, and the extra driving it costs. Never a net figure presented as a verdict.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "volume": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "decisionReasonBreakEven": "Only worth the detour from {volume} up",
+  "@decisionReasonBreakEven": {
+    "description": "The reason line when a cheaper station's detour eats the saving at the assumed quantity (#4090). The break-even volume from the economics spec, stated as the condition it is.",
+    "placeholders": {
+      "volume": {
+        "type": "String"
+      }
+    }
+  },
+  "decisionValueUnavailable": "Record a fill-up and the detour can be priced, not just the pump",
+  "@decisionValueUnavailable": {
+    "description": "Replaces the Best value row when no consumption figure exists (#4090). The header states why the ranking is missing rather than fabricating a recommendation — economics spec section 4.1."
+  },
+  "decisionShowAll": "{count, plural, =1{Show the one station} other{Show all {count} stations}}",
+  "@decisionShowAll": {
+    "description": "Closes the decision header (#4090) and scrolls on to the full list.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "decisionAssumption": "Based on {consumption} and {volume}",
+  "@decisionAssumption": {
+    "description": "The assumptions the decision header's arithmetic rests on, shown as the assumptions they are (#4090). Consumption is the vehicle's measured or estimated figure; volume is the assumed purchase.",
+    "placeholders": {
+      "consumption": {
+        "type": "String"
+      },
+      "volume": {
+        "type": "String"
+      }
+    }
+  },
+  "shellSwipeCoachMark": "Swipe down — or double-tap the bar — to use the whole screen",
+  "@shellSwipeCoachMark": {
+    "description": "One-time coach mark teaching the swipe-away gesture (#4106/#4107). Names BOTH gestures and what they gain; shown once ever, retires itself after 7s, dismissed by performing it, tapping it, or its Dismiss button."
+  },
   "shellBarHiddenAnnounce": "Navigation hidden. Swipe up from the bottom, or long-press the button, to bring it back.",
   "@shellBarHiddenAnnounce": {
     "description": "Announced to assistive technologies when the user swipes the bottom navigation bar away (#4097). It names BOTH ways back, because a hidden bar with no affordance is a dead end."

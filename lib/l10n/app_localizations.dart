@@ -5456,6 +5456,72 @@ abstract class AppLocalizations {
   /// **'The Consumption tab was hidden by your profile settings.'**
   String get consumptionTabHiddenNotice;
 
+  /// Tooltip and screen-reader label on the small country flag each result carries (#4105). Names the country and the open-data service the price came from, so the flag on a card means the same thing as the flag on the summary bar.
+  ///
+  /// In en, this message translates to:
+  /// **'Prices from {country} — {source}'**
+  String stationSourceFlagTooltip(String country, String source);
+
+  /// Ranking label in the results decision header (#4090): the station with the lowest effective price per litre once the detour's fuel is counted.
+  ///
+  /// In en, this message translates to:
+  /// **'Best value'**
+  String get decisionBestValue;
+
+  /// Ranking label in the results decision header (#4090): the lowest pump price, before any detour arithmetic.
+  ///
+  /// In en, this message translates to:
+  /// **'Cheapest'**
+  String get decisionCheapest;
+
+  /// Ranking label in the results decision header (#4090): the least driving.
+  ///
+  /// In en, this message translates to:
+  /// **'Closest'**
+  String get decisionClosest;
+
+  /// The reason line under the Best value row of the decision header (#4090).
+  ///
+  /// In en, this message translates to:
+  /// **'Best balance of price and detour'**
+  String get decisionReasonBestValue;
+
+  /// The reason line under a cheaper-but-further row of the decision header (#4090). Both halves of the trade are stated: what the pump price saves at the assumed quantity, and the extra driving it costs. Never a net figure presented as a verdict.
+  ///
+  /// In en, this message translates to:
+  /// **'Saves {amount} on {volume} · {distance} more driving'**
+  String decisionReasonSaves(String amount, String volume, String distance);
+
+  /// The reason line when a cheaper station's detour eats the saving at the assumed quantity (#4090). The break-even volume from the economics spec, stated as the condition it is.
+  ///
+  /// In en, this message translates to:
+  /// **'Only worth the detour from {volume} up'**
+  String decisionReasonBreakEven(String volume);
+
+  /// Replaces the Best value row when no consumption figure exists (#4090). The header states why the ranking is missing rather than fabricating a recommendation — economics spec section 4.1.
+  ///
+  /// In en, this message translates to:
+  /// **'Record a fill-up and the detour can be priced, not just the pump'**
+  String get decisionValueUnavailable;
+
+  /// Closes the decision header (#4090) and scrolls on to the full list.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Show the one station} other{Show all {count} stations}}'**
+  String decisionShowAll(int count);
+
+  /// The assumptions the decision header's arithmetic rests on, shown as the assumptions they are (#4090). Consumption is the vehicle's measured or estimated figure; volume is the assumed purchase.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on {consumption} and {volume}'**
+  String decisionAssumption(String consumption, String volume);
+
+  /// One-time coach mark teaching the swipe-away gesture (#4106/#4107). Names BOTH gestures and what they gain; shown once ever, retires itself after 7s, dismissed by performing it, tapping it, or its Dismiss button.
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe down — or double-tap the bar — to use the whole screen'**
+  String get shellSwipeCoachMark;
+
   /// Announced to assistive technologies when the user swipes the bottom navigation bar away (#4097). It names BOTH ways back, because a hidden bar with no affordance is a dead end.
   ///
   /// In en, this message translates to:

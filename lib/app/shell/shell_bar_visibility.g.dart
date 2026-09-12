@@ -155,3 +155,78 @@ abstract class _$ShellBarHidden extends $Notifier<bool> {
     element.handleCreate(ref, build);
   }
 }
+
+/// Whether the swipe-away coach mark has been shown (#4106).
+///
+/// Once ever, like the #1690 swipe-between-tabs hint: a gesture needs
+/// introducing exactly one time, and a hint that returns is an
+/// annoyance rather than help.
+
+@ProviderFor(ShellSwipeCoachSeen)
+final shellSwipeCoachSeenProvider = ShellSwipeCoachSeenProvider._();
+
+/// Whether the swipe-away coach mark has been shown (#4106).
+///
+/// Once ever, like the #1690 swipe-between-tabs hint: a gesture needs
+/// introducing exactly one time, and a hint that returns is an
+/// annoyance rather than help.
+final class ShellSwipeCoachSeenProvider
+    extends $NotifierProvider<ShellSwipeCoachSeen, bool> {
+  /// Whether the swipe-away coach mark has been shown (#4106).
+  ///
+  /// Once ever, like the #1690 swipe-between-tabs hint: a gesture needs
+  /// introducing exactly one time, and a hint that returns is an
+  /// annoyance rather than help.
+  ShellSwipeCoachSeenProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'shellSwipeCoachSeenProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$shellSwipeCoachSeenHash();
+
+  @$internal
+  @override
+  ShellSwipeCoachSeen create() => ShellSwipeCoachSeen();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$shellSwipeCoachSeenHash() =>
+    r'5c7ececb81dcad55eae47f7e5d25ed0536321bd7';
+
+/// Whether the swipe-away coach mark has been shown (#4106).
+///
+/// Once ever, like the #1690 swipe-between-tabs hint: a gesture needs
+/// introducing exactly one time, and a hint that returns is an
+/// annoyance rather than help.
+
+abstract class _$ShellSwipeCoachSeen extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<bool, bool>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<bool, bool>,
+              bool,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}

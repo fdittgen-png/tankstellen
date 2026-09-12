@@ -2984,6 +2984,57 @@ class AppLocalizationsDe extends AppLocalizations {
       'Der Verbrauch-Tab wurde durch deine Profileinstellungen ausgeblendet.';
 
   @override
+  String stationSourceFlagTooltip(String country, String source) {
+    return 'Preise aus $country — $source';
+  }
+
+  @override
+  String get decisionBestValue => 'Bester Wert';
+
+  @override
+  String get decisionCheapest => 'Günstigster';
+
+  @override
+  String get decisionClosest => 'Nächster';
+
+  @override
+  String get decisionReasonBestValue => 'Bestes Verhältnis von Preis und Umweg';
+
+  @override
+  String decisionReasonSaves(String amount, String volume, String distance) {
+    return 'Spart $amount bei $volume · $distance mehr Fahrt';
+  }
+
+  @override
+  String decisionReasonBreakEven(String volume) {
+    return 'Der Umweg lohnt sich erst ab $volume';
+  }
+
+  @override
+  String get decisionValueUnavailable =>
+      'Tankvorgang erfassen — dann lässt sich der Umweg mitrechnen, nicht nur der Preis';
+
+  @override
+  String decisionShowAll(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Alle $count Stationen anzeigen',
+      one: 'Die eine Station anzeigen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String decisionAssumption(String consumption, String volume) {
+    return 'Basis: $consumption und $volume';
+  }
+
+  @override
+  String get shellSwipeCoachMark =>
+      'Nach unten wischen oder doppelt auf die Leiste tippen, um den ganzen Bildschirm zu nutzen';
+
+  @override
   String get shellBarHiddenAnnounce =>
       'Navigation ausgeblendet. Von unten nach oben wischen oder die Taste lange drücken, um sie zurückzuholen.';
 
