@@ -4,6 +4,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../perf/startup_timer.dart';
+import 'hive_first_frame_boxes.dart';
 import 'hive_cipher_loader.dart';
 import 'impl/hive_directory_resolver.dart';
 import 'hive_isolate_boxes.dart';
@@ -210,12 +212,18 @@ class HiveBoxes {
   /// nine deep-feature boxes in [_deferredBoxes] move to [initDeferred],
   /// which the app-initializer kicks after the first frame. Every box
   /// `init()` opens is still open before it returns.
+  /// #4110 — the marks below are INSIDE this method because one
+  /// `hive_init` phase around it owned 8,855 ms of an 8,891 ms cold
+  /// start and could not say which kind of work did. [HiveOpenTiming]
+  /// names the slowest single box; see it for why the phase cannot.
   static Future<void> init() async {
     // #3747 — on iOS the base dir is Application Support (out of the
     // UIFileSharingEnabled Documents surface), with a one-time move of
     // the legacy box files; elsewhere identical to Hive.initFlutter().
     await HiveDirectoryResolver.initHive();
+    StartupTimer.instance.mark('hive_dir');
     final cipher = await HiveCipherLoader.loadGuarded();
+    StartupTimer.instance.mark('hive_cipher');
 
     // Phase 1 — migrate any pre-encryption plaintext boxes. The probes
     // are independent, so they (and any migration) run in parallel.
@@ -223,36 +231,10 @@ class HiveBoxes {
       _encryptedBoxes.map((boxName) =>
           HiveLegacyMigration.migrateLegacyPlaintextBox(boxName, cipher)),
     );
+    StartupTimer.instance.mark('hive_migrate');
 
-    // Phase 2 — open the first-frame-critical boxes in one parallel
-    // batch. #1686 — a box damaged beyond Hive's crash recovery throws
-    // here; it is re-tagged as a HiveCorruptionException for the startup
-    // error path rather than crashing on a raw HiveError.
-    try {
-      await Future.wait<Box<dynamic>>([
-        Hive.openBox(settings, encryptionCipher: cipher),
-        Hive.openBox(profiles, encryptionCipher: cipher),
-        Hive.openBox(favorites, encryptionCipher: cipher),
-        Hive.openBox(cache, encryptionCipher: cipher),
-        Hive.openBox(priceHistory, encryptionCipher: cipher),
-        Hive.openBox(alerts, encryptionCipher: cipher),
-        // #1105 — isolate error spool: the background isolate writes
-        // here before Riverpod is available, so it must be open now.
-        Hive.openBox<String>(isolateErrorSpool),
-        // #1373 — central feature-flag set: read during the first build.
-        Hive.openBox<dynamic>(featureFlags),
-        // #1517 — active "use mode" profile: gates the first route.
-        Hive.openBox<dynamic>(appProfile),
-        // #1686 — schema-version meta box. Unencrypted: small integers.
-        Hive.openBox<int>(boxSchema),
-      ]);
-      // HiveError is Hive's runtime storage-failure type, not a bug.
-    } on HiveError catch (e, st) { // ignore: avoid_catching_errors
-      // #3979 — keep Hive's own stack (a plain throw dropped the frame
-      // naming the corrupt box).
-      Error.throwWithStackTrace(HiveCorruptionException(
-          'a storage box could not be opened (${e.message})'), st);
-    }
+    await HiveFirstFrameBoxes.openAll(cipher);
+    StartupTimer.instance.mark('hive_open');
 
     // #2670 — the main isolate owns these for the whole app lifetime; a
     // foreground background scan's closeIsolateBoxes() must never close them.
@@ -261,6 +243,7 @@ class HiveBoxes {
     // #1686 stamp missing schema versions + #2922 run the cache eviction for
     // any box whose stamp is below currentSchemaVersion.
     await _ensureSchemaVersions();
+    StartupTimer.instance.mark('hive_schema');
   }
 
   /// Every box the main isolate will EVER open — first-frame and deferred
