@@ -24,7 +24,7 @@ import '../theme/spacing.dart';
 /// grammar moved from "elevated filled card" to "outlined primary card".
 ///
 /// Frame grammar:
-/// * margin [Spacing.surfaceMargin] (12 horizontal / 8 vertical)
+/// * margin [Spacing.listCardMargin] (12 horizontal / 4 vertical — #4091)
 /// * `Clip.antiAlias`
 /// * fill `surfaceContainerLow`, 1 dp `outlineVariant` edge, elevation 0
 ///   (elevation is reserved for things that float)
@@ -60,7 +60,7 @@ class StationCardShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Card(
-      margin: Spacing.surfaceMargin,
+      margin: Spacing.listCardMargin,
       clipBehavior: Clip.antiAlias,
       elevation: 0,
       color: scheme.surfaceContainerLow,

@@ -14,12 +14,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/station.dart';
+import 'package:tankstellen/core/domain/station_amenity.dart';
 import 'package:tankstellen/core/theme/app_text.dart';
 import 'package:tankstellen/core/widgets/brand_logo.dart';
 import 'package:tankstellen/features/search/presentation/widgets/station_card.dart';
 
 import '../../../../fixtures/stations.dart';
 import '../../../../helpers/pump_app.dart';
+
+const _stationWithFacilities = Station(
+  id: 'facilities',
+  name: 'Tankstelle',
+  brand: 'ARAL',
+  street: 'Leipziger Str.',
+  postCode: '10117',
+  place: 'Berlin',
+  lat: 52.51,
+  lng: 13.39,
+  dist: 2.5,
+  e10: 1.809,
+  isOpen: true,
+  updatedAt: '10:30',
+  amenities: {
+    StationAmenity.shop,
+    StationAmenity.carWash,
+    StationAmenity.airPump,
+    StationAmenity.toilet,
+  },
+);
 
 const _station24h = Station(
   id: '24h-station',
@@ -128,15 +150,19 @@ void main() {
       expect(mark, findsOneWidget);
       expect(tester.getTopLeft(mark).dx, lessThan(tester.getTopLeft(price).dx));
 
-      // The title (brand) and address are BELOW the headline row.
+      // The title (brand) and the place line are BELOW the headline row.
+      // #4091 — the place line, not the street: the postal address left
+      // the card for the detail screen.
       final title = find.text('STAR');
       expect(tester.getTopLeft(title).dy, greaterThan(tester.getBottomLeft(price).dy - 1));
-      final address = find.textContaining('Hauptstr.');
-      expect(tester.getTopLeft(address).dy, greaterThan(tester.getTopLeft(title).dy));
+      expect(find.textContaining('Hauptstr.'), findsNothing,
+          reason: 'the street belongs to the detail screen now (#4091)');
+      final place = find.textContaining('Berlin');
+      expect(tester.getTopLeft(place).dy, greaterThan(tester.getTopLeft(title).dy));
     });
 
-    testWidgets('name is the title role, address the body role, distance '
-        'the label role', (tester) async {
+    testWidgets('name is the title role, the place line the body role, '
+        'freshness the label role', (tester) async {
       late BuildContext ctx;
       await pumpAt320(
         tester,
@@ -155,16 +181,15 @@ void main() {
       expect(title.style?.fontSize, AppText.title(ctx).fontSize);
       expect(title.style?.fontWeight, FontWeight.w600);
 
-      final address = tester.widget<Text>(find.textContaining('Hauptstr.'));
-      expect(address.style?.fontSize, AppText.body(ctx).fontSize);
-
+      // #4091 — place and distance share the body-role line.
+      final place = tester.widget<Text>(find.textContaining('Berlin'));
+      expect(place.style?.fontSize, AppText.body(ctx).fontSize);
       final distance = tester.widget<Text>(find.textContaining('1,5 km'));
-      expect(distance.style?.fontSize, AppText.label(ctx).fontSize);
+      expect(distance.style?.fontSize, AppText.body(ctx).fontSize);
     });
 
-    testWidgets('distance · freshness · status share ONE label line', (
-      tester,
-    ) async {
+    testWidgets('place · distance is one line, and freshness · status is '
+        'the one label line under it (#4091)', (tester) async {
       await pumpAt320(
         tester,
         const StationCard(
@@ -180,11 +205,18 @@ void main() {
       expect(updated, findsOneWidget);
       expect(dot, findsOneWidget);
 
-      final distanceCenter = tester.getCenter(distance).dy;
-      expect(tester.getCenter(updated).dy, closeTo(distanceCenter, 8));
-      expect(tester.getCenter(dot).dy, closeTo(distanceCenter, 8));
-      // Left to right: distance, freshness, dot.
-      expect(tester.getTopLeft(distance).dx, lessThan(tester.getTopLeft(updated).dx));
+      // The town and the distance share their line, in that order.
+      final place = find.textContaining('Berlin');
+      expect(tester.getCenter(distance).dy,
+          closeTo(tester.getCenter(place).dy, 8));
+      expect(tester.getTopLeft(place).dx,
+          lessThan(tester.getTopLeft(distance).dx));
+
+      // Freshness and the status dot share the label line BELOW it.
+      expect(tester.getCenter(dot).dy,
+          closeTo(tester.getCenter(updated).dy, 8));
+      expect(tester.getTopLeft(updated).dy,
+          greaterThan(tester.getTopLeft(distance).dy));
       expect(tester.getTopLeft(updated).dx, lessThan(tester.getTopLeft(dot).dx));
     });
 
@@ -299,4 +331,70 @@ void main() {
       expect(title.style?.color, Theme.of(ctx).colorScheme.onSurface);
     });
   });
+  /// #4091 — the target is not a pixel height, it is how many stations a
+  /// driver can compare without scrolling. Six on a typical phone, and
+  /// still four when the OS text size is turned up — because the people
+  /// most likely to raise it are the people least well served by a list
+  /// that shows two rows.
+  group('StationCard — comparison density (#4091)', () {
+    /// The list area of a current phone (393 × 852 logical) once the
+    /// shell's chrome is taken out: status bar, app bar and bottom bar.
+    /// Measuring against the whole screen would flatter the card.
+    const phone = Size(393, 852);
+    const chrome = 168.0;
+    final listArea = phone.height - chrome;
+
+    Future<double> cardHeight(WidgetTester tester,
+        {required double textScale, Station station = testStation}) async {
+      tester.view.physicalSize = phone;
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await pumpScaledApp(
+        tester,
+        StationCard(station: station, selectedFuelType: FuelType.e10),
+        textScaleFactor: textScale,
+      );
+      expect(tester.takeException(), isNull);
+      return tester.getSize(find.byType(StationCard)).height;
+    }
+
+    testWidgets('five stations are comparable at the default text size',
+        (tester) async {
+      final height = await cardHeight(tester, textScale: 1.0);
+      expect(
+        listArea / height,
+        greaterThanOrEqualTo(5),
+        reason: 'a $height dp card fits only '
+            '${(listArea / height).floor()} rows in $listArea dp of list',
+      );
+    });
+
+    testWidgets('four are still comparable at 1.3x text', (tester) async {
+      final height = await cardHeight(tester, textScale: 1.3);
+      expect(
+        listArea / height,
+        greaterThanOrEqualTo(4),
+        reason: 'a $height dp card at 1.3x fits only '
+            '${(listArea / height).floor()} rows',
+      );
+    });
+
+    testWidgets('a station with facilities costs ONE line for them, not a '
+        'wrapped row of pills', (tester) async {
+      final bare = await cardHeight(tester, textScale: 1.0);
+      final withFacilities = await cardHeight(
+        tester,
+        textScale: 1.0,
+        station: _stationWithFacilities,
+      );
+      expect(
+        withFacilities - bare,
+        lessThanOrEqualTo(24),
+        reason: 'facilities added ${withFacilities - bare} dp; a compact '
+            'summary line is worth about one line of label type',
+      );
+    });
+  });
+
 }

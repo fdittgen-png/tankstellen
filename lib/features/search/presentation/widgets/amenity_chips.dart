@@ -59,16 +59,26 @@ class AmenityChips extends StatelessWidget {
     );
   }
 
-  String _localizedLabel(StationAmenity a, AppLocalizations l10n) {
-    return switch (a) {
-      StationAmenity.shop => l10n.amenityShop,
-      StationAmenity.carWash => l10n.amenityCarWash,
-      StationAmenity.airPump => l10n.amenityAirPump,
-      StationAmenity.toilet => l10n.amenityToilet,
-      StationAmenity.restaurant => l10n.amenityRestaurant,
-      StationAmenity.atm => l10n.amenityAtm,
-      StationAmenity.wifi => l10n.amenityWifi,
-      StationAmenity.ev => l10n.amenityEv,
-    };
-  }
+  String _localizedLabel(StationAmenity a, AppLocalizations l10n) =>
+      localizedAmenityLabel(a, l10n);
+}
+
+/// The localized name of an amenity — one switch, so the detail screen's
+/// chips and the result card's compact summary (#4091) can never drift
+/// apart on what a facility is called.
+///
+/// Not to be confused with the English-only `amenityLabel` in
+/// `core/domain/station_amenity.dart`, which predates localization and
+/// has no production caller left.
+String localizedAmenityLabel(StationAmenity a, AppLocalizations l10n) {
+  return switch (a) {
+    StationAmenity.shop => l10n.amenityShop,
+    StationAmenity.carWash => l10n.amenityCarWash,
+    StationAmenity.airPump => l10n.amenityAirPump,
+    StationAmenity.toilet => l10n.amenityToilet,
+    StationAmenity.restaurant => l10n.amenityRestaurant,
+    StationAmenity.atm => l10n.amenityAtm,
+    StationAmenity.wifi => l10n.amenityWifi,
+    StationAmenity.ev => l10n.amenityEv,
+  };
 }

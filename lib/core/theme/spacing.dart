@@ -47,4 +47,14 @@ abstract class Spacing {
   /// [md] (8) vertical. The 12 dp gutter separates content from the page
   /// edge; the 8 dp rhythm separates one card from the next (#3948).
   static const surfaceMargin = EdgeInsets.symmetric(horizontal: lg, vertical: md);
+
+  /// The margin every station card in a LIST carries (#4091).
+  ///
+  /// Half the vertical breathing room of [surfaceMargin]: a card in a
+  /// scrolling comparison is separated from its neighbours by its own
+  /// edge, not by a gutter, and the gutter was costing a full row of
+  /// comparison per screen. Horizontal is unchanged — the screen gutter
+  /// is a page-level rhythm, not a per-card one.
+  static const listCardMargin =
+      EdgeInsets.symmetric(horizontal: lg, vertical: sm);
 }

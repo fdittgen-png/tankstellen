@@ -19,6 +19,7 @@ import 'package:tankstellen/core/theme/spacing.dart';
 import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/core/domain/station_amenity.dart';
 import 'package:tankstellen/features/search/presentation/widgets/amenity_chips.dart';
+import 'package:tankstellen/features/search/presentation/widgets/results/amenity_summary.dart';
 import 'package:tankstellen/features/search/presentation/widgets/station_card.dart';
 
 import '../../../../helpers/pump_app.dart';
@@ -36,15 +37,19 @@ void main() {
       expect(find.text('STAR'), findsOneWidget);
     });
 
-    testWidgets('renders station address', (tester) async {
+    testWidgets('#4091 — renders the TOWN and the distance, not the postal '
+        'address', (tester) async {
       await pumpApp(
         tester,
         const StationCard(station: testStation, selectedFuelType: FuelType.e10),
       );
 
-      // Address + postcode combined on one line when brand is shown
-      expect(find.textContaining('Hauptstr.'), findsOneWidget);
-      expect(find.textContaining('10115'), findsOneWidget);
+      expect(find.textContaining('Berlin'), findsOneWidget);
+      expect(find.textContaining('1,5 km'), findsOneWidget);
+      // The street and post code belong to the detail screen: nobody
+      // picks a forecourt by its house number.
+      expect(find.textContaining('Hauptstr.'), findsNothing);
+      expect(find.textContaining('10115'), findsNothing);
     });
 
     testWidgets('brand-less CRE station shows full name as title and NO orphan '
@@ -474,9 +479,8 @@ void main() {
       },
     );
 
-    testWidgets('renders amenity chips on single horizontal line', (
-      tester,
-    ) async {
+    testWidgets('#4091 — facilities are ONE compact line, not a wrap of '
+        'chips', (tester) async {
       const stationWithAmenities = Station(
         id: 'amenity-test',
         name: 'Test Station',
@@ -505,8 +509,19 @@ void main() {
         ),
       );
 
-      // AmenityChips widget should be rendered
-      expect(find.byType(AmenityChips), findsOneWidget);
+      // Two named, the rest counted — one line, no pills.
+      expect(find.byType(AmenitySummary), findsOneWidget);
+      expect(find.byType(AmenityChips), findsNothing,
+          reason: 'the wrap of bordered pills cost the card two rows');
+      expect(find.textContaining('+2'), findsOneWidget);
+      // …and the count is never opaque: the hidden facilities are spoken.
+      final summary = tester.widget<Tooltip>(
+        find.descendant(
+          of: find.byType(AmenitySummary),
+          matching: find.byType(Tooltip),
+        ),
+      );
+      expect(summary.message, contains('Air'));
     });
 
     testWidgets('calls onFavoriteTap when favorite button tapped', (
@@ -1131,7 +1146,7 @@ void main() {
     });
 
     group('card polish (#592)', () {
-      testWidgets('card carries the grammar surface margin (#3948)', (
+      testWidgets('card carries the list-card margin (#3948 / #4091)', (
         tester,
       ) async {
         await pumpApp(
@@ -1143,7 +1158,9 @@ void main() {
         );
 
         final card = tester.widget<Card>(find.byType(Card).first);
-        expect(card.margin, Spacing.surfaceMargin);
+        // #4091 — half the vertical gutter of a standalone surface: in a
+        // scrolling comparison the gutter was costing a whole row.
+        expect(card.margin, Spacing.listCardMargin);
       });
 
       testWidgets('card is a primary card: outlined, no elevation (#3948)', (
@@ -1252,11 +1269,18 @@ void main() {
           findsOneWidget,
           reason: 'name-less, brand-less station shows the localized label',
         );
-        // The street survives on the address subtitle line.
+        // #4091 — the street left the card entirely (it lives on the
+        // detail screen now). What the row shows is the TOWN, which is
+        // what a driver compares, and never the sentinel or the street.
         expect(
           find.textContaining('26 AVENUE DE VERDUN'),
+          findsNothing,
+          reason: 'the postal address is the detail screen\'s job (#4091)',
+        );
+        expect(
+          find.textContaining('Pézenas'),
           findsOneWidget,
-          reason: 'the street is kept as the address subtitle',
+          reason: 'the place line names the town',
         );
       },
     );
@@ -1301,36 +1325,29 @@ void main() {
     });
 
     testWidgets(
-      'the all-fuels stripe is a VISIBLE colour, not the invisible grey',
+      '#4091 — the all-fuels view has no per-row stripe either; #2493\'s '
+      'invisible-grey trap is gone with the decorative stripe itself',
       (tester) async {
-        late Color primary;
         await pumpApp(
           tester,
-          Builder(
-            builder: (context) {
-              primary = Theme.of(context).colorScheme.primary;
-              return const StationCard(
-                station: testStation,
-                selectedFuelType: FuelType.all,
-              );
-            },
+          const StationCard(
+            station: testStation,
+            selectedFuelType: FuelType.all,
           ),
         );
 
         final shell = tester.widget<StationCardShell>(
           find.byType(StationCardShell),
         );
-        // #2493 — the all-fuels stripe must be the forest-green primary,
-        // never the near-invisible neutral grey `#6F6F6F` returned by
-        // FuelColors.forType(FuelType.all).
-        expect(shell.stripeColor, primary);
-        expect(shell.stripeColor, isNot(const Color(0xFF6F6F6F)));
+        // #2493 fixed a near-invisible neutral grey `#6F6F6F` stripe by
+        // substituting the primary. There is no fuel-derived stripe left
+        // to be invisible — the accent is spent on the cheapest row only.
+        expect(shell.stripeColor, isNull);
       },
     );
 
-    testWidgets('a single concrete fuel uses its fuel stripe colour', (
-      tester,
-    ) async {
+    testWidgets('#4091 — an ordinary row has NO stripe: the accent is '
+        'semantic, not decorative', (tester) async {
       await pumpApp(
         tester,
         const StationCard(
@@ -1341,7 +1358,10 @@ void main() {
       final shell = tester.widget<StationCardShell>(
         find.byType(StationCardShell),
       );
-      expect(shell.stripeColor, FuelColors.forType(FuelType.diesel));
+      expect(shell.stripeColor, isNull,
+          reason: 'the fuel colour on every row told the user only what '
+              'they had already chosen — twenty rows of decoration '
+              'reading as twenty rows of signal');
     });
 
     testWidgets('the cheapest card widens the stripe and uses success', (
