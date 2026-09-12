@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../core/error/guarded.dart';
-import '../core/storage/storage_providers.dart';
 import '../core/utils/frame_callbacks.dart';
 import '../core/widgets/snackbar_helper.dart';
 import '../features/feature_management/application/feature_flags_provider.dart';
@@ -21,6 +20,7 @@ import '../core/navigation/search_fab_action_provider.dart';
 import 'shell/shell_bottom_bar.dart';
 import 'shell/shell_destinations.dart';
 import 'shell/shell_nav_rail.dart';
+import 'shell/shell_swipe_hint.dart';
 import '../core/utils/edge_to_edge.dart';
 
 /// The main app shell with adaptive navigation.
@@ -84,7 +84,7 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
       ref.read(currentShellBranchProvider.notifier).set(_currentIndex);
       // #1690 — one-time first-run hint that the tabs can be swiped
       // between (the gesture is otherwise undiscoverable).
-      unawaited(_maybeShowSwipeHint());
+      unawaited(ShellSwipeHint.maybeShow(context, ref));
     });
 
     _iconControllers = List.generate(
@@ -201,33 +201,6 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
       _goToPage(_branchForSlot[slot + 1]);
     } else if (velocity > 0 && slot > 0) {
       _goToPage(_branchForSlot[slot - 1]);
-    }
-  }
-
-  /// SettingsStorage key for the one-time swipe-between-tabs hint.
-  static const String _swipeHintStorageKey = 'shell_swipe_hint_shown';
-
-  /// #1690 — surface a one-time hint that the tabs respond to a
-  /// horizontal swipe (an otherwise undiscoverable gesture). Shown once
-  /// ever, gated on a [SettingsStorage] flag; best-effort so a missing
-  /// settings box in a widget test simply skips the hint.
-  Future<void> _maybeShowSwipeHint() async {
-    try {
-      final settings = ref.read(settingsStorageProvider);
-      if (settings.getSetting(_swipeHintStorageKey) == true) return;
-      await settings.putSetting(_swipeHintStorageKey, true);
-      if (!mounted) return;
-      final l10n = AppLocalizations.of(context);
-      // #2173 — route through SnackBarHelper so the liveRegion announce
-      // (#1692) isn't bypassed; plain info, no visual change.
-      SnackBarHelper.show(
-        context,
-        l10n.swipeBetweenTabsHint,
-        duration: const Duration(seconds: 5),
-      );
-    } catch (e, st) {
-      // #3143 — release-visible: debugPrint is no-opped in release.
-      logFailure(e, st, where: 'ShellScreen swipe hint');
     }
   }
 
@@ -384,6 +357,9 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
       // #520 — see comment in the wide-screen branch above. Same fix,
       // applied to the compact Scaffold that hosts the bottom nav.
       primary: false,
+      // #4084 — bodies run behind the bar so the notch shows the map; every
+      // branch root is a PageScaffold, which self-insets unless it opts out.
+      extendBody: true,
       body: body,
       bottomNavigationBar: ShellBottomBar(
         items: visibleDestinations,

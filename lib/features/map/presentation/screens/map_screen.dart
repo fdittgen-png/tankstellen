@@ -219,6 +219,7 @@ class _MapScreenState extends ConsumerState<MapScreen>
         const SettingsAppBarAction(),
       ],
       bodyPadding: EdgeInsets.zero,
+      bodyBehindBottomBar: true, // #4084 — the map shows through the notch
       body: RepaintBoundary(
         key: _shareBoundaryKey,
         child: Column(

@@ -15,7 +15,6 @@ import 'station_cluster_layers.dart';
 import 'station_map_body.dart';
 import 'station_marker.dart';
 import 'station_marker_model_builder.dart';
-import '../../../../core/theme/shell_metrics.dart';
 
 /// Camera zoom bounds (#1457). Top end matches the OSM tile cap so a
 /// `move(camera.zoom + 1)` past the cap doesn't park the user on a
@@ -344,12 +343,12 @@ class _StationMapLayersState extends State<StationMapLayers> {
         // Price legend — #3002: hidden on the driving map so it never sits
         // under the oversized driving bottom bar.
         if (widget.showLegend)
-          const Positioned(
+          Positioned(
             left: 16,
-            // #4080 — the body runs to the bar now; keep the legend clear
-            // of the centre button's arc.
-            bottom: 16 + kShellButtonRise,
-            child: PriceLegend(),
+            // #4084 — the map runs behind the bar; the bar's height is the
+            // bottom padding, so the legend sits 16 above the bar as before.
+            bottom: 16 + MediaQuery.paddingOf(context).bottom,
+            child: const PriceLegend(),
           ),
       ],
     );

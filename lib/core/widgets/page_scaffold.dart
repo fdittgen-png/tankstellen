@@ -67,6 +67,14 @@ class PageScaffold extends StatelessWidget {
   /// content (map screen).
   final EdgeInsets? bodyPadding;
 
+  /// #4084 — the shell runs branch bodies behind its bottom bar
+  /// (`extendBody`) so the docked button's notch shows the branch through
+  /// it. By default this scaffold insets itself by the bar's height so
+  /// lists, floating buttons and sheets keep today's geometry; a screen
+  /// whose body IS the thing that should show through — the map — sets
+  /// this and positions its own overlays by `MediaQuery.padding.bottom`.
+  final bool bodyBehindBottomBar;
+
   /// Optional FAB. Passed through to [Scaffold.floatingActionButton].
   final Widget? floatingActionButton;
 
@@ -123,6 +131,7 @@ class PageScaffold extends StatelessWidget {
     this.bannerIcon,
     this.actions,
     this.bodyPadding,
+    this.bodyBehindBottomBar = false,
     this.floatingActionButton,
     this.floatingActionButtonLocation,
     this.leading,
@@ -146,7 +155,7 @@ class PageScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectivePadding = bodyPadding ?? Spacing.screenPadding;
-    return Scaffold(
+    final scaffold = Scaffold(
       appBar: AppBar(
         title: titleWidget ?? Semantics(header: true, child: Text(title!)),
         actions: actions,
@@ -177,6 +186,10 @@ class PageScaffold extends StatelessWidget {
       floatingActionButtonLocation: floatingActionButtonLocation,
       bottomNavigationBar: bottomNavigationBar,
     );
+    if (bodyBehindBottomBar) return scaffold;
+    // The shell's bar height arrives as MediaQuery.padding.bottom; consume
+    // it here once so nothing inside double-insets.
+    return SafeArea(top: false, child: scaffold);
   }
 }
 
