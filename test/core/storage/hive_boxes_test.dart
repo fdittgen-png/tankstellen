@@ -295,11 +295,16 @@ void main() {
           dotAll: true,
         ).firstMatch(source);
         expect(initMatch, isNotNull);
-        // #4110 — one Future.wait is in init() (the migration probes) and
-        // one is in openAll() (the box batch). Counting across both is
-        // what the assertion always meant: nothing on the cold-start
-        // critical path waits on anything it need not.
-        final initBody = initMatch!.group(1)! + opensSource;
+        // #4110 — the two parallel batches moved out of init(): the box
+        // opens to openAll(), and the migration probes to
+        // HiveLegacyMigration.runOnce when they were gated to run once
+        // ever. Counting across all three is what the assertion always
+        // meant: nothing on the cold-start critical path waits on
+        // anything it need not.
+        final initBody = initMatch!.group(1)! +
+            opensSource +
+            File('lib/core/storage/hive_legacy_migration.dart')
+                .readAsStringSync();
 
         // The ~18 boxes have no inter-box ordering dependency and all
         // sit on the cold-start critical path. They must open
