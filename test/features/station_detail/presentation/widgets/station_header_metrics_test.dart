@@ -12,6 +12,7 @@ import 'package:tankstellen/features/station_detail/presentation/widgets/station
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../../../../fixtures/stations.dart';
+import 'package:tankstellen/core/theme/shell_metrics.dart';
 
 /// #3902 — the compact sliver header is sized from its content, so the
 /// band ends `kHeaderBottomInset` under the address instead of leaving a
@@ -70,7 +71,7 @@ void main() {
     testWidgets('budgets toolbar + status row + the painted brand header + '
         'insets — nothing more', (tester) async {
       final m = await measure(tester, testStation);
-      final floor = kToolbarHeight +
+      final floor = kAppToolbarHeight +
           kHeaderTopGap +
           kStatusDotSize +
           kHeaderStatusGap +
@@ -92,7 +93,7 @@ void main() {
       expect(
         scaled.expanded,
         greaterThanOrEqualTo(
-          kToolbarHeight +
+          kAppToolbarHeight +
               kHeaderTopGap +
               kStatusDotSize +
               kHeaderStatusGap +
@@ -122,7 +123,7 @@ void main() {
       expect(
         narrow.expanded,
         greaterThanOrEqualTo(
-          kToolbarHeight +
+          kAppToolbarHeight +
               kHeaderTopGap +
               kStatusDotSize +
               kHeaderStatusGap +
@@ -149,13 +150,46 @@ void main() {
       expect(
         m.expanded,
         greaterThanOrEqualTo(
-          kToolbarHeight +
+          kAppToolbarHeight +
               kHeaderTopGap +
               kStatusDotSize +
               kHeaderStatusGap +
               m.painted +
               kHeaderBottomInset,
         ),
+      );
+    });
+    // #4081 — the zone line #4076 folded into the header is content the
+    // band must budget for; without it the Prices card clipped the line.
+    testWidgets('budgets the zone line (department, region · kind)',
+        (tester) async {
+      const zoned = Station(
+        id: 's-zoned',
+        name: 'Station Essence Super U',
+        brand: 'Super U',
+        street: '1 Avenue du Mas Viel',
+        postCode: '34290',
+        place: 'Servian',
+        lat: 43.43,
+        lng: 3.30,
+        isOpen: true,
+        department: 'Hérault',
+        region: 'Occitanie',
+        stationType: 'R',
+      );
+      final m = await measure(tester, zoned);
+      expect(
+        m.expanded,
+        greaterThanOrEqualTo(
+          kAppToolbarHeight +
+              kHeaderTopGap +
+              kStatusDotSize +
+              kHeaderStatusGap +
+              m.painted +
+              kHeaderBottomInset,
+        ),
+        reason: 'the painted header (with the zone line) must fit inside '
+            'the expanded band with the bottom inset intact',
       );
     });
   });

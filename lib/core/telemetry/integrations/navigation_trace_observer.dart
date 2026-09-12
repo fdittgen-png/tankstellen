@@ -1,23 +1,37 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../collectors/app_state_collector.dart';
 import '../collectors/breadcrumb_collector.dart';
+import '../../utils/edge_to_edge.dart';
 
 class NavigationTraceObserver extends NavigatorObserver {
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    // #4082 — self-heal the system UI on every navigation: an immersive
+    // screen's exit that missed its restore left a black status band on
+    // whatever came next. Idempotent, one platform call.
+    unawaited(EdgeToEdge.restore());
     _track(route);
   }
 
   @override
   void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    // #4082 — self-heal the system UI on every navigation: an immersive
+    // screen's exit that missed its restore left a black status band on
+    // whatever came next. Idempotent, one platform call.
+    unawaited(EdgeToEdge.restore());
     if (newRoute != null) _track(newRoute);
   }
 
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    // #4082 — self-heal the system UI on every navigation: an immersive
+    // screen's exit that missed its restore left a black status band on
+    // whatever came next. Idempotent, one platform call.
+    unawaited(EdgeToEdge.restore());
     if (previousRoute != null) _track(previousRoute);
   }
 

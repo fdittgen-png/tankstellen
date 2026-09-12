@@ -213,11 +213,15 @@ class SearchSummaryBar extends ConsumerWidget {
             // #3957 — the band is chrome above the results: 2 dp of its own
             // padding, dense pills inside. It used to spend 6.
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-            child: Wrap(
-              spacing: 6,
-              runSpacing: 2,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
+            // #4080 — ONE row, always: a chip that does not fit scrolls
+            // sideways instead of wrapping the band to two rows and
+            // pushing the map down.
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                spacing: 6,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
                 // #3955 — the open-data credit leads the band.
                 const _DataSourceSegment(),
                 SummaryChip(
@@ -263,7 +267,7 @@ class SearchSummaryBar extends ConsumerWidget {
                   ),
                 if (!radarActive) const PriceFreshnessSegment(),
               ],
-            ),
+            )),
           ),
         ),
         ),

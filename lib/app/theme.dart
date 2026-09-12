@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../core/theme/app_radius.dart';
 import '../core/theme/spacing.dart';
+import '../core/theme/shell_metrics.dart';
 
 /// Calm forest-green palette (#1757) — the app's professional default
 /// look, drawn from the green-shield app icon (`#2E7D32`).
@@ -58,6 +59,9 @@ class AppTheme {
   static ThemeData _polish(ThemeData theme) {
     final cs = theme.colorScheme;
     return theme.copyWith(
+      // #4082 — one toolbar height for the whole app; SliverAppBars set it
+      // explicitly since they do not read the theme's.
+      appBarTheme: theme.appBarTheme.copyWith(toolbarHeight: kAppToolbarHeight),
       snackBarTheme: theme.snackBarTheme.copyWith(
         behavior: SnackBarBehavior.floating,
       ),

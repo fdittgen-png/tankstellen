@@ -53,7 +53,6 @@ class ShellBottomBar extends ConsumerWidget {
     // Portrait: the centre button docks into a concave notch carved into
     // the bar's top edge (see _centerButton, #2552). Landscape keeps the
     // bar flat — no head-room.
-    final rise = isLandscape ? 0.0 : 24.0;
 
     final primaryIndex = items.indexWhere((i) => i.isPrimary);
 
@@ -119,13 +118,20 @@ class ShellBottomBar extends ConsumerWidget {
       maxScaleFactor: 1.3,
       child: SafeArea(
         top: false,
+        // #4080 — the widget is exactly the coloured bar. It used to reserve
+        // an extra `rise` strip above it for the protruding centre button,
+        // which every tab body then stopped ABOVE: on the Map that was a
+        // pale band between the map and the bar with the button sitting
+        // half on nothing. The button's protrusion comes from the notch
+        // geometry and the docked FAB location, not from reserved height —
+        // bodies now run to the bar and the button floats over them.
         child: SizedBox(
-          height: barHeight + rise,
+          height: barHeight,
           child: Stack(
             children: [
-              // Coloured bar pinned to the bottom. The top `rise` strip
-              // is where the docked centre button protrudes above the
-              // notch carved into the bar's top edge (#2552).
+              // Coloured bar pinned to the bottom; the docked centre button
+              // protrudes `rise` above the notch carved into its top edge
+              // (#2552).
               Positioned(
                 left: 0,
                 right: 0,
