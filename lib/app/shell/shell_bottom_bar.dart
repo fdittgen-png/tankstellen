@@ -8,8 +8,10 @@ import 'notched_bar_border.dart';
 import '../../core/navigation/search_fab_action_provider.dart';
 import 'shell_nav_item.dart';
 import 'dart:async';
+import 'shell_bar_double_tap.dart';
 import 'shell_bar_visibility.dart';
 import 'shell_center_button.dart';
+import 'shell_swipe_coach_mark.dart';
 
 /// Compact-screen bottom navigation bar (#1874).
 ///
@@ -136,11 +138,19 @@ class ShellBottomBar extends ConsumerWidget {
           // #4097 — a DRAG toggles; tap keeps its current meaning, so
           // nothing the user does today changes. Down hides, up shows,
           // and the target is the bar's full width, not a 56 dp circle.
+          //
+          // A drag recognizer competes for the pointer but never HOLDS
+          // the arena, so a plain tap on a tab or on the round button
+          // still resolves the instant the finger leaves. The double-tap
+          // deliberately does not live here — see [ShellBarDoubleTap].
           onVerticalDragEnd: (details) {
             final v = details.primaryVelocity ?? 0;
             if (v.abs() < 200) return;
             unawaited(
               ref.read(shellBarHiddenProvider.notifier).set(v > 0),
+            );
+            unawaited(
+              ref.read(shellSwipeCoachSeenProvider.notifier).markSeen(),
             );
           },
           child: AnimatedSize(
@@ -149,9 +159,6 @@ class ShellBottomBar extends ConsumerWidget {
             alignment: Alignment.bottomCenter,
         child: SizedBox(
           height: boxHeight,
-            unawaited(
-              ref.read(shellSwipeCoachSeenProvider.notifier).markSeen(),
-            );
           child: Stack(
             children: [
               // Coloured bar pinned to the bottom; the docked centre button
@@ -173,12 +180,34 @@ class ShellBottomBar extends ConsumerWidget {
                     child: ExcludeSemantics(
                       key: const Key('shell_bar_surface_semantics'),
                       excluding: hidden,
-                      child: bar,
+                      // #4107 — a double-tap on the bar toggles it away.
+                      // Scoped to the tab surface on purpose: the round
+                      // button is NOT a descendant, so the primary search
+                      // action keeps its zero-delay tap (see the class
+                      // doc for the 300 ms arena hold this avoids).
+                      child: ShellBarDoubleTap(
+                        onDoubleTap: () => unawaited(
+                          ref
+                              .read(shellBarHiddenProvider.notifier)
+                              .set(!hidden),
+                        ),
+                        child: bar,
+                      ),
                     ),
                   ),
                 ),
               ),
               // Raised primary action, horizontally centred.
+              // #4106 — introduce the gesture once, over the bar it acts
+              // on. Never while the bar is already hidden: the user has
+              // plainly found it.
+              if (!hidden && !ref.watch(shellSwipeCoachSeenProvider))
+                ShellSwipeCoachMark(
+                  barHeight: barHeight,
+                  onDismiss: () => unawaited(
+                    ref.read(shellSwipeCoachSeenProvider.notifier).markSeen(),
+                  ),
+                ),
               if (primaryIndex >= 0)
                 Align(
                   alignment:
@@ -198,16 +227,6 @@ class ShellBottomBar extends ConsumerWidget {
           ),
             ),
           ),
-              // #4106 — introduce the gesture once, over the bar it acts
-              // on. Never while the bar is already hidden: the user has
-              // plainly found it.
-              if (!hidden && !ref.watch(shellSwipeCoachSeenProvider))
-                ShellSwipeCoachMark(
-                  barHeight: barHeight,
-                  onDismiss: () => unawaited(
-                    ref.read(shellSwipeCoachSeenProvider.notifier).markSeen(),
-                  ),
-                ),
         ),
       ),
     );
