@@ -2960,6 +2960,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'The Consumption tab was hidden by your profile settings.';
 
   @override
+  String get shellBarHiddenAnnounce =>
+      'Navigation hidden. Swipe up from the bottom, or long-press the button, to bring it back.';
+
+  @override
+  String get shellBarShownAnnounce => 'Navigation shown.';
+
+  @override
+  String get shellBarToggleHint => 'Long-press to hide or show the navigation';
+
+  @override
   String get swipeBetweenTabsHint =>
       'Tip: swipe left or right to switch between tabs.';
 
@@ -12087,6 +12097,17 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get consumptionTabHiddenNotice =>
       '⟦Ŧĥé Çóñšúɱƥŧîóñ ŧáƀ ŵáš ĥîđđéñ ƀý ýóúř ƥřóƒîłé šéŧŧîñǧš. ·····················⟧';
+
+  @override
+  String get shellBarHiddenAnnounce =>
+      '⟦Ñáṽîǧáŧîóñ ĥîđđéñ. Šŵîƥé úƥ ƒřóɱ ŧĥé ƀóŧŧóɱ, óř łóñǧ-ƥřéšš ŧĥé ƀúŧŧóñ, ŧó ƀřîñǧ îŧ ƀáçķ. ·······························⟧';
+
+  @override
+  String get shellBarShownAnnounce => '⟦Ñáṽîǧáŧîóñ šĥóŵñ. ·······⟧';
+
+  @override
+  String get shellBarToggleHint =>
+      '⟦Łóñǧ-ƥřéšš ŧó ĥîđé óř šĥóŵ ŧĥé ñáṽîǧáŧîóñ ···············⟧';
 
   @override
   String get swipeBetweenTabsHint =>

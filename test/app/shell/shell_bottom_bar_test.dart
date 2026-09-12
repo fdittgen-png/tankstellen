@@ -17,6 +17,7 @@ import 'package:tankstellen/features/search/presentation/screens/search_criteria
 import 'package:tankstellen/features/search/providers/search_provider.dart';
 
 import '../../fixtures/stations.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// #2553 — a SearchState seeded with one result so the default FAB tap
 /// takes the push-free "other tab WITH results → jump to Search" branch
@@ -82,6 +83,10 @@ void main() {
       // ProviderScope ancestor even when no overrides are needed.
       ProviderScope(
         child: MaterialApp(
+            // #4097 — the centre button carries an accessibility hint
+            // now, so it needs localizations like any user-facing text.
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: Align(
               alignment: Alignment.bottomCenter,
@@ -301,6 +306,10 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
+            // #4097 — the centre button carries an accessibility hint
+            // now, so it needs localizations like any user-facing text.
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Stack(
               children: [
                 Navigator(
@@ -468,6 +477,10 @@ void main() {
         // ProviderScope ancestor.
         ProviderScope(
           child: MaterialApp(
+            // #4097 — the centre button carries an accessibility hint
+            // now, so it needs localizations like any user-facing text.
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Directionality(
               textDirection: TextDirection.rtl,
               child: Scaffold(
@@ -512,6 +525,10 @@ void main() {
         UncontrolledProviderScope(
           container: container,
           child: MaterialApp(
+            // #4097 — the centre button carries an accessibility hint
+            // now, so it needs localizations like any user-facing text.
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
               body: Align(
                 alignment: Alignment.bottomCenter,
@@ -645,6 +662,10 @@ void main() {
       return tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
+            // #4097 — the centre button carries an accessibility hint
+            // now, so it needs localizations like any user-facing text.
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: MediaQuery(
               data: MediaQueryData(size: Size(width, 800)),
               child: Scaffold(
@@ -785,6 +806,10 @@ void main() {
         UncontrolledProviderScope(
           container: container,
           child: MaterialApp(
+            // #4097 — the centre button carries an accessibility hint
+            // now, so it needs localizations like any user-facing text.
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
               body: Align(
                 alignment: Alignment.bottomCenter,

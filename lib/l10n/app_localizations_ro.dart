@@ -2989,6 +2989,16 @@ class AppLocalizationsRo extends AppLocalizations {
       'Fila Consum a fost ascunsă de setările profilului dvs.';
 
   @override
+  String get shellBarHiddenAnnounce =>
+      'Navigation hidden. Swipe up from the bottom, or long-press the button, to bring it back.';
+
+  @override
+  String get shellBarShownAnnounce => 'Navigation shown.';
+
+  @override
+  String get shellBarToggleHint => 'Long-press to hide or show the navigation';
+
+  @override
   String get swipeBetweenTabsHint =>
       'Sfat: glisați stânga sau dreapta pentru a comuta între file.';
 

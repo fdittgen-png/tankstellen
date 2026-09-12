@@ -2974,6 +2974,16 @@ class AppLocalizationsHr extends AppLocalizations {
       'Kartica Potrošnja skrivena je vašim postavkama profila.';
 
   @override
+  String get shellBarHiddenAnnounce =>
+      'Navigation hidden. Swipe up from the bottom, or long-press the button, to bring it back.';
+
+  @override
+  String get shellBarShownAnnounce => 'Navigation shown.';
+
+  @override
+  String get shellBarToggleHint => 'Long-press to hide or show the navigation';
+
+  @override
   String get swipeBetweenTabsHint =>
       'Savjet: povucite lijevo ili desno za prebacivanje između kartica.';
 
