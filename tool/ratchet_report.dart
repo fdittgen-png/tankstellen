@@ -389,11 +389,20 @@ Map<String, int>? _optOutBaseline(String root) {
 // ── Baseline pins parsed from single-number ratchet tests ───────────────
 
 int? _pinnedBaseline(String root, String testPath) {
-  final source = _read(root, testPath);
-  if (source == null) return null;
-  final match =
-      RegExp(r'const _baseline\s*=\s*(\d+);').firstMatch(source);
-  return match == null ? null : int.parse(match.group(1)!);
+  final source = File('$root/$testPath').readAsStringSync();
+  final scalar = RegExp(r'const _baseline\s*=\s*(\d+);').firstMatch(source);
+  if (scalar != null) return int.parse(scalar.group(1)!);
+  // #4074 — a per-file map (`const _baseline = <String, int>{ ... };`):
+  // the pinned total is the sum of its entries.
+  final block = RegExp(r'const _baseline\s*=\s*<String, int>\{(.*?)\};',
+          dotAll: true)
+      .firstMatch(source);
+  if (block == null) return null;
+  var total = 0;
+  for (final e in RegExp(r"'[^']+':\s*(\d+),").allMatches(block.group(1)!)) {
+    total += int.parse(e.group(1)!);
+  }
+  return total;
 }
 
 // ── Duplication (dimension 13) ──────────────────────────────────────────
