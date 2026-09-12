@@ -3039,6 +3039,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get availabilityNotReported => 'Not reported';
 
   @override
+  String get refuelQuantityTitle => 'How much do you usually buy?';
+
+  @override
+  String get refuelQuantityExplainer =>
+      'Best value compares what a refuel really costs, so it needs a rough volume. Sparkilo uses the median of your own fill-ups until you say otherwise.';
+
+  @override
+  String get refuelQuantityMeasured => 'Use my fill-up history';
+
+  @override
+  String get refuelQuantityFullTank => 'A full tank';
+
+  @override
+  String get refuelQuantityChange => 'Change';
+
+  @override
+  String refuelQuantityMeasuredValue(String volume) {
+    return '$volume (from your fill-ups)';
+  }
+
+  @override
+  String refuelConsumptionMeasured(String consumption) {
+    return '$consumption (measured)';
+  }
+
+  @override
+  String get refuelConsumptionMissing => 'No consumption yet';
+
+  @override
   String get shellSwipeCoachMark =>
       'Swipe down — or double-tap the bar — to use the whole screen';
 
@@ -12252,6 +12281,35 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get availabilityNotReported => '⟦Ñóŧ řéƥóřŧéđ ·····⟧';
+
+  @override
+  String get refuelQuantityTitle => '⟦Ĥóŵ ɱúçĥ đó ýóú úšúáłłý ƀúý? ··········⟧';
+
+  @override
+  String get refuelQuantityExplainer =>
+      '⟦Ɓéšŧ ṽáłúé çóɱƥářéš ŵĥáŧ á řéƒúéł řéáłłý çóšŧš, šó îŧ ñééđš á řóúǧĥ ṽółúɱé. Šƥářķîłó úšéš ŧĥé ɱéđîáñ óƒ ýóúř óŵñ ƒîłł-úƥš úñŧîł ýóú šáý óŧĥéřŵîšé. ·····················································⟧';
+
+  @override
+  String get refuelQuantityMeasured => '⟦Úšé ɱý ƒîłł-úƥ ĥîšŧóřý ········⟧';
+
+  @override
+  String get refuelQuantityFullTank => '⟦Á ƒúłł ŧáñķ ····⟧';
+
+  @override
+  String get refuelQuantityChange => '⟦Çĥáñǧé ···⟧';
+
+  @override
+  String refuelQuantityMeasuredValue(String volume) {
+    return '⟦$volume (ƒřóɱ ýóúř ƒîłł-úƥš) ·······⟧';
+  }
+
+  @override
+  String refuelConsumptionMeasured(String consumption) {
+    return '⟦$consumption (ɱéášúřéđ) ····⟧';
+  }
+
+  @override
+  String get refuelConsumptionMissing => '⟦Ñó çóñšúɱƥŧîóñ ýéŧ ·······⟧';
 
   @override
   String get shellSwipeCoachMark =>

@@ -3063,6 +3063,35 @@ class AppLocalizationsDe extends AppLocalizations {
   String get availabilityNotReported => 'Nicht gemeldet';
 
   @override
+  String get refuelQuantityTitle => 'Wie viel tankst du normalerweise?';
+
+  @override
+  String get refuelQuantityExplainer =>
+      '„Bester Wert“ vergleicht, was ein Tankstopp wirklich kostet — dafür braucht es eine ungefähre Menge. Sparkilo nimmt den Median deiner eigenen Tankvorgänge, solange du nichts anderes sagst.';
+
+  @override
+  String get refuelQuantityMeasured => 'Meine Tankhistorie verwenden';
+
+  @override
+  String get refuelQuantityFullTank => 'Eine Tankfüllung';
+
+  @override
+  String get refuelQuantityChange => 'Ändern';
+
+  @override
+  String refuelQuantityMeasuredValue(String volume) {
+    return '$volume (aus deinen Tankvorgängen)';
+  }
+
+  @override
+  String refuelConsumptionMeasured(String consumption) {
+    return '$consumption (gemessen)';
+  }
+
+  @override
+  String get refuelConsumptionMissing => 'Noch kein Verbrauch';
+
+  @override
   String get shellSwipeCoachMark =>
       'Nach unten wischen oder doppelt auf die Leiste tippen, um den ganzen Bildschirm zu nutzen';
 

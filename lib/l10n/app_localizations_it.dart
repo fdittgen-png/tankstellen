@@ -3062,6 +3062,35 @@ class AppLocalizationsIt extends AppLocalizations {
   String get availabilityNotReported => 'Not reported';
 
   @override
+  String get refuelQuantityTitle => 'How much do you usually buy?';
+
+  @override
+  String get refuelQuantityExplainer =>
+      'Best value compares what a refuel really costs, so it needs a rough volume. Sparkilo uses the median of your own fill-ups until you say otherwise.';
+
+  @override
+  String get refuelQuantityMeasured => 'Use my fill-up history';
+
+  @override
+  String get refuelQuantityFullTank => 'A full tank';
+
+  @override
+  String get refuelQuantityChange => 'Change';
+
+  @override
+  String refuelQuantityMeasuredValue(String volume) {
+    return '$volume (from your fill-ups)';
+  }
+
+  @override
+  String refuelConsumptionMeasured(String consumption) {
+    return '$consumption (measured)';
+  }
+
+  @override
+  String get refuelConsumptionMissing => 'No consumption yet';
+
+  @override
   String get shellSwipeCoachMark =>
       'Swipe down to hide the bars and use the whole screen';
 

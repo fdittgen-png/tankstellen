@@ -447,8 +447,8 @@ void main() {
     );
 
     testWidgets(
-      '#2622 — last-updated timestamp reads as "Updated {time}", not a '
-      'bare code',
+      '#2622 / #4092 — the bare timestamp is never shown alone; the row '
+      'says the freshness BAND and keeps the stamp in the tooltip',
       (tester) async {
         const updatedStation = Station(
           id: 'updated-test',
@@ -473,9 +473,21 @@ void main() {
           ),
         );
 
-        expect(find.textContaining('Updated 10:30'), findsOneWidget);
-        // The bare timestamp on its own must not appear.
+        // #4092 — the visible text is the band, in words; "10:30" on its
+        // own said nothing about whether it was today.
+        expect(find.byKey(const Key('station_card_freshness_word')),
+            findsOneWidget);
         expect(find.text('10:30'), findsNothing);
+        expect(find.textContaining('Updated 10:30'), findsNothing);
+        // …but the exact stamp is still one hover / one screen reader
+        // away, which is the #2622 promise it must keep.
+        final tooltip = tester.widget<Tooltip>(
+          find.ancestor(
+            of: find.byKey(const Key('station_card_freshness_word')),
+            matching: find.byType(Tooltip),
+          ).first,
+        );
+        expect(tooltip.message, contains('Updated 10:30'));
       },
     );
 

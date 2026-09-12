@@ -5576,6 +5576,54 @@ abstract class AppLocalizations {
   /// **'Not reported'**
   String get availabilityNotReported;
 
+  /// Title of the refill-quantity sheet (#4095). The quantity is an assumption behind the Best value comparison; the app never needs it to work, and never asks for tank capacity.
+  ///
+  /// In en, this message translates to:
+  /// **'How much do you usually buy?'**
+  String get refuelQuantityTitle;
+
+  /// Body of the refill-quantity sheet (#4095): says what the number is for and that the default is measured, not guessed.
+  ///
+  /// In en, this message translates to:
+  /// **'Best value compares what a refuel really costs, so it needs a rough volume. Sparkilo uses the median of your own fill-ups until you say otherwise.'**
+  String get refuelQuantityExplainer;
+
+  /// The option that hands the quantity back to the measured median (#4095) — the default, and the better answer where a history exists.
+  ///
+  /// In en, this message translates to:
+  /// **'Use my fill-up history'**
+  String get refuelQuantityMeasured;
+
+  /// Offered only when the active vehicle has a tank capacity on file (#4095). Capacity is a ceiling on the quantity, never a requirement.
+  ///
+  /// In en, this message translates to:
+  /// **'A full tank'**
+  String get refuelQuantityFullTank;
+
+  /// The affordance on the decision header's assumption line that opens the refill-quantity sheet (#4095).
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get refuelQuantityChange;
+
+  /// The measured-median option with the value it currently resolves to (#4095).
+  ///
+  /// In en, this message translates to:
+  /// **'{volume} (from your fill-ups)'**
+  String refuelQuantityMeasuredValue(String volume);
+
+  /// The vehicle's consumption shown as the assumption it is (#4095), flagged as coming from the user's own fill-ups rather than a model.
+  ///
+  /// In en, this message translates to:
+  /// **'{consumption} (measured)'**
+  String refuelConsumptionMeasured(String consumption);
+
+  /// Shown in the refill-quantity sheet when there is no measured consumption (#4095) — the Best value ranking is withheld until there is one.
+  ///
+  /// In en, this message translates to:
+  /// **'No consumption yet'**
+  String get refuelConsumptionMissing;
+
   /// One-time coach mark teaching the swipe-away gesture (#4106/#4107). Names BOTH gestures and what they gain; shown once ever, retires itself after 7s, dismissed by performing it, tapping it, or its Dismiss button.
   ///
   /// In en, this message translates to:

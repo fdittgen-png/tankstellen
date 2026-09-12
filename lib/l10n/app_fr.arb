@@ -6008,5 +6008,55 @@
   "priceLabel": "Prix",
   "priceFreshnessLabel": "Actualité du prix",
   "availabilityLabel": "Disponibilité",
-  "availabilityNotReported": "Non communiquée"
+  "availabilityNotReported": "Non communiquée",
+  "refuelQuantityTitle": "How much do you usually buy?",
+  "@refuelQuantityTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelQuantityExplainer": "Best value compares what a refuel really costs, so it needs a rough volume. Sparkilo uses the median of your own fill-ups until you say otherwise.",
+  "@refuelQuantityExplainer": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelQuantityMeasured": "Use my fill-up history",
+  "@refuelQuantityMeasured": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelQuantityFullTank": "A full tank",
+  "@refuelQuantityFullTank": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelQuantityChange": "Change",
+  "@refuelQuantityChange": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelQuantityMeasuredValue": "{volume} (from your fill-ups)",
+  "@refuelQuantityMeasuredValue": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "volume": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelConsumptionMeasured": "{consumption} (measured)",
+  "@refuelConsumptionMeasured": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "consumption": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelConsumptionMissing": "No consumption yet",
+  "@refuelConsumptionMissing": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  }
 }
