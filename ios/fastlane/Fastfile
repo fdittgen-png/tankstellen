@@ -782,9 +782,18 @@ platform :ios do
       end
     end
 
-    UI.important("=== Builds attached to each EXTERNAL group (newest first) ===")
+    # #3814 — EVERY group, not just the external ones. Four theories were
+    # refuted with measurements (Beta App Review, group attachment,
+    # unaccepted invite, the #3812 interleaved numbers) while this lane
+    # only ever looked at `extern`. A device signed in under an identity
+    # that is an INTERNAL tester — which every App Store Connect user is —
+    # installs from the internal group's builds, and nothing here has ever
+    # reported what those are. If an internal group's newest build is
+    # 6.0.0, the whole "newest in extern" analysis has been about a group
+    # the affected phone was never installing from.
+    UI.important("=== Builds attached to EACH group (newest first) ===")
     UI.message("This is what a tester in that group can actually install.")
-    groups.reject(&:is_internal_group).each do |g|
+    groups.each do |g|
       UI.message("  --- #{g.name} ---")
       # `Build.all` rejected `filter:` (ArgumentError: unknown keyword), and
       # the association name has moved between spaceship versions. Rather than
@@ -838,9 +847,10 @@ platform :ios do
       end
     end
 
-    # Roster of every EXTERNAL group. The builds are attached and the reporting
-    # address is a member, yet its phone is offered nothing newer — so the
-    # remaining question is WHICH identity is actually entitled. An invite that
+    # Roster of every group. The builds are attached and the reporting
+    # address is a member of `extern`, yet its phone is offered nothing
+    # newer — so the remaining question is WHICH identity is actually
+    # entitled, and which group that identity installs from. An invite that
     # was never accepted leaves a tester listed but empty-handed, and a build
     # installed in July may belong to a different Apple ID entirely.
     # NOTE — there is no per-tester delivery signal to query. `betaBuildMetrics`
@@ -849,8 +859,11 @@ platform :ios do
     # already reads correct here. So the deliverable is not a richer read: it is
     # `testflight_assert_delivery` below, asserting the states that CAN be
     # measured, on every build, instead of nobody looking for seven weeks.
-    UI.important("=== External group rosters ===")
-    groups.reject(&:is_internal_group).each do |g|
+    # #3814 — every group again, for the same reason: an identity that
+    # appears in NO external roster but 47 sessions of usage has to be
+    # somewhere, and "somewhere" is an internal group this loop skipped.
+    UI.important("=== Group rosters (internal AND external) ===")
+    groups.each do |g|
       UI.message("  --- #{g.name} ---")
       begin
         roster = Spaceship::ConnectAPI::BetaTester.all(
