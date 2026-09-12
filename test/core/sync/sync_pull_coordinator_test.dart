@@ -140,4 +140,71 @@ void main() {
 
     expect(coordinator.lastCompletedAt, stamped);
   });
+
+  group('#4112 — a timed-out pull warns first and escalates only when it '
+      'persists', () {
+    test('consecutive timed-out passes escalate; one success clears the '
+        'board', () {
+      var alwaysHangs = true;
+      SyncPullEntry hanging() => SyncPullEntry(
+            tables: const ['favorites'],
+            timeout: const Duration(seconds: 15),
+            pull: () async {
+              if (alwaysHangs) {
+                await Future<void>.delayed(const Duration(days: 1));
+              }
+              return 1;
+            },
+          );
+
+      fakeAsync((async) {
+        coordinator.register(enabled: () => true, entries: [hanging()]);
+        for (var pass = 1; pass <= 3; pass++) {
+          unawaited(coordinator.pullAll());
+          async.elapse(const Duration(seconds: 20));
+          expect(coordinator.consecutiveTimeoutsFor(const ['favorites']), pass);
+        }
+        // Below the threshold a timeout is a warning; at it, an error.
+        // That distinction is the whole fix: a single failed PULL costs
+        // the user nothing (the local data is intact and the next pass
+        // catches up), so reporting the first one at error level put it
+        // in the same bucket as a corrupted box.
+        expect(SyncPullCoordinator.timeoutsBeforeError, 3);
+
+        alwaysHangs = false;
+        unawaited(coordinator.pullAll());
+        async.elapse(const Duration(seconds: 20));
+        expect(coordinator.consecutiveTimeoutsFor(const ['favorites']), 0,
+            reason: 'one successful pass means the tables are converging '
+                'again');
+      });
+    });
+
+    test('a hung table still costs its OWN budget and no more — there is '
+        'no in-pass retry doubling it', () {
+      fakeAsync((async) {
+        var passDone = false;
+        coordinator.register(enabled: () => true, entries: [
+          entry('hung', latency: const Duration(minutes: 10)),
+        ]);
+        unawaited(coordinator.pullAll().then((_) => passDone = true));
+        async.elapse(const Duration(seconds: 16));
+        expect(passDone, isTrue,
+            reason: 'a retry seconds after a 15 s timeout on a slow link '
+                'would have timed out too, and doubled every other '
+                "table's wait for the pass to finish");
+      });
+    });
+
+    test('an error is reported immediately — only TIMEOUTS are routine',
+        () async {
+      coordinator.register(enabled: () => true, entries: [
+        entry('boom', throwing: StateError('schema mismatch')),
+      ]);
+      await coordinator.pullAll();
+      expect(coordinator.consecutiveTimeoutsFor(const ['boom']), 0,
+          reason: 'a server that answered with an error is not a timeout');
+    });
+  });
+
 }
