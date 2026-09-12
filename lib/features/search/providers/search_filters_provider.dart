@@ -18,6 +18,7 @@ import 'search_provider.dart';
 import 'search_screen_ui_provider.dart';
 import 'station_rating_provider.dart';
 import '../../../core/domain/refuel_economics.dart';
+import '../../../core/domain/refuel_profile_provider.dart';
 
 part 'search_filters_provider.g.dart';
 
@@ -137,7 +138,8 @@ List<SearchResultItem> filteredSortedSearchResults(
     if (kindFilter != ResultKind.fuel) ...evFiltered,
   ];
 
-  return sortSearchResults(filtered, sortMode, fuelType, ratings);
+  return sortSearchResults(filtered, sortMode, fuelType, ratings,
+      profile: ref.watch(refuelProfileProvider));
 }
 
 /// Pure sort over a unified results list (#1762).
