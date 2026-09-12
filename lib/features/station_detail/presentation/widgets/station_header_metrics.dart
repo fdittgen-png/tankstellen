@@ -120,6 +120,14 @@ double stationHeaderExpandedHeight(BuildContext context, Station station) {
   if (subtitle != null) {
     column += measure(subtitle, headerSubtitleStyle(theme), textWidth);
   }
+  // #4081 — the zone line #4076 folded into the header (department,
+  // region · station kind) is content too: without it the band ended
+  // under the address and the Prices card clipped the line in half.
+  final zone = stationZoneLine(station, l10n);
+  if (zone != null) {
+    column += kIndependentLineGap +
+        measure(zone, headerSubtitleStyle(theme), textWidth);
+  }
   if (isIndependentSentinel(station)) {
     column += kIndependentLineGap +
         measure(l10n.independentStation, headerIndependentStyle(theme),

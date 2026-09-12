@@ -158,6 +158,39 @@ void main() {
         ),
       );
     });
+    // #4081 — the zone line #4076 folded into the header is content the
+    // band must budget for; without it the Prices card clipped the line.
+    testWidgets('budgets the zone line (department, region · kind)',
+        (tester) async {
+      const zoned = Station(
+        id: 's-zoned',
+        name: 'Station Essence Super U',
+        brand: 'Super U',
+        street: '1 Avenue du Mas Viel',
+        postCode: '34290',
+        place: 'Servian',
+        lat: 43.43,
+        lng: 3.30,
+        isOpen: true,
+        department: 'Hérault',
+        region: 'Occitanie',
+        stationType: 'R',
+      );
+      final m = await measure(tester, zoned);
+      expect(
+        m.expanded,
+        greaterThanOrEqualTo(
+          kToolbarHeight +
+              kHeaderTopGap +
+              kStatusDotSize +
+              kHeaderStatusGap +
+              m.painted +
+              kHeaderBottomInset,
+        ),
+        reason: 'the painted header (with the zone line) must fit inside '
+            'the expanded band with the bottom inset intact',
+      );
+    });
   });
 
   group('stationHeaderSubtitle', () {
