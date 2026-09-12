@@ -135,26 +135,27 @@ void main() {
       // app in the transient-overlay state Android draws as a dark scrim.
       // Restore the overlays first to end immersive for certain, THEN go
       // edge-to-edge so the app draws behind the bars again.
+      // #4084 — restore is a pure re-assert now. The old two-step exit
+      // (manual, then edgeToEdge) existed to end a sticky immersive mode
+      // that #3843 removed app-wide; the `manual` step itself was the one
+      // thing that ever left edge-to-edge, and Flutter then deduped the
+      // unchanged overlay style and never re-sent it — the black band.
       final modes = calls
           .where((c) =>
               c.contains('setEnabledSystemUIMode') ||
               c.contains('setEnabledSystemUIOverlays'))
           .toList();
-      expect(modes.length, 2,
-          reason: 'expected the two-step immersive exit, got: $modes');
-      expect(modes.first, contains('setEnabledSystemUIOverlays'),
-          reason: 'step 1 must force the overlays back, ending sticky '
-              'immersive — edgeToEdge alone does not reliably clear it');
-      expect(modes.last, contains('edgeToEdge'),
-          reason: 'step 2 must re-establish edge-to-edge, or the app stops '
-              'drawing behind the bars and the native window background '
-              '(black) shows through the transparent status bar');
-      // The overlay style is batched to the next frame rather than sent as an
-      // immediate platform message, so assert the value Flutter actually
-      // holds — re-showing the bars WITHOUT this is how the black band
-      // appeared.
+      expect(modes, hasLength(1),
+          reason: 'restore must never pass through manual: $modes');
+      expect(modes.single, contains('edgeToEdge'));
+      final styles =
+          calls.where((c) => c.contains('setSystemUIOverlayStyle')).toList();
+      expect(styles, isNotEmpty,
+          reason: 'the style must be FORCED through Flutter\'s dedupe — an '
+              'OS-side reset is invisible to it, so an unchanged style would '
+              'never be re-sent');
       expect(SystemChrome.latestStyle, EdgeToEdge.overlayStyle,
-          reason: 'restore must re-apply the transparent overlay style');
+          reason: 'restore must leave the transparent overlay style applied');
 
       tester.binding.defaultBinaryMessenger
           .setMockMethodCallHandler(SystemChannels.platform, null);

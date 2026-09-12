@@ -36,8 +36,13 @@ class OsmAttribution extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RichAttributionWidget(
-      attributions: [TextSourceAttribution(osmAttributionText(context))],
+    // #4084 — the map runs behind the shell's bar; lift the credit by
+    // the bar's height (MediaQuery.padding.bottom) so it stays visible.
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
+      child: RichAttributionWidget(
+        attributions: [TextSourceAttribution(osmAttributionText(context))],
+      ),
     );
   }
 }
