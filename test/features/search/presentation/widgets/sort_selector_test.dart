@@ -222,7 +222,7 @@ void main() {
           SortMode.name,
           SortMode.open24h,
           SortMode.rating,
-          SortMode.priceDistance,
+          SortMode.bestValue,
         ]),
       );
     });

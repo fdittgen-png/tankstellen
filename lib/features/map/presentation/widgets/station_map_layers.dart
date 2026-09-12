@@ -53,7 +53,7 @@ class StationMapLayers extends StatefulWidget {
   /// on the map: the top-ranked few keep their full price bubble while
   /// the rest render as compact price-band dots so a bounded result set
   /// stays fully visible without the bubbles overlapping. `price` /
-  /// `priceDistance` emphasize the cheapest; everything else (distance,
+  /// `bestValue` emphasize the cheapest; everything else (distance,
   /// 24h, rating, name) emphasizes the closest. Defaults to
   /// [SortMode.price] — the savings-first emphasis — for callers (route,
   /// driving, inline) that don't surface a sort selector.
@@ -231,7 +231,7 @@ class _StationMapLayersState extends State<StationMapLayers> {
       selectedFuel: widget.selectedFuel,
       selectedStationIds: widget.selectedStationIds,
       byPrice: widget.sortMode == SortMode.price ||
-          widget.sortMode == SortMode.priceDistance,
+          widget.sortMode == SortMode.bestValue,
       clusterAlways: widget.clusterAlways,
       fuelResolver: widget.fuelResolver,
       onStationTap: widget.onStationTap,

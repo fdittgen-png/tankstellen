@@ -185,7 +185,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
                 // docked search FAB still floats over the list bottom;
                 // reserve the shared clearance so the last card is not
                 // sitting under it.
-                padding: const EdgeInsets.only(bottom: kFabScrollClearance),
+                padding: EdgeInsets.only(bottom: shellScrollClearance(context)),
                 itemCount: sorted.length + (showHelp ? 1 : 0),
                 itemBuilder: (context, rawIndex) {
                   if (showHelp && rawIndex == 0) {

@@ -242,7 +242,7 @@ void main() {
       (
         'results_sort_price_distance',
         'Sort by price per kilometre',
-        SortMode.priceDistance,
+        SortMode.bestValue,
       ),
     ]) {
       testWidgets('"$label" is a labelled entry and still sorts', (
@@ -304,7 +304,7 @@ void main() {
       );
       container
           .read(selectedSortModeProvider.notifier)
-          .set(SortMode.priceDistance);
+          .set(SortMode.bestValue);
       await tester.pump();
       await tester.tap(find.byKey(const Key('results_action_menu')));
       await tester.pumpAndSettle();

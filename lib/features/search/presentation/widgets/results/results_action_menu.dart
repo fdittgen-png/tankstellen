@@ -86,7 +86,7 @@ class ResultsActionMenu extends ConsumerWidget {
       case ResultsAction.sortOpen24h:
         _sort(ref, SortMode.open24h);
       case ResultsAction.sortByPriceDistance:
-        _sort(ref, SortMode.priceDistance);
+        _sort(ref, SortMode.bestValue);
     }
   }
 
@@ -160,7 +160,7 @@ class ResultsActionMenu extends ConsumerWidget {
           value: ResultsAction.sortByPriceDistance,
           icon: Icons.balance,
           label: l10n.sortMenuPriceDistance,
-          selected: sortMode == SortMode.priceDistance,
+          selected: sortMode == SortMode.bestValue,
           selectedSemantics: l10n.sortMenuActiveSemantic(
             l10n.sortMenuPriceDistance,
           ),

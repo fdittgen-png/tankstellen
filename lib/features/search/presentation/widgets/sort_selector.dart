@@ -4,7 +4,18 @@
 import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 
-enum SortMode { distance, price, name, open24h, rating, priceDistance }
+enum SortMode {
+  distance,
+  price,
+  name,
+  open24h,
+  rating,
+
+  /// #4088 — effective price per litre: the pump price plus what the drive
+  /// there costs, over the litres bought. Was `priceDistance` ("Price/km"),
+  /// a ratio that ranked the farther of two equally-priced stations first.
+  bestValue,
+}
 
 /// The sort group that now lives **inside** the results icon row (#3943).
 ///
