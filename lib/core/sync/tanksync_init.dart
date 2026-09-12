@@ -5,7 +5,6 @@
 import 'package:flutter/foundation.dart';
 
 import '../logging/app_log.dart';
-import '../logging/error_logger.dart';
 import '../storage/hive_storage.dart';
 import 'supabase_client.dart';
 
@@ -71,7 +70,6 @@ class TankSyncInit {
         init,
     String? Function()? sessionUserId,
     Future<String?> Function()? signInAnonymously,
-    Future<void> Function(String userId)? ensurePublicUser,
   }) async {
     lastOutcome = null;
     final outcome = await _run(
@@ -80,7 +78,6 @@ class TankSyncInit {
       sessionUserId:
           sessionUserId ?? () => TankSyncClient.client?.auth.currentUser?.id,
       signInAnonymously: signInAnonymously ?? TankSyncClient.signInAnonymously,
-      ensurePublicUser: ensurePublicUser ?? _defaultEnsurePublicUser,
     );
     lastOutcome = outcome;
     return outcome;
@@ -93,7 +90,6 @@ class TankSyncInit {
         init,
     required String? Function() sessionUserId,
     required Future<String?> Function() signInAnonymously,
-    required Future<void> Function(String userId) ensurePublicUser,
   }) async {
     final syncEnabled = storage.getSetting('sync_enabled') as bool? ?? false;
     // #3866 — no client without the Cloud Sync consent.
@@ -123,13 +119,10 @@ class TankSyncInit {
         log.info('TankSync: userId changed');
         await storage.putSetting('sync_user_id', sessionId);
       }
-      if (sessionId != null) {
-        try {
-          await ensurePublicUser(sessionId);
-        } catch (e, st) {
-          log.error(e, st, layer: ErrorLayer.sync, context: {'where': 'maybeInitTankSync users upsert'});
-        }
-      }
+      // #4069 — no second `users` upsert here: TankSyncClient's init and
+      // every sign-in path already run the retrying _ensurePublicUser.
+      // The one-shot copy double-upserted on every fresh sign-in and
+      // logged its own failure even when the retrying path succeeded.
       log.info('TankSync: ready');
       return TankSyncInitOutcome.ready;
     } catch (e, st) {
@@ -143,12 +136,6 @@ class TankSyncInit {
   static Future<void> _defaultInit(
           {required String url, required String anonKey}) =>
       TankSyncClient.init(url: url, anonKey: anonKey);
-
-  static Future<void> _defaultEnsurePublicUser(String userId) async {
-    final client = TankSyncClient.client;
-    if (client == null) return;
-    await client.from('users').upsert({'id': userId}, onConflict: 'id');
-  }
 
   /// Reset the static outcome — test isolation only.
   @visibleForTesting

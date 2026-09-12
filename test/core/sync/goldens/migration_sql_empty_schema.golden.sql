@@ -1,4 +1,4 @@
--- TankSync Schema Setup (schema version 11)
+-- TankSync Schema Setup (schema version 12)
 -- Run this in your Supabase SQL Editor
 -- Dashboard → SQL Editor → New Query → Paste → Run
 
@@ -193,6 +193,23 @@ CREATE TABLE IF NOT EXISTS public.content_reports (
 CREATE INDEX IF NOT EXISTS content_reports_reporter_idx
   ON public.content_reports(reporter_user_id);
 
+CREATE TABLE IF NOT EXISTS public.wait_time_pings (
+  id UUID NOT NULL DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  session_id UUID NOT NULL,
+  station_id TEXT NOT NULL,
+  country_code TEXT NOT NULL,
+  event_type TEXT NOT NULL CHECK (event_type IN ('arrived', 'left')),
+  recorded_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, id)
+);
+CREATE INDEX IF NOT EXISTS wait_time_pings_user_idx
+  ON public.wait_time_pings(user_id);
+CREATE INDEX IF NOT EXISTS wait_time_pings_station_recorded_idx
+  ON public.wait_time_pings(station_id, recorded_at);
+CREATE INDEX IF NOT EXISTS wait_time_pings_session_idx
+  ON public.wait_time_pings(session_id);
+
 CREATE TABLE IF NOT EXISTS public.deletions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
@@ -256,6 +273,7 @@ ALTER TABLE public.trip_summaries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.trip_details ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.trip_shares ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.content_reports ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.wait_time_pings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.deletions ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS users_own ON public.users;
@@ -388,6 +406,11 @@ CREATE POLICY content_reports_select_own ON public.content_reports
 DROP POLICY IF EXISTS content_reports_delete_own ON public.content_reports;
 CREATE POLICY content_reports_delete_own ON public.content_reports
   FOR DELETE USING (reporter_user_id = auth.uid());
+
+-- Wait-time pings (#2650): a user reads, writes and deletes only their own.
+DROP POLICY IF EXISTS wait_time_pings_own ON public.wait_time_pings;
+CREATE POLICY wait_time_pings_own ON public.wait_time_pings
+  FOR ALL USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
 
 -- Deletion tombstones (#3078): a user only ever sees / writes their own.
 DROP POLICY IF EXISTS deletions_own ON public.deletions;
@@ -724,7 +747,7 @@ DROP POLICY IF EXISTS tanksync_meta_read ON public.tanksync_meta;
 CREATE POLICY tanksync_meta_read ON public.tanksync_meta
   FOR SELECT USING (true);
 INSERT INTO public.tanksync_meta (key, value, updated_at)
-  VALUES ('schema_version', '11', now())
+  VALUES ('schema_version', '12', now())
   ON CONFLICT (key)
   DO UPDATE SET value = EXCLUDED.value, updated_at = now();
 

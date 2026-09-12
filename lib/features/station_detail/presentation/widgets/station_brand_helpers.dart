@@ -3,6 +3,7 @@
 
 import '../../../search/domain/entities/brand_registry.dart';
 import '../../../../core/domain/station.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// True when the station has a real, displayable brand — i.e. not
 /// empty and not one of the sentinel strings that parsers use when
@@ -65,4 +66,15 @@ String? stationHeaderSubtitle(Station s) {
     return line.isEmpty ? null : line;
   }
   return city.isEmpty ? null : city;
+}
+
+/// #4076 — the zone line that used to be a whole "Zone" section with a
+/// map icon: `Hérault, Occitanie · Local station`. Null when the source
+/// carries neither department nor region, so the header simply has one
+/// line fewer.
+String? stationZoneLine(Station s, AppLocalizations l) {
+  final place = [s.department, s.region].whereType<String>().join(', ');
+  if (place.isEmpty) return null;
+  final kind = s.stationType == 'A' ? l.highway : l.localStation;
+  return '$place · $kind';
 }

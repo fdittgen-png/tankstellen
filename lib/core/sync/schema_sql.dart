@@ -50,7 +50,10 @@ import 'schema_table_specs.dart';
 /// v11 (#4060): `share_trip_with_email_v2()` returns a TEXT outcome so the
 /// client can tell "no such recipient" from "this trip is not on the server
 /// yet" — v1 stays for clients in the field.
-const int kSupabaseSchemaVersion = 11;
+/// v12 (#4062): `wait_time_pings` reaches the wizard SQL — the client read
+/// and deleted it through UserDataSync's table maps, invisible to the
+/// literal `.from()` gate, so a self-host never got the table.
+const int kSupabaseSchemaVersion = 12;
 
 /// The metadata table that records the applied schema version. Readable by
 /// anyone (it carries no user data — only the schema version the verifier

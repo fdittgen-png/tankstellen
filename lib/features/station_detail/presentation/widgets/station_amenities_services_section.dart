@@ -8,6 +8,7 @@ import '../../../../core/domain/station_amenity.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/presentation/widgets/amenity_chips.dart';
+import '../../../../core/widgets/app_pill.dart';
 
 /// The ONE "Amenities & services" section of the station-detail screen
 /// (#3928, epic #3925).
@@ -88,16 +89,14 @@ class _StationAmenitiesServicesSectionState
         if (visibleAmenityCount > 0 && visibleServiceCount > 0)
           const SizedBox(height: 4),
         if (visibleServiceCount > 0)
+          // #4076 — the raw leftovers wear the SAME grammar as the typed
+          // chips above. Two chip styles for one list read as two lists.
           Wrap(
-            spacing: 6,
-            runSpacing: 4,
+            spacing: 4,
+            runSpacing: 2,
             children: [
               for (final label in services.take(visibleServiceCount))
-                Chip(
-                  avatar: const Icon(Icons.check_circle_outline, size: 16),
-                  label: Text(label, style: const TextStyle(fontSize: 11)),
-                  visualDensity: VisualDensity.compact,
-                ),
+                AppPill(icon: Icons.check_circle_outline, label: label),
             ],
           ),
         if (hidden > 0 || _expanded)
@@ -158,8 +157,22 @@ String normaliseAmenityKey(String label) {
     }
   }
   final plain = buffer.toString();
-  return _synonyms[plain] ?? plain;
+  final exact = _synonyms[plain];
+  if (exact != null) return exact;
+  // #4076 — phrase-aware: the APIs emit compounds like "Station de
+  // gonflage" and "DAB (Distributeur automatique de billets)" whose
+  // normalised form never equals a synonym key, so the typed chip and the
+  // raw string both rendered ("Air" AND "Station de gonflage"). Longest
+  // key wins; keys under five characters (air, dab, wc) are exact-only so
+  // "Aire de repos" cannot become an air pump.
+  for (final key in _synonymKeysLongestFirst) {
+    if (key.length >= 5 && plain.contains(key)) return _synonyms[key]!;
+  }
+  return plain;
 }
+
+final List<String> _synonymKeysLongestFirst = _synonyms.keys.toList()
+  ..sort((a, b) => b.length.compareTo(a.length));
 
 String _amenityKey(StationAmenity amenity) => switch (amenity) {
       StationAmenity.shop => 'shop',

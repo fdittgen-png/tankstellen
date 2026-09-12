@@ -201,12 +201,15 @@ class _StationDetailLoaded extends StatelessWidget {
                 const SizedBox(height: 8),
                 StationInfoSection(station: station, detail: detail),
                 const SizedBox(height: 8),
-                StationRatingSection(stationId: stationId),
-                const SizedBox(height: 8),
                 // #1957 — the price-history chart is a tall,
                 // detail-on-demand block; show it in a foldable that is
                 // collapsed by default so it does not dominate the page.
+                // #4076 — above the rating: its collapsed header now
+                // carries the stats row, the most useful numbers after
+                // the prices themselves.
                 PriceHistoryFoldable(stationId: stationId, station: station),
+                const SizedBox(height: 8),
+                StationRatingSection(stationId: stationId),
               ]),
             ),
           ),

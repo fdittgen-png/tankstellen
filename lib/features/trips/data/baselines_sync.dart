@@ -90,7 +90,7 @@ class BaselinesSync {
             'vehicle_id': vehicleId,
             'total_samples': total,
             'data': mergedDecoded,
-            'updated_at': DateTime.now().toUtc().toIso8601String(),
+            'updated_at': SyncRowOps.lwwStamp(null),
           },
         ],
         onConflict: 'user_id,vehicle_id',

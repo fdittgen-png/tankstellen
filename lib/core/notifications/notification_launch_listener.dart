@@ -97,7 +97,8 @@ class _NotificationLaunchListenerState
     super.initState();
     unawaited(_handleColdLaunch());
     _subscription =
-        NotificationTapDispatcher.instance.stream.listen(_dispatch);
+        // #4070 — only the payloads addressed to this handler.
+        NotificationTapDispatcher.instance.launchPayloads.listen(_dispatch);
   }
 
   @override

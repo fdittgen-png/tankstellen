@@ -43,9 +43,10 @@ class StationBrandHeader extends StatelessWidget {
     // address (or just postcode + place when the heading IS the street).
     final heading = stationDisplayHeading(station);
     final subtitle = stationHeaderSubtitle(station);
+    final zone = stationZoneLine(station, l10n);
 
     return Semantics(
-      label: subtitle != null ? '$heading, $subtitle' : heading,
+      label: [heading, ?subtitle, ?zone].join(', '),
       header: true,
       excludeSemantics: true,
       child: Row(
@@ -60,6 +61,13 @@ class StationBrandHeader extends StatelessWidget {
                 Text(heading, style: headerHeadingStyle(theme)),
                 if (subtitle != null)
                   Text(subtitle, style: headerSubtitleStyle(theme)),
+                // #4076 — department · region · station kind, folded in
+                // here from what used to be a section of its own.
+                if (zone != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: kIndependentLineGap),
+                    child: Text(zone, style: headerSubtitleStyle(theme)),
+                  ),
                 if (isIndependentSentinel(station))
                   Padding(
                     padding: const EdgeInsets.only(

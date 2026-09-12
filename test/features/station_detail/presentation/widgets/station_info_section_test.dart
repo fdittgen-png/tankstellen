@@ -8,6 +8,12 @@ import 'package:tankstellen/core/domain/station_amenity.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/station_info_section.dart';
 
 import '../../../../helpers/pump_app.dart';
+import 'package:tankstellen/core/widgets/app_pill.dart';
+
+/// #4076 — the raw service leftovers wear the same AppPill grammar as
+/// the typed amenity chips; they are told apart by their check icon.
+Finder rawServicePills() => find.byWidgetPredicate(
+    (w) => w is AppPill && w.icon == Icons.check_circle_outline);
 
 void main() {
   group('StationInfoSection', () {
@@ -97,15 +103,13 @@ void main() {
         ),
       );
 
-      expect(find.text('Zone'), findsOneWidget);
+      // #4076 — "Zone" is no longer a section here; it is a header line.
+      expect(find.text('Zone'), findsNothing);
       expect(find.text('Amenities & services'), findsOneWidget);
       // The old separate headings are gone.
       expect(find.text('Amenities'), findsNothing);
       expect(find.textContaining('Services ('), findsNothing);
 
-      final zonePos = tester.getTopLeft(find.text('Zone'));
-      final mergedPos = tester.getTopLeft(find.text('Amenities & services'));
-      expect(mergedPos.dy, greaterThan(zonePos.dy));
     });
 
     testWidgets('the merged section is NOT collapsed — up to eight chips '
@@ -126,7 +130,7 @@ void main() {
         ),
       );
 
-      expect(find.byType(Chip), findsNWidgets(3));
+      expect(rawServicePills(), findsNWidgets(3));
       expect(find.text('Car Wash'), findsOneWidget);
       expect(find.text('Shop'), findsOneWidget);
       expect(find.text('ATM'), findsOneWidget);
@@ -158,14 +162,14 @@ void main() {
         ),
       );
 
-      expect(find.byType(Chip), findsNWidgets(8));
+      expect(rawServicePills(), findsNWidgets(8));
       expect(find.text('Show more (2)'), findsOneWidget);
       expect(find.text('Douches'), findsNothing);
 
       await tester.tap(find.text('Show more (2)'));
       await tester.pumpAndSettle();
 
-      expect(find.byType(Chip), findsNWidgets(10));
+      expect(rawServicePills(), findsNWidgets(10));
       expect(find.text('Douches'), findsOneWidget);
       expect(find.text('Show less'), findsOneWidget);
     });
@@ -188,7 +192,7 @@ void main() {
       );
 
       expect(find.text('Amenities & services'), findsNothing);
-      expect(find.byType(Chip), findsNothing);
+      expect(rawServicePills(), findsNothing);
     });
 
     testWidgets('a raw service string that repeats a typed amenity is '
@@ -223,7 +227,7 @@ void main() {
       expect(find.text('Station de lavage'), findsNothing);
       expect(find.text('Gonflage'), findsNothing);
       expect(find.text('Distributeur'), findsNothing);
-      expect(find.byType(Chip), findsNWidgets(1));
+      expect(rawServicePills(), findsNWidgets(1));
       expect(find.text('Piste poids lourds'), findsOneWidget);
       expect(find.text('Car Wash'), findsOneWidget);
       expect(find.text('Air'), findsOneWidget);

@@ -9,6 +9,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../domain/live_activity_content.dart';
 import '../../../core/logging/app_log.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/notifications/notification_tap_dispatcher.dart';
 
 /// #3722 — the ANDROID twin of the iOS Live Activity (#3170): an ongoing
 /// chronometer notification on the lock screen / notification shade
@@ -70,7 +71,8 @@ class AndroidLiveActivityNotifier {
   static const String actionStop = 'trip_stop';
 
   /// Payload prefix for action round-trips via NotificationTapDispatcher.
-  static const String actionPayloadPrefix = 'trip_action:';
+  static const String actionPayloadPrefix =
+      NotificationTapDispatcher.actionPrefix; // #4070 — one definition
 
   Future<void> _ensureChannel() async {
     if (_channelCreated) return;

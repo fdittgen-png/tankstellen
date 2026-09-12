@@ -102,6 +102,45 @@ void main() {
   // there is no public reset path, so any later test that subscribes
   // would observe a closed stream. Keep these grouped at the bottom.
   // -----------------------------------------------------------------
+  // #4070 — the channel is shared by alert deep-links and trip-tile
+  // actions. Each listener must see ONLY its own payloads: the launch
+  // handler used to jsonDecode `trip_action:*` and log a fabricated error
+  // per Stop tap (#4054), and the shape guard added there in turn hid a
+  // truncated alert payload.
+  group('NotificationTapDispatcher — namespaced streams (#4070)', () {
+    test('a trip-tile action never reaches the launch stream', () async {
+      final d = NotificationTapDispatcher.instance;
+      final launch = <String?>[];
+      final actions = <String>[];
+      final s1 = d.launchPayloads.listen(launch.add);
+      final s2 = d.actionPayloads.listen(actions.add);
+      d.dispatch('trip_action:trip_stop');
+      d.dispatch('trip_action:trip_pause');
+      await Future<void>.delayed(Duration.zero);
+      expect(launch, isEmpty);
+      expect(actions, ['trip_action:trip_stop', 'trip_action:trip_pause']);
+      await s1.cancel();
+      await s2.cancel();
+    });
+
+    test('an alert payload — even a truncated one — never reaches the '
+        'action stream, and does reach the launch stream', () async {
+      final d = NotificationTapDispatcher.instance;
+      final launch = <String?>[];
+      final actions = <String>[];
+      final s1 = d.launchPayloads.listen(launch.add);
+      final s2 = d.actionPayloads.listen(actions.add);
+      d.dispatch('{"k":"radius","s":"de-1","c":"de"}');
+      d.dispatch('"k":"radius",'); // truncated: still the launch handler's
+      d.dispatch(null);
+      await Future<void>.delayed(Duration.zero);
+      expect(actions, isEmpty);
+      expect(launch, ['{"k":"radius","s":"de-1","c":"de"}', '"k":"radius",', null]);
+      await s1.cancel();
+      await s2.cancel();
+    });
+  });
+
   group('NotificationTapDispatcher — debugClose (must run last)', () {
     test('debugClose closes the stream; subsequent dispatch is a no-op',
         () async {

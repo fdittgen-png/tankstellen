@@ -57,7 +57,10 @@ void main() {
       // `vm_service` — and needs Dart >= 3.12, which #3801 provides.
       // `pub global` resolves independently, so unlike a dev dependency it
       // cannot disturb this project's own dependency graph.
-      expect(servers['dart']['command'], 'dart');
+      // #4066 — an ABSOLUTE dart: the MCP client resolves `command` against
+      // its own PATH before the server's env applies, so a bare `dart`
+      // never launched. The pub-build guarantee below is about the ARGS.
+      expect(servers['dart']['command'], endsWith('/dart'));
       expect((servers['dart']['args'] as List).take(4).toList(),
           ['pub', 'global', 'run', 'dart_mcp_server']);
     });

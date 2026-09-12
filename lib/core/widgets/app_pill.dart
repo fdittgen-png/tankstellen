@@ -57,11 +57,19 @@ class AppPill extends StatelessWidget {
             Icon(icon, size: 12, color: fg),
             const SizedBox(width: 2),
           ],
-          Text(
-            label,
-            style: theme.textTheme.labelSmall?.copyWith(
-              fontSize: 10,
-              color: fg,
+          // #4076 — a pill never overflows its line: a label longer than
+          // the row (a long raw service string at 1.3× text) ellipsises
+          // instead of throwing a RenderFlex overflow.
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              softWrap: false,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.labelSmall?.copyWith(
+                fontSize: 10,
+                color: fg,
+              ),
             ),
           ),
         ],

@@ -180,7 +180,10 @@ void main() {
   /// The distinction pinned here: a payload that does not open a JSON
   /// object is *not mine* and must be silent; one that looks like mine
   /// and fails to parse is *mine and corrupt* and must stay reported.
-  group('#4054 — a foreign payload is not a fault', () {
+  // #4070 — foreign payloads no longer reach this decoder at all (the
+  // dispatcher namespaces them); what does reach it is addressed to it,
+  // so a parse failure is a real fault and must be logged.
+  group('#4054/#4070 — what reaches the decoder is addressed to it', () {
     late List<Object> logged;
 
     Future<void> settle() => Future<void>.delayed(Duration.zero);
@@ -208,28 +211,6 @@ void main() {
         Map<String, dynamic>? contextMap,
         DateTime? timestamp,
       }) async {};
-    });
-
-    test('the exact trip-tile payloads from the field log stay silent',
-        () async {
-      for (final raw in const [
-        'trip_action:trip_stop',
-        'trip_action:trip_pause',
-      ]) {
-        expect(NotificationPayload.tryDecode(raw), isNull, reason: raw);
-      }
-      await settle();
-      expect(logged, isEmpty,
-          reason: 'a payload addressed to another listener is routine — it '
-              "does not belong in the user's error log");
-    });
-
-    test('nor does any other payload that opens no JSON object', () async {
-      for (final raw in const ['legacy-v1', '42', '[1,2]', 'null', '   ']) {
-        expect(NotificationPayload.tryDecode(raw), isNull, reason: raw);
-      }
-      await settle();
-      expect(logged, isEmpty);
     });
 
     test('a payload that DOES open an object but is corrupt still logs',

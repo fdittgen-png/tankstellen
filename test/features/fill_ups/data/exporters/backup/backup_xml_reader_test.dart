@@ -303,4 +303,15 @@ void main() {
       expect(() => reader.read(xml), returnsNormally);
     });
   });
+
+  // #4071 — a negative litre value is refused at the boundary. TankPeriod
+  // asserts `liters >= 0`; a hand-edited or corrupt backup must not be
+  // able to construct an invalid report past that assert.
+  test('a negative <Liters> is rejected with a BackupXmlReadException',
+      () {
+    const reader = BackupXmlReader();
+    final bad = _fillUps().first.copyWith(liters: -1.5);
+    final xml = _buildXml(fillUps: [bad]);
+    expect(() => reader.read(xml), throwsA(isA<BackupXmlReadException>()));
+  });
 }

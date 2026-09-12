@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "dart": {
-      "command": "dart",
+      "command": "${HOME}/development/flutter/bin/dart",
       "args": [
         "pub",
         "global",

@@ -353,7 +353,8 @@ void main() {
     // prompt, identity read, odometer tracker, run state, fuel
     // accumulator) and the gear-coaching metric became a pure function.
     // No private field is written from more than one file any more.
-    'lib/features/obd2/data/session/trip_recording_controller.dart': 2483,
+    // #4068 — 2483 → 2481: the two dead `stopped`/`started` setters left the drop-host adapter; one `finalise()` forwarder replaced them.
+    'lib/features/obd2/data/session/trip_recording_controller.dart': 2481,
     // #4035 — 1 541 → 1 517: the pure ELM AT grammar (the `ATI` command,
     // the firmware-string parse, the reset-command test) left the library.
     'lib/features/obd2/data/session/obd2_service.dart': 1517,
@@ -383,7 +384,8 @@ void main() {
     'lib/features/obd2/data/obd2_connect_trace_log.dart': 627,
     'lib/features/obd2/data/session/obd2_link_supervisor.dart': 604,
     'lib/features/obd2/presentation/widgets/obd2_adapter_picker.dart': 601,
-    'lib/features/obd2/data/session/dropped_session_manager.dart': 586,
+    // #4068 — 586 → 581: both grace finalisers collapse their flag writes into `_host.finalise()`.
+    'lib/features/obd2/data/session/dropped_session_manager.dart': 581,
     'lib/features/driving_score/data/driving_score_calculator.dart': 556,
     'lib/features/profile/presentation/screens/developer_tools/pump_ocr_tester_screen.dart': 525,
     'lib/features/trips/domain/services/gear_inference.dart': 523,

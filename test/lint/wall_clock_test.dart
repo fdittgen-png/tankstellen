@@ -72,17 +72,19 @@ void main() {
     'lib/core/storage/stores/cache_hive_store.dart': 2,
     // #3743 (epic item 5) — the entity sync configs moved into their
     // owning features; keys follow the files, counts unchanged.
-    'lib/features/trips/data/baselines_sync.dart': 1,
-    'lib/core/sync/deletions_sync.dart': 1,
+    // #4065 — baselines_sync.dart: 1 → 0; updated_at now stamps through SyncRowOps.lwwStamp.
+    // #4065 — deletions_sync.dart: 1 → 0; the tombstone stamp goes through SyncRowOps.lwwStamp.
     // #4046/#4047 — entity_sync.dart drops to ZERO: its only raw read was
     // `lwwStamp`'s fallback, which moved into sync_row_ops.dart and now
     // reads through the AppClock seam. Ratchet-down, entry deleted.
-    'lib/features/itinerary/data/itineraries_sync.dart': 5,
+    // #4065 — itineraries_sync.dart: 5 → 4; updated_at now stamps through SyncRowOps.lwwStamp.
+    'lib/features/itinerary/data/itineraries_sync.dart': 4,
     'lib/core/sync/price_history_sync.dart': 1,
-    'lib/core/sync/ratings_sync.dart': 2,
+    // #4065 — ratings_sync.dart: 2 → 0; updated_at now stamps through SyncRowOps.lwwStamp.
     // #4056 — 4 → 2: the two row-builder reads moved to
     // trips_sync_rows.dart and go through SyncRowOps.lwwStamp there.
-    'lib/features/trips/data/trips_sync.dart': 2,
+    // #4065 — trips_sync.dart: 2 → 1; updated_at now stamps through SyncRowOps.lwwStamp.
+    'lib/features/trips/data/trips_sync.dart': 1,
     'lib/core/telemetry/collectors/breadcrumb_collector.dart': 1,
     'lib/core/telemetry/storage/isolate_error_spool.dart': 1,
     'lib/core/telemetry/storage/startup_failure_store.dart': 1,

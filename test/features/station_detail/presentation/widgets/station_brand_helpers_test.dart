@@ -5,6 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/search/domain/entities/brand_registry.dart';
 import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/station_brand_helpers.dart';
+import 'package:flutter/material.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
+import '../../../../fixtures/stations.dart';
 
 /// Builds a minimal Station with the given [brand]. All other fields use
 /// stable, valid defaults so the brand is the only variable under test.
@@ -82,4 +85,60 @@ void main() {
       );
     });
   });
+
+  // #4076 — the zone folds into the header as one secondary line.
+  group('stationZoneLine (#4076)', () {
+    final l = lookupAppLocalizations(const Locale('en'));
+
+    test('department, region and station kind on one line', () {
+      expect(stationZoneLine(_zoned, l), 'Hérault, Occitanie · Local station');
+      expect(stationZoneLine(_zonedHighway, l), 'Hérault, Occitanie · Highway');
+    });
+
+    test('absent when the source has neither department nor region', () {
+      expect(stationZoneLine(testStation, l), isNull);
+    });
+  });
 }
+
+const _zoned = Station(
+  id: '51d4b477-a095-1aa0-e100-80009459e03a',
+  name: 'Star Tankstelle',
+  brand: 'STAR',
+  street: 'Hauptstr.',
+  houseNumber: '12',
+  postCode: '10115',
+  place: 'Berlin',
+  lat: 52.5200,
+  lng: 13.4050,
+  dist: 1.5,
+  e5: 1.859,
+  e10: 1.799,
+  diesel: 1.659,
+  isOpen: true,
+  updatedAt: '2026-03-27T10:00:00+01:00',
+  department: 'Hérault',
+  region: 'Occitanie',
+  stationType: 'R',
+);
+
+const _zonedHighway = Station(
+  id: '51d4b477-a095-1aa0-e100-80009459e03a',
+  name: 'Star Tankstelle',
+  brand: 'STAR',
+  street: 'Hauptstr.',
+  houseNumber: '12',
+  postCode: '10115',
+  place: 'Berlin',
+  lat: 52.5200,
+  lng: 13.4050,
+  dist: 1.5,
+  e5: 1.859,
+  e10: 1.799,
+  diesel: 1.659,
+  isOpen: true,
+  updatedAt: '2026-03-27T10:00:00+01:00',
+  department: 'Hérault',
+  region: 'Occitanie',
+  stationType: 'A',
+);

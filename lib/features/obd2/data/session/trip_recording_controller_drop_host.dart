@@ -111,13 +111,11 @@ class _DroppedSessionHostAdapter implements DroppedSessionHost {
 
   @override
   bool get stopped => _c._run.stopped;
-  @override
-  set stopped(bool value) => _c._run.setStopped(value);
 
   @override
   bool get started => _c._run.started;
   @override
-  set started(bool value) => _c._run.setStarted(value);
+  void finalise() => _c._run.end();
 
   @override
   bool get paused => _c._run.paused;
