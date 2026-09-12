@@ -144,6 +144,30 @@ class ShellCenterButton extends ConsumerWidget {
           )
         : null;
 
+    // #4097 — the non-gesture way back. `Semantics.onLongPress` is
+    // exposed to TalkBack and switch access as an ACTION, so a user who
+    // cannot perform a drag can still show a hidden bar; the physical
+    // long-press below is the same path for everyone else. Tap is
+    // untouched, so nothing anyone does today changes.
+    final l10n = AppLocalizations.of(context);
+    final hidden = ref.watch(shellBarHiddenProvider);
+    // Idempotent on purpose: the semantics action and the physical
+    // long-press share one merged semantics node, so performing the
+    // action invokes BOTH handlers. `set` to an explicit target — rather
+    // than `toggle` — makes the second call a no-op instead of undoing
+    // the first.
+    Future<void> toggleBar() async {
+      await ref.read(shellBarHiddenProvider.notifier).set(!hidden);
+      if (!context.mounted) return;
+      // `announce` is deprecated in favour of `sendAnnouncement` (Flutter
+      // 3.35): same channel, multi-window safe.
+      unawaited(SemanticsService.sendAnnouncement(
+        View.of(context),
+        hidden ? l10n.shellBarShownAnnounce : l10n.shellBarHiddenAnnounce,
+        Directionality.of(context),
+      ));
+    }
+
     final button = DecoratedBox(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
@@ -170,6 +194,13 @@ class ShellCenterButton extends ConsumerWidget {
           child: InkWell(
             customBorder: const CircleBorder(),
             onTap: onTapHandler,
+            // #4103 — the long-press MUST share the InkWell's arena. As an
+            // outer GestureDetector it competed with this tap for the same
+            // pointer, so a finger resting a fraction too long toggled the
+            // bar and the search never fired — "sometimes no longer
+            // triggers a research". One recognizer set, disambiguated by
+            // Flutter, and the ripple matches the gesture.
+            onLongPress: () => unawaited(toggleBar()),
             child: SizedBox(
               width: diameter,
               height: diameter,
@@ -194,30 +225,6 @@ class ShellCenterButton extends ConsumerWidget {
       ),
     );
 
-    // #4097 — the non-gesture way back. `Semantics.onLongPress` is
-    // exposed to TalkBack and switch access as an ACTION, so a user who
-    // cannot perform a drag can still show a hidden bar; the physical
-    // long-press below is the same path for everyone else. Tap is
-    // untouched, so nothing anyone does today changes.
-    final l10n = AppLocalizations.of(context);
-    final hidden = ref.watch(shellBarHiddenProvider);
-    // Idempotent on purpose: the semantics action and the physical
-    // long-press share one merged semantics node, so performing the
-    // action invokes BOTH handlers. `set` to an explicit target — rather
-    // than `toggle` — makes the second call a no-op instead of undoing
-    // the first.
-    Future<void> toggleBar() async {
-      await ref.read(shellBarHiddenProvider.notifier).set(!hidden);
-      if (!context.mounted) return;
-      // `announce` is deprecated in favour of `sendAnnouncement` (Flutter
-      // 3.35): same channel, multi-window safe.
-      unawaited(SemanticsService.sendAnnouncement(
-        View.of(context),
-        hidden ? l10n.shellBarShownAnnounce : l10n.shellBarHiddenAnnounce,
-        Directionality.of(context),
-      ));
-    }
-
     return Semantics(
       label: tooltipLabel,
       button: true,
@@ -229,10 +236,7 @@ class ShellCenterButton extends ConsumerWidget {
       // the seat now, for both orientations; no separate cradle disc.
       child: Tooltip(
         message: tooltipLabel,
-        child: GestureDetector(
-          onLongPress: () => unawaited(toggleBar()),
-          child: button,
-        ),
+        child: button,
       ),
     );
   }

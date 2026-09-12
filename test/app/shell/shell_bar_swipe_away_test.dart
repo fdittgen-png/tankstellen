@@ -12,6 +12,7 @@ import 'package:flutter/semantics.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../../helpers/silence_error_logger.dart';
+import 'package:tankstellen/core/navigation/search_fab_action_provider.dart';
 
 /// #4097 — swipe the bar away for a full-screen view.
 ///
@@ -58,6 +59,9 @@ void main() {
     if (hidden) {
       await container.read(shellBarHiddenProvider.notifier).set(true);
     }
+    // #4106 — retire the coach mark unless a test is about it, so the
+    // gesture tests exercise the bar and not the hint over it.
+    await container.read(shellSwipeCoachSeenProvider.notifier).markSeen();
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
@@ -221,6 +225,57 @@ void main() {
       expect(container.read(shellBarHiddenProvider), isTrue);
       await container.read(shellBarHiddenProvider.notifier).toggle();
       expect(container.read(shellBarHiddenProvider), isFalse);
+    });
+  });
+
+  group('#4103 — the search button searches', () {
+    testWidgets('a long press toggles the bar, and a TAP still fires the '
+        'button\'s action', (tester) async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      await container.read(shellSwipeCoachSeenProvider.notifier).markSeen();
+      var fired = 0;
+      container.read(searchFabActionControllerProvider.notifier).set(
+            SearchFabAction(
+              icon: Icons.bolt,
+              tooltip: 'Run',
+              onTap: () => fired++,
+            ),
+          );
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              bottomNavigationBar: ShellBottomBar(
+                items: items,
+                branchForSlot: List<int>.generate(items.length, (i) => i),
+                currentIndex: 0,
+                iconControllers: controllers,
+                isLandscape: false,
+                onTap: (_) {},
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // The long press toggles the bar — and must not count as a tap.
+      await tester.longPress(find.byType(ShellCenterButton));
+      await tester.pumpAndSettle();
+      expect(container.read(shellBarHiddenProvider), isTrue);
+      expect(fired, 0, reason: 'a long press is not a search');
+
+      // And a plain tap still reaches the action. Before #4103 the
+      // long-press lived in an outer GestureDetector and competed for the
+      // same pointer, so this fired nothing.
+      await tester.tap(find.byType(ShellCenterButton));
+      await tester.pumpAndSettle();
+      expect(fired, 1,
+          reason: 'the tap must survive the long-press living beside it');
     });
   });
 }
