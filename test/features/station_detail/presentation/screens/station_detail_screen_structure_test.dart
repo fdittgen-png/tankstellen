@@ -25,6 +25,7 @@ import '../../../../fixtures/stations.dart';
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
 import '../../../../mocks/mocks.dart';
+import 'package:tankstellen/core/theme/shell_metrics.dart';
 
 /// Structural layout coverage for StationDetailScreen (#2161 / #2352).
 ///
@@ -174,7 +175,7 @@ void main() {
       final expanded = appBar.expandedHeight!;
       // Tighter than the old fixed 196 at 1.0x would have been at 1.3x,
       // yet still tall enough for toolbar + status row + brand header.
-      expect(expanded, greaterThan(kToolbarHeight + kBrandLogoSize));
+      expect(expanded, greaterThan(kAppToolbarHeight + kBrandLogoSize));
       expect(expanded, lessThan(260));
     });
 

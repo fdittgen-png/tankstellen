@@ -22,6 +22,7 @@ import '../widgets/station_prices_section.dart';
 import '../widgets/station_rating_section.dart';
 import '../widgets/station_status_row.dart';
 import 'station_detail_wide_layout.dart';
+import '../../../../core/theme/shell_metrics.dart';
 
 /// Detail screen for a single fuel station.
 ///
@@ -161,7 +162,7 @@ class _StationDetailLoaded extends StatelessWidget {
                   // much to avoid overlap when fully expanded.
                   padding: const EdgeInsets.fromLTRB(
                     kHeaderHorizontalPadding,
-                    kToolbarHeight + kHeaderTopGap,
+                    kAppToolbarHeight + kHeaderTopGap,
                     kHeaderHorizontalPadding,
                     kHeaderBottomInset,
                   ),

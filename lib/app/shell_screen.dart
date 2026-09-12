@@ -21,6 +21,7 @@ import '../core/navigation/search_fab_action_provider.dart';
 import 'shell/shell_bottom_bar.dart';
 import 'shell/shell_destinations.dart';
 import 'shell/shell_nav_rail.dart';
+import '../core/utils/edge_to_edge.dart';
 
 /// The main app shell with adaptive navigation.
 ///
@@ -159,6 +160,10 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
     // and make the central FAB dead on the tab the user switched to.
     ref.read(searchFabActionControllerProvider.notifier).set(null);
 
+    // #4082 — a branch switch is neither a route event nor a resume, so
+    // an immersive screen's leftover black status band survived it.
+    // Re-assert edge-to-edge here too; idempotent.
+    unawaited(EdgeToEdge.restore());
     // Navigate via go_router — this preserves each branch's state.
     // #2811 — guard + trace: a goBranch throw must not silently leave the
     // shell mid-transition (bar present but no tab highlighted) with nothing

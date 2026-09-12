@@ -5,6 +5,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../logging/app_log.dart';
+import '../logging/error_logger.dart';
 
 /// Configures edge-to-edge display for Android 15+ compatibility.
 ///
@@ -51,6 +53,18 @@ class EdgeToEdge {
   /// `manual` is not the inverse of `edgeToEdge`; [enable] is. This is that
   /// inverse, in one place, so the seventh screen cannot get it wrong.
   static Future<void> restore() async {
+    // #4082 — called on every navigation and branch switch now, so a
+    // platform without the channel (tests, desktop) must not turn a
+    // self-heal into a crash: log it and carry on.
+    try {
+      await _restore();
+    } catch (e, st) {
+      log.warn('EdgeToEdge.restore: system UI call failed',
+          error: e, stack: st, layer: ErrorLayer.other);
+    }
+  }
+
+  static Future<void> _restore() async {
     // #3841 — leave immersive in TWO steps, deliberately.
     //
     // The status-bar COLOUR is already transparent everywhere (FlexColorScheme

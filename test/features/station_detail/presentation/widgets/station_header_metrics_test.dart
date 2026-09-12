@@ -12,6 +12,7 @@ import 'package:tankstellen/features/station_detail/presentation/widgets/station
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../../../../fixtures/stations.dart';
+import 'package:tankstellen/core/theme/shell_metrics.dart';
 
 /// #3902 — the compact sliver header is sized from its content, so the
 /// band ends `kHeaderBottomInset` under the address instead of leaving a
@@ -70,7 +71,7 @@ void main() {
     testWidgets('budgets toolbar + status row + the painted brand header + '
         'insets — nothing more', (tester) async {
       final m = await measure(tester, testStation);
-      final floor = kToolbarHeight +
+      final floor = kAppToolbarHeight +
           kHeaderTopGap +
           kStatusDotSize +
           kHeaderStatusGap +
@@ -92,7 +93,7 @@ void main() {
       expect(
         scaled.expanded,
         greaterThanOrEqualTo(
-          kToolbarHeight +
+          kAppToolbarHeight +
               kHeaderTopGap +
               kStatusDotSize +
               kHeaderStatusGap +
@@ -122,7 +123,7 @@ void main() {
       expect(
         narrow.expanded,
         greaterThanOrEqualTo(
-          kToolbarHeight +
+          kAppToolbarHeight +
               kHeaderTopGap +
               kStatusDotSize +
               kHeaderStatusGap +
@@ -149,7 +150,7 @@ void main() {
       expect(
         m.expanded,
         greaterThanOrEqualTo(
-          kToolbarHeight +
+          kAppToolbarHeight +
               kHeaderTopGap +
               kStatusDotSize +
               kHeaderStatusGap +
@@ -180,7 +181,7 @@ void main() {
       expect(
         m.expanded,
         greaterThanOrEqualTo(
-          kToolbarHeight +
+          kAppToolbarHeight +
               kHeaderTopGap +
               kStatusDotSize +
               kHeaderStatusGap +

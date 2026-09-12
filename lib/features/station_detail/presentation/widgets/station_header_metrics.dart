@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/domain/station.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'station_brand_helpers.dart';
+import '../../../../core/theme/shell_metrics.dart';
 
 /// Layout constants + measurement for the collapsing station-detail header
 /// (#3902).
@@ -30,10 +31,10 @@ const double kHeaderHorizontalPadding = 16;
 
 /// Gap between the pinned toolbar row (back arrow / actions) and the status
 /// row.
-const double kHeaderTopGap = 8;
+const double kHeaderTopGap = 4; // #4082 — was 8
 
 /// Gap between the status row and the brand header.
-const double kHeaderStatusGap = 8;
+const double kHeaderStatusGap = 6; // #4082 — was 8
 
 /// Space kept under the address so the band does not end flush on the text.
 const double kHeaderBottomInset = 16;
@@ -135,7 +136,7 @@ double stationHeaderExpandedHeight(BuildContext context, Station station) {
   }
   final brandHeader = math.max(kBrandLogoSize, column);
 
-  return (kToolbarHeight +
+  return (kAppToolbarHeight +
           kHeaderTopGap +
           statusRow +
           kHeaderStatusGap +
