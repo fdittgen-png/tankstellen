@@ -102,7 +102,7 @@ void main() {
 
     test('stations exist but none has a price for the selected fuel', () {
       final c = container(
-        route: result(stations: [
+        route: result(stations: const [
           Station(
             id: 'a', name: 'a', brand: 'b', street: 'r', postCode: '1',
             place: 'p', lat: 45, lng: 5,
