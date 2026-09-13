@@ -6466,5 +6466,84 @@
   "@storageKeyLostGuidance": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "refuelPlanTab": "Plan",
+  "@refuelPlanTab": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelPlanCheapestTitle": "Cheapest trip",
+  "@refuelPlanCheapestTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelPlanFastestTitle": "Fastest trip",
+  "@refuelPlanFastestTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelPlanStopCount": "{count, plural, =0{No stop needed} =1{1 stop} other{{count} stops}}",
+  "@refuelPlanStopCount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "refuelPlanTotal": "{cost} total · {perKm}/km",
+  "@refuelPlanTotal": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "cost": {
+        "type": "String"
+      },
+      "perKm": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelPlanStopLine": "Buy {litres} — {cost}",
+  "@refuelPlanStopLine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      },
+      "cost": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelPlanGap": "No station in range between {from} and {to}",
+  "@refuelPlanGap": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelPlanNeedsConsumption": "Add a few fill-ups and Sparkilo can plan your stops",
+  "@refuelPlanNeedsConsumption": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelPlanNeedsTank": "Set your tank size to plan refuelling stops",
+  "@refuelPlanNeedsTank": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelPlanNeedsPrices": "No station on this route has a price for your fuel",
+  "@refuelPlanNeedsPrices": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

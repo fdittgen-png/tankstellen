@@ -502,6 +502,54 @@ class AppLocalizationsCs extends AppLocalizations {
   String get wrongStatusClosed => 'Zobrazeno jako zavřeno, ale otevřeno';
 
   @override
+  String get refuelPlanTab => 'Plan';
+
+  @override
+  String get refuelPlanCheapestTitle => 'Cheapest trip';
+
+  @override
+  String get refuelPlanFastestTitle => 'Fastest trip';
+
+  @override
+  String refuelPlanStopCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stops',
+      one: '1 stop',
+      zero: 'No stop needed',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String refuelPlanTotal(String cost, String perKm) {
+    return '$cost total · $perKm/km';
+  }
+
+  @override
+  String refuelPlanStopLine(String litres, String cost) {
+    return 'Buy $litres — $cost';
+  }
+
+  @override
+  String refuelPlanGap(String from, String to) {
+    return 'No station in range between $from and $to';
+  }
+
+  @override
+  String get refuelPlanNeedsConsumption =>
+      'Add a few fill-ups and Sparkilo can plan your stops';
+
+  @override
+  String get refuelPlanNeedsTank =>
+      'Set your tank size to plan refuelling stops';
+
+  @override
+  String get refuelPlanNeedsPrices =>
+      'No station on this route has a price for your fuel';
+
+  @override
   String get allStations => 'Všechny stanice';
 
   @override

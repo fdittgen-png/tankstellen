@@ -501,6 +501,54 @@ class AppLocalizationsEn extends AppLocalizations {
   String get wrongStatusClosed => 'Shown as closed, but open';
 
   @override
+  String get refuelPlanTab => 'Plan';
+
+  @override
+  String get refuelPlanCheapestTitle => 'Cheapest trip';
+
+  @override
+  String get refuelPlanFastestTitle => 'Fastest trip';
+
+  @override
+  String refuelPlanStopCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stops',
+      one: '1 stop',
+      zero: 'No stop needed',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String refuelPlanTotal(String cost, String perKm) {
+    return '$cost total · $perKm/km';
+  }
+
+  @override
+  String refuelPlanStopLine(String litres, String cost) {
+    return 'Buy $litres — $cost';
+  }
+
+  @override
+  String refuelPlanGap(String from, String to) {
+    return 'No station in range between $from and $to';
+  }
+
+  @override
+  String get refuelPlanNeedsConsumption =>
+      'Add a few fill-ups and Sparkilo can plan your stops';
+
+  @override
+  String get refuelPlanNeedsTank =>
+      'Set your tank size to plan refuelling stops';
+
+  @override
+  String get refuelPlanNeedsPrices =>
+      'No station on this route has a price for your fuel';
+
+  @override
   String get allStations => 'All stations';
 
   @override
@@ -9715,6 +9763,54 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get wrongStatusClosed => '⟦Šĥóŵñ áš çłóšéđ, ƀúŧ óƥéñ ·········⟧';
+
+  @override
+  String get refuelPlanTab => '⟦Ƥłáñ ··⟧';
+
+  @override
+  String get refuelPlanCheapestTitle => '⟦Çĥéáƥéšŧ ŧřîƥ ·····⟧';
+
+  @override
+  String get refuelPlanFastestTitle => '⟦Ƒášŧéšŧ ŧřîƥ ·····⟧';
+
+  @override
+  String refuelPlanStopCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stops',
+      one: '1 stop',
+      zero: 'No stop needed',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String refuelPlanTotal(String cost, String perKm) {
+    return '⟦$cost ŧóŧáł · $perKm/ķɱ ···⟧';
+  }
+
+  @override
+  String refuelPlanStopLine(String litres, String cost) {
+    return '⟦Ɓúý $litres — $cost ·⟧';
+  }
+
+  @override
+  String refuelPlanGap(String from, String to) {
+    return '⟦Ñó šŧáŧîóñ îñ řáñǧé ƀéŧŵééñ $from áñđ $to ············⟧';
+  }
+
+  @override
+  String get refuelPlanNeedsConsumption =>
+      '⟦Áđđ á ƒéŵ ƒîłł-úƥš áñđ Šƥářķîłó çáñ ƥłáñ ýóúř šŧóƥš ··················⟧';
+
+  @override
+  String get refuelPlanNeedsTank =>
+      '⟦Šéŧ ýóúř ŧáñķ šîžé ŧó ƥłáñ řéƒúéłłîñǧ šŧóƥš ················⟧';
+
+  @override
+  String get refuelPlanNeedsPrices =>
+      '⟦Ñó šŧáŧîóñ óñ ŧĥîš řóúŧé ĥáš á ƥřîçé ƒóř ýóúř ƒúéł ··················⟧';
 
   @override
   String get allStations => '⟦Áłł šŧáŧîóñš ·····⟧';

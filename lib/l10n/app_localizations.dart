@@ -1053,6 +1053,66 @@ abstract class AppLocalizations {
   /// **'Shown as closed, but open'**
   String get wrongStatusClosed;
 
+  /// Third pill on the route results, beside All stations and Best stops (#4146). Names the mode that plans WHERE the trip must stop given the tank, rather than listing stations.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan'**
+  String get refuelPlanTab;
+
+  /// The plan that minimises total money — fuel bought plus the driving the detours cost (#4146).
+  ///
+  /// In en, this message translates to:
+  /// **'Cheapest trip'**
+  String get refuelPlanCheapestTitle;
+
+  /// The plan that minimises time — fewest stops, smallest detours (#4146).
+  ///
+  /// In en, this message translates to:
+  /// **'Fastest trip'**
+  String get refuelPlanFastestTitle;
+
+  /// How many refuelling stops a plan needs (#4146). Zero is a real and good answer — the tank covers the trip.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No stop needed} =1{1 stop} other{{count} stops}}'**
+  String refuelPlanStopCount(int count);
+
+  /// A plan's total cost and its cost per kilometre (#4146). Both are money, already formatted with the currency.
+  ///
+  /// In en, this message translates to:
+  /// **'{cost} total · {perKm}/km'**
+  String refuelPlanTotal(String cost, String perKm);
+
+  /// One stop of a plan: the litres to buy there and what they cost (#4146). 'Just enough to reach a cheaper station' is a real instruction, so this is often not a full tank.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy {litres} — {cost}'**
+  String refuelPlanStopLine(String litres, String cost);
+
+  /// The route cannot be driven on this tank (#4146). Names the stretch rather than returning a plan that would strand the driver.
+  ///
+  /// In en, this message translates to:
+  /// **'No station in range between {from} and {to}'**
+  String refuelPlanGap(String from, String to);
+
+  /// Blocker: no measured consumption, so range cannot be computed (#4146). Never defaulted — range is the whole constraint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a few fill-ups and Sparkilo can plan your stops'**
+  String get refuelPlanNeedsConsumption;
+
+  /// Blocker: no tank capacity on the vehicle (#4146).
+  ///
+  /// In en, this message translates to:
+  /// **'Set your tank size to plan refuelling stops'**
+  String get refuelPlanNeedsTank;
+
+  /// Blocker: candidates exist but none is priced for the selected fuel (#4146).
+  ///
+  /// In en, this message translates to:
+  /// **'No station on this route has a price for your fuel'**
+  String get refuelPlanNeedsPrices;
+
   /// No description provided for @allStations.
   ///
   /// In en, this message translates to:

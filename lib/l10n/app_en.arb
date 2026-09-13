@@ -259,6 +259,75 @@
   "wrongDieselPrice": "Wrong Diesel price",
   "wrongStatusOpen": "Shown as open, but closed",
   "wrongStatusClosed": "Shown as closed, but open",
+  "refuelPlanTab": "Plan",
+  "@refuelPlanTab": {
+    "description": "Third pill on the route results, beside All stations and Best stops (#4146). Names the mode that plans WHERE the trip must stop given the tank, rather than listing stations."
+  },
+  "refuelPlanCheapestTitle": "Cheapest trip",
+  "@refuelPlanCheapestTitle": {
+    "description": "The plan that minimises total money — fuel bought plus the driving the detours cost (#4146)."
+  },
+  "refuelPlanFastestTitle": "Fastest trip",
+  "@refuelPlanFastestTitle": {
+    "description": "The plan that minimises time — fewest stops, smallest detours (#4146)."
+  },
+  "refuelPlanStopCount": "{count, plural, =0{No stop needed} =1{1 stop} other{{count} stops}}",
+  "@refuelPlanStopCount": {
+    "description": "How many refuelling stops a plan needs (#4146). Zero is a real and good answer — the tank covers the trip.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "refuelPlanTotal": "{cost} total · {perKm}/km",
+  "@refuelPlanTotal": {
+    "description": "A plan's total cost and its cost per kilometre (#4146). Both are money, already formatted with the currency.",
+    "placeholders": {
+      "cost": {
+        "type": "String"
+      },
+      "perKm": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelPlanStopLine": "Buy {litres} — {cost}",
+  "@refuelPlanStopLine": {
+    "description": "One stop of a plan: the litres to buy there and what they cost (#4146). 'Just enough to reach a cheaper station' is a real instruction, so this is often not a full tank.",
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      },
+      "cost": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelPlanGap": "No station in range between {from} and {to}",
+  "@refuelPlanGap": {
+    "description": "The route cannot be driven on this tank (#4146). Names the stretch rather than returning a plan that would strand the driver.",
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelPlanNeedsConsumption": "Add a few fill-ups and Sparkilo can plan your stops",
+  "@refuelPlanNeedsConsumption": {
+    "description": "Blocker: no measured consumption, so range cannot be computed (#4146). Never defaulted — range is the whole constraint."
+  },
+  "refuelPlanNeedsTank": "Set your tank size to plan refuelling stops",
+  "@refuelPlanNeedsTank": {
+    "description": "Blocker: no tank capacity on the vehicle (#4146)."
+  },
+  "refuelPlanNeedsPrices": "No station on this route has a price for your fuel",
+  "@refuelPlanNeedsPrices": {
+    "description": "Blocker: candidates exist but none is priced for the selected fuel (#4146)."
+  },
   "allStations": "All stations",
   "bestStops": "Best stops",
   "openInMaps": "Open in Maps",
