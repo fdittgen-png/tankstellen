@@ -165,18 +165,18 @@ class ConsumptionStatsCard extends ConsumerWidget {
             ),
           ],
           const SizedBox(height: Spacing.lg),
+          // #4135 — cost per kilometre reads FIRST. Both numbers were
+          // already here at equal weight, and nothing said which one
+          // mattered; €/km is what closes the loop between a cheaper
+          // station and a cheaper month, so it takes the leading slot.
+          //
+          // Emphasis by POSITION, not by type size: #3950's visual
+          // grammar makes the stat figures the card's focal numbers, tied
+          // with each other and topping the title and every caption. A
+          // bigger €/km would have broken that tie here and nowhere else,
+          // leaving this panel inconsistent with every other one.
           Row(
             children: [
-              Expanded(
-                child: _StatTile(
-                  icon: Icons.speed,
-                  label: l.statAvgConsumption,
-                  value: avgConsumption != null
-                      ? UnitFormatter.formatDecimal(avgConsumption, fractionDigits: 2)
-                      : '—',
-                ),
-              ),
-              const SizedBox(width: Spacing.md),
               Expanded(
                 child: _StatTile(
                   icon: Icons.euro,
@@ -184,6 +184,16 @@ class ConsumptionStatsCard extends ConsumerWidget {
                   // #2491 — locale-aware 3 dp via formatPerKm.
                   value: avgCostKm != null
                       ? PriceFormatter.formatPerKm(avgCostKm)
+                      : '—',
+                ),
+              ),
+              const SizedBox(width: Spacing.md),
+              Expanded(
+                child: _StatTile(
+                  icon: Icons.speed,
+                  label: l.statAvgConsumption,
+                  value: avgConsumption != null
+                      ? UnitFormatter.formatDecimal(avgConsumption, fractionDigits: 2)
                       : '—',
                 ),
               ),
