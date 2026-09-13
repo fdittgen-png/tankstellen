@@ -7419,6 +7419,18 @@ class AppLocalizationsDe extends AppLocalizations {
       'Zur Wiederherstellung leere den App-Speicher in den Geräteeinstellungen oder installiere die App neu. Deine Favoriten und dein Verlauf werden nur auf diesem Gerät gespeichert und können nicht automatisch wiederhergestellt werden.';
 
   @override
+  String get storageKeyLostTitle =>
+      'Wiederhergestellte Daten sind nicht lesbar';
+
+  @override
+  String get storageKeyLostMessage =>
+      'Diese Installation wurde aus einem Backup wiederhergestellt. Die Daten von Sparkilo sind zurück, der Schlüssel dazu nicht: Android bewahrt ihn in der sicheren Hardware des Telefons auf, und er lässt sich weder auf ein anderes Gerät übertragen noch aus einem Backup wiederherstellen.';
+
+  @override
+  String get storageKeyLostGuidance =>
+      'Der wiederhergestellte Verlauf ist nicht zu retten. Leere den App-Speicher in den Geräteeinstellungen, um neu zu starten — melde dich dann bei TankSync an, und alles Synchronisierte ist wieder da.';
+
+  @override
   String syncAdoptTitle(String email) {
     return 'Konto von $email beitreten';
   }

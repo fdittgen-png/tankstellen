@@ -7350,6 +7350,17 @@ class AppLocalizationsEn extends AppLocalizations {
       'To recover, clear the app\'s storage in your device settings, or reinstall the app. Your favourites and history are stored on this device only, so they cannot be restored automatically.';
 
   @override
+  String get storageKeyLostTitle => 'Restored data cannot be read';
+
+  @override
+  String get storageKeyLostMessage =>
+      'This install was restored from a backup, which brought back Sparkilo\'s data but not the key that unlocks it. Android keeps that key in the phone\'s secure hardware, and it cannot be copied to another device or restored from a backup.';
+
+  @override
+  String get storageKeyLostGuidance =>
+      'The restored history cannot be recovered. Clear the app’s storage in your device settings to start fresh — then sign in to TankSync and everything you had synced comes back.';
+
+  @override
   String syncAdoptTitle(String email) {
     return 'Join $email\'s account';
   }
@@ -16735,6 +16746,18 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get storageRecoveryGuidance =>
       '⟦Ŧó řéçóṽéř, çłéář ŧĥé áƥƥ\'š šŧóřáǧé îñ ýóúř đéṽîçé šéŧŧîñǧš, óř řéîñšŧáłł ŧĥé áƥƥ. Ýóúř ƒáṽóúřîŧéš áñđ ĥîšŧóřý ářé šŧóřéđ óñ ŧĥîš đéṽîçé óñłý, šó ŧĥéý çáññóŧ ƀé řéšŧóřéđ áúŧóɱáŧîçáłłý. ···································································⟧';
+
+  @override
+  String get storageKeyLostTitle =>
+      '⟦Řéšŧóřéđ đáŧá çáññóŧ ƀé řéáđ ···········⟧';
+
+  @override
+  String get storageKeyLostMessage =>
+      '⟦Ŧĥîš îñšŧáłł ŵáš řéšŧóřéđ ƒřóɱ á ƀáçķúƥ, ŵĥîçĥ ƀřóúǧĥŧ ƀáçķ Šƥářķîłó\'š đáŧá ƀúŧ ñóŧ ŧĥé ķéý ŧĥáŧ úñłóçķš îŧ. Áñđřóîđ ķééƥš ŧĥáŧ ķéý îñ ŧĥé ƥĥóñé\'š šéçúřé ĥářđŵářé, áñđ îŧ çáññóŧ ƀé çóƥîéđ ŧó áñóŧĥéř đéṽîçé óř řéšŧóřéđ ƒřóɱ á ƀáçķúƥ. ····················································································⟧';
+
+  @override
+  String get storageKeyLostGuidance =>
+      '⟦Ŧĥé řéšŧóřéđ ĥîšŧóřý çáññóŧ ƀé řéçóṽéřéđ. Çłéář ŧĥé áƥƥ’š šŧóřáǧé îñ ýóúř đéṽîçé šéŧŧîñǧš ŧó šŧářŧ ƒřéšĥ — ŧĥéñ šîǧñ îñ ŧó ŦáñķŠýñç áñđ éṽéřýŧĥîñǧ ýóú ĥáđ šýñçéđ çóɱéš ƀáçķ. ·······························································⟧';
 
   @override
   String syncAdoptTitle(String email) {

@@ -19,11 +19,17 @@ import 'animated_splash.dart';
 /// advising users to destroy their data to work around a bug a patch
 /// fixed in one line.
 ///
-/// [corrupted] therefore gates the copy. Only an actual
+/// [cause] therefore gates the copy. Only an actual
 /// `HiveCorruptionException` — Hive itself reporting a file it cannot
 /// recover — earns the clear-your-storage advice. Everything else gets a
 /// message that states what is known, says the data is intact, and
 /// explicitly tells the user NOT to clear storage.
+///
+/// #4118 added a third cause. A restored install carries the encrypted
+/// boxes without the KeyStore key that reads them, and the old screen
+/// called that damage: the files are perfectly intact, the cause is
+/// known, and the good news the corruption copy cannot offer — TankSync
+/// still holds whatever was synced — was never said.
 ///
 /// Before this screen existed, a box damaged beyond Hive's own crash
 /// recovery threw an uncaught exception out of `_initStorage`, leaving
@@ -40,13 +46,31 @@ import 'animated_splash.dart';
 /// shown in the device language; if the delegate has not resolved yet a
 /// hard-coded English fallback keeps the screen useful rather than
 /// blank.
-class StorageRecoveryHost extends StatelessWidget {
-  const StorageRecoveryHost({super.key, this.corrupted = false});
-
-  /// True only when Hive itself reported a file it could not recover.
-  /// Defaults to false — the safe direction, because the false branch
+/// Why the storage phase failed — which decides what the screen is
+/// allowed to claim, and whether it may advise data loss (#4116/#4118).
+enum StorageRecoveryCause {
+  /// Cause not established: a cipher fault, a TraceStorage fault, or a
+  /// bug of ours. The DEFAULT, and the only safe default — this branch
   /// never advises data loss.
-  final bool corrupted;
+  unknown,
+
+  /// Hive itself reported a box file it could not recover.
+  corruptBox,
+
+  /// The boxes are intact but this install has no key for them — a
+  /// backup or device-transfer restore.
+  keyLost,
+}
+
+class StorageRecoveryHost extends StatelessWidget {
+  const StorageRecoveryHost({
+    super.key,
+    this.cause = StorageRecoveryCause.unknown,
+  });
+
+  /// Why startup failed. Defaults to [StorageRecoveryCause.unknown] —
+  /// the safe direction, because that branch never advises data loss.
+  final StorageRecoveryCause cause;
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +82,7 @@ class StorageRecoveryHost extends StatelessWidget {
       supportedLocales: AppLocalizations.supportedLocales,
       onGenerateRoute: (_) => PageRouteBuilder<void>(
         pageBuilder: (context, animation, secondaryAnimation) =>
-            _StorageRecoveryBody(corrupted: corrupted),
+            _StorageRecoveryBody(cause: cause),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
       ),
@@ -67,20 +91,32 @@ class StorageRecoveryHost extends StatelessWidget {
 }
 
 class _StorageRecoveryBody extends StatelessWidget {
-  const _StorageRecoveryBody({required this.corrupted});
+  const _StorageRecoveryBody({required this.cause});
 
-  final bool corrupted;
+  final StorageRecoveryCause cause;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    // #4116 — claim damage only when damage was actually reported.
-    final title =
-        corrupted ? l10n.storageRecoveryTitle : l10n.startupFailureTitle;
-    final message =
-        corrupted ? l10n.storageRecoveryMessage : l10n.startupFailureMessage;
-    final guidance =
-        corrupted ? l10n.storageRecoveryGuidance : l10n.startupFailureGuidance;
+    // #4116 — claim damage only when damage was actually reported;
+    // #4118 — and name the restore when that is what happened.
+    final (title, message, guidance) = switch (cause) {
+      StorageRecoveryCause.corruptBox => (
+          l10n.storageRecoveryTitle,
+          l10n.storageRecoveryMessage,
+          l10n.storageRecoveryGuidance,
+        ),
+      StorageRecoveryCause.keyLost => (
+          l10n.storageKeyLostTitle,
+          l10n.storageKeyLostMessage,
+          l10n.storageKeyLostGuidance,
+        ),
+      StorageRecoveryCause.unknown => (
+          l10n.startupFailureTitle,
+          l10n.startupFailureMessage,
+          l10n.startupFailureGuidance,
+        ),
+    };
 
     return Semantics(
       container: true,

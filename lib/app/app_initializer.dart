@@ -47,11 +47,11 @@ import '../features/profile/data/repositories/profile_repository.dart';
 import '../features/widget/data/home_widget_service.dart';
 import '../features/widget/providers/pending_widget_uri_provider.dart';
 import 'startup/startup_overrides.dart';
+import 'startup/storage_failure_gate.dart';
 import 'startup/launch_sync_phase.dart';
 import 'startup/provider_warmup_phase.dart';
 import 'startup/telemetry_replay_phase.dart';
 import 'startup/trip_recovery_phase.dart';
-import 'widgets/storage_recovery_screen.dart';
 
 part 'app_initializer_boot_support.dart';
 part 'app_initializer_deferred_tasks.dart';
@@ -82,32 +82,10 @@ class AppInitializer {
     // for non-`en_US` locales instead of throwing `LocaleDataException`.
     await initializeDateFormatting();
 
-    // #2294 — a Hive box damaged beyond crash recovery throws a
-    // HiveCorruptionException out of the storage phase; #3149 widened the
-    // net to ANY storage-phase fault. Both previously escaped uncaught —
-    // no Zone handler exists yet (handlers install only in `_launch`) —
-    // freezing the splash with no message and no telemetry. Surface a
-    // localized recovery screen and route the exception through
-    // errorLogger; startup cannot continue without local storage.
-    try {
-      await _initStorage();
-    } on HiveCorruptionException catch (e, st) {
-      // #3149 — Hive is down (spool can't write); plain-file the cause.
-      await StartupFailureStore.persist(e, st);
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st));
-      // #4116 — only THIS branch may advise clearing storage.
-      runApp(const ProviderScope(child: StorageRecoveryHost(corrupted: true)));
-      return;
-    } catch (e, st) {
-      // #3149 — any OTHER storage-phase fault (secure-storage cipher,
-      // TraceStorage, loadApiKey…) previously escaped uncaught — no Zone
-      // handler exists yet — freezing the splash with zero telemetry.
-      await StartupFailureStore.persist(e, st);
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: {'where': 'initStorage'}));
-      runApp(const ProviderScope(child: StorageRecoveryHost()));
-      return;
-    }
+    // #2294 / #3149 / #4116 / #4118 — the storage phase and its three
+    // distinct failure verdicts live in one place; see the gate for why
+    // the distinction is not cosmetic.
+    if (!await runStoragePhaseGuarded(_initStorage)) return;
     StartupTimer.instance.mark('storage_ready');
 
     await _initServicesInParallel();

@@ -6079,5 +6079,8 @@
         "type": "String"
       }
     }
-  }
+  },
+  "storageKeyLostTitle": "Les données restaurées sont illisibles",
+  "storageKeyLostMessage": "Cette installation a été restaurée depuis une sauvegarde : les données de Sparkilo sont revenues, mais pas la clé qui les déverrouille. Android conserve cette clé dans le matériel sécurisé du téléphone ; elle ne peut ni être copiée vers un autre appareil ni être restaurée depuis une sauvegarde.",
+  "storageKeyLostGuidance": "L'historique restauré est irrécupérable. Videz le stockage de l'application dans les réglages de l'appareil pour repartir de zéro — connectez-vous ensuite à TankSync et tout ce que vous aviez synchronisé revient."
 }

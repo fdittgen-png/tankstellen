@@ -7460,6 +7460,17 @@ class AppLocalizationsFr extends AppLocalizations {
       'Pour récupérer, videz le stockage de l\'application dans les réglages de l\'appareil ou réinstallez l\'application. Vos favoris et votre historique sont enregistrés uniquement sur cet appareil et ne peuvent pas être restaurés automatiquement.';
 
   @override
+  String get storageKeyLostTitle => 'Les données restaurées sont illisibles';
+
+  @override
+  String get storageKeyLostMessage =>
+      'Cette installation a été restaurée depuis une sauvegarde : les données de Sparkilo sont revenues, mais pas la clé qui les déverrouille. Android conserve cette clé dans le matériel sécurisé du téléphone ; elle ne peut ni être copiée vers un autre appareil ni être restaurée depuis une sauvegarde.';
+
+  @override
+  String get storageKeyLostGuidance =>
+      'L\'historique restauré est irrécupérable. Videz le stockage de l\'application dans les réglages de l\'appareil pour repartir de zéro — connectez-vous ensuite à TankSync et tout ce que vous aviez synchronisé revient.';
+
+  @override
   String syncAdoptTitle(String email) {
     return 'Rejoindre le compte de $email';
   }

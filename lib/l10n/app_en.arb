@@ -7540,6 +7540,18 @@
   "@storageRecoveryGuidance": {
     "description": "Guidance text on the storage-corruption recovery screen telling the user how to recover — clear app storage or reinstall (#2294)."
   },
+  "storageKeyLostTitle": "Restored data cannot be read",
+  "@storageKeyLostTitle": {
+    "description": "Title of the #4118 recovery screen: this install was restored from a backup or a device transfer, which copied the encrypted database but not its KeyStore-bound key. NOT corruption — the files are intact, they are simply unreadable."
+  },
+  "storageKeyLostMessage": "This install was restored from a backup, which brought back Sparkilo's data but not the key that unlocks it. Android keeps that key in the phone's secure hardware, and it cannot be copied to another device or restored from a backup.",
+  "@storageKeyLostMessage": {
+    "description": "Body of the #4118 recovery screen. States the cause plainly and says the data is not damaged."
+  },
+  "storageKeyLostGuidance": "The restored history cannot be recovered. Clear the app’s storage in your device settings to start fresh — then sign in to TankSync and everything you had synced comes back.",
+  "@storageKeyLostGuidance": {
+    "description": "Guidance on the #4118 recovery screen. This is the one non-corruption case where clearing storage IS the right advice, so it names the exit the corruption copy has no way to offer: TankSync still holds whatever was synced."
+  },
   "syncAdoptTitle": "Join {email}'s account",
   "@syncAdoptTitle": {
     "description": "Title of the QR-join adoption step — the second device adopts the first device's email account (#3080).",

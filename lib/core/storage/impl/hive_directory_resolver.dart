@@ -29,6 +29,18 @@ import '../../logging/error_logger.dart';
 class HiveDirectoryResolver {
   HiveDirectoryResolver._();
 
+  /// Where [initHive] rooted Hive this launch, or null if it has not
+  /// run (or could not resolve a path).
+  ///
+  /// #4118 — the box FILES have to be inspectable before the first
+  /// `openBox`, and Hive keeps its own base path private. Opening an
+  /// encrypted box under the wrong key does not throw: Hive's crash
+  /// recovery decides the frames are corrupt and TRUNCATES the file to
+  /// zero bytes. So "are there boxes here?" is a question that can only
+  /// be answered before the opens, and only with this path.
+  static String? get hivePath => _hivePath;
+  static String? _hivePath;
+
   /// Initialise Hive's base directory. Drop-in replacement for the
   /// `Hive.initFlutter()` call in `HiveBoxes.init` /
   /// `HiveIsolateBoxes.initInIsolate` — never throws beyond what
@@ -38,9 +50,42 @@ class HiveDirectoryResolver {
       await _initIos();
       return;
     }
-    // Non-iOS: byte-identical to the previous behaviour.
+    // Non-iOS: byte-identical to the previous behaviour — `initFlutter`
+    // with no sub-directory roots Hive in the documents dir, which is
+    // resolved here too so [hivePath] can answer. path_provider caches
+    // the lookup, so this is not a second platform round-trip.
     await Hive.initFlutter();
+    try {
+      _hivePath = (await getApplicationDocumentsDirectory()).path;
+    } catch (e) { // ignore: avoid_catching_errors
+      // Hive is already initialised either way; an unknown path only
+      // costs the #4118 pre-open check, never the launch.
+      debugPrint('HiveDirectoryResolver: documents dir unavailable ($e)');
+    }
   }
+
+  /// Whether any Hive box file already exists in [hivePath] (#4118).
+  ///
+  /// False when the path is unknown or unreadable — the safe direction:
+  /// this gates a hard stop, so an I/O hiccup must never invent one.
+  static bool get hasExistingBoxFiles {
+    final path = _hivePath;
+    if (path == null) return false;
+    try {
+      final dir = Directory(path);
+      if (!dir.existsSync()) return false;
+      return dir
+          .listSync()
+          .any((e) => e is File && e.path.endsWith('.hive'));
+    } catch (e) { // ignore: avoid_catching_errors
+      debugPrint('HiveDirectoryResolver: box-file scan failed ($e)');
+      return false;
+    }
+  }
+
+  /// Test seam for [hivePath] / [hasExistingBoxFiles].
+  @visibleForTesting
+  static set hivePathForTest(String? path) => _hivePath = path;
 
   /// iOS: root Hive in Application Support, migrating legacy
   /// Documents-dir box files once. Any resolution failure falls back to
@@ -53,7 +98,9 @@ class HiveDirectoryResolver {
     try {
       final support = await getApplicationSupportDirectory();
       final legacy = await getApplicationDocumentsDirectory();
-      Hive.init(migrateAndResolve(legacy, support));
+      final resolved = migrateAndResolve(legacy, support);
+      Hive.init(resolved);
+      _hivePath = resolved;
     } catch (e, st) { // ignore: unused_catch_stack
       debugPrint('HiveDirectoryResolver: iOS dir resolution failed ($e) '
           '— falling back to the legacy Documents dir.');

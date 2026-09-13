@@ -7376,6 +7376,17 @@ class AppLocalizationsSv extends AppLocalizations {
       'För att återställa rensar du appens lagring i enhetens inställningar eller installerar om appen. Dina favoriter och din historik sparas endast på den här enheten och kan därför inte återställas automatiskt.';
 
   @override
+  String get storageKeyLostTitle => 'Restored data cannot be read';
+
+  @override
+  String get storageKeyLostMessage =>
+      'This install was restored from a backup, which brought back Sparkilo\'s data but not the key that unlocks it. Android keeps that key in the phone\'s secure hardware, and it cannot be copied to another device or restored from a backup.';
+
+  @override
+  String get storageKeyLostGuidance =>
+      'The restored history cannot be recovered. Clear the app’s storage in your device settings to start fresh — then sign in to TankSync and everything you had synced comes back.';
+
+  @override
   String syncAdoptTitle(String email) {
     return 'Gå med i kontot $email';
   }

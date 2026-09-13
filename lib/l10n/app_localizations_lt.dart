@@ -7426,6 +7426,17 @@ class AppLocalizationsLt extends AppLocalizations {
       'Norėdami atkurti, įrenginio nustatymuose išvalykite programos saugyklą arba iš naujo įdiekite programą. Jūsų mėgstamiausi ir istorija saugomi tik šiame įrenginyje, todėl jų negalima atkurti automatiškai.';
 
   @override
+  String get storageKeyLostTitle => 'Restored data cannot be read';
+
+  @override
+  String get storageKeyLostMessage =>
+      'This install was restored from a backup, which brought back Sparkilo\'s data but not the key that unlocks it. Android keeps that key in the phone\'s secure hardware, and it cannot be copied to another device or restored from a backup.';
+
+  @override
+  String get storageKeyLostGuidance =>
+      'The restored history cannot be recovered. Clear the app’s storage in your device settings to start fresh — then sign in to TankSync and everything you had synced comes back.';
+
+  @override
   String syncAdoptTitle(String email) {
     return 'Prisijungti prie $email paskyros';
   }

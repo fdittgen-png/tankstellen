@@ -1,5 +1,8 @@
 {
   "storageRecoveryTitle": "Speicherproblem",
   "storageRecoveryMessage": "Sparkilo konnte seinen lokalen Datenspeicher nicht öffnen. Die Speicherdatei scheint beschädigt zu sein.",
-  "storageRecoveryGuidance": "Zur Wiederherstellung leere den App-Speicher in den Geräteeinstellungen oder installiere die App neu. Deine Favoriten und dein Verlauf werden nur auf diesem Gerät gespeichert und können nicht automatisch wiederhergestellt werden."
+  "storageRecoveryGuidance": "Zur Wiederherstellung leere den App-Speicher in den Geräteeinstellungen oder installiere die App neu. Deine Favoriten und dein Verlauf werden nur auf diesem Gerät gespeichert und können nicht automatisch wiederhergestellt werden.",
+  "storageKeyLostTitle": "Wiederhergestellte Daten sind nicht lesbar",
+  "storageKeyLostMessage": "Diese Installation wurde aus einem Backup wiederhergestellt. Die Daten von Sparkilo sind zurück, der Schlüssel dazu nicht: Android bewahrt ihn in der sicheren Hardware des Telefons auf, und er lässt sich weder auf ein anderes Gerät übertragen noch aus einem Backup wiederherstellen.",
+  "storageKeyLostGuidance": "Der wiederhergestellte Verlauf ist nicht zu retten. Leere den App-Speicher in den Geräteeinstellungen, um neu zu starten — melde dich dann bei TankSync an, und alles Synchronisierte ist wieder da."
 }

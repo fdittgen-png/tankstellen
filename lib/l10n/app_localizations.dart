@@ -12567,6 +12567,24 @@ abstract class AppLocalizations {
   /// **'To recover, clear the app\'s storage in your device settings, or reinstall the app. Your favourites and history are stored on this device only, so they cannot be restored automatically.'**
   String get storageRecoveryGuidance;
 
+  /// Title of the #4118 recovery screen: this install was restored from a backup or a device transfer, which copied the encrypted database but not its KeyStore-bound key. NOT corruption — the files are intact, they are simply unreadable.
+  ///
+  /// In en, this message translates to:
+  /// **'Restored data cannot be read'**
+  String get storageKeyLostTitle;
+
+  /// Body of the #4118 recovery screen. States the cause plainly and says the data is not damaged.
+  ///
+  /// In en, this message translates to:
+  /// **'This install was restored from a backup, which brought back Sparkilo\'s data but not the key that unlocks it. Android keeps that key in the phone\'s secure hardware, and it cannot be copied to another device or restored from a backup.'**
+  String get storageKeyLostMessage;
+
+  /// Guidance on the #4118 recovery screen. This is the one non-corruption case where clearing storage IS the right advice, so it names the exit the corruption copy has no way to offer: TankSync still holds whatever was synced.
+  ///
+  /// In en, this message translates to:
+  /// **'The restored history cannot be recovered. Clear the app’s storage in your device settings to start fresh — then sign in to TankSync and everything you had synced comes back.'**
+  String get storageKeyLostGuidance;
+
   /// Title of the QR-join adoption step — the second device adopts the first device's email account (#3080).
   ///
   /// In en, this message translates to:
