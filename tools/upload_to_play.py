@@ -135,23 +135,67 @@ def _execute_with_retry(call_factory, *, label: str):
     raise last_error
 
 
+def newest_changelog(changelog_dir: Path, locale: str) -> Path | None:
+    """The highest-numbered changelog file for `locale`, or None.
+
+    #4131 — the Play versionCode is a wall-clock number (#3513), computed
+    at build time, so `changelogs/{versionCode}.txt` can NEVER match for
+    Play: nothing can pre-create a file named after a minute that has not
+    happened yet. Every build therefore shipped the `Daily build <date>`
+    fallback as its what's-new, in production as well as beta.
+
+    The maintained changelogs are keyed by the per-ABI codes derived from
+    `pubspec.yaml`'s build number (51381/51382/51383 for 6.0.5+5138) —
+    those are the F-Droid versionCodes, and the fdroiddata recipe pins
+    exactly them. So the newest of those is the release notes the project
+    actually writes, and it is what Play should show when no exact match
+    exists and the caller passed no explicit text.
+    """
+    d = changelog_dir / locale / "changelogs"
+    if not d.is_dir():
+        return None
+    numbered = []
+    for f in d.glob("*.txt"):
+        try:
+            numbered.append((int(f.stem), f))
+        except ValueError:
+            continue  # not a versionCode-named file; ignore
+    if not numbered:
+        return None
+    return max(numbered)[1]
+
+
 def load_release_notes(
     changelog_dir: Path,
     locales: list[str],
     version_code: int,
     fallback: str,
+    *,
+    explicit_fallback: bool,
 ) -> list[dict]:
     """Build the releaseNotes payload, one entry per locale.
 
-    For each locale, prefer fastlane/metadata/android/{locale}/changelogs/{versionCode}.txt;
-    fall back to the provided default text if the file is missing.
+    Preference order per locale:
+      1. `changelogs/{versionCode}.txt` — an exact match.
+      2. the caller's `--release-notes`, when one was given explicitly.
+      3. the newest maintained changelog (see [newest_changelog]).
+      4. the generic `Daily build <date>`.
+
+    (2) sits above (3) so a release dispatched with its own notes still
+    wins, and (3) exists so an unattended build stops describing itself
+    as a daily build (#4131).
     """
     notes = []
     for locale in locales:
         path = changelog_dir / locale / "changelogs" / f"{version_code}.txt"
+        newest = None if explicit_fallback else newest_changelog(changelog_dir, locale)
         if path.is_file():
             text = path.read_text(encoding="utf-8").strip()
             print(f"  [{locale}] using {path}")
+        elif newest is not None:
+            text = newest.read_text(encoding="utf-8").strip()
+            print(f"  [{locale}] no changelog for {version_code}; "
+                  f"using newest maintained {newest.name}")
         else:
             text = fallback
             print(f"  [{locale}] no per-version changelog, using fallback")
@@ -193,6 +237,7 @@ def main() -> int:
         print(f"ERROR: service-account key not found at {key}", file=sys.stderr)
         return 2
 
+    explicit_fallback = args.release_notes is not None
     fallback_notes = args.release_notes or f"Daily build {date.today().isoformat()}"
 
     print(f"Authenticating as service account from {key}")
@@ -254,7 +299,9 @@ def main() -> int:
     print(f"  uploaded versionCode: {version_code}")
 
     print(f"Resolving release notes for versionCode {version_code}")
-    release_notes = load_release_notes(changelog_dir, args.locales, version_code, fallback_notes)
+    release_notes = load_release_notes(
+        changelog_dir, args.locales, version_code, fallback_notes,
+        explicit_fallback=explicit_fallback)
 
     # The Play API can't bootstrap a FIRST production rollout's country
     # availability (a first release must be 'completed', 'completed' rejects
