@@ -338,10 +338,20 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
                   thickness: 1,
                   color: theme.colorScheme.surfaceContainerHighest,
                 ),
+                // #4119 — the sheet runs to the physical screen bottom, so
+                // without this the Save/Delete row sits BEHIND the Android
+                // navigation bar: five field screenshots showed the system
+                // back/home targets drawn over a destructive button. This is
+                // not a Scaffold body, so nothing else adds the inset —
+                // which is also why it cannot double it (the
+                // `feedback_scaffold_inset_doubling` trap).
                 constrain(
-                  Padding(
-                    padding: const EdgeInsets.all(Spacing.xl),
-                    child: footer,
+                  SafeArea(
+                    top: false,
+                    child: Padding(
+                      padding: const EdgeInsets.all(Spacing.xl),
+                      child: footer,
+                    ),
                   ),
                 ),
               ],

@@ -294,4 +294,51 @@ void main() {
       verify(() => tts.setLanguage('en-US')).called(1);
     });
   });
+
+  group('#4127 — a missing voice is reported, never whispered', () {
+    test('an explicit false vetoes the region tag and falls back to the '
+        'bare language code', () async {
+      when(() => tts.isLanguageAvailable('fr-FR'))
+          .thenAnswer((_) async => false);
+      when(() => tts.isLanguageAvailable('fr')).thenAnswer((_) async => true);
+
+      await service.setAppLocale('fr');
+      await service.initialize();
+
+      // Engines often register a generic voice with no region; trying it
+      // is the difference between French and the device voice reading
+      // French.
+      verifyNever(() => tts.setLanguage('fr-FR'));
+      verify(() => tts.setLanguage('fr')).called(greaterThanOrEqualTo(1));
+      expect(service.languageVoiceMissing, isFalse);
+    });
+
+    test('no voice at all is RECORDED — the alternative is the device '
+        'voice reading foreign text', () async {
+      when(() => tts.isLanguageAvailable(any())).thenAnswer((_) async => false);
+
+      await service.setAppLocale('fr');
+      await service.initialize();
+
+      verifyNever(() => tts.setLanguage(any()));
+      expect(service.languageVoiceMissing, isTrue,
+          reason: 'French text in an English voice is worse than either '
+              'language; callers need to know so they can stay silent');
+    });
+
+    test('an UNKNOWN answer still attempts the voice — a probe may veto, '
+        'never block', () async {
+      // null / non-bool / throwing all mean "I do not know". Treating
+      // that as unavailable would lose the voice on every platform whose
+      // plugin does not answer definitively.
+      when(() => tts.isLanguageAvailable(any())).thenAnswer((_) async => null);
+
+      await service.setAppLocale('de');
+      await service.initialize();
+
+      verify(() => tts.setLanguage('de-DE')).called(greaterThanOrEqualTo(1));
+      expect(service.languageVoiceMissing, isFalse);
+    });
+  });
+
 }

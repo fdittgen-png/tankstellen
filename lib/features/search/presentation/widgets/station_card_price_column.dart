@@ -120,7 +120,14 @@ class StationCardHeadlineRow extends StatelessWidget {
             const SizedBox(width: Spacing.md),
             if (isCheapest) ...[
               ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 88),
+                // #4123 — was 88, which fits the English "Cheapest" and
+                // ellipsises the French superlative to "Le moins ch…".
+                // "Le moins cher" cannot be shortened to "Moins cher":
+                // that is the comparative (cheaper), and this badge means
+                // THE cheapest. So the slot gives way, not the wording.
+                // The price beside it is already `Expanded`, so it yields
+                // first and nothing overflows.
+                constraints: const BoxConstraints(maxWidth: 120),
                 child: const _CheapestBadge(),
               ),
               const SizedBox(width: Spacing.sm),

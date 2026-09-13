@@ -3050,7 +3050,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get priceFreshnessStale => 'Prix ancien';
 
   @override
-  String get priceFreshnessUnknown => 'Ancienneté du prix inconnue';
+  String get priceFreshnessUnknown => 'Âge du prix inconnu';
 
   @override
   String priceFreshnessTooltip(String band, String stamp) {
@@ -3099,7 +3099,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get refuelConsumptionMissing => 'No consumption yet';
 
   @override
-  String get mapSheetViewDetails => 'View station details';
+  String get mapSheetViewDetails => 'Voir les détails de la station';
 
   @override
   String get startupFailureTitle => 'Sparkilo n\'a pas pu démarrer';
