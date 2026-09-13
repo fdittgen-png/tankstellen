@@ -323,7 +323,7 @@ const _featurePairBaseline = <String, int>{
   'favorites -> alerts': 1,
   'favorites -> price_history': 1,
   'favorites -> profile': 1,
-  'favorites -> search': 2,
+  'favorites -> search': 1,
   'favorites -> widget': 1,
   'feature_management -> profile': 2,
   // #3743 (epic item 1, fill_ups extraction, step 2/5) — re-attributed

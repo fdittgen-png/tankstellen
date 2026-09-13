@@ -6,7 +6,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/domain/brand_appearance.dart';
 import '../../../../core/domain/station.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_text.dart';
@@ -19,6 +18,7 @@ import '../../../../core/widgets/animated_price_text.dart';
 import '../../../../core/widgets/brand_logo.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'station_card_badges.dart';
+import 'station_presentation.dart';
 
 /// The card's headline row (#3949): brand mark, the display-role price
 /// with its baseline-aligned unit and the colour-blind tier arrow, then —
@@ -33,68 +33,33 @@ import 'station_card_badges.dart';
 /// translation; the 32×32 star keeps its tap target.
 class StationCardHeadlineRow extends StatelessWidget {
   final Station station;
-  final BrandAppearance? brandMark;
-  final double? price;
-  final String? currencyOverride;
+
+  /// #4133 — everything this row shows, derived once by
+  /// [StationPresentation]. It used to take price, discount, currency,
+  /// brand mark and fuel label as five separate arguments and re-derive
+  /// the effective price from two of them.
+  final StationPresentation presentation;
+
   final bool isFavorite;
   final bool isCheapest;
   final PriceTier? priceTier;
-
-  /// Per-litre loyalty discount that applies to this station's brand
-  /// (#1120 pilot). When non-null and positive, the headline renders the
-  /// effective price (raw − discount) and a `−€0.05` badge with the raw
-  /// price struck through follows beneath it.
-  final double? loyaltyDiscount;
   final VoidCallback? onFavoriteTap;
-
-  /// #4124 — the pump code to render beside the price when the price is
-  /// NOT the fuel the user asked for, or null in the ordinary case.
-  ///
-  /// On a cross-border route `route_results_view` prices each station by
-  /// its own country's profile fuel (#2631), so a Spanish row under an
-  /// E85 search carries an E5 price. The DECISION — is this a
-  /// substitution, and what is this fuel called in this station's country
-  /// (#2717's Magna/Premium) — belongs to the caller, which owns both
-  /// fuels and already resolves the country for the currency. This row
-  /// only renders it.
-  final String? substitutedFuelLabel;
 
   const StationCardHeadlineRow({
     super.key,
     required this.station,
-    required this.brandMark,
-    required this.price,
-    required this.currencyOverride,
+    required this.presentation,
     required this.isFavorite,
     required this.isCheapest,
     required this.priceTier,
-    required this.loyaltyDiscount,
     required this.onFavoriteTap,
-    this.substitutedFuelLabel,
   });
-
-  /// Effective price after applying [loyaltyDiscount]. Returns the
-  /// raw price unchanged when no discount applies. Floors the result
-  /// at 0.001 so a hand-edited Hive dump with a wildly large
-  /// discount can never produce a negative-looking display.
-  double? get _effectivePrice {
-    final raw = price;
-    if (raw == null) return null;
-    final discount = loyaltyDiscount;
-    if (discount == null || discount <= 0) return raw;
-    final effective = raw - discount;
-    return effective < 0.001 ? 0.001 : effective;
-  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final effective = _effectivePrice;
-    final hasDiscount =
-        loyaltyDiscount != null &&
-        loyaltyDiscount! > 0 &&
-        price != null &&
-        effective != null;
+    final p = presentation;
+    final hasDiscount = p.hasDiscount;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,7 +67,7 @@ class StationCardHeadlineRow extends StatelessWidget {
       children: [
         Row(
           children: [
-            if (brandMark != null) ...[
+            if (p.brandMark != null) ...[
               // The row's own semantic label already names the brand;
               // letting the mark announce it again would read the brand
               // twice on every card. #3940 — the slot stays SQUARE: a Row
@@ -121,12 +86,12 @@ class StationCardHeadlineRow extends StatelessWidget {
                   alignment: AlignmentDirectional.centerStart,
                   child: _PriceHeadline(
                     station: station,
-                    price: effective,
-                    rawPrice: price,
+                    price: p.price,
+                    rawPrice: p.rawPrice,
                     hasDiscount: hasDiscount,
-                    currencyOverride: currencyOverride,
+                    currencyOverride: p.currencySymbol,
                     priceTier: priceTier,
-                    substitutedFuelLabel: substitutedFuelLabel,
+                    substitutedFuelLabel: p.substitutedFuelLabel,
                   ),
                 ),
               ),
@@ -174,9 +139,9 @@ class StationCardHeadlineRow extends StatelessWidget {
         if (hasDiscount)
           StationCardLoyaltyBadge(
             station: station,
-            discount: loyaltyDiscount!,
-            rawPrice: price!,
-            currencyOverride: currencyOverride,
+            discount: p.loyaltyDiscount!,
+            rawPrice: p.rawPrice!,
+            currencyOverride: p.currencySymbol,
           ),
       ],
     );

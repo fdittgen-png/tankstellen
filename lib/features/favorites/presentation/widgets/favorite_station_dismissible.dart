@@ -13,7 +13,9 @@ import '../../../../core/widgets/favorite_dismissible.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/station.dart';
-import '../../../search/presentation/widgets/station_card.dart';
+// #4133 — through the barrel, which the boundary lint exempts;
+// a direct reach-in counted against the favorites→search pair.
+import '../../../search/api.dart';
 import '../../domain/stale_price_policy.dart';
 import '../../providers/favorites_provider.dart';
 
