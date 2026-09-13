@@ -654,7 +654,7 @@ Når en rute krydser en grænse, **forespørges hvert land i korridoren gennem s
 
 > *España — Geoportal Gasolineras (MITECO) · France — Prix Carburants (data.economie.gouv.fr)*
 
-Fordi kvaliteterne er forskellige fra land til land, viser et grænseoverskridende resultat med rette E85 på den franske strækning og Gasolina 95/E5 på den spanske. Hver er prissat korrekt for sin side, aldrig midlet.
+Fordi kvaliteterne er forskellige fra land til land, viser et grænseoverskridende resultat med rette E85 på den franske strækning og Gasolina 95/E5 på den spanske. Hver er prissat korrekt for sin side, aldrig midlet. Prisen på hver række bærer pumpekoden for den kvalitet, den gælder, når det ikke er det brændstof du valgte, så et fransk E85 til 0,82 og et spansk E5 til 1,62 ikke kan læses som én søjle af sammenlignelige tal.
 
 **Du skal bruge en profil pr. land** med den rigtige foretrukne kvalitet, ellers har den anden strækning intet at prissætte og viser `--`. Se Sådan fungerer Sparkilo → Profiler.
 
@@ -694,7 +694,7 @@ Hver række tilføjer to tal, som en søgning i nærheden ikke har:
 - **Omvej** — de ekstra kilometer i forhold til den direkte linje.
 - **Besparelse ift. gennemsnit** — mod korridorens gennemsnit, ikke et nationalt.
 
-Skift til **Alle stationer** for at se hver station langs ruten frem for udvalget. Kortet tegner linjen med alle nåle.
+Skift til **Alle stationer** for at se hver station langs ruten frem for udvalget. Kortet tegner linjen med alle nåle. Antallet af stationer i overskriften tæller rækkerne på skærmen, så det følger vælgeren — og enhver station du har strøget væk.
 
 ---
 
@@ -2135,6 +2135,21 @@ Slå **Opstartsspor** til (Funktioner & brugstilstand → Udvikler og eksperimen
 **Indstillinger → Sikkerhedskopi & gendannelse → Eksportér sikkerhedskopi** skriver en ZIP til Downloads; gendannelse tilbyder flet eller erstat. Vil du have en maskinlæsbar dataeksport i stedet, så brug **Privatliv og data → Eksportér eller slet → Eksportér mine data → ZIP-arkiv**.
 
 TankSync er **ikke** en sikkerhedskopi — det spejler udvalgte kategorier, og ture kun hvis du også slog tursynkronisering til.
+
+---
+
+## Jeg skiftede telefon eller geninstallerede, og min historik er væk
+
+En overførsel fra enhed til enhed eller en gendannelse fra Androids sky kan ikke hente denne apps lokale database tilbage. Android gemmer nøglen, der åbner den, i telefonens sikre hardware, hvor ingen sikkerhedskopi kan nå den, og det er med vilje: netop det forhindrer enhver, der kopierer filerne fra din telefon, i at læse dine ture.
+
+En gendannelse gjorde det tidligere endnu værre. Den lagde den krypterede database tilbage, mens nøglen blev efterladt, og den første opstart ryddede derefter den fil, den ikke kunne læse. Appen holder nu sin database uden for Androids sikkerhedskopier og uden for enhedsoverførsel, så en gendannet installation blot starter tom i stedet for at ødelægge det, der lige blev gendannet.
+
+**Hvad der faktisk kommer tilbage:**
+
+- **TankSync**, hvis det var slået til: log ind med samme konto, og dine ture, optankninger, køretøjer, favoritter, bedømmelser og OBD2-baselines hentes igen.
+- **En eksporteret ZIP-sikkerhedskopi:** Indstillinger → Sikkerhedskopi & gendannelse → Importér. Uden TankSync er det den eneste vej, der overlever et telefonskifte.
+
+**Inden du skifter telefon,** eksportér en ZIP-sikkerhedskopi, eller kontrollér under Synkronisering og konto, at TankSync er slået til og faktisk har synkroniseret.
 
 ---
 

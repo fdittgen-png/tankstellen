@@ -46,7 +46,7 @@ Quando un percorso attraversa un confine, **ogni paese del corridoio è interrog
 
 > *España — Geoportal Gasolineras (MITECO) · France — Prix Carburants (data.economie.gouv.fr)*
 
-Poiché le qualità differiscono per paese, un risultato transfrontaliero mostra legittimamente E85 sul tratto francese e Gasolina 95/E5 su quello spagnolo. Ciascuno è quotato correttamente per il suo lato, mai mediato.
+Poiché le qualità differiscono per paese, un risultato transfrontaliero mostra legittimamente E85 sul tratto francese e Gasolina 95/E5 su quello spagnolo. Ciascuno è quotato correttamente per il suo lato, mai mediato. Il prezzo di ogni riga porta il codice alla pompa della qualità a cui si riferisce ogni volta che non è il carburante scelto, così un E85 francese a 0,82 e un E5 spagnolo a 1,62 non possono essere letti come una sola colonna di numeri confrontabili.
 
 **Serve un profilo per paese** con la qualità preferita giusta, altrimenti il secondo tratto non ha nulla da quotare e mostra `--`. Vedi [Come funziona Sparkilo → Profili](User-it-How-It-Works#profili-un-contesto-un-insieme-di-valori-predefiniti).
 
@@ -88,7 +88,7 @@ Ogni riga aggiunge due numeri che una ricerca nelle vicinanze non ha:
 - **Deviazione** — i chilometri in più rispetto alla linea diretta.
 - **Risparmio rispetto alla media** — sulla media del corridoio, non su una nazionale.
 
-Passa a **Tutte le stazioni** per vedere ogni stazione lungo il percorso invece della selezione. La mappa traccia la polilinea con tutti i segnaposto.
+Passa a **Tutte le stazioni** per vedere ogni stazione lungo il percorso invece della selezione. La mappa traccia la polilinea con tutti i segnaposto. Il numero di stazioni nell'intestazione conta le righe a schermo, quindi segue il selettore — e ogni stazione che hai scartato.
 
 ---
 

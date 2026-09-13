@@ -181,6 +181,21 @@ TankSync er **ikke** en sikkerhedskopi — det spejler udvalgte kategorier, og t
 
 ---
 
+## Jeg skiftede telefon eller geninstallerede, og min historik er væk
+
+En overførsel fra enhed til enhed eller en gendannelse fra Androids sky kan ikke hente denne apps lokale database tilbage. Android gemmer nøglen, der åbner den, i telefonens sikre hardware, hvor ingen sikkerhedskopi kan nå den, og det er med vilje: netop det forhindrer enhver, der kopierer filerne fra din telefon, i at læse dine ture.
+
+En gendannelse gjorde det tidligere endnu værre. Den lagde den krypterede database tilbage, mens nøglen blev efterladt, og den første opstart ryddede derefter den fil, den ikke kunne læse. Appen holder nu sin database uden for Androids sikkerhedskopier og uden for enhedsoverførsel, så en gendannet installation blot starter tom i stedet for at ødelægge det, der lige blev gendannet.
+
+**Hvad der faktisk kommer tilbage:**
+
+- **TankSync**, hvis det var slået til: log ind med samme konto, og dine ture, optankninger, køretøjer, favoritter, bedømmelser og OBD2-baselines hentes igen.
+- **En eksporteret ZIP-sikkerhedskopi:** Indstillinger → Sikkerhedskopi & gendannelse → Importér. Uden TankSync er det den eneste vej, der overlever et telefonskifte.
+
+**Inden du skifter telefon,** eksportér en ZIP-sikkerhedskopi, eller kontrollér under Synkronisering og konto, at TankSync er slået til og faktisk har synkroniseret.
+
+---
+
 ## Hvordan sletter jeg alt?
 
 - **Enhed:** Privatliv og data → Eksportér eller slet → **Slet alle mine data**. Uigenkaldeligt.

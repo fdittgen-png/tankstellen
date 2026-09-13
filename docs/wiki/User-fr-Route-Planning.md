@@ -46,7 +46,7 @@ Quand une route franchit une frontière, **chaque pays du corridor est interrog�
 
 > *España — Geoportal Gasolineras (MITECO) · France — Prix Carburants (data.economie.gouv.fr)*
 
-Comme les sortes diffèrent selon le pays, un résultat transfrontalier montre légitimement du E85 sur le tronçon français et de la Gasolina 95/E5 sur l'espagnol. Chacun est correctement tarifé de son côté, jamais moyenné.
+Comme les sortes diffèrent selon le pays, un résultat transfrontalier montre légitimement du E85 sur le tronçon français et de la Gasolina 95/E5 sur l'espagnol. Chacun est correctement tarifé de son côté, jamais moyenné. Le prix de chaque ligne porte le code à la pompe de la sorte concernée dès qu'il ne s'agit pas du carburant que vous avez choisi : un E85 français à 0,82 et un E5 espagnol à 1,62 ne peuvent donc plus se lire comme une seule colonne de nombres comparables.
 
 **Il vous faut un profil par pays** avec la bonne sorte préférée, sinon le second tronçon n'a rien à tarifer et affiche `--`. Voir [Comment fonctionne Sparkilo → Profils](User-fr-How-It-Works#profils--un-contexte-un-jeu-de-valeurs-par-défaut).
 
@@ -88,7 +88,7 @@ Chaque ligne ajoute deux chiffres qu'une recherche à proximité n'a pas :
 - **Détour** — les kilomètres en plus par rapport à la ligne directe.
 - **Économie vs moyenne** — contre la moyenne du corridor, pas une moyenne nationale.
 
-Passez à **Toutes les stations** pour voir chaque station le long de la route plutôt que la sélection. La carte trace la polyligne avec toutes les épingles.
+Passez à **Toutes les stations** pour voir chaque station le long de la route plutôt que la sélection. La carte trace la polyligne avec toutes les épingles. Le nombre de stations dans l'en-tête compte les lignes affichées : il suit donc le sélecteur, et toute station que vous avez balayée.
 
 ---
 

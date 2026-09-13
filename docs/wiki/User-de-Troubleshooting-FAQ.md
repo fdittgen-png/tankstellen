@@ -181,6 +181,21 @@ TankSync ist **keine** Sicherung — es spiegelt ausgewählte Kategorien, und Fa
 
 ---
 
+## Neues Handy oder neu installiert — mein Verlauf ist weg
+
+Eine Geräteübertragung oder eine Android-Cloud-Wiederherstellung kann die lokale Datenbank dieser App nicht zurückbringen. Android bewahrt den Schlüssel dazu in der sicheren Hardware des Telefons auf, wohin absichtlich keine Sicherung reicht: genau das verhindert, dass jemand deine Fahrten lesen kann, der die Dateien vom Telefon kopiert.
+
+Eine Wiederherstellung machte es früher sogar schlimmer. Sie legte die verschlüsselte Datenbank zurück, während der Schlüssel zurückblieb, und der erste Start löschte dann die Datei, die er nicht lesen konnte. Die App hält ihre Datenbank jetzt aus Android-Sicherungen und aus der Geräteübertragung heraus, damit eine wiederhergestellte Installation einfach leer startet, statt das Wiederhergestellte zu zerstören.
+
+**Was tatsächlich zurückkommt:**
+
+- **TankSync**, wenn es aktiv war: mit demselben Konto anmelden, und Fahrten, Tankvorgänge, Fahrzeuge, Favoriten, Bewertungen und OBD2-Baselines werden wieder geladen.
+- **Eine exportierte Sicherungs-ZIP:** Einstellungen → Sicherung & Wiederherstellung → Importieren. Ohne TankSync ist das der einzige Weg, der einen Handywechsel übersteht.
+
+**Vor einem Handywechsel** eine Sicherungs-ZIP exportieren oder unter Synchronisierung & Konto prüfen, dass TankSync aktiv ist und wirklich synchronisiert hat.
+
+---
+
 ## Wie lösche ich alles?
 
 - **Gerät:** Datenschutz & Daten → Exportieren oder löschen → **Alle meine Daten löschen**. Unwiderruflich.

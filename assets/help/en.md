@@ -654,7 +654,7 @@ When a route crosses a border, **every country in the corridor is queried throug
 
 > *España — Geoportal Gasolineras (MITECO) · France — Prix Carburants (data.economie.gouv.fr)*
 
-Because grades differ by country, a cross-border result legitimately shows E85 on the French leg and Gasolina 95/E5 on the Spanish leg. They are priced correctly for each side, never averaged.
+Because grades differ by country, a cross-border result legitimately shows E85 on the French leg and Gasolina 95/E5 on the Spanish leg. They are priced correctly for each side, never averaged. The price on each row carries the pump code of the grade it is for whenever that is not the fuel you selected, so a French E85 at 0.82 and a Spanish E5 at 1.62 cannot be read as one column of comparable numbers.
 
 **You need a profile per country** with the right preferred fuel, otherwise the second leg has no grade to price and its stations render `--`. See How Sparkilo Works → Profiles.
 
@@ -694,7 +694,7 @@ Each row adds two numbers a nearby search doesn't have:
 - **Detour** — the extra kilometres versus the direct line.
 - **Saving vs. average** — against the corridor average, not a national one.
 
-Switch to **All stations** to see every station along the route rather than the shortlist. The map draws the polyline with all pins.
+Switch to **All stations** to see every station along the route rather than the shortlist. The map draws the polyline with all pins. The station count in the header counts the rows on screen, so it moves with the toggle — and with any station you have swiped away.
 
 ---
 
@@ -2135,6 +2135,21 @@ Turn on **Startup initialization trace** (Features & use mode → Developer & ex
 **Settings → Backup & restore → Export backup** writes a ZIP to Downloads; restore offers merge or replace. For a machine-readable data export instead, use **Privacy & data → Export or delete → Export my data → ZIP archive**.
 
 TankSync is **not** a backup — it mirrors selected categories, and trips only if you also enabled trip sync.
+
+---
+
+## I changed phones or reinstalled, and my history is gone
+
+A device-to-device transfer or an Android cloud restore cannot bring this app's local database back. Android keeps the key that unlocks it in the phone's secure hardware, where — by design — no backup can reach it: that is what stops anyone who copies the files off your phone from reading your trips.
+
+A restore used to make things actively worse. It put the encrypted database back while the key stayed behind, and the first launch then cleared the file it could not read. The app now keeps its database out of Android backups and out of device transfer, so a restored install simply starts empty instead of destroying what was restored.
+
+**What does come back:**
+
+- **TankSync**, if it was on: sign in with the same account and your trips, fill-ups, vehicles, favourites, ratings and OBD2 baselines download again.
+- **An exported backup ZIP:** Settings → Backup & restore → Import. Without TankSync this is the only route that survives a change of phone.
+
+**Before you change phones,** export a backup ZIP, or check on Sync & account that TankSync is on and has actually synced.
 
 ---
 

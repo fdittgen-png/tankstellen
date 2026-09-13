@@ -181,6 +181,21 @@ TankSync **non** è un backup — replica categorie scelte, e i viaggi solo se h
 
 ---
 
+## Ho cambiato telefono o reinstallato, e la cronologia è sparita
+
+Un trasferimento da dispositivo a dispositivo o un ripristino dal cloud Android non può riportare indietro il database locale di questa app. Android conserva la chiave che lo apre nell'hardware sicuro del telefono, dove nessun backup arriva, e questo è voluto: è esattamente ciò che impedisce a chi copiasse i file dal telefono di leggere i tuoi viaggi.
+
+Un ripristino prima peggiorava le cose. Rimetteva al suo posto il database cifrato mentre la chiave restava indietro, e il primo avvio cancellava poi il file che non riusciva a leggere. L'app ora tiene il proprio database fuori dai backup Android e fuori dal trasferimento fra dispositivi, così un'installazione ripristinata parte semplicemente vuota invece di distruggere quanto era appena stato ripristinato.
+
+**Cosa torna davvero:**
+
+- **TankSync**, se era attivo: accedi con lo stesso account e i tuoi viaggi, rifornimenti, veicoli, preferiti, valutazioni e baseline OBD2 vengono scaricati di nuovo.
+- **Un backup ZIP esportato:** Impostazioni → Backup e ripristino → Importa. Senza TankSync è l'unica strada che sopravvive a un cambio di telefono.
+
+**Prima di cambiare telefono,** esporta un backup ZIP, oppure controlla in Sincronizzazione e account che TankSync sia attivo e abbia davvero sincronizzato.
+
+---
+
 ## Come elimino tutto?
 
 - **Dispositivo:** Privacy e dati → Esporta o elimina → **Elimina tutti i miei dati**. Irreversibile.

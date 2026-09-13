@@ -46,7 +46,7 @@ Når en rute krydser en grænse, **forespørges hvert land i korridoren gennem s
 
 > *España — Geoportal Gasolineras (MITECO) · France — Prix Carburants (data.economie.gouv.fr)*
 
-Fordi kvaliteterne er forskellige fra land til land, viser et grænseoverskridende resultat med rette E85 på den franske strækning og Gasolina 95/E5 på den spanske. Hver er prissat korrekt for sin side, aldrig midlet.
+Fordi kvaliteterne er forskellige fra land til land, viser et grænseoverskridende resultat med rette E85 på den franske strækning og Gasolina 95/E5 på den spanske. Hver er prissat korrekt for sin side, aldrig midlet. Prisen på hver række bærer pumpekoden for den kvalitet, den gælder, når det ikke er det brændstof du valgte, så et fransk E85 til 0,82 og et spansk E5 til 1,62 ikke kan læses som én søjle af sammenlignelige tal.
 
 **Du skal bruge en profil pr. land** med den rigtige foretrukne kvalitet, ellers har den anden strækning intet at prissætte og viser `--`. Se [Sådan fungerer Sparkilo → Profiler](User-da-How-It-Works#profiler-én-kontekst-ét-sæt-standardværdier).
 
@@ -88,7 +88,7 @@ Hver række tilføjer to tal, som en søgning i nærheden ikke har:
 - **Omvej** — de ekstra kilometer i forhold til den direkte linje.
 - **Besparelse ift. gennemsnit** — mod korridorens gennemsnit, ikke et nationalt.
 
-Skift til **Alle stationer** for at se hver station langs ruten frem for udvalget. Kortet tegner linjen med alle nåle.
+Skift til **Alle stationer** for at se hver station langs ruten frem for udvalget. Kortet tegner linjen med alle nåle. Antallet af stationer i overskriften tæller rækkerne på skærmen, så det følger vælgeren — og enhver station du har strøget væk.
 
 ---
 
