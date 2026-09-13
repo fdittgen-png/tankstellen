@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:tankstellen/core/data/storage_repository.dart';
+import 'package:tankstellen/core/storage/hive_boxes.dart';
+import 'package:tankstellen/core/storage/stores/cache_hive_store.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 
 /// In-memory fake of [HiveStorage] for unit tests.
@@ -20,6 +22,15 @@ import 'package:tankstellen/core/storage/hive_storage.dart';
 /// Use [FakeStorageRepository] when you only need the [StorageRepository]
 /// interface — it's an alias of this class with a narrower static type.
 class FakeHiveStorage implements HiveStorage {
+  /// #4110 — the real `HiveStorage` keeps the bulk datasets in their own
+  /// deferred box. A fake has no Hive boxes at all, so this exists to
+  /// satisfy the interface; `datasetCacheFor` checks whether the box is
+  /// actually open and falls back to the single in-memory store here, so
+  /// nothing routes through it.
+  @override
+  final CacheHiveStore datasetStore =
+      CacheHiveStore(boxName: HiveBoxes.datasets);
+
   // ---------------------------------------------------------------------------
   // Backing state
   // ---------------------------------------------------------------------------

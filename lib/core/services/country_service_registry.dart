@@ -146,6 +146,8 @@ class CountryServiceRegistry {
       countryCode,
       storage: ref.read(storageRepositoryProvider),
       cache: cache,
+      // #4110 — the datasets box, opened after the first frame.
+      datasetCache: datasetCacheFor(ref.read(storageRepositoryProvider)),
       tankerkoenigDio: countryCode == 'DE'
           ? ref.read(tankerkoenigDioProvider)
           : null,
@@ -180,6 +182,7 @@ class CountryServiceRegistry {
     String countryCode, {
     required StorageRepository storage,
     required CacheStrategy cache,
+    CacheStrategy? datasetCache,
     Dio? tankerkoenigDio,
     DataAccessRecorder? recorder,
     ProviderRequestBudget? budget,
@@ -192,7 +195,10 @@ class CountryServiceRegistry {
       countryCode,
       CountryServiceDependencies(
         storage: storage,
-        cache: cache,
+        // #4110 — the bulk datasets read through their OWN box. Falls
+        // back to the response cache when the caller does not supply one,
+        // which is the pre-#4110 behaviour and what every test relies on.
+        cache: datasetCache ?? cache,
         tankerkoenigDio: tankerkoenigDio,
       ),
     );

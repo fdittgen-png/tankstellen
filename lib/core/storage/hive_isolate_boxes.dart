@@ -82,6 +82,10 @@ class HiveIsolateBoxes {
     _IsolateBox<dynamic>(HiveBoxes.profiles, ciphered: true),
     _IsolateBox<dynamic>(HiveBoxes.alerts, ciphered: true),
     _IsolateBox<dynamic>(HiveBoxes.cache, ciphered: true),
+    // #4110 — the bulk datasets left the cache box. The background scan
+    // reads them through the same read-through, so without this a scan
+    // would refetch a whole national dataset over the network.
+    _IsolateBox<dynamic>(HiveBoxes.datasets, ciphered: true),
     _IsolateBox<dynamic>(HiveBoxes.priceHistory, ciphered: true),
     // #579 — velocity detector reads/writes snapshots from the BG
     // isolate, mirroring the main-isolate open above.

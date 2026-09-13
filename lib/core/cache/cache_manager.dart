@@ -5,11 +5,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../constants/app_constants.dart';
 import '../data/storage_repository.dart';
 import '../logging/error_logger.dart';
 import '../services/service_result.dart';
+import '../storage/hive_boxes.dart';
+import '../storage/hive_storage.dart';
 import '../storage/storage_providers.dart';
 import 'cache_eviction_policy.dart';
 import 'cache_schema.dart';
@@ -82,6 +85,26 @@ CacheManager cacheManager(Ref ref) {
 ///
 /// This enables unit-testing chains with a trivial in-memory fake instead
 /// of requiring Hive infrastructure.
+/// The [CacheStrategy] the bulk national datasets read through (#4110).
+///
+/// A `HiveStorage` keeps them in their OWN box, opened after the first
+/// frame, because `Hive.openBox` deserializes every value it reads and
+/// these are multi-MB payloads — paying for them inside `hive_init` made
+/// the cold start wait on ~11k `Station.fromJson` calls it had no use for
+/// yet. Any other storage (a test fake, the in-memory one) has no such
+/// box, so it keeps the single-store behaviour and nothing changes for it.
+CacheStrategy datasetCacheFor(StorageRepository storage) {
+  // The box is opened AFTER the first frame, which is the whole point —
+  // so a caller that runs before `initDeferred` completes, or any storage
+  // with no Hive behind it, keeps the pre-#4110 single-store behaviour
+  // instead of writing into a box that is not there. Same philosophy as
+  // the #2670 reader guard: a closed box degrades, it never throws.
+  if (storage is HiveStorage && Hive.isBoxOpen(HiveBoxes.datasets)) {
+    return CacheManager(storage.datasetStore);
+  }
+  return CacheManager(storage);
+}
+
 abstract interface class CacheStrategy {
   /// Store data with metadata envelope.
   Future<void> put(

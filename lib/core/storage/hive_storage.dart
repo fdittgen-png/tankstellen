@@ -44,6 +44,12 @@ class HiveStorage implements StorageRepository {
   final FavoritesHiveStore _favorites = FavoritesHiveStore();
   final ProfilesHiveStore _profiles = ProfilesHiveStore();
   final CacheHiveStore _cache = CacheHiveStore();
+
+  /// #4110 — the bulk-dataset store, on its own deferred box. Not part of
+  /// [StorageRepository]: nothing generic wants it, and adding a member
+  /// to that interface would touch every fake that implements it.
+  final CacheHiveStore datasetStore =
+      CacheHiveStore(boxName: HiveBoxes.datasets);
   final PriceHistoryHiveStore _priceHistory = PriceHistoryHiveStore();
   final AlertsHiveStore _alerts = AlertsHiveStore();
 

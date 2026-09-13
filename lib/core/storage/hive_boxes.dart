@@ -43,6 +43,14 @@ class HiveBoxes {
   static const String settings = 'settings';
   static const String favorites = 'favorites';
   static const String cache = 'cache';
+
+  /// Whole-country bulk datasets (#4110). Separate from [cache] because
+  /// `openBox` DESERIALIZES every value: these are multi-MB national
+  /// payloads (~11k `Station.fromJson`), and paying for them inside
+  /// `hive_init` defeated the `compute()` in `PersistentDataset.readAsync`
+  /// that exists to keep exactly that work off the UI isolate. Deferred,
+  /// so the first frame no longer waits for it.
+  static const String datasets = 'datasets';
   static const String profiles = 'profiles';
   static const String priceHistory = 'price_history';
   static const String alerts = 'alerts';
@@ -138,7 +146,7 @@ class HiveBoxes {
     obd2Baselines, obd2TripHistory, achievements, obd2SupportedPids,
     obd2NegotiatedProtocol, serviceReminders, obd2PausedTrips,
     obd2ActiveTrip, priceSnapshots, isolateErrorSpool, trafficSignalsCache,
-    featureFlags, appProfile, boxSchema, errorTraces,
+    featureFlags, appProfile, boxSchema, errorTraces, datasets,
   };
 
   /// Meta box recording the schema version of each persistent box
@@ -161,7 +169,11 @@ class HiveBoxes {
   /// [HiveSchemaMigration.evictStaleCacheOnUpgrade] to clear the network-cache
   /// entries (only) so they refetch fresh; the schema-guard test pins the
   /// cached-`Station` key set here so a future change without a bump FAILS.
-  static const int currentSchemaVersion = 2;
+  /// #4110 — 2 → 3: the `dataset:` entries moved out of [cache] into
+  /// [datasets]. The bump drives the same eviction to drop the orphaned
+  /// copies from the cache box; they are caches with a hard TTL, so the
+  /// next search refetches one per country, once.
+  static const int currentSchemaVersion = 3;
 
   // #3149 — the secure-storage cipher load (and its StorageInitException
   // re-tag) lives in HiveCipherLoader so a keychain/keystore fault
@@ -271,6 +283,7 @@ class HiveBoxes {
         settings, profiles, favorites, cache, priceHistory, alerts,
         isolateErrorSpool, featureFlags, appProfile, boxSchema,
         ..._deferredBoxes,
+        datasets,
       ];
 
   /// Stamps + migrates the persistent boxes against [currentSchemaVersion]
@@ -321,6 +334,8 @@ class HiveBoxes {
         Hive.openBox<String>(name,
             encryptionCipher:
                 _encryptedDeferredBoxes.contains(name) ? cipher : null),
+      // #4110 — dynamic, not String: it holds the JSON envelopes.
+      Hive.openBox<dynamic>(datasets, encryptionCipher: cipher),
     ]);
     // #3882 — the deferred trip boxes carry a schema stamp too (the trip
     // history box changed its row layout to meta + columnar chunks; the
