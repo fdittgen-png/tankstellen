@@ -373,7 +373,7 @@ void main() {
     'lib/features/fill_ups/providers/consumption_providers.dart': 973,
     'lib/features/obd2/data/transport/flutter_blue_plus_elm_channel.dart': 948,
     'lib/features/obd2/data/session/live_sample_snapshot.dart': 943,
-    'lib/features/profile/presentation/widgets/profile_edit_sheet.dart': 891,
+    'lib/features/profile/presentation/widgets/profile_edit_sheet.dart': 889,
     'lib/features/obd2/data/session/obd2_self_test_driver.dart': 846,
     'lib/features/fill_ups/presentation/screens/add_fill_up_screen.dart': 824,
     'lib/features/fill_ups/presentation/widgets/fuel_type_efficiency_card.dart': 810,
