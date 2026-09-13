@@ -19,8 +19,13 @@ import '../data/storage_repository.dart';
 ///  - [storage] backs the API-key gate (DE/KR/CL/GB), the OSM brand
 ///    enricher (FR legacy), and is the [CacheStorage] the bulk datasets
 ///    persist to.
-///  - [cache] is the shared [CacheStrategy] the bulk-dataset services
-///    (ES/IT/AR/DK + the flag-gated FR/GB bulk paths) read-through.
+///  - [cache] is the [CacheStrategy] the bulk-dataset services
+///    (ES/IT/AR/DK + the flag-gated FR/GB bulk paths) read-through. #4110
+///    pointed it at the `datasets` box: it is the dataset channel and
+///    nothing else — every consumer passes it straight to a service's
+///    `cache:`, which each service uses only to build its
+///    `PersistentDataset`. The chain's per-key response cache is a
+///    separate argument.
 ///  - [tankerkoenigDio] is the rate-limited, API-key-injecting Dio the DE
 ///    Tankerkönig service talks through. Background callers build a plain
 ///    rate-limited Dio (the key is sent per-request); the foreground hands
@@ -35,7 +40,8 @@ class CountryServiceDependencies {
   /// Storage repository (favorites, settings, API keys, cache).
   final StorageRepository storage;
 
-  /// Shared cache layer the bulk-dataset services persist through.
+  /// Cache layer the bulk-dataset services persist through — the
+  /// `datasets` box in production (#4110).
   final CacheStrategy cache;
 
   /// Dio for the DE Tankerkönig service. Only the DE factory reads it; other

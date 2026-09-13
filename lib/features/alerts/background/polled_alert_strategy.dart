@@ -139,6 +139,8 @@ class PolledAlertStrategy implements CountryAlertStrategy {
             countryCode,
             storage: storage,
             cache: cache,
+            // #4110 — see bulk_dataset_alert_strategy.
+            datasetCache: datasetCacheFor(storage),
             tankerkoenigDio: countryCode == 'DE'
                 ? _buildTankerkoenigDio(apiKey, d)
                 : null,

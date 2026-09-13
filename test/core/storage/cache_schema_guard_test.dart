@@ -73,6 +73,43 @@ void main() {
         'region',
         'amenities',
       },
+      // v3 (#4110): the Station shape is UNCHANGED. The bump exists to
+      // evict the `dataset:` keys that moved to their own box; they are
+      // caches with a hard TTL, so eviction is the migration. Spelled out
+      // rather than aliased to v2, so a shape change under either version
+      // still has to be noticed here.
+      3: {
+        'id',
+        'name',
+        'brand',
+        'street',
+        'houseNumber',
+        'postCode',
+        'place',
+        'lat',
+        'lng',
+        'dist',
+        'e5',
+        'e10',
+        'e98',
+        'diesel',
+        'dieselPremium',
+        'e85',
+        'lpg',
+        'cng',
+        'isOpen',
+        'updatedAt',
+        'openingHoursText',
+        'openingHours',
+        'is24h',
+        'services',
+        'availableFuels',
+        'unavailableFuels',
+        'stationType',
+        'department',
+        'region',
+        'amenities',
+      },
     };
 
     test('currentSchemaVersion has a pinned cached-Station key signature', () {

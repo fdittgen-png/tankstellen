@@ -35,41 +35,56 @@ import 'hive_isolate_ownership.dart';
 class HiveCacheRecovery {
   HiveCacheRecovery._();
 
-  static Future<bool>? _inFlight;
+  static final Map<String, Future<bool>> _inFlight = {};
 
-  /// Recover the `cache` box after a write-path [FileSystemException].
+  /// Recover [boxName] after a write-path [FileSystemException].
   /// Returns true when the box is open and writable again.
-  static Future<bool> recover() => _inFlight ??= _recover().whenComplete(() {
-        _inFlight = null;
-      });
+  ///
+  /// #4110 — takes the box name: the bulk datasets live in their own box
+  /// now, and recovering `cache` when `datasets` is the dead one both
+  /// leaves the caller write-dead and resets a box that was fine. The
+  /// in-flight coalescing is therefore per box.
+  static Future<bool> recover({String boxName = HiveBoxes.cache}) {
+    final pending = _inFlight[boxName];
+    if (pending != null) return pending;
+    final started = _recover(boxName).whenComplete(() {
+      // `remove` hands back the stored Future; binding it keeps
+      // `discarded_futures` satisfied without pretending to await it.
+      final dropped = _inFlight.remove(boxName);
+      assert(dropped != null, 'the in-flight entry vanished');
+    });
+    _inFlight[boxName] = started;
+    return started;
+  }
 
-  static Future<bool> _recover() async {
+  static Future<bool> _recover(String boxName) async {
     try {
       // Drop the broken handle. close() on a dead file may itself throw —
       // that still unregisters the box from Hive's registry.
-      if (Hive.isBoxOpen(HiveBoxes.cache)) {
+      if (Hive.isBoxOpen(boxName)) {
         try {
-          await Hive.box<dynamic>(HiveBoxes.cache).close();
+          await Hive.box<dynamic>(boxName).close();
         } catch (_) {
           // ignore: silent_catch — the handle is already broken; closing is best-effort cleanup
         }
       }
       final cipher = await HiveCipherLoader.loadGuarded();
       try {
-        await Hive.openBox<dynamic>(HiveBoxes.cache, encryptionCipher: cipher);
+        await Hive.openBox<dynamic>(boxName, encryptionCipher: cipher);
       } catch (e, st) {
         // The on-disk file is damaged beyond reopen (e.g. a half-finished
         // foreign compaction). The cache is disposable: start fresh rather
         // than staying write-dead until restart.
-        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
-          'where': 'HiveCacheRecovery: reopen failed — resetting cache box',
+        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {
+          'where': 'HiveCacheRecovery: reopen failed — resetting box',
+          'box': boxName,
         }));
-        await Hive.deleteBoxFromDisk(HiveBoxes.cache);
-        await Hive.openBox<dynamic>(HiveBoxes.cache, encryptionCipher: cipher);
+        await Hive.deleteBoxFromDisk(boxName);
+        await Hive.openBox<dynamic>(boxName, encryptionCipher: cipher);
       }
       // The recovered handle belongs to the main isolate again (#2670).
-      HiveIsolateOwnership.markOwned(const [HiveBoxes.cache]);
-      debugPrint('HiveCacheRecovery: cache box recovered');
+      HiveIsolateOwnership.markOwned([boxName]);
+      debugPrint('HiveCacheRecovery: $boxName box recovered');
       return true;
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {

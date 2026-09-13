@@ -30,8 +30,18 @@ import '../hive_cache_recovery.dart';
 class CacheHiveStore implements CacheStorage, ItineraryStorage {
   /// Recovery hook — [HiveCacheRecovery.recover] in production, a fake in
   /// tests (the dead-handle state can't be produced via Hive's public API).
-  CacheHiveStore({@visibleForTesting Future<bool> Function()? recover})
-      : _recover = recover ?? HiveCacheRecovery.recover;
+  /// [boxName] selects which Hive box backs this store. Defaults to the
+  /// network-response [HiveBoxes.cache]; #4110 added a second instance on
+  /// [HiveBoxes.datasets] so the multi-MB national datasets are not
+  /// deserialized inside `hive_init` on every cold start.
+  CacheHiveStore({
+    String boxName = HiveBoxes.cache,
+    @visibleForTesting Future<bool> Function()? recover,
+  })  : _boxName = boxName,
+        _recover =
+            recover ?? (() => HiveCacheRecovery.recover(boxName: boxName));
+
+  final String _boxName;
 
   final Future<bool> Function() _recover;
 
@@ -59,8 +69,8 @@ class CacheHiveStore implements CacheStorage, ItineraryStorage {
 
   Box<dynamic>? _boxOrNull() {
     try {
-      if (!Hive.isBoxOpen(HiveBoxes.cache)) return null;
-      return Hive.box(HiveBoxes.cache);
+      if (!Hive.isBoxOpen(_boxName)) return null;
+      return Hive.box(_boxName);
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.storage, e, st,
           context: const {'where': 'CacheHiveStore: cache box unavailable'}));

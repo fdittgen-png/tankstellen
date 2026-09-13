@@ -123,6 +123,10 @@ class BulkDatasetAlertStrategy implements CountryAlertStrategy {
           countryCode,
           storage: _storage,
           cache: _cache,
+          // #4110 — the bulk datasets read through their own box, which
+          // the isolate opens too; without this a background scan would
+          // refetch a whole national dataset over the network.
+          datasetCache: datasetCacheFor(_storage),
           // #2866 — count the bulk download in the trace + share the dataset
           // refresh budget with the foreground.
           recorder: _recorder,
