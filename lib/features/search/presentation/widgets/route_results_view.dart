@@ -289,6 +289,9 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
           result.profileFuelByCountry,
           fuelType,
         ),
+        // #4124 — and tell the card what was ASKED for, so a row priced
+        // by another country's grade says which grade it is.
+        requestedFuelType: fuelType,
         isFavorite: ref.watch(isFavoriteProvider(item.id)),
         profileFuelType: ref.watch(activeProfileProvider)?.preferredFuelType,
         onTap: () => StationDetailRoute(item.id).push<void>(context),

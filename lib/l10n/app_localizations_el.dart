@@ -3107,6 +3107,11 @@ class AppLocalizationsEl extends AppLocalizations {
       'Close the app and open it again. If it keeps happening, check for an update: this is almost always a fault in the app rather than in your data. Do not clear the app\'s storage — that would delete your favourites and history without fixing anything.';
 
   @override
+  String priceIsForFuel(String fuel) {
+    return 'This price is for $fuel — not the fuel you selected, which this station does not sell';
+  }
+
+  @override
   String get shellSwipeCoachMark =>
       'Swipe down to hide the bars and use the whole screen';
 

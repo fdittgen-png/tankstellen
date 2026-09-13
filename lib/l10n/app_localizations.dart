@@ -5636,6 +5636,12 @@ abstract class AppLocalizations {
   /// **'Close the app and open it again. If it keeps happening, check for an update: this is almost always a fault in the app rather than in your data. Do not clear the app\'s storage — that would delete your favourites and history without fixing anything.'**
   String get startupFailureGuidance;
 
+  /// Tooltip and screen-reader label on the pump code beside a substituted price (#4124). A cross-border route prices each station by its own country's fuel (#2631), so the number may be a different product from the row above it; this says which.
+  ///
+  /// In en, this message translates to:
+  /// **'This price is for {fuel} — not the fuel you selected, which this station does not sell'**
+  String priceIsForFuel(String fuel);
+
   /// One-time coach mark teaching the swipe-away gesture (#4106/#4107). Names BOTH gestures and what they gain; shown once ever, retires itself after 7s, dismissed by performing it, tapping it, or its Dismiss button.
   ///
   /// In en, this message translates to:

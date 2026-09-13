@@ -3076,6 +3076,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Close the app and open it again. If it keeps happening, check for an update: this is almost always a fault in the app rather than in your data. Do not clear the app\'s storage — that would delete your favourites and history without fixing anything.';
 
   @override
+  String priceIsForFuel(String fuel) {
+    return 'This price is for $fuel — not the fuel you selected, which this station does not sell';
+  }
+
+  @override
   String get shellSwipeCoachMark =>
       'Swipe down — or double-tap the bar — to use the whole screen';
 
@@ -12326,6 +12331,11 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get startupFailureGuidance =>
       '⟦Çłóšé ŧĥé áƥƥ áñđ óƥéñ îŧ áǧáîñ. Îƒ îŧ ķééƥš ĥáƥƥéñîñǧ, çĥéçķ ƒóř áñ úƥđáŧé: ŧĥîš îš áłɱóšŧ áłŵáýš á ƒáúłŧ îñ ŧĥé áƥƥ řáŧĥéř ŧĥáñ îñ ýóúř đáŧá. Đó ñóŧ çłéář ŧĥé áƥƥ\'š šŧóřáǧé — ŧĥáŧ ŵóúłđ đéłéŧé ýóúř ƒáṽóúřîŧéš áñđ ĥîšŧóřý ŵîŧĥóúŧ ƒîẋîñǧ áñýŧĥîñǧ. ························································································⟧';
+
+  @override
+  String priceIsForFuel(String fuel) {
+    return '⟦Ŧĥîš ƥřîçé îš ƒóř $fuel — ñóŧ ŧĥé ƒúéł ýóú šéłéçŧéđ, ŵĥîçĥ ŧĥîš šŧáŧîóñ đóéš ñóŧ šéłł ····························⟧';
+  }
 
   @override
   String get shellSwipeCoachMark =>

@@ -6416,5 +6416,15 @@
   "@startupFailureGuidance": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "priceIsForFuel": "This price is for {fuel} — not the fuel you selected, which this station does not sell",
+  "@priceIsForFuel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      }
+    }
   }
 }
