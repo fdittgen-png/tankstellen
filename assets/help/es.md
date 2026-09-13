@@ -655,7 +655,7 @@ Cuando una ruta cruza una frontera, **cada país del corredor se consulta con su
 
 > *España — Geoportal Gasolineras (MITECO) · France — Prix Carburants (data.economie.gouv.fr)*
 
-Como las calidades difieren por país, un resultado transfronterizo muestra legítimamente E85 en el tramo francés y Gasolina 95/E5 en el español. Cada uno está tarificado correctamente para su lado, nunca promediado.
+Como las calidades difieren por país, un resultado transfronterizo muestra legítimamente E85 en el tramo francés y Gasolina 95/E5 en el español. Cada uno está tarificado correctamente para su lado, nunca promediado. El precio de cada fila lleva el código de surtidor de la calidad a la que corresponde siempre que no sea el combustible que elegiste, así que un E85 francés a 0,82 y un E5 español a 1,62 no pueden leerse como una sola columna de cifras comparables.
 
 **Necesitas un perfil por país** con la calidad preferida correcta, o el segundo tramo no tendrá nada que tarificar y mostrará `--`. Ver Cómo funciona Sparkilo → Perfiles.
 
@@ -695,7 +695,7 @@ Cada fila añade dos números que una búsqueda cercana no tiene:
 - **Desvío** — los kilómetros extra frente a la línea directa.
 - **Ahorro respecto a la media** — frente a la media del corredor, no una nacional.
 
-Cambia a **Todas las estaciones** para ver cada estación de la ruta en vez de la selección. El mapa traza la polilínea con todas las chinchetas.
+Cambia a **Todas las estaciones** para ver cada estación de la ruta en vez de la selección. El mapa traza la polilínea con todas las chinchetas. El número de estaciones del encabezado cuenta las filas en pantalla, así que se mueve con el selector — y con cualquier estación que hayas descartado.
 
 ---
 
@@ -2136,6 +2136,21 @@ Activa **Traza de inicialización al arranque** (Funciones y modo de uso → Des
 **Ajustes → Copia de seguridad y restauración → Exportar copia** escribe un ZIP en Descargas; la restauración ofrece fusionar o reemplazar. Para una exportación legible por máquina, usa en su lugar **Privacidad y datos → Exportar o eliminar → Exportar mis datos → Archivo ZIP**.
 
 TankSync **no** es una copia de seguridad — replica categorías escogidas, y los viajes solo si también activaste su sincronización.
+
+---
+
+## Cambié de teléfono o reinstalé, y mi historial ha desaparecido
+
+Una transferencia entre dispositivos o una restauración desde la nube de Android no puede recuperar la base de datos local de esta aplicación. Android guarda la clave que la desbloquea en el hardware seguro del teléfono, donde ninguna copia de seguridad llega, y así está pensado: es justo lo que impide que alguien que copie los archivos del teléfono pueda leer tus viajes.
+
+Antes, una restauración empeoraba las cosas. Devolvía la base cifrada a su sitio mientras la clave se quedaba atrás, y el primer arranque borraba después el archivo que no podía leer. La aplicación ya mantiene su base fuera de las copias de Android y de la transferencia entre dispositivos, de modo que una instalación restaurada simplemente arranca vacía en lugar de destruir lo que se acababa de restaurar.
+
+**Qué sí vuelve:**
+
+- **TankSync**, si estaba activo: inicia sesión con la misma cuenta y tus viajes, repostajes, vehículos, favoritos, valoraciones y referencias OBD2 se descargan de nuevo.
+- **Una copia ZIP exportada:** Ajustes → Copia de seguridad y restauración → Importar. Sin TankSync es la única vía que sobrevive a un cambio de teléfono.
+
+**Antes de cambiar de teléfono,** exporta una copia ZIP, o comprueba en Sincronización y cuenta que TankSync está activo y ha sincronizado de verdad.
 
 ---
 

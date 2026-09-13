@@ -41,6 +41,15 @@ class StagedProgressCard extends StatefulWidget {
   /// Widget-test handle on the Cancel button.
   final Key? cancelKey;
 
+  /// #4126 — optional block under the progress bar, above Cancel.
+  ///
+  /// The trip-start twin fills it with the step checklist: the card's
+  /// single swapped label is the right density for a save that takes a
+  /// moment, and far too little for a connect the user may watch for ten
+  /// seconds. Kept a plain `Widget` so this stays primitives-only and
+  /// the caller's stage enum never crosses the boundary.
+  final Widget? details;
+
   const StagedProgressCard({
     super.key,
     required this.icon,
@@ -50,6 +59,7 @@ class StagedProgressCard extends StatefulWidget {
     this.announceStages = false,
     this.onCancel,
     this.cancelKey,
+    this.details,
   });
 
   @override
@@ -133,6 +143,10 @@ class _StagedProgressCardState extends State<StagedProgressCard>
                 color: theme.colorScheme.onPrimaryContainer,
               ),
             ),
+            if (widget.details case final details?) ...[
+              const SizedBox(height: 12),
+              details,
+            ],
             // #3335 — escape hatch for a stuck / slow flow.
             if (widget.onCancel != null) ...[
               const SizedBox(height: 4),

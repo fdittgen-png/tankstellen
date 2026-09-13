@@ -46,7 +46,7 @@ When a route crosses a border, **every country in the corridor is queried throug
 
 > *España — Geoportal Gasolineras (MITECO) · France — Prix Carburants (data.economie.gouv.fr)*
 
-Because grades differ by country, a cross-border result legitimately shows E85 on the French leg and Gasolina 95/E5 on the Spanish leg. They are priced correctly for each side, never averaged.
+Because grades differ by country, a cross-border result legitimately shows E85 on the French leg and Gasolina 95/E5 on the Spanish leg. They are priced correctly for each side, never averaged. The price on each row carries the pump code of the grade it is for whenever that is not the fuel you selected, so a French E85 at 0.82 and a Spanish E5 at 1.62 cannot be read as one column of comparable numbers.
 
 **You need a profile per country** with the right preferred fuel, otherwise the second leg has no grade to price and its stations render `--`. See [How Sparkilo Works → Profiles](User-en-How-It-Works#profiles-one-context-one-set-of-defaults).
 
@@ -88,7 +88,7 @@ Each row adds two numbers a nearby search doesn't have:
 - **Detour** — the extra kilometres versus the direct line.
 - **Saving vs. average** — against the corridor average, not a national one.
 
-Switch to **All stations** to see every station along the route rather than the shortlist. The map draws the polyline with all pins.
+Switch to **All stations** to see every station along the route rather than the shortlist. The map draws the polyline with all pins. The station count in the header counts the rows on screen, so it moves with the toggle — and with any station you have swiped away.
 
 ---
 

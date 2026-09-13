@@ -3050,7 +3050,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get priceFreshnessStale => 'Prix ancien';
 
   @override
-  String get priceFreshnessUnknown => 'Ancienneté du prix inconnue';
+  String get priceFreshnessUnknown => 'Âge du prix inconnu';
 
   @override
   String priceFreshnessTooltip(String band, String stamp) {
@@ -3099,7 +3099,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get refuelConsumptionMissing => 'No consumption yet';
 
   @override
-  String get mapSheetViewDetails => 'View station details';
+  String get mapSheetViewDetails => 'Voir les détails de la station';
 
   @override
   String get startupFailureTitle => 'Sparkilo n\'a pas pu démarrer';
@@ -3111,6 +3111,11 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get startupFailureGuidance =>
       'Fermez l\'application et rouvrez-la. Si le problème persiste, cherchez une mise à jour : il s\'agit presque toujours d\'un défaut de l\'application et non de vos données. Ne videz PAS le stockage de l\'application — cela supprimerait vos favoris et votre historique sans rien corriger.';
+
+  @override
+  String priceIsForFuel(String fuel) {
+    return 'Ce prix est celui du $fuel — pas du carburant que vous avez sélectionné, que cette station ne vend pas';
+  }
 
   @override
   String get shellSwipeCoachMark =>
@@ -7455,6 +7460,17 @@ class AppLocalizationsFr extends AppLocalizations {
       'Pour récupérer, videz le stockage de l\'application dans les réglages de l\'appareil ou réinstallez l\'application. Vos favoris et votre historique sont enregistrés uniquement sur cet appareil et ne peuvent pas être restaurés automatiquement.';
 
   @override
+  String get storageKeyLostTitle => 'Les données restaurées sont illisibles';
+
+  @override
+  String get storageKeyLostMessage =>
+      'Cette installation a été restaurée depuis une sauvegarde : les données de Sparkilo sont revenues, mais pas la clé qui les déverrouille. Android conserve cette clé dans le matériel sécurisé du téléphone ; elle ne peut ni être copiée vers un autre appareil ni être restaurée depuis une sauvegarde.';
+
+  @override
+  String get storageKeyLostGuidance =>
+      'L\'historique restauré est irrécupérable. Videz le stockage de l\'application dans les réglages de l\'appareil pour repartir de zéro — connectez-vous ensuite à TankSync et tout ce que vous aviez synchronisé revient.';
+
+  @override
   String syncAdoptTitle(String email) {
     return 'Rejoindre le compte de $email';
   }
@@ -7749,6 +7765,20 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get trajetsResumeRecordingButton => 'Reprendre l\'enregistrement';
+
+  @override
+  String get tripStartStepAdapter => 'Adaptateur OBD2';
+
+  @override
+  String get tripStartStepVehicle => 'Données du véhicule';
+
+  @override
+  String get tripStartStepRecording => 'Enregistrement';
+
+  @override
+  String tripStartSlowHint(String action) {
+    return 'L\'adaptateur met généralement quelques secondes à répondre. Si rien ne bouge, choisissez « $action » dans le menu ci-dessus.';
+  }
 
   @override
   String get tripStartProgressConnectingAdapter =>

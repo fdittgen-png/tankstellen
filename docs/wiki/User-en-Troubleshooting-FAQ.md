@@ -181,6 +181,21 @@ TankSync is **not** a backup — it mirrors selected categories, and trips only 
 
 ---
 
+## I changed phones or reinstalled, and my history is gone
+
+A device-to-device transfer or an Android cloud restore cannot bring this app's local database back. Android keeps the key that unlocks it in the phone's secure hardware, where — by design — no backup can reach it: that is what stops anyone who copies the files off your phone from reading your trips.
+
+A restore used to make things actively worse. It put the encrypted database back while the key stayed behind, and the first launch then cleared the file it could not read. The app now keeps its database out of Android backups and out of device transfer, so a restored install simply starts empty instead of destroying what was restored.
+
+**What does come back:**
+
+- **TankSync**, if it was on: sign in with the same account and your trips, fill-ups, vehicles, favourites, ratings and OBD2 baselines download again.
+- **An exported backup ZIP:** Settings → Backup & restore → Import. Without TankSync this is the only route that survives a change of phone.
+
+**Before you change phones,** export a backup ZIP, or check on Sync & account that TankSync is on and has actually synced.
+
+---
+
 ## How do I delete everything?
 
 - **Device:** Privacy & data → Export or delete → **Delete all my data**. Irreversible.

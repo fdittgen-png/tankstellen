@@ -13,6 +13,7 @@ import '../../../../core/location/location_consent.dart';
 import '../../../../core/location/user_position_provider.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/utils/frame_callbacks.dart';
+import '../../../../core/widgets/app_brand_glyph.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -249,7 +250,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     }
 
     return PageScaffold(
-      title: l10n.appTitle, // i18n-ignore: brand name
+      titleWidget: const AppBrandTitle(), // #4128 — the mark, then the word.
       toolbarHeight: isLandscape ? 40 : null,
       actions: [
         IconButton(

@@ -13,9 +13,33 @@
    * HomeWidgetPreferences.xml — home-widget render state, device-local.
    * files/crash_journal/ — CrashForensics' crash journal, device-local
      diagnostics.
+
+  #4118 — and the local database, because backing it up made a restore
+  WORSE than no restore.
+
+  The Hive boxes (app_flutter/, under the root domain — path_provider's
+  Android documents dir) are AES-encrypted with `hive_encryption_key`,
+  which FlutterSecureStorage keeps in EncryptedSharedPreferences under a
+  master key held in the Android KeyStore. KeyStore material is
+  hardware-bound: it is never in a cloud backup and never in a
+  device-to-device transfer. So a restore used to put back the encrypted
+  boxes and the encrypted prefs while the only key that could read
+  either stayed on the old phone. Every box then failed to open, which
+  the startup path reported as corruption — turning "fresh install, no
+  data" into "install that will not start", whose only exit was clearing
+  the very data the restore had brought back.
+
+  Excluding both halves makes a restored install a CLEAN install: the
+  app starts, and TankSync pulls back whatever was synced. Excluding
+  only one half would be worse than excluding neither.
 -->
 <full-backup-content>
     <exclude domain="sharedpref" path="FlutterSharedPreferences.xml"/>
     <exclude domain="sharedpref" path="HomeWidgetPreferences.xml"/>
     <exclude domain="file" path="crash_journal/"/>
+    <!-- #4118 — the encrypted Hive boxes… -->
+    <exclude domain="root" path="app_flutter/"/>
+    <!-- …and the KeyStore-bound key store that cannot follow them. -->
+    <exclude domain="sharedpref" path="FlutterSecureStorage.xml"/>
+    <exclude domain="sharedpref" path="FlutterSecureStorageConfiguration.xml"/>
 </full-backup-content>

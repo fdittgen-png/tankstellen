@@ -3084,6 +3084,11 @@ class AppLocalizationsNb extends AppLocalizations {
       'Close the app and open it again. If it keeps happening, check for an update: this is almost always a fault in the app rather than in your data. Do not clear the app\'s storage — that would delete your favourites and history without fixing anything.';
 
   @override
+  String priceIsForFuel(String fuel) {
+    return 'This price is for $fuel — not the fuel you selected, which this station does not sell';
+  }
+
+  @override
   String get shellSwipeCoachMark =>
       'Swipe down to hide the bars and use the whole screen';
 
@@ -7381,6 +7386,17 @@ class AppLocalizationsNb extends AppLocalizations {
       'For å gjenopprette må du tømme appens lagring i enhetsinnstillingene eller installere appen på nytt. Favorittene og historikken din lagres bare på denne enheten, så de kan ikke gjenopprettes automatisk.';
 
   @override
+  String get storageKeyLostTitle => 'Restored data cannot be read';
+
+  @override
+  String get storageKeyLostMessage =>
+      'This install was restored from a backup, which brought back Sparkilo\'s data but not the key that unlocks it. Android keeps that key in the phone\'s secure hardware, and it cannot be copied to another device or restored from a backup.';
+
+  @override
+  String get storageKeyLostGuidance =>
+      'The restored history cannot be recovered. Clear the app’s storage in your device settings to start fresh — then sign in to TankSync and everything you had synced comes back.';
+
+  @override
   String syncAdoptTitle(String email) {
     return 'Bli med i kontoen $email';
   }
@@ -7672,6 +7688,20 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get trajetsResumeRecordingButton => 'Gjenoppta opptak';
+
+  @override
+  String get tripStartStepAdapter => 'OBD2 adapter';
+
+  @override
+  String get tripStartStepVehicle => 'Vehicle data';
+
+  @override
+  String get tripStartStepRecording => 'Recording';
+
+  @override
+  String tripStartSlowHint(String action) {
+    return 'Reaching the adapter usually takes a few seconds. If it stays here, pick \"$action\" from the menu above.';
+  }
 
   @override
   String get tripStartProgressConnectingAdapter => 'Kobler til OBD2-adapter…';

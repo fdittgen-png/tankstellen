@@ -1799,6 +1799,8 @@
   "@startupFailureMessage": {"description": "Body of the startup-failure screen (#4116). It states what is known — startup failed — and explicitly reassures that the data is intact, because the corruption screen this replaces claimed damage that had not been established."},
   "startupFailureGuidance": "Close the app and open it again. If it keeps happening, check for an update: this is almost always a fault in the app rather than in your data. Do not clear the app's storage — that would delete your favourites and history without fixing anything.",
   "@startupFailureGuidance": {"description": "Guidance on the startup-failure screen (#4116). It actively COUNTERMANDS the clear-storage advice: for a non-corruption fault that destroys the user's favourites and history and fixes nothing."},
+  "priceIsForFuel": "This price is for {fuel} — not the fuel you selected, which this station does not sell",
+  "@priceIsForFuel": {"description": "Tooltip and screen-reader label on the pump code beside a substituted price (#4124). A cross-border route prices each station by its own country's fuel (#2631), so the number may be a different product from the row above it; this says which.", "placeholders": {"fuel": {"type": "String"}}},
   "shellSwipeCoachMark": "Swipe down — or double-tap the bar — to use the whole screen",
   "@shellSwipeCoachMark": {
     "description": "One-time coach mark teaching the swipe-away gesture (#4106/#4107). Names BOTH gestures and what they gain; shown once ever, retires itself after 7s, dismissed by performing it, tapping it, or its Dismiss button."

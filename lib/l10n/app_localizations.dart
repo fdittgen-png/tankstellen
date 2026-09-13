@@ -5636,6 +5636,12 @@ abstract class AppLocalizations {
   /// **'Close the app and open it again. If it keeps happening, check for an update: this is almost always a fault in the app rather than in your data. Do not clear the app\'s storage — that would delete your favourites and history without fixing anything.'**
   String get startupFailureGuidance;
 
+  /// Tooltip and screen-reader label on the pump code beside a substituted price (#4124). A cross-border route prices each station by its own country's fuel (#2631), so the number may be a different product from the row above it; this says which.
+  ///
+  /// In en, this message translates to:
+  /// **'This price is for {fuel} — not the fuel you selected, which this station does not sell'**
+  String priceIsForFuel(String fuel);
+
   /// One-time coach mark teaching the swipe-away gesture (#4106/#4107). Names BOTH gestures and what they gain; shown once ever, retires itself after 7s, dismissed by performing it, tapping it, or its Dismiss button.
   ///
   /// In en, this message translates to:
@@ -12561,6 +12567,24 @@ abstract class AppLocalizations {
   /// **'To recover, clear the app\'s storage in your device settings, or reinstall the app. Your favourites and history are stored on this device only, so they cannot be restored automatically.'**
   String get storageRecoveryGuidance;
 
+  /// Title of the #4118 recovery screen: this install was restored from a backup or a device transfer, which copied the encrypted database but not its KeyStore-bound key. NOT corruption — the files are intact, they are simply unreadable.
+  ///
+  /// In en, this message translates to:
+  /// **'Restored data cannot be read'**
+  String get storageKeyLostTitle;
+
+  /// Body of the #4118 recovery screen. States the cause plainly and says the data is not damaged.
+  ///
+  /// In en, this message translates to:
+  /// **'This install was restored from a backup, which brought back Sparkilo\'s data but not the key that unlocks it. Android keeps that key in the phone\'s secure hardware, and it cannot be copied to another device or restored from a backup.'**
+  String get storageKeyLostMessage;
+
+  /// Guidance on the #4118 recovery screen. This is the one non-corruption case where clearing storage IS the right advice, so it names the exit the corruption copy has no way to offer: TankSync still holds whatever was synced.
+  ///
+  /// In en, this message translates to:
+  /// **'The restored history cannot be recovered. Clear the app’s storage in your device settings to start fresh — then sign in to TankSync and everything you had synced comes back.'**
+  String get storageKeyLostGuidance;
+
   /// Title of the QR-join adoption step — the second device adopts the first device's email account (#3080).
   ///
   /// In en, this message translates to:
@@ -13040,6 +13064,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Resume recording'**
   String get trajetsResumeRecordingButton;
+
+  /// Short name of the first trip-start step, shown in the #4126 checklist. Unlike tripStartProgressConnectingAdapter this is a NOUN with no ellipsis: it labels a row that can be pending, running or done.
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 adapter'**
+  String get tripStartStepAdapter;
+
+  /// Short name of the second trip-start step (#4126 checklist).
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle data'**
+  String get tripStartStepVehicle;
+
+  /// Short name of the third trip-start step (#4126 checklist).
+  ///
+  /// In en, this message translates to:
+  /// **'Recording'**
+  String get tripStartStepRecording;
+
+  /// Standing note under the #4126 trip-start checklist. A blank wait of 3-12 s (field logs show far longer) reads as a broken app; this says the wait is expected and names the escape hatch that already exists. {action} is the obd2ResetConnection label.
+  ///
+  /// In en, this message translates to:
+  /// **'Reaching the adapter usually takes a few seconds. If it stays here, pick \"{action}\" from the menu above.'**
+  String tripStartSlowHint(String action);
 
   /// Status label shown on the Trips tab while the pinned OBD2 adapter is being reached over Bluetooth, before the recording screen opens. Replaces the silent disabled-button wait.
   ///

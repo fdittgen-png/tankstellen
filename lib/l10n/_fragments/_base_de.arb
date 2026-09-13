@@ -1218,6 +1218,7 @@
   "startupFailureTitle": "Sparkilo konnte nicht starten",
   "startupFailureMessage": "Sparkilo konnte den Start nicht abschließen. Deine gespeicherten Daten sind unverändert.",
   "startupFailureGuidance": "Schließe die App und öffne sie erneut. Wenn es weiterhin auftritt, suche nach einem Update: das ist fast immer ein Fehler in der App und nicht in deinen Daten. Lösche NICHT den App-Speicher — das würde deine Favoriten und deinen Verlauf löschen, ohne etwas zu beheben.",
+  "priceIsForFuel": "Dieser Preis gilt für {fuel} — nicht für den gewählten Kraftstoff, den diese Station nicht verkauft",
   "shellSwipeCoachMark": "Nach unten wischen oder doppelt auf die Leiste tippen, um den ganzen Bildschirm zu nutzen",
   "shellBarHiddenAnnounce": "Navigation ausgeblendet. Von unten nach oben wischen oder die Taste lange drücken, um sie zurückzuholen.",
   "shellBarShownAnnounce": "Navigation eingeblendet.",

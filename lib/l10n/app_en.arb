@@ -1805,6 +1805,15 @@
   "@startupFailureGuidance": {
     "description": "Guidance on the startup-failure screen (#4116). It actively COUNTERMANDS the clear-storage advice: for a non-corruption fault that destroys the user's favourites and history and fixes nothing."
   },
+  "priceIsForFuel": "This price is for {fuel} — not the fuel you selected, which this station does not sell",
+  "@priceIsForFuel": {
+    "description": "Tooltip and screen-reader label on the pump code beside a substituted price (#4124). A cross-border route prices each station by its own country's fuel (#2631), so the number may be a different product from the row above it; this says which.",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      }
+    }
+  },
   "shellSwipeCoachMark": "Swipe down — or double-tap the bar — to use the whole screen",
   "@shellSwipeCoachMark": {
     "description": "One-time coach mark teaching the swipe-away gesture (#4106/#4107). Names BOTH gestures and what they gain; shown once ever, retires itself after 7s, dismissed by performing it, tapping it, or its Dismiss button."
@@ -7531,6 +7540,18 @@
   "@storageRecoveryGuidance": {
     "description": "Guidance text on the storage-corruption recovery screen telling the user how to recover — clear app storage or reinstall (#2294)."
   },
+  "storageKeyLostTitle": "Restored data cannot be read",
+  "@storageKeyLostTitle": {
+    "description": "Title of the #4118 recovery screen: this install was restored from a backup or a device transfer, which copied the encrypted database but not its KeyStore-bound key. NOT corruption — the files are intact, they are simply unreadable."
+  },
+  "storageKeyLostMessage": "This install was restored from a backup, which brought back Sparkilo's data but not the key that unlocks it. Android keeps that key in the phone's secure hardware, and it cannot be copied to another device or restored from a backup.",
+  "@storageKeyLostMessage": {
+    "description": "Body of the #4118 recovery screen. States the cause plainly and says the data is not damaged."
+  },
+  "storageKeyLostGuidance": "The restored history cannot be recovered. Clear the app’s storage in your device settings to start fresh — then sign in to TankSync and everything you had synced comes back.",
+  "@storageKeyLostGuidance": {
+    "description": "Guidance on the #4118 recovery screen. This is the one non-corruption case where clearing storage IS the right advice, so it names the exit the corruption copy has no way to offer: TankSync still holds whatever was synced."
+  },
   "syncAdoptTitle": "Join {email}'s account",
   "@syncAdoptTitle": {
     "description": "Title of the QR-join adoption step — the second device adopts the first device's email account (#3080).",
@@ -7944,6 +7965,27 @@
   "trajetsResumeRecordingButton": "Resume recording",
   "@trajetsResumeRecordingButton": {
     "description": "Primary CTA on the Trips tab when a trip is already being recorded in the background; tapping it brings focus back to the recording screen (#1237)."
+  },
+  "tripStartStepAdapter": "OBD2 adapter",
+  "@tripStartStepAdapter": {
+    "description": "Short name of the first trip-start step, shown in the #4126 checklist. Unlike tripStartProgressConnectingAdapter this is a NOUN with no ellipsis: it labels a row that can be pending, running or done."
+  },
+  "tripStartStepVehicle": "Vehicle data",
+  "@tripStartStepVehicle": {
+    "description": "Short name of the second trip-start step (#4126 checklist)."
+  },
+  "tripStartStepRecording": "Recording",
+  "@tripStartStepRecording": {
+    "description": "Short name of the third trip-start step (#4126 checklist)."
+  },
+  "tripStartSlowHint": "Reaching the adapter usually takes a few seconds. If it stays here, pick \"{action}\" from the menu above.",
+  "@tripStartSlowHint": {
+    "description": "Standing note under the #4126 trip-start checklist. A blank wait of 3-12 s (field logs show far longer) reads as a broken app; this says the wait is expected and names the escape hatch that already exists. {action} is the obd2ResetConnection label.",
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
   },
   "tripStartProgressConnectingAdapter": "Connecting to OBD2 adapter…",
   "@tripStartProgressConnectingAdapter": {

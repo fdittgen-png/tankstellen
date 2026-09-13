@@ -5,8 +5,11 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/app/startup/storage_failure_gate.dart';
+import 'package:tankstellen/app/widgets/storage_recovery_screen.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/core/storage/hive_cipher_loader.dart';
+import 'package:tankstellen/core/telemetry/storage/startup_failure_store.dart';
 
 /// #3149 — the startup-brick gap around #2294: `run()` caught ONLY
 /// HiveCorruptionException, while `_loadCipher()` (FlutterSecureStorage)
@@ -59,19 +62,119 @@ void main() {
     });
   });
 
-  group('AppInitializer wires unknown storage failures to recovery (#3149)',
-      () {
-    late String initSource;
+  group('the storage phase routes every failure to the right screen', () {
+    // #4118 — these two used to read `app_initializer.dart` AS TEXT and
+    // assert that a catch-all sat after the specific catch. They broke
+    // the moment the catches moved into `storage_failure_gate.dart` —
+    // which is the honest verdict of a test that pins prose, not
+    // behaviour: the routing was intact, the string had moved.
+    //
+    // The gate takes the storage phase as a function, so the real thing
+    // can be driven now. #4116 is the reason this matters: four
+    // source-scanning tests guarded the first-frame box opens and none
+    // of them RAN the code, so a self-recursive alias shipped with
+    // 16,626 tests green.
+    late Directory tmp;
+
+    setUp(() {
+      tmp = Directory.systemTemp.createTempSync('brick_recovery_test');
+      StartupFailureStore.directoryProvider = () async => tmp;
+    });
+
+    tearDown(() {
+      StartupFailureStore.resetForTest();
+      tmp.deleteSync(recursive: true);
+    });
+
+    /// Drives the gate with a storage phase that throws [fault] and
+    /// returns the cause the screen was mounted with.
+    ///
+    /// [fault] is `Object` because the whole point is that the gate must
+    /// cope with whatever the storage phase throws — including an
+    /// `Error`, which is what a bug of ours looks like.
+    Future<StorageRecoveryCause?> causeFor(
+        WidgetTester tester, Object fault) async {
+      // `runAsync`: the gate awaits StartupFailureStore's real file I/O,
+      // and a testWidgets body runs in a fake-async zone that never
+      // completes it (the first attempt hung for the full 10-minute
+      // timeout rather than failing).
+      final ok = await tester.runAsync(
+          // ignore: only_throw_errors
+          () => runStoragePhaseGuarded(() async => throw fault));
+      expect(ok, isFalse, reason: 'startup cannot continue without storage');
+      await tester.pump();
+      final host = tester.widgetList<StorageRecoveryHost>(
+          find.byType(StorageRecoveryHost));
+      return host.isEmpty ? null : host.first.cause;
+    }
+
+    testWidgets('a corrupt box is the only fault that may claim damage',
+        (tester) async {
+      final cause = await causeFor(
+          tester, const HiveCorruptionException('box unreadable'));
+      expect(cause, StorageRecoveryCause.corruptBox);
+    });
+
+    testWidgets('a lost key says RESTORE, not damage', (tester) async {
+      final cause =
+          await causeFor(tester, const StorageKeyLostException('no key'));
+      expect(cause, StorageRecoveryCause.keyLost);
+    });
+
+    testWidgets('anything else lands on the harmless branch',
+        (tester) async {
+      // The #4116 asymmetry: claiming "not damaged" wrongly costs a
+      // restart, claiming "damaged" wrongly costs the user their
+      // favourites and history for good. A cipher fault, a TraceStorage
+      // fault or a bug of ours must never reach the destructive copy.
+      final cause = await causeFor(
+          tester, const StorageInitException('cipher unavailable'));
+      expect(cause, StorageRecoveryCause.unknown);
+
+      final onAPlainError = await causeFor(tester, StateError('a bug'));
+      expect(onAPlainError, StorageRecoveryCause.unknown);
+    });
+
+    testWidgets('every branch persists the cause Hive-INDEPENDENTLY, so the '
+        'next launch can replay it', (tester) async {
+      // Hive is the thing that is down, so the error spool cannot record
+      // anything — only a plain file survives to the next launch.
+      for (final fault in <Object>[
+        const HiveCorruptionException('box unreadable'),
+        const StorageKeyLostException('no key'),
+        const StorageInitException('cipher unavailable'),
+      ]) {
+        for (final f in tmp.listSync()) {
+          f.deleteSync(recursive: true);
+        }
+        await causeFor(tester, fault);
+        expect(tmp.listSync(), isNotEmpty,
+            reason: 'nothing was written for $fault — that launch would '
+                'be undiagnosable');
+      }
+    });
+
+    testWidgets('a storage phase that succeeds mounts nothing and lets '
+        'startup continue', (tester) async {
+      final ok =
+          await tester.runAsync(() => runStoragePhaseGuarded(() async {}));
+      await tester.pump();
+
+      expect(ok, isTrue);
+      expect(find.byType(StorageRecoveryHost), findsNothing);
+      expect(tmp.listSync(), isEmpty);
+    });
+  });
+
+  group('the guarded cipher path stays guarded (#3149)', () {
     late String hiveBoxesSource;
 
     setUpAll(() {
-      initSource = File('lib/app/app_initializer.dart').readAsStringSync();
       hiveBoxesSource =
           File('lib/core/storage/hive_boxes.dart').readAsStringSync();
     });
 
-    test('HiveBoxes.init / initInIsolate load the cipher via the guarded '
-        'path', () {
+    test('HiveBoxes.init loads the cipher via the guarded path', () {
       expect(hiveBoxesSource, contains('await HiveCipherLoader.loadGuarded()'),
           reason: 'the secure-storage read must be inside the typed '
               're-tag so a PlatformException cannot escape untyped');
@@ -80,37 +183,8 @@ void main() {
           reason: 'no init path may bypass the guard');
     });
 
-    test('run() has a catch-all AFTER the specific HiveCorruptionException '
-        'catch, routing to the same StorageRecoveryHost', () {
-      final specific = initSource.indexOf('on HiveCorruptionException');
-      expect(specific, isNonNegative);
-      final rest = initSource.substring(specific);
-      final catchAll = rest.indexOf('} catch (e, st) {');
-      expect(catchAll, isNonNegative,
-          reason: 'unknown storage failures (cipher, trace box, profile '
-              'seed) must not escape uncaught — no Zone handler exists yet');
-      // The catch-all block must route to the recovery host too.
-      final afterCatchAll = rest.substring(catchAll);
-      final block = afterCatchAll.substring(
-          0, afterCatchAll.indexOf("StartupTimer.instance.mark('storage_ready')"));
-      // #3272 — wrapped in a bare ProviderScope (missing_provider_scope).
-      expect(block,
-          contains('runApp(const ProviderScope(child: StorageRecoveryHost()))'));
-      expect(block, contains('errorLogger.log(ErrorLayer.storage'));
-    });
-
-    test('both storage-brick catches persist the cause Hive-independently '
-        'and the next launch replays it', () {
-      final specific = initSource.indexOf('on HiveCorruptionException');
-      final upToStorageReady = initSource.substring(
-          specific, initSource.indexOf("mark('storage_ready')"));
-      expect(
-          RegExp(r'StartupFailureStore\.persist')
-              .allMatches(upToStorageReady)
-              .length,
-          2,
-          reason: 'Hive is down in both paths — the spool cannot record; '
-              'only the plain file survives for the next launch');
+    test('the replay of a persisted brick record is still wired', () {
+      final initSource = File('lib/app/app_initializer.dart').readAsStringSync();
       expect(initSource, contains('StartupFailureStore.drain()'),
           reason: 'a persisted brick record must be replayed into the '
               'trace pipeline on the next successful launch');

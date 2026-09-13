@@ -5989,7 +5989,7 @@
   "priceFreshnessRecent": "Prix du jour",
   "priceFreshnessAging": "Prix vieillissant",
   "priceFreshnessStale": "Prix ancien",
-  "priceFreshnessUnknown": "Ancienneté du prix inconnue",
+  "priceFreshnessUnknown": "Âge du prix inconnu",
   "priceFreshnessTooltip": "{band} · {stamp}",
   "@priceFreshnessTooltip": {
     "x-mt": "needs-native-review",
@@ -6057,12 +6057,30 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "mapSheetViewDetails": "View station details",
-  "@mapSheetViewDetails": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
+  "mapSheetViewDetails": "Voir les détails de la station",
   "startupFailureTitle": "Sparkilo n'a pas pu démarrer",
   "startupFailureMessage": "Sparkilo n'a pas pu terminer son démarrage. Vos données enregistrées sont intactes.",
-  "startupFailureGuidance": "Fermez l'application et rouvrez-la. Si le problème persiste, cherchez une mise à jour : il s'agit presque toujours d'un défaut de l'application et non de vos données. Ne videz PAS le stockage de l'application — cela supprimerait vos favoris et votre historique sans rien corriger."
+  "startupFailureGuidance": "Fermez l'application et rouvrez-la. Si le problème persiste, cherchez une mise à jour : il s'agit presque toujours d'un défaut de l'application et non de vos données. Ne videz PAS le stockage de l'application — cela supprimerait vos favoris et votre historique sans rien corriger.",
+  "priceIsForFuel": "Ce prix est celui du {fuel} — pas du carburant que vous avez sélectionné, que cette station ne vend pas",
+  "@priceIsForFuel": {
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      }
+    }
+  },
+  "tripStartStepAdapter": "Adaptateur OBD2",
+  "tripStartStepVehicle": "Données du véhicule",
+  "tripStartStepRecording": "Enregistrement",
+  "tripStartSlowHint": "L'adaptateur met généralement quelques secondes à répondre. Si rien ne bouge, choisissez « {action} » dans le menu ci-dessus.",
+  "@tripStartSlowHint": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "storageKeyLostTitle": "Les données restaurées sont illisibles",
+  "storageKeyLostMessage": "Cette installation a été restaurée depuis une sauvegarde : les données de Sparkilo sont revenues, mais pas la clé qui les déverrouille. Android conserve cette clé dans le matériel sécurisé du téléphone ; elle ne peut ni être copiée vers un autre appareil ni être restaurée depuis une sauvegarde.",
+  "storageKeyLostGuidance": "L'historique restauré est irrécupérable. Videz le stockage de l'application dans les réglages de l'appareil pour repartir de zéro — connectez-vous ensuite à TankSync et tout ce que vous aviez synchronisé revient."
 }

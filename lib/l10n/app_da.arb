@@ -6416,5 +6416,55 @@
   "@startupFailureGuidance": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "priceIsForFuel": "This price is for {fuel} — not the fuel you selected, which this station does not sell",
+  "@priceIsForFuel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      }
+    }
+  },
+  "tripStartStepAdapter": "OBD2 adapter",
+  "@tripStartStepAdapter": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripStartStepVehicle": "Vehicle data",
+  "@tripStartStepVehicle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripStartStepRecording": "Recording",
+  "@tripStartStepRecording": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripStartSlowHint": "Reaching the adapter usually takes a few seconds. If it stays here, pick \"{action}\" from the menu above.",
+  "@tripStartSlowHint": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "storageKeyLostTitle": "Restored data cannot be read",
+  "@storageKeyLostTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "storageKeyLostMessage": "This install was restored from a backup, which brought back Sparkilo's data but not the key that unlocks it. Android keeps that key in the phone's secure hardware, and it cannot be copied to another device or restored from a backup.",
+  "@storageKeyLostMessage": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "storageKeyLostGuidance": "The restored history cannot be recovered. Clear the app’s storage in your device settings to start fresh — then sign in to TankSync and everything you had synced comes back.",
+  "@storageKeyLostGuidance": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

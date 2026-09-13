@@ -47,6 +47,18 @@ class StationCardHeadlineRow extends StatelessWidget {
   final double? loyaltyDiscount;
   final VoidCallback? onFavoriteTap;
 
+  /// #4124 — the pump code to render beside the price when the price is
+  /// NOT the fuel the user asked for, or null in the ordinary case.
+  ///
+  /// On a cross-border route `route_results_view` prices each station by
+  /// its own country's profile fuel (#2631), so a Spanish row under an
+  /// E85 search carries an E5 price. The DECISION — is this a
+  /// substitution, and what is this fuel called in this station's country
+  /// (#2717's Magna/Premium) — belongs to the caller, which owns both
+  /// fuels and already resolves the country for the currency. This row
+  /// only renders it.
+  final String? substitutedFuelLabel;
+
   const StationCardHeadlineRow({
     super.key,
     required this.station,
@@ -58,6 +70,7 @@ class StationCardHeadlineRow extends StatelessWidget {
     required this.priceTier,
     required this.loyaltyDiscount,
     required this.onFavoriteTap,
+    this.substitutedFuelLabel,
   });
 
   /// Effective price after applying [loyaltyDiscount]. Returns the
@@ -113,6 +126,7 @@ class StationCardHeadlineRow extends StatelessWidget {
                     hasDiscount: hasDiscount,
                     currencyOverride: currencyOverride,
                     priceTier: priceTier,
+                    substitutedFuelLabel: substitutedFuelLabel,
                   ),
                 ),
               ),
@@ -120,7 +134,14 @@ class StationCardHeadlineRow extends StatelessWidget {
             const SizedBox(width: Spacing.md),
             if (isCheapest) ...[
               ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 88),
+                // #4123 — was 88, which fits the English "Cheapest" and
+                // ellipsises the French superlative to "Le moins ch…".
+                // "Le moins cher" cannot be shortened to "Moins cher":
+                // that is the comparative (cheaper), and this badge means
+                // THE cheapest. So the slot gives way, not the wording.
+                // The price beside it is already `Expanded`, so it yields
+                // first and nothing overflows.
+                constraints: const BoxConstraints(maxWidth: 120),
                 child: const _CheapestBadge(),
               ),
               const SizedBox(width: Spacing.sm),
@@ -177,6 +198,10 @@ class _PriceHeadline extends StatelessWidget {
   final String? currencyOverride;
   final PriceTier? priceTier;
 
+  /// #4124 — non-null when the price shown is NOT the fuel the user
+  /// asked for: that fuel's pump code, rendered beside the number.
+  final String? substitutedFuelLabel;
+
   const _PriceHeadline({
     required this.station,
     required this.price,
@@ -184,6 +209,7 @@ class _PriceHeadline extends StatelessWidget {
     required this.hasDiscount,
     required this.currencyOverride,
     required this.priceTier,
+    this.substitutedFuelLabel,
   });
 
   @override
@@ -248,6 +274,27 @@ class _PriceHeadline extends StatelessWidget {
           Text(
             l10n.stationCardPriceUnit(currency),
             style: AppText.unit(context),
+          ),
+        ],
+        // #4124 — name the fuel when it is NOT the one asked for. #2400
+        // settled this question already and `shortFuelLabel` was written
+        // for it; the caller that used it was lost somewhere since, which
+        // is how a French E85 at 0,82 came to sit in the same column as a
+        // Spanish E5 at 1,62 with nothing to tell them apart.
+        //
+        // Language-neutral pump code, in the unit role beside the unit:
+        // this qualifies the number, it is not prose about it.
+        if (substitutedFuelLabel case final label?) ...[
+          const SizedBox(width: Spacing.xs),
+          Tooltip(
+            message: l10n.priceIsForFuel(label),
+            child: Text(
+              label,
+              style: AppText.unit(context).copyWith(
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
           ),
         ],
       ],

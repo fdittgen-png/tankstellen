@@ -12,6 +12,7 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/widgets/section_card.dart';
+import '../../../../core/widgets/sheet_footer_inset.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
@@ -338,12 +339,9 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
                   thickness: 1,
                   color: theme.colorScheme.surfaceContainerHighest,
                 ),
-                constrain(
-                  Padding(
-                    padding: const EdgeInsets.all(Spacing.xl),
-                    child: footer,
-                  ),
-                ),
+                // #4119 — the footer needs the system navigation inset
+                // added back by hand; see [SheetFooterInset].
+                constrain(SheetFooterInset(child: footer)),
               ],
             );
           },

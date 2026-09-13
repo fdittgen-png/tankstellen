@@ -3076,6 +3076,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Close the app and open it again. If it keeps happening, check for an update: this is almost always a fault in the app rather than in your data. Do not clear the app\'s storage — that would delete your favourites and history without fixing anything.';
 
   @override
+  String priceIsForFuel(String fuel) {
+    return 'This price is for $fuel — not the fuel you selected, which this station does not sell';
+  }
+
+  @override
   String get shellSwipeCoachMark =>
       'Swipe down — or double-tap the bar — to use the whole screen';
 
@@ -7345,6 +7350,17 @@ class AppLocalizationsEn extends AppLocalizations {
       'To recover, clear the app\'s storage in your device settings, or reinstall the app. Your favourites and history are stored on this device only, so they cannot be restored automatically.';
 
   @override
+  String get storageKeyLostTitle => 'Restored data cannot be read';
+
+  @override
+  String get storageKeyLostMessage =>
+      'This install was restored from a backup, which brought back Sparkilo\'s data but not the key that unlocks it. Android keeps that key in the phone\'s secure hardware, and it cannot be copied to another device or restored from a backup.';
+
+  @override
+  String get storageKeyLostGuidance =>
+      'The restored history cannot be recovered. Clear the app’s storage in your device settings to start fresh — then sign in to TankSync and everything you had synced comes back.';
+
+  @override
   String syncAdoptTitle(String email) {
     return 'Join $email\'s account';
   }
@@ -7635,6 +7651,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trajetsResumeRecordingButton => 'Resume recording';
+
+  @override
+  String get tripStartStepAdapter => 'OBD2 adapter';
+
+  @override
+  String get tripStartStepVehicle => 'Vehicle data';
+
+  @override
+  String get tripStartStepRecording => 'Recording';
+
+  @override
+  String tripStartSlowHint(String action) {
+    return 'Reaching the adapter usually takes a few seconds. If it stays here, pick \"$action\" from the menu above.';
+  }
 
   @override
   String get tripStartProgressConnectingAdapter =>
@@ -12328,6 +12358,11 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Çłóšé ŧĥé áƥƥ áñđ óƥéñ îŧ áǧáîñ. Îƒ îŧ ķééƥš ĥáƥƥéñîñǧ, çĥéçķ ƒóř áñ úƥđáŧé: ŧĥîš îš áłɱóšŧ áłŵáýš á ƒáúłŧ îñ ŧĥé áƥƥ řáŧĥéř ŧĥáñ îñ ýóúř đáŧá. Đó ñóŧ çłéář ŧĥé áƥƥ\'š šŧóřáǧé — ŧĥáŧ ŵóúłđ đéłéŧé ýóúř ƒáṽóúřîŧéš áñđ ĥîšŧóřý ŵîŧĥóúŧ ƒîẋîñǧ áñýŧĥîñǧ. ························································································⟧';
 
   @override
+  String priceIsForFuel(String fuel) {
+    return '⟦Ŧĥîš ƥřîçé îš ƒóř $fuel — ñóŧ ŧĥé ƒúéł ýóú šéłéçŧéđ, ŵĥîçĥ ŧĥîš šŧáŧîóñ đóéš ñóŧ šéłł ····························⟧';
+  }
+
+  @override
   String get shellSwipeCoachMark =>
       '⟦Šŵîƥé đóŵñ — óř đóúƀłé-ŧáƥ ŧĥé ƀář — ŧó úšé ŧĥé ŵĥółé šçřééñ ····················⟧';
 
@@ -16713,6 +16748,18 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Ŧó řéçóṽéř, çłéář ŧĥé áƥƥ\'š šŧóřáǧé îñ ýóúř đéṽîçé šéŧŧîñǧš, óř řéîñšŧáłł ŧĥé áƥƥ. Ýóúř ƒáṽóúřîŧéš áñđ ĥîšŧóřý ářé šŧóřéđ óñ ŧĥîš đéṽîçé óñłý, šó ŧĥéý çáññóŧ ƀé řéšŧóřéđ áúŧóɱáŧîçáłłý. ···································································⟧';
 
   @override
+  String get storageKeyLostTitle =>
+      '⟦Řéšŧóřéđ đáŧá çáññóŧ ƀé řéáđ ···········⟧';
+
+  @override
+  String get storageKeyLostMessage =>
+      '⟦Ŧĥîš îñšŧáłł ŵáš řéšŧóřéđ ƒřóɱ á ƀáçķúƥ, ŵĥîçĥ ƀřóúǧĥŧ ƀáçķ Šƥářķîłó\'š đáŧá ƀúŧ ñóŧ ŧĥé ķéý ŧĥáŧ úñłóçķš îŧ. Áñđřóîđ ķééƥš ŧĥáŧ ķéý îñ ŧĥé ƥĥóñé\'š šéçúřé ĥářđŵářé, áñđ îŧ çáññóŧ ƀé çóƥîéđ ŧó áñóŧĥéř đéṽîçé óř řéšŧóřéđ ƒřóɱ á ƀáçķúƥ. ····················································································⟧';
+
+  @override
+  String get storageKeyLostGuidance =>
+      '⟦Ŧĥé řéšŧóřéđ ĥîšŧóřý çáññóŧ ƀé řéçóṽéřéđ. Çłéář ŧĥé áƥƥ’š šŧóřáǧé îñ ýóúř đéṽîçé šéŧŧîñǧš ŧó šŧářŧ ƒřéšĥ — ŧĥéñ šîǧñ îñ ŧó ŦáñķŠýñç áñđ éṽéřýŧĥîñǧ ýóú ĥáđ šýñçéđ çóɱéš ƀáçķ. ·······························································⟧';
+
+  @override
   String syncAdoptTitle(String email) {
     return '⟦Ĵóîñ $email\'š áççóúñŧ ·····⟧';
   }
@@ -17009,6 +17056,20 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get trajetsResumeRecordingButton => '⟦Řéšúɱé řéçóřđîñǧ ·······⟧';
+
+  @override
+  String get tripStartStepAdapter => '⟦ÓƁĐ2 áđáƥŧéř ·····⟧';
+
+  @override
+  String get tripStartStepVehicle => '⟦Ṽéĥîçłé đáŧá ·····⟧';
+
+  @override
+  String get tripStartStepRecording => '⟦Řéçóřđîñǧ ····⟧';
+
+  @override
+  String tripStartSlowHint(String action) {
+    return '⟦Řéáçĥîñǧ ŧĥé áđáƥŧéř úšúáłłý ŧáķéš á ƒéŵ šéçóñđš. Îƒ îŧ šŧáýš ĥéřé, ƥîçķ \"$action\" ƒřóɱ ŧĥé ɱéñú áƀóṽé. ·································⟧';
+  }
 
   @override
   String get tripStartProgressConnectingAdapter =>

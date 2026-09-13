@@ -64,7 +64,11 @@ void main() {
       expect(runBody, isNotNull, reason: 'run() method must exist');
 
       final bootstrap = runBody!.indexOf('_bootstrap()');
-      final storage = runBody.indexOf('_initStorage()');
+      // #4118 — the storage phase is invoked as
+      // `runStoragePhaseGuarded(_initStorage)` now (the three failure
+      // verdicts moved into the gate), so match the name without the
+      // call parens. This test is about ORDER, not call syntax.
+      final storage = runBody.indexOf('_initStorage');
       final services = runBody.indexOf('_initServicesInParallel()');
       final tankSync = runBody.indexOf('_maybeInitTankSync');
       final launch = runBody.indexOf('_launch(');

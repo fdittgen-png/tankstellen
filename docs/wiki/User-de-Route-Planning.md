@@ -46,7 +46,7 @@ Nicht „am günstigsten in der Nähe", sondern **am günstigsten auf dem Weg** 
 
 > *España — Geoportal Gasolineras (MITECO) · France — Prix Carburants (data.economie.gouv.fr)*
 
-Weil die Sorten je Land unterschiedlich sind, zeigt ein grenzüberschreitendes Ergebnis zu Recht E85 auf dem französischen und Gasolina 95/E5 auf dem spanischen Abschnitt. Beide sind für ihre Seite korrekt bepreist, nie gemittelt.
+Weil die Sorten je Land unterschiedlich sind, zeigt ein grenzüberschreitendes Ergebnis zu Recht E85 auf dem französischen und Gasolina 95/E5 auf dem spanischen Abschnitt. Beide sind für ihre Seite korrekt bepreist, nie gemittelt. Der Preis jeder Zeile trägt das Pumpenkürzel der Sorte, für die er gilt, sobald das nicht der gewählte Kraftstoff ist — so lassen sich ein französisches E85 zu 0,82 und ein spanisches E5 zu 1,62 nicht als eine Spalte vergleichbarer Zahlen lesen.
 
 **Du brauchst ein Profil pro Land** mit der richtigen bevorzugten Sorte, sonst hat der zweite Abschnitt nichts zu bepreisen und zeigt `--`. Siehe [Wie Sparkilo funktioniert → Profile](User-de-How-It-Works#profile-ein-kontext-ein-satz-voreinstellungen).
 
@@ -88,7 +88,7 @@ Jede Zeile hat zwei Zahlen, die eine Umkreissuche nicht hat:
 - **Umweg** — die Mehrkilometer gegenüber der direkten Linie.
 - **Ersparnis gegenüber dem Durchschnitt** — gegen den Korridordurchschnitt, nicht gegen einen nationalen.
 
-Mit **Alle Stationen** siehst du statt der Auswahl jede Station entlang der Route. Die Karte zeichnet die Linie mit allen Nadeln.
+Mit **Alle Stationen** siehst du statt der Auswahl jede Station entlang der Route. Die Karte zeichnet die Linie mit allen Nadeln. Die Stationszahl in der Kopfzeile zählt die angezeigten Zeilen, bewegt sich also mit dem Umschalter — und mit jeder weggewischten Station.
 
 ---
 

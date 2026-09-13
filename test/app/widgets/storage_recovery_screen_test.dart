@@ -17,11 +17,11 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 void main() {
   group('StorageRecoveryHost', () {
     testWidgets('renders the English recovery copy from ARB', (tester) async {
-      // #4116 — `corrupted: true` is now required to get the CORRUPTION
+      // #4116/#4118 — the corruptBox cause is now required to get the CORRUPTION
       // copy. The default branch deliberately says something else and
       // never advises clearing storage; see
       // storage_recovery_cause_test.dart.
-      await tester.pumpWidget(const StorageRecoveryHost(corrupted: true));
+      await tester.pumpWidget(const StorageRecoveryHost(cause: StorageRecoveryCause.corruptBox));
       await tester.pumpAndSettle();
 
       final l10n = await AppLocalizations.delegate.load(const Locale('en'));
@@ -50,48 +50,45 @@ void main() {
     });
   });
 
-  group('AppInitializer wires HiveCorruptionException to recovery (#2294)', () {
+  group('the storage phase is routed through the gate (#2294/#4118)', () {
+    // What this group used to do: read `app_initializer.dart` as text and
+    // assert a `try` wrapped `_initStorage`, that a catch targeted
+    // HiveCorruptionException, and that the block called errorLogger and
+    // runApp. All three broke when the catches moved into
+    // `storage_failure_gate.dart` — while the routing itself was
+    // completely intact. A test that pins prose reports a refactor as a
+    // regression and would report a real regression as nothing at all.
+    //
+    // The behaviour now has executing coverage: `startup_brick_recovery_test`
+    // drives `runStoragePhaseGuarded` with each fault and asserts which
+    // screen is mounted, that the cause is persisted Hive-independently,
+    // and that a successful phase mounts nothing.
+    //
+    // One structural fact survives here, because no test that drives the
+    // gate can see it: that `run()` actually sends the storage phase
+    // through the gate at all. Without this, the gate could be perfect
+    // and unreachable.
     late String initSource;
 
     setUpAll(() {
       initSource = File('lib/app/app_initializer.dart').readAsStringSync();
     });
 
-    test('run() catches HiveCorruptionException around _initStorage', () {
+    test('run() puts _initStorage behind runStoragePhaseGuarded', () {
       final runBody = _extractMethodBody(initSource, 'static Future<void> run');
       expect(runBody, isNotNull);
-
-      final tryIdx = runBody!.indexOf('try {');
-      final initIdx = runBody.indexOf('await _initStorage()');
-      final catchIdx = runBody.indexOf('on HiveCorruptionException');
-      expect(tryIdx, isNonNegative, reason: 'run() must guard _initStorage');
-      expect(initIdx, isNonNegative);
-      expect(catchIdx, isNonNegative,
-          reason: 'the catch must target HiveCorruptionException specifically');
-      expect(tryIdx, lessThan(initIdx),
-          reason: 'the try must wrap the _initStorage await');
-      expect(initIdx, lessThan(catchIdx),
-          reason: 'the catch follows the guarded await');
+      expect(runBody, contains('runStoragePhaseGuarded(_initStorage)'),
+          reason: 'an unguarded storage phase freezes the user on the '
+              'splash with no message and no telemetry — no Zone handler '
+              'exists this early');
     });
 
-    test('the catch routes the exception through errorLogger', () {
+    test('run() STOPS when the gate reports failure', () {
+      // The gate returning false has to end the launch. Continuing past a
+      // failed storage phase is how the app reaches the first screen with
+      // no providers behind it.
       final runBody = _extractMethodBody(initSource, 'static Future<void> run');
-      expect(runBody, isNotNull);
-      final catchIdx = runBody!.indexOf('on HiveCorruptionException');
-      // Slice the catch block region up to the next StartupTimer mark.
-      final after = runBody.substring(catchIdx);
-      expect(after, contains('errorLogger.log(ErrorLayer.storage'),
-          reason: 'the corruption exception must reach the errorLogger / '
-              'TraceRecorder pipeline (#2294 acceptance)');
-      // #3272 — wrapped in a bare ProviderScope (missing_provider_scope).
-      expect(after,
-          contains('runApp(const ProviderScope(child: StorageRecoveryHost()))'),
-          reason: 'a recovery screen must be shown instead of a frozen splash');
-    });
-
-    test('StorageRecoveryHost is imported', () {
-      expect(initSource, contains("import 'widgets/storage_recovery_screen.dart';"),
-          reason: 'the recovery host must be imported so the wiring compiles');
+      expect(runBody, contains('if (!await runStoragePhaseGuarded(_initStorage)) return;'));
     });
   });
 }

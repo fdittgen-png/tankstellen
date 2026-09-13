@@ -181,6 +181,21 @@ TankSync n'est **pas** une sauvegarde — il réplique des catégories choisies,
 
 ---
 
+## J'ai changé de téléphone ou réinstallé, et mon historique a disparu
+
+Un transfert d'appareil à appareil ou une restauration depuis le cloud Android ne peut pas ramener la base de données locale de cette application. Android conserve la clé qui la déverrouille dans le matériel sécurisé du téléphone, où aucune sauvegarde n'a accès, et c'est voulu : c'est précisément ce qui empêche quiconque copierait les fichiers de votre téléphone de lire vos trajets.
+
+Une restauration faisait même pire avant. Elle remettait la base chiffrée en place alors que la clé restait sur l'ancien téléphone, et le premier démarrage effaçait ensuite le fichier qu'il ne pouvait pas lire. L'application exclut désormais sa base des sauvegardes Android et du transfert d'appareil, si bien qu'une installation restaurée démarre simplement vide au lieu de détruire ce qui venait d'être restauré.
+
+**Ce qui revient réellement :**
+
+- **TankSync**, s'il était activé : connectez-vous avec le même compte et vos trajets, pleins, véhicules, favoris, notes et références OBD2 se retéléchargent.
+- **Une sauvegarde ZIP exportée :** Réglages → Sauvegarde et restauration → Importer. Sans TankSync, c'est la seule voie qui survit à un changement de téléphone.
+
+**Avant de changer de téléphone,** exportez une sauvegarde ZIP, ou vérifiez dans Synchronisation et compte que TankSync est actif et a bien synchronisé.
+
+---
+
 ## Comment tout supprimer ?
 
 - **Appareil :** Confidentialité et données → Exporter ou supprimer → **Supprimer toutes mes données**. Irréversible.

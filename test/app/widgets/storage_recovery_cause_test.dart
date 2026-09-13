@@ -21,17 +21,22 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 /// damaged costs the user a restart, while claiming "damaged" when it is
 /// not costs them their favourites and history permanently. So the
 /// default is the harmless branch.
+///
+/// #4118 added the third cause — a restored install whose KeyStore key
+/// could not follow its boxes. Clearing storage IS right there, but for
+/// a different reason and with a different consequence, and the
+/// corruption copy can say neither.
 void main() {
   Future<AppLocalizations> pump(WidgetTester tester,
-      {required bool corrupted}) async {
-    await tester.pumpWidget(StorageRecoveryHost(corrupted: corrupted));
+      {required StorageRecoveryCause cause}) async {
+    await tester.pumpWidget(StorageRecoveryHost(cause: cause));
     await tester.pumpAndSettle();
     return AppLocalizations.of(tester.element(find.byType(Column)));
   }
 
   testWidgets('a NON-corruption fault never advises clearing storage',
       (tester) async {
-    final l10n = await pump(tester, corrupted: false);
+    final l10n = await pump(tester, cause: StorageRecoveryCause.unknown);
 
     expect(find.text(l10n.startupFailureTitle), findsOneWidget);
     expect(find.text(l10n.startupFailureMessage), findsOneWidget);
@@ -47,7 +52,7 @@ void main() {
 
   testWidgets('the non-corruption message says the data is intact',
       (tester) async {
-    final l10n = await pump(tester, corrupted: false);
+    final l10n = await pump(tester, cause: StorageRecoveryCause.unknown);
     // Whatever the wording per locale, the reassurance has to be there:
     // a user who reads "storage problem" and nothing else assumes the
     // worst and wipes.
@@ -62,12 +67,39 @@ void main() {
 
   testWidgets('established corruption DOES keep the clear-storage advice',
       (tester) async {
-    final l10n = await pump(tester, corrupted: true);
+    final l10n = await pump(tester, cause: StorageRecoveryCause.corruptBox);
     expect(find.text(l10n.storageRecoveryTitle), findsOneWidget);
     expect(find.text(l10n.storageRecoveryGuidance), findsOneWidget,
         reason: 'when Hive reports a file it cannot recover, clearing '
             'storage genuinely is the recovery');
     expect(find.text(l10n.startupFailureGuidance), findsNothing);
+  });
+
+  testWidgets('a restored install is told it was a RESTORE, not damage',
+      (tester) async {
+    final l10n = await pump(tester, cause: StorageRecoveryCause.keyLost);
+
+    expect(find.text(l10n.storageKeyLostTitle), findsOneWidget);
+    expect(find.text(l10n.storageKeyLostGuidance), findsOneWidget);
+
+    // Not the corruption copy: the files are intact, and "damaged"
+    // implies a repair that AES-256 with a lost key does not have.
+    expect(find.text(l10n.storageRecoveryMessage), findsNothing);
+    expect(find.text(l10n.startupFailureGuidance), findsNothing);
+  });
+
+  testWidgets('the restore copy names the exit the corruption copy cannot',
+      (tester) async {
+    final l10n = await pump(tester, cause: StorageRecoveryCause.keyLost);
+    // Whatever the wording per locale, the one piece of good news has to
+    // survive translation: the synced data is not gone.
+    expect(l10n.storageKeyLostGuidance, contains('TankSync'),
+        reason: 'clearing storage without being told the synced data '
+            'comes back reads as "lose everything"');
+    expect(l10n.storageRecoveryGuidance, isNot(contains('TankSync')),
+        reason: 'the corruption case has no such promise to make — this '
+            'test exists so the two copies cannot be collapsed back '
+            'into one');
   });
 
   testWidgets('the default is the HARMLESS branch', (tester) async {

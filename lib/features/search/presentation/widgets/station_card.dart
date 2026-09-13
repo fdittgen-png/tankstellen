@@ -71,6 +71,18 @@ class StationCard extends StatelessWidget {
   /// dominant.
   final FuelType? profileFuelType;
 
+  /// #4124 — the fuel the USER asked for, when [selectedFuelType] may not
+  /// be it.
+  ///
+  /// The cross-border route list prices each station by its own country's
+  /// profile fuel (#2631) and passes the result as [selectedFuelType], so
+  /// under an E85 search a Spanish row can carry an E5 price. Given both,
+  /// the card names the fuel it is actually showing. `null` — every other
+  /// list — means "[selectedFuelType] is what was asked for", and no row
+  /// carries a label: on a single-fuel list it would be noise on every
+  /// card.
+  final FuelType? requestedFuelType;
+
   /// Active loyalty/fuel-club discounts keyed by canonical brand
   /// string (#1120 pilot). When this station's brand canonicalizes to
   /// a key in the map and the per-litre discount is positive, the
@@ -127,6 +139,7 @@ class StationCard extends StatelessWidget {
     this.priceTier,
     this.rating,
     this.profileFuelType,
+    this.requestedFuelType,
     this.activeDiscountsByBrand,
     this.closenessRadiusMeters,
     this.isStalePrice = false,
@@ -142,6 +155,34 @@ class StationCard extends StatelessWidget {
   bool get _hasBrand => hasRealBrand(station) && station.brand != 'Autoroute';
 
   double? get _displayPrice => station.priceFor(selectedFuelType);
+
+  /// The country this station sits in (#514 / #516) — id prefix first,
+  /// then a bounding-box match on its coordinates. Resolved once and used
+  /// for both the currency symbol and the #2717 pump-grade naming.
+  CountryConfig? get _country => Countries.countryForStation(
+    id: station.id,
+    lat: station.lat,
+    lng: station.lng,
+  );
+
+  /// #4124 — the pump code to show beside the price, or null when the
+  /// price IS the fuel the user asked for.
+  ///
+  /// #2400 settled this question and `shortFuelLabel` was written for it;
+  /// the caller that used it was lost somewhere since, which is how a
+  /// French E85 at 0,82 came to sit directly above a Spanish E5 at 1,62
+  /// with nothing to tell the two numbers apart. The wildcard is excluded
+  /// on purpose: a user who asked for "any fuel" already expects whatever
+  /// the forecourt sells, so every row would wear a label and none of
+  /// them would mean anything.
+  String? get _substitutedFuelLabel {
+    final requested = requestedFuelType;
+    if (requested == null || requested == selectedFuelType) return null;
+    if (requested == FuelType.all) return null;
+    // Nothing to qualify when there is no number to qualify.
+    if (_displayPrice == null) return null;
+    return fuelDisplayLabel(selectedFuelType, countryCode: _country?.code);
+  }
 
   /// The offline brand mark for this row (#3931), or `null` when the
   /// station has no recognised brand.
@@ -180,11 +221,7 @@ class StationCard extends StatelessWidget {
   ///
   /// Returns `null` when neither path resolves — the caller falls
   /// back to the globally-set active profile currency.
-  String? get _stationCurrency => Countries.countryForStation(
-    id: station.id,
-    lat: station.lat,
-    lng: station.lng,
-  )?.currencySymbol;
+  String? get _stationCurrency => _country?.currencySymbol;
 
   /// #2926 — title fallback brand → name → localized "Unbranded station".
   /// The raw street is NEVER the title: it is the address line below, so
@@ -203,6 +240,7 @@ class StationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final price = _displayPrice;
     final currencyOverride = _stationCurrency;
+    final substitutedFuelLabel = _substitutedFuelLabel;
     final formattedPrice = PriceFormatter.formatPrice(
       price,
       currencyOverride: currencyOverride,
@@ -219,6 +257,10 @@ class StationCard extends StatelessWidget {
       _hasBrand ? station.brand : station.name,
       station.street,
       formattedPrice,
+      // #4124 — a screen reader gets the whole sentence, not the pump
+      // code: "E5" read out after a price says nothing on its own.
+      if (substitutedFuelLabel != null)
+        l10n.priceIsForFuel(substitutedFuelLabel),
       semanticStatus,
       // #3949 — the 24 h flag left the visible chrome for the status dot's
       // tooltip; the row's own label keeps announcing it.
@@ -267,6 +309,7 @@ class StationCard extends StatelessWidget {
                 priceTier: priceTier,
                 loyaltyDiscount: _loyaltyDiscount,
                 onFavoriteTap: onFavoriteTap,
+                substitutedFuelLabel: substitutedFuelLabel,
               ),
               const SizedBox(height: Spacing.xs),
               _TitleLine(text: titleText, rating: rating),

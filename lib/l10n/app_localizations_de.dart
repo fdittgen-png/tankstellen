@@ -3100,6 +3100,11 @@ class AppLocalizationsDe extends AppLocalizations {
       'Schließe die App und öffne sie erneut. Wenn es weiterhin auftritt, suche nach einem Update: das ist fast immer ein Fehler in der App und nicht in deinen Daten. Lösche NICHT den App-Speicher — das würde deine Favoriten und deinen Verlauf löschen, ohne etwas zu beheben.';
 
   @override
+  String priceIsForFuel(String fuel) {
+    return 'Dieser Preis gilt für $fuel — nicht für den gewählten Kraftstoff, den diese Station nicht verkauft';
+  }
+
+  @override
   String get shellSwipeCoachMark =>
       'Nach unten wischen oder doppelt auf die Leiste tippen, um den ganzen Bildschirm zu nutzen';
 
@@ -7414,6 +7419,18 @@ class AppLocalizationsDe extends AppLocalizations {
       'Zur Wiederherstellung leere den App-Speicher in den Geräteeinstellungen oder installiere die App neu. Deine Favoriten und dein Verlauf werden nur auf diesem Gerät gespeichert und können nicht automatisch wiederhergestellt werden.';
 
   @override
+  String get storageKeyLostTitle =>
+      'Wiederhergestellte Daten sind nicht lesbar';
+
+  @override
+  String get storageKeyLostMessage =>
+      'Diese Installation wurde aus einem Backup wiederhergestellt. Die Daten von Sparkilo sind zurück, der Schlüssel dazu nicht: Android bewahrt ihn in der sicheren Hardware des Telefons auf, und er lässt sich weder auf ein anderes Gerät übertragen noch aus einem Backup wiederherstellen.';
+
+  @override
+  String get storageKeyLostGuidance =>
+      'Der wiederhergestellte Verlauf ist nicht zu retten. Leere den App-Speicher in den Geräteeinstellungen, um neu zu starten — melde dich dann bei TankSync an, und alles Synchronisierte ist wieder da.';
+
+  @override
   String syncAdoptTitle(String email) {
     return 'Konto von $email beitreten';
   }
@@ -7708,6 +7725,20 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get trajetsResumeRecordingButton => 'Aufzeichnung fortsetzen';
+
+  @override
+  String get tripStartStepAdapter => 'OBD2-Adapter';
+
+  @override
+  String get tripStartStepVehicle => 'Fahrzeugdaten';
+
+  @override
+  String get tripStartStepRecording => 'Aufzeichnung';
+
+  @override
+  String tripStartSlowHint(String action) {
+    return 'Der Adapter braucht meist einige Sekunden. Bleibt es hier stehen, wähle oben im Menü \"$action\".';
+  }
 
   @override
   String get tripStartProgressConnectingAdapter => 'Verbinde mit OBD2-Adapter…';

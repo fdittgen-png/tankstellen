@@ -181,6 +181,21 @@ O TankSync **não** é uma cópia de segurança — replica categorias escolhida
 
 ---
 
+## Mudei de telefone ou reinstalei, e o meu histórico desapareceu
+
+Uma transferência entre dispositivos ou um restauro a partir da nuvem Android não consegue trazer de volta a base de dados local desta aplicação. O Android guarda a chave que a desbloqueia no hardware seguro do telefone, onde nenhuma cópia de segurança chega, e é propositado: é precisamente o que impede que alguém que copie os ficheiros do telefone consiga ler as suas viagens.
+
+Antes, um restauro piorava as coisas. Repunha a base cifrada no lugar enquanto a chave ficava atrás, e o primeiro arranque apagava depois o ficheiro que não conseguia ler. A aplicação mantém agora a sua base fora das cópias do Android e fora da transferência entre dispositivos, para que uma instalação restaurada arranque simplesmente vazia em vez de destruir o que acabara de ser restaurado.
+
+**O que volta de facto:**
+
+- **TankSync**, se estava ativo: inicie sessão com a mesma conta e as suas viagens, abastecimentos, veículos, favoritos, avaliações e referências OBD2 são descarregados novamente.
+- **Uma cópia ZIP exportada:** Definições → Cópia de segurança e restauro → Importar. Sem o TankSync é a única via que sobrevive a uma mudança de telefone.
+
+**Antes de mudar de telefone,** exporte uma cópia ZIP, ou verifique em Sincronização e conta que o TankSync está ativo e sincronizou de facto.
+
+---
+
 ## Como apago tudo?
 
 - **Dispositivo:** Privacidade e dados → Exportar ou eliminar → **Eliminar todos os meus dados**. Irreversível.

@@ -8,6 +8,7 @@ import '../../../../core/widgets/responsive_layout.dart';
 import '../../../../core/services/service_result.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/widgets/page_scaffold.dart';
+import '../../../../core/widgets/scroll_aware_fab_host.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/station.dart';
@@ -127,93 +128,101 @@ class _StationDetailLoaded extends StatelessWidget {
     final station = detail.station;
     final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
 
-    return Scaffold(
-      // #3337 — surface "directions" as a prominent labelled FAB; it was a
-      // small AppBar icon users struggled to find. #3902 — it is the ONE
-      // navigate affordance on the screen (the header's round button went).
-      floatingActionButton: StationDirectionsFab(station: station),
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            pinned: true,
-            // #1989 trimmed a fixed 220 to 196; #3902 replaces the round
-            // number with a measurement of the status row + brand header
-            // text, so the band ends `kHeaderBottomInset` under the address
-            // instead of leaving a strip of empty brand-green.
-            expandedHeight: stationHeaderExpandedHeight(context, station),
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () => context.pop(),
-              tooltip: l10n.tooltipBack,
-            ),
-            actions: [
-              StationDetailAppBarActions(
-                stationId: stationId,
-                station: station,
+    // #4120 — the FAB yields while the list moves. The rating stars are
+    // the only tap targets in its path, and a user reaching for the
+    // fifth star mid-scroll could press "Navigate" instead. Collapsing
+    // costs nothing at rest; more clearance would have pushed the whole
+    // screen further from the thumb to fix a transient.
+    return ScrollAwareFabHost(
+      builder: (context, scrolling) => Scaffold(
+        // #3337 — surface "directions" as a prominent labelled FAB; it was a
+        // small AppBar icon users struggled to find. #3902 — it is the ONE
+        // navigate affordance on the screen (the header's round button went).
+        floatingActionButton:
+            StationDirectionsFab(station: station, extended: !scrolling),
+        body: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              pinned: true,
+              // #1989 trimmed a fixed 220 to 196; #3902 replaces the round
+              // number with a measurement of the status row + brand header
+              // text, so the band ends `kHeaderBottomInset` under the address
+              // instead of leaving a strip of empty brand-green.
+              expandedHeight: stationHeaderExpandedHeight(context, station),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => context.pop(),
+                tooltip: l10n.tooltipBack,
               ),
-            ],
-            flexibleSpace: FlexibleSpaceBar(
-              background: SafeArea(
-                child: Padding(
-                  // Keep the rich block clear of the pinned toolbar at the
-                  // top — the leading / title / actions sit in the first
-                  // kToolbarHeight (56dp) of the SliverAppBar regardless of
-                  // expansion state, so the background has to inset by that
-                  // much to avoid overlap when fully expanded.
-                  padding: const EdgeInsets.fromLTRB(
-                    kHeaderHorizontalPadding,
-                    kAppToolbarHeight + kHeaderTopGap,
-                    kHeaderHorizontalPadding,
-                    kHeaderBottomInset,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      StationStatusRow(
-                        station: station,
-                        stationId: stationId,
-                      ),
-                      const SizedBox(height: kHeaderStatusGap),
-                      StationBrandHeader(station: station),
-                    ],
+              actions: [
+                StationDetailAppBarActions(
+                  stationId: stationId,
+                  station: station,
+                ),
+              ],
+              flexibleSpace: FlexibleSpaceBar(
+                background: SafeArea(
+                  child: Padding(
+                    // Keep the rich block clear of the pinned toolbar at the
+                    // top — the leading / title / actions sit in the first
+                    // kToolbarHeight (56dp) of the SliverAppBar regardless of
+                    // expansion state, so the background has to inset by that
+                    // much to avoid overlap when fully expanded.
+                    padding: const EdgeInsets.fromLTRB(
+                      kHeaderHorizontalPadding,
+                      kAppToolbarHeight + kHeaderTopGap,
+                      kHeaderHorizontalPadding,
+                      kHeaderBottomInset,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        StationStatusRow(
+                          station: station,
+                          stationId: stationId,
+                        ),
+                        const SizedBox(height: kHeaderStatusGap),
+                        StationBrandHeader(station: station),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          SliverToBoxAdapter(child: ServiceStatusBanner(result: serviceResult)),
-          SliverPadding(
-            // #3902 — the list reserves the shared FAB clearance so the
-            // extended "Navigate" FAB never covers the last card. This is a
-            // pushed route with no shell bottom bar consuming the system
-            // inset, so — unlike the tab bodies — the safe-area gap sits
-            // under the content and is added on top of the clearance.
-            padding: EdgeInsets.fromLTRB(
-              16,
-              16,
-              16,
-              kFabScrollClearance + bottomPadding,
+            SliverToBoxAdapter(child: ServiceStatusBanner(result: serviceResult)),
+            SliverPadding(
+              // #3902 — the list reserves the shared FAB clearance so the
+              // extended "Navigate" FAB never covers the last card. This is a
+              // pushed route with no shell bottom bar consuming the system
+              // inset, so — unlike the tab bodies — the safe-area gap sits
+              // under the content and is added on top of the clearance.
+              padding: EdgeInsets.fromLTRB(
+                16,
+                16,
+                16,
+                kFabScrollClearance + bottomPadding,
+              ),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate.fixed([
+                  StationPricesSection(station: station),
+                  const SizedBox(height: 8),
+                  StationInfoSection(station: station, detail: detail),
+                  const SizedBox(height: 8),
+                  // #1957 — the price-history chart is a tall,
+                  // detail-on-demand block; show it in a foldable that is
+                  // collapsed by default so it does not dominate the page.
+                  // #4076 — above the rating: its collapsed header now
+                  // carries the stats row, the most useful numbers after
+                  // the prices themselves.
+                  PriceHistoryFoldable(stationId: stationId, station: station),
+                  const SizedBox(height: 8),
+                  StationRatingSection(stationId: stationId),
+                ]),
+              ),
             ),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate.fixed([
-                StationPricesSection(station: station),
-                const SizedBox(height: 8),
-                StationInfoSection(station: station, detail: detail),
-                const SizedBox(height: 8),
-                // #1957 — the price-history chart is a tall,
-                // detail-on-demand block; show it in a foldable that is
-                // collapsed by default so it does not dominate the page.
-                // #4076 — above the rating: its collapsed header now
-                // carries the stats row, the most useful numbers after
-                // the prices themselves.
-                PriceHistoryFoldable(stationId: stationId, station: station),
-                const SizedBox(height: 8),
-                StationRatingSection(stationId: stationId),
-              ]),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

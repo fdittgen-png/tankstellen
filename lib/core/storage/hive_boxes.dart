@@ -225,6 +225,11 @@ class HiveBoxes {
     final cipher = await HiveCipherLoader.loadGuarded();
     StartupTimer.instance.mark('hive_cipher');
 
+    // #4118 — stop before the first open if this install has no key for
+    // the boxes already on disk; see the guard for why "before" is the
+    // whole point.
+    HiveCipherLoader.assertKeyMatchesExistingBoxes();
+
     // Phase 1 — migrate any pre-encryption plaintext boxes, ONCE ever.
     // #4110 — this ran on every cold start and cost a full open+close of
     // every encrypted box before Phase 2 opened them again. See

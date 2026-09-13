@@ -3,6 +3,9 @@
 
 import 'dart:ui' show Locale;
 
+import '../../logging/app_log.dart';
+import '../../telemetry/health_counters.dart';
+
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -100,23 +103,85 @@ class FlutterTtsAnnouncementService implements VoiceAnnouncementService {
     }
   }
 
+  /// True when the last [_applyTtsLanguage] could not find a voice for the
+  /// selected language (#4127).
+  ///
+  /// The announcement TEXT is always the selected locale's, so a missing
+  /// voice does not mean "speaks English" — it means the device voice
+  /// reads FOREIGN text, which is the one outcome worse than either
+  /// language. Callers use this to stay silent rather than produce
+  /// gibberish, and the voice settings use it to name the language to
+  /// install.
+  bool get languageVoiceMissing => _languageVoiceMissing;
+  bool _languageVoiceMissing = false;
+
   /// Push the BCP-47 voice for [languageCode] to the native engine,
   /// falling back gracefully if that locale's voice is unavailable so a
   /// missing voice never crashes an announcement (#2762).
+  ///
+  /// #4127 — the result used to be discarded: `setLanguage` failing was
+  /// logged with `debugPrint` (silenced in release) and the engine kept
+  /// the DEVICE voice, so a phone with no French voice read French text
+  /// in English. The engine is asked whether it HAS the voice now, the
+  /// region-less tag is tried as a second chance (engines often register
+  /// a generic `fr` without a region), and a genuine miss is recorded
+  /// rather than whispered.
   Future<void> _applyTtsLanguage(String languageCode) async {
-    try {
-      await setLanguage(_ttsLocaleFor(languageCode));
-    } catch (e, st) {
-      debugPrint('VoiceAnnouncement: setLanguage failed, keeping default: $e');
-      debugPrintStack(stackTrace: st);
+    final candidates = <String>{
+      _ttsLocaleFor(languageCode),
+      languageCode.toLowerCase(),
+    };
+    for (final tag in candidates) {
+      // The probe can VETO a candidate; it can never block one.
+      //
+      // Only an EXPLICIT false means "this engine has no such voice".
+      // `isLanguageAvailable` is `Future<dynamic>`: a plugin or platform
+      // that answers null, a non-bool, or throws is saying "I do not
+      // know", and treating that as unavailable would lose the voice on
+      // every such platform — a worse regression than the bug being
+      // fixed. Unknown therefore falls through to the attempt below,
+      // which is exactly the behaviour that was already correct.
+      var vetoed = false;
+      try {
+        vetoed = await _tts.isLanguageAvailable(tag) == false;
+      } catch (e, st) {
+        debugPrint('VoiceAnnouncement: isLanguageAvailable("$tag") '
+            'unavailable, attempting anyway: $e');
+        debugPrintStack(stackTrace: st);
+      }
+      if (vetoed) continue;
+      try {
+        await setLanguage(tag);
+        _languageVoiceMissing = false;
+        return;
+      } catch (e, st) {
+        log.warn('VoiceAnnouncement: setLanguage("$tag") failed',
+            error: e, stack: st, layer: ErrorLayer.other);
+      }
     }
+    // No voice for the selected language. Visible, not whispered: the
+    // alternative is the device voice reading text it cannot pronounce.
+    _languageVoiceMissing = true;
+    log.warn(
+      'VoiceAnnouncement: no TTS voice for "$languageCode" — announcements '
+      'would read ${languageCode.toUpperCase()} text in the device voice',
+      layer: ErrorLayer.other,
+    );
+    healthCounters.increment('voice.languageUnavailable');
   }
 
   /// Map an app language code to a TTS BCP-47 tag. Covers the explicit
   /// region cases users notice most; anything else falls back to
   /// `<code>-<CODE>` (e.g. `it` -> `it-IT`), which the native engines
   /// resolve for every shipped locale.
-  String _ttsLocaleFor(String languageCode) {
+  @visibleForTesting
+  static String ttsLocaleFor(String languageCode) =>
+      _ttsLocaleForImpl(languageCode);
+
+  String _ttsLocaleFor(String languageCode) =>
+      _ttsLocaleForImpl(languageCode);
+
+  static String _ttsLocaleForImpl(String languageCode) {
     const explicit = <String, String>{
       'en': 'en-US',
       'de': 'de-DE',
@@ -127,6 +192,16 @@ class FlutterTtsAnnouncementService implements VoiceAnnouncementService {
       'cs': 'cs-CZ',
       'sv': 'sv-SE',
       'da': 'da-DK',
+      // #4127 — the two shipped languages whose code is NOT their
+      // country code, so the `<code>-<CODE>` fallback below invents a
+      // locale that no engine has: `sl-SL` and `et-ET`. Both silently
+      // took the setLanguage-failed path, leaving the device voice to
+      // read Slovenian / Estonian text.
+      //
+      // `et` was found by the locale table test, not by reading the
+      // code — which is the argument for the table.
+      'sl': 'sl-SI',
+      'et': 'et-EE',
     };
     final code = languageCode.toLowerCase();
     return explicit[code] ?? '$code-${code.toUpperCase()}';
