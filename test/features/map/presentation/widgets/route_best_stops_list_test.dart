@@ -94,12 +94,27 @@ void main() {
       }
     });
 
-    testWidgets('bar has the fixed 52-px height', (tester) async {
-      // Changing this height would misalign the map overlay the
-      // chips sit on top of — pin it as a visual contract.
+    testWidgets('the band is 52 px of chips plus the FAB protrusion '
+        'beneath them (#4121)', (tester) async {
+      // The height is a visual contract — it aligns with the map overlay
+      // the chips sit on top of — so it is pinned rather than tuned.
+      //
+      // #4121 — it grew by the shell FAB's protrusion (32). The docked
+      // search button is centred on the bottom bar's top edge and
+      // punched a fixed hole through the middle of this row; the chips
+      // are lifted above it while the band's surface still meets the
+      // bar.
       await tester.pumpWidget(buildHost(stations: testStationList));
       final size = tester.getSize(find.byType(RouteBestStopsList));
-      expect(size.height, 52);
+      expect(size.height, 52 + 32);
+
+      // The lift must be UNDER the chips, not around them: a chip's
+      // bottom edge has to clear the protrusion, or the fix is only a
+      // taller band with the same hole in it.
+      final chip = tester.getRect(find.byType(RouteStationChip).first);
+      final band = tester.getRect(find.byType(RouteBestStopsList));
+      expect(band.bottom - chip.bottom, greaterThanOrEqualTo(32),
+          reason: 'the chips sit above the docked button, not behind it');
     });
   });
 }

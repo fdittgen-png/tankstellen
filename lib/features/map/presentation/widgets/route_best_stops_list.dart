@@ -33,12 +33,24 @@ class RouteBestStopsList extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    // #4121 — the shell's docked search button is centred on the bottom
+    // bar's top edge and protrudes ~28 dp above it, straight through the
+    // middle of this row. The row scrolls horizontally, so no chip is
+    // unreachable — but the obstruction is FIXED and the list is not, so
+    // reading the row means scrolling every item around a hole in the
+    // centre, and stop 2 of a ranked list is what usually sits in it.
+    //
+    // The chips are lifted clear of the protrusion rather than the row
+    // being made taller only to be covered. The band's own surface still
+    // meets the bar, so nothing shows through underneath.
+    const fabProtrusion = 32.0;
+
     return Container(
-      height: 52,
+      height: 52 + fabProtrusion,
       color: theme.colorScheme.surfaceContainerHighest,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.fromLTRB(8, 4, 8, 4 + fabProtrusion),
         itemCount: stations.length,
         itemBuilder: (context, index) {
           final station = stations[index];
