@@ -3,7 +3,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/trips/domain/entities/trip_start_stage.dart';
 import 'package:tankstellen/features/trips/presentation/widgets/trip_start_progress.dart';
 import 'package:tankstellen/features/trips/presentation/widgets/trip_start_stage_checklist.dart';
 
