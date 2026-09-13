@@ -1,11 +1,10 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/logging/app_log.dart';
 import '../../core/logging/error_logger.dart';
 import '../../core/storage/hive_boxes.dart';
 import '../../core/storage/hive_cipher_loader.dart';
@@ -61,8 +60,9 @@ Future<bool> runStoragePhaseGuarded(Future<void> Function() initStorage) async {
 
 Future<void> _report(Object e, StackTrace st, String cause) async {
   await StartupFailureStore.persist(e, st);
-  unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-      context: {'where': 'initStorage', 'cause': cause}));
+  log.error(e, st,
+      layer: ErrorLayer.storage,
+      context: {'where': 'initStorage', 'cause': cause});
 }
 
 void _mount(StorageRecoveryCause cause) =>

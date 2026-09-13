@@ -57,10 +57,11 @@ class HiveDirectoryResolver {
     await Hive.initFlutter();
     try {
       _hivePath = (await getApplicationDocumentsDirectory()).path;
-    } catch (e) { // ignore: avoid_catching_errors
+    } catch (e, st) {
       // Hive is already initialised either way; an unknown path only
       // costs the #4118 pre-open check, never the launch.
-      debugPrint('HiveDirectoryResolver: documents dir unavailable ($e)');
+      log.warn('HiveDirectoryResolver: documents dir unavailable',
+          error: e, stack: st, layer: ErrorLayer.storage);
     }
   }
 
@@ -77,8 +78,9 @@ class HiveDirectoryResolver {
       return dir
           .listSync()
           .any((e) => e is File && e.path.endsWith('.hive'));
-    } catch (e) { // ignore: avoid_catching_errors
-      debugPrint('HiveDirectoryResolver: box-file scan failed ($e)');
+    } catch (e, st) {
+      log.warn('HiveDirectoryResolver: box-file scan failed',
+          error: e, stack: st, layer: ErrorLayer.storage);
       return false;
     }
   }
