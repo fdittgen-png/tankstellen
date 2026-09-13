@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../../core/navigation/app_routes.dart';
+import '../../../../core/utils/best_stops.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -292,20 +293,20 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
     }
   }
 
+  /// The cheapest station per route segment (#4125 — the rule itself
+  /// lives in `core/utils/best_stops.dart`; the route results LIST
+  /// applies the same one, which it could not while both features held
+  /// a private copy).
   List<Station> _getBestStopStations(
     List<Station> allStations,
     RouteSearchResult result,
-  ) {
-    final segmentMap = result.cheapestPerSegment;
-    if (segmentMap == null || segmentMap.isEmpty) {
-      if (result.cheapestId != null) {
-        return allStations.where((s) => s.id == result.cheapestId).toList();
-      }
-      return allStations.take(5).toList();
-    }
-    final bestIds = segmentMap.values.toSet();
-    return allStations.where((s) => bestIds.contains(s.id)).toList();
-  }
+  ) =>
+      bestStopsAmong<Station>(
+        stations: allStations,
+        idOf: (s) => s.id,
+        cheapestPerSegment: result.cheapestPerSegment,
+        cheapestId: result.cheapestId,
+      );
 
   void _openSelectedInMaps(RouteSearchResult result) {
     final start = result.route.geometry.first;

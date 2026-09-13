@@ -15,7 +15,11 @@ import 'package:tankstellen/features/search/providers/ignored_stations_provider.
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
 
-RouteSearchResult _resultWithStations(int count, {bool isPartial = false}) {
+RouteSearchResult _resultWithStations(
+  int count, {
+  bool isPartial = false,
+  Map<int, String>? cheapestPerSegment,
+}) {
   final stations = <SearchResultItem>[
     for (var i = 0; i < count; i++)
       FuelStationResult(Station(
@@ -41,6 +45,7 @@ RouteSearchResult _resultWithStations(int count, {bool isPartial = false}) {
     ),
     stations: stations,
     isPartial: isPartial,
+    cheapestPerSegment: cheapestPerSegment,
   );
 }
 
@@ -188,6 +193,61 @@ void main() {
       expect(find.text('All stations'), findsOneWidget);
       expect(find.text('Best stops'), findsOneWidget);
     });
+
+    testWidgets('#4125 — the header counts the rows the list is SHOWING, so '
+        'the toggle moves the number', (tester) async {
+      final test = standardTestOverrides();
+      // Eight stations along the route, two of them the cheapest in their
+      // segment — the shape of the field report: 108 results, a handful
+      // of curated stops.
+      final result = _resultWithStations(
+        8,
+        cheapestPerSegment: const {0: 'st-2', 1: 'st-5'},
+      );
+
+      await pumpApp(
+        tester,
+        const CustomScrollView(slivers: [RouteResultsView()]),
+        overrides: [
+          ...test.overrides,
+          routeSearchStateProvider.overrideWith(() => _FixedRouteSearch(result)),
+          ignoredStationsProvider.overrideWith(() => _NoIgnoredStations()),
+        ],
+      );
+
+      // Best stops is the default (#2111). Two segment winners, two rows,
+      // and the header says two — it used to say eight.
+      expect(find.textContaining('2 stations'), findsOneWidget);
+      expect(find.textContaining('8 stations'), findsNothing);
+
+      await tester.tap(find.text('All stations'));
+      await tester.pump();
+
+      expect(find.textContaining('8 stations'), findsOneWidget);
+      expect(find.textContaining('2 stations'), findsNothing);
+    });
+
+    testWidgets('#4125 — a swiped-away station leaves the count too',
+        (tester) async {
+      final test = standardTestOverrides();
+
+      await pumpApp(
+        tester,
+        const CustomScrollView(slivers: [RouteResultsView()]),
+        overrides: [
+          ...test.overrides,
+          routeSearchStateProvider
+              .overrideWith(() => _FixedRouteSearch(_resultWithStations(3))),
+          // The ignore set is the other filter the old count ignored: the
+          // header read the raw service result, so hiding a row left the
+          // number describing a list that no longer existed.
+          ignoredStationsProvider.overrideWith(() => _OneIgnoredStation()),
+        ],
+      );
+
+      expect(find.textContaining('2 stations'), findsOneWidget);
+      expect(find.textContaining('3 stations'), findsNothing);
+    });
   });
 }
 
@@ -202,4 +262,9 @@ class _FixedRouteSearch extends RouteSearchState {
 class _NoIgnoredStations extends IgnoredStations {
   @override
   List<String> build() => const [];
+}
+
+class _OneIgnoredStation extends IgnoredStations {
+  @override
+  List<String> build() => const ['st-1'];
 }

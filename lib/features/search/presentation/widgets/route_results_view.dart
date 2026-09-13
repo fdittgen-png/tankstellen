@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/utils/best_stops.dart';
 import '../../../../core/utils/duration_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
@@ -104,7 +105,8 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
           delegate: SliverChildBuilderDelegate(
             (context, index) {
               if (index == 0) {
-                return _buildHeader(context, l10n, result);
+                return _buildHeader(
+                    context, l10n, result, displayItems.length);
               }
               final item = displayItems[index - 1];
               if (item is FuelStationResult) {
@@ -137,6 +139,7 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
     BuildContext context,
     AppLocalizations l10n,
     RouteSearchResult result,
+    int shownCount,
   ) {
     final theme = Theme.of(context);
     return Padding(
@@ -161,9 +164,19 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
                   Icon(Icons.route, size: 16, color: theme.colorScheme.primary),
                   const SizedBox(width: 8),
                   Text(
+                    // #4125 — count the rows THIS LIST is showing.
+                    // It read `result.stations.length`: the raw service
+                    // result, before the swipe-away ignore filter and
+                    // before the All/Best toggle. So "108 stations" stood
+                    // above whatever the toggle had left — 7 curated stops
+                    // under "Meilleurs arrêts" — and the one number on the
+                    // screen described neither state of the screen. Three
+                    // counts were in play for one route (108 results, 55
+                    // fuel stations on the map, 7 best stops); each
+                    // surface now counts what it renders.
                     '${result.route.distanceKm.round()} km · '
                     '${formatTravelDuration(l10n, result.route.durationMinutes)} · '
-                    '${l10n.routeStationCount(result.stations.length)}',
+                    '${l10n.routeStationCount(shownCount)}',
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -367,25 +380,17 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
     });
   }
 
-  /// Filter to only the cheapest station per route segment.
+  /// Filter to only the cheapest station per route segment (#4125 — the
+  /// rule itself lives in `core/utils/best_stops.dart`; the map's route
+  /// view applies the same one).
   List<SearchResultItem> _filterBestStops(
     List<FuelStationResult> allStations,
     RouteSearchResult result,
-  ) {
-    final segmentMap = result.cheapestPerSegment;
-    if (segmentMap == null || segmentMap.isEmpty) {
-      if (result.cheapestId != null) {
-        return allStations
-            .where((s) => s.id == result.cheapestId)
-            .cast<SearchResultItem>()
-            .toList();
-      }
-      return allStations.take(5).cast<SearchResultItem>().toList();
-    }
-    final bestIds = segmentMap.values.toSet();
-    return allStations
-        .where((s) => bestIds.contains(s.id))
-        .cast<SearchResultItem>()
-        .toList();
-  }
+  ) =>
+      bestStopsAmong<FuelStationResult>(
+        stations: allStations,
+        idOf: (s) => s.id,
+        cheapestPerSegment: result.cheapestPerSegment,
+        cheapestId: result.cheapestId,
+      ).cast<SearchResultItem>().toList();
 }
