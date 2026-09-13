@@ -54,7 +54,11 @@ class RouteInfoBar extends StatelessWidget {
             tooltip: l10n.saveRoute,
             onPressed: onSaveRoute,
             padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+            // #4147 — Material's 48 dp minimum. A 28 dp target directly
+            // above the Android gesture strip is how a tap meant for
+            // "save route" becomes a system back. The ICON stays small so
+            // the bar keeps its height; only the target grows.
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             iconSize: 14,
           ),
           IconButton(
@@ -62,7 +66,7 @@ class RouteInfoBar extends StatelessWidget {
             tooltip: l10n.openInMaps,
             onPressed: onOpenInMaps,
             padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             iconSize: 14,
           ),
         ],

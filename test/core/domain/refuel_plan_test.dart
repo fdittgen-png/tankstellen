@@ -3,6 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/domain/refuel_plan.dart';
+import 'package:tankstellen/core/domain/refuel_planner.dart';
 
 /// #4146 — planning a long trip's stops once range is a constraint.
 ///
