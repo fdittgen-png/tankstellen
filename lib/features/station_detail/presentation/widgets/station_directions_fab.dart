@@ -20,10 +20,22 @@ import 'station_brand_helpers.dart';
 /// makes it immediately discoverable, mirroring the "Directions" affordance on
 /// a maps place card. Behaviour is identical to the old icon
 /// ([NavigationUtils.openInMaps]).
+///
+/// #4120 — [extended] false collapses it to the icon alone while the
+/// list is moving, so the label stops covering the rating stars a user
+/// is scrolling towards. See [ScrollAwareFabHost].
 class StationDirectionsFab extends StatelessWidget {
   final Station station;
 
-  const StationDirectionsFab({super.key, required this.station});
+  /// Whether to show the label beside the icon. Defaults to true, the
+  /// resting state — the labelled form is the whole point of #3337.
+  final bool extended;
+
+  const StationDirectionsFab({
+    super.key,
+    required this.station,
+    this.extended = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +51,11 @@ class StationDirectionsFab extends StatelessWidget {
       ),
       icon: const Icon(Icons.directions),
       label: Text(l10n.navigate),
+      // The tooltip carries the label while it is collapsed, so the
+      // button never becomes an unexplained icon — and the semantic
+      // label stays constant either way.
+      isExtended: extended,
+      tooltip: l10n.navigate,
     );
   }
 }
