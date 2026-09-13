@@ -6426,5 +6426,30 @@
         "type": "String"
       }
     }
+  },
+  "tripStartStepAdapter": "OBD2 adapter",
+  "@tripStartStepAdapter": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripStartStepVehicle": "Vehicle data",
+  "@tripStartStepVehicle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripStartStepRecording": "Recording",
+  "@tripStartStepRecording": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripStartSlowHint": "Reaching the adapter usually takes a few seconds. If it stays here, pick \"{action}\" from the menu above.",
+  "@tripStartSlowHint": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -13047,6 +13047,30 @@ abstract class AppLocalizations {
   /// **'Resume recording'**
   String get trajetsResumeRecordingButton;
 
+  /// Short name of the first trip-start step, shown in the #4126 checklist. Unlike tripStartProgressConnectingAdapter this is a NOUN with no ellipsis: it labels a row that can be pending, running or done.
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 adapter'**
+  String get tripStartStepAdapter;
+
+  /// Short name of the second trip-start step (#4126 checklist).
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle data'**
+  String get tripStartStepVehicle;
+
+  /// Short name of the third trip-start step (#4126 checklist).
+  ///
+  /// In en, this message translates to:
+  /// **'Recording'**
+  String get tripStartStepRecording;
+
+  /// Standing note under the #4126 trip-start checklist. A blank wait of 3-12 s (field logs show far longer) reads as a broken app; this says the wait is expected and names the escape hatch that already exists. {action} is the obd2ResetConnection label.
+  ///
+  /// In en, this message translates to:
+  /// **'Reaching the adapter usually takes a few seconds. If it stays here, pick \"{action}\" from the menu above.'**
+  String tripStartSlowHint(String action);
+
   /// Status label shown on the Trips tab while the pinned OBD2 adapter is being reached over Bluetooth, before the recording screen opens. Replaces the silent disabled-button wait.
   ///
   /// In en, this message translates to:

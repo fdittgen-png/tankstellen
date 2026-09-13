@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/widgets/staged_progress_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/trip_start_stage.dart';
+import 'trip_start_stage_checklist.dart';
 
 // #2274 concern 2 — the stage enum moved to the domain layer so the
 // [TripRecordingState] can carry it without a provider→presentation
@@ -60,6 +61,8 @@ class TripStartProgress extends StatelessWidget {
       stageKey: stage,
       onCancel: onCancel,
       cancelKey: const Key('trip_start_progress_cancel'),
+      // #4126 — all three steps, not just the one in flight.
+      details: TripStartStageChecklist(stage: stage),
     );
   }
 }

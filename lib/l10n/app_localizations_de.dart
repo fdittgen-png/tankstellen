@@ -7715,6 +7715,20 @@ class AppLocalizationsDe extends AppLocalizations {
   String get trajetsResumeRecordingButton => 'Aufzeichnung fortsetzen';
 
   @override
+  String get tripStartStepAdapter => 'OBD2-Adapter';
+
+  @override
+  String get tripStartStepVehicle => 'Fahrzeugdaten';
+
+  @override
+  String get tripStartStepRecording => 'Aufzeichnung';
+
+  @override
+  String tripStartSlowHint(String action) {
+    return 'Der Adapter braucht meist einige Sekunden. Bleibt es hier stehen, wähle oben im Menü \"$action\".';
+  }
+
+  @override
   String get tripStartProgressConnectingAdapter => 'Verbinde mit OBD2-Adapter…';
 
   @override

@@ -6068,5 +6068,16 @@
         "type": "String"
       }
     }
+  },
+  "tripStartStepAdapter": "Adaptateur OBD2",
+  "tripStartStepVehicle": "Données du véhicule",
+  "tripStartStepRecording": "Enregistrement",
+  "tripStartSlowHint": "L'adaptateur met généralement quelques secondes à répondre. Si rien ne bouge, choisissez « {action} » dans le menu ci-dessus.",
+  "@tripStartSlowHint": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
   }
 }

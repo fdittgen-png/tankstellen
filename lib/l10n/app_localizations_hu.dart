@@ -7721,6 +7721,20 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trajetsResumeRecordingButton => 'Rögzítés folytatása';
 
   @override
+  String get tripStartStepAdapter => 'OBD2 adapter';
+
+  @override
+  String get tripStartStepVehicle => 'Vehicle data';
+
+  @override
+  String get tripStartStepRecording => 'Recording';
+
+  @override
+  String tripStartSlowHint(String action) {
+    return 'Reaching the adapter usually takes a few seconds. If it stays here, pick \"$action\" from the menu above.';
+  }
+
+  @override
   String get tripStartProgressConnectingAdapter =>
       'Csatlakozás az OBD2-adapterhez…';
 
