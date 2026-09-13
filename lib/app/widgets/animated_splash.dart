@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_motion.dart';
+import '../../core/widgets/app_brand_glyph.dart';
 import '../../l10n/app_localizations.dart';
 
 /// Animated Flutter splash shown between the native splash drawable and the
@@ -144,12 +145,14 @@ class _AnimatedSplashState extends State<AnimatedSplash>
                     opacity: _fade,
                     child: ScaleTransition(
                       scale: _scale,
-                      child: const ExcludeSemantics(
-                        child: SizedBox(
-                          width: 144,
-                          height: 144,
-                          child: CustomPaint(painter: _BrandGlyphPainter()),
-                        ),
+                      // #4128 — the one definition of the mark now lives
+                      // in core so the home screen's app bar can show the
+                      // same shape. The splash keeps its fixed
+                      // light-on-brand-green ink: its backdrop is the
+                      // launcher's green in both themes.
+                      child: const AppBrandGlyph(
+                        size: 144,
+                        color: AnimatedSplash.logoColor,
                       ),
                     ),
                   ),
@@ -217,65 +220,6 @@ class _SplashProgressBar extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Paints the brand glyph (shield outline with a fuel-drop inside) directly
-/// in Dart. Mirrors the adaptive-icon vector in
-/// `android/app/src/main/res/drawable/ic_launcher_foreground.xml` so the
-/// splash glyph is pixel-consistent with the launcher icon the user just
-/// tapped.
-///
-/// Painting in code rather than loading an SVG/PNG avoids adding an
-/// asset (allowlist forbids new images) and keeps the splash rendering
-/// path zero-allocation after the first frame.
-class _BrandGlyphPainter extends CustomPainter {
-  const _BrandGlyphPainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    // Work in a 108×108 coordinate system that mirrors the adaptive icon
-    // viewport so the strokes line up 1:1 with the launcher icon.
-    final scale = size.width / 108.0;
-    canvas.save();
-    canvas.scale(scale);
-
-    final strokePaint = Paint()
-      ..color = AnimatedSplash.logoColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 4
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    final fillPaint = Paint()
-      ..color = AnimatedSplash.logoColor
-      ..style = PaintingStyle.fill;
-
-    // Shield outline.
-    final shield = Path()
-      ..moveTo(54, 24)
-      ..lineTo(78, 32)
-      ..lineTo(78, 58)
-      ..cubicTo(78, 72, 68, 82, 54, 86)
-      ..cubicTo(40, 82, 30, 72, 30, 58)
-      ..lineTo(30, 32)
-      ..close();
-    canvas.drawPath(shield, strokePaint);
-
-    // Fuel drop.
-    final drop = Path()
-      ..moveTo(54, 38)
-      ..cubicTo(54, 38, 42, 52, 42, 62)
-      ..cubicTo(42, 69.18, 47.37, 75, 54, 75)
-      ..cubicTo(60.63, 75, 66, 69.18, 66, 62)
-      ..cubicTo(66, 52, 54, 38, 54, 38)
-      ..close();
-    canvas.drawPath(drop, fillPaint);
-
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(covariant _BrandGlyphPainter oldDelegate) => false;
 }
 
 /// Minimal top-level widget that mounts [AnimatedSplash] before
