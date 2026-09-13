@@ -11,6 +11,7 @@ import '../../feedback/github_issue_reporter/error_report_payload.dart';
 import '../../feedback/github_issue_reporter/error_reporter.dart';
 import '../../feedback/github_issue_reporter/error_reporter_context.dart';
 import '../service_result.dart';
+import '../surface_state.dart';
 
 /// Displays a banner when data comes from cache or fallback services.
 class ServiceStatusBanner extends StatelessWidget {
@@ -20,35 +21,26 @@ class ServiceStatusBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!result.isStale && !result.hadFallbacks) {
-      return const SizedBox.shrink();
-    }
+    // #4134 — one model decides the state; this widget only renders it.
+    final state = surfaceStateOf(result);
+    final style = SurfaceStateStyle.of(context, state);
+    if (style == null) return const SizedBox.shrink();
 
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
-    final Color backgroundColor;
-    final IconData icon;
-    final String message;
-
-    if (result.isStale) {
-      backgroundColor = theme.colorScheme.errorContainer;
-      icon = Icons.cloud_off;
-      message = '${l10n.offlineLabel} — ${result.freshnessLabel}';
-    } else if (result.hadFallbacks) {
-      backgroundColor = theme.colorScheme.tertiaryContainer;
-      icon = Icons.info_outline;
-      message = _localizedFallbackSummary(result, l10n);
-    } else {
-      return const SizedBox.shrink();
-    }
+    final message = switch (state) {
+      SurfaceState.offline => '${l10n.offlineLabel} — ${result.freshnessLabel}',
+      SurfaceState.degraded => _localizedFallbackSummary(result, l10n),
+      SurfaceState.full => '',
+    };
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: backgroundColor,
+      color: style.background,
       child: Row(
         children: [
-          Icon(icon, size: 16),
+          Icon(style.icon, size: 16),
           const SizedBox(width: 8),
           Expanded(child: Text(message, style: theme.textTheme.bodySmall)),
         ],
