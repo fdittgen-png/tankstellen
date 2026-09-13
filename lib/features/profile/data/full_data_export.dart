@@ -87,6 +87,10 @@ const Map<String, String?> kBoxExportCoverage = {
   HiveBoxes.errorTraces: null, // exported by "Save error log" (scrubbed)
   HiveBoxes.isolateErrorSpool: null, // same, drained into error traces
   HiveBoxes.cache: null, // reconstructable API responses, no user input
+  // #4110 — the same reasoning as `cache`, which is where these lived
+  // until they were moved off the first-frame path: whole-country public
+  // datasets, refetchable, carrying no user input.
+  HiveBoxes.datasets: null,
   HiveBoxes.priceSnapshots: null, // public station prices, 6 h TTL
   HiveBoxes.trafficSignalsCache: null, // public OSM data
   HiveBoxes.featureFlags: null, // which features are on — in app_data
