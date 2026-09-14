@@ -112,6 +112,9 @@ void main() {
   });
 
   test('getAll survives JSON round-trip via storage', () async {
+    // The subject here is SERIALISATION fidelity, so the record already
+    // carries a currency — otherwise `save` stamps one (#4136) and this
+    // would be measuring the stamp instead of the round-trip.
     final original = FillUp(
       id: 'x',
       date: DateTime(2026, 3, 15, 10, 30),
@@ -122,10 +125,36 @@ void main() {
       stationId: 's1',
       stationName: 'Shell',
       notes: 'hi',
+      currency: 'EUR',
     );
     await repo.save(original);
     final restored = repo.getAll().first;
     expect(restored, original);
+  });
+
+  group('#4136 — the currency stamp', () {
+    test('a record with no currency gets the active one', () async {
+      // Stamped in the repository rather than the form, so every
+      // creation path is covered — manual entry, receipt scan, and
+      // anything added later.
+      await repo.save(_make(id: 'fresh'));
+      expect(repo.getAll().single.currency, isNotNull);
+    });
+
+    test('a record that ALREADY has one keeps it', () async {
+      // A backup restored in another country must not be relabelled
+      // with today's currency — that is precisely the silent
+      // cross-currency history the field exists to prevent.
+      await repo.save(_make(id: 'imported').copyWith(currency: 'GBP'));
+      expect(repo.getAll().single.currency, 'GBP');
+    });
+
+    test('re-saving does not relabel', () async {
+      await repo.save(_make(id: 'a').copyWith(currency: 'CLP'));
+      final stored = repo.getAll().single;
+      await repo.save(stored);
+      expect(repo.getAll().single.currency, 'CLP');
+    });
   });
 
   test('getAll tolerates malformed raw entries without crashing', () async {

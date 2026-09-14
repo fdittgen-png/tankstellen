@@ -23,6 +23,7 @@ void main() {
     int daysAgo = 1,
     FuelType fuel = FuelType.e10,
     bool correction = false,
+    String? currency,
   }) =>
       FillUp(
         id: id,
@@ -32,6 +33,7 @@ void main() {
         odometerKm: 10000 + daysAgo.toDouble(),
         fuelType: fuel,
         isCorrection: correction,
+        currency: currency,
       );
 
   group('the baseline', () {
@@ -129,7 +131,7 @@ void main() {
       final ledger = savingsLedgerFor(fills, fuelType: FuelType.e10, now: now);
       expect(ledger.entries.firstWhere((e) => e.fillUpId == 'dear').amount,
           closeTo(-10.0, 1e-9));
-      expect(ledger.total, lessThan(ledger.totalSaved),
+      expect(ledger.total!, lessThan(ledger.totalSaved!),
           reason: 'the net must be visible beside the wins-only figure');
     });
 
@@ -160,4 +162,94 @@ void main() {
       expect(after.entries.any((e) => e.fillUpId == 'f0'), isFalse);
     });
   });
+  group('#4136 — currency-correct, never a silent sum', () {
+    // The rule was DOCUMENTED on this class and not implemented: the
+    // code summed every entry regardless, and `FillUp` carried no
+    // currency at all, so it could not have done otherwise. A comment
+    // describing behaviour the model cannot express is worse than no
+    // comment — it reads as a guarantee.
+
+    List<FillUp> history({String? currency}) => [
+          for (var i = 0; i < 5; i++)
+            fill(
+              id: 'f$i',
+              litres: 40,
+              pricePerLitre: 1.70,
+              daysAgo: i * 5 + 1,
+              currency: currency,
+            ),
+        ];
+
+    test('one currency totals normally', () {
+      final l = savingsLedgerFor(history(currency: 'EUR'),
+          fuelType: FuelType.e10, now: now);
+      expect(l.isSingleCurrency, isTrue);
+      expect(l.total, isNotNull);
+      expect(l.totalsByCurrency.keys, ['EUR']);
+    });
+
+    test('an ALL-UNKNOWN history still totals — it is one currency', () {
+      // A driver who never left their country has exactly one currency
+      // and simply logged before the field existed. Refusing them a
+      // total would break every existing install to guard a case they
+      // do not have.
+      final l = savingsLedgerFor(history(),
+          fuelType: FuelType.e10, now: now);
+      expect(l.isSingleCurrency, isTrue);
+      expect(l.total, isNotNull);
+      expect(l.totalsByCurrency.keys, [kUnknownCurrency]);
+    });
+
+    test('two currencies produce NO total, and a breakdown instead', () {
+      // €40 + £40 is a number that is true in no currency at all.
+      final fills = [
+        ...history(currency: 'EUR').take(3),
+        fill(id: 'gb1', litres: 40, pricePerLitre: 1.70, daysAgo: 20,
+            currency: 'GBP'),
+        fill(id: 'gb2', litres: 40, pricePerLitre: 1.80, daysAgo: 25,
+            currency: 'GBP'),
+      ];
+      final l = savingsLedgerFor(fills, fuelType: FuelType.e10, now: now);
+      expect(l.isSingleCurrency, isFalse);
+      expect(l.total, isNull);
+      expect(l.totalSaved, isNull,
+          reason: 'the wins-only figure is the same sum with a filter — '
+              'it cannot be currency-correct when the net is not');
+      expect(l.totalsByCurrency.keys.toSet(), {'EUR', 'GBP'});
+    });
+
+    test('a KNOWN currency mixed with unknowns also refuses', () {
+      // The unknowns cannot be placed. Assuming they are the known one
+      // is the guess this whole field exists to avoid.
+      final fills = [
+        ...history(currency: 'EUR').take(3),
+        fill(id: 'old', litres: 40, pricePerLitre: 1.70, daysAgo: 30),
+      ];
+      final l = savingsLedgerFor(fills, fuelType: FuelType.e10, now: now);
+      expect(l.total, isNull);
+      expect(l.totalsByCurrency.keys.toSet(), {'EUR', kUnknownCurrency});
+    });
+
+    test('each currency nets on its own', () {
+      final fills = [
+        fill(id: 'e1', litres: 40, pricePerLitre: 1.70, daysAgo: 1,
+            currency: 'EUR'),
+        fill(id: 'e2', litres: 40, pricePerLitre: 1.70, daysAgo: 5,
+            currency: 'EUR'),
+        fill(id: 'e3', litres: 40, pricePerLitre: 1.70, daysAgo: 9,
+            currency: 'EUR'),
+        fill(id: 'e4', litres: 40, pricePerLitre: 1.70, daysAgo: 13,
+            currency: 'EUR'),
+        fill(id: 'g1', litres: 40, pricePerLitre: 1.90, daysAgo: 17,
+            currency: 'GBP'),
+      ];
+      final l = savingsLedgerFor(fills, fuelType: FuelType.e10, now: now);
+      final totals = l.totalsByCurrency;
+      expect(totals['GBP'], isNot(0),
+          reason: 'the GBP fill is above the (EUR-dominated) baseline, so '
+              'it nets negative — in POUNDS, and only in pounds');
+      expect(totals.containsKey('EUR'), isTrue);
+    });
+  });
+
 }

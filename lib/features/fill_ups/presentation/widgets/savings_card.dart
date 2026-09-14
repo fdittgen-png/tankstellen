@@ -53,21 +53,37 @@ class SavingsCard extends ConsumerWidget {
         children: [
           Text(l10n.savingsTitle, style: AppText.title(context)),
           const SizedBox(height: Spacing.xs),
-          Text(
-            l10n.savingsNet(
-              PriceFormatter.formatPrice(ledger.total),
-              ledger.entries.length,
-            ),
-            style: AppText.unit(context).copyWith(
-              fontWeight: FontWeight.w700,
-              // Green for a win, the error colour for a loss — this is
-              // one of the few places a red number is genuinely the
-              // right answer, because it IS bad news about money.
-              color: ledger.total >= 0
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.error,
-            ),
-          ),
+          // #4136 — one number only when there IS one number. A history
+          // spanning two currencies has no single total, so the card
+          // shows each currency's own rather than a sum that is true in
+          // neither.
+          if (ledger.total case final total?)
+            Text(
+              l10n.savingsNet(
+                PriceFormatter.formatPrice(total),
+                ledger.entries.length,
+              ),
+              style: AppText.unit(context).copyWith(
+                fontWeight: FontWeight.w700,
+                // Green for a win, the error colour for a loss — this is
+                // one of the few places a red number is genuinely the
+                // right answer, because it IS bad news about money.
+                color: total >= 0
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.error,
+              ),
+            )
+          else
+            for (final e in ledger.totalsByCurrency.entries)
+              Text(
+                '${e.key} ${PriceFormatter.formatPrice(e.value)}',
+                style: AppText.unit(context).copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: e.value >= 0
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.error,
+                ),
+              ),
           const SizedBox(height: Spacing.sm),
           // The reference, stated — without it the number above is not
           // reproducible, which trust rule 4 forbids.

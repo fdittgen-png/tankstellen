@@ -9,6 +9,7 @@ import '../../../../core/storage/hive_map_coercion.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../domain/entities/fill_up.dart';
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/utils/price_formatter.dart';
 
 /// Repository for CRUD operations on [FillUp] records.
 ///
@@ -43,7 +44,19 @@ class FillUpRepository {
   }
 
   /// Add or update a single fill-up (matched by id).
-  Future<void> save(FillUp fillUp) async {
+  ///
+  /// #4136 — stamps the active currency on a record that has none, so a
+  /// history that later spans two can be told apart instead of silently
+  /// summed. Done HERE rather than in the form: the currency is a
+  /// property of the record, not of one screen, and every creation path
+  /// (manual entry, receipt scan, a future importer) goes through this.
+  ///
+  /// A record that ALREADY carries one keeps it — a backup restored in
+  /// another country must not be relabelled with today's currency.
+  Future<void> save(FillUp rawFillUp) async {
+    final fillUp = rawFillUp.currency == null
+        ? rawFillUp.copyWith(currency: PriceFormatter.currencyCode)
+        : rawFillUp;
     final all = [...getAll()];
     final index = all.indexWhere((f) => f.id == fillUp.id);
     if (index >= 0) {
