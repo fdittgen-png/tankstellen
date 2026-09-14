@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:ui' show lerpDouble;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,6 +10,7 @@ import 'notched_bar_border.dart';
 import '../../core/navigation/search_fab_action_provider.dart';
 import 'shell_nav_item.dart';
 import 'dart:async';
+import 'shell_bar_collapse.dart';
 import 'shell_bar_double_tap.dart';
 import 'shell_bar_visibility.dart';
 import 'shell_center_button.dart';
@@ -55,7 +58,10 @@ class ShellBottomBar extends ConsumerWidget {
     // button stays put, revealing the strip of content the bar covered.
     // Landscape keeps its bar; the nav rail owns that case.
     final hidden = !isLandscape && ref.watch(shellBarHiddenProvider);
-    final boxHeight = hidden ? (isLandscape ? 40.0 : 56.0) : barHeight;
+    // #4168 — both ENDS of the collapse, so every property below can be
+    // a function of one progress value instead of a set of independent
+    // implicit animations that were free to disagree with each other.
+    final collapsedBoxHeight = isLandscape ? 40.0 : 56.0;
     // #2113 — context-aware override registered by criteria / results
     // screens. Null means "default branch-switch behaviour".
     final fabAction = ref.watch(searchFabActionControllerProvider);
@@ -134,46 +140,94 @@ class ShellBottomBar extends ConsumerWidget {
         // half on nothing. The button's protrusion comes from the notch
         // geometry and the docked FAB location, not from reserved height —
         // bodies now run to the bar and the button floats over them.
-        child: GestureDetector(
-          // #4097 — a DRAG toggles; tap keeps its current meaning, so
-          // nothing the user does today changes. Down hides, up shows,
-          // and the target is the bar's full width, not a 56 dp circle.
-          //
-          // A drag recognizer competes for the pointer but never HOLDS
-          // the arena, so a plain tap on a tab or on the round button
-          // still resolves the instant the finger leaves. The double-tap
-          // deliberately does not live here — see [ShellBarDoubleTap].
-          onVerticalDragEnd: (details) {
-            final v = details.primaryVelocity ?? 0;
-            if (v.abs() < 200) return;
-            unawaited(
-              ref.read(shellBarHiddenProvider.notifier).set(v > 0),
-            );
-            unawaited(
-              ref.read(shellSwipeCoachSeenProvider.notifier).markSeen(),
-            );
-          },
-          child: AnimatedSize(
-            duration: kShellBarHideDuration,
-            curve: Curves.easeOutCubic,
-            alignment: Alignment.bottomCenter,
-        child: SizedBox(
-          height: boxHeight,
-          child: Stack(
-            children: [
-              // Coloured bar pinned to the bottom; the docked centre button
-              // protrudes `rise` above the notch carved into its top edge
-              // (#2552).
-              // The tab surface: slid fully below the fold when hidden and
-              // made inert, so no tab can be tapped or read through it.
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: AnimatedSlide(
-                  offset: Offset(0, hidden ? 1 : 0),
-                  duration: kShellBarHideDuration,
-                  curve: Curves.easeOutCubic,
+        child: ShellBarCollapse(
+          // #4169 — the finger drives the progress directly, and the
+          // bar's own height is the distance that covers the whole
+          // travel: the control moves at roughly life size, which is
+          // what makes it feel pulled rather than triggered.
+          dragExtent: barHeight,
+          enabled: !isLandscape,
+          builder: (context, t) => _frame(
+            context: context,
+            ref: ref,
+            t: t,
+            hidden: hidden,
+            bar: bar,
+            barHeight: barHeight,
+            collapsedBoxHeight: collapsedBoxHeight,
+            diameter: diameter,
+            primaryIndex: primaryIndex,
+            fabAction: fabAction,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// One frame of the collapse, at progress [t] (0 expanded, 1 hidden).
+  ///
+  /// #4168 — what used to be here was an `AnimatedSize`, an
+  /// `AnimatedSlide` and, fatally, a plain `Align` whose alignment
+  /// flipped between `topCenter` and `bottomCenter`. `Align` is not
+  /// `AnimatedAlign`, so the button JUMPED to its new seat on the first
+  /// frame and then sat still while everything around it animated for
+  /// the remaining 219 ms.
+  ///
+  /// #4169 — and the split that makes driving this from a finger
+  /// affordable. `PageScaffold` watches the same preference and
+  /// collapses the TOP app bar with it on 44 screens, so a box height
+  /// that followed `t` would relayout map, lists and charts on every
+  /// frame of every swipe. Chrome is continuous; LAYOUT is quantised:
+  /// the reserved height takes the expanded value for the whole gesture
+  /// and only drops at the far end, where the surface has already gone
+  /// and nothing is drawn in the difference.
+  Widget _frame({
+    required BuildContext context,
+    required WidgetRef ref,
+    required double t,
+    required bool hidden,
+    required Widget bar,
+    required double barHeight,
+    required double collapsedBoxHeight,
+    required double diameter,
+    required int primaryIndex,
+    required SearchFabAction? fabAction,
+  }) {
+    // Two values across a whole drag, and never a third. See the class
+    // note above: this is the number every body in the app reads as
+    // `MediaQuery.padding.bottom`.
+    final boxHeight = t >= 1 ? collapsedBoxHeight : barHeight;
+    // The button's seat, measured from the box's bottom edge — which is
+    // pinned to the safe-area inset and does not move. Expanded it sits
+    // in the notch at the bar's top edge; collapsed it rests on the
+    // floor. Eight logical pixels, and the whole point is that they are
+    // TRAVELLED rather than skipped.
+    final buttonBottom = lerpDouble(barHeight - diameter, 0, t)!;
+    // The surface CONTRACTS rather than sliding out from under the
+    // button. Sliding is the cheap version and it reads as a drawer
+    // leaving; contracting reads as the control changing shape around
+    // the one part of it that stays.
+    final surfaceFactor = (1 - t).clamp(0.0, 1.0);
+    // Contents go before the surface does, so the bar never reaches its
+    // last few pixels still carrying legible labels.
+    final contentOpacity = (1 - t / 0.7).clamp(0.0, 1.0);
+    return SizedBox(
+      height: boxHeight,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // The tab surface, made inert once hidden so no tab can be
+          // tapped or read through it.
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: ClipRect(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                heightFactor: surfaceFactor,
+                child: Opacity(
+                  opacity: contentOpacity,
                   child: IgnorePointer(
                     key: const Key('shell_bar_surface'),
                     ignoring: hidden,
@@ -182,9 +236,10 @@ class ShellBottomBar extends ConsumerWidget {
                       excluding: hidden,
                       // #4107 — a double-tap on the bar toggles it away.
                       // Scoped to the tab surface on purpose: the round
-                      // button is NOT a descendant, so the primary search
-                      // action keeps its zero-delay tap (see the class
-                      // doc for the 300 ms arena hold this avoids).
+                      // button is NOT a descendant, so the primary
+                      // search action keeps its zero-delay tap (see the
+                      // class doc for the 300 ms arena hold this
+                      // avoids).
                       child: ShellBarDoubleTap(
                         onDoubleTap: () => unawaited(
                           ref
@@ -197,37 +252,41 @@ class ShellBottomBar extends ConsumerWidget {
                   ),
                 ),
               ),
-              // Raised primary action, horizontally centred.
-              // #4106 — introduce the gesture once, over the bar it acts
-              // on. Never while the bar is already hidden: the user has
-              // plainly found it.
-              if (!hidden && !ref.watch(shellSwipeCoachSeenProvider))
-                ShellSwipeCoachMark(
-                  barHeight: barHeight,
-                  onDismiss: () => unawaited(
-                    ref.read(shellSwipeCoachSeenProvider.notifier).markSeen(),
-                  ),
-                ),
-              if (primaryIndex >= 0)
-                Align(
-                  alignment:
-                      hidden ? Alignment.bottomCenter : Alignment.topCenter,
-                  child: ShellCenterButton(
-                    items: items,
-                    slot: primaryIndex,
-                    currentIndex: currentIndex,
-                    iconControllers: iconControllers,
-                    branchForSlot: branchForSlot,
-                    isLandscape: isLandscape,
-                    onTap: onTap,
-                    action: fabAction,
-                  ),
-                ),
-            ],
-          ),
             ),
           ),
-        ),
+          // #4106 — introduce the gesture once, over the bar it acts on.
+          // Never while the bar is already hidden: the user has plainly
+          // found it.
+          if (!hidden && !ref.watch(shellSwipeCoachSeenProvider))
+            ShellSwipeCoachMark(
+              barHeight: barHeight,
+              onDismiss: () => unawaited(
+                ref.read(shellSwipeCoachSeenProvider.notifier).markSeen(),
+              ),
+            ),
+          // The raised primary action. Horizontally centred and
+          // vertically CONTINUOUS — this is the anchor the eye follows
+          // through the whole transition.
+          if (primaryIndex >= 0)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: buttonBottom,
+              child: Align(
+                child: ShellCenterButton(
+                  items: items,
+                  slot: primaryIndex,
+                  currentIndex: currentIndex,
+                  iconControllers: iconControllers,
+                  branchForSlot: branchForSlot,
+                  isLandscape: isLandscape,
+                  onTap: onTap,
+                  action: fabAction,
+                  collapseProgress: t,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

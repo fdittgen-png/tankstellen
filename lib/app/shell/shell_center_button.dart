@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'dart:async';
+import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
@@ -31,6 +32,7 @@ class ShellCenterButton extends ConsumerWidget {
     required this.isLandscape,
     required this.onTap,
     this.action,
+    this.collapseProgress = 0,
   });
 
   final List<ShellNavItem> items;
@@ -45,6 +47,17 @@ class ShellCenterButton extends ConsumerWidget {
 
   /// A registered context-aware action that overrides the default tap.
   final SearchFabAction? action;
+
+  /// How far the bar around this button has collapsed — 0 docked in the
+  /// notch, 1 floating alone over the body (#4168).
+  ///
+  /// Only the DEPTH reads this. The button's size does not change: it is
+  /// 56 dp, Material's standard FAB, and the primary action of the whole
+  /// app — there is nowhere for it to shrink to that would not cost it
+  /// prominence. What changes is what it is sitting on. Docked, it has a
+  /// bar surface beneath it and a tight shadow is right; alone over a
+  /// map, a softer and wider one is what says "I am floating here now".
+  final double collapseProgress;
 
 
   /// The raised, primary-tinted centre button for the core action.
@@ -66,6 +79,9 @@ class ShellCenterButton extends ConsumerWidget {
     final item = items[i];
     final controller = iconControllers[branchForSlot[i]];
     final diameter = isLandscape ? 40.0 : 56.0;
+    // #4168 — clamped because #4169 drives this straight off a finger,
+    // and a drag that overshoots must not produce a negative blur.
+    final t = collapseProgress.clamp(0.0, 1.0);
 
     // #2113 — context-aware FAB. Default reads stay safe (no `watch`
     // here so a results refresh doesn't re-paint the whole bar) —
@@ -174,9 +190,10 @@ class ShellCenterButton extends ConsumerWidget {
         boxShadow: actionEnabled
             ? [
                 BoxShadow(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.30),
-                  blurRadius: 14,
-                  offset: const Offset(0, 4),
+                  color: theme.colorScheme.primary
+                      .withValues(alpha: lerpDouble(0.30, 0.20, t)!),
+                  blurRadius: lerpDouble(14, 22, t)!,
+                  offset: Offset(0, lerpDouble(4, 7, t)!),
                 ),
               ]
             : const [],
@@ -186,8 +203,9 @@ class ShellCenterButton extends ConsumerWidget {
         shape: CircleBorder(
           side: BorderSide(color: ringColor, width: isLandscape ? 2 : 2.5),
         ),
-        elevation: 4,
-        shadowColor: Colors.black.withValues(alpha: 0.4),
+        elevation: lerpDouble(4, 7, t)!,
+        shadowColor: Colors.black
+            .withValues(alpha: lerpDouble(0.4, 0.28, t)!),
         clipBehavior: Clip.antiAlias,
         child: Ink(
           decoration: BoxDecoration(shape: BoxShape.circle, gradient: gradient),
