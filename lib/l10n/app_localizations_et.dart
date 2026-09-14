@@ -3942,6 +3942,18 @@ class AppLocalizationsEt extends AppLocalizations {
   String get settingsMenuLabel => 'Seaded';
 
   @override
+  String get consumptionMetricLitres => 'Litres';
+
+  @override
+  String get consumptionMetricSpend => 'Spend';
+
+  @override
+  String get consumptionMetricPricePerLitre => 'Price/L';
+
+  @override
+  String get consumptionMetricPerHundred => 'L/100 km';
+
+  @override
   String get consumptionStatsPageTitle => 'Tarbimisstatistika';
 
   @override

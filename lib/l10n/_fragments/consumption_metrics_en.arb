@@ -1,0 +1,18 @@
+{
+  "consumptionMetricLitres": "Litres",
+  "@consumptionMetricLitres": {
+    "description": "Metric selector chip on the consumption report's evolution chart: total litres per month (#4175)."
+  },
+  "consumptionMetricSpend": "Spend",
+  "@consumptionMetricSpend": {
+    "description": "Metric selector chip: total money spent per month (#4175)."
+  },
+  "consumptionMetricPricePerLitre": "Price/L",
+  "@consumptionMetricPricePerLitre": {
+    "description": "Metric selector chip: average price per litre per month (#4175)."
+  },
+  "consumptionMetricPerHundred": "L/100 km",
+  "@consumptionMetricPerHundred": {
+    "description": "Metric selector chip: average consumption per month. The unit itself is language-neutral in most locales but is a key so locales using other units can adapt it (#4175)."
+  }
+}

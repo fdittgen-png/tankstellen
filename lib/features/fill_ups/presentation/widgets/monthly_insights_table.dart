@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 import '../../../../core/theme/app_text.dart';
-import '../../../../core/widgets/metric_delta_arrow.dart';
+import '../../../../core/widgets/metric_delta_pill.dart';
 
 /// The ONE month-over-month metric table (#3904, #3950) — shared by the
 /// Trajets `MonthlyInsightsCard` and the consumption-statistics page's
@@ -46,8 +46,12 @@ class MonthlyMetric {
   });
 }
 
-/// Width reserved for the trailing delta-arrow column.
-const double _arrowColumnWidth = 20;
+/// Width reserved for the trailing delta column (#4175).
+///
+/// Intrinsic now rather than a fixed 20 dp: the column carries a tinted
+/// pill with the percentage in it instead of a bare arrow. The row does
+/// not get wider overall, because the percentage LEFT the previous
+/// column in the same change — see [_PreviousCell].
 
 /// Gap between the label / value / arrow columns.
 const double _columnGap = 8;
@@ -104,7 +108,7 @@ class MonthlyMetricsTable extends StatelessWidget {
         0: const FlexColumnWidth(),
         1: const IntrinsicColumnWidth(),
         if (showPreviousColumn) 2: const IntrinsicColumnWidth(),
-        if (showPreviousColumn) 3: const FixedColumnWidth(_arrowColumnWidth),
+        if (showPreviousColumn) 3: const IntrinsicColumnWidth(),
       },
       defaultVerticalAlignment: TableCellVerticalAlignment.middle,
       children: [
@@ -126,19 +130,17 @@ class MonthlyMetricsTable extends StatelessWidget {
               if (showPreviousColumn)
                 _cell(
                   m.showPrevious
-                      ? _PreviousCell(
-                          value: m.previousValue,
-                          percentText: m.percentText,
-                          style: previousStyle,
-                        )
+                      ? _ValueCell(
+                          text: m.previousValue, style: previousStyle)
                       : const SizedBox.shrink(),
                   leading: _columnGap,
                 ),
               if (showPreviousColumn)
                 _cell(
                   m.showPrevious
-                      ? MetricDeltaArrow(
+                      ? MetricDeltaPill(
                           delta: m.delta,
+                          percentText: m.percentText,
                           neutral:
                               m.sentiment == MonthlyMetricSentiment.neutral,
                           flatBelow: _flatDelta,
@@ -158,35 +160,6 @@ class MonthlyMetricsTable extends StatelessWidget {
         padding: EdgeInsets.only(left: leading, top: 3, bottom: 3),
         child: child,
       );
-}
-
-/// The previous-month figure, with the optional percentage change
-/// stacked under it (#2698) — both in the label role, right-aligned.
-class _PreviousCell extends StatelessWidget {
-  final String value;
-  final String? percentText;
-  final TextStyle style;
-
-  const _PreviousCell({
-    required this.value,
-    required this.percentText,
-    required this.style,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final valueCell = _ValueCell(text: value, style: style);
-    final percent = percentText;
-    if (percent == null) return valueCell;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        valueCell,
-        _ValueCell(text: percent, style: style),
-      ],
-    );
-  }
 }
 
 /// A single-line, right-aligned figure that never wraps.

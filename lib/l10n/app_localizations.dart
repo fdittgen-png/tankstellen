@@ -6980,6 +6980,30 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settingsMenuLabel;
 
+  /// Metric selector chip on the consumption report's evolution chart: total litres per month (#4175).
+  ///
+  /// In en, this message translates to:
+  /// **'Litres'**
+  String get consumptionMetricLitres;
+
+  /// Metric selector chip: total money spent per month (#4175).
+  ///
+  /// In en, this message translates to:
+  /// **'Spend'**
+  String get consumptionMetricSpend;
+
+  /// Metric selector chip: average price per litre per month (#4175).
+  ///
+  /// In en, this message translates to:
+  /// **'Price/L'**
+  String get consumptionMetricPricePerLitre;
+
+  /// Metric selector chip: average consumption per month. The unit itself is language-neutral in most locales but is a key so locales using other units can adapt it (#4175).
+  ///
+  /// In en, this message translates to:
+  /// **'L/100 km'**
+  String get consumptionMetricPerHundred;
+
   /// App-bar title of the full consumption-statistics detail page opened from the Fuel tab's summary card (#2698).
   ///
   /// In en, this message translates to:

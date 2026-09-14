@@ -3968,6 +3968,18 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsMenuLabel => 'Einstellungen';
 
   @override
+  String get consumptionMetricLitres => 'Liter';
+
+  @override
+  String get consumptionMetricSpend => 'Ausgaben';
+
+  @override
+  String get consumptionMetricPricePerLitre => 'Preis/L';
+
+  @override
+  String get consumptionMetricPerHundred => 'L/100 km';
+
+  @override
   String get consumptionStatsPageTitle => 'Verbrauchsstatistik';
 
   @override

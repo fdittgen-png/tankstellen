@@ -3930,6 +3930,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsMenuLabel => 'Settings';
 
   @override
+  String get consumptionMetricLitres => 'Litres';
+
+  @override
+  String get consumptionMetricSpend => 'Spend';
+
+  @override
+  String get consumptionMetricPricePerLitre => 'Price/L';
+
+  @override
+  String get consumptionMetricPerHundred => 'L/100 km';
+
+  @override
   String get consumptionStatsPageTitle => 'Consumption statistics';
 
   @override
@@ -13376,6 +13388,18 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get settingsMenuLabel => '⟦Šéŧŧîñǧš ····⟧';
+
+  @override
+  String get consumptionMetricLitres => '⟦Łîŧřéš ···⟧';
+
+  @override
+  String get consumptionMetricSpend => '⟦Šƥéñđ ··⟧';
+
+  @override
+  String get consumptionMetricPricePerLitre => '⟦Ƥřîçé/Ł ···⟧';
+
+  @override
+  String get consumptionMetricPerHundred => '⟦Ł/100 ķɱ ·⟧';
 
   @override
   String get consumptionStatsPageTitle => '⟦Çóñšúɱƥŧîóñ šŧáŧîšŧîçš ·········⟧';
