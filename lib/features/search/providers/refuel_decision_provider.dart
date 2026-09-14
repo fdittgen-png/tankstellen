@@ -4,6 +4,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/domain/refuel_economics.dart';
+import '../../../core/time/app_clock.dart';
 import '../../../core/domain/refuel_profile_provider.dart';
 import '../../../core/domain/search_result_item.dart';
 import '../../../core/utils/station_extensions.dart';
@@ -32,6 +33,10 @@ part 'refuel_decision_provider.g.dart';
 RefuelDecision refuelDecision(Ref ref, List<SearchResultItem> items) {
   final fuelType = ref.watch(selectedFuelTypeProvider);
   final profile = ref.watch(refuelProfileProvider);
+  // #4139 — the gates for the conditional lead (spec §3.1). Neither
+  // enters the arithmetic; both decide whether Best Value is confident
+  // enough to be stated as THE answer rather than one of three.
+  final now = ref.watch(appClockProvider).now();
   return RefuelEconomics.decide(
     [
       for (final item in items.whereType<FuelStationResult>())
@@ -39,8 +44,23 @@ RefuelDecision refuelDecision(Ref ref, List<SearchResultItem> items) {
           stationId: item.station.id,
           oneWayKm: item.dist,
           pricePerLitre: item.station.priceFor(fuelType),
+          // #3198's tri-state survives: null is unknown, and unknown is
+          // not open — the lead is withheld either way.
+          isOpenNow: item.station.isOpen,
+          priceAge: _priceAge(item.station.updatedAt, now),
         ),
     ],
     profile,
   );
+}
+
+/// How old the station's price is, or null when the stamp is missing or
+/// unparseable — which withholds the lead rather than assuming freshness.
+Duration? _priceAge(String? updatedAt, DateTime now) {
+  if (updatedAt == null) return null;
+  final stamp = DateTime.tryParse(updatedAt);
+  if (stamp == null) return null;
+  final age = now.difference(stamp);
+  // A stamp in the future is a broken feed, not a fresh price.
+  return age.isNegative ? null : age;
 }

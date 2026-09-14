@@ -1113,6 +1113,18 @@ abstract class AppLocalizations {
   /// **'No station on this route has a price for your fuel'**
   String get refuelPlanNeedsPrices;
 
+  /// Heading above the decision rows when Best Value is confident enough to LEAD (spec §3.1, #4139) — measured consumption, station open now, price under 24 h old. Absent when any gate fails, and the three rankings then speak for themselves.
+  ///
+  /// In en, this message translates to:
+  /// **'Best stop for you'**
+  String get decisionConfidentLead;
+
+  /// The one line that makes the #4139 lead explainable: the three gates that let it be stated as an answer rather than one ranking of three.
+  ///
+  /// In en, this message translates to:
+  /// **'Open now, price from the last day, and measured on your own consumption'**
+  String get decisionConfidentWhy;
+
   /// No description provided for @allStations.
   ///
   /// In en, this message translates to:

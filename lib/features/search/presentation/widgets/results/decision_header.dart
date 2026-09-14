@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../core/domain/refuel_profile_provider.dart';
 import '../../../../../core/domain/search_result_item.dart';
+import '../../../../../core/theme/app_text.dart';
 import '../../../../../core/theme/spacing.dart';
 import '../../../../../core/utils/unit_formatter.dart';
 import '../../../../../core/widgets/primary_card.dart';
@@ -80,6 +81,31 @@ class DecisionHeader extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // #4139 / spec §3.1 — when the gates hold, say which stop is
+          // the answer instead of leaving the reader to compare three
+          // rankings. The rows below are unchanged: leading is emphasis,
+          // it never removes an answer.
+          if (decision.confidentPick != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                  Spacing.lg, Spacing.md, Spacing.lg, Spacing.xs),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.decisionConfidentLead,
+                      style: AppText.title(context)),
+                  const SizedBox(height: 2),
+                  // Explainable in ONE sentence — which is the whole
+                  // reason the gates are gates and not a blended score.
+                  Text(
+                    l10n.decisionConfidentWhy,
+                    style: AppText.label(context).copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           for (final quote in picks) ...[
             if (quote != picks.first)
               Divider(

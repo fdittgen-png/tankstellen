@@ -550,6 +550,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Aucune station de ce trajet n\'affiche de prix pour votre carburant';
 
   @override
+  String get decisionConfidentLead => 'Le meilleur arrêt pour vous';
+
+  @override
+  String get decisionConfidentWhy =>
+      'Ouverte maintenant, prix du jour, calculé sur votre propre consommation';
+
+  @override
   String get allStations => 'Toutes les stations';
 
   @override

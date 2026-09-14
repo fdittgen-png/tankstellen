@@ -328,6 +328,14 @@
   "@refuelPlanNeedsPrices": {
     "description": "Blocker: candidates exist but none is priced for the selected fuel (#4146)."
   },
+  "decisionConfidentLead": "Best stop for you",
+  "@decisionConfidentLead": {
+    "description": "Heading above the decision rows when Best Value is confident enough to LEAD (spec §3.1, #4139) — measured consumption, station open now, price under 24 h old. Absent when any gate fails, and the three rankings then speak for themselves."
+  },
+  "decisionConfidentWhy": "Open now, price from the last day, and measured on your own consumption",
+  "@decisionConfidentWhy": {
+    "description": "The one line that makes the #4139 lead explainable: the three gates that let it be stated as an answer rather than one ranking of three."
+  },
   "allStations": "All stations",
   "bestStops": "Best stops",
   "openInMaps": "Open in Maps",

@@ -550,6 +550,13 @@ class AppLocalizationsBg extends AppLocalizations {
       'No station on this route has a price for your fuel';
 
   @override
+  String get decisionConfidentLead => 'Best stop for you';
+
+  @override
+  String get decisionConfidentWhy =>
+      'Open now, price from the last day, and measured on your own consumption';
+
+  @override
   String get allStations => 'Всички станции';
 
   @override

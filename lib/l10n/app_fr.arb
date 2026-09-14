@@ -6129,5 +6129,7 @@
   },
   "refuelPlanNeedsConsumption": "Ajoutez quelques pleins et Sparkilo planifiera vos arrêts",
   "refuelPlanNeedsTank": "Renseignez la capacité de votre réservoir pour planifier les arrêts",
-  "refuelPlanNeedsPrices": "Aucune station de ce trajet n'affiche de prix pour votre carburant"
+  "refuelPlanNeedsPrices": "Aucune station de ce trajet n'affiche de prix pour votre carburant",
+  "decisionConfidentLead": "Le meilleur arrêt pour vous",
+  "decisionConfidentWhy": "Ouverte maintenant, prix du jour, calculé sur votre propre consommation"
 }

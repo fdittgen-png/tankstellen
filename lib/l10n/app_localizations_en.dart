@@ -549,6 +549,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'No station on this route has a price for your fuel';
 
   @override
+  String get decisionConfidentLead => 'Best stop for you';
+
+  @override
+  String get decisionConfidentWhy =>
+      'Open now, price from the last day, and measured on your own consumption';
+
+  @override
   String get allStations => 'All stations';
 
   @override
@@ -9811,6 +9818,13 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get refuelPlanNeedsPrices =>
       '⟦Ñó šŧáŧîóñ óñ ŧĥîš řóúŧé ĥáš á ƥřîçé ƒóř ýóúř ƒúéł ··················⟧';
+
+  @override
+  String get decisionConfidentLead => '⟦Ɓéšŧ šŧóƥ ƒóř ýóú ······⟧';
+
+  @override
+  String get decisionConfidentWhy =>
+      '⟦Óƥéñ ñóŵ, ƥřîçé ƒřóɱ ŧĥé łášŧ đáý, áñđ ɱéášúřéđ óñ ýóúř óŵñ çóñšúɱƥŧîóñ ··························⟧';
 
   @override
   String get allStations => '⟦Áłł šŧáŧîóñš ·····⟧';

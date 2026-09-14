@@ -551,6 +551,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Keine Station auf dieser Route hat einen Preis für deinen Kraftstoff';
 
   @override
+  String get decisionConfidentLead => 'Bester Stopp für dich';
+
+  @override
+  String get decisionConfidentWhy =>
+      'Jetzt geöffnet, Preis vom letzten Tag, gerechnet mit deinem eigenen Verbrauch';
+
+  @override
   String get allStations => 'Alle Stationen';
 
   @override

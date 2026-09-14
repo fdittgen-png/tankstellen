@@ -255,6 +255,8 @@
   "refuelPlanNeedsConsumption": "Trage ein paar Tankvorgänge ein, dann plant Sparkilo deine Stopps",
   "refuelPlanNeedsTank": "Hinterlege deine Tankgröße, um Tankstopps zu planen",
   "refuelPlanNeedsPrices": "Keine Station auf dieser Route hat einen Preis für deinen Kraftstoff",
+  "decisionConfidentLead": "Bester Stopp für dich",
+  "decisionConfidentWhy": "Jetzt geöffnet, Preis vom letzten Tag, gerechnet mit deinem eigenen Verbrauch",
   "allStations": "Alle Stationen",
   "bestStops": "Beste Stopps",
   "openInMaps": "In Karten öffnen",

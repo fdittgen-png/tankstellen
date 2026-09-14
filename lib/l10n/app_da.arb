@@ -6545,5 +6545,15 @@
   "@refuelPlanNeedsPrices": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "decisionConfidentLead": "Best stop for you",
+  "@decisionConfidentLead": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "decisionConfidentWhy": "Open now, price from the last day, and measured on your own consumption",
+  "@decisionConfidentWhy": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }
