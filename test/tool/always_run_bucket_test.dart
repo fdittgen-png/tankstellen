@@ -13,11 +13,12 @@
 // subset — lint guards, ARB parity, ADR format, security manifests —
 // because those tests' value depends on running on every PR.
 
-import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
 
-const _selectorPath = 'tool/test_selector.dart';
+// The selector is a `tool/` script, not a library, so this is a relative
+// import by design — `main()` only runs when the file is EXECUTED, so
+// importing it is free.
+import '../../tool/test_selector.dart';
 
 /// The contract-bearing always-run tests. If one of these accidentally
 /// gains a transitive `lib/` import, this test fails BEFORE the test
@@ -50,36 +51,29 @@ void main() {
   test(
     'every contract-bearing always-run test stays in the bucket '
     '(no accidental lib/ imports — #1593 regression guard)',
-    () async {
-      // Run the selector with a non-lib change. The output is exactly
-      // the always-run bucket — affected set is empty for this input.
-      final p = await Process.start(
-        'dart',
-        ['run', _selectorPath, '-'],
-        runInShell: false,
-      );
-      p.stdin.writeln('README.md');
-      await p.stdin.close();
-      final stdoutF =
-          p.stdout.transform(const SystemEncoding().decoder).join();
-      final exitCode = await p.exitCode;
-      final stdout = await stdoutF;
-      expect(exitCode, 0,
-          reason: 'selector should exit 0 when the always-run bucket '
-              'is non-empty (which it always is)');
+    () {
+      // #4177 — computed IN PROCESS. This used to spawn
+      // `dart run tool/test_selector.dart`, which competes for the pub /
+      // build-hook lock with everything else a full parallel
+      // `flutter test` has in flight; it went red twice for that reason
+      // while passing every time on its own. A contract guard that fails
+      // for a reason unrelated to its contract is worse than no guard,
+      // because the first red gets re-run, the second gets ignored, and
+      // by the third nobody remembers what it protected.
+      //
+      // It also deletes the stdout parsing the subprocess forced: `dart
+      // run` prepends "Running build hooks..." with no newline, so the
+      // old version had to regex test paths back out of the noise.
+      //
+      // An empty `libChanged` is the same input the old invocation gave
+      // (a README-only change): nothing under lib/ moved, so `affected`
+      // is empty and the output is exactly the always-run bucket.
+      final bucket = selectTests(const <String>{}).alwaysRun;
 
-      // Dart's `pub get` / build-runner prepends a chatty `Running
-      // build hooks...` (no newline before the first selector line)
-      // to stdout when run via `dart run`. The pragmatic fix: keep
-      // only the substring of each split line that matches a test
-      // file path. Anything before `test/` is build-runner noise.
-      final pathRe = RegExp(r'(test/[^\s]+_test\.dart)');
-      final bucket = <String>{};
-      for (final line in stdout.split('\n')) {
-        for (final m in pathRe.allMatches(line)) {
-          bucket.add(m.group(1)!);
-        }
-      }
+      expect(bucket, isNotEmpty,
+          reason: 'the always-run bucket is never empty — an empty one '
+              'means the selector stopped finding tests, not that the '
+              'bucket shrank');
 
       for (final required in _mustStayInBucket) {
         expect(
@@ -94,4 +88,17 @@ void main() {
       }
     },
   );
+
+  test('a changed lib/ file pulls its dependents in, and not the world',
+      () {
+    // The other half of the selector's contract, now cheap to assert
+    // because there is no subprocess: a real change selects the tests
+    // that depend on it PLUS the always-run bucket, and nothing else.
+    final selection = selectTests(const {'lib/core/domain/data_value.dart'});
+    expect(selection.affected, isNotEmpty,
+        reason: 'DataValue has dependents; selecting none would scope '
+            'them out of their own PR');
+    expect(selection.affected.intersection(selection.alwaysRun), isEmpty,
+        reason: 'a test is in one bucket or the other, never counted twice');
+  });
 }

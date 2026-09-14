@@ -17,6 +17,46 @@
 /// They live here now, and every compound transition — begin, end,
 /// resume-from-drop — sets its whole group in one method, so a caller
 /// cannot perform half of one.
+/// The states a recording can actually be IN (#4162, epic #4155).
+///
+/// [TripRunState] carries five booleans, which describes **32
+/// combinations**. A handful are reachable and, until now, nobody had
+/// written down which — and #4162's framing is that every impossible
+/// combination is a bug waiting for the right interruption, which the OS
+/// supplies on its own schedule. That is why these only ever reproduce
+/// in the field.
+///
+/// This enum is the written-down answer. It is DERIVED from the flags
+/// rather than replacing them: #4034 already made the transitions
+/// atomic, and a storage change here would be a behaviour change in the
+/// app's highest-risk subsystem. `trip_run_state_reachability_test`
+/// drives every transition from every reachable state and asserts the
+/// result always lands on one of these.
+///
+/// Order matters — a state read must check [finished] FIRST, because an
+/// auto-finalised drop leaves `stopped` true and `started` false.
+enum TripRunPhase {
+  /// Never begun. The only state with nothing set.
+  idle,
+
+  /// Begun and sampling.
+  running,
+
+  /// The user paused. Resumable by the user.
+  pausedByUser,
+
+  /// The link dropped AND GPS is gone too. Resumable by the link
+  /// returning, or finalised by the grace timer.
+  pausedByDrop,
+
+  /// #2565 — the link died and recording continues on GPS alone. An
+  /// ACTIVE state, not a pause.
+  degradedGpsOnly,
+
+  /// Ended. `stopped` is true and `started` is false.
+  finished,
+}
+
 class TripRunState {
   bool _started = false;
   bool _stopped = false;
@@ -41,6 +81,21 @@ class TripRunState {
 
   /// True for both the user pause and the drop pause.
   bool get isPaused => _paused || _pausedDueToDrop;
+
+  /// Which of the six reachable states this is (#4162).
+  ///
+  /// The order of the checks IS the precedence, and it is not
+  /// arbitrary: `finished` first because an auto-finalised drop leaves
+  /// `stopped` true with `started` false; `degradedGpsOnly` before the
+  /// pauses because #2565 is an active state that outranks them.
+  TripRunPhase get phase {
+    if (_stopped) return TripRunPhase.finished;
+    if (!_started) return TripRunPhase.idle;
+    if (_degradedGpsOnly) return TripRunPhase.degradedGpsOnly;
+    if (_pausedDueToDrop) return TripRunPhase.pausedByDrop;
+    if (_paused) return TripRunPhase.pausedByUser;
+    return TripRunPhase.running;
+  }
 
   /// The trip has begun. `stopped` is cleared in the same step so a
   /// restart can never be seen as "stopped and started at once".
