@@ -556,6 +556,29 @@ class AppLocalizationsEn extends AppLocalizations {
       'Open now, price from the last day, and measured on your own consumption';
 
   @override
+  String get savingsTitle => 'Against your usual price';
+
+  @override
+  String savingsNet(String amount, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fills',
+      one: '1 fill',
+    );
+    return '$amount net over $_temp0';
+  }
+
+  @override
+  String savingsReference(String price, String litres) {
+    return 'Your usual: $price per litre, $litres per fill';
+  }
+
+  @override
+  String get savingsNeedsHistory =>
+      'A few more fill-ups and Sparkilo can tell you what you are saving';
+
+  @override
   String get allStations => 'All stations';
 
   @override
@@ -9825,6 +9848,29 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get decisionConfidentWhy =>
       '⟦Óƥéñ ñóŵ, ƥřîçé ƒřóɱ ŧĥé łášŧ đáý, áñđ ɱéášúřéđ óñ ýóúř óŵñ çóñšúɱƥŧîóñ ··························⟧';
+
+  @override
+  String get savingsTitle => '⟦Áǧáîñšŧ ýóúř úšúáł ƥřîçé ·········⟧';
+
+  @override
+  String savingsNet(String amount, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fills',
+      one: '1 fill',
+    );
+    return '⟦$amount ñéŧ óṽéř $_temp0 ···⟧';
+  }
+
+  @override
+  String savingsReference(String price, String litres) {
+    return '⟦Ýóúř úšúáł: $price ƥéř łîŧřé, $litres ƥéř ƒîłł ···········⟧';
+  }
+
+  @override
+  String get savingsNeedsHistory =>
+      '⟦Á ƒéŵ ɱóřé ƒîłł-úƥš áñđ Šƥářķîłó çáñ ŧéłł ýóú ŵĥáŧ ýóú ářé šáṽîñǧ ·······················⟧';
 
   @override
   String get allStations => '⟦Áłł šŧáŧîóñš ·····⟧';

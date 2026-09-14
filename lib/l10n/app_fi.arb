@@ -7047,5 +7047,41 @@
   "@decisionConfidentWhy": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "savingsTitle": "Against your usual price",
+  "@savingsTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "savingsNet": "{amount} net over {count, plural, =1{1 fill} other{{count} fills}}",
+  "@savingsNet": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savingsReference": "Your usual: {price} per litre, {litres} per fill",
+  "@savingsReference": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "savingsNeedsHistory": "A few more fill-ups and Sparkilo can tell you what you are saving",
+  "@savingsNeedsHistory": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

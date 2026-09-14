@@ -1125,6 +1125,30 @@ abstract class AppLocalizations {
   /// **'Open now, price from the last day, and measured on your own consumption'**
   String get decisionConfidentWhy;
 
+  /// Heading of the savings card (#4136). Names the REFERENCE, because a saving with no stated reference is not reproducible (economics spec trust rule 4).
+  ///
+  /// In en, this message translates to:
+  /// **'Against your usual price'**
+  String get savingsTitle;
+
+  /// The savings card's headline: the NET across every counted fill, wins and misses alike. Signed on purpose — a wins-only total would be a lie of omission.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} net over {count, plural, =1{1 fill} other{{count} fills}}'**
+  String savingsNet(String amount, int count);
+
+  /// The baseline the savings are measured against (#4150) — the median over the last 90 days, stated so the arithmetic can be checked.
+  ///
+  /// In en, this message translates to:
+  /// **'Your usual: {price} per litre, {litres} per fill'**
+  String savingsReference(String price, String litres);
+
+  /// Empty state for the savings card (#4136): below the minimum sample count there is no honest baseline, so no number is shown rather than a computed-looking zero.
+  ///
+  /// In en, this message translates to:
+  /// **'A few more fill-ups and Sparkilo can tell you what you are saving'**
+  String get savingsNeedsHistory;
+
   /// No description provided for @allStations.
   ///
   /// In en, this message translates to:

@@ -6131,5 +6131,29 @@
   "refuelPlanNeedsTank": "Renseignez la capacité de votre réservoir pour planifier les arrêts",
   "refuelPlanNeedsPrices": "Aucune station de ce trajet n'affiche de prix pour votre carburant",
   "decisionConfidentLead": "Le meilleur arrêt pour vous",
-  "decisionConfidentWhy": "Ouverte maintenant, prix du jour, calculé sur votre propre consommation"
+  "decisionConfidentWhy": "Ouverte maintenant, prix du jour, calculé sur votre propre consommation",
+  "savingsTitle": "Par rapport à votre prix habituel",
+  "savingsNet": "{amount} net sur {count, plural, =1{1 plein} other{{count} pleins}}",
+  "@savingsNet": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savingsReference": "Votre habituel : {price} le litre, {litres} par plein",
+  "@savingsReference": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "savingsNeedsHistory": "Encore quelques pleins et Sparkilo vous dira ce que vous économisez"
 }

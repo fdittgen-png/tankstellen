@@ -558,6 +558,29 @@ class AppLocalizationsDe extends AppLocalizations {
       'Jetzt geöffnet, Preis vom letzten Tag, gerechnet mit deinem eigenen Verbrauch';
 
   @override
+  String get savingsTitle => 'Gegenüber deinem üblichen Preis';
+
+  @override
+  String savingsNet(String amount, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tankfüllungen',
+      one: '1 Tankfüllung',
+    );
+    return '$amount netto über $_temp0';
+  }
+
+  @override
+  String savingsReference(String price, String litres) {
+    return 'Dein Üblicher: $price pro Liter, $litres pro Tankfüllung';
+  }
+
+  @override
+  String get savingsNeedsHistory =>
+      'Noch ein paar Tankvorgänge, dann zeigt Sparkilo dir deine Ersparnis';
+
+  @override
   String get allStations => 'Alle Stationen';
 
   @override

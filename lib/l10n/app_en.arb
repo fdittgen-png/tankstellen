@@ -336,6 +336,38 @@
   "@decisionConfidentWhy": {
     "description": "The one line that makes the #4139 lead explainable: the three gates that let it be stated as an answer rather than one ranking of three."
   },
+  "savingsTitle": "Against your usual price",
+  "@savingsTitle": {
+    "description": "Heading of the savings card (#4136). Names the REFERENCE, because a saving with no stated reference is not reproducible (economics spec trust rule 4)."
+  },
+  "savingsNet": "{amount} net over {count, plural, =1{1 fill} other{{count} fills}}",
+  "@savingsNet": {
+    "description": "The savings card's headline: the NET across every counted fill, wins and misses alike. Signed on purpose — a wins-only total would be a lie of omission.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savingsReference": "Your usual: {price} per litre, {litres} per fill",
+  "@savingsReference": {
+    "description": "The baseline the savings are measured against (#4150) — the median over the last 90 days, stated so the arithmetic can be checked.",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "savingsNeedsHistory": "A few more fill-ups and Sparkilo can tell you what you are saving",
+  "@savingsNeedsHistory": {
+    "description": "Empty state for the savings card (#4136): below the minimum sample count there is no honest baseline, so no number is shown rather than a computed-looking zero."
+  },
   "allStations": "All stations",
   "bestStops": "Best stops",
   "openInMaps": "Open in Maps",
