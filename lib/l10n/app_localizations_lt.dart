@@ -3967,6 +3967,18 @@ class AppLocalizationsLt extends AppLocalizations {
   String get settingsMenuLabel => 'Nustatymai';
 
   @override
+  String get consumptionMetricLitres => 'Litres';
+
+  @override
+  String get consumptionMetricSpend => 'Spend';
+
+  @override
+  String get consumptionMetricPricePerLitre => 'Price/L';
+
+  @override
+  String get consumptionMetricPerHundred => 'L/100 km';
+
+  @override
   String get consumptionStatsPageTitle => 'Sąnaudų statistika';
 
   @override

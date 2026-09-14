@@ -3971,6 +3971,18 @@ class AppLocalizationsBg extends AppLocalizations {
   String get settingsMenuLabel => 'Настройки';
 
   @override
+  String get consumptionMetricLitres => 'Litres';
+
+  @override
+  String get consumptionMetricSpend => 'Spend';
+
+  @override
+  String get consumptionMetricPricePerLitre => 'Price/L';
+
+  @override
+  String get consumptionMetricPerHundred => 'L/100 km';
+
+  @override
   String get consumptionStatsPageTitle => 'Статистика на разхода';
 
   @override

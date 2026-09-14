@@ -6201,5 +6201,25 @@
   "dataBasisDerived": "Déduit d'autres valeurs",
   "decisionLeadCaveatHours": "les horaires d'ouverture ne sont pas publiés pour ce pays",
   "decisionLeadCaveatPriceAge": "cette source n'indique pas quand le prix a été relevé",
-  "decisionLeadCaveatSeparator": " · "
+  "decisionLeadCaveatSeparator": " · ",
+  "consumptionMetricLitres": "Litres",
+  "@consumptionMetricLitres": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consumptionMetricSpend": "Spend",
+  "@consumptionMetricSpend": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consumptionMetricPricePerLitre": "Price/L",
+  "@consumptionMetricPricePerLitre": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consumptionMetricPerHundred": "L/100 km",
+  "@consumptionMetricPerHundred": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  }
 }

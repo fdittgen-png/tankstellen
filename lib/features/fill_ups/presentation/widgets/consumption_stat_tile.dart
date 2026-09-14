@@ -18,11 +18,18 @@ class ConsumptionStatTile extends StatelessWidget {
   final String label;
   final String value;
 
+  /// Accent for the icon's tonal container (#4175). Defaults to the
+  /// scheme's primary — pass a different role to give a metric family
+  /// its own hue. Always a SCHEME colour: the app ships light, dark and
+  /// an eco theme, and a literal here would be wrong in two of them.
+  final Color? accent;
+
   const ConsumptionStatTile({
     super.key,
     required this.icon,
     required this.label,
     required this.value,
+    this.accent,
   });
 
   /// Fraction of the display role a tile figure renders at. The full
@@ -46,7 +53,24 @@ class ConsumptionStatTile extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(icon, size: 16, color: theme.colorScheme.primary),
+            // #4175 — a tonal disc behind the glyph. The single cheapest
+            // "designed rather than assembled" change on the tile: a
+            // bare 16 dp line icon on a flat panel reads as a bullet
+            // point, the same mark in a tinted container reads as a
+            // metric's mark. No elevation — #3947 reserves that for
+            // floating things.
+            Container(
+              width: 26,
+              height: 26,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: (accent ?? theme.colorScheme.primary)
+                    .withValues(alpha: 0.12),
+              ),
+              alignment: Alignment.center,
+              child: Icon(icon,
+                  size: 15, color: accent ?? theme.colorScheme.primary),
+            ),
             const SizedBox(width: Spacing.sm),
             Expanded(
               child: Text(

@@ -7181,5 +7181,25 @@
   "@decisionLeadCaveatSeparator": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "consumptionMetricLitres": "Litres",
+  "@consumptionMetricLitres": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consumptionMetricSpend": "Spend",
+  "@consumptionMetricSpend": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consumptionMetricPricePerLitre": "Price/L",
+  "@consumptionMetricPricePerLitre": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consumptionMetricPerHundred": "L/100 km",
+  "@consumptionMetricPerHundred": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

@@ -3970,6 +3970,18 @@ class AppLocalizationsRo extends AppLocalizations {
   String get settingsMenuLabel => 'Setări';
 
   @override
+  String get consumptionMetricLitres => 'Litres';
+
+  @override
+  String get consumptionMetricSpend => 'Spend';
+
+  @override
+  String get consumptionMetricPricePerLitre => 'Price/L';
+
+  @override
+  String get consumptionMetricPerHundred => 'L/100 km';
+
+  @override
   String get consumptionStatsPageTitle => 'Statistici consum';
 
   @override
