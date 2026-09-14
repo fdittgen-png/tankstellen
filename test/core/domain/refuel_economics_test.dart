@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/domain/data_value.dart';
 import 'package:tankstellen/core/domain/refuel_economics.dart';
 
 /// #4089 — the decision model of `docs/specs/refuel-economics.md`.
@@ -344,9 +345,24 @@ void main() {
 /// fourth ranking out; admitting them as GATES rather than weights is
 /// what makes the lead explainable in a sentence.
 void _confidentPickTests() {
+  // #4156 — the gates take provenance, not bare nullables. `open: null`
+  // and `age: null` keep their old meaning (the provider publishes this
+  // kind of data and left THIS row blank); the provider-publishes-none
+  // case is the new [DataUnknownReason.notPublishedByProvider] and is
+  // exercised in its own group below.
+  DataValue<bool> openValue(bool? open) => open == null
+      ? const DataValue.unknown(
+          reason: DataUnknownReason.notPublishedForThisItem)
+      : DataValue.measured(open);
+
+  DataValue<Duration> ageValue(Duration? age) => age == null
+      ? const DataValue.unknown(
+          reason: DataUnknownReason.notPublishedForThisItem)
+      : DataValue.measured(age);
+
   RefuelCandidate candidate({
-    bool? open = true,
-    Duration? age = const Duration(hours: 2),
+    DataValue<bool> open = const DataValue.measured(true),
+    DataValue<Duration> age = const DataValue.measured(Duration(hours: 2)),
     double price = 1.60,
   }) =>
       RefuelCandidate(
@@ -354,14 +370,14 @@ void _confidentPickTests() {
         oneWayKm: 2,
         pricePerLitre: price,
         isRoadDistance: true,
-        isOpenNow: open,
+        openState: open,
         priceAge: age,
       );
 
-  RefuelDecision decide({
+  RefuelDecision decideWith({
     bool estimated = false,
-    bool? open = true,
-    Duration? age = const Duration(hours: 2),
+    DataValue<bool> open = const DataValue.measured(true),
+    DataValue<Duration> age = const DataValue.measured(Duration(hours: 2)),
   }) =>
       RefuelEconomics.decide(
         [candidate(open: open, age: age)],
@@ -369,6 +385,17 @@ void _confidentPickTests() {
           consumptionLPer100km: 6.5,
           consumptionIsEstimated: estimated,
         ),
+      );
+
+  RefuelDecision decide({
+    bool estimated = false,
+    bool? open = true,
+    Duration? age = const Duration(hours: 2),
+  }) =>
+      decideWith(
+        estimated: estimated,
+        open: openValue(open),
+        age: ageValue(age),
       );
 
   group('RefuelDecision.confidentPick (#4139)', () {
@@ -388,9 +415,11 @@ void _confidentPickTests() {
       expect(decide(open: false).confidentPick, isNull);
     });
 
-    test('never leads when openness is unknown', () {
+    test('never leads when openness is unknown FOR THIS STATION', () {
       // #3198's tri-state: unknown is not open. A confident answer at a
       // forecourt that turns out to be shut is the failure §5 named.
+      // #4156 narrows this to the case the provider could have answered
+      // and did not — a real, station-specific gap.
       expect(decide(open: null).confidentPick, isNull);
     });
 
@@ -400,6 +429,83 @@ void _confidentPickTests() {
 
     test('never leads when the price age is unknown', () {
       expect(decide(age: null).confidentPick, isNull);
+    });
+
+    // -----------------------------------------------------------------
+    // #4156 — a gate the PROVIDER cannot answer is not a gate to fail
+    // -----------------------------------------------------------------
+    // Eleven of the seventeen registered countries publish no opening
+    // hours for anyone. Reading that as "closed" withheld the lead in
+    // every one of them forever, and nothing said why. The distinction
+    // the provider capability draws is between a gap this provider could
+    // have filled and a question it never answers for anybody.
+
+    test('leads when the provider publishes no hours AT ALL', () {
+      final decision = decideWith(
+        open: const DataValue.unknown(
+            reason: DataUnknownReason.notPublishedByProvider),
+      );
+      expect(decision.confidentPick, isNotNull);
+    });
+
+    test('and says so, rather than passing the gate silently', () {
+      final decision = decideWith(
+        open: const DataValue.unknown(
+            reason: DataUnknownReason.notPublishedByProvider),
+      );
+      expect(decision.leadCaveats,
+          contains(LeadCaveat.openingHoursNotPublished));
+    });
+
+    test('leads when the provider stamps no prices AT ALL', () {
+      final decision = decideWith(
+        age: const DataValue.unknown(
+            reason: DataUnknownReason.notPublishedByProvider),
+      );
+      expect(decision.confidentPick, isNotNull);
+      expect(decision.leadCaveats, contains(LeadCaveat.priceAgeNotPublished));
+    });
+
+    test('a KNOWN-closed station still blocks, whatever the provider', () {
+      // The stand-down is about absence, never about a "no" we were told.
+      expect(decideWith(open: const DataValue.measured(false)).confidentPick,
+          isNull);
+    });
+
+    test('a stale price still blocks — staleness is an answer, not a gap',
+        () {
+      expect(
+        decideWith(
+          age: const DataValue.measured(Duration(hours: 30)),
+        ).confidentPick,
+        isNull,
+      );
+    });
+
+    test('no caveats when every gate was actually checked', () {
+      expect(decide().leadCaveats, isEmpty);
+    });
+
+    test('no caveats when there is no lead to qualify', () {
+      // A caveat on an answer nobody is being shown is noise.
+      final blocked = decideWith(
+        estimated: true,
+        open: const DataValue.unknown(
+            reason: DataUnknownReason.notPublishedByProvider),
+      );
+      expect(blocked.confidentPick, isNull);
+      expect(blocked.leadCaveats, isEmpty);
+    });
+
+    test('both caveats at once — the MX/KR/SI shape', () {
+      final decision = decideWith(
+        open: const DataValue.unknown(
+            reason: DataUnknownReason.notPublishedByProvider),
+        age: const DataValue.unknown(
+            reason: DataUnknownReason.notPublishedByProvider),
+      );
+      expect(decision.confidentPick, isNotNull);
+      expect(decision.leadCaveats, hasLength(2));
     });
 
     test('the gates never change the ranking itself', () {

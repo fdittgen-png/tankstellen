@@ -15,7 +15,30 @@ import 'dart:math' as math;
 
 import 'package:meta/meta.dart';
 
+import 'data_value.dart';
 import 'refuel_economics.dart';
+
+/// What the conditional lead could NOT verify (#4156).
+///
+/// A gate the provider cannot answer is not a gate we may fail — that
+/// would have disabled the lead in eleven of seventeen countries because
+/// their source publishes no opening hours, which is a fact about the
+/// source and not about the forecourt. It is also not a gate we may
+/// silently pass: the user is being shown one answer instead of three,
+/// and is owed the reason it is only *probably* right.
+///
+/// So the gate steps aside and records why. The UI states these next to
+/// the lead; `docs/specs/refuel-economics.md` trust rule 1 — a missing
+/// input is stated, never defaulted.
+enum LeadCaveat {
+  /// This country's source publishes no opening hours at all, so nobody
+  /// checked whether the forecourt is open.
+  openingHoursNotPublished,
+
+  /// This country's source stamps no prices, so the age of the number is
+  /// our download time, not the provider's price time.
+  priceAgeNotPublished,
+}
 
 /// Which question a station is the answer to.
 enum RefuelRanking {
@@ -62,22 +85,78 @@ class RefuelDecision {
   ///
   /// Non-null only when every gate holds: a Best Value exists, the
   /// consumption behind it was MEASURED rather than modelled, the station
-  /// is open now, and its price is fresh. Any gate failing returns the UI
-  /// to the three-answer header.
+  /// is not known to be closed, and its price is not known to be stale.
+  /// Any gate failing returns the UI to the three-answer header.
   ///
   /// The gates never change the RANKING — they decide whether it is
   /// confident enough to be stated as an answer. That is the difference
   /// between §3.1 and the blended score §5 still refuses: a gate can be
   /// explained in one sentence, a weight cannot.
+  ///
+  /// #4156 — "not known to be closed" is doing real work in that
+  /// sentence. A gate the country's provider cannot answer for anyone
+  /// stands down and is reported in [leadCaveats]; a gate it can answer
+  /// and left blank for THIS station still blocks.
   RefuelQuote? get confidentPick {
     final pick = bestValue;
     if (pick == null) return null;
     if (profile.consumptionIsEstimated) return null;
-    if (pick.candidate.isOpenNow != true) return null;
-    final age = pick.candidate.priceAge;
-    if (age == null || age > kConfidentPickMaxPriceAge) return null;
+    if (_openGateBlocks(pick.candidate.openState)) return null;
+    if (_freshnessGateBlocks(pick.candidate.priceAge)) return null;
     return pick;
   }
+
+  /// What [confidentPick] could not verify, so the UI can say so (#4156).
+  ///
+  /// Empty when every gate was actually checked. Never populated when
+  /// there is no lead — a caveat on an answer nobody is being shown is
+  /// noise.
+  Set<LeadCaveat> get leadCaveats {
+    final pick = confidentPick;
+    if (pick == null) return const {};
+    return {
+      if (_notPublishedByProvider(pick.candidate.openState))
+        LeadCaveat.openingHoursNotPublished,
+      if (_notPublishedByProvider(pick.candidate.priceAge))
+        LeadCaveat.priceAgeNotPublished,
+    };
+  }
+
+  /// True when the provider for this row publishes nothing of the kind —
+  /// the one unknown that lets a gate stand down rather than fail.
+  static bool _notPublishedByProvider(DataValue<Object?> value) =>
+      value is Unknown &&
+      value.reason == DataUnknownReason.notPublishedByProvider;
+
+  /// Open now, or nobody could have known.
+  ///
+  /// Blocks on a station we know is closed, and on a station whose
+  /// provider DOES publish hours but published none for this row — that
+  /// gap is real and specific to the forecourt we are about to send
+  /// someone to. Stands down when the provider publishes no hours for
+  /// anyone; [leadCaveats] carries that forward.
+  static bool _openGateBlocks(DataValue<bool> openState) =>
+      switch (openState) {
+        Measured<bool>(:final value) => !value,
+        Unknown<bool>(:final reason) =>
+          reason != DataUnknownReason.notPublishedByProvider,
+        _ => true,
+      };
+
+  /// Fresh enough to lead on, or nobody could have known.
+  ///
+  /// [kConfidentPickMaxPriceAge] is unchanged and still the product
+  /// decision it was in #4139. What #4156 adds is the difference between
+  /// "this provider stamps no prices" — in which case there is no age to
+  /// test and the gate stands down with a caveat — and "this provider
+  /// stamps prices and left this one blank", which stays a block.
+  static bool _freshnessGateBlocks(DataValue<Duration> priceAge) =>
+      switch (priceAge) {
+        Measured<Duration>(:final value) => value > kConfidentPickMaxPriceAge,
+        Unknown<Duration>(:final reason) =>
+          reason != DataUnknownReason.notPublishedByProvider,
+        _ => true,
+      };
 
   /// The rankings [stationId] holds, so the UI can collapse a station
   /// that is several answers at once into one row instead of repeating

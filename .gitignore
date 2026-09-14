@@ -82,6 +82,10 @@ docs/*
 !docs/play-store/
 !docs/decisions/
 !docs/guides/
+# Specs the source cites by path: five files reference
+# docs/specs/refuel-economics.md in their doc comments, and a spec a
+# reviewer cannot open is a spec nobody can hold the code to (#4156).
+!docs/specs/
 # The user and developer wiki: the repository is the source of truth
 # and the GitHub wiki is its mirror (#4005, docs/guides/wiki-mirror.md).
 !docs/wiki/

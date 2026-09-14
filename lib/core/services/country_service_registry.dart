@@ -19,6 +19,7 @@ import 'diagnostics/data_access_recorder.dart';
 import 'diagnostics/data_access_recorder_provider.dart';
 import 'fuel_service_policy.dart';
 import 'impl/demo_station_service.dart';
+import 'provider_capability.dart';
 import 'service_providers.dart';
 import 'station_service.dart';
 import 'station_service_chain.dart';
@@ -73,6 +74,15 @@ class CountryServiceRegistry {
   /// unregistered (#2264).
   static FuelServicePolicy? policyFor(String countryCode) =>
       _byCode[countryCode]?.policy;
+
+  /// What [countryCode]'s upstream can support (#4156), or null when the
+  /// code is unregistered.
+  ///
+  /// Readable without constructing the service — a surface deciding
+  /// whether to offer an amenities filter must not have to build an HTTP
+  /// client to find out.
+  static ProviderCapability? capabilityFor(String countryCode) =>
+      _byCode[countryCode]?.capability;
 
   /// Ordered list of fuel types for [countryCode], or the default minimal
   /// set when the code is unregistered. Mirrors the historical
