@@ -937,4 +937,59 @@ void main() {
               '${dupes.map((e) => '"${e.key}" -> ${e.value}').join('; ')}');
     });
   });
+  group('#4161 — production promotion is gated on a driven artifact', () {
+    late String train;
+
+    setUpAll(() {
+      train = File('.github/workflows/release-train.yml').readAsStringSync();
+    });
+
+    test('the release train takes a validated_build input', () {
+      expect(train, contains('validated_build:'));
+    });
+
+    test('a production-artifact-gate job exists', () {
+      expect(train, contains('production-artifact-gate:'));
+    });
+
+    test('android-production CANNOT run without the gate', () {
+      // The whole point: a forgotten checklist must block the promotion
+      // rather than file a note. If this `needs` is ever dropped, the
+      // gate becomes decorative.
+      final idx = train.indexOf('  android-production:');
+      expect(idx, greaterThan(0));
+      final block = train.substring(idx, idx + 400);
+      expect(block, contains('needs: [production-artifact-gate]'));
+    });
+
+    test('the gate refuses an empty value', () {
+      expect(train, contains(r'if [ -z "${VALIDATED}" ]'));
+      expect(train, contains('exit 1'));
+    });
+
+    test('the checklist it points at exists and names the #3590 path', () {
+      final doc = File('docs/guides/production-artifact-gate.md');
+      expect(doc.existsSync(), isTrue);
+      final text = doc.readAsStringSync();
+      // The gate is only worth as much as the steps behind it.
+      expect(text, contains('Start a recording'));
+      expect(text, contains('Stop the recording'));
+      expect(text, contains('#3590'));
+      expect(text, contains('Open Testing'),
+          reason: 'a sideloaded build has none of the transformation this '
+              'gate exists to exercise');
+    });
+
+    test('the F-Droid release dex-scan gate is still wired', () {
+      // #4161 adds a gate; it does not replace the one that covers the
+      // other end of the artifact matrix.
+      for (final wf in ['fdroid.yml', 'fdroid-publish.yml']) {
+        final text =
+            File('.github/workflows/$wf').readAsStringSync();
+        expect(text, contains('audit_no_gms.sh'), reason: wf);
+        expect(text, contains('app-fdroid-release.apk'), reason: wf);
+      }
+    });
+  });
+
 }

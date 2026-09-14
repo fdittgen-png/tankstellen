@@ -42,6 +42,13 @@ on:
         description: 'Release notes (Play + TestFlight; per-version changelogs used when empty)'
         required: false
         type: string
+      validated_build:
+        description: >-
+          PRODUCTION ONLY (#4161): the Play-signed beta build number you
+          drove through docs/guides/production-artifact-gate.md. Blank
+          blocks the promotion.
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -63,8 +70,44 @@ jobs:
       release_notes: ${{ inputs.release_notes }}
     secrets: inherit
 
+  # #4161 — the artifact users install is not the artifact CI tests. Play's
+  # Automatic Integrity Protection rewrites the uploaded APK, and #3590
+  # crashed in exactly that rewritten layer: no debug, profile or
+  # sideloaded build contained the transformation, so nothing local could
+  # reproduce it.
+  #
+  # CI cannot drive a Play-signed install (it needs a device with Play
+  # Services, which the F-Droid flavour deliberately cannot use), so the
+  # gate is a RECORDED checklist rather than an automation that would
+  # silently test the wrong artifact. Blank input ⇒ this job fails ⇒
+  # `android-production` never runs.
+  production-artifact-gate:
+    if: (inputs.channel || 'beta') == 'production'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: The Play-signed artifact must have been driven
+        env:
+          VALIDATED: ${{ inputs.validated_build }}
+        run: |
+          set -euo pipefail
+          if [ -z "${VALIDATED}" ]; then
+            echo "::error::Production promotion blocked (#4161)."
+            echo "::error::No validated_build given. Run the checklist in"
+            echo "::error::docs/guides/production-artifact-gate.md against the"
+            echo "::error::Play-signed beta, then re-dispatch with its build number."
+            exit 1
+          fi
+          if ! printf '%s' "${VALIDATED}" | grep -Eq '^[0-9]{6,}$'; then
+            echo "::error::validated_build='${VALIDATED}' is not a Play versionCode."
+            exit 1
+          fi
+          echo "Play-signed artifact ${VALIDATED} recorded as driven." \
+            >> "$GITHUB_STEP_SUMMARY"
+
   android-production:
     if: (inputs.channel || 'beta') == 'production'
+    needs: [production-artifact-gate]
     uses: ./.github/workflows/promote-release.yml
     with:
       from_track: beta
