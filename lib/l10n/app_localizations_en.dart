@@ -579,6 +579,17 @@ class AppLocalizationsEn extends AppLocalizations {
       'A few more fill-ups and Sparkilo can tell you what you are saving';
 
   @override
+  String criteriaMoreFilters(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'More filters ($count)',
+      zero: 'More filters',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get allStations => 'All stations';
 
   @override
@@ -9871,6 +9882,17 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get savingsNeedsHistory =>
       '⟦Á ƒéŵ ɱóřé ƒîłł-úƥš áñđ Šƥářķîłó çáñ ŧéłł ýóú ŵĥáŧ ýóú ářé šáṽîñǧ ·······················⟧';
+
+  @override
+  String criteriaMoreFilters(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'More filters ($count)',
+      zero: 'More filters',
+    );
+    return '⟦$_temp0⟧';
+  }
 
   @override
   String get allStations => '⟦Áłł šŧáŧîóñš ·····⟧';

@@ -579,6 +579,17 @@ class AppLocalizationsDa extends AppLocalizations {
       'A few more fill-ups and Sparkilo can tell you what you are saving';
 
   @override
+  String criteriaMoreFilters(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'More filters ($count)',
+      zero: 'More filters',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get allStations => 'Alle stationer';
 
   @override

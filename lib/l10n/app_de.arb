@@ -261,6 +261,7 @@
   "savingsNet": "{amount} netto über {count, plural, =1{1 Tankfüllung} other{{count} Tankfüllungen}}",
   "savingsReference": "Dein Üblicher: {price} pro Liter, {litres} pro Tankfüllung",
   "savingsNeedsHistory": "Noch ein paar Tankvorgänge, dann zeigt Sparkilo dir deine Ersparnis",
+  "criteriaMoreFilters": "{count, plural, =0{Weitere Filter} other{Weitere Filter ({count})}}",
   "allStations": "Alle Stationen",
   "bestStops": "Beste Stopps",
   "openInMaps": "In Karten öffnen",

@@ -205,6 +205,16 @@ void main() {
 
       expect(container.read(selectedAmenitiesProvider), isEmpty);
 
+      // #4166 — Équipements is collapsed until asked for, so the real
+      // flow is one tap to reveal it. The count in the header is what
+      // keeps that honest; see `criteria_refinements_test.dart`.
+      final moreFilters = find.textContaining('More filters');
+      if (moreFilters.evaluate().isNotEmpty) {
+        await tester.ensureVisible(moreFilters.first);
+        await tester.tap(moreFilters.first);
+        await tester.pumpAndSettle();
+      }
+
       final shopChip = find.byKey(const ValueKey('criteria-amenity-shop'));
       await tester.ensureVisible(shopChip);
       await tester.pump();
@@ -247,6 +257,14 @@ void main() {
       ];
 
       await pumpApp(tester, const SearchCriteriaScreen(), overrides: overrides);
+
+      // #4166 — reveal Équipements first; it is collapsed by default.
+      final moreFilters = find.textContaining('More filters');
+      if (moreFilters.evaluate().isNotEmpty) {
+        await tester.ensureVisible(moreFilters.first);
+        await tester.tap(moreFilters.first);
+        await tester.pumpAndSettle();
+      }
 
       // Select the "Air" amenity chip so we can assert it gets persisted.
       final airChip = find.byKey(const ValueKey('criteria-amenity-airPump'));

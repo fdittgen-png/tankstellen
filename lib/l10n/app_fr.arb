@@ -6155,5 +6155,13 @@
       }
     }
   },
-  "savingsNeedsHistory": "Encore quelques pleins et Sparkilo vous dira ce que vous économisez"
+  "savingsNeedsHistory": "Encore quelques pleins et Sparkilo vous dira ce que vous économisez",
+  "criteriaMoreFilters": "{count, plural, =0{Plus de filtres} other{Plus de filtres ({count})}}",
+  "@criteriaMoreFilters": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

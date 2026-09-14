@@ -291,6 +291,8 @@
   "@savingsReference": {"description": "The baseline the savings are measured against (#4150) — the median over the last 90 days, stated so the arithmetic can be checked.", "placeholders": {"price": {"type": "String"}, "litres": {"type": "String"}}},
   "savingsNeedsHistory": "A few more fill-ups and Sparkilo can tell you what you are saving",
   "@savingsNeedsHistory": {"description": "Empty state for the savings card (#4136): below the minimum sample count there is no honest baseline, so no number is shown rather than a computed-looking zero."},
+  "criteriaMoreFilters": "{count, plural, =0{More filters} other{More filters ({count})}}",
+  "@criteriaMoreFilters": {"description": "The collapsed refinements section of the search form (#4166). The COUNT is the point: a user whose results are narrow can see why without expanding, so collapsing never hides an active filter.", "placeholders": {"count": {"type": "int"}}},
   "allStations": "All stations",
   "bestStops": "Best stops",
   "openInMaps": "Open in Maps",

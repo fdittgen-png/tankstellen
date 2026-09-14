@@ -581,6 +581,17 @@ class AppLocalizationsDe extends AppLocalizations {
       'Noch ein paar Tankvorgänge, dann zeigt Sparkilo dir deine Ersparnis';
 
   @override
+  String criteriaMoreFilters(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Weitere Filter ($count)',
+      zero: 'Weitere Filter',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get allStations => 'Alle Stationen';
 
   @override

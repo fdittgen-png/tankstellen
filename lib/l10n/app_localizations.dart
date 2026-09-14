@@ -1149,6 +1149,12 @@ abstract class AppLocalizations {
   /// **'A few more fill-ups and Sparkilo can tell you what you are saving'**
   String get savingsNeedsHistory;
 
+  /// The collapsed refinements section of the search form (#4166). The COUNT is the point: a user whose results are narrow can see why without expanding, so collapsing never hides an active filter.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{More filters} other{More filters ({count})}}'**
+  String criteriaMoreFilters(int count);
+
   /// No description provided for @allStations.
   ///
   /// In en, this message translates to:

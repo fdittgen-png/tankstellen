@@ -6591,5 +6591,15 @@
   "@savingsNeedsHistory": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "criteriaMoreFilters": "{count, plural, =0{More filters} other{More filters ({count})}}",
+  "@criteriaMoreFilters": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }
