@@ -23,6 +23,7 @@ import '../../domain/entities/consumption_stats.dart';
 import '../../domain/entities/fill_up.dart';
 import '../../providers/consumption_providers.dart';
 import 'consumption_stats_card.dart';
+import 'savings_card.dart';
 import 'edit_correction_fill_up_sheet.dart';
 import 'fill_inventory_card.dart';
 import 'fill_up_card.dart';
@@ -96,6 +97,10 @@ class FuelTab extends ConsumerWidget {
         // comparison + evolution charts).
         onTap: () => context.push(RoutePaths.consumptionStats),
       ),
+      // #4136 — directly under the consumption figures, because it is
+      // the same story told in money: what the driving cost, and what
+      // buying it well was worth.
+      const SavingsCard(),
       // #3648 — the per-tank insight loop (recordings-vs-pump comparison,
       // #3616) moved to the Trajets tab: the Carburant tab is purely
       // fill-and-tank, everything recording-derived lives with the trips.

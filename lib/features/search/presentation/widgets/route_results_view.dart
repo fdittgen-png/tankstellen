@@ -4,7 +4,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/utils/best_stops.dart';
-import '../../../../core/utils/duration_formatter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../../core/navigation/app_routes.dart';
@@ -26,12 +25,13 @@ import '../../../../core/domain/search_result_item.dart';
 import '../../providers/ignored_stations_provider.dart';
 import '../../providers/search_provider.dart';
 import '../../../profile/providers/profile_provider.dart';
-import '../../../../core/widgets/selectable_pill.dart';
+import 'refuel_plan_card.dart';
+import 'route_results_header.dart';
 import 'ev_station_card.dart';
 import 'station_card.dart';
 
 /// View mode toggle for route search results.
-enum RouteResultMode { allStations, bestStops }
+enum RouteResultMode { allStations, bestStops, plan }
 
 /// Displays route search results as a sliver list with an all/best-stops
 /// toggle and dismissible station cards (swipe to navigate or hide).
@@ -97,6 +97,26 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
         final allFuelStations = visibleStations
             .whereType<FuelStationResult>()
             .toList();
+        // #4146 — the plan is not a filter over the list, it is a
+        // different answer: where the trip must stop given the tank. So
+        // it replaces the rows rather than shortening them.
+        if (_resultMode == RouteResultMode.plan) {
+          return SliverList(
+            delegate: SliverChildListDelegate.fixed([
+              RouteResultsHeader(
+                result: result,
+                shownCount: result.stations.length,
+                mode: _resultMode,
+                onModeChanged: (m) => setState(() => _resultMode = m),
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+                child: RefuelPlanCard(),
+              ),
+            ]),
+          );
+        }
+
         final displayItems = _resultMode == RouteResultMode.bestStops
             ? _filterBestStops(allFuelStations, result)
             : visibleStations;
@@ -105,8 +125,12 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
           delegate: SliverChildBuilderDelegate(
             (context, index) {
               if (index == 0) {
-                return _buildHeader(
-                    context, l10n, result, displayItems.length);
+                return RouteResultsHeader(
+                  result: result,
+                  shownCount: displayItems.length,
+                  mode: _resultMode,
+                  onModeChanged: (m) => setState(() => _resultMode = m),
+                );
               }
               final item = displayItems[index - 1];
               if (item is FuelStationResult) {
@@ -130,83 +154,6 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
           error: error,
           onRetry: () => ref.read(routeSearchStateProvider.notifier).clear(),
         ),
-      ),
-    );
-  }
-
-  /// Route info header with distance/duration and all/best-stops toggle.
-  Widget _buildHeader(
-    BuildContext context,
-    AppLocalizations l10n,
-    RouteSearchResult result,
-    int shownCount,
-  ) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // #2622 — de-densify: the route summary and the All/Best toggle
-          // share ONE row (summary left, pills right) and wrap when narrow.
-          // The "Every {km} km" segment row was a verbatim duplicate of the
-          // SearchSummaryBar's second chip (same routeSegmentSummaryBadge
-          // key); it stays visible there, so it is dropped from the header.
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            alignment: WrapAlignment.spaceBetween,
-            spacing: 8,
-            runSpacing: 6,
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.route, size: 16, color: theme.colorScheme.primary),
-                  const SizedBox(width: 8),
-                  Text(
-                    // #4125 — count the rows THIS LIST is showing.
-                    // It read `result.stations.length`: the raw service
-                    // result, before the swipe-away ignore filter and
-                    // before the All/Best toggle. So "108 stations" stood
-                    // above whatever the toggle had left — 7 curated stops
-                    // under "Meilleurs arrêts" — and the one number on the
-                    // screen described neither state of the screen. Three
-                    // counts were in play for one route (108 results, 55
-                    // fuel stations on the map, 7 best stops); each
-                    // surface now counts what it renders.
-                    '${result.route.distanceKm.round()} km · '
-                    '${formatTravelDuration(l10n, result.route.durationMinutes)} · '
-                    '${l10n.routeStationCount(shownCount)}',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SelectablePill(
-                    label: l10n.allStations,
-                    icon: Icons.local_gas_station,
-                    selected: _resultMode == RouteResultMode.allStations,
-                    onTap: () => setState(
-                      () => _resultMode = RouteResultMode.allStations,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  SelectablePill(
-                    label: l10n.bestStops,
-                    icon: Icons.star,
-                    selected: _resultMode == RouteResultMode.bestStops,
-                    onTap: () =>
-                        setState(() => _resultMode = RouteResultMode.bestStops),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }

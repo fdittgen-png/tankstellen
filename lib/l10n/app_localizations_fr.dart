@@ -502,6 +502,95 @@ class AppLocalizationsFr extends AppLocalizations {
   String get wrongStatusClosed => 'Affiché fermé, mais ouvert';
 
   @override
+  String get refuelPlanTab => 'Plan';
+
+  @override
+  String get refuelPlanCheapestTitle => 'Trajet le moins cher';
+
+  @override
+  String get refuelPlanFastestTitle => 'Trajet le plus rapide';
+
+  @override
+  String refuelPlanStopCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count arrêts',
+      one: '1 arrêt',
+      zero: 'Aucun arrêt nécessaire',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String refuelPlanTotal(String cost, String perKm) {
+    return '$cost au total · $perKm/km';
+  }
+
+  @override
+  String refuelPlanStopLine(String litres, String cost) {
+    return 'Faire $litres — $cost';
+  }
+
+  @override
+  String refuelPlanGap(String from, String to) {
+    return 'Aucune station à portée entre $from et $to';
+  }
+
+  @override
+  String get refuelPlanNeedsConsumption =>
+      'Ajoutez quelques pleins et Sparkilo planifiera vos arrêts';
+
+  @override
+  String get refuelPlanNeedsTank =>
+      'Renseignez la capacité de votre réservoir pour planifier les arrêts';
+
+  @override
+  String get refuelPlanNeedsPrices =>
+      'Aucune station de ce trajet n\'affiche de prix pour votre carburant';
+
+  @override
+  String get decisionConfidentLead => 'Le meilleur arrêt pour vous';
+
+  @override
+  String get decisionConfidentWhy =>
+      'Ouverte maintenant, prix du jour, calculé sur votre propre consommation';
+
+  @override
+  String get savingsTitle => 'Par rapport à votre prix habituel';
+
+  @override
+  String savingsNet(String amount, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pleins',
+      one: '1 plein',
+    );
+    return '$amount net sur $_temp0';
+  }
+
+  @override
+  String savingsReference(String price, String litres) {
+    return 'Votre habituel : $price le litre, $litres par plein';
+  }
+
+  @override
+  String get savingsNeedsHistory =>
+      'Encore quelques pleins et Sparkilo vous dira ce que vous économisez';
+
+  @override
+  String criteriaMoreFilters(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Plus de filtres ($count)',
+      zero: 'Plus de filtres',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get allStations => 'Toutes les stations';
 
   @override

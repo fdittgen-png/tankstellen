@@ -1053,6 +1053,108 @@ abstract class AppLocalizations {
   /// **'Shown as closed, but open'**
   String get wrongStatusClosed;
 
+  /// Third pill on the route results, beside All stations and Best stops (#4146). Names the mode that plans WHERE the trip must stop given the tank, rather than listing stations.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan'**
+  String get refuelPlanTab;
+
+  /// The plan that minimises total money — fuel bought plus the driving the detours cost (#4146).
+  ///
+  /// In en, this message translates to:
+  /// **'Cheapest trip'**
+  String get refuelPlanCheapestTitle;
+
+  /// The plan that minimises time — fewest stops, smallest detours (#4146).
+  ///
+  /// In en, this message translates to:
+  /// **'Fastest trip'**
+  String get refuelPlanFastestTitle;
+
+  /// How many refuelling stops a plan needs (#4146). Zero is a real and good answer — the tank covers the trip.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No stop needed} =1{1 stop} other{{count} stops}}'**
+  String refuelPlanStopCount(int count);
+
+  /// A plan's total cost and its cost per kilometre (#4146). Both are money, already formatted with the currency.
+  ///
+  /// In en, this message translates to:
+  /// **'{cost} total · {perKm}/km'**
+  String refuelPlanTotal(String cost, String perKm);
+
+  /// One stop of a plan: the litres to buy there and what they cost (#4146). 'Just enough to reach a cheaper station' is a real instruction, so this is often not a full tank.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy {litres} — {cost}'**
+  String refuelPlanStopLine(String litres, String cost);
+
+  /// The route cannot be driven on this tank (#4146). Names the stretch rather than returning a plan that would strand the driver.
+  ///
+  /// In en, this message translates to:
+  /// **'No station in range between {from} and {to}'**
+  String refuelPlanGap(String from, String to);
+
+  /// Blocker: no measured consumption, so range cannot be computed (#4146). Never defaulted — range is the whole constraint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a few fill-ups and Sparkilo can plan your stops'**
+  String get refuelPlanNeedsConsumption;
+
+  /// Blocker: no tank capacity on the vehicle (#4146).
+  ///
+  /// In en, this message translates to:
+  /// **'Set your tank size to plan refuelling stops'**
+  String get refuelPlanNeedsTank;
+
+  /// Blocker: candidates exist but none is priced for the selected fuel (#4146).
+  ///
+  /// In en, this message translates to:
+  /// **'No station on this route has a price for your fuel'**
+  String get refuelPlanNeedsPrices;
+
+  /// Heading above the decision rows when Best Value is confident enough to LEAD (spec §3.1, #4139) — measured consumption, station open now, price under 24 h old. Absent when any gate fails, and the three rankings then speak for themselves.
+  ///
+  /// In en, this message translates to:
+  /// **'Best stop for you'**
+  String get decisionConfidentLead;
+
+  /// The one line that makes the #4139 lead explainable: the three gates that let it be stated as an answer rather than one ranking of three.
+  ///
+  /// In en, this message translates to:
+  /// **'Open now, price from the last day, and measured on your own consumption'**
+  String get decisionConfidentWhy;
+
+  /// Heading of the savings card (#4136). Names the REFERENCE, because a saving with no stated reference is not reproducible (economics spec trust rule 4).
+  ///
+  /// In en, this message translates to:
+  /// **'Against your usual price'**
+  String get savingsTitle;
+
+  /// The savings card's headline: the NET across every counted fill, wins and misses alike. Signed on purpose — a wins-only total would be a lie of omission.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} net over {count, plural, =1{1 fill} other{{count} fills}}'**
+  String savingsNet(String amount, int count);
+
+  /// The baseline the savings are measured against (#4150) — the median over the last 90 days, stated so the arithmetic can be checked.
+  ///
+  /// In en, this message translates to:
+  /// **'Your usual: {price} per litre, {litres} per fill'**
+  String savingsReference(String price, String litres);
+
+  /// Empty state for the savings card (#4136): below the minimum sample count there is no honest baseline, so no number is shown rather than a computed-looking zero.
+  ///
+  /// In en, this message translates to:
+  /// **'A few more fill-ups and Sparkilo can tell you what you are saving'**
+  String get savingsNeedsHistory;
+
+  /// The collapsed refinements section of the search form (#4166). The COUNT is the point: a user whose results are narrow can see why without expanding, so collapsing never hides an active filter.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{More filters} other{More filters ({count})}}'**
+  String criteriaMoreFilters(int count);
+
   /// No description provided for @allStations.
   ///
   /// In en, this message translates to:

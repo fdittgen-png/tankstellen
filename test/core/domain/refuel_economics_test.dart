@@ -9,6 +9,7 @@ import 'package:tankstellen/core/domain/refuel_economics.dart';
 /// The spec's §4 trust rules are the point of this file: a recommendation
 /// the user cannot reproduce is worse than none. Each rule has a group.
 void main() {
+  _confidentPickTests();
   // The spec's worked example, so the documented arithmetic and the code
   // can never drift apart silently.
   const specCandidate = RefuelCandidate(
@@ -331,6 +332,85 @@ void main() {
         expect(d.cheapest!.candidate.stationId, 'a');
         expect(d.closest!.candidate.stationId, 'a');
       }
+    });
+  });
+}
+
+/// #4139 — the conditional lead (spec §3.1).
+///
+/// The UI may present Best Value AS the answer, rather than as one of
+/// three rankings, only when the inputs are good enough to defend it.
+/// Each gate below is one of the objections §5 raised when it ruled a
+/// fourth ranking out; admitting them as GATES rather than weights is
+/// what makes the lead explainable in a sentence.
+void _confidentPickTests() {
+  RefuelCandidate candidate({
+    bool? open = true,
+    Duration? age = const Duration(hours: 2),
+    double price = 1.60,
+  }) =>
+      RefuelCandidate(
+        stationId: 's',
+        oneWayKm: 2,
+        pricePerLitre: price,
+        isRoadDistance: true,
+        isOpenNow: open,
+        priceAge: age,
+      );
+
+  RefuelDecision decide({
+    bool estimated = false,
+    bool? open = true,
+    Duration? age = const Duration(hours: 2),
+  }) =>
+      RefuelEconomics.decide(
+        [candidate(open: open, age: age)],
+        RefuelProfile(
+          consumptionLPer100km: 6.5,
+          consumptionIsEstimated: estimated,
+        ),
+      );
+
+  group('RefuelDecision.confidentPick (#4139)', () {
+    test('leads when every gate holds', () {
+      expect(decide().confidentPick, isNotNull);
+    });
+
+    test('never leads on an ESTIMATED consumption', () {
+      // Trust rule 2: an answer built on a model must not read as a
+      // measurement, and leading is exactly that claim.
+      expect(decide(estimated: true).confidentPick, isNull);
+      expect(decide(estimated: true).bestValue, isNotNull,
+          reason: 'the RANKING is still valid — only the lead is withheld');
+    });
+
+    test('never leads at a closed station', () {
+      expect(decide(open: false).confidentPick, isNull);
+    });
+
+    test('never leads when openness is unknown', () {
+      // #3198's tri-state: unknown is not open. A confident answer at a
+      // forecourt that turns out to be shut is the failure §5 named.
+      expect(decide(open: null).confidentPick, isNull);
+    });
+
+    test('never leads on a stale price', () {
+      expect(decide(age: const Duration(hours: 30)).confidentPick, isNull);
+    });
+
+    test('never leads when the price age is unknown', () {
+      expect(decide(age: null).confidentPick, isNull);
+    });
+
+    test('the gates never change the ranking itself', () {
+      // A gate decides whether the answer is stated, never what it is —
+      // the difference between §3.1 and the blended score §5 refuses.
+      final open = decide();
+      final closed = decide(open: false);
+      expect(closed.bestValue!.candidate.stationId,
+          open.bestValue!.candidate.stationId);
+      expect(closed.bestValue!.effectivePricePerLitre,
+          open.bestValue!.effectivePricePerLitre);
     });
   });
 }

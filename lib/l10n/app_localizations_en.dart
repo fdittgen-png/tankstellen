@@ -501,6 +501,95 @@ class AppLocalizationsEn extends AppLocalizations {
   String get wrongStatusClosed => 'Shown as closed, but open';
 
   @override
+  String get refuelPlanTab => 'Plan';
+
+  @override
+  String get refuelPlanCheapestTitle => 'Cheapest trip';
+
+  @override
+  String get refuelPlanFastestTitle => 'Fastest trip';
+
+  @override
+  String refuelPlanStopCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stops',
+      one: '1 stop',
+      zero: 'No stop needed',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String refuelPlanTotal(String cost, String perKm) {
+    return '$cost total · $perKm/km';
+  }
+
+  @override
+  String refuelPlanStopLine(String litres, String cost) {
+    return 'Buy $litres — $cost';
+  }
+
+  @override
+  String refuelPlanGap(String from, String to) {
+    return 'No station in range between $from and $to';
+  }
+
+  @override
+  String get refuelPlanNeedsConsumption =>
+      'Add a few fill-ups and Sparkilo can plan your stops';
+
+  @override
+  String get refuelPlanNeedsTank =>
+      'Set your tank size to plan refuelling stops';
+
+  @override
+  String get refuelPlanNeedsPrices =>
+      'No station on this route has a price for your fuel';
+
+  @override
+  String get decisionConfidentLead => 'Best stop for you';
+
+  @override
+  String get decisionConfidentWhy =>
+      'Open now, price from the last day, and measured on your own consumption';
+
+  @override
+  String get savingsTitle => 'Against your usual price';
+
+  @override
+  String savingsNet(String amount, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fills',
+      one: '1 fill',
+    );
+    return '$amount net over $_temp0';
+  }
+
+  @override
+  String savingsReference(String price, String litres) {
+    return 'Your usual: $price per litre, $litres per fill';
+  }
+
+  @override
+  String get savingsNeedsHistory =>
+      'A few more fill-ups and Sparkilo can tell you what you are saving';
+
+  @override
+  String criteriaMoreFilters(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'More filters ($count)',
+      zero: 'More filters',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get allStations => 'All stations';
 
   @override
@@ -9715,6 +9804,95 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get wrongStatusClosed => '⟦Šĥóŵñ áš çłóšéđ, ƀúŧ óƥéñ ·········⟧';
+
+  @override
+  String get refuelPlanTab => '⟦Ƥłáñ ··⟧';
+
+  @override
+  String get refuelPlanCheapestTitle => '⟦Çĥéáƥéšŧ ŧřîƥ ·····⟧';
+
+  @override
+  String get refuelPlanFastestTitle => '⟦Ƒášŧéšŧ ŧřîƥ ·····⟧';
+
+  @override
+  String refuelPlanStopCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stops',
+      one: '1 stop',
+      zero: 'No stop needed',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String refuelPlanTotal(String cost, String perKm) {
+    return '⟦$cost ŧóŧáł · $perKm/ķɱ ···⟧';
+  }
+
+  @override
+  String refuelPlanStopLine(String litres, String cost) {
+    return '⟦Ɓúý $litres — $cost ·⟧';
+  }
+
+  @override
+  String refuelPlanGap(String from, String to) {
+    return '⟦Ñó šŧáŧîóñ îñ řáñǧé ƀéŧŵééñ $from áñđ $to ············⟧';
+  }
+
+  @override
+  String get refuelPlanNeedsConsumption =>
+      '⟦Áđđ á ƒéŵ ƒîłł-úƥš áñđ Šƥářķîłó çáñ ƥłáñ ýóúř šŧóƥš ··················⟧';
+
+  @override
+  String get refuelPlanNeedsTank =>
+      '⟦Šéŧ ýóúř ŧáñķ šîžé ŧó ƥłáñ řéƒúéłłîñǧ šŧóƥš ················⟧';
+
+  @override
+  String get refuelPlanNeedsPrices =>
+      '⟦Ñó šŧáŧîóñ óñ ŧĥîš řóúŧé ĥáš á ƥřîçé ƒóř ýóúř ƒúéł ··················⟧';
+
+  @override
+  String get decisionConfidentLead => '⟦Ɓéšŧ šŧóƥ ƒóř ýóú ······⟧';
+
+  @override
+  String get decisionConfidentWhy =>
+      '⟦Óƥéñ ñóŵ, ƥřîçé ƒřóɱ ŧĥé łášŧ đáý, áñđ ɱéášúřéđ óñ ýóúř óŵñ çóñšúɱƥŧîóñ ··························⟧';
+
+  @override
+  String get savingsTitle => '⟦Áǧáîñšŧ ýóúř úšúáł ƥřîçé ·········⟧';
+
+  @override
+  String savingsNet(String amount, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fills',
+      one: '1 fill',
+    );
+    return '⟦$amount ñéŧ óṽéř $_temp0 ···⟧';
+  }
+
+  @override
+  String savingsReference(String price, String litres) {
+    return '⟦Ýóúř úšúáł: $price ƥéř łîŧřé, $litres ƥéř ƒîłł ···········⟧';
+  }
+
+  @override
+  String get savingsNeedsHistory =>
+      '⟦Á ƒéŵ ɱóřé ƒîłł-úƥš áñđ Šƥářķîłó çáñ ŧéłł ýóú ŵĥáŧ ýóú ářé šáṽîñǧ ·······················⟧';
+
+  @override
+  String criteriaMoreFilters(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'More filters ($count)',
+      zero: 'More filters',
+    );
+    return '⟦$_temp0⟧';
+  }
 
   @override
   String get allStations => '⟦Áłł šŧáŧîóñš ·····⟧';

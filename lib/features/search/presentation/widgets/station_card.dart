@@ -2,19 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
-import '../../../../core/country/country_config.dart';
 import '../../../../core/theme/app_text.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/price_tier.dart';
-import '../../../../core/utils/station_extensions.dart';
-import '../../../../core/domain/brand_appearance.dart';
 import '../../../../core/widgets/station_card_shell.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../trips/api.dart';
-import '../../../station_detail/presentation/widgets/station_brand_helpers.dart';
-import '../../domain/entities/brand_registry.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/station.dart';
 import '../../../../core/widgets/amenity_summary.dart';
@@ -22,6 +17,7 @@ import '../../../../core/widgets/amenity_summary.dart';
 import 'station_card_badges.dart';
 import 'station_card_price_column.dart';
 import 'station_card_price_row.dart';
+import 'station_presentation.dart';
 import 'station_card_status.dart';
 
 /// One station in the results list, laid out against the visual grammar
@@ -146,106 +142,28 @@ class StationCard extends StatelessWidget {
     this.showSeparator = true,
   });
 
-  /// True if the station has a real brand name (not empty, not generic "Station")
-  /// Defers to the shared [hasRealBrand] helper so the search card and
-  /// the detail screen agree on what counts as a brand (#2061). The
-  /// helper excludes the legacy `'Station'` sentinel + the
-  /// `BrandRegistry.independentLabel` (`'Independent'` from #482).
-  /// `'Autoroute'` is a synthetic motorway tag, kept excluded here.
-  bool get _hasBrand => hasRealBrand(station) && station.brand != 'Autoroute';
-
-  double? get _displayPrice => station.priceFor(selectedFuelType);
-
-  /// The country this station sits in (#514 / #516) — id prefix first,
-  /// then a bounding-box match on its coordinates. Resolved once and used
-  /// for both the currency symbol and the #2717 pump-grade naming.
-  CountryConfig? get _country => Countries.countryForStation(
-    id: station.id,
-    lat: station.lat,
-    lng: station.lng,
-  );
-
-  /// #4124 — the pump code to show beside the price, or null when the
-  /// price IS the fuel the user asked for.
-  ///
-  /// #2400 settled this question and `shortFuelLabel` was written for it;
-  /// the caller that used it was lost somewhere since, which is how a
-  /// French E85 at 0,82 came to sit directly above a Spanish E5 at 1,62
-  /// with nothing to tell the two numbers apart. The wildcard is excluded
-  /// on purpose: a user who asked for "any fuel" already expects whatever
-  /// the forecourt sells, so every row would wear a label and none of
-  /// them would mean anything.
-  String? get _substitutedFuelLabel {
-    final requested = requestedFuelType;
-    if (requested == null || requested == selectedFuelType) return null;
-    if (requested == FuelType.all) return null;
-    // Nothing to qualify when there is no number to qualify.
-    if (_displayPrice == null) return null;
-    return fuelDisplayLabel(selectedFuelType, countryCode: _country?.code);
-  }
-
-  /// The offline brand mark for this row (#3931), or `null` when the
-  /// station has no recognised brand.
-  ///
-  /// Deliberately absent rather than neutral for an unknown brand: a
-  /// column of identical grey pump boxes down a result list is noise,
-  /// and the row already names the station. The mark only appears where
-  /// it carries information — the colour the driver recognises from the
-  /// forecourt sign.
-  BrandAppearance? get _brandMark =>
-      _hasBrand ? BrandAppearance.of(station.brand) : null;
-
-  /// Resolve the per-litre loyalty discount that applies to this
-  /// station, or `null` if no card matches (#1120 pilot). The lookup
-  /// is canonical-brand → discount, so the caller doesn't have to
-  /// know about the raw API brand strings.
-  double? get _loyaltyDiscount {
-    final discounts = activeDiscountsByBrand;
-    if (discounts == null || discounts.isEmpty) return null;
-    final canonical = BrandRegistry.canonicalize(station.brand);
-    if (canonical == null) return null;
-    final discount = discounts[canonical];
-    if (discount == null || discount <= 0) return null;
-    return discount;
-  }
-
-  /// Per-station currency symbol derived from the station's origin
-  /// country (#514 / #516). The resolution order is:
-  ///
-  /// 1. Id prefix (`uk-`, `pt-`, `mx-`, …) for services that tag
-  ///    their ids with a country code.
-  /// 2. Bounding-box match on `lat` / `lng` — catches raw upstream
-  ///    ids (DE Tankerkoenig UUIDs, FR Prix-Carburants numeric ids,
-  ///    AT E-Control, ES MITECO, IT MISE) and repairs legacy
-  ///    favorites saved before the prefix scheme existed.
-  ///
-  /// Returns `null` when neither path resolves — the caller falls
-  /// back to the globally-set active profile currency.
-  String? get _stationCurrency => _country?.currencySymbol;
-
-  /// #2926 — title fallback brand → name → localized "Unbranded station".
-  /// The raw street is NEVER the title: it is the address line below, so
-  /// promoting it to the title read as a broken duplicate (e.g. "26 AVENUE DE
-  /// VERDUN" shown as the station "name", repeated on the next line). An
-  /// unbranded forecourt that carries a real name (e.g. a Mexican CRE company
-  /// name) still shows that name; one with no brand AND no name gets the
-  /// localized label, and the street drops to the address line instead.
-  String _titleText(AppLocalizations l10n) {
-    if (_hasBrand) return station.brand;
-    if (station.name.isNotEmpty) return station.name;
-    return l10n.stationUnbrandedTitle;
-  }
+  /// #4133 — every value this row shows, derived once. The card used to
+  /// compute price, discount, currency, brand fallback and the #4124 fuel
+  /// label itself, and so did the map marker, the map sheet and the
+  /// favourites row — each a little differently. See
+  /// [StationPresentation] for why that kept producing bugs.
+  StationPresentation _presentation(AppLocalizations l10n) =>
+      StationPresentation.of(
+        station,
+        selectedFuelType: selectedFuelType,
+        requestedFuelType: requestedFuelType,
+        activeDiscountsByBrand: activeDiscountsByBrand,
+        l10n: l10n,
+      );
 
   @override
   Widget build(BuildContext context) {
-    final price = _displayPrice;
-    final currencyOverride = _stationCurrency;
-    final substitutedFuelLabel = _substitutedFuelLabel;
-    final formattedPrice = PriceFormatter.formatPrice(
-      price,
-      currencyOverride: currencyOverride,
-    );
     final l10n = AppLocalizations.of(context);
+    final p = _presentation(l10n);
+    final formattedPrice = PriceFormatter.formatPrice(
+      p.price,
+      currencyOverride: p.currencySymbol,
+    );
     // #3198 — tri-state: an unknown open state is announced as unknown,
     // never as closed (and never as open).
     final semanticStatus = switch (station.isOpen) {
@@ -254,13 +172,13 @@ class StationCard extends StatelessWidget {
       null => l10n.openStateUnknown,
     };
     final semanticLabel = <String>[
-      _hasBrand ? station.brand : station.name,
+      p.hasBrand ? station.brand : station.name,
       station.street,
       formattedPrice,
       // #4124 — a screen reader gets the whole sentence, not the pump
       // code: "E5" read out after a price says nothing on its own.
-      if (substitutedFuelLabel != null)
-        l10n.priceIsForFuel(substitutedFuelLabel),
+      if (p.substitutedFuelLabel case final label?)
+        l10n.priceIsForFuel(label),
       semanticStatus,
       // #3949 — the 24 h flag left the visible chrome for the status dot's
       // tooltip; the row's own label keeps announcing it.
@@ -275,7 +193,6 @@ class StationCard extends StatelessWidget {
     // cheapest row. Every other card gets the frame's own hairline.
     final stripeColor =
         isCheapest ? DarkModeColors.success(context) : null;
-    final titleText = _titleText(l10n);
 
     return Semantics(
       label: semanticLabel,
@@ -301,18 +218,14 @@ class StationCard extends StatelessWidget {
             children: [
               StationCardHeadlineRow(
                 station: station,
-                brandMark: _brandMark,
-                price: price,
-                currencyOverride: currencyOverride,
+                presentation: p,
                 isFavorite: isFavorite,
                 isCheapest: isCheapest,
                 priceTier: priceTier,
-                loyaltyDiscount: _loyaltyDiscount,
                 onFavoriteTap: onFavoriteTap,
-                substitutedFuelLabel: substitutedFuelLabel,
               ),
               const SizedBox(height: Spacing.xs),
-              _TitleLine(text: titleText, rating: rating),
+              _TitleLine(text: p.title, rating: rating),
               // #4091 — where it is and how far, on one line. The full
               // postal address moved to the detail screen: nobody picks a
               // forecourt by its house number.

@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/utils/best_stops.dart';
+import '../../../../core/widgets/shell_bottom_inset.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -203,7 +204,11 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
               }
             }),
           ),
-        RouteInfoBar(
+        // #4147 — the bar carries CONTROLS, so it clears the chrome the
+        // map is allowed to paint behind. Without this its two actions
+        // land on the Android gesture strip.
+        ShellBottomInset(
+          child: RouteInfoBar(
           distanceKm: result.route.distanceKm,
           durationMinutes: result.route.durationMinutes,
           stationCountLabel: _viewMode == RouteViewMode.bestStops
@@ -211,6 +216,7 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
               : (l10n.nStations(allFuelStations.length)),
           onSaveRoute: () => _showSaveRouteDialog(context, result),
           onOpenInMaps: () => _openSelectedInMaps(result),
+          ),
         ),
       ],
     );

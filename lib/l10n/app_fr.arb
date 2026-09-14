@@ -6082,5 +6082,86 @@
   },
   "storageKeyLostTitle": "Les données restaurées sont illisibles",
   "storageKeyLostMessage": "Cette installation a été restaurée depuis une sauvegarde : les données de Sparkilo sont revenues, mais pas la clé qui les déverrouille. Android conserve cette clé dans le matériel sécurisé du téléphone ; elle ne peut ni être copiée vers un autre appareil ni être restaurée depuis une sauvegarde.",
-  "storageKeyLostGuidance": "L'historique restauré est irrécupérable. Videz le stockage de l'application dans les réglages de l'appareil pour repartir de zéro — connectez-vous ensuite à TankSync et tout ce que vous aviez synchronisé revient."
+  "storageKeyLostGuidance": "L'historique restauré est irrécupérable. Videz le stockage de l'application dans les réglages de l'appareil pour repartir de zéro — connectez-vous ensuite à TankSync et tout ce que vous aviez synchronisé revient.",
+  "refuelPlanTab": "Plan",
+  "refuelPlanCheapestTitle": "Trajet le moins cher",
+  "refuelPlanFastestTitle": "Trajet le plus rapide",
+  "refuelPlanStopCount": "{count, plural, =0{Aucun arrêt nécessaire} =1{1 arrêt} other{{count} arrêts}}",
+  "@refuelPlanStopCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "refuelPlanTotal": "{cost} au total · {perKm}/km",
+  "@refuelPlanTotal": {
+    "placeholders": {
+      "cost": {
+        "type": "String"
+      },
+      "perKm": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelPlanStopLine": "Faire {litres} — {cost}",
+  "@refuelPlanStopLine": {
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      },
+      "cost": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelPlanGap": "Aucune station à portée entre {from} et {to}",
+  "@refuelPlanGap": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelPlanNeedsConsumption": "Ajoutez quelques pleins et Sparkilo planifiera vos arrêts",
+  "refuelPlanNeedsTank": "Renseignez la capacité de votre réservoir pour planifier les arrêts",
+  "refuelPlanNeedsPrices": "Aucune station de ce trajet n'affiche de prix pour votre carburant",
+  "decisionConfidentLead": "Le meilleur arrêt pour vous",
+  "decisionConfidentWhy": "Ouverte maintenant, prix du jour, calculé sur votre propre consommation",
+  "savingsTitle": "Par rapport à votre prix habituel",
+  "savingsNet": "{amount} net sur {count, plural, =1{1 plein} other{{count} pleins}}",
+  "@savingsNet": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savingsReference": "Votre habituel : {price} le litre, {litres} par plein",
+  "@savingsReference": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "savingsNeedsHistory": "Encore quelques pleins et Sparkilo vous dira ce que vous économisez",
+  "criteriaMoreFilters": "{count, plural, =0{Plus de filtres} other{Plus de filtres ({count})}}",
+  "@criteriaMoreFilters": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

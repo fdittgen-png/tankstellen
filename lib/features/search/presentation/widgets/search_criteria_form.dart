@@ -16,6 +16,7 @@ import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
 import '../../providers/search_screen_ui_provider.dart';
 import 'amenity_filter_wrap.dart';
+import 'criteria_refinements.dart';
 import 'brand_filter_chips.dart';
 import '../../../../core/help/help_anchors.dart';
 import '../../../../core/help/help_dot.dart';
@@ -155,6 +156,13 @@ class SearchCriteriaForm extends ConsumerWidget {
             secondary: const Icon(Icons.schedule),
           ),
           const SizedBox(height: 4),
+          // #4166 — the decision (mode, where, fuel, radius, open now)
+          // stays above. Équipements and Marques are the bulky sections
+          // most searches never touch, and they were costing every user
+          // a scroll on every search.
+          CriteriaRefinements(
+            activeCount: amenities.length,
+            children: [
           CriteriaSectionHeader(l10n.amenities,
               anchor: HelpAnchor.searchAmenities),
           const SizedBox(height: 4),
@@ -177,6 +185,8 @@ class SearchCriteriaForm extends ConsumerWidget {
                 ],
               );
             },
+          ),
+            ],
           ),
           const SizedBox(height: 16),
           if (disabledReason case final reason?) ...[

@@ -697,6 +697,31 @@ void main() {
     );
   });
 
+  group('ConsumptionStatsCard — €/km leads (#4135)', () {
+    testWidgets('cost per km is the FIRST stat, litres the second',
+        (tester) async {
+      // Both numbers were already on this card at equal weight, and
+      // nothing said which one mattered. €/km is what closes the loop
+      // between a cheaper station and a cheaper month, so it reads first.
+      //
+      // Emphasis by POSITION, deliberately. A larger €/km was tried and
+      // reverted: #3950 makes the stat figures the card's focal numbers,
+      // tied with each other, so a bigger one here would break that tie
+      // in this panel and nowhere else.
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(
+          stats: _stats(avgConsumptionL100km: 6.4, avgCostPerKm: 0.105),
+        ),
+      );
+
+      final euro = tester.getTopLeft(find.byIcon(Icons.euro));
+      final speed = tester.getTopLeft(find.byIcon(Icons.speed));
+      expect(euro.dy, speed.dy, reason: 'same row, so the order is the x');
+      expect(euro.dx, lessThan(speed.dx));
+    });
+  });
+
   // ─── #3950 (Epic #3947) — the visual grammar ────────────────────────
   //
   // The panel's stat figures are its focal numbers: a display-derived

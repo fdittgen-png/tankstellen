@@ -23,9 +23,14 @@
 /// distance, as it must be.
 library;
 
-import 'dart:math' as math;
 
 import 'package:meta/meta.dart';
+
+import 'refuel_decision.dart';
+
+// Re-exported so every existing caller keeps one import: the split
+// (#4139) is an internal seam, not a change to this layer's contract.
+export 'refuel_decision.dart';
 
 /// The default litres a refuel is assumed to buy when the user has no
 /// fill-up history to measure (#4089).
@@ -50,6 +55,14 @@ const double kCrowFliesRoadFactor = 1.3;
 /// not on the way to anywhere.
 const double kRoundTripFactor = 2;
 
+/// How fresh a price must be for Best Value to LEAD rather than merely
+/// rank (spec §3.1, #4139).
+///
+/// A day: every source the app uses refreshes at least daily, so a price
+/// older than this is one the provider itself has stopped standing
+/// behind.
+const Duration kConfidentPickMaxPriceAge = Duration(hours: 24);
+
 /// One way — the station is on a route the user is driving anyway, so
 /// only the deviation counts. The route layer supplies the real
 /// deviation as a road distance.
@@ -63,6 +76,8 @@ class RefuelCandidate {
     required this.oneWayKm,
     this.pricePerLitre,
     this.isRoadDistance = false,
+    this.isOpenNow,
+    this.priceAge,
   });
 
   final String stationId;
@@ -80,17 +95,31 @@ class RefuelCandidate {
   /// factor applies.
   final bool isRoadDistance;
 
+  /// Whether the station is open right now, or null when unknown (#4139).
+  ///
+  /// Never used in the ARITHMETIC — it gates whether Best Value may LEAD
+  /// (spec §3.1). A confident recommendation at a closed forecourt is the
+  /// failure §5 named as costing more trust than the optimisation buys.
+  final bool? isOpenNow;
+
+  /// How old the price is, or null when unknown (#4139). Gates the lead
+  /// for the same reason; never enters the cost.
+  final Duration? priceAge;
+
   @override
   bool operator ==(Object other) =>
       other is RefuelCandidate &&
       other.stationId == stationId &&
       other.oneWayKm == oneWayKm &&
       other.pricePerLitre == pricePerLitre &&
-      other.isRoadDistance == isRoadDistance;
+      other.isRoadDistance == isRoadDistance &&
+      other.isOpenNow == isOpenNow &&
+      other.priceAge == priceAge;
 
   @override
   int get hashCode =>
-      Object.hash(stationId, oneWayKm, pricePerLitre, isRoadDistance);
+      Object.hash(stationId, oneWayKm, pricePerLitre, isRoadDistance,
+          isOpenNow, priceAge);
 }
 
 /// The vehicle and intent side of the calculation.
@@ -181,107 +210,6 @@ class RefuelQuote {
   /// Kept so [effectivePricePerLitre] does not need the profile again.
   double get _litres =>
       cost!.purchaseCost / (candidate.pricePerLitre ?? 1);
-}
-
-/// Which question a station is the answer to.
-enum RefuelRanking {
-  /// Lowest price per litre — pure price, no arithmetic.
-  cheapest,
-
-  /// Least driving.
-  closest,
-
-  /// Lowest effective price per litre — price and detour together.
-  bestValue,
-}
-
-/// The three answers, and nothing claiming to be THE answer.
-///
-/// The UI presents all three with their reasons; it never tells the user
-/// one station is objectively best (spec §3). [bestValue] is null
-/// exactly when the profile could not support the calculation, which the
-/// UI must surface as a reason rather than hide.
-@immutable
-class RefuelDecision {
-  const RefuelDecision({
-    required this.profile,
-    required this.quotes,
-    this.cheapest,
-    this.closest,
-    this.bestValue,
-  });
-
-  final RefuelProfile profile;
-
-  /// Every candidate, costed, in input order.
-  final List<RefuelQuote> quotes;
-
-  final RefuelQuote? cheapest;
-  final RefuelQuote? closest;
-  final RefuelQuote? bestValue;
-
-  /// False when no Best Value could be computed — the UI states why
-  /// instead of showing a recommendation it cannot justify.
-  bool get valueRankingAvailable => bestValue != null;
-
-  /// The rankings [stationId] holds, so the UI can collapse a station
-  /// that is several answers at once into one row instead of repeating
-  /// it three times.
-  Set<RefuelRanking> rankingsFor(String stationId) => {
-        if (cheapest?.candidate.stationId == stationId)
-          RefuelRanking.cheapest,
-        if (closest?.candidate.stationId == stationId) RefuelRanking.closest,
-        if (bestValue?.candidate.stationId == stationId)
-          RefuelRanking.bestValue,
-      };
-
-  /// The distinct stations worth presenting, best-value first, then
-  /// cheapest, then closest — each appearing once.
-  List<RefuelQuote> get distinctPicks {
-    final seen = <String>{};
-    return [
-      for (final q in [bestValue, cheapest, closest])
-        if (q != null && seen.add(q.candidate.stationId)) q,
-    ];
-  }
-
-  /// What choosing [quote] over [reference] saves, in currency, at the
-  /// profile's quantity. Negative means it costs more. Null when either
-  /// side has no cost.
-  double? savings(RefuelQuote quote, RefuelQuote reference) {
-    final a = quote.cost, b = reference.cost;
-    if (a == null || b == null) return null;
-    return b.totalCost - a.totalCost;
-  }
-
-  /// Extra kilometres [quote] costs over [reference]. Never negative —
-  /// a nearer pick simply has no extra driving to declare.
-  double extraTravelKm(RefuelQuote quote, RefuelQuote reference) {
-    final a = quote.cost?.travelKm, b = reference.cost?.travelKm;
-    if (a == null || b == null) return 0;
-    return math.max(0, a - b);
-  }
-
-  /// The quantity at which [quote] starts beating [reference] — the
-  /// honest form of "only worth the detour if you buy at least this
-  /// much".
-  ///
-  /// Null when the question does not arise: either side unpriced, no
-  /// consumption, [quote] not actually cheaper per litre, or [quote]
-  /// already winning at any quantity (it is cheaper AND no further).
-  double? breakEvenLitres(RefuelQuote quote, RefuelQuote reference) {
-    final pS = quote.candidate.pricePerLitre;
-    final pK = reference.candidate.pricePerLitre;
-    final cS = quote.cost, cK = reference.cost;
-    final c = profile.consumptionLPer100km;
-    if (pS == null || pK == null || cS == null || cK == null || c == null) {
-      return null;
-    }
-    if (pK <= pS) return null; // not the cheaper one; nothing to justify
-    final numerator = (c / 100) * (cS.travelKm * pS - cK.travelKm * pK);
-    if (numerator <= 0) return null; // wins at any quantity
-    return numerator / (pK - pS);
-  }
 }
 
 /// The calculation. One entry point, no state.

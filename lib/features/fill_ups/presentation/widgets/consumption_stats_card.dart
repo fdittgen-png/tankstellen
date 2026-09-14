@@ -15,6 +15,7 @@ import '../../../feature_management/api.dart';
 import '../../domain/entities/consumption_stats.dart';
 import '../../providers/pending_reconciliation_provider.dart';
 import 'confidence_tier_badge.dart';
+import 'consumption_stat_tile.dart';
 import 'pump_gain_chip.dart';
 import 'resolve_gap_banner.dart';
 import '../../../../core/utils/unit_formatter.dart';
@@ -165,25 +166,35 @@ class ConsumptionStatsCard extends ConsumerWidget {
             ),
           ],
           const SizedBox(height: Spacing.lg),
+          // #4135 — cost per kilometre reads FIRST. Both numbers were
+          // already here at equal weight, and nothing said which one
+          // mattered; €/km is what closes the loop between a cheaper
+          // station and a cheaper month, so it takes the leading slot.
+          //
+          // Emphasis by POSITION, not by type size: #3950's visual
+          // grammar makes the stat figures the card's focal numbers, tied
+          // with each other and topping the title and every caption. A
+          // bigger €/km would have broken that tie here and nowhere else,
+          // leaving this panel inconsistent with every other one.
           Row(
             children: [
               Expanded(
-                child: _StatTile(
-                  icon: Icons.speed,
-                  label: l.statAvgConsumption,
-                  value: avgConsumption != null
-                      ? UnitFormatter.formatDecimal(avgConsumption, fractionDigits: 2)
-                      : '—',
-                ),
-              ),
-              const SizedBox(width: Spacing.md),
-              Expanded(
-                child: _StatTile(
+                child: ConsumptionStatTile(
                   icon: Icons.euro,
                   label: l.statAvgCostPerKm,
                   // #2491 — locale-aware 3 dp via formatPerKm.
                   value: avgCostKm != null
                       ? PriceFormatter.formatPerKm(avgCostKm)
+                      : '—',
+                ),
+              ),
+              const SizedBox(width: Spacing.md),
+              Expanded(
+                child: ConsumptionStatTile(
+                  icon: Icons.speed,
+                  label: l.statAvgConsumption,
+                  value: avgConsumption != null
+                      ? UnitFormatter.formatDecimal(avgConsumption, fractionDigits: 2)
                       : '—',
                 ),
               ),
@@ -193,7 +204,7 @@ class ConsumptionStatsCard extends ConsumerWidget {
           Row(
             children: [
               Expanded(
-                child: _StatTile(
+                child: ConsumptionStatTile(
                   icon: Icons.local_gas_station,
                   label: l.statTotalLiters,
                   value: UnitFormatter.formatDecimal(stats.totalLiters),
@@ -201,7 +212,7 @@ class ConsumptionStatsCard extends ConsumerWidget {
               ),
               const SizedBox(width: Spacing.md),
               Expanded(
-                child: _StatTile(
+                child: ConsumptionStatTile(
                   icon: Icons.payments_outlined,
                   label: l.statTotalSpent,
                   // #2491 — locale-aware 2 dp + currency symbol.
@@ -217,7 +228,7 @@ class ConsumptionStatsCard extends ConsumerWidget {
             Row(
               children: [
                 Expanded(
-                  child: _StatTile(
+                  child: ConsumptionStatTile(
                     icon: Icons.format_list_numbered,
                     label: l.statFillUpCount,
                     value: '${stats.fillUpCount}',
@@ -265,6 +276,6 @@ class ConsumptionStatsCard extends ConsumerWidget {
 }
 
 // The three private decoration widgets (_OpenWindowBanner,
-// _CorrectionShareHint, _StatTile) live in the
+// _CorrectionShareHint, ConsumptionStatTile) live in the
 // `part`'d consumption_stats_card_parts.dart so this file stays under
 // the 400-line cap (#2698 / file_length_test).
