@@ -20,6 +20,7 @@ import '../../features/station_services/spain/miteco_station_service.dart';
 import '../../features/station_services/uk/uk_service_builder.dart';
 import '../country/country_bounding_box.dart';
 import '../domain/fuel_type.dart';
+import 'country_capabilities.dart';
 import 'country_service_entry.dart';
 import 'country_service_policies.dart';
 import 'service_result.dart';
@@ -79,6 +80,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
       FuelType.lpg, FuelType.electric, FuelType.all,
     ],
     policy: kPtPolicy,
+    capability: kPtCapability,
   ),
   CountryServiceEntry(
     countryCode: 'GB',
@@ -96,6 +98,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
       FuelType.electric, FuelType.all,
     ],
     policy: kUkPolicy,
+    capability: kUkCapability,
   ),
   CountryServiceEntry(
     countryCode: 'DK',
@@ -112,6 +115,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
       FuelType.dieselPremium, FuelType.electric, FuelType.all,
     ],
     policy: kDkPolicy,
+    capability: kDkCapability,
   ),
   CountryServiceEntry(
     countryCode: 'LU',
@@ -129,6 +133,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
       FuelType.lpg, FuelType.electric, FuelType.all,
     ],
     policy: kLuPolicy,
+    capability: kLuCapability,
   ),
   CountryServiceEntry(
     countryCode: 'SI',
@@ -149,6 +154,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
       FuelType.electric, FuelType.all,
     ],
     policy: kSiPolicy,
+    capability: kSiCapability,
   ),
   // ── Continental EU (test order matters for shadow neighbours) ─────
   CountryServiceEntry(
@@ -164,6 +170,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
       FuelType.e5, FuelType.diesel, FuelType.electric, FuelType.all,
     ],
     policy: kAtPolicy,
+    capability: kAtCapability,
   ),
   CountryServiceEntry(
     countryCode: 'FR',
@@ -180,6 +187,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
       FuelType.e85, FuelType.lpg, FuelType.electric, FuelType.all,
     ],
     policy: kFrPolicy,
+    capability: kFrCapability,
   ),
   CountryServiceEntry(
     countryCode: 'IT',
@@ -194,6 +202,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
       FuelType.electric, FuelType.all,
     ],
     policy: kItPolicy,
+    capability: kItCapability,
   ),
   CountryServiceEntry(
     countryCode: 'ES',
@@ -210,6 +219,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
       FuelType.all,
     ],
     policy: kEsPolicy,
+    capability: kEsCapability,
   ),
   CountryServiceEntry(
     countryCode: 'DE',
@@ -222,6 +232,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
     // DE: Tankerkönig publishes E5, E10, Diesel.
     availableFuelTypes: kDefaultFuelTypes,
     policy: kDePolicy,
+    capability: kDeCapability,
   ),
   // ── Non-EU countries (no overlap concerns) ─────────────────────────
   CountryServiceEntry(
@@ -240,6 +251,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
       FuelType.electric, FuelType.all,
     ],
     policy: kMxPolicy,
+    capability: kMxCapability,
   ),
   // CL before AR: Chile's narrow strip sits inside AR's generous
   // longitude range along the cordillera (#596).
@@ -257,6 +269,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
       FuelType.lpg, FuelType.electric, FuelType.all,
     ],
     policy: kClPolicy,
+    capability: kClCapability,
   ),
   CountryServiceEntry(
     countryCode: 'AR',
@@ -274,6 +287,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
       FuelType.all,
     ],
     policy: kArPolicy,
+    capability: kArCapability,
   ),
   CountryServiceEntry(
     countryCode: 'AU',
@@ -293,6 +307,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
       FuelType.lpg, FuelType.electric, FuelType.all,
     ],
     policy: kAuPolicy,
+    capability: kAuCapability,
   ),
   CountryServiceEntry(
     countryCode: 'KR',
@@ -310,6 +325,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
       FuelType.lpg, FuelType.electric, FuelType.all,
     ],
     policy: kKrPolicy,
+    capability: kKrCapability,
   ),
   CountryServiceEntry(
     countryCode: 'GR',
@@ -327,6 +343,7 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
       FuelType.lpg, FuelType.electric, FuelType.all,
     ],
     policy: kGrPolicy,
+    capability: kGrCapability,
   ),
   CountryServiceEntry(
     countryCode: 'RO',
@@ -346,5 +363,6 @@ const List<CountryServiceEntry> kCountryServiceEntries = [
       FuelType.all,
     ],
     policy: kRoPolicy,
+    capability: kRoCapability,
   ),
 ];

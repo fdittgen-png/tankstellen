@@ -5,6 +5,7 @@ import '../../../core/telemetry/health_counters.dart';
 import '../../trips/api.dart';
 import 'trip_distance_source.dart';
 import 'virtual_odometer.dart';
+import '../../../core/domain/data_value.dart';
 
 /// Owns the trip's distance-resolution concern — the pure, async-free,
 /// stream-free three-tier selection between the car's odometer delta, a
@@ -164,6 +165,32 @@ class TripDistanceResolver {
     if (_gpsTrackDistanceKm() != null) return kDistanceSourceGps;
     return kDistanceSourceVirtual;
   }
+
+  /// A recorded distance in the app-wide provenance shape (#4160).
+  ///
+  /// [TripSummary.distanceSource] is a persisted string and stays one —
+  /// it is written into backups and read back by
+  /// `backup_xml_reader.dart`, so changing its storage shape would be a
+  /// migration for no gain. This is the view a rendering or analytics
+  /// path takes instead:
+  ///
+  ///  * [kDistanceSourceReal] — the car's own odometer, the ground truth;
+  ///  * [kDistanceSourceGps] — a haversine-summed track. Still an
+  ///    observation, just a different instrument, so still [Measured];
+  ///  * [kDistanceSourceVirtual] — [VirtualOdometer] integration of
+  ///    speed over time. Computed from other measured values and never
+  ///    observed directly, which is [DataBasis.derived] exactly.
+  ///
+  /// An unrecognised string is [DataUnknownReason.unreadable] rather than
+  /// a guess: a backup written by a future version must not have its
+  /// distance silently promoted to measured.
+  static DataValue<double> distanceAsDataValue(double km, String source) =>
+      switch (source) {
+        kDistanceSourceReal || kDistanceSourceGps => DataValue.measured(km),
+        kDistanceSourceVirtual =>
+          DataValue.estimated(km, basis: DataBasis.derived),
+        _ => const DataValue.unknown(reason: DataUnknownReason.unreadable),
+      };
 
   /// `odometerLatest - odometerStart` if both are present and the delta is
   /// above a small noise-floor epsilon (0.05 km — half the 0.1 km

@@ -4198,6 +4198,58 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String dataApproximate(String value) {
+    return '≈ $value';
+  }
+
+  @override
+  String dataStale(String value, String age) {
+    return '$value (vor $age)';
+  }
+
+  @override
+  String dataLastSeen(String age) {
+    return 'Zuletzt vor $age gesehen';
+  }
+
+  @override
+  String get dataUnknownProvider =>
+      'Diese Datenquelle veröffentlicht das nicht';
+
+  @override
+  String get dataUnknownItem => 'Für diese Tankstelle nicht veröffentlicht';
+
+  @override
+  String get dataUnknownNotMeasured => 'Noch nicht gemessen';
+
+  @override
+  String get dataUnknownVehicle => 'Fehlt in deinem Fahrzeug';
+
+  @override
+  String get dataUnknownUnreadable =>
+      'Die Datenquelle hat etwas Unlesbares geliefert';
+
+  @override
+  String get dataBasisCatalog => 'Herstellerangabe';
+
+  @override
+  String get dataBasisFleetAverage => 'Klassendurchschnitt';
+
+  @override
+  String get dataBasisDerived => 'Aus anderen Werten abgeleitet';
+
+  @override
+  String get decisionLeadCaveatHours =>
+      'für dieses Land werden keine Öffnungszeiten veröffentlicht';
+
+  @override
+  String get decisionLeadCaveatPriceAge =>
+      'diese Quelle nennt nicht, wann der Preis gesetzt wurde';
+
+  @override
+  String get decisionLeadCaveatSeparator => ' · ';
+
+  @override
   String get developerToolsSectionTitle => 'Entwicklerwerkzeuge';
 
   @override

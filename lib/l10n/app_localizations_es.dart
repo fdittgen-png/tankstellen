@@ -4197,6 +4197,57 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String dataApproximate(String value) {
+    return '≈ $value';
+  }
+
+  @override
+  String dataStale(String value, String age) {
+    return '$value ($age old)';
+  }
+
+  @override
+  String dataLastSeen(String age) {
+    return 'Last seen $age ago';
+  }
+
+  @override
+  String get dataUnknownProvider => 'This data source doesn\'t publish it';
+
+  @override
+  String get dataUnknownItem => 'Not published for this station';
+
+  @override
+  String get dataUnknownNotMeasured => 'Not measured yet';
+
+  @override
+  String get dataUnknownVehicle => 'Missing from your vehicle';
+
+  @override
+  String get dataUnknownUnreadable =>
+      'The data source sent something unreadable';
+
+  @override
+  String get dataBasisCatalog => 'Manufacturer figure';
+
+  @override
+  String get dataBasisFleetAverage => 'Class average';
+
+  @override
+  String get dataBasisDerived => 'Derived from other figures';
+
+  @override
+  String get decisionLeadCaveatHours =>
+      'opening hours aren\'t published for this country';
+
+  @override
+  String get decisionLeadCaveatPriceAge =>
+      'this source doesn\'t say when the price was set';
+
+  @override
+  String get decisionLeadCaveatSeparator => ' · ';
+
+  @override
   String get developerToolsSectionTitle => 'Herramientas de desarrollo';
 
   @override

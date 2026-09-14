@@ -17,6 +17,14 @@ part of 'refuel_decision_provider.dart';
 /// recommendation changes with it, which is the only honest behaviour
 /// when the header claims to name the best of what is on screen.
 ///
+/// #4156 — `isOpen` and `updatedAt` reach the gates through the
+/// country's `ProviderCapability`, not raw. A `bool?` read "unknown as
+/// closed", which meant the conditional lead could never fire in the
+/// eleven countries whose source publishes no hours at all. The
+/// capability separates "this provider publishes none" (a gate that
+/// stands down, with a caveat) from "this provider publishes them and
+/// left this row blank" (a gate that still blocks).
+///
 /// EV rows are excluded. The economics is litres and L/100 km; a charger
 /// has neither, and inventing a conversion to keep it in the ranking
 /// would be exactly the fabricated authority `docs/specs/refuel-
@@ -38,6 +46,14 @@ final refuelDecisionProvider = RefuelDecisionFamily._();
 /// recommendation changes with it, which is the only honest behaviour
 /// when the header claims to name the best of what is on screen.
 ///
+/// #4156 — `isOpen` and `updatedAt` reach the gates through the
+/// country's `ProviderCapability`, not raw. A `bool?` read "unknown as
+/// closed", which meant the conditional lead could never fire in the
+/// eleven countries whose source publishes no hours at all. The
+/// capability separates "this provider publishes none" (a gate that
+/// stands down, with a caveat) from "this provider publishes them and
+/// left this row blank" (a gate that still blocks).
+///
 /// EV rows are excluded. The economics is litres and L/100 km; a charger
 /// has neither, and inventing a conversion to keep it in the ranking
 /// would be exactly the fabricated authority `docs/specs/refuel-
@@ -58,6 +74,14 @@ final class RefuelDecisionProvider
   /// what the user is actually looking at: hide a brand and the
   /// recommendation changes with it, which is the only honest behaviour
   /// when the header claims to name the best of what is on screen.
+  ///
+  /// #4156 — `isOpen` and `updatedAt` reach the gates through the
+  /// country's `ProviderCapability`, not raw. A `bool?` read "unknown as
+  /// closed", which meant the conditional lead could never fire in the
+  /// eleven countries whose source publishes no hours at all. The
+  /// capability separates "this provider publishes none" (a gate that
+  /// stands down, with a caveat) from "this provider publishes them and
+  /// left this row blank" (a gate that still blocks).
   ///
   /// EV rows are excluded. The economics is litres and L/100 km; a charger
   /// has neither, and inventing a conversion to keep it in the ranking
@@ -120,7 +144,7 @@ final class RefuelDecisionProvider
   }
 }
 
-String _$refuelDecisionHash() => r'002419ce85d370a9331095199ac9e05c5a4a3d6a';
+String _$refuelDecisionHash() => r'751d5183b5c52c642ffdb8696bf323ba82a49656';
 
 /// The three answers for the current result set (#4090, epic #4087).
 ///
@@ -128,6 +152,14 @@ String _$refuelDecisionHash() => r'002419ce85d370a9331095199ac9e05c5a4a3d6a';
 /// what the user is actually looking at: hide a brand and the
 /// recommendation changes with it, which is the only honest behaviour
 /// when the header claims to name the best of what is on screen.
+///
+/// #4156 — `isOpen` and `updatedAt` reach the gates through the
+/// country's `ProviderCapability`, not raw. A `bool?` read "unknown as
+/// closed", which meant the conditional lead could never fire in the
+/// eleven countries whose source publishes no hours at all. The
+/// capability separates "this provider publishes none" (a gate that
+/// stands down, with a caveat) from "this provider publishes them and
+/// left this row blank" (a gate that still blocks).
 ///
 /// EV rows are excluded. The economics is litres and L/100 km; a charger
 /// has neither, and inventing a conversion to keep it in the ranking
@@ -157,6 +189,14 @@ final class RefuelDecisionFamily extends $Family
   /// what the user is actually looking at: hide a brand and the
   /// recommendation changes with it, which is the only honest behaviour
   /// when the header claims to name the best of what is on screen.
+  ///
+  /// #4156 — `isOpen` and `updatedAt` reach the gates through the
+  /// country's `ProviderCapability`, not raw. A `bool?` read "unknown as
+  /// closed", which meant the conditional lead could never fire in the
+  /// eleven countries whose source publishes no hours at all. The
+  /// capability separates "this provider publishes none" (a gate that
+  /// stands down, with a caveat) from "this provider publishes them and
+  /// left this row blank" (a gate that still blocks).
   ///
   /// EV rows are excluded. The economics is litres and L/100 km; a charger
   /// has neither, and inventing a conversion to keep it in the ranking

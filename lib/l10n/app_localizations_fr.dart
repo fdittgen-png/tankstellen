@@ -4213,6 +4213,57 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String dataApproximate(String value) {
+    return '≈ $value';
+  }
+
+  @override
+  String dataStale(String value, String age) {
+    return '$value (il y a $age)';
+  }
+
+  @override
+  String dataLastSeen(String age) {
+    return 'Vu il y a $age';
+  }
+
+  @override
+  String get dataUnknownProvider => 'Cette source de données ne le publie pas';
+
+  @override
+  String get dataUnknownItem => 'Non publié pour cette station';
+
+  @override
+  String get dataUnknownNotMeasured => 'Pas encore mesuré';
+
+  @override
+  String get dataUnknownVehicle => 'Absent de votre véhicule';
+
+  @override
+  String get dataUnknownUnreadable =>
+      'La source de données a renvoyé quelque chose d\'illisible';
+
+  @override
+  String get dataBasisCatalog => 'Valeur constructeur';
+
+  @override
+  String get dataBasisFleetAverage => 'Moyenne de la catégorie';
+
+  @override
+  String get dataBasisDerived => 'Déduit d\'autres valeurs';
+
+  @override
+  String get decisionLeadCaveatHours =>
+      'les horaires d\'ouverture ne sont pas publiés pour ce pays';
+
+  @override
+  String get decisionLeadCaveatPriceAge =>
+      'cette source n\'indique pas quand le prix a été relevé';
+
+  @override
+  String get decisionLeadCaveatSeparator => ' · ';
+
+  @override
   String get developerToolsSectionTitle => 'Outils de développement';
 
   @override

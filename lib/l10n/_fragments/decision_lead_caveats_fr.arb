@@ -1,0 +1,5 @@
+{
+  "decisionLeadCaveatHours": "les horaires d'ouverture ne sont pas publiés pour ce pays",
+  "decisionLeadCaveatPriceAge": "cette source n'indique pas quand le prix a été relevé",
+  "decisionLeadCaveatSeparator": " · "
+}

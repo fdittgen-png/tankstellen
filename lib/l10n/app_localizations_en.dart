@@ -4157,6 +4157,57 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String dataApproximate(String value) {
+    return '≈ $value';
+  }
+
+  @override
+  String dataStale(String value, String age) {
+    return '$value ($age old)';
+  }
+
+  @override
+  String dataLastSeen(String age) {
+    return 'Last seen $age ago';
+  }
+
+  @override
+  String get dataUnknownProvider => 'This data source doesn\'t publish it';
+
+  @override
+  String get dataUnknownItem => 'Not published for this station';
+
+  @override
+  String get dataUnknownNotMeasured => 'Not measured yet';
+
+  @override
+  String get dataUnknownVehicle => 'Missing from your vehicle';
+
+  @override
+  String get dataUnknownUnreadable =>
+      'The data source sent something unreadable';
+
+  @override
+  String get dataBasisCatalog => 'Manufacturer figure';
+
+  @override
+  String get dataBasisFleetAverage => 'Class average';
+
+  @override
+  String get dataBasisDerived => 'Derived from other figures';
+
+  @override
+  String get decisionLeadCaveatHours =>
+      'opening hours aren\'t published for this country';
+
+  @override
+  String get decisionLeadCaveatPriceAge =>
+      'this source doesn\'t say when the price was set';
+
+  @override
+  String get decisionLeadCaveatSeparator => ' · ';
+
+  @override
   String get developerToolsSectionTitle => 'Developer tools';
 
   @override
@@ -13557,6 +13608,58 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String mapAttributionOsm(String brand) {
     return '⟦© $brand çóñŧřîƀúŧóřš ·····⟧';
   }
+
+  @override
+  String dataApproximate(String value) {
+    return '⟦≈ $value⟧';
+  }
+
+  @override
+  String dataStale(String value, String age) {
+    return '⟦$value ($age ółđ) ·⟧';
+  }
+
+  @override
+  String dataLastSeen(String age) {
+    return '⟦Łášŧ šééñ $age áǧó ·····⟧';
+  }
+
+  @override
+  String get dataUnknownProvider =>
+      '⟦Ŧĥîš đáŧá šóúřçé đóéšñ\'ŧ ƥúƀłîšĥ îŧ ·············⟧';
+
+  @override
+  String get dataUnknownItem => '⟦Ñóŧ ƥúƀłîšĥéđ ƒóř ŧĥîš šŧáŧîóñ ············⟧';
+
+  @override
+  String get dataUnknownNotMeasured => '⟦Ñóŧ ɱéášúřéđ ýéŧ ······⟧';
+
+  @override
+  String get dataUnknownVehicle => '⟦Ṁîššîñǧ ƒřóɱ ýóúř ṽéĥîçłé ··········⟧';
+
+  @override
+  String get dataUnknownUnreadable =>
+      '⟦Ŧĥé đáŧá šóúřçé šéñŧ šóɱéŧĥîñǧ úñřéáđáƀłé ················⟧';
+
+  @override
+  String get dataBasisCatalog => '⟦Ṁáñúƒáçŧúřéř ƒîǧúřé ········⟧';
+
+  @override
+  String get dataBasisFleetAverage => '⟦Çłášš áṽéřáǧé ·····⟧';
+
+  @override
+  String get dataBasisDerived => '⟦Đéřîṽéđ ƒřóɱ óŧĥéř ƒîǧúřéš ··········⟧';
+
+  @override
+  String get decisionLeadCaveatHours =>
+      '⟦óƥéñîñǧ ĥóúřš ářéñ\'ŧ ƥúƀłîšĥéđ ƒóř ŧĥîš çóúñŧřý ··················⟧';
+
+  @override
+  String get decisionLeadCaveatPriceAge =>
+      '⟦ŧĥîš šóúřçé đóéšñ\'ŧ šáý ŵĥéñ ŧĥé ƥřîçé ŵáš šéŧ ·················⟧';
+
+  @override
+  String get decisionLeadCaveatSeparator => '⟦ · ⟧';
 
   @override
   String get developerToolsSectionTitle => '⟦Đéṽéłóƥéř ŧóółš ······⟧';

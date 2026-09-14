@@ -1,0 +1,14 @@
+{
+  "decisionLeadCaveatHours": "opening hours aren't published for this country",
+  "@decisionLeadCaveatHours": {
+    "description": "Caveat under the confident lead: the country's data source publishes no opening hours, so nobody checked whether the station is open (#4156)."
+  },
+  "decisionLeadCaveatPriceAge": "this source doesn't say when the price was set",
+  "@decisionLeadCaveatPriceAge": {
+    "description": "Caveat under the confident lead: the country's data source stamps no prices, so the age we know is our own download time (#4156)."
+  },
+  "decisionLeadCaveatSeparator": " · ",
+  "@decisionLeadCaveatSeparator": {
+    "description": "Joins two lead caveats on one line. A separator, not a sentence — locales that prefer a comma may change it (#4156)."
+  }
+}

@@ -5,6 +5,7 @@ import '../country/country_bounding_box.dart';
 import '../domain/fuel_type.dart';
 import 'country_service_dependencies.dart';
 import 'fuel_service_policy.dart';
+import 'provider_capability.dart';
 import 'service_result.dart';
 import 'station_service.dart';
 
@@ -78,6 +79,19 @@ class CountryServiceEntry {
   /// Whether this country requires a user-provided API key.
   final bool requiresApiKey;
 
+  /// What this country's upstream can actually support (#4156).
+  ///
+  /// REQUIRED, and deliberately so: the acceptance criterion "a test
+  /// fails when a country is added without one" is best satisfied by the
+  /// compiler. A capability nobody can forget to declare is a contract;
+  /// an optional one is documentation.
+  ///
+  /// Distinct from [policy], which is a *fetch* policy — how often we may
+  /// ask, and whether the source is a bulk file. This says what the data
+  /// supports and how far it may be trusted, which is what every consumer
+  /// was previously assuming the best case about.
+  final ProviderCapability capability;
+
   /// Typed data-source policy (#2264) — the single source of truth for the
   /// cache TTLs and rate-limit interval the service layer reads. The
   /// `StationServiceChain` branches on [FuelServicePolicy.model] to decide
@@ -103,6 +117,7 @@ class CountryServiceEntry {
     required this.boundingBox,
     required this.availableFuelTypes,
     required this.policy,
+    required this.capability,
     required this.buildService,
     this.requiresApiKey = false,
   });

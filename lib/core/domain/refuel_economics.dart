@@ -26,6 +26,7 @@ library;
 
 import 'package:meta/meta.dart';
 
+import 'data_value.dart';
 import 'refuel_decision.dart';
 
 // Re-exported so every existing caller keeps one import: the split
@@ -76,8 +77,12 @@ class RefuelCandidate {
     required this.oneWayKm,
     this.pricePerLitre,
     this.isRoadDistance = false,
-    this.isOpenNow,
-    this.priceAge,
+    this.openState = const DataValue.unknown(
+      reason: DataUnknownReason.notPublishedForThisItem,
+    ),
+    this.priceAge = const DataValue.unknown(
+      reason: DataUnknownReason.notPublishedForThisItem,
+    ),
   });
 
   final String stationId;
@@ -95,16 +100,29 @@ class RefuelCandidate {
   /// factor applies.
   final bool isRoadDistance;
 
-  /// Whether the station is open right now, or null when unknown (#4139).
+  /// Whether the station is open right now (#4139), as far as the
+  /// country's provider can say (#4156).
   ///
   /// Never used in the ARITHMETIC — it gates whether Best Value may LEAD
   /// (spec §3.1). A confident recommendation at a closed forecourt is the
   /// failure §5 named as costing more trust than the optimisation buys.
-  final bool? isOpenNow;
+  ///
+  /// Was a `bool?`, which conflated two different absences and read both
+  /// as "closed": eleven of the seventeen registered countries publish no
+  /// opening hours for anyone, so the conditional lead could not fire in
+  /// any of them and nothing said why.
+  /// `ProviderCapability.openState` produces this, and the difference
+  /// between the two unknowns is what the gate now reads.
+  final DataValue<bool> openState;
 
-  /// How old the price is, or null when unknown (#4139). Gates the lead
-  /// for the same reason; never enters the cost.
-  final Duration? priceAge;
+  /// How old the price is (#4139), as far as the country's provider can
+  /// say (#4156). Gates the lead for the same reason; never enters the
+  /// cost.
+  ///
+  /// [DataUnknownReason.notPublishedByProvider] means the source stamps
+  /// no prices at all — the age we could compute would be our own
+  /// download clock. See `ProviderCapability.priceAge`.
+  final DataValue<Duration> priceAge;
 
   @override
   bool operator ==(Object other) =>
@@ -113,13 +131,13 @@ class RefuelCandidate {
       other.oneWayKm == oneWayKm &&
       other.pricePerLitre == pricePerLitre &&
       other.isRoadDistance == isRoadDistance &&
-      other.isOpenNow == isOpenNow &&
+      other.openState == openState &&
       other.priceAge == priceAge;
 
   @override
   int get hashCode =>
       Object.hash(stationId, oneWayKm, pricePerLitre, isRoadDistance,
-          isOpenNow, priceAge);
+          openState, priceAge);
 }
 
 /// The vehicle and intent side of the calculation.
@@ -155,6 +173,30 @@ class RefuelProfile {
 
   /// Applied to crow-flies distances only. See [kCrowFliesRoadFactor].
   final double roadFactor;
+
+  /// The same pair in the app-wide shape (#4160).
+  ///
+  /// [consumptionLPer100km] and [consumptionIsEstimated] are a value with
+  /// a flag beside it, which is exactly the arrangement a `≈` goes
+  /// missing from: nothing stops the flag being dropped on the way to a
+  /// widget. Both fields stay — the arithmetic below wants a plain
+  /// `double?` and always will — but a rendering path takes this getter
+  /// instead, and the provenance cannot be left behind.
+  ///
+  /// A null consumption is [DataUnknownReason.notMeasuredYet]: it means
+  /// the user has no fill-up history, and trust rule 1 requires saying
+  /// which missing input it is rather than showing an empty figure.
+  DataValue<double> get consumption {
+    final value = consumptionLPer100km;
+    if (value == null) {
+      return const DataValue.unknown(
+        reason: DataUnknownReason.notMeasuredYet,
+      );
+    }
+    return consumptionIsEstimated
+        ? DataValue.estimated(value, basis: DataBasis.fleetAverage)
+        : DataValue.measured(value);
+  }
 
   /// Whether an economic ranking can be computed at all.
   bool get canRankByValue =>

@@ -7093,5 +7093,93 @@
         "type": "int"
       }
     }
+  },
+  "dataApproximate": "≈ {value}",
+  "@dataApproximate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "dataStale": "{value} ({age} old)",
+  "@dataStale": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "age": {
+        "type": "String"
+      }
+    }
+  },
+  "dataLastSeen": "Last seen {age} ago",
+  "@dataLastSeen": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "age": {
+        "type": "String"
+      }
+    }
+  },
+  "dataUnknownProvider": "This data source doesn't publish it",
+  "@dataUnknownProvider": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "dataUnknownItem": "Not published for this station",
+  "@dataUnknownItem": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "dataUnknownNotMeasured": "Not measured yet",
+  "@dataUnknownNotMeasured": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "dataUnknownVehicle": "Missing from your vehicle",
+  "@dataUnknownVehicle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "dataUnknownUnreadable": "The data source sent something unreadable",
+  "@dataUnknownUnreadable": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "dataBasisCatalog": "Manufacturer figure",
+  "@dataBasisCatalog": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "dataBasisFleetAverage": "Class average",
+  "@dataBasisFleetAverage": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "dataBasisDerived": "Derived from other figures",
+  "@dataBasisDerived": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "decisionLeadCaveatHours": "opening hours aren't published for this country",
+  "@decisionLeadCaveatHours": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "decisionLeadCaveatPriceAge": "this source doesn't say when the price was set",
+  "@decisionLeadCaveatPriceAge": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "decisionLeadCaveatSeparator": " · ",
+  "@decisionLeadCaveatSeparator": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

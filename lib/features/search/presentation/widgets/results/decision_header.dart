@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../../core/domain/refuel_economics.dart';
 import '../../../../../core/domain/refuel_profile_provider.dart';
 import '../../../../../core/domain/search_result_item.dart';
 import '../../../../../core/theme/app_text.dart';
@@ -103,6 +104,21 @@ class DecisionHeader extends ConsumerWidget {
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
+                  // #4156 — a gate the country's provider cannot answer
+                  // steps aside rather than failing (which would have
+                  // disabled the lead in eleven countries). It says so
+                  // here: trust rule 1, a missing input is stated.
+                  if (decision.leadCaveats.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Text(
+                        _caveatText(l10n, decision.leadCaveats),
+                        style: AppText.label(context).copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -151,6 +167,19 @@ class DecisionHeader extends ConsumerWidget {
     );
   }
 }
+
+/// What the lead could not verify, on one line (#4156).
+///
+/// Both caveats at once is a real combination (MX, KR, SI …), so they
+/// join rather than one winning — the reader is owed both reasons, not
+/// the more alarming one.
+String _caveatText(AppLocalizations l10n, Set<LeadCaveat> caveats) => [
+      if (caveats.contains(LeadCaveat.openingHoursNotPublished))
+        l10n.decisionLeadCaveatHours,
+      if (caveats.contains(LeadCaveat.priceAgeNotPublished))
+        l10n.decisionLeadCaveatPriceAge,
+    ].join(l10n.decisionLeadCaveatSeparator);
+
 
 /// The Best Value row's stand-in when the vehicle side is unknown.
 class _ValueUnavailableRow extends StatelessWidget {

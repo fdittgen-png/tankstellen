@@ -1,0 +1,49 @@
+{
+  "dataApproximate": "≈ {value}",
+  "@dataApproximate": {
+    "description": "Wraps a modelled (not measured) figure so trust rule 2 of the refuel-economics spec reads as an approximation (#4160).",
+    "placeholders": { "value": { "type": "String" } }
+  },
+  "dataStale": "{value} ({age} old)",
+  "@dataStale": {
+    "description": "A value that was measured but is now too old to present as current (#4160).",
+    "placeholders": { "value": { "type": "String" }, "age": { "type": "String" } }
+  },
+  "dataLastSeen": "Last seen {age} ago",
+  "@dataLastSeen": {
+    "description": "Caveat line under a stale figure (#4160).",
+    "placeholders": { "age": { "type": "String" } }
+  },
+  "dataUnknownProvider": "This data source doesn't publish it",
+  "@dataUnknownProvider": {
+    "description": "Reason a value is unknown: the upstream provider publishes no such data at all (#4156/#4160)."
+  },
+  "dataUnknownItem": "Not published for this station",
+  "@dataUnknownItem": {
+    "description": "Reason a value is unknown: the provider publishes it, but not for this row (#4160)."
+  },
+  "dataUnknownNotMeasured": "Not measured yet",
+  "@dataUnknownNotMeasured": {
+    "description": "Reason a value is unknown: we could measure it, but there is no history yet (#4160)."
+  },
+  "dataUnknownVehicle": "Missing from your vehicle",
+  "@dataUnknownVehicle": {
+    "description": "Reason a value is unknown: the vehicle profile lacks the input the calculation needs (#4160)."
+  },
+  "dataUnknownUnreadable": "The data source sent something unreadable",
+  "@dataUnknownUnreadable": {
+    "description": "Reason a value is unknown: the upstream response could not be parsed — an absence and a parse failure must not read alike (#4160)."
+  },
+  "dataBasisCatalog": "Manufacturer figure",
+  "@dataBasisCatalog": {
+    "description": "What an estimate rests on: a published figure for the vehicle model (#4160)."
+  },
+  "dataBasisFleetAverage": "Class average",
+  "@dataBasisFleetAverage": {
+    "description": "What an estimate rests on: an average over a vehicle class, nothing specific to this car (#4160)."
+  },
+  "dataBasisDerived": "Derived from other figures",
+  "@dataBasisDerived": {
+    "description": "What an estimate rests on: computed from other measured values rather than observed (#4160)."
+  }
+}
