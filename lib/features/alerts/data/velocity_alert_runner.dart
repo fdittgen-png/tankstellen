@@ -12,6 +12,7 @@ import '../../../core/storage/hive_boxes.dart';
 import '../../../core/storage/hive_map_coercion.dart';
 import '../../../core/domain/fuel_type.dart';
 import '../domain/entities/velocity_alert_config.dart';
+import '../domain/station_price_sample.dart';
 import '../domain/velocity_alert_detector.dart';
 import 'models/price_snapshot.dart';
 import 'price_snapshot_store.dart';
@@ -69,7 +70,7 @@ class VelocityAlertRunner {
   /// disable the radius filter (detector will then accept every
   /// observation, which matches the "better to fire" stance).
   Future<VelocityAlertEvent?> run({
-    required List<VelocityStationObservation> observations,
+    required List<StationPriceSample> observations,
     required DateTime now,
     double? userLat,
     double? userLng,
@@ -82,7 +83,7 @@ class VelocityAlertRunner {
         PriceSnapshot(
           stationId: obs.stationId,
           fuelType: config.fuelType.apiValue,
-          price: obs.price,
+          price: obs.pricePerLiter,
           timestamp: now,
           lat: obs.lat,
           lng: obs.lng,

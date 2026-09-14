@@ -4,6 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/alerts/data/models/price_snapshot.dart';
 import 'package:tankstellen/features/alerts/domain/entities/velocity_alert_config.dart';
+import 'package:tankstellen/features/alerts/domain/station_price_sample.dart';
 import 'package:tankstellen/features/alerts/domain/velocity_alert_detector.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 
@@ -45,15 +46,19 @@ void main() {
     );
   }
 
-  VelocityStationObservation observation({
+  // #4149 — one sample type for every detector.
+  StationPriceSample observation({
     required String stationId,
     required double price,
     List<double>? coords,
+    FuelType fuel = FuelType.e10,
   }) {
     final c = coords ?? nearbyStations[stationId] ?? [userLat, userLng];
-    return VelocityStationObservation(
+    return StationPriceSample(
       stationId: stationId,
-      price: price,
+      name: stationId,
+      fuelType: fuel.apiValue,
+      pricePerLiter: price,
       lat: c[0],
       lng: c[1],
     );

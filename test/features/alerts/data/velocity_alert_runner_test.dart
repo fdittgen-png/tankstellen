@@ -12,6 +12,7 @@ import 'package:tankstellen/features/alerts/data/price_snapshot_store.dart';
 import 'package:tankstellen/features/alerts/data/velocity_alert_cooldown.dart';
 import 'package:tankstellen/features/alerts/data/velocity_alert_runner.dart';
 import 'package:tankstellen/features/alerts/domain/entities/velocity_alert_config.dart';
+import 'package:tankstellen/features/alerts/domain/station_price_sample.dart';
 import 'package:tankstellen/features/alerts/domain/velocity_alert_detector.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 
@@ -103,11 +104,16 @@ void main() {
   final hourPlus =
       now.subtract(const Duration(hours: 1, minutes: 10));
 
-  VelocityStationObservation obs(String id, double price) {
+  // #4149 — one sample type for every detector. The fuel is now part
+  // of the sample instead of something the detector had to trust the
+  // caller about.
+  StationPriceSample obs(String id, double price) {
     final c = nearbyCoords[id]!;
-    return VelocityStationObservation(
+    return StationPriceSample(
       stationId: id,
-      price: price,
+      name: id,
+      fuelType: FuelType.e10.apiValue,
+      pricePerLiter: price,
       lat: c[0],
       lng: c[1],
     );
