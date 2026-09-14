@@ -3385,6 +3385,66 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String alertReasonNetSaving(String amount) {
+    return 'Rund $amount bei deiner üblichen Tankfüllung';
+  }
+
+  @override
+  String alertReasonBelowThreshold(String delta) {
+    return '$delta/L unter deinem Zielpreis';
+  }
+
+  @override
+  String alertReasonBelowYourMedian(String delta) {
+    return '$delta/L unter deinem üblichen Preis';
+  }
+
+  @override
+  String alertReasonBelowLocalMedian(String delta) {
+    return '$delta/L unter dem lokalen Durchschnitt';
+  }
+
+  @override
+  String alertReasonBelowEarlier(String delta) {
+    return '$delta/L günstiger als vorhin';
+  }
+
+  @override
+  String alertReasonBelowCheapestOnRoute(String delta) {
+    return '$delta/L unter dem besten Preis auf deiner Route';
+  }
+
+  @override
+  String alertReasonBelowCheapestNearby(String delta) {
+    return '$delta/L unter dem besten Preis in der Nähe';
+  }
+
+  @override
+  String alertReasonDistance(String distance) {
+    return '$distance entfernt';
+  }
+
+  @override
+  String alertReasonPriceAge(String age) {
+    return 'Preis vor $age aktualisiert';
+  }
+
+  @override
+  String get alertReasonPriceAgeUnknown =>
+      'Diese Datenquelle nennt nicht, wann der Preis gesetzt wurde';
+
+  @override
+  String get alertReasonSourceMedium =>
+      'Die Daten dieses Landes werden seltener aktualisiert';
+
+  @override
+  String get alertReasonSourceLow =>
+      'Die Daten dieses Landes sind unvollständig oder werden selten aktualisiert';
+
+  @override
+  String get alertConfidenceMediumPrefix => 'Mögliche Ersparnis';
+
+  @override
   String alertsLastChecked(String when) {
     return 'Zuletzt geprüft: $when';
   }

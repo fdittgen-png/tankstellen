@@ -6221,5 +6221,81 @@
   "@consumptionMetricPerHundred": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
-  }
+  },
+  "alertReasonNetSaving": "Environ {amount} sur votre plein habituel",
+  "@alertReasonNetSaving": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "alertReasonBelowThreshold": "{delta}/L sous le prix que vous avez fixé",
+  "@alertReasonBelowThreshold": {
+    "placeholders": {
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "alertReasonBelowYourMedian": "{delta}/L sous votre prix habituel",
+  "@alertReasonBelowYourMedian": {
+    "placeholders": {
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "alertReasonBelowLocalMedian": "{delta}/L sous la moyenne locale",
+  "@alertReasonBelowLocalMedian": {
+    "placeholders": {
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "alertReasonBelowEarlier": "{delta}/L moins cher que tout à l'heure",
+  "@alertReasonBelowEarlier": {
+    "placeholders": {
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "alertReasonBelowCheapestOnRoute": "{delta}/L sous le meilleur prix de votre trajet",
+  "@alertReasonBelowCheapestOnRoute": {
+    "placeholders": {
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "alertReasonBelowCheapestNearby": "{delta}/L sous le meilleur prix à proximité",
+  "@alertReasonBelowCheapestNearby": {
+    "placeholders": {
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "alertReasonDistance": "à {distance}",
+  "@alertReasonDistance": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "alertReasonPriceAge": "Prix mis à jour il y a {age}",
+  "@alertReasonPriceAge": {
+    "placeholders": {
+      "age": {
+        "type": "String"
+      }
+    }
+  },
+  "alertReasonPriceAgeUnknown": "Cette source de données n'indique pas quand le prix a été relevé",
+  "alertReasonSourceMedium": "Les données de ce pays sont actualisées moins souvent",
+  "alertReasonSourceLow": "Les données de ce pays sont incomplètes ou rarement actualisées",
+  "alertConfidenceMediumPrefix": "Économie potentielle"
 }

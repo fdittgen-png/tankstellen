@@ -45,6 +45,7 @@ library;
 import 'package:meta/meta.dart';
 
 import 'opportunity.dart';
+import 'opportunity_confidence.dart';
 import 'opportunity_scorer.dart';
 
 /// Why an opportunity did not become a notification.
@@ -68,6 +69,11 @@ enum BudgetRefusal {
 
   /// A better opportunity in the same scan took the slot.
   outrankedInWindow,
+
+  /// Too weakly supported to arrive uninvited (#4152). NOT discarded:
+  /// the in-app feed is where the user came looking, and a weak signal
+  /// is still worth having when they asked for it.
+  confidenceTooLow,
 
   /// The scorer refused it outright — expired, untrustworthy provider,
   /// or a saving that does not reconcile.
@@ -204,12 +210,13 @@ abstract final class OpportunityBudget {
     required BudgetState state,
     required DateTime now,
     BudgetPolicy policy = const BudgetPolicy(),
+    ConfidenceInputs Function(Opportunity)? confidenceInputs,
   }) {
     final demoted = <DemotedOpportunity>[];
     final eligible = <Opportunity>[];
 
     for (final o in candidates) {
-      final refusal = _refuse(o, state, now, policy);
+      final refusal = _refuse(o, state, now, policy, confidenceInputs);
       if (refusal != null) {
         demoted.add(DemotedOpportunity(o, refusal));
       } else {
@@ -238,9 +245,22 @@ abstract final class OpportunityBudget {
     BudgetState state,
     DateTime now,
     BudgetPolicy policy,
+    ConfidenceInputs Function(Opportunity)? confidenceInputs,
   ) {
     if (!OpportunityScorer.isEligible(o, now)) {
       return BudgetRefusal.ineligible;
+    }
+    // #4152 — a weakly supported alert may not arrive uninvited. The
+    // inputs come from the caller because two of the four (consumption
+    // provenance, road-vs-crow-flies) belong to the profile and the
+    // routing rather than to the opportunity; defaulting them to the
+    // favourable value here would quietly inflate the band, which is
+    // the one direction this must never fail in.
+    final inputs = confidenceInputs?.call(o) ??
+        OpportunityConfidence.inputsFor(o);
+    if (!OpportunityConfidence.mayNotify(
+        OpportunityConfidence.of(inputs))) {
+      return BudgetRefusal.confidenceTooLow;
     }
     // The floor first: a mediocre opportunity must not even compete for
     // the quota, or it can spend a slot the day's best one needed.
