@@ -6,10 +6,13 @@ import 'dart:math' as math;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 
+import '../../../core/domain/fuel_type.dart';
 import '../../../core/domain/refuel_economics.dart';
 import '../../../core/domain/refuel_profile_provider.dart';
 import '../../../core/domain/refuel_quantity_provider.dart';
+import '../../../core/time/app_clock.dart';
 import '../../vehicle/api.dart';
+import '../domain/services/price_baseline.dart';
 import 'consumption_providers.dart';
 import 'fuel_type_efficiency_provider.dart';
 
@@ -28,6 +31,14 @@ import 'fuel_type_efficiency_provider.dart';
 ///    default is personal from the first few fills and one
 ///    splash-and-dash or jerrycan cannot skew it. No question is asked
 ///    of the user to get a correct answer.
+///
+///    #4150 — that median is the WINDOWED one from [PriceBaseline] when
+///    the driver has enough recent history, falling back to the
+///    all-history median otherwise. Two medians existed: this provider
+///    averaged every fill ever logged while the savings ledger used a
+///    90-day window, so "your usual fill" was a different number
+///    depending on which screen asked. Tank sizes and habits change; the
+///    windowed figure follows them and the all-time one does not.
 ///  * #4095 — an explicit `refuelQuantityProvider` choice wins over the
 ///    median when the user has made one. It is capped at the active
 ///    vehicle's tank capacity where a capacity is configured, because
@@ -37,9 +48,19 @@ import 'fuel_type_efficiency_provider.dart';
 ///    never required for any of this to work (economics spec §2).
 final realRefuelProfileProvider = Provider<RefuelProfile>((ref) {
   final consumption = ref.watch(consumptionStatsProvider).avgConsumptionL100km;
-  final median = RefuelEconomics.medianLitres(
-    ref.watch(activeVehicleFillUpsProvider).map((f) => f.liters),
-  );
+  // Already scoped to the active vehicle: a household with a diesel and
+  // an E85 car has two habits, and mixing them makes both wrong.
+  final fills = ref.watch(activeVehicleFillUpsProvider);
+  final fuel = ref.watch(activeVehicleProfileProvider)?.preferredFuelType;
+  final baseline = (fuel == null || fuel.isEmpty)
+      ? null
+      : priceBaselineFor(
+          fills,
+          fuelType: FuelType.fromString(fuel),
+          now: ref.watch(appClockProvider).now(),
+        );
+  final median = baseline?.typicalLitres ??
+      RefuelEconomics.medianLitres(fills.map((f) => f.liters));
   final chosen = ref.watch(refuelQuantityProvider);
   final capacity = ref.watch(activeVehicleProfileProvider)?.tankCapacityL;
   final litres = chosen ?? median ?? kDefaultRefuelLitres;
