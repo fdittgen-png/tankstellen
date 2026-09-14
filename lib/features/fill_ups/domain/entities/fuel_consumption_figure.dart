@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import '../../../../core/domain/data_value.dart';
+
 /// Where a per-fuel litres/100 km figure comes from (#3945).
 enum FuelConsumptionProvenance {
   /// Measured on the pump: a PURE plein-to-plein window of that very grade
@@ -29,6 +31,22 @@ class FuelConsumptionFigure {
 
   bool get isEstimated => provenance == FuelConsumptionProvenance.estimated;
   bool get isMeasured => provenance == FuelConsumptionProvenance.measured;
+
+  /// The same fact in the app-wide shape (#4160).
+  ///
+  /// This type predates [DataValue] and keeps its own enum — it is the
+  /// shape the fill-up layer and its tests speak, and rewriting them to
+  /// prove a generalisation would be churn. What the generalisation buys
+  /// is that a figure crossing into a rendering path arrives as a
+  /// [DataValue], where the `≈` of `docs/specs/refuel-economics.md`
+  /// trust rule 2 is a property of the type rather than of the widget
+  /// author remembering.
+  ///
+  /// An estimated consumption is a class average, not a figure for this
+  /// particular car — [DataBasis.fleetAverage] says so.
+  DataValue<double> get asDataValue => isMeasured
+      ? DataValue.measured(litersPer100km)
+      : DataValue.estimated(litersPer100km, basis: DataBasis.fleetAverage);
 
   @override
   bool operator ==(Object other) =>

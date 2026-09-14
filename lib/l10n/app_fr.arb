@@ -6163,5 +6163,43 @@
         "type": "int"
       }
     }
-  }
+  },
+  "dataApproximate": "≈ {value}",
+  "@dataApproximate": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "dataStale": "{value} (il y a {age})",
+  "@dataStale": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "age": {
+        "type": "String"
+      }
+    }
+  },
+  "dataLastSeen": "Vu il y a {age}",
+  "@dataLastSeen": {
+    "placeholders": {
+      "age": {
+        "type": "String"
+      }
+    }
+  },
+  "dataUnknownProvider": "Cette source de données ne le publie pas",
+  "dataUnknownItem": "Non publié pour cette station",
+  "dataUnknownNotMeasured": "Pas encore mesuré",
+  "dataUnknownVehicle": "Absent de votre véhicule",
+  "dataUnknownUnreadable": "La source de données a renvoyé quelque chose d'illisible",
+  "dataBasisCatalog": "Valeur constructeur",
+  "dataBasisFleetAverage": "Moyenne de la catégorie",
+  "dataBasisDerived": "Déduit d'autres valeurs",
+  "decisionLeadCaveatHours": "les horaires d'ouverture ne sont pas publiés pour ce pays",
+  "decisionLeadCaveatPriceAge": "cette source n'indique pas quand le prix a été relevé",
+  "decisionLeadCaveatSeparator": " · "
 }

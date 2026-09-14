@@ -1,0 +1,13 @@
+{
+  "dataApproximate": "≈ {value}",
+  "dataStale": "{value} (il y a {age})",
+  "dataLastSeen": "Vu il y a {age}",
+  "dataUnknownProvider": "Cette source de données ne le publie pas",
+  "dataUnknownItem": "Non publié pour cette station",
+  "dataUnknownNotMeasured": "Pas encore mesuré",
+  "dataUnknownVehicle": "Absent de votre véhicule",
+  "dataUnknownUnreadable": "La source de données a renvoyé quelque chose d'illisible",
+  "dataBasisCatalog": "Valeur constructeur",
+  "dataBasisFleetAverage": "Moyenne de la catégorie",
+  "dataBasisDerived": "Déduit d'autres valeurs"
+}

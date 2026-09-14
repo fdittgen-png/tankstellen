@@ -1,0 +1,13 @@
+{
+  "dataApproximate": "≈ {value}",
+  "dataStale": "{value} (vor {age})",
+  "dataLastSeen": "Zuletzt vor {age} gesehen",
+  "dataUnknownProvider": "Diese Datenquelle veröffentlicht das nicht",
+  "dataUnknownItem": "Für diese Tankstelle nicht veröffentlicht",
+  "dataUnknownNotMeasured": "Noch nicht gemessen",
+  "dataUnknownVehicle": "Fehlt in deinem Fahrzeug",
+  "dataUnknownUnreadable": "Die Datenquelle hat etwas Unlesbares geliefert",
+  "dataBasisCatalog": "Herstellerangabe",
+  "dataBasisFleetAverage": "Klassendurchschnitt",
+  "dataBasisDerived": "Aus anderen Werten abgeleitet"
+}

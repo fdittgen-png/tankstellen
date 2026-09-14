@@ -26,6 +26,7 @@ library;
 
 import 'package:meta/meta.dart';
 
+import 'data_value.dart';
 import 'refuel_decision.dart';
 
 // Re-exported so every existing caller keeps one import: the split
@@ -155,6 +156,30 @@ class RefuelProfile {
 
   /// Applied to crow-flies distances only. See [kCrowFliesRoadFactor].
   final double roadFactor;
+
+  /// The same pair in the app-wide shape (#4160).
+  ///
+  /// [consumptionLPer100km] and [consumptionIsEstimated] are a value with
+  /// a flag beside it, which is exactly the arrangement a `≈` goes
+  /// missing from: nothing stops the flag being dropped on the way to a
+  /// widget. Both fields stay — the arithmetic below wants a plain
+  /// `double?` and always will — but a rendering path takes this getter
+  /// instead, and the provenance cannot be left behind.
+  ///
+  /// A null consumption is [DataUnknownReason.notMeasuredYet]: it means
+  /// the user has no fill-up history, and trust rule 1 requires saying
+  /// which missing input it is rather than showing an empty figure.
+  DataValue<double> get consumption {
+    final value = consumptionLPer100km;
+    if (value == null) {
+      return const DataValue.unknown(
+        reason: DataUnknownReason.notMeasuredYet,
+      );
+    }
+    return consumptionIsEstimated
+        ? DataValue.estimated(value, basis: DataBasis.fleetAverage)
+        : DataValue.measured(value);
+  }
 
   /// Whether an economic ranking can be computed at all.
   bool get canRankByValue =>

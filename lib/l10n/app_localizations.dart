@@ -7305,6 +7305,90 @@ abstract class AppLocalizations {
   /// **'© {brand} contributors'**
   String mapAttributionOsm(String brand);
 
+  /// Wraps a modelled (not measured) figure so trust rule 2 of the refuel-economics spec reads as an approximation (#4160).
+  ///
+  /// In en, this message translates to:
+  /// **'≈ {value}'**
+  String dataApproximate(String value);
+
+  /// A value that was measured but is now too old to present as current (#4160).
+  ///
+  /// In en, this message translates to:
+  /// **'{value} ({age} old)'**
+  String dataStale(String value, String age);
+
+  /// Caveat line under a stale figure (#4160).
+  ///
+  /// In en, this message translates to:
+  /// **'Last seen {age} ago'**
+  String dataLastSeen(String age);
+
+  /// Reason a value is unknown: the upstream provider publishes no such data at all (#4156/#4160).
+  ///
+  /// In en, this message translates to:
+  /// **'This data source doesn\'t publish it'**
+  String get dataUnknownProvider;
+
+  /// Reason a value is unknown: the provider publishes it, but not for this row (#4160).
+  ///
+  /// In en, this message translates to:
+  /// **'Not published for this station'**
+  String get dataUnknownItem;
+
+  /// Reason a value is unknown: we could measure it, but there is no history yet (#4160).
+  ///
+  /// In en, this message translates to:
+  /// **'Not measured yet'**
+  String get dataUnknownNotMeasured;
+
+  /// Reason a value is unknown: the vehicle profile lacks the input the calculation needs (#4160).
+  ///
+  /// In en, this message translates to:
+  /// **'Missing from your vehicle'**
+  String get dataUnknownVehicle;
+
+  /// Reason a value is unknown: the upstream response could not be parsed — an absence and a parse failure must not read alike (#4160).
+  ///
+  /// In en, this message translates to:
+  /// **'The data source sent something unreadable'**
+  String get dataUnknownUnreadable;
+
+  /// What an estimate rests on: a published figure for the vehicle model (#4160).
+  ///
+  /// In en, this message translates to:
+  /// **'Manufacturer figure'**
+  String get dataBasisCatalog;
+
+  /// What an estimate rests on: an average over a vehicle class, nothing specific to this car (#4160).
+  ///
+  /// In en, this message translates to:
+  /// **'Class average'**
+  String get dataBasisFleetAverage;
+
+  /// What an estimate rests on: computed from other measured values rather than observed (#4160).
+  ///
+  /// In en, this message translates to:
+  /// **'Derived from other figures'**
+  String get dataBasisDerived;
+
+  /// Caveat under the confident lead: the country's data source publishes no opening hours, so nobody checked whether the station is open (#4156).
+  ///
+  /// In en, this message translates to:
+  /// **'opening hours aren\'t published for this country'**
+  String get decisionLeadCaveatHours;
+
+  /// Caveat under the confident lead: the country's data source stamps no prices, so the age we know is our own download time (#4156).
+  ///
+  /// In en, this message translates to:
+  /// **'this source doesn\'t say when the price was set'**
+  String get decisionLeadCaveatPriceAge;
+
+  /// Joins two lead caveats on one line. A separator, not a sentence — locales that prefer a comma may change it (#4156).
+  ///
+  /// In en, this message translates to:
+  /// **' · '**
+  String get decisionLeadCaveatSeparator;
+
   /// Title of the Settings section / screen hosting dev-only diagnostics, shown only when Developer / Debug mode is on (#2248).
   ///
   /// In en, this message translates to:
