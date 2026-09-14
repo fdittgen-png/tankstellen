@@ -49,10 +49,22 @@ void main() {
         ),
       );
 
-      await expectLater(
-        find.byType(RepaintBoundary).first,
-        matchesGoldenFile('service_status_banner_stale.png'),
-      );
+      // #4134 — structural, not a PNG. This case asserts a COLOUR
+      // SEMANTIC (offline must not read as an error), which a pixel diff
+      // states only by accident and a Linux/macOS baseline mismatch
+      // breaks for unrelated reasons — see `golden_cross_platform_baseline`.
+      final ctx = tester.element(find.byType(ServiceStatusBanner));
+      final scheme = Theme.of(ctx).colorScheme;
+      final box = tester.widget<Container>(find.descendant(
+        of: find.byType(ServiceStatusBanner),
+        matching: find.byType(Container),
+      ));
+
+      expect(find.byIcon(Icons.cloud_off), findsOneWidget);
+      expect(box.color, isNot(scheme.errorContainer),
+          reason: 'serving cached prices with no network is the app doing '
+              'its job under worse conditions, not something breaking');
+      expect(box.color, scheme.secondaryContainer);
     });
 
     testWidgets('fallback — info banner', (tester) async {
@@ -112,10 +124,21 @@ void main() {
         ),
       );
 
-      await expectLater(
-        find.byType(RepaintBoundary).first,
-        matchesGoldenFile('service_status_banner_stale_multi_error.png'),
-      );
+      // #4134 — stale wins over the fallbacks: the user is looking at old
+      // data, which is the more important thing to say. Structural for
+      // the same reason as the case above.
+      final ctx = tester.element(find.byType(ServiceStatusBanner));
+      final scheme = Theme.of(ctx).colorScheme;
+      final box = tester.widget<Container>(find.descendant(
+        of: find.byType(ServiceStatusBanner),
+        matching: find.byType(Container),
+      ));
+
+      expect(find.byIcon(Icons.cloud_off), findsOneWidget);
+      expect(find.byIcon(Icons.info_outline), findsNothing,
+          reason: 'one banner, and offline is the one that matters');
+      expect(box.color, scheme.secondaryContainer);
+      expect(box.color, isNot(scheme.errorContainer));
     });
   });
 
