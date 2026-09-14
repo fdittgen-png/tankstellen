@@ -6029,6 +6029,84 @@ abstract class AppLocalizations {
   /// **'+ {count} more'**
   String radiusAlertGroupedMore(String count);
 
+  /// Why-this-alert line: what acting on it is worth in money, net of the detour (#4152).
+  ///
+  /// In en, this message translates to:
+  /// **'About {amount} on your usual fill'**
+  String alertReasonNetSaving(String amount);
+
+  /// Why-this-alert line: how far below the user's own threshold the price is (#4152).
+  ///
+  /// In en, this message translates to:
+  /// **'{delta}/L below the price you set'**
+  String alertReasonBelowThreshold(String delta);
+
+  /// Why-this-alert line: how far below the user's own median price this is (#4152).
+  ///
+  /// In en, this message translates to:
+  /// **'{delta}/L below what you usually pay'**
+  String alertReasonBelowYourMedian(String delta);
+
+  /// Why-this-alert line: how far below the surrounding area's average price this is (#4152).
+  ///
+  /// In en, this message translates to:
+  /// **'{delta}/L below the local average'**
+  String alertReasonBelowLocalMedian(String delta);
+
+  /// Why-this-alert line: how far the price has fallen at this station since the detector's lookback window (#4152).
+  ///
+  /// In en, this message translates to:
+  /// **'{delta}/L cheaper than earlier'**
+  String alertReasonBelowEarlier(String delta);
+
+  /// Why-this-alert line: cheaper than the best station on the planned route (#4152).
+  ///
+  /// In en, this message translates to:
+  /// **'{delta}/L below the best on your route'**
+  String alertReasonBelowCheapestOnRoute(String delta);
+
+  /// Why-this-alert line: cheaper than the best station within range (#4152).
+  ///
+  /// In en, this message translates to:
+  /// **'{delta}/L below the best nearby'**
+  String alertReasonBelowCheapestNearby(String delta);
+
+  /// Why-this-alert line: how far the station is (#4152).
+  ///
+  /// In en, this message translates to:
+  /// **'{distance} away'**
+  String alertReasonDistance(String distance);
+
+  /// Why-this-alert line: how old the price is, when the provider stamps prices (#4152).
+  ///
+  /// In en, this message translates to:
+  /// **'Price updated {age} ago'**
+  String alertReasonPriceAge(String age);
+
+  /// Why-this-alert line stated instead of a price age, when the country's provider publishes no timestamps at all — trust rule 1 says a missing input is stated, never defaulted (#4152/#4156).
+  ///
+  /// In en, this message translates to:
+  /// **'This data source doesn\'t say when the price was set'**
+  String get alertReasonPriceAgeUnknown;
+
+  /// Why-this-alert line: the provider's publication cadence is slower than the best sources (#4152).
+  ///
+  /// In en, this message translates to:
+  /// **'This country\'s data refreshes less often'**
+  String get alertReasonSourceMedium;
+
+  /// Why-this-alert line: the provider covers only part of the country or refreshes rarely (#4152).
+  ///
+  /// In en, this message translates to:
+  /// **'This country\'s data is incomplete or slow to refresh'**
+  String get alertReasonSourceLow;
+
+  /// How a medium-confidence alert hedges its claim, instead of stating a saving outright (#4152).
+  ///
+  /// In en, this message translates to:
+  /// **'Potential saving'**
+  String get alertConfidenceMediumPrefix;
+
   /// Footer line on the alerts screen showing when the background alert scan last completed (#3147), so the alert SLA is field-verifiable. {when} is a locale-formatted date + time.
   ///
   /// In en, this message translates to:

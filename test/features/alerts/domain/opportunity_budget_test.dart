@@ -7,6 +7,7 @@ import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/services/provider_capability.dart';
 import 'package:tankstellen/features/alerts/domain/opportunity.dart';
 import 'package:tankstellen/features/alerts/domain/opportunity_budget.dart';
+import 'package:tankstellen/features/alerts/domain/opportunity_confidence.dart';
 
 /// #4151 — one attention budget across every alert kind.
 ///
@@ -285,6 +286,69 @@ void main() {
         now: justAfterMidnight,
       );
       expect(out.demoted.single.reason, BudgetRefusal.dailyCapReached);
+    });
+  });
+
+  group('#4152 — a weak alert may not arrive uninvited', () {
+    test('low confidence is refused, and NAMED', () {
+      final out = OpportunityBudget.decide(
+        candidates: [op(net: 9)],
+        state: const BudgetState(),
+        now: now,
+        confidenceInputs: (_) => const ConfidenceInputs(
+          provider: DataConfidence.low,
+          priceAge: DataValue.measured(Duration(minutes: 5)),
+        ),
+      );
+      expect(out.isQuiet, isTrue);
+      expect(out.demoted.single.reason, BudgetRefusal.confidenceTooLow);
+    });
+
+    test('it is demoted, not discarded — the feed still gets it', () {
+      // The user came looking in the in-app feed; a weak signal is
+      // still worth having when they asked for it. It simply may not
+      // interrupt.
+      final out = OpportunityBudget.decide(
+        candidates: [op(stationId: 'weak', net: 9)],
+        state: const BudgetState(),
+        now: now,
+        confidenceInputs: (_) => const ConfidenceInputs(
+          provider: DataConfidence.none,
+          priceAge: DataValue.measured(Duration(minutes: 5)),
+        ),
+      );
+      expect(out.demoted.single.opportunity.stationId, 'weak');
+    });
+
+    test('medium confidence still notifies', () {
+      final out = OpportunityBudget.decide(
+        candidates: [op(net: 9)],
+        state: const BudgetState(),
+        now: now,
+        confidenceInputs: (_) => const ConfidenceInputs(
+          provider: DataConfidence.medium,
+          priceAge: DataValue.measured(Duration(minutes: 5)),
+        ),
+      );
+      expect(out.notify, isNotNull);
+    });
+
+    test('a high-confidence one outranks a weak one that scores better',
+        () {
+      // The weak one is refused before the ranking, so a bigger number
+      // behind worse data never wins.
+      final out = OpportunityBudget.decide(
+        candidates: [op(stationId: 'weak', net: 40), op(stationId: 'good', net: 2)],
+        state: const BudgetState(),
+        now: now,
+        confidenceInputs: (o) => ConfidenceInputs(
+          provider: o.stationId == 'weak'
+              ? DataConfidence.low
+              : DataConfidence.high,
+          priceAge: const DataValue.measured(Duration(minutes: 5)),
+        ),
+      );
+      expect(out.notify!.stationId, 'good');
     });
   });
 

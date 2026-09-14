@@ -6709,5 +6709,115 @@
   "@consumptionMetricPerHundred": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "alertReasonNetSaving": "About {amount} on your usual fill",
+  "@alertReasonNetSaving": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "alertReasonBelowThreshold": "{delta}/L below the price you set",
+  "@alertReasonBelowThreshold": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "alertReasonBelowYourMedian": "{delta}/L below what you usually pay",
+  "@alertReasonBelowYourMedian": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "alertReasonBelowLocalMedian": "{delta}/L below the local average",
+  "@alertReasonBelowLocalMedian": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "alertReasonBelowEarlier": "{delta}/L cheaper than earlier",
+  "@alertReasonBelowEarlier": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "alertReasonBelowCheapestOnRoute": "{delta}/L below the best on your route",
+  "@alertReasonBelowCheapestOnRoute": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "alertReasonBelowCheapestNearby": "{delta}/L below the best nearby",
+  "@alertReasonBelowCheapestNearby": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "alertReasonDistance": "{distance} away",
+  "@alertReasonDistance": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "alertReasonPriceAge": "Price updated {age} ago",
+  "@alertReasonPriceAge": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "age": {
+        "type": "String"
+      }
+    }
+  },
+  "alertReasonPriceAgeUnknown": "This data source doesn't say when the price was set",
+  "@alertReasonPriceAgeUnknown": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "alertReasonSourceMedium": "This country's data refreshes less often",
+  "@alertReasonSourceMedium": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "alertReasonSourceLow": "This country's data is incomplete or slow to refresh",
+  "@alertReasonSourceLow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "alertConfidenceMediumPrefix": "Potential saving",
+  "@alertConfidenceMediumPrefix": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

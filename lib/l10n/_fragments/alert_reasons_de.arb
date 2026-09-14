@@ -1,0 +1,15 @@
+{
+  "alertReasonNetSaving": "Rund {amount} bei deiner üblichen Tankfüllung",
+  "alertReasonBelowThreshold": "{delta}/L unter deinem Zielpreis",
+  "alertReasonBelowYourMedian": "{delta}/L unter deinem üblichen Preis",
+  "alertReasonBelowLocalMedian": "{delta}/L unter dem lokalen Durchschnitt",
+  "alertReasonBelowEarlier": "{delta}/L günstiger als vorhin",
+  "alertReasonBelowCheapestOnRoute": "{delta}/L unter dem besten Preis auf deiner Route",
+  "alertReasonBelowCheapestNearby": "{delta}/L unter dem besten Preis in der Nähe",
+  "alertReasonDistance": "{distance} entfernt",
+  "alertReasonPriceAge": "Preis vor {age} aktualisiert",
+  "alertReasonPriceAgeUnknown": "Diese Datenquelle nennt nicht, wann der Preis gesetzt wurde",
+  "alertReasonSourceMedium": "Die Daten dieses Landes werden seltener aktualisiert",
+  "alertReasonSourceLow": "Die Daten dieses Landes sind unvollständig oder werden selten aktualisiert",
+  "alertConfidenceMediumPrefix": "Mögliche Ersparnis"
+}

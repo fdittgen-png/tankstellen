@@ -3356,6 +3356,66 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String alertReasonNetSaving(String amount) {
+    return 'About $amount on your usual fill';
+  }
+
+  @override
+  String alertReasonBelowThreshold(String delta) {
+    return '$delta/L below the price you set';
+  }
+
+  @override
+  String alertReasonBelowYourMedian(String delta) {
+    return '$delta/L below what you usually pay';
+  }
+
+  @override
+  String alertReasonBelowLocalMedian(String delta) {
+    return '$delta/L below the local average';
+  }
+
+  @override
+  String alertReasonBelowEarlier(String delta) {
+    return '$delta/L cheaper than earlier';
+  }
+
+  @override
+  String alertReasonBelowCheapestOnRoute(String delta) {
+    return '$delta/L below the best on your route';
+  }
+
+  @override
+  String alertReasonBelowCheapestNearby(String delta) {
+    return '$delta/L below the best nearby';
+  }
+
+  @override
+  String alertReasonDistance(String distance) {
+    return '$distance away';
+  }
+
+  @override
+  String alertReasonPriceAge(String age) {
+    return 'Price updated $age ago';
+  }
+
+  @override
+  String get alertReasonPriceAgeUnknown =>
+      'This data source doesn\'t say when the price was set';
+
+  @override
+  String get alertReasonSourceMedium =>
+      'This country\'s data refreshes less often';
+
+  @override
+  String get alertReasonSourceLow =>
+      'This country\'s data is incomplete or slow to refresh';
+
+  @override
+  String get alertConfidenceMediumPrefix => 'Potential saving';
+
+  @override
   String alertsLastChecked(String when) {
     return 'Last checked: $when';
   }
@@ -12793,6 +12853,66 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String radiusAlertGroupedMore(String count) {
     return '⟦+ $count ɱóřé ··⟧';
   }
+
+  @override
+  String alertReasonNetSaving(String amount) {
+    return '⟦Áƀóúŧ $amount óñ ýóúř úšúáł ƒîłł ·········⟧';
+  }
+
+  @override
+  String alertReasonBelowThreshold(String delta) {
+    return '⟦$delta/Ł ƀéłóŵ ŧĥé ƥřîçé ýóú šéŧ ·········⟧';
+  }
+
+  @override
+  String alertReasonBelowYourMedian(String delta) {
+    return '⟦$delta/Ł ƀéłóŵ ŵĥáŧ ýóú úšúáłłý ƥáý ··········⟧';
+  }
+
+  @override
+  String alertReasonBelowLocalMedian(String delta) {
+    return '⟦$delta/Ł ƀéłóŵ ŧĥé łóçáł áṽéřáǧé ·········⟧';
+  }
+
+  @override
+  String alertReasonBelowEarlier(String delta) {
+    return '⟦$delta/Ł çĥéáƥéř ŧĥáñ éářłîéř ·········⟧';
+  }
+
+  @override
+  String alertReasonBelowCheapestOnRoute(String delta) {
+    return '⟦$delta/Ł ƀéłóŵ ŧĥé ƀéšŧ óñ ýóúř řóúŧé ···········⟧';
+  }
+
+  @override
+  String alertReasonBelowCheapestNearby(String delta) {
+    return '⟦$delta/Ł ƀéłóŵ ŧĥé ƀéšŧ ñéářƀý ·········⟧';
+  }
+
+  @override
+  String alertReasonDistance(String distance) {
+    return '⟦$distance áŵáý ··⟧';
+  }
+
+  @override
+  String alertReasonPriceAge(String age) {
+    return '⟦Ƥřîçé úƥđáŧéđ $age áǧó ·······⟧';
+  }
+
+  @override
+  String get alertReasonPriceAgeUnknown =>
+      '⟦Ŧĥîš đáŧá šóúřçé đóéšñ\'ŧ šáý ŵĥéñ ŧĥé ƥřîçé ŵáš šéŧ ··················⟧';
+
+  @override
+  String get alertReasonSourceMedium =>
+      '⟦Ŧĥîš çóúñŧřý\'š đáŧá řéƒřéšĥéš łéšš óƒŧéñ ···············⟧';
+
+  @override
+  String get alertReasonSourceLow =>
+      '⟦Ŧĥîš çóúñŧřý\'š đáŧá îš îñçóɱƥłéŧé óř šłóŵ ŧó řéƒřéšĥ ···················⟧';
+
+  @override
+  String get alertConfidenceMediumPrefix => '⟦Ƥóŧéñŧîáł šáṽîñǧ ·······⟧';
 
   @override
   String alertsLastChecked(String when) {

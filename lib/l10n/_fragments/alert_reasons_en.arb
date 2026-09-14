@@ -1,0 +1,63 @@
+{
+  "alertReasonNetSaving": "About {amount} on your usual fill",
+  "@alertReasonNetSaving": {
+    "description": "Why-this-alert line: what acting on it is worth in money, net of the detour (#4152).",
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "alertReasonBelowThreshold": "{delta}/L below the price you set",
+  "@alertReasonBelowThreshold": {
+    "description": "Why-this-alert line: how far below the user's own threshold the price is (#4152).",
+    "placeholders": { "delta": { "type": "String" } }
+  },
+  "alertReasonBelowYourMedian": "{delta}/L below what you usually pay",
+  "@alertReasonBelowYourMedian": {
+    "description": "Why-this-alert line: how far below the user's own median price this is (#4152).",
+    "placeholders": { "delta": { "type": "String" } }
+  },
+  "alertReasonBelowLocalMedian": "{delta}/L below the local average",
+  "@alertReasonBelowLocalMedian": {
+    "description": "Why-this-alert line: how far below the surrounding area's average price this is (#4152).",
+    "placeholders": { "delta": { "type": "String" } }
+  },
+  "alertReasonBelowEarlier": "{delta}/L cheaper than earlier",
+  "@alertReasonBelowEarlier": {
+    "description": "Why-this-alert line: how far the price has fallen at this station since the detector's lookback window (#4152).",
+    "placeholders": { "delta": { "type": "String" } }
+  },
+  "alertReasonBelowCheapestOnRoute": "{delta}/L below the best on your route",
+  "@alertReasonBelowCheapestOnRoute": {
+    "description": "Why-this-alert line: cheaper than the best station on the planned route (#4152).",
+    "placeholders": { "delta": { "type": "String" } }
+  },
+  "alertReasonBelowCheapestNearby": "{delta}/L below the best nearby",
+  "@alertReasonBelowCheapestNearby": {
+    "description": "Why-this-alert line: cheaper than the best station within range (#4152).",
+    "placeholders": { "delta": { "type": "String" } }
+  },
+  "alertReasonDistance": "{distance} away",
+  "@alertReasonDistance": {
+    "description": "Why-this-alert line: how far the station is (#4152).",
+    "placeholders": { "distance": { "type": "String" } }
+  },
+  "alertReasonPriceAge": "Price updated {age} ago",
+  "@alertReasonPriceAge": {
+    "description": "Why-this-alert line: how old the price is, when the provider stamps prices (#4152).",
+    "placeholders": { "age": { "type": "String" } }
+  },
+  "alertReasonPriceAgeUnknown": "This data source doesn't say when the price was set",
+  "@alertReasonPriceAgeUnknown": {
+    "description": "Why-this-alert line stated instead of a price age, when the country's provider publishes no timestamps at all — trust rule 1 says a missing input is stated, never defaulted (#4152/#4156)."
+  },
+  "alertReasonSourceMedium": "This country's data refreshes less often",
+  "@alertReasonSourceMedium": {
+    "description": "Why-this-alert line: the provider's publication cadence is slower than the best sources (#4152)."
+  },
+  "alertReasonSourceLow": "This country's data is incomplete or slow to refresh",
+  "@alertReasonSourceLow": {
+    "description": "Why-this-alert line: the provider covers only part of the country or refreshes rarely (#4152)."
+  },
+  "alertConfidenceMediumPrefix": "Potential saving",
+  "@alertConfidenceMediumPrefix": {
+    "description": "How a medium-confidence alert hedges its claim, instead of stating a saving outright (#4152)."
+  }
+}
