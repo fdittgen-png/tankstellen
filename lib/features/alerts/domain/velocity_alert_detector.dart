@@ -5,26 +5,7 @@ import '../../../core/utils/geo_utils.dart';
 import '../../../core/domain/fuel_type.dart';
 import '../data/models/price_snapshot.dart';
 import 'entities/velocity_alert_config.dart';
-
-/// Snapshot of a station's *current* price for a given fuel.
-///
-/// The detector accepts a minimal shape rather than the full
-/// [Station] model so it can be driven from the background isolate,
-/// tests, or a future different source without coupling to the
-/// search feature.
-class VelocityStationObservation {
-  final String stationId;
-  final double price;
-  final double lat;
-  final double lng;
-
-  const VelocityStationObservation({
-    required this.stationId,
-    required this.price,
-    required this.lat,
-    required this.lng,
-  });
-}
+import 'station_price_sample.dart';
 
 /// Emitted when enough nearby stations have dropped fast enough on
 /// the watched fuel type (#579).
@@ -71,7 +52,7 @@ class VelocityAlertDetector {
   /// [VelocityAlertEvent] summarising the drops.
   static VelocityAlertEvent? detect({
     required VelocityAlertConfig config,
-    required List<VelocityStationObservation> observations,
+    required List<StationPriceSample> observations,
     required List<PriceSnapshot> previousSnapshots,
     required DateTime now,
     double? userLat,
@@ -100,6 +81,12 @@ class VelocityAlertDetector {
 
     final drops = <_Drop>[];
     for (final obs in observations) {
+      // #4149 — the shared sample type carries its fuel, so a caller
+      // that mixes fuels can no longer make this detector compare a
+      // diesel price against a petrol snapshot. The old observation
+      // type had no fuel at all and this loop simply trusted the
+      // caller.
+      if (obs.fuelType != config.fuelType.apiValue) continue;
       // Radius filter — skip stations outside the configured
       // radius when we know where the user is. When we don't,
       // accept every station (better to fire than be silent).
@@ -109,7 +96,7 @@ class VelocityAlertDetector {
       }
       final prior = mostRecentBefore[obs.stationId];
       if (prior == null) continue; // first time seen → can't compute drop
-      final dropCents = (prior.price - obs.price) * 100;
+      final dropCents = (prior.price - obs.pricePerLiter) * 100;
       if (dropCents < config.minDropCents) continue;
       drops.add(_Drop(obs.stationId, dropCents));
     }

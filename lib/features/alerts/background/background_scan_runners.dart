@@ -155,7 +155,7 @@ class BackgroundScanRunners {
             '${config.fuelType.apiValue} not in the active country feed');
         return 0;
       }
-      final observations = <VelocityStationObservation>[];
+      final observations = <StationPriceSample>[];
       for (final entry in prices.entries) {
         final stationId = entry.key;
         final p = entry.value;
@@ -169,9 +169,11 @@ class BackgroundScanRunners {
         final lat = data?.getDouble('lat');
         final lng = data?.getDouble('lng');
         if (lat == null || lng == null) continue;
-        observations.add(VelocityStationObservation(
+        observations.add(StationPriceSample(
           stationId: stationId,
-          price: price,
+          name: data?['name']?.toString() ?? stationId,
+          fuelType: config.fuelType.apiValue,
+          pricePerLiter: price,
           lat: lat,
           lng: lng,
         ));
