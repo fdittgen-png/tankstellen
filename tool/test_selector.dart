@@ -60,6 +60,61 @@ const List<String> _runAllExactMatches = [
 const String _libRoot = 'lib/';
 const String _testRoot = 'test/';
 
+/// What the selector decided, split so a caller can inspect either half
+/// (#4177).
+class TestSelection {
+  const TestSelection({required this.affected, required this.alwaysRun});
+
+  /// Tests whose transitive `lib/` dependencies include a changed file.
+  final Set<String> affected;
+
+  /// Tests with NO transitive `lib/` import — cross-cutting contracts
+  /// that must run on every PR regardless of what changed.
+  final Set<String> alwaysRun;
+}
+
+/// Compute the selection for [libChanged], **in process**.
+///
+/// Extracted from [main] so `always_run_bucket_test` can call it
+/// directly instead of spawning `dart run` (#4177). That subprocess
+/// competes for the pub / build-hook lock with everything else a full
+/// parallel `flutter test` has in flight, and went red twice for that
+/// reason — a contract guard that fails for a reason unrelated to its
+/// contract is worse than no guard, because the third red gets ignored.
+TestSelection selectTests(Set<String> libChanged) {
+  // The file → direct-imports forward edge map for every Dart file under
+  // `lib/` and `test/`. Keys and values are POSIX-style relative paths
+  // from the project root.
+  final imports = <String, Set<String>>{};
+  _scanDartFiles(_libRoot, imports);
+  _scanDartFiles(_testRoot, imports);
+
+  // Only `_test.dart` files are emitted — helpers / fixtures in
+  // `test/helpers/`, `test/mocks/`, etc. aren't directly runnable.
+  final allTests = imports.keys
+      .where((k) => k.startsWith(_testRoot) && k.endsWith('_test.dart'))
+      .toList()
+    ..sort();
+
+  final affected = <String>{};
+  final alwaysRun = <String>{};
+
+  for (final t in allTests) {
+    final transitive = _transitiveClosure(t, imports);
+    final libDeps = transitive.where((f) => f.startsWith(_libRoot)).toSet();
+
+    if (libDeps.isEmpty) {
+      // Cross-cutting: no transitive lib import → always-run bucket.
+      alwaysRun.add(t);
+      continue;
+    }
+    if (libDeps.any(libChanged.contains)) {
+      affected.add(t);
+    }
+  }
+  return TestSelection(affected: affected, alwaysRun: alwaysRun);
+}
+
 Future<void> main(List<String> argv) async {
   String base = 'master';
   bool readStdin = false;
@@ -94,40 +149,12 @@ Future<void> main(List<String> argv) async {
       .where((p) => p.startsWith(_libRoot) && p.endsWith('.dart'))
       .toSet();
 
-  // Build the file → direct-imports forward edge map for every Dart
-  // file under `lib/` and `test/`. The map keys + values are
-  // POSIX-style relative paths from the project root.
-  final imports = <String, Set<String>>{};
-  _scanDartFiles(_libRoot, imports);
-  _scanDartFiles(_testRoot, imports);
-
-  // For each test file, compute its transitive lib imports. Only
-  // `_test.dart` files are emitted — helpers / fixtures in
-  // `test/helpers/`, `test/mocks/`, etc. aren't directly runnable.
-  final allTests = imports.keys
-      .where((k) => k.startsWith(_testRoot) && k.endsWith('_test.dart'))
+  final selection = selectTests(libChanged);
+  final out = (<String>{}
+        ..addAll(selection.affected)
+        ..addAll(selection.alwaysRun))
       .toList()
     ..sort();
-
-  final affected = <String>{};
-  final alwaysRun = <String>{};
-
-  for (final t in allTests) {
-    final transitive = _transitiveClosure(t, imports);
-    final libDeps =
-        transitive.where((f) => f.startsWith(_libRoot)).toSet();
-
-    if (libDeps.isEmpty) {
-      // Cross-cutting: no transitive lib import → always-run bucket.
-      alwaysRun.add(t);
-      continue;
-    }
-    if (libDeps.any(libChanged.contains)) {
-      affected.add(t);
-    }
-  }
-
-  final out = (<String>{}..addAll(affected)..addAll(alwaysRun)).toList()..sort();
   for (final t in out) {
     stdout.writeln(t);
   }

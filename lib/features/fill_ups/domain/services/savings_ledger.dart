@@ -13,6 +13,7 @@ class SavingsEntry {
     required this.litres,
     required this.pricePaid,
     required this.referencePrice,
+    this.currency,
   });
 
   final String fillUpId;
@@ -25,6 +26,10 @@ class SavingsEntry {
   /// €/L this driver normally pays — the baseline this is measured
   /// against, carried so the claim can be reproduced (trust rule 4).
   final double referencePrice;
+
+  /// ISO code [amount] is denominated in, or null for a fill logged
+  /// before the currency was recorded (#4136).
+  final String? currency;
 
   /// Positive when the fill beat the baseline, negative when it did not.
   ///
@@ -57,7 +62,9 @@ class SavingsEntry {
 ///   arithmetic, not a saving.
 /// * **Corrections are excluded**, as everywhere else.
 /// * **One currency.** A history spanning two currencies produces no
-///   total rather than a silently summed one.
+///   single total — [total] is null and [totalsByCurrency] holds the
+///   breakdown. Adding €40 to £40 produces a number that is true in no
+///   currency at all.
 class SavingsLedger {
   const SavingsLedger({required this.entries, required this.baseline});
 
@@ -73,13 +80,52 @@ class SavingsLedger {
   bool get isAvailable => baseline != null;
 
   /// Net across every counted fill — wins and misses.
-  double get total => entries.fold<double>(0, (sum, e) => sum + e.amount);
+  /// Every currency present, with its own net. The key is the ISO code,
+  /// or [kUnknownCurrency] for fills logged before the currency was
+  /// recorded (#4136).
+  Map<String, double> get totalsByCurrency {
+    final out = <String, double>{};
+    for (final e in entries) {
+      final key = e.currency ?? kUnknownCurrency;
+      out[key] = (out[key] ?? 0) + e.amount;
+    }
+    return out;
+  }
+
+  /// Whether every counted fill is in the same currency.
+  ///
+  /// An all-unknown history counts as one: a driver who never left their
+  /// country has exactly one currency and simply logged before the field
+  /// existed. A history that mixes a KNOWN currency with unknowns does
+  /// not, because the unknowns cannot be placed.
+  bool get isSingleCurrency => totalsByCurrency.length <= 1;
+
+  /// Net across every counted fill — wins and misses.
+  ///
+  /// **Null when the history spans more than one currency.** The caller
+  /// shows [totalsByCurrency] instead. There is no conversion here: a
+  /// rate would have to be the rate on each fill's own date, the app
+  /// does not have one, and a wrong rate is worse than two honest
+  /// totals.
+  double? get total => isSingleCurrency
+      ? entries.fold<double>(0, (sum, e) => sum + e.amount)
+      : null;
 
   /// Only the fills that beat the baseline. Shown BESIDE [total], never
   /// instead of it.
-  double get totalSaved =>
-      entries.where((e) => e.amount > 0).fold<double>(0, (s, e) => s + e.amount);
+  double? get totalSaved => isSingleCurrency
+      ? entries
+          .where((e) => e.amount > 0)
+          .fold<double>(0, (s, e) => s + e.amount)
+      : null;
 }
+
+/// The bucket unrecorded currencies fall into (#4136).
+///
+/// Its own key rather than a guess at the active currency: assuming
+/// today's is precisely the silent cross-currency sum this exists to
+/// prevent.
+const String kUnknownCurrency = '?';
 
 /// Build the ledger for one fuel from the driver's own history.
 SavingsLedger savingsLedgerFor(
@@ -105,6 +151,7 @@ SavingsLedger savingsLedgerFor(
           litres: f.liters,
           pricePaid: f.totalCost / f.liters,
           referencePrice: baseline.typicalPricePerLitre,
+          currency: f.currency,
         ),
   ];
   return SavingsLedger(entries: entries, baseline: baseline);

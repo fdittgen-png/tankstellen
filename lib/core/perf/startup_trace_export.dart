@@ -10,6 +10,7 @@ import '../sharing/public_file_exporter.dart';
 import '../storage/hive_open_timing.dart';
 import '../telemetry/storage/trace_storage.dart';
 import 'startup_timer.dart';
+import 'perf_budgets.dart';
 
 /// #3383 — file export + canonical JSON for the startup-initialization trace
 /// (the [StartupTimer] milestones). Local-only, files-only: writes JSON to the
@@ -87,6 +88,11 @@ class StartupTraceExport {
       'totalMs': totalMs,
       'phases': phases(milestones),
       'spans': spanMaps(spans),
+      // #4163 — the budgets travel with the measurement, so a field
+      // export says both what the device did AND what it was supposed
+      // to do. A phase list without its ceilings asks the reader to
+      // remember what "slow" means.
+      'budgets': perfBudgetExportRows(),
       // #4110 — omitted rather than null-filled when init has not run
       // (a test, or an export before storage came up): an absent field
       // is honest, a `{"name": null}` row invites a reader to conclude

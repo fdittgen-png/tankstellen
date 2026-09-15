@@ -222,6 +222,10 @@ class BackupXmlWriter {
       _writeText(builder, 'FuelType', f.fuelType.apiValue);
       _writeText(builder, 'Liters', f.liters.toString());
       _writeText(builder, 'TotalCost', f.totalCost.toString());
+      // #4136 — the currency TotalCost is denominated in. Without it a
+      // backup restored in another country is relabelled with today's
+      // currency, and the history silently becomes cross-currency.
+      _writeOptionalText(builder, 'Currency', f.currency);
       _writeText(builder, 'OdometerKm', f.odometerKm.toString());
       _writeOptionalText(builder, 'StationId', f.stationId);
       _writeOptionalText(builder, 'StationName', f.stationName);

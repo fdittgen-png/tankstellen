@@ -246,6 +246,9 @@ class BackupXmlReader {
       fuelType: FuelType.fromString(reqText(f, 'FuelType')),
       liters: reqNonNegativeDouble(f, 'Liters'),
       totalCost: reqDouble(f, 'TotalCost'),
+      // #4136 — absent in backups written before the field existed;
+      // null then flows through as "unknown", never as today's currency.
+      currency: readText(f, 'Currency'),
       odometerKm: reqDouble(f, 'OdometerKm'),
       stationId: readText(f, 'StationId'),
       stationName: readText(f, 'StationName'),

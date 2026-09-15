@@ -25,6 +25,21 @@ abstract class FillUp with _$FillUp {
     String? stationId,
     String? stationName,
     String? notes,
+    /// ISO currency code this fill-up's [totalCost] is denominated in
+    /// (#4136).
+    ///
+    /// Null on every fill logged before this field existed, and on any
+    /// fill whose country could not be resolved. Null does NOT mean
+    /// "the current currency": a driver who moved country has a history
+    /// in two, and assuming today's currency is exactly the silent
+    /// cross-currency sum this field exists to prevent. Consumers must
+    /// treat null as *unknown* — see [SavingsLedger].
+    ///
+    /// A field-add is transparent to TankSync (the whole model rides in
+    /// the JSONB `data` column), so no schema change is required —
+    /// CLAUDE.md rule 5.
+    String? currency,
+
     /// Optional reference to the [VehicleProfile] this fill-up belongs to
     /// (#694). Null means the user logged the fill-up without attributing
     /// it to a specific vehicle. Used to group per-vehicle stats and to

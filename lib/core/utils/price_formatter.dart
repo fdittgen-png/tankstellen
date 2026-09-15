@@ -47,6 +47,13 @@ class PriceFormatter {
   /// the zero-decimal decision in [formatTotal] — see [_zeroDecimal].
   static String get _currencyCode => _activeConfig.currency;
 
+  /// The active country's ISO currency code (#4136).
+  ///
+  /// Public because a fill-up must RECORD the currency it was entered
+  /// in — a cost stored without one cannot later be told apart from a
+  /// cost in another currency, and the two get summed.
+  static String get currencyCode => _currencyCode;
+
   /// Currencies that carry no minor unit, so a total is whole-numbered
   /// (₩1050, not ₩1050,00). Keyed off the ISO 4217 code so the set
   /// stays correct as countries are added. Covers the registered

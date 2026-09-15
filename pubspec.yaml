@@ -194,6 +194,12 @@ dev_dependencies:
   # riverpod/analyzer cluster is its own lockstep migration, not a rider
   # on an SDK bump.
   riverpod_lint: 3.1.3
+  # Property-based testing (#4158). DEV ONLY — never enters the shipped
+  # APK, so the F-Droid / NonFreeNet rule that keeps runtime deps out
+  # does not apply. What it buys over a hand-rolled generator is
+  # SHRINKING: a failing case is reduced to its minimal form instead of
+  # printing a random 17-decimal input nobody can read.
+  glados: ^1.1.7
 
 # #3172 — iOS ML Kit pod strip. iOS OCR is 100% Apple Vision since #3052,
 # but the upstream plugins still linked GoogleMLKit/TextRecognition +

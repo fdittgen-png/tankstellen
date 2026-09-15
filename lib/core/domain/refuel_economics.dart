@@ -36,11 +36,40 @@ export 'refuel_decision.dart';
 /// The default litres a refuel is assumed to buy when the user has no
 /// fill-up history to measure (#4089).
 ///
-/// A round European tankful. It only sets the SCALE of the detour
-/// penalty — `Q` appears once, as a divisor — so being 10 L out moves
-/// the effective price by cents, never the sign of a comparison. The
-/// caller should prefer the user's own median fill-up; see
-/// [RefuelProfile.litresIntended].
+/// A round European tankful.
+///
+/// ## What Q does, and what it does NOT do (corrected by #4158)
+///
+/// The effective price works out to `p + detourCost / Q`, and
+/// `detourCost` does not depend on Q. So Q is the divisor that
+/// **amortises the detour**: the more litres you buy, the less the drive
+/// to get there costs per litre.
+///
+/// This docstring previously claimed Q "moves the effective price by
+/// cents, never the sign of a comparison". **That is false**, and a
+/// property test found the counterexample on its first run:
+///
+/// ```
+/// a: €1.47/L at 0.7 km      b: €1.40/L at 7.7 km      6 L/100 km
+///   Q=20 → a 1.4794, b 1.4981   a wins
+///   Q=80 → a 1.4723, b 1.4245   b wins
+/// ```
+///
+/// That behaviour is CORRECT — a cheaper station further away genuinely
+/// becomes worth the drive once you are buying enough — but it means Q
+/// is a real input to the ranking, not a harmless scale factor. It is
+/// why `RefuelProfile.litresIntended` is measured from the user's own
+/// median fill (#4150) rather than defaulted, and why #4095 lets them
+/// change it.
+///
+/// What IS invariant, and is tested:
+///
+///  * at **equal distance** the effective price is proportional to the
+///    pump price, so Q never reorders two stations the same distance
+///    away;
+///  * raising Q moves every effective price monotonically **toward** its
+///    pump price, never away.
+///
 const double kDefaultRefuelLitres = 40;
 
 /// Crow-flies → road distance correction (#4089).
