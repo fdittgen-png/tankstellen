@@ -118,6 +118,7 @@ class DrivingAnalysisTraceCard extends ConsumerWidget {
       adapterName: entry?.adapterName,
       adapterMac: entry?.adapterMac,
       automatic: entry?.automatic ?? false,
+      roadLoad: RoadLoadTrack.from(samples).toTrace(), // #4203
     );
     final ok = await DrivingAnalysisTraceExport.export(trace);
     if (!context.mounted) return;

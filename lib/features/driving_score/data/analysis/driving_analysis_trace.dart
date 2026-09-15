@@ -109,6 +109,7 @@ class DrivingAnalysisTrace {
     this.adapterName,
     this.adapterMac,
     this.automatic = false,
+    this.roadLoad,
   });
 
   /// #3795 — how the recording ended. Null for trips saved before the
@@ -125,6 +126,10 @@ class DrivingAnalysisTrace {
 
   /// Whether auto-record started this trip.
   final bool automatic;
+
+  /// #4203 — the derived road-load features (grade / curvature confidence,
+  /// stops, curves by approach, oscillations) for model validation.
+  final Map<String, Object>? roadLoad;
 
   Map<String, dynamic> toJson() => {
         'schema': schema,
@@ -163,6 +168,7 @@ class DrivingAnalysisTrace {
           'events': [for (final r in summary.imuEventRecords) r.toJson()],
           'droppedEvents': summary.imuEventRecordsDropped,
         },
+        'roadLoad': roadLoad,
         'gpsFeatures': gpsFeatures == null
             ? null
             : {
