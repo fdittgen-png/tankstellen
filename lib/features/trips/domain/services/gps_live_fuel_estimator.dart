@@ -5,6 +5,7 @@ import 'dart:math' as math;
 
 import '../../../../core/domain/gps_calibration_matrix.dart';
 import '../../../../core/domain/vehicle_profile.dart';
+import '../vehicle_road_load_parameters.dart';
 import 'gps_fuel_estimator.dart';
 
 /// GPS-only **live** fuel-consumption estimator — a calibrated physics
@@ -63,6 +64,7 @@ class GpsLiveFuelEstimator {
     required this._engineEfficiency,
     required this._idleLitersPerHour,
     required this._physicsScale,
+    required this.parameters,
   });
 
   // ─── Physical constants ───
@@ -71,62 +73,21 @@ class GpsLiveFuelEstimator {
   static const double _moveThresholdMps = 0.5; // below this v is "stopped"
   static const int _accelWindow = 3; // moving-average low-pass length
 
-  // ─── Per-fuel volumetric energy density (LHV, MJ/L) + driveline params ───
-  //
-  // The energy→litres step `ṁ = P / (η · LHV · 1e6)` divides tractive
-  // energy by a *volumetric* lower heating value, so the LHV must match
-  // the fuel actually in the tank. Before #2431 this was a binary
-  // diesel-vs-petrol branch, which sent E85 (and LPG) down the petrol
-  // LHV (31.9 MJ/L): E85 packs ~25.6 MJ/L — ~20 % less energy per litre
-  // — so the same tractive work needs ~25 % MORE litres. Scaling an E85
-  // trip by the petrol LHV therefore under-counts its litres / Ø by
-  // ~20-25 %. This is the energy-path sibling of #2437's AFR/density fix
-  // (which corrected the OBD2 air-mass→litres path but not this physics
-  // energy→litres path).
-  //
-  // Sources (volumetric LHV at ~15 °C, commonly cited road-fuel figures):
-  //   * petrol  ≈ 31.9–32 MJ/L (kept at the legacy 31.9 so existing
-  //     petrol estimates don't shift),
-  //   * diesel  ≈ 35.8–36 MJ/L,
-  //   * E85     ≈ 25.6 MJ/L (≈85 % ethanol @ 21.2 MJ/L + 15 % petrol),
-  //   * LPG     ≈ 26 MJ/L (propane/butane autogas, liquid).
-  static const double petrolLhvMjPerL = 31.9;
-  static const double petrolEfficiency = 0.28;
-  static const double petrolIdleLPerHour = 0.7;
-  static const double dieselLhvMjPerL = 35.8;
-  static const double dieselEfficiency = 0.34;
-  static const double dieselIdleLPerHour = 0.5;
-
-  /// E85 volumetric LHV (#2431). ~85 % ethanol (≈21.2 MJ/L) + ~15 %
-  /// petrol → ≈25.6 MJ/L, ~20 % below petrol. Ethanol's higher knock
-  /// resistance also lets flex-fuel engines run a touch more efficiently,
-  /// but the dominant correction is the lower energy density, so the
-  /// efficiency stays at the petrol value and the LHV carries the fix.
-  static const double e85LhvMjPerL = 25.6;
-
-  /// LPG / autogas volumetric LHV (#2431). Liquid propane/butane mix
-  /// ≈26 MJ/L — also well below petrol. Same efficiency/idle as petrol
-  /// (spark-ignition engine); the LHV carries the correction.
-  static const double lpgLhvMjPerL = 26.0;
-
-  // ─── Vehicle-class default table (mass / Cd / frontalArea / Crr) ───
-  // Resolved by curb weight when a measured mass is available, else the
-  // [_classDefault] catch-all row. VehicleType only distinguishes the
-  // powertrain (combustion / hybrid / ev) — it carries no body-size
-  // class — so the body-load defaults are bucketed by weight instead.
-  static const _VehicleClass _compact =
-      _VehicleClass(massKg: 1300, cd: 0.30, areaM2: 2.15, crr: 0.012);
-  static const _VehicleClass _midsize =
-      _VehicleClass(massKg: 1550, cd: 0.30, areaM2: 2.25, crr: 0.012);
-  static const _VehicleClass _suv =
-      _VehicleClass(massKg: 1900, cd: 0.38, areaM2: 2.80, crr: 0.013);
-  static const _VehicleClass _classDefault =
-      _VehicleClass(massKg: 1500, cd: 0.32, areaM2: 2.30, crr: 0.012);
-
-  // Curb-weight bucket thresholds (kg) that map a measured mass to a
-  // body-load class for Cd / frontal-area / Crr.
-  static const int _compactMaxKg = 1450;
-  static const int _midsizeMaxKg = 1750;
+  // ─── Energy constants — owned by [VehicleRoadLoadParameters] (#4209) ───
+  static const double petrolLhvMjPerL =
+      VehicleRoadLoadParameters.petrolLhvMjPerL;
+  static const double petrolEfficiency =
+      VehicleRoadLoadParameters.petrolEfficiency;
+  static const double petrolIdleLPerHour =
+      VehicleRoadLoadParameters.petrolIdleLPerHour;
+  static const double dieselLhvMjPerL =
+      VehicleRoadLoadParameters.dieselLhvMjPerL;
+  static const double dieselEfficiency =
+      VehicleRoadLoadParameters.dieselEfficiency;
+  static const double dieselIdleLPerHour =
+      VehicleRoadLoadParameters.dieselIdleLPerHour;
+  static const double e85LhvMjPerL = VehicleRoadLoadParameters.e85LhvMjPerL;
+  static const double lpgLhvMjPerL = VehicleRoadLoadParameters.lpgLhvMjPerL;
 
   final double _massKg;
   final double _dragCoefficient;
@@ -136,6 +97,10 @@ class GpsLiveFuelEstimator {
   final double _engineEfficiency;
   final double _idleLitersPerHour;
   final double _physicsScale;
+
+  /// #4209 — the parameter set behind every figure, with its provenance,
+  /// for the debug trace and the calibration.
+  final VehicleRoadLoadParameters parameters;
 
   // ─── Accumulated state ───
   final List<double> _accelWindowSamples = <double>[];
@@ -172,22 +137,32 @@ class GpsLiveFuelEstimator {
   factory GpsLiveFuelEstimator.forVehicle(
     VehicleProfile? vehicle,
     GpsCalibrationMatrix? matrix,
-  ) {
-    final klass = _resolveClass(vehicle?.curbWeightKg);
-    final massKg = (vehicle?.curbWeightKg)?.toDouble() ?? klass.massKg;
-    final fuel = _resolveFuel(vehicle?.preferredFuelType);
-    final scale = matrix?.physicsScale ?? 1.0;
-    return GpsLiveFuelEstimator._(
-      massKg: massKg,
-      dragCoefficient: klass.cd,
-      frontalAreaM2: klass.areaM2,
-      rollingResistance: klass.crr,
-      lowerHeatingValueMjPerL: fuel.lhvMjPerL,
-      engineEfficiency: fuel.efficiency,
-      idleLitersPerHour: fuel.idleLPerHour,
-      physicsScale: scale,
-    );
-  }
+  ) =>
+      GpsLiveFuelEstimator.withParameters(
+        VehicleRoadLoadParameters.resolve(
+          curbWeightKg: vehicle?.curbWeightKg,
+          preferredFuelType: vehicle?.preferredFuelType,
+        ),
+        physicsScale: matrix?.physicsScale ?? 1.0,
+      );
+
+  /// #4209 — an estimator over an explicit parameter set (sensitivity
+  /// analysis, replay with a candidate parameter version).
+  factory GpsLiveFuelEstimator.withParameters(
+    VehicleRoadLoadParameters parameters, {
+    double physicsScale = 1.0,
+  }) =>
+      GpsLiveFuelEstimator._(
+        massKg: parameters.massKg,
+        dragCoefficient: parameters.dragCoefficient,
+        frontalAreaM2: parameters.frontalAreaM2,
+        rollingResistance: parameters.rollingResistance,
+        lowerHeatingValueMjPerL: parameters.lowerHeatingValueMjPerL,
+        engineEfficiency: parameters.engineEfficiency,
+        idleLitersPerHour: parameters.idleLitersPerHour,
+        physicsScale: physicsScale,
+        parameters: parameters,
+      );
 
   /// Fold one GPS sample into the estimate and return the new instant
   /// L/100 km (also exposed via [instantLPer100Km]).
@@ -259,86 +234,4 @@ class GpsLiveFuelEstimator {
     final sum = _accelWindowSamples.reduce((a, b) => a + b);
     return sum / _accelWindowSamples.length;
   }
-
-  /// Map a curb weight (kg) to a body-load class. Null weight → the
-  /// population-default catch-all row.
-  static _VehicleClass _resolveClass(int? curbWeightKg) {
-    if (curbWeightKg == null) return _classDefault;
-    if (curbWeightKg <= _compactMaxKg) return _compact;
-    if (curbWeightKg <= _midsizeMaxKg) return _midsize;
-    return _suv;
-  }
-
-  /// Map a [VehicleProfile.preferredFuelType] free-text string to its
-  /// fuel-energy + driveline params (#2431). The match order mirrors
-  /// [resolveAfrDensity] in `fuel_rate_estimator.dart` (#2437) so the
-  /// physics energy→litres path and the OBD2 air-mass→litres path can
-  /// never disagree on which fuel a figure is scaled for:
-  ///
-  ///   * `diesel` (contains, so `"dieselPremium"` matches) → diesel LHV,
-  ///   * `e85` / `ethanol` → E85 LHV (the #2431 fix — was petrol before),
-  ///   * `lpg` / `autogas` → LPG LHV,
-  ///   * everything else (petrol / e10 / super / cng / null / unknown)
-  ///     → petrol defaults. CNG has no meaningful volumetric LHV (sold
-  ///     by mass), so it takes the petrol default — matching #2437's
-  ///     documented "unknown → petrol, safer to under-count" rule.
-  static _FuelParams _resolveFuel(String? preferredFuelType) {
-    final key = preferredFuelType?.toLowerCase().trim() ?? '';
-    if (key.contains('diesel')) {
-      return const _FuelParams(
-        lhvMjPerL: dieselLhvMjPerL,
-        efficiency: dieselEfficiency,
-        idleLPerHour: dieselIdleLPerHour,
-      );
-    }
-    if (key.contains('e85') || key.contains('ethanol')) {
-      // E85: lower energy density carries the correction; spark-ignition
-      // efficiency + idle stay at the petrol values.
-      return const _FuelParams(
-        lhvMjPerL: e85LhvMjPerL,
-        efficiency: petrolEfficiency,
-        idleLPerHour: petrolIdleLPerHour,
-      );
-    }
-    if (key.contains('lpg') || key.contains('autogas')) {
-      return const _FuelParams(
-        lhvMjPerL: lpgLhvMjPerL,
-        efficiency: petrolEfficiency,
-        idleLPerHour: petrolIdleLPerHour,
-      );
-    }
-    return const _FuelParams(
-      lhvMjPerL: petrolLhvMjPerL,
-      efficiency: petrolEfficiency,
-      idleLPerHour: petrolIdleLPerHour,
-    );
-  }
-}
-
-/// Body-load defaults for one vehicle class.
-class _VehicleClass {
-  const _VehicleClass({
-    required this.massKg,
-    required this.cd,
-    required this.areaM2,
-    required this.crr,
-  });
-
-  final double massKg;
-  final double cd;
-  final double areaM2;
-  final double crr;
-}
-
-/// Fuel-energy + driveline params for one fuel type.
-class _FuelParams {
-  const _FuelParams({
-    required this.lhvMjPerL,
-    required this.efficiency,
-    required this.idleLPerHour,
-  });
-
-  final double lhvMjPerL;
-  final double efficiency;
-  final double idleLPerHour;
 }
