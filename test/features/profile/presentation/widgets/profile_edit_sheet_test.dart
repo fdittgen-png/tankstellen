@@ -155,23 +155,28 @@ void main() {
   });
 
   group('Delete profile l10n', () {
-    test('English ARB has deleteProfile strings', () {
-      final source = File('lib/l10n/app_en.arb').readAsStringSync();
-      expect(source, contains('deleteProfileTitle'));
-      expect(source, contains('deleteProfileBody'));
-      expect(source, contains('deleteProfileConfirm'));
+    // #4235 — resolved through the generated localizations, not by grepping
+    // the ARB text: a key that exists but never reaches the app fails here.
+    final en = lookupAppLocalizations(const Locale('en'));
+
+    test('English resolves every deleteProfile string', () {
+      expect(en.deleteProfileTitle, isNotEmpty);
+      expect(en.deleteProfileBody, isNotEmpty);
+      expect(en.deleteProfileConfirm, isNotEmpty);
     });
 
-    test('German ARB has deleteProfile strings', () {
-      final source = File('lib/l10n/app_de.arb').readAsStringSync();
-      expect(source, contains('deleteProfileTitle'));
-      expect(source, contains('Profil löschen'));
+    test('German resolves translated deleteProfile strings', () {
+      final de = lookupAppLocalizations(const Locale('de'));
+      expect([de.deleteProfileTitle, de.deleteProfileConfirm],
+          contains('Profil löschen'));
+      expect(de.deleteProfileBody, isNot(en.deleteProfileBody));
     });
 
-    test('French ARB has deleteProfile strings', () {
-      final source = File('lib/l10n/app_fr.arb').readAsStringSync();
-      expect(source, contains('deleteProfileTitle'));
-      expect(source, contains('Supprimer le profil'));
+    test('French resolves translated deleteProfile strings', () {
+      final fr = lookupAppLocalizations(const Locale('fr'));
+      expect([fr.deleteProfileTitle, fr.deleteProfileConfirm],
+          contains('Supprimer le profil'));
+      expect(fr.deleteProfileBody, isNot(en.deleteProfileBody));
     });
 
     test('all 23 ARB files have deleteProfile keys', () {
