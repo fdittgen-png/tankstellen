@@ -7073,6 +7073,66 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get opportunitiesSectionTitle => 'Opportunities';
+
+  @override
+  String get opportunitiesEmptyTitle => 'Nothing worth telling you about yet';
+
+  @override
+  String get opportunitiesEmptyBody =>
+      'SparKilo checks your stations and your area in the background. A stop worth the detour, a price unusual for your area, or one below what you normally pay will appear here — whether or not it was worth a notification.';
+
+  @override
+  String get opportunityNotSentLabel => 'Not sent';
+
+  @override
+  String get opportunityKindBestStopNow => 'Best stop nearby';
+
+  @override
+  String get opportunityKindBestStopOnRoute => 'Best stop on your route';
+
+  @override
+  String get opportunityKindRefuelSoon => 'You will need fuel';
+
+  @override
+  String get opportunityKindExceptionalLocalPrice => 'Unusual price nearby';
+
+  @override
+  String get opportunityKindPersonalBaseline => 'Below what you usually pay';
+
+  @override
+  String get opportunityKindLocalMovement => 'Prices moving nearby';
+
+  @override
+  String get opportunityKindFavouriteStation => 'Your price alert';
+
+  @override
+  String get opportunityRefusalDailyCap =>
+      'You had already had today\'s alerts';
+
+  @override
+  String get opportunityRefusalTooSoon => 'Another alert had just gone out';
+
+  @override
+  String get opportunityRefusalBelowFloor =>
+      'Not enough to be worth interrupting you';
+
+  @override
+  String get opportunityRefusalAlreadyTold =>
+      'You were told about this station recently';
+
+  @override
+  String get opportunityRefusalOutranked => 'A better one went out instead';
+
+  @override
+  String get opportunityRefusalConfidenceTooLow =>
+      'Too weakly supported to arrive uninvited';
+
+  @override
+  String get opportunityRefusalIneligible =>
+      'It stopped being true before we could send it';
+
+  @override
   String opportunityBestStopNowTitle(String fuelType) {
     return 'Cheapest $fuelType nearby';
   }

@@ -6992,6 +6992,66 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get opportunitiesSectionTitle => 'Opportunities';
+
+  @override
+  String get opportunitiesEmptyTitle => 'Nothing worth telling you about yet';
+
+  @override
+  String get opportunitiesEmptyBody =>
+      'SparKilo watches your stations and your area in the background. A stop worth the detour, or a price unusual for where you are, appears here.';
+
+  @override
+  String get opportunityNotSentLabel => 'Not sent';
+
+  @override
+  String get opportunityKindBestStopNow => 'Best stop nearby';
+
+  @override
+  String get opportunityKindBestStopOnRoute => 'Best stop on your route';
+
+  @override
+  String get opportunityKindRefuelSoon => 'You will need fuel';
+
+  @override
+  String get opportunityKindExceptionalLocalPrice => 'Unusual price nearby';
+
+  @override
+  String get opportunityKindPersonalBaseline => 'Below what you usually pay';
+
+  @override
+  String get opportunityKindLocalMovement => 'Prices moving nearby';
+
+  @override
+  String get opportunityKindFavouriteStation => 'Your price alert';
+
+  @override
+  String get opportunityRefusalDailyCap =>
+      'You had already had today\'s alerts';
+
+  @override
+  String get opportunityRefusalTooSoon => 'Another alert had just gone out';
+
+  @override
+  String get opportunityRefusalBelowFloor =>
+      'Not enough to be worth interrupting you';
+
+  @override
+  String get opportunityRefusalAlreadyTold =>
+      'You were told about this station recently';
+
+  @override
+  String get opportunityRefusalOutranked => 'A better one went out instead';
+
+  @override
+  String get opportunityRefusalConfidenceTooLow =>
+      'Too weakly supported to arrive uninvited';
+
+  @override
+  String get opportunityRefusalIneligible =>
+      'It stopped being true before we could send it';
+
+  @override
   String opportunityBestStopNowTitle(String fuelType) {
     return 'Cheapest $fuelType nearby';
   }
@@ -16675,6 +16735,72 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
     });
     return '⟦$_temp0⟧';
   }
+
+  @override
+  String get opportunitiesSectionTitle => '⟦Óƥƥóřŧúñîŧîéš ······⟧';
+
+  @override
+  String get opportunitiesEmptyTitle =>
+      '⟦Ñóŧĥîñǧ ŵóřŧĥ ŧéłłîñǧ ýóú áƀóúŧ ýéŧ ··············⟧';
+
+  @override
+  String get opportunitiesEmptyBody =>
+      '⟦ŠƥářĶîłó ŵáŧçĥéš ýóúř šŧáŧîóñš áñđ ýóúř ářéá îñ ŧĥé ƀáçķǧřóúñđ. Á šŧóƥ ŵóřŧĥ ŧĥé đéŧóúř, óř á ƥřîçé úñúšúáł ƒóř ŵĥéřé ýóú ářé, áƥƥéářš ĥéřé. ··················································⟧';
+
+  @override
+  String get opportunityNotSentLabel => '⟦Ñóŧ šéñŧ ···⟧';
+
+  @override
+  String get opportunityKindBestStopNow => '⟦Ɓéšŧ šŧóƥ ñéářƀý ······⟧';
+
+  @override
+  String get opportunityKindBestStopOnRoute =>
+      '⟦Ɓéšŧ šŧóƥ óñ ýóúř řóúŧé ·········⟧';
+
+  @override
+  String get opportunityKindRefuelSoon => '⟦Ýóú ŵîłł ñééđ ƒúéł ·······⟧';
+
+  @override
+  String get opportunityKindExceptionalLocalPrice =>
+      '⟦Úñúšúáł ƥřîçé ñéářƀý ········⟧';
+
+  @override
+  String get opportunityKindPersonalBaseline =>
+      '⟦Ɓéłóŵ ŵĥáŧ ýóú úšúáłłý ƥáý ··········⟧';
+
+  @override
+  String get opportunityKindLocalMovement => '⟦Ƥřîçéš ɱóṽîñǧ ñéářƀý ········⟧';
+
+  @override
+  String get opportunityKindFavouriteStation => '⟦Ýóúř ƥřîçé áłéřŧ ······⟧';
+
+  @override
+  String get opportunityRefusalDailyCap =>
+      '⟦Ýóú ĥáđ áłřéáđý ĥáđ ŧóđáý\'š áłéřŧš ·············⟧';
+
+  @override
+  String get opportunityRefusalTooSoon =>
+      '⟦Áñóŧĥéř áłéřŧ ĥáđ ĵúšŧ ǧóñé óúŧ ············⟧';
+
+  @override
+  String get opportunityRefusalBelowFloor =>
+      '⟦Ñóŧ éñóúǧĥ ŧó ƀé ŵóřŧĥ îñŧéřřúƥŧîñǧ ýóú ···············⟧';
+
+  @override
+  String get opportunityRefusalAlreadyTold =>
+      '⟦Ýóú ŵéřé ŧółđ áƀóúŧ ŧĥîš šŧáŧîóñ řéçéñŧłý ················⟧';
+
+  @override
+  String get opportunityRefusalOutranked =>
+      '⟦Á ƀéŧŧéř óñé ŵéñŧ óúŧ îñšŧéáđ ···········⟧';
+
+  @override
+  String get opportunityRefusalConfidenceTooLow =>
+      '⟦Ŧóó ŵéáķłý šúƥƥóřŧéđ ŧó ářřîṽé úñîñṽîŧéđ ················⟧';
+
+  @override
+  String get opportunityRefusalIneligible =>
+      '⟦Îŧ šŧóƥƥéđ ƀéîñǧ ŧřúé ƀéƒóřé ŵé çóúłđ šéñđ îŧ ·················⟧';
 
   @override
   String opportunityBestStopNowTitle(String fuelType) {

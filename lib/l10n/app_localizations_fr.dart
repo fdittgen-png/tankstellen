@@ -7095,6 +7095,69 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get opportunitiesSectionTitle => 'Opportunités';
+
+  @override
+  String get opportunitiesEmptyTitle =>
+      'Rien qui mérite encore d\'être signalé';
+
+  @override
+  String get opportunitiesEmptyBody =>
+      'SparKilo surveille vos stations et votre secteur en arrière-plan. Un arrêt qui vaut le détour, ou un prix inhabituel, apparaîtra ici.';
+
+  @override
+  String get opportunityNotSentLabel => 'Non envoyée';
+
+  @override
+  String get opportunityKindBestStopNow => 'Meilleur arrêt à proximité';
+
+  @override
+  String get opportunityKindBestStopOnRoute =>
+      'Meilleur arrêt sur votre trajet';
+
+  @override
+  String get opportunityKindRefuelSoon => 'Vous allez devoir faire le plein';
+
+  @override
+  String get opportunityKindExceptionalLocalPrice =>
+      'Prix inhabituel à proximité';
+
+  @override
+  String get opportunityKindPersonalBaseline => 'Moins cher que d\'habitude';
+
+  @override
+  String get opportunityKindLocalMovement => 'Les prix bougent près de vous';
+
+  @override
+  String get opportunityKindFavouriteStation => 'Votre alerte de prix';
+
+  @override
+  String get opportunityRefusalDailyCap =>
+      'Vous aviez déjà eu vos alertes du jour';
+
+  @override
+  String get opportunityRefusalTooSoon => 'Une autre alerte venait de partir';
+
+  @override
+  String get opportunityRefusalBelowFloor => 'Pas assez pour vous déranger';
+
+  @override
+  String get opportunityRefusalAlreadyTold =>
+      'Vous avez déjà été prévenu pour cette station';
+
+  @override
+  String get opportunityRefusalOutranked =>
+      'Une meilleure est partie à la place';
+
+  @override
+  String get opportunityRefusalConfidenceTooLow =>
+      'Trop peu étayée pour arriver sans être demandée';
+
+  @override
+  String get opportunityRefusalIneligible =>
+      'Ce n\'était déjà plus vrai au moment d\'envoyer';
+
+  @override
   String opportunityBestStopNowTitle(String fuelType) {
     return '$fuelType le moins cher à proximité';
   }

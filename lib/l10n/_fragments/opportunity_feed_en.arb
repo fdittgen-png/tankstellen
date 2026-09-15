@@ -1,0 +1,46 @@
+{
+  "opportunitiesSectionTitle": "Opportunities",
+  "@opportunitiesSectionTitle": {
+    "description": "Heading of the feed that shows what the background engine found — everything it scored, whether or not it became a notification (#4154, epic #4148). Sits above the configured station and zone alerts, because it is what HAPPENED rather than what the user set up."
+  },
+  "opportunitiesEmptyTitle": "Nothing worth telling you about yet",
+  "@opportunitiesEmptyTitle": {
+    "description": "Empty state of the opportunities feed. Deliberately not 'no results': nothing failed, the engine simply has not found a decision worth surfacing (#4154)."
+  },
+  "opportunitiesEmptyBody": "SparKilo watches your stations and your area in the background. A stop worth the detour, or a price unusual for where you are, appears here.",
+  "@opportunitiesEmptyBody": {
+    "description": "Empty-state body of the opportunities feed. #4154 requires this to say what the engine is watching for and why nothing is there yet, and explicitly forbids a fabricated example row."
+  },
+  "opportunityNotSentLabel": "Not sent",
+  "@opportunityNotSentLabel": {
+    "description": "Chip on a feed row the attention budget declined to push (#4151). It is followed by the reason; the row is still shown because a demotion is not a deletion."
+  },
+  "opportunityKindBestStopNow": "Best stop nearby",
+  "@opportunityKindBestStopNow": {"description": "Feed row label for OpportunityKind.bestStopNow (#4154)."},
+  "opportunityKindBestStopOnRoute": "Best stop on your route",
+  "@opportunityKindBestStopOnRoute": {"description": "Feed row label for OpportunityKind.bestStopOnRoute (#4154)."},
+  "opportunityKindRefuelSoon": "You will need fuel",
+  "@opportunityKindRefuelSoon": {"description": "Feed row label for OpportunityKind.refuelSoon — the tank is low enough that a stop is coming regardless of price (#4153)."},
+  "opportunityKindExceptionalLocalPrice": "Unusual price nearby",
+  "@opportunityKindExceptionalLocalPrice": {"description": "Feed row label for OpportunityKind.exceptionalLocalPrice — unusual for the area, not merely below a number (#4154)."},
+  "opportunityKindPersonalBaseline": "Below what you usually pay",
+  "@opportunityKindPersonalBaseline": {"description": "Feed row label for OpportunityKind.personalBaseline — measured against this user's own fill-up history (#4150)."},
+  "opportunityKindLocalMovement": "Prices moving nearby",
+  "@opportunityKindLocalMovement": {"description": "Feed row label for OpportunityKind.localMovement — the one kind that is about an AREA rather than a station, so the row names no station (#4154)."},
+  "opportunityKindFavouriteStation": "Your price alert",
+  "@opportunityKindFavouriteStation": {"description": "Feed row label for OpportunityKind.favouriteStation — an alert the user configured themselves (#4154)."},
+  "opportunityRefusalDailyCap": "You had already had today's alerts",
+  "@opportunityRefusalDailyCap": {"description": "Reason shown on a feed row the budget refused with BudgetRefusal.dailyCapReached. Phrased as a fact about the day, not as an error (#4151)."},
+  "opportunityRefusalTooSoon": "Another alert had just gone out",
+  "@opportunityRefusalTooSoon": {"description": "Reason for BudgetRefusal.tooSoonAfterLast — the minimum spacing between any two notifications, across every alert kind (#4151)."},
+  "opportunityRefusalBelowFloor": "Not enough to be worth interrupting you",
+  "@opportunityRefusalBelowFloor": {"description": "Reason for BudgetRefusal.savingBelowFloor — the saving was below the point where an interruption costs more than it returns (#4151)."},
+  "opportunityRefusalAlreadyTold": "You were told about this station recently",
+  "@opportunityRefusalAlreadyTold": {"description": "Reason for BudgetRefusal.alreadyToldRecently — the cross-detector quiet period for one station (#4151)."},
+  "opportunityRefusalOutranked": "A better one went out instead",
+  "@opportunityRefusalOutranked": {"description": "Reason for BudgetRefusal.outrankedInWindow — every candidate from one scan is decided together and the best one takes the slot, so a cheap find does not win merely by being first (#4151)."},
+  "opportunityRefusalConfidenceTooLow": "Too weakly supported to arrive uninvited",
+  "@opportunityRefusalConfidenceTooLow": {"description": "Reason for BudgetRefusal.confidenceTooLow (#4152). The row is still in the feed: a weak signal is worth having when the user came looking for it, just not worth a push."},
+  "opportunityRefusalIneligible": "It stopped being true before we could send it",
+  "@opportunityRefusalIneligible": {"description": "Reason for BudgetRefusal.ineligible — expired, an untrustworthy source, or a saving that did not reconcile (#4151)."}
+}

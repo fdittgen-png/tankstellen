@@ -11903,6 +11903,114 @@ abstract class AppLocalizations {
   /// **'{open, select, true{Station is open} false{Station is closed} other{Open state unknown}}'**
   String stationOpenStateSemantic(String open);
 
+  /// Heading of the feed that shows what the background engine found — everything it scored, whether or not it became a notification (#4154, epic #4148). Sits above the configured station and zone alerts, because it is what HAPPENED rather than what the user set up.
+  ///
+  /// In en, this message translates to:
+  /// **'Opportunities'**
+  String get opportunitiesSectionTitle;
+
+  /// Empty state of the opportunities feed. Deliberately not 'no results': nothing failed, the engine simply has not found a decision worth surfacing (#4154).
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing worth telling you about yet'**
+  String get opportunitiesEmptyTitle;
+
+  /// Empty-state body of the opportunities feed. #4154 requires this to say what the engine is watching for and why nothing is there yet, and explicitly forbids a fabricated example row.
+  ///
+  /// In en, this message translates to:
+  /// **'SparKilo watches your stations and your area in the background. A stop worth the detour, or a price unusual for where you are, appears here.'**
+  String get opportunitiesEmptyBody;
+
+  /// Chip on a feed row the attention budget declined to push (#4151). It is followed by the reason; the row is still shown because a demotion is not a deletion.
+  ///
+  /// In en, this message translates to:
+  /// **'Not sent'**
+  String get opportunityNotSentLabel;
+
+  /// Feed row label for OpportunityKind.bestStopNow (#4154).
+  ///
+  /// In en, this message translates to:
+  /// **'Best stop nearby'**
+  String get opportunityKindBestStopNow;
+
+  /// Feed row label for OpportunityKind.bestStopOnRoute (#4154).
+  ///
+  /// In en, this message translates to:
+  /// **'Best stop on your route'**
+  String get opportunityKindBestStopOnRoute;
+
+  /// Feed row label for OpportunityKind.refuelSoon — the tank is low enough that a stop is coming regardless of price (#4153).
+  ///
+  /// In en, this message translates to:
+  /// **'You will need fuel'**
+  String get opportunityKindRefuelSoon;
+
+  /// Feed row label for OpportunityKind.exceptionalLocalPrice — unusual for the area, not merely below a number (#4154).
+  ///
+  /// In en, this message translates to:
+  /// **'Unusual price nearby'**
+  String get opportunityKindExceptionalLocalPrice;
+
+  /// Feed row label for OpportunityKind.personalBaseline — measured against this user's own fill-up history (#4150).
+  ///
+  /// In en, this message translates to:
+  /// **'Below what you usually pay'**
+  String get opportunityKindPersonalBaseline;
+
+  /// Feed row label for OpportunityKind.localMovement — the one kind that is about an AREA rather than a station, so the row names no station (#4154).
+  ///
+  /// In en, this message translates to:
+  /// **'Prices moving nearby'**
+  String get opportunityKindLocalMovement;
+
+  /// Feed row label for OpportunityKind.favouriteStation — an alert the user configured themselves (#4154).
+  ///
+  /// In en, this message translates to:
+  /// **'Your price alert'**
+  String get opportunityKindFavouriteStation;
+
+  /// Reason shown on a feed row the budget refused with BudgetRefusal.dailyCapReached. Phrased as a fact about the day, not as an error (#4151).
+  ///
+  /// In en, this message translates to:
+  /// **'You had already had today\'s alerts'**
+  String get opportunityRefusalDailyCap;
+
+  /// Reason for BudgetRefusal.tooSoonAfterLast — the minimum spacing between any two notifications, across every alert kind (#4151).
+  ///
+  /// In en, this message translates to:
+  /// **'Another alert had just gone out'**
+  String get opportunityRefusalTooSoon;
+
+  /// Reason for BudgetRefusal.savingBelowFloor — the saving was below the point where an interruption costs more than it returns (#4151).
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough to be worth interrupting you'**
+  String get opportunityRefusalBelowFloor;
+
+  /// Reason for BudgetRefusal.alreadyToldRecently — the cross-detector quiet period for one station (#4151).
+  ///
+  /// In en, this message translates to:
+  /// **'You were told about this station recently'**
+  String get opportunityRefusalAlreadyTold;
+
+  /// Reason for BudgetRefusal.outrankedInWindow — every candidate from one scan is decided together and the best one takes the slot, so a cheap find does not win merely by being first (#4151).
+  ///
+  /// In en, this message translates to:
+  /// **'A better one went out instead'**
+  String get opportunityRefusalOutranked;
+
+  /// Reason for BudgetRefusal.confidenceTooLow (#4152). The row is still in the feed: a weak signal is worth having when the user came looking for it, just not worth a push.
+  ///
+  /// In en, this message translates to:
+  /// **'Too weakly supported to arrive uninvited'**
+  String get opportunityRefusalConfidenceTooLow;
+
+  /// Reason for BudgetRefusal.ineligible — expired, an untrustworthy source, or a saving that did not reconcile (#4151).
+  ///
+  /// In en, this message translates to:
+  /// **'It stopped being true before we could send it'**
+  String get opportunityRefusalIneligible;
+
   /// Title of the background notification for OpportunityKind.bestStopNow — the best stop available right now, near where the user is (#4183, epic #4148). Resolved in the main isolate at task-registration time and read back by the WorkManager isolate via Hive settings, like every other background notification template.
   ///
   /// In en, this message translates to:
