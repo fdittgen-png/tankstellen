@@ -105,11 +105,11 @@ mixin _TripRecordingSummary on _TripRecordingTelemetryIngest {
       ),
       fuelRateSuspect: fuelRateSuspect,
       volumetricEfficiencyUsed: _fuel.volumetricEfficiencyUsed,
-      // #3887 — the pump-anchored gain the estimated fuel carried.
-      // #3918 — the RESOLVED gain (per-fuel / scalar) the live chain
-      // actually multiplied by; the scalar only when nothing was derived.
+      // #3887/#3918/#4220 — the resolved gain the live chain applied + its fuel.
       pumpGainApplied:
           _liveSampleSnapshot.lastPumpGainResolution?.gain ?? _vehicle?.pumpGain,
+      pumpGainFuelKey:
+          _liveSampleSnapshot.lastPumpGainResolution?.requestedFuelKey,
     );
   }
 }

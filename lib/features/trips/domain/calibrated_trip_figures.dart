@@ -70,25 +70,33 @@ class CalibratedTripFigures {
     return ((g - 1.0) * 100).round();
   }
 
-  /// Re-express [summary] at [vehicle]'s current gain for [fuelKey]
-  /// (null → the vehicle's tank / default fuel; see
-  /// [pumpGainFuelKeyFor]). A null [vehicle] passes the stored figures
-  /// through unchanged.
+  /// Re-express [summary] at [vehicle]'s current gain for the fuel the trip
+  /// was recorded on ([TripSummary.pumpGainFuelKey], #4220). [fuelKey]
+  /// overrides it (the tank report passes its window's grade). A legacy
+  /// trip without a key on a per-fuel vehicle is NOT re-expressed — which
+  /// grade it burned is unknown, so the gain it carries stays the honest
+  /// figure. A null [vehicle] passes the stored figures through unchanged.
   static CalibratedTripFigures of(
     TripSummary summary,
     VehicleProfile? vehicle, {
     String? fuelKey,
   }) {
     final kind = tripFuelSourceKind(summary);
+    final tripFuelKey = fuelKey ?? summary.pumpGainFuelKey;
     final resolution = resolvePumpGain(
       vehicle,
-      fuelKey: fuelKey ?? pumpGainFuelKeyFor(vehicle),
+      fuelKey: tripFuelKey ?? pumpGainFuelKeyFor(vehicle),
     );
+    final gradeUnknown = tripFuelKey == null &&
+        vehicle != null &&
+        (vehicle.multiFuelCapable || vehicle.pumpGainByFuel.isNotEmpty);
     final applied = summary.pumpGainApplied;
     final storedLiters = summary.fuelLitersConsumed;
     final storedAvg = summary.avgLPer100Km;
     var scale = 1.0;
-    if (kind == TripFuelSourceKind.estimated && vehicle != null) {
+    if (kind == TripFuelSourceKind.estimated &&
+        vehicle != null &&
+        !gradeUnknown) {
       final pg = applied ?? 1.0;
       if (pg > 0 && (resolution.gain - pg).abs() > 1e-6) {
         scale = resolution.gain / pg;

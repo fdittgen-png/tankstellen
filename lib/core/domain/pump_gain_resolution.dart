@@ -29,6 +29,7 @@ class PumpGainResolution {
     required this.samples,
     this.fuelKey,
     this.updatedAt,
+    this.requestedFuelKey,
   });
 
   static const PumpGainResolution none = PumpGainResolution(
@@ -47,6 +48,11 @@ class PumpGainResolution {
   /// the scalar / uncalibrated sources.
   final String? fuelKey;
   final DateTime? updatedAt;
+
+  /// #4220 — the normalised key the lookup ASKED for, whichever source
+  /// answered (null only when no key was known). A trip stamps it so its
+  /// figures are later re-expressed at the same fuel's gain.
+  final String? requestedFuelKey;
 
   /// Signed distance from 1.0 in percent (`+8` = the estimates were
   /// raised, `-22` = lowered).
@@ -88,6 +94,7 @@ PumpGainResolution resolvePumpGain(VehicleProfile? vehicle, {String? fuelKey}) {
         samples: entry.samples,
         fuelKey: key,
         updatedAt: entry.updatedAt,
+        requestedFuelKey: key,
       );
     }
   }
@@ -97,7 +104,14 @@ PumpGainResolution resolvePumpGain(VehicleProfile? vehicle, {String? fuelKey}) {
       source: PumpGainSource.vehicle,
       samples: vehicle.pumpGainSamples,
       updatedAt: vehicle.pumpGainUpdatedAt,
+      requestedFuelKey: key,
     );
   }
-  return PumpGainResolution.none;
+  if (key == null) return PumpGainResolution.none;
+  return PumpGainResolution(
+    gain: 1.0,
+    source: PumpGainSource.uncalibrated,
+    samples: 0,
+    requestedFuelKey: key,
+  );
 }

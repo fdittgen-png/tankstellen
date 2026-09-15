@@ -54,6 +54,8 @@ Map<String, dynamic> tripSummaryToJson(TripSummary s) => {
       if (s.pumpGainApplied != null) 'pg': s.pumpGainApplied,
       // #3919: the dominant fuel-source branch, for the list badges.
       if (s.dominantFuelSource != null) 'dfs': s.dominantFuelSource,
+      // #4220: the fuel key the gain was resolved under.
+      if (s.pumpGainFuelKey != null) 'pgk': s.pumpGainFuelKey,
       // #2025 — trajet kind. Omitted when gpsPlusObd2 (the historical
       // default) so legacy trips round-trip with zero bytes added.
       if (s.kind != TripKind.gpsPlusObd2) 'kind': s.kind.wireName,
@@ -116,6 +118,7 @@ TripSummary tripSummaryFromJson(Map<String, dynamic> j) => TripSummary(
       volumetricEfficiencyUsed: (j['veUsed'] as num?)?.toDouble(),
       pumpGainApplied: (j['pg'] as num?)?.toDouble(),
       dominantFuelSource: j['dfs'] as String?,
+      pumpGainFuelKey: j['pgk'] as String?,
       // #2025: trajet kind. Missing key → gpsPlusObd2 because every
       // recording before this field landed required an OBD2 connection.
       kind: TripKind.fromWireName(j['kind'] as String?),
