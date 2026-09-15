@@ -22,7 +22,6 @@ library;
 
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../../core/logging/app_log.dart';
@@ -89,7 +88,8 @@ class BudgetStateStore {
   Future<void> write(BudgetState state, DateTime now) async {
     final box = _boxOrNull();
     if (box == null) {
-      debugPrint('BudgetStateStore.write: alerts box closed, dropping');
+      log.debug('write: alerts box closed, dropping',
+          tag: 'BudgetStateStore');
       return;
     }
     final pruned = state.pruned(now);

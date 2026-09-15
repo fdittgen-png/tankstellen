@@ -22,6 +22,7 @@ import 'country_alert_strategy_resolver.dart';
 import 'daily_collection.dart';
 import '../../../core/background/hive_isolate_lock.dart';
 import 'notification_templates.dart';
+import 'scan_opportunity_dispatch.dart';
 import '../../../core/background/provider_request_budget.dart';
 import '../../../core/logging/run_scope.dart';
 
@@ -310,29 +311,17 @@ class BackgroundAlertScanCoordinator {
       await BackgroundPriceHistoryWriter.updateCachedStations(storage, prices);
     }
 
-    var alertsFired = await BackgroundScanRunners.runPerStationAlerts(
+    // #4183 — the three paths DETECT; one dispatcher decides. See
+    // `scan_opportunity_dispatch.dart` for what that replaced.
+    final alertsFired = await detectAndDispatch(
       repo: repo,
       alerts: alerts,
       prices: prices,
       now: now,
       templates: templates,
-      fallbackCountryCode: activeCountry,
-    );
-
-    if (prices.isNotEmpty) {
-      alertsFired += await BackgroundScanRunners.runVelocity(
-        storage: storage,
-        prices: prices,
-        now: now,
-        templates: templates,
-        fallbackCountryCode: activeCountry,
-      );
-    }
-
-    alertsFired += await BackgroundScanRunners.runRadiusAlerts(
-      now: now,
+      storage: storage,
       resolver: resolver,
-      templates: templates,
+      activeCountry: activeCountry,
     );
 
     await HomeWidgetService.updateWidget(

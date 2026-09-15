@@ -13,13 +13,13 @@ import '../../alerts/data/repositories/alert_repository.dart';
 import '../../alerts/data/velocity_alert_cooldown.dart';
 import '../../alerts/data/velocity_alert_runner.dart';
 import '../../alerts/domain/radius_alert_evaluator.dart';
-import '../../alerts/domain/velocity_alert_detector.dart';
+import '../../alerts/domain/opportunity.dart';
+import '../../alerts/domain/opportunity_detectors.dart';
+import '../../../core/services/provider_capability.dart';
 import '../../../core/domain/search_params.dart';
 import '../../../core/constants/field_names.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/logging/app_log.dart';
-import '../../../core/notifications/local_notification_service.dart';
-import '../../../core/notifications/notification_service.dart';
 import '../../../core/services/country_service_registry.dart';
 import '../../../core/storage/hive_storage.dart';
 import '../../../core/storage/storage_keys.dart';
@@ -27,21 +27,49 @@ import '../../../core/utils/json_extensions.dart';
 import 'country_alert_strategy_resolver.dart';
 import 'fuel_price_fields.dart';
 import 'notification_templates.dart';
+import 'scan_notification_copy_builders.dart';
+import 'opportunity_dispatcher.dart';
+import 'scan_opportunity_capture.dart';
 
 /// Alert-evaluation runners invoked by [BackgroundAlertScanCoordinator]
 /// during a scan (#2415). Split out of the coordinator to keep each file
-/// reviewable (file-length cap). These are the three notification paths the
+/// reviewable (file-length cap). These are the three detection paths the
 /// scan fans out into — per-station price alerts, the velocity detector, and
 /// radius alerts — plus the localized copy builders they share.
 ///
 /// All methods assume Hive is already initialised in this isolate and the
-/// HiveIsolateLock is held (the coordinator owns that lifecycle). Each runner
-/// reuses the existing alert machinery read-only (RadiusAlertRunner,
-/// VelocityAlertRunner) and never mutates their throttle behaviour.
+/// HiveIsolateLock is held (the coordinator owns that lifecycle).
+///
+/// ## #4183 — they detect, they no longer decide
+///
+/// Each returns [OpportunityCandidate]s now instead of posting
+/// notifications and counting them. Three runners each certain of
+/// themselves could not make one budget: `alert_delivery_sla`'s "1-3 per
+/// day, never next-day" was a coincidence of three thresholds rather than
+/// a property of the system. [OpportunityDispatcher] makes the single
+/// interrupt decision and records everything it refuses.
+///
+/// The velocity and radius paths reach that shape through
+/// [CapturingNotificationService] rather than a rewrite — see
+/// `scan_opportunity_capture.dart` for what that preserves and the one
+/// ordering caveat it leaves (#4185).
 class BackgroundScanRunners {
   BackgroundScanRunners._();
 
   /// Do not re-fire the same per-station price alert within this window.
+  ///
+  /// #4183 — **no longer the gate.** `BudgetPolicy.perStationQuiet` (12 h,
+  /// across every detector) now decides, and it is strictly stricter, so
+  /// this 4 h check became dead weight in front of it. Kept as a constant
+  /// because `background_service.dart` re-exports it and because the
+  /// number records what the per-station path used to promise.
+  ///
+  /// The consequence is the one user-visible behaviour change in #4183: a
+  /// station alert the user configured can now re-fire at most every 12 h
+  /// rather than every 4. That follows from #4151's decision to have ONE
+  /// budget across kinds; a 4 h per-station retrigger and a 1-3/day cap
+  /// are not simultaneously satisfiable once a user has several alerts.
+  /// Tune `perStationQuiet`, not this.
   static const priceAlertRetriggerCooldown = Duration(hours: 4);
 
   /// #2864 — per-station price-alert evaluation is now country/currency/fuel
@@ -52,16 +80,16 @@ class BackgroundScanRunners {
   /// LPG / CNG / E98 alert in a country whose provider exposes that fuel fires,
   /// and the notification renders in that country's currency. DE e5/e10/diesel
   /// resolution + the euro are unchanged.
-  /// Returns the number of notifications fired (#3147 — the count feeds
-  /// the coordinator's persisted scan journal).
-  static Future<int> runPerStationAlerts({
+  /// #4183 — returns the opportunities this path FOUND. Whether any of
+  /// them interrupts anyone is [OpportunityDispatcher]'s decision.
+  static Future<List<OpportunityCandidate>> detectPerStationAlerts({
     required AlertRepository repo,
     required List<PriceAlert> alerts,
     required Map<String, Map<String, dynamic>> prices,
     required DateTime now,
     required BackgroundNotificationTemplates templates,
     String? fallbackCountryCode,
-    @visibleForTesting NotificationService? notifier,
+    HiveStorage? storage,
   }) async {
     final activeAlerts = alerts.where((a) => a.isActive).toList();
     if (activeAlerts.isEmpty || prices.isEmpty) {
@@ -71,12 +99,10 @@ class BackgroundScanRunners {
               : 'no active alerts')
           : 'no prices fetched (refresh failed?)';
       debugPrint('BackgroundScanRunners: alert loop skipped — $reason');
-      return 0;
+      return const [];
     }
 
-    final notify = notifier ?? LocalNotificationService();
-    await notify.initialize();
-    var notificationCount = 0;
+    final found = <OpportunityCandidate>[];
 
     for (final alert in activeAlerts) {
       final stationPrices = prices[alert.stationId];
@@ -95,33 +121,43 @@ class BackgroundScanRunners {
       final currentPrice = stationPrices.getDouble(fuelKey);
       if (currentPrice == null || currentPrice > alert.targetPrice) continue;
 
-      if (alert.lastTriggeredAt != null &&
-          now.difference(alert.lastTriggeredAt!) <
-              priceAlertRetriggerCooldown) {
-        debugPrint(
-            'BackgroundScanRunners: alert ${alert.stationId} tripped '
-            'but cooldown still active — skipping');
-        continue;
-      }
-
-      await notify.showPriceAlert(
-        id: alert.stationId.hashCode,
-        title: templates.renderPriceAlertTitle(
-          station: alert.stationName,
-          fuelType: alert.fuelType.displayName,
+      // #4183 — no local cooldown check. `BudgetPolicy.perStationQuiet`
+      // is stricter and spans every detector; see the constant's doc.
+      // `lastTriggeredAt` is still written, by the coordinator, AFTER a
+      // notification actually goes out — it is user-visible in the alert
+      // list and must mean "you were told", not "we considered it".
+      final capability =
+          country == null ? null : CountryServiceRegistry.capabilityFor(country);
+      found.add(OpportunityCandidate(
+        opportunityFromPriceAlert(
+          alert: alert,
+          currentPrice: currentPrice,
+          // No user position in this path, and a fabricated distance
+          // would reach the budget's ranking. Zero is the honest input:
+          // the ranking is by money, and this kind carries none.
+          distanceKm: 0,
+          priceAge: priceAgeForScannedRow(capability),
+          confidence: capability?.confidence ?? DataConfidence.none,
+          now: now,
         ),
-        body: templates.renderPriceAlertBody(
-          price: currentPrice.toStringAsFixed(3),
-          target: alert.targetPrice.toStringAsFixed(3),
-          currency: templates.currencyForCountry(country),
+        // The copy this path has always produced, verbatim.
+        copy: (
+          title: templates.renderPriceAlertTitle(
+            station: alert.stationName,
+            fuelType: alert.fuelType.displayName,
+          ),
+          body: templates.renderPriceAlertBody(
+            price: currentPrice.toStringAsFixed(3),
+            target: alert.targetPrice.toStringAsFixed(3),
+            currency: templates.currencyForCountry(country),
+          ),
         ),
-      );
-      notificationCount++;
-      await repo.saveAlert(alert.copyWith(lastTriggeredAt: now));
+      ));
     }
-    debugPrint('BackgroundScanRunners: $notificationCount alerts triggered');
-    return notificationCount;
+    debugPrint('BackgroundScanRunners: ${found.length} station alerts tripped');
+    return found;
   }
+
 
   /// #579 — velocity detector across nearby stations.
   ///
@@ -129,8 +165,8 @@ class BackgroundScanRunners {
   /// the active country ([fallbackCountryCode]), so the detector runs on the
   /// fuel the user's country actually exposes (e.g. an LPG velocity alert in FR)
   /// rather than the DE-only e5/e10/diesel switch.
-  /// Returns 1 when a velocity notification fired, else 0 (#3147).
-  static Future<int> runVelocity({
+  /// #4183 — detects; the dispatcher decides.
+  static Future<List<OpportunityCandidate>> detectVelocity({
     required HiveStorage storage,
     required Map<String, Map<String, dynamic>> prices,
     required DateTime now,
@@ -138,8 +174,9 @@ class BackgroundScanRunners {
     String? fallbackCountryCode,
   }) async {
     try {
-      final notifier = LocalNotificationService();
-      await notifier.initialize();
+      // #4183 — the runner keeps its cooldown and its copy; only the
+      // POST is intercepted. See `scan_opportunity_capture.dart`.
+      final notifier = CapturingNotificationService();
       final runner = VelocityAlertRunner(
         snapshotStore: PriceSnapshotStore(),
         cooldown: VelocityAlertCooldown(),
@@ -153,7 +190,7 @@ class BackgroundScanRunners {
       if (fuelKey == null) {
         debugPrint('BackgroundScanRunners: velocity skipped — '
             '${config.fuelType.apiValue} not in the active country feed');
-        return 0;
+        return const [];
       }
       final observations = <StationPriceSample>[];
       for (final entry in prices.entries) {
@@ -181,7 +218,7 @@ class BackgroundScanRunners {
       if (observations.isEmpty) {
         debugPrint('BackgroundScanRunners: velocity has no usable '
             'observations');
-        return 0;
+        return const [];
       }
       final userLat = storage.getSetting(StorageKeys.userPositionLat) as num?;
       final userLng = storage.getSetting(StorageKeys.userPositionLng) as num?;
@@ -191,12 +228,33 @@ class BackgroundScanRunners {
         userLat: userLat?.toDouble(),
         userLng: userLng?.toDouble(),
       );
-      if (event != null) {
-        debugPrint('BackgroundScanRunners: velocity alert '
-            '${event.fuelType.apiValue}, count=${event.stationCount}');
-        return 1;
-      }
-      return 0;
+      if (event == null) return const [];
+      debugPrint('BackgroundScanRunners: velocity movement '
+          '${event.fuelType.apiValue}, count=${event.stationCount}');
+
+      // An area-wide movement, not a station: no id, no money, and the
+      // cheapest observation stands for "what it costs now". The
+      // reference is what the detector actually compared against — the
+      // same stations, a lookback ago — which is `maxDropCents` above it.
+      final cheapest = observations
+          .map((o) => o.pricePerLiter)
+          .reduce((a, b) => a < b ? a : b);
+      final capability = fallbackCountryCode == null
+          ? null
+          : CountryServiceRegistry.capabilityFor(fallbackCountryCode);
+      return pairWithCapturedCopy(
+        [
+          opportunityFromVelocityEvent(
+            event: event,
+            priceAge: priceAgeForScannedRow(capability),
+            confidence: capability?.confidence ?? DataConfidence.none,
+            now: now,
+            referencePrice: cheapest + event.maxDropCents / 100,
+            currentPrice: cheapest,
+          ),
+        ],
+        notifier.captured,
+      );
     } catch (e, st) {
       // #3147 bonus — single log call: `errorLogger.log` already routes
       // to the IsolateErrorSpool when unbound, so the former explicit
@@ -207,7 +265,7 @@ class BackgroundScanRunners {
         'isolateTaskName': 'velocity_detector',
         'priceCount': prices.length,
       });
-      return 0;
+      return const [];
     }
   }
 
@@ -227,8 +285,8 @@ class BackgroundScanRunners {
   /// country reuse one strategy (and, for bulk, one in-memory dataset). A
   /// centre whose country has no buildable strategy (e.g. the AU stub) yields
   /// no samples this scan.
-  /// Returns the number of radius alerts fired (#3147).
-  static Future<int> runRadiusAlerts({
+  /// #4183 — detects; the dispatcher decides.
+  static Future<List<OpportunityCandidate>> detectRadiusAlerts({
     required DateTime now,
     required CountryAlertStrategyResolver resolver,
     required BackgroundNotificationTemplates templates,
@@ -238,10 +296,12 @@ class BackgroundScanRunners {
       final radiusAlerts = await store.list();
       if (radiusAlerts.where((a) => a.enabled).isEmpty) {
         debugPrint('BackgroundScanRunners: no active radius alerts');
-        return 0;
+        return const [];
       }
-      final notifier = LocalNotificationService();
-      await notifier.initialize();
+      // #4183 — the runner keeps its dedup (including the price-drop
+      // escape hatch), its grouping and its copy; only the POST is
+      // intercepted. See `scan_opportunity_capture.dart`.
+      final notifier = CapturingNotificationService();
       final runner = RadiusAlertRunner(
         store: store,
         dedup: RadiusAlertDedup(),
@@ -276,70 +336,47 @@ class BackgroundScanRunners {
           return samples;
         },
       );
-      debugPrint('BackgroundScanRunners: ${fired.length} radius alerts fired');
-      return fired.length;
+      debugPrint('BackgroundScanRunners: ${fired.length} radius alerts '
+          'matched');
+
+      // One opportunity per grouped event, standing for its cheapest
+      // match — the grouped COPY the runner built travels with it, so
+      // "Berlin: 5 stations ≤ 1.699 €" survives intact. Building one
+      // opportunity per station instead would put five candidates in
+      // front of a budget that can only send one, and the winner would
+      // then be rendered as a single station.
+      final found = <Opportunity>[];
+      for (final event in fired) {
+        final cheapest = event.matches.isEmpty
+            ? null
+            : event.matches
+                .reduce((a, b) => a.pricePerLiter <= b.pricePerLiter ? a : b);
+        if (cheapest == null) continue;
+        final country = CountryServiceRegistry.countryForLatLng(
+            event.alert.centerLat, event.alert.centerLng);
+        final capability = country == null
+            ? null
+            : CountryServiceRegistry.capabilityFor(country);
+        found.add(opportunityFromRadiusMatch(
+          alert: event.alert,
+          sample: cheapest,
+          // The runner reports matches within the alert's radius; the
+          // per-match distance is not on the sample, and inventing one
+          // would reach the budget's ordering.
+          distanceKm: 0,
+          priceAge: priceAgeForScannedRow(capability),
+          confidence: capability?.confidence ?? DataConfidence.none,
+          now: now,
+        ));
+      }
+      return pairWithCapturedCopy(found, notifier.captured);
     } catch (e, st) {
       // #3147 bonus — single log call (see [runVelocity]'s catch).
       log.error(e, st, layer: ErrorLayer.other, context: const {
         'where': 'BackgroundScanRunners: radius alert runner failed',
         'isolateTaskName': 'radius_alerts',
       });
-      return 0;
+      return const [];
     }
   }
-}
-
-/// Build notification copy for a velocity event. #2306 — copy comes from the
-/// localized [BackgroundNotificationTemplates] the main isolate resolved for
-/// the active in-app language.
-@visibleForTesting
-VelocityAlertCopy buildVelocityCopy(
-  VelocityAlertEvent event,
-  BackgroundNotificationTemplates templates,
-) {
-  final fuelLabel = event.fuelType.displayName.toUpperCase();
-  return VelocityAlertCopy(
-    title: templates.renderVelocityTitle(fuelLabel: fuelLabel),
-    body: templates.renderVelocityBody(
-      count: event.stationCount,
-      cents: event.maxDropCents.round(),
-    ),
-  );
-}
-
-/// Build notification copy for a grouped radius alert (#1012 phase 2). #2306
-/// — copy comes from the localized [BackgroundNotificationTemplates].
-///
-/// #2864 — the currency is resolved from the radius centre's country (via the
-/// registry bounding box), so a GB / DK / … radius alert renders in £ / kr
-/// instead of a forced euro. A centre outside every registered box falls back
-/// to the template's default (euro).
-@visibleForTesting
-RadiusAlertCopy buildRadiusAlertCopy(
-  RadiusAlertGroupedEvent event,
-  BackgroundNotificationTemplates templates,
-) {
-  final threshold = event.alert.threshold.toStringAsFixed(3);
-  final label = event.alert.label;
-  final country = CountryServiceRegistry.countryForLatLng(
-      event.alert.centerLat, event.alert.centerLng);
-  final currency = templates.currencyForCountry(country);
-  final total = event.matches.length + event.truncatedMoreCount;
-  final lines = event.matches
-      // #2211 — show the station name, not the raw id. The per-line
-      // "name price currency" mask is language-neutral.
-      .map((m) => '${m.name} ${m.pricePerLiter.toStringAsFixed(3)} $currency')
-      .toList();
-  if (event.truncatedMoreCount > 0) {
-    lines.add(templates.renderRadiusMore(count: event.truncatedMoreCount));
-  }
-  return RadiusAlertCopy(
-    title: templates.renderRadiusTitle(
-      label: label,
-      count: total,
-      threshold: threshold,
-      currency: currency,
-    ),
-    body: lines.join('\n'),
-  );
 }

@@ -10,6 +10,7 @@ import 'package:tankstellen/core/notifications/notification_service.dart';
 import 'package:tankstellen/core/services/provider_capability.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/features/alerts/background/notification_templates.dart';
+import 'package:tankstellen/features/alerts/background/opportunity_notification_copy.dart';
 import 'package:tankstellen/features/alerts/background/opportunity_dispatcher.dart';
 import 'package:tankstellen/features/alerts/data/budget_state_store.dart';
 import 'package:tankstellen/features/alerts/data/opportunity_feed_store.dart';
@@ -75,9 +76,12 @@ void main() {
   final templates = BackgroundNotificationTemplates.resolveForLanguage('en');
 
   Future<DispatchOutcome> dispatch(List<Opportunity> candidates,
-          {DateTime? at}) =>
+          {DateTime? at, Map<String, NotificationCopy> copyFor = const {}}) =>
       dispatcher.dispatch(
-        candidates: candidates,
+        candidates: [
+          for (final o in candidates)
+            OpportunityCandidate(o, copy: copyFor[o.stationId]),
+        ],
         now: at ?? now,
         notifier: notifier,
         templates: templates,
@@ -247,6 +251,28 @@ void main() {
           reason: 'the finding is real whether or not the channel took it');
       expect(const BudgetStateStore().read().recentNotifications, isEmpty);
     });
+  });
+
+  test("a detector's own copy is used verbatim", () async {
+    // The radius case: one grouped notification over five stations,
+    // which a single per-station Opportunity cannot reproduce. The
+    // dispatcher decides WHETHER to interrupt; the detector that already
+    // knows how to say it best still says it.
+    await dispatch(
+      [opportunity(kind: OpportunityKind.exceptionalLocalPrice)],
+      copyFor: {
+        'de-a': (
+          title: 'Berlin: 5 stations at or below 1.699 EUR',
+          body: 'ARAL 1.649 EUR\nShell 1.659 EUR',
+        ),
+      },
+    );
+
+    expect(notifier.sent.single.title,
+        'Berlin: 5 stations at or below 1.699 EUR');
+    expect(notifier.sent.single.body, contains('Shell'),
+        reason: 'rendering this from one opportunity would have demoted a '
+            'five-station roll-up to a one-station line');
   });
 
   test('a closed alerts box degrades to a no-op, not a crash', () async {

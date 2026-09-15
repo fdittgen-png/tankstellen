@@ -144,9 +144,10 @@ class OpportunityFeedStore {
   Future<void> recordScan(BudgetOutcome outcome, DateTime now) async {
     final box = _boxOrNull();
     if (box == null) {
-      debugPrint('OpportunityFeedStore.recordScan: alerts box closed, '
-          'dropping ${outcome.demoted.length + (outcome.isQuiet ? 0 : 1)} '
-          'entries');
+      log.debug(
+          'recordScan: alerts box closed, dropping '
+          '${outcome.demoted.length + (outcome.isQuiet ? 0 : 1)} entries',
+          tag: 'OpportunityFeedStore');
       return;
     }
     final fresh = <FeedEntry>[

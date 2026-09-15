@@ -27,6 +27,22 @@
 /// has an answer a user can open rather than one in a log file nobody
 /// has. A dispatch that notified nobody still records what it found.
 ///
+/// ## Why a detector may supply its own copy
+///
+/// The radius runner fires ONE GROUPED notification per alert — "Berlin:
+/// 5 stations ≤ 1.699 €" over a five-line body — while [Opportunity] is
+/// per-station by design (#4149 kept that grouping where it was). A
+/// single opportunity therefore cannot reproduce that text, and rendering
+/// it from one would demote a five-station roll-up to "ARAL Berlin: 1
+/// stations ≤ 1.699 €".
+///
+/// So [OpportunityCandidate] carries optional pre-built copy, used
+/// verbatim when present. The dispatcher decides WHETHER to interrupt;
+/// a detector that already knows how to say it best still says it. #4149
+/// was a migration, not a rewrite — "none of them changes when an alert
+/// fires" — and quietly changing what one SAYS would have been the same
+/// kind of unannounced change.
+///
 /// ## Runs in a background isolate
 ///
 /// No `BuildContext`, no Riverpod container, and no clock of its own —
@@ -48,6 +64,19 @@ import '../domain/opportunity_confidence.dart';
 import 'notification_templates.dart';
 import 'opportunity_notification_copy.dart';
 
+/// One candidate, plus the copy its detector already built when it has
+/// better copy than a single opportunity can produce. See the library
+/// doc for the radius case this exists for.
+@immutable
+class OpportunityCandidate {
+  const OpportunityCandidate(this.opportunity, {this.copy});
+
+  final Opportunity opportunity;
+
+  /// Used verbatim when non-null. Null means "render me from the kind".
+  final NotificationCopy? copy;
+}
+
 /// What one dispatch did.
 @immutable
 class DispatchOutcome {
@@ -55,11 +84,17 @@ class DispatchOutcome {
     required this.notified,
     required this.recorded,
     required this.demotions,
+    this.notifiedOpportunity,
   });
 
   /// Whether a notification actually went out. False when the budget
   /// refused everything AND when the winner could not be rendered.
   final bool notified;
+
+  /// The one that was sent, when one was. Callers need it to record
+  /// what they told the user about — `PriceAlert.lastTriggeredAt` is
+  /// user-visible and must mean "you were told", not "we considered it".
+  final Opportunity? notifiedOpportunity;
 
   /// How many entries reached the feed — the notified one plus every
   /// refusal.
@@ -96,7 +131,7 @@ class OpportunityDispatcher {
   /// one across a scan, and initializing per dispatch would re-register
   /// the channel on every wakeup.
   Future<DispatchOutcome> dispatch({
-    required List<Opportunity> candidates,
+    required List<OpportunityCandidate> candidates,
     required DateTime now,
     required NotificationService notifier,
     required BackgroundNotificationTemplates templates,
@@ -110,9 +145,13 @@ class OpportunityDispatcher {
           notified: false, recorded: 0, demotions: []);
     }
 
+    final prebuilt = <Opportunity, NotificationCopy>{
+      for (final c in candidates) c.opportunity: ?c.copy,
+    };
+
     final state = budgetState.read();
     var outcome = OpportunityBudget.decide(
-      candidates: candidates,
+      candidates: [for (final c in candidates) c.opportunity],
       state: state,
       now: now,
       policy: policy,
@@ -121,20 +160,23 @@ class OpportunityDispatcher {
 
     var notified = false;
     if (outcome.notify case final winner?) {
-      final copy = OpportunityNotificationCopy.render(
-        winner,
-        templates,
-        priceOf: priceOf ?? defaultPrice,
-        distanceOf: distanceOf ?? defaultDistance,
-        currency: currencyOf?.call(winner),
-      );
+      final copy = prebuilt[winner] ??
+          OpportunityNotificationCopy.render(
+            winner,
+            templates,
+            priceOf: priceOf ?? defaultPrice,
+            distanceOf: distanceOf ?? defaultDistance,
+            currency: currencyOf?.call(winner),
+          );
       if (copy == null) {
         // The winner cannot be stated without inventing a field it does
         // not carry. It stays in the feed with a reason rather than
         // becoming a notification naming a station id — and, crucially,
         // it does NOT spend the budget slot.
-        debugPrint('OpportunityDispatcher: winner ${winner.stationId} has no '
-            'renderable copy (${winner.kind.name}); recording, not sending');
+        log.debug(
+            'winner ${winner.stationId} has no renderable copy '
+            '(${winner.kind.name}); recording, not sending',
+            tag: 'OpportunityDispatcher');
         outcome = BudgetOutcome(demoted: [
           DemotedOpportunity(winner, BudgetRefusal.ineligible),
           ...outcome.demoted,
@@ -158,6 +200,7 @@ class OpportunityDispatcher {
 
     return DispatchOutcome(
       notified: notified,
+      notifiedOpportunity: notified ? outcome.notify : null,
       recorded: outcome.demoted.length + (notified ? 1 : 0),
       demotions: outcome.demoted,
     );
