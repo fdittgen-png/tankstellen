@@ -38,11 +38,16 @@ class CacheSchema {
   /// [fallback].
   static const Map<String, int> byPrefix = {
     // serializeStationList — {'stations': [Station.toJson()]}
-    'search': 1,
-    'station': 1,
-    'dataset': 1,
+    //
+    // #4189 — 1 → 2: `Station` gained `priceUpdatedAt`, the machine-
+    // readable price stamp the freshness gate reads. Every prefix whose
+    // shape embeds a `Station` moves together; `prices`, `geo` and
+    // `city` do not embed one and stay at 1.
+    'search': 2,
+    'station': 2,
+    'dataset': 2,
     // serializeStationDetail — station + hours + overrides envelope
-    'detail': 1,
+    'detail': 2,
     // serializePrices — {'prices': {id: StationPrices.toJson()}}
     'prices': 1,
     // geocoding_chain inline shapes: {'lat','lng'} / {'address'} /

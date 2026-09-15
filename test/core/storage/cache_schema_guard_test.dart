@@ -110,6 +110,42 @@ void main() {
         'region',
         'amenities',
       },
+      // v4 (#4189): `priceUpdatedAt` — the machine-readable price stamp.
+      // `updatedAt` stays beside it as the DISPLAY label; the pair is
+      // deliberate and documented on the model.
+      4: {
+        'id',
+        'name',
+        'brand',
+        'street',
+        'houseNumber',
+        'postCode',
+        'place',
+        'lat',
+        'lng',
+        'dist',
+        'e5',
+        'e10',
+        'e98',
+        'diesel',
+        'dieselPremium',
+        'e85',
+        'lpg',
+        'cng',
+        'isOpen',
+        'updatedAt',
+        'priceUpdatedAt',
+        'openingHoursText',
+        'openingHours',
+        'is24h',
+        'services',
+        'availableFuels',
+        'unavailableFuels',
+        'stationType',
+        'department',
+        'region',
+        'amenities',
+      },
     };
 
     test('currentSchemaVersion has a pinned cached-Station key signature', () {

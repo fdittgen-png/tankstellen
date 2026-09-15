@@ -173,7 +173,14 @@ class HiveBoxes {
   /// [datasets]. The bump drives the same eviction to drop the orphaned
   /// copies from the cache box; they are caches with a hard TTL, so the
   /// next search refetches one per country, once.
-  static const int currentSchemaVersion = 3;
+  /// #4189 — 3 → 4: `Station` gained `priceUpdatedAt`, the machine-
+  /// readable price stamp the freshness gate reads. The field is
+  /// additive and a cached blob without it degrades to today's
+  /// behaviour, but the bump is what makes the fix REACH existing
+  /// users: without it, a device keeps serving pre-#4189 Station blobs
+  /// from cache and the confident pick stays withheld in FR/DK/PT until
+  /// every entry's TTL happens to expire.
+  static const int currentSchemaVersion = 4;
 
   // #3149 — the secure-storage cipher load (and its StorageInitException
   // re-tag) lives in HiveCipherLoader so a keychain/keystore fault
