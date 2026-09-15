@@ -115,6 +115,8 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
           // honest unknown instead of the old hard-coded `true`.
           isOpen: null,
           updatedAt: prices?.updatedAt,
+          // #4189 — explicit machine-readable half.
+          priceUpdatedAt: DateTime.tryParse(prices?.updatedAt ?? ''),
           stationType: s.type == 'Autostradale' ? 'A' : 'R',
         ));
       }

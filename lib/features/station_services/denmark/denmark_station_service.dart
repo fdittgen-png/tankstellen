@@ -229,6 +229,10 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
           // unknown instead of the old hard-coded `true`.
           isOpen: null,
           updatedAt: _formatIsoTime(r['last_updated_time']?.toString()),
+          // #4189 — the machine-readable half. `updatedAt` is the label;
+          // the freshness gate reasons over this.
+          priceUpdatedAt:
+              DateTime.tryParse(r['last_updated_time']?.toString() ?? ''),
         );
       }).whereType<Station>().toList();
     } on DioException catch (e, st) {
@@ -299,6 +303,10 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
           updatedAt: _formatIsoTime(
             (prices.isNotEmpty ? prices.first['lastUpdated'] : null)?.toString(),
           ),
+          priceUpdatedAt: DateTime.tryParse(
+              (prices.isNotEmpty ? prices.first['lastUpdated'] : null)
+                      ?.toString() ??
+                  ''),
         );
       }).whereType<Station>().toList();
     } on DioException catch (e, st) {

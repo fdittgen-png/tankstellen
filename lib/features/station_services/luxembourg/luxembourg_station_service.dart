@@ -271,6 +271,11 @@ class LuxembourgStationService
           // honest unknown instead of the old hard-coded `true`.
           isOpen: null,
           updatedAt: effectiveDate,
+          // #4189 — a LUSTAT `period` may be a month ("2026-03"),
+          // which does not parse as an instant. Null then, which the
+          // capability reads as "no stamp for this row" — honest,
+          // and the same behaviour as before.
+          priceUpdatedAt: DateTime.tryParse(effectiveDate ?? ''),
         ),
     ];
 

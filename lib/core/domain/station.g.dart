@@ -29,6 +29,9 @@ _Station _$StationFromJson(Map<String, dynamic> json) => _Station(
   cng: _priceFromJson(json['cng']),
   isOpen: json['isOpen'] as bool?,
   updatedAt: json['updatedAt'] as String?,
+  priceUpdatedAt: json['priceUpdatedAt'] == null
+      ? null
+      : DateTime.parse(json['priceUpdatedAt'] as String),
   openingHoursText: json['openingHoursText'] as String?,
   openingHours: json['openingHours'] == null
       ? null
@@ -78,6 +81,7 @@ Map<String, dynamic> _$StationToJson(_Station instance) => <String, dynamic>{
   'cng': instance.cng,
   'isOpen': instance.isOpen,
   'updatedAt': instance.updatedAt,
+  'priceUpdatedAt': instance.priceUpdatedAt?.toIso8601String(),
   'openingHoursText': instance.openingHoursText,
   'openingHours': instance.openingHours?.toJson(),
   'is24h': instance.is24h,

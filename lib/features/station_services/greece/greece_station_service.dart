@@ -375,6 +375,9 @@ class GreeceStationService
       // notion at all: honest unknown.
       isOpen: null,
       updatedAt: newestDate.isEmpty ? null : newestDate,
+      // #4189 — explicit rather than relying on `updatedAt` happening
+      // to parse. Null when the DATE will not read as an instant.
+      priceUpdatedAt: DateTime.tryParse(newestDate),
     );
   }
 

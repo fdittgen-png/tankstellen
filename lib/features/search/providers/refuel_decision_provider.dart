@@ -76,7 +76,7 @@ RefuelCandidate _candidate(
           item.station.lng);
   final capability =
       code == null ? null : CountryServiceRegistry.capabilityFor(code);
-  final age = _priceAge(item.station.updatedAt, now);
+  final age = _priceAge(item.station.priceUpdatedAt, now);
   return RefuelCandidate(
     stationId: item.station.id,
     oneWayKm: item.dist,
@@ -95,11 +95,18 @@ RefuelCandidate _candidate(
   );
 }
 
-/// How old the station's price is, or null when the stamp is missing or
-/// unparseable — which withholds the lead rather than assuming freshness.
-Duration? _priceAge(String? updatedAt, DateTime now) {
-  if (updatedAt == null) return null;
-  final stamp = DateTime.tryParse(updatedAt);
+/// How old the station's price is, or null when the provider published
+/// no stamp — which lets [ProviderCapability] decide whether that is a
+/// stand-down or a block, rather than deciding here.
+///
+/// #4189 — this read `Station.updatedAt`, which is a DISPLAY string
+/// (`dd/MM HH:mm`). `DateTime.tryParse` returned null for it, so a
+/// French, Danish or Portuguese price — from providers whose capability
+/// declares `priceTimestamp: true` — became
+/// `notPublishedForThisItem`, which the freshness gate treats as a
+/// block. The confident pick was withheld in three of the best-data
+/// countries for a reason that was not true.
+Duration? _priceAge(DateTime? stamp, DateTime now) {
   if (stamp == null) return null;
   final age = now.difference(stamp);
   // A stamp in the future is a broken feed, not a fresh price.

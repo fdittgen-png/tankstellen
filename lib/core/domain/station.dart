@@ -40,7 +40,32 @@ abstract class Station with _$Station {
     // widget JSON carries an explicit bool (still read as-is); a missing
     // or null key reads as null.
     bool? isOpen,
+    /// The price stamp as the user reads it: `dd/MM HH:mm`, or whatever
+    /// the country's adapter formats.
+    ///
+    /// **Display only. Never parse this.** #4189: every adapter that had
+    /// a real timestamp formatted it here at the parse boundary and
+    /// threw the machine-readable value away, so
+    /// `DateTime.tryParse('23/03 00:01')` returned null and the
+    /// price-freshness gate never fired in France, Denmark or Portugal —
+    /// three of the countries whose capability declares
+    /// `priceTimestamp: true`. The confident pick was silently withheld
+    /// for all of them, for a reason that was not true.
+    ///
+    /// [priceUpdatedAt] is the value to reason over.
     String? updatedAt,
+    /// When the provider says this station's price was set (#4189).
+    ///
+    /// The machine-readable half of [updatedAt]: one parse at the
+    /// adapter, two outputs. Null where the provider publishes no stamp
+    /// (eleven of seventeen countries) — which
+    /// `ProviderCapability.priceAge` reads as `notPublishedByProvider`
+    /// and stands the gate down over, rather than blocking.
+    ///
+    /// ADDITIVE for every codec (#2777 lesson): cache and favorites JSON
+    /// written before this field lacks the key, reads as null, and
+    /// behaves exactly as it does today until the next refresh.
+    DateTime? priceUpdatedAt,
     String? openingHoursText,  // "Lun 07:00-18:30, Mar 07:00-18:30..."
     // Epic C4 — structured weekly hours from a per-country
     // [OpeningHoursAdapter], carried on the search-result station so a
