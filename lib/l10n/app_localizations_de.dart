@@ -8853,6 +8853,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get criteriaSwapEndpoints => 'Start und Ziel tauschen';
 
   @override
+  String get criteriaRadiusCustom => 'Individuell';
+
+  @override
   String get fillUpOdometerFromLastFillUp =>
       'Aus Ihrer letzten Tankfüllung vorausgefüllt';
 

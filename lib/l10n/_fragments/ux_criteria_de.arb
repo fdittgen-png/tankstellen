@@ -30,5 +30,6 @@
       }
     }
   },
-  "criteriaSwapEndpoints": "Start und Ziel tauschen"
+  "criteriaSwapEndpoints": "Start und Ziel tauschen",
+  "criteriaRadiusCustom": "Individuell"
 }

@@ -729,6 +729,8 @@ void main() {
         clock = clock.add(const Duration(minutes: 14));
         builtScanner!.isPassiveWaiting = false;
         capturedOnReconnect!.call();
+        // #4196 — the adopted link proves itself with engine data.
+        ctl.debugObserveHighPriorityParse(937.0);
 
         expect(ctl.currentState, TripRecordingControllerState.recording,
             reason: 'a late reconnect after passive-waiting must resume full '

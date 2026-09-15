@@ -14819,6 +14819,12 @@ abstract class AppLocalizations {
   /// **'Swap start and destination'**
   String get criteriaSwapEndpoints;
 
+  /// Chip after the radius presets (5 / 10 / 25 km) on the search-criteria sheet; selecting it reveals a slider for any other radius (#4199). Keep it one short word.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get criteriaRadiusCustom;
+
   /// Helper text under the odometer field of the Add fill-up form when the value was pre-filled from the vehicle's most recent fill-up (#3899).
   ///
   /// In en, this message translates to:

@@ -8900,6 +8900,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get criteriaSwapEndpoints => 'Inverser le départ et la destination';
 
   @override
+  String get criteriaRadiusCustom => 'Custom';
+
+  @override
   String get fillUpOdometerFromLastFillUp =>
       'Pré-rempli depuis votre dernier plein';
 

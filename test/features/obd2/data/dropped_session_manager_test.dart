@@ -450,6 +450,7 @@ void main() {
 
         mgr.handleDrop(reason: TripDropReason.silentFailure);
         mgr.onScannerReconnect();
+        mgr.onEngineData(); // #4196 — the recovery's proof
 
         // The scheduler pause/resume events are journaled by the real
         // host adapter (which mediates every gating call, so it catches
@@ -458,7 +459,8 @@ void main() {
         expect(host.sessionEvents, [
           'linkDrop:silentFailure',
           'degradedGpsOnly:silentFailure',
-          'leftDegraded',
+          'recoveryVerifying:link adopted — waiting up to 45s for engine data',
+          'leftDegraded:engine data verified',
         ], reason: 'the timeline is the whole point: a reader must see '
             'WHAT dropped, that GPS carried the trip, and when OBD2 '
             'came back — in order');
@@ -552,9 +554,12 @@ void main() {
         final startsBefore = host.startSchedulerCalls;
 
         capturedOnReconnect!.call();
+        expect(host.degradedGpsOnly, isTrue,
+            reason: '#4196 — GPS-only until the adopted link delivers');
+        mgr.onEngineData();
 
         expect(host.degradedGpsOnly, isFalse,
-            reason: 'a reconnect must drop back to full OBD2 recording');
+            reason: 'engine data drops back to full OBD2 recording');
         expect(host.pausedDueToDrop, isFalse,
             reason: 'the user never saw a pause');
         expect(host.startSchedulerCalls, startsBefore + 1,

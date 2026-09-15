@@ -4487,6 +4487,7 @@
     }
   },
   "criteriaSwapEndpoints": "Start und Ziel tauschen",
+  "criteriaRadiusCustom": "Individuell",
   "fillUpOdometerFromLastFillUp": "Aus Ihrer letzten Tankfüllung vorausgefüllt",
   "fillUpStationLabel": "Tankstelle",
   "fillUpStationChange": "Ändern",

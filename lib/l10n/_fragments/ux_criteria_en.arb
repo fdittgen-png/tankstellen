@@ -62,5 +62,9 @@
   "criteriaSwapEndpoints": "Swap start and destination",
   "@criteriaSwapEndpoints": {
     "description": "Tooltip of the icon button between the start and destination fields that exchanges the two endpoints of a route search (#3927)."
+  },
+  "criteriaRadiusCustom": "Custom",
+  "@criteriaRadiusCustom": {
+    "description": "Chip after the radius presets (5 / 10 / 25 km) on the search-criteria sheet; selecting it reveals a slider for any other radius (#4199). Keep it one short word."
   }
 }

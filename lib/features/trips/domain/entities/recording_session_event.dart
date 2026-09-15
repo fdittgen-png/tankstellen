@@ -42,8 +42,17 @@ enum RecordingSessionEventKind {
   /// OBD2 gone, GPS alive — the trip kept recording GPS-only (#2565).
   degradedGpsOnly,
 
-  /// OBD2 re-attached and full recording resumed.
+  /// OBD2 re-attached and full recording resumed. #4196 — written only
+  /// once fresh engine data arrived, never on the adoption alone.
   leftDegraded,
+
+  /// #4196 — a link was adopted while GPS-only; polling resumed and the
+  /// trip waits for engine data before calling it a recovery.
+  recoveryVerifying,
+
+  /// #4196 — the adopted link delivered no engine data in its window and
+  /// was handed back to the owner. Detail = the consecutive count.
+  recoveryUnverified,
 
   /// #3915 — the same `Obd2Service` instance was rebound and dropped
   /// again twice within a minute: the trip refuses it for the rest of

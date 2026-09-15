@@ -8865,6 +8865,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get criteriaSwapEndpoints => 'Swap start and destination';
 
   @override
+  String get criteriaRadiusCustom => 'Custom';
+
+  @override
   String get fillUpOdometerFromLastFillUp =>
       'Pré-preenchido a partir do seu último abastecimento';
 

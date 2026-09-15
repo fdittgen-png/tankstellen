@@ -10,7 +10,8 @@ import '../../../../core/logging/app_log.dart';
 import '../../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../../../trips/api.dart';
 import 'obd2_reattach_source.dart';
-import 'obd2_service.dart';
+import 'readoption_cycle_breaker.dart';
+import 'recovery_verifier.dart';
 import '../auto_record_trace_log.dart';
 import '../obd2_comm_diagnostics.dart';
 import '../obd2_session_diagnostic.dart';
@@ -18,8 +19,11 @@ import 'dropped_session_host.dart';
 import 'dropped_session_repo_resolver.dart';
 import '../paused_trip_repository.dart';
 
+export 'readoption_cycle_breaker.dart' show ReadoptionCycleBreaker;
+
 part 'dropped_session_manager_engine_off.dart';
 part 'dropped_session_manager_reattach.dart';
+part 'dropped_session_manager_verify.dart';
 
 /// Why a recording transitioned into the paused-due-to-drop state
 /// (#1330 phase 3). Distinguishes the two failure modes that share the
@@ -109,6 +113,9 @@ class DroppedSessionManager {
   late final ReadoptionCycleBreaker _adoptionGate =
       ReadoptionCycleBreaker(now: _now);
 
+  /// #4196 — an adoption is verified by engine data, not the probe.
+  final RecoveryVerifier _verifier;
+
   DroppedSessionManager({
     required this._host,
     required this._now,
@@ -116,9 +123,11 @@ class DroppedSessionManager {
     required this._silentReconnectWindow,
     this._pinnedAdapterMac,
     this._reconnectScannerFactory,
+    Duration recoveryVerifyWindow = RecoveryVerifier.defaultWindow,
     PausedTripRepository? pausedRepo,
     TripHistoryRepository? historyRepo,
-  })  : _repos = DroppedSessionRepoResolver(
+  })  : _verifier = RecoveryVerifier(baseWindow: recoveryVerifyWindow),
+        _repos = DroppedSessionRepoResolver(
           pausedOverride: pausedRepo,
           historyOverride: historyRepo,
         );
@@ -237,13 +246,10 @@ class DroppedSessionManager {
   void onScannerReconnect() {
     _reconnectScanner = null;
     if (_host.degradedGpsOnly) {
-      // #2565 — OBD2 re-attached while recording GPS-only: drop back to full
-      // OBD2 recording. The trip never paused, so there is no grace timer to
-      // cancel and no pause-banner teardown; clear the degrade flag then
-      // resume polling cleanly. The drop-window samples stay honestly GPS-only.
-      _host.degradedGpsOnly = false;
-      _note(RecordingSessionEventKind.leftDegraded);
-      _resumePollingAfterSilentReconnect();
+      // #2565 — OBD2 re-attached while recording GPS-only. #4196 — the
+      // reattach proved the ADAPTER, not the car: resume polling but stay
+      // GPS-only until the first fresh engine parse (the verify part).
+      _beginRecoveryVerification();
       return;
     }
     if (_silentlyReconnecting) {
@@ -330,6 +336,7 @@ class DroppedSessionManager {
   /// the controller's stop(). Scanner teardown is awaited separately by
   /// stop() via [stopReconnectScanner].
   void cancelAllTimers() {
+    _verifier.cancel();
     _graceTimer?.cancel();
     _graceTimer = null;
     _silentReconnectTimer?.cancel();

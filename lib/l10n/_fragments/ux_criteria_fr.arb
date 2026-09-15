@@ -30,5 +30,6 @@
       }
     }
   },
-  "criteriaSwapEndpoints": "Inverser le départ et la destination"
+  "criteriaSwapEndpoints": "Inverser le départ et la destination",
+  "criteriaRadiusCustom": "Personnalisé"
 }

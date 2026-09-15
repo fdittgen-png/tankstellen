@@ -1,12 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 //
-// #3915 (Epic #3914) — the re-adoption cycle breaker in
-// [DroppedSessionManager]: the SAME `Obd2Service` instance rebound and
-// dropped again twice within 60 s of its rebind is refused for the rest
-// of the trip (journal `adoptionRefused`), and the reattach source is
-// handed the gate so it waits for a DIFFERENT instance. The 2026-09-01
-// field trip re-adopted one instance every ~8.2 s for 43 minutes.
+// #4196 (Epic #4195) — a reattach is an ADOPTION, not a recovery. The
+// reattach source proves adoption with `ATRV`, which the ELM chip answers
+// with the vehicle bus dead; the manager used to leave GPS-only and
+// journal `leftDegraded` on that alone. The trip now stays GPS-only until
+// the first fresh engine parse, and a link that delivers none within its
+// window is handed back — with the window stretching per consecutive
+// unverified adoption, so a dead bus cannot become a dial storm.
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -24,14 +25,14 @@ import 'package:tankstellen/features/trips/domain/entities/recording_session_eve
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 
 void main() {
-  group('DroppedSessionManager re-adoption cycle breaker (#3915)', () {
+  group('DroppedSessionManager verified recovery (#4196)', () {
     late Directory tmpDir;
     late Box<String> pausedBox;
     late Box<String> historyBox;
     late DateTime clock;
 
     setUp(() async {
-      tmpDir = Directory.systemTemp.createTempSync('readoption_test_');
+      tmpDir = Directory.systemTemp.createTempSync('verify_recovery_test_');
       Hive.init(tmpDir.path);
       // Unique per test run without a wall-clock read (#3660 ratchet):
       // the temp dir name is already unique.
@@ -49,7 +50,7 @@ void main() {
     });
 
     ({DroppedSessionManager mgr, _FakeHost host, List<_GateScanner> sources})
-        build() {
+        build({required Duration verifyWindow}) {
       final host = _FakeHost()..gpsAlive = true;
       final sources = <_GateScanner>[];
       final mgr = DroppedSessionManager(
@@ -63,123 +64,122 @@ void main() {
           sources.add(s);
           return s;
         },
+        recoveryVerifyWindow: verifyWindow,
         pausedRepo: PausedTripRepository(box: pausedBox),
         historyRepo: TripHistoryRepository(box: historyBox),
       );
       return (mgr: mgr, host: host, sources: sources);
     }
 
-    /// The reattach source's fire, as production does it: report the
-    /// adoption to the gate, then the manager's reconnect callback.
-    void rebind(
-        DroppedSessionManager mgr, _GateScanner source, Obd2Service svc) {
+    /// The reattach source's fire, as production does it.
+    void adopt(_GateScanner source, Obd2Service svc) {
       source.adoptionGate!.noteAdopted(svc);
       source.onReconnect();
-      // #4196 — the rebind delivered engine data (then died): a verified
-      // recovery, so the next drop runs the ordinary drop path.
-      mgr.onEngineData();
     }
 
-    Iterable<String> refusals(_FakeHost host) => host.sessionEvents
-        .where((e) => e.startsWith(RecordingSessionEventKind.adoptionRefused.name));
+    Iterable<String> eventsOf(_FakeHost host, RecordingSessionEventKind kind) =>
+        host.sessionEvents.where((e) => e.split(':').first == kind.name);
 
     test(
-        'the SAME instance rebound and dropped twice within 60 s is '
-        'refused: journal event, gate refuses it, the owner seam still '
-        'runs, and a fresh source waits with the same gate', () {
-      final t = build();
-      final corpse = Obd2Service(FakeObd2Transport());
-
-      // Drop 1 — the first drop of the trip; GPS alive ⇒ degrade + source.
+        'adopted but silent: GPS-only holds, no leftDegraded — and the '
+        'window hands the link back and waits for another', () async {
+      final t = build(verifyWindow: const Duration(milliseconds: 40));
       t.mgr.handleDrop();
-      expect(t.host.degradedGpsOnly, isTrue);
-      expect(t.sources, hasLength(1));
-      final gate = t.sources[0].adoptionGate;
-      expect(gate, isNotNull, reason: 'the manager wires its gate in');
+      adopt(t.sources[0], Obd2Service(FakeObd2Transport()));
 
-      // The source hands the trip `corpse`; 8.2 s later it drops again.
-      rebind(t.mgr, t.sources[0], corpse);
-      expect(t.host.degradedGpsOnly, isFalse);
-      clock = clock.add(const Duration(milliseconds: 8200));
-      t.mgr.handleDrop();
-      expect(gate!.isRefused(corpse), isFalse,
-          reason: 'ONE quick re-drop is link weather, not a cycle');
-      expect(refusals(t.host), isEmpty);
-      expect(t.sources, hasLength(2));
-
-      // The same instance comes back once more and dies again.
-      rebind(t.mgr, t.sources[1], corpse);
-      clock = clock.add(const Duration(milliseconds: 8200));
-      t.mgr.handleDrop();
-
-      expect(gate.isRefused(corpse), isTrue,
-          reason: 'the field loop: the same instance, twice in a row, '
-              'within the window — refused for the rest of the trip');
-      expect(refusals(t.host), hasLength(1));
-      expect(refusals(t.host).single, contains('transportError'));
-      expect(t.host.disconnectDroppedServiceCalls, 3,
-          reason: 'the owner seam (recycle) runs on every drop, the '
-              'refused one included');
       expect(t.host.degradedGpsOnly, isTrue,
-          reason: 'GPS-only continues while waiting for a different link');
-      expect(t.sources, hasLength(3));
-      expect(identical(t.sources[2].adoptionGate, gate), isTrue,
-          reason: 'the new source carries the same gate, so it will not '
-              'fire the refused instance');
-      expect(t.sources[2].startCalls, 1);
+          reason: 'the adoption proved the adapter, not the car');
+      expect(t.mgr.awaitingEngineData, isTrue);
+      expect(eventsOf(t.host, RecordingSessionEventKind.recoveryVerifying),
+          hasLength(1));
+      expect(eventsOf(t.host, RecordingSessionEventKind.leftDegraded), isEmpty,
+          reason: 'RED before #4196: journaled as recovered on the probe');
 
-      // A different instance is welcome.
-      final fresh = Obd2Service(FakeObd2Transport());
-      expect(gate.isRefused(fresh), isFalse);
+      await Future<void>.delayed(const Duration(milliseconds: 90));
+
+      expect(eventsOf(t.host, RecordingSessionEventKind.recoveryUnverified),
+          hasLength(1));
+      expect(t.mgr.awaitingEngineData, isFalse);
+      expect(t.host.degradedGpsOnly, isTrue, reason: 'GPS carries on');
+      expect(t.host.disconnectDroppedServiceCalls, 2,
+          reason: 'handed back to the owner through the drop seam');
+      expect(t.sources, hasLength(2));
+      expect(t.sources[1].startCalls, 1,
+          reason: 'a fresh reattach source waits for the next link');
+    });
+
+    test('the first engine parse completes the recovery — once', () async {
+      final t = build(verifyWindow: const Duration(milliseconds: 40));
+      t.mgr.handleDrop();
+      adopt(t.sources[0], Obd2Service(FakeObd2Transport()));
+
+      t.mgr.onEngineData();
+
+      expect(t.host.degradedGpsOnly, isFalse);
+      expect(t.mgr.dropReason, isNull);
+      expect(t.host.sessionEvents.last, 'leftDegraded:engine data verified');
+
+      await Future<void>.delayed(const Duration(milliseconds: 90));
+      t.mgr.onEngineData();
+      expect(eventsOf(t.host, RecordingSessionEventKind.recoveryUnverified),
+          isEmpty, reason: 'a verified recovery cancels the window');
+      expect(eventsOf(t.host, RecordingSessionEventKind.leftDegraded),
+          hasLength(1), reason: 'later parses are no-ops');
     });
 
     test(
-        'a different instance resets the streak, and a re-drop after the '
-        'window does not count', () {
-      final t = build();
-      final a = Obd2Service(FakeObd2Transport());
-      final b = Obd2Service(FakeObd2Transport());
-
+        'consecutive unverified adoptions stretch the window (capped at 4×); '
+        'engine data resets it', () async {
+      final t = build(verifyWindow: const Duration(milliseconds: 20));
       t.mgr.handleDrop();
-      rebind(t.mgr, t.sources[0], a);
-      clock = clock.add(const Duration(seconds: 8));
-      t.mgr.handleDrop(); // quick re-drop #1 of a
 
-      rebind(t.mgr, t.sources[1], b); // a DIFFERENT instance: streak resets
-      clock = clock.add(const Duration(seconds: 8));
-      t.mgr.handleDrop(); // quick re-drop #1 of b
-      final gate = t.sources[0].adoptionGate!;
-      expect(gate.isRefused(a), isFalse);
-      expect(gate.isRefused(b), isFalse);
+      final windows = <int>[];
+      for (var i = 0; i < 5; i++) {
+        final window = t.mgr.currentRecoveryVerifyWindow;
+        windows.add(window.inMilliseconds);
+        adopt(t.sources[i], Obd2Service(FakeObd2Transport()));
+        await Future<void>.delayed(window + const Duration(milliseconds: 40));
+      }
 
-      rebind(t.mgr, t.sources[2], b);
-      clock = clock.add(const Duration(seconds: 90)); // lived past the window
-      t.mgr.handleDrop();
-      expect(gate.isRefused(b), isFalse,
-          reason: 'a link that lived 90 s earned its adoption');
-      expect(refusals(t.host), isEmpty);
+      expect(windows, [20, 40, 60, 80, 80],
+          reason: 'a bus that never answers costs one dial per stretched '
+              'window, never a storm');
+      expect(eventsOf(t.host, RecordingSessionEventKind.recoveryUnverified),
+          hasLength(5));
+
+      adopt(t.sources[5], Obd2Service(FakeObd2Transport()));
+      t.mgr.onEngineData();
+      expect(t.mgr.currentRecoveryVerifyWindow,
+          const Duration(milliseconds: 20));
     });
 
-    test('ReadoptionCycleBreaker — identity, not equality, and the '
-        'window is measured from the LAST rebind', () {
-      final breaker = ReadoptionCycleBreaker(now: () => clock);
-      final a = Obd2Service(FakeObd2Transport());
-      expect(breaker.noteDrop(), isNull, reason: 'nothing adopted yet');
+    test('the SAME instance adopted twice without engine data is refused',
+        () async {
+      final t = build(verifyWindow: const Duration(milliseconds: 20));
+      t.mgr.handleDrop();
+      final mute = Obd2Service(FakeObd2Transport());
 
-      breaker.noteAdopted(a);
-      clock = clock.add(const Duration(seconds: 59));
-      expect(breaker.noteDrop(), isNull);
-      breaker.noteAdopted(a);
-      clock = clock.add(const Duration(seconds: 61));
-      expect(breaker.noteDrop(), isNull,
-          reason: 'past the window: the streak resets');
-      breaker.noteAdopted(a);
-      clock = clock.add(const Duration(seconds: 1));
-      expect(breaker.noteDrop(), isNull, reason: 'streak restarted at 1');
-      breaker.noteAdopted(a);
-      clock = clock.add(const Duration(seconds: 1));
-      expect(breaker.noteDrop(), same(a));
-      expect(breaker.isRefused(a), isTrue);
+      adopt(t.sources[0], mute);
+      await Future<void>.delayed(const Duration(milliseconds: 60));
+      adopt(t.sources[1], mute);
+      await Future<void>.delayed(const Duration(milliseconds: 90));
+
+      expect(t.sources[1].adoptionGate!.isRefused(mute), isTrue,
+          reason: 'an adoption that never delivered is a quick re-drop '
+              'for the #3915 cycle breaker');
+    });
+
+    test('stopping the trip cancels a pending verification', () async {
+      final t = build(verifyWindow: const Duration(milliseconds: 20));
+      t.mgr.handleDrop();
+      adopt(t.sources[0], Obd2Service(FakeObd2Transport()));
+
+      t.mgr.cancelAllTimers();
+      await Future<void>.delayed(const Duration(milliseconds: 60));
+
+      expect(t.mgr.awaitingEngineData, isFalse);
+      expect(eventsOf(t.host, RecordingSessionEventKind.recoveryUnverified),
+          isEmpty);
     });
   });
 }
