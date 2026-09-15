@@ -67,6 +67,26 @@ class _SearchRadiusSliderState extends State<SearchRadiusSlider> {
         .where((km) => km >= widget.minKm && km <= widget.maxKm)
         .toList(growable: false);
     final custom = _customRequested || !presets.contains(rounded);
+    final customControl = custom
+      // #1962 — the compact reaction overlay keeps the row short.
+      ? SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            overlayShape:
+                const RoundSliderOverlayShape(overlayRadius: 14),
+          ),
+          child: Slider(
+            value: value,
+            min: widget.minKm,
+            max: widget.maxKm,
+            divisions: (widget.maxKm - widget.minKm).round(),
+            // No drag bubble — the title row already shows it —
+            // but screen readers still hear the value in km.
+            semanticFormatterCallback: (v) =>
+                l10n.searchSummaryRadiusValue('${v.round()}'),
+            onChanged: _drag,
+          ),
+        )
+      : const SizedBox(width: double.infinity);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -123,31 +143,17 @@ class _SearchRadiusSliderState extends State<SearchRadiusSlider> {
             ),
           ],
         ),
-        AnimatedSize(
-          duration: const Duration(milliseconds: 180),
-          curve: Curves.easeOut,
-          alignment: Alignment.topCenter,
-          child: custom
-              // #1962 — the compact reaction overlay keeps the row short.
-              ? SliderTheme(
-                  data: SliderTheme.of(context).copyWith(
-                    overlayShape:
-                        const RoundSliderOverlayShape(overlayRadius: 14),
-                  ),
-                  child: Slider(
-                    value: value,
-                    min: widget.minKm,
-                    max: widget.maxKm,
-                    divisions: (widget.maxKm - widget.minKm).round(),
-                    // No drag bubble — the title row already shows it —
-                    // but screen readers still hear the value in km.
-                    semanticFormatterCallback: (v) =>
-                        l10n.searchSummaryRadiusValue('${v.round()}'),
-                    onChanged: _drag,
-                  ),
-                )
-              : const SizedBox(width: double.infinity),
-        ),
+        // #4238 — reduced motion: the control appears without a size
+        // animation (a zero-duration AnimatedSize mutates layout mid-pass).
+        if (MediaQuery.disableAnimationsOf(context))
+          customControl
+        else
+          AnimatedSize(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOut,
+            alignment: Alignment.topCenter,
+            child: customControl,
+          ),
       ],
     );
   }

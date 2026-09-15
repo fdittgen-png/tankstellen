@@ -20,6 +20,7 @@ import '../../../core/domain/search_result_item.dart';
 import '../../../core/domain/station.dart';
 // #727 — SearchState reads `searchLocationProvider` so we import
 // filters_provider directly (re-exports don't surface symbols here).
+import 'last_search_breadcrumb.dart';
 import 'search_filters_provider.dart';
 import 'search_provider_orchestration.dart';
 import 'search_result_helpers.dart';
@@ -136,12 +137,8 @@ class SearchState extends _$SearchState {
     double? radiusKm,
     SortBy? sortBy,
   }) {
-    final fuel = fuelType?.name ?? 'default';
-    final radius = radiusKm?.toStringAsFixed(0) ?? 'default';
-    final sort = sortBy?.apiValue ?? 'default';
-    AppStateCollector.updateLastSearch(
-      'mode=$mode fuel=$fuel radiusKm=$radius sort=$sort',
-    );
+    AppStateCollector.updateLastSearch(lastSearchBreadcrumb(mode,
+        fuelType: fuelType, radiusKm: radiusKm, sortBy: sortBy));
   }
 
   /// Wraps a search closure with standard loading state + error

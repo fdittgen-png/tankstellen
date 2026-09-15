@@ -350,6 +350,96 @@ void main() {
 
       await ctl.stop();
     });
+
+    test(
+        '#4237 — recovery attaches to the SAME recording: session and the '
+        'samples captured before the drop survive the rebind', () async {
+      final transport = FakeObd2Transport(initResponses());
+      await transport.connect();
+      VoidCallback? capturedOnReconnect;
+      final ctl = TripRecordingController(
+        service: Obd2Service(transport),
+        pollInterval: const Duration(milliseconds: 40),
+        schedulerTickRate: const Duration(milliseconds: 10),
+        vehicleId: 'car-context',
+        pausedRepo: pausedRepo,
+        historyRepo: historyRepo,
+        pinnedAdapterMac: 'AA:BB',
+        reconnectScannerFactory: (mac, onReconnect) {
+          capturedOnReconnect = onReconnect;
+          return _ObservableScanner(
+            pinnedMac: mac,
+            onReconnect: onReconnect,
+            onStart: () {},
+            onStop: () {},
+          );
+        },
+      );
+
+      await ctl.start();
+      final sessionBefore = ctl.sessionId;
+      ctl.updateGpsFix(latitude: 48, longitude: 7, speedKmh: 60);
+      ctl.debugEmitNow();
+      final samplesBefore = ctl.capturedSamples.length;
+      ctl.debugTriggerDrop();
+
+      final live = FakeObd2Transport({
+        ...initResponses(),
+        '010D': '41 0D 32>',
+        '010C': '41 0C 0E A6>',
+      });
+      await live.connect();
+      ctl.replaceService(Obd2Service(live));
+      capturedOnReconnect!.call();
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+
+      expect(ctl.currentState, TripRecordingControllerState.recording);
+      expect(ctl.sessionId, sessionBefore,
+          reason: 'a recovery must not start a new session');
+      expect(ctl.capturedSamples.length, greaterThanOrEqualTo(samplesBefore),
+          reason: 'the drive before the drop stays part of the trip');
+      await ctl.stop();
+    });
+
+    test(
+        '#4237 — stopping mid-recovery tears the watch down, and a late '
+        'reattach callback after the stop changes nothing', () async {
+      final transport = FakeObd2Transport(initResponses());
+      await transport.connect();
+      VoidCallback? capturedOnReconnect;
+      var stops = 0;
+      final ctl = TripRecordingController(
+        service: Obd2Service(transport),
+        pollInterval: const Duration(minutes: 1),
+        vehicleId: 'car-late-callback',
+        pausedRepo: pausedRepo,
+        historyRepo: historyRepo,
+        pinnedAdapterMac: 'AA:BB',
+        reconnectScannerFactory: (mac, onReconnect) {
+          capturedOnReconnect = onReconnect;
+          return _ObservableScanner(
+            pinnedMac: mac,
+            onReconnect: onReconnect,
+            onStart: () {},
+            onStop: () => stops++,
+          );
+        },
+      );
+
+      await ctl.start();
+      ctl.updateGpsFix(latitude: 48, longitude: 7, speedKmh: 60);
+      ctl.debugTriggerDrop();
+      expect(ctl.currentState, TripRecordingControllerState.degradedGpsOnly);
+
+      await ctl.stop();
+      expect(stops, 1, reason: 'the reattach watch ends with the trip');
+      final after = ctl.currentState;
+
+      capturedOnReconnect!.call(); // the #4190 class: a callback outliving its owner
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(ctl.currentState, after,
+          reason: 'a finished trip is never resurrected by a late reattach');
+    });
   });
 }
 

@@ -138,9 +138,18 @@ void main() {
       expect(starFinder, findsOneWidget,
           reason: 'The star-outline button must be visible before favoriting');
 
+      // #4190 — wait for the write to land, not for a fixed 100 ms: under a
+      // loaded full-suite run the write can take longer, and the assertion
+      // below then read an empty store (`Actual: []`).
       await tester.runAsync(() async {
         await tester.tap(starFinder);
-        await Future<void>.delayed(const Duration(milliseconds: 100));
+        await _until(() {
+          final storage = container.read(storageRepositoryProvider);
+          // Both writes: the id list, then the station JSON.
+          return storage.getEvFavoriteIds().contains(testStation.id) &&
+              storage.getEvFavoriteStationData(testStation.id) != null &&
+              container.read(favoritesProvider).contains(testStation.id);
+        });
       });
       await tester.pump();
 
@@ -197,7 +206,14 @@ void main() {
 
       await tester.runAsync(() async {
         await tester.tap(find.byType(AnimatedFavoriteStar));
-        await Future<void>.delayed(const Duration(milliseconds: 100));
+        await _until(() {
+          final storage = container.read(storageRepositoryProvider);
+          // #4190 — the id removal, the JSON removal and the provider state
+          // land in that order, each after its own await.
+          return storage.getEvFavoriteIds().isEmpty &&
+              storage.getEvFavoriteStationData(testStation.id) == null &&
+              !container.read(favoritesProvider).contains(testStation.id);
+        });
       });
       await tester.pump();
 
@@ -218,6 +234,20 @@ void main() {
           isFalse);
     },
   );
+}
+
+/// #4190 — polls [done] in real time (the store's I/O runs outside FakeAsync,
+/// inside `runAsync`) and fails loudly if it never becomes true, instead of
+/// sleeping a fixed interval and racing the write.
+Future<void> _until(bool Function() done,
+    {Duration timeout = const Duration(seconds: 5)}) async {
+  final deadline = Stopwatch()..start();
+  while (!done()) {
+    if (deadline.elapsed > timeout) {
+      fail('condition not reached within $timeout');
+    }
+    await Future<void>.delayed(const Duration(milliseconds: 5));
+  }
 }
 
 class _DisabledSyncState extends SyncState {
