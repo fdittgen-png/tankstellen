@@ -121,6 +121,11 @@ docs/guides/*
 !docs/guides/i18n-hardcoded-worklist.md
 !docs/guides/driving-insights.md
 !docs/guides/auto-record.md
+# #4161 — the manual checklist the release train's production-artifact
+# gate points at. `test/ci/ci_workflow_test.dart` asserts this file
+# exists; without the allow-rule the file lived on disk, passed locally
+# and was never committed, so the gate pointed at nothing in CI.
+!docs/guides/production-artifact-gate.md
 # #3810 — the MCP dev-server setup. `.mcp.json` is committed, so the doc
 # explaining what each server is for (and why dart_format is excluded)
 # has to reach a fresh clone with it.
