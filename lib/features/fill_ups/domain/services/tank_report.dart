@@ -25,6 +25,7 @@
 ///    far recorded estimates still sit from the pump.
 library;
 
+import '../../../../core/domain/pump_gain_resolution.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../entities/fill_up.dart';
 import '../../../trips/api.dart';
@@ -267,16 +268,37 @@ PumpCalibration? _calibration(
 }
 
 /// #3918 — the window's recorded consumption RE-EXPRESSED at [vehicle]'s
-/// current pump gain for the closing fill's fuel ([CalibratedTripFigures]
-/// — display only), and the residual against the pump that remains
-/// after that calibration. Null when the recordings carry no fuel.
+/// current pump gain ([CalibratedTripFigures] — display only), and the
+/// residual against the pump that remains after that calibration. Null
+/// when the recordings carry no fuel.
+///
+/// #4202 — at the gain of the fuel the window BURNED (the grade its
+/// recordings were stamped with, else the opening fill's), never the
+/// closing fill's: a tank of E10 followed by an E85 fill is an E10 window.
+/// #4202 — the normalised grade a window BURNED: the key its recordings
+/// were resolved under (#4220), else the opening fill's fuel. Null-safe for
+/// legacy recordings that carry no key.
+String burnedFuelKey(
+  TankPeriod period,
+  Map<String, TripSummary> tripSummariesById,
+) {
+  final keys = <String>{};
+  for (final id in period.closing.linkedTripIds) {
+    final key = normalizePumpGainFuelKey(tripSummariesById[id]?.pumpGainFuelKey);
+    if (key != null) keys.add(key);
+  }
+  if (keys.length == 1) return keys.single;
+  return normalizePumpGainFuelKey(period.opening.fuelType.apiValue) ??
+      period.opening.fuelType.apiValue;
+}
+
 ({double recordedLPer100Km, double residualPct})? calibratedTankRecording(
   TankPeriod period,
   Map<String, TripSummary> tripSummariesById,
   VehicleProfile? vehicle,
 ) {
   var liters = 0.0, km = 0.0;
-  final fuelKey = period.closing.fuelType.apiValue;
+  final fuelKey = burnedFuelKey(period, tripSummariesById);
   for (final id in period.closing.linkedTripIds) {
     final t = tripSummariesById[id];
     if (t == null || t.isVirtual || isEngineOffTransport(t)) continue;
