@@ -135,7 +135,11 @@ class BackgroundScanRunners {
           // would reach the budget's ranking. Zero is the honest input:
           // the ranking is by money, and this kind carries none.
           distanceKm: 0,
-          priceAge: priceAgeForScannedRow(capability),
+          // #4186 — a real age now, where the provider published a
+          // stamp. The freshness gate can finally refuse a stale
+          // background opportunity instead of never seeing one.
+          priceAge: priceAgeForScannedRow(capability,
+              stampedAt: scannedRowStamp(stationPrices), now: now),
           confidence: capability?.confidence ?? DataConfidence.none,
           now: now,
         ),
@@ -249,6 +253,11 @@ class BackgroundScanRunners {
         [
           opportunityFromVelocityEvent(
             event: event,
+            // #4186 — deliberately NO stamp. A movement is about an
+            // area, not a row: the observations come from many stations
+            // with many stamps, and dating it by any one of them would
+            // be a figure true of no station. The capability's own
+            // unknown is the honest answer.
             priceAge: priceAgeForScannedRow(capability),
             confidence: capability?.confidence ?? DataConfidence.none,
             now: now,
@@ -370,7 +379,9 @@ class BackgroundScanRunners {
             // per-match distance is not on the sample, and inventing one
             // would reach the budget's ordering.
             distanceKm: 0,
-            priceAge: priceAgeForScannedRow(capability),
+            // #4186 — the sample carries its station's stamp now.
+            priceAge: priceAgeForScannedRow(capability,
+                stampedAt: cheapest.priceUpdatedAt, now: now),
             confidence: capability?.confidence ?? DataConfidence.none,
             now: now,
           ),

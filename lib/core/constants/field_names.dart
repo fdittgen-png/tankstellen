@@ -20,6 +20,11 @@ class TankerkoenigFields {
   static const diesel = 'diesel';
   static const isOpen = 'isOpen';
 
+  /// #4186 — the provider's price stamp, ISO-8601, carried through the
+  /// background scan's flattened price map so the freshness gate can
+  /// reason over it. Absent when the provider publishes none.
+  static const priceUpdatedAt = 'priceUpdatedAt';
+
   // #2864 — extended fuel grades non-DE providers expose. The
   // country-agnostic price map (background_price_shape.dart) already carries
   // these keys; naming them here keeps the FuelType→field mapping
