@@ -6217,6 +6217,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get maintenanceActionSnooze => 'Snooze 30 days';
 
   @override
+  String mapMarkerLimitNotice(int shown, int total) {
+    return 'Showing $shown of $total — zoom in for the rest';
+  }
+
+  @override
   String get consumptionMonthlyInsightsTitle => 'This month vs last month';
 
   @override
@@ -15795,6 +15800,11 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get maintenanceActionSnooze => '⟦Šñóóžé 30 đáýš ·····⟧';
+
+  @override
+  String mapMarkerLimitNotice(int shown, int total) {
+    return '⟦Šĥóŵîñǧ $shown óƒ $total — žóóɱ îñ ƒóř ŧĥé řéšŧ ···········⟧';
+  }
 
   @override
   String get consumptionMonthlyInsightsTitle =>

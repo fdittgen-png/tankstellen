@@ -6257,6 +6257,11 @@ class AppLocalizationsCs extends AppLocalizations {
   String get maintenanceActionSnooze => 'Odložit na 30 dní';
 
   @override
+  String mapMarkerLimitNotice(int shown, int total) {
+    return 'Showing $shown of $total — zoom in for the rest';
+  }
+
+  @override
   String get consumptionMonthlyInsightsTitle => 'Tento měsíc vs. minulý měsíc';
 
   @override

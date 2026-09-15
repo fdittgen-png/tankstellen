@@ -6026,6 +6026,20 @@
   "@maintenanceActionSnooze": {
     "description": "Label on the 'Snooze 30 days' button of the predictive-maintenance card — silences the card for the standard 30-day snooze window (#1124)."
   },
+  "mapMarkerLimitNotice": "Showing {shown} of {total} — zoom in for the rest",
+  "@mapMarkerLimitNotice": {
+    "description": "Small pill on the station map, shown only when more stations are inside the current view than the map will draw markers for (#4181). The map keeps the most relevant ones — cheapest for a price sort, closest otherwise, plus anything the user selected — so the pill has to say plainly that it is a subset and how to see the rest. Never appears for an ordinary result set.",
+    "placeholders": {
+      "shown": {
+        "type": "int",
+        "example": "400"
+      },
+      "total": {
+        "type": "int",
+        "example": "612"
+      }
+    }
+  },
   "consumptionMonthlyInsightsTitle": "This month vs last month",
   "@consumptionMonthlyInsightsTitle": {
     "description": "Title of the monthly-insights card on the Trajets tab landing screen — aggregates all trips into a current-vs-previous-month comparison (#1041 phase 4)."

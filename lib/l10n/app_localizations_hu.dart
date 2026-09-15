@@ -6280,6 +6280,11 @@ class AppLocalizationsHu extends AppLocalizations {
   String get maintenanceActionSnooze => 'Halasztás 30 napra';
 
   @override
+  String mapMarkerLimitNotice(int shown, int total) {
+    return 'Showing $shown of $total — zoom in for the rest';
+  }
+
+  @override
   String get consumptionMonthlyInsightsTitle => 'Ez a hónap vs. előző hónap';
 
   @override

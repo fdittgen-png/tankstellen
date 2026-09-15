@@ -7,6 +7,7 @@ import 'package:latlong2/latlong.dart';
 
 import 'station_map_geometry.dart';
 import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/perf/perf_budgets.dart';
 import '../../../../core/perf/startup_kpi.dart';
 import '../../../../core/domain/station.dart';
 import '../../../search/presentation/widgets/sort_selector.dart';
@@ -186,6 +187,10 @@ class _StationMapLayersState extends State<StationMapLayers> {
   /// selected one (the builder only gets the [Marker]s). Rebuilt with [_markers].
   final Map<Marker, MarkerMeta> _markerMeta = {};
 
+  /// #4181 — stations inside the current view with no marker. Zero in
+  /// every ordinary result; drives the map's "showing N of M" pill.
+  int _omittedCount = 0;
+
   /// #3000 — the per-marker meta map, exposed so a test can assert a clustered
   /// cross-border station carries its [fuelResolver]-derived price (not '--').
   @visibleForTesting
@@ -196,6 +201,12 @@ class _StationMapLayersState extends State<StationMapLayers> {
   /// guarded `didUpdateWidget` fit waits on this so a `fitCamera` call
   /// never lands before the controller has a real viewport (#2399).
   bool _mapReady = false;
+
+  /// #4181 — the camera's visible bounds, snapped to a coarse grid so a
+  /// pixel-level pan does not rebuild every marker. Null until the first
+  /// `onPositionChanged`, which is the "no camera yet, cull nothing"
+  /// case [StationMapGeometry.withinCameraBounds] handles.
+  LatLngBounds? _cameraBounds;
 
   /// The bounds the camera was last fitted to. Held so a redundant
   /// rebuild (EV-toggle, app resume, unrelated provider change) does not
@@ -221,6 +232,7 @@ class _StationMapLayersState extends State<StationMapLayers> {
   void _recomputeMarkers() {
     final model = StationMarkerModelBuilder.build(
       context: context,
+      cameraBounds: _cameraBounds,
       stations: widget.stations,
       selectedFuel: widget.selectedFuel,
       selectedStationIds: widget.selectedStationIds,
@@ -232,6 +244,7 @@ class _StationMapLayersState extends State<StationMapLayers> {
       markerVariant: widget.markerVariant,
     );
     _markers = model.markers;
+    _omittedCount = model.omittedCount;
     // #4140 — the map's price bubbles are the third surface that can be
     // first to show a price. Idempotent; see [StartupKpi.markUsefulMap].
     if (_markers.isNotEmpty) StartupKpi.markUsefulMap();
@@ -298,6 +311,31 @@ class _StationMapLayersState extends State<StationMapLayers> {
     }
   }
 
+  /// #4181 — remember the viewport so [_recomputeMarkers] can cull to it.
+  ///
+  /// `onPositionChanged` fires on every camera frame of a pan, so the
+  /// bounds are SNAPPED to a coarse grid (~0.01°, roughly a kilometre)
+  /// and a rebuild is scheduled only when the snapped box actually
+  /// changes. Without that, a single fling would rebuild every marker
+  /// sixty times a second — the exact cost #1774's memoisation exists to
+  /// avoid, reintroduced by the fix for the unbounded count.
+  void _onCameraChanged(LatLngBounds bounds) {
+    // Inert below the cap: an ordinary map has nothing to cull, and a
+    // per-frame rebuild there would cost more than the bound saves.
+    if (widget.stations.length <= kMapMarkerBudget.limit!) return;
+    const grid = 0.01;
+    double snapDown(double v) => (v / grid).floorToDouble() * grid;
+    double snapUp(double v) => (v / grid).ceilToDouble() * grid;
+    final snapped = LatLngBounds(
+      LatLng(snapDown(bounds.south), snapDown(bounds.west)),
+      LatLng(snapUp(bounds.north), snapUp(bounds.east)),
+    );
+    if (_cameraBounds == snapped) return;
+    _cameraBounds = snapped;
+    if (!mounted) return;
+    setState(_recomputeMarkers);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -313,6 +351,8 @@ class _StationMapLayersState extends State<StationMapLayers> {
           onMapReady: () {
             if (mounted) _mapReady = true;
           },
+          omittedCount: _omittedCount,
+          onCameraChanged: _onCameraChanged,
           interactionOptions: widget.interactionOptions,
           onMapTap: widget.onMapTap,
           routePolyline: widget.routePolyline,

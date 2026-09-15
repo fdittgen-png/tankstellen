@@ -6819,5 +6819,20 @@
   "@alertConfidenceMediumPrefix": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "mapMarkerLimitNotice": "Showing {shown} of {total} — zoom in for the rest",
+  "@mapMarkerLimitNotice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "shown": {
+        "type": "int",
+        "example": "400"
+      },
+      "total": {
+        "type": "int",
+        "example": "612"
+      }
+    }
   }
 }

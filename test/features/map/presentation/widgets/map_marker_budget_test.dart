@@ -9,10 +9,14 @@
 ///
 /// **What this test can and cannot say.** It cannot assert a frame time:
 /// a CI runner has no mid-range Android GPU. What it can hold is the
-/// SHAPE of the cost — that the builder stays linear in its input and
-/// does not, say, start building a marker per fuel type per station. And
-/// it records the fact that nothing bounds the input (#4181), so the
-/// budget is a guard rather than a derived ceiling.
+/// SHAPE of the cost — that the builder stays linear in its input up to
+/// the cap, and does not, say, start building a marker per fuel type per
+/// station.
+///
+/// #4181 closed the gap this file used to record: the builder bounds its
+/// own output now, so [kMapMarkerBudget] is a DERIVED ceiling rather
+/// than a guard on an unbounded quantity. The test that deliberately
+/// asserted the absence of a bound is inverted below.
 library;
 
 import 'package:flutter/material.dart';
@@ -74,9 +78,9 @@ void main() {
 
   testWidgets('a realistic dense result stays inside the guard',
       (tester) async {
-    // 250 stations is a dense-city 25 km search. It is under the guard
-    // today; nothing in the code KEEPS it there, which is the point of
-    // #4181.
+    // 250 stations is a dense-city 25 km search, under the ceiling. Since
+    // #4181 the builder also KEEPS it there, which is what makes the
+    // number a bound rather than a hope.
     final model = await buildFor(tester, 250);
     expect(model.markers.length,
         lessThanOrEqualTo(kMapMarkerBudget.limit!),
@@ -85,14 +89,40 @@ void main() {
             'this.');
   });
 
-  testWidgets('the count is NOT bounded by the builder — recorded, not '
-      'asserted as safe', (tester) async {
-    // Deliberately documents the gap instead of hiding it: handed more
-    // than the guard, the builder happily produces more than the guard.
-    // If this ever starts failing, someone capped it and #4181 can close.
+  testWidgets('#4181 — the count IS bounded now, and the budget is the bound',
+      (tester) async {
+    // The inverse of what this test asserted before #4181: handed more
+    // than the ceiling, the builder keeps the ceiling's worth.
     final model = await buildFor(tester, kMapMarkerBudget.limit!.toInt() + 50);
-    expect(model.markers.length, greaterThan(kMapMarkerBudget.limit!),
-        reason: 'the builder now bounds its output — good. Update '
-            'kMapMarkerBudget to say it is derived, and close #4181.');
+    expect(model.markers.length, kMapMarkerBudget.limit!.toInt());
+    expect(model.omittedCount, 50,
+        reason: 'the loss is REPORTED, not silent — a cluster badge that '
+            'counts fewer members than exist has to be explainable');
+  });
+
+  testWidgets('#4181 — the cap keeps the cheapest under a price sort',
+      (tester) async {
+    // The rule the issue warns about: "silently dropping the cheapest
+    // station off the map is worse than a slow map". _stations() cycles
+    // prices 1.70..1.99, so the cheapest exist throughout the input and
+    // a naive truncation would lose most of them.
+    final cap = kMapMarkerBudget.limit!.toInt();
+    final model = await buildFor(tester, cap + 200);
+
+    final cheapest = model.meta.values
+        .map((m) => m.price)
+        .whereType<double>()
+        .reduce((a, b) => a < b ? a : b);
+    expect(cheapest, closeTo(1.70, 1e-9),
+        reason: 'the cheapest price in the input must survive the cap');
+  });
+
+  testWidgets('#4181 — an ordinary result is untouched, cap and all',
+      (tester) async {
+    final model = await buildFor(tester, 250);
+    expect(model.markers, hasLength(250));
+    expect(model.omittedCount, 0,
+        reason: 'below the cap nothing is culled and nothing is capped, so '
+            'the map behaves exactly as it did before #4181');
   });
 }

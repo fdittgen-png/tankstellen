@@ -2875,6 +2875,20 @@
   "maintenanceSignalMafDeviationBody": "Der Kraftstoffverbrauch bei konstanter Fahrt ist über deine letzten {tripCount} Fahrten um {percent} % gefallen. Möglicher Hinweis auf einen verstopften Luftfilter — eine Prüfung lohnt sich.",
   "maintenanceActionDismiss": "Verwerfen",
   "maintenanceActionSnooze": "30 Tage stumm",
+  "mapMarkerLimitNotice": "{shown} von {total} sichtbar — zum Rest heranzoomen",
+  "@mapMarkerLimitNotice": {
+    "description": "Small pill on the station map, shown only when more stations are inside the current view than the map will draw markers for (#4181). The map keeps the most relevant ones — cheapest for a price sort, closest otherwise, plus anything the user selected — so the pill has to say plainly that it is a subset and how to see the rest. Never appears for an ordinary result set.",
+    "placeholders": {
+      "shown": {
+        "type": "int",
+        "example": "400"
+      },
+      "total": {
+        "type": "int",
+        "example": "612"
+      }
+    }
+  },
   "consumptionMonthlyInsightsTitle": "Dieser Monat vs. letzter Monat",
   "consumptionMonthlyTripsLabel": "Fahrten",
   "consumptionMonthlyDriveTimeLabel": "Fahrzeit",

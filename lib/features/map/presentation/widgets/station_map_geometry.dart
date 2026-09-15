@@ -199,6 +199,80 @@ class StationMapGeometry {
     return ordered;
   }
 
+  /// Cull [stations] to what a camera framing [bounds] can show, plus
+  /// [marginScreens] screens of margin on each side so a short pan
+  /// reveals markers that were already built (#4181).
+  ///
+  /// Returns the input UNCHANGED when [bounds] is null — before the
+  /// first `onPositionChanged` there is no camera to cull against, and
+  /// showing fewer stations than exist is only acceptable when we know
+  /// they are off-screen.
+  ///
+  /// This bounds what a ZOOMED-IN map builds. It does not bound the
+  /// count on its own: zoom far enough out and everything is visible
+  /// again, which is what [capByRelevance] is for.
+  static List<Station> withinCameraBounds(
+    List<Station> stations,
+    LatLngBounds? bounds, {
+    double marginScreens = 1.0,
+  }) {
+    if (bounds == null) return stations;
+    final latMargin = (bounds.north - bounds.south).abs() * marginScreens;
+    final lngMargin = (bounds.east - bounds.west).abs() * marginScreens;
+    final south = bounds.south - latMargin;
+    final north = bounds.north + latMargin;
+    final west = bounds.west - lngMargin;
+    final east = bounds.east + lngMargin;
+    return [
+      for (final s in stations)
+        if (s.lat.isFinite &&
+            s.lng.isFinite &&
+            s.lat >= south &&
+            s.lat <= north &&
+            s.lng >= west &&
+            s.lng <= east)
+          s,
+    ];
+  }
+
+  /// Keep at most [cap] stations, choosing the ones the user is looking
+  /// for (#4181).
+  ///
+  /// The rule, in order:
+  ///
+  ///  1. every station in [selectedIds] — the user pointed at it, and a
+  ///     selection vanishing off the map is the one unacceptable drop;
+  ///  2. then [rankForEmphasis] order — cheapest first for a price sort,
+  ///     closest first otherwise. That is already the app's own notion
+  ///     of relevance, so the map and the list agree about what matters.
+  ///
+  /// Returns the input unchanged when it already fits, so below the cap
+  /// nothing about the map's behaviour changes at all.
+  ///
+  /// The result is NOT re-ordered for painting; callers still run
+  /// [orderedByPriceForPainting] over it.
+  static List<Station> capByRelevance(
+    List<Station> stations,
+    FuelType selectedFuel, {
+    required int cap,
+    required bool byPrice,
+    Set<String>? selectedIds,
+  }) {
+    if (stations.length <= cap) return stations;
+    final kept = <Station>[];
+    final keptIds = <String>{};
+    if (selectedIds != null && selectedIds.isNotEmpty) {
+      for (final s in stations) {
+        if (selectedIds.contains(s.id) && keptIds.add(s.id)) kept.add(s);
+      }
+    }
+    for (final s in rankForEmphasis(stations, selectedFuel, byPrice: byPrice)) {
+      if (kept.length >= cap) break;
+      if (keptIds.add(s.id)) kept.add(s);
+    }
+    return kept;
+  }
+
   /// Rank [stations] for marker EMPHASIS (#2510): the cheapest stations first
   /// when [byPrice] (a price-oriented sort), the closest first otherwise. The
   /// first [emphasisCount] entries get the full price bubble; the rest become

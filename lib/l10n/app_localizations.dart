@@ -10602,6 +10602,12 @@ abstract class AppLocalizations {
   /// **'Snooze 30 days'**
   String get maintenanceActionSnooze;
 
+  /// Small pill on the station map, shown only when more stations are inside the current view than the map will draw markers for (#4181). The map keeps the most relevant ones — cheapest for a price sort, closest otherwise, plus anything the user selected — so the pill has to say plainly that it is a subset and how to see the rest. Never appears for an ordinary result set.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing {shown} of {total} — zoom in for the rest'**
+  String mapMarkerLimitNotice(int shown, int total);
+
   /// Title of the monthly-insights card on the Trajets tab landing screen — aggregates all trips into a current-vs-previous-month comparison (#1041 phase 4).
   ///
   /// In en, this message translates to:

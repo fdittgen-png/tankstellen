@@ -6,7 +6,9 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../data/sparkilo_tile_layer.dart';
+import '../../../../core/theme/app_radius.dart';
 import '../../../../core/widgets/osm_attribution.dart';
+import '../../../../l10n/app_localizations.dart';
 import 'station_cluster_layers.dart';
 import 'station_map_geometry.dart';
 
@@ -42,6 +44,8 @@ class StationMapBody extends StatelessWidget {
     required this.selectedStationIds,
     required this.stationCount,
     required this.extraLayers,
+    this.onCameraChanged,
+    this.omittedCount = 0,
   });
 
   final MapController mapController;
@@ -65,6 +69,17 @@ class StationMapBody extends StatelessWidget {
   /// at [StationMapGeometry.clusterThreshold].
   final int stationCount;
   final List<Widget> extraLayers;
+
+  /// #4181 — the camera's visible bounds after every move, so the parent
+  /// can cull markers to the viewport. Null on maps that do not cull.
+  final void Function(LatLngBounds bounds)? onCameraChanged;
+
+  /// #4181 — how many stations inside the CURRENT VIEW got no marker
+  /// because the relevance cap bit. Zero in every ordinary result; when
+  /// non-zero the map says so rather than quietly drawing a smaller
+  /// world, because a cluster badge then counts fewer members than are
+  /// really there.
+  final int omittedCount;
 
   @override
   Widget build(BuildContext context) {
@@ -103,6 +118,12 @@ class StationMapBody extends StatelessWidget {
             const InteractionOptions(flags: InteractiveFlag.all),
         // #3002 — driving wires a background-tap to its auto-lock reset.
         onTap: onMapTap == null ? null : (_, _) => onMapTap!(),
+        // #4181 — report the viewport so the parent can bound what it
+        // builds. Fires on every camera frame, so the parent must debounce
+        // (it snaps to a coarse grid) rather than rebuild per pixel.
+        onPositionChanged: onCameraChanged == null
+            ? null
+            : (camera, _) => onCameraChanged!(camera.visibleBounds),
       ),
       children: [
         // #2398 — the SINGLE hardened tile path. No inline TileLayer, no reset
@@ -189,9 +210,57 @@ class StationMapBody extends StatelessWidget {
             MarkerLayer(markers: markers),
         // Extra layers (e.g. EV overlay)
         ...extraLayers,
+        // #4181 — the subset notice. Only ever built when the relevance
+        // cap actually bit, which an ordinary result never does.
+        if (omittedCount > 0)
+          _LimitedMarkersPill(
+            shown: markers.length,
+            total: markers.length + omittedCount,
+          ),
         // Attribution — localized OSM credit (#2402).
         const OsmAttribution(),
       ],
+    );
+  }
+}
+
+/// #4181 — "showing N of M, zoom in for the rest".
+///
+/// Deliberately a plain statement rather than a warning: the map IS
+/// showing fewer stations than the view contains, and the user's remedy
+/// is one gesture away. Styled like the attribution credit so it reads
+/// as map chrome, not as an error.
+class _LimitedMarkersPill extends StatelessWidget {
+  const _LimitedMarkersPill({required this.shown, required this.total});
+
+  final int shown;
+  final int total;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Align(
+      alignment: Alignment.topCenter,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface.withValues(alpha: 0.92),
+              borderRadius: AppRadius.lg,
+            ),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              child: Text(
+                AppLocalizations.of(context)
+                    .mapMarkerLimitNotice(shown, total),
+                style: theme.textTheme.labelSmall,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

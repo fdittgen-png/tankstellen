@@ -6241,6 +6241,11 @@ class AppLocalizationsEt extends AppLocalizations {
   String get maintenanceActionSnooze => 'Lükka 30 päevaks edasi';
 
   @override
+  String mapMarkerLimitNotice(int shown, int total) {
+    return 'Showing $shown of $total — zoom in for the rest';
+  }
+
+  @override
   String get consumptionMonthlyInsightsTitle => 'See kuu vs eelmine kuu';
 
   @override

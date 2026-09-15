@@ -6247,6 +6247,11 @@ class AppLocalizationsNb extends AppLocalizations {
   String get maintenanceActionSnooze => 'Utsett 30 dager';
 
   @override
+  String mapMarkerLimitNotice(int shown, int total) {
+    return 'Showing $shown of $total — zoom in for the rest';
+  }
+
+  @override
   String get consumptionMonthlyInsightsTitle =>
       'Denne måneden vs forrige måned';
 

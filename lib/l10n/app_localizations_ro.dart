@@ -6291,6 +6291,11 @@ class AppLocalizationsRo extends AppLocalizations {
   String get maintenanceActionSnooze => 'Amânați 30 de zile';
 
   @override
+  String mapMarkerLimitNotice(int shown, int total) {
+    return 'Showing $shown of $total — zoom in for the rest';
+  }
+
+  @override
   String get consumptionMonthlyInsightsTitle =>
       'Luna aceasta față de luna trecută';
 

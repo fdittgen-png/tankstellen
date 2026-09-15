@@ -1735,6 +1735,7 @@
   "maintenanceSignalMafDeviationBody": "⟦Çřúîšé ƒúéł řáŧé ĥáš đřóƥƥéđ ƀý {percent}% óṽéř ýóúř łášŧ {tripCount} ŧřîƥš. Ƥóššîƀłé šîǧñ óƒ á çłóǧǧéđ áîř ƒîłŧéř óř řéšŧřîçŧéđ îñŧáķé — ŵóřŧĥ á çĥéçķ-úƥ. ···············································⟧",
   "maintenanceActionDismiss": "⟦Đîšɱîšš ···⟧",
   "maintenanceActionSnooze": "⟦Šñóóžé 30 đáýš ·····⟧",
+  "mapMarkerLimitNotice": "⟦Šĥóŵîñǧ {shown} óƒ {total} — žóóɱ îñ ƒóř ŧĥé řéšŧ ···········⟧",
   "consumptionMonthlyInsightsTitle": "⟦Ŧĥîš ɱóñŧĥ ṽš łášŧ ɱóñŧĥ ·········⟧",
   "consumptionMonthlyTripsLabel": "⟦Ŧřîƥš ··⟧",
   "consumptionMonthlyDriveTimeLabel": "⟦Đřîṽé ŧîɱé ····⟧",

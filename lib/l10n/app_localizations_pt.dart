@@ -6292,6 +6292,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get maintenanceActionSnooze => 'Adiar 30 dias';
 
   @override
+  String mapMarkerLimitNotice(int shown, int total) {
+    return 'Showing $shown of $total — zoom in for the rest';
+  }
+
+  @override
   String get consumptionMonthlyInsightsTitle => 'Este mês vs mês passado';
 
   @override

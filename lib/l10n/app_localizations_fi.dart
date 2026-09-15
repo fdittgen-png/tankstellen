@@ -6247,6 +6247,11 @@ class AppLocalizationsFi extends AppLocalizations {
   String get maintenanceActionSnooze => 'Lykkää 30 päivää';
 
   @override
+  String mapMarkerLimitNotice(int shown, int total) {
+    return 'Showing $shown of $total — zoom in for the rest';
+  }
+
+  @override
   String get consumptionMonthlyInsightsTitle =>
       'Tämä kuukausi vs. viime kuukausi';
 
