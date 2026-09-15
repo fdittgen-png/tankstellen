@@ -11,6 +11,8 @@ import 'package:home_widget/home_widget.dart';
 
 import '../../../core/country/country_config.dart';
 import '../../../core/data/storage_repository.dart';
+import '../../../core/domain/data_value.dart';
+import '../../../core/services/station_open_state.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/storage/storage_keys.dart';
 import '../../../core/utils/geo_utils.dart' as geo;
@@ -405,7 +407,17 @@ class HomeWidgetService {
       'e5': data['e5'],
       'e10': data['e10'],
       'diesel': data['diesel'],
-      'isOpen': data['isOpen'] ?? false,
+      // #4179 — absent, not false, when the open state is unknown. See
+      // [resolveStationOpenState]: this builder used to read an unknown
+      // as CLOSED while the nearest-station builder read the identical
+      // unknown as OPEN.
+      if (resolveStationOpenState(
+            stationId: id,
+            lat: stationLat,
+            lng: stationLng,
+            published: data['isOpen'] as bool?,
+          ) case Measured<bool>(:final value))
+        'isOpen': value,
       'currency': ?currency,
       if (preferredFuelType != null)
         'preferred_fuel_code': preferredFuelType.apiValue,

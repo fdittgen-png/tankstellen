@@ -414,23 +414,34 @@ object StationWidgetRenderer {
             getColorCompat(context, priceColorRes),
         )
 
-        val isOpen = station.optBoolean("isOpen", false)
-        row.setTextViewText(
-            R.id.station_status,
-            if (isOpen) "● Open" else "○ Closed",
-        )
-        // #2600 — the status pill carried no explicit colour, so it
-        // inherited the launcher theme's default text colour, which could
-        // be near-invisible on the dark-navy widget background. Pin it:
-        // open → the cheap green, closed → the dim secondary.
-        row.setTextColor(
-            R.id.station_status,
-            getColorCompat(
-                context,
-                if (isOpen) R.color.widget_price_cheap
-                else R.color.widget_text_secondary,
-            ),
-        )
+        // #4179 — the open state is TRI-state. The Dart side omits the
+        // key entirely when the provider publishes no opening hours
+        // (eleven of seventeen countries) or publishes none for this
+        // station, and an absent key must render no pill at all: an
+        // `optBoolean(..., false)` turned "we do not know" into a
+        // confident "○ Closed" on every station in those countries.
+        if (station.has("isOpen") && !station.isNull("isOpen")) {
+            val isOpen = station.optBoolean("isOpen", false)
+            row.setViewVisibility(R.id.station_status, View.VISIBLE)
+            row.setTextViewText(
+                R.id.station_status,
+                if (isOpen) "● Open" else "○ Closed",
+            )
+            // #2600 — the status pill carried no explicit colour, so it
+            // inherited the launcher theme's default text colour, which
+            // could be near-invisible on the dark-navy widget background.
+            // Pin it: open → the cheap green, closed → the dim secondary.
+            row.setTextColor(
+                R.id.station_status,
+                getColorCompat(
+                    context,
+                    if (isOpen) R.color.widget_price_cheap
+                    else R.color.widget_text_secondary,
+                ),
+            )
+        } else {
+            row.setViewVisibility(R.id.station_status, View.GONE)
+        }
 
         // #1121 — predictive nudge line. Render only when the user selected
         // the predictive variant AND the Dart side attached `predictive_*`

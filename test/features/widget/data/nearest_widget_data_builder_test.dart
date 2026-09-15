@@ -331,6 +331,9 @@ void main() {
         expect(s['distanceKm'], isA<num>());
         expect(s['priceFormatted'], isA<String>());
         expect(s['currency'], isA<String>());
+        // #4179 — tri-state: present only when the provider published
+        // one. These fixtures are German (`de-*`) and carry an explicit
+        // flag, so it must be here AND be a bool.
         expect(s['isOpen'], isA<bool>());
       }
       // First station has the shortest distance.
