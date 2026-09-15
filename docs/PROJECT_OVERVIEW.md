@@ -834,7 +834,14 @@ integration_test/                  # app_test, fresh_install_wizard, golden_flow
   files. CI passes **no** `--threshold`, so the effective gate is the script default
   of **40 %** — and it runs only on pushes to `master`, never on a pull request.
   See [§22-A](#22-known-gaps-and-stale-documentation).
-- **Startup budget**: `scripts/check_startup_budget.sh`, **2000 ms**.
+- **Startup budget**: `scripts/check_startup_budget.sh`. The number itself is
+  `kColdStartBudget` in `lib/core/perf/perf_budgets.dart` (**2500 ms** to a
+  usable map, measured on a mid-range Samsung); the script READS it rather
+  than restating it (#4140 — it used to print a 2000 of its own). CI cannot
+  time a cold start, so what it enforces is structural: the instrumentation
+  is present, the KPI reaches the trace export, and
+  `test/core/perf/startup_regression_gate_test.dart` pins the first-frame
+  box set and the pre-`runApp` await list the budget was measured over.
 - **Module boundaries**: `scripts/check_module_boundaries.sh` +
   `scripts/module_boundary_allowlist.txt`.
 

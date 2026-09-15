@@ -32,6 +32,13 @@ class StartupTimer {
   /// Whether the timer has been started.
   bool get isRunning => _stopwatch.isRunning;
 
+  /// Whether [start] has ever run on this launch — true even after
+  /// [finish] stopped the stopwatch, because the post-first-frame
+  /// timeline (#3445 spans, the #4140 KPI) is still anchored to it.
+  /// False in any harness that did not come up through `AppInitializer`,
+  /// which is what lets those recorders decline to invent a launch.
+  bool get hasStarted => _wallClockEpoch != null;
+
   /// All recorded milestones (in order).
   List<StartupMilestone> get milestones => List.unmodifiable(_milestones);
 

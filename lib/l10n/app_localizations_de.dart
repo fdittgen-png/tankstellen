@@ -6278,6 +6278,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get maintenanceActionSnooze => '30 Tage stumm';
 
   @override
+  String mapMarkerLimitNotice(int shown, int total) {
+    return '$shown von $total sichtbar — zum Rest heranzoomen';
+  }
+
+  @override
   String get consumptionMonthlyInsightsTitle =>
       'Dieser Monat vs. letzter Monat';
 
@@ -7299,6 +7304,30 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get reconcileResolveGapSemanticLabel =>
       'Ungeklärte Kraftstoff- und Fahrten-Differenz klären';
+
+  @override
+  String get recoveryStillWorksNoStations =>
+      'Es ist nichts kaputt — die Suche war einfach leer.';
+
+  @override
+  String get recoveryStillWorksApiKey =>
+      'Gespeicherte Tankstellen und deine Tank-Historie funktionieren weiterhin.';
+
+  @override
+  String get recoveryStillWorksLocation =>
+      'Du kannst weiterhin nach Postleitzahl oder Ort suchen.';
+
+  @override
+  String get recoveryStillWorksConnection =>
+      'Bereits geladene Preise werden weiterhin angezeigt.';
+
+  @override
+  String get recoveryStillWorksRouting =>
+      'Die Umkreissuche funktioniert weiterhin — nur die Route fehlt.';
+
+  @override
+  String get recoveryStillWorksFallback =>
+      'Gespeicherte Tankstellen und deine Tank-Historie funktionieren weiterhin.';
 
   @override
   String get refuelUnitPerKwh => '/kWh';

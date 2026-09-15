@@ -6297,5 +6297,50 @@
   "alertReasonPriceAgeUnknown": "Cette source de données n'indique pas quand le prix a été relevé",
   "alertReasonSourceMedium": "Les données de ce pays sont actualisées moins souvent",
   "alertReasonSourceLow": "Les données de ce pays sont incomplètes ou rarement actualisées",
-  "alertConfidenceMediumPrefix": "Économie potentielle"
+  "alertConfidenceMediumPrefix": "Économie potentielle",
+  "mapMarkerLimitNotice": "{shown} sur {total} affichées — zoomez pour voir le reste",
+  "@mapMarkerLimitNotice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "shown": {
+        "type": "int",
+        "example": "400"
+      },
+      "total": {
+        "type": "int",
+        "example": "612"
+      }
+    }
+  },
+  "recoveryStillWorksNoStations": "Rien n'est cassé — la recherche n'a simplement rien trouvé.",
+  "@recoveryStillWorksNoStations": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recoveryStillWorksApiKey": "Vos stations enregistrées et votre historique de pleins fonctionnent toujours.",
+  "@recoveryStillWorksApiKey": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recoveryStillWorksLocation": "Vous pouvez toujours chercher par code postal ou par ville.",
+  "@recoveryStillWorksLocation": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recoveryStillWorksConnection": "Les prix déjà chargés restent affichés.",
+  "@recoveryStillWorksConnection": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recoveryStillWorksRouting": "La recherche à proximité fonctionne toujours — seul l'itinéraire est indisponible.",
+  "@recoveryStillWorksRouting": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recoveryStillWorksFallback": "Vos stations enregistrées et votre historique de pleins fonctionnent toujours.",
+  "@recoveryStillWorksFallback": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  }
 }

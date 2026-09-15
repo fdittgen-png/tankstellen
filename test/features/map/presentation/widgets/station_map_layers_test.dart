@@ -12,6 +12,7 @@ import 'package:tankstellen/features/map/presentation/widgets/station_map_geomet
 import 'package:tankstellen/features/map/presentation/widgets/station_map_layers.dart';
 import 'package:tankstellen/features/map/presentation/widgets/station_marker.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/perf/perf_budgets.dart';
 import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/search/presentation/widgets/sort_selector.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
@@ -411,6 +412,25 @@ void main() {
         // A plain MarkerLayer carries every station marker. (The centre
         // marker is its own MarkerLayer, so there are two.)
         expect(find.byType(MarkerLayer), findsWidgets);
+      },
+    );
+
+    testWidgets(
+      '#4181 — past the marker ceiling the map bounds itself AND says so',
+      (tester) async {
+        final cap = kMapMarkerBudget.limit!.toInt();
+        await pumpWith(tester, nStations(cap + 60));
+
+        final state = tester.state(find.byType(StationMapLayers));
+        final built =
+            ((state as dynamic).markerMetaForTesting as Map).length;
+        expect(built, lessThanOrEqualTo(cap),
+            reason: 'before #4181 the builder produced one marker per '
+                'station with nothing capping the station count');
+
+        // The subset is stated, not silent: a clustered station with no
+        // marker also makes its badge count fewer members than exist.
+        expect(find.textContaining(RegExp(r'\d+ of \d+')), findsOneWidget);
       },
     );
 

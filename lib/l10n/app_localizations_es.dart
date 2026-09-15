@@ -6291,6 +6291,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String get maintenanceActionSnooze => 'Posponer 30 días';
 
   @override
+  String mapMarkerLimitNotice(int shown, int total) {
+    return 'Showing $shown of $total — zoom in for the rest';
+  }
+
+  @override
   String get consumptionMonthlyInsightsTitle => 'Este mes frente al mes pasado';
 
   @override
@@ -7311,6 +7316,30 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get reconcileResolveGapSemanticLabel =>
       'Resolver la diferencia de combustible y viajes sin resolver';
+
+  @override
+  String get recoveryStillWorksNoStations =>
+      'Nothing is wrong — the search simply came back empty.';
+
+  @override
+  String get recoveryStillWorksApiKey =>
+      'Saved stations and your fill-up history still work.';
+
+  @override
+  String get recoveryStillWorksLocation =>
+      'You can still search by postal code or city.';
+
+  @override
+  String get recoveryStillWorksConnection =>
+      'Prices you have already loaded are still shown.';
+
+  @override
+  String get recoveryStillWorksRouting =>
+      'Nearby search still works — only the route is unavailable.';
+
+  @override
+  String get recoveryStillWorksFallback =>
+      'Saved stations and your fill-up history still work.';
 
   @override
   String get refuelUnitPerKwh => '/kWh';

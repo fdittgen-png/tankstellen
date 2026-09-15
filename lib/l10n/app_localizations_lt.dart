@@ -6279,6 +6279,11 @@ class AppLocalizationsLt extends AppLocalizations {
   String get maintenanceActionSnooze => 'Priminti po 30 dienų';
 
   @override
+  String mapMarkerLimitNotice(int shown, int total) {
+    return 'Showing $shown of $total — zoom in for the rest';
+  }
+
+  @override
   String get consumptionMonthlyInsightsTitle =>
       'Šis mėnuo palyginti su praėjusiu';
 
@@ -7303,6 +7308,30 @@ class AppLocalizationsLt extends AppLocalizations {
   @override
   String get reconcileResolveGapSemanticLabel =>
       'Išspręsti neišspręstą kuro ir kelionių skirtumą';
+
+  @override
+  String get recoveryStillWorksNoStations =>
+      'Nothing is wrong — the search simply came back empty.';
+
+  @override
+  String get recoveryStillWorksApiKey =>
+      'Saved stations and your fill-up history still work.';
+
+  @override
+  String get recoveryStillWorksLocation =>
+      'You can still search by postal code or city.';
+
+  @override
+  String get recoveryStillWorksConnection =>
+      'Prices you have already loaded are still shown.';
+
+  @override
+  String get recoveryStillWorksRouting =>
+      'Nearby search still works — only the route is unavailable.';
+
+  @override
+  String get recoveryStillWorksFallback =>
+      'Saved stations and your fill-up history still work.';
 
   @override
   String get refuelUnitPerKwh => '/kWh';

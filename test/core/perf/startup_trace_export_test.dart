@@ -4,6 +4,8 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/perf/perf_budgets.dart';
+import 'package:tankstellen/core/perf/startup_kpi.dart';
 import 'package:tankstellen/core/perf/startup_timer.dart';
 import 'package:tankstellen/core/perf/startup_trace_export.dart';
 import 'package:tankstellen/core/telemetry/storage/trace_storage.dart';
@@ -142,6 +144,26 @@ void main() {
     });
   });
 
+  group('#4140 — the export names the KPI', () {
+    test('every document carries it, stated as unknown when unreached', () {
+      final doc = StartupTraceExport.buildDocument(
+        milestones: const [],
+        totalMs: 8891,
+        exportedAt: DateTime.utc(2026, 9, 12),
+        appVersion: '6.0.5',
+      );
+
+      final kpi = doc['kpi']! as Map<String, Object?>;
+      expect(kpi['name'], StartupKpi.spanName);
+      expect(kpi['definition'], StartupKpi.definition);
+      expect(kpi['budgetMs'], kColdStartBudget.limit,
+          reason: 'a reader of the export must not have to remember what '
+              'slow means');
+      expect(kpi['unknownReason'], isNotNull);
+      expect(kpi.containsKey('ms'), isFalse);
+    });
+  });
+
   group('#4110 — the export names the long pole', () {
     test('slowestBoxOpen travels when init recorded one', () {
       final doc = StartupTraceExport.buildDocument(
@@ -152,10 +174,13 @@ void main() {
         slowestBoxOpen: ('cache', 8600),
       );
       expect(doc['slowestBoxOpen'], {'box': 'cache', 'durationMs': 8600});
-      expect(StartupTraceExport.schemaVersion, 3,
+    });
+
+    test('the schema version moves with the field set', () {
+      expect(StartupTraceExport.schemaVersion, 4,
           reason: 'a new export field is a schema bump, or a reader cannot '
               'tell an old export without the field from a new one whose '
-              'init never ran');
+              'init never ran. v4 added the #4140 `kpi` section');
     });
 
     test('it is OMITTED, not null-filled, when init has not run', () {

@@ -92,28 +92,28 @@ const kStationRowWidgetBudget = PerfBudget(
 
 /// How many markers may reach the map before clustering.
 ///
-/// ⚠️ **This is a GUARD on an unbounded quantity, not a derived bound.**
+/// This was a GUARD on an unbounded quantity until #4181; it is the
+/// actual bound now. `StationMarkerModelBuilder` reads this constant and
+/// enforces it: cull to the camera plus a screen of margin, then keep at
+/// most this many by relevance (selection first, then cheapest for a
+/// price sort / closest otherwise). Stations dropped by the second step
+/// are reported as `omittedCount` and the map says "showing N of M",
+/// because `clusterAlways: true` means a dropped station also makes a
+/// cluster badge count fewer members than exist.
 ///
-/// `StationMarkerModelBuilder` maps over every station it is handed —
-/// `emphasisCount: 4` only decides which get the full price bubble, the
-/// rest still become markers — and `clusterAlways: true` means each one
-/// is BUILT even when it collapses into a cluster badge. Nothing caps
-/// the list. The only limit is however many stations a 25 km search
-/// returns, which in a dense city is a few hundred.
-///
-/// The first version of this comment claimed "the search radius cap and
-/// the per-country result cap together bound a realistic result set
-/// below this". There is no per-country result cap. Checking that claim
-/// is what found the gap; capping it is #4181.
+/// The history is worth keeping: the first version of this comment
+/// claimed "the search radius cap and the per-country result cap
+/// together bound a realistic result set below this". There is no
+/// per-country result cap. Checking that plausible sentence is what
+/// found the gap.
 const kMapMarkerBudget = PerfBudget(
   surface: 'map markers',
   limit: 400,
   unit: 'markers built per frame',
-  measuredOn: 'NOT derived — a guard. The builder is linear in the '
-      'station count and nothing bounds that count (#4181). 400 is the '
-      'point past which a mid-range device visibly stutters while '
-      'panning; asserted structurally so the LINEARITY cannot regress '
-      'into something worse',
+  measuredOn: '400 is the point past which a mid-range device visibly '
+      'stutters while panning. Since #4181 the builder ENFORCES it, so '
+      'this is a derived ceiling rather than a hope about what a search '
+      'returns; a dense-city 25 km result is ~250 and never reaches it',
   assertedInCi: true,
 );
 
@@ -121,6 +121,13 @@ const kMapMarkerBudget = PerfBudget(
 ///
 /// The one #4110 and #4140 already measure. Reported, not asserted in
 /// CI: a runner's cold start is not a phone's.
+///
+/// #4140 pinned down what "usable map" means — `StartupKpi` records
+/// launch → the first painted frame carrying a readable price, and this
+/// is the ceiling it is judged against. The structural half of that
+/// issue (`startup_regression_gate_test.dart`) is what CI *can* hold:
+/// the work this number was measured over cannot grow silently, even
+/// though the number itself is a field signal.
 const kColdStartBudget = PerfBudget(
   surface: 'cold start to usable map',
   limit: 2500,
@@ -130,6 +137,10 @@ const kColdStartBudget = PerfBudget(
 );
 
 /// Hive open, all first-frame boxes.
+///
+/// #4140 fixed the SET this was measured over: the gate runs
+/// `HiveFirstFrameBoxes.openAll` and fails if the boxes it opened are
+/// not exactly the pinned ten, in either direction.
 const kHiveOpenBudget = PerfBudget(
   surface: 'Hive open (first-frame boxes)',
   limit: 400,

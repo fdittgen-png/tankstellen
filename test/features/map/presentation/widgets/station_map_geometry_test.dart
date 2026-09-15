@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/map/presentation/widgets/station_map_geometry.dart';
 
@@ -27,6 +28,7 @@ import 'package:tankstellen/features/map/presentation/widgets/station_map_geomet
 /// These tests reproduce the mechanism directly: `CameraFit.bounds(...)`
 /// over the geometry helper's output must always yield a FINITE camera.
 void main() {
+  _boundingTests();
   // A camera to fit against — size and starting position are irrelevant
   // to the fit math; only the resulting centre/zoom finiteness matters.
   MapCamera fitCameraTo(LatLngBounds bounds) {
@@ -182,6 +184,117 @@ void main() {
       expect(bounds.north.isFinite, isTrue);
       expect(bounds.south.isFinite, isTrue);
       expectFiniteCamera(bounds);
+    });
+  });
+}
+
+/// #4181 — the two steps that bound the marker count.
+void _boundingTests() {
+  List<Station> at(List<(double, double)> coords) => [
+        for (var i = 0; i < coords.length; i++)
+          Station(
+            id: 's$i',
+            name: 'S$i',
+            brand: 'B',
+            street: 'St',
+            postCode: '1',
+            place: 'P',
+            lat: coords[i].$1,
+            lng: coords[i].$2,
+            dist: i.toDouble(),
+            e10: 2.0 - i * 0.01,
+          ),
+      ];
+
+  group('withinCameraBounds (#4181)', () {
+    final view = LatLngBounds(const LatLng(52.0, 13.0), const LatLng(52.1, 13.1));
+
+    test('a null camera culls NOTHING', () {
+      final all = at([(0, 0), (80, 170)]);
+      expect(StationMapGeometry.withinCameraBounds(all, null), same(all),
+          reason: 'before the first onPositionChanged there is no camera; '
+              'showing fewer stations than exist is only acceptable when '
+              'we know they are off-screen');
+    });
+
+    test('keeps what is inside, plus a screen of margin on each side', () {
+      // Span is 0.1°, margin 1.0 screens → the accepted box is
+      // 51.9..52.2 lat, 12.9..13.2 lng.
+      final kept = StationMapGeometry.withinCameraBounds(
+        at([
+          (52.05, 13.05), // dead centre
+          (52.15, 13.15), // inside the margin
+          (52.25, 13.05), // one margin too far north
+          (52.05, 12.80), // one margin too far west
+        ]),
+        view,
+      );
+      expect(kept.map((s) => s.id), ['s0', 's1']);
+    });
+
+    test('a non-finite coordinate is culled rather than compared', () {
+      final kept = StationMapGeometry.withinCameraBounds(
+        [
+          ...at([(52.05, 13.05)]),
+          const Station(
+            id: 'nan',
+            name: 'N',
+            brand: 'B',
+            street: 'St',
+            postCode: '1',
+            place: 'P',
+            lat: double.nan,
+            lng: double.nan,
+          ),
+        ],
+        view,
+      );
+      expect(kept.map((s) => s.id), ['s0']);
+    });
+  });
+
+  group('capByRelevance (#4181)', () {
+    test('returns the input untouched when it already fits', () {
+      final all = at([(52.0, 13.0), (52.1, 13.1)]);
+      expect(
+          StationMapGeometry.capByRelevance(all, FuelType.e10,
+              cap: 10, byPrice: true),
+          same(all));
+    });
+
+    test('keeps the CHEAPEST under a price sort', () {
+      // Prices descend with the index, so the cheapest are at the END —
+      // a naive take(cap) would lose every one of them.
+      final all = at([for (var i = 0; i < 20; i++) (52.0 + i * 0.001, 13.0)]);
+      final kept = StationMapGeometry.capByRelevance(all, FuelType.e10,
+          cap: 3, byPrice: true);
+      expect(kept.map((s) => s.id), ['s19', 's18', 's17']);
+    });
+
+    test('keeps the CLOSEST when the sort is not by price', () {
+      final all = at([for (var i = 0; i < 20; i++) (52.0 + i * 0.001, 13.0)]);
+      final kept = StationMapGeometry.capByRelevance(all, FuelType.e10,
+          cap: 3, byPrice: false);
+      expect(kept.map((s) => s.id), ['s0', 's1', 's2']);
+    });
+
+    test('a SELECTED station survives the cap even when it ranks last', () {
+      // s0 is the most expensive of twenty and the furthest away — it
+      // loses on both rankings. The user pointed at it, so it stays.
+      final all = at([for (var i = 0; i < 20; i++) (52.0 + i * 0.001, 13.0)]);
+      final kept = StationMapGeometry.capByRelevance(all, FuelType.e10,
+          cap: 3, byPrice: true, selectedIds: {'s0'});
+      expect(kept.map((s) => s.id), contains('s0'));
+      expect(kept, hasLength(3),
+          reason: 'a forced-in selection spends a slot, it does not add one');
+    });
+
+    test('never returns a station twice when it is both selected and top-ranked',
+        () {
+      final all = at([for (var i = 0; i < 20; i++) (52.0 + i * 0.001, 13.0)]);
+      final kept = StationMapGeometry.capByRelevance(all, FuelType.e10,
+          cap: 3, byPrice: true, selectedIds: {'s19'});
+      expect(kept.map((s) => s.id).toSet(), hasLength(3));
     });
   });
 }

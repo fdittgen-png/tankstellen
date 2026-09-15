@@ -122,12 +122,37 @@ void main() {
       expect(out['brand'], 'Shell Berlin Oranienstr');
     });
 
-    test('isOpen defaults to false (not null) when missing', () {
+    test('#4179 — a missing isOpen is ABSENT, not false', () {
+      // Germany publishes opening hours, so a row with no `isOpen` is a
+      // station the provider said nothing about — not a closed one. The
+      // renderers draw no status pill for an absent key.
       final out = HomeWidgetService.compactStationDataForTest(
         'de-abc',
         {...germanStation}..remove('isOpen'),
       );
-      expect(out['isOpen'], false);
+      expect(out.containsKey('isOpen'), isFalse,
+          reason: 'the old `?? false` turned "we do not know" into a '
+              'confident "○ Closed" — and the nearest-station builder '
+              'turned the identical unknown into "● Open"');
+    });
+
+    test('#4179 — a country that publishes no hours never emits isOpen', () {
+      // Slovenia publishes opening hours as free text, so its capability
+      // says openingHours: false. Even a row carrying `isOpen: true`
+      // must not produce a claim: the provider cannot answer this.
+      final out = HomeWidgetService.compactStationDataForTest(
+        'si-abc',
+        {...germanStation, 'isOpen': true},
+      );
+      expect(out.containsKey('isOpen'), isFalse);
+    });
+
+    test('#4179 — a published open state still travels', () {
+      final out = HomeWidgetService.compactStationDataForTest(
+        'de-abc',
+        {...germanStation, 'isOpen': true},
+      );
+      expect(out['isOpen'], isTrue);
     });
   });
 

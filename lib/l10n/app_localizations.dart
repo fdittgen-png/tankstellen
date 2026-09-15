@@ -10602,6 +10602,12 @@ abstract class AppLocalizations {
   /// **'Snooze 30 days'**
   String get maintenanceActionSnooze;
 
+  /// Small pill on the station map, shown only when more stations are inside the current view than the map will draw markers for (#4181). The map keeps the most relevant ones — cheapest for a price sort, closest otherwise, plus anything the user selected — so the pill has to say plainly that it is a subset and how to see the rest. Never appears for an ordinary result set.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing {shown} of {total} — zoom in for the rest'**
+  String mapMarkerLimitNotice(int shown, int total);
+
   /// Title of the monthly-insights card on the Trajets tab landing screen — aggregates all trips into a current-vs-previous-month comparison (#1041 phase 4).
   ///
   /// In en, this message translates to:
@@ -12302,6 +12308,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Resolve unresolved fuel and trip gap'**
   String get reconcileResolveGapSemanticLabel;
+
+  /// #4141 recovery contract, the 'can I continue' line for an empty search result. Says plainly that no failure occurred, because an empty result screen that looks like an error makes users retry a search that worked.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing is wrong — the search simply came back empty.'**
+  String get recoveryStillWorksNoStations;
+
+  /// #4141 recovery contract, the 'can I continue' line when the price provider cannot be reached for want of a key. Names the two things that keep working so the user does not conclude the app is broken.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved stations and your fill-up history still work.'**
+  String get recoveryStillWorksApiKey;
+
+  /// #4141 recovery contract, the 'can I continue' line when the device position is unavailable. The alternative path is the answer, not an apology.
+  ///
+  /// In en, this message translates to:
+  /// **'You can still search by postal code or city.'**
+  String get recoveryStillWorksLocation;
+
+  /// #4141 recovery contract, the 'can I continue' line for a connection failure. The cache is what keeps the app useful offline and the user cannot see that it is being used unless told.
+  ///
+  /// In en, this message translates to:
+  /// **'Prices you have already loaded are still shown.'**
+  String get recoveryStillWorksConnection;
+
+  /// #4141 recovery contract, the 'can I continue' line when route planning fails. Scopes the failure to the one feature that broke.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearby search still works — only the route is unavailable.'**
+  String get recoveryStillWorksRouting;
+
+  /// #4141 recovery contract, the default 'can I continue' line for an unclassified failure. Deliberately the same promise as the API-key case: the two local features never depend on the network.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved stations and your fill-up history still work.'**
+  String get recoveryStillWorksFallback;
 
   /// Trailing unit suffix on an EV charging price in the unified RefuelOptionCard (#1116 phase 3b).
   ///

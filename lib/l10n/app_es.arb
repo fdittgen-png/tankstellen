@@ -6819,5 +6819,50 @@
   "@alertConfidenceMediumPrefix": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "mapMarkerLimitNotice": "Showing {shown} of {total} — zoom in for the rest",
+  "@mapMarkerLimitNotice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "shown": {
+        "type": "int",
+        "example": "400"
+      },
+      "total": {
+        "type": "int",
+        "example": "612"
+      }
+    }
+  },
+  "recoveryStillWorksNoStations": "Nothing is wrong — the search simply came back empty.",
+  "@recoveryStillWorksNoStations": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recoveryStillWorksApiKey": "Saved stations and your fill-up history still work.",
+  "@recoveryStillWorksApiKey": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recoveryStillWorksLocation": "You can still search by postal code or city.",
+  "@recoveryStillWorksLocation": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recoveryStillWorksConnection": "Prices you have already loaded are still shown.",
+  "@recoveryStillWorksConnection": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recoveryStillWorksRouting": "Nearby search still works — only the route is unavailable.",
+  "@recoveryStillWorksRouting": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recoveryStillWorksFallback": "Saved stations and your fill-up history still work.",
+  "@recoveryStillWorksFallback": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

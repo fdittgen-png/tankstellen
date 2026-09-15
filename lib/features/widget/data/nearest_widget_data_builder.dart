@@ -10,6 +10,8 @@ import 'package:home_widget/home_widget.dart';
 
 import '../../../core/country/country_config.dart';
 import '../../../core/data/storage_repository.dart';
+import '../../../core/domain/data_value.dart';
+import '../../../core/services/station_open_state.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/storage/storage_keys.dart';
 import '../../../core/domain/search_params.dart';
@@ -329,11 +331,20 @@ class NearestWidgetDataBuilder {
       'distanceKm': double.parse(station.dist.toStringAsFixed(1)),
       'priceFormatted': priceFormatted,
       'currency': currency,
-      // #3198 — the Kotlin/Swift widget renderers expect a bool and have
-      // no third state; an unknown open state must not render the "closed"
-      // marker, so it maps to true here (the pre-#3198 value for every
-      // country that publishes no signal).
-      'isOpen': station.isOpen ?? true,
+      // #4179 — the open state is tri-state, and the channel now says so:
+      // the key is ABSENT when the provider does not publish hours (eleven
+      // of seventeen countries) or publishes none for this station. The
+      // renderers draw no status pill for an absent key. #3198's `?? true`
+      // lived here and `?? false` lived in the favorites builder, so the
+      // same unknown read as open or closed depending on which widget the
+      // user had placed.
+      if (resolveStationOpenState(
+            stationId: station.id,
+            lat: station.lat,
+            lng: station.lng,
+            published: station.isOpen,
+          ) case Measured<bool>(:final value))
+        'isOpen': value,
       // Parity fields with the favorites widget so the Kotlin renderer
       // can switch modes without a second JSON shape.
       'preferred_fuel_code': fuel.apiValue,

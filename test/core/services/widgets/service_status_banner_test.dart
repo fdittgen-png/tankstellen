@@ -140,20 +140,68 @@ void main() {
       expect(retryPressed, isTrue);
     });
 
-    testWidgets('hides retry button when onRetry is null', (tester) async {
+    testWidgets('#4141 — there is ALWAYS a way out', (tester) async {
+      // This test used to assert the opposite: "hides retry button when
+      // onRetry is null". A failure screen with nothing to tap is what
+      // #4141's contract removes — `onRetry` is required now, and
+      // `RecoveryMessage.primaryAction` cannot be omitted.
       await tester.pumpWidget(
-        wrapInApp(const ServiceChainErrorWidget(error: NoApiKeyException())),
+        wrapInApp(
+          ServiceChainErrorWidget(
+            error: const NoApiKeyException(),
+            onRetry: () {},
+          ),
+        ),
       );
 
-      expect(find.byType(FilledButton), findsNothing);
+      expect(find.byType(FilledButton), findsOneWidget);
     });
 
     testWidgets('shows hint for NoApiKeyException', (tester) async {
       await tester.pumpWidget(
-        wrapInApp(const ServiceChainErrorWidget(error: NoApiKeyException())),
+        wrapInApp(
+          ServiceChainErrorWidget(
+            error: const NoApiKeyException(),
+            onRetry: () {},
+          ),
+        ),
       );
 
       expect(find.textContaining('API key'), findsWidgets);
+    });
+
+    testWidgets('#4141 — and it always says whether the user can continue',
+        (tester) async {
+      await tester.pumpWidget(
+        wrapInApp(
+          ServiceChainErrorWidget(
+            error: const NoApiKeyException(),
+            onRetry: () {},
+          ),
+        ),
+      );
+
+      // The line that was missing from every version of this screen.
+      expect(find.text('Saved stations and your fill-up history still work.'),
+          findsOneWidget);
+    });
+
+    testWidgets('#4141 — the raw error is never on the first screen',
+        (tester) async {
+      await tester.pumpWidget(
+        wrapInApp(
+          ServiceChainErrorWidget(
+            error: Exception('DioException [connection timeout]'),
+            onRetry: () {},
+          ),
+        ),
+      );
+
+      // It is in the tree, but only inside the collapsed details tile.
+      expect(find.textContaining('DioException'), findsNothing,
+          reason: 'transport vocabulary belongs one tap deeper, never in '
+              'the first thing a user reads');
+      expect(find.byType(ExpansionTile), findsOneWidget);
     });
 
     testWidgets('shows hint for LocationException', (tester) async {
