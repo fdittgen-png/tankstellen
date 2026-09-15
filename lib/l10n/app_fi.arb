@@ -7464,5 +7464,95 @@
         "type": "String"
       }
     }
+  },
+  "opportunitiesSectionTitle": "Opportunities",
+  "@opportunitiesSectionTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "opportunitiesEmptyTitle": "Nothing worth telling you about yet",
+  "@opportunitiesEmptyTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "opportunitiesEmptyBody": "SparKilo checks your stations and your area in the background. A stop worth the detour, a price unusual for your area, or one below what you normally pay will appear here — whether or not it was worth a notification.",
+  "@opportunitiesEmptyBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "opportunityNotSentLabel": "Not sent",
+  "@opportunityNotSentLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "opportunityKindBestStopNow": "Best stop nearby",
+  "@opportunityKindBestStopNow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "opportunityKindBestStopOnRoute": "Best stop on your route",
+  "@opportunityKindBestStopOnRoute": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "opportunityKindRefuelSoon": "You will need fuel",
+  "@opportunityKindRefuelSoon": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "opportunityKindExceptionalLocalPrice": "Unusual price nearby",
+  "@opportunityKindExceptionalLocalPrice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "opportunityKindPersonalBaseline": "Below what you usually pay",
+  "@opportunityKindPersonalBaseline": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "opportunityKindLocalMovement": "Prices moving nearby",
+  "@opportunityKindLocalMovement": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "opportunityKindFavouriteStation": "Your price alert",
+  "@opportunityKindFavouriteStation": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "opportunityRefusalDailyCap": "You had already had today's alerts",
+  "@opportunityRefusalDailyCap": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "opportunityRefusalTooSoon": "Another alert had just gone out",
+  "@opportunityRefusalTooSoon": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "opportunityRefusalBelowFloor": "Not enough to be worth interrupting you",
+  "@opportunityRefusalBelowFloor": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "opportunityRefusalAlreadyTold": "You were told about this station recently",
+  "@opportunityRefusalAlreadyTold": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "opportunityRefusalOutranked": "A better one went out instead",
+  "@opportunityRefusalOutranked": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "opportunityRefusalConfidenceTooLow": "Too weakly supported to arrive uninvited",
+  "@opportunityRefusalConfidenceTooLow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "opportunityRefusalIneligible": "It stopped being true before we could send it",
+  "@opportunityRefusalIneligible": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

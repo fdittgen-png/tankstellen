@@ -7060,6 +7060,70 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get opportunitiesSectionTitle => 'Gelegenheiten';
+
+  @override
+  String get opportunitiesEmptyTitle =>
+      'Noch nichts, was eine Meldung wert wäre';
+
+  @override
+  String get opportunitiesEmptyBody =>
+      'SparKilo beobachtet deine Tankstellen und deine Umgebung im Hintergrund. Ein Stopp, der den Umweg wert ist, oder ein ungewöhnlicher Preis erscheint hier.';
+
+  @override
+  String get opportunityNotSentLabel => 'Nicht gesendet';
+
+  @override
+  String get opportunityKindBestStopNow => 'Bester Stopp in der Nähe';
+
+  @override
+  String get opportunityKindBestStopOnRoute => 'Bester Stopp auf deiner Route';
+
+  @override
+  String get opportunityKindRefuelSoon => 'Du wirst tanken müssen';
+
+  @override
+  String get opportunityKindExceptionalLocalPrice =>
+      'Ungewöhnlicher Preis in der Nähe';
+
+  @override
+  String get opportunityKindPersonalBaseline => 'Günstiger als du sonst zahlst';
+
+  @override
+  String get opportunityKindLocalMovement => 'Preise in Bewegung';
+
+  @override
+  String get opportunityKindFavouriteStation => 'Dein Preisalarm';
+
+  @override
+  String get opportunityRefusalDailyCap =>
+      'Du hattest heute schon deine Meldungen';
+
+  @override
+  String get opportunityRefusalTooSoon =>
+      'Gerade eben ging schon eine Meldung raus';
+
+  @override
+  String get opportunityRefusalBelowFloor =>
+      'Zu wenig, um dich dafür zu unterbrechen';
+
+  @override
+  String get opportunityRefusalAlreadyTold =>
+      'Über diese Tankstelle hast du kürzlich gehört';
+
+  @override
+  String get opportunityRefusalOutranked =>
+      'Eine bessere ging stattdessen raus';
+
+  @override
+  String get opportunityRefusalConfidenceTooLow =>
+      'Zu schwach belegt, um ungefragt zu kommen';
+
+  @override
+  String get opportunityRefusalIneligible =>
+      'Es stimmte nicht mehr, bevor wir senden konnten';
+
+  @override
   String opportunityBestStopNowTitle(String fuelType) {
     return 'Günstigstes $fuelType in der Nähe';
   }

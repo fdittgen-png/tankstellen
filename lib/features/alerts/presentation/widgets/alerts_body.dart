@@ -6,22 +6,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/storage/storage_keys.dart';
-import '../../../../core/theme/app_text.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/help_banner.dart';
-import '../../../../core/widgets/section_card.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/price_alert.dart';
 import '../../domain/entities/radius_alert.dart';
 import '../../providers/alert_provider.dart';
+import '../../providers/opportunity_feed_provider.dart';
 import '../../providers/radius_alerts_provider.dart';
 import 'alert_station_picker_sheet.dart';
 import 'alert_statistics_card.dart';
 import 'alerts_best_effort_note.dart';
 import 'alerts_last_checked_footer.dart';
 import 'alerts_list_tiles.dart';
+import 'alerts_section_chrome.dart';
+import 'opportunity_feed_section.dart';
 import 'radius_alert_create_sheet.dart';
 
 /// The alerts page content — stats strip, station-alert section,
@@ -112,6 +113,9 @@ class _Refreshable extends StatelessWidget {
       onRefresh: () async {
         ref.invalidate(alertsAsyncProvider);
         ref.invalidate(radiusAlertsProvider);
+        // #4154 — the feed is a plain read of a row the background scan
+        // writes, so a pull re-reads what the last scan left.
+        ref.invalidate(opportunityFeedProvider);
       },
       child: child,
     );
@@ -133,6 +137,19 @@ class _AlertsEmptyState extends ConsumerWidget {
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(vertical: Spacing.xxl),
       children: [
+        // #4154 — the engine runs whether or not the user configured
+        // anything, so its findings belong here too — but ONLY when it
+        // has some. #3951 collapsed this branch to one [EmptyState] and
+        // one primary action on purpose, and a second empty state
+        // stacked above it is exactly the chrome that decision removed.
+        if (ref.watch(opportunityFeedProvider).isNotEmpty) ...[
+          SectionHeader(title: l10n.opportunitiesSectionTitle),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: Spacing.lg),
+            child: OpportunityFeedSection(hideWhenEmpty: true),
+          ),
+          const SizedBox(height: Spacing.lg),
+        ],
         EmptyState(
           icon: Icons.notifications_none_outlined,
           title: l10n.alertsEmptyTitle,
@@ -185,21 +202,38 @@ class _AlertsSections extends ConsumerWidget {
             icon: Icons.notifications_active_outlined,
             message: l10n.helpBannerAlerts,
           ),
+        // ── Opportunities (#4154) ───────────────────────────────────
+        // First, because this is what HAPPENED. The two lists below are
+        // what the user SET UP, and a screen that leads with
+        // configuration asks them to remember what they asked for.
+        //
+        // Only when there is something, though: this is still a
+        // configuration screen, and an empty note above the lists the
+        // user came for buries them for no gain. The empty state lands
+        // with the screen restructure, where the feed IS the screen.
+        if (ref.watch(opportunityFeedProvider).isNotEmpty) ...[
+          SectionHeader(title: l10n.opportunitiesSectionTitle),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: Spacing.lg),
+            child: OpportunityFeedSection(hideWhenEmpty: true),
+          ),
+          const SizedBox(height: Spacing.lg),
+        ],
         const AlertStatisticsCard(),
         // ── Station alerts ──────────────────────────────────────────
-        _SectionHeader(
+        SectionHeader(
           title: l10n.alertsStationSectionTitle,
           count: alerts.length,
           addTooltip: l10n.alertsStationAdd,
           onAdd: () => AlertStationPickerSheet.addStationAlert(context, ref),
         ),
         if (alerts.isEmpty)
-          _SectionEmpty(
+          SectionEmpty(
             icon: Icons.notifications_off_outlined,
             text: l10n.noPriceAlertsHint,
           )
         else
-          _GroupedAlertsCard(
+          GroupedAlertsCard(
             children: [
               for (final a in alerts)
                 AlertListTile(key: ValueKey(a.id), alert: a),
@@ -207,7 +241,7 @@ class _AlertsSections extends ConsumerWidget {
           ),
         const SizedBox(height: Spacing.lg),
         // ── Zone / radius alerts (#578 phase 2) ─────────────────────
-        _SectionHeader(
+        SectionHeader(
           title: l10n.alertsRadiusSectionTitle,
           count: radiusAsync.asData?.value.length ?? 0,
           addTooltip: l10n.alertsRadiusAdd,
@@ -218,7 +252,7 @@ class _AlertsSections extends ConsumerWidget {
             if (radiusAlerts.isEmpty) {
               return const _RadiusEmptyState();
             }
-            return _GroupedAlertsCard(
+            return GroupedAlertsCard(
               children: [
                 for (final a in radiusAlerts)
                   RadiusAlertListTile(
@@ -245,108 +279,6 @@ class _AlertsSections extends ConsumerWidget {
         // Renders nothing on other platforms.
         const AlertsBestEffortNote(),
       ],
-    );
-  }
-}
-
-/// One section's alerts, grouped inside a single rounded card with hairline
-/// dividers between rows (#2819). `clipBehavior` keeps each row's
-/// swipe-to-delete background inside the card's rounded corners.
-class _GroupedAlertsCard extends StatelessWidget {
-  final List<Widget> children;
-
-  const _GroupedAlertsCard({required this.children});
-
-  @override
-  Widget build(BuildContext context) {
-    // SectionCard (#923) clips to its rounded corners and carries the
-    // canonical elevation/outline; padding zero keeps the rows full-bleed
-    // so the hairline dividers span edge-to-edge.
-    return SectionCard(
-      margin: const EdgeInsets.fromLTRB(Spacing.lg, 0, Spacing.lg, Spacing.sm),
-      padding: EdgeInsets.zero,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (var i = 0; i < children.length; i++) ...[
-            if (i > 0) const Divider(height: 1),
-            children[i],
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-/// Compact inline empty row for a section with no alerts yet — far less
-/// wasteful than a full-screen [EmptyState] inside a two-section layout.
-class _SectionEmpty extends StatelessWidget {
-  final IconData icon;
-  final String text;
-
-  const _SectionEmpty({required this.icon, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        Spacing.xl,
-        Spacing.sm,
-        Spacing.xl,
-        Spacing.md,
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 20, color: theme.colorScheme.onSurfaceVariant),
-          const SizedBox(width: Spacing.lg),
-          Expanded(child: Text(text, style: AppText.label(context))),
-        ],
-      ),
-    );
-  }
-}
-
-/// A section header: title + count + an add button (#2819). Shared by
-/// the Station and Zone sections so both read symmetrically. #3951 — the
-/// " (n)" suffix is dropped at zero: a "(0)" is chrome for an absence.
-class _SectionHeader extends StatelessWidget {
-  final String title;
-  final int count;
-  final String addTooltip;
-  final VoidCallback onAdd;
-
-  const _SectionHeader({
-    required this.title,
-    required this.count,
-    required this.addTooltip,
-    required this.onAdd,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        Spacing.xl,
-        Spacing.md,
-        Spacing.md,
-        Spacing.sm,
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              count > 0 ? '$title ($count)' : title,
-              style: AppText.title(context),
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.add),
-            tooltip: addTooltip,
-            onPressed: onAdd,
-          ),
-        ],
-      ),
     );
   }
 }
