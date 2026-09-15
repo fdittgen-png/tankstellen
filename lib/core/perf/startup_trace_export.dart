@@ -9,6 +9,7 @@ import '../logging/error_logger.dart';
 import '../sharing/public_file_exporter.dart';
 import '../storage/hive_open_timing.dart';
 import '../telemetry/storage/trace_storage.dart';
+import 'startup_kpi.dart';
 import 'startup_timer.dart';
 import 'perf_budgets.dart';
 
@@ -35,7 +36,12 @@ class StartupTraceExport {
   /// and `HiveBoxes.init` now marks its four sub-phases — but the box
   /// opens are PARALLEL, so their durations overlap and the phase alone
   /// cannot say which one is the long pole. This names it.
-  static const int schemaVersion = 3;
+  ///
+  /// v4 (#4140): adds `kpi` — time to useful map. Every earlier version
+  /// reported phases and left the reader to decide which of them the
+  /// user felt; this one names the number and carries its budget and its
+  /// definition beside it.
+  static const int schemaVersion = 4;
 
   /// The export-section key registered into the error-log export.
   static const String exportSectionKey = 'startupTrace';
@@ -88,6 +94,9 @@ class StartupTraceExport {
       'totalMs': totalMs,
       'phases': phases(milestones),
       'spans': spanMaps(spans),
+      // #4140 — the one number this app defends, first in the document
+      // after the totals because it is what a reader came for.
+      'kpi': StartupKpi.exportRow(),
       // #4163 — the budgets travel with the measurement, so a field
       // export says both what the device did AND what it was supposed
       // to do. A phase list without its ceilings asks the reader to
@@ -147,6 +156,7 @@ class StartupTraceExport {
           'totalMs': StartupTimer.instance.totalMs,
           'phases': phases(StartupTimer.instance.milestones),
           'spans': spanMaps(StartupTimer.instance.spans),
+          'kpi': StartupKpi.exportRow(),
           if (HiveOpenTiming.slowest case final slowest?)
             'slowestBoxOpen': {
               'box': slowest.$1,

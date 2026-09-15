@@ -2,48 +2,54 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: MIT
 
-# Startup time budget enforcement for CI.
-# Verifies that startup instrumentation is in place and that the
-# timer utility tests pass. On a real device/emulator, this would
-# check cold start time against a budget — but CI runners don't
-# have emulators, so we enforce the structural contract instead.
+# Startup budget enforcement for CI.
 #
-# Usage: bash scripts/check_startup_budget.sh [--budget-ms N]
-#   --budget-ms N   Maximum allowed startup time in ms (default: 2000)
-#                   Used as reference budget; enforced in integration tests.
+# A CI runner has no phone, so this cannot time a cold start. What it CAN
+# hold is the structural half: the instrumentation is still in place, and
+# the work the budget was measured over has not grown. #4140 is where
+# that half became a real gate (test/core/perf/startup_regression_gate_test.dart
+# runs HiveFirstFrameBoxes.openAll and pins both the first-frame box set
+# and the pre-first-frame await list); this script is its CI entry point.
 #
-# This script:
-#   1. Checks that main.dart contains StartupTimer instrumentation
-#   2. Runs the startup timer unit tests
-#   3. Prints the configured budget for visibility
+# ## One number, one place (#4140)
+#
+# This script used to carry `BUDGET_MS=2000` of its own while
+# `kColdStartBudget` said 2,500 ms and docs/PROJECT_OVERVIEW.md repeated
+# the 2,000. Three statements of one budget, none derived from another,
+# and the one with a recorded measurement behind it was not the one CI
+# printed. The number is now READ from the constant that carries its
+# provenance — a budget this script cannot restate is a budget it cannot
+# contradict.
+#
+# Usage: bash scripts/check_startup_budget.sh
 
 set -euo pipefail
 
-BUDGET_MS=2000
+BUDGETS_FILE="lib/core/perf/perf_budgets.dart"
+INIT_FILE="lib/app/app_initializer.dart"
 
-# Parse arguments
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --budget-ms)
-      BUDGET_MS="$2"
-      shift 2
-      ;;
-    *)
-      echo "Unknown argument: $1"
-      echo "Usage: bash scripts/check_startup_budget.sh [--budget-ms N]"
-      exit 1
-      ;;
-  esac
-done
+echo "=== Startup Budget Check ==="
 
-echo "=== Startup Time Budget Check ==="
-echo "Budget: ${BUDGET_MS}ms"
+# 1. The budget, read from the constant that carries its provenance.
+if [ ! -f "$BUDGETS_FILE" ]; then
+  echo "::error::$BUDGETS_FILE not found — the budgets have no home"
+  exit 1
+fi
+
+BUDGET_MS=$(awk '/^const kColdStartBudget = PerfBudget\(/,/^\);/' "$BUDGETS_FILE" \
+  | sed -n 's/^  limit: \([0-9]*\),$/\1/p')
+
+if [ -z "$BUDGET_MS" ]; then
+  echo "::error::could not read kColdStartBudget.limit from $BUDGETS_FILE."
+  echo "::error::Refusing to invent a number: a budget nobody can defend is worse than none."
+  exit 1
+fi
+
+echo "Cold start to a usable map: ${BUDGET_MS} ms (kColdStartBudget)"
+echo "Measured on a device, reported in the field export — not asserted here."
 echo ""
 
-# 1. Check that the cold-start sequence has instrumentation markers.
-#    Since #424 the cold-start logic lives in lib/app/app_initializer.dart,
-#    not main.dart — we check whichever file holds the markers today.
-INIT_FILE="lib/app/app_initializer.dart"
+# 2. The instrumentation that produces it must still be in place.
 if [ ! -f "$INIT_FILE" ]; then
   echo "::error::$INIT_FILE not found (cold-start sequence missing)"
   exit 1
@@ -66,18 +72,22 @@ fi
 
 echo "Instrumentation markers: OK"
 
-# 2. Count milestones
 MILESTONE_COUNT=$(grep -c "StartupTimer.instance.mark(" "$INIT_FILE" || true)
 echo "Milestones in ${INIT_FILE}: ${MILESTONE_COUNT}"
 
-if [ "$MILESTONE_COUNT" -lt 3 ]; then
-  echo "::warning::Only ${MILESTONE_COUNT} milestones — consider adding more for better visibility"
+# 3. The KPI derived from them must still reach the trace export.
+if ! grep -q "StartupKpi.exportRow()" lib/core/perf/startup_trace_export.dart; then
+  echo "::error::the #4140 KPI no longer reaches the startup trace export —"
+  echo "::error::the field read-out is how this budget is ever checked at all."
+  exit 1
 fi
 
-# 3. Run startup timer tests
+echo "KPI reported in the startup trace: OK"
+
+# 4. The structural gates, including the #4140 regression gate.
 echo ""
-echo "Running startup timer tests..."
+echo "Running startup + perf tests..."
 flutter test test/core/perf/ --reporter compact
+
 echo ""
 echo "Startup budget check passed."
-echo "Budget reference: ${BUDGET_MS}ms (enforced in integration/device tests)"

@@ -47,7 +47,7 @@ post-merge** and are promoted only deliberately.
 | 11 | Lint opt-out comments | *none* — `// ignore: silent_catch` (29) + `catch_no_st` (14) | **43** | ❌ | The escape hatch of ratchets 4/7/9 is itself unratcheted — opt-outs can inflate silently |
 | 12 | Test coverage | `check_coverage.sh --threshold 40`, post-merge only | 40 % static floor | ❌ never fires | §22-A: a floor that never fires is not a control |
 | 13 | Cross-file duplication | *none* (one-off scan found the errorLogger block) | **≈130 dup groups** | ❌ | No mechanism at all; this is how the 26-file block accumulated |
-| 14 | Startup time | `check_startup_budget.sh` | 2000 ms static | ⚠️ static ceiling | Never re-measured or lowered since set |
+| 14 | Startup time | `check_startup_budget.sh` + `startup_regression_gate_test.dart` | `kColdStartBudget` (2500 ms, measured) + an exact first-frame box set and pre-`runApp` await list | ⚠️ timing reported, structure ratcheted | #4140: the script's own 2000 ms is gone (it reads the constant); the WORK the budget covers is now exact in both directions. The timing itself still cannot be asserted on a runner |
 | 15 | Artifact size (AAB/APK) | *none* | unmeasured | ❌ | A dependency bump can add 10 MB silently (it has — the iOS ML Kit pods, #3172) |
 | 16 | TODO/FIXME debt | *none* | **5** | ❌ | Small enough to pin at ~0 immediately |
 

@@ -7,6 +7,7 @@ import 'package:latlong2/latlong.dart';
 
 import 'station_map_geometry.dart';
 import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/perf/startup_kpi.dart';
 import '../../../../core/domain/station.dart';
 import '../../../search/presentation/widgets/sort_selector.dart';
 import 'map_zoom_controls.dart';
@@ -231,6 +232,9 @@ class _StationMapLayersState extends State<StationMapLayers> {
       markerVariant: widget.markerVariant,
     );
     _markers = model.markers;
+    // #4140 — the map's price bubbles are the third surface that can be
+    // first to show a price. Idempotent; see [StartupKpi.markUsefulMap].
+    if (_markers.isNotEmpty) StartupKpi.markUsefulMap();
     _priceRange = model.priceRange;
     _markerMeta
       ..clear()

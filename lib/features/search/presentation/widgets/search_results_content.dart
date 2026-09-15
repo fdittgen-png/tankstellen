@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/location/user_position_provider.dart';
 import '../../../../core/navigation/app_routes.dart';
+import '../../../../core/perf/startup_kpi.dart';
 import '../../../../core/services/service_result.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/widgets/responsive_layout.dart';
@@ -108,6 +109,10 @@ class SearchResultsContent extends ConsumerWidget {
           final wide = isWideScreen(context);
           void toggleScope() =>
               ref.read(radarScopeModeProvider.notifier).toggle();
+          // #4140 — a non-empty radar result is one of the two ways a
+          // price first reaches the screen. Idempotent, so a rebuild is
+          // a bool check; see [StartupKpi.markUsefulMap].
+          StartupKpi.markUsefulMap();
           final list = SearchResultsList(
             result: radarResult,
             onRefresh: () => ref.read(radarSearchProvider.notifier).runRadar(),
@@ -226,6 +231,8 @@ class SearchResultsContent extends ConsumerWidget {
             ),
           );
         }
+        // #4140 — and this is the other one: the ordinary search.
+        StartupKpi.markUsefulMap();
         return SearchResultsList(result: result, onRefresh: onGpsRetry);
       },
       loading: () => const ShimmerStationList(),

@@ -31,9 +31,23 @@ abstract final class HiveOpenTiming {
   static (String, int)? get slowest => _slowest;
   static (String, int)? _slowest;
 
-  /// Forget the recorded long pole — test isolation only.
+  /// Every box name this wrapper opened, in completion order (#4140).
+  ///
+  /// The first-frame box set is a startup budget, and #4116 is the
+  /// standing proof that a test which reads the batch's SOURCE can pass
+  /// while the batch does something else entirely. This makes the set
+  /// OBSERVABLE: the gate compares what `openAll` actually opened, not
+  /// what its text says it opens.
+  static List<String> get openedBoxes => List.unmodifiable(_opened);
+  static final List<String> _opened = [];
+
+  /// Forget the recorded long pole and the opened-box list — test
+  /// isolation only.
   @visibleForTesting
-  static void reset() => _slowest = null;
+  static void reset() {
+    _slowest = null;
+    _opened.clear();
+  }
 
   static Future<Box<T>> timed<T>(
       String name, Future<Box<T>> Function() open) async {
@@ -42,6 +56,7 @@ abstract final class HiveOpenTiming {
       return await open();
     } finally {
       sw.stop();
+      _opened.add(name);
       final current = _slowest;
       if (current == null || sw.elapsedMilliseconds > current.$2) {
         _slowest = (name, sw.elapsedMilliseconds);

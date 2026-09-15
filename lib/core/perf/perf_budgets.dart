@@ -121,6 +121,13 @@ const kMapMarkerBudget = PerfBudget(
 ///
 /// The one #4110 and #4140 already measure. Reported, not asserted in
 /// CI: a runner's cold start is not a phone's.
+///
+/// #4140 pinned down what "usable map" means — `StartupKpi` records
+/// launch → the first painted frame carrying a readable price, and this
+/// is the ceiling it is judged against. The structural half of that
+/// issue (`startup_regression_gate_test.dart`) is what CI *can* hold:
+/// the work this number was measured over cannot grow silently, even
+/// though the number itself is a field signal.
 const kColdStartBudget = PerfBudget(
   surface: 'cold start to usable map',
   limit: 2500,
@@ -130,6 +137,10 @@ const kColdStartBudget = PerfBudget(
 );
 
 /// Hive open, all first-frame boxes.
+///
+/// #4140 fixed the SET this was measured over: the gate runs
+/// `HiveFirstFrameBoxes.openAll` and fails if the boxes it opened are
+/// not exactly the pinned ten, in either direction.
 const kHiveOpenBudget = PerfBudget(
   surface: 'Hive open (first-frame boxes)',
   limit: 400,
