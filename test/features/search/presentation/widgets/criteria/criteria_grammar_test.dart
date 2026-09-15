@@ -152,9 +152,9 @@ void main() {
       );
 
       final chips = find.byType(ChoiceChip);
-      expect(chips, findsNWidgets(3));
-      // Three short presets fit one row even in the square test font.
-      expect(rowsOf(tester, chips), 1);
+      // #4199 — the three presets plus Custom (the slider hides behind it).
+      expect(chips, findsNWidgets(4));
+      expect(rowsOf(tester, chips), lessThanOrEqualTo(2));
       for (final chip in tester.widgetList<ChoiceChip>(chips)) {
         expect(chip.padding, kCriteriaChipPadding);
       }

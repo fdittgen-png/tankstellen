@@ -8763,6 +8763,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get criteriaSwapEndpoints => 'Swap start and destination';
 
   @override
+  String get criteriaRadiusCustom => 'Custom';
+
+  @override
   String get fillUpOdometerFromLastFillUp =>
       'Pre-filled from your last fill-up';
 
@@ -18556,6 +18559,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get criteriaSwapEndpoints => '⟦Šŵáƥ šŧářŧ áñđ đéšŧîñáŧîóñ ··········⟧';
+
+  @override
+  String get criteriaRadiusCustom => '⟦Çúšŧóɱ ···⟧';
 
   @override
   String get fillUpOdometerFromLastFillUp =>

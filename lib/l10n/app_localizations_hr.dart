@@ -8830,6 +8830,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get criteriaSwapEndpoints => 'Swap start and destination';
 
   @override
+  String get criteriaRadiusCustom => 'Custom';
+
+  @override
   String get fillUpOdometerFromLastFillUp =>
       'Pre-filled from your last fill-up';
 

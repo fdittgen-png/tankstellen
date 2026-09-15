@@ -7062,5 +7062,10 @@
   "@opportunityRefusalIneligible": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "criteriaRadiusCustom": "Custom",
+  "@criteriaRadiusCustom": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

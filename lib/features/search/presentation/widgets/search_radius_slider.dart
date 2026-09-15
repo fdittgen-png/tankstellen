@@ -8,16 +8,19 @@ import '../../../../core/theme/spacing.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'criteria/criteria_chip_group.dart';
 
-/// Title row + slider for the search radius (km). Pulled out of
-/// `search_criteria_screen.dart` so the screen's `build` method stays
-/// readable and the slider can be exercised in isolation by widget tests.
+/// The search radius (km): preset chips first, a custom slider second.
 ///
-/// #3927 — a slider alone makes the four radii people actually use a
-/// drag-and-squint exercise, so the common values are also one tap away
-/// as preset chips under the track. Presets outside `[minKm, maxKm]` are
-/// not offered: `SearchRadius.set` clamps to 25 km, so a 50 km chip would
-/// silently land on 25 and lie about what it did.
-class SearchRadiusSlider extends StatelessWidget {
+/// #3927 — the four radii people actually use are one tap away as chips.
+/// Presets outside `[minKm, maxKm]` are not offered: `SearchRadius.set`
+/// clamps to 25 km, so a 50 km chip would silently land on 25 and lie
+/// about what it did.
+///
+/// #4199 (Epic #4198) — the value used to show three times at once: in the
+/// title row, in the slider's drag bubble and on the selected chip. Now a
+/// preset value is shown by its chip alone; the slider appears only behind
+/// the Custom chip (or when the radius is not a preset), and then the
+/// title row carries the value because no chip does.
+class SearchRadiusSlider extends StatefulWidget {
   final double radiusKm;
   final ValueChanged<double> onChanged;
   final double minKm;
@@ -35,20 +38,40 @@ class SearchRadiusSlider extends StatelessWidget {
   });
 
   @override
+  State<SearchRadiusSlider> createState() => _SearchRadiusSliderState();
+}
+
+class _SearchRadiusSliderState extends State<SearchRadiusSlider> {
+  /// The user opened the custom control, or dragged it. Kept while the
+  /// drag passes over a preset value so the slider never vanishes under
+  /// the finger.
+  bool _customRequested = false;
+
+  void _selectPreset(int km) {
+    setState(() => _customRequested = false);
+    widget.onChanged(km.toDouble());
+  }
+
+  void _drag(double km) {
+    if (!_customRequested) setState(() => _customRequested = true);
+    widget.onChanged(km);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final divisions = (maxKm - minKm).round();
-    final rounded = radiusKm.round();
-    final presets = presetsKm
-        .where((km) => km >= minKm && km <= maxKm)
+    final value = widget.radiusKm.clamp(widget.minKm, widget.maxKm).toDouble();
+    final rounded = value.round();
+    final presets = SearchRadiusSlider.presetsKm
+        .where((km) => km >= widget.minKm && km <= widget.maxKm)
         .toList(growable: false);
+    final custom = _customRequested || !presets.contains(rounded);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // #3949 — the section name is the grammar's title role, like the
-        // fuel / amenity / brand headers above and below it; the current
-        // value beside it is the same role in the primary colour.
+        // fuel / amenity / brand headers above and below it.
         Row(
           crossAxisAlignment: CrossAxisAlignment.baseline,
           textBaseline: TextBaseline.alphabetic,
@@ -61,31 +84,18 @@ class SearchRadiusSlider extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const SizedBox(width: Spacing.md),
-            Text(
-              l10n.searchSummaryRadiusValue('$rounded'),
-              style: AppText.title(context).copyWith(
-                color: theme.colorScheme.primary,
+            if (custom) ...[
+              const SizedBox(width: Spacing.md),
+              Text(
+                l10n.searchSummaryRadiusValue('$rounded'),
+                style: AppText.title(context).copyWith(
+                  color: theme.colorScheme.primary,
+                ),
               ),
-            ),
+            ],
           ],
         ),
-        // #1962 — shrink the slider's reaction overlay so the control
-        // takes far less vertical space in the compact criteria form
-        // (the default 24 dp overlay inflates the row to ~48 dp).
-        SliderTheme(
-          data: SliderTheme.of(context).copyWith(
-            overlayShape: const RoundSliderOverlayShape(overlayRadius: 14),
-          ),
-          child: Slider(
-            value: radiusKm.clamp(minKm, maxKm),
-            min: minKm,
-            max: maxKm,
-            divisions: divisions,
-            label: '$rounded km',
-            onChanged: onChanged,
-          ),
-        ),
+        const SizedBox(height: Spacing.sm),
         Wrap(
           spacing: Spacing.md,
           runSpacing: Spacing.sm,
@@ -94,15 +104,49 @@ class SearchRadiusSlider extends StatelessWidget {
               ChoiceChip(
                 key: ValueKey('criteria-radius-preset-$km'),
                 label: Text(l10n.searchSummaryRadiusValue('$km')),
-                selected: rounded == km,
+                selected: !custom && rounded == km,
                 // #3949 — the tightened criteria-chip geometry shared with
                 // the fuel group, so both read as one chip role.
                 padding: kCriteriaChipPadding,
                 labelPadding: kCriteriaChipLabelPadding,
                 visualDensity: VisualDensity.compact,
-                onSelected: (_) => onChanged(km.toDouble()),
+                onSelected: (_) => _selectPreset(km),
               ),
+            ChoiceChip(
+              key: const ValueKey('criteria-radius-custom'),
+              label: Text(l10n.criteriaRadiusCustom),
+              selected: custom,
+              padding: kCriteriaChipPadding,
+              labelPadding: kCriteriaChipLabelPadding,
+              visualDensity: VisualDensity.compact,
+              onSelected: (_) => setState(() => _customRequested = true),
+            ),
           ],
+        ),
+        AnimatedSize(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
+          alignment: Alignment.topCenter,
+          child: custom
+              // #1962 — the compact reaction overlay keeps the row short.
+              ? SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    overlayShape:
+                        const RoundSliderOverlayShape(overlayRadius: 14),
+                  ),
+                  child: Slider(
+                    value: value,
+                    min: widget.minKm,
+                    max: widget.maxKm,
+                    divisions: (widget.maxKm - widget.minKm).round(),
+                    // No drag bubble — the title row already shows it —
+                    // but screen readers still hear the value in km.
+                    semanticFormatterCallback: (v) =>
+                        l10n.searchSummaryRadiusValue('${v.round()}'),
+                    onChanged: _drag,
+                  ),
+                )
+              : const SizedBox(width: double.infinity),
         ),
       ],
     );
