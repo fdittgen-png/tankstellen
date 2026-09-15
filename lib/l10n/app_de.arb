@@ -3327,6 +3327,106 @@
   "showLessHours": "Weniger anzeigen",
   "openStateUnknown": "Unbekannt",
   "stationOpenStateSemantic": "{open, select, true{Station ist geöffnet} false{Station ist geschlossen} other{Öffnungsstatus unbekannt}}",
+  "opportunityBestStopNowTitle": "Günstigstes {fuelType} in der Nähe",
+  "@opportunityBestStopNowTitle": {
+    "description": "Title of the background notification for OpportunityKind.bestStopNow — the best stop available right now, near where the user is (#4183, epic #4148). Resolved in the main isolate at task-registration time and read back by the WorkManager isolate via Hive settings, like every other background notification template.",
+    "placeholders": {
+      "fuelType": {
+        "type": "String"
+      }
+    }
+  },
+  "opportunityBestStopNowBody": "{price} {currency} bei {station} · {distance} km",
+  "@opportunityBestStopNowBody": {
+    "description": "Body for OpportunityKind.bestStopNow. Deliberately only fields that are always present on this kind — price, station name and distance — so the copy never has to hedge a missing saving (#4183).",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      },
+      "station": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "opportunityBestStopOnRouteTitle": "Günstigstes {fuelType} auf deiner Route",
+  "@opportunityBestStopOnRouteTitle": {
+    "description": "Title for OpportunityKind.bestStopOnRoute — the best stop along a route the user is driving (#4183). Distinct from the nearby case because 'on your route' is what makes the detour cost already accounted for.",
+    "placeholders": {
+      "fuelType": {
+        "type": "String"
+      }
+    }
+  },
+  "opportunityBestStopOnRouteBody": "{price} {currency} bei {station} · {distance} km voraus",
+  "@opportunityBestStopOnRouteBody": {
+    "description": "Body for OpportunityKind.bestStopOnRoute. 'ahead' rather than a bare distance: on a route the number is along the way, not a detour radius (#4183).",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      },
+      "station": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "opportunityRefuelSoonTitle": "Zeit zum Tanken",
+  "@opportunityRefuelSoonTitle": {
+    "description": "Title for OpportunityKind.refuelSoon — the tank is low enough that a stop is coming whether or not the price is good (#4153, #4183). States the need, not a bargain, because that is what this kind is about."
+  },
+  "opportunityRefuelSoonBody": "{station} · {distance} km voraus · {price} {currency}",
+  "@opportunityRefuelSoonBody": {
+    "description": "Body for OpportunityKind.refuelSoon: where to stop, how far ahead it is, and what it costs — in that order, because the stop is the point and the price is the detail (#4183).",
+    "placeholders": {
+      "station": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "opportunityPersonalBaselineTitle": "{fuelType} günstiger als sonst",
+  "@opportunityPersonalBaselineTitle": {
+    "description": "Title for OpportunityKind.personalBaseline — a price unusual against THIS user's own fill-up history rather than against a local median (#4150, #4183). 'your usual' is the reference and has to be in the title, or the claim reads as a generic bargain.",
+    "placeholders": {
+      "fuelType": {
+        "type": "String"
+      }
+    }
+  },
+  "opportunityPersonalBaselineBody": "{price} {currency} bei {station}",
+  "@opportunityPersonalBaselineBody": {
+    "description": "Body for OpportunityKind.personalBaseline. The comparison itself is in the title; this is the fact behind it (#4183).",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      },
+      "station": {
+        "type": "String"
+      }
+    }
+  },
   "permissionRationaleCameraTitle": "Kamerazugriff",
   "permissionRationaleCameraSubtitle": "Diese App möchte Ihre Kamera verwenden, um Belege, Zapfsäulen-Displays und QR-Codes zu lesen.",
   "permissionRationaleCameraWhatHappens": "Was passiert mit dem Kamerabild:",

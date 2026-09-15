@@ -7356,5 +7356,113 @@
   "@recoveryStillWorksFallback": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "opportunityBestStopNowTitle": "Cheapest {fuelType} nearby",
+  "@opportunityBestStopNowTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuelType": {
+        "type": "String"
+      }
+    }
+  },
+  "opportunityBestStopNowBody": "{price} {currency} at {station} · {distance} km",
+  "@opportunityBestStopNowBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      },
+      "station": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "opportunityBestStopOnRouteTitle": "Cheapest {fuelType} on your route",
+  "@opportunityBestStopOnRouteTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuelType": {
+        "type": "String"
+      }
+    }
+  },
+  "opportunityBestStopOnRouteBody": "{price} {currency} at {station} · {distance} km ahead",
+  "@opportunityBestStopOnRouteBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      },
+      "station": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "opportunityRefuelSoonTitle": "Time to refuel",
+  "@opportunityRefuelSoonTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "opportunityRefuelSoonBody": "{station} · {distance} km ahead · {price} {currency}",
+  "@opportunityRefuelSoonBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "station": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "opportunityPersonalBaselineTitle": "{fuelType} below your usual price",
+  "@opportunityPersonalBaselineTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuelType": {
+        "type": "String"
+      }
+    }
+  },
+  "opportunityPersonalBaselineBody": "{price} {currency} at {station}",
+  "@opportunityPersonalBaselineBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      },
+      "station": {
+        "type": "String"
+      }
+    }
   }
 }

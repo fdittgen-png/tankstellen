@@ -7095,6 +7095,63 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String opportunityBestStopNowTitle(String fuelType) {
+    return '$fuelType le moins cher à proximité';
+  }
+
+  @override
+  String opportunityBestStopNowBody(
+    String price,
+    String currency,
+    String station,
+    String distance,
+  ) {
+    return '$price $currency à $station · $distance km';
+  }
+
+  @override
+  String opportunityBestStopOnRouteTitle(String fuelType) {
+    return '$fuelType le moins cher sur votre trajet';
+  }
+
+  @override
+  String opportunityBestStopOnRouteBody(
+    String price,
+    String currency,
+    String station,
+    String distance,
+  ) {
+    return '$price $currency à $station · $distance km plus loin';
+  }
+
+  @override
+  String get opportunityRefuelSoonTitle => 'Il est temps de faire le plein';
+
+  @override
+  String opportunityRefuelSoonBody(
+    String station,
+    String distance,
+    String price,
+    String currency,
+  ) {
+    return '$station · $distance km plus loin · $price $currency';
+  }
+
+  @override
+  String opportunityPersonalBaselineTitle(String fuelType) {
+    return '$fuelType moins cher que d\'habitude';
+  }
+
+  @override
+  String opportunityPersonalBaselineBody(
+    String price,
+    String currency,
+    String station,
+  ) {
+    return '$price $currency à $station';
+  }
+
+  @override
   String get permissionRationaleCameraTitle => 'Accès à l\'appareil photo';
 
   @override

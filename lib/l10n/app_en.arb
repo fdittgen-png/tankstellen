@@ -7158,6 +7158,106 @@
       }
     }
   },
+  "opportunityBestStopNowTitle": "Cheapest {fuelType} nearby",
+  "@opportunityBestStopNowTitle": {
+    "description": "Title of the background notification for OpportunityKind.bestStopNow — the best stop available right now, near where the user is (#4183, epic #4148). Resolved in the main isolate at task-registration time and read back by the WorkManager isolate via Hive settings, like every other background notification template.",
+    "placeholders": {
+      "fuelType": {
+        "type": "String"
+      }
+    }
+  },
+  "opportunityBestStopNowBody": "{price} {currency} at {station} · {distance} km",
+  "@opportunityBestStopNowBody": {
+    "description": "Body for OpportunityKind.bestStopNow. Deliberately only fields that are always present on this kind — price, station name and distance — so the copy never has to hedge a missing saving (#4183).",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      },
+      "station": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "opportunityBestStopOnRouteTitle": "Cheapest {fuelType} on your route",
+  "@opportunityBestStopOnRouteTitle": {
+    "description": "Title for OpportunityKind.bestStopOnRoute — the best stop along a route the user is driving (#4183). Distinct from the nearby case because 'on your route' is what makes the detour cost already accounted for.",
+    "placeholders": {
+      "fuelType": {
+        "type": "String"
+      }
+    }
+  },
+  "opportunityBestStopOnRouteBody": "{price} {currency} at {station} · {distance} km ahead",
+  "@opportunityBestStopOnRouteBody": {
+    "description": "Body for OpportunityKind.bestStopOnRoute. 'ahead' rather than a bare distance: on a route the number is along the way, not a detour radius (#4183).",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      },
+      "station": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "opportunityRefuelSoonTitle": "Time to refuel",
+  "@opportunityRefuelSoonTitle": {
+    "description": "Title for OpportunityKind.refuelSoon — the tank is low enough that a stop is coming whether or not the price is good (#4153, #4183). States the need, not a bargain, because that is what this kind is about."
+  },
+  "opportunityRefuelSoonBody": "{station} · {distance} km ahead · {price} {currency}",
+  "@opportunityRefuelSoonBody": {
+    "description": "Body for OpportunityKind.refuelSoon: where to stop, how far ahead it is, and what it costs — in that order, because the stop is the point and the price is the detail (#4183).",
+    "placeholders": {
+      "station": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "opportunityPersonalBaselineTitle": "{fuelType} below your usual price",
+  "@opportunityPersonalBaselineTitle": {
+    "description": "Title for OpportunityKind.personalBaseline — a price unusual against THIS user's own fill-up history rather than against a local median (#4150, #4183). 'your usual' is the reference and has to be in the title, or the claim reads as a generic bargain.",
+    "placeholders": {
+      "fuelType": {
+        "type": "String"
+      }
+    }
+  },
+  "opportunityPersonalBaselineBody": "{price} {currency} at {station}",
+  "@opportunityPersonalBaselineBody": {
+    "description": "Body for OpportunityKind.personalBaseline. The comparison itself is in the title; this is the fact behind it (#4183).",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      },
+      "station": {
+        "type": "String"
+      }
+    }
+  },
   "permissionRationaleCameraTitle": "Camera Access",
   "@permissionRationaleCameraTitle": {
     "description": "Title of the GDPR pre-permission rationale shown once before the OS camera prompt (receipt / pump-display / QR scan) (#3872)."
