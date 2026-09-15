@@ -102,22 +102,31 @@ class SearchCriteriaForm extends ConsumerWidget {
           if (routePlanningOn) ...[
             SearchModeToggle(
               mode: mode,
-              onChanged: (m) =>
-                  ref.read(activeSearchModeProvider.notifier).set(m),
+              onChanged: (m) {
+                // #4238 — the field being left must not keep the keyboard.
+                FocusScope.of(context).unfocus();
+                ref.read(activeSearchModeProvider.notifier).set(m);
+              },
             ),
             const SizedBox(height: 8),
           ],
           // #2111 — segmented control labels the active mode.
-          if (mode == SearchMode.nearby) ...[
-            LocationInput(
+          // #4238 — both inputs stay mounted and the inactive one is
+          // offstage, so switching modes never erases what was typed in the
+          // other (a conditional child disposed its text controllers).
+          Offstage(
+            offstage: mode != SearchMode.nearby,
+            child: LocationInput(
               key: locationInputKey,
               onGpsSearch: onGpsSearch,
               onZipSearch: onZipSearch,
               onCitySearch: onCitySearch,
             ),
-          ] else ...[
-            RouteInput(key: routeInputKey, onSearch: onRouteSearch),
-          ],
+          ),
+          Offstage(
+            offstage: mode != SearchMode.route,
+            child: RouteInput(key: routeInputKey, onSearch: onRouteSearch),
+          ),
           const SizedBox(height: 8),
           CriteriaSectionHeader(l10n.fuelType,
               anchor: HelpAnchor.searchFuelType),

@@ -59,7 +59,10 @@ void main() {
 
         expect(find.byType(LocationInput), findsOneWidget);
         expect(find.byType(FuelTypeSelector), findsOneWidget);
-        expect(find.byType(Slider), findsOneWidget);
+        // #4238 — the radius control a user sees (presets + Custom), not a
+        // widget count.
+        expect(find.byKey(const ValueKey('criteria-radius-custom')),
+            findsOneWidget);
         // #2131 — the inline "Search" CTA moved to the central FAB in
         // the shell bar; the criteria screen no longer renders its own
         // submit button.
