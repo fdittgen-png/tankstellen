@@ -7236,6 +7236,30 @@ class AppLocalizationsEn extends AppLocalizations {
       'Resolve unresolved fuel and trip gap';
 
   @override
+  String get recoveryStillWorksNoStations =>
+      'Nothing is wrong — the search simply came back empty.';
+
+  @override
+  String get recoveryStillWorksApiKey =>
+      'Saved stations and your fill-up history still work.';
+
+  @override
+  String get recoveryStillWorksLocation =>
+      'You can still search by postal code or city.';
+
+  @override
+  String get recoveryStillWorksConnection =>
+      'Prices you have already loaded are still shown.';
+
+  @override
+  String get recoveryStillWorksRouting =>
+      'Nearby search still works — only the route is unavailable.';
+
+  @override
+  String get recoveryStillWorksFallback =>
+      'Saved stations and your fill-up history still work.';
+
+  @override
   String get refuelUnitPerKwh => '/kWh';
 
   @override
@@ -16842,6 +16866,30 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get reconcileResolveGapSemanticLabel =>
       '⟦Řéšółṽé úñřéšółṽéđ ƒúéł áñđ ŧřîƥ ǧáƥ ··············⟧';
+
+  @override
+  String get recoveryStillWorksNoStations =>
+      '⟦Ñóŧĥîñǧ îš ŵřóñǧ — ŧĥé šéářçĥ šîɱƥłý çáɱé ƀáçķ éɱƥŧý. ···················⟧';
+
+  @override
+  String get recoveryStillWorksApiKey =>
+      '⟦Šáṽéđ šŧáŧîóñš áñđ ýóúř ƒîłł-úƥ ĥîšŧóřý šŧîłł ŵóřķ. ···················⟧';
+
+  @override
+  String get recoveryStillWorksLocation =>
+      '⟦Ýóú çáñ šŧîłł šéářçĥ ƀý ƥóšŧáł çóđé óř çîŧý. ················⟧';
+
+  @override
+  String get recoveryStillWorksConnection =>
+      '⟦Ƥřîçéš ýóú ĥáṽé áłřéáđý łóáđéđ ářé šŧîłł šĥóŵñ. ··················⟧';
+
+  @override
+  String get recoveryStillWorksRouting =>
+      '⟦Ñéářƀý šéářçĥ šŧîłł ŵóřķš — óñłý ŧĥé řóúŧé îš úñáṽáîłáƀłé. ·····················⟧';
+
+  @override
+  String get recoveryStillWorksFallback =>
+      '⟦Šáṽéđ šŧáŧîóñš áñđ ýóúř ƒîłł-úƥ ĥîšŧóřý šŧîłł ŵóřķ. ···················⟧';
 
   @override
   String get refuelUnitPerKwh => '⟦/ķŴĥ ·⟧';

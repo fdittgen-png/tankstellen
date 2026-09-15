@@ -3449,6 +3449,30 @@
   "reconcileVirtualTrajetDelete": "Virtuelle Fahrt löschen",
   "reconcileResolveGapBanner": "Ungeklärte Kraftstoff-/Fahrten-Differenz von {gap} L — zum Klären tippen",
   "reconcileResolveGapSemanticLabel": "Ungeklärte Kraftstoff- und Fahrten-Differenz klären",
+  "recoveryStillWorksNoStations": "Es ist nichts kaputt — die Suche war einfach leer.",
+  "@recoveryStillWorksNoStations": {
+    "description": "#4141 recovery contract, the 'can I continue' line for an empty search result. Says plainly that no failure occurred, because an empty result screen that looks like an error makes users retry a search that worked."
+  },
+  "recoveryStillWorksApiKey": "Gespeicherte Tankstellen und deine Tank-Historie funktionieren weiterhin.",
+  "@recoveryStillWorksApiKey": {
+    "description": "#4141 recovery contract, the 'can I continue' line when the price provider cannot be reached for want of a key. Names the two things that keep working so the user does not conclude the app is broken."
+  },
+  "recoveryStillWorksLocation": "Du kannst weiterhin nach Postleitzahl oder Ort suchen.",
+  "@recoveryStillWorksLocation": {
+    "description": "#4141 recovery contract, the 'can I continue' line when the device position is unavailable. The alternative path is the answer, not an apology."
+  },
+  "recoveryStillWorksConnection": "Bereits geladene Preise werden weiterhin angezeigt.",
+  "@recoveryStillWorksConnection": {
+    "description": "#4141 recovery contract, the 'can I continue' line for a connection failure. The cache is what keeps the app useful offline and the user cannot see that it is being used unless told."
+  },
+  "recoveryStillWorksRouting": "Die Umkreissuche funktioniert weiterhin — nur die Route fehlt.",
+  "@recoveryStillWorksRouting": {
+    "description": "#4141 recovery contract, the 'can I continue' line when route planning fails. Scopes the failure to the one feature that broke."
+  },
+  "recoveryStillWorksFallback": "Gespeicherte Tankstellen und deine Tank-Historie funktionieren weiterhin.",
+  "@recoveryStillWorksFallback": {
+    "description": "#4141 recovery contract, the default 'can I continue' line for an unclassified failure. Deliberately the same promise as the API-key case: the two local features never depend on the network."
+  },
   "refuelUnitPerKwh": "/kWh",
   "refuelUnitPerSession": "/Sitzung",
   "stationCardPriceUnit": "{currency}/l",

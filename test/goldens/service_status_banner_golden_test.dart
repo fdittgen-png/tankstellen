@@ -6,6 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/widgets/service_status_banner.dart';
 
+import 'package:tankstellen/l10n/app_localizations.dart';
+
 import '../helpers/pump_app.dart';
 
 void main() {
@@ -142,39 +144,91 @@ void main() {
     });
   });
 
-  group('ServiceChainErrorWidget golden tests', () {
-    testWidgets('generic error with retry button', (tester) async {
+  /// #4141 — structural, not PNGs, for the same reason the two cases
+  /// above became structural at #4134.
+  ///
+  /// These two were pixel goldens of the failure screen, and #4141
+  /// changed that screen: it gained the "can I continue" line, which is
+  /// the whole point of the recovery contract. A PNG baseline states
+  /// "these pixels" and nothing about WHY, so it fails on a deliberate
+  /// improvement with a diff a reader has to interpret — and a
+  /// locally-regenerated baseline then reddens Linux CI on the 1.5%
+  /// tolerance (`golden_cross_platform_baseline`).
+  ///
+  /// What a golden was actually protecting here is the ARRANGEMENT: the
+  /// four parts in the order a person asks them, and the diagnostic not
+  /// being one of them. That is assertable exactly, on any platform.
+  group('ServiceChainErrorWidget renders the recovery contract (#4141)', () {
+    /// The vertical position of the single widget matching [finder].
+    double topOf(WidgetTester tester, Finder finder) =>
+        tester.getTopLeft(finder).dy;
+
+    testWidgets('the four parts appear in the order they are asked',
+        (tester) async {
       await pumpApp(
         tester,
-        RepaintBoundary(
-          child: ServiceChainErrorWidget(
-            error: Exception('No stations found in this area'),
-            onRetry: () {},
-          ),
+        ServiceChainErrorWidget(
+          error: Exception('No stations found in this area'),
+          onRetry: () {},
         ),
       );
 
-      await expectLater(
-        find.byType(RepaintBoundary).first,
-        matchesGoldenFile('service_chain_error_generic.png'),
-      );
+      final l10n = AppLocalizations.of(
+          tester.element(find.byType(ServiceChainErrorWidget)));
+
+      // 1. what happened, 2. why it matters, 3. can I continue,
+      // 4. what do I do.
+      final whatHappened = topOf(tester, find.text(l10n.noResults));
+      final whyItMatters = topOf(tester, find.text(l10n.errorHintNoStations));
+      final canIContinue =
+          topOf(tester, find.text(l10n.recoveryStillWorksNoStations));
+      final whatDoIDo = topOf(tester, find.widgetWithText(FilledButton, l10n.retry));
+
+      expect(whatHappened, lessThan(whyItMatters));
+      expect(whyItMatters, lessThan(canIContinue));
+      expect(canIContinue, lessThan(whatDoIDo),
+          reason: 'the action comes last: a button above the sentence '
+              'explaining whether anything is broken invites a tap '
+              'before the reader knows what it costs');
     });
 
-    testWidgets('timeout error', (tester) async {
+    testWidgets('an empty search is not dressed as a failure', (tester) async {
       await pumpApp(
         tester,
-        RepaintBoundary(
-          child: ServiceChainErrorWidget(
-            error: Exception('Connection timeout after 10s'),
-            onRetry: () {},
-          ),
+        ServiceChainErrorWidget(
+          error: Exception('No stations found in this area'),
+          onRetry: () {},
         ),
       );
 
-      await expectLater(
-        find.byType(RepaintBoundary).first,
-        matchesGoldenFile('service_chain_error_timeout.png'),
+      final ctx = tester.element(find.byType(ServiceChainErrorWidget));
+      final icon = tester.widget<Icon>(find.byType(Icon).first);
+      expect(icon.color, isNot(Theme.of(ctx).colorScheme.error),
+          reason: 'RecoveryImpact.unaffected — nothing failed, the search '
+              'simply came back empty');
+    });
+
+    testWidgets('a real failure IS dressed as one, and hides its cause',
+        (tester) async {
+      await pumpApp(
+        tester,
+        ServiceChainErrorWidget(
+          error: Exception('Connection timeout after 10s'),
+          onRetry: () {},
+        ),
       );
+
+      final ctx = tester.element(find.byType(ServiceChainErrorWidget));
+      final icon = tester.widget<Icon>(find.byType(Icon).first);
+      expect(icon.color, Theme.of(ctx).colorScheme.error);
+
+      final l10n = AppLocalizations.of(ctx);
+      expect(find.text(l10n.recoveryStillWorksConnection), findsOneWidget,
+          reason: 'the cache is what keeps the app useful offline, and the '
+              'user cannot see it is being used unless told');
+      expect(find.textContaining('Exception'), findsNothing,
+          reason: 'the raw error lives behind the details tile, never on '
+              'the first screen');
     });
   });
 }

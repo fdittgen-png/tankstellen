@@ -7323,6 +7323,30 @@ class AppLocalizationsPt extends AppLocalizations {
       'Resolver diferença não resolvida entre combustível e viagens';
 
   @override
+  String get recoveryStillWorksNoStations =>
+      'Nothing is wrong — the search simply came back empty.';
+
+  @override
+  String get recoveryStillWorksApiKey =>
+      'Saved stations and your fill-up history still work.';
+
+  @override
+  String get recoveryStillWorksLocation =>
+      'You can still search by postal code or city.';
+
+  @override
+  String get recoveryStillWorksConnection =>
+      'Prices you have already loaded are still shown.';
+
+  @override
+  String get recoveryStillWorksRouting =>
+      'Nearby search still works — only the route is unavailable.';
+
+  @override
+  String get recoveryStillWorksFallback =>
+      'Saved stations and your fill-up history still work.';
+
+  @override
   String get refuelUnitPerKwh => '/kWh';
 
   @override

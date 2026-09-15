@@ -6,6 +6,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../error/error_localizer.dart';
+import '../../error/recovery_message.dart';
+import '../../error/widgets/recovery_message_view.dart';
 import '../../error/exceptions.dart';
 import '../../feedback/github_issue_reporter/error_report_payload.dart';
 import '../../feedback/github_issue_reporter/error_reporter.dart';
@@ -62,10 +64,25 @@ String _localizedFallbackSummary(
 }
 
 /// Shows error when the entire service chain failed.
-/// Formats errors for humans — never shows raw Dart objects.
+///
+/// #4141 — this screen is now a [RecoveryMessage] rendered by
+/// [RecoveryMessageView], so it answers the four questions in order
+/// instead of three. The one it could not answer before is the one that
+/// matters most: "can I continue". A user told that saved stations and
+/// their fill-up history still work does not conclude the app is broken.
+///
+/// The existing title/hint strings are reused verbatim rather than
+/// re-split, because they are shared with other surfaces; some of the
+/// hints carry a suggestion as well as a consequence, which #4144 can
+/// tease apart. What is new here is the continuity line and the fact
+/// that a site with no offered action no longer compiles.
 class ServiceChainErrorWidget extends StatelessWidget {
   final Object error;
-  final VoidCallback? onRetry;
+
+  /// #4141 — required. The contract says a failure must offer a way out,
+  /// and every call site already passed one; making it optional only
+  /// left room for a future screen with nothing to tap.
+  final VoidCallback onRetry;
 
   /// Reporter used by the "Report this issue" button. Defaults to a
   /// real [ErrorReporter] that opens a consent dialog and launches the
@@ -87,7 +104,7 @@ class ServiceChainErrorWidget extends StatelessWidget {
   const ServiceChainErrorWidget({
     super.key,
     required this.error,
-    this.onRetry,
+    required this.onRetry,
     this.reporter,
     this.countryCode,
     this.searchContext,
@@ -106,33 +123,63 @@ class ServiceChainErrorWidget extends StatelessWidget {
     return l10n.noResults;
   }
 
-  /// Extract actionable hint text from the error chain.
-  String _hint(AppLocalizations l10n) {
+  /// Which of the six failures this is.
+  ///
+  /// #4141 — one classification feeding BOTH the hint and the
+  /// continuity line. They used to be two independent `if` ladders in
+  /// the making, which is how a screen ends up telling a user their
+  /// route failed and that their route still works.
+  _ChainFailure _classify() {
     final msg = error.toString().toLowerCase();
     if (msg.contains('no stations found') ||
         msg.contains('keine tankstellen')) {
-      return l10n.errorHintNoStations;
+      return _ChainFailure.noStations;
     }
     if (msg.contains('api key') ||
         error is NoApiKeyException ||
         error is NoEvApiKeyException) {
-      return l10n.errorHintApiKey;
+      return _ChainFailure.apiKey;
     }
     if (msg.contains('location') ||
         msg.contains('gps') ||
         error is LocationException) {
-      return l10n.locationDenied;
+      return _ChainFailure.location;
     }
     if (msg.contains('timeout') || msg.contains('connection')) {
-      return l10n.errorHintConnection;
+      return _ChainFailure.connection;
     }
     if (msg.contains('route') ||
         msg.contains('osrm') ||
         msg.contains('routing')) {
-      return l10n.errorHintRouting;
+      return _ChainFailure.routing;
     }
-    return l10n.errorHintFallback;
+    return _ChainFailure.unclassified;
   }
+
+  String _hint(AppLocalizations l10n) => switch (_classify()) {
+        _ChainFailure.noStations => l10n.errorHintNoStations,
+        _ChainFailure.apiKey => l10n.errorHintApiKey,
+        _ChainFailure.location => l10n.locationDenied,
+        _ChainFailure.connection => l10n.errorHintConnection,
+        _ChainFailure.routing => l10n.errorHintRouting,
+        _ChainFailure.unclassified => l10n.errorHintFallback,
+      };
+
+  /// The "can I continue" line (#4141) — one per failure, never omitted.
+  String _stillWorks(AppLocalizations l10n) => switch (_classify()) {
+        _ChainFailure.noStations => l10n.recoveryStillWorksNoStations,
+        _ChainFailure.apiKey => l10n.recoveryStillWorksApiKey,
+        _ChainFailure.location => l10n.recoveryStillWorksLocation,
+        _ChainFailure.connection => l10n.recoveryStillWorksConnection,
+        _ChainFailure.routing => l10n.recoveryStillWorksRouting,
+        _ChainFailure.unclassified => l10n.recoveryStillWorksFallback,
+      };
+
+  /// An empty search is not a degradation — nothing failed and nothing
+  /// is missing. Every other case is the app continuing with less.
+  RecoveryImpact get _impact => _classify() == _ChainFailure.noStations
+      ? RecoveryImpact.unaffected
+      : RecoveryImpact.degraded;
 
   /// Extract technical details for the expandable section.
   ///
@@ -177,83 +224,50 @@ class ServiceChainErrorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
+    final reportable = ErrorReportPayload.assessReportability(error).reportable;
 
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.cloud_off, size: 64, color: theme.colorScheme.error),
-            const SizedBox(height: 16),
-            Text(
-              _title(l10n),
-              style: theme.textTheme.titleLarge,
-              textAlign: TextAlign.center,
+        child: RecoveryMessageView(
+          message: RecoveryMessage(
+            whatHappened: _title(l10n),
+            whyItMatters: _hint(l10n),
+            impact: _impact,
+            whatStillWorks: _stillWorks(l10n),
+            primaryAction: RecoveryAction(
+              label: l10n.retry,
+              onInvoke: onRetry,
+              icon: Icons.refresh,
             ),
-            const SizedBox(height: 12),
-            Text(
-              _hint(l10n),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            if (onRetry != null)
-              FilledButton.icon(
-                onPressed: onRetry,
-                icon: const Icon(Icons.refresh),
-                label: Text(l10n.retry),
-              ),
-            // #1606 — suppress the report CTA for errors that should
-            // never become a GitHub issue: designed-in stop-gap
-            // messages tied to a tracked issue, and transient
-            // connectivity failures. The hint above already tells the
-            // user what to do in those cases.
-            if (ErrorReportPayload.assessReportability(error).reportable) ...[
-              const SizedBox(height: 8),
-              TextButton.icon(
-                onPressed: () => _onReportPressed(context),
-                icon: const Icon(Icons.bug_report_outlined, size: 18),
-                label: Text(l10n.reportThisIssue),
-              ),
-            ],
-            const SizedBox(height: 12),
-            // Expandable technical details
-            Theme(
-              data: theme.copyWith(dividerColor: Colors.transparent),
-              child: ExpansionTile(
-                title: Text(
-                  l10n.detailsLabel,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                children: _technicalDetails(l10n)
-                    .map(
-                      (d) => Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 2,
-                        ),
-                        child: Text(
-                          d,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                            fontSize: 11,
-                          ),
-                        ),
-                      ),
-                    )
-                    .toList(),
-              ),
-            ),
-          ],
+            // #1606 — no report CTA for errors that should never become a
+            // GitHub issue: designed-in stop-gap messages tied to a
+            // tracked issue, and transient connectivity failures. The
+            // hint already tells the user what to do in those cases.
+            secondaryAction: reportable
+                ? RecoveryAction(
+                    label: l10n.reportThisIssue,
+                    onInvoke: () => _onReportPressed(context),
+                    icon: Icons.bug_report_outlined,
+                  )
+                : null,
+            diagnostic: _technicalDetails(l10n),
+          ),
         ),
       ),
     );
   }
+}
+
+/// The six failures this screen distinguishes (#4141). An enum rather
+/// than a chain of `if`s repeated per rendered line, so a new failure
+/// cannot reach one line and miss another.
+enum _ChainFailure {
+  noStations,
+  apiKey,
+  location,
+  connection,
+  routing,
+  unclassified,
 }

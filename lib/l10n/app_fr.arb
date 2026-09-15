@@ -6312,5 +6312,35 @@
         "example": "612"
       }
     }
+  },
+  "recoveryStillWorksNoStations": "Rien n'est cassé — la recherche n'a simplement rien trouvé.",
+  "@recoveryStillWorksNoStations": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recoveryStillWorksApiKey": "Vos stations enregistrées et votre historique de pleins fonctionnent toujours.",
+  "@recoveryStillWorksApiKey": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recoveryStillWorksLocation": "Vous pouvez toujours chercher par code postal ou par ville.",
+  "@recoveryStillWorksLocation": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recoveryStillWorksConnection": "Les prix déjà chargés restent affichés.",
+  "@recoveryStillWorksConnection": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recoveryStillWorksRouting": "La recherche à proximité fonctionne toujours — seul l'itinéraire est indisponible.",
+  "@recoveryStillWorksRouting": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recoveryStillWorksFallback": "Vos stations enregistrées et votre historique de pleins fonctionnent toujours.",
+  "@recoveryStillWorksFallback": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

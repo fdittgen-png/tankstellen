@@ -7461,6 +7461,30 @@
   "@reconcileResolveGapSemanticLabel": {
     "description": "Accessibility label for the tappable 'Resolve gap' banner on the consumption stats card (#2445)."
   },
+  "recoveryStillWorksNoStations": "Nothing is wrong — the search simply came back empty.",
+  "@recoveryStillWorksNoStations": {
+    "description": "#4141 recovery contract, the 'can I continue' line for an empty search result. Says plainly that no failure occurred, because an empty result screen that looks like an error makes users retry a search that worked."
+  },
+  "recoveryStillWorksApiKey": "Saved stations and your fill-up history still work.",
+  "@recoveryStillWorksApiKey": {
+    "description": "#4141 recovery contract, the 'can I continue' line when the price provider cannot be reached for want of a key. Names the two things that keep working so the user does not conclude the app is broken."
+  },
+  "recoveryStillWorksLocation": "You can still search by postal code or city.",
+  "@recoveryStillWorksLocation": {
+    "description": "#4141 recovery contract, the 'can I continue' line when the device position is unavailable. The alternative path is the answer, not an apology."
+  },
+  "recoveryStillWorksConnection": "Prices you have already loaded are still shown.",
+  "@recoveryStillWorksConnection": {
+    "description": "#4141 recovery contract, the 'can I continue' line for a connection failure. The cache is what keeps the app useful offline and the user cannot see that it is being used unless told."
+  },
+  "recoveryStillWorksRouting": "Nearby search still works — only the route is unavailable.",
+  "@recoveryStillWorksRouting": {
+    "description": "#4141 recovery contract, the 'can I continue' line when route planning fails. Scopes the failure to the one feature that broke."
+  },
+  "recoveryStillWorksFallback": "Saved stations and your fill-up history still work.",
+  "@recoveryStillWorksFallback": {
+    "description": "#4141 recovery contract, the default 'can I continue' line for an unclassified failure. Deliberately the same promise as the API-key case: the two local features never depend on the network."
+  },
   "refuelUnitPerKwh": "/kWh",
   "@refuelUnitPerKwh": {
     "description": "Trailing unit suffix on an EV charging price in the unified RefuelOptionCard (#1116 phase 3b)."
