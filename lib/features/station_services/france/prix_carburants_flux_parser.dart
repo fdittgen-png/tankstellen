@@ -183,6 +183,10 @@ Station? parseFluxPdv(XmlElement pdv, {DateTime? now}) {
         ? true
         : openStateFromHours(openingHours, now ?? nowInCountry('FR')),
     updatedAt: _formatMaj(mostRecentMaj),
+    // #4189 — the machine-readable half. The XML flux carries the
+    // same ISO `maj` attribute the JSON feed does; `_formatMaj` is
+    // only its label.
+    priceUpdatedAt: DateTime.tryParse(mostRecentMaj ?? ''),
     stationType: pop.isEmpty ? null : pop,
     is24h: is24h,
     openingHoursText: openingHoursText,

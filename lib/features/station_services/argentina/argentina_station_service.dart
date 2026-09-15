@@ -192,6 +192,8 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
           // honest unknown instead of the old hard-coded `true`.
           isOpen: null,
           updatedAt: raw.fechaVigencia,
+          // #4189 — explicit machine-readable half.
+          priceUpdatedAt: DateTime.tryParse(raw.fechaVigencia),
           region: raw.provincia,
         ));
       }

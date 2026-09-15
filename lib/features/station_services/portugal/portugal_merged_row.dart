@@ -81,8 +81,18 @@ class PortugalMergedRow {
     }
   }
 
+  /// The raw DGEG stamp as a real instant (#4189).
+  ///
+  /// The machine-readable half of [formattedUpdatedAt]: one value, two
+  /// outputs. Null when the row carried no stamp or it will not parse —
+  /// an absent age, never a guessed one.
+  DateTime? get priceUpdatedAt =>
+      rawUpdatedAt == null ? null : DateTime.tryParse(rawUpdatedAt!);
+
   /// "2026-06-08 10:30" → "08/06 10:30" (the dd/MM HH:mm convention the
   /// other country services use for [Station.updatedAt]).
+  ///
+  /// **Display only** — the freshness gate reads [priceUpdatedAt].
   String? get formattedUpdatedAt {
     final raw = rawUpdatedAt;
     if (raw == null) return null;

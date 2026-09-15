@@ -116,10 +116,12 @@ void main() {
   /// The pinned (version, signature) pairs. A mismatch means the codec's
   /// shape drifted: bump CacheSchema.byPrefix AND update the pin here.
   const pins = <String, ({int version, String shape})>{
-    'search': (version: 1, shape: _stationListShape),
-    'station': (version: 1, shape: _stationListShape),
-    'dataset': (version: 1, shape: _stationListShape),
-    'detail': (version: 1, shape: _detailShape),
+    // #4189 — v2: `Station.priceUpdatedAt`, the machine-readable price
+    // stamp. Every prefix whose shape embeds a Station moved together.
+    'search': (version: 2, shape: _stationListShape),
+    'station': (version: 2, shape: _stationListShape),
+    'dataset': (version: 2, shape: _stationListShape),
+    'detail': (version: 2, shape: _detailShape),
     'prices': (version: 1, shape: _pricesShape),
     'geo': (version: 1, shape: _geoShape),
     'city': (version: 1, shape: _cityShape),
@@ -149,11 +151,11 @@ void main() {
 // Pinned structural signatures (see shapeOf). Nullable fields the
 // fixture leaves unset print as `null` — key ADDS/REMOVES/RENAMES are
 // the drift this pin exists to catch.
-const _stationListShape = '{stations:[{amenities:[],availableFuels:[],brand:str,cng:null,department:null,diesel:double,dieselPremium:null,dist:double,e10:double,e5:double,e85:null,e98:null,houseNumber:str,id:str,is24h:bool,isOpen:bool,lat:double,lng:double,lpg:null,name:str,openingHours:null,openingHoursText:null,place:str,postCode:str,region:null,services:[],stationType:null,street:str,unavailableFuels:[],updatedAt:str}]}';
+const _stationListShape = '{stations:[{amenities:[],availableFuels:[],brand:str,cng:null,department:null,diesel:double,dieselPremium:null,dist:double,e10:double,e5:double,e85:null,e98:null,houseNumber:str,id:str,is24h:bool,isOpen:bool,lat:double,lng:double,lpg:null,name:str,openingHours:null,openingHoursText:null,place:str,postCode:str,priceUpdatedAt:null,region:null,services:[],stationType:null,street:str,unavailableFuels:[],updatedAt:str}]}';
 const _detailShape =
     '{openingHours:{automate24h:bool,availability:str,days:[],'
     'rawSource:null},openingTimes:[{end:str,start:str,text:str}],'
-    'overrides:[str],state:str,station:{amenities:[],availableFuels:[],brand:str,cng:null,department:null,diesel:double,dieselPremium:null,dist:double,e10:double,e5:double,e85:null,e98:null,houseNumber:str,id:str,is24h:bool,isOpen:bool,lat:double,lng:double,lpg:null,name:str,openingHours:null,openingHoursText:null,place:str,postCode:str,region:null,services:[],stationType:null,street:str,unavailableFuels:[],updatedAt:str},wholeDay:bool}';
+    'overrides:[str],state:str,station:{amenities:[],availableFuels:[],brand:str,cng:null,department:null,diesel:double,dieselPremium:null,dist:double,e10:double,e5:double,e85:null,e98:null,houseNumber:str,id:str,is24h:bool,isOpen:bool,lat:double,lng:double,lpg:null,name:str,openingHours:null,openingHoursText:null,place:str,postCode:str,priceUpdatedAt:null,region:null,services:[],stationType:null,street:str,unavailableFuels:[],updatedAt:str},wholeDay:bool}';
 const _pricesShape =
     '{prices:{id-1:{cng:double,diesel:double,dieselPremium:double,'
     'e10:double,e5:double,e85:double,e98:double,lpg:double,'

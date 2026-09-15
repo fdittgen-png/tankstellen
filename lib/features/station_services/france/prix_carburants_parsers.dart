@@ -40,6 +40,12 @@ import '../../../core/country/country_time.dart';
 import '../../../core/utils/geo_utils.dart';
 import '../../../core/logging/error_logger.dart';
 import '../opening_hours/open_state_from_hours.dart';
+import 'prix_carburants_price_stamp.dart';
+
+/// #4189 — the price-stamp helpers moved to their own library (this one
+/// was at the 400-line cap). Re-exported so every existing import of
+/// this file keeps resolving them.
+export 'prix_carburants_price_stamp.dart';
 import 'france_opening_hours_adapter.dart';
 import '../../../core/utils/number_parsing.dart';
 
@@ -144,6 +150,7 @@ Station? parsePrixCarburantsStation(
           ? true
           : openStateFromHours(openingHours, now ?? nowInCountry('FR')),
       updatedAt: parsePrixCarburantsMostRecentUpdate(r),
+      priceUpdatedAt: parsePrixCarburantsUpdatedAt(r),
       is24h: automate24h,
       openingHoursText:
           parsePrixCarburantsOpeningHours(hoursInput['horaires_jour']),
@@ -161,32 +168,6 @@ Station? parsePrixCarburantsStation(
   } on FormatException catch (e, st) {
     unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Prix-Carburants station parse failed'}));
     return null;
-  }
-}
-
-/// Format the most recent `*_maj` ISO timestamp on a record as
-/// `dd/MM HH:mm`. Returns `null` when no timestamp fields are
-/// populated; falls back to a trimmed substring on malformed input.
-String? parsePrixCarburantsMostRecentUpdate(Map<String, dynamic> r) {
-  final dates = <String>[
-    r['gazole_maj']?.toString() ?? '',
-    r['sp95_maj']?.toString() ?? '',
-    r['e10_maj']?.toString() ?? '',
-    r['sp98_maj']?.toString() ?? '',
-    r['e85_maj']?.toString() ?? '',
-    r['gplc_maj']?.toString() ?? '',
-  ].where((d) => d.isNotEmpty).toList();
-  if (dates.isEmpty) return null;
-  dates.sort((a, b) => b.compareTo(a)); // Most recent first
-  // Format: "2026-03-23T00:01:00+00:00" → "23/03 00:01"
-  try {
-    final dt = DateTime.parse(dates.first);
-    return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-  } on FormatException catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Prix-Carburants date parse failed'}));
-    final raw = dates.first;
-    final cut = raw.length >= 16 ? raw.substring(0, 16) : raw;
-    return cut.replaceAll('T', ' ');
   }
 }
 

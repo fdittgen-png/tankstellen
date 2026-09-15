@@ -263,6 +263,7 @@ class PortugalStationService
         // unknown instead of the old hard-coded `true`.
         isOpen: null,
         updatedAt: row.formattedUpdatedAt,
+        priceUpdatedAt: row.priceUpdatedAt,
       ));
     }
 

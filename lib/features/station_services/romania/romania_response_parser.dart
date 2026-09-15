@@ -162,6 +162,8 @@ class MonitorulStationAccumulator {
       // unknown instead of the old hard-coded `true`.
       isOpen: null,
       updatedAt: updatedAt,
+      // #4189 — the gate reasons over this, not over the label.
+      priceUpdatedAt: DateTime.tryParse(updatedAt ?? ''),
     );
   }
 
