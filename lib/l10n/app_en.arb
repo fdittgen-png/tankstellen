@@ -3801,18 +3801,6 @@
   "@lessonAdviceLowGear": {
     "description": "How-to-improve advice for the low-gear lesson in the post-trip lessons registry (#2251). Embedded in the GPX recording export."
   },
-  "insightHighSpeedBand": "Sustained high speed ({pctTime}% of trip): wasted {liters} L",
-  "@insightHighSpeedBand": {
-    "description": "Post-trip lesson headline for the high-speed-band penalty (#2287) — time spent above ~110 km/h where aerodynamic drag dominates consumption. Placeholders are pre-formatted strings.",
-    "placeholders": {
-      "pctTime": {
-        "type": "String"
-      },
-      "liters": {
-        "type": "String"
-      }
-    }
-  },
   "insightHighSpeedBandNoFuel": "Sustained high speed ({pctTime}% of trip)",
   "@insightHighSpeedBandNoFuel": {
     "description": "High-speed-band lesson headline (#2287) for trips with no fuel-consumption figure (GPS-only / no fuel-rate PID) — same coaching without the wasted-litres clause.",
@@ -3969,6 +3957,81 @@
   "lessonTransportAdvice": "The engine reported no activity for almost the whole distance. Either the OBD2 stream failed mid-trip or the car was moved without driving — the consumption figure is unreliable and excluded from your statistics.",
   "@lessonTransportAdvice": {
     "description": "#3599 info lesson advice body"
+  },
+  "insightHighRpmShare": "Engine over 3000 RPM ({pctTime}% of trip)",
+  "@insightHighRpmShare": {
+    "description": "#4221 — evidence-first lesson headline: no litres (a modelled litre figure is never shown). Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      }
+    }
+  },
+  "insightHardAccelEvents": "{count} hard accelerations",
+  "@insightHardAccelEvents": {
+    "description": "#4221 — evidence-first lesson headline: no litres (a modelled litre figure is never shown). Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "insightIdlingLong": "Long idling with the engine running ({minutes} min)",
+  "@insightIdlingLong": {
+    "description": "#4221 — only unbroken stationary idles longer than a traffic-light cycle; short stops are traffic. No litres.",
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "insightFullThrottleShare": "Full throttle ({pctTime}% of trip)",
+  "@insightFullThrottleShare": {
+    "description": "#4221 — evidence-first lesson headline: no litres (a modelled litre figure is never shown). Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      }
+    }
+  },
+  "insightLambdaEnrichmentShare": "Rich mixture under load ({pctTime}% of trip)",
+  "@insightLambdaEnrichmentShare": {
+    "description": "#4221 — evidence-first lesson headline: no litres (a modelled litre figure is never shown). Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      }
+    }
+  },
+  "insightClimbingShare": "Climbing at {gradePercent}% grade ({pctTime}% of trip)",
+  "@insightClimbingShare": {
+    "description": "#4221 — evidence-first lesson headline: no litres (a modelled litre figure is never shown). Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "gradePercent": {
+        "type": "String"
+      },
+      "pctTime": {
+        "type": "String"
+      }
+    }
+  },
+  "insightRestartEvents": "{count} stop-and-go restarts",
+  "@insightRestartEvents": {
+    "description": "#4221 — evidence-first lesson headline: no litres (a modelled litre figure is never shown). Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "insightTrailingLitersApprox": "≈ +{liters} L",
+  "@insightTrailingLitersApprox": {
+    "description": "#4221 — lesson badge shown ONLY when the litres were integrated from a measured fuel rate; the ≈ marks it as an approximation.",
+    "placeholders": {
+      "liters": {
+        "type": "String"
+      }
+    }
   },
   "drivingScoreCardTitle": "Driving score",
   "@drivingScoreCardTitle": {
@@ -4189,6 +4252,15 @@
   "ecoNudgeHighRpm": "High revs at cruise — shifting up earlier saves fuel",
   "@ecoNudgeHighRpm": {
     "description": "Live in-trip nudge SnackBar (#3432) after sustained high-RPM steady-speed cruising. Rate-limited to at most one nudge per minute, three per trip."
+  },
+  "insightUpshiftCruiseShare": "High-RPM cruising ({pctTime}% of trip): shifting up earlier uses less fuel",
+  "@insightUpshiftCruiseShare": {
+    "description": "#4221 — evidence-first lesson headline: no litres (a modelled litre figure is never shown). Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      }
+    }
   },
   "obd2CoverageNoneNote": "No engine data arrived from the OBD2 adapter on this trip — fuel figures are GPS-based estimates.",
   "@obd2CoverageNoneNote": {

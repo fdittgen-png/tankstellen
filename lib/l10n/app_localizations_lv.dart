@@ -4540,11 +4540,6 @@ class AppLocalizationsLv extends AppLocalizations {
       'Pārslēdziet augstāku pārnesumu agrāk, lai dzinējs darbotos zemākos un ekonomiskākos apgriezienos.';
 
   @override
-  String insightHighSpeedBand(String pctTime, String liters) {
-    return 'Ilgstoši augsts ātrums ($pctTime% no brauciena): izšķērdēti $liters L';
-  }
-
-  @override
   String insightHighSpeedBandNoFuel(String pctTime) {
     return 'Ilgstoši augsts ātrums ($pctTime% no brauciena)';
   }
@@ -4648,6 +4643,46 @@ class AppLocalizationsLv extends AppLocalizations {
   @override
   String get lessonTransportAdvice =>
       'Dzinējs gandrīz visā attālumā neziņoja par aktivitāti. Vai nu OBD2 datu plūsma pārtrūka brauciena vidū, vai auto tika pārvietots, nebraucot — patēriņa rādījums ir neuzticams un izslēgts no jūsu statistikas.';
+
+  @override
+  String insightHighRpmShare(String pctTime) {
+    return 'Engine over 3000 RPM ($pctTime% of trip)';
+  }
+
+  @override
+  String insightHardAccelEvents(String count) {
+    return '$count hard accelerations';
+  }
+
+  @override
+  String insightIdlingLong(String minutes) {
+    return 'Long idling with the engine running ($minutes min)';
+  }
+
+  @override
+  String insightFullThrottleShare(String pctTime) {
+    return 'Full throttle ($pctTime% of trip)';
+  }
+
+  @override
+  String insightLambdaEnrichmentShare(String pctTime) {
+    return 'Rich mixture under load ($pctTime% of trip)';
+  }
+
+  @override
+  String insightClimbingShare(String gradePercent, String pctTime) {
+    return 'Climbing at $gradePercent% grade ($pctTime% of trip)';
+  }
+
+  @override
+  String insightRestartEvents(String count) {
+    return '$count stop-and-go restarts';
+  }
+
+  @override
+  String insightTrailingLitersApprox(String liters) {
+    return '≈ +$liters L';
+  }
 
   @override
   String get drivingScoreCardTitle => 'Braukšanas novērtējums';
@@ -4807,6 +4842,11 @@ class AppLocalizationsLv extends AppLocalizations {
   @override
   String get ecoNudgeHighRpm =>
       'Augsti apgriezieni vienmērīgā braukšanā — agrāka pārslēgšanās uz augstāku pārnesumu taupa degvielu';
+
+  @override
+  String insightUpshiftCruiseShare(String pctTime) {
+    return 'High-RPM cruising ($pctTime% of trip): shifting up earlier uses less fuel';
+  }
 
   @override
   String get obd2CoverageNoneNote =>

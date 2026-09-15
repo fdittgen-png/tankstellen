@@ -4523,11 +4523,6 @@ class AppLocalizationsCs extends AppLocalizations {
       'Řaďte nahoru dříve, aby se motor usadil v nižších, úspornějších otáčkách.';
 
   @override
-  String insightHighSpeedBand(String pctTime, String liters) {
-    return 'Trvale vysoká rychlost ($pctTime % jízdy): zbytečně $liters l';
-  }
-
-  @override
   String insightHighSpeedBandNoFuel(String pctTime) {
     return 'Trvale vysoká rychlost ($pctTime % jízdy)';
   }
@@ -4631,6 +4626,46 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get lessonTransportAdvice =>
       'Motor nehlásil téměř po celou vzdálenost žádnou aktivitu. Buď datový tok OBD2 v půli jízdy selhal, nebo bylo auto přemístěno bez jízdy — údaj o spotřebě je nespolehlivý a ze statistik je vyloučen.';
+
+  @override
+  String insightHighRpmShare(String pctTime) {
+    return 'Engine over 3000 RPM ($pctTime% of trip)';
+  }
+
+  @override
+  String insightHardAccelEvents(String count) {
+    return '$count hard accelerations';
+  }
+
+  @override
+  String insightIdlingLong(String minutes) {
+    return 'Long idling with the engine running ($minutes min)';
+  }
+
+  @override
+  String insightFullThrottleShare(String pctTime) {
+    return 'Full throttle ($pctTime% of trip)';
+  }
+
+  @override
+  String insightLambdaEnrichmentShare(String pctTime) {
+    return 'Rich mixture under load ($pctTime% of trip)';
+  }
+
+  @override
+  String insightClimbingShare(String gradePercent, String pctTime) {
+    return 'Climbing at $gradePercent% grade ($pctTime% of trip)';
+  }
+
+  @override
+  String insightRestartEvents(String count) {
+    return '$count stop-and-go restarts';
+  }
+
+  @override
+  String insightTrailingLitersApprox(String liters) {
+    return '≈ +$liters L';
+  }
 
   @override
   String get drivingScoreCardTitle => 'Skóre jízdy';
@@ -4790,6 +4825,11 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get ecoNudgeHighRpm =>
       'Vysoké otáčky při ustálené jízdě — dřívější přeřazení nahoru šetří palivo';
+
+  @override
+  String insightUpshiftCruiseShare(String pctTime) {
+    return 'High-RPM cruising ($pctTime% of trip): shifting up earlier uses less fuel';
+  }
 
   @override
   String get obd2CoverageNoneNote =>

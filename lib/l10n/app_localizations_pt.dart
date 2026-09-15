@@ -4546,11 +4546,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'Suba de mudança mais cedo para que o motor fique em rotações mais baixas e económicas.';
 
   @override
-  String insightHighSpeedBand(String pctTime, String liters) {
-    return 'Velocidade alta prolongada ($pctTime% da viagem): desperdiçados $liters L';
-  }
-
-  @override
   String insightHighSpeedBandNoFuel(String pctTime) {
     return 'Velocidade alta prolongada ($pctTime% da viagem)';
   }
@@ -4654,6 +4649,46 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get lessonTransportAdvice =>
       'O motor não reportou atividade em quase toda a distância. Ou o fluxo OBD2 falhou a meio da viagem, ou o carro foi deslocado sem ser conduzido — o valor de consumo não é fiável e fica excluído das suas estatísticas.';
+
+  @override
+  String insightHighRpmShare(String pctTime) {
+    return 'Engine over 3000 RPM ($pctTime% of trip)';
+  }
+
+  @override
+  String insightHardAccelEvents(String count) {
+    return '$count hard accelerations';
+  }
+
+  @override
+  String insightIdlingLong(String minutes) {
+    return 'Long idling with the engine running ($minutes min)';
+  }
+
+  @override
+  String insightFullThrottleShare(String pctTime) {
+    return 'Full throttle ($pctTime% of trip)';
+  }
+
+  @override
+  String insightLambdaEnrichmentShare(String pctTime) {
+    return 'Rich mixture under load ($pctTime% of trip)';
+  }
+
+  @override
+  String insightClimbingShare(String gradePercent, String pctTime) {
+    return 'Climbing at $gradePercent% grade ($pctTime% of trip)';
+  }
+
+  @override
+  String insightRestartEvents(String count) {
+    return '$count stop-and-go restarts';
+  }
+
+  @override
+  String insightTrailingLitersApprox(String liters) {
+    return '≈ +$liters L';
+  }
 
   @override
   String get drivingScoreCardTitle => 'Pontuação de condução';
@@ -4813,6 +4848,11 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get ecoNudgeHighRpm =>
       'Rotações altas em cruzeiro — subir de mudança mais cedo poupa combustível';
+
+  @override
+  String insightUpshiftCruiseShare(String pctTime) {
+    return 'High-RPM cruising ($pctTime% of trip): shifting up earlier uses less fuel';
+  }
 
   @override
   String get obd2CoverageNoneNote =>

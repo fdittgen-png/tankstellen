@@ -27,16 +27,15 @@ class HighRpmRule implements DrivingLessonRule {
     final insight = context.insightFor('insightHighRpm');
     if (insight == null) return null;
 
-    final liters = formatLessonLiters(insight.litersWasted);
     final pct = formatLessonPercent(insight.percentOfTrip);
     return DrivingLesson(
       id: id,
-      impact: insight.litersWasted,
-      metricValue: insight.litersWasted,
-      title: l.insightHighRpm(pct, liters),
+      impact: insight.percentOfTrip,
+      metricValue: (insight.metadata['highRpmSeconds'] ?? 0).toDouble(),
+      title: l.insightHighRpmShare(pct),
       advice: l.lessonAdviceHighRpm,
       subtitle: l.insightSubtitlePctOfTrip(pct),
-      trailing: l.insightTrailingLitersWasted(liters),
+      trailing: approxLitersTrailing(insight, l), // #4221
     );
   }
 }

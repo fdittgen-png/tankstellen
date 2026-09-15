@@ -43,17 +43,15 @@ class UpshiftCruiseRule implements DrivingLessonRule {
     final liters = attribution.highRpmCruiseLiters;
     if (liters < kUpshiftCruiseNoiseFloorLiters) return null;
 
-    final litersText = formatLessonLiters(liters);
-    final pct = formatLessonPercent(
-        attribution.percentOfTrip(FuelEventType.highRpmCruise));
+    final share = attribution.percentOfTrip(FuelEventType.highRpmCruise);
+    final pct = formatLessonPercent(share);
     return DrivingLesson(
       id: id,
-      impact: liters,
-      metricValue: liters,
-      title: l.insightUpshiftCruise(pct, litersText),
+      impact: share,
+      metricValue: share,
+      title: l.insightUpshiftCruiseShare(pct),
       advice: l.lessonAdviceUpshiftCruise,
       subtitle: l.insightSubtitlePctOfTrip(pct),
-      trailing: l.insightTrailingLitersWasted(litersText),
     );
   }
 }

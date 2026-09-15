@@ -11,7 +11,6 @@
   "lessonAdviceHighRpm": "Früher hochschalten, um den Motor aus dem hohen Drehzahlbereich zu halten.",
   "lessonAdviceHardAccel": "Sanfter Gas geben – gleichmäßiges Beschleunigen spart Sprit.",
   "lessonAdviceLowGear": "Früher hochschalten, damit der Motor in einem niedrigeren, effizienteren Gang läuft.",
-  "insightHighSpeedBand": "Anhaltend hohe Geschwindigkeit ({pctTime}% der Fahrt): {liters} L verschwendet",
   "insightHighSpeedBandNoFuel": "Anhaltend hohe Geschwindigkeit ({pctTime}% der Fahrt)",
   "lessonAdviceHighSpeedBand": "Über 110 km/h Gas wegnehmen – der Luftwiderstand steigt stark, schon etwas langsamer spart viel Sprit.",
   "lessonSmoothDrivingTitle": "Vorausschauend gefahren – gut gemacht!",
@@ -40,5 +39,13 @@
   "lessonTransportAdvice": "Der Motor meldete fast über die gesamte Strecke keine Aktivität. Entweder ist der OBD2-Datenstrom ausgefallen oder das Fahrzeug wurde ohne eigenen Antrieb bewegt — der Verbrauchswert ist unzuverlässig und fließt nicht in deine Statistiken ein.",
   "@lessonTransportAdvice": {
     "description": "#3599"
-  }
+  },
+  "insightHighRpmShare": "Motor über 3000 U/min ({pctTime}% der Fahrt)",
+  "insightHardAccelEvents": "{count} starke Beschleunigungen",
+  "insightIdlingLong": "Langer Leerlauf mit laufendem Motor ({minutes} Min.)",
+  "insightFullThrottleShare": "Vollgas ({pctTime}% der Fahrt)",
+  "insightLambdaEnrichmentShare": "Fettes Gemisch unter Last ({pctTime}% der Fahrt)",
+  "insightClimbingShare": "Steigung mit {gradePercent}% ({pctTime}% der Fahrt)",
+  "insightRestartEvents": "{count} Stop-and-go-Anfahrten",
+  "insightTrailingLitersApprox": "≈ +{liters} L"
 }

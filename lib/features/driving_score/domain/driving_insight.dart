@@ -37,11 +37,17 @@ class DrivingInsight {
   /// will pull values out by key.
   final Map<String, num> metadata;
 
+  /// #4221 — true only when [litersWasted] was integrated from a MEASURED
+  /// fuel rate. Otherwise the figure is a modelled guess and must never be
+  /// shown as a number.
+  final bool litersMeasured;
+
   const DrivingInsight({
     required this.labelKey,
     required this.litersWasted,
     required this.percentOfTrip,
     this.metadata = const {},
+    this.litersMeasured = false,
   });
 
   @override
@@ -51,6 +57,7 @@ class DrivingInsight {
         other.labelKey == labelKey &&
         other.litersWasted == litersWasted &&
         other.percentOfTrip == percentOfTrip &&
+        other.litersMeasured == litersMeasured &&
         _mapEquals(other.metadata, metadata);
   }
 
@@ -59,6 +66,7 @@ class DrivingInsight {
         labelKey,
         litersWasted,
         percentOfTrip,
+        litersMeasured,
         // Hash the sorted entries so two equal maps with different
         // insertion order still hash the same.
         Object.hashAllUnordered(
@@ -71,6 +79,7 @@ class DrivingInsight {
       'labelKey: $labelKey, '
       'litersWasted: ${litersWasted.toStringAsFixed(3)}, '
       'percentOfTrip: ${percentOfTrip.toStringAsFixed(1)}, '
+      'litersMeasured: $litersMeasured, '
       'metadata: $metadata)';
 
   static bool _mapEquals(Map<String, num> a, Map<String, num> b) {

@@ -4531,11 +4531,6 @@ class AppLocalizationsPl extends AppLocalizations {
       'Zmieniaj na wyższy bieg wcześniej, aby silnik pracował na niższych, oszczędniejszych obrotach.';
 
   @override
-  String insightHighSpeedBand(String pctTime, String liters) {
-    return 'Utrzymująca się wysoka prędkość ($pctTime% trasy): zmarnowano $liters L';
-  }
-
-  @override
   String insightHighSpeedBandNoFuel(String pctTime) {
     return 'Utrzymująca się wysoka prędkość ($pctTime% trasy)';
   }
@@ -4639,6 +4634,46 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get lessonTransportAdvice =>
       'Silnik nie zgłaszał aktywności przez niemal cały dystans. Albo strumień OBD2 urwał się w trakcie podróży, albo samochód przemieszczono bez jazdy — wartość spalania jest niewiarygodna i wykluczona ze statystyk.';
+
+  @override
+  String insightHighRpmShare(String pctTime) {
+    return 'Engine over 3000 RPM ($pctTime% of trip)';
+  }
+
+  @override
+  String insightHardAccelEvents(String count) {
+    return '$count hard accelerations';
+  }
+
+  @override
+  String insightIdlingLong(String minutes) {
+    return 'Long idling with the engine running ($minutes min)';
+  }
+
+  @override
+  String insightFullThrottleShare(String pctTime) {
+    return 'Full throttle ($pctTime% of trip)';
+  }
+
+  @override
+  String insightLambdaEnrichmentShare(String pctTime) {
+    return 'Rich mixture under load ($pctTime% of trip)';
+  }
+
+  @override
+  String insightClimbingShare(String gradePercent, String pctTime) {
+    return 'Climbing at $gradePercent% grade ($pctTime% of trip)';
+  }
+
+  @override
+  String insightRestartEvents(String count) {
+    return '$count stop-and-go restarts';
+  }
+
+  @override
+  String insightTrailingLitersApprox(String liters) {
+    return '≈ +$liters L';
+  }
 
   @override
   String get drivingScoreCardTitle => 'Wynik jazdy';
@@ -4798,6 +4833,11 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get ecoNudgeHighRpm =>
       'Wysokie obroty przy stałej prędkości — wcześniejsza zmiana biegu oszczędza paliwo';
+
+  @override
+  String insightUpshiftCruiseShare(String pctTime) {
+    return 'High-RPM cruising ($pctTime% of trip): shifting up earlier uses less fuel';
+  }
 
   @override
   String get obd2CoverageNoneNote =>

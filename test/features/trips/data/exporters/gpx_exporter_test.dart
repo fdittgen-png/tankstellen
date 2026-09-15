@@ -297,7 +297,7 @@ void main() {
       expect(idling.getAttribute('impact'), isNotNull);
       // Per-lesson localized title + advice message.
       final title = idling.findElements('tankstellen:title').single.innerText;
-      expect(title, contains('Idling'));
+      expect(title, contains('Long idling')); // #4221
       final message =
           idling.findElements('tankstellen:message').single.innerText;
       expect(message, isNotEmpty);

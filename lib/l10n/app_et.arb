@@ -1608,7 +1608,6 @@
   "tripRecordingAutoPinTitle": "Salvestuse alustamisel alati kinnita",
   "tripRecordingAutoPinSubtitle": "Kinnita vorm igal sõidul automaatselt, selle asemel et iga kord puudutada. Kasutab rohkem akut.",
   "tripRecordingConnectingTitle": "Salvestuse alustamine…",
-  "insightHighSpeedBand": "Püsiv suur kiirus ({pctTime}% sõidust): raisatud {liters} L",
   "insightHighSpeedBandNoFuel": "Püsiv suur kiirus ({pctTime}% sõidust)",
   "lessonAdviceHighSpeedBand": "Üle 110 km/h võta gaasi maha – õhutakistus kasvab järsult, veidi aeglasemalt säästab palju kütust.",
   "lessonSmoothDrivingTitle": "Sujuv sõit – tubli töö!",
@@ -7559,5 +7558,98 @@
   "@criteriaRadiusCustom": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "insightHighRpmShare": "Engine over 3000 RPM ({pctTime}% of trip)",
+  "@insightHighRpmShare": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      }
+    }
+  },
+  "insightHardAccelEvents": "{count} hard accelerations",
+  "@insightHardAccelEvents": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "insightIdlingLong": "Long idling with the engine running ({minutes} min)",
+  "@insightIdlingLong": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "insightFullThrottleShare": "Full throttle ({pctTime}% of trip)",
+  "@insightFullThrottleShare": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      }
+    }
+  },
+  "insightLambdaEnrichmentShare": "Rich mixture under load ({pctTime}% of trip)",
+  "@insightLambdaEnrichmentShare": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      }
+    }
+  },
+  "insightClimbingShare": "Climbing at {gradePercent}% grade ({pctTime}% of trip)",
+  "@insightClimbingShare": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "gradePercent": {
+        "type": "String"
+      },
+      "pctTime": {
+        "type": "String"
+      }
+    }
+  },
+  "insightRestartEvents": "{count} stop-and-go restarts",
+  "@insightRestartEvents": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "insightTrailingLitersApprox": "≈ +{liters} L",
+  "@insightTrailingLitersApprox": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "insightUpshiftCruiseShare": "High-RPM cruising ({pctTime}% of trip): shifting up earlier uses less fuel",
+  "@insightUpshiftCruiseShare": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -1916,7 +1916,6 @@
   "lessonAdviceHighRpm": "Früher hochschalten, um den Motor aus dem hohen Drehzahlbereich zu halten.",
   "lessonAdviceHardAccel": "Sanfter Gas geben – gleichmäßiges Beschleunigen spart Sprit.",
   "lessonAdviceLowGear": "Früher hochschalten, damit der Motor in einem niedrigeren, effizienteren Gang läuft.",
-  "insightHighSpeedBand": "Anhaltend hohe Geschwindigkeit ({pctTime}% der Fahrt): {liters} L verschwendet",
   "insightHighSpeedBandNoFuel": "Anhaltend hohe Geschwindigkeit ({pctTime}% der Fahrt)",
   "lessonAdviceHighSpeedBand": "Über 110 km/h Gas wegnehmen – der Luftwiderstand steigt stark, schon etwas langsamer spart viel Sprit.",
   "lessonSmoothDrivingTitle": "Vorausschauend gefahren – gut gemacht!",
@@ -1946,6 +1945,14 @@
   "@lessonTransportAdvice": {
     "description": "#3599"
   },
+  "insightHighRpmShare": "Motor über 3000 U/min ({pctTime}% der Fahrt)",
+  "insightHardAccelEvents": "{count} starke Beschleunigungen",
+  "insightIdlingLong": "Langer Leerlauf mit laufendem Motor ({minutes} Min.)",
+  "insightFullThrottleShare": "Vollgas ({pctTime}% der Fahrt)",
+  "insightLambdaEnrichmentShare": "Fettes Gemisch unter Last ({pctTime}% der Fahrt)",
+  "insightClimbingShare": "Steigung mit {gradePercent}% ({pctTime}% der Fahrt)",
+  "insightRestartEvents": "{count} Stop-and-go-Anfahrten",
+  "insightTrailingLitersApprox": "≈ +{liters} L",
   "drivingScoreCardTitle": "Fahrnote",
   "drivingScoreCardOutOf": "/100",
   "drivingScoreCardSubtitle": "Gesamtnote aus Leerlauf, starken Beschleunigungen, hartem Bremsen und Zeit über 3000 U/min. Ein Vergleich „besser als X% deiner bisherigen Fahrten“ folgt in einem späteren Release.",
@@ -2081,6 +2088,7 @@
   "@ecoNudgeHighRpm": {
     "description": "Live in-trip nudge SnackBar (#3432) after sustained high-RPM steady-speed cruising. Rate-limited to at most one nudge per minute, three per trip."
   },
+  "insightUpshiftCruiseShare": "Hochtouriges Fahren ({pctTime}% der Fahrt): früheres Hochschalten spart Kraftstoff",
   "obd2CoverageNoneNote": "Auf dieser Fahrt kamen keine Motordaten vom OBD2-Adapter an — die Kraftstoffwerte sind GPS-basierte Schätzungen.",
   "obd2CoverageDroppedNote": "Die Motordaten endeten bei {percent} % der Fahrt (Verbindung abgerissen) — spätere Kraftstoffwerte sind GPS-basierte Schätzungen.",
   "obd2CoveragePartialNote": "Motordaten deckten nur {percent} % dieser Fahrt ab — Lücken nutzen GPS-basierte Schätzungen.",

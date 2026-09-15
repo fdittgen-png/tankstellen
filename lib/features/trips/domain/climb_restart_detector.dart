@@ -52,11 +52,15 @@ const double _wastedLitersPerRestart = 0.04;
 class ClimbCostResult {
   const ClimbCostResult({
     required this.climbingLiters,
+    this.measured = false,
     required this.climbSeconds,
     required this.peakGradePercent,
   });
 
   final double climbingLiters;
+
+  /// #4221 — every climbing interval carried a measured fuel rate.
+  final bool measured;
   final double climbSeconds;
   final double peakGradePercent;
 
@@ -89,6 +93,7 @@ ClimbCostResult detectClimbCost(List<TripSample> sortedSamples) {
   var climbingLiters = 0.0;
   var climbSeconds = 0.0;
   var peakGradePercent = 0.0;
+  var climbMeasured = true;
 
   for (var i = 1; i < sortedSamples.length; i++) {
     final prev = sortedSamples[i - 1];
@@ -118,6 +123,7 @@ ClimbCostResult detectClimbCost(List<TripSample> sortedSamples) {
     final rate = (measuredRate != null && measuredRate > 0)
         ? measuredRate
         : _climbFallbackLPerHour;
+    if (rate != measuredRate) climbMeasured = false;
     climbingLiters += rate * (1 - _climbCounterfactualRatio) * dt / 3600.0;
   }
 
@@ -125,6 +131,7 @@ ClimbCostResult detectClimbCost(List<TripSample> sortedSamples) {
     climbingLiters: climbingLiters,
     climbSeconds: climbSeconds,
     peakGradePercent: peakGradePercent,
+    measured: climbSeconds > 0 && climbMeasured,
   );
 }
 

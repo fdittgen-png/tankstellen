@@ -4547,11 +4547,6 @@ class AppLocalizationsRo extends AppLocalizations {
       'Schimbați mai devreme într-o treaptă superioară pentru ca motorul să funcționeze la turații mai mici și mai economice.';
 
   @override
-  String insightHighSpeedBand(String pctTime, String liters) {
-    return 'Viteză mare susținută ($pctTime% din traseu): risipiți $liters L';
-  }
-
-  @override
   String insightHighSpeedBandNoFuel(String pctTime) {
     return 'Viteză mare susținută ($pctTime% din traseu)';
   }
@@ -4655,6 +4650,46 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get lessonTransportAdvice =>
       'Motorul nu a raportat activitate pe aproape toată distanța. Fie fluxul OBD2 a cedat în timpul călătoriei, fie mașina a fost mutată fără a fi condusă — valoarea consumului este nesigură și exclusă din statisticile tale.';
+
+  @override
+  String insightHighRpmShare(String pctTime) {
+    return 'Engine over 3000 RPM ($pctTime% of trip)';
+  }
+
+  @override
+  String insightHardAccelEvents(String count) {
+    return '$count hard accelerations';
+  }
+
+  @override
+  String insightIdlingLong(String minutes) {
+    return 'Long idling with the engine running ($minutes min)';
+  }
+
+  @override
+  String insightFullThrottleShare(String pctTime) {
+    return 'Full throttle ($pctTime% of trip)';
+  }
+
+  @override
+  String insightLambdaEnrichmentShare(String pctTime) {
+    return 'Rich mixture under load ($pctTime% of trip)';
+  }
+
+  @override
+  String insightClimbingShare(String gradePercent, String pctTime) {
+    return 'Climbing at $gradePercent% grade ($pctTime% of trip)';
+  }
+
+  @override
+  String insightRestartEvents(String count) {
+    return '$count stop-and-go restarts';
+  }
+
+  @override
+  String insightTrailingLitersApprox(String liters) {
+    return '≈ +$liters L';
+  }
 
   @override
   String get drivingScoreCardTitle => 'Scor de condus';
@@ -4814,6 +4849,11 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get ecoNudgeHighRpm =>
       'Turații mari în mers constant — schimbarea mai devreme într-o treaptă superioară economisește combustibil';
+
+  @override
+  String insightUpshiftCruiseShare(String pctTime) {
+    return 'High-RPM cruising ($pctTime% of trip): shifting up earlier uses less fuel';
+  }
 
   @override
   String get obd2CoverageNoneNote =>

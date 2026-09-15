@@ -87,17 +87,18 @@ void main() {
     const rule = HighSpeedBandRule();
 
     test('fires on a sustained-high-speed trip with a fuel figure and '
-        'estimates wasted litres', () {
+        'states the time share — no modelled litres (#4221)', () {
       final lesson = rule.evaluate(
         ctx(summary(fuelLitersConsumed: 5.0), highSpeedSamples()),
         l,
       );
       expect(lesson, isNotNull);
       expect(lesson!.id, highSpeedBandLessonId);
-      // share≈1.0 × 5 L × 0.20 drag factor = ~1.0 L wasted.
-      expect(lesson.metricValue, closeTo(1.0, 1e-6));
-      expect(lesson.impact, closeTo(1.0, 1e-6));
-      expect(lesson.trailing, isNotNull);
+      expect(lesson.metricValue, closeTo(1.0, 1e-6), reason: 'the share');
+      expect(lesson.impact, closeTo(100.0, 1e-4));
+      expect(lesson.trailing, isNull,
+          reason: 'a fixed drag factor × trip fuel is a model, not a '
+              'measurement');
       expect(lesson.advice, isNotEmpty);
     });
 
@@ -118,8 +119,7 @@ void main() {
       expect(lesson, isNotNull);
       expect(lesson!.trailing, isNull,
           reason: 'no fuel figure → no wasted-litres badge');
-      // Impact is the time-share (~1.0) rather than litres.
-      expect(lesson.impact, closeTo(1.0, 1e-9));
+      expect(lesson.impact, closeTo(100.0, 1e-6));
     });
   });
 

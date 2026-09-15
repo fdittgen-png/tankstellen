@@ -27,16 +27,15 @@ class FullThrottleRule implements DrivingLessonRule {
     final insight = context.insightFor('insightFullThrottle');
     if (insight == null) return null;
 
-    final liters = formatLessonLiters(insight.litersWasted);
     final pct = formatLessonPercent(insight.percentOfTrip);
     return DrivingLesson(
       id: id,
-      impact: insight.litersWasted,
-      metricValue: insight.litersWasted,
-      title: l.insightFullThrottle(pct, liters),
+      impact: insight.percentOfTrip,
+      metricValue: (insight.metadata['fullThrottleSeconds'] ?? 0).toDouble(),
+      title: l.insightFullThrottleShare(pct),
       advice: l.lessonAdviceFullThrottle,
       subtitle: l.insightSubtitlePctOfTrip(pct),
-      trailing: l.insightTrailingLitersWasted(liters),
+      trailing: approxLitersTrailing(insight, l), // #4221
     );
   }
 }

@@ -215,9 +215,9 @@ void main() {
       expect(lessons.map((e) => e.id), contains(idlingLessonId));
     });
 
-    test('cost lines are ranked by litres wasted descending', () {
-      // High-RPM (~1.6 L over the trip) dominates idling (~0.2 L). A
-      // trip carrying both must order high-RPM before idling.
+    test('cost lines are ranked by evidence share descending (#4221)', () {
+      // High-RPM for 1500 s (62.5 % of the trip) outranks 900 s of idling
+      // (37.5 %).
       final reg = DrivingLessonRegistry.standard();
       final samples = <TripSample>[
         TripSample(
@@ -228,7 +228,7 @@ void main() {
             rpm: 4000,
             fuelRateLPerHour: 12),
         TripSample(
-            timestamp: start.add(const Duration(seconds: 1200)),
+            timestamp: start.add(const Duration(seconds: 1500)),
             speedKmh: 0,
             rpm: 800),
         TripSample(
@@ -295,9 +295,11 @@ void main() {
       final lessons = reg.evaluate(summary(), idleSamples(), l);
       final idling = lessons.firstWhere((e) => e.id == idlingLessonId);
       // 20 min idle at 0.6 L/h ≈ 0.2 L, 100 % of the trip.
-      expect(idling.title, 'Idling (100% of trip): wasted 0.2 L');
+      // #4221 — evidence first; 20 min of idle with no fuel rate carries no
+      // litre figure at all.
+      expect(idling.title, 'Long idling with the engine running (20 min)');
       expect(idling.subtitle, '100% of trip');
-      expect(idling.trailing, '+0.2 L');
+      expect(idling.trailing, isNull);
       expect(idling.advice, isNotEmpty);
     });
 
@@ -306,8 +308,9 @@ void main() {
       final lessons = reg.evaluate(summary(), hardAccelSamples(), l);
       final hardAccel = lessons.firstWhere((e) => e.id == hardAccelLessonId);
       // 5 events × 0.05 L = 0.25 L → one-decimal "0.3" (rounds up).
-      expect(hardAccel.title, '5 hard accelerations: wasted 0.3 L');
-      expect(hardAccel.trailing, '+0.3 L');
+      // #4221 — the 0.05 L-per-event constant is never rendered.
+      expect(hardAccel.title, '5 hard accelerations');
+      expect(hardAccel.trailing, isNull);
     });
 
     test('hard-accel lesson sources its count from the IMU-preferred figure '

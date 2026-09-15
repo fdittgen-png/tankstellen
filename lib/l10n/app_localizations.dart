@@ -7845,12 +7845,6 @@ abstract class AppLocalizations {
   /// **'Shift up sooner so the engine settles into a lower, more efficient gear.'**
   String get lessonAdviceLowGear;
 
-  /// Post-trip lesson headline for the high-speed-band penalty (#2287) — time spent above ~110 km/h where aerodynamic drag dominates consumption. Placeholders are pre-formatted strings.
-  ///
-  /// In en, this message translates to:
-  /// **'Sustained high speed ({pctTime}% of trip): wasted {liters} L'**
-  String insightHighSpeedBand(String pctTime, String liters);
-
   /// High-speed-band lesson headline (#2287) for trips with no fuel-consumption figure (GPS-only / no fuel-rate PID) — same coaching without the wasted-litres clause.
   ///
   /// In en, this message translates to:
@@ -7992,6 +7986,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The engine reported no activity for almost the whole distance. Either the OBD2 stream failed mid-trip or the car was moved without driving — the consumption figure is unreliable and excluded from your statistics.'**
   String get lessonTransportAdvice;
+
+  /// #4221 — evidence-first lesson headline: no litres (a modelled litre figure is never shown). Placeholders are pre-formatted strings.
+  ///
+  /// In en, this message translates to:
+  /// **'Engine over 3000 RPM ({pctTime}% of trip)'**
+  String insightHighRpmShare(String pctTime);
+
+  /// #4221 — evidence-first lesson headline: no litres (a modelled litre figure is never shown). Placeholders are pre-formatted strings.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} hard accelerations'**
+  String insightHardAccelEvents(String count);
+
+  /// #4221 — only unbroken stationary idles longer than a traffic-light cycle; short stops are traffic. No litres.
+  ///
+  /// In en, this message translates to:
+  /// **'Long idling with the engine running ({minutes} min)'**
+  String insightIdlingLong(String minutes);
+
+  /// #4221 — evidence-first lesson headline: no litres (a modelled litre figure is never shown). Placeholders are pre-formatted strings.
+  ///
+  /// In en, this message translates to:
+  /// **'Full throttle ({pctTime}% of trip)'**
+  String insightFullThrottleShare(String pctTime);
+
+  /// #4221 — evidence-first lesson headline: no litres (a modelled litre figure is never shown). Placeholders are pre-formatted strings.
+  ///
+  /// In en, this message translates to:
+  /// **'Rich mixture under load ({pctTime}% of trip)'**
+  String insightLambdaEnrichmentShare(String pctTime);
+
+  /// #4221 — evidence-first lesson headline: no litres (a modelled litre figure is never shown). Placeholders are pre-formatted strings.
+  ///
+  /// In en, this message translates to:
+  /// **'Climbing at {gradePercent}% grade ({pctTime}% of trip)'**
+  String insightClimbingShare(String gradePercent, String pctTime);
+
+  /// #4221 — evidence-first lesson headline: no litres (a modelled litre figure is never shown). Placeholders are pre-formatted strings.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} stop-and-go restarts'**
+  String insightRestartEvents(String count);
+
+  /// #4221 — lesson badge shown ONLY when the litres were integrated from a measured fuel rate; the ≈ marks it as an approximation.
+  ///
+  /// In en, this message translates to:
+  /// **'≈ +{liters} L'**
+  String insightTrailingLitersApprox(String liters);
 
   /// Title of the composite driving-score card on the Trip detail screen — sits at the top of the Insights group above the cost-line card (#1041 phase 5a Card A).
   ///
@@ -8268,6 +8310,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'High revs at cruise — shifting up earlier saves fuel'**
   String get ecoNudgeHighRpm;
+
+  /// #4221 — evidence-first lesson headline: no litres (a modelled litre figure is never shown). Placeholders are pre-formatted strings.
+  ///
+  /// In en, this message translates to:
+  /// **'High-RPM cruising ({pctTime}% of trip): shifting up earlier uses less fuel'**
+  String insightUpshiftCruiseShare(String pctTime);
 
   /// Trip-detail note (#3499, epic #3498) shown on a gpsPlusObd2 trip whose samples carried ZERO engine PIDs: the adapter session never delivered engine data (drop at start, silent ECU, no supported PIDs), so the fuel chart/figures silently fell back to the GPS-physics estimate. This makes that fallback honest instead of unexplained.
   ///

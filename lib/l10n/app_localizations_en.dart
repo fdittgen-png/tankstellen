@@ -4495,11 +4495,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Shift up sooner so the engine settles into a lower, more efficient gear.';
 
   @override
-  String insightHighSpeedBand(String pctTime, String liters) {
-    return 'Sustained high speed ($pctTime% of trip): wasted $liters L';
-  }
-
-  @override
   String insightHighSpeedBandNoFuel(String pctTime) {
     return 'Sustained high speed ($pctTime% of trip)';
   }
@@ -4603,6 +4598,46 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get lessonTransportAdvice =>
       'The engine reported no activity for almost the whole distance. Either the OBD2 stream failed mid-trip or the car was moved without driving — the consumption figure is unreliable and excluded from your statistics.';
+
+  @override
+  String insightHighRpmShare(String pctTime) {
+    return 'Engine over 3000 RPM ($pctTime% of trip)';
+  }
+
+  @override
+  String insightHardAccelEvents(String count) {
+    return '$count hard accelerations';
+  }
+
+  @override
+  String insightIdlingLong(String minutes) {
+    return 'Long idling with the engine running ($minutes min)';
+  }
+
+  @override
+  String insightFullThrottleShare(String pctTime) {
+    return 'Full throttle ($pctTime% of trip)';
+  }
+
+  @override
+  String insightLambdaEnrichmentShare(String pctTime) {
+    return 'Rich mixture under load ($pctTime% of trip)';
+  }
+
+  @override
+  String insightClimbingShare(String gradePercent, String pctTime) {
+    return 'Climbing at $gradePercent% grade ($pctTime% of trip)';
+  }
+
+  @override
+  String insightRestartEvents(String count) {
+    return '$count stop-and-go restarts';
+  }
+
+  @override
+  String insightTrailingLitersApprox(String liters) {
+    return '≈ +$liters L';
+  }
 
   @override
   String get drivingScoreCardTitle => 'Driving score';
@@ -4761,6 +4796,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get ecoNudgeHighRpm =>
       'High revs at cruise — shifting up earlier saves fuel';
+
+  @override
+  String insightUpshiftCruiseShare(String pctTime) {
+    return 'High-RPM cruising ($pctTime% of trip): shifting up earlier uses less fuel';
+  }
 
   @override
   String get obd2CoverageNoneNote =>
@@ -14182,11 +14222,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Šĥîƒŧ úƥ šóóñéř šó ŧĥé éñǧîñé šéŧŧłéš îñŧó á łóŵéř, ɱóřé éƒƒîçîéñŧ ǧéář. ··························⟧';
 
   @override
-  String insightHighSpeedBand(String pctTime, String liters) {
-    return '⟦Šúšŧáîñéđ ĥîǧĥ šƥééđ ($pctTime% óƒ ŧřîƥ): ŵášŧéđ $liters Ł ··············⟧';
-  }
-
-  @override
   String insightHighSpeedBandNoFuel(String pctTime) {
     return '⟦Šúšŧáîñéđ ĥîǧĥ šƥééđ ($pctTime% óƒ ŧřîƥ) ···········⟧';
   }
@@ -14291,6 +14326,46 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get lessonTransportAdvice =>
       '⟦Ŧĥé éñǧîñé řéƥóřŧéđ ñó áçŧîṽîŧý ƒóř áłɱóšŧ ŧĥé ŵĥółé đîšŧáñçé. Éîŧĥéř ŧĥé ÓƁĐ2 šŧřéáɱ ƒáîłéđ ɱîđ-ŧřîƥ óř ŧĥé çář ŵáš ɱóṽéđ ŵîŧĥóúŧ đřîṽîñǧ — ŧĥé çóñšúɱƥŧîóñ ƒîǧúřé îš úñřéłîáƀłé áñđ éẋçłúđéđ ƒřóɱ ýóúř šŧáŧîšŧîçš. ··············································································⟧';
+
+  @override
+  String insightHighRpmShare(String pctTime) {
+    return '⟦Éñǧîñé óṽéř 3000 ŘƤṀ ($pctTime% óƒ ŧřîƥ) ·········⟧';
+  }
+
+  @override
+  String insightHardAccelEvents(String count) {
+    return '⟦$count ĥářđ áççéłéřáŧîóñš ········⟧';
+  }
+
+  @override
+  String insightIdlingLong(String minutes) {
+    return '⟦Łóñǧ îđłîñǧ ŵîŧĥ ŧĥé éñǧîñé řúññîñǧ ($minutes ɱîñ) ···············⟧';
+  }
+
+  @override
+  String insightFullThrottleShare(String pctTime) {
+    return '⟦Ƒúłł ŧĥřóŧŧłé ($pctTime% óƒ ŧřîƥ) ········⟧';
+  }
+
+  @override
+  String insightLambdaEnrichmentShare(String pctTime) {
+    return '⟦Řîçĥ ɱîẋŧúřé úñđéř łóáđ ($pctTime% óƒ ŧřîƥ) ············⟧';
+  }
+
+  @override
+  String insightClimbingShare(String gradePercent, String pctTime) {
+    return '⟦Çłîɱƀîñǧ áŧ $gradePercent% ǧřáđé ($pctTime% óƒ ŧřîƥ) ·········⟧';
+  }
+
+  @override
+  String insightRestartEvents(String count) {
+    return '⟦$count šŧóƥ-áñđ-ǧó řéšŧářŧš ········⟧';
+  }
+
+  @override
+  String insightTrailingLitersApprox(String liters) {
+    return '⟦≈ +$liters Ł⟧';
+  }
 
   @override
   String get drivingScoreCardTitle => '⟦Đřîṽîñǧ šçóřé ·····⟧';
@@ -14451,6 +14526,11 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get ecoNudgeHighRpm =>
       '⟦Ĥîǧĥ řéṽš áŧ çřúîšé — šĥîƒŧîñǧ úƥ éářłîéř šáṽéš ƒúéł ···················⟧';
+
+  @override
+  String insightUpshiftCruiseShare(String pctTime) {
+    return '⟦Ĥîǧĥ-ŘƤṀ çřúîšîñǧ ($pctTime% óƒ ŧřîƥ): šĥîƒŧîñǧ úƥ éářłîéř úšéš łéšš ƒúéł ·······················⟧';
+  }
 
   @override
   String get obd2CoverageNoneNote =>

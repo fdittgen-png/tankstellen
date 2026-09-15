@@ -29,16 +29,17 @@ class IdlingRule implements DrivingLessonRule {
     final insight = context.insightFor('insightIdling');
     if (insight == null) return null;
 
-    final liters = formatLessonLiters(insight.litersWasted);
+    final idleSeconds = (insight.metadata['idleSeconds'] ?? 0).toDouble();
+    final minutes = '${(idleSeconds / 60).round() < 1 ? 1 : (idleSeconds / 60).round()}';
     final pct = formatLessonPercent(insight.percentOfTrip);
     return DrivingLesson(
       id: id,
-      impact: insight.litersWasted,
-      metricValue: insight.litersWasted,
-      title: l.insightIdling(pct, liters),
+      impact: insight.percentOfTrip,
+      metricValue: idleSeconds,
+      title: l.insightIdlingLong(minutes),
       advice: l.lessonAdviceIdling,
       subtitle: l.insightSubtitlePctOfTrip(pct),
-      trailing: l.insightTrailingLitersWasted(liters),
+      trailing: approxLitersTrailing(insight, l), // #4221
     );
   }
 }
