@@ -121,13 +121,24 @@ Opportunity opportunityFromRadiusMatch({
 /// drive, and the velocity detector knows neither. [Opportunity
 /// .isPriceable] is false, and `OpportunityScorer` will therefore never
 /// rank it on money it does not have.
+///
+/// [referencePrice] is OPTIONAL, and in practice null (#4183). A
+/// [VelocityAlertEvent] carries `affectedStationIds` and the LARGEST
+/// drop across them — it does not say which station that was, nor what
+/// that station charged before. So there is no (current, earlier) pair
+/// that belongs to one station, and composing one from the cheapest
+/// current price plus the biggest drop would state a per-litre delta
+/// that is true of no station at all. `Opportunity.referencePrice`
+/// already allows null for exactly this — "the comparison is
+/// categorical rather than numeric" — and `OpportunityReasons.of` then
+/// omits the below-reference line instead of rendering a fabricated one.
 Opportunity opportunityFromVelocityEvent({
   required VelocityAlertEvent event,
   required DataValue<Duration> priceAge,
   required DataConfidence confidence,
   required DateTime now,
-  required double referencePrice,
   required double currentPrice,
+  double? referencePrice,
   double distanceKm = 0,
 }) =>
     Opportunity(

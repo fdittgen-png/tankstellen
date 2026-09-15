@@ -13,7 +13,6 @@ import '../../alerts/data/repositories/alert_repository.dart';
 import '../../alerts/data/velocity_alert_cooldown.dart';
 import '../../alerts/data/velocity_alert_runner.dart';
 import '../../alerts/domain/radius_alert_evaluator.dart';
-import '../../alerts/domain/opportunity.dart';
 import '../../alerts/domain/opportunity_detectors.dart';
 import '../../../core/services/provider_capability.dart';
 import '../../../core/domain/search_params.dart';
@@ -232,10 +231,14 @@ class BackgroundScanRunners {
       debugPrint('BackgroundScanRunners: velocity movement '
           '${event.fuelType.apiValue}, count=${event.stationCount}');
 
-      // An area-wide movement, not a station: no id, no money, and the
-      // cheapest observation stands for "what it costs now". The
-      // reference is what the detector actually compared against — the
-      // same stations, a lookback ago — which is `maxDropCents` above it.
+      // An area-wide movement, not a station: no id, no money, and no
+      // NUMERIC reference. The event names the affected stations and the
+      // largest drop among them, not which station that was nor what it
+      // charged before — so a (current, earlier) pair composed from the
+      // cheapest price plus the biggest drop would describe no station
+      // at all. The cheapest current observation is a real, checkable
+      // number and the one a driver would act on; the comparison stays
+      // categorical (`OpportunityReference.priceEarlier`, no figure).
       final cheapest = observations
           .map((o) => o.pricePerLiter)
           .reduce((a, b) => a < b ? a : b);
@@ -249,7 +252,6 @@ class BackgroundScanRunners {
             priceAge: priceAgeForScannedRow(capability),
             confidence: capability?.confidence ?? DataConfidence.none,
             now: now,
-            referencePrice: cheapest + event.maxDropCents / 100,
             currentPrice: cheapest,
           ),
         ],
@@ -345,31 +347,39 @@ class BackgroundScanRunners {
       // opportunity per station instead would put five candidates in
       // front of a budget that can only send one, and the winner would
       // then be rendered as a single station.
-      final found = <Opportunity>[];
-      for (final event in fired) {
-        final cheapest = event.matches.isEmpty
-            ? null
-            : event.matches
-                .reduce((a, b) => a.pricePerLiter <= b.pricePerLiter ? a : b);
-        if (cheapest == null) continue;
+      // Paired by INDEX inside one loop rather than by two lists of the
+      // same length afterwards: a grouped event with no matches would
+      // shorten `found` and silently de-pair every candidate's copy.
+      // Here a skipped event skips its own capture and nothing else.
+      final found = <OpportunityCandidate>[];
+      for (var i = 0; i < fired.length; i++) {
+        final event = fired[i];
+        if (event.matches.isEmpty) continue;
+        final cheapest = event.matches
+            .reduce((a, b) => a.pricePerLiter <= b.pricePerLiter ? a : b);
         final country = CountryServiceRegistry.countryForLatLng(
             event.alert.centerLat, event.alert.centerLng);
         final capability = country == null
             ? null
             : CountryServiceRegistry.capabilityFor(country);
-        found.add(opportunityFromRadiusMatch(
-          alert: event.alert,
-          sample: cheapest,
-          // The runner reports matches within the alert's radius; the
-          // per-match distance is not on the sample, and inventing one
-          // would reach the budget's ordering.
-          distanceKm: 0,
-          priceAge: priceAgeForScannedRow(capability),
-          confidence: capability?.confidence ?? DataConfidence.none,
-          now: now,
+        found.add(OpportunityCandidate(
+          opportunityFromRadiusMatch(
+            alert: event.alert,
+            sample: cheapest,
+            // The runner reports matches within the alert's radius; the
+            // per-match distance is not on the sample, and inventing one
+            // would reach the budget's ordering.
+            distanceKm: 0,
+            priceAge: priceAgeForScannedRow(capability),
+            confidence: capability?.confidence ?? DataConfidence.none,
+            now: now,
+          ),
+          copy: i < notifier.captured.length
+              ? notifier.captured[i].copy
+              : null,
         ));
       }
-      return pairWithCapturedCopy(found, notifier.captured);
+      return found;
     } catch (e, st) {
       // #3147 bonus — single log call (see [runVelocity]'s catch).
       log.error(e, st, layer: ErrorLayer.other, context: const {

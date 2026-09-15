@@ -107,14 +107,16 @@ class CapturingNotificationService implements NotificationService {
 
 /// Pair [opportunities] with the copy their runner built, by position.
 ///
-/// The runners emit their events and their notifications in the same
-/// order, which is the only correspondence available without threading
-/// an id through two third-party-shaped runner APIs. When the counts
-/// disagree — a runner that grouped several findings into one post — the
-/// extra opportunities travel with NO copy, so the dispatcher renders
-/// them from their kind if they ever win. Never a mismatched pairing:
-/// putting one finding's text on another's numbers is the one outcome
-/// that would be worse than plain copy.
+/// Used by the velocity path, where one event produces exactly one post,
+/// so the correspondence is trivial. The radius path pairs inside its own
+/// loop instead: a grouped event with no matches would shorten the
+/// opportunity list and, under the length check below, silently strip the
+/// copy from every OTHER candidate too.
+///
+/// When the counts disagree the extras travel with NO copy, so the
+/// dispatcher renders them from their kind if they ever win. Never a
+/// mismatched pairing: putting one finding's text on another's numbers is
+/// the one outcome that would be worse than plain copy.
 List<OpportunityCandidate> pairWithCapturedCopy(
   List<Opportunity> opportunities,
   List<CapturedNotification> captured,
