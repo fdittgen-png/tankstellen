@@ -27,18 +27,17 @@ class ClimbingCostRule implements DrivingLessonRule {
     final insight = context.insightFor('insightClimbingCost');
     if (insight == null) return null;
 
-    final liters = formatLessonLiters(insight.litersWasted);
     final pct = formatLessonPercent(insight.percentOfTrip);
     final gradePct =
         formatLessonPercent((insight.metadata['gradePercent'] ?? 0).toDouble());
     return DrivingLesson(
       id: id,
-      impact: insight.litersWasted,
-      metricValue: insight.litersWasted,
-      title: l.insightClimbingCost(gradePct, pct, liters),
+      impact: insight.percentOfTrip,
+      metricValue: (insight.metadata['climbSeconds'] ?? 0).toDouble(),
+      title: l.insightClimbingShare(gradePct, pct),
       advice: l.lessonAdviceClimbingCost,
       subtitle: l.insightSubtitlePctOfTrip(pct),
-      trailing: l.insightTrailingLitersWasted(liters),
+      trailing: approxLitersTrailing(insight, l), // #4221
     );
   }
 }

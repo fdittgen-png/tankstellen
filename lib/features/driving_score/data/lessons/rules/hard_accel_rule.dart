@@ -40,7 +40,6 @@ class HardAccelRule implements DrivingLessonRule {
     final insight = context.insightFor('insightHardAccel');
     if (insight == null) return null;
 
-    final liters = formatLessonLiters(insight.litersWasted);
     final pct = formatLessonPercent(insight.percentOfTrip);
     // #2789 C5 — prefer the IMU-resolved count when the inertial sensor ran;
     // otherwise fall back to the GPS-derived event count from the analyzer
@@ -58,12 +57,12 @@ class HardAccelRule implements DrivingLessonRule {
     final count = eventCount.toString();
     return DrivingLesson(
       id: id,
-      impact: insight.litersWasted,
-      metricValue: insight.litersWasted,
-      title: l.insightHardAccel(count, liters),
+      impact: eventCount.toDouble(),
+      metricValue: eventCount.toDouble(),
+      title: l.insightHardAccelEvents(count),
       advice: l.lessonAdviceHardAccel,
       subtitle: l.insightSubtitlePctOfTrip(pct),
-      trailing: l.insightTrailingLitersWasted(liters),
+      trailing: approxLitersTrailing(insight, l), // #4221
     );
   }
 }

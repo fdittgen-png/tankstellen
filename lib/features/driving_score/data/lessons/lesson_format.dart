@@ -11,6 +11,9 @@
 ///   * percent to a whole number ("12", not "12.345").
 library;
 
+import '../../../../l10n/app_localizations.dart';
+import '../../domain/driving_insight.dart';
+
 /// One-decimal litres — "0.6". Negative values (impossible in
 /// production, cheap to defend) clamp to zero.
 String formatLessonLiters(double liters) {
@@ -20,3 +23,11 @@ String formatLessonLiters(double liters) {
 
 /// Whole-number percent — "12".
 String formatLessonPercent(double pct) => pct.toStringAsFixed(0);
+
+/// #4221 — the litres badge: only for litres integrated from a measured
+/// fuel rate, and always marked approximate. Null otherwise — a modelled
+/// guess is never rendered as a number.
+String? approxLitersTrailing(DrivingInsight insight, AppLocalizations l) =>
+    insight.litersMeasured
+        ? l.insightTrailingLitersApprox(formatLessonLiters(insight.litersWasted))
+        : null;

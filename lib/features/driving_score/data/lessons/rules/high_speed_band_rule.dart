@@ -27,18 +27,11 @@ const double kHighSpeedMinShare = 0.10;
 /// is at or above [kHighSpeedThresholdKmh], then fires when that share
 /// clears [kHighSpeedMinShare].
 ///
-/// Where litres are derivable (the summary carries
-/// [TripSummary.fuelLitersConsumed]) the estimated extra litres is the
-/// high-speed time-share × total litres × a drag-penalty factor —
-/// honest and unit-testable. On a GPS-only / no-fuel-rate trip litres are
-/// absent, so the lesson still fires (impact = the time-share) and simply
-/// omits the litres badge — graceful degradation.
+/// #4221 — the lesson states the high-speed time share only. It used to
+/// quote "wasted" litres as trip litres × share × a fixed 20 % drag factor:
+/// a model presented as a measurement, so no litre figure is shown.
 class HighSpeedBandRule implements DrivingLessonRule {
   const HighSpeedBandRule();
-
-  /// Fraction of the high-speed litres considered *wasted* vs. driving
-  /// the same distance at an efficient cruise — a conservative 20 %.
-  static const double _dragPenaltyFactor = 0.20;
 
   @override
   String get id => highSpeedBandLessonId;
@@ -52,28 +45,13 @@ class HighSpeedBandRule implements DrivingLessonRule {
     if (share < kHighSpeedMinShare) return null;
 
     final pct = formatLessonPercent(share * 100.0);
-    final totalLiters = context.summary.fuelLitersConsumed;
-    // Estimated extra litres burned by the drag penalty in the high-speed
-    // band. Null when the trip has no fuel figure (GPS-only) — the lesson
-    // then ranks on the time-share alone and shows no litres badge.
-    final wastedLiters = (totalLiters != null && totalLiters > 0)
-        ? totalLiters * share * _dragPenaltyFactor
-        : null;
-
     return DrivingLesson(
       id: id,
-      // Litres dominate the waste ranking when known; otherwise the
-      // time-share keeps the lesson in the list at a modest weight.
-      impact: wastedLiters ?? share,
-      metricValue: wastedLiters ?? share,
-      title: wastedLiters != null
-          ? l.insightHighSpeedBand(pct, formatLessonLiters(wastedLiters))
-          : l.insightHighSpeedBandNoFuel(pct),
+      impact: share * 100.0,
+      metricValue: share,
+      title: l.insightHighSpeedBandNoFuel(pct),
       advice: l.lessonAdviceHighSpeedBand,
       subtitle: l.insightSubtitlePctOfTrip(pct),
-      trailing: wastedLiters != null
-          ? l.insightTrailingLitersWasted(formatLessonLiters(wastedLiters))
-          : null,
     );
   }
 }

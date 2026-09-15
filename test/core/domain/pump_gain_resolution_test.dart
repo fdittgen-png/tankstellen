@@ -64,7 +64,12 @@ void main() {
 
   test('nothing learned → 1.0, uncalibrated; null vehicle likewise', () {
     const v = VehicleProfile(id: 'v', name: 'x');
-    expect(resolvePumpGain(v, fuelKey: 'e10'), PumpGainResolution.none);
+    // #4220 — still gain 1.0 / uncalibrated, but it now reports the key.
+    final r = resolvePumpGain(v, fuelKey: 'e10');
+    expect(r.gain, 1.0);
+    expect(r.source, PumpGainSource.uncalibrated);
+    expect(r.requestedFuelKey, 'e10');
+    expect(resolvePumpGain(v), same(PumpGainResolution.none));
     expect(resolvePumpGain(v).isCalibrated, isFalse);
     expect(resolvePumpGain(null, fuelKey: 'e10').gain, 1.0);
   });

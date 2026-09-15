@@ -28,16 +28,15 @@ class LambdaEnrichmentRule implements DrivingLessonRule {
     final insight = context.insightFor('insightLambdaEnrichment');
     if (insight == null) return null;
 
-    final liters = formatLessonLiters(insight.litersWasted);
     final pct = formatLessonPercent(insight.percentOfTrip);
     return DrivingLesson(
       id: id,
-      impact: insight.litersWasted,
-      metricValue: insight.litersWasted,
-      title: l.insightLambdaEnrichment(pct, liters),
+      impact: insight.percentOfTrip,
+      metricValue: (insight.metadata['lambdaEnrichSeconds'] ?? 0).toDouble(),
+      title: l.insightLambdaEnrichmentShare(pct),
       advice: l.lessonAdviceLambdaEnrichment,
       subtitle: l.insightSubtitlePctOfTrip(pct),
-      trailing: l.insightTrailingLitersWasted(liters),
+      trailing: approxLitersTrailing(insight, l), // #4221
     );
   }
 }

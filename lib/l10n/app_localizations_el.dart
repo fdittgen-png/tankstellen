@@ -4550,11 +4550,6 @@ class AppLocalizationsEl extends AppLocalizations {
       'Αλλάζετε νωρίτερα σε υψηλότερη σχέση ώστε ο κινητήρας να σταθεροποιείται σε χαμηλότερες, πιο οικονομικές στροφές.';
 
   @override
-  String insightHighSpeedBand(String pctTime, String liters) {
-    return 'Παρατεταμένη υψηλή ταχύτητα ($pctTime% της διαδρομής): σπαταλήθηκαν $liters L';
-  }
-
-  @override
   String insightHighSpeedBandNoFuel(String pctTime) {
     return 'Παρατεταμένη υψηλή ταχύτητα ($pctTime% της διαδρομής)';
   }
@@ -4658,6 +4653,46 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get lessonTransportAdvice =>
       'Ο κινητήρας δεν ανέφερε δραστηριότητα σχεδόν σε όλη την απόσταση. Είτε η ροή OBD2 διακόπηκε στη μέση της διαδρομής είτε το αυτοκίνητο μετακινήθηκε χωρίς οδήγηση — η τιμή κατανάλωσης είναι αναξιόπιστη και εξαιρείται από τα στατιστικά σας.';
+
+  @override
+  String insightHighRpmShare(String pctTime) {
+    return 'Engine over 3000 RPM ($pctTime% of trip)';
+  }
+
+  @override
+  String insightHardAccelEvents(String count) {
+    return '$count hard accelerations';
+  }
+
+  @override
+  String insightIdlingLong(String minutes) {
+    return 'Long idling with the engine running ($minutes min)';
+  }
+
+  @override
+  String insightFullThrottleShare(String pctTime) {
+    return 'Full throttle ($pctTime% of trip)';
+  }
+
+  @override
+  String insightLambdaEnrichmentShare(String pctTime) {
+    return 'Rich mixture under load ($pctTime% of trip)';
+  }
+
+  @override
+  String insightClimbingShare(String gradePercent, String pctTime) {
+    return 'Climbing at $gradePercent% grade ($pctTime% of trip)';
+  }
+
+  @override
+  String insightRestartEvents(String count) {
+    return '$count stop-and-go restarts';
+  }
+
+  @override
+  String insightTrailingLitersApprox(String liters) {
+    return '≈ +$liters L';
+  }
 
   @override
   String get drivingScoreCardTitle => 'Βαθμολογία οδήγησης';
@@ -4817,6 +4852,11 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get ecoNudgeHighRpm =>
       'Υψηλές στροφές σε σταθερή ταχύτητα — νωρίτερη αλλαγή σε μεγαλύτερη σχέση εξοικονομεί καύσιμο';
+
+  @override
+  String insightUpshiftCruiseShare(String pctTime) {
+    return 'High-RPM cruising ($pctTime% of trip): shifting up earlier uses less fuel';
+  }
 
   @override
   String get obd2CoverageNoneNote =>

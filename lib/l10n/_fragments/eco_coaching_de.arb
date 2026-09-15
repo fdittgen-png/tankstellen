@@ -88,5 +88,6 @@
   "ecoNudgeHighRpm": "Hohe Drehzahl beim Dahingleiten — früheres Hochschalten spart Kraftstoff",
   "@ecoNudgeHighRpm": {
     "description": "Live in-trip nudge SnackBar (#3432) after sustained high-RPM steady-speed cruising. Rate-limited to at most one nudge per minute, three per trip."
-  }
+  },
+  "insightUpshiftCruiseShare": "Hochtouriges Fahren ({pctTime}% der Fahrt): früheres Hochschalten spart Kraftstoff"
 }

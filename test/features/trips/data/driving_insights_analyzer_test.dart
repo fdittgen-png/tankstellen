@@ -48,6 +48,8 @@ void main() {
       expect(insights.single.litersWasted, closeTo(0.2, 0.01));
       expect(insights.single.percentOfTrip, closeTo(100.0, 0.5));
       expect(insights.single.metadata['idleSeconds'], closeTo(1200, 1));
+      expect(insights.single.litersMeasured, isFalse,
+          reason: 'no fuel rate — the 0.2 L is an assumption (#4221)');
     });
 
     test(
@@ -114,8 +116,8 @@ void main() {
       // Confirm descending order.
       for (var i = 1; i < insights.length; i++) {
         expect(
-          insights[i - 1].litersWasted,
-          greaterThanOrEqualTo(insights[i].litersWasted),
+          insights[i - 1].percentOfTrip,
+          greaterThanOrEqualTo(insights[i].percentOfTrip),
         );
       }
     });
@@ -267,13 +269,14 @@ void main() {
         'insightHardAccel',
         'insightIdling',
       }));
-      // High-RPM should rank first (largest waste).
-      expect(insights.first.labelKey, 'insightHighRpm');
+      // #4221 — ranked by evidence: 1200 s of idle (50 % of the trip) outranks
+      // 600 s above 3000 RPM (25 %), whatever litres a model assigns.
+      expect(insights.first.labelKey, 'insightIdling');
       // Sorted descending.
       for (var i = 1; i < insights.length; i++) {
         expect(
-          insights[i - 1].litersWasted,
-          greaterThanOrEqualTo(insights[i].litersWasted),
+          insights[i - 1].percentOfTrip,
+          greaterThanOrEqualTo(insights[i].percentOfTrip),
         );
       }
     });
@@ -316,6 +319,7 @@ void main() {
       expect(insights, hasLength(1));
       expect(insights.single.labelKey, 'insightHighRpm');
       expect(insights.single.litersWasted, closeTo(0.4, 0.05));
+      expect(insights.single.litersMeasured, isFalse);
     });
 
     test('DrivingInsight equality and hashCode work as value-objects', () {
@@ -688,6 +692,87 @@ void main() {
       // The DETECTION is power-blind; only the WEIGHT changes.
       expect(hardAccelFor(55).metadata['eventCount'], 5);
       expect(hardAccelFor(230).metadata['eventCount'], 5);
+    });
+  });
+
+  group('#4221 — evidence first, litres only when measured', () {
+    final start = DateTime.utc(2026);
+
+    List<TripSample> stopAndGo({double? idleRate}) {
+      final out = <TripSample>[];
+      var t = start;
+      for (var i = 0; i < 10; i++) {
+        // 40 s at a red light, then 30 s rolling.
+        for (var s = 0; s <= 40; s += 10) {
+          out.add(TripSample(
+              timestamp: t.add(Duration(seconds: s)),
+              speedKmh: 0,
+              rpm: 800,
+              fuelRateLPerHour: idleRate));
+        }
+        t = t.add(const Duration(seconds: 41));
+        out.add(TripSample(timestamp: t, speedKmh: 30, rpm: 1800));
+        t = t.add(const Duration(seconds: 30));
+      }
+      return out;
+    }
+
+    List<TripSample> longIdle({double? rate}) => [
+          for (var s = 0; s <= 300; s += 10)
+            TripSample(
+                timestamp: start.add(Duration(seconds: s)),
+                speedKmh: 0,
+                rpm: 800,
+                fuelRateLPerHour: rate),
+          TripSample(
+              timestamp: start.add(const Duration(seconds: 330)),
+              speedKmh: 40,
+              rpm: 1800),
+        ];
+
+    test('red-light stops are traffic: no idling insight at all', () {
+      final keys = analyzeTrip(stopAndGo(idleRate: 0.8))
+          .map((i) => i.labelKey);
+      expect(keys, isNot(contains('insightIdling')),
+          reason: 'before #4221 every stationary second was booked as '
+              '100 % avoidable waste');
+    });
+
+    test('a 5-minute idle with a measured rate is a lesson with measured '
+        'litres', () {
+      final idle = analyzeTrip(longIdle(rate: 0.9))
+          .singleWhere((i) => i.labelKey == 'insightIdling');
+      // The interval up to the first moving sample is still stationary.
+      expect(idle.metadata['idleSeconds'], closeTo(330, 1));
+      expect(idle.metadata['longIdleEpisodes'], 1);
+      expect(idle.litersWasted, closeTo(0.9 * 330 / 3600, 1e-6));
+      expect(idle.litersMeasured, isTrue);
+    });
+
+    test('the same idle without a fuel rate carries no measured litres', () {
+      final idle = analyzeTrip(longIdle())
+          .singleWhere((i) => i.labelKey == 'insightIdling');
+      expect(idle.litersMeasured, isFalse);
+    });
+
+    test('a hard-acceleration line never claims measured litres', () {
+      final samples = <TripSample>[];
+      var t = start;
+      for (var i = 0; i < 5; i++) {
+        samples
+          ..add(TripSample(timestamp: t, speedKmh: 0, rpm: 900))
+          ..add(TripSample(
+              timestamp: t.add(const Duration(seconds: 2)),
+              speedKmh: 40,
+              rpm: 3000,
+              fuelRateLPerHour: 20));
+        t = t.add(const Duration(seconds: 12));
+      }
+      for (final a in analyzeTrip(samples)
+          .where((i) => i.labelKey == 'insightHardAccel')) {
+        expect(a.litersMeasured, isFalse,
+            reason: 'its litres are a per-event constant');
+      }
     });
   });
 }

@@ -151,8 +151,8 @@ void main() {
       expect(g.liters, 10.5);
     });
 
-    test('a multi-fuel vehicle resolves the per-fuel gain by fuelKey, else '
-        'the tank grade', () {
+    test('a multi-fuel vehicle resolves the per-fuel gain by the trip\'s '
+        'own fuel key (#4220), never guessing a legacy trip\'s grade', () {
       const flex = VehicleProfile(
         id: 'v',
         name: 'Flex',
@@ -166,7 +166,13 @@ void main() {
         },
       );
       final t = _trip(dominant: 'speedDensity');
-      expect(CalibratedTripFigures.of(t, flex).scale, closeTo(0.7, 1e-9));
+      expect(CalibratedTripFigures.of(t, flex).scale, 1.0,
+          reason: '#4220 — no recorded fuel key: the grade is unknown, so the '
+              'figure is not re-expressed at the tank\'s grade today');
+      expect(
+          CalibratedTripFigures.of(t.copyWith(pumpGainFuelKey: 'e85'), flex)
+              .scale,
+          closeTo(0.7, 1e-9));
       expect(CalibratedTripFigures.of(t, flex, fuelKey: 'e10').scale,
           closeTo(0.8, 1e-9));
       expect(CalibratedTripFigures.of(t, flex, fuelKey: 'e98').scale,

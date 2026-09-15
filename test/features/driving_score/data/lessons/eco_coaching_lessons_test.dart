@@ -44,8 +44,8 @@ void main() {
       );
 
   group('upshiftCruise lesson (#3432)', () {
-    test('fires on sustained steady high-RPM cruising with the estimated '
-        'saving as its litres', () {
+    test('fires on sustained steady high-RPM cruising and states the time '
+        'share — no modelled saving in litres (#4221)', () {
       // 10 min at 3000 RPM / 80 km/h / 8 L/h → saving = 8 × 25 % ×
       // 600 s / 3600 = 0.333 L → formatted "0.3".
       final samples = [
@@ -56,9 +56,11 @@ void main() {
           DrivingLessonRegistry.standard().evaluate(summary, samples, l);
       final lesson =
           lessons.firstWhere((e) => e.id == upshiftCruiseLessonId);
-      expect(lesson.metricValue, closeTo(8 * 0.25 * 600 / 3600, 1e-6));
-      expect(lesson.title, contains('shifting up earlier could save 0.3 L'));
-      expect(lesson.trailing, '+0.3 L');
+      expect(lesson.metricValue, closeTo(100.0, 1e-6),
+          reason: 'the share of the trip spent cruising at high RPM');
+      expect(lesson.title, contains('shifting up earlier uses less fuel'));
+      expect(lesson.trailing, isNull,
+          reason: 'the 25 % saving ratio is an assumption, never rendered');
       expect(lesson.polarity, LessonPolarity.negative);
     });
 

@@ -4542,11 +4542,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Früher hochschalten, damit der Motor in einem niedrigeren, effizienteren Gang läuft.';
 
   @override
-  String insightHighSpeedBand(String pctTime, String liters) {
-    return 'Anhaltend hohe Geschwindigkeit ($pctTime% der Fahrt): $liters L verschwendet';
-  }
-
-  @override
   String insightHighSpeedBandNoFuel(String pctTime) {
     return 'Anhaltend hohe Geschwindigkeit ($pctTime% der Fahrt)';
   }
@@ -4651,6 +4646,46 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get lessonTransportAdvice =>
       'Der Motor meldete fast über die gesamte Strecke keine Aktivität. Entweder ist der OBD2-Datenstrom ausgefallen oder das Fahrzeug wurde ohne eigenen Antrieb bewegt — der Verbrauchswert ist unzuverlässig und fließt nicht in deine Statistiken ein.';
+
+  @override
+  String insightHighRpmShare(String pctTime) {
+    return 'Motor über 3000 U/min ($pctTime% der Fahrt)';
+  }
+
+  @override
+  String insightHardAccelEvents(String count) {
+    return '$count starke Beschleunigungen';
+  }
+
+  @override
+  String insightIdlingLong(String minutes) {
+    return 'Langer Leerlauf mit laufendem Motor ($minutes Min.)';
+  }
+
+  @override
+  String insightFullThrottleShare(String pctTime) {
+    return 'Vollgas ($pctTime% der Fahrt)';
+  }
+
+  @override
+  String insightLambdaEnrichmentShare(String pctTime) {
+    return 'Fettes Gemisch unter Last ($pctTime% der Fahrt)';
+  }
+
+  @override
+  String insightClimbingShare(String gradePercent, String pctTime) {
+    return 'Steigung mit $gradePercent% ($pctTime% der Fahrt)';
+  }
+
+  @override
+  String insightRestartEvents(String count) {
+    return '$count Stop-and-go-Anfahrten';
+  }
+
+  @override
+  String insightTrailingLitersApprox(String liters) {
+    return '≈ +$liters L';
+  }
 
   @override
   String get drivingScoreCardTitle => 'Fahrnote';
@@ -4810,6 +4845,11 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get ecoNudgeHighRpm =>
       'Hohe Drehzahl beim Dahingleiten — früheres Hochschalten spart Kraftstoff';
+
+  @override
+  String insightUpshiftCruiseShare(String pctTime) {
+    return 'Hochtouriges Fahren ($pctTime% der Fahrt): früheres Hochschalten spart Kraftstoff';
+  }
 
   @override
   String get obd2CoverageNoneNote =>

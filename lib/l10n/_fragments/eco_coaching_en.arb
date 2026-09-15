@@ -88,5 +88,14 @@
   "ecoNudgeHighRpm": "High revs at cruise — shifting up earlier saves fuel",
   "@ecoNudgeHighRpm": {
     "description": "Live in-trip nudge SnackBar (#3432) after sustained high-RPM steady-speed cruising. Rate-limited to at most one nudge per minute, three per trip."
+  },
+  "insightUpshiftCruiseShare": "High-RPM cruising ({pctTime}% of trip): shifting up earlier uses less fuel",
+  "@insightUpshiftCruiseShare": {
+    "description": "#4221 — evidence-first lesson headline: no litres (a modelled litre figure is never shown). Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      }
+    }
   }
 }

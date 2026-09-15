@@ -7,8 +7,10 @@
 /// Phase 1 covers three behaviour-driven categories — high RPM,
 /// hard acceleration, and idling. Each yields a [DrivingInsight] when
 /// it accumulates at least [_noiseFloorLiters] of estimated waste.
-/// Results are sorted by `litersWasted` descending and capped at
-/// [_topN] entries so the UI shows a focused list.
+/// Results are ranked by evidence — share of the trip — and capped at
+/// [_topN] entries (#4221). `litersWasted` is still computed, but a
+/// figure is only meaningful to show when [DrivingInsight.litersMeasured]
+/// says a measured fuel rate backed it; otherwise it is a modelled guess.
 ///
 /// The counterfactual model is documented in
 /// `docs/guides/driving-insights.md`. Numbers here are intentionally
@@ -19,6 +21,7 @@ library;
 
 import '../../trips/api.dart';
 import '../domain/driving_insight.dart';
+import 'avoidable_idle.dart';
 
 /// RPM above which a sample counts as "high RPM".
 const double _highRpmThreshold = 3000;
@@ -127,8 +130,8 @@ List<DrivingInsight> analyzeTrip(
   double highRpmWastedLiters = 0;
   bool sawFuelRateInHighRpm = false;
 
-  double idleSeconds = 0;
-  double idleWastedLiters = 0;
+  // #4221 — only unbroken long idles count; short stops are traffic.
+  final idle = AvoidableIdle(fallbackRateLPerHour: _idleFuelRateAssumptionLPerHour);
 
   // #2461 — full-throttle (pedal else throttle ≥ 90 %) and λ-enrichment
   // (commanded mixture richer than stoich) cost lines.
@@ -205,16 +208,12 @@ List<DrivingInsight> analyzeTrip(
     // #2692 C4-G — `(prev.rpm ?? 0)`: a GPS-only sample (rpm null, no
     // engine signal) is never counted as an idling engine.
     if (prev.speedKmh <= 0.5 && (prev.rpm ?? 0) > 0) {
-      idleSeconds += dt;
-      final measuredRate = prev.fuelRateLPerHour;
-      // Idle wastes 100% of the fuel — there's no counterfactual,
-      // every drop is avoidable (turn the engine off).
-      final rate = (measuredRate != null && measuredRate > 0)
-          ? measuredRate
-          : _idleFuelRateAssumptionLPerHour;
-      idleWastedLiters += rate * dt / 3600.0;
+      idle.addIdle(dt, prev.fuelRateLPerHour);
+    } else {
+      idle.endRun();
     }
   }
+  idle.endRun();
 
   final candidates = <DrivingInsight>[];
 
@@ -232,6 +231,7 @@ List<DrivingInsight> analyzeTrip(
       candidates.add(DrivingInsight(
         labelKey: 'insightHighRpm',
         litersWasted: liters,
+        litersMeasured: sawFuelRateInHighRpm,
         percentOfTrip: pctTime,
         metadata: {
           'aboveRpm': _highRpmThreshold,
@@ -266,14 +266,16 @@ List<DrivingInsight> analyzeTrip(
   }
 
   // Idling cost line.
-  if (idleSeconds > 0 && idleWastedLiters >= _noiseFloorLiters) {
-    final pctTime = idleSeconds / totalDt * 100.0;
+  if (idle.episodes > 0) {
+    final pctTime = idle.seconds / totalDt * 100.0;
     candidates.add(DrivingInsight(
       labelKey: 'insightIdling',
-      litersWasted: idleWastedLiters,
+      litersWasted: idle.liters,
+      litersMeasured: idle.measured,
       percentOfTrip: pctTime,
       metadata: {
-        'idleSeconds': idleSeconds,
+        'idleSeconds': idle.seconds,
+        'longIdleEpisodes': idle.episodes,
         'pctTime': pctTime,
       },
     ));
@@ -292,6 +294,7 @@ List<DrivingInsight> analyzeTrip(
       candidates.add(DrivingInsight(
         labelKey: 'insightFullThrottle',
         litersWasted: liters,
+        litersMeasured: sawFuelRateInFullThrottle,
         percentOfTrip: pctTime,
         metadata: {
           'fullThrottleSeconds': fullThrottleSeconds,
@@ -314,6 +317,7 @@ List<DrivingInsight> analyzeTrip(
       candidates.add(DrivingInsight(
         labelKey: 'insightLambdaEnrichment',
         litersWasted: liters,
+        litersMeasured: sawFuelRateInLambda,
         percentOfTrip: pctTime,
         metadata: {
           'lambdaEnrichSeconds': lambdaEnrichSeconds,
@@ -332,6 +336,7 @@ List<DrivingInsight> analyzeTrip(
     candidates.add(DrivingInsight(
       labelKey: 'insightClimbingCost',
       litersWasted: climb.climbingLiters,
+      litersMeasured: climb.measured,
       percentOfTrip: pctTime,
       metadata: {
         'gradePercent': climb.peakGradePercent,
@@ -358,10 +363,14 @@ List<DrivingInsight> analyzeTrip(
     ));
   }
 
-  // Sort by wasted litres descending and cap at [_topN].
-  candidates.sort((a, b) => b.litersWasted.compareTo(a.litersWasted));
-  if (candidates.length <= _topN) return candidates;
-  return candidates.sublist(0, _topN);
+  // #4221 — rank by evidence (share of the trip), never by litres a model
+  // invented; ties keep the declaration order above.
+  final ranked = [for (var i = 0; i < candidates.length; i++) (i, candidates[i])]
+    ..sort((a, b) {
+      final byShare = b.$2.percentOfTrip.compareTo(a.$2.percentOfTrip);
+      return byShare != 0 ? byShare : a.$1.compareTo(b.$1);
+    });
+  return [for (final r in ranked.take(_topN)) r.$2];
 }
 
 /// Fallback when no fuel-rate samples are available during the

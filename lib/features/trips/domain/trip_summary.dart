@@ -119,6 +119,10 @@ class TripSummary {
   /// trips and trips without a fuel signal.
   final String? dominantFuelSource;
 
+  /// #4220 — the fuel key [pumpGainApplied] was resolved under; null on
+  /// legacy trips. Retro figures re-express at THIS fuel's gain.
+  final String? pumpGainFuelKey;
+
   /// Kind of trajet — whether the recorder collected OBD2 telemetry
   /// alongside GPS, or GPS only (#2025). Trips upgrade in-place from
   /// `gpsOnly` to `gpsPlusObd2` the moment an OBD2 adapter starts
@@ -228,6 +232,7 @@ class TripSummary {
     this.volumetricEfficiencyUsed,
     this.pumpGainApplied,
     this.dominantFuelSource,
+    this.pumpGainFuelKey,
     this.kind = TripKind.gpsPlusObd2,
     this.harshEvents = const [],
     this.isVirtual = false,
@@ -281,6 +286,7 @@ class TripSummary {
     double? volumetricEfficiencyUsed,
     double? pumpGainApplied,
     String? dominantFuelSource,
+    String? pumpGainFuelKey,
     TripKind? kind,
     List<HarshEvent>? harshEvents,
     bool? isVirtual,
@@ -316,6 +322,7 @@ class TripSummary {
             volumetricEfficiencyUsed ?? this.volumetricEfficiencyUsed,
         pumpGainApplied: pumpGainApplied ?? this.pumpGainApplied,
         dominantFuelSource: dominantFuelSource ?? this.dominantFuelSource,
+        pumpGainFuelKey: pumpGainFuelKey ?? this.pumpGainFuelKey,
         kind: kind ?? this.kind,
         harshEvents: harshEvents ?? this.harshEvents,
         isVirtual: isVirtual ?? this.isVirtual,
