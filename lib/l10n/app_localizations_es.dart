@@ -8798,6 +8798,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'primer depósito lleno (aún no se ha cerrado ninguna ventana)';
 
   @override
+  String get fillInventorySkipMixedFuel =>
+      'the tank held a mix of grades, so it cannot calibrate one';
+
+  @override
   String fillInventorySkipCoverageTooLow(int coverage) {
     return 'los viajes grabados cubren el $coverage % del depósito (se necesita el 60 %)';
   }

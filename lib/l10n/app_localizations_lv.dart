@@ -8789,6 +8789,10 @@ class AppLocalizationsLv extends AppLocalizations {
       'first full tank (no window closed yet)';
 
   @override
+  String get fillInventorySkipMixedFuel =>
+      'the tank held a mix of grades, so it cannot calibrate one';
+
+  @override
   String fillInventorySkipCoverageTooLow(int coverage) {
     return 'recorded trips cover $coverage % of the tank (60 % needed)';
   }

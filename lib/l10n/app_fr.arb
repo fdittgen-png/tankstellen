@@ -6637,5 +6637,10 @@
         "type": "String"
       }
     }
+  },
+  "fillInventorySkipMixedFuel": "the tank held a mix of grades, so it cannot calibrate one",
+  "@fillInventorySkipMixedFuel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }
