@@ -100,10 +100,24 @@ class RadiusAlertRunner {
   ///
   /// Safe to call with no active alerts: the runner returns an empty
   /// list and never touches the notifier.
+  /// #4185 — the dedup rows this run did NOT write because
+  /// `recordFire: false`, one per fired event, keyed by alert id. The
+  /// caller records the one whose notification actually went out.
+  final List<RadiusAlertPendingFire> pendingFires = [];
+
+  /// Detect (and, unless [recordFire] is false, notify + stamp the dedup).
+  ///
+  /// #4185 — the background scan passes `recordFire: false` and records
+  /// through [recordFire] after the budget has sent, so a finding the
+  /// budget refused is not suppressed for the next 12 h despite the user
+  /// never having been told. The dedup's price-drop escape hatch is
+  /// unaffected: it reads rows, and unwritten rows cannot suppress.
   Future<List<RadiusAlertGroupedEvent>> run({
     required DateTime now,
     required SamplesForAlert samplesFor,
+    bool recordFire = true,
   }) async {
+    pendingFires.clear();
     final alerts = await store.list();
     final active = alerts.where((a) => a.enabled).toList();
     if (active.isEmpty) return const [];
@@ -180,26 +194,17 @@ class RadiusAlertRunner {
           body: copy.body,
           payload: payload,
         );
-        // Stamp the per-alert dedup row first — that's the source of
-        // truth for the next cycle's gating decision.
-        await dedup.recordAlertFire(
+        final pending = RadiusAlertPendingFire(
           alertId: alert.id,
           cheapestPrice: cheapest,
-          now: now,
+          matches: List<StationPriceSample>.unmodifiable(matches),
         );
-        // Also keep the per-(alert, station) fire records refreshed
-        // for every station in this cycle's match set. Phase 3's
-        // deep-link payload needs to know "what was the price when we
-        // told the user about this station last?" and that lookup
-        // would be impossible if we only stamped the cheapest one.
-        for (final match in matches) {
-          await dedup.recordFire(
-            alertId: alert.id,
-            stationId: match.stationId,
-            price: match.pricePerLiter,
-            now: now,
-          );
+        if (!recordFire) {
+          pendingFires.add(pending);
+          fired.add(event);
+          continue;
         }
+        await this.recordFire(pending, now);
         fired.add(event);
       } catch (e, st) {
         // One bad alert (e.g. country API down) must not block the
@@ -208,6 +213,29 @@ class RadiusAlertRunner {
       }
     }
     return fired;
+  }
+
+  /// #4185 — write the dedup rows for a fire that actually reached the
+  /// user: the per-alert row that gates the next cycle, plus one row per
+  /// matched station so the phase-3 deep link knows what each station cost
+  /// when we last told the user about it.
+  Future<void> recordFire(
+    RadiusAlertPendingFire pending,
+    DateTime now,
+  ) async {
+    await dedup.recordAlertFire(
+      alertId: pending.alertId,
+      cheapestPrice: pending.cheapestPrice,
+      now: now,
+    );
+    for (final match in pending.matches) {
+      await dedup.recordFire(
+        alertId: pending.alertId,
+        stationId: match.stationId,
+        price: match.pricePerLiter,
+        now: now,
+      );
+    }
   }
 
   /// Stable notification id per alert. Re-fires overwrite the
@@ -257,4 +285,21 @@ class RadiusAlertCopy {
   final String title;
   final String body;
   const RadiusAlertCopy({required this.title, required this.body});
+}
+
+/// #4185 — the dedup rows one fired radius alert would write, deferred
+/// until its notification has actually gone out.
+class RadiusAlertPendingFire {
+  const RadiusAlertPendingFire({
+    required this.alertId,
+    required this.cheapestPrice,
+    required this.matches,
+  });
+
+  final String alertId;
+  final double cheapestPrice;
+
+  /// Every match of the cycle (not just the rendered top-N), because each
+  /// one gets a per-station row.
+  final List<StationPriceSample> matches;
 }

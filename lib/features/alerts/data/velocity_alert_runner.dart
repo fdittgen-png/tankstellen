@@ -69,11 +69,20 @@ class VelocityAlertRunner {
   /// under the `user_position_*` settings keys. Pass `null` to
   /// disable the radius filter (detector will then accept every
   /// observation, which matches the "better to fire" stance).
+  /// Detect (and, unless [recordFire] is false, notify + stamp the
+  /// cooldown).
+  ///
+  /// #4185 — the background scan passes `recordFire: false`: it captures
+  /// the copy, hands the finding to the budget, and calls [recordFired]
+  /// only if a notification actually went out. A cooldown written when
+  /// the runner *decided* to fire suppresses the next scan's finding even
+  /// when the budget refused this one and the user was never told.
   Future<VelocityAlertEvent?> run({
     required List<StationPriceSample> observations,
     required DateTime now,
     double? userLat,
     double? userLng,
+    bool recordFire = true,
   }) async {
     final config = await loadConfig();
 
@@ -128,9 +137,14 @@ class VelocityAlertRunner {
       title: copy.title,
       body: copy.body,
     );
-    await cooldown.recordFired(fuelType: event.fuelType, now: now);
+    if (recordFire) await recordFired(event, now);
     return event;
   }
+
+  /// #4185 — stamp the cooldown for [event]. The scan calls this after the
+  /// dispatcher has actually sent; [run] calls it itself otherwise.
+  Future<void> recordFired(VelocityAlertEvent event, DateTime now) =>
+      cooldown.recordFired(fuelType: event.fuelType, now: now);
 
   /// Load the persisted [VelocityAlertConfig] from the `settings`
   /// Hive box or return defaults when missing/corrupt.

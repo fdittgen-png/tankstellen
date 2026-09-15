@@ -125,6 +125,51 @@ void main() {
       expect(feed.where((e) => e.wasNotified), hasLength(1));
     });
 
+    test('#4185 — only the SENT candidate records; a refused one must not',
+        () async {
+      final recorded = <String>[];
+      final outcome = await dispatcher.dispatch(
+        candidates: [
+          OpportunityCandidate(
+            opportunity(stationId: 'de-loser', net: 1.0),
+            onNotified: () async => recorded.add('de-loser'),
+          ),
+          OpportunityCandidate(
+            opportunity(stationId: 'de-winner', net: 9.0),
+            onNotified: () async => recorded.add('de-winner'),
+          ),
+        ],
+        now: now,
+        notifier: notifier,
+        templates: templates,
+      );
+
+      expect(outcome.notified, isTrue);
+      expect(recorded, ['de-winner'],
+          reason: 'a dedup row for the refused finding would say "we told '
+              'you" about something the user never saw (#4185)');
+    });
+
+    test('a refused scan records nothing at all', () async {
+      final recorded = <String>[];
+      // A dispatch with no renderable copy cannot send: the candidate is
+      // recorded in the feed with a reason, and its dedup must stay clean.
+      final outcome = await dispatcher.dispatch(
+        candidates: [
+          OpportunityCandidate(
+            opportunity(stationName: null, referencePrice: null, net: null),
+            onNotified: () async => recorded.add('unrenderable'),
+          ),
+        ],
+        now: now,
+        notifier: notifier,
+        templates: templates,
+      );
+
+      expect(outcome.notified, isFalse);
+      expect(recorded, isEmpty);
+    });
+
     test('the best one wins, not the first one', () async {
       await dispatch([
         opportunity(stationId: 'de-cheap-find', net: 1.0),

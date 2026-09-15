@@ -69,12 +69,18 @@ import 'opportunity_notification_copy.dart';
 /// doc for the radius case this exists for.
 @immutable
 class OpportunityCandidate {
-  const OpportunityCandidate(this.opportunity, {this.copy});
+  const OpportunityCandidate(this.opportunity, {this.copy, this.onNotified});
 
   final Opportunity opportunity;
 
   /// Used verbatim when non-null. Null means "render me from the kind".
   final NotificationCopy? copy;
+
+  /// #4185 — run ONLY for the candidate whose notification actually went
+  /// out, and only after it did. This is where a detector's dedup /
+  /// cooldown row belongs: written before the budget has spoken, it says
+  /// "we told you" about something the user was never told.
+  final Future<void> Function()? onNotified;
 }
 
 /// What one dispatch did.
@@ -148,6 +154,10 @@ class OpportunityDispatcher {
     final prebuilt = <Opportunity, NotificationCopy>{
       for (final c in candidates) c.opportunity: ?c.copy,
     };
+    // #4185 — so the winner's detector can record what was SENT.
+    final byOpportunity = <Opportunity, OpportunityCandidate>{
+      for (final c in candidates) c.opportunity: c,
+    };
 
     final state = budgetState.read();
     var outcome = OpportunityBudget.decide(
@@ -185,6 +195,10 @@ class OpportunityDispatcher {
         notified = await _notify(winner, copy, notifier);
         if (notified) {
           await budgetState.write(state.recording(winner, now), now);
+          // #4185 — the dedup / cooldown write, now that a notification
+          // really went out. Never for a refused candidate: that is the
+          // suppression this issue exists to remove.
+          await byOpportunity[winner]?.onNotified?.call();
         } else {
           // The channel refused it. Not a budget decision, so the slot is
           // not spent — but the finding is still real and still recorded.

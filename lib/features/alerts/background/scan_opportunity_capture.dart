@@ -26,23 +26,23 @@
 ///    a duplicate rule — see `opportunity_budget.dart`);
 ///  * the velocity cooldown and its per-area semantics.
 ///
-/// ## The one ordering caveat, stated rather than hidden
+/// ## The ordering, fixed in #4185
 ///
-/// Those runners write their dedup state when THEY decide to fire. If
-/// the budget then refuses, the dedup has recorded a fire that never
-/// reached anyone, so the same finding stays suppressed for its window.
-/// It is bounded — the budget only refuses when something better went
-/// out or the day's cap is spent, which is roughly when not re-offering
-/// it is right anyway — but it is a real seam in the wrong order, and it
-/// is the reason those two runners eventually want the detect/notify
-/// split the per-station one got here (#4185).
+/// Those runners used to write their dedup state when THEY decided to
+/// fire, so a finding the budget then refused stayed suppressed for its
+/// whole window despite the user never having been told. Both now detect
+/// with `recordFire: false` and hand the write to
+/// `OpportunityCandidate.onNotified`, which the dispatcher runs only for
+/// the notification that actually went out. The positional
+/// `pairWithCapturedCopy` helper went with it: each candidate is now
+/// built beside the event it belongs to, with its own copy and its own
+/// deferred record.
 library;
 
 import '../../../core/notifications/notification_service.dart';
 import '../../../core/constants/field_names.dart';
 import '../../../core/domain/data_value.dart';
 import '../../../core/services/provider_capability.dart';
-import '../domain/opportunity.dart';
 import 'opportunity_dispatcher.dart';
 import 'opportunity_notification_copy.dart';
 
@@ -105,32 +105,6 @@ class CapturingNotificationService implements NotificationService {
   @override
   Future<void> cancelAll() async {}
 }
-
-/// Pair [opportunities] with the copy their runner built, by position.
-///
-/// Used by the velocity path, where one event produces exactly one post,
-/// so the correspondence is trivial. The radius path pairs inside its own
-/// loop instead: a grouped event with no matches would shorten the
-/// opportunity list and, under the length check below, silently strip the
-/// copy from every OTHER candidate too.
-///
-/// When the counts disagree the extras travel with NO copy, so the
-/// dispatcher renders them from their kind if they ever win. Never a
-/// mismatched pairing: putting one finding's text on another's numbers is
-/// the one outcome that would be worse than plain copy.
-List<OpportunityCandidate> pairWithCapturedCopy(
-  List<Opportunity> opportunities,
-  List<CapturedNotification> captured,
-) =>
-    [
-      for (var i = 0; i < opportunities.length; i++)
-        OpportunityCandidate(
-          opportunities[i],
-          copy: i < captured.length && opportunities.length == captured.length
-              ? captured[i].copy
-              : null,
-        ),
-    ];
 
 /// The freshness of a background-scanned price.
 ///
