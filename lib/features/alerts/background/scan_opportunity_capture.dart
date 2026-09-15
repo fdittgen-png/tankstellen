@@ -39,6 +39,7 @@
 library;
 
 import '../../../core/notifications/notification_service.dart';
+import '../../../core/constants/field_names.dart';
 import '../../../core/domain/data_value.dart';
 import '../../../core/services/provider_capability.dart';
 import '../domain/opportunity.dart';
@@ -131,24 +132,36 @@ List<OpportunityCandidate> pairWithCapturedCopy(
         ),
     ];
 
-/// The freshness of a background-scanned price, as far as we can say.
+/// The freshness of a background-scanned price.
 ///
-/// The background price map is a flat `id → {status, e5, e10, …}` shape
-/// with no per-row timestamp — `StationPrices` does not carry one, so
-/// the polled path has none to pass on. For a provider that publishes
-/// no stamps at all ([ProviderCapability.priceTimestamp] false) this is
-/// exactly right: `notPublishedByProvider`.
+/// #4186 — the background scan's flattened price map now carries the
+/// provider's stamp ([TankerkoenigFields.priceUpdatedAt]), so this can
+/// finally answer the question instead of reporting "the provider left
+/// this row blank" for eight providers that had in fact published one.
+/// That was the background twin of #4189, where the same stamp was
+/// formatted for display and the instant thrown away.
 ///
-/// For a provider that DOES stamp, this reports
-/// `notPublishedForThisItem`, which is not quite the truth — the
-/// provider published one and this path did not carry it. It is
-/// recorded here rather than papered over, and it makes no claim
-/// either way: `OpportunityScorer` only gates on a `Measured` age, and
-/// #4152's reason list deliberately renders NOTHING for
-/// `notPublishedForThisItem`. So the label is internal and produces no
-/// user-visible statement. Carrying the stamp through `StationPrices`
-/// is #4186.
-DataValue<Duration> priceAgeForScannedRow(ProviderCapability? capability) =>
-    capability?.priceAge(null) ??
-    const DataValue.unknown(
+/// [stampedAt] is null where the provider publishes nothing, and
+/// `ProviderCapability.priceAge` reads that as
+/// `notPublishedByProvider` — which stands the freshness gate down with
+/// a caveat rather than blocking. A stamp in the future is a broken
+/// feed, not a fresh price, and yields no age.
+DataValue<Duration> priceAgeForScannedRow(
+  ProviderCapability? capability, {
+  DateTime? stampedAt,
+  DateTime? now,
+}) {
+  if (capability == null) {
+    return const DataValue.unknown(
         reason: DataUnknownReason.notPublishedByProvider);
+  }
+  if (stampedAt == null || now == null) return capability.priceAge(null);
+  final age = now.difference(stampedAt);
+  return capability.priceAge(age.isNegative ? null : age);
+}
+
+/// The provider's stamp on one row of the background price map, or null.
+DateTime? scannedRowStamp(Map<String, dynamic>? row) {
+  final raw = row?[TankerkoenigFields.priceUpdatedAt];
+  return raw is String ? DateTime.tryParse(raw) : null;
+}

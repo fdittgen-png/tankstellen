@@ -21,6 +21,12 @@ import '../../../core/services/station_service.dart';
 Map<String, dynamic> stationPricesToTankerkoenigShape(StationPrices prices) => {
       TankerkoenigFields.status:
           prices.isOpen ? TankerkoenigFields.statusOpen : 'closed',
+      // #4186 — the price stamp reaches the background evaluator. Absent
+      // when the provider publishes none, which the capability reads as
+      // `notPublishedByProvider` and stands the gate down over.
+      if (prices.priceUpdatedAt != null)
+        TankerkoenigFields.priceUpdatedAt:
+            prices.priceUpdatedAt!.toIso8601String(),
       TankerkoenigFields.e5: prices.e5,
       TankerkoenigFields.e10: prices.e10,
       TankerkoenigFields.diesel: prices.diesel,
@@ -37,6 +43,11 @@ Map<String, dynamic> stationPricesToTankerkoenigShape(StationPrices prices) => {
 /// `getPrices` returns empty by design (prices live on the dataset rows the
 /// search emits, not behind a per-station endpoint).
 Map<String, dynamic> stationToTankerkoenigShape(Station station) => {
+      // #4186 — the bulk path already had it on the Station (#4189) and
+      // simply dropped it here.
+      if (station.priceUpdatedAt != null)
+        TankerkoenigFields.priceUpdatedAt:
+            station.priceUpdatedAt!.toIso8601String(),
       // #3198 — tri-state `Station.isOpen`: only a KNOWN-closed station
       // reports 'closed'; an unknown state stays 'open' so price alerts
       // keep evaluating for the many countries whose feed publishes no

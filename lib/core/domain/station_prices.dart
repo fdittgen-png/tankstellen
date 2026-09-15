@@ -25,6 +25,20 @@ class StationPrices {
   final double? cng;
   final String status;
 
+  /// When the provider says these prices were set (#4186).
+  ///
+  /// The background scan flattens this model into a
+  /// `{status, e5, e10, …}` map and had nowhere to put a stamp, so
+  /// `priceAgeForScannedRow` reported `notPublishedForThisItem` even for
+  /// the eight providers that DO publish one — the background twin of
+  /// the #4189 defect, where a timestamp was formatted for display and
+  /// the instant thrown away.
+  ///
+  /// Null where the provider publishes no stamp, which
+  /// `ProviderCapability.priceAge` reads as `notPublishedByProvider` and
+  /// stands the freshness gate down over rather than blocking.
+  final DateTime? priceUpdatedAt;
+
   const StationPrices({
     this.e5,
     this.e10,
@@ -34,6 +48,7 @@ class StationPrices {
     this.e85,
     this.lpg,
     this.cng,
+    this.priceUpdatedAt,
     required this.status,
   });
 
@@ -48,6 +63,8 @@ class StationPrices {
         'e85': e85,
         'lpg': lpg,
         'cng': cng,
+        if (priceUpdatedAt != null)
+          'priceUpdatedAt': priceUpdatedAt!.toIso8601String(),
         'status': status,
       };
 
@@ -60,6 +77,11 @@ class StationPrices {
         e85: _price(json['e85']),
         lpg: _price(json['lpg']),
         cng: _price(json['cng']),
+        // ADDITIVE (#2777's lesson): a cached blob written before #4186
+        // lacks the key and reads as null — exactly today's behaviour.
+        priceUpdatedAt: json['priceUpdatedAt'] is String
+            ? DateTime.tryParse(json['priceUpdatedAt'] as String)
+            : null,
         status: json['status'] as String? ?? 'closed',
       );
 

@@ -48,6 +48,11 @@ class StationPriceSample {
   /// threshold — the evaluator doesn't convert units.
   final double pricePerLiter;
 
+  /// When the provider says this price was set (#4186), or null where it
+  /// publishes no stamp. Carried so a radius opportunity can be dated
+  /// instead of reporting an absence the provider did not have.
+  final DateTime? priceUpdatedAt;
+
   const StationPriceSample({
     required this.stationId,
     required this.name,
@@ -55,6 +60,7 @@ class StationPriceSample {
     required this.lng,
     required this.fuelType,
     required this.pricePerLiter,
+    this.priceUpdatedAt,
   });
 
   /// Build one sample per fuel that [station] has a price for.
@@ -80,6 +86,7 @@ class StationPriceSample {
         lng: station.lng,
         fuelType: fuel.apiValue,
         pricePerLiter: price,
+        priceUpdatedAt: station.priceUpdatedAt,
       ));
     }
     return out;

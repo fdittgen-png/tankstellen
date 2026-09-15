@@ -303,6 +303,9 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
           diesel: parseLooseDouble(r['gazole_prix']),
           e85: parseLooseDouble(r['e85_prix']),
           lpg: parseLooseDouble(r['gplc_prix']),
+          // #4186 — the background twin of #4189: the provider stamps
+          // these prices and this path used to drop the stamp.
+          priceUpdatedAt: parser.parsePrixCarburantsUpdatedAt(r),
           status: 'open',
         );
       }
