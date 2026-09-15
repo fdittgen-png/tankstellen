@@ -3,11 +3,26 @@
 
 /// One attention budget across every alert kind (#4151, epic #4148).
 ///
-/// Each kind suppressed itself: `background_scan_dedup_store`,
-/// `radius_alert_dedup`, the velocity cooldown. Each is correct on its
-/// own terms and none of them knows the others exist, so three kinds
-/// could fire three notifications inside a minute with every one having
-/// passed its own check.
+/// Each kind suppressed itself: `radius_alert_dedup` and the velocity
+/// cooldown. Each is correct on its own terms and neither knows the
+/// other exists, so two kinds could fire inside a minute with both
+/// having passed their own check.
+///
+/// **Correction to this doc's first version**, which also named
+/// `background_scan_dedup_store`. That store is not a per-kind
+/// suppressor: it is a scan-TRIGGER cooldown, stopping a second OS
+/// wakeup (WorkManager, the widget refresh, `BGAppRefreshTask`) from
+/// re-fetching prices seconds after the first. Its own doc says it
+/// "does NOT replace the per-alert throttles". It sits upstream of
+/// everything here and this policy neither replaces nor touches it.
+///
+/// One thing `radius_alert_dedup` has that this policy does not: its
+/// 12 h window — the same 12 h as [BudgetPolicy.perStationQuiet] — has
+/// an escape hatch, allowing a re-fire when the cheapest match dropped
+/// further by at least `priceDropEpsilon`. "Tell me when it gets even
+/// cheaper" is a capability, not a duplicate rule, and folding radius
+/// into [BudgetPolicy.perStationQuiet] without it would remove it
+/// (#4183).
 ///
 /// `alert_delivery_sla` pins the contract — **1-3 per day, ≤3-4 h
 /// latency, never next-day** — and nothing enforced it.

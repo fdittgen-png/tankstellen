@@ -6992,6 +6992,63 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String opportunityBestStopNowTitle(String fuelType) {
+    return 'Cheapest $fuelType nearby';
+  }
+
+  @override
+  String opportunityBestStopNowBody(
+    String price,
+    String currency,
+    String station,
+    String distance,
+  ) {
+    return '$price $currency at $station · $distance km';
+  }
+
+  @override
+  String opportunityBestStopOnRouteTitle(String fuelType) {
+    return 'Cheapest $fuelType on your route';
+  }
+
+  @override
+  String opportunityBestStopOnRouteBody(
+    String price,
+    String currency,
+    String station,
+    String distance,
+  ) {
+    return '$price $currency at $station · $distance km ahead';
+  }
+
+  @override
+  String get opportunityRefuelSoonTitle => 'Time to refuel';
+
+  @override
+  String opportunityRefuelSoonBody(
+    String station,
+    String distance,
+    String price,
+    String currency,
+  ) {
+    return '$station · $distance km ahead · $price $currency';
+  }
+
+  @override
+  String opportunityPersonalBaselineTitle(String fuelType) {
+    return '$fuelType below your usual price';
+  }
+
+  @override
+  String opportunityPersonalBaselineBody(
+    String price,
+    String currency,
+    String station,
+  ) {
+    return '$price $currency at $station';
+  }
+
+  @override
   String get permissionRationaleCameraTitle => 'Camera Access';
 
   @override
@@ -16617,6 +16674,63 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       'other': 'Open state unknown',
     });
     return '⟦$_temp0⟧';
+  }
+
+  @override
+  String opportunityBestStopNowTitle(String fuelType) {
+    return '⟦Çĥéáƥéšŧ $fuelType ñéářƀý ······⟧';
+  }
+
+  @override
+  String opportunityBestStopNowBody(
+    String price,
+    String currency,
+    String station,
+    String distance,
+  ) {
+    return '⟦$price $currency áŧ $station · $distance ķɱ ··⟧';
+  }
+
+  @override
+  String opportunityBestStopOnRouteTitle(String fuelType) {
+    return '⟦Çĥéáƥéšŧ $fuelType óñ ýóúř řóúŧé ·········⟧';
+  }
+
+  @override
+  String opportunityBestStopOnRouteBody(
+    String price,
+    String currency,
+    String station,
+    String distance,
+  ) {
+    return '⟦$price $currency áŧ $station · $distance ķɱ áĥéáđ ····⟧';
+  }
+
+  @override
+  String get opportunityRefuelSoonTitle => '⟦Ŧîɱé ŧó řéƒúéł ·····⟧';
+
+  @override
+  String opportunityRefuelSoonBody(
+    String station,
+    String distance,
+    String price,
+    String currency,
+  ) {
+    return '⟦$station · $distance ķɱ áĥéáđ · $price $currency ···⟧';
+  }
+
+  @override
+  String opportunityPersonalBaselineTitle(String fuelType) {
+    return '⟦$fuelType ƀéłóŵ ýóúř úšúáł ƥřîçé ·········⟧';
+  }
+
+  @override
+  String opportunityPersonalBaselineBody(
+    String price,
+    String currency,
+    String station,
+  ) {
+    return '⟦$price $currency áŧ $station ·⟧';
   }
 
   @override

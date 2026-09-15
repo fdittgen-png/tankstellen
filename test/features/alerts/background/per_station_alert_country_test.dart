@@ -6,7 +6,6 @@ import 'package:tankstellen/features/alerts/background/background_scan_runners.d
 import 'package:tankstellen/features/alerts/background/notification_templates.dart';
 import 'package:tankstellen/core/constants/field_names.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
-import 'package:tankstellen/core/notifications/notification_service.dart';
 import 'package:tankstellen/features/alerts/data/models/price_alert.dart';
 import 'package:tankstellen/features/alerts/data/repositories/alert_repository.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
@@ -32,42 +31,6 @@ class _FakeAlertStorage implements AlertStorage {
 }
 
 /// Captures every notification the runner emits.
-class _FakeNotifier implements NotificationService {
-  final List<({int id, String title, String body, String? payload})>
-      priceAlerts = [];
-
-  @override
-  Future<void> initialize() async {}
-
-  @override
-  Future<void> showPriceAlert({
-    required int id,
-    required String title,
-    required String body,
-    String? payload,
-  }) async {
-    priceAlerts.add((id: id, title: title, body: body, payload: payload));
-  }
-
-  @override
-  Future<bool> requestPermission() async => true;
-
-  @override
-  Future<bool> areNotificationsEnabled() async => true;
-
-  @override
-  Future<void> showServiceReminder({
-    required int id,
-    required String title,
-    required String body,
-  }) async {}
-
-  @override
-  Future<void> cancelNotification(int id) async {}
-
-  @override
-  Future<void> cancelAll() async {}
-}
 
 void main() {
   final templates = BackgroundNotificationTemplates.resolveForLanguage('en');
@@ -87,10 +50,13 @@ void main() {
         createdAt: DateTime.utc(2026, 6, 1),
       );
 
-  group('runPerStationAlerts — #2864 country/currency/fuel aware', () {
+  /// #4183 — the runner DETECTS now; the copy it built travels on the
+  /// candidate instead of being posted on the spot. The assertions are
+  /// unchanged in substance: same country resolution, same fuel gate,
+  /// same currency in the same body text — read off the candidate.
+  group('detectPerStationAlerts — #2864 country/currency/fuel aware', () {
     test('an FR LPG alert resolves the lpg field, fires, and renders in €',
         () async {
-      final notifier = _FakeNotifier();
       final repo = AlertRepository(_FakeAlertStorage());
       final fr = alert(
         id: 'a-fr',
@@ -99,7 +65,7 @@ void main() {
         target: 1.000,
       );
 
-      await BackgroundScanRunners.runPerStationAlerts(
+      final found = await BackgroundScanRunners.detectPerStationAlerts(
         repo: repo,
         alerts: [fr],
         prices: {
@@ -113,19 +79,17 @@ void main() {
         now: DateTime.utc(2026, 6, 4, 8),
         templates: templates,
         fallbackCountryCode: 'FR',
-        notifier: notifier,
       );
 
-      expect(notifier.priceAlerts, hasLength(1),
-          reason: 'FR LPG alert must fire — the old e5/e10/diesel-only switch '
+      expect(found, hasLength(1),
+          reason: 'FR LPG alert must trip — the old e5/e10/diesel-only switch '
               'could never resolve LPG.');
       // FR is EUR-zone, so the body renders the euro.
-      expect(notifier.priceAlerts.single.body, contains('€'));
-      expect(notifier.priceAlerts.single.body, contains('0.899'));
+      expect(found.single.copy!.body, contains('€'));
+      expect(found.single.copy!.body, contains('0.899'));
     });
 
     test('a GB diesel alert renders £, not a forced euro', () async {
-      final notifier = _FakeNotifier();
       final repo = AlertRepository(_FakeAlertStorage());
       final gb = alert(
         id: 'a-gb',
@@ -134,7 +98,7 @@ void main() {
         target: 1.500,
       );
 
-      await BackgroundScanRunners.runPerStationAlerts(
+      final found = await BackgroundScanRunners.detectPerStationAlerts(
         repo: repo,
         alerts: [gb],
         prices: {
@@ -146,16 +110,14 @@ void main() {
         now: DateTime.utc(2026, 6, 4, 8),
         templates: templates,
         fallbackCountryCode: 'GB',
-        notifier: notifier,
       );
 
-      expect(notifier.priceAlerts, hasLength(1));
-      expect(notifier.priceAlerts.single.body, contains('£'));
-      expect(notifier.priceAlerts.single.body, isNot(contains('€')));
+      expect(found, hasLength(1));
+      expect(found.single.copy!.body, contains('£'));
+      expect(found.single.copy!.body, isNot(contains('€')));
     });
 
     test('a DE e5 alert is byte-identical (resolves e5 + €)', () async {
-      final notifier = _FakeNotifier();
       final repo = AlertRepository(_FakeAlertStorage());
       final de = alert(
         id: 'a-de',
@@ -164,7 +126,7 @@ void main() {
         target: 1.800,
       );
 
-      await BackgroundScanRunners.runPerStationAlerts(
+      final found = await BackgroundScanRunners.detectPerStationAlerts(
         repo: repo,
         alerts: [de],
         prices: {
@@ -176,17 +138,15 @@ void main() {
         now: DateTime.utc(2026, 6, 4, 8),
         templates: templates,
         fallbackCountryCode: 'DE',
-        notifier: notifier,
       );
 
-      expect(notifier.priceAlerts, hasLength(1));
-      expect(notifier.priceAlerts.single.body, contains('€'));
-      expect(notifier.priceAlerts.single.body, contains('1.759'));
+      expect(found, hasLength(1));
+      expect(found.single.copy!.body, contains('€'));
+      expect(found.single.copy!.body, contains('1.759'));
     });
 
     test('a DE LPG alert does NOT fire (LPG absent from the DE feed)',
         () async {
-      final notifier = _FakeNotifier();
       final repo = AlertRepository(_FakeAlertStorage());
       final deLpg = alert(
         id: 'a-de-lpg',
@@ -195,7 +155,7 @@ void main() {
         target: 1.000,
       );
 
-      await BackgroundScanRunners.runPerStationAlerts(
+      final found = await BackgroundScanRunners.detectPerStationAlerts(
         repo: repo,
         alerts: [deLpg],
         prices: {
@@ -209,11 +169,10 @@ void main() {
         now: DateTime.utc(2026, 6, 4, 8),
         templates: templates,
         fallbackCountryCode: 'DE',
-        notifier: notifier,
       );
 
-      expect(notifier.priceAlerts, isEmpty,
-          reason: 'DE has no LPG in its feed — the alert must not fire.');
+      expect(found, isEmpty,
+          reason: 'DE has no LPG in its feed — the alert must not trip.');
     });
   });
 }

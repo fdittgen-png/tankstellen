@@ -7042,6 +7042,63 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String opportunityBestStopNowTitle(String fuelType) {
+    return 'Cheapest $fuelType nearby';
+  }
+
+  @override
+  String opportunityBestStopNowBody(
+    String price,
+    String currency,
+    String station,
+    String distance,
+  ) {
+    return '$price $currency at $station · $distance km';
+  }
+
+  @override
+  String opportunityBestStopOnRouteTitle(String fuelType) {
+    return 'Cheapest $fuelType on your route';
+  }
+
+  @override
+  String opportunityBestStopOnRouteBody(
+    String price,
+    String currency,
+    String station,
+    String distance,
+  ) {
+    return '$price $currency at $station · $distance km ahead';
+  }
+
+  @override
+  String get opportunityRefuelSoonTitle => 'Time to refuel';
+
+  @override
+  String opportunityRefuelSoonBody(
+    String station,
+    String distance,
+    String price,
+    String currency,
+  ) {
+    return '$station · $distance km ahead · $price $currency';
+  }
+
+  @override
+  String opportunityPersonalBaselineTitle(String fuelType) {
+    return '$fuelType below your usual price';
+  }
+
+  @override
+  String opportunityPersonalBaselineBody(
+    String price,
+    String currency,
+    String station,
+  ) {
+    return '$price $currency at $station';
+  }
+
+  @override
   String get permissionRationaleCameraTitle => 'Cameratoegang';
 
   @override

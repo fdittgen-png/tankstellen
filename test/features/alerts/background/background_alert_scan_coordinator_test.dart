@@ -3,7 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/alerts/background/background_alert_scan_coordinator.dart';
-import 'package:tankstellen/features/alerts/background/background_scan_runners.dart';
+import 'package:tankstellen/features/alerts/background/scan_notification_copy_builders.dart';
 import 'package:tankstellen/features/alerts/background/fuel_price_fields.dart';
 import 'package:tankstellen/features/alerts/background/notification_templates.dart';
 import 'package:tankstellen/features/alerts/data/radius_alert_runner.dart';

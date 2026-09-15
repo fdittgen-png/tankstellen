@@ -6,6 +6,7 @@ import 'dart:ui' as ui;
 
 import '../../../l10n/app_localizations.dart';
 import '../../../core/country/country_config.dart';
+import 'opportunity_notification_copy.dart';
 
 /// #2306 — localized notification copy resolved IN THE MAIN ISOLATE and
 /// handed to the WorkManager background isolate.
@@ -46,6 +47,11 @@ class BackgroundNotificationTemplates {
   /// `+ {count} more` — trailing line of the radius body when truncated.
   final String radiusGroupedMore;
 
+  /// #4183 — the opportunity kinds that did not exist before the engine
+  /// did. Kept in their own object so this class stays the size it was
+  /// and a future kind adds one field there, not two here.
+  final OpportunityTemplates opportunity;
+
   /// Default currency symbol — the euro — used when a render call does not
   /// supply a per-alert currency (the fallback / legacy path).
   ///
@@ -63,6 +69,7 @@ class BackgroundNotificationTemplates {
     required this.velocityBody,
     required this.radiusGroupedTitle,
     required this.radiusGroupedMore,
+    required this.opportunity,
     required this.currencySymbol,
   });
 
@@ -87,6 +94,21 @@ class BackgroundNotificationTemplates {
       radiusGroupedTitle: l.radiusAlertGroupedTitle(
           '{label}', '{count}', '{threshold}', '{currency}'),
       radiusGroupedMore: l.radiusAlertGroupedMore('{count}'),
+      opportunity: OpportunityTemplates(
+        bestStopNowTitle: l.opportunityBestStopNowTitle('{fuelType}'),
+        bestStopNowBody: l.opportunityBestStopNowBody(
+            '{price}', '{currency}', '{station}', '{distance}'),
+        bestStopOnRouteTitle: l.opportunityBestStopOnRouteTitle('{fuelType}'),
+        bestStopOnRouteBody: l.opportunityBestStopOnRouteBody(
+            '{price}', '{currency}', '{station}', '{distance}'),
+        refuelSoonTitle: l.opportunityRefuelSoonTitle,
+        refuelSoonBody: l.opportunityRefuelSoonBody(
+            '{station}', '{distance}', '{price}', '{currency}'),
+        personalBaselineTitle:
+            l.opportunityPersonalBaselineTitle('{fuelType}'),
+        personalBaselineBody: l.opportunityPersonalBaselineBody(
+            '{price}', '{currency}', '{station}'),
+      ),
       currencySymbol: _euro,
     );
   }
@@ -118,6 +140,7 @@ class BackgroundNotificationTemplates {
         'velocityBody': velocityBody,
         'radiusGroupedTitle': radiusGroupedTitle,
         'radiusGroupedMore': radiusGroupedMore,
+        'opportunity': opportunity.toJson(),
         'currencySymbol': currencySymbol,
       };
 
@@ -136,6 +159,11 @@ class BackgroundNotificationTemplates {
         velocityBody: map['velocityBody'] as String,
         radiusGroupedTitle: map['radiusGroupedTitle'] as String,
         radiusGroupedMore: map['radiusGroupedMore'] as String,
+        // #4183 — absent in a blob written before the engine existed.
+        // `tryDecode` returning null sends the caller down the existing
+        // fall-back-to-live-resolution path, and the main isolate
+        // rewrites the blob on the next launch.
+        opportunity: OpportunityTemplates.tryDecode(map['opportunity'])!,
         currencySymbol: map['currencySymbol'] as String,
       );
     } catch (_) {
@@ -192,6 +220,69 @@ class BackgroundNotificationTemplates {
         'count': '$count',
         'threshold': threshold,
         'currency': currency ?? currencySymbol,
+      });
+
+  // ── #4183 opportunity kinds ───────────────────────────────────────
+
+  String renderOpportunityBestStopNowTitle({required String fuelType}) =>
+      _fill(opportunity.bestStopNowTitle, {'fuelType': fuelType});
+
+  String renderOpportunityBestStopNowBody({
+    required String price,
+    required String currency,
+    required String station,
+    required String distance,
+  }) =>
+      _fill(opportunity.bestStopNowBody, {
+        'price': price,
+        'currency': currency,
+        'station': station,
+        'distance': distance,
+      });
+
+  String renderOpportunityBestStopOnRouteTitle({required String fuelType}) =>
+      _fill(opportunity.bestStopOnRouteTitle, {'fuelType': fuelType});
+
+  String renderOpportunityBestStopOnRouteBody({
+    required String price,
+    required String currency,
+    required String station,
+    required String distance,
+  }) =>
+      _fill(opportunity.bestStopOnRouteBody, {
+        'price': price,
+        'currency': currency,
+        'station': station,
+        'distance': distance,
+      });
+
+  String renderOpportunityRefuelSoonTitle() => opportunity.refuelSoonTitle;
+
+  String renderOpportunityRefuelSoonBody({
+    required String station,
+    required String distance,
+    required String price,
+    required String currency,
+  }) =>
+      _fill(opportunity.refuelSoonBody, {
+        'station': station,
+        'distance': distance,
+        'price': price,
+        'currency': currency,
+      });
+
+  String renderOpportunityPersonalBaselineTitle({required String fuelType}) =>
+      _fill(opportunity.personalBaselineTitle, {'fuelType': fuelType});
+
+  String renderOpportunityPersonalBaselineBody({
+    required String price,
+    required String currency,
+    required String station,
+  }) =>
+      _fill(opportunity.personalBaselineBody, {
+        'price': price,
+        'currency': currency,
+        'station': station,
       });
 
   /// Trailing `+ N more` line of the radius body.

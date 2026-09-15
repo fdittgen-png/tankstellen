@@ -19,6 +19,7 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 /// input, as a band derived from named tiers rather than a number that
 /// implies a precision the inputs do not have.
 void main() {
+  _velocityReferenceTests();
   final now = DateTime.utc(2026, 9, 14, 12);
 
   Opportunity op({
@@ -250,5 +251,43 @@ void main() {
       expect(alertConfidencePrefix(en, AlertConfidence.medium), isNotEmpty);
       expect(alertConfidencePrefix(en, AlertConfidence.low), isNull);
     });
+  });
+}
+
+/// #4183 — an area-wide movement states no per-litre delta.
+///
+/// A `VelocityAlertEvent` carries the affected station ids and the
+/// LARGEST drop among them. It does not say which station that was, nor
+/// what that station charged before — so a (current, earlier) pair
+/// composed from the cheapest current price plus the biggest drop would
+/// describe no station at all, and `OpportunityReasons` would render it
+/// as a confident "N ¢/L below what it was".
+void _velocityReferenceTests() {
+  Opportunity movement({double? referencePrice}) => Opportunity(
+        kind: OpportunityKind.localMovement,
+        fuelType: 'e10',
+        currentPrice: 1.649,
+        reference: OpportunityReference.priceEarlier,
+        referencePrice: referencePrice,
+        distanceKm: 0,
+        priceAge: const DataValue.measured(Duration(minutes: 10)),
+        confidence: DataConfidence.high,
+        detectedAt: DateTime.utc(2026, 9, 15),
+        expiresAt: DateTime.utc(2026, 9, 15, 6),
+      );
+
+  test('a movement with no numeric reference renders no below-reference line',
+      () {
+    final reasons = OpportunityReasons.of(movement());
+    expect(reasons.whereType<BelowReferenceReason>(), isEmpty,
+        reason: 'the comparison is categorical; a figure here would be '
+            'true of no station');
+  });
+
+  test('a movement that DOES carry a coherent pair still renders one', () {
+    // The capability is not removed — only the fabricated use of it.
+    final reasons = OpportunityReasons.of(movement(referencePrice: 1.709));
+    expect(reasons.whereType<BelowReferenceReason>().single.perLitreDelta,
+        closeTo(0.06, 1e-9));
   });
 }

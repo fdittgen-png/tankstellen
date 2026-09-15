@@ -11903,6 +11903,73 @@ abstract class AppLocalizations {
   /// **'{open, select, true{Station is open} false{Station is closed} other{Open state unknown}}'**
   String stationOpenStateSemantic(String open);
 
+  /// Title of the background notification for OpportunityKind.bestStopNow — the best stop available right now, near where the user is (#4183, epic #4148). Resolved in the main isolate at task-registration time and read back by the WorkManager isolate via Hive settings, like every other background notification template.
+  ///
+  /// In en, this message translates to:
+  /// **'Cheapest {fuelType} nearby'**
+  String opportunityBestStopNowTitle(String fuelType);
+
+  /// Body for OpportunityKind.bestStopNow. Deliberately only fields that are always present on this kind — price, station name and distance — so the copy never has to hedge a missing saving (#4183).
+  ///
+  /// In en, this message translates to:
+  /// **'{price} {currency} at {station} · {distance} km'**
+  String opportunityBestStopNowBody(
+    String price,
+    String currency,
+    String station,
+    String distance,
+  );
+
+  /// Title for OpportunityKind.bestStopOnRoute — the best stop along a route the user is driving (#4183). Distinct from the nearby case because 'on your route' is what makes the detour cost already accounted for.
+  ///
+  /// In en, this message translates to:
+  /// **'Cheapest {fuelType} on your route'**
+  String opportunityBestStopOnRouteTitle(String fuelType);
+
+  /// Body for OpportunityKind.bestStopOnRoute. 'ahead' rather than a bare distance: on a route the number is along the way, not a detour radius (#4183).
+  ///
+  /// In en, this message translates to:
+  /// **'{price} {currency} at {station} · {distance} km ahead'**
+  String opportunityBestStopOnRouteBody(
+    String price,
+    String currency,
+    String station,
+    String distance,
+  );
+
+  /// Title for OpportunityKind.refuelSoon — the tank is low enough that a stop is coming whether or not the price is good (#4153, #4183). States the need, not a bargain, because that is what this kind is about.
+  ///
+  /// In en, this message translates to:
+  /// **'Time to refuel'**
+  String get opportunityRefuelSoonTitle;
+
+  /// Body for OpportunityKind.refuelSoon: where to stop, how far ahead it is, and what it costs — in that order, because the stop is the point and the price is the detail (#4183).
+  ///
+  /// In en, this message translates to:
+  /// **'{station} · {distance} km ahead · {price} {currency}'**
+  String opportunityRefuelSoonBody(
+    String station,
+    String distance,
+    String price,
+    String currency,
+  );
+
+  /// Title for OpportunityKind.personalBaseline — a price unusual against THIS user's own fill-up history rather than against a local median (#4150, #4183). 'your usual' is the reference and has to be in the title, or the claim reads as a generic bargain.
+  ///
+  /// In en, this message translates to:
+  /// **'{fuelType} below your usual price'**
+  String opportunityPersonalBaselineTitle(String fuelType);
+
+  /// Body for OpportunityKind.personalBaseline. The comparison itself is in the title; this is the fact behind it (#4183).
+  ///
+  /// In en, this message translates to:
+  /// **'{price} {currency} at {station}'**
+  String opportunityPersonalBaselineBody(
+    String price,
+    String currency,
+    String station,
+  );
+
   /// Title of the GDPR pre-permission rationale shown once before the OS camera prompt (receipt / pump-display / QR scan) (#3872).
   ///
   /// In en, this message translates to:
