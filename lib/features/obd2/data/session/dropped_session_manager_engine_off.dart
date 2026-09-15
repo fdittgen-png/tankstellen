@@ -96,6 +96,7 @@ extension DroppedSessionEngineOff on DroppedSessionManager {
   /// routes through the ordinary visible-drop path (grace timer + banner).
   void escalateDegradedToPaused() {
     if (!_host.degradedGpsOnly || _host.stopped) return;
+    _verifier.cancel(); // #4196 — nothing left to verify
     _host.degradedGpsOnly = false;
     _trace(AutoRecordEventKind.dropEscalatedToVisible);
     _enterVisibleDrop(_dropReason ?? TripDropReason.transportError);

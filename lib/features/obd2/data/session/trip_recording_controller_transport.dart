@@ -269,11 +269,11 @@ mixin _TripRecordingTransportGuard on _TripRecordingSessionState {
   /// different message.
   void _observeHighPriorityParse(Object? parsedValue) {
     if (parsedValue != null) {
-      // ANY successful high-priority parse clears the window — we're
-      // detecting "ECU is dead", not "this one PID is unsupported".
-      // #3602 — the staleness fence anchor.
+      // ANY parse clears the window ("ECU is dead", not "PID unsupported"),
+      // anchors the #3602 fence and completes a pending #4196 recovery.
       _engineFence.onFreshParse(_now());
       _dropDetector.observeHighPriorityParse(parsedValue);
+      _droppedSession.onEngineData();
       return;
     }
     // The transport-error drop already paused us — don't let a stretch

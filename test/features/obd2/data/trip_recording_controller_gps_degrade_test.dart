@@ -197,19 +197,77 @@ void main() {
       await liveTransport.connect();
       ctl.replaceService(Obd2Service(liveTransport));
       capturedOnReconnect!.call();
-      expect(ctl.currentState, TripRecordingControllerState.recording,
-          reason: 'an OBD2 reconnect must drop back to full recording');
+      expect(ctl.currentState, TripRecordingControllerState.degradedGpsOnly,
+          reason: '#4196 — an adoption is not a recovery: GPS-only until '
+              'the adopted link delivers engine data');
 
       // The scheduler restarted on the LIVE service: OBD2 PID speed
-      // (50 km/h) flows again and wins over the GPS latch.
+      // (50 km/h) flows again, verifies the recovery, and wins over the
+      // GPS latch.
       final readings = <TripLiveReading>[];
       final sub = ctl.live.listen(readings.add);
       await Future<void>.delayed(const Duration(milliseconds: 200));
+      expect(ctl.currentState, TripRecordingControllerState.recording,
+          reason: 'the first fresh engine parse completes the recovery');
       expect(readings.any((r) => r.speedKmh == 50), isTrue,
           reason: 'after reconnect the OBD2 speed PID (50 km/h) must win '
               'again over the GPS latch');
 
       await sub.cancel();
+      await ctl.stop();
+    });
+
+    test(
+        '#4196 — the adapter answers but the bus stays silent: NOT a '
+        'recovery — polling runs on the adopted link, the trip stays '
+        'GPS-only', () async {
+      final transport = FakeObd2Transport(initResponses());
+      await transport.connect();
+      VoidCallback? capturedOnReconnect;
+
+      final ctl = TripRecordingController(
+        service: Obd2Service(transport),
+        pollInterval: const Duration(milliseconds: 40),
+        schedulerTickRate: const Duration(milliseconds: 10),
+        vehicleId: 'car-dead-bus',
+        pausedRepo: pausedRepo,
+        historyRepo: historyRepo,
+        pinnedAdapterMac: 'AA:BB',
+        reconnectScannerFactory: (mac, onReconnect) {
+          capturedOnReconnect = onReconnect;
+          return _ObservableScanner(
+            pinnedMac: mac,
+            onReconnect: onReconnect,
+            onStart: () {},
+            onStop: () {},
+          );
+        },
+      );
+
+      await ctl.start();
+      ctl.updateGpsFix(latitude: 48, longitude: 7, speedKmh: 60);
+      ctl.debugTriggerDrop();
+      expect(ctl.currentState, TripRecordingControllerState.degradedGpsOnly);
+
+      // The shape the ATRV adoption probe cannot tell apart from a live
+      // link: the ELM chip answers on its own, the vehicle bus does not.
+      final adapterOnly = FakeObd2Transport({
+        ...initResponses(),
+        'ATRV': '12.6V>',
+        '010D': 'NO DATA>',
+        '010C': 'NO DATA>',
+      });
+      await adapterOnly.connect();
+      ctl.replaceService(Obd2Service(adapterOnly));
+      capturedOnReconnect!.call();
+
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      expect(adapterOnly.sentCommands, isNotEmpty,
+          reason: 'polling resumed on the adopted link');
+      expect(ctl.currentState, TripRecordingControllerState.degradedGpsOnly,
+          reason: 'RED before #4196: the adoption alone flipped the trip '
+              'back to full OBD2 with no engine sample behind it');
+
       await ctl.stop();
     });
 
