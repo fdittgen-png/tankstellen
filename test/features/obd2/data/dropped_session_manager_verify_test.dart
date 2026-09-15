@@ -8,6 +8,7 @@
 // the first fresh engine parse, and a link that delivers none within its
 // window is handed back — with the window stretching per consecutive
 // unverified adoption, so a dead bus cannot become a dial storm.
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -18,6 +19,7 @@ import 'package:tankstellen/features/obd2/data/session/dropped_session_host.dart
 import 'package:tankstellen/features/obd2/data/session/dropped_session_manager.dart';
 import 'package:tankstellen/features/obd2/data/session/obd2_reattach_source.dart';
 import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/session/recovery_verifier.dart';
 import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 import 'package:tankstellen/features/trips/domain/entities/gps_sample_diagnostic.dart';
@@ -50,7 +52,7 @@ void main() {
     });
 
     ({DroppedSessionManager mgr, _FakeHost host, List<_GateScanner> sources})
-        build({required Duration verifyWindow}) {
+        build({required RecoveryVerifier verifier}) {
       final host = _FakeHost()..gpsAlive = true;
       final sources = <_GateScanner>[];
       final mgr = DroppedSessionManager(
@@ -64,7 +66,7 @@ void main() {
           sources.add(s);
           return s;
         },
-        recoveryVerifyWindow: verifyWindow,
+        recoveryVerifier: verifier,
         pausedRepo: PausedTripRepository(box: pausedBox),
         historyRepo: TripHistoryRepository(box: historyBox),
       );
@@ -83,7 +85,9 @@ void main() {
     test(
         'adopted but silent: GPS-only holds, no leftDegraded — and the '
         'window hands the link back and waits for another', () async {
-      final t = build(verifyWindow: const Duration(milliseconds: 40));
+      final timers = _FakeTimers();
+      final t = build(
+          verifier: RecoveryVerifier(baseWindow: const Duration(milliseconds: 40), startTimer: timers.start));
       t.mgr.handleDrop();
       adopt(t.sources[0], Obd2Service(FakeObd2Transport()));
 
@@ -95,7 +99,7 @@ void main() {
       expect(eventsOf(t.host, RecordingSessionEventKind.leftDegraded), isEmpty,
           reason: 'RED before #4196: journaled as recovered on the probe');
 
-      await Future<void>.delayed(const Duration(milliseconds: 90));
+      timers.elapse(); // the window elapses — no sleeping
 
       expect(eventsOf(t.host, RecordingSessionEventKind.recoveryUnverified),
           hasLength(1));
@@ -109,7 +113,9 @@ void main() {
     });
 
     test('the first engine parse completes the recovery — once', () async {
-      final t = build(verifyWindow: const Duration(milliseconds: 40));
+      final timers = _FakeTimers();
+      final t = build(
+          verifier: RecoveryVerifier(baseWindow: const Duration(milliseconds: 40), startTimer: timers.start));
       t.mgr.handleDrop();
       adopt(t.sources[0], Obd2Service(FakeObd2Transport()));
 
@@ -119,7 +125,7 @@ void main() {
       expect(t.mgr.dropReason, isNull);
       expect(t.host.sessionEvents.last, 'leftDegraded:engine data verified');
 
-      await Future<void>.delayed(const Duration(milliseconds: 90));
+      timers.elapse(); // the window elapses — no sleeping
       t.mgr.onEngineData();
       expect(eventsOf(t.host, RecordingSessionEventKind.recoveryUnverified),
           isEmpty, reason: 'a verified recovery cancels the window');
@@ -130,7 +136,9 @@ void main() {
     test(
         'consecutive unverified adoptions stretch the window (capped at 4×); '
         'engine data resets it', () async {
-      final t = build(verifyWindow: const Duration(milliseconds: 20));
+      final timers = _FakeTimers();
+      final t = build(
+          verifier: RecoveryVerifier(baseWindow: const Duration(milliseconds: 20), startTimer: timers.start));
       t.mgr.handleDrop();
 
       final windows = <int>[];
@@ -138,7 +146,7 @@ void main() {
         final window = t.mgr.currentRecoveryVerifyWindow;
         windows.add(window.inMilliseconds);
         adopt(t.sources[i], Obd2Service(FakeObd2Transport()));
-        await Future<void>.delayed(window + const Duration(milliseconds: 40));
+        timers.elapse(); // the window elapses — no sleeping
       }
 
       expect(windows, [20, 40, 60, 80, 80],
@@ -155,27 +163,52 @@ void main() {
 
     test('the SAME instance adopted twice without engine data is refused',
         () async {
-      final t = build(verifyWindow: const Duration(milliseconds: 20));
+      final timers = _FakeTimers();
+      final t = build(
+          verifier: RecoveryVerifier(baseWindow: const Duration(milliseconds: 20), startTimer: timers.start));
       t.mgr.handleDrop();
       final mute = Obd2Service(FakeObd2Transport());
 
       adopt(t.sources[0], mute);
-      await Future<void>.delayed(const Duration(milliseconds: 60));
+      timers.elapse(); // the window elapses — no sleeping
       adopt(t.sources[1], mute);
-      await Future<void>.delayed(const Duration(milliseconds: 90));
+      timers.elapse(); // the window elapses — no sleeping
 
       expect(t.sources[1].adoptionGate!.isRefused(mute), isTrue,
           reason: 'an adoption that never delivered is a quick re-drop '
               'for the #3915 cycle breaker');
     });
 
+    test(
+        '#4237 — a duplicate adoption signal is single-flight: one polling '
+        'start, one window, one verdict', () async {
+      final timers = _FakeTimers();
+      final t = build(
+          verifier: RecoveryVerifier(baseWindow: const Duration(milliseconds: 40), startTimer: timers.start));
+      t.mgr.handleDrop();
+      adopt(t.sources[0], Obd2Service(FakeObd2Transport()));
+      // A late second fire of the same source (a duplicate trigger).
+      t.sources[0].onReconnect();
+
+      expect(t.host.startSchedulerCalls, 1,
+          reason: 'a second trigger must not start a second polling loop');
+      expect(eventsOf(t.host, RecordingSessionEventKind.recoveryVerifying),
+          hasLength(1));
+
+      timers.elapse(); // the window elapses — no sleeping
+      expect(eventsOf(t.host, RecordingSessionEventKind.recoveryUnverified),
+          hasLength(1), reason: 'one window, one verdict');
+    });
+
     test('stopping the trip cancels a pending verification', () async {
-      final t = build(verifyWindow: const Duration(milliseconds: 20));
+      final timers = _FakeTimers();
+      final t = build(
+          verifier: RecoveryVerifier(baseWindow: const Duration(milliseconds: 20), startTimer: timers.start));
       t.mgr.handleDrop();
       adopt(t.sources[0], Obd2Service(FakeObd2Transport()));
 
       t.mgr.cancelAllTimers();
-      await Future<void>.delayed(const Duration(milliseconds: 60));
+      timers.elapse(); // the window elapses — no sleeping
 
       expect(t.mgr.awaitingEngineData, isFalse);
       expect(eventsOf(t.host, RecordingSessionEventKind.recoveryUnverified),
@@ -227,6 +260,7 @@ class _FakeHost implements DroppedSessionHost {
   }
 
   int disconnectDroppedServiceCalls = 0;
+  int startSchedulerCalls = 0;
   final List<String> sessionEvents = [];
 
   @override
@@ -268,7 +302,7 @@ class _FakeHost implements DroppedSessionHost {
   @override
   void resumeScheduler() {}
   @override
-  void startScheduler() {}
+  void startScheduler() => startSchedulerCalls++;
   @override
   void resetDropDetector() {}
   @override
@@ -301,4 +335,44 @@ class _FakeHost implements DroppedSessionHost {
         startedAt: DateTime(2026, 9, 1, 19, 22),
         endedAt: DateTime(2026, 9, 1, 19, 30),
       );
+}
+
+/// Deterministic timers (#4237): nothing fires until the test elapses them.
+class _FakeTimers {
+  final List<_FakeTimer> _all = [];
+
+  Timer start(Duration duration, void Function() callback) {
+    final timer = _FakeTimer(callback);
+    _all.add(timer);
+    return timer;
+  }
+
+  /// Every pending window elapses now.
+  void elapse() {
+    for (final timer in List.of(_all)) {
+      timer.fire();
+    }
+  }
+}
+
+class _FakeTimer implements Timer {
+  _FakeTimer(this._callback);
+
+  final void Function() _callback;
+  bool _active = true;
+
+  void fire() {
+    if (!_active) return;
+    _active = false;
+    _callback();
+  }
+
+  @override
+  void cancel() => _active = false;
+
+  @override
+  bool get isActive => _active;
+
+  @override
+  int get tick => 0;
 }

@@ -123,10 +123,10 @@ class DroppedSessionManager {
     required this._silentReconnectWindow,
     this._pinnedAdapterMac,
     this._reconnectScannerFactory,
-    Duration recoveryVerifyWindow = RecoveryVerifier.defaultWindow,
+    RecoveryVerifier? recoveryVerifier,
     PausedTripRepository? pausedRepo,
     TripHistoryRepository? historyRepo,
-  })  : _verifier = RecoveryVerifier(baseWindow: recoveryVerifyWindow),
+  })  : _verifier = recoveryVerifier ?? RecoveryVerifier(),
         _repos = DroppedSessionRepoResolver(
           pausedOverride: pausedRepo,
           historyOverride: historyRepo,

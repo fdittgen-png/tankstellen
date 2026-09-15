@@ -7,12 +7,12 @@ part of 'dropped_session_manager.dart';
 /// and rationale live in [RecoveryVerifier].
 extension DroppedSessionVerify on DroppedSessionManager {
   bool get awaitingEngineData => _verifier.awaiting;
-
   Duration get currentRecoveryVerifyWindow => _verifier.nextWindow;
 
   /// The adapter came back while degraded: resume polling on it, keep
   /// recording GPS-only, and wait for the bus to prove itself.
   void _beginRecoveryVerification() {
+    if (_verifier.awaiting) return; // #4237 — single-flight
     final window = _verifier.begin(_onRecoveryUnverified);
     _note(RecordingSessionEventKind.recoveryVerifying,
         'link adopted — waiting up to ${window.inSeconds}s for engine data');

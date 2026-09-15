@@ -22,7 +22,14 @@ import 'dart:math' as math;
 /// (capped at 4×), so a bus that never answers costs one dial every few
 /// minutes, never a storm.
 class RecoveryVerifier {
-  RecoveryVerifier({this.baseWindow = defaultWindow});
+  RecoveryVerifier({
+    this.baseWindow = defaultWindow,
+    Timer Function(Duration, void Function())? startTimer,
+  }) : _startTimer = startTimer ?? Timer.new;
+
+  /// Timer seam: tests fire the window deterministically instead of
+  /// sleeping through it (#4237).
+  final Timer Function(Duration, void Function()) _startTimer;
 
   /// Covers the 8 s reconnect grace, a ~17 s quiet-window protocol
   /// search and the 15 s staleness fence.
@@ -48,7 +55,7 @@ class RecoveryVerifier {
     final window = nextWindow;
     cancel();
     _awaiting = true;
-    _timer = Timer(window, () {
+    _timer = _startTimer(window, () {
       _timer = null;
       if (!_awaiting) return;
       _awaiting = false;
