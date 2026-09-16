@@ -13,6 +13,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../logging/error_logger.dart';
+import '../../utils/localized_fuel_name.dart';
 import '../voice_announcement_service.dart';
 
 /// Platform TTS implementation using [FlutterTts].
@@ -237,7 +238,7 @@ class FlutterTtsAnnouncementService implements VoiceAnnouncementService {
     return _localizations().voiceStationAnnouncement(
       name,
       dist,
-      candidate.fuelType,
+      localizedFuelName(_localizations(), candidate.fuelType),
       priceParts[0],
       priceParts[1],
     );

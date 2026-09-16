@@ -97,7 +97,7 @@ class VoiceAnnouncementListener extends _$VoiceAnnouncementListener {
     try {
       await engine.evaluateAndAnnounce(
         nearbyStations: [station],
-        fuelType: fuel.displayName,
+        fuelType: fuel,
         priceExtractor: (s) => _priceFor(s, fuel),
         // The detector already computed the live distance to this station;
         // reuse it so we don't recompute a haversine from a position the

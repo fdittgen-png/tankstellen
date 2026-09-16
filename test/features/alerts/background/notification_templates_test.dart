@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/alerts/background/notification_templates.dart';
 
@@ -134,6 +136,57 @@ void main() {
       expect(decoded.radiusGroupedTitle, original.radiusGroupedTitle);
       expect(decoded.radiusGroupedMore, original.radiusGroupedMore);
       expect(decoded.currencySymbol, original.currencySymbol);
+      expect(decoded.fuelLabels, original.fuelLabels);
+    });
+
+    test('the fuel labels are localized, not FuelType.displayName (#4301)',
+        () {
+      // Italian, matching the round-trip case above. `it` is a real probe:
+      // lpg is `GPL` and e85 `Bioetanolo E85`, where FuelType.displayName
+      // says `GPL / LPG` and `E85 / Bioéthanol`. For diesel/e10 the two
+      // spellings coincide, so those grades could never detect this.
+      final templates = BackgroundNotificationTemplates.resolveForLanguage('it');
+
+      expect(templates.fuelLabelFor('lpg'), 'GPL');
+      expect(templates.fuelLabelFor('e85'), 'Bioetanolo E85');
+      // The hybrids must be absent. Without this the assertions above
+      // could pass while displayName still leaked through some other
+      // path — and a negative against a string no code can emit is the
+      // vacuous-negative trap #4295 had to undo five times.
+      expect(templates.fuelLabels.values, isNot(contains('GPL / LPG')));
+      expect(templates.fuelLabels.values,
+          isNot(contains('E85 / Bioéthanol')));
+    });
+
+    test('the search wildcard is never an alert subject (#4301)', () {
+      final templates = BackgroundNotificationTemplates.resolveForLanguage('en');
+
+      expect(templates.fuelLabels.containsKey('all'), isFalse,
+          reason: 'FuelType.all is a search-time wildcard; an alert is '
+              'always about one grade');
+    });
+
+    test('an unknown apiValue falls back to itself, never null (#4301)', () {
+      final templates = BackgroundNotificationTemplates.resolveForLanguage('en');
+
+      // A blob predating a grade, or a grade this build does not know.
+      // `e10` reads as a label; `null` interpolated into a sentence reads
+      // as a bug.
+      expect(templates.fuelLabelFor('some_future_grade'), 'some_future_grade');
+    });
+
+    test('a blob without fuelLabels decodes to null, so the caller '
+        're-resolves (#4301 / #4183 path)', () {
+      final encoded =
+          BackgroundNotificationTemplates.resolveForLanguage('de').encode();
+      final map = jsonDecode(encoded) as Map<String, dynamic>;
+      // Exactly what a blob written before #4301 looks like.
+      map.remove('fuelLabels');
+
+      expect(BackgroundNotificationTemplates.tryDecode(jsonEncode(map)), isNull,
+          reason: 'null sends the caller down the existing '
+              'fall-back-to-live-resolution path, and the main isolate '
+              'rewrites the blob on the next launch');
     });
 
     test('tryDecode returns null for null / empty / malformed blobs', () {

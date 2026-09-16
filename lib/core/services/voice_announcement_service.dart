@@ -1,12 +1,23 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import '../domain/fuel_type.dart';
 import '../domain/station.dart';
 
 /// A station that is near enough and cheap enough to announce.
 class AnnouncementCandidate {
   final Station station;
-  final String fuelType;
+
+  /// The grade this candidate is about.
+  ///
+  /// A [FuelType], not a pre-formatted label (#4301). The spoken sentence
+  /// is built in [VoiceAnnouncementService] implementations, which is
+  /// where the selected locale is known — `FlutterTtsAnnouncementService`
+  /// already resolves `AppLocalizations` for it. Passing a label in from
+  /// the call site sent a string past that localizer and into speech, so
+  /// a German driver heard the French half of
+  /// `FuelType.displayName`'s `GPL / LPG`.
+  final FuelType fuelType;
   final double price;
   final double distanceKm;
 

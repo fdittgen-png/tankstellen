@@ -6,6 +6,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/services/impl/flutter_tts_announcement_service.dart';
 import 'package:tankstellen/core/services/voice_announcement_service.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/station.dart';
 
 import '../../../fixtures/stations.dart';
@@ -25,7 +26,7 @@ void _stubAllSetters(_MockFlutterTts tts) {
 
 AnnouncementCandidate _candidate({
   Station? station,
-  String fuelType = 'Diesel',
+  FuelType fuelType = FuelType.diesel,
   double price = 1.659,
   double distanceKm = 1.5,
 }) {
@@ -144,7 +145,7 @@ void main() {
       await service.initialize();
 
       await service.announce(_candidate(
-        fuelType: 'Diesel',
+        fuelType: FuelType.diesel,
         price: 1.42,
         distanceKm: 1.2,
       ));
@@ -161,7 +162,7 @@ void main() {
       await service.initialize();
 
       await service.announce(_candidate(
-        fuelType: 'Diesel',
+        fuelType: FuelType.diesel,
         price: 1.42,
         distanceKm: 1.2,
       ));
@@ -172,6 +173,27 @@ void main() {
       // And NOT the hardcoded English wording.
       verifyNever(
           () => tts.speak(any(that: contains('kilometers ahead'))));
+    });
+
+    test('speaks the GERMAN grade name, not displayName\'s hybrid (#4301)',
+        () async {
+      await service.setAppLocale('de');
+      await service.initialize();
+
+      await service.announce(_candidate(
+        fuelType: FuelType.lpg,
+        price: 1.42,
+        distanceKm: 1.2,
+      ));
+
+      // The grade is the probe: German says `Autogas (LPG)` where
+      // FuelType.displayName says `GPL / LPG`. The two cases above use
+      // Diesel, which is byte-identical in en, fr AND displayName — so
+      // neither of them could ever have caught a label that skipped the
+      // localizer, and this announcement is SPOKEN, which made it the
+      // worst place in the app to pronounce a French product name.
+      verify(() => tts.speak(any(that: contains('Autogas (LPG)')))).called(1);
+      verifyNever(() => tts.speak(any(that: contains('GPL / LPG'))));
     });
 
     test('uses brand when brand is non-empty', () async {
@@ -192,12 +214,15 @@ void main() {
 
       await service.announce(_candidate(
         station: brandedStation,
-        fuelType: 'E10',
+        fuelType: FuelType.e10,
         price: 1.79,
         distanceKm: 0.5,
       ));
 
-      verify(() => tts.speak('Shell, 0.5 kilometers ahead, E10 1 euros 79'))
+      // #4301 — `Super E10`, not `E10`: the grade now comes from the ARB
+      // (`fuelNameE10`) instead of a literal the test happened to pass in.
+      verify(() =>
+              tts.speak('Shell, 0.5 kilometers ahead, Super E10 1 euros 79'))
           .called(1);
     });
 
@@ -219,7 +244,7 @@ void main() {
 
       await service.announce(_candidate(
         station: unbrandedStation,
-        fuelType: 'Diesel',
+        fuelType: FuelType.diesel,
         price: 1.50,
         distanceKm: 0.5,
       ));

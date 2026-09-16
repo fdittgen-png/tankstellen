@@ -21,6 +21,13 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 void main() {
   final AppLocalizations l10nEn = lookupAppLocalizations(const Locale('en'));
 
+  /// #4301 — the Live Activity's fuel label used to come from
+  /// `FuelType.displayName`, a French/English hybrid every locale saw.
+  /// German is the probe: for lpg the ARB says `Autogas (LPG)` where
+  /// `displayName` says `GPL / LPG`. For e5/e10/e98/diesel the two are
+  /// byte-identical, so an English assertion cannot detect the fix at all.
+  final AppLocalizations l10nDe = lookupAppLocalizations(const Locale('de'));
+
   final now = DateTime(2026, 6, 10, 12);
 
   Station station({
@@ -61,13 +68,14 @@ void main() {
     Station? radarStation,
     FuelType fuel = FuelType.e10,
     double? radiusMeters = 3000,
+    AppLocalizations? l,
   }) => buildLiveActivityContent(
     state: state ?? recording(),
     approach: approach,
     radarStation: radarStation,
     fuel: fuel,
     radiusMeters: radiusMeters,
-    l: l10nEn,
+    l: l ?? l10nEn,
     now: now,
   );
 
@@ -198,7 +206,11 @@ void main() {
       expect(content.mode, LiveActivityMode.approach);
       expect(content.stationName, 'ARAL Hauptstr.');
       expect(content.priceText, PriceFormatter.formatPrice(1.789));
-      expect(content.fuelLabel, FuelType.e10.displayName);
+      // #4301 — the ARB string the payload now carries, spelled out. It
+      // happens to equal FuelType.e10.displayName, which is exactly why
+      // this assertion alone cannot police the fix; the German case below
+      // is the one that can.
+      expect(content.fuelLabel, 'Super E10');
       // #3258 — radar distance now routes through the SSoT unit-aware
       // formatter (GB→mi, sub-km→m/yd), matching the search cards.
       expect(content.stationDistanceText, PriceFormatter.formatDistance(0.45));
@@ -211,6 +223,24 @@ void main() {
       expect(content.mode, LiveActivityMode.approach);
       expect(content.stationDistanceText, isNull);
       expect(content.progress, isNull);
+    });
+
+    test('the fuel label is the reader\'s language, not displayName (#4301)',
+        () {
+      final content = build(
+        approach: ApproachInRadius(station: station(), distanceMeters: 450),
+        fuel: FuelType.lpg,
+        l: l10nDe,
+      )!;
+
+      // A Live Activity is glanceable chrome on the lock screen — a German
+      // driver must not read a French product name there.
+      expect(content.fuelLabel, 'Autogas (LPG)');
+      // And the old hybrid must be gone. Without this the assertion above
+      // could pass while `displayName` still leaked somewhere else, and a
+      // findsNothing-style check against a string no code path emits is
+      // the vacuous-negative trap #4295 had to undo five times.
+      expect(content.fuelLabel, isNot('GPL / LPG'));
     });
 
     test('a station without a name falls back to the brand', () {
