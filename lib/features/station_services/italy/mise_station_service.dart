@@ -115,8 +115,9 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
           // honest unknown instead of the old hard-coded `true`.
           isOpen: null,
           updatedAt: prices?.updatedAt,
-          // #4189 — explicit machine-readable half.
-          priceUpdatedAt: DateTime.tryParse(prices?.updatedAt ?? ''),
+          // #4189 — explicit machine-readable half. #4309 — from the raw
+          // `dtComu` stamp: the label carries no year and never parsed.
+          priceUpdatedAt: prices?.priceUpdatedAt,
           stationType: s.type == 'Autostradale' ? 'A' : 'R',
         ));
       }
@@ -284,17 +285,19 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
         existing.metano ??= price;
       }
 
-      // Keep the most recent update time
-      if (dateStr.isNotEmpty && (existing.updatedAt == null || dateStr.compareTo(existing.updatedAt!) > 0)) {
-        // Convert "20/03/2026 20:00:08" → "20/03 20:00"
-        final dtParts = dateStr.split(' ');
-        if (dtParts.length >= 2) {
-          final datePart = dtParts[0].split('/');
-          final timePart = dtParts[1].split(':');
-          if (datePart.length >= 2 && timePart.length >= 2) {
-            existing.updatedAt = '${datePart[0]}/${datePart[1]} ${timePart[0]}:${timePart[1]}';
-          }
-        }
+      // Keep the most recent update time. #4309 — compared as instants:
+      // the old string compare of a raw stamp against the stored
+      // `dd/MM HH:mm` label let a later row's OLDER stamp overwrite a
+      // newer one (recorded station 23778 kept 07:58 over 23:13). The raw
+      // stamp is kept for the freshness gate; the label is display only.
+      final stamp = parseMiseDtComu(dateStr);
+      final current = existing.priceUpdatedAt;
+      if (stamp != null && (current == null || stamp.isAfter(current))) {
+        existing.updatedAtRaw = dateStr.trim();
+        // "20/03/2026 20:00:08" → "20/03 20:00"
+        String two(int v) => v.toString().padLeft(2, '0');
+        existing.updatedAt = '${two(stamp.day)}/${two(stamp.month)} '
+            '${two(stamp.hour)}:${two(stamp.minute)}';
       }
 
       prices[id] = existing;

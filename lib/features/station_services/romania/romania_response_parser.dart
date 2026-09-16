@@ -25,6 +25,37 @@ import '../../../core/utils/geo_utils.dart';
 import 'romania_observatory_keys.dart';
 import '../../../core/utils/number_parsing.dart';
 
+/// A Monitorul `updatedate` ("11/06/2026 00:19", day-first) as a real
+/// instant (#4309). Null when [raw] is missing or is not a valid
+/// `dd/MM/yyyy HH:mm` stamp (a trailing `:ss` is tolerated) — an absent
+/// age, never a guessed one.
+///
+/// Wall-clock convention, the one PT and FR already follow (#4189): the
+/// provider's own fields are kept as-is, with no timezone conversion. FR's
+/// `*_maj` stamps carry an explicit offset, which `DateTime.tryParse`
+/// honours; PT's `DataAtualizacao` ("2026-06-08 13:15") carries none and
+/// `DateTime.tryParse` yields a local DateTime holding those wall-clock
+/// fields (`portugal_merged_row.dart`). The observatory's stamps carry no
+/// offset either, so they get exactly PT's treatment.
+DateTime? parseMonitorulUpdateDate(String? raw) {
+  final m = _updateDate.firstMatch(raw?.trim() ?? '');
+  if (m == null) return null;
+  int g(int i) => int.parse(m.group(i) ?? '0');
+  final value = DateTime(g(3), g(2), g(1), g(4), g(5), g(6));
+  // `DateTime` rolls an out-of-range field over (31/02 → 03/03); a stamp
+  // that does not survive the round trip is malformed, not a date.
+  final valid = value.year == g(3) &&
+      value.month == g(2) &&
+      value.day == g(1) &&
+      value.hour == g(4) &&
+      value.minute == g(5) &&
+      value.second == g(6);
+  return valid ? value : null;
+}
+
+final RegExp _updateDate =
+    RegExp(r'^(\d{2})/(\d{2})/(\d{4}) (\d{2}):(\d{2})(?::(\d{2}))?$');
+
 /// Drain one single-product envelope into [byId], merging on the
 /// station id (`Products[].stationid` joins `Stations[].id`).
 ///
@@ -162,8 +193,10 @@ class MonitorulStationAccumulator {
       // unknown instead of the old hard-coded `true`.
       isOpen: null,
       updatedAt: updatedAt,
-      // #4189 — the gate reasons over this, not over the label.
-      priceUpdatedAt: DateTime.tryParse(updatedAt ?? ''),
+      // #4189 — the gate reasons over this, not over the label. #4309 —
+      // parsed explicitly: `DateTime.tryParse` rejects the day-first
+      // `updatedate`, so this was null for every station.
+      priceUpdatedAt: parseMonitorulUpdateDate(updatedAt),
     );
   }
 
