@@ -69,9 +69,11 @@ void main() {
       // verdicts moved into the gate), so match the name without the
       // call parens. This test is about ORDER, not call syntax.
       final storage = runBody.indexOf('_initStorage');
-      // #4317 — the parallel service await is gone; what stays before the
-      // launch is SENDING the home-widget group id.
-      final services = runBody.indexOf('SentPlatformCall(HomeWidgetService.init)');
+      // #4317 — the parallel service await is gone. #4319 — what stays
+      // before the launch is one dependency graph whose probe SENDS the
+      // home-widget group id first.
+      final services =
+          runBody.indexOf("StartupTimer.instance.mark('launch_critical_services')");
       final tankSync = runBody.indexOf('_maybeInitTankSync');
       final launch = runBody.indexOf('_launch(');
 
@@ -113,7 +115,7 @@ void main() {
         'LocalNotificationService().initialize',
         'BackgroundService.reconcile',
         'BackgroundService.onOpportunisticWake',
-        'homeWidgetGroupId.rethrowFailure',
+        'widgetLaunch.groupIdAnswered',
       ]) {
         expect(launchBody, contains(service));
       }
@@ -343,28 +345,22 @@ void main() {
 
   group('Widget cold-launch URI dispatch (#2600)', () {
     test(
-        '_stashWidgetLaunchUri stashes the launch URI with no refresh '
-        'discrimination', () {
+        'the probe stashes the launch URI with no refresh discrimination '
+        '(#4319: it lives in LaunchCriticalPath now)', () {
       // #2600 — the refresh button is now a native broadcast handled in
       // place; it never launches the app. The former #2159 refresh-marker
-      // interception (`isWidgetRefreshUri` → `nearestWidgetRefreshProvider`
-      // before the stash) was therefore removed: every cold-launch URI is
-      // a station deep-link to stash for the router redirect.
-      final body = _extractMethodBody(
-          initSource, 'static Future<void> _stashWidgetLaunchUri');
-      expect(body, isNotNull,
-          reason: '_stashWidgetLaunchUri must exist');
-
-      expect(body, contains('pendingWidgetUriProvider.notifier'),
-          reason: 'launch URIs must flow through the pending stash');
-      expect(body, isNot(contains('isWidgetRefreshUri')),
-          reason:
-              'the refresh-marker discriminator is gone — refresh no '
-              'longer launches the app (#2600)');
-      expect(body, isNot(contains('nearestWidgetRefreshProvider')),
-          reason:
-              'the cold-launch path must not dispatch to the refresh '
-              'notifier any more (#2600)');
+      // interception was removed: every cold-launch URI is a station
+      // deep-link to stash for the router redirect. The stash itself is
+      // EXECUTED by launch_critical_path_test.dart and router_test.dart.
+      final path =
+          File('lib/app/startup/launch_critical_path.dart').readAsStringSync();
+      final probe =
+          File('lib/app/startup/widget_launch_probe.dart').readAsStringSync();
+      expect(path, contains('pendingWidgetUriProvider.notifier'));
+      for (final source in [path, probe]) {
+        expect(source, isNot(contains('isWidgetRefreshUri')));
+        expect(source, isNot(contains('nearestWidgetRefreshProvider')));
+      }
     });
   });
 }

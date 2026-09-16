@@ -27,7 +27,7 @@ import 'shell_screen.dart';
 part 'router.g.dart';
 
 /// Consumes the pending home-widget cold-launch URI (set by
-/// `AppInitializer._stashWidgetLaunchUri`) and converts it to a router
+/// `LaunchCriticalPath.run`, #4319) and converts it to a router
 /// path. Returns `null` when no URI is pending or the URI doesn't
 /// resolve to a known route — callers fall back to their default
 /// landing behaviour.

@@ -379,7 +379,9 @@ void main() {
     'lib/features/fill_ups/presentation/widgets/fuel_type_efficiency_card.dart': 810,
     // #4317 — 746 → 731: the pre-launch service batch and its error shield
     // left; the runtime services are a library of their own.
-    'lib/app/app_initializer.dart': 731,
+    // #4319 — 731 → 677: the launch graph and the widget probe became
+    // libraries of their own (launch_critical_path, widget_launch_probe).
+    'lib/app/app_initializer.dart': 677,
     'lib/features/obd2/data/obd2_comm_diagnostics.dart': 726,
     'lib/features/vehicle/presentation/screens/edit_vehicle_screen.dart': 714,
     'lib/features/obd2/data/protocol/adapter_registry.dart': 706,

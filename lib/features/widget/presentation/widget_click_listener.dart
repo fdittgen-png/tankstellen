@@ -70,7 +70,7 @@ WidgetLaunchHandler widgetLaunchHandler(Ref ref) {
 ///
 /// **Cold start** is handled one layer up by the router's redirect
 /// chain, which consumes the URI stashed by
-/// `AppInitializer._stashWidgetLaunchUri` before the first frame paints
+/// `LaunchCriticalPath.run` (#4319) before the first frame paints
 /// (#widget-deeplink). Reading the URI synchronously at app boot —
 /// rather than racing a post-frame callback against the redirect — is
 /// what stops the landing-screen flash and the (intermittent) lost

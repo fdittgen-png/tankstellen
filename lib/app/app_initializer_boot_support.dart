@@ -133,39 +133,6 @@ void _configureSentryOptions(
 }
 
 // ---------------------------------------------------------------------------
-// Widget cold-launch URI probe
-// ---------------------------------------------------------------------------
-
-/// Body of [AppInitializer._stashWidgetLaunchUri]. Capped by a short
-/// timeout: the `home_widget` plugin's platform channel is normally
-/// instant, but a stuck implementation must not block cold start. On
-/// timeout / error the warm-click stream still delivers the URI a few
-/// frames later — the cost is the very situation this probe was written
-/// to remove (a brief landing-screen flash), not data loss.
-Future<void> _probeWidgetLaunchUri({
-  required void Function(Uri uri) stash,
-}) async {
-  try {
-    final uri = await HomeWidget.initiallyLaunchedFromHomeWidget()
-        .timeout(const Duration(milliseconds: 200));
-    if (uri == null) return;
-    // #2600 — the only widget launch URI is a station deep-link now.
-    // The refresh button no longer launches the app (it is a native
-    // broadcast handled in place), so the former #2159 refresh-marker
-    // discrimination was removed: every launch URI is a route to stash.
-    stash(uri);
-  } on TimeoutException {
-    // Expected benign race (stuck plugin / slow channel) — the warm-click
-    // stream still delivers the URI. Breadcrumb, not an ERROR trace.
-    BreadcrumbCollector.add('widget-launch-probe-timeout',
-        detail: '200ms — falling back to the warm-click stream');
-  } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.other, e, st,
-        context: {'where': 'stashWidgetLaunchUri'}));
-  }
-}
-
-// ---------------------------------------------------------------------------
 // Phase 5 — global error-handler bodies
 // ---------------------------------------------------------------------------
 

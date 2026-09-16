@@ -151,17 +151,19 @@ final Set<String> _firstFrameBoxBaseline = {
 /// The statements in `AppInitializer.run` that the first frame waits for,
 /// verbatim and in order.
 const List<String> _preFirstFrameAwaits = [
-  'await initializeDateFormatting();',
-  'if (!await runStoragePhaseGuarded(_initStorage)) return;',
+  // #4319 — ONE await: the date formatting, the guarded storage phase and
+  // the widget probe used to be three serial awaits; they are now started
+  // together and awaited as one dependency graph, whose ordering is
+  // EXECUTED by test/app/startup/launch_critical_path_test.dart.
   // #4317 — `await _initServicesInParallel();` left: notifications, the
   // background scheduler and the home-widget answer run post-frame.
-  'await _stashWidgetLaunchUri(container);',
+  'final container = await LaunchCriticalPath.run(',
 ];
 
 /// Every `await` in the body, including those inside the post-first-frame
 /// closures — the backstop for an await added where [_isTopLevelStatement]
 /// cannot see it.
-const int _totalAwaitsInRunBody = 10;
+const int _totalAwaitsInRunBody = 8;
 
 final RegExp _awaitPattern = RegExp(r'\bawait\b');
 

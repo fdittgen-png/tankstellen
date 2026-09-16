@@ -32,9 +32,13 @@ void main() {
 
     test('AppInitializer marks key milestones', () {
       // Verify at least the critical milestones are present
+      // #4319 — `storage_ready` is marked by LaunchCriticalPath the moment
+      // the storage verdict lands (it overlaps the probe now); executed in
+      // launch_critical_path_test.dart.
+      expect(File('lib/app/startup/launch_critical_path.dart').readAsStringSync(),
+          contains("StartupTimer.instance.mark('storage_ready')"));
       for (final milestone in [
         'binding',
-        'storage_ready',
         // #4317 — was `services_init`; the services moved post-frame.
         'launch_critical_services',
         'first_frame',

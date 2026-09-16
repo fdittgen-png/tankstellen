@@ -87,8 +87,13 @@ void main() {
       // The gate returning false has to end the launch. Continuing past a
       // failed storage phase is how the app reaches the first screen with
       // no providers behind it.
+      // #4319 — the gate runs inside LaunchCriticalPath, which returns no
+      // container on failure (EXECUTED in launch_critical_path_test.dart:
+      // "a storage failure ... launches nothing"); run() stops on that.
       final runBody = _extractMethodBody(initSource, 'static Future<void> run');
-      expect(runBody, contains('if (!await runStoragePhaseGuarded(_initStorage)) return;'));
+      expect(runBody,
+          contains('storage: () => runStoragePhaseGuarded(_initStorage),'));
+      expect(runBody, contains('if (container == null) return;'));
     });
   });
 }
