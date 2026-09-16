@@ -40,13 +40,17 @@ void main() {
     double? net = 3.8,
     DataConfidence confidence = DataConfidence.high,
     DateTime? detectedAt,
+    // #4302 — settable so a case can drive a grade whose ARB label and
+    // apiValue actually differ. The default is the value this fixture
+    // always hardcoded, so every existing caller is unchanged.
+    String fuelType = 'e10',
   }) {
     final at = detectedAt ?? now;
     return Opportunity(
       kind: kind,
       stationId: stationId,
       stationName: stationName,
-      fuelType: 'e10',
+      fuelType: fuelType,
       currentPrice: currentPrice,
       reference: OpportunityReference.thresholdYouSet,
       referencePrice: referencePrice,
@@ -86,6 +90,92 @@ void main() {
         notifier: notifier,
         templates: templates,
       );
+
+  // #4302 — `Opportunity.fuelType` holds an apiValue, and five of the
+  // seven kinds set it into a notification title. Untranslated that read
+  // `STAR - e10` and `diesel dropped at nearby stations`.
+  //
+  // `OpportunityNotificationCopy.render` had NO test of any kind before
+  // this group: its only production caller is the dispatcher's
+  // `prebuilt[winner] ?? render(...)` fallback, which the existing cases
+  // never reach because they either supply `copyFor` or assert on the
+  // station name alone. So these drive `render` directly.
+  group('rendered copy names the grade, not its apiValue (#4302)', () {
+    /// The five kinds whose ARB title interpolates `{fuelType}` /
+    /// `{fuelLabel}`. `refuelSoon` ("Time to refuel") and
+    /// `exceptionalLocalPrice` (labelled by station) name no grade.
+    const gradeNaming = [
+      OpportunityKind.favouriteStation,
+      OpportunityKind.localMovement,
+      OpportunityKind.bestStopNow,
+      OpportunityKind.bestStopOnRoute,
+      OpportunityKind.personalBaseline,
+    ];
+
+    NotificationCopy? renderFor(
+      OpportunityKind kind, {
+      String fuelType = 'e10',
+      String language = 'en',
+    }) =>
+        OpportunityNotificationCopy.render(
+          opportunity(kind: kind, fuelType: fuelType),
+          BackgroundNotificationTemplates.resolveForLanguage(language),
+          priceOf: (v) => v.toStringAsFixed(3),
+          distanceOf: (v) => '${v.toStringAsFixed(1)} km',
+        );
+
+    for (final kind in gradeNaming) {
+      test('${kind.name} renders the ARB label, never the apiValue', () {
+        final copy = renderFor(kind);
+
+        expect(copy, isNotNull,
+            reason: 'a null render here would make every assertion below '
+                'pass by not running');
+        expect(copy!.title, contains('Super E10'));
+        // The apiValue must not survive into the sentence. Checked as a
+        // word boundary because `Super E10` legitimately contains "E10".
+        expect(copy.title, isNot(matches(RegExp(r'\be10\b'))),
+            reason: 'the raw apiValue in a title is the #4302 defect');
+      });
+    }
+
+    test('the German label reaches the title (#4302)', () {
+      // lpg is the probe: German says `Autogas (LPG)` where the apiValue
+      // is `lpg` and FuelType.displayName is `GPL / LPG`. For e10 the ARB
+      // string merely CONTAINS the apiValue, so it cannot prove the
+      // lookup ran — only a grade where they diverge can.
+      final copy = renderFor(OpportunityKind.bestStopNow,
+          fuelType: 'lpg', language: 'de');
+
+      expect(copy!.title, contains('Autogas (LPG)'));
+      expect(copy.title, isNot(contains('GPL / LPG')),
+          reason: 'displayName is a French/English hybrid; this path never '
+              'used it, and must not start');
+      expect(copy.title, isNot(matches(RegExp(r'\blpg\b'))));
+    });
+
+    test('an unknown apiValue degrades to itself rather than a gap', () {
+      // A blob predating a grade, or a grade this build does not know.
+      final copy = renderFor(OpportunityKind.bestStopNow,
+          fuelType: 'some_future_grade');
+
+      expect(copy!.title, contains('some_future_grade'),
+          reason: 'a label is better than an empty slot or the literal '
+              '"null" in a sentence the user reads');
+    });
+
+    test('refuelSoon names no grade, so its empty fuelType is harmless',
+        () {
+      // `trip_opportunity_detector` builds refuelSoon with
+      // `fuelType: ''`. That is correct, not a defect: the ARB title is
+      // "Time to refuel" and takes no fuel argument at all. Pinned so a
+      // future reader does not "fix" it into a fabricated grade.
+      final copy = renderFor(OpportunityKind.refuelSoon, fuelType: '');
+
+      expect(copy, isNotNull);
+      expect(copy!.title, isNotEmpty);
+    });
+  });
 
   group('the chain', () {
     test('one candidate becomes one notification and one feed entry',

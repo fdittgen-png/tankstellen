@@ -127,7 +127,15 @@ abstract final class OpportunityNotificationCopy {
     final price = priceOf(o.currentPrice);
     final distance = distanceOf(o.distanceKm);
     final station = o.stationName;
-    final fuel = o.fuelType;
+    // #4302 — `Opportunity.fuelType` holds an apiValue (`e10`), not a
+    // label: it is a persisted, compared identifier (equality, hashCode
+    // and the codec all depend on it), so it must stay one. The display
+    // name is resolved here instead, from the labels the main isolate
+    // put in the blob for the active in-app language (#4301).
+    //
+    // Untranslated it read `STAR - e10` and `diesel dropped at nearby
+    // stations`, since every title below sets the grade mid-sentence.
+    final fuel = templates.fuelLabelFor(o.fuelType);
 
     // Every kind below except localMovement is ABOUT a station, and its
     // copy names one. Without a name there is nothing honest to render.
