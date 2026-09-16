@@ -8,13 +8,15 @@ import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Wraps a child widget in a localized MaterialApp so that
-/// `AppLocalizations.of(context)` resolves to English copy. The form
-/// fields are pure stateless — no Riverpod, no Hive — so a plain
-/// MaterialApp is enough (no `pumpApp` / ProviderScope needed).
-Widget _wrap(Widget child) => MaterialApp(
+/// `AppLocalizations.of(context)` resolves to English copy by default;
+/// pass [locale] for another language (#4295 asserts a German render).
+/// The form fields are pure stateless — no Riverpod, no Hive — so a
+/// plain MaterialApp is enough (no `pumpApp` / ProviderScope needed).
+Widget _wrap(Widget child, {Locale locale = const Locale('en')}) =>
+    MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      locale: const Locale('en'),
+      locale: locale,
       home: Scaffold(body: child),
     );
 
@@ -67,8 +69,9 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Fuel type'), findsOneWidget);
-      // The currently-selected value renders inside the closed dropdown.
-      expect(find.text(FuelType.diesel.displayName), findsOneWidget);
+      // The currently-selected value renders inside the closed dropdown,
+      // as the ARB string the field renders since #4295.
+      expect(find.text('Diesel'), findsOneWidget);
     });
 
     testWidgets('fires onChanged when the user picks a new fuel',
@@ -89,7 +92,7 @@ void main() {
 
       // Multiple matches exist when the menu is open (closed-state label
       // + open-menu item); picking .last selects the menu item.
-      await tester.tap(find.text(FuelType.e10.displayName).last);
+      await tester.tap(find.text('Super E10').last);
       await tester.pumpAndSettle();
 
       expect(picked, [FuelType.e10]);
@@ -158,6 +161,30 @@ void main() {
       expect(menuValues, contains(FuelType.lpg));
       expect(menuValues, contains(FuelType.e85));
       expect(menuValues, isNot(contains(FuelType.all)));
+    });
+
+    testWidgets("renders the fuel label in the reader's language (#4295)",
+        (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          RadiusAlertFuelTypeField(
+            value: FuelType.lpg,
+            evaluableFuels: const [FuelType.diesel, FuelType.e85, FuelType.lpg],
+            onChanged: (_) {},
+          ),
+          locale: const Locale('de'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // The closed dropdown shows the selected fuel. German for LPG is
+      // 'Autogas (LPG)'. FuelType.displayName is 'GPL / LPG' — a
+      // French/English hybrid that every one of the 24 locales rendered
+      // before #4295, which is why the diesel/e10 assertions above
+      // cannot detect this fix: for those grades the two spellings are
+      // identical, and only lpg/cng/e85/hydrogen/electric differ.
+      expect(find.text('Autogas (LPG)'), findsOneWidget);
+      expect(find.text('GPL / LPG'), findsNothing);
     });
   });
 

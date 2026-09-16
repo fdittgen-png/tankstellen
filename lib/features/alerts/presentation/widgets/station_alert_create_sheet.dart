@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../../background/fuel_price_fields.dart';
 import '../../../../core/country/country_config.dart';
+import '../../../../core/utils/localized_fuel_name.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/sheet_form_actions.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -179,7 +180,7 @@ class _StationAlertCreateSheetState extends State<StationAlertCreateSheet> {
                       .map(
                         (ft) => DropdownMenuItem(
                           value: ft,
-                          child: Text(ft.displayName),
+                          child: Text(localizedFuelName(l10n, ft)),
                         ),
                       )
                       .toList(),
