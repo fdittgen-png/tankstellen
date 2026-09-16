@@ -8877,6 +8877,24 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get homeNextStopTitle => 'Your next fuel stop';
+
+  @override
+  String get homeVehicleTitle => 'Your car';
+
+  @override
+  String get homeVehicleCostPerKm => 'per km';
+
+  @override
+  String get homeVehicleConsumption => 'L/100 km';
+
+  @override
+  String get homeVehicleFromFillUps => 'Measured from your fill-ups';
+
+  @override
+  String get homeSavingsTitle => 'You\'ve saved';
+
+  @override
   String get logoCreditsTitle => 'Logo credits';
 
   @override
@@ -18691,6 +18709,25 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String searchSummaryAgeDays(int days) {
     return '⟦$days đ⟧';
   }
+
+  @override
+  String get homeNextStopTitle => '⟦Ýóúř ñéẋŧ ƒúéł šŧóƥ ·······⟧';
+
+  @override
+  String get homeVehicleTitle => '⟦Ýóúř çář ···⟧';
+
+  @override
+  String get homeVehicleCostPerKm => '⟦ƥéř ķɱ ··⟧';
+
+  @override
+  String get homeVehicleConsumption => '⟦Ł/100 ķɱ ·⟧';
+
+  @override
+  String get homeVehicleFromFillUps =>
+      '⟦Ṁéášúřéđ ƒřóɱ ýóúř ƒîłł-úƥš ··········⟧';
+
+  @override
+  String get homeSavingsTitle => '⟦Ýóú\'ṽé šáṽéđ ·····⟧';
 
   @override
   String get logoCreditsTitle => '⟦Łóǧó çřéđîŧš ·····⟧';

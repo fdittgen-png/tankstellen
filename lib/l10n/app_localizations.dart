@@ -14975,6 +14975,42 @@ abstract class AppLocalizations {
   /// **'{days} d'**
   String searchSummaryAgeDays(int days);
 
+  /// Header of the home surface's decision block (#4137). It re-presents the three answers DecisionHeader already computed — cheapest, closest, best value — more compactly; it never ranks again or names one winner (refuel-economics spec §3).
+  ///
+  /// In en, this message translates to:
+  /// **'Your next fuel stop'**
+  String get homeNextStopTitle;
+
+  /// Header of the home surface's vehicle block (#4137): cost per kilometre and measured consumption, both from the user's own fill-ups.
+  ///
+  /// In en, this message translates to:
+  /// **'Your car'**
+  String get homeVehicleTitle;
+
+  /// Label under the cost-per-kilometre figure on the home surface (#4137). The currency symbol comes from the formatted value beside it.
+  ///
+  /// In en, this message translates to:
+  /// **'per km'**
+  String get homeVehicleCostPerKm;
+
+  /// Label under the average-consumption figure on the home surface (#4137).
+  ///
+  /// In en, this message translates to:
+  /// **'L/100 km'**
+  String get homeVehicleConsumption;
+
+  /// One-line provenance under the vehicle figures on the home surface (#4137) — these are measurements, not estimates, which is why the block is absent until there are enough fill-ups.
+  ///
+  /// In en, this message translates to:
+  /// **'Measured from your fill-ups'**
+  String get homeVehicleFromFillUps;
+
+  /// Header of the home surface's savings block (#4137/#4136). Shown only when the ledger has a baseline and a single currency; there is nothing honest to total otherwise.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve saved'**
+  String get homeSavingsTitle;
+
   /// Title of the Settings → About → logo credits screen, and the label of the row in About that opens it (#3940). Lists every station-brand logo bundled with the app, with its licence, author and source.
   ///
   /// In en, this message translates to:

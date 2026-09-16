@@ -4544,6 +4544,12 @@
       }
     }
   },
+  "homeNextStopTitle": "Dein nächster Tankstopp",
+  "homeVehicleTitle": "Dein Auto",
+  "homeVehicleCostPerKm": "pro km",
+  "homeVehicleConsumption": "l/100 km",
+  "homeVehicleFromFillUps": "Aus deinen Tankvorgängen gemessen",
+  "homeSavingsTitle": "Du hast gespart",
   "logoCreditsTitle": "Logo-Nachweise",
   "logoCreditsAboutSubtitle": "{count, plural, =1{1 Markenlogo von Wikimedia Commons} other{{count} Markenlogos von Wikimedia Commons}}",
   "@logoCreditsAboutSubtitle": {

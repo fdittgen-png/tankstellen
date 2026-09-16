@@ -8967,6 +8967,24 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get homeNextStopTitle => 'Dein nächster Tankstopp';
+
+  @override
+  String get homeVehicleTitle => 'Dein Auto';
+
+  @override
+  String get homeVehicleCostPerKm => 'pro km';
+
+  @override
+  String get homeVehicleConsumption => 'l/100 km';
+
+  @override
+  String get homeVehicleFromFillUps => 'Aus deinen Tankvorgängen gemessen';
+
+  @override
+  String get homeSavingsTitle => 'Du hast gespart';
+
+  @override
   String get logoCreditsTitle => 'Logo-Nachweise';
 
   @override
