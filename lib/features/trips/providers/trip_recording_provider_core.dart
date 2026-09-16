@@ -20,8 +20,10 @@ mixin _TripRecordingCore on _$TripRecording {
   bool _startInProgress = false;
 
   /// #4162 — every state write goes through [_publish], which asks the
-  /// phase gate whether the change is a documented transition.
-  final TripRecordingPhaseGate _phaseGate = TripRecordingPhaseGate();
+  /// phase gate whether the change is a documented transition. #4311 — a
+  /// save is enforced: nothing may pull the phase out of `saving` sideways.
+  final TripRecordingPhaseGate _phaseGate =
+      TripRecordingPhaseGate(enforcedFrom: {TripRecordingPhase.saving});
   void _publish(TripRecordingState next, String cause) =>
       state = _phaseGate.admit(state, next, cause);
 

@@ -116,9 +116,9 @@ class ActiveTripRecoveryService {
       return ActiveTripRecoveryOutcome.none;
     }
 
-    // #3250 — a snapshot whose phase is already terminal was finalised to
-    // history (the grace-window auto-finalise, or the stop-transition flush)
-    // but the WAL was left behind. Recovering it resurrects an already-saved
+    // #3250 — a snapshot whose phase is already terminal was written by an
+    // earlier version's stop-transition flush (#4311 removed it: a row now
+    // exists only while its trip is not in history) and left behind. Recovering it resurrects an already-saved
     // trip as a `pausedDueToDrop` banner, and End/Resume re-puts the SAME Hive
     // id — overwriting the good saved entry with a gutted recovery summary.
     // Drop it: it is NOT a live trip to resume.

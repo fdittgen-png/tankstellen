@@ -5,14 +5,19 @@
 /// every trip, walked through its phases.
 ///
 /// An OBD2 stop awaits a final odometer read before it saves, and the
-/// live loop keeps ticking underneath it. The trace below records every
-/// phase change the recording makes across a stop with a slow odometer.
+/// live loop keeps ticking underneath it. Each test drives one of the
+/// defects #4311 filed against that path: the phase flickering mid-save,
+/// a kill waiting on the history write, the grace finalise resurrecting
+/// its WAL row — and F1, a Stop arriving after the grace finalise.
 library;
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/trips/domain/entities/trip_termination.dart';
 import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
 
 import '../../../helpers/silence_error_logger.dart';
+import '../support/gated_trip_history_repository.dart';
 import '../support/phase_trace.dart';
 import '../support/recording_disk_image.dart';
 import '../support/recording_session_driver.dart';
@@ -33,8 +38,8 @@ void main() {
     await disk.close();
   });
 
-  test('an OBD2 stop walks only documented edges — or filed defects',
-      () async {
+  test('an OBD2 stop never flickers back: no saving→recording, no '
+      'finished→saving (#4311 S1/S2)', () async {
     final container = driver.container();
     addTearDown(container.dispose);
     final transport = SlowOdometerTransport();
@@ -48,17 +53,98 @@ void main() {
     transport.odometerDelay = const Duration(milliseconds: 700);
     await notifier.stop();
 
+    final state = container.read(tripRecordingProvider);
+    expect(state.phase, TripRecordingPhase.finished);
+    expect(state.saveStage, isNull,
+        reason: 'S2: the save stage must not leak into finished');
+    expect(disk.historyRepo.loadAll(), hasLength(1));
+    expect(trace.illegal, isEmpty, reason: 'trace: ${trace.edges}');
+    expect(trace.edges, [
+      (TripRecordingPhase.recording, TripRecordingPhase.saving),
+      (TripRecordingPhase.saving, TripRecordingPhase.finished),
+    ]);
+  });
+
+  test('K1 — a kill while the OBD2 stop waits on the history write '
+      'recovers the trip', () async {
+    final gated = GatedTripHistoryRepository(box: disk.historyBox);
+    final old = ProviderContainer(overrides: [
+      ...driver.overrides,
+      tripHistoryRepositoryProvider.overrideWithValue(gated),
+    ]);
+    final notifier = await RecordingSessionDriver.startObd2(old);
+    RecordingSessionDriver.captureObd2Samples(notifier, 10);
+    final stopping = notifier.stop();
+    await gated.reached;
+
+    final image = await disk.capture();
+    gated.release();
+    await stopping;
+    await RecordingDisk.settle();
+    old.dispose();
+
+    final next = await disk.relaunch(image, overrides: driver.overrides);
+    addTearDown(next.dispose);
+    expect(next.read(tripRecordingProvider).phase,
+        TripRecordingPhase.pausedDueToDrop,
+        reason: 'the trip was not yet in history, so its WAL row is a trip '
+            'to hand back — not a finalised row to discard');
+    await next.read(tripRecordingProvider.notifier).stop();
+    final saved = disk.historyRepo.loadAll();
+    expect(saved, hasLength(1));
+    expect(saved.single.samples, hasLength(10));
+    expect(saved.single.termination?.reason,
+        TripTerminationReason.recoveredAfterProcessDeath);
+  });
+
+  test('K2 — the grace-window finalise leaves no WAL row behind', () async {
+    final container = driver.container();
+    addTearDown(container.dispose);
+    final trace = PhaseTrace(container);
+    addTearDown(trace.close);
+    final notifier = await RecordingSessionDriver.startObd2(container);
+    // A grace-finalised controller keeps its emit timer until a Stop tears
+    // it down (the F1 path below) — tear it down before the container goes.
+    addTearDown(notifier.stop);
+    RecordingSessionDriver.captureObd2Samples(notifier, 5);
+    final ctl = notifier.debugController!
+      ..debugTriggerDrop(reason: TripDropReason.silentFailure);
+    await RecordingDisk.settle();
+
+    await ctl.debugExpireGraceWindow();
+    await RecordingDisk.settle();
+
     expect(container.read(tripRecordingProvider).phase,
         TripRecordingPhase.finished);
     expect(disk.historyRepo.loadAll(), hasLength(1));
+    expect(disk.activeBox.isEmpty, isTrue,
+        reason: 'the finalised trip is in history; a row on disk would be '
+            'discarded at the next launch with a false error');
+    expect(disk.pausedBox.isEmpty, isTrue);
     trace.expectLawful();
-    // #4311 S1 / S2 — pinned until the fix removes them from
-    // kKnownIllegalEdges.
-    expect(trace.saw(TripRecordingPhase.saving, TripRecordingPhase.recording),
-        isTrue,
-        reason: 'S1: the live loop republished recording mid-save');
-    expect(trace.saw(TripRecordingPhase.finished, TripRecordingPhase.saving),
-        isTrue,
-        reason: 'S2: the stop published finished, then saving again');
+  });
+
+  test('F1 — Stop after the grace window finalised the trip saves nothing '
+      'twice', () async {
+    final container = driver.container();
+    addTearDown(container.dispose);
+    final notifier = await RecordingSessionDriver.startObd2(container);
+    RecordingSessionDriver.captureObd2Samples(notifier, 5);
+    final ctl = notifier.debugController!
+      ..debugTriggerDrop(reason: TripDropReason.silentFailure);
+    await RecordingDisk.settle();
+    await ctl.debugExpireGraceWindow();
+    await RecordingDisk.settle();
+    expect(disk.historyRepo.loadAll(), hasLength(1));
+
+    // The recording screen's Stop (and the tile's) still reaches the
+    // provider. (The tile's automatic variant only adds a badge bump.)
+    await notifier.stop();
+    await RecordingDisk.settle();
+
+    expect(disk.historyRepo.loadAll(), hasLength(1),
+        reason: 'one drive, one history row');
+    expect(container.read(tripRecordingProvider).phase,
+        TripRecordingPhase.finished);
   });
 }

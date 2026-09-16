@@ -109,37 +109,39 @@ class DroppedSessionRepoResolver {
 
   /// Grace-window finalisation persistence (#797): write the partial into
   /// trip-history (with the still-live buffer + GPS diagnostics + the
-  /// automatic flag, #2291) and delete the paused row. The lifecycle flag
-  /// flips + emit stay on the manager.
+  /// automatic flag, #2291), then delete the paused row and clear the WAL.
+  /// #4311 — the two deletes run ONLY once the history write landed: while
+  /// the trip is not in history, those rows are the only copy a relaunch
+  /// can recover. The lifecycle flag flips + emit stay on the manager.
   Future<void> finaliseToHistory(
     DroppedSessionHost host, {
     String? dropReason,
   }) async {
     final id = host.sessionId;
     final historyRepo = resolveHistory();
-    if (historyRepo != null && id != null) {
-      try {
-        await historyRepo.save(TripHistoryEntry(
-          id: id,
-          vehicleId: host.vehicleId,
-          summary: host.buildFinalSummary(),
-          samples: await host.collectAllSamples(), // #3878
-          gpsSampleDiagnostics: host.capturedGpsSampleDiagnostics,
-          automatic: host.automatic,
-          // #3795 — the link never came back and the grace elapsed; the
-          // drop reason that started it is the supplementary detail.
-          termination: TripTermination(
-            TripTerminationReason.graceWindowExpiry,
-            detail: dropReason,
-          ),
-        ));
-      } catch (e, st) {
-        log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'DroppedSessionManager grace finalise'});
-      }
+    if (historyRepo == null || id == null) return;
+    try {
+      await historyRepo.save(TripHistoryEntry(
+        id: id,
+        vehicleId: host.vehicleId,
+        summary: host.buildFinalSummary(),
+        samples: await host.collectAllSamples(), // #3878
+        gpsSampleDiagnostics: host.capturedGpsSampleDiagnostics,
+        automatic: host.automatic,
+        // #3795 — the link never came back and the grace elapsed; the
+        // drop reason that started it is the supplementary detail.
+        termination: TripTermination(
+          TripTerminationReason.graceWindowExpiry,
+          detail: dropReason,
+        ),
+      ));
+    } catch (e, st) {
+      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'DroppedSessionManager grace finalise'});
+      return;
     }
     deletePausedRow(id);
     // #3250 — clear the active-trip WAL: this trip is now in history, so the
     // launch-time recovery must not resurrect it as a paused session.
-    unawaited(resolveActive()?.clearSnapshot());
+    await resolveActive()?.clearSnapshot();
   }
 }
