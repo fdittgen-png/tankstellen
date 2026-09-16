@@ -19,6 +19,7 @@
 library;
 
 import 'road_grade_calculator.dart';
+import 'road_load_track.dart';
 import 'trip_recorder.dart';
 
 /// Grade fraction above which a confident sample counts as a real climb.
@@ -83,33 +84,33 @@ class RestartCostResult {
       RestartCostResult(restartCount: 0, restartLiters: 0);
 }
 
-/// Recompute confident road grade over [sortedSamples] (must be sorted by
-/// timestamp) and attribute the extra fuel burned while climbing. Pure.
-ClimbCostResult detectClimbCost(List<TripSample> sortedSamples) {
+/// Attribute the extra fuel burned while climbing over [sortedSamples]
+/// (sorted by timestamp). #4203 — the grade comes from the shared
+/// [RoadLoadTrack] (one grade derivation with confidence, accuracy gating
+/// and tunnel handling) instead of a private [RoadGradeCalculator]; pass
+/// [track] when the caller already built one. Pure.
+ClimbCostResult detectClimbCost(
+  List<TripSample> sortedSamples, {
+  RoadLoadTrack? track,
+}) {
   if (sortedSamples.length < 2) return ClimbCostResult.none;
 
-  final gradeCalc = RoadGradeCalculator();
-  var cumulativeDistanceM = 0.0;
+  final points = (track ?? RoadLoadTrack.from(sortedSamples)).points;
   var climbingLiters = 0.0;
   var climbSeconds = 0.0;
   var peakGradePercent = 0.0;
   var climbMeasured = true;
 
-  for (var i = 1; i < sortedSamples.length; i++) {
+  for (var i = 1; i < sortedSamples.length && i < points.length; i++) {
     final prev = sortedSamples[i - 1];
     final cur = sortedSamples[i];
     final dt = cur.timestamp.difference(prev.timestamp).inMicroseconds /
         Duration.microsecondsPerSecond;
     if (dt <= 0) continue;
 
-    // Fold the START sample into the same calculator the live folder uses.
-    final speedMps = prev.speedKmh / 3.6;
-    cumulativeDistanceM += speedMps * dt;
-    gradeCalc.addSample(
-      cumulativeDistanceKm: cumulativeDistanceM / 1000.0,
-      altitudeM: prev.altitudeM,
-    );
-    final grade = gradeCalc.current;
+    // The grade known at the START sample, as the previous inline
+    // calculator read it after folding that sample in.
+    final grade = points[i - 1].grade;
     if (!grade.confident || grade.gradeFraction <= _climbGradeThreshold) {
       continue;
     }

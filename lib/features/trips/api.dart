@@ -43,6 +43,7 @@ export 'domain/entities/gps_sample_diagnostic.dart';
 export 'domain/entities/recording_session_event.dart';
 export 'domain/entities/trip_termination.dart';
 export 'domain/recording_session_journal.dart';
+export 'domain/road_load_track.dart';
 export 'domain/entities/trip_save_stage.dart';
 export 'domain/fuel_event_attribution.dart';
 export 'domain/gps_coverage_report.dart';

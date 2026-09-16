@@ -8,6 +8,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../feature_management/api.dart';
 import '../../data/analysis/driving_analysis_trace.dart';
 import '../../data/analysis/driving_analysis_trace_export.dart';
+import '../../data/driving_dimensions_calculator.dart';
 import '../../domain/driving_score.dart';
 import '../../../trips/api.dart';
 import '../../domain/lessons/driving_lesson.dart';
@@ -118,6 +119,10 @@ class DrivingAnalysisTraceCard extends ConsumerWidget {
       adapterName: entry?.adapterName,
       adapterMac: entry?.adapterMac,
       automatic: entry?.automatic ?? false,
+      roadLoad: RoadLoadTrack.from(samples).toTrace(), // #4203
+      dimensions: computeDrivingDimensions(samples,
+              secondsBelowOptimalGear: summary.secondsBelowOptimalGear)
+          .toJson(), // #4205
     );
     final ok = await DrivingAnalysisTraceExport.export(trace);
     if (!context.mounted) return;

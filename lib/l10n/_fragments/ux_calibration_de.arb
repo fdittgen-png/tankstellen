@@ -90,6 +90,7 @@
   "fillInventorySkipNoVehicle": "kein Fahrzeug bei dieser Betankung",
   "@fillInventorySkipNoVehicle": {"description": "#3917 — skip reason."},
   "fillInventorySkipNoWindow": "erstes Volltanken (noch kein Fenster geschlossen)",
+  "fillInventorySkipMixedFuel": "der Tank enthielt gemischte Sorten – er kann keine einzelne kalibrieren",
   "@fillInventorySkipNoWindow": {"description": "#3917 — skip reason."},
   "fillInventorySkipCoverageTooLow": "aufgezeichnete Fahrten decken {coverage} % des Tanks ab (60 % nötig)",
   "@fillInventorySkipCoverageTooLow": {

@@ -8836,6 +8836,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'premier plein complet (aucune fenêtre fermée)';
 
   @override
+  String get fillInventorySkipMixedFuel =>
+      'the tank held a mix of grades, so it cannot calibrate one';
+
+  @override
   String fillInventorySkipCoverageTooLow(int coverage) {
     return 'les trajets enregistrés couvrent $coverage % du plein (60 % requis)';
   }

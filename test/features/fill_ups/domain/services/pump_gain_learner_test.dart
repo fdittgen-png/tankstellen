@@ -31,7 +31,8 @@ FillUp _fill(String id, int day, double odo, double liters,
       linkedTripIds: trips,
     );
 
-TripSummary _trip(double km, double liters, {double? gain}) => TripSummary(
+TripSummary _trip(double km, double liters, {double? gain, String? fuelKey}) =>
+    TripSummary(
       distanceKm: km,
       maxRpm: 3000,
       highRpmSeconds: 0,
@@ -42,6 +43,7 @@ TripSummary _trip(double km, double liters, {double? gain}) => TripSummary(
       avgLPer100Km: liters / km * 100,
       startedAt: _t0,
       pumpGainApplied: gain,
+      pumpGainFuelKey: fuelKey,
     );
 
 void main() {
@@ -246,8 +248,9 @@ void main() {
           pumpGain: 0.6,
           pumpGainSamples: 1,
           pumpGainByFuel: {'e85': PumpGainEntry(gain: 0.6, samples: 1)}));
+      // #4202 — a window that BURNED E10: opened on E10, closed on E10.
       final e10Fills = [
-        fills.first,
+        fills.first.copyWith(fuelType: FuelType.e10),
         fills.last.copyWith(fuelType: FuelType.e10),
       ];
       final o = await learner.evaluate(
@@ -264,6 +267,72 @@ void main() {
       expect(p.pumpGainByFuel['e10']!.samples, 1);
       // Scalar: 0.5 × 0.608 + 0.5 × 0.6 ≈ 0.604.
       expect(p.pumpGain, closeTo(0.604, 0.005));
+    });
+
+    test(
+        '#4202 — switching grade at the closing fill: the window burned the '
+        'OPENING grade, so E10 is learned, E85 untouched', () async {
+      await repo.save(const VehicleProfile(
+          id: 'car',
+          name: 'Flex',
+          multiFuelCapable: true,
+          pumpGainByFuel: {'e85': PumpGainEntry(gain: 0.6, samples: 1)}));
+      final switched = [
+        fills.first.copyWith(fuelType: FuelType.e10),
+        fills.last, // closes on E85
+      ];
+      final o = await learner.evaluate(
+          vehicleId: 'car',
+          closing: switched.last,
+          fillUps: switched,
+          tripSummariesById: trips);
+      expect(o.fuelKey, 'e10',
+          reason: 'before #4202 the closing fill\'s E85 was keyed');
+      expect(o.result!.fuelKey, 'e10');
+      final p = repo.getById('car')!;
+      expect(p.pumpGainByFuel['e85']!.gain, 0.6, reason: 'untouched');
+      expect(p.pumpGainByFuel['e10']!.samples, 1);
+      expect(o.distanceSource, 'odometer');
+    });
+
+    test('#4202 — the grade the recordings were stamped with wins', () async {
+      await repo.save(const VehicleProfile(
+          id: 'car', name: 'Flex', multiFuelCapable: true));
+      final stamped = {
+        'a': _trip(300, 31.5, fuelKey: 'e85'),
+        'b': _trip(153, 16.07, fuelKey: 'e85'),
+      };
+      final opensOnE10 = [
+        fills.first.copyWith(fuelType: FuelType.e10),
+        fills.last,
+      ];
+      final o = await learner.evaluate(
+          vehicleId: 'car',
+          closing: opensOnE10.last,
+          fillUps: opensOnE10,
+          tripSummariesById: stamped);
+      expect(o.fuelKey, 'e85');
+      expect(repo.getById('car')!.pumpGainByFuel.keys, ['e85']);
+    });
+
+    test('#4202 — recordings on two grades are a mixed tank: skipped with a '
+        'reason, nothing learned', () async {
+      await repo.save(const VehicleProfile(
+          id: 'car', name: 'Flex', multiFuelCapable: true));
+      final mixed = {
+        'a': _trip(300, 31.5, fuelKey: 'e85'),
+        'b': _trip(153, 16.07, fuelKey: 'e10'),
+      };
+      final o = await learner.evaluate(
+          vehicleId: 'car',
+          closing: fills.last,
+          fillUps: fills,
+          tripSummariesById: mixed);
+      expect(o.skipReason, PumpGainSkipReason.mixedFuel);
+      expect(o.calibrated, isFalse);
+      final p = repo.getById('car')!;
+      expect(p.pumpGainByFuel, isEmpty);
+      expect(p.pumpGainSamples, 0);
     });
   });
 }

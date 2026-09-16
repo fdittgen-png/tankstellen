@@ -2406,6 +2406,7 @@
   "fillInventorySkipCorrection": "⟦çóřřéçŧîóñ éñŧřý, ñóŧ á ƥúɱƥéđ ƒîłł ·············⟧",
   "fillInventorySkipNoVehicle": "⟦ñó ṽéĥîçłé óñ ŧĥîš ƒîłł ·········⟧",
   "fillInventorySkipNoWindow": "⟦ƒîřšŧ ƒúłł ŧáñķ (ñó ŵîñđóŵ çłóšéđ ýéŧ) ··············⟧",
+  "fillInventorySkipMixedFuel": "⟦ŧĥé ŧáñķ ĥéłđ á ɱîẋ óƒ ǧřáđéš, šó îŧ çáññóŧ çáłîƀřáŧé óñé ····················⟧",
   "fillInventorySkipCoverageTooLow": "⟦řéçóřđéđ ŧřîƥš çóṽéř {coverage} % óƒ ŧĥé ŧáñķ (60 % ñééđéđ) ···············⟧",
   "fillInventorySkipRecordedTooShort": "⟦óñłý {km} řéçóřđéđ ķɱ (40 ķɱ ñééđéđ) ··········⟧",
   "fillInventorySkipNoRecordedFuel": "⟦ŧĥé řéçóřđéđ ŧřîƥš çářřý ñó ƒúéł ƒîǧúřé ···············⟧",

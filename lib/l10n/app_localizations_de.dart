@@ -8790,6 +8790,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'erstes Volltanken (noch kein Fenster geschlossen)';
 
   @override
+  String get fillInventorySkipMixedFuel =>
+      'der Tank enthielt gemischte Sorten – er kann keine einzelne kalibrieren';
+
+  @override
   String fillInventorySkipCoverageTooLow(int coverage) {
     return 'aufgezeichnete Fahrten decken $coverage % des Tanks ab (60 % nötig)';
   }

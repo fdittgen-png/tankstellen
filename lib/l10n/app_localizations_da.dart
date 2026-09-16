@@ -8734,6 +8734,10 @@ class AppLocalizationsDa extends AppLocalizations {
       'første fulde tank (intet vindue lukket endnu)';
 
   @override
+  String get fillInventorySkipMixedFuel =>
+      'the tank held a mix of grades, so it cannot calibrate one';
+
+  @override
   String fillInventorySkipCoverageTooLow(int coverage) {
     return 'optagne ture dækker $coverage % af tanken (60 % kræves)';
   }

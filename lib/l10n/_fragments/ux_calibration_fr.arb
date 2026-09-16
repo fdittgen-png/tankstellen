@@ -90,6 +90,7 @@
   "fillInventorySkipNoVehicle": "aucun véhicule sur ce plein",
   "@fillInventorySkipNoVehicle": {"description": "#3917 — skip reason."},
   "fillInventorySkipNoWindow": "premier plein complet (aucune fenêtre fermée)",
+  "fillInventorySkipMixedFuel": "le réservoir contenait un mélange de carburants – il ne peut en calibrer aucun seul",
   "@fillInventorySkipNoWindow": {"description": "#3917 — skip reason."},
   "fillInventorySkipCoverageTooLow": "les trajets enregistrés couvrent {coverage} % du plein (60 % requis)",
   "@fillInventorySkipCoverageTooLow": {

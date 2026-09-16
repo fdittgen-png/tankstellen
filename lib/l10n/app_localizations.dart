@@ -14701,6 +14701,12 @@ abstract class AppLocalizations {
   /// **'first full tank (no window closed yet)'**
   String get fillInventorySkipNoWindow;
 
+  /// #4202 — skip reason: the window's recordings ran on different fuel grades.
+  ///
+  /// In en, this message translates to:
+  /// **'the tank held a mix of grades, so it cannot calibrate one'**
+  String get fillInventorySkipMixedFuel;
+
   /// #3917 — skip reason: recording coverage below the calibration bar.
   ///
   /// In en, this message translates to:

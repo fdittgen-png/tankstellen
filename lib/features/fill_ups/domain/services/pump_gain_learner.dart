@@ -40,6 +40,11 @@ enum PumpGainSkipReason {
   /// [PumpGainLearner.maxImplausibleRatio] — a typo'd receipt, not a
   /// calibration signal.
   implausibleTarget,
+
+  /// #4202 — the window's recordings were resolved under different fuel
+  /// grades: the tank held a mix, and one pump figure cannot calibrate
+  /// one grade from it.
+  mixedFuel,
 }
 
 /// Outcome of one [PumpGainLearner.reconcileAfterFillUp] (#3887).
@@ -102,8 +107,16 @@ class PumpGainOutcome {
     this.rawRecordedLPer100Km,
   });
 
-  /// The closing fill's normalised fuel key.
+  /// #4202 — the normalised key of the fuel the window BURNED (the grade
+  /// its recordings were resolved under, else the opening fill's), not the
+  /// closing fill's: a car that runs a tank of E10 and fills E85 learns
+  /// the E10 gain from that window.
   final String fuelKey;
+
+  /// Where the window distance came from. Always the odometer delta: a
+  /// GPS sum of the same recordings would make coverage 100 % by
+  /// construction, so a window without an odometer delta never calibrates.
+  String get distanceSource => 'odometer';
   final PumpGainResult? result;
   final PumpGainSkipReason? skipReason;
 
@@ -205,7 +218,8 @@ class PumpGainLearner {
     required List<FillUp> fillUps,
     required Map<String, TripSummary> tripSummariesById,
   }) async {
-    final fuelKey =
+    // Until a window is known, the closing fill's grade labels the outcome.
+    var fuelKey =
         normalizePumpGainFuelKey(closing.fuelType.apiValue) ?? 'unknown';
     PumpGainOutcome skip(PumpGainSkipReason why,
             {TankPeriod? period,
@@ -234,6 +248,7 @@ class PumpGainLearner {
     }
 
     var recordedKm = 0.0, rawLiters = 0.0;
+    final burnedKeys = <String>{};
     for (final id in closing.linkedTripIds) {
       final t = tripSummariesById[id];
       if (t == null || t.isVirtual) continue;
@@ -241,6 +256,21 @@ class PumpGainLearner {
       if (liters == null || liters <= 0 || t.distanceKm <= 0) continue;
       rawLiters += liters / (t.pumpGainApplied ?? 1.0);
       recordedKm += t.distanceKm;
+      final key = normalizePumpGainFuelKey(t.pumpGainFuelKey);
+      if (key != null) burnedKeys.add(key);
+    }
+    // #4202 — key the window by the fuel it burned. Recordings carry the
+    // grade their gain was resolved under (#4220); legacy recordings
+    // without one fall back to the opening fill — what the tank held when
+    // the window began. Never the closing fill's grade.
+    fuelKey = burnedKeys.length == 1
+        ? burnedKeys.single
+        : normalizePumpGainFuelKey(period.opening.fuelType.apiValue) ??
+            fuelKey;
+    if (burnedKeys.length > 1) {
+      _skip('mixed fuel ${burnedKeys.join('+')}');
+      return skip(PumpGainSkipReason.mixedFuel,
+          period: period, recordedKm: recordedKm);
     }
     final coverage = (recordedKm / period.distanceKm).clamp(0.0, 1.0);
     final rawLPer100 =

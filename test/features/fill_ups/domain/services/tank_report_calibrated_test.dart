@@ -25,7 +25,8 @@ FillUp _fill(String id, int day, double odo, {List<String> trips = const []}) =>
       linkedTripIds: trips,
     );
 
-TripSummary _trip(double km, double liters, {String? dominant, double? veUsed}) =>
+TripSummary _trip(double km, double liters,
+        {String? dominant, double? veUsed, String? fuelKey}) =>
     TripSummary(
       distanceKm: km,
       maxRpm: 3000,
@@ -38,6 +39,7 @@ TripSummary _trip(double km, double liters, {String? dominant, double? veUsed}) 
       startedAt: _t0,
       dominantFuelSource: dominant,
       volumetricEfficiencyUsed: veUsed,
+      pumpGainFuelKey: fuelKey,
     );
 
 void main() {
@@ -69,7 +71,7 @@ void main() {
     expect(r.residualPct.abs(), lessThan(1));
   });
 
-  test('the closing fill\'s fuel picks the per-fuel gain', () {
+  test('the burned grade picks the per-fuel gain (#4202)', () {
     const flex = VehicleProfile(
       id: 'car',
       name: 'Flex',
@@ -79,6 +81,39 @@ void main() {
     );
     final r = calibratedTankRecording(period, trips, flex)!;
     expect(r.recordedLPer100Km, closeTo(5.25, 0.01));
+  });
+
+  test('#4202 — a window that burned E10 and closed on E85 uses the E10 '
+      'gain, and a stamped recording outranks the opening fill', () {
+    const flex = VehicleProfile(
+      id: 'car',
+      name: 'Flex',
+      multiFuelCapable: true,
+      pumpGain: 1.0,
+      pumpGainByFuel: {
+        'e85': PumpGainEntry(gain: 0.5, samples: 1),
+        'e10': PumpGainEntry(gain: 0.8, samples: 1),
+      },
+    );
+    final e10Window = TankPeriod(
+      opening: _fill('f1', 0, 100000).copyWith(fuelType: FuelType.e10),
+      closing: _fill('f2', 10, 100559, trips: ['a', 'b']), // E85 fill
+      distanceKm: 559,
+      liters: 35.7,
+      pumpedCost: 30,
+    );
+    expect(calibratedTankRecording(e10Window, trips, flex)!.recordedLPer100Km,
+        closeTo(10.5 * 0.8, 0.01),
+        reason: 'before #4202 the closing E85 gain (0.5) was applied');
+
+    final stamped = {
+      'a': _trip(300, 31.5, veUsed: 0.85, fuelKey: 'e85'),
+      'b': _trip(153, 16.07, veUsed: 0.85, fuelKey: 'e85'),
+    };
+    expect(
+        calibratedTankRecording(e10Window, stamped, flex)!.recordedLPer100Km,
+        closeTo(10.5 * 0.5, 0.01),
+        reason: 'the recordings ran on E85');
   });
 
   test('measured trips are not rescaled; no fuel → null', () {

@@ -260,6 +260,7 @@ class _CalibrationLine extends StatelessWidget {
         PumpGainSkipReason.noRecordedFuel => l.fillInventorySkipNoRecordedFuel,
         PumpGainSkipReason.implausibleTarget =>
           l.fillInventorySkipImplausible,
+        PumpGainSkipReason.mixedFuel => l.fillInventorySkipMixedFuel, // #4202
       };
 
   @override

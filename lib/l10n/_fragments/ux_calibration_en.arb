@@ -91,6 +91,8 @@
   "@fillInventorySkipNoVehicle": {"description": "#3917 — skip reason."},
   "fillInventorySkipNoWindow": "first full tank (no window closed yet)",
   "@fillInventorySkipNoWindow": {"description": "#3917 — skip reason."},
+  "fillInventorySkipMixedFuel": "the tank held a mix of grades, so it cannot calibrate one",
+  "@fillInventorySkipMixedFuel": {"description": "#4202 — skip reason: the window's recordings ran on different fuel grades."},
   "fillInventorySkipCoverageTooLow": "recorded trips cover {coverage} % of the tank (60 % needed)",
   "@fillInventorySkipCoverageTooLow": {
     "placeholders": {
