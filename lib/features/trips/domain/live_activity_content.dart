@@ -4,6 +4,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../../../core/services/approach_detector.dart';
+import '../../../core/utils/localized_fuel_name.dart';
 import '../../../core/utils/price_formatter.dart';
 import '../../../core/utils/radar_closeness.dart';
 import '../../../core/utils/station_extensions.dart';
@@ -256,7 +257,7 @@ LiveActivityContent? buildLiveActivityContent({
       stopActionLabel: stopActionLabel,
       stationName: station.name.isNotEmpty ? station.name : station.brand,
       priceText: price != null ? PriceFormatter.formatPrice(price) : '--',
-      fuelLabel: fuel.displayName,
+      fuelLabel: localizedFuelName(l, fuel),
       stationDistanceText: stationDistanceText,
       progress: (distMeters != null && radiusMeters != null)
           ? RadarCloseness.fillFor(distMeters, radiusMeters)
