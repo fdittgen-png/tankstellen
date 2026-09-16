@@ -18,6 +18,7 @@ library;
 // lib/core/sync; exported so cross-feature consumers (device linking)
 // keep going through the barrel.
 export 'data/alerts_sync.dart';
+export 'data/opportunity_watch_store.dart';
 export 'data/price_snapshot_store.dart';
 export 'data/radius_alert_dedup.dart';
 export 'data/radius_alert_runner.dart';
@@ -25,14 +26,21 @@ export 'data/radius_alert_store.dart';
 export 'data/repositories/alert_repository.dart';
 export 'data/test_alert_runner.dart';
 export 'data/velocity_alert_cooldown.dart';
+export 'data/usual_station_store.dart';
 export 'data/velocity_alert_runner.dart';
 export 'domain/entities/price_alert.dart';
 export 'domain/entities/radius_alert.dart';
 export 'domain/radius_alert_evaluator.dart';
+export 'domain/usual_station_candidate.dart';
 export 'domain/velocity_alert_detector.dart';
 export 'presentation/screens/alerts_screen.dart';
+// #4154 — Settings hosts the "what to watch" switches; the widget and
+// the two settings providers behind it are part of this contract.
+export 'presentation/widgets/opportunity_watch_section.dart';
 export 'presentation/widgets/station_alert_create_sheet.dart';
 export 'providers/alert_provider.dart';
+export 'providers/opportunity_watch_provider.dart';
+export 'providers/usual_station_provider.dart';
 // #3131 — the background engine moved in; car_data_service consumes the
 // country strategy through this contract.
 export 'background/country_alert_strategy.dart';

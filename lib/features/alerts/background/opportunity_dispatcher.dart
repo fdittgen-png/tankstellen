@@ -58,6 +58,7 @@ import '../../../core/logging/error_logger.dart';
 import '../../../core/notifications/notification_service.dart';
 import '../data/budget_state_store.dart';
 import '../data/opportunity_feed_store.dart';
+import '../data/opportunity_watch_store.dart';
 import '../domain/opportunity.dart';
 import '../domain/opportunity_budget.dart';
 import '../domain/opportunity_confidence.dart';
@@ -69,12 +70,18 @@ import 'opportunity_notification_copy.dart';
 /// doc for the radius case this exists for.
 @immutable
 class OpportunityCandidate {
-  const OpportunityCandidate(this.opportunity, {this.copy});
+  const OpportunityCandidate(this.opportunity, {this.copy, this.onNotified});
 
   final Opportunity opportunity;
 
   /// Used verbatim when non-null. Null means "render me from the kind".
   final NotificationCopy? copy;
+
+  /// #4185 — run ONLY for the candidate whose notification actually went
+  /// out, and only after it did. This is where a detector's dedup /
+  /// cooldown row belongs: written before the budget has spoken, it says
+  /// "we told you" about something the user was never told.
+  final Future<void> Function()? onNotified;
 }
 
 /// What one dispatch did.
@@ -112,11 +119,16 @@ class OpportunityDispatcher {
     this.feed = const OpportunityFeedStore(),
     this.budgetState = const BudgetStateStore(),
     this.policy = const BudgetPolicy(),
+    this.watch = const OpportunityWatchStore(),
   });
 
   final OpportunityFeedStore feed;
   final BudgetStateStore budgetState;
   final BudgetPolicy policy;
+
+  /// #4154 — which kinds the user asked to hear about. Read here rather
+  /// than through a provider: this runs in a background isolate.
+  final OpportunityWatchStore watch;
 
   /// Three decimals, matching what the per-station runner has always
   /// shown. Not a locale format: this runs where there is no locale, and
@@ -148,14 +160,21 @@ class OpportunityDispatcher {
     final prebuilt = <Opportunity, NotificationCopy>{
       for (final c in candidates) c.opportunity: ?c.copy,
     };
+    // #4185 — so the winner's detector can record what was SENT.
+    final byOpportunity = <Opportunity, OpportunityCandidate>{
+      for (final c in candidates) c.opportunity: c,
+    };
 
     final state = budgetState.read();
+    final watched = watch.read();
     var outcome = OpportunityBudget.decide(
       candidates: [for (final c in candidates) c.opportunity],
       state: state,
       now: now,
       policy: policy,
       confidenceInputs: confidenceInputs,
+      // #4154 — an unwatched kind is refused, and still recorded.
+      watched: watched.contains,
     );
 
     var notified = false;
@@ -185,6 +204,10 @@ class OpportunityDispatcher {
         notified = await _notify(winner, copy, notifier);
         if (notified) {
           await budgetState.write(state.recording(winner, now), now);
+          // #4185 — the dedup / cooldown write, now that a notification
+          // really went out. Never for a refused candidate: that is the
+          // suppression this issue exists to remove.
+          await byOpportunity[winner]?.onNotified?.call();
         } else {
           // The channel refused it. Not a budget decision, so the slot is
           // not spent — but the finding is still real and still recorded.

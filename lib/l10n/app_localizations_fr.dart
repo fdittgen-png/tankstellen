@@ -7198,6 +7198,37 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ce n\'était déjà plus vrai au moment d\'envoyer';
 
   @override
+  String get opportunityRefusalNotWatched => 'You are not watching for this';
+
+  @override
+  String get opportunitiesScreenTitle => 'Opportunities';
+
+  @override
+  String get opportunitiesWatchHeader => 'What to watch for';
+
+  @override
+  String get opportunitiesWatchHint =>
+      'Everything the engine finds appears in Opportunities. These switches decide what may interrupt you.';
+
+  @override
+  String get usualStationTitle => 'Your usual station';
+
+  @override
+  String usualStationCandidate(Object fills, Object station) {
+    return '$station — $fills fill-ups';
+  }
+
+  @override
+  String get usualStationConfirm => 'Set as usual';
+
+  @override
+  String get usualStationClear => 'Not my usual';
+
+  @override
+  String get usualStationNone =>
+      'Add a few fill-ups and SparKilo can suggest one';
+
+  @override
   String opportunityBestStopNowTitle(String fuelType) {
     return '$fuelType le moins cher à proximité';
   }

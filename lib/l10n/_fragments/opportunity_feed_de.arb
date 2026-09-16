@@ -70,5 +70,14 @@
   "opportunityRefusalIneligible": "Es stimmte nicht mehr, bevor wir senden konnten",
   "@opportunityRefusalIneligible": {
     "description": "Reason for BudgetRefusal.ineligible — expired, an untrustworthy source, or a saving that did not reconcile (#4151)."
-  }
+  },
+  "opportunityRefusalNotWatched": "Darauf achtest du nicht",
+  "opportunitiesScreenTitle": "Gelegenheiten",
+  "opportunitiesWatchHeader": "Worauf geachtet wird",
+  "opportunitiesWatchHint": "Alles, was die Erkennung findet, erscheint unter Gelegenheiten. Diese Schalter entscheiden, was dich unterbrechen darf.",
+  "usualStationTitle": "Deine Stammtankstelle",
+  "usualStationCandidate": "{station} — {fills} Tankvorgänge",
+  "usualStationConfirm": "Als Stamm festlegen",
+  "usualStationClear": "Nicht meine Stammtankstelle",
+  "usualStationNone": "Erfasse ein paar Tankvorgänge, dann kann SparKilo eine vorschlagen"
 }

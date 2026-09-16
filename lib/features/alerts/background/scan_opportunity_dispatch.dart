@@ -33,6 +33,7 @@ import 'background_scan_runners.dart';
 import 'country_alert_strategy_resolver.dart';
 import 'notification_templates.dart';
 import 'opportunity_dispatcher.dart';
+import 'velocity_scan_detector.dart';
 
 /// Run the three detectors, hand everything to one budget, and record
 /// what the user was actually told.
@@ -61,7 +62,7 @@ Future<int> detectAndDispatch({
       fallbackCountryCode: activeCountry,
     ),
     if (prices.isNotEmpty)
-      ...await BackgroundScanRunners.detectVelocity(
+      ...await detectVelocity(
         storage: storage,
         prices: prices,
         now: now,

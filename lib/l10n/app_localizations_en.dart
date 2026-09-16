@@ -7092,6 +7092,37 @@ class AppLocalizationsEn extends AppLocalizations {
       'It stopped being true before we could send it';
 
   @override
+  String get opportunityRefusalNotWatched => 'You are not watching for this';
+
+  @override
+  String get opportunitiesScreenTitle => 'Opportunities';
+
+  @override
+  String get opportunitiesWatchHeader => 'What to watch for';
+
+  @override
+  String get opportunitiesWatchHint =>
+      'Everything the engine finds appears in Opportunities. These switches decide what may interrupt you.';
+
+  @override
+  String get usualStationTitle => 'Your usual station';
+
+  @override
+  String usualStationCandidate(Object fills, Object station) {
+    return '$station — $fills fill-ups';
+  }
+
+  @override
+  String get usualStationConfirm => 'Set as usual';
+
+  @override
+  String get usualStationClear => 'Not my usual';
+
+  @override
+  String get usualStationNone =>
+      'Add a few fill-ups and SparKilo can suggest one';
+
+  @override
   String opportunityBestStopNowTitle(String fuelType) {
     return 'Cheapest $fuelType nearby';
   }
@@ -16888,6 +16919,38 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get opportunityRefusalIneligible =>
       '⟦Îŧ šŧóƥƥéđ ƀéîñǧ ŧřúé ƀéƒóřé ŵé çóúłđ šéñđ îŧ ·················⟧';
+
+  @override
+  String get opportunityRefusalNotWatched =>
+      '⟦Ýóú ářé ñóŧ ŵáŧçĥîñǧ ƒóř ŧĥîš ···········⟧';
+
+  @override
+  String get opportunitiesScreenTitle => '⟦Óƥƥóřŧúñîŧîéš ······⟧';
+
+  @override
+  String get opportunitiesWatchHeader => '⟦Ŵĥáŧ ŧó ŵáŧçĥ ƒóř ······⟧';
+
+  @override
+  String get opportunitiesWatchHint =>
+      '⟦Éṽéřýŧĥîñǧ ŧĥé éñǧîñé ƒîñđš áƥƥéářš îñ Óƥƥóřŧúñîŧîéš. Ŧĥéšé šŵîŧçĥéš đéçîđé ŵĥáŧ ɱáý îñŧéřřúƥŧ ýóú. ······································⟧';
+
+  @override
+  String get usualStationTitle => '⟦Ýóúř úšúáł šŧáŧîóñ ·······⟧';
+
+  @override
+  String usualStationCandidate(Object fills, Object station) {
+    return '⟦$station — $fills ƒîłł-úƥš ···⟧';
+  }
+
+  @override
+  String get usualStationConfirm => '⟦Šéŧ áš úšúáł ·····⟧';
+
+  @override
+  String get usualStationClear => '⟦Ñóŧ ɱý úšúáł ·····⟧';
+
+  @override
+  String get usualStationNone =>
+      '⟦Áđđ á ƒéŵ ƒîłł-úƥš áñđ ŠƥářĶîłó çáñ šúǧǧéšŧ óñé ·················⟧';
 
   @override
   String opportunityBestStopNowTitle(String fuelType) {

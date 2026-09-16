@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/widgets/labeled_value_slider.dart';
 import 'package:tankstellen/core/widgets/scope_badge.dart';
 import 'package:tankstellen/features/driving/presentation/widgets/voice_announcements_settings_tile.dart';
+import 'package:tankstellen/features/alerts/domain/opportunity.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/profile/presentation/screens/settings/driving_consumption_screen.dart';
 import 'package:tankstellen/features/profile/presentation/screens/settings/prices_alerts_screen.dart';
@@ -101,6 +102,35 @@ void main() {
           reason: '${f.name} must render as a switch bound to its flag');
     }
     expect(find.byType(ExpansionTile), findsNothing);
+  });
+
+  testWidgets('Prices & alerts hosts the #4154 "what to watch" switches, '
+      'every kind on by default', (tester) async {
+    await pumpTall(tester, const PricesAlertsScreen());
+    final l = l10n(tester, PricesAlertsScreen);
+    expect(find.text(l.opportunitiesWatchHeader), findsOneWidget);
+    expect(find.text(l.opportunitiesWatchHint), findsOneWidget);
+
+    // This harness never opens Hive, so the stores take their
+    // closed-box branches — which is the assertion worth making here:
+    // a fresh install must watch EVERYTHING (#4149). The toggle
+    // round-trip is covered against a real box in
+    // test/features/alerts/data/opportunity_watch_store_test.dart,
+    // because a write dropped by a closed box would pass here either
+    // way.
+    for (final kind in OpportunityKind.values) {
+      final key = Key('opportunityWatch_${kind.name}');
+      expect(find.byKey(key), findsOneWidget,
+          reason: '${kind.name} must render as a switch');
+      expect(tester.widget<SwitchListTile>(find.byKey(key)).value, isTrue,
+          reason: 'an absent row is a fresh install, not a user who '
+              'switched ${kind.name} off');
+    }
+
+    expect(find.text(l.usualStationTitle), findsOneWidget);
+    expect(find.text(l.usualStationNone), findsOneWidget,
+        reason: 'no station set and no fill-up history to suggest one');
+    expect(find.byKey(const Key('usualStationClear')), findsNothing);
   });
 
   testWidgets('Prices & alerts hosts the voice-announcement sliders when '

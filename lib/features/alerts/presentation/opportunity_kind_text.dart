@@ -42,5 +42,6 @@ String opportunityRefusalText(AppLocalizations l, BudgetRefusal refusal) =>
       BudgetRefusal.alreadyToldRecently => l.opportunityRefusalAlreadyTold,
       BudgetRefusal.outrankedInWindow => l.opportunityRefusalOutranked,
       BudgetRefusal.confidenceTooLow => l.opportunityRefusalConfidenceTooLow,
+      BudgetRefusal.notWatched => l.opportunityRefusalNotWatched,
       BudgetRefusal.ineligible => l.opportunityRefusalIneligible,
     };

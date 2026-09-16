@@ -9,6 +9,7 @@ import '../../../../../core/navigation/app_routes.dart';
 import '../../../../../core/widgets/section_card.dart';
 import '../../../../../core/widgets/settings_menu_tile.dart';
 import '../../../../../l10n/app_localizations.dart';
+import '../../../../alerts/api.dart' show OpportunityWatchSection;
 import '../../../../driving/api.dart' show VoiceAnnouncementsSettingsTile;
 import '../../../../feature_management/api.dart';
 import '../../../providers/voice_announcements_enabled_provider.dart';
@@ -56,6 +57,15 @@ class PricesAlertsScreen extends ConsumerWidget {
           subtitle: l.settingsAlertsTileSubtitle,
           onTap: () => context.push(RoutePaths.alerts),
         ),
+        const SizedBox(height: 16),
+        // #4154 — which findings may interrupt, next to the alerts they
+        // govern. The Opportunities screen shows everything the engine
+        // found; these switches decide what earns a notification.
+        SettingsGroupHeader(
+          icon: Icons.notifications_paused_outlined,
+          title: l.opportunitiesWatchHeader,
+        ),
+        const OpportunityWatchSection(),
         const SizedBox(height: 16),
         SettingsGroupHeader(
           icon: Icons.record_voice_over_outlined,
