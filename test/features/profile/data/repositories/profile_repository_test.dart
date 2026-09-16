@@ -9,6 +9,7 @@ import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/data/repositories/profile_repository.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/station_amenity.dart';
 
 /// Uses a real [HiveStorage] wired to a temp Hive dir so the repository's
 /// JSON round-trips exercise the real serialisation path.
@@ -307,6 +308,228 @@ void main() {
       final cleared = await repo.dedupeCountryProfiles();
       expect(cleared, 0,
           reason: 'null country is exempt from the one-per-country rule');
+    });
+  });
+
+  // #4259 (Epic #4257) — cloning a profile for another country.
+  group('cloneProfileForCountry', () {
+    /// A source profile with NON-DEFAULT values in the fields
+    /// `createProfile()` cannot express. Asserting defaults would prove
+    /// nothing — the point is that these survive the clone.
+    Future<UserProfile> richSource() async {
+      final base = await repo.createProfile(
+        name: 'France',
+        preferredFuelType: FuelType.e10,
+        countryCode: 'FR',
+        languageCode: 'fr',
+      );
+      final rich = base.copyWith(
+        defaultSearchRadius: 27.5,
+        landingScreen: LandingScreen.map,
+        routeSegmentKm: 80,
+        avoidHighways: true,
+        routeDetourBudgetKm: 12.5,
+        minRouteSavingPerLiter: 0.07,
+        routeSearchTopNPerSamplePoint: 3,
+        routeSearchCriterion: RouteSearchCriterion.nearest,
+        preferredAmenities: const [StationAmenity.carWash],
+        defaultVehicleId: 'veh-1',
+        hybridFuelChoice: FuelType.electric,
+        approachRadiusKm: 2.5,
+        approachPriceMode: ApproachPriceMode.cheapestInRadius,
+        approachMinPollSeconds: 9,
+        widgetColorScheme: 'green',
+        widgetVariant: 'predictive',
+        favoriteStationIds: const ['fr-123'],
+        ratingMode: 'private',
+        autoUpdatePosition: true,
+        homeZipCode: '75001',
+      );
+      await repo.updateProfile(rich);
+      return rich;
+    }
+
+    test('carries every country-independent setting to the clone', () async {
+      final source = await richSource();
+      final clone = repo.cloneProfileForCountry(
+        source: source,
+        countryCode: 'AT',
+        fuel: FuelType.e5,
+        name: 'Österreich',
+      );
+
+      expect(clone.defaultSearchRadius, 27.5);
+      expect(clone.landingScreen, LandingScreen.map);
+      expect(clone.routeSegmentKm, 80);
+      expect(clone.avoidHighways, isTrue);
+      expect(clone.routeDetourBudgetKm, 12.5);
+      expect(clone.minRouteSavingPerLiter, 0.07);
+      expect(clone.routeSearchTopNPerSamplePoint, 3);
+      expect(clone.routeSearchCriterion, RouteSearchCriterion.nearest);
+      expect(clone.preferredAmenities, const [StationAmenity.carWash]);
+      expect(clone.defaultVehicleId, 'veh-1');
+      expect(clone.hybridFuelChoice, FuelType.electric);
+      expect(clone.approachRadiusKm, 2.5);
+      expect(clone.approachPriceMode, ApproachPriceMode.cheapestInRadius);
+      expect(clone.approachMinPollSeconds, 9);
+      expect(clone.widgetColorScheme, 'green');
+      expect(clone.widgetVariant, 'predictive');
+      expect(clone.favoriteStationIds, const ['fr-123']);
+      expect(clone.ratingMode, 'private');
+      expect(clone.autoUpdatePosition, isTrue);
+      expect(clone.homeZipCode, '75001');
+    });
+
+    test('changes only country, fuel, name and id', () async {
+      final source = await richSource();
+      final clone = repo.cloneProfileForCountry(
+        source: source,
+        countryCode: 'AT',
+        fuel: FuelType.e5,
+        name: 'Österreich',
+      );
+      expect(clone.countryCode, 'AT');
+      expect(clone.preferredFuelType, FuelType.e5);
+      expect(clone.name, 'Österreich');
+      expect(clone.id, isNot(source.id));
+      expect(clone.id, isNotEmpty);
+    });
+
+    test('keeps the source language — the UI language is not a property '
+        'of the country being added', () async {
+      final source = await richSource();
+      final clone = repo.cloneProfileForCountry(
+        source: source,
+        countryCode: 'AT',
+        fuel: FuelType.e5,
+        name: 'Österreich',
+      );
+      expect(clone.languageCode, 'fr');
+    });
+
+    test('writes nothing by itself', () async {
+      final source = await richSource();
+      repo.cloneProfileForCountry(
+        source: source,
+        countryCode: 'AT',
+        fuel: FuelType.e5,
+        name: 'Österreich',
+      );
+      expect(repo.getAllProfiles(), hasLength(1),
+          reason: 'the clone is a pure model build; the caller persists it');
+    });
+  });
+
+  group('createMissingCountryProfiles', () {
+    Future<UserProfile> frSource() => repo.createProfile(
+          name: 'France',
+          preferredFuelType: FuelType.e10,
+          countryCode: 'FR',
+          languageCode: 'fr',
+        );
+
+    CountryProfileProposal proposal(UserProfile src, String code,
+            [FuelType fuel = FuelType.e5]) =>
+        CountryProfileProposal(
+          source: src,
+          countryCode: code,
+          fuel: fuel,
+          name: code,
+        );
+
+    test('creates a profile per proposal', () async {
+      final src = await frSource();
+      final result = await repo.createMissingCountryProfiles(
+          [proposal(src, 'AT'), proposal(src, 'IT')]);
+
+      expect(result.created, hasLength(2));
+      expect(result.skipped, isEmpty);
+      expect(result.failed, isEmpty);
+      expect(result.isComplete, isTrue);
+      expect(result.hasChanges, isTrue);
+      expect(repo.getAllProfiles().map((p) => p.countryCode),
+          containsAll(['FR', 'AT', 'IT']));
+    });
+
+    test('does NOT change the active profile', () async {
+      final src = await frSource();
+      expect(repo.getActiveProfile()?.id, src.id);
+
+      await repo.createMissingCountryProfiles(
+          [proposal(src, 'AT'), proposal(src, 'IT')]);
+
+      expect(repo.getActiveProfile()?.id, src.id,
+          reason: 'Epic #4257 §C — creating profiles never activates them');
+    });
+
+    test('with NO active profile, still activates nothing (#4268)', () async {
+      // Build a source without going through createProfile, so no
+      // activation happens and the active id stays unset.
+      const src = UserProfile(id: 'src-1', name: 'FR', countryCode: 'FR');
+      await repo.updateProfile(src);
+      expect(repo.getActiveProfile(), isNull);
+
+      final result =
+          await repo.createMissingCountryProfiles([proposal(src, 'AT')]);
+
+      expect(result.created, hasLength(1));
+      expect(repo.getActiveProfile(), isNull,
+          reason: 'a route-created profile must not become the active '
+              'country just because none was set');
+    });
+
+    test('an already-taken country is skipped, not duplicated', () async {
+      final src = await frSource();
+      await repo.createProfile(name: 'Austria', countryCode: 'AT');
+
+      final result =
+          await repo.createMissingCountryProfiles([proposal(src, 'AT')]);
+
+      expect(result.created, isEmpty);
+      expect(result.skipped, ['AT']);
+      expect(result.isComplete, isTrue, reason: 'a skip is not a failure');
+      expect(result.hasChanges, isFalse);
+      expect(
+          repo.getAllProfiles().where((p) => p.countryCode == 'AT'),
+          hasLength(1));
+    });
+
+    test('is idempotent — a second identical batch creates nothing',
+        () async {
+      final src = await frSource();
+      final proposals = [proposal(src, 'AT'), proposal(src, 'IT')];
+
+      final first = await repo.createMissingCountryProfiles(proposals);
+      final second = await repo.createMissingCountryProfiles(proposals);
+
+      expect(first.created, hasLength(2));
+      expect(second.created, isEmpty);
+      expect(second.skipped, ['AT', 'IT']);
+      expect(repo.getAllProfiles(), hasLength(3),
+          reason: 'double tap / retry must not duplicate a country');
+    });
+
+    test('a duplicate country WITHIN one batch is caught by the per-write '
+        'recheck', () async {
+      final src = await frSource();
+      final result = await repo.createMissingCountryProfiles(
+          [proposal(src, 'AT'), proposal(src, 'AT')]);
+
+      expect(result.created, hasLength(1));
+      expect(result.skipped, ['AT']);
+      expect(
+          repo.getAllProfiles().where((p) => p.countryCode == 'AT'),
+          hasLength(1));
+    });
+
+    test('an empty proposal list is a no-op', () async {
+      await frSource();
+      final result = await repo.createMissingCountryProfiles([]);
+      expect(result.created, isEmpty);
+      expect(result.skipped, isEmpty);
+      expect(result.isComplete, isTrue);
+      expect(result.hasChanges, isFalse);
+      expect(repo.getAllProfiles(), hasLength(1));
     });
   });
 }
