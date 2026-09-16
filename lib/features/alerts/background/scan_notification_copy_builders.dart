@@ -28,13 +28,18 @@ VelocityAlertCopy buildVelocityCopy(
   VelocityAlertEvent event,
   BackgroundNotificationTemplates templates,
 ) {
-  // #4283 — still the English name, and it is user-visible inside an
-  // otherwise localized notification. Fixing it here is not a one-liner:
-  // this runs in a background isolate with no BuildContext, so the label
-  // has to come from `lookupAppLocalizations` the way
-  // `BackgroundNotificationTemplates.resolveForLanguage` already does.
-  // Left for the isolate pass rather than half-done here.
-  final fuelLabel = event.fuelType.displayName.toUpperCase();
+  // #4301 — the grade name now travels in the templates blob, resolved
+  // by the main isolate for the active in-app language, like every other
+  // string here. Resolving it locally was never an option: this isolate's
+  // own locale is the DEVICE locale, which is the bug #2306 fixed.
+  //
+  // The `.toUpperCase()` this line used to carry is gone. The template is
+  // `{fuelLabel} dropped at nearby stations`, so the label opens a
+  // sentence: upper-casing it shouted `AUTOGAS (LPG)` mid-sentence, and
+  // Dart's `toUpperCase` is not locale-aware (the Turkish dotless-i
+  // class of bug). It was emphasis on a short English token, and it does
+  // not survive translation.
+  final fuelLabel = templates.fuelLabelFor(event.fuelType.apiValue);
   return VelocityAlertCopy(
     title: templates.renderVelocityTitle(fuelLabel: fuelLabel),
     body: templates.renderVelocityBody(

@@ -6,6 +6,8 @@ import 'dart:ui' as ui;
 
 import '../../../l10n/app_localizations.dart';
 import '../../../core/country/country_config.dart';
+import '../../../core/domain/fuel_type.dart';
+import '../../../core/utils/localized_fuel_name.dart';
 import 'opportunity_notification_copy.dart';
 
 /// #2306 — localized notification copy resolved IN THE MAIN ISOLATE and
@@ -62,6 +64,21 @@ class BackgroundNotificationTemplates {
   /// country resolves, so DE / EUR-zone behaviour is byte-identical.
   final String currencySymbol;
 
+  /// Localized fuel-grade names, keyed by [FuelType.apiValue] (#4301).
+  ///
+  /// The isolate renders `{fuelType}` / `{fuelLabel}` into notification
+  /// copy, and the only label it had was [FuelType.displayName] — a
+  /// French/English hybrid (`GPL / LPG`, `E85 / Bioéthanol`) that every
+  /// one of the 24 locales received inside otherwise localized text.
+  ///
+  /// It cannot be fixed at the render site. The isolate has no
+  /// `BuildContext`, and resolving its own locale is the very bug #2306
+  /// fixed — that is the *device* locale, not the in-app language the
+  /// user picked. So the labels travel the way every other string here
+  /// does: resolved by [fromL10n] in the main isolate and carried in the
+  /// blob.
+  final Map<String, String> fuelLabels;
+
   const BackgroundNotificationTemplates({
     required this.priceAlertTitle,
     required this.priceAlertBody,
@@ -71,6 +88,7 @@ class BackgroundNotificationTemplates {
     required this.radiusGroupedMore,
     required this.opportunity,
     required this.currencySymbol,
+    required this.fuelLabels,
   });
 
   /// Hive settings key under which the JSON blob is stored.
@@ -110,6 +128,13 @@ class BackgroundNotificationTemplates {
             '{price}', '{currency}', '{station}'),
       ),
       currencySymbol: _euro,
+      // #4301 — every grade the isolate might name, in the language the
+      // main isolate resolved. `FuelType.all` is excluded: the search
+      // wildcard is never the subject of an alert.
+      fuelLabels: {
+        for (final fuel in FuelType.values)
+          if (fuel != FuelType.all) fuel.apiValue: localizedFuelName(l, fuel),
+      },
     );
   }
 
@@ -142,6 +167,7 @@ class BackgroundNotificationTemplates {
         'radiusGroupedMore': radiusGroupedMore,
         'opportunity': opportunity.toJson(),
         'currencySymbol': currencySymbol,
+        'fuelLabels': fuelLabels,
       };
 
   String encode() => jsonEncode(toJson());
@@ -165,6 +191,12 @@ class BackgroundNotificationTemplates {
         // rewrites the blob on the next launch.
         opportunity: OpportunityTemplates.tryDecode(map['opportunity'])!,
         currencySymbol: map['currencySymbol'] as String,
+        // #4301 — absent in a blob written before the fuel labels
+        // travelled. The cast throws, `tryDecode` returns null, and the
+        // caller takes the same fall-back-to-live-resolution path #4183
+        // relies on; the main isolate rewrites the blob next launch.
+        fuelLabels: (map['fuelLabels'] as Map<String, dynamic>)
+            .map((key, value) => MapEntry(key, value as String)),
       );
     } catch (_) {
       return null;
@@ -204,6 +236,15 @@ class BackgroundNotificationTemplates {
   /// Velocity-drop body.
   String renderVelocityBody({required int count, required int cents}) =>
       _fill(velocityBody, {'count': '$count', 'cents': '$cents'});
+
+  /// The localized grade name for [apiValue] (#4301).
+  ///
+  /// Falls back to [apiValue] itself when the blob predates a grade, or
+  /// carries one this build does not know. That is deliberate: the
+  /// alternative is `null` interpolated into a sentence, and a bare
+  /// `e10` reads as a label while `null` reads as a bug. `FuelType.all`
+  /// is never in the map — the search wildcard is not an alert subject.
+  String fuelLabelFor(String apiValue) => fuelLabels[apiValue] ?? apiValue;
 
   /// Radius-alert grouped title.
   ///

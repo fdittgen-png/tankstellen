@@ -143,10 +143,9 @@ class BackgroundScanRunners {
         copy: (
           title: templates.renderPriceAlertTitle(
             station: alert.stationName,
-            // #4283 — English inside localized alert copy; same isolate
-            // constraint as scan_notification_copy_builders: no BuildContext
-            // here, so the label must come from `lookupAppLocalizations`.
-            fuelType: alert.fuelType.displayName,
+            // #4301 — the grade name travels in the templates blob now,
+            // resolved by the main isolate for the active in-app language.
+            fuelType: templates.fuelLabelFor(alert.fuelType.apiValue),
           ),
           body: templates.renderPriceAlertBody(
             price: currentPrice.toStringAsFixed(3),
