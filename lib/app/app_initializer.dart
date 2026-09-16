@@ -29,6 +29,7 @@ import '../core/logging/app_log.dart';
 import '../core/logging/error_log_denoise.dart';
 import '../core/logging/error_logger.dart';
 import '../core/notifications/local_notification_service.dart';
+import '../core/notifications/notification_launch_ledger.dart';
 import '../core/perf/launch_sync_trace.dart';
 import '../core/perf/startup_timer.dart';
 import '../core/services/country_service_registry.dart';
@@ -50,6 +51,7 @@ import 'startup/startup_overrides.dart';
 import 'startup/storage_failure_gate.dart';
 import 'startup/launch_sync_phase.dart';
 import 'startup/provider_warmup_phase.dart';
+import 'startup/runtime_services_phase.dart';
 import 'startup/telemetry_replay_phase.dart';
 import 'startup/trip_recovery_phase.dart';
 
@@ -57,7 +59,7 @@ part 'app_initializer_boot_support.dart';
 part 'app_initializer_deferred_tasks.dart';
 
 /// Drives the cold-start sequence in well-defined phases: **bootstrap** →
-/// **storage** → **services** (parallel) → **optional deferred**
+/// **storage** → **services** (post-frame, #4317) → **optional deferred**
 /// (post-first-frame) → **runApp**. Full phase narrative + #3139 notes:
 /// atop `app_initializer_deferred_tasks.dart` (`part`, move-only #3761).
 ///
@@ -88,8 +90,12 @@ class AppInitializer {
     if (!await runStoragePhaseGuarded(_initStorage)) return;
     StartupTimer.instance.mark('storage_ready');
 
-    await _initServicesInParallel();
-    StartupTimer.instance.mark('services_init');
+    // #4317 — the only service operation left before launch: SEND the
+    // home-widget group id so no later widget write can reach the iOS
+    // plugin ahead of it. Its answer, notifications and the background
+    // scheduler are runtime housekeeping, run after the first frame.
+    final homeWidgetGroupId = SentPlatformCall(HomeWidgetService.init);
+    StartupTimer.instance.mark('launch_critical_services');
 
     final container = createContainer();
 
@@ -175,7 +181,7 @@ class AppInitializer {
       };
     }
 
-    _launch(container, appBuilder);
+    _launch(container, appBuilder, homeWidgetGroupId);
   }
 
   /// Builds the app's ONE root [ProviderContainer] — the production
@@ -261,28 +267,8 @@ class AppInitializer {
     });
   }
 
-  // Phase 3 — services (parallel).
-
-  /// Notifications, background tasks and the home widget initialiser are
-  /// independent — parallelised; each future is individually
-  /// error-protected so one failing plugin doesn't block the others.
-  static Future<void> _initServicesInParallel() async {
-    await Future.wait<void>([
-      _safe('notifications', LocalNotificationService().initialize),
-      _safe('background', _maybeInitBackground),
-      _safe('home_widget', HomeWidgetService.init),
-    ]);
-  }
-
-  /// Schedule periodic price polling only when the user has at least one
-  /// active alert (#713 — per Tankerkönig's ToS, requests on demand only).
-  /// #2210 — reconcile gates BOTH price and radius alerts. #3169 — a cold
-  /// launch also fires an opportunistic scan (an execution window iOS
-  /// reliably grants; Android no-ops), cross-trigger-cooldown-gated.
-  static Future<void> _maybeInitBackground() async {
-    await BackgroundService.reconcile();
-    await BackgroundService.onOpportunisticWake();
-  }
+  // Phase 3 — runtime services: post-first-frame since #4317, see
+  // RuntimeServicesPhase and `_launch`.
 
   // Phase 4 — optional TankSync.
 
@@ -334,6 +320,7 @@ class AppInitializer {
   static void _launch(
     ProviderContainer container,
     Widget Function(ProviderContainer container) appBuilder,
+    SentPlatformCall homeWidgetGroupId,
   ) {
     // #1104 — bind the unified errorLogger to this container so every
     // foreground `errorLogger.log(...)` routes through TraceRecorder +
@@ -341,6 +328,17 @@ class AppInitializer {
     // by TelemetryReplayPhase).
     errorLogger.bind(container);
     _installErrorHandlers();
+
+    // #4317 — notifications, the #713/#2210 alert-gated scheduler and the
+    // #3169 cold-launch scan, off the critical path. Registered after the
+    // bind and in the same synchronous block as `runApp`, so they report
+    // through the foreground pipeline and never start before the handoff.
+    RuntimeServicesPhase.scheduleAfterFirstFrame(RuntimeServices(
+      initNotifications: LocalNotificationService().initialize,
+      reconcileBackground: BackgroundService.reconcile,
+      opportunisticWake: BackgroundService.onOpportunisticWake,
+      homeWidgetSetup: homeWidgetGroupId.rethrowFailure,
+    ));
 
     // #609 heartbeat, #1004/#1303 trip recoveries, orchestrator start,
     // aggregator hook, isolate-spool drain — in order (see part file).

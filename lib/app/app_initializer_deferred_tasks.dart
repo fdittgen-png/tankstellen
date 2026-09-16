@@ -18,8 +18,8 @@ part of 'app_initializer.dart';
 ///    can't write local data; we surface it but still attempt to keep
 ///    going so the user isn't stuck on a black screen. The secure-storage
 ///    API-key read and `TraceStorage.init()` run in parallel (#795).
-/// 3. **services** — notifications, background tasks, home widget;
-///    independent of each other → parallelised with `Future.wait`.
+/// 3. **services** — #4317: only the home-widget group id is SENT here;
+///    notifications + scheduler run post-frame (RuntimeServicesPhase).
 /// 4. **optional (deferred)** — community config + TankSync, plus
 ///    one-shot migrations (vehicle reference-catalog backfill #950, the
 ///    feature-flag legacy-toggle promoter #1373). All scheduled for a

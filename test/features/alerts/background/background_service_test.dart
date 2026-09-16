@@ -709,10 +709,15 @@ void main() {
         isTrue,
         reason: 'the wake must be gated on the resumed transition',
       );
+      // #4317 — the cold-launch wake moved into RuntimeServicesPhase (after
+      // the first frame, reconcile first); its ordering and once-only
+      // behaviour are EXECUTED by runtime_services_phase_test.dart. This
+      // pins that production still wires the real wake into it.
       final initializer =
           File('lib/app/app_initializer.dart').readAsStringSync();
       expect(
-        initializer.contains('BackgroundService.onOpportunisticWake()'),
+        initializer.contains(
+            'opportunisticWake: BackgroundService.onOpportunisticWake,'),
         isTrue,
         reason: 'cold launch must fire the wake after reconcile',
       );

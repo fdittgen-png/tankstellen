@@ -8,8 +8,7 @@ part of 'app_initializer.dart';
 /// #1680 file-length cap (sanctioned #3761 decomposition — move-only,
 /// behaviour preserved). Free functions here are the bodies behind the
 /// structurally-pinned thin members in `app_initializer.dart`: bootstrap,
-/// the storage-phase profile seed, the parallel-service error shield, the
-/// shared PackageInfo future, the Sentry options block and the global
+/// the storage-phase profile seed, the shared PackageInfo future, the Sentry options block and the global
 /// error-handler bodies.
 
 // ---------------------------------------------------------------------------
@@ -20,6 +19,9 @@ void _bootstrap() {
   WidgetsFlutterBinding.ensureInitialized();
   // Opt in to edge-to-edge display (required for Android 15+).
   EdgeToEdge.enable();
+  // #4317 — notification init runs after the first frame now; queue the
+  // taps the plugin forwards before then instead of discarding them.
+  NotificationLaunchLedger.reserveEarlyTapBuffer();
 
   // Note: we no longer override Flutter's default ImageCache size
   // (was bumped to 200 MB / 2000 entries by #711 as a workaround
@@ -59,21 +61,6 @@ Future<void> _verifyRegistryAndSeedProfile() async {
   // past it (see `run()`'s post-first-frame block).
   final profileRepo = ProfileRepository(HiveStorage());
   await profileRepo.ensureDefaultProfile();
-}
-
-// ---------------------------------------------------------------------------
-// Phase 3 — services (parallel) error shield
-// ---------------------------------------------------------------------------
-
-Future<void> _safe(String label, Future<void> Function() body) async {
-  try {
-    await body();
-  } catch (e, st) {
-    // #3143 — pre-bind, so this spools via IsolateErrorSpool and is
-    // drained into the trace pipeline post-first-frame.
-    unawaited(errorLogger.log(ErrorLayer.background, e, st,
-        context: {'where': 'serviceInit', 'service': label}));
-  }
 }
 
 // ---------------------------------------------------------------------------

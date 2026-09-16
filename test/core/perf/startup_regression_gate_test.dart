@@ -95,7 +95,7 @@ void main() {
               'asserts nothing until that is fixed');
     });
 
-    test('blocks on exactly the four steps the budget accounts for', () {
+    test('blocks on exactly the steps the budget accounts for', () {
       final blocking = [
         for (final line in bodyLines)
           if (_isTopLevelStatement(line) && _mentionsAwait(line)) line.trim(),
@@ -105,7 +105,7 @@ void main() {
           reason: 'The set of steps that BLOCK the first frame changed.\n\n'
               'Each one of these is serial time before anything paints, '
               'and ${kColdStartBudget.limit} ${kColdStartBudget.unit} was '
-              'measured with these four.\n\n'
+              'measured with these.\n\n'
               'Before adding one, ask what #4110 asked: does the first '
               'frame actually need it, or can it go through '
               '_deferPostFirstFrame? If it must block, update this list '
@@ -153,14 +153,15 @@ final Set<String> _firstFrameBoxBaseline = {
 const List<String> _preFirstFrameAwaits = [
   'await initializeDateFormatting();',
   'if (!await runStoragePhaseGuarded(_initStorage)) return;',
-  'await _initServicesInParallel();',
+  // #4317 — `await _initServicesInParallel();` left: notifications, the
+  // background scheduler and the home-widget answer run post-frame.
   'await _stashWidgetLaunchUri(container);',
 ];
 
 /// Every `await` in the body, including those inside the post-first-frame
 /// closures — the backstop for an await added where [_isTopLevelStatement]
 /// cannot see it.
-const int _totalAwaitsInRunBody = 11;
+const int _totalAwaitsInRunBody = 10;
 
 final RegExp _awaitPattern = RegExp(r'\bawait\b');
 

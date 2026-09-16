@@ -377,7 +377,9 @@ void main() {
     'lib/features/obd2/data/session/obd2_self_test_driver.dart': 846,
     'lib/features/fill_ups/presentation/screens/add_fill_up_screen.dart': 824,
     'lib/features/fill_ups/presentation/widgets/fuel_type_efficiency_card.dart': 810,
-    'lib/app/app_initializer.dart': 746,
+    // #4317 — 746 → 731: the pre-launch service batch and its error shield
+    // left; the runtime services are a library of their own.
+    'lib/app/app_initializer.dart': 731,
     'lib/features/obd2/data/obd2_comm_diagnostics.dart': 726,
     'lib/features/vehicle/presentation/screens/edit_vehicle_screen.dart': 714,
     'lib/features/obd2/data/protocol/adapter_registry.dart': 706,

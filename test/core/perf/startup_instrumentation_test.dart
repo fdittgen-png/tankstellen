@@ -35,7 +35,8 @@ void main() {
       for (final milestone in [
         'binding',
         'storage_ready',
-        'services_init',
+        // #4317 — was `services_init`; the services moved post-frame.
+        'launch_critical_services',
         'first_frame',
       ]) {
         expect(

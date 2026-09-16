@@ -56,8 +56,8 @@ void main() {
   });
 
   group('AppInitializer phase ordering', () {
-    test('runs in order: bootstrap → storage → services → optional → launch',
-        () {
+    test('runs in order: bootstrap → storage → launch-critical service '
+        'send → optional → launch', () {
       // Pin the call ordering inside AppInitializer.run so a future edit
       // can't accidentally do storage-before-bootstrap or skip a phase.
       final runBody = _extractMethodBody(initSource, 'static Future<void> run');
@@ -69,7 +69,9 @@ void main() {
       // verdicts moved into the gate), so match the name without the
       // call parens. This test is about ORDER, not call syntax.
       final storage = runBody.indexOf('_initStorage');
-      final services = runBody.indexOf('_initServicesInParallel()');
+      // #4317 — the parallel service await is gone; what stays before the
+      // launch is SENDING the home-widget group id.
+      final services = runBody.indexOf('SentPlatformCall(HomeWidgetService.init)');
       final tankSync = runBody.indexOf('_maybeInitTankSync');
       final launch = runBody.indexOf('_launch(');
 
@@ -89,39 +91,32 @@ void main() {
           reason: 'TankSync must precede _launch');
     });
 
-    test('service inits run in parallel via Future.wait', () {
-      // A future regression that swaps Future.wait back to sequential awaits
-      // must fail this test — that was the whole point of the refactor.
-      final body = _extractMethodBody(
-        initSource,
-        'static Future<void> _initServicesInParallel',
-      );
-      expect(body, isNotNull);
-      expect(body, contains('Future.wait'));
-      expect(body, contains('LocalNotificationService'));
-      // Background polling is now gated on active alerts (#713); the
-      // parallel slot may reference the gating helper instead of the
-      // service directly. Either is fine so long as background work
-      // still happens in the same Future.wait slot.
-      expect(
-        body!.contains('BackgroundService.init') ||
-            body.contains('_maybeInitBackground'),
-        isTrue,
-        reason: 'background init (or its gating helper) must run in parallel',
-      );
-      expect(body, contains('HomeWidgetService.init'));
-    });
+    test('#4317 — runtime services are scheduled from _launch, after the '
+        'bind, and nothing awaits them before the handoff', () {
+      // The behaviour (parallel, failure-isolated, post-frame, once) is
+      // EXECUTED by test/app/startup/runtime_services_phase_test.dart; this
+      // only pins where production wires it.
+      final runBody = _extractMethodBody(initSource, 'static Future<void> run');
+      expect(runBody, isNot(contains('LocalNotificationService')));
+      expect(runBody, isNot(contains('BackgroundService')));
 
-    test('each parallel service init is wrapped in error protection', () {
-      // Failing notifications must not block background or home widget init.
-      final body = _extractMethodBody(
-        initSource,
-        'static Future<void> _initServicesInParallel',
-      );
-      expect(body, isNotNull);
-      expect(body, contains('_safe('),
-          reason: 'each parallel init should go through _safe to isolate '
-              'failures across services');
+      final launchBody = _extractMethodBody(initSource, 'static void _launch');
+      final bind = launchBody!.indexOf('errorLogger.bind(container)');
+      final schedule =
+          launchBody.indexOf('RuntimeServicesPhase.scheduleAfterFirstFrame(');
+      final runApp = launchBody.indexOf('runApp(');
+      expect(bind, isNonNegative);
+      expect(schedule, greaterThan(bind),
+          reason: 'failures must report through the bound pipeline');
+      expect(runApp, greaterThan(schedule));
+      for (final service in [
+        'LocalNotificationService().initialize',
+        'BackgroundService.reconcile',
+        'BackgroundService.onOpportunisticWake',
+        'homeWidgetGroupId.rethrowFailure',
+      ]) {
+        expect(launchBody, contains(service));
+      }
     });
 
     test('TankSync init is bounded by an 8-second timeout', () {
