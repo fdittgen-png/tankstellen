@@ -48,20 +48,6 @@ enum LandingScreen {
 
   final String key;
   const LandingScreen(this.key);
-
-  /// Localized display name. Falls back to English.
-  String localizedName(String languageCode) {
-    const names = {
-      'favorites': {'en': 'Favorites', 'de': 'Favoriten', 'fr': 'Favoris', 'es': 'Favoritos', 'it': 'Preferiti', 'nl': 'Favorieten', 'da': 'Favoritter', 'sv': 'Favoriter', 'fi': 'Suosikit', 'pl': 'Ulubione'},
-      'map': {'en': 'Map', 'de': 'Karte', 'fr': 'Carte', 'es': 'Mapa', 'it': 'Mappa', 'nl': 'Kaart', 'da': 'Kort', 'sv': 'Karta', 'fi': 'Kartta', 'pl': 'Mapa'},
-      'cheapest': {'en': 'Cheapest nearby', 'de': 'Günstigste', 'fr': 'Moins cher', 'es': 'Más barato', 'it': 'Più economico', 'nl': 'Goedkoopste', 'da': 'Billigste', 'sv': 'Billigast', 'fi': 'Halvin', 'pl': 'Najtańsze'},
-      'nearest': {'en': 'Nearest stations', 'de': 'Nächste Tankstellen', 'fr': 'À proximité', 'es': 'Estaciones cercanas', 'it': 'Stazioni vicine', 'nl': 'Dichtstbijzijnde', 'da': 'Nærmeste', 'sv': 'Närmaste', 'fi': 'Lähimmät', 'pl': 'Najbliższe'},
-    };
-    return names[key]?[languageCode] ?? names[key]?['en'] ?? key;
-  }
-
-  /// For backward compatibility with existing serialized profiles
-  String get displayName => localizedName('en');
 }
 
 @freezed

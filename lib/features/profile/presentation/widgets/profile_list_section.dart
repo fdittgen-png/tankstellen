@@ -10,6 +10,7 @@ import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/user_profile.dart';
 import '../../providers/profile_provider.dart';
+import '../landing_screen_l10n.dart';
 import 'profile_edit_sheet.dart';
 
 class ProfileListSection extends ConsumerWidget {
@@ -44,7 +45,7 @@ class ProfileListSection extends ConsumerWidget {
                 '${profile.countryCode != null ? (Countries.byCode(profile.countryCode!)?.flag ?? "") : ""} '
                 '${profile.preferredFuelType.displayName} | '
                 '${profile.defaultSearchRadius.round()} km | '
-                '${profile.landingScreen.localizedName(Localizations.localeOf(context).languageCode)}',
+                '${profile.landingScreen.label(AppLocalizations.of(context))}',
               ),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,

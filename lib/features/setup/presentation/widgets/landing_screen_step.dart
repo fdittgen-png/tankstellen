@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/domain/entities/user_profile.dart';
+import '../../../profile/presentation/landing_screen_l10n.dart';
 import '../../providers/onboarding_wizard_provider.dart';
 
 /// Onboarding step for choosing the default landing screen.
@@ -65,7 +66,7 @@ class LandingScreenStep extends ConsumerWidget {
                   color: selected ? theme.colorScheme.primary : null,
                 ),
                 title: Text(
-                  screen.localizedName(l10n.localeName),
+                  screen.label(l10n),
                   style: TextStyle(
                     fontWeight: selected ? FontWeight.bold : null,
                     color: selected ? theme.colorScheme.primary : null,

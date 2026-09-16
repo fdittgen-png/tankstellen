@@ -128,6 +128,18 @@ class AppLocalizationsRo extends AppLocalizations {
   String get landingScreen => 'Ecran de pornire';
 
   @override
+  String get landingScreenFavorites => 'Favorites';
+
+  @override
+  String get landingScreenMap => 'Map';
+
+  @override
+  String get landingScreenCheapest => 'Cheapest nearby';
+
+  @override
+  String get landingScreenNearest => 'Nearest stations';
+
+  @override
   String get homeZip => 'Cod poștal de acasă';
 
   @override

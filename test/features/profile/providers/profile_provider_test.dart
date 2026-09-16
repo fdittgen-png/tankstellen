@@ -307,27 +307,11 @@ void main() {
   // LandingScreen
   // -------------------------------------------------------------------------
   group('LandingScreen', () {
-    test('has correct English display names', () {
-      expect(LandingScreen.nearest.displayName, 'Nearest stations');
-      expect(LandingScreen.favorites.displayName, 'Favorites');
-      expect(LandingScreen.map.displayName, 'Map');
-      expect(LandingScreen.cheapest.displayName, 'Cheapest nearby');
-    });
-
-    test('localizedName returns German for de', () {
-      expect(LandingScreen.nearest.localizedName('de'), 'Nächste Tankstellen');
-      expect(LandingScreen.favorites.localizedName('de'), 'Favoriten');
-    });
-
-    test('localizedName returns French for fr', () {
-      expect(LandingScreen.nearest.localizedName('fr'), 'À proximité');
-      expect(LandingScreen.favorites.localizedName('fr'), 'Favoris');
-    });
-
-    test('localizedName falls back to English for unknown language', () {
-      expect(LandingScreen.nearest.localizedName('xx'), 'Nearest stations');
-    });
-
+    // #4269 — the English/German/French/fallback assertions that stood here
+    // checked a hard-coded translation table on the enum. The labels are ARB
+    // keys now, so they are covered by `landing_screen_test.dart` against
+    // `LandingScreenL10n.label` and by the l10n coverage gate. The enum's
+    // persistence contract below is unaffected and stays.
     test('search is removed from the enum', () {
       final names = LandingScreen.values.map((v) => v.name).toList();
       expect(names, isNot(contains('search')));
