@@ -25,6 +25,9 @@ export 'presentation/widgets/search_summary_bar.dart';
 export 'presentation/widgets/sort_selector.dart';
 export 'presentation/widgets/station_card.dart';
 export 'providers/ev_charging_service_provider.dart';
+// #4137 — the home surface re-presents this decision content rather
+// than ranking again; it must reach it through the barrel.
+export 'presentation/widgets/results/decision_header.dart';
 export 'providers/ev_search_provider.dart';
 // #3884 — the radar auto-pin preference gets a proper Settings home
 // (Driving & consumption → Fuel Station Radar) next to its help-sheet

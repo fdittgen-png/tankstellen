@@ -9856,6 +9856,30 @@
       }
     }
   },
+  "homeNextStopTitle": "Your next fuel stop",
+  "@homeNextStopTitle": {
+    "description": "Header of the home surface's decision block (#4137). It re-presents the three answers DecisionHeader already computed — cheapest, closest, best value — more compactly; it never ranks again or names one winner (refuel-economics spec §3)."
+  },
+  "homeVehicleTitle": "Your car",
+  "@homeVehicleTitle": {
+    "description": "Header of the home surface's vehicle block (#4137): cost per kilometre and measured consumption, both from the user's own fill-ups."
+  },
+  "homeVehicleCostPerKm": "per km",
+  "@homeVehicleCostPerKm": {
+    "description": "Label under the cost-per-kilometre figure on the home surface (#4137). The currency symbol comes from the formatted value beside it."
+  },
+  "homeVehicleConsumption": "L/100 km",
+  "@homeVehicleConsumption": {
+    "description": "Label under the average-consumption figure on the home surface (#4137)."
+  },
+  "homeVehicleFromFillUps": "Measured from your fill-ups",
+  "@homeVehicleFromFillUps": {
+    "description": "One-line provenance under the vehicle figures on the home surface (#4137) — these are measurements, not estimates, which is why the block is absent until there are enough fill-ups."
+  },
+  "homeSavingsTitle": "You've saved",
+  "@homeSavingsTitle": {
+    "description": "Header of the home surface's savings block (#4137/#4136). Shown only when the ledger has a baseline and a single currency; there is nothing honest to total otherwise."
+  },
   "logoCreditsTitle": "Logo credits",
   "@logoCreditsTitle": {
     "description": "Title of the Settings → About → logo credits screen, and the label of the row in About that opens it (#3940). Lists every station-brand logo bundled with the app, with its licence, author and source."

@@ -7253,5 +7253,35 @@
   "@criteriaIntentNeedsConsumption": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "homeNextStopTitle": "Your next fuel stop",
+  "@homeNextStopTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "homeVehicleTitle": "Your car",
+  "@homeVehicleTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "homeVehicleCostPerKm": "per km",
+  "@homeVehicleCostPerKm": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "homeVehicleConsumption": "L/100 km",
+  "@homeVehicleConsumption": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "homeVehicleFromFillUps": "Measured from your fill-ups",
+  "@homeVehicleFromFillUps": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "homeSavingsTitle": "You've saved",
+  "@homeSavingsTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

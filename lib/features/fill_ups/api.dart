@@ -42,6 +42,8 @@ export 'presentation/widgets/maintenance_suggestion_card.dart';
 export 'presentation/widgets/monthly_insights_card.dart';
 export 'presentation/widgets/tank_report_card.dart';
 export 'providers/consumption_providers.dart';
+// #4137 — the home savings block reads the realised-savings ledger.
+export 'providers/savings_provider.dart';
 export 'providers/fuel_type_efficiency_provider.dart';
 export 'providers/obd2_fuel_level_tracker.dart';
 export 'providers/psa_fuel_level_provider.dart';

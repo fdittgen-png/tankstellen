@@ -9095,6 +9095,24 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get homeNextStopTitle => 'Your next fuel stop';
+
+  @override
+  String get homeVehicleTitle => 'Your car';
+
+  @override
+  String get homeVehicleCostPerKm => 'per km';
+
+  @override
+  String get homeVehicleConsumption => 'L/100 km';
+
+  @override
+  String get homeVehicleFromFillUps => 'Measured from your fill-ups';
+
+  @override
+  String get homeSavingsTitle => 'You\'ve saved';
+
+  @override
   String get logoCreditsTitle => 'Crédits des logos';
 
   @override
