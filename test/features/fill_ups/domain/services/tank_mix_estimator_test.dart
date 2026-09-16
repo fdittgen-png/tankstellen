@@ -54,6 +54,190 @@ void main() {
           orElse: () => const TankMixShare(fuel: FuelType.e5, share: 0))
       .share;
 
+  group('grounding — which rung the mix actually rests on (#4275)', () {
+    test('a full fill with a known capacity is pinned, not guessed', () {
+      // 35 L into a 35 L tank: prior = capacity - pumped = 0. Tier 1, and
+      // a genuine run-dry pin — nothing earlier survives to carry doubt.
+      final mix = estimateTankMix(
+        vehicle: vehicle,
+        fillUps: [fill(date: DateTime(2026, 7, 1), liters: 35)],
+      );
+
+      expect(mix!.grounding, TankMixGrounding.pinnedByFullTank);
+      expect(mix.isMeasured, isTrue);
+    });
+
+    test('a pre-pump sensor level grounds the blend on a reading', () {
+      final mix = estimateTankMix(
+        vehicle: vehicle,
+        fillUps: [
+          fill(date: DateTime(2026, 7, 1), liters: 35),
+          fill(
+            date: DateTime(2026, 7, 8),
+            liters: 10,
+            fuelType: FuelType.e10,
+            isFullTank: false,
+            fuelLevelBeforeL: 10,
+          ),
+        ],
+      );
+
+      expect(mix!.grounding, TankMixGrounding.sensorLevel);
+      expect(mix.isMeasured, isTrue,
+          reason: 'a tank reading is a measurement, not a reconstruction');
+    });
+
+    test('the odometer-delta burn estimate is NOT a measurement', () {
+      final mix = estimateTankMix(
+        vehicle: vehicle,
+        fillUps: [
+          fill(date: DateTime(2026, 6, 1), liters: 30, odometerKm: 1000),
+          fill(date: DateTime(2026, 6, 10), liters: 30, odometerKm: 1300),
+          fill(
+            date: DateTime(2026, 6, 15),
+            liters: 10,
+            fuelType: FuelType.e10,
+            isFullTank: false,
+            odometerKm: 1400,
+          ),
+        ],
+      );
+
+      expect(mix!.grounding, TankMixGrounding.burnEstimate);
+      expect(mix.isMeasured, isFalse,
+          reason: 'the burn rate is an average and the odometer is the '
+              "driver's — real inputs, but a reconstruction");
+    });
+
+    test('nothing known bottoms out at the midpoint guess', () {
+      final mix = estimateTankMix(
+        vehicle: vehicle,
+        fillUps: [
+          fill(date: DateTime(2026, 7, 1), liters: 35),
+          fill(
+            date: DateTime(2026, 7, 8),
+            liters: 10,
+            fuelType: FuelType.e10,
+            isFullTank: false,
+          ),
+        ],
+      );
+
+      expect(mix!.grounding, TankMixGrounding.midpointGuess);
+      expect(mix.isMeasured, isFalse);
+    });
+
+    test('a later full fill onto a NON-empty tank does not clear the floor',
+        () {
+      // The estimator's own "washing out earlier guesses" history. The
+      // closing 28 L plein pins prior = 7 L — but those 7 L are made of
+      // the midpoint-guessed blend, so ~20 % of this "pinned" composition
+      // still rests on a coin flip. Reporting it as measured would be a
+      // lie dressed as arithmetic.
+      final mix = estimateTankMix(
+        vehicle: vehicle,
+        fillUps: [
+          fill(date: DateTime(2026, 7, 1), liters: 35),
+          fill(
+            date: DateTime(2026, 7, 8),
+            liters: 10,
+            fuelType: FuelType.e10,
+            isFullTank: false,
+          ),
+          fill(date: DateTime(2026, 7, 15), liters: 28),
+        ],
+      );
+
+      expect(mix!.grounding, TankMixGrounding.midpointGuess,
+          reason: 'the floor is the weakest rung across the walk, and a '
+              'non-zero residual carries that weakness forward');
+      expect(mix.isMeasured, isFalse);
+    });
+
+    test('a run-dry switch DOES clear the floor', () {
+      // Same guessed history, but the final fill takes the whole 35 L
+      // tank: prior = 0, so no earlier fuel survives and the mix is
+      // pinned to that grade alone. ADR 0015 v3 names this case as
+      // correctly staying pure.
+      final mix = estimateTankMix(
+        vehicle: vehicle,
+        fillUps: [
+          fill(date: DateTime(2026, 7, 1), liters: 35),
+          fill(
+            date: DateTime(2026, 7, 8),
+            liters: 10,
+            fuelType: FuelType.e10,
+            isFullTank: false,
+          ),
+          fill(date: DateTime(2026, 7, 15), liters: 35),
+        ],
+      );
+
+      expect(mix!.grounding, TankMixGrounding.pinnedByFullTank);
+      expect(mix.isMeasured, isTrue);
+      expect(shareOf(mix, FuelType.e85), closeTo(1.0, 1e-9),
+          reason: 'a run-dry switch really is a pure tank');
+    });
+
+    test('a capacity-less vehicle cannot pin, so the floor stays honest',
+        () {
+      const noCapacity = VehicleProfile(
+        id: 'v2',
+        name: 'No capacity',
+        type: VehicleType.combustion,
+        multiFuelCapable: true,
+      );
+
+      final mix = estimateTankMix(
+        vehicle: noCapacity,
+        fillUps: [
+          fill(date: DateTime(2026, 7, 1), liters: 35),
+          fill(
+            date: DateTime(2026, 7, 8),
+            liters: 10,
+            fuelType: FuelType.e10,
+            isFullTank: false,
+          ),
+        ],
+      );
+
+      expect(mix!.grounding, TankMixGrounding.midpointGuess,
+          reason: 'the full flag cannot pin a residual without a capacity, '
+              'so tier 1 never fires and the walk falls to the midpoint');
+      expect(mix.isMeasured, isFalse);
+    });
+
+    test('a first fill that consults no rung has no grounding at all', () {
+      // Non-full, no sensor level, no previous level: the untagged
+      // first-fill branch. Its residual is attributed to this fill's own
+      // grade by the documented convergence rule — not an inference about
+      // a blend, so it claims no provenance rather than a weak one.
+      final mix = estimateTankMix(
+        vehicle: vehicle,
+        fillUps: [
+          fill(date: DateTime(2026, 7, 1), liters: 20, isFullTank: false),
+        ],
+      );
+
+      expect(mix!.grounding, isNull);
+      expect(mix.isMeasured, isFalse,
+          reason: 'absence of provenance is never evidence of measurement');
+    });
+
+    test('a hand-built estimate carries no grounding', () {
+      // The three tank_level_card fixtures build TankMixEstimate directly.
+      // Defaulting grounding to any enum value would claim a provenance
+      // such an estimate does not have.
+      final built = TankMixEstimate(
+        shares: const [TankMixShare(fuel: FuelType.e10, share: 1)],
+        asOf: DateTime(2026, 7, 1),
+      );
+
+      expect(built.grounding, isNull);
+      expect(built.isMeasured, isFalse);
+    });
+  });
+
   group('sentinels', () {
     test('no fills → null', () {
       expect(estimateTankMix(vehicle: vehicle, fillUps: const []), isNull);
