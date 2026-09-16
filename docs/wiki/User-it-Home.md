@@ -18,7 +18,7 @@ Tutta l'app è costruita su un'idea: **un'auto costa denaro in tre modi indipend
 |---|---|---|
 | **1. Il prezzo** | *Dove il carburante costa meno adesso?* | Ricerca, Mappa, Preferiti, Avvisi, Itinerari |
 | **2. Il consumo** | *Quanti litri ogni 100 km, e perché?* | Viaggi, eco-coaching, OBD2 |
-| **3. La verità** | *Quanto ho pagato davvero, e la stima dell'app è onesta?* | Scheda Carburante, rifornimenti, statistiche consumi |
+| **3. La verità** | *Quanto ho pagato davvero, e la stima dell'app è onesta?* | Scheda Cost (schermata Carburante), rifornimenti, statistiche consumi |
 
 Il livello 1 fa già risparmiare e non richiede nulla oltre all'app. I livelli 2 e 3 richiedono i tuoi rifornimenti; il livello 2 diventa molto più preciso con un adattatore OBD2 economico. Quanto scendere lo decidi tu — vedi [Come funziona Sparkilo](User-it-How-It-Works).
 
@@ -37,7 +37,7 @@ Il livello 1 fa già risparmiare e non richiede nulla oltre all'app. I livelli 2
 
 | Pagina | Cosa imparerai |
 |---|---|
-| [Trovare stazioni](User-it-Finding-Stations) | Il pulsante Cerca centrale, i criteri, leggere una scheda, il dettaglio, la mappa, il radar stazioni |
+| [Trovare stazioni](User-it-Finding-Stations) | Il pulsante Find centrale, i criteri, leggere una scheda, il dettaglio, la mappa, il radar stazioni |
 | [Pianificazione itinerario](User-it-Route-Planning) | Le soste più economiche lungo il percorso, i corridoi transfrontalieri, le quattro strategie |
 | [Preferiti e avvisi](User-it-Favorites-And-Alerts) | Stazioni salvate, avvisi di stazione e di zona, come si comporta davvero il controllo in background |
 | [Ricarica elettrica](User-it-EV-Charging) | Colonnine via OpenChargeMap, connettori, filtri di potenza |

@@ -8067,6 +8067,18 @@
   "@featureDescription_addFillUpShareIntentReceipt": {
     "description": "Settings toggle description for the inbound OS share-intent receipt importer (#2735)."
   },
+  "shellTabFind": "Find",
+  "@shellTabFind": {
+    "description": "Bottom-bar label of the centre Search destination, named by intent: where should I stop? (#4143)"
+  },
+  "shellTabCost": "Cost",
+  "@shellTabCost": {
+    "description": "Bottom-bar label of the fuel-log destination (fill-ups, charging, savings), named by intent: what does my car cost? (#4143)"
+  },
+  "shellTabDrive": "Drive",
+  "@shellTabDrive": {
+    "description": "Bottom-bar label of the trips destination, named by intent: how am I driving? (#4143)"
+  },
   "speedConsumptionCardTitle": "Consumption by speed",
   "@speedConsumptionCardTitle": {
     "description": "Title of the consumption-by-speed card on the Carbon dashboard Charts tab — bins per-second OBD2 samples by speed band so the user can see what motorway speed is costing them per 100 km (#1192)."

@@ -73,7 +73,7 @@ Nel foglio dei criteri scegli il tipo **EV** e avvia una ricerca per raggio. Fil
 
 Le colonnine si mettono tra i preferiti come le stazioni; in orizzontale e su tablet preferiti e avvisi appaiono affiancati. La scheda preferita mostra i **kW per connettore**, **quanti sono liberi** e i **tipi di connettore**.
 
-Gli avvisi di prezzo servono a poco per la ricarica, dato che la maggior parte degli operatori applica tariffe forfettarie al kWh. Le sessioni di ricarica si registrano come rifornimenti: **scheda Carburante → Aggiungi**, con kWh al posto dei litri — alimentano le stesse statistiche di costo al chilometro dei rifornimenti termici.
+Gli avvisi di prezzo servono a poco per la ricarica, dato che la maggior parte degli operatori applica tariffe forfettarie al kWh. Le sessioni di ricarica si registrano come rifornimenti: **scheda Cost (schermata Carburante) → Aggiungi**, con kWh al posto dei litri — alimentano le stesse statistiche di costo al chilometro dei rifornimenti termici.
 
 ---
 

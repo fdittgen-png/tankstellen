@@ -26,9 +26,9 @@ Sparkilo peut être un chercheur de prix en deux écrans ou un véritable ordina
 
 | Préréglage | Vous obtenez | Barre du bas |
 |---|---|---|
-| **Basique** | Carburant et recharge les moins chers à proximité, favoris, alertes de prix, itinéraires | Favoris · Carte · **Recherche** |
-| **Moyen** | Tout Basique + suivi manuel des pleins, consommation et coût réels | + Carburant |
-| **Complet** | Tout Moyen + enregistrement OBD2 automatique des trajets, scores de conduite, cartes de fidélité | + Trajets |
+| **Basique** | Carburant et recharge les moins chers à proximité, favoris, alertes de prix, itinéraires | Favoris · Carte · **Trouver** |
+| **Moyen** | Tout Basique + suivi manuel des pleins, consommation et coût réels | + Coûts |
+| **Complet** | Tout Moyen + enregistrement OBD2 automatique des trajets, scores de conduite, cartes de fidélité | + Conduite |
 | **Personnalisé** | Votre propre mélange — dès que vous touchez un interrupteur | selon le cas |
 
 ### Comment ça marche réellement
@@ -39,7 +39,7 @@ Un préréglage n'est pas un mode dans lequel l'application tourne — c'est un 
 
 - **Désactiver une fonction la retire de l'application, pas seulement de la vue** — son travail en arrière-plan s'arrête aussi. *Alertes de prix* éteintes arrête la vérification périodique ; *Trace GPS des trajets* éteinte arrête l'enregistrement des points de route.
 - **Les préréglages écrasent votre mélange personnel.** Toucher *Moyen* remplace chaque interrupteur. Si vous avez réglé les choses à la main, restez en Personnalisé.
-- **La barre du bas change de forme.** Si l'onglet Carburant ou Trajets a disparu, c'est que vous (ou un préréglage) avez éteint *Analyse de consommation* ou *Enregistrement OBD2 des trajets* — ce n'est pas un bug.
+- **La barre du bas change de forme.** Si l'onglet Coûts (écran Carburant) ou Conduite (écran Trajets) a disparu, c'est que vous (ou un préréglage) avez éteint *Analyse de consommation* ou *Enregistrement OBD2 des trajets* — ce n'est pas un bug.
 
 ---
 

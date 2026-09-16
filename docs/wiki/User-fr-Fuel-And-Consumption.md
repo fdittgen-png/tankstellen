@@ -1,10 +1,10 @@
 # Carnet de pleins et consommation
 
-Niveaux 2 et 3 des [trois niveaux d'économie](User-fr-How-It-Works#les-trois-niveaux-déconomie) : combien vous brûlez, et ce que cela a vraiment coûté. L'onglet ⛽ **Carburant** apparaît en modes **Moyen** et **Complet**.
+Niveaux 2 et 3 des [trois niveaux d'économie](User-fr-How-It-Works#les-trois-niveaux-déconomie) : combien vous brûlez, et ce que cela a vraiment coûté. L'onglet ⛽ **Coûts** (écran Carburant) apparaît en modes **Moyen** et **Complet**.
 
 ---
 
-## L'onglet Carburant d'un coup d'œil
+## L'écran Carburant d'un coup d'œil
 
 <img src="guide/fuel-tab.jpg" width="340" alt="Onglet Carburant : niveau du réservoir avec autonomie, carte de statistiques avec badge de précision, et liste des pleins">
 
@@ -81,7 +81,7 @@ La reconnaissance tourne **sur l'appareil** ; l'image n'est jamais envoyée. Jet
 
 ## Le rapport de plein — le moment de vérité
 
-À chaque fermeture d'un plein complet, l'application publie un rapport. Dans l'onglet Trajets, il ressemble à ceci :
+À chaque fermeture d'un plein complet, l'application publie un rapport. Dans l'onglet Conduite (écran Trajets), il ressemble à ceci :
 
 <img src="guide/trips-tab.jpg" width="340" alt="Rapport de plein : 6,4 L/100 km, écart avec le plein précédent, barre de couverture et verdict de calibrage">
 
@@ -111,7 +111,7 @@ La carte peut aussi pointer *ce qui a changé* — part de haut régime, événe
 
 ## Statistiques de consommation
 
-Touchez la carte de statistiques, ou **Carburant → Statistiques de consommation**.
+Touchez la carte de statistiques, ou **onglet Coûts (écran Carburant) → Statistiques de consommation**.
 
 <img src="guide/consumption-stats-1.jpg" width="340" alt="En-tête des statistiques : puces de filtre par carburant, totaux et tableau ce mois-ci vs le mois dernier">
 

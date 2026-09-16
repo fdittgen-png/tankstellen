@@ -1,10 +1,10 @@
 # Trajets et éco-coaching
 
-L'onglet 🛣️ **Trajets** est un carnet de bord automatique doublé d'un coach de conduite. Il apparaît en mode **Complet**.
+L'onglet 🛣️ **Conduite** (écran Trajets) est un carnet de bord automatique doublé d'un coach de conduite. Il apparaît en mode **Complet**.
 
 ---
 
-## L'onglet Trajets
+## L'écran Trajets
 
 <img src="guide/trips-tab.jpg" width="340" alt="Onglet Trajets : comparaison mensuelle, rapport de plein et liste des trajets avec le bouton d'enregistrement">
 

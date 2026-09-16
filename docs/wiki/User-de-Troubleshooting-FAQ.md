@@ -100,11 +100,11 @@ Prüfe auch die **Startgeschwindigkeit** im Fahrzeug-Editor — ein kurzes Kriec
 Arbeite es in dieser Reihenfolge ab:
 
 1. **Öffne die Fahrt und lies die Karte zur OBD2-Kommunikationsgesundheit.** Liegt die Abdeckung deutlich unter 100 %, wurden Lücken mit GPS-Schätzungen gefüllt und der Fahrtdurchschnitt ist eine Mischung, keine Messung.
-2. **Sieh dir den Tank-Bericht im Fahrten-Tab an.** Sagt er, die Schätzungen lägen *n* % über oder unter der Zapfsäulen-Wahrheit, weiß die App es bereits und hat sich gerade korrigiert — erwarte Bewegung bei den nächsten Fahrten.
+2. **Sieh dir den Tank-Bericht im Fahren-Tab (Bildschirm Fahrten) an.** Sagt er, die Schätzungen lägen *n* % über oder unter der Zapfsäulen-Wahrheit, weiß die App es bereits und hat sich gerade korrigiert — erwarte Bewegung bei den nächsten Fahrten.
 3. **Prüfe den Tankinhalt** am Fahrzeug. Ein falscher Wert erzeugt monatelang plausible, aber falsche Reichweiten.
 4. **Prüfe deine Kilometerstände.** Verbrauch ist Liter ÷ Kilometer, und die Kilometer sind vollständig deine Eingabe.
 5. **Prüfe, ob du „Voller Tank" gesetzt hast.** Nur Voll-zu-voll-Fenster können etwas kalibrieren.
-6. **Prüfe das Genauigkeits-Badge** im Kraftstoff-Tab. *Niedrig* heißt, dass noch nichts das Modell verankert hat — der Wert ist eine Modellausgabe, und das sagt er auch.
+6. **Prüfe das Genauigkeits-Badge** im Kosten-Tab (Bildschirm Kraftstoff). *Niedrig* heißt, dass noch nichts das Modell verankert hat — der Wert ist eine Modellausgabe, und das sagt er auch.
 
 Hintergrund: [Wie Sparkilo funktioniert → Wie aus einem Liter eine Zahl wird](User-de-How-It-Works#wie-aus-einem-liter-eine-zahl-wird).
 
@@ -211,9 +211,9 @@ Teilweise. Favoriten zeigen ihre letzten bekannten Preise, kürzlich betrachtete
 
 ---
 
-## Wo ist der Kraftstoff- oder Fahrten-Tab hin?
+## Wo ist der Kosten- oder Fahren-Tab hin?
 
-Sie gehören zu den Nutzungsmodi **Mittel** und **Voll**. Ist einer verschwunden, hat eine Voreinstellung oder ein Einzelschalter ihn ausgeschaltet: Einstellungen → Funktionen & Nutzungsmodus → Verbrauch.
+Der Kosten-Tab (Bildschirm Kraftstoff) und der Fahren-Tab (Bildschirm Fahrten) gehören zu den Nutzungsmodi **Mittel** und **Voll**. Ist einer verschwunden, hat eine Voreinstellung oder ein Einzelschalter ihn ausgeschaltet: Einstellungen → Funktionen & Nutzungsmodus → Verbrauch.
 
 ---
 

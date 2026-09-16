@@ -18,7 +18,7 @@ Toute l'application est bâtie sur une idée : **une voiture coûte de l'argent 
 |---|---|---|
 | **1. Le prix** | *Où le carburant est-il le moins cher en ce moment ?* | Recherche, Carte, Favoris, Alertes, Itinéraires |
 | **2. La consommation** | *Combien de litres aux 100 km, et pourquoi ?* | Trajets, éco-coaching, OBD2 |
-| **3. La vérité** | *Qu'ai-je réellement payé, et l'estimation de l'app est-elle honnête ?* | Onglet Carburant, pleins, statistiques de consommation |
+| **3. La vérité** | *Qu'ai-je réellement payé, et l'estimation de l'app est-elle honnête ?* | Onglet Coûts (écran Carburant), pleins, statistiques de consommation |
 
 Le niveau 1 fait déjà économiser et ne demande rien de plus que l'application. Les niveaux 2 et 3 demandent vos pleins ; le niveau 2 devient nettement plus précis avec un adaptateur OBD2 bon marché. C'est vous qui décidez jusqu'où aller — voir [Comment fonctionne Sparkilo](User-fr-How-It-Works).
 
@@ -37,7 +37,7 @@ Le niveau 1 fait déjà économiser et ne demande rien de plus que l'application
 
 | Page | Ce que vous y apprenez |
 |---|---|
-| [Trouver des stations](User-fr-Finding-Stations) | Le bouton Recherche central, les critères, lire une fiche station, le détail, la carte, le radar de stations-service |
+| [Trouver des stations](User-fr-Finding-Stations) | Le bouton Trouver central, les critères, lire une fiche station, le détail, la carte, le radar de stations-service |
 | [Planification d'itinéraire](User-fr-Route-Planning) | Les arrêts les moins chers sur la route, les corridors transfrontaliers, les quatre stratégies |
 | [Favoris et alertes](User-fr-Favorites-And-Alerts) | Stations enregistrées, alertes de station et de zone, comment la vérification en arrière-plan se comporte vraiment |
 | [Recharge électrique](User-fr-EV-Charging) | Bornes via OpenChargeMap, connecteurs, filtres de puissance |

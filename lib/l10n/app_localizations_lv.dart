@@ -7746,6 +7746,15 @@ class AppLocalizationsLv extends AppLocalizations {
       'Dalieties ar čeka fotoattēlu no citas lietotnes, lai iepriekš aizpildītu uzpildi — datums, litri, kopsumma un stacija tiek nolasīta ierīcē.';
 
   @override
+  String get shellTabFind => 'Find';
+
+  @override
+  String get shellTabCost => 'Cost';
+
+  @override
+  String get shellTabDrive => 'Drive';
+
+  @override
   String get speedConsumptionCardTitle => 'Patēriņš pēc ātruma';
 
   @override

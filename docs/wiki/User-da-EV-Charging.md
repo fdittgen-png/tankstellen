@@ -73,7 +73,7 @@ Vælg typen **EV** i kriteriearket og kør en radiussøgning. Tilgængelige filt
 
 Ladepunkter kan gøres til favoritter præcis som tankstationer; på tværs og på tablet vises favoritter og advarsler side om side. Favoritkortet viser **kW pr. stik**, **hvor mange der er ledige lige nu** og **stiktyperne**.
 
-Prisadvarsler nytter kun lidt ved opladning, da de fleste operatører bruger faste kWh-takster. Ladesessioner registreres som tankninger: **fanen Brændstof → Tilføj**, med kWh i stedet for liter — de fodrer den samme statistik over pris pr. kilometer som forbrændingstankninger.
+Prisadvarsler nytter kun lidt ved opladning, da de fleste operatører bruger faste kWh-takster. Ladesessioner registreres som tankninger: **fanen Cost (skærmen Brændstof) → Tilføj**, med kWh i stedet for liter — de fodrer den samme statistik over pris pr. kilometer som forbrændingstankninger.
 
 ---
 

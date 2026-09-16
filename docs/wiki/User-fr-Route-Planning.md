@@ -8,7 +8,7 @@ Non pas « le moins cher près de moi » mais **le moins cher sur la route** —
 
 <img src="guide/search-criteria-route-1.jpg" width="340" alt="Critères en mode trajet : départ, étape, destination, carburant, segment, détour, économie minimale">
 
-*Touchez **Recherche** → basculez sur **Rechercher le long du trajet**. Le bouton reste désactivé tant qu'une destination et un carburant ne sont pas définis.*
+*Touchez **Trouver** → basculez sur **Rechercher le long du trajet**. Le bouton reste désactivé tant qu'une destination et un carburant ne sont pas définis.*
 
 | Champ | Signification |
 |---|---|

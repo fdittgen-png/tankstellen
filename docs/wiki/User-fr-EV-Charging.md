@@ -73,7 +73,7 @@ Dans la feuille de critères, choisissez le type **VE** et lancez une recherche 
 
 Les bornes se mettent en favori comme les stations ; en paysage et sur tablette, favoris et alertes s'affichent côte à côte. La fiche favorite montre les **kW par connecteur**, **combien sont libres** et les **types de connecteurs**.
 
-Les alertes de prix ont peu d'intérêt en recharge, la plupart des opérateurs appliquant un tarif forfaitaire au kWh. Les sessions de recharge s'enregistrent comme des pleins : **onglet Carburant → Ajouter**, avec des kWh au lieu de litres — elles alimentent les mêmes statistiques de coût au kilomètre que les pleins thermiques.
+Les alertes de prix ont peu d'intérêt en recharge, la plupart des opérateurs appliquant un tarif forfaitaire au kWh. Les sessions de recharge s'enregistrent comme des pleins : **onglet Coûts (écran Carburant) → Ajouter**, avec des kWh au lieu de litres — elles alimentent les mêmes statistiques de coût au kilomètre que les pleins thermiques.
 
 ---
 

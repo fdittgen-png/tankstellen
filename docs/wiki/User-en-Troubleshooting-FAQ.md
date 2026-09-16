@@ -100,11 +100,11 @@ Also check the **start-speed threshold** in the vehicle editor — a short crawl
 Work through it in this order:
 
 1. **Open the trip and read the OBD2 communication health card.** If coverage is well under 100 %, the gaps were filled with GPS estimates and the trip average is a blend, not a measurement.
-2. **Check the tank report on the Trips tab.** If it says the estimates run *n* % over or under pump truth, the app already knows and has just corrected itself — expect the next trips to move.
+2. **Check the tank report on the Drive tab (Trips screen).** If it says the estimates run *n* % over or under pump truth, the app already knows and has just corrected itself — expect the next trips to move.
 3. **Check the tank capacity** on the vehicle. A wrong capacity produces plausible-but-wrong range for months.
 4. **Check your odometer entries.** Consumption is litres ÷ kilometres, and the kilometres are entirely your typing.
 5. **Check whether you ticked "Full tank".** Only full-to-full windows can calibrate anything.
-6. **Check the accuracy badge** on the Fuel tab. *Low* means nothing has anchored the model yet — the figure is a model output, and it says so.
+6. **Check the accuracy badge** on the Cost tab (Fuel screen). *Low* means nothing has anchored the model yet — the figure is a model output, and it says so.
 
 Background: [How Sparkilo Works → How a litre becomes a number](User-en-How-It-Works#how-a-litre-becomes-a-number).
 
@@ -211,9 +211,9 @@ Partly. Favourites show their last-known prices, recently viewed map tiles are c
 
 ---
 
-## Where did the Fuel or Trips tab go?
+## Where did the Cost or Drive tab go?
 
-They belong to the **Medium** and **Full** use modes. If one vanished, a preset or an individual switch turned it off: Settings → Features & use mode → Consumption.
+The Cost tab (Fuel screen) and the Drive tab (Trips screen) belong to the **Medium** and **Full** use modes. If one vanished, a preset or an individual switch turned it off: Settings → Features & use mode → Consumption.
 
 ---
 

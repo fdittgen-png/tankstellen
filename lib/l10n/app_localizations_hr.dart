@@ -7724,6 +7724,15 @@ class AppLocalizationsHr extends AppLocalizations {
       'Podijelite fotografiju računa iz druge aplikacije za prethodno popunjavanje punjenja — datum, litri, ukupno i postaja se čitaju na uređaju.';
 
   @override
+  String get shellTabFind => 'Find';
+
+  @override
+  String get shellTabCost => 'Cost';
+
+  @override
+  String get shellTabDrive => 'Drive';
+
+  @override
   String get speedConsumptionCardTitle => 'Potrošnja prema brzini';
 
   @override

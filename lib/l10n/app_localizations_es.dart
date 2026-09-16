@@ -7749,6 +7749,15 @@ class AppLocalizationsEs extends AppLocalizations {
       'Comparte una foto del ticket desde otra app para rellenar automáticamente un repostaje — fecha, litros, total y gasolinera se leen en el dispositivo.';
 
   @override
+  String get shellTabFind => 'Find';
+
+  @override
+  String get shellTabCost => 'Cost';
+
+  @override
+  String get shellTabDrive => 'Drive';
+
+  @override
   String get speedConsumptionCardTitle => 'Consumo por velocidad';
 
   @override

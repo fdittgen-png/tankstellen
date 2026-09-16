@@ -76,8 +76,8 @@ Det er den mest betydningsfulde enkeltindstilling, for den afgør hvor meget app
 *Indstillinger → Funktioner & brugstilstand. Start på **Basis**, hvis du kun vil have billigere brændstof; gå op, når du vil vide hvorfor bilen drikker.*
 
 - **Basis** — find billigt brændstof og opladning, favoritter, advarsler, ruter.
-- **Mellem** — tilføjer fanen **Brændstof**: registrér tankninger, se reelt forbrug og reelle omkostninger. Ingen hardware nødvendig.
-- **Fuld** — tilføjer fanen **Ture**: automatisk optagelse, kørescorer, loyalitetskort. En OBD2-adapter er valgfri selv her — ture optages med GPS alene.
+- **Mellem** — tilføjer fanen **Cost** (skærmen Brændstof): registrér tankninger, se reelt forbrug og reelle omkostninger. Ingen hardware nødvendig.
+- **Fuld** — tilføjer fanen **Drive** (skærmen Ture): automatisk optagelse, kørescorer, loyalitetskort. En OBD2-adapter er valgfri selv her — ture optages med GPS alene.
 
 Du kan skifte når som helst, og enhver enkeltkontakt du rører bagefter sætter dig i **Tilpasset**. Den fulde liste, og hvad hver enkelt koster i batteri, data eller privatliv: [Indstillingsoversigt → Funktioner & brugstilstand](User-da-Settings-Reference#funktioner--brugstilstand).
 
@@ -103,13 +103,13 @@ Nøglen ligger i det hardwarebaserede pengeskab (Android Keystore / iOS Keychain
 
 <img src="guide/favorites.jpg" width="340" alt="Fanen Favoritter med den nederste bjælke og den centrale Søg-knap">
 
-*Den hævede grønne **Søg**-knap i midten er den eneste søgeudløser i hele appen.*
+*Den hævede grønne **Find**-knap i midten er den eneste søgeudløser i hele appen.*
 
 - ⭐ **Favoritter** — gemte stationer og dine prisadvarsler
 - 🗺️ **Kort** — hver station i nærheden som prisfarvet nål
-- 🔍 **Søg** *(midten)* — i nærheden eller langs en rute
-- ⛽ **Brændstof** — tank, forbrug, tankninger *(fra Mellem)*
-- 🛣️ **Ture** — logbog og coaching *(Fuld)*
+- 🔍 **Find** *(midten)* — i nærheden eller langs en rute
+- ⛽ **Cost** *(skærmen Brændstof)* — tank, forbrug, tankninger *(fra Mellem)*
+- 🛣️ **Drive** *(skærmen Ture)* — logbog og coaching *(Fuld)*
 
 Indstillinger er **ikke** en fane: det er tandhjulet øverst til højre på hovedskærmene. På en tablet, eller en telefon holdt på tværs, deler appen sig i to spalter, så liste og kort (eller detalje) ses samtidig.
 
@@ -119,7 +119,7 @@ Indstillinger er **ikke** en fane: det er tandhjulet øverst til højre på hove
 
 <img src="guide/search-criteria-nearby.jpg" width="340" alt="Kriterieark til en søgning i nærheden">
 
-*Tryk på **Søg** → kriteriearket åbner forudfyldt fra din profil. Justér, og tryk **Søg** igen.*
+*Tryk på **Find** → kriteriearket åbner forudfyldt fra din profil. Justér, og tryk igen (**Kør søgning**).*
 
 Du får en liste sorteret fra billigst (eller efter afstand — dit valg), hvor hvert kort viser pris, tendens, afstand og hvor frisk tallet er. Et tryk åbner detaljen. Den fulde rundtur: [Find tankstationer](User-da-Finding-Stations).
 

@@ -26,9 +26,9 @@ Sparkilo kan være en prisfinder på to skærme eller en fuldgyldig kørecompute
 
 | Forudindstilling | Du får | Nederste bjælke |
 |---|---|---|
-| **Basis** | Billigste brændstof og opladning i nærheden, favoritter, prisadvarsler, ruter | Favoritter · Kort · **Søg** |
-| **Mellem** | Alt i Basis + manuel tankbog, reelt forbrug og reelle omkostninger | + Brændstof |
-| **Fuld** | Alt i Mellem + automatisk OBD2-turoptagelse, kørescorer, loyalitetskort | + Ture |
+| **Basis** | Billigste brændstof og opladning i nærheden, favoritter, prisadvarsler, ruter | Favoritter · Kort · **Find** |
+| **Mellem** | Alt i Basis + manuel tankbog, reelt forbrug og reelle omkostninger | + Cost |
+| **Fuld** | Alt i Mellem + automatisk OBD2-turoptagelse, kørescorer, loyalitetskort | + Drive |
 | **Tilpasset** | Din egen blanding — i samme øjeblik du rører en enkelt kontakt | afhænger |
 
 ### Sådan virker det i praksis
@@ -39,7 +39,7 @@ En forudindstilling er ikke en tilstand, appen kører i — den er et **navngive
 
 - **At slå en funktion fra fjerner den fra appen, ikke kun fra synet** — også dens baggrundsarbejde stopper. *Prisadvarsler* slået fra stopper det periodiske baggrundstjek; *GPS-turspor* slået fra stopper lagring af rutepunkter.
 - **Forudindstillinger overskriver din egen blanding.** Et tryk på *Mellem* skriver hver kontakt om. Har du finjusteret i hånden, så bliv i Tilpasset.
-- **Den nederste bjælke skifter form.** Er fanen Brændstof eller Ture forsvundet, har du (eller en forudindstilling) slået *Forbrugsanalyse* eller *OBD2-turoptagelse* fra — det er ikke en fejl.
+- **Den nederste bjælke skifter form.** Er fanen Cost (skærmen Brændstof) eller Drive (skærmen Ture) forsvundet, har du (eller en forudindstilling) slået *Forbrugsanalyse* eller *OBD2-turoptagelse* fra — det er ikke en fejl.
 
 ---
 

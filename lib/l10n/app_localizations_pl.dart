@@ -7729,6 +7729,15 @@ class AppLocalizationsPl extends AppLocalizations {
       'Udostępnij zdjęcie paragonu z innej aplikacji, aby wstępnie wypełnić tankowanie — data, litry, suma i stacja odczytywane na urządzeniu.';
 
   @override
+  String get shellTabFind => 'Find';
+
+  @override
+  String get shellTabCost => 'Cost';
+
+  @override
+  String get shellTabDrive => 'Drive';
+
+  @override
   String get speedConsumptionCardTitle => 'Zużycie wg prędkości';
 
   @override

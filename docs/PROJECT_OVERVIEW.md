@@ -84,7 +84,7 @@ serving none of them gets pushed back before code is written.**
   to it (e.g. *France — Prix-Carburants (gouv.fr)*).
 - **17 countries**, **23 languages**.
 - **One central search button** in a concave notch of the 5-tab bottom bar
-  (Favorites · Map · **Search** · Fuel · Trips) opening a *Search criteria* sheet:
+  (Favorites · Map · **Find** · Cost · Drive) opening a *Search criteria* sheet:
   Nearby vs Search-along-route, fuel-type chips (E10 / E5 / 98 / Diesel / LPG / CNG /
   E85 / EV), radius slider, *Open only*, amenity filters, highway filter,
   *Save as my defaults*.
@@ -144,7 +144,7 @@ serving none of them gets pushed back before code is written.**
 - **Fill-up log** — manual, receipt OCR (incl. shared-PDF receipts
   rasterised on-device), or OBD auto-import on disconnect. Each fill shows L/100 km,
   % delta vs previous, €/L.
-- **Fuel tab** — live tank level + estimated range, consumption stats with an accuracy
+- **Cost tab (Fuel screen)** — live tank level + estimated range, consumption stats with an accuracy
   indicator, learned volumetric efficiency η_v, avg L/100 km, avg cost/km, totals.
 - **Trip history**, **vehicle profiles** (combustion / hybrid / EV, multi-vehicle),
   **fuel-cost calculator**, **carbon dashboard** (cost + CO₂, split by trip length and

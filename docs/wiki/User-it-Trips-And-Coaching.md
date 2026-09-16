@@ -1,10 +1,10 @@
 # Viaggi ed eco-coaching
 
-La scheda 🛣️ **Viaggi** è un registro automatico più un istruttore di guida. Compare nella modalità **Completo**.
+La scheda 🛣️ **Drive** (schermata Percorsi) è un registro automatico più un istruttore di guida. Compare nella modalità **Completo**.
 
 ---
 
-## La scheda Viaggi
+## La schermata Percorsi
 
 <img src="guide/trips-tab.jpg" width="340" alt="Scheda Viaggi: confronto mensile, rapporto del pieno ed elenco viaggi col pulsante di registrazione">
 

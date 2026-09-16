@@ -73,7 +73,7 @@ Im Kriterien-Dialog den Typ **E-Auto** wählen und eine Umkreissuche starten. Ve
 
 Ladepunkte lassen sich wie Tankstellen favorisieren; im Querformat und auf Tablets liegen Favoriten und Alarme nebeneinander. Die Favoritenkarte zeigt **kW je Anschluss**, **wie viele gerade frei sind** und die **Steckertypen**.
 
-Preisalarme bringen beim Laden wenig, weil die meisten Betreiber pauschale kWh-Tarife haben. Ladevorgänge werden wie Tankfüllungen erfasst: **Kraftstoff-Tab → Hinzufügen**, mit kWh statt Litern — sie fließen in dieselbe Kosten-pro-Kilometer-Statistik wie Verbrenner-Tankfüllungen.
+Preisalarme bringen beim Laden wenig, weil die meisten Betreiber pauschale kWh-Tarife haben. Ladevorgänge werden wie Tankfüllungen erfasst: **Kosten-Tab (Bildschirm Kraftstoff) → Hinzufügen**, mit kWh statt Litern — sie fließen in dieselbe Kosten-pro-Kilometer-Statistik wie Verbrenner-Tankfüllungen.
 
 ---
 

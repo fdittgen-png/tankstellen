@@ -7701,6 +7701,15 @@ class AppLocalizationsFi extends AppLocalizations {
       'Jaa kuittivalokuva toisesta sovelluksesta esitäyttääksesi tankkauksen — päivämäärä, litrat, yhteissumma ja asema luetaan laitteella.';
 
   @override
+  String get shellTabFind => 'Find';
+
+  @override
+  String get shellTabCost => 'Cost';
+
+  @override
+  String get shellTabDrive => 'Drive';
+
+  @override
   String get speedConsumptionCardTitle => 'Kulutus nopeuden mukaan';
 
   @override

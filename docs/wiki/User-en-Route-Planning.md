@@ -8,7 +8,7 @@ Not "cheapest near me" but **cheapest on the way** — the difference is worth s
 
 <img src="guide/search-criteria-route-1.jpg" width="340" alt="Criteria sheet in route mode: start, add stop, destination, fuel, segment, detour, minimum saving">
 
-*Tap **Search** → switch to **Search along route**. The Search button stays disabled until a destination and a fuel grade are set.*
+*Tap **Find** → switch to **Search along route**. The button stays disabled until a destination and a fuel grade are set.*
 
 | Field | Meaning |
 |---|---|

@@ -76,8 +76,8 @@ Cambiare paese **svuota i dati di stazione in cache**, perché i prezzi del forn
 *Impostazioni → Funzioni e modalità d'uso. Parti da **Base** se vuoi solo carburante più economico; sali quando vorrai sapere perché la tua auto beve.*
 
 - **Base** — trovare carburante e ricarica, preferiti, avvisi, itinerari.
-- **Medio** — aggiunge la scheda **Carburante**: registrare i rifornimenti, vedere consumo e costo reali. Nessun hardware.
-- **Completo** — aggiunge la scheda **Viaggi**: registrazione automatica, punteggi di guida, carte fedeltà. Un adattatore OBD2 resta facoltativo anche qui — i viaggi si registrano col solo GPS.
+- **Medio** — aggiunge la scheda **Cost** (schermata Carburante): registrare i rifornimenti, vedere consumo e costo reali. Nessun hardware.
+- **Completo** — aggiunge la scheda **Drive** (schermata Percorsi): registrazione automatica, punteggi di guida, carte fedeltà. Un adattatore OBD2 resta facoltativo anche qui — i viaggi si registrano col solo GPS.
 
 Puoi cambiare in ogni momento, e ogni interruttore toccato poi ti porta in **Personalizzato**. L'elenco completo, e quanto ciascuno costa in batteria, dati o privacy: [Riferimento impostazioni → Funzioni e modalità d'uso](User-it-Settings-Reference#funzioni-e-modalità-duso).
 
@@ -103,13 +103,13 @@ La chiave sta nella cassaforte hardware (Android Keystore / Portachiavi iOS) ed 
 
 <img src="guide/favorites.jpg" width="340" alt="Scheda Preferiti con la barra inferiore e il pulsante Cerca centrale">
 
-*Il pulsante verde **Cerca** rialzato al centro è l'unico attivatore di ricerca dell'intera app.*
+*Il pulsante verde **Find** rialzato al centro è l'unico attivatore di ricerca dell'intera app.*
 
 - ⭐ **Preferiti** — stazioni salvate e avvisi di prezzo
 - 🗺️ **Mappa** — ogni stazione vicina come segnaposto colorato per prezzo
-- 🔍 **Cerca** *(al centro)* — nelle vicinanze o lungo un itinerario
-- ⛽ **Carburante** — serbatoio, consumi, rifornimenti *(da Medio in su)*
-- 🛣️ **Viaggi** — registro e coaching *(Completo)*
+- 🔍 **Find** *(al centro)* — nelle vicinanze o lungo un itinerario
+- ⛽ **Cost** *(schermata Carburante)* — serbatoio, consumi, rifornimenti *(da Medio in su)*
+- 🛣️ **Drive** *(schermata Percorsi)* — registro e coaching *(Completo)*
 
 Le impostazioni **non** sono una scheda: è l'ingranaggio in alto a destra delle schermate principali. Su tablet, o telefono in orizzontale, l'app si divide in due colonne per vedere elenco e mappa (o dettaglio) insieme.
 
@@ -119,7 +119,7 @@ Le impostazioni **non** sono una scheda: è l'ingranaggio in alto a destra delle
 
 <img src="guide/search-criteria-nearby.jpg" width="340" alt="Foglio dei criteri per una ricerca nelle vicinanze">
 
-*Tocca **Cerca** → il foglio dei criteri si apre precompilato dal profilo. Regola, poi tocca di nuovo **Cerca**.*
+*Tocca **Find** → il foglio dei criteri si apre precompilato dal profilo. Regola, poi toccalo di nuovo (**Esegui ricerca**).*
 
 Ottieni un elenco dal più economico (o per distanza — a te la scelta), ogni scheda con prezzo, tendenza, distanza e freschezza. Un tocco apre il dettaglio. Il giro completo: [Trovare stazioni](User-it-Finding-Stations).
 

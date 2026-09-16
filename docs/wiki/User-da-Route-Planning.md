@@ -8,7 +8,7 @@ Ikke « billigst i nærheden af mig » men **billigst på vejen** — forskellen
 
 <img src="guide/search-criteria-route-1.jpg" width="340" alt="Kriterier i rutetilstand: start, stop, destination, brændstof, segment, omvej, mindste besparelse">
 
-*Tryk på **Søg** → skift til **Søg langs ruten**. Knappen er slået fra, indtil der er destination og brændstofkvalitet.*
+*Tryk på **Find** → skift til **Søg langs ruten**. Knappen er slået fra, indtil der er destination og brændstofkvalitet.*
 
 | Felt | Betydning |
 |---|---|

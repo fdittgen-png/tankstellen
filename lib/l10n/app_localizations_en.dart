@@ -7665,6 +7665,15 @@ class AppLocalizationsEn extends AppLocalizations {
       'Share a receipt photo from another app to pre-fill a fill-up — date, litres, total, and station are read on-device.';
 
   @override
+  String get shellTabFind => 'Find';
+
+  @override
+  String get shellTabCost => 'Cost';
+
+  @override
+  String get shellTabDrive => 'Drive';
+
+  @override
   String get speedConsumptionCardTitle => 'Consumption by speed';
 
   @override
@@ -17482,6 +17491,15 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get featureDescription_addFillUpShareIntentReceipt =>
       '⟦Šĥářé á řéçéîƥŧ ƥĥóŧó ƒřóɱ áñóŧĥéř áƥƥ ŧó ƥřé-ƒîłł á ƒîłł-úƥ — đáŧé, łîŧřéš, ŧóŧáł, áñđ šŧáŧîóñ ářé řéáđ óñ-đéṽîçé. ········································⟧';
+
+  @override
+  String get shellTabFind => '⟦Ƒîñđ ··⟧';
+
+  @override
+  String get shellTabCost => '⟦Çóšŧ ··⟧';
+
+  @override
+  String get shellTabDrive => '⟦Đřîṽé ··⟧';
 
   @override
   String get speedConsumptionCardTitle => '⟦Çóñšúɱƥŧîóñ ƀý šƥééđ ········⟧';

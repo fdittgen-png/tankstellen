@@ -18,7 +18,7 @@ Hele appen er bygget om én idé: **en bil koster penge på tre uafhængige måd
 |---|---|---|
 | **1. Prisen** | *Hvor er brændstof billigst lige nu?* | Søgning, Kort, Favoritter, Advarsler, Ruter |
 | **2. Forbruget** | *Hvor mange liter pr. 100 km, og hvorfor?* | Ture, øko-coaching, OBD2 |
-| **3. Sandheden** | *Hvad betalte jeg reelt, og er appens skøn ærligt?* | Fanen Brændstof, tankninger, forbrugsstatistik |
+| **3. Sandheden** | *Hvad betalte jeg reelt, og er appens skøn ærligt?* | Fanen Cost (skærmen Brændstof), tankninger, forbrugsstatistik |
 
 Niveau 1 sparer allerede penge og kræver intet ud over appen. Niveau 2 og 3 kræver dine tankninger; niveau 2 bliver markant skarpere med en billig OBD2-adapter. Hvor langt du går, bestemmer du selv — se [Sådan fungerer Sparkilo](User-da-How-It-Works).
 
@@ -37,7 +37,7 @@ Niveau 1 sparer allerede penge og kræver intet ud over appen. Niveau 2 og 3 kr�
 
 | Side | Hvad du lærer |
 |---|---|
-| [Find tankstationer](User-da-Finding-Stations) | Den centrale Søg-knap, kriterierne, at læse et stationskort, detaljen, kortet, tankstationsradaren |
+| [Find tankstationer](User-da-Finding-Stations) | Den centrale Find-knap, kriterierne, at læse et stationskort, detaljen, kortet, tankstationsradaren |
 | [Ruteplanlægning](User-da-Route-Planning) | De billigste stop på ruten, grænseoverskridende korridorer, de fire strategier |
 | [Favoritter og advarsler](User-da-Favorites-And-Alerts) | Gemte stationer, stations- og zoneadvarsler, hvordan baggrundstjekket faktisk opfører sig |
 | [Elopladning](User-da-EV-Charging) | Ladepunkter via OpenChargeMap, stik, effektfiltre |

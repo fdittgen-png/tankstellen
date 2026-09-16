@@ -100,11 +100,11 @@ Vérifiez aussi le **seuil de vitesse de départ** dans l'éditeur de véhicule 
 Procédez dans cet ordre :
 
 1. **Ouvrez le trajet et lisez la carte de santé de la communication OBD2.** Si la couverture est nettement sous 100 %, les trous ont été comblés par des estimations GPS et la moyenne du trajet est un mélange, pas une mesure.
-2. **Regardez le rapport de plein dans l'onglet Trajets.** S'il indique que les estimations sont *n* % au-dessus ou en dessous de la vérité de la pompe, l'application le sait déjà et vient de se corriger — attendez-vous à un mouvement sur les prochains trajets.
+2. **Regardez le rapport de plein dans l'onglet Conduite (écran Trajets).** S'il indique que les estimations sont *n* % au-dessus ou en dessous de la vérité de la pompe, l'application le sait déjà et vient de se corriger — attendez-vous à un mouvement sur les prochains trajets.
 3. **Vérifiez la capacité du réservoir** sur le véhicule. Une capacité fausse produit des autonomies crédibles mais erronées pendant des mois.
 4. **Vérifiez vos relevés de compteur.** La consommation, c'est litres ÷ kilomètres, et les kilomètres viennent entièrement de votre saisie.
 5. **Vérifiez que vous avez coché « Plein complet ».** Seules les fenêtres plein à plein peuvent calibrer quoi que ce soit.
-6. **Regardez le badge de précision** dans l'onglet Carburant. *Faible* signifie que rien n'a encore ancré le modèle — le chiffre est une sortie de modèle, et il le dit.
+6. **Regardez le badge de précision** dans l'onglet Coûts (écran Carburant). *Faible* signifie que rien n'a encore ancré le modèle — le chiffre est une sortie de modèle, et il le dit.
 
 Contexte : [Comment fonctionne Sparkilo → Comment un litre devient un chiffre](User-fr-How-It-Works#comment-un-litre-devient-un-chiffre).
 
@@ -211,9 +211,9 @@ En partie. Les favoris affichent leurs derniers prix connus, les tuiles récemme
 
 ---
 
-## Où est passé l'onglet Carburant ou Trajets ?
+## Où est passé l'onglet Coûts ou Conduite ?
 
-Ils appartiennent aux modes **Moyen** et **Complet**. Si l'un a disparu, un préréglage ou un interrupteur l'a désactivé : Réglages → Fonctions et mode d'utilisation → Conso.
+L'onglet Coûts (écran Carburant) et l'onglet Conduite (écran Trajets) appartiennent aux modes **Moyen** et **Complet**. Si l'un a disparu, un préréglage ou un interrupteur l'a désactivé : Réglages → Fonctions et mode d'utilisation → Conso.
 
 ---
 

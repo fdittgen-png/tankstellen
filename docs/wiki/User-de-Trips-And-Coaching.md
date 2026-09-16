@@ -1,10 +1,10 @@
 # Fahrten & Eco-Coaching
 
-Der 🛣️ **Fahrten**-Tab ist ein automatisches Fahrtenbuch plus Fahrtrainer. Er erscheint im Nutzungsmodus **Voll**.
+Der 🛣️ **Fahren**-Tab (Bildschirm Fahrten) ist ein automatisches Fahrtenbuch plus Fahrtrainer. Er erscheint im Nutzungsmodus **Voll**.
 
 ---
 
-## Der Fahrten-Tab
+## Der Fahrten-Bildschirm
 
 <img src="guide/trips-tab.jpg" width="340" alt="Fahrten-Tab: Monatsvergleich, Tank-Bericht und Fahrtliste mit Aufzeichnungs-Button">
 

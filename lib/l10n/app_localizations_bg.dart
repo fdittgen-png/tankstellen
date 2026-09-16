@@ -7760,6 +7760,15 @@ class AppLocalizationsBg extends AppLocalizations {
       'Споделете снимка на касова бележка от друго приложение за предварително попълване на зареждане — дата, литри, сума и станция се разпознават на устройството.';
 
   @override
+  String get shellTabFind => 'Find';
+
+  @override
+  String get shellTabCost => 'Cost';
+
+  @override
+  String get shellTabDrive => 'Drive';
+
+  @override
   String get speedConsumptionCardTitle => 'Разход по скорост';
 
   @override

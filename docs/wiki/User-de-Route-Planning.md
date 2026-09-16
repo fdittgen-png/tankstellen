@@ -8,7 +8,7 @@ Nicht „am günstigsten in der Nähe", sondern **am günstigsten auf dem Weg** 
 
 <img src="guide/search-criteria-route-1.jpg" width="340" alt="Kriterien im Routenmodus: Start, Zwischenstopp, Ziel, Kraftstoff, Segment, Umweg, Mindestersparnis">
 
-*Auf **Suche** tippen → auf **Entlang der Route suchen** wechseln. Der Such-Button bleibt gesperrt, bis Ziel und Kraftstoffsorte gesetzt sind.*
+*Auf **Finden** tippen → auf **Entlang der Route suchen** wechseln. Der Button bleibt gesperrt, bis Ziel und Kraftstoffsorte gesetzt sind.*
 
 | Feld | Bedeutung |
 |---|---|

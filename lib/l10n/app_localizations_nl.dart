@@ -7719,6 +7719,15 @@ class AppLocalizationsNl extends AppLocalizations {
       'Deel een bonfoto vanuit een andere app om een tankbeurt voor te invullen — datum, liters, totaal en station worden op het apparaat uitgelezen.';
 
   @override
+  String get shellTabFind => 'Find';
+
+  @override
+  String get shellTabCost => 'Cost';
+
+  @override
+  String get shellTabDrive => 'Drive';
+
+  @override
   String get speedConsumptionCardTitle => 'Verbruik per snelheid';
 
   @override

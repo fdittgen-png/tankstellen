@@ -12970,6 +12970,24 @@ abstract class AppLocalizations {
   /// **'Share a receipt photo from another app to pre-fill a fill-up — date, litres, total, and station are read on-device.'**
   String get featureDescription_addFillUpShareIntentReceipt;
 
+  /// Bottom-bar label of the centre Search destination, named by intent: where should I stop? (#4143)
+  ///
+  /// In en, this message translates to:
+  /// **'Find'**
+  String get shellTabFind;
+
+  /// Bottom-bar label of the fuel-log destination (fill-ups, charging, savings), named by intent: what does my car cost? (#4143)
+  ///
+  /// In en, this message translates to:
+  /// **'Cost'**
+  String get shellTabCost;
+
+  /// Bottom-bar label of the trips destination, named by intent: how am I driving? (#4143)
+  ///
+  /// In en, this message translates to:
+  /// **'Drive'**
+  String get shellTabDrive;
+
   /// Title of the consumption-by-speed card on the Carbon dashboard Charts tab — bins per-second OBD2 samples by speed band so the user can see what motorway speed is costing them per 100 km (#1192).
   ///
   /// In en, this message translates to:

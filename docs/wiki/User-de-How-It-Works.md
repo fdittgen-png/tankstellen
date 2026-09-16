@@ -26,9 +26,9 @@ Sparkilo kann ein Preisfinder aus zwei Bildschirmen sein oder ein vollwertiger B
 
 | Voreinstellung | Du bekommst | Untere Leiste |
 |---|---|---|
-| **Basis** | Günstigsten Kraftstoff und Ladepunkte in der Nähe, Favoriten, Preisalarme, Routenplanung | Favoriten · Karte · **Suche** |
-| **Mittel** | Alles aus Basis + manuelles Tankbuch, echter Verbrauch und Kosten | + Kraftstoff |
-| **Voll** | Alles aus Mittel + automatische OBD2-Fahrtaufzeichnung, Fahrnoten, Kundenkarten | + Fahrten |
+| **Basis** | Günstigsten Kraftstoff und Ladepunkte in der Nähe, Favoriten, Preisalarme, Routenplanung | Favoriten · Karte · **Finden** |
+| **Mittel** | Alles aus Basis + manuelles Tankbuch, echter Verbrauch und Kosten | + Kosten |
+| **Voll** | Alles aus Mittel + automatische OBD2-Fahrtaufzeichnung, Fahrnoten, Kundenkarten | + Fahren |
 | **Benutzerdefiniert** | Deine eigene Mischung — sobald du irgendeinen Einzelschalter umlegst | je nachdem |
 
 ### Wie es tatsächlich funktioniert
@@ -39,7 +39,7 @@ Eine Voreinstellung ist kein Modus, in dem die App läuft — sie ist ein **bena
 
 - **Eine Funktion auszuschalten entfernt sie aus der App, nicht nur aus der Ansicht** — auch ihre Hintergrundarbeit endet. *Preisalarme* aus stoppt die periodische Hintergrundprüfung; *GPS-Fahrtspur* aus stoppt das Speichern von Routenpunkten.
 - **Voreinstellungen zerstören deine eigene Mischung.** Ein Tipp auf *Mittel* überschreibt jeden Einzelschalter. Wer von Hand feinjustiert hat, bleibt auf Benutzerdefiniert.
-- **Die untere Leiste ändert ihre Form.** Wenn der Kraftstoff- oder Fahrten-Tab verschwunden ist, hast du (oder eine Voreinstellung) *Verbrauchs-Tab* bzw. *OBD2-Fahrtaufzeichnung* ausgeschaltet — kein Fehler.
+- **Die untere Leiste ändert ihre Form.** Wenn der Kosten-Tab (Bildschirm Kraftstoff) oder Fahren-Tab (Bildschirm Fahrten) verschwunden ist, hast du (oder eine Voreinstellung) *Verbrauchs-Tab* bzw. *OBD2-Fahrtaufzeichnung* ausgeschaltet — kein Fehler.
 
 ---
 

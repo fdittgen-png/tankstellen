@@ -76,8 +76,8 @@ Es el ajuste de mayores consecuencias, porque decide cuánta aplicación obtiene
 *Ajustes → Funciones y modo de uso. Empieza en **Básico** si solo quieres combustible más barato; sube cuando quieras saber por qué tu coche bebe.*
 
 - **Básico** — encontrar combustible y recarga, favoritos, alertas, rutas.
-- **Intermedio** — añade la pestaña **Combustible**: registrar repostajes, ver consumo y coste reales. Sin hardware.
-- **Completo** — añade la pestaña **Viajes**: grabación automática, puntuaciones, tarjetas de fidelidad. Un adaptador OBD2 sigue siendo opcional incluso aquí — los viajes se graban solo con GPS.
+- **Intermedio** — añade la pestaña **Cost** (pantalla Combustible): registrar repostajes, ver consumo y coste reales. Sin hardware.
+- **Completo** — añade la pestaña **Drive** (pantalla Viajes): grabación automática, puntuaciones, tarjetas de fidelidad. Un adaptador OBD2 sigue siendo opcional incluso aquí — los viajes se graban solo con GPS.
 
 Puedes cambiar cuando quieras, y cualquier interruptor que toques después te pone en **Personalizado**. La lista completa, y lo que cada uno cuesta en batería, datos o privacidad: [Referencia de ajustes → Funciones y modo de uso](User-es-Settings-Reference#funciones-y-modo-de-uso).
 
@@ -103,13 +103,13 @@ La clave se guarda en la caja fuerte de hardware (Android Keystore / Llavero de 
 
 <img src="guide/favorites.jpg" width="340" alt="Pestaña Favoritos con la barra inferior y el botón Buscar central">
 
-*El botón verde **Buscar** elevado en el centro es el único disparador de búsqueda de toda la app.*
+*El botón verde **Find** elevado en el centro es el único disparador de búsqueda de toda la app.*
 
 - ⭐ **Favoritos** — estaciones guardadas y alertas de precio
 - 🗺️ **Mapa** — cada estación cercana como chincheta coloreada por precio
-- 🔍 **Buscar** *(centro)* — cerca o a lo largo de una ruta
-- ⛽ **Combustible** — depósito, consumo, repostajes *(desde Intermedio)*
-- 🛣️ **Viajes** — cuaderno de bitácora y coaching *(Completo)*
+- 🔍 **Find** *(centro)* — cerca o a lo largo de una ruta
+- ⛽ **Cost** *(pantalla Combustible)* — depósito, consumo, repostajes *(desde Intermedio)*
+- 🛣️ **Drive** *(pantalla Viajes)* — cuaderno de bitácora y coaching *(Completo)*
 
 Los ajustes **no** son una pestaña: es el engranaje arriba a la derecha de las pantallas principales. En tableta, o teléfono en horizontal, la app se divide en dos columnas para ver lista y mapa (o detalle) a la vez.
 
@@ -119,7 +119,7 @@ Los ajustes **no** son una pestaña: es el engranaje arriba a la derecha de las 
 
 <img src="guide/search-criteria-nearby.jpg" width="340" alt="Hoja de criterios para una búsqueda cercana">
 
-*Toca **Buscar** → la hoja de criterios se abre rellenada desde tu perfil. Ajusta y vuelve a tocar **Buscar**.*
+*Toca **Find** → la hoja de criterios se abre rellenada desde tu perfil. Ajusta y vuelve a tocarlo (**Ejecutar búsqueda**).*
 
 Obtienes una lista ordenada del más barato (o por distancia — tú eliges), cada ficha con precio, tendencia, distancia y frescura. Un toque abre el detalle. El recorrido completo: [Encontrar gasolineras](User-es-Finding-Stations).
 

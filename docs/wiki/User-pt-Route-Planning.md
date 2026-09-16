@@ -8,7 +8,7 @@ Não « o mais barato perto de mim » mas **o mais barato no caminho** — a dif
 
 <img src="guide/search-criteria-route-1.jpg" width="340" alt="Critérios em modo itinerário: partida, paragem, destino, combustível, segmento, desvio, poupança mínima">
 
-*Toque em **Pesquisar** → mude para **Pesquisar ao longo do trajeto**. O botão fica desativado até haver destino e combustível.*
+*Toque em **Find** → mude para **Pesquisar ao longo do trajeto**. O botão fica desativado até haver destino e combustível.*
 
 | Campo | Significado |
 |---|---|

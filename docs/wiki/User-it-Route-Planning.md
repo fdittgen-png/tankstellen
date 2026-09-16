@@ -8,7 +8,7 @@ Non « il più economico vicino a me » ma **il più economico sulla strada** �
 
 <img src="guide/search-criteria-route-1.jpg" width="340" alt="Criteri in modalità itinerario: partenza, tappa, destinazione, carburante, segmento, deviazione, risparmio minimo">
 
-*Tocca **Cerca** → passa a **Cerca lungo l'itinerario**. Il pulsante resta disattivato finché non ci sono destinazione e carburante.*
+*Tocca **Find** → passa a **Cerca lungo l'itinerario**. Il pulsante resta disattivato finché non ci sono destinazione e carburante.*
 
 | Campo | Significato |
 |---|---|

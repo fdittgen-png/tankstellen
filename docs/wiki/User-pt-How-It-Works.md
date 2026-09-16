@@ -26,9 +26,9 @@ O Sparkilo pode ser um procurador de preços de dois ecrãs ou um computador de 
 
 | Predefinição | Obtém | Barra inferior |
 |---|---|---|
-| **Básico** | Combustível e carregamento mais baratos por perto, favoritos, alertas, itinerários | Favoritos · Mapa · **Pesquisar** |
-| **Médio** | Tudo o de Básico + registo manual dos abastecimentos, consumo e custo reais | + Combustível |
-| **Completo** | Tudo o de Médio + gravação OBD2 automática das viagens, pontuações, cartões de fidelização | + Viagens |
+| **Básico** | Combustível e carregamento mais baratos por perto, favoritos, alertas, itinerários | Favoritos · Mapa · **Find** |
+| **Médio** | Tudo o de Básico + registo manual dos abastecimentos, consumo e custo reais | + Cost |
+| **Completo** | Tudo o de Médio + gravação OBD2 automática das viagens, pontuações, cartões de fidelização | + Drive |
 | **Personalizado** | A sua própria mistura — assim que toca num interruptor | conforme o caso |
 
 ### Como funciona de verdade
@@ -39,7 +39,7 @@ Uma predefinição não é um modo em que a aplicação corre — é um **conjun
 
 - **Desativar uma função retira-a da aplicação, não apenas da vista** — o seu trabalho em segundo plano também para. *Alertas de preço* desligados param a verificação periódica; *Rasto GPS das viagens* desligado para de guardar os pontos de rota.
 - **As predefinições sobrepõem-se à sua mistura.** Tocar em *Médio* reescreve cada interruptor. Se afinou à mão, fique em Personalizado.
-- **A barra inferior muda de forma.** Se o separador Combustível ou Viagens desapareceu, você (ou uma predefinição) desligou *Estatísticas de consumo* ou *Gravação OBD2 das viagens* — não é um erro.
+- **A barra inferior muda de forma.** Se o separador Cost (ecrã Combustível) ou Drive (ecrã Viagens) desapareceu, você (ou uma predefinição) desligou *Estatísticas de consumo* ou *Gravação OBD2 das viagens* — não é um erro.
 
 ---
 

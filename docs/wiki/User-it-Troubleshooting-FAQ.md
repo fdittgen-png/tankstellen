@@ -100,11 +100,11 @@ Controlla anche la **soglia di velocità di partenza** nell'editor di veicolo �
 Procedi in quest'ordine:
 
 1. **Apri il viaggio e leggi la scheda di salute della comunicazione OBD2.** Se la copertura è ben sotto il 100 %, i vuoti sono stati riempiti con stime GPS e la media è un misto, non una misura.
-2. **Guarda il rapporto del pieno nella scheda Viaggi.** Se dice che le stime sono del *n* % sopra o sotto la verità della pompa, l'app lo sa già e si è appena corretta — aspettati movimento nei prossimi viaggi.
+2. **Guarda il rapporto del pieno nella scheda Drive (schermata Percorsi).** Se dice che le stime sono del *n* % sopra o sotto la verità della pompa, l'app lo sa già e si è appena corretta — aspettati movimento nei prossimi viaggi.
 3. **Controlla la capacità del serbatoio** sul veicolo. Una capacità sbagliata produce per mesi autonomie credibili ma errate.
 4. **Controlla i tuoi chilometraggi.** Il consumo è litri ÷ chilometri, e i chilometri vengono interamente da ciò che digiti.
 5. **Controlla di aver spuntato « Pieno ».** Solo le finestre da pieno a pieno possono calibrare qualcosa.
-6. **Guarda il badge di precisione** nella scheda Carburante. *Bassa* significa che nulla ha ancora ancorato il modello — il valore è un'uscita di modello, e lo dichiara.
+6. **Guarda il badge di precisione** nella scheda Cost (schermata Carburante). *Bassa* significa che nulla ha ancora ancorato il modello — il valore è un'uscita di modello, e lo dichiara.
 
 Contesto: [Come funziona Sparkilo → Come un litro diventa un numero](User-it-How-It-Works#come-un-litro-diventa-un-numero).
 
@@ -211,9 +211,9 @@ In parte. I preferiti mostrano gli ultimi prezzi noti, le tessere consultate di 
 
 ---
 
-## Dov'è finita la scheda Carburante o Viaggi?
+## Dov'è finita la scheda Cost o Drive?
 
-Appartengono alle modalità **Medio** e **Completo**. Se una è sparita, una preimpostazione o un interruttore l'ha spenta: Impostazioni → Funzioni e modalità d'uso → Consumo.
+La scheda Cost (schermata Carburante) e la scheda Drive (schermata Percorsi) appartengono alle modalità **Medio** e **Completo**. Se una è sparita, una preimpostazione o un interruttore l'ha spenta: Impostazioni → Funzioni e modalità d'uso → Consumo.
 
 ---
 
