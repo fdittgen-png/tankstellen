@@ -25,6 +25,9 @@ void main() {
       WidgetTester tester, {
       required FuelType value,
       ValueChanged<FuelType>? onChanged,
+      // #4304 — the delegates were always installed; only the locale was
+      // missing, so every assertion here was implicitly English.
+      Locale locale = const Locale('en'),
     }) {
       return tester.pumpWidget(
         ProviderScope(
@@ -39,6 +42,7 @@ void main() {
               GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: AppLocalizations.supportedLocales,
+            locale: locale,
             home: Scaffold(
               body: ProfileFuelTypeDropdown(
                 value: value,
@@ -50,10 +54,14 @@ void main() {
       );
     }
 
-    testWidgets('renders the displayName of the selected fuel type',
+    testWidgets('renders the localized name of the selected fuel type',
         (tester) async {
       await pumpDropdown(tester, value: FuelType.e10);
-      expect(find.text(FuelType.e10.displayName), findsOneWidget);
+      // #4304 — the ARB string the widget renders. It happens to equal
+      // FuelType.e10.displayName, which is exactly why this assertion
+      // alone cannot police the label's provenance; the German case
+      // below is the one that can.
+      expect(find.text('Super E10'), findsOneWidget);
     });
 
     testWidgets('opening the menu lists every FuelType except `all`',
@@ -62,11 +70,24 @@ void main() {
       await tester.tap(find.byType(DropdownButtonFormField<FuelType>));
       await tester.pumpAndSettle();
 
-      // The "all" wildcard must not appear as a profile preference.
-      expect(find.text(FuelType.all.displayName), findsNothing);
-      // A few real fuel types should appear in the open menu.
-      expect(find.text(FuelType.e5.displayName), findsAtLeast(1));
-      expect(find.text(FuelType.diesel.displayName), findsAtLeast(1));
+      // #4304 — the wildcard must not be OFFERED, asserted on the menu's
+      // values rather than on text. The old check searched for
+      // `FuelType.all.displayName` (the literal "All"), a string this
+      // dropdown never renders under any circumstances — so it could not
+      // fail, and tested nothing its comment claimed.
+      final offered = tester
+          .widgetList<DropdownMenuItem<FuelType>>(
+            find.byType(DropdownMenuItem<FuelType>),
+          )
+          .map((i) => i.value)
+          .toSet();
+      expect(offered, isNot(contains(FuelType.all)),
+          reason: 'the search-time wildcard is not a profile preference');
+
+      // A few real fuel types should appear in the open menu, spelled as
+      // the ARB strings the widget renders.
+      expect(find.text('Super E5'), findsAtLeast(1));
+      expect(find.text('Diesel'), findsAtLeast(1));
     });
 
     testWidgets('forwards selection to onChanged when user picks a new fuel',
@@ -80,9 +101,26 @@ void main() {
       await tester.tap(find.byType(DropdownButtonFormField<FuelType>));
       await tester.pumpAndSettle();
       // .last is the menu entry (the field label is .first).
-      await tester.tap(find.text(FuelType.diesel.displayName).last);
+      await tester.tap(find.text('Diesel').last);
       await tester.pumpAndSettle();
       expect(captured, FuelType.diesel);
+    });
+
+    testWidgets('renders the reader\'s language, not displayName (#4304)',
+        (tester) async {
+      await pumpDropdown(
+        tester,
+        value: FuelType.lpg,
+        locale: const Locale('de'),
+      );
+
+      // lpg is the probe. German says `Autogas (LPG)`; FuelType.displayName
+      // says `GPL / LPG`, a French/English hybrid. For e5/e10/e98/diesel the
+      // ARB string and displayName are byte-identical, so every other
+      // assertion in this file passes whichever one the widget uses — which
+      // is why none of them could detect #4283's fix regressing here.
+      expect(find.text('Autogas (LPG)'), findsOneWidget);
+      expect(find.text('GPL / LPG'), findsNothing);
     });
   });
 }
