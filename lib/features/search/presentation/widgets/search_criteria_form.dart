@@ -12,6 +12,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../route_search/domain/entities/route_info.dart';
 import '../../../route_search/presentation/widgets/route_input.dart';
 import '../../../../core/domain/search_mode.dart';
+import '../../providers/brand_filter_provider.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
 import '../../providers/search_screen_ui_provider.dart';
@@ -85,6 +86,35 @@ class SearchCriteriaForm extends ConsumerWidget {
     final radius = ref.watch(searchRadiusProvider);
     final openOnly = ref.watch(openOnlyFilterProvider);
     final amenities = ref.watch(selectedAmenitiesProvider);
+    final brands = ref.watch(selectedBrandsProvider);
+    final excludeHighway = ref.watch(excludeHighwayStationsProvider);
+
+    // #4199 — every constraint that narrows the results, counted once.
+    //
+    // The header used to report `amenities.length` alone, so a user with
+    // "open now" on and two brands selected saw a bare "More filters"
+    // and no number. That is the failure #4166 built this header to
+    // prevent: results quietly narrowed with nothing on screen to
+    // explain it.
+    //
+    // "Active" means DIFFERS FROM UNFILTERED, not "differs from the
+    // user's saved default" — every one of these providers restores a
+    // saved default and degrades to the unfiltered value, and a filter
+    // the user made their default is still narrowing this search.
+    //
+    // Open-now counts even though its switch stays ABOVE the section:
+    // #4166 deliberately kept the decision (mode, where, fuel, radius,
+    // open now) out of the collapsible, and counting it here does not
+    // move it. Brands count even when their chips are hidden — the
+    // chips only render once results exist, so a saved brand default is
+    // exactly the invisible-but-active case worth reporting.
+    // `resultKindFilter` is deliberately excluded: it is not reachable
+    // from this sheet, so reporting it would name a filter the user
+    // cannot see or clear here.
+    final activeFilterCount = amenities.length +
+        brands.length +
+        (openOnly ? 1 : 0) +
+        (excludeHighway ? 1 : 0);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -177,7 +207,7 @@ class SearchCriteriaForm extends ConsumerWidget {
           // most searches never touch, and they were costing every user
           // a scroll on every search.
           CriteriaRefinements(
-            activeCount: amenities.length,
+            activeCount: activeFilterCount,
             children: [
           CriteriaSectionHeader(l10n.amenities,
               anchor: HelpAnchor.searchAmenities),

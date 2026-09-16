@@ -250,6 +250,82 @@ void main() {
       expect(c.read(selectedAmenitiesProvider), {StationAmenity.shop});
     });
 
+    testWidgets('#4199 — open-now ALONE is counted, though its switch sits '
+        'above the collapsible', (tester) async {
+      // The header used to count `amenities.length`, so a user with
+      // open-now on and no amenities saw a bare "More filters" while
+      // their results were quietly narrowed — the exact failure #4166
+      // introduced the counter to prevent. #4166 deliberately keeps the
+      // switch ABOVE the section (it is part of the decision, not a
+      // bulky refinement); counting it here does not move it.
+      final c = await _pumpCriteria(tester);
+      c.read(selectedAmenitiesProvider.notifier).clear();
+      c.read(openOnlyFilterProvider.notifier).set(true);
+      await tester.pumpAndSettle();
+
+      expect(find.text(_l.criteriaMoreFilters(1)), findsOneWidget,
+          reason: 'open-now narrows the results, so the collapsed header '
+              'must say one filter is active');
+    });
+
+    testWidgets('#4199 — open-now and an amenity sum into one count',
+        (tester) async {
+      final c = await _pumpCriteria(tester);
+      c.read(selectedAmenitiesProvider.notifier).clear();
+      c.read(openOnlyFilterProvider.notifier).set(true);
+      c.read(selectedAmenitiesProvider.notifier).toggle(StationAmenity.shop);
+      await tester.pumpAndSettle();
+
+      expect(find.text(_l.criteriaMoreFilters(2)), findsOneWidget,
+          reason: 'every constraint that narrows the results counts once');
+    });
+
+    testWidgets('#4200 — picking an intent then changing a knob it owns '
+        'drops the selection to Custom', (tester) async {
+      // #4138's third acceptance criterion at SHEET level: the knobs stay
+      // authoritative, so the sheet must never show a label that no longer
+      // describes its own state.
+      //
+      // #4200's bullet says "change fuel", but no preset owns fuel type —
+      // `SearchIntentPreset` decides sortMode / routeStrategy / openOnly /
+      // excludeHighway / resultKindFuelOnly only. Changing fuel therefore
+      // cannot diverge from a preset, and asserting that it does would
+      // pin behaviour the domain does not have. Open-now IS owned by
+      // cheapestNearby, so that is the honest knob to move.
+      final c = await _pumpCriteria(tester);
+
+      final cheapest =
+          find.byKey(const ValueKey('criteria-intent-cheapestNearby'));
+      await tester.ensureVisible(cheapest);
+      await tester.tap(cheapest);
+      await tester.pumpAndSettle();
+      expect(tester.widget<ChoiceChip>(cheapest).selected, isTrue);
+      expect(c.read(openOnlyFilterProvider), isTrue,
+          reason: 'the preset set it');
+
+      // Reach past the intent row and turn off a filter the preset set.
+      c.read(openOnlyFilterProvider.notifier).set(false);
+      await tester.pumpAndSettle();
+
+      expect(tester.widget<ChoiceChip>(cheapest).selected, isFalse,
+          reason: 'the parameters no longer match the preset');
+      expect(
+        tester.widget<ChoiceChip>(
+          find.byKey(const ValueKey('criteria-intent-custom')),
+        ).selected,
+        isTrue,
+      );
+    });
+
+    testWidgets('#4200 — route mode with no endpoints says WHY Search is '
+        'disabled', (tester) async {
+      // A greyed button that does not say why is what #3927 fixed; the
+      // reason survives at the end of the form beside Reset.
+      await _pumpCriteria(tester, mode: SearchMode.route);
+      expect(find.text(_l.criteriaSubmitDisabledRoute), findsOneWidget,
+          reason: 'an actionable reason, not just a dead control');
+    });
+
     testWidgets('reduced motion: the custom radius control appears without '
         'animating', (tester) async {
       await _pumpCriteria(tester, reduceMotion: true);
