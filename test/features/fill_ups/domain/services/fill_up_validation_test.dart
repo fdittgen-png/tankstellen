@@ -109,6 +109,34 @@ void main() {
     expect(val.sourceMix[TripFuelSourceKind.measured], 1);
   });
 
+  // #4321 — the recorder stamps `pumpGainApplied` on measured trips too,
+  // though no measured branch ever multiplied by it.
+  test('#4321 — a measured trip stamped pg 0.8 contributes its RAW litres',
+      () {
+    const v = VehicleProfile(
+        id: 'car', name: 'x', pumpGain: 0.8, pumpGainSamples: 2);
+    final measured = {
+      'a': _trip(453, 47.6, gain: 0.8, dominant: 'pid9D', fuelKey: 'e85'),
+    };
+    final val = FillUpValidation.of(_window(trips: ['a']), measured, v);
+    expect(val.rawRecordedLPer100Km, closeTo(10.5, 0.01),
+        reason: '13.13 means the unapplied gain was divided back out');
+    expect(val.calibratedRecordedLPer100Km, closeTo(10.5, 0.01));
+  });
+
+  test('#4321 — an estimated trip has its gain removed exactly once', () {
+    const v = VehicleProfile(
+        id: 'car', name: 'x', pumpGain: 0.6, pumpGainSamples: 2);
+    // 10.5 L/100 raw, recorded at 0.6 → 6.3 L/100 stored.
+    final estimated = {
+      'a': _trip(453, 28.539, gain: 0.6, dominant: 'speedDensity',
+          fuelKey: 'e85'),
+    };
+    final val = FillUpValidation.of(_window(trips: ['a']), estimated, v);
+    expect(val.rawRecordedLPer100Km, closeTo(10.5, 0.01));
+    expect(val.calibratedRecordedLPer100Km, closeTo(6.3, 0.01));
+  });
+
   test('thin evidence says so: low coverage, mixed grades, no recordings',
       () {
     const v = VehicleProfile(

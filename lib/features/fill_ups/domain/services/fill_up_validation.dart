@@ -144,7 +144,7 @@ class FillUpValidation {
       if (key != null) stampedKeys.add(key);
       final liters = t.fuelLitersConsumed;
       if (liters == null || liters <= 0 || t.distanceKm <= 0) continue;
-      rawLiters += liters / (t.pumpGainApplied ?? 1.0);
+      rawLiters += liters / tripPumpGainCarried(t); // #4321
       recordedKm += t.distanceKm;
     }
     final missing = <String>[
