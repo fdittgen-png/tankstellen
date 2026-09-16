@@ -392,7 +392,6 @@ void main() {
     'lib/features/trips/domain/services/gear_inference.dart': 502,
     'lib/features/receipts_ocr/presentation/widgets/ocr_trace_steps_panel.dart': 509,
     'lib/features/obd2/data/session/auto_trip_coordinator.dart': 496,
-    'lib/core/services/station_service_chain.dart': 492,
     'lib/features/search/presentation/screens/search_criteria_screen.dart': 473,
     'lib/features/trips/presentation/widgets/vehicle_baseline_section.dart': 454,
     'lib/features/trips/data/trip_history_entry.dart': 450,
