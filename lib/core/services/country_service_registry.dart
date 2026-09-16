@@ -19,6 +19,7 @@ import 'diagnostics/data_access_recorder.dart';
 import 'diagnostics/data_access_recorder_provider.dart';
 import 'fuel_service_policy.dart';
 import 'impl/demo_station_service.dart';
+import 'provider_freshness_monitor.dart';
 import 'provider_capability.dart';
 import 'service_providers.dart';
 import 'station_service.dart';
@@ -196,6 +197,7 @@ class CountryServiceRegistry {
     Dio? tankerkoenigDio,
     DataAccessRecorder? recorder,
     ProviderRequestBudget? budget,
+    ProviderFreshnessMonitor? freshness,
   }) {
     final entry = _byCode[countryCode];
     if (entry == null) return DemoStationService(countryCode: countryCode);
@@ -222,6 +224,11 @@ class CountryServiceRegistry {
       policy: entry.policy,
       recorder: recorder,
       budget: budget,
+      // #4171 — defaulted, not threaded: `storage` is already required
+      // here, and a background scan is the traffic most likely to notice a
+      // provider that stopped publishing. Leaving each caller to remember
+      // is how a detector ends up never firing.
+      freshness: freshness ?? ProviderFreshnessMonitor(storage),
     );
   }
 

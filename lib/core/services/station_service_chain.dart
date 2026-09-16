@@ -18,6 +18,7 @@ import 'non_fuel_station_guard.dart';
 import 'service_result.dart';
 import 'station_service.dart';
 import 'chain_executor.dart';
+import 'provider_freshness_monitor.dart';
 import 'station_service_chain_codec.dart';
 import 'station_transient_retry.dart';
 
@@ -81,12 +82,17 @@ class StationServiceChain with _ChainCoalescing implements StationService {
   @override
   final ProviderRequestBudget? _budget;
 
+  /// #4171 — handed to [ChainExecutor], which records every successful
+  /// upstream response against the country's declared freshness promise.
+  final ProviderFreshnessMonitor? _freshness;
+
   StationServiceChain(this._primary, this._cache, {
     this._errorSource = ServiceSource.tankerkoenigApi,
     this.countryCode = '',
     this._policy,
     this._recorder,
     this._budget,
+    this._freshness,
   });
 
   /// Generic cache-through + request coalescing.
@@ -126,6 +132,7 @@ class StationServiceChain with _ChainCoalescing implements StationService {
       errorSource: _errorSource,
       recorder: _recorder,
       budget: _budget,
+      freshness: _freshness,
     ).execute<T>(
       stalePaintDeadline: stalePaintDeadline,
       cacheKey: cacheKey,
