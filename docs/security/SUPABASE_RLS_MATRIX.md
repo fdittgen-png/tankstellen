@@ -94,7 +94,7 @@ explicitly, and is `REVOKE`d from `PUBLIC` and `anon` before being
 | `claim_trip_share(token)` | `authenticated` | Writes `auth.uid()` into the unclaimed link-share row matching `token`, after which the `*_shared_read` policies start matching. | #3747 predecessor migration (`trip_shares`). |
 | `resolve_share_recipient(email)` | `service_role` only | Legacy e-mail → UUID lookup. | `REVOKE`d from `authenticated` in `20260818000002` — kept defined for idempotent re-runs and SQL-editor use. |
 | `is_database_owner()` / `auto_register_owner()` | policy / trigger internals | Owner gate on `users` DELETE; first-user registration into `database_owner`. | `search_path` pinned in `20260818000001`. |
-| `audit_rls_policies()` | `service_role` only | Lists every `public.*` table with its RLS state and policy count for the security test. | `REVOKE`d from `anon` and `authenticated`. |
+| `audit_rls_policies()` | `service_role` only | Lists every `public.*` table with its RLS state and policy count for the security test. | `REVOKE`d from `anon` and `authenticated`; `search_path` pinned in `20260916000001` (#4251). |
 
 The migration source-of-truth lives in `supabase/migrations/`:
 
@@ -140,6 +140,8 @@ The migration source-of-truth lives in `supabase/migrations/`:
 - `20260818000001_pin_owner_fn_search_path.sql` — pins `search_path` on
   `is_database_owner()`, `auto_register_owner()`, `limit_bulk_delete()`;
   no RLS change.
+- `20260916000001_pin_audit_fn_search_path.sql` — pins `search_path` on
+  `audit_rls_policies()` (#4251); no RLS change.
 - `20260818000002_share_trip_with_email.sql` — `share_trip_with_email()`
   RPC; revokes `resolve_share_recipient()` from `authenticated` (#3747).
 - *(Epic #3865, pending)* — `erase_my_data()` RPC; no public-table RLS
