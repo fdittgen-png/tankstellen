@@ -48,6 +48,12 @@ class ProfileRepository {
     return data;
   }
 
+  /// [activateIfNone] — when no profile is active yet, the created one
+  /// becomes active. That is right for first-run onboarding and wrong for
+  /// every automatic country setup: a route- or location-created profile
+  /// must never become the user's active country just because none was set
+  /// (#4268, Epic #4257 §C). Defaults to today's behaviour so onboarding is
+  /// unchanged; automatic creators pass `false`.
   Future<UserProfile> createProfile({
     required String name,
     FuelType preferredFuelType = FuelType.e10,
@@ -56,6 +62,7 @@ class ProfileRepository {
     String? homeZipCode,
     String? countryCode,
     String? languageCode,
+    bool activateIfNone = true,
   }) async {
     final profile = UserProfile(
       id: _uuid.v4(),
@@ -69,8 +76,9 @@ class ProfileRepository {
     );
     await _storage.saveProfile(profile.id, profile.toJson());
 
-    // If this is the first profile, make it active
-    if (_storage.getActiveProfileId() == null) {
+    // If this is the first profile, make it active — unless the caller
+    // explicitly declined (#4268).
+    if (activateIfNone && _storage.getActiveProfileId() == null) {
       await _storage.setActiveProfileId(profile.id);
     }
     return profile;
@@ -96,14 +104,49 @@ class ProfileRepository {
     );
   }
 
+  /// Delete [id]; when it was the active profile, hand the active context
+  /// to a **deterministically chosen** survivor.
+  ///
+  /// #4267 — this used `remaining.first` over `getAllProfiles()`, which is
+  /// an unordered Hive map read. The active profile is the country context
+  /// for nearby search and every country-scoped feature, so deleting it
+  /// moved the user to an arbitrary country that could differ between two
+  /// devices holding the same data.
+  ///
+  /// `UserProfile` carries no "last used" or modified timestamp, so the
+  /// rule has to come from the data itself: order by country code, then
+  /// name, then id — all three so the comparison is total and cannot fall
+  /// back to storage order on a tie. Profiles with a country sort ahead of
+  /// profiles without one, since a country-less profile gives the user no
+  /// country context at all.
+  ///
+  /// Telling the user which country became active is presentation work and
+  /// belongs to #4265; this only makes the choice stable and explainable.
   Future<void> deleteProfile(String id) async {
     await _storage.deleteProfile(id);
-    if (_storage.getActiveProfileId() == id) {
-      final remaining = getAllProfiles();
-      if (remaining.isNotEmpty) {
-        await _storage.setActiveProfileId(remaining.first.id);
-      }
-    }
+    if (_storage.getActiveProfileId() != id) return;
+
+    final remaining = getAllProfiles();
+    if (remaining.isEmpty) return;
+    await _storage.setActiveProfileId(_nextActiveAfterDeletion(remaining).id);
+  }
+
+  /// The deterministic successor for the active slot (#4267). Pure and
+  /// order-independent: the same set of profiles always yields the same
+  /// winner, whatever order storage returned them in.
+  UserProfile _nextActiveAfterDeletion(List<UserProfile> candidates) {
+    final sorted = [...candidates]..sort((a, b) {
+      final ac = a.countryCode ?? '';
+      final bc = b.countryCode ?? '';
+      // A profile bound to a country outranks one with no country.
+      if (ac.isEmpty != bc.isEmpty) return ac.isEmpty ? 1 : -1;
+      final byCountry = ac.compareTo(bc);
+      if (byCountry != 0) return byCountry;
+      final byName = a.name.compareTo(b.name);
+      if (byName != 0) return byName;
+      return a.id.compareTo(b.id);
+    });
+    return sorted.first;
   }
 
   Future<void> setActiveProfile(String id) async {

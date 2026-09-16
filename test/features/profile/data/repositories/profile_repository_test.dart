@@ -110,8 +110,7 @@ void main() {
   });
 
   group('deleteProfile', () {
-    test('deleting the active profile reassigns to the next one',
-        () async {
+    test('deleting the active profile reassigns to a survivor', () async {
       final a = await repo.createProfile(name: 'A');
       final b = await repo.createProfile(name: 'B');
       expect(repo.getActiveProfile()?.id, a.id);
@@ -120,6 +119,48 @@ void main() {
 
       expect(repo.getAllProfiles().map((p) => p.id).toList(), [b.id]);
       expect(repo.getActiveProfile()?.id, b.id);
+    });
+
+    // #4267 — the successor used to be `remaining.first` over an unordered
+    // Hive read, so the user's active COUNTRY could land anywhere.
+    test('the successor is the same whatever order the profiles were '
+        'created in', () async {
+      Future<String> winnerFor(List<String> countries) async {
+        // Fresh store per permutation.
+        for (final p in repo.getAllProfiles()) {
+          await repo.deleteProfile(p.id);
+        }
+        final active = await repo.createProfile(name: 'Active', countryCode: 'ZZ');
+        await repo.setActiveProfile(active.id);
+        for (final c in countries) {
+          await repo.createProfile(name: 'P-$c', countryCode: c);
+        }
+        await repo.deleteProfile(active.id);
+        return repo.getActiveProfile()!.countryCode!;
+      }
+
+      final forward = await winnerFor(['IT', 'AT', 'FR']);
+      final reverse = await winnerFor(['FR', 'AT', 'IT']);
+      final shuffled = await winnerFor(['AT', 'FR', 'IT']);
+
+      expect(forward, reverse);
+      expect(forward, shuffled);
+      expect(forward, 'AT',
+          reason: 'ordered by country code, so AT wins over FR and IT '
+              'regardless of insertion order');
+    });
+
+    test('a country-bound profile outranks a country-less one', () async {
+      final active = await repo.createProfile(name: 'Active', countryCode: 'ZZ');
+      await repo.setActiveProfile(active.id);
+      await repo.createProfile(name: 'AAA no country');
+      await repo.createProfile(name: 'ZZZ with country', countryCode: 'FR');
+
+      await repo.deleteProfile(active.id);
+
+      expect(repo.getActiveProfile()?.countryCode, 'FR',
+          reason: 'a profile with no country gives the user no country '
+              'context, so it is the last resort');
     });
 
     test('deleting an inactive profile keeps the active pointer',
@@ -138,6 +179,31 @@ void main() {
       // activeProfileId is still set in storage but the profile is
       // gone; getActiveProfile returns null because the lookup fails.
       expect(repo.getActiveProfile(), isNull);
+    });
+  });
+
+  // #4268 — activation must be the caller's decision, not a side effect.
+  group('createProfile activateIfNone', () {
+    test('activateIfNone: false leaves an empty active slot empty', () async {
+      final p = await repo.createProfile(name: 'Route-created',
+          countryCode: 'AT', activateIfNone: false);
+      expect(repo.getAllProfiles().map((x) => x.id), contains(p.id));
+      expect(repo.getActiveProfile(), isNull,
+          reason: 'an automatic country setup must not claim the active '
+              'country just because none was set');
+    });
+
+    test('activateIfNone: false never unseats an existing active profile',
+        () async {
+      final first = await repo.createProfile(name: 'First');
+      await repo.createProfile(name: 'Second', activateIfNone: false);
+      expect(repo.getActiveProfile()?.id, first.id);
+    });
+
+    test('the default still activates the first profile — onboarding is '
+        'unchanged', () async {
+      final p = await repo.createProfile(name: 'Onboarding');
+      expect(repo.getActiveProfile()?.id, p.id);
     });
   });
 
