@@ -17,6 +17,7 @@ Future<PriceAlert?> _openSheet(
   String stationId = 'station-1',
   String stationName = 'Test Station',
   double? currentPrice,
+  Locale locale = const Locale('en'),
 }) async {
   PriceAlert? result;
   await pumpApp(
@@ -34,6 +35,7 @@ Future<PriceAlert?> _openSheet(
         child: const Text('open'),
       ),
     ),
+    locale: locale,
   );
   await tester.tap(find.text('open'));
   await tester.pumpAndSettle();
@@ -69,7 +71,9 @@ void main() {
     testWidgets('defaults fuel type to diesel', (tester) async {
       await _openSheet(tester);
 
-      expect(find.text(FuelType.diesel.displayName), findsOneWidget);
+      // The ARB string the sheet renders since #4295, not
+      // FuelType.displayName (which happens to match for diesel).
+      expect(find.text('Diesel'), findsOneWidget);
     });
 
     testWidgets('prefills the target 5 % under the current price, in the '
@@ -254,7 +258,7 @@ void main() {
       // Open the dropdown, pick E10.
       await tester.tap(find.byType(DropdownButtonFormField<FuelType>));
       await tester.pumpAndSettle();
-      await tester.tap(find.text(FuelType.e10.displayName).last);
+      await tester.tap(find.text('Super E10').last);
       await tester.pumpAndSettle();
 
       await tester.enterText(find.byType(TextFormField), '1.600');
@@ -276,15 +280,19 @@ void main() {
       await tester.pumpAndSettle();
 
       // The three DE-evaluable fuels are offered.
-      expect(find.text(FuelType.e5.displayName), findsWidgets);
-      expect(find.text(FuelType.e10.displayName), findsWidgets);
-      expect(find.text(FuelType.diesel.displayName), findsWidgets);
-      // Fuels the German feed doesn't price are gone.
-      expect(find.text(FuelType.e98.displayName), findsNothing);
-      expect(find.text(FuelType.dieselPremium.displayName), findsNothing);
-      expect(find.text(FuelType.e85.displayName), findsNothing);
-      expect(find.text(FuelType.lpg.displayName), findsNothing);
-      expect(find.text(FuelType.cng.displayName), findsNothing);
+      expect(find.text('Super E5'), findsWidgets);
+      expect(find.text('Super E10'), findsWidgets);
+      expect(find.text('Diesel'), findsWidgets);
+      // Fuels the German feed doesn't price are gone. These are spelled
+      // as the ARB strings the sheet renders since #4295, NOT as
+      // FuelType.displayName: for lpg/cng/e85 the two differ, so a
+      // findsNothing against 'GPL / LPG' would pass without asserting
+      // anything at all — the string simply never renders any more.
+      expect(find.text('Super 98'), findsNothing);
+      expect(find.text('Diesel Premium'), findsNothing);
+      expect(find.text('E85 Bioethanol'), findsNothing);
+      expect(find.text('LPG'), findsNothing);
+      expect(find.text('CNG'), findsNothing);
     });
   });
 
@@ -326,11 +334,37 @@ void main() {
 
       // France's provider exposes super-unleaded, bioethanol and LPG —
       // all now offered because alerts fire for FR.
-      expect(find.text(FuelType.e98.displayName), findsWidgets);
-      expect(find.text(FuelType.e85.displayName), findsWidgets);
-      expect(find.text(FuelType.lpg.displayName), findsWidgets);
-      // The wildcard is never an alert target.
-      expect(find.text(FuelType.all.displayName), findsNothing);
+      expect(find.text('Super 98'), findsWidgets);
+      expect(find.text('E85 Bioethanol'), findsWidgets);
+      expect(find.text('LPG'), findsWidgets);
+      // The wildcard is never an alert target. `localizedFuelName` falls
+      // back to FuelType.displayName for the synthetic `all`, so 'All'
+      // remains the right string to look for.
+      expect(find.text('All'), findsNothing);
+    });
+
+    testWidgets("renders fuel labels in the reader's language, not "
+        'displayName (#4295)', (tester) async {
+      await _openSheet(
+        tester,
+        stationId: 'fr-12345',
+        locale: const Locale('de'),
+      );
+
+      await tester.tap(find.byType(DropdownButtonFormField<FuelType>));
+      await tester.pumpAndSettle();
+
+      // FuelType.displayName is a French/English hybrid — 'GPL / LPG',
+      // 'E85 / Bioéthanol' — which every one of the 24 locales rendered
+      // before #4295. A German reader must get the German ARB strings.
+      expect(find.text('Autogas (LPG)'), findsWidgets);
+      expect(find.text('E85 Bioethanol'), findsWidgets);
+      // And the hybrids must be gone. This is the assertion that gives
+      // the findsNothing cases above their meaning: it proves those
+      // strings are absent because the fix landed, not because the test
+      // is looking for text no code path can produce.
+      expect(find.text('GPL / LPG'), findsNothing);
+      expect(find.text('E85 / Bioéthanol'), findsNothing);
     });
 
     testWidgets('an unprefixed legacy id falls back to the default (DE) set',
@@ -343,7 +377,7 @@ void main() {
 
       await tester.tap(find.byType(DropdownButtonFormField<FuelType>));
       await tester.pumpAndSettle();
-      expect(find.text(FuelType.lpg.displayName), findsNothing);
+      expect(find.text('LPG'), findsNothing);
     });
   });
 }

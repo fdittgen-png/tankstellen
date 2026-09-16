@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/utils/localized_fuel_name.dart';
 import '../../../../core/widgets/sheet_form_actions.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/fuel_type.dart';
@@ -83,7 +84,12 @@ class RadiusAlertFuelTypeField extends StatelessWidget {
         border: const OutlineInputBorder(),
       ),
       items: fuels
-          .map((t) => DropdownMenuItem(value: t, child: Text(t.displayName)))
+          .map(
+            (t) => DropdownMenuItem(
+              value: t,
+              child: Text(localizedFuelName(l10n, t)),
+            ),
+          )
           .toList(),
       onChanged: (v) {
         if (v != null) onChanged(v);
