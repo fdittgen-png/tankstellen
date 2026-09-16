@@ -35,7 +35,12 @@ void main() {
         'architecture-lint');
     expect(layerOf('test/features/x/presentation/y_test.dart'), 'widget');
     expect(layerOf('test/features/x/domain/y_test.dart'), 'domain');
+    // #4235 — a scan-ONLY file has nothing executable to trust.
     expect(actionFor('widget', const ['source-scan']), 'REPLACE');
+    // …but a residual scan beside real behaviour coverage is not the
+    // #4116 false-green risk; it is a cleanup, not a rewrite.
+    expect(actionFor('widget', const ['source-scan'], execAsserts: 12),
+        'KEEP+REFACTOR');
     expect(actionFor('architecture-lint', const ['source-scan']), 'KEEP');
     expect(actionFor('data', const ['real-sleep']), 'KEEP+REFACTOR');
     expect(actionFor('data', const ['flaky-tagged']), 'KEEP+REFACTOR');
@@ -57,6 +62,16 @@ void main() {
         r.path == 'test/features/map/tile_layer_consistency_test.dart');
     expect(guard.layer, 'architecture-lint');
     expect(guard.action, 'KEEP');
+  });
+
+  test('#4235 — no REPLACE row still has executable coverage', () {
+    // The whole point of the proportional rule: REPLACE must name files
+    // that prove the text and nothing else.
+    for (final r in rows.where((r) => r.action == 'REPLACE')) {
+      expect(r.execAsserts, 0,
+          reason: '${r.path} has ${r.execAsserts} executed assertions — it '
+              'is a cleanup (KEEP+REFACTOR), not a rewrite');
+    }
   });
 
   test('the snapshot has a table row per file', () {
