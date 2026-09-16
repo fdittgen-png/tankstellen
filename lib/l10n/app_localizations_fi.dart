@@ -127,6 +127,18 @@ class AppLocalizationsFi extends AppLocalizations {
   String get landingScreen => 'Aloitusnäyttö';
 
   @override
+  String get landingScreenFavorites => 'Suosikit';
+
+  @override
+  String get landingScreenMap => 'Kartta';
+
+  @override
+  String get landingScreenCheapest => 'Halvin lähellä';
+
+  @override
+  String get landingScreenNearest => 'Lähimmät huoltoasemat';
+
+  @override
   String get homeZip => 'Kotiosoitteen postinumero';
 
   @override

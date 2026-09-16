@@ -127,6 +127,18 @@ class AppLocalizationsEl extends AppLocalizations {
   String get landingScreen => 'Αρχική οθόνη';
 
   @override
+  String get landingScreenFavorites => 'Αγαπημένα';
+
+  @override
+  String get landingScreenMap => 'Χάρτης';
+
+  @override
+  String get landingScreenCheapest => 'Φθηνότερα κοντά';
+
+  @override
+  String get landingScreenNearest => 'Κοντινότερα πρατήρια';
+
+  @override
   String get homeZip => 'Τ.Κ. κατοικίας';
 
   @override

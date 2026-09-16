@@ -128,6 +128,18 @@ class AppLocalizationsHu extends AppLocalizations {
   String get landingScreen => 'Kezdőképernyő';
 
   @override
+  String get landingScreenFavorites => 'Kedvencek';
+
+  @override
+  String get landingScreenMap => 'Térkép';
+
+  @override
+  String get landingScreenCheapest => 'Legolcsóbb a közelben';
+
+  @override
+  String get landingScreenNearest => 'Legközelebbi benzinkutak';
+
+  @override
   String get homeZip => 'Otthoni irányítószám';
 
   @override

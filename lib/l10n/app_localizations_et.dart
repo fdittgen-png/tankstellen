@@ -127,6 +127,18 @@ class AppLocalizationsEt extends AppLocalizations {
   String get landingScreen => 'Avakuva';
 
   @override
+  String get landingScreenFavorites => 'Lemmikud';
+
+  @override
+  String get landingScreenMap => 'Kaart';
+
+  @override
+  String get landingScreenCheapest => 'Odavaim läheduses';
+
+  @override
+  String get landingScreenNearest => 'Lähimad tanklad';
+
+  @override
   String get homeZip => 'Kodu postiindeks';
 
   @override

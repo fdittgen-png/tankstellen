@@ -52,6 +52,22 @@
   "preferredFuel": "Preferred fuel",
   "defaultRadius": "Default radius",
   "landingScreen": "Start screen",
+  "landingScreenFavorites": "Favorites",
+  "@landingScreenFavorites": {
+    "description": "Start-screen option: Favorites (#4269)"
+  },
+  "landingScreenMap": "Map",
+  "@landingScreenMap": {
+    "description": "Start-screen option: Map (#4269)"
+  },
+  "landingScreenCheapest": "Cheapest nearby",
+  "@landingScreenCheapest": {
+    "description": "Start-screen option: Cheapest nearby (#4269)"
+  },
+  "landingScreenNearest": "Nearest stations",
+  "@landingScreenNearest": {
+    "description": "Start-screen option: Nearest stations (#4269)"
+  },
   "homeZip": "Home postal code",
   "newProfile": "New profile",
   "editProfile": "Edit profile",

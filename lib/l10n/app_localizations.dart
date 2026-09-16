@@ -369,6 +369,30 @@ abstract class AppLocalizations {
   /// **'Start screen'**
   String get landingScreen;
 
+  /// Start-screen option: Favorites (#4269)
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get landingScreenFavorites;
+
+  /// Start-screen option: Map (#4269)
+  ///
+  /// In en, this message translates to:
+  /// **'Map'**
+  String get landingScreenMap;
+
+  /// Start-screen option: Cheapest nearby (#4269)
+  ///
+  /// In en, this message translates to:
+  /// **'Cheapest nearby'**
+  String get landingScreenCheapest;
+
+  /// Start-screen option: Nearest stations (#4269)
+  ///
+  /// In en, this message translates to:
+  /// **'Nearest stations'**
+  String get landingScreenNearest;
+
   /// No description provided for @homeZip.
   ///
   /// In en, this message translates to:

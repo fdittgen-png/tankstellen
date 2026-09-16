@@ -127,6 +127,18 @@ class AppLocalizationsBg extends AppLocalizations {
   String get landingScreen => 'Начален екран';
 
   @override
+  String get landingScreenFavorites => 'Любими';
+
+  @override
+  String get landingScreenMap => 'Карта';
+
+  @override
+  String get landingScreenCheapest => 'Най-евтините наблизо';
+
+  @override
+  String get landingScreenNearest => 'Най-близките бензиностанции';
+
+  @override
   String get homeZip => 'Домашен пощенски код';
 
   @override

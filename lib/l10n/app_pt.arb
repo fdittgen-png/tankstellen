@@ -7259,5 +7259,21 @@
   "@homeSavingsTitle": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "landingScreenFavorites": "Favoritos",
+  "@landingScreenFavorites": {
+    "description": "MT — needs native review"
+  },
+  "landingScreenMap": "Mapa",
+  "@landingScreenMap": {
+    "description": "MT — needs native review"
+  },
+  "landingScreenCheapest": "Mais barato perto",
+  "@landingScreenCheapest": {
+    "description": "MT — needs native review"
+  },
+  "landingScreenNearest": "Postos mais próximos",
+  "@landingScreenNearest": {
+    "description": "MT — needs native review"
   }
 }

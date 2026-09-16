@@ -7751,5 +7751,21 @@
   "@homeSavingsTitle": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "landingScreenFavorites": "Favorieten",
+  "@landingScreenFavorites": {
+    "description": "MT — needs native review"
+  },
+  "landingScreenMap": "Kaart",
+  "@landingScreenMap": {
+    "description": "MT — needs native review"
+  },
+  "landingScreenCheapest": "Goedkoopste in de buurt",
+  "@landingScreenCheapest": {
+    "description": "MT — needs native review"
+  },
+  "landingScreenNearest": "Dichtstbijzijnde tankstations",
+  "@landingScreenNearest": {
+    "description": "MT — needs native review"
   }
 }

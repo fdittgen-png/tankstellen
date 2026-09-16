@@ -7751,5 +7751,21 @@
   "@homeSavingsTitle": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "landingScreenFavorites": "Kedvencek",
+  "@landingScreenFavorites": {
+    "description": "MT — needs native review"
+  },
+  "landingScreenMap": "Térkép",
+  "@landingScreenMap": {
+    "description": "MT — needs native review"
+  },
+  "landingScreenCheapest": "Legolcsóbb a közelben",
+  "@landingScreenCheapest": {
+    "description": "MT — needs native review"
+  },
+  "landingScreenNearest": "Legközelebbi benzinkutak",
+  "@landingScreenNearest": {
+    "description": "MT — needs native review"
   }
 }

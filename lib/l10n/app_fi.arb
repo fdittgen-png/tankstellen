@@ -7751,5 +7751,21 @@
   "@homeSavingsTitle": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "landingScreenFavorites": "Suosikit",
+  "@landingScreenFavorites": {
+    "description": "MT — needs native review"
+  },
+  "landingScreenMap": "Kartta",
+  "@landingScreenMap": {
+    "description": "MT — needs native review"
+  },
+  "landingScreenCheapest": "Halvin lähellä",
+  "@landingScreenCheapest": {
+    "description": "MT — needs native review"
+  },
+  "landingScreenNearest": "Lähimmät huoltoasemat",
+  "@landingScreenNearest": {
+    "description": "MT — needs native review"
   }
 }

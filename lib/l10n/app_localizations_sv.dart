@@ -127,6 +127,18 @@ class AppLocalizationsSv extends AppLocalizations {
   String get landingScreen => 'Startskärm';
 
   @override
+  String get landingScreenFavorites => 'Favoriter';
+
+  @override
+  String get landingScreenMap => 'Karta';
+
+  @override
+  String get landingScreenCheapest => 'Billigast i närheten';
+
+  @override
+  String get landingScreenNearest => 'Närmaste bensinstationer';
+
+  @override
   String get homeZip => 'Hempostnummer';
 
   @override

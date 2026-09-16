@@ -127,6 +127,18 @@ class AppLocalizationsPl extends AppLocalizations {
   String get landingScreen => 'Ekran startowy';
 
   @override
+  String get landingScreenFavorites => 'Ulubione';
+
+  @override
+  String get landingScreenMap => 'Mapa';
+
+  @override
+  String get landingScreenCheapest => 'Najtańsze w pobliżu';
+
+  @override
+  String get landingScreenNearest => 'Najbliższe stacje paliw';
+
+  @override
   String get homeZip => 'Kod pocztowy domu';
 
   @override

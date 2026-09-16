@@ -7259,5 +7259,21 @@
   "@homeSavingsTitle": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "landingScreenFavorites": "Preferiti",
+  "@landingScreenFavorites": {
+    "description": "MT — needs native review"
+  },
+  "landingScreenMap": "Mappa",
+  "@landingScreenMap": {
+    "description": "MT — needs native review"
+  },
+  "landingScreenCheapest": "Più economico nelle vicinanze",
+  "@landingScreenCheapest": {
+    "description": "MT — needs native review"
+  },
+  "landingScreenNearest": "Stazioni più vicine",
+  "@landingScreenNearest": {
+    "description": "MT — needs native review"
   }
 }

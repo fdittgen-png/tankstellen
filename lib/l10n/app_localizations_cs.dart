@@ -127,6 +127,18 @@ class AppLocalizationsCs extends AppLocalizations {
   String get landingScreen => 'Úvodní obrazovka';
 
   @override
+  String get landingScreenFavorites => 'Oblíbené';
+
+  @override
+  String get landingScreenMap => 'Mapa';
+
+  @override
+  String get landingScreenCheapest => 'Nejlevnější v okolí';
+
+  @override
+  String get landingScreenNearest => 'Nejbližší čerpací stanice';
+
+  @override
   String get homeZip => 'PSČ domova';
 
   @override

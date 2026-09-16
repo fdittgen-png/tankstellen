@@ -3,6 +3,8 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
+import '../../../../core/logging/app_log.dart';
+import '../../../../core/logging/error_logger.dart';
 import '../../../../core/data/storage_repository.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/domain/fuel_type.dart';
@@ -48,6 +50,12 @@ class ProfileRepository {
     return data;
   }
 
+  /// [activateIfNone] — when no profile is active yet, the created one
+  /// becomes active. That is right for first-run onboarding and wrong for
+  /// every automatic country setup: a route- or location-created profile
+  /// must never become the user's active country just because none was set
+  /// (#4268, Epic #4257 §C). Defaults to today's behaviour so onboarding is
+  /// unchanged; automatic creators pass `false`.
   Future<UserProfile> createProfile({
     required String name,
     FuelType preferredFuelType = FuelType.e10,
@@ -56,6 +64,7 @@ class ProfileRepository {
     String? homeZipCode,
     String? countryCode,
     String? languageCode,
+    bool activateIfNone = true,
   }) async {
     final profile = UserProfile(
       id: _uuid.v4(),
@@ -69,8 +78,9 @@ class ProfileRepository {
     );
     await _storage.saveProfile(profile.id, profile.toJson());
 
-    // If this is the first profile, make it active
-    if (_storage.getActiveProfileId() == null) {
+    // If this is the first profile, make it active — unless the caller
+    // explicitly declined (#4268).
+    if (activateIfNone && _storage.getActiveProfileId() == null) {
       await _storage.setActiveProfileId(profile.id);
     }
     return profile;
@@ -96,14 +106,49 @@ class ProfileRepository {
     );
   }
 
+  /// Delete [id]; when it was the active profile, hand the active context
+  /// to a **deterministically chosen** survivor.
+  ///
+  /// #4267 — this used `remaining.first` over `getAllProfiles()`, which is
+  /// an unordered Hive map read. The active profile is the country context
+  /// for nearby search and every country-scoped feature, so deleting it
+  /// moved the user to an arbitrary country that could differ between two
+  /// devices holding the same data.
+  ///
+  /// `UserProfile` carries no "last used" or modified timestamp, so the
+  /// rule has to come from the data itself: order by country code, then
+  /// name, then id — all three so the comparison is total and cannot fall
+  /// back to storage order on a tie. Profiles with a country sort ahead of
+  /// profiles without one, since a country-less profile gives the user no
+  /// country context at all.
+  ///
+  /// Telling the user which country became active is presentation work and
+  /// belongs to #4265; this only makes the choice stable and explainable.
   Future<void> deleteProfile(String id) async {
     await _storage.deleteProfile(id);
-    if (_storage.getActiveProfileId() == id) {
-      final remaining = getAllProfiles();
-      if (remaining.isNotEmpty) {
-        await _storage.setActiveProfileId(remaining.first.id);
-      }
-    }
+    if (_storage.getActiveProfileId() != id) return;
+
+    final remaining = getAllProfiles();
+    if (remaining.isEmpty) return;
+    await _storage.setActiveProfileId(_nextActiveAfterDeletion(remaining).id);
+  }
+
+  /// The deterministic successor for the active slot (#4267). Pure and
+  /// order-independent: the same set of profiles always yields the same
+  /// winner, whatever order storage returned them in.
+  UserProfile _nextActiveAfterDeletion(List<UserProfile> candidates) {
+    final sorted = [...candidates]..sort((a, b) {
+      final ac = a.countryCode ?? '';
+      final bc = b.countryCode ?? '';
+      // A profile bound to a country outranks one with no country.
+      if (ac.isEmpty != bc.isEmpty) return ac.isEmpty ? 1 : -1;
+      final byCountry = ac.compareTo(bc);
+      if (byCountry != 0) return byCountry;
+      final byName = a.name.compareTo(b.name);
+      if (byName != 0) return byName;
+      return a.id.compareTo(b.id);
+    });
+    return sorted.first;
   }
 
   Future<void> setActiveProfile(String id) async {
@@ -185,4 +230,172 @@ class ProfileRepository {
     }
     return cleared;
   }
+
+  /// #4259 — a country profile derived from [source] as a template.
+  ///
+  /// [createProfile] accepts 7 of `UserProfile`'s ~28 fields, so cloning
+  /// through it would silently reset the rest to defaults: route segment
+  /// length, detour budget, saving threshold, top-N and criterion,
+  /// amenities, default vehicle, hybrid choice, approach radius/mode/poll,
+  /// widget colour/variant, favourites, rating mode and auto-update. This
+  /// clones with `copyWith` instead, so every country-independent setting
+  /// carries over — and a field added to `UserProfile` later is carried
+  /// automatically rather than being forgotten at a hand-written mapping.
+  ///
+  /// Only the country-specific context changes: a fresh [id], the target
+  /// [countryCode], the [fuel] resolved for that country (see
+  /// `CountryFuelCapability`, #4258) and a [name]. `languageCode` is kept
+  /// from [source] — the UI language is the user's choice, not a property
+  /// of the country being added.
+  ///
+  /// Pure: builds the model, writes nothing. The caller persists it (see
+  /// [createMissingCountryProfiles]) so a batch stays atomic-ish and
+  /// testable.
+  UserProfile cloneProfileForCountry({
+    required UserProfile source,
+    required String countryCode,
+    required FuelType fuel,
+    required String name,
+  }) {
+    return source.copyWith(
+      id: _uuid.v4(),
+      name: name,
+      countryCode: countryCode,
+      preferredFuelType: fuel,
+    );
+  }
+
+  /// #4259 — create the missing country profiles in [proposals], skipping
+  /// any country that is already taken.
+  ///
+  /// Idempotent by re-reading occupancy immediately before each write, so a
+  /// double tap, a retry, or a concurrent profile creation cannot produce a
+  /// duplicate country. Never depends on storage order.
+  ///
+  /// **The active profile is never touched.** [createProfile] activates
+  /// whatever it creates when no active id is set (#4268), which on a fresh
+  /// install whose first action is a cross-border route search would hand
+  /// the active country to a route-created profile — forbidden without
+  /// exception by Epic #4257 §C. This path therefore does NOT go through
+  /// [createProfile]: it builds the model itself and persists it with
+  /// [updateProfile], a plain keyed write that has no activation side
+  /// effect. The captured/restored id below is a backstop that asserts the
+  /// invariant rather than the thing that provides it.
+  ///
+  /// One country's failure does not abort the batch: each is reported
+  /// separately so the caller can offer "Retry Italy" rather than an
+  /// all-or-nothing error (#4257 §7).
+  Future<CountryProfileBatchResult> createMissingCountryProfiles(
+    List<CountryProfileProposal> proposals,
+  ) async {
+    final activeIdBefore = _storage.getActiveProfileId();
+    final created = <UserProfile>[];
+    final skipped = <String>[];
+    final failed = <String, Object>{};
+
+    for (final proposal in proposals) {
+      final code = proposal.countryCode;
+      try {
+        // Re-check occupancy per write, not once up front: an earlier
+        // proposal in this same batch, another isolate, or a retry may
+        // have taken the country since the proposals were computed.
+        if (isCountryTaken(code)) {
+          skipped.add(code);
+          continue;
+        }
+        final profile = cloneProfileForCountry(
+          source: proposal.source,
+          countryCode: code,
+          fuel: proposal.fuel,
+          name: proposal.name,
+        );
+        await updateProfile(profile);
+        created.add(profile);
+      } catch (e, st) {
+        // #1103 — a failure reported to the user as "Retry Italy" is
+        // useless if it cannot be diagnosed, so the stack trace goes to
+        // the error log (through the ADR 0021 facade) while the error
+        // itself goes back to the caller for the retry UI. The context is
+        // deliberately non-const: which country failed is the whole point.
+        log.error(e, st, layer: ErrorLayer.storage, context: {
+          'where': 'ProfileRepository.createMissingCountryProfiles',
+          'country': code,
+        });
+        failed[code] = e;
+      }
+    }
+
+    // Restore the active pointer if a write moved it (#4268). Only
+    // meaningful when there WAS one — a device with no active profile
+    // keeps none, so nothing is activated behind the user's back.
+    if (activeIdBefore != null &&
+        _storage.getActiveProfileId() != activeIdBefore) {
+      await _storage.setActiveProfileId(activeIdBefore);
+    }
+
+    return CountryProfileBatchResult(
+      created: created,
+      skipped: skipped,
+      failed: failed,
+    );
+  }
+}
+
+/// #4259 — one country to be set up, resolved before any UI is shown.
+///
+/// [fuel] comes from `CountryFuelCapability.resolveForCountry` (#4258); a
+/// country with no valid fuel never becomes a proposal, so this type
+/// cannot represent an unusable suggestion.
+class CountryProfileProposal {
+  const CountryProfileProposal({
+    required this.source,
+    required this.countryCode,
+    required this.fuel,
+    required this.name,
+  });
+
+  /// The profile used as a template — normally the active one.
+  final UserProfile source;
+
+  /// Upper-case ISO 3166-1 alpha-2 code of the country to add.
+  final String countryCode;
+
+  /// The grade resolved for [countryCode] (#4258).
+  final FuelType fuel;
+
+  /// Display name to persist. Derived by the caller from the localized
+  /// country name so the user never has to invent one (#4263).
+  final String name;
+}
+
+/// #4259 — the outcome of [ProfileRepository.createMissingCountryProfiles].
+///
+/// Three outcomes are reported separately because the UX needs them
+/// separately: "Spain added / Italy couldn't be set up right now /
+/// [Retry Italy]" (#4257 §7). A partially-failed batch must never render
+/// as "Done".
+class CountryProfileBatchResult {
+  const CountryProfileBatchResult({
+    required this.created,
+    required this.skipped,
+    required this.failed,
+  });
+
+  /// Profiles written by this call.
+  final List<UserProfile> created;
+
+  /// Country codes that already had a profile — a safe no-op, not an error.
+  final List<String> skipped;
+
+  /// Country code → the error that stopped it. Retry targets exactly these.
+  final Map<String, Object> failed;
+
+  /// Whether every proposal resolved to a profile (created or already
+  /// present). False means the caller must offer a retry rather than
+  /// reporting success.
+  bool get isComplete => failed.isEmpty;
+
+  /// Whether anything was actually written — the signal to refresh profile
+  /// state and rerun the pending search (#4260).
+  bool get hasChanges => created.isNotEmpty;
 }

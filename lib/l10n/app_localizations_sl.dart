@@ -127,6 +127,18 @@ class AppLocalizationsSl extends AppLocalizations {
   String get landingScreen => 'Začetni zaslon';
 
   @override
+  String get landingScreenFavorites => 'Favorites';
+
+  @override
+  String get landingScreenMap => 'Map';
+
+  @override
+  String get landingScreenCheapest => 'Cheapest nearby';
+
+  @override
+  String get landingScreenNearest => 'Nearest stations';
+
+  @override
   String get homeZip => 'Domača poštna številka';
 
   @override

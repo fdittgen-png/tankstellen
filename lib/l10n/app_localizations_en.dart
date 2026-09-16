@@ -127,6 +127,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get landingScreen => 'Start screen';
 
   @override
+  String get landingScreenFavorites => 'Favorites';
+
+  @override
+  String get landingScreenMap => 'Map';
+
+  @override
+  String get landingScreenCheapest => 'Cheapest nearby';
+
+  @override
+  String get landingScreenNearest => 'Nearest stations';
+
+  @override
   String get homeZip => 'Home postal code';
 
   @override
@@ -9733,6 +9745,18 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get landingScreen => '⟦Šŧářŧ šçřééñ ·····⟧';
+
+  @override
+  String get landingScreenFavorites => '⟦Ƒáṽóřîŧéš ····⟧';
+
+  @override
+  String get landingScreenMap => '⟦Ṁáƥ ·⟧';
+
+  @override
+  String get landingScreenCheapest => '⟦Çĥéáƥéšŧ ñéářƀý ······⟧';
+
+  @override
+  String get landingScreenNearest => '⟦Ñéářéšŧ šŧáŧîóñš ·······⟧';
 
   @override
   String get homeZip => '⟦Ĥóɱé ƥóšŧáł çóđé ······⟧';

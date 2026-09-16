@@ -5,11 +5,12 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/user_profile.dart';
+import '../landing_screen_l10n.dart';
 
 /// Dropdown for picking the user's preferred [LandingScreen] (the screen
 /// that opens when the app is launched). Filters out [LandingScreen.map]
 /// because the map is not a valid landing destination, and labels every
-/// option using [LandingScreen.localizedName] in the active locale.
+/// option through [LandingScreenL10n.label] (#4269).
 ///
 /// Pulled out of `profile_edit_sheet.dart` so the sheet's `build` method
 /// drops 20 lines and so the filter + localization can be exercised by
@@ -27,7 +28,6 @@ class ProfileLandingScreenDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final languageCode = Localizations.localeOf(context).languageCode;
     return DropdownButtonFormField<LandingScreen>(
       initialValue: value,
       decoration: InputDecoration(
@@ -39,7 +39,7 @@ class ProfileLandingScreenDropdown extends StatelessWidget {
           .map(
             (s) => DropdownMenuItem(
               value: s,
-              child: Text(s.localizedName(languageCode)),
+              child: Text(s.label(l10n)),
             ),
           )
           .toList(),

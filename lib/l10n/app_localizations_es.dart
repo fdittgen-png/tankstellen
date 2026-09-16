@@ -128,6 +128,18 @@ class AppLocalizationsEs extends AppLocalizations {
   String get landingScreen => 'Pantalla de inicio';
 
   @override
+  String get landingScreenFavorites => 'Favoritos';
+
+  @override
+  String get landingScreenMap => 'Mapa';
+
+  @override
+  String get landingScreenCheapest => 'Más barato cerca';
+
+  @override
+  String get landingScreenNearest => 'Estaciones más cercanas';
+
+  @override
   String get homeZip => 'Código postal de casa';
 
   @override

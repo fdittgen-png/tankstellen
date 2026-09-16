@@ -16,6 +16,7 @@ library;
 
 export 'data/repositories/profile_repository.dart';
 export 'domain/entities/user_profile.dart';
+export 'presentation/landing_screen_l10n.dart';
 export 'presentation/screens/developer_tools/developer_tools_screen.dart';
 export 'presentation/screens/developer_tools/error_log_viewer_screen.dart';
 export 'presentation/screens/developer_tools/feature_flag_dump_screen.dart';
