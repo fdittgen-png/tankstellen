@@ -20,6 +20,7 @@ import 'price_history_stats_row.dart';
 import '../../../../core/theme/app_text.dart';
 import '../../../../core/widgets/panel_card.dart';
 import '../../../price_history/presentation/widgets/fill_up_guidance_card.dart';
+import '../../../../core/utils/localized_fuel_name.dart';
 
 /// Price history block of the station-detail screen — records the
 /// current price on init, then renders one of THREE honest states
@@ -235,7 +236,8 @@ class _PriceHistorySectionState extends ConsumerState<PriceHistorySection> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(fuel.displayName, style: AppText.title(context)),
+            Text(localizedFuelName(AppLocalizations.of(context), fuel),
+                style: AppText.title(context)),
             const SizedBox(height: 12),
             PriceChart(records: history, fuelType: fuel),
             const SizedBox(height: 8),

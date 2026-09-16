@@ -15,6 +15,7 @@ import '../../domain/services/tank_level_estimator.dart';
 import '../../providers/tank_level_provider.dart';
 import '../../providers/tank_mix_provider.dart';
 import '../../../trips/api.dart';
+import '../../../../core/utils/localized_fuel_name.dart';
 
 /// Tank-level card on the Fuel tab (#1195) — the Carburant tab's
 /// **primary card** since #3950 (Epic #3947).
@@ -241,7 +242,7 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
     final parts = [
       for (final s in mix.shares)
         if (s.share >= 0.01)
-          '${s.fuel.displayName} ${(s.share * 100).round()} %',
+          '${localizedFuelName(l, s.fuel)} ${(s.share * 100).round()} %',
     ].join(' · ');
     return l.tankMixCaption(parts);
   }

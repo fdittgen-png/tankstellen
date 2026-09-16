@@ -12,6 +12,7 @@ import '../../domain/entities/user_profile.dart';
 import '../../providers/profile_provider.dart';
 import '../landing_screen_l10n.dart';
 import 'profile_edit_sheet.dart';
+import '../../../../core/utils/localized_fuel_name.dart';
 
 class ProfileListSection extends ConsumerWidget {
   const ProfileListSection({super.key});
@@ -43,7 +44,7 @@ class ProfileListSection extends ConsumerWidget {
               title: Text(profile.name),
               subtitle: Text(
                 '${profile.countryCode != null ? (Countries.byCode(profile.countryCode!)?.flag ?? "") : ""} '
-                '${profile.preferredFuelType.displayName} | '
+                '${localizedFuelName(AppLocalizations.of(context), profile.preferredFuelType)} | '
                 '${profile.defaultSearchRadius.round()} km | '
                 '${profile.landingScreen.label(AppLocalizations.of(context))}',
               ),

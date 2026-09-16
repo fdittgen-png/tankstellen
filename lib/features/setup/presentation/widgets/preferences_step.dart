@@ -8,6 +8,7 @@ import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../providers/onboarding_wizard_provider.dart';
+import '../../../../core/utils/localized_fuel_name.dart';
 
 /// Onboarding step for setting default zip code, search radius, and fuel type.
 class PreferencesStep extends ConsumerStatefulWidget {
@@ -147,7 +148,7 @@ class _PreferencesStepState extends ConsumerState<PreferencesStep> {
                               final selected =
                                   activeFuel.runtimeType == fuel.runtimeType;
                               return ChoiceChip(
-                                label: Text(fuel.displayName),
+                                label: Text(localizedFuelName(l10n, fuel)),
                                 selected: selected,
                                 onSelected: locked
                                     ? null

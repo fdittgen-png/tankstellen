@@ -69,6 +69,10 @@ List<BadScanDiffRow> buildBadScanDiffRows({
     ),
     BadScanDiffRow(
       l.badScanReportFieldFuel,
+      // #4283 — deliberately NOT localized. This is the diagnostic diff
+      // table a bad-scan report attaches for a human triaging OCR, the
+      // same reasoning as the ISO date below: the READER needs a stable
+      // value, not one that changes with the reporter's locale.
       p.fuelType?.displayName ?? _kMissing,
       _kMissing,
     ),

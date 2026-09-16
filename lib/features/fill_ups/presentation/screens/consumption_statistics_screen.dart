@@ -24,7 +24,7 @@ import '../../domain/services/fill_up_monthly_stats_aggregator.dart';
 import '../../providers/monthly_fuel_stats_provider.dart';
 import '../widgets/consumption_stat_tile.dart';
 import '../widgets/fuel_type_efficiency_card.dart';
-import '../widgets/localized_fuel_name.dart';
+import '../../../../core/utils/localized_fuel_name.dart';
 import '../widgets/monthly_fuel_charts.dart';
 import '../widgets/monthly_fuel_comparison_card.dart';
 import '../../../../core/utils/unit_formatter.dart';

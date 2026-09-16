@@ -75,14 +75,14 @@ void main() {
       );
 
       expect(find.text('E85'), findsOneWidget);
-      expect(find.byTooltip('Fuel: E85 / Bioéthanol'), findsOneWidget);
+      expect(find.byTooltip('Fuel: E85 Bioethanol'), findsOneWidget);
       expect(find.byTooltip('Within 10 km'), findsOneWidget);
 
       // The whole band is one tappable semantics node, so the pills'
       // sentences are announced as part of it — the words the pills
       // stopped showing are still read out.
       expect(
-        find.bySemanticsLabel(RegExp(r'Fuel: E85 / Bioéthanol')),
+        find.bySemanticsLabel(RegExp(r'Fuel: E85 Bioethanol')),
         findsOneWidget,
       );
       expect(find.bySemanticsLabel(RegExp(r'Within 10 km')), findsOneWidget);

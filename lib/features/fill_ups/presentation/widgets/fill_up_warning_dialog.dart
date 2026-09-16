@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../domain/add_fill_up_warnings.dart';
+import '../../../../core/utils/localized_fuel_name.dart';
 
 /// Shows the "Check this fill-up" confirmation dialog (#2836) listing the
 /// pending [warnings] and asking the user to fix or save anyway.
@@ -31,8 +32,8 @@ Future<bool> showFillUpWarningDialog({
     for (final w in warnings)
       switch (w) {
         FillUpWarning.fuelEngineMismatch => l.fillUpWarningFuelMismatch(
-          chosenFuel.displayName,
-          vehicleFuel?.displayName ?? chosenFuel.displayName,
+          localizedFuelName(l, chosenFuel),
+          localizedFuelName(l, vehicleFuel ?? chosenFuel),
         ),
         FillUpWarning.odometerBelowPrevious =>
           l.fillUpWarningOdometerBelowPrevious(

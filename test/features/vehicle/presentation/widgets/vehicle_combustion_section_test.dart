@@ -7,6 +7,8 @@ import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/features/vehicle/presentation/widgets/vehicle_combustion_section.dart';
 
 import '../../../../helpers/pump_app.dart';
+import 'package:tankstellen/core/utils/localized_fuel_name.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Rejects empty/non-numeric input — matches the shape of the real
 /// validator the EditVehicleScreen hands down.
@@ -127,7 +129,9 @@ void main() {
 
         await tester.tap(find.byType(DropdownButtonFormField<FuelType?>));
         await tester.pumpAndSettle();
-        await tester.tap(find.text(FuelType.diesel.displayName).last);
+        final l10n = AppLocalizations.of(
+            tester.element(find.byType(DropdownButtonFormField<FuelType?>)));
+        await tester.tap(find.text(localizedFuelName(l10n, FuelType.diesel)).last);
         await tester.pumpAndSettle();
 
         expect(changed, equals(FuelType.diesel));
@@ -165,8 +169,10 @@ void main() {
         // Open the dropdown.
         await tester.tap(find.byType(DropdownButtonFormField<FuelType?>));
         await tester.pumpAndSettle();
+        final l10n = AppLocalizations.of(
+            tester.element(find.byType(DropdownButtonFormField<FuelType?>)));
         // Pick "Diesel" (displayName from the shared dropdown, #713).
-        await tester.tap(find.text(FuelType.diesel.displayName).last);
+        await tester.tap(find.text(localizedFuelName(l10n, FuelType.diesel)).last);
         await tester.pumpAndSettle();
 
         expect(fuel.text, FuelType.diesel.apiValue,
@@ -227,6 +233,8 @@ void main() {
 
         await tester.tap(find.byType(DropdownButtonFormField<FuelType?>));
         await tester.pumpAndSettle();
+        final l10n = AppLocalizations.of(
+            tester.element(find.byType(DropdownButtonFormField<FuelType?>)));
 
         for (final f in [
           FuelType.e5,
@@ -238,10 +246,10 @@ void main() {
           FuelType.lpg,
           FuelType.cng,
         ]) {
-          expect(find.text(f.displayName), findsWidgets,
-              reason: '${f.displayName} must appear as an option');
+          expect(find.text(localizedFuelName(l10n, f)), findsWidgets,
+              reason: '${localizedFuelName(l10n, f)} must appear as an option');
         }
-        expect(find.text(FuelType.electric.displayName), findsNothing,
+        expect(find.text(localizedFuelName(l10n, FuelType.electric)), findsNothing,
             reason: 'Electric is configured via the EV section, not here');
         expect(find.text(FuelType.all.displayName), findsNothing,
             reason: 'The synthetic "all" sentinel must not be pickable');
