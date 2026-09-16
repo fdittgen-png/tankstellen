@@ -1082,6 +1082,11 @@ class AppLocalizationsDa extends AppLocalizations {
   String get deleteProfileConfirm => 'Delete profile';
 
   @override
+  String activeCountryChangedTo(String country) {
+    return 'Aktivt land er nu $country';
+  }
+
+  @override
   String get errorNetwork => 'Network error. Check your connection.';
 
   @override

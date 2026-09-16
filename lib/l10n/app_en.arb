@@ -712,6 +712,16 @@
   "deleteProfileTitle": "Delete profile?",
   "deleteProfileBody": "This profile and its settings will be permanently deleted. This cannot be undone.",
   "deleteProfileConfirm": "Delete profile",
+  "activeCountryChangedTo": "Active country is now {country}",
+  "@activeCountryChangedTo": {
+    "description": "Snackbar after deleting the ACTIVE country profile, naming the country that took over the active context (#4280/#4267).",
+    "placeholders": {
+      "country": {
+        "type": "String",
+        "example": "France"
+      }
+    }
+  },
   "errorNetwork": "Network error. Check your connection.",
   "errorServer": "Server error. Please try again later.",
   "aboutVersionLine": "Version {version}",

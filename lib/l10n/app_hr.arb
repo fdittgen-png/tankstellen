@@ -7767,5 +7767,16 @@
   "landingScreenNearest": "Najbliže benzinske postaje",
   "@landingScreenNearest": {
     "description": "MT — needs native review"
+  },
+  "activeCountryChangedTo": "Active country is now {country}",
+  "@activeCountryChangedTo": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "country": {
+        "type": "String",
+        "example": "France"
+      }
+    }
   }
 }

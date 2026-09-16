@@ -2031,6 +2031,12 @@ abstract class AppLocalizations {
   /// **'Delete profile'**
   String get deleteProfileConfirm;
 
+  /// Snackbar after deleting the ACTIVE country profile, naming the country that took over the active context (#4280/#4267).
+  ///
+  /// In en, this message translates to:
+  /// **'Active country is now {country}'**
+  String activeCountryChangedTo(String country);
+
   /// No description provided for @errorNetwork.
   ///
   /// In en, this message translates to:
