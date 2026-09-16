@@ -9,6 +9,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/station.dart';
 import 'proximity_fill_bar.dart';
+import '../../../../core/utils/localized_fuel_name.dart';
 
 /// The huge-price PiP layout for the Fuel Station Radar (#2084 / #2601 /
 /// #2661). Extracted from `trip_recording_pip_view.dart` so that file stays
@@ -64,7 +65,7 @@ class TripRecordingPipPriceLayout extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final price = station.priceFor(fuel);
     final priceText = price != null ? PriceFormatter.formatPrice(price) : '—';
-    final fuelLabel = fuel.displayName;
+    final fuelLabel = localizedFuelName(l, fuel);
     final distance = distanceMeters;
 
     // #3258 — SSoT unit-aware distance (GB → miles, sub-km → metres/yards),

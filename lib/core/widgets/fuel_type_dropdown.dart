@@ -7,8 +7,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../domain/fuel_type.dart';
 import '../../l10n/app_localizations.dart';
 import '../country/fuel_type_picker_provider.dart';
+import '../utils/localized_fuel_name.dart';
 
-/// Shared dropdown for picking a [FuelType]. Uses [FuelType.displayName]
+/// Shared dropdown for picking a [FuelType]. Uses [localizedFuelName]
 /// for labels (e.g. "Super E10", "E85 / Bioéthanol", "Electric ⚡") so
 /// every surface — profile, vehicle, fill-up — shows the same polished
 /// list. Filters out [FuelType.all] (a search wildcard, not a preference).
@@ -55,7 +56,8 @@ class FuelTypeDropdown extends ConsumerWidget {
         prefixIcon: prefixIcon,
       ),
       items: items
-          .map((t) => DropdownMenuItem(value: t, child: Text(t.displayName)))
+          .map((t) => DropdownMenuItem(
+                value: t, child: Text(localizedFuelName(l10n, t))))
           .toList(),
       onChanged: (v) {
         if (v != null) onChanged(v);
@@ -114,7 +116,8 @@ class NullableFuelTypeDropdown extends ConsumerWidget {
         ),
         ...items.map(
           (t) =>
-              DropdownMenuItem<FuelType?>(value: t, child: Text(t.displayName)),
+              DropdownMenuItem<FuelType?>(
+                  value: t, child: Text(localizedFuelName(l10n, t))),
         ),
       ],
       onChanged: onChanged,

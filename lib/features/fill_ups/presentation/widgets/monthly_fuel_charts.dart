@@ -14,7 +14,7 @@ import '../../../../core/theme/fuel_colors.dart';
 import '../../../carbon/domain/monthly_summary.dart';
 import '../../../carbon/presentation/widgets/monthly_bar_chart.dart';
 import '../../domain/services/fill_up_monthly_stats_aggregator.dart';
-import 'localized_fuel_name.dart';
+import '../../../../core/utils/localized_fuel_name.dart';
 import 'monthly_metric_chart.dart';
 
 /// Monthly evolution for the consumption-statistics page (#2698, #4175).

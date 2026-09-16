@@ -12,7 +12,7 @@ import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../domain/entities/fuel_type_efficiency_stats.dart';
 import '../../domain/services/fuel_type_efficiency_aggregator.dart';
 import '../../providers/fuel_type_efficiency_provider.dart';
-import 'localized_fuel_name.dart';
+import '../../../../core/utils/localized_fuel_name.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../core/widgets/metric_delta_arrow.dart';
 

@@ -41,7 +41,7 @@ void main() {
       expect(find.text('Super E5'), findsOneWidget);
       expect(find.text('Super E10'), findsOneWidget);
       expect(find.text('Diesel'), findsOneWidget);
-      expect(find.text('Electric \u26a1'), findsOneWidget);
+      expect(find.text('Electric'), findsOneWidget);
       expect(find.text('All'), findsOneWidget);
     });
 
@@ -65,8 +65,8 @@ void main() {
       expect(find.text('Super E5'), findsOneWidget);
       expect(find.text('Super 98'), findsOneWidget);
       expect(find.text('Diesel'), findsOneWidget);
-      expect(find.text('E85 / Bio\u00e9thanol'), findsOneWidget);
-      expect(find.text('GPL / LPG'), findsOneWidget);
+      expect(find.text('E85 Bioethanol'), findsOneWidget);
+      expect(find.text('LPG'), findsOneWidget);
     });
 
     testWidgets('current selection is highlighted via ChoiceChip', (tester) async {
@@ -116,7 +116,7 @@ void main() {
       );
 
       final chips = tester.widgetList<ChoiceChip>(find.byType(ChoiceChip));
-      expect((chips.first.label as Text).data, 'E85 / Bioéthanol');
+      expect((chips.first.label as Text).data, 'E85 Bioethanol');
       expect(chips.first.selected, isTrue);
       // Its chip is laid out on screen, not clipped past an edge.
       final chipFinder = find.byKey(
@@ -283,7 +283,7 @@ void main() {
       );
 
       // Same shape as showElectric=false: no EV chip, no 'All'.
-      expect(find.text('Electric ⚡'), findsNothing);
+      expect(find.text('Electric'), findsNothing);
       expect(find.text('All'), findsNothing);
       expect(find.text('Super E5'), findsOneWidget);
       expect(find.text('Diesel'), findsOneWidget);

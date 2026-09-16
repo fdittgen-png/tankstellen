@@ -27,6 +27,7 @@ import '../../providers/search_provider.dart';
 import '../screens/search_criteria_screen.dart';
 import 'results/price_freshness_segment.dart';
 import 'results/summary_chip.dart';
+import '../../../../core/utils/localized_fuel_name.dart';
 
 part 'search_summary_bar_source.dart';
 
@@ -111,7 +112,7 @@ class SearchSummaryBar extends ConsumerWidget {
   /// name the visible code stands for.
   String _fuelTooltip(AppLocalizations l10n, FuelType type) =>
       l10n.searchSummaryFuelTooltip(
-        type == FuelType.all ? l10n.allFuels : type.displayName,
+        type == FuelType.all ? l10n.allFuels : localizedFuelName(l10n, type),
       );
 
   /// The segment that follows the fuel pill. In nearby mode it shows the

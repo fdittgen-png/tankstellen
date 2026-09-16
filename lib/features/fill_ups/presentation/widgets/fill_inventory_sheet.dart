@@ -15,7 +15,7 @@ import '../../domain/entities/fill_inventory.dart';
 import '../../domain/services/pump_gain_learner.dart';
 import '../../domain/services/tank_level_estimator.dart';
 import '../../providers/tank_level_provider.dart';
-import 'localized_fuel_name.dart';
+import '../../../../core/utils/localized_fuel_name.dart';
 
 /// Show the "Bilan du plein" (#3917) after a FULL fill was saved: the
 /// inventory the tank window established and the calibration outcome

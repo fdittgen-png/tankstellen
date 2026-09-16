@@ -16,6 +16,7 @@ import '../../domain/entities/price_alert.dart';
 import '../../domain/entities/radius_alert.dart';
 import '../../providers/alert_provider.dart';
 import '../../providers/radius_alerts_provider.dart';
+import '../../../../core/utils/localized_fuel_name.dart';
 
 /// Row widgets of the alerts page (#3905 — split out of
 /// `alerts_screen.dart` so [AlertsBody] can be reused by the Favorites
@@ -58,7 +59,8 @@ class AlertListTile extends ConsumerWidget {
           overflow: TextOverflow.ellipsis,
         ),
         subtitle: Text(
-          '${alert.fuelType.displayName} ≤ ${PriceFormatter.formatPrice(alert.targetPrice)}',
+          '${localizedFuelName(l10n, alert.fuelType)} ≤ '
+          '${PriceFormatter.formatPrice(alert.targetPrice)}',
         ),
         // #2117 — platform-adaptive switch glyph.
         trailing: Switch.adaptive(
@@ -118,7 +120,7 @@ class RadiusAlertListTile extends ConsumerWidget {
         ),
         title: Text(alert.label, maxLines: 1, overflow: TextOverflow.ellipsis),
         subtitle: Text(
-          '${FuelType.fromString(alert.fuelType).displayName} ≤ '
+          '${localizedFuelName(l10n, FuelType.fromString(alert.fuelType))} ≤ '
           '${PriceFormatter.formatPrice(alert.threshold)} '
           '· ${alert.radiusKm.round()} km',
         ),

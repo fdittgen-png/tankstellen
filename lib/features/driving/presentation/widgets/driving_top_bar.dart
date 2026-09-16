@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/utils/localized_fuel_name.dart';
 
 /// Top bar of the driving-mode screen — title + active fuel type chip,
 /// over a translucent gradient that fades into the map below.
@@ -57,7 +58,7 @@ class DrivingTopBar extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                selectedFuel.displayName,
+                localizedFuelName(l10n, selectedFuel),
                 // #3994 — labelLarge is the 14 sp role; unlike a literal it
                 // follows the text-size setting.
                 style: theme.textTheme.labelLarge!.copyWith(

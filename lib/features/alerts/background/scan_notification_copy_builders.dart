@@ -28,6 +28,12 @@ VelocityAlertCopy buildVelocityCopy(
   VelocityAlertEvent event,
   BackgroundNotificationTemplates templates,
 ) {
+  // #4283 — still the English name, and it is user-visible inside an
+  // otherwise localized notification. Fixing it here is not a one-liner:
+  // this runs in a background isolate with no BuildContext, so the label
+  // has to come from `lookupAppLocalizations` the way
+  // `BackgroundNotificationTemplates.resolveForLanguage` already does.
+  // Left for the isolate pass rather than half-done here.
   final fuelLabel = event.fuelType.displayName.toUpperCase();
   return VelocityAlertCopy(
     title: templates.renderVelocityTitle(fuelLabel: fuelLabel),

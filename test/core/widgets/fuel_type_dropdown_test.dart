@@ -7,6 +7,8 @@ import 'package:tankstellen/core/widgets/fuel_type_dropdown.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 
 import '../../helpers/pump_app.dart';
+import 'package:tankstellen/core/utils/localized_fuel_name.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 // Every non-wildcard fuel — used to exercise the dropdown without the
 // active-country filter kicking in (#703). Call sites that want the
@@ -15,7 +17,7 @@ final _allFuels = FuelType.values.where((t) => t != FuelType.all).toList();
 
 void main() {
   group('FuelTypeDropdown', () {
-    testWidgets('shows all non-wildcard fuels by displayName', (tester) async {
+    testWidgets('shows all non-wildcard fuels by their localized label', (tester) async {
       await pumpApp(
         tester,
         FuelTypeDropdown(
@@ -27,12 +29,14 @@ void main() {
 
       await tester.tap(find.byType(DropdownButtonFormField<FuelType>));
       await tester.pumpAndSettle();
+      final l10n = AppLocalizations.of(
+          tester.element(find.byType(DropdownButtonFormField<FuelType>)));
 
       for (final f in _allFuels) {
-        expect(find.text(f.displayName), findsWidgets,
-            reason: '${f.displayName} must render with its localized label');
+        expect(find.text(localizedFuelName(l10n, f)), findsWidgets,
+            reason: '${localizedFuelName(l10n, f)} must render with its localized label');
       }
-      expect(find.text(FuelType.all.displayName), findsNothing,
+      expect(find.text(localizedFuelName(l10n, FuelType.all)), findsNothing,
           reason: 'The "all" wildcard must never be pickable as a preference');
     });
 
@@ -49,8 +53,10 @@ void main() {
           options: const [FuelType.e5, FuelType.diesel],
         ),
       );
-      expect(tester.takeException(), isNull);
-      expect(find.text(FuelType.e10.displayName), findsOneWidget,
+
+      final l10n = AppLocalizations.of(
+          tester.element(find.byType(DropdownButtonFormField<FuelType>)));      expect(tester.takeException(), isNull);
+      expect(find.text(localizedFuelName(l10n, FuelType.e10)), findsOneWidget,
           reason: 'the legacy selection must render so the user can '
               'switch to a real grade');
     });
@@ -69,7 +75,9 @@ void main() {
 
       await tester.tap(find.byType(DropdownButtonFormField<FuelType>));
       await tester.pumpAndSettle();
-      await tester.tap(find.text(FuelType.diesel.displayName).last);
+      final l10n = AppLocalizations.of(
+          tester.element(find.byType(DropdownButtonFormField<FuelType>)));
+      await tester.tap(find.text(localizedFuelName(l10n, FuelType.diesel)).last);
       await tester.pumpAndSettle();
 
       expect(picked, FuelType.diesel);
@@ -77,7 +85,7 @@ void main() {
   });
 
   group('NullableFuelTypeDropdown', () {
-    testWidgets('includes a "not set" entry plus all fuels by displayName',
+    testWidgets('includes a "not set" entry plus all fuels by their localized label',
         (tester) async {
       await pumpApp(
         tester,
@@ -90,10 +98,12 @@ void main() {
 
       await tester.tap(find.byType(DropdownButtonFormField<FuelType?>));
       await tester.pumpAndSettle();
+      final l10n = AppLocalizations.of(
+          tester.element(find.byType(DropdownButtonFormField<FuelType?>)));
 
       expect(find.text('Not set'), findsWidgets);
-      expect(find.text(FuelType.e10.displayName), findsWidgets);
-      expect(find.text(FuelType.electric.displayName), findsWidgets);
+      expect(find.text(localizedFuelName(l10n, FuelType.e10)), findsWidgets);
+      expect(find.text(localizedFuelName(l10n, FuelType.electric)), findsWidgets);
     });
 
     testWidgets('options parameter restricts which fuels appear',
@@ -109,10 +119,12 @@ void main() {
 
       await tester.tap(find.byType(DropdownButtonFormField<FuelType?>));
       await tester.pumpAndSettle();
+      final l10n = AppLocalizations.of(
+          tester.element(find.byType(DropdownButtonFormField<FuelType?>)));
 
-      expect(find.text(FuelType.e5.displayName), findsWidgets);
-      expect(find.text(FuelType.diesel.displayName), findsWidgets);
-      expect(find.text(FuelType.electric.displayName), findsNothing,
+      expect(find.text(localizedFuelName(l10n, FuelType.e5)), findsWidgets);
+      expect(find.text(localizedFuelName(l10n, FuelType.diesel)), findsWidgets);
+      expect(find.text(localizedFuelName(l10n, FuelType.electric)), findsNothing,
           reason: 'Restricted list must hide fuels not in [options]');
     });
   });

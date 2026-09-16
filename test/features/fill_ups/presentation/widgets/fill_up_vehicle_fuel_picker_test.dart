@@ -8,6 +8,7 @@ import 'package:tankstellen/features/fill_ups/presentation/widgets/fill_up_vehic
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
+import 'package:tankstellen/core/utils/localized_fuel_name.dart';
 
 /// Widget tests for [FillUpVehicleFuelPicker] (#713 / #563 extraction).
 ///
@@ -77,21 +78,23 @@ void main() {
       fuelType: FuelType.e10,
     );
     await tester.pumpAndSettle();
+    final l10n = AppLocalizations.of(
+        tester.element(find.byType(DropdownButtonFormField<FuelType>)));
 
     await tester.tap(find.byType(DropdownButtonFormField<FuelType>));
     await tester.pumpAndSettle();
 
     // Petrol family — the four interchangeable petrol grades all show.
-    expect(find.text(FuelType.e10.displayName), findsWidgets);
-    expect(find.text(FuelType.e5.displayName), findsWidgets);
-    expect(find.text(FuelType.e98.displayName), findsWidgets);
-    expect(find.text(FuelType.e85.displayName), findsWidgets);
+    expect(find.text(localizedFuelName(l10n, FuelType.e10)), findsWidgets);
+    expect(find.text(localizedFuelName(l10n, FuelType.e5)), findsWidgets);
+    expect(find.text(localizedFuelName(l10n, FuelType.e98)), findsWidgets);
+    expect(find.text(localizedFuelName(l10n, FuelType.e85)), findsWidgets);
 
     // Cross-family options must NOT appear — guarding against the
     // pre-#713 behaviour where the picker offered every fuel.
-    expect(find.text(FuelType.diesel.displayName), findsNothing);
-    expect(find.text(FuelType.electric.displayName), findsNothing);
-    expect(find.text(FuelType.lpg.displayName), findsNothing);
+    expect(find.text(localizedFuelName(l10n, FuelType.diesel)), findsNothing);
+    expect(find.text(localizedFuelName(l10n, FuelType.electric)), findsNothing);
+    expect(find.text(localizedFuelName(l10n, FuelType.lpg)), findsNothing);
   });
 
   testWidgets(
@@ -104,17 +107,19 @@ void main() {
       fuelType: FuelType.diesel,
     );
     await tester.pumpAndSettle();
+    final l10n = AppLocalizations.of(
+        tester.element(find.byType(DropdownButtonFormField<FuelType>)));
 
     await tester.tap(find.byType(DropdownButtonFormField<FuelType>));
     await tester.pumpAndSettle();
 
-    expect(find.text(FuelType.diesel.displayName), findsWidgets);
-    expect(find.text(FuelType.dieselPremium.displayName), findsWidgets);
+    expect(find.text(localizedFuelName(l10n, FuelType.diesel)), findsWidgets);
+    expect(find.text(localizedFuelName(l10n, FuelType.dieselPremium)), findsWidgets);
 
     // Petrol options must NOT appear on a diesel — physically incompatible.
-    expect(find.text(FuelType.e10.displayName), findsNothing);
-    expect(find.text(FuelType.e85.displayName), findsNothing);
-    expect(find.text(FuelType.electric.displayName), findsNothing);
+    expect(find.text(localizedFuelName(l10n, FuelType.e10)), findsNothing);
+    expect(find.text(localizedFuelName(l10n, FuelType.e85)), findsNothing);
+    expect(find.text(localizedFuelName(l10n, FuelType.electric)), findsNothing);
   });
 
   testWidgets(
@@ -126,13 +131,15 @@ void main() {
       fuelType: FuelType.electric,
     );
     await tester.pumpAndSettle();
+    final l10n = AppLocalizations.of(
+        tester.element(find.byType(DropdownButtonFormField<FuelType>)));
 
     await tester.tap(find.byType(DropdownButtonFormField<FuelType>));
     await tester.pumpAndSettle();
 
-    expect(find.text(FuelType.electric.displayName), findsWidgets);
-    expect(find.text(FuelType.diesel.displayName), findsNothing);
-    expect(find.text(FuelType.e10.displayName), findsNothing);
+    expect(find.text(localizedFuelName(l10n, FuelType.electric)), findsWidgets);
+    expect(find.text(localizedFuelName(l10n, FuelType.diesel)), findsNothing);
+    expect(find.text(localizedFuelName(l10n, FuelType.e10)), findsNothing);
   });
 
   testWidgets(
@@ -174,10 +181,12 @@ void main() {
       onChanged: (f) => picked = f,
     );
     await tester.pumpAndSettle();
+    final l10n = AppLocalizations.of(
+        tester.element(find.byType(DropdownButtonFormField<FuelType>)));
 
     await tester.tap(find.byType(DropdownButtonFormField<FuelType>));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(FuelType.e85.displayName).last);
+    await tester.tap(find.text(localizedFuelName(l10n, FuelType.e85)).last);
     await tester.pumpAndSettle();
 
     expect(picked, FuelType.e85,

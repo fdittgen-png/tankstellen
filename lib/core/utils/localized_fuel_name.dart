@@ -1,10 +1,16 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../../../l10n/app_localizations.dart';
-import '../../../../core/domain/fuel_type.dart';
+import '../../l10n/app_localizations.dart';
+import '../domain/fuel_type.dart';
 
 /// ARB-localized display name for a [FuelType] (#2887, Epic #2881).
+///
+/// Lives in `core/` because `core/widgets/fuel_type_dropdown.dart` needs
+/// it and `core -> feature` is the one boundary the ratchet holds at
+/// zero — "the api.dart barrel does not excuse it" (#3129). It was in
+/// `fill_ups/presentation/widgets/` while only that feature used it;
+/// #4283 made it the label for every fuel surface in the app.
 ///
 /// Distinct from the non-localized [FuelType.displayName] (which carries
 /// hard-coded English/French strings like "Super E5" / "GPL / LPG") and

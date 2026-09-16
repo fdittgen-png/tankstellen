@@ -19,6 +19,7 @@ import '../../../../core/domain/station.dart';
 import 'proximity_fill_bar.dart';
 import 'radar_swipe_wrapper.dart';
 import '../../../../core/widgets/panel_card.dart';
+import '../../../../core/utils/localized_fuel_name.dart';
 
 /// "Closest station" radar card pinned to the TOP of the active
 /// trip-recording column (#2380).
@@ -225,7 +226,7 @@ class RadarCard extends StatelessWidget {
         ? null
         : l.stationUpdatedLabel(updated);
     final subtitleParts = <String>[
-      fuel.displayName,
+      localizedFuelName(l, fuel),
       ?distanceLabel,
       ?updatedLabel,
     ];

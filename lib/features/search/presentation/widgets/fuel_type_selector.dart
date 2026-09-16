@@ -17,6 +17,7 @@ import '../../../../core/services/country_service_registry.dart'
     show fuelTypesForCountry;
 import '../../providers/search_provider.dart';
 import 'criteria/criteria_chip_group.dart';
+import '../../../../core/utils/localized_fuel_name.dart';
 
 class FuelTypeSelector extends ConsumerWidget {
   const FuelTypeSelector({super.key});
@@ -92,7 +93,7 @@ class FuelTypeSelector extends ConsumerWidget {
     // Localize "All" for display — other types use their canonical names
     final label = type == FuelType.all
         ? (AppLocalizations.of(context).allFuels)
-        : type.displayName;
+        : localizedFuelName(AppLocalizations.of(context), type);
     return Semantics(
       label: AppLocalizations.of(
         context,
