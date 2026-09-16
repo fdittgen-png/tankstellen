@@ -23,6 +23,14 @@ const TripSummary kEmptyTripSummary = TripSummary(
   harshAccelerations: 0,
 );
 
+/// Whether [ctl] has stopped — the WAL must then write nothing (#4311):
+/// its trip is being, or has been, saved to history, and a row written now
+/// would outlive that save. A kill would then relaunch onto a row naming
+/// an already-finalised trip, or (before #4311) discard a trip that was
+/// still waiting on its history write.
+bool controllerHasStopped(TripRecordingController ctl) =>
+    ctl.currentState == TripRecordingControllerState.stopped;
+
 String phaseStringForController(TripRecordingController ctl) =>
     // #4243 — one vocabulary, shared with the reader.
     recordingPhaseToWire(ctl.currentState);

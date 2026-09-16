@@ -369,7 +369,9 @@ void main() {
     // #4162 — 1403 → 1384: the no-movement discard log joined its guard and
     // the empty WAL-seed summary became a shared constant, paying for the
     // one publish funnel every state write now walks through.
-    'lib/features/trips/providers/trip_recording_provider.dart': 1384,
+    // #4311 — 1384 → 1382: the WAL's stopped-controller guard is a pure
+    // controller read in active_snapshot_from_controller.dart.
+    'lib/features/trips/providers/trip_recording_provider.dart': 1382,
     // #4037 — 1 032 across 5 files → 756 across 3: the pin/wake-lock
     // state became an owned collaborator and the body a plain widget.
     'lib/features/trips/presentation/screens/trip_recording_screen.dart': 756,

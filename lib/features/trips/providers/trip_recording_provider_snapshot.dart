@@ -139,9 +139,6 @@ mixin _TripRecordingSnapshot on _$TripRecording, _TripRecordingCore {
     );
   }
 
-  /// Map the controller's enum to the string the snapshot
-  /// serialises. Centralised so the recovery service doesn't have
-  /// to translate enum names — both sides agree on the wire format.
   /// Cheap gate called from the live-stream listener. Promotes to
   /// a real flush when either the time threshold or the sample
   /// threshold is crossed.
@@ -173,8 +170,7 @@ mixin _TripRecordingSnapshot on _$TripRecording, _TripRecordingCore {
     // makes the intent at the call site obvious without changing
     // behaviour.
     final ctl = _obd2?.controller;
-    if (!force && ctl == null) return;
-    if (ctl == null) return;
+    if (ctl == null || controllerHasStopped(ctl)) return; // #4311
     final repo = _resolveActiveRepo();
     if (repo == null) return;
     final next = _buildSnapshotFor(ctl);
