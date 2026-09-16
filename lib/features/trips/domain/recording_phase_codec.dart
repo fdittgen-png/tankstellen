@@ -23,6 +23,17 @@
 /// has to resume. So `toWire(degradedGpsOnly) == 'recording'` and
 /// `fromWire('recording') == recording`: the asymmetry is the behaviour,
 /// not a bug to fix.
+///
+/// ## The WAL invariant (#4162)
+///
+/// **A WAL row exists ⟺ its trip is not yet in history.** The row is
+/// cleared only once the trip's history write has landed, and that clear
+/// is the ONLY terminal marker a recovery may trust: a row on disk after
+/// a process death is a trip to hand back to the user, whatever phase it
+/// names. [isTerminalRecordingPhase] still reads `'stopped'` as terminal,
+/// for rows written before this rule — but a writer that persists
+/// `'stopped'` ahead of its history write (#4311) makes a kill in that
+/// window discard the trip.
 library;
 
 import '../../obd2/api.dart';

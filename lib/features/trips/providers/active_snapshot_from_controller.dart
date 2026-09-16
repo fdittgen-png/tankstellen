@@ -12,6 +12,17 @@ import '../domain/trip_recorder.dart';
 // notifier state — they are functions of the controller alone, so they are
 // a library of their own and testable without building a notifier.
 
+/// The summary of a trip nothing has been recorded for yet — the WAL
+/// seed's, and a controller's before its first captured sample.
+const TripSummary kEmptyTripSummary = TripSummary(
+  distanceKm: 0,
+  maxRpm: 0,
+  highRpmSeconds: 0,
+  idleSeconds: 0,
+  harshBrakes: 0,
+  harshAccelerations: 0,
+);
+
 String phaseStringForController(TripRecordingController ctl) =>
     // #4243 — one vocabulary, shared with the reader.
     recordingPhaseToWire(ctl.currentState);
@@ -29,16 +40,7 @@ TripSummary summaryFromController(TripRecordingController ctl) {
   // recorder snapshot; deferred until recovery acquires a richer preview.
   final first = ctl.firstCapturedAt;
   final last = ctl.latestSample?.timestamp;
-  if (first == null || last == null) {
-    return const TripSummary(
-      distanceKm: 0,
-      maxRpm: 0,
-      highRpmSeconds: 0,
-      idleSeconds: 0,
-      harshBrakes: 0,
-      harshAccelerations: 0,
-    );
-  }
+  if (first == null || last == null) return kEmptyTripSummary;
   // #3741 — incremental running max; the old whole-buffer loop was
   // O(n) per 5 s flush (O(n²) over a drive) on the gauge isolate.
   final maxRpm = ctl.maxCapturedRpm;

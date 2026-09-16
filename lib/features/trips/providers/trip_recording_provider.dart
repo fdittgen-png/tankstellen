@@ -43,6 +43,7 @@ import 'trip_haptic_controller.dart';
 import 'trip_oem_fuel_level_controller.dart';
 import 'trip_history_provider.dart';
 import 'trip_recording_phase.dart';
+import 'trip_recording_phase_gate.dart';
 import 'trip_recording_state.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/logging/app_log.dart';
@@ -110,7 +111,7 @@ class TripRecording extends _$TripRecording
   /// controller exposes to its [DroppedSessionHost] (#2188).
   TripRecordingState _stateForPipeline() => state;
   void _setStateFromPipeline(TripRecordingState value) {
-    state = value;
+    _publish(value, 'pipeline'); // #4162 — the pipelines' one door
   }
 
   /// Standalone entry point for starting a trajet (#888).

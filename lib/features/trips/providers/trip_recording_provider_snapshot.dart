@@ -96,14 +96,7 @@ mixin _TripRecordingSnapshot on _$TripRecording, _TripRecordingCore {
       vin: ctl.vin,
       automatic: _lastTrip.automatic, // #3251 — auto-record provenance
       phase: 'recording',
-      summary: const TripSummary(
-        distanceKm: 0,
-        maxRpm: 0,
-        highRpmSeconds: 0,
-        idleSeconds: 0,
-        harshBrakes: 0,
-        harshAccelerations: 0,
-      ),
+      summary: kEmptyTripSummary,
       samples: const [],
       odometerStartKm: ctl.odometerStartKm,
       odometerLatestKm: ctl.odometerLatestKm,
@@ -266,9 +259,9 @@ mixin _TripRecordingSnapshot on _$TripRecording, _TripRecordingCore {
       vehicleId: snapshot.vehicleId,
       startedAt: snapshot.startedAt,
     );
-    state = state.copyWith(
+    _publish(state.copyWith(
       phase: TripRecordingPhase.pausedDueToDrop,
-    );
+    ), 'restoreFromSnapshot');
     return true;
   }
 }

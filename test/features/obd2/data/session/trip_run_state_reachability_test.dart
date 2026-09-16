@@ -1,240 +1,191 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-/// #4162 — which recording states are actually reachable, written down.
+/// #4162 — which recording flag combinations are actually reachable,
+/// written down and proven.
 ///
-/// `TripRunState` carries five booleans: 32 combinations. #4034 already
-/// gave them one owner and made each transition atomic, which is the
-/// half that matters most. The half that was missing is the one #4162
-/// names:
+/// `TripRunState` carries five booleans: 32 combinations. The previous
+/// version of this test could not fail — its "closure" reset every state
+/// through raw setters, so it explored combinations no caller can make,
+/// and it asserted only that a total function returned an enum value. Its
+/// "kill" called `end()`, which a kill never does.
 ///
-/// > Every impossible combination is a bug waiting for the right
-/// > interruption — and the OS provides interruptions on its own
-/// > schedule, which is why these only ever reproduce in the field.
-///
-/// So this drives every transition from every state reachable from
-/// `idle`, and asserts the flags never land outside the documented set.
-/// Exhaustive rather than illustrative: the point is the combinations
-/// nobody thought of.
-///
-/// **No behaviour change is intended.** These tests describe what the
-/// code already does; a failure means either a real unreachable state or
-/// a transition that changed meaning.
+/// This walk uses only the transitions production performs, each behind
+/// the guard its real caller applies (named on every entry), so the set it
+/// finds IS the reachable set. It must be exactly eight tuples.
 library;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/data/session/trip_run_state.dart';
 
-/// The flag tuple, for comparing states without caring about identity.
-({bool started, bool stopped, bool paused, bool drop, bool degraded})
-    snapshot(TripRunState s) => (
-          started: s.started,
-          stopped: s.stopped,
-          paused: s.paused,
-          drop: s.pausedDueToDrop,
-          degraded: s.degradedGpsOnly,
-        );
+/// (started, stopped, paused, drop, degraded) as a 5-character bit string.
+String bits(TripRunState s) => [
+      s.started,
+      s.stopped,
+      s.paused,
+      s.pausedDueToDrop,
+      s.degradedGpsOnly,
+    ].map((b) => b ? '1' : '0').join();
 
-/// Every transition the type exposes, by name, so a failure says which.
-final Map<String, void Function(TripRunState)> transitions = {
-  'begin': (s) => s.begin(),
-  'end': (s) => s.end(),
-  'pauseByUser': (s) => s.pauseByUser(),
-  'clearUserPause': (s) => s.clearUserPause(),
-  'clearDropPause': (s) => s.clearDropPause(),
-  'setPausedDueToDrop(true)': (s) => s.setPausedDueToDrop(true),
-  'setPausedDueToDrop(false)': (s) => s.setPausedDueToDrop(false),
-  'setDegradedGpsOnly(true)': (s) => s.setDegradedGpsOnly(true),
-  'setDegradedGpsOnly(false)': (s) => s.setDegradedGpsOnly(false),
+/// Every way production moves the flags, with its caller's guard.
+final Map<String, void Function(TripRunState)> realTransitions = {
+  // TripRecordingController.start: `if (_run.started) return;`
+  'start': (s) {
+    if (!s.started) s.begin();
+  },
+  // .start with the engine off at start (#3858): begin, then the
+  // engine-off wait sets the degrade.
+  'start engine-off': (s) {
+    if (s.started) return;
+    s
+      ..begin()
+      ..setDegradedGpsOnly(true);
+  },
+  // .stop — unconditional.
+  'stop': (s) => s.end(),
+  // .pause → TripRunState.pauseByUser (its own guard).
+  'pause': (s) => s.pauseByUser(),
+  // .resume: `if (!_run.isPaused) return;` then clears the drop, then the
+  // user pause.
+  'resume': (s) {
+    if (!s.isPaused) return;
+    if (s.pausedDueToDrop) s.clearDropPause();
+    s.clearUserPause();
+  },
+  // DroppedSessionManager.handleDrop, GPS alive (#2565): returns while
+  // dropped or degraded; drops are only detected on a running loop.
+  'drop, GPS alive → degrade': (s) {
+    if (!s.started || s.pausedDueToDrop || s.degradedGpsOnly) return;
+    s.setDegradedGpsOnly(true);
+  },
+  // .handleDrop, GPS dead → _enterVisibleDrop (directly, or after the
+  // #1904 silent window — whose escalation also refuses when stopped).
+  'drop, GPS dead → pause': (s) {
+    if (!s.started || s.pausedDueToDrop || s.degradedGpsOnly) return;
+    s.setPausedDueToDrop(true);
+  },
+  // .escalateDegradedToPaused: GPS died too.
+  'degraded, GPS dies → pause': (s) {
+    if (!s.degradedGpsOnly || s.stopped) return;
+    s
+      ..setDegradedGpsOnly(false)
+      ..setPausedDueToDrop(true);
+  },
+  // .onEngineData (#4196) / .onEngineRunning(linkAlive) (#3859).
+  'engine data returns → leave degrade': (s) {
+    if (s.stopped || !s.degradedGpsOnly) return;
+    s.setDegradedGpsOnly(false);
+  },
+  // ._onGraceWindowElapsed: `if (!_host.pausedDueToDrop) return;`
+  'grace window expires': (s) {
+    if (s.pausedDueToDrop) s.end();
+  },
+  // .finaliseParked (#3862): `if (_host.stopped) return;`
+  'parked auto-finalise': (s) {
+    if (!s.stopped) s.end();
+  },
 };
 
+/// Replays [path] from a fresh state.
+TripRunState replay(List<String> path) {
+  final s = TripRunState();
+  for (final step in path) {
+    realTransitions[step]!(s);
+  }
+  return s;
+}
+
+/// Breadth-first over real transitions: every reachable tuple, with the
+/// shortest path that reaches it.
+Map<String, List<String>> reachable() {
+  final found = <String, List<String>>{bits(TripRunState()): const []};
+  final queue = <List<String>>[const []];
+  while (queue.isNotEmpty) {
+    final path = queue.removeAt(0);
+    for (final step in realTransitions.keys) {
+      final next = [...path, step];
+      final key = bits(replay(next));
+      if (found.containsKey(key)) continue;
+      found[key] = next;
+      queue.add(next);
+    }
+  }
+  return found;
+}
+
+TripRunPhase phaseOfBits(String b) => tripRunPhaseOf(
+      started: b[0] == '1',
+      stopped: b[1] == '1',
+      paused: b[2] == '1',
+      pausedDueToDrop: b[3] == '1',
+      degradedGpsOnly: b[4] == '1',
+    );
+
 void main() {
-  group('the six reachable states', () {
-    test('a fresh run is idle', () {
-      expect(TripRunState().phase, TripRunPhase.idle);
-    });
+  final found = reachable();
 
-    test('begin → running', () {
-      final s = TripRunState()..begin();
-      expect(s.phase, TripRunPhase.running);
-      expect(s.isRecording, isTrue);
-    });
-
-    test('a user pause is resumable and stops sampling', () {
-      final s = TripRunState()..begin();
-      expect(s.pauseByUser(), isTrue);
-      expect(s.phase, TripRunPhase.pausedByUser);
-      expect(s.isRecording, isFalse);
-      s.clearUserPause();
-      expect(s.phase, TripRunPhase.running);
-    });
-
-    test('a drop pause is a different state from a user pause', () {
-      // They resume differently — the user clears one, the link
-      // returning clears the other — so collapsing them loses the
-      // difference that decides who may resume.
-      final s = TripRunState()
-        ..begin()
-        ..setPausedDueToDrop(true);
-      expect(s.phase, TripRunPhase.pausedByDrop);
-      expect(s.isPaused, isTrue);
-    });
-
-    test('#2565 degraded is ACTIVE, and outranks a drop pause', () {
-      final s = TripRunState()
-        ..begin()
-        ..setPausedDueToDrop(true)
-        ..setDegradedGpsOnly(true);
-      expect(s.phase, TripRunPhase.degradedGpsOnly);
-      expect(s.isRecording, isTrue,
-          reason: 'recording continues on GPS alone — it is not a pause');
-    });
-
-    test('end → finished, and finished outranks everything', () {
-      // An auto-finalised drop leaves `stopped` true and `started`
-      // false, which is why a state read must check stopped FIRST.
-      final s = TripRunState()
-        ..begin()
-        ..setPausedDueToDrop(true)
-        ..setDegradedGpsOnly(true)
-        ..end();
-      expect(s.phase, TripRunPhase.finished);
-      expect(s.isRecording, isFalse);
-      expect(s.isPaused, isFalse,
-          reason: '#4068 — a user pause must not outlive the trip');
-    });
+  test('exactly eight flag tuples are reachable', () {
+    expect(found.keys.toSet(), {
+      '00000', // idle
+      '10000', // running
+      '10100', // paused by the user
+      '10010', // paused by a drop
+      '10001', // degraded onto GPS
+      '01000', // finished
+      '10101', // a user pause taken while degraded
+      '10110', // a drop escalating under a user pause (#1904 window)
+    }, reason: 'paths: $found');
   });
 
-  group('no transition reaches an undocumented state', () {
-    test('the closure of every transition from idle stays in the enum',
-        () {
-      // Breadth-first over the whole reachable graph. Every state
-      // discovered must map to one of the six; a combination that maps
-      // to none is exactly the "bug waiting for the right interruption".
-      final seen = <String>{};
-      final queue = <TripRunState>[TripRunState()];
-      final reached = <TripRunPhase>{};
-
-      while (queue.isNotEmpty) {
-        final current = queue.removeLast();
-        final key = snapshot(current).toString();
-        if (!seen.add(key)) continue;
-        reached.add(current.phase);
-
-        for (final entry in transitions.entries) {
-          final next = TripRunState()
-            ..setStarted(current.started)
-            ..setStopped(current.stopped)
-            ..setPausedDueToDrop(current.pausedDueToDrop)
-            ..setDegradedGpsOnly(current.degradedGpsOnly);
-          if (current.paused) {
-            next.begin();
-            next.pauseByUser();
-            next
-              ..setStarted(current.started)
-              ..setStopped(current.stopped)
-              ..setPausedDueToDrop(current.pausedDueToDrop)
-              ..setDegradedGpsOnly(current.degradedGpsOnly);
-          }
-          entry.value(next);
-          queue.add(next);
-        }
+  test('a drop pause and a degrade never coexist, and a finished or '
+      'unstarted trip carries no pause or degrade', () {
+    for (final b in found.keys) {
+      expect(b[3] == '1' && b[4] == '1', isFalse, reason: b);
+      if (b[0] == '0') {
+        expect(b.substring(2), '000', reason: '$b via ${found[b]}');
       }
-
-      // 32 combinations exist; far fewer are reachable, and every one
-      // that is reachable has a name.
-      expect(seen.length, lessThan(32),
-          reason: 'if every combination is reachable, the flags carry no '
-              'invariant at all');
-      expect(reached, isNotEmpty);
-      for (final p in reached) {
-        expect(TripRunPhase.values, contains(p));
-      }
-    });
-
-    test('`phase` is total — every combination maps somewhere', () {
-      // The other direction: even a state the transitions cannot
-      // produce must not crash a reader. A recording tile that throws
-      // because the OS restored a combination nobody expected is the
-      // failure mode this issue is about.
-      for (var bits = 0; bits < 32; bits++) {
-        final s = TripRunState()
-          ..setStarted(bits & 1 != 0)
-          ..setStopped(bits & 2 != 0)
-          ..setPausedDueToDrop(bits & 8 != 0)
-          ..setDegradedGpsOnly(bits & 16 != 0);
-        if (bits & 4 != 0) {
-          s.begin();
-          s.pauseByUser();
-          s
-            ..setStarted(bits & 1 != 0)
-            ..setStopped(bits & 2 != 0)
-            ..setPausedDueToDrop(bits & 8 != 0)
-            ..setDegradedGpsOnly(bits & 16 != 0);
-        }
-        expect(() => s.phase, returnsNormally, reason: 'bits=$bits');
-        expect(TripRunPhase.values, contains(s.phase), reason: 'bits=$bits');
-      }
-    });
+    }
   });
 
-  group('the interruptions the OS actually performs', () {
-    test('KILL mid-trip: end() from any active state finalises cleanly',
-        () {
-      for (final setup in <void Function(TripRunState)>[
-        (s) => s.begin(),
-        (s) => s..begin()..pauseByUser(),
-        (s) => s..begin()..setPausedDueToDrop(true),
-        (s) => s..begin()..setDegradedGpsOnly(true),
-      ]) {
-        final s = TripRunState();
-        setup(s);
-        s.end();
-        expect(s.phase, TripRunPhase.finished);
-        expect(s.isRecording, isFalse);
-        expect(s.isPaused, isFalse);
-      }
-    });
+  test('every reachable tuple has a name, and the name is what the UI '
+      'shows', () {
+    const expected = {
+      '00000': TripRunPhase.idle,
+      '10000': TripRunPhase.running,
+      '10100': TripRunPhase.pausedByUser,
+      '10010': TripRunPhase.pausedByDrop,
+      '10001': TripRunPhase.degradedGpsOnly,
+      '01000': TripRunPhase.finished,
+      // The pauses outrank the degrade: no samples flow during a user
+      // pause, so this must not read as recording (#4162 — the enum used
+      // to disagree with the controller's currentState here).
+      '10101': TripRunPhase.pausedByUser,
+      '10110': TripRunPhase.pausedByDrop,
+    };
+    for (final e in found.entries) {
+      final s = replay(e.value);
+      expect(s.phase, expected[e.key], reason: '${e.key} via ${e.value}');
+      expect(
+        s.isRecording,
+        s.phase == TripRunPhase.running ||
+            s.phase == TripRunPhase.degradedGpsOnly,
+        reason: e.key,
+      );
+    }
+  });
 
-    test('RESTART: begin() after end() is never "stopped and started"',
-        () {
-      final s = TripRunState()
-        ..begin()
-        ..end()
-        ..begin();
-      expect(s.phase, TripRunPhase.running);
-      expect(s.stopped, isFalse,
-          reason: 'a restart seen as both would make every downstream '
-              'read pick whichever it checked first');
-    });
+  test('the phase function is total over all 32 combinations', () {
+    for (var n = 0; n < 32; n++) {
+      final b = n.toRadixString(2).padLeft(5, '0');
+      expect(() => phaseOfBits(b), returnsNormally, reason: b);
+    }
+    // finished outranks everything, even combinations no caller makes.
+    expect(phaseOfBits('11111'), TripRunPhase.finished);
+    expect(phaseOfBits('00111'), TripRunPhase.idle);
+  });
 
-    test('LINK DROP then RETURN walks back to running', () {
-      final s = TripRunState()..begin();
-      s.setPausedDueToDrop(true);
-      expect(s.phase, TripRunPhase.pausedByDrop);
-      s.clearDropPause();
-      expect(s.phase, TripRunPhase.running);
-    });
-
-    test('DEGRADE then GPS DIES becomes a drop pause, not a stop', () {
-      // #2565's escalation path: GPS-only is active until GPS goes too.
-      final s = TripRunState()
-        ..begin()
-        ..setDegradedGpsOnly(true);
-      expect(s.phase, TripRunPhase.degradedGpsOnly);
-      s
-        ..setDegradedGpsOnly(false)
-        ..setPausedDueToDrop(true);
-      expect(s.phase, TripRunPhase.pausedByDrop);
-      expect(s.isRecording, isFalse);
-    });
-
-    test('a pause cannot be taken twice, or before the trip starts', () {
-      expect(TripRunState().pauseByUser(), isFalse,
-          reason: 'pausing a trip that never began');
-      final s = TripRunState()..begin();
-      expect(s.pauseByUser(), isTrue);
-      expect(s.pauseByUser(), isFalse, reason: 'already paused');
-    });
+  test('RESTART after a finish is never "stopped and started at once"', () {
+    final s = replay(['start', 'stop', 'start']);
+    expect(bits(s), '10000');
   });
 }

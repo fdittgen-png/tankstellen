@@ -349,7 +349,9 @@ void main() {
     // accumulator) and the gear-coaching metric became a pure function.
     // No private field is written from more than one file any more.
     // #4068 — 2483 → 2481: the two dead `stopped`/`started` setters left the drop-host adapter; one `finalise()` forwarder replaced them.
-    'lib/features/obd2/data/session/trip_recording_controller.dart': 2481,
+    // #4162 — 2481 → 2476: `currentState` is a projection of the run
+    // state's one documented precedence instead of a second if-chain.
+    'lib/features/obd2/data/session/trip_recording_controller.dart': 2476,
     // #4035 — 1 541 → 1 517: the pure ELM AT grammar (the `ATI` command,
     // the firmware-string parse, the reset-command test) left the library.
     // #4315 — 1 517 → 1 368: the dead pull fuel-rate entry point, the
@@ -364,7 +366,10 @@ void main() {
     // #4036 — 1 466 → 1 403: the last-trip identity and the pipeline
     // selection became owned collaborators, and the WAL snapshot's two
     // pure controller reads a library of their own.
-    'lib/features/trips/providers/trip_recording_provider.dart': 1403,
+    // #4162 — 1403 → 1384: the no-movement discard log joined its guard and
+    // the empty WAL-seed summary became a shared constant, paying for the
+    // one publish funnel every state write now walks through.
+    'lib/features/trips/providers/trip_recording_provider.dart': 1384,
     // #4037 — 1 032 across 5 files → 756 across 3: the pin/wake-lock
     // state became an owned collaborator and the body a plain widget.
     'lib/features/trips/presentation/screens/trip_recording_screen.dart': 756,
